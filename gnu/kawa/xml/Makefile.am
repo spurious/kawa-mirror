@@ -24,6 +24,11 @@ java_sources = \
   HttpPrinter.java \
   IntersectNodes.java \
   IteratorItems.java \
+  KAttr.java \
+  KDocument.java \
+  KElement.java \
+  KNode.java \
+  KText.java \
   ListItems.java \
   MakeResponseHeader.java \
   MakeUnescapedData.java \

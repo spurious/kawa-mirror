@@ -1,3 +1,12 @@
+2004-01-03  Per Bothner  <per@bothner.com>
+
+	* KNode.java:  New class, extends SeqPosition, implements Node.
+	* KText.java:  New class, extends KNode, implements Text.
+	* KAttr.java:  New class, extends KNode, implements Attr.
+	* KDocument.java:  New class, extends KNode, implements Document.
+	* KElement.java:  New class, extends KNode, implements Element.
+	* Makefile.am (java_sources):  Add new files.
+
 2003-12-24  Per Bothner  <per@bothner.com>
 
 	* AttributeConstructor.java (setQName):  New method.

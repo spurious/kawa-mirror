@@ -1,3 +1,8 @@
+2000-10-02  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (allocFields):  If decl.field is already set (e.g.
+	by a require), don't allocate a field.
+
 2000-08-23  Daniel Bonniot <bonniot@cma.ensmp.fr>
 
 	* SetExp.java (compile):  Handle more cases of needValue.

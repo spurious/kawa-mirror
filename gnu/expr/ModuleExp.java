@@ -68,7 +68,7 @@ public class ModuleExp extends LambdaExp
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.isSimple() && ! decl.isPublic())
+	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
 	  continue;
 	if (decl instanceof kawa.lang.Macro
 	    && ((kawa.lang.Macro) decl).expander instanceof LambdaExp

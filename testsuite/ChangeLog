@@ -1,3 +1,9 @@
+Sun Dec 15 22:37:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* num-test.scm:  Fix typo.
+	* test.scm:  Add set! fail-expected where needed.
+	Remove newline to fix one test.
+
 Fri Dec 13 17:04:54 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	New directory - for test suites for Kawa.

@@ -26,8 +26,7 @@
 ;;; send corrections or additions to jaffer@ai.mit.edu or
 ;;; Aubrey Jaffer, 84 Pleasant St., Wakefield MA 01880, USA
 
-(TEST-INIT "scm-test")
-(define errs '())
+(TEST-INIT "scm-test")(define errs '())
 
 ;(define test
 ;  (lambda (expect fun . args)
@@ -554,11 +553,17 @@
 (test #f string->number "D")
 (test #f string->number "i")
 (test #f string->number "I")
+(set! fail-expected "imaginary literal")
 (test #f string->number "3i")
+(set! fail-expected "imaginary literal")
 (test #f string->number "3I")
+(set! fail-expected "imaginary literal")
 (test #f string->number "33i")
+(set! fail-expected "imaginary literal")
 (test #f string->number "33I")
+(set! fail-expected "imaginary literal")
 (test #f string->number "3.3i")
+(set! fail-expected "imaginary literal")
 (test #f string->number "3.3I")
 (test #f string->number "-")
 (test #f string->number "+")

@@ -1,7 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
 import java.io.*;
-import gnu.bytecode.ZipArchive;
 import gnu.bytecode.ZipLoader;
 
 public class load extends Procedure1 {
@@ -50,8 +49,7 @@ public class load extends Procedure1 {
 	  throw new GenericError ("load: "+name+" - not found");
 	if (!zfile.canRead ())
 	  throw new GenericError ("load: "+name+" - not readable");
-	ZipArchive zar = new ZipArchive (name, "r");
-	ZipLoader loader = new ZipLoader (zar);
+	ZipLoader loader = new ZipLoader (name);
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	return ((ModuleBody) clas.newInstance ()).run (env);
       }

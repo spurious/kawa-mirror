@@ -168,6 +168,7 @@ values_v.class \
 call_with_values.class \
 make_quantity.class quantity2number.class quantity2unit.class \
 make_future.class sleep.class \
+try_finally.class \
 error.class \
 Scheme.class \
 null_env.class \

@@ -10,6 +10,11 @@ public class Scheme extends Interpreter
     return env;
   }
 
+  public static void setEnvironment (Environment environ)
+  {
+    env = environ;
+  }
+
   public void define(String sym, Object p)
   {
     env.define (sym, p);
@@ -357,6 +362,7 @@ public class Scheme extends Interpreter
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
       define_proc ("null-environment", "kawa.standard.null_env");
       define_proc ("interaction-environment", "kawa.standard.user_env");
+      define_proc ("dynamic-wind", "kawa.lib.syntax");
 
       user_environment = new Environment (r5_environment);
       user_environment.setName ("interaction-environment");
@@ -383,6 +389,7 @@ public class Scheme extends Interpreter
       define("primitive-interface-method", new kawa.standard.prim_method(185));
       define("primitive-constructor", new kawa.standard.prim_method(183));
       define("primitive-op1", new kawa.standard.prim_method());
+      define_syntax("try-finally", "kawa.standard.try_finally");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -403,10 +410,9 @@ public class Scheme extends Interpreter
       define_proc ("record-type-field-names", "kawa.lib.reflection");
       define_proc ("record?", "kawa.lib.reflection");
 
-      //-- (when cond exp ...)
-      define_syntax ("when", "kawa.lib.syntax");
-      //-- (unless cond exp ...)
-      define_syntax ("unless", "kawa.lib.syntax");
+      define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
+      define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
+      define_syntax ("fluid-let", "kawa.lib.syntax");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");

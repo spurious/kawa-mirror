@@ -1,3 +1,17 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* Environment.java: Implement Externalizable.
+	(writeExternal, readExternal, readResolve):  New methods.
+
+	* Environment.java (envTable. EmptyNamespace):  New static fields.
+	(getInstance):  New method.
+	(<init>):  New constructor.
+
+	* Symbol.java (getNamespaceURI, getLocalName, make):  New methods.
+	(<init>):  Set constraint for uninterned Symbol.
+	(readExternal):  Set constraint even for uninterned Symbol.
+	Intern name if non-null.
+
 2002-10-28  Per Bothner  <bothner@bothner.com>
 
 	* Binding.java:  Renamed to Symbol.java.

@@ -9,6 +9,27 @@ import java.io.*;
 public class Symbol extends Location implements Externalizable
     // implements java.util.Map.Entry
 {
+  public final String getNamespaceURI()
+  {
+    Environment env = getEnvironment();
+    return env == null ? null : env.getName();
+  }
+
+  /** Synonym for getName - the "print name" of the symbol without Environment.
+   * Useful when thinking of a Symbol as an XML QName. */
+  public final String getLocalName()
+  {
+    return getName();
+  }
+
+  public static Symbol make (String namespace, String name)
+  {
+    Environment env = Environment.getInstance(namespace);
+    if (name != null)
+      name = name.intern();
+    return env.getSymbol(name);
+  }
+
   /** The current value of the binding. */
   Object value;
 
@@ -97,6 +118,7 @@ public class Symbol extends Location implements Externalizable
   public Symbol (String name)
   {
     setName(name); 
+    constraint = UnboundConstraint.getInstance((Environment) null);
   }
 
   // The compiler emits calls to this method.
@@ -341,9 +363,12 @@ public class Symbol extends Location implements Externalizable
   {
     String name = (String) in.readObject();
     Environment env = (Environment) in.readObject();
-    if (env != null)
+    if (env == null)
+      constraint = UnboundConstraint.getInstance((Environment) null);
+    else
       constraint = env.unboundConstraint;
-    setName(name);
+    if (name != null)
+      setName(name.intern());
   }
 
   public Object readResolve() throws ObjectStreamException

@@ -2,6 +2,8 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
+import java.util.Hashtable;
+import java.io.*;
 
 /**
  * An environment contains (name->value) bindings.
@@ -9,7 +11,7 @@ package gnu.mapping;
  * @author	Per Bothner
  */
 
-public class Environment extends NameMap
+public class Environment extends NameMap implements Externalizable
 {
   Symbol[] table;
   int log2Size;
@@ -40,6 +42,22 @@ public class Environment extends NameMap
   public Environment getPrevious ()
   {
     return previous;
+  }
+
+  static final Hashtable envTable = new Hashtable(50);
+  static final Environment EmptyNamespace = getInstance("");
+
+  public static Environment getInstance(String name)
+  {
+    if (name == null)
+      name = "";
+    Environment env = (Environment) envTable.get(name);
+    if (env != null)
+      return env;
+    env = new Environment ();
+    env.setName(name);
+    envTable.put(name, env);
+    return env;
   }
 
   public static Environment user () { return current(); }
@@ -101,6 +119,12 @@ public class Environment extends NameMap
   public Environment ()
   {
     this(64);
+  }
+
+  public Environment (String name)
+  {
+    this();
+    setName(name);
   }
 
   public Environment (int capacity)
@@ -339,4 +363,26 @@ public class Environment extends NameMap
     return expr.eval (this);
   }
   */
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName((String) in.readObject());
+  }
+
+  public Object readResolve() throws ObjectStreamException
+  {
+    String name = getName();
+    Environment env = (Environment) envTable.get(name);
+    if (env != null)
+      return env;
+    envTable.put(name, this);
+    return this;
+   
+  }
 }

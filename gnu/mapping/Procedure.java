@@ -19,16 +19,16 @@ public abstract class Procedure extends Named implements Printable
 
   public abstract Object applyN (Object[] args);
 
-   public abstract Object apply0 ();
+  public abstract Object apply0 ();
 
-   public abstract Object apply1 (Object arg1);
+  public abstract Object apply1 (Object arg1);
 
-   public abstract Object apply2 (Object arg1,Object arg2);
+  public abstract Object apply2 (Object arg1,Object arg2);
 
-   public abstract Object apply3 (Object arg1, Object arg2, Object arg3);
+  public abstract Object apply3 (Object arg1, Object arg2, Object arg3);
 
-   public abstract Object apply4(Object arg1,Object arg2,
-				 Object arg3,Object arg4);
+  public abstract Object apply4(Object arg1,Object arg2,
+				Object arg3,Object arg4);
 
   public final int minArgs() { return numArgs() & 0xFFF; }
   public final int maxArgs() { return numArgs() >> 12; }

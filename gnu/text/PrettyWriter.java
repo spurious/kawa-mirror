@@ -104,33 +104,35 @@ public class PrettyWriter extends java.io.Writer
    * to output the buffer. The length is stored in the logical block stack. */
   char[] suffix = new char[initialBufferSize];
 
-  // We have a queue of pending operations.  This is primarily stored
-  // in the circular buffer queueInts.  There are different kinds of
-  // operation types, and each operation can require a variable number
-  // of elements in the buffer, depending on the operation type.  Given
-  // an operation at 'index', the type operation type code is
-  // 'getQueueType(index)' (one of the QITEM_XXX_TYPE macros
-  // below), and the number of elements in the buffer is
-  // 'getQueueSize(index)' (one of the QITEM_XXX_SIZE values
-  // below).  You can think of the various QITEM_XXX_TYPEs as
-  // "sub-classes" of queued operations, but instead of creating
-  // actual Java objects, we allocate the objects' fields in the
-  // queueInts and QueueStrings arrays, to avoid expensive object
-  // allocation.  The special QITEM_NOP_TYPE is a used as a
-  // marker for when there isn't enough space in the rest of buffer,
-  // so we have to wrap around to the start.  The other QITEM_XXX
-  // macros are the offsets of the various "fields" relative to the
-  // start index.
-      
   static final int QUEUE_INIT_ALLOC_SIZE = 300; // FIXME
+
+  /** A queue of pending operations.
+   * This is primarily stored in the circular buffer queueInts.  There
+   * are different kinds of operation types, and each operation can
+   * require a variable number of elements in the buffer, depending on
+   * the operation type.  Given an operation at 'index', the type
+   * operation type code is 'getQueueType(index)' (one of the
+   * QITEM_XXX_TYPE macros below), and the number of elements in the
+   * buffer is 'getQueueSize(index)' (one of the QITEM_XXX_SIZE values
+   * below).  You can think of the various QITEM_XXX_TYPEs as
+   * "sub-classes" of queued operations, but instead of creating
+   * actual Java objects, we allocate the objects' fields in the
+   * queueInts and QueueStrings arrays, to avoid expensive object
+   * allocation.  The special QITEM_NOP_TYPE is a used as a marker for
+   * when there isn't enough space in the rest of buffer, so we have
+   * to wrap around to the start.  The other QITEM_XXX macros are the
+   * offsets of the various "fields" relative to the start index. */
   int[] queueInts = new int[QUEUE_INIT_ALLOC_SIZE];
+
   /** For simplicity, queueStrings is the same size as queueInts. */
   String[] queueStrings = new String[QUEUE_INIT_ALLOC_SIZE];
   /** Index in queueInts and queueStrings of oldest enqueued operation. */
   int queueTail;
   /** Number of elements (in queueInts and queueStrings) in use. */
   int queueSize;
-  /** Index (into queueInts) of current unclosed begin-block node. */
+  /** If >= 0, index (into queueInts) of current unclosed begin-block node.
+   * This is a head of a linked linked of queued BLOCK_START for which
+   * we haven't seen the matching BLOCK_END  */
   int currentBlock = -1;
   /** Number of startLogicalBlock - number of endLogicalBlock. */
   public int pendingBlocksCount;
@@ -180,9 +182,9 @@ public class PrettyWriter extends java.io.Writer
   /** A "block-start" queue item. */
   static final int QITEM_BLOCK_START_TYPE = 4;
   static final int QITEM_BLOCK_START_SIZE = QITEM_SECTION_START_SIZE + 3;
-  /** If the QITEM_SECTION_START_BLOCK_END < 0, it points to
+  /** If the QITEM_BLOCK_START_BLOCK_END < 0, it points to
    * the previous (outer) un-closed block-start.
-   * If QITEM_SECTION_START_BLOCK_END > 0, it points to the
+   * If QITEM_BLOCK_START_BLOCK_END > 0, it points to the
    * corresponding block-end node.
    * In both cases the pointers are relative to the current BLOCK_START. */
   static final int QITEM_BLOCK_START_BLOCK_END = QITEM_SECTION_START_SIZE;
@@ -583,11 +585,23 @@ public class PrettyWriter extends java.io.Writer
       currentBlock = -1;
     else
       {
-	// Make currentBlock absolute instead of relative.
-	outerBlock += start;
-	if (outerBlock < 0)
-	  outerBlock += queueInts.length;
-	currentBlock = outerBlock;
+	int qtailFromStart = queueTail - start;
+	if (qtailFromStart > 0)
+	  qtailFromStart -= queueInts.length;
+	if (outerBlock < qtailFromStart)
+	  {
+	    // reallyStartLogicalBlock has been called for the outer block,
+	    // so there is no currentBlock.
+	    currentBlock = -1;
+	  }
+	else
+	  {
+	    // Make currentBlock absolute instead of relative.
+	    outerBlock += start;
+	    if (outerBlock < 0)
+	      outerBlock += queueInts.length;
+	    currentBlock = outerBlock;
+	  }
       }
     String suffix = queueStrings[start + QITEM_BLOCK_START_SUFFIX];
     if (suffix != null)
@@ -1273,6 +1287,27 @@ public class PrettyWriter extends java.io.Writer
 	out.print('\"');
 	out.print(" length: ");
 	out.println(str.length());
+      }
+  }
+
+  void check (String where)
+  {
+    String msg = null;
+    if (currentBlock != -1
+	&& ! (currentBlock < queueInts.length
+	      && currentBlock >= queueTail
+	      ? currentBlock < queueTail + queueSize
+	      : currentBlock < queueTail + queueSize - queueInts.length))
+      msg = ("currentBlock ("+currentBlock
+	     +") >= queue length ("+queueInts.length+")");
+    if (msg != null)
+      {
+	if (where != null)
+	  msg = "in "+where+": "+msg;
+	log.println(msg);
+	dumpQueue(); 
+	log.flush();
+	throw new Error(msg);
       }
   }
   */

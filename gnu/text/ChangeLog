@@ -1,5 +1,9 @@
 2004-08-05  Per Bothner  <per@bothner.com>
 
+	* PrettyWriter.java (endLogicalBlock):  Fix "dangling pointer" bug.
+
+	* PrettyWriter.java (check):  New debugging method.
+
 	* PrettyWriter.java:  Renamed QUEUED_OP_XXX to short QITEM_XXX.
 	Renamed QUEUED_OP_SIZE TO QITEM_BASE_SIZE.
 	Renamed QUEUED_OP_TYPE to QITEM_TYPE_AND_SIZE.

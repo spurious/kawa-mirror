@@ -42,8 +42,9 @@ class prim_method extends Syntax
 	    && str.charAt(len-1) == '>')
 	  {
 	    String tstr = str.substring(1, len-1);
-	    if (Type.isValidJavaTypeName(tstr))
-	      return PrimProcedure.string2Type(tstr);
+	    Type type = PrimProcedure.string2Type(tstr);
+	    if (type != null)
+	      return type;
 	  }
       }
     tr.syntaxError("invalid type spec (must be \"type\" or <type>): " + str);

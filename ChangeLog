@@ -1,3 +1,19 @@
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	* gnu/kawa/util:  New package directory.
+	* kawa/lang/Makefile.am (java_JAVA):  Remove classes moved
+ 	to gnu/kawa/util.
+	* gnu/*:  Update for classes moved to new gnu.kawa.util (some renamed).
+	* kawa/*:  Likewise.
+	* gnu/kawa/Makefile.am (SUBDIRS):  Add util.
+	* kawa/lang/ScmRead.java (readUniformVector):  New method.
+	(readObject):  Use readUniformVector to read SRFI-4 uniform vectors.
+ 	(readCharacter):  Use new Char.nameToChar method.
+	* kawa/standard/length.java:  Removed - replaced by Scheme code.
+	* kawa/standard/Makefile.am (java_JAVA):  Update accordingly.
+	* kawa/standard/Scheme (initScheme):  Add new SRFI-4 procedures.
+	(getNamedType):  Add new type names for SRFI-4 uniform vectors.
+
 1999-12-06  Per Bothner  <per@bothner.com>
 
 	* Makefile.am, Makefile.in (JAVADOC_PACKAGES):  Add new packages.

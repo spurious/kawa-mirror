@@ -1,3 +1,13 @@
+The class Sequence, Pair, PairWithPosition, FString, and Char were
+moved from kawa.lang to the new package gnu.kawa.util.  It seems that
+these classes (except perhaps Char) belong together.  The classes List
+and Vector were also moved, and at the same time renamed to LList and
+FVector, respectively, to avoid clashed with classes in java.util.
+
+New data types and procedures for "uniform vectors" of primitive types
+were implemented.  These follow the SRFI-4 specification, which you
+can find at http://srfi.schemers.org/srfi-4/srfi-4.html .
+
 You can now use the syntax NAME :: TYPE to specify the type of a parameter.
 For example: (define (vector-length x :: <vector>) (invoke x 'length)).
 The following also works: (define (vector-length (x :: <vector>)) ...).

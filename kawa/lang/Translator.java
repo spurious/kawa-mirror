@@ -78,6 +78,8 @@ public class Translator extends Object
     this (Environment.user());
   }
 
+  public final Environment getGlobalEnvironment() { return env; }
+
   final Expression rewrite_car (Pair pair)
   {
     Object car = pair.car;
@@ -156,6 +158,9 @@ public class Translator extends Object
       {
 	String sym = (String) obj;
 	obj = current_decls.get (sym);
+
+        if (obj instanceof Syntax)
+          return obj;
 	Binding binding = null;
         if (obj != null)
 	  {
@@ -200,19 +205,12 @@ public class Translator extends Object
       {
 	ref = (ReferenceExp) func;
         Declaration decl = ref.getBinding();
-	if (decl != null)
-          {
-            Expression value = decl.getValue();
-            if (value instanceof QuoteExp)
-              {
-                proc = ((QuoteExp) value).getValue();
-                if (proc instanceof Syntax)
-                  return apply_rewrite ((Syntax) proc, p);
-              }
-          }
-        else
+	if (decl == null)
 	  {
-	    proc = getBinding(ref.getName());
+            String name = ref.getName();
+            Binding binding = env.lookup((String) name);
+	    if (binding != null && binding.isBound())
+              proc = binding.get();
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)
@@ -229,6 +227,8 @@ public class Translator extends Object
 	    if (proc instanceof Inlineable)
 	      func = new QuoteExp(proc);
 	  }
+        else if (decl instanceof Syntax)
+          return apply_rewrite ((Syntax) decl, p);
       }
 
     int cdr_length = List.length (cdr);
@@ -460,6 +460,20 @@ public class Translator extends Object
 		    }
 		  forms.addElement (st);
 		}
+	      else if (syntax == Scheme.defineAliasSyntax
+		       && st_pair.cdr instanceof Pair
+		       && ! (current_scope instanceof ModuleExp)
+                       &&  ((Pair) st_pair.cdr).car instanceof String)
+		{
+		  Object name = ((Pair) st_pair.cdr).car;
+		  if (defs == null)
+		    defs = new LetExp (null);
+                  Type typeLocation = ClassType.make("gnu.mapping.Location");
+                  Declaration decl
+                    = defs.addDeclaration((String) name, typeLocation);
+                  decl.setIndirectBinding(true);
+		  forms.addElement (st);
+		}
 	      else
 		forms.addElement (st);
 	    }
@@ -517,6 +531,8 @@ public class Translator extends Object
   void push (Declaration decl)
   {
     String sym = decl.symbol();
+    if (sym == null)
+      return;
     Object old_decl = current_decls.get (sym);
     if (old_decl != null)
       decl.shadowed = old_decl;
@@ -529,6 +545,8 @@ public class Translator extends Object
   void pop (Declaration decl)
   {
     String sym = decl.symbol();
+    if (sym == null)
+      return;
     if (decl.shadowed == null)
       current_decls.remove (sym);
     else

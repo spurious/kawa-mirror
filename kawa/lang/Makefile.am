@@ -41,7 +41,6 @@ CalledContinuation.java \
 Syntax.java Macro.java \
 SyntaxRule.java \
 SyntaxRules.java \
-DefMacro.java \
 AutoloadSyntax.java \
 CompileFile.java \
 loadcompiled.java \

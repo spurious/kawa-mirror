@@ -29,6 +29,10 @@ public class SyntaxRule implements Compilable
    * These need re-naming to be "hygienic". */
   String[] template_identifiers;
 
+  /** Declarations captured at macro definition time.
+   * The binding (if any) for template_identifiers[i] is captured_decls[i]. */
+  Object[] captured_decls;
+
   public SyntaxRule (Pattern pattern,
 		     String pattern_nesting,
 		     String template_program,
@@ -61,8 +65,12 @@ public class SyntaxRule implements Compilable
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
 
-    this.template_identifiers = new String[template_identifiers.size()];
+    int num_identifiers = template_identifiers.size();
+    this.template_identifiers = new String[num_identifiers];
     template_identifiers.copyInto (this.template_identifiers);
+    this.captured_decls = new Object[num_identifiers];
+    for (int i = num_identifiers;  --i >= 0; )
+      captured_decls[i] = tr.current_decls.get(this.template_identifiers[i]);
   }
 
   static final String dots3 = "...";
@@ -256,7 +264,9 @@ public class SyntaxRule implements Compilable
 	String name = template_identifiers[i];
 	String renamed_symbol = Symbol.makeUninterned (name);
 	vars[num_variables + i] = renamed_symbol;
-	tr.current_decls.put (renamed_symbol, name);
+        Object captured = captured_decls == null ? null : captured_decls[i];
+	tr.current_decls.put (renamed_symbol,
+                              captured == null ? name : captured);
       }
     return execute_template (0, vars, 0, indexes, tr, form);
   }

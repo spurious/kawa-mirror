@@ -1,3 +1,7 @@
+2003-05-07  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (request-parameter):  Add optional default parameter.
+
 2003-03-21  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* srfi1.scm (list-tabulate):  Fix thinko.

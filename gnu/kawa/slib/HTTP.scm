@@ -59,8 +59,11 @@
   (let ((query (invoke (get-request) 'getQueryString)))
     (if (eq? query #!null) #f query)))
 
-(define (request-parameter (name :: <String>)) :: <String>
-  (invoke (get-request) 'getParameter name))
+(define (request-parameter (name :: <String>) #!optional (default #!null))
+  :: <String>
+  (let ((value :: <java.lang.String>
+	       (invoke (get-request) 'getParameter name)))
+    (if (eq? value #!null) default value)))
 
 (define (request-parameters (name :: <String>))
   (make <gnu.mapping.Values>

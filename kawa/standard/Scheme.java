@@ -45,6 +45,16 @@ public class Scheme extends LispInterpreter
     define (name, new AutoloadSyntax (name, className, environ));
   }
 
+  /** Declare in the current Environment a Syntax bound to a static field.
+   * @param name the procedure's source-level name.
+   * @param cname the name of the class containing the field.
+   */
+
+  protected void defSntxStFld(String name, String className)
+  {
+    define (name, new AutoloadSyntax (name, className, environ));
+  }
+
   public static Environment nullEnvironment;
   public static Environment r4Environment;
   public static Environment r5Environment;
@@ -92,9 +102,9 @@ public class Scheme extends LispInterpreter
       //-- Section 4.1  -- complete
       define (LispInterpreter.quote_sym, new Quote ());
       define_syntax("%define", new kawa.standard.define(lambda));
-      define_syntax ("define", "kawa.lib.prim_syntax");
+      defSntxStFld("define", "kawa.lib.prim_syntax");
 
-      define_syntax ("if", "kawa.lib.prim_syntax");
+      defSntxStFld("if", "kawa.lib.prim_syntax");
       define_syntax ("set!", "kawa.standard.set_b");
 
       // Section 4.2  -- complete
@@ -388,9 +398,9 @@ public class Scheme extends LispInterpreter
       defProcStFld("values", "kawa.lib.misc");
       defProcStFld("call-with-values", "kawa.standard.call_with_values",
 		   "callWithValues");
-      define_syntax("let-values", "kawa.lib.syntax");
-      define_syntax("let*-values", "kawa.lib.syntax");
-      define_syntax("receive", "kawa.lib.syntax");
+      defSntxStFld("let-values", "kawa.lib.syntax");
+      defSntxStFld("let*-values", "kawa.lib.syntax");
+      defSntxStFld("receive", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
@@ -401,8 +411,8 @@ public class Scheme extends LispInterpreter
       kawaEnvironment = new Environment (r5Environment);
       environ = kawaEnvironment;
  
-      define_syntax ("define-private", "kawa.lib.prim_syntax");
-      define_syntax ("define-constant", "kawa.lib.prim_syntax");
+      defSntxStFld ("define-private", "kawa.lib.prim_syntax");
+      defSntxStFld ("define-constant", "kawa.lib.prim_syntax");
 
       define_syntax("define-autoload", new define_autoload(false));
       define_syntax("define-autoloads-from-file", new define_autoload(true));
@@ -438,24 +448,24 @@ public class Scheme extends LispInterpreter
       define_syntax("primitive-constructor",
                     new kawa.standard.prim_method(183));
       define_syntax("primitive-op1", new kawa.standard.prim_method());
-      define_syntax("primitive-get-field", "kawa.lib.reflection");
-      define_syntax("primitive-set-field", "kawa.lib.reflection");
-      define_syntax("primitive-get-static", "kawa.lib.reflection");
-      define_syntax("primitive-set-static", "kawa.lib.reflection");
-      define_syntax("primitive-array-new", "kawa.lib.reflection");
-      define_syntax("primitive-array-get", "kawa.lib.reflection");
-      define_syntax("primitive-array-set", "kawa.lib.reflection");
-      define_syntax("primitive-array-length", "kawa.lib.reflection");
+      defSntxStFld("primitive-get-field", "kawa.lib.reflection");
+      defSntxStFld("primitive-set-field", "kawa.lib.reflection");
+      defSntxStFld("primitive-get-static", "kawa.lib.reflection");
+      defSntxStFld("primitive-set-static", "kawa.lib.reflection");
+      defSntxStFld("primitive-array-new", "kawa.lib.reflection");
+      defSntxStFld("primitive-array-get", "kawa.lib.reflection");
+      defSntxStFld("primitive-array-set", "kawa.lib.reflection");
+      defSntxStFld("primitive-array-length", "kawa.lib.reflection");
       defProcStFld("subtype?", "kawa.lib.reflection");
       defProcStFld("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
-      define_syntax("try-finally", "kawa.lib.syntax");
-      define_syntax("try-catch", "kawa.lib.prim_syntax");
+      defSntxStFld("try-finally", "kawa.lib.syntax");
+      defSntxStFld("try-catch", "kawa.lib.prim_syntax");
       define_proc("throw", "kawa.standard.throw_name");
       defProcStFld("catch", "kawa.lib.syntax");
       defProcStFld("error", "kawa.lib.misc");
       define_proc("as", gnu.kawa.functions.Convert.as);
       defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
-      define_syntax("synchronized", "kawa.lib.syntax");
+      defSntxStFld("synchronized", "kawa.lib.syntax");
       object objectSyntax = new kawa.standard.object(lambda);
       define_syntax("object", objectSyntax);
       define_syntax("define-class",
@@ -512,10 +522,10 @@ public class Scheme extends LispInterpreter
       defProcStFld("record-type-name", "kawa.lib.reflection");
       defProcStFld("record-type-field-names", "kawa.lib.reflection");
       defProcStFld("record?", "kawa.lib.reflection");
-      define_syntax("define-record-type", "gnu.kawa.slib.DefineRecordType");
+      defSntxStFld("define-record-type", "gnu.kawa.slib.DefineRecordType");
 
-      define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
-      define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
+      defSntxStFld("when", "kawa.lib.syntax"); //-- (when cond exp ...)
+      defSntxStFld("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
       define_syntax ("fluid-let", "kawa.standard.fluid_let");
       define_syntax("constant-fold", "kawa.standard.constant_fold");
 
@@ -524,7 +534,7 @@ public class Scheme extends LispInterpreter
       defProcStFld("environment-bound?", "kawa.lib.misc");
       defProcStFld("scheme-implementation-version", "kawa.lib.misc");
       defProcStFld("scheme-window", "kawa.lib.windows");
-      define_syntax ("define-procedure", "kawa.lib.syntax");
+      defSntxStFld("define-procedure", "kawa.lib.syntax");
       defProcStFld("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       defProcStFld("procedure-property", "kawa.lib.misc");
@@ -538,15 +548,15 @@ public class Scheme extends LispInterpreter
       define_syntax ("define-base-unit", new kawa.standard.define_unit(true));
 
       defProcStFld("gentemp", "kawa.lib.syntax");
-      define_syntax ("defmacro", "kawa.lib.syntax");
+      defSntxStFld("defmacro", "kawa.lib.syntax");
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
-      define_syntax ("future", "kawa.lib.thread");
+      defSntxStFld("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
 
-      define_syntax ("trace", "kawa.lib.trace");
-      define_syntax ("untrace", "kawa.lib.trace");
+      defSntxStFld("trace", "kawa.lib.trace");
+      defSntxStFld("untrace", "kawa.lib.trace");
 
       defProcStFld("format", "gnu.kawa.functions.Format");
       defProcStFld("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
@@ -672,13 +682,12 @@ public class Scheme extends LispInterpreter
       defProcStFld("f64vector->list", "kawa.lib.uniform");
       defProcStFld("list->f64vector", "kawa.lib.uniform");
 
-      define_syntax("cut", "gnu.kawa.slib.cut");
-      define_syntax("cute", "gnu.kawa.slib.cut");
+      defSntxStFld("cut", "gnu.kawa.slib.cut");
+      defSntxStFld("cute", "gnu.kawa.slib.cut");
 
       define_proc ("emacs", "gnu.jemacs.buffer.emacs");
       define_proc ("node", "gnu.kawa.xml.MakeTreeNode");
-      define_syntax("%if-feature", "kawa.standard.IfFeature");
-      define_syntax("cond-expand", "kawa.lib.syntax");
+      defSntxStFld("cond-expand", "kawa.lib.syntax");
   }
 
   static int scheme_counter = 0;

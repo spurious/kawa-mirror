@@ -1,5 +1,8 @@
 2004-11-16  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (defSntxStFld): New method.
+	(initScheme): Replace many uses of define_syntax by defSntxStFld.
+
 	* kawa/standard/throw_name.java (throwName): New static field.
 	* kawa/standard/call_with_values.java (callWithvalues): Likewise.
 	* kawa/standard/Scheme.java (initScheme): Replace most define_field

@@ -7,7 +7,6 @@ import java.io.PrintStream;
 
 /** This class prints out in contents of a ClassType in human-readable form.
  * The output format matches my earlier jcf-dump program (in gcc/java).
- * This class is not complete - for example it needs a dis-assembler.
  * @author Per Bothner <bothner@cygnus>
  */
 

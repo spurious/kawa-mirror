@@ -1,3 +1,14 @@
+2001-07-16  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (booleanValue):  Make static.
+
+	* Scope.java (find_var):  Renamed to ...
+	(getvariable): ... new name.
+	* CodeAttr.java (getArg):  Update accordingly.
+	(getCurrentScope):  New method.
+
+	* CodeAttr.java (getCurrentScope):  New method.
+
 2001-04-23  Per Bothner  <per@bothner.com>
 
 	* CodeFragment.java (linenumbers):  New field.

@@ -80,7 +80,7 @@ public class Scope
    * Return a variable the scope, by numerical index.
    * @param index the number of the variable
    */
-  Variable find_var (int index) {
+  public Variable getVariable(int index) {
     Variable var = vars;
     while (--index >= 0)
       var = var.next;

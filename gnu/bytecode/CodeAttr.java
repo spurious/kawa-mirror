@@ -384,6 +384,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     return scope;
   }
 
+  public Scope getCurrentScope()
+  {
+    return locals.current_scope;
+  }
+
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
@@ -398,7 +403,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Get the index'th parameter. */
   public Variable getArg (int index)
   {
-    return locals.parameter_scope.find_var (index);
+    return locals.parameter_scope.getVariable(index);
   }
 
   /**

@@ -1,3 +1,7 @@
+2003-06-03  Per Bothner  <per@bothner.com>
+
+	* kawa.c (main):  Don't set outgoing argv[0] to incoming argv[0]!
+
 2003-05-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa.sh):  If --with-gcj, just exec kawa-bin.

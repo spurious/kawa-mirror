@@ -634,9 +634,7 @@ main(int argc, char** argv)
 	  int conn;
 #ifdef GCJ_COMPILED
 	  char* rp = rindex(argv[0], '/');
-	  if (rp == NULL)
-	    command_args[0] = argv[0];
-	  else
+	  if (rp != NULL)
 	    {
 	      int dirlen = rp - argv[0];
 	      command_args[0] = malloc (dirlen + strlen(COMMAND) + 2);

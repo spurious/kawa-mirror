@@ -1,3 +1,7 @@
+2002-02-11  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (writeChar):  Use character entity if non-ascii.
+
 2002-02-05  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java.in (parse):  Handle space after attribute name.

@@ -113,6 +113,8 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
       writeRaw("&amp;");
     else if (v == '\"' && inAttribute)
       writeRaw("&quot;");
+    else if (v >= 127)
+      writeRaw("&"+v+";");
     else
       writeRaw((char) v);
     prev = v;

@@ -1,3 +1,11 @@
+2003-08-06  Per Bothner  <per@bothner.com>
+
+	* PairClassType.java (<init>):  Don't set INTERFACE - it is possible
+	this isn't an actual class pair, but we need the static link.
+
+	* Declaration.java (makeField):  If a non-captured ClassExp,
+	make field static.
+
 2003-08-01  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField):  Use implementation type for field.

@@ -36,9 +36,8 @@ public class PairClassType extends ClassType
   {
     super(reflectInterface.getName());
     setExisting(true);
-    access_flags |= Access.INTERFACE;
     reflectClass = reflectInterface;
-    registerTypeForClass(reflectInterface, this);
+    Type.registerTypeForClass(reflectInterface, this);
     this.instanceType = (ClassType) Type.make(reflectInstanceClass);
   }
 

@@ -551,7 +551,9 @@ public class Declaration
     if (! isPrivate() || external_access)
       fflags |= Access.PUBLIC;
     if (getFlag(STATIC_SPECIFIED)
-	|| (isConstant && value instanceof QuoteExp))
+	|| (isConstant && value instanceof QuoteExp)
+	|| (value instanceof ClassExp
+	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;
     Type ftype;
     if (isAlias())

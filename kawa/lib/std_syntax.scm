@@ -139,6 +139,7 @@
 				 ((let* . body)
 				  (%syntax-error
 				   "missing bindings list in let*"))))
+
 ;;; DO
 
 ;;; Helper macro for do, to handle optional step.

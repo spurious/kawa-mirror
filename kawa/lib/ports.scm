@@ -10,6 +10,21 @@
 (define (current-output-port)
   ((primitive-static-method <output-port> "outDefault" <output-port> ())))
 
+(define (write value #!optional
+	       (port :: <output-port>
+		     (invoke-static  <output-port> 'outDefault)))
+  (invoke port 'writeSchemeObject value #t))
+
+(define (display value #!optional
+		 (port :: <output-port>
+		       (invoke-static  <output-port> 'outDefault)))
+  (invoke port 'writeSchemeObject value #f))
+
+(define (write-char ch #!optional
+		    (port :: <output-port>
+			  (invoke-static  <output-port> 'outDefault)))
+  (invoke port 'writeSchemeObject ch #f))
+
 ;; SRFI-6
 (define (open-input-string string)
   ((primitive-virtual-method <string> "open" <input-port> ())

@@ -1,3 +1,8 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* StringValue.java (contains, startsWith, endsWith):  Use stringValue
+	rather than toString to convert arguments.
+
 2003-07-23  Terje Pedersen  <terje@brassforum.com>
 
 	* StringValue.java (stringLength, substringBefore, substringAfter,

@@ -194,13 +194,13 @@ public class StringValue extends Procedure1
     if (str == Values.empty || contain == Values.empty)
       return Values.empty;
 
-    String s = str.toString();
-    String c = contain.toString();
+    String s = stringValue(str);
+    String c = stringValue(contain);
 
     if (c.length()==0) return Boolean.TRUE;
-    if (s.length()==0 && c.length()>0) return Boolean.FALSE;
+    if (s.length()==0) return Boolean.FALSE;
 
-    return s.indexOf(c)<0? Boolean.FALSE : Boolean.TRUE;
+    return s.indexOf(c) <0 ? Boolean.FALSE : Boolean.TRUE;
   }
 
   public static Object startsWith (Object str, Object with)
@@ -208,13 +208,13 @@ public class StringValue extends Procedure1
     if (str == Values.empty || with == Values.empty)
       return Values.empty;
 
-    String s = str.toString();
-    String w = with.toString();
+    String s = stringValue(str);
+    String w = stringValue(with);
 
     if (w.length()==0) return Boolean.TRUE;
-    if (s.length()==0 && w.length()>0) return Boolean.FALSE;
+    if (s.length()==0) return Boolean.FALSE;
 
-    return s.startsWith(w)? Boolean.TRUE : Boolean.FALSE;
+    return s.startsWith(w) ? Boolean.TRUE : Boolean.FALSE;
   }
 
   public static Object endsWith (Object str, Object with)
@@ -222,13 +222,13 @@ public class StringValue extends Procedure1
     if (str == Values.empty || with == Values.empty)
       return Values.empty;
 
-    String s = str.toString();
-    String w = with.toString();
+    String s = stringValue(str);
+    String w = stringValue(with);
 
     if (w.length()==0) return Boolean.TRUE;
-    if (s.length()==0 && w.length()>0) return Boolean.FALSE;
+    if (s.length()==0) return Boolean.FALSE;
 
-    return s.endsWith(w)? Boolean.TRUE : Boolean.FALSE;
+    return s.endsWith(w) ? Boolean.TRUE : Boolean.FALSE;
   }
 
   public static Object stringJoin (Object strseq, Object join)

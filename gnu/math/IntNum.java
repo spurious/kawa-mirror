@@ -1158,39 +1158,107 @@ public class IntNum extends RatNum implements Compilable
       return (double) ival;
     if (ival <= 2)
       return (double) longValue ();
-
-    int il = MPN.intLength (words, ival) + 1;
-    long l = MPN.rshift_long (words, ival, il - 64);
-    boolean neg = l < 0;
-    if (neg)
-      l = -l;
-    // l is now properly viewed as unsigned, since the -l might have
-    // overflowed.  For correct rounding, check the bit that we will shift out.
-    if ((l & (1l << 10)) != 0)
-      l += (1l << 11);
-    // Check for overflow into the sign bit.
-    // This could be because either the negation or addition overflowed.
-    // (However, it is not possible both overflowed.)
-    if (l < 0)
-      {
-	l >>>= 1;
-	il += 1;
-      }
-    // At this point the sign bit is zero, but the next-highest bit is one.
-    // That bit becomes the "hidden" bit.
-    l = (l >> 10) & 0xfffffffffffffL;
-    double d;
-    if (il >= 1025)
-      d = Double.POSITIVE_INFINITY;
+    if (isNegative ())
+      return IntNum.neg (this).roundToDouble (0, true, false);
     else
-      {
-	l += (long)(il + 1021) << 52;
-	d = Double.longBitsToDouble (l);
-      }
-    if (neg)
-      d = -d;
-    return d;
+      return roundToDouble (0, false, false);
   }
+
+  /** Return true if any of the lowest n bits are one.
+   * (false if n is negative).  */
+  boolean checkBits (int n)
+  {
+    if (n <= 0)
+      return false;
+    if (words == null)
+      return n > 31 || ((ival & ((1 << n) - 1)) != 0);
+    int i;
+    for (i = 0; i < (n >> 5) ; i++)
+      if (words[i] != 0)
+	return true;
+    return (n & 31) != 0 && (words[i] & ((1 << (n & 31)) - 1)) != 0;
+  }
+
+  /** Convert a semi-processed IntNum to double.
+   * Number must be non-negative.  Multiplies by a power of two, applies sign,
+   * and converts to double, with the usual java rounding.
+   * @param exp power of two, positive or negative, by which to multiply
+   * @param neg true if negative
+   * @param remainder true if the IntNum is the result of a truncating
+   * division that had non-zero remainder.  To ensure proper rounding in
+   * this case, the IntNum must have at least 54 bits.  */
+  public double roundToDouble (int exp, boolean neg, boolean remainder)
+  {
+    // Compute length.
+    int il = intLength();
+
+    // Exponent when normalized to have decimal point directly after
+    // leading one.  This is stored excess 1023 in the exponent bit field.
+    exp += il - 1;
+
+    // Gross underflow.  If exp == -1075, we let the rounding
+    // computation determine whether it is minval or 0 (which are just
+    // 0x0000 0000 0000 0001 and 0x0000 0000 0000 0000 as bit
+    // patterns).
+    if (exp < -1075)
+      return neg ? -0.0 : 0.0;
+
+    // gross overflow
+    if (exp > 1023)
+      return neg ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+
+    // number of bits in mantissa, including the leading one.
+    // 53 unless it's denormalized
+    int ml = (exp >= -1022 ? 53 : 53 + exp + 1022);
+
+    // Get top ml + 1 bits.  The extra one is for rounding.
+    long m;
+    int excess_bits = il - (ml + 1);
+    if (excess_bits > 0)
+      m = ((words == null) ? ival >> excess_bits
+	   : MPN.rshift_long (words, ival, excess_bits));
+    else
+      m = longValue () << (- excess_bits);
+
+    // Special rounding for maxval.  If the number exceeds maxval by
+    // any amount, even if it's less than half a step, it overflows.
+    if (exp == 1023 && ((m >> 1) == (1L << 53) - 1))
+      {
+	if (remainder || checkBits (il - ml))
+	  return neg ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+	else
+	  return neg ? - Double.MAX_VALUE : Double.MAX_VALUE;
+      }
+
+    // Normal round-to-even rule: round up if the bit dropped is a one, and
+    // the bit above it or any of the bits below it is a one.
+    if ((m & 1) == 1
+	&& ((m & 2) == 2 || remainder || checkBits (il - (ml + 1))))
+      {
+	m += 2;
+	// Check if we overflowed the mantissa
+	if ((m & (1L << 54)) != 0)
+	  {
+	    exp++;
+	    // renormalize
+	    m >>= 1;
+	  }
+	// Check if a denormalized mantissa was just rounded up to a
+	// normalized one.
+	else if (ml == 52 && (m & (1L << 53)) != 0)
+	  exp++;
+      }
+	
+    // Discard the rounding bit
+    m >>= 1;
+
+    long bits_sign = neg ? (1L << 63) : 0;
+    exp += 1023;
+    long bits_exp = (exp <= 0) ? 0 : ((long)exp) << 52;
+    long bits_mant = m & ~(1L << 52);
+    return Double.longBitsToDouble (bits_sign | bits_exp | bits_mant);
+  }
+
 
   public Numeric add (Object y, int k)
   {

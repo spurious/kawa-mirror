@@ -1,3 +1,13 @@
+Sat Jan 10 15:08:24 1998  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java (getAbsolute):  Fix for negative numbers.
+
+Sat Jan 10 13:53:19 1998  Alouatte Petrofsky <albatros@wco.com>
+
+	* IntNum.java (roundToDouble, checkBits):  New methods.
+	(doubleValue):  Use roundToDouble.
+	* IntFraction.java (doubleValue):  Use roundToDouble.
+
 Sun Dec 14 15:52:08 1997  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (setAdd);  Fix to handle negative int argument.

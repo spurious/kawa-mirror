@@ -108,9 +108,24 @@ public class IntFraction extends RatNum
 
   public double doubleValue ()
   {
-    // FIXME.  Can cause unnecessary overflow or loss of precison.
-    /// Better to calculate ((num << 64)/den).doubleValue() / (2**64);
-    return numerator().doubleValue () / denominator().doubleValue();
+    boolean neg = num.isNegative ();
+    IntNum n = num;
+    if (neg)
+      n = IntNum.neg (n);
+    int num_len = n.intLength ();
+    int den_len = den.intLength ();
+    int exp = 0;
+    if (num_len < den_len + 54)
+      {
+	n = IntNum.shift (num, den_len + 54 - num_len);
+	exp = - (den_len + 54 - num_len);
+      }
+    IntNum quot = new IntNum ();
+    IntNum remainder = new IntNum ();
+    IntNum.divide (n, den, quot, remainder, TRUNCATE);
+    quot = quot.canonicalize ();
+    remainder = remainder.canonicalize ();
+    return quot.roundToDouble (exp, neg, !remainder.isZero ());
   }
 
   public String toString (int radix)

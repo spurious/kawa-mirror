@@ -16,6 +16,11 @@ public class UnboundConstraint extends Constraint
     throw new UnboundSymbol(binding.getName());
   }
 
+  public boolean isBound (Binding binding)
+  {
+    return false;
+  }
+
   public void set (Binding binding, Object value)
   {
     synchronized (binding)
@@ -24,5 +29,10 @@ public class UnboundConstraint extends Constraint
 	  binding.setConstraint(environment.trivialConstraint);
 	binding.constraint.set(binding, value);
       }
+  }
+
+  public Environment getEnvironment (Binding binding)
+  {
+    return environment;
   }
 }

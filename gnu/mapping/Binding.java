@@ -32,7 +32,7 @@ public final class Binding extends Location
 
   public boolean isBound ()
   {
-    return ! (constraint instanceof UnboundConstraint);  // FIXME
+    return constraint.isBound(this);
   }
 
   public Binding (String name)

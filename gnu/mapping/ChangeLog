@@ -1,3 +1,14 @@
+1999-08-06  Per Bothner  <per@bothner.com>
+
+	* Constraint.java (isBound):  New method.
+	(getValue, setValue, getConstraint, setConstraint):  New methods.
+	* Binding.java (isBound):  Use Constraint.isBound.
+	* Environment.java (unboundConstraint):  Generalize type to Contraint.
+	* TrivialConstraint.java (isBound, getEnvironment):  New methods.
+	* UnboundConstraint.java (isBound, getEnvironment):  New methods.
+
+	* WrongType.java:  Major re-write for more informative messages.
+
 1999-07-16  Per Bothner  <per@bothner.com>
 
 	* Future.java (action):  Change from Procedure0 to Procedure.

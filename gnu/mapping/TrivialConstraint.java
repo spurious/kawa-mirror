@@ -11,6 +11,11 @@ public class TrivialConstraint extends Constraint
     this.environment = environment;
   }
 
+  public boolean isBound (Binding binding)
+  {
+    return true;
+  }
+
   public Object get (Binding binding)
   {
     return binding.value;
@@ -19,5 +24,10 @@ public class TrivialConstraint extends Constraint
   public void set (Binding binding, Object value)
   {
     binding.value = value;
+  }
+
+  public Environment getEnvironment (Binding binding)
+  {
+    return environment;
   }
 }

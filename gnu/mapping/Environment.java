@@ -15,7 +15,7 @@ public class Environment extends NameMap
   Environment previous;
 
   protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
-  protected UnboundConstraint unboundConstraint = new UnboundConstraint(this);
+  protected Constraint unboundConstraint = new UnboundConstraint(this);
 
   static final float threshold = (float) 0.7;
   static int num_bindings;

@@ -10,6 +10,19 @@ public abstract class Constraint
 
   public abstract void set (Binding binding, Object value);
 
+  public boolean isBound (Binding binding)
+  {
+    try
+      {
+        get(binding);
+        return true;
+      }
+    catch (UnboundSymbol ex)
+      {
+        return false;
+      }
+  }
+
   public Procedure getProcedure (Binding binding)
   {
     return (Procedure) get(binding);
@@ -20,5 +33,26 @@ public abstract class Constraint
   public Environment getEnvironment (Binding binding)
   {
     return null;
+  }
+
+  protected final static Object getValue(Binding binding)
+  {
+    return binding.value;
+  }
+
+  protected final static void setValue(Binding binding, Object value)
+  {
+    binding.value = value;
+  }
+
+  protected final static Constraint getConstraint(Binding binding)
+  {
+    return binding.constraint;
+  }
+
+  protected final static void setConstraint(Binding binding,
+                                            Constraint constraint)
+  {
+    binding.constraint = constraint;
   }
 }

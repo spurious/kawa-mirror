@@ -1,16 +1,90 @@
 package gnu.mapping;
 
-public class WrongType extends RuntimeException {
-   //-- number of the argument
-   public int number;
-   //-- type of the argument
-   public String typeExpected;
-   //-- Procedure name that threw the exception
-   public String procname;
+public class WrongType extends RuntimeException
+{
+  //-- number of the argument, 0-origin
+  // ARG_UNKNOWN mean unknown argument number
+  // ARG_VARNAME means not a call, procname is a variable name.
+  // ARG_DESCRIPTION means not a call, procname describes the target.
+  public int number;
 
-   public WrongType(String name, int n, String u) {
-      procname = name;
-      number = n;
-      typeExpected = u;
-   }
+  public static final int ARG_UNKNOWN = -1;
+  public static final int ARG_VARNAME = -2;
+  public static final int ARG_DESCRIPTION = -3;
+
+  //-- type of the argument
+  public String typeExpected;
+  //-- Procedure name that threw the exception
+  public String procname;
+  public Procedure proc;
+  public ClassCastException castExcept;
+
+  public WrongType(String name, int n, String u)
+  {
+    procname = name;
+    number = n - 1;
+    typeExpected = u;
+  }
+
+  public WrongType(Procedure proc, int n, ClassCastException ex)
+  {
+    this.proc = proc;
+    this.procname = proc.getName();
+    this.number = n;
+    this.castExcept = ex;
+  }
+
+  public WrongType(String procname, int n, ClassCastException ex)
+  {
+    this.procname = procname;
+    this.number = n;
+    this.castExcept = ex;
+  }
+
+  /** This interface is designed for a compact call sequence. */
+  public static WrongType make(ClassCastException ex, Procedure proc, int n)
+  {
+    return new WrongType(proc, n, ex);
+  }
+
+  /** This interface is designed for a compact call sequence. */
+  public static WrongType make(ClassCastException ex, String procname, int n)
+  {
+    return new WrongType(procname, n, ex);
+  }
+
+  public String getMessage()
+  {
+    StringBuffer sbuf = new StringBuffer(100);
+    if (number == ARG_VARNAME)
+      {
+        sbuf.append("Value for variable `");
+        sbuf.append(procname);
+        sbuf.append("' has wrong type");
+      }
+    else if (number == ARG_DESCRIPTION)
+      {
+        sbuf.append(procname);
+        sbuf.append(" has wrong type");
+      }
+    else
+      {
+        sbuf.append("Argument ");
+        if (number >= 0)
+          {
+            sbuf.append('#');
+            sbuf.append(number);
+          }
+        sbuf.append(" to `");
+        sbuf.append(procname);
+        sbuf.append("' has wrong type");
+      }
+    if (castExcept != null)
+      {
+        sbuf.append(" (");
+        sbuf.append(castExcept.getMessage());
+        sbuf.append(')');
+      }
+    return sbuf.toString();
+  }
 }

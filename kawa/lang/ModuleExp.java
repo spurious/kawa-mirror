@@ -18,7 +18,7 @@ public class ModuleExp extends LambdaExp
    * This can be a let scope, or primitive procedure. */
   public boolean mustCompile;
 
-  public ModuleExp (List body, Translator tr, String filename)
+  public ModuleExp (Object body, Translator tr, String filename)
   {
     super (formals, body, tr);
     lookup(env_formal).setType(Compilation.scmEnvironmentType);

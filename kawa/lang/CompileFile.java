@@ -33,7 +33,7 @@ public class CompileFile extends Procedure2
   public static final ModuleExp read (InPort port, Translator tr)
        throws GenericError
   {
-    List body;
+    Object body;
     try
       {
 	body = port.readListBody ();

@@ -397,7 +397,7 @@ public abstract class Interpreter
       {
         if (spec instanceof Class)
           return getTypeFor((Class) spec);
-        if (spec instanceof String)
+        if (spec instanceof String || spec instanceof FString)
           return getTypeFor(spec.toString());
         if (spec instanceof Symbol)
           return getTypeFor(((Symbol) spec).getName());

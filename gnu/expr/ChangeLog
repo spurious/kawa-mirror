@@ -1,3 +1,7 @@
+2004-02-15  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (asType):  Handle FString.
+
 2004-02-13  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add entry for "q2".

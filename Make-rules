@@ -23,6 +23,8 @@ DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
+# Used when pre-processing a file using sed.
+DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' 
 
 # Make sure $(KAWA1) is available, if --enable-gcj-compiled.
 $(TO_TOPDIR)/kawa1$(exeext):

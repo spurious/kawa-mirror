@@ -1,3 +1,7 @@
+2002-02-13  Per Bothner  <per@bothner.com>
+
+	* Make-rules (DONT_EDIT_SUBS):  Moved from gnu/xml/Makefile.am.
+
 2002-02-12  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (main, getInterpreterFromFilenameExtension,

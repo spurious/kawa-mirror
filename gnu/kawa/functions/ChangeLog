@@ -1,3 +1,8 @@
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* AddOp.java:  Use LangPrimType instead of plain PrimTypes.
+	Fixes bug reported 05-10 by Walter C. Pelissero <walter@pelissero.org>.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SUFFIXES):  Removed redundant macro.

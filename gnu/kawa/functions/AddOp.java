@@ -4,6 +4,7 @@ import gnu.math.Numeric;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.kawa.lispexpr.LangPrimType;
 
 /**
  * Implement the Scheme standard functions "+" and "-".
@@ -128,22 +129,22 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
             else if (sig0 == 'D')
               {
                 opcode = 119 /* dneg */;
-                type = Type.double_type;
+                type = LangPrimType.doubleType;
               }
             else if (sig0 == 'F')
               {
                 opcode = 118 /* fneg */;
-                type = Type.float_type;
+                type = LangPrimType.floatType;
               }
             else if (sig0 == 'J')
               {
                 opcode = 117 /* lneg */;
-                type = Type.long_type;
+                type = LangPrimType.longType;
               }
             else
               {
                 opcode = 116 /* ineg */;
-                type = Type.int_type;
+                type = LangPrimType.intType;
               }
             if (type != null)
               {
@@ -171,22 +172,22 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
             else if (sig0 == 'D' || sig1 == 'D')
               {
                 opcode = plusOrMinus > 0 ? 99 /* dadd */ : 103 /* dsub */;
-                type = Type.double_type;
+                type = LangPrimType.doubleType;
               }
             else if (sig0 == 'F' || sig1 == 'F')
               {
                 opcode = plusOrMinus > 0 ? 98 /* fadd */ : 102 /* fsub */;
-                type = Type.float_type;
+                type = LangPrimType.floatType;
               }
             else if (sig0 == 'J' || sig1 == 'J')
               {
                 opcode = plusOrMinus > 0 ? 97 /* ladd */ : 101 /* lsub */;
-                type = Type.long_type;
+                type = LangPrimType.longType;
               }
             else
               {
                 opcode = plusOrMinus > 0 ? 96 /* iadd */ : 100 /* isub */;
-                type = Type.int_type;
+                type = LangPrimType.intType;
               }
             if (type != null)
               {
@@ -234,12 +235,12 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	else if (sig == 'D' || sig == 'F')
 	  {
 	    if (type.isSubtype(typeRealNum))
-	      ptype = Type.double_type;
+	      ptype = LangPrimType.doubleType;
 	  }
 	else
 	  {
 	    if (type.isSubtype(typeIntNum))
-	      ptype = sig == 'J' ? Type.long_type : Type.int_type;
+	      ptype = sig == 'J' ? LangPrimType.longType : LangPrimType.intType;
 	  }
       }
     if (ptype != null)
@@ -248,7 +249,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	// FIXME would be nice to use iinc when appropriate!
 	// We would need to use a special LocalVariableTarget,
 	// created by SetExp when dest is a local variable.
-	// Then if len==2 && ptype==Type.int_type
+	// Then if len==2 && ptype==LangPrimType.intType
 	// && target instanceof LocalVariableTarget
 	// && one arg is QuoteExp && other arg is same local as target
 	// => then emit iinc.

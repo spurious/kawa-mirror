@@ -43,6 +43,7 @@ implements java.awt.event.FocusListener,
       modeline = new Modeline(this, ((SwingBuffer) buffer).modelineDocument);
     setBuffer(buffer);
     jtextpane.addFocusListener(this);
+    jtextpane.addKeyListener(this);
   }
 
   /** Warp this (and optional modeline) inside a ScrollPane in a new JPanel. */
@@ -87,7 +88,6 @@ implements java.awt.event.FocusListener,
 
     super.setBuffer(buffer);
     jtextpane.setDocument(((SwingBuffer) buffer).doc);
-    jtextpane.addKeyListener(this);
     if (modeline != null)
       modeline.setDocument(((SwingBuffer) buffer).modelineDocument);
     EWindow selected = getSelected();

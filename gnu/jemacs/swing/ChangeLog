@@ -1,3 +1,8 @@
+2002-03-24  Per Bothner  <per@bothner.com>
+
+	* SwingWindow.java (<init>):  Call addKeyListener here, instead of ...
+	(setBuffer):  ... here, which causes it to be called too many times.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	New package.

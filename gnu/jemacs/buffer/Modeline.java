@@ -3,20 +3,15 @@ import java.awt.event.FocusEvent;
 import javax.swing.*;
 import java.awt.*;
 
+// Any point to this now?
 public class Modeline extends javax.swing.JTextPane
 {
   Window window;
 
   public Modeline(Window window)
   {
-    super();
+    super(window.buffer.modelineDocument);
     this.window = window;
-    redraw();
-  }
-
-  public void redraw()
-  {
-    setText("---JEmacs: " + window.buffer.getName() + " ---");
   }
 
   public Dimension getMinimumSize() { return getPreferredSize(); }

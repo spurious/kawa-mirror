@@ -1,0 +1,5 @@
+2000-04-23  Per Bothner  <per@bothner.com>
+
+	New package.
+	* hanoi.el:  Imported for xemacs.  Now works as is!
+	* rect.el: Imported from xemacs-21.2.32.  (Not working yet.)

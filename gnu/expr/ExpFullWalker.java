@@ -82,7 +82,7 @@ public class ExpFullWalker extends ExpWalker
       {
 	if (exp.defaultArgs != null)
 	  exp.defaultArgs = walkExps(exp.defaultArgs);
-	if (exitValue == null)
+	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
 	return exp;
       }

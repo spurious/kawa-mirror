@@ -78,14 +78,8 @@
      we must list them each here.
   -->
   <fileset id="build.preprocessed" dir="${build.preprocessed}">
-     <include name="gnu/lists/AbstractSequence.java"/>
-     <include name="gnu/lists/Convert.java"/>
-     <include name="gnu/lists/SeqPosition.java"/>
-     <include name="gnu/lists/Sequence.java"/>
-     <include name="gnu/lists/SimpleVector.java"/>
      <include name="gnu/xml/ParsedXMLHandler.java"/>
      <include name="gnu/xml/ParsedXMLHandlerByte.java"/>
-     <include name="gnu/xml/QName.java"/>
      <include name="gnu/xml/XMLParserChar.java"/>
      <include name="gnu/xml/XMLParserByte.java"/>
      <include name="kawa/Version.java"/>
@@ -134,12 +128,6 @@
        Ant only sets a property once (within a given task chain) and so
        the second setting is ignored if "available" set it to "true".
     -->
-    <!-- 
-       If java.util.List is in the classpath, then we'll compile with
-       Java Collections, unless you override the setting of with-collections.
-    -->
-    <available property="with-collections" classname="java.util.List"/>
-    <property name="with-collections" value="false"/>
     
     <!-- 
        If java.awt.Component is in the classpath, then we'll compile the
@@ -180,7 +168,6 @@
         version=${version}
         dist.kawa.jar=${dist.kawa.jar}
         build.dir=${build.dir}
-        with-collections=${with-collections}
         with-awt=${with-awt}
         with-swing=${with-swing}
         with-sax2=${with-sax2}
@@ -198,14 +185,6 @@
     -->
 
     <xcopy dataOnly="true">
-      <linestripperset id="strip-with-collections-true">
-        <linestripper first="if WITHOUT COLLECTIONS" last="endif WITHOUT COLLECTIONS" />
-      </linestripperset>
-
-      <linestripperset id="strip-with-collections-false">
-        <linestripper first="if WITH COLLECTIONS" last="endif WITH COLLECTIONS" />
-      </linestripperset>
-
       <linestripperset id="strip-byte-subs">
         <linestripper first="if CHAR is char" last="endif CHAR is char" />
       </linestripperset>
@@ -325,16 +304,6 @@
           value="Automatically generated file - DO NOT EDIT!.  -*- buffer-read-only: t -*-" />
       </filterset>
       
-      <filterset id="filter-with-collections-true">
-        <filter token="if WITH COLLECTIONS" value="" />
-        <filter token="endif WITH COLLECTIONS" value="" />
-      </filterset>
-
-      <filterset id="filter-with-collections-false">
-        <filter token="if WITHOUT COLLECTIONS" value="" />
-        <filter token="endif WITHOUT COLLECTIONS" value="" />
-      </filterset>
-
       <filterset id="filter-byte-subs">
         <filter token="CHAR" value="byte" />
         <filter token="XMLParser" value="XMLParserByte" />
@@ -364,15 +333,6 @@
       </filterset>
     </xcopy>
 
-    <xcopy todir="${build.preprocessed}/gnu/lists" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/lists" includes="*.java.in"/>
-      <mapper type="glob" from="*.java.in" to="*.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-with-collections-${with-collections}"/>
-      <linestripperset refid="strip-with-collections-${with-collections}"/>
-    </xcopy>
-    
     <xcopy todir="${build.preprocessed}/gnu/xml" 
            overwrite="${preprocess.overwrite}">
       <fileset dir="${src.dir}/gnu/xml" />

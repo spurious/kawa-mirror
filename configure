@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE GCJ ac_ct_GCJ GCJFLAGS EGREP ECHO RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE pathsep filesep JAVA JAVAC XML_SELECTED JAVA_COLLECTIONS_SELECTED AWT_SELECTED SWING_SELECTED GCJ_COMPILED_SELECTED GCJ_SELECTED extra_java TOP_BUILDDIR JEMACS_VERSION LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot LN_S CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE GCJ ac_ct_GCJ GCJFLAGS EGREP ECHO RANLIB ac_ct_RANLIB CPP CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL GCJDEPMODE am__fastdepGCJ_TRUE am__fastdepGCJ_FALSE LIBTOOL_DEPS WITH_GCJ_TRUE WITH_GCJ_FALSE ENABLE_XML_TRUE ENABLE_XML_FALSE ENABLE_SERVLET_TRUE ENABLE_SERVLET_FALSE WITH_SWING_TRUE WITH_SWING_FALSE WITH_AWT_TRUE WITH_AWT_FALSE WITH_SAX2_TRUE WITH_SAX2_FALSE ENABLE_KAWA_FRONTEND_TRUE ENABLE_KAWA_FRONTEND_FALSE pathsep filesep JAVA JAVAC XML_SELECTED AWT_SELECTED SWING_SELECTED GCJ_COMPILED_SELECTED GCJ_SELECTED extra_java TOP_BUILDDIR JEMACS_VERSION LIBOBJS LTLIBOBJS'
 ac_subst_files='Make_rules'
 
 # Initialize some variables set by options.
@@ -1044,7 +1044,6 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gjc              Compile Kawa using GCJ (GNU Compiler for Java)
-  --without-java-collections Don't use Java collections (java.util.List)
   --with-swing            Assume Swing (Java Foundation Classes) is available
   --with-awt              Assume AWT is available (default on)
   --with-sax2             Assume AWT is available
@@ -2102,15 +2101,6 @@ if test "${enable_servlet+set}" = set; then
   enable_servlet=$enableval
 else
   enable_servlet=no
-fi;
-
-
-# Check whether --with-java-collections or --without-java-collections was given.
-if test "${with_java_collections+set}" = set; then
-  withval="$with_java_collections"
-  with_java_collections=$withval
-else
-  with_java_collections=yes
 fi;
 
 
@@ -4209,7 +4199,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4212 "configure"' > conftest.$ac_ext
+  echo '#line 4202 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5270,7 +5260,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5273:" \
+echo "$as_me:5263:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6200,11 +6190,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6203: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6193: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6207: \$? = $ac_status" >&5
+   echo "$as_me:6197: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6412,11 +6402,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6415: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6405: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6419: \$? = $ac_status" >&5
+   echo "$as_me:6409: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6479,11 +6469,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6482: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6472: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6486: \$? = $ac_status" >&5
+   echo "$as_me:6476: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8325,7 +8315,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8328 "configure"
+#line 8318 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8423,7 +8413,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8426 "configure"
+#line 8416 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10334,11 +10324,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10337: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10327: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10341: \$? = $ac_status" >&5
+   echo "$as_me:10331: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10401,11 +10391,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10404: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10394: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10408: \$? = $ac_status" >&5
+   echo "$as_me:10398: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11526,7 +11516,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11529 "configure"
+#line 11519 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11624,7 +11614,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11627 "configure"
+#line 11617 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12387,11 +12377,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12390: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12380: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12394: \$? = $ac_status" >&5
+   echo "$as_me:12384: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12454,11 +12444,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12457: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12447: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12461: \$? = $ac_status" >&5
+   echo "$as_me:12451: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14274,11 +14264,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14277: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14267: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14281: \$? = $ac_status" >&5
+   echo "$as_me:14271: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14486,11 +14476,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14489: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14479: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14493: \$? = $ac_status" >&5
+   echo "$as_me:14483: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14553,11 +14543,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14556: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14546: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14560: \$? = $ac_status" >&5
+   echo "$as_me:14550: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16399,7 +16389,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 16402 "configure"
+#line 16392 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -16497,7 +16487,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 16500 "configure"
+#line 16490 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17731,15 +17721,6 @@ else
 fi
 
 
-case ${with_java_collections} in
-  yes)
-    JAVA_COLLECTIONS_SELECTED=WITH_JAVA_COLLECTIONS
-    ;;
-  *)
-    JAVA_COLLECTIONS_SELECTED=WITHOUT_JAVA_COLLECTIONS
-    ;;
-esac
-
 case ${with_swing} in
   yes)
     extra_java='$(java_SWING)'
@@ -17773,7 +17754,6 @@ filesep='/'
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
-
 
 
 
@@ -18741,7 +18721,6 @@ s,@filesep@,$filesep,;t t
 s,@JAVA@,$JAVA,;t t
 s,@JAVAC@,$JAVAC,;t t
 s,@XML_SELECTED@,$XML_SELECTED,;t t
-s,@JAVA_COLLECTIONS_SELECTED@,$JAVA_COLLECTIONS_SELECTED,;t t
 s,@AWT_SELECTED@,$AWT_SELECTED,;t t
 s,@SWING_SELECTED@,$SWING_SELECTED,;t t
 s,@GCJ_COMPILED_SELECTED@,$GCJ_COMPILED_SELECTED,;t t

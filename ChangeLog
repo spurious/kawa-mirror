@@ -1,5 +1,10 @@
 2003-05-09  Per Bothner  <per@bothner.com>
 
+	* configure.in:  Remove --with-java-collections arg and related crud.
+	* build.xml (build.preprocessed):  Remove gnu/lists and QName.
+	Remove no-longer-needed will-collections crud.
+	* build.properties:  Remove with-collections.
+
 	* build.xml (build.selectjava):  Add new gnu/lists classes.
 
 2003-05-04  Per Bothner  <per@bothner.com>

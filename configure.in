@@ -28,10 +28,6 @@ AC_ARG_ENABLE(servlet,
   [  --enable-servlet        Build support for generating servlets],
   enable_servlet=$enableval, enable_servlet=no)
 
-AC_ARG_WITH(java-collections,
-  [  --without-java-collections Don't use Java collections (java.util.List)],
-  with_java_collections=$withval, with_java_collections=yes)
-
 AC_ARG_WITH(swing,
   [  --with-swing            Assume Swing (Java Foundation Classes) is available])
 
@@ -103,15 +99,6 @@ AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 
-case ${with_java_collections} in
-  yes)
-    JAVA_COLLECTIONS_SELECTED=WITH_JAVA_COLLECTIONS
-    ;;
-  *)
-    JAVA_COLLECTIONS_SELECTED=WITHOUT_JAVA_COLLECTIONS
-    ;;
-esac
-  
 case ${with_swing} in
   yes)
     extra_java='$(java_SWING)'
@@ -146,7 +133,6 @@ AC_SUBST(JAVAC)
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
 AC_SUBST(XML_SELECTED)
-AC_SUBST(JAVA_COLLECTIONS_SELECTED)
 AC_SUBST(AWT_SELECTED)
 AC_SUBST(SWING_SELECTED)
 AC_SUBST(GCJ_COMPILED_SELECTED)

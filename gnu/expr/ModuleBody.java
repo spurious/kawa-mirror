@@ -94,6 +94,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 	  }
 	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
 	gnu.mapping.OutPort.runCleanups();
+	kawa.repl.exitDecrement();
       }
     catch (Throwable ex)
       {

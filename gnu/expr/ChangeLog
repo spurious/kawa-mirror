@@ -1,5 +1,7 @@
 2002-04-18  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java (runAsMain):  Call kawa.repl's exitDecrement.
+
 	* Compilation.java:  Use Methods's new startCode method.
 
 2002-03-18  Per Bothner  <per@bothner.com>

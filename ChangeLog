@@ -1,3 +1,8 @@
+2004-12-20  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (selfEvauatingSymbol): New method.
+	(matches, getBinding, rewrite_pair, rewrite): Use new method.
+
 2004-12-19  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxTemplate.java: New handling of ellipsis,

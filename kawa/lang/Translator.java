@@ -148,6 +148,11 @@ public class Translator extends Compilation
     return null;
   }
 
+  final boolean selfEvaluatingSymbol (Object obj)
+  {
+    return ((LispInterpreter) getInterpreter()).selfEvaluatingSymbol(obj);
+  }
+
   /** True iff a form matches a literal symbol. */
   public boolean matches(Object form, String literal)
   {
@@ -156,7 +161,7 @@ public class Translator extends Compilation
 	// FIXME
 	return literal == ((SyntaxForm) form).form;
       }
-    if (form instanceof Symbol)
+    if (form instanceof Symbol && ! selfEvaluatingSymbol(form))
       {
 	ReferenceExp rexp = getOriginalRef(lexical.lookup(form, -1));
 	if (rexp != null)
@@ -196,7 +201,8 @@ public class Translator extends Compilation
    */
   Object getBinding (Object obj, boolean function)
   {
-    if (obj instanceof String || obj instanceof Symbol)
+    if (obj instanceof String
+	|| (obj instanceof Symbol && ! selfEvaluatingSymbol(obj)))
       {
 	Object nameToLookup;
 	Declaration decl = lexical.lookup(obj, function);
@@ -320,7 +326,7 @@ public class Translator extends Compilation
 	    Object sym = ref.getSymbol();
 	    Symbol symbol;
 	    String name;
-	    if (sym instanceof Symbol)
+	    if (sym instanceof Symbol && ! selfEvaluatingSymbol(sym))
 	      {
 		symbol = (Symbol) sym;
 		name = symbol.getName();
@@ -631,7 +637,8 @@ public class Translator extends Compilation
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair ((Pair) exp);
-    else if (exp instanceof String || exp instanceof Symbol)
+    else if (exp instanceof String
+	     || (exp instanceof Symbol && ! selfEvaluatingSymbol(exp)))
       {
 	Declaration decl = lexical.lookup(exp, function);
 	Object nameToLookup;

@@ -236,7 +236,7 @@ public class NamespaceResolver extends FilterConsumer
 		int end = i < attrCount ? startIndexes[i+1] : tlist.gapStart;
 		// Kludge:  Hard-wired in the size of BEGIN_ATTRIBUTE_LONG
 		// and END_ATTRIBUTE from TreeList.  
-		tlist.consumeRange(start + 5, end - 1, cons);
+		tlist.consumeIRange(start + 5, end - 1, cons);
 		cons.endAttribute();
 	      }
 	  }

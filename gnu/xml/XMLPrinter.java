@@ -220,7 +220,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     else if (v instanceof SeqPosition)
       {
 	SeqPosition pos = (SeqPosition) v;
-	pos.sequence.consumeNext(pos.ipos, pos.xpos, this);
+	pos.sequence.consumeNext(pos.ipos, this);
       }
     else if (v instanceof Char)
       writeChar(((Char) v).intValue());
@@ -291,13 +291,13 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
       super.write(buf, limit - count, count);
   }
 
-  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)
+  public boolean writePosition(AbstractSequence seq, int ipos)
   {
-    seq.consumeNext(ipos, xpos, this);
+    seq.consumeNext(ipos, this);
     return true;
   }
 
-  public boolean consume(TreePosition position)
+  public boolean consume (SeqPosition position)
   {
     throw new Error("not implemented consume(TreePosition)");
   }

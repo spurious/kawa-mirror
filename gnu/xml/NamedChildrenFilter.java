@@ -90,7 +90,7 @@ public class NamedChildrenFilter extends FilterConsumer
 	SeqPosition pos = (SeqPosition) val;
 	if (pos.sequence instanceof TreeList)
 	  {
-	    ((TreeList) pos.sequence).consumeNext(pos.ipos, pos.xpos, this);
+	    ((TreeList) pos.sequence).consumeNext(pos.ipos, this);
 	    return;
 	  }
       }

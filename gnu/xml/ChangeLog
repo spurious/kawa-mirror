@@ -1,5 +1,9 @@
 2003-01-09  Per Bothner  <per@bothner.com>
 
+	* NamedChildrenFilter.java:  Update for gnu.lists changes.
+	* NamespaceResolver.java:  Likewise.
+	* XMLPrinter.java:  Likewise.
+	
 	* XMLPrinter.java (<init>):  Add 5 new constructors.
 	(setStyle):  New method.
 	(make):  Use setStyle.

@@ -1,3 +1,7 @@
+2002-06-13  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (writeExternal):  Fix typo in exception message.
+
 2002-06-05  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (emitCoerceToObject):  New method.

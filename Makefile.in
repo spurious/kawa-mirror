@@ -72,7 +72,7 @@ DATA = $(java_DATA)
 
 DIST_COMMON = README ChangeLog Makefile.am Makefile.in NEWS README TODO \
 aclocal.m4 configure configure.in install-sh mdate-sh mkinstalldirs \
-stamp-vti texinfo.tex version.texi
+texinfo.tex version.texi
 
 
 PACKAGE = @PACKAGE@
@@ -106,12 +106,12 @@ stamp-vti: kawa.texi $(top_srcdir)/configure.in
 	  && $(SHELL) ./mdate-sh kawa.texi`" > vti.tmp
 	echo "@set EDITION $(VERSION)" >> vti.tmp
 	echo "@set VERSION $(VERSION)" >> vti.tmp
-	if cmp -s vti.tmp $(srcdir)/version.texi; then \
+	if cmp -s vti.tmp version.texi; then \
 	  rm vti.tmp;			\
 	else					\
-	  mv vti.tmp $(srcdir)/version.texi; \
+	  mv vti.tmp version.texi; \
 	fi
-	echo timestamp > $(srcdir)/stamp-vti
+	echo timestamp > stamp-vti
 
 mostlyclean-vti:
 	rm -f vti.tmp
@@ -252,11 +252,24 @@ distdir: $(DEP_DISTFILES)
 	distdir=`cd $(distdir) && pwd` \
 	  && cd $(srcdir) \
 	  && automake --include-deps --output-dir=$$distdir --strictness=foreign
-	@for file in `cd $(srcdir) && echo $(DISTFILES)`; do \
+	if test "$(srcdir)" = "." && ln -s . linkdir ; then true; \
+	else \
+	  mkdir linkdir; \
+	  for dir in $(srcdir) . ; do \
+	    for file in `cd $$dir && echo *` ; do \
+	      test -f linkdir/$$file \
+	      || test -d $$dir/$$file \
+	      || ln $$dir/$$file linkdir/$$file 2> /dev/null \
+	      || cp -p $$dir/$$file linkdir/$$file; \
+	    done; \
+	  done; \
+	fi
+	for file in `cd linkdir && echo $(DISTFILES)`; do \
 	  test -f $(distdir)/$$file \
-	  || ln $(srcdir)/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p $(srcdir)/$$file $(distdir)/$$file; \
+	  || ln linkdir/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p linkdir/$$file $(distdir)/$$file; \
 	done
+	rm -rf linkdir
 	for subdir in $(SUBDIRS); do		\
 	  test -d $(distdir)/$$subdir		\
 	  || mkdir $(distdir)/$$subdir		\
@@ -356,14 +369,14 @@ mostlyclean distclean maintainer-clean
 kawac.class:  $(srcdir)/kawac.java
 	$(JAVAC) -d . $<
 
-kawa.txt:  $(srcdir)/kawa.texi
+kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \
 	    --no-split --no-headers --paragraph-indent=asis $< -o - \
           | sed -e '/^Concept Index/,$$d' \
              -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
 
-kawa.html:  $(srcdir)/kawa.texi
+kawa.html:  $(srcdir)/kawa.texi version.texi
 	texi2html $<
 
 all-recursive:  kawac.class

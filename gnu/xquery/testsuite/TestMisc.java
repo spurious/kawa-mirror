@@ -103,7 +103,7 @@ public class TestMisc
 	     "<fld1 align=\"left\">b1</fld1>");
 
     evalTest("document(\"tab.xml\")/result/row/(fld2,fld1)",
-	     "<fld2 align=\"right\">12</fld2><fld1>a1</fld1><fld2 align=\"right\">22</fld2><fld1 align=\"left\">b1</fld1>");
+	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
 
     evalTest("string-value(document('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
@@ -162,6 +162,19 @@ public class TestMisc
 	     + " return ('[', $n, ']')",
 	     "[<a at1=\"val1\"><b /><c /></a>][ at1=\"val1\"][<b />][<c />]");
 
+    // Boundary whitsapce (xmlspace) tests:
+    evalTest("declare xmlspace = preserve\n"
+	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
+	     " ;<b/>;  x  ;");
+    evalTest("declare xmlspace = skip\n"
+	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
+	     "<b/>; x ;");
+    evalTest("declare xmlspace = skip\n"
+	     + "for $n in (<a> x <b/> y<c/>&#x20;</a>)/node() return ($n,';')",
+	     " x ;<b/>; y;<c/>; ;");
+    evalTest("for $n in (<a> <b/> </a>)/node() return ($n,';')",
+	     "<b/>;");
+
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
     evalTest("declare namespace x1='XXX'\n declare namespace x2='XXX'\n"
@@ -204,9 +217,8 @@ public class TestMisc
 
     evalTest("document(\"tab.xml\")/result/row[1]/descendant::*",
 	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
-    evalTest("document(\"tab.xml\")/result/row[1]/descendant::node()",
-	     "<fld1>a1</fld1>a1<fld2 align=\"right\">12</fld2>"
-	     + " align=\"right\"12");
+    evalTest("for $x in document(\"tab.xml\")/result/row[1]/descendant::node() return ($x,';')",
+	     "\n;<fld1>a1</fld1>;a1;\n;<fld2 align=\"right\">12</fld2>;12;\n;");
     evalTest("document(\"tab.xml\")/result/row[1]/descendant::text()",
 	     "a112");
     evalTest("document(\"tab.xml\")/result/row[1]/descendant-or-self::*",
@@ -225,7 +237,6 @@ public class TestMisc
     evalTest("define function x(){<a><b x='1'/><b x='2'/></a>}"
 	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
-    failureExpectedNext = "";
     evalTest("define function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>}"
 	     + " let $st := s()/a return ("
 	     + " '[',$st/@x ,'] [',$st ,']')",
@@ -363,6 +374,7 @@ public class TestMisc
 	      ex = throwable;
 	  }
 	throwable = ex;
+	// throwable.printStackTrace();
 	if (ex instanceof SyntaxException)
 	  result = "*** caught SyntaxException - "
 	    + ((SyntaxException) ex).getMessages().getErrors();

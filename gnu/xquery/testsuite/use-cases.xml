@@ -158,18 +158,265 @@ the title of the book and its price from each source.</description>
 </test>
 
 <test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q6</ident>
+<description>For each book that has at least one author, list the title
+and first two authors, and an empty "et-al" element if the book has
+additional authors.</description>
+<query>
+<bib>
+  {
+    for $b in doc("bib.xml")//book
+    where count($b/author) &gt; 0
+    return
+        <book>
+            { $b/title }
+            {
+                for $a in $b/author[position()&lt;=2]  
+                return $a
+            }
+            {
+                if (count($b/author) &gt; 2)
+                 then <et-al/>
+                 else ()
+            }
+        </book>
+  }
+</bib>
+</query>
+<expect>
+<bib>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <author>
+            <last>Stevens</last>
+            <first>W.</first>
+        </author>
+    </book>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <author>
+            <last>Stevens</last>
+            <first>W.</first>
+        </author>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <author>
+            <last>Abiteboul</last>
+            <first>Serge</first>
+        </author>
+        <author>
+            <last>Buneman</last>
+            <first>Peter</first>
+        </author>
+        <et-al/>
+    </book>
+</bib>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q9</ident>
+<description>In the document "books.xml", find all section or chapter titles
+that contain the word "XML", regardless of the level of nesting.</description>
+<NOTE>books.xml has been inlines to the $books variable.</NOTE>
+<query>
+let $books :=
+document {
+<chapter>
+    <title>Data Model</title>
+    <section>
+        <title>Syntax For Data Model</title>
+    </section>
+    <section>
+        <title>XML</title>
+        <section>
+            <title>Basic Syntax</title>
+        </section>
+        <section>
+            <title>XML and Semistructured Data</title>
+        </section>
+    </section>
+</chapter>
+}
+return
+<results>
+  {
+    for $t in $books//(chapter | section)/title
+    where contains($t/text(), "XML")
+    return $t
+  }
+</results>
+</query>
+<expect>
+<results>
+    <title>XML</title>
+    <title>XML and Semistructured Data</title>
+</results>
+</expect>
+</test>
+
+<!--
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q10</ident>
+<description>In the document "prices.xml", find the minimum price for
+each book, in the form of a "minprice" element with the book title as
+its title attribute.</description>
+<query>
+<results>
+  {
+    let $doc := doc("docs/prices.xml")
+    for $t in distinct-values($doc//book/title)
+    let $p := $doc//book[title = $t]/price
+    return
+      <minprice title="{ $t }">
+        <price>{ min($p) }</price>
+      </minprice>
+  }
+</results>
+</query>
+<expect>
+<results>
+    <minprice title="Advanced Programming in the Unix environment">
+        <price>65.95</price>
+    </minprice>
+    <minprice title="TCP/IP Illustrated">
+        <price>65.95</price>
+    </minprice>
+    <minprice title="Data on the Web">
+        <price>34.95</price>
+    </minprice>
+</results>
+</expect>
+</test>
+-->
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q11</ident>
+<description>For each book with an author, return the book with its
+title and authors. For each book with an editor, return a reference
+with the book title and the editor's affiliation.</description>
+<query>
+<bib>
+{
+        for $b in doc("bib.xml")//book[author]
+        return
+            <book>
+                { $b/title }
+                { $b/author }
+            </book>
+}
+{
+        for $b in doc("bib.xml")//book[editor]
+        return
+          <reference>
+            { $b/title }
+            {$b/editor/affiliation}
+          </reference>
+}
+</bib> 
+</query>
+<expect>
+<bib>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <author>
+            <last>Stevens</last>
+            <first>W.</first>
+        </author>
+    </book>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <author>
+            <last>Stevens</last>
+            <first>W.</first>
+        </author>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <author>
+            <last>Abiteboul</last>
+            <first>Serge</first>
+        </author>
+        <author>
+            <last>Buneman</last>
+            <first>Peter</first>
+        </author>
+        <author>
+            <last>Suciu</last>
+            <first>Dan</first>
+        </author>
+    </book>
+    <reference>
+        <title>The Economics of Technology and Content for Digital TV</title>
+        <affiliation>CITI</affiliation>
+    </reference>
+</bib>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q1</ident>
+<description><![CDATA[Prepare a (nested) table of contents for Book1, listing
+all the sections and their titles. Preserve the original attributes of
+each <section> element, if any.]]></description>
+<query>
+(:define function toc($book-or-section as element()) as element()*:)
+define function toc($book-or-section as element())
+{
+    for $section in $book-or-section/section
+    return
+        <section>
+                { $section/@* , $section/title , toc($section) }            
+        </section>
+}
+
+<toc>
+   {
+     for $s in doc("book1.xml")/book return toc($s)
+   }
+</toc>
+</query>
+<expect>
+<toc>
+    <section id="intro" difficulty="easy">
+        <title>Introduction</title>
+        <section>
+            <title>Audience</title>
+        </section>
+        <section>
+            <title>Web Data and the Two Cultures</title>
+        </section>
+    </section>
+    <section id="syntax" difficulty="medium">
+        <title>A Syntax For Data</title>
+        <section>
+            <title>Base Types</title>
+        </section>
+        <section>
+            <title>Representing Relational Databases</title>
+        </section>
+        <section>
+            <title>Representing Object Databases</title>
+        </section>
+    </section>
+</toc>
+</expect>
+</test>
+
+<test>
 <ident>Use Case "TREE": Queries that preserve hierarchy: Q2</ident>
 <description><!CDATA[[Prepare a (flat) figure list for Book1, listing all the
 figures and their titles. Preserve the original attributes of each
 <figure>; element, if any.]]></description>
-<NOTE>had to remove spaces between 'figure' and attribute expressions</NOTE>
 <query>
 let $res :=
 <figlist>
 {
     for $f in document("book1.xml")//figure
     return
-        <figure>{ $f/@* }
+        <figure>
+            { $f/@* }
             { $f/title }
         </figure>
 }
@@ -233,11 +480,10 @@ immediately contained in the section.</description>
     for $s in document("book1.xml")//section
     let $f := $s/figure 
     return
-        <section title={ $s/title/text() } figcount={ count($f) }/>
+        <section title="{ $s/title/text() }" figcount="{ count($f) }"/>
 }
 </section_list> ]]>
 </query>
-<NOTE> the expcted out in the use-cases document is in the wrong order</NOTE>
 <expect>
 <section_list>
 <section title="Introduction" figcount="0"/>
@@ -263,7 +509,8 @@ includes the number of figures immediately contained in the section.
 <query><![CDATA[
 define function section_summary($s)
 {
-    <section>{ $s/@* }
+    <section>
+        { $s/@* }
         { $s/title }
         <figcount>{ count($s/figure) }</figcount>
 {
@@ -410,15 +657,14 @@ return
 
 <test>
 <ident>Use Case "PARTS" - Recursive Parts Explosion: Q1 inline data</ident>
-<NOTE>Instead of using an external parts-data.xml file, dine $Parts-line</NOTE>
-<NOTE>use ...//part where COND instead of ...//[COND]</NOTE>
-<NOTE>removed parameter and return type specifie</NOTE>
+<NOTE>Instead of using an external parts-data.xml file, define $parts-list
+inline</NOTE>
 <query><![CDATA[
 
-define function one_level ($p, $parts-data)
+define function one_level ($p as element(), $parts-data) as element()
 {
-    <part partid={ $p/@partid } 
-          name={ $p/@name } >
+    <part partid="{ $p/@partid }"
+          name="{ $p/@name }" >
 {
             for $s in $parts-data//part
             where $s/@partof = $p/@partid
@@ -443,30 +689,28 @@ let $parts-list :=
 return
 <parttree>
 {
-    for $p in $parts-list//part where empty($p/@partof)
+    for $p in $parts-list//part[empty(@partof)]
     return one_level($p, $parts-list)
   }
 </parttree>]]>
 </query>
-<NOTE>Need to used CDATA and unabbreviated end tags</NOTE>
 <expect>
-<![CDATA[
 <parttree>
-<part partid="0" name="car">
-<part partid="1" name="engine">
-<part partid="3" name="piston"></part>
-</part>
-<part partid="2" name="door">
-<part partid="4" name="window"></part>
-<part partid="5" name="lock"></part>
-</part>
-</part>
-<part partid="10" name="skateboard">
-<part partid="11" name="board"></part>
-<part partid="12" name="wheel"></part>
-</part>
-<part partid="20" name="canoe"></part>
-</parttree>]]>
+  <part partid="0" name="car">
+    <part partid="1" name="engine">
+      <part partid="3" name="piston" />
+    </part>
+    <part partid="2" name="door">
+      <part partid="4" name="window" />
+      <part partid="5" name="lock" />
+    </part>
+  </part>
+  <part partid="10" name="skateboard">
+    <part partid="11" name="board" />
+    <part partid="12" name="wheel" />
+  </part>
+  <part partid="20" name="canoe" />
+</parttree>
 </expect>
 </test>
 

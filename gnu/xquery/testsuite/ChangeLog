@@ -1,3 +1,11 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main):  Fix/update some tests.
+	Add 4 tests for boundary whitespace and	declare xmlspace.
+	* maketab1.xql:  Add a now-needed xmlspace declaration.
+	* use-cases.xml:  Add 4 more use cases.
+	Update older test cases to match official uses cases.
+
 2003-07-26  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Add test for distinct-nodes.

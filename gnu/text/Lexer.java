@@ -28,7 +28,7 @@ public class Lexer extends Reader
   /** Enter a nested expression.
    * This is used in interactive mode to control whether to continue
    * past end of line, depending on whether the expression is incomplete.
-   * @parm promptChar Used in prompt string to indicate type of nesting.
+   * @param promptChar Used in prompt string to indicate type of nesting.
    * @return The previous value of promptChar, to be passed to popNesting.
    */
   public char pushNesting (char promptChar)

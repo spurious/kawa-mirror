@@ -102,7 +102,7 @@ public class SourceMessages
   }
 
   /** Record a new error.
-   * @param serverity is the seriousness of the error
+   * @param severity is the seriousness of the error
    *  - one of 'w' (for warning), 'e' (for error), or 'f' (for fatal error)
    * @param filename the name or URL of the file containing the error
    * @param line the (1-origin) line number or 0 if unknown
@@ -116,7 +116,7 @@ public class SourceMessages
   }
 
   /** Record a new error at the current default source file location.
-   * @param serverity is the seriousness of the error
+   * @param severity is the seriousness of the error
    *  - one of 'w' (for warning), 'e' (for error), or 'f' (for fatal error)
    * @param message the error message
    */

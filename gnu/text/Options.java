@@ -202,7 +202,7 @@ public class Options
   }
 
   /** Set a list of options, remember the old value.
-   * @ param options is vector of triples, echo of which is consisting of:
+   * @param options is vector of triples, echo of which is consisting of:
    * a String option key;
    * an entry whose valus is ignores and is used to store the old value; and
    * a new value for the options.

@@ -1,0 +1,8 @@
+(define-syntax let (syntax-rules ()
+		    ((let (bindings ...) body ...)
+		     (%let (bindings ...) body ...))
+		    ((let name ((var init) ...) body ...)
+		     ((letrec ((name (lambda (var ...)
+				       body ...)))
+			name)
+		      init ...))))

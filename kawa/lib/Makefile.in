@@ -42,13 +42,17 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .scm .class
 
-JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
-JAVA=java -classpath ../..:$$CLASSPATH
+JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVA=java -classpath @TOP_BUILDDIR@:$$CLASSPATH
 
 javadir=$(prefix)/java/kawa/lib
 
 OBJ=\
+  case.class \
+  cond.class \
+  delay.class \
   do.class \
+  let.class \
   when_unless.class
 
 java_DATA=$(OBJ)
@@ -57,7 +61,7 @@ CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 
-DIST_COMMON = Makefile.am Makefile.in
+DIST_COMMON = ChangeLog Makefile.am Makefile.in
 
 
 PACKAGE = @PACKAGE@

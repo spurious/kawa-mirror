@@ -94,6 +94,10 @@ public class Compilation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeSymbol
     = ClassType.make("gnu.mapping.Symbol", typeLocation);
+  static public final Method getSymbolValueMethod
+    = typeInterpreter.getDeclaredMethod("getSymbolValue", 1);
+  static public final Method getSymbolProcedureMethod
+    = typeInterpreter.getDeclaredMethod("getSymbolProcedure", 1);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
@@ -1668,7 +1672,7 @@ public class Compilation
     pop(current_scope);
   }
 
-  public Declaration lookup(String name, int namespace)
+  public Declaration lookup(Object name, int namespace)
   {
     Interpreter interp = getInterpreter();
     for (ScopeExp scope = current_scope;  scope != null;  scope = scope.outer)

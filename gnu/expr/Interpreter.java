@@ -4,10 +4,12 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
+import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
+import gnu.kawa.reflect.ClassMethods;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 
@@ -370,7 +372,7 @@ public abstract class Interpreter
         if (spec instanceof Symbol)
           return getTypeFor(((Symbol) spec).getName());
         if (spec instanceof CharSeq)
-          return gnu.bytecode.ClassType.make(spec.toString());
+          return ClassType.make(spec.toString());
       }
     return (Type) spec;
   }
@@ -576,6 +578,36 @@ public abstract class Interpreter
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"
 				 + messages.toString(20));
+  }
+
+  public Object getDefaultSymbolValue (Symbol sym, boolean function)
+  {
+    String uri = sym.getNamespaceURI();
+    String name = sym.getName();
+    if (function || ! hasSeparateFunctionNamespace())
+      {
+	if (uri != null && uri.startsWith("class:"))
+	  return ClassMethods.apply(uri.substring(6), name);
+      }
+    throw new UnboundSymbol(name);
+  }
+
+  public static Object getSymbolValue (Symbol sym)
+  {
+    Object val = sym.get(Symbol.UNBOUND);
+    if (val == Symbol.UNBOUND)
+      return getInterpreter().getDefaultSymbolValue(sym, false);
+    return val;
+  }
+
+  public static Procedure getSymbolProcedure (Symbol sym)
+  {
+    Object val = sym.getFunctionValue(Symbol.UNBOUND);
+    if (val == Symbol.UNBOUND)
+      val = sym.get(Symbol.UNBOUND);
+    if (val == Symbol.UNBOUND)
+      val = getInterpreter().getDefaultSymbolValue(sym, true);
+    return (Procedure) val;
   }
 
   // The compiler finds registerEnvironment by using reflection.

@@ -97,11 +97,12 @@ public class ReferenceExp extends Expression
       }
     if (getDontDereference())
       return symbol instanceof Symbol ? symbol : env.getSymbol(symbol.toString());
-    else if (getFlag(PREFER_BINDING2))
+    else if (getFlag(PREFER_BINDING2) || symbol instanceof Symbol)
       {
-	Symbol bind = symbol instanceof Symbol ? (Symbol) symbol
+	Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
 	  : env.getSymbol(symbol.toString());
-	return isProcedureName() ? bind.getFunctionValue() : bind.get();
+	return isProcedureName() ? Interpreter.getSymbolProcedure(sym)
+	  : Interpreter.getSymbolValue(sym);
       }
     else
       return env.getChecked(symbol.toString());
@@ -118,14 +119,15 @@ public class ReferenceExp extends Expression
     if (decl.isIndirectBinding() && ! getDontDereference())
       {
 	if (! isProcedureName())
-	  code.emitInvokeVirtual(Compilation.getLocationMethod);
+	  code.emitInvokeStatic(Compilation.getSymbolValueMethod);
 	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
 	//   code.emitGetField(Compilation.functionValueBinding2Field);
 	else
 	  {
-	    code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	    //code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	    code.emitInvokeStatic(Compilation.getSymbolProcedureMethod);
 	    rtype = Compilation.typeProcedure;
-      }
+	  }
       }
     else if (decl.isFluid() && decl.field == null)
       code.emitGetField(FluidLetExp.valueField);

@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.text.*;
+import gnu.bytecode.*;
 
 public class InlineCalls extends ExpWalker
 {
@@ -14,6 +15,41 @@ public class InlineCalls extends ExpWalker
     walker.walk(exp);
   }
 
+  /** Possibly convert a Symbol method call to invokeStatic or make. */
+  public static Expression rewriteToInvocation(Symbol sym, Expression[] args)
+  {
+    String uri = sym.getNamespaceURI();
+    if (uri == null || ! uri.startsWith("class:"))
+      return null;
+    String className = uri.substring(6);
+    String methodName = sym.getName();
+    ClassType typeInvoke = ClassType.make("gnu.kawa.reflect.Invoke");
+    String invFieldName;
+    Procedure invProc;
+    boolean isNew = methodName.equals("new");
+    if (isNew)
+      {
+	invFieldName = "make";
+	invProc = gnu.kawa.reflect.Invoke.make;
+      }
+    else
+      {
+	invFieldName = "invokeStatic";
+	invProc = gnu.kawa.reflect.Invoke.invokeStatic;
+      }
+    Field invField = typeInvoke.getDeclaredField(invFieldName);
+    Declaration invDecl = new Declaration("invoke", invField);
+    invDecl.noteValue(new QuoteExp(invProc));
+    invDecl.setFlag(Declaration.IS_CONSTANT);
+    Expression[] xargs = new Expression[args.length + (isNew ? 1 : 2)];
+    System.arraycopy(args, 0, xargs, (isNew ? 1 : 2), args.length);
+    xargs[0] = new QuoteExp(className);
+    if (! isNew)
+      xargs[1] = new QuoteExp(methodName);
+    args = xargs;
+    return new ApplyExp(new ReferenceExp(invDecl), args);
+  }
+
   protected Expression walkApplyExp(ApplyExp exp)
   {
     super.walkApplyExp(exp);
@@ -25,13 +61,22 @@ public class InlineCalls extends ExpWalker
     Declaration decl = null;
     if (func instanceof ReferenceExp)
       {
-        decl = ((ReferenceExp) func).binding;
+	ReferenceExp rexp = (ReferenceExp) func;
+        decl = rexp.binding;
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
             func = decl.getValue();
 	    if (func instanceof LambdaExp) 
 	      lambda = (LambdaExp) func;
 	  }
+	else if (rexp.getSymbol() instanceof Symbol)
+	  {
+	    Expression inv
+	      = rewriteToInvocation((Symbol) rexp.getSymbol(), exp.args);
+	    if (inv != null)
+	      return inv;
+	  }
+		 
       }
     if (func instanceof QuoteExp)
       {

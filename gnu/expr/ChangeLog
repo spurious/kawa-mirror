@@ -1,3 +1,14 @@
+2002-11-20  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getSymbolValue, getSymbolProcedure,
+	getDefaultSymbolValue):  New methods.
+	* Compilation.java (lookup):  Argument can be Symbol as well as String.
+	(getSymbolValueMethod, getSymbolProcedureMethod):  New fields.
+	* ReferenceExp.java (eval):  Handle Symbol better.
+	(eval, compile):  Use new Interpreter methods.
+	* InlineCalls.java (rewriteToInvocation):  New method.
+	(walkApplyExp):  If function is Symbol, try rewriteToInvocation.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (NAMESPACE_PREFIX):  New constant.

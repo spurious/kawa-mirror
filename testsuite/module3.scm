@@ -23,3 +23,8 @@
 
 (define (namespace-syntax-call)
   (namespace-syntax-test))
+
+;; Test for Savannah bug #5651
+(define (iarr-set (array :: <int[]>) (index :: <int>) (value :: <int>))
+  (let ((setter (primitive-array-set <int>)))
+    (setter array index value)))

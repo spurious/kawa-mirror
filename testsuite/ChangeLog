@@ -1,3 +1,9 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	Based on Savannah bug #5651 from Chris Dean <Chris.Dean@sokitomi.com>.
+	* module3.scm (iarr-set):  New function.
+	* obj-test.scm:  New test for primitive-array macros.
+
 2003-09-11  Per Bothner  <per@bothner.com>
 
 	* testing.scm (test):  Catch exception.

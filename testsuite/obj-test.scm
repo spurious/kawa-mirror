@@ -1,4 +1,4 @@
-(test-init "Objects" 87)
+(test-init "Objects" 88)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -274,3 +274,12 @@
 (test 99 pa-getter pa-data 5)
 (test #!null pa-getter pa-data 6)
 (test 10 pa-length pa-data)
+
+;; Test for Savannah bug #5651
+(define arr-5 ((primitive-array-new <int>) 5))
+((primitive-array-set <int>) arr-5 1 98)
+(iarr-set arr-5 0 99)
+(test '(99 98 0) 'prim-arr-test
+      (let ((getter (primitive-array-get <int>)))
+	(list (getter arr-5 0) (getter arr-5 1)
+	      ((primitive-array-get <int>) arr-5 4))))

@@ -1,3 +1,13 @@
+2003-10-12  Per Bothner  <per@bothner.com>
+
+	* prog1.java:  New class, extends Syntax.
+	* function.java:  New class, extends Syntax.
+	* Makefile.am (java_sources):  Update accordingly.
+	* CommonLisp.java (<init>):  Define function, prog1, prog2.
+
+	* defun.java (rewriteForm):  Simplify.
+	* defvar.java (rewriteForm):  Handle Symbols properly.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (<init>):  Minor simplification/optimization.

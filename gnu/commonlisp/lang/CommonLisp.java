@@ -127,7 +127,10 @@ public class CommonLisp extends Lisp2
     defun("defvar", new defvar(false));
     defun("defconst", new defvar(true));
     defun("defsubst", new defun(lambda));
+    defun("function", new function(lambda));
     defun("setq", new setq());
+    defun("prog1", new prog1("prog1", 1));
+    defun("prog2", prog1.prog2);
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));

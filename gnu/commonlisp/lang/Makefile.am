@@ -5,7 +5,11 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   CLispReader.java \
   Lisp2.java \
-  defun.java setq.java defvar.java \
+  defvar.java \
+  defun.java \
+  function.java \
+  prog1.java \
+  setq.java \
   Symbols.java \
   SymbolTable.java \
   UnwindProtect.java \

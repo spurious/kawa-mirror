@@ -55,11 +55,7 @@ public class defun extends Syntax implements Printable
       {
 	Pair p1 = (Pair) obj;
 	
-	if (p1.car instanceof Symbol)
-	  {
-	    name = p1.car;
-	  }
-	else if (p1.car instanceof String)
+	if (p1.car instanceof Symbol || p1.car instanceof String)
 	  {
 	    name = p1.car.toString();
 	  }
@@ -73,8 +69,7 @@ public class defun extends Syntax implements Printable
 	    Pair p2 = (Pair) p1.cdr;
 	    LambdaExp lexp = new LambdaExp();
 	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr);
-	    lexp.setName (name instanceof Symbol ? ((Symbol) name).getName()
-			  : name.toString());
+	    lexp.setName(name);
 	    if (p2 instanceof PairWithPosition)
 	      {
 		PairWithPosition pp = (PairWithPosition) p2;

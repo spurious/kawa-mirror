@@ -46,7 +46,7 @@ public class defvar extends Syntax
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object obj = form.cdr;
-    String name = null;
+    Object name = null;
     Expression value = null;
     Declaration decl = null;
 
@@ -56,7 +56,7 @@ public class defvar extends Syntax
 	if (p1.car instanceof Declaration)
 	  {
 	    decl = (Declaration) p1.car;
-	    name = decl.getName();
+	    name = decl.getSymbol();
 	    if (p1.cdr instanceof Pair)
 	      {
 		Pair p2 = (Pair) p1.cdr;

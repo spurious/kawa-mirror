@@ -16,8 +16,9 @@ public class define extends Syntax implements Printable
     this.makePrivate = makePrivate;
   }
 
-  public Expression rewrite (Object obj, Translator tr)
+  public Expression rewriteForm (Pair form, Translator tr)
   {
+    Object obj = form.cdr;
     String name = null;
     Expression value = null;
     Declaration decl = null;

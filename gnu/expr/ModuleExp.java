@@ -218,7 +218,7 @@ public class ModuleExp extends LambdaExp
 					  fld.getName());
 		    Symbol sym = dname instanceof Symbol ? (Symbol) dname
 		      : Symbol.make("", dname.toString().intern());
-		    Object property = comp.getInterpreter()
+		    Object property = comp.getLanguage()
 		      .getEnvPropertyFor(decl);
 		    // Would it be better to check if fld is FINAL?
                     // If it is, gets its value; other wisecreate

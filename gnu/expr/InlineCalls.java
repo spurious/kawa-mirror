@@ -147,8 +147,8 @@ public class InlineCalls extends ExpWalker
     Expression test = exp.test;
     if (test instanceof QuoteExp)
       {
-	Interpreter interpreter = comp.getInterpreter();
-	if (interpreter.isTrue(((QuoteExp) test).getValue()))
+	Language language = comp.getLanguage();
+	if (language.isTrue(((QuoteExp) test).getValue()))
 	  return exp.then_clause;
 	else
 	  return exp.else_clause == null ? QuoteExp.voidExp : exp.else_clause;

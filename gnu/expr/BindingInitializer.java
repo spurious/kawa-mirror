@@ -37,7 +37,7 @@ public class BindingInitializer extends Initializer
 
     if (value == null)
       {
-	boolean func = comp.getInterpreter().hasSeparateFunctionNamespace();
+	boolean func = comp.getLanguage().hasSeparateFunctionNamespace();
 	Object property
 	  = func && decl.isProcedureDecl() ? EnvironmentKey.FUNCTION : null;
 

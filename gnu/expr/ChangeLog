@@ -1,3 +1,10 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (getInterpreter): Remove deprecated method.
+	* BindingInitializer.java: Update Interpreter->Lanuguage various places.
+	* InlineCalls.java: Likewise.
+	* ModuleExp.java: Likewise.
+
 2005-03-03  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (context): New field.

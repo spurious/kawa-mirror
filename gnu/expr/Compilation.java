@@ -2057,8 +2057,6 @@ public class Compilation
 
   protected Language language;
   public Language getLanguage() { return language; }
-  /** @deprecated */
-  public Interpreter getInterpreter() { return language; }
   public Environment getEnvironment() { return language.getEnvironment(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }

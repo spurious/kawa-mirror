@@ -1,3 +1,13 @@
+2002-03-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS):  Remove cygnus options - it
+	does work wellto have just this directory be 'cygnus' style, even
+	though I consider it a mistake to leave the *.info files in $srcdir.
+
+	* kawa.texi (Syntax and conditional compilation):  New mode.
+	Document srfi-0's cond-expand and move defmacro+gentemp here.
+	(Multiple values):  Document srfi-8's receive macro.
+
 2002-02-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST):  Remove html.

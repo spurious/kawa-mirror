@@ -112,10 +112,6 @@ install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 pathsep = @pathsep@
-
-# Have .info files to be created in builddir, not srcdir.
-AUTOMAKE_OPTIONS = cygnus
-
 SUFFIXES = .pdf
 
 KAWA_HTMLS = kawa/index.html
@@ -137,16 +133,15 @@ XSLT = xsltproc
 subdir = doc
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-depcomp =
-am__depfiles_maybe =
 DIST_SOURCES =
-TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 INFO_DEPS = kawa.info kawa-tour.info
 DVIS = kawa.dvi kawa-tour.dvi
 TEXINFOS = kawa.texi kawa-tour.texi
 
 NROFF = nroff
 MANS = $(man_MANS)
+DIST_COMMON = ChangeLog Makefile.am Makefile.in mdate-sh stamp-vti \
+	texinfo.tex version.texi
 all: all-am
 
 .SUFFIXES:
@@ -162,7 +157,7 @@ distclean-libtool:
 	-rm -f libtool
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus  doc/Makefile
+	  $(AUTOMAKE) --gnu  doc/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 
@@ -193,31 +188,24 @@ kawa-tour.info: kawa-tour.texi
 kawa-tour.dvi: kawa-tour.texi
 
 .texi.info:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
-	  -I $(srcdir) $<
+	@cd $(srcdir) && rm -f $@ $@-[0-9] $@-[0-9][0-9]
+	cd $(srcdir) \
+	  && $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
+	       `echo $< | sed 's,.*/,,'`
 
 .texi.dvi:
-	TEXINPUTS="$(top_srcdir)/../texinfo$(PATH_SEPARATOR)$$TEXINPUTS" \
+	TEXINPUTS="$(srcdir)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	MAKEINFO='$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir)' \
 	$(TEXI2DVI) $<
 
 .texi:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
-	  -I $(srcdir) $<
+	@cd $(srcdir) && rm -f $@ $@-[0-9] $@-[0-9][0-9]
+	cd $(srcdir) \
+	  && $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) \
+	       `echo $< | sed 's,.*/,,'`
 
-MAKEINFO = `if test -f $(top_builddir)/../texinfo/makeinfo/makeinfo; then \
-            echo $(top_builddir)/../texinfo/makeinfo/makeinfo; \
-          else \
-            echo makeinfo; \
-          fi`
-
-TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then \
-             echo $(top_srcdir)/../texinfo/util/texi2dvi; \
-           else \
-             echo texi2dvi; \
-           fi`
+MAKEINFO = @MAKEINFO@
+TEXI2DVI = texi2dvi
 DVIPS = dvips
 .dvi.ps:
 	$(DVIPS) $< -o $@
@@ -244,7 +232,7 @@ uninstall-info-am:
 dist-info: $(INFO_DEPS)
 	list='$(INFO_DEPS)'; \
 	for base in $$list; do \
-	  if test -f $$base; then d=.; else d=$(srcdir); fi; \
+	  d=$(srcdir); \
 	  for file in $$d/$$base*; do \
 	    relfile=`expr "$$file" : "$$d/\(.*\)"`; \
 	    test -f $(distdir)/$$relfile || \
@@ -260,14 +248,13 @@ mostlyclean-aminfo:
 	  kawa-tour.vr
 
 maintainer-clean-aminfo:
+	cd $(srcdir) && \
 	for i in $(INFO_DEPS); do \
 	  rm -f $$i; \
 	  if test "`echo $$i-[0-9]*`" != "$$i-[0-9]*"; then \
 	    rm -f $$i-[0-9]*; \
 	  fi; \
 	done
-
-clean-info: mostlyclean-aminfo
 
 man1dir = $(mandir)/man1
 install-man1: $(man1_MANS) $(man_MANS)
@@ -310,12 +297,39 @@ uninstall-man1:
 tags: TAGS
 TAGS:
 
-check-am:
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+
+top_distdir = ..
+distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
+	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
+	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
+	    dir="/$$dir"; \
+	    $(mkinstalldirs) "$(distdir)$$dir"; \
+	  else \
+	    dir=''; \
+	  fi; \
+	  if test -d $$d/$$file; then \
+	    cp -pR $$d/$$file $(distdir)$$dir \
+	    || exit 1; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
+	  fi; \
+	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="${top_distdir}" distdir="$(distdir)" \
+	  dist-info
+check-am: all-am
 check: check-am
-all-am: Makefile $(MANS)
+all-am: Makefile $(INFO_DEPS) $(MANS)
 
 installdirs:
-	$(mkinstalldirs) $(DESTDIR)$(man1dir)
+	$(mkinstalldirs) $(DESTDIR)$(infodir) $(DESTDIR)$(man1dir)
 
 install: install-am
 install-exec: install-exec-am
@@ -358,18 +372,18 @@ info: info-am
 
 info-am: $(INFO_DEPS)
 
-install-data-am: install-man
+install-data-am: install-info-am install-man
 
 install-exec-am:
 
-install-info:
+install-info: install-info-am
 
 install-info-am: $(INFO_DEPS)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(infodir)
 	@list='$(INFO_DEPS)'; \
 	for file in $$list; do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  d=$(srcdir); \
 	  for ifile in echo $$d/$$file $$d/$$file-[0-9] $$d/$$file-[0-9][0-9]; do \
 	    if test -f $$ifile; then \
 	      relfile=`expr "$$ifile" : "$$d/\(.*\)"`; \
@@ -401,21 +415,21 @@ mostlyclean: mostlyclean-am
 mostlyclean-am: mostlyclean-aminfo mostlyclean-generic \
 	mostlyclean-libtool mostlyclean-vti
 
-uninstall-am: uninstall-man
+uninstall-am: uninstall-info-am uninstall-man
 
 uninstall-man: uninstall-man1
 
-.PHONY: all all-am check check-am clean clean-generic clean-info \
-	clean-libtool dist-info distclean distclean-generic \
-	distclean-libtool dvi dvi-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-man1 \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-aminfo \
-	maintainer-clean-generic maintainer-clean-vti mostlyclean \
-	mostlyclean-aminfo mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-vti uninstall uninstall-am uninstall-info-am \
-	uninstall-man uninstall-man1
+.PHONY: all all-am check check-am clean clean-generic clean-libtool \
+	dist-info distclean distclean-generic distclean-libtool distdir \
+	dvi dvi-am info info-am install install-am install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-man1 install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-aminfo maintainer-clean-generic \
+	maintainer-clean-vti mostlyclean mostlyclean-aminfo \
+	mostlyclean-generic mostlyclean-libtool mostlyclean-vti \
+	uninstall uninstall-am uninstall-info-am uninstall-man \
+	uninstall-man1
 
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi

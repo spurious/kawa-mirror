@@ -1,6 +1,3 @@
-# Have .info files to be created in builddir, not srcdir.
-AUTOMAKE_OPTIONS = cygnus
-
 SUFFIXES = .pdf
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi

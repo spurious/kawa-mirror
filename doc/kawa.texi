@@ -1074,6 +1074,7 @@ find that library.
 @chapter Extensions
 
 @menu
+* Syntax and conditional compilation::
 * Multiple values::
 * Special named constants::
 * Keywords::
@@ -1091,7 +1092,81 @@ find that library.
 * Miscellaneous::
 @end menu
 
-@node Multiple values, Special named constants, Extensions, Extensions
+@node Syntax and conditional compilation, Multiple values, Extensions, Extensions
+@section Syntax and conditional compilation
+
+@deffn Syntax define-syntax ..
+Pattern ...
+@end deffn
+
+@deffn Syntax defmacro name lambda-list form ...
+Defines an old-style macro a la Common Lisp,
+and installs @code{(lambda @var{lambda-list} @var{form} ...)}
+as the expansion function for @var{name}.
+When the translator sees an application of @var{name},
+the expansion function is called with the rest of the application
+as the actual arguments.  The resulting object must be a Scheme
+source form that is futher processed (it may be repeatedly macro-expanded).
+
+If you define a macro with @code{defmacro}, you (currently) cannot use
+the macro in the same compilation as the definition.
+This restriction does not apply to macros defined by @code{define-syntax}.
+@end deffn
+
+@defun gentemp
+Returns a new (interned) symbol each time it is called.
+The symbol names are implementation-dependent.
+(This is not directly macro-related, but is often used in conjunction
+with @code{defmacro} to get a fresh unique identifier.)
+@end defun
+
+@deffn Syntax cond-expand cond-expand-clause* [(else command-or-definition*)]
+@display
+@var{cond-expand-clause} ::= @code{(@var{feature-requirement} @var{command-or-definition}*)}
+@var{feature-requirement} ::= @var{feature-identifier}
+  | @code{(and @var{feature-requirement}*)}
+  | @code{(or @var{feature-requirement}*)}
+  | @code{(not @var{feature-requirement})}
+@var{feature-identifier} ::= a symbol which is the name or alias of a SRFI
+@end display
+
+The @code{cond-expand} form tests for the existence of features at
+macro-expansion time. It either expands into the body of one of its
+clauses or signals an error during syntactic
+processing. @code{cond-expand} expands into the body of the first clause
+whose feature requirement is currently satisfied; the @code{else}
+clause, if present, is selected if none of the previous clauses is
+selected.
+
+A feature requirement has an obvious interpretation as a logical
+formula, where the @var{feature-identifier} variables have meaning true if @c 
+the feature corresponding to the feature identifier, as specified in the
+SRFI registry, is in effect at the location of the @code{cond-expand} form, and
+false otherwise. A feature requirement is satisfied if its formula is
+true under this interpretation.
+
+Examples:
+@example
+(cond-expand
+    ((and srfi-1 srfi-10)
+     (write 1))
+    ((or srfi-1 srfi-10)
+     (write 2))
+    (else))
+@end example
+
+@example
+(cond-expand
+  (command-line
+   (define (program-name) (car (argv)))))
+@end example
+
+The second example assumes that @code{command-line} is an alias for some
+feature which gives access to command line arguments. Note that an error
+will be signaled at macro-expansion time if this feature is not present.
+@end deffn
+
+@node Multiple values, Special named constants, Syntax and conditional compilation, Extensions
 @section Multiple values
 
 The multiple-value feature was added in R5RS.
@@ -1151,6 +1226,37 @@ visible, and so on.
 @end example
 @end deffn
 
+@deffn Syntax receive formals expression body
+The @var{formals}, @var{expression}, and @var{body} are as described in R5RS.
+Specifically, @var{formals} can have any of three forms:
+@table @samp
+@item (@var{variable1} ... @var{variablen})
+The environment in which the receive-expression is evaluated is extended
+by binding @var{variable1}, ..., @var{variablen} to fresh locations. The
+@var{expression} is evaluated, and its values are stored into those
+locations. (It is an error if @var{expression} does not have exactly @var{n}
+values.)
+@item @var{variable}
+The environment in which the receive-expression is evaluated is extended
+by binding @var{variable} to a fresh location. The @var{expression} is
+evaluated, its values are converted into a newly allocated list, and the
+list is stored in the location bound to @var{variable}.
+@item (@var{variable1} ... @var{variablen} . @var{variablen+1})
+The environment in which the receive-expression is evaluated is extended
+by binding @var{variable1}, ..., @var{variablen+1} to fresh
+locations. The @var{expression} is evaluated. Its first @var{n} values
+are stored into the locations bound to @var{variable1}
+... @var{variablen}. Any remaining values are converted into a newly
+allocated list, which is stored into the location bound to
+@var{variablen+1} (It is an error if @var{expression} does not have at
+least @var{n} values.)
+@end table
+
+In any case, the expressions in @var{body} are evaluated sequentially in the
+extended environment. The results of the last expression in the body are
+the values of the receive-expression.
+@end deffn
+
 @defun values-append arg1 ...
 The values resulting from evaluating each argument are appended
 together.
@@ -1202,14 +1308,14 @@ self-evaluating and therefore do not need to be quoted in expressions.
 They are used mainly for specifying keyword arguments.
 
 @display
-@var{keyword} = @var{identifier}:
+@var{keyword} ::= @var{identifier}:
 @end display
 
 An alternative syntax, with the colon first, is supported for
 compatibility with Common Lisp and some other Scheme implementations:
 
 @display
-@var{keyword} = :@var{identifier}
+@var{keyword} ::= :@var{identifier}
 @end display
 
 Putting the colon first has exactly the same effect as putting it last;
@@ -1329,30 +1435,29 @@ Kawa borrows the extended formal argument list of DSSSL,
 and Kawa allows you to declare the type of the parameter.
 
 @display
-@var{lambda-expression} = (lambda @var{formals} [@var{rtype}] @var{body})
+@var{lambda-expression} ::= (lambda @var{formals} [@var{rtype}] @var{body})
 @end display
 where
 @display
-@var{formals} = (@var{formal-arguments}) | @var{rest-arg}
+@var{formals} ::= (@var{formal-arguments}) | @var{rest-arg}
 @end display
 You can of course also use the extended format in a @code{define}:
 @display
 (define (@var{name} @var{formal-arguments}) [@var{rtype}] @var{body})
 @end display
-
 @display
-@var{formal-arguments} =
+@var{formal-arguments} ::=
     @var{req-opt-args} (@var{rest-key-args} | . @var{rest-arg})
 @end display
 @display
-@var{req-opt-args} = @var{req-arg} ... [#!optional @var{opt-arg} ...]
-@var{rest-key-args} = [#!rest @var{rest-arg}] [#key @var{key-arg} ...]
-@var{req-arg} = @var{variable} [:: @var{type}] | (@var{variable} [[::] @var{type}] )
-@var{opt-arg} = @var{arg-with-default}
-@var{key-arg} =  @var{arg-with-default}
-@var{arg-with-default} = @var{variable} [:: @var{type}]
+@var{req-opt-args} ::= @var{req-arg} ... [#!optional @var{opt-arg} ...]
+@var{rest-key-args} ::= [#!rest @var{rest-arg}] [#key @var{key-arg} ...]
+@var{req-arg} ::= @var{variable} [:: @var{type}] | (@var{variable} [[::] @var{type}] )
+@var{opt-arg} ::= @var{arg-with-default}
+@var{key-arg} ::=  @var{arg-with-default}
+@var{arg-with-default} ::= @var{variable} [:: @var{type}]
     | ( @var{variable} [:: @var{type} [@var{initializer}] | @var{initializer} [[::] @var{type}]] )
-@var{rest-arg} = @var{variable}
+@var{rest-arg} ::= @var{variable}
 @end display
 
 When the procedure is applied to a list of actual arguments, the formal and
@@ -2027,25 +2132,6 @@ special characters.
 Returns the Kawa version number as a string.
 @c (Compatible with slib.)
 @end defun
-
-@defun gentemp
-Returns a new (interned) symbol each time it is called.
-The symbol names are implementation-dependent.
-@end defun
-
-@deffn Syntax defmacro name lambda-list form ...
-Defines an old-style macro a la Common Lisp,
-and installs @code{(lambda @var{lambda-list} @var{form} ...)}
-as the expansion function for @var{name}.
-When the translator sees an application of @var{name},
-the expansion function is called with the rest of the application
-as the actual arguments.  The resulting object must be a Scheme
-source form that is futher processed (it may be repeatedly macro-expanded).
-
-If you define a macro with @code{defmacro}, you (currently) cannot use
-the macro in the same compilation as the definition.
-This restriction does not apply to macros defined by @code{define-syntax}.
-@end deffn
 
 @defvar command-line-arguments
 Any command-line arguments (following flags processed by Kawa itself)
@@ -3379,9 +3465,9 @@ The problem involves Java class loaders.
 @deffn Syntax define-class name (supers ...) field-or-method-decl ...
 @deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
 @display
-@var{field-or-method} = @var{field-decl} | @var{method-decl}
-@var{field-decl} = (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{body})
+@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
+@var{field-decl} ::= (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{body})
 @end display
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
@@ -3486,10 +3572,10 @@ A simple example:
 Returns a new instance of an anonymous (inner) class.
 The syntax is similar to @code{define-class}.
 @display
-@var{field-or-method} = @var{field-decl} | @var{method-decl}
-@var{field-decl} = (@var{fname} [[[::] @var{ftype}] @var{finit}])
+@var{field-or-method} ::= @var{field-decl} | @var{method-decl}
+@var{field-decl} ::= (@var{fname} [[[::] @var{ftype}] @var{finit}])
     | (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
 @end display
 
 Returns a new instance of a unique (anonymous) class.
@@ -4627,7 +4713,13 @@ by the author.
 This manual has quoted from SRFI-6,
 which is Copyright (C) William D Clinger (1999). All Rights Reserved.
 
-The following notice applies to SRFI-6 and SRFI-11, which is quoted in
+This manual has quoted from SRFI-8,
+which is Copyright (C) John David Stone (1999). All Rights Reserved.
+
+This manual has quoted from SRFI-11,
+which is Copyright (C) Lars T. Hansen (1999). All Rights Reserved.
+
+The following notice applies to SRFI-6, SRFI-8, and SRFI-11, which is quoted in
 this manual, but it does not apply to the manual as a whole:
 
 @quotation

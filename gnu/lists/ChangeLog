@@ -1,3 +1,8 @@
+2003-07-23  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (stableCompare):  New method.
+	(compare):  New static 4-argument method.
+
 2003-07-10  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (consumeNext):  Hopefully more efficient.

@@ -633,6 +633,25 @@ public abstract class AbstractSequence
     return arr;
   }
 
+  /** This is used for the XML concept of "document order". */
+  public int stableCompare (AbstractSequence other)
+  {
+    int id1 = System.identityHashCode(this);
+    int id2 = System.identityHashCode(other);
+    return id1 < id2 ? -1 : id1 > id2 ? 1 : 0;
+  }
+
+  /** This is used for the XML concept of "document order".
+   * It is overridden in gnu.xml.NodeTree for a more robust implementation.
+   */
+  public static int compare(AbstractSequence seq1, int pos1,
+			    AbstractSequence seq2, int pos2)
+  {
+    if (seq1 == seq2)
+      return seq1.compare(pos1, pos2);
+    return seq1.stableCompare(seq2);
+  }
+
   public int hashCode()
   {
     // Implementation specified by the Collections specification.

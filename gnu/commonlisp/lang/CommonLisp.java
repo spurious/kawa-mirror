@@ -9,6 +9,7 @@ import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
 import gnu.kawa.lispexpr.LangPrimType;
+import gnu.kawa.functions.DisplayFormat;
 
 public class CommonLisp extends Interpreter
 {
@@ -126,7 +127,6 @@ public class CommonLisp extends Interpreter
       }
     catch (Exception ex)
       {
-        System.err.println("loadCklass:"+name);
         ex.printStackTrace(System.err);
 	throw new WrappedException(ex);
       }
@@ -217,6 +217,8 @@ public class CommonLisp extends Interpreter
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
+    defun("princ", displayFormat);
+    defun("prin1", writeFormat);
   }
 
   public static CommonLisp getInstance()
@@ -255,25 +257,12 @@ public class CommonLisp extends Interpreter
     return CLispReader.readObject(in);
   }
 
-  public void print (Object value, OutPort out)
+  static final DisplayFormat writeFormat = new DisplayFormat(true, 'C');
+  static final DisplayFormat displayFormat = new DisplayFormat(false, 'C');
+
+  public FormatToConsumer getFormat(boolean readable)
   {
-    if (value == Scheme.voidObject)
-      return;
-    if (value instanceof Values)
-      {
-	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  {
-	    SFormat.print (values[i], out);
-	    out.println();
-	  }
-      }
-    else
-      {
-	SFormat.print (value, out);
-	out.println();
-      }
-    out.flush();
+    return readable ? writeFormat : displayFormat;
   }
 
   LangPrimType booleanType;

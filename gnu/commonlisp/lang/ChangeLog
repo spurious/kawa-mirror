@@ -1,3 +1,10 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (writeFormat, displayFormat):  New fields.
+	(getFormat): New method.
+	(<init>):  Define procedures prin1 and princ.
+	(print):  Removed method.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java:  Update to use LangPrimType.

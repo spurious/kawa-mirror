@@ -215,6 +215,22 @@ public class SetExp extends Expression
 	      var = decl.allocateVariable(code);
 	    code.emitStore(var);
 	  }
+	else if (decl.context instanceof ClassExp && decl.field == null
+		 && ! getFlag(PROCEDURE)
+		 && ((ClassExp) decl.context).isMakingClassPair())
+	  {
+	    String setName = ClassExp.slotToMethodName("set", decl.getName());
+	    ClassExp cl = (ClassExp) decl.context;
+	    Method setter = cl.type.getDeclaredMethod(setName, 1);
+	    cl.loadHeapFrame(comp);
+	    new_value.compile(comp, decl.getType());
+	    if (needValue)
+	      {
+		code.emitDupX();
+		valuePushed = true;
+	      }
+	    code.emitInvoke(setter);
+	  }
 	else
 	  {
 	    Field field = decl.field;

@@ -1,50 +1,41 @@
-ANNOUNCE:  Kawa Scheme Interpreter, version 0.3
+ANNOUNCE:  Kawa Scheme interpreter and compiler, version 0.3
 =============================================================================
 
 A new version of the Kawa interpreter is availiable.
 
-Kawa (pronounced kava) is a scheme interpreter written completely in Java.
+Kawa (pronounced kava) is a Scheme interpreter written completely in Java.
+Scheme procedures are now compiled into Java bytecodes for efficiency.
+
+The full sources and documentation is available by anonymous ftp
+from ftp.cygnus.com, in pub/bothner/kawa-0.3.tar.gz.
+
+The pre-compiled .class files (only) are in the same directory
+in kawa-0.3-compiled.tar.gz.
+
+The release will shortly also be availble from:
+	http://www.winternet.com/~sgml/kawa/index.html
+
+A slightly out-of-date design document discussing gow to compile
+Scheme into Java is in http://www.cygnus.com/~bothner/scm3java.html.
 
 Changes since 0.2:
 ==================
+The biggest single change is that Scheme procedures are now compiled
+to Java bytecodes.  This is mainly for efficiency, but it also allows
+us to do tail-recursion-elimination in some cases.
 
-Changes since 0.1:
-==================
+The "codegen" library is included.  This is a toolkit that handles
+most of the details needed to generate Java bytecode (.class) files.
 
-Kawa 0.2 (6-10-96)
+The internal structure of Kawa has been extensively re-written,
+especially how syntax transforms, eval, and apply are done,
+largely due to the needs for compilation.
 
-Created an Executable and Syntaxable interface for procedures and syntaxes.
+Almost all the R4RS procedures are now implemented, except that
+there are stiil large gaps in Section 6.5 "Numbers".
 
-Changed class names to get rid of name conflicts that were causing
-problems due to java compiler bugs.
+A new author:  This release is made by Per Bothner of Cygnus Support,
+with help from R. Alexander Milowsk, the original author of Kawa.
 
-Changed string to be java.lang.StringBuffer
-
-Added Procedure0, Procedure1, Procedure2, Procedure3, Procedure4 classes
-for simplifying procedure parameter checking.
-
-Added Syntax0, Syntax1, Syntax2, Syntax3, Syntax4 classes for simplifying
-syntax parameter checking.
-
-Fixed lambda to clone the current execution frames.  Thus, the following now
-works:
-   (define x 5)
-   (define foo (lambda () x))
-
-   (let ((x 10)) (foo)) => 5
-
-   -and-
-
-   (define bar (let ((x 1)) (lambda () x)))
-   (bar) => 1
-
-Created the kawa.lang.iport and kawa.lang.oport classes for input and output
-ports, respectively.
-
-Finished the kawa.Shell class.
-
-Create in, out, err members on the kawa.lang.Interpreter class for the stdin,
-stdout, stderr respectively (as iport or oport).
-
-=============================================================================
-
+	--Per Bothner
+Cygnus Support     bothner@cygnus.com

@@ -10,6 +10,7 @@ These classes are free software.  You can use and re-distribute a class
 without restriction (in source or binary form) as long as you use a
 version has not been modified in any way from a version released
 by Per Bothner, Cygnus Solutions, or the Free Software Foundation.
+(See the Kawa manual for more information.) 
 You may make and distribute a modified version, provided you follow
 the terms of the GNU General Public License; either version 2,
 or (at your option) any later version.  (Version 2 is included below.)

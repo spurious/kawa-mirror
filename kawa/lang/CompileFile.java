@@ -152,6 +152,8 @@ public class CompileFile extends Procedure2
       }
     Translator tr = new Translator (Environment.user(), messages);
     ModuleExp mexp = read (inname, tr);
+    if (messages.seenErrors())
+      return;
 
     try
       {

@@ -24,6 +24,9 @@ public class Translator extends Object
   public Environment environ;
   ScopeExp current_scope;
 
+  /** If doing immediate evaluation. */
+  public boolean immediate;
+
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
   public ScopeExp currentScope() { return current_scope; }
@@ -169,6 +172,12 @@ public class Translator extends Object
 
         if (obj instanceof Syntax)
           return obj;
+	if (obj instanceof Declaration)
+	  {
+	    Expression dval = ((Declaration) obj).getValue();
+	    if (dval instanceof QuoteExp)
+	      return ((QuoteExp) dval).getValue();
+	  }
 	binding = null;
         if (obj != null)
 	  {
@@ -203,8 +212,9 @@ public class Translator extends Object
 
   public Expression rewrite_pair (Pair p)
   {
-    if (p.car instanceof Syntax)
-      return apply_rewrite((Syntax) p.car, p);
+    Syntax syn = check_if_Syntax(p.car);
+    if (syn != null)
+      return apply_rewrite(syn, p);
     Object cdr = p.cdr;
 
     Expression func = rewrite_car (p);
@@ -369,10 +379,32 @@ public class Translator extends Object
         Pair st_pair = (Pair) st;
         Object op = st_pair.car;
         Syntax syntax = check_if_Syntax (op);
-        if (syntax == null)
-          forms.addElement(st);
-        else if (! syntax.scanForDefinitions(st_pair, forms, defs, this))
-          return false;
+	if (syntax == null)
+	  forms.addElement(st);
+	else
+	  {
+	    String save_filename = current_filename;
+	    int save_line = current_line;
+	    int save_column = current_column;
+	    try
+	      {
+		if (st_pair instanceof PairWithPosition)
+		  {
+		    PairWithPosition pp = (PairWithPosition) st_pair;
+		    current_filename = pp.getFile();
+		    current_line = pp.getLine();
+		    current_column = pp.getColumn();
+		  }
+		if (! syntax.scanForDefinitions(st_pair, forms, defs, this))
+		  return false;
+	      }
+	    finally
+	      {
+		current_filename = save_filename;
+		current_line = save_line;
+		current_column = save_column;
+	      }
+	  }
       }
     return true;
   }
@@ -561,5 +593,4 @@ public class Translator extends Object
     popDecls(scope);
     current_scope = scope.outer;
   }
-
 }

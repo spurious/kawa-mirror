@@ -36,6 +36,7 @@ public class Shell
   {
     SourceMessages messages = new SourceMessages();
     Translator tr = new Translator(env, messages);
+    tr.immediate = true;
     Lexer lexer = interp.getLexer(inp, messages);
     for (;;)
       {

@@ -1,3 +1,11 @@
+New syntax (object (SUPERS ...) FIELD-AND-METHOS ...) for creating
+a new object instance of an anonymous class.  Needs work.
+
+New procedures field and static-field for more convenient field access.
+
+Syntactic sugar:  (lambda ARGS <TYPE> BODY) -> (lambda ARGS (as <TYPE> BODY)).
+This is especially useful for declaring methods in classes.
+
 A new synchonized form allows you to synchronize on an arbitrary Java
 object, and execute some forms while having an exclusive lock on the
 object.  (The syntax matches that used by Skij.)

@@ -114,3 +114,28 @@ Quantities:
 Arithmetic involving Units should return Units.
 Printing a Unit should return something readable, maybe:
   (quantity->unit 1cm) -> "1cm". while 1cm -> "1.0cm".
+
+EVENT CALLBACKS - Proposed design
+
+Syntax:  (listener (EXTRA-INTERFACE ...)
+           ((METHOD-NAME+ [EVENT-TYPE])+ ARG ACTIONS ...) ...)
+
+Example:  (invoke component 'addMouseListener
+	    (listener ((mousePressed mouseReleases) evt
+              (display (list "mouse pressed or released:" evt))))
+
+This creates a new "listener" instance.  The instance has one
+method for each METHOD-NAME; the method takes a single argument
+of the specified EVENT-TYPE.  The EVENT-TYPE can be left out
+in the case of standard java METHOD-NAMES;  for example
+if the METHOD-NAME is mousePressed, the implied EVENT-TYPE
+is <java.awt.event.MouseEvent>.  When the method is executed,
+the actual Event is bound to ARG, and the ACTIONS executed.
+(The type is ARG is the least common super-type of all
+the explicit or implicit EVENT-TYPES for corresponding METHOD-NAMES.)
+The allocated listener instance implements all the interfaces
+listed in the EXTRA-INTERFACE list;  if addition, if an EVENT-TYPE
+was implied, the corresponding Listener interface is also implied.
+(For example a METHOD-NAME of mousePressed implies an EVENT-TYPE
+of <java.awt.event.MouseEvent>, and hence an interface of
+<java.awt.event.MouseListener>.)

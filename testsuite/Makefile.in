@@ -42,9 +42,10 @@ JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
 KAWATEST = $(JAVA) $(JAVAFLAGS) kawa -f "$(srcdir)/testing.scm"
 
+SOURCES = testing.scm test.scm num-test.scm
 CLEANFILES = tmp?
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
-DIST_COMMON = Makefile.am Makefile.in
+DIST_COMMON = ChangeLog Makefile.am Makefile.in
 
 
 PACKAGE = @PACKAGE@

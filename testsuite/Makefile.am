@@ -16,4 +16,5 @@ check-scm:
 check-num:
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
 
+SOURCES = testing.scm test.scm num-test.scm
 CLEANFILES = tmp?

@@ -1,3 +1,11 @@
+2005-02-07  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (java_SCM): Re-order so DefineRecordType.scm is
+	compiled before srfi-37, which uses define-record.type.
+
+	* srfi-37.scm (arg-fold): Use define-function syntax rather than
+	an explicit lambda, so Kawa generates a true function definition.
+
 2005-01-29  Per Bothner  <per@bothner.com>
 
 	* srfi37.scm:  Use module-export.

@@ -50,8 +50,8 @@
     (optional-arg? option-optional-arg?)
     (processor option-processor))
 
-(define args-fold
-  (lambda (args
+(define (args-fold 
+           args
            options
            unrecognized-option-proc
            operand-proc
@@ -212,4 +212,5 @@
                    (else
                     (let-values ((seeds (apply operand-proc arg seeds)))
                       (scan-args args seeds)))))))))
-      (scan-args args seeds))))
+      (scan-args args seeds)))
+

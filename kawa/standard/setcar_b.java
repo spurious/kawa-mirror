@@ -16,6 +16,6 @@ public class setcar_b extends Procedure2
 	return Interpreter.voidObject;
       }
     else
-      throw new WrongType(this.name,1,"pair");
+      throw new WrongType(this.name (), 1, "pair");
   }
 }

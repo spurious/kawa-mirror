@@ -14,6 +14,6 @@ public class vector_length extends Procedure1
     if (arg1 instanceof Vector)
       return new java.lang.Integer(((Vector)arg1).length ());
     else
-      throw new kawa.lang.WrongType(this.name,1,"vector");
+      throw new kawa.lang.WrongType(this.name(),1,"vector");
   }
 }

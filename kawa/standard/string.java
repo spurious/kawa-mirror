@@ -19,7 +19,7 @@ public class string extends ProcedureN
 	if (arg instanceof Char)
 	  str.append (((Char)arg).charValue());
 	else
-	  throw new WrongType (this.name,count,"character");
+	  throw new WrongType (this.name(),count,"character");
       }
     return str;
   }

@@ -10,9 +10,9 @@ public class apply extends ProcedureN
   {
     int count = args.length;
     if (count < 2)
-      throw new WrongArguments(this.name,2,"(apply proc [args] args)");
+      throw new WrongArguments(this.name(),2,"(apply proc [args] args)");
     if (! (args[0] instanceof Procedure))
-      throw new WrongType(this.name,1,"procedure");
+      throw new WrongType(this.name(),1,"procedure");
     Procedure proc = (Procedure) args[0];
     Object last = args[count-1];
     int last_count = kawa.standard.length.length (last);
@@ -27,7 +27,7 @@ public class apply extends ProcedureN
 	last = pair.cdr;
       }
     if (last != List.Empty)
-      throw new WrongType(this.name,count-1,"list");
+      throw new WrongType(this.name(),count-1,"list");
     return proc.applyN (proc_args);
   }
 }

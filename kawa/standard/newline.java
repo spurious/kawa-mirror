@@ -19,7 +19,7 @@ public class newline extends Procedure0or1
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof OutPort))
-      throw new WrongType (this.name, 1, "output port");
+      throw new WrongType (this.name(), 1, "output port");
     ((OutPort) arg1).println ();
     return Interpreter.voidObject;
   }

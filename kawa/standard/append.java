@@ -37,7 +37,7 @@ public class append extends ProcedureN
 	    list = list_pair.cdr;
 	  }
 	if (list != List.Empty)
-	  throw new WrongType(this.name,2,"list");
+	  throw new WrongType(this.name (), 2, "list");
 	if (last != null)
 	  {
 	    last.cdr = result;

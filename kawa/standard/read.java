@@ -17,7 +17,7 @@ public class read extends Procedure0or1 {
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof InPort))
-      throw new WrongType (this.name, 0, "input port");
+      throw new WrongType (this.name(), 0, "input port");
     try
       {
 	return ((InPort)arg1).readSchemeObject ();

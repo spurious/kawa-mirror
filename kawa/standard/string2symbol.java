@@ -19,6 +19,6 @@ public class string2symbol extends Procedure1
     if (arg1 instanceof StringBuffer)
       return Symbol.intern(((StringBuffer)arg1).toString());
     else
-      throw new WrongType(this.name,1,"string");
+      throw new WrongType(this.name(),1,"string");
   }
 }

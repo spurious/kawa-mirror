@@ -24,18 +24,12 @@ public class list_tail extends Procedure2
   public Object apply2 (Object arg1, Object arg2)
        throws WrongArguments, WrongType, GenericError
   {
-    if (arg1 instanceof Pair)
-      {
-	if (arg2 instanceof java.lang.Integer)
-	  {
-            Pair list = (Pair)arg1;
-            int count = ((java.lang.Integer)arg2).intValue();
-	    return listTail (list, count);
-	  }
-	else
-	  throw new WrongType(this.name,2,"integer");
-      }
-    else
-      throw new WrongType(this.name,1,"list");
+    if (! (arg1 instanceof Pair))
+      throw new WrongType(this.name (), 1, "list");
+    if (! (arg2 instanceof java.lang.Integer))
+      throw new WrongType(this.name (), 2, "integer");
+    Pair list = (Pair)arg1;
+    int count = ((java.lang.Integer)arg2).intValue();
+    return listTail (list, count);
   }
 }

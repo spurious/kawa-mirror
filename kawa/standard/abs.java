@@ -21,7 +21,7 @@ public class abs extends kawa.lang.Procedure1 {
             arg1 = new java.lang.Double(((java.lang.Double)arg1).doubleValue()*(-1));
          } 
       } else {
-         throw new kawa.lang.WrongType(this.name,1,"number");
+         throw new kawa.lang.WrongType(this.name(),1,"number");
       }
       return arg1;
    }

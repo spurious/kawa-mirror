@@ -26,7 +26,7 @@ public class zero_p extends kawa.lang.Procedure1 {
             return kawa.lang.Interpreter.falseObject;
          }
       } else {
-         throw new kawa.lang.WrongType(this.name,1,"number");
+         throw new kawa.lang.WrongType(this.name(),1,"number");
       }
    }
 

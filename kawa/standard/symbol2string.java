@@ -19,6 +19,6 @@ public class symbol2string extends kawa.lang.Procedure1
     if (arg1 instanceof Symbol)
       return new java.lang.StringBuffer(((Symbol)arg1).toString());
     else
-      throw new WrongType(this.name,1,"symbol");
+      throw new WrongType (this.name(), 1, "symbol");
   }
 }

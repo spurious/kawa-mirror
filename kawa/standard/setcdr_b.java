@@ -16,6 +16,6 @@ public class setcdr_b extends Procedure2
 	return Interpreter.voidObject;
       }
     else
-      throw new kawa.lang.WrongType(this.name,1,"pair");
+      throw new kawa.lang.WrongType(this.name (), 1, "pair");
   }
 }

@@ -17,7 +17,7 @@ public class make_vector extends Procedure1or2 {
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof java.lang.Integer))
-      throw new WrongType(this.name,1,"integer");
+      throw new WrongType(this.name(),1,"integer");
     int count = ((java.lang.Integer)arg1).intValue();
     return new Vector (count, arg2);
   }

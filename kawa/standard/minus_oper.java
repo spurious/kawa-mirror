@@ -26,7 +26,7 @@ public class minus_oper extends ProcedureN
 	else if (arg instanceof Integer)
 	  ival = ((Integer)arg).intValue();
 	else
-	  throw new WrongType(this.name, 1,"number");
+	  throw new WrongType(this.name(), 1,"number");
 	i++;
       }
     for (; i < args.length; i++)
@@ -49,7 +49,7 @@ public class minus_oper extends ProcedureN
 	      dval -= ((Integer)arg).intValue();
 	  }
 	else
-	  throw new WrongType(this.name,i + 1,"number");
+	  throw new WrongType(this.name(),i + 1,"number");
       }
 
       if (isInteger)

@@ -19,7 +19,7 @@ public class reverse extends Procedure1
 	arg = pair.cdr;
       }
     if (arg != List.Empty)
-      throw new WrongType(this.name,1,"list");
+      throw new WrongType(this.name (), 1, "list");
     return result;
   }
 }

@@ -16,7 +16,7 @@ public class string_length extends kawa.lang.Procedure1 {
       if (arg1 instanceof java.lang.StringBuffer) {
          return new java.lang.Integer(((java.lang.StringBuffer)arg1).length());
       } else {
-         throw new kawa.lang.WrongType(this.name,1,"string");
+         throw new kawa.lang.WrongType(this.name(),1,"string");
       }
    }
 

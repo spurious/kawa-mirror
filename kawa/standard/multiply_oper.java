@@ -34,7 +34,7 @@ public class multiply_oper extends ProcedureN
 	      dval *= ((Integer)arg).intValue();
 	  }
 	else
-	  throw new WrongType(this.name,i + 1,"number");
+	  throw new WrongType(this.name(),i + 1,"number");
       }
 
       if (isInteger)

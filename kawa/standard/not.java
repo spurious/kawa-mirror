@@ -25,7 +25,7 @@ public class not extends kawa.lang.Procedure1 {
             return kawa.lang.Interpreter.trueObject;
          }
       } else {
-         throw new kawa.lang.WrongType(this.name,1,"boolean");
+         throw new kawa.lang.WrongType(this.name (), 1, "boolean");
       }
    }
 

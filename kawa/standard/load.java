@@ -140,7 +140,7 @@ public class load extends Procedure1 {
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof StringBuffer))
-      throw new WrongType (this.name, 1, "file name");
+      throw new WrongType (this.name(), 1, "file name");
     String name = arg1.toString ();
     if (name.endsWith (".zip"))
       return loadCompiled (name);

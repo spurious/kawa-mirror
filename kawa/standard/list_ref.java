@@ -12,7 +12,7 @@ public class list_ref extends Procedure2
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg2 instanceof java.lang.Integer))
-      throw new WrongType(this.name,2,"integer");
+      throw new WrongType(this.name (), 2, "integer");
     Object tail = list_tail.listTail (arg1,
 				      ((java.lang.Integer)arg2).intValue());
     if (tail instanceof Pair)

@@ -12,12 +12,12 @@ public class string_set_b extends Procedure3
        throws WrongType, GenericError
   {
     if (! (arg1 instanceof StringBuffer))
-      throw new WrongType(this.name,1,"string");
+      throw new WrongType(this.name(),1,"string");
     StringBuffer str = (StringBuffer) arg1;
     if (! (arg2 instanceof Integer))
-      throw new WrongType(this.name,2,"integer");
+      throw new WrongType(this.name(),2,"integer");
     if (! (arg3 instanceof Char))
-      throw new WrongType(this.name,3,"character");
+      throw new WrongType(this.name(),3,"character");
     try
       {
 	str.setCharAt((int)((Integer)arg2).intValue(),

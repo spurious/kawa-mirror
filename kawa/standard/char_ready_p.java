@@ -17,7 +17,7 @@ public class char_ready_p extends Procedure0or1 {
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof InPort))
-      throw new WrongType (this.name, 1, "input port");
+      throw new WrongType (this.name(), 1, "input port");
     // FIXME should return #t if EOF was seen.
     try
       {

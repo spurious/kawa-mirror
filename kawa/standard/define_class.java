@@ -19,13 +19,16 @@ public class define_class extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Object st_cdr = st.cdr;
+    SyntaxForm nameSyntax = null;
     while (st_cdr instanceof SyntaxForm)
-      st_cdr = ((SyntaxForm) st_cdr).form;
+      {
+	nameSyntax = (SyntaxForm) st_cdr;
+	st_cdr = nameSyntax.form;
+      }
     if (! (st_cdr instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st_cdr;
     Object name = p.car;
-    SyntaxForm nameSyntax = null;
     while (name instanceof SyntaxForm)
       {
 	nameSyntax = (SyntaxForm) name;

@@ -1,3 +1,11 @@
+2005-02-16  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/object.java (rewriteClassDef): If an input sub-form
+	is a SyntaxForm remember that, and use it to setCurrentScope.
+	Fixes Savannah PR 11822.
+	* kawa/standard/define_class.java (scanForDefinitions): Handle the
+	case that the input form is wrapped in a SyntaxForm.
+
 2005-02-15  Per Bothner  <per@bothner.com>
 
 	Use ModuleInfo to make sure 'run' is only done once, even if immediate.

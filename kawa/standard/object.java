@@ -75,13 +75,17 @@ public class object extends Syntax
     LambdaExp method_list = null;
     LambdaExp last_method = null;
     // First pass (get Declarations).
-    // Should be done at scan time.  FIXME.
     Vector inits = new Vector(20);
+    SyntaxForm componentsSyntax = null;
     for (Object obj = components;  obj != LList.Empty;  )
       {
-	// FIXME need to set current scope from SyntaxForm.
+	// The SyntaxForm scopes aren't used in scanClassDef, but they are
+	// used in rewriteClassDef, and might as well make the code the same.
 	while (obj instanceof SyntaxForm)
-	  obj = ((SyntaxForm) obj).form;
+	  {
+	    componentsSyntax = (SyntaxForm) obj;
+	    obj = componentsSyntax.form;
+	  }
 	if (! (obj instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -89,8 +93,12 @@ public class object extends Syntax
 	  }
 	pair = (Pair) obj;
 	Object pair_car = pair.car;
+	SyntaxForm memberSyntax = componentsSyntax;
 	while (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  {
+	    memberSyntax = (SyntaxForm) pair_car;
+	    pair_car = memberSyntax.form;
+	  }
 	if (! (pair_car instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -100,8 +108,12 @@ public class object extends Syntax
 	Object savedPos1 = tr.pushPositionOf(pair);
 	pair = (Pair) pair_car;
 	pair_car = pair.car;
+	SyntaxForm memberCarSyntax = memberSyntax;
 	while (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  {
+	    memberCarSyntax = (SyntaxForm) pair_car;
+	    pair_car = memberCarSyntax.form;
+	  }
 	if (pair_car instanceof String || pair_car instanceof Symbol
 	    || pair_car instanceof Keyword)
 	  { // Field declaration.
@@ -292,10 +304,6 @@ public class object extends Syntax
 	    decl.setFlag(Declaration.FIELD_OR_METHOD);
 	    decl.setProcedureDecl(true);
 	    lexp.setSymbol(mname);
-	    if (pair.cdr instanceof PairWithPosition)
-	      lexp.setFile(((PairWithPosition) pair.cdr).getFile());
-	    Object body = lambda.rewriteAttrs(lexp, pair.cdr, tr);
-	    lambda.rewrite(lexp, mpair.cdr, tr);
 	    if (last_method == null)
 	      method_list = lexp;
 	    else
@@ -340,23 +348,34 @@ public class object extends Syntax
     LambdaExp meth = method_list;
     int init_index = 0;  // Input index in inits Vector.
     int finit_index = 0;   // Output index in inits vector.
+    SyntaxForm componentsSyntax = null;
     for (Object obj = components;  obj != LList.Empty;  )
       {
-	// FIXME need to set current scope from SyntaxForm.
 	while (obj instanceof SyntaxForm)
-	  obj = ((SyntaxForm) obj).form;
+	  {
+	    componentsSyntax = (SyntaxForm) obj;
+	    obj = componentsSyntax.form;
+	  }
 	Pair pair = (Pair) obj;
 	Object savedPos1 = tr.pushPositionOf(pair);
 	Object pair_car = pair.car;
+	SyntaxForm memberSyntax = componentsSyntax;
 	while (pair_car instanceof SyntaxForm)
-	  pair_car = ((SyntaxForm) pair_car).form;
+	  {
+	    memberSyntax = (SyntaxForm) pair_car;
+	    pair_car = memberSyntax.form;
+	  }
 	try
 	  {
 	    obj = pair.cdr; // Next member.
 	    pair = (Pair) pair_car;
 	    pair_car = pair.car;
+	    SyntaxForm memberCarSyntax = memberSyntax;
 	    while (pair_car instanceof SyntaxForm)
-	      pair_car = ((SyntaxForm) pair_car).form;
+	      {
+		memberCarSyntax = (SyntaxForm) pair_car;
+		pair_car = memberCarSyntax.form;
+	      }
 	    if (pair_car instanceof String || pair_car instanceof Symbol
 		|| pair_car instanceof Keyword)
 	      { // Field declaration.
@@ -441,11 +460,13 @@ public class object extends Syntax
 	      }
 	    else if (pair_car instanceof Pair)
 	      { // Method declaration.
-		Pair mpair = (Pair) pair_car;
-		LambdaExp lexp = meth;
+		ScopeExp save_scope = tr.currentScope();
+		if (memberCarSyntax != null)
+		  tr.setCurrentScope(memberCarSyntax.scope);
+		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr);
+		if (memberCarSyntax != null)
+		  tr.setCurrentScope(save_scope);
 		meth = meth.nextSibling;
-		Object body = lambda.skipAttrs(lexp, pair.cdr, tr);
-		lambda.rewriteBody(lexp, body, tr);
 	      }
 	    else
 	      tr.syntaxError("invalid field/method definition");

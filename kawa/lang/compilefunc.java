@@ -210,7 +210,10 @@ public class compilefunc extends Procedure2
 	  }
       }
 
-    lexp.body.compile (comp, false);
+    lexp.start_label = new Label (comp.method);
+    lexp.start_label.define (comp.method);
+
+    lexp.body.compile (comp, Expression.LAST);
     comp.method.compile_return ();
 
     if (! comp.immediate && comp.curClass == comp.mainClass)

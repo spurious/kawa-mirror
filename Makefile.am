@@ -171,15 +171,19 @@ selected-java-source: Makefile
 $(srcdir)/patch-source-list:
 	(cd $(srcdir); \
 	find . -name '*.java' -exec \
-	   grep -lE 'BEGIN JAVA|BEGIN JAXP' '{}' ';') > $@
+	   grep -lE 'BEGIN JAVA| #endif ' '{}' ';') > $@
+
+COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
+COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 
 select-java1: $(srcdir)/patch-source-list
 	cd $(srcdir); \
 	for file in `cat patch-source-list`; do \
 	echo Converting $$file to Java1; \
-        sed -e '/BEGIN JAVA[25]/,/END JAVA[25]/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
-	    -e '/BEGIN JAXP/,/END JAXP/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
-            -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)//[ ]*|\1|' \
+        sed -e '/BEGIN JAVA[25]/,/END JAVA[25]/$(COMMENT_OUT)' \
+	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_OUT)' \
+	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_IN)' \
+            -e '/BEGIN JAVA1/,/END JAVA1/$(COMMENT_IN)' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
 	echo 1 >$(srcdir)/selected-java-source
 
@@ -187,9 +191,10 @@ select-java2: $(srcdir)/patch-source-list
 	cd $(srcdir); \
 	for file in `cat patch-source-list`; do \
 	echo Converting $$file to Java2; \
-        sed -e '/BEGIN JAVA[15]/,/END JAVA[15]/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
-	    -e '/BEGIN JAXP/,/END JAXP/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
-            -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)//[ ]*|\1|' \
+        sed -e '/BEGIN JAVA[15]/,/END JAVA[15]/$(COMMENT_OUT)' \
+	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_OUT)' \
+	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_IN)' \
+            -e '/BEGIN JAVA2/,/END JAVA2/$(COMMENT_IN)' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
 	echo 2 >$(srcdir)/selected-java-source
 
@@ -197,9 +202,10 @@ select-java5: $(srcdir)/patch-source-list
 	cd $(srcdir); \
 	for file in `cat patch-source-list`; do \
 	echo Converting $$file to Java5; \
-        sed -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
-            -e '/BEGIN JAXP 1.3/,/END JAXP 1.3/s|^\([[:space:]]*\)//[ ]*|\1|' \
-            -e '/BEGIN JAVA[25]/,/END JAVA[25]/s|^\([[:space:]]*\)//[ ]*|\1|' \
+        sed -e '/BEGIN JAVA1/,/END JAVA1/$(COMMENT_OUT)' \
+	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_IN)' \
+	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_OUT)' \
+            -e '/BEGIN JAVA[25]/,/END JAVA[25]/$(COMMENT_IN)' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
 	echo 5 >$(srcdir)/selected-java-source
 

@@ -89,7 +89,7 @@
      <include name="**/*.java"/>
      <or>
         <contains text="BEGIN JAVA" casesensitive="true"/>
-        <contains text="BEGIN JAXP" casesensitive="true"/>
+        <contains text=" #endif " casesensitive="true"/>
      </or>
   </fileset>
 
@@ -236,7 +236,8 @@
         <linecommenter first="BEGIN JAVA1" last="END JAVA1" comment="false"/>
         <linecommenter first="BEGIN JAVA2" last="END JAVA2" comment="true"/>
         <linecommenter first="BEGIN JAVA5" last="END JAVA5" comment="true"/>
-        <linecommenter first="BEGIN JAXP 1.3+" last="END JAXP 1.3+" comment="true"/>
+        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="true"/>
+        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="false"/>
       </linecommenterset>
     </xcopy>
     <copy todir="${build.preprocessed}">
@@ -253,7 +254,8 @@
         <linecommenter first="BEGIN JAVA1" last="END JAVA1" comment="true"/>
         <linecommenter first="BEGIN JAVA2" last="END JAVA2" comment="false"/>
         <linecommenter first="BEGIN JAVA5" last="END JAVA5" comment="true"/>
-        <linecommenter first="BEGIN JAXP 1.3+" last="END JAXP 1.3+" comment="true"/>
+        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="true"/>
+        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="false"/>
       </linecommenterset>
     </xcopy>
     <copy todir="${build.preprocessed}">
@@ -270,7 +272,8 @@
         <linecommenter first="BEGIN JAVA1" last="END JAVA1" comment="true"/>
         <linecommenter first="BEGIN JAVA2" last="END JAVA2" comment="false"/>
         <linecommenter first="BEGIN JAVA5" last="END JAVA5" comment="false"/>
-        <linecommenter first="BEGIN JAXP 1.3+" last="END JAXP 1.3+" comment="false"/>
+        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="false"/>
+        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="true"/>
       </linecommenterset>
     </xcopy>
     <copy todir="${build.preprocessed}">

@@ -1,5 +1,9 @@
 2004-12-22  Per Bothner  <per@bothner.com>
 
+	* Makefile.am: Partially convert pre-processor syntax, for JAXP
+	version selection: use #ifdef, #ifndef, #else.  Updates rules.
+	* build.xml: Update select-java1, select-java2, select-java5.
+
 	* kawa/lang/SyntaxTemplate.java: Fix comment syntax so it doesn't
 	break under 'make select-java1' -> 'make select-java2'.
 	* kawa/lang/Translator.java (syntaxError): Moved to Compilation.

@@ -2,22 +2,20 @@ package kawa.lang;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 
-// Should be called PrimSetField for consistency.
-
-public class SetFieldProc extends Procedure2 implements Inlineable
+public class PrimSetStatic extends Procedure1 implements Inlineable
 {
   ClassType ctype;
   String fname;
   gnu.bytecode.Field field;
   java.lang.reflect.Field reflectField;
 
-  SetFieldProc (Class clas, String fname) throws GenericError
+  PrimSetStatic (Class clas, String fname) throws GenericError
   {
     ctype = (ClassType) gnu.bytecode.Type.make(clas);
     this.fname = fname;
   }
 
-  public SetFieldProc (ClassType ctype, String name, Type ftype, int flags)
+  public PrimSetStatic (ClassType ctype, String name, Type ftype, int flags)
   {
     this.ctype = ctype;
     this.fname = name;
@@ -26,7 +24,7 @@ public class SetFieldProc extends Procedure2 implements Inlineable
       field = ctype.addField(name, ftype, flags);
   }
 
-  public Object apply2 (Object arg1, Object arg2)
+  public Object apply1 (Object arg1)
   {
     if (reflectField == null)
       {
@@ -42,7 +40,7 @@ public class SetFieldProc extends Procedure2 implements Inlineable
       }
     try
       {
-	reflectField.set(arg1, arg2);
+	reflectField.set(null, arg1);
 	return Interpreter.voidObject;
       }
     catch (IllegalAccessException ex)
@@ -60,10 +58,9 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
-    exp.args[0].compile(comp, 0, ctype);
-    exp.args[1].compile(comp, 0, field.getType());
+    exp.args[0].compile(comp, 0, field.getType());
     gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPutField(field);
+    code.emitPutStatic(field);
     if ((flags & Expression.IGNORED) == 0)
       comp.compileConstant (Interpreter.voidObject);
   }

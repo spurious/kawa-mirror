@@ -100,6 +100,8 @@ loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
 SpecialType.class PrimProcedure.class \
+PrimGetStatic.class PrimSetStatic.class \
+PrimArrayNew.class PrimArrayLength.class PrimArraySet.class PrimArrayGet.class\
 Values.class \
 Promise.class \
 Future.class \

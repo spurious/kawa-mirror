@@ -13,7 +13,7 @@
 @end iftex
 @titlepage
 @title Kawa, the Java-based Scheme system
-@subtitle September, 1996
+@subtitle @value{UPDATED}
 @sp 1
 @author Per Bothner
 @page
@@ -81,6 +81,9 @@ an online copy of R4RS
 (@url{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html}).
 @end ifclear
 
+For copyright information on the software and docuemntation,
+see @ref{License}.
+
 @menu
 * Features::
 * Getting Kawa::
@@ -110,6 +113,18 @@ and does not perform major transformations on the code.)
 Kawa provides the usual read-eval-print loop, as well as batch modes.
 
 Kawa is written in an object-oriented style.
+
+Kawa implements most of the features of the expression language of DSSSL,
+the Scheme-derived ISO-standard Document Style Semantics and Specification
+Language for SGML.  Of the core expression language, the only features
+missing are character properties, @code{external-procedure},
+the time-relationed procedures, and character name escapes in
+string literals.  Also, Kawa is not generally tail-recursive,
+and literal unescaped symbols are case-insensitive (folded to lower-case).
+From the full expression language, Kawa additionally is missing
+@code{format-number}, @code{format-numer-list}, and language objects.
+Quantities, keyword values, and the expanded @code{lambda} form
+(with optional and keyword parameters) are supported.
 
 @node Getting Kawa, Installation, Features, Top
 @section Getting Kawa
@@ -159,11 +174,8 @@ Alternatively, you can install the pre-compiled binary distribution.
 
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) version 1.0.x from JavaSoft (Sun).
-(Kawa has also been reported to work with JDK 1.1, Kaffe,
-Semantec Cafe, and J++.)
-@c (@emph{Note:} Kawa is @emph{not} supported on JDK 1.1 beta3,
-@c due to bugs in the latter!)
+(JDK) version 1.0.x or 1.1 from JavaSoft (Sun).
+(Kawa has also been reported to work with Kaffe, Semantec Cafe, and J++.)
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
@@ -249,8 +261,12 @@ compiled @samp{.class} files into @code{/usr/local/java}.  If you want them
 to be installed someplace else, such as @code{$PREFIX/java}, then
 specify that when you run configure:
 @example
-./configure -- prefix $PREFIX
+./configure --prefix $PREFIX
 @end example
+
+If you have JDK 1.1 or some other Java 1.1 system with the
+java.lang.reflect.Field class, you add the option @code{--with-jdk1}.
+This will enable the record feature.
 
 Thus you need to compile all the .java source files.
 Just run make:
@@ -399,6 +415,21 @@ nor @code{letrec-syntax} are implemented.
 @node Extensions, Compiling, Restrictions, Top
 @section Extensions
 
+@menu
+* Multiple values::
+* Keywords::
+* Special named constants::
+* Optional and keyword lambda parameters::
+* Logical Number Operations::
+* Records::
+* Ports::
+* Eval and Environments::
+* Quantities::
+* Threads::
+* Miscellaneous::
+@end menu
+
+@node Multiple values, Special named constants, Extensions, Extensions
 @subsection Multiple values
 
 The multiple-value feature will be in R5RS.
@@ -413,6 +444,132 @@ when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
 @end defun
 
+@node Special named constants, Keywords, Multiple values, Extensions
+@subsection Special named constants
+
+@defvr Constant #!optional
+Special self-evaluating literal used in lambda parameter lists
+before optional parameters.
+@end defvr
+
+@defvr Constant #!rest
+Special self-evaluating literal used in lambda parameter lists
+before the rest parameter.
+@end defvr
+
+@defvr Constant #!key
+Special self-evaluating literal used in lambda parameter lists
+before keyword parameters.
+@end defvr
+
+@defvr Constant #!eof
+The end-of-file object.
+@end defvr
+
+@defvr Constant #!void
+The void value.  Same as @code{(values)}.
+If this is the value of an expression in a read-eval-print loop,
+nothing is printed.
+@end defvr
+
+@defvr Constant #!null
+The Java @code{null} value.  This is not really a Scheme value,
+but is useful when interfacing to low-level Java code.
+@end defvr
+
+@node Keywords, Optional and keyword lambda parameters, Special named constants, Extensions
+@subsection Keywords
+
+Keywords are similar to symbols.  The mian difference is that keywords are
+self-evaluating and therefore do no need to be quoted in expressions.
+They are used mainly for specifying keyword arguments.
+
+@display
+@var{keyword} = @var{identifier}:
+@end display
+
+A keyword is a single token; therefore no whitespace is allowed between
+the @var{identifier} and the colon (which is not considered part
+of the name of the keyword).
+
+@defun keyword? obj
+Return @code{#t} is @var{obj} is a keyword, and otherwise returns @code{#f}.
+@end defun
+
+@defun keyword->string keyword
+Returns the name of @var{keyword} as a string.
+The name does not include the final @code{#\:}.
+@end defun
+
+@defun string->keyword string
+Returns the keyword whose name is @var{string}.
+(The @var{string} does not include a final @code{#\:}.)
+@end defun
+
+@node Optional and keyword lambda parameters, Logical Number Operations, Keywords, Extensions
+@subsection Optional and keyword lambda parameters
+
+Kawa borrows the extended formal argument list of DSSSL:
+
+@display
+@var{lambda-expression} = (lambda (@var{formal-arguments}) @var{body})
+@end display
+You can of course also use the extended format in a @code{define}:
+@display
+(define (@var{name} @var{formal-arguments}) @var{body})
+@end display
+
+@display
+@var{formal-arguments} =
+@var{required-optional-arguments} . @var{rest-variable} @var{or:}
+@var{required-optional-arguments} @var{rest-keyword-arguments}
+@end display
+@display
+@var{required-optional-arguments} = @var{required-argument}* (#!optional @var{optional-argument}*)?
+@var{optional-argument} = @var{variable} | (@var{variable} @var{initializer})
+@var{required-argument} = @var{variable}
+@var{rest-keyword-arguments} = (#!rest @var{rest-variable})? (#!key @var{keyword-argument}*)?
+@var{keyword-argument} = @var{variable} | (@var{variable} @var{initializer})
+@end display
+
+When the procedure is applied to a list of actual arguments, the formal and
+actual arguments are processed from left to right as follows:
+
+@itemize @bullet
+@item
+The @var{required-argument}s are bound to actual arguments starting with the
+first actual argument.  It shall be an error if there are fewer actual
+arguments then there are @var{required-argument}s.
+@item
+Next the @var{optional-argument}s are bound to remaining actual arguemnts.
+Ig the are fewer remaining actual arguments than there are
+@var{optional-argument}s, then the remaining @var{variable}s are bound
+to the corresponding @var{initializer}, if one was specified, and
+otherwise to @code{#f}.  The @var{initializer} is evaluated in an
+environment in which all the previous formal parameters have been bound.
+@item
+If there is a @var{rest-variable}, it is bound to a list of all the
+remaining actual arguemnts.  These remaining actual arguemnts are also
+eligible to be bound to keyword arguemnts.   If there is no
+@var{rest-variable} and there are no @var{keyword-argument}s, then it shall
+be an error if there are any remaining actual arguments.
+@item
+If @code{#!key} was specified, then there shall be an even number of
+remianing actual arguments.  These are interpreted as a series of pairs,
+where the first memer of each pair is a keyword specifying the argument name,
+and the second is the corresponding value.  It shall be an error if the first
+member of a pair is not a keyword.  If shall be an error if the argument name
+is not the same as a variable in a @var{keyword-argument}s, unless there
+is a @var{rest-variable}.  If the same argument name occurrs more than once
+in a the list of actual arguments, then the first value is used.
+If there is no actual argument for a particular @var{keyword-argument},
+then the variable is bound
+to the corresponding @var{initializer}, if one was specified, and
+otherwise to @code{#f}.  The @var{initializer} is evaluated in an
+environment in which all the previous formal parameters have been bound.
+@end itemize
+
+@node Logical Number Operations, Records, Optional and keyword lambda parameters, Extensions
 @subsection Logical Number Operations
 
 These functions operate on the 2's complement binary representation
@@ -481,6 +638,134 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
+@node Records, Ports, Logical Number Operations, Extensions
+@subsection Records
+
+The Record package provides a facility for user to define their own
+record data types.  A record type is implemented as Java Class
+object, and records are extensions of the class @code{Record}.
+These procedures are only available if you specified @code{--with-jdk11}
+when you configured Kawa, since they use the Java 1.1 reflection facility.
+
+@defun make-record-type type-name field-names
+Returns a @dfn{record-type descriptor}, a value representing a new data
+type disjoint from all others.  The @var{type-name} argument must be a
+string, but is only used for debugging purposes (such as the printed
+representation of a record of the new type).  The @var{field-names}
+argument is a list of symbols naming the @dfn{fields} of a record of the
+new type.  It is an error if the list contains any duplicates.
+
+In Kawa, returns a newly-created @code{Class} object that extends
+the @code{Record} class.  Each record field is implemented as
+a public Java instance field.
+@end defun
+
+@c @defun make-record-sub-type type-name field-names rtd
+@c Returns a @dfn{record-type descriptor}, a value representing a new data
+@c type, disjoint from all others.  The @var{type-name} argument must be a
+@c string.  The @var{field-names} argument is a list of symbols naming the
+@c additional @dfn{fields} to be appended to @var{field-names} of
+@c @var{rtd}.  It is an error if the combinded list contains any
+@c duplicates.@refill
+@c
+@c Record-modifiers and record-accessors for @var{rtd} work for the new
+@c record-sub-type as well.  But record-modifiers and record-accessors for
+@c the new record-sub-type will not neccessarily work for @var{rtd}.@refill
+@c @end defun
+
+@defun record-constructor rtd [field-names]
+Returns a procedure for constructing new members of the type represented
+by @var{rtd}.  The returned procedure accepts exactly as many arguments
+as there are symbols in the given list, @var{field-names}; these are
+used, in order, as the initial values of those fields in a new record,
+which is returned by the constructor procedure.  The values of any
+fields not named in that list are unspecified.  The @var{field-names}
+argument defaults to the list of field names in the call to
+@code{make-record-type} that created the type represented by @var{rtd};
+if the @var{field-names} argument is provided, it is an error if it
+contains any duplicates or any symbols not in the default list.
+
+In Kawa, @var{rtd} may be any @code{Class} that has a public default
+constructor, as long as the @var{field-nameds} are public instance
+fields.  (The fields should have type @code{Object} -- unless you
+know what you are doing!)
+@end defun
+
+@defun record-predicate rtd
+Returns a procedure for testing membership in the type represented by
+@var{rtd}.  The returned procedure accepts exactly one argument and
+returns a true value if the argument is a member of the indicated record
+type; it returns a false value otherwise.
+
+In Kawa, the retured procedure checks if the argument is an instance
+of @var{rtd} or one of its sub-classes.
+@end defun
+
+@c @defun record-sub-predicate rtd
+@c Returns a procedure for testing membership in the type represented by
+@c @var{rtd} or its parents.  The returned procedure accepts exactly one
+@c argument and returns a true value if the argument is a member of the
+@c indicated record type or its parents; it returns a false value
+@c otherwise.@refill
+@c @end defun
+
+@defun record-accessor rtd field-name
+Returns a procedure for reading the value of a particular field of a
+member of the type represented by @var{rtd}.  The returned procedure
+accepts exactly one argument which must be a record of the appropriate
+type; it returns the current value of the field named by the symbol
+@var{field-name} in that record.  The symbol @var{field-name} must be a
+member of the list of field-names in the call to @code{make-record-type}
+that created the type represented by @var{rtd}.  (In Kawa,
+the @var{field-name} can be any public non-final Object field
+of the @code{Class} @var{rtd}.)
+@end defun
+
+
+@defun record-modifier rtd field-name
+Returns a procedure for writing the value of a particular field of a
+member of the type represented by @var{rtd}.  The returned procedure
+accepts exactly two arguments: first, a record of the appropriate type,
+and second, an arbitrary Scheme value; it modifies the field named by
+the symbol @var{field-name} in that record to contain the given value.
+The returned value of the modifier procedure is unspecified.  The symbol
+@var{field-name} must be a member of the list of field-names in the call
+to @code{make-record-type} that created the type represented by
+@var{rtd}.  (In Kawa,
+the @var{field-name} can be any public non-final Object field
+of the @code{Class} @var{rtd}.)
+@end defun
+
+@defun record? obj
+Returns a true value if @var{obj} is a record of any type and a false
+value otherwise.
+
+In Kawa, this is true if @var{obj} is an instance of @code{kawa.lang.Record}.
+@end defun
+
+@defun record-type-descriptor record
+Returns a record-type descriptor representing the type of the given
+record.  That is, for example, if the returned descriptor were passed to
+@code{record-predicate}, the resulting predicate would return a true
+value when passed the given record.  In Kawa, @var{record} may be any object,
+and value returned is the class of the object.
+@end defun
+
+@defun record-type-name rtd
+Returns the type-name associated with the type represented by rtd.  The
+returned value is @code{eqv?} to the @var{type-name} argument given in
+the call to @code{make-record-type} that created the type represented by
+@var{rtd}.@refill
+@end defun
+
+@defun record-type-field-names rtd
+Returns a list of the symbols naming the fields in members of the type
+represented by @var{rtd}.  The returned value is @code{equal?} to the
+field-names argument given in the call to @code{make-record-type} that
+created the type represented by @var{rtd}.@refill
+@end defun
+
+@node Ports, Eval and Environments, Records, Extensions
 @subsection Ports
 
 @defun call-with-input-string string proc
@@ -495,6 +780,13 @@ and call @var{proc} with that port as its one argument.
 Return a string consisting of the data written to the port.
 @end defun
 
+@defun force-output [port]
+Forces any pending output on @var{port} to be delivered to the output
+device and returns an unspecified value.  If the @var{port} argument is
+omitted it defaults to the value returned by @code{(current-output-port)}.
+@end defun
+
+@node Eval and Environments, Quantities, Ports, Extensions
 @subsection Eval and Environments
 
 @defun eval expression [environment-specifier]
@@ -530,6 +822,7 @@ This procedure return an environment that contains implementation-defined
 bindings, as well as top-level user bindings.
 @end defun
 
+@node Quantities, Threads, Eval and Environments, Extensions
 @subsection Quantities
 
 As a super-class of numbers, Kawa also provides quantities.
@@ -568,6 +861,12 @@ You can specify a string instead of @var{unit}, such as @code{"cm"}
 or @code{"s"} (seconds).
 @end defun
 
+@defmac define-unit unit-name expression
+Define @var{unit-name} as a unit (that can be used in literals)
+equal to the quantity @var{expression}.
+@end defmac
+
+@node Threads, Miscellaneous, Quantities, Extensions
 @subsection Threads
 
 There is a very preliminary interface to create parallel threads.
@@ -596,6 +895,7 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
+@node Miscellaneous,  , Threads, Extensions
 @subsection Miscellaneous
 
 @defun exit [code]
@@ -603,6 +903,13 @@ Exits the Kawa interpreter, and ends the Java session.
 The integer value @var{code} is returned to the operating
 system.  If @var{code} is not specified, zero is returned,
 indicating normal (non-error) termination.
+@end defun
+
+@defun error string
+Signals an error with the given @var{string} as an error message.
+It does this by throwing a @code{GenericError} (but that may change).
+This normally prints a stack trace, and brings you back to
+the top level, or exits kawa if you are not running interactively.
 @end defun
 
 @defmac when condition form...
@@ -802,6 +1109,12 @@ can be converted to and from Scheme characters.  The type
 if and only if the actual argument is @code{#f}.
 The return type @code{"void"} indicates that no value is returned.
 
+@defmac primitive-constructor class (argtype ...)
+Returns a new anonymous procedure, which when called will create
+a new object of the specified class, and will then call the
+constructor matching the specidfied argument types.
+@end defmac
+
 @defmac primitive-virtual-method class method rtype (argtype ...)
 Returns a new anonymous procedure, which when called will
 invoke the instance method whose name is the string @var{method}
@@ -814,12 +1127,15 @@ invoke the static method whose name is the string @var{method}
 in the class whose name is @var{class}.
 @end defmac
 
+@defmac primitive-interface-method interface method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the matching method from the interface whose name is @var{interface}.
+@end defmac
+
 The macros return procedure values, just like @code{lambda},
 but the procedures are @emph{not} first-class.  Currently, they can
 only be used directly as the procedure of a procedure call, and
-they cannot be assigned, nor passed as values.  They are only
-supported in compiled code, and therefore cannot be used in
-the interactive top-level.  These restrictions will be
+they cannot be assigned, nor passed as values.  These restrictions will be
 eased in a future Kawa release (which will use the new
 Java reflective facilities).  Note also that neither macro
 checks that there really is a method that matches the specification.
@@ -921,6 +1237,31 @@ changes to Kawa, and announcing snapshots.  If you wish to subscribe
 @node License,  , Reporting Bugs, Top
 @section License
 
+This is the license for the Kawa software:
+
 @include license.terms
+
+Here is the license for this manual:
+
+Copyright @copyright{} 1996, 1997 Per Bothner
+@*Parts of this manual were derived from the SLIB manual,
+copyright @copyright{} 1993, 1994 Todd R. Eigenschink and Aubrey Jaffer.
+@*Parts of this manual were derived from ISO/EIC 10179:1996(E)
+(Document Style and Specifical Language) - unknown copyright.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the author.
+
 
 @bye

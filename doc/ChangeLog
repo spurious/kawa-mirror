@@ -1,3 +1,10 @@
+Tue Mar 18 14:13:49 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa.texi:  Docuemnt DSSSL expression language compliance;
+	special named constants; keyword; optional and keyword parameters;
+	records;  and a few new functions.
+	* Makefile.{am,in} (EXTRA_DIST):  Add Compliance.html.
+
 Mon Feb  3 23:09:39 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa.texi:  Document threads (future, sleep).  Fix two typos.

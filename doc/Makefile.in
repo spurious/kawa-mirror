@@ -38,13 +38,18 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
 TOP_BUILDDIR = @TOP_BUILDDIR@
+JAVA = @JAVA@
 PACKAGE = @PACKAGE@
+JAVAC = @JAVAC@
 VERSION = @VERSION@
+EXTRA_OBJ = @EXTRA_OBJ@
+JAVA_VERSION = @JAVA_VERSION@
+EXTRA_MISC = @EXTRA_MISC@
 
 info_TEXINFOS = kawa-tour.texi
 
 EXTRA_DIST = kawa.txt kawa.html scm2java.html license.terms \
-  kawa-tour.tex kawa-tour.ps
+  kawa-tour.tex kawa-tour.ps Compliance.html
 info_TEXINFOS = kawa.texi
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

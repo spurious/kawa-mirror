@@ -250,7 +250,7 @@ public abstract class AbstractSequence
    *       : (index + count < 0 || index > size())),
    *   where index == nextIndex(ipos, xpos).
    */
-  protected void remove(int ipos, Object xpos, int count)
+  public void remove(int ipos, Object xpos, int count)
   {
     SeqPosition it = new SeqPosition(this);
     makeRelativePosition(ipos, xpos, count, true, it, 0);

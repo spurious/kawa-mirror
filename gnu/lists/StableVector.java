@@ -117,8 +117,8 @@ public class StableVector extends GapVector
     return ipos;
   }
 
-  protected void makePosition(int index, boolean isAfter,
-			      PositionContainer posSet, int posNumber)
+  public void makePosition(int index, boolean isAfter,
+			   PositionContainer posSet, int posNumber)
   {
     int ipos = createPosition(index, isAfter);
     posSet.setPosition(posNumber, ipos, null);

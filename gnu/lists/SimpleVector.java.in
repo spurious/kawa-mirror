@@ -227,7 +227,7 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
     clearBuffer(size, count);
   }
 
-  protected void remove(int ipos, Object xpos, int count)
+  public void remove(int ipos, Object xpos, int count)
   {
     int index = ipos >>> 1;
     int ipos0, ipos1;

@@ -1,3 +1,10 @@
+2002-01-31  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (response-header, response-content-type, request-path-info,
+	request-path-translated, request-query-string):  New procedures.
+
+	* Makefile.am (EXTRA_DIST):  Add scm files.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* CGIServletWrapper.java:  New class, to wrap servlets as CGI scripts.

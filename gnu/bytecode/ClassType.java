@@ -345,12 +345,12 @@ public class ClassType extends Type implements AttrContainer {
   }
 
   /** Compile (in given method) cast from Object to this Type. */
-  public void compileCoerceFromObject (Method method)
+  public void emitCoerceFromObject (CodeAttr code)
   {
     if (this == Type.string_type)
-      method.compile_invoke_virtual (Type.toString_method);
+      code.emitInvokeVirtual(Type.toString_method);
     else if (this != Type.pointer_type)
-      method.compile_checkcast (this);
+      code.emitCheckcast(this);
   }
 
   public String toString()

@@ -35,6 +35,7 @@ Method.class \
 CodeAttr.class \
 LineNumbersAttr.class LocalVarsAttr.class \
 MiscAttr.class \
+PrimType.class \
 Scope.class \
 SourceFileAttr.class \
 Type.class \

@@ -1,3 +1,23 @@
+Tue Feb  3 12:33:46 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitPushThis, emitInvokeMethod, emitInvokeVirtual,
+	emitInvokeSpecial, emitInvokeStatic, emotGotoIfEq, emitGotoIfNE,
+	emitGotoIf, emitIfIntNotZero, emitIfIntCompare, EmitIfIntLt, emitIfNEq,
+	emitConvert, emitInstanceof):  New methods based on old ones in Method.
+	* Method.java (compile_convert, compile_goto_ifeq, compile_goto_ifne,
+	compile_goto_if, compile_if_neq_0, compile_if_icmp, compile_ifi_lt,
+	compile_ifneq, compile_invoke_method, compile_invoke_virtual,
+	compile_invoke_special, compile_invoke_static):  Removed methods.
+
+	* Type.java (byte_type etc): Change types from Type to PrimType.
+	(toString, isInstance, emitIsInstance, coerceFromObject,
+	coerceToObject, emitCoerceToObject):  New virtual methods.
+	(compileCoerceFromObject):  Rename to emitCoerceFromObject and
+	change argument type.
+	* ClassType.java (compileCoerceFromObject): Likewise.
+	* PrimType.java:  New class - extends type.
+	* Makefile.am, Makefile.in (OBJ):  Add PrimType.class.
+
 Mon Jan 26 16:24:46 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (emitCheckcast):  New method, base on

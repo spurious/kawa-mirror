@@ -24,13 +24,6 @@ public class Type {
     size = 4;
   }
 
-  Type (String nam, String sig, int siz, Class reflectClass) {
-    this_name = nam;
-    signature = sig;
-    size = siz;
-    this.reflectClass = reflectClass;
-  }
-
   public Type promote () {
     return size < 4 ? int_type : this;
   }
@@ -180,50 +173,64 @@ public class Type {
     return i == len;
   }
 
-  /** Compile code to coerce/convert from Objevt to this type. */
-  public void compileCoerceFromObject (Method method)
+  public boolean isInstance (Object obj)
   {
-    if (this == boolean_type)
-      {
-	method.compile_checkcast (boolean_ctype);
-	method.compile_invoke_virtual (booleanValue_method);
-	return;
-      }
-    method.compile_checkcast (number_type);
-    if (this == int_type || this == short_type || this == byte_type)
-      method.compile_invoke_virtual (intValue_method);
-    else if (this == long_type)
-      method.compile_invoke_virtual (longValue_method);
-    else if (this == double_type)
-      method.compile_invoke_virtual (doubleValue_method);
-    else if (this == float_type)
-      method.compile_invoke_virtual (floatValue_method);
-    // Have left out Character -> char, since not used by Kawa.
-    else
-      throw new Error ("unimplemented compileCoerceFromObject");
+    return getReflectClass().isInstance(obj);
   }
 
-  static public Type byte_type = new Type ("byte", "B", 1,
-					   java.lang.Byte.TYPE);
-  static public Type short_type = new Type ("short", "S", 2,
-					    java.lang.Short.TYPE);
-  static public Type int_type = new Type ("int", "I", 4,
-					  java.lang.Integer.TYPE);
-  static public Type long_type = new Type ("long", "J", 8,
-					   java.lang.Long.TYPE);
+  public void emitIsInstance (CodeAttr code)
+  {
+    code.emitInstanceof(this);
+  }
 
-  static public Type float_type = new Type ("float", "F", 4,
-					    java.lang.Float.TYPE);
-  static public Type double_type = new Type ("double", "D", 8,
-					     java.lang.Double.TYPE);
+  /** Convert an object to a value of this Type.
+   * Throw a ClassCastException when this is not possible. */
+  public Object coerceFromObject (Object obj)
+  {
+    if (getReflectClass().isAssignableFrom(obj.getClass()))
+      return obj;
+    throw new ClassCastException("don't know how to coerce "
+				 + obj.getClass().getName() + " to "
+				 + getName());
+  }
 
-  static public Type boolean_type = new Type ("boolean", "Z", 1,
-					      java.lang.Boolean.TYPE);
-  static public Type char_type = new Type ("char", "C", 2,
-					   java.lang.Character.TYPE);
+  public Object coerceToObject (Object obj)
+  {
+    return obj;
+  }
 
-  static public Type void_type = new Type ("void", "V", 0,
-					   java.lang.Void.TYPE);
+  /** Compile code to convert an object (on the stack) to this Type. */
+  public void emitCoerceToObject (CodeAttr code)
+  {
+  }
+
+  /** Compile code to coerce/convert from Object to this type. */
+  public void emitCoerceFromObject (CodeAttr code)
+  {
+    throw new Error ("unimplemented emitCoerceFromObject");
+  }
+
+  static public Type byte_type = new PrimType ("byte", "B", 1,
+					       java.lang.Byte.TYPE);
+  static public Type short_type = new PrimType ("short", "S", 2,
+						java.lang.Short.TYPE);
+  static public Type int_type = new PrimType ("int", "I", 4,
+					      java.lang.Integer.TYPE);
+  static public Type long_type = new PrimType ("long", "J", 8,
+					       java.lang.Long.TYPE);
+
+  static public Type float_type = new PrimType ("float", "F", 4,
+						java.lang.Float.TYPE);
+  static public Type double_type = new PrimType ("double", "D", 8,
+						 java.lang.Double.TYPE);
+
+  static public Type boolean_type = new PrimType ("boolean", "Z", 1,
+						  java.lang.Boolean.TYPE);
+  static public Type char_type = new PrimType ("char", "C", 2,
+					       java.lang.Character.TYPE);
+
+  static public Type void_type = new PrimType ("void", "V", 0,
+					       java.lang.Void.TYPE);
 
   static public ClassType pointer_type = new ClassType ("java.lang.Object");
   static public ClassType string_type = new ClassType ("java.lang.String");
@@ -257,4 +264,8 @@ public class Type {
     return reflectClass;
   }
 
+  public String toString()
+  {
+    return "Type " + getName();
+  }
 }

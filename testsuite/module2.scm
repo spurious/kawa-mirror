@@ -1,6 +1,7 @@
 (module-export list-length-1 list-length-3 classify list1234
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair)
 (require <module1>)
+(require <module1a>)
 (define (list-length-1 x) :: <integer>
   (list-length-2 x))
 (define list-length-3 #t)
@@ -41,3 +42,6 @@
 
 (define (make-pair x y)
   (make <pair> car: x cdr: y))
+
+;; Used to cause stack overflow - see bug #8818.
+(define-abc-func abc-returner)

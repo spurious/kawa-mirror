@@ -1,3 +1,10 @@
+2004-05-06  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* module1a.scm:  New module, uses defmacro.
+	* module2.scm:  Use new module.
+	* Makefile.am:  Update accordingly.
+	Test case for bug #8818.
+
 2004-05-04  Per Bothner  <per@bothner.com>
 
 	* num-test.scm:  Add 5 new Comparable/CollectionsLsort tests.

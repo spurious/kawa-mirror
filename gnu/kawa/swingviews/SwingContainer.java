@@ -41,9 +41,7 @@ class ProcActionListener implements ActionListener
   {
     try
       {
-	System.err.println("before action");
 	proc.apply0();
-	System.err.println("after action");
       }
     catch (Throwable ex)
       {

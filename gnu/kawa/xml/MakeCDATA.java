@@ -31,7 +31,6 @@ public class MakeCDATA extends CpsProcedure // NodeConstructor
 	int n = sbuf.length();
 	char[] chars = new char[n];
 	sbuf.getChars(0, n, chars, 0);
-	System.err.println("writeCDATA["+sbuf+"] to "+out.getClass().getName());
 	out.writeCDATA(chars, 0, n);
       }
     finally

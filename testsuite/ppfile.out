@@ -64,6 +64,6 @@
 
 (define (pprint-file
          ifile
-         optional
+         #!optional
          (oport (current-output-port)))
   (pprint-filter-file ifile (lambda (x) x) oport))

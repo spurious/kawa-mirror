@@ -16,7 +16,7 @@ public class TextAreaWriter extends java.io. Writer
 
   public synchronized void write(int x)
   {
-    str = str + x;
+    str = str + (char) x;
     if (x == '\n')
       flush();
   }
@@ -26,8 +26,7 @@ public class TextAreaWriter extends java.io. Writer
     if (area instanceof MessageArea)
       {
 	MessageArea msg = (MessageArea) area;
-	area.insert(str, msg.outputMark);
-	msg.outputMark += str.length();
+	msg.write(str);
       }
     else
       area.append(str);

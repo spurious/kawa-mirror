@@ -27,7 +27,7 @@ repl.class:  $(srcdir)/repl.java
 javadir=$(prefix)/java/$(subdir)
 
 OBJ = Shell.class repl.class \
-  GuiConsole.class MessageArea.class TextAreaWriter.class
+  GuiConsole.class MessageArea.class TextAreaWriter.class GuiInPort.class
 
 
 # These are generated automatically when the $(OBJ) files are built,

@@ -95,6 +95,30 @@ public class format extends ProcedureN
     return new FString(chars);
   }
 
+  /**
+   * Apply format and argument, yielding an FString.
+   * @param style either '%' (C/Emacs-style format specifiers), or
+   *   '~' (Common Lisp-style format specifiers).
+   * @param fmt the format string or specification
+   * @param args the arguments to be formatted
+   */
+  public static FString formatToString(char style, Object fmt, Object[] args)
+  {
+    ReportFormat rfmt = ParseFormat.asFormat(fmt, style);
+    CharArrayOutPort port = new CharArrayOutPort();
+    try
+      {
+	rfmt.format(args, 0, port, null);
+      }
+    catch (java.io.IOException ex)
+      {
+	throw new RuntimeException("Error in format: "+ ex);
+      }
+    char[] chars = port.toCharArray();
+    port.close ();
+    return new FString(chars);
+  }
+
   public Object applyN (Object[] args)
   {
     return format$V(args);

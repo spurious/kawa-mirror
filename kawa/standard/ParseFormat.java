@@ -24,11 +24,16 @@ public class ParseFormat extends Procedure1
   public ReportFormat parseFormat(LineBufferedReader fmt)
     throws java.text.ParseException, java.io.IOException
   {
+    return parseFormat(fmt, emacsStyle ? '?' : '~');
+  }
+
+  public static ReportFormat parseFormat(LineBufferedReader fmt, char magic)
+    throws java.text.ParseException, java.io.IOException
+  {
     StringBuffer fbuf = new StringBuffer(100);
     int position = 0;
     java.util.Vector formats = new java.util.Vector();
     Format format;
-    char magic = emacsStyle ? '?' : '~';
     for (;;)
       {
 	int ch = fmt.read();
@@ -174,9 +179,16 @@ public class ParseFormat extends Procedure1
 
   public Object apply1 (Object arg)
   {
+    return asFormat(arg, emacsStyle ? '?' : '~');
+  }
+
+  public static ReportFormat asFormat (Object arg, char style)
+  {
     try
       {
-	if (! emacsStyle)
+	if (arg instanceof ReportFormat)
+	  return (ReportFormat) arg;
+	if (style == '~')
 	  return new LispFormat(arg.toString());
 	else
 	  {
@@ -187,7 +199,7 @@ public class ParseFormat extends Procedure1
 	      iport = new CharArrayInPort(arg.toString()); 
 	    try
 	      {
-		return parseFormat(iport);
+		return parseFormat(iport, style);
 	      }
 	    finally
 	      {

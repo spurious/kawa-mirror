@@ -451,7 +451,7 @@ public class Scheme extends Interpreter
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.syntax");
       define_proc("as", kawa.standard.convert.getInstance());
-      define_proc("instance?", new kawa.standard.instance(this));
+      define_proc("instance?", new gnu.kawa.reflect.InstanceOf(this));
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
       define_syntax("define-class", "kawa.standard.define_class");
@@ -754,29 +754,7 @@ public class Scheme extends Interpreter
   /** If exp is a "constant" Type, return that type, otherwise return null. */
   public static Type getTypeValue (Expression exp)
   {
-    if (exp instanceof QuoteExp)
-      {
-	Object value = ((QuoteExp) exp).getValue();
-	if (value instanceof Type)
-	  return (Type) value;
-	else if (value instanceof Class)
-	  return Type.make((Class) value);
-      }
-    else if (exp instanceof ReferenceExp)
-      {
-	ReferenceExp rexp = (ReferenceExp) exp;
-        Declaration binding = rexp.getBinding();
-	if (binding == null)
-	  {
-	    String name = rexp.getName();
-	    int len = name.length(); 
-	    if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
-	      return Scheme.string2Type(name.substring(1, len-1));
-	  }
-	else if (binding.isAlias())
-	  return getTypeValue(binding.getValue());
-      }
-    return null;
+    return getInstance().getTypeFor(exp);
   }
 
   public static ModuleExp makeModuleExp(Object body, Translator tr)

@@ -38,11 +38,12 @@ public class prim_method extends Syntax
       return Scheme.string2Type(str);
     else if (obj instanceof String)
       {
-        Type type = Scheme.getTypeValue(tr.rewrite(obj));
+        Type type = tr.getInterpreter().getTypeFor(tr.rewrite(obj));
 	if (type != null)
 	  return type;
       }
-    tr.syntaxError("invalid type spec (must be \"type\" or <type>): " + str);
+    tr.syntaxError("invalid type spec (must be \"type\" or 'type or <type>): "
+                   + str);
     return Type.pointer_type;
   }
 

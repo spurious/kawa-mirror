@@ -258,15 +258,7 @@ public class SyntaxRule implements Compilable
 	vars[num_variables + i] = renamed_symbol;
 	tr.current_decls.put (renamed_symbol, name);
       }
-    Object expansion = execute_template (0, vars, 0, indexes, tr);
-    /* DEBUGGING:
-    OutPort err = OutPort.errDefault();
-    err.print("{Expanded macro: ");
-    SFormat.print(expansion, err);
-    err.println('}');
-    err.flush();
-    */
-    return expansion;
+    return execute_template (0, vars, 0, indexes, tr);
   }
 
   /**

@@ -120,7 +120,6 @@ public class Window extends javax.swing.JTextPane
   public void setBuffer (Buffer buffer)
   {
     this.buffer = buffer;
-    System.err.println("<setBuffer buf:"+buffer+" dot:"+buffer.getDot());
     setDocument(buffer.document);
     setKeymap(buffer.keymap);
     if (modeline != null)
@@ -128,7 +127,6 @@ public class Window extends javax.swing.JTextPane
     Caret caret = getCaret();
     caret.setDot(buffer.getDot());
     buffer.curPosition = caret;
-    System.err.println(">setBuffer buf:"+buffer+" dot:"+buffer.getDot());
   }
 
   /** Returns the "Emacs value" (1-origin) of point. */

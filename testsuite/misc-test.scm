@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 54)
+(test-init "Miscellaneous" 55)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -129,6 +129,13 @@
       (with-content (document) (with-content (view type: diagram))
 		    (with-content (view type: text))))
 
+(test '("X" . "X:abc") 'synchronized
+      (let* ((x "X")
+	     (y "abc")
+	     (z	(synchronized y
+			      (set! y (string-append x ":" y))
+			      (cons x y))))
+	z))
 
 (section "closures")
 

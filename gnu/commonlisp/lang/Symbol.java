@@ -80,8 +80,6 @@ public class Symbol extends Binding
 					 Object symbol, Object value)
   {
     Binding binding = getBinding(environ, symbol);
-    if (symbol.equals("defvar"))
-	System.err.println("setFun "+binding+"/"+System.identityHashCode(binding)+ " name:"+symbol+" int?"+(symbol=="defvar"));
     binding.setFunctionValue(value);
   }
 

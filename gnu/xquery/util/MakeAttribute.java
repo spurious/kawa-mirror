@@ -38,6 +38,7 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
 	CodeAttr code = comp.getCode();
 	
 	code.emitLoad(consumer);
+	code.emitDup();
 	args[0].compile(comp, Target.pushObject);
 	code.emitDup();
 	code.emitInvokeVirtual(Type.pointer_type.getDeclaredMethod("toString", 0));

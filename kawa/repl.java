@@ -291,6 +291,10 @@ public class repl extends Procedure0or1
 	  {
 	    Compilation.generateMainDefault = true;
 	  }
+	else if (arg.equals("--applet"))
+	  {
+	    Compilation.generateAppletDefault = true;
+	  }
 	else if (arg.equals("--debug-dump-zip"))
 	  {
 	    gnu.expr.LambdaExp.dumpZipPrefix = "kawa-zip-dump-";

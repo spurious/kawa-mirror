@@ -25,6 +25,7 @@ public class load extends Procedure1 {
 	Object inst = clas.newInstance ();
 	if (! (inst instanceof Procedure0))
 	  throw new RuntimeException ("load - class is not an Procedure0");
+	gnu.kawa.reflect.ClassMemberConstraint.defineAll(inst, env);
 	((ModuleBody)inst).run();
       }
     catch (ClassNotFoundException ex)
@@ -148,6 +149,10 @@ public class load extends Procedure1 {
 	apply (name, env);
 	return Scheme.voidObject;
       }
+    catch (java.io.FileNotFoundException e)
+      {
+	throw new RuntimeException ("load: file not readable: " + name);
+      }
     catch (SyntaxException ex)
       {
 	throw new RuntimeException("load: errors while compiling `"+
@@ -156,7 +161,7 @@ public class load extends Procedure1 {
   }
 
   public static final void apply (String name, Environment env)
-    throws SyntaxException
+      throws SyntaxException, java.io.FileNotFoundException
   {
     if (name.endsWith (".zip") || name.endsWith(".jar"))
       {
@@ -221,10 +226,6 @@ public class load extends Procedure1 {
 				       +"\" after loading");
 	      }
 	  }
-	catch (java.io.FileNotFoundException e)
-	  {
-	    throw new RuntimeException ("load: file not readable: " + name);
-	  }
 	catch (java.io.IOException e)
           {
             throw new RuntimeException ("I/O exception in load: "+e.toString ());
@@ -261,6 +262,6 @@ public class load extends Procedure1 {
 	if (file.exists ())
 	  loadSource (xname, env);
       }
-    throw new RuntimeException ("load:  " + name + " - not found");
+    throw new java.io.FileNotFoundException(name);
   }
 }

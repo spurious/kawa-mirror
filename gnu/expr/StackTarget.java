@@ -35,7 +35,7 @@ public class StackTarget extends Target
       }
 
     stackType.emitCoerceToObject(code);
-    return stackType.isSubtype(type);
+    return type instanceof ClassType && stackType.isSubtype(type);
   }
 
   public void compileFromStack(Compilation comp, Type stackType)

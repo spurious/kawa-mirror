@@ -1,3 +1,15 @@
+2001-09-20  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (PRIVATE_SPECIFIED):  New flag.
+	(makeField):  Only mangle if needed.
+	Don't make UNKNOWN field final if we don't set it in clinit.
+
+	* Declaration,java (isStatic):  Replace broken definition.
+	* SetExp.java (eval):  No longer use isStatic; just check if ModuleExp.
+
+	* StackTarget.java (compileFromStack0):  Add test that type is a
+	ClassType.  Fixes bug reported by Jocelyn Paine.
+
 2001-09-18   Andreas Schlapbach  <schlpbch@kde.org>
 
 	* Interpreter.java (getLanguages):  New static method.

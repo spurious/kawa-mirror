@@ -85,7 +85,7 @@ public class SetExp extends Expression
     Object new_val = new_value.eval (env);
 
     if (binding != null
-        && ! (binding.isStatic() && ! binding.isPrivate()))
+        && ! (binding.context instanceof ModuleExp))
       throw new Error ("internal error - SetExp.eval with lexical binding");
     if (isDefining ())
       {

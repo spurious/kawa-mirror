@@ -180,6 +180,7 @@ public class Declaration
   public static final int IS_CONSTANT = 0x4000;
   public static final int IS_SYNTAX = 0x8000;
   public static final int IS_UNKNOWN = 0x10000;
+  public static final int PRIVATE_SPECIFIED = 0x20000;
 
   protected int flags = IS_SIMPLE;
 
@@ -300,8 +301,10 @@ public class Declaration
   }
 
   public boolean isStatic()
-  { // This will soon be wrong.  FIXME.  Probably use isPublic instead.
-    return context instanceof ModuleExp && ! isPrivate();
+  {
+    return (getFlag(STATIC_SPECIFIED)
+	    || (context instanceof ModuleExp
+		&& ((ModuleExp) context).isStatic()));
   }
 
   public final boolean isLexical()
@@ -476,7 +479,7 @@ public class Declaration
     String fname = getName();
     if (getFlag(IS_UNKNOWN))
       fname = "id$" + fname;
-    fname = Compilation.mangleName(fname, true);
+    fname = Compilation.mangleNameIfNeeded(fname);
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
@@ -487,9 +490,18 @@ public class Declaration
     if (! isPrivate())
       fflags |= Access.PUBLIC;
     if (getFlag(STATIC_SPECIFIED)
-	|| getFlag(IS_UNKNOWN) // FIXME - should not be automatically static.
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
+    if (getFlag(IS_UNKNOWN))
+      {
+	// This is a kludge.  We really should set STATIC only of the module
+	// is static, in which case it should be safe to make it always FINAL.
+	// But for now we don't support non-static UNKNOWNs.  FIXME.
+	fflags |= Access.STATIC;
+	if (! (context instanceof ModuleExp
+	       && ((ModuleExp) context).isStatic()))
+	  fflags &= ~Access.FINAL;
+      }
     Type ftype = (isIndirectBinding() ? Compilation.typeBinding
 		  : value == null || typeSpecified ? getType()
 		  : value.getType());

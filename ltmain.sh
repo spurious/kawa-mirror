@@ -1,6 +1,6 @@
 # Generated from ltmain.m4sh; do not edit by hand
 
-# ltmain.sh (GNU libtool 1.1863 2005/03/02 10:36:40) 2.1a
+# ltmain.sh (GNU libtool 1.1886 2005/03/16 17:43:49) 2.1a
 # Written by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005 Free Software Foundation, Inc.
@@ -63,7 +63,7 @@
 #       compiler:		$LTCC
 #       compiler flags:		$LTCFLAGS
 #       linker:		$LD (gnu? $with_gnu_ld)
-#       $progname:		(GNU libtool 1.1863 2005/03/02 10:36:40) 2.1a
+#       $progname:		(GNU libtool 1.1886 2005/03/16 17:43:49) 2.1a
 #       automake:		$automake_version
 #       autoconf:		$autoconf_version
 #
@@ -72,8 +72,8 @@
 PROGRAM=ltmain.sh
 PACKAGE=libtool
 VERSION=2.1a
-TIMESTAMP=" 1.1863 2005/03/02 10:36:40"
-package_revision=1.1863
+TIMESTAMP=" 1.1886 2005/03/16 17:43:49"
+package_revision=1.1886
 
 ## --------------------- ##
 ## M4sh Initialization.  ##
@@ -172,8 +172,9 @@ EXIT_SKIP=77	  # $? = 77 is used to indicate a skipped test to automake.
 exit_status=$EXIT_SUCCESS
 
 # Make sure IFS has a sensible default
-: ${IFS="
- 	"}
+lt_nl='
+'
+IFS=" 	$lt_nl"
 
 dirname="s,/[^/]*$,,"
 basename="s,^.*/,,"
@@ -1557,8 +1558,7 @@ func_mode_compile ()
 	;;
 
       target )
-	func_quote_for_eval "$arg"
-	libobj="$func_quote_for_eval_result"
+	libobj="$arg"
 	arg_mode=normal
 	continue
 	;;
@@ -1622,9 +1622,6 @@ func_mode_compile ()
       func_quote_for_eval "$lastarg"
       base_compile="$base_compile $func_quote_for_eval_result"
     done # for arg
-
-    func_quote_for_eval "$srcfile"
-    srcfile="$func_quote_for_eval_result"
 
     case $arg_mode in
     arg)
@@ -1699,6 +1696,9 @@ func_mode_compile ()
       esac
     done
 
+    func_quote_for_eval "$libobj"
+    test "X$libobj" != "X$func_quote_for_eval_result" \
+      && func_fatal_error "libobj name \`$libobj' may not contain shell special characters."
     func_basename "$obj"
     objname="$func_basename_result"
     func_dirname "$obj" "/" ""
@@ -1765,12 +1765,14 @@ compiler."
 	$opt_dry_run || $RM $removelist
 	exit $EXIT_FAILURE
       fi
-      $ECHO $srcfile > "$lockfile"
+      $ECHO "$srcfile" > "$lockfile"
     fi
 
     if test -n "$fix_srcfile_path"; then
       eval srcfile=\"$fix_srcfile_path\"
     fi
+    func_quote_for_eval "$srcfile"
+    qsrcfile=$func_quote_for_eval_result
 
     $opt_dry_run || $RM "$libobj" "${libobj}T"
 
@@ -1792,10 +1794,10 @@ EOF
       fbsd_hideous_sh_bug=$base_compile
 
       if test "$pic_mode" != no; then
-	command="$base_compile $srcfile $pic_flag"
+	command="$base_compile $qsrcfile $pic_flag"
       else
 	# Don't build PIC code
-	command="$base_compile $srcfile"
+	command="$base_compile $qsrcfile"
       fi
 
       func_mkdir_p "$xdir$objdir"
@@ -1859,9 +1861,9 @@ EOF
     if test "$build_old_libs" = yes; then
       if test "$pic_mode" != yes; then
 	# Don't build PIC code
-	command="$base_compile $srcfile"
+	command="$base_compile $qsrcfile"
       else
-	command="$base_compile $srcfile $pic_flag"
+	command="$base_compile $qsrcfile $pic_flag"
       fi
       if test "$compiler_c_o" = yes; then
 	command="$command -o $obj"
@@ -4759,7 +4761,7 @@ func_mode_link ()
 	case $current in
 	0|[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]) ;;
 	*)
-	  func_error "CURRENT \`$current' is not a nonnegative integer"
+	  func_error "CURRENT \`$current' must be a nonnegative integer"
 	  func_fatal_error "\`$vinfo' is not valid version information"
 	  ;;
 	esac
@@ -4767,7 +4769,7 @@ func_mode_link ()
 	case $revision in
 	0|[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]) ;;
 	*)
-	  func_error "REVISION \`$revision' is not a nonnegative integer"
+	  func_error "REVISION \`$revision' must be a nonnegative integer"
 	  func_fatal_error "\`$vinfo' is not valid version information"
 	  ;;
 	esac
@@ -4775,7 +4777,7 @@ func_mode_link ()
 	case $age in
 	0|[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]) ;;
 	*)
-	  func_error "AGE \`$age' is not a nonnegative integer"
+	  func_error "AGE \`$age' must be a nonnegative integer"
 	  func_fatal_error "\`$vinfo' is not valid version information"
 	  ;;
 	esac

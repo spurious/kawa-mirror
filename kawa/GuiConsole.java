@@ -5,8 +5,8 @@ import java.awt.event.*;
 import java.io.*;
 import gnu.mapping.*;
 
+import gnu.expr.Interpreter;
 import kawa.standard.Scheme;
-import kawa.lang.Interpreter;
 
 /** A Frame containing a Kwa read-eval-print loop.
   * @author Albert Ting <alt@artisan.com> (original base)

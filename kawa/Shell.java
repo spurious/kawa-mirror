@@ -117,6 +117,7 @@ public class Shell
 	  kawa.standard.load.loadSource(InPort.inDefault(), env);
 	else
 	  {
+	    // kawa.standard.load.apply(fname,env);
 	    InPort fstream = InPort.openFile(fname);
 	    kawa.standard.load.loadSource(fstream, env);
 	    fstream.close();

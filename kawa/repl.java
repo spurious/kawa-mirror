@@ -79,31 +79,29 @@ public class repl extends Procedure0or1
 			       commandLineArguments);
   }
 
-  static Interpreter defaultInterpreter = null;
-
   public static Interpreter getInterpreter()
   {
-    if (defaultInterpreter == null)
+    if (Interpreter.defaultInterpreter == null)
       {
-	defaultInterpreter = new Scheme();
-	Environment.setCurrent(defaultInterpreter.getEnvironment());
+	Interpreter.defaultInterpreter = new Scheme();
+	Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
       }
-    return defaultInterpreter;
+    return Interpreter.defaultInterpreter;
   }
 
   public static void setInterpreter(String name)
   {
-    Interpreter previous = defaultInterpreter; 
+    Interpreter previous = Interpreter.defaultInterpreter; 
     if (name.length() > 2 && name.charAt(0) == '-')
       name = name.substring(name.charAt(1) == '-' ? 2 :1);
     if (name.equals("scheme"))
-      defaultInterpreter = Scheme.getInstance();
+      Interpreter.defaultInterpreter = Scheme.getInstance();
     else if (name.equals("elisp") || name.equals("emacs"))
-      defaultInterpreter = gnu.jemacs.lang.ELisp.getInstance();
+      Interpreter.defaultInterpreter = gnu.jemacs.lang.ELisp.getInstance();
     else
       bad_option(name);
     if (previous == null)
-      Environment.setCurrent(defaultInterpreter.getEnvironment());
+      Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
   }
 
   public static void main(String args[])
@@ -122,7 +120,7 @@ public class repl extends Procedure0or1
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
-	    Shell.runString(args[iArg], defaultInterpreter, Environment.getCurrent());
+	    Shell.runString(args[iArg], Interpreter.defaultInterpreter, Environment.getCurrent());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -142,7 +140,7 @@ public class repl extends Procedure0or1
 	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(defaultInterpreter, Environment.getCurrent());
+	    Shell.run(Interpreter.defaultInterpreter, Environment.getCurrent());
 	    return;
 	  }
 	else if (arg.equals ("-w"))
@@ -150,7 +148,7 @@ public class repl extends Procedure0or1
 	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    new kawa.GuiConsole(defaultInterpreter, Environment.getCurrent());
+	    new kawa.GuiConsole(Interpreter.defaultInterpreter, Environment.getCurrent());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))
@@ -279,7 +277,7 @@ public class repl extends Procedure0or1
 		    System.err.println("got connection from "
 				       +client.getInetAddress()
 				       +" port:"+client.getPort());
-		    serveTelnet(defaultInterpreter, client);
+		    serveTelnet(Interpreter.defaultInterpreter, client);
 		  }
 	      }
 	    catch (java.io.IOException ex)
@@ -340,7 +338,7 @@ public class repl extends Procedure0or1
       {
 	setArgs (args, iArg);
 	checkInitFile();
-	Shell.run(defaultInterpreter);
+	Shell.run(Interpreter.defaultInterpreter);
       }
    }
 

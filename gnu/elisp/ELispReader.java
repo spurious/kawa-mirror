@@ -103,19 +103,7 @@ public class ELispReader extends gnu.text.LispReader
 	  break;
 	skip();
       }
-    if (lastChar == ':')
-      {
-	str.setLength(str.length()-1);
-	return Keyword.make(str.toString());
-      }
-    if (firstChar == ':')
-      {
-	str.reverse();
-	str.setLength(str.length()-1);
-	str.reverse();
-	return Keyword.make(str.toString());
-      }
-    return str.toString().intern();
+    return ELisp.getSymbol(str.toString().intern());
   }
 
   boolean charIsInt = true;

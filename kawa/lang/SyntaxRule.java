@@ -6,6 +6,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 public class SyntaxRule implements Compilable
 {
@@ -174,7 +175,7 @@ public class SyntaxRule implements Compilable
 	      }
 	  }
 	int code;
-	if (pair.cdr == List.Empty)
+	if (pair.cdr == LList.Empty)
 	  code = LIST1;
 	else
 	  {
@@ -308,7 +309,7 @@ public class SyntaxRule implements Compilable
 	else if (ch == LIST1)
 	  {
 	    Object car = stack.pop ();
-	    stack.push (new Pair (car, List.Empty));
+	    stack.push (new Pair (car, LList.Empty));
 	  }
 	else if (ch == START_REPEAT)
 	  {
@@ -355,7 +356,7 @@ public class SyntaxRule implements Compilable
 	      }
 	    Pair last = null;
 	    Object following = stack.pop ();
-	    Object result = List.Empty;
+	    Object result = LList.Empty;
 	    for (int j = 0;  j < count; j++)
 	      {
 		indexes[nesting] = j;
@@ -363,7 +364,7 @@ public class SyntaxRule implements Compilable
 						   vars,
 						   nesting + 1, indexes,
 						   tr, form);
-		Pair pair = new Pair (element, List.Empty);
+		Pair pair = new Pair (element, LList.Empty);
 		if (last == null)
 		  result = pair;
 		else

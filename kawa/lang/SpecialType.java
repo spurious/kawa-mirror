@@ -3,6 +3,7 @@ import gnu.bytecode.*;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
+import gnu.kawa.util.Char;
 
 /** Use to implement some special types that convert differently. */
 

@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.mapping.Printable;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the "quote" Scheme primitive.
@@ -13,7 +14,7 @@ public class Quote extends Syntax implements Printable
   {
     Pair pair;
     if (! (obj instanceof Pair)
-        || (pair = (Pair) obj).cdr != List.Empty)
+        || (pair = (Pair) obj).cdr != LList.Empty)
       return tr.syntaxError ("quote requires a single argument");
     return new QuoteExp (pair.car);
   }

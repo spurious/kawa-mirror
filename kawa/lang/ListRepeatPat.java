@@ -5,6 +5,7 @@ import gnu.bytecode.Access;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 public class ListRepeatPat extends Pattern implements Printable, Compilable
 {
@@ -36,7 +37,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
       SFormat.print (obj, System.err);
       System.err.print (")\n");
       */
-    int length = List.list_length (obj);
+    int length = LList.list_length (obj);
     if (length < 0)
       return false;
 

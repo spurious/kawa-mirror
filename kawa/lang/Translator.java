@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
+import gnu.kawa.util.*;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -236,7 +237,7 @@ public class Translator extends Object
           return apply_rewrite ((Syntax) decl, p);
       }
 
-    int cdr_length = List.length (cdr);
+    int cdr_length = LList.length (cdr);
 
     if (func instanceof QuoteExp)
       {
@@ -375,7 +376,7 @@ public class Translator extends Object
   public boolean scan_body (Object body, java.util.Vector forms, ScopeExp defs)
   {
     boolean result = true;
-    while (body != List.Empty)
+    while (body != LList.Empty)
       {
 	if (! (body instanceof Pair))
 	  {

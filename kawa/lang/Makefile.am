@@ -11,10 +11,8 @@ GenericError.java\
 NamedException.java
 
 java_JAVA=\
-Char.java \
 QueueReader.java \
 ScmRead.java \
-NullReader.java CharArrayInPort.java \
 \
 Pattern.java \
 AnyPat.java \
@@ -24,12 +22,6 @@ ListRepeatPat.java \
 PairPat.java \
 VarListPat.java \
 \
-Sequence.java \
-List.java \
-Pair.java \
-PairWithPosition.java \
-FString.java \
-Vector.java \
 Lambda.java \
 Quote.java \
 Translator.java \

@@ -5,8 +5,8 @@ import kawa.standard.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
-import gnu.text.SourceMessages;
-import gnu.text.Lexer;
+import gnu.text.*;
+import gnu.kawa.util.*;
 
 /** Utility functions (static methods) for kawa.repl.
  * Should probably be merged with kawa.repl.  FIXME. */
@@ -43,7 +43,7 @@ public class Shell
 	  {
 	    lexer.clearErrors();
 	    PairWithPosition body = new PairWithPosition(inp,
-							 null, List.Empty);
+							 null, LList.Empty);
 	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
 
             // Skip whitespace, in case somebody calls (read-char) or similar.

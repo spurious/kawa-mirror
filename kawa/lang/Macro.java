@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.kawa.util.*;
 
 public class Macro extends Syntax
 {

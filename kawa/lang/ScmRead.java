@@ -5,6 +5,8 @@ import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
+import gnu.kawa.util.*;
+import java.util.Vector;
 
 /** A class to read Scheme forms (S-expressions). */
 
@@ -28,12 +30,12 @@ public class ScmRead extends gnu.text.LispReader
 
   protected Object makeNil ()
   {
-    return List.Empty;
+    return LList.Empty;
   }
 
   protected Object makePair (Object car, int line, int column)
   {
-    PairWithPosition pair = new PairWithPosition (port, car, List.Empty);
+    PairWithPosition pair = new PairWithPosition (port, car, LList.Empty);
     pair.setLine(line + 1, column + 1);
     pair.setFile (port.getName ());
     return pair;
@@ -144,24 +146,18 @@ public class ScmRead extends gnu.text.LispReader
     if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
       {
 	String name = readSymbol(c, 'D').toString();
-        int i = Char.charNames.length; 
-        for ( ; ; ) {
-           if (--i < 0) {
-              break;
-           }
-           if (Char.charNames[i].equals(name)) {
-              c = Char.charNameValues[i];
-             break;
-           }
-        }
-        if (i<0) {
-           if (name.length()>1) {
-	     error("unknown character name: " + name);
-	     c = '?';
-           } else {
+
+        c = Char.nameToChar(name);
+        if (c < 0)
+          {
+            if (name.length() > 1)
+              {
+                error("unknown character name: " + name);
+                c = '?';
+              }
+            else
               c = origc;
-           }
-        }
+          }
       }
     else if ((origc = Character.digit((char) c, 8)) >= 0)
       {
@@ -188,6 +184,54 @@ public class ScmRead extends gnu.text.LispReader
 	  skip();
       }
     return Char.make((char)c);
+  }
+
+  UniformVector readUniformVector(char kind)
+      throws java.io.IOException, SyntaxException
+  {
+    int size = readOptionalExponent();
+    if (! (size == 8 || size == 16 || size == 32 || size == 64)
+        || (kind == 'f' && size < 32)
+        || read() != '(')
+      {
+        error("invalid uniform vector syntax");
+        return null;
+      }
+    Object list = readList(')');
+    UniformVector vec = null;
+    int len = LList.list_length(list);
+    if (len <= 0)
+      {
+        error("invalid elements in uniform vector syntax");
+        return null;
+      }
+    Sequence q = (Sequence) list;
+    switch (kind)
+      {
+      case 'f':
+        switch (size)
+          {
+          case 32:  return new F32Vector(q);
+          case 64:  return new F64Vector(q);
+          }
+      case 's':
+        switch (size)
+          {
+          case  8:  return new S8Vector(q);
+          case 16:  return new S16Vector(q);
+          case 32:  return new S32Vector(q);
+          case 64:  return new S64Vector(q);
+          }
+      case 'u':
+        switch (size)
+          {
+          case  8:  return new U8Vector(q);
+          case 16:  return new U16Vector(q);
+          case 32:  return new U32Vector(q);
+          case 64:  return new U64Vector(q);
+          }
+      }
+    return null;
   }
 
   /** Read a special named constant, assuming "#!" has already been read. */
@@ -340,11 +384,11 @@ public class ScmRead extends gnu.text.LispReader
 	      power = 1;
 	    }
 	    if (power != 1)
-              u = List.list3("expt", u, IntNum.make(power));
+              u = LList.list3("expt", u, IntNum.make(power));
 	    if (unit == null)
 	      unit = u;
 	    else
-	      unit = List.list3("*", unit, u);
+	      unit = LList.list3("*", unit, u);
 	    c = peek ();
 	  }
       }
@@ -352,7 +396,7 @@ public class ScmRead extends gnu.text.LispReader
     if (unit == null)
       return cnum;
     else
-      return List.list3("*", cnum, unit);
+      return LList.list3("*", cnum, unit);
   }
 
   Complex readComplex (int c, int radix, char exactness)
@@ -688,18 +732,18 @@ public class ScmRead extends gnu.text.LispReader
       throws java.io.IOException, SyntaxException
   {
     return new Pair (func_symbol,
-		     new Pair (readObject (), List.Empty));
+		     new Pair (readObject (), LList.Empty));
   }
 
 
-  protected Vector readVector ()
+  protected FVector readVector ()
     throws java.io.IOException, SyntaxException
   {
     char saveReadState = ((InPort) port).readState;
     ((InPort) port).readState = '(';
      try
        {
-	 java.util.Vector vec = new java.util.Vector();
+	 Vector vec = new Vector();
 	 for (;;)
 	   {
 	     int c = skipWhitespaceAndComments();
@@ -711,7 +755,7 @@ public class ScmRead extends gnu.text.LispReader
 	   }
 	 Object[] objs = new Object[vec.size()];
 	 vec.copyInto(objs);
-	 return new Vector(objs);
+	 return new FVector(objs);
        }
      finally
        {
@@ -742,7 +786,7 @@ public class ScmRead extends gnu.text.LispReader
 	      {
 		c = read();
 		if (c < 0) // EOF
-		  return List.Empty;
+		  return LList.Empty;
 	      } while (c != '\n' && c!= '\r');
             break;
 	  case ')':
@@ -798,7 +842,13 @@ public class ScmRead extends gnu.text.LispReader
 	      case 't':
 		return Interpreter.trueObject;
 	      case 'f':
+                next = peek();
+                if (Character.isDigit((char) next))
+                  return readUniformVector('f');
 		return Interpreter.falseObject;
+              case 's':
+              case 'u':
+                return readUniformVector((char) next);
 	      case 'x':
 	      case 'd':
 	      case 'o':

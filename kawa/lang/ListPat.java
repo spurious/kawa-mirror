@@ -1,4 +1,5 @@
 package kawa.lang;
+import gnu.kawa.util.*;
 
 /** Match a list whose length in in the range [min_length .. max_length]. */
 

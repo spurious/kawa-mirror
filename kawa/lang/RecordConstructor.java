@@ -2,6 +2,7 @@ package kawa.lang;
 import java.lang.reflect.Field;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class RecordConstructor extends ProcedureN
 {
@@ -52,7 +53,7 @@ public class RecordConstructor extends ProcedureN
       }
     else
       {
-	int nfields = List.length(fieldsList);
+	int nfields = LList.length(fieldsList);
 	this.fields = new Field[nfields];
 	for (int i = 0;  i < nfields;  i++)
 	  {

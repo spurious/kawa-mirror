@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the lambda builtin.
@@ -102,7 +103,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	rest_args = 1;
       }
-    else if (bindings != List.Empty)
+    else if (bindings != LList.Empty)
       {
 	tr.syntaxError ("misformed formals in lambda");
 	return;
@@ -182,7 +183,7 @@ public class Lambda extends Syntax implements Printable
                 typeSpec = p.car;
                 if (p.cdr instanceof Pair)
                   p = (Pair) p.cdr;
-                else if (p.cdr == List.Empty)
+                else if (p.cdr == LList.Empty)
                   p = null;
                 else
                   {
@@ -196,7 +197,7 @@ public class Lambda extends Syntax implements Printable
                 defaultValue = p.car;
                 if (p.cdr instanceof Pair)
                   p = (Pair) p.cdr;
-                else if (p.cdr == List.Empty)
+                else if (p.cdr == LList.Empty)
                   p = null;
                 else
                   {
@@ -214,7 +215,7 @@ public class Lambda extends Syntax implements Printable
                     return;
                   }
                 typeSpec = p.car;
-                if (p.cdr != List.Empty)
+                if (p.cdr != LList.Empty)
                   {
                     tr.syntaxError("junk at end of specifier for parameter `"
                                    + name + '\'');

@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * Implement autoloading of Syntax (including macros).

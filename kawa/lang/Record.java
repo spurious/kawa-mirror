@@ -3,6 +3,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class Record extends NameMap
 {
@@ -143,7 +144,7 @@ public class Record extends NameMap
     ps.print(toString());
   }
 
-  public static ClassType makeRecordType (String name, List fnames)
+  public static ClassType makeRecordType (String name, LList fnames)
   {
     ClassType superClass = ClassType.make("kawa.lang.Record");
     ClassType clas = new ClassType(name);
@@ -162,11 +163,11 @@ public class Record extends NameMap
     code.emitInvokeSpecial(superConstructor);
     code.emitReturn();
 
-    while (fnames != List.Empty)
+    while (fnames != LList.Empty)
       {
 	Pair pair = (Pair) fnames;
 	clas.addField(pair.car.toString(), Type.pointer_type, Access.PUBLIC);
-	fnames = (List) pair.cdr;
+	fnames = (LList) pair.cdr;
       }
     byte[][] arrays = new byte[1][];
     String[] names = new String[1];
@@ -192,9 +193,9 @@ public class Record extends NameMap
       }
   }
 
-  public static List typeFieldNames (Class clas)
+  public static LList typeFieldNames (Class clas)
   {
-    List list = List.Empty;
+    LList list = LList.Empty;
     Field[] fields = clas.getFields();
     for (int i = fields.length;  --i >= 0; )
       {
@@ -205,7 +206,7 @@ public class Record extends NameMap
     return list;
   }
 
-  public static List typeFieldNames (ClassType ctype)
+  public static LList typeFieldNames (ClassType ctype)
   {
     return typeFieldNames(ctype.getReflectClass());
   }

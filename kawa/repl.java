@@ -5,6 +5,7 @@ import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
+import gnu.kawa.util.*;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -39,7 +40,7 @@ public class repl extends Procedure0or1
     System.exit (-1);
   }
 
-  public static Vector commandLineArguments;
+  public static FVector commandLineArguments;
 
   public static String homeDirectory;
 
@@ -72,7 +73,7 @@ public class repl extends Procedure0or1
     Object[] array = new Object[args.length - arg_start];
     for (int i = arg_start;  i < args.length;  i++)
       array[i - arg_start] = new FString (args[i]);
-    commandLineArguments = new Vector (array);  // FIXME scsh has list
+    commandLineArguments = new FVector (array);  // FIXME scsh has list
     // FIXME scsh also has command-line proc
     Environment.define_global ("command-line-arguments",
 			       commandLineArguments);

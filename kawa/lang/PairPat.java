@@ -5,6 +5,7 @@ import gnu.bytecode.Access;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 public class PairPat extends Pattern implements Printable, Compilable
 {

@@ -6,6 +6,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Compilable
 {
@@ -41,7 +42,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
-    int rules_count = List.list_length (rules);
+    int rules_count = LList.list_length (rules);
     if (rules_count <= 0)
       {
 	rules_count = 0;
@@ -81,7 +82,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 		return;
 	      }
 	    syntax_rule_pair = (Pair) syntax_rule_pair.cdr;
-	    if (syntax_rule_pair.cdr != List.Empty)
+	    if (syntax_rule_pair.cdr != LList.Empty)
 	      {
 		tr.syntaxError ("junk after "+i+"'th syntax rule");
 		return;
@@ -152,7 +153,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 	    Pair cdr_pair = (Pair) pair.cdr;
 	    if (cdr_pair.car == SyntaxRule.dots3)
 	      {
-		if (cdr_pair.cdr != List.Empty)
+		if (cdr_pair.cdr != LList.Empty)
 		  tr.syntaxError ("junk follows ... in syntax-rule pattern");
 		Pattern car_pat
 		  = translate_pattern (pair.car, literal_identifiers,

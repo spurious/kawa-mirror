@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
+import gnu.kawa.util.*;
 
 /* This implements the R5RS "eval" procedure. */
 
@@ -11,7 +12,7 @@ public class Eval extends Procedure1or2
 
   public static Object eval (Object sexpr, Environment env)
   {
-    PairWithPosition body = new PairWithPosition(sexpr, List.Empty);
+    PairWithPosition body = new PairWithPosition(sexpr, LList.Empty);
     body.setFile("<eval>");
     return evalBody(body, env, new SourceMessages());
   }

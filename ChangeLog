@@ -1,3 +1,22 @@
+Thu Jul 18 15:04:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/{setcar_b,setcar_b).java:  Return voidObject.
+	* kawa/standard/{car,car).java:  Fix exception message.
+	* kawa/standard/list_ref.java:  Fix typo.
+	
+	* kawa/{char2integer,char_alphabetic_p,char_downcase,
+	char_lower_case_p,char_numeric_p,char_upcase,char_upper_case_p,
+	char_whitespace_p,integer2char}.java:  Add remaining char functions.
+	* kawa/standard/reverse.java:  Add last missing list function.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}:  Update.
+
+	* kawa/lang/InPort.java:  Fix mis-reading of ,@ (unquote-splicing).
+	(readUnquoteSplicing,readUnquote):  Inline single calls, and remove.
+
+	* kawa/lang/Symbol.java (print):  Slashify if printReadable.
+	* kawa/lang/Char.java:  Add makeLiteral, print;  implement Compilable.
+	* kawa/lang/CompileFile.jave:  Don't add redundant .zip extension.
+
 Wed Jul 17 20:34:37 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/Shell.java:  Don't exit if eval returns #<eof>.

@@ -79,7 +79,6 @@
 <TR><TD>eqv?<TD>yes/0.1<TD>
 <TR><TD>eq?<TD>yes/0.1<TD>
 <TR><TD>equal?<TD>yes/0.1<TD>vectors and lists aren't recursively checked yet...
-
 <TR><TD><STRONG>Section 6.3</STRONG>
     <TD COLSPAN=2><STRONG>Pairs and lists</STRONG>
 <TR><TD>pair?<TD>yes/0.1<TD>
@@ -88,39 +87,40 @@
 <TR><TD>cdr<TD>yes/0.1<TD>
 <TR><TD>set-car!<TD>yes/0.1<TD>
 <TR><TD>set-cdr!<TD>yes/0.1<TD>
-<TR><TD>caar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caaaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caaadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caaddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cadaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cadadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>caddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cadddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdaaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdaadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdaddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cddaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cddadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cdddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
-<TR><TD>cddddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caar<TD>yes/0.1<TD>
+<TR><TD>cadr<TD>yes/0.1<TD>
+<TR><TD>cdar<TD>yes/0.1<TD>
+<TR><TD>cddr<TD>yes/0.1<TD>
+<TR><TD>caaar<TD>yes/0.1<TD>
+<TR><TD>caadr<TD>yes/0.1<TD>
+<TR><TD>cadar<TD>yes/0.1<TD>
+<TR><TD>caddr<TD>yes/0.1<TD>
+<TR><TD>cdaar<TD>yes/0.1<TD>
+<TR><TD>cdadr<TD>yes/0.1<TD>
+<TR><TD>cddar<TD>yes/0.1<TD>
+<TR><TD>cdddr<TD>yes/0.1<TD>
+<TR><TD>caaaar<TD>yes/0.1<TD>
+<TR><TD>caaadr<TD>yes/0.1<TD>
+<TR><TD>caadar<TD>yes/0.1<TD>
+<TR><TD>caaddr<TD>yes/0.1<TD>
+<TR><TD>cadaar<TD>yes/0.1<TD>
+<TR><TD>cadadr<TD>yes/0.1<TD>
+<TR><TD>caddar<TD>yes/0.1<TD>
+<TR><TD>cadddr<TD>yes/0.1<TD>
+<TR><TD>cdaaar<TD>yes/0.1<TD>
+<TR><TD>cdaadr<TD>yes/0.1<TD>
+<TR><TD>cdadar<TD>yes/0.1<TD>
+<TR><TD>cdaddr<TD>yes/0.1<TD>
+<TR><TD>cddaar<TD>yes/0.1<TD>
+<TR><TD>cddadr<TD>yes/0.1<TD>
+<TR><TD>cdddar<TD>yes/0.1<TD>
+<TR><TD>cddddr<TD>yes/0.1<TD>
 <TR><TD>null?<TD>yes/0.1<TD>
 <TR><TD>list?<TD>yes/0.1<TD>
 <TR><TD>list<TD>yes/0.1<TD>
 <TR><TD>length<TD>yes/0.1<TD>
 <TR><TD>append<TD>yes/0.1<TD>
+<TR><TD>reverse<TD>yes/0.3<TD>
 <TR><TD>list-tail<TD>yes/0.1<TD>
 <TR><TD>list-ref<TD>yes/0.1<TD>
 <TR><TD>memq<TD>yes/0.1<TD>
@@ -205,13 +205,13 @@
 <TR><TD>char-ci<=?<TD>yes/0.3<TD>
 <TR><TD>char-ci>?<TD>yes/0.3<TD>
 <TR><TD>char-ci>=?<TD>yes/0.3<TD>
-<TR><TD>char-alphabetic?<TD>no<TD>
-<TR><TD>char-numeric?<TD>no<TD>
-<TR><TD>char-whitespace?<TD>no<TD>
-<TR><TD>char-upper-case?<TD>no<TD>
-<TR><TD>char-lower-case?<TD>no<TD>
-<TR><TD>char->integer<TD>no<TD>
-<TR><TD>integer->char<TD>no<TD>
+<TR><TD>char-alphabetic?<TD>yes/0.3<TD>
+<TR><TD>char-numeric?<TD>yes/0.3<TD>
+<TR><TD>char-whitespace?<TD>yes/0.3<TD>
+<TR><TD>char-upper-case?<TD>yes/0.3<TD>
+<TR><TD>char-lower-case?<TD>yes/0.3<TD>
+<TR><TD>char->integer<TD>yes/0.3<TD>
+<TR><TD>integer->char<TD>yes/0.3<TD>
 
 <TR><TD><STRONG>Section 6.7</STRONG>
     <TD COLSPAN=2><STRONG>Strings</STRONG>

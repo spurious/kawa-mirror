@@ -280,7 +280,7 @@ public class require extends Syntax
 		    fdecl.setSimple(false);
 		    adecl.setFlag(Declaration.IS_IMPORTED);
 		    adecl.setSimple(false);
-		    tr.pushBinding(fdname, adecl);  // Add to translation env.
+		    tr.push(adecl);  // Add to translation env.
 		    forms.addElement(sexp);
 		  }
 		catch (Exception ex)

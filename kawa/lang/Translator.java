@@ -438,6 +438,9 @@ public class Translator extends Compilation
                 decl = Declaration.getDeclaration(proc);
               }
           }
+	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
+	    && decl.isProcedureDecl())
+	  return syntaxError("not implemented: variable reference to a method");
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
 	if (separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
@@ -721,8 +724,6 @@ public class Translator extends Compilation
       mexp.declareThis(null);
 
     setModule(mexp);
-    int nforms = forms.size();
-    int ndecls = mexp.countDecls();
     mexp.body = makeBody(forms, mexp);
     popDecls();
     /* DEBUGGING:

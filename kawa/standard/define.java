@@ -51,7 +51,7 @@ public class define extends Syntax implements Printable
     if (sym != null)
       {
 	Declaration decl = defs.getDefine(sym, 'w', tr);
-	tr.pushBinding(sym, decl);
+	tr.push(decl);
 	if (makePrivate)
 	  {
 	    decl.setFlag(Declaration.PRIVATE_SPECIFIED);
@@ -59,6 +59,8 @@ public class define extends Syntax implements Printable
 	  }
 	if (makeConstant)
 	  decl.setFlag(Declaration.IS_CONSTANT);
+	if (function)
+	  decl.setProcedureDecl(true);
 	Object declForm = (! function) ? (Object) decl
 	  : (Object) tr.makePair(namePair, decl, namePair.cdr);
 	p = tr.makePair(p, declForm, p.cdr);

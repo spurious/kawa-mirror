@@ -76,6 +76,7 @@ public class object extends Syntax
 	    Object sname = pair.car;
 	    Declaration decl = oexp.addDeclaration(sname);
 	    decl.setSimple(false);
+	    decl.setFlag(Declaration.FIELD_OR_METHOD);
 	    int nKeywords = 0;
 	    Object args = pair.cdr;
 	    Object init = null;
@@ -167,6 +168,8 @@ public class object extends Syntax
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.setClassMethod(true);
 	    decl.noteValue(lexp);
+	    decl.setFlag(Declaration.FIELD_OR_METHOD);
+	    decl.setProcedureDecl(true);
 	    lexp.setName (mname);
 	    if (last_method == null)
 	      method_list = lexp;

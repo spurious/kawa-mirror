@@ -1,5 +1,18 @@
 2003-04-12  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (finishModule):  Remove unused variables.
+	
+	* kawa/standard/define.java (scanForDefinitions):  Set PROCEDURE
+	flag of Declaration.
+	* kawa/standard/object.java (rewriteClassDef):  Set FIELD_OR_METHOD
+	or PROCEDURE flags of Declaration as appropriate.
+	* kawa/lang/Translator.java (rewrite):  Complain if variable
+	reference to a class method.
+
+	* kawa/standard/define.java (scanForDefinitions):  Use Translator's
+	push method instead of pushBinding.
+	* kawa/standard/require.java (scanForDefinitions):  Likewise.
+
 	* kawa/repl.java (apply0, apply1, checkInitFile):  Don't use
 	static fields from kawa.standard.Scheme.
 

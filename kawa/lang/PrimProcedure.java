@@ -78,6 +78,19 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     this.method = method;
     this.argTypes = method.getParameterTypes();
     this.retType = method.getReturnType();
+    int flags = method.getModifiers();
+    if ((flags & Access.STATIC) != 0)
+      this.op_code = 184;  // invokestatic
+    else
+      {
+	ClassType mclass = method.getDeclaringClass();
+	if ((mclass.getModifiers() & Access.INTERFACE) != 0)
+	  this.op_code = 185;  // invokeinterface
+	else if ("<init>".equals(method.getName()))
+	  this.op_code = 183;  // invokespecial
+	else
+	  this.op_code = 182;  // invokevirtual
+      }
   }
 
   public PrimProcedure(int opcode, Type retType, Type[] argTypes)
@@ -136,24 +149,24 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	types.put ("java.lang.String", Type.string_type);
 
 	types.put ("object", Type.pointer_type);
-	types.put ("number", new ClassType("gnu.math.Numeric"));
-	types.put ("quantity", new ClassType("gnu.math.Quantity"));
-	types.put ("complex", new ClassType("gnu.math.Complex"));
-	types.put ("real", new ClassType("gnu.math.RealNum"));
-	types.put ("rational", new ClassType("gnu.math.RatNum"));
-	types.put ("integer", new ClassType("gnu.math.IntNum"));
-	types.put ("symbol", new ClassType("java.lang.String"));
-	types.put ("keyword", new ClassType("gnu.expr.Keyword"));
-	types.put ("list", new ClassType("kawa.lang.List"));
-	types.put ("pair", new ClassType("kawa.lang.Pair"));
-	types.put ("string", new ClassType("kawa.lang.FString"));
-	types.put ("vector", new ClassType("kawa.lang.Vector"));
-	types.put ("function", new ClassType("gnu.mapping.Procedure"));
-	types.put ("input-port", new ClassType("gnu.mapping.InPort"));
-	types.put ("output-port", new ClassType("gnu.mapping.OutPort"));
-	types.put ("record", new ClassType("kawa.lang.Record"));
-	types.put ("type", new ClassType("gnu.bytecode.Type"));
-	types.put ("class-type", new ClassType("gnu.bytecode.ClassType"));
+	types.put ("number", ClassType.make("gnu.math.Numeric"));
+	types.put ("quantity", ClassType.make("gnu.math.Quantity"));
+	types.put ("complex", ClassType.make("gnu.math.Complex"));
+	types.put ("real", ClassType.make("gnu.math.RealNum"));
+	types.put ("rational", ClassType.make("gnu.math.RatNum"));
+	types.put ("integer", ClassType.make("gnu.math.IntNum"));
+	types.put ("symbol", ClassType.make("java.lang.String"));
+	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
+	types.put ("list", ClassType.make("kawa.lang.List"));
+	types.put ("pair", ClassType.make("kawa.lang.Pair"));
+	types.put ("string", ClassType.make("kawa.lang.FString"));
+	types.put ("vector", ClassType.make("kawa.lang.Vector"));
+	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
+	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
+	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
+	types.put ("record", ClassType.make("kawa.lang.Record"));
+	types.put ("type", ClassType.make("gnu.bytecode.Type"));
+	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
       }
     return (Type) types.get(name);
   }

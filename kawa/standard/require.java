@@ -37,7 +37,11 @@ public class require extends Syntax
   {
     try
       {
-	return find(Class.forName(typeName), Environment.getCurrent()); 
+	Object value =
+	  find(Class.forName(typeName), Environment.getCurrent()); 
+	if (value instanceof Runnable)
+	  ((Runnable) value).run();
+	return value;
       }
     catch (java.lang.ClassNotFoundException ex)
       {
@@ -69,8 +73,6 @@ public class require extends Syntax
             throw new WrappedException(ex);
           }
       }
-    if (value instanceof Runnable)
-      ((Runnable) value).run();
     return value;
   }
 
@@ -126,6 +128,7 @@ public class require extends Syntax
     String tname = type.getName();
     Object instance = null;
     ClassType t = (ClassType) type;
+    boolean isRunnable = t.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
     for (;;)
       {
@@ -195,18 +198,23 @@ public class require extends Syntax
         if (t == null)
           break;
       }
+
+    ClassType thisType = ClassType.make("kawa.standard.require");
+    Expression[] args = { new QuoteExp(tname) };
+    ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
+    Expression action;
     if (instance != null && ! immediate)
       {
-	ClassType thisType = ClassType.make("kawa.standard.require");
-	Expression[] args = { new QuoteExp(tname) };
-	ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
 	decl.noteValue(dofind);
 	SetExp sexp = new SetExp(decl, dofind);
 	sexp.setDefining(true);
-	forms.addElement(sexp);
+	action = sexp;
       }
+    else if (isRunnable)
+      action = dofind;
     else
-      forms.addElement(QuoteExp.voidExp);
+      action = QuoteExp.voidExp;
+    forms.addElement(action);
     tr.mustCompileHere();
     return true;
   }

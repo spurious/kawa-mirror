@@ -10,6 +10,8 @@ import gnu.text.SourceMessages;
 import gnu.kawa.util.*;
 import gnu.kawa.lispexpr.*;
 import gnu.kawa.reflect.ClassMemberConstraint;
+import gnu.lists.FormatToConsumer;
+import gnu.kawa.functions.DisplayFormat;
 
 public class Scheme extends Interpreter
 {
@@ -369,8 +371,8 @@ public class Scheme extends Interpreter
       define_proc (new readchar (true));   // peek-char
       define_proc ("eof-object?", "kawa.lib.ports");
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
-      define_proc ("write", "kawa.lib.ports");
-      define_field ("display", "kawa.lib.ports", "display");
+      define_field("write", "kawa.standard.Scheme", "writeFormat");
+      define_field("display", "kawa.standard.Scheme", "displayFormat");
       define_proc ("write-char", "kawa.lib.ports");
       define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");
@@ -760,25 +762,12 @@ public class Scheme extends Interpreter
     return new ScmRead(inp, messages);
   }
 
-  public void print (Object value, OutPort out)
+  public static final DisplayFormat writeFormat = new DisplayFormat(true, 'S');
+  public static final DisplayFormat displayFormat = new DisplayFormat(false, 'S');
+
+  public FormatToConsumer getFormat(boolean readable)
   {
-    if (value == Scheme.voidObject)
-      return;
-    if (value instanceof Values)
-      {
-	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  {
-	    SFormat.print (values[i], out);
-	    out.println();
-	  }
-      }
-    else
-      {
-	SFormat.print (value, out);
-	out.println();
-      }
-    out.flush();
+    return readable ? writeFormat : displayFormat;
   }
 
   /** If exp is a "constant" Type, return that type, otherwise return null. */

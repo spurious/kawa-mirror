@@ -1,3 +1,10 @@
+Tue Mar 16 20:49:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* PrimType.java (emitCoerceFromObject):  Handle coercing to void.
+
+	* ClassType.java (getModifiers):  If access_flags is 0,
+	check reflectClass.getModifiers().  (Bit of a hack.)
+
 Thu Feb 11 16:14:30 1999  Zvi Har'El  <rl@math.technion.ac.il>
 
 	* InnerClassesAttr.java (print): Fix for anonymous classes.

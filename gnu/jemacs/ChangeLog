@@ -1,3 +1,8 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* testsuite:  New directory.
+	* Makefile.am (SUBDIRS):  Added testsuite.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* lisp:  New directory (and package).

@@ -74,7 +74,7 @@ extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = lang buffer lisp
+SUBDIRS = lang buffer lisp testsuite
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in

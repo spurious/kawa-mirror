@@ -11,6 +11,12 @@ import gnu.text.Char;
 
 public class DisplayFormat extends Procedure1or2 implements FormatToConsumer
 {
+  /** Create a new instance.
+   * @param readable if output should be formatted so it could be read
+   *   back in again, for example strings shoudl be quoted.
+   * @param language the programming language style to use, where
+   *   'S' is Scheme, 'C' is Common Lisp, and 'E' is Emacs Lisp.
+   */
   public DisplayFormat(boolean readable, char language)
   {
     this.readable = readable;
@@ -76,6 +82,8 @@ public class DisplayFormat extends Procedure1or2 implements FormatToConsumer
       writeChar(((Char)obj).charValue(), out);
     else if (obj instanceof Character)
       writeChar(((Character)obj).charValue(), out);
+    else if (obj instanceof Binding)
+      writeObject(obj.toString(), out);
     else if (obj instanceof CharSequence)
       {
 	CharSequence str = (CharSequence) obj;

@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
+import gnu.kawa.lispexpr.LangPrimType;
 
 public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 {
@@ -255,7 +256,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       {
 	args[0].compile(comp, Target.pushValue(type));
 	code.emitArrayLength();
-	target.compileFromStack(comp, kawa.standard.Scheme.intType);  // FIXME
+	target.compileFromStack(comp, LangPrimType.intType);  // FIXME
 	return;
       }
     ApplyExp.compile(exp, comp, target);
@@ -282,7 +283,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
           }
 	else if (type instanceof ArrayType && "length".equals(name)
 		 && ! isStatic)
-	  return kawa.standard.Scheme.intType;  // FIXME
+	  return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
       }
     return Type.pointer_type;
   }

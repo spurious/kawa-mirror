@@ -2,6 +2,7 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.lispexpr.LangPrimType;
 
 public class ArrayLength extends Procedure1 implements Inlineable
 {
@@ -22,11 +23,11 @@ public class ArrayLength extends Procedure1 implements Inlineable
     exp.getArgs()[0].compile(comp, new ArrayType(element_type));
     CodeAttr code = comp.getCode();
     code.emitArrayLength();
-    target.compileFromStack(comp, kawa.standard.Scheme.intType);
+    target.compileFromStack(comp, gnu.kawa.lispexpr.LangPrimType.intType);
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
-    return kawa.standard.Scheme.intType;
+    return gnu.kawa.lispexpr.LangPrimType.intType;
   }
 }

@@ -1,3 +1,8 @@
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* ArrayLength.java:  Update to use LangPrimType.
+	* SlotGet.java:  Likewise.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java, SlotGet.java:  Update for new gnu.lists.Fstring.

@@ -161,7 +161,7 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     else
       code.emitInvokeMethod(method, opcode());
 
-    if (retType == Type.void_type)
+    if (retType.isVoid())
       comp.compileConstant(Values.empty, target);
     else
       target.compileFromStack(comp, retType);

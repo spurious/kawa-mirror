@@ -28,7 +28,7 @@ public class LispReader extends Lexer
       {
 	return Environment.getCurrent().getChecked(name);
       }
-    catch (UnboundSymbol ex)
+    catch (UnboundLocationException ex)
       {
 	return name;
       }
@@ -74,7 +74,7 @@ public class LispReader extends Lexer
     try
       {
 	String read_case_string
-	  = Environment.lookup_global("symbol-read-case").toString();
+	  = Environment.getCurrent().get("symbol-read-case", "P").toString();
 	read_case = read_case_string.charAt(0);
 	if (read_case == 'P') ;
 	else if (read_case == 'u')

@@ -5,6 +5,8 @@ package gnu.kawa.lispexpr;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;
+import gnu.mapping.EnvironmentKey;
+import gnu.kawa.reflect.StaticFieldLocation;
 import kawa.lang.Translator; // FIXME
 import gnu.mapping.Values;
 
@@ -49,6 +51,25 @@ public abstract class LispInterpreter extends Interpreter
       lexer.fatal("An unexpected close paren was read.");
     tr.finishModule(mexp, first);
     return tr;
+  }
+
+  /** Declare in the current Environment a Syntax bound to a static field.
+   * @param name the procedure's source-level name.
+   * @param cname the name of the class containing the field.
+   * @param fname the name of the field, which should be a static
+   *   final field whose type extends kawa.lang.Syntax.
+   */
+  protected void defSntxStFld(String name, String cname, String fname)
+  {
+    Object property
+      = hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION : null;
+    StaticFieldLocation.define(environ, environ.getSymbol(name), property,
+			       cname, fname);
+  }
+
+  protected void defSntxStFld(String name, String cname)
+  {
+    defSntxStFld(name, cname, Compilation.mangleNameIfNeeded(name));
   }
 
   /** Combine a <body> consisting of a list of expression. */

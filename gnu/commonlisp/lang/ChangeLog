@@ -1,6 +1,6 @@
 2001-05-01  Per Bothner  <per@bothner.com>
 
-	Steps to making jemacs depens on commonlisp rather than vice versa.
+	Steps to making jemacs depends on commonlisp rather than vice versa.
 	* UnwindProtect.java:  Moved from ../../../gnu/jemacs/lang.
 	* defun.java:  Moved from ../../../gnu/jemacs/lang.
 	* defvar.java:  Moved from ../../../gnu/jemacs/lang.

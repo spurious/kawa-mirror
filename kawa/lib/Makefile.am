@@ -6,6 +6,7 @@ java_SCM=\
   $(java_SCM_ALWAYS) \
   $(scm_@AWT_SELECTED@)
 
+# NOTE if you update this list, also update build.xml.
 java_SCM_ALWAYS =\
   std_syntax.scm \
   reflection.scm \

@@ -57,14 +57,14 @@ public class ObjectType extends Type
       {
 	if (reflectClass == null)
 	  {
-	    /* BEGIN JAVA2 */
+	    /* #ifdef JAVA2 */
 	    /* Specifies optional 'initialize' argument. */
 	    reflectClass = Class.forName(getInternalName().replace('/', '.'),
 					 false, getClass().getClassLoader());
-	    /* END JAVA2 */
-	    /* BEGIN JAVA1 */
+	    /* #endif */
+	    /* #ifndef JAVA2 */
 	    // reflectClass = Class.forName(getInternalName().replace('/', '.'));
-	    /* END JAVA1 */
+	    /* #endif */
 	  }
         flags |= EXISTING_CLASS;
       }

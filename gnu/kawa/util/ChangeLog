@@ -1,3 +1,7 @@
+2001-03-29  Per Bothner  <per@bothner.com>
+
+	* Position.java:  Removed - subsumed by gnu.lists.SeqPosition.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* AbstractString.java:  Replaced by gnu.lists.CharSequence.

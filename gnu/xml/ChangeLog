@@ -1,3 +1,11 @@
+2003-10-29  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java:  Re-implement namespaces to preserve
+	namespace info using a chain of NamespaceBindings.
+	* ParsedXMLToConsumer.java (emitEndElement):  Don't allocate a
+	String for the end tag.
+	* XMLPrinter.java:  Print out namespace declarations.
+
 2003-10-28  Per Bothner  <per@bothner.com>
 
 	* NamespaceBinding.java:  New class.

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -16,7 +16,17 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   boolean htmlCompat = true;
   public boolean escapeText = true;
   boolean isHtml = false;
+  boolean undeclareNamespaces = false;
   Object style;
+
+  /** Chain of currently active namespace nodes. */
+  NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
+
+  /** Stack of namespaceBindings as of active beginGroup calls. */
+  NamespaceBinding[] namespaceSaveStack = new NamespaceBinding[20];
+
+  /** Difference between number of beginGroup and endGroup calls so far. */
+  int groupNesting;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
@@ -159,6 +169,67 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     closeTag();
     super.write('<');
     super.write(typeName);
+    NamespaceBinding groupBindings = null;
+    namespaceSaveStack[groupNesting++] = namespaceBindings;
+    if (type instanceof XName)
+      {
+	groupBindings = ((XName) type).namespaceNodes;
+	NamespaceBinding join
+	  = NamespaceBinding.commonAncestor(groupBindings, namespaceBindings);
+	for (NamespaceBinding ns = groupBindings;  ns != join;  ns = ns.next)
+	  {
+	    String prefix = ns.prefix;
+	    String uri = ns.uri;
+	    if (uri == namespaceBindings.resolve(prefix))
+	      // A matching namespace declaration is already in scope.
+	      continue;
+	    super.write(' '); // prettyprint break
+	    if (prefix == null)
+	      super.write("xmlns");
+	    else
+	      {
+		super.write("xmlns:");
+		super.write(prefix);
+	      }
+	    super.write("=\"");
+	    inAttribute = true;
+	    if (uri != null)
+	      writeChars(uri);
+	    inAttribute = false;
+	    super.write('\"');
+	  }
+	if (undeclareNamespaces)
+	  {
+	    // As needed emit namespace undeclarations as in
+	    // the XML Namespaces 1.1 Candidate Recommendation.
+	    // Most commonly this loop will run zero times.
+	    for (NamespaceBinding ns = namespaceBindings;
+		 ns != join;  ns = ns.next)
+	      {
+		String prefix = ns.prefix;
+		if (ns.uri != null && groupBindings.resolve(prefix) == null)
+		  {
+		    super.write(' '); // prettyprint break
+		    if (prefix == null)
+		      super.write("xmlns");
+		    else
+		      {
+			super.write("xmlns:");
+			super.write(prefix);
+		      }
+		    super.write("=\"\"");
+		  }
+	      }
+	  }
+	namespaceBindings = groupBindings;
+      }
+    if (groupNesting >= namespaceSaveStack.length)
+      {
+	NamespaceBinding[] tmp = new NamespaceBinding[2 * groupNesting];
+	System.arraycopy(namespaceSaveStack, 0, tmp, 0, groupNesting);
+	namespaceSaveStack = tmp;
+      }
+
     inStartTag = true;
     if (isHtml
 	&& ("script".equals(typeName) || "style".equals(typeName)))
@@ -195,7 +266,11 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     prev = '>';
     if (isHtml && ! escapeText
 	&& ("script".equals(typeName) || "style".equals(typeName)))
+
       escapeText = true;
+
+    namespaceBindings = namespaceSaveStack[--groupNesting];
+    namespaceSaveStack[groupNesting] = null;
   }
 
   /** Write a attribute for the current group.

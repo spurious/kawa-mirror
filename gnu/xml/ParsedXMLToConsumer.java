@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+ // Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -43,17 +43,9 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   // In contrast, base may be either ==cons or ==tlist.
   Consumer cons;
 
-  // Stack of prefix->uri pairs that are currently active.
-  String[] namespaceStack;
-
-  // Length of active part of namespaceStack.
-  // This is twice the number of namespace declarations seen (including
-  // the predefined one for "xml"), since we push both the prefix and the uri.
-  int namespaceStackLength;
-
   // For each beginGroup seen (and not yet seen the endGroup),
-  // the value of namespaceStackLength at the beginGroup.
-  int[] namespaceLengthStack = new int[10];
+  // the value of namespaceBindings at the beginGroup.
+  NamespaceBinding[] namespaceBindingsAtBeginGroup = new NamespaceBinding[20];
 
   /** Number of beginGroups seen without close endGroup. */
   int nesting;
@@ -61,10 +53,18 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   /** Used if we need to save attribute values of namespace attributes. */
   StringBuffer stringValue;
 
-  /** True if namespace declarations should be passed through.
+  /** True if namespace declarations should be passed through as attributes.
    * Like SAX2's http://xml.org/features/namespace-prefixes. */
   public boolean namespacePrefixes = false;
 
+  /** Map either lexical-QName or expanded-QName to a MappingInfo.
+   * This is conceptually two hash tables merged into a single data structure.
+   * (1) when we first see a tag (a QName as a lexical form before namespace
+   * resolution), we map the tag String to an preliminary info entry that
+   * has a null qname field.  These are entered into the pendingNames table.
+   * (2) After see the namespace declaration, we use the same table and keys,
+   * but name the uri and qtype.namespaceNodes also have to match.
+   */
   MappingInfo[] mappingTable = new MappingInfo[128];
   int mappingTableMask = mappingTable.length - 1;
 
@@ -84,8 +84,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       {
 	String uri = stringValue.toString();
 	uri = uri.length() == 0 ? null : uri.intern();
-	namespaceStack[namespaceStackLength + 1] = uri;
-	namespaceStackLength += 2;
+	namespaceBindings.uri = uri;
 	stringValue = null;
       }
   }
@@ -94,23 +93,25 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   {
     if (isAttribute && prefix == null)
       return "";
-    for (int i = namespaceStackLength;  (i -= 2) >= 0;  )
-      {
-	String nsPrefix = namespaceStack[i];
-	if (nsPrefix == prefix
-	    || (prefix == null && nsPrefix == null))
-	  return namespaceStack[i+1];
-      }
+    String uri = namespaceBindings.resolve(prefix);
+    if (uri != null)
+      return uri;
     if (prefix != null)
-      parser.error('e', "unknwon namespace prefix '" + prefix + '\'');
+      parser.error('e', "unknown namespace prefix '" + prefix + '\'');
     return "";
   }
+
+  NamespaceBinding namespaceBindings;
 
   void closeStartTag ()
   {
     if (! inStartTag || inAttribute)
       return;
     inStartTag = false;
+
+    NamespaceBinding prevBindings = namespaceBindingsAtBeginGroup[nesting-1];
+    // Reverse current set of bindings to match input order.
+    namespaceBindings = namespaceBindings.reversePrefix(prevBindings);
 
     for (int i = 0;  i <= attrCount; i++)
       {
@@ -123,12 +124,18 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 	int hash = info.tagHash;
 	int bucket = hash & mappingTableMask;
 	info = mappingTable[bucket];
+	MappingInfo tagMatch = null;
+	XName type;
 	for (;;)
 	  {
 	    if (info == null)
 	      {
-		if (pendingNames[i].qname == null)
-		    info = pendingNames[i];
+		info = tagMatch;
+		if (tagMatch != null)
+		  {
+		    // A mappingTable entry created by lookupTag.
+		    // Might as well make it do double duty here as well.
+		  }
 		else
 		  {
 		    info = new MappingInfo();
@@ -141,15 +148,23 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		  }
 		info.uri = uri;
 		info.qname = Symbol.make(uri, local);
+		type = new XName();
+		type.qname = info.qname;
+		type.namespaceNodes = namespaceBindings;
+		info.type = type;
 		break;
 	      }
-	    if (info.tag == name
-		&& info.uri == uri
-		&& info.qname != null)
-	      break;
+	    if (info.tag == name)
+	      {
+		type = info.type;
+		if (info.qname == null)
+		  tagMatch = info;
+		else if (info.uri == uri
+			 && type.namespaceNodes == namespaceBindings)
+		  break;
+	      }
 	    info = info.nextInBucket;
 	  }
-	Object type = info.qname;
 	if (cons == tlist)
 	  {
 	    int index = info.index;
@@ -279,10 +294,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     else
       tlist = new TreeList(); // just for temporary storage
 
-    namespaceStack = new String[10];
-    namespaceStack[0] = "xml";
-    namespaceStack[1] = "http://www.w3.org/XML/1998/namespace";
-    namespaceStackLength = 2;
+    namespaceBindings = NamespaceBinding.predefinedXML;
   }
 
   public void emitCharacters(char[] data, int start, int length)
@@ -302,14 +314,13 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     MappingInfo info = lookupTag(data, start, count);
     String name = info.tag;
     closeStartTag();
-    if (nesting >= namespaceLengthStack.length)
+    if (nesting >= namespaceBindingsAtBeginGroup.length)
       {
-	int[] tmp = new int[2 * nesting];
-	System.arraycopy(namespaceLengthStack, 0, tmp, 0, nesting);
-	namespaceLengthStack = tmp;
+	NamespaceBinding[] tmp = new NamespaceBinding[2 * nesting];
+	System.arraycopy(namespaceBindingsAtBeginGroup, 0, tmp, 0, nesting);
+	namespaceBindingsAtBeginGroup = tmp;
       }
-    namespaceLengthStack[nesting] = namespaceStackLength;
-    nesting++;
+    namespaceBindingsAtBeginGroup[nesting++] = namespaceBindings;
     inStartTag = true;
 
     startIndexes[0] = tlist.gapStart;
@@ -343,12 +354,6 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 	System.arraycopy(startIndexes, 0, itmp, 0, attrCount);
 	startIndexes = itmp;
       }
-    if (namespaceStackLength >= namespaceStack.length)
-      {
-	String[] tmp = new String[2 * namespaceStack.length];
-	System.arraycopy(namespaceStack, 0, tmp, 0, namespaceStackLength);
-	namespaceStack = tmp;
-      }
     pendingNames[attrCount] = info;
     startIndexes[attrCount] = tlist.gapStart;
     String prefix = info.prefix;
@@ -357,7 +362,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       {
 	if (prefix == "xmlns")
 	  {
-	    namespaceStack[namespaceStackLength] = local;
+	    namespaceBindings
+	      = new NamespaceBinding(local, null, namespaceBindings);
 	    stringValue = new StringBuffer(100);
 	  }
       }
@@ -365,7 +371,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       {
 	if (name == "xmlns")
 	  {
-	    namespaceStack[namespaceStackLength] = null;
+	    namespaceBindings
+	      = new NamespaceBinding(null, null, namespaceBindings);
 	    stringValue = new StringBuffer(100);
 	  }
       }
@@ -393,16 +400,19 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 	return;
       }
     String old = names[depth-1];
-    String name = (data == null ? old
-		   : new String(data, start, length));
-    if (data != null && ! name.equals(old))
+    if (data != null && ! MappingInfo.match(old, data, start, length))
       {
 	if (! mismatchReported && parser != null)
 	  {
 	    mismatchReported = true;
 	    int nlen = length + 3;
 	    parser.pos -= nlen;
-	    parser.error('e', "</" + name+"> matching <"+old+">");
+	    StringBuffer sbuf = new StringBuffer("</");
+	    sbuf.append(data, start, length);
+	    sbuf.append("> matching <");
+	    sbuf.append(old);
+	    sbuf.append('>');
+	    parser.error('e', sbuf.toString());
 	    parser.pos += nlen;
 	  }
       }
@@ -412,13 +422,11 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 	names[depth-1] = null;  // For the sake of Gc.
 	depth--;
       }
-    String typeName = name;
     closeStartTag();
     if (nesting <= 0)
       return; // Only if error.
-    nesting--;
-    namespaceStackLength = namespaceLengthStack[nesting];
-    base.endGroup(typeName);
+    namespaceBindings = namespaceBindingsAtBeginGroup[--nesting];
+    base.endGroup(old);
   }
 
   /** Handles the predefined entities, such as "&lt;" and "&quot;". */
@@ -478,6 +486,10 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     // FIXME?
   }
 
+  /** Calculate a hashCode for a string of characters in a char array.
+   * Equivalent to <code>new String(data, start, length).hashCode()</code>
+   * but more efficient as we don't have to allocate the String.
+   */
   static int hash (char[] data, int start, int length)
   {
     int hash = 0;
@@ -486,6 +498,14 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     return hash;
   }
 
+  /** Look up an attribute/element tag (a QName as a lexical string
+   * before namespace resolution), and return a MappingInfo with the
+   * tag, tagHash, prefix, and local fields set.
+   * The trick is to avoid allocating a new String for each element or
+   * attribute node we see, but only allocate a new String when we see a
+   * tag we haven't seen.  So we calculate the hash code using the
+   * characters in the array, rather than using String's hashCode.
+   */
   MappingInfo lookupTag (char[] data, int start, int length)
   {
     int hash = hash(data, start, length);
@@ -496,8 +516,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
       {
 	if (info == null)
 	  {
+	    // No match found - create a new MappingInfo and Strings.
 	    info = new MappingInfo();
-	    // Should we intern() ?
 	    String tag = new String(data, start, length).intern();
 	    info.tag = tag;
 	    info.tagHash = hash;
@@ -554,31 +574,40 @@ final class MappingInfo
   // maybe future: MappingInfo prevInBucket;
   // maybe future: MappingInfo nextForPrefix;
 
-  /** The source (unresolved) QName as it appears in the XML file. */
+  /** The source (unresolved) QName as it appears in the XML file.
+   * This String is interned. */
   String tag;
 
   /** The hashCode of tag. */
   int tagHash;
 
   /** The prefix part of tag: - the part before the colon.
-   * It is null if there is no colon in tag. */
+   * It is null if there is no colon in tag.  Otherwise it is interned.  */
   String prefix;
 
   /** The local name part of tag: - the part after the colon. 
-   * It is the same as tag if there is no colon in tag. */
+   * It is the same as tag if there is no colon in tag.
+   * Either way it is interned.  */
   String local;
 
   /** The namespace URI. */
   String uri;
 
   /** The Symbol/type for the resolved QName. */
-  Object qname;
+  Symbol qname;
+
+  XName type;
 
   /** If non-negative: An index into a TreeList objects array. */
   int index = -1;
 
-  /** An optization of 'new String(data, start, next).equals(tag)'. */
+  /** An optimization of 'new String(data, start, next).equals(tag)'. */
   boolean match (char[] data, int start, int length)
+  {
+    return match(tag, data, start, length);
+  }
+
+  static boolean match (String tag, char[] data, int start, int length)
   {
     if (tag.length () != length)
       return false;

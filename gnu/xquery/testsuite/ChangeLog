@@ -1,3 +1,7 @@
+2004-01-12  Per Bothner  <per@bothner.com>
+
+	* exp-format-users.html:  Update to include XML declaration.
+
 2003-12-26  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Added a new test.

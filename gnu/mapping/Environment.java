@@ -16,7 +16,7 @@ public class Environment extends NameMap
   private int mask;
   int num_bindings;
 
-  private static Environment global;
+  static Environment global;
 
   Environment previous;
 

@@ -97,7 +97,7 @@ public abstract class MethodProc extends ProcedureN
 
   public Object match (Object[] args)
   {
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     return match(ctx, args) == 0 ? ctx : null;
     // FUTURE:
     // vars.setArgs(args);
@@ -123,7 +123,7 @@ public abstract class MethodProc extends ProcedureN
   public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
-    CallContext vars = new CallContext();
+    CallContext vars = CallContext.getInstance();
     int err = match(vars, args);
     if (err != 0)
       throw matchFailAsException(err, this, args);
@@ -145,6 +145,9 @@ public abstract class MethodProc extends ProcedureN
     int min2 = proc2.minArgs();
     int max1 = proc1.maxArgs();
     int max2 = proc2.maxArgs();
+    if ((max1 >= 0 && max1 < min2)
+	|| (max2 >= 0 && max2 < min1))
+      return null;
     int num1 = proc1.numParameters();
     int num2 = proc2.numParameters();
     int limit = num1 > num2 ? num1 : num2;

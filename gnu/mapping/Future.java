@@ -6,8 +6,6 @@ public class Future extends Thread
   Future parent;
   CallContext context;
 
-  public FluidBinding fluidBindings;
-
   Environment environment;
   InPort in;
   OutPort out;
@@ -58,10 +56,15 @@ public class Future extends Thread
 
   /** Set the CallContext we use for this Thread. */
   public final void setCallContext(CallContext context)
-  { this.context = context; }
+  {
+    this.context = context;
+    if (context != null)
+      context.currentThread = this;
+  }
 
   public void run ()
   {
+    setCallContext(new CallContext());
     try
       {
 	result = action.apply0 ();
@@ -91,34 +94,20 @@ public class Future extends Thread
     return result;
   }
 
-  public void setFluids (FluidBinding new_fluids)
+  /**
+   * @deprecated
+   */
+  public final void setFluids (FluidBinding new_fluids)
   {
-    FluidBinding old_fluids = fluidBindings;
-    FluidBinding fluid = new_fluids;
-    for ( ; fluid != old_fluids;  fluid = fluid.previous)
-      {
-	Binding binding = fluid.binding;
-	Constraint constraint = binding.constraint;
-	if (constraint instanceof FluidConstraint)
-	  ((FluidConstraint) constraint).referenceCount++;
-	else
-	  binding.constraint = new FluidConstraint(constraint);
-      }
-    fluidBindings = new_fluids;
+    context.setFluids(new_fluids);
   }
 
-  public void resetFluids (FluidBinding old_fluids)
+  /**
+   * @deprecated
+   */
+  public final void resetFluids (FluidBinding old_fluids)
   {
-    FluidBinding new_fluids = fluidBindings;
-    FluidBinding fluid = new_fluids;
-    for ( ; fluid != old_fluids;  fluid = fluid.previous)
-      {
-	Binding binding = fluid.binding;
-	FluidConstraint constraint = (FluidConstraint) binding.constraint;
-	if (constraint.referenceCount-- <= 0)
-	  binding.constraint = constraint.savedConstraint;
-      }
-    fluidBindings = old_fluids;
+    context.resetFluids(old_fluids);
   }
 
   public String toString() {
@@ -129,46 +118,12 @@ public class Future extends Thread
     return buf.toString();
   }
 
-
-  static Future defaultContext = null;
-
-  static synchronized void getDefaultContext ()
-  {
-    if (defaultContext == null)
-      defaultContext = new Future(null);
-  }
-
   /** Get chain of FluidBindings for the current thread (if a Future).
    * Should fix to work with other threads. */
 
   public static FluidBinding getFluids()
   {
-    Thread thread = Thread.currentThread();
-    /*
-    for (;;)
-      {
-	if (thread instanceof Future)
-	  return ((Future)thread).fluidBindings;
-	FluidBinding fl = ....get(thread);
-	if (fl != null)
-	  return fl;
-	thread = thread.getParent();
-      }
-    */
-    if (thread instanceof Future)
-      return ((Future)thread).fluidBindings;
-    if (defaultContext == null)
-      getDefaultContext();
-    return defaultContext.fluidBindings;
-  }
-
-  public static Future getContext ()
-  {
-    Thread thread = Thread.currentThread();
-    if (thread instanceof Future)
-      return (Future)thread;
-    if (defaultContext == null)
-      getDefaultContext();
-    return defaultContext;
+    return CallContext.getInstance(Thread.currentThread()).fluidBindings;
   }
 }
+

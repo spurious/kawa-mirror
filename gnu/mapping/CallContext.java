@@ -8,17 +8,70 @@ import java.util.Hashtable;
 public class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
+  // static ThreadLocal currentContext = new ThreadLocal();
   static Hashtable threadMap = new Hashtable(50);
+  Thread currentThread;
+
+  /** A marker used to indicate a temporary CallContext.
+   * This is so we can create and bind a a CallContext on a fluid-let,
+   * and then unbind it from teh current then when the fluid-let finishes.
+   * Otherwise, the threadMap might prevent GC of the thread.
+   * We could use ThreadLocal variables, though that would require JDK 1.2.
+   */
+  private static FluidBinding mustRemoveMarker
+  = new FluidBinding(null, null, null);
+
+  public CallContext ()
+  {
+  }
+
+  public CallContext (Thread thread)
+  {
+    setInstance(thread, this);
+  }
+
+  public final Environment getEnvironment()
+  {
+    if (currentThread instanceof Future)
+      return ((Future) currentThread).environment;
+    return Environment.global;
+  }
+
+  public static CallContext setMainContext()
+  {
+    Thread thread = Thread.currentThread();
+    CallContext ctx = new CallContext(thread);
+    defaultContext = ctx;
+    return ctx;
+  }
+
+  static CallContext defaultContext = null;
+
+  static synchronized void getDefaultContext ()
+  {
+    if (defaultContext == null)
+      defaultContext = new CallContext();
+  }
 
   /** Get or create a CallContext for the current thread. */
-  public static CallContext getInstanceForCurrentThread()
+  public static CallContext getInstance()
   {
+    /*
+    CallContext ctx = currentContext.get();
+    if (ctx != null)
+      {
+	ctx = new CallContext(Thread.currentThread());
+	currentContext.set(ctx);
+      }
+    return ctx;
+    */
+
     Thread thread = Thread.currentThread();
     CallContext ctx = getInstance(thread);
     if (ctx == null)
       {
-	ctx = new CallContext();
-	setInstance(thread, ctx);
+	ctx = new CallContext(thread);
+	ctx.fluidBindings = mustRemoveMarker;
       }
     return ctx;
   }
@@ -29,8 +82,12 @@ public class CallContext implements Runnable
   {
     if (thread instanceof Future)
       return ((Future) thread).getCallContext();
-    else
-      return  (CallContext) threadMap.get(thread);
+    Object ctx = threadMap.get(thread);
+    if (ctx != null)
+      return (CallContext) ctx;
+    if (defaultContext == null)
+      getDefaultContext();
+    return defaultContext;
   }
 
   /** Set the CallContext associated with the current thread. */
@@ -41,7 +98,10 @@ public class CallContext implements Runnable
     else if (ctx == null)
       threadMap.remove(thread);
     else
-      threadMap.put(thread, ctx);
+      {
+	threadMap.put(thread, ctx);
+	ctx.currentThread = thread;
+      }
   }
 
   public Procedure proc;
@@ -296,5 +356,43 @@ public class CallContext implements Runnable
   public void writeValue(Object value)
   {
     Values.writeValues(value, consumer);
+  }
+
+  public FluidBinding fluidBindings;
+
+  public void setFluids (FluidBinding new_fluids)
+  {
+    FluidBinding old_fluids = fluidBindings;
+    FluidBinding fluid = new_fluids;
+    for ( ; fluid != old_fluids;  fluid = fluid.previous)
+      {
+	Binding binding = fluid.binding;
+	Constraint constraint = binding.constraint;
+	if (constraint instanceof FluidConstraint)
+	  ((FluidConstraint) constraint).referenceCount++;
+	else
+	  binding.constraint = new FluidConstraint(constraint);
+      }
+    fluidBindings = new_fluids;
+  }
+
+  public void resetFluids (FluidBinding old_fluids)
+  {
+    FluidBinding new_fluids = fluidBindings;
+    FluidBinding fluid = new_fluids;
+    for ( ; fluid != old_fluids;  fluid = fluid.previous)
+      {
+	Binding binding = fluid.binding;
+	FluidConstraint constraint = (FluidConstraint) binding.constraint;
+	if (constraint.referenceCount-- <= 0)
+	  binding.constraint = constraint.savedConstraint;
+      }
+    fluidBindings = old_fluids;
+
+    if (old_fluids == mustRemoveMarker)
+      {
+	setInstance(currentThread, null);
+	currentThread = null;
+      }
   }
 }

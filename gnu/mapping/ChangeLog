@@ -1,3 +1,30 @@
+2002-02-12  Per Bothner  <per@bothner.com>
+
+	* CallContext.java:  Allow fluid bindings for any thread,
+	not just Future.  Map Thread->CallContext.
+	(threadMap):  New static field.
+	(currentThread):  New field.
+	(<init>):  New constructors.
+	(defaultContext):  New field.
+	(setMainContext):  New method - sets .defaultContext.
+	(getInstanceForCurrentThread):  Renamed to getInstance.
+	(getInstance):  Use threadMap.
+	(fluidBindings, setFluids, resetFluids):  Moved from Future.
+	(resetMarker):  New static field.
+	(resetFluids):  Check for resetMarker.
+	* Future.java (setCallContext):  Also set context's currentThread.
+	(fluidBindings):  Moved to CallContext.java.
+	(setFluids, resetFluids):  Deprecated - just call CallContext methods.
+	(defaultContext, getDefaultContext):  Removed - now go via CallContext.
+	(getFluids):  Just get current CallContexts's fludiBindings.
+	(getContext):  Removed - no longer used.
+	* MethodProc.java (match, applyN):  Use CallContext.getInstance.
+
+	* CallContext.java (getEnvironment):  New method.
+	* Environment.java (global):  Make non-private, for new method.
+
+	* MethodProc.java (mostSpecific):  Return null if no argcount overlap.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* Values.java (make):  Change return type to Values.

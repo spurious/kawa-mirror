@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 6)
+(test-init "Common Lisp tests" 11)
 
 (setq y 100)
 (defun foo1 (x)
@@ -24,3 +24,9 @@
 
 (defmacro list-1 (bar) `(list ,bar))
 (test '(12) 'defmacro (list-1 12))
+
+(test '(3 4) 'list-1 (list 3 4))
+(test nil 'functionp-1 (functionp 'list))
+(test t 'functionp-2 (functionp #'list))
+(test t 'functionp-3 (functionp (function list)))
+(test '(3 4) 'function-1 ((function list) 3 4))

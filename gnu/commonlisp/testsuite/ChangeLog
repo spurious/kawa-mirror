@@ -1,3 +1,7 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* lang-test.lisp: Add some tests of function, #', and functionp.
+
 2003-04-18  Per Bothner  <per@bothner.com>
 
 	* lang-test.lisp:  Rename a duplicate test name.

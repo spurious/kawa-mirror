@@ -117,7 +117,16 @@ public class InPort extends FilterInputStream implements Printable
 
   public int available () throws java.io.IOException
   {
-    return (limit - pos) + in.available ();
+    int avail;
+    try
+      {
+	avail = in.available ();
+      }
+    catch (java.io.IOException ex)
+      {
+	avail = 0;
+      }
+    return (limit - pos) + avail;
   }
 
   /** Read a byte. */
@@ -400,10 +409,21 @@ public class InPort extends FilterInputStream implements Printable
 	str.append ((char) c);
 	c = readChar ();
       }
-    if (c >= 0)
-      unreadChar();
     if (digits == 0)
       throw new ReadError (this, "number constant with no digits");
+    if (c == '/')
+      {
+	c = peekChar ();
+	if (Character.digit ((char)c, radix) < 0)
+	  throw new ReadError (this,"\"/\" in rational not followed by digit");
+	Numeric denominator = readSchemeNumber(radix, 'e');
+	if (isFloat || ! (denominator instanceof IntNum))
+	  throw new ReadError (this, "invalid fraction");
+	return RatNum.make (IntNum.valueOf(str.toString (), radix),
+			    (IntNum) denominator);
+      }
+    if (c >= 0)
+      unreadChar();
 
     if (isFloat)
       return new DFloNum (str.toString ());

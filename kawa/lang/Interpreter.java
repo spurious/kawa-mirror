@@ -117,7 +117,7 @@ public class Interpreter extends Object
 
   public Expression rewrite_body (Object exp)
   {
-    int count = kawa.standard.length.length (exp);
+    int count = List.length (exp);
     if (count == 1)
       return rewrite (((Pair)exp).car);
     else if (count == 0)
@@ -256,7 +256,7 @@ public class Interpreter extends Object
 	  return apply_rewrite ((Syntax) binding, cdr);
       }
 
-    int cdr_length = kawa.standard.length.length (cdr);
+    int cdr_length = List.length (cdr);
 
     Expression func = rewrite_car (p);
     Expression[] args = new Expression[cdr_length];

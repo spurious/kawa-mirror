@@ -346,9 +346,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     return scope;
   }
 
-  public void beginScope()  // Is this needed?
-  { locals.current_scope.start_pc = PC; }
-
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;

@@ -1,5 +1,8 @@
 1999-12-06  Per Bothner  <per@bothner.com>
 
+	* Invoke.java (getMethods):  Set cacheArgs *after* recursive call done.
+	(compile):  Use methods instead of acheMethods.
+
 	* ClassMemberConstraint.java:  New class;  extends Constraint.
 	* Makefile.am, Makefile.in (java_JAVA): Add ClassMemberConstraint.java.
 	* Invoke.java (applyN):  Throw exception if no applicable method found.

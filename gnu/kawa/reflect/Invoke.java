@@ -130,8 +130,6 @@ public class Invoke extends ProcedureN implements Inlineable
     if (args == cacheArgs)
       return cacheMethods;
     int nargs = args.length;
-    cacheArgs = args;
-    cacheMethods = null;
     Type[] atypes = new Type[nargs - argsToSkip];
     int i = 0;
     if (kind == 'V')
@@ -143,6 +141,7 @@ public class Invoke extends ProcedureN implements Inlineable
                               kind == 'S' ? Access.STATIC : 0, Access.STATIC,
                               kawa.standard.Scheme.getInstance());
     long num = ClassMethods.selectApplicable(methods, atypes);
+    cacheArgs = args;
     cacheDefinitelyApplicableMethodCount = (int) (num >> 32);
     cachePossiblyApplicableMethodCount = (int) num;
     cacheMethods = methods;
@@ -197,7 +196,7 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 Object[] slots;
                 if (kind == 'N'
-                    && (ClassMethods.selectApplicable(cacheMethods,
+                    && (ClassMethods.selectApplicable(methods,
                                                       Type.typeArray0)
                         >> 32) == 1
                     && (slots = checkKeywords(type, args, 1)) != null)
@@ -227,7 +226,7 @@ public class Invoke extends ProcedureN implements Inlineable
                       }
                     else
                       {
-                        PrimProcedure method = cacheMethods[0];
+                        PrimProcedure method = methods[0];
                         CodeAttr code = comp.getCode();
                         method.compile(new ApplyExp(method, new Expression[0]),
                                        comp, Target.pushObject);

@@ -9,9 +9,16 @@ import gnu.expr.*;
 
 public class not extends Procedure1 implements Inlineable
 {
+  Interpreter interpreter;
+
+  public not(Interpreter interpreter)
+  {
+    this.interpreter = interpreter;
+  }
+
   public Object apply1 (Object arg1)
    {
-     return Interpreter.boolObject (arg1 == Scheme.falseObject);
+     return interpreter.booleanObject(! interpreter.isTrue(arg1));
    }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -17,7 +17,7 @@ public class write extends Procedure1or2
   public final Object apply1 (Object arg1)
   {
     OutPort.outDefault().writeSchemeObject (arg1, readable);
-    return Interpreter.voidObject;
+    return Scheme.voidObject;
   }
 
   public final Object apply2 (Object arg1,Object arg2)
@@ -25,7 +25,7 @@ public class write extends Procedure1or2
     if (! (arg2 instanceof OutPort))
       throw new WrongType (this.name (), 1, "output port");
     ((OutPort)arg2).writeSchemeObject (arg1, readable);
-    return Interpreter.voidObject;
+    return Scheme.voidObject;
   }
 
 }

@@ -13,16 +13,18 @@ import gnu.kawa.util.*;
 public class and_or extends Syntax implements Printable
 {
   boolean is_and;
+  Interpreter interpreter;
   
-  and_or (boolean is_and)
+  public and_or (boolean is_and, Interpreter interpreter)
   {
     this.is_and = is_and;
+    this.interpreter = interpreter;
   }
 
   public Expression rewrite (Object obj, Translator tr)
   {
     if (obj == LList.Empty)
-      return new QuoteExp (Scheme.boolObject (is_and));
+      return new QuoteExp (interpreter.booleanObject(is_and));
     if (! (obj instanceof Pair))
       return tr.syntaxError ("non-list arguments to and/or");
     Pair pair = (Pair) obj;

@@ -57,7 +57,7 @@ public class LambdaExp extends ScopeExp
    * (Otherwise, we use "this" as the implicit "closureEnv" field.) */
   public Field closureEnvField;
 
-  /** Field in heapFrame,getType() that contains the static link.
+  /** Field in heapFrame.getType() that contains the static link.
    * Its value is this function's heapFrame value. */
   public Field staticLinkField;
 
@@ -273,10 +273,9 @@ public class LambdaExp extends ScopeExp
 	  {
 	    closureEnv = parentFrame;
 	  }
-	else if (parent.heapFrameLambda == this)
+	else if (parent.heapFrameLambda == this || isClassMethod())
 	  closureEnv = thisVariable;
-	else if (isClassMethod() ? ! parent.getNeedsStaticLink()
-		 : ! isClassGenerated())
+	else if (! isClassGenerated())
 	  {
 	    if (parent.heapFrame == null)
 	      closureEnv = null;

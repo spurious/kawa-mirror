@@ -208,7 +208,7 @@ class MPN
   }
 
     /** Divide divident[0:len-1] by (unsigned int)divisor.
-     * Write result into quotient[0:len-1.
+     * Write result into quotient[0:len-1].
      * Return the one-word (unsigned) remainder.
      * OK for quotient==dividend.
      */

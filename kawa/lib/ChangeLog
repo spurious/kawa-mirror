@@ -1,3 +1,8 @@
+2003-01-31  Per Bothner  <per@bothner.com>
+
+	* thread.scm (exit):  Fix typo - statuc -> status.
+	Reported by Wen-Chun Ni <wcn@tbcommerce.com>.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* ports.scm (port-line, input-port-line-number, input-port-prompter):

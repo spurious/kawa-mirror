@@ -1,3 +1,7 @@
+Wed Dec  2 18:54:30 1998  Dr Alexander Bunkenburg <bunkenba-www@dcs.gla.ac.uk>
+
+	* DComplex.java (log):  Fix x_im -> x_re bug.
+
 Mon Nov 23 14:32:35 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (make):  Don't alloc words array if len==1.

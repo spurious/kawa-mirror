@@ -150,7 +150,7 @@ public class DComplex extends Complex
   public static Complex log (double x_re, double x_im)
   {
     return make (Math.log (DComplex.hypot (x_re, x_im)),
-		 Math.atan2 (x_im, x_im));
+		 Math.atan2 (x_im, x_re));
   }
 
   // The code below is adapted from f2c's libF77, and is subject to this

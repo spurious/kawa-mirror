@@ -868,6 +868,7 @@ public class Scheme extends Interpreter
         types.put ("f32vector", ClassType.make("gnu.lists.F32Vector"));
         types.put ("f64vector", ClassType.make("gnu.lists.F64Vector"));
         types.put ("document", ClassType.make("gnu.lists.TreeList"));
+        types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
       }
     Type type = (Type) types.get(name);
     if (type == null && name.startsWith("elisp:"))

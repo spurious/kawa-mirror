@@ -1,3 +1,8 @@
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (getNamedType):  Add <readtable>.
+	* kawa/standard/require.java:  Add readtable feature.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (readBody):  Removed method.

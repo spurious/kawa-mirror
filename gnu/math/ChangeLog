@@ -1,3 +1,7 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* RealNum.java:	Change "select" (preprocessor) syntax.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* Unit.java:  Remove unused import statements.

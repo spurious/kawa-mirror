@@ -4,9 +4,9 @@
 package gnu.math;
 
 public abstract class RealNum extends Complex
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   implements Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   public final RealNum re() { return this; }
   public final RealNum im() { return IntNum.zero(); }

@@ -45,9 +45,18 @@ public class LetExp extends ScopeExp
     Variable var = firstVar();
     for (int i = 0; i < inits.length; i++, var = var.nextVar())
       {
-	inits[i].compile (comp,
-			  ((Declaration) var).ignorable() ? Target.Ignore
-			  : Target.pushObject);
+	Target varTarget;
+	if (((Declaration) var).ignorable())
+	  varTarget = Target.Ignore;
+	else
+	  {
+	    Type varType = var.getType();
+	    if (varType == Type.pointer_type)
+	      varTarget = Target.pushObject;
+	    else
+	      varTarget = new StackTarget(varType);
+	  }
+	inits[i].compile (comp, varTarget);
       }
 
     code.enterScope (scope);

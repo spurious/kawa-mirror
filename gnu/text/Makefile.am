@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
   Char.java \
   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
   QueueReader.java SourceMessages.java NullReader.java \
@@ -15,5 +15,6 @@ java_JAVA=\
 EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-text
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
   Numeric.java \
   Quantity.java DQuantity.java CQuantity.java \
   Complex.java CComplex.java DComplex.java \
@@ -21,5 +21,6 @@ java_JAVA=\
 EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-math
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -2,10 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+@Make_rules@
 
-javadir=$(datadir)/java/$(subdir)
-
-java_JAVA=\
+java_sources = \
   Reserved.java BinaryOp.java Convert.java \
   Lexer.java Parser.java Prompter.java
+
+PACKAGE_FNAME = gnu-ecmascript
+GCJ_INPUTS =  $(java_Java)
+
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

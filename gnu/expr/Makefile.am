@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
   ApplyExp.java \
   BeginExp.java \
   BindingInitializer.java \
@@ -63,5 +63,6 @@ java_JAVA=\
 EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-expr
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all:  Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

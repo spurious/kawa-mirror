@@ -2,15 +2,14 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
 java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
 
 GCJ_DEPS = elisp-classes.stamp
 PACKAGE_CFNAME = gnu-jemacs-lisp
-
-java_JAVA =
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 EXTRA_DIST = $(java_ELISP)
 
@@ -20,5 +19,5 @@ all: Makefile $(@SWING_SELECTED@)
 
 WITH_SWING = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
-classjava.stamp: elisp-classes.stamp
-	touch classjava.stamp
+java-classes.stamp: elisp-classes.stamp
+	touch java-classes.stamp

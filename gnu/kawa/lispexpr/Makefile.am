@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
   LispReader.java \
   ReaderDispatch.java \
   ReaderDispatchMacro.java \
@@ -23,5 +23,6 @@ java_JAVA=\
 KAWA = $(JAVA) kawa.repl
 
 PACKAGE_FNAME = gnu-kawa-lispexpr
+GCJ_INPUTS =  $(java_Java)
 
-all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

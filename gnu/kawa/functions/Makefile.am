@@ -2,11 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-javadir=$(datadir)/java/$(subdir)
-
-java_JAVA=\
+java_sources=\
   AddOp.java \
   Apply.java \
   Assoc.java \
@@ -18,5 +16,6 @@ java_JAVA=\
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
 PACKAGE_FNAME = gnu-kawa-functions
+GCJ_INPUTS =  $(java_Java)
 
-all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

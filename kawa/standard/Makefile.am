@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
 set_b.java \
 quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
@@ -83,6 +83,6 @@ TracedProcedure.java \
 scheme_env.java
 
 PACKAGE_FNAME = kawa-standard
-CLEANFILES = *.class *.o *.stamp
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

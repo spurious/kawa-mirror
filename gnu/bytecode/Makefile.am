@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
 Access.java \
 Attribute.java \
 AttrContainer.java \
@@ -42,15 +42,15 @@ ExceptionsAttr.java \
 dump.java
 
 PACKAGE_FNAME = gnu-bytecode
-
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o dump$(exext)
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 dump$(exext):  $(OFILES_DIR)/gnu-bytecode.o
 	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.o
 
-CLEANFILES = *.class *.o *.stamp dump$(exext)
+EXTRA_CLEAN = *.o dump$(exext)
 
 EXTRA_DIST = package.html
 

@@ -2,23 +2,25 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-PACKAGE_CFNAME = gnu-kawa-slib
+PACKAGE_FNAME = gnu-kawa-slib
+GCJ_INPUTS =  *.class
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext) \
-  $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+  $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm readtable.scm \
   $(SCMSOURCES_@XML_SELECTED@)
 SOURCES = $(java_SCM)
 SCMSOURCES_XML_ENABLED = XML.scm
 EXTRA_DIST = $(java_SCM) XML.scm
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 all: Makefile scm-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) $(@GCJ_COMPILED_SELECTED@)
 
-scm-classes.stamp:  ../../../kawa/classjava.stamp
+scm-classes.stamp:  ../../../kawa/java-classes.stamp
 
-../../../kawa/classjava.stamp:
+../../../kawa/java-classes.stamp:
 	cd ../../../kawa; $(MAKE)
 
 # Used to generate makekawa.bat in ../../.. .

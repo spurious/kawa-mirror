@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources=\
   AliasConstraint.java \
   ApplyMethodContainer.java ApplyMethodProc.java \
   Binding.java \
@@ -54,5 +54,6 @@ java_JAVA=\
 EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-mapping
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
 java_sources = \
   Array.java \
@@ -47,8 +47,6 @@ java_BUILT = \
   SimpleVector.java
 
 BUILT_SOURCES = $(java_BUILT)
-java_Java= $(java_BUILT) $(java_sources)
-GCJ_DEPS = $(java_Java)
 EXTRA_DIST = $(java_sources) \
   AbstractSequence.java.in Convert.java.in Sequence.java.in \
   SeqPosition.java.in SimpleVector.java.in
@@ -63,6 +61,7 @@ SED_WITHOUT_JAVA_COLLECTIONS_SUBS = \
   -e '/@*if WITHOUT COLLECTIONS@/d'
 
 PACKAGE_FNAME = gnu-lists
+GCJ_INPUTS =  $(java_Java)
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
   

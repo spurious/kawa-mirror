@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
 java_WITH_SWING = \
   Buffer.java \
@@ -30,21 +30,19 @@ java_WITH_SWING = \
   TooLongAction.java \
   Window.java
 
-EXTRA_JAVA = $(java_WITH_SWING)
-
-java_JAVA=\
+java_sources = \
   $(java_@SWING_SELECTED@) \
   Signal.java
 
 java_SCM = emacs.scm
 
-EXTRA_DIST = emacs.scm $(EXTRA_JAVA) package.html
-
+EXTRA_DIST = emacs.scm $(java_WITH_SWING) package.html
 GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
 GCJ_DEPS = $(java_WITH_SWING) scm-classes.stamp
 PACKAGE_CFNAME = gnu-jemacs-buffer
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-WITH_SWING: classjava.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+WITH_SWING: java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 WITHOUT_SWING:
 

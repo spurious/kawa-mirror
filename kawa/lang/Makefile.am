@@ -2,13 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
 EXCEPTIONS=\
 GenericError.java\
 NamedException.java
 
-java_JAVA=\
+java_sources = \
 Pattern.java \
 AnyPat.java \
 EqualPat.java \
@@ -16,7 +16,6 @@ ListPat.java \
 ListRepeatPat.java \
 PairPat.java \
 VarListPat.java \
-\
 Lambda.java \
 Quote.java \
 Translator.java \
@@ -37,5 +36,6 @@ Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)
 
 PACKAGE_FNAME = kawa-lang
+GCJ_INPUTS =  $(java_Java)
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -1,7 +1,6 @@
-# Makefile.in generated automatically by automake 1.4e from Makefile.am.
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
-# Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -10,6 +9,9 @@
 # but WITHOUT ANY WARRANTY, to the extent permitted by law; without
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
+
+# Process this with automake to create Makefile.in
+
 
 SHELL = @SHELL@
 
@@ -32,6 +34,8 @@ mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
 
+DESTDIR =
+
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -44,10 +48,9 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
 
 NORMAL_INSTALL = :
@@ -56,19 +59,11 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-
-@SET_MAKE@
-AMDEP = @AMDEP@
-AMTAR = @AMTAR@
-AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
-DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
-INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-INSTALL_STRIP_PROGRAM_ENV = @INSTALL_STRIP_PROGRAM_ENV@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
@@ -76,284 +71,124 @@ JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
-STRIP = @STRIP@
+SHELL = @SHELL@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
-_am_include = @_am_include@
 extra_java = @extra_java@
-install_sh = @install_sh@
 kawa_bin = @kawa_bin@
-
-# Process this with automake to create Makefile.in
-
-
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class .scm .el .lisp
-
-javadir = $(datadir)/java/$(subdir)
-JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
-JAVAROOT = $(top_builddir)
-GCJ = gcj
-JAR = fastjar
-#GCJFLAGS = -gdwarf-2
-GCJFLAGS = -g
-OFILES_DIR = $(TO_TOPDIR)/bin
-TO_TOPDIR = $(top_builddir)
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
-GCJ_DEPS = $(java_JAVA)
-CLEANFILES = *.class *.o *.stamp
-
-DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
-ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
-# Compiler to use for compiling builtin .scm/.el/.cl files.
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
-ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
-
-java_JAVA = \
-set_b.java \
-quasiquote.java \
-prim_method.java prim_throw.java throw_name.java \
-not.java \
-and_or.java \
-cxr.java \
-append.java \
-integer_p.java \
-positive_p.java \
-max.java \
-min.java \
-NumberCompare.java \
-multiply_oper.java \
-divide_oper.java \
-modulo.java \
-gcd.java \
-lcm.java \
-fluid_let.java \
-rationalize.java \
-atan.java \
-sqrt.java \
-expt.java \
-exact2inexact.java \
-inexact2exact.java \
-string2number.java \
-string_v.java \
-string_ci_equal_p.java \
-string_lessthan_p.java \
-string_lessequal_p.java \
-string_greaterthan_p.java \
-string_greaterequal_p.java \
-string_ci_lessthan_p.java \
-string_ci_lessequal_p.java \
-string_ci_greaterthan_p.java \
-string_ci_greaterequal_p.java \
-string_append.java \
-vector_append.java \
-force.java \
-call_with_input_file.java \
-call_with_output_file.java \
-with_input_from_file.java \
-with_output_to_file.java \
-read.java \
-readchar.java \
-read_line.java \
-char_ready_p.java \
-open_input_file.java \
-open_output_file.java \
-call_with_output_string.java \
-load.java \
-constant_fold.java \
-map.java \
-callcc.java \
-logand.java logior.java logxor.java \
-define.java \
-define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
-require.java module_extends.java module_implements.java module_name.java \
-module_static.java export.java define_unit.java \
-syntax_error.java \
-let.java \
-letrec.java \
-begin.java \
-ifp.java \
-call_with_values.java \
-make_quantity.java quantity2number.java quantity2unit.java \
-make_future.java sleep.java \
-try_catch.java try_finally.java synchronizd.java \
-convert.java \
-make.java location.java \
-define_alias.java define_variable.java define_autoload.java \
-define_member_alias.java \
-StaticFieldConstraint.java \
-ScmEnv.java Scheme.java \
-object.java define_class.java \
-TracedProcedure.java \
-scheme_env.java
+java_sources =  set_b.java quasiquote.java prim_method.java prim_throw.java throw_name.java not.java and_or.java cxr.java append.java integer_p.java positive_p.java max.java min.java NumberCompare.java multiply_oper.java divide_oper.java modulo.java gcd.java lcm.java fluid_let.java rationalize.java atan.java sqrt.java expt.java exact2inexact.java inexact2exact.java string2number.java string_v.java string_ci_equal_p.java string_lessthan_p.java string_lessequal_p.java string_greaterthan_p.java string_greaterequal_p.java string_ci_lessthan_p.java string_ci_lessequal_p.java string_ci_greaterthan_p.java string_ci_greaterequal_p.java string_append.java vector_append.java force.java call_with_input_file.java call_with_output_file.java with_input_from_file.java with_output_to_file.java read.java readchar.java read_line.java char_ready_p.java open_input_file.java open_output_file.java call_with_output_string.java load.java constant_fold.java map.java callcc.java logand.java logior.java logxor.java define.java define_syntax.java syntax_rules.java let_syntax.java syntax_case.java require.java module_extends.java module_implements.java module_name.java module_static.java export.java define_unit.java syntax_error.java let.java letrec.java begin.java ifp.java call_with_values.java make_quantity.java quantity2number.java quantity2unit.java make_future.java sleep.java try_catch.java try_finally.java synchronizd.java convert.java make.java location.java define_alias.java define_variable.java define_autoload.java define_member_alias.java StaticFieldConstraint.java ScmEnv.java Scheme.java object.java define_class.java TracedProcedure.java scheme_env.java
 
 
 PACKAGE_FNAME = kawa-standard
-OBJEXT = o
-subdir = kawa/standard
+GCJ_INPUTS = $(java_Java)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES =
-DIST_SOURCES =
-depcomp = 
-all: all-am
+CONFIG_CLEAN_FILES = 
+DIST_COMMON =  Makefile.am Makefile.in
 
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = gtar
+GZIP_ENV = --best
+all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .java .class .scm .el .lisp
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/standard/Makefile
 
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/Make-rules $(top_srcdir)/configure.in $(ACLOCAL_M4)
-	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus  kawa/standard/Makefile
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) && \
-	  CONFIG_HEADERS= CONFIG_LINKS= \
-	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
-
-install-javaJAVA: classjava.stamp
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
-	done
-
-uninstall-javaJAVA:
-	@$(NORMAL_UNINSTALL)
-	@for p in *.class; do \
-	  echo " rm -f $(DESTDIR)$(javadir)/$$p"; \
-	  rm -f $(DESTDIR)$(javadir)/$$p; \
-	done
-
-clean-javaJAVA:
-	-rm -f *.class classjava.stamp
-classjava.stamp: $(java_JAVA)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
-	echo timestamp > classjava.stamp
 tags: TAGS
 TAGS:
 
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = kawa/standard
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
 check-am:
 check: check-am
-all-am: Makefile classjava.stamp
-
-installdirs:
-
-install: install-am
+installcheck-am:
+installcheck: installcheck-am
+install-info-am: 
+install-info: install-info-am
+install-exec-am:
 install-exec: install-exec-am
+
+install-data-am:
 install-data: install-data-am
-uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-
-installcheck: installcheck-am
-
+install: install-am
+uninstall-am:
+uninstall: uninstall-am
+all-am: Makefile
+all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
-	  INSTALL_PROGRAM_ENV='$(INSTALL_STRIP_PROGRAM_ENV)' install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+
 
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-	@echo "This command is intended for maintainers to use"
-	@echo "it deletes files that may require special tools to rebuild."
-	-rm -f Makefile.in
-clean: clean-am
-
-clean-am: clean-generic clean-javaJAVA mostlyclean-am
-
-distclean: distclean-am
-
-distclean-am: clean-am distclean-generic
-
-dvi:
-
-dvi-am:
-
-info:
-
-info-am:
-
-install-data-am: install-javaJAVA
-
-install-exec-am:
-
-install-info:
-
-install-man:
-
-installcheck-am:
-
-maintainer-clean: maintainer-clean-am
-
-maintainer-clean-am: distclean-am maintainer-clean-generic
+mostlyclean-am:  mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic
+clean-am:  clean-generic mostlyclean-am
 
-uninstall-am: uninstall-javaJAVA
+clean: clean-am
 
-.PHONY: all all-am check check-am clean clean-generic clean-javaJAVA \
-	distclean distclean-generic dvi dvi-am info info-am install \
-	install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-javaJAVA install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic uninstall uninstall-am uninstall-javaJAVA
+distclean-am:  distclean-generic clean-am
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-generic distclean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
+
+.PHONY: tags distdir info-am info dvi-am dvi check check-am \
+installcheck-am installcheck install-info-am install-info \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-# Make sure $(KAWA1) is available, if --enable-gcj-compiled.
-$(TO_TOPDIR)/kawa1$(exeext):
-	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
+@Make_rules@
 
-$(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
-	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
-
-$(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
-	  *.class -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
-
-java-classes.stamp: $(java_Java)
-	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
-	echo timestamp > java-classes.stamp
-
-scm-classes.stamp: $(java_SCM)
-	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
-	  $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --module-static -C $?
-	echo timestamp > scm-classes.stamp
-
-elisp-classes.stamp: $(java_ELISP)
-	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
-	  $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
-	echo timestamp > elisp-classes.stamp
-
-# Almost the same as automake's install-javaJAVA, but the standard
-# automake support for Java doesn't handle built Java classes.
-install-java-classes: java-classes.stamp
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
-	done
-
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

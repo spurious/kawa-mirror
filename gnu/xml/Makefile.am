@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
 #  CompileTemplates.java
 
@@ -40,7 +40,6 @@ java_BUILT = \
 
 BUILT_SOURCES = $(java_BUILT)
 java_Java= $(java_BUILT) $(java_sources)
-GCJ_DEPS = $(java_Java)
 EXTRA_DIST = $(java_sources) \
   XMLParser.java.in ParsedXMLHandler.java.in
 
@@ -77,6 +76,7 @@ ParsedXMLHandler.java:  $(srcdir)/ParsedXMLHandler.java.in
 # CLEANFILES = $(java_BUILT) *.class *.stamp
 
 PACKAGE_FNAME = gnu-xml
+GCJ_INPUTS =  $(java_Java)
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 

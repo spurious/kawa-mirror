@@ -32,12 +32,13 @@ public class define extends Syntax implements Printable
   {
     if (! (st.cdr instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Pair p = (Pair) st.cdr;
-    Object name = p.car;
-    Pair namePair = p;
+    Pair p1 = (Pair) st.cdr;
+    Object name = p1.car;
+    Pair namePair = p1;
     Object sym = null;
-    boolean function = false;
-    if (name instanceof String || name instanceof Symbol)
+    LambdaExp lexp = null;
+    if ((name instanceof String || name instanceof Symbol)
+	&& p1.cdr instanceof Pair)
       {
 	sym = name;
       }
@@ -47,7 +48,7 @@ public class define extends Syntax implements Printable
         if (namePair.car instanceof String
 	    || namePair.car instanceof Symbol)
 	  sym = namePair.car;
-	function = true;
+	lexp = new LambdaExp();
       }
     if (sym != null)
       {
@@ -60,15 +61,40 @@ public class define extends Syntax implements Printable
 	  }
 	if (makeConstant)
 	  decl.setFlag(Declaration.IS_CONSTANT);
-	if (function)
-	  decl.setProcedureDecl(true);
-	Object declForm = (! function) ? (Object) decl
-	  : (Object) tr.makePair(namePair, decl, namePair.cdr);
-	p = tr.makePair(p, declForm, p.cdr);
-	st = tr.makePair(st, this, p);
+	Object declForm;
+	if (lexp != null)
+	  {
+	    decl.setProcedureDecl(true);
+	    lexp.nameDecl = decl;
+	    lambda.rewrite(lexp, namePair.cdr, tr);
+	    declForm = tr.makePair(namePair, lexp, namePair.cdr);
+	    declForm = tr.makePair(p1, declForm,
+				   lambda.rewriteAttrs(lexp, p1.cdr, tr));
+	  }
+	else
+	  {
+	    Pair p2 = (Pair) p1.cdr;
+	    Pair p3;
+	    if (tr.matches(p2.car, "::") && p2.cdr instanceof Pair
+		&& (p3 = (Pair) p2.cdr).cdr instanceof Pair)
+	      {
+		decl.setType(tr.exp2Type(p3));
+		decl.setFlag(Declaration.TYPE_SPECIFIED);
+		p2 = (Pair) p3.cdr;
+	      }
+	    Object value_list;
+	    if (p2.cdr == LList.Empty)
+	      {
+                name = decl.getSymbol();
+		value_list = p2;
+	      }
+	    else
+	      value_list = p2.cdr;
+	    declForm = tr.makePair(p1, decl, value_list);
+	  }
         if (defs instanceof ModuleExp)
           {
-            if (! makePrivate)
+	    if (! makePrivate)
               {
                 decl.setCanRead(true);
 		// (define (f) ...) defaults f to being read-only,
@@ -79,6 +105,7 @@ public class define extends Syntax implements Printable
 		  decl.setCanWrite(true);
               }
           }
+	st = tr.makePair(st, this, declForm);
 	Translator.setLine(decl, namePair);
       }
     forms.addElement (st);
@@ -92,6 +119,7 @@ public class define extends Syntax implements Printable
     Expression value = null;
     Declaration decl = null;
     boolean not_in_body = false;
+    LambdaExp lexp = null;
 
     if (obj instanceof Pair)
       {
@@ -104,7 +132,6 @@ public class define extends Syntax implements Printable
 	    if (p2.cdr == LList.Empty)
 	      {
 		name = p1.car;
-		value = tr.rewrite (p2.car);
 		not_in_body = true;
 	      }
 	  }
@@ -113,13 +140,6 @@ public class define extends Syntax implements Printable
 	    decl = (Declaration) p1.car;
 	    Pair p2 = (Pair) p1.cdr;
 	    Pair p3;
-	    if (tr.matches(p2.car, "::") && p2.cdr instanceof Pair
-		&& (p3 = (Pair) p2.cdr).cdr instanceof Pair)
-	      {
-		decl.setType(tr.exp2Type(p3));
-		decl.setFlag(Declaration.TYPE_SPECIFIED);
-		p2 = (Pair) p3.cdr;
-	      }
 	    if (p2.cdr == LList.Empty)
 	      {
                 name = decl.getSymbol();
@@ -134,15 +154,16 @@ public class define extends Syntax implements Printable
 		name = p2.car;
 		not_in_body = true;
               }
-            else if (p2.car instanceof Declaration)
+            else if (p2.car instanceof LambdaExp)
               {
-                decl = (Declaration) p2.car;
+		lexp = (LambdaExp) p2.car;
+                decl = lexp.nameDecl;
+		lexp.nameDecl = null;
                 name = decl.getSymbol();
-              }
-            if (name != null)
-              {
-		LambdaExp lexp = new LambdaExp();
-		lambda.rewrite(lexp, p2.cdr, p1.cdr, tr);
+
+		if (p1.cdr instanceof PairWithPosition)
+		  lexp.setFile(((PairWithPosition) p1.cdr).getFile());
+		lambda.rewriteBody(lexp, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
 		  {
@@ -160,6 +181,7 @@ public class define extends Syntax implements Printable
       return tr.syntaxError (getName() + " is only allowed in a <body>");
     SetExp sexp = new SetExp (name, value);
     sexp.setDefining (true);
+    sexp.binding = decl;
     if (decl != null)
       {
 	sexp.binding = decl;

@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.kawa.functions.Convert;
 
@@ -44,8 +45,16 @@ public class Lambda extends Syntax implements Printable
    * @param body the body of the procedure
    * @param tr the (Scheme) Translator
    */
-  // FIXME make method of Translator
   public void rewrite(LambdaExp lexp, Object formals, Object body, Translator tr)
+  {
+    rewrite(lexp, formals, tr);
+    if (body instanceof PairWithPosition)
+      lexp.setFile(((PairWithPosition) body).getFile());
+    body = rewriteAttrs(lexp, body, tr);
+    rewriteBody(lexp, body, tr);
+  }
+
+  public void rewrite(LambdaExp lexp, Object formals, Translator tr)
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
@@ -144,7 +153,6 @@ public class Lambda extends Syntax implements Printable
     if (key_args > 0)
       lexp.keywords = new Keyword[key_args];
 
-    tr.push(lexp);
     bindings = formals;
     int i = 0;
     opt_args = 0;
@@ -250,7 +258,7 @@ public class Lambda extends Syntax implements Printable
 	    return;
 	  }
 	if (mode == optionalKeyword || mode == keyKeyword)
-	  lexp.defaultArgs[opt_args++] = tr.rewrite(defaultValue);
+	  lexp.defaultArgs[opt_args++] = new LangExp(defaultValue);
 	if (mode == keyKeyword)
 	  lexp.keywords[key_args++]
 	    = Keyword.make(name instanceof Symbol ? ((Symbol) name).getName()
@@ -270,49 +278,145 @@ public class Lambda extends Syntax implements Printable
 	else if (mode == restKeyword)
 	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.
-	tr.push(decl);
       }
     if (bindings instanceof String || bindings instanceof Symbol)
       {
 	Declaration decl = lexp.addDeclaration (bindings);
 	decl.setType(Compilation.scmListType);
 	decl.noteValue (null);  // Does not have a known value.
-	tr.push(decl);
       }
-    if (body instanceof PairWithPosition)
-      lexp.setFile(((PairWithPosition) body).getFile());
-    rewriteBody(lexp, body, tr);
+  }
+
+  public Object rewriteAttrs(LambdaExp lexp, Object body, Translator tr)
+  {
+    String accessFlagName = null;
+    String allocationFlagName = null;
+    int accessFlag = 0;
+    int allocationFlag = 0;
+    while (body instanceof Pair)
+      {
+	Pair pair1 = (Pair) body;
+	if (! (pair1.cdr instanceof Pair))
+	  break;
+	Object attrName = pair1.car;
+	Pair pair2 = (Pair) pair1.cdr;
+
+	Object attrValue = pair2.car;
+	if (tr.matches(attrName, "::"))
+	  attrName = null;
+	else if (! (attrName instanceof Keyword))
+	  break;
+	Expression attrExpr = tr.rewrite_car(pair2, false);
+	if (attrName == null)
+	  {
+	    gnu.bytecode.Type rtype
+	      = tr.getInterpreter().getTypeFor(attrExpr);
+	    if (rtype != null)
+	      lexp.setReturnType(rtype);
+	  }
+	else if (attrName == kawa.standard.object.accessKeyword)
+	  {
+	    if (! (attrExpr instanceof QuoteExp)
+		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
+		      || attrValue instanceof FString))
+	      tr.error('e', "access: value not a constant symbol or string");
+	    else if (lexp.nameDecl == null)
+	      tr.error('e', "access: not allowed for anonymous function");
+	    else
+	      {
+		String value = attrValue.toString();
+		if ("private".equals(value))
+		  accessFlag = Declaration.PRIVATE_ACCESS;
+		else if ("protected".equals(value))
+		  accessFlag = Declaration.PROTECTED_ACCESS;
+		else if ("public".equals(value))
+		  accessFlag = Declaration.PUBLIC_ACCESS;
+		else if ("package".equals(value))
+		  accessFlag = Declaration.PACKAGE_ACCESS;
+		else
+		  tr.error('e', "unknown access specifier");
+		if (accessFlagName != null && value != null)
+		  {
+		    tr.error('e', "duplicate access specifiers - "
+			     + accessFlagName + " and "
+			     + value);
+		  }
+		accessFlagName = value;
+	      }
+	  }
+	else if (attrName == kawa.standard.object.allocationKeyword)
+	  {
+	    if (! (attrExpr instanceof QuoteExp)
+		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
+		      || attrValue instanceof FString))
+	      tr.error('e', "allocation: value not a constant symbol or string");
+	    else if (lexp.nameDecl == null)
+	      tr.error('e', "allocation: not allowed for anonymous function");
+	    else
+	      {
+		String value = attrValue.toString();
+		if ("class".equals(value) || "static".equals(value))
+		  allocationFlag = Declaration.STATIC_SPECIFIED;
+		else if ("instance".equals(value))
+		  allocationFlag = Declaration.NONSTATIC_SPECIFIED;
+		else
+		  tr.error('e', "unknown allocation specifier");
+		if (allocationFlagName != null && value != null)
+		  {
+		    tr.error('e', "duplicate allocation specifiers - "
+			     + allocationFlagName + " and "
+			     + value);
+		  }
+		allocationFlagName = value;
+	      }
+	  }
+	else
+	  {
+	    tr.error('w', "unknown procedure property "+attrName);
+	  }
+	body = pair2.cdr;
+      }
+    accessFlag |= allocationFlag;
+    if (accessFlag != 0)
+      lexp.nameDecl.setFlag(accessFlag);
+    return body;
+  }
+
+  public Object skipAttrs(LambdaExp lexp, Object body, Translator tr)
+  {
+    while (body instanceof Pair)
+      {
+	Pair pair = (Pair) body;
+	Object attr;
+	if (! (pair.cdr instanceof Pair))
+	  break;
+	Object attrName = pair.car;
+	Object attrValue = ((Pair) pair.cdr).car;
+	if (tr.matches(attrName, "::"))
+	  attrName = null;
+	else if (! (attrName instanceof Keyword))
+	  break;
+	body = ((Pair) pair.cdr).cdr;
+      }
+    return body;
   }
 
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
-    // Syntatic sugar:  <TYPE> BODY (or :: <TYPE> BODY) --> (as <TYPE> BODY)
-    boolean sawColons = false;
-    if (body instanceof Pair && tr.matches(((Pair) body).car, "::"))
-      {
-	body = ((Pair) body).cdr;
-	sawColons = true;
-      }
-    if (body instanceof Pair && ((Pair) body).car == "<sequence>")
-      {
-        ClassType type = ClassType.make("gnu.lists.Consumer");
-        Declaration rdecl = new Declaration("$result$", type);
-        lexp.add(null, rdecl);
-        tr.push(rdecl);
-        lexp.min_args++;
-        if (lexp.max_args >= 0)
-          lexp.max_args++;
-        lexp.setFlag(true, LambdaExp.SEQUENCE_RESULT);
-        body = ((Pair) body).cdr;
-      }
+    tr.push(lexp);
+    if (lexp.defaultArgs != null)
+      for (int i = 0, n = lexp.defaultArgs.length;  i < n;  i++)
+	lexp.defaultArgs[i] = tr.rewrite(lexp.defaultArgs[i]);
+
     lexp.body = tr.rewrite_body (body);
+    Type rtype;
     if (lexp.body instanceof BeginExp)
       {
 	BeginExp bexp = (BeginExp) lexp.body;
 	Expression[] exps = bexp.getExpressions();
 	int len = exps.length;
-	// We allow ':: "TYPENAME" BODY' but not '"TYPENAME" BODY'
-	if (len > 1 && (sawColons || exps[0] instanceof ReferenceExp))
+	// Handle '<TYPENAME> BODY':
+	if (len > 1 && exps[0] instanceof ReferenceExp)
 	  {
 	    Expression rexp = exps[0];
 	    len--;
@@ -326,6 +430,12 @@ public class Lambda extends Syntax implements Printable
 	      }
 	    Convert.setCoercedReturnValue(lexp, rexp, tr.getInterpreter());
 	  }
+      }
+    else if (lexp.returnType != null && lexp.returnType != Type.pointer_type)
+      {
+	Expression value = lexp.body;
+	lexp.body = Convert.makeCoercion(value, lexp.returnType);
+	lexp.body.setLine(value);
       }
     tr.pop(lexp);
   }

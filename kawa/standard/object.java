@@ -9,8 +9,9 @@ import gnu.mapping.Symbol;
 public class object extends Syntax
 {
   Lambda lambda;
+  public static final Keyword accessKeyword = Keyword.make("access");
   static final Keyword typeKeyword = Keyword.make("type");
-  static final Keyword allocationKeyword = Keyword.make("allocation");
+  public static final Keyword allocationKeyword = Keyword.make("allocation");
   static final Keyword initKeyword = Keyword.make("init");
   static final Keyword initformKeyword = Keyword.make("initform");
   static final Keyword init_formKeyword = Keyword.make("init-form");
@@ -38,16 +39,24 @@ public class object extends Syntax
     ObjectExp oexp = new ObjectExp();
     oexp.setSimple(true);
     // if (clname != null) oexp.setName(clname);
-    return rewriteClassDef(pair, oexp, tr);
+    Object[] saved = scanClassDef(pair, oexp, tr);
+    if (saved != null)
+      rewriteClassDef(saved, tr);
+    return oexp;
   }
 
-  public Expression rewriteClassDef (Pair pair, ClassExp oexp,
-                                     Translator tr)
+  /** Does the first "scan-time" processing of the class/object definition.
+   * Returns an array of values to be used at "rewrite-time".
+   */
+  public Object[] scanClassDef (Pair pair, ClassExp oexp, Translator tr)
   {
     tr.mustCompileHere();
     int num_supers = LList.listLength(pair.car, false);
     if (num_supers < 0)
-      return tr.syntaxError("object superclass specification not a list");
+      {
+	tr.error('e', "object superclass specification not a list");
+	return null;
+      }
     Expression[] supers = new Expression[num_supers];
     Object superlist = pair.car;
     for (int i = 0;  i < num_supers;  i++)
@@ -56,6 +65,7 @@ public class object extends Syntax
 	supers[i] = tr.rewrite(superpair.car);
 	superlist = superpair.cdr;
       }
+    oexp.supers = supers;
     Object components = pair.cdr;
     LambdaExp method_list = null;
     LambdaExp last_method = null;
@@ -67,7 +77,10 @@ public class object extends Syntax
       {
 	if (! (obj instanceof Pair)
 	    || ! ((pair = (Pair) obj).car instanceof Pair))
-	  return tr.syntaxError("object member not a list");
+	  {
+	    tr.error('e', "object member not a list");
+	    return null;
+	  }
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String || pair.car instanceof Symbol
@@ -78,6 +91,8 @@ public class object extends Syntax
 	    Object args;
 	    Declaration decl;
 	    int allocationFlag = 0;
+	    String accessFlagName = null;
+	    int accessFlag = 0;
 	    if (sname instanceof Keyword)
 	      {
 		decl = null;
@@ -140,6 +155,41 @@ public class object extends Syntax
 				 != sname.toString())
 			  tr.error('w', "init-keyword option ignored");
 		      }
+		    else if (key == accessKeyword)
+		      {
+			String newAccessFlag = null;
+			if (matches(value, "private", tr))
+			  {
+			    newAccessFlag = "private";
+			    accessFlag = Declaration.PRIVATE_ACCESS;
+			  }
+			else if (matches(value, "protected", tr))
+			  {
+			    newAccessFlag = "protected";
+			    accessFlag = Declaration.PROTECTED_ACCESS;
+			  }
+			else if (matches(value, "public", tr))
+			  {
+			    newAccessFlag = "public";
+			    accessFlag = Declaration.PUBLIC_ACCESS;
+			  }
+			else if (matches(value, "package", tr))
+			  {
+			    newAccessFlag = "package";
+			    accessFlag = Declaration.PACKAGE_ACCESS;
+			  }
+			else
+			  {
+			    tr.error('e', "unknown access specifier");
+			  }
+			if (accessFlagName != null && newAccessFlag != null)
+			  {
+			    tr.error('e', "duplicate access specifiers - "
+				     + accessFlagName + " and "
+				     + newAccessFlag);
+			  }
+			accessFlagName = newAccessFlag;
+		      }
 		    else
 		      {
 			tr.error('w', "unknown slot keyword '"+key+"'");
@@ -166,8 +216,11 @@ public class object extends Syntax
 		  }
 	      }
 	    if (args != LList.Empty)
-	      return tr.syntaxError("invalid argument list for slot '"
-				    + sname + '\''+" args:"+(args==null?"null":args.getClass().getName()));
+	      {
+		tr.error('e', "invalid argument list for slot '"
+			 + sname + '\''+" args:"+(args==null?"null":args.getClass().getName()));
+		return null;
+	      }
 	    if (init != null)
 	      {
 		boolean isStatic
@@ -179,7 +232,10 @@ public class object extends Syntax
 	    if (decl == null)
 	      {
 		if (init == null)
-		  return tr.syntaxError("missing field name");
+		  {
+		    tr.error('e', "missing field name");
+		    return null;
+		  }
 	      }
 	    else
 	      {
@@ -187,6 +243,8 @@ public class object extends Syntax
 		  decl.setType(tr.exp2Type(typePair));
 		if (allocationFlag != 0)
 		  decl.setFlag(allocationFlag);
+		if (accessFlag != 0)
+		  decl.setFlag(accessFlag);
 		decl.setCanRead(true);
 		decl.setCanWrite(true);
 	      }
@@ -197,14 +255,22 @@ public class object extends Syntax
 	    Object mname = mpair.car;
 	    if (! (mname instanceof String)
 		&& ! (mname instanceof Symbol))
-	      return tr.syntaxError("missing method name");
+	      {
+		tr.error('e', "missing method name");
+		return null;
+	      }
 	    Declaration decl = oexp.addDeclaration(mname);
 	    LambdaExp lexp = new LambdaExp();
+	    lexp.outer = oexp;
 	    lexp.setClassMethod(true);
 	    decl.noteValue(lexp);
 	    decl.setFlag(Declaration.FIELD_OR_METHOD);
 	    decl.setProcedureDecl(true);
 	    lexp.setName (mname);
+	    if (pair.cdr instanceof PairWithPosition)
+	      lexp.setFile(((PairWithPosition) pair.cdr).getFile());
+	    Object body = lambda.rewriteAttrs(lexp, pair.cdr, tr);
+	    lambda.rewrite(lexp, mpair.cdr, tr);
 	    if (last_method == null)
 	      method_list = lexp;
 	    else
@@ -212,10 +278,26 @@ public class object extends Syntax
 	    last_method = lexp;
 	  }
 	else
-	  return tr.syntaxError("invalid field/method definition");
+	  tr.error ('e', "invalid field/method definition");
       }
+    Object[] result = {
+      oexp,
+      components,
+      inits,
+      clinits,
+      method_list
+    };
+    return result;
+  }
+
+  public void rewriteClassDef (Object[] saved, Translator tr)
+  {
+    ClassExp oexp = (ClassExp) saved[0];
+    Object components = saved[1];
+    Vector inits = (Vector) saved[2];
+    Vector clinits = (Vector) saved[3];
+    LambdaExp method_list = (LambdaExp) saved[4];
     oexp.firstChild = method_list;
-    oexp.supers = supers;
     tr.push(oexp);
 
     // Second pass (rewrite method/initializer bodies).
@@ -224,7 +306,7 @@ public class object extends Syntax
     int finit_index = 0;   // Output index in inits vector.
     for (Object obj = components;  obj != LList.Empty;  )
       {
-	pair = (Pair) obj;
+	Pair pair = (Pair) obj;
 	Object savedPos = tr.pushPositionOf(pair);
 	try
 	  {
@@ -315,10 +397,11 @@ public class object extends Syntax
 		Pair mpair = (Pair) pair.car;
 		LambdaExp lexp = meth;
 		meth = meth.nextSibling;
-		lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+		Object body = lambda.skipAttrs(lexp, pair.cdr, tr);
+		lambda.rewriteBody(lexp, body, tr);
 	      }
 	    else
-	      return tr.syntaxError("invalid field/method definition");
+	      tr.syntaxError("invalid field/method definition");
 	  }
 	finally
 	  {
@@ -330,7 +413,6 @@ public class object extends Syntax
     makeInitMethod(inits, false, oexp, tr);
     makeInitMethod(clinits, true, oexp, tr);
     tr.pop(oexp);
-    return oexp;
   }
 
   private static void makeInitMethod (Vector inits, boolean isStatic,

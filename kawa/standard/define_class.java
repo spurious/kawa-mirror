@@ -24,7 +24,15 @@ public class define_class extends Syntax
 	|| ! ((name = (p = (Pair) st.cdr).car) instanceof String
 	      || name instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
+    if (! (p instanceof Pair))
+      return super.scanForDefinitions(st, forms, defs, tr);
     Declaration decl = defs.getDefine(name, 'w', tr);
+    if (p instanceof PairWithPosition)
+      {
+        PairWithPosition declPos = (PairWithPosition) p;
+        decl.setFile(declPos.getFile());
+        decl.setLine(declPos.getLine(), declPos.getColumn());
+      }
     ClassExp oexp = new ClassExp();
     decl.noteValue(oexp);
     if (isSimple)
@@ -37,14 +45,11 @@ public class define_class extends Syntax
         tr.mustCompileHere();
         tr.push(decl);
       }
-    Pair declForm = tr.makePair(p, decl, p.cdr);
-    if (declForm instanceof PairWithPosition)
-      {
-        PairWithPosition declPos = (PairWithPosition) declForm;
-        decl.setFile(declPos.getFile());
-        decl.setLine(declPos.getLine(), declPos.getColumn());
-      }
-    st = tr.makePair(st, this, declForm);
+    p = (Pair) p.cdr;
+    Object[] saved = objectSyntax.scanClassDef(p, oexp, tr);
+    if (saved == null)
+	return false;
+    st = tr.makePair(st, this, tr.makePair(p, decl, saved));
     forms.addElement (st);
     return true;
   }
@@ -57,13 +62,10 @@ public class define_class extends Syntax
     if (form.cdr instanceof Pair)
       {
         form = (Pair) form.cdr;
-	if (form.car instanceof String || form.car instanceof Symbol)
-          symbol = form.car;
-        else if (form.car instanceof Declaration)
-          {
-            decl = (Declaration) form.car;
-            symbol = decl.getName();
-          }
+	if (! (form.car instanceof Declaration))
+	  return tr.syntaxError(this.getName() + " can only be used in <body>");
+	decl = (Declaration) form.car;
+	symbol = decl.getSymbol();
       }
     if (symbol == null)
       return tr.syntaxError("missing class name in "+this.getName());
@@ -80,10 +82,10 @@ public class define_class extends Syntax
 	 ? name.substring(1, nlen-1)
 	 : name);
     oexp.setName(cname);
-    Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
+    objectSyntax.rewriteClassDef((Object[]) form.cdr, tr);
     // lexp.body = oe;
     // tr.pop(lexp);
-    SetExp sexp = new SetExp (symbol, oe);
+    SetExp sexp = new SetExp (symbol, oexp);
     sexp.binding = decl;
     sexp.setDefining (true);
     // sexp.binding = decl;

@@ -1,3 +1,24 @@
+Wed Nov 20 23:02:32 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/InPort.java (available):  Handle IOException.
+
+	* kawa/lang/InPort.java (readSchemeNumber):  Handle fraction.
+	
+	* kawa/standard/int_length.java:  New procedure and class.
+	* kawa/standard/length.java:  Remove length method (using
+	method with same name as class confuses J++).
+	* kawa/lang/Interpreter.java:  Change length.length to List.length.
+	* kawa/standard/{apply,length,let,letrec}.java:  Likewise.	
+	* kawa/standard/values.java:  Rename to values_v to avoid case problem.
+	* kawa/standard/{Scheme.java,Makefile.{am,in}}:  Update.
+
+Sat Nov 16 15:08:42 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/compilefunc.java (compile):  Only compile_return
+	if reachableHere ().
+	* kawa/lang/IfExp.java (compile):  Use new Method methods for
+	IfState:  compile_ifneq, compile_else, compile_fi.
+
 Mon Nov  4 16:07:08 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/{eq_p,eqv_p,equal_p,list_p,symbol2string}.java:

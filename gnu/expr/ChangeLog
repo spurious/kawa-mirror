@@ -1,3 +1,15 @@
+2005-02-11  Per Bothner  <per@bothner.com>
+
+	Any non-alias indirect field should use ThreadLocation for
+	proper Location access when multiple threads are mixed.
+	* BindingInitializer.java (emit):  Create a ThreadLocation rather
+	than a plain single-thread Location if decl is indirect non-alias.
+	* Declaration.java (makeField): Make indirect non-alias field static.
+	Fixes Savannah bug #11801.
+
+	* Interpreter.java (defineFromFieldValue): Handle the case of Location
+	with non-null getKeySymbol but not NamedLocation - e.g. ThreadLocation.
+
 2005-02-07  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (compile): Use new StaticFieldLocation.make.

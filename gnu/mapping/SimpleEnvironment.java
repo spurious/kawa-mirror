@@ -118,7 +118,7 @@ public class SimpleEnvironment extends Environment
   NamedLocation newLocation (Symbol name, Object property)
   {
     if ((flags & THREAD_SAFE) != 0)
-      return new SharedLocation(name, property, ++currentTimestamp);
+      return new SharedLocation(name, property, currentTimestamp);
     else
       return new PlainLocation(name, property);
   }
@@ -184,6 +184,8 @@ public class SimpleEnvironment extends Environment
   // FIXME rename to define
   NamedLocation addLocation (Symbol name, Object property, int hash, Location loc)
   {
+    if (loc instanceof ThreadLocation)
+      loc = ((ThreadLocation) loc).getLocation();
     NamedLocation nloc = lookupDirect(name, property, hash);
     if (loc == nloc)
       return nloc;
@@ -355,7 +357,7 @@ public class SimpleEnvironment extends Environment
     for (int index = table.length;  --index >= 0; )
       {
 	NamedLocation prev = null;
-	int timestamp = ++currentTimestamp;
+	int timestamp = currentTimestamp;
 	for (NamedLocation loc = table[index];  loc != null; )
 	  {
 	    NamedLocation next = loc.next;
@@ -367,7 +369,7 @@ public class SimpleEnvironment extends Environment
 		sloc.value = loc.value;
 		loc.next = null;
 		loc.base = sloc;
-		loc.value = null;
+		loc.value = IndirectableLocation.INDIRECT_FLUIDS;
 		loc = sloc;
 	      }
 	    if (prev == null)

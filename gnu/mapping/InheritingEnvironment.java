@@ -100,9 +100,14 @@ public class InheritingEnvironment extends SimpleEnvironment
       {
 	if (create /* && loc.getEnvironment() != this*/)
 	  {
-	    NamedLocation xloc = addLocation(name, property, hash, loc);
-	    xloc.value = IndirectableLocation.DIRECT_ON_SET;
+	    NamedLocation xloc = addUnboundLocation(name, property, hash);
+	    if ((flags & CAN_DEFINE) == 0 && loc.isBound())
+	      redefineError(name, property, xloc);
 	    xloc.base = loc;
+	    if ((flags & DIRECT_INHERITED_ON_SET) != 0)
+	      xloc.value = IndirectableLocation.DIRECT_ON_SET;
+	    else
+	      xloc.value = null;
 	    return xloc;
 	  }
 	else

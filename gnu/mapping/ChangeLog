@@ -1,5 +1,19 @@
 2005-02-11  Per Bothner  <per@bothner.com>
 
+	* Environment.java (toString): New method.
+
+	Fixes Savannah bug #11801.
+	* Environment.java (DIRECT_INHERITED_ON_SET): New flag.
+	(make(String, Environment)): Increment parent's currentTimestamp.
+	* Future.java (run): Need to make child shared (THREAD_SAFE), and
+	clear DIRECT_INHERITED_ON_SET bit.
+	* InheritingEnvironment.java (getLocation): "Inline" addLocation.
+	Only set DIRECT_ON_SET on new location if DIRECT_INHERITED_ON_SET.
+	* SimpleEnvironment.java (newLocation): Don't need to increment
+	timestamp, as long as it is done when a child is created by Future.run.
+	(makeShared): Likewise.
+	Set INDIRECT_FLUIDS on old PlainLocation so it properly redirects.
+
 	* UnboundLocationException.java (getMessage): A Location may have
 	a non-null getKeySymbol even if it isn't a NamedLocation.
 

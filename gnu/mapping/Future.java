@@ -43,7 +43,10 @@ public class Future extends Thread
     try
       {
 	context = CallContext.getInstance();
-	context.curEnvironment = Environment.make(getName(), initEnvironment);
+	SimpleEnvironment env = Environment.make(getName(), initEnvironment); 
+	context.curEnvironment = env;
+	env.makeShared();
+	env.flags &= ~Environment.DIRECT_INHERITED_ON_SET;
 	result = action.apply0 ();
       }
     catch (Throwable ex)

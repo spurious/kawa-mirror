@@ -37,12 +37,7 @@ public class BindingInitializer extends Initializer
 
     if (value == null)
       {
-	boolean lookupInEnv
-	  = decl.getFlag(Declaration.IS_UNKNOWN|Declaration.IS_DYNAMIC|Declaration.IS_FLUID);
-	if (lookupInEnv)
-	  // FIXME - this should be cached in a local Variable:
-	  code.emitInvokeStatic(Compilation.getCurrentEnvironmentMethod);
-
+	boolean lookupInEnv = decl.isIndirectBinding() && ! decl.isAlias();
 	boolean func = comp.getInterpreter().hasSeparateFunctionNamespace();
 	Object property
 	  = func && decl.isProcedureDecl() ? EnvironmentKey.FUNCTION : null;
@@ -53,12 +48,14 @@ public class BindingInitializer extends Initializer
 	comp.compileConstant(name, Target.pushObject);
 	if (! lookupInEnv)
 	  code.emitInvokeStatic(makeLocationMethod(name));
-	else if (property == null)
-	  code.emitInvokeVirtual(Compilation.getLocation1EnvironmentMethod);
 	else
 	  {
-	    comp.compileConstant(property, Target.pushObject);
-	    code.emitInvokeVirtual(Compilation.getLocation2EnvironmentMethod);
+	    if (property == null)
+	      code.emitPushNull();
+	    else
+	      comp.compileConstant(property, Target.pushObject);
+	    code.emitInvokeStatic(ClassType.make("gnu.mapping.ThreadLocation")
+				  .getDeclaredMethod("getInstance", 2));
 	  }
       }
     else

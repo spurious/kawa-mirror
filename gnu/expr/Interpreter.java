@@ -270,8 +270,16 @@ public abstract class Interpreter
   public void defineFromFieldValue(java.lang.reflect.Field fld, Object value)
     throws Throwable
   {
-    if (value instanceof NamedLocation)
-      environ.addLocation((NamedLocation) value);
+    if (value instanceof Location)
+      {
+	Location loc = (Location) value;
+	Symbol sym = loc.getKeySymbol();
+	if (sym != null)
+	  {
+	    environ.addLocation(sym, loc.getKeyProperty(), loc);
+	    return;
+	  }
+      }
     else
       {
 	Object vname;

@@ -35,7 +35,11 @@ public abstract class Environment
   /** May be shared by multiple threads. */
   static final int THREAD_SAFE = 8;
 
-  int flags = CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE;
+  /** If this flag is on, set DIRECT_ON_SET for inherited locations. */
+  static final int DIRECT_INHERITED_ON_SET = 16;
+
+  int flags = (CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE
+	       |DIRECT_INHERITED_ON_SET);
 
   public int getFlags () { return flags; }
 
@@ -339,8 +343,16 @@ public abstract class Environment
 
   public static SimpleEnvironment make (String name, Environment parent)
   {
+    SimpleEnvironment p = (SimpleEnvironment)parent;
     InheritingEnvironment env = new InheritingEnvironment(name, parent);
-    env.baseTimestamp = ((SimpleEnvironment)parent).currentTimestamp;
+    env.baseTimestamp = ++p.currentTimestamp;
     return env;
   }
+
+  public String toString ()
+  {
+    return "#<environment "+getName()+'>';
+  }
 }
+
+

@@ -10,6 +10,8 @@ java_sources = \
   ElementConstructor.java \
   ElementType.java \
   HttpPrinter.java \
+  IteratorItems.java \
+  ListItems.java \
   MakeResponseHeader.java \
   MakeUnescapedData.java \
   NamedAttributes.java \

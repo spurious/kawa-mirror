@@ -682,8 +682,6 @@ public class ClassType extends ObjectType implements AttrContainer {
     return -3;
   }
 
-  
-
   public String toString()
   {
     return "ClassType " + getName();

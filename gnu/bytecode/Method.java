@@ -19,7 +19,6 @@ import java.io.*;
 public class Method implements AttrContainer {
   private String name;
   Type[] arg_types;
-  
   Type return_type;
   int access_flags;
   int name_index; /* Index in constant table, or 0 if un-assigned */
@@ -52,8 +51,9 @@ public class Method implements AttrContainer {
   CodeAttr code;
   public final CodeAttr getCode () { return code; }
 
-  Method (ClassType clfile, int flags) {
-     if (clfile.last_method == null)
+  Method (ClassType clfile, int flags)
+  {
+    if (clfile.last_method == null)
        clfile.methods = this;
     else
       clfile.last_method.next = this;

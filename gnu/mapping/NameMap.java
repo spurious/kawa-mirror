@@ -1,19 +1,20 @@
 package gnu.mapping;
 
-/* Abstract class from mappings to Strings to bindings. */
+/* Abstract class from mappings to Strings to bindings.
+ * This class isn't actually used for anything ... */
 
-public abstract class NameMap extends Procedure1 implements HasSetter
-  // implements java.util.Map
+public abstract class NameMap extends Procedure1
+  implements HasSetter
 {
   /** Get the value bound to the given name.
-   * @exception gnu.mapping.UnboundSymbol the name has no binding
+   * @exception gnu.mapping.UnboundLocation the name has no binding
    * @see Environment#get(Object)
    */
   public final Object getChecked(String name)
   {
-    Object value = get(name, Symbol.UNBOUND);
-    if (value == Symbol.UNBOUND)
-      throw new UnboundSymbol(name);
+    Object value = get(name, Location.UNBOUND);
+    if (value == Location.UNBOUND)
+      throw new UnboundLocationException(name+" in "+this);
     return value;
   }
 
@@ -22,7 +23,7 @@ public abstract class NameMap extends Procedure1 implements HasSetter
    * (for compatibility with Java2 Collections framework).
    * @see Environment#getChecked(String)
    */
-  public final Object get (Object name)
+  public Object get (Object name)
   {
     return get((String) name, null);
   }

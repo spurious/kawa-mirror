@@ -1,61 +1,279 @@
-// Copyright (c) 1996-2000, 2001, 2002, 2004  Per M.A. Bothner.
+// Copyright (c) 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
 import java.util.Hashtable;
-import java.io.*;
 
-/**
- * An environment contains (name->value) bindings.
- * Names are Strings that are compared by ==, not equal.
- * @author	Per Bothner
+/** A mapping from <code>EnvironmentKey</code> to <code>Location</code>s.
+ * An <code>EnvironmentKey</code> is either a <code>Symbol</code> or
+ * a (<code>Symbol</code>, property)-pair.
  */
 
-public class Environment extends NameMap implements Externalizable
+public abstract class Environment
+  extends NameMap
+  // implements java.util.map.Map<EnvironmentKey, Object>
 {
-  Symbol[] table;
-  int log2Size;
-  private int mask;
-  int num_bindings;
-
   static Environment global;
 
-  Environment previous;
+  // FIXME Deprecated
+  public static void setGlobal (Environment env)
+  {
+    global = env;
+  }
 
-  boolean locked;
+  public static Environment getGlobal ()
+  {
+    return global;
+  }
 
-  protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
-  protected UnboundConstraint unboundConstraint = new UnboundConstraint(this);
-  protected ConstantConstraint constantConstraint;
+  static final int CAN_DEFINE = 1;
+  static final int CAN_REDEFINE = 2;
+
+  /** If 'put' can implicitly define an unbound location. */
+  static final int CAN_IMPLICITLY_DEFINE = 4;
+
+  /** May be shared by multiple threads. */
+  static final int THREAD_SAFE = 8;
+
+  int flags = CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE;
+
+  public int getFlags () { return flags; }
+
+  public void setFlag (boolean setting, int flag)
+  {
+    if (setting) flags |= flag;
+    else flags &= ~flag;
+  }
+
+  /** True if new bindings (non-unbound Locations) can be added. */
+  public boolean getCanDefine() { return ( flags & CAN_DEFINE) != 0; }
+  public void setCanDefine(boolean canDefine)
+  { if (canDefine) flags |= CAN_DEFINE; else flags &= ~CAN_DEFINE; }
+
+  /** True if bindings can be removed or replaced by other kinds of Location.*/
+  public boolean getCanRedefine() { return ( flags & CAN_REDEFINE) != 0; }
+  public void setCanRedefine(boolean canRedefine)
+  { if (canRedefine) flags |= CAN_REDEFINE; else flags &= ~CAN_REDEFINE; }
 
   /** True if this environment is locked - bindings cannot be added or removed. */
   public final boolean isLocked()
   {
-    return locked;
-  }
-
-  public final void setLocked(boolean locked)
-  {
-    this.locked = locked;
+    return (flags & (CAN_DEFINE|CAN_REDEFINE)) == 0;
   }
 
   public void setLocked ()
   {
-    this.locked = true;
+    flags &= ~(CAN_DEFINE|CAN_REDEFINE|CAN_IMPLICITLY_DEFINE);
   }
 
-  public Environment getPrevious ()
+  /** Return a location bound to (key, property).
+   * Create new unbound Location if no such Location exists. */
+  public final Location getLocation (Symbol key, Object property)
   {
-    return previous;
+    return getLocation(key, property, true);
   }
 
-  public void setPrevious (Environment previous)
+  /** Return a location bound to key (and null property).
+   * Create new unbound Location if no such Location exists. */
+  public final Location getLocation (Symbol key)
   {
-    this.previous = previous;
+    return getLocation(key, null, true);
+  }
+
+  /** Return a location bound to (key, property).
+   * Return null if no such Location exists. */
+  public final Location lookup (Symbol key, Object property)
+  {
+    return getLocation(key, property, false);
+  }
+
+  public abstract NamedLocation
+  lookup (Symbol name, Object property, int hash);
+
+  public final Location lookup (Symbol key)
+  {
+    return getLocation(key, null, false);
+  }
+
+  public abstract NamedLocation getLocation (Symbol key, Object property,
+					       boolean create);
+
+  public final Location getLocation (Object key, boolean create)
+  {
+    Object property = null;
+    if (key instanceof EnvironmentKey)
+      {
+	EnvironmentKey k = (EnvironmentKey) key;
+	key = k.getKeySymbol();
+	property = k.getKeyProperty();
+      }
+    Symbol sym = key instanceof Symbol ? (Symbol) key
+      : getSymbol((String) key);
+    return getLocation(sym, property, create);
+  }
+
+  public boolean isBound(Symbol key, Object property)
+  {
+    Location loc = lookup(key, property);
+    if (loc == null)
+      return false;
+    return loc.isBound();
+  }
+
+  public final boolean isBound(Symbol key)
+  {
+    return isBound(key, null);
+  }
+
+  public final boolean containsKey (Object key)
+  {
+    Object property = null;
+    if (key instanceof EnvironmentKey)
+      {
+	EnvironmentKey k = (EnvironmentKey) key;
+	key = k.getKeySymbol();
+	property = k.getKeyProperty();
+      }
+    Symbol sym = key instanceof Symbol ? (Symbol) key
+      : getSymbol((String) key);
+    return isBound(sym, property);
+  }
+
+  public Object get (Symbol key, Object property, Object defaultValue)
+  {
+    Location loc = lookup(key, property);
+    if (loc == null)
+      return defaultValue;
+    return loc.get(defaultValue);
+  }
+
+  public final Object get (EnvironmentKey key, Object defaultValue)
+  {
+    Symbol symbol = key.getKeySymbol();
+    Object property = key.getKeyProperty();
+    return get(symbol, property, defaultValue);
+  }
+
+  public final Object get(String key, Object defaultValue)
+  {
+    return get(getSymbol(key), null, defaultValue);
+  }
+
+  public Object get (Symbol sym)
+  {
+    Object unb = Location.UNBOUND;
+    Object val = get(sym, null, unb);
+    if (val == unb)
+      throw new UnboundLocationException(sym);
+    return val;
+  }
+
+  public final Object getFunction (Symbol key, Object defaultValue)
+  {
+    return get(key, EnvironmentKey.FUNCTION, defaultValue);
+  }
+
+  public final Object getFunction (Symbol sym)
+  {
+    Object unb = Location.UNBOUND;
+    Object val = get(sym, EnvironmentKey.FUNCTION, unb);
+    if (val == unb)
+      throw new UnboundLocationException(sym);
+    return val;
+  }
+
+  public final Object get (Object key)
+  {
+    Object property = null;
+    if (key instanceof EnvironmentKey)
+      {
+	EnvironmentKey k = (EnvironmentKey) key;
+	key = k.getKeySymbol();
+	property = k.getKeyProperty();
+      }
+    Symbol sym = key instanceof Symbol ? (Symbol) key
+      : getSymbol((String) key);
+    return get(sym, property, null);
+  }
+
+  public void put(Symbol key, Object property, Object newValue)
+  {
+    Location loc = getLocation(key, property);
+    if (loc.isConstant()) // FIXME - is this helpful?
+      define(key, property, newValue);
+    else
+      loc.set(newValue);
+  }
+
+  public abstract void define (Symbol key, Object property, Object newValue);
+
+  public final void put (Symbol key, Object newValue)
+  {
+    put(key, null, newValue);
+  }
+
+  public final Object put(Object key, Object newValue)
+  {
+    Location loc = getLocation(key, true);
+    Object oldValue = loc.get(null);
+    loc.set(newValue);
+    return oldValue;
+  }
+
+  public final void putFunction(Symbol key, Object newValue)
+  {
+    put(key, EnvironmentKey.FUNCTION, newValue);
+  }
+
+  public final Object put (String key, Object value)
+  {
+    return put((Object) key, value);
+  }
+
+  public Object remove (EnvironmentKey key)
+  {
+    Object value = get(key, null);
+    remove(key.getKeySymbol(), key.getKeyProperty());
+    return value;
+  }
+
+  public void remove (Symbol sym, Object property)
+  {
+    remove(getLocation(sym, property, false));
+  }
+
+  public final void remove (Symbol sym)
+  {
+    remove(sym, null);
+  }
+
+  public final void removeFunction (Symbol sym)
+  {
+    remove(sym, EnvironmentKey.FUNCTION);
+  }
+
+  public final Object remove (Object key)
+  {
+    Location loc = getLocation(key, false);
+    if (loc == null)
+      return null;
+    Object oldValue = loc.get(null);
+    remove(loc);
+    return oldValue;
+  }
+
+  public Namespace defaultNamespace()
+  {
+    // FIXME: return get("*package*, Namespace.getDefault())
+    return Namespace.getDefault();
+  }
+
+  public Symbol getSymbol (String name)
+  {
+    return defaultNamespace().getSymbol(name);
   }
 
   static final Hashtable envTable = new Hashtable(50);
-  static final Environment EmptyNamespace = getInstance("");
 
   public static Environment getInstance(String name)
   {
@@ -66,47 +284,20 @@ public class Environment extends NameMap implements Externalizable
 	Environment env = (Environment) envTable.get(name);
 	if (env != null)
 	  return env;
-	env = new Environment ();
+	env = new SimpleEnvironment ();
 	env.setName(name);
 	envTable.put(name, env);
 	return env;
       }
   }
 
-  public static Environment user () { return getCurrent(); }
+  /** Does not enumerate inherited Locations. */
+  public abstract LocationEnumeration enumerateLocations();
 
-  public static Object lookup_global (String name)
-       throws UnboundSymbol
-  {
-    Symbol binding = getCurrent().lookup(name);
-    if (binding == null)
-      throw new UnboundSymbol(name);
-    return binding.get ();
-  }
+  /** Does enumerate inherited Locations. */
+  public abstract LocationEnumeration enumerateAllLocations();
 
-  /** Define name (interned) to have a given value. */
-  public static void define_global (String name, Object new_value)
-  {
-    getCurrent().defineValue(name, new_value);
-  }
-
-  public static void defineFunction (String name, Object new_value)
-  {
-    defineFunction(user(), name, new_value);
-  }
-
-  public static void defineFunction (Environment env,
-				     String name, Object new_value)
-  {
-    Symbol binding = env.getSymbol(name);
-    binding.constraint.setFunctionValue(binding, new_value);
-  }
-
-  /** Define name (interned) to have a given value. */
-  public static void put_global (String name, Object new_value)
-  {
-    getCurrent().put (name, new_value);
-  }
+  protected abstract boolean hasMoreElements (LocationEnumeration it);
 
   /**
     * @deprecated
@@ -119,311 +310,35 @@ public class Environment extends NameMap implements Externalizable
 
   public static void setCurrent (Environment env)
   {
-    CallContext ctx = CallContext.getInstance();
-    ctx.curEnvironment = env;
+    CallContext.getInstance().curEnvironment = env;
   }
 
-  public static void setGlobal (Environment env)
+  public static Environment user () { return getCurrent(); }
+
+  public final void addLocation (NamedLocation loc)
   {
-    global = env;
+    addLocation(loc.getKeySymbol(), loc.getKeyProperty(), loc);
   }
 
-  public Environment ()
+  public abstract void addLocation (Symbol name, Object prop, Location loc);
+
+  public final void addLocation (EnvironmentKey key, Location loc)
   {
-    this(64);
+    addLocation(key.getKeySymbol(), key.getKeyProperty(), loc);
   }
 
-  public Environment (String name)
+  public static SimpleEnvironment make ()
   {
-    this();
-    setName(name);
+    return new SimpleEnvironment();
   }
 
-  public Environment (int capacity)
+  public static SimpleEnvironment make (String name)
   {
-    log2Size = 4;
-    while (capacity > (1 << log2Size))
-      log2Size++;
-    capacity = 1 << log2Size;
-    table = new Symbol[capacity];
-    mask = capacity - 1;
+    return new SimpleEnvironment(name);
   }
 
-  public Environment (Environment previous)
+  public static SimpleEnvironment make (String name, Environment parent)
   {
-    this ();
-    this.previous = previous;
-  }
-
-  public synchronized Symbol getSymbol (String name)
-  {
-    Symbol binding = lookup(name);
-    if (binding != null)
-      return binding;
-    /* FIXME
-    int hash = System.identityHashCode(name);
-    int index = Symbol.hashSearch(table, log2Size,mask, name, hash);
-    Symbol binding = table[index];
-    if (binding != null && binding != Symbol.hashDELETED)
-      return binding;
-    if (locked)
-      {
-	if (previous == null)
-	  throw new UnboundSymbol(name);
-	return previous.getSymbol(name);
-      }
-    */
-    binding = addSymbol(name, null);
-    binding.constraint = unboundConstraint;
-    return binding;
-  }
-
-  public static Symbol getCurrentSymbol (String name)
-  {
-    return getCurrent().getSymbol(name);
-  }
-
-  /**
-   * Search for a variable binding by name.
-   * @param sym the (interned) name of the binding to search for
-   * @return the value of the binding, or null if not found
-   */
-
-  public Symbol lookup (String name)
-  {
-    return lookup(name, System.identityHashCode(name));
-  }
-
-  private Symbol lookup (String name, int hash)
-  {
-    for (Environment env = this;  env != null;  )
-      {
-	synchronized (env)
-	  {
-	    int index = Symbol.hashSearch(env.table, env.log2Size, env.mask,
-					  name, hash);
-	    Symbol element = env.table[index];
-	    if (element != null && element != Symbol.hashDELETED)
-		return element;
-	    env = env.previous;
-	  }
-      }
-    return null;
-  }
-
-  /**
-   * Define the value binding for a symbol.
-   */
-  public Symbol defineValue (String name, Object value)
-  {
-    Symbol binding = getSymbol(name);
-    binding.constraint = trivialConstraint;
-    binding.value = value;
-    return binding;
-  }
-
-  /**
-   * Define the value or function binding for a symbol, as appropriate
-   */
-  public Symbol define (String name, Object value)
-  {
-    return defineValue(name, value);
-  }
-
-  public synchronized void addSymbol(Symbol binding)
-  {
-    // Rehash if over 2/3 full.
-    if (3 * num_bindings >= 2 * table.length)
-      rehash();
-    if (Symbol.hashSet(table, log2Size, binding) == null)
-      num_bindings++;
-  }
-
-  public Symbol addSymbol (String name, Object value)
-  {
-    Symbol binding = new Symbol(name);
-    binding.constraint = trivialConstraint;
-    binding.value = value;
-    addSymbol(binding);
-    return binding;
-  }
-
-  void rehash ()
-  {
-    int new_capacity = 2 * table.length;
-    Symbol[] new_table = new Symbol[new_capacity];
-
-    Symbol.hashInsertAll(new_table, log2Size + 1,
-			  table, log2Size);
-    table = new_table;
-    log2Size++;
-    mask = (mask << 1) | 1;
-  }
-
-  public Object remove (String name)
-  {
-    Environment env = this;
-    for (;;)
-      {
-	if (env == null)
-	  return null;
-	if (locked)
-	  throw new IllegalStateException("attempt to remove variable: "
-					  + name + " locked environment");
-	Environment previous;
-	synchronized (env)
-	  {
-	    Symbol[] env_tab = env.table;
-	    Named old = Symbol.hashDelete(env.table, env.log2Size, name);
-	    if (old != null)
-		return old;
-	    previous = env.previous;
-	  }
-	env = previous;
-      }
-  }
-
-  public Object remove (Object name)
-  {
-    return remove((String) name);
-  }
-
-  public synchronized void remove (Symbol binding)
-  {
-    String name = binding.getName();
-    if (locked)
-      throw new IllegalStateException("attempt to remove variable: "
-				      + name + " locked environment");
-    Symbol.hashDelete(table, log2Size, name);
-  }
-
-  public final boolean isBound(String name)
-  {
-    return get(name, Symbol.UNBOUND) != Symbol.UNBOUND;
-  }
-
-  public Object get(String name, Object defaultValue)
-  {
-    Symbol binding = lookup(name);
-    if (binding == null)
-      return defaultValue;
-    return binding.get(defaultValue);
-  }
-
-  /** Get the function binding for a symbol.
-   * If this Environment is a single-namespace language (such as Scheme).
-   * this is equivalent to getChecked.
-   * @exception gnu.mapping.UnboundSymbol the name has no function binding
-   */
-  public Object getFunction(String name)
-  {
-    return getChecked(name);
-  }
-
-  public Object put (/* interned */ String name, Object value)
-  {
-    Symbol binding = lookup (name);
-    if (binding == null)
-      {
-	define (name, value);
-	return null;
-      }
-    else if (! binding.isBound())
-      {
-	binding.set (value);
-        return null;
-      }
-    else
-      {
-	Object old_value = binding.get ();
-	binding.set (value);
-	return old_value;
-      }
-  }
-
-  public Object put (Object name, Object value)
-  {
-    return put ((String) name, value);
-  }
-
-  /** Set the function binding for a symbol.
-   * If this Environment is a single-namespace language (such as Scheme).
-   * this is equivalent to put.
-   */
-  public void putFunction(String name, Object value)
-  {
-    put(name, value);
-  }
-
-  /** Does not enumerate inherited Symbols. */
-  public SymbolEnumeration enumerateSymbols()
-  {
-    return new SymbolEnumeration(table, 1 << log2Size);
-  }
-
-  /** Does enumerate inherited Symbols. */
-  public SymbolEnumeration enumerateAllSymbols()
-  {
-    return new SymbolEnumeration(this);
-  }
-
-  public String toString ()
-  {
-    String name = getName();
-    if (name == null)
-      name = super.toString ();
-    return "#<environment " + name + '>';
-  }
-
-  /**
-   * Evaluate an expression in this Environment.
-   */
-  /*
-  final public Object
-  eval (Expression expr)
-  {
-    return expr.eval (this);
-  }
-  */
-
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-    out.writeObject(getName());
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-    setName((String) in.readObject());
-  }
-
-  public Object readResolve() throws ObjectStreamException
-  {
-    String name = getName();
-    Environment env = (Environment) envTable.get(name);
-    if (env != null)
-      return env;
-    envTable.put(name, this);
-    return this;
-   
-  }
-
-  public static Environment make ()
-  {
-    return new Environment();
-  }
-
-  /* Return type conflicts with gnu.commonlisp.lang.SymbolTable.make
-  public static Environment make (String name)
-  {
-    return new Environment(name);
-  }
-  */
-
-  public static Environment make (String name, Environment parent)
-  {
-    Environment env = new Environment(parent);
-    env.setName(name);
-    return env;
+    return new InheritingEnvironment(name, parent);
   }
 }

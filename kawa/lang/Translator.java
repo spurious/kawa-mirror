@@ -795,6 +795,8 @@ public class Translator extends Compilation
 
   public void setLineOf (Expression exp)
   {
+    if (exp instanceof QuoteExp)
+      return;
     if (exp.getFile () == null)
       exp.setFile(getFile());
     if (exp.getLine () == 0)

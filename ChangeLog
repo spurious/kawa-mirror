@@ -1,3 +1,7 @@
+2004-12-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (setLineOf): Do nothing if QuoteExp.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Partially convert pre-processor syntax, for JAXP

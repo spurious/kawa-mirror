@@ -233,9 +233,9 @@ public class Scheme extends Interpreter
       define_proc ("make-rectangular", "kawa.lib.numbers");
       define_proc ("make-polar", "kawa.lib.numbers");
       define_proc ("real-part", "kawa.lib.numbers");
-      define_proc ("imag-part", "kawa.standard.imag_part");
-      define_proc ("magnitude", "kawa.standard.abs");
-      define_proc ("angle", "kawa.standard.angle");
+      define_proc ("imag-part", "kawa.lib.numbers");
+      define_proc ("magnitude", "kawa.lib.numbers");
+      define_proc ("angle", "kawa.lib.numbers");
       define_proc ("exact->inexact", "kawa.standard.exact2inexact");
       define_proc ("inexact->exact", "kawa.standard.inexact2exact");
       define_proc ("number->string", "kawa.standard.number2string");

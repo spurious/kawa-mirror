@@ -78,7 +78,6 @@ acos.class \
 atan.class \
 sqrt.class \
 expt.class \
-imag_part.class angle.class \
 exact2inexact.class \
 inexact2exact.class \
 number2string.class \

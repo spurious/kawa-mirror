@@ -259,7 +259,7 @@ public class XQResolveNames extends ResolveNames
   protected Expression walkSetExp (SetExp exp)
   {
     Expression result = super.walkSetExp(exp);
-    Declaration decl = exp.binding;
+    Declaration decl = exp.getBinding();
     Object name;
     if (decl != null && ! getCompilation().immediate
 	&& (name = decl.getSymbol()) instanceof Symbol

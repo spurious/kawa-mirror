@@ -2957,9 +2957,8 @@ public class XQParser extends LispReader // should be extends Lexer
     comp.pop(lexp);
     if (retType != null)
       Convert.setCoercedReturnValue(lexp, retType, interpreter);
-    SetExp sexp = new SetExp (name, lexp);
+    SetExp sexp = new SetExp(decl, lexp);
     sexp.setDefining (true);
-    sexp.binding = decl;
     decl.noteValue(lexp);
     return sexp;
   }

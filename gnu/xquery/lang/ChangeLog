@@ -1,3 +1,9 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* XQuery.java: Use different SetExp constructor,
+	to avoid setting the 'binding' field, which will become private.
+	* XQResolveNames.java: Use SetExp's setBinding method.
+
 2005-01-25  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (registerEnvironment): Update Interpreter -> Language.

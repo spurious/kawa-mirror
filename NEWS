@@ -1,3 +1,13 @@
+Changed calling convention for --full-tailcalls to write results
+to a Consumer, usually a TreeList or something to be printed.
+A top-level ModuleBody now uses the same CpsProcedure convention.
+This is useful for generating xml or html.
+
+New libtool support allows kawa to be built as a shared library.
+
+The new configure flag --with-gcj uses gcj to compile
+Kawa to both .class files and native code.  This is experimental.
+
 Changes from Kawa 1.6.70 to 1.6.90.
 ==================================
 The reader (for Scheme and Lisp) has been re-written to be table-driven,

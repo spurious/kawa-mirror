@@ -1,3 +1,22 @@
+2001-05-08  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Add AC_OBJEXT and AC_CANONICAL_HOST (otherwise
+	make install tried to use libtool).
+	Change --enable-gcc-compiled to --with-gcj.
+	* libtool.m4, ltcf-c.sh, ltcf-cxx.sh, ltcf-gcj.sh, ltconfig, ltmain.sh:
+	New files, part of libtool support.
+	* Makefile.am (EXTRA_DIST):  Add new files.
+	* Make-rules:  Various cleanups for libtool support.
+	* */Makefile.am:  Various changes for libtool support etc.
+	* kawa/Makefile.am (EXTR_DIST):  Add Version.java.in.
+	* kawa/Shell.java:  Avoid removed PairWithPosition constructor.
+	* kawa/lang/Eval.java (eval, evalBody):  New method overloads.
+	(apply(Environment,CallContext)):  New method.
+	* kawa/standard/load.java (loadClassFile):  No longer test that inst
+	is a Procedure0 (it is now a CpsProcedure).
+	* kawa/standard/require.java (find):  Don't check if value is a
+	MdouleBody, since ModuleBody is now always Runnable.
+
 2001-05-01  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.91.

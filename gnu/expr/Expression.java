@@ -25,8 +25,30 @@ public abstract class Expression implements Printable
   {
     int line = getLine ();
     if (line > 0)
-      comp.method.compile_linenumber (line);
-    compile(comp, target);
+      {
+        comp.method.compile_linenumber (line);
+        compileNotePosition(comp, target);
+      }
+    else
+      compile(comp, target);
+  }
+
+  /** Compile, but take note of line number. */
+  public final void compileNotePosition(Compilation comp, Target target)
+  {
+    String saveFilename = comp.filename;
+    int savePosition = comp.position;
+    try
+      {
+        comp.filename = filename;
+        comp.position = position;
+        compile(comp, target);
+      }
+    finally
+      {
+        comp.filename = saveFilename;
+        comp.position = savePosition;
+      }
   }
 
   public final void compile (Compilation comp, Type type)

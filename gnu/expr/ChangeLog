@@ -1,3 +1,14 @@
+1999-08-22  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (error):  New methods, like those in Translator.
+	(addClass):  Use new ApplyExp constructor.
+	* ApplyExp.java (<init>):  New constructor.
+	(compile):  Use new Compilation.error methods.
+
+	* Expression.java (compileNotePosition):  New method.
+
+	* LambdaExp.java:  Provide a cache for evaluated value.
+
 1999-08-18  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (getName):  Use super.getName() instead of

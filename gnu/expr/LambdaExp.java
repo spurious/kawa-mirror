@@ -54,7 +54,7 @@ public class LambdaExp extends ScopeExp
   public LambdaExp nextSibling;
 
   /** A magic value to indicate there is no unique return continuation. */
-  final static ApplyExp unknownContinuation = new ApplyExp (null, null);
+  final static ApplyExp unknownContinuation = new ApplyExp ((Expression) null, null);
 
   /** The unique caller that calls this lambda.
       The value is null, if no callers have been seen.
@@ -952,8 +952,13 @@ public class LambdaExp extends ScopeExp
   public static String dumpZipPrefix;
   public static int dumpZipCounter;
 
+  /** A cache if this has already been evaluated. */
+  Procedure thisValue;
+
   public Object eval (Environment env)
   {
+    if (thisValue != null)
+      return thisValue;
     try
       {
 	String class_name = getJavaName ();
@@ -1025,10 +1030,10 @@ public class LambdaExp extends ScopeExp
 		throw new Error("internal error - "+ex);
 	      }
 	  }
-	Named named = (Named) inst;
-	if (named.name () == null)
-	  named.setName (this.name);
-
+	Procedure proc = (Procedure) inst;
+	if (proc.name () == null)
+	  proc.setName (this.name);
+        thisValue = proc;
 	return inst;
       }
     catch (java.io.IOException ex)

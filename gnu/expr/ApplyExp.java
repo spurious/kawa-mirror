@@ -26,6 +26,8 @@ public class ApplyExp extends Expression
 
   public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
 
+  public ApplyExp (Procedure p, Expression[] a) { func = new QuoteExp(p); args = a; }
+
   public Object eval (Environment env)
   {
     Object rator = func.eval(env);
@@ -134,15 +136,13 @@ public class ApplyExp extends Expression
 	// the rewrite pass is finished.
 	if (exp.args.length < func_lambda.min_args)
 	  {
-	    System.err.print ("warning:  too few args for ");
-	    System.err.println(func_name);
+            comp.error('w', "too few args for " + func_name);
 	    func_lambda = null;
 	  }
 	else if (func_lambda.max_args >= 0
 		 && exp.args.length > func_lambda.max_args)
 	  {
-	    System.err.print ("warning:  too many args for ");
-	    System.err.println(func_name);
+            comp.error('w', "too many args for " + func_name);
 	    func_lambda = null;
 	  }
 	else if (! func_lambda.getCanRead() && ! func_lambda.getInlineOnly()

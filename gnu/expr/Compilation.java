@@ -691,7 +691,7 @@ public class Compilation
 	    if (! var.isSimple())
 	      var = var.nextVar();  // Skip xxIncoming fake fields.
 	  }
-	body = new ApplyExp(new QuoteExp(new PrimProcedure(method, lexp)), args);
+	body = new ApplyExp(new PrimProcedure(method, lexp), args);
 	lexp.heapFrame = null;
       }
 
@@ -881,5 +881,24 @@ public class Compilation
     Field field = mainClass.addField(fieldName, typeBinding, Access.STATIC);
     bindingFields.put(name, field);
     return field;
+  }
+
+  String filename;
+  int position;
+
+  public void error(char severity, String message)
+  {
+    error(severity, filename, position >> 12, position & ((1 << 12) - 1), message);
+  }
+
+  public void error(char severity, String filename, int line, int column, String message)
+  {
+    error(new gnu.text.SourceError(severity, filename, line, column, message));
+  }
+
+  public void error(gnu.text.SourceError err)
+  {
+    // FIXME - use SourceMessages framework!
+    System.err.println(err);
   }
 }

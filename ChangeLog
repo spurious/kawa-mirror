@@ -1,3 +1,13 @@
+2004-09-05  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/ifp.java (allowElseList): New flag.
+	(<init>): New constructor.
+	(rewrite):  Rewrite.
+
+	* kawa/lang/ListPat.java (match):  Check that list isn't too long.
+	Based on a patch (8/19) from Dominique Boucher
+	<dominique.boucher@nuecho.com>.
+
 2004-08-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/readchar.java (readChar, peekChar): New static fields.

@@ -33,6 +33,8 @@ public class ListPat extends Pattern
 	else
 	  break;
       }
+    if (i == max && obj != LList.Empty)
+      return false;
     for ( ; i < max; i++)
       vars[start_vars + i] = default_val;
     return true;

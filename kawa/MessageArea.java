@@ -14,7 +14,6 @@ import java.util.*;
  */
 public class MessageArea extends TextArea
   implements KeyListener, TextListener {
-  private boolean doFocus = false;
   private kawa.TextAreaWriter out_stream;
   private PrintWriter out;
   private PrintWriter err;
@@ -31,10 +30,9 @@ public class MessageArea extends TextArea
    *
    * @param     focus    specifies if this is focus traversable
    */
-  public MessageArea(boolean focus, gnu.text.QueueReader in) {
+  public MessageArea(gnu.text.QueueReader in) {
     super();
 
-    this.doFocus = focus;
     this.in = in;
 
     out_stream = new kawa.TextAreaWriter(this);
@@ -46,11 +44,8 @@ public class MessageArea extends TextArea
     addTextListener(this);
   }
 
-  public boolean isFocusTraversable() {
-    return(doFocus && super.isFocusTraversable());
-  }
-
-  void enter () {
+  void enter ()
+  {
 	int pos = getCaretPosition();
 	String str = getText();
 	int len = str.length();

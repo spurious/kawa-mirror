@@ -1,3 +1,15 @@
+2002-10-21  Per Bothner  <per@bothner.com>
+
+	* kawa/MessageArea.java (doFocus):  Remove field - always true.
+	(<init>):  Don't set focus.
+	(isFocusTraversable):  Remove - now equivalent to super method.
+	* kawa/GuiConsole.java (<init>):   Change new MessageArea to match.
+
+2002-10-14  Francisco Vides Fernández <pvides@dedalo.ws>
+
+	* kawa/GuiConsole.java (<init>):  Pass true for focus argument
+	in Message constructor.
+
 2002-10-20  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (scanForDefinitions):  Change to create

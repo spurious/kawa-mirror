@@ -47,7 +47,7 @@ public class GuiConsole extends Frame implements ActionListener {
     this.environment = environment;
 
     in_r = new gnu.text.QueueReader ();
-    message = new MessageArea(false, in_r);
+    message = new MessageArea(in_r);
     window_number++;
     kawa.repl.exitIncrement();
 

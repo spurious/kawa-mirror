@@ -179,6 +179,7 @@ public class ApplyExp extends Expression
 	  exp.args[i].compile (comp, Target.pushObject);
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
+	func_lambda.allocChildClasses(comp);
 	func_lambda.allocParameters(comp, null);
 	popParams (code, func_lambda);
 	func_lambda.enterFunction(comp, null);

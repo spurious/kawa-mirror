@@ -9,6 +9,11 @@ exact->inexact only implemented for RealNums, not other Complex.
 
 Fix scheme-window so #!eof closes window.
 
+Optimize eqv? so if one of the arguments is constant and
+not Char or Numeric, inline it the same way eq? is.
+(This helps case when the labels are symbols,
+which help the "lattice" benchmark.)
+
 Implement source-filename source-line source-column macros.
 Macro-expansions lose line number information.
 Fix when switching to syntatic closures.
@@ -133,3 +138,6 @@ was implied, the corresponding Listener interface is also implied.
 (For example a METHOD-NAME of mousePressed implies an EVENT-TYPE
 of <java.awt.event.MouseEvent>, and hence an interface of
 <java.awt.event.MouseListener>.)
+
+BENCHMARKS
+http://www.ccs.neu.edu/home/will/Twobit/kvwbenchmarks.html

@@ -1,3 +1,7 @@
+1999-04-22  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/standard/object.scm (rewrite):  Do setClassMethod on $finit$.
+
 1999-04-09  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/Translator.java (systemClassLoader):  New private field.

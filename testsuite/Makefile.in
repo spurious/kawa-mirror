@@ -39,7 +39,11 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 PACKAGE = @PACKAGE@
+JAVAC = @JAVAC@
 VERSION = @VERSION@
+EXTRA_OBJ = @EXTRA_OBJ@
+JAVA_VERSION = @JAVA_VERSION@
+EXTRA_MISC = @EXTRA_MISC@
 
 JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
@@ -48,7 +52,10 @@ KAWA = KAWALIB=.. ../kawa/kawa
 KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
 KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
 
-SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm
+MISC_1_1 = check-obj
+
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
+  obj-test.scm
 CLEANFILES = tmp?
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -138,7 +145,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 all:
 
-check:  check-scm check-num check-mac
+check:  check-scm check-num check-mac @EXTRA_MISC@
 
 check-scm:
 	rm -rf tmp?
@@ -151,6 +158,9 @@ check-num:
 check-mac:
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
+
+check-obj:
+	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 .SUFFIXES:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -1,3 +1,8 @@
+Mon Mar 17 22:05:01 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* obj-test.scm:  New test.  Test record feature (if JDK 1.1).
+	* Makefile.am, Makefile.in:  Update.
+
 Mon Feb  3 22:58:45 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Makefile.am:  KAWATEST now uses kawa shell script.

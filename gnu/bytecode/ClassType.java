@@ -395,7 +395,7 @@ public class ClassType extends ObjectType
    * @param filter to select methods to return
    * @param searchSupers 0 if only current class should be searched,
    *   1 if superclasses should also be searched,
-   *   2 if super-interfaces should also be search
+   *   2 if super-interfaces should also be searched
    * @return a fresh array containing the methods satisfying the filter
    */
   public Method[] getMethods (Filter filter, int searchSupers)

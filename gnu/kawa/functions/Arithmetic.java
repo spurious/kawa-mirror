@@ -19,9 +19,9 @@ public class Arithmetic
   public static final int BIGDECIMAL_CODE = 5;
   /** Promotion code for gnu.math.RatNum. */
   public static final int RATNUM_CODE = 6;
-  /** Promoition code float/Float. */
+  /** Promotion code float/Float. */
   public static final int FLOAT_CODE = 7;
-  /** Promoition code double/Double. */
+  /** Promotion code double/Double. */
   public static final int DOUBLE_CODE = 8;
   /** Promotion code for gnu.math.FloNum. */
   public static final int FLONUM_CODE = 9;

@@ -65,10 +65,20 @@ public abstract class RealNum extends Complex
     return (RealNum)(x.mul(y));
   }
 
+  public static RealNum div (RealNum x, RealNum y)
+  {
+    return (RealNum)(x.div(y));
+  }
+
   /* These are defined in Complex, but have to be overridden. */
   public abstract Numeric add (Object obj, int k);
   public abstract Numeric mul (Object obj);
   public abstract Numeric div (Object obj);
+
+  public RealNum angle()
+  {
+    return IntNum.zero();
+  }
 
   public Numeric abs ()
   {
@@ -112,5 +122,29 @@ public abstract class RealNum extends Complex
 	break;
       }
     return new DFloNum (d);
+  }
+
+  public Complex exp ()
+  {
+    return new DFloNum(Math.exp(doubleValue()));
+  }
+
+  public Complex log ()
+  {
+    double x = doubleValue();
+    if (x < 0)
+      return DComplex.log(x, 0.0);
+    return new DFloNum(Math.log(x));
+  }
+
+  public final Complex sin() { return new DFloNum(Math.sin(doubleValue())); }
+
+  public final Complex sqrt ()
+  {
+    double d = doubleValue();
+    if (d >= 0)
+      return new DFloNum(Math.sqrt(d));
+    else
+      return DComplex.sqrt(d, 0);
   }
 }

@@ -1,3 +1,13 @@
+Tue Jan 21 18:25:50 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Complex.java (doubleRealValue):  Synonym for doubleValue();
+	(polar, power, abs, angle, div, div_reversed, exp, log, sqrt):  New.
+	* DComplex.java (div, power, log, sqrt, hypot):  New methods.
+	* RealNum.java (dov, angle, exp, log, sin, sqrt):  New methods.
+	* Unit.java (sqrt): New (placeholder) method.
+	(mul):  Add extra simplifications.
+	* MulUnit.java (sqrt):  New method.
+
 Mon Jan 20 15:58:50 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* Numeric.java:  Inherit from java.lang.Number.

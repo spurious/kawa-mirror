@@ -27,19 +27,19 @@ public class Unit extends Quantity
 	unit2 = Unit.Empty;
 	power2 = 0;
       }
-    if (power1 == 0)
+    if (power1 == 0 || unit1 == Unit.Empty)
       {
 	unit1 = unit2;
 	power1 = power2;
 	unit2 = Unit.Empty;
 	power2 = 0;
       }
-    if (unit2 == Unit.Empty)
+    if (power2 == 0 || unit2 == Unit.Empty)
       {
 	if (power1 == 1)
 	  return unit1;
 	if (power1 == 0)
-	  return unit2;
+	  return Unit.Empty;
       }
     if (unit1 instanceof MulUnit)
       {
@@ -134,6 +134,13 @@ public class Unit extends Quantity
     if (y.words != null)
       throw new ArithmeticException("Unit raised to bignum power");
     return pow (this, y.ival);
+  }
+
+  public Unit sqrt ()
+  {
+    if (this == Unit.Empty)
+      return this;
+    throw new RuntimeException ("unimplemented Unit.sqrt");
   }
 
   public static java.util.Hashtable unitTable = new java.util.Hashtable ();

@@ -14,6 +14,7 @@ public abstract class Complex extends Quantity
 
   public double doubleValue () { return re().doubleValue (); }
   public double doubleImagValue () { return im().doubleValue (); }
+  public final double doubleRealValue () { return doubleValue (); }
   public long longValue () { return re().longValue(); }
 
   public static Complex make (RealNum re, RealNum im)
@@ -32,14 +33,39 @@ public abstract class Complex extends Quantity
     return new DComplex(re, im);
   }
 
-  /*
-  public RealNum abs ()
+  public static DComplex polar (double r, double t)
   {
-    Double real = re().as_double ();
-    Double imag = im().as_double ();
-    return Math.sqrt (real * real + imag * imag);
+    return new DComplex(r * Math.cos(t), r * Math.sin(t));
   }
-  */
+
+  public static DComplex polar (RealNum r, RealNum t)
+  {
+    return polar(r.doubleValue(), t.doubleValue());
+  }
+
+  public static Complex power (Complex x, Complex y)
+  {
+    if (y instanceof IntNum)
+      return (Complex) x.power((IntNum) y);
+    double x_re = x.doubleRealValue();
+    double x_im = x.doubleImagValue();
+    double y_re = y.doubleRealValue();
+    double y_im = y.doubleImagValue();
+    if (x_im == 0.0 && y_im == 0
+	&& (x_re >= 0 || Double.isInfinite(x_re) || Double.isNaN(x_re)))
+      return new DFloNum (Math.pow (x_re, y_re));
+    return DComplex.power (x_re, x_im, y_re, y_im);
+  }
+
+  public Numeric abs ()
+  {  
+    return new DFloNum(DComplex.hypot(doubleRealValue(), doubleImagValue()));
+  }
+
+  public RealNum angle()
+  {
+    return new DFloNum(Math.atan2(doubleImagValue(), doubleRealValue()));
+  }
 
   public static boolean equals (Complex x, Complex y)
   {
@@ -135,15 +161,53 @@ public abstract class Complex extends Quantity
     throw new IllegalArgumentException ();
   }
 
+  public static Complex div (Complex x, Complex y)
+  {
+    if (! x.isExact () || ! y.isExact ())
+      return DComplex.div (x.doubleRealValue(), x.doubleImagValue(),
+			   y.doubleRealValue(), y.doubleImagValue());
+
+    RealNum x_re = x.re();
+    RealNum x_im = x.im();
+    RealNum y_re = y.re();
+    RealNum y_im = y.im();
+
+    RealNum q = RealNum.add (RealNum.mul(y_re, y_re),
+			     RealNum.mul(y_im, y_im), 1);
+    RealNum n = RealNum.add(RealNum.mul(x_re, y_re),
+			    RealNum.mul(x_im, y_im), 1);
+    RealNum d = RealNum.add(RealNum.mul(x_im, y_re),
+			    RealNum.mul(x_re, y_im), -1);
+    return Complex.make(RealNum.div(n, q), RealNum.div(d, q));
+  }
+
   public Numeric div (Object y)
   {
-    throw new Error ("Complex.div not implemented yet!");   //FIXME!
+    if (y instanceof Complex)
+      return div (this, (Complex) y);
+    return ((Numeric)y).div_reversed (this);
   }
 
-  public Numeric abs ()
+  public Numeric div_reversed (Numeric x)
   {
-    throw new Error ("Complex.abs not implemented yet!");   //FIXME!
+    if (x instanceof Complex)
+      return div ((Complex)x, this);
+    throw new IllegalArgumentException ();
+  }
+
+  public Complex exp ()
+  {
+    return polar (Math.exp(doubleRealValue()), doubleImagValue());
   }
 
 
+  public Complex log ()
+  {
+    return DComplex.log(doubleRealValue(), doubleImagValue());
+  }
+  
+  public Complex sqrt ()
+  {
+    return DComplex.sqrt(doubleRealValue(), doubleImagValue());
+  }
 }

@@ -81,18 +81,18 @@ public abstract class Procedure implements Named, Printable
   public int numArgs() { return 0xfffff000; }
 
   /* CPS: ??
-  public void apply1(Object arg, CallStack stack, CallFrame rlink, int rpc)
+  public void apply1(Object arg, CallContext stack, CallFrame rlink, int rpc)
   {
     context.value = apply1(arg);
     context.frame = rlink;
     context.pc = rpc;
   }
   */
-  /** Call this Procedure using the explicit-CallStack-convention.
+  /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */
 
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
     stack.value = applyN(stack.args);
   }

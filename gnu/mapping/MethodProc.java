@@ -9,12 +9,6 @@ import gnu.bytecode.Type;
 
 public abstract class MethodProc extends ProcedureN
 {
-  /** Return a buffer that can contain decoded (matched) arguments. */
-  public Object getVarBuffer()
-  {
-    return new Object[maxArgs()];
-  }
-
   /** Test if method is applicable to an invocation with given arguments.
    * Returns -1 if no; 1 if yes; 0 if need to check at run-time. */
   public int isApplicable(Type[] argTypes)
@@ -55,28 +49,69 @@ public abstract class MethodProc extends ProcedureN
   }
 
   /** Match the incoming arguments.
+   * @param ctx where to save the matched result on success
    * @param args the incoming argument list
-   * @param vars where to save the matched result on success
-   * @return null if the match succeeded, else an exception
-   * Note: This is not a good API, as creating a RuntimException is expensive!
+   * @return non-negative if the match succeeded, else negative
    */
-  public abstract RuntimeException match (Object vars, Object[] args);
+  public abstract int match (CallContext ctx, Object[] args);
+  // FUTURE:
+  // On success, vars has been initialized so vars.run() will work.
+  // public abstract int match(CallContext vars);
+
+  /** Return code from match:  Unspecified failure. */
+  public static final int NO_MATCH = -1;
+
+  /** Return code from match:  Too few actual arguments.
+   * The lower half is the minimum number of arguments (if not 0xffff). */
+  public static final int NO_MATCH_TOO_FEW_ARGS = 0xfff10000;
+
+  /** Return code from match:  Too many actual arguments.
+   * The lower half is the maximum number of arguments (if not 0xffff). */
+  public static final int NO_MATCH_TOO_MANY_ARGS = 0xfff20000;
+
+  /** Return code from match:  Ambigious which method to select. */
+  public static final int NO_MATCH_AMBIGUOUS = 0xfff30000;
+
+  /** Return code from match: Invalid argument type.
+   * In that case the lower half is the 0-origin index of the first
+   * argument that does not match. */
+  public static final int NO_MATCH_BAD_TYPE = 0xfff40000;
 
   public Object match (Object[] args)
   {
-    Object vars = getVarBuffer();
-    return match(vars, args) == null ? vars : null;
+    CallContext ctx = new CallContext();
+    return match(ctx, args) == 0 ? ctx : null;
+    // FUTURE:
+    // vars.setArgs(args);
+    // return match(vars) == 0 ? vars : null;
   }
 
-  public abstract Object applyV(Object vars);
+  public abstract Object applyV(CallContext ctx);
+  // FUTURE:
+  // ctx.run();
+
+  public static RuntimeException
+  matchFailAsException(int code, Procedure proc, Object[] args)
+  {
+    int arg = (short) code;
+    code &= 0xffff0000;
+    if (code == NO_MATCH_TOO_FEW_ARGS || code == NO_MATCH_TOO_MANY_ARGS)
+      return new WrongArguments(proc, args.length);
+    if (code != NO_MATCH_BAD_TYPE)
+      arg = WrongType.ARG_UNKNOWN;
+    throw new WrongType(proc, arg, null);
+  }
 
   public Object applyN(Object[] args)
   {
     checkArgCount(this, args.length);
-    Object vars = getVarBuffer();
-    RuntimeException err = match(vars, args);
-    if (err != null)
-      throw err;
+    CallContext vars = new CallContext();
+    int err = match(vars, args);
+    if (err != 0)
+      throw matchFailAsException(err, this, args);
+    // FUTURE:
+    // vars.run();
+    // return vars.getResult();
     return applyV(vars);
   }
 

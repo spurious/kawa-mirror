@@ -11,40 +11,39 @@ public abstract class CpsProcedure extends MethodProc
   {
   }
 
-  public abstract void apply (CallStack stack);
+  public abstract void apply (CallContext stack);
 
   public Object applyN (Object[] args)
   {
-    CallStack stack = new CallStack();
+    CallContext stack = new CallContext();
     stack.args = args;
     stack.proc = this;
     stack.run();
     return stack.value;
-  }
-
-  public Object getVarBuffer()
-  {
-    return new CallStack();
   }
 
   // FIXME - only checks argument length.
-  public RuntimeException match (Object vars, Object[] args)
+  public int match (CallContext ctx, Object[] args)
   {
-    CallStack stack = (CallStack) vars;
     int argCount = args.length;
     int num = numArgs();
-    if (argCount < (num & 0xFFF)
-	|| (num >= 0 && argCount > (num >> 12)))
-      return new WrongArguments(this, argCount);
-    stack.args = args;
-    stack.proc = this;
-    return null;
+    int min = num & 0xFFF;
+    if (argCount < min)
+      return NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+        if (argCount > max)
+          return NO_MATCH_TOO_MANY_ARGS|max;
+      }
+    ctx.args = args;
+    ctx.proc = this;
+    return 0;
   }
 
-  public Object applyV(Object vars)
+  public Object applyV(CallContext ctx)
   {
-    CallStack stack = (CallStack) vars;
-    stack.run();
-    return stack.value;
+    ctx.run();
+    return ctx.value;
   }
 }

@@ -1,3 +1,24 @@
+2000-08-17  Per Bothner  <per@bothner.com>
+
+	* CallStack.java:  Renamed to ...
+	* CallContext.java:  Renamed from CallStack.java.
+	(value1, value2, value3, value4, values, ivalue1, ivalue2): New fields.
+	(count, where):  New fields.
+	(getArgAsObject, setArgs, setArgsN):  New methods.
+	* Makefile.am, Procedure.java, CallFrame.java:  Update accordingly.
+	* MethodProc.java (applyV):  Takes CallContext, not Object.
+	(getVarBuffer):  Removed - calls replaced by 'new CallContext()'.
+	(match):  Return an int return code, not RuntimeException.
+	(NO_MATCH, NO_MATCH_TOO_FEW_ARGS, NO_MATCH_TOO_MANY_ARGS,
+	NO_MATCH_AMBIGUOUS, NO_MATCH_BAD_TYPE):  New match return codes.
+	(matchFailAsException):  Convert int return code to RuntimeException.
+	* CpsProcedure.java:  Update to match MethodProc changes.
+	(getVarBuffer):  Removed method.
+	
+	* OutPort.java (numberFormat, objectFormat):  New fields.
+	(print(primitive-type)):  If numberFormat is non-null, use it.
+	(print(Object)):  If objectFormat is non-null, use it.
+
 2000-06-17  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java:  Moved from gnu.expr.

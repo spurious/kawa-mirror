@@ -30,7 +30,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
     ctx.run();
   }
 
-  public Object apply0 ()
+  public Object apply0 () throws Throwable
   {
     CallContext ctx = new CallContext();
     ctx.values = Values.noArgs;

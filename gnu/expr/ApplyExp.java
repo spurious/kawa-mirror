@@ -35,7 +35,7 @@ public class ApplyExp extends Expression
     args = a;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     Procedure proc = (Procedure) func.eval(env);
     int n = args.length;
@@ -45,7 +45,7 @@ public class ApplyExp extends Expression
     return proc.applyN (vals);
   }
 
-  public void eval (Environment env, CallContext ctx)
+  public void eval (Environment env, CallContext ctx) throws Throwable
   {
     Procedure proc = (Procedure) func.eval(env);
     int n = args.length;
@@ -480,6 +480,14 @@ public class ApplyExp extends Expression
       {
 	vals[i] = ((QuoteExp) (exp.args[i])).getValue();
       }
-    return new QuoteExp(proc.applyN(vals));
+    try
+      {
+	return new QuoteExp(proc.applyN(vals));
+      }
+    catch (Throwable ex)
+      {
+	// Should emit error message or warning.  FIXME. 
+	return null;
+      }
   }
 }

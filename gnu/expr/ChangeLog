@@ -1,3 +1,15 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* Expression.java, ApplyExp.java, BeginExp.java, IfExp.java,
+	ModuleExp.java, SetExp.java, SynchronizedExp.java, TryExp.java (eval):
+	Now specify throws Throwable.
+	* ModuleExp.java (evalModule):  Likewise.
+	Use CallContext's new runUntilDone method.
+	* GenericProc.java, ModuleBody.java (apply* methods):   Likewise.
+	* PrimProcedure.java (applyV):  Now throws Throwable, so on an
+	InvocationTargetException just re-throw target exception.
+	* ApplyExp.java (inlineIfConstant):  Catch Throwable.
+
 2001-10-16  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* Compilation.java (allocClass(ModuleExp)): Replaces 

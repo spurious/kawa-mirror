@@ -39,7 +39,7 @@ public class GenericProc extends MethodProc
       maxArgs = n;
   }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
     MethodProc best = null;
@@ -110,7 +110,7 @@ public class GenericProc extends MethodProc
     return NO_MATCH;
   }
 
-  public Object applyV(CallContext ctx)
+  public Object applyV(CallContext ctx) throws Throwable
   {
     return ((MethodProc) ctx.value1).applyV((CallContext) ctx.value2);
   }

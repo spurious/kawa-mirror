@@ -114,7 +114,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     return 0;
   }
 
-  public Object applyV (CallContext ctx)
+  public Object applyV (CallContext ctx) throws Throwable
   {
     int arg_count = argTypes.length;
     boolean is_constructor = op_code == 183;
@@ -146,15 +146,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     catch (java.lang.reflect.InvocationTargetException ex)
       {
 	Throwable th = ex.getTargetException();
-	if (th instanceof RuntimeException)
-	  throw (RuntimeException) th;
-	if (th instanceof Error)
-	  throw (Error) th;
-	throw new WrappedException(th);
-      }
-    catch (Exception ex)
-      {
-	throw new RuntimeException("apply not implemented for PrimProcedure "+this+" - "+ ex);
+	throw th;
       }
   }
 

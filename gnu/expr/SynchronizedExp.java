@@ -13,7 +13,7 @@ public class SynchronizedExp extends Expression
     this.body = body;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     Object value = object.eval(env);
     synchronized (value)

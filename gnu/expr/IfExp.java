@@ -26,7 +26,7 @@ public class IfExp extends Expression
     return Interpreter.defaultInterpreter; // FIXME
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     Interpreter interpreter = getInterpreter();
     if (interpreter.isTrue((test.eval (env))))
@@ -37,7 +37,7 @@ public class IfExp extends Expression
       return interpreter.noValue();
   }
 
-  public void eval (Environment env, CallContext ctx)
+  public void eval (Environment env, CallContext ctx) throws Throwable
   {
     Interpreter interpreter = getInterpreter();
     if (interpreter.isTrue((test.eval (env))))

@@ -10,13 +10,13 @@ import gnu.mapping.*;
 
 public abstract class Expression implements Printable
 {
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     throw new RuntimeException ("internal error - "
 			        + getClass() + ".eval called");
   }
 
-  public void eval (Environment env, CallContext ctx)
+  public void eval (Environment env, CallContext ctx) throws Throwable
   {
     Object val = eval(env);
     ctx.writeValue(val);

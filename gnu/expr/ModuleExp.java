@@ -34,7 +34,7 @@ public class ModuleExp extends LambdaExp
   {
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     //if (thisValue != null)
     /// return thisValue;
@@ -153,7 +153,7 @@ public class ModuleExp extends LambdaExp
       }
   }
 
-  public final Object evalModule (Environment env)
+  public final Object evalModule (Environment env) throws Throwable
   {
     CallContext ctx = new CallContext();
     ctx.values = Values.noArgs;
@@ -161,7 +161,7 @@ public class ModuleExp extends LambdaExp
     return Values.make((gnu.lists.TreeList) ctx.vstack);
   }
 
-  public final void evalModule (Environment env, CallContext ctx)
+  public final void evalModule (Environment env, CallContext ctx) throws Throwable
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -186,7 +186,7 @@ public class ModuleExp extends LambdaExp
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
 	    ctx.proc = mod;
 	  }
-	ctx.run();
+	ctx.runUntilDone();
       }
     finally
       {

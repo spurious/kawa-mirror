@@ -27,7 +27,7 @@ public class TryExp extends Expression
     this.finally_clause = finally_clause;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     if (catch_clauses != null)
       throw new RuntimeException("internal error - TryExp.eval called");

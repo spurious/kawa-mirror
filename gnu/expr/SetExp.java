@@ -69,7 +69,7 @@ public class SetExp extends Expression
     new_value = val;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     if (isSetIfUnbound())
       {

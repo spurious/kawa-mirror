@@ -63,7 +63,7 @@ public class BeginExp extends Expression
     length = exps.length;
   }
 
-  public Object eval (Environment env)
+  public Object eval (Environment env) throws Throwable
   {
     int n = length;
     int i;

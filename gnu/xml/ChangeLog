@@ -1,3 +1,10 @@
+2004-05-05  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLHandler.java.in (emitCDATA):  New method.
+ 	* ParsedXMLToConsumer.java (emitCDATA):  New method.
+	* XMLParser.java.in (parse):  Call emitCDATA if we saw CDATA.
+	* XMLPrinter.java (writeCDATA):  New method.
+
 2004-04-18  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLToConsumer.java (emitComment, emitProcessingInstruction):

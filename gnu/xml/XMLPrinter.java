@@ -415,6 +415,30 @@ public class XMLPrinter extends PrintConsumer
     prev = '>';
   }
 
+  public void writeCDATA (char[] chars, int offset, int length)
+  {
+    closeTag();
+    print("<![CDATA[");
+    int limit = offset+length;
+    // Look for and deal with embedded "]]>".  This can't happen with
+    // data generated from XML, but maybe somebody generated invalid CDATA.
+    for (int i = offset;  i < limit - 2;  i++)
+      {
+	if (chars[i] == ']' && chars[i+1] == ']' && chars[i+2] == '>')
+	  {
+	    if (i > offset)
+	      super.write(chars, offset, i - offset);
+	    print("]]]><![CDATA[]>");
+	    offset = i + 3;
+	    length = limit - offset;
+	    i = i + 2;
+	  }
+      }
+    super.write(chars, offset, length);
+    print("]]>");
+    prev = '>';
+  }
+
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length)
   {

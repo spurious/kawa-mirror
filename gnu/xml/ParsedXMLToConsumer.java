@@ -308,6 +308,15 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     base.write(data, start, length);
   }
 
+  public void emitCDATA(char[] data, int start, int length)
+  {
+    closeStartTag();
+    if (base instanceof XConsumer)
+      ((XConsumer) base).writeCDATA(data, start, length);
+    else
+      emitCharacters(data, start, length);
+  }
+
   public void emitBeginElement(char[] data, int start, int count)
   {
     MappingInfo info = lookupTag(data, start, count);

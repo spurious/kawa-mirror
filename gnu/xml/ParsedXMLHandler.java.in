@@ -60,6 +60,14 @@ public class @ParsedXMLHandler@
   {
   }
 
+  /** Process a CDATA section.
+   * The data (starting at start for length @CHAR@s).
+   * Does not include the delimiters (i.e. "<![CDATA[" and "]]>" are excluded). */
+  public void emitCDATA(@CHAR@[] text, int start, int length)
+  {
+    emitCharacters(text, start, length);
+  }
+
   /** Process a processing incluction. */
   public void emitProcessingInstruction(@CHAR@[] buffer,
                                         int target, int tlength,

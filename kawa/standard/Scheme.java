@@ -963,6 +963,6 @@ public class Scheme extends LispInterpreter
   {
     Scheme interp = new Scheme();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 }

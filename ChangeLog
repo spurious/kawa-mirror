@@ -1,3 +1,9 @@
+2004-01-09  Per Bothner  <bothner@bothner.com>
+
+	* kawa/repl.java:  Use new Environment setGlobal method.
+	* kawa/standard/Scheme.java (registerEnvironment):  Update setCurrent
+	to setGlobal.
+
 2003-12-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions):  Fix thinko -

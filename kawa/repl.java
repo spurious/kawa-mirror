@@ -180,7 +180,7 @@ public class repl extends Procedure0or1
 	if (interp != null)
 	  {
 	    Interpreter.defaultInterpreter = interp;
-	    Environment.setCurrent(interp.getEnvironment());
+	    Environment.setGlobal(interp.getEnvironment());
 	    return interp;
 	  }
       }
@@ -192,7 +192,7 @@ public class repl extends Procedure0or1
     if (Interpreter.defaultInterpreter == null)
       {
 	Interpreter.defaultInterpreter = Interpreter.getInstance(null);
-	Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
+	Environment.setGlobal(Interpreter.defaultInterpreter.getEnvironment());
       }
     return Interpreter.defaultInterpreter;
   }
@@ -577,7 +577,7 @@ public class repl extends Procedure0or1
 	      {
 		Interpreter.defaultInterpreter = interpreter;
 		if (previous == null)
-		  Environment.setCurrent(interpreter.getEnvironment());
+		  Environment.setGlobal(interpreter.getEnvironment());
 	      }
 	    else
 	      {

@@ -600,7 +600,7 @@ public class LambdaExp extends ScopeExp
 	      {
 		code.emitDup(ctype);
 		code.emitPushString(name);
-		code.emitPutField(comp.nameField);
+		code.emitInvokeVirtual(comp.setNameMethod);
 	      }
 	    // Set numArgs field.
 	    code.emitDup(ctype);
@@ -1326,7 +1326,7 @@ public class LambdaExp extends ScopeExp
 	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
 	Class clas = loader.loadClass (class_name, true);
 	/* Pass literal values to the compiled code. */
-	for (Initializer init = comp.clinitChain;  init != null;
+	for (Literal init = comp.literalsChain;  init != null;
 	     init = init.next)
 	  {
 	    /* DEBUGGING:
@@ -1337,9 +1337,8 @@ public class LambdaExp extends ScopeExp
 	    */
 	    try
 	      {
-                if (init instanceof Literal)
-                  clas.getDeclaredField(init.field.getName())
-                    .set(null, ((Literal) init).value);
+		clas.getDeclaredField(init.field.getName())
+		  .set(null, init.value);
 	      }
 	    catch (java.lang.NoSuchFieldException ex)
 	      {

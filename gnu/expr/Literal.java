@@ -3,8 +3,12 @@ import gnu.bytecode.*;
 
 /** A Literal contains compile-time information about a constant. */
 
-public class Literal extends Initializer
+public class Literal
 {
+  Literal next;
+
+  public Field field;
+
   Object value;
 
   /* If field is non-null, it is the number of the Field.
@@ -33,21 +37,19 @@ public class Literal extends Initializer
   Type[] argTypes;
 
   public static final Literal nullLiteral
-    = new Literal(null, Type.pointer_type);
+    = new Literal(null, Type.nullType);
 
   public final Object getValue() { return value; }
 
   void assign (Compilation comp)
   {
-    assign(null, comp);
+    assign((String) null, comp);
   }
 
   /** Assign a static Field to hold the value of this Literal.
    * This supports the same value being used multiple times or cyclically. */
   void assign (String name, Compilation comp)
   {
-    next = comp.clinitChain;
-    comp.clinitChain = this;
     int flags = comp.immediate ? Access.STATIC|Access.PUBLIC
       : Access.STATIC|Access.FINAL;
     if (name == null)
@@ -57,7 +59,14 @@ public class Literal extends Initializer
       }
     else
       flags |= Access.PUBLIC;
-    field = comp.mainClass.addField (name, type, flags);
+    assign(comp.mainClass.addField (name, type, flags), comp);
+  }
+
+  void assign (Field field, Compilation comp)
+  {
+    next = comp.literalsChain;
+    comp.literalsChain = this;
+    this.field = field;
   }
 
   /** Create a new Literal, where comp must be in immediate mode. */
@@ -98,9 +107,10 @@ public class Literal extends Initializer
     this.type = type;
   }
 
-  public void emit(Compilation comp)
+  public static void emit(Compilation comp)
   {
-    if (! comp.immediate && comp.litTable == null)
+    if (! comp.immediate && comp.literalsChain != null
+	&& comp.litTable == null)
       {
 	comp.litTable = new LitTable(comp);
 	try

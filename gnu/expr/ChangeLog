@@ -1,3 +1,47 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (getType):  If value is null, type is Type.nullType.
+	* Literal.java (nullLiteral):  Its type is now Type.nullType.
+	* LitTable.java (emit):  Handle null value.
+
+	* Compilation.java (literalsChain):  New field.
+	(addClass):  Call Literal.emit.  Do it *after* processing clinitChain,
+	but make sure it is executed first.  (Gotos - sigh.)
+	* Literal.java:  New longer inherit from Initializer.
+	(next, field):  New fields (no longer inherited).
+	(assign(Field,Compilation)):  New overload.
+	Link on new comp.literalsChain, not comp.clinitChain.
+	(emit):  Make static.
+	* LambdaExp.java (evalToClass):  Update accordingly.
+	* LitTable.java (emit):  Literals are no longer in clinitChain.
+	* BindingInitializer.java (emit):  Add optimization.
+
+	* Compilation.java (nameField):  Removed, since sym_name is gone.
+	(setNameMethod):  New method.
+	(addClass): Invoke setNameMethod instead of setting nameField.
+
+	* LitTable.java (emit(Literal,booolen)):  Serialization spec says
+	readResolve should return Object.  Hence, add needed cast.
+	* Keyword.java (readResolve):  Fix return type to Object.
+	* Special.java (readResolve):  Likewise.
+
+	* Keyword.java (<init>):  Don't copy argument String.
+
+	* Declaration.java (makeField):  New method, based on code from
+	BindingInitializer constructor.
+	* ModuleExp.java (allocFields):  Use Declaration's makeField method.
+	* BindingInitializer.java (<init>):  Likewise.
+	* SetExp.java (compile):  Use Declaration's new makeField method.
+	Do nothing here for constant ModuleExp fields.
+
+	* Declaration.java (noteValue):  If same Expression, same value.
+
+	* CompiledProc.java:  Removed old file.
+
+	* GenericProc.java (make$V):  New method.
+
+	* Interpreter.java (languages):  Add language file extensions.
+
 2000-06-05  Per Bothner  <per@bothner.com>
 
 	* MethodProc.java (mostSpecific):  Fix type comparisons.

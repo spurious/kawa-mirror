@@ -109,8 +109,8 @@ public class Compilation
   static final Field emptyConstant
     = scmListType.addField ("Empty", scmListType,
 			    Access.PUBLIC|Access.STATIC);
-  static final Field nameField
-    = typeProcedure.addField ("sym_name", scmSymbolType, Access.PROTECTED);
+  static final Method setNameMethod
+    = typeProcedure.getDeclaredMethod("setName", 1);
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
@@ -268,6 +268,9 @@ public class Compilation
 
   /** Rembembers stuff to do in <clinit> of main class. */
   Initializer clinitChain;
+
+  /** Rembembers literals to initialize (in <clinit>). */
+  Literal literalsChain;
 
   public static boolean generateMainDefault = false;
   /** True if we should generate a main(String[]) method. */
@@ -706,7 +709,7 @@ public class Compilation
       {
 	constructor_method.compile_push_this ();
 	compileConstant (lexp.name);
-	code.emitPutField(nameField);
+	code.emitInvokeVirtual(setNameMethod);
       }
 
     if (curClass == mainClass) // lexp.isModuleBody())
@@ -1192,7 +1195,7 @@ public class Compilation
       generateConstructor (curClass, lexp);
 
     if (curClass == mainClass && ! immediate
-	&& (staticModule || clinitChain != null))
+	&& (staticModule || clinitChain != null || literalsChain != null))
       {
 	Method save_method = method;
 
@@ -1200,9 +1203,27 @@ public class Compilation
 	  classInitLabel.define(code);
 	else
 	  startClassInit();
-	dumpInitializers(clinitChain);
-
 	code = getCode();
+	if (clinitChain != null)
+	  {
+	    Label lab0 = new Label(code);
+	    Label lab1 = new Label(code);
+	    Label lab2 = new Label(code);
+	    // These gotos are losing.  Should instead do a pre-pass (using
+	    // an ExpWalker) before compilation that collects all needed
+	    // constants.  Then we generate code to init the literals *first*,
+	    // before compiling anything else.  FIXME.
+	    code.emitGoto(lab1);
+	    lab0.define(code);
+	    dumpInitializers(clinitChain);
+	    code.emitGoto(lab2);
+	    lab1.define(code);
+	    Literal.emit(this);
+	    code.emitGoto(lab0);
+	    lab2.define(code);
+	  }
+	else
+	  Literal.emit(this);
 
 	if (staticModule)
 	  {

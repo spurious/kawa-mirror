@@ -42,24 +42,38 @@ public class ClassMemberConstraint extends Constraint
     this.name = field.getName();
   }
 
-  void setup()
+  void setup(Binding binding)
   {
     if (rfield == null)
       {
-        Class clas = type.getReflectClass();
+	Class clas;
+	try
+	  {
+	    clas = type.getReflectClass();
+	  }
+	catch (RuntimeException ex)
+	  {
+	    String name = binding.getName();
+	    throw new UnboundSymbol(name, "Unbound symbol " + name
+				    + " - " + ex.toString());
+	  }
         try
           {
             rfield = clas.getField(name);
           }
         catch (java.lang.NoSuchFieldException ex)
           {
+	    String name = binding.getName();
+	    throw new UnboundSymbol(name, "Unbound symbol " + name
+				    + " - no field " + name
+				    + " in " + type.getName());
           }
       }
   }
 
   public Object get (Binding binding)
   {
-    setup();
+    setup(binding);
     try
       {
         return rfield.get(getValue(binding));
@@ -72,7 +86,7 @@ public class ClassMemberConstraint extends Constraint
 
   public void set (Binding binding, Object value)
   {
-    setup();
+    setup(binding);
     try
       {
         rfield.set(getValue(binding), value);

@@ -2,6 +2,12 @@
 
 	* kawa/lang/Lambda.java (rewrite):  Check for mis-placed '::'.
 
+	* kawa/standard/IfFeature.java:  New class, extends Syntax.
+	* kawa/standard/Makefile.am (java_sources):  Add IfFeature.java.
+	* kawa/standard/Scheme.java:  Standard procedures memq, memv, member,
+	assq, assv, and assoc are now defined in kawa.lib.syntax.
+	* kawa/standard/require.java:  Recognuze 'srfi-1 and 'list-lib.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add gnu/jemacs/swing/Makefile.

@@ -74,6 +74,7 @@ StaticFieldConstraint.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java thisRef.java \
 TracedProcedure.java \
+IfFeature.java \
 scheme_env.java
 
 PACKAGE_FNAME = kawa-standard

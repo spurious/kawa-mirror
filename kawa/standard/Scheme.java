@@ -72,12 +72,6 @@ public class Scheme extends LispInterpreter
   public static gnu.kawa.functions.IsEq isEq;
   public static gnu.kawa.functions.IsEqv isEqv;
   public static gnu.kawa.functions.IsEqual isEqual;
-  public static gnu.kawa.functions.Member memq;
-  public static gnu.kawa.functions.Member memv;
-  public static gnu.kawa.functions.Member member;
-  public static gnu.kawa.functions.Assoc assq;
-  public static gnu.kawa.functions.Assoc assv;
-  public static gnu.kawa.functions.Assoc assoc;
 
   public static Scheme getInstance()
   {
@@ -205,12 +199,12 @@ public class Scheme extends LispInterpreter
       define_field("list-tail", "kawa.lib.lists");
       define_field("list-ref", "kawa.lib.lists");
 
-      define_field("memq", "kawa.standard.Scheme");
-      define_field("memv", "kawa.standard.Scheme");
-      define_field("member", "kawa.standard.Scheme");
-      define_field("assq", "kawa.standard.Scheme");
-      define_field("assv", "kawa.standard.Scheme");
-      define_field("assoc", "kawa.standard.Scheme");
+      define_field("memq", "kawa.lib.lists");
+      define_field("memv", "kawa.lib.lists");
+      define_field("member", "kawa.lib.lists");
+      define_field("assq", "kawa.lib.lists");
+      define_field("assv", "kawa.lib.lists");
+      define_field("assoc", "kawa.lib.lists");
 
       //-- Section 6.4  -- complete, including slashified read/write
       
@@ -409,6 +403,7 @@ public class Scheme extends LispInterpreter
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_field("let-values", "kawa.lib.syntax");
       define_field("let*-values", "kawa.lib.syntax");
+      define_field("receive", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
@@ -663,6 +658,8 @@ public class Scheme extends LispInterpreter
 
       define_proc ("emacs", "gnu.jemacs.buffer.emacs");
       define_proc ("node", "gnu.kawa.xml.MakeTreeNode");
+      define_syntax("%if-feature", "kawa.standard.IfFeature");
+      define_syntax("cond-expand", "kawa.lib.syntax");
   }
 
   static int scheme_counter = 0;
@@ -682,12 +679,6 @@ public class Scheme extends LispInterpreter
         isEq = new gnu.kawa.functions.IsEq(this, "eq?");
         isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?");
         isEqual = new gnu.kawa.functions.IsEqual(this, "equal?");
-        memq = new gnu.kawa.functions.Member("memq", isEq);
-        memv = new gnu.kawa.functions.Member("memv", isEqv);
-        member = new gnu.kawa.functions.Member("member", isEqual);
-        assq = new gnu.kawa.functions.Assoc("assq", isEq);
-        assv = new gnu.kawa.functions.Assoc("assv", isEqv);
-        assoc = new gnu.kawa.functions.Assoc("assoc", isEqual);
       }
   }
 

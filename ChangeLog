@@ -1,3 +1,7 @@
+1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/object.java (rewrite):  Fields have unknown value.
+
 1999-04-23  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/lang/Translator.java (errors):  Removed field.

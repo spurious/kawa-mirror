@@ -1,3 +1,14 @@
+Changes from Kawa 1.4 to 1.5
+============================
+Execute a ~/.kawarc.scm file on startup, if it exists.
+
+Add a number of functions for testing, renaming, and deleting files.
+These are meant to be compatible with scsh, Guile, and MIT Scheme:
+file-exists?, file-directory?, file-readable?, file-writable?, delete-file,
+rename-file, create-diretory, and the variable home-directory.
+
+Fixed some small bugs, mainly in gnu.math and in load.
+
 Changes from Kawa 1.2 to 1.4
 ============================
 The codegen package has been renamed gnu.bytecode.

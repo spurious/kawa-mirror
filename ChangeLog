@@ -1,3 +1,23 @@
+Mon May 26 12:11:52 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in, configure (VERSION):  Set to 1.5.
+	* **/Makefile.{am,in}:  Use CPASSPATH environment variable (which
+	add to standard path), instead of -classpath (which replaces).
+	* kawa/standard/load.java (loadSource):  Do fstream.close when done.
+	(apply2):  Fix filenames.
+	* kawa/standard/Scheme.java:  Add new functions from lib/files.scm.
+	* kawa/repl.java:  Add support for home-directory, and reading
+	init file from ~/.kawarc.scm.
+
+Tue May 20 22:13:25 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/InPort.java (readOptionalExponent);  Handle sign.
+	(readSchemeNumber):  Update Complex.imOne use from field to method.
+
+Wed May  7 12:26:28 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/InPort.java:  Fix some problems in reading numbers.
+
 Tue Apr  1 18:55:47 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Compilation.java (mangleClassName):  Mangle common Scheme

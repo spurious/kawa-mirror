@@ -3,22 +3,28 @@
 (define-constant xx :: <int> 20)
 
 (define-simple-class <SimpleA> ()
-  (a :: <int> init: (- b 2))
+  (two :: <int> init-form: 2 access: 'private)
+  (a :: <int> init: (- b two))
   (b :: <int> init-form: 6 allocation: class:)
+  (n22 :: <int> init-value: 22 allocation: 'static access: 'protected)
   (hyphenated-field? init-value: "yes")
   ((lambda-method1)
    (lambda (x) (make-vector 1 x))) ; This lambda doesn't "capture" anything.
   ((lambda-method2 n)
    (lambda (x) (make-vector (+ a n) x))) ; This lambda does.
+  ((x1900) :: <int> access: 'package allocation: 'static
+   1900)
+  ((g) :: <int> access: 'protected
+   (+ xx a))
   ((f (y :: <int>)) :: <int>
-   (if (equal? hyphenated-field? "yes") (+ xx a b y) 999)))
+   (if (equal? hyphenated-field? "yes") (+ (g) b y) 999)))
 
 (define-class <ClsB> ()
   (b :: <int> 14)) ;; deprecated syntax
 
 (define-class <ClsC> (<ClsB>)
   (c :: <int>)
-  (:init (set! c 22))
+  (:init (set! c (static-field <SimpleA> 'n22)))
   ((f (y :: <int>)) :: <int> (+ xx c y)))
 
 (define-syntax define-class-using-syntax-rules
@@ -37,7 +43,8 @@
 
 (define-simple-class <SimpleDateTest> (<java.util.Date>)
   ((get-year) :: <int>
-   (+ (invoke-special <java.util.Date> (this) 'get-year) 1900)))
+   (+ (invoke-special <java.util.Date> (this) 'get-year)
+      (invoke-static <SimpleA> 'x1900))))
 
 (define-private counter :: <int> 0)
 

@@ -1,3 +1,7 @@
+2004-02-15  Per Bothner  <per@bothner.com>
+
+	* classes1.scm:  Add access: properties and test them.
+
 2003-12-25  Per Bothner  <per@bothner.com>
 
 	* module1.scm (namespace-syntax-test):  Specific timezone UTC so

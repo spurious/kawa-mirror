@@ -1,3 +1,7 @@
+1999-04-11  Per Bothner  <bothner@cygnus.com>
+
+	* LambdaExp.java (declareClosureEnv):  Fix for object methods.
+
 Wed Apr  7 18:04:27 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* FluidLetExp.java:  New LetExp class.

@@ -1,4 +1,4 @@
-// Copyright (c) 1996-2000, 2001, 2002  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2001, 2002, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -56,21 +56,24 @@ public class Environment extends NameMap implements Externalizable
   {
     if (name == null)
       name = "";
-    Environment env = (Environment) envTable.get(name);
-    if (env != null)
-      return env;
-    env = new Environment ();
-    env.setName(name);
-    envTable.put(name, env);
-    return env;
+    synchronized (envTable)
+      {
+	Environment env = (Environment) envTable.get(name);
+	if (env != null)
+	  return env;
+	env = new Environment ();
+	env.setName(name);
+	envTable.put(name, env);
+	return env;
+      }
   }
 
-  public static Environment user () { return current(); }
+  public static Environment user () { return getCurrent(); }
 
   public static Object lookup_global (String name)
        throws UnboundSymbol
   {
-    Symbol binding = user().lookup(name);
+    Symbol binding = getCurrent().lookup(name);
     if (binding == null)
       throw new UnboundSymbol(name);
     return binding.get ();
@@ -79,7 +82,7 @@ public class Environment extends NameMap implements Externalizable
   /** Define name (interned) to have a given value. */
   public static void define_global (String name, Object new_value)
   {
-    user().defineValue (name, new_value);
+    getCurrent().defineValue(name, new_value);
   }
 
   public static void defineFunction (String name, Object new_value)
@@ -97,7 +100,7 @@ public class Environment extends NameMap implements Externalizable
   /** Define name (interned) to have a given value. */
   public static void put_global (String name, Object new_value)
   {
-    user().put (name, new_value);
+    getCurrent().put (name, new_value);
   }
 
   /**
@@ -106,19 +109,18 @@ public class Environment extends NameMap implements Externalizable
   public static Environment current () { return getCurrent(); }
   public static Environment getCurrent ()
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      return ((Future)thread).environment;
-    return global;
+    return CallContext.getInstance().getEnvironment();
   }
 
   public static void setCurrent (Environment env)
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      ((Future) thread).environment = env;
-    else
-      global = env;
+    CallContext ctx = CallContext.getInstance();
+    ctx.curEnvironment = env;
+  }
+
+  public static void setGlobal (Environment env)
+  {
+    global = env;
   }
 
   public Environment ()
@@ -148,7 +150,7 @@ public class Environment extends NameMap implements Externalizable
     this.previous = previous;
   }
 
-  public Symbol getSymbol (String name)
+  public synchronized Symbol getSymbol (String name)
   {
     Symbol binding = lookup(name);
     if (binding != null)
@@ -189,13 +191,17 @@ public class Environment extends NameMap implements Externalizable
 
   private Symbol lookup (String name, int hash)
   {
-    for (Environment env = this;  env != null;  env = env.previous)
+    for (Environment env = this;  env != null;  )
       {
-	int index = Symbol.hashSearch(env.table, env.log2Size, env.mask,
-				       name, hash);
-	Symbol element = env.table[index];
-	if (element != null && element != Symbol.hashDELETED)
-	  return element;
+	synchronized (env)
+	  {
+	    int index = Symbol.hashSearch(env.table, env.log2Size, env.mask,
+					  name, hash);
+	    Symbol element = env.table[index];
+	    if (element != null && element != Symbol.hashDELETED)
+		return element;
+	    env = env.previous;
+	  }
       }
     return null;
   }
@@ -219,7 +225,7 @@ public class Environment extends NameMap implements Externalizable
     return defineValue(name, value);
   }
 
-  public void addSymbol(Symbol binding)
+  public synchronized void addSymbol(Symbol binding)
   {
     // Rehash if over 2/3 full.
     if (3 * num_bindings >= 2 * table.length)
@@ -252,17 +258,23 @@ public class Environment extends NameMap implements Externalizable
   public Object remove (String name)
   {
     Environment env = this;
-    for ( ; ;  env = env.previous)
+    for (;;)
       {
 	if (env == null)
 	  return null;
 	if (locked)
 	  throw new IllegalStateException("attempt to remove variable: "
 					  + name + " locked environment");
-	Symbol[] env_tab = env.table;
-	Named old = Symbol.hashDelete(env.table, env.log2Size, name);
-	if (old != null)
-	  return old;
+	Environment previous;
+	synchronized (env)
+	  {
+	    Symbol[] env_tab = env.table;
+	    Named old = Symbol.hashDelete(env.table, env.log2Size, name);
+	    if (old != null)
+		return old;
+	    previous = env.previous;
+	  }
+	env = previous;
       }
   }
 
@@ -271,7 +283,7 @@ public class Environment extends NameMap implements Externalizable
     return remove((String) name);
   }
 
-  public void remove (Symbol binding)
+  public synchronized void remove (Symbol binding)
   {
     String name = binding.getName();
     if (locked)

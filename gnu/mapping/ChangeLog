@@ -1,3 +1,20 @@
+2004-01-09  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (curEnvironment):  New field.
+	(getEnvironment):  Rewrite to use curEnvironment.
+	* Environment.java (getCurrent):  Use CallContext's getEnvironment.
+	(setCurrent):  Set current CallContext's curEnvironment.
+	(setGlobal):  New method.
+	* Future.java (environmentr):  Renamed field to initEnvironment,
+	(<init>):  Update accordingly.
+	(run):  Set CallContext.curEnvironment from initEnvironment.
+	
+	* Environment.java (user, lookup_global, define_global, put_global):
+	Call getCurrent directly.
+
+	* Environment.java (getInstance, getSymbol, lookup, addSymbol, remove):
+	Add synchronization as appropropriate.
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* CharArrayOutPort.java (toString):  New method.

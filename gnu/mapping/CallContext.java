@@ -1,4 +1,4 @@
-// Copyright (C) 2002, 2003  Per M.A. Bothner.
+// Copyright (C) 2002, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -19,11 +19,11 @@ public class CallContext implements Runnable
   /* END JAVA1 */
   Thread currentThread;
 
+  Environment curEnvironment;
+
   public final Environment getEnvironment()
   {
-    if (currentThread instanceof Future)
-      return ((Future) currentThread).environment;
-    return Environment.global;
+    return curEnvironment != null ? curEnvironment : Environment.global;
   }
 
   public static void setInstance(CallContext ctx)

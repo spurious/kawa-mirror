@@ -5,7 +5,7 @@ public class Future extends Thread
   Object result;
   CallContext context;
 
-  Environment environment;
+  private Environment initEnvironment;
   InPort in;
   OutPort out;
   OutPort err;
@@ -25,7 +25,7 @@ public class Future extends Thread
 		 InPort in, OutPort out, OutPort err)
   {
     this.action = action;
-    this.environment = environment;
+    this.initEnvironment = environment;
     this.in = in;
     this.out = out;
     this.err = err;
@@ -46,6 +46,7 @@ public class Future extends Thread
       {
 	context = CallContext.getInstance();
 	context.fluidBindings = initBindings;
+	context.curEnvironment = initEnvironment;
 	result = action.apply0 ();
       }
     catch (Throwable ex)

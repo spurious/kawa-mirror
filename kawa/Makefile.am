@@ -8,7 +8,7 @@ SUFFIXES = .java .class
 
 bin_SCRIPTS = kawa
 
-# Sufix for batch files.
+# Suffix for batch files.
 BAT=
 
 # Use an environment variable for CLASSPATH so we pick up standard classes:
@@ -24,7 +24,7 @@ JCFLAGS = -g
 repl.class:  $(srcdir)/repl.java
 	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
 
-javadir=$(prefix)/java/$(subdir)
+javadir=$(datadir)/java/$(subdir)
 
 OBJ = Shell.class repl.class \
   GuiConsole.class MessageArea.class TextAreaWriter.class GuiInPort.class
@@ -41,11 +41,11 @@ java_DATA=$(OBJ) $(SECONDARY_OBJS)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ) kawa$(BAT) tmp
+CLEANFILES = *.class kawa$(BAT) tmp
 
 kawa$(BAT):
 	echo '#!/bin/sh' >tmp
-	echo 'KAWALIB=$${KAWALIB-$(prefix)/java}' >>tmp
+	echo 'KAWALIB=$${KAWALIB-$(datadir)/java}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \

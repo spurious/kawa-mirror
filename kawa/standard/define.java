@@ -10,27 +10,27 @@ public class define extends Syntax implements Printable
 {
   public Expression rewrite (Object obj, Translator tr)
   {
-    Symbol name = null;
+    String name = null;
     Expression value = null;
 
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
-	if (p1.car instanceof Symbol && p1.cdr instanceof Pair)
+	if (p1.car instanceof String && p1.cdr instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    if (p2.cdr == List.Empty)
 	      {
-		name = (Symbol)p1.car;
+		name = (String) p1.car;
 		value = tr.rewrite (p2.car);
 	      }
 	  }
 	else if (p1.car instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.car;
-	    if (p2.car instanceof Symbol)
+	    if (p2.car instanceof String)
 	      {
-		name = (Symbol) p2.car;
+		name = (String) p2.car;
 		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
@@ -54,9 +54,9 @@ public class define extends Syntax implements Printable
     else
       {
 	Object binding = tr.current_decls.get (name);
-	// Hygenic macro expansion may bind a renamed (uninterned) Symbol
-	// to the original Symbol.
-	if (binding == null || binding instanceof Symbol)
+	// Hygenic macro expansion may bind a renamed (uninterned) symbol
+	// to the original symbol.
+	if (binding == null || binding instanceof String)
 	  return tr.syntaxError ("invalid use of define");
 	SetExp sexp = new SetExp (name, value);
 	sexp.binding = tr.resolve (name, (Declaration) binding);

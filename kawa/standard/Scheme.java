@@ -10,22 +10,12 @@ public class Scheme extends Interpreter
     return env;
   }
 
-  public void define(String name, Object p)
-  {
-    env.put (Symbol.make (name), p);
-  }
-
-  public void define(Symbol sym, Object p)
+  public void define(String sym, Object p)
   {
     env.define (sym, p);
   }
 
-  public Object lookup(java.lang.String name)
-  {
-    return env.get (Symbol.make (name));
-  }
-
-  public Object lookup(Symbol name)
+  public Object lookup(String name)
   {
     return env.get (name);
   }
@@ -38,15 +28,13 @@ public class Scheme extends Interpreter
   /* Define a procedure to be autoloaded. */
   final void define_proc (String name, String className)
   {
-    Symbol symbol = Symbol.make (name);
-    define (symbol, new AutoloadProcedure (symbol, className));
+    define (name, new AutoloadProcedure (name, className));
   }
 
   /* Define a Syntax to be autoloaded. */
   final void define_syntax (String name, String className)
   {
-    Symbol symbol = Symbol.make (name);
-    define (symbol, new AutoloadSyntax (symbol, className));
+    define (name, new AutoloadSyntax (name, className));
   }
 
   static Environment null_environment;
@@ -288,12 +276,12 @@ public class Scheme extends Interpreter
       define_proc ("string-ci<=?", "kawa.standard.string_ci_lessequal_p");
       define_proc ("string-ci>=?", "kawa.standard.string_ci_greaterequal_p");
 
-      define_proc ("substring", "kawa.standard.substring");
+      define_proc ("substring", "kawa.lib.strings");
       define_proc ("string-append", "kawa.standard.string_append");
       define_proc ("string->list", "kawa.standard.string2list");
       define_proc ("list->string", "kawa.standard.list2string");
-      define_proc ("string-copy", "kawa.standard.string_copy");
-      define_proc ("string-fill!", "kawa.standard.string_fill_b");
+      define_proc ("string-copy", "kawa.lib.strings");
+      define_proc ("string-fill!", "kawa.lib.strings");
 
       //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.standard.vector_p");
@@ -375,7 +363,7 @@ public class Scheme extends Interpreter
       env = user_environment;
       define_proc ("exit", "kawa.lib.thread");
 
-      Symbol sym = Symbol.make ("arithmetic-shift");
+      String sym = "arithmetic-shift";
       proc = new AutoloadProcedure (sym, "kawa.standard.ashift");
       define (sym, proc);
       define ("ash", proc);

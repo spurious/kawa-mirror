@@ -120,10 +120,7 @@ string_ci_lessthan_p.class \
 string_ci_lessequal_p.class \
 string_ci_greaterthan_p.class \
 string_ci_greaterequal_p.class \
-substring.class \
 string_append.class \
-string_copy.class \
-string_fill_b.class \
 vector_p.class \
 make_vector.class \
 vector_v.class \

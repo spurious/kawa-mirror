@@ -16,15 +16,15 @@ public class set_b extends Syntax implements Printable
     Object [] match = pattern.match (obj);
     if (match == null)
       return tr.syntaxError ("missing or extra arguments to set!");
-    if (! (match[0] instanceof Symbol))
+    if (! (match[0] instanceof String))
       return tr.syntaxError ("first set! argument is not a variable name");
-    Symbol sym = (Symbol) match[0];
+    String sym = (String) match[0];
     Expression value = tr.rewrite (match[1]);
     Object binding = tr.current_decls.get (sym);
-    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
-    // to the original Symbol.  Here, use the original Symbol.
-    if (binding != null && binding instanceof Symbol)
-      return new SetExp ((Symbol) binding, value);
+    // Hygenic macro expansion may bind a renamed (uninterned) symbol
+    // to the original symbol.  Here, use the original symbol.
+    if (binding != null && binding instanceof String)
+      return new SetExp ((String) binding, value);
     SetExp sexp = new SetExp (sym, value);
     sexp.binding = tr.resolve (sym, (Declaration) binding);
     if (sexp.binding != null)

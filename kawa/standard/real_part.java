@@ -9,6 +9,6 @@ Procedure1
 {
   public Object apply1 (Object arg1)
    {
-     return ((RatNum)arg1).numerator ();
+     return ((Complex) arg1).re();
    }
 }

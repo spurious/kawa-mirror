@@ -30,9 +30,9 @@ public class letrec extends Syntax implements Printable
 	Object[] bind_match = pattern2.match (bind_pair.car);
 	if (bind_match == null)
 	  return tr.syntaxError ("letrec binding is not 2-element list");
-	if (! (bind_match[0] instanceof Symbol))
+	if (! (bind_match[0] instanceof String))
 	  return tr.syntaxError ("letrec variable is not an identifier");
-	let.addDeclaration((Symbol) bind_match[0]);
+	let.addDeclaration((String) bind_match[0]);
 	inits[i] = QuoteExp.undefined_exp;
 	orig_inits[i] = bind_match[1];
 	bindings = bind_pair.cdr;

@@ -1,15 +1,19 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
 
 public class PositionManager
 {
-  static PositionManager manager = new PositionManager();
+  static final PositionManager manager = new PositionManager();
 
   static public SeqPosition getPositionObject (int ipos)
   {
-    return manager.positions[ipos];
+    PositionManager m = manager;
+    synchronized (m)
+      {
+	return m.positions[ipos];
+      }
   }
 
   SeqPosition[] positions = new SeqPosition[50];
@@ -53,7 +57,7 @@ public class PositionManager
     addToFreeList(ivals, 1, ivals.length);
   }
 
-  public int register(SeqPosition pos)
+  public synchronized int register(SeqPosition pos)
   {
     int i = getFreeSlot();
     positions[i] = pos;
@@ -61,13 +65,14 @@ public class PositionManager
     return i;
   }
 
-  public void release(int ipos)
+  public synchronized void release(int ipos)
   {
-    ExtPosition pos = (ExtPosition) positions[ipos];
-    pos.position = -1;
+    SeqPosition pos = positions[ipos];
+    if (pos instanceof ExtPosition)
+      ((ExtPosition) pos).position = -1;
     positions[ipos] = null;
     ivals[ipos] = freeListHead;
     freeListHead = ipos;
-    pos.finalize();
+    pos.release();
   }
 }

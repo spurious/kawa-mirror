@@ -64,7 +64,7 @@ public class TreePosition extends SeqPosition implements Cloneable
 
   public void set (TreePosition position)
   {
-    clear();
+    release();
     int d = position.depth;
     depth = d;
     if (d < 0)
@@ -223,12 +223,7 @@ public class TreePosition extends SeqPosition implements Cloneable
     return sstack[i].getPosNext(istack[i]);
   }
 
-  public void finalize()
-  {
-    clear();
-  }
-
-  public void clear()
+  public void release()
   {
     while (sequence != null)
       {

@@ -1,3 +1,30 @@
+2004-08-31  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (getIterator(int)): New overloaded method.
+	(getIterator(), listIterator): Define in terms of new method.
+	* LList.java (getIterator(int)): New method replaces getIterator().
+
+	* ExtPosition.java (finalize): Rename to release.
+	Just use the inherited finalize.
+	* TreePosition.java (clear): Rename to release.
+	(set): Change to use clear.
+	(finalize): Remove as being redundant.
+
+	* LListPosition.java (set): Clear xpos if we're not setting it.
+	(set):  New overloaded method, to override inherited method.
+	(gotoPrevious):  Add cast to pick specific method.
+
+	* LListPosition.java (hasPrevious): New method.
+
+	* LListPosition.java (getNextPair): Take cdr of result.
+
+	* LListPosition.java (getNextPair): Take cdr of result.
+
+	* PositionManager.java (getPositionObject, reister, release):
+	Add synchronization.
+
+	* SeqPosition.java (previous): Use getPrevious method.
+
 2004-08-04  Christian Surlykke <christian@surlykke.dk>
 
 	* GapVector.java: (GapVector) Initialization of gapStart and gapEnd.

@@ -184,7 +184,7 @@ implements
   /** See java.util.ListIterator. */
   public Object previous()
   {
-    Object result = sequence.getPosPrevious(getPos());
+    Object result = getPrevious();
     if (result == Sequence.eofValue || ! gotoPrevious())
       throw new NoSuchElementException();
     return result;
@@ -278,9 +278,11 @@ implements
     setPos(sequence.addPos(getPos(), o));
   }
 
-  /** Get a Pos int for this SeqPosition.
-   * By default this is the ipos cookie, but for sequences that need extra
-   * state that an ipos for efficient position, we use a PositionManager index.
+  /** Get a position int "cookie" for this SeqPosition.
+   * The result can be passed to AbstractSequence's getPosNext(int),
+   * createRelativePos, and other methods.
+   * By default this is the value of ipos, but for sequences that need emore
+   * state than an ipos for efficient position, we use a PositionManager index.
    * So this gets over-ridden in ExtPosition.
    */
   public int getPos ()

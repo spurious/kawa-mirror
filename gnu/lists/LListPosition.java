@@ -4,7 +4,7 @@
 package gnu.lists;
 
 /** LListPosition - a SeqPosition for LLists.
- * Normally, we just use a since int Pos to indicate a position in a
+ * Normally, we just use an int pos to indicate a position in a
  * sequence.  But for linked lists that would be very inefficient.
  * So this sub-class in addition uses an xpos field to point to the
  * current Pair.  However, we do so in a non-obvious way.  After a next(),
@@ -24,10 +24,6 @@ package gnu.lists;
 
 class LListPosition extends ExtPosition
 {
-  /**
-   * An Object that (together with ipos) indicates the current position.
-   * The actual value has no meaning, except as interpreted by sequence.
-   */
   Object xpos;
 
   public LListPosition (LListPosition old)
@@ -69,6 +65,13 @@ class LListPosition extends ExtPosition
           }
 	xpos = p;
       }
+    else
+      xpos = null;
+  }
+
+  public void set (AbstractSequence seq, int index, boolean isAfter)
+  {
+    set((LList) seq, index, isAfter);
   }
 
   public boolean hasNext()
@@ -85,6 +88,11 @@ class LListPosition extends ExtPosition
     if ((ipos & 1) > 0) // if isAfter
       next = ((Pair) next).cdr;
     return next != LList.Empty;
+  }
+
+  public boolean hasPrevious()
+  {
+    return (ipos >>> 1) != 0;
   }
 
   /** Get the Pair whose car contains the next element, or null. */
@@ -108,7 +116,7 @@ class LListPosition extends ExtPosition
         if (xpos == null)
           next = sequence;
         else
-          next = xpos;
+          next = ((Pair) xpos).cdr;
       }
     if (next == LList.Empty)
       return null;
@@ -200,12 +208,25 @@ class LListPosition extends ExtPosition
 	return true;
       }
     int index = nextIndex();
-    set(sequence, index - 1, false);
+    set((LList) sequence, index - 1, false);
     return true;
   }
 
   public String toString()
   {
-    return "LListPos["+super.toString()+" pos:"+position+']';
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append("LListPos[");
+    //sbuf.append(super.toString());
+    sbuf.append("index:");
+    sbuf.append(ipos);
+    if (isAfter())
+      sbuf.append(" after");
+    if (position >= 0)
+      {
+	sbuf.append(" position:");
+	sbuf.append(position);
+      }
+    sbuf.append(']');
+    return sbuf.toString();
   }
 }

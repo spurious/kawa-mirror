@@ -32,18 +32,10 @@ public class ExtPosition extends SeqPosition
     return (ipos & 1) != 0;
   }
 
-  public void finalize()
+  public void release ()
   {
     if (position >= 0)
       PositionManager.manager.release(position);
+    sequence = null;
   }
-
-  /*
-    Sequence:releasePos(int position)
-  {
-    SeqPosition pos = PositionManger.manager.positions[position];
-    pos.finalize();    
-
-  }
-  */
 }

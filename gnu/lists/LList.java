@@ -98,9 +98,9 @@ public class LList extends ExtSequence
     return true;
   }
 
-  public SeqPosition getIterator()
+  public SeqPosition getIterator(int index)
   {
-    return new LListPosition(this, 0, false);
+    return new LListPosition(this, index, false);
   }
 
   public int createPos(int index, boolean isAfter)

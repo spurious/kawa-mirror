@@ -190,9 +190,14 @@ public abstract class AbstractSequence
     return getIterator();
   }
 
-  public SeqPosition getIterator()
+  public final SeqPosition getIterator()
   {
-    return new SeqPosition(this, startPos());
+    return getIterator(0);
+  }
+
+  public SeqPosition getIterator(int index)
+  {
+    return new SeqPosition(this, index, false);
   }
 
   public SeqPosition getIteratorAtPos(int ipos)
@@ -206,14 +211,14 @@ public abstract class AbstractSequence
     return getIterator();
   }
 
-  public ListIterator listIterator()
+  public final ListIterator listIterator()
   {
-    return listIterator(0);
+    return getIterator(0);
   }
 
-  public ListIterator listIterator(int index)
+  public final ListIterator listIterator(int index)
   {
-    return new SeqPosition(this, index, false);
+    return getIterator(index);
   }
   /* END JAVA2 */
 

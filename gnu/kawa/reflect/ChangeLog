@@ -1,3 +1,7 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java (<init>):  New constructor.
+
 2000-08-17  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN):  Update for new MethodProc protocol.

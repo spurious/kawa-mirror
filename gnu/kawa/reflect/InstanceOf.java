@@ -12,6 +12,12 @@ public class InstanceOf extends Procedure2 implements Inlineable
     this.interpreter = interpreter;
   }
 
+  public InstanceOf(Interpreter interpreter, String name)
+  {
+    this.interpreter = interpreter;
+    setName(name);
+  }
+
   public Object apply2 (Object arg1, Object arg2)
   {
     Type type = interpreter.asType(arg2);

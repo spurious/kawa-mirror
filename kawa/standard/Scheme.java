@@ -93,6 +93,8 @@ public class Scheme extends Interpreter
       define ("or", new kawa.standard.and_or (false));
       define_syntax ("%let", "kawa.standard.let");
       define_syntax ("let", "kawa.lib.std_syntax");
+      define_syntax ("%let-decl", "kawa.lib.std_syntax");
+      define_syntax ("%let-init", "kawa.lib.std_syntax");
       define_syntax ("let*", "kawa.lib.std_syntax");
       define_syntax ("letrec", "kawa.standard.letrec");
 
@@ -603,17 +605,10 @@ public class Scheme extends Interpreter
     return null;
   }
 
-  /** The name of the formal parameter for the incoming Environment. */
-  static private String env_formal = Symbol.makeUninterned ("theEnvironment");
-
-  /** The formal parameter list of a ModuleBody. */
-  static public Object moduleFormals = new Pair (env_formal, List.Empty);
-
   public static ModuleExp makeModuleExp(Object body, Translator tr)
   {
     ModuleExp mexp = new ModuleExp();
-    Lambda.rewrite(mexp, moduleFormals, body, tr);
-    mexp.lookup(env_formal).setType(Compilation.scmEnvironmentType);
+    Lambda.rewrite(mexp, List.Empty, body, tr);
     return mexp;
   }
 

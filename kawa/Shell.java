@@ -24,12 +24,9 @@ public class Shell
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Binding pr = Environment.getCurrentBinding("default-prompter");
-	if (pr != null) // FIXME - is this how we want it to work?
-	  {
-	    Procedure prompter = pr.getProcedure();
-	    ((TtyInPort)inp).setPrompter(prompter);
-	  }
+	Procedure prompter = interp.getPrompter();
+	if (prompter != null)
+	  ((TtyInPort)inp).setPrompter(prompter);
       }
 
     run(interp, env, inp, OutPort.outDefault(), OutPort.errDefault());
@@ -39,8 +36,6 @@ public class Shell
 			  InPort inp, OutPort pout, OutPort perr)
   {
     SourceMessages messages = new SourceMessages();
-    Translator tr = new Translator(env, messages);
-    tr.immediate = true;
     Lexer lexer = interp.getLexer(inp, messages);
     CallContext ctx = new CallContext();
     FormatToConsumer saveFormat = null;
@@ -49,8 +44,7 @@ public class Shell
     else
       {
 	saveFormat = pout.objectFormat;
-	pout.objectFormat = interp.getFormat(false);
-	ctx.consumer = pout;
+	ctx.consumer = interp.getOutputConsumer(pout);
       }
     try
       {
@@ -58,15 +52,12 @@ public class Shell
 	  {
 	    try
 	      {
-		lexer.clearErrors();
-		PairWithPosition body
-		  = PairWithPosition.make(null, LList.Empty,
-					  inp.getName(),
-					  inp.getLineNumber() + 1,
-					  inp.getColumnNumber() + 1);
-		Object sexp = ((LispReader) lexer).readObject(); // FIXME
-		if (sexp == Sequence.eofValue)
-		  return;
+		ModuleExp mod = interp.parse(env, lexer);
+		if (mod == null) // end-of-file
+		  break;
+		mod.setName("atInteractiveLevel");  // FIXME
+		if (lexer.checkErrors(perr, 20))
+		  continue;
 
 		// Skip whitespace, in case somebody calls (read-char) or similar.
 		int ch;
@@ -82,13 +73,6 @@ public class Shell
 		      }
 		  }
 
-		body.car = sexp;
-		/* If the errors were minor, we could perhaps try to
-		   do Translation (to check for more errors)  .  ??? */
-		ModuleExp mod = Scheme.makeModuleExp(body, tr);
-		mod.setName("atInteractiveLevel");  // FIXME
-		if (lexer.checkErrors(perr, 20))
-		  continue;
 
 		mod.evalModule(env, ctx);
 		ctx.run();

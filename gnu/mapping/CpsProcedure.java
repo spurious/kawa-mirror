@@ -16,7 +16,7 @@ public abstract class CpsProcedure extends MethodProc
   public Object applyN (Object[] args)
   {
     CallContext stack = new CallContext();
-    stack.args = args;
+    stack.values = args;
     stack.proc = this;
     stack.run();
     return stack.value;
@@ -36,7 +36,7 @@ public abstract class CpsProcedure extends MethodProc
         if (argCount > max)
           return NO_MATCH_TOO_MANY_ARGS|max;
       }
-    ctx.args = args;
+    ctx.values = args;
     ctx.proc = this;
     return 0;
   }

@@ -15,7 +15,7 @@ public abstract class CallFrame extends CpsProcedure implements Cloneable
 
   public void apply (CallContext stack)
   {
-    Object[] args = stack.args;
+    Object[] args = stack.values;
     Procedure.checkArgCount(this, args.length);
     try
       {

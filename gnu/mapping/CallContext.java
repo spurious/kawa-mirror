@@ -7,11 +7,12 @@ public class CallContext implements Runnable
 {
   public Procedure proc;
 
+  /* CPS: ??
+  CallFrame frame;
+  */
+
   /** The program location in the current procedure. */
   public int pc;
-
-  /** Where incoming arguments are passed. */
-  public Object[] args; // FIXME
 
   /** Function results are left here. */
   public Object value; // FIXME
@@ -105,10 +106,30 @@ public class CallContext implements Runnable
     where = 0;
   }
 
+  public Object[] getArgs()
+  {
+    if (where == 0)
+      return values;
+    else
+      {
+	int i = count;
+	Object[] args = new Object[i];
+	while (--i >= 0)
+	  args[i] = getArgAsObject(i);
+	return args;
+      }
+  }
+
   public void run()
   {
     for (;;)
       {
+	/** Cps
+	CallFrame frame = this.frame;
+	if (frame == null)
+	  break;
+	frame.step(this);
+	*/
 	Procedure proc = this.proc;
 	if (proc == null)
 	  break;

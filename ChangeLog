@@ -1,3 +1,8 @@
+2005-01-12  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (makeBody): Don't make AppendValues call
+	here since it causes Scheme begin at top-level to mis-behave.
+
 2005-01-10  Per Bothner  <per@bothner.com>
 
 	* config.guess: Update to newer version, from libtool 1.5.10.

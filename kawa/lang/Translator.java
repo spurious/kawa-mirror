@@ -1068,11 +1068,7 @@ public class Translator extends Compilation
 	for (int i = 0; i < nforms; i++)
 	  exps[i] = (Expression) formStack.elementAt(first + i);
 	formStack.setSize(first);
-	if (scope instanceof ModuleExp)
-	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
-			      exps);
-	else
-	  return ((LispInterpreter) getInterpreter()).makeBody(exps);
+	return ((LispInterpreter) getInterpreter()).makeBody(exps);
       }
   }
 

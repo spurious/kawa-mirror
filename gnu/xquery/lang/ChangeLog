@@ -1,3 +1,27 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (focusDefined):  Remove field.  Instead, just check
+	whether DOT_VARNAME is in scope.
+	(parseRelativePathExpr, parseStepQualifiers,
+	parseFunctionDefinition):  Don't set/unset focusDefined.
+	(DOT_VARNAME, POSITION_VARNAME, LAST_VARNAME):  New constants.
+	(parseNodeTest):  Look for DOT_VARNAME to see if context is defined.
+	(parseCheckNodeTest):  Remove - just use parseNodeTest directly.
+	(parseMaybePrimaryExpr):  Re-write position() and last() to
+	RerefenceExps using POSITION_VARNAME and LAST_VARNAME.
+	(parseNodeTest):  Use new xxxAxis classes.
+	(parseRelativePathExpr):  Second expression is now a 3-argument
+	LambdaExp.  Pass it DOT_VARNAME, POSITION_VARNAME, and LAST_VARNAME.
+	Handle '//' now exactly as specified in standard.
+	Comment out some optimizations for now.
+	Use new RelativeStep class instead of ValuesMap.
+	(parseStepQualifiers):  Pass axis parameter, since handling of
+	qualifiers depends on type of axis (forward, reverse, or none).
+	Second expression is also now a 3-argument LambdaExp.
+	Pass it DOT_VARNAME, POSITION_VARNAME, and LAST_VARNAME.
+	* XQuery.java (<init>):  Don't define position() - it is now
+	re-written at parse time to POSITION_VARNAME.
+
 2003-08-01  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (XQUERY_FUNCTION_NAMESPACE):  Update URL.

@@ -21,8 +21,19 @@ public class XQParser extends LispReader // should be extends Lexer
 {
   int curToken;
   Object curValue;
-  boolean focusDefined = true;
   XQuery interpreter;
+
+  int seenPosition;
+  int seenLast;
+
+  /** The inetrnal name of the variable containing '.', teh context node. */
+  static final String DOT_VARNAME = "{dot}";
+
+  /** The pseduo-function position() is mapped to a reference. */
+  static final String POSITION_VARNAME = "{position}";
+
+  /** The pseduo-function last() is mapped to a reference to this variable. */
+  static final String LAST_VARNAME = "{last}";
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -1228,20 +1239,13 @@ public class XQParser extends LispReader // should be extends Lexer
     return Symbol.make(uri, local);
   }
 
-  Expression parseCheckNodeTest(int axis)
-      throws java.io.IOException, SyntaxException
-  {
-    Expression result = parseNodeTest(axis);
-    if (result != null && ! focusDefined)
-      return syntaxError("node test when focus is undefined");
-    return result;
-  }
-
   Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
-    Declaration dotDecl = parser.lookup("dot", -1);
-    Expression dot = new ReferenceExp("dot", dotDecl);
+    Declaration dotDecl = parser.lookup(DOT_VARNAME, -1);
+    if (dotDecl == null)
+      error("node test when focus is undefined");
+    Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
     int token = peekOperand();
     /*
     if (token == NCNAME_TOKEN || token == QNAME_TOKEN 
@@ -1269,7 +1273,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
 	 || curToken == OP_NODE || curToken == OP_TEXT))
       {
-	Object predicate;
+	NodePredicate predicate;
 	if (curToken == OP_NODE || curToken == OP_TEXT)
 	  {
 	    if (curToken == OP_NODE)
@@ -1288,12 +1292,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	    Symbol qname = parseNameTest(defaultElementNamespace);
 	    predicate = new ElementType(qname);
 	  }
-	Expression[] args = { dot, new QuoteExp(predicate) };
-	Expression func
-	  = axis == AXIS_DESCENDANT ? funcNamedDescendants
-	  : axis == AXIS_DESCENDANT_OR_SELF ? funcNamedDescendantsOrSelf
-	  : funcNamedChildren;
-	exp = new ApplyExp(func, args);
+	Expression[] args = { dot };
+	TreeScanner op;
+	if (axis == AXIS_DESCENDANT)
+	  op = DescendantAxis.make(predicate);
+	else if (axis == AXIS_DESCENDANT_OR_SELF)
+	  op = DescendantOrSelfAxis.make(predicate);
+	else
+	  op = ChildAxis.make(predicate);
+	exp = new ApplyExp(new QuoteExp(op), args);
       }
     else if (axis == AXIS_ATTRIBUTE)
       {
@@ -1301,9 +1308,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
 	  {
 	    Symbol qname = parseNameTest("");
-	    Expression[] args = { dot, new QuoteExp(qname), };
-	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
-			       args);
+	    Expression[] args = { dot };
+	    TreeScanner op = AttributeAxis.make(new AttributeType(qname));
+	    exp = new ApplyExp(new QuoteExp(op), args);
 	  }
 	else
 	  return syntaxError("missing name or '*' after '@' or attribute::");
@@ -1320,44 +1327,42 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression exp = parseStepExpr();
-    boolean saveFocusDefined = focusDefined;
-    focusDefined = true;
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	boolean descendants = curToken == SLASHSLASH_TOKEN;
 
-	LambdaExp lexp = new LambdaExp(1);
-	Declaration decl = lexp.addDeclaration("dot");
-	decl.setFlag(Declaration.IS_SINGLE_VALUE);
-	decl.noteValue (null);  // Does not have a known value.
+	LambdaExp lexp = new LambdaExp(3);
+	Declaration dotDecl = lexp.addDeclaration(DOT_VARNAME);
+	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
+	dotDecl.noteValue (null);  // Does not have a known value.
+	lexp.addDeclaration(POSITION_VARNAME, Type.int_type);
+	lexp.addDeclaration(LAST_VARNAME, Type.int_type);
 	parser.push(lexp);
-	/* FIXME - Enable this when we do proper distinct-doc-order sorting.
 	if (descendants)
 	  {
 	    curToken = '/';
-	    Declaration dotDecl = parser.lookup("dot", -1);
-	    Expression dot = new ReferenceExp("dot", dotDecl);
-	    Expression[] args = { dot, new QuoteExp(new NodeType("node")) };
-	    lexp.body = new ApplyExp(funcNamedDescendantsOrSelf, args);
-	    descendants = false; // FIXME Actually simplify below.
+	    Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
+	    Expression[] args = { dot };
+	    TreeScanner op = DescendantOrSelfAxis.make(anyNodeTest);
+	    lexp.body = new ApplyExp(new QuoteExp(op), args);
+	    //descendants = false; // FIXME Actually simplify below.
 	  }
 	else
-	*/
 	  {
 	    getRawToken();
 	    lexp.body = parseStepExpr();
 	  }
 	parser.pop(lexp);
 
-	boolean handled = false;
-
+	/*
 	if (lexp.body instanceof ApplyExp)
 	  {
 	    // Optimize the case of a simple name step.
 	    ApplyExp aexp = (ApplyExp) lexp.body;
 	    Expression func = aexp.getFunction();
 	    Expression[] args = aexp.getArgs();
-	    if (func == funcNamedChildren && args.length==2
+	    if (false
+		&& func == funcNamedChildren && args.length==2
 		&& args[0] instanceof ReferenceExp
 		&& ((ReferenceExp) args[0]).getBinding() == decl)
 	      {
@@ -1367,7 +1372,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		exp = new ApplyExp (func, args);
 		handled = true;
 	      }
-	    else if (func == funcValuesFilter && args.length==2
+	    else if (func == funcForwardFilter && args.length==2
 		     && args[0] instanceof ApplyExp
 		     && descendants)
 	      {
@@ -1381,16 +1386,13 @@ public class XQParser extends LispReader // should be extends Lexer
 		  }
 	      }
 	  }
+	*/
 
-	if (! handled)
-	  {
-	    Expression[] args = new Expression[] { lexp, exp };
-	    Expression func = makeFunctionExp("gnu.kawa.functions.ValuesMap",
-				   "valuesMap");
-	    exp = new ApplyExp(func, args);
-	  }
+	Expression[] args = new Expression[] { exp, lexp };
+	Expression func = makeFunctionExp("gnu.xquery.util.RelativeStep",
+					  "relativeStep");
+	exp = new ApplyExp(func, args);
       }
-    focusDefined = saveFocusDefined;
     return exp;
   }
 
@@ -1401,31 +1403,56 @@ public class XQParser extends LispReader // should be extends Lexer
     if (axis  >= 0 && axis < COUNT_OP_AXIS)
       {
 	getRawToken();
-	return parseStepQualifiers(parseCheckNodeTest(axis));
+	return parseStepQualifiers(parseNodeTest(axis), axis);
       }
     else
       return parseOtherStepExpr();
   }
 
-  Expression parseStepQualifiers(Expression exp)
+  Expression parseStepQualifiers(Expression exp, int axis)
     throws java.io.IOException, SyntaxException
   {
-    boolean saveFocusDefined = focusDefined;
-    focusDefined = true;
     for (;;)
       {
 	if (curToken == '[')
 	  {
 	    int startLine = getLineNumber() + 1;
 	    int startColumn = getColumnNumber() + 1;
+	    int saveSeenPosition = seenPosition;
+	    int saveSawLast = seenLast;
 	    getRawToken();
-	    LambdaExp lexp = new LambdaExp(1);
+	    LambdaExp lexp = new LambdaExp(3);
 	    lexp.setFile(getName());
 	    lexp.setLine(startLine, startColumn);
-	    Declaration dot = lexp.addDeclaration("dot");
+	    Declaration dot = lexp.addDeclaration(DOT_VARNAME);
+	    lexp.addDeclaration(POSITION_VARNAME, Type.int_type);
+	    lexp.addDeclaration(LAST_VARNAME, Type.int_type);
 	    parser.push(lexp);
 	    dot.noteValue(null);
 	    Expression cond = parseExpr();
+	    char kind;
+	    Expression valuesFilter;
+	    if (axis < 0)
+	      {
+		kind = 'P';
+		valuesFilter = funcExprFilter;
+	      }
+	    else if (axis == AXIS_ANCESTOR || axis == AXIS_ANCESTOR_OR_SELF
+		     || axis == AXIS_PARENT || axis == AXIS_PRECEDING
+		     || axis == AXIS_PRECEDING_SIBLING)
+	      {
+		kind = 'R';
+		valuesFilter = funcReverseFilter;
+	      }
+	    else
+	      {
+		kind = 'F';
+		valuesFilter = funcForwardFilter;
+	      }
+	    /*)
+	    boolean sawPosition = seenPosition > saveSeenPosition;
+	    boolean sawLast = seenLast > saveSeenLast;
+	    */
 	    cond.setFile(getName());
 	    cond.setLine(startLine, startColumn);
 	    parser.pop(lexp);
@@ -1434,7 +1461,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      return syntaxError("missing ']'");
 	    getRawToken();
 	    Expression[] args = { exp, lexp };
-	    exp = new ApplyExp(funcValuesFilter, args);
+	    exp = new ApplyExp(valuesFilter, args);
 	  }
 	/*
 	else if (curToken == ARROW_TOKEN)
@@ -1442,7 +1469,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	*/
 	else
 	  {
-	    focusDefined = saveFocusDefined;
 	    return exp;
 	  }
       }
@@ -1454,7 +1480,7 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression e = parsePrimaryExpr();
-    e = parseStepQualifiers(e);
+    e = parseStepQualifiers(e, -1);
     return e;
   }
 
@@ -2063,10 +2089,42 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
 	Expression[] args = new Expression[vec.size()];
-	vec.copyInto(args);
-	ReferenceExp rexp = new ReferenceExp(name, null);
-	rexp.setProcedureName(true);
-	exp = new ApplyExp(rexp, args);
+
+	String varName = null;
+	if (name instanceof Symbol)
+	  {
+	    Symbol sym = (Symbol) name;
+	    String lname = sym.getLocalName();
+	    if (sym.getNamespaceURI() == XQuery.XQUERY_FUNCTION_NAMESPACE)
+	      {
+		if (lname == "position")
+		  {
+		    seenPosition++;
+		    varName = POSITION_VARNAME;
+		  }
+		if (lname == "last")
+		  {
+		    seenLast++;
+		    varName = LAST_VARNAME;
+		  }
+	      }
+	  }
+	if (varName != null)
+	  {
+	    if (args.length != 0)
+	      error("arguments in call to " + name);
+	    Declaration decl = parser.lookup(varName, -1);
+	    if (decl == null)
+	      error("undefined context for " + name);
+	    exp = new ReferenceExp(varName, decl);
+	  }
+	else
+	  {
+	    vec.copyInto(args);
+	    ReferenceExp rexp = new ReferenceExp(name, null);
+	    rexp.setProcedureName(true);
+	    exp = new ApplyExp(rexp, args);
+	  }
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	popNesting(save);
@@ -2158,13 +2216,13 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (next >= 0)
 	      unread();
-	    return parseCheckNodeTest(-1);
+	    return parseNodeTest(-1);
 	  }
       }
     else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@'
 	     || token == OP_NODE || token == OP_TEXT)
       {
-	return parseCheckNodeTest(-1);
+	return parseNodeTest(-1);
       }
     else
       return null;
@@ -2420,10 +2478,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
       }
     getRawToken();
-    focusDefined = false;
     Expression retType = parseOptionalTypeDeclaration ();
     lexp.body = parseEnclosedExpr();
-    focusDefined = true;
     parser.pop(lexp);
     if (retType != null)
       Convert.setCoercedReturnValue(lexp, retType, interpreter);
@@ -2686,8 +2742,12 @@ public class XQParser extends LispReader // should be extends Lexer
   static final Expression funcNamedDescendantsOrSelf
     = makeFunctionExp("gnu.kawa.xml.NamedDescendants", 
 		      "namedDescendantsOrSelf");
-  static final Expression funcValuesFilter
-    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "valuesFilter");
+  static final Expression funcForwardFilter
+    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "forwardFilter");
+  static final Expression funcReverseFilter
+    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "reverseFilter");
+  static final Expression funcExprFilter
+    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "exprFilter");
 
   static final NodeType textNodeTest = new NodeType("text", NodeType.TEXT_OK);
   static final NodeType anyNodeTest = new NodeType("node");

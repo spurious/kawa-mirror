@@ -183,7 +183,6 @@ public class XQuery extends Interpreter
     define("avg", gnu.xquery.util.Average.avg);
     define("index-of", gnu.xquery.util.IndexOf.indexOf);
     define("last-index-of", gnu.xquery.util.LastIndexOf.lastIndexOf);
-    define("position", gnu.xquery.util.Position.position);
     define("sublist", gnu.xquery.util.SubList.subList);
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
     define("false", new ConstantFunction0("false", Boolean.FALSE));

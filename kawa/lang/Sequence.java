@@ -36,4 +36,35 @@ public abstract class Sequence
       arr[len] = null; 
     return arr;
   }
+
+  public java.util.Enumeration elements()
+  {
+    return new SeqEnumeration(this);
+  }
+}
+
+class SeqEnumeration implements java.util.Enumeration
+{
+  Sequence seq;
+  int length;
+  int current;
+
+  public SeqEnumeration(Sequence seq)
+  {
+    this.seq = seq;
+    this.length = seq.length();
+    this.current = 0;
+  }
+
+  public boolean hasMoreElements()
+  {
+    return current < length;
+  }
+
+  public Object nextElement()
+  {
+    if (current < length)
+      return seq.elementAt(current++);
+    throw new java.util.NoSuchElementException();
+  }
 }

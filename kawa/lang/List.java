@@ -121,4 +121,49 @@ public class List extends Sequence implements Printable, Compilable
   public void emit (Literal literal, Compilation comp)
   {
   }
+
+  public java.util.Enumeration elements()
+  {
+    return new ListEnumeration(this);
+  }
+}
+
+/** A Enumerations for linked Lists.
+ * Can handle improper lists, though the tail should be a Sequence. */
+
+class ListEnumeration implements java.util.Enumeration
+{
+  Object seq;
+  int length = -1;
+  int current = 0;
+
+  public ListEnumeration(List list)
+  {
+    seq = list;
+  }
+
+  public boolean hasMoreElements()
+  {
+    if (seq instanceof Pair)
+      return true;
+    if (length < 0)
+      length = ((Sequence) seq).length();
+    return current < length;
+  }
+
+  public Object nextElement()
+  {
+    if (seq instanceof Pair)
+      {
+        Pair pair = (Pair) seq;
+        seq = pair.cdr;
+        return pair.car;
+      }
+    Sequence seq = (Sequence) this.seq;
+    if (length < 0)
+      length = seq.length();
+    if (current < length)
+      return seq.elementAt(current++);
+    throw new java.util.NoSuchElementException();
+  }
 }

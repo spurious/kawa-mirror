@@ -16,15 +16,7 @@ public class LetExp extends ScopeExp
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    Object[] values = shared ? env.values : new Object[frameSize];
-    int i = 0;
-    for (Variable var = firstVar ();  var != null; var = var.nextVar ())
-      {
-	if (var != heapFrame)
-	  values[var.offset] = inits[i].eval (env);
-	i++;
-      }
-    return body.eval (shared ? env : new Environment (values, this, env));
+    throw new GenericError ("internal error - LetExp.eval called");
   }
 
   /* Recursive helper routine, to store the values on the stack

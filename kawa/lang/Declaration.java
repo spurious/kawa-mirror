@@ -17,7 +17,7 @@ import codegen.*;
  * The baseVariable field points to the declaration of the headFrame array.
  *
  * If a function needs a heapFrame array, then LambdaExp.heapFrame
- * points to the declaration variable that points to the heapFrame array.
+ * points to the declaration that points to the heapFrame array.
  * This declaration has isSimple and isArtificial true.
  *
  * The heapFrame array is passed to the constructors of inferior
@@ -79,7 +79,7 @@ public class Declaration extends Variable
   public Declaration baseVariable;
 
   /** If non-null, the Declaration that we "shadow" (hide). */
-  Declaration shadowed;
+  Object shadowed;  /* Either a Declaration or a Symbol. */
 
   /** If non-null, the single expression used to set this variable.
    * If the variable can be set more than once, then value is null. */
@@ -103,59 +103,13 @@ public class Declaration extends Variable
 
   public String string_name () { return sym.toString (); }
 
-  public Object getValue (Object[] frame)
-  {
-    //System.err.println ("getvalue: " + sym + " offset:"+offset + " context:"+context + " this:"+this);
-    if (context.heapFrame == this)
-      return frame;
-    if (baseVariable != null)
-      frame = (Object[]) baseVariable.getValue (frame);
-    return frame[offset];
-  }
-
-  public Object[] getFrame (Environment env)
-  {
-    //System.err.println ("getframe: " + sym + " offset:"+offset);
-    Object frame[] = env.values;
-    ScopeExp curScope = env.scope;
-    ScopeExp declScope = context;
-    while (declScope.shared) declScope = declScope.outer;
-    for (; curScope != declScope; curScope = curScope.outer)
-      {
-	if (curScope instanceof LambdaExp)
-	  {
-	    LambdaExp lambda = (LambdaExp) curScope;
-	    if (lambda.staticLink == null)
-	      throw new Error ("interal error - canot find static link");
-	    frame = (Object[]) lambda.staticLink.getValue (frame);
-	  }
-      }
-    return frame;
-  }
-
-  Object getValue (Environment env)
-  {
-    if (context.heapFrame == this)
-      return env.values;
-    //System.err.println ("getvalue: " + sym);
-    return getValue (getFrame (env)); 
-  }
-
-  void setValue (Environment env, Object value)
-  {
-    Object[] frame = getFrame (env);
-    if (baseVariable != null)
-      frame = (Object[]) baseVariable.getValue (frame);
-    frame[offset] = value;
-  }
-
   /**
    * Insert this into Interpreter.current_decls.
    * (Used at rewrite time, not eval time.)
    */
   void push (Interpreter interp)
   {
-    Declaration old_decl = (Declaration) interp.current_decls.get (sym);
+    Object old_decl = interp.current_decls.get (sym);
     if (old_decl != null)
       shadowed = old_decl;
     interp.current_decls.put (sym, this);

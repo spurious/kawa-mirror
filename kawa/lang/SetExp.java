@@ -47,16 +47,16 @@ public class SetExp extends Expression
     Object new_val = new_value.eval (env);
 
     if (binding != null)
-      {
-	ScopeExp scope = binding.context;
-	while (scope.shared)
-	  scope = scope.outer;
-	while (env.scope != scope)
-	  env = env.outer;
-	env.values[binding.offset] = new_val;
-      }
+      throw new Error ("internal error - SetExp.eval with lexical binding");
+    if (isDefining ())
+      env.define (name, new_val);
     else
-      env.interp.define (name, new_val);
+      {
+	Binding bind = env.lookup (name);
+	if (bind == null)
+	  throw new UnboundSymbol (name);
+	env.put (name, new_val);
+      }
     return Interpreter.voidObject;
   }
 

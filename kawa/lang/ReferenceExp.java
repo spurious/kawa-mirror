@@ -27,10 +27,10 @@ public class ReferenceExp extends Expression
   {
     Object val;
     if (binding != null)
-      return binding.getValue (env);
+      throw new Error("internal error: ReeferenceExp.eval on lexical binding");
     else
       {
-	val = env.interp.lookup (symbol);
+	val = env.get (symbol);
 	if (val == null)
 	  throw new UnboundSymbol (symbol);
       }
@@ -52,7 +52,7 @@ public class ReferenceExp extends Expression
 	LambdaExp declLambda = decl.context.currentLambda ();
 	if (curLambda != declLambda)
 	  {
-	    comp.method.compile_push_value (curLambda.staticLink);
+	    compile_load (curLambda.staticLink, comp);
 	    LambdaExp lambda = curLambda.outerLambda ();
 	    for ( ; lambda != declLambda;  lambda = lambda.outerLambda ())
 	      {

@@ -1,4 +1,4 @@
-(test-init "Objects" 91)
+(test-init "Objects" 95)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -209,6 +209,14 @@
 (slot-set! obj1 'a (+ 10 (static-field <SimpleA> 'b)))
 (test "yes" slot-ref obj1 'hyphenated-field?)
 (test 16 field obj1 'a)
+(slot-set! obj1 'happy #t)
+(test #t slot-ref obj1 'happy)
+(slot-set! obj1 'happy #f)
+(test #f slot-ref obj1 'happy)
+(force-compile slot-set! (as <SimpleA> obj1) 'happy #t)
+(test #t slot-ref (as <SimpleA> obj1) 'happy)
+(set! (field obj1 'happy) #f)
+(test #f field obj1 'happy)
 
 (define obj2 (make <SimpleB>))
 (test 4 field obj2 'a)

@@ -1,3 +1,7 @@
+2004-08-05  Chris Dean  <ctdean@sokitomi.com>
+
+	* obj-test.scm:  Check for "isName" methods.
+
 2004-08-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Adjust classpath for CGI tests, so we get

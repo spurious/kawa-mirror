@@ -6,9 +6,29 @@ import gnu.expr.*;
 public class SlotSet extends Procedure3 implements Inlineable
 {
   /** True if this is a "static-field" operation. */
-  static boolean isStatic;
+  boolean isStatic;
 
-  public static void apply (Object obj, String name, Object value)
+  public static final SlotSet setField$Ex = new SlotSet("set-field!", false);
+  public static final SlotSet setStaticField$Ex
+  = new SlotSet("set-static-field!", true);
+
+  public SlotSet(String name, boolean isStatic)
+  {
+    super(name);
+    this.isStatic = isStatic;
+  }
+
+  public static void setField (Object obj, String name, Object value)
+  {
+    apply(false, obj, name, value);
+  }
+
+  public static void setStaticField (Object obj, String name, Object value)
+  {
+    apply(true, obj, name, value);
+  }
+
+  public static void apply (boolean isStatic, Object obj, String name, Object value)
   {
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
     boolean illegalAccess = false;
@@ -17,7 +37,12 @@ public class SlotSet extends Procedure3 implements Inlineable
     try
       {
         java.lang.reflect.Field field = clas.getField(name);
-        field.set(obj, interpreter.coerceFromObject(field.getType(), value));
+	Class ftype = field.getType();
+	if ("gnu.mapping.Binding".equals(ftype.getName())
+	    && (field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
+	  ((Binding) field.get(obj)).set(value);
+	else
+	  field.set(obj, interpreter.coerceFromObject(ftype, value));
         return;
       }
     catch (java.lang.NoSuchFieldException ex)
@@ -74,7 +99,7 @@ public class SlotSet extends Procedure3 implements Inlineable
 
   public Object apply3 (Object obj, Object fname, Object value)
   {
-    apply(obj, (String) fname, value);
+    apply(isStatic, obj, (String) fname, value);
     return Values.empty;
   }
 
@@ -110,15 +135,31 @@ public class SlotSet extends Procedure3 implements Inlineable
                          Expression valArg, Object part, Compilation comp)
   {
     CodeAttr code = comp.getCode();
+    boolean isStatic
+      = thisProc instanceof SlotSet && ((SlotSet) thisProc).isStatic;
     if (part instanceof gnu.bytecode.Field)
       {
         gnu.bytecode.Field field = (gnu.bytecode.Field) part;
         boolean isStaticField = field.getStaticFlag();
+	Type ftype = field.getType();
+	boolean indirect = ("gnu.mapping.Binding".equals(ftype.getName())
+			    && (field.getModifiers() & Access.FINAL) != 0);
         if (isStatic && ! isStaticField)
           comp.error('e', ("cannot access non-static field `" + field.getName()
                            + "' using `" + thisProc.getName() + '\''));
-        valArg.compile(comp, Target.pushValue(field.getType()));
-        if (isStaticField)
+	if (indirect)
+	  {
+	    if (isStaticField)
+	      code.emitGetStatic(field); 
+	    else
+	      code.emitGetField(field);
+	  }
+        valArg.compile(comp,
+		       indirect ? Target.pushObject : Target.pushValue(ftype));
+	if (indirect)
+	  code.emitInvokeVirtual(Compilation.typeBinding.getDeclaredMethod
+				 ("set", 1));
+        else if (isStaticField)
           code.emitPutStatic(field); 
         else
           code.emitPutField(field);

@@ -117,7 +117,7 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 Keyword key = (Keyword) margs[i];
                 Object arg = margs[i+1];
-                SlotSet.apply(result, key.getName(), arg);
+                SlotSet.apply(false, result, key.getName(), arg);
               }
             return result;
           }

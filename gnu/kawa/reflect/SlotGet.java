@@ -12,13 +12,22 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
   /** True if this is a "static-field" operation. */
   boolean isStatic;
 
-  public static SlotGet field = new SlotGet("field", false);
-  public static SlotGet staticField = new SlotGet("static-field", true);
+  Procedure setter;
+  public static SlotGet field = new SlotGet("field", false, SlotSet.setField$Ex);
+  public static SlotGet staticField
+  = new SlotGet("static-field", true, SlotSet.setStaticField$Ex);
 
   public SlotGet(String name, boolean isStatic)
   {
     super(name);
     this.isStatic = isStatic;
+  }
+
+  public SlotGet(String name, boolean isStatic, Procedure setter)
+  {
+    super(name);
+    this.isStatic = isStatic;
+    this.setter = setter;
   }
 
   public static Object field(Object obj, String fname)
@@ -62,7 +71,12 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
         try
           {
             Object result = field.get(obj);
-            result = interpreter.coerceToObject(field.getType(), result);
+	    if (result instanceof Binding
+		&& ((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
+		    != 0))
+	      result = ((Binding) result).get();
+	    else
+	      result = interpreter.coerceToObject(field.getType(), result);
             return result;
           }
         catch (IllegalAccessException ex)
@@ -134,7 +148,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 
   public void set2 (Object obj, Object name, Object value)
   {
-    SlotSet.apply(obj, (String) name, value);
+    SlotSet.apply(isStatic, obj, (String) name, value);
   }
 
   Object getField(Type type, String name)
@@ -227,7 +241,11 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
               }
             else
               code.emitGetField(field);
-	    target.compileFromStack(comp, field.getType());
+	    Type ftype = field.getType();
+	    if ("gnu.mapping.Binding".equals(ftype.getName())
+		&& (modifiers & Access.FINAL) != 0)
+	      code.emitInvokeVirtual(Compilation.getLocationMethod);
+	    target.compileFromStack(comp, ftype);
             return;
           }
         if (part instanceof gnu.bytecode.Method)
@@ -286,5 +304,10 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 	  return gnu.kawa.lispexpr.LangPrimType.intType;  // FIXME
       }
     return Type.pointer_type;
+  }
+
+  public Procedure getSetter()
+  {
+    return setter == null ? super.getSetter() : setter;
   }
 }

@@ -23,6 +23,12 @@ public class SourceMessages
 
   public void clearErrors() { errorCount = 0; }
 
+  public void clear()
+  {
+    firstError = lastError = null;
+    errorCount = 0;
+  }
+
   // The last SourceError with a *differnt* filename than prev has.
   SourceError lastPrevFilename = null;
 
@@ -80,7 +86,7 @@ public class SourceMessages
     error(new SourceError(severity, filename, line, column, message));
   }
 
-  void printAll(java.io.PrintStream out, int max)
+  public void printAll(java.io.PrintStream out, int max)
   {
     for (SourceError err = firstError;
 	 err != null && --max >= 0;  err = err.next)
@@ -89,7 +95,7 @@ public class SourceMessages
       }
   }
 
-  void printAll(java.io.PrintWriter out, int max)
+  public void printAll(java.io.PrintWriter out, int max)
   {
     for (SourceError err = firstError;
 	 err != null && --max >= 0;  err = err.next)

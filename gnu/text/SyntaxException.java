@@ -17,4 +17,9 @@ public class SyntaxException extends Exception
   {
     messages.printAll(out, max);
   }
+
+  public void clear()
+  {
+    messages.clear();
+  }
 }

@@ -17,9 +17,7 @@ public class ExceptionsAttr extends Attribute
   public ExceptionsAttr(Method meth)
   {
     super("Exceptions");
-    setContainer(meth);
-    setNext(meth.getAttributes());
-    meth.setAttributes(this);
+    addToFrontOf(meth);
   }
 
   /** Set the Exceptions attribute to refer to classes whose indices

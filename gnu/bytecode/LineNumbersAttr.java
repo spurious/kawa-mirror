@@ -22,9 +22,7 @@ public class LineNumbersAttr extends Attribute
   public LineNumbersAttr(CodeAttr code)
   {
     super("LineNumberTable");
-    setContainer(code); 
-    setNext(code.getAttributes()); 
-    code.setAttributes(this);
+    addToFrontOf(code);
     code.lines = this;
   }
 

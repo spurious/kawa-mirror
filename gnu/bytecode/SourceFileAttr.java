@@ -31,8 +31,7 @@ public class SourceFileAttr extends Attribute
     else
       {
 	SourceFileAttr sattr = new SourceFileAttr(filename);
-	sattr.setNext(cl.getAttributes());
-	cl.setAttributes(sattr);
+        sattr.addToFrontOf(cl);
       }
   }
 

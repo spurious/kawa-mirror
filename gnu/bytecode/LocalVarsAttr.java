@@ -21,10 +21,17 @@ public class LocalVarsAttr extends Attribute
   public LocalVarsAttr(CodeAttr code)
   {
     super("LocalVariableTable");
-    setContainer(code);
-    setNext(code.getAttributes()); 
-    code.setAttributes(this);
+    addToFrontOf(code);
     method = (Method) code.getContainer();
+    code.locals = this;
+  }
+
+  /** Create, but don't link into method.code's attributes list (yet). */
+  public LocalVarsAttr(Method method)
+  {
+    super("LocalVariableTable");
+    CodeAttr code = method.code;
+    this.method = method;
     code.locals = this;
   }
 
@@ -53,6 +60,18 @@ public class LocalVarsAttr extends Attribute
 	    var.start_pc = code.PC;
 	  }
       }
+  }
+
+  public final boolean isEmpty ()
+  {
+    VarEnumerator vars = allVars();
+    Variable var;
+    while ((var = vars.nextVar ()) != null)
+      {
+	if (var.isSimple () && var.name != null)
+          return false;
+      }
+    return true;
   }
 
   public final int getCount ()

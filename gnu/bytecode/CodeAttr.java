@@ -105,9 +105,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public CodeAttr (Method meth)
   {
     super ("Code");
-    setContainer(meth);
-    setNext(meth.getAttributes());
-    meth.setAttributes(this);
+    addToFrontOf(meth);
     meth.code = this;
   }
 
@@ -346,7 +344,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     scope.start_pc = PC;
     readPC = PC;
     if (locals == null)
-      locals = new LocalVarsAttr(this);
+      locals = new LocalVarsAttr(getMethod());
     locals.enterScope(scope);
     if (locals.parameter_scope == null) 
       locals.parameter_scope= scope;
@@ -1656,6 +1654,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
+    if (locals != null && locals.container == null && ! locals.isEmpty())
+      locals.addToFrontOf(this);
     Attribute.assignConstants(this, cl);
   }
 

@@ -1,3 +1,15 @@
+1999-12-02  Per Bothner  <per@bothner.com>
+
+	* Attribute.java (addToFrontOf):  New method.
+	* CodeAttr.java, ExceptionsAttr.java, InnerClassesAttr.java,
+	LineNumbersAttr.java, LocalVarsAttr.java, SourceFileAttr.java 
+	(<init>):  Use new addToFrontOf method.
+	* LocalVarsAttr.java (isEmpty):  New method.
+	(<init>):  New (overloaded) constructor.
+	* CodeAttr.java (pushScope):  Use new LocalVarsAttr constructor.
+	(assignConstants):  If we have something to emit in a (non-empty)
+	LocalVars attribute, link it into the attribute list.
+
 1999-11-18  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getModifiers):  Update access_flags after calling

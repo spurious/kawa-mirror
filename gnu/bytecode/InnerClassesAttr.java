@@ -11,9 +11,7 @@ public class InnerClassesAttr  extends Attribute
   public InnerClassesAttr (ClassType cl)
   {
     super("InnerClasses");
-    setContainer(cl);
-    setNext(cl.getAttributes());
-    cl.setAttributes(this);
+    addToFrontOf(cl);
   }
 
   public InnerClassesAttr (short[] data, ClassType cl)

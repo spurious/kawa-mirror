@@ -542,6 +542,7 @@ public class Scheme extends Interpreter
       define_proc ("%makeProcLocation", "kawa.standard.makeProcLocation");
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
+      define ("define-member-alias", new kawa.standard.define_member_alias());
   }
 
   static int scheme_counter = 0;
@@ -730,6 +731,10 @@ public class Scheme extends Interpreter
 	types.put ("record", ClassType.make("kawa.lang.Record"));
 	types.put ("type", ClassType.make("gnu.bytecode.Type"));
 	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
+
+        // Only if JEmacs is available.  FIXME.
+	types.put ("buffer", ClassType.make("gnu.jemacs.buffer.Buffer"));
+	types.put ("window", ClassType.make("gnu.jemacs.buffer.Window"));
       }
     return (Type) types.get(name);
   }

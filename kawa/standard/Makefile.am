@@ -126,6 +126,7 @@ convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java makeProcLocation.java location.java \
 define_alias.java \
+define_member_alias.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java \
 TracedProcedure.java \

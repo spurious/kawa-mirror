@@ -36,7 +36,7 @@ public class let extends Syntax implements Printable
 	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
 	Object init;
-	if ("::".equals(binding.car)) // && "::" is unbound FIXME
+	if ("::" == binding.car) // && "::" is unbound FIXME
 	  {
 	    if (! (binding.cdr instanceof Pair)
 		|| (binding = (Pair) binding.cdr).cdr == List.Empty)

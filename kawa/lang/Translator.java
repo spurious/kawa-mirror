@@ -298,6 +298,7 @@ public class Translator extends Parser
       {
 	String name = (String) exp;
 	Object binding = environ.get (name);
+        boolean separate = getInterpreter().hasSeparateFunctionNamespace();
 	Declaration decl = null;
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.  Here, use the original symbol.
@@ -306,11 +307,12 @@ public class Translator extends Parser
         else if (binding instanceof Declaration) // ?? FIXME
           {
             decl = (Declaration) binding;
-            if (! isLexical(decl))
+            if (! isLexical(decl)
+                || (separate && decl.isProcedureDecl()))
               decl = null;
           }
 	ReferenceExp rexp = new ReferenceExp (name, decl);
-	if (getInterpreter().hasSeparateFunctionNamespace())
+	if (separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;
       }

@@ -1,3 +1,8 @@
+2000-06-26  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite):  If separate name spaces,
+	don't resolve regular name to procedure decl.
+
 2000-06-24  Per Bothner  <per@bothner.com>
 	
 	* configure.in:  Set version to 1.6.70.

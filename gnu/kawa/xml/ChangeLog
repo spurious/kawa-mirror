@@ -1,3 +1,9 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* Children.java: Moved from gnu.mapping.xquery, because it is also
+	used for Scheme.
+	* Makefile.am: Update accordingly.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Use different SetExp constructor,

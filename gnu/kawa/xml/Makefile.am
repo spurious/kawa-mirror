@@ -9,6 +9,7 @@ java_sources = \
   Attributes.java \
   AttributeType.java \
   ChildAxis.java \
+  Children.java \
   CoerceNodes.java \
   CommentConstructor.java \
   DefineNamespace.java \

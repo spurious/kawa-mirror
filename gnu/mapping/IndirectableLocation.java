@@ -8,6 +8,15 @@ public abstract class IndirectableLocation extends Location
   /** If <code>value==DIRECT_ON_SET</code>, break indirection on a <code>set</code>. */
   protected static final Object DIRECT_ON_SET = new String("(direct-on-set)");
 
+  /** If <code>value</code> has this value, forc indirection even
+   * for the <code>setWithSave</code> operation.
+   * Ignoring the restore aspect of a <code>fluid-let</code>, it is normally
+   * treated as closer to a <code>define</code> than to a <code>set</code>,
+   * in that we break the sharing with another <code>Environment</code>.
+   * Setting <code>value</code> to <code>INDIRECT_FLUIDS</code> means we do
+   * <em>not</em> want to break the indirection in this case. */
+  protected static final Object INDIRECT_FLUIDS = new String("(indirect-fluids)");
+
   /** If non-null, operations are forwarded to the base location. */
   protected Location base;
 

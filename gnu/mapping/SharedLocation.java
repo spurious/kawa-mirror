@@ -47,7 +47,9 @@ public class SharedLocation extends NamedLocation
   {
     Object old;
     if (base != null)
-      {
+      {	
+	if (value == INDIRECT_FLUIDS)
+	  return base.setWithSave(newValue);
 	old = base;
 	base = null;
       }

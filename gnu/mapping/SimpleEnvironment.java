@@ -192,7 +192,7 @@ public class SimpleEnvironment extends Environment
     if (! (loc.isBound() ? getCanDefine() : getCanRedefine()))
       redefineError(name, property, nloc);
     nloc.base = loc;
-    nloc.value = null;
+    nloc.value = IndirectableLocation.INDIRECT_FLUIDS;
     return nloc;
   }
 

@@ -1,3 +1,11 @@
+2005-01-16  Per Bothner  <per@bothner.com>
+
+	* IndirectableLocation.java (INDIRECT_FLUIDS): New constant.
+	* SimpleEnvironment.java (addLocation): Set value to INDIRECT_FLUIDS.
+	* PlainLocation.java (setWithSave): Check for INDIRECT_FLUIDS.
+	* SharedLocation.java (setWithSave): Likewise.
+	Fixes Savannah bug #11578.
+
 2005-01-07  Per Bothner  <per@bothner.com>
 
 	* NamedLocation.java: Remove unneeded import.

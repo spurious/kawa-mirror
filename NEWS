@@ -1,12 +1,14 @@
-Changes from Kawa 1.6.53 to 1.6.54
+Changes from Kawa 1.6.53 to 1.6.55
 ==================================
+Local functions that are only called from one locations, except for
+tail-recursion, are now inlined.  This inlines do loops, and most
+"named let" loops.
+
 New representation of closures (closures with captured local variables).
 We no longer use an array for the closure.  Instead we store the captured
 variables in the Procedure itself.  This should be faster (since
 we can use field accesses rather than array indexing, which requires
 bounds checking), and avoids a separate environment object.
-
-Preliminary support for inlining, concentrating on do loops.
 
 If the compiler sees a function call whose (non-lexically-bound) name
 matches an existing (globally-defined) procedure, and that procedure

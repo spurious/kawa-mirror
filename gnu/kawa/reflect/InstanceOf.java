@@ -5,23 +5,23 @@ import gnu.expr.*;
 
 public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 {
-  Interpreter interpreter;
+  Language language;
 
-  public InstanceOf(Interpreter interpreter)
+  public InstanceOf(Language language)
   {
-    this.interpreter = interpreter;
+    this.language = language;
   }
 
-  public InstanceOf(Interpreter interpreter, String name)
+  public InstanceOf(Language language, String name)
   {
-    this.interpreter = interpreter;
+    this.language = language;
     setName(name);
   }
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    Type type = interpreter.asType(arg2);
-    return interpreter.booleanObject(type.isInstance(arg1));
+    Type type = language.asType(arg2);
+    return language.booleanObject(type.isInstance(arg1));
   }
 
   static gnu.bytecode.ClassType typeType;
@@ -42,7 +42,7 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
       {
         try
           {
-            type = interpreter.asType(((QuoteExp) typeArg).getValue());
+            type = language.asType(((QuoteExp) typeArg).getValue());
           }
         catch (Exception ex)
           {
@@ -50,7 +50,7 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
           }
       }
     else 
-      type = interpreter.getTypeFor(typeArg);
+      type = language.getTypeFor(typeArg);
     if (type != null)
       {
 	args[0].compile(comp, Target.pushObject);
@@ -77,12 +77,12 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 	args[0].compile(comp, Target.pushObject);
 	code.emitInvokeVirtual(instanceMethod);
       }
-    target.compileFromStack(comp, interpreter.getTypeFor(Boolean.TYPE));
+    target.compileFromStack(comp, language.getTypeFor(Boolean.TYPE));
   }
 
   public Type getReturnType (Expression[] args)
   {
-    return interpreter.getTypeFor(Boolean.TYPE);
+    return language.getTypeFor(Boolean.TYPE);
   }
 
   public static void emitIsInstance(TypeValue type, Variable incoming,

@@ -1,3 +1,7 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java: Update Interpreter -> Language.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java: Update Interpreter -> Language.

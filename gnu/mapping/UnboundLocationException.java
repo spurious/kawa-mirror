@@ -30,6 +30,9 @@ public class UnboundLocationException extends RuntimeException
   
   public String getMessage()
   {
+    String msg = super.getMessage();
+    if (msg != null)
+      return msg;
     StringBuffer sbuf = new StringBuffer();
     Symbol name = location == null ? null : location.getKeySymbol();
     if (name != null)

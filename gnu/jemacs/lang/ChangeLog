@@ -1,3 +1,8 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* package.html:  New file.
+
 2000-02-11  Per Bothner  <per@bothner.com>
 
 	* ELispReader.java (isDelimiter):  Add '\'' and '#' as delimiters.

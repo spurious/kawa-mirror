@@ -68,20 +68,24 @@ public class Shell extends Procedure0
   {
     Environment env = interp.getEnvironment();
     Translator tr = new Translator (env);
+    ScmRead lexer = new ScmRead(inp);
     for (;;)
       {
 	try
 	  {
-	    Object sexp = interp.read(inp);
+	    lexer.clearErrors();
+	    PairWithPosition body = new PairWithPosition(inp,
+							 null, List.Empty);
+	    Object sexp = lexer.readObject();
 	    if (sexp == Sequence.eofValue)
 	      return;
+	    body.car = sexp;
+	    /* If the errors were minor, we could perhaps try to
+	       do Translation (to check for more errors)  .  ??? */
+	    if (lexer.checkErrors(perr, 20))
+	      continue;
 	    tr.errors = 0;
-
-	    String filename = inp.getName ();
-	    if (filename == null)
-	      filename = "<unknown>";
-	    ModuleExp mod = new ModuleExp (new Pair (sexp, List.Empty),
-					   tr, filename);
+	    ModuleExp mod = new ModuleExp (body, tr);
 	    mod.setName("atInteractiveLevel");  // FIXME
 
 	    /* DEBUGGING:
@@ -94,7 +98,7 @@ public class Shell extends Procedure0
 
 	    if (tr.errors == 0)
 	      {
-		Object result = mod.eval_module (env);
+		Object result = mod.evalModule (env);
 		if (pout != null)
 		  interp.print(result, pout);
 	      }
@@ -116,9 +120,9 @@ public class Shell extends Procedure0
 	    perr.println("Invalid parameter, should be: "+ e.getMessage());
 	    e.printStackTrace(perr);
 	  }
-	catch (kawa.lang.ReadError e)
+	catch (kawa.lang.SyntaxException e)
 	  {
-	    perr.println (e);
+	    e.printAll(perr, 20);
 	  }
 	catch (Exception e)
 	  {

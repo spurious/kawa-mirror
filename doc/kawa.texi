@@ -79,7 +79,7 @@ and
 are used by Kawa, and distributed with it, but may be independently useful.
 
 For a technical overview of Kawa, see these
-@uref{http://sources.redhat.com/kawa/papers/,papers}.
+@uref{http://www.gnu.org/software/kawa/internals.html}.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -870,21 +870,23 @@ You can also compile your Scheme program to native code using GCJ.
 @node Archive compilation, Files compilation, Compiling, Compiling
 @section Compiling Scheme to an archive file
 
-To byte-compile a file @samp{foo.scm} do:
+@defun compile-file source-file compiled-archive
+Compile the @var{source-file}, producing a @code{.zip} archive
+@var{compiled-file}.
+
+
+For example, to byte-compile a file @samp{foo.scm} do:
 @example
 (compile-file "foo.scm" "foo")
 @end example
 
-This will create @samp{foo.zip}, which contains byte-compiled "j-code"
-that implements @samp{foo.scm}.
-
-You can later do:
-@example
-(load "foo")
-@end example
-
-This will load @samp{foo.zip}, which should have the same effect as
-loading @samp{foo.scm}, except you will get the byte-compiled versions.
+This will create @samp{foo.zip}, which contains byte-compiled "j-code".
+You can move this file around, without worrying about class paths.
+To load the compiled file, you can later @code{load} the
+named file, as in either @code{(load "foo")} or @code{(load "foo.zip")}.
+This should have the same effect as
+loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
+@end defun
 
 @node Files compilation, Application compilation, Archive compilation, Compiling
 @section Compiling Scheme to a set of .class files

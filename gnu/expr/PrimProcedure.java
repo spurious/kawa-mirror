@@ -259,8 +259,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 		       Type retType, Type[] argTypes)
   {
     this.op_code = op_code;
-    if (op_code == 185) // invokeinterface
-      classtype.access_flags |= Access.INTERFACE;
     method = classtype.addMethod (name, op_code == 184 ? Access.STATIC : 0,
 				  argTypes, retType);
     this.retType = retType;

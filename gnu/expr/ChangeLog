@@ -1,5 +1,8 @@
 2001-11-18  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (<init>): Don't set interface flag as it prevents
+	future getModifiers calls from getting the reflectClass's modifiers.
+	
 	* Expression.java (printLineColumn):  New method.
 	* BeginExp.java, LetExp.java, SetExp.java (print): Use printLineColumn.
 

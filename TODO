@@ -1,3 +1,8 @@
+Optimize away append-values call in HelloCgiS.class.
+Optimize NumberCompare further.
+For doc: AUTOMAKE_OPTIONS = cygnus
+document eval methods
+
 BEFORE KAWA 1.7?
 * Make sure build.xml works (fix various HTTP.scm, brl, etc)
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).

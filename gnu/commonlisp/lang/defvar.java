@@ -31,8 +31,8 @@ public class defvar extends Syntax
 	  }
 	else
 	  tr.error('w', "duplicate declaration for `" + name + "'");
-	p = tr.makePair(p, decl, p.cdr);
-	st = tr.makePair(st, this, p);
+	p = Translator.makePair(p, decl, p.cdr);
+	st = Translator.makePair(st, this, p);
         if (defs instanceof ModuleExp)
           {
 	    decl.setCanRead(true);

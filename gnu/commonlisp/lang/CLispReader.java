@@ -1,7 +1,6 @@
 package gnu.commonlisp.lang;
 import gnu.kawa.lispexpr.*;
 import gnu.mapping.*;
-import gnu.lists.*;
 import gnu.text.*;
 
 /** A class to read CommonLisp forms (S-expressions). */

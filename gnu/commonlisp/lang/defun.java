@@ -39,7 +39,7 @@ public class defun extends Syntax implements Printable
 
     if (defs instanceof ModuleExp)
       decl.setCanRead(true);
-    st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));
+    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.cdr));
     forms.addElement (st);
     return true;
   }

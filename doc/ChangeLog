@@ -1,3 +1,7 @@
+2003-07-15  Chris Dean  <Chris.Dean@mercedsystems.com>
+
+	* kawa.texi (Method operations):  Document new invoke-special function.
+
 2003-06-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Scheme types in Java): Update ancient class names.

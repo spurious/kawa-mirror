@@ -3887,6 +3887,38 @@ or
 @end example
 @end defun
 
+@defun invoke-special class receiver-object name arg ...
+The @var{class} can be a @code{<java.lang.Class>}, a
+@code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
+that names a Java class.  
+The @var{name} can be @code{<symbol>} or
+@code{<string>} that names one or more methods in the Java class.
+The name is "mangled" (@pxref{Mangling}) into a valid Java name.
+
+This procedure is very similar to @code{invoke} and @code{invoke-static}
+and invokes the specified method, ignoring any methods in subclasses
+that might overide it.  One interesting use is to invoke a method in
+your super-class like the Java language @code{super} keyword.
+
+Any methods in the specified @var{class} that match "@var{name}" or
+"@var{name}$V" collectively form a generic procedure.  That generic
+procedure is then applied as in @code{invoke} using the
+@code{receiver-object} and the arguments (if any).
+
+The compiler must be able to inline this procedure (because you cannot
+force a specific method to be called using reflection).  Therefore the
+@var{class} and @var{name} must resolve at compile-time to a specific
+method.
+
+@example
+(define-simple-class <MyClass> (<java.util.Date>)
+  ((get-year) :: <int>
+   (+ (invoke-special <java.util.Date> (this) 'get-year)) 1900)
+  ((set-year (year :: <int>)) :: <void>
+   (invoke-special <java.util.Date> (this) 'set-year (- year 1900))))
+@end example
+@end defun
+
 @defun class-methods class name
 Return a generic function containing those methods of @var{class}
 that match the name @var{name}, in the sense of @code{invoke-static}.

@@ -16,15 +16,10 @@ public class with_compile_options extends Syntax
       return;
     if (rest == form.cdr)
       {
-	tr.scanBody(rest, defs);
+	tr.scanBody(rest, defs, false);
 	return;
       }
-    int first = tr.formStack.size();
-    tr.scanBody(rest, defs);
-    rest = LList.Empty;
-    while (tr.formStack.size() > first)
-      rest = new Pair(tr.formStack.pop(), rest);
-    rest = new Pair(stack, rest);
+    rest = tr.scanBody(rest, defs, true);
     tr.currentOptions.popOptionValues(stack);
     tr.formStack.add(Translator.makePair(form, form.car, rest));
   }

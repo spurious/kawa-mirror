@@ -18,6 +18,10 @@ public class begin extends Syntax implements Printable
 
   public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
-    tr.scanBody(st.cdr, defs);
+    Object body = tr.scanBody(st.cdr, defs, true);
+    if (body != LList.Empty)
+      // Because rewrite to be called later, with whatever is left after
+      // removing declarations.
+      tr.formStack.add(Translator.makePair(st, st.car, body));
   }
 }

@@ -935,13 +935,18 @@ public class Translator extends Compilation
   }
 
   /** Recursive helper method for rewrite_body.
-   * Scan body for definitions, placing partially macro-expanded
-   * expressions into forms.
-   * If definitions were seen, return a LetExp containing the definitions.
+   * Scan body for definitions, adding partially macro-expanded
+   * expressions into the <code>formStack</code>.
+   * @param makeList if true, return a list representation of the scanned
+   *   forms (not including declarations); else forms are push on formStack
+   * @return a list of forms if <code>makeList</code> (possibly wrapped
+   * in a <code>SyntaxForm</code>); otherwise <code>null</code>.
    */
 
-  public void scanBody (Object body, ScopeExp defs)
+  public Object scanBody (Object body, ScopeExp defs, boolean makeList)
   {
+    Object list = makeList ? LList.Empty : null;
+    Pair lastPair = null;
     while (body != LList.Empty)
       {
 	if (body instanceof SyntaxForm)
@@ -952,9 +957,17 @@ public class Translator extends Compilation
 	      {
 		setCurrentScope(sf.scope);
 		int first = formStack.size();
-		scanBody(sf.form, defs);
-		formStack.add(wrapSyntax(popForms(first), sf));
-		return;
+		scanBody(sf.form, defs, false);
+		Object f = wrapSyntax(popForms(first), sf);
+		if (makeList)
+		  {
+		    if (lastPair == null)
+		      return f;
+		    lastPair.cdr = f;
+		    return list;
+		  }
+		formStack.add(f);
+		return null;
 	      }
 	    finally
 	      {
@@ -964,7 +977,23 @@ public class Translator extends Compilation
 	else if (body instanceof Pair)
 	  {
 	    Pair pair = (Pair) body;
+	    int first = formStack.size();
 	    scanForm(pair.car, defs);
+	    int fsize = formStack.size();
+	    if (makeList)
+	      {
+		for (int i = first;  i < fsize;  i++)
+		  {
+		    Pair npair
+		      = makePair(pair, formStack.elementAt(i), LList.Empty);
+		    if (lastPair == null)
+		      list = npair;
+		    else
+		      lastPair.cdr = npair;
+		    lastPair = npair;
+		  }
+		formStack.setSize(first);
+	      }
 	    body = pair.cdr;
 	  }
 	else
@@ -973,6 +1002,7 @@ public class Translator extends Compilation
 	    break;
 	  }
       }
+    return list;
   }
 
   public static Pair makePair(Pair pair, Object car, Object cdr)
@@ -997,7 +1027,7 @@ public class Translator extends Compilation
     current_scope = defs;
     try
       {
-	scanBody(exp, defs);
+	scanBody(exp, defs, false);
 	if (formStack.size() == first)
 	  formStack.add(syntaxError ("body with no expressions"));
 	int ndecls = defs.countDecls();
@@ -1063,7 +1093,11 @@ public class Translator extends Compilation
 	for (int i = 0; i < nforms; i++)
 	  exps[i] = (Expression) formStack.elementAt(first + i);
 	formStack.setSize(first);
-	return ((LispInterpreter) getInterpreter()).makeBody(exps);
+	if (scope instanceof ModuleExp)
+	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
+			      exps);
+	else
+	  return ((LispInterpreter) getInterpreter()).makeBody(exps);
       }
   }
 

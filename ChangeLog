@@ -1,5 +1,16 @@
 2005-01-22  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (scanBody): New parameter makeList, to
+	specify whether we return a list or push result on formStack.
+	(rewrite_body): Fix scanBody call.
+	(makeBody): Revert 01-12 change because it breaks top-level.
+	* kawa/standard/begin.java (scanForm):  Use tr.scanForm option to
+	create a list, and return a scanned for for later rewrite.
+	Alternative fix to problem fixed by 01-12 change.
+	* kawa/lang/Eval.java (evalBody): Update scanForm call.
+	*: kawa/standard/with_compile_options.java (scanForm): Update calls to
+	tr.scanForm. Let Translator create list rather than doing it here.
+
 	* kawa/standard/Scheme.java (scheme_counter): Remove static field.
 	(getNewEnvironment): Use inherited env_counter instead.
 

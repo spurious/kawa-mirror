@@ -82,7 +82,7 @@ public class Eval extends Procedure1or2
 	Values forms = new Values();
 	tr.push(mod);
 	int first = tr.formStack.size();
-	tr.scanBody(body, mod);
+	tr.scanBody(body, mod, false);
 	tr.finishModule(mod, first);
 
 	if (body instanceof PairWithPosition)

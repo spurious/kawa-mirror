@@ -35,17 +35,18 @@ public class define extends Syntax implements Printable
     Pair p = (Pair) st.cdr;
     Object name = p.car;
     Pair namePair = p;
-    String sym = null;
+    Object sym = null;
     boolean function = false;
-    if (name instanceof String)
+    if (name instanceof String || name instanceof Symbol)
       {
-	sym = (String) name;
+	sym = name;
       }
     else if (name instanceof Pair)
       {
         namePair = (Pair) name;
-        if (namePair.car instanceof String)
-	  sym = (String) namePair.car;
+        if (namePair.car instanceof String
+	    || namePair.car instanceof Symbol)
+	  sym = namePair.car;
 	function = true;
       }
     if (sym != null)
@@ -87,19 +88,21 @@ public class define extends Syntax implements Printable
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object obj = form.cdr;
-    String name = null;
+    Object name = null;
     Expression value = null;
     Declaration decl = null;
 
     if (obj instanceof Pair)
       {
 	Pair p1 = (Pair) obj;
-	if (p1.car instanceof String && p1.cdr instanceof Pair)
+	if ((p1.car instanceof String
+	     || p1.car instanceof Symbol)
+	    && p1.cdr instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    if (p2.cdr == LList.Empty)
 	      {
-		name = (String) p1.car;
+		name = p1.car;
 		value = tr.rewrite (p2.car);
 	      }
 	  }
@@ -117,21 +120,21 @@ public class define extends Syntax implements Printable
 	      }
 	    if (p2.cdr == LList.Empty)
 	      {
-                name = decl.getName();
+                name = decl.getSymbol();
 		value = tr.rewrite (p2.car);
 	      }
 	  }
 	else if (p1.car instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.car;
-	    if (p2.car instanceof String)
+	    if (p2.car instanceof String || p2.car instanceof Symbol)
 	      {
-		name = (String) p2.car;
+		name = p2.car;
               }
             else if (p2.car instanceof Declaration)
               {
                 decl = (Declaration) p2.car;
-                name = decl.getName();
+                name = decl.getSymbol();
               }
             if (name != null)
               {

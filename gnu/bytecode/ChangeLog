@@ -1,5 +1,7 @@
 2002-03-02  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (dump):  Remove rule for making executable.
+
 	* README:  Remove obsolete file.
 
 	* CodeAttr.java (emitGotoIfCompare2):  ALso allow ifeq and ifne.

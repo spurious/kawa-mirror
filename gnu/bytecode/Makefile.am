@@ -1,9 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
-@Make_rules@
-
 java_sources = \
 Access.java \
 Attribute.java \
@@ -42,15 +38,10 @@ ExceptionsAttr.java \
 dump.java
 
 PACKAGE_FNAME = gnu-bytecode
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).lo dump$(exext)
 GCJ_INPUTS =  $(java_Java)
-
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-
-dump$(exext):  $(OFILES_DIR)/gnu-bytecode.lo
-	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.lo
-
-EXTRA_CLEAN = dump$(exext)
 
 EXTRA_DIST = package.html
 
+include $(top_srcdir)/Make-rules
+
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

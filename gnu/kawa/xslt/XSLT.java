@@ -182,10 +182,10 @@ public class XSLT extends XQuery
     for (int i = 0;  i < args.length;  i++)
       {
 	String arg = args[i];
-	TreeList doc = Document.parse(Document.makeURL(arg, base));
+	KDocument doc = Document.parse(Document.makeURL(arg, base));
 	Focus pos = Focus.getCurrent();
-	pos.push(doc, 0);
-	process(doc, pos, ctx);
+	pos.push(doc.sequence, doc.ipos);
+	process((TreeList) doc.sequence, pos, ctx);
       }
   }
 

@@ -97,22 +97,22 @@
 ;;; DO
 
 ;;; Helper macro for do, to handle optional step.
-(define-syntax %do-step (syntax-rules ()
-				      ((%do-step variable step) step)
-				      ((%do-step variable) variable)))
+(define-syntax %do-step
+  (syntax-rules ()
+		((%do-step variable step) step)
+		((%do-step variable) variable)))
 
-(define-syntax do (syntax-rules ()
-				((do ((variable init . step) ...)
-				     (test sequence) commands ...)
-				 (letrec ((loop
-					   (lambda (variable ...)
-					     (if test
-						 (begin sequence)
-						 (begin
-						   commands ...
-						   (loop (%do-step variable . step) ...))))))
-				   (loop init ...))
-				 )))
+(define-syntax do
+  (syntax-rules ()
+		((do ((name init . step) ...)
+		     (test . result) commands ...)
+		 (letrec ((loop
+			   (lambda (name ...)
+			     (if test
+				 (begin (if #f #f) . result)
+				 (begin commands ...
+					(loop (%do-step name . step) ...))))))
+		   (loop init ...)))))
 
 ;;; DELAY
 

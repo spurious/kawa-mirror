@@ -19,6 +19,7 @@ javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
   std_syntax.class \
+  thread.class \
   when_unless.class
 
 java_DATA=$(OBJ)

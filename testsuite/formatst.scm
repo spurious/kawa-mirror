@@ -637,6 +637,13 @@ def")
      ; number though format:complex is #f; this is why we put them in
      ; strings 
 
+(test '("{~:<[~3d]~:>}" (2 3)) "{([  2])}")
+(test '("{~:<[~3d]~:>}" 23) "{23}")
+(test '("~:<~W ~@_~:I~W ~:_~W~1I ~_~W~:>" (defun prod (x y) (* x y)))
+      "(defun prod (x y) (* x y))")
+(test '("~:<~W.~:I~W.~W~1I.~W~:>" (defun prod (x y) (* x y)))
+      "(defun.prod.(x y).(* x y))")
+
 ; inquiry test
 
 ;; SLIB specific: (test '("~:q") format:version)

@@ -1,3 +1,7 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* formatst.scm: Add 4 tests for ~<...~:> (Logical Block).
+
 2004-12-26  Per Bothner  <per@bothner.com>
 
 	* included-1.scm: New file, to test include-relative.

@@ -1,5 +1,9 @@
 2004-05-10  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/object.java (scanClassDef, rewriteClassDef):  Improved
+	line number setting.
+	(scanClassDef):  Error if duplicate init forms.
+
 	* kawa/standard/object.java (scanClassDef):  Remove clinits local.
 	(rewriteClassDef):  Remove clinits form returned array.
 	(scanClassDef) Don't rewrite init-form: expression yet.

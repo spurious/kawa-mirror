@@ -81,6 +81,7 @@ public class object extends Syntax
 	    return null;
 	  }
 	obj = pair.cdr; // Next member.
+	Object savedPos1 = tr.pushPositionOf(pair);
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String || pair.car instanceof Symbol
 	    || pair.car instanceof Keyword)
@@ -102,6 +103,7 @@ public class object extends Syntax
 		decl = oexp.addDeclaration(sname);
 		decl.setSimple(false);
 		decl.setFlag(Declaration.FIELD_OR_METHOD);
+		tr.setLine(decl, pair);
 		args = pair.cdr;
 	      }
 	    int nKeywords = 0;
@@ -112,6 +114,7 @@ public class object extends Syntax
 		pair = (Pair) args;
 		Pair keyPair = pair;
 		Object key = pair.car;
+		Object savedPos2 = tr.pushPositionOf(pair);
 		args = pair.cdr;
 		if ((key == "::" || key instanceof Keyword)
 		    && args instanceof Pair)
@@ -139,6 +142,8 @@ public class object extends Syntax
 			     || key == init_formKeyword
 			     || key == init_valueKeyword)
 		      {
+			if (init != null)
+			  tr.error('e', "duplicate initialization");
 			init = value;
 			// In the case of 'init-form: EXPR' the scope of EXPR
 			// doesn't include this class;
@@ -213,6 +218,7 @@ public class object extends Syntax
 		    args = null;  // Trigger error message
 		    break;
 		  }
+		tr.popPositionOf(savedPos2);
 	      }
 	    if (args != LList.Empty)
 	      {
@@ -259,6 +265,7 @@ public class object extends Syntax
 		return null;
 	      }
 	    Declaration decl = oexp.addDeclaration(mname);
+	    tr.setLine(decl, mpair);
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.outer = oexp;
 	    lexp.setClassMethod(true);
@@ -278,6 +285,7 @@ public class object extends Syntax
 	  }
 	else
 	  tr.error ('e', "invalid field/method definition");
+	tr.popPositionOf(savedPos1);
       }
     Object[] result = {
       oexp,
@@ -316,7 +324,7 @@ public class object extends Syntax
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	Pair pair = (Pair) obj;
-	Object savedPos = tr.pushPositionOf(pair);
+	Object savedPos1 = tr.pushPositionOf(pair);
 	try
 	  {
 	    obj = pair.cdr; // Next member.
@@ -332,6 +340,7 @@ public class object extends Syntax
 		  {
 		    pair = (Pair) args;
 		    Object key = pair.car;
+		    Object savedPos2 = tr.pushPositionOf(pair);
 		    args = pair.cdr;
 		    if ((key == "::" || key instanceof Keyword)
 			&& args instanceof Pair)
@@ -373,6 +382,7 @@ public class object extends Syntax
 			args = null;  // Trigger error message
 			break;
 		      }
+		    tr.popPositionOf(savedPos2);
 		  }
 		if (init != null)
 		  {
@@ -387,6 +397,7 @@ public class object extends Syntax
 			Declaration decl = (Declaration) d;
 			isStatic = decl.getFlag(Declaration.STATIC_SPECIFIED);
 			SetExp sexp = new SetExp (decl.getName(), initValue);
+			tr.setLineOf(sexp);
 			sexp.binding = decl;
 			decl.noteValue(null);
 			initValue = sexp;
@@ -414,7 +425,7 @@ public class object extends Syntax
 	  }
 	finally
 	  {
-	    tr.popPositionOf(savedPos);
+	    tr.popPositionOf(savedPos1);
 	  }
 	
       }

@@ -1,3 +1,9 @@
+2003-09-08  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite):  Resolve hygiene using
+	getOriginalRef *before* resolving namespace prefix.
+	Fixes Savannah bug #5113.
+
 2003-09-03  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (processArgs): Set Compilation.defaultCallConvention.

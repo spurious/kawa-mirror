@@ -361,9 +361,28 @@ public class Translator extends Compilation
       {
 	Declaration decl = lexical.lookup(exp, function);
 	Symbol symbol = null;
-	if (exp instanceof String && decl == null)
+	if (decl != null)
 	  {
-	    String str = (String) exp;
+	    nameToLookup = decl.getSymbol();
+	    exp = null;
+	    ReferenceExp rexp = getOriginalRef(decl);
+	    if (rexp != null)
+	      {
+		decl = rexp.getBinding();
+		if (decl == null)
+		  {
+		    exp = rexp.getSymbol();
+		    nameToLookup = exp;
+		  }
+	      }
+	  }
+	else
+	  {
+	    nameToLookup = exp;
+	  }
+	if (nameToLookup instanceof String && decl == null)
+	  {
+	    String str = (String) nameToLookup;
 	    int colon = str.indexOf(':');
 	    if (colon > 0 && colon < str.length() - 1)
 	      {
@@ -399,25 +418,6 @@ public class Translator extends Compilation
 		      }
 		  }
 	      }
-	  }
-	if (decl != null)
-	  {
-	    nameToLookup = decl.getSymbol();
-	    exp = null;
-	    ReferenceExp rexp = getOriginalRef(decl);
-	    if (rexp != null)
-	      {
-		decl = rexp.getBinding();
-		if (decl == null)
-		  {
-		    exp = rexp.getSymbol();
-		    nameToLookup = exp;
-		  }
-	      }
-	  }
-	else
-	  {
-	    nameToLookup = exp;
 	  }
 	symbol = exp instanceof String ? env.lookup((String) exp)
 	  : (Symbol) exp;

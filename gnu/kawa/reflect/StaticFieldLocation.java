@@ -30,11 +30,13 @@ public class StaticFieldLocation extends FieldLocation
     return value;
   }
 
-  public static void define(Environment environ, Symbol sym, Object property,
-                            String cname, String fname)
+  public static StaticFieldLocation
+  define(Environment environ, Symbol sym, Object property,
+	 String cname, String fname)
   {
-    environ.addLocation(sym, property,
-			new StaticFieldLocation(cname, fname));
+    StaticFieldLocation loc = new StaticFieldLocation(cname, fname);
+    environ.addLocation(sym, property, loc);
+    return loc;
   }
 
   public static StaticFieldLocation make (/*Object name,*/ String cname, String fldName)

@@ -1,3 +1,10 @@
+2005-03-11  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (PROCEDURE, SYNTAX): New constants.
+	(setup): Tweak accordingly.
+	(setProcedure, setSyntax, isProcedureOrSyntax): New methods.
+	* StaticFieldLocation.java (define): Return StaticFieldLocation.
+
 2005-03-07  Per Bothner  <per@bothner.com>
 
 	* InstanceOf.java: Update Interpreter -> Language.

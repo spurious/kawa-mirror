@@ -15,10 +15,30 @@ public class FieldLocation extends ClassMemberLocation
   static final int INDIRECT_LOCATION = 2;
   static final int CONSTANT = 4;
   static final int VALUE_SET = 8;
+  // The PROCEDURE and SYNTAX flags aren't current used by getDeclaration,
+  // but probably should be, assuming we can count on them.
+  public static final int PROCEDURE = 16;
+  public static final int SYNTAX = 32;
   private int flags;
 
   protected boolean isIndirectLocation ()
   { return (flags & INDIRECT_LOCATION) != 0; }
+
+  public void setProcedure ()
+  {
+    flags |= PROCEDURE;
+  }
+
+  public void setSyntax ()
+  {
+    flags |= SYNTAX;
+  }
+
+  /** Not reliable, yet. */
+  public boolean isProcedureOrSyntax ()
+  {
+    return (flags & (PROCEDURE+SYNTAX)) != 0;
+  }
 
   public FieldLocation(Object instance, String cname, String fname)
   {
@@ -78,7 +98,7 @@ public class FieldLocation extends ClassMemberLocation
   {
     synchronized (this)
       {
-	if (flags != 0)
+	if ((flags & SETUP_DONE) != 0)
 	  return;
 	super.setup();
 	String fname = getMemberName();
@@ -94,7 +114,7 @@ public class FieldLocation extends ClassMemberLocation
 	    else
 	      fl |= CONSTANT;
 	  }
-	flags = fl;
+	flags |= fl;
       }
   }
 

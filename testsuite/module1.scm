@@ -11,3 +11,6 @@
   (syntax-rules ()
    ((deldup list)
     (delete-duplicates list))))
+
+(define (call-to-first x)
+  (first x))

@@ -1,4 +1,4 @@
-(test-init "macros" 40)
+(test-init "macros" 41)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -139,4 +139,11 @@
     (let ((s 1))
       (set! s (+ s 1))
       s))))
-(test 2 'est-set (test-set))
+(test 2 'test-set (test-set))
+
+(define-syntax test-colon
+ (syntax-rules ()
+   ((test-colon x)
+    (let loop ((size :: <int> 10))
+      (+ size x)))))
+(test 14 'test-colon (test-colon 4))

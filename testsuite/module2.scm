@@ -6,7 +6,7 @@
 (define list-length-3 #t)
 (set! list-length-3 list-length-2)
 
-(define list1234 (deldup '(1 1 2 3 4 4)))
+(define list1234 (deldup (call-to-first '((1 1 2 3 4 4)))))
 
 ;; Caused VerifyError
 (define name internal-node-name)

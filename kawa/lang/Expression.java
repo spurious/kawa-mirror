@@ -43,6 +43,15 @@ public abstract class Expression implements Printable
 	comp.method.compile_checkcast (Char.scmCharType);
 	comp.method.compile_invoke_virtual (Char.charValueMethod);
       }
+    else if (type == Type.boolean_type)
+      {
+	comp.compileConstant (Interpreter.falseObject);
+	comp.method.compile_ifneq ();
+	comp.method.compile_push_int(1);
+	comp.method.compile_else ();
+	comp.method.compile_push_int(0);
+	comp.method.compile_fi ();
+      }
     else
       type.compileCoerceFromObject(comp.method);
   }

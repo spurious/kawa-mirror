@@ -191,8 +191,8 @@ public class Translator extends Object
 	  {
 	    PrimProcedure proc = (PrimProcedure) qfunc.value;
 	    Method method = proc.method;
-	    boolean is_static = method.getStaticFlag();
-	    if (args.length != method.getParameterTypes().length + (is_static ? 0 : 1))
+	    boolean is_static = proc.getStaticFlag();
+	    if (args.length != proc.getParameterTypes().length + (is_static ? 0 : 1))
 	      return syntaxError ("wrong number of arguments to primitive");
 	    return new PrimApplyExp (qfunc, args);
 	  }

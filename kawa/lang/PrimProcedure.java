@@ -39,6 +39,13 @@ public class PrimProcedure extends ProcedureN
     this.argTypes= argTypes;
   }
 
+  public final boolean getStaticFlag()
+  {
+    return method == null || method.getStaticFlag();
+  }
+
+  public final Type[] getParameterTypes() { return argTypes; }
+
   static Hashtable types;
 
   public static Type string2Type (String name)

@@ -1,9 +1,10 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class ELisp extends kawa.standard.Scheme
 {
-  public static final kawa.lang.List FALSE = kawa.lang.List.Empty;
+  public static final LList FALSE = LList.Empty;
   public static final String TRUE = "t";
 
   /** Get a ELisp symbol for a given (interned) Java string. */
@@ -18,7 +19,7 @@ public class ELisp extends kawa.standard.Scheme
   /** Get a ELisp string for a given Java string. */
   public static Object getString (String name)
   {
-    return new kawa.lang.FString(name);
+    return new FString(name);
   }
 
   /** Get a ELisp string for a given ELisp symbol. */

@@ -4,6 +4,7 @@ import gnu.mapping.*;
 import gnu.text.*;
 import gnu.math.*;
 import gnu.expr.Keyword;
+import gnu.kawa.util.*;
 
 /** A class to read Emacs Lisp forms (S-expressions). */
 
@@ -27,12 +28,12 @@ public class ELispReader extends gnu.text.LispReader
 
   protected Object makeNil ()
   {
-    return List.Empty;
+    return LList.Empty;
   }
 
   protected Object makePair (Object car, int line, int column)
   {
-    PairWithPosition pair = new PairWithPosition (port, car, List.Empty);
+    PairWithPosition pair = new PairWithPosition (port, car, LList.Empty);
     pair.setLine(line + 1, column + 1);
     pair.setFile (port.getName());
     return pair;
@@ -563,11 +564,11 @@ public class ELispReader extends gnu.text.LispReader
       throws java.io.IOException, SyntaxException
   {
     return new Pair (func_symbol,
-		     new Pair (readObject (), List.Empty));
+		     new Pair (readObject (), LList.Empty));
   }
 
 
-  protected Vector readVector ()
+  protected FVector readVector ()
     throws java.io.IOException, SyntaxException
   {
     char saveReadState = ((InPort) port).readState;
@@ -586,7 +587,7 @@ public class ELispReader extends gnu.text.LispReader
 	   }
 	 Object[] objs = new Object[vec.size()];
 	 vec.copyInto(objs);
-	 return new Vector(objs);
+	 return new FVector(objs);
        }
      finally
        {
@@ -617,7 +618,7 @@ public class ELispReader extends gnu.text.LispReader
 	      {
 		c = read();
 		if (c < 0) // EOF
-		  return List.Empty;
+		  return LList.Empty;
 	      } while (c != '\n' && c!= '\r');
             break;
 	  case ')':

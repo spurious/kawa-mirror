@@ -2,7 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import kawa.lang.FString;
+import gnu.kawa.util.FString;
 
 public class Invoke extends ProcedureN implements Inlineable
 {

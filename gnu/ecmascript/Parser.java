@@ -3,7 +3,7 @@ import java.util.Vector;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.expr.*;
-import kawa.lang.Sequence;
+import gnu.kawa.util.Sequence;
 import kawa.lang.Interpreter;  // FIXME
 
 public class Parser

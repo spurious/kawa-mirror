@@ -3,8 +3,7 @@ import gnu.mapping.Procedure;
 import gnu.math.IntNum;
 import javax.swing.*;
 import javax.swing.text.*;
-import kawa.lang.FString;
-import kawa.lang.Sequence;
+import gnu.kawa.util.*;
 
 /** This manages the keymaps active for a given buffer.
  *
@@ -208,9 +207,9 @@ public class BufferKeymap implements javax.swing.text.Keymap
 
   public static KeyStroke asKeyStroke(Object key)
   {
-    if (key instanceof kawa.lang.Char)
+    if (key instanceof Char)
       {
-	char value = ((kawa.lang.Char) key).charValue();
+	char value = ((Char) key).charValue();
 	return javax.swing.KeyStroke.getKeyStroke(value);
       }
     return (KeyStroke) key;
@@ -224,15 +223,14 @@ public class BufferKeymap implements javax.swing.text.Keymap
     else if (binding instanceof Keymap)
       binding = new PrefixAction(null, (Keymap) binding);
     KeyStroke key;
-    if (keySpec instanceof Sequence
-        && ! (keySpec instanceof kawa.lang.List))
+    if (keySpec instanceof Sequence && ! (keySpec instanceof LList))
       {
 	Sequence value = (Sequence) keySpec;
         int len = value.length();
         key = null;
         for (int i = 0;  i < len; )
           {
-            key = asKeyStroke(value.elementAt(i));
+            key = asKeyStroke(value.get(i));
             i++;
             if (i < len)
               {

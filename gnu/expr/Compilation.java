@@ -58,10 +58,10 @@ public class Compilation
   static public ClassType javaStringType = typeString;
   static public ClassType scmSymbolType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
-  static public ClassType scmSequenceType = ClassType.make("kawa.lang.Sequence");
+  static public ClassType scmSequenceType = ClassType.make("gnu.kawa.util.Sequence");
   static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
-  static public ClassType scmListType = ClassType.make("kawa.lang.List");
-  static public ClassType typePair = ClassType.make("kawa.lang.Pair");
+  static public ClassType scmListType = ClassType.make("gnu.kawa.util.LList");
+  static public ClassType typePair = ClassType.make("gnu.kawa.util.Pair");
   static public ClassType scmPairType = typePair;
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
   public static final ArrayType objArrayType = new ArrayType (typeObject);

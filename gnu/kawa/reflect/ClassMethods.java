@@ -3,7 +3,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
-import kawa.lang.FString;
+import gnu.kawa.util.FString;
 
 public class ClassMethods extends ProcedureN
 {

@@ -1,7 +1,8 @@
 package gnu.ecmascript;
 import gnu.mapping.*;
 import gnu.expr.*;
-import kawa.lang.Sequence;
+import gnu.kawa.util.Sequence;
+import gnu.kawa.util.Char;
 
 /**
   * Reads EcmaScript token from a InPort.
@@ -16,21 +17,21 @@ public class Lexer extends gnu.text.Lexer
     super(port);
   }
 
-  public final static kawa.lang.Char lparenToken = kawa.lang.Char.make('(');
-  public final static kawa.lang.Char rparenToken = kawa.lang.Char.make(')');
-  public final static kawa.lang.Char lbraceToken = kawa.lang.Char.make('{');
-  public final static kawa.lang.Char rbraceToken = kawa.lang.Char.make('}');
-  public final static kawa.lang.Char lbracketToken = kawa.lang.Char.make('[');
-  public final static kawa.lang.Char rbracketToken = kawa.lang.Char.make(']');
-  public final static kawa.lang.Char dotToken = kawa.lang.Char.make('.');
-  public final static kawa.lang.Char condToken = kawa.lang.Char.make('?');
-  public final static kawa.lang.Char commaToken = kawa.lang.Char.make(',');
-  public final static kawa.lang.Char colonToken = kawa.lang.Char.make(':');
-  public final static kawa.lang.Char equalToken = kawa.lang.Char.make('=');
-  public final static kawa.lang.Char tildeToken = kawa.lang.Char.make('~');
-  public final static kawa.lang.Char notToken = kawa.lang.Char.make('!');
-  public final static kawa.lang.Char semicolonToken = kawa.lang.Char.make(';');
-  public final static Object eolToken = kawa.lang.Char.make('\n');
+  public final static Char lparenToken = Char.make('(');
+  public final static Char rparenToken = Char.make(')');
+  public final static Char lbraceToken = Char.make('{');
+  public final static Char rbraceToken = Char.make('}');
+  public final static Char lbracketToken = Char.make('[');
+  public final static Char rbracketToken = Char.make(']');
+  public final static Char dotToken = Char.make('.');
+  public final static Char condToken = Char.make('?');
+  public final static Char commaToken = Char.make(',');
+  public final static Char colonToken = Char.make(':');
+  public final static Char equalToken = Char.make('=');
+  public final static Char tildeToken = Char.make('~');
+  public final static Char notToken = Char.make('!');
+  public final static Char semicolonToken = Char.make(';');
+  public final static Object eolToken = Char.make('\n');
   public final static Object eofToken = Sequence.eofValue;
   public final static Reserved elseToken
   = new Reserved("else", Reserved.ELSE_TOKEN);
@@ -449,7 +450,7 @@ public class Lexer extends gnu.text.Lexer
 	  return token;
 	return word;
       }
-    return kawa.lang.Char.make((char) ch);
+    return Char.make((char) ch);
   }
 
   public static Object getToken(InPort inp)

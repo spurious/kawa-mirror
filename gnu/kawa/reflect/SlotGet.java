@@ -2,6 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.kawa.util.FString;
 
 public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 {
@@ -31,7 +32,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 
   public Object apply2 (Object obj, Object name)
   {
-    if (! (name instanceof String) && ! (name instanceof kawa.lang.FString))
+    if (! (name instanceof String) && ! (name instanceof FString))
       throw WrongType.make(null, this, 1);
     kawa.lang.Interpreter interpreter = kawa.standard.Scheme.getInstance();
     String fname = gnu.expr.Compilation.mangleName(name.toString());

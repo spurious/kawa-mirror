@@ -1,5 +1,6 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class ObArray extends Environment
 {
@@ -8,7 +9,7 @@ public class ObArray extends Environment
 
   public static Environment asEnvironment(Object env)
   {
-    if (env instanceof kawa.lang.Vector)
+    if (env instanceof FVector)
       {
         // LispRef says the only valid way to create an obarray is
         // (make-vector LENGTH 0).  This here is a kludge to associate
@@ -16,12 +17,12 @@ public class ObArray extends Environment
         // use element 0 as a link to the assocaited ObArray), but Emacs
         // does not create obarrays much, and the few places that create
         // them could be speeded up by using (make-obarray LENGTH).
-        kawa.lang.Vector vec = (kawa.lang.Vector) env;
-        env = vec.elementAt(0);
+        FVector vec = (FVector) env;
+        env = vec.get(0);
         if (! (env instanceof Environment))
           {
             env = new ObArray(vec.length());
-            vec.setElementAt(env, 0);
+            vec.set(0, env);
           }
         
       }

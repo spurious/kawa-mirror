@@ -1,14 +1,15 @@
 Complete R4RS procedures.
-
+Implement internal define.
 Complete bignum support.
 
 Add fraction and complex support.
 
-Add access to native java methods.
+Add nicer way to access native java methods.
 
-We depend on 2 hacks to automake:
+We depend on some hacks to automake:
 - info files make in builddir, not $(srcdir)
 - DATA is added to DIST_DEPFILES
+- distdir also searches current dir
 Try to get automake maintainers to accept these.
 
 Implement Scheme record types as Java classes, once JDK 1.1 reflection

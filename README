@@ -6,7 +6,7 @@ It is implemented in Java, and compiles Scheme into Java byte-codes.
 
 The file kawa.txt (which was automatically generated from kawa.texi)
 explains how to build, install, and use Kawa.
-The file kawa.html conatins the same information in HTML format.
+The file kawa.html contains the same information in HTML format.
 
 The file NEWS summarizes recent changes.
 
@@ -15,14 +15,5 @@ The file Compliance.html summarizes divergence from the R4RS.
 A slightly out-of-date design document discussing how to compile
 Scheme into Java is in http://www.cygnus.com/~bothner/scm2java.html.
 
-Authors
-=======
-R. Alexander Milowski <alex@copsol.com> wrote and released
-versions 0.1 and 0.2.
-
-Per Bothner <bothner@cygnus.com> re-wrote the evaluator to use byte
-compilation, made many other changes, and released 0.3 and later versions.
-
-If you have a problem or bug, for now send a report to the authors.
-If there is demand, we will set up a mailing list.
-Future announcements will be announced at least to comp.lang.scheme.
+	--Per Bothner
+Cygnus Support     bothner@cygnus.com

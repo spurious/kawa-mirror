@@ -25,6 +25,18 @@ START-INFO-DIR-ENTRY
 * kawa: (kawa).         Kawa, the Java-based Scheme system
 END-INFO-DIR-ENTRY
 @end format
+@menu
+* Features::                    
+* Installation::                
+* Running::                     
+* Restrictions::                
+* Extensions::                  
+* Compiling::                   
+* Primitive functions::         
+* Reporting Bugs::              
+* License::                     
+@end menu
+
 @node Top, Features, (dir), (dir)
 @top
 @unnumbered The Kawa Scheme system, by Per Bothner
@@ -38,7 +50,6 @@ This documents version @value{VERSION}, updated @value{UPDATED}.
 R. Alexander Milowski @w{<alex@@copsol.com>} wrote the first Kawa releases.
 Per Bothner @w{<bothner@@cygnus.com>} extensively re-wrote Kawa,
 and released version 0.3 and up.
-For now, send bug reports to @w{bothner@@cygnus.com}.
 
 @menu
 * Features::
@@ -48,6 +59,7 @@ For now, send bug reports to @w{bothner@@cygnus.com}.
 * Extensions::
 * Compiling::            Compiling Scheme code to byte-codes
 * Primitive functions::  Writing new "primitive" Scheme functions in Java
+* Reporting Bugs::
 * License::              
 @end menu
 
@@ -78,9 +90,9 @@ You can compile Kawa from the source distribution.
 Alternatively, you can install the pre-compiled binary distribution.
 
 @menu
-* Running Java::         Getting and running Java
-* Binary distribution::  Installing and using the binary distribution
-* Source distribution::  Installing and using the source distribution
+* Running Java::                Getting and running Java
+* Binary distribution::         Installing and using the binary distribution
+* Source distribution::         Installing and using the source distribution
 @end menu
 
 @node Running Java, Binary distribution, Installation, Installation
@@ -284,6 +296,69 @@ re-define a global definition), and there must be no assignments
 @node Extensions, Compiling, Restrictions, Top
 @section Extensions
 
+@subsection Multiple values
+
+@defun values object ...
+Delivers all of its arguments to its continuation.
+@end defun
+
+@defun call-with-values thunk receiver
+Call its @var{thunk} argument with a continuation that,
+when passed some values, calls the @var{receiver} procedure
+with those values as arguments.
+@end defun
+
+@subsection Ports
+
+@defun call-with-input-string string proc
+Create an input port that gets its data from @var{string},
+call @var{proc} with that port as its one argument, and return
+the result from the call of @var{proc}
+@end defun
+
+@defun call-with-output-string proc
+Create an output port that writes its data to a @var{string},
+and call @var{proc} with that port as its one argument.
+Return a string consisting of the data written to the port.
+@end defun
+
+@subsection Eval and Environments
+
+@defun eval expression [environment-specifier]
+@code{eval} evaluates @var{expression} in the environment indicated
+by @var{environment-specifier}.
+
+The default for @var{environment-specifier} is the result
+of @code{(interaction-environment)}.
+@end defun
+
+@defun null-environment
+This procedure returns an environment that contains no variable bindings,
+but contains (syntactic) bindings for all the syntactic keywords.
+
+The effect of assigning to a variable in this environment (such
+as @code{let}) is undefined.
+@end defun
+
+@defun scheme-report-environment version
+The @var{version} must be an exact non-negative inetger corresponding to
+a version of one of the Revised@var{version} Reports on Scheme.
+The procedure returns an environment that contains exactly the set of
+bindings specified in the corresponding report.
+
+This implementation supports @var{version} that is 4 or 5.
+
+The effect of assigning to a variable in this environment (such
+as @code{car}) is undefined.
+@end defun
+
+@defun interaction-environment
+This procedure return an environment that contains implementation-defined
+bindings, as well as top-level user bindings.
+@end defun
+
+@subsection Miscellaneous
+
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.
 The integer value @var{code} is returned to the operating
@@ -301,21 +376,17 @@ If @var{condition} is false, evaluate each @var{form} in order,
 returning the value of the last one.
 @end defmac
 
+@defun arithmetic-shift i j
+Shifts @var{i} by @var{j}.
+It is a "left" shift if @code{@var{j}>0}, and
+a "right" shift if @code{@var{j}<0}.
+
+The result is equal to @code{(floor (* @var{i} (expt 2 @var{j})))}.
+@end defun
+
 @defun vector-append @var{arg}...
 Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
-@end defun
-
-@defun call-with-input-string string proc
-Create an input port that gets its data from @var{string},
-call @var{proc} with that port as its one argument, and return
-the result from the call of @var{proc}
-@end defun
-
-@defun call-with-output-string proc
-Create an output port that writes its data to a @var{string},
-and call @var{proc} with that port as its one argument.
-Return a string consisting of the data written to the port.
 @end defun
 
 @node Compiling, Primitive functions, Extensions, Top
@@ -358,8 +429,8 @@ The compiled class files do have to be installed be installed somewhere
 in the @code{CLASSPATH}.
 
 @menu
-* Archive compilation::  Compiling Scheme to an archive file
-* Files compilation::    Compiling Scheme to a set of .class files
+* Archive compilation::         Compiling Scheme to an archive file
+* Files compilation::           Compiling Scheme to a set of .class files
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
@@ -426,7 +497,7 @@ or:
 (load "my/lib/foo.class")
 @end example
 
-@node Primitive functions, License, Compiling, Top
+@node Primitive functions, Reporting Bugs, Compiling, Top
 @section Writing new "primitive" Scheme functions in Java
 
 @subsection Scheme types in Java
@@ -486,7 +557,17 @@ It is quite likely they will not remain in the package @samp{kawa.lang},
 so you should probably use @code{import} statements rather than
 fully-qualified class names to refer to Kawa classes.
 
-@node License,  , Primitive functions, Top
+@node Reporting Bugs, License, Primitive functions, Top
+@section Reporting Bugs
+
+If you have a problem installing or using Kawa,
+send mail to @code{kawa@@cygnus.com}
+
+This mailing list is used for reporting bugs, patches, discussing
+changes to Kawa, and announcing snapshots.  If you wish to subscribe
+(or later unsubscribe), send a request to @code{kawa-request@@cygnus.com}.
+
+@node License,  , Reporting Bugs, Top
 @section License
 
 @include license.terms

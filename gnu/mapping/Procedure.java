@@ -107,7 +107,7 @@ public abstract class Procedure extends Named implements Printable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
-    String n = name ();
+    String n = getName();
     if (n == null)
       ps.print ("<unnamed>");
     else

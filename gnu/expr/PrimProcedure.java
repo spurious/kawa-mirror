@@ -193,7 +193,7 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 
   public String getName()
   {
-    String name = name();
+    String name = super.getName();
     if (name != null)
       return name;
     name = getVerboseName();

@@ -1,3 +1,8 @@
+1999-08-18  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (getName):  Use super.getName() instead of
+ 	deprecated name().
+
 1999-08-17  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkObjectExp):   Don't call super.walkObjectExp,

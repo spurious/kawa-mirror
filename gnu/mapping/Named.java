@@ -15,7 +15,7 @@ public class Named extends Object {
 
   public final String name()
   {
-    return sym_name;
+    return getName();
   }
 
   public String getName()

@@ -1,3 +1,8 @@
+1999-08-18  Per Bothner  <per@bothner.com>
+
+	* Named.java (name):  Always call getName().
+	* Procedure.java (print):  Call getName() instead of deprecated name().
+
 1999-08-06  Per Bothner  <per@bothner.com>
 
 	* Constraint.java (isBound):  New method.

@@ -125,8 +125,7 @@ public class load extends Procedure1 {
     else
       {
 	SourceMessages messages = new SourceMessages();
-	Translator tr = new Translator(env, messages);
-	ModuleExp mexp = CompileFile.read(port, tr);
+	ModuleExp mexp = CompileFile.read(port, messages);
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (messages.seenErrors())
 	  throw new SyntaxException(messages);

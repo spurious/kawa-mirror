@@ -13,7 +13,7 @@ import gnu.kawa.reflect.ClassMemberConstraint;
 import gnu.lists.FormatToConsumer;
 import gnu.kawa.functions.DisplayFormat;
 
-public class Scheme extends Interpreter
+public class Scheme extends LispInterpreter
 {
 
   protected void define_proc (Named proc)
@@ -373,6 +373,7 @@ public class Scheme extends Interpreter
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
       define_field("write", "kawa.standard.Scheme", "writeFormat");
       define_field("display", "kawa.standard.Scheme", "displayFormat");
+      define_field("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
       define_proc ("write-char", "kawa.lib.ports");
       define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");
@@ -469,13 +470,13 @@ public class Scheme extends Interpreter
                     new kawa.standard.define_class(objectSyntax));
       define_syntax("this", "kawa.lib.syntax");
       define_proc("make", gnu.kawa.reflect.Invoke.make);
-      define_proc("slot-ref", gnu.kawa.reflect.SlotGet.field);
-      define_proc("slot-set!", "gnu.kawa.reflect.SlotSet");
-      define_proc("field", gnu.kawa.reflect.SlotGet.field);
+      define_field("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
+      define_field("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
+      define_field("field", "gnu.kawa.reflect.SlotGet");
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
-      define_proc("static-field", gnu.kawa.reflect.SlotGet.staticField);
+      define_field("static-field", "gnu.kawa.reflect.SlotGet");
       define_proc("invoke", gnu.kawa.reflect.Invoke.invoke);
-      define_proc("invoke-static", gnu.kawa.reflect.Invoke.invokeStatic);
+      define_field("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -520,7 +521,7 @@ public class Scheme extends Interpreter
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
       define_proc ("environment-bound?", "kawa.lib.misc");
       define_proc ("scheme-implementation-version", "kawa.lib.misc");
-      define_proc ("scheme-window", "kawa.lib.misc");
+      define_proc ("scheme-window", "kawa.lib.windows");
       define_syntax ("define-procedure", "kawa.lib.syntax");
       define_field("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
@@ -546,6 +547,9 @@ public class Scheme extends Interpreter
 
       define_field("format", "gnu.kawa.functions.Format");
       define_field("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
+
+      define_field("make-element", "gnu.xquery.util.MakeElement", "makeElement");
+      define_field("make-attribute", "gnu.xquery.util.MakeAttribute", "makeAttribute");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");

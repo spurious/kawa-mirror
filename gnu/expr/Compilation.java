@@ -703,7 +703,8 @@ public class Compilation
 
     // If immediate, we cannot set the function name in the constructor,
     // since setLiterals has not been called yet (except for nested functions).
-    if (lexp != null && lexp.name != null && !immediate)
+    if (lexp != null && lexp.name != null && !immediate
+	&& curClass.getSuperclass().isSubtype(typeProcedure))
       {
 	constructor_method.compile_push_this ();
 	compileConstant (lexp.name);

@@ -1,3 +1,9 @@
+2000-12-02  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateConstructor):  Don't generate call to
+	setName if module super-class has been specified, since super-class
+	might not have setName.
+
 2000-11-21  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java:  Handle more stringent SecurityManager.

@@ -195,7 +195,8 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 		    args = new Expression[2];
 		    args[0] = arg1;
 		    args[1] = arg0;
-		    mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
+		    if (mask != TRUE_IF_EQU && mask != TRUE_IF_GRT+TRUE_IF_LSS)
+		      mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
 		  }
 		else
 		  ctypes[1] = AddOp.typeIntNum;
@@ -220,7 +221,8 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 	    if (arg0 instanceof QuoteExp && ! (arg1 instanceof QuoteExp))
 	      {
 		Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
-		mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
+		if (mask != TRUE_IF_EQU && mask != TRUE_IF_GRT+TRUE_IF_LSS)
+		  mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
 	      }
 	    Label label1 = ctarget.trueBranchComesFirst ? ctarget.ifFalse : ctarget.ifTrue;
 	    if (ctarget.trueBranchComesFirst)

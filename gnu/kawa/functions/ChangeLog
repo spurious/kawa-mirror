@@ -1,3 +1,8 @@
+2003-04-19  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (compile):  Fix logic for swapping arguments.
+	Based on patch from Vladimir Tsichevski <wowa@jet.msk.su>.
+
 2003-04-08  Per Bothner  <per@bothner.com>
 
 	* Convert.java (compile):  Only compileFromStack if reachable.

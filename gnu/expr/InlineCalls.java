@@ -120,6 +120,21 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
+  protected Expression walkIfExp (IfExp exp)
+  {
+    exp.walkChildren(this);
+    Expression test = exp.test;
+    if (test instanceof QuoteExp)
+      {
+	Interpreter interpreter = comp.getInterpreter();
+	if (interpreter.isTrue(((QuoteExp) test).getValue()))
+	  return exp.then_clause;
+	else
+	  return exp.else_clause;
+      }
+    return exp;
+  }
+
   protected Expression walkSetExp (SetExp exp)
   {
     Declaration decl = exp.binding;

@@ -1706,6 +1706,17 @@ public class XQParser extends LispReader // should be extends Lexer
     unread(ch);
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() + 1;
+
+    // Handle Unix #!PROGRAM convention. */
+    if (ch == '#' && startLine == 1 && startColumn == 1)
+      {
+	read();
+	if ((ch = read()) != '!' || (ch = read()) != '/')
+	  error("'#' is only allowed in initial '#!/PROGRAM'");
+	while (ch != '\r' && ch != '\n' && ch >= 0)
+	  ch = read();
+      }
+
     if (getRawToken() == EOF_TOKEN)
       return null;
     peekOperand();

@@ -10,13 +10,19 @@ CLASSPATH = ../..:$(srcdir)/../..:$$CLASSPATH
 CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
 
 JAVAC = javac
+JCFLAGS = -g
 KAWA = $(JAVA) kawa.repl
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JFLAGS) -d ../.. $<
 
 .scm.class:
 	$(CLASSPATH_ENV) $(KAWA) -d ../.. -P $(subdir). -C $< 
+
+misc.class: $(srcdir)/misc.scm
+	$(CLASSPATH_ENV) $(KAWA) \
+	  -e '(define-syntax %V (syntax-rules () ((%V) "@VERSION@")))' \
+	  -d ../.. -P $(subdir). -C $(srcdir)/misc.scm
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -32,12 +38,7 @@ OBJ=\
   strings.class \
   syntax.class \
   vectors.class \
-  @EXTRA_OBJ@
-
-OBJ_1_0 = 
-OBJ_1_1 = reflection.class
-
-EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
+  reflection.class
 
 # These are generated automatically when the $(OBJ) files are built,
 # but they also need to be installed.
@@ -63,6 +64,8 @@ SECONDARY_OBJS=\
   keywords$$keyword_2_string.class \
   keywords$$keyword_P.class \
   keywords$$string_2_keyword.class \
+  misc$$environment__bound_P.class \
+  misc$$scheme__implementation__version.class \
   ports$$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \
@@ -83,9 +86,6 @@ SECONDARY_OBJS=\
   vectors$$vector__length.class \
   vectors$$vector__ref.class \
   vectors$$vector__set_B.class \
-  @EXTRA_MISC@
-
-MISC_1_1 = \
   reflection$$lambda.class \
   reflection$$make__record__type.class \
   reflection$$record_P.class \

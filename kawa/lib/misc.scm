@@ -5,3 +5,5 @@
              env sym)
        #!null)))
 
+;;; Here %V is a macro defined in the Makefile.
+(define (scheme-implementation-version) (%V))

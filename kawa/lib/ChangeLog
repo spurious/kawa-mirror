@@ -1,3 +1,9 @@
+Sat Nov  1 23:26:45 1997  Per Bothner  <bothner@cygnus.com>
+
+	* misc.scm (scheme-implementation-version):  New procedure.
+	* Makefile.am (misc.class):  New rule to pass VERSION.
+	Also now always include reflection.class, and remove OBJ_1_1 stuff.
+
 Fri Sep 26 23:43:16 1997  Per Bothner  <bothner@cygnus.com>
 
 	* ports.scm (transcript-on, transcript-off):  Use new static

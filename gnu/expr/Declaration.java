@@ -653,8 +653,7 @@ public class Declaration
 	|| isStatic()
 	|| (isConstant && value instanceof QuoteExp)
 	|| (value instanceof ClassExp
-	    && ! ((LambdaExp) value).getNeedsClosureEnv())
-	|| (isIndirectBinding() && ! isAlias()))
+	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;
     if ((isIndirectBinding() || isConstant)
 	&& ! comp.immediate)

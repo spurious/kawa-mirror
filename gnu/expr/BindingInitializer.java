@@ -37,25 +37,32 @@ public class BindingInitializer extends Initializer
 
     if (value == null)
       {
-	boolean lookupInEnv = decl.isIndirectBinding() && ! decl.isAlias();
 	boolean func = comp.getInterpreter().hasSeparateFunctionNamespace();
 	Object property
 	  = func && decl.isProcedureDecl() ? EnvironmentKey.FUNCTION : null;
 
 	Object name = decl.getSymbol();
-	if (name instanceof String && lookupInEnv)
+	if (name instanceof String && ! decl.isAlias())
 	  name = Namespace.EmptyNamespace.getSymbol((String) name);
 	comp.compileConstant(name, Target.pushObject);
-	if (! lookupInEnv)
+	if (decl.isAlias())
 	  code.emitInvokeStatic(makeLocationMethod(name));
 	else
 	  {
-	    if (property == null)
-	      code.emitPushNull();
+	    ClassType t = ClassType.make("gnu.mapping.ThreadLocation");
+	    if (decl.getFlag(Declaration.IS_UNKNOWN
+			     |Declaration.IS_DYNAMIC|Declaration.IS_FLUID))
+	      {
+		if (property == null)
+		  code.emitPushNull();
+		else
+		  comp.compileConstant(property, Target.pushObject);
+		code.emitInvokeStatic(t.getDeclaredMethod("getInstance", 2));
+	      }
 	    else
-	      comp.compileConstant(property, Target.pushObject);
-	    code.emitInvokeStatic(ClassType.make("gnu.mapping.ThreadLocation")
-				  .getDeclaredMethod("getInstance", 2));
+	      {
+		code.emitInvokeStatic(t.getDeclaredMethod("makePrivate", 1));
+	      }
 	  }
       }
     else

@@ -1,3 +1,9 @@
+2005-02-25  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Revert 2005-02-11 change.
+	* BindingInitializer.java (emit): In the default case of an indirect
+	but not dynamic/fluid, create an "anonymous" ThreadLocation instead.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* ScopeExp.java (popScope): New method.

@@ -109,14 +109,14 @@ public class SortedNodes extends Values
     if (gapStart > 0)
       {
 	int oindex = getIntN(gapStart - POS_SIZE + 1);
-	if (objects[oindex] == arg1)
+	if (objects[oindex] == seq)
 	  return oindex;
       }
     // See if can re-use the object index of the position after the gap.
     if (gapEnd < data.length)
       {
 	int oindex = getIntN(gapEnd + 1);
-	if (objects[oindex] == arg1)
+	if (objects[oindex] == seq)
 	  return oindex;
       }
     return super.find(seq);

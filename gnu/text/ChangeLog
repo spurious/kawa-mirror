@@ -1,3 +1,7 @@
+2001-07-17  Per Bothner  <per@bothner.com>
+
+	* EnglishIntegerFormat.java:  For now disable FormatToConsumer support.
+
 2001-07-06  Thomas Kirk  <tk@research.att.com>
 
 	* PrettyWriter.java(ensureSpaceInBuffer): Don't call

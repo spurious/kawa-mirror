@@ -1,3 +1,7 @@
+2002-11-20  Per Bothner  <bothner@bothner.com>
+
+	* TestMisc.java:  Add 3 tests for QNames for method invocation.
+
 2002-10-22  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Update 'namespace' to 'declare namespace'.

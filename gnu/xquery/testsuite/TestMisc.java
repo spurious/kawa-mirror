@@ -205,6 +205,14 @@ public class TestMisc
     evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element b",
 	     "false true false");
 
+    evalTest("declare namespace Int='class:java.lang.Integer'\n"
+	     + "Int:toHexString(266)", "10a");
+    evalTest("declare namespace File='class:java.io.File'\n"
+	     + "define function make-file ($x) {File:new($x)}\n"
+	     + "define function parent ($x) {java.io.File:getParent($x)}\n"
+	     + "parent(make-file('dir/mine.txt'))", "dir");
+    evalTest("java.lang.Integer:toHexString(255)", "ff");
+
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:4: missing PrimaryExpr");
 

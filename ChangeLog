@@ -1,3 +1,7 @@
+2000-04-18  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.67.
+
 2000-04-17  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Record.java (getFieldFields):  Removed two methods.

@@ -1,3 +1,11 @@
+Created a new class gnu.kawa.util.AbstractString, with the Scheme
+alias <abstract-string>.  The old gnu.kawa.util.FString now
+extends AbstractString.  A new class CharBuffer provides an
+growable buffer, with markers (automatically-adjusted positions).
+Many of the Scheme <string> procedures now work on <abstract-string>.
+The JEmacs BufferContnat class (contains the characters of a buffer)
+now extends CharBuffer.
+
 New section in manual / web page for projects using Kawa.
 
 The record feasture (make-record-type etc) how handles "funny" type

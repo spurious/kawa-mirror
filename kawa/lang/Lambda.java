@@ -16,10 +16,10 @@ public class Lambda extends Syntax implements Printable
     Object [] match = pattern.match (obj);
     if (match == null)
       return tr.syntaxError ("missing formals in lambda");
-    int old_errors = tr.errors;
+    int old_errors = tr.getMessages().getErrorCount();
     LambdaExp lexp = new LambdaExp();
     rewrite(lexp, match[0], match[1], tr);
-    if (tr.errors > old_errors)
+    if (tr.getMessages().getErrorCount() > old_errors)
       return new ErrorExp("bad lambda expression");
     return lexp;
   }

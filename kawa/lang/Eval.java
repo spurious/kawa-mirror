@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.SourceMessages;
 
 /* This implements the R5RS "eval" procedure. */
 
@@ -12,21 +13,23 @@ public class Eval extends Procedure1or2
   {
     PairWithPosition body = new PairWithPosition(sexpr, List.Empty);
     body.setFile("<eval>");
-    return evalBody(body, env);
+    return evalBody(body, env, new SourceMessages());
   }
 
-  public static Object evalBody (Object body, Environment env)
+  public static Object evalBody (Object body, Environment env,
+				 SourceMessages messages)
   {
     Environment orig_env = Environment.getCurrent();
     try
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
-	Translator tr = new Translator (env);
+	Translator tr = new Translator (env, messages);
 	ModuleExp mod = kawa.standard.Scheme.makeModuleExp(body, tr);
 	mod.setName (evalFunctionName);
-	if (tr.errors > 0)
-	    throw new GenericError ("syntax errors during eval");
+	if (messages.seenErrors())
+	  throw new RuntimeException("invalid syntax in eval form:\n"
+				     + messages.toString(20));
 	return mod.evalModule (env);
       }
     finally

@@ -33,7 +33,11 @@
   (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
                  (as <String> name)))
 
-;;(define (set-keymap-name keymap new-name) ...)
+(define (make-sparse-keymap #!optional name)
+  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
+                 (as <String> name)))
+
+(define (set-keymap-name keymap new-name) #!void)  ;; ignored FIXME
 
 (define (keymap-name (keymap <keymap>))
   (invoke keymap 'getName))
@@ -62,9 +66,10 @@
 		 (invoke keymap 'getDefaultAction)))
 
 (define global-map
-  (invoke-static <javax.swing.text.JTextComponent> 'getKeymap
-                 (static-field <javax.swing.text.JTextComponent>
-                               'DEFAULT_KEYMAP)))
+  (static-field <gnu.jemacs.buffer.BufferKeymap> 'globalKeymap))
+
+(define esc-map
+  (static-field <gnu.jemacs.buffer.BufferKeymap> 'metaKeymap))
 
 (define (current-global-map)
   global-map)
@@ -342,6 +347,7 @@
   (invoke buffer 'setDot (invoke buffer 'positionToOffset position))
   (invoke buffer 'getDot))
 
+#| Scheme only
 (define (forward-char #!optional
 		      (count :: <int> 1) (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'forwardChar count))
@@ -349,6 +355,7 @@
 (define (backward-char #!optional
 		      (count :: <int> 1) (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'backwardChar count))
+|#
 
 (define (point-at-bol
          #!optional
@@ -390,13 +397,15 @@
                       (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'forwardLine count))
 
+#|
 (define (next-line #!optional (count 1) (buffer :: <buffer> (current-buffer)))
-  (move-line count))
+  (line-move count))
 
 (define (previous-line #!optional (count 1) (buffer :: <buffer> (current-buffer)))
-  (move-line (- count)))
+  (line-move (- count)))
+|#
 
-(define (move-line arg #!optional (buffer ::  <buffer> (current-buffer)))
+(define (line-move arg #!optional (buffer ::  <buffer> (current-buffer)))
   (let ((goal-column (current-column buffer)))
     (forward-line arg buffer)
     (move-to-column goal-column #f buffer)))
@@ -418,9 +427,16 @@
   (invoke buffer 'getPointMarker share))
 
 (define (copy-marker position #!optional kind)
-  (let* ((buffer :: <buffer> (if (marker? position) (marker-buffer position) (current-buffer)))
-	 (dot (invoke buffer 'positionToOffset position)))
-    (make <marker> buffer dot (if kind 2 1))))
+  (let ((buffer :: <buffer>
+		(if (marker? position)
+		    (invoke (as <marker> position) 'getBuffer)
+		    (current-buffer))))
+    (if (eq? buffer #!null)
+	(make <marker>)
+	(make <marker>
+	  buffer
+	  (invoke buffer 'positionToOffset position)
+	  (if kind 2 1)))))
 
 (define (marker-position (marker <marker>))
   (let ((value (invoke marker 'getPoint)))
@@ -497,9 +513,10 @@
 (define (emacs-help)
   (format #t "Sorry - no help available.~%~!"))
 
+#|
+(define-key global-map #(backspace) delete-backward-char)
 (define-key global-map #(down) next-line)
 (define-key global-map #(up) previous-line)
-(define-key global-map #(backspace) delete-backward-char)
 (define-key global-map #(left) backward-char)
 (define-key global-map #(right) forward-char)
 (define-key global-map "\C-a" beginning-of-line)
@@ -509,8 +526,8 @@
 (define-key global-map "\C-d" delete-char)
 (define-key global-map "\C-e" end-of-line)
 (define-key global-map "\C-f" forward-char)
-(define-key global-map "\C-x\C-s" save-buffer)
 (define-key global-map "\C-x\C-w" write-file)
+(define-key global-map "\C-x\C-s" save-buffer)
 (define-key global-map "\C-x0" delete-window)
 (define-key global-map "\C-x1" delete-other-windows)
 (define-key global-map "\C-x2" split-window-vertically)
@@ -524,6 +541,7 @@
 (define-key global-map "\C-x5f" find-file-other-frame)
 (define-key global-map "\C-xo" other-window)
 (define-key global-map '(control h) emacs-help)
+|#
 
 (define default-menubar
   (list
@@ -555,8 +573,10 @@
                              <void> ())
    buffer))
 
-(define repl-map (make-keymap))
+(define repl-map (make-keymap 'repl-map))
+(define-key repl-map "\r" term-send-input)
 (define-key repl-map "\n" term-send-input)
+(define-key repl-map 'return term-send-input)
 
 ;;; TELNET
 
@@ -577,8 +597,12 @@
 
 (define (scheme-swing-window)
   (let ((buffer
-         (invoke-static <gnu.jemacs.buffer.ReplBuffer> 'scheme)))
+         (invoke-static <gnu.jemacs.buffer.ReplBuffer> 'make 'scheme)))
     (use-local-map repl-map buffer)
     ; (make-frame buffer)
     (switch-to-buffer buffer)
     buffer))
+
+(define (decode-buffer buffer)
+  (if (eq? '() buffer) (current-buffer)
+      (get-buffer buffer)))

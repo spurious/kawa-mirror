@@ -2,7 +2,6 @@ package gnu.jemacs.buffer;
 import gnu.mapping.*;
 import gnu.expr.Interpreter;
 import kawa.lang.*;
-import kawa.standard.Scheme;
 import javax.swing.text.*;
 import gnu.text.QueueReader;
 
@@ -55,8 +54,13 @@ public class ReplBuffer extends Buffer
     processMark.setDot(pos);
   }
 
-  public static ReplBuffer scheme()
+  public static ReplBuffer make(String language)
   {
-   return  new ReplBuffer(Scheme.getInstance(), Environment.getCurrent());
+   return make(Interpreter.getInstance(language));
+  }
+
+  public static ReplBuffer make(Interpreter interpreter)
+  {
+   return new ReplBuffer(interpreter, Environment.getCurrent());
   }
 }

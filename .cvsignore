@@ -4,3 +4,4 @@ config.status
 libtool
 patch-source-list
 selected-java-source
+kawa*.jar

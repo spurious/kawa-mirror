@@ -536,16 +536,37 @@ public class Declaration
 
   public void printInfo(OutPort out)
   {
-    out.print(symbol);
-    out.print('/');
-    out.print(id);
-    out.print("/fl:");
-    out.print(Integer.toHexString(flags));
+    StringBuffer sbuf = new StringBuffer();
+    printInfo(sbuf);
+    out.print(sbuf.toString());
+  }
+
+  public void printInfo(StringBuffer sbuf)
+  {
+    sbuf.append(symbol);
+    sbuf.append('/');
+    sbuf.append(id);
+    /*
+    int line = getLine();
+    if (line != 0)
+      {
+	sbuf.append("l=");
+	sbuf.append(line);
+	int column = getColumn();
+	if (column != 0)
+	  {
+	    sbuf.append(':');
+	    sbuf.append(column);
+	  }
+      }
+    */
+    sbuf.append("/fl:");
+    sbuf.append(Integer.toHexString(flags));
     Type t = getType();
     if (t != null && t != Type.pointer_type)
       {
-	out.print("::");
-	out.print(t.getName());
+	sbuf.append("::");
+	sbuf.append(t.getName());
       }
   }
 
@@ -553,6 +574,13 @@ public class Declaration
   public String toString()
   {
     return "Declaration["+symbol+'/'+id+']';
+    /*
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append("Declaration[");
+    printInfo(sbuf);
+    sbuf.append(']');
+    return sbuf.toString();
+    */
   }
 
 

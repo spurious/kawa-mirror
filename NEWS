@@ -1,4 +1,15 @@
-class-methods, invoke-static, define-private
+The procedures slot-ref and slot-set! are now available.
+They are equivalent to the existing `field', but reading
+a field `x' will look for `getX' method if there is no public
+`x' field; writing to a field will look for `setX'.
+
+The procedure `make' makes it convenient to create new
+objects.
+
+There is now a teaser screen snapshot of "JEmacs"
+at http://www.bothner.com/~per/papers/jemacs.png.
+
+The html version of the manual now has a primitive index.
 
 The new functions invoke-static and class-methods allow you
 to call an arbitary Java method.  They both take a class
@@ -17,10 +28,18 @@ lead to faster startup and less resource use, but procedure
 application will probably be noticably slower (though not so much
 slower as when reflection is used).  The reason for the slowdown
 is that we in the general case now do an extra method call, plus
-a not-yetoptimized switch statement.  This change is part of the
+a not-yet-optimized switch statement.  This change is part of the
 new Kawa module system.  That will allow the compiler to
 substitute direct methods calls in more cases, which I hope will
 more than make up for the slowdown.
+
+A Scheme procedure is now in general compiled to a Java method
+whose name is a "mangling" of the Scheme procedure's name.  If the
+procedure takes a variable number of parameters, then "$V" is added
+to the name;  this indicates that the last argument is a Java
+array containing the rest of the arguments.  Conversely, calling a
+Java method whose name ends in "$V" passes any excess arguments in
+the last argument, which must be an array type.
 
 Many changes to the "Emacs-emulation" library in gnu.jemacs.buffer:
 * Implemented commands to read and save files.

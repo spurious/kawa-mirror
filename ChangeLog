@@ -1,3 +1,24 @@
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.60.
+	(AC_OUTPUT):  Add gnu/kawa/Makefile gnu/kawa/reflect/Makefile.
+	
+	* kawa/lang/Interpreter.java (coerceFromObject, coerceToObject):
+	New methods.
+
+	* kawa/standard/call_with_values.java: Update values() -> getValues().
+	* kawa/standard/Scheme.java:  Likewise.
+
+	* kawa/lang/InvokeStatic.java:  Moved to gnu/kawa/reflect.
+	* kawa/standard/class_methods.java:  Replaced by
+ 	gnu/kawa/reflect/ClassMethods.java.
+	* kawa/standard/field.java:  Replaced by gnu/kawa/reflect/SlotGet.java.
+	* kawa/standard/Scheme.java:  Update for new or moved procedures.
+	* kawa/lang/Makefile.am:  Update accordingly.
+	* kawa/standard/Makefile.am:  Likewise.
+
+	* kawa/standard/list_v.java (list$V):  New method.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/InvokeStatic.java:  Get rid of lots of crud by

@@ -2,7 +2,8 @@ TO BE DONE FOR 2.0:
 
 Implement SRFI 0: Feature-based conditional expansion construct 
 Implement SRFI 4: Homogeneous numeric vector datatypes 
-Implement SRFI 6: Basic String Ports 
+Implement SRFI 6: Basic String Ports
+IMplement SRFI 9: Defining Record Types
 
 Fix scheme-window in misc.scm.
 

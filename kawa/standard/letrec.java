@@ -10,7 +10,6 @@ import codegen.*;
 public class letrec extends Syntax implements Printable
 {
   static private Pattern pattern2 = new ListPat (2);
-  static QuoteExp undefined_exp = new QuoteExp (Interpreter.undefinedObject);
 
   public Expression rewrite (Object obj, Interpreter interp)
        throws kawa.lang.WrongArguments
@@ -35,7 +34,7 @@ public class letrec extends Syntax implements Printable
 	if (! (bind_match[0] instanceof Symbol))
 	  return interp.syntaxError ("letrec variable is not an indetifier");
 	let.add_decl ((Symbol) bind_match[0]);
-	inits[i] = undefined_exp;
+	inits[i] = QuoteExp.undefined_exp;
 	orig_inits[i] = bind_match[1];
 	bindings = bind_pair.cdr;
       }
@@ -43,8 +42,10 @@ public class letrec extends Syntax implements Printable
     i = 0;
     for (Variable var = let.firstVar ();  var != null;  var = var.nextVar (), i++)
       {
-	newbody[i] = new SetExp((Declaration) var,
-				interp.rewrite(orig_inits[i]));
+	Expression exp = interp.rewrite(orig_inits[i]);
+	Declaration decl = (Declaration) var;
+	newbody[i] = new SetExp(decl, exp);
+	decl.noteValue (exp);				
       }
     newbody[decl_count] = interp.rewrite_body(body);
     let.body = new BeginExp(newbody);

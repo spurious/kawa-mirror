@@ -33,8 +33,9 @@ public class letstar extends Syntax implements Printable
     if (! (bind_match[0] instanceof Symbol))
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body) [var is not an identifier]");
     LetExp let = new LetExp (inits);
-    let.add_decl ((Symbol) bind_match[0]);
+    Declaration decl = let.add_decl ((Symbol) bind_match[0]);
     inits[0] = interp.rewrite (bind_match[1]);
+    decl.noteValue (inits[0]);
     let.push (interp);
     let.body = rewrite (bind_pair.cdr, body, interp); // self-recurse
     let.pop (interp);

@@ -29,8 +29,9 @@ public class let extends Syntax implements Printable
 	throw new WrongArguments("let", 2, "(let ((var init)...) body)");
 	if (! (bind_match[0] instanceof Symbol))
 	  throw new WrongArguments("let", 2, "(let ((var init)...) body) [var is not an identifier]");
-	let.add_decl ((Symbol) bind_match[0]);
+	Declaration decl = let.add_decl ((Symbol) bind_match[0]);
 	inits[i] = interp.rewrite (bind_match[1]);
+	decl.noteValue (inits[i]);
 	bindings = bind_pair.cdr;
       }
     let.push (interp);

@@ -242,6 +242,12 @@ uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
+
+# Build a .zip archive from the compiled classes.
+# Assumes you have done a 'make install' first.
+
+kawa-@VERSION@-compiled.zip:
+	(cd $(javadir); zip -r -n .class - kawa codegen) > $@
 .SUFFIXES:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

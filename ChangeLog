@@ -1,3 +1,8 @@
+Tue Feb 11 20:06:49 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in (VERSION):  Set to 1.2.
+	* Makefile.am (kawa-@VERSION@-compiled.zip):  New rule.
+
 Tue Feb  4 22:16:51 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Expression.java (Compile with Type):  Cast to

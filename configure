@@ -611,7 +611,7 @@ cat >> confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
 EOF
 
-VERSION=1.2beta
+VERSION=1.2
 
 cat >> confdefs.h <<EOF
 #define VERSION "$VERSION"

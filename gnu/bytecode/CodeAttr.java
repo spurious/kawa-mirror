@@ -23,6 +23,14 @@ public class CodeAttr extends Attribute implements AttrContainer
   private int max_locals;
   int PC;
   byte[] code;
+
+  /* The exception handler table, as a vector of quadruples
+     (start_pc, end_pc, handler_pc, catch_type).
+     Only the first exception_table_length quadrules are defined. */
+  short[] exception_table;
+
+  /* The number of (defined) exception handlers (i.e. quadruples)
+     in exception_table. */
   int exception_table_length;
 
   /* A chain of labels.  Unsorted, except that the Label with
@@ -31,6 +39,16 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /** The stack of currently active conditionals. */
   IfState if_stack;
+
+  /** The stack of currently active try statements. */
+  TryState try_stack;
+
+  public final Method getMethod() { return (Method) getContainer(); }
+
+  public final ConstantPool getConstants ()
+  {
+    return getMethod().classfile.constants;
+  }
 
   /* True if we cannot fall through to bytes[PC] -
      the previous instruction was an uncondition control transfer.  */
@@ -171,16 +189,461 @@ public class CodeAttr extends Attribute implements AttrContainer
     return stack_types[SP - 1];
   }
 
-  final void compileTransfer (Label label, int opcode)
+  /** Compile code to pop values off the stack (and ignore them).
+   * @param nvalues the number of values (not words) to pop
+   */
+  public void emitPop (int nvalues)
+  {
+    for ( ; nvalues > 0;  --nvalues)
+      {
+        reserve(1);
+	Type type = popType();
+	if (type.size > 4)
+	  put1(88);  // pop2
+	else if (nvalues > 1)
+	  { // optimization:  can we pop 2 4-byte words using a pop2
+	    Type type2 = popType();
+	    if (type2.size > 4)
+	      {
+		put1(87);  // pop
+		reserve(1);
+	      }
+	    put1(88);  // pop2
+	    --nvalues;
+	  }
+	else
+	  put1(87); // pop
+      }
+  }
+
+  public void emitSwap ()
+  {
+    reserve(1);
+    Type type1 = popType();
+    Type type2 = popType();
+    if (type1.size > 4 || type2.size > 4)
+      throw new Error ("emitSwap:  not allowed for long or double");
+    pushType(type1);
+    put1(95);  // swap
+    pushType(type2);
+  }
+
+  /** Compile code to duplicate with offset.
+   * @param size the size of the stack item to duplicate (1 or 2)
+   * @param offset where to insert the result (must be 0, 1, or 2)
+   * The new words get inserted at stack[SP-size-offset]
+   */
+  public void emitDup (int size, int offset)
+  {
+    if (size == 0)
+      return;
+    reserve(1);
+    // copied1 and (optionally copied2) are the types of the duplicated words
+    Type copied1 = popType ();
+    Type copied2 = null;
+    if (size == 1)
+      {
+	if (copied1.size > 4)
+	  throw new Error ("using dup for 2-word type");
+      }
+    else if (size != 2)
+      throw new Error ("invalid size to emitDup");
+    else if (copied1.size <= 4)
+      {
+	copied2 = popType();
+	if (copied2.size > 4)
+	  throw new Error ("dup will cause invalid types on stack");
+      }
+
+    int kind;
+    // These are the types of the words (in any) that are "skipped":
+    Type skipped1 = null;
+    Type skipped2 = null;
+    if (offset == 0)
+      {
+	kind = size == 1 ? 89 : 92;  // dup or dup2
+      }
+    else if (offset == 1)
+      {
+	kind = size == 1 ? 90 : 93; // dup_x1 or dup2_x1
+	skipped1 = popType ();
+	if (skipped1.size > 4)
+	  throw new Error ("dup will cause invalid types on stack");
+      }
+    else if (offset == 2)
+      {
+	kind = size == 1 ? 91 : 94; // dup_x2 or dup2_x2
+	skipped1 = popType();
+	if (skipped1.size <= 4)
+	  {
+	    skipped2 = popType();
+	    if (skipped2.size > 4)
+	      throw new Error ("dup will cause invalid types on stack");
+	  }
+      }
+    else
+      throw new Error ("emitDup:  invalid offset");
+
+    put1(kind);
+    if (copied2 != null)
+      pushType(copied2);
+    pushType(copied1);
+    if (skipped2 != null)
+      pushType(skipped2);
+    if (skipped1 != null)
+      pushType(skipped1);
+    if (copied2 != null)
+      pushType(copied2);
+    pushType(copied1);
+  }
+
+  /**
+   * Compile code to duplicate the top 1 or 2 words.
+   * @param size number of words to duplicate
+   */
+  public void emitDup (int size)
+  {
+    emitDup(size, 0);
+  }
+
+  public void emitDup (Type type)
+  {
+    emitDup(type.size > 4 ? 2 : 1, 0);
+  }
+
+  public void enterScope (Scope scope)
+  {
+    locals.enterScope(scope);
+  }
+
+  public Scope pushScope () {
+    Scope scope = new Scope ();
+    scope.start_pc = PC;
+    if (locals == null)
+      locals = new LocalVarsAttr(this);
+    locals.enterScope(scope);
+    if (locals.parameter_scope == null) 
+      locals.parameter_scope= scope;
+    return scope;
+  }
+
+
+  public Scope popScope () {
+    Scope scope = locals.current_scope;
+    locals.current_scope = scope.parent;
+    scope.end_pc = PC;
+    for (Variable var = scope.vars; var != null; var = var.next) {
+      if (var.isSimple () && ! var.dead ())
+	var.freeLocal(this);
+    }
+    return scope;
+  }
+
+  /** Get the index'th parameter. */
+  public Variable getArg (int index)
+  {
+    return locals.parameter_scope.find_var (index);
+  }
+
+  /**
+   * Search by name for a Variable
+   * @param name name to search for
+   * @return the Variable, or null if not found (in any scope of this Method).
+   */
+  Variable lookup (String name)
+  {
+    Scope scope = locals.current_scope;
+    for (; scope != null;  scope = scope.parent)
+      {
+	Variable var = scope.lookup (name);
+	if (var != null)
+	  return var;
+      }
+    return null;
+  }
+
+  /** Add a new local variable (in the current scope).
+   * @param type type of the new Variable.
+   * @return the new Variable. */
+  public Variable addLocal (Type type)
+  {
+    return locals.current_scope.addVariable(this, type, null);
+  }
+
+  /** Add a new local variable (in the current scope).
+   * @param type type of the new Variable.
+   * @param name name of the new Variable.
+   * @return the new Variable. */
+  Variable addLocal (Type type, String name)
+  {
+    return locals.current_scope.addVariable (this, type, name);
+  }
+
+  public final void emitPushInt(int i)
+  {
+    reserve(3);
+    if (i >= -1 && i <= 5)
+      put1(i + 3);  // iconst_m1 .. iconst_5
+    else if (i >= -128 && i < 128)
+      {
+	put1(16); // bipush
+	put1(i);
+      }
+    else if (i >= -32768 && i < 32768)
+      {
+	put1(17); // sipush
+	put2(i);
+      }
+    else
+      {
+	int j = getConstants().addInt(i).index;
+	if (j < 256)
+	  {
+	    put1(18); // ldc1
+	    put1(j);
+	  }
+	else
+	  {
+	    put1(19); // ldc2
+	    put2(j);
+	  }
+      }
+    pushType(Type.int_type);
+  }
+
+  public void emitPushLong (long i)
+  {
+    if (i == 0 || i == 1)
+      {
+	reserve(1);
+	put1 (9 + (int) i);  // lconst_0 .. lconst_1
+      }
+    else if ((long) (int) i == i)
+      {
+	emitPushInt ((int) i);
+	reserve(1);
+	popType();
+	put1 (133); // i2l
+      }
+    else
+      {
+	reserve(3);
+	int j = getConstants().addLong(i).index;
+      	put1 (20); // ldc2w
+	put2 (j);
+      }
+    pushType(Type.double_type);
+  }
+
+  public void emitPushDouble (double x)
+  {
+    if (x == 0.0)
+      {
+	reserve(1);
+	put1 (14);  // dconst_0
+      }
+    else if (x == 1.0)
+      {
+	reserve(1);
+	put1 (15);  // dconst_1
+      }
+    else if (x >= -128.0 && x < 128.0
+	     && (double)(int)x == x)
+      {
+	// Saves space in the constant pool
+	// Probably faster, at least on modern CPUs.
+	emitPushInt ((int) x);
+	reserve(1);
+	popType();
+	put1 (135); // i2d
+      }
+    else
+      {
+	reserve(3);
+	int j = getConstants().addDouble(x).index;
+      	put1(20); // ldc2w
+	put2(j);
+      }
+    pushType(Type.long_type);
+  }
+
+  public final void emitPushString (String str)
+  {
+    reserve(3);
+    int index = getConstants().addString(str).index;
+    if (index < 256)
+      {
+	put1(18); // ldc1
+	put1(index);
+      }
+    else
+      {
+	put1(19); // ldc2
+	put2(index);
+      }
+    pushType(Type.string_type);
+  }
+
+  public void emitPushNull ()
+  {
+    reserve(1);
+    put1(1);  // aconst_null
+    pushType(Type.pointer_type);
+  }
+
+  void emitNewArray (int type_code)
+  {
+    reserve(2);
+    put1(188);  // newarray
+    put1(type_code);
+  }
+
+  public final void emitArrayLength ()
+  {
+    reserve(1);
+    put1(190);  // arraylength
+    pushType(Type.int_type);
+  }
+
+  /**
+   * Invoke new on a class type.
+   * Does not call the constructor!
+   * @param type the desired new object type
+   */
+  public void emitNew (ClassType type)
+  {
+    reserve(3);
+    put1(187); // new
+    putIndex2(getConstants().addClass(type));
+    pushType(type);
+  }
+
+  /** Compile code to allocate a new array.
+   * The size shold have been already pushed on the stack.
+   * @param type type of the array elements
+   */
+  public void emitNewArray (Type element_type)
+  {
+    popType();
+    if (element_type == Type.byte_type)
+      emitNewArray (8);
+    else if (element_type == Type.short_type)
+      emitNewArray (9);
+    else if (element_type == Type.int_type)
+      emitNewArray (10);
+    else if (element_type == Type.long_type)
+      emitNewArray (11);
+    else if (element_type == Type.float_type)
+      emitNewArray (6);
+    else if (element_type == Type.double_type)
+      emitNewArray (7);
+    else if (element_type == Type.boolean_type)
+      emitNewArray (4);
+    else if (element_type == Type.char_type)
+      emitNewArray (5);
+    else if (element_type instanceof ClassType)
+      {
+	reserve(3);
+	put1(189); // anewarray
+	putIndex2(getConstants().addClass((ClassType) element_type));
+      }
+    else
+      throw new Error ("unimplemented type in emitNewArray");
+    pushType(Type.pointer_type);
+  }
+
+  public void emitStore (Variable var)
+  {
+   if (var.dead ())
+      throw new Error ("attempting to push dead variable");
+    int offset = var.offset;
+    if (offset < 0 || !var.isSimple ())
+      throw new Error ("attempting to store in unassigned variable");
+    Type type = var.getType().promote ();
+    int kind;
+    reserve(4);
+    popType();
+    if (type == Type.int_type)
+      kind = 0; // istore??
+    else if (type == Type.long_type)
+      kind = 1; // lstore??
+    else if (type == Type.float_type)
+      kind = 2; // float??
+    else if (type == Type.double_type)
+      kind = 3; // dstore??
+    else
+      kind = 4; // astore??
+    if (offset <= 3)
+      put1(59 + 4 * kind + offset);  // [ilfda]store_[0123]
+    else
+      {
+	if (offset >= 256)
+	  {
+	    put1(196); // wide
+	    put1(offset >> 8);
+	  }
+	put1(54 + kind);  // [ilfda]store
+	put1(offset);
+      }
+  }
+
+
+  private final void emitFieldop (Field field, int opcode)
+  {
+    reserve(3);
+    put1(opcode);
+    putIndex2(getConstants().addFieldRef(field));
+  }
+
+  /** Compile code to get a static field value.
+   * Stack:  ... => ..., value */
+
+  public final void emitGetStatic(Field field)
+  {
+    pushType(field.type);
+    emitFieldop (field, 178);  // getstatic
+  }
+
+  /** Compile code to get a non-static field value.
+   * Stack:  ..., objectref => ..., value */
+
+  public final void emitGetField(Field field)
+  {
+    popType();
+    pushType(field.type);
+    emitFieldop(field, 180);  // getfield
+  }
+
+  /** Compile code to put a static field value.
+   * Stack:  ..., value => ... */
+
+  public final void emitPutStatic (Field field)
+  {
+    popType();
+    emitFieldop(field, 179);  // putstatic
+  }
+
+  /** Compile code to put a non-static field value.
+   * Stack:  ..., objectref, value => ... */
+
+  public final void emitPutField (Field field)
+  {
+    popType();
+    popType();
+    emitFieldop(field, 181);  // putfield
+  }
+
+
+  final void emitTransfer (Label label, int opcode)
   {
     put1(opcode);
     label.emit(this);
   }
 
-  /** Compile an unconditional branch (goto).
+  /** Compile an unconditional branch (goto) or a jsr.
    * @param label target of the branch (must be in this method).
    */
-  public final void compileGoto (Label label)
+  public final void emitGoto (Label label, int opcode)
   {
     reserve(5);
     if (label.defined ())
@@ -188,23 +651,46 @@ public class CodeAttr extends Attribute implements AttrContainer
 	int delta = label.position - PC;
 	if (delta < -32768)
 	  {
-	    put1(200);  // goto_w
+	    put1(opcode-167);  // goto_w or jsr_w
 	    put4(delta);
 	  }
 	else
 	  {
-	    put1(167); // goto
+	    put1(opcode); // goto or jsr
 	    put2(delta);
 	  }
       }
     else
-      compileTransfer (label, 167); // goto label
+      emitTransfer (label, opcode); // goto label or jsr label
     unreachable_here = true;
   }
 
+  /** Compile an unconditional branch (goto).
+   * @param label target of the branch (must be in this method).
+   */
+  public final void emitGoto (Label label)
+  {
+    emitGoto(label, 167);
+  }
+
+  public void emitRet (Variable var)
+  {
+    int offset = var.offset;
+    if (offset < 256)
+      {
+	put1(169);  // ret
+	put1(offset);
+      }
+    else
+      {
+	put1(196);  // wide
+	put1(169);  // ret
+	put2(offset);
+      }
+  }
 
   /** Compile start of else clause. */
-  public final void compileElse ()
+  public final void emitElse ()
   {
     Label else_label = if_stack.end_label;
     Label end_label = new Label (this);
@@ -215,7 +701,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if_stack.then_stacked_types = new Type[stack_growth];
 	System.arraycopy (stack_types, if_stack.start_stack_size,
 			  if_stack.then_stacked_types, 0, stack_growth);
-	compileGoto (end_label);
+	emitGoto (end_label);
       }
     while (SP != if_stack.start_stack_size)
       popType();
@@ -224,7 +710,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile end of conditional. */
-  public final void compileFi ()
+  public final void emitFi ()
   {
     boolean make_unreachable = false;
     if (! if_stack.doing_else)
@@ -257,6 +743,157 @@ public class CodeAttr extends Attribute implements AttrContainer
       unreachable_here = true;
     // Pop the if_stack.
     if_stack = if_stack.previous;
+  }
+
+  /**
+   * Compile a method return.
+   */
+  public final void emitReturn ()
+  {
+    reserve(1);
+    if (getMethod().getReturnType() == Type.void_type)
+      {
+	put1(177); // return
+	return;
+      }
+    Type type = popType();
+    if (type == Type.int_type
+	|| type == Type.short_type
+	|| type == Type.byte_type
+	|| type == Type.boolean_type
+	|| type == Type.char_type)
+      put1(172); // ireturn
+    else if (type == Type.long_type)
+      put1(173); // lreturn
+    else if (type == Type.float_type)
+      put1(174); // freturn
+    else if (type == Type.double_type)
+      put1(175); // dreturn
+    else if (type == Type.void_type)
+      throw new Error ("returning void type");
+    else
+      put1(176); // arreturn
+  }
+
+  /** Add an exception handler. */
+  public void addHandler (int start_pc, int end_pc,
+			  int handler_pc, int catch_type)
+  {
+    int index = 4 * exception_table_length;
+    if (exception_table == null)
+      {
+	exception_table = new short[20];
+      }
+    else if (exception_table.length <= index)
+      {
+	short[] new_table = new short[2 * exception_table.length];
+	System.arraycopy(exception_table, 0, new_table, 0, index);
+	exception_table = new_table;
+      }
+    exception_table[index++] = (short) start_pc;
+    exception_table[index++] = (short) end_pc;
+    exception_table[index++] = (short) handler_pc;
+    exception_table[index++] = (short) catch_type;
+    exception_table_length++;
+  }
+
+  /** Add an exception handler. */
+  public void addHandler (int start_pc, int end_pc, int handler_pc,
+			  ClassType catch_type, ConstantPool constants)
+  {
+    int catch_type_index;
+    if (catch_type == null)
+      catch_type_index = 0;
+    else
+      catch_type_index = constants.addClass(catch_type).index;
+    addHandler(start_pc, end_pc, handler_pc, catch_type_index);
+  }
+
+
+  public void emitTryStart(boolean has_finally)
+  {
+    TryState try_state = new TryState(this);
+    if (has_finally)
+      try_state.finally_subr = new Label(this);
+  }
+
+  public void emitTryEnd()
+  {
+    if (try_stack.end_label == null)
+      {
+	try_stack.end_label = new Label(this);
+	if (try_stack.finally_subr != null)
+	  emitGoto(try_stack.finally_subr, 168);  // jsr
+	if (reachableHere())
+	  emitGoto(try_stack.end_label);
+	try_stack.end_pc = PC;
+      }
+  }
+
+  public void emitCatchStart(Variable var)
+  {
+    emitTryEnd();
+    if (try_stack.try_type != null)
+      {
+	emitCatchEnd();
+      }
+    ClassType type = (ClassType) var.getType();
+    try_stack.try_type = type;
+    addHandler(try_stack.start_pc, try_stack.end_pc,
+	       PC, type, getConstants());
+    //pushScope();
+    if (var != null)
+      {
+	pushType(type);
+	emitStore(var);
+      }
+  }
+
+  public void emitCatchEnd()
+  {
+    if (try_stack.finally_subr != null)
+      emitGoto(try_stack.finally_subr, 168); // jsr
+    if (reachableHere())
+      emitGoto(try_stack.end_label);
+    popScope();
+    try_stack.try_type = null;
+  }
+
+  public void emitFinallyStart()
+  {
+    emitTryEnd();
+    if (try_stack.try_type != null)
+      {
+	emitCatchEnd();
+      }
+
+    emitCatchStart(null);
+    //emitCatchEnd();
+    
+    //if (try_stack.finally_subr == null)
+    // error();
+    try_stack.finally_subr.define(this);
+    pushScope();
+    Type ret_addr_type = Type.pointer_type;
+    try_stack.finally_ret_addr = addLocal(ret_addr_type);
+    pushType(ret_addr_type);
+    emitStore(try_stack.finally_ret_addr);
+  }
+
+  public void emitFinallyEnd()
+  {
+    emitRet(try_stack.finally_ret_addr);
+    unreachable_here = true;
+    popScope();
+    try_stack.finally_subr = null;
+  }
+
+  public void emitTryCatchEnd()
+  {
+    if (try_stack.finally_subr != null)
+      emitFinallyEnd();
+    try_stack.end_label.define(this);
+    try_stack = try_stack.previous;
   }
 
   /* Make sure the label with oldest fixup is first in labels. */
@@ -337,6 +974,32 @@ public class CodeAttr extends Attribute implements AttrContainer
     int length = getCodeLength();
     dst.println(length);
     disAssemble(dst, 0, length);
+    if (exception_table_length > 0)
+      {
+	dst.print("Exceptions (count: ");
+	dst.print(exception_table_length);
+	dst.println("):");
+	int count = exception_table_length;
+	for (int i = 0;  --count >= 0;  i += 4)
+	  {
+	    dst.print("  start: ");
+	    dst.print(exception_table[i] & 0xffff);
+	    dst.print(", end: ");
+	    dst.print(exception_table[i+1] & 0xffff);
+	    dst.print(", handler: ");
+	    dst.print(exception_table[i+2] & 0xffff);
+	    dst.print(", type: ");
+	    int catch_type_index = exception_table[i+3] & 0xffff;
+	    if (catch_type_index == 0)
+	      dst.print("0 /* finally */");
+	    else
+	      {
+		dst.printOptionalIndex(catch_type_index);
+		dst.printConstantTersely(catch_type_index, ConstantPool.CLASS);
+	      }
+	    dst.println();
+	  }
+      }
     dst.printAttributes(this);
   }
 

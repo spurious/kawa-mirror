@@ -30,7 +30,7 @@ CpoolRef.class \
 CpoolString.class \
 CpoolUtf8.class \
 Location.class Field.class \
-IfState.class Label.class \
+Label.class IfState.class TryState.class \
 Method.class \
 CodeAttr.class \
 LineNumbersAttr.class LocalVarsAttr.class \

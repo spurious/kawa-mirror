@@ -20,7 +20,7 @@ public class Method implements AttrContainer {
   public final void setAttributes (Attribute attributes)
   { this.attributes = attributes; }
   CodeAttr code;
-  LocalVarsAttr locals;
+  public final CodeAttr getCode () { return code; }
 
   Method (ClassType clfile, int flags) {
      if (clfile.last_method == null)
@@ -49,90 +49,35 @@ public class Method implements AttrContainer {
     return classfile.constants;
   }
     
-  public void enterScope (Scope scope)
-  {
-    if (locals == null)
-      locals = new LocalVarsAttr(code);
-    locals.enterScope(scope);
-  }
-
   public Scope pushScope () {
     prepareCode(0);
-    Scope scope = new Scope ();
-    scope.start_pc = code.PC;
-    enterScope(scope);
-    return scope;
+    return code.pushScope();
   }
 
   /** True if control could reach here. */
   public boolean reachableHere () { return !code.unreachable_here; }
 
-  public Scope popScope () {
-    Scope scope = locals.current_scope;
-    locals.current_scope = scope.parent;
-    scope.end_pc = code.PC;
-    for (Variable var = scope.vars; var != null; var = var.next) {
-      if (var.isSimple () && ! var.dead ())
-	kill_local (var);
-    }
-    return scope;
-  }
-
-  /**
-   * Search by name for a Variable
-   * @param name name to search for
-   * @return the Variable, or null if not found (in any scope of this Method).
-   */
-  Variable lookup (String name) {
-    for (Scope scope = locals.current_scope; scope != null;  scope = scope.parent) {
-      Variable var = scope.lookup (name);
-      if (var != null)
-	return var;
-    }
-    return null;
-  }
+  public Scope popScope () { return code.popScope(); }
 
   /** Assign a local variable to a given slot.
    * @param local the Variable to assign
    * @param slot the local variable slot desired
+   * @deprecated
    * @return true iff we succeeded (i.e. the slot was unused) */
   public boolean assign_local (Variable local, int slot)
   {
-    int size = local.getType().size > 4 ? 2 : 1;
-    if (locals.used == null)
-      locals.used = new Variable[20+size];
-    else if (code.getMaxLocals() + size >= locals.used.length) {
-      Variable[] new_locals = new Variable [2 * locals.used.length + size];
-      System.arraycopy (locals.used, 0, new_locals, 0, code.getMaxLocals());
-      locals.used = new_locals;
-    }
-    for (int j = 0; j < size; j++)
-      {
-	if (locals.used[slot+j] != null)
-	  return false;
-      }
-    for (int j = 0; j < size; j++)
-      locals.used[slot + j] = local;
-    if (slot + size > code.getMaxLocals())
-      code.setMaxLocals(slot + size);
-    local.offset = slot;
-    return true;
+    return local.reserveLocal(slot, code);
   }
 
   /**
    * Allocate slots for a local variable (or parameter).
    * @param local the variable we need to allocate
    * @return the index of the (first) slot.
+   * @deprecated
    */
   public void allocate_local (Variable local)
   {
-    for (int i = 0; ; i++)
-      {
-	if (assign_local (local, i))
-	  {
-	    return;
-	  }
-      }
+    local.allocateLocal(code);
   }
 
   /** Allocate a Code attribute, and prepare to generate code. */
@@ -142,50 +87,21 @@ public class Method implements AttrContainer {
     if (classfile.constants == null)
       classfile.constants = new ConstantPool();
     prepareCode(0);
-    if (locals == null)
-      locals = new LocalVarsAttr(code);
-    if (locals.parameter_scope == null)
-      locals.parameter_scope = pushScope();
+    code.pushScope();
   }
 
   public void init_param_slots ()
   {
     initCode ();
     if ((access_flags & Access.STATIC) == 0)
-      addLocal (classfile).setParameter (true);
+      code.addLocal(classfile).setParameter(true);
     int arg_count = arg_types.length;
     for (int i = 0;  i < arg_count;  i++) {
-      addLocal (arg_types[i]).setParameter (true);
+      code.addLocal(arg_types[i]).setParameter (true);
     }
   }
 
-  /* Get the index'th parameter. */
-  public Variable find_arg (int index) {
-    return locals.parameter_scope.find_var (index);
-  }
-
-  /** Add a new local variable (in the current scope).
-   * @param type type of the new Variable.
-   * @return the new Variable. */
-  public Variable addLocal (Type type)
-  {
-    return locals.current_scope.addVariable(this, type, null);
-  }
-
-  /** Add a new local variable (in the current scope).
-   * @param type type of the new Variable.
-   * @param name name of the new Variable.
-   * @return the new Variable. */
-  Variable addLocal (Type type, String name)
-  {
-    return locals.current_scope.addVariable (this, type, name);
-  }
-  void kill_local (Variable var) {
-    var.end_pc = code.PC;
-    int size = var.getType().size > 4 ? 2 : 1;
-    while (--size >= 0)
-      locals.used [var.offset + size] = null;
-  }
+  void kill_local (Variable var) { var.freeLocal(code); }
 
   /** Method that must be called before we generate any instructions.
     * Set so there is room for at least max_size bytes of code.
@@ -208,171 +124,6 @@ public class Method implements AttrContainer {
 
   final Type pop_stack_type () { return code.popType(); }
   final void push_stack_type (Type type) { code.pushType(type); }
-
-  public void push_int_const (int i) { compile_push_int (i); } //old
-  public void compile_push_int (int i) {
-    prepareCode(3);
-    if (i >= -1 && i <= 5)
-      code.put1(i + 3);  // iconst_m1 .. iconst_5
-    else if (i >= -128 && i < 128) {
-      code.put1(16); // bipush
-      code.put1(i);
-    } else if (i >= -32768 && i < 32768) {
-      code.put1(17); // sipush
-      code.put2(i);
-    } else {
-      int j = getConstants().addInt(i).index;
-      if (j < 256) {
-	code.put1(18); // ldc1
-	code.put1(j);
-      } else {
-	code.put1(19); // ldc2
-	code.put2(j);
-      }
-    }
-    push_stack_type (Type.int_type);
-  }
-
-  public void compile_push_long (long i)
-  {
-    if (i == 0 || i == 1)
-      {
-	prepareCode(1);
-	code.put1 (9 + (int) i);  // lconst_0 .. lconst_1
-      }
-    else if ((long) (int) i == i)
-      {
-	compile_push_int ((int) i);
-	prepareCode(1);
-	pop_stack_type ();
-	code.put1 (133); // i2l
-      }
-    else
-      {
-	prepareCode(3);
-	int j = getConstants().addLong(i).index;
-      	code.put1 (20); // ldc2w
-	code.put2 (j);
-      }
-    push_stack_type (Type.double_type);
-  }
-
-  public void compile_push_double (double x)
-  {
-    if (x == 0.0)
-      {
-	prepareCode(1);
-	code.put1 (14);  // dconst_0
-      }
-    else if (x == 1.0)
-      {
-	prepareCode(1);
-	code.put1 (15);  // dconst_1
-      }
-    else if (x >= -128.0 && x < 128.0
-	     && (double)(int)x == x)
-      {
-	// Saves space in the constant pool
-	// Probably faster, at least on modern CPUs.
-	compile_push_int ((int) x);
-	prepareCode(1);
-	pop_stack_type ();
-	code.put1 (135); // i2d
-      }
-    else
-      {
-	prepareCode(3);
-	int j = getConstants().addDouble(x).index;
-      	code.put1(20); // ldc2w
-	code.put2(j);
-      }
-    push_stack_type (Type.long_type);
-  }
-
-  public void compile_push_string (String str)
-  {
-    prepareCode(3);
-    int index = getConstants().addString(str).index;
-    if (index < 256)
-      {
-	code.put1(18); // ldc1
-	code.put1(index);
-      }
-    else
-      {
-	code.put1(19); // ldc2
-	code.put2(index);
-      }
-    push_stack_type (Type.string_type);
-  }
-
-  public void compile_push_null ()
-  {
-    prepareCode(1);
-    code.put1(1);  // aconst_null
-    push_stack_type (Type.pointer_type);
-  }
-
-  void compile_new_array (int type_code)
-  {
-    prepareCode(2);
-    code.put1(188);  // newarray
-    code.put1(type_code);
-  }
-
-  public final void compile_arraylength ()
-  {
-    prepareCode(1);
-    code.put1(190);  // arraylength
-    push_stack_type (Type.int_type);
-  }
-
-  /**
-   * Invoke new on a class type.
-   * Does not call the constructor!
-   * @param type the desired new object type
-   */
-  public void compile_new (ClassType type)
-  {
-    prepareCode(3);
-    code.put1(187); // new
-    code.putIndex2(getConstants().addClass(type));
-    push_stack_type (type);
-  }
-
-  /** Compile code to allocate a new array.
-   * The size shold have been already pushed on the stack.
-   * @param type type of the array elements
-   */
-  public void compile_new_array (Type element_type)
-  {
-    pop_stack_type ();
-    if (element_type == Type.byte_type)
-      compile_new_array (8);
-    else if (element_type == Type.short_type)
-      compile_new_array (9);
-    else if (element_type == Type.int_type)
-      compile_new_array (10);
-    else if (element_type == Type.long_type)
-      compile_new_array (11);
-    else if (element_type == Type.float_type)
-      compile_new_array (6);
-    else if (element_type == Type.double_type)
-      compile_new_array (7);
-    else if (element_type == Type.boolean_type)
-      compile_new_array (4);
-    else if (element_type == Type.char_type)
-      compile_new_array (5);
-    else if (element_type instanceof ClassType)
-      {
-	prepareCode(3);
-	code.put1(189); // anewarray
-	code.putIndex2(getConstants().addClass((ClassType) element_type));
-      }
-    else
-      throw new Error ("unimplemented type in compile_new_array");
-    push_stack_type (Type.pointer_type);
-  }
 
   public void compile_checkcast (Type type)
   {
@@ -444,129 +195,6 @@ public class Method implements AttrContainer {
   }
 
   /**
-   * Compile code to pop values off the stack (and ignore them).
-   * @param nvalues the number of values (not words) to pop
-   */
-  public void compile_pop (int nvalues)
-  {
-    for ( ; nvalues > 0;  --nvalues)
-      {
-        prepareCode(1);
-	Type type = pop_stack_type ();
-	if (type.size > 4)
-	  code.put1(88);  // pop2
-	else if (nvalues > 1)
-	  { // optimization:  can we pop 2 4-byte words using a pop2
-	    Type type2 = pop_stack_type ();
-	    if (type2.size > 4)
-	      {
-		code.put1(87);  // pop
-		prepareCode(1);
-	      }
-	    code.put1(88);  // pop2
-	    --nvalues;
-	  }
-	else
-	  code.put1(87); // pop
-      }
-  }
-
-  public void compile_swap ()
-  {
-    prepareCode(1);
-    Type type1 = pop_stack_type ();
-    Type type2 = pop_stack_type ();
-    if (type1.size > 4 || type2.size > 4)
-      throw new Error ("compile_swap:  not allowed for long or double");
-    push_stack_type (type1);
-    code.put1(95);  // swap
-    push_stack_type (type2);
-  }
-
-  /** Compile code to duplicate with offset.
-   * @param size the size of the stack item to duplicate (1 or 2)
-   * @param offset where to insert the result (must be 0, 1, or 2)
-   * The new words get inserted at stack[SP-size-offset]
-   */
-  public void compile_dup (int size, int offset)
-  {
-    if (size == 0)
-      return;
-    prepareCode(1);
-    // copied1 and (optionally copied2) are the types of the duplicated words
-    Type copied1 = pop_stack_type ();
-    Type copied2 = null;
-    if (size == 1)
-      {
-	if (copied1.size > 4)
-	  throw new Error ("using dup for 2-word type");
-      }
-    else if (size != 2)
-      throw new Error ("invalid size to compile_dup");
-    else if (copied1.size <= 4)
-      {
-	copied2 = pop_stack_type ();
-	if (copied2.size > 4)
-	  throw new Error ("dup will cause invalid types on stack");
-      }
-
-    int kind;
-    // These are the types of the words (in any) that are "skipped":
-    Type skipped1 = null;
-    Type skipped2 = null;
-    if (offset == 0)
-      {
-	kind = size == 1 ? 89 : 92;  // dup or dup2
-      }
-    else if (offset == 1)
-      {
-	kind = size == 1 ? 90 : 93; // dup_x1 or dup2_x1
-	skipped1 = pop_stack_type ();
-	if (skipped1.size > 4)
-	  throw new Error ("dup will cause invalid types on stack");
-      }
-    else if (offset == 2)
-      {
-	kind = size == 1 ? 91 : 94; // dup_x2 or dup2_x2
-	skipped1 = pop_stack_type ();
-	if (skipped1.size <= 4)
-	  {
-	    skipped2 = pop_stack_type ();
-	    if (skipped2.size > 4)
-	      throw new Error ("dup will cause invalid types on stack");
-	  }
-      }
-    else
-      throw new Error ("compile_dup:  invalid offset");
-
-    code.put1(kind);
-    if (copied2 != null)
-      push_stack_type (copied2);
-    push_stack_type (copied1);
-    if (skipped2 != null)
-      push_stack_type (skipped2);
-    if (skipped1 != null)
-      push_stack_type (skipped1);
-    if (copied2 != null)
-      push_stack_type (copied2);
-    push_stack_type (copied1);
-  }
-
-  /**
-   * Compile code to duplicate the top 1 or 2 words.
-   * @param size number of words to duplicate
-   */
-  public void compile_dup (int size)
-  {
-    compile_dup (size, 0);
-  }
-
-  public void compile_dup (Type type)
-  {
-    compile_dup (type.size > 4 ? 2 : 1, 0);
-  }
-
-  /**
    * Comple code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
    */
@@ -606,39 +234,12 @@ public class Method implements AttrContainer {
     push_stack_type (var.getType());
   }
 
+  /**
+    * @deprecated
+    */
   public void compile_store_value (Variable var)
   {
-   if (var.dead ())
-      throw new Error ("attempting to push dead variable");
-    int offset = var.offset;
-    if (offset < 0 || !var.isSimple ())
-      throw new Error ("attempting to store in unassigned variable");
-    Type type = var.getType().promote ();
-    int kind;
-    prepareCode(4);
-    pop_stack_type ();
-    if (type == Type.int_type)
-      kind = 0; // istore??
-    else if (type == Type.long_type)
-      kind = 1; // lstore??
-    else if (type == Type.float_type)
-      kind = 2; // float??
-    else if (type == Type.double_type)
-      kind = 3; // dstore??
-    else
-      kind = 4; // astore??
-    if (offset <= 3)
-      code.put1(59 + 4 * kind + offset);  // [ilfda]store_[0123]
-    else
-      {
-	if (offset >= 256)
-	  {
-	    code.put1(196); // wide
-	    code.put1(offset >> 8);
-	  }
-	code.put1(54 + kind);  // [ilfda]store
-	code.put1(offset);
-      }
+    code.emitStore(var);
   }
 
   public void compile_push_this ()
@@ -752,7 +353,7 @@ public class Method implements AttrContainer {
       opcode = 165;  // if_acmpeq (inverted: if_acmpne)
     if (invert)
       opcode++;
-    code.compileTransfer (label, opcode);
+    code.emitTransfer (label, opcode);
   }
 
   /** Compile a conditional transfer if 2 top stack elements are equal. */
@@ -773,7 +374,7 @@ public class Method implements AttrContainer {
     IfState new_if = new IfState (code);
     pop_stack_type ();
     prepareCode(3);
-    code.compileTransfer (new_if.end_label, opcode);
+    code.emitTransfer (new_if.end_label, opcode);
     new_if.start_stack_size = code.SP;
   }
 
@@ -791,7 +392,7 @@ public class Method implements AttrContainer {
     pop_stack_type ();
     pop_stack_type ();
     prepareCode(3);
-    code.compileTransfer(new_if.end_label, opcode);
+    code.emitTransfer(new_if.end_label, opcode);
     new_if.start_stack_size = code.SP;
   }
 
@@ -808,45 +409,6 @@ public class Method implements AttrContainer {
     IfState new_if = new IfState (code);
     compile_goto_ifeq (new_if.end_label);
     new_if.start_stack_size = code.SP;
-  }
-
-  /** Compile start of else clause. */
-  public final void compile_else ()  { code.compileElse(); }
-
-  /** Compile end of conditional. */
-  public final void compile_fi () { code.compileFi(); }
-
-  /** Compile an unconditional branch (goto).
-   * @param label target of the branch (must be in this method).
-   */
-  public final void compile_goto (Label label) { code.compileGoto(label); }
-
-  /**
-   * Compile a function return.
-   */
-  public final void compile_return () {
-    prepareCode(1);
-    if (return_type == Type.void_type) {
-      code.put1(177); // return
-      return;
-    }
-    Type type = pop_stack_type ();
-    if (type == Type.int_type
-	|| type == Type.short_type
-	|| type == Type.byte_type
-	|| type == Type.boolean_type
-	|| type == Type.char_type)
-      code.put1(172); // ireturn
-    else if (type == Type.long_type)
-      code.put1(173); // lreturn
-    else if (type == Type.float_type)
-      code.put1(174); // freturn
-    else if (type == Type.double_type)
-      code.put1(175); // dreturn
-    else if (type == Type.void_type)
-      throw new Error ("returning void type");
-    else
-      code.put1(176); // arreturn
   }
 
   /*
@@ -956,7 +518,7 @@ public class Method implements AttrContainer {
 	for (int i = arg_types.length;  --i >= 0; )
 	  {
 	    arg_slots -= arg_types[i].size > 4 ? 2 : 1;
-	    compile_store_value (locals.used [arg_slots]);
+	    code.emitStore(code.locals.used [arg_slots]);
 	  }
       }
     prepareCode(5);
@@ -973,52 +535,6 @@ public class Method implements AttrContainer {
       }
     code.unreachable_here = true;
   }
-
-  private void compile_fieldop (Field field, int opcode)
-  {
-    prepareCode(3);
-    code.put1(opcode);
-    code.putIndex2(getConstants().addFieldRef(field));
-  }
-
-  /** Compile code to get a static field value.
-   * Stack:  ... => ..., value */
-
-  public void compile_getstatic (Field field)
-  {
-    push_stack_type (field.type);
-    compile_fieldop (field, 178);  // getstatic
-  }
-
-  /** Compile code to get a non-static field value.
-   * Stack:  ..., objectref => ..., value */
-
-  public void compile_getfield (Field field)
-  {
-    pop_stack_type ();
-    push_stack_type (field.type);
-    compile_fieldop (field, 180);  // getfield
-  }
-
-  /** Compile code to put a static field value.
-   * Stack:  ..., value => ... */
-
-  public void compile_putstatic (Field field)
-  {
-    pop_stack_type ();
-    compile_fieldop (field, 179);  // putstatic
-  }
-
-  /** Compile code to put a non-static field value.
-   * Stack:  ..., objectref, value => ... */
-
-  public void compile_putfield (Field field)
-  {
-    pop_stack_type ();
-    pop_stack_type ();
-    compile_fieldop (field, 181);  // putfield
-  }
-
 
   public void compile_linenumber (int linenumber)
   {

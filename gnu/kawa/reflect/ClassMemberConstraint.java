@@ -72,7 +72,7 @@ public class ClassMemberConstraint extends Constraint
       }
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     setup(binding);
     try

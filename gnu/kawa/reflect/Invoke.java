@@ -29,27 +29,28 @@ public class Invoke extends ProcedureN implements Inlineable
     this.interpreter = interpreter;
   }
 
-  public static Object invoke$V(Object[] args)
+  public static Object invoke$V(Object[] args) throws Throwable
   {
     return applyN(invoke, args);
   }
 
-  public static Object invokeStatic$V(Object[] args)
+  public static Object invokeStatic$V(Object[] args) throws Throwable
   {
     return applyN(invokeStatic, args);
   }
 
-  public static Object make$V(Object[] args)
+  public static Object make$V(Object[] args) throws Throwable
   {
     return applyN(make, args);
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     return applyN(this, args);
   }
 
   protected static Object applyN (Invoke thisProc, Object[] args)
+    throws Throwable
   {
     int nargs = args.length;
     Procedure.checkArgCount(thisProc, nargs);

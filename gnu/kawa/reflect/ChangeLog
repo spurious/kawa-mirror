@@ -1,3 +1,9 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (get):  New takes defaultValue param.
+
+	* Invoke.java:  Various methods now specify throws Throwable.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (set):  If we cannot set the field,

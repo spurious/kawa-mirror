@@ -1,3 +1,5 @@
+(module-static #t)
+
 (define (pair? x)
   (instance? x <pair>))
 
@@ -14,6 +16,18 @@
 (define (set-cdr! (p <pair>) x)
   ((primitive-set-field <pair> "cdr" <object>)
    p x))
+
+(define-procedure car
+  setter: set-car!
+  (lambda ((x :: <pair>))
+    ((primitive-get-field <pair> "car" <Object>)
+     x)))
+
+(define-procedure cdr
+  setter: set-cdr!
+  (lambda ((x :: <pair>))
+    ((primitive-get-field <pair> "cdr" <Object>)
+     x)))
 
 (define (length list :: <list>) <int>
   (invoke-static <list> 'length list))

@@ -1,3 +1,5 @@
+(module-static #t)
+
 (define (number? x) :: <boolean> (instance? x <number>))
 (define (quantity? x) :: <boolean>  (instance? x <quantity>))
 (define (complex? x) :: <boolean>  (instance? x <complex>))

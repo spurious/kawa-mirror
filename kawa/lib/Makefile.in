@@ -85,7 +85,7 @@ javadir = $(datadir)/java/$(subdir)
 
 java_JAVA = $(java_SCM)
 
-java_SCM =    std_syntax.scm   reflection.scm   lists.scm   thread.scm   characters.scm   files.scm   keywords.scm   ports.scm   misc.scm   numbers.scm   strings.scm   syntax.scm   vectors.scm   uniform.scm   system.scm   trace.scm   emacs.scm
+java_SCM =    std_syntax.scm   reflection.scm   syntax.scm   lists.scm   thread.scm   characters.scm   files.scm   keywords.scm   ports.scm   misc.scm   numbers.scm   strings.scm   vectors.scm   uniform.scm   system.scm   trace.scm
 
 
 SOURCES = $(java_JAVA)

@@ -15,6 +15,7 @@ java_JAVA = $(java_SCM)
 java_SCM=\
   std_syntax.scm \
   reflection.scm \
+  syntax.scm \
   lists.scm \
   thread.scm \
   characters.scm \
@@ -24,12 +25,10 @@ java_SCM=\
   misc.scm \
   numbers.scm \
   strings.scm \
-  syntax.scm \
   vectors.scm \
   uniform.scm \
   system.scm \
-  trace.scm \
-  emacs.scm
+  trace.scm
 
 SOURCES = $(java_JAVA)
 

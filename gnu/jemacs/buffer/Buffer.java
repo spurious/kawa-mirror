@@ -5,6 +5,7 @@ import java.awt.Color;
 import gnu.mapping.InPort;
 import gnu.kawa.util.AbstractString;
 import gnu.text.Char;
+import gnu.kawa.util.CharBuffer;
 
 public class Buffer extends DefaultStyledDocument
 {
@@ -521,4 +522,55 @@ public class Buffer extends DefaultStyledDocument
     window.setBuffer(this);
     return window;
   }
+
+  /*
+  public Element createLeafElement(Element parent, AttributeSet attributes,
+                                   int p0, int p1)
+  {
+    p0 = content.createPosition(p0,
+                                p0==0?CharBuffer.BEFORE_MARK_KIND:CharBuffer.AFTER_MARK_KIND);
+    p1 = content.createPosition(p1, CharBuffer.AFTER_MARK_KIND);
+    return new Leaf(this, parent, attributes, p0, p1);
+  }
+  */
 }
+
+/*
+class Leaf implements javax.swing.text.Element
+{
+  AttributeSet attributes;
+  Buffer buffer;
+  Element parent;
+  int startPosition;
+  int endPosition;
+
+  public Leaf(Buffer buffer, Element parent, AttributeSet attributes,
+                     int startPosition, int endPosition)
+  {
+    this.buffer = buffer;
+    this.parent = parent;
+    this.attributes = attributes;
+    this.startPosition = startPosition;
+    this.endPosition = endPosition;
+  }
+  public String getName() { return "content"; }
+  public int getElementIndex(int offset) { return 0; }
+  public Element getElement(int offset) { return null; }
+  public AttributeSet getAttributes() { return attributes; }
+  public Document getDocument() { return buffer;}
+  public Element getParentElement() { return parent; }
+  public boolean isLeaf() { return true; }
+  public int getElementCount() { return 0; }
+  public int getStartOffset()
+  { return buffer.content.getPositionOffset(startPosition); }
+  public int getEndOffset()
+  { return buffer.content.getPositionOffset(endPosition); }
+
+  public void finalize()
+  {
+    gnu.kawa.util.CharBuffer content = buffer.content;
+    content.releasePosition(startPosition);
+    content.releasePosition(endPosition);
+  }
+}
+*/

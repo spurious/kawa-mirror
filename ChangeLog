@@ -1,3 +1,13 @@
+Mon Nov  4 16:07:08 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/{eq_p,eqv_p,equal_p,list_p,symbol2string}.java:
+	Remove redundant name qualification (which J++ complains about).
+	Remove constructors.  Generally remove verbosity.
+	* kawa/standard/equal_p.java (equal_p):  Remove.
+	(J++ thinks static method is constructor.)
+	* kawa/standard/Scheme.java:  Don't depend on eq_p.name etc.
+	* kawa/lang/EqualPat.java (match):  Remove use of equal_p.equal_p.
+
 Thu Oct 24 12:39:52 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/list.java:  Renamed to list_v to avoid problems

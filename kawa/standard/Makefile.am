@@ -127,6 +127,7 @@ setter.java make.java makeProcLocation.java location.java \
 define_alias.java \
 ScmEnv.java Scheme.java \
 object.java field.java static_field.java \
+TracedProcedure.java \
 null_env.java \
 user_env.java \
 scheme_env.java

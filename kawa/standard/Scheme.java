@@ -329,6 +329,7 @@ public class Scheme extends Interpreter
       define_proc (new map (true));        // map
       define_proc (new map (false));       // for-each
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
+      define_proc ("call/cc", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
 
       //-- Section 6.10  -- complete
@@ -455,6 +456,8 @@ public class Scheme extends Interpreter
       define_proc("file-readable?", "kawa.lib.files");
       define_proc("file-writable?", "kawa.lib.files");
       define_proc("delete-file", "kawa.lib.files");
+      define_proc("system-tmpdir", "kawa.lib.files");
+      define_proc("make-temporary-file", "kawa.lib.files");
       define_proc("rename-file", "kawa.lib.files");
       define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
@@ -506,6 +509,9 @@ public class Scheme extends Interpreter
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
+
+      define_syntax ("trace", "kawa.lib.trace");
+      define_syntax ("untrace", "kawa.lib.trace");
 
       define_proc ("format", "kawa.standard.format");
       define_proc ("parse-format", parseFormat);

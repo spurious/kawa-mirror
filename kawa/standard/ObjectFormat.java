@@ -52,8 +52,11 @@ public class ObjectFormat extends ReportFormat
     return format(args, start, dst, maxChars, readable);
   }
 
-  public static int format(Object[] args, int start, Writer dst,
-			   int maxChars, boolean readable)
+  /**
+   * Return false iff truncation.
+   */
+  public static boolean format(Object arg, Writer dst,
+			       int maxChars, boolean readable)
     throws java.io.IOException
   {
     if (maxChars < 0 && dst instanceof OutPort)
@@ -63,33 +66,48 @@ public class ObjectFormat extends ReportFormat
 	try
 	  {
 	    oport.printReadable = readable;
-	    SFormat.print(args[start], oport);
+	    SFormat.print(arg, oport);
 	  }
 	finally
 	  {
 	    oport.printReadable = saveReadable;
 	  }
+	return true;
       }
     else if (maxChars < 0 && dst instanceof CharArrayWriter)
       {
 	OutPort oport = new OutPort(dst);
 	oport.printReadable = readable;
-	SFormat.print(args[start], oport);
+	SFormat.print(arg, oport);
 	oport.flush();
+	return true;
       }
     else
       {
 	CharArrayWriter wr = new CharArrayWriter();
 	OutPort oport = new OutPort(wr);
 	oport.printReadable = readable;
-	SFormat.print(args[start], oport);
+	SFormat.print(arg, oport);
 	oport.flush();
 	int len = wr.size();
 	if (maxChars < 0 || len <= maxChars)
-	  wr.writeTo(dst);
+	  {
+	    wr.writeTo(dst);
+	    return true;
+	  }
 	else
-	  dst.write(wr.toCharArray(), 0, maxChars);
+	  {
+	    dst.write(wr.toCharArray(), 0, maxChars);
+	    return false;
+	  }
       }
+  }
+
+  public static int format(Object[] args, int start, Writer dst,
+			   int maxChars, boolean readable)
+    throws java.io.IOException
+  {
+    format(args[start], dst, maxChars, readable);
     return start + 1;
   }
 

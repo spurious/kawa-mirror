@@ -226,7 +226,6 @@ java_sources = \
   OutPort.java \
   CharArrayInPort.java \
   CharArrayOutPort.java \
-  SharedLocation.java \
   PlainLocation.java \
   Printable.java \
   Procedure.java \
@@ -243,6 +242,7 @@ java_sources = \
   Setter.java \
   Setter0.java \
   Setter1.java \
+  SharedLocation.java \
   SimpleEnvironment.java \
   Symbol.java \
   TtyInPort.java \

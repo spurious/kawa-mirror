@@ -1,4 +1,4 @@
-(test-init "macros" 49)
+(test-init "macros" 50)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -96,6 +96,13 @@
       (begin
 	(define-syntax test-ds2 (syntax-rules () ((test-ds2 x) (list 'x))))
 	(test-ds2 (t2))))
+
+(set! x 1)
+(set! y 2)
+(set! z 3)
+(define-syntax test-ds3
+  (syntax-rules () ((test-ds3 x y) (let ((y x) (x z) (z y)) (list x y z)))))
+(test '(3 2 3) 'test-ds3 (test-ds3 y z))
 
 (test '() 'cut-1 ((cut list)))
 (test '() 'cut-2  ((cut list <...>)))

@@ -1,3 +1,7 @@
+2004-10-23  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: Add new test.
+
 2004-08-05  Chris Dean  <ctdean@sokitomi.com>
 
 	* classes1.scm (<SimpleA>):  Add mHappy field and isHappy/setHappy

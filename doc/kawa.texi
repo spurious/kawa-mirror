@@ -66,15 +66,7 @@ A nice quick introduction to Scheme can be found in
 discusses Scheme implementation is
 @uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
-
 Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
-
-For copyright information on the software and documentation,
-see @ref{License}.
-
-This package has nothing to do with the
-@uref{http://www.allaire.com/products/kawa/,Kawa commercial Java IDE}.
-
 The packages
 @uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
 @uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
@@ -89,7 +81,13 @@ are used by Kawa, and distributed with it, but may be independently useful.
 For a technical overview of Kawa, see these
 @uref{http://sources.redhat.com/kawa/papers/,papers}.
 
+For copyright information on the software and documentation,
+see @ref{License}.
+
 Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
+
+This package has nothing to do with the
+@uref{http://www.macromedia.com/software/kawa/,Kawa commercial Java IDE}.
 
 @menu
 * Features::
@@ -1602,7 +1600,7 @@ Perform one of the 16 bitwise operations of @var{x} and @var{y},
 depending on @var{op}.
 @end defun
 
-@defun bittest i j
+@defun logtest i j
 Returns true if the arguments have any bits in common.
 Same as @code{(not (zero? (logand @var{i} @var{j})))},
 but is more efficient.
@@ -3508,7 +3506,7 @@ An example (derived from the Skij FAQ):
 @end example
 
 The behavior of interpreted code and compiled code is not
-indentical, though you should get the same result either way
+identical, though you should get the same result either way
 unless you have designed the classes rather strangely.  The
 details will be nailed down later, but the basic idea is that
 the compiler will "inline" the @code{invoke-static} call
@@ -3549,6 +3547,12 @@ so the compiler will print a warning.  To avoid a waning, you can
 use a type declaration, or insert a cast:
 @example
 (invoke (as <java.util.Date> my-date) 'setDate cur-date)
+@end example
+or
+@example
+(let ((my-date :: <java.util.Date> (calculate-date))
+      (cur-date :: <int> (get-cur-date)))
+  (invoke my-date 'setDate cur-date))
 @end example
 @end defun
 
@@ -4134,8 +4138,8 @@ Applying the procedure returns the length of the array.
 
 The following lower-level primitives require you to specify
 the parameter and return types explicitly.
-Type specifications are currently required to be string literals
-or one of the standard types (@pxref{Standard Types}).
+You should probably use the functions @code{invoke} and @code{invoke-static}
+(@pxref{Method operations}) instead.
 
 @deffn Syntax primitive-constructor class (argtype ...)
 Returns a new anonymous procedure, which when called will create

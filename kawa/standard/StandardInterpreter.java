@@ -23,6 +23,9 @@ public class StandardInterpreter extends Interpreter
       define("if", new kawa.standard.ifp());
       define("set!", new kawa.standard.set_b());
 
+      // Section 4.2
+      define("cond",new kawa.standard.cond());
+
       //-- Section 6.1
       proc = new kawa.standard.not();
       define(proc.name,proc);
@@ -204,6 +207,38 @@ public class StandardInterpreter extends Interpreter
       define(proc.name,proc);
       proc = new kawa.standard.string_set_b();
       define(proc.name,proc);
+      proc = new kawa.standard.list2string();
+      define(proc.name,proc);
+      proc = new kawa.standard.string2list();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_append();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_ci_equal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_ci_greaterthan_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_ci_greaterthanequal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_ci_lessthan_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_ci_lessthanequal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_copy();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_fill_b();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_equal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_greaterthan_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_greaterthanequal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_lessthan_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.string_lessthanequal_p();
+      define(proc.name,proc);
+      proc = new kawa.standard.substring();
+      define(proc.name,proc);
 
       //-- Section 6.8
       proc = new kawa.standard.vector_p();
@@ -217,6 +252,12 @@ public class StandardInterpreter extends Interpreter
       proc = new kawa.standard.vector_ref();
       define(proc.name,proc);
       proc = new kawa.standard.vector_set_b();
+      define(proc.name,proc);
+      proc = new kawa.standard.list2vector();
+      define(proc.name,proc);
+      proc = new kawa.standard.vector2list();
+      define(proc.name,proc);
+      proc = new kawa.standard.vector_fill_b();
       define(proc.name,proc);
 
       //-- Section 6.9

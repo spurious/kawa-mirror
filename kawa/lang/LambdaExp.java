@@ -8,11 +8,11 @@ import gnu.bytecode.*;
 
 public class LambdaExp extends ScopeExp
 {
-  String name;
-  Expression body;
-  int min_args;
+  public String name;
+  public Expression body;
+  public int min_args;
   // Maximum number of actual arguments;  -1 if variable.
-  int max_args;
+  public int max_args;
   Keyword[] keywords;
   Expression[] defaultArgs;
 
@@ -43,6 +43,19 @@ public class LambdaExp extends ScopeExp
   public LambdaExp outerLambda ()
   {
     return outer == null ? null : outer.currentLambda ();
+  }
+
+  private void declareThis()
+  {
+    Variable var;
+    var = addDeclaration ("this");
+    var.setParameter (true);  var.setArtificial (true);
+  }
+
+  public LambdaExp (Expression body)
+  {
+    declareThis();
+    this.body = body;
   }
 
   /**
@@ -143,9 +156,7 @@ public class LambdaExp extends ScopeExp
     if (key_args > 0)
       keywords = new Keyword[key_args];
 
-    Variable var;
-    var = addDeclaration ("this");
-    var.setParameter (true);  var.setArtificial (true);
+    declareThis();
     
     if (min_args != max_args || min_args > 4)
       {

@@ -1,3 +1,10 @@
+2005-01-07  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (patch-source-list): Filter with sed out initial "./".
+	(select-java1, select-java2, select-java5): Use new PreProcess class.
+
+	* build.xml: Add support for #ifndef JAVA5.
+
 2005-01-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxPattern.java (translate): Pass correct SyntaxForm.

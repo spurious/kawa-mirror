@@ -187,44 +187,28 @@ selected-java-source: Makefile
 
 $(srcdir)/patch-source-list:
 	(cd $(srcdir); \
-	find . -name '*.java' -exec \
-	   grep -lE ' #ifdef ' '{}' ';') > $@
+	find . -name '*.java' -exec grep -lE ' #ifdef ' '{}' ';') \
+	  | sed -e 's|./||' > $@
 
 COMMENT_IN = s|^\([[:space:]]*\)//[ ]*|\1|
 COMMENT_OUT = s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|
 
-select-java1: $(srcdir)/patch-source-list
-	cd $(srcdir); \
-	for file in `cat patch-source-list`; do \
-	echo Converting $$file to Java1; \
-        sed -e '/#ifdef JAVA[25]/,/#endif/$(COMMENT_OUT)' \
-            -e '/#ifndef JAVA2/,/#endif/$(COMMENT_IN)' \
-	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_IN)' \
-	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_OUT)' \
-	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
+	$(JAVAC) -d . $(srcdir)/gnu/kawa/util/PreProcess.java
+
+select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA5 -JAXP-1.3 \
+	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
 	echo 1 >$(srcdir)/selected-java-source
 
-select-java2: $(srcdir)/patch-source-list
-	cd $(srcdir); \
-	for file in `cat patch-source-list`; do \
-	echo Converting $$file to Java2; \
-        sed -e '/#ifdef JAVA5/,/#endif/$(COMMENT_OUT)' \
-            -e '/#ifdef JAVA2/,/#endif/$(COMMENT_IN)' \
-            -e '/#ifndef JAVA2/,/#endif/$(COMMENT_OUT)' \
-	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_OUT)' \
-	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_IN)' \
-	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 -JAXP-1.3 \
+	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
 	echo 2 >$(srcdir)/selected-java-source
 
-select-java5: $(srcdir)/patch-source-list
-	cd $(srcdir); \
-	for file in `cat patch-source-list`; do \
-	echo Converting $$file to Java5; \
-        sed -e '/#ifdef JAVA[25]/,/#endif/$(COMMENT_IN)' \
-	    -e '/#ifndef JAVA2/,/#endif/$(COMMENT_OUT)' \
-	    -e '/#ifdef JAXP/,/#endif/$(COMMENT_IN)' \
-	    -e '/#ifndef JAXP/,/#endif/$(COMMENT_OUT)' \
-	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
+	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA5 +JAXP-1.3 \
+	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
 	echo 5 >$(srcdir)/selected-java-source
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \

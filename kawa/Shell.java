@@ -134,14 +134,17 @@ public class Shell extends Procedure0
 
   public static void runFile (String fname)
   {
+    Environment env = Environment.user();
     try
       {
-	InPort iport;
 	if (fname.equals ("-"))
-	  iport = InPort.inDefault ();
+	  kawa.standard.load.loadSource(InPort.inDefault(), env);
 	else
-	  iport = new InPort (new FileInputStream(fname), fname);
-	kawa.standard.load.loadSource (iport, Environment.user ());
+	  {
+	    InPort fstream = InPort.openFile(fname);
+	    kawa.standard.load.loadSource(fstream, env);
+	    fstream.close();
+	  }
       }
     catch (FileNotFoundException e)
       {

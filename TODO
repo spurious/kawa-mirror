@@ -1,13 +1,8 @@
 Complete R4RS procedures.
 
-Complete the full scheme reader.
+Complete bignum support.
 
-Figure out quasi-quote, quote-unsplicing
+Add fraction and complex support.
 
 Add access to native java methods.
 
-Add -e command line argument.
-
-Macros??
-
-Remove Interpreter eval, apply; class Executable

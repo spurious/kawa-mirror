@@ -6,6 +6,8 @@
 @c version: %W% %G%
 @c %**end of header
 
+@include version.texi
+
 @iftex
 @finalout
 @end iftex
@@ -18,6 +20,11 @@
 @end titlepage
 
 @ifinfo
+@format
+START-INFO-DIR-ENTRY
+* kawa: (kawa).         Kawa, the Java-based Scheme system
+END-INFO-DIR-ENTRY
+@end format
 @node Top, Features, (dir), (dir)
 @top
 @unnumbered The Kawa Scheme system, by Per Bothner
@@ -35,10 +42,10 @@ and that compiles Scheme code into Java byte-codes.
 * Compilation::
 @end menu
 
-@node Features
+@node Features, Installation, Top, Top
 @section Features
 
-@node Installation
+@node Installation, Running, Features, Top
 @section Building and installing Kawa
 
 @subsection Setting up to use Java
@@ -70,12 +77,12 @@ of the binary release is just to save you time and trouble
 compiling the sources.
 
 The binary release comes as a gzip-compress tar file:
-kawa-0.3-compiled.tar.gz.
+kawa-@value{VERSION}-compiled.tar.gz.
 
 You need to decide where you want to put the kawa .class files.
 Assuming it is /usr/local/java, you can do:
 @example
-gunzip -c <kawa-0.3-compiled.tar.gz|(cd /usr/local/java; tar xf -)
+gunzip -c <kawa-@value{VERSION}-compiled.tar.gz|(cd /usr/local/java; tar xf -)
 @end example
 
 Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
@@ -94,8 +101,8 @@ The Kawa release normally comes as a gzip-compressed tar file.
 
 In your build directory do:
 @example
-tar xzf kawa-0.3.tar.gz
-cd kawa-0.3
+tar xzf kawa-@value{VERSION}.tar.gz
+cd kawa-@value{VERSION}
 @end example
 
 Then you must configure the sources.  This you can do
@@ -142,7 +149,7 @@ that $PREFIX/java is on the path:
 export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
 @end example
 
-@node Running
+@node Running, Restrictions, Installation, Top
 @section How to start up and run Kawa
 
 To running Kawa, you must start a Java interpreter.
@@ -185,7 +192,7 @@ are assinged to the global variable @samp{command-line-arguments},
 which is a vector of strings.
 @end defvar
 
-@node Restrictions
+@node Restrictions, Extensions, Running, Top
 @section Features of R4RS not implemented
 
 The file Compliance.html specifies which functions and syntax
@@ -209,7 +216,7 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using set!) to the procedure binding.
 
-@node Extensions
+@node Extensions, Compilation, Restrictions, Top
 @section Extensions
 
 @defun exit [code]
@@ -234,7 +241,7 @@ Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
 @end defun
 
-@node Compilation
+@node Compilation,  , Extensions, Top
 @section Compilation
 To byte-compile a file @samp{foo.scm} do:
 @example

@@ -1,3 +1,19 @@
+Fri Sep 13 14:27:31 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure{.in,}:  Update to version 0.5.
+	* kawac.java (main):  Allow infile to follow switches.
+	* kawa.texi:  Use VERSION macro.
+	* mdate-sh, version.texi:  New files, needed for VERSION macro.
+
+	* kawa/standard/{ceiling,exact2inexact,floor,inexact2exact,
+	round,truncate}.java:  More standard Scheme functions.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}}:  Update.
+	* kawa/lang/Continuation.java:  Improve error message.
+	* kawa/lang/Interpreter.java (read):  Removed.
+	* {,kawa/{,lang/,math/,standard/,lib/}}Makefile.{am,in}: Fix
+	javac classpath so both build and source directories are searched.
+	Do not change directory (which confuses make and is not needed).
+	
 Fri Sep 13 08:21:33 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/call_with_input_string.javaL  New class.

@@ -15,14 +15,12 @@ class kawac
 
   public static void main(java.lang.String args[])
   {
-    if (args.length == 0)
-      usage ();
-    String infile = args[0];
+    String infile = null;
     String directory = null;
     String prefix = null;
     String topname = null;
 
-    for (int iArg = 1;  iArg < args.length;  iArg++)
+    for (int iArg = 0;  iArg < args.length;  iArg++)
       {
 	if (args[iArg].equals ("-d"))
 	  {
@@ -31,17 +29,18 @@ class kawac
 	      usage ();
 	    directory = args[iArg];
 	  }
+	else if (infile == null)
+	  infile = args[iArg];
 	else if (prefix == null)
-	  {
-	    prefix = args[iArg];
-	  }
+	  prefix = args[iArg];
 	else if (topname == null)
-	  {
-	    topname = args[iArg];
-	  }
+	  topname = args[iArg];
 	else
 	  usage ();
       }
+
+    if (infile == null)
+      usage ();
 
     kawa.standard.StandardInterpreter interpreter =
       new kawa.standard.StandardInterpreter(InPort.inDefault (),

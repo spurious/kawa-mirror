@@ -178,15 +178,15 @@ public class ApplyExp extends Expression
 		 && comp.inlineOk(func_lambda)
 		 && (method = func_lambda.getMethod(args_length)) != null)
 	  {
+	    PrimProcedure pproc = new PrimProcedure(method, func_lambda);
 	    boolean is_static = method.getStaticFlag();
 	    Expression[] args = exp.getArgs();
-	    int extraArg = 0;
-	    Type[] argTypes = method.getParameterTypes();
+	    boolean extraArg = false;
 	    // ?? Procedure.checkArgCount(this, args.length); // FIXME
 	    if (! is_static || func_lambda.declareClosureEnv() != null)
 	      {
 		if (is_static)
-		  extraArg = 1;
+		  extraArg = true;
 		if (comp.curLambda == func_lambda)  // Recursive call.
 		  code.emitLoad(func_lambda.closureEnv != null
 				? func_lambda.closureEnv
@@ -195,8 +195,9 @@ public class ApplyExp extends Expression
 		  func_lambda.getOwningLambda().loadHeapFrame(comp);
 	      }
 
-	    boolean varArgs = func_lambda.restArgType() != null;
 	    /*
+	    Type[] argTypes = method.getParameterTypes();
+	    boolean varArgs = func_lambda.restArgType() != null;
 	    if (func_lambda.isHandlingTailCalls())
 	      {
 		Type[] tmp = new Type[argTypes.length-1];
@@ -217,12 +218,8 @@ public class ApplyExp extends Expression
 		return;
 	      }
 	    */
-	    PrimProcedure.compileArgs(args,
-				      extraArg > 0 ? Type.void_type : null,
-				      argTypes, varArgs,
-				      func_name, func_lambda, comp);
-	    code.emitInvoke(method);
-	    target.compileFromStack(comp, func_lambda.getReturnType());
+	    pproc.compile(extraArg ? Type.void_type : null,
+			  args, comp, target);
 	    return;
 	  }
       }

@@ -254,6 +254,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public PrimProcedure(Method method, LambdaExp source)
   {
     this(method);
+    this.retType = source.getReturnType();
     this.source = source;
   }
 

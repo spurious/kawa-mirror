@@ -1,3 +1,8 @@
+2003-09-18  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (<init>(Method,LambdaExp)):  Re-set retType.
+	* ApplyExp.java (compile):  Defer method inlining to PrimProcedure.
+
 2003-09-09  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setNext):  New method.

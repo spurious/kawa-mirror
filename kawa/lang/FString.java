@@ -151,6 +151,39 @@ public class FString extends Sequence implements Printable, Compilable
     code.emitInvokeSpecial(initFStringMethod);
   }
 
+  /** Change every character to be uppercase. */
+  public void makeUpperCase()
+  {
+    for (int i = value.length;  --i >= 0; )
+      value[i] = Character.toUpperCase(value[i]);
+  }
+
+  /** Change every character to be lowercase. */
+  public void makeLowerCase()
+  {
+    for (int i = value.length;  --i >= 0; )
+      value[i] = Character.toLowerCase(value[i]);
+  }
+
+  /** Capitalize this string.
+   * Change first character of each word to titlecase,
+   * and change teh other characters rest to lowercase. */
+  public void makeCapitalize()
+  {
+    char prev = ' ';
+    int len = value.length;
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = value[i];
+	if (! Character.isLetterOrDigit(prev))
+	  ch = Character.toTitleCase(ch); 
+        else 
+          ch = Character.toLowerCase(ch);
+	value[i] = ch;
+	prev = ch;
+      }
+  }
+
   public void print (java.io.PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)

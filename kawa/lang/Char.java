@@ -99,7 +99,8 @@ public class Char implements Printable, Compilable
   }
 
   static char[] charNameValues = { ' ', '\t', '\n', '\n'
-				   ,'\r', '\f', '\b', '\177' };
+				   ,'\r', '\f', '\b',
+				   '\033', '\177', '\177', '\0' };
   static String[] charNames = { "space",
 				"tab",
 				"newline",
@@ -107,7 +108,10 @@ public class Char implements Printable, Compilable
 				"return",
 				"page",
 				"backspace",
-				"rubout" };
+				"esc",
+				"del",
+				"rubout",
+				"nul"};
 
   public String toString ()
   {
@@ -124,25 +128,41 @@ public class Char implements Printable, Compilable
     return buf.toString();
   }
 
+  public static String toScmReadableString (int ch)
+  {
+    StringBuffer sbuf = new StringBuffer(20);
+    sbuf.append("#\\");
+    for (int i = 0;  i < charNameValues.length;  i++)
+      {
+	if ((char) ch == charNameValues[i])
+	  {
+	    sbuf.append(charNames[i]);
+	    return sbuf.toString();
+	  }
+      }
+    if (ch < 8)
+      {
+	sbuf.append('0');  // make sure there at least two octal digits
+	sbuf.append(ch);
+      }
+    else if (ch < ' ' || ch > 0x7F)
+      {
+	sbuf.append(Integer.toString(ch, 8));
+      }
+    else
+      sbuf.append((char) ch);
+    return sbuf.toString();
+  }
+
   public void print(PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)
       && ((OutPort)ps).printReadable;
     char ch = charValue ();
     if (readable)
-      {
-	ps.print ('#');
-	ps.print ('\\');
-	for (int i = 0;  i < charNameValues.length;  i++)
-	  {
-	    if (ch == charNameValues[i])
-	      {
-		ps.print (charNames[i]);
-		return;
-	      }
-	  }
-      }
-    ps.print (ch);
+      ps.print(toScmReadableString(ch));
+    else
+      ps.print (ch);
   }
 
   static public ClassType scmCharType;

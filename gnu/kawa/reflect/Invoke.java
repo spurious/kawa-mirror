@@ -295,9 +295,13 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
-                  comp.error('w',
-                             "more than one definitelty applicable method `"
-                             +name+"' in "+type.getName());
+		  {
+		    comp.error('w',
+			       "more than one definitely applicable method `"
+			       +name+"' in "+type.getName());
+		    for (int i = 0;  i < okCount;  i++)
+		      comp.error('w', "candidate: " + methods[i]);
+		  }
               }
 	    else if (okCount == 0)
 	      {

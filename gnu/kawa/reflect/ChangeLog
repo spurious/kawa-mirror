@@ -1,3 +1,7 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (compile):  Better warning - list applicable methods.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (get):  New takes defaultValue param.

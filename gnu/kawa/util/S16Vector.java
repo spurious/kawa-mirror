@@ -25,6 +25,11 @@ public class S16Vector extends UniformVector implements Externalizable
     data = new short[num];
   }
 
+  public S16Vector (short[] data)
+  {
+    this.data = data;
+  }
+
   public S16Vector(Sequence seq)
   {
     data = new short[seq.length()];

@@ -25,6 +25,11 @@ public class U32Vector extends UniformVector implements Externalizable
     data = new int[num];
   }
 
+  public U32Vector (int[] data)
+  {
+    this.data = data;
+  }
+
   public U32Vector(Sequence seq)
   {
     data = new int[seq.length()];

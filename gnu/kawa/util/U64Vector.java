@@ -25,6 +25,11 @@ public class U64Vector extends UniformVector implements Externalizable
     data = new long[num];
   }
 
+  public U64Vector (long[] data)
+  {
+    this.data = data;
+  }
+
   public U64Vector(Sequence seq)
   {
     data = new long[seq.length()];

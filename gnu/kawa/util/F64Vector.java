@@ -25,6 +25,11 @@ public class F64Vector extends UniformVector implements Externalizable
     data = new double[num];
   }
 
+  public F64Vector (double[] data)
+  {
+    this.data = data;
+  }
+
   public F64Vector(Sequence seq)
   {
     data = new double[seq.length()];

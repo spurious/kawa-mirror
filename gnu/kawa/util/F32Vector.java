@@ -25,6 +25,11 @@ public class F32Vector extends UniformVector implements Externalizable
     data = new float[num];
   }
 
+  public F32Vector (float[] data)
+  {
+    this.data = data;
+  }
+
   public F32Vector(Sequence seq)
   {
     data = new float[seq.length()];

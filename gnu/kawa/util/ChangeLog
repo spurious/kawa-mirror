@@ -1,3 +1,16 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* F32Vector.java (<init>(float[])):  New contructor.
+	* F64Vector.java (<init>(double[])):  New contructor.
+	* S8Vector.java (<init>(byte[])):  New contructor.
+	* S16Vector.java (<init>(short[])):  New contructor.
+	* S32Vector.java (<init>(int[])):  New contructor.
+	* S64Vector.java (<init>(long[])):  New contructor.
+	* U8Vector.java (<init>(byte[])):  New contructor.
+	* U16Vector.java (<init>(short[])):  New contructor.
+	* U32Vector.java (<init>(int[])):  New contructor.
+	* U64Vector.java (<init>(long[])):  New contructor.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* F32Vector.java:  Make implement java.io.Externalizable.

@@ -25,6 +25,11 @@ public class S8Vector extends UniformVector implements Externalizable
     data = new byte[num];
   }
 
+  public S8Vector (byte[] data)
+  {
+    this.data = data;
+  }
+
   public S8Vector(Sequence seq)
   {
     data = new byte[seq.length()];

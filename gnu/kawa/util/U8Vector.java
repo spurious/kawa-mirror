@@ -25,6 +25,11 @@ public class U8Vector extends UniformVector implements Externalizable
     data = new byte[num];
   }
 
+  public U8Vector (byte[] data)
+  {
+    this.data = data;
+  }
+
   public U8Vector(Sequence seq)
   {
     data = new byte[seq.length()];

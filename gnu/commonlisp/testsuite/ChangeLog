@@ -1,3 +1,7 @@
+2003-01-01  Per Bothner  <per@bothner.com>
+
+	* lang-test.lisp:  Add a defmacro test.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA):  Update to use ../../../bin/kawa.

@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 5)
+(test-init "Common Lisp tests" 6)
 
 (setq y 100)
 (defun foo1 (x)
@@ -21,3 +21,6 @@
       'format-test-1
       (format "The octal value of ~d is ~o,
    and the hex value is ~x." 18 18 18))
+
+(defmacro list-1 (bar) `(list ,bar))
+(test '(12) 'defmacro (list-1 12))

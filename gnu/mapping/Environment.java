@@ -52,6 +52,12 @@ public class Environment // extends [almost] java.util.Dictionary
     user().define (name, new_value);
   }
 
+  /** Define name (interned) to have a given value. */
+  public static void put_global (String name, Object new_value)
+  {
+    user().put (name, new_value);
+  }
+
   /**
     * @deprecated
     */

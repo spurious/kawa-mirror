@@ -696,7 +696,7 @@ public class LispReader extends Lexer
 		if (unit == null)
 		  unit = u;
 		else if (u instanceof Unit && unit instanceof Unit)
-		  unit = Unit.mul((Unit) unit, (Unit) u);
+		  unit = Unit.times((Unit) unit, (Unit) u);
 		else
 		  unit = LList.list3("*", unit, u);
 		if (pos >= end)

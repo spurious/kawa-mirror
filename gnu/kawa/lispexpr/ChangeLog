@@ -1,5 +1,7 @@
 2003-08-20  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (parseNumber):  Unit.mul has been renamed to times.
+
 	* LispReader.java (isPotentialNumber):  New method.
 	(checkNumber):  Inlined in handleToken and removed.
 	(parseNumber):  New extra 'exactness' parameter.

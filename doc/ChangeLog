@@ -1,3 +1,8 @@
+Mon Feb  8 22:39:52 1999  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Update various URLs etc.
+	Mention that Kawa is available by anonymous cvs.
+
 Sat Jan  2 22:37:40 1999  Per Bothner  <bothner@cygnus.com>
 
 	* mdate-sh:  Update to newer version.

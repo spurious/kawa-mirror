@@ -1,4 +1,4 @@
-(test-init "Objects" 33)
+(test-init "Objects" 34)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -142,3 +142,12 @@
       (force-eval field #f 'TRUE))
 (test #f 'test-slot-ref-4
       (force-compile field #t 'FALSE))
+
+;; Make sure objects compiled in separate compilations don't cause
+;; errors (naming clashes)
+(test '(1 2) (lambda ()
+               ;; define each object in a separate compile
+               (define obj1 (eval '(object () ((one) 1))))
+               (define obj2 (eval '(object () ((two) 2))))
+               (list (invoke obj1 'one)
+                     (invoke obj2 'two))))

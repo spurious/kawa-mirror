@@ -10,9 +10,9 @@ public class syntax extends Syntax
 {
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     IdentityHashMap table = new IdentityHashMap();
-    /* END JAVA2 */
+    /* #endif */
 
     if (! (form.cdr instanceof Pair)
 	|| (form = (Pair) (form.cdr)).cdr != LList.Empty)
@@ -40,17 +40,17 @@ public class syntax extends Syntax
 
   Object convert (Object form, Object m, Translator tr)
   {
-    /* BEGIN JAVA1 */
+    /* #ifndef JAVA2 */
     // Object map = m;
-    /* END JAVA1 */
-    /* BEGIN JAVA2 */
+    /* #endif */
+    /* #ifdef JAVA2 */
     IdentityHashMap map = (IdentityHashMap) m;
     Object x = map.get(form);
     if (x != null)
       return x;
     map.put(form, form);
     x = form;
-    /* END JAVA2 */
+    /* #endif */
     if (form instanceof Pair)
       {
 	Pair p = (Pair) form;
@@ -92,9 +92,9 @@ public class syntax extends Syntax
 	if (d != null)
 	  x = new ReferenceExp(d);
       }
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     map.put(form, x);
-    /* END JAVA2 */
+    /* #endif */
     return x;
   }
 }

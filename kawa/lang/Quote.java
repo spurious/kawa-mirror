@@ -32,12 +32,12 @@ public class Quote extends Syntax implements Printable
 
   public static Object expand (Object template, boolean quasi, Translator tr)
   {
-    /* BEGIN JAVA1 */
+    /* #ifndef JAVA2 */
     // Object seen = null;
-    /* END JAVA1 */
-    /* BEGIN JAVA2 */
+    /* #endif */
+    /* #ifdef JAVA2 */
     IdentityHashMap seen = new IdentityHashMap();
-    /* END JAVA2 */
+    /* #endif */
     return expand(template, quasi ? 1 : QUOTE_DEPTH, null, seen, tr);
   }
 
@@ -119,7 +119,7 @@ public class Quote extends Syntax implements Printable
   static Object expand (Object template, int depth,
 			SyntaxForm syntax, Object seen, Translator tr)
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     IdentityHashMap map = (IdentityHashMap) seen;
     Object old = map.get(template);
     if (old == WORKING)
@@ -133,7 +133,7 @@ public class Quote extends Syntax implements Printable
       }
     else if (old != null)
       return old;
-    /* END JAVA2 */
+    /* #endif */
     Object result;
     if (template instanceof Pair)
       result = expand_pair ((Pair) template, depth, syntax, seen, tr);
@@ -221,11 +221,11 @@ public class Quote extends Syntax implements Printable
       result = tr.namespaceResolve((String) template);
     else
       result = template;
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (template != result && map.get(template) == CYCLE)
       tr.error('e', "cycle in non-literal data");
     map.put(template, result);
-    /* END JAVA2 */
+    /* #endif */
     return result;
   }
 

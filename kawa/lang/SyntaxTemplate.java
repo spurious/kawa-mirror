@@ -171,12 +171,12 @@ public class SyntaxTemplate implements Externalizable
       : tr.patternScope.patternNesting.toString();
     StringBuffer program = new StringBuffer ();
     java.util.Vector literals_vector = new java.util.Vector ();
-    /* BEGIN JAVA1 */
+    /* #ifndef JAVA2 */
     // Object seen = null;
-    /* END JAVA1 */
-    /* BEGIN JAVA2 */
+    /* #endif */
+    /* #ifdef JAVA2 */
     IdentityHashMap seen = new IdentityHashMap();
-    /* END JAVA2 */
+    /* #endif */
     convert_template(template, syntax,
 		     program, 0, literals_vector, seen, false, tr);
     this.template_program = program.toString();
@@ -223,7 +223,7 @@ public class SyntaxTemplate implements Externalizable
 	syntax = (SyntaxForm) form;
 	form = syntax.form;
       }
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (form instanceof Pair || form instanceof FVector)
       {
 	IdentityHashMap seen_map = (IdentityHashMap) seen;
@@ -235,7 +235,7 @@ public class SyntaxTemplate implements Externalizable
 	  }
 	seen_map.put(form, form);
       }
-    /* END JAVA2 */
+    /* #endif */
 
     if (form instanceof Pair)
       {

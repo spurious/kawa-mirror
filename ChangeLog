@@ -1,3 +1,8 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Quote.java, kawa/lang/SyntaxTemplate.java,
+	kawa/standard/syntax.java: Change "select" (preprocessor) syntax.
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (importDefinitions): Avoid some

@@ -1,5 +1,14 @@
 2003-03-02  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (addMethodFor):  DOn't set closureEnv.
+
+	* Declaration.java (printInfo):  New method.
+	* LetExp.java (print):  Use printInfo.
+	* LambdaExp.java (print):  Likewise.  Create logical blocks.
+	* ModuleExp.java (print):  Likewise.
+
+2003-03-02  Per Bothner  <per@bothner.com>
+
 	* LambdaExp.java (enterFunction):  No need to allocate a staticLink
 	field if this is a ModuleExp - it's never used.
 

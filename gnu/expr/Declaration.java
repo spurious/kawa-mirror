@@ -5,6 +5,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Named;
 import gnu.mapping.Symbol;
+import gnu.mapping.OutPort;
 
 /**
  * The static information associated with a local variable binding.
@@ -480,6 +481,21 @@ public class Declaration
   public final int getColumn ()
   {
     return position & ((1 << 12) - 1);
+  }
+
+  public void printInfo(OutPort out)
+  {
+    out.print(symbol);
+    out.print('/');
+    out.print(id);
+    out.print("/fl:");
+    out.print(Integer.toHexString(flags));
+    Type t = getType();
+    if (t != null && t != type.pointer_type)
+      {
+	out.print("::");
+	out.print(t.getName());
+      }
   }
 
 

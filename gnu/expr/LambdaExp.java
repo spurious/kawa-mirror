@@ -742,7 +742,7 @@ public class LambdaExp extends ScopeExp
     if (ctype.isInterface())
       mflags |= Access.ABSTRACT;
     if (! isStatic)
-      closureEnv = declareThis(ctype);
+      declareThis(ctype);
 
     Type rtype
       = (getFlag(SEQUENCE_RESULT)
@@ -1403,9 +1403,10 @@ public class LambdaExp extends ScopeExp
       }
     out.print(id);
     out.print('/');
+    out.print("fl:");  out.print(Integer.toHexString(flags));
     out.writeSpaceFill();
     printLineColumn(out);
-    out.print('(');
+    out.startLogicalBlock("(", false, ")");
     Special prevMode = null;
     int i = 0;
     int opt_i = 0;
@@ -1435,14 +1436,7 @@ public class LambdaExp extends ScopeExp
 	  defaultArg = defaultArgs[opt_i++];
 	if (defaultArg != null)
 	  out.print('(');
-	out.print(decl);
-	Type type = decl.getType();
-	if (type != null && type != Type.pointer_type)
-	  {
-	    out.writeSpaceFill();
-	    out.print(":: ");
-	    out.print(type);
-	  }
+	decl.printInfo(out);
 	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
 	  {
 	    out.print(' ');
@@ -1452,7 +1446,7 @@ public class LambdaExp extends ScopeExp
 	i++;
 	prevMode = mode;
       }
-    out.print(')');
+    out.endLogicalBlock(")");
     out.writeSpaceLinear();
     if (body == null)
       out.print("<null body>");

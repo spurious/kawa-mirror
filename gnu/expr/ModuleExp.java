@@ -271,11 +271,15 @@ public class ModuleExp extends LambdaExp
     out.print('/');
     out.writeSpaceFill();
     out.startLogicalBlock("(", false, ")");
-    for (Declaration decl = firstDecl();
-         decl != null;  decl = decl.nextDecl())
+    Declaration decl = firstDecl();
+    if (decl != null)
       {
-	out.print(decl);
-	out.writeSpaceFill();
+	out.print("Declarations:");
+	for (; decl != null;  decl = decl.nextDecl())
+	  {
+	    out.writeSpaceFill();
+	    decl.printInfo(out);
+	  }
       }
     out.endLogicalBlock(")");
     out.writeSpaceLinear();

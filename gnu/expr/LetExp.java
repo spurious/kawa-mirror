@@ -105,10 +105,10 @@ public class LetExp extends ScopeExp
     
     for (; decl != null;  decl = decl.nextDecl())
       {
-	if (i > 0)
-	  out.writeSpaceLinear();
-	out.print('(');
-	out.print(decl);
+	out.startLogicalBlock("(", false, ")");
+	decl.printInfo(out);
+	out.writeSpaceFill();
+	out.print('=');
 	out.writeSpaceFill();
 	//if (decl.isArtificial ())
         //out.print ("<artificial>");
@@ -120,7 +120,7 @@ public class LetExp extends ScopeExp
 	      inits[i].print(out);
 	    i++;
 	  }
-	out.print(')');
+	out.endLogicalBlock(")");
       }
     out.endLogicalBlock(")");
     out.writeSpaceLinear();

@@ -56,7 +56,7 @@ public class callcc extends Procedure1
 }
 
 /*
-class Continuation extends CpsProcedure
+class Continuation extends MethodProc
 {
   Procedure frame;
   int pc;

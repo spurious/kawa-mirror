@@ -44,6 +44,7 @@ $(CLASSESDIR)snull.class \
 $(CLASSESDIR)pair.class \
 $(CLASSESDIR)iport.class \
 $(CLASSESDIR)oport.class \
+$(CLASSESDIR)print.class \
 $(CLASSESDIR)symbol.class \
 $(CLASSESDIR)vector.class \
 $(CLASSESDIR)Exit.class \

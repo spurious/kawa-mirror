@@ -21,15 +21,9 @@ public class vector extends Object implements Printable {
     public void print(java.io.PrintStream ps) {
        ps.print("#(");
        for (int t=0; t<size; t++) {
-          if (t!=0) {
+          if (t!=0)
              ps.print(" ");
-          }
-          Object o = value.elementAt(t);
-          if (o instanceof kawa.lang.Printable) {
-             ((kawa.lang.Printable)o).print(ps);
-          } else {
-             ps.print("#<"+o.getClass().getName()+">");
-          }
+	  kawa.lang.print.print (value.elementAt(t), ps);
        }
        ps.print(")");
     }

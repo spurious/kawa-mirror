@@ -14,43 +14,24 @@ public class pair extends Object implements Printable {
 
    public void print(java.io.PrintStream ps) {
       ps.print("(");
-      if (car instanceof Printable) {
-         ((Printable)car).print(ps);
-      } else {
-         ps.print("#<"+car.getClass().getName()+">");
-      }
-      if (cdr!=null) {
-         if (cdr instanceof kawa.lang.pair) {
-            ps.print(" ");
-            ((kawa.lang.pair)cdr).printNoParen(ps);
-         } else if (cdr instanceof Printable) {
-            ps.print(" . ");
-            ((Printable)cdr).print(ps);
-         } else {
-            ps.print(" . ");
-            ps.print("#<"+cdr.getClass().getName()+">");
-         }
-      }
+      printNoParen(this, ps);
       ps.print(")");
    }
 
-   public void printNoParen(java.io.PrintStream ps) {
-      if (car instanceof Printable) {
-         ((Printable)car).print(ps);
-      } else {
-         ps.print("#<"+car.getClass().getName()+">");
-      }
-      if (cdr!=null && !(cdr instanceof kawa.lang.snull)) {
-         if (cdr instanceof kawa.lang.pair) {
-            ps.print(" ");
-            ((kawa.lang.pair)cdr).printNoParen(ps);
-         } else if (cdr instanceof Printable) {
-            ps.print(" . ");
-            ((Printable)cdr).print(ps);
-         } else {
-            ps.print(" . ");
-            ps.print("#<"+cdr.getClass().getName()+">");
-         }
-      }
+   static public final void printNoParen(pair p, java.io.PrintStream ps) {
+     for (;;) {
+       kawa.lang.print.print (p.car, ps);
+       Object cdr = p.cdr;
+       if (cdr == null || cdr instanceof kawa.lang.snull)
+	 break;
+       if (cdr instanceof kawa.lang.pair) {
+	 ps.print(" ");
+	 p = (kawa.lang.pair)cdr;
+       } else {
+	 ps.print(" . ");
+	 kawa.lang.print.print (cdr, ps);
+         break;
+       }
+     }
    }
 };

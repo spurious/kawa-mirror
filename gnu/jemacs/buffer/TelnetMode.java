@@ -35,7 +35,7 @@ public class TelnetMode extends ProcessMode
   }
 
   //protected static final int ENTER_CODE = 1;
-  //static Procedure enter = new ApplyMethodProc(this, ENTER_CODE, "enter", 0);
+  //static Procedure enter = new ModuleMethod(this, ENTER_CODE, "enter", 0);
 
   public static void telnetMode (Buffer buffer, String host, int port)
   {
@@ -43,7 +43,7 @@ public class TelnetMode extends ProcessMode
   }
 
   /*
-  public Object apply0(ApplyMethodProc proc)
+  public Object apply0(ModuleMethod proc)
   {
     switch (proc.selector)
       {

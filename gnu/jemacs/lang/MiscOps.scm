@@ -20,6 +20,26 @@
 
 (define (minibuffer-depth) 0)  ;; FIXME
 
+;; The 'if' primitive in version takes an arbitary number of 'else'
+;; expressions, in contrast to the Scheme and CommonLisp definitions.
+
+(%define-syntax if
+  (lambda (x)
+    (syntax-case x ()
+		 ((_ test then)
+		  (make <gnu.expr.IfExp>
+		    (syntax->expression (syntax test))
+		    (syntax->expression (syntax then))
+		    (static-field <gnu.commonlisp.lang.Lisp2> 'nilExpr)))
+		 ((_ test then else ...)
+		  (make <gnu.expr.IfExp>
+		    (syntax->expression (syntax test))
+		    (syntax->expression (syntax then))
+		    (syntax-body->expression (syntax (begin else ...)))))
+		 ((_ . rest)
+		  (syntax-error (syntax rest)
+				"too few expressions for 'if'")))))
+
 (define-syntax catch
   (syntax-rules ()
 		((catch tag body ...)

@@ -1,3 +1,8 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* MiscOps.scm (if): Define elisp-specific macro.
+	* ELisp.java (<init>): Remove old definition of 'if'.
+
 2004-09-12  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>): ELisp 'if' syntax allows multiple-statement

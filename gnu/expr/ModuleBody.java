@@ -17,24 +17,14 @@ public abstract class ModuleBody extends CpsProcedure
   {
   }
 
-  /** For backwards compatibily.
-   * Earlier versions of Kawa used this to initialize a module.
-   * Allows run(Consumer) to call those methods. */
-  public Object run (Environment env)
-  {
-    return Values.empty;
-  }
-
   public void run ()
   {
-    run (new VoidConsumer());
+    run (VoidConsumer.instance);
   }
 
   public void run(Consumer out)
   {
     CallContext ctx = CallContext.getInstance();
-    // For backwards compatibility - see run(Environment).
-    run(ctx.getEnvironment());
     Consumer save = ctx.consumer;
     try
       {

@@ -140,9 +140,6 @@ public class ModuleExp extends LambdaExp
   public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
   {
     ModuleExp mexp = comp.getModule();
-    if (! mexp.getFlag(NONSTATIC_SPECIFIED)
-	&& ! mexp.getFlag(SUPERTYPE_SPECIFIED))
-      mexp.setFlag(STATIC_SPECIFIED);
     Environment orig_env = Environment.getCurrent();
     try
       {

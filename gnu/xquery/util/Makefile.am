@@ -7,6 +7,7 @@ AUTOMAKE_OPTIONS = foreign
 java_sources = \
   AppendValues.java \
   Children.java \
+  Compare.java \
   Document.java \
   IntegerRange.java \
   IsEmptySequence.java \

@@ -1,3 +1,8 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* Compare.java:  New class, extends Procedure2.
+	* Makefile.am (java_sources):  Add Compare.java.
+
 2001-11-01  Per Bothner  <per@bothner.com>
 
 	* ValuesFilter.java:  New class, extends CpsProcedure.

@@ -71,7 +71,7 @@ public class object extends Syntax
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String)
 	  { // Field declaration.
-	    Object type = null;
+	    Pair typePair = null;
 	    String sname = (String) pair.car;
 	    Declaration decl = oexp.addDeclaration(sname);
 	    decl.setSimple(false);
@@ -81,6 +81,7 @@ public class object extends Syntax
 	    while (args instanceof Pair)
 	      {
 		pair = (Pair) args;
+		Pair keyPair = pair;
 		Object key = pair.car;
 		args = pair.cdr;
 		if ((key == "::" || key instanceof Keyword)
@@ -91,7 +92,7 @@ public class object extends Syntax
 		    Object value = pair.car;
 		    args = pair.cdr;
 		    if (key == "::" || key == typeKeyword)
-		      type = value;
+		      typePair = pair;
 		    else if (key == allocationKeyword)
 		      {
 			if (value == classKeyword)
@@ -125,11 +126,11 @@ public class object extends Syntax
 		    init = key;
 		  }
 		else if (args instanceof Pair
-			 && nKeywords == 0 && init == null && type == null
+			 && nKeywords == 0 && init == null && typePair == null
 			 && (pair = (Pair) args).cdr == LList.Empty)
 		  {
 		    // Backward compatibility.
-		    type = key;
+		    typePair = keyPair;
 		    init = pair.car;
 		    args = pair.cdr;
 		  }
@@ -148,8 +149,8 @@ public class object extends Syntax
 		  inits = new Vector (20);
 		inits.addElement(decl);
 	      }
-	    if (type != null)
-	      decl.setType(prim_method.exp2Type(type, tr));
+	    if (typePair != null)
+	      decl.setType(tr.exp2Type(typePair));
 	    decl.setCanRead(true);
 	    decl.setCanWrite(true);
 	  }
@@ -183,78 +184,87 @@ public class object extends Syntax
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	pair = (Pair) obj;
-	obj = pair.cdr; // Next member.
-	pair = (Pair) pair.car;
-	if (pair.car instanceof String)
-	  { // Field declaration.
-	    Object type = null;
-	    int nKeywords = 0;
-	    Object args = pair.cdr;
-	    Object init = null;
-	    while (args instanceof Pair)
-	      {
-		pair = (Pair) args;
-		Object key = pair.car;
-		args = pair.cdr;
-		if ((key == "::" || key instanceof Keyword)
-		    && args instanceof Pair)
+	Object savedPos = tr.pushPositionOf(pair);
+	try
+	  {
+	    obj = pair.cdr; // Next member.
+	    pair = (Pair) pair.car;
+	    if (pair.car instanceof String)
+	      { // Field declaration.
+		Object type = null;
+		int nKeywords = 0;
+		Object args = pair.cdr;
+		Object init = null;
+		while (args instanceof Pair)
 		  {
-		    nKeywords++;
 		    pair = (Pair) args;
-		    Object value = pair.car;
+		    Object key = pair.car;
 		    args = pair.cdr;
-		    if (key == "::" || key == typeKeyword)
-		      type = value;
-		    else if (key == initformKeyword
-			     || key == init_formKeyword
-			     || key == init_valueKeyword)
+		    if ((key == "::" || key instanceof Keyword)
+			&& args instanceof Pair)
 		      {
-			init = value;
+			nKeywords++;
+			pair = (Pair) args;
+			Object value = pair.car;
+			args = pair.cdr;
+			if (key == "::" || key == typeKeyword)
+			  type = value;
+			else if (key == initformKeyword
+				 || key == init_formKeyword
+				 || key == init_valueKeyword)
+			  {
+			    init = value;
+			  }
+			else
+			  {
+			    // handled in first pass.
+			  }
+		      }
+		    else if (args == LList.Empty && init == null)
+		      {
+			// CLtL:2 explicitly prohibits this as an extension.
+			init = key;
+		      }
+		    else if (args instanceof Pair
+			     && nKeywords == 0 && init == null && type == null
+			     && (pair = (Pair) args).cdr == LList.Empty)
+		      {
+			// Backward compatibility.
+			type = key;
+			init = pair.car;
+			args = pair.cdr;
 		      }
 		    else
 		      {
-			// handled in first pass.
+			args = null;  // Trigger error message
+			break;
 		      }
 		  }
-		else if (args == LList.Empty && init == null)
+		if (init != null)
 		  {
-		    // CLtL:2 explicitly prohibits this as an extension.
-		    init = key;
-		  }
-		else if (args instanceof Pair
-			 && nKeywords == 0 && init == null && type == null
-			 && (pair = (Pair) args).cdr == LList.Empty)
-		  {
-		    // Backward compatibility.
-		    type = key;
-		    init = pair.car;
-		    args = pair.cdr;
-		  }
-		else
-		  {
-		    args = null;  // Trigger error message
-		    break;
+		    Declaration decl = (Declaration) inits.elementAt(init_index);
+		    Expression initValue = tr.rewrite(init);
+		    SetExp sexp = new SetExp (decl.getName(), initValue);
+		    sexp.binding = decl;
+		    decl.noteValue(null);
+		    inits.setElementAt(sexp, init_index++);
 		  }
 	      }
-	    if (init != null)
-	      {
-		Declaration decl = (Declaration) inits.elementAt(init_index);
-		Expression initValue = tr.rewrite(init);
-		SetExp sexp = new SetExp (decl.getName(), initValue);
-		sexp.binding = decl;
-		decl.noteValue(null);
-		inits.setElementAt(sexp, init_index++);
+	    else if (pair.car instanceof Pair)
+	      { // Method declaration.
+		Pair mpair = (Pair) pair.car;
+		LambdaExp lexp = meth;
+		meth = meth.nextSibling;
+		lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
 	      }
+	    else
+	      return tr.syntaxError("invalid field/method definition");
 	  }
-	else if (pair.car instanceof Pair)
-	  { // Method declaration.
-	    Pair mpair = (Pair) pair.car;
-	    LambdaExp lexp = meth;
-	    meth = meth.nextSibling;
- 	    lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+	finally
+	  {
+	    tr.popPositionOf(savedPos);
 	  }
-	else
-	  return tr.syntaxError("invalid field/method definition");
+	
       }
     if (inits != null)
       {

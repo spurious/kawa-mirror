@@ -1,3 +1,16 @@
+2001-08-24  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (pushPositionOf, popPositionOf):
+	New methods to make it easier to save and restore line numbers etc.
+	(rewrite_with_position):  Use new methods.
+	(exp2Type):  New method
+	* kawa/lang/Lambda.java (rewrite):  Use new method.
+	* kawa/standard/object.java (rewriteClassDef):  Likwise.
+
+	* kawa/standard/thisRef.java:  New class, extends Syntax.
+	* kawa/standard/Makefile.am (java_sources):  Add thisRef.java.
+	* kawa/standard/Scheme.java (initScheme):  Change define for "this".
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add gnu/xquery/testsuite/tab.xml.

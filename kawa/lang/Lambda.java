@@ -161,7 +161,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	String name;
 	Object defaultValue = defaultDefault;
-	Object typeSpec = null;
+	Pair typeSpecPair = null;
         Pair p;
 	if (pair.car instanceof String || pair.car instanceof Binding)
           {
@@ -176,7 +176,7 @@ public class Lambda extends Syntax implements Printable
                     return;
                   }
                 p = (Pair) p.cdr;
-                typeSpec = p.car;
+                typeSpecPair = p;
                 pair = p;
               }
           }
@@ -196,7 +196,7 @@ public class Lambda extends Syntax implements Printable
                     return;
                   }
                 p = (Pair) p.cdr;
-                typeSpec = p.car;
+                typeSpecPair = p;
                 if (p.cdr instanceof Pair)
                   p = (Pair) p.cdr;
                 else if (p.cdr == LList.Empty)
@@ -224,13 +224,13 @@ public class Lambda extends Syntax implements Printable
               }
             if (p != null)
               {
-                if (typeSpec != null)
+                if (typeSpecPair != null)
                   {
                     tr.syntaxError("duplicate type specifier for parameter `"
                                    + name + '\'');
                     return;
                   }
-                typeSpec = p.car;
+                typeSpecPair = p;
                 if (p.cdr != LList.Empty)
                   {
                     tr.syntaxError("junk at end of specifier for parameter `"
@@ -255,9 +255,9 @@ public class Lambda extends Syntax implements Printable
             decl.setFile(declPos.getFile());
             decl.setLine(declPos.getLine(), declPos.getColumn());
           }
-	if (typeSpec != null)
+	if (typeSpecPair != null)
 	  {
-	    decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
+	    decl.setType(tr.exp2Type(typeSpecPair));
 	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	  }
 	else if (mode == restKeyword)
@@ -284,7 +284,6 @@ public class Lambda extends Syntax implements Printable
       body = ((Pair) body).cdr;
     if (body instanceof Pair && ((Pair) body).car == "<sequence>")
       {
-        System.err.println("make sequence");
         ClassType type = ClassType.make("gnu.lists.Consumer");
         Declaration rdecl = new Declaration("$result$", type);
         lexp.add(null, rdecl);

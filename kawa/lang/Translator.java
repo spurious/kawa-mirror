@@ -399,6 +399,45 @@ public class Translator extends Parser
       }
   }
 
+  PairWithPosition positionPair;
+
+  /** Note current line number position from a PairWithPosition.
+   * Return an object to pass to popPositionOf.
+   */
+  public Object pushPositionOf(Object pair)
+  {
+    if (! (pair instanceof PairWithPosition))
+      return null;
+    PairWithPosition ppair = (PairWithPosition) pair;
+    Object saved = positionPair;
+    if (positionPair == null
+	|| positionPair.getFile() != current_filename
+	|| positionPair.getLine() != current_line
+	|| positionPair.getColumn() != current_column)
+      {
+	saved = PairWithPosition.make(Special.eof, positionPair,
+				      current_filename,
+				      current_line, current_column);
+      }
+    setLine(pair);
+    positionPair = ppair;
+    return saved;
+  }
+
+  /** Restore  line number position from a previous pushPositionOf.
+   * @param saved value returned by matching pushPositionOf.
+   */
+  public void popPositionOf(Object saved)
+  {
+    if (saved == null)
+      return;
+    setLine(saved);
+    positionPair = (PairWithPosition) saved;
+    if (positionPair.car == Special.eof)
+      positionPair = (PairWithPosition) positionPair.cdr;
+  }
+
+
   public void setLine (Object pair)
   {
     if (pair instanceof PairWithPosition)
@@ -408,35 +447,52 @@ public class Translator extends Parser
       }
   }
 
+  /** Extract a type from the car fo a pair. */
+  public Type exp2Type(Pair typeSpecPair)
+  {
+    Object saved = pushPositionOf(typeSpecPair);
+    try
+      {
+	Expression texp = rewrite_car(typeSpecPair, false);
+	if (texp instanceof ErrorExp)
+	  return null;
+	Type type = getInterpreter().getTypeFor(texp);
+	 if (type == null)
+	   {
+	     if (texp instanceof ReferenceExp)
+	       error('e', "unknown type name '"
+		     + ((ReferenceExp) texp).getName() + '\'');
+	     else
+	       error('e',
+		 "invalid type spec (must be \"type\" or 'type or <type>)");
+	   }
+	 return type;
+      }
+    finally
+      {
+	popPositionOf(saved);
+      }
+  }
+
   public Expression rewrite_with_position (Object exp, boolean function,
                                            PairWithPosition pair)
   {
-    String save_filename = current_filename;
-    int save_line = current_line;
-    int save_column = current_column;
+    Object saved = pushPositionOf(pair);
     Expression result;
     try
       {
-	String exp_file = pair.getFile ();
-	int exp_line = pair.getLine ();
-	int exp_column = pair.getColumn ();
-	current_filename = exp_file;
-        current_line = exp_line;
-	current_column = exp_column;
 	if (exp == pair)
 	  result = rewrite_pair (pair);  // To avoid a cycle
 	else
 	  result = rewrite (exp, function);
 	if (result.getFile () == null)
-	  result.setFile (exp_file);
+	  result.setFile(current_filename);
 	if (result.getLine () == 0)
-	  result.setLine (exp_line, exp_column);
+	  result.setLine (current_line, current_column);
       }
     finally
       {
-	current_filename = save_filename;
-	current_line = save_line;
-	current_column = save_column;
+	popPositionOf(saved);
       }
     return result;
   }

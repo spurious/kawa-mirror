@@ -9,8 +9,8 @@ import java.io.*;
 import gnu.xml.*;
 import gnu.lists.*;
 
-public class ElementConstructor extends CpsProcedure
-implements Inlineable, Externalizable
+public class ElementConstructor extends NodeConstructor
+implements Externalizable
 {
   /** XML source name - e.g. "PREFIX:LOCAL". */
   String sname;
@@ -51,60 +51,46 @@ implements Inlineable, Externalizable
 
   public void apply (CallContext ctx)
   {
-    Consumer out = ctx.consumer;
-    Object endMarker = Symbol.UNBOUND;
-    out.beginGroup(sname, qname);
-    for (;;)
+    Consumer saved = ctx.consumer;
+    Consumer out = pushNodeContext(ctx);
+    try
       {
-	Object arg = ctx.getNextArg(endMarker);
-	if (arg == endMarker)
-	  break;
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(out);
-	else
-	  out.writeObject(arg);
+	out.beginGroup(sname, qname);
+	Object endMarker = Symbol.UNBOUND;
+	for (;;)
+	  {
+	    Object arg = ctx.getNextArg(endMarker);
+	    if (arg == endMarker)
+	      break;
+	    if (arg instanceof Consumable)
+	      ((Consumable) arg).consume(out);
+	    else
+	      out.writeObject(arg);
+	  }
+	out.endGroup(sname);
       }
-    out.endGroup(sname);
-  }
-
-  public void compile (ApplyExp exp, Compilation comp, Target target)
-  {
-    if (target instanceof ConsumerTarget)
+    finally
       {
-	Variable consumer = ((ConsumerTarget) target).getConsumerVariable();
-	Expression[] args = exp.getArgs();
-	int nargs = args.length;
-	CodeAttr code = comp.getCode();
-	
-	code.emitLoad(consumer);
-	comp.compileConstant(sname, Target.pushObject);
-	comp.compileConstant(qname, Target.pushObject);
-	code.emitInvokeInterface(beginGroupMethod);
-	for (int i = 0;  i < nargs;  i++)
-	  args[i].compileWithPosition(comp, target);
-	code.emitLoad(consumer);
-	comp.compileConstant(sname, Target.pushObject);
-	code.emitInvokeInterface(endGroupMethod);
+	popNodeContext(saved, ctx);
       }
-    else if (target instanceof IgnoreTarget)
-      ApplyExp.compile(exp, comp, target);
-    else
-      compileUsingNodeTree(exp, comp, target);
   }
 
-  /** Compile an expression using a fresh NodeTree.
-   * Compare with ConsumerTarget.compileUsingConsumer, but creates a NodeTree.
-   */
-  public static void compileUsingNodeTree(Expression exp,
-					  Compilation comp, Target target)
+  public void compileToNode (ApplyExp exp, Compilation comp,
+				      ConsumerTarget target)
   {
-    Method makeMethod = typeNodeTree.getDeclaredMethod("make", 0);
-    ConsumerTarget.compileUsingConsumer(exp, comp, target, makeMethod, null);
-  }
-
-  public Type getReturnType (Expression[] args)
-  {
-    return Compilation.typeObject;
+    Variable consumer = target.getConsumerVariable();
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    CodeAttr code = comp.getCode();
+    code.emitLoad(consumer);
+    comp.compileConstant(sname, Target.pushObject);
+    comp.compileConstant(qname, Target.pushObject);
+    code.emitInvokeInterface(beginGroupMethod);
+    for (int i = 0;  i < nargs;  i++)
+      compileChild(args[i], comp, target);
+    code.emitLoad(consumer);
+    comp.compileConstant(sname, Target.pushObject);
+    code.emitInvokeInterface(endGroupMethod);
   }
 
   public String toString()
@@ -112,9 +98,6 @@ implements Inlineable, Externalizable
     return "#<ElementConstructor "+sname+" :: "+qname+'>';
   }
 
-
-  static final ClassType typeNodeTree
-    = ClassType.make("gnu.xml.NodeTree");
 
   static final Method beginGroupMethod
     = Compilation.typeConsumer.getDeclaredMethod("beginGroup", 2);

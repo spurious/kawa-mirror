@@ -1,3 +1,13 @@
+2003-09-24  Per Bothner  <per@bothner.com>
+
+	* NodeConstructor.java:  New abstract class, extends CpsProcedure.
+	* Makefile.am:  Update accordingly.
+	* AttributeConstructor.java:  Now extends NodeConstructor.
+	(apply):  Update.  (compileToNode):  New, replaces compile method.
+	* DocumentConstructor.java:  Likewise.
+	* ElementConstructor.java:  Likewise.  Move getReturnType up.
+	* TextConstructor.java:  Use two NodeConstructor helper methods.
+
 2003-09-18  Per Bothner  <per@bothner.com>
 
 	* Nodes.java (root):  New static methods.

@@ -9,8 +9,8 @@ import java.io.*;
 import gnu.xml.*;
 import gnu.lists.*;
 
-public class AttributeConstructor extends CpsProcedure
-implements Inlineable, Externalizable
+public class AttributeConstructor extends NodeConstructor
+implements Externalizable
 {
   /** XML source name - e.g. "PREFIX:LOCAL". */
   String sname;
@@ -51,44 +51,45 @@ implements Inlineable, Externalizable
 
   public void apply (CallContext ctx)
   {
-    Consumer out = ctx.consumer;
-    out.beginAttribute(sname, qname);
-    Object endMarker = Symbol.UNBOUND;
-    for (;;)
+    Consumer saved = ctx.consumer;
+    Consumer out = pushNodeContext(ctx);
+    try
       {
-	Object arg = ctx.getNextArg(endMarker);
-	if (arg == endMarker)
-	  break;
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(out);
-	else
-	  out.writeObject(arg);
+	out.beginAttribute(sname, qname);
+	Object endMarker = Symbol.UNBOUND;
+	for (;;)
+	  {
+	    Object arg = ctx.getNextArg(endMarker);
+	    if (arg == endMarker)
+	      break;
+	    if (arg instanceof Consumable)
+	      ((Consumable) arg).consume(out);
+	    else
+	      out.writeObject(arg);
+	  }
+	out.endAttribute();
       }
-    out.endAttribute();
+    finally
+      {
+	popNodeContext(saved, ctx);
+      }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  public void compileToNode (ApplyExp exp, Compilation comp,
+				      ConsumerTarget target)
   {
-    if (target instanceof ConsumerTarget)
-      {
-	Variable consumer = ((ConsumerTarget) target).getConsumerVariable();
-	Expression[] args = exp.getArgs();
-	int nargs = args.length;
-	CodeAttr code = comp.getCode();
-	
-	code.emitLoad(consumer);
-	comp.compileConstant(sname, Target.pushObject);
-	comp.compileConstant(qname, Target.pushObject);
-	code.emitInvokeInterface(beginAttributeMethod);
-	for (int i = 0;  i < nargs;  i++)
-	  args[i].compile(comp, target);
-	code.emitLoad(consumer);
-	code.emitInvokeInterface(endAttributeMethod);
-      }
-    else if (target instanceof IgnoreTarget)
-      ApplyExp.compile(exp, comp, target);
-    else
-      ConsumerTarget.compileUsingConsumer(exp, comp, target);
+    Variable consumer = ((ConsumerTarget) target).getConsumerVariable();
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    CodeAttr code = comp.getCode();
+    code.emitLoad(consumer);
+    comp.compileConstant(sname, Target.pushObject);
+    comp.compileConstant(qname, Target.pushObject);
+    code.emitInvokeInterface(beginAttributeMethod);
+    for (int i = 0;  i < nargs;  i++)
+      compileChild(args[i], comp, target);
+    code.emitLoad(consumer);
+    code.emitInvokeInterface(endAttributeMethod);
   }
 
   public Type getReturnType (Expression[] args)

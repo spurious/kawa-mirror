@@ -4,27 +4,58 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.expr.*;
+import gnu.bytecode.*;
 
-public class DocumentConstructor extends CpsProcedure
+public class DocumentConstructor extends NodeConstructor
 {
   public static final DocumentConstructor documentConstructor
     = new DocumentConstructor();
 
   public void apply (CallContext ctx)
   {
-    Consumer out = ctx.consumer;
-    Object endMarker = Symbol.UNBOUND;
-    out.beginDocument();
-    for (;;)
+    Consumer saved = ctx.consumer;
+    Consumer out = pushNodeContext(ctx);
+    try
       {
-	Object arg = ctx.getNextArg(endMarker);
-	if (arg == endMarker)
-	  break;
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(out);
-	else
-	  out.writeObject(arg);
+	Object endMarker = Symbol.UNBOUND;
+	out.beginDocument();
+	for (;;)
+	  {
+	    Object arg = ctx.getNextArg(endMarker);
+	    if (arg == endMarker)
+	      break;
+	    if (arg instanceof Consumable)
+	      ((Consumable) arg).consume(out);
+	    else
+	      out.writeObject(arg);
+	  }
+	out.endDocument();
       }
-    out.endDocument();
+    finally
+      {
+	popNodeContext(saved, ctx);
+      }
   }
+
+  public void compileToNode (ApplyExp exp, Compilation comp,
+				      ConsumerTarget target)
+  {
+    Variable consumer = target.getConsumerVariable();
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    CodeAttr code = comp.getCode();
+    code.emitLoad(consumer);
+    code.emitInvokeInterface(beginDocumentMethod);
+    for (int i = 0;  i < nargs;  i++)
+      compileChild(args[i], comp, target);
+    code.emitLoad(consumer);
+    code.emitInvokeInterface(endDocumentMethod);
+  }
+
+  static final Method beginDocumentMethod
+    = Compilation.typeConsumer.getDeclaredMethod("beginDocument", 0);
+  static final Method endDocumentMethod
+    = Compilation.typeConsumer.getDeclaredMethod("endDocument", 0);
+
 }

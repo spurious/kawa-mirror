@@ -28,6 +28,7 @@ java_sources = \
   MakeUnescapedData.java \
   NamespaceEnv.java \
   NodeCompare.java \
+  NodeConstructor.java \
   NodeName.java \
   Nodes.java \
   NodeType.java \

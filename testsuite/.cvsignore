@@ -1,0 +1,7 @@
+Makefile
+*.class
+*.log
+HelloCgiX
+testing.zip
+scribble.html
+tmp*

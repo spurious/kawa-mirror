@@ -1,0 +1,8 @@
+Makefile
+*.info
+*.info-*
+stamp-vti
+version.texi
+kawa
+kawa.1
+

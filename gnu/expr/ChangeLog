@@ -1,3 +1,12 @@
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java:  New inherits from MethodProc.
+	(getVarBuffer, isApplicable, match, applyV):  New methods.
+
+	* PrimProcedure.java:  Interpret methods whose names end in "$V"
+	as taking a variable number of arguments;  the excess ones are
+	bundled in an array passed as the last argument.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	No longer create new class for top-level procedures;

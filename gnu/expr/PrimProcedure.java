@@ -28,29 +28,62 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public Type getReturnType (Expression[] args) { return retType; }
 
+  /** Return true iff the last parameter is a "rest" argument. */
+  public boolean takesVarArgs()
+  {
+    return method.getName().endsWith("$V");
+  }
+
+  /** Return a buffer that can contain decoded (matched) arguments. */
+  public Object getVarBuffer()
+  {
+    return new Object[minArgs() + (takesVarArgs() ? 1 : 0)];
+  }
+
   public int numArgs()
   {
     int num = argTypes.length;
     if (! getStaticFlag())
       num++;
-    return num + (num << 12);
+    return takesVarArgs() ? (num - 1) + (-1 << 12) : num + (num << 12);
   }
 
   public RuntimeException match (Object vars, Object[] args)
   {
     int nargs = args.length;
     Object[] rargs = (Object[]) vars;
-    if (rargs.length != nargs)
+    boolean takesVarArgs = takesVarArgs();
+    int fixArgs = takesVarArgs ? rargs.length - 1 : rargs.length;
+
+    if (takesVarArgs ? nargs < fixArgs: nargs != rargs.length)
       return new WrongArguments(this, nargs);
     int arg_count = argTypes.length;
-    int this_count = nargs - arg_count; // 0 if static, 1 otherwise.
+    Type elementType = null;
+    Object[] restArray = null;
+    if (takesVarArgs)
+      {
+        ArrayType restArrayType = (ArrayType) argTypes[arg_count-1];
+        elementType = restArrayType.getComponentType();
+        Class elementClass = elementType.getReflectClass();
+        restArray = (Object[])
+          java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
+        rargs[rargs.length-1] = restArray;
+      }
+    int this_count = getStaticFlag() ? 0 : 1;
     if (this_count != 0)
       rargs[0] = method.getDeclaringClass().coerceFromObject(args[0]);
     for (int i = this_count;  i < nargs; i++)
       {
         try
           {
-            rargs[i] = argTypes[i-this_count].coerceFromObject(args[i]);
+            Object arg = args[i];
+            Type type = i < fixArgs ? argTypes[i-this_count] : elementType;
+            if (type != Type.pointer_type)
+              arg = type.coerceFromObject(arg);
+            if (i < fixArgs)
+              rargs[i] = arg;
+            else
+              restArray[i - fixArgs] = arg;
           }
         catch (ClassCastException ex)
           {

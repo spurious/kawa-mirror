@@ -14,6 +14,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   Type[] argTypes;
   Method method;
   int op_code;
+  boolean is_special = false;
 
   /** If non-null, the LambdaExp that this PrimProcedure implements. */
   LambdaExp source;
@@ -220,6 +221,16 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       interpreter.getTypeFor(method.getReturnType().getReflectClass());
   }
 
+  public PrimProcedure(Method method, boolean is_special,
+                       Interpreter interpreter)
+  {
+    this(method, interpreter);
+    if (is_special) {
+      this.is_special = true;
+      op_code = 183;
+    }
+  }
+  
   private void init(Method method)
   {
     this.method = method;
@@ -289,7 +300,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public final boolean getStaticFlag()
   {
-    return method == null || method.getStaticFlag() || op_code == 183;
+    return method == null 
+      || method.getStaticFlag()
+      || (op_code == 183 && ! is_special);
   }
 
   public final Type[] getParameterTypes() { return argTypes; }
@@ -372,11 +385,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  }
       }
 
-    if (opcode() == 183) // invokespecial == primitive-constructor
+    // invokespecial == primitive-constructor
+    if (opcode() == 183 && ! is_special) 
       {
-	code.emitNew(mclass);
-	code.emitDup(mclass);
+        code.emitNew(mclass);
+        code.emitDup(mclass);
       }
+    
 
     Expression[] args = exp.getArgs();
     String arg_error = WrongArguments.checkArgCount(this, args.length);

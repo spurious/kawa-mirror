@@ -1,3 +1,8 @@
+2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* PrimProcedure.java: Add invoke-special to call super classes.
+	Add constructor and emit byte code for invoke-special.
+
 2003-07-16  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (inlineIfConstant):  New overload - pass ExpWalker.

@@ -28,9 +28,6 @@ read.java \
 readchar.java \
 read_line.java \
 char_ready_p.java \
-open_input_file.java \
-open_output_file.java \
-call_with_output_string.java \
 load.java \
 constant_fold.java \
 map.java \

@@ -1,3 +1,15 @@
+2004-08-24  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/readchar.java (readChar, peekChar): New static fields.
+	* kawa/standard/Scheme.java (initScheme):  Use new static fields.
+
+	* kawa/standard/Scheme.java (initScheme):  Functions open-input-file,
+	pen-output-file, and call-with-output-string now in kawa.lib.ports.
+	* kawa/standard/open_input_file.java:  Remove - no longer needed.
+	* kawa/standard/open_output_file.java:  Likewise.
+	* kawa/standard/call_with_output_string.java:  Likewise.
+	* kawa/standard/Makefile.am:  Update accordingly.
+
 2004-08-23  Per Bothner  <per@bothner.com>
 
 	* configure.in (--with-swt):  New option.

@@ -344,14 +344,14 @@ public class Scheme extends LispInterpreter
 		   "kawa.standard.with_input_from_file");
       define_proc ("with-output-to-file",
 		   "kawa.standard.with_output_to_file");
-      define_proc ("open-input-file", "kawa.standard.open_input_file");
-      define_proc ("open-output-file", "kawa.standard.open_output_file");
+      define_proc ("open-input-file", "kawa.lib.ports");
+      define_proc ("open-output-file", "kawa.lib.ports");
       define_proc ("close-input-port", "kawa.lib.ports");
       define_proc ("close-output-port", "kawa.lib.ports");
       define_proc ("read", "kawa.standard.read");
       define_proc ("read-line", "kawa.standard.read_line");
-      define_proc (new readchar (false));  // read-char
-      define_proc (new readchar (true));   // peek-char
+      define_field("read-char", "kawa.standard.readchar", "readChar");
+      define_field("peek-char", "kawa.standard.readchar", "peekChar");
       define_proc ("eof-object?", "kawa.lib.ports");
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
       define_field("write", "kawa.standard.Scheme", "writeFormat");
@@ -367,8 +367,7 @@ public class Scheme extends LispInterpreter
       define_proc ("open-input-string", "kawa.lib.ports");  // SRFI-6
       define_proc ("open-output-string", "kawa.lib.ports");  // SRFI-6
       define_proc ("get-output-string", "kawa.lib.ports");  // SRFI-6
-      define_proc ("call-with-output-string",  // Extension
-		   "kawa.standard.call_with_output_string");
+      define_proc ("call-with-output-string", "kawa.lib.ports"); // Extension
       define_proc ("force-output", "kawa.lib.ports");  // Extension
 
       define_field("port-line", "kawa.lib.ports");

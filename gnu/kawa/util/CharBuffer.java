@@ -70,6 +70,24 @@ public class CharBuffer extends AbstractString
     array[index] = ch;
   }
 
+  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
+  {
+    int count = srcEnd - srcBegin;
+    if (srcBegin < gapStart)
+      {
+	int len = gapStart - srcBegin;
+	if (len > count)
+	  len = count;
+	count -= len;
+	System.arraycopy(array, srcBegin, dst, dstBegin, len);
+	dstBegin += len;
+	srcBegin += len;
+      }
+    srcBegin += gapEnd - gapStart;
+    if (srcBegin >= gapEnd && count != 0)
+      System.arraycopy(array, srcBegin, dst, dstBegin, count);
+  }
+
   public void writeTo (int start, int count, java.io.Writer dest)
     throws java.io.IOException
   {

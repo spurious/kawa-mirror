@@ -1,7 +1,8 @@
 package gnu.kawa.util;
 import gnu.text.Char;
+import gnu.mapping.*;
 
-public abstract class AbstractString extends UniformVector
+public abstract class AbstractString extends UniformVector implements Printable
 {
   /** Kind of position which always stays before text inserted here.
    * An example is the pseudo-mark representing the beginning of the buffer. */
@@ -23,6 +24,14 @@ public abstract class AbstractString extends UniformVector
     if (index < 0 || index >= length())
       throw new StringIndexOutOfBoundsException(index);
     return Char.make(charAt(index));
+  }
+
+  /** Copy characters into a destination buffer.
+   * Same interface as java.lang.String's getChars. */
+  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
+  {
+    for (int i = srcBegin;  i < srcEnd;  i++)
+      dst[dstBegin++] = charAt(i);
   }
 
   /**
@@ -165,11 +174,65 @@ public abstract class AbstractString extends UniformVector
       }
   }
 
-  public AbstractString subString(int fromIndex, int toIndex)
+  public void print (java.io.PrintWriter ps)
   {
-    return new SubString(this,
-			 createPosition(fromIndex, BEFORE_MARK_KIND),
-			 createPosition(toIndex, AFTER_MARK_KIND));
+    int len = length();
+    if ((ps instanceof OutPort) && ((OutPort)ps).printReadable)
+      {
+	ps.print ('\"');
+	for (int i = 0;  i < len; i++)
+	  {
+	    char ch = charAt(i);
+	    if ((ch == '\\' || ch == '\"'))
+	      ps.print ('\\');
+	    /*
+	    // These escapes are not standard Scheme,
+	    // so should probably not be enabled by default.
+	    else if (ch == '\n')
+	      { ps.print("\\n"); continue; }
+	    else if (ch == '\r')
+	      { ps.print("\\r"); continue; }
+	    else if (ch == '\t')
+	      { ps.print("\\t"); continue; }
+	    */
+	    ps.print (ch);
+	  }
+	ps.print ('\"');
+      }
+    else
+      {
+	for (int i = 0;  i < len; i++)
+	  {
+	    ps.print (charAt(i));
+	  }
+      }
+  }
+
+  /**
+   * Make a copy of a substring, returning a String.
+   * (Same interface as the Java2 StringBuffer substring method.)
+   * (In contract subString makes a shared substring,
+   * and takes position values.)
+   */
+  public String substring(int start, int end)
+  {
+    char[] chars = new char[end - start];
+    getChars(start, end, chars, 0);
+    return new String(chars);
+  }
+
+  public String toString()
+  {
+    return substring(0, length());
+  }
+
+  /** Make a shared sub-string, using position values.
+   * (In contrast, substring makes a copy, and takes raw offsets.)
+   * (Does not necessarily do any error checking.)
+   */
+  public AbstractString subString(int fromPosition, int toPosition)
+  {
+    return new SubString(this, fromPosition, toPosition);
   }
 
   public int getStartPosition()

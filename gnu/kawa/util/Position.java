@@ -6,9 +6,9 @@ package gnu.kawa.util;
 
 public class Position
 {
-  AbstractString data;
+  protected AbstractString data;
 
-  int position;
+  protected int position;
 
   public Position()
   {

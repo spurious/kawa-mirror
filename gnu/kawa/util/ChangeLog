@@ -1,3 +1,17 @@
+2000-06-24  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java:  Implement gnu.mapping.Printable.
+	(print):  New method, code copied from FString.
+	(getChars, substring, toString, subString):  New methods.
+	* CharBuffer.java (getChars):  New method.
+	* FString.java (getChars, toCharArray):  Moved.
+	(print):  Use super.print.
+	* SubString.java (getChars, substring, subString):  New method.
+	(charAt, setCharAt, createPosition):  Add start	offset,
+	don't subtract it!
+
+	* Position.java (data, position):  Make protected.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* Char.java:  Moved to gnu.text.

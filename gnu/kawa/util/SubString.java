@@ -25,7 +25,7 @@ public class SubString extends AbstractString
     int start = base.getPositionOffset(startPosition);
     if (index < 0 || index >= end - start)
       throw new StringIndexOutOfBoundsException(index);
-    return base.charAt(index - start);
+    return base.charAt(index + start);
   }
 
   public final void setCharAt(int index, char ch)
@@ -34,7 +34,36 @@ public class SubString extends AbstractString
     int start = base.getPositionOffset(startPosition);
     if (index < 0 || index >= end - start)
       throw new StringIndexOutOfBoundsException(index);
-    base.setCharAt(index - start, ch);
+    base.setCharAt(index + start, ch);
+  }
+
+  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
+  {
+    int start = base.getPositionOffset(startPosition);
+    int end = base.getPositionOffset(endPosition);
+    srcBegin += start;
+    srcEnd += start;
+    if (srcEnd > end)
+      throw new StringIndexOutOfBoundsException();
+    base.getChars(srcBegin, srcEnd, dst, dstBegin);
+  }
+
+  public String substring(int startIndex, int endIndex)
+  {
+    int start = base.getPositionOffset(startPosition);
+    int end = base.getPositionOffset(endPosition);
+    startIndex += start;
+    endIndex += start;
+    if (startIndex > endIndex || endIndex > end)
+      throw new StringIndexOutOfBoundsException(endIndex);
+    return base.substring(startIndex, endIndex);
+  }
+
+  /** Make a shared sub-string, using position values.
+   */
+  public AbstractString subString(int fromPosition, int toPosition)
+  {
+    return base.subString(fromPosition, toPosition);
   }
 
   public void writeTo (int start, int count, java.io.Writer dest)
@@ -54,7 +83,7 @@ public class SubString extends AbstractString
   public int createPosition (int offset, int kind)
   {
     int start = base.getPositionOffset(startPosition);
-    return base.createPosition(offset - start, kind);
+    return base.createPosition(offset + start, kind);
   }
 
   public int getStartPosition()

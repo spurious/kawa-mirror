@@ -7,7 +7,7 @@ import gnu.mapping.*;
  * @author Per Bothner
  */
 
-public class FString extends AbstractString implements Printable, Externalizable
+public class FString extends AbstractString implements Externalizable
 {
   char[] value;
 
@@ -55,6 +55,26 @@ public class FString extends AbstractString implements Printable, Externalizable
   {
     value = new char[length];
     System.arraycopy(buffer, offset, value, 0, length);
+  }
+
+  public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)
+  {
+    if (srcBegin < 0 || srcBegin > srcEnd)
+      throw new StringIndexOutOfBoundsException(srcBegin);
+    if (srcEnd > value.length)
+      throw new StringIndexOutOfBoundsException(srcEnd);
+    if (dstBegin+srcEnd-srcBegin > dst.length)
+      throw new StringIndexOutOfBoundsException(dstBegin);
+    if (srcBegin < srcEnd)
+      System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
+  }
+
+  /** Return a char[] contain the characters of this string.
+   * It is unspecified if the result is a copy or shares with this FString.
+   */
+  public char[] toCharArray()
+  {
+    return value;
   }
 
   public FString copy (int start, int end)
@@ -118,26 +138,6 @@ public class FString extends AbstractString implements Printable, Externalizable
     string.getChars(0, string.length(), value, where);
   }
 
-  public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)
-  {
-    if (srcBegin < 0 || srcBegin > srcEnd)
-      throw new StringIndexOutOfBoundsException(srcBegin);
-    if (srcEnd > value.length)
-      throw new StringIndexOutOfBoundsException(srcEnd);
-    if (dstBegin+srcEnd-srcBegin > dst.length)
-      throw new StringIndexOutOfBoundsException(dstBegin);
-    if (srcBegin < srcEnd)
-      System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
-  }
-
-  /** Return a char[] contain the characters of this string.
-   * It is unspecified if the result is a copy or shares with this FString.
-   */
-  public char[] toCharArray()
-  {
-    return value;
-  }
-
   public int hashCode ()
   {
     /* Matches String.hashCode specification, as updated specification in
@@ -168,33 +168,10 @@ public class FString extends AbstractString implements Printable, Externalizable
 
   public void print (java.io.PrintWriter ps)
   {
-    boolean readable = (ps instanceof OutPort)
-      && ((OutPort)ps).printReadable;
-    int len = length();
-    if (readable)
-      {
-	ps.print ('\"');
-	for (int i = 0;  i < len; i++)
-	  {
-	    char ch = value[i];
-	    if ((ch == '\\' || ch == '\"'))
-	      ps.print ('\\');
-	    /*
-	    // These escapes are not standard Scheme,
-	    // so should probably not be enabled by default.
-	    else if (ch == '\n')
-	      { ps.print("\\n"); continue; }
-	    else if (ch == '\r')
-	      { ps.print("\\r"); continue; }
-	    else if (ch == '\t')
-	      { ps.print("\\t"); continue; }
-	    */
-	    ps.print (ch);
-	  }
-	ps.print ('\"');
-      }
+    if ((ps instanceof OutPort) && ((OutPort)ps).printReadable)
+      super.print(ps);
     else
-      ps.print(value);
+      ps.print(toString());
   }
 
   /** Return a new InPort that reads characters from this string. */

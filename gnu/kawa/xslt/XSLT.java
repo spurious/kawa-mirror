@@ -162,15 +162,6 @@ public class XSLT extends XQuery
       defineApplyTemplate(pattern, priority, mode, template);
   }
 
-  public static void process(String url, CallContext ctx)
-    throws Throwable
-  {
-    TreeList doc = Document.parse(url);
-    Focus pos = Focus.getCurrent();
-    pos.push(doc, 0);
-    process(doc, pos, ctx);
-  }
-
   public static void process(TreeList doc, Focus pos, CallContext ctx)
     throws Throwable
   {
@@ -222,14 +213,16 @@ public class XSLT extends XQuery
   public static void runStylesheet()
     throws Throwable
   {
+    CallContext ctx = CallContext.getInstance();
+    String base = CallContext.getBaseUriDefault();
     String[] args = kawa.repl.commandLineArgArray;
-    String inputFileName = null;
     for (int i = 0;  i < args.length;  i++)
       {
 	String arg = args[i];
-	CallContext ctx = CallContext.getInstance();
-	inputFileName = arg;
-	process(arg, ctx);
+	TreeList doc = Document.parse(Document.makeURL(arg, base));
+	Focus pos = Focus.getCurrent();
+	pos.push(doc, 0);
+	process(doc, pos, ctx);
       }
   }
 

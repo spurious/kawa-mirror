@@ -1,5 +1,8 @@
 2003-08-03  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseNodeTest):  Handle self:: and parent:: axies.
+	(parseNodeTest):  Handle '.' and '..'.
+
 	* XQParser.java (focusDefined):  Remove field.  Instead, just check
 	whether DOT_VARNAME is in scope.
 	(parseRelativePathExpr, parseStepQualifiers,
@@ -19,6 +22,7 @@
 	qualifiers depends on type of axis (forward, reverse, or none).
 	Second expression is also now a 3-argument LambdaExp.
 	Pass it DOT_VARNAME, POSITION_VARNAME, and LAST_VARNAME.
+
 	* XQuery.java (<init>):  Don't define position() - it is now
 	re-written at parse time to POSITION_VARNAME.
 

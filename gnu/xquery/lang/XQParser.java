@@ -1267,7 +1267,8 @@ public class XQParser extends LispReader // should be extends Lexer
     
     Expression exp;
     if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT
-	 || axis == AXIS_DESCENDANT_OR_SELF)
+	 || axis == AXIS_DESCENDANT_OR_SELF
+	 || axis == AXIS_SELF || axis == AXIS_PARENT)
 	&&
 	(curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
 	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
@@ -1298,6 +1299,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  op = DescendantAxis.make(predicate);
 	else if (axis == AXIS_DESCENDANT_OR_SELF)
 	  op = DescendantOrSelfAxis.make(predicate);
+	else if (axis == AXIS_SELF)
+	  op = SelfAxis.make(predicate);
+	else if (axis == AXIS_PARENT)
+	  op = ParentAxis.make(predicate);
 	else
 	  op = ChildAxis.make(predicate);
 	exp = new ApplyExp(new QuoteExp(op), args);
@@ -1399,7 +1404,23 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseStepExpr()
       throws java.io.IOException, SyntaxException
   {
-    int axis = peekOperand() - OP_AXIS_FIRST;
+    int axis;
+    if (curToken == '.' || curToken == DOTDOT_TOKEN)
+      {
+	axis = curToken == '.' ? AXIS_SELF : AXIS_PARENT;
+	getRawToken();
+	Declaration dotDecl = parser.lookup(DOT_VARNAME, -1);
+	if (dotDecl == null)
+	  error("node test when focus is undefined");
+	Expression exp = new ReferenceExp(DOT_VARNAME, dotDecl);
+	if (axis == AXIS_PARENT)
+	  {
+	    Expression[] args = { exp };
+	    exp = new ApplyExp(ParentAxis.make(anyNodeTest), args);
+	  }
+	return parseStepQualifiers(exp, axis);
+      }
+    axis = peekOperand() - OP_AXIS_FIRST;
     if (axis  >= 0 && axis < COUNT_OP_AXIS)
       {
 	getRawToken();

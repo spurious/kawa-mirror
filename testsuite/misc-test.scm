@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 108)
+(test-init "Miscellaneous" 109)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -451,6 +451,16 @@
 (test '|123| Long:toString (Long:new '00123))
 (define (to-int-string x) (java.lang.Object:toString (Long:new x)))
 (test '|124| to-int-string '00124)
+
+;;; Based on bug report 2002-12-3 from Petter &Ouml;sterlund <petos@fyrplus.se>
+(define (fie-6)
+ 6
+  (define (runn)
+    foo)
+  (define (foo)
+   'done)
+  (apply runn '())) 
+(test 'done 'call-fie-6 ((fie-6)))
 
 ;; Test instance?
 (test #t instance? 1 <number>)

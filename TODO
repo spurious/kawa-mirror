@@ -6,9 +6,13 @@ Get GuiConsole working for multiple windows.
 Provide a low-level Scheme interface to catch Java exceptions.
 Implement a higher-level Scheme catch/throw interface.
 
+Verify correctness for JDK 1.2beta.
+
 TO BE DONE FOR 2.0:
 
 Provide a way to write a "main" method in Scheme.
+
+Support presistence and serialization of Scheme values.
 
 Allow the type of an Expression to be other than Object.
 Use type declarations and (local) type inference.

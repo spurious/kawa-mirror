@@ -1,3 +1,13 @@
+2003-12-24  Per Bothner  <per@bothner.com>
+
+	* AttributeConstructor.java (setQName):  New method.
+	(make):  Don't bother interning the sname.
+	* ElementConstructor.java (qname):  Renamed field to 'type'
+	and changed its type to Object.
+	(getQName, getNamespaceURI, getLocalName):  Rewrite.
+	(setQName, getNamespaceNodes, setNamespaceNodes):  New methods.
+	(make, readExternal):  Don't bother interning the sname.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java (<init>):  Remove unneeded throws specifications.

@@ -21,6 +21,7 @@ implements Externalizable
   public String getXmlName() { return sname; }
 
   public Symbol getQName() { return qname; }
+  public void setQName(Symbol qname) { this.qname = qname; }
 
   public final String getNamespaceURI() { return qname.getNamespaceURI(); }
 
@@ -36,7 +37,7 @@ implements Externalizable
   public static AttributeConstructor make(String sname, Symbol qname)
   {
     AttributeConstructor result = new AttributeConstructor();
-    result.sname = sname.intern();
+    result.sname = sname;
     result.qname = qname;
     return result;
   }
@@ -44,7 +45,7 @@ implements Externalizable
   public static AttributeConstructor make(String sname, String namespaceURI, String localName)
   {
     AttributeConstructor result = new AttributeConstructor();
-    result.sname = sname.intern();
+    result.sname = sname;
     result.qname = Symbol.make(namespaceURI, localName);
     return result;
   }

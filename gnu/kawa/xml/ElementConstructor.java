@@ -15,16 +15,53 @@ implements Externalizable
   /** XML source name - e.g. "PREFIX:LOCAL". */
   String sname;
 
-  Symbol qname;
+  Object type;
 
   /** Get name is XML source syntax - i.e. "PREFIX:LOCAL". */
-  public String getXmlName() { return sname; }
+  public String getXmlName()
+  {
+    return sname;
+  }
 
-  public Symbol getQName() { return qname; }
+  public Symbol getQName()
+  {
+    if (type instanceof XName)
+      return ((XName) type).getQName();
+    else
+      return (Symbol) type;
+  }
 
-  public final String getNamespaceURI() { return qname.getNamespaceURI(); }
+  public void setQName(Symbol qname)
+  {
+    if (type instanceof XName)
+      ((XName) type).setQName(qname);
+    else
+      type = qname;
+  }
 
-  public final String getLocalName() { return qname.getLocalName(); }
+  public NamespaceBinding getNamespaceNodes ()
+  {
+    return type instanceof XName ? ((XName) type).getNamespaceNodes() : null;
+  }
+
+  public void setNamespaceNodes (NamespaceBinding bindings)
+  {
+    if (type instanceof XName)
+      ((XName) type).setNamespaceNodes(bindings);
+    else
+      {
+	XName xname = new XName();
+	xname.setNamespaceNodes(bindings);
+	xname.setQName((Symbol) type);
+	type = xname;
+      }
+  }
+
+  public final String getNamespaceURI()
+  { return getQName().getNamespaceURI(); }
+
+  public final String getLocalName()
+  { return getQName().getLocalName(); }
 
   public final String getPrefix()
   {
@@ -36,16 +73,16 @@ implements Externalizable
   public static ElementConstructor make(String sname, Symbol qname)
   {
     ElementConstructor result = new ElementConstructor();
-    result.sname = sname.intern();
-    result.qname = qname;
+    result.sname = sname;
+    result.type = qname;
     return result;
   }
 
   public static ElementConstructor make(String sname, String namespaceURI, String localName)
   {
     ElementConstructor result = new ElementConstructor();
-    result.sname = sname.intern();
-    result.qname = Symbol.make(namespaceURI, localName);
+    result.sname = sname;
+    result.type = Symbol.make(namespaceURI, localName);
     return result;
   }
 
@@ -55,7 +92,7 @@ implements Externalizable
     Consumer out = pushNodeContext(ctx);
     try
       {
-	out.beginGroup(sname, qname);
+	out.beginGroup(sname, type);
 	Object endMarker = Symbol.UNBOUND;
 	for (;;)
 	  {
@@ -84,7 +121,7 @@ implements Externalizable
     CodeAttr code = comp.getCode();
     code.emitLoad(consumer);
     comp.compileConstant(sname, Target.pushObject);
-    comp.compileConstant(qname, Target.pushObject);
+    comp.compileConstant(type, Target.pushObject);
     code.emitInvokeInterface(beginGroupMethod);
     for (int i = 0;  i < nargs;  i++)
       compileChild(args[i], comp, target);
@@ -95,7 +132,7 @@ implements Externalizable
 
   public String toString()
   {
-    return "#<ElementConstructor "+sname+" :: "+qname+'>';
+    return "#<ElementConstructor "+sname+" :: "+type+'>';
   }
 
 
@@ -107,14 +144,14 @@ implements Externalizable
   public void writeExternal(ObjectOutput out) throws IOException
   {
     out.writeObject(sname);
-    out.writeObject(qname);
+    out.writeObject(type);
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    sname = ((String) in.readObject()).intern();
-    qname = (Symbol) in.readObject();
+    sname = (String) in.readObject();
+    type = in.readObject();
   }
 
 }

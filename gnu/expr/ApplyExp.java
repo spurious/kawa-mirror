@@ -198,8 +198,8 @@ public class ApplyExp extends Expression
     if (func_lambda != null)
       {
 	// These error message should really be done earlier,
-	// but we do not have the right information until
-	// the rewrite pass is finished.
+	// but we do not have the right information until the rewrite pass
+	// is finished.  Perhaps InlineCalls would work?  FIXME
         String msg = null;
 	if (args_length < func_lambda.min_args)
           msg = "too few args for ";
@@ -236,12 +236,7 @@ public class ApplyExp extends Expression
         if (msg != null)
           {
             comp.error('w', msg + func_name);
-            if (exp_func instanceof ReferenceExp)
-              {
-                func_lambda = null;
-                exp_func
-                  = new ReferenceExp(((ReferenceExp) exp_func).getName());
-              }
+	    func_lambda = null;
           }
       }
 

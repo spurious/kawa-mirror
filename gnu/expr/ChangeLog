@@ -1,3 +1,8 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* ApplyExpr.java (compile):  After too many/few-arguments message,
+	set exp_lambda to 0, but don't make a new ReferenceExp.
+
 2001-03-09  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (<init>):  Add a debugging hook.

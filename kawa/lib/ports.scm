@@ -15,6 +15,15 @@
   ((primitive-virtual-method <string> "open" <input-port> ())
    string))
 
+(define (open-output-string) <string-output-port>
+  ((primitive-constructor  <string-output-port> ())))
+
+(define (get-output-string (output-port  <string-output-port>))
+  ((primitive-constructor <string> (<char[]>))
+   ((primitive-virtual-method <string-output-port> "toCharArray"
+                              <char[]> ())
+    output-port)))
+
 (define (call-with-input-string str proc)
   (let* ((port
 	  ((primitive-virtual-method <string> "open" <input-port> ())

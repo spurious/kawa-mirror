@@ -2,29 +2,19 @@
   (instance? x <kawa.lang.Char>))
 
 (define (char-alphabetic? (char <char>))
-  ((primitive-static-method <java.lang.Character> "isLetter"
-			     <boolean> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "isLetter" char))
 
 (define (char-numeric? (char <char>))
-  ((primitive-static-method <java.lang.Character> "isDigit"
-			     <boolean> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "isDigit" char))
 
 (define (char-whitespace? (char <char>))
-  ((primitive-static-method <java.lang.Character> "isSpace"
-			     <boolean> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "isSpace" char))
 
 (define (char-upper-case? (char <char>))
-  ((primitive-static-method <java.lang.Character> "isUpperCase"
-			     <boolean> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "isUpperCase" char))
 
 (define (char-lower-case? (char <char>))
-  ((primitive-static-method <java.lang.Character> "isLowerCase"
-			     <boolean> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "isLowerCase" char))
 
 (define (char->integer (char <char>))
   ((primitive-virtual-method <kawa.lang.Char> "intValue"
@@ -32,16 +22,10 @@
    char))
 
 (define (integer->char (n <int>))
-  ((primitive-static-method <kawa.lang.Char> "make"
-			    <kawa.lang.Char> (<int>))
-   n))
+  (invoke-static <kawa.lang.Char> "make" n))
 
 (define (char-upcase (char <char>))
-  ((primitive-static-method <java.lang.Character> "toUpperCase"
-			    <char> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "toUpperCase" char))
 
 (define (char-downcase (char <char>))
-  ((primitive-static-method <java.lang.Character> "toLowerCase"
-			    <char> (<char>))
-   char))
+  (invoke-static <java.lang.Character> "toLowerCase" char))

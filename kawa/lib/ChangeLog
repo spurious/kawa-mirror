@@ -1,3 +1,9 @@
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	* ports.scm (open-output-string, get-output-string):  New procedures.
+	* characters.scm, vectors.scm:  Use invoke and invoke-static.
+	* strings.scm (make-string):  Use (make <string> ...).
+
 1999-10-25  Per Bothner  <per@bothner.com>
 
 	* kawa/lib/ports.scm (open-input-string):  New procedure. 

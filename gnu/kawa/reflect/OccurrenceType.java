@@ -10,7 +10,7 @@ import gnu.expr.*;
 
 /** A type that matches some number of repetitions of a basetype. */
 
-public class OccurrenceType extends Type
+public class OccurrenceType extends ObjectType
   implements Externalizable, TypeValue
 {
   Type base;
@@ -120,6 +120,38 @@ public class OccurrenceType extends Type
     out.writeObject(base);
     out.writeInt(minOccurs);
     out.writeInt(maxOccurs);
+  }
+
+  public String toString ()
+  {
+    String b = base.toString();
+    boolean parens = b == null || b.indexOf(' ') >= 0;
+    StringBuffer sbuf = new StringBuffer();
+    if (parens)
+      sbuf.append('(');
+    sbuf.append(b);
+    if (parens)
+      sbuf.append(')');
+    if (minOccurs == 1 && maxOccurs == 1)
+      ;
+    else if (minOccurs == 0 && maxOccurs == 1)
+      sbuf.append('?');
+    else if (minOccurs == 1 && maxOccurs == -1)
+      sbuf.append('+');
+    else if (minOccurs == 0 && maxOccurs == -1)
+      sbuf.append('*');
+    else
+      {
+	sbuf.append('{');
+	sbuf.append(minOccurs);
+	sbuf.append(',');
+	if (maxOccurs >= 0)
+	  sbuf.append(maxOccurs);
+	else
+	  sbuf.append('*');
+	sbuf.append('}');
+      }
+    return sbuf.toString();
   }
 
   public void readExternal(ObjectInput in)

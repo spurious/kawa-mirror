@@ -44,6 +44,11 @@ public class Environment extends NameMap implements Externalizable
     return previous;
   }
 
+  public void setPrevious (Environment previous)
+  {
+    this.previous = previous;
+  }
+
   static final Hashtable envTable = new Hashtable(50);
   static final Environment EmptyNamespace = getInstance("");
 

@@ -1,5 +1,7 @@
 2003-10-07  Per Bothner  <per@bothner.com>
 
+	* Environment.java (setPrevious):  New method.
+
 	* Values.java (equals):  Remove - for now use inherited method,
 	which for a Value just compares identity.
 

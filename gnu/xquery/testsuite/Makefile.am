@@ -11,6 +11,7 @@ java_sources = TestMisc.java TestSuite.java
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   auction.xml.in outline.xml.in usemod.xql mod1.xql mod2.xql \
+  bad-1.xql expected-1.errs \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
 
@@ -73,5 +74,13 @@ check-mod: usemod.class
 	  then echo '# usemod test passes'; \
 	  else echo FAIL usemod test; fi
 
+bad-1.log: $(srcdir)/bad-1.xql
+	-CLASSPATH=$(KAWALIB) $(KAWA) -C $< 2>&1 \
+	| sed -e '1d' -e 's|^.*/bad-1.xql|bad-1.xql|' >bad-1.log
+check-bad-1: bad-1.log
+	@if diff -b $(srcdir)/expected-1.errs bad-1.log; \
+	  then echo '# bad-1 test passes'; \
+	  else echo FAIL bad-1 test; fi
+
 check:  check-misc check-suite check-maketab1 check-multab check-descend \
-	  check-format-users check-mod
+	  check-format-users check-mod check-bad-1

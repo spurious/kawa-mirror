@@ -379,8 +379,8 @@ public class TestMisc
     evalTest("+ +", "*** syntax error - <string>:1:3: missing expression");
 
     evalTest("declare namespace x1='XXX",
-	     "*** caught SyntaxException - <string>:1:26: "
-	     + "unexpected end-of-file in string");
+	     "*** caught SyntaxException - <string>:1:22: "
+	     + "unexpected end-of-file in string starting here");
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");

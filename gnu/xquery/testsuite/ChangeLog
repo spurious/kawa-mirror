@@ -1,3 +1,12 @@
+2004-12-12  Per Bothner  <per@bothner.com>
+
+	* bad-1.xql: New bad-syntax test.
+	* expected-1.errs: Expected error output.
+	* Makefile.am: Update accordingly.
+	(bad-1.log, check-bad-1): New rules.
+
+	* TestMisc.java: Update for improved error locations.
+
 2004-12-11  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Update 'instanceof' instance of'.

@@ -1,4 +1,3 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
@@ -265,11 +264,11 @@ public class Convert
   {
     // We assume that if collections are available the Double.parseDouble
     // is also available.
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     return Double.parseDouble(str);
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // return Double.valueOf(str).doubleValue();
-    /* END JAVA1 */
+    /* #endif */
   }
 }

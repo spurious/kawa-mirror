@@ -8,9 +8,9 @@ import java.io.*;
 
 public class S16Vector extends SimpleVector
   implements Externalizable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   short[] data;
   protected static short[] empty = new short[0];

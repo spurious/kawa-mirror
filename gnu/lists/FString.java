@@ -11,9 +11,9 @@ import java.io.*;
 
 public class FString extends SimpleVector
 implements CharSeq, Externalizable, Consumable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   public char[] data;
   protected static char[] empty = new char[0];

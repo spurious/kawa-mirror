@@ -1,4 +1,3 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 

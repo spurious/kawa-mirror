@@ -1,4 +1,3 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 package gnu.lists;
@@ -23,9 +22,9 @@ import java.util.NoSuchElementException;
 
 public class SeqPosition
 implements
-/* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     java.util.ListIterator,
-/* END JAVA2 */
+    /* #endif */
     java.util.Enumeration
 {
   /**

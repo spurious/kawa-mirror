@@ -1,3 +1,12 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java, Convert.java, EofClass.java, F32Vector.java,
+	F64Vector.java, FString.java, FVector.java, LList.java, Pair.java,
+	S16Vector.java, S32Vector.java, S64Vector.java, S8Vector.java,
+	SeqPosition.java, Sequence.java, SimpleVector.java, TreeList.java,
+	U16Vector.java, U32Vector.java, U64Vector.java, U8Vector.java:
+	Change "select" (preprocessor) syntax.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* LList.java (compareTo):  Move comment, so it doesn't get

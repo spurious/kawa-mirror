@@ -1,4 +1,3 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
@@ -19,9 +18,9 @@ package gnu.lists;
 
 public interface Sequence
 extends
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     java.util.List,
-    /* END JAVA2 */
+    /* #endif */
     Consumable
 {
   /** Special magic end-of-file marker. */

@@ -184,7 +184,7 @@ public class Pair extends LList implements Externalizable
       }
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   static public int compareTo (Pair pair1, Pair pair2)
   {
     if (pair1 == pair2)
@@ -222,7 +222,7 @@ public class Pair extends LList implements Externalizable
     else
       return compareTo(this, (Pair) obj);
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public Object get (int index)
   {

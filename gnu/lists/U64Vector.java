@@ -8,9 +8,9 @@ import java.io.*;
 
 public class U64Vector extends SimpleVector
   implements Externalizable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   long[] data;
 

@@ -8,9 +8,9 @@ import java.io.*;
 
 public class F32Vector extends SimpleVector
   implements Externalizable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   float[] data;
   protected static float[] empty = new float[0];

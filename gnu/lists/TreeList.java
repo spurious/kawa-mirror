@@ -14,9 +14,9 @@ package gnu.lists;
 
 public class TreeList extends AbstractSequence
   implements
-  /* BEGIN JAVA5 */
+  /* #ifdef JAVA5 */
   // Appendable,
-  /* END JAVA5 */
+  /* #endif */
   XConsumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
@@ -713,7 +713,7 @@ public class TreeList extends AbstractSequence
     gapStart = i + length;
   }
 
-  /* BEGIN JAVA5 */
+  /* #ifdef JAVA5 */
   // public Appendable append (char c)
   // {
     // writeChar(c);
@@ -735,7 +735,7 @@ public class TreeList extends AbstractSequence
       // append(csq.charAt(i));
     // return this;
   // }
-  /* END JAVA5 */
+  /* #endif */
 
   public boolean isEmpty()
   {

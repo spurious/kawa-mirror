@@ -18,9 +18,9 @@ import java.io.*;
 
 public class LList extends ExtSequence
   implements Sequence, Externalizable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   /** Do not use - only public for serialization! */
   public LList () { }
@@ -78,12 +78,12 @@ public class LList extends ExtSequence
     return this == obj;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public int compareTo(Object obj)
   { // Over-ridden in Pair!
     return obj == Empty ? 0 : -1;
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public int size()
   {
@@ -215,7 +215,7 @@ public class LList extends ExtSequence
     return count;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public static LList makeList (java.util.List vals)
   {
     java.util.Iterator e = vals.iterator();
@@ -232,8 +232,8 @@ public class LList extends ExtSequence
       }
     return result;
   }
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // public static LList makeList (Sequence vals)
   // {
     // java.util.Enumeration e = ((AbstractSequence) vals).elements();
@@ -250,7 +250,7 @@ public class LList extends ExtSequence
       // }
     // return result;
   // }
-  /* END JAVA1 */
+  /* #endif */
 
   public static LList makeList (Object[] vals, int offset, int length)
   {

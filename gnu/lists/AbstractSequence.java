@@ -1,11 +1,10 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-/* BEGIN JAVA2 */
+/* #ifdef JAVA2 */
 import java.util.*;
-/* END JAVA2 */
+/* #endif */
 import java.util.Enumeration;
 
 /**
@@ -72,12 +71,12 @@ public abstract class AbstractSequence
   protected RuntimeException unsupported (String text)
   {
     text = getClass().getName() + " does not implement " + text;
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     return new UnsupportedOperationException(text);
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // throw new RuntimeException(text);
-    /* END JAVA1 */
+    /* #endif */
   }
 
   public Object set(int index, Object element)
@@ -170,7 +169,7 @@ public abstract class AbstractSequence
     return indexOf(o) >= 0;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   /** See java.util.List. */
   public boolean containsAll(Collection c)
   {
@@ -183,7 +182,7 @@ public abstract class AbstractSequence
       }
     return true;
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public final Enumeration elements()
   {
@@ -205,7 +204,7 @@ public abstract class AbstractSequence
     return new SeqPosition(this, copyPos(ipos));
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public final Iterator iterator()
   {
     return getIterator();
@@ -220,7 +219,7 @@ public abstract class AbstractSequence
   {
     return getIterator(index);
   }
-  /* END JAVA2 */
+  /* #endif */
 
   /** Add a value at a specified Pos.
    * @return the updated Pos, which is after the inserted value..
@@ -245,7 +244,7 @@ public abstract class AbstractSequence
     releasePos(pos);
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   /** See java.util.Collection. */
   public boolean addAll(Collection c)
   {
@@ -265,8 +264,8 @@ public abstract class AbstractSequence
     releasePos(pos);
     return changed;
   }
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // public boolean addAll(Sequence c)
   // {
     // return addAll(size(), c);
@@ -284,7 +283,7 @@ public abstract class AbstractSequence
     // releasePos(pos);
     // return changed;
   // }
-  /* END JAVA1 */
+  /* #endif */
 
   /**
    * Remove one or more elements.
@@ -342,7 +341,7 @@ public abstract class AbstractSequence
     return true;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public boolean removeAll(Collection c)
   {
     boolean changed = false;
@@ -372,7 +371,7 @@ public abstract class AbstractSequence
       }
     return changed;
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public void clear()
   {
@@ -709,41 +708,41 @@ public abstract class AbstractSequence
   {
     // Compatible with the Collections specification.
     // FIXME should also depend on class?
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (! (this instanceof java.util.List)
 	|| ! (o instanceof java.util.List))
       return this == o;
     Iterator it1 = iterator();
     Iterator it2 = ((java.util.List) o).iterator();
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // if (! (this instanceof Sequence) || ! (o instanceof Sequence))
       // return this == o;
     // Enumeration it1 = elements();
     // Enumeration it2 = ((Sequence) o).elements();
-    /* END JAVA1 */
+    /* #endif */
     for (;;)
       {
-	/* BEGIN JAVA2 */
+	/* #ifdef JAVA2 */
         boolean more1 = it1.hasNext();
         boolean more2 = it2.hasNext();
-	/* END JAVA2 */
-	/* BEGIN JAVA1 */
+	/* #endif */
+	/* #ifndef JAVA2 */
         // boolean more1 = it1.hasMoreElements();
         // boolean more2 = it2.hasMoreElements();
-	/* END JAVA1 */
+	/* #endif */
         if (more1 != more2)
           return false;
         if (! more1)
           return true;
-	/* BEGIN JAVA2 */
+	/* #ifdef JAVA2 */
         Object e1 = it1.next();
         Object e2 = it2.next();
-	/* END JAVA2 */
-	/* BEGIN JAVA1 */
+	/* #endif */
+	/* #ifndef JAVA2 */
         // Object e1 = it1.nextElement();
         // Object e2 = it2.nextElement();
-	/* END JAVA1 */
+	/* #endif */
         if (e1 == null)
           {
             if (e2 != null)
@@ -764,14 +763,14 @@ public abstract class AbstractSequence
     return new SubSequence(this, ipos0, ipos1);
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public List subList(int fromIx, int toIx)
   {
     return new SubSequence(this,
 			   createPos(fromIx, false),
 			   createPos(toIx, true));
   }
-  /* END JAVA2 */
+  /* #endif */
 
   /** Copy an element specified by a position pair to a Consumer.
    * @return if hasNext(ipos). */

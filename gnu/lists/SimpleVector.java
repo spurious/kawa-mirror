@@ -1,11 +1,10 @@
-// -*-Java-*-
 // Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-/* BEGIN JAVA2 */
+/* #ifdef JAVA2 */
 import java.util.*;
-/* END JAVA2 */
+/* #endif */
 
 /** A SimpleVector implement as a simple array plus a current size.
  *
@@ -205,7 +204,7 @@ public abstract class SimpleVector extends AbstractSequence
     set(index, o);
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public boolean addAll(int index, Collection c)
   {
     boolean changed = false;
@@ -219,8 +218,8 @@ public abstract class SimpleVector extends AbstractSequence
       }
     return changed;
   }
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // public boolean addAll(int index, Sequence c)
   // {
     // boolean changed = false;
@@ -234,7 +233,7 @@ public abstract class SimpleVector extends AbstractSequence
       // }
     // return changed;
   // }
-  /* END JAVA1 */
+  /* #endif */
 
   protected abstract void clearBuffer(int start, int count);
 
@@ -299,7 +298,7 @@ public abstract class SimpleVector extends AbstractSequence
     return true;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public boolean removeAll(Collection c)
   {
     boolean changed = false;
@@ -343,7 +342,7 @@ public abstract class SimpleVector extends AbstractSequence
     setSize(j);
     return changed;
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public void clear ()
   {

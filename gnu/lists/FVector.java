@@ -8,9 +8,9 @@ import java.io.*;
 
 public class FVector extends SimpleVector
   implements Externalizable, Consumable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   public Object[] data;
 
@@ -46,20 +46,20 @@ public class FVector extends SimpleVector
     this.data = data;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public FVector(java.util.List seq)
   {
     this.data = new Object[seq.size()];
     addAll(seq);
   }
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // public FVector(Sequence seq)
   // {
     // this.data = new Object[seq.size()];
     // addAll(seq);
   // }
-  /* END JAVA1 */
+  /* #endif */
 
   /** Get the allocated length of the data buffer. */
   public int getBufferLength()
@@ -128,7 +128,7 @@ public class FVector extends SimpleVector
     return true;
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public int compareTo(Object obj)
   {
     FVector vec2 = (FVector) obj;
@@ -147,7 +147,7 @@ public class FVector extends SimpleVector
       }
     return n1 - n2;
   }
-  /* END JAVA2 */
+  /* #endif */
 
   /*
   public final void setElementAt (Object new_value, int index)

@@ -8,9 +8,9 @@ import java.io.*;
 
 public class F64Vector extends SimpleVector
   implements Externalizable
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   , Comparable
-  /* END JAVA2 */
+  /* #endif */
 {
   double[] data;
   protected static double[] empty = new double[0];

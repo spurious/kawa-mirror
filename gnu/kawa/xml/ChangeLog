@@ -1,3 +1,11 @@
+2003-10-16  Per Bothner  <per@bothner.com>
+
+	* Nodes.java (getSeq, getPos):  New convenience functions.
+	* IntersectNodes.java:  New class, extends Procedure2.
+	* Makefile.am:  Update accordingly.
+
+	* UnionNodes.java:  It implements Inlineable.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* Nodes.java (get):  Fix off-by-one bug.

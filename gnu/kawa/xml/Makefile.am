@@ -22,6 +22,7 @@ java_sources = \
   FollowingAxis.java \
   FollowingSiblingAxis.java \
   HttpPrinter.java \
+  IntersectNodes.java \
   IteratorItems.java \
   ListItems.java \
   MakeResponseHeader.java \

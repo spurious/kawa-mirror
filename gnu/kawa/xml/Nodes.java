@@ -217,6 +217,34 @@ public class Nodes extends Values
 			    getIntN(i+3));
   }
 
+  /** Optimization of ((SeqPosition) get(index)).sequence.
+   * However returns null instead of throwing IndexOutOfBoundsException
+   * if index >= count. */
+  public AbstractSequence getSeq (int index)
+  {
+    int i = POS_SIZE * index;
+    if (i >= gapStart)
+      i += gapEnd - gapStart;
+    if (i < 0 || i >= data.length)
+      return null;
+    // Inline of: return getPosNext(i << 1)
+    if (data[i] != POSITION_PAIR_FOLLOWS)
+      throw new RuntimeException("internal error - unexpected data");
+    return (AbstractSequence) objects[getIntN(i+1)];
+  }
+
+  /** Optimization of ((SeqPosition) get(index)). ipos. */
+  public int getPos (int index)
+  {
+    int i = POS_SIZE * index;
+    if (i >= gapStart)
+      i += gapEnd - gapStart;
+    // Inline of: return getPosNext(i << 1)
+    if (data[i] != POSITION_PAIR_FOLLOWS)
+      throw new RuntimeException("internal error - unexpected data");
+    return getIntN(i+3);
+  }
+
   private static SeqPosition root (AbstractSequence seq, int ipos)
   {
     int end = seq.endPos();

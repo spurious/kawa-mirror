@@ -11,7 +11,7 @@ import gnu.kawa.functions.AppendValues;
  * Implements the XQuery '|' or 'union' operator.
  */
 
-public class UnionNodes extends Procedure2
+public class UnionNodes extends Procedure2 implements Inlineable
 {
   public static final UnionNodes unionNodes = new UnionNodes();
 

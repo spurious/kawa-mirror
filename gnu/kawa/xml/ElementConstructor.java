@@ -98,16 +98,8 @@ implements Inlineable, Externalizable
   public static void compileUsingNodeTree(Expression exp,
 					  Compilation comp, Target target)
   {
-    CodeAttr code = comp.getCode();
-    Scope scope = code.pushScope();
-    Variable node = scope.addVariable(code, typeNodeTree, null);
-    ConsumerTarget ctarget = new ConsumerTarget(node);
-    code.emitInvokeStatic(typeNodeTree.getDeclaredMethod("make", 0));
-    code.emitStore(node);
-    exp.compile(comp, ctarget);
-    code.emitLoad(node);
-    code.popScope();
-    target.compileFromStack(comp, typeNodeTree);
+    Method makeMethod = typeNodeTree.getDeclaredMethod("make", 0);
+    ConsumerTarget.compileUsingConsumer(exp, comp, target, makeMethod, null);
   }
 
   public Type getReturnType (Expression[] args)

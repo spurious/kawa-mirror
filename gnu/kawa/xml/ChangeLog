@@ -1,3 +1,8 @@
+2003-07-26  Per Bothner  <per@bothner.com>
+
+	* ElementConstructor.java (compileUsingNodeTree):  Use new
+	ConsumerTarget.compileUsingConsumer helper method.
+
 2003-07-23  Per Bothner  <per@bothner.com>
 
 	* NodeCompare.java:  New class, extends Procedure2.

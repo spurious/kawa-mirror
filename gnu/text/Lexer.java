@@ -91,7 +91,7 @@ public class Lexer extends Reader
   public boolean seenErrors()
   { return messages != null && messages.seenErrors(); }
 
-  public void clearErrors() { if (messages != null) messages.errorCount = 0; }
+  public void clearErrors() { if (messages != null) messages.clearErrors(); }
 
   public void error(char severity, String filename, int line, int column,
 		    String message)

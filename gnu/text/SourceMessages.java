@@ -8,7 +8,7 @@ package gnu.text;
 public class SourceMessages
 {
   // Number of errors (not counting warnings).  A value of 1000 is "fatal".
-  int errorCount;
+  private int errorCount = 0;
 
   SourceError firstError;
   SourceError lastError;

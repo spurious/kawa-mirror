@@ -1,3 +1,8 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* SourceMessages.java (errorCount):  Make private.
+	* Lexer.java (clearErrors):  Use SourceMessages.errorCount method.
+
 1999-12-10  Per Bothner  <per@bothner.com>
 
 	* NullReader.java, CharArrayInPort.java:  Moved from kawa/lang.

@@ -1,3 +1,32 @@
+Tue Mar 10 20:01:37 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/ApplyExp.java (getFunction):  New method.
+	* kawa/lang/PrimArrayNew.java (compile):  Fix compile target type bug.
+	* kawa/lang/PrimProcedure.java (applyN):  Use coerced args values.
+	* kawa/lang/PrimArraySet.java (compile):  Convert value.
+
+	* kawa/standard/Scheme.java (getTypeValue):  New static method.
+	(initScheme):  Add "constant-fold", "system", and more.  Minor fixes.
+	* kawa/standard/Makefile.am:  Update.
+	* kawa/standard/constant_fold.java:  New Syntax.
+	* kawa/standard/{convert.java,instance.java}:  Use Scheme.getTypeValue.
+	Various small fixes and improvements.
+
+Mon Mar  9 17:53:33 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/SysInPort.java:  New TtyInPort class.
+	* kawa/lang/InPort.java (systemInPort, defaultInPort):  Replace inp.
+	(systemInPort):  Is now a SysInPort, instead of TtyInPort.
+	* kawa/lang/Makefile.am:  Update accordingly.
+
+	* kawa/lang/PairWithPosition.java:  Line and column nums are 1-origin.
+
+	* kawa/lang/PrimProcedure.java (compile):  Renamed for gnu.bytecode.
+
+	* kawa/lang/ReferenceExp.java (getName, getBinding):  New methods.
+	* kawa/lang/PrimArraySet.java (apply3):  Convert value.
+	* kawa/lang/SetFieldProc.java (apply2):  Add type convertion.
+
 Tue Mar  3 11:51:08 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in (AC_OUTPUT):  Generate kawa/Version.java.

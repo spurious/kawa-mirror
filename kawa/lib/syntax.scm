@@ -39,3 +39,64 @@
 		   <kawa.lang.NamedException> "applyHandler"
 		   <object> (<object> <function>))
 		  ex key handler))))
+
+;; SRFI-11  Copyright (C) Lars T Hansen (1999). All Rights Reserved.
+
+;; This document and translations of it may be copied and furnished to
+;; others, and derivative works that comment on or otherwise explain
+;; it or assist in its implementation may be prepared, copied,
+;; published and distributed, in whole or in part, without restriction
+;; of any kind, provided that the above copyright notice and this
+;; paragraph are included on all such copies and derivative
+;; works. However, this document itself may not be modified in any
+;; way, such as by removing the copyright notice or references to the
+;; Scheme Request For Implementation process or editors, except as
+;; needed for the purpose of developing SRFIs in which case the
+;; procedures for copyrights defined in the SRFI process must be
+;; followed, or as required to translate it into languages other than
+;; English.
+
+;; The limited permissions granted above are perpetual and will not be
+;; revoked by the authors or their successors or assigns.
+
+;; This document and the information contained herein is provided on
+;; an "AS IS" basis and THE AUTHOR AND THE SRFI EDITORS DISCLAIM ALL
+;; WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
+;; WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE
+;; ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS
+;; FOR A PARTICULAR PURPOSE.
+
+(define-syntax let-values
+  (syntax-rules ()
+    ((let-values (?binding ...) ?body0 ?body1 ...)
+     (let-values "bind" (?binding ...) () (begin ?body0 ?body1 ...)))
+    
+    ((let-values "bind" () ?tmps ?body)
+     (let ?tmps ?body))
+    
+    ((let-values "bind" ((?b0 ?e0) ?binding ...) ?tmps ?body)
+     (let-values "mktmp" ?b0 ?e0 () (?binding ...) ?tmps ?body))
+    
+    ((let-values "mktmp" () ?e0 ?args ?bindings ?tmps ?body)
+     (call-with-values 
+       (lambda () ?e0)
+       (lambda ?args
+         (let-values "bind" ?bindings ?tmps ?body))))
+    
+    ((let-values "mktmp" (?a . ?b) ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
+     (let-values "mktmp" ?b ?e0 (?arg ... x) ?bindings (?tmp ... (?a x)) ?body))
+    
+    ((let-values "mktmp" ?a ?e0 (?arg ...) ?bindings (?tmp ...) ?body)
+     (call-with-values
+       (lambda () ?e0)
+       (lambda (?arg ... . x)
+         (let-values "bind" ?bindings (?tmp ... (?a x)) ?body))))))
+
+(define-syntax let*-values
+  (syntax-rules ()
+    ((let*-values () ?body0 ?body1 ...)
+     (begin ?body0 ?body1 ...))
+
+    ((let*-values (?binding0 ?binding1 ...) ?body0 ?body1 ...)
+     (let-values (?binding0)
+       (let*-values (?binding1 ...) ?body0 ?body1 ...)))))

@@ -1,3 +1,8 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* syntax.scm:  Add Lars T Hansen's implementation of let-values
+	and let*values.  [srfi-11]
+
 Weiqi Gao <weiqigao@networkusa.net>
 
 	* ports.scm (set-input-port-line-number!):  Fix typo.

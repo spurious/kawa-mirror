@@ -27,35 +27,44 @@ public class CallContext implements Runnable
     return Environment.global;
   }
 
-  /** Get or create a CallContext for the current thread. */
-  public static CallContext getInstance()
+  public static void setInstance(CallContext ctx)
   {
-    CallContext ctx;
+    Thread thread = Thread.currentThread();
+    ctx.currentThread = thread; 
 @if WITH REFERENCES@
-    Object thloc = currentContext.get();
-    if (thloc == null)
-      {
-	ctx = new CallContext();
-	ctx.currentThread = Thread.currentThread();
-	currentContext.set(ctx);
-      }
+    currentContext.set(ctx);
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+    if (thread instanceof Future)
+      ((Future) thread).context = ctx;
     else
-      ctx = (CallContext) thloc;
+      threadMap.put(thread, ctx);
+@endif WITHOUT REFERENCES@
+  }
+
+  /** Get but don't create a CallContext for the current thread. */
+  public static CallContext getOnlyInstance()
+  {
+@if WITH REFERENCES@
+    return (CallContext) currentContext.get();
 @endif WITH REFERENCES@
 @if WITHOUT REFERENCES@
     Thread thread = Thread.currentThread();
     if (thread instanceof Future)
       return ((Future) thread).getCallContext();
-    Object thloc = threadMap.get(thread);
-    if (thloc == null)
+    return (CallContext) threadMap.get(thread);
+@endif WITHOUT REFERENCES@
+  }
+
+  /** Get or create a CallContext for the current thread. */
+  public static CallContext getInstance()
+  {
+    CallContext ctx = getOnlyInstance();
+    if (ctx == null)
       {
 	ctx = new CallContext();
-	ctx.currentThread = thread;
-	threadMap.put(thread, ctx);
+	setInstance(ctx);
       }
-    else
-      ctx = (CallContext) thloc;
-@endif WITHOUT REFERENCES@
     return ctx;
   }
 

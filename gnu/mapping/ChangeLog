@@ -1,3 +1,8 @@
+2002-02-14  Per Bothner  <per@bothner.com>
+
+	* CallContext.java.in (getOnlyInstance, setInstance):  New methods.
+	(getInstance):  Use getOnlyInstance and setInstance/
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* CallContext.java:  Removed to CallContext.java.in.

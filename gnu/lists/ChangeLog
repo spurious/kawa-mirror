@@ -1,3 +1,21 @@
+2003-08-02  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (firstAttributePos):  New method.
+	* TreeList.java (firstAttributePos):  New method.
+
+	* AttributePredicate.java (isInstance):  Remove xpos parameter.
+
+	* TreeList.java (createPos):  Just call createRelativePos.
+	(createRelativePos):  Fix some corner cases.
+
+	* TreeList.java (posToDataIndex):  Fix some corner cases.
+
+	* TreeList.java (copyToList):  New method.
+	This is a kludge, since it creates a gnu.xml.NodeTree.
+	(getPosNext):  Use use copyToList when copying to new TreeList.
+
+	* TreeList.java (compare):  Simplify and fix using posToDataIndex.
+
 2003-07-26  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (POSITION_PAIR_FOLLOWS):  Make protected.

@@ -9,6 +9,6 @@ package gnu.lists;
 
 public interface AttributePredicate extends NodePredicate
 {
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
+  public boolean isInstance(AbstractSequence seq, int ipos,
 			    Object attributeType);
 }

@@ -670,20 +670,7 @@ implements Consumer, PositionConsumer, Consumable
 
   public int createPos(int index, boolean isAfter)
   {
-    if (isAfter)
-      {
-	if (index == 0)
-	  return 1;
-	index--;
-      }
-    int i = 0;
-    while (--index >= 0)
-      {
-	i = nextDataIndex(i);
-	if (i < 0)
-	  throw new IndexOutOfBoundsException();
-      }
-    return isAfter ? ((i + 1) << 1) | 1 : (i << 1);
+    return createRelativePos(0, index, isAfter);
   }
 
   public final int posToDataIndex (int ipos)
@@ -693,12 +680,16 @@ implements Consumer, PositionConsumer, Consumable
     int index = ipos >>> 1;
     if ((ipos & 1) != 0)
       index--;
-    if ((ipos & 1) != 0)
-      index = nextDataIndex(index);
     if (index >= gapStart)
       index += gapEnd - gapStart;
-    if (index < 0)
-      index = data.length;
+    if ((ipos & 1) != 0)
+      {
+	index = nextDataIndex(index);
+	if (index < 0)
+	  return data.length;
+	if (index == gapStart)
+	  index += gapEnd - gapStart;
+      }
     return index;
   }
 
@@ -806,6 +797,12 @@ implements Consumer, PositionConsumer, Consumable
       return false;
     pos.push(this, index << 1);
     return true;
+  }
+
+  public int firstAttributePos (int ipos)
+  {
+    int index = gotoAttributesStart(posToDataIndex(ipos));
+    return index < 0 ? 0 : index << 1;
   }
 
   public int gotoAttributesStart(int index)
@@ -1320,6 +1317,15 @@ implements Consumer, PositionConsumer, Consumable
       return super.getPosPrevious(ipos);
   }
 
+  private Object copyToList(int startPosition, int endPosition)
+  {
+    //    return new TreeList(this, start, end);
+    // FIXME:  dependency on gnu.xml!
+    gnu.xml.NodeTree nodes = new gnu.xml.NodeTree();
+    consumeIRange(startPosition, endPosition, nodes);
+    return nodes;
+  }
+
   public Object getPosNext(int ipos)
   {
     int index = posToDataIndex(ipos);
@@ -1333,7 +1339,7 @@ implements Consumer, PositionConsumer, Consumable
       return objects[datum-OBJECT_REF_SHORT];
     if (datum >= BEGIN_GROUP_SHORT
 	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return new TreeList(this, index, index + data[index+1] + 2);
+      return copyToList(index, index + data[index+1] + 2);
     /*
     if ((datum & 0xFF00) == BYTE_PREFIX)
       return Sequence.TEXT_BYTE_VALUE;
@@ -1354,7 +1360,7 @@ implements Consumer, PositionConsumer, Consumable
 		  || (end_offset == gapStart && gapEnd == data.length)))
 	    return this;
 	  */
-	  return new TreeList(this, index, end_offset);
+	  return copyToList(index, end_offset);
 	}
       case BOOL_FALSE:
       case BOOL_TRUE:
@@ -1377,13 +1383,13 @@ implements Consumer, PositionConsumer, Consumable
 	{
 	  int end_offset = getIntN(index+3);
 	  end_offset += end_offset < 0 ? data.length : index;
-	  return new TreeList(this, index, end_offset+1);
+	  return copyToList(index, end_offset+1);
 	}
       case BEGIN_GROUP_LONG:
 	{
 	  int end_offset = getIntN(index+1);
 	  end_offset += end_offset < 0 ? data.length : index;
-	  return new TreeList(this, index, end_offset+7);
+	  return copyToList(index, end_offset+7);
 	}
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
@@ -1423,11 +1429,6 @@ implements Consumer, PositionConsumer, Consumable
       index += gapEnd - gapStart;
     if (index == data.length)
       return -1;
-    if (index <0 || index >= data.length)
-      {
-	System.err.println("bad index:"+index);
-	dump();
-      }
     char datum = data[index];
     index++;
     if (datum <= MAX_CHAR_SHORT)
@@ -1536,8 +1537,13 @@ implements Consumer, PositionConsumer, Consumable
   {
     if (isAfter)
       {
-	if (offset == 0 && (istart & 1) != 0)
-	  return istart;
+	if (offset == 0)
+	  {
+	    if ((istart & 1) != 0)
+	      return istart;
+	    if (istart == 0)
+	      return 1;
+	  }
 	offset--;
       }
     if (offset < 0)
@@ -1549,6 +1555,8 @@ implements Consumer, PositionConsumer, Consumable
 	if (pos < 0)
 	  throw new IndexOutOfBoundsException();
       }
+    if (pos >= gapEnd)
+      pos -= gapEnd - gapStart;
     return isAfter ? ((pos + 1) << 1) | 1 : (pos << 1);
   }
 
@@ -1747,10 +1755,12 @@ implements Consumer, PositionConsumer, Consumable
 
   public int nextPos (int position)
   {
-    boolean isAfter = (position & 1) != 0;
     int index = posToDataIndex(position);
+    int i0 = index;
     if (index == data.length)
       return 0;
+    if (index >= gapEnd)
+      index -= gapEnd - gapStart;
     return (index << 1) + 3;
   }
 
@@ -1839,41 +1849,13 @@ implements Consumer, PositionConsumer, Consumable
   /** Compare two positions, and indicate their relative order. */
   public int compare(int ipos1, int ipos2)
   {
-    int i1, i2;
-    if (ipos1 == -1)
-      i1 = data.length;
-    else
-      {
-	i1 = ipos1 >>> 1;
-	if (i1 >= gapStart)
-	  i1 += gapEnd - gapStart;
-      }
-    if (ipos2 == -1)
-      i2 = data.length;
-    else
-      {
-	i2 = ipos2 >>> 1;
-	if (i2 >= gapStart)
-	  i2 += gapEnd - gapStart;
-      }
-    if (((ipos1 ^ ipos2) & 1) != 0)
-      { /* isAfter(ipos1) != isAfter(ipos2) */
-	if ((ipos1 & 1) != 0) /* isAfter(ipos1) */
-	  {
-	    if (i1 == i2)
-	      return 1;
-	    if (i1 < i2)
-	      i1 = nextDataIndex(i1);
-	  }
-	else /* isAfter(ipos2) */
-	  {
-	    if (i1 == i2)
-	      return -1;
-	    if (i2 < i1)
-	      i2 = nextDataIndex(i1);
-	  }
-
-      }
+    // It's difficult to optimize this, because because if (say) isAfter(ipos1)
+    // then we need nextDataIndex((ipos1>>>1)-1).  In that case comparing
+    // (ipos1>>>1)-1 and (pos2>>>1)-1 tells us nothing, since the former
+    // could be a BEGIN_GROUP, while the latter might be a node inside
+    // the group.
+    int i1 = posToDataIndex(ipos1);
+    int i2 = posToDataIndex(ipos2);
     return i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
   }
 

@@ -501,6 +501,14 @@ public abstract class AbstractSequence
     return 0;
   }
 
+  /** Like firstChildPos.
+   * Problem: Should this stop before we get to children?
+   * I think so, but that requires changes to TreeList. */
+  public int firstAttributePos (int ipos)
+  {
+    return 0;
+  }
+
   /** Get position of parent.
    * @param ipos child position.  It is not released by this method.
    * @return the p os of the parent, or endPos() is there is no known parent.

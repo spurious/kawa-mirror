@@ -40,6 +40,8 @@ public class ZipLoader extends ClassLoader
     int index = loadedClasses.indexOf(name);
     if (index >= 0)
       clas = (Class) loadedClasses.elementAt(index+1);
+    else if (zar == null)
+      clas = findSystemClass (name);
     else
       {
 	String member_name = name.replace ('.', '/') + ".class";

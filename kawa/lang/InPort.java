@@ -66,6 +66,12 @@ public class InPort extends LineBufferedReader implements Printable
     return read ();
   }
 
+  final boolean isDelimiter (char ch)
+  {
+    return (Character.isWhitespace (ch)
+	    || ch == ')' || ch == '(' || ch == '"' || ch == ';');
+  }
+
   char readState = '\n';
   /** Return a character that indicates what we are currently reading.
     * Returns '\n' if we are not inside read; '\"' if reading a string;
@@ -116,8 +122,7 @@ public class InPort extends LineBufferedReader implements Printable
 	if (c < 0)
 	  break;
 	char ch = (char)c;
-	if (Character.isWhitespace (ch)
-	    || ch == ')' || ch == '(' || ch == '"' || ch == ';')
+	if (isDelimiter(ch))
 	  {
 	    unread ();
 	    break;
@@ -692,11 +697,39 @@ public class InPort extends LineBufferedReader implements Printable
 		     new Pair (readSchemeObject (), List.Empty));
   }
 
+  /** Read a #|...|#-style comment (which may contain other nested comments).
+    * Assumes the initial "#|" has already been read.
+    */
+  final void readNestedComment ()
+       throws java.io.IOException, ReadError
+  {
+    int commentNesting = 1;
+    do
+      {
+	int c = read ();
+	if (c == '|')
+	  {
+	    c = read();
+	    if (c == '#')
+	      commentNesting--;
+	  }
+	else if (c == '#')
+	  {
+	    c = read();
+	    if (c == '|')
+	      commentNesting++;
+	  }
+	if (c < 0)
+	  throw new EofReadError (this, "unexpected eof in #| comment.");
+      } while (commentNesting > 0);
+  }
+
+
   protected void skipWhitespaceAndComments()
-      throws java.io.IOException
+      throws java.io.IOException, ReadError
   {
     int c;
-    do
+    for (;;)
       {
 	c = read ();
 	if (c < 0)
@@ -712,14 +745,22 @@ public class InPort extends LineBufferedReader implements Printable
 		  break;
 	      }
 	  }
-      } while (Character.isWhitespace ((char) c));
+	else if (c == '#' && peek() == '|')
+	  {
+	    read();
+	    readNestedComment();
+	    continue;
+	  }
+	else if (!Character.isWhitespace ((char)c))
+	  break;
+      }
     unread ();
   }
 
   /** Read a list (possibly improper) of zero or more Scheme forms.
    * Assumes '(' has been read.  Does not read the final ')'.
    */
-  protected List readListBody ()
+  protected Object readListBody ()
        throws java.io.IOException, ReadError
   {
     Pair last = null;
@@ -737,15 +778,23 @@ public class InPort extends LineBufferedReader implements Printable
 	    int next = peek ();
 	    if (next < 0)
 	      throw new EofReadError (this, ". followed by EOF");
-	    if (Character.isWhitespace((char)next))
+	    if (isDelimiter((char)next))
 	      {
-		if (last == null)
-		  throw new ReadError (this, ". at start of list");
+		// if (last == null && pedantic)
+		//   throw new ReadError (this, ". at start of list");
 		//-- Read the cdr for the Pair
 		Object cdr = readSchemeObject ();
 		skipWhitespaceAndComments();
 		if (peek () != ')')
 		  throw new ReadError (this, ". OBJECT not followed by )");
+
+		// ( a1 ... an . cdr) creates an n-element list ended by
+		// cdr.  If n==0, a reasonable (and common) extension is to
+		// interpret this as a 0-element list ended by cdr - i.e.
+		// just cdr by itself.
+		if (last == null)
+		  return cdr;
+
 		last.cdr = cdr;
 		return list;
 	      }
@@ -767,14 +816,14 @@ public class InPort extends LineBufferedReader implements Printable
     return list;
   }
 
-  protected List readList ()
+  protected Object readList ()
        throws java.io.IOException, ReadError
   {
     char saveReadState = readState;
     readState = '(';
     try
       {
-	List list = readListBody ();
+	Object list = readListBody ();
 	int c = read ();
 	if (c < 0)
 	  throw new EofReadError (this, "unexpected EOF in list");
@@ -785,6 +834,35 @@ public class InPort extends LineBufferedReader implements Printable
 	readState = saveReadState;
       }
   }
+
+  protected Vector readVector ()
+    throws java.io.IOException, ReadError
+  {
+    char saveReadState = readState;
+    readState = '(';
+     try
+       {
+	 java.util.Vector vec = new java.util.Vector();
+	 for (;;)
+	   {
+	     skipWhitespaceAndComments();
+	     int c = read();
+	     if (c < 0)
+	       throw new EofReadError(this, "unexpected EOF in vector");
+	     if (c == ')')
+	       break;
+	     vec.addElement(readSchemeObject(c));
+	   }
+	 Object[] objs = new Object[vec.size()];
+	 vec.copyInto(objs);
+	 return new Vector(objs);
+       }
+     finally
+       {
+	readState = saveReadState;
+       }
+  }
+ 
 
   public Object readSchemeObject ()
       throws java.io.IOException, ReadError
@@ -864,7 +942,7 @@ public class InPort extends LineBufferedReader implements Printable
 	    switch (next)
 	      {
 	      case '(':
-		return readList ().toVector ();
+		return readVector();
 	      case '\\':
 		return readCharacter();
 	      case '!':
@@ -882,30 +960,11 @@ public class InPort extends LineBufferedReader implements Printable
 		unread ();
 		return readSchemeNumber ('#', 10);
 	      case '|':
-		int commentNesting = 1;
 		saveReadState = readState;
 		readState = '|';
 		try
 		  {
-		    do
-		      {
-			c = read();
-			if (c == '|')
-			  {
-			    c = read();
-			    if (c == '#')
-			      commentNesting--;
-			  }
-			else if (c == '#')
-			  {
-			    c = read();
-			    if (c == '|')
-			      commentNesting++;
-			  }
-			if (c < 0)
-			  throw new EofReadError (this,
-					 "unexpected eof in #| comment.");
-		      } while (commentNesting > 0);
+		    readNestedComment();
 		  }
 		finally
 		  {

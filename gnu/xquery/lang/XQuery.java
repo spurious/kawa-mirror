@@ -254,6 +254,12 @@ class Prompter extends Procedure1
 {
   public Object apply1 (Object arg)
   {
-    return "xquery[" + (((InPort) arg).getLineNumber() + 1) + "]: ";
+    InPort port = (InPort) arg;
+    int line = port.getLineNumber() + 1;
+    char state = port.readState;
+    if (state == '<')
+      return "<!--" + line + "-->";
+    else
+      return "{--" + line + "--} ";
   }
 }

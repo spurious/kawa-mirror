@@ -1466,9 +1466,19 @@ public class XQParser extends LispReader // should be extends Lexer
 	      getRawToken();
 	    return exp;
 	  }
-	exp = parseElementConstructor();
-	exp.setFile(getName());
-	exp.setLine(startLine, startColumn);
+	InPort port = (InPort) getPort();
+	char saveReadState = port.readState;
+	try
+	  {
+	    port.readState = '<';
+	    exp = parseElementConstructor();
+	    exp.setFile(getName());
+	    exp.setLine(startLine, startColumn);
+	  }
+	finally
+	  {
+	    port.readState = saveReadState;
+	  }
       }
     else if (token == STRING_TOKEN)
       {
@@ -1686,6 +1696,7 @@ public class XQParser extends LispReader // should be extends Lexer
     else
       {
 	Expression cond;
+	nesting++;
 	if (curToken == OP_WHERE)
 	  {
 	    getRawToken();
@@ -1697,6 +1708,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  cond = null;
+	nesting--;
 	boolean sawReturn = match("return");
 	if (! sawReturn && ! match("let") && ! match("for"))
 	  return syntaxError("missing 'return' clause");
@@ -1757,7 +1769,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("missing ':=' in 'let' clause - "+curToken);
       }
     getRawToken();
+    nesting++;
     Expression value = parseBinaryExpr(priority(OP_OR));
+    nesting--;
     return parseFLWRExpression(isFor, name, value);
   }
 

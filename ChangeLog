@@ -1,3 +1,9 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_namespace.java:  New class; extends Syntax.
+	* kawa/standard/Makefile.am (java_sources0:  Added define_nameapace..
+	* kawa/standard/Scheme.java (initScheme):  Define define-namespace.
+
 2001-10-20  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Use CallContext's runUntilDone, not run.

@@ -164,7 +164,7 @@ public class SetExp extends Expression
 	  {
 	    expander.flags |= LambdaExp.NO_FIELD;
 	    expander.compileAsMethod(comp);
-	    comp.applyMethods.addElement(expander);
+	    comp.mainLambda.applyMethods.addElement(expander);
 	  }
 	decl.makeField(comp, new_value);
       }

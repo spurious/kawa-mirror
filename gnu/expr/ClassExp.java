@@ -2,7 +2,7 @@ package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 
-public class ClassExp extends ObjectExp
+public class ClassExp extends LambdaExp
 {
   /*
   public Object eval (Environment env)
@@ -13,6 +13,7 @@ public class ClassExp extends ObjectExp
     }
   */
 
+  /*
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
@@ -38,4 +39,5 @@ public class ClassExp extends ObjectExp
 
     target.compileFromStack(comp, typeType);
   }
+  */
 }

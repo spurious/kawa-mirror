@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import java.util.Vector;
 
 /**
  * Class used to implement Scheme lambda expressions.
@@ -17,6 +18,9 @@ public class LambdaExp extends ScopeExp
   public int min_args;
   // Maximum number of actual arguments;  -1 if variable.
   public int max_args;
+
+  /** Set of visible top-level LambdaExps that need apply methods. */
+  Vector applyMethods = new Vector();
 
   //  public int plainArgs;
   Variable argsArray;
@@ -35,8 +39,7 @@ public class LambdaExp extends ScopeExp
   Declaration capturedVars;
 
   /** A local variable that points to the heap-allocated part of the frame.
-   * This is an instance of heapFrameLambda (which is one of our children);
-   * each captured variable is a field in the heapFrame.  A procedure has
+   * Each captured variable is a field in the heapFrame.  A procedure has
    * a heapFrame iff if has a parameter or local variable that is
    * referenced ("captured") by a non-inline inferior procedure.
    * (I.e there is a least one non-inline procedure that encloses the
@@ -212,9 +215,7 @@ public class LambdaExp extends ScopeExp
     return (! getInlineOnly()
 	    && (isHandlingTailCalls()
 		|| isModuleBody ()
-		|| this instanceof ObjectExp
-		|| (! outerLambda().isModuleBody()
-		    && getCanRead())));
+		|| this instanceof ObjectExp));
   }
 
   public final boolean isHandlingTailCalls ()
@@ -231,7 +232,7 @@ public class LambdaExp extends ScopeExp
   public ClassType getCompiledClassType(Compilation comp)
   {
     if (type == Compilation.typeProcedure)
-      throw new Error("internal error: getCompileClassType");
+      throw new Error("internal error: getCompiledClassType");
     return type;
   }
 
@@ -511,11 +512,26 @@ public class LambdaExp extends ScopeExp
   public void compileEnd (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    if (comp.method.reachableHere() && ! isHandlingTailCalls())
-      code.emitReturn();
-    code.popScope();        // Undoes enterScope in allocParameters
+    if (! getInlineOnly() || Compilation.usingTailCalls)
+      {
+	if (comp.method.reachableHere() && ! isHandlingTailCalls())
+	  code.emitReturn();
+	code.popScope();        // Undoes enterScope in allocParameters
+      }
     if (! Compilation.fewerClasses) // FIXME
       code.popScope(); // Undoes pushScope in method.initCode.
+
+    if (applyMethods != null && applyMethods.size() > 0)
+      {
+	Method save_method = comp.method;
+	ClassType save_class = comp.curClass;
+	comp.curClass = getHeapFrameType();
+	comp.generateApplyMethods(this);
+	comp.method = save_method;
+	comp.curClass = save_class;
+      }
+    if (heapFrame != null && ! Compilation.usingTailCalls)
+      comp.generateConstructor(this);
   }
 
   Field allocFieldFor (Compilation comp)
@@ -528,7 +544,13 @@ public class LambdaExp extends ScopeExp
     if (nameDecl != null && nameDecl.context instanceof ModuleExp)
       {
 	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
-	  fflags |= Access.STATIC;
+          {
+            fflags |= Access.STATIC;
+            // If there is no instanceField, then the field gets initialized in
+            // <init>, not <clinit>, which is bad for a "static final" field.
+            if (! ((ModuleExp) nameDecl.context).isStatic())
+              fflags &= ~Access.FINAL;
+          }
 	if (! nameDecl.isPrivate())
 	  fflags |= Access.PUBLIC;
       }
@@ -536,10 +558,11 @@ public class LambdaExp extends ScopeExp
       {
 	fname = fname + "$Fn" + ++comp.localFieldIndex;
 	if (! getNeedsClosureEnv())
-	  fflags |= Access.STATIC;
+	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
     Type rtype = Compilation.getMethodProcType(comp.mainClass);
-    Field field = comp.mainClass.addField (fname, rtype, fflags);
+    ClassType frameType = getHeapLambda(outer).getHeapFrameType();
+    Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)
       nameDecl.field = field;
     return field;
@@ -549,7 +572,7 @@ public class LambdaExp extends ScopeExp
   {
     compileAsMethod(comp);
 
-    comp.applyMethods.addElement(this);
+    getHeapLambda(outer).applyMethods.addElement(this);
 
     return (new ProcInitializer(this, comp)).field;
   }
@@ -557,10 +580,13 @@ public class LambdaExp extends ScopeExp
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
-      return;
-    if (getInlineOnly())
-      throw new Error("internal error: compile called for inlineOnly LambdaExp");
-    LambdaExp parent = outerLambda();
+      {
+	if (getInlineOnly())
+	  return;
+	if (Compilation.usingTailCalls)
+	  return;
+	// else Causes failures.  Better to remove unneeded LambdaExp earlier. FIXME
+      }
     Type rtype;
     CodeAttr code = comp.getCode();
 
@@ -629,7 +655,7 @@ public class LambdaExp extends ScopeExp
 	    code.emitPutField(comp.callerCallFrameField);
 	  }
       }
-    else
+    else { LambdaExp outer = outerLambda();
     if (! isClassGenerated())
       {
 	rtype = comp.typeModuleMethod;
@@ -643,31 +669,64 @@ public class LambdaExp extends ScopeExp
 	    Field field = compileSetField(comp);
 	    if (field.getStaticFlag())
 	      code.emitGetStatic(field);
-	    else
+	    else if (Compilation.usingTailCalls)
 	      {
 		code.emitPushThis();
 		code.emitGetField(field);
 	      }
+	    else
+	      {
+		LambdaExp parent = comp.curLambda;
+		Variable frame
+		  = parent.heapFrame != null ? parent.heapFrame
+		  : parent.closureEnv;
+		code.emitLoad(frame);
+		code.emitGetField(field);
+	      }
 	  }
       }
-    else if (parent != null && parent.heapFrameLambda == this)
+    else if (Compilation.usingTailCalls && outer != null && outer.heapFrameLambda == this)
       {
 	// When parent was entered, we allocated an instance of this
 	// Procedure, and assigned it to parent's heapFrame.
 	// So just get the heapFrame.
-	code.emitLoad(parent.heapFrame);
-	rtype = parent.heapFrame.getType();
+	code.emitLoad(outer.heapFrame);
+	rtype = outer.heapFrame.getType();
       }
     else
       {
 	rtype = compileAlloc (comp);
-      }
+      } }
     target.compileFromStack(comp, rtype);
+  }
+
+  public ClassType getHeapFrameType()
+  {
+    if (this instanceof ModuleExp || this instanceof ObjectExp)
+      return (ClassType) getType();
+    else
+      return (ClassType) heapFrame.getType();
+  }
+
+  public static LambdaExp getHeapLambda(ScopeExp scope)
+  {
+    ScopeExp exp = scope;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return null;
+	if (exp instanceof ModuleExp
+	    || exp instanceof ObjectExp
+	    || (exp instanceof LambdaExp 
+		&& ((LambdaExp) exp).heapFrame != null))
+	  return (LambdaExp) exp;
+      }
   }
 
   void addMethodFor (Compilation comp, ObjectType closureEnvType)
   {
-    ClassType ctype = comp.curClass;
+    LambdaExp heapLambda = getHeapLambda(outer);
+    ClassType ctype = heapLambda.getHeapFrameType();
     // generate_unique_name (new_class, child.getName());
     String name = getName();
     StringBuffer nameBuf = new StringBuffer(60);
@@ -682,10 +741,16 @@ public class LambdaExp extends ScopeExp
       nameBuf.append(comp.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
+    /*
+    if (Compilation.usingTailCalls)
+      nameBuf.append("$T");
+    */
 
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
-    int numStubs = ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
+    int numStubs =
+      ((flags & DEFAULT_CAPTURES_ARG) != 0) || Compilation.usingTailCalls ? 0
+      : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
 
@@ -711,8 +776,23 @@ public class LambdaExp extends ScopeExp
     if (! isStatic)
       closureEnv = declareThis(ctype);
 
-    Type rtype = getFlag(SEQUENCE_RESULT) ? Type.void_type : body.getType();
+    Type rtype
+      = (getFlag(SEQUENCE_RESULT)
+	 || (Compilation.usingTailCalls && ! isClassMethod()))
+      ? Type.void_type
+      : body.getType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
+    /*
+    if (Compilation.usingTailCalls)
+      {
+	Type[] atypes = new Type[1+extraArg];
+	if (extraArg > 0)
+	  atypes[0] = closureEnvType;
+	atypes[extraArg] = comp.typeCallContext;
+	primMethods[0] = ctype.addMethod(nameBuf.toString(), atypes, rtype, mflags);
+	return;
+      }
+    */
     for (int i = 0;  i <= numStubs;  i++)
       {
 	int plainArgs = min_args + i;
@@ -787,7 +867,11 @@ public class LambdaExp extends ScopeExp
 	
 	Declaration decl = firstDecl();
 	if (isHandlingTailCalls())
-	  firstArgsArrayArg = decl;
+	  {
+	    firstArgsArrayArg = decl;
+	    if (! Compilation.usingTailCalls) // FIXME
+	      scope.addVariable(null, comp.typeCallContext, "$ctx");
+	  }
 	for (;;)
 	  {
 	    if (decl == firstArgsArrayArg && argsArray != null)
@@ -829,6 +913,7 @@ public class LambdaExp extends ScopeExp
 
     declareClosureEnv();
 
+    if (Compilation.usingTailCalls)
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       { 
@@ -880,6 +965,10 @@ public class LambdaExp extends ScopeExp
 	    ObjectType closureEnvType;
 	    if (! child.getNeedsClosureEnv())
 	      closureEnvType = null;
+	    else if (this instanceof ObjectExp)
+	      closureEnvType = getCompiledClassType(comp);
+	    else if ("$finit$".equals(getName()))
+	      closureEnvType = outerLambda().getCompiledClassType(comp);
             else
               {
                 LambdaExp owner = this;
@@ -897,19 +986,24 @@ public class LambdaExp extends ScopeExp
     if (heapFrame != null)
       {
 	ClassType frameType;
-	if (this instanceof ModuleExp)
+	if (this instanceof ModuleExp || this instanceof ObjectExp)
 	  frameType = getCompiledClassType(comp);
-	else if (heapFrameLambda != null)
+	else if (Compilation.usingTailCalls && heapFrameLambda != null)
 	  {
 	    frameType = heapFrameLambda.getCompiledClassType(comp);
 	  }
 	else
 	  {
 	    frameType = new ClassType(comp.generateClassName("frame"));
+	    if (Compilation.usingTailCalls) // FIXME
 	    frameType.setSuper(Type.pointer_type);
+	    else
+	    frameType.setSuper(Compilation.typeModuleBody);
 	    comp.addClass(frameType);
 	  }
 	heapFrame.setType(frameType);
+	if (! Compilation.usingTailCalls) // FIXME
+	this.type = frameType;
       }
   }
 
@@ -956,6 +1050,9 @@ public class LambdaExp extends ScopeExp
   static Method searchForKeywordMethod3;
   static Method searchForKeywordMethod4;
 
+  /** Rembembers stuff to do in <init> of this class. */
+  Initializer initChain;
+
   void enterFunction (Compilation comp)
   {
     CodeAttr code = comp.getCode();
@@ -997,7 +1094,7 @@ public class LambdaExp extends ScopeExp
 	if (closureEnv != null && heapFrame != null)
 	  staticLinkField = frameType.addField("staticLink",
 					       closureEnv.getType());
-        if (! (this instanceof ModuleExp))
+        if (! (this instanceof ModuleExp) && ! (this instanceof ObjectExp))
           {
             if (heapFrameLambda != null)
               heapFrameLambda.compileAlloc(comp);
@@ -1005,7 +1102,7 @@ public class LambdaExp extends ScopeExp
               {
                 code.emitNew(frameType);
                 code.emitDup(frameType);
-                Method constructor = comp.generateConstructor(frameType, null);
+                Method constructor = comp.getConstructor(this);
                 code.emitInvokeSpecial(constructor);
               }
             if (staticLinkField != null)
@@ -1185,12 +1282,14 @@ public class LambdaExp extends ScopeExp
     flags |= METHODS_COMPILED;
     Method save_method = comp.method;
     LambdaExp save_lambda = comp.curLambda;
+    Variable saveStackContext = comp.callStackContext;
     comp.curLambda = this;
 
     Method method = primMethods[0];
     boolean isStatic = method.getStaticFlag();
     Type rtype = method.getReturnType();
-    Target target = getFlag(SEQUENCE_RESULT) ? new ConsumerTarget(firstDecl())
+    Target target = Compilation.usingTailCalls ? Target.returnObject
+      // : getFlag(SEQUENCE_RESULT) ? new ConsumerTarget(firstDecl()) FIXME
       : Target.returnValue(rtype);
     int numStubs = primMethods.length - 1;
     Type restArgType = restArgType();
@@ -1284,127 +1383,11 @@ public class LambdaExp extends ScopeExp
     compileChildMethods(comp);
     comp.method = save_method;
     comp.curLambda = save_lambda;
+    comp.callStackContext = saveStackContext;
   }
-
-  /** Used to control with .zip files dumps are generated. */
-  public static String dumpZipPrefix;
-  public static int dumpZipCounter;
 
   /** A cache if this has already been evaluated. */
   Procedure thisValue;
-
-  public Class evalToClass ()
-  {
-    try
-      {
-	String class_name = getJavaName ();
-
-	Compilation comp = new Compilation (this, class_name, null, true);
-
-	byte[][] classes = new byte[comp.numClasses][];
-	String[] classNames = new String[comp.numClasses];
-	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  {
-	    ClassType clas = comp.classes[iClass];
-	    classNames[iClass] = clas.getName ();
-	    classes[iClass] = clas.writeToArray ();
-	  }
-
-	if (dumpZipPrefix != null)
-	  {
-	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
-	    if (dumpZipCounter >= 0)
-	      zipname.append(++dumpZipCounter);
-	    zipname.append(".zip");
-	    java.io.FileOutputStream zfout
-	      = new java.io.FileOutputStream(zipname.toString());
-	    java.util.zip.ZipOutputStream zout
-	      = new java.util.zip.ZipOutputStream(zfout);
-	    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	      {
-		String clname
-		  = classNames[iClass].replace ('.', '/') + ".class";
-		java.util.zip.ZipEntry zent
-		  = new java.util.zip.ZipEntry (clname);
-		zent.setSize(classes[iClass].length);
-		java.util.zip.CRC32 crc = new java.util.zip.CRC32();
-		crc.update(classes[iClass]);
-		zent.setCrc(crc.getValue());
-		zent.setMethod(java.util.zip.ZipEntry.STORED);
-		zout.putNextEntry(zent);
-		zout.write(classes[iClass]);
-	      }
-	    zout.close ();
-	  }
-
-	/* DEBUGGING:
-	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
-	*/
-
-	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
-	Class clas = loader.loadClass (class_name, true);
-	/* Pass literal values to the compiled code. */
-	for (Literal init = comp.literalsChain;  init != null;
-	     init = init.next)
-	  {
-	    /* DEBUGGING:
-	    OutPort out = OutPort.errDefault();
-	    out.print("init["+init.index+"]=");
-	    SFormat.print(init.value, out);
-	    out.println();
-	    */
-	    try
-	      {
-		clas.getDeclaredField(init.field.getName())
-		  .set(null, init.value);
-	      }
-	    catch (java.lang.NoSuchFieldException ex)
-	      {
-		throw new Error("internal error - "+ex);
-	      }
-	  }
-        return clas;
-      }
-    catch (java.io.IOException ex)
-      {
-	ex.printStackTrace(OutPort.errDefault());
-	throw new RuntimeException ("I/O error in lambda eval: "+ex);
-      }
-    catch (ClassNotFoundException ex)
-      {
-	throw new RuntimeException("class not found in lambda eval");
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new RuntimeException("class illegal access: in lambda eval");
-      }
-  }
-
-  public Object eval (Environment env)
-  {
-    if (thisValue != null)
-      return thisValue;
-    try
-      {
-        Class clas = evalToClass();
-	Object inst = clas.newInstance ();
-
-	Procedure proc = (Procedure) inst;
-	if (proc.getName() == null)
-	  proc.setName (this.name);
-        thisValue = proc;
-	return inst;
-      }
-    catch (InstantiationException ex)
-      {
-	throw new RuntimeException("class not instantiable: in lambda eval");
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new RuntimeException("class illegal access: in lambda eval");
-      }
-  }
 
   protected Expression walk (ExpWalker walker)
   {

@@ -9,15 +9,16 @@ public class ProcInitializer extends Initializer
   {
     field = lexp.allocFieldFor(comp);
     proc = lexp;
-    if (comp.instanceField != null)
+    LambdaExp heapLambda = LambdaExp.getHeapLambda(lexp.outer);
+    if (heapLambda instanceof ModuleExp && comp.instanceField != null)
       {
 	next = comp.clinitChain;
 	comp.clinitChain = this;
       }
     else
       {
-	next = comp.initChain;
-	comp.initChain = this;
+	next = heapLambda.initChain;
+	heapLambda.initChain = this;
       }
   }
 

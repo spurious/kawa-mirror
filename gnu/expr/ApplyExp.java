@@ -221,7 +221,7 @@ public class ApplyExp extends Expression
 		if (comp.curLambda == func_lambda)
 		  code.emitLoad(func_lambda.closureEnv);  // Recursive call.
 		else
-		  func_lambda.outerLambda().loadHeapFrame(comp);
+		  LambdaExp.getHeapLambda(func_lambda.outerLambda()).loadHeapFrame(comp);
 	      }
 
 	    boolean varArgs = func_lambda.restArgType() != null;
@@ -316,7 +316,10 @@ public class ApplyExp extends Expression
 	popParams (code, func_lambda, false);
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
-	code.popScope();
+	if (Compilation.usingTailCalls)
+	  code.popScope();
+	else
+	  func_lambda.compileEnd(comp);
 	// comp.method.popScope();
 	func_lambda.compileChildMethods(comp);
 	comp.curLambda = saveLambda;

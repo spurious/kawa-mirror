@@ -302,7 +302,7 @@ public class Declaration
     else if (this.value != value)
       {
 	if (this.value instanceof LambdaExp) 
-          ((LambdaExp) this.value).nameDecl = null; 
+	  ((LambdaExp) this.value).nameDecl = null;
 	this.value = null;
       }
   }
@@ -504,8 +504,8 @@ public class Declaration
 	  }
 	else
 	  {
-	    init.next = comp.initChain;
-	    comp.initChain = init;
+	    init.next = comp.mainLambda.initChain; // FIXME why mainLambda?
+	    comp.mainLambda.initChain = init;
 	  }
       }
   }

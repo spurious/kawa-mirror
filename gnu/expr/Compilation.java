@@ -9,8 +9,6 @@ import java.io.*;
 
 public class Compilation
 {
-  /** Set of visible top-level LambdaExps that need apply methods. */
-  Vector applyMethods = new Vector();
   /** Used by LambdaExp.getSelectorValue if need to allocate new selector. */
   int maxSelectorValue;
 
@@ -18,6 +16,7 @@ public class Compilation
   public ClassType mainClass;
 
   public LambdaExp curLambda;
+  public ModuleExp mainLambda;
   public Variable thisDecl;
 
   /** Contains "$instance" if the module is static; otherwise null. */
@@ -241,6 +240,10 @@ public class Compilation
     = ClassType.make("gnu.mapping.CpsProcedure");
   public static ClassType typeCallFrame
     = ClassType.make("gnu.mapping.CallFrame");
+  public static ClassType typeCpsMethodProc
+  = ClassType.make("gnu.mapping.CpsMethodProc", typeCpsProcedure);
+  public static ClassType typeCpsMethodContainer
+  = ClassType.make("gnu.mapping.CpsMethodContainer");
   public static Field numArgsCallFrameField
     = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
   public static Field argsCallContextField
@@ -262,9 +265,6 @@ public class Compilation
 
   Hashtable literalTable;
   int literalsCount;
-
-  /** Rembembers stuff to do in <init> of main class. */
-  Initializer initChain;
 
   /** Rembembers stuff to do in <clinit> of main class. */
   Initializer clinitChain;
@@ -600,13 +600,14 @@ public class Compilation
    * @param prefix prefix to pre-pend to the names of other (non-top) classes
    * @param immediate true if the classes will be immediately loaded
    */
-  public Compilation (LambdaExp lexp, String classname, String prefix,
+  public Compilation (ModuleExp lexp, String classname, String prefix,
 		      boolean immediate)
   {
     source_filename = lexp.filename;
     classPrefix = prefix;
     this.immediate = immediate;
     mainClass = new ClassType(classname);
+    mainLambda = lexp;
 
     // Do various code re-writes and optimization.
 
@@ -672,13 +673,24 @@ public class Compilation
     return type;
   }
 
-  public final Method generateConstructor (ClassType clas, LambdaExp lexp)
+  public final Method getConstructor (LambdaExp lexp)
+  {
+    ClassType clas = (Compilation.usingTailCalls ? curClass
+		      : lexp.getHeapFrameType());
+    return clas.addMethod("<init>", Access.PUBLIC, apply0args, Type.void_type);
+  }
+
+  public final void generateConstructor (LambdaExp lexp)
+  {
+    generateConstructor (Compilation.usingTailCalls ? curClass : lexp.getHeapFrameType(), lexp);
+  }
+
+  public final void generateConstructor (ClassType clas, LambdaExp lexp)
   {
     Method save_method = method;
     ClassType save_class = curClass;
     curClass = clas;
-    Method constructor_method = clas.addMethod("<init>", Access.PUBLIC,
-					       apply0args, Type.void_type);
+    Method constructor_method = getConstructor(lexp);
     clas.constructor = constructor_method;
 
     Method superConstructor
@@ -690,50 +702,39 @@ public class Compilation
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
 
-    if (curClass == mainClass)
+    Initializer init;
+    lexp.initChain = Initializer.reverse(lexp.initChain);
+    while ((init = lexp.initChain) != null)
       {
-	Initializer init;
-        initChain = Initializer.reverse(initChain);
-	while ((init = initChain) != null)
-	  {
-	    initChain = init.next;
-	    init.emit(this);
-	  }
-      }
-
-    // If immediate, we cannot set the function name in the constructor,
-    // since setLiterals has not been called yet (except for nested functions).
-    if (lexp != null && lexp.name != null && !immediate
-	&& curClass.getSuperclass().isSubtype(typeProcedure))
-      {
-	constructor_method.compile_push_this ();
-	compileConstant (lexp.name);
-	code.emitInvokeVirtual(setNameMethod);
+	lexp.initChain = init.next;
+	init.emit(this);
       }
 
     code.emitReturn();
     method = save_method;
     curClass = save_class;
-    return constructor_method;
   }
 
   /** Generate ModuleBody's apply0 .. applyN methods.
    * Use the applyMethods vector, which contains methods that implement
    * the (public, readable) methods of the current module. */
-  public void generateApplyMethods()
+  public void generateApplyMethods(LambdaExp lexp)
   {
-    int numApplyMethods = applyMethods.size();
+    int numApplyMethods = lexp.applyMethods.size();
     if (numApplyMethods == 0)
       return;
     boolean generateApplyMethodContainer
       = ! (curClass.getSuperclass().isSubtype(typeProcedure));
     ClassType procType
-      = generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
+      = Compilation.usingTailCalls ? typeCpsMethodProc
+      : generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
     if (generateApplyMethodContainer)
       curClass.addInterface(typeApplyMethodContainer);
+    if (Compilation.usingTailCalls)
+      curClass.addInterface(typeCpsMethodContainer);
     Method save_method = method;
     CodeAttr code = null;
-    for (int i = 0;  i < 6; i++)
+    for (int i = Compilation.usingTailCalls ? 5 : 0;  i < 6; i++)
       {
 	// If i < 5, generate the method named ("apply"+i);
 	// else generate "applyN".
@@ -744,12 +745,14 @@ public class Compilation
 
 	for (int j = numApplyMethods;  --j >= 0; )
 	  {
-	    LambdaExp source = (LambdaExp) applyMethods.elementAt(j);
+	    LambdaExp source = (LambdaExp) lexp.applyMethods.elementAt(j);
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
+	    //System.err.println("generatApp "+primMethods[0]+" "+source);
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
+	      || Compilation.usingTailCalls
 	      || source.max_args >= source.min_args + numMethods;
 	    int methodIndex;
 	    boolean skipThisProc = false;
@@ -780,6 +783,12 @@ public class Compilation
 		    applyArgs = new Type[i + 1];
 		    for (int k = i;  k > 0;  k--)
 		      applyArgs[k] = typeObject;
+		  }
+		else if (Compilation.usingTailCalls)
+		  {
+		    mname = "apply";
+		    applyArgs = new Type[2];
+		    applyArgs[1] = typeCallContext;
 		  }
 		else
 		  {
@@ -1049,7 +1058,7 @@ public class Compilation
 	if (((ModuleExp) lexp).isStatic())
 	  {
 	    staticModule = true;
-	    generateConstructor (curClass, lexp);
+	    generateConstructor (lexp);
 	    instanceField = curClass.addField("$instance", curClass,
 					     Access.STATIC|Access.FINAL);
 	    apply_method = startClassInit();
@@ -1157,10 +1166,7 @@ public class Compilation
         ex.printStackTrace(System.err);
         System.exit(-1);
       }
-    if (staticModule)
-      code.emitReturn();
-    else
-      lexp.compileEnd(this);
+    lexp.compileEnd(this);
 
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.
@@ -1173,11 +1179,8 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (lexp.isModuleBody ())
-      generateApplyMethods();
-
-    if (! staticModule)
-      generateConstructor (curClass, lexp);
+    if (Compilation.usingTailCalls && ! staticModule)
+      generateConstructor(lexp);
 
     if (curClass == mainClass && ! immediate
 	&& (staticModule || clinitChain != null || literalsChain != null))

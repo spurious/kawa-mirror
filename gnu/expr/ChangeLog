@@ -1,3 +1,43 @@
+2001-02-26  Per Bothner  <per@bothner.com>
+
+	Use ModuleMethod to implement nested procedures too.
+	* ApplyExp.java (compile):  Use LambdaExp.getHeapLambda.
+	Use LambdaExp's compileEnd (unless --full-tailscalls).
+	* Declaration.java (makeField):  Use comp.mainLambda's chain.
+	* Compilation.java (applyMethods, initChain):  Moved to LambdaExp.
+	(mainLambda):  New field.
+	(typeCpsMethodProc, typeCpsMethodContainer):  New types.
+	(<init>):  now requires ModuleExp, not LambdaExp.
+	(getConstructor):  New method.
+	(generateConstructor):  Return void.  Make on-argument overload.
+	Use getConstructor.  Always traverse LambdaExp's (new) initChain.
+	(generateApplyMethods):  Take LambdaExp parameter.
+	(addClass):  Call compileEnd even if staticModule.
+	* FindCapturedVars.java (capture):  Don't set heapFrameLambda.
+	* LambdaExp.java (applyMethod):  New field, moved from Compilation.
+	(isClassGenerated):  Return false for normal methods.
+	(compileEnd):  Handle applyMethods, check for getInlineOnly().
+	(allocFieldFor):  Don't make field FINAL if static.
+	New scheme for selecting frame for field.
+	(compileSetField):  Handle applyMethods moving from Compilation.
+	(compile):  Don't return on IgnoreTraget (unless inlined or
+	--full-tailcalls);  causes test failures from missing methods.
+	(compile):  Frame is not always this.
+	(getHeapFrameType, getHeapLambda):  New methods.
+	(addMethodFor):  Use getHeapFrameType to find method's class.
+	(allocFrame, enterFunction): In ObjectExp, frameType is object's class.
+	(evalToClass, dumpZipPrefix, dumpZipCounter, eval): Moved to ModuleExp.
+	* ClassExp.java:  Now extends LambdaExp, not ObjectExp.
+	* ModuleExp.java:  Now inherit from ClassExp.
+	(compile):  Commented out.
+	(evalToClass, dumpZipPrefix, dumpZipCounter, eval):
+	Moved from LambdaExp.
+	* ObjectExp.java (compile):  Use Compilation's new generateConstructor.
+	* ProcInitializer.java (<init>):  Chain is now managed by heapLambda.
+	* SetExp.java (compile):  Handle applyMethods moving to LambdaExp.
+
+	* Parser.java (mustCompileHere):  Look for enclosing ModuleExp.
+
 2000-12-13  Per Bothner  <per@bothner.com>
 
 	* Expression.java (makeGetField):  New static convenience method.

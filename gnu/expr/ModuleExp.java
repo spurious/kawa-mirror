@@ -10,7 +10,7 @@ import gnu.bytecode.*;
  * @author	Per Bothner
  */
 
-public class ModuleExp extends LambdaExp
+public class ModuleExp extends ClassExp
 {
   /** True if the body is too complex to evaluate,and we must compile it.
    * This is because it contains a construct we know how to compile, but not
@@ -25,6 +25,125 @@ public class ModuleExp extends LambdaExp
 
   public ModuleExp ()
   {
+  }
+
+  public Object eval (Environment env)
+  {
+    //if (thisValue != null)
+    /// return thisValue;
+    try
+      {
+        Class clas = evalToClass();
+	Object inst = clas.newInstance ();
+
+	Procedure proc = (Procedure) inst;
+	if (proc.getName() == null)
+	  proc.setName (this.name);
+        //thisValue = proc;
+	return inst;
+      }
+    catch (InstantiationException ex)
+      {
+	throw new RuntimeException("class not instantiable: in lambda eval");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new RuntimeException("class illegal access: in lambda eval");
+      }
+  }
+
+  /** Used to control which .zip file dumps are generated. */
+  public static String dumpZipPrefix;
+  public static int dumpZipCounter;
+
+  ///** A cache if this has already been evaluated. */
+  //Procedure thisValue;
+
+  public Class evalToClass ()
+  {
+    try
+      {
+	String class_name = getJavaName ();
+
+	Compilation comp = new Compilation (this, class_name, null, true);
+
+	byte[][] classes = new byte[comp.numClasses][];
+	String[] classNames = new String[comp.numClasses];
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  {
+	    ClassType clas = comp.classes[iClass];
+	    classNames[iClass] = clas.getName ();
+	    classes[iClass] = clas.writeToArray ();
+	  }
+	if (dumpZipPrefix != null)
+	  {
+	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
+	    if (dumpZipCounter >= 0)
+	      zipname.append(++dumpZipCounter);
+	    zipname.append(".zip");
+	    java.io.FileOutputStream zfout
+	      = new java.io.FileOutputStream(zipname.toString());
+	    java.util.zip.ZipOutputStream zout
+	      = new java.util.zip.ZipOutputStream(zfout);
+	    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	      {
+		String clname
+		  = classNames[iClass].replace ('.', '/') + ".class";
+		java.util.zip.ZipEntry zent
+		  = new java.util.zip.ZipEntry (clname);
+		zent.setSize(classes[iClass].length);
+		java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+		crc.update(classes[iClass]);
+		zent.setCrc(crc.getValue());
+		zent.setMethod(java.util.zip.ZipEntry.STORED);
+		zout.putNextEntry(zent);
+		zout.write(classes[iClass]);
+	      }
+	    zout.close ();
+	  }
+
+	/* DEBUGGING:
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
+	*/
+
+	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
+	Class clas = loader.loadClass (class_name, true);
+	/* Pass literal values to the compiled code. */
+	for (Literal init = comp.literalsChain;  init != null;
+	     init = init.next)
+	  {
+	    /* DEBUGGING:
+	    OutPort out = OutPort.errDefault();
+	    out.print("init["+init.index+"]=");
+	    SFormat.print(init.value, out);
+	    out.println();
+	    */
+	    try
+	      {
+		clas.getDeclaredField(init.field.getName())
+		  .set(null, init.value);
+	      }
+	    catch (java.lang.NoSuchFieldException ex)
+	      {
+		throw new Error("internal error - "+ex);
+	      }
+	  }
+        return clas;
+      }
+    catch (java.io.IOException ex)
+      {
+	ex.printStackTrace(OutPort.errDefault());
+	throw new RuntimeException ("I/O error in lambda eval: "+ex);
+      }
+    catch (ClassNotFoundException ex)
+      {
+	throw new RuntimeException("class not found in lambda eval");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new RuntimeException("class illegal access: in lambda eval");
+      }
   }
 
   public final Object evalModule (Environment env)

@@ -117,8 +117,7 @@ public class ObjectExp extends LambdaExp
               closureEnvField = staticLinkField
                 = new_class.addField("closureEnv", parentFrame.getType());
 	  }
-	comp.generateConstructor (comp.curClass, this);
-
+	comp.generateConstructor (this);
 	CodeAttr code;
 
 	for (Declaration decl = firstDecl();

@@ -1,5 +1,10 @@
 2005-01-02  Per Bothner  <per@bothner.com>
 
+	* PrettyWriter.java (NEWLINE_SPACE): New newline-kind.
+	(write [3 variants]): Maybe enqueue a NEWLINE_SPACE.
+
+	* PrettyWriter.java: Some more normally-commented-out debug stuff.
+
 	* Char.java: Change "select" (preprocessor) syntax.
 
 2005-01-01  Per Bothner  <per@bothner.com>

@@ -54,7 +54,8 @@ public class PrettyWriter extends java.io.Writer
 
   /** The column the first character in the buffer will appear in.
    * Normally zero, but if we end up with a very long line with no breaks in it
-   * we might have to output part of it. Then this will no longer be zero. */
+   * we might have to output part of it. Then this will no longer be zero.
+   * Ditto after emitting a prompt. */
   int bufferStartColumn;
   
   /** The line number we are currently on. Used for *print-lines* abrevs and
@@ -169,14 +170,17 @@ public class PrettyWriter extends java.io.Writer
   public static final int NEWLINE_LINEAR = 'N';
   public static final int NEWLINE_LITERAL = 'L';
   public static final int NEWLINE_FILL = 'F';
+  /** A non-nested ' ' gets an implicit NEWLINE_SPACE.
+   * This is treated similarly to NEWLINE_FILL, but not quite. */
+  public static final int NEWLINE_SPACE = 'S';
   public static final int NEWLINE_MISER = 'M';
   public static final int NEWLINE_MANDATORY = 'R';  // "required"
 
   static final int QITEM_INDENTATION_TYPE = 3;
   static final int QITEM_INDENTATION_SIZE = QITEM_BASE_SIZE + 2;
   static final int QITEM_INDENTATION_KIND = QITEM_BASE_SIZE;
-  static final int QITEM_INDENTATION_BLOCK = 'B';
-  static final int QITEM_INDENTATION_CURRENT = 'C';
+  static final char QITEM_INDENTATION_BLOCK = 'B';
+  static final char QITEM_INDENTATION_CURRENT = 'C';
   static final int QITEM_INDENTATION_AMOUNT = QITEM_BASE_SIZE + 1;
 
   /** A "block-start" queue item. */
@@ -243,6 +247,8 @@ public class PrettyWriter extends java.io.Writer
 	int fillPointer = bufferFillPointer;
 	buffer[fillPointer] = (char) ch;
 	bufferFillPointer = 1 + fillPointer;
+	if (ch == ' ' && isPrettyPrinting && currentBlock < 0)
+	  enqueueNewline(NEWLINE_SPACE);
       }
   }
 
@@ -273,7 +279,15 @@ public class PrettyWriter extends java.io.Writer
 		fillPointer = bufferFillPointer;
 	      }
 	    else
-	      buffer[fillPointer++] = (char) ch;
+	      {
+		buffer[fillPointer++] = (char) ch;
+		if (ch == ' ' && isPrettyPrinting && currentBlock < 0)
+		  {
+		    bufferFillPointer = fillPointer;
+		    enqueueNewline(NEWLINE_SPACE);
+		    fillPointer = bufferFillPointer;
+		  }
+	      }
 	  }
 	bufferFillPointer = fillPointer;
       }
@@ -294,10 +308,13 @@ public class PrettyWriter extends java.io.Writer
 	// Look for newline.  Should be merged with following loop.  FIXME.
 	for (int i = start;  i < end;  i++)
 	  {
-	    if (str[i] == '\n' && isPrettyPrinting)
+	    char c;
+	    if (isPrettyPrinting
+		&& ((c = str[i]) == '\n'
+		    || (c == ' ' && currentBlock < 0)))
 	      {
-		write (str, start, i - start); // Recurse
-		enqueueNewline(NEWLINE_LITERAL);
+		write(str, start, i - start); // Recurse
+		write(c);
 		start = i + 1;
 		count = end - start;
 		continue retry;
@@ -471,16 +488,16 @@ public class PrettyWriter extends java.io.Writer
     queueInts[addr + QITEM_TYPE_AND_SIZE] = kind | (size << 16);
     if (size > 1)
       queueInts[addr + QITEM_POSN] = indexPosn(bufferFillPointer);
+    //log("enqueue "+itemKindString(kind)+" size:"+size+" at:"+queueSize+enqueueExtraLog); enqueueExtraLog = "";
     queueSize += size;
-    //log("enqueue kind:"+kind+" size:"+size+" -> "+queueSize);
     return addr;
   }
 
   public void enqueueNewline (int kind)
   {
     int depth = pendingBlocksCount;
+    //enqueueExtraLog = " kind:"+(char) kind;
     int newline = enqueue(QITEM_NEWLINE_TYPE, QITEM_NEWLINE_SIZE);
-    //log("enqueueNewline kind:"+((char) kind)+" at:"+newline);
     queueInts[newline + QITEM_NEWLINE_KIND] = kind;
     queueInts[newline + QITEM_SECTION_START_DEPTH] = pendingBlocksCount;
     queueInts[newline + QITEM_SECTION_START_SECTION_END] = 0;
@@ -517,8 +534,9 @@ public class PrettyWriter extends java.io.Writer
       enqueueNewline(kind);
   }
 
-  public int enqueueIndent (int kind, int amount)
+  public int enqueueIndent (char kind, int amount)
   {
+    //enqueueExtraLog = " kind:"+kind+" amount:"+amount;
     int result = enqueue(QITEM_INDENTATION_TYPE, QITEM_INDENTATION_SIZE);
     queueInts[result + QITEM_INDENTATION_KIND] = kind;
     queueInts[result + QITEM_INDENTATION_AMOUNT] = amount;
@@ -814,6 +832,8 @@ public class PrettyWriter extends java.io.Writer
 		    cond = true;
 		    break;
 		  }
+		/// ... fall through to ...
+	      case NEWLINE_SPACE:
 		int end = queueInts[next+QITEM_SECTION_START_SECTION_END];
 		if (end == 0)
 		  end = -1;
@@ -854,6 +874,7 @@ public class PrettyWriter extends java.io.Writer
 		  indent += getStartColumn();
 		else
 		  indent += posnColumn(queueInts[next+QITEM_POSN]);
+		//log("setIndent from "+next+": "+queueInts[next+QITEM_INDENTATION_AMOUNT]+" column:"+indent);
 		setIndentation(indent);
 	      }
 	    break;
@@ -1132,7 +1153,7 @@ public class PrettyWriter extends java.io.Writer
   }
 
   /*
-  static PrintWriter log;
+  public static PrintWriter log;
   static {
     try { log = new PrintWriter(new FileOutputStream("/tmp/pplog")); }
     catch (Throwable ex) { ex.printStackTrace(); }
@@ -1234,6 +1255,7 @@ public class PrettyWriter extends java.io.Writer
 	      case NEWLINE_LINEAR:    skind = "linear";    break;
 	      case NEWLINE_LITERAL:   skind = "literal";   break;
 	      case NEWLINE_FILL:      skind = "fill";      break;
+	      case NEWLINE_SPACE:     skind = "space";      break;
 	      case NEWLINE_MISER:     skind = "miser";     break;
 	      case NEWLINE_MANDATORY: skind = "mandatory"; break;
 	      }
@@ -1310,5 +1332,20 @@ public class PrettyWriter extends java.io.Writer
 	throw new Error(msg);
       }
   }
+
+  String itemKindString (int kind)
+  {
+    switch (kind)
+      {
+      case QITEM_NOP_TYPE:  return "nop";
+      case QITEM_NEWLINE_TYPE:  return "newline";
+      case QITEM_INDENTATION_TYPE:  return "indentation";
+      case QITEM_BLOCK_START_TYPE:  return "block-start";
+      case QITEM_BLOCK_END_TYPE:  return "block-end";
+      case QITEM_TAB_TYPE:  return "tab";
+      default: return "("+kind+" - unknown)";
+      }
+  }
+  String enqueueExtraLog = "";
   */
 }

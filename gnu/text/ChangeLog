@@ -1,3 +1,8 @@
+2003-11-10  Per Bothner  <per@bothner.com>
+
+	* IntegerFormat.java (MIN_DIGITS):  New flag.
+	(format):  Handle new flag.
+
 2003-10-20  Per Bothner  <per@bothner.com>
 
 	* Options.java (valueOf):  Allow "on"/"off" for boolean options.

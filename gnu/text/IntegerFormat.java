@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -13,8 +13,15 @@ import java.io.Writer;
 public class IntegerFormat extends ReportFormat
 {
   public int base;
+
+  /** Minimal width of the result, includiing sign, commas, etc.
+   * However, if the MIN_DIGITS flag is given, it's the minimum number
+   * of digits instead.  This is used for printf-style "precision".  */
   public int minWidth;
+
+  /** The padding characters, by default ' '. */
   public int padChar;
+
   public int commaChar;
   public int commaInterval;
 
@@ -34,6 +41,9 @@ public class IntegerFormat extends ReportFormat
   public static final int PAD_RIGHT = 16;
 
   public static final int UPPERCASE = 32;
+
+  /** The minWidth is minimum number of digits, not minimum total width. */
+  public static final int MIN_DIGITS = 64;
 
   public IntegerFormat ()
   {
@@ -81,6 +91,7 @@ public class IntegerFormat extends ReportFormat
 	int unpadded_len = ndigits + numCommas;
 	if (neg || (flags & (SHOW_PLUS|SHOW_SPACE)) != 0)
 	  unpadded_len++;
+
         if ((flags & SHOW_BASE) != 0)
           {
             if (base == 16)
@@ -88,6 +99,12 @@ public class IntegerFormat extends ReportFormat
             else if (base == 8 && sarg0 != '0')
               unpadded_len += 1;
           }
+	if ((flags & MIN_DIGITS) != 0)
+	  {
+	    unpadded_len = ndigits;
+	    if (slen == 1 && sarg0 == '0' && minWidth == 0)
+	      slen = 0;
+	  }
         if (! padRight && ! padInternal)
           for (; minWidth > unpadded_len;  --minWidth)
             dst.write(padChar);
@@ -118,13 +135,14 @@ public class IntegerFormat extends ReportFormat
             dst.write(padChar);
 	for (;;)
 	  {
+	    if (slen == 0)
+	      break;
             char ch = sarg.charAt(i++);
             if (uppercase)
               ch = Character.toUpperCase(ch);
 	    dst.write(ch);
-	    if (--slen == 0)
-	      break;
-	    if (printCommas && (slen % commaInterval) == 0)
+	    --slen;
+	    if (printCommas && slen > 0 && (slen % commaInterval) == 0)
 	      dst.write(commaChar);
 	  }
         if (padRight)

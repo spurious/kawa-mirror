@@ -411,11 +411,14 @@ public class CallContext implements Runnable
     for ( ; fluid != old_fluids;  fluid = fluid.previous)
       {
 	Symbol symbol = fluid.symbol;
-	Constraint constraint = symbol.constraint;
-	if (constraint instanceof FluidConstraint)
-	  ((FluidConstraint) constraint).referenceCount++;
-	else
-	  symbol.constraint = new FluidConstraint(constraint);
+	synchronized (symbol)
+	  {
+	    Constraint constraint = symbol.constraint;
+	    if (constraint instanceof FluidConstraint)
+	      ((FluidConstraint) constraint).referenceCount++;
+	    else
+	      symbol.constraint = new FluidConstraint(constraint);
+	  }
       }
     fluidBindings = new_fluids;
   }
@@ -427,9 +430,12 @@ public class CallContext implements Runnable
     for ( ; fluid != old_fluids;  fluid = fluid.previous)
       {
 	Symbol symbol = fluid.symbol;
-	FluidConstraint constraint = (FluidConstraint) symbol.constraint;
-	if (constraint.referenceCount-- <= 0)
-	  symbol.constraint = constraint.savedConstraint;
+	synchronized (symbol)
+	  {
+	    FluidConstraint constraint = (FluidConstraint) symbol.constraint;
+	    if (constraint.referenceCount-- <= 0)
+	      symbol.constraint = constraint.savedConstraint;
+	  }
       }
     fluidBindings = old_fluids;
   }

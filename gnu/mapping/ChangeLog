@@ -1,5 +1,8 @@
 2003-10-09  Per Bothner  <per@bothner.com>
 
+	* CallContext.java (setFluids, resetFluids):  Add synchronization, as
+	syggested by jared@mercedsystems.com.	Fixes Savannah bug #5789.
+
 	* ApplyMethodProc.java (module):  Make field public.
 	* CpsMethodProc.java (module):  Make field public.
 

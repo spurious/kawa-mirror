@@ -1,33 +1,41 @@
-(define (call-with-input-file pathname proc)
-  (let ((port :: <input-port> (open-input-file pathname)))
+(define (open-input-file (pathname :: <String>)) :: <input-port>
+  (invoke-static <input-port> 'openFile pathname))
+
+(define (open-output-file (pathname :: <String>)) :: <output-port>
+  (invoke-static <output-port> 'openFile pathname))
+
+(define (call-with-input-file (pathname :: <String>) (proc :: <procedure>))
+	  :: <void>
+ (let ((port :: <input-port> (open-input-file pathname)))
     (try-finally
      (proc port)
      (close-input-port port))))
 
-(define (call-with-output-file pathname proc)
+(define (call-with-output-file pathname proc) :: <void>
   (let ((port :: <output-port> (open-output-file pathname)))
     (try-finally
      (proc port)
      (close-output-port port))))
 
-(define (input-port? x)
+(define (input-port? x) :: <boolean>
   (instance? x <input-port>))
 
-(define (output-port? x)
+(define (output-port? x) :: <boolean>
   (instance? x <output-port>))
 
-(define (current-input-port)
+(define (current-input-port) :: <input-port>
   ((primitive-static-method <input-port> "inDefault" <input-port> ())))
 
-(define (current-output-port)
+(define (current-output-port) :: <output-port>
   ((primitive-static-method <output-port> "outDefault" <output-port> ())))
 
-(define (current-error-port)
+(define (current-error-port) :: <output-port>
   ((primitive-static-method <output-port> "errDefault" <output-port> ())))
 
 (define (write-char ch #!optional
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))
+  :: <void>
   (invoke port 'writeChar (char->integer ch)))
 
 ;; SRFI-6
@@ -35,7 +43,7 @@
   (make <gnu.mapping.CharArrayInPort>
     (field str 'data) (field str 'size)))
 
-(define (open-output-string) <string-output-port>
+(define (open-output-string) :: <string-output-port>
   ((primitive-constructor  <string-output-port> ())))
 
 (define (get-output-string (output-port  <string-output-port>))
@@ -44,13 +52,21 @@
                               <char[]> ())
     output-port)))
 
-(define (call-with-input-string (str :: <string>) proc)
-  (let* ((port
+(define (call-with-input-string (str :: <string>) (proc :: <procedure>))
+  (let* ((port :: <gnu.mapping.CharArrayInPort>
 	  (make <gnu.mapping.CharArrayInPort>
 	    (field str 'data) (field str 'size)))
 	 (result (proc port)))
     (close-input-port port)
     result))
+
+(define (call-with-output-string (proc :: <procedure>))
+  (let ((port :: <gnu.mapping.CharArrayOutPort>
+	      (make <gnu.mapping.CharArrayOutPort>)))
+    (proc port)
+    (let ((chars :: <char[]> (invoke port 'toCharArray)))
+      (invoke port 'close)
+      (make <string> chars))))
 
 (define (force-output #!optional (port (current-output-port)))
   ((primitive-virtual-method <java.io.Writer> "flush" <void> ())

@@ -14,12 +14,12 @@ java_SCM_ALWAYS =\
   lists.scm \
   thread.scm \
   characters.scm \
-  files.scm \
   keywords.scm \
-  ports.scm \
-  misc.scm \
   numbers.scm \
   strings.scm \
+  ports.scm \
+  files.scm \
+  misc.scm \
   vectors.scm \
   uniform.scm \
   arrays.scm \

@@ -21,6 +21,14 @@ public class WrongArguments extends IllegalArgumentException {
     int num = proc.numArgs();
     int min = num & 0xfff;
     int max = num >> 12;
+    String pname = proc.getName();
+    if (pname == null)
+      pname = proc.getClass().getName();
+    return checkArgCount(pname, min, max, argCount);
+  }
+
+  public static String checkArgCount (String pname, int min, int max, int argCount)
+  {
     boolean tooMany;
     if (argCount < min)
       tooMany = false;
@@ -30,8 +38,7 @@ public class WrongArguments extends IllegalArgumentException {
       return null;
     StringBuffer buf = new StringBuffer(100);
     buf.append("call to '");
-    String pname = proc.getName();
-    buf.append(pname != null ? pname : proc.getClass().getName());
+    buf.append(pname);
     buf.append("' has too ");
     buf.append(tooMany ? "many" : "few");
     buf.append(" arguments (");

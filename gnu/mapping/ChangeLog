@@ -1,3 +1,8 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* WrongArguments.java (checkArgCount): Split into two overloaded
+	methods, so we can use it for a LambdaExp.
+
 2002-07-02  Per Bothner  <per@bothner.com>
 
 	* Values.java (canonicalize):  New method.

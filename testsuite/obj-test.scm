@@ -1,4 +1,4 @@
-(test-init "Objects" 34)
+(test-init "Objects" 37)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -70,6 +70,10 @@
 
 (test 1 'object-locals
       (let ((x (object (<java.lang.Object>) (z (lambda (x) (display x)))))) 1))
+
+(test 1 'object-locals
+      (let* ((d display)
+	     (x (object (<java.lang.Object>) (z (lambda (x) (d x)))))) 1))
 
 (test 2 'object-with-closure-1
       (length (let*
@@ -151,3 +155,7 @@
                (define obj2 (eval '(object () ((two) 2))))
                (list (invoke obj1 'one)
                      (invoke obj2 'two))))
+
+(require <module1>)
+(test 4 list-length-1 '(a b c d))
+(test 2 list-length-3 '(a b))

@@ -1,3 +1,9 @@
+2001-02-27  Per Bothner  <per@bothner.com>
+
+	* module1.scm:  New module, to test separate compilation.
+	* obj-test.scm:  Some extra tests, including require of module1.
+	* Makefile.am:  Update to compile and use module1.
+
 2000-09-21  Per Bothner  <per@bothner.com>
 
 	* num-test.scm:  New remainder test, from brlewis@alum.mit.edu.

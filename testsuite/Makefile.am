@@ -34,7 +34,7 @@ check-mac: testing.zip
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
-check-obj: testing.zip
+check-obj: testing.zip module1.class
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
@@ -55,6 +55,9 @@ check-ppfile:
 scribble.class: $(srcdir)/scribble.scm
 	$(KAWA) --applet -C $(srcdir)/scribble.scm
 
+module1.class: $(srcdir)/module1.scm
+	$(KAWA) -C $(srcdir)/module1.scm
+
 APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
@@ -62,6 +65,6 @@ check-scribble: scribble.class
 	CLASSPATH=.:.. $(APPLETVIEWER) $(srcdir)/scribble.html
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm
+  obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = ppfile.out

@@ -30,9 +30,20 @@ public class CpoolClass extends CpoolEntry {
     return name.string;
   }
 
-  final static int hashCode (CpoolUtf8 name) { return name.hash ^ 0xF0F; }
+  final static int hashCode (CpoolUtf8 name)
+  {
+    return name.hashCode() ^ 0xF0F;
+  }
 
-  void write (DataOutputStream dstr) throws java.io.IOException {
+  public int hashCode ()
+  {
+    if (hash == 0)
+      hash = hashCode(name);
+    return hash;
+  }
+
+  void write (DataOutputStream dstr) throws java.io.IOException
+  {
     dstr.writeByte (ConstantPool.CLASS);
     dstr.writeShort (name.index);
   }

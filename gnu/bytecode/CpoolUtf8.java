@@ -16,6 +16,13 @@ public class CpoolUtf8 extends CpoolEntry
     string = s;
   }
 
+  public int hashCode ()
+  {
+    if (hash == 0)
+      hash = string.hashCode();
+    return hash;
+  }
+
   public final void intern () { string = string.intern(); }
 
   public int getTag() { return 1; } // CONSTANT_CUtf8

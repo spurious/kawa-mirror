@@ -351,7 +351,8 @@ public class ClassType extends ObjectType implements AttrContainer {
   public void writeToFile (String filename)
     throws java.io.IOException
  {
-    FileOutputStream stream = new FileOutputStream (filename);
+    OutputStream stream
+      = new BufferedOutputStream(new FileOutputStream (filename));
     writeToStream (stream);
     stream.close ();
   }

@@ -39,7 +39,7 @@ abstract public class CpoolEntry
   /**
    * Enter current element into cpool.hashTab.
    */
-  private void add_hashed (ConstantPool cpool)
+  void add_hashed (ConstantPool cpool)
   {
     CpoolEntry[] hashTab = cpool.hashTab;
     int index = (hash & 0x7FFFFFFF) % hashTab.length;
@@ -59,39 +59,25 @@ abstract public class CpoolEntry
      // (Re-)allocate the cpool.pool array if need be.
      if (cpool.pool == null)
 	cpool.pool = new CpoolEntry[60];
-     else if (index >= cpool.pool.length) {
-       int old_size = cpool.pool.length;
-       int new_size = 2 * cpool.pool.length;
-       int i;
-       CpoolEntry[] new_pool = new CpoolEntry[new_size];
-       for (i = 0; i < old_size; i++) {
-	 new_pool[i] = cpool.pool[i];
+     else if (index >= cpool.pool.length)
+       {
+	 int old_size = cpool.pool.length;
+	 int new_size = 2 * cpool.pool.length;
+	 CpoolEntry[] new_pool = new CpoolEntry[new_size];
+	 for (int i = 0; i < old_size; i++)
+	   new_pool[i] = cpool.pool[i];
+	 cpool.pool = new_pool;
        }
-       cpool.pool = new_pool;
-     }
 
      // Re-hash cpool.hashTab hash_table if needed.
-     if (cpool.hashTab == null)
-       cpool.hashTab = new CpoolEntry[101];
-     else {
-       int old_size = cpool.hashTab.length;
-       if (index >= 0.60 * old_size) {
-	 CpoolEntry[] new_hash = new CpoolEntry[2 * old_size + 1];
-	 cpool.hashTab = new_hash;
-	 int i;
-	 for (i = 0; i < old_size; i++) {
-	   CpoolEntry entry = cpool.pool[i];
-	   if (entry != null)
-	     entry.add_hashed (cpool);
-	 }
-       }
-     }
+     if (cpool.hashTab == null || index >= 0.60 * cpool.hashTab.length)
+       cpool.rehash();
 
      // Enter into cpool.constant_pool array.
      cpool.pool[index] = this;
      // Enter into cpool.hashTab hash table.
      add_hashed (cpool);
-   }
+  }
 
   /** Print this constant pool entry.
    * If verbosity==0, print very tersely (no extraneous text).

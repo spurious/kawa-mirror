@@ -27,12 +27,20 @@ public class CpoolValue1 extends CpoolEntry
     return value;
   }
 
-  final static int hashCode (int val) { return val; }
+  static int hashCode (int val) { return val; }
 
-  void write (DataOutputStream dstr) throws java.io.IOException {
-	dstr.writeByte (tag);
-        dstr.writeInt (value);
-    }
+  public int hashCode ()
+  {
+    if (hash == 0)
+      hash = value;
+    return hash;
+  }
+
+  void write (DataOutputStream dstr) throws java.io.IOException
+  {
+    dstr.writeByte (tag);
+    dstr.writeInt (value);
+  }
 
   public void print (ClassTypeWriter dst, int verbosity)
   {

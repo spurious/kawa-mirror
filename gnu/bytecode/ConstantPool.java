@@ -47,26 +47,53 @@ public class ConstantPool
 
   CpoolEntry[] hashTab;
 
+  void rehash ()
+  {
+    if (hashTab == null && count > 0)
+      {
+	// Entries may not have been hashed before.  Make sure they are now.
+	for (int i = pool.length;  --i >= 0; )
+	  {
+	    CpoolEntry entry = pool[i];
+	    // Make sure entry.hash is not the default value 0.
+	    if (entry != null)
+	      entry.hashCode();
+	  }
+      }
+
+    hashTab = new CpoolEntry[count < 5 ? 101 : 2 * count];
+    if (pool != null)
+      {
+	for (int i = pool.length;  --i >= 0; )
+	  {
+	    CpoolEntry entry = pool[i];
+	    if (entry != null)
+	      entry.add_hashed (this);
+	  }
+      }
+  }
+
   public CpoolUtf8 addUtf8 (String s)
   {
     s = s.intern();
     int h = s.hashCode();
 
     // Check if we already have a matching CONSTANT_Utf8.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolUtf8)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolUtf8)
-	      {
-		CpoolUtf8 utf = (CpoolUtf8) entry;
-		if (utf.string == s)
-		  return utf;
-	      }
+	    CpoolUtf8 utf = (CpoolUtf8) entry;
+	    if (utf.string == s)
+	      return utf;
 	  }
       }
+    if (locked)
+      throw new Error("adding new Utf8 entry to locked contant pool: "+s);
     return new CpoolUtf8(this, h, s);
   }
 
@@ -85,18 +112,16 @@ public class ConstantPool
     int h = CpoolClass.hashCode(name);
 
     // Check if we already have a matching CONSTANT_Class.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolClass)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolClass)
-	      {
-		CpoolClass ent = (CpoolClass) entry;
-		if (ent.name == name)
-		  return ent;
-	      }
+	    CpoolClass ent = (CpoolClass) entry;
+	    if (ent.name == name)
+	      return ent;
 	  }
       }
     return new CpoolClass (this, h, name);
@@ -107,18 +132,16 @@ public class ConstantPool
     int h = CpoolValue1.hashCode(val);
 
     // Check if we already have a matching CONSTANT_Integer.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolValue1)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolValue1)
-	      {
-		CpoolValue1 ent = (CpoolValue1) entry;
-		if (ent.tag == tag && ent.value == val)
-		  return ent;
-	      }
+	    CpoolValue1 ent = (CpoolValue1) entry;
+	    if (ent.tag == tag && ent.value == val)
+	      return ent;
 	  }
       }
     return new CpoolValue1 (this, tag, h, val);
@@ -129,18 +152,16 @@ public class ConstantPool
     int h = CpoolValue2.hashCode(val);
 
     // Check if we already have a matching CONSTANT_Integer.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolValue2)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolValue2)
-	      {
-		CpoolValue2 ent = (CpoolValue2) entry;
-		if (ent.tag == tag && ent.value == val)
-		  return ent;
-	      }
+	    CpoolValue2 ent = (CpoolValue2) entry;
+	    if (ent.tag == tag && ent.value == val)
+	      return ent;
 	  }
       }
     return new CpoolValue2 (this, tag, h, val);
@@ -176,18 +197,16 @@ public class ConstantPool
     int h = CpoolString.hashCode (str);
 
     // Check if we already have a matching CONSTANT_String.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolString)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolString)
-	      {
-		CpoolString ent = (CpoolString) entry;
-		if (ent.str == str)
-		  return ent;
-	      }
+	    CpoolString ent = (CpoolString) entry;
+	    if (ent.str == str)
+	      return ent;
 	  }
       }
     return new CpoolString (this, h, str);
@@ -213,18 +232,16 @@ public class ConstantPool
     int h = CpoolNameAndType.hashCode (name, type);
 
     // Check if we already have a matching CONSTANT_Integer.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
-	  {
-	    if (h == entry.hash
-		&& entry instanceof CpoolNameAndType
-		&& ((CpoolNameAndType)entry).name == name
-		&& ((CpoolNameAndType)entry).type == type)
-	      return (CpoolNameAndType)entry;
-	  }
+	if (h == entry.hash
+	    && entry instanceof CpoolNameAndType
+	    && ((CpoolNameAndType)entry).name == name
+	    && ((CpoolNameAndType)entry).type == type)
+	  return (CpoolNameAndType)entry;
       }
     return new CpoolNameAndType(this, h, name, type);
   }
@@ -235,20 +252,18 @@ public class ConstantPool
     int h = CpoolRef.hashCode (clas, nameAndType);
 
     // Check if we already have a matching CONSTANT_Integer.
-    if (hashTab != null)
+    if (hashTab == null)
+      rehash();
+    int index = (h & 0x7FFFFFFF) % hashTab.length;
+    for (CpoolEntry entry = hashTab[index]; entry != null; entry = entry.next)
       {
-	int index = (h & 0x7FFFFFFF) % hashTab.length;
-	CpoolEntry entry;
-	for (entry = hashTab[index]; entry != null; entry = entry.next)
+	if (h == entry.hash && entry instanceof CpoolRef)
 	  {
-	    if (h == entry.hash && entry instanceof CpoolRef)
-	      {
-		CpoolRef ref = (CpoolRef) entry;
-		if (ref.tag == tag
-		    && ref.clas == clas
-		    && ref.nameAndType== nameAndType)
-		  return ref;
-	      }
+	    CpoolRef ref = (CpoolRef) entry;
+	    if (ref.tag == tag
+		&& ref.clas == clas
+		&& ref.nameAndType== nameAndType)
+	      return ref;
 	  }
       }
     return new CpoolRef (this, h, tag, clas, nameAndType);
@@ -368,6 +383,5 @@ public class ConstantPool
 	    break;
 	  }
       }
-    locked = true;
   }
 }

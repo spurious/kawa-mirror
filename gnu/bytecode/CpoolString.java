@@ -25,7 +25,14 @@ public class CpoolString extends CpoolEntry
     return str;
   }
 
-  final static int hashCode (CpoolUtf8 str) { return str.hash ^ 0xF30F; }
+  final static int hashCode (CpoolUtf8 str) { return str.hashCode() ^ 0xF30F; }
+
+  public int hashCode ()
+  {
+    if (hash == 0)
+      hash = hashCode(str);
+    return hash;
+  }
 
   void write (DataOutputStream dstr) throws java.io.IOException
   {

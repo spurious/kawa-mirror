@@ -43,7 +43,14 @@ CpoolRef extends CpoolEntry
 
   final static int hashCode (CpoolClass clas, CpoolNameAndType nameAndType)
   {
-    return clas.hash ^ nameAndType.hash;
+    return clas.hashCode() ^ nameAndType.hashCode();
+  }
+
+  public int hashCode ()
+  {
+    if (hash == 0)
+      hash = hashCode(clas, nameAndType);
+    return hash;
   }
 
   void write (DataOutputStream dstr) throws java.io.IOException

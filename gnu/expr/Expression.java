@@ -59,6 +59,25 @@ public abstract class Expression implements Printable
   String filename;
   int position;
 
+  public static final Expression[] noExpressions = new Expression[0];
+
+  /** Helper method to create a `while' statement. */
+  public static Expression makeWhile(Expression cond, Expression body)
+  {
+    Expression[] inits = new Expression[1];
+    LetExp let = new LetExp(inits);
+    Declaration fdecl = let.addDeclaration("%do%loop");
+    Expression recurse = new ApplyExp(new ReferenceExp(fdecl), noExpressions);
+    IfExp lbody = new IfExp(cond,
+			    new BeginExp(body, recurse),
+			    QuoteExp.voidExp);
+    LambdaExp lexp = new LambdaExp(lbody);
+    inits[0] = lexp;
+    fdecl.noteValue(lexp);
+    let.setBody(new ApplyExp(new ReferenceExp(fdecl), noExpressions));
+    return let;
+  }
+
   public final void setFile (String filename)
   {
     this.filename = filename;
@@ -96,5 +115,30 @@ public abstract class Expression implements Printable
   {
     return Type.pointer_type;
   }
+
+  protected int flags;
+  protected static final int NEXT_AVAIL_FLAG = 1;
+
+  public void setFlag (boolean setting, int flag)
+  {
+    if (setting) flags |= flag;
+    else flags &= ~flag;
+  }
+
+  public void setFlag (int flag)
+  {
+    flags |= flag;
+  }
+
+  public int  getFlags()
+  {
+    return flags;
+  }
+
+  public boolean getFlag (int flag)
+  {
+    return (flags & flag) != 0;
+  }
+
 
 }

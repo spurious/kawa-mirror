@@ -107,14 +107,6 @@ public class LambdaExp extends ScopeExp
   static final int METHODS_COMPILED = 128;
   static final int NO_FIELD = 256;
   static final int DEFAULT_CAPTURES_ARG = 512;
-  protected int flags;
-  public int  getFlags() { return flags; }
-
-  final void setFlag (boolean setting, int flag)
-  {
-    if (setting) flags |= flag;
-    else flags &= ~flag;
-  }
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }

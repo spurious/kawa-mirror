@@ -23,11 +23,12 @@ public class SetExp extends Expression
   public SetExp (String sym, Expression val)
   { name = sym;  new_value = val; }
 
-  static private int DEFINING_FLAG = 1;
-  static private int GLOBAL_FLAG = 2;
-  static private int HAS_VALUE = 4;
-  static private int PROCEDURE = 8;
-  static private int SET_IF_UNBOUND = 16;
+  static private int DEFINING_FLAG = NEXT_AVAIL_FLAG;
+  static private int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
+  public static  int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
+  static private int PROCEDURE = NEXT_AVAIL_FLAG << 3;
+  static private int SET_IF_UNBOUND = NEXT_AVAIL_FLAG << 4;
+  static private int HAS_VALUE = NEXT_AVAIL_FLAG << 5;
 
   public final boolean isDefining ()
   {
@@ -81,7 +82,7 @@ public class SetExp extends Expression
 	if (getHasValue())
 	  return name;
 	else
-	  return Values.empty; //FIXME Interpreter.noValue
+	  return Interpreter.getInterpreter().noValue();
       }
 
     Object new_val = new_value.eval (env);
@@ -93,14 +94,16 @@ public class SetExp extends Expression
       env.define (name, new_val);
     else
       {
-	Binding bind = env.lookup (name);
+	Binding bind = (getFlag(PREFER_BINDING2)
+			? Binding2.getBinding2(env, name)
+			: env.lookup (name));
 	if (bind != null)
 	  env.put (name, new_val);
 	else
 	  env.define (name, new_val);
 	//	  throw new UnboundSymbol (name);
       }
-    return getHasValue() ? new_val : Values.empty; // FIXME Interpreter.noValue
+    return getHasValue() ? new_val : Interpreter.getInterpreter().noValue();
   }
 
   static Method setMethod = null;

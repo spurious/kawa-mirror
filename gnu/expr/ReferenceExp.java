@@ -24,9 +24,9 @@ public class ReferenceExp extends Expression
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;
 
-  private static int DONT_DEREFERENCE = 1;
-  private static int PROCEDURE_NAME = 2;
-  int flags;
+  private static int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
+  private static int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
+  public static int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
 
   /* If true, must have binding.isBinding().  Don't dereference Binding. */
   public final boolean getDontDereference()
@@ -35,10 +35,7 @@ public class ReferenceExp extends Expression
   }
 
   public final void setDontDereference(boolean setting)
-  {
-    if (setting) flags |= DONT_DEREFERENCE;
-    else flags &= ~DONT_DEREFERENCE;
-  }
+  { setFlag(setting, DONT_DEREFERENCE); }
 
   /** True if this identifier appears in "function call position".
    * If so, it should be interpreted as a function name, which makes a
@@ -51,8 +48,7 @@ public class ReferenceExp extends Expression
   /** Note if this identifier appears in "function call position". */
   public final void setProcedureName(boolean setting)
   {
-    if (setting) flags |= PROCEDURE_NAME;
-    else flags &= ~PROCEDURE_NAME;
+    setFlag(setting, PROCEDURE_NAME);
   }
 
   public ReferenceExp (String symbol)
@@ -77,16 +73,13 @@ public class ReferenceExp extends Expression
     if (binding != null
         && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       throw new Error("internal error: ReferenceExp.eval on lexical binding");
-    Binding bind = env.lookup(symbol);
-    if (isProcedureName() && bind instanceof Binding2)
+    if (getFlag(PREFER_BINDING2))
       {
-	Object result = ((Binding2) bind).functionValue;
-	if (result != null)
-	  return result;
+	Binding bind = Binding2.getBinding2(env, symbol);
+	return isProcedureName() ? bind.getProcedure() : bind.get();
       }
-    else if (bind != null)
-      return bind.get();
-    return env.getChecked(symbol);
+    else
+      return env.getChecked(symbol);
   }
 
   public void compile (Compilation comp, Target target)
@@ -119,10 +112,12 @@ public class ReferenceExp extends Expression
 	  }
 	if (! isProcedureName())
 	  code.emitInvokeVirtual(Compilation.getLocationMethod);
-	else if (! comp.getInterpreter().hasSeparateFunctionNamespace())
+	else //if (! comp.getInterpreter().hasSeparateFunctionNamespace())
 	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	/*
 	else
 	  code.emitGetField(Compilation.functionValueBinding2Field);
+	*/
       }
     target.compileFromStack(comp, getType());
   }

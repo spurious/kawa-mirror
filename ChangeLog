@@ -1,5 +1,8 @@
 Sat Jul 20 11:25:05 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	Make kawa-0.3 release.
+
+	* configure.in, configure (AC_INIT):  Look for kawa.java now.
 	* kawa/Shell.java:  Re-structure.
 
 	* kawa/standard/{and,or}.java:  Remove old-style implementations.

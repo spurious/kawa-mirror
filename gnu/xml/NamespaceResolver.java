@@ -262,6 +262,7 @@ public class NamespaceResolver extends FilterConsumer
   public void endGroup(String typeName)
   {
     closeStartTag();
+    /*
     if (! typeName.equals(nameStack[0]) && ! mismatchReported)
       {
 	mismatchReported = true;
@@ -270,6 +271,7 @@ public class NamespaceResolver extends FilterConsumer
 	parser.error('e', "</" + typeName+"> matching <"+nameStack[0]+">");
 	parser.pos += nlen;
       }
+    */
     if (nesting <= 0)
       return; // Only if error.
     nesting--;

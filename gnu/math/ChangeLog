@@ -1,3 +1,7 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* package.html:  Remove "http:" from relative URLs.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (setShiftRight):  Avoid undefined shift by 32.

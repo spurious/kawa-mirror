@@ -1,3 +1,8 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (getNamedType):  Update "abstract-string"
+	for CharSequence -> CharSeq renaming.
+
 2001-09-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/NumberCompare.java:  Moved to gnu.kawa.functions.

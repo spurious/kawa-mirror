@@ -832,7 +832,7 @@ public class Scheme extends LispInterpreter
 	types.put ("pair-with-position",
 		   ClassType.make("gnu.lists.PairWithPosition"));
 	types.put ("string", ClassType.make("gnu.lists.FString"));
-	types.put ("abstract-string", ClassType.make("gnu.lists.CharSequence"));
+	types.put ("abstract-string", ClassType.make("gnu.lists.CharSeq"));
 	types.put ("character", ClassType.make("gnu.text.Char"));
 	types.put ("vector", ClassType.make("gnu.lists.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));

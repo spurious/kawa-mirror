@@ -1,6 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.OutPort;
+import gnu.mapping.*;
 
 /**
  * Class used to implement "let" syntax (and variants) for Scheme.
@@ -46,6 +46,48 @@ public class LetExp extends ScopeExp
 	  }
       }
   }
+
+  /* CPS:
+   * Need to ensure that ctx.pc is 0 before the this is called
+   * the first time. This is currently done by match0.
+   * Need to define concention so ReferenceExp can find appropriate binding.
+   * Need to define convention for what gets copied, if anything,
+   * when a continuation is created.  (Note problem below if a half-initialized
+   * frame gets captuerd.  Then multiple cals to the same continuation
+   * could clobber the frame, unless it has been copied.  But copying the
+   * frame is tricky if we want to avoid copying the whole stack, plus we
+   * have to correctly handle set! to a local/
+  public void apply (CallContext ctx) throws Throwable
+  {
+    CallFrame fr;
+    if (ctx.pc == 0)
+      {
+	fr = new gnu.mapping.CallFrame();
+	fr.previous = ctx.frame;
+	fr.saveVstackLen = ctx.startFromContext();
+	ctx.frame = fr;
+      }
+    else
+      fr = ctx.frame;
+    int i = ctx.pc;
+    if (i == inits.length + 1)
+      {
+	// pop
+	ctx.frame = fr.previous;
+	return;
+      }
+    if (i > 0)
+      fr.values[i-1] = ctx.getFromContext(fr.saveVstackLen);
+    ctx.pc++;
+    if (i == inits.length)
+      {
+        body.match0(ctx);
+	return;
+      }
+    fr.saveVstackLen = ctx.startFromContext();
+    inits[i].match0(ctx);
+  }
+  */
 
   public void compile (Compilation comp, Target target)
   {

@@ -2009,7 +2009,8 @@ implements Consumer, PositionConsumer, Consumable
 			break;
 		      case BEGIN_ATTRIBUTE_LONG:
 			j = getIntN(i+1);
-			out.print("=BEGIN_ATTRIBUTE name:"+j+"="+objects[j]);
+			out.print("=BEGIN_ATTRIBUTE name:"+j
+				  +"="+objects[j]+"::"+objects[j+1]);
 			j = getIntN(i+3);
 			j += j < 0 ? data.length : i;
 			out.print(" end:"+j);

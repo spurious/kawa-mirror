@@ -1,6 +1,6 @@
 ;; FIXME - optimize or remove call-cc uses
 ;; FIXME - map for-each are also defined here
-:: FIXME - map-in-order?
+;; FIXME - map-in-order?
 
 ;;; SRFI-1 list-processing library 			-*- Scheme -*-
 ;;; Reference implementation

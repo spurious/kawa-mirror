@@ -776,7 +776,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("attempting to push dead variable");
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
-      throw new Error ("attempting to store in unassigned variable"+var.getName()
+      throw new Error ("attempting to store in unassigned variable "+var.getName()
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
     reserve(4);

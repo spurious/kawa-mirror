@@ -1,3 +1,10 @@
+1999-04-15  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ClassFileInput.java (readAttribute): Use readUnsignedShort (twice).
+	(From Jay Krell <jay.krell@cornell.edu>.)
+
+	* CodeAttr.java (emitStore):  Add missing space in error message.
+	
 1999-04-05  Geoff Berry  <gcb@duke.edu>
 
 	* ClassFileInput.java (readAttribute): Handle Exceptions attribute.

@@ -12,7 +12,8 @@ import java.io.*;
 public class LineNumbersAttr extends Attribute
 {
   // The line number table.  Each even entry (starting with index 0) is a PC,
-  // and the following odd entry is the linenumber.
+  // and the following odd entry is the linenumber.  Each number is
+  // actually unsigned, so should be masked with 0xFFFF.
   short[] linenumber_table;
   // The number of linenumber (pairs) in linenumber_table.
   int linenumber_count;
@@ -77,9 +78,9 @@ public class LineNumbersAttr extends Attribute
     for (int i = 0;  i < linenumber_count;  i++)
       {
 	dst.print("  line: ");
-	dst.print(linenumber_table[2 * i + 1]); // line number
+	dst.print(linenumber_table[2 * i + 1] & 0xFFFF); // line number
 	dst.print(" at pc: ");
-	dst.println(linenumber_table[2 * i]);   // start_pc
+	dst.println(linenumber_table[2 * i] & 0xFFFF);   // start_pc
       }
   }
 }

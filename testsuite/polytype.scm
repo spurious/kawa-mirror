@@ -1,4 +1,5 @@
 ; polytype.scm
+(test-init "polytype")
 
 ;------------------------------------------------------------------------------
 ;
@@ -39,7 +40,7 @@
 ;
 ; Variables are symbols starting with a "?" (e.g. ?a)
 
-(define variable-count 0)
+(define variable-count #f)
 
 (define (new-variable)
   (set! variable-count (+ variable-count 1))
@@ -89,27 +90,22 @@
 
 ;------------------------------------------------------------------------------
 
-(define (instance xx prefix)   ; generate an instance of x with new variables
-;;(display "(instance x:") (write xx) (display ")") (newline)
+(define (instance x prefix)   ; generate an instance of x with new variables
   (define (new x env success) ; in place of the generic variables in prefix
-;;    (display "(new x:") (write x) (display ")") (newline)
     (cond ((and (variable? x) (generic? x prefix))
            (if (env-bound? x env)
              (success (env-value x env) env)
              (let ((var (new-variable)))
                (success var (env-update x var env)))))
            ((pair? x)
-;;	    (display "x:") (write x) (newline)
             (new (car x) env
               (lambda (a env)
-;;		(if (not (pair? x))
-;;		    (begin (display "bad x:") (write x) (newline) (exit -1)))
                 (new (cdr x) env
                   (lambda (b env)
                     (success (cons a b) env))))))
            (else
             (success x env))))
-  (new xx (env-empty) (lambda (a env) a)))
+  (new x (env-empty) (lambda (a env) a)))
 
 (define (generic? var prefix) ; is the variable 'var' generic in the 'prefix'
   (cond ((null? prefix)
@@ -232,59 +228,66 @@
 ;
 ; Some examples:
 
-(define (try x) (write (type x)) (newline))
-
 (define example1
   '(cdr '(1 2 3)))
 
-;(try example1) ; returns: (LIST NUM)
-(test '(list num)
-      'example1 (type example1))
-
 (define example2
   '(lambda (x y) (if (car x) (car y) (length y))))
-
-;(try example2) ; returns: (-> (LIST BOOL) (LIST NUM) NUM)
-(test '(-> (list bool) (list num) num)
-      'example2 (type example2))
 
 (define example3
   '(letrec ((fact (lambda (x) (if (< x 2) 1 (* x (fact (- x 1)))))))
      fact))
 
-;(try example3) ; returns: (-> NUM NUM)
-(test '(-> num num)
-      'example3 (type example3))
-
 (define example4
   '(let ((ident (lambda (x) x))) (ident ident)))
-
-;(try example4) ; returns: (-> ?10 ?10)
-(test '(-> ?20 ?20)
-      'example4 (type example4))
 
 (define example5
   '(letrec ((length (lambda (l) (if (null? l) 0 (+ 1 (length (cdr l)))))))
      length))
-
-;(try example5) ; returns: (-> (LIST ?174) NUM)
-(test '(-> (list ?24) num)
-      'example5 (type example5))
 
 (define example6
   '(letrec ((map (lambda (f l)
                    (if (null? l) '() (cons (f (car l)) (map f (cdr l)))))))
      map))
 
-;(try example6) ; returns: (-> (-> ?194 ?199) (LIST ?194) (LIST ?199))
-(test '(-> (-> ?33 ?34) (list ?33) (list ?34))
-      'example6 (type example6))
-
 (define example7
   '(lambda (x)
      (+ 4 (call/cc (lambda (exit)
                      (if (null? x) (exit 0) (length x)))))))
 
-;(try example7) ; returns: (-> (LIST ?207) NUM)
-(test '(-> (list ?51) num)
-      'example7 (type example7))
+;(define (test expect fun result)
+;  (write result)
+;  (newline)
+;  (if (not (equal? expect result))
+;      (begin
+;        (display "EXPECTED ")
+;        (write expect)
+;        (newline))))
+
+(define (run)
+
+  (set! variable-count 0)
+
+  (test '(list num)
+        'example1 (type example1))
+
+  (test '(-> (list bool) (list num) num)
+        'example2 (type example2))
+
+  (test '(-> num num)
+        'example3 (type example3))
+
+  (test '(-> ?20 ?20)
+        'example4 (type example4))
+
+  (test '(-> (list ?24) num)
+        'example5 (type example5))
+
+  (test '(-> (-> ?33 ?34) (list ?33) (list ?34))
+        'example6 (type example6))
+
+  (test '(-> (list ?51) num)
+        'example7 (type example7)))
+
+;(time (run))
+(run)

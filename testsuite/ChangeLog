@@ -1,3 +1,7 @@
+Fri Jul 10 18:11:41 1998  Per Bothner  <bothner@cygnus.com>
+
+	* polytype.scm:  Merge with updated version from Feeley.
+
 Mon Jun 29 17:59:06 1998  Per Bothner  <bothner@cygnus.com>
 
 	* test.scm:  Merged some more code from Jaffar's version.

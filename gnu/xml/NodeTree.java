@@ -133,6 +133,15 @@ public class NodeTree extends TreeList
     return index >= 0 && data[index] == BEGIN_ATTRIBUTE_LONG;
   }
 
+  /** Get the target of a process-instruction. */
+  public String posTarget (int ipos)
+  {
+    int index = posToDataIndex(ipos);
+    if (data[index] != PROCESSING_INSTRUCTION)
+      throw new ClassCastException("expected process-instruction");
+    return (String) objects[getIntN(index+1)];
+  }
+
   public String toString ()
   {
     CharArrayOutPort wr = new CharArrayOutPort();

@@ -118,9 +118,9 @@ public class SwingBuffer extends Buffer
     //doc.remove(index, count);
   }
 
-  public void remove(int ipos, Object xpos, int count)
+  public void removePos(int ipos, int count)
   {
-    remove(nextIndex(ipos, xpos), count);
+    remove(nextIndex(ipos), count);
   }
 
   public void save(Writer out)
@@ -165,9 +165,9 @@ public class SwingBuffer extends Buffer
     insert(getDot(), string ,style);
   }
 
-  public void insert (String string, Object style, int ipos, Object xpos)
+  public void insert (String string, Object style, int ipos)
   {
-    insert (nextIndex(ipos, xpos), string, style);
+    insert (nextIndex(ipos), string, style);
   }
 
   public void insertFile(Reader in)
@@ -283,9 +283,9 @@ public class SwingBuffer extends Buffer
     content.consume(start, count, out);
   }
 
-  public int createPosition(int index, boolean isAfter)
+  public int createPos(int index, boolean isAfter)
   {
-    return content.createPosition(index, isAfter);
+    return content.createPos(index, isAfter);
   }
 
   public Object get (int index)
@@ -298,14 +298,14 @@ public class SwingBuffer extends Buffer
     return content.size();
   }
 
-  public int nextIndex(int ipos, Object xpos)
+  public int nextIndex(int ipos)
   {
-    return content.nextIndex(ipos, xpos);
+    return content.nextIndex(ipos);
   }
 
   public long savePointMark ()
   {
-    int pointPosition = content.createPosition(getDot(), false);
+    int pointPosition = content.createPos(getDot(), false);
     int markPosition = 0;  // FIXME
     return ((long) markPosition) << 32 | ((long) pointPosition & 0xffffffffl);
   }
@@ -314,8 +314,8 @@ public class SwingBuffer extends Buffer
   {
     int pointPosition = (int) pointMark;
     int markPosition = (int) (pointMark >> 32);
-    setDot(content.nextIndex(pointPosition, null));
-    content.releasePosition(pointPosition, null);
+    setDot(content.nextIndex(pointPosition));
+    content.releasePos(pointPosition);
     // Restore mark - FIXME
     // content.releasePosition(markPosition);
   }

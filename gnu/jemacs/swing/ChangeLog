@@ -1,3 +1,8 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java:  Update for gnu.lists changes.
+	* SwingWindow.java:  Likewise.
+
 2002-11-05  Per Bothner  <per@bothner.com>
 
 	* SwingWindow.java (<init>):  Don't call setBuffer, since that

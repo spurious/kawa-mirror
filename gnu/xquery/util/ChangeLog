@@ -1,3 +1,9 @@
+2003-09-24  Per Bothner  <per@bothner.com>
+
+	* MakeAttribute.java:  Now extends gnu.kawa.xml.NodeConstructor.
+	(apply):  Update.  (compileToNode):  New, replaces compile method.
+	* MakeElement.java:  Likewise.
+
 2003-09-11  Per Bothner  <per@bothner.com>
 
 	* ValuesFilter.java:  Implement CanInline.

@@ -6,9 +6,9 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
-import gnu.kawa.xml.ElementConstructor;
+import gnu.kawa.xml.*;
 
-public class MakeElement extends CpsProcedure implements CanInline, Inlineable
+public class MakeElement extends NodeConstructor implements CanInline
 {
   public static final MakeElement makeElement = new MakeElement();
 
@@ -47,21 +47,29 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 
   public void apply (CallContext ctx)
   {
-    Object type = ctx.getNextArg();
-    Consumer out = ctx.consumer;
-    beginGroup(out, type);
-    Object endMarker = Special.dfault;
-    for (;;)
+    Consumer saved = ctx.consumer;
+    Consumer out = pushNodeContext(ctx);
+    try
       {
-        Object arg = ctx.getNextArg(endMarker);
-	if (arg == endMarker)
-	  break;
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(out);
-	else
-	  ctx.writeValue(arg);
+	Object type = ctx.getNextArg();
+	beginGroup(out, type);
+	Object endMarker = Special.dfault;
+	for (;;)
+	  {
+	    Object arg = ctx.getNextArg(endMarker);
+	    if (arg == endMarker)
+	      break;
+	    if (arg instanceof Consumable)
+	      ((Consumable) arg).consume(out);
+	    else
+	      ctx.writeValue(arg);
+	  }
+	endGroup(out, type);
       }
-    endGroup(out, type);
+    finally
+      {
+	popNodeContext(saved, ctx);
+      }
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
@@ -82,30 +90,22 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
     return exp;
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  public void compileToNode (ApplyExp exp, Compilation comp,
+				      ConsumerTarget target)
   {
-    if (target instanceof ConsumerTarget)
-      {
-	Variable consumer = ((ConsumerTarget) target).getConsumerVariable();
-	Expression[] args = exp.getArgs();
-	int nargs = args.length;
-	CodeAttr code = comp.getCode();
-	
-	code.emitLoad(consumer);
-	code.emitDup();
-	args[0].compile(comp, Target.pushObject);
-	code.emitDup(1, 1); // dup_x1
-	// Stack:  consumer, tagtype, consumer, tagtype
-	code.emitInvokeStatic(beginGroupMethod);
-	// Stack:  consumer, name
-	for (int i = 1;  i < nargs;  i++)
-	  args[i].compile(comp, target);
-	code.emitInvokeStatic(endGroupMethod);
-      }
-    else if (target instanceof IgnoreTarget)
-      ApplyExp.compile(exp, comp, target);
-    else
-      ElementConstructor.compileUsingNodeTree(exp, comp, target);
+    Variable consumer = target.getConsumerVariable();
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    CodeAttr code = comp.getCode();
+    code.emitLoad(consumer);
+    code.emitDup();
+    args[0].compile(comp, Target.pushObject);
+    code.emitDup(1, 1); // dup_x1
+    // Stack:  consumer, tagtype, consumer, tagtype
+    code.emitInvokeStatic(beginGroupMethod);
+    for (int i = 1;  i < nargs;  i++)
+      compileChild(args[i], comp, target);
+    code.emitInvokeStatic(endGroupMethod);
   }
 
   public Type getReturnType (Expression[] args)

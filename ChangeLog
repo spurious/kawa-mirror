@@ -1,3 +1,8 @@
+2003-04-25  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (select-java1, select-java2):  New rules to convert
+	basebase to Java1-compliant and back again.
+
 2003-04-21  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (getOriginalRef):  New method.

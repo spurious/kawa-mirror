@@ -178,4 +178,21 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
 
+select-java1:
+	cd $(srcdir); \
+	for file in `find . -name '*.java' -exec grep -l 'BEGIN JAVA[12]' '{}' ';'`; do \
+	echo Converting $$file to Java1; \
+        sed -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+            -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)//[ ]*|\1|' \
+	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+
+select-java2:
+	cd $(srcdir); \
+	for file in `find . -name '*.java' -exec grep -l 'BEGIN JAVA[12]' '{}' ';'`; do \
+	echo Converting $$file to Java2; \
+        sed -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+            -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)//[ ]*|\1|' \
+	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+
 distall:  distcheck dist-kawa-@VERSION@.jar jemacs.jar
+

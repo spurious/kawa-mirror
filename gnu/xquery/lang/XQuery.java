@@ -65,6 +65,7 @@ public class XQuery extends Interpreter
   }
 
   public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
     gnu.expr.Parser tr = new gnu.expr.Parser(messages);
@@ -72,40 +73,26 @@ public class XQuery extends Interpreter
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
-    try
+    XQParser lexer = (XQParser) getLexer(port, messages);
+    lexer.nesting = 1;
+    Vector exps = new Vector(10);
+    for (;;)
       {
-	XQParser lexer = (XQParser) getLexer(port, messages);
-	lexer.nesting = 1;
-	Vector exps = new Vector(10);
-        for (;;)
-          {
-	    Expression sexp = lexer.parse(tr);
-	    if (sexp == null)
-	      break;
-	    exps.addElement(sexp);
-          }
-	int nexps = exps.size();
-	if (nexps == 0)
-	  mexp.body = QuoteExp.voidExp;
-	else if (nexps == 1)
-	  mexp.body = (Expression) exps.elementAt(0);
-	else
-	  {
-	    Expression[] arr = new Expression[nexps];
-	    exps.copyInto(arr);
-	    mexp.body = new BeginExp(arr);
-	  }
+	Expression sexp = lexer.parse(tr);
+	if (sexp == null)
+	  break;
+	exps.addElement(sexp);
       }
-    catch (gnu.text.SyntaxException ex)
+    int nexps = exps.size();
+    if (nexps == 0)
+      mexp.body = QuoteExp.voidExp;
+    else if (nexps == 1)
+      mexp.body = (Expression) exps.elementAt(0);
+    else
       {
-        // Got a fatal error.
-        if (ex.getMessages() != messages)
-          throw new RuntimeException ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-      }
-    catch (java.io.IOException e)
-      {
-	throw new RuntimeException ("I/O exception reading file: " + e.toString ());
+	Expression[] arr = new Expression[nexps];
+	exps.copyInto(arr);
+	mexp.body = new BeginExp(arr);
       }
     tr.pop(mexp);
     return mexp;
@@ -157,11 +144,11 @@ public class XQuery extends Interpreter
 	loadClass("kawa.lib.lists");
 	loadClass("kawa.lib.strings");
 	loadClass("gnu.commonlisp.lisp.PrimOps");
-	loadClass("gnu.kawa.servlet.HTTP");
+	loadClass("gnu.kawa.slib.HTTP");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	// Ignore - gnu.kawa.servlet.HTTP is only built if servlets enabled.
+	// Ignore - gnu.kawa.slib.HTTP is only built if servlets enabled.
       }
 
     define("define", new kawa.standard.set_b());

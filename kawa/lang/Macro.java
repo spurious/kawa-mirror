@@ -4,12 +4,11 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.util.*;
 
-public class Macro extends Syntax
+public class Macro extends Syntax implements Compilable, Printable
 {
-  public Object transformer;
-
-  public static ClassType thisType;
+  public static final ClassType thisType = ClassType.make("kawa.lang.Macro");
   static public Method makeMethod;
+  public Expression expander;
 
   public static Macro make (String name, Procedure expander)
   {
@@ -19,8 +18,6 @@ public class Macro extends Syntax
 
   public static Method getMakeMethod()
   {
-    if (thisType == null)
-      thisType = ClassType.make("kawa.lang.Macro");
     if (makeMethod == null)
       {
         Type[] args = { Compilation.javaStringType, Compilation.typeProcedure };
@@ -33,19 +30,19 @@ public class Macro extends Syntax
   public Macro(String name, Procedure expander)
   {
     super(name);
-    this.value = new QuoteExp(expander);
+    //setType(thisType);
+    this.expander = new QuoteExp(expander);
   }
 
   public Macro(String name, Expression lexp)
   {
     super(name);
-    this.value = lexp;
+    this.expander = lexp;
   }
 
-  public Macro(String name, Object transformer)
+  public Macro(String name)
   {
     super(name);
-    this.transformer = transformer;
   }
 
   public gnu.expr.Expression rewriteForm (Pair form, Translator tr)
@@ -55,19 +52,25 @@ public class Macro extends Syntax
 
   public String toString()
   {
-    return "#<macro "+getName()+'>';
+    return "#<macro "+getName()+'/'+id+'>';
+  }
+
+  public void print(java.io.PrintWriter ps)
+  {
+    ps.print("#<macro ");
+    ps.print(getName());
+    ps.print ('>');
   }
 
   public Object expand (Pair form, Translator tr)
   {
     try
       {
-        Expression value = getValue();
-        Procedure expander = (Procedure) value.eval(tr.getGlobalEnvironment());
+        Procedure pr = (Procedure) expander.eval(tr.getGlobalEnvironment());
         SyntaxForm sform = new SyntaxForm();
         sform.form = form;
         sform.tr = tr;
-	Object expansion = expander.apply1(sform);
+	Object expansion = pr.apply1(sform);
         return expansion;
       }
     catch (Exception ex)
@@ -103,5 +106,25 @@ public class Macro extends Syntax
         tr.current_column = save_column;
         tr.currentSyntax = saveSyntax;
       }
+  }
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    Expression value = expander;
+    if (! (value instanceof QuoteExp))
+      comp.error('f', "internal error compiling a macro");
+    getMakeMethod();
+    Literal literal = new Literal (this, thisType, comp);
+    comp.findLiteral(((QuoteExp) value).getValue());
+    return literal;
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    literal.check_cycle();
+    CodeAttr code = comp.getCode();
+    code.emitPushString(getName());
+    comp.emitLiteral(((QuoteExp) expander).getValue());
+    code.emitInvokeStatic(getMakeMethod());
   }
 }

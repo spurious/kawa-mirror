@@ -512,10 +512,7 @@ public class Translator extends Object
     String sym = decl.getName();
     if (sym == null)
       return;
-    Object old_decl = environ.get (sym);
-    if (old_decl != null)
-      decl.shadowed = old_decl;
-    environ.put (sym, decl);
+    pushBinding(sym, decl);
   }
 
   /** Remove this from Translator.environ.
@@ -526,15 +523,12 @@ public class Translator extends Object
     String sym = decl.getName();
     if (sym == null)
       return;
-    if (decl.shadowed == null)
-      environ.remove (sym);
-    else
-      environ.put (sym, decl.shadowed);
+    popBinding();
   }
 
   public final void pushDecls (ScopeExp scope)
   {
-    shadowStack.push(null);
+    //shadowStack.push(null);
     for (Declaration decl = scope.firstDecl();
          decl != null;  decl = decl.nextDecl())
       push(decl);
@@ -550,7 +544,7 @@ public class Translator extends Object
   public void push (ScopeExp scope)
   {
     scope.outer = current_scope;
-    if (! (scope instanceof LambdaExp)) // which implies: outer != null
+    if (! (scope instanceof ModuleExp))
       mustCompileHere();
     current_scope = scope;
     pushDecls(scope);

@@ -171,9 +171,7 @@
 
 
 (define (get-buffer buffer-or-name)
-  ((primitive-static-method  <buffer> "coerceBuffer"
-			     <buffer> (<object>))
-   buffer-or-name))
+  (invoke-static <buffer> 'coerceBuffer buffer-or-name))
 
 (define (generate-new-buffer-name starting-name)
   ((primitive-static-method <buffer> "generateNewBufferName"
@@ -483,6 +481,27 @@
 (define (move-to-column column
 			#!optional force (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'moveToColumn column force))
+
+;;; PROCESSES
+
+(define (process? obj)
+  (instance? x <process>))
+
+(define (process-send-string (process :: <process>) string)
+  (invoke process 'writeToInferior string))
+
+(define (process-buffer (process :: <process>))
+  (invoke process 'getBuffer))
+
+(define (process-mark (process :: <process>))
+  (invoke process 'getProcessMark))
+
+(define (get-buffer-process buffer-or-name)
+  (invoke-static <process> 'getProcessMode (get-buffer buffer-or-name)))
+
+;;; NETWORK CONNECTION
+
+; (define (open-network-stream name buffer-or-name host service) ...)
 
 ;;; DEFAULT BINDINGS
 

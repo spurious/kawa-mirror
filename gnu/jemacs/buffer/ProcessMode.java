@@ -20,6 +20,11 @@ public class ProcessMode extends Mode
     modeMap.setDefaultAction(new ProcessDefaultAction());
   }
 
+  public Marker getProcessMark ()
+  {
+    return processMark;
+  }
+
   public static void enterAction()
   {
     Buffer buffer = Buffer.getCurrent();
@@ -62,9 +67,14 @@ public class ProcessMode extends Mode
 	  return (ProcessMode) mode;
       }
   }
+
+  public void writeToInferior(gnu.kawa.util.AbstractString str)
+    throws java.io.IOException
+  {
+    str.writeTo(toInferior);
+    toInferior.flush();
+  }
 }
-
-
 
 class ProcessDefaultAction extends javax.swing.text.TextAction
 {

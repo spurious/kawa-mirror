@@ -8,6 +8,11 @@ public class Mode implements gnu.mapping.ApplyMethodContainer
   public Buffer buffer;
   public Mode next;
 
+  public Buffer getBuffer()
+  {
+    return buffer;
+  }
+
   public Object apply0(ApplyMethodProc proc)
   {
     return applyN(proc, Values.noArgs);

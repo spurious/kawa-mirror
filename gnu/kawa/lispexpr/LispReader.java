@@ -293,7 +293,12 @@ public class LispReader extends Lexer
 	    if (i == start)
 	      return false;
 	  }
-	else if (ch != '.' && ch != '_' && ch != '^')
+	else if (ch == '_' || ch == '^')
+ 	  {
+	    if (i == start /* && ! common_lisp? */)
+	      return false;
+	  }
+	else if (ch != '.')
 	  return false;
       }
     return sawDigits > 0;

@@ -202,6 +202,9 @@ for various platforms
 from @url{http://java.sun.com/products/jdk/1.1/index.html/index.html}.
 @end ifclear
 
+If you want to run Kawa on a Macintosh, see
+@uref{http://home.earthlink.net/~athene/2/scheme/mackawa.html}.
+
 The program @code{java} is the Java interpreter.
 The program @code{javac} is the Java compiler,
 and is needed if you want to compile the source release yourself.
@@ -2013,7 +2016,7 @@ argument is a value (coercible to @var{element-type}) which replaces
 the value specified by the index in the given array.
 @end deffn
 
-@deffn Syntax primitive-array-set element-type
+@deffn Syntax primitive-array-get element-type
 Evaluates to a two-argument procedure.  The first argument of
 the resulting procedure must be an array whose elements have type
 @var{element-type};  the second argument is an index.

@@ -619,7 +619,7 @@ where the first member of each pair is a keyword specifying the argument name,
 and the second is the corresponding value.  It shall be an error if the first
 member of a pair is not a keyword.  It shall be an error if the argument name
 is not the same as a variable in a @var{key-arg}s, unless there
-is a @var{rest-arg}.  If the same argument name occurrs more than once
+is a @var{rest-arg}.  If the same argument name occurs more than once
 in the list of actual arguments, then the first value is used.
 If there is no actual argument for a particular @var{key-arg},
 then the variable is bound

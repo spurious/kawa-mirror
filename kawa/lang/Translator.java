@@ -232,8 +232,6 @@ public class Translator extends Object
       }
     else if (exp instanceof Expression)
       return (Expression) exp;
-    else if (exp == null)
-      return null;
     else
       return new QuoteExp (exp);
   }
@@ -371,5 +369,4 @@ public class Translator extends Object
     defs.pop(this);
     return defs;
   }
-
 }

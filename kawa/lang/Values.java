@@ -8,6 +8,8 @@ public class Values implements Printable
 {
   private Object[] vals;
 
+  public static final Values empty = new Values(new Object[0]);
+
   /** Constructor.
    * @param values the values to encapulate
    */
@@ -22,6 +24,16 @@ public class Values implements Printable
     return vals;
   }
 
+  public static Object make (Object[] vals)
+  {
+    if (vals.length == 1)
+      return vals[0];
+    else if (vals.length == 0)
+      return empty;
+    else
+      return new Values(vals);    
+  }
+
   /** Apply a Procedure with these values as the arguments. */
   public Object call_with (Procedure proc)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
@@ -31,6 +43,11 @@ public class Values implements Printable
 
   public void print(java.io.PrintStream ps)
   {
+    if (this == empty)
+      {
+	ps.print("#!void");
+	return;
+      }
     int size = vals.length;
     ps.print("#<values");
     for (int i = 0; i < size; i++)

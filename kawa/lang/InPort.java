@@ -285,16 +285,17 @@ public class InPort extends FilterInputStream implements Printable
     readChar ();
   }
 
-  Symbol readSymbol ()
+  Object readSymbol ()
        throws java.io.IOException, ReadError
   {
     return readSymbol (readChar ());
   }
 
-  Symbol readSymbol (int c)
+  Object readSymbol (int c)
        throws java.io.IOException, ReadError
   {
     StringBuffer str = new StringBuffer (30);
+    char lastChar = ' ';
     for (;;)
       {
 	if (c < 0)
@@ -312,11 +313,21 @@ public class InPort extends FilterInputStream implements Printable
 	    if (c < 0)
 	      break;  // Error
 	    ch = (char) c;
+	    lastChar = ' ';
 	  }
 	else
-	  ch = Character.toLowerCase (ch);
+
+	  {
+	    lastChar = ch;
+	    ch = Character.toLowerCase (ch);
+	  }
 	str.append (ch);
 	c = readChar ();
+      }
+    if (lastChar == ':')
+      {
+	str.setLength(str.length()-1);
+	return Keyword.make(str.toString());
       }
     return Symbol.make (str.toString ());
   }
@@ -334,29 +345,49 @@ public class InPort extends FilterInputStream implements Printable
     int origc = c;
     if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
       {
-	Symbol name = readSymbol (c);
+	String name = readSymbol(c).toString();
         int i = Char.charNames.length; 
         for ( ; ; ) {
            if (--i < 0) {
               break;
            }
-           if (Char.charNames[i] == name) {
+           if (Char.charNames[i].equals(name)) {
               c = Char.charNameValues[i];
              break;
            }
         }
         if (i<0) {
-           if (name.toString().length()>1) {
-              throw new ReadError (
-                 this,
-                 "unknown character name: " + name.toString()
-              );
+           if (name.length()>1) {
+	     throw new ReadError (this, "unknown character name: " + name);
            } else {
               c = origc;
            }
         }
       }
     return Char.make((char)c);
+  }
+
+  /** Read a special named constant, assuming "#!" has already been read. */
+  protected Object readSpecial()
+       throws java.io.IOException, ReadError  
+  {
+    int c = readChar ();
+    if (c < 0)
+      throw new EofReadError (this, "unexpected EOF after #!");
+    String name = readSymbol(c).toString();
+    if (name.equals("optional"))
+      return Special.optional;
+    if (name.equals("rest"))
+      return Special.rest;
+    if (name.equals("key"))
+      return Special.key;
+    if (name.equals("eof"))
+      return Special.eof;
+    if (name.equals("void"))
+      return Values.empty;
+    if (name.equals("null"))
+      return null;
+    throw new ReadError(this, "unknown named constant #!"+name);
   }
 
   /** Read a word of alphabetic characters.
@@ -684,8 +715,7 @@ public class InPort extends FilterInputStream implements Printable
       throws java.io.IOException, ReadError
   {
     return new Pair (func_symbol,
-		     new Pair (readSchemeObject (),
-			       Interpreter.nullObject));
+		     new Pair (readSchemeObject (), List.Empty));
   }
 
   protected void skipWhitespaceAndComments()
@@ -795,7 +825,7 @@ public class InPort extends FilterInputStream implements Printable
 	      {
 		c = readChar();
 		if (c < 0) // EOF
-		  return Interpreter.nullObject;
+		  return List.Empty;
 	      } while (c!='\n');
             break;
 	  case ')':
@@ -835,6 +865,8 @@ public class InPort extends FilterInputStream implements Printable
 		return readList ().toVector ();
 	      case '\\':
 		return readCharacter();
+	      case '!':
+		return readSpecial();
 	      case 't':
 		return Interpreter.trueObject;
 	      case 'f':

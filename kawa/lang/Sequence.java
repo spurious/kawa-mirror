@@ -11,5 +11,5 @@ public abstract class Sequence
 
   abstract public Object elementAt (int index);
 
-  public static Symbol eofValue = Symbol.makeUninterned ("#<eof>"); 
+  public static Special eofValue = Special.eof;
 }

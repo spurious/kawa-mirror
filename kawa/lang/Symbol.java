@@ -4,12 +4,12 @@ import java.io.PrintStream;
 
 public class Symbol extends Object implements Printable, Compilable
 {
-  private java.lang.String name;
+  private String name;
 
   // Note:  No public constructor!
-  private Symbol (java.lang.String n)
+  private Symbol (String n)
   {
-    name = new java.lang.String(n);
+    name = n;
   }
 
   public static final Symbol makeUninterned (String s)
@@ -57,7 +57,7 @@ public class Symbol extends Object implements Printable, Compilable
     return make (name);
   }
 
-  public void print(java.io.PrintStream ps)
+  public static void print(String name, java.io.PrintStream ps)
   {
     boolean readable = (ps instanceof OutPort)
       && ((OutPort)ps).printReadable;
@@ -81,6 +81,11 @@ public class Symbol extends Object implements Printable, Compilable
       }
     else
       ps.print(name);
+  }
+
+  public void print(java.io.PrintStream ps)
+  {
+    print(name, ps);
   }
 
   public Literal makeLiteral (Compilation comp)

@@ -99,14 +99,14 @@ public class Char implements Printable, Compilable
 
   static char[] charNameValues = { ' ', '\t', '\n', '\n'
 				   ,'\r', '\f', '\b', '\177' };
-  static Symbol[] charNames = { Symbol.intern("space"),
-			 Symbol.intern("tab"),
-			 Symbol.intern("newline"),
-			 Symbol.intern("linefeed"),
-			 Symbol.intern("return"),
-			 Symbol.intern("page"),
-			 Symbol.intern("backspace"),
-			 Symbol.intern("rubout") };
+  static String[] charNames = { "space",
+				"tab",
+				"newline",
+				"linefeed",
+				"return",
+				"page",
+				"backspace",
+				"rubout" };
 
   public void print(PrintStream ps)
   {

@@ -1,3 +1,8 @@
+2002-11-23  Per Bothner  <per@bothner.com>
+
+	* StaticFieldConstraint.java:  Moved from kawa.standard.
+	* Makefile.am (java_sources):  Add new file.
+
 2002-11-20  Per Bothner  <bothner@bothner.com>
 
 	* ClassMethods.java:  Convert from ProcedureN to Procedure2.

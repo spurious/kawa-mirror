@@ -13,6 +13,7 @@ java_sources = \
   Invoke.java \
   SlotGet.java \
   SlotSet.java \
+  StaticFieldConstraint.java \
   StaticGet.java \
   StaticSet.java \
   TypeSwitch.java

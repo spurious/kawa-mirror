@@ -153,16 +153,37 @@ public class Char implements Externalizable
   public String toString ()
   {
     StringBuffer buf = new StringBuffer();
-    new Error("Char.toString called").printStackTrace();
-    buf.append("[Char '");
-    if (value >= (int) ' ' && value < 127)
+    buf.append('\'');
+    if (value >= (int) ' ' && value < 127 && value != '\'')
       buf.append((char) value);
     else
       {
 	buf.append('\\');
-	buf.append(Integer.toOctalString(value));
+	if (value == '\'')
+	  buf.append('\'');
+	else if (value == '\n')
+	  buf.append('n');
+	else if (value == '\r')
+	  buf.append('r');
+	else if (value == '\t')
+	  buf.append('t');
+	else if (value < 256)
+	  {
+	    String str = Integer.toOctalString(value);
+	    for (int i = 3 - str.length(); --i >= 0; )
+	      buf.append('0');
+	    buf.append(str);
+	  }
+	else
+	  {
+	    buf.append('u');
+	    String str = Integer.toHexString(value);
+	    for (int i = 4 - str.length(); --i >= 0; )
+	      buf.append('0');
+	    buf.append(str);
+	  }
       }
-    buf.append("']");
+    buf.append('\'');
     return buf.toString();
   }
 

@@ -1,5 +1,7 @@
 2002-02-13  Per Bothner  <per@bothner.com>
 
+	* Char.java (toString):  Print char in Java format, e.g. "'\t'".
+
 	* Char.java:  No longer implements Printable.
 	Thus no gnu.text no longer depends on gnu.mapping.
 	(print):  Remove method.

@@ -1,3 +1,7 @@
+Sun Feb  8 23:29:37 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitGotoIfEq):  Use signature to select opcode.
+
 Tue Feb  3 12:33:46 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (emitPushThis, emitInvokeMethod, emitInvokeVirtual,

@@ -772,28 +772,30 @@ public class CodeAttr extends Attribute implements AttrContainer
     Type type1 = popType().promote();
     reserve(4);
     int opcode;
-    if (type1 == Type.int_type && type2 == Type.int_type)
+    char sig1 = type1.getSignature().charAt(0);
+    char sig2 = type2.getSignature().charAt(0);
+    if (sig1 == 'I' && sig2 == 'I')
       opcode = 159;  // if_cmpeq (inverted: if_icmpne)
-    else if (type1 == Type.long_type && type2 == Type.long_type)
+    else if (sig1 == 'J' && sig2 == 'J')
       {
 	put1(148);   // lcmp
 	opcode = 153;  // ifeq (inverted: ifeq)
       }
-    else if (type1 == Type.float_type && type2 == Type.float_type)
+    else if (sig1 == 'F' && sig2 == 'F')
       {
 	put1(149);   // fcmpl
 	opcode = 153;  // ifeq (inverted: ifeq)
       }
-    else if (type1 == Type.double_type && type2 == Type.double_type)
+    else if (sig1 == 'D' && sig2 == 'D')
       {
 	put1(149);   // fcmpl
 	opcode = 153;  // ifeq (inverted: ifeq)
       }
-    else if (type1.getSignature().length() == 1
-	     || type2.getSignature().length() == 1)
-      throw new Error ("non-matching types to compile_goto_ifeq");
-    else
+    else if ((sig1 == 'L' || sig1 == '[')
+	     && (sig2 == 'L' || sig2 == '['))
       opcode = 165;  // if_acmpeq (inverted: if_acmpne)
+    else
+      throw new Error ("non-matching types to compile_goto_ifeq");
     if (invert)
       opcode++;
     emitTransfer (label, opcode);

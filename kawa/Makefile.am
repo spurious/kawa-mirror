@@ -23,7 +23,7 @@ CLEANFILES = *.class kawa$(BAT) tmp *.stamp
 BUILT_SOURCES = Version.java
 SOURCES = $(java_JAVA) Version.java.in
 
-Version.java: $(srcdir)/Version.java.in
+Version.java: $(srcdir)/Version.java.in $(srcdir)/../configure.in
 	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/Version.java.in >Version.java
 
 kawa$(BAT):

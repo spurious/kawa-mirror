@@ -137,7 +137,14 @@
 		   (maybe-report-section)
 		   (report-fail (current-output-port) fun args res expect)))))
      (set! fail-expected #f))
-   (if (procedure? fun) (apply fun args) (car args))))
+   (if (procedure? fun)
+       (cond-expand (kawa
+		     (try-catch
+		      (apply fun args)
+		      (ex <java.lang.Throwable> ex)))
+		    (else
+		     (apply fun args)))
+       (car args))))
 
 (define (report-display value)
   (display value)

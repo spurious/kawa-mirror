@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 119)
+(test-init "Miscellaneous" 121)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -443,6 +443,13 @@
 (test "#<procedure Plus10>" 'plus10-name1 (format "~s" plus10))
 (set-procedure-property! plus10 'name 'PlusTen)
 (test "#<procedure PlusTen>" 'plus10-name2 (format "~s" plus10))
+
+(define-procedure Plus
+  (lambda ((x :: <number>) (y :: <number>)) (+ x y))
+  (lambda ((x :: <string>) (y :: <string>)) (string-append x y)))
+(test 12 Plus 5 7)
+(set! fail-expected "overload resolution on lambda parameter types not implemented")
+(test "57" Plus "5" "7")
 
 (define (return-null) #!null)
 (test #!null return-null)

@@ -12,6 +12,7 @@ import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.LispInterpreter;
+import java.util.Hashtable;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -24,7 +25,7 @@ import gnu.kawa.lispexpr.LispInterpreter;
 public class Translator extends Compilation
 {
   // Current lexical scope - map name to Declaration.
-  public Environment environ;
+  public Hashtable environ;  // Should use HashMap, but requires JDK 1.2.
 
   // Global environment used to look for syntax/macros.
   private Environment env;
@@ -59,14 +60,14 @@ public class Translator extends Compilation
   {
     super(messages);
     this.env = env;
-    environ = new Environment();
+    environ = new Hashtable();
   }
 
   public Translator (Environment env)
   {
     super(new SourceMessages());
     this.env = env;
-    environ = new Environment();
+    environ = new Hashtable();
   }
 
   public Translator ()
@@ -126,42 +127,18 @@ public class Translator extends Compilation
     return new ErrorExp (message);
   }
 
-  private String nameToLookup;
+  private Object nameToLookup;
 
   /** True iff a form matches a literal symbol. */
   public boolean matches(Object form, String literal)
   {
-    if (! literal.equals(form))
-      return false;
-    Symbol symbol = environ.lookup(literal);
-    if (symbol == null || ! symbol.isBound())
-      return true;
-    Object val1 = symbol.getValue();
     // Check for hygiene re-naming - see SyntaxRule.execute_template.
-    return val1 == literal;
+    if (form instanceof Symbol)
+      form = environ.get(form);
+    return form == literal;
   }
 
-  Symbol lookup(Object obj)
-  {
-    String name = obj.toString();
-    Symbol symbol = environ.lookup(name);
-    if (symbol == null)
-      symbol = obj instanceof Symbol ? (Symbol) obj : env.lookup(name);
-    else if (symbol.isBound())
-      {
-	Object val1 = symbol.getValue();
-	// Check for hygiene re-naming - see SyntaxRule.execute_template.
-	if (val1 instanceof String)
-	  {
-	    name = (String) val1;
-	    symbol = env.lookup(name);
-	  }
-      }
-    nameToLookup = name;
-    return symbol;
-  }
-
-  public Declaration lookup(String name, int namespace)
+  public Declaration lookup(Object name, int namespace)
   {
     Object binding = environ.get(name);
     Declaration decl = (Declaration) binding;
@@ -171,12 +148,12 @@ public class Translator extends Compilation
     return lookupGlobal(name, namespace);
   }
 
-  public Declaration lookupGlobal(String name)
+  public Declaration lookupGlobal(Object name)
   {
     return lookupGlobal(name, -1);
   }
 
-  public Declaration lookupGlobal(String name, int namespace)
+  public Declaration lookupGlobal(Object name, int namespace)
   {
     ModuleExp module = currentModule();
     Declaration decl = module.lookup(name, getInterpreter(), namespace);
@@ -206,8 +183,25 @@ public class Translator extends Compilation
   {
     if (obj instanceof String || obj instanceof Symbol)
       {
-	Symbol symbol = lookup(obj);
-	obj = resolve(symbol, function);
+	Object value = environ.get(obj);
+	Symbol symbol = null;
+	if (value instanceof Declaration)
+	  {
+	    nameToLookup = ((Declaration) value).getSymbol();
+	    obj = value;
+	  }
+	else
+	  {
+	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
+	    if (value instanceof String)
+	      obj = value;
+	    nameToLookup = obj;
+	    if (obj instanceof Symbol)
+	      symbol = (Symbol) obj;
+	    else
+	      symbol = env.lookup(obj.toString());
+	    obj = resolve(symbol, function);
+	  }
         if (obj instanceof Syntax)
           return obj;
 	if (obj instanceof Declaration)
@@ -224,7 +218,8 @@ public class Translator extends Compilation
 	  }
 	else
 	  {
-	    symbol = env.lookup(nameToLookup);
+	    symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
+	      : env.lookup(nameToLookup.toString());
 	    if (symbol != null && symbol.isBound())
 	      return symbol.get();
 	  }
@@ -260,8 +255,19 @@ public class Translator extends Compilation
         Declaration decl = ref.getBinding();
 	if (decl == null)
 	  {
-            String name = ref.getName();
-            Symbol symbol = env.lookup(name);
+	    Object sym = ref.getSymbol();
+	    Symbol symbol;
+	    String name;
+	    if (sym instanceof Symbol)
+	      {
+		symbol = (Symbol) sym;
+		name = symbol.getName();
+	      }
+	    else
+	      {
+		name = sym.toString();
+		symbol = env.lookup(name);
+	      }
 	    if (symbol != null)
 	      if (getInterpreter().hasSeparateFunctionNamespace())
 		proc = symbol.getFunctionValue(null);
@@ -329,13 +335,29 @@ public class Translator extends Compilation
       return rewrite_pair ((Pair) exp);
     else if (exp instanceof String || exp instanceof Symbol)
       {
-	Symbol symbol = lookup(exp);
-	Object value = resolve(symbol, function);
-	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
+	Object value = environ.get(exp);
 	Declaration decl = null;
-        if (value instanceof Declaration) // ?? FIXME
+	Symbol symbol = null;
+	if (value instanceof Declaration)
+	  {
+	    decl = (Declaration) value;
+	    nameToLookup = decl.getSymbol();
+	  }
+	else
+	  {
+	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
+	    if (value instanceof String)
+	      exp = value;
+	    nameToLookup = exp;
+	    if (exp instanceof Symbol)
+	      symbol = (Symbol) exp;
+	    else
+	      symbol = env.lookup(exp.toString());
+	  }
+	value = resolve(symbol, function);
+	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
+        if (decl != null)
           {
-            decl = (Declaration) value;
             if (! isLexical(decl)
                 || (separate && decl.isProcedureDecl()))
               decl = null;
@@ -677,7 +699,7 @@ public class Translator extends Compilation
   /** Used to remember shadowed bindings in environ.
    * For each binding, we push <old binding>, <name>.
    * For each new scope, we push <null>. */
-  public /**/ java.util.Stack shadowStack = new java.util.Stack();
+  java.util.Stack shadowStack = new java.util.Stack();
 
  /**
    * Insert decl into environ.
@@ -685,7 +707,7 @@ public class Translator extends Compilation
    */
   public void push (Declaration decl)
   {
-    String sym = decl.getName();
+    Object sym = decl.getSymbol();
     if (sym == null)
       return;
     pushBinding(sym, decl);
@@ -736,7 +758,7 @@ public class Translator extends Compilation
   }
 
   /** Note a new binding, remembering old binding in the shadowStack. */
-  public void pushBinding(String name, Object value)
+  public void pushBinding(Object name, Object value)
   {
     Object old = environ.put(name, value);
     // It is possible the same Declaration may be pushed twice:  Once

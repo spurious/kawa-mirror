@@ -159,7 +159,7 @@ public class Lambda extends Syntax implements Printable
 	    mode = pair.car;
 	    continue;
 	  }
-	String name;
+	Object name;
 	Object defaultValue = defaultDefault;
 	Pair typeSpecPair = null;
         Pair p;
@@ -170,7 +170,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	if (pair.car instanceof String || pair.car instanceof Symbol)
           {
-            name = pair.car.toString();
+            name = pair.car;
             if (pair.cdr instanceof Pair
                 && tr.matches((p = (Pair) pair.cdr).car, "::"))
               {
@@ -190,7 +190,7 @@ public class Lambda extends Syntax implements Printable
 		     || p.car instanceof Symbol)
 		 && p.cdr instanceof Pair)
           {
-	    name = p.car.toString();
+	    name = p.car;
             p = (Pair) p.cdr;
             if (tr.matches(p.car, "::"))
               {
@@ -252,7 +252,9 @@ public class Lambda extends Syntax implements Printable
 	if (mode == optionalKeyword || mode == keyKeyword)
 	  lexp.defaultArgs[opt_args++] = tr.rewrite(defaultValue);
 	if (mode == keyKeyword)
-	  lexp.keywords[key_args++] = Keyword.make(name.toString());
+	  lexp.keywords[key_args++]
+	    = Keyword.make(name instanceof Symbol ? ((Symbol) name).getName()
+			   : name.toString());
 	Declaration decl = lexp.addDeclaration (name);
         if (bindings instanceof PairWithPosition)
           {

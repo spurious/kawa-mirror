@@ -1,3 +1,21 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewrite):  Parameter name can be Symbol.
+	* kawa/lang/SyntaxRules.java (literal_identifiers):  Can now be Symbol.
+	(<init>, translate_pattern, readExternal):  Update accordingly.
+	(translate_pattern):  Handle Symbols.
+	(expand):  Renamed hygiene names now use uninterned Symbol, instead of
+	uninterned String, since Hashtable doesn't distinguish latter.
+	* kawa/lang/Translator.java (environ):  Change type to Hashtable,
+	because keys can now be Symbols, not just Strings.
+	(<init>):  Change to match.
+	(matches, getBinding, rewrite_pair, rewrite):  Re-write to handle
+	new types for hygiene.
+	(lookup(Object)):  Removed.
+	(lookup, lookupGlobals, getBinding. push, pushBinding):
+	Names can be either Symbols or Strings.
+	(shadowStack):  No longer public.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_class.java:  Don't hardwire "define-class" name.

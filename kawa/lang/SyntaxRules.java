@@ -9,7 +9,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
    * the rest are as specied in the syntax-rules form. */
-  String[] literal_identifiers;
+  Object[] literal_identifiers;
 
   SyntaxRule[] rules;
 
@@ -30,7 +30,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
   }
 
-  public SyntaxRules (String[] literal_identifiers, SyntaxRule[] rules,
+  public SyntaxRules (Object[] literal_identifiers, SyntaxRule[] rules,
 		      int template_identifiers_length)
   {
     this.literal_identifiers = literal_identifiers;
@@ -38,7 +38,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     calculate_maxVars(template_identifiers_length);    
   }
 
-  public SyntaxRules (String[] literal_identifiers, Object rules,
+  public SyntaxRules (Object[] literal_identifiers, Object rules,
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
@@ -97,7 +97,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		tr.syntaxError ("pattern does not start with name");
 		return;
 	      }
-            literal_identifiers[0] = (String) ((Pair)pattern).car;
+            literal_identifiers[0] = ((Pair)pattern).car;
 	    pattern = ((Pair) pattern).cdr;
 
 	    Pattern translated_pattern
@@ -154,7 +154,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
    * @return the translated Pattern
    */
   public static Pattern translate_pattern (Object pattern,
-					   String[] literal_identifiers,
+					   Object[] literal_identifiers,
 					   java.util.Vector pattern_names,
 					   StringBuffer pattern_nesting,
 					   int nesting, Translator tr )
@@ -184,7 +184,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 					       pattern_names, pattern_nesting,
 					       nesting, tr));
       }
-    else if (pattern instanceof String)
+    else if (pattern instanceof String || pattern instanceof Symbol)
       {
 	for (int i = literal_identifiers.length;  --i >= 0; )
 	  {
@@ -195,6 +195,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    if (literal_identifiers[i] == pattern)
 	      return new EqualPat (pattern);
 	  }
+	if (pattern instanceof Symbol) // FIXME
+	  pattern = ((Symbol) pattern).getName();
 	if (pattern_names.contains (pattern))
 	  tr.syntaxError ("duplicated pattern variable " + pattern);
 	pattern_names.addElement (pattern);
@@ -249,7 +251,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    for (int j = 0;  j < num_identifiers;  j++)
 	      {
 		String name = macro.templateIdentifiers[j];
-		String renamed_symbol = new String(name);
+		Symbol renamed_symbol = new Symbol(name);
 		vars[rule.num_variables + j] = renamed_symbol;
 		Object captured = macro.capturedDeclarations == null ? null
 		  : macro.capturedDeclarations[j];
@@ -291,7 +293,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    literal_identifiers = (String[]) in.readObject();
+    literal_identifiers = (Object[]) in.readObject();
     rules = (SyntaxRule[]) in.readObject();
     maxVars = in.readInt();
   }

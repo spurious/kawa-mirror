@@ -59,6 +59,10 @@ public abstract class Type {
     return size < 4 ? int_type : this;
   }
 
+  public final int getSize() { return size; }
+
+  public final boolean isVoid () { return size == 0; }
+
   /** Returns the primitive type corresponding to a signature character.
    * @return a primitive type, or null if there is no such type. */
   public static Type signatureToPrimitive(char sig)

@@ -175,7 +175,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void pushType(Type type)
   {
-    if (type == Type.void_type)
+    if (type.size == 0)
       throw new Error ("pushing void type onto stack");
     if (stack_types == null)
       stack_types = new Type[20];
@@ -194,7 +194,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final Type popType ()
   {
     if (SP <= 0)
-      throw new Error("popType called with empty stack");
+      throw new Error("popType called with empty stack "+getMethod());
     Type type = stack_types[--SP];
     if (type.size == 8)
       if (popType () != Type.void_type)
@@ -884,7 +884,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     while (--arg_count >= 0)
       popType();
-    if (method.return_type != Type.void_type)
+    if (method.return_type.size != 0)
       pushType(method.return_type);
   }
 
@@ -1382,7 +1382,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitReturn ()
   {
-    if (getMethod().getReturnType() == Type.void_type)
+    if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
 	put1(177); // return

@@ -2368,6 +2368,9 @@ JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 
 
 
+#These don't do anything, because Make-rules can't contain autoconf
+#substitutions.  Perhaps fix when new automake is out.
+#AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
 
 
 

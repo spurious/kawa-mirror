@@ -100,6 +100,9 @@ JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)
+#These don't do anything, because Make-rules can't contain autoconf
+#substitutions.  Perhaps fix when new automake is out.
+#AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
 AC_SUBST(kawa_bin)
 AC_SUBST(XML_SELECTED)
 AC_SUBST(JAVA_COLLECTIONS_SELECTED)

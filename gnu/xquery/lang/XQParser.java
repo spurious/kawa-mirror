@@ -20,6 +20,7 @@ public class XQParser extends LispReader // should be extends Lexer
 {
   int curToken;
   Object curValue;
+  boolean focusDefined = true;
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -916,6 +917,15 @@ public class XQParser extends LispReader // should be extends Lexer
     return QName.make(uri, local);
   }
 
+  Expression parseCheckNodeTest(int axis)
+      throws java.io.IOException, SyntaxException
+  {
+    Expression result = parseNodeTest(axis);
+    if (result != null && ! focusDefined)
+      return syntaxError("node test when focus is undefined");
+    return result;
+  }
+
   Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
@@ -999,6 +1009,8 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression exp = parseStepExpr();
+    boolean saveFocusDefined = focusDefined;
+    focusDefined = true;
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	boolean descendants = curToken == SLASHSLASH_TOKEN;
@@ -1067,6 +1079,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    exp = new ApplyExp(func, args);
 	  }
       }
+    focusDefined = saveFocusDefined;
     return exp;
   }
 
@@ -1077,7 +1090,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (axis  >= 0 && axis < COUNT_OP_AXIS)
       {
 	getRawToken();
-	return parseStepQualifiers(parseNodeTest(axis));
+	return parseStepQualifiers(parseCheckNodeTest(axis));
       }
     else
       return parseOtherStepExpr();
@@ -1086,6 +1099,8 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseStepQualifiers(Expression exp)
     throws java.io.IOException, SyntaxException
   {
+    boolean saveFocusDefined = focusDefined;
+    focusDefined = true;
     for (;;)
       {
 	if (curToken == '[')
@@ -1115,7 +1130,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  ...;
 	*/
 	else
-	  return exp;
+	  {
+	    focusDefined = saveFocusDefined;
+	    return exp;
+	  }
       }
   }
 
@@ -1666,13 +1684,13 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (next >= 0)
 	      unread();
-	    return parseNodeTest(-1);
+	    return parseCheckNodeTest(-1);
 	  }
       }
     else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@'
 	     || token == OP_NODE || token == OP_TEXT)
       {
-	return parseNodeTest(-1);
+	return parseCheckNodeTest(-1);
       }
     else
       return null;
@@ -1891,7 +1909,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
       }
     getRawToken();
+    focusDefined = false;
     lexp.body = parseEnclosedExpr();
+    focusDefined = true;
     parser.pop(lexp);
     SetExp sexp = new SetExp (name, lexp);
     sexp.setDefining (true);

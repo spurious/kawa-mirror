@@ -10,7 +10,7 @@ public class string2number extends Procedure1or2
     try
       {
 	InPort iport = call_with_input_string.open_input_string (str);
-	return iport.readSchemeNumber (radix, ' ');
+	return iport.readSchemeNumber (radix);
       }
     catch (ReadError ex)
       {
@@ -26,7 +26,7 @@ public class string2number extends Procedure1or2
   public final Object apply1 (Object arg1)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    return parse (arg1.toString (), 0);
+    return parse (arg1.toString (), 10);
   }
 
   public final Object apply2 (Object arg1, Object arg2)

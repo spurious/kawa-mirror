@@ -7,6 +7,7 @@ import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
 import gnu.lists.Sequence;
+import gnu.lists.VoidConsumer;
 
 public class load extends Procedure1 {
   /** Load using the name of a compile .class file. */
@@ -114,13 +115,16 @@ public class load extends Procedure1 {
   public final static void loadSource (InPort port, Environment env)
     throws SyntaxException
   {
+    boolean print = ModuleBody.getMainPrintValues();
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more efficient.
     // Unfortunately, it is difficult to get macros to work properly.
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run(Interpreter.defaultInterpreter, env, port, null, OutPort.errDefault());
+	kawa.Shell.run(Interpreter.defaultInterpreter, env, port,
+		       print ? OutPort.outDefault() : null,
+		       OutPort.errDefault());
       }
     else
       {
@@ -129,7 +133,13 @@ public class load extends Procedure1 {
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (messages.seenErrors())
 	  throw new SyntaxException(messages);
-	mexp.evalModule(env);
+	CallContext ctx = new CallContext();
+	if (print)
+	  ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(OutPort.outDefault());
+	else
+	  ctx.consumer = new VoidConsumer();
+	ctx.values = Values.noArgs;
+	mexp.evalModule(env, ctx);
       }
   }
 

@@ -5,24 +5,30 @@ import gnu.expr.*;
 
 public class define_class extends Syntax
 {
+  boolean isSimple;
   object objectSyntax;
 
-  define_class (object objectSyntax)
+  define_class (object objectSyntax, boolean isSimple)
   {
     this.objectSyntax = objectSyntax;
+    this.isSimple = isSimple;
   }
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    /*
     Pair p;
-    System.err.println("def_class def:"+defs+" is "+defs.getClass());
     if (! (st.cdr instanceof Pair)
         || ! ((p = (Pair) st.cdr).car instanceof String))
       return super.scanForDefinitions(st, forms, defs, tr);
     String name = (String) p.car;
     Declaration decl = new Declaration(name);
+    ClassExp oexp = new ClassExp();
+    decl.noteValue(oexp);
+    if (isSimple)
+      decl.setFlag(Declaration.STATIC_SPECIFIED);
+    decl.setFlag(Declaration.IS_CONSTANT);
+    decl.setType(Compilation.typeClassType);
     if (defs instanceof ModuleExp)
       {
         tr.mustCompileHere();
@@ -37,19 +43,16 @@ public class define_class extends Syntax
         decl.setFile(declPos.getFile());
         decl.setLine(declPos.getLine(), declPos.getColumn());
       }
+    System.err.println("cl add decl:"+decl+ " defs:"+defs);
     defs.addDeclaration(decl);
     st = tr.makePair(st, this, declForm);
     forms.addElement (st);
     return true;
-    */
-    return false;
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    return null;
-    /*
-    FIXME needs work
+    //FIXME needs work
     String name = null;
     Declaration decl = null;
     if (form.cdr instanceof Pair)
@@ -69,21 +72,23 @@ public class define_class extends Syntax
     //LambdaExp lexp = new LambdaExp();
     //lexp.setName(name);
     //    tr.push(lexp);
-    ClassExp oexp = new ClassExp();
-    oexp.setName(name);
+    ClassExp oexp = (ClassExp) decl.getValue();
+    oexp.setSimple(isSimple);
+    int nlen = name.length();
+    String cname
+      = (nlen > 2 && name.charAt(0) == '<' && name.charAt(nlen-1) == '>'
+	 ? name.substring(1, nlen-1)
+	 : name);
+    oexp.setName(cname);
+    System.err.println("d-c name:"+cname);
     Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
     // lexp.body = oe;
     // tr.pop(lexp);
     SetExp sexp = new SetExp (name, oe);
-    if (decl != null)
-      {
-	sexp.binding = decl;
-	decl.noteValue(oe);
-      }
+    sexp.binding = decl;
     sexp.setDefining (true);
     // sexp.binding = decl;
     // decl.noteValue (value);
     return sexp;
-    */
   }
 }

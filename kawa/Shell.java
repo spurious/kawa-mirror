@@ -93,6 +93,7 @@ public class Shell
 	    catch (gnu.text.SyntaxException e)
 	      {
 		e.printAll(perr, 20);
+		e.clear();
 	      }
 	    catch (Exception e)
 	      {
@@ -109,7 +110,9 @@ public class Shell
 
   public static void runString (String str, Interpreter interp, Environment env)
   {
-    run(interp, env, new CharArrayInPort(str), null, OutPort.errDefault());
+    run(interp, env, new CharArrayInPort(str),
+	ModuleBody.getMainPrintValues() ? OutPort.outDefault() : null,
+	OutPort.errDefault());
   }
 
   public static void runFile (String fname)

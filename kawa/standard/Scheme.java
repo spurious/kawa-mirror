@@ -467,7 +467,9 @@ public class Scheme extends LispInterpreter
       object objectSyntax = new kawa.standard.object(lambda);
       define_syntax("object", objectSyntax);
       define_syntax("define-class",
-                    new kawa.standard.define_class(objectSyntax));
+                    new kawa.standard.define_class(objectSyntax, false));
+      define_syntax("define-simple-class",
+                    new kawa.standard.define_class(objectSyntax, true));
       define_syntax("this", "kawa.lib.syntax");
       define_proc("make", gnu.kawa.reflect.Invoke.make);
       define_field("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
@@ -550,6 +552,8 @@ public class Scheme extends LispInterpreter
 
       define_field("make-element", "gnu.xquery.util.MakeElement", "makeElement");
       define_field("make-attribute", "gnu.xquery.util.MakeAttribute", "makeAttribute");
+      define_field("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
+      define_field("children", "gnu.xquery.util.Children", "children");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
@@ -919,73 +923,4 @@ public class Scheme extends LispInterpreter
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
   }
-
-  public static String demangleName(String name)
-  {
-    StringBuffer sbuf = new StringBuffer();
-    int len = name.length();
-    boolean mangled = false;
-    boolean predicate = false;
-    boolean downCaseNext = false;
-    for (int i = 0;  i < len;  i++)
-      {
-	char ch = name.charAt(i);
-	if (downCaseNext)
-	  {
-	    ch = Character.toLowerCase(ch);
-	    downCaseNext = false;
-	  }
-	char d;
-	if (ch == 'i' && i == 0 && len > 2 && name.charAt(i+1) == 's'
-	    && ! Character.isLowerCase(d = name.charAt(i+2)))
-	  {
-	    mangled = true;
-	    predicate = true;
-	    i++;
-	    if (Character.isUpperCase(d) || Character.isTitleCase(d))
-	      {
-		sbuf.append(Character.toLowerCase(d));
-		i++;
-		continue;
-	      }
-	    continue;
-	  }
-	else if (ch == '$' && i + 2 < len)
-	  {
-	    char c1 = name.charAt(i+1);
-	    char c2 = name.charAt(i+2);
-	    d = Compilation.demangle2(c1, c2);
-	    if (d != (char)(-1))
-	      {
-		sbuf.append(d);
-		i += 2;
-		mangled = true;
-		downCaseNext = true;
-		continue;
-	      }
-	    else if (c1 == 'T' && c2 == 'o' && i + 3 < len
-		     && name.charAt(i+3) == '$')
-	      {
-		sbuf.append("->");
-		i += 3;
-		mangled = true;
-		downCaseNext = true;
-		continue;
-	      }
-	  }
-	else if (i > 1
-		 && (Character.isUpperCase(ch) || Character.isTitleCase(ch))
-		 && (Character.isLowerCase(name.charAt(i-1))))
-	  {
-	    sbuf.append('-');
-	    mangled = true;
-	    ch = Character.toLowerCase(ch);
-	  }
-	sbuf.append(ch);
-      }
-    if (predicate)
-      sbuf.append('?');
-    return mangled ? sbuf.toString() : name;
-  }
-
 }

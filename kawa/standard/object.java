@@ -28,11 +28,12 @@ public class object extends Syntax
 	pair = (Pair) pair.cdr;
       }
     ObjectExp oexp = new ObjectExp();
+    oexp.setSimple(true);
     // if (clname != null) oexp.setName(clname);
     return rewriteClassDef(pair, oexp, tr);
   }
 
-  public Expression rewriteClassDef (Pair pair, ObjectExp oexp,
+  public Expression rewriteClassDef (Pair pair, ClassExp oexp,
                                      Translator tr)
   {
     tr.mustCompileHere();
@@ -45,11 +46,6 @@ public class object extends Syntax
       {
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite(superpair.car);
-	Type type = Scheme.getTypeValue(supers[i]);
-	if (type == null || ! (type instanceof ClassType))
-	  return tr.syntaxError("object base class/interface `"+superpair.car
-				+"' not known");
-	supers[i] = new QuoteExp(type);
 	superlist = superpair.cdr;
       }
     Object components = pair.cdr;

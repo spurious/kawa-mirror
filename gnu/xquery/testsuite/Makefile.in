@@ -101,11 +101,9 @@ KAWALIB = ../../..
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
-DOTEST = $(KAWA) --clisp  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
-
 CLEANFILES = tmp? *.log testing.zip *.class
 
-SOURCES = lang-test.lisp
+SOURCES = test1.xql expected1.xml
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in

@@ -1,3 +1,8 @@
+2003-11-03  Per Bothner  <per@bothner.com>
+
+	* UnescapedData.java:  New longer implement Consumable.
+	(consume):  Remove method.
+
 2003-10-07  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (equals):  If either operand is non-List

@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -9,7 +9,7 @@ import java.io.*;
  * a literal '<' as a plain "<", instead of being escaped as "&lt;".
  */
 
-public class UnescapedData implements Externalizable, Consumable
+public class UnescapedData implements Externalizable
 {
   String data;
 
@@ -25,11 +25,6 @@ public class UnescapedData implements Externalizable, Consumable
   public final String getData() { return data; }
 
   public final String toString() { return data; }
-
-  public void consume(Consumer out)
-  {
-    out.writeChars(data);
-  }
 
   public final boolean equals(Object other)
   {

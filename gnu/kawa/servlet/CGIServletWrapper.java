@@ -438,7 +438,7 @@ implements HttpServletRequest, HttpServletResponse,
   {
     return null; // FIXME
   }
-  
+
   public Locale getLocale()
   {
     return null; // FIXME

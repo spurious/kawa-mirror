@@ -69,6 +69,8 @@ public class XQParser extends LispReader // should be extends Lexer
   /* FuncName including following '('). */
   static final int FNAME_TOKEN = 'F';
 
+  static final int DEFINE_TOKEN = 'N';
+
   /* 'Q': QName (intern'ed name is curValue)
    * 'R': NCName ':' '*'
    * OP_AXIS_FIRST: 'ancestor' followed by '::'
@@ -412,7 +414,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (next == '('
 	    && ! name.equalsIgnoreCase("if"))
 	  // FunctionCall or KindTest
-	  return FNAME_TOKEN;
+	  return curToken = FNAME_TOKEN;
+	if ((next == 'f' || next == 'F') && "define".equalsIgnoreCase(name))
+	  {
+	    unread();
+	    return curToken = DEFINE_TOKEN;
+	  }
 	//int next = peek();
 	if (next != ':')
 	  {
@@ -423,7 +430,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (next == ':')
 	  {
 	    next = read();
-	    if (next == ':') // We've seen an Axix specifier.
+	    if (next == ':') // We've seen an Axis specifier.
 	      {
 		// match axis name
 		name = name.intern();
@@ -1002,7 +1009,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	Expression[] args = new Expression[vec.size()];
 	vec.copyInto(args);
-	exp = new ApplyExp(new ReferenceExp(name), args);
+	Declaration decl = parser.lookup(name, Interpreter.FUNCTION_NAMESPACE);
+	exp = new ApplyExp(new ReferenceExp(name, decl), args);
 	nesting--;
       }
     else if (token == NCNAME_TOKEN || token == QNAME_TOKEN)
@@ -1195,6 +1203,59 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseFLWRExpression(isFor, name, value);
   }
 
+  public Expression parseFunctionDefinition()
+      throws java.io.IOException, SyntaxException
+  {
+    if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
+      return syntaxError("missing function name");
+    String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
+    getRawToken();
+    if (curToken != '(')
+      return syntaxError("missing parameter list:"+curToken);
+    getRawToken();
+    LambdaExp lexp = new LambdaExp();
+    lexp.setFile(getName());
+    lexp.setLine(getLineNumber(), getColumnNumber());
+    lexp.setName(name);
+    Declaration decl = parser.currentScope().addDeclaration(name);
+    decl.setCanRead(true);
+    decl.setProcedureDecl(true);
+    parser.push(lexp);
+    if (curToken != ')')
+      {
+	for (;;)
+	  {
+	    if (curToken != '$')
+	      error("missing '$' before parameter name");
+	    else
+	      getRawToken();
+	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+	      {
+		String pname
+		  = new String(tokenBuffer, 0, tokenBufferLength).intern();
+		Declaration param = lexp.addDeclaration(pname);
+		//parser.push(param);
+		getRawToken();
+	      }
+	    lexp.min_args++;
+	    lexp.max_args++;
+	    if (curToken == ')')
+	      break;
+	    if (curToken != ',')
+	      return syntaxError("missing ',' in parameter list");
+	    getRawToken();
+	  }
+      }
+    getRawToken();
+    lexp.body = parseEnclosedExpr();
+    parser.pop(lexp);
+    SetExp sexp = new SetExp (name, lexp);
+    sexp.setDefining (true);
+    sexp.binding = decl;
+    decl.noteValue(lexp);
+    return sexp;
+  }
+
   public Object readObject ()
       throws java.io.IOException, SyntaxException
   {
@@ -1211,6 +1272,16 @@ public class XQParser extends LispReader // should be extends Lexer
     this.parser = parser;
     if (getRawToken() == EOF_TOKEN)
       return null;
+    peekOperand();
+    if (curToken == DEFINE_TOKEN)
+      {
+	getRawToken();
+	if (match("function"))
+	  getRawToken();
+	else
+	  error("'define' is not followed by 'function'");
+	return parseFunctionDefinition();
+      }
     Expression exp = parseExprSequence();
     if (curToken == EOL_TOKEN)
       unread('\n');

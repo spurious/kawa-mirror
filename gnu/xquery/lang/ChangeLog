@@ -1,3 +1,20 @@
+2001-10-02  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (parseFile):  Handle multiple top-level "statements".
+
+	* XQuery.java (getNamespaceOf):  New method.
+
+	* XQuery.java (<init>):  Define function "empty".
+
+	* XQuery.java (registerEnvironment):  Explicitly setting current
+	Environment is redundant, so don't.
+
+	* XQParser.java (DEFINE_TOKEN):  New constant.
+	(peekOperand):  Recognize 'define'.
+	(parseMaybePrimaryExpr):  Search for matching function Declaration.
+	(parseFunctionDefinition):  New method.
+	(parse):  Handle 'define function'.
+
 2001-09-29  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseContent):  Use Vector's 'addElement' method

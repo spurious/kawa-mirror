@@ -12,6 +12,7 @@ import gnu.kawa.lispexpr.LangPrimType;
 import gnu.xquery.util.*;
 import gnu.xml.*;
 import gnu.text.Lexer;
+import java.util.Vector;
 
 public class XQuery extends Interpreter
 {
@@ -72,15 +73,25 @@ public class XQuery extends Interpreter
       {
 	XQParser lexer = (XQParser) getLexer(port, messages);
 	lexer.nesting = 1;
+	Vector exps = new Vector(10);
         for (;;)
           {
 	    Expression sexp = lexer.parse(tr);
 	    if (sexp == null)
 	      break;
-	    if (mexp.body != null)
-	      throw new RuntimeException ("not implemented - multiple actions");
-	    mexp.body = sexp;
+	    exps.addElement(sexp);
           }
+	int nexps = exps.size();
+	if (nexps == 0)
+	  mexp.body = QuoteExp.voidExp;
+	else if (nexps == 1)
+	  mexp.body = (Expression) exps.elementAt(0);
+	else
+	  {
+	    Expression[] arr = new Expression[nexps];
+	    exps.copyInto(arr);
+	    mexp.body = new BeginExp(arr);
+	  }
       }
     catch (gnu.text.SyntaxException ex)
       {
@@ -95,6 +106,11 @@ public class XQuery extends Interpreter
       }
     tr.pop(mexp);
     return mexp;
+  }
+
+  public int getNamespaceOf(Declaration decl)
+  {
+    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
   }
 
   public String getName()
@@ -168,6 +184,7 @@ public class XQuery extends Interpreter
 
     define("define", new kawa.standard.set_b());
     define("document", gnu.xquery.util.Document.document);
+    define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
     define("string-value", gnu.xquery.util.StringValue.stringValue);
   }
 
@@ -191,9 +208,7 @@ public class XQuery extends Interpreter
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    XQuery interp = new XQuery();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Interpreter.defaultInterpreter = new XQuery();
   }
 
   public Object read (InPort in)

@@ -1,3 +1,9 @@
+2005-01-07  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (getStringContent): New method implements Buffer.
+	(charAt, getChars, setCharAt, fill, writeTo, consume): Removed;
+	use methods inherited from Buffer.
+
 2004-08-04  Christian Surlykke <christian@surlykke.dk>
         
 	* IgnoreAction.java: Moved here from gnu.jemacs.buffer

@@ -176,12 +176,9 @@ public class SwtBuffer extends Buffer
     return 0;
   }
 
-  /**
-   * @see gnu.lists.CharSeq#charAt(int)
-   */
-  public char charAt(int index)
+  public CharSeq getStringContent ()
   {
-    return bufferContent.charAt(index);
+    return bufferContent;
   }
 
   /**
@@ -245,61 +242,12 @@ public class SwtBuffer extends Buffer
   }
 
   /**
-   * @see gnu.lists.CharSeq#getChars(int, int, char[], int)
-   */
-  public void getChars(int srcBegin, int srcEnd, char[] dst, int dstBegin)
-  {
-    bufferContent.getChars(srcBegin, srcEnd, dst, dstBegin);
-  }
-
-  /**
-   * @see gnu.lists.CharSeq#setCharAt(int, char)
-   */
-  public void setCharAt(int index, char ch)
-  {
-    bufferContent.replaceTextRange(index, 1, String.valueOf(ch));
-  }
-
-  /**
-   * @see gnu.lists.CharSeq#fill(char)
-   */
-  public void fill(char value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see gnu.lists.CharSeq#fill(int, int, char)
-   */
-  public void fill(int fromIndex, int toIndex, char value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see gnu.lists.CharSeq#writeTo(int, int, java.io.Writer)
-   */
-  public void writeTo(int start, int count, Writer dest) throws IOException
-  {
-  }
-
-  /**
-   * @see gnu.lists.CharSeq#consume(int, int, gnu.lists.Consumer)
-   */
-  public void consume(int start, int count, Consumer out)
-  {
-    bufferContent.consume(start, count, out);
-  }
-
-  /**
    * @return
    */
   public StyledTextContent getBufferContent()
   {
     return bufferContent;
   }
-
-  
   
   /**
    * @see gnu.jemacs.buffer.Buffer#forwardLine(int)

@@ -63,12 +63,92 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     redrawModeline();
   }
 
-  /*
-  public CharSeq getStringContent ()
+  public abstract CharSeq getStringContent ();
+
+  /**
+   * @see gnu.lists.CharSeq#charAt(int)
+   */
+  public char charAt(int index)
   {
-    return content;
+    return getStringContent().charAt(index);
   }
-  */
+
+  /**
+   * @see gnu.lists.CharSeq#setCharAt(int, char)
+   */
+  public void setCharAt(int index, char ch)
+  {
+    getStringContent().setCharAt(index, ch);
+  }
+
+  /**
+   * @see gnu.lists.CharSeq#fill(char)
+   */
+  public void fill(char value)
+  {
+    getStringContent().fill(value);
+  }
+
+  /**
+   * @see gnu.lists.CharSeq#fill(int, int, char)
+   */
+  public void fill(int fromIndex, int toIndex, char value)
+  {
+    getStringContent().fill(fromIndex, toIndex, value);
+  }
+
+  /**
+   * @see gnu.lists.CharSeq#getChars(int, int, char[], int)
+   */
+  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
+  {
+    getStringContent().getChars(srcBegin, srcEnd, dst, dstBegin);
+  }
+
+  /* #ifdef JAVA5 */
+  // /**
+  //  * @see gnu.lists.CharSeq#writeTo(int, int, Appendable)
+  //  */
+  // public void writeTo(int start, int count, Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   getStringContent().writeTo(start, count, dest);
+  // }
+
+  // public void writeTo(Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   writeTo(0, length(), dest);
+  // }
+
+  // public CharSeq subSequence(int start, int end)
+  // {
+  //   return getStringContent().subSequence(start, end);
+  // }
+  /* #endif */
+  /* #ifndef JAVA5 */
+  /**
+   * @see gnu.lists.CharSeq#writeTo(int, int, java.io.Writer)
+   */
+  public void writeTo(int start, int count, java.io.Writer dest)
+    throws java.io.IOException
+  {
+    getStringContent().writeTo(start, count, dest);
+  }
+
+  public void writeTo(java.io.Writer str) throws java.io.IOException
+  {
+    writeTo(0, length(), str);
+  }
+  /* #endif */
+
+  /**
+   * @see gnu.lists.CharSeq#consume(int, int, gnu.lists.Consumer)
+   */
+  public void consume(int start, int count, gnu.lists.Consumer out)
+  {
+    getStringContent().consume(start, count, out);
+  }
 
   public static Buffer findFile(String fname)
   {
@@ -292,11 +372,6 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     return ((Marker) position).getOffset();
   }
 
-  public void writeTo(java.io.Writer str) throws java.io.IOException
-  {
-    writeTo(0, length(), str);
-  }
-
   public abstract void insertFile(Reader in) throws Exception;
 
   public abstract void save(Writer out) throws Exception;
@@ -484,8 +559,6 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   {
     BufferLocal.make(Symbols.getSymbol(symbol), all);
   }
-
-  public abstract char charAt(int index);
 
   public EKeymap getLocalKeymap() { return localKeymap; }
 

@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import gnu.jemacs.buffer.*;
 import gnu.mapping.*;
+import gnu.lists.CharSeq;
 import javax.swing.text.*;
 import java.awt.Color;
 
@@ -249,40 +250,9 @@ public class SwingBuffer extends Buffer
     return doc.getLength();
   }
 
-  public char charAt(int index)
+  public CharSeq getStringContent ()
   {
-    return content.charAt(index);
-  }
-
-  public void setCharAt(int index, char ch)
-  {
-    content.setCharAt(index, ch);
-  }
-
-  public void fill(char value)
-  {
-    content.fill(value);
-  }
-
-  public void fill(int fromIndex, int toIndex, char value)
-  {
-    content.fill(fromIndex, toIndex, value);
-  }
-
-  public void getChars (int srcBegin, int srcEnd, char[] dst, int dstBegin)
-  {
-    content.getChars(srcBegin, srcEnd, dst, dstBegin);
-  }
-
-  public void writeTo(int start, int count, java.io.Writer dest)
-    throws java.io.IOException
-  {
-    content.writeTo(start, count, dest);
-  }
-
-  public void consume(int start, int count, gnu.lists.Consumer out)
-  {
-    content.consume(start, count, out);
+    return content;
   }
 
   public int createPos(int index, boolean isAfter)

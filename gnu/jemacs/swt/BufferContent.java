@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import gnu.lists.CharSeq;
+
 import org.eclipse.swt.custom.StyledTextContent;
 import org.eclipse.swt.custom.TextChangeListener;
 import org.eclipse.swt.custom.TextChangedEvent;
@@ -20,7 +22,8 @@ import org.eclipse.swt.custom.TextChangingEvent;
  * @author Christian Surlykke
  *         12-07-2004
  */
-public class BufferContent extends SwtCharBuffer implements StyledTextContent
+public class BufferContent extends SwtCharBuffer
+  implements StyledTextContent, CharSeq
 {
   /**
    * @param str
@@ -267,6 +270,17 @@ public class BufferContent extends SwtCharBuffer implements StyledTextContent
     } 
   }
 
+  public void fill(char value)
+  {
+    fill(0, size(), value);
+  }
+
+  public void fill(int fromIndex, int toIndex, char value)
+  {
+    for (int i = fromIndex;  i < toIndex;  i)
+      setCharAt(value);
+  }
+
   /**
    * @param out
    * @throws IOException
@@ -276,6 +290,4 @@ public class BufferContent extends SwtCharBuffer implements StyledTextContent
     out.write(chars.data, 0, gapStart);
     out.write(chars.data, gapEnd, chars.data.length - gapEnd);
   }
-
-
 }

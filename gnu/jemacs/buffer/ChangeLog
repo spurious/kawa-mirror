@@ -1,3 +1,9 @@
+2005-01-07  Per Bothner  <per@bothner.com>
+
+	* Buffer. java (getStringContent): New abstract (uncommented) method.
+	(charAt, setCharAt, fill, writeTo, consume): New CharSeq methods,
+	implemented using getStringContent.
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* BufferLocal.java (make): Set base field.

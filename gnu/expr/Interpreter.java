@@ -574,7 +574,7 @@ public abstract class Interpreter
   /** Read expressions from a Reader and write the result to a Consumer. */
   public void eval (Reader in, Consumer out) throws Throwable
   {
-    InPort port = in instanceof Reader ? (InPort) in : new InPort(in);
+    InPort port = in instanceof InPort ? (InPort) in : new InPort(in);
     CallContext ctx = CallContext.getInstance();
     Consumer save = ctx.consumer;
     try

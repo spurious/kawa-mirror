@@ -1,3 +1,7 @@
+2003-06-13  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (eval):  Fix incorrect instanceof test.
+
 2003-06-06  Per Bothner  <per@bothner.com>
 
 	* Expression.java (compileNotePosition):  Take extra parameter.

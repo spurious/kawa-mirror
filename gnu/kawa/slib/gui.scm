@@ -67,7 +67,6 @@
 				 ((primitive-array-get <object>) args (+ i 1))))
 		     (loop (+ i 2)))
 		    (else
-		     (Formatadd #t "In menu ~s add item ~s.~%~!" menu arg)
 		     (invoke menu 'add (as <javax.swing.JMenuItem> arg))
 		     (loop (+ i 1)))))))
       menu))

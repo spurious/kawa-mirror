@@ -1532,6 +1532,17 @@ Throws an exception if that cannot be done.
 Not supported for @var{type} to be a primitive type such as @code{<int>}.
 @end defun
 
+@deffn Syntax synchronized object form ...
+Synchronize on the given @var{object}.  (This means getting an
+exclusive lock on the object, by acquiring its @dfn{monitor}.)
+Then execute the @var{form}s while holding the lock.
+When the @var{form}s finish (normally or abnormally by throwing
+an exception), the lock is released.
+Returns the result of the last @var{form}.
+Equivalent to the Java @code{synchronized} statement,
+except that it may return a result.
+@end deffn
+
 @node Compiling, Low-level functions, Extensions, Top
 @chapter Compiling Scheme code to byte-codes
 

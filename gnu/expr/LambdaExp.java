@@ -33,6 +33,19 @@ public class LambdaExp extends ScopeExp
   LambdaExp firstChild;
   LambdaExp nextSibling;
 
+  /** A magic value to indicate there is no unique return continuation. */
+  final static ApplyExp unknownContinuation = new ApplyExp (null, null);
+
+  /** The unique caller that calls this lambda.
+      The value is null, if no callers have been seen.
+      A value of unknownContinuation means there are multiple call sites.
+      Tail-recursive calls do not count as multiple call sites. (With a
+      little more analysis, we could also allow multiple non-self tail-calls
+      as long as they all are ultimately called from the same place.)
+      This is used to see if we can inline the function at its unique
+      call site. */
+  ApplyExp returnContinuation;
+
   /** If non-null, a Declaration whose value is (only) this LambdaExp. */
   Declaration nameDecl;
 
@@ -180,7 +193,6 @@ public class LambdaExp extends ScopeExp
 
   public LambdaExp (Expression body)
   {
-    //declareThis();
     this.body = body;
   }
 

@@ -291,10 +291,21 @@ public class require extends Syntax
 		Declaration adecl = defs.getDefine(aname, 'w', tr);
 		adecl.setAlias(true);
 		adecl.setIndirectBinding(true);
- 		if (immediate)
-		  adecl.setCanRead(true);
-		ReferenceExp fref = new ReferenceExp(fdecl);
-		fref.setDontDereference(true);
+		Expression fexp;
+		if (immediate)
+		  {
+		    if (! isAlias)
+		      fvalue = new ClassMemberLocation(instance, t, fname);
+		    fexp = new QuoteExp(fvalue);
+		    adecl.setCanRead(true);
+		  }
+		else
+		  {
+		    ReferenceExp fref = new ReferenceExp(fdecl);
+		    fref.setDontDereference(true);
+		    fexp = fref;
+		    adecl.setPrivate(true);
+		  }
 		if (fdecl.isProcedureDecl())
 		  adecl.setProcedureDecl(true);
 		if (isStatic)
@@ -305,7 +316,6 @@ public class require extends Syntax
 		else
 		  fdecl.base = decl;
 		/*
-		Expression fexp;
 		if (fvalue instanceof gnu.mapping.Location)
 		  {
 		    Declaration fdecl = new Declaration(aname, ftype);
@@ -334,21 +344,21 @@ public class require extends Syntax
 		    args[j++] = new QuoteExp(fname);
 		    fexp = new ApplyExp(m, args);
 		  }
-		SetExp sexp = new SetExp(adecl, fexp);
 		*/
-		SetExp sexp = new SetExp(adecl, fref);
-		sexp.setDefining(true);
-		forms.addElement(sexp);
+		if (! immediate)
+		  {
+		    SetExp sexp = new SetExp(adecl, fexp);
+		    sexp.setDefining(true);
+		    forms.addElement(sexp);
+		  }
 		adecl.setAlias(true);
 		adecl.setIndirectBinding(true);
-		adecl.noteValue(fref);
+		adecl.noteValue(fexp);
 		adecl.setType(Compilation.typeLocation);
 		if ((rfield.getModifiers() & Access.FINAL) != 0)
 		  {
 		    adecl.setFlag(Declaration.IS_CONSTANT);
 		  }
-		
-		adecl.setPrivate(true);
 		adecl.setFlag(Declaration.IS_IMPORTED);
 		adecl.setSimple(false);
 		tr.push(adecl);  // Add to translation env.
@@ -423,7 +433,7 @@ public class require extends Syntax
 	fdname = Compilation.demangleName(fname, true).intern();
       }
     Declaration fdecl = new Declaration(fdname, dtype);
-    if (isAlias || ftype.isSubtype(Compilation.typeLocation))
+    if (isAlias)
       fdecl.setIndirectBinding(true);
     else if (ftype.isSubtype(Compilation.typeProcedure))
       fdecl.setProcedureDecl(true);
@@ -432,7 +442,6 @@ public class require extends Syntax
     if ((fld.getModifiers() & Access.FINAL) != 0
 	&& ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
-    fdecl.setPrivate(true);
     fdecl.setSimple(false);
     fdecl.field = fld;
     //if ((fld.getModifiers() & Access.FINAL) != 0)

@@ -1,3 +1,8 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Avoid some
+	needless work in immediate mode.
+
 2004-12-27  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_syntax.java (scanForm): Use new isStatic().

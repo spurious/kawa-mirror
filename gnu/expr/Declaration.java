@@ -84,6 +84,12 @@ public class Declaration
     if (var != null) var.setSimple(b);
   }
 
+  public final void setSyntax ()
+  {
+    setSimple(false);
+    setFlag(Declaration.IS_CONSTANT | Declaration.IS_SYNTAX);
+  }
+
   /** Return the ScopeExp that contains (declares) this Declaration. */
   public final ScopeExp getContext() { return context; }
 

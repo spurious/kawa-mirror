@@ -1,3 +1,17 @@
+2004-03-03  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (generateApplyMethods):  Move save/set/restore of
+	curClass here from LambdaExp's compileEnd.
+	* LambdaExp.java (compileEnd):  Simplify generateApplyMethods call.
+
+	* ModuleExp.java (allocFields):  Remove special case for IS_SYNTAX.
+	* SetExp.java (compile):  Likewise.
+	* LambdaExp.java (NO_FIELD):  Make public; needed by defined_syntax.
+	(compile):  If NO_FIELD, need to addApplyMethod here.
+	* Declaration.java (setSyntax):  New method.
+
+	* Compilation.java (typeMacro):  Remove unused static field.
+
 2004-02-15  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (asType):  Handle FString.

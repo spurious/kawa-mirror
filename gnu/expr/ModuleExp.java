@@ -237,10 +237,6 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
-	if (decl.getFlag(Declaration.IS_SYNTAX)
-	    && ((kawa.lang.Macro) decl.getConstantValue()).expander instanceof LambdaExp
-	    && ! decl.isPrivate())
-	  continue;  // Handled in SetExp.
 	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);

@@ -98,7 +98,7 @@ public class LambdaExp extends ScopeExp
   static final int CANNOT_INLINE = 32;
   static final int CLASS_METHOD = 64;
   static final int METHODS_COMPILED = 128;
-  static final int NO_FIELD = 256;
+  public static final int NO_FIELD = 256;
   static final int DEFAULT_CAPTURES_ARG = 512;
   public static final int SEQUENCE_RESULT = 1024;
   protected static final int NEXT_AVAIL_FLAG = 2048;
@@ -499,17 +499,9 @@ public class LambdaExp extends ScopeExp
     if (! Compilation.fewerClasses) // FIXME
       code.popScope(); // Undoes pushScope in method.initCode.
 
-    if (applyMethods != null && applyMethods.size() > 0)
-      {
-	Method save_method = comp.method;
-	ClassType save_class = comp.curClass;
-	comp.curClass = getHeapFrameType();
-	comp.generateApplyMethods(this);
-	comp.method = save_method;
-	comp.curClass = save_class;
-      }
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);
+    comp.generateApplyMethods(this);
   }
 
   Field allocFieldFor (Compilation comp)
@@ -646,6 +638,7 @@ public class LambdaExp extends ScopeExp
 	if ((flags & NO_FIELD) != 0)
 	  {
 	    compileAsMethod(comp);
+	    getOwningLambda().addApplyMethod(this);
 	    ProcInitializer.emitLoadModuleMethod(this, comp);
 	  }
 	else

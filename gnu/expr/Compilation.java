@@ -123,8 +123,6 @@ public class Compilation
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeInterpreter
     = ClassType.make("gnu.expr.Interpreter");
-  static public ClassType typeMacro
-    = ClassType.make("kawa.lang.Macro");
   static public ClassType typeEnvironment
     = ClassType.make("gnu.mapping.Environment");
   static public ClassType typeLocation
@@ -569,7 +567,6 @@ public class Compilation
 		  {
 		    // Remove file extension:
 		    int extLen = len - dot;
-		    System.err.println("xtLen:"+extLen);
 		    if (extLen <= 4
 			|| (extLen == 5 && name.endsWith("html")))
 		      {
@@ -1213,6 +1210,8 @@ public class Compilation
       = lexp.applyMethods == null ? 0 : lexp.applyMethods.size();
     if (numApplyMethods == 0)
       return;
+    ClassType save_class = curClass;
+    curClass = lexp.getHeapFrameType();
     boolean generateApplyMethodContainer
       = ! (curClass.getSuperclass().isSubtype(typeProcedure));
     ClassType procType = getMethodProcType(curClass);
@@ -1503,6 +1502,7 @@ public class Compilation
 	  }
       }
     method = save_method;
+    curClass = save_class;
   }
 
   private Method startClassInit ()

@@ -155,20 +155,7 @@ public class SetExp extends Expression
 		 || decl.getFlag(Declaration.IS_CONSTANT))
 	     && isDefining()
 	     && decl.getValue() != null)
-      { // This is handled in ModuleExp's allocFields method.
-	if (decl.getFlag(Declaration.IS_SYNTAX))
-	  {
-	    value = ((kawa.lang.Macro)  decl.getConstantValue()).expander;
-	    if (value instanceof LambdaExp)
-	      {
-		LambdaExp expander = (LambdaExp) value;
-		expander.flags |= LambdaExp.NO_FIELD;
-		expander.compileAsMethod(comp);
-		comp.mainLambda.addApplyMethod(expander);
-		decl.makeField(comp, new_value);
-	      }
-	  }
-	// Otherwise this is handled in ModuleExp's allocFields method.  But:
+      { // This is handled in ModuleExp's allocFields method.  But:
 	if (needValue)
 	  {
 	    decl.load(comp);

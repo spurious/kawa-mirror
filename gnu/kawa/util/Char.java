@@ -119,6 +119,20 @@ public class Char implements Printable, Compilable
         if (charNames[i].equals(name))
           return charNameValues[i];
       }
+    int len = name.length();
+    if (len > 1 && name.charAt(0) == 'u')
+      {
+	int value = 0;
+	for (int pos = 1;  ;  pos++)
+	  {
+	    if (pos == len)
+	      return value;
+	    int dig = Character.digit(name.charAt(pos), 16);
+	    if (dig < 0)
+	      break;
+	    value = (value << 4) + dig;
+	  }
+      }
     return -1;
   }
 

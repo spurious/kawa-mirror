@@ -1,3 +1,7 @@
+2000-03-17  Per Bothner  <per@bothner.com>
+
+	* Char.java (nameToChar):  Handle Unicode syntax: #\uaaaa .
+
 2000-03-12  Per Bothner  <per@bothner.com>
 
 	* UniformVector.java (setAll):  New method.

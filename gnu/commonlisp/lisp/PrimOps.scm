@@ -37,12 +37,12 @@
 ;; mapatoms
 ;; unintern
 
-(define (symbol-plist symbol)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'getPropertyList symbol))
+;;(define (symbol-plist symbol)
+;;  (invoke-static <gnu.commonlisp.lang.Symbol> 'getPropertyList symbol))
 
-(define (setplist symbol plist)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'setPropertyList symbol plist)
-  plist)
+;;(define (setplist symbol plist)
+;;  (invoke-static <gnu.commonlisp.lang.Symbol> 'setPropertyList symbol plist)
+;;  plist)
 
 (define (plist-get plist prop #!optional default)
   (invoke-static <gnu.commonlisp.lang.Symbol> 'plistGet plist prop default))
@@ -59,11 +59,11 @@
        #!void)
       '() 't))
 
-(define (get symbol property #!optional (default '()))
-  (plist-get (symbol-plist symbol) property default))
+(define (get (symbol :: <gnu.mapping.Binding>) property #!optional (default '()))
+  (invoke symbol 'getProperty property default))
 
-(define (put symbol property value)
-  (setplist symbol (plist-put (symbol-plist symbol) property value)))
+(define (put (symbol :: <gnu.mapping.Binding>) property value)
+  (invoke symbol 'setProperty property value))
 
 ;; VARIABLES
 

@@ -112,7 +112,7 @@ CLEANFILES = *.class *.stamp
 EXTRA_GCJ_INPUTS = *.class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-DIST_COMMON =  Makefile.am Makefile.in
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

@@ -1,3 +1,11 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* Convert.java:  Moved from kawa.standard.convert.java.
+	(makeCoercion):  Static methods moved from Expression.
+	* Makefile.am (java_sources);  Added Convert.java.
+
+	* ValuesMap.java (compile):  Use compileWithPosition.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (inline):  Also set returnContinuation of lambda.

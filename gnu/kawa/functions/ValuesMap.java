@@ -104,7 +104,7 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     starget.value = param.allocateVariable(code);
     Type retAddrType = Type.pointer_type;
     Variable retAddr = code.addLocal(retAddrType);
-    vals.compile(comp, starget);
+    vals.compileWithPosition(comp, starget);
 
     if (code.reachableHere())
       code.emitGoto(starget.done);

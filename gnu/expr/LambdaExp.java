@@ -499,13 +499,8 @@ public class LambdaExp extends ScopeExp
       {
 	// Call setName(name) on the result.
 	if (setNameMethod == null)
-	  {
-	    ClassType typeNamed = ClassType.make("gnu.mapping.Named");
-	    setNameMethod
-	      = typeNamed.addMethod("setName",
-				    Compilation.string1Arg, Type.void_type,
-				    Access.PUBLIC|Access.FINAL);
-	  }
+	  setNameMethod
+	    = comp.typeProcedure.getDeclaredMethod("setName", 1);
 	code.emitDup(new_class);
 	code.emitPushString(name);
 	code.emitInvokeVirtual(setNameMethod);

@@ -99,7 +99,7 @@ public class Compilation
     = typeInterpreter.addField ("undefinedObject", scmUndefinedType,
 				Access.PUBLIC|Access.STATIC);
   static final Field nameField
-  = scmNamedType.addField ("sym_name", scmSymbolType, Access.PUBLIC);
+    = typeProcedure.addField ("sym_name", scmSymbolType, Access.PROTECTED);
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;

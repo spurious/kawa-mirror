@@ -90,40 +90,42 @@ public class AutoloadProcedure extends Procedure
       { throw_error ("illegal access in class "); }
   }
 
-  public Object apply0 ()
+  public Procedure getLoaded ()
   {
     if (loaded == null)
-      load ();
-    return loaded.apply0 ();
+      load();
+    return loaded;
+  }
+
+  public int numArgs ()
+  {
+    return getLoaded().numArgs();
+  }
+
+  public Object apply0 ()
+  {
+    return getLoaded().apply0 ();
   }
 
   public Object apply1 (Object arg1)
   {
-    if (loaded == null)
-      load ();
-    return loaded.apply1 (arg1);
+    return getLoaded().apply1 (arg1);
   }
 
    public Object apply2 (Object arg1,Object arg2)
   {
-    if (loaded == null)
-      load ();
-    return loaded.apply2 (arg1, arg2);
+    return getLoaded().apply2 (arg1, arg2);
   }
 
   public Object apply3 (Object arg1, Object arg2, Object arg3)
   {
-    if (loaded == null)
-      load ();
-    return loaded.apply3 (arg1, arg2, arg3);
+    return getLoaded().apply3 (arg1, arg2, arg3);
   }
 
   public Object apply4 (Object arg1, Object arg2,
 			Object arg3, Object arg4) 
   {
-    if (loaded == null)
-      load ();
-    return loaded.apply4 (arg1, arg2, arg3, arg4);
+    return getLoaded().apply4 (arg1, arg2, arg3, arg4);
   }
 
   public Object applyN (Object[] args)

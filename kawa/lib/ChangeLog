@@ -1,3 +1,9 @@
+1999-08-22  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (boundp):  New function.
+	* numbers.scm (sin, cos, tan):  Re-write to use invoke-static.
+	* syntax.scm (defmacro):  Re-write to use Defmacro.
+
 1999-08-06  Per Bothner  <per@bothner.com>
 
 	* characters.scm, numbers.scm, strings.scm, vectors.scm:  Add many

@@ -1,6 +1,7 @@
 package gnu.mapping;
 
-/** A procedure activation frame (when compiled with explicit stacks). */
+/** A procedure activation frame (when compiled with explicit stacks).
+ * Not yet working/useful. */
 
 public abstract class CallFrame extends CpsProcedure
 implements Cloneable, CpsMethodContainer

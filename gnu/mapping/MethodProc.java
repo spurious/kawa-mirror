@@ -66,6 +66,23 @@ public abstract class MethodProc extends ProcedureN
     return atypes[index];
   }
 
+  /*
+  public abstract int applyIfMatches (CallContext ctx) throws Throwable
+  {
+    int code = match(ctx, args);
+    if (code == 0)
+      method.applyV(ctx);
+    return code;
+  }
+
+  public void apply (CallContext stack) throws Throwable
+  {
+    int code = applyIfMatches(ctx);
+    if (code < 0)
+      throw new WrongType(this, code, null);
+  }
+*/
+
   /** Match the incoming arguments.
    * @param ctx where to save the matched result on success
    * @param args the incoming argument list

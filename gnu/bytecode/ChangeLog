@@ -1,3 +1,8 @@
+2004-02-20  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitTryEnd):  Don't emitStore if ! reachableHere().
+	Fixes bug reported by dominique.boucher@nuecho.com 2/20.
+
 2004-02-19  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* ClassType.java (getPackageName):  Use lastIndexOf, not indexOf.

@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2003  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -1872,7 +1872,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     if (try_stack.end_label == null)
       {
-	if (try_stack.saved_result != null)
+	if (try_stack.saved_result != null && reachableHere())
 	  emitStore(try_stack.saved_result);
 	try_stack.end_label = new Label(this);
 	if (reachableHere())

@@ -1,5 +1,8 @@
 2004-08-03  Per Bothner  <per@bothner.com>
 
+	* ModuleBody.java:  Extend Procedure0 instead of CpsProcedure.
+	(apply0):  Use CallContext's runUntilValue instead of applyV.
+
 	* Compilation.java (typeCpsProcedure):  Remove field.
 	(typeCpsMethodProc):  Don't inherit from CpsProcedure.
 

@@ -11,7 +11,7 @@ import gnu.kawa.reflect.ClassMemberConstraint;
  * faster virtual method calls instead of slower interface calls).
  */
 
-public abstract class ModuleBody extends CpsProcedure
+public abstract class ModuleBody extends Procedure0
 {
   public void apply (CallContext stack)
   {
@@ -44,7 +44,7 @@ public abstract class ModuleBody extends CpsProcedure
     CallContext ctx = CallContext.getInstance();
     ctx.values = Values.noArgs;
     ctx.proc = this;
-    return applyV(ctx);
+    return ctx.runUntilValue();
   }
 
   private static boolean mainPrintValues;

@@ -9,10 +9,6 @@ import java.lang.reflect.*;
  * We use an extra level of indirection, but we save by having
  * to create fewer classes than in the one-class-per-procedure
  * scheme, without having to use (slow) reflection.
- *
- * ModuleMethod is redundant, since it could be replaced by ApplyMethodProc.
- * However, ModuleMethod uses virtual method calls, while ApplyMethodProc
- * uses the possibly much slower interface method calls.
  */
 
 public class ModuleMethod extends MethodProc

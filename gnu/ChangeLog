@@ -1,3 +1,8 @@
+Sat Apr  4 17:43:34 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ecmascript:  New sub-directory.
+	* Makefile.am (SUBDIRS):  Added ecmascript.
+
 Mon Mar 31 16:44:57 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* PACKAGES:  New list of "gnu." Java packages.

@@ -6,7 +6,7 @@ import java.io.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
 {
-  /** The list of literals identifiers.
+  /** The list of literal identifiers.
    * The 0'th element is name of the macro being defined;
    * the rest are as specied in the syntax-rules form. */
   Object[] literal_identifiers;
@@ -212,6 +212,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     for (int i = 0;  i < rules.length;  i++)
       {
 	SyntaxRule rule = rules[i];
+	if (rule==null)
+	  return new ErrorExp("error defining "+macro);
 	// check that literals have correct binding - FIXME!!
 	Pattern pattern = rule.pattern;
 	boolean matched = pattern.match (obj, vars, 0);

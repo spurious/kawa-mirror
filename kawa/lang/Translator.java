@@ -1192,12 +1192,8 @@ public class Translator extends Compilation
   {
     if (templateScope == null)
       return decl; // ???
-    Object name = decl.getSymbol();
-    Declaration alias = new Declaration(name);
-    alias.setAlias(true);
+    Declaration alias = makeAlias(decl.getSymbol(), templateScope);
     alias.noteValue(new ReferenceExp(decl));
-    alias.setPrivate(true);
-    alias.context = templateScope;
     return alias;
   }
 
@@ -1246,14 +1242,12 @@ public class Translator extends Compilation
       }
   }
 
-  public Declaration makeAlias (Object name, SyntaxForm nameSyntax)
+  Declaration makeAlias (Object name, ScopeExp templateScope)
   {
-    ScopeExp templateScope = nameSyntax.scope;
     Declaration alias = new Declaration(name);
     alias.setAlias(true);
     alias.setPrivate(true);
     alias.context = templateScope;
-    templateScope.addDeclaration(alias);
     return alias;
   }
 
@@ -1262,7 +1256,8 @@ public class Translator extends Compilation
     Declaration alias;
     if (nameSyntax != null && nameSyntax.scope != currentScope())
       {
-	alias = makeAlias(name, nameSyntax);
+	alias = makeAlias(name, nameSyntax.scope);
+	nameSyntax.scope.addDeclaration(alias);
 	name = new String(name.toString());
       }
     else

@@ -263,6 +263,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		int start_pc = program.length();
 		program.append((char) MATCH_PAIR);
 		Pair pair = (Pair) pattern;
+		SyntaxForm car_syntax = syntax;
 		Object next = pair.cdr;
 		while (next instanceof SyntaxForm)
 		  {
@@ -271,8 +272,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		  }
 		boolean repeat = false;
 		if (next instanceof Pair
-		    // FIXME - hygiene!
-		    && ((Pair) next).car == SyntaxRule.dots3)
+		    && tr.matches(((Pair) next).car, SyntaxRule.dots3))
 		  {
 		    repeat = true;
 		    next = ((Pair) next).cdr;
@@ -288,7 +288,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		  context = '\0';
 		translate(pair.car, program, literal_identifiers,
 			  repeat ? nesting + 1 : nesting,
-			  literals, syntax,
+			  literals, car_syntax,
 			  context == 'V' ? '\0' : 'P', tr);
 		int subvarN = patternNames.size() - subvar0;
 		int width = ((program.length() - start_pc - 1) << 3)
@@ -613,14 +613,22 @@ public class SyntaxPattern extends Pattern implements Externalizable
   {
     if (id1 != id2)
       return false;
-    if (sc1 instanceof ModuleExp)
-      sc1 = null;
-    if (sc2 instanceof ModuleExp)
-      sc2 = null;
-    if (sc1 == sc2)
-      return true;
-    // FIXME
-    return true;
+    Declaration d1 = null, d2 = null;
+    while (sc1 != null && ! (sc1 instanceof ModuleExp))
+      {
+	d1 = sc1.lookup(id1);
+	if (d1 != null)
+	  break;
+	sc1 = sc1.outer;
+      }
+    while (sc2 != null && ! (sc2 instanceof ModuleExp))
+      {
+	d2 = sc1.lookup(id1);
+	if (d2 != null)
+	  break;
+	sc2 = sc2.outer;
+      }
+    return d1 == d2;
   }
 
   /** Parse the literals list in a syntax-rules or syntax-case. */

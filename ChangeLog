@@ -1,3 +1,14 @@
+2005-01-03  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxPattern.java (translate): Pass correct SyntaxForm.
+	(literalIdentifierEq): Finish implementation.
+
+	* kawa/lang/SyntaxRules.java (expand): Recover robustly if there
+	was an error defining the macro.
+
+	* kawa/lang/Translator.java (makeAlias, makeRenamedAlias): Some
+	code moving to reduce duplication..
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (JAVATOP): Remove unused macro.

@@ -32,6 +32,11 @@ public class ELisp extends kawa.standard.Scheme
     return new ELispReader(inp, messages);
   }
 
+  public String getName()
+  {
+    return "Emacs-Lisp";
+  }
+
   static ELisp instance;
 
   public static kawa.standard.Scheme getInstance() // Bad return type FIXME

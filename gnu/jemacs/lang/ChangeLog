@@ -1,3 +1,7 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (getName):  New method - set the "language name".
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* ELispReader.java (readEscape):  Moved to SourceMessages.

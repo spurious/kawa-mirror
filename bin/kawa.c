@@ -69,11 +69,15 @@
 #endif
 #endif
 
+#ifndef JAVA
+#define JAVA "java"
+#endif
+
 #ifndef COMMAND
 #ifdef GCJ_COMPILED
 #define COMMAND "kawa-bin"
 #else
-#define COMMAND "java"
+#define COMMAND JAVA
 #endif
 #endif
 #ifndef COMMAND_ARGS
@@ -84,9 +88,6 @@
 #endif
 #endif
 
-#ifndef GCJ_COMPILED
-char *kawalib = KAWALIB;
-#endif
 
 #if defined(SUPPORT_PTY) && !defined(SUPPORT_TELNET)
 static int use_telnet = 0;
@@ -466,7 +467,6 @@ line_handler (char *line)
 int
 main(int argc, char** argv)
 {
-  char *path, *classpath;
   int in_from_tty_fd;
 #if SUPPORT_TELNET
   char *hostname = "127.0.0.1";  /* localhost */
@@ -493,45 +493,7 @@ main(int argc, char** argv)
 #endif
 
 #ifndef GCJ_COMPILED
-  path = getenv("KAWALIB");
-  if (path == NULL)
-    path = kawalib;
-  i = strlen (path);
-  if (i > 4
-      && (strcmp (path+i-4, ".zip") == 0
-	  || strcmp (path+i-4, ".jar") == 0))
-    {
-      if (access (path, R_OK) < 0)
-	{
-	  perror ("KAWALIB does not specify a readable .zip/.jar file");
-	  exit(0);
-	}
-    }
-  else
-    {
-      char *buf = malloc (i + 20);
-      sprintf (buf, "%s/kawa/repl.class", path);
-      if (access (buf, R_OK) < 0)
-	{
-	  perror ("KAWALIB does not contain kawa/repl.class");
-	  exit(0);
-	}
-    }
-  
-  classpath = getenv ("CLASSPATH");
-  if (classpath == NULL)
-    {
-      char *buf = malloc (strlen (path) + 20);
-      sprintf (buf, "CLASSPATH=%s", path);
-      classpath = buf;
-    }
-  else
-    {
-      char *buf = malloc (strlen (path) + strlen (classpath) + 20);
-      sprintf (buf, "CLASSPATH=%s:%s", classpath, path);
-      classpath = buf;
-    }
-  putenv (classpath);
+  putenv (get_classpath());
 #endif
 
   if (! use_telnet)
@@ -722,12 +684,13 @@ main(int argc, char** argv)
 	  if (child == 0)
 	    {
 	      execvp(out_argv[0], out_argv);
-	      fprintf (stderr, "failed to exec " COMMAND "!\n");
+	      perror ("failed to exec " COMMAND);
 	      exit (-1);
 	    }
 	  else if (child < 0)
 	    {
-	      fprintf (stderr, "unable to fork " COMMAND "!\n");
+
+	      perror ("failed to fork " COMMAND);
 	      exit (-1);
 	    }
 	  signal (SIGCHLD, sig_child);

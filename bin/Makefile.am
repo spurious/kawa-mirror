@@ -1,13 +1,15 @@
 if WITH_GCJ
-bin_PROGRAMS =  @kawa_bin@ kawa-bin
+KAWAPROGS =  @kawa_bin@ kawa-bin
 bin_SCRIPTS = gckawa
 else
-bin_PROGRAMS =  @kawa_bin@
+KAWAPROGS =  @kawa_bin@
 endif
+bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
-kawa_SOURCES = kawa.c
+kawa_SOURCES = kawa.c kawapath.c
+cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
 CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 
@@ -15,15 +17,17 @@ READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-WITH_GCJ_DEFS = -DGCJ_COMPILED
-WITHOUT_GCJ_DEFS = -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
+WITH_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
+WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
 DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
-KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o gnu-xquery-lang.o
-LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
+KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
+  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o
+LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
+  gnu-brl.lo gnu-kawa-brl.lo
 endif
 
 kawa.sh:

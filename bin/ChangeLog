@@ -1,3 +1,12 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* kawa.c:  Move some logic to kawapath.c
+	* kawapath.c: New file.
+	* cgi-servlet.c:  New program.
+	* Makefile.am:  Update accordingly.
+
+	* Makefile.am:  Also link in gnu-brl.lo and gnu-kawa-brl.lo.
+
 2001-10-17  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Update for gnu/kawa/xml.

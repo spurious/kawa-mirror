@@ -96,13 +96,15 @@ XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
-@WITH_GCJ_TRUE@bin_PROGRAMS = @WITH_GCJ_TRUE@@kawa_bin@ kawa-bin
-@WITH_GCJ_FALSE@bin_PROGRAMS = @WITH_GCJ_FALSE@@kawa_bin@
+@WITH_GCJ_TRUE@KAWAPROGS = @WITH_GCJ_TRUE@@kawa_bin@ kawa-bin
+@WITH_GCJ_FALSE@KAWAPROGS = @WITH_GCJ_FALSE@@kawa_bin@
 @WITH_GCJ_TRUE@bin_SCRIPTS = @WITH_GCJ_TRUE@gckawa
+bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
-kawa_SOURCES = kawa.c
+kawa_SOURCES = kawa.c kawapath.c
+cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES = 
 CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 
@@ -110,14 +112,16 @@ READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH = 
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-WITH_GCJ_DEFS = -DGCJ_COMPILED
-WITHOUT_GCJ_DEFS = -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
+WITH_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DGCJ_COMPILED
+WITHOUT_GCJ_DEFS = -DJAVA='"$(JAVA)"' -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
 DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
-@ENABLE_XML_TRUE@KAWA2_XML_OFILES = @ENABLE_XML_TRUE@gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o gnu-xquery-lang.o
-@ENABLE_XML_TRUE@LIBADD_XML = @ENABLE_XML_TRUE@gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
+@ENABLE_XML_TRUE@KAWA2_XML_OFILES = @ENABLE_XML_TRUE@gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
+@ENABLE_XML_TRUE@  gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o
+@ENABLE_XML_TRUE@LIBADD_XML = @ENABLE_XML_TRUE@gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
+@ENABLE_XML_TRUE@  gnu-brl.lo gnu-kawa-brl.lo
 
 KAWA1_OFILES = \
   gnu-bytecode.lo \
@@ -178,19 +182,26 @@ libkawa_la_LDFLAGS =
 @ENABLE_XML_TRUE@gnu-math.lo gnu-text.lo gnu-commonlisp-lang.lo \
 @ENABLE_XML_TRUE@kawa-lang.lo kawa-repl.lo kawa-standard.lo \
 @ENABLE_XML_TRUE@gnu-ecmascript.lo gnu-xml.lo gnu-kawa-xml.lo \
-@ENABLE_XML_TRUE@gnu-xquery-util.lo gnu-xquery-lang.lo gnu-kawa-slib.lo \
+@ENABLE_XML_TRUE@gnu-xquery-util.lo gnu-xquery-lang.lo gnu-brl.lo \
+@ENABLE_XML_TRUE@gnu-kawa-brl.lo gnu-kawa-slib.lo \
 @ENABLE_XML_TRUE@gnu-commonlisp-lisp.lo kawa-lib.lo
 libkawa_la_OBJECTS = 
-@WITH_GCJ_FALSE@bin_PROGRAMS =  @kawa_bin@
+@WITH_GCJ_FALSE@bin_PROGRAMS =  @kawa_bin@ cgi-servlet$(EXEEXT)
+@WITH_GCJ_TRUE@bin_PROGRAMS =  @kawa_bin@ kawa-bin$(EXEEXT) \
+@WITH_GCJ_TRUE@cgi-servlet$(EXEEXT)
 PROGRAMS =  $(bin_PROGRAMS)
 
-kawa_OBJECTS =  kawa.$(OBJEXT)
+kawa_OBJECTS =  kawa.$(OBJEXT) kawapath.$(OBJEXT)
 kawa_DEPENDENCIES = 
 kawa_LDFLAGS = 
 kawa_bin_OBJECTS = 
 kawa_bin_LDADD = $(LDADD)
 kawa_bin_DEPENDENCIES = 
 kawa_bin_LDFLAGS = 
+cgi_servlet_OBJECTS =  cgi-servlet.$(OBJEXT) kawapath.$(OBJEXT)
+cgi_servlet_LDADD = $(LDADD)
+cgi_servlet_DEPENDENCIES = 
+cgi_servlet_LDFLAGS = 
 SCRIPTS =  $(bin_SCRIPTS) $(noinst_SCRIPTS)
 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -204,8 +215,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(libkawa_la_SOURCES) $(kawa_SOURCES) $(kawa_bin_SOURCES)
-OBJECTS = $(libkawa_la_OBJECTS) $(kawa_OBJECTS) $(kawa_bin_OBJECTS)
+SOURCES = $(libkawa_la_SOURCES) $(kawa_SOURCES) $(kawa_bin_SOURCES) $(cgi_servlet_SOURCES)
+OBJECTS = $(libkawa_la_OBJECTS) $(kawa_OBJECTS) $(kawa_bin_OBJECTS) $(cgi_servlet_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -318,6 +329,10 @@ uninstall-binPROGRAMS:
 kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES)
 	@rm -f kawa$(EXEEXT)
 	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
+
+cgi-servlet$(EXEEXT): $(cgi_servlet_OBJECTS) $(cgi_servlet_DEPENDENCIES)
+	@rm -f cgi-servlet$(EXEEXT)
+	$(LINK) $(cgi_servlet_LDFLAGS) $(cgi_servlet_OBJECTS) $(cgi_servlet_LDADD) $(LIBS)
 
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)

@@ -1,5 +1,6 @@
 package kawa.lang;
 import kawa.standard.Scheme;
+import kawa.standard.StaticFieldConstraint;
 import gnu.bytecode.Method;
 import gnu.bytecode.Variable;
 import gnu.mapping.*;
@@ -7,6 +8,7 @@ import gnu.expr.*;
 import java.lang.reflect.Modifier;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.kawa.util.*;
 
@@ -78,13 +80,13 @@ public class Translator extends Parser
     return rewrite(input);
   }
 
-  final Expression rewrite_car (Pair pair)
+  final Expression rewrite_car (Pair pair, boolean function)
   {
     Object car = pair.car;
     if (pair instanceof PairWithPosition)
-      return rewrite_with_position (car, (PairWithPosition) pair);
+      return rewrite_with_position (car, function, (PairWithPosition) pair);
     else
-      return rewrite (car);
+      return rewrite (car, function);
   }
 
   Syntax currentSyntax;
@@ -133,7 +135,10 @@ public class Translator extends Parser
     env.put (name, value);
   }
 
-  Object getBinding (Object obj)
+  /**
+   * @param function true if obj is in function-call position (i.e. first).
+   */
+  Object getBinding (Object obj, boolean function)
   {
     if (obj instanceof String)
       {
@@ -141,11 +146,21 @@ public class Translator extends Parser
 	Binding binding = environ.lookup (sym);
 	if (binding == null)
 	  binding = env.lookup(sym);
+        else if (binding.isBound())
+          {
+            // Check for hygiene re-naming.
+            Object val1 = binding.getValue();
+            if (val1 instanceof String)
+              binding = env.lookup((String) val1);
+          }
 	if (binding == null)
 	  obj = null;
-	else
+	else if (function)
 	  obj = binding.getFunctionValue();
-
+        else if (binding.isBound())
+          obj = binding.getValue();
+        else
+          obj = null;
         if (obj instanceof Syntax)
           return obj;
 	if (obj instanceof Declaration)
@@ -157,11 +172,14 @@ public class Translator extends Parser
 	binding = null;
         if (obj != null)
 	  {
+            /*
 	    // Hygenic macro expansion may bind a renamed (uninterned) symbol
 	    // to the original symbol.  Here, use the original symbol.
 	    if (obj instanceof String)
 	      binding = env.lookup((String) obj);
-	    else if (obj instanceof Declaration
+	    else
+            */
+            if (obj instanceof Declaration
 		     && ! isLexical((Declaration) obj))
 	      obj = null;
 	  }
@@ -180,7 +198,7 @@ public class Translator extends Parser
    */
   public Syntax check_if_Syntax (Object obj)
   {
-    obj = getBinding(obj);
+    obj = getBinding(obj, true);
     if (obj instanceof Syntax)
       return (Syntax) obj;
     return null;
@@ -188,15 +206,13 @@ public class Translator extends Parser
 
   public Expression rewrite_pair (Pair p)
   {
-    Syntax syn = check_if_Syntax(p.car);
-    if (syn != null)
-      return apply_rewrite(syn, p);
+    if (p.car instanceof Syntax)
+      return apply_rewrite((Syntax) p.car, p);
     Object cdr = p.cdr;
 
-    Expression func = rewrite_car (p);
+    Expression func = rewrite_car (p, true);
     Object proc = null;
     ReferenceExp ref = null;
-
     if (func instanceof ReferenceExp)
       {
 	ref = (ReferenceExp) func;
@@ -220,11 +236,43 @@ public class Translator extends Parser
                     proc = null;
                   }
               }
-	    if (proc instanceof Inlineable)
-	      func = new QuoteExp(proc);
 	  }
-        else if (decl instanceof Syntax)
-          return apply_rewrite ((Syntax) decl, p);
+        else if (decl.getFlag(Declaration.IS_SYNTAX))
+          return apply_rewrite ((Syntax) decl.getConstantValue(), p);
+
+        if (proc != null && proc instanceof Procedure
+            && ! immediate && ref.getBinding() == null)
+          {
+            Procedure pproc = (Procedure) proc;
+
+            Class procClass = PrimProcedure.getProcedureClass(pproc);
+            gnu.bytecode.Field procField;
+            if (procClass != null)
+              {
+                ClassType procType = (ClassType) Type.make(procClass);
+                String fname = Compilation.mangleName(pproc.getName());
+                procField = procType.getDeclaredField(fname);
+              }
+            else
+              procField = null;
+            if (procField != null)
+              {
+                int fflags = procField.getModifiers();
+                if ((fflags & Access.STATIC) != 0)
+                  {
+                    Declaration fdecl
+                      = new Declaration(pproc.getName(), procField);
+                    fdecl.noteValue(new QuoteExp(pproc));
+                    ref.setBinding(fdecl);
+                    if ((fflags & Access.FINAL) != 0)
+                      fdecl.setFlag(Declaration.IS_CONSTANT);
+                  }
+              }
+          }
+
+	ref.setProcedureName(true);
+	if (getInterpreter().hasSeparateFunctionNamespace())
+	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
     int cdr_length = LList.length (cdr);
@@ -246,42 +294,10 @@ public class Translator extends Parser
     for (int i = 0; i < cdr_length; i++)
       {
 	Pair cdr_pair = (Pair) cdr;
-	args[i] = rewrite_car (cdr_pair);
+	args[i] = rewrite_car (cdr_pair, false);
 	cdr = cdr_pair.cdr;
       }
 
-  tryDirectCall:
-    if (proc != null && proc instanceof Procedure
-        && ! (proc instanceof Inlineable))
-      {
-	if (proc instanceof AutoloadProcedure)
-	  {
-	    try
-	      {
-		proc = ((AutoloadProcedure) proc).getLoaded();
-	      }
-	    catch (RuntimeException ex)
-	      {
-                ex.printStackTrace(System.err);
-		break tryDirectCall;
-	      }
-	    if (proc == null || ! (proc instanceof Procedure)
-                || proc instanceof Inlineable)
-	      break tryDirectCall;
-	  }
-
-        PrimProcedure pproc
-          = PrimProcedure.getMethodFor((Procedure) proc, args);
-        if (pproc != null)
-          func = new QuoteExp(pproc);
-      }
-
-    if (func instanceof ReferenceExp)
-      {
-	((ReferenceExp) func).setProcedureName(true);
-	if (getInterpreter().hasSeparateFunctionNamespace())
-	  func.setFlag(ReferenceExp.PREFER_BINDING2);
-      }
     return new ApplyExp (func, args);
   }
 
@@ -290,26 +306,88 @@ public class Translator extends Parser
    */
   public Expression rewrite (Object exp)
   {
+    return rewrite(exp, false);
+  }
+
+  /**
+   * Re-write a Scheme expression in S-expression format into internal form.
+   */
+  public Expression rewrite (Object exp, boolean function)
+  {
     if (exp instanceof PairWithPosition)
-      return rewrite_with_position (exp, (PairWithPosition) exp);
+      return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair ((Pair) exp);
     else if (exp instanceof String)
       {
 	String name = (String) exp;
-	Object binding = environ.get (name);
+	Binding binding = environ.lookup(name);
+        if (binding == null)
+	  binding = env.lookup(name);
+        else if (binding.isBound())
+          {
+            // Check for hygiene re-naming - see SyntaxRule.execute_template.
+            Object val1 = binding.getValue();
+            if (val1 instanceof String)
+              {
+                name = (String) val1;
+                binding = env.lookup(name);
+              }
+          }
+        Object value;
+	if (binding == null)
+	  value = null;
+	else if (function)
+	  value = binding.getFunctionValue();
+        else if (binding.isBound())
+          value = binding.getValue();
+        else
+          value = null;
         boolean separate = getInterpreter().hasSeparateFunctionNamespace();
 	Declaration decl = null;
-	// Hygenic macro expansion may bind a renamed (uninterned) symbol
-	// to the original symbol.  Here, use the original symbol.
-	if (binding != null && binding instanceof String)
-	  name = (String) binding;
-        else if (binding instanceof Declaration) // ?? FIXME
+        if (value instanceof Declaration) // ?? FIXME
           {
-            decl = (Declaration) binding;
+            decl = (Declaration) value;
             if (! isLexical(decl)
                 || (separate && decl.isProcedureDecl()))
               decl = null;
+          }
+        else if (! immediate && value instanceof Named)
+          {
+            if (value instanceof AutoloadProcedure)
+              {
+                try
+                  {
+                    value = ((AutoloadProcedure) value).getLoaded();
+                  }
+                catch (RuntimeException ex)
+                  {
+                  }
+              }
+            Named proc = (Named) value;
+            Constraint constraint = binding.getConstraint();
+            if (constraint instanceof StaticFieldConstraint)
+              {
+                StaticFieldConstraint fconstraint
+                  = (StaticFieldConstraint) constraint;
+                String fname = fconstraint.getName();
+                ClassType t = fconstraint.getDeclaringClass();
+                gnu.bytecode.Field procField = t.getDeclaredField(fname);
+                if (procField != null && procField.getStaticFlag())
+                  {
+                    int fflags = procField.getModifiers();
+                    decl = new Declaration(proc.getName(), procField);
+                    decl.noteValue(new QuoteExp(proc));
+                    if ((fflags & Access.FINAL) != 0)
+                      decl.setFlag(Declaration.IS_CONSTANT);
+                    if (value instanceof Syntax)
+                      decl.setFlag(Declaration.IS_SYNTAX);
+                  }
+              }
+            else
+              {
+                decl = Declaration.getDeclaration(proc);
+              }
           }
 	ReferenceExp rexp = new ReferenceExp (name, decl);
 	if (separate)
@@ -341,7 +419,8 @@ public class Translator extends Parser
       }
   }
 
-  public Expression rewrite_with_position (Object exp, PairWithPosition pair)
+  public Expression rewrite_with_position (Object exp, boolean function,
+                                           PairWithPosition pair)
   {
     String save_filename = current_filename;
     int save_line = current_line;
@@ -358,7 +437,7 @@ public class Translator extends Parser
 	if (exp == pair)
 	  result = rewrite_pair (pair);  // To avoid a cycle
 	else
-	  result = rewrite (exp);
+	  result = rewrite (exp, function);
 	if (result.getFile () == null)
 	  result.setFile (exp_file);
 	if (result.getLine () == 0)

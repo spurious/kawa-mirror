@@ -60,10 +60,10 @@ public class Record extends NameMap
 
   public Object put (String fname, Object value)
   {
-    return set1 (this, value, fname);
+    return set1 (this, fname, value);
   }
 
-  public static Object set1 (Object record, Object value, String fname)
+  public static Object set1 (Object record, String fname, Object value)
   {
     Class clas = record.getClass();
     java.lang.reflect.Field fld;

@@ -14,6 +14,13 @@ public class Macro extends Syntax implements Printable, Externalizable
     return mac;
   }
 
+  public void bind(Declaration decl)
+  {
+    decl.setSimple(false);
+    decl.setFlag(Declaration.IS_CONSTANT | Declaration.IS_SYNTAX);
+    decl.noteValue(new QuoteExp(this));
+  }
+
   public void setExpander (Procedure expander)
   {
     this.expander = new QuoteExp(expander);
@@ -48,7 +55,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public String toString()
   {
-    return "#<macro "+getName()+'/'+id+'>';
+    return "#<macro "+getName()+'>';
   }
 
   public void print(java.io.PrintWriter ps)

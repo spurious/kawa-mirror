@@ -9,18 +9,20 @@ import gnu.kawa.util.*;
  * @author	Per Bothner
  */
 
-abstract public class Syntax extends Declaration implements Printable, Named
+abstract public class Syntax implements Printable, Named
 {
+  String name;
+
+  public String getName() { return name; }
+
+  public void setName (String name) { this.name = name; }
+
   public Syntax ()
   {
-    setSimple(false);
-    // Kludge to force Declaration.makeField to set field FINAL.
-    setFlag(Declaration.IS_CONSTANT);
   }
 
   public Syntax (String name)
   {
-    this();
     setName(name);
   }
 

@@ -6,6 +6,16 @@
 	(allocClass):  Inline into addClass.
 	(addClass):  Set instanceField earlier since used by ProcInitializer.
 
+	* PrimProcedure.java (compile/4):  Change 2nd operand to ApplyExp.
+	Also optimize IgnoreTarget.  Add sometimes-needed runUntilDone call.
+	(compile/3):  Change caller appropriately.
+	* ApplyExp.java (compile):  Likewise.
+
+	* PrimProcedure.java (numArgs):  Adjust for takesContext().
+	(getProcedureClass):  Handle ApplyMethodProc and CpsMethodProc.
+	(getMethodFor/5):  Also search for methods ending in $X and $V$X.
+	Remove unused local variable 'variable'.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* Declaration (makeField):  If name is a Symbol for an indirect

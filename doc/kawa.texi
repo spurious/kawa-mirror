@@ -1302,6 +1302,16 @@ Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
 @end defun
 
+@defun instance? value type
+Returns @code{#t} iff @var{value} is an instance of type @var{type}.
+(Undefined if @var{type} is a primitive type, such as @code{<int>}.)
+@end defun
+
+@defun as type value
+Converts or coerces @var{value} to a value of type @var{type}.
+Throws an exception if that cannot be done.
+@end defun
+
 @node Compiling, Primitive functions, Extensions, Top
 @chapter Compiling Scheme code to byte-codes
 

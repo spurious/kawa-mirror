@@ -1,5 +1,11 @@
 2003-08-03  Per Bothner  <per@bothner.com>
 
+	* NodeType.java (ATTRIBUTE_OK):  New constant.
+	(isInstance(AbstractSequence,int,int)):  Always false if EOF_VALUE.
+	Check ATTRIBUTE_OK if ATTRIBUTE_VALUE.
+	* SortNodes.java (numArgs):  Remove redundant method.
+	(typeSortedNodes, makeSortedNodesMethod):  Make public.
+
 	* TreeScanner.java:  New class, extends CpsProcedure.
 	* AttributeAxis.java:  New class, extends TreeScanner.
 	* ChildAxis.java:  New class, extends TreeScanner.

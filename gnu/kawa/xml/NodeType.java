@@ -18,6 +18,7 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
 {
   public static final int TEXT_OK = 1;
   public static final int GROUP_OK = 2;
+  public static final int ATTRIBUTE_OK = 4;
   int kinds = -1;
 
   public NodeType(String name, int kinds)
@@ -71,9 +72,11 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
 
   public static boolean isInstance(AbstractSequence seq, int ipos, int kinds)
   {
-    if (kinds >= 0)
+    int kind = seq.getNextKind(ipos);
+    if (kinds < 0)
+      return kind != Sequence.EOF_VALUE;
+    else
       {
-	int kind = seq.getNextKind(ipos);
 	switch (kind)
 	  {
 	  case Sequence.EOF_VALUE:
@@ -95,8 +98,9 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
 	    return (kinds & TEXT_OK) != 0;
 	  case Sequence.GROUP_VALUE:
 	    return (kinds & GROUP_OK) != 0;
-	  case Sequence.DOCUMENT_VALUE:
 	  case Sequence.ATTRIBUTE_VALUE:
+	    return (kinds & ATTRIBUTE_OK) != 0;
+	  case Sequence.DOCUMENT_VALUE:
 	    return false;
 	  }
       }

@@ -14,8 +14,6 @@ public class SortNodes extends Procedure1 implements Inlineable
 {
   public static final SortNodes sortNodes = new SortNodes();
 
-  public int numArgs() { return 0x1001; }
-
   public Object apply1 (Object values)
   {
     SortedNodes nodes = new SortedNodes();
@@ -34,9 +32,9 @@ public class SortNodes extends Procedure1 implements Inlineable
     return Compilation.typeObject;
   }
 
-  static final ClassType typeSortedNodes
+  public static final ClassType typeSortedNodes
     = ClassType.make("gnu.kawa.xml.SortedNodes");
-  static final Method makeSortedNodesMethod
+  public static final Method makeSortedNodesMethod
     = typeSortedNodes.getDeclaredMethod("<init>", 0);
 
 }

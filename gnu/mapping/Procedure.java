@@ -32,7 +32,10 @@ public abstract class Procedure extends Named implements Printable
   public abstract Object apply4(Object arg1,Object arg2,
 				Object arg3,Object arg4);
 
+  /** Minimum number of arguments required. */
   public final int minArgs() { return numArgs() & 0xFFF; }
+
+  /** Maximum number of arguments allowed, or -1 for unlimited. */
   public final int maxArgs() { return numArgs() >> 12; }
 
   /** Check that the number of arguments in a call is valid.

@@ -31,7 +31,7 @@ $(TO_TOPDIR)/kawa1$(exeext):
 $(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
 	$(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(GCJFLAGS) \
 	  --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
-	  $? $(EXTRA_GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
+	  $^ $(EXTRA_GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?

@@ -1,3 +1,27 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* Make-rules ($(PACKAGE_FNAME).lo):  Link $^ rather than $? to get
+	all the dependencies, not just the out-of-date ones.
+	
+	* kawa/standard/Scheme.java (writeFormat, displayFormat):  New fields.
+	(getFormat): New method.
+	(<init>):  Change procedures display and write.
+	(print):  Removed method.
+
+	* kawa/standard/require.java (find(Class,Environment)):  Don't run
+	Runnable instance here (at compile-time).
+	(find(String)):  Run it here instead (at run-time).
+	(scanForDefinitions):  If no instance yet, but class is Runnable,
+	return ApplyExp to find instance at run-time.
+
+	* kawa.repl (main):  New --debug-print-expr option.
+	Update copyright date printed by --version.
+	Call WriterManager's registerShutdownHook.
+	Call OutPort's runCleanups method in finalizer.
+
+	* Shell.java (run):  Instead of printing results here, call evalModule
+	with the standard output as the Consumer.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SpecialType.java:  Moved to gnu.kawa.lispexpr.LangPrimType.

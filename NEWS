@@ -1,3 +1,21 @@
+Kawa now has builtin pretty-printer support, using an algorithm from
+Steel Bank Common Lisp converted from Lisp to Java.  The high-level
+Common Lisp pretty-printing features are mostly not yet implemented,
+but the low-level support is there.  The standard output and error
+ports default to pretty-printing.
+
+A new formatting framework uses the Consumer interface from gnu.lists.
+You can associate a format with an output port.  Common Lisp and JEmacs
+finally print using their respective syntaxes.
+
+All output port (OutPort instances) are now automatically flushed on
+program exit, using a new WriterManager helper class.
+
+The new commmand-line option --debug-print-expr causes the Expression
+for each expression to be printed.  The option --debug-print-final-expr
+is similar, but prints Expressions after optimization just before
+compilation.  They are printed using the new pretty-printer.
+
 Changed calling convention for --full-tailcalls to write results
 to a Consumer, usually a TreeList or something to be printed.
 A top-level ModuleBody now uses the same CpsProcedure convention.

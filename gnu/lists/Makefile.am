@@ -14,6 +14,7 @@ java_sources = \
   Consumable.java \
   Convert.java \
   ElementPredicate.java \
+  EofClass.java \
   ExtPosition.java \
   ExtSequence.java \
   F32Vector.java \

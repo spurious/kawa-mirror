@@ -29,7 +29,7 @@ extends
     Consumable
 {
   /** Special magic end-of-file marker. */
-  public static final Object eofValue = new EofClass();
+  public static final Object eofValue = EofClass.eofValue;
 
   /** True is this sequence contains no elements. */
   public boolean isEmpty();
@@ -76,26 +76,4 @@ extends
   public static final int PROCESSING_INSTRUCTION_VALUE = 16;
   public static final int ENTITY_REFERENCE_VALUE = 16;
   */
-}
-
-class EofClass implements Externalizable
-{
-  public final String toString()
-  {
-    return "#!eof";
-  }
-
-  public void writeExternal(ObjectOutput out) throws IOException
-  {
-  }
-
-  public void readExternal(ObjectInput in)
-    throws IOException, ClassNotFoundException
-  {
-  }
-
-  public Object readResolve() throws ObjectStreamException
-  {
-    return Sequence.eofValue;
-  }
 }

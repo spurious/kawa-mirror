@@ -1,3 +1,11 @@
+2003-10-02  Per Bothner  <per@bothner.com>
+
+	* Sequence.java:  Move class EofClass to separate file.
+	* Makefile.am:  Update accordingly.
+	* EofClass.java:  Make class public.
+	(eofValue):  New public field.
+	* Sequence.java (eofValue):  Make same as EofClass.eofValue.
+
 2003-09-30  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (INT_FOLLOWS):  Make public - used by CallContext.

@@ -290,7 +290,7 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--debug-dump-zip"))
 	  {
-	    gnu.expr.LambdaExp.dumpZipPrefix = "kawa-zip-dump-";
+	    gnu.expr.ModuleExp.dumpZipPrefix = "kawa-zip-dump-";
 	  }
 	else if (arg.equals("--module-static"))
 	  {

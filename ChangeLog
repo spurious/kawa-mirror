@@ -1,3 +1,8 @@
+2001-02-27  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main):  Field dumpZipPrefix moved to ModuleExp.
+	* kawa/standard/define_class.java: Comment out until we can fix it.
+
 2001-02-16  Per Bothner  <per@bothner.com>
 
 	* configure.in:  New --enable-xml flag.

@@ -15,6 +15,7 @@ public class define_class extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
+    /*
     Pair p;
     System.err.println("def_class def:"+defs+" is "+defs.getClass());
     if (! (st.cdr instanceof Pair)
@@ -40,10 +41,15 @@ public class define_class extends Syntax
     st = tr.makePair(st, this, declForm);
     forms.addElement (st);
     return true;
+    */
+    return false;
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
+    return null;
+    /*
+    FIXME needs work
     String name = null;
     Declaration decl = null;
     if (form.cdr instanceof Pair)
@@ -66,10 +72,8 @@ public class define_class extends Syntax
     ClassExp oexp = new ClassExp();
     oexp.setName(name);
     Expression oe = objectSyntax.rewriteClassDef((Pair) form.cdr, oexp, tr);
-    /*
-    lexp.body = oe;
-    tr.pop(lexp);
-    */
+    // lexp.body = oe;
+    // tr.pop(lexp);
     SetExp sexp = new SetExp (name, oe);
     if (decl != null)
       {
@@ -77,10 +81,9 @@ public class define_class extends Syntax
 	decl.noteValue(oe);
       }
     sexp.setDefining (true);
-    /*
-    sexp.binding = decl;
-    decl.noteValue (value);
-    */
+    // sexp.binding = decl;
+    // decl.noteValue (value);
     return sexp;
+    */
   }
 }

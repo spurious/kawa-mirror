@@ -1,9 +1,18 @@
-A new gnu.kawa.xml package (whose name is likey to change) contains
+The implementation of procedure closures has been changed to basically
+be the same as top-level procedures (except when --full-tailcalls is
+specified):  Each procedure is now an instance of a ModuleMethod,
+which each "frame" is an instance of ModuleBody, just like for
+top-level functions.  This sometimes reduces the number of classes
+generated, but more importantly it simplifies the implementation.
+
+A new gnu.kawa.xml package (whose name is likely to change) contains
 XML-related code, currently an XML parser and printer.
 The new class gnu.kawa.util.TreeList (alias <document>) is useful
 for compactly representing nested structures, including XML documents.
 If you (require 'xml) you will get Scheme interfaces (print-as-xml
 and parse-xml-from-url) to these classes.
+
+New package gnu.kawa.functions, for primitive functions (written in Java).
 
 The map and for-each procedure is now inlined.  This is most especially
 beneficial when it allows the mapped-over procedure to also be inlined,

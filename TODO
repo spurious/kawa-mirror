@@ -1,9 +1,21 @@
+Perhaps CallFrame should extend ModuleBody.
+
 BEFORE KAWA 1.7:
 * Finish modules: define-module?  constructor arguments?
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
 * Printer for ELisp and CLisp.
+* Tail-calls in top-level functions should loop.
+* Document in internals.html how ModuleMethod/ModuleBody works.
+
+Should inline when accessing a final static field (using static-field),
+for int (or shorter) types - but only for "compile-time constants".
+(Needs checking .class file that field is given ConstantValue.)
+
+Starting (emacs) has wrong keybindings unless --elisp is specified.
+
+ModuleMethod should do type-checking in match, for proper generics.
 
 Move kawa.standard.convert to gnu.kawa.reflect.Convert.
 Move kawa.lang.Lambda to gnu.kawa.lispexpr.Lambda.  Merge with Elisp version.

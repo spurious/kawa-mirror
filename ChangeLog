@@ -1,3 +1,12 @@
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_OUTPUT):  Add gnu/xquery/testsuite/tab.xml.
+	
+	* kawa/standard/object.java (rewriteClassDef):  New implementation to
+	handle CLOS-style keyword-options arguments.
+	* kawa/standard/require.java (scanForDefinitions):  Map implementation
+	type to source type when setting type of declaration.
+
 2001-08-17  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (main):  Don't getInterpreter on --connect.

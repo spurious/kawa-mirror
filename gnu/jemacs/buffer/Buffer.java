@@ -470,4 +470,16 @@ public class Buffer
       end = count > 0 ? content.length() - 1 : 0;
     return content.scan(target, start, end, count, allowQuit);
   }
+
+  public Window display(boolean notThisWindow, Frame frame)
+  {
+    if (frame == null)
+      frame = Frame.getSelectedFrame();
+    Window selected = frame.getSelectedWindow();
+    Window window = frame.otherWindow(1);
+    if (selected == window && notThisWindow)
+      window = selected.split(-1, false);
+    window.setBuffer(this);
+    return window;
+  }
 }

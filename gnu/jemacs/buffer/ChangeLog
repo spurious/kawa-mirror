@@ -1,3 +1,27 @@
+2000-02-26  Per Bothner  <per@bothner.com>
+
+	* ProcAction.java:  Removed, replaced by/renamed to Command.java.
+	* Command.java:  New class.
+	(command):  New field, replaces proc field.
+	(perform):  New static method.
+	* Makefile.am, Makefile.in:  Update accordingly.
+	* BufferKeymap.java:  Likewise.
+
+	* Buffer.java (display):  New method.
+	* Menu.java:  No longer implements ActionListener.
+	(menuEntried):  Removed Hashtable field.
+	(setMenu):  Use enumerator.  Don't create extra initial separator.
+	Add a JComponent as is.
+	Create a MenuItem (new class) instead of JMenuItem.
+	(actionPerformed):  Moved to MenuItem.
+	(class MenuItem):  New non-public class, extends JMenuItem.
+	* emacs.scm (find-file-other-window, find-file-other-frame,
+	pop-to-buffer, display-window, switch-to-buffer-other-window,
+	switch-to-buffer-other-frame):  New procedures.
+	(default-menubar):  Do't use literal, so we can use
+	function references, rather than function names.
+
+
 2000-02-26  Simon Josefsson <jas@pdc.kth.se>
 
 	* Menu.java:  New file.

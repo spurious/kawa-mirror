@@ -67,31 +67,9 @@
 
 (define current-menubar #!null)
 
-(define default-menubar
-  '(
-    ("File"
-     #("Open..." find-file)
-     #("Open in Other Window..." find-file-other-window )
-     #("Open in New Frame..." find-file-other-frame )
-     #("Insert File..." insert-file )
-     #("View File..." view-file )
-     "------"
-     #("New Frame" make-frame)
-     #("Delete Frame" delete-frame)
-     "------"
-     #( "Save" save-buffer :active (buffer-modified-p) ) )
-    ("Tools"
-     #( "Scheme interaction" scheme-swing-window))
-    #!null
-    ("Help"
-     #( "About JEmacs..." about-jemacs ) )))
-
-(define (set-menubar-dirty-flag)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "setMenuBar"
-			     <void> (<gnu.jemacs.buffer.Menu>))
-   (selected-frame)
-   ((primitive-constructor <gnu.jemacs.buffer.Menu> 
-			   (<object>)) current-menubar)))
+(define (set-menubar-dirty-flag #!optional (frame :: <frame> (selected-frame)))
+  (invoke frame 'setMenuBar
+	  (make <gnu.jemacs.buffer.Menu> current-menubar)))
 
 (define (set-menubar menubar)
   (set! current-menubar menubar)
@@ -107,6 +85,16 @@
   ((primitive-static-method <buffer> "findFile"
                             <buffer> (<String>))
    filename))
+
+(define (find-file-other-window
+	 #!optional (filename
+		     (read-from-minibuffer "Find file in other window: ")))
+  (switch-to-buffer-other-window (find-file-noselect filename)))
+
+(define (find-file-other-frame
+	 #!optional (filename
+		     (read-from-minibuffer "Find file in other frame: ")))
+  (switch-to-buffer-other-frame (find-file-noselect filename)))
 
 (define (save-buffer #!optional (buffer (current-buffer)))
   (if (buffer-file-name buffer)
@@ -126,6 +114,16 @@
    buffer filename))
 
 ;;; BUFFERS
+
+(define (pop-to-buffer buffer
+		       #!optional not-this-window-p
+		       (on-frame :: <gnu.jemacs.buffer.Frame> #!null))
+  (select-window (display-window buffer not-this-window-p on-frame)))
+
+(define (display-window (buffer :: <buffer>)
+			#!optional not-this-window-p
+			(on-frame :: <gnu.jemacs.buffer.Frame> #!null))
+  (invoke buffer 'display not-this-window-p on-frame))
 
 (define (current-buffer)
   (invoke-static <buffer> 'getCurrent))
@@ -241,6 +239,12 @@
     (set-buffer buf)
     (set-window-buffer (selected-window) buf)))
 
+(define (switch-to-buffer-other-window (buffer :: <buffer>))
+  (pop-to-buffer buffer #t (selected-frame)))
+
+(define (switch-to-buffer-other-frame (buffer :: <buffer>))
+  (pop-to-buffer buffer #f (make-frame buffer)))
+
 (define (set-window-buffer window buffer)
   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "setBuffer"
 			    <void> (<buffer>))
@@ -255,10 +259,10 @@
 
 ;;; FRAMES
 
-(define (make-frame #!optional (buffer (current-buffer)))
-  ((primitive-constructor <gnu.jemacs.buffer.Frame> (<buffer>))
-   buffer)
-  (set-menubar default-menubar))
+(define (make-frame #!optional (buffer :: <buffer> (current-buffer)))
+  (let ((frame (make <frame> buffer)))
+    (set-menubar default-menubar)
+    frame))
 
 (define (delete-frame #!optional (frame (selected-frame)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "delete" <void> ())
@@ -493,13 +497,34 @@
 (define-key global-map "\C-x1" delete-other-windows)
 (define-key global-map "\C-x2" split-window-vertically)
 (define-key global-map "\C-x3" split-window-horizontally)
+(define-key global-map "\C-x4f" find-file-other-window)
 (define-key global-map "\C-xb" switch-to-buffer)
 (define-key global-map "\C-xi" insert-file)
 (define-key global-map "\C-x\C-f" find-file)
 (define-key global-map "\C-x50" delete-frame)
 (define-key global-map "\C-x52" make-frame)
+(define-key global-map "\C-x5f" find-file-other-frame)
 (define-key global-map "\C-xo" other-window)
 (define-key global-map '(control h) emacs-help)
+
+(define default-menubar
+  (list
+   (list "File"
+	 (vector "Open..." find-file)
+	 (vector "Open in Other Window..." find-file-other-window)
+	 (vector "Open in New Frame..." find-file-other-frame)
+	 #("Insert File..." insert-file )
+	 ;; #("View File..." view-file )
+	 "------"
+	 (vector "New Frame" make-frame)
+	 (vector "Delete Frame" delete-frame)
+	 "------"
+	 (vector "Save" save-buffer :active (buffer-modified-p) ))
+   (list "Tools"
+	 (vector "Scheme interaction" scheme-swing-window))
+   #!null
+   (list "Help"
+	 #( "About JEmacs..." about-jemacs ) )))
 
 (define (emacs)
   (set-buffer (get-buffer-create "*scratch*"))

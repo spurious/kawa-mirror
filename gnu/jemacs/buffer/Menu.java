@@ -11,10 +11,8 @@ import java.util.*;
  * @author Simon Josefsson <jas@pdc.kth.se> (orginal contribution)
  */
 
-public class Menu extends JMenu implements ActionListener
+public class Menu extends JMenu
 {
-  Hashtable menuEntries = new Hashtable();
-
   public Menu ()
   {
     super();
@@ -33,63 +31,64 @@ public class Menu extends JMenu implements ActionListener
 
     Sequence menuList = (LList) menu;
 	
-    if (menuList.get(0) instanceof FString)
+    java.util.Enumeration e = menuList.elements();
+    for (int i = 0;  e.hasMoreElements(); i++)
       {
-	FString name = (FString) menuList.get(0);
-	this.setText(name.toString());
-      }
-
-    for (int i = 0; i < menuList.length(); i++)
-      {
-	if (menuList.get(i) == null)
+	Object item = e.nextElement();
+	if (item == null)
 	  {
 	    this.add(Box.createHorizontalGlue());
 	  }
-	else if (menuList.get(i) instanceof FString)
+	else if (item instanceof FString)
 	  {
-	    // FIXME handle different type of separators
-	    this.addSeparator();
+	    if (i == 0)
+		this.setText(item.toString());
+	    else
+	      // FIXME handle different type of separators
+	      this.addSeparator();
 	  }
-	else if (menuList.get(i) instanceof FVector)
+	else if (item instanceof FVector)
 	  {
-	    FVector menuEntry = (FVector) menuList.get(i);
+	    FVector menuEntry = (FVector) item;
 
 	    if (menuEntry.get(0) instanceof FString)
 	      {
 		FString txt = (FString) menuEntry.get(0);
-		String proc = (String) menuEntry.get(1);
+		Object proc = menuEntry.get(1);
 
 		// FIXME handle all possible keywords
 
-		JMenuItem menuItem = new JMenuItem (txt.toString());
-		menuEntries.put(txt.toString(), proc);
-		menuItem.addActionListener(this);
+		JMenuItem menuItem = new MenuItem (txt.toString(), proc);
 		this.add(menuItem);
 	      }
 	  }
-	else if (menuList.get(i) instanceof LList)
+	else if (item instanceof JComponent)
+	  this.add((JComponent) item);
+	else if (item instanceof LList)
 	  {
 	    // FIXME don't create new objects, keep it within this
-	    Menu tmp = new Menu(menuList.get(i));
+	    Menu tmp = new Menu(item);
 	    this.add(tmp);
 	  }
       }
   }
 
+}
+
+class MenuItem extends JMenuItem implements java.awt.event.ActionListener
+{
+  Object command;
+
+  public MenuItem(String text, Object command)
+  {
+    super(text);
+    this.command = command;
+    this.addActionListener(this);
+  }
+
   public void actionPerformed(java.awt.event.ActionEvent event)
   {
     JMenuItem source = (JMenuItem) event.getSource();
-    String procname = (String) menuEntries.get(source.getText());
-      
-    if (gnu.jemacs.lang.Symbol.isBound (procname))
-      {
-	Procedure proc = gnu.jemacs.lang.Symbol.getBinding(procname).getProcedure();
-	try
-	  {
-	    proc.apply0();
-	  } catch (CancelledException ex) {
-	    // Do nothing.
-	  }
-      }
+    Command.perform(command);
   }
 }

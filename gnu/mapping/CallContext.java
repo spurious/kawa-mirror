@@ -36,7 +36,7 @@ public final class CallContext implements Runnable
   public int count;
   
   /** Index of next argument.
-   * This is used methods like getNextArg, uses by callees. */
+   * This is used by methods like getNextArg, used by callees. */
   public int next;
 
   /** Encoding of where the arguments are.

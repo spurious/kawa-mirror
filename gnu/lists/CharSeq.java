@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2005  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -46,8 +46,7 @@ public interface CharSeq
   //   throws java.io.IOException;
 
   // public CharSeq subSequence(int start, int end);
-  /* #endif */
-  /* #ifndef JAVA5 */
+  /* #else */
   /**
    * Write out (part of) this string.
    * @param start index of initial character to write

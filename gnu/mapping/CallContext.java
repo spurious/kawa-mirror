@@ -12,8 +12,7 @@ public class CallContext // implements Runnable
 {
   /* #ifdef JAVA2 */
   static ThreadLocal currentContext = new ThreadLocal();
-  /* #endif */
-  /* #ifndef JAVA2 */
+  /* #else */
   // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
   /* #endif */
   Thread currentThread;
@@ -31,8 +30,7 @@ public class CallContext // implements Runnable
     ctx.currentThread = thread; 
     /* #ifdef JAVA2 */
     currentContext.set(ctx);
-    /* #endif */
-    /* #ifndef JAVA2 */
+    /* #else */
     // if (thread instanceof Future)
     //   ((Future) thread).context = ctx;
     // else
@@ -45,8 +43,7 @@ public class CallContext // implements Runnable
   {
     /* #ifdef JAVA2 */
     return (CallContext) currentContext.get();
-    /* #endif */
-    /* #ifndef JAVA2 */
+    /* #else */
     // Thread thread = Thread.currentThread();
     // if (thread instanceof Future)
     //   return ((Future) thread).getCallContext();

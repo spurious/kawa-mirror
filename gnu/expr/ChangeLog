@@ -1,5 +1,7 @@
 2003-11-09  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (applyV):  Handle takesContext().
+
 	* Interpreter.java (eval):  Use CallContext's startFromContext
 	and getFromContext methods.
 

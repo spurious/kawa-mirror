@@ -159,6 +159,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  return ((java.lang.reflect.Constructor) member).newInstance(rargs);
 	else
 	  {
+	    if (takesContext())
+	      {
+		int nargs = rargs.length;
+		Object[] xargs = new Object[nargs+1];
+		System.arraycopy(rargs, 0, xargs, 0, nargs);
+		xargs[nargs] = ctx;
+		rargs = xargs;
+	      }
 	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
 	    Object result = meth.invoke(ctx.value1, rargs);
             return retType.coerceToObject(result);

@@ -1,3 +1,7 @@
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (makeU):  New static method.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* Unit.java (<init>):  Constructor do not enter new Unit in unitTable.

@@ -89,6 +89,19 @@ public class IntNum extends RatNum implements Compilable
     return result;
   }
 
+  /** Make an IntNum from an unsigned 64-bit value. */
+  public static IntNum makeU (long value)
+  {
+    if (value >= 0)
+      return make(value);
+    IntNum result = alloc(3);
+    result.ival = 3;
+    result.words[0] = (int) value;
+    result.words[1] = (int) (value >> 32);
+    result.words[2] = 0;
+    return result;
+  }
+
   /** Make a canonicalized IntNum from an array of words.
    * The array may be reused (without copying). */
   public static IntNum make (int[] words, int len)

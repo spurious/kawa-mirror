@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = cygnus
 JAVATOP =
-SUBDIRS = gnu kawa doc testsuite
+SUBDIRS = doc testsuite gnu kawa
 javadir=$(datadir)/java
 
 JAR = jar

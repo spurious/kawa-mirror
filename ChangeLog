@@ -1,3 +1,28 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Move testsuite before gnu, to "force" check
+	to be run there before in gnu/jemacs/testsuite.M
+	* configure.in (AC_OUTPUT):  Added gnu/jemacs/testsuite/Makefile.
+
+	* kawa/lang/AutoloadProcedure.java:  Implement Externalizable.
+	* kawa/lang/AutoloadSyntax.java:  Implement Externalizable.
+
+	* kawa/lang/Syntax.java (<init>):  Don't bother setting TYPE_SPECIFIED.
+
+	* kawa/lang/Translator.java (finishModule):  Handle case of no forms.
+
+	* kawa/standard/define_autoload.java:  New class, extends Syntax.
+	* kawa/standard/define_unit.java:  New class, extends Syntax.
+	* kawa/standard/Makefile.am (java_JAVA):  Update accordingly.
+	* kawa/standard/Scheme.java (initScheme):  Add new syntaxes.
+	* kawa/standard/define_syntax.java (rewriteForm):  Add a noteValue.
+	* kawa/standard/define.java (makeConstant):  New field.
+	Generaize to implement define-constant.
+	* kawa/standard/require.java:  If immediate, just call
+	ClassMemberConstraint.define.
+
+	* kawa/standard/set_b.java (rewrite):  Complain if setting a constant.
+
 2000-06-09  Bruce Lewis  <brlewis@alum.mit.edu>
 
 	* kawa/standard/read_line.java (apply):  Fix off-by-one error in
@@ -2818,7 +2843,7 @@ Thu Jul 11 15:10:14 1996  Per Bothner  <bothner@deneb.cygnus.com>
 	* kawa/standard/{let,letstar}.java:  Don't allocate array of
 	Declarations (since we now use links).
 	* kawa/standard/define.java:  Set DEFINING_FLAG on result.
-	* kawa/standard/letrec.java:  Re-wriiten to use extend Syntax.
+	* kawa/standard/letrec.java:  Re-written to use extend Syntax.
 	* kawa/standard/StandardInterpreter.java: Upadet for new letrec.
 	* kawa/standard/load.java:  Close on port on eof.
 	* kawa/standard/string2list.java:  Use Char.make rather than new Char.

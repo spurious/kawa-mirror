@@ -4,7 +4,7 @@ import gnu.bytecode.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
 import java.io.*;
-import gnu.kawa.reflect.FieldLocation;
+import gnu.kawa.reflect.StaticFieldLocation;
 
 /**
  * Class used to implement Scheme top-level environments.
@@ -126,28 +126,11 @@ public class ModuleExp extends LambdaExp
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
 	*/
 
+        CallContext ctx = CallContext.getInstance();
+        ctx.value1 = comp;
+
 	Class clas = loader.loadClass (class_name, true);
 	comp.mainClass.setReflectClass(clas);
-	/* Pass literal values to the compiled code. */
-	for (Literal init = comp.litTable.literalsChain;  init != null;
-	     init = init.next)
-	  {
-	    /* DEBUGGING:
-	    OutPort out = OutPort.errDefault();
-	    out.print("init["+init.index+"]=");
-	    out.print(init.value);
-	    out.println();
-	    */
-	    try
-	      {
-		clas.getDeclaredField(init.field.getName())
-		  .set(null, init.value);
-	      }
-	    catch (java.lang.NoSuchFieldException ex)
-	      {
-		throw new Error("internal error - "+ex);
-	      }
-	  }
         return clas;
       }
     catch (java.io.IOException ex)
@@ -158,10 +141,6 @@ public class ModuleExp extends LambdaExp
     catch (ClassNotFoundException ex)
       {
 	throw new RuntimeException("class not found in lambda eval");
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new RuntimeException("class illegal access: in lambda eval");
       }
   }
 
@@ -191,19 +170,20 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-	    ModuleBody mod;
 	    try
 	      {
 		Class clas = evalToClass(comp);
 		if (clas == null)
 		  return;
-		Object inst = clas.newInstance ();
-
-		Procedure proc = (Procedure) inst;
-		if (proc.getSymbol() == null)
-		  proc.setSymbol(mexp.getSymbol());
-
-		mod = (ModuleBody) inst;
+                Object inst;
+                try
+                  {
+                    inst = clas.getDeclaredField("$instance").get(null);
+                  }
+                catch (NoSuchFieldException ex)
+                  {
+                    inst = clas.newInstance();
+                  }
 
 		// Import declarations defined in module into the Environment.
 		for (Declaration decl = mexp.firstDecl();
@@ -213,15 +193,12 @@ public class ModuleExp extends LambdaExp
 		    if (decl.isPrivate() || dname == null)
 		      continue;
 		    Field fld = decl.field;
-		    Location loc
-                      = new FieldLocation(inst, fld.getDeclaringClass(),
-					  fld.getName());
 		    Symbol sym = dname instanceof Symbol ? (Symbol) dname
 		      : Symbol.make("", dname.toString().intern());
 		    Object property = comp.getLanguage()
 		      .getEnvPropertyFor(decl);
 		    // Would it be better to check if fld is FINAL?
-                    // If it is, gets its value; other wisecreate
+                    // If it is, gets its value; otherwise create
                     // a FieldLocation to access it?  FIXME.
 		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
 		      {
@@ -231,7 +208,7 @@ public class ModuleExp extends LambdaExp
 			    && dvalue != QuoteExp.undefined_exp)
 			  value = ((QuoteExp) dvalue).getValue();
 			else
-			  value = loc.get();
+                          value = decl.field.getReflectField().get(null);
 			if (decl.isIndirectBinding())
 			  env.addLocation(sym, property, (Location) value);
 			else
@@ -240,23 +217,20 @@ public class ModuleExp extends LambdaExp
 		      }
 		    else
 		      {
-			if (decl.isIndirectBinding())
-			  loc = (Location) loc.get();
-			// else perhaps use a StaticFieldLocation?  FIXME
+                        Location loc
+                          = new StaticFieldLocation(fld.getDeclaringClass(),
+                                                    fld.getName());
 			// Perhaps set loc.decl = decl?
 			env.addLocation(sym, property, loc);
 		      }
 		  }
-	      }
-	    catch (InstantiationException ex)
-	      {
-		throw new RuntimeException("class not instantiable: in lambda eval");
+                if (inst instanceof ModuleBody)
+                  ((ModuleBody) inst).run(ctx);
 	      }
 	    catch (IllegalAccessException ex)
 	      {
 		throw new RuntimeException("class illegal access: in lambda eval");
 	      }
-	    mod.run(ctx);
 	  }
 	ctx.runUntilDone();
       }
@@ -264,6 +238,45 @@ public class ModuleExp extends LambdaExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(orig_env);
+      }
+  }
+
+  /** Call-back from compiled code to initialize literals in immediate mode.
+   * In non-immediate mode (i.e. generating class files) the compiler emits
+   * code to "re-construct" literal values.  However, in immediate mode
+   * that would be wasteful, plus we would get values that are similar (equals)
+   * to but not necessarily identical (eq) to the compile-time literal.
+   * So we need to pass the literal values to the compiled code, by using
+   * reflectiion to initialize various static fields.  This method does that.
+   * It is called from start of the the generated static initializer, which
+   * helps makes things more consistent between immediate and non-immediate
+   * mode.
+   */
+  public static void setupLiterals ()
+  {
+    CallContext ctx = CallContext.getInstance();
+    Compilation comp = (Compilation) ctx.value1;
+    try
+      {
+        Class clas = comp.loader.loadClass(comp.mainClass.getName(), true);
+
+	/* Pass literal values to the compiled code. */
+	for (Literal init = comp.litTable.literalsChain;  init != null;
+	     init = init.next)
+	  {
+	    /* DEBUGGING:
+	    OutPort out = OutPort.errDefault();
+	    out.print("init["+init.index+"]=");
+	    out.print(init.value);
+	    out.println();
+	    */
+            clas.getDeclaredField(init.field.getName())
+              .set(null, init.value);
+	  }
+      }
+    catch (Throwable ex)
+      {
+        throw new WrappedException("internal error", ex);
       }
   }
 

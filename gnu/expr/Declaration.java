@@ -720,19 +720,12 @@ public class Declaration
       setIndirectBinding(true);
     if (! isPrivate() || external_access)
       fflags |= Access.PUBLIC;
-    // In immediate mode there is no point in making module fields non-static,
-    // and making them static is more efficient.  In that case we make the
-    // fields non-final, since they may get set in <init> rather than <clinit>
-    // (see below), and setting final static fields in non-static methods
-    // has been known to break incorrect VMs (and it is kind of gross).
-    if (comp.immediate
-	|| isStatic()
+    if (isStatic()
 	|| (isConstant && value instanceof QuoteExp)
 	|| (value instanceof ClassExp
 	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;
-    if ((isIndirectBinding() || isConstant)
-	&& ! comp.immediate)
+    if (isIndirectBinding() || isConstant)
       fflags |= Access.FINAL;
     Type ftype = getType().getImplementationType();
     if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))
@@ -771,11 +764,7 @@ public class Declaration
 	     || (value != null && ! (value instanceof ClassExp)))
       {
 	BindingInitializer init = new BindingInitializer(this, value);
-	// In immediate mode we can't initialize variables in <clinit>,
-	// even though the field is static.  This is because the literals
-	// (which might be needed by the initializer) are passed in using
-	// reflection, which cannot be done before class initialization.
-	if ((fflags & Access.STATIC) != 0 && ! comp.immediate)
+	if ((fflags & Access.STATIC) != 0)
 	  {
 	    init.next = comp.clinitChain;
 	    comp.clinitChain = init;

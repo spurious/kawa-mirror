@@ -1097,7 +1097,7 @@ public class Compilation
 	code.emitLoad(code.getCurrentScope().getVariable(1));
 	code.emitPutField(lexp.staticLinkField);
       }
-    if (curClass == mainClass)
+    if (curClass == mainClass && ! immediate)
       {
 	code.emitPushThis();
 	code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleInfo")
@@ -1887,12 +1887,10 @@ public class Compilation
 
 	initMethod = startClassInit();
 	code = getCode();
-	if (! immediate)
-	  {
-	    startLiterals = new Label(code);
-	    afterLiterals = new Label(code);
-	    code.fixupChain(afterLiterals, startLiterals);
-	  }
+
+        startLiterals = new Label(code);
+        afterLiterals = new Label(code);
+        code.fixupChain(afterLiterals, startLiterals);
 	  
 	if (staticModule)
 	  {
@@ -1989,7 +1987,11 @@ public class Compilation
 
 	try
 	  {
-	    litTable.emit();
+            if (immediate)
+              code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleExp")
+                                    .getDeclaredMethod("setupLiterals", 0));
+            else
+              litTable.emit();
 	  }
 	catch (Throwable ex)
 	  {
@@ -2134,6 +2136,11 @@ public class Compilation
       {
 	if (mainLambda == null)
 	  mainLambda = (ModuleExp) scope;
+
+        // In immediate mode there is no point in a non-static module:
+        // a static module is simpler and more efficient.
+        if (immediate)
+          scope.setFlag(ModuleExp.STATIC_SPECIFIED);
       }
     else
       mustCompileHere();

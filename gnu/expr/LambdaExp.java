@@ -517,9 +517,7 @@ public class LambdaExp extends ScopeExp
 	boolean external_access = nameDecl.needsExternalAccess();
 	if (external_access)
 	  fname = Declaration.PRIVATE_PREFIX + fname;
-	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED)
-	    || (comp.immediate
-		&& ! nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED)))
+	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
           {
             fflags |= Access.STATIC;
             // If there is no moduleInstanceVar, then the field gets

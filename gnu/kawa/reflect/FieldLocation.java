@@ -9,16 +9,30 @@ public class FieldLocation extends ClassMemberLocation
   Declaration decl;
   /** The cached location of the field, if final.
    * This is the value of this Location, exception if isIndirectLocation(),
-   * we need to do an extra indiorection. */
+   * we need to do an extra indirection. */
   Object value;
-  static final int SETUP_DONE = 1;
+  static final int SETUP_DONE = 1; // FIXME - do we still need this?
+
+  /** Flag that indicates that field value has type Location.
+   * Hence <code>get</code> of this Location requies an extra indirection. */
   static final int INDIRECT_LOCATION = 2;
+  /** The actual value (following any indirection) is constant.
+   * I.e. if INDIRECT_LOCATION is set, then that Location has isConstant set,
+   * Otherwise the actual value is a final field. */
   static final int CONSTANT = 4;
+  /** Flag that indicates that the value field has been set.
+   * If INDIRECT_LOCATION has been set, but not CONSTANT, then
+   * the <code>value</code> is a Location we need to indirect.
+   * If CONSTANT is set, then this is the actual (final) value.
+   * Not set unless at least one of INDIRECT_LOCATION or CONSTANT are set. */
   static final int VALUE_SET = 8;
   // The PROCEDURE and SYNTAX flags aren't current used by getDeclaration,
   // but probably should be, assuming we can count on them.
   public static final int PROCEDURE = 16;
   public static final int SYNTAX = 32;
+  /** True if the flags <code>PROCEDURE|SYNTAX|INDIRECT_LOCATION|CONSTANT</code>
+   * are valid. */
+  public static final int KIND_FLAGS_SET = 64;
   private int flags;
 
   protected boolean isIndirectLocation ()
@@ -26,17 +40,75 @@ public class FieldLocation extends ClassMemberLocation
 
   public void setProcedure ()
   {
-    flags |= PROCEDURE;
+    flags |= PROCEDURE|CONSTANT|KIND_FLAGS_SET;
   }
 
   public void setSyntax ()
   {
-    flags |= SYNTAX;
+    flags |= SYNTAX|CONSTANT|KIND_FLAGS_SET;
   }
 
-  /** Not reliable, yet. */
+  void setKindFlags ()
+  {
+    String fname = getMemberName();
+    gnu.bytecode.Field fld = getDeclaringClass().getDeclaredField(fname);
+    int fflags = fld.getModifiers();
+    Type ftype = fld.getType();
+    if (ftype.isSubtype(Compilation.typeLocation))
+      flags |= INDIRECT_LOCATION;
+    if ((fflags & Access.FINAL) != 0)
+      {
+        if ((flags & INDIRECT_LOCATION) == 0)
+          {
+            flags |= CONSTANT;
+            if (ftype.isSubtype(Compilation.typeProcedure))
+              flags |= PROCEDURE;
+            if (ftype.isSubtype(ClassType.make("kawa.lang.Syntax")))
+              flags |= SYNTAX;
+          }
+        else
+          {
+            Location loc = (Location) getFieldValue();
+            if (loc instanceof FieldLocation)
+              {
+                FieldLocation floc = (FieldLocation) loc;
+                if ((floc.flags & KIND_FLAGS_SET) == 0)
+                  floc.setKindFlags();
+                flags |= (floc.flags & (SYNTAX|PROCEDURE|CONSTANT));
+                if ((floc.flags & CONSTANT) != 0)
+                  {
+                    if ((floc.flags & VALUE_SET) != 0)
+                      {
+                        value = floc.value;
+                        flags |= VALUE_SET;
+                      }
+                  }
+                else
+                  {
+                    value = floc;
+                    flags |= VALUE_SET;
+                  }
+              }
+            else if (loc.isConstant())
+              {
+                Object val = loc.get(null);
+                // if (val == null) ????;
+                if (val instanceof Procedure)
+                  flags |= PROCEDURE;
+                if (val instanceof kawa.lang.Syntax) // FIXME
+                  flags |= SYNTAX;
+                flags |= CONSTANT|VALUE_SET;
+                value = val;
+              }
+          }
+      }
+    flags |= KIND_FLAGS_SET;
+  }
+
   public boolean isProcedureOrSyntax ()
   {
+    if ((flags & KIND_FLAGS_SET) == 0)
+      setKindFlags();
     return (flags & (PROCEDURE+SYNTAX)) != 0;
   }
 
@@ -83,7 +155,9 @@ public class FieldLocation extends ClassMemberLocation
 	d.noteValue(new QuoteExp(val));
 	if ((fflags & Access.FINAL) != 0)
 	  d.setFlag(Declaration.IS_CONSTANT);
-	if (val instanceof kawa.lang.Syntax)
+	if ((flags & PROCEDURE) != 0)
+	  d.setProcedureDecl(true);
+	if ((flags & SYNTAX) != 0)
 	  d.setFlag(Declaration.IS_SYNTAX);
 	if (val instanceof kawa.lang.Macro)
 	  d.setSyntax();
@@ -101,20 +175,9 @@ public class FieldLocation extends ClassMemberLocation
 	if ((flags & SETUP_DONE) != 0)
 	  return;
 	super.setup();
-	String fname = getMemberName();
-	ClassType t = getDeclaringClass();
-	gnu.bytecode.Field fld = t.getDeclaredField(fname);
-	int fflags = fld.getModifiers();
-	int fl = SETUP_DONE;
-	if ((fflags & Access.FINAL) != 0)
-	  {
-	    Type ftype = fld.getType();
-	    if (ftype.isSubtype(Compilation.typeLocation))
-	      fl |= INDIRECT_LOCATION;
-	    else
-	      fl |= CONSTANT;
-	  }
-	flags |= fl;
+        if ((flags & KIND_FLAGS_SET) == 0)
+          setKindFlags();
+        flags |= SETUP_DONE;
       }
   }
 
@@ -190,17 +253,14 @@ public class FieldLocation extends ClassMemberLocation
 	    v = getFieldValue();
 	    value = v;
 	  }
-	if (++xxx > 2)
-	  throw new Error("cycle "+this+" type:"+type+" fld:"+rfield);
 	((Location) v).set(newValue);
       }
   }
 
-  int xxx = 0;
-
   public boolean isConstant ()
   {
-    setup();
+    if ((flags & KIND_FLAGS_SET) == 0)
+      setKindFlags();
     if ((flags & CONSTANT) != 0)
       return true;
     if (isIndirectLocation())
@@ -210,6 +270,14 @@ public class FieldLocation extends ClassMemberLocation
 	  v = value;
 	else
 	  {
+            try
+              {
+                setup();
+              }
+            catch (Throwable ex)
+              {
+                return false;
+              }
 	    v = getFieldValue();
 	    flags |= VALUE_SET;
 	    value = v;
@@ -221,21 +289,23 @@ public class FieldLocation extends ClassMemberLocation
 
   public boolean isBound ()
   {
-    try
-      {
-	setup();
-      }
-    catch (Throwable ex)
-      {
-	return false;
-      }
-    if (! isIndirectLocation())
+    if ((flags & KIND_FLAGS_SET) == 0)
+      setKindFlags();
+    if ((flags & CONSTANT) != 0 || (flags & INDIRECT_LOCATION) == 0)
       return true;
     Object v;
     if ((flags & VALUE_SET) != 0)
       v = value;
     else
       {
+        try
+          {
+            setup();
+          }
+        catch (Throwable ex)
+          {
+            return false;
+          }
 	v = getFieldValue();
 	flags |= VALUE_SET;
 	value = v;

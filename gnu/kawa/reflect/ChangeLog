@@ -1,3 +1,11 @@
+2005-03-23  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (PROCEDURE, SYNTAX, KIND_FLAGS_SET): New flags.
+	(setProcedure, setSyntax): Also set CONSTANT and KIND_FLAGS_SET.
+	(setKindFlags): New function.
+	(isProcedureOrSyntax, getDeclaration, setup): Use setKindFlags.
+	(isConstant, isBound):  Use setKindFlags to avoid loading class..
+
 2005-03-16  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (defineAll): Skip PRIVATE_PREFIX and

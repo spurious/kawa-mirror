@@ -1,3 +1,16 @@
+2005-03-23  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (push): Set STATIC_SPECIFIED if immediate module.
+	(addClass): This allows removing some special casing for immediate.
+	If immediate call ModuleExp.setupLiterals to do so.
+	(generateConstructor): Don't register an immediate module.
+	* ModuleExp.java: In immediate mode initialize literals using a
+	call-back from the <clinit> to new setupLiterals method.
+	(setupLiterals): New static method, called from compiled code.
+	(evalModule): Cleanup importing of module-exported declarations.
+	* Declaration.java (makeField): Don't need special case for immediate.
+	* LambdaExp.java (allocFieldFor): Likewise.
+
 2005-03-22  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java: Generalize to work without a field.

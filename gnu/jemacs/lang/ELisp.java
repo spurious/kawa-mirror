@@ -138,6 +138,7 @@ public class ELisp extends Lisp2
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
     defun("defun", new gnu.commonlisp.lang.defun(lambda));
+    defun("function", new gnu.commonlisp.lang.function(lambda));
 
     defun("defgroup", new defgroup());
     defun("defcustom", new defcustom());
@@ -145,6 +146,8 @@ public class ELisp extends Lisp2
     defun("defconst", new gnu.commonlisp.lang.defvar(true));
     defun("defsubst", new gnu.commonlisp.lang.defun(lambda));
     defun("setq", new gnu.commonlisp.lang.setq());
+    defun("prog1", gnu.commonlisp.lang.prog1.prog1);
+    defun("prog2", gnu.commonlisp.lang.prog1.prog2);
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));

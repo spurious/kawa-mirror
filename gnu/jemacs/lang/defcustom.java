@@ -15,16 +15,14 @@ public class defcustom extends Syntax
     Object name = p.car;
     if (name instanceof String || name instanceof Symbol)
       {
-	String sym = name instanceof String ? (String) name
-	  : ((Symbol) name).getName();
-	Declaration decl = defs.lookup(sym);
+	Declaration decl = defs.lookup(name);
 	if (decl == null)
 	  {
-	    decl = new Declaration(sym);
+	    decl = new Declaration(name);
 	    defs.addDeclaration(decl);
 	  }
 	else
-	  tr.error('w', "duplicate declaration for `"+sym+"'");
+	  tr.error('w', "duplicate declaration for `"+name+"'");
 	p = tr.makePair(p, decl, p.cdr);
 	st = tr.makePair(st, this, p);
         if (defs instanceof ModuleExp)

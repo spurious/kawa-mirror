@@ -62,7 +62,7 @@ public class lambda extends Lambda
 	for (Declaration arg = lexp.firstDecl();  arg != null;
 	     arg = arg.nextDecl(), i++)
 	  {
-	    Declaration decl = let.addDeclaration(arg.getName());
+	    Declaration decl = let.addDeclaration(arg.getSymbol());
 	    decl.setFluid(true);
 	    decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
 	    inits[i] = new ReferenceExp(arg);

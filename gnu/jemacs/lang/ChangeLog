@@ -1,3 +1,9 @@
+2003-10-12  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Define function, prog1, prog2 syntax forms.
+	* defcustom.java (scanForDefinitions):  Handle Symbols properly.
+	* lambda.java (rewruiteBody):  Likewise.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Minor simplification/optimization.

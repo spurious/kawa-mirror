@@ -1,4 +1,6 @@
 XQuery:
+* New Java api for evaluating Java expression with a given context sequence
+  (item, position, size).  See www.gnu.org/software/qexo/Running.html
 * Much improved namespace support.  Namespace attributes in a source
   xml document are remembered, and correctly serialized (printed).
   There is support for namespace undeclarations (as in the XML Namespaces

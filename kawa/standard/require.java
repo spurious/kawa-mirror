@@ -74,6 +74,8 @@ public class require extends Syntax
     map("list-lib", SLIB_PREFIX + "srfi1");
     map("srfi-37", SLIB_PREFIX + "srfi37");
     map("args-fold", SLIB_PREFIX + "srfi37");
+    map("srfi-64", SLIB_PREFIX + "srfi64");
+    map("testing", SLIB_PREFIX + "testing");
     map("gui", SLIB_PREFIX + "gui");
   }
 

@@ -1,5 +1,7 @@
 2005-04-02  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (featureMap): Add 'srfi-64,'testing.
+
 	* kawa/lang/Eval.java (evalBody): Save/set/restore current Compilation.
 
 	* kawa/lang/Eval.java (eval): New static field.

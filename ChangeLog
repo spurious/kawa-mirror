@@ -1,5 +1,11 @@
 2005-01-10  Per Bothner  <per@bothner.com>
 
+	* config.guess: Update to newer version, from libtool 1.5.10.
+	* config.sub: Likewise.
+	* ltmain.sh: Update to libtool 1.5.10.
+
+	* configure.in: More little fixes and updates.
+
 	* configure.in: Ran autoupdate over file to update to current autoconf
 	syntax, followed by some manual fixups of AC_CONFIG_LINK.
 

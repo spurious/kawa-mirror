@@ -71,6 +71,11 @@ public class Declaration
     return symbol == null ? null : symbol instanceof Symbol ? ((Symbol) symbol).getName()
       : symbol.toString();
   }
+  public final void setName(Object symbol)
+  {
+    this.symbol = symbol;
+  }
+
   public final Object getSymbol() { return symbol; }
   public final void setSymbol(Object symbol) { this.symbol = symbol; }
 
@@ -376,11 +381,6 @@ public class Declaration
     flags |= CAN_WRITE;
     if (base != null)
       base.setCanRead();
-  }
-
-  public final void setName(Object symbol)
-  {
-    this.symbol = symbol;
   }
 
   /** True if we never need to access this declaration. */

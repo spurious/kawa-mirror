@@ -1,3 +1,7 @@
+2005-02-16  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (setName): Move closer to getName and setSymbol.
+
 2005-02-15  Per Bothner  <per@bothner.com>
 
 	* ModuleInfo.java: New class.

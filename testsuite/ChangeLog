@@ -1,3 +1,12 @@
+2004-05-23  Per Bothner  <per@bothner.com>
+
+	New testcase, based on Chris Dean's testcase for Savannah bug #8837.
+	* classes1.scm (counter, get-new-count):  Move to the end, specifically
+	after use in IdClass1.
+	* obj-test.scm:  Move make of <IdClass2> before require, so we can
+	test loading of a class without using require.
+	Add one new expected failure.
+
 2004-05-17  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* misc-test.scm:  Testcase for Savannah bug #8955.

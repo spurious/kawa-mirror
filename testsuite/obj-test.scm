@@ -191,12 +191,13 @@
 
 (test 1062806400000 'namespace-syntax-test (namespace-syntax-call))
 
+(define IsClass2-value (make <IdClass2>))
 (require <classes1>)
 (require <classes2>)
 
-(define IsClass2-value (make <IdClass2>))
 (test 3 slot-ref IsClass2-value 'var1)
 (test 4 slot-ref IsClass2-value 'var2)
+(set! fail-expected "static counter is incorrectly initialized in non-static run method")
 (test 5 get-new-count)
 
 (define obj1 (make <SimpleA>))

@@ -46,16 +46,16 @@
    (+ (invoke-special <java.util.Date> (this) 'get-year)
       (invoke-static <SimpleA> 'x1900))))
 
+(define-simple-class <IdClass1> ()
+  (var0 allocation: 'class init: (get-new-count))
+  (var1 init-form: (get-new-count)))
+
 (define-private counter :: <int> 0)
 
 (define (get-new-count)
   (set! counter (+ counter 1))
   counter)
 
-(define-simple-class <IdClass1> ()
-  (var0 allocation: 'class init: (get-new-count))
-  (var1 init-form: (get-new-count)))
- 
 (define-simple-class <IdClass2> (<IdClass1>)
   (allocation: 'class init: (get-new-count))
   (var2 init-form: (get-new-count)))

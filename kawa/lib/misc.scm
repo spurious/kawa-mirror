@@ -70,11 +70,7 @@
   (cond ((instance? arg <kawa.lang.Promise>)
 	 (invoke (as <kawa.lang.Promise> arg) 'force))
 	((instance? arg <gnu.mapping.Future>)
-	 (set! msg1 (format #f "force ~s~%~!" arg))
-	 (let ((r
-		(invoke (as <gnu.mapping.Future> arg) 'waitForResult)))
-	   (set! msg2 (format #f "force -> ~s~%~!" r))
-	   r))
+	 (invoke (as <gnu.mapping.Future> arg) 'waitForResult))
 	(else arg)))
 
 ;;; The one-argument case is a standard DSSSL procedure.

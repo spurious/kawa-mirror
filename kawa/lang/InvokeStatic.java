@@ -2,6 +2,8 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import kawa.standard.class_methods;
+import java.lang.reflect.Modifier;
 
 public class InvokeStatic extends ProcedureN implements Inlineable
 {
@@ -9,45 +11,13 @@ public class InvokeStatic extends ProcedureN implements Inlineable
   {
     int len = args.length;
     Procedure.checkArgCount(this, len);
-    ClassType type;
-    Object t = args[0];
-    if (t instanceof ClassType)
-      type = (ClassType) t;
-    else if (t instanceof String || t instanceof kawa.lang.FString)
-      type = ClassType.make(t.toString());
-    else
-      throw WrongType.make(null, this, 0);
-      
-    t = args[1];
-    if (! (t instanceof String || t instanceof kawa.lang.FString))
-      throw WrongType.make(null, this, 1);
-    String mname = t.toString();
-
-    Class clas = type.getReflectClass();
-    if (clas == null)
-      throw new RuntimeException("no such class: "+type.getName());
-    int nMethods = type.getMethodCount();
-    if (nMethods == 0)
-      {
-        type.addMethods(clas);
-        nMethods = type.getMethodCount();
-      }
-    int nargs = len - 2;
-    Type[] paramTypes = new Type[nargs];
-    for (int i = nargs;  --i >= 0; )
-      paramTypes[i] = Type.make(args[i + 2].getClass());
-    Method[] matches = type.getMatchingMethods(mname, paramTypes, Access.STATIC);
-    if (matches.length == 1)
-      {
-        PrimProcedure proc = new PrimProcedure(matches[0]);
-        Object[] margs = new Object[nargs];
-        System.arraycopy(args, 2, margs, 0, nargs);
-        return proc.applyN(margs);
-      }
-    else
-      throw new RuntimeException((matches.length == 0 ? "no static method "
-                                  : "ambiguous static method (ignoring parameter types) ")
-                                 +type.getName()+"."+mname);
+    len -= 2;
+    Procedure proc = class_methods.apply(this, args[0], args[1],
+                                         null, null,
+                                         Modifier.STATIC, Modifier.STATIC);
+    Object[] rargs = new Object[len];
+    System.arraycopy(args, 2, rargs, 0, len);
+    return proc.applyN(rargs);
   }
 
   public int numArgs() { return (-1 << 12) | 2; }
@@ -73,20 +43,12 @@ public class InvokeStatic extends ProcedureN implements Inlineable
         if (val instanceof kawa.lang.FString || val instanceof String)
           {
             String mname = val.toString();
-            int nMethods = ctype.getMethodCount();
-            Type[] paramTypes = new Type[nargs];
-            for (int i = nargs;  --i >= 0; )
-              paramTypes[i] = args[i+2].getType();
-
-            if (nMethods == 0)
-              {
-                Class cclass = ctype.getReflectClass();
-                if (cclass != null)
-                  ctype.addMethods(cclass);
-              }
-            Method[] matches = ctype.getMatchingMethods(mname, paramTypes, Access.STATIC);
-            if (matches.length == 1)
-              return cacheProc = new PrimProcedure(matches[0]);
+            Procedure proc
+              = class_methods.apply(this, type, val,
+                                    null, null,
+                                    Modifier.STATIC, Modifier.STATIC);
+            if (proc instanceof PrimProcedure)
+              return (PrimProcedure) proc;
           }
       }
     cacheProc = null;

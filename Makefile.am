@@ -1,6 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = cygnus
 SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
 

@@ -64,7 +64,7 @@ PACKAGE = @PACKAGE@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = cygnus
 SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
 

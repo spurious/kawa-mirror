@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -41,7 +41,7 @@ public class FluidLetExp extends LetExp
       {
         decl.allocateVariable(code);
 	inits[i].compile(comp, Target.pushObject);
-	code.emitGetStatic(comp.getBindingField(decl.getName()));
+	decl.base.load(comp);
 	code.emitInvokeStatic(makeFluidBindingMethod);
 	code.emitDup(1);
 	code.emitStore(decl.getVariable());

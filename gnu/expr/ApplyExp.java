@@ -28,6 +28,12 @@ public class ApplyExp extends Expression
 
   public ApplyExp (Procedure p, Expression[] a) { func = new QuoteExp(p); args = a; }
 
+  public ApplyExp (Method m, Expression[] a)
+  {
+    func = new QuoteExp(new PrimProcedure(m));
+    args = a;
+  }
+
   public Object eval (Environment env)
   {
     Procedure proc = (Procedure) func.eval(env);
@@ -119,7 +125,7 @@ public class ApplyExp extends Expression
     else if (exp_func instanceof ReferenceExp) 
       { 
         Declaration func_decl = ((ReferenceExp) exp_func).binding;
-        if (func_decl != null)
+        if (! func_decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
 	    Expression value = func_decl.getValue();
 	    func_name = func_decl.getName();

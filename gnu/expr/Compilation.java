@@ -711,41 +711,10 @@ public class Compilation
 	code.emitInvokeVirtual(setNameMethod);
       }
 
-    if (curClass == mainClass) // lexp.isModuleBody())
-      {
-	// If a statisModule, then this does nothing, because its too
-	// early.  Instead, the bindings get emitted in <clinit> later.
-	initBindingFields();
-      }
-
     code.emitReturn();
     method = save_method;
     curClass = save_class;
     return constructor_method;
-  }
-
-  void initBindingFields()
-  {
-    CodeAttr code = getCode();
-    int numGlobals = bindingFields.size();
-    if (numGlobals > 0)
-      {
-	code.emitInvokeStatic(getCurrentEnvironmentMethod);
-	java.util.Enumeration e = bindingFields.keys();
-	while (e.hasMoreElements())
-	  {
-	    String id = (String) e.nextElement();
-	    Field fld = (Field) bindingFields.get(id);
-	    if (--numGlobals > 0)
-	      code.emitDup(1);
-	    code.emitPushString(id);
-	    if (getInterpreter().hasSeparateFunctionNamespace())
-	      code.emitInvokeStatic(getBinding2Method);
-	    else
-	      code.emitInvokeVirtual(getBindingEnvironmentMethod);
-	    code.emitPutStatic(fld);
-	  }
-      }
   }
 
   /** Generate ModuleBody's apply0 .. applyN methods.
@@ -1242,10 +1211,7 @@ public class Compilation
 	  Literal.emit(this);
 
 	if (staticModule)
-	  {
-	    initBindingFields();
-	    code.emitGoto(classBodyLabel);
-	  }
+	  code.emitGoto(classBodyLabel);
 	else
 	  code.emitReturn();
 	method = save_method;
@@ -1290,22 +1256,6 @@ public class Compilation
   public void freeLocalField (Field field)
   {
     // FIXME
-  }
-
-  Hashtable bindingFields = new Hashtable(100);
-
-  /** Allocate a static Binding field used to access globals bindings. */
-  public Field getBindingField (String name)
-  {
-    Object fld = bindingFields.get(name);
-    if (fld != null)
-      return (Field) fld;
-    String fieldName = "id"+bindingFields.size()+"$"+mangleName(name);
-    Type ftype = getInterpreter().hasSeparateFunctionNamespace()
-      ? typeBinding2 : typeBinding;
-    Field field = mainClass.addField(fieldName, ftype, Access.STATIC);
-    bindingFields.put(name, field);
-    return field;
   }
 
   String filename;

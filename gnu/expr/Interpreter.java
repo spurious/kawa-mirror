@@ -202,7 +202,7 @@ public abstract class Interpreter
       {
         ReferenceExp rexp = (ReferenceExp) exp;
         Declaration decl = rexp.getBinding();
-        if (decl != null)
+        if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
           return getTypeFor(decl.getValue());
         String name = rexp.getName();
         int len = name.length();

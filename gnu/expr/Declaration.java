@@ -80,7 +80,8 @@ public class Declaration
   /** Used to link Declarations in a LambdaExp's capturedVars list. */
   Declaration nextCapturedVar;
 
-  /** If non-null, field is relative to base. */
+  /** If non-null, field is relative to base.
+   * If IS_FLUID, base points to IS_UNKNOWN Binding. */
   public Declaration base;
 
   public Field field;
@@ -108,7 +109,12 @@ public class Declaration
           code.emitGetStatic(field);
       }
     else
-      code.emitLoad(getVariable());
+      {
+	Variable var = getVariable();
+	if (var == null)
+	  var = allocateVariable(code);
+	code.emitLoad(var);
+      }
   }
 
   /* Compile code to store a value (which must already be on the
@@ -160,6 +166,7 @@ public class Declaration
   public static final int TYPE_SPECIFIED = 0x2000;
   public static final int IS_CONSTANT = 0x4000;
   public static final int IS_SYNTAX = 0x8000;
+  public static final int IS_UNKNOWN = 0x10000;
 
   protected int flags = IS_SIMPLE;
 
@@ -432,7 +439,10 @@ public class Declaration
 	Expression declValue = decl.getValue();
 	if (! (declValue instanceof ReferenceExp))
 	  break;
-	decl = ((ReferenceExp) declValue).binding;
+	ReferenceExp rexp = (ReferenceExp) declValue;
+	if (rexp.binding == null)
+	  break;
+	decl = rexp.binding;
       }
     return decl;
   }
@@ -451,6 +461,7 @@ public class Declaration
     if (! isPrivate())
       fflags |= Access.PUBLIC;
     if (getFlag(STATIC_SPECIFIED)
+	|| getFlag(IS_UNKNOWN) // FIXME - should not be automatically static.
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
     Type ftype;
@@ -479,7 +490,8 @@ public class Declaration
       {
 	field.setConstantValue(((QuoteExp) value).getValue(), comp.mainClass);
       }
-    else if (isIndirectBinding() || value != null)
+    else if ((isIndirectBinding() || value != null)
+	     && ! getFlag(IS_UNKNOWN))
       {
 	BindingInitializer init = new BindingInitializer(this, field, value);
 	if ((fflags & Access.STATIC) != 0)

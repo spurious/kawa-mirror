@@ -23,6 +23,8 @@ public class SetExp extends Expression
   public SetExp (String sym, Expression val)
   { name = sym;  new_value = val; }
 
+  public final String getName() { return name; }
+
   static private int DEFINING_FLAG = NEXT_AVAIL_FLAG;
   static private int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
   public static  int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
@@ -132,31 +134,30 @@ public class SetExp extends Expression
 
     // This code is kind of kludgy, because it handles a number of
     // different cases:  assignments and definitions to both local and
-    // globals variables.  Some of the complication is because we want
+    // global variables.  Some of the complication is because we want
     // to generate fields for module-level definitions;  this is how
     // bindings are exported from modules.
 
     Object value;
-    if (binding != null && ! binding.isPrivate() && ! comp.usingCPStyle()
-	&& binding.context instanceof ModuleExp
-	&& binding.getValue() instanceof LambdaExp
-	&& ((LambdaExp) binding.getValue()).getName() != null // FIXME
-	&& binding.getValue() == new_value)
+    Declaration decl = binding;
+    if (! decl.isPrivate() && ! comp.usingCPStyle()
+	&& decl.context instanceof ModuleExp
+	&& decl.getValue() instanceof LambdaExp
+	&& ((LambdaExp) decl.getValue()).getName() != null // FIXME
+	&& decl.getValue() == new_value)
       {
 	((LambdaExp) new_value).compileSetField(comp);
       }
-    else if (binding != null
-	     && binding.context instanceof ModuleExp
+    else if (decl.context instanceof ModuleExp
 	     && (new_value instanceof QuoteExp)
-	     && ! binding.isPrivate() && ! comp.immediate
-	     && binding.getValue() != null)
+	     && ! decl.isPrivate() && ! comp.immediate
+	     && decl.getValue() != null)
       { // This is handled in ModuleExp's allocFields method.
       }
-    else if (binding != null
-             && binding.getFlag(Declaration.IS_SYNTAX)
-	     && binding.context instanceof ModuleExp
-	     && (value = ((kawa.lang.Macro)  binding.getConstantValue()).expander) instanceof LambdaExp
-	     && ! binding.isPrivate())
+    else if (decl.getFlag(Declaration.IS_SYNTAX)
+	     && decl.context instanceof ModuleExp
+	     && (value = ((kawa.lang.Macro)  decl.getConstantValue()).expander) instanceof LambdaExp
+	     && ! decl.isPrivate())
       {
 	LambdaExp expander = (LambdaExp) value;
 	if (! expander.isHandlingTailCalls())
@@ -165,21 +166,20 @@ public class SetExp extends Expression
 	    expander.compileAsMethod(comp);
 	    comp.applyMethods.addElement(expander);
 	  }
-	binding.makeField(comp, new_value);
+	decl.makeField(comp, new_value);
       }
-    else if (binding != null)
+    else
       {
-	Declaration decl = binding;
 	if (! isDefining())
 	  decl = Declaration.followAliases(decl);
 	if (decl.ignorable())
 	  new_value.compile (comp, Target.Ignore);
-	else if (binding.isAlias() && isDefining())
+	else if (decl.isAlias() && isDefining())
 	  {
-	    if (binding.isPublic()
-		|| !( binding.getValue() instanceof ReferenceExp))
+	    if (decl.isPublic()
+		|| !( decl.getValue() instanceof ReferenceExp))
 	      {
-		binding.load(comp);
+		decl.load(comp);
 		new_value.compile (comp, Target.pushObject);
 		Method meth = ClassType.make("gnu.mapping.AliasConstraint")
 		  .getDeclaredMethod("define", 2);
@@ -191,6 +191,11 @@ public class SetExp extends Expression
 	  {
 	    decl.load(comp);
 	    new_value.compile (comp, Target.pushObject);
+	    if (needValue)
+	      {
+		code.emitDupX();
+		valuePushed = true;
+	      }
 	    if (setMethod == null)
 	      setMethod = comp.typeLocation.addMethod
 		("set", Compilation.apply1args,
@@ -243,28 +248,6 @@ public class SetExp extends Expression
                 code.emitPutField(field);
               }
 	  }
-      }
-    else
-      {
-	comp.compileConstant (name);
-	new_value.compile (comp, Target.pushObject);
-        if (needValue)
-          {
-            code.emitDupX();
-            valuePushed = true;
-          }
-	Method method;
-	if (isDefining())
-	  {
-	    if (isFuncDef()
-		&& comp.getInterpreter().hasSeparateFunctionNamespace())
-	      method = comp.defineFunctionMethod;
-	    else
-	      method = comp.defineGlobalMethod;
-	  }
-	else
-	  method = comp.putGlobalMethod;
-	code.emitInvokeStatic(method);
       }
 
     if (needValue && ! valuePushed)

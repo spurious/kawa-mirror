@@ -1,3 +1,26 @@
+2000-12-09  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (IS_UNKNOWN):  New flag.
+	(load):  If need Variable, and not yet allocated, do so now.
+	(followAliases): Exit loop before returning null.
+	(makeField):  If decl IS_UNKNOWN, make field static for now.
+	No longer create BindingItitializer for unknown decls.
+	* ApplyExp.java (<init>(Method,Expression[])):  New constructor.
+	* ApplyExp.java (compile):  Check if decl IS_UNKNOWN, rather than null.
+	* Interpreter.java (getTypeFor):  Likewise, but check null first.
+	* Compilation.java (getBindingField):  Removed method - no longer used.
+	(bindingFields):  Removed field.
+	(initBindingFields):  Removed method.
+	(generateConstructor, addClass):  Don't call initBindingFields.
+	* FindCapturedVars.java (walkModuleExp, walkFluidLetExp):  New methods.
+	(unknwonDecls, currentModule):  New fields.
+	(allocUnboundDecl):  New method.
+	(walkReferenceExp, walkSetExp):  Call allocUnboundDecl if needed.
+	* FluidLetExp.java (compile):  Load decl.base to get (unknown) Binding.
+	* SetExp.java (getName):  New method.
+	(compile):  Changes since binding is now never null.
+	* ReferenceExp.java (compile:  Likewise.
+
 2000-12-02  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateConstructor):  Don't generate call to

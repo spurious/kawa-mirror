@@ -1,4 +1,5 @@
 package gnu.expr;
+import java.util.Hashtable;
 
 public class FindCapturedVars extends ExpFullWalker
 {
@@ -65,9 +66,68 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
+  public Object walkModuleExp (ModuleExp exp)
+  {
+    ModuleExp saveModule = currentModule;
+    Hashtable saveDecls = unknownDecls;
+    currentModule = exp;
+    unknownDecls = null;
+    try
+      {
+	return walkLambdaExp(exp);
+      }
+    finally
+      {
+	if (unknownDecls != null)
+	  {
+	    int count = unknownDecls.size();
+	    java.util.Enumeration e = unknownDecls.keys();
+	    int i = 0;
+	    Expression[] init = new Expression[1];
+	    LetExp let = new LetExp(init);
+	    Declaration env =
+	      let.addDeclaration("env$",
+				 Compilation.typeEnvironment);
+	    init[0] = new ApplyExp(Compilation.getCurrentEnvironmentMethod,
+				   Expression.noExpressions);
+	    env.setCanRead(true);
+	    env.noteValue(init[0]);
+	    Expression[] exps = new Expression[count+1];
+	    for (;  e.hasMoreElements();  i++)
+	      {
+		String id = (String) e.nextElement();
+		Declaration decl = (Declaration) unknownDecls.get(id);
+		Expression[] args = new Expression[2];
+		args[0] = new ReferenceExp(env);
+		args[1] = new QuoteExp(id);
+		SetExp set = new SetExp(decl, 
+					new ApplyExp(Compilation.getBindingEnvironmentMethod, args));
+		set.setDefining(true);
+		exps[i] = set;
+	      }
+	    exps[i] = currentModule.body;
+	    let.setBody(new BeginExp(exps));
+	    currentModule.body = let;
+	  }
+	currentModule = saveModule;
+	unknownDecls = saveDecls;
+      }
+  }
+
+  public Object walkFluidLetExp (FluidLetExp exp)
+  {
+    for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
+      {
+	Declaration bind = allocUnboundDecl(decl.getName());
+	capture(bind);
+	decl.base = bind;
+      }
+    return super.walkLetExp(exp);
+  }
+
   public Object walkLetExp (LetExp exp)
   {
-    if (exp.body instanceof BeginExp && ! (exp instanceof FluidLetExp))
+    if (exp.body instanceof BeginExp)
       {
 	// Optimize "letrec"-like forms.
 	// If init[i] is the magic QuoteExp.nullExp, and the real value
@@ -106,6 +166,8 @@ public class FindCapturedVars extends ExpFullWalker
     if (! (decl.getCanRead() || decl.getCanCall()))
       return;
 
+    if (decl.getFlag(Declaration.IS_UNKNOWN))
+      return; // FIXME - for now, as long as unknows are static
     if (decl.field != null && decl.field.getStaticFlag())
       return;
 
@@ -228,12 +290,46 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
+  Hashtable unknownDecls = null;
+  ModuleExp currentModule = null;
+
+  Declaration allocUnboundDecl(String name)
+  {
+    Declaration decl;
+    if (unknownDecls == null)
+      {
+	unknownDecls = new Hashtable(100);
+	decl = null;
+      }
+    else
+      decl = (Declaration) unknownDecls.get(name);
+    if (decl == null)
+      {
+	String fieldName = "id" + unknownDecls.size() + "$" + name;
+	decl = currentModule.addDeclaration(fieldName);
+	decl.setSimple(false);
+	decl.setPrivate(true);
+	if (currentModule.isStatic())
+	  decl.setFlag(Declaration.STATIC_SPECIFIED);
+	decl.setCanRead(true);
+	decl.setFlag(Declaration.IS_UNKNOWN);
+	decl.setIndirectBinding(true);
+	unknownDecls.put(name, decl);
+      }
+    return decl;
+  }
+
   public Object walkReferenceExp (ReferenceExp exp)
   {
-    Declaration decl = Declaration.followAliases(exp.getBinding());
-    if (decl != null)
-      capture(decl);
-   return exp;
+    Declaration decl = exp.getBinding();
+    if (decl == null)
+      {
+	decl = allocUnboundDecl(exp.getName());
+	exp.setBinding(decl);
+      }
+    else // FIXME remove else when IS_UNKNOWN decls are non-static
+    capture(Declaration.followAliases(decl));
+    return exp;
   }
 
   public Object walkThisExp (ThisExp exp)
@@ -245,9 +341,14 @@ public class FindCapturedVars extends ExpFullWalker
 
   public Object walkSetExp (SetExp exp)
   {
-    Declaration decl = Declaration.followAliases(exp.binding);
-    if (decl != null)
-      capture(decl);
+    Declaration decl = exp.binding;
+    if (decl == null)
+      {
+	decl = allocUnboundDecl(exp.getName());
+	exp.binding = decl;
+      }
+    else // FIXME remove else when IS_UNKNOWN decls are non-static
+    capture(Declaration.followAliases(decl));
     return super.walkSetExp(exp);
   }
 

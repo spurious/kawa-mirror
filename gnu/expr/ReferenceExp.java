@@ -107,40 +107,18 @@ public class ReferenceExp extends Expression
       return;
     CodeAttr code = comp.getCode();
     Declaration decl = Declaration.followAliases(binding);
-    if (decl != null)
+    decl.load(comp);
+    if (decl.isIndirectBinding() && ! getDontDereference())
       {
-	decl.load(comp);
-	if (decl.isIndirectBinding() && ! getDontDereference())
-	  {
-	    code.emitInvokeVirtual (Compilation.getLocationMethod);
-	  }
-	else if (decl.isFluid())
-	  code.emitGetField(FluidLetExp.valueField);
-      }
-    else
-      {
-	Field field = comp.getBindingField(symbol);
-	if (field.getStaticFlag())
-	  code.emitGetStatic(field);
-	else
-	  {
-	    LambdaExp lexp = comp.curLambda;
-	    while (! (lexp instanceof ModuleExp))
-	      lexp = lexp.outerLambda();
-	    lexp.loadHeapFrame(comp);
-	    code.emitGetField(field);
-	  }
-	if (getDontDereference())
-	  { }
-	else if (! isProcedureName())
+	if (! isProcedureName())
 	  code.emitInvokeVirtual(Compilation.getLocationMethod);
-	else //if (! comp.getInterpreter().hasSeparateFunctionNamespace())
-	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
-	/*
+	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
+	//   code.emitGetField(Compilation.functionValueBinding2Field);
 	else
-	  code.emitGetField(Compilation.functionValueBinding2Field);
-	*/
+	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
       }
+    else if (decl.isFluid())
+      code.emitGetField(FluidLetExp.valueField);
     target.compileFromStack(comp, getType());
   }
 

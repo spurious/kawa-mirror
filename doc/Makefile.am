@@ -23,13 +23,13 @@ kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1
 
-../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf internals.html kawa-tour.ps
-	tar cf - kawa/*.html kawa.pdf internals.html kawa-tour.ps|gzip -c --best >$@
+../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf kawa-tour.ps
+	tar cf - kawa/*.html kawa.pdf kawa-tour.ps|gzip -c --best >$@
 
 EXTRA_DIST = kawa.txt scm2java.html kawa.man \
   kawa-tour.tex mdate-sh
 info_TEXINFOS = kawa.texi kawa-tour.texi
-CLEANFILES = kawa.txt *.info kawa/*.html internals.html kawa1.tmp kawa.1
+CLEANFILES = kawa.txt *.info kawa/*.html kawa1.tmp kawa.1
 
 # Redundant if configured with  --enable-maintainer-mode.
 # Work around a questionable autoconf feature.
@@ -44,30 +44,3 @@ install-html:
 	cp kawa_toc.html $(HTML_HOME)/kawa/index.html
 	sed -e 's|HREF="kawa_|HREF="kawa/kawa_|g' -e 's|HREF="../|HREF="|g' \
 		<kawa_toc.html >$(HTML_HOME)/kawa.html
-
-XSLT = xsltproc
-DOCBOOK_XSL = $$HOME/XML/docbook-xsl/html/docbook.xsl
-
-internals.html: $(srcdir)/internals.xml
-	$(XSLT) $(DOCBOOK_XSL) $< > $@
-
-internals/index.html: $(srcdir)/internals.xml
-	$(XSLT) --stringparam base.dir internals/ \
-	  --stringparam generate.section.toc.level 1 \
-	  --stringparam use.id.as.filename 1 \
-	  $(DOCBOOK_XSL) $<
-
-TransformToLatex.class:
-	ln -s /home/bothner/public_html/papers/Freenix00/TransformToLatex.class .
-usenix.sty:
-	ln -s /home/bothner/public_html/papers/Freenix00/usenix.sty .
-
-internals.tex: $(srcdir)/internals.xml TransformToLatex.class
-	CLASSPATH=$(XSL_CLASSPATH) \
-	  $(JAVA) TransformToLatex $(srcdir)/internals.xml /home/bothner/public_html/papers/Freenix00/docbook-to-latex.xsl internals.tex
-
-internals.dvi: internals.tex usenix.sty
-	latex internals.tex
-
-internals.ps: internals.dvi
-	dvips -o internals.ps internals.dvi

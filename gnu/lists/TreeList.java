@@ -854,8 +854,8 @@ implements Consumer, PositionConsumer, Consumable
 	    continue;
 	  case BEGIN_GROUP_LONG:
 	    index = getIntN(pos);
-	    pos += 2;
 	    index += index >= 0 ? pos - 1 : data.length;
+	    pos += 2;
 	    index = getIntN(index + 1);
 	    out.beginGroup(objects[index].toString(), objects[index+1]);
 	    continue;
@@ -1117,19 +1117,19 @@ implements Consumer, PositionConsumer, Consumable
 	    sbuf.append(datum != BOOL_FALSE);
 	    return index;
 	  case INT_FOLLOWS:
-	    sbuf.append(getIntN(index+1));
+	    sbuf.append(getIntN(index));
 	    return index + 2;
 	  case LONG_FOLLOWS:
-	    sbuf.append(getLongN(index+1));
+	    sbuf.append(getLongN(index));
 	    return index + 4;
 	  case FLOAT_FOLLOWS:
-	    sbuf.append(Float.intBitsToFloat(getIntN(index+1)));
+	    sbuf.append(Float.intBitsToFloat(getIntN(index)));
 	    return index + 2;
 	  case DOUBLE_FOLLOWS:
-	    sbuf.append(Double.longBitsToDouble(getLongN(index+1)));
+	    sbuf.append(Double.longBitsToDouble(getLongN(index)));
 	    return index + 4;
 	  case CHAR_FOLLOWS:
-	    sbuf.append(data[index+1]);
+	    sbuf.append(data[index]);
 	    return index + 1;
 	  case BEGIN_DOCUMENT:
 	    doChildren = 1;
@@ -1151,12 +1151,19 @@ implements Consumer, PositionConsumer, Consumable
 	    int end = getIntN(index+2);
 	    index = end + (end < 0 ? data.length + 1 : index);
 	    break;
-	  case POSITION_REF_FOLLOWS:
 	  case POSITION_TRIPLE_FOLLOWS:
+	    {
+	      AbstractSequence seq = (AbstractSequence) objects[getIntN(index)];
+	      int ipos = getIntN(index+2);
+	      ((TreeList) seq).stringValue(inGroup, ipos >> 1, sbuf);
+	      index += 6;
+	    }
+	    break;
+	  case POSITION_REF_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
 	  case CHAR_PAIR_FOLLOWS:
 	  default:
-	    throw new Error("unimplemented");
+	    throw new Error("unimplemented: "+Integer.toHexString(datum)+" at:"+index);
 	  }
       }
     if (value != null)

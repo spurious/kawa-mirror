@@ -1,3 +1,10 @@
+2001-12-29  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (consumeRange):  Fix indexing bug for BEGIN_GROUP_LONG.
+
+	* TreeList.java (stringValue):  Fix indexing bugs.
+	Support POSITION_TRIPLE_FOLLOWS.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (get):  Add working implementation.

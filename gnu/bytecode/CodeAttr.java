@@ -247,11 +247,22 @@ public class CodeAttr extends Attribute implements AttrContainer
     reserve(1);
     Type type1 = popType();
     Type type2 = popType();
+
     if (type1.size > 4 || type2.size > 4)
-      throw new Error ("emitSwap:  not allowed for long or double");
-    pushType(type1);
-    put1(95);  // swap
-    pushType(type2);
+      {
+	// There is no swap instruction in the JVM for this case.
+	// Fall back to a more convoluted way.
+	pushType(type2);
+	pushType(type1);
+	emitDupX();
+	emitPop(1);
+      }
+    else
+      {
+	pushType(type1);
+	put1(95);  // swap
+	pushType(type2);
+      }
   }
 
   /** Emit code to duplicate the top element of the stack. */

@@ -1,3 +1,7 @@
+2002-11-19  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* CodeAttr.java (emitSwap):  Handle two word values.
+
 2002-10-21  Daniel Bonniot  <bonniot@users.sourceforge.net>
 
 	* CodeAttr.java (doPendingFinalizers): Fix verification error

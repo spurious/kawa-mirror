@@ -1284,7 +1284,7 @@ public class LambdaExp extends ScopeExp
 	    // Now finish copying the incoming argument into its
 	    // home location.
             if (paramType != stackType)
-	      CheckedTarget.emitCheckedCoerce(comp, this, i, paramType);
+	      CheckedTarget.emitCheckedCoerce(comp, this, i+1, paramType);
 	    if (param.isIndirectBinding())
               param.pushIndirectBinding(comp);
 	    if (param.isSimple())

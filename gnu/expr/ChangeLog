@@ -1,3 +1,19 @@
+2004-10-23  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (argno): Make field 1-orgin, matching WrongType.
+	(<init>): New constructor, for general non-call casting.
+	(getInstance): New factor method, for non-call casting.
+	(initWrongType): Called methods now take extra parameter.
+	(emitCheckedCoerce): Take an extra Variable with argValue.
+	(emitCheckedCoerce): Pass incoming value to WrongType.make.
+	* LambdaExp.java (enterFunction): Adjust argument number to 1-origin.
+	* PrimProcedure.java (compileArgs): Likewise.
+	* Compilation.java (generateApplyMethodsWithoutContext,
+	generateApplyMethodsWithContext): Likewise.
+	(generateApplyMethodsWithoutContext): Pass incoming Variable to
+	CheckedTarget.emitCheckedCoerceif there is one.
+	* LetExp.java (compile): Coerce value using CheckedTarget.
+
 2004-10-14  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (usedClass):  Generalize parmater to Type, so we

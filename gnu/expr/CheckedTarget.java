@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.WrongType;
 
 /** Same as StackTarget, but catch ClassCastException.
  * Generate code so that if coercion fails, catch ClassCastException,
@@ -12,7 +13,14 @@ public class CheckedTarget extends StackTarget
 {
   LambdaExp proc;
   String procname;
+  /** 1-origin argument index, or WrongType.ARG_CAST. */
   int argno;
+
+  public CheckedTarget(Type type)
+  {
+    super(type);
+    argno = WrongType.ARG_CAST;
+  }
 
   public CheckedTarget(Type type, LambdaExp proc, int argno)
   {
@@ -41,6 +49,12 @@ public class CheckedTarget extends StackTarget
             : new CheckedTarget(type, proc, argno));
   }
 
+  public static Target getInstance(Type type)
+  {
+    return (type == Type.pointer_type ? Target.pushObject
+            : new CheckedTarget(type));
+  }
+
   static ClassType typeClassCastException;
   static ClassType typeWrongType;
   static Method makeWrongTypeStringMethod;
@@ -53,18 +67,20 @@ public class CheckedTarget extends StackTarget
     if (typeWrongType == null)
       {
         typeWrongType= ClassType.make("gnu.mapping.WrongType");
-        Type[] args = new Type[3];
+        Type[] args = new Type[4];
         args[0] = typeClassCastException;
         args[1] = Compilation.javaStringType;
         args[2] = Type.int_type;
+	args[3] = Type.pointer_type;
         makeWrongTypeStringMethod
           = typeWrongType.addMethod("make", args,
                                     typeWrongType,
                                     Access.PUBLIC|Access.STATIC);
-        args = new Type[3];
+        args = new Type[4];
         args[0] = typeClassCastException;
         args[1] = Compilation.typeProcedure;
         args[2] = Type.int_type;
+	args[3] = Type.pointer_type;
         makeWrongTypeProcMethod
           = typeWrongType.addMethod("make", args,
                                     typeWrongType,
@@ -75,23 +91,30 @@ public class CheckedTarget extends StackTarget
   public void compileFromStack(Compilation comp, Type stackType)
   {
     if (! compileFromStack0(comp, stackType))
-      emitCheckedCoerce(comp, proc, procname, argno, type);
+      emitCheckedCoerce(comp, proc, procname, argno, type, null);
   }
 
   public static void emitCheckedCoerce(Compilation comp,
                                        String procname, int argno, Type type)
   {
-    emitCheckedCoerce(comp, null, procname, argno, type);
+    emitCheckedCoerce(comp, null, procname, argno, type, null);
   }
 
   public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
                                        int argno, Type type)
   {
-    emitCheckedCoerce(comp, proc, proc.getName(), argno, type);
+    emitCheckedCoerce(comp, proc, proc.getName(), argno, type, null);
+  }
+
+  public static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
+                                       int argno, Type type, Variable argValue)
+  {
+    emitCheckedCoerce(comp, proc, proc.getName(), argno, type, argValue);
   }
 
   static void emitCheckedCoerce(Compilation comp, LambdaExp proc,
-                                String procname, int argno, Type type)
+                                String procname, int argno, Type type,
+				Variable argValue)
   {
     CodeAttr code = comp.getCode();
     // If we're not in a try statement, it is more efficient to defer
@@ -102,18 +125,31 @@ public class CheckedTarget extends StackTarget
     initWrongType();
     int startPC = code.getPC();
     Label startTry = new Label(code);
+    Scope tmpScope;
+    if (argValue == null && type != Type.tostring_type)
+      {
+	tmpScope = code.pushScope();
+	argValue = code.addLocal(Type.pointer_type);
+	code.emitDup(1);
+	code.emitStore(argValue);
+      }
+    else
+      tmpScope = null;
     startTry.define(code);
     emitCoerceFromObject(type, comp);
 
     int endPC = code.getPC();
     // If no cast was needed, no code has been generated.
     // Thus endPC is equal to startPC and we can stop safely.
-    if (endPC == startPC)
-      return;
-
-    // Can never raise an exception, so we don't need to catch it.
-    if (type == Type.tostring_type)
-      return;
+    // Also, tostring_type can never raise an exception, so we don't need
+    // to catch it.
+    if (endPC == startPC
+	|| type == Type.tostring_type)
+      {
+	if (tmpScope != null)
+	  code.popScope();
+	return;
+      }
 
     Label endTry = new Label(code);
     endTry.define(code);
@@ -141,10 +177,15 @@ public class CheckedTarget extends StackTarget
     if (thisIsProc)
       code.emitPushThis();
     else
-      code.emitPushString(procname == null ? "lambda" : procname);
-    code.emitPushInt(argno+1);
+      code.emitPushString(procname == null && argno != WrongType.ARG_CAST
+			  ? "lambda"
+			  : procname);
+    code.emitPushInt(argno);
+    code.emitLoad(argValue);
     code.emitInvokeStatic(thisIsProc ? makeWrongTypeProcMethod
                           : makeWrongTypeStringMethod);
+    if (tmpScope != null)
+      code.popScope();
     code.emitThrow();
     if (isInTry)
       endLabel.define(code);

@@ -1456,7 +1456,7 @@ public class Compilation
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,
-						  k, ptype);
+						  k+1, ptype);
 		var = var.nextDecl();
 	      }
 
@@ -1639,8 +1639,12 @@ public class Compilation
 		    code.emitInc(counter, (short) (-1));
 		  }
 
+		Variable pvar = null;
 		if (i <= 4) // apply'i method
-		  code.emitLoad(code.getArg(k + 2));
+		  {
+		    pvar = code.getArg(k + 2);
+		    code.emitLoad(pvar);
+		  }
 		else // applyN method
 		  {
 		    // Load Object[]args value:
@@ -1651,7 +1655,7 @@ public class Compilation
 		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,
-						  k, ptype);
+						  k+1, ptype, pvar);
 		var = var.nextDecl();
 	      }
 
@@ -1701,7 +1705,8 @@ public class Compilation
 			if (mustConvert)
 			  {
 			    CheckedTarget.emitCheckedCoerce
-			      (this, source, source.getName(), -1, elType);
+			      (this, source, source.getName(),
+			       0, elType, null);
 			  }
 			code.emitArrayStore(elType);
 			testLabel.define(code);

@@ -55,10 +55,7 @@ public class LetExp extends ScopeExp
 	else
 	  {
 	    Type varType = decl.getType();
-	    if (varType == Type.pointer_type)
-	      varTarget = Target.pushObject;
-	    else
-	      varTarget = new StackTarget(varType);
+	    varTarget = CheckedTarget.getInstance(varType);
 	  }
 	inits[i].compile (comp, varTarget);
       }

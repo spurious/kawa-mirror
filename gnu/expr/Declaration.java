@@ -479,7 +479,7 @@ public class Declaration
 	  {
 	    Type type = isIndirectBinding() ? Compilation.typeLocation
 	      : getType().getImplementationType();
-	    var = context.scope.addVariable(code, type, vname);
+	    var = context.getVarScope().addVariable(code, type, vname);
 	  }
       }
     return var;

@@ -39,7 +39,7 @@ public class FluidLetExp extends LetExp
     Variable old_bindings = code.addLocal(typeFluidBinding);
     code.emitDup(1);
     code.emitStore(old_bindings);
-    code.enterScope (scope);
+    code.enterScope(getVarScope());
     Declaration decl = firstDecl();
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {

@@ -385,7 +385,7 @@ public class LambdaExp extends ScopeExp
     if (thisVariable == null)
       {
         thisVariable = new Variable("this");
-	scope.addVariableAfter(null, thisVariable);
+	getVarScope().addVariableAfter(null, thisVariable);
 	thisVariable.setParameter (true);  thisVariable.setArtificial (true);
       }
     if (thisVariable.getType() == null)
@@ -416,7 +416,7 @@ public class LambdaExp extends ScopeExp
 	      {
 		Type envType = primMethod.getParameterTypes()[0];
 		closureEnv = new Variable("closureEnv", envType);
-		scope.addVariableAfter(null, closureEnv);
+		getVarScope().addVariableAfter(null, closureEnv);
 		closureEnv.setArtificial(true);
 		closureEnv.setParameter(true);
 	      }
@@ -426,7 +426,7 @@ public class LambdaExp extends ScopeExp
 	else
 	  {
 	    closureEnv = new Variable("closureEnv", parentFrame.getType());
-	    scope.addVariable(closureEnv);
+	    getVarScope().addVariable(closureEnv);
 	    closureEnv.setArtificial(true);
 	  }
       }
@@ -934,7 +934,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    if (decl == firstArgsArrayArg && argsArray != null)
 	      {
-		scope.addVariable(argsArray);
+		getVarScope().addVariable(argsArray);
 	      } 
 	    if (! getInlineOnly()
 		&& getCallConvention() >= Compilation.CALL_WITH_CONSUMER
@@ -943,7 +943,9 @@ public class LambdaExp extends ScopeExp
 		    : decl == firstArgsArrayArg.nextDecl()))
 	      {
 		Variable var =
-		  scope.addVariable(null, Compilation.typeCallContext, "$ctx");
+		  getVarScope().addVariable(null,
+					    Compilation.typeCallContext,
+					    "$ctx");
 		var.setParameter(true);
 		var.setArtificial(true);
 	      } 
@@ -968,8 +970,8 @@ public class LambdaExp extends ScopeExp
 		String vname
                   = Compilation.mangleName(decl.getName()).intern();
 		Type vtype = decl.getType().getImplementationType();
-                var = decl.var = scope.addVariable(null, vtype, vname);
-		//scope.addVariableAfter(var, decl);
+                var = decl.var = getVarScope().addVariable(null, vtype, vname);
+		//getVarScope().addVariableAfter(var, decl);
 		var.setArtificial (true);
 		var.setParameter (true);
 		//var.allocateLocal(code);
@@ -1034,7 +1036,7 @@ public class LambdaExp extends ScopeExp
     int i = 0;
     int j = 0;
 
-    code.locals.enterScope (scope);
+    code.locals.enterScope(getVarScope());
 
     for (Declaration decl = firstDecl();  decl != null;  )
       {
@@ -1073,7 +1075,7 @@ public class LambdaExp extends ScopeExp
     CodeAttr code = comp.getCode();
 
     // Tail-calls loop back to here!
-    scope.setStartPC(code);
+    getVarScope().setStartPC(code);
 
     if (closureEnv != null && ! closureEnv.isParameter()
 	&& ! comp.usingCPStyle())

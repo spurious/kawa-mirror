@@ -36,7 +36,7 @@ public class CatchClause extends ScopeExp
     gnu.bytecode.CodeAttr code = comp.getCode();
     Declaration catchDecl = firstDecl();
     Variable catchVar = catchDecl.allocateVariable(code);
-    code.enterScope (scope);
+    code.enterScope(getVarScope());
     code.emitCatchStart(catchVar);
     body.compileWithPosition(comp, target);
     code.emitCatchEnd();

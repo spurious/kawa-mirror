@@ -363,7 +363,7 @@ public class ApplyExp extends Expression
     if (tail_recurse)
       {
 	popParams(code, func_lambda, toArray);
-	code.emitTailCall(false, func_lambda.scope);
+	code.emitTailCall(false, func_lambda.getVarScope());
 	return;
       }
     code.emitInvokeVirtual(method);
@@ -401,7 +401,7 @@ public class ApplyExp extends Expression
   private static void popParams (CodeAttr code, LambdaExp lexp,
                                  boolean toArray)
   {
-    Variable params = lexp.scope.firstVar();
+    Variable params = lexp.getVarScope().firstVar();
     if (params != null && params.getName() == "this")
       params = params.nextVar();
     if (params != null && params.getName() == "$ctx")

@@ -69,7 +69,7 @@ public class LetExp extends ScopeExp
 	init.compile (comp, varTarget);
       }
 
-    code.enterScope (scope);
+    code.enterScope(getVarScope());
 
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstDecl());

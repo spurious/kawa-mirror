@@ -11,9 +11,17 @@ public abstract class ScopeExp extends Expression
   Declaration decls;
   Declaration last;
 
-  Scope scope;
+  private Scope scope;
 
   public final Declaration firstDecl () { return decls; }
+
+  public Scope getVarScope ()
+  {
+    Scope sc = scope;
+    if (sc == null)
+      scope = sc = new Scope();
+    return sc;
+  }
 
   public void add (Declaration decl)
   {
@@ -89,7 +97,7 @@ public abstract class ScopeExp extends Expression
       last = prev;
   }
 
-  public ScopeExp () { scope = new Scope (); }
+  public ScopeExp () { }
 
   /** The statically enclosing binding contour. */
   public ScopeExp outer;

@@ -1,5 +1,16 @@
 2004-11-15  Per Bothner  <per@bothner.com>
 
+	* ScopeExp.java (getVarScope): New method. Allocate scope if needed.
+	(<init>): Don't allocate scope field until needed.
+	(scope): Make private.
+	* ApplyExp.java: Use getVarScope methods.
+	* CatchClause.java: Likewise
+	* Compilation.java: Likewise
+	* Declaration.java: Likewise
+	* FluidLetExp.java: Likewise
+	* LambdaExp.java: Likewise
+	* LetExp.java: Likewise
+
 	* Declaration.java (printInfo(StringBuffer)): New method.
 
 2004-11-14  Per Bothner  <per@bothner.com>

@@ -1861,8 +1861,7 @@ public class Compilation
     if (module.isHandlingTailCalls() || usingCPStyle())
       {
 	Variable callStackContext = new Variable ("$ctx", typeCallContext);
-	Scope scope = module.scope;
-	scope.addVariableAfter(thisDecl, callStackContext);
+	module.getVarScope().addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
 	callStackContext.setArtificial(true);
       }
@@ -2051,7 +2050,7 @@ public class Compilation
     CodeAttr code = getCode();
     if (curLambda.getCallConvention() >= CALL_WITH_CONSUMER)
       {
-	Variable var = curLambda.scope.lookup("$ctx");
+	Variable var = curLambda.getVarScope().lookup("$ctx");
 	if (var != null && var.getType() == typeCallContext)
 	  {
 	    code.emitLoad(var);

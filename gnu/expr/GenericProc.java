@@ -114,4 +114,30 @@ public class GenericProc extends MethodProc
     Object[] arr = (Object[]) vars;
     return ((MethodProc) arr[0]).applyV(arr[1]);
   }
+
+  /** Create a GenericProc from one or more methods, plus properties. */
+  public static GenericProc make$V (Object[] args)
+  {
+    int alen = args.length;
+    int mlen = 0;
+    GenericProc result = new GenericProc();
+    for (int i = 0;  i < alen;  i++)
+      {
+	Object arg = args[i];
+	if (arg instanceof Keyword)
+	  {
+	    String name = ((Keyword) arg).getName();
+	    Object value = args[++i];
+	    if (name == "name")
+	      result.setName(value.toString());
+	    else if (name == "method")
+	      result.add((MethodProc) value);
+	    else
+	      result.setProperty(name, value);
+	  }
+	else
+	  result.add((MethodProc) arg);
+      }
+    return result;
+  }
 }

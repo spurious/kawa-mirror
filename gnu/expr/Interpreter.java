@@ -33,18 +33,18 @@ public abstract class Interpreter
 
   /**
    * List of known languages and their Interpreter classes.
-   * Each element is one or more language names, followed by the
-   * name of the Interpreter sub-class.
+   * Each element is one or more language names, or filename extensions,
+   * followed by the name of the Interpreter sub-class.
    * The table is searched from the beginning.
    */
 
   static String[][] languages =
   {
-    { "scheme", "kawa.standard.Scheme" },
-    { "emacs", "elisp", "gnu.jemacs.lang.ELisp" }
+    { "scheme", ".scm", "kawa.standard.Scheme" },
+    { "emacs", "elisp", ".el", "gnu.jemacs.lang.ELisp" }
   };
 
-  /** Look for an interpreter for a language with the given name.
+  /** Look for an interpreter for a language with the given name or extension.
    * If name is null, look for the first language available. */
   public static Interpreter getInstance (String name)
   {

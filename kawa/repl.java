@@ -141,6 +141,11 @@ public class repl
 						     compilationTopname))
 		      System.exit(-1);
 		  }
+		catch (gnu.text.SyntaxException ex)
+		  {
+		    ex.printAll(OutPort.errDefault(), 50);
+		    System.exit(-1);
+		  }
 		catch (Throwable ex)
 		  {
 		    System.err.println("Internal error while compiling "+arg);

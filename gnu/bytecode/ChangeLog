@@ -1,3 +1,8 @@
+2002-08-16  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare):  tostring_type is more general.
+	* ArrayType.java (compare):  Likewise.
+
 2002-08-06  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (isExisting):  New method.

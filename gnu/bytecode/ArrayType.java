@@ -48,7 +48,8 @@ public class ArrayType extends ObjectType
       return 1;
     if (other instanceof ArrayType)
       return elements.compare(((ArrayType) other).elements);
-    else if (other.getName().equals("java.lang.Object"))
+    else if (other.getName().equals("java.lang.Object")
+	     || other == tostring_type)
       return -1;
     else
       return -3;

@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 
 /** Use this Enuemration class to iterate over the Variables in a Scope.
  * Descends into child scopes.

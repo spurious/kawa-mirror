@@ -30,7 +30,7 @@ pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 
-top_builddir = ..
+top_builddir = ../..
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -49,7 +49,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -126,7 +126,7 @@ TAGS:
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = codegen
+subdir = gnu/bytecode
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
@@ -191,7 +191,7 @@ maintainer-clean
 
 
 .java.class:
-	$(JAVAC) -d .. $<
+	$(JAVAC) -d ../.. $<
 
 all: $(OBJ)
 .SUFFIXES:

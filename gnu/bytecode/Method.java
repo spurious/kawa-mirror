@@ -1,8 +1,8 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class Method {
-  byte[] name;  /* Utf8 */
+  private String name;
   Type[] arg_types;
   
   Type return_type;
@@ -32,7 +32,7 @@ public class Method {
     access_flags = flags;
     classfile = clfile;
 
-    parameter_scope = push_scope ();
+    parameter_scope = pushScope ();
   }
 
   public final void setStaticFlag (boolean is_static) {
@@ -60,7 +60,7 @@ public class Method {
   public Scope current_scope;
   Scope parameter_scope;
 
-  public Scope push_scope () {
+  public Scope pushScope () {
     Scope scope = new Scope ();
     enterScope (scope);
     return scope;
@@ -80,12 +80,12 @@ public class Method {
 	      used_locals[var.offset] = var;
 	    else if (used_locals[var.offset] != var)
 	      throw new Error ("inconsistent local variable assignments for "
-+var.strName()+" at "+var.offset+" != "+used_locals[var.offset]);
++var.getName()+" at "+var.offset+" != "+used_locals[var.offset]);
 	  }
       }
   }
 
-  public Scope pop_scope () {
+  public Scope popScope () {
     Scope scope = current_scope;
     current_scope = scope.parent;
     scope.end_pc = PC;
@@ -101,7 +101,7 @@ public class Method {
    * @param name name to search for
    * @return the Variable, or null if not found (in any scope of this Method).
    */
-  Variable lookup (byte[] name) {
+  Variable lookup (String name) {
     for (Scope scope = current_scope; scope != null;  scope = scope.parent) {
       Variable var = scope.lookup (name);
       if (var != null)
@@ -110,17 +110,13 @@ public class Method {
     return null;
   }
 
-  Variable lookup (String name) {
-    return lookup (ClassType.to_utf8 (name));
-  }
-
   /** Assign a local variable to a given slot.
    * @param local the Variable to assign
    * @param slot the local variable slot desired
    * @return true iff we succeeded (i.e. the slot was unused) */
   public boolean assign_local (Variable local, int slot)
   {
-    int size = local.type.size > 4 ? 2 : 1;
+    int size = local.getType().size > 4 ? 2 : 1;
     if (used_locals == null)
       used_locals = new Variable[20+size];
     else if (max_locals + size >= used_locals.length) {
@@ -161,10 +157,10 @@ public class Method {
   public void init_param_slots ()
   {
     if ((access_flags & Access.STATIC) == 0)
-      new_local (classfile).setParameter (true);
+      addLocal (classfile).setParameter (true);
     int arg_count = arg_types.length;
     for (int i = 0;  i < arg_count;  i++) {
-      new_local (arg_types[i]).setParameter (true);
+      addLocal (arg_types[i]).setParameter (true);
     }
   }
 
@@ -173,20 +169,25 @@ public class Method {
     return parameter_scope.find_var (index);
   }
 
-  public Variable new_local (Type type)
+  /** Add a new local variable (in the current scope).
+   * @param type type of the new Variable.
+   * @return the new Variable. */
+  public Variable addLocal (Type type)
   {
-    return current_scope.new_var (this, type, null);
-  }
-  Variable new_local (Type type, String name) {
-    return current_scope.new_var (this, type, ClassType.to_utf8 (name));
-  }
-  Variable new_local (Type type, byte[] name) {
-    return current_scope.new_var (this, type, name);
+    return current_scope.addVariable(this, type, null);
   }
 
+  /** Add a new local variable (in the current scope).
+   * @param type type of the new Variable.
+   * @param name name of the new Variable.
+   * @return the new Variable. */
+  Variable addLocal (Type type, String name)
+  {
+    return current_scope.addVariable (this, type, name);
+  }
   void kill_local (Variable var) {
     var.end_pc = PC;
-    int size = var.type.size > 4 ? 2 : 1;
+    int size = var.getType().size > 4 ? 2 : 1;
     while (--size >= 0)
       used_locals [var.offset + size] = null;
   }
@@ -380,7 +381,7 @@ public class Method {
     push_stack_type (Type.long_type);
   }
 
-  public void compile_push_string (byte[] str)
+  public void compile_push_string (String str)
   {
     instruction_start_hook (3);
     CpoolUtf8 bytes = CpoolUtf8.get_const (classfile, str);
@@ -396,11 +397,6 @@ public class Method {
 	put2 (index);
       }
     push_stack_type (Type.string_type);
-  }
-
-  public void compile_push_string (String str)
-  {
-    compile_push_string (ClassType.to_utf8 (str));
   }
 
   public void compile_push_null ()
@@ -675,7 +671,7 @@ public class Method {
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to load from unassigned variable "+var
 +" simple:"+var.isSimple ()+", offset: "+offset);
-    Type type = var.type.promote ();
+    Type type = var.getType().promote ();
     int code;
     instruction_start_hook (4);
     if (type == Type.int_type)
@@ -700,7 +696,7 @@ public class Method {
 	put1 (21 + code);  // [ilfda]load
 	put1 (offset);
       }
-    push_stack_type (var.type);
+    push_stack_type (var.getType());
   }
 
   public void compile_store_value (Variable var)
@@ -710,7 +706,7 @@ public class Method {
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to store in unassigned variable");
-    Type type = var.type.promote ();
+    Type type = var.getType().promote ();
     int code;
     instruction_start_hook (4);
     pop_stack_type ();
@@ -756,19 +752,19 @@ public class Method {
 
   public final void compile_convert (Type from, Type to)
   {
-    byte[] to_sig = to.signature;
-    byte[] from_sig = from.signature;
+    String to_sig = to.getSignature();
+    String from_sig = from.getSignature();
     int op = -1;
-    if (to_sig.length == 1 || from_sig.length == 1)
+    if (to_sig.length() == 1 || from_sig.length() == 1)
       {
-	byte to_sig0 = to_sig[0];
-	byte from_sig0 = to_sig[0];
+	char to_sig0 = to_sig.charAt(0);
+	char from_sig0 = to_sig.charAt(0);
 	if (from.size < 4)
-	  from_sig0 = (byte) 'I';
+	  from_sig0 = 'I';
 	if (to.size < 4)
 	  {
 	    compile_convert (from, Type.int_type);
-	    from_sig0 = (byte) 'I';
+	    from_sig0 = 'I';
 	  }
 	if (from_sig0 == to_sig0)
 	  return;
@@ -848,7 +844,8 @@ public class Method {
 	put1 (149);   // fcmpl
 	opcode = 153;  // ifeq (inverted: ifeq)
       }
-    else if (type1.signature.length == 1 || type2.signature.length == 1)
+    else if (type1.getSignature().length() == 1
+	     || type2.getSignature().length() == 1)
       throw new Error ("non-matching types to compile_goto_ifeq");
     else
       opcode = 165;  // if_acmpeq (inverted: if_acmpne)
@@ -1295,27 +1292,20 @@ public class Method {
       }
   }
 
-  private byte[] signature;
+  private String signature;
 
-  public byte[] getSignature ()
+  public String getSignature ()
   {
     if (signature == null)
       {
-	ByteArrayOutputStream bstr = new ByteArrayOutputStream ();
+	StringBuffer buf = new StringBuffer(100);
 	int args_count = arg_types.length; 
-	try
-	  {
-	    bstr.write ((byte)'(');
-	    for (int i = 0; i < args_count; i++) {
-	      bstr.write (arg_types[i].signature);
-	    }
-	    bstr.write ((byte)')');
-	    bstr.write (return_type.signature);
-	    signature = bstr.toByteArray();
-	  }
-	catch (IOException ex) {
-	  throw new Error(ex.toString());
-	}
+	buf.append('(');
+	for (int i = 0; i < args_count; i++)
+	  buf.append (arg_types[i].getSignature());
+	buf.append(')');
+	buf.append(return_type.getSignature());
+	signature = buf.toString();
       }
     return signature;
   }
@@ -1354,7 +1344,7 @@ public class Method {
 		  var.name_index = classfile.get_utf8_const (var.name);
 		if (var.signature_index == 0)
 		  var.signature_index
-		    = classfile.get_utf8_const (var.type.signature);
+		    = classfile.get_utf8_const (var.getType().signature);
 	      }
 	  }
 	
@@ -1370,9 +1360,12 @@ public class Method {
 
   public Type[] getParameterTypes() { return arg_types; }
 
-  public String getName ()
+  public final String getName ()
   {
-    // FIXME - only works for ASCII names!
-    return name == null ? null : new String (name, 0);
+    return name;
+  }
+  public final void setName(String name)
+  {
+    this.name = name;
   }
 };

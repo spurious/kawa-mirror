@@ -1,9 +1,8 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class Type {
-  byte[] name;
-  byte[] signature;
+  String signature;
   // Fully-qualified name (in external format, i.e. using '.' to separate).
   String this_name;
   /**
@@ -13,45 +12,18 @@ public class Type {
 
   Type () { }
 
-  public final byte[] getSignature () { return signature; }
-
-  /**
-   * Given a class type, return the corresponing signature string.
-   */
-  static byte[] class_signature (byte[] class_name) {
-    int name_length = class_name.length;
-    byte[] sig = new byte[name_length+2];
-    sig[0] = (byte) 'L';
-    System.arraycopy (class_name, 0, sig, 1, name_length);
-    sig[name_length + 1] = (byte) ';';
-    return sig;
-  }
-
-  public Type (byte[] nam, byte[] sig)
-  {
-    this(nam, sig, 4);
-  }
-
-  protected Type (byte[] class_name) {
-    this (class_name, class_signature (class_name));
-  }
+  public final String getSignature () { return signature; }
+  protected void setSignature(String sig) { this.signature = sig; }
 
   Type (String nam, String sig) {
     this_name = nam;
-    name = ClassType.to_utf8 (nam);
-    signature = ClassType.to_utf8 (sig);
+    signature = sig;
     size = 4;
-  }
-  Type (byte[] nam, byte[] sig, int siz)
-  {
-    name = nam;  signature = sig; size = siz;
-    this_name = new String(nam, 0);
   }
 
   Type (String nam, String sig, int siz) {
     this_name = nam;
-    name = ClassType.to_utf8 (nam);
-    signature = ClassType.to_utf8 (sig);
+    signature = sig;
     size = siz;
   }
 
@@ -105,22 +77,22 @@ public class Type {
   static public ClassType boolean_ctype = new ClassType ("java.lang.Boolean");
   static public Type[] typeArray0 = new Type[0];
   static public Method toString_method
-  = pointer_type.new_method ("toString", typeArray0,
+  = pointer_type.addMethod ("toString", typeArray0,
 			     string_type, Access.PUBLIC);
   static public ClassType number_type = new ClassType ("java.lang.Number");
   static public Method intValue_method
-  = number_type.new_method ("intValue", typeArray0,
+  = number_type.addMethod ("intValue", typeArray0,
 			    int_type, Access.PUBLIC);
   static public Method longValue_method
-  = number_type.new_method ("longValue", typeArray0,
+  = number_type.addMethod ("longValue", typeArray0,
 			    long_type, Access.PUBLIC);
   static public Method floatValue_method
-  = number_type.new_method ("floatValue", typeArray0,
+  = number_type.addMethod ("floatValue", typeArray0,
 			    float_type, Access.PUBLIC);
   static public Method doubleValue_method
-  = number_type.new_method ("doubleValue", typeArray0,
+  = number_type.addMethod ("doubleValue", typeArray0,
 			    double_type, Access.PUBLIC);
   static public Method booleanValue_method
-  = boolean_ctype.new_method ("booleanValue", typeArray0,
+  = boolean_ctype.addMethod ("booleanValue", typeArray0,
 			      boolean_type, Access.PUBLIC);
 }

@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 /** A CONSTANT_NameAndType entry in the constant pool. */
@@ -21,7 +21,7 @@ public class CpoolNameAndType extends CpoolEntry {
   public static CpoolNameAndType
   get_const (ClassType classfile, Method method)
   {
-    CpoolUtf8 name = CpoolUtf8.get_const (classfile, method.name);
+    CpoolUtf8 name = CpoolUtf8.get_const (classfile, method.getName());
     CpoolUtf8 type = CpoolUtf8.get_const (classfile, method.getSignature ());
     return get_const (classfile, name, type);
   }
@@ -29,7 +29,7 @@ public class CpoolNameAndType extends CpoolEntry {
   public static CpoolNameAndType
   get_const (ClassType classfile, Field field)
   {
-    CpoolUtf8 name = CpoolUtf8.get_const (classfile, field.name);
+    CpoolUtf8 name = CpoolUtf8.get_const (classfile, field.getName());
     CpoolUtf8 type = CpoolUtf8.get_const (classfile, field.getSignature ());
     return get_const (classfile, name, type);
   }

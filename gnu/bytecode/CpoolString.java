@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 /** A CONSTANT_String entry in the constant pool. */

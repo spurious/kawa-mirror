@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.util.Hashtable;
 import java.io.*;
 

@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 /** The state of a conditional expression or statement. */

@@ -1,8 +1,8 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class Field {
-  byte[] name;  /* Utf8 */
+  private String name;
   public Type type;
   int name_index; /* Index in constant table, or 0 if un-assigned */
   int signature_index; /* Index in constant table, or 0 if un-assigned */
@@ -10,7 +10,9 @@ public class Field {
   int flags;
   Field next;
 
-  public final byte[] getSignature () { return type.getSignature (); }
+  public final String getSignature () { return type.getSignature (); }
+
+  public final Type getType () { return type; }
 
   /** The class that contains this field. */
   ClassType owner;
@@ -52,9 +54,14 @@ public class Field {
 	= classfile.get_utf8_const ("ConstantValue");
   }
 
-  public String strName ()
+  public final String getName ()
   {
-    // FIXME - only works for ASCII names!
-    return name == null ? null : new String (name, 0);
+    return name;
   }
+
+  public final void setName (String name)
+  {
+    this.name = name;
+  }
+
 }

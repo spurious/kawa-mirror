@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 /** A CONSTANT_{Field,Method,InterfaceMethod}Ref entry in the constant pool. */

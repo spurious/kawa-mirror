@@ -4,10 +4,10 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 .java.class:
-	$(JAVAC) -d .. $<
+	$(JAVAC) -d ../.. $<
 
 javadir=$(prefix)/java/$(subdir)
 

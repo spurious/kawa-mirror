@@ -1,3 +1,10 @@
+Tue Mar 25 13:26:29 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	Move this package from codegen to gnu.bytecode.
+	Change all names and signatures from byte[] (Utf8) to String.
+	Rename some methods to be more "conventional" (e.g.
+	strName -> getName; set_class_name -> setname.
+
 Mon Mar 24 13:35:46 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Method.java:  Add more char->byte casts.

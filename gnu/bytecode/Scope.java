@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class Scope
@@ -30,16 +30,16 @@ public class Scope
     parent.lastChild = this;
   }
 
-  Variable new_var (Method method, Type type, byte[] name)
+  Variable addVariable (Method method, Type type, String name)
   {
     Variable var = new Variable ();
-    var.type = type;
-    var.name = name;
-    add_var (method, var);
+    var.setType(type);
+    var.setName(name);
+    addVariable (method, var);
     return var;
    }
 
-  public void add_var (Variable var)
+  public void addVariable (Variable var)
   {
     if (last_var == null)
       vars = var;
@@ -48,10 +48,10 @@ public class Scope
     last_var = var;
   }
 
-  public void add_var (Method method, Variable var)
+  public void addVariable (Method method, Variable var)
   {
     var.start_pc = method.PC;
-    add_var (var);
+    addVariable (var);
     if (var.isSimple ())
       method.allocate_local (var);
   }
@@ -83,9 +83,9 @@ public class Scope
    * @param name name to search for
    * @return the Variable, or null if not found (in this scope).
    */
-  Variable lookup (byte[] name) {
+  Variable lookup (String name) {
     for (Variable var = vars;  var != null;  var = var.next) {
-      if (equals (var.name, name))
+      if (name.equals(var.name))
 	return var;
     }
     return null;

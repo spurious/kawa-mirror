@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class Variable implements java.util.Enumeration {
@@ -37,8 +37,8 @@ public class Variable implements java.util.Enumeration {
   int start_pc;
   int end_pc;
 
-  public Type type;
-  public byte[] name;
+  private Type type;
+  public String name;
   final boolean dead () { return end_pc > 0; }
 
   /** Returns true for a "simple" variable.
@@ -86,14 +86,22 @@ public class Variable implements java.util.Enumeration {
       flags &= ~ARTIFICIAL_FLAG;
   }
 
-  public byte[] utfName ()
+  public final String getName ()
   {
     return name;
   }
 
-  public String strName ()
+  public final void setName (String name)
   {
-    // FIXME - only works for ASCII names!
-    return name == null ? null : new String (name, 0);
+    this.name = name;
+  }
+
+  public final Type getType()
+  {
+    return type;
+  }
+  public final void setType(Type type)
+  {
+    this.type = type;
   }
 }

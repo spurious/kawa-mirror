@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 
 /** Load classes from a Zip archive.
  * @author	Per Bothner

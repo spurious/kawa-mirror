@@ -1,4 +1,4 @@
-package codegen;
+package gnu.bytecode;
 import java.io.*;
 
 public class ClassType extends Type {
@@ -15,10 +15,6 @@ public class ClassType extends Type {
 
   boolean emitDebugInfo = true;
 
-//  public Method new_method (String name, String signature, int flags);
-//  public Method new_method (String name, Type return_ type,
-//			      Type[] argtypes, int flags);
-
   // Constant-pool-related fields. */
 
   /** The entries in the constant pool.
@@ -32,19 +28,13 @@ public class ClassType extends Type {
   CpoolEntry[] constant_pool_hash;
 
   /** Get index in constant pool of a CONSTANT_Utf8 constant,
-   * Re-use existing constant if there is one;  otherwise allocate new entry.
+    * Re-use existing constant if there is one;  otherwise allocate new entry.
    * @param value of constant (as Unicode String)
    */
   public int get_utf8_const (String str) {
     return CpoolUtf8.get_const (this, str).index;
   }
-  /** Get index in constant pool of a CONSTANT_Utf8 constant,
-   * Re-use existing constant if there is one;  otherwise allocate new entry.
-   * @param value of constant (as Utf8 byte-string)
-   */
-  public int get_utf8_const (byte[] str) {
-    return CpoolUtf8.get_const (this, str).index;
-  }
+
   public int get_class_const (ClassType ctype)
   {
     return CpoolClass.get_const (this, ctype.this_name).index;
@@ -66,14 +56,11 @@ public class ClassType extends Type {
    * @param name the name to give to the class
    * @return the the constant pool entry for the class
    */
-  CpoolClass set_class_name (String name)
+  CpoolClass setName (String name)
   {
     this_name = name;
-    return set_class_name (to_utf8 (name.replace ('.', '/')));
-  }
-
-  CpoolClass set_class_name (byte[] name)
-  {
+    name = name.replace ('.', '/');
+    setSignature("L"+name+";");
     CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
     CpoolClass class_entry = CpoolClass.get_const (this, name_entry);
     this_class = class_entry.index;
@@ -126,8 +113,9 @@ public class ClassType extends Type {
   }
   public ClassType (String class_name)
   {
-    super (to_utf8 (class_name.replace ('.', '/')));
-    set_class_name (class_name);
+    super();
+    size = 4;
+    setName(class_name);
 
     super_class = -1;
   }
@@ -153,28 +141,28 @@ public class ClassType extends Type {
   /**
    * Add a new field to this class.
    */
-  public Field new_field () { return new Field (this); }
+  public Field addField () { return new Field (this); }
 
   /**
    * Add a new field to this class, and name the field.
    * @param name the name of the mew field
    */
-  public Field new_field (String name) {
+  public Field addField (String name) {
     Field field = new Field (this);
-    field.name = to_utf8 (name);
+    field.setName(name);
     return field;
   }
 
-  public final Field new_field (String name, Type type) {
+  public final Field addField (String name, Type type) {
     Field field = new Field (this);
-    field.name = to_utf8 (name);
+    field.setName(name);
     field.type = type;
     return field;
   }
-  public final Field new_field (String name, Type type, int flags)
+  public final Field addField (String name, Type type, int flags)
   {
-    Field field = new_field (name, type);
-    field.name = to_utf8 (name);
+    Field field = addField (name, type);
+    field.setName(name);
     field.type = type;
     field.flags = flags;
     return field;
@@ -185,33 +173,33 @@ public class ClassType extends Type {
   Method last_method;
   public Method constructor;
 
-  Method new_method () {
+  Method addMethod () {
     return new Method (this, 0);
   }
 
-  public Method new_method (String name) {
+  public Method addMethod (String name) {
     Method method = new Method (this, 0);
-    method.name = to_utf8 (name);
+    method.setName(name);
     return method;
   }
 
-  public Method new_method (String name, int flags) {
+  public Method addMethod (String name, int flags) {
     Method method = new Method (this, flags);
-    method.name = to_utf8 (name);
+    method.setName(name);
     return method;
   }
 
-  public Method new_method (String name,
-			      Type[] arg_types, Type return_type,
-			      int flags) {
+  public Method addMethod (String name,
+			   Type[] arg_types, Type return_type,
+			   int flags) {
     Method method = new Method (this, flags);
-    method.name = to_utf8 (name);
+    method.setName(name);
     method.arg_types = arg_types;
     method.return_type = return_type;
     return method;
   }
 
-  public void do_fixups () {
+  public void doFixups () {
     if (super_class < 0)
       setSuper ("java.lang.Object");
     for (Field field = fields; field != null; field = field.next) {
@@ -223,13 +211,13 @@ public class ClassType extends Type {
     }
   }
 
-  public void emit_to_stream (OutputStream stream)
+  public void writeToStream (OutputStream stream)
     throws java.io.IOException
   {
     DataOutputStream dstr = new DataOutputStream (stream);
     int i;
 
-    do_fixups ();
+    doFixups ();
 
     dstr.writeInt (0xcafebabe);  // magic
     dstr.writeShort (minor_version);
@@ -274,25 +262,25 @@ public class ClassType extends Type {
       }
   }
 
-  public void emit_to_file (String filename)
+  public void writeToFile (String filename)
     throws java.io.IOException
  {
     FileOutputStream stream = new FileOutputStream (filename);
-    emit_to_stream (stream);
+    writeToStream (stream);
     stream.close ();
   }
 
-  public void emit_to_file ()
+  public void writeToFile ()
     throws java.io.IOException
   {
-    emit_to_file (this_name.replace ('.', '/') + ".class");
+    writeToFile (this_name.replace ('.', '/') + ".class");
   }
 
-  public byte[] emit_to_array ()
+  public byte[] writeToArray ()
     throws java.io.IOException
   {
     ByteArrayOutputStream stream = new ByteArrayOutputStream (500);
-    emit_to_stream (stream);
+    writeToStream(stream);
     return stream.toByteArray ();    
   }
 

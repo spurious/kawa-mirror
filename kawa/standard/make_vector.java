@@ -5,6 +5,16 @@ import gnu.mapping.*;
 
 public class make_vector extends Procedure1or2
 {
+  public static Object apply (int arg1)
+  {
+    return new Vector (arg1, Interpreter.undefinedObject);
+  }
+
+  public static Object apply (int arg1, Object arg2)
+  {
+    return new Vector (arg1, arg2);
+  }
+
   public final Object apply1 (Object arg1)
   {
     return apply2 (arg1, Interpreter.undefinedObject);

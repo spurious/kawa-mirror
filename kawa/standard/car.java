@@ -6,6 +6,11 @@ import gnu.mapping.WrongType;
 
 public class car extends Procedure1 implements HasSetter
 {
+  public static Object apply (Pair arg)
+  {
+    return arg.car;
+  }
+
   public Object apply1 (Object arg1)
   {
     if (arg1 instanceof Pair)

@@ -16,6 +16,11 @@ public class cons extends Procedure2 implements Compilable
     super("cons");
   }
 
+  public static Pair apply (Object arg1, Object arg2) 
+  {
+    return new Pair (arg1, arg2);
+  }
+
   public Object apply2 (Object arg1, Object arg2) 
   {
     return new Pair (arg1, arg2);

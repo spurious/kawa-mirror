@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 82)
+(test-init "Miscellaneous" 84)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -7,6 +7,16 @@
       (lambda ( x y #!optional z #!rest r #!key i (j 1))
 	(list x y z i: i j: j))
       3 4 5 i: 6 i: 7)
+
+(test '(200 . 100)
+      (lambda (x #!optional (y (* 2 x)) (p (lambda () (cons y x))))
+	(p))
+      100)
+
+(test '(100 . 200)
+      (lambda (x #!optional (y (* 2 x)))
+	(cons x y))
+      100)
 
 (test #t keyword? foo:)
 (test #t keyword? 'foo:)

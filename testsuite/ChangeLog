@@ -1,3 +1,7 @@
+2000-02-25  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Added two more tests for #!optional.
+
 2000-02-12  Per Bothner  <per@bothner.com>
 
 	* scribble.scm:  New "applet" testcase.

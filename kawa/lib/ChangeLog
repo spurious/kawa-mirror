@@ -1,3 +1,9 @@
+Sun Mar  7 17:18:57 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* std_syntax.scm (let):  Handle type specifier for named let.
+	(let*):  Generalize to handle named type specifiers.
+	(delay):  Promise thunk is now Procedure instead of Proceure0.
+
 Tue Feb  9 11:31:16 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* numbers.scm (sin, cos, tan):  New procedures.

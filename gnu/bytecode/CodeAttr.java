@@ -1031,6 +1031,11 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
+  public final void emitIfThen ()
+  {
+    new IfState(this);
+  }
+
   /** Compile start of else clause. */
   public final void emitElse ()
   {

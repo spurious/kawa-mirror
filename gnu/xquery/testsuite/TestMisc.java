@@ -184,6 +184,18 @@ public class TestMisc
 	     + "string(document(\"tab.xml\")/result/*:row[k:fld1])",
 	     "\nc1\n33\n44\nc2\n");
 
+    evalTest("document(\"tab.xml\")/result/row[1]/descendant::*",
+	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
+    evalTest("document(\"tab.xml\")/result/row[1]/descendant::node()",
+	     "<fld1>a1</fld1>a1<fld2 align=\"right\">12</fld2>"
+	     + " align=\"right\"12");
+    evalTest("document(\"tab.xml\")/result/row[1]/descendant::text()",
+	     "a112");
+    evalTest("document(\"tab.xml\")/result/row[1]/descendant-or-self::*",
+	     "<row><fld1>a1</fld1>"
+	     + "<fld2 align=\"right\">12</fld2></row>"
+	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
+
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:4: missing PrimaryExpr");
 

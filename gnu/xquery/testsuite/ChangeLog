@@ -1,6 +1,10 @@
+2002-06-11  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  New tests for descendant:: and descendant-or-self::.
+
 2002-04-08  Per Bothner  <per@bothner.com>
 
-	* TestMisc.java:  Addes tests for node(), text() and children().
+	* TestMisc.java:  Added tests for node(), text() and children().
 
 	* use-cases.xml:  We can now use text() as in the original use-cases.
 

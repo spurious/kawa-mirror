@@ -78,7 +78,7 @@ public class Invoke extends ProcedureN implements Inlineable
 	if (dtype instanceof PairClassType)
 	  {
 	    PairClassType ptype = (PairClassType) dtype;
-	    dtype = ptype.reflectInstanceClass;
+	    dtype = ptype.instanceType;
 	    staticLink = ptype.getStaticLink();
 	  }
       }
@@ -339,7 +339,7 @@ public class Invoke extends ProcedureN implements Inlineable
         Type type = (kind == 'V' ? arg0.getType()
                      : interpreter.getTypeFor(arg0));
 	if (type instanceof PairClassType)
-	  return ((PairClassType) type).reflectInstanceClass;
+	  return ((PairClassType) type).instanceType;
         if (type instanceof ClassType)
 	  return (ClassType) type;
       }

@@ -1,3 +1,9 @@
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* Invoke.java:  Update for PairClassType field rename.
+
+	* ClassMemberConstraint.java (define):  Use reversible demangling.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  If value isn't a Named,

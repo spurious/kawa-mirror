@@ -106,12 +106,12 @@ public class Eval extends Procedure1or2
     throws Throwable
   {
     Procedure.checkArgCount(this, ctx.count);
-    Object exp = ctx.getArgAsObject(0);
+    Object exp = ctx.getNextArg();
     Environment env;
-    if (ctx.count > 1)
-      env = (Environment) ctx.getArgAsObject(1);
-    else
+    env = (Environment) ctx.getNextArg(null);
+    if (env == null)
       env = Environment.user();
+    ctx.lastArg();
     eval(exp, env, ctx);
   }
 }

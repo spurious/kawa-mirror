@@ -1,3 +1,8 @@
+2003-06-14  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Eval.java (apply):  Use CallContext's getNextArg
+	method rather than getArgAsObject, which will be deprecated. 
+
 2003-06-06  Jim White  <jim@pagesmiths.com>
 
 	* build.xml:  Add gnu/ecmascript.  Add gnu/jemacs/swing.

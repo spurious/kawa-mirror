@@ -75,7 +75,29 @@ public class SyntaxPattern extends Pattern implements Externalizable
 
   public boolean match (Object obj, Object[] vars, int start_vars)
   {
-    return match(obj, vars, start_vars, 0, null);
+    boolean r = match(obj, vars, start_vars, 0, null);
+    if (false)  // DEBUGGING
+      {
+	OutPort err = OutPort.errDefault();
+	err.print("{match ");
+	kawa.standard.Scheme.writeFormat.writeObject(obj, err);
+	err.print(" in ");
+	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
+	if (r)
+	  {
+	    err.print(" -> vars: ");
+	    for (int i = start_vars;  i < vars.length;  i++)
+	      {
+		err.println();
+		err.print("  " + i +" : ");
+		kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
+	      }
+	    err.println('}');
+	  }
+	else
+	  err.println(" -> failed}");
+      }
+    return r;
   }
 
   public SyntaxPattern (String program, Object[] literals, int varCount)

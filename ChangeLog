@@ -1,6 +1,20 @@
 2004-12-19  Per Bothner  <per@bothner.com>
 
-	* kawa/standard/Scheem.java (initScheme): Define 'case-lambda'.
+	* kawa/lang/SyntaxTemplate.java: New handling of ellipsis,
+	needed to correctly process forms like (template ... ...).
+	(BUILD_REPEAT): Remove constant.
+	(BUILD_DOTS): New constant.
+	(print_template_program, convert_template): Update accordingly.
+	(execute_car):  Gnerealize to executeToList.  Handle BUILD_DOTS.
+
+	* kawa/lang/SyntaxTemplate.java (convert_template):  Extra isVector
+	paremater, since argument to BUILD_VECTOR must be true list.
+
+	* kawa/lang/SyntaxTemplate.java (convert_template): Check for cycles.
+	
+	* kawa/lang/SyntaxPattern.java (match): Add optional debug output.
+
+	* kawa/standard/Scheme.java (initScheme): Define 'case-lambda'.
 
 2004-12-18  Per Bothner  <per@bothner.com>
 

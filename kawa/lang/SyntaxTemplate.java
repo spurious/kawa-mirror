@@ -28,17 +28,10 @@ public class SyntaxTemplate implements Externalizable
   /** Make following operand into a 1-element list. */
   static final int BUILD_LIST1 = (1<<3)+BUILD_MISC;
 
-  /** Wrap following sub-expression in a SyntaxForm. */
-  static final int BUILD_SYNTAX = (2<<3)+BUILD_MISC;
+  static final int BUILD_NIL = (2<<3)+BUILD_MISC;
 
-  /** A sub-template that gets repeated depending on a matched pattern.
-   * Followed by a variable index of a pattern variable of at least
-   * the needed depth, followed by a length, followed by the sub-template
-   * to be repeated.  If the length is 0, the result is a list with one
-   * pair for each match of the pattern variable.  If the length is > 0,
-   * it is the length of the repeated sub-template, which is followed by
-   * another subtemplate to be spliced (appended) to the repetition. */
-  static final int BUILD_REPEAT = (3<<3)+BUILD_MISC;
+  /** Wrap following sub-expression in a SyntaxForm. */
+  static final int BUILD_SYNTAX = (3<<3)+BUILD_MISC;
 
   /** Build a vector (an <code>FVector</code>) from following sub-expression.
    * The latter must evaluate to a list. */
@@ -47,7 +40,7 @@ public class SyntaxTemplate implements Externalizable
   /** Instruction to creat a <code>Pair</code> from sub-expressions.
    * Instruction <code>BUILD_CONS+4*delta</code> is followed by a
    * sub-expression for the <code>car</code>
-   * (whose length is <code<delta</code> chars),
+   * (whose length is <code>delta</code> chars),
    * followed by the expression for the <code>cdr</code>. */
   static final int BUILD_CONS = 1;
 
@@ -63,6 +56,11 @@ public class SyntaxTemplate implements Externalizable
 
   /** Instruction BUILD_LITERAL+8*i pushes literal_values[i]. */
   final static int BUILD_LITERAL = 4;
+
+  /** Instruction <code>BUILD_DOTS+8*i</code> repeats a sub-expression.
+   * The value <code>i</code> is a variable index of a pattern variable
+   * of at least the needed depth.  The result is spliced in. */
+  final static int BUILD_DOTS = 5;
 
   /** Unfinished support for "operand" values that need more tahn 13 bits. */
   final static int BUILD_WIDE = 7;
@@ -104,13 +102,22 @@ public class SyntaxTemplate implements Externalizable
 	ps.print("  " + i + ": " + (int)ch);
 	if (ch == BUILD_LIST1)
 	  ps.println (" - LIST1");
+	else if (ch == BUILD_NIL)
+	  ps.println (" - NIL");
 	else if (ch == BUILD_SYNTAX)
 	  ps.println (" - SYNTAX");
-	else if (ch == BUILD_REPEAT)
+	else if ((ch & 7) == BUILD_DOTS)
 	  {
-	    int var_num = template_program.charAt(++i);
-	    int width = template_program.charAt(++i);
-	    ps.println (" - BUILD_REPEAT var:"+var_num+" width:"+width);
+	    int var_num = ch >> 3;
+	    ps.print(" - DOTS (var: ");
+	    ps.print(var_num);
+	    if (patternNames != null
+		&& var_num >= 0 && var_num < patternNames.size())
+	      {
+		ps.print(" = ");
+		ps.print(patternNames.elementAt(var_num));
+	      }
+	    ps.println(')');
 	  }
 	else if (ch == BUILD_VECTOR)
 	  ps.println (" - VECTOR");
@@ -170,7 +177,7 @@ public class SyntaxTemplate implements Externalizable
     /* BEGIN JAVA2 */
     IdentityHashMap seen = new IdentityHashMap();
     /* END JAVA2 */
-    convert_template(template, program, 0, literals_vector, seen, tr);
+    convert_template(template, program, 0, literals_vector, seen, false, tr);
     this.template_program = program.toString();
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
@@ -195,8 +202,6 @@ public class SyntaxTemplate implements Externalizable
    * @param template_program (output) the translated template
    * @param nesting the depth of ... we are inside
    * @param literals_vector (output) the literal data in the template
-   * @param quote_nesting if inside a quote: -1; if inside n levels
-   *   of quasiquote: n;  otherwise: 0
    * @param tr  the current Translator
    * @return the index of a pattern variable (in <code>pattern_names</code>)
    *   that is nested at least as much as <code>nesting</code>;
@@ -204,64 +209,85 @@ public class SyntaxTemplate implements Externalizable
    *   and -2 if the is no pattern variable or elipsis.
    */
   public int convert_template (Object form,
-			   StringBuffer template_program,
-			   int nesting,
-			   java.util.Vector literals_vector,
-			   Object seen,
-			   Translator tr)
+			       StringBuffer template_program,
+			       int nesting,
+			       java.util.Vector literals_vector,
+			       Object seen,
+			       boolean isVector,
+			       Translator tr)
   {
+    /* BEGIN JAVA2 */
+    if (form instanceof Pair || form instanceof FVector)
+      {
+	IdentityHashMap seen_map = (IdentityHashMap) seen;
+	if (seen_map.containsKey(form))
+	  {
+	    // FIXME cycles are OK if data are literal.
+	    tr.syntaxError("self-referential (cyclic) syntax tenplate");
+	    return -2;
+	  }
+	seen_map.put(form, form);
+      }
+    /* END JAVA2 */
+
     if (form instanceof Pair)
       {
 	Pair pair = (Pair) form;
-	int ret;
+	int ret_cdr = -2;;
 	int save_pc = template_program.length();
-	if (pair.cdr instanceof Pair)
+	Object car = pair.car;
+	int save_literals = literals_vector.size();
+  
+	// This may get patched to a BUILD_CONS.
+	template_program.append((char) BUILD_LIST1);
+
+	int num_dots3 = 0;
+	Object rest = pair.cdr;
+	while (rest instanceof Pair)
 	  {
-	    Pair cdr_pair = (Pair) pair.cdr;
-	    if (cdr_pair.car == dots3)
+	    Pair p = (Pair) rest;
+	    if (p.car != dots3)
+	      break;
+	    num_dots3++;
+	    rest = p.cdr;
+	    template_program.append((char) BUILD_DOTS); // to be patched.
+	  }
+	int ret_car = convert_template(car, template_program,
+				       nesting + num_dots3,
+				       literals_vector, seen, false, tr);
+
+	if (rest != LList.Empty)
+	  {
+	    int delta = template_program.length() - save_pc - 1;
+	    template_program.setCharAt(save_pc,
+				       (char)((delta<<3)+BUILD_CONS));
+	    ret_cdr = convert_template (rest, template_program, nesting,
+					literals_vector, seen, isVector, tr);
+	  }
+	if (num_dots3 > 0)
+	  {
+	    if (ret_car < 0)
+	      tr.syntaxError ("... follows template with no suitably-nested pattern variable");
+	    for (int i = num_dots3;  --i >= 0; )
 	      {
-		template_program.append((char) BUILD_REPEAT);
-		template_program.append('\0'); /* var_num, to be patched */
-		template_program.append('\0'); /* width, to be patched */
-		ret = convert_template(pair.car, template_program, nesting + 1,
-				       literals_vector, seen, tr);
-		if (ret <= -1)
-		  tr.syntaxError ("... follows template with no suitably-nested pattern variable");
-		else
-		  template_program.setCharAt(save_pc+1, (char) ret);
-		if (cdr_pair.cdr != LList.Empty)
-		  {
-		    int width = template_program.length() - save_pc - 3;
-		    template_program.setCharAt(save_pc+2, (char) width);
-		    convert_template(cdr_pair.cdr, template_program, nesting,
-				     literals_vector, seen, tr);
-		  }
-		if (nesting >= max_nesting)
-		  max_nesting = nesting + 1;
-		return ret;
+		char op = (char) ((ret_car << 3) + BUILD_DOTS);
+		template_program.setCharAt(save_pc+i + 1, op);
+		int n = nesting+num_dots3;
+		if (n >= max_nesting)
+		  max_nesting = n;
 	      }
 	  }
-	int save_literals = literals_vector.size();
-	if (pair.cdr == LList.Empty)
-	  {
-	    template_program.append((char) BUILD_LIST1);
-	    ret = convert_template(pair.car, template_program, nesting,
-				   literals_vector, seen, tr);
-	  }
-	else
-	  {
-	    template_program.append((char) BUILD_CONS);
-	    ret = convert_template (pair.car, template_program, nesting,
-				    literals_vector, seen, tr);
-	    int delta = template_program.length() - save_pc - 1;
-	    template_program.setCharAt(save_pc, (char)((delta<<3)+BUILD_CONS));
-	    int ret2 = convert_template (pair.cdr, template_program, nesting,
-					 literals_vector, seen, tr);
-	    if (ret < 0)
-	      ret = ret2;
-	  }
-	if (ret >= -1)
-	  return ret;
+	if (ret_car >= 0)
+	  return ret_car;
+	if (ret_cdr >= 0)
+	  return ret_cdr;
+	if (ret_car == -1 || ret_cdr == -1)
+	  return -1;
+	if (isVector)
+	  return -2;
+	// There is no pattern variable in 'form', so treat it as literal.
+	// This is optimization to group non-substrituted "chunks"
+	// as a single literal and a single SyntaxForm value.
 	literals_vector.setSize(save_literals);
 	template_program.setLength(save_pc);
       }
@@ -270,7 +296,12 @@ public class SyntaxTemplate implements Externalizable
 	template_program.append((char) BUILD_VECTOR);
 	return convert_template(LList.makeList((FVector) form),
 				template_program, nesting,
-				literals_vector, seen, tr);
+				literals_vector, seen, true, tr);
+      }
+    else if (form == LList.Empty)
+      {
+	template_program.append((char) BUILD_NIL);
+	return -2;
       }
     else if (form instanceof String
 	     && tr != null && tr.patternScope != null)
@@ -332,14 +363,36 @@ public class SyntaxTemplate implements Externalizable
    */
   public Object execute (Object[] vars)
   {
+    if (false)  // DEBUGGING
+      {
+	OutPort err = OutPort.errDefault();
+	err.print("{Expand template in ");
+	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
+	err.print(" vars: ");
+	for (int i = 0;  i < vars.length;  i++)
+	  {
+	    err.println();
+	    err.print("  " + i +" : ");
+	    kawa.standard.Scheme.writeFormat.writeObject(vars[i], err);
+	  }
+	err.println('}');
+      }
+
     Object result = execute(vars, (Translator) Compilation.getCurrent());
-    /* DEBUGGING:
-    OutPort err = OutPort.errDefault();
-    err.print("{Expansion of syntax template: ");
-    err.print(result);
-    err.println('}');
-    err.flush();
-    */
+
+    if (false) // DEBUGGING:
+      {
+	OutPort err = OutPort.errDefault();
+	err.startLogicalBlock("", false, "}");
+	err.print("{Expansion of syntax template ");
+	err.print(((Translator) Compilation.getCurrent()).getCurrentSyntax());
+	err.print(": ");
+	err.writeBreakLinear();
+	kawa.standard.Scheme.writeFormat.writeObject(result, err);
+	err.endLogicalBlock("}");
+	err.println();
+	err.flush();
+      }
     return result;
   }
 
@@ -369,16 +422,49 @@ public class SyntaxTemplate implements Externalizable
     return var;    
   }
 
-  Pair execute_car (int pc, Object[] vars, int nesting, int[] indexes,
-		    Translator tr, ScopeExp templateScope)
+  /** Similar to execute, but return is wrapped in a list.
+   * Normally the result is a single Pair, BUILD_DOTS can return zero
+   * or many Pairs. */
+  LList executeToList (int pc, Object[] vars, int nesting, int[] indexes,
+			Translator tr, ScopeExp templateScope)
   {
+    int pc0 = pc;
     int ch = template_program.charAt(pc);
+    while ((ch & 7) == BUILD_WIDE)
+      ch = ((ch - BUILD_WIDE) << 13) |	template_program.charAt(++pc);
     if ((ch & 7) == BUILD_VAR_CAR)
       {
 	Pair p = (Pair) get_var(ch >> 3, vars, indexes);
 	return Translator.makePair(p, p.car, LList.Empty);
       }
-    Object v = execute(pc, vars, nesting, indexes, tr, templateScope);
+    else if ((ch & 7) == BUILD_DOTS)
+      {
+	int var_num = (int) (ch >> 3);
+	Object var = vars[var_num];
+	int count = get_count(var, nesting, indexes);
+	LList result = LList.Empty;
+	Pair last = null; // Final Pair of result list, or null.
+	pc++;
+	for (int j = 0;  j < count; j++)
+	  {
+	    indexes[nesting] = j;
+	    LList list
+	      = executeToList(pc, vars, nesting + 1, indexes, tr, templateScope);
+	    if (last == null)
+	      result = list;
+	    else
+	      last.cdr = list;
+	    // Normally list is a single Pair, but if it is multiple Pairs,
+	    // find the last Pair so we can properly splice everything.
+	    while (list instanceof Pair)
+	      {
+		last = (Pair) list;
+		list = (LList) last.cdr;
+	      }
+	  }
+	return result;
+      }
+    Object v = execute(pc0, vars, nesting, indexes, tr, templateScope);
     return new Pair(v, LList.Empty);
   }
 
@@ -402,62 +488,45 @@ public class SyntaxTemplate implements Externalizable
       ch = ((ch - BUILD_WIDE) << 13) |	template_program.charAt(++pc);
     if (ch == BUILD_LIST1)
       {
-	return execute_car(pc+1, vars, nesting, indexes, tr, templateScope);
+	return executeToList(pc+1, vars, nesting, indexes, tr, templateScope);
       }
+    else if (ch == BUILD_NIL)
+      return LList.Empty;
     else if (ch == BUILD_SYNTAX)
       {
 	Object v = execute(pc+1, vars, nesting, indexes, tr, templateScope);
 	return v == LList.Empty ? v : SyntaxForm.make(v, templateScope);
       }
-    else if ((ch & 3) == BUILD_CONS)
+    else if ((ch & 7) == BUILD_CONS)
       {
 	Pair p = null;
 	Object result = null;
+	int pc0=pc, pc1=pc;
 	for (;;)
 	  {
 	    pc++;
-	    Pair q = execute_car(pc, vars, nesting, indexes, tr, templateScope);
+	    pc1=pc;
+	    Object q
+	      = executeToList(pc, vars, nesting, indexes, tr, templateScope);
 	    if (p == null)
 	      result = q;
 	    else
 	      p.cdr = q;
-	    p = q;
+	    while (q instanceof Pair)
+	      {
+		p = (Pair) q;
+		q = p.cdr;
+	      }
 	    pc += ch >> 3;
 	    ch = template_program.charAt(pc);
 	    if ((ch & 7) != BUILD_CONS)
 	      break;
 	  }
-	p.cdr = execute(pc, vars, nesting, indexes, tr, templateScope);
-	return result;
-      }
-    else if (ch == BUILD_REPEAT)
-      {
-	int var_num = (int) template_program.charAt(++pc);
-	int width = (int) template_program.charAt(++pc);
-	Object var = vars [var_num];
-	int count = get_count(var, nesting, indexes);
-	Pair last = null;
-	Object result = LList.Empty;
-	pc++;
-	for (int j = 0;  j < count; j++)
-	  {
-	    indexes[nesting] = j;
-	    Pair pair = execute_car(pc, vars, nesting + 1, indexes, tr, templateScope);
-	    if (last == null)
-	      result = pair;
-	    else
-	      last.cdr = pair;
-	    last = pair;
-	  }
-	Object cdr;
-	if (width == 0)
-	  cdr = LList.Empty;
-	else
-	  cdr = execute(pc+width, vars, nesting, indexes, tr, templateScope);
-	if (last == null)
+	Object cdr = execute(pc, vars, nesting, indexes, tr, templateScope);
+	if (p == null)
 	  result = cdr;
 	else
-	  last.cdr = cdr;
+	  p.cdr = cdr;
 	return result;
       }
     else if (ch == BUILD_VECTOR)

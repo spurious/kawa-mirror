@@ -72,7 +72,7 @@ CallContext.java: $(srcdir)/CallContext.java.in
 
 BUILT_SOURCES = $(java_BUILT)
 java_Java= $(java_BUILT) $(java_sources)
-EXTRA_DIST = package.html $(java_BUILT)
+EXTRA_DIST = package.html CallContext.java.in
 
 PACKAGE_FNAME = gnu-mapping
 GCJ_INPUTS =  $(java_Java)

@@ -1,7 +1,7 @@
 2002-02-15  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (java_sources):  Leave out CallContext.java.
-	(EXTRA_DIST):  Leave out $(java_sources), but add $(java_BUILT).
+	(EXTRA_DIST):  Leave out $(java_sources), but add CallContext.java.in.
 
 2002-02-14  Per Bothner  <per@bothner.com>
 

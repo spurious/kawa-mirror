@@ -567,6 +567,37 @@
       <include name="gnu/kawa/brl/"/>
       <patternset refid="with-sax2-${with-sax2}"/>
     </javac>
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.brl. --module-static -C"/>
+      <fileset dir="${src.dir}/gnu/brl"> 
+        <include name="stringfun.scm"/>
+      </fileset>
+    </apply>
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.brl. --module-static -C"/>
+      <fileset dir="${src.dir}/gnu/kawa/brl"> 
+        <include name="progfun.scm"/>
+      </fileset>
+    </apply>
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <fileset dir="${src.dir}/gnu/kawa/slib"> 
+        <include name="XML.scm"/>
+        <include name="XString.scm"/>
+      </fileset>
+    </apply>
   </target>
 
   <target name="servlet-classes" 
@@ -668,9 +699,6 @@
       <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
       <fileset refid="jemacs-buffer-scm"/>
     </apply>
-
-    <!-- !JPW: Don't know why, but "elisp" can't "getInstance" if this is present: -->
-    <delete file="${build.classes}/gnu/jemacs/lisp/primitives.class"/>
 
     <apply taskname="elisp" executable="java" 
            failonerror="true" parallel="true">

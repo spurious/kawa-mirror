@@ -1,3 +1,12 @@
+2002-09-28  Jim White  <jim@pagesmiths.com>
+
+	* build.xml: Compile .scm files for xml-classes.
+	Remove unneeded workaround in servlet-classes.
+
+2002-09-27  Per Bothner  <per@bothner.com>
+
+ 	* kawa/lang/Translator.java (rewrite):  Only map Procedure to
+	
 2002-09-27  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Only map Procedure to

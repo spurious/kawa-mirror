@@ -1,5 +1,12 @@
 2002-10-20  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (scanForDefinitions):  Change to create
+	an alias declaration as well as the imported field.  This is needed
+	if the imported decl is re-exported or used in an exported macro.
+	* kawa/standard/define_syntax.java (scanForDefinitions):  Set type.
+	* kawa/lang/Translator.java (rewrite_pair):  Follow aliases
+	before checking for macro.
+
 	* kawa/lang/Macro.java (copying <init>):  Copy name as well.
 
 	* kawa/standard/define_alias.java (rewrite):  Simplify.

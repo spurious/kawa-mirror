@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.functions.Convert;
 import java.util.*;
 
 public class require extends Syntax
@@ -175,6 +176,9 @@ public class require extends Syntax
     boolean isRunnable = t.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
     Vector macros = null;
+    ClassType thisType = ClassType.make("kawa.standard.require");
+    Expression[] args = { new QuoteExp(tname) };
+    ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
     for (;;)
       {
 	Class rclass = t.getReflectClass();
@@ -194,6 +198,10 @@ public class require extends Syntax
 		    decl.setPrivate(true);
 		    defs.addDeclaration(decl);
 		    decl.setCanRead(true);
+		    decl.noteValue(dofind);
+		    SetExp sexp = new SetExp(decl, dofind);
+		    sexp.setDefining(true);
+		    forms.addElement(sexp);
 		  }
               }
             String fname = fld.getName();
@@ -222,8 +230,17 @@ public class require extends Syntax
 			 ? ((Named) fvalue).getName()
 			 : Compilation.demangleName(fname, true).intern());
 		    Type dtype = interp.getTypeFor(ftype.getReflectClass());
-		    Declaration fdecl = defs.getDefine(fdname, 'w', tr);
-		    fdecl.setType(dtype);
+		    // We create an alias in the current context that points
+		    // a dummy declaration in the exported module.  Normally,
+		    // followAliases will skip the alias, so we use the latter.
+		    // But if the binding is re-exported (or EXTERNAL_ACCESS
+		    // gets set), then we need a separate declaration.
+		    // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
+		    Declaration adecl = defs.getDefine(fdname, 'w', tr);
+		    Declaration fdecl = new Declaration(fdname, dtype);
+		    ReferenceExp fref = new ReferenceExp(fdecl);
+		    SetExp sexp = new SetExp(adecl, fref);
+		    sexp.setDefining(true);
                     if (isAlias || ftype.isSubtype(Compilation.typeBinding))
                       fdecl.setIndirectBinding(true);
 		    if (isAlias)
@@ -233,7 +250,7 @@ public class require extends Syntax
 		    fdecl.field = fld;
 		    if (ftable == null)
 		      ftable = new Hashtable(40);
-		    ftable.put(fname, fdecl);
+		    ftable.put(fname, adecl);
 		    if (fvalue instanceof Macro)
 		      {
 			// Copy the Macro, as we will be modifying it later.
@@ -246,9 +263,24 @@ public class require extends Syntax
 		      }
 		    else
 		      fdecl.noteValue(new QuoteExp(fvalue));
+		    // Need to be aliase - so we can follow them!
+		    adecl.setAlias(true);
+		    adecl.setIndirectBinding(true);
+		    adecl.noteValue(fref);
+		    // Kludge, needed by FindCapturedVars.capture:
+		    fdecl.context = defs;
+		    if ((rfield.getModifiers() & Access.FINAL) != 0)
+		      {
+			adecl.setType(dtype);
+			adecl.setFlag(Declaration.IS_CONSTANT);
+		      }
 		    fdecl.setPrivate(true);
+		    adecl.setPrivate(true);
 		    fdecl.setSimple(false);
-		    tr.pushBinding(fdname, fdecl);  // Add to translation env.
+		    adecl.setFlag(Declaration.IS_IMPORTED);
+		    adecl.setSimple(false);
+		    tr.pushBinding(fdname, adecl);  // Add to translation env.
+		    forms.addElement(sexp);
 		  }
 		catch (Exception ex)
 		  {
@@ -269,22 +301,9 @@ public class require extends Syntax
 	  }
       }
 
-    ClassType thisType = ClassType.make("kawa.standard.require");
-    Expression[] args = { new QuoteExp(tname) };
-    ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
-    Expression action;
-    if (instance != null && ! immediate)
-      {
-	decl.noteValue(dofind);
-	SetExp sexp = new SetExp(decl, dofind);
-	sexp.setDefining(true);
-	action = sexp;
-      }
-    else if (isRunnable) // Need to make sure 'run' is invoked.
-      action = gnu.kawa.functions.Convert.makeCoercion(dofind, Type.void_type);
-    else
-      action = QuoteExp.voidExp;
-    forms.addElement(action);
+    if ((instance == null || immediate)
+	&& isRunnable) // Need to make sure 'run' is invoked.
+      forms.addElement(Convert.makeCoercion(dofind, Type.void_type));
     tr.mustCompileHere();
     return true;
   }

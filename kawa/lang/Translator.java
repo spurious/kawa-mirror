@@ -281,8 +281,12 @@ public class Translator extends Compilation
                   }
               }
 	  }
-        else if (decl.getFlag(Declaration.IS_SYNTAX))
-          return apply_rewrite ((Syntax) decl.getConstantValue(), p);
+        else
+	  {
+	    decl = Declaration.followAliases(decl);
+	    if (decl.getFlag(Declaration.IS_SYNTAX))
+	      return apply_rewrite ((Syntax) decl.getConstantValue(), p);
+	  }
 
 	ref.setProcedureName(true);
 	if (getInterpreter().hasSeparateFunctionNamespace())

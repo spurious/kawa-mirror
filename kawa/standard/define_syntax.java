@@ -85,6 +85,7 @@ public class define_syntax extends Syntax
       }
 
     Declaration decl = defs.getDefine(name, 'w', tr);
+    decl.setType(typeMacro);
     Macro macro = Macro.make(decl);
     macro.expander = p.car;
     p = tr.makePair(st, this, new Pair(decl, p));

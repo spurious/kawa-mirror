@@ -13,16 +13,37 @@ public class InPort extends FilterInputStream implements Printable
 
   int limit;
 
+  // The current line number (at pos).
+  int linenumber;
+
+  // The position that marks the start of the current line, or -1 if unknown.
+  int linestart;
+
+  protected int markpos = -1;
+
+  protected int marklimit;
+
   String name;
+
+  public String getName ()
+  {
+    return name;
+  }
+
+  public void setName (String name)
+  {
+    this.name = name;
+  }
 
   public InPort (InputStream in)
   {
     super (in);
+    linenumber = 1;
   }
 
   public InPort (InputStream in, String name)
   {
-    super (in);
+    this (in);
     this.name = name;
   }
 
@@ -39,37 +60,136 @@ public class InPort extends FilterInputStream implements Printable
     inp = in;
   }
 
+  public int getLineNumber ()
+  {
+    return linenumber;
+  }
+
+  public int getColumnNumber ()
+  {
+    return pos - getLineStart ();
+  }
+
+  public void setLineNumber (int linenumber)
+  {
+    this.linenumber = linenumber;
+  }
+
+  public boolean markSupported ()
+  {
+    return true;
+  }
+
+  private final int getLineStart ()
+  {
+    if (linestart < 0)
+      {
+	linestart = pos;
+	while (linestart > 0 && buffer[linestart - 1] != '\n')
+	  linestart--;
+      }
+    return linestart;
+  }
+
+  public synchronized void mark(int read_limit)
+  {
+    marklimit = read_limit;
+    markpos = pos;
+  }
+
+  public void reset ()  throws IOException
+  {
+    if (markpos < 0)
+      throw new IOException("Resetting to invalid mark");
+    if (markpos < getLineStart ())
+      {
+	for (pos = linestart; pos > markpos; )
+	  {
+	    --pos;
+	    if (buffer[pos] == '\n')
+	      linenumber--;
+	  }
+	linestart = -1;
+      }
+    pos = markpos;
+  }
+
+  public int available () throws java.io.IOException
+  {
+    return (limit - pos) + in.available ();
+  }
+
+  /** Read a byte. */
+
   public int read ()
        throws java.io.IOException
   {
     if (pos >= limit)
       {
-	if (buffer == null)
-	  buffer = new byte[100];
-	pos = 0;
-	limit = 0;
-	for (;;)
+	// Calculate how much to save from the existing buffer.
+	// This should be the last line starting before both markpos and pos.
+	int save_start = pos;
+	if (markpos >= 0 && markpos < pos)
 	  {
-	    int ch = in.read ();
-	    if (ch == -1)
-	      {
-		if (pos == limit)
-		  return ch;
-		break;
-	      }
-	    if (limit >= buffer.length)
-	      {
-		byte[] new_buffer = new byte[2 * buffer.length];
-		System.arraycopy (buffer, 0, new_buffer, 0, buffer.length);
-		buffer = new_buffer;
-	      }
-	    buffer[limit++] = (byte) ch;
-	    if (ch == '\n' || ch == '\r')
-	      break;
+	    if (pos - markpos > marklimit)
+	      markpos = -1;
+	    else
+	      save_start = markpos;
 	  }
+	if (getLineStart () > save_start)
+	  {
+	    while (save_start > 0 && buffer[save_start - 1] != '\n')
+	      save_start--;
+	  }
+	else
+	  save_start = linestart;
+
+	int avail = in.available ();
+	if (buffer == null)
+	  buffer = new byte[avail >= 1024 ? 1024 : 256];
+	else
+	  {
+	    byte[] new_buffer;
+	    int copy_size = limit - save_start;
+	    if (copy_size >= buffer.length)
+	      new_buffer = new byte [2 * buffer.length];
+	    else
+	      {
+		new_buffer = buffer;
+		if (save_start == 0)
+		  copy_size = 0;
+	      }
+	    System.arraycopy (buffer, save_start, new_buffer, 0, copy_size);
+	    buffer = new_buffer;
+	  }
+
+	pos -= save_start;
+	if (markpos >= 0)
+	  markpos -= save_start;
+	linestart -= save_start;
+
+	int to_read = buffer.length - pos;
+	if (to_read > avail)
+	  to_read = avail > 0 ? avail : 1;
+	to_read = in.read (buffer, pos, to_read);
+	if (to_read <= 0)
+	  {
+	    limit = pos;
+	    return -1;
+	  }
+	limit = pos + to_read;
       }
-    return buffer[pos++];
+    int ch = buffer[pos++];
+    if (ch == '\n')
+      {
+	linestart = pos;
+	linenumber++;
+      }
+    return ch;
   }
+
+  /** Read a (possibly multi-byte) character.
+   * Currently, we assume the external representation is UTF-8. */
 
   public int readChar ()
        throws java.io.IOException
@@ -122,6 +242,11 @@ public class InPort extends FilterInputStream implements Printable
     for (;;)
       {
 	byte ch = buffer[--pos];
+	if (ch == '\n')
+	  {
+	    linestart = -1;
+	    linenumber--;
+	  }
 	if ((ch & 0xC0) != 0x80)
 	  return;
       }
@@ -290,18 +415,12 @@ public class InPort extends FilterInputStream implements Printable
     return obj;
   }
 
-  protected Object readQuote ()
+  protected Object readQuote (Symbol func_symbol)
       throws java.io.IOException, SyntaxError
   {
-    return new Pair(Interpreter.quote_sym,
-		    new Pair(readSchemeObject (), Interpreter.nullObject));
-  }
-
-  protected Object readQuasiQuote ()
-      throws java.io.IOException, SyntaxError
-  {
-    return new Pair(Interpreter.quasiquote_sym,
-		    new Pair(readSchemeObject (), Interpreter.nullObject));
+    return new Pair (func_symbol,
+		     new Pair (readSchemeObject (),
+			       Interpreter.nullObject));
   }
 
   protected void skipWhitespaceAndComments()
@@ -330,44 +449,54 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   protected List readList ()
-      throws java.io.IOException, SyntaxError
+       throws java.io.IOException, SyntaxError
   {
-     skipWhitespaceAndComments();
-     //-- null Primitive
-     int c;
-     if ((c = peekChar())==')')
-       {
-         skipChar ();
-         return List.Empty;
-       }
+    skipWhitespaceAndComments();
+    //-- null Primitive
+    int c;
+    if ((c = peekChar())==')')
+      {
+	skipChar ();
+	return List.Empty;
+      }
 
-     //-- Car of the list
-     Object car = readSchemeObject ();
-     Object cdr = Interpreter.nullObject;
-     skipWhitespaceAndComments();
+    int line = getLineNumber ();
+    int column = getColumnNumber ();
+    
+    //-- Car of the list
+    Object car = readSchemeObject ();
+    Object cdr = Interpreter.nullObject;
+    skipWhitespaceAndComments();
 
-     c = readChar ();
-     if (c != ')')
-       {
-	 int next;
-         if (c == '.'
-	     && (next = peekChar ()) >= 0
-	     && Character.isSpace((char)next))
-	   {
-	     //-- Read the cdr for the Pair
-	     cdr = readSchemeObject ();
-	     skipWhitespaceAndComments();
-	     if (readChar ()!=')')
-	       throw new ReadError (this, "Malformed list.");
-	   }
-	 else
-	   {
-	     //-- Read the read of the list
-	     unreadChar ();
-	     cdr = readList();
-	   }           
-       }
-     return new Pair (car,cdr);
+    c = readChar ();
+    if (c != ')')
+      {
+	int next;
+	if (c == '.'
+	    && (next = peekChar ()) >= 0
+	    && Character.isSpace((char)next))
+	  {
+	    //-- Read the cdr for the Pair
+	    cdr = readSchemeObject ();
+	    skipWhitespaceAndComments();
+	    if (readChar ()!=')')
+	      throw new ReadError (this, "Malformed list.");
+	  }
+	else
+	  {
+	    //-- Read the read of the list
+	    unreadChar ();
+	    cdr = readList();
+	  }           
+      }
+    // if (???) return new Pair (car, cdr);
+    // else  FIXME
+    {
+      PairWithPosition pair = new PairWithPosition (this, car, cdr);
+      pair.setLine (line, column);
+      pair.setFile (getName ());
+      return pair;
+    }
   }
 
   public Object readSchemeObject ()
@@ -398,21 +527,19 @@ public class InPort extends FilterInputStream implements Printable
 	  case '"':
 	    return readString();
 	  case '\'':
-	    return readQuote();
+	    return readQuote(Interpreter.quote_sym);
 	  case '`':
-	    return readQuasiQuote();
+	    return readQuote(Interpreter.quasiquote_sym);
 	  case ',':
+	    Symbol func;
 	    if (peekChar()=='@')
 	      {
 		skipChar ();
-		return new Pair(Interpreter.unquotesplicing_sym,
-				new Pair (readSchemeObject (),
-					  Interpreter.nullObject));
+		func = Interpreter.unquotesplicing_sym;
 	      }
 	    else
-	      return new Pair(Interpreter.unquote_sym,
-			      new Pair (readSchemeObject (),
-					Interpreter.nullObject));
+	      func = Interpreter.unquote_sym;
+	    return readQuote (func);
 	  case '+':
 	  case '-':
 	    int next = peekChar ();

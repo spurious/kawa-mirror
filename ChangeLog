@@ -1,3 +1,8 @@
+2003-01-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Use 3-operand form of
+	define_field for unescaped-data.
+
 2003-01-01  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initScheme):  Use 3-operand form of

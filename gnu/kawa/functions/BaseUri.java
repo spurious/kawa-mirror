@@ -34,7 +34,7 @@ public class BaseUri extends Procedure0or1
 
   /** Tests if a URL has a scheme.
    * For convenience, we treat a 1-character "scheme" as an
-   * MS-DOS-style "drive letter" - i.e. not a scheme.. */
+   * MS-DOS-style "drive letter" - i.e. not a scheme. */
   public static boolean hasScheme (String name)
   {
     return uriSchemeLength(name) > 1;

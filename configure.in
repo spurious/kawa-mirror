@@ -18,7 +18,7 @@ AC_ARG_ENABLE(kawa-frontend,
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
 
 AC_ARG_WITH(gcj,
-  [  --with-gjc              Compile Kawa using GCJ (GNU Compiler for Java)])
+  [  --with-gcj              Compile Kawa using GCJ (GNU Compiler for Java)])
 
 AC_ARG_ENABLE(xml,
   [  --disable-xml           Don't build support for XML processing],

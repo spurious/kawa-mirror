@@ -1,3 +1,8 @@
+2004-04-17  Per Bothner  <per@bothner.com>
+
+	* configure.in: Fix help text typo reported by Pete Chown.
+	Fixes bug #7851.
+
 2004-03-08  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_syntax.java (rewriteForm): Do setProcedureDecl

@@ -109,6 +109,21 @@ public class Char implements Printable, Compilable
 				"backspace",
 				"rubout" };
 
+  public String toString ()
+  {
+    StringBuffer buf = new StringBuffer();
+    buf.append("[Char '");
+    if (value >= (int) ' ' && value < 127)
+      buf.append((char) value);
+    else
+      {
+	buf.append('\\');
+	buf.append(Integer.toOctalString(value));
+      }
+    buf.append("']");
+    return buf.toString();
+  }
+
   public void print(PrintWriter ps)
   {
     boolean readable = (ps instanceof OutPort)

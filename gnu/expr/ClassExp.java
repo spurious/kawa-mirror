@@ -121,7 +121,33 @@ public class ClassExp extends LambdaExp
 	if (! isSimple() || this instanceof ObjectExp)
 	  name = comp.generateClassName(name);
 	else
-	  name = comp.mangleNameIfNeeded(name);
+	  {
+	    int start = 0;
+	    StringBuffer nbuf = new StringBuffer(100);;
+	    for (;;)
+	      {
+		int dot = name.indexOf('.', start);
+		if (dot < 0)
+		  break;
+		nbuf.append(comp.mangleNameIfNeeded(name.substring(start,
+								  dot)));
+		nbuf.append('.');
+		start = dot + 1;
+	      }
+	    if (start == 0)
+	      {
+		String mainName = comp.mainClass == null ? null
+		  : comp.mainClass.getName();
+		int dot = mainName == null ? -1 : mainName.lastIndexOf('.');
+		if (dot > 0)
+		  nbuf.append(mainName.substring(0, dot + 1));
+		else if (comp.classPrefix != null)
+		  nbuf.append(comp.classPrefix);
+	      }
+	    if (start < name.length())
+	      nbuf.append(comp.mangleNameIfNeeded(name.substring(start)));
+	    name = nbuf.toString();
+	  }
 	type.setName(name);
       }
     return type;
@@ -381,8 +407,7 @@ public class ClassExp extends LambdaExp
 		  fld = instanceType.addField(fname, ftype, Access.PUBLIC);
 		Method impl = instanceType.addMethod(mname, Access.PUBLIC,
 						     ptypes, rtype);
-		impl.init_param_slots ();
-		code = impl.getCode();
+		code = impl.startCode();
 		code.emitPushThis();
 		if (ch == 'g')
 		  {
@@ -411,8 +436,7 @@ public class ClassExp extends LambdaExp
 		  {
 		    Method impl = instanceType.addMethod(mname, Access.PUBLIC,
 							 ptypes, rtype);
-		    impl.init_param_slots ();
-		    code = impl.getCode();
+		    code = impl.startCode();
 		    for (Variable var = code.getCurrentScope().firstVar();
 			 var != null;  var = var.nextVar())
 		      code.emitLoad(var);

@@ -1,3 +1,11 @@
+2003-02-19  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getCompiledClassType):  Add package prefixes to
+	names of simple classes.
+
+	* ClassExp.java (compile):  Replace deprecated init_param_slots calls
+	by startCode.
+
 2003-02-04  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor):  Only make $finit$ method private

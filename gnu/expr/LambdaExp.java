@@ -625,7 +625,7 @@ public class LambdaExp extends ScopeExp
 	allocParameters(comp);
 	enterFunction(comp);
 
-	body.compileWithPosition(comp, Target.returnObject);
+	compileBody(comp);
 	compileEnd(comp);
 	comp.curLambda = saveLambda;
 	func_end.define(code);
@@ -816,7 +816,7 @@ public class LambdaExp extends ScopeExp
 	    Type lastType = var.getType();
 	    String lastTypeName = lastType.getName();
 	    if (key_args > 0 || numStubs < opt_args
-		|| ! ("gnu.kawa.util.LList".equals(lastTypeName)
+		|| ! ("gnu.lists.LList".equals(lastTypeName)
 		      || "java.lang.Object[]".equals(lastTypeName)))
 	      {
 		lastType = comp.objArrayType;
@@ -1296,10 +1296,6 @@ public class LambdaExp extends ScopeExp
 
     Method method = primMethods[0];
     boolean isStatic = method.getStaticFlag();
-    Type rtype = method.getReturnType();
-    Target target = Compilation.usingTailCalls ? Target.returnObject
-      // : getFlag(SEQUENCE_RESULT) ? new ConsumerTarget(firstDecl()) FIXME
-      : Target.returnValue(rtype);
     int numStubs = primMethods.length - 1;
     Type restArgType = restArgType();
 
@@ -1352,7 +1348,7 @@ public class LambdaExp extends ScopeExp
 	      {
 		Expression arg;
 		String lastTypeName = restArgType.getName();
-		if ("gnu.kawa.util.LList".equals(lastTypeName))
+		if ("gnu.lists.LList".equals(lastTypeName))
 		  arg = new QuoteExp(gnu.lists.LList.Empty);
 		else if ("java.lang.Object[]".equals(lastTypeName))
 		  arg = new QuoteExp(Values.noArgs);
@@ -1384,7 +1380,7 @@ public class LambdaExp extends ScopeExp
 	    allocParameters(comp);
 	    enterFunction(comp);
 
-	    body.compileWithPosition(comp, target);
+	    compileBody(comp);
 	    compileEnd(comp);
 	  }
       }
@@ -1393,6 +1389,26 @@ public class LambdaExp extends ScopeExp
     comp.method = save_method;
     comp.curLambda = save_lambda;
     comp.callStackContext = saveStackContext;
+  }
+
+  public void compileBody (Compilation comp)
+  {
+    Target target;
+    if (isHandlingTailCalls())
+      {
+	CodeAttr code = comp.getCode();
+	Variable ctxVar = scope.getVariable(1);
+	code.emitLoad(ctxVar);
+	code.emitGetField(comp.typeCallContext.getDeclaredField("consumer"));
+	Scope scope = code.getCurrentScope();
+	Variable result
+	  = scope.addVariable(code, Compilation.typeConsumer, "$result");
+	code.emitStore(result);
+	target = new ConsumerTarget(result);
+      }
+    else
+      target = Target.pushValue(comp.method.getReturnType());
+    body.compileWithPosition(comp, target);
   }
 
   /** A cache if this has already been evaluated. */

@@ -54,7 +54,6 @@ java_sources = \
   StackTarget.java \
   Symbol.java \
   SynchronizedExp.java \
-  TailTarget.java \
   Target.java \
   ThisExp.java \
   TryExp.java \

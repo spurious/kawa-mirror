@@ -1,3 +1,37 @@
+2001-07-16  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Added xquery.
+	(getOutputConsumer, getPrompter):  New methods.
+	(parse, parseFile):  New abstract methods.
+
+	* LambdaExp.java (compileBody):  New method.
+	(compile, compileAsMethod):  Use compileBody.
+	* ObjectExp.java (compile):  Likewise.
+	* Compilation.java (addClass):  Likewise.
+	* TailTarget.java:  Remove - use compileBody instead.
+	* Makefile.am (java_sources):  Update accordingly.
+	* Target.java (returnObject, returnValue):  Removed.
+
+	* Parser.java:  Make non-abstract - used directly by XQuery.
+	(currentModule, lookup):  New methods.
+	(popBinding, pushBinding, push, pop, pushecls, popDecls):
+	Moved to Translator.
+	* ApplyExp.java (compile):  If handling tail calls, use setArgsN.
+
+	* Compilation.java (typeConsumer):  New static field.
+
+	* ConsumerTarget.java:  Re-formatted.
+	(cunsumer):  Fieldtype changed from Declaration to Variable.
+	(compileUsingConsumer):  New static helper method.
+	* Keyword.java (apply):  Update for endAttribute change in Consumer.
+
+	* LambdaExp.java:  Overdue update of package containing LList.
+
+	* ModuleBody.java (runAsMain):  Optionally print values.
+	(getMainPrintValues, setMainPrintValues):  New methods.
+
+	* ScopeExp.java (currentModule):  New method.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (asType):  Allow argument to be Binding.

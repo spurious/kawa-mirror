@@ -224,6 +224,8 @@ public class Compilation
   /* Classes, fields, and methods used wgen usingCPStyle". */
   public static ClassType typeCallContext
     = ClassType.make("gnu.mapping.CallContext");
+  public static final ClassType typeConsumer
+  = ClassType.make("gnu.lists.Consumer");
   public static Method popCallContextMethod
     = typeCallContext.addMethod("pop", apply0args, Type.void_type,
 			      Access.PUBLIC);
@@ -1149,7 +1151,7 @@ public class Compilation
 
     try
       {
-        body.compileWithPosition(this, Target.returnObject);
+	lexp.compileBody(this);
       }
     catch (Exception ex)
       {

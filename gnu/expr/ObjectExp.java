@@ -159,8 +159,7 @@ public class ObjectExp extends LambdaExp
             child.allocChildClasses(comp);
 	    child.allocParameters(comp);
 	    child.enterFunction(comp);
-	    Type rtype = comp.method.getReturnType();
-	    child.body.compileWithPosition(comp, Target.returnValue(rtype));
+	    child.compileBody(comp);
 	    child.compileEnd(comp);
 	    child.compileChildMethods(comp);
 	    comp.method = save_method;

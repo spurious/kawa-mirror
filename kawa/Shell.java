@@ -73,15 +73,9 @@ public class Shell
 	      perr.println("usage: "+e.usage);
 	    e.printStackTrace(perr);
 	  }
-	catch (WrongType e)
-	  {
-	    perr.println("Argument "+e.number+" to "+e.procname
-			 +" must be of type "+e.typeExpected);
-	    e.printStackTrace(perr);
-	  }
 	catch (java.lang.ClassCastException e)
 	  {
-	    perr.println("Invalid parameter, should be: "+ e.getMessage());
+	    perr.println("Invalid parameter, was: "+ e.getMessage());
 	    e.printStackTrace(perr);
 	  }
 	catch (gnu.text.SyntaxException e)

@@ -25,6 +25,7 @@ public class GuiConsole extends Frame implements ActionListener {
   public static int numConsoles = 0;
 
   Interpreter interp;
+  Environment environment;
   Future thread;
 
   kawa.lang.QueueReader in_r;
@@ -34,13 +35,13 @@ public class GuiConsole extends Frame implements ActionListener {
 
   public static void main(String[] args) {
     Interpreter interp = new Scheme();
-    Environment.setCurrent(Scheme.builtin());
-    new GuiConsole(interp);
+    new GuiConsole(interp, interp.getNewEnvironment());
   }
 
-  public GuiConsole(Interpreter interp) {
+  public GuiConsole(Interpreter interp, Environment environment) {
     super("Kawa");
     this.interp = interp;
+    this.environment = environment;
 
     in_r = new kawa.lang.QueueReader ();
     message = new MessageArea(false, in_r);
@@ -61,9 +62,8 @@ public class GuiConsole extends Frame implements ActionListener {
     setSize(700,500);
     setVisible(true);
 
-    Environment env = interp.getEnvironment();
     thread = new Future (new kawa.repl(interp),
-			 env, in_p, out_p, err_p);
+			 environment, in_p, out_p, err_p);
     thread.start();
   }
 
@@ -132,9 +132,9 @@ public class GuiConsole extends Frame implements ActionListener {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))
-      new GuiConsole(new Scheme());
+      new GuiConsole(interp, interp.getNewEnvironment());
     else if (cmd.equals(NEW_SHARED))
-      new GuiConsole(interp);
+      new GuiConsole(interp, environment);
     else if (cmd.equals(EXIT))
       System.exit(0);
     else if (cmd.equals(CLOSE))

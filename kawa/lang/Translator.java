@@ -258,7 +258,8 @@ public class Translator extends Object
 	    java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
 	    java.lang.reflect.Method best = null;
 	    Class[] bestTypes = null;
-	    String name = ((Procedure) proc).getName();
+            Procedure pproc = (Procedure) proc;
+	    String name = pproc.getName();
 	    if (name == null)
 	      break tryDirectCall;
 	    String mangledName = Compilation.mangleName(name);
@@ -292,7 +293,9 @@ public class Translator extends Object
 		  = procType.addMethod(best.getName(), best.getModifiers(),
 				       argTypes,
 				       Type.make(best.getReturnType()));
-		func = new QuoteExp(new PrimProcedure(method));
+                pproc = new PrimProcedure(method);
+                pproc.setName(name);
+		func = new QuoteExp(pproc);
 	      }
 	  }
 	catch (SecurityException ex)

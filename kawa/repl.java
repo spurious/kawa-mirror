@@ -148,7 +148,7 @@ public class repl extends Procedure0or1
 	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    new kawa.GuiConsole(defaultInterpreter);
+	    new kawa.GuiConsole(defaultInterpreter, Environment.getCurrent());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))

@@ -13,10 +13,14 @@ public class car extends Procedure1 implements HasSetter
 
   public Object apply1 (Object arg1)
   {
-    if (arg1 instanceof Pair)
-      return ((Pair)arg1).car;
-    else
-      throw new WrongType(this.name (), 1, "pair");
+    try
+      {
+        return ((Pair)arg1).car;
+      }
+    catch (ClassCastException ex)
+      {
+        throw WrongType.make(ex, this, 0);
+      }
   }
 
   public void set1 (Object value, Object pair)

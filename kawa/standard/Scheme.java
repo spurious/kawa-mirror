@@ -37,7 +37,7 @@ public class Scheme extends Interpreter
   static Environment null_environment;
   static Environment r4_environment;
   static Environment r5_environment;
-  static Environment kawa_environment;
+  protected static Environment kawa_environment;
 
   public static Syntax beginSyntax;
   public static Syntax defineSyntax;
@@ -541,6 +541,15 @@ public class Scheme extends Interpreter
   public Scheme (Environment environ)
   {
     this.environ = environ;
+  }
+
+  public Environment getNewEnvironment ()
+  {
+    if (kawa_environment == null)
+      initScheme();
+    Environment environ = new ScmEnv (kawa_environment);
+    environ.setName ("interaction-environment."+(++scheme_counter));
+    return environ;
   }
 
   /** Evalutate Scheme expressions from string.

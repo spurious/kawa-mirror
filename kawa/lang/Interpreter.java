@@ -42,5 +42,10 @@ public abstract class Interpreter
     throws java.io.IOException, gnu.text.SyntaxException;
   public abstract void print (Object obj, OutPort out);
 
+  public Environment getNewEnvironment ()
+  {
+    return new Environment(environ);
+  }
+
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
 }

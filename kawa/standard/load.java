@@ -260,7 +260,10 @@ public class load extends Procedure1 {
 	xname = fname + ".scm";
 	file = new File (xname);
 	if (file.exists ())
-	  loadSource (xname, env);
+	  {
+	    loadSource (xname, env);
+	    return;
+	  }
       }
     throw new java.io.FileNotFoundException(name);
   }

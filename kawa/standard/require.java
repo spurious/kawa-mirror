@@ -28,7 +28,7 @@ public class require extends Syntax
 
   public static Object find(Class ctype, Environment env)
   {
-    String mangledName = ctype.getName() + "$instance";
+    String mangledName = (ctype.getName() + "$instance").intern();
     Binding binding = env.getBinding(mangledName);
     Object value;
     synchronized (binding)

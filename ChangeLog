@@ -1,3 +1,12 @@
+2000-11-21  Matthias Radestock <matthias@lshift.net>
+
+	* kawa/standard/load.java (apply): Removes an incorrect fall-through
+	that results in files to be loaded twice.
+
+	* kawa/standard/require.java (find): Fixes lookup of module class
+	instances which resulted in multiple require's for the same module
+	to loadExecute the module multiple times
+
 2000-10-23  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files):  Strip off any file

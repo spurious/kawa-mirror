@@ -614,6 +614,7 @@ public class Compilation
     lexp.setCanRead(true);
     if (! usingCPStyle)
       FindCapturedVars.findCapturedVars(lexp);
+    InlineCalls.inlineCalls(lexp);
 
     mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);

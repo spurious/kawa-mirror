@@ -11,4 +11,18 @@ public abstract class Initializer
   public Field field;
 
   public abstract void emit(Compilation comp);
+
+  public static Initializer reverse(Initializer list)
+  {
+    // Algorithm takes from gcc's tree.c.
+    Initializer prev = null;
+    while (list != null)
+      {
+        Initializer next = list.next;
+        list.next = prev;
+        prev = list;
+        list = next;
+      }
+    return prev;
+  }
 }

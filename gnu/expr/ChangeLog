@@ -1,9 +1,19 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* CanInline.java:  New interface.
+	* InlineCalls.java:  New class, extends ExpFullWalker.
+	* Makefile.am (java_JAVA):  Add new classes.
+	* ApplyExp.java (inlineIfConstant):  New utility method.
+	* Compilation.java (<init>):  Call inlineCalls.inlineCalls.
+
+	* Initializer.java (reverse):  New static method.
+
 	* Declaration.java (<init>(String,Field)):  New constructor.
 	(getDeclaration):  Two new static methods.
 
 	* PrimProcedure.java (makeBuiltinBinary):  New static method.
+	(compileArgs):  Update for moved class kawa.standard.list_v
+	-> gnu.kawa.functions.MakeList.
 
 	* SetApplyExp.java (setterProcedure):  Update for moved class
 	kawa.standard.setter -> gnu.kawa.functions.Setter.

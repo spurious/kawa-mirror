@@ -406,4 +406,19 @@ public class ApplyExp extends Expression
     return super.getType();
   }
 
+  public static Expression inlineIfConstant(Procedure proc, ApplyExp exp)
+  {
+    int len = exp.args.length;
+    for (int i = len;  --i >= 0; )
+      {
+	if (! (exp.args[i] instanceof QuoteExp))
+	  return exp;
+      }
+    Object[] vals = new Object[len];
+    for (int i = len;  --i >= 0; )
+      {
+	vals[i] = ((QuoteExp) (exp.args[i])).getValue();
+      }
+    return new QuoteExp(proc.applyN(vals));
+  }
 }

@@ -11,6 +11,7 @@ java_JAVA=\
   BeginExp.java \
   BindingInitializer.java \
   BlockExp.java \
+  CanInline.java \
   CatchClause.java \
   ChainLambdas.java \
   CheckedTarget.java \
@@ -32,6 +33,7 @@ java_JAVA=\
   IgnoreTarget.java \
   Initializer.java \
   Inlineable.java \
+  InlineCalls.java \
   Interpreter.java \
   Keyword.java \
   LambdaExp.java \

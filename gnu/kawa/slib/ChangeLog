@@ -1,3 +1,10 @@
+2003-01-24  Per Bothner  <per@bothner.com>
+
+	* cut.scm:  New file.  Imported implementation of SRFI-26, written
+	by Al Petrofsky and Sebastian Egner.
+	Added moduile-export.
+	* Makefile.am (java_SCM):  Added cut.scm.
+
 2002-11-12  Per Bothner  <per@bothner.com>
 
 	* srfi1.scm: Fix typo - comment start was written with colons.

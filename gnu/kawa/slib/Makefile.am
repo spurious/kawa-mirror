@@ -14,7 +14,7 @@ SERVLET_SCM = HTTP.scm
 endif
 # NOTE if this list is changed, also update build,xml.
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm srfi1.scm readtable.scm \
-  DefineRecordType.scm $(XML_SCM) $(SERVLET_SCM)
+  DefineRecordType.scm cut.scm $(XML_SCM) $(SERVLET_SCM)
 EXTRA_DIST = $(java_SCM) XML.scm HTTP.scm
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 

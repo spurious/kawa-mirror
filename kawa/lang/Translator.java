@@ -124,16 +124,28 @@ public class Translator extends Compilation
 
   private Object nameToLookup;
 
+  /** Check if declaraton is an alias for some other name.
+   * This is needed to chase identifiers renamed for hygienic macro
+   * expansion - see SyntaxRules.expand. */
+  static ReferenceExp getOriginalRef(Declaration decl)
+  {
+    if (decl != null && decl.isAlias() && ! decl.isIndirectBinding())
+      {
+	Expression value = decl.getValue();
+	if (value instanceof ReferenceExp)
+	  return (ReferenceExp) value;
+      }
+    return null;
+  }
+
   /** True iff a form matches a literal symbol. */
   public boolean matches(Object form, String literal)
   {
     if (form instanceof Symbol)
       {
-	// Check for hygiene re-naming - see SyntaxRule.execute_template.
-	Declaration decl = lexical.lookup(form, -1);
-	if (decl != null && decl.isAlias()
-	    && decl.getValue() instanceof ReferenceExp)
-	  form = ((ReferenceExp) decl.getValue()).getSymbol();
+	ReferenceExp rexp = getOriginalRef(lexical.lookup(form, -1));
+	if (rexp != null)
+	  form = rexp.getSymbol();
       }
     return form == literal;
   }
@@ -187,10 +199,9 @@ public class Translator extends Compilation
 	Declaration decl = lexical.lookup(obj, function);
 	if (decl != null)
 	  {
-	    if (decl.isAlias() && decl.getValue() instanceof ReferenceExp)
+	    ReferenceExp rexp = getOriginalRef(decl);
+	    if (rexp != null)
 	      {
-		// Handle hygiene re-naming - see SyntaxRules.java.expand.
-		ReferenceExp rexp = (ReferenceExp) decl.getValue();
 		decl = rexp.getBinding();
 		obj = rexp.getSymbol();
 		nameToLookup = obj;
@@ -392,10 +403,9 @@ public class Translator extends Compilation
 	  {
 	    nameToLookup = decl.getSymbol();
 	    exp = null;
-	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
-	    if (decl.isAlias() && decl.getValue() instanceof ReferenceExp)
+	    ReferenceExp rexp = getOriginalRef(decl);
+	    if (rexp != null)
 	      {
-		ReferenceExp rexp = (ReferenceExp) decl.getValue();
 		decl = rexp.getBinding();
 		if (decl == null)
 		  {

@@ -1,3 +1,11 @@
+2000-02-19  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (runFile):  Catch SyntaxException, and do printAll.
+
+	* kawa/standard/Scheme.java (initSCheme):  Define `emacs'.
+
+	* configure.in:  New substitution variable SWING_SELECTED.
+
 2000-02-12  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme (initScheme):  Define "this" macro.

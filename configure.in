@@ -31,10 +31,17 @@ dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
 
 case ${with_swing} in
-  yes) extra_java='$(java_SWING)' ;;
-  *) extra_java='' ;;
+  yes)
+    extra_java='$(java_SWING)'
+    SWING_SELECTED=WITH_SWING
+    ;;
+  *)
+    extra_java=''
+    SWING_SELECTED=WITHOUT_SWING
+    ;;
 esac
   
+AC_SUBST(SWING_SELECTED)
 AC_SUBST(extra_java)
 AC_SUBST(TOP_BUILDDIR)
 AC_SUBST(CC)

@@ -1105,7 +1105,7 @@ else
   if { (eval echo configure:1106: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; }; then
     for file in conftest.*; do
       case $file in
-      *.c | *.o | *.obj | *.ilk | *.pdb) ;;
+      *.c | *.o | *.obj) ;;
       *) ac_cv_exeext=`echo $file | sed -e s/conftest//` ;;
       esac
     done
@@ -1172,10 +1172,17 @@ JAVAC=${JAVAC-javac}
 TOP_BUILDDIR=`pwd`
 
 case ${with_swing} in
-  yes) extra_java='$(java_SWING)' ;;
-  *) extra_java='' ;;
+  yes)
+    extra_java='$(java_SWING)'
+    SWING_SELECTED=WITH_SWING
+    ;;
+  *)
+    extra_java=''
+    SWING_SELECTED=WITHOUT_SWING
+    ;;
 esac
   
+
 
 
 
@@ -1354,6 +1361,7 @@ s%@EXEEXT@%$EXEEXT%g
 s%@JAVA@%$JAVA%g
 s%@JAVAC@%$JAVAC%g
 s%@kawa_bin@%$kawa_bin%g
+s%@SWING_SELECTED@%$SWING_SELECTED%g
 s%@extra_java@%$extra_java%g
 s%@TOP_BUILDDIR@%$TOP_BUILDDIR%g
 

@@ -63,7 +63,7 @@ public class Keyword extends Object implements Printable, Compilable
 	if (vals[i] == keyword)
 	  return vals[i+1];
       }
-    return null;
+    return Special.dfault;
   }
 
   public String getName() { return name; }

@@ -12,6 +12,7 @@ public class Special extends Object implements Printable, Compilable
   public static Special rest = new Special("#!rest");
   public static Special key = new Special("#!key");
   public static Special eof = new Special("#!eof");
+  public static Special dfault = new Special("#!default");
   // Also:
   // #!void is the same as Values.Empty.
   // #!null is Java null.
@@ -62,6 +63,10 @@ public class Special extends Object implements Printable, Compilable
 			 comp);
     if (this == eof)
       return new Literal(this, thisType.addField("eof", thisType,
+						  Access.PUBLIC|Access.STATIC),
+			 comp);
+    if (this == dfault)
+      return new Literal(this, thisType.addField("dfault", thisType,
 						  Access.PUBLIC|Access.STATIC),
 			 comp);
     return new Literal (this, thisType, comp);

@@ -1,7 +1,12 @@
-(define (set-size win w h)
-  ((primitive-virtual-method <java.awt.Component> "setSize" <void>
-			     (<int> <int>))
-   win w h))
+(define-alias <marker> <gnu.jemacs.buffer.Marker>)
+(define-alias <process> <gnu.jemacs.buffer.ProcessMode>)
+(define-alias <buffer> <gnu.jemacs.buffer.Buffer>)
+(define-alias <window> <gnu.jemacs.buffer.Window>)
+(define-alias <frame> <gnu.jemacs.buffer.Frame>)
+(define-alias <keymap> <javax.swing.text.Keymap>)
+
+(define (set-size (win :: <java.awt.Component>) (w :: <int>) (h :: <int>))
+  (invoke win w h))
 
 ;;; From here on, the functions are ordered as in the Lisp Reference
 ;;; Manual, XEmacs version 21.x.
@@ -11,14 +16,14 @@
 (define (open-output-buffer (buffer <buffer>))
   (make <gnu.jemacs.buffer.BufferWriter> buffer))
 
-(define (open-output-marker (marker <gnu.jemacs.buffer.Marker>))
+(define (open-output-marker (marker <marker>))
   (make <gnu.jemacs.buffer.BufferWriter> marker #f))
 
 ;;; MINIBUFFERS
 
 (define (read-dialog prompt)
   (symbol->string
-   (invoke (as <gnu.jemacs.buffer.Frame> (window-frame)) 'ask prompt)))
+   (invoke (as <frame> (window-frame)) 'ask prompt)))
 
 (define read-from-minibuffer read-dialog)
 
@@ -28,8 +33,33 @@
   (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
                  (as <String> name)))
 
-(define (keymap-name (keymap <javax.swing.text.Keymap>))
+;;(define (set-keymap-name keymap new-name) ...)
+
+(define (keymap-name (keymap <keymap>))
   (invoke keymap 'getName))
+
+(define (set-keymap-parent (keymap  :: <keymap>) parent)
+  (invoke keymap 'setResolveParent (or parent #!null)))
+
+(define (set-keymap-parents (keymap  :: <keymap>) parents)
+  (cond ((null? parents) (invoke keymap 'setResolveParent #!null))
+	((null? (cdr parents)) (invoke keymap 'setResolveParent (car parents)))
+	(else (error "not implemented - more than one keymap parent"))))
+
+(define (keymap-parent (keymap :: <keymap>))
+  (invoke keymap 'getResolveParent))
+
+(define (keymap-parents keymap)
+  (list (keymap-parent keymap)))
+
+(define (set-keymap-default-binding
+	 (keymap :: <keymap>) command)
+  (invoke keymap 'setDefaultAction
+	  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'asAction command)))
+  
+(define (keymap-default-binding (keymap :: <keymap>))
+  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'asNonAction
+		 (invoke keymap 'getDefaultAction)))
 
 (define global-map
   (invoke-static <javax.swing.text.JTextComponent> 'getKeymap
@@ -42,26 +72,23 @@
 (define (current-local-map #!optional (buffer :: <buffer> (current-buffer)))
   (invoke (field buffer 'keymap) 'getLocalKeymap))
 
-(define (use-local-map keymap #!optional (buffer (current-buffer)))
+(define (use-local-map keymap #!optional (buffer :: <buffer> (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "setLocalKeymap"
-                             <void> (<javax.swing.text.Keymap>))
-   ((primitive-get-field <buffer> "keymap"
-                         <gnu.jemacs.buffer.BufferKeymap>)
-    buffer)
+                             <void> (<keymap>))
+   (field buffer 'keymap)
    keymap))
 
-(define (lookup-key keymap keys #!optional accept-defaults)
+(define (lookup-key (keymap :: <keymap>)
+		    (keys :: <gnu.kawa.util.Sequence>)
+		    #!optional (accept-defaults :: <boolean> #f))
   (let ((binding
-         ((primitive-static-method <gnu.jemacs.buffer.BufferKeymap> "lookupKey"
-                                   <object> (<javax.swing.text.Keymap>
-                                             <gnu.kawa.util.Sequence> <boolean>))
-          keymap keys accept-defaults)))
+         (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'lookupKey
+			keymap keys accept-defaults)))
     (if (eq? binding #!null) #f binding)))
 
 (define (define-key keymap key binding)
-  ((primitive-static-method <gnu.jemacs.buffer.BufferKeymap> "defineKey" <void>
-			    (<javax.swing.text.Keymap> <object> <object>))
-   keymap key binding))
+  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'defineKey
+		 keymap key binding))
 
 ;;; MENUS
 
@@ -89,9 +116,7 @@
 
 (define (find-file-noselect
          #!optional (filename (read-from-minibuffer "Find file: ")))
-  ((primitive-static-method <buffer> "findFile"
-                            <buffer> (<String>))
-   filename))
+  (invoke-static <buffer> 'findFile filename))
 
 (define (find-file-other-window
 	 #!optional (filename
@@ -103,10 +128,9 @@
 		     (read-from-minibuffer "Find file in other frame: ")))
   (switch-to-buffer-other-frame (find-file-noselect filename)))
 
-(define (save-buffer #!optional (buffer (current-buffer)))
+(define (save-buffer #!optional (buffer :: <buffer> (current-buffer)))
   (if (buffer-file-name buffer)
-      ((primitive-virtual-method <buffer> "save" <void> ())
-       (current-buffer))
+      (invoke buffer 'save)
       (write-file (read-from-minibuffer "File to save in: ") buffer)))
 
 (define (write-file #!optional (filename (read-from-minibuffer "Write-file: "))
@@ -124,12 +148,12 @@
 
 (define (pop-to-buffer buffer
 		       #!optional not-this-window-p
-		       (on-frame :: <gnu.jemacs.buffer.Frame> #!null))
+		       (on-frame :: <frame> #!null))
   (select-window (display-window buffer not-this-window-p on-frame)))
 
 (define (display-window (buffer :: <buffer>)
 			#!optional not-this-window-p
-			(on-frame :: <gnu.jemacs.buffer.Frame> #!null))
+			(on-frame :: <frame> #!null))
   (invoke buffer 'display not-this-window-p on-frame))
 
 (define (current-buffer)
@@ -186,8 +210,8 @@
 ;;; WINDOWS
 
 (define (split-window #!optional (window (selected-window)) (size -1) (horizontal #f))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "split"
-			     <gnu.jemacs.buffer.Window> (<int> <boolean>))
+  ((primitive-virtual-method <window> "split"
+			     <window> (<int> <boolean>))
    window size horizontal))
 
 (define (split-window-vertically #!optional (arg -1))
@@ -200,31 +224,24 @@
   ; (interactive "P")
   (split-window (selected-window) arg #t))
 
-(define (delete-window #!optional (window (selected-window)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "delete"
-                             <void> ())
-   window))
+(define (delete-window #!optional (window :: <window> (selected-window)))
+  (invoke window 'delete))
 
 (define (delete-other-windows #!optional (window (selected-window)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "deleteOtherWindows"
+  ((primitive-virtual-method <window> "deleteOtherWindows"
                              <void> ())
    window))
 
 (define (selected-window)
-  ((primitive-static-method <gnu.jemacs.buffer.Window> "getSelected"
-			    <gnu.jemacs.buffer.Window> ())))
+  (invoke-static <window> 'getSelected))
 
-(define (select-window window)
-  ((primitive-static-method <gnu.jemacs.buffer.Window> "setSelected"
-			    <void> (<gnu.jemacs.buffer.Window>))
-   window)
+(define (select-window (window :: <window>))
+  (invoke-static <window> 'setSelected window)
   window)
 
 ;; Emacs allows extra options.
-(define (next-window window)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getNextWindowInFrame"
-                             <gnu.jemacs.buffer.Window> (<int>))
-   window 1))
+(define (next-window (window :: <window>))
+  (invoke window 'getNextWindowInFrame 1))
 
 ;; Emacs allows some special values for frame.
 (define (other-window #!optional (count 1) (frame (selected-frame)))
@@ -233,10 +250,8 @@
                               <gnu.jemacs.buffer.Window> (<int>))
     (frame-selected-window frame) count)))
 
-(define (window-buffer #!optional (window (selected-window)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getBuffer"
-			    <buffer> ())
-   window))
+(define (window-buffer #!optional (window :: <window> (selected-window)))
+  (invoke window 'getBuffer))
 
 (define (switch-to-buffer
          #!optional (buffer (read-from-minibuffer "Switch to buffer: ")))
@@ -288,14 +303,12 @@
     (set-menubar default-menubar)
     frame))
 
-(define (delete-frame #!optional (frame (selected-frame)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "delete" <void> ())
-   frame))
+(define (delete-frame #!optional (frame :: <frame> (selected-frame)))
+  (invoke frame 'delete))
 
 ;; Emacs:  frame-live-p
-(define (frame-live? frame)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "isLive" <boolean> ())
-   frame))
+(define (frame-live? (frame :: <frame>))
+  (invoke frame 'isLive))
 
 (define (window-frame #!optional (window (selected-window)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getFrame"
@@ -331,24 +344,20 @@
   (invoke buffer 'setDot (invoke buffer 'positionToOffset position))
   (invoke buffer 'getDot))
 
-(define (forward-char #!optional (count 1) (buffer (current-buffer)))
-  ((primitive-virtual-method <buffer> "forwardChar" <void> (<int>))
-   buffer count))
+(define (forward-char #!optional
+		      (count :: <int> 1) (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'forwardChar count))
 
-(define (backward-char #!optional (count 1) (buffer (current-buffer)))
-  ((primitive-virtual-method <buffer> "backwardChar" <void> (<int>))
-   buffer count))
+(define (backward-char #!optional
+		      (count :: <int> 1) (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'backwardChar count))
 
 (define (point-at-bol
          #!optional
          (n  :: <int> 1)
          (buffer  :: <buffer> (current-buffer)))
   <int>
-  (let* ((orig (point buffer))
-         (shortage (forward-line (- n 1) buffer))
-         (end (point buffer)))
-    (invoke buffer 'setPoint orig)
-    end))
+  (as <int> (invoke buffer 'forwardLine (- n 1) (invoke buffer 'getDot))))
 
 (define (point-at-eol #!optional (count  :: <int> 1)
                       (buffer  :: <buffer> (current-buffer)))
@@ -381,25 +390,7 @@
 (define (forward-line #!optional
                       (count :: <int> 1)
                       (buffer :: <buffer> (current-buffer)))
-  (let* ((content :: <gnu.jemacs.buffer.BufferContent>
-                  (invoke buffer 'getContent))
-         (negp (<= count 0))
-         (pos2 (invoke buffer 'getDot))
-         (pos-shortage
-          (invoke buffer 'scan
-                  #\Newline pos2 0
-                  (- count (if negp 1 0)) #t))
-         (shortage (arithmetic-shift pos-shortage -32))
-         (pos (as <int> pos-shortage)))
-    (if (and (> shortage 0)
-             (or negp
-                 (and (> (invoke buffer 'maxDot) (invoke buffer 'minDot))
-                      (not (= pos pos2))
-                      (not (char=? #\Newline
-                                   (invoke content 'charAt (- pos 1)))))))
-        (set! shortage (- shortage 1)))
-    (invoke buffer 'setDot pos)
-    (if negp (- shortage) shortage)))
+  (invoke buffer 'forwardLine count))
 
 (define (next-line #!optional (count 1) (buffer :: <buffer> (current-buffer)))
   (move-line count))
@@ -427,36 +418,33 @@
 		      (set-buffer save-buffer)
 		      (goto-char save-point save-buffer)))))))
 
+(define (marker? x)
+  (instance? x <marker>))
+
 (define (make-marker)
-  (make <gnu.jemacs.buffer.Marker>))
+  (make <marker>))
 
-(define (point-marker #!optional (share #f) (buffer (current-buffer)))
-  ((primitive-virtual-method <buffer> "getPointMarker"
-                             <gnu.jemacs.buffer.Marker> (<boolean>))
-   buffer share))
+(define (point-marker #!optional
+		      (share :: <boolean> #f)
+		      (buffer :: <buffer> (current-buffer)))
+  <marker>
+  (invoke buffer 'getPointMarker share))
 
+(define (copy-marker position #!optional kind)
+  (let* ((buffer :: <buffer> (if (marker? position) (marker-buffer position) (current-buffer)))
+	 (dot (invoke buffer 'positionToOffset position)))
+    (make <marker> buffer dot (if kind 2 1))))
 
-;; Emacs allows an integer as well as a marker.
-(define (copy-marker (marker <gnu.jemacs.buffer.Marker>))
-  ((primitive-constructor <gnu.jemacs.buffer.Marker> (<gnu.jemacs.buffer.Marker>))
-   marker))
-
-(define (marker-position (marker <gnu.jemacs.buffer.Marker>))
-  (let ((value
-         ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "getPoint" <int> ())
-          marker)))
+(define (marker-position (marker <marker>))
+  (let ((value (invoke marker 'getPoint)))
     (if (= value 0) #f value)))
 
-(define (marker-buffer (marker <gnu.jemacs.buffer.Marker>))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "getBuffer"
-                             <buffer> ())
-   marker))
+(define (marker-buffer (marker <marker>))
+  (invoke marker 'getBuffer))
 
-(define (set-marker (marker <gnu.jemacs.buffer.Marker>) position
+(define (set-marker (marker <marker>) position
                     #!optional (buffer :: <buffer> (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "set" <void>
-                             (<buffer> <int>))
-   marker buffer (invoke buffer 'positionToOffset position)))
+  (invoke marker 'set buffer (invoke buffer 'positionToOffset position)))
 
 ;;; TEXT
 
@@ -562,10 +550,26 @@
 (define repl-map (make-keymap))
 (define-key repl-map "\n" term-send-input)
 
+;;; TELNET
+
+(define (telnet #!optional (host (read-from-minibuffer "Open telnet connecttion to host:"))
+		(port :: <int> 23))
+  (let ((buffer (get-buffer-create "*Telnet*")))
+    (invoke-static <gnu.jemacs.buffer.TelnetMode> 'telnetMode buffer host port)
+    (use-local-map (static-field <process> 'modeMap) buffer)
+    (switch-to-buffer buffer)
+    buffer))    
+
+(define (shell #!optional (cmd "/bin/bash"))
+  (let ((buffer (get-buffer-create "*Shell*")))
+    (invoke-static <gnu.jemacs.buffer.InfProcessMode> 'shellMode buffer cmd)
+    (use-local-map (static-field <process> 'modeMap) buffer)
+    (switch-to-buffer buffer)
+    buffer))    
+
 (define (scheme-swing-window)
   (let ((buffer
-         ((primitive-static-method <gnu.jemacs.buffer.ReplBuffer> "scheme"
-                                   <gnu.jemacs.buffer.ReplBuffer> ()))))
+         (invoke-static <gnu.jemacs.buffer.ReplBuffer> 'scheme)))
     (use-local-map repl-map buffer)
     ; (make-frame buffer)
     (switch-to-buffer buffer)

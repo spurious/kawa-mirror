@@ -1,3 +1,40 @@
+2000-04-14  Per Bothner  <per@bothner.com>
+
+	* BufferWriter.java:  Handle escape sequences.
+	(resetAttributes, updateStyle, getColor, handleSetCharacterRendition,
+	handleOperatingSystemCommand, handleCSICommand, handleEscapeBracket,
+	deleteChars, moveColumns, write1):  New methods.
+	(write):  Re-write to handle escapes state.
+	* InputStreamHandler.java:  New class, extends Thread.
+
+	* BufferKeymap.java (asNonAction):  New method.
+	(lookupKey):  Use asNonAction.
+	(asAction):  New method.
+	(defineKey):  Use asAction.
+	(lookupKey):  Only accept default action if getKeyChar() non-zero.
+	
+	* Marker.java (<init>):  New constructor.
+	(forwardChar, backwardChar, currentColumn, moveToColumn, forwardLine):
+	New methods, based on code in Buffer.java.
+	* Buffer.java (modes):  New field.
+	(forwardChar, backwardChar, moveToColumn):  Call BufferMarker method.
+	(forwardLine):  New method.
+	* emacs.scm (set-keymap-parent, set-keymap-parents, keymap-parent,
+	keymap-parents, set-keymap-default-binding, keymap-default-binding,
+	marker?):  New procedures.
+	(point-at-bol, forward-line):  Re-write to use Buffers's forwardLine.
+
+	* Mode.java:  New class.
+	* ProcessMode.java:  New class - extends Mode.
+	* TelnetMode.java:  New class - extends ProcessMode.
+	* InfProcessMode.java:  New class - extends ProcessMode.
+	* Makefile.am (java_WITH_SWING):  Update with new classes.
+	* emacs.scm (shell, telnet):  New procedures.
+
+	* emacs.scm (<marker>, <process>, <buffer>, <window>, <frame>,
+	<keymap>):  Define as type aliases using define-alias.
+	Use these aliases in rest of file.
+
 2000-03-21  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (charHeight, charWidth):  New fields.

@@ -42,6 +42,9 @@ public class Buffer
   StyledDocument modelineDocument;
   public final BufferKeymap keymap = new BufferKeymap(this);
 
+  /** List of modes active for this buffer, mahor mode first. */
+  Mode modes;
+
   /** Map buffer names to buffer.s */
   public static java.util.Hashtable buffers
   = new java.util.Hashtable(100);
@@ -222,27 +225,12 @@ public class Buffer
 
   public void forwardChar(int i)
   {
-    int point = getDot();
-    int max = maxDot();
-    if (point + i > max)
-      {
-	point = max;
-	Signal.signal("End of buffer");
-      }
-    point += i;
-    setDot(point);
+    pointMarker.forwardChar(i);
   }
 
   public void backwardChar(int i)
   {
-    int point = getDot();
-    if (point < i)
-      {
-	point = 0;
-	Signal.signal("Beginning of buffer");
-      }
-    point -= i;
-    setDot(point);
+    pointMarker.backwardChar(i);
   }
 
   public String toString()
@@ -451,39 +439,9 @@ public class Buffer
     return column;
   }
 
-  // force is currently ignored FIXME
   public int moveToColumn(int column, boolean force)
   { 
-    int lineStart = lineStartOffset(getDot());
-    BufferReader port
-      = new BufferReader(this, lineStart, maxDot() - lineStart);
-    int resultColumn = 0;
-    int offset = lineStart;
-    for (;;)
-      {
-	int ch = port.read();
-	if (ch < 0 || ch == '\n')
-	  {
-	    if (force)
-	      {
-		// FIXME
-	      }
-	    break;
-	  }
-	int width = charWidth((char) ch, resultColumn);
-	offset++;
-	resultColumn += width;
-	if (resultColumn >= column)
-	  {
-	    if (resultColumn > column && force)
-	      {
-		// FIXME
-	      }
-	    break;
-	  }
-      }
-    setDot(offset);
-    return resultColumn;
+    return pointMarker.moveToColumn(column, force);
   }
 
   public int lineStartOffset(int offset)
@@ -518,6 +476,34 @@ public class Buffer
     if (end == 0)
       end = count > 0 ? content.length() - 1 : 0;
     return content.scan(target, start, end, count, allowQuit);
+  }
+
+  
+  /** Find the position a give number of lines forward or backward.
+   * A side-effect-free version of Emacs's forward-line function.
+   * @param lines number of lines forward (or backward if negative)
+   * @param start initial position (buffer offset)
+   * @return (SHORTAGE<<32|POS)
+   */
+  public final long forwardLine(int lines, int start)
+  {
+    boolean neg = lines <= 0;
+    long scanned = scan('\n', start, 0, lines - (neg ? 1 : 0), true);
+    int shortage = (int) (scanned >> 32);
+    int pos = (int) scanned;
+    if (shortage > 0
+	&& (neg
+	    || (maxDot() > minDot() && pos != start
+		&& content.charAt(pos - 1) != '\n')))
+      shortage--;
+    return ((long) (neg ? -shortage : shortage) << 32) | (long) pos;
+  }
+
+  public int forwardLine(int lines)
+  {
+    long value = forwardLine(lines, getDot());
+    setDot((int) value);
+    return (int) (value >> 32);
   }
 
   public Window display(boolean notThisWindow, Frame frame)

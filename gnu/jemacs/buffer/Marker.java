@@ -29,6 +29,12 @@ public final class Marker implements Position
       }
   }
 
+  public Marker (Buffer buffer, int offset, int kind)
+  {
+    this.buffer = buffer;
+    this.index = buffer.content.allocatePosition(offset, kind);
+  }
+
   public void finalize()
   {
     if (buffer != null)
@@ -193,6 +199,136 @@ public final class Marker implements Position
       }
     setDot(point);
   }
+
+  public void forwardChar(int i)
+  {
+    int point = getOffset();
+    int max = buffer.maxDot();
+    if (point + i > max)
+      {
+	point = max;
+	Signal.signal("End of buffer");
+      }
+    point += i;
+    setDot(point);
+  }
+
+  public void backwardChar(int i)
+  {
+    int point = getOffset();
+    if (point < i)
+      {
+	point = 0;
+	Signal.signal("Beginning of buffer");
+      }
+    point -= i;
+    setDot(point);
+  }
+
+  public int currentColumn()
+  {
+    return buffer.currentColumn(getOffset());
+  }
+
+  // force is currently ignored FIXME
+  public int moveToColumn(int column, boolean force)
+  { 
+    int lineStart = buffer.lineStartOffset(getOffset());
+    BufferReader port
+      = new BufferReader(buffer, lineStart, buffer.maxDot() - lineStart);
+    int resultColumn = 0;
+    int offset = lineStart;
+    for (;;)
+      {
+	int ch = port.read();
+	if (ch < 0 || ch == '\n')
+	  {
+	    if (force)
+	      {
+		// FIXME
+	      }
+	    break;
+	  }
+	int width = buffer.charWidth((char) ch, resultColumn);
+	offset++;
+	resultColumn += width;
+	if (resultColumn >= column)
+	  {
+	    if (resultColumn > column && force)
+	      {
+		// FIXME
+	      }
+	    break;
+	  }
+      }
+    setDot(offset);
+    return resultColumn;
+  }
+
+  public int forwardLine(int lines)
+  {
+    long value = buffer.forwardLine(lines, getOffset());
+    setDot((int) value);
+    return (int) (value >> 32);
+  }
+
+  /** Move to start of frame line COUNTs down.
+   * Assume window width is WIDTH.
+   * If LINES is negative, this is moving up. */
+
+  /*
+  public int verticalMotion(int count, int width)
+  {
+    if (count == 0)
+      {
+	moveToColumn ((currentColumn() / width) * width, false);
+	return 0;
+      }
+    if (count > 0)
+      {
+	int todo = count + currentColumn() / width;
+	endOfLine();
+	// The loop iterates over buffer lines;
+	// H is the number of screen lines in the current line, i.e.
+	// the ceiling of dividing the buffer line width by width.
+	for (;;)
+	  {
+	    int h = (currentColumn() + width - 1) / width;
+	    if (h <= 0) h = 1;
+	    if (h > todo)
+	      break;
+	    if (eobp())
+	      break;
+	    todo -= h;
+	    forwardChar(1);  // move past '\n'.
+	    endOfLine();  // and on to the end of the next line.
+	  }
+	if (todo >= h && todo > 0)
+	  return count - todo + h - 1; // Hit end of buffer.
+      }
+    else // count > 0 -- Similar algorithm, but for upward motion.
+      {
+	int todo = - count;
+	for (;;)
+	  {
+	    int h = (currentColumn() + width - 1) / width;
+	    if (h <= 0) h = 1;
+	    if (h > todo)
+	      break;
+	    beginningOfLine();
+	    if (bobp())
+	      break;
+	    todo -= h;
+	    backwardChar(1); // Move to end of previous line
+	  }
+	if (todo >= h && todo > 0)
+	  return count + todo - 1 + h; // Hit beginning of buffer.
+	todo = h - todo - 1;
+      }
+    moveToColumn(todo * width, false);
+    return count;
+  }
+  */
 
   public int hashCode()
   {

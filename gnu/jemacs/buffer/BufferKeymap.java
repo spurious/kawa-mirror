@@ -100,6 +100,14 @@ public class BufferKeymap implements javax.swing.text.Keymap
         prefixKeys[i] = asKeyStroke(enumKeys.nextElement());
       }
     Action action = lookupKey(keymap, prefixKeys, nKeys, null, acceptDefaults);
+    return asNonAction(action);
+  }
+
+  /**
+   * Inverse of asAction method.
+   */
+  public static Object asNonAction(Action action)
+  {
     if (action instanceof PrefixAction)
       return ((PrefixAction) action).getKeymap();
     if (action instanceof Command)
@@ -109,6 +117,20 @@ public class BufferKeymap implements javax.swing.text.Keymap
     if (action instanceof TooLongAction)
       return IntNum.make(((TooLongAction) action).getMaxValid());
     return action;
+  }
+
+  /**
+   * Convert a "command" to action.
+   */
+  public static Action asAction(Object binding)
+  {
+    if (binding instanceof Procedure)
+      return new Command((Procedure) binding);
+    if (binding instanceof String)
+      return new Command(binding, (String) binding);
+    if (binding instanceof Keymap)
+      return new PrefixAction(null, (Keymap) binding);
+    return (Action) binding;
   }
 
   public static Action lookupKey(Keymap keymap,
@@ -126,7 +148,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
         i++;
         if (action == null)
           {
-            if (acceptDefaults)
+            if (acceptDefaults && key_i.getKeyChar() != 0)
               return keymap.getDefaultAction();
             return action;
           }
@@ -146,7 +168,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
         Action action = lookupKey(actual, pendingKeys, pendingLength,
                                   key, j < activeLength - 1);
         if (action != null)
-          return action;
+	  return action;
       }
     return null;
   }
@@ -261,12 +283,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
   public static void defineKey(javax.swing.text.Keymap keymap,
 			       Object keySpec, Object binding)
   {
-    if (binding instanceof Procedure)
-      binding = new Command((Procedure) binding);
-    else if (binding instanceof String)
-      binding = new Command(binding, (String) binding);
-    else if (binding instanceof Keymap)
-      binding = new PrefixAction(null, (Keymap) binding);
+    Action action = (Action) asAction(binding);
     KeyStroke key;
     if (keySpec instanceof Sequence && ! (keySpec instanceof LList))
       {
@@ -301,7 +318,6 @@ public class BufferKeymap implements javax.swing.text.Keymap
       }
     else
       key = asKeyStroke(keySpec);
-    keymap.addActionForKeyStroke(key,
-				 (javax.swing.Action) binding);
+    keymap.addActionForKeyStroke(key, action);
   }
 }

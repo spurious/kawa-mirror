@@ -7,6 +7,11 @@ import java.io.*;
 
 class repl
 {
+  public static String prompt = "kawa>";
+  public static String compilationDirectory = null;
+  public static String compilationTopname = null;
+  public static String compilationPrefix = null;
+
   static void bad_option (String str)
   {
     System.err.println ("bad option " + str);
@@ -56,8 +61,49 @@ class repl
 	  {
 	    iArg++;
 	    setArgs (args, iArg);
-	    Shell.run (InPort.inDefault (), env, true, true);
+	    Shell.run (InPort.inDefault (), env, prompt, true);
 	    return;
+	  }
+	else if (args[iArg].equals ("-d"))
+	  {
+	    iArg++;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    compilationDirectory = args[iArg];
+	  }
+	else if (args[iArg].equals ("-P"))
+	  {
+	    iArg++;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    compilationPrefix = args[iArg];
+	  }
+	else if (args[iArg].equals ("-T"))
+	  {
+	    iArg++;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    compilationTopname = args[iArg];
+	  }
+	else if (args[iArg].equals ("-C"))
+	  {
+	    iArg++;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    try
+	      {
+		if (CompileFile.compile_to_files(args[iArg],
+						 compilationDirectory,
+						 compilationPrefix,
+						 compilationTopname))
+		  System.exit(-1);
+	      }
+	    catch (GenericError ex)
+	      {
+		System.err.println(ex.getMessage ());
+		System.exit(-1);
+	      }
+	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
 	  bad_option (arg);
@@ -75,7 +121,7 @@ class repl
     else
       {
 	setArgs (args, iArg);
-	Shell.run (InPort.inDefault (), env, true, true);
+	Shell.run (InPort.inDefault (), env, prompt, true);
       }
    }
 }

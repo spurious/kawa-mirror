@@ -8,28 +8,27 @@ import java.io.*;
 public class Shell
 {
   public static void run (InPort inp, Environment env,
-			  boolean pflag, boolean dflag)
+			  String prompt, boolean dflag)
   {
     Translator tr = new Translator (env);
     java.io.PrintStream pout = OutPort.outDefault();
     java.io.PrintStream perr = OutPort.errDefault();
-    boolean prompt = pflag;
     boolean display = dflag;
 
     for (;;)
       {
 	try
 	  {
-            if (prompt)
+            if (prompt != null)
 	      {
-		pout.print("kawa>");
+		pout.print(prompt);
 		pout.flush();
 	      }
 
 	    Object sexp = inp.readSchemeObject ();
 	    if (sexp == Sequence.eofValue)
 	      {
-		if (prompt)
+		if (prompt != null)
 		  pout.println ();
 		return;
 	      }
@@ -96,7 +95,7 @@ public class Shell
   public static void runString (String str, Environment env, boolean dflag)
   {
     InPort str_port = call_with_input_string.open_input_string (str);
-    run (str_port, env, false, dflag);
+    run (str_port, env, null, dflag);
   }
 
   public static void runFile (String fname)

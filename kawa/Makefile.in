@@ -82,7 +82,7 @@ default: all
 
 
 $(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
+	cd $(top_srcdir) && automake --strictness=foreign $(subdir)/Makefile
 
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -131,7 +131,7 @@ uninstall-javaDATA:
 @SET_MAKE@
 
 all-recursive install-data-recursive install-exec-recursive \
-installdirs-recursive install-recursive uninstall-recursive install-info-recursive \
+installdirs-recursive install-recursive uninstall-recursive  \
 check-recursive installcheck-recursive info-recursive dvi-recursive \
 mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
@@ -172,7 +172,7 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = kawa
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
@@ -190,7 +190,6 @@ dvi: dvi-recursive
 check: all-am
 	$(MAKE) check-recursive
 installcheck: installcheck-recursive
-install-info: install-info-recursive
 all-am: $(SCRIPTS) $(DATA) Makefile
 
 install-exec-am: install-binSCRIPTS
@@ -260,14 +259,18 @@ all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info dvi check \
-installcheck install-info all-am install-exec-am install-data-am \
-uninstall-am install-exec install-data install uninstall all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
+installcheck all-am install-exec-am install-data-am uninstall-am \
+install-exec install-data install uninstall all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
 	$(JAVAC) -d .. $<
+
+# This redundant rule is needed for some versions of make, but not GNU make.
+repl.class:  $(srcdir)/repl.java
+	$(JAVAC) -d . $<
 
 kawa$(BAT):
 	echo '#!/bin/sh' >tmp
@@ -280,6 +283,10 @@ kawa$(BAT):
 	mv tmp kawa$(BAT)
 
 all: $(OBJ) kawa
+
+# Forve repl.class to be built before sub-dirs.
+# Specifically, lib needs repl to compile scm files.
+all-recursive:  repl.class
 .SUFFIXES:
 .SUFFIXES: .java .class
 

@@ -17,6 +17,10 @@ JAVAC = javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 .java.class:
 	$(JAVAC) -d .. $<
 
+# This redundant rule is needed for some versions of make, but not GNU make.
+repl.class:  $(srcdir)/repl.java
+	$(JAVAC) -d . $<
+
 javadir=$(prefix)/java/$(subdir)
 
 OBJ = Shell.class repl.class
@@ -40,5 +44,6 @@ kawa$(BAT):
 
 all: $(OBJ) kawa
 
-
-
+# Forve repl.class to be built before sub-dirs.
+# Specifically, lib needs repl to compile scm files.
+all-recursive:  repl.class

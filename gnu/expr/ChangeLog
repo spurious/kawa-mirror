@@ -1,3 +1,7 @@
+2004-06-27  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkReferenceExp):  Check for '<classname>'.
+
 2004-06-21  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (getCompiledClassType):  Method body moved to ...

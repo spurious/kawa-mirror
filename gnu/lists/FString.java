@@ -167,6 +167,11 @@ implements CharSeq, Externalizable, Consumable
       dst.append(data, srcBegin, srcEnd - srcBegin);
   }
 
+  public void getChars (StringBuffer dst)
+  {
+    dst.append(data, 0, size);
+  }
+
   /** Return a char[] contain the characters of this string.
    * It is unspecified if the result is a copy or shares with this FString.
    */

@@ -22,7 +22,7 @@ public class GapVector extends AbstractSequence implements Sequence
 
   public int size()
   {
-    return base.getBufferLength() - (gapEnd - gapStart);
+    return base.size - (gapEnd - gapStart);
   }
 
   public boolean hasNext(int ipos)
@@ -30,7 +30,7 @@ public class GapVector extends AbstractSequence implements Sequence
     int index = ipos >>> 1;
     if (index >= gapStart)
       index += gapEnd - gapStart;
-    return index < base.getBufferLength();
+    return index < base.size;
   }
 
   public int getNextKind(int ipos)
@@ -56,7 +56,7 @@ public class GapVector extends AbstractSequence implements Sequence
 
   public void fill (Object value)
   {
-    base.fill(gapEnd, base.getBufferLength(), value);
+    base.fill(gapEnd, base.size, value);
     base.fill(0, gapStart, value);
   }
 
@@ -87,14 +87,14 @@ public class GapVector extends AbstractSequence implements Sequence
   {
     if (size > gapEnd - gapStart)
       {
-	int oldLength = base.getBufferLength();
+	int oldLength = base.size;
         int newLength = oldLength < 16 ? 16 : 2 * oldLength;
 	int minLength = oldLength - (gapEnd - gapStart) + size;
 	if (newLength < minLength)
 	  newLength = minLength;
 	// FIXME  this does unneeded copying.
 	// It may also leave unwanted junk in the gap (gap for gc).
-	base.setBufferLength(newLength);
+	base.setSize(newLength);
 	int newGapEnd = newLength - oldLength + gapEnd;
 	base.shift(gapEnd, newGapEnd, oldLength - gapEnd);
 	gapEnd = newGapEnd;
@@ -169,7 +169,7 @@ public class GapVector extends AbstractSequence implements Sequence
 
   protected int nextIndex(int ipos)
   {
-    int index = ipos == -1 ? base.getBufferLength() : ipos >>> 1;
+    int index = ipos == -1 ? base.size : ipos >>> 1;
     if (index > gapStart)
       index -= gapEnd - gapStart;
     return index;

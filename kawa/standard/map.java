@@ -166,7 +166,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
 	compArgs[0] = new ReferenceExp(largs[i]);
 	compArgs[1] = empty;
 	lexp.body = new IfExp(new ApplyExp(isEq, compArgs),
-			      lexp.body, QuoteExp.voidExp);
+			      QuoteExp.voidExp, lexp.body);
 	initArgs[i] = args[i+1];
       }
 

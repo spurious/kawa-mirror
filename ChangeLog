@@ -1,3 +1,9 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline):  Swap order of then-clause and
+	else-clause in generated code.  Fixes bug 'for-each does not compile
+	in CVS tree' reported by Emmanuel Castro <castro@lirmm.fr>.
+
 2000-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (map, forEach):  New fields.

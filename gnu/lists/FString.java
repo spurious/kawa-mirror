@@ -202,6 +202,33 @@ implements CharSeq, Externalizable, Consumable
     return new FString(copy);
   }
 
+  /** Append all the characters of another <code>FString</code>. */
+  public boolean addAll(FString s)
+  {
+    int newSize = size + s.size;
+    if (data.length < newSize)
+      setBufferLength(newSize);
+    System.arraycopy(s.data, 0, data, size, s.size);
+    size = newSize;
+    return s.size > 0;
+  }
+    
+  /** Append arguments to this FString.
+   * Used to implement Scheme's string-append and string-append/shared.
+   * @param args an array of FString value
+   * @param startIndex index of first string in <code>args</code> to use
+   */
+  public void addAllStrings(Object[] args, int startIndex)
+  {
+    int total = size;
+    for (int i = startIndex; i < args.length; ++i)
+      total += ((FString) args[i]).size;
+    setBufferLength(total);
+    
+    for (int i = startIndex; i < args.length; ++i)
+      addAll((FString) args[i]);
+  }
+  
   public String toString ()
   {
     return new String (data, 0, size);

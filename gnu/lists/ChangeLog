@@ -1,3 +1,9 @@
+2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* FString.java (addAll): New method to add an FString directly.
+	* FString.java (addAllStrings): New method to add an array of
+	FStrings. 
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* SeqPosition.java (toString):  Rename to toInfo, and add new toString.

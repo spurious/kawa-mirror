@@ -2,7 +2,7 @@ SUFFIXES = .java .class .scm .el .lisp
 
 javadir=$(datadir)/java/$(subdir)
 JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@$$CLASSPATH
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@conf_classpath@@pathsep@$$CLASSPATH
 JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
@@ -15,7 +15,6 @@ ENABLE_GCJ_COMPILED = $(EXTRA_GCJ_COMPILED) $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 java_Java= $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 SOURCES = $(java_sources) $(java_SCM)
-DIST_SOURCES = $(SOURCES)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
 clean:
 	rm -f $(CLEANFILES)

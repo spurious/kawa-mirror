@@ -1,3 +1,13 @@
+2004-08-09  Per Bothner  <per@bothner.com>
+
+	* Make-rules (DIST_SOURCES):  Remove unused macro.
+
+	* configure.in:  Replace --enable-servlet by --with-servlet[=jar].
+	Default enable_servlet from with_servlet.
+	(conf_classpath):  New variable, set from --with-servlet.
+	Use AC_HELP_STRING.
+	* Make-rules (CLASSPATH_ENV):  Use autoconf variable @conf_classpath@.
+
 2004-08-08  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Don't set decl if no uri.

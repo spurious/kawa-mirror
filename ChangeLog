@@ -1,3 +1,13 @@
+Fri Feb  6 17:17:17 1998  Per Bothner  <bothner@cygnus.com>
+
+	* */Makefile.am, */Makefile.in (javadir):  Change from $(prefix)/java
+	to $(datadir)/java.  More compatible with GNU standards and Linux FHS.
+	* kawa/Makefile.am (kawa#(BAT)):  Update KAWALIB location accordingly.
+	* kawa/Makefile.am (CLEANFILES):  Use *.class instead of $(OBJ).
+
+	* kawa/standard/Scheme.java:  Add scheme-window procedure.
+	* kawa/repl.java (main):  Add -w flag (creates new GuiConsole).
+
 Tue Feb  3 12:57:50 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in, configure:  Set version to 1.5.95.

@@ -23,7 +23,7 @@ public class Symbol extends Binding2
   public static boolean isSymbol(Object val)
   {
     return val instanceof String || val == ELisp.FALSE
-      || val instanceof Symbol2;
+      || val instanceof Binding2;
   }
 
   public static boolean isBound(Object sym)

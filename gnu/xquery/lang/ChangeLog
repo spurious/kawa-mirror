@@ -1,5 +1,11 @@
 2003-12-25  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseRelativePathExpr, parseFLWRExpression):  last(),
+	position() and and 'for' 'at' index should be LangPrimType.intType,
+	so arithmetic works as it should.
+
+2003-12-25  Per Bothner  <per@bothner.com>
+
 	Handle namespace declaration attributes.
 	* XQResolveNames.java:  New class, extends gnu.expr.ResolveNames.
 	* Makefile.am (java_sources):  Add XQResolveNames.java.

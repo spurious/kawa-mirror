@@ -1461,8 +1461,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	Declaration dotDecl = lexp.addDeclaration(DOT_VARNAME);
 	dotDecl.setFlag(Declaration.IS_SINGLE_VALUE);
 	dotDecl.noteValue (null);  // Does not have a known value.
-	lexp.addDeclaration(POSITION_VARNAME, Type.int_type);
-	lexp.addDeclaration(LAST_VARNAME, Type.int_type);
+	lexp.addDeclaration(POSITION_VARNAME, LangPrimType.intType);
+	lexp.addDeclaration(LAST_VARNAME, LangPrimType.intType);
 	parser.push(lexp);
 	if (descendants)
 	  {
@@ -2605,7 +2605,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (posDecl != null)
       {
 	sc.addDeclaration(posDecl);
-	posDecl.setType(Type.int_type);
+	posDecl.setType(LangPrimType.intType);
 	posDecl.noteValue(null);
 	posDecl.setFlag(Declaration.IS_SINGLE_VALUE);
       }

@@ -214,20 +214,6 @@ public class OutPort extends PrintConsumer implements Printable
     write (i);
   }
 
-  public void writeSchemeObject (Object obj, boolean readable)
-  {
-    boolean saveReadable = printReadable;
-    try
-      {
-	printReadable = readable;
-	SFormat.print (obj, this);
-      }
-    finally
-      {
-	printReadable = saveReadable;
-      }
-  }
-
   //  java.text.FieldPosition fieldPosition;
 
   /** If non-null, use this to print numbers. */

@@ -149,7 +149,7 @@ public class Symbol extends Location implements Externalizable
     if (isBound())
       {
 	ps.print(" -> ");
-	SFormat.print(get(), ps);
+	ps.print(get());
       }
     else
       ps.print("(unbound)");

@@ -127,8 +127,8 @@ public class Values extends TreeList implements Printable, Externalizable
     ps.print("#<values");
     for (int i = 0; i < size; i++)
       {
-	ps.print (" ");
-	SFormat.print (vals[i], ps);
+	ps.print(" ");
+	ps.print(vals[i]);
       }
     ps.print (">");
   }

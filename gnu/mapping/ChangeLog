@@ -1,3 +1,13 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* SFormat.java (print):  Remove formatting.  Instead just indircet
+	to DisplayMethod's writeObject.
+	(format):  Remove usused method.
+	(printReadable): Inline into print and remove.
+	* OutPort.java (writeSchemeObject):  Remove no-longer-used method.
+	* Symbol.java (print):  Don't use SFormat.
+	* Values.java (print):  Likewise.
+
 2003-03-15  Per Bothner  <per@bothner.com>
 
 	* Symbol.java:  Reduce set of inconsistent 'make' overloadings to one.

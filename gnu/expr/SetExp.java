@@ -95,14 +95,15 @@ public class SetExp extends Expression
 	  }
 	else if (binding.isSimple ())
 	  {
-	    new_value.compile (comp, Target.pushObject);
+	    new_value.compile (comp, binding.getType());
 	    code.emitStore(binding);
 	  }
 	else
 	  {
 	    binding.loadOwningObject(comp);
-	    new_value.compile (comp, Target.pushObject);
-	    code.emitPutField(binding.field);
+	    Field field = binding.field;
+	    new_value.compile (comp, field.getType());
+	    code.emitPutField(field);
 	  }
       }
     else

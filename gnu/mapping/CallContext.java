@@ -19,6 +19,9 @@ public class CallContext // implements Runnable
 
   Environment curEnvironment;
 
+  public final Environment getEnvironmentRaw() { return curEnvironment; }
+  public final void setEnvironmentRaw(Environment env) { curEnvironment = env;}
+
   public final Environment getEnvironment()
   {
     if (curEnvironment == null)

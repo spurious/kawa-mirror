@@ -1,5 +1,7 @@
 2005-03-29  Per Bothner  <per@bothner.com>
 
+	* CallContext.java (getEnvironmentRaw, setEnvironmentRaw): New methods.
+
 	* SimpleEnvironment.java (redefinedError): Extend error message.
 
 	* WrappedException.java (<init>): Use to-string to get default message;

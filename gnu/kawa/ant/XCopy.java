@@ -19,6 +19,13 @@ public class XCopy extends Copy
       return stripper;
    }
    
+   public LineCommenterSet createLineCommenterSet()
+   {
+      LineCommenterSet stripper = new LineCommenterSet();
+      getFilterSets().addElement(stripper);
+      return stripper;
+   }
+   
    public void setDataOnly(final boolean f)
    {
       dataOnly = f;

@@ -2,7 +2,7 @@
 
 # These Java sources are not built or used when using configure+make, only
 # when using Ant - but they still should go into the distribution tar file.
-EXTRA_DIST = LineStripperSet.java XCopy.java Makefile.am
+EXTRA_DIST = LineStripperSet.java LineCommenterSet.java XCopy.java Makefile.am
 CLEANFILES = $(top_builddir)/tools/$(subdir)/*.class
 
 all:

@@ -1,3 +1,13 @@
+2003-05-03  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST):  Add LineCommenterSet.java.
+
+2003-04-29  Jim White  <jim@pagesmiths.com>
+
+	Support for JAVA1 <-> JAVA2 source conversion.
+	* LineCommenterSet.java:  New class, extends FilterSet.
+	* XCopy.java (createLineCommenterSet):  New method.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (AUTOMAKE_OPTIONS):  No longer foreign.

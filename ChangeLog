@@ -1,3 +1,42 @@
+Sun Jun 28 23:07:49 1998  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in:  Set version to 1.6.53.
+	(AC_OUTPUT):  Add gnu/text/Makefile.
+
+	* kawa/lang/ApplyExp.java (compile):  Fix incorrect implementation
+	of tail-recursion.  Use CodeAttr.emitTailCall.
+	* kawa/lang/LambdaExp.java (start_label):  Removed - no longer needed.
+	* kawa/lang/Compilation.java (addClass):  Don't set lexp.start_label.
+
+	* kawa/lang/Char.java:  Add some extra named characters.
+	(toScmReadableString):  New method.  May emit octal form.
+	(print):  Use toScmReadableString.
+	* kawa/lang/FString.java (makeUpperCase, makeLowerCase,
+	makeCapitalize):  New methods.
+
+	* kawa/lang/Special.java (dfault):  New static.
+	* kawa/lang/Keyword.java (searchForKeyword):  If no match, return
+	Special.dfault, not null, to allow #!null as a default.
+	* kawa/lang/Compilation.java (addClass):  Update for new default
+	return value of searchForKeyword (Special.dfault).
+	
+	* kawa/lang/LambdaExp.java (<init>):  Set file name.
+	* kawa/lang/{Lexer.java, LineBufferedReader.java, SourceError.java,
+	SyntaxException.java}:  Moved to gnu.text package.
+	* kawa/Shell.java, kawa/lang/{CompileFile,InPort,Interpreter}.java,
+	kawa/standard/read.java:  Update because of moved classes.
+	* kawa/lang/{Makefile.am/Makefile.in}:  Update accordingly.
+	* kawa/lang/PairWithPosition.java (<init>):  Use LineBufferedReader.
+	* kawa/lang/ScmRead.java (readCharacter):  Support octal notation.
+	(readSpecial):  Read #!default as Special.dfault.
+	Add some casts to (InPort) to get readState.  Yuck.
+
+	* kawa/standard/LispFormat.java:  New class - Common Lisp-style format.
+	* kawa/standard/ObjectFormat.java:  New - plain Object formatting.
+	* kawa/standard/ParseFormat.java:  New Procedure1.
+	* kawa/standard/Makefile.am, Makefile.in:  Update for new classes.
+	* kawa/standard/Scheme.java:  Update for new procedures.
+
 Sun May 24 13:13:52 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.6.52.

@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.52)
+AM_INIT_AUTOMAKE(kawa, 1.6.53)
 
 AM_MAINTAINER_MODE
 AM_EXEEXT
@@ -23,6 +23,6 @@ AC_SUBST(TOP_BUILDDIR)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
-  gnu/ecmascript/Makefile
+  gnu/text/Makefile gnu/ecmascript/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile)

@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  BooleanValue.java \
   Children.java \
   Compare.java \
   IntegerRange.java \

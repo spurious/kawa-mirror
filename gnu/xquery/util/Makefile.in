@@ -152,6 +152,7 @@ DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' \
 
 
 java_sources = \
+  BooleanValue.java \
   Children.java \
   Compare.java \
   IntegerRange.java \

@@ -130,18 +130,17 @@ public class StandardInterpreter extends Interpreter
       define_proc ("abs", "kawa.standard.abs");
 
       //-- Section 6.6
-      proc = new kawa.standard.char_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.char_equal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.char_less_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.char_less_equal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.char_greater_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.char_greater_equal_p();
-      define(proc.name,proc);
+      define_proc ("char?", "kawa.standard.char_p");
+      define_proc ("char=?", "kawa.standard.char_equal_p");
+      define_proc ("char<?", "kawa.standard.char_less_p");
+      define_proc ("char>?", "kawa.standard.char_greater_p");
+      define_proc ("char<=?", "kawa.standard.char_less_equal_p");
+      define_proc ("char>=?", "kawa.standard.char_greater_equal_p");
+      define_proc ("char-ci=?", "kawa.standard.char_ci_equal_p");
+      define_proc ("char-ci<?", "kawa.standard.char_ci_less_p");
+      define_proc ("char-ci>?", "kawa.standard.char_ci_greater_p");
+      define_proc ("char-ci<=?", "kawa.standard.char_ci_less_equal_p");
+      define_proc ("char-ci>=?", "kawa.standard.char_ci_greater_equal_p");
       
       //-- Section 6.7
       proc = new kawa.standard.string_p();
@@ -208,9 +207,16 @@ public class StandardInterpreter extends Interpreter
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
 
       //-- Section 6.10
+      define_proc ("input-port?", "kawa.standard.input_port_p.java");
+      define_proc ("output-port?", "kawa.standard.output_port_p.java");
+      define_proc ("open-input-file", "kawa.standard.open_input_file");
+      define_proc ("open-output-file", "kawa.standard.open_output_file");
+      define_proc ("close-input-port", "kawa.standard.close_input_port");
+      define_proc ("close-output-port", "kawa.standard.close_output_port");
       define_proc ("read", "kawa.standard.read");
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
+      define_proc ("eof-object?", "kawa.standard.eof_object_p");
       define_proc (new write(true));       // write
       define_proc (new write(false));      // display
       define_proc ("write-char", "kawa.standard.writechar");

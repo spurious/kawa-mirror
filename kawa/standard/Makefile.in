@@ -120,6 +120,11 @@ char_less_p.class \
 char_less_equal_p.class \
 char_greater_p.class \
 char_greater_equal_p.class \
+char_ci_equal_p.class \
+char_ci_less_p.class \
+char_ci_less_equal_p.class \
+char_ci_greater_p.class \
+char_ci_greater_equal_p.class \
 string_p.class \
 make_string.class \
 string.class \
@@ -157,6 +162,12 @@ eof_object_p.class \
 write.class \
 newline.class \
 writechar.class \
+input_port_p.class \
+output_port_p.class \
+open_input_file.class \
+open_output_file.class \
+close_input_port.class \
+close_output_port.class \
 load.class \
 procedure_p.class \
 apply.class \

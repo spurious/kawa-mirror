@@ -35,9 +35,9 @@ public class PairPat extends Pattern implements Printable, Compilable
   public void print(java.io.PrintStream ps)
   {
     ps.print ("#<pair-pattern car: ");
-    kawa.lang.print.print (car, ps);
+    SFormat.print (car, ps);
     ps.print (" cdr: ");
-    kawa.lang.print.print (cdr, ps);
+    SFormat.print (cdr, ps);
     ps.print ('>');
   }
 

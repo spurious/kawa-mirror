@@ -105,7 +105,7 @@ public class SyntaxRule implements Compilable
 	  {
 	    int lit_num = (ch - FIRST_LITERALS) >> 1;
 	    ps.print (" - literal[" + lit_num + "]: ");
-	    kawa.lang.print.print (literal_values [lit_num], ps);
+	    SFormat.print (literal_values [lit_num], ps);
 	    ps.println ();
 	  }
 	else
@@ -247,7 +247,7 @@ public class SyntaxRule implements Compilable
 	Object expansion = execute_template (0, vars, 0, indexes, interp);
 	/* DEBUGGING:
 	System.err.print ("{Expanded macro: ");
-	kawa.lang.print.print (expansion, System.err);
+	SFormat.print (expansion, System.err);
 	System.err.println ('}');
 	*/
 	Expression exp = interp.rewrite (expansion);

@@ -36,7 +36,7 @@ public class Promise implements Printable
       ps.print (" - not forced yet>");
     else
       {
-	print.print (result, ps);
+	SFormat.print (result, ps);
 	ps.print ('>');
       }
   }

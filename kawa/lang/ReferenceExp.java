@@ -88,7 +88,7 @@ public class ReferenceExp extends Expression
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%ref ");
-    kawa.lang.print.print (symbol, ps);
+    SFormat.print (symbol, ps);
     ps.print(")");
   }
 }

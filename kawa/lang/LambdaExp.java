@@ -227,7 +227,7 @@ public class LambdaExp extends ScopeExp
 	  {
 	    /* DEBUGGING:
 	    System.err.print ("literal["+literal.index+"]=");
-	    print.print (literal.value, System.err);
+	    SFormat.print (literal.value, System.err);
 	    System.err.println();
 	    */
 	    literals[literal.index] = literal.value;

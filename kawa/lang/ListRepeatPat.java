@@ -21,7 +21,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
   public void print(java.io.PrintStream ps)
   {
     ps.print ("#<list-repeat-pattern ");
-    kawa.lang.print.print (element_pattern, ps);
+    SFormat.print (element_pattern, ps);
     ps.print ('>');
   }
 
@@ -31,7 +31,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
       System.err.print ("(match ");
       print (System.err);
       System.err.print (" on ");
-      kawa.lang.print.print (obj, System.err);
+      SFormat.print (obj, System.err);
       System.err.print (")\n");
       */
     int length = List.list_length (obj);
@@ -47,9 +47,9 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
 	Pair pair = (Pair) obj;
 	/* DEBUGGING
 	   System.err.print ("(sub-match ["+j+"] ");
-	   kawa.lang.print.print (element_pattern, System.err);
+	   SFormat.print (element_pattern, System.err);
 	   System.err.print (" on ");
-	   kawa.lang.print.print (pair.car, System.err);
+	   SFormat.print (pair.car, System.err);
 	   */
 
 	if (element_pattern.match (pair.car, element_vars, 0) < 0)

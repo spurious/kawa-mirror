@@ -204,7 +204,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	      {
 		if (j > 0)  System.err.print ("; ");
 		System.err.print (j + ": ");
-		kawa.lang.print.print (vars[j], System.err);
+		SFormat.print (vars[j], System.err);
 	      }
 	    System.err.println ('}');
 	    */

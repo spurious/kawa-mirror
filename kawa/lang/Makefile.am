@@ -55,7 +55,7 @@ List.class \
 Pair.class \
 PairWithPosition.class \
 FString.class \
-print.class \
+SFormat.class \
 Symbol.class \
 Vector.class \
 Undefined.class \

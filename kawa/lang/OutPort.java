@@ -117,7 +117,7 @@ public class OutPort extends PrintStream implements Printable
     try
       {
 	printReadable = readable;
-	kawa.lang.print.print (obj, this);
+	SFormat.print (obj, this);
       }
     finally
       {

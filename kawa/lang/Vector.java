@@ -107,7 +107,7 @@ public class Vector extends Sequence implements Printable, Compilable
       {
 	if (t!=0)
 	  ps.print(" ");
-	kawa.lang.print.print (value[t], ps);
+	SFormat.print (value[t], ps);
       }
     ps.print(")");
   }

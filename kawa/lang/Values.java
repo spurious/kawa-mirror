@@ -36,7 +36,7 @@ public class Values implements Printable
     for (int i = 0; i < size; i++)
       {
 	ps.print (" ");
-	kawa.lang.print.print (vals[i], ps);
+	SFormat.print (vals[i], ps);
       }
     ps.print (">");
   }

@@ -28,7 +28,7 @@ public class QuoteExp extends Expression
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%quote ");
-    kawa.lang.print.print (value, ps);
+    SFormat.print (value, ps);
     ps.print(")");
   }
 }

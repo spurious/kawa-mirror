@@ -108,7 +108,7 @@ public class SetExp extends Expression
   public void print (java.io.PrintStream ps)
   {
     ps.print(isDefining () ? "(#%define " : "(#%set! ");
-    kawa.lang.print.print (name, ps);
+    SFormat.print (name, ps);
     ps.print(" ");
     new_value.print (ps);
     ps.print(")");

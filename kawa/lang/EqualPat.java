@@ -26,7 +26,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
   public void print(java.io.PrintStream ps)
   {
     ps.print ("#<match equal");
-    kawa.lang.print.print (value, ps);
+    SFormat.print (value, ps);
     ps.print ('>');
   }
 

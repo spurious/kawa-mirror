@@ -105,7 +105,7 @@ public class Pair extends List implements Printable, Compilable
   {
     for (;;)
       {
-	kawa.lang.print.print (p.car, ps);
+	SFormat.print (p.car, ps);
 	Object cdr = p.cdr;
 	if (cdr == null || cdr == List.Empty)
 	  break;
@@ -117,7 +117,7 @@ public class Pair extends List implements Printable, Compilable
 	else
 	  {
 	    ps.print(" . ");
-	    kawa.lang.print.print (cdr, ps);
+	    SFormat.print (cdr, ps);
 	    break;
 	  }
       }

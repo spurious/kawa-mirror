@@ -1,4 +1,4 @@
-(test-init "numbers" 1656)
+(test-init "numbers" 1661)
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -150,3 +150,20 @@
 (set! v (vector 1 0.5 5/2 8 2.5))
 (java.util.Collections:sort v)
 (test #(0.5 1 5/2 2.5 8) 'sort-v-3 v)
+(set! v #("abc" "aa" "zy" ""))
+(java.util.Collections:sort v)
+(test #("" "aa" "abc" "zy") 'sort-v-4 v)
+(set! v #f32(1.2 -1.2 8.9 100.0 8.9))
+(java.util.Collections:sort v)
+(test #f32(-1.2 1.2 8.9 8.9 100.0) 'sort-v-5 v)
+(set! v #(#s64(3 5) #s64(3 4 5) #s64(-1) #s64(-5)
+	  #s64(-1 20) #s64() #s64(-1 10)))
+(java.util.Collections:sort v)
+(test #(#s64() #s64(-5) #s64(-1) #s64(-1 10) #s64(-1 20) #s64(3 4 5) #s64(3 5))
+      'sort-v-6 v)
+(set! v '("abc" "aa" "zy" ""))
+(java.util.Collections:sort v)
+(test '("" "aa" "abc" "zy") 'sort-v-7 v)
+(set! v #((b 3) (a 1) (b 2) (a 2) (b -1) (a)))
+(java.util.Collections:sort v)
+(test #((a) (a 1) (a 2) (b -1) (b 2) (b 3)) 'sort-v-8 v)

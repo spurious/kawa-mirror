@@ -39,7 +39,7 @@ java_SCM = emacs.scm
 EXTRA_DIST = emacs.scm $(java_WITH_SWING) package.html
 GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
 GCJ_DEPS = $(java_WITH_SWING) scm-classes.stamp
-PACKAGE_CFNAME = gnu-jemacs-buffer
+PACKAGE_FNAME = gnu-jemacs-buffer
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 WITH_SWING: java-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -162,7 +162,6 @@ public final class Marker extends SeqPosition implements Position
       {
 	try
 	  {
-	    System.err.println("insertStr '"+ch+"' point:"+point);
 	    buffer.insertString(point, str, style);
 	  }
 	catch (javax.swing.text.BadLocationException ex)

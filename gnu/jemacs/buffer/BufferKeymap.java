@@ -6,6 +6,7 @@ import javax.swing.text.*;
 import gnu.lists.*;
 import gnu.text.Char;
 import java.awt.event.KeyEvent;
+import gnu.mapping.Binding;
 
 /** This manages the keymaps active for a given buffer.
  *
@@ -154,8 +155,8 @@ public class BufferKeymap implements javax.swing.text.Keymap
   {
     if (binding instanceof Procedure)
       return new Command((Procedure) binding, key);
-    if (binding instanceof String)
-      return new Command(binding, (String) binding, key);
+    if (binding instanceof String || binding instanceof Binding)
+      return new Command(binding, binding.toString(), key);
     if (binding instanceof Keymap)
       return new Command((Keymap) binding, key);
     return (Action) binding;
@@ -264,7 +265,6 @@ public class BufferKeymap implements javax.swing.text.Keymap
         i++;
         if (action == null)
           {
-	    System.err.println("lookupKey no match "+toString(key)+" ignoreable?"+ignorable(key));
             if (ignorable(key))
               return IgnoreAction.getInstance();
             else
@@ -277,9 +277,8 @@ public class BufferKeymap implements javax.swing.text.Keymap
 	  comm = ((Command) action).getCommand();
 	else
 	  comm = null;
-	if (comm instanceof String)
+	if (comm instanceof String || comm instanceof Binding)
 	  comm = Command.resolveSymbol(comm);
-	System.err.println("lookupKey "+toString(key)+" > "+comm);
 	if (comm instanceof Keymap)
 	  keymap = (Keymap) comm;
 	else
@@ -379,13 +378,16 @@ public class BufferKeymap implements javax.swing.text.Keymap
 	  key = pair.car;
 	else
 	  {
-	    if (pair.car == "control")
+	    Object car = pair.car;
+	    if (car instanceof Binding)
+	      car = car.toString();
+	    if (car == "control")
 	      m |= CTRL_MASK;
-	    if (pair.car == "meta")
+	    if (car == "meta")
 	      m |= META_MASK;
-	    if (pair.car == "shift")
+	    if (car == "shift")
 	      m |= SHIFT_MASK;
-	    if (pair.car == "alt")
+	    if (car == "alt")
 	      m |= ALT_MASK;
 	    key = pair.cdr;
 	  }
@@ -398,9 +400,9 @@ public class BufferKeymap implements javax.swing.text.Keymap
       {
 	return asKeyStroke((char) ((IntNum) key).intValue(), m);
       }
-    if (key instanceof String)
+    if (key instanceof String || key instanceof Binding)
       {
-	String name = (String) key;
+	String name = key.toString();
 	if (name.length() == 1)
 	  {
 	    char ch = name.charAt(0);

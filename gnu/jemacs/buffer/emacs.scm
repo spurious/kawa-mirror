@@ -151,12 +151,12 @@
 ;;; BUFFERS
 
 (define (pop-to-buffer buffer
-		       #!optional not-this-window-p
+		       #!optional (not-this-window-p :: <boolean>)
 		       (on-frame :: <frame> #!null))
   (select-window (display-window buffer not-this-window-p on-frame)))
 
 (define (display-window (buffer :: <buffer>)
-			#!optional not-this-window-p
+			#!optional (not-this-window-p :: <boolean>)
 			(on-frame :: <frame> #!null))
   (invoke buffer 'display not-this-window-p on-frame))
 
@@ -211,7 +211,7 @@
 
 ;;; WINDOWS
 
-(define (split-window #!optional (window (selected-window)) (size -1) (horizontal #f))
+(define (split-window #!optional (window :: <window> (selected-window)) (size :: <int> -1) (horizontal ::  <boolean> #f))
   ((primitive-virtual-method <window> "split"
 			     <window> (<int> <boolean>))
    window size horizontal))
@@ -485,8 +485,8 @@
 (define (current-column #!optional (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'currentColumn))
 
-(define (move-to-column column
-			#!optional force (buffer :: <buffer> (current-buffer)))
+(define (move-to-column (column :: <int>)
+			#!optional (force :: <boolean>) (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'moveToColumn column force))
 
 ;;; PROCESSES

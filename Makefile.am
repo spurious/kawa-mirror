@@ -6,15 +6,15 @@ SUBDIRS = codegen kawa
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 MAKEINFO=makeinfo
+JAVAC=javac -classpath .:$(srcdir):$$CLASSPATH
 
 .java.class:
-	cd $(srcdir); $(JAVAC) $(<F)
+	$(JAVAC) -d . $<
 
 # This redundant rule is needed for some versions of make, but not GNU make.
 kawac.class:  $(srcdir)/kawac.java
-	cd $(srcdir); $(JAVAC) kawac.java
+	$(JAVAC) -d . $<
 
 kawa.txt:  $(srcdir)/kawa.texi
 	$(MAKEINFO) --no-split --no-headers --paragraph-indent=asis $< -o - \

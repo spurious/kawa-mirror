@@ -30,6 +30,8 @@ extends
   /** Special magic end-of-file marker. */
   public static final Object eofValue = new String[] { "(EOF)" };
 
+  public boolean isEmpty();
+
   /** See java.util.List. */
   public int size();
 
@@ -39,5 +41,33 @@ extends
   public void fill(Object value);
 
   public java.util.Enumeration elements();
-  
+
+  public static final int EOF_VALUE = 0;
+  public static final int PRIM_VALUE = 16;
+  public static final int INT_U8_VALUE = PRIM_VALUE + 1;
+  public static final int INT_S8_VALUE = PRIM_VALUE + 2;
+  public static final int INT_U16_VALUE = PRIM_VALUE + 3;
+  public static final int INT_S16_VALUE = PRIM_VALUE + 4;
+  public static final int INT_U32_VALUE = PRIM_VALUE + 5;
+  public static final int INT_S32_VALUE = PRIM_VALUE + 6;
+  public static final int INT_U64_VALUE = PRIM_VALUE + 7;
+  public static final int INT_S64_VALUE = PRIM_VALUE + 8;
+
+  public static final int FLOAT_VALUE = PRIM_VALUE + 9;
+  public static final int DOUBLE_VALUE = PRIM_VALUE + 10;
+  public static final int BOOLEAN_VALUE = PRIM_VALUE + 11;
+  /** A byte in an encoded string.
+   * Part of a char, in contrast with INT_S8_VALUE, which is an integer. */
+  public static final int TEXT_BYTE_VALUE = PRIM_VALUE + 12;
+  public static final int CHAR_VALUE = PRIM_VALUE + 13;
+  public static final int OBJECT_VALUE = 32;
+  public static final int GROUP_VALUE = 33;
+  /*
+  public static final int ATTRIBUTE_VALUE = 16;
+  public static final int NAMESPACE_ATTRIBUTE_VALUE = 16;
+  public static final int COMMENT_VALUE = 16;
+  public static final int DOCUMENT_VALUE = 16;
+  public static final int PROCESSING_INSTRUCTION_VALUE = 16;
+  public static final int ENTITY_REFERENCE_VALUE = 16;
+  */
 }

@@ -4,14 +4,16 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .scm .class
 
-JAVA=java -classpath ../..:$$CLASSPATH
+JAVA = java
+JAVAFLAGS = -classpath ../..:$$CLASSPATH
+
 JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 .java.class:
 	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	$(JAVA) kawac -d ../.. $< $(subdir).
+	$(JAVA) $(JAVAFLAGS) kawac -d ../.. $< $(subdir).
 
 javadir=$(prefix)/java/$(subdir)
 

@@ -2,6 +2,7 @@
 
 	* Compilation.java (error):  New methods, like those in Translator.
 	(addClass):  Use new ApplyExp constructor.
+	(scmPatternType):  Removed - no longer needed.
 	* ApplyExp.java (<init>):  New constructor.
 	(compile):  Use new Compilation.error methods.
 

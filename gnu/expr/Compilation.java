@@ -55,7 +55,6 @@ public class Compilation
   static public ClassType scmListType = ClassType.make("kawa.lang.List");
   static public ClassType scmPairType = ClassType.make("kawa.lang.Pair");
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
-  static public ClassType scmPatternType = ClassType.make("kawa.lang.Pattern");
   public static final ArrayType objArrayType = new ArrayType (scmObjectType);
   public static final ArrayType symbolArrayType = new ArrayType(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");

@@ -98,6 +98,11 @@ jemacs-@JEMACS_VERSION@.jar:
 	      `find . -name '*.class' -print` \
 	  && cd .. && rm -rf tmpdir
 
+bytecode-@BYTECODE_VERSION@.jar: ./gnu/bytecode/java-classes.stamp
+	$(JAR) cmf $(srcdir)/gnu/bytecode/jar-manifest \
+	  bytecode-@BYTECODE_VERSION@.jar \
+	  `find gnu/bytecode -name '*.class' -print` 
+
 kawa-@VERSION@-src.zip: kawa-@VERSION@.tar.gz
 	mkdir zip-temp
 	cd zip-temp ;\
@@ -109,6 +114,7 @@ kawa-compiled.zip: kawa-@VERSION@-compiled.zip
 kawa.jar: kawa-@VERSION@.jar
 kawa-src.zip: kawa-@VERSION@-src.zip
 jemacs.jar: jemacs-@JEMACS_VERSION@.jar
+bytecode.jar: bytecode-@BYTECODE_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
@@ -161,10 +167,22 @@ install-jar:
 	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
 	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
 
+install-bytecode-jar: bytecode-@BYTECODE_VERSION@.jar
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	$(INSTALL_DATA) bytecode-@BYTECODE_VERSION@.jar \
+	  $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar
+	cd $(DESTDIR)$(javadir) && rm -f bytecode.jar \
+	  && $(LN_S) bytecode-@BYTECODE_VERSION@.jar bytecode.jar
+
 uninstall-local: uninstall-jar
 uninstall-jar:
 	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
 	  $(DESTDIR)$(javadir)/kawa.jar
+
+uninstall-bytecode-jar:
+	rm -f $(DESTDIR)$(javadir)/bytecode-@BYTECODE_VERSION@.jar \
+	  $(DESTDIR)$(javadir)/bytecode.jar
 
 kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
 	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/kawa/Version.java.in >$@
@@ -212,4 +230,4 @@ select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	echo 5 >$(srcdir)/selected-java-source
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
-  kawa-@VERSION@-src.zip jemacs.jar
+  kawa-@VERSION@-src.zip jemacs-@JEMACS_VERSION@.jar bytecode-@BYTECODE_VERSION@.jar

@@ -13,7 +13,8 @@ kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
 kawa-@VERSION@-compiled.jar:
-	$(JAR) cf $@ gnu/*/*.class gnu/*/*/*.class kawa/*.class kawa/*/*.class
+	$(JAR) cmf $(srcdir)/jar-manifest $@ \
+	  gnu/*/*.class gnu/*/*/*.class kawa/*.class kawa/*/*.class
 
 kawa-compiled.zip: kawa-@VERSION@-compiled.zip
 kawa-compiled.jar: kawa-@VERSION@-compiled.jar
@@ -37,7 +38,7 @@ install-javadoc-html:
 	rm -rf $(JAVADOC_DIR)
 	-mkdir $(JAVADOC_DIR)
 	cd $(top_srcdir) && $(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
-	echo "Now also copy over the COPYING files!"
+	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt

@@ -8,9 +8,15 @@ import gnu.expr.*;
 
 public class let_syntax extends Syntax implements Printable
 {
+  boolean recursive;
+
+  public let_syntax(boolean recursive)
+  {
+    this.recursive = recursive;
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
-    System.err.println("expand let-syntax");
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing let-syntax arguments");
     Pair pair = (Pair) obj;
@@ -18,6 +24,7 @@ public class let_syntax extends Syntax implements Printable
     Object body = pair.cdr;
     int decl_count = List.length (bindings);
     Expression[] inits = new Expression[decl_count];
+    Macro[] decls = new Macro[decl_count];
     LetExp let = new LetExp (inits);
     for (int i = 0; i < decl_count; i++)
       {
@@ -30,21 +37,23 @@ public class let_syntax extends Syntax implements Printable
 	String name = (String) binding.car;
 	if (! (binding.cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for `"+name+"'");
-	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
-	Object init;
-	if (binding.cdr == List.Empty)
-	  {
-	    init = binding.car;
-	  }
-	else
+	if (binding.cdr != List.Empty)
 	  return tr.syntaxError("let binding for `"+name+"' is improper list");
-	inits[i] = tr.rewrite (init);
-	decl.noteValue (inits[i]);
+        decls[i] = new Macro(name, binding.car);
+        let.addDeclaration(decls[i]);
+	inits[i] = QuoteExp.nullExp;
 	bindings = bind_pair.cdr;
-        System.err.println("do let-syntax "+decl);
       }
-    tr.push(let);
+    if (recursive)
+      tr.push(let);
+    for (int i = 0; i < decl_count; i++)   
+      {
+        inits[i] = tr.rewrite(decls[i].transformer);
+        decls[i].noteValue(inits[i]);
+      }
+    if (! recursive)
+      tr.push(let);
     Expression result = tr.rewrite_body(body);
     tr.pop(let);
     return result;

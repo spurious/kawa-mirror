@@ -18,15 +18,15 @@ public class define_syntax extends Syntax
     Expression rule = tr.rewrite(pair.car);
 
     // Add rule to translation environment.
-    tr.addGlobal(name, new DefMacro(rule));
+    tr.addGlobal(name, new Macro(name, rule));
     // Add rule to execution environment.
     Expression args[] = new Expression[2];
     args[0] = new QuoteExp(name);
     args[1] = rule;
-    Method makeDefMacro = DefMacro.getMakeMethod();
+    Method makeMacro = Macro.getMakeMethod();
     SetExp result
       = new SetExp (name,
-                    new ApplyExp(new QuoteExp(new PrimProcedure(makeDefMacro)),
+                    new ApplyExp(new QuoteExp(new PrimProcedure(makeMacro)),
                                  args));
     result.setDefining (true);
     return result;

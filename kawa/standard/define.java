@@ -48,23 +48,18 @@ public class define extends Syntax implements Printable
       }
     if (name == null)
       return tr.syntaxError ("invalid syntax for define");
-    if (tr.currentScope() instanceof ModuleExp)
-      {
-	SetExp result = new SetExp (name, value);
-	result.setDefining (true);
-	return result;
-      }
-    else
+    SetExp sexp = new SetExp (name, value);
+    sexp.setDefining (true);
+    if (! (tr.currentScope() instanceof ModuleExp))
       {
 	Object binding = tr.current_decls.get (name);
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.
 	if (binding == null || binding instanceof String)
 	  return tr.syntaxError ("invalid use of define");
-	SetExp sexp = new SetExp (name, value);
 	sexp.binding = (Declaration) binding;
 	sexp.binding.noteValue (value);
-	return sexp;
       }
+    return sexp;
   }
 }

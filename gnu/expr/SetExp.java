@@ -67,11 +67,6 @@ public class SetExp extends Expression
     this.binding = decl;
     name = decl.getName();
     new_value = val;
-
-    if ("%do%loop".equals(decl.getName())
-	&& val instanceof LambdaExp
-	&& ! Compilation.usingCPStyle())
-      ((LambdaExp) val).setInlineOnly(true);
   }
 
   public Object eval (Environment env)

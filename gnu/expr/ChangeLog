@@ -1,3 +1,11 @@
+2001-03-09  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (<init>):  Add a debugging hook.
+
+	* PushApply.java (walkApplyExp):  Add walkChildren call.
+
+	* SetExp.java (<init>):  Remove "%do%loop" kludge; hopefully unneeded.
+
 2001-03-06  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java	(compile):  When calling an inlined function,

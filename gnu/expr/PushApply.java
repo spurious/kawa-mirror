@@ -39,6 +39,7 @@ public class PushApply extends ExpWalker
 	stmts[last_index] = exp;
 	return begin.walk(this);
       }
+    exp.walkChildren(this);
     return exp;
   }
 }

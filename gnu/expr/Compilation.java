@@ -614,8 +614,15 @@ public class Compilation
     mainClass = new ClassType(classname);
     mainLambda = lexp;
 
-    // Do various code re-writes and optimization.
+    /* DEBUGGING:
+    OutPort perr = OutPort.errDefault();
+    perr.println ("[Expression after parsing:");
+    lexp.print (perr);
+    perr.println();
+    perr.flush();
+    */
 
+    // Do various code re-writes and optimization.
     PushApply.pushApply(lexp);
     InlineCalls.inlineCalls(lexp);
     ChainLambdas.chainLambdas(lexp, this);

@@ -69,7 +69,6 @@ call_with_values.java \
 make_quantity.java quantity2number.java quantity2unit.java \
 make_future.java sleep.java \
 try_catch.java try_finally.java synchronizd.java \
-convert.java \
 make.java location.java \
 define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \

@@ -1,5 +1,12 @@
 2001-11-24  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/convert.java:  Moved to gnu.kawa.functions.Convert.
+	* kawa/standard/Makefile.am:  Update accordingly
+	* kawa/standard/Scheme.java (initScheme):  Likewise.
+
+	* kawa/standard/Scheme.java (getTypeFor):  Map "java.lang.String"
+	to Type.tostring_type, for convenience.
+
 	* kawa/standard/map.java:  The makeGetField helper methods was moved
 	from Expression to SlotGet.
 	* kawa/lang/Lambda.java: makeCoercion moved from Expression to Convert.

@@ -464,7 +464,7 @@ public class Scheme extends LispInterpreter
       define_proc("throw", "kawa.standard.throw_name");
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.misc");
-      define_proc("as", kawa.standard.convert.as);
+      define_proc("as", gnu.kawa.functions.Convert.as);
       define_field("instance?", "kawa.standard.Scheme", "instanceOf");
       define_syntax("synchronized", "kawa.standard.synchronizd");
       object objectSyntax = new kawa.standard.object(lambda);
@@ -923,8 +923,11 @@ public class Scheme extends LispInterpreter
 
   public Type getTypeFor (Class clas)
   {
+    String name = clas.getName();
     if (clas.isPrimitive())
-      return getNamedType(clas.getName());
+      return getNamedType(name);
+    if ("java.lang.String".equals(name))
+      return Type.tostring_type;
     return Type.make(clas);
   }
 

@@ -1,7 +1,12 @@
-Changes from Kawa 1.6.92 to 1.6.94.
+Changes from Kawa 1.6.94 to 1.6.95.
 ==================================
 A new language "xquery" implements a (so far small subset of) XQuery,
 the draft XML Query languaage.
+
+Various internal (Java API) changes:  Changes to gnu.expr.Interpreter
+to make it easier to add non-Lisp-like languages;  gnu.lists.Consumer
+now has an endAttribute method that need to be called after each
+attribute, rather than endAttributes that was called after all of them.
 
 If configured with --with-gcj, Kawa builds and intalls a 'gckawa' script
 to simlify linking with needed libraries.

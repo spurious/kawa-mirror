@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
 import gnu.expr.*;
-import gnu.kawa.util.Char;
+import gnu.text.Char;
 
 /** Use to implement some special types that convert differently. */
 
@@ -67,7 +67,7 @@ public class SpecialType extends gnu.bytecode.PrimType
       case 'C':
 	// We handle char specially, because Kawa does not use standard
 	// java.lang.Character type.
-	ClassType scmCharType = ClassType.make("gnu.kawa.util.Char");
+	ClassType scmCharType = ClassType.make("gnu.text.Char");
 	Method charValueMethod = scmCharType.getDeclaredMethod("charValue", 0);
 	code.emitCheckcast(scmCharType);
 	code.emitInvokeVirtual(charValueMethod);
@@ -116,7 +116,7 @@ public class SpecialType extends gnu.bytecode.PrimType
 	code.emitFi();
 	break;
       case 'C':
-	ClassType scmCharType = ClassType.make("gnu.kawa.util.Char");
+	ClassType scmCharType = ClassType.make("gnu.text.Char");
 	Method makeCharMethod = scmCharType.getDeclaredMethod("make", 1);
 	code.emitInvokeStatic(makeCharMethod);
 	break;

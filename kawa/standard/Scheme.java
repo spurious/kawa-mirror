@@ -930,7 +930,7 @@ public class Scheme extends LispInterpreter
       {
 	t = string2Type(name.substring(0, name.length()-2));
 	if (t != null)
-	  t = gnu.bytecode.ArrayType.make(t);
+	  t = ArrayType.make(t);
       }
     else
       t = getNamedType (name);

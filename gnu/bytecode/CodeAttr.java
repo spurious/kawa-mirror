@@ -491,6 +491,13 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.pointer_type);
   }
 
+  public final void emitPushThis()
+  {
+    reserve(1);
+    put1(42);  // aload_0
+    pushType(getMethod().getDeclaringClass());
+  }
+
   void emitNewArray (int type_code)
   {
     reserve(2);
@@ -673,6 +680,51 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitFieldop(field, 181);  // putfield
   }
 
+  public void emitInvokeMethod (Method method, int opcode)
+  {
+    reserve(opcode == 185 ? 5 : 3);
+    int arg_count = method.arg_types.length;
+    boolean is_invokestatic = opcode == 184;
+    if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
+      throw new Error
+	("emitInvokeXxx static flag mis-match method.flags="+method.access_flags);
+    if (!is_invokestatic)
+      arg_count++;
+    put1(opcode);  // invokevirtual, invokespecial, or invokestatic
+    putIndex2(getConstants().addMethodRef(method));
+    if (opcode == 185)  // invokeinterface
+      {
+	put1(arg_count);
+	put1(0);
+      }
+    while (--arg_count >= 0)
+      popType();
+    if (method.return_type != Type.void_type)
+      pushType(method.return_type);
+  }
+
+  /** Compile a virtual method call.
+   * The stack contains the 'this' object, followed by the arguments in order.
+   * @param method the method to invoke virtually
+   */
+  public void emitInvokeVirtual (Method method)
+  {
+    emitInvokeMethod(method, 182);  // invokevirtual
+  }
+
+  public void emitInvokeSpecial (Method method)
+  {
+    emitInvokeMethod(method, 183);  // invokespecial
+  }
+
+  /** Compile a static method call.
+   * The stack contains the the arguments in order.
+   * @param method the static method to invoke
+   */
+  public void emitInvokeStatic (Method method)
+  {
+    emitInvokeMethod(method, 184);  // invokestatic
+  }
 
   final void emitTransfer (Label label, int opcode)
   {
@@ -711,6 +763,96 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     emitGoto(label, 167);
     unreachable_here = true;
+  }
+
+  //public final void compile_goto_ifeq (Label label, boolean invert)
+  public final void emitGotoIfEq (Label label, boolean invert)
+  {
+    Type type2 = popType().promote();
+    Type type1 = popType().promote();
+    reserve(4);
+    int opcode;
+    if (type1 == Type.int_type && type2 == Type.int_type)
+      opcode = 159;  // if_cmpeq (inverted: if_icmpne)
+    else if (type1 == Type.long_type && type2 == Type.long_type)
+      {
+	put1(148);   // lcmp
+	opcode = 153;  // ifeq (inverted: ifeq)
+      }
+    else if (type1 == Type.float_type && type2 == Type.float_type)
+      {
+	put1(149);   // fcmpl
+	opcode = 153;  // ifeq (inverted: ifeq)
+      }
+    else if (type1 == Type.double_type && type2 == Type.double_type)
+      {
+	put1(149);   // fcmpl
+	opcode = 153;  // ifeq (inverted: ifeq)
+      }
+    else if (type1.getSignature().length() == 1
+	     || type2.getSignature().length() == 1)
+      throw new Error ("non-matching types to compile_goto_ifeq");
+    else
+      opcode = 165;  // if_acmpeq (inverted: if_acmpne)
+    if (invert)
+      opcode++;
+    emitTransfer (label, opcode);
+  }
+
+  /** Compile a conditional transfer if 2 top stack elements are equal. */
+  public final void emitGotoIfEq (Label label)
+  {
+    emitGotoIfEq(label, false);
+  }
+
+  /** Compile conditional transfer if 2 top stack elements are not equal. */
+  public final void emitGotoIfNE (Label label)
+  {
+    emitGotoIfEq(label, true);
+  }
+
+  /** Compile start of a conditional:  if (!(x OPCODE 0)) ...
+   * The value of x must already have been pushed. */
+  public final void emitGotoIf (int opcode)
+  {
+    IfState new_if = new IfState(this);
+    popType();
+    reserve(3);
+    emitTransfer (new_if.end_label, opcode);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of conditional:  if (x != 0) */
+  public final void emitIfIntNotZero()
+  {
+    emitGotoIf(153); // ifeq
+  }
+
+  /** Compile start of a conditional:  if (!(x OPCODE y)) ...
+   * The value of x and y must already have been pushed. */
+  public final void emitIfIntCompare(int opcode)
+  {
+    IfState new_if = new IfState(this);
+    popType();
+    popType();
+    reserve(3);
+    emitTransfer(new_if.end_label, opcode);
+    new_if.start_stack_size = SP;
+  }
+
+  /* Compile start of a conditional:  if (x < y) ... */
+  public final void emitIfIntLt()
+  {
+    emitIfIntCompare(162);  // if_icmpge
+  }
+
+  /** Compile start of a conditional:  if (x != y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfNEq ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfEq(new_if.end_label);
+    new_if.start_stack_size = SP;
   }
 
   public void emitRet (Variable var)
@@ -785,11 +927,85 @@ public class CodeAttr extends Attribute implements AttrContainer
     if_stack = if_stack.previous;
   }
 
-  public void emitCheckcast (Type type)
+  /**
+   * Convert the element on top of the stack to requested type
+   */
+  public final void emitConvert (Type type) {
+    Type from = popType();
+    pushType(from);
+    emitConvert(from, type);
+  }
+
+  public final void emitConvert (Type from, Type to)
+  {
+    String to_sig = to.getSignature();
+    String from_sig = from.getSignature();
+    int op = -1;
+    if (to_sig.length() == 1 || from_sig.length() == 1)
+      {
+	char to_sig0 = to_sig.charAt(0);
+	char from_sig0 = to_sig.charAt(0);
+	if (from.size < 4)
+	  from_sig0 = 'I';
+	if (to.size < 4)
+	  {
+	    emitConvert(from, Type.int_type);
+	    from_sig0 = 'I';
+	  }
+	if (from_sig0 == to_sig0)
+	  return;
+	switch (from_sig0)
+	  {
+	  case 'I':
+	    switch (to_sig0)
+	      {
+	        case 'B':  op = 145;  break;  // i2b
+	        case 'C':  op = 146;  break;  // i2c
+	        case 'S':  op = 147;  break;  // i2s
+		case 'J':  op = 133;  break;  // i2l
+		case 'F':  op = 134;  break;  // i2f
+		case 'D':  op = 135;  break;  // i2d
+	      }
+	    break;
+	  case 'J':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 136;  break;  // l2i
+		case 'F':  op = 137;  break;  // l2f
+		case 'D':  op = 138;  break;  // l2d
+	      }
+	    break;
+	  case 'F':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 139;  break;  // f2i
+		case 'J':  op = 140;  break;  // f2l
+		case 'D':  op = 141;  break;  // f2d
+	      }
+	    break;
+	  case 'D':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 142;  break;  // d2i
+		case 'J':  op = 143;  break;  // d2l
+		case 'F':  op = 144;  break;  // d2f
+	      }
+	    break;
+	  }
+      }
+    if (op < 0)
+      throw new Error ("unsupported Method.compile_convert");
+    reserve(1);
+    popType();
+    put1(op);
+    pushType(to);
+  }
+
+  private void emitCheckcast (Type type, int opcode)
   {
     reserve(3);
     popType();
-    put1(192);  // checkcast
+    put1(opcode);
     if (type instanceof ArrayType)
       {
 	ArrayType atype = (ArrayType) type;
@@ -801,8 +1017,19 @@ public class CodeAttr extends Attribute implements AttrContainer
 	putIndex2(getConstants().addClass((ClassType) type));
       }
     else
-      throw new Error ("unimplemented type in compile_checkcast");
+      throw new Error ("unimplemented type in emitCheckcast/emitInstanceof");
+  } 
+
+  public void emitCheckcast (Type type)
+  {
+    emitCheckcast(type, 192);
     pushType(type);
+  }
+
+  public void emitInstanceof (Type type)
+  {
+    emitCheckcast(type, 193);
+    pushType(Type.boolean_type);
   }
 
   public final void emitThrow ()

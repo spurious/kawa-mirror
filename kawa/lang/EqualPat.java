@@ -1,8 +1,4 @@
 package kawa.lang;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
@@ -11,7 +7,7 @@ import java.io.*;
  * A pattern that requires an exact match (using equal?).
  */
 
-public class EqualPat extends Pattern implements Printable, Compilable, Externalizable
+public class EqualPat extends Pattern implements Printable, Externalizable
 {
 
   Object value;
@@ -47,30 +43,5 @@ public class EqualPat extends Pattern implements Printable, Compilable, External
     throws IOException, ClassNotFoundException
   {
     value = in.readObject();
-  }
-
-  static public ClassType EqualPatType;
-  static Method makeEqualPatMethod;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (EqualPatType == null)
-      {
-	EqualPatType = ClassType.make("kawa.lang.EqualPat",
-                                      Pattern.typePattern);
-	makeEqualPatMethod =
-	  EqualPatType.addMethod ("make", comp.apply1args,
-				   EqualPatType, Access.PUBLIC|Access.STATIC);
-      }
-    Literal literal = new Literal (this, EqualPatType, comp);
-    comp.findLiteral (value);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    literal.check_cycle ();
-    comp.emitLiteral (value);
-    comp.getCode().emitInvokeStatic(makeEqualPatMethod);
   }
 }

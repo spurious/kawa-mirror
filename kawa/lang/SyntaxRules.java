@@ -1,15 +1,10 @@
 package kawa.lang;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
-import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
 import java.io.*;
 
-public class SyntaxRules extends Procedure1 implements Printable, Compilable, Externalizable 
+public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
 {
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
@@ -262,55 +257,5 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable, Ex
     literal_identifiers = (String[]) in.readObject();
     rules = (SyntaxRule[]) in.readObject();
     calculate_maxVars ();
-  }
-
-  static public ClassType thisType;
-  static public Method initSyntaxRulesMethod;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (SyntaxRule.thisType == null)
-	SyntaxRule.thisType = ClassType.make("kawa.lang.SyntaxRule");
-    if (thisType == null)
-      {
-	thisType = new ClassType ("kawa.lang.SyntaxRules");
-	Type[] argTypes = new Type[2];
-	argTypes[0] = comp.symbolArrayType;
-	argTypes[1] = new ArrayType (SyntaxRule.thisType);
-	initSyntaxRulesMethod
-	  = thisType.addMethod ("<init>", argTypes,
-				      Type.void_type, Access.PUBLIC);
-      }
-    Literal literal = new Literal (this, thisType, comp);
-    comp.findLiteral (literal_identifiers);
-    for (int i = 0;  i < rules.length;  i++)
-      comp.findLiteral (rules[i]);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    literal.check_cycle ();
-    int len = rules.length;
-    // Allocate the SyntaxRules object
-    code.emitNew(thisType);
-    code.emitDup(1);  // dup
-    comp.emitLiteral (literal_identifiers);
-    code.emitPushInt(len);
-    code.emitNewArray(SyntaxRule.thisType);
-    // Initialize the SyntaxRule elements.
-    for (int i = 0;  i < len;  i++)
-      {
-	code.emitDup(1);  // dup
-	code.emitPushInt(i);
-	comp.emitLiteral (rules[i]);
-	// Stack contents:  ..., this,this,literals, array, array, i, rules[i]
-	code.emitArrayStore(SyntaxRule.thisType);
-	// Stack contents:  ..., this, this, literals, array
-      }
-
-    // Stack contents:  ..., this, this, literals, array
-    code.emitInvokeSpecial(initSyntaxRulesMethod);
   }
 }

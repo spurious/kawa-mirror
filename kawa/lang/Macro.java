@@ -1,31 +1,17 @@
 package kawa.lang;
 import gnu.expr.*;
 import gnu.mapping.*;
-import gnu.bytecode.*;
 import gnu.kawa.util.*;
 import java.io.*;
 
-public class Macro extends Syntax implements Compilable, Printable, Externalizable
+public class Macro extends Syntax implements Printable, Externalizable
 {
-  public static final ClassType thisType = ClassType.make("kawa.lang.Macro");
-  static public Method makeMethod;
   public Expression expander;
 
   public static Macro make (String name, Procedure expander)
   {
     Macro mac = new Macro(name, expander);
     return mac;
-  }
-
-  public static Method getMakeMethod()
-  {
-    if (makeMethod == null)
-      {
-        Type[] args = { Compilation.javaStringType, Compilation.typeProcedure };
-        makeMethod = thisType.addMethod("make", args,
-                                        thisType, Access.STATIC|Access.PUBLIC);
-      }
-    return makeMethod;
   }
 
   public Macro ()
@@ -120,25 +106,5 @@ public class Macro extends Syntax implements Compilable, Printable, Externalizab
   {
     setName((String) in.readObject());
     expander = new QuoteExp(in.readObject());
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    Expression value = expander;
-    if (! (value instanceof QuoteExp))
-      comp.error('f', "internal error compiling a macro");
-    getMakeMethod();
-    Literal literal = new Literal (this, thisType, comp);
-    comp.findLiteral(((QuoteExp) value).getValue());
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    literal.check_cycle();
-    CodeAttr code = comp.getCode();
-    code.emitPushString(getName());
-    comp.emitLiteral(((QuoteExp) expander).getValue());
-    code.emitInvokeStatic(getMakeMethod());
   }
 }

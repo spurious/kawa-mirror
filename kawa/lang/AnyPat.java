@@ -1,7 +1,4 @@
 package kawa.lang;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
@@ -10,7 +7,7 @@ import java.io.*;
  * A pattern that matches anything.
  */
 
-public class AnyPat extends Pattern implements Printable, Compilable, Externalizable
+public class AnyPat extends Pattern implements Printable, Externalizable
 {
   public AnyPat () { }
 
@@ -29,9 +26,6 @@ public class AnyPat extends Pattern implements Printable, Compilable, Externaliz
 
   public int varCount () { return 1; }
 
-  static public ClassType thisType;
-  static Method makeAnyPatMethod;
-
   /**
    * @serialData Write nothing.
    */
@@ -42,22 +36,5 @@ public class AnyPat extends Pattern implements Printable, Compilable, Externaliz
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (thisType == null)
-      {
-	thisType = ClassType.make("kawa.lang.AnyPat");
-	makeAnyPatMethod =
-	  thisType.addMethod ("make", comp.apply0args,
-			       thisType, Access.PUBLIC|Access.STATIC);
-      }
-    return new Literal (this, thisType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    comp.getCode().emitInvokeStatic(makeAnyPatMethod);
   }
 }

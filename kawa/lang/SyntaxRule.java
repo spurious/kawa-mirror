@@ -1,15 +1,10 @@
 package kawa.lang;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
-import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
 import java.io.*;
 
-public class SyntaxRule implements Compilable, Externalizable 
+public class SyntaxRule implements Externalizable 
 {
   Pattern pattern;
   String template_program;
@@ -423,49 +418,5 @@ public class SyntaxRule implements Compilable, Externalizable
     template_identifiers = (String[]) in.readObject();
     literal_values = (Object[]) in.readObject();
     max_nesting = in.readInt();
-  }
-
-  static public ClassType thisType;
-  static public Method initSyntaxRuleMethod;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (thisType == null)
-      thisType = ClassType.make("kawa.lang.SyntaxRule");
-    if (initSyntaxRuleMethod == null)
-      {
-	Type[] argTypes = new Type[6];
-	argTypes[0] = Pattern.typePattern;
-	argTypes[1] = comp.javaStringType;
-	argTypes[2] = comp.javaStringType;
-	argTypes[3] = comp.symbolArrayType;
-	argTypes[4] = comp.objArrayType;
-	argTypes[5] = Type.int_type;
-	initSyntaxRuleMethod
-	  = thisType.addMethod ("<init>", argTypes,
-				 Type.void_type, Access.PUBLIC);
-      } 
-    Literal literal = new Literal (this, thisType, comp);
-    comp.findLiteral (pattern);
-    comp.findLiteral (pattern_nesting);
-    comp.findLiteral (template_program);
-    comp.findLiteral (template_identifiers);
-    comp.findLiteral (literal_values);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    literal.check_cycle ();
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitNew(thisType);
-    code.emitDup(thisType);
-    comp.emitLiteral (pattern);
-    comp.emitLiteral (pattern_nesting);
-    comp.emitLiteral (template_program);
-    comp.emitLiteral (template_identifiers);
-    comp.emitLiteral (literal_values);
-    code.emitPushInt(max_nesting);
-    code.emitInvokeSpecial(initSyntaxRuleMethod);
   }
 }

@@ -1,14 +1,10 @@
 package kawa.lang;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
 import java.io.*;
 
-public class ListRepeatPat extends Pattern implements Printable, Compilable, Externalizable
+public class ListRepeatPat extends Pattern implements Printable, Externalizable
 {
   Pattern element_pattern;
 
@@ -71,9 +67,6 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable, Ext
 
   public int varCount () { return element_pattern.varCount (); }
 
-  static public ClassType thisType;
-  static Method makeListRepeatMethod;
-
   /**
    * @serialData Write the element_pattern (using writeObject).
    */
@@ -86,28 +79,5 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable, Ext
     throws IOException, ClassNotFoundException
   {
     element_pattern = (Pattern) in.readObject();
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (thisType == null)
-      {
-	thisType = ClassType.make("kawa.lang.ListRepeatPat");
-	Type[] apply1args = new Type[1];
-	apply1args[0] = Pattern.typePattern;
-	makeListRepeatMethod =
-	  thisType.addMethod ("make", apply1args,
-			       thisType, Access.PUBLIC|Access.STATIC);
-      }
-    Literal literal = new Literal (this, thisType, comp);
-    comp.findLiteral (element_pattern);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    literal.check_cycle ();
-    comp.emitLiteral (element_pattern);
-    comp.getCode().emitInvokeStatic(makeListRepeatMethod);
   }
 }

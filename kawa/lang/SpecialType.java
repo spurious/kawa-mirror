@@ -67,9 +67,10 @@ public class SpecialType extends gnu.bytecode.PrimType
       case 'C':
 	// We handle char specially, because Kawa does not use standard
 	// java.lang.Character type.
-	Char.initMakeMethods();
-	code.emitCheckcast(Char.scmCharType);
-	code.emitInvokeVirtual(Char.charValueMethod);
+	ClassType scmCharType = ClassType.make("gnu.kawa.util.Char");
+	Method charValueMethod = scmCharType.getDeclaredMethod("charValue", 0);
+	code.emitCheckcast(scmCharType);
+	code.emitInvokeVirtual(charValueMethod);
 	break;
       default:
 	super.emitCoerceFromObject(code);
@@ -102,6 +103,9 @@ public class SpecialType extends gnu.bytecode.PrimType
   public void emitCoerceToObject (CodeAttr code)
   {
     char sig1 = getSignature().charAt(0);
+    ClassType clas;
+    Method method;
+    Type[] args;
     switch (sig1)
       {
       case 'Z':
@@ -112,23 +116,33 @@ public class SpecialType extends gnu.bytecode.PrimType
 	code.emitFi();
 	break;
       case 'C':
-	Char.initMakeMethods();
-	code.emitInvokeStatic(Char.makeCharMethod);
+	ClassType scmCharType = ClassType.make("gnu.kawa.util.Char");
+	Method makeCharMethod = scmCharType.getDeclaredMethod("make", 1);
+	code.emitInvokeStatic(makeCharMethod);
 	break;
       case 'B':  case 'S':  case 'I':
-	IntNum.initMakeMethods();
-	code.emitInvokeStatic(IntNum.makeIntMethod);
+	clas = ClassType.make("gnu.math.IntNum");
+	args = new Type[1];
+	args[0] = Type.int_type;
+	method = clas.getDeclaredMethod("make", args);
+	code.emitInvokeStatic(method);
 	break;
       case 'J':
-	IntNum.initMakeMethods();
-	code.emitInvokeStatic(IntNum.makeLongMethod);
+	clas = ClassType.make("gnu.math.IntNum");
+	args = new Type[1];
+	args[0] = Type.long_type;
+	method = clas.getDeclaredMethod("make", args);
+	code.emitInvokeStatic(method);
 	break;
       case 'F':
 	code.emitConvert(Type.float_type, Type.double_type);
 	// ... fall through ...
       case 'D':
-	DFloNum.initMakeMethods();
-	code.emitInvokeStatic(DFloNum.makeMethod);
+	clas = ClassType.make("gnu.math.DFloNum");
+	args = new Type[1];
+	args[0] = Type.double_type;
+	method = clas.getDeclaredMethod("make", args);
+	code.emitInvokeStatic(method);
 	break;
       default:
 	super.emitCoerceToObject(code);

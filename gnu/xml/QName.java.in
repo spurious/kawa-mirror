@@ -49,7 +49,9 @@ public class QName implements Externalizable
   {
     StringBuffer sbuf = new StringBuffer(100);
     sbuf.append("QName{");
-    if (namespaceURI != null)
+    if (namespaceURI == null)
+      sbuf.append('*');
+    else
       sbuf.append(namespaceURI);
     sbuf.append("}:");
     sbuf.append(localName);

@@ -1,3 +1,11 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java (getIndex):  Fix logic error.
+
+	* XMLParser.java.in:  New constructor.
+
+	* QName.java.in (toString):  Print a null namespaceURI as '*'.
+
 2002-04-07  Per Bothner  <per@bothner.com>
 
 	* XPath.java:  Mark as deprecated.

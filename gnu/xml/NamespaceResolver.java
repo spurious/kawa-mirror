@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -189,45 +189,13 @@ public class NamespaceResolver extends FilterConsumer
     int hash = name == null ? 0 : name.hashCode();
     int i = hash & indexHashMask;
     Object[] objects = tlist.objects;
-    int step = (hash << 1) | 1;
-    for (;;)
-      {
-	int index = indexHash[i];
-	if (index > 0)
-	  {
-	    if (objects[index-1] == name && objects[index] == type)
-	      return index-1;
-	    i = (i + step) & indexHashMask;
-	  }
-	else
-	  {
-	    index = nextIndex;
-	    if (index >= objects.length)
-	      {
-		tlist.resizeObjects();
-		objects = tlist.objects;
-	      }
-	    objects[index] = name;
-	    objects[index + 1] = type;
-	    indexHash[i] = index + 1;
-	    nextIndex += 2;
-	    indexHashCount += 2;
-	    int avail2 = 2 * indexHash.length;
-	    if (3 * indexHashCount >= avail2)
-	      { // rehash when 2/3 full
-		int[] old = indexHash;
-		indexHash = new int[avail2];
-		indexHashMask = avail2 - 1;
-		for (i = old.length;  --i >= 0; )
-		  {
-		    int j = old[i];
-		    if (j > 0)
-		      getIndex((String) objects[j-1], objects[j]);
-		  }
-	      }
-	    return index;
-	  }
-      }
+    int index = indexHash[i];
+    if (index > 0
+	&& objects[index-1] == name && objects[index] == type)
+      return index-1;
+    index = tlist.find(name, type);
+    indexHash[i] = index + 1;
+    return index;
   }
 
   void closeStartTag ()

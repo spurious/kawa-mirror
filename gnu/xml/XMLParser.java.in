@@ -528,6 +528,32 @@ public class @XMLParser@
       }
   }
 
+@if CHAR is byte@
+  public @XMLParser@(InputStream in, @ParsedXMLHandler@ out)
+    throws IOException
+  {
+    this.in = in; 
+    buffer = new byte[1024];
+    pos = 0;
+    limit = 0;
+
+    this.out = out;
+  }
+@endif CHAR is byte@
+
+@if CHAR is char@
+  public @XMLParser@(Reader in, @ParsedXMLHandler@ out)
+    throws IOException
+  {
+    this.in = in;
+    buffer = new char[1024];
+    pos = 0;
+    limit = 0;
+
+    this.out = out;
+  }
+@endif CHAR is char@
+
   public @XMLParser@(@CHAR@[] buffer, int pos, int limit,
 		     @ParsedXMLHandler@ out)
   {

@@ -1,5 +1,9 @@
 2005-03-18  Per Bothner  <per@bothner.com>
 
+	* system.scm (convert-list-to-string-array): Optimize by adding type
+	declarations and inlining car/cdr.
+	(tokenize-string-to-string-array): Likewise.
+
 	* prim_syntax.scm (try-catch): Don't translate catch-clause to a let,
 	with a bogus initial value.  Instead we generate a temporary LambdaExp.
 	Fixes Savannah bug #11540.

@@ -36,17 +36,16 @@
       ((primitive-array-set <String>) arr i (vector-ref vec i)))))
 
 (define (convert-list-to-string-array lst)
-  (let* ((count (length lst))
+  (let* ((count :: <int> (length lst))
 	 (arr ((primitive-array-new <String>) count)))
-    (do ((p lst (cdr p))
-	 (i 0 (+ i 1)))
-	((null? p) arr)
-      ((primitive-array-set <String>) arr i (car p)))))
+    (let loop ((p lst) (i :: <int> 0))
+      (if (null? p) arr
+	  (let ((pp :: <pair> p))
+	    ((primitive-array-set <String>) arr i (field pp 'car))
+	    (loop (field pp 'cdr) (+ i 1)))))))
 
-
-(define (tokenize-string-to-string-array string)
-  (let* ((toks ((primitive-constructor <java.util.StringTokenizer> (<String>))
-		string))
+(define (tokenize-string-to-string-array (string :: <String>))
+  (let* ((toks (make <java.util.StringTokenizer> string))
 	 (rlist
 	  (do ((list '() (cons
 			  ((primitive-virtual-method
@@ -58,12 +57,13 @@
 		     toks))
 	       list)
 	    #!void))
-	 (count (length rlist))
+	 (count :: <int> (length rlist))
 	 (arr ((primitive-array-new <String>) count)))
-    (do ((p rlist (cdr p))
-	 (i (- count 1) (- i 1)))
-	((null? p) arr)
-      ((primitive-array-set <String>) arr i (car p)))))
+    (let loop ((p rlist) (i :: <int> (- count 1)))
+      (if (null? p) arr
+	  (let ((pp :: <pair> p))
+	    ((primitive-array-set <String>) arr i (field pp 'car))
+	    (loop (field pp 'cdr) (- i 1)))))))
 
 (define (tokenize-string-using-shell string)
   (let ((arr :: <java.lang.String[]>

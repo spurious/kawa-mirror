@@ -534,17 +534,19 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--cps"))
 	  {
-	    gnu.expr.Compilation.fewerClasses = true;
-	    gnu.expr.Compilation.usingTailCalls = true;
-	    gnu.expr.Compilation.usingCPStyle = true;
+	    Compilation.fewerClasses = true;
+	    Compilation.defaultCallConvention
+	      = Compilation.CALL_WITH_CONTINUATIONS;
 	  }
 	else if (arg.equals("--full-tailcalls"))
 	  {
-	    gnu.expr.Compilation.usingTailCalls = true;
+	    Compilation.defaultCallConvention
+	      = Compilation.CALL_WITH_TAILCALLS;
 	  }
 	else if (arg.equals("--no-full-tailcalls"))
 	  {
-	    gnu.expr.Compilation.usingTailCalls = false;
+	    Compilation.defaultCallConvention
+	      = Compilation.CALL_WITH_RETURN;
 	  }
 	else if (arg.equals("--help"))
 	  {

@@ -2,6 +2,7 @@ package kawa.standard;
 import gnu.mapping.*;
 import java.io.PrintWriter;
 import gnu.math.IntNum;
+import gnu.kawa.functions.ObjectFormat;
 
 /** A TracedProcedure is a Procedure wrapper that writes trace output. */
 

@@ -1,5 +1,7 @@
 2001-12-24  Per Bothner  <per@bothner.com>
 
+	* package.html:  Remove "http:" from relative URLs.
+
 	* Method.java (toString):  Use getName of declaring class to avoid
 	prefixing by "Class Type ".  Fixes bug reported by Daniel Bonniot.
 

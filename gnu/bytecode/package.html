@@ -9,17 +9,17 @@ Contains classes to generate, read,
 write, and print Java bytecode (<code>.class</code>) files.
 <p>
 It is used by
-<a href="http:../kawa/">Kawa</a>
+<a href="../kawa/">Kawa</a>
 to compile Scheme into bytecodes;  it should be useful
 for other languages that need to be compiled into Java bytecodes.
 (An interesting exercise would be an interactive Java expression evaluator.)
 The classes here are relatively low-level.  If you want to use them
 to generate bytecode from a high-level language, it is better to
-use the <a href="http:../gnu/expr/">gnu.expr</a> package, which works
+use the <a href="../gnu/expr/">gnu.expr</a> package, which works
 at the expression level, and handles all the code-generation for you.
 <p>
 Javadoc generated
-<a href="http:../kawa/api/Package-gnu.bytecode.html">documentation</a>
+<a href="../kawa/api/Package-gnu.bytecode.html">documentation</a>
 of the class is available online.
 <p>
 The most important class is <code>ClassType</code>.
@@ -68,7 +68,7 @@ use <code>ZipArchive</code> as an application:
 java gnu.bytecode.ZipArchive [txpq] <var>archive</var> [<var>file</var> ...]
 </pre>
 See the comments for
-<a href="http:../kawa/api/gnu.bytecode.ZipArchive.html#main"
+<a href="../kawa/api/gnu.bytecode.ZipArchive.html#main"
 ><code>ZipArchive.main</code></a>.
 <code>ZipArchive</code> does not do compression or uncompressions, and
 it is reported that that some programs do not like the archives it creates.
@@ -98,7 +98,7 @@ See the file <a href="../../COPYING">COPYING</a>.
 
 <h2>How to get it</h2>
 The <code>gnu.bytecode</code> package is currently distributed as part of
-<a href="http:../kawa/">Kawa</a>, though it can be used independent
+<a href="../kawa/">Kawa</a>, though it can be used independent
 of the rest of Kawa.
 
 <h2>Bugs and patches</h2>

@@ -1,3 +1,29 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* confgure.in (AC_OUTPUT):  Add gnu/jemacs/lisp/Makefile.
+	
+	* kawa/lang/AnyPat.java:  No longer implement Compilable.
+	* kawa/lang/EqualPat.java:  No longer implement Compilable.
+	* kawa/lang/PairPat.java:  No longer implement Compilable.
+	* kawa/lang/ListRepeatPat.java:  No longer implement Compilable.
+	* kawa/lang/Macro.java:  No longer implement Compilable
+	* kawa/lang/SyntaxRule.java:  No longer implement Compilable
+	* kawa/lang/SyntaxRules.java:  No longer implement Compilable
+
+	* kawa/lang/SpecialType.java:  Do method lookup here instead of
+	expecting it in gnu.kawa.util.Char or gnu.math methods.
+
+	* kawa/standard/Scheme.java (string2Type):  Use ArrayType.make.
+	(<init>):  Set Interpreter.defaultInterpreter first.
+	(getNamedType):  Add <procedure> as a synonym for <function>.
+	(getTypeFor):  New method.
+	(exp2Type):  Just call getTypeFor.
+
+	* kawa/standard/define_syntax.java
+	(typeMacro, makeMethod):  New static fields.
+	(rewriteForm):  Check if syntax rule is Externalizable, rather
+	than no-longer-used Compilable.  Use new makeMethod field.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/AutoloadProcedure.java:  Use new Environment puttFunction.

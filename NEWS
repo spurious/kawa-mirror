@@ -1,5 +1,13 @@
-A bunch of classes now implement java.io.Externalizable, including
-all the classes that can be used as literals.
+The gnu.math package no longer has any dependencies on kawa.* or gnu.*.
+
+Compliation of literals has been re-done.  A class that can be used
+in a literal no longer needs to be declared as Compilable.  Instead,
+you declare it as implementaing java.io.Externalizable, and make
+sure it has appropriate methods.
+
+All the standard "data" types (i.e. not procedures or ports) now
+implement java.io.Externalizable, and can thus be serialized.
+If they appear in literals, they can also be compiled.
 
 Created a new class gnu.kawa.util.AbstractString, with the Scheme
 alias <abstract-string>.  The old gnu.kawa.util.FString now

@@ -10,6 +10,42 @@ import java.util.*;
 
 public class require extends Syntax
 {
+  /* NOTE on handling mutually recursive modules:
+
+     How can Kawa compile two or more modules that mutually require
+     each other?  Kawa separates the "scan" stage (top-level
+     scanning of a module, looking for definitions), and "rewrite"
+     (expand macros and resolve names) makes this possible.
+
+     If module A sees a (require <B>), it needs to suspend scanning A,
+     and import the definitions exported by B.  If B has not been
+     compiled yet, it must parse and scan B.  If while scanning B, it
+     sees a (require <A>), it must wait to import the definitions of A
+     until we've done scanning B, returned to A, and finished scanning
+     A.  At that point we can add to B the definitions exported from
+     A.  Thus the (require <A>) in B.has to *lazily* imports A's
+     definitions, using somekind of placeholder.
+
+     One complication is knowing whether a (require <B>) refers to a
+     source file to be compiled.  It is not enough to check if a class
+     B exists, since if we're compiljng B we want to use the current
+     source B.scm, not an older B.class.  This is complicated by the
+     (module-name B) declaration: We don't know whether source file
+     B.scm provides the B class until we've parsed B.scm.  A solution
+     to this problem is that we first parse all the source files,
+     yielding their S-expression form.  We then check for module-name
+     forms.  However, the possibility of macros does complicate this:
+     There could be a macro that re-defines module-name, and there
+     could be a macro that expands to module-name.  Arguably worrying
+     about these possibilities may be overkill.  However, it can be
+     handled thus: Parse each source file to S-expressions.  Scan each
+     source file's S-expression until the first require (if any).
+     Then go back to each source file, process the require, and scan
+     the rest of the file.  If we see a require for one of the source
+     files later in the compilation list, skip it until the end.  At
+     the end process any deferred require's.  Finally, do the
+     "rewrite" step and the rest of compilation.
+   */
   static java.util.Hashtable featureMap = new java.util.Hashtable();
 
   static void map(String featureName, String className)

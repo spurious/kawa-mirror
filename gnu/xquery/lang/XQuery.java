@@ -157,6 +157,7 @@ public class XQuery extends Interpreter
 	loadClass("kawa.lib.lists");
 	loadClass("kawa.lib.strings");
 	loadClass("gnu.commonlisp.lisp.PrimOps");
+	loadClass("gnu.kawa.servlet.HTTP");
       }
     catch (java.lang.ClassNotFoundException ex)
       {

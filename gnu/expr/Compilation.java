@@ -126,18 +126,7 @@ public class Compilation
   static public final Field falseConstant
     = scmBooleanType.addField ("FALSE", scmBooleanType,
 			       Access.PUBLIC|Access.STATIC);
-  static final Field voidConstant
-    = typeInterpreter.addField ("voidObject", typeObject,
-				Access.PUBLIC|Access.STATIC);
-  static final Field undefinedConstant
-    = typeInterpreter.addField ("undefinedObject", scmUndefinedType,
-				Access.PUBLIC|Access.STATIC);
-  static final Field emptyConstant
-    = scmListType.addField ("Empty", scmListType,
-			    Access.PUBLIC|Access.STATIC);
-  static final Field eofConstant
-    = scmSequenceType.addField ("eofValue", typeObject,
-				Access.PUBLIC|Access.STATIC);
+
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
   static Method initIntegerMethod;
@@ -338,12 +327,15 @@ public class Compilation
     else if (value instanceof String && ! immediate)
       code.emitPushString((String) value);
     else
-      {
-	Literal literal = litTable.findLiteral(value);
-	if (literal.field == null)
-	  literal.assign(litTable);
-	code.emitGetStatic(literal.field);
-      }
+      code.emitGetStatic(compileConstantToField(value));
+  }
+
+  public Field compileConstantToField (Object value)
+  {
+    Literal literal = litTable.findLiteral(value);
+    if (literal.field == null)
+      literal.assign(litTable);
+    return literal.field;
   }
 
   public static boolean inlineOk = true;
@@ -1472,8 +1464,6 @@ public class Compilation
 
     Method apply_method;
     boolean staticModule = false;
-    Label classInitLabel = null;
-    Label classBodyLabel = null;
     
     if (usingCPStyle())
       {
@@ -1481,32 +1471,13 @@ public class Compilation
           = curClass.addMethod ("step", arg_types, Type.void_type, 
                                 Access.PUBLIC|Access.FINAL);
       }
-    else if (module.isHandlingTailCalls())
+    else
       {
 	apply_method
 	  = curClass.addMethod ("apply", arg_types, Type.void_type,
 				Access.PUBLIC|Access.FINAL);
       }
-    else
-      {
-	staticModule = true;
-	generateConstructor (module);
-	instanceField = curClass.addField("$instance", curClass,
-					  Access.STATIC|Access.FINAL);
-	apply_method = startClassInit();
-	code = getCode();
-	code.emitNew(curClass);
-	code.emitDup(curClass);
-	code.emitInvokeSpecial(curClass.constructor);
-	code.emitPutStatic(instanceField);
-
-	classInitLabel = new Label(code);
-	classBodyLabel = new Label(code);
-	code.emitGoto(classInitLabel);
-	classBodyLabel.define(code);
-      }
     method = apply_method;
-
     // For each parameter, assign it to its proper slot.
     // If a parameter !isSimple(), we cannot assign it to a local slot,
     // so instead create an artificial Variable for the incoming argument.
@@ -1517,7 +1488,7 @@ public class Compilation
 
     thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
     module.closureEnv = module.thisVariable;
-    module.heapFrame = module.thisVariable;
+    module.heapFrame = module.isStatic() ? null : module.thisVariable;
     module.allocChildClasses(this);
 
     if (module.isHandlingTailCalls() || usingCPStyle())
@@ -1583,18 +1554,29 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (curClass == mainClass // && ! immediate
+    staticModule = module.isStatic();
+    if (curClass == mainClass
 	&& (staticModule || clinitChain != null
 	    || litTable.literalsChain != null
 	    || generateMain || generateApplet || generateServlet))
       {
 	Method save_method = method;
 
-	if (staticModule)
-	  classInitLabel.define(code);
-	else
-	  startClassInit();
+	if (module.isStatic())
+	  {
+	    generateConstructor (module);
+	    instanceField = curClass.addField("$instance", curClass,
+					      Access.STATIC|Access.FINAL);
+	  }
+	startClassInit();
 	code = getCode();
+	if (staticModule)
+	  {
+	    code.emitNew(curClass);
+	    code.emitDup(curClass);
+	    code.emitInvokeSpecial(curClass.constructor);
+	    code.emitPutStatic(instanceField);
+	  }
 	if (clinitChain != null)
 	  {
 	    Label lab0 = new Label(code);
@@ -1616,10 +1598,13 @@ public class Compilation
 	else
 	  emitLiterals();
 
-	if (staticModule)
-	  code.emitGoto(classBodyLabel);
-	else
-	  code.emitReturn();
+	if (staticModule && ! generateMain && ! immediate)
+	  {
+	    code.emitGetStatic(instanceField);
+	    code.emitInvokeStatic(getCallContextInstanceMethod);
+	    code.emitInvokeVirtual(apply_method);
+	  }
+	code.emitReturn();
 	method = save_method;
       }
 

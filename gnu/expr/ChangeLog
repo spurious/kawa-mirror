@@ -9,6 +9,13 @@
 	nameDecl, use its symbol, which in XQuery or CLisp may be a Symbol.
 	* ModuleMethod.java (<init>):  Name can be a Symbol or a String.
 
+	* LambdaExp.java (getCallConvention, isHandlingTailCalls):  Don't
+	treat static modules different from non-static.
+	(allocChildClasses):  Check for inline methods.  Check for
+	CALL_WITH_CONSUMER convention rather than just tailcall convention.
+	* Compilation.java (addClass):  Make static modules simpler and more
+	consistent with non-static by using apply method.
+
 	* FindTailCalls.java (walkApplyExp):  If function is append-values,
 	then last operand may be a tail-call.
 

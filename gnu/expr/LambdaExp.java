@@ -204,7 +204,7 @@ public class LambdaExp extends ScopeExp
    * @return One of the CALL_WITH_xxx values in Compilation. */
   public int getCallConvention ()
   {
-    if (isModuleBody() && ! ((ModuleExp) this).isStatic())
+    if (isModuleBody())
       return ((Compilation.defaultCallConvention
 	      >= Compilation.CALL_WITH_CONSUMER)
 	      ? Compilation.defaultCallConvention
@@ -219,9 +219,9 @@ public class LambdaExp extends ScopeExp
 
   public final boolean isHandlingTailCalls ()
   {
-    return (isModuleBody() && ! ((ModuleExp) this).isStatic())
+    return isModuleBody()
       || (Compilation.defaultCallConvention >= Compilation.CALL_WITH_TAILCALLS
-	  && ! isModuleBody() && ! isClassMethod());
+	  && ! isClassMethod());
   }
 
   public final boolean variable_args () { return max_args < 0; }
@@ -788,6 +788,7 @@ public class LambdaExp extends ScopeExp
     if (getCallConvention () >= Compilation.CALL_WITH_CONSUMER
 	&& ! isInitMethod)
       ctxArg = 1;
+
     int nameBaseLength = nameBuf.length();
     for (int i = 0;  i <= numStubs;  i++)
       {
@@ -880,7 +881,8 @@ public class LambdaExp extends ScopeExp
 	      {
 		scope.addVariable(argsArray);
 	      } 
-	    if (isHandlingTailCalls()
+	    if (! getInlineOnly()
+		&& getCallConvention() >= Compilation.CALL_WITH_CONSUMER
 		&& (firstArgsArrayArg == null ? decl == null
 		    : argsArray != null ? decl == firstArgsArrayArg
 		    : decl == firstArgsArrayArg.nextDecl()))

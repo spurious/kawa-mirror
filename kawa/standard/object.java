@@ -31,7 +31,8 @@ public class object extends Syntax
 	supers[i] = tr.rewrite(superpair.car);
 	Type type = Scheme.getTypeValue(supers[i]);
 	if (type == null || ! (type instanceof ClassType))
-	  return tr.syntaxError("object base class/interface not known");
+	  return tr.syntaxError("object base class/interface `"+superpair.car
+				+"' not known");
 	supers[i] = new QuoteExp(type);
 	superlist = superpair.cdr;
       }
@@ -82,6 +83,7 @@ public class object extends Syntax
 	    String mname = (String) mpair.car;
 	    Declaration decl = oexp.addDeclaration(mname);
 	    LambdaExp lexp = new LambdaExp();
+	    lexp.setClassMethod(true);
 	    decl.noteValue(lexp);
 	    lexp.setName (mname);
 	    if (last_method == null)
@@ -124,7 +126,6 @@ public class object extends Syntax
 		sexp.binding = decl;
 		decl.noteValue(initValue);
 		inits.setElementAt(sexp, init_index++);
-System.err.println("add init for "+decl.getName()+" - "+initValue);
 	      }
 	  }
 	else if (pair.car instanceof Pair)

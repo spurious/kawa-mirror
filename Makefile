@@ -4,7 +4,7 @@
 #=========================================================================
 # Unix version
 #=========================================================================
-JAVAC=javac -classpath ..:$$CLASSPATH
+JAVAC=javac -classpath .:$$CLASSPATH
 CLASSES=../classes
 CLASSESDIR=$(CLASSES)/
  

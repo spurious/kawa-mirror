@@ -1,3 +1,13 @@
+Wed Jun 12 22:06:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/print.java:  New class, with just a print method (for now).
+	* kawa/lang/pair.java (print):  Just call printNoParen.
+	(printNoParen):  Use loop (not recursion), and kawa.lang.print.print.
+	* kawa/lang/vector.java (print):  Use kawa.lang.print.print.
+	* kawa/Shell.java (run):  Use kawa.lang.print.print.
+	* Makefile (JAVAC):  Search ".:, not ".." for classpath.
+	* kawa/lang/Makefile (OBJ):  Add print.class.
+
 Wed Jun 12 19:34:35 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Interpreter.java (trueObject, falseObject,

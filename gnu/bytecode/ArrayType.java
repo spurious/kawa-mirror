@@ -8,7 +8,7 @@ public class ArrayType extends Type
   {
     byte[] sig = new byte[element_signature.length+1];
     System.arraycopy (element_signature, 0, sig, 1, element_signature.length);
-    sig[0] = '[';
+    sig[0] = (byte) '[';
     return sig;
   }
 
@@ -16,8 +16,8 @@ public class ArrayType extends Type
   {
     byte[] name = new byte[element_typename.length+2];
     System.arraycopy (element_typename, 0, name, 0, element_typename.length);
-    name[element_typename.length] = '[';
-    name[element_typename.length+1] = ']';
+    name[element_typename.length] = (byte) '[';
+    name[element_typename.length+1] = (byte) ']';
     return name;
   }
 

@@ -417,6 +417,13 @@ public class Method {
     put1 (type_code);
   }
 
+  public final void compile_arraylength ()
+  {
+    instruction_start_hook (1);
+    put1 (190);  // arraylength
+    push_stack_type (Type.int_type);
+  }
+
   /**
    * Invoke new on a class type.
    * Does not call the constructor!
@@ -869,7 +876,7 @@ public class Method {
   public final void compile_goto_if (int opcode)
   {
     IfState new_if = new IfState (this);
-    Type type1 = pop_stack_type ().promote ();
+    pop_stack_type ();
     instruction_start_hook (3);
     compile_transfer (new_if.end_label, opcode);
     new_if.start_stack_size = SP;
@@ -879,6 +886,24 @@ public class Method {
   public final void compile_if_neq_0 ()
   {
     compile_goto_if (153); // ifeq
+  }
+
+  /** Compile start of a conditional:  if (!(x OPCODE y)) ...
+   * The value of x and y must already have been pushed. */
+  public final void compile_if_icmp(int opcode)
+  {
+    IfState new_if = new IfState (this);
+    pop_stack_type ();
+    pop_stack_type ();
+    instruction_start_hook (3);
+    compile_transfer (new_if.end_label, opcode);
+    new_if.start_stack_size = SP;
+  }
+
+  /* Compile start of a conditional:  if (x < y) ... */
+  public final void compile_ifi_lt()
+  {
+    compile_if_icmp(162);  // if_icmpge
   }
 
   /** Compile start of a conditional:  if (x != y) ...
@@ -1061,7 +1086,7 @@ public class Method {
       arg_count++;
     while (--arg_count >= 0)
       pop_stack_type ();
-    put1 (opcode);  // invokevirtual, invokenonvirtual, or invokestatic
+    put1 (opcode);  // invokevirtual, invokespecial, or invokestatic
     put2 (CpoolRef.get_const (classfile, method).index);
     if (method.return_type != Type.void_type)
       push_stack_type (method.return_type);
@@ -1076,9 +1101,9 @@ public class Method {
     compile_invoke_method (method, 182);  // invokevirtual
   }
 
-  public void compile_invoke_nonvirtual (Method method)
+  public void compile_invoke_special (Method method)
   {
-    compile_invoke_method (method, 183);  // invokenonvirtual
+    compile_invoke_method (method, 183);  // invokespecial
   }
 
   /** Compile a static method call.

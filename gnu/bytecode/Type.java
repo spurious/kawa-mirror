@@ -21,9 +21,9 @@ public class Type {
   static byte[] class_signature (byte[] class_name) {
     int name_length = class_name.length;
     byte[] sig = new byte[name_length+2];
-    sig[0] = 'L';
+    sig[0] = (byte) 'L';
     System.arraycopy (class_name, 0, sig, 1, name_length);
-    sig[name_length + 1] = ';';
+    sig[name_length + 1] = (byte) ';';
     return sig;
   }
 

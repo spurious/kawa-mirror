@@ -90,7 +90,7 @@ public class ClassType extends Type {
    * Set the superclass of the is class.
    * param name name of super class, or null if this is "Object".
    */
-  public CpoolClass set_super (String name) {
+  public CpoolClass setSuper (String name) {
     if (name == null) {
       super_class = 0;
       return null;
@@ -104,9 +104,9 @@ public class ClassType extends Type {
     }
   }
 
-  public CpoolClass set_super (ClassType superClass)
+  public CpoolClass setSuper (ClassType superClass)
   {
-    return set_super (superClass.this_name);
+    return setSuper (superClass.this_name);
   }
 
   public void setInterfaces (ClassType[] interfaces)
@@ -213,7 +213,7 @@ public class ClassType extends Type {
 
   public void do_fixups () {
     if (super_class < 0)
-      set_super ("java.lang.Object");
+      setSuper ("java.lang.Object");
     for (Field field = fields; field != null; field = field.next) {
       field.assign_constants (this);
     }

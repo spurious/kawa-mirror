@@ -1,3 +1,11 @@
+Mon Mar 17 17:15:28 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* ArrayType.java, Type.java:  Cast char literals to byte.
+	* ClassType.java:  Rename set_super -> setSuper.
+	* Method.java (compile_arraylength, compile_if_icmp,
+	compile_ifi_lt):  New methods.
+	(compile_invoke_nonvirtual):  Renamed to compile_invoke_special.
+
 Tue Feb  4 22:13:40 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* ZipArchive.java:  Add char-constant -> byte casts.

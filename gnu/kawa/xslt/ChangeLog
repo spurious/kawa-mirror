@@ -1,3 +1,8 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* TemplateTable.java:  Remove unused import statements.
+	* XSLT.java:  Likewise.
+
 2004-01-09  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (registerEnvironment):  Update setCurrent to setGlobal.

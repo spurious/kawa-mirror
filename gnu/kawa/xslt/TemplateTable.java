@@ -1,5 +1,4 @@
 package gnu.kawa.xslt;
-import gnu.xml.*;
 import gnu.mapping.Procedure;
 import gnu.mapping.Symbol;
 

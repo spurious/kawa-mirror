@@ -3,10 +3,7 @@
 
 package gnu.kawa.xslt;
 import gnu.mapping.*;
-import kawa.standard.Scheme;
-import gnu.kawa.lispexpr.*;
 import gnu.lists.*;
-import gnu.xml.*;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.xquery.lang.*;

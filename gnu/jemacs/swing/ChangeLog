@@ -1,3 +1,10 @@
+2002-11-05  Per Bothner  <per@bothner.com>
+
+	* SwingWindow.java (<init>):  Don't call setBuffer, since that
+	duplicates setDocument, which causes JDK 1.4 to freeze. Tracked down  
+	by Francisco Vides Fernández <pvides@dedalo.ws>.  A fix is to
+	set this.buffer directly.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* SwingBuffer.java (makePosition):  Remove - use inherited default.

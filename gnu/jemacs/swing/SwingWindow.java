@@ -41,7 +41,7 @@ implements java.awt.event.FocusListener,
     panemap.put(jtextpane, this);
     if (wantModeline)
       modeline = new Modeline(this, ((SwingBuffer) buffer).modelineDocument);
-    setBuffer(buffer);
+    this.buffer = buffer;
     jtextpane.addFocusListener(this);
     jtextpane.addKeyListener(this);
   }

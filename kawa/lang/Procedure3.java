@@ -17,38 +17,34 @@ public abstract class Procedure3 extends Procedure
     super(n);
   }
 
+  public int numArgs() { return 0x3003; }
+
   public Object apply0 ()
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name(), 3,"(?)");
+    throw new WrongArguments(this, 0);
   }
 
   public Object apply1 (Object arg1)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name(), 3,"(?)");
+    throw new WrongArguments(this, 1);
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name(), 3,"(?)");
+    throw new WrongArguments(this, 2);
   }
 
-  public abstract Object apply3 (Object arg1, Object arg2, Object arg3)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol;
+  public abstract Object apply3 (Object arg1, Object arg2, Object arg3);
 
   public Object apply4 (Object arg1, Object arg2, Object arg3, Object arg4)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new WrongArguments(this.name(), 2,"(?)");
+    throw new WrongArguments(this, 4);
   }
 
   public Object applyN (Object[] args)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (args.length != 3)
-      throw new WrongArguments(this.name(), 3,"(?)");
+      throw new WrongArguments(this, args.length);
     return apply3 (args[0], args[1], args[2]);
   }
 }

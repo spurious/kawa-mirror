@@ -1839,7 +1839,7 @@ Multi-dimensional arrays are specified
 by @uref{http://srfi.schemers.org/srfi-25/srfi-25.html,SRFI-25}.
 In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
 Furthermore, if such an array is simple (not created @code{share-array})
-it will be implemented using a @code{@<vector>}.
+it will be implemented using a @code{<vector>}.
 Uniform vectors and strings are also arrays in Kawa.
 
 @node Uniform vectors, Exceptions, Arrays, Extensions

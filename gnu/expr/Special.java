@@ -43,7 +43,7 @@ public class Special extends Object implements Printable, Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("gnu.expr.Special");
+	thisType = ClassType.make("gnu.expr.Special");
 	Type[] apply1args = new Type[1];
 	apply1args[0] = comp.javaStringType;
 	makeMethod =

@@ -52,10 +52,10 @@
    (invoke-static <java.lang.System> 'getProperty 'file.separator)))
 
 (define (system-tmpdir)
-  (let ((name ; Java2 only
+  (let ((name :: <java.lang.String> ; Java2 only
 	 (invoke-static <java.lang.System> 'getProperty 'java.io.tmpdir)))
     (if (not (eq? name #!null))
-	(symbol->string name)
+	(make <string> name)
 	(let ((sep (%file-separator)))
 	  (if (equal? sep "\\") "C:\\temp" "/tmp")))))
 

@@ -72,12 +72,10 @@ public class ELisp extends Lisp2
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	ex.printStackTrace();
 	throw ex;
       }
     catch (Exception ex)
       {
-	ex.printStackTrace();
 	throw new WrappedException(ex);
       }
   }

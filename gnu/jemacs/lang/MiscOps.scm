@@ -8,7 +8,7 @@
 (define (input-pending-p) '())
 
 ;; FIXME
-(define (message msg) (format #t msg))
+(define (message msg . args) (format #t msg))
 
 ;; FIXME
 (define (provide name) '())

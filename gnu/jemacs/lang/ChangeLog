@@ -1,5 +1,7 @@
 2001-06-19  Per Bothner  <per@bothner.com>
 
+	* MiscOps.scm (message):  Allow and ignore extra arguments.
+
 	* ELisp.java (<init>):  Use SymbolTable.make.
 	* ELisp.java (<init>):  Fix initialization of t and nil.
 	* lambda.java (rewriteBody): "interactive" symbol can be Binding.

@@ -494,7 +494,9 @@ public class Translator extends Object
     return defs;
   }
 
-  public ModuleExp module;
+  ModuleExp module;
+
+  public final ModuleExp getModule() { return module; }
 
   public void finishModule(ModuleExp mexp, java.util.Vector forms)
   {

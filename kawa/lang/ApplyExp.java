@@ -45,8 +45,8 @@ public class ApplyExp extends Expression
 		System.err.println (func_decl.string_name ());
 		func_lambda = null;
 	      }
-	    else if (func_lambda.min_args >= 0
-		     && args.length > func_lambda.min_args)
+	    else if (func_lambda.max_args >= 0
+		     && args.length > func_lambda.max_args)
 	      {
 		System.err.print ("warning:  too many args for ");
 		System.err.println (func_decl.string_name ());

@@ -89,13 +89,9 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
       }
 
     // Try looking for a method "getFname" instead:
-    StringBuffer getname = new StringBuffer(fname.length()+3);
-    getname.append("get");
-    getname.append(Character.toTitleCase(fname.charAt(0)));
-    getname.append(fname.substring(1));
+    String mname = ClassExp.slotToMethodName("get", fname);
     try
       {
-        String mname = getname.toString();
         java.lang.reflect.Method getmethod
           = clas.getMethod(mname, noClasses);
         if (isStatic
@@ -151,7 +147,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     SlotSet.apply(isStatic, obj, (String) name, value);
   }
 
-  Object getField(Type type, String name)
+  static Object getField(Type type, String name)
   {
     if (type instanceof ClassType && name != null)
       {
@@ -161,12 +157,8 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
           return field;
 
         // Try looking for a method "getFname" instead:
-        StringBuffer getname = new StringBuffer(name.length()+3);
-        getname.append("get");
-        getname.append(Character.toTitleCase(name.charAt(0)));
-        getname.append(name.substring(1));
-        gnu.bytecode.Method method = clas.getMethod(getname.toString(),
-                                                    Type.typeArray0);
+        String getname = ClassExp.slotToMethodName("get", name);
+        gnu.bytecode.Method method = clas.getMethod(getname, Type.typeArray0);
         return method;
       }
     return null;
@@ -191,7 +183,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {
-        ClassType ctype = (ClassType) type;
+	ClassType ctype = (ClassType) type;
         Object part = getField(ctype, name);
         if (part instanceof gnu.bytecode.Field)
           {

@@ -2,6 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.expr.Compilation;
 
 /** A Constraint whose value is that of a named field/method of an object.
  * The object used is the owning Binding's value.
@@ -129,6 +130,8 @@ public class ClassMemberConstraint extends Constraint
 	      }
 	    if (value instanceof Named)
 	      name = ((Named) value).getName();
+	    else
+	      name = Compilation.demangleName(name);
 
 	    // The problem with the following is that we can't catch
 	    // set! to a constant (defined using define-contsant).  (Note we

@@ -71,8 +71,17 @@ public class Invoke extends ProcedureN implements Inlineable
         else
           throw new WrongType(thisProc, 0, null);
       }
+    Object staticLink = null;
     if (kind == 'N')
-      mname = "<init>";
+      {
+	mname = "<init>";
+	if (dtype instanceof PairClassType)
+	  {
+	    PairClassType ptype = (PairClassType) dtype;
+	    dtype = ptype.reflectInstanceClass;
+	    staticLink = ptype.getStaticLink();
+	  }
+      }
     else
       {
         Object arg1 = args[1];
@@ -90,10 +99,13 @@ public class Invoke extends ProcedureN implements Inlineable
     if (proc == null)
       throw new RuntimeException(thisProc.getName() + ": no method named `"
                                  + mname + "' in class " + dtype.getName());
-    Object[] margs = new Object[nargs-(kind == 'S' ? 2 : 1)];
+    Object[] margs
+      = new Object[nargs-(kind == 'S' ? 2 : staticLink != null ? 0 : 1)];
     int i = 0;
     if (kind == 'V')
       margs[i++] = args[0];
+    else if (staticLink != null)
+      margs[i++] = staticLink;
     System.arraycopy(args, kind == 'N' ? 1 : 2, margs, i,
                      nargs - (kind == 'N' ? 1 : 2));
     if (kind == 'N')
@@ -112,8 +124,18 @@ public class Invoke extends ProcedureN implements Inlineable
                   throw MethodProc.matchFailAsException(err, thisProc, args);
               }
 
-            Object result = proc.apply0();
-            for (i = 0;  i < len;  i += 2)
+            Object result;
+	    if (staticLink == null)
+	      {
+		result = proc.apply0();
+		i = 0;
+	      }
+	    else
+	      {
+		result = proc.apply1(staticLink);
+		i = 1;
+	      }
+            for (;  i < len;  i += 2)
               {
                 Keyword key = (Keyword) margs[i];
                 Object arg = margs[i+1];
@@ -316,8 +338,10 @@ public class Invoke extends ProcedureN implements Inlineable
         Expression arg0 = args[0];
         Type type = (kind == 'V' ? arg0.getType()
                      : interpreter.getTypeFor(arg0));
+	if (type instanceof PairClassType)
+	  return ((PairClassType) type).reflectInstanceClass;
         if (type instanceof ClassType)
-          return (ClassType) type;
+	  return (ClassType) type;
       }
     return null;
   }

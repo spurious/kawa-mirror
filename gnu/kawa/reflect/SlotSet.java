@@ -55,19 +55,16 @@ public class SlotSet extends Procedure3 implements Inlineable
 
     // Try looking for a method "setFname" instead.
     // First look for "getName", to get the "field type".
-    StringBuffer namebuf = new StringBuffer(name.length()+3);
-    namebuf.append("get");
-    namebuf.append(Character.toTitleCase(name.charAt(0)));
-    namebuf.append(name.substring(1));
+    String getName = ClassExp.slotToMethodName("get", name);
     try
       {
         java.lang.reflect.Method getmethod
-          = clas.getMethod(namebuf.toString(), SlotGet.noClasses);
-        namebuf.setCharAt(0, 's');
+          = clas.getMethod(getName, SlotGet.noClasses);
+	String setName = ClassExp.slotToMethodName("set", name);
         Class[] setArgTypes = new Class[1];
         setArgTypes[0] = getmethod.getReturnType();
         java.lang.reflect.Method setmethod
-          = clas.getMethod(namebuf.toString(), setArgTypes);
+          = clas.getMethod(setName, setArgTypes);
         Object[] args = new Object[1];
         args[0] = interpreter.coerceFromObject(setArgTypes[0], value);
         setmethod.invoke(obj, args);
@@ -113,19 +110,15 @@ public class SlotSet extends Procedure3 implements Inlineable
           return field;
 
         // Try looking for a method "getFname" instead:
-        StringBuffer getname = new StringBuffer(name.length()+3);
-        getname.append("get");
-        getname.append(Character.toTitleCase(name.charAt(0)));
-        getname.append(name.substring(1));
-        gnu.bytecode.Method method = clas.getMethod(getname.toString(),
-                                                    Type.typeArray0);
+        String getName = ClassExp.slotToMethodName("get", name);
+        gnu.bytecode.Method method = clas.getMethod(getName, Type.typeArray0);
         if (method == null)
           return null;
         Type ftype = method.getReturnType();
-        getname.setCharAt(0, 's');
+        String setName = ClassExp.slotToMethodName("set", name);
         Type[] args = new Type[1];
         args[0] = ftype;
-        method = clas.getMethod(getname.toString(), args);
+        method = clas.getMethod(setName, args);
         return method;
       }
     return null;

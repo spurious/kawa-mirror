@@ -1,3 +1,10 @@
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Objects and Classes):  New chapter.
+	Move some old sections to the new chapter.
+	Document `make' function.
+	Generate index if html.  (makeinfo crashes.)
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Describe invoke-static and class-methods.

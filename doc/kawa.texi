@@ -3,8 +3,10 @@
 @setfilename kawa.info
 @settitle Kawa, the Java-based Scheme system
 @setchapternewpage off
-@c @syncodeindex fn cp
-@c @syncodeindex vr cp
+@c @ifhtml
+@syncodeindex fn cp
+@syncodeindex vr cp
+@c @end ifhtml
 @c version: %W% %G%
 @c %**end of header
 
@@ -100,11 +102,15 @@ For a technical overview of Kawa, see these
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
 * Restrictions::         Features of R5RS not implemented
-* Extensions::           Kawa features not in standard Scheme
 * Compiling::            Compiling Scheme code to byte-codes
+* Extensions::           Kawa features not in standard Scheme
+* Objects and Classes::  Object-oriented features
 * Low-level functions::  The Scheme-Java interface
 * Reporting Bugs::       The Kawa Mailing List
 * License::              
+@ifhtml
+<LI><A HREF="kawa_12.html">Index</A>
+@end ifhtml
 @end menu
 
 @node Features, Getting Kawa, Top, Top
@@ -552,7 +558,7 @@ is in a new window, you can select @samp{Close} from the @samp{File} menu.
 To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
 
-@node Restrictions, Extensions, Running, Top
+@node Restrictions, Compiling, Running, Top
 @chapter Features of R5RS not implemented
 
 Kawa implements all the required and optional features of R5RS,
@@ -587,7 +593,151 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
-@node Extensions, Compiling, Restrictions, Top
+@node Compiling, Extensions, Restrictions, Top
+@chapter Compiling Scheme code to byte-codes
+
+All Scheme functions and source files are invisibly compiled
+into internal Java byte-codes.
+A traditional evaluator is only used for top-level directly entered
+expressions @emph{outside} a lambda.  (It would have been simpler
+to also byte-compile top-level expressions by surrounding them
+by a dummy lambda.  However, this would create a new Class object
+in the Java VM for every top-level expression.  This is undesirable
+unless you have a VM that can garbage collect Class objects.)
+
+To save speed when loading large Scheme source files, you probably
+want to pre-compile them and save them on your local disk.
+There are two ways to do this.
+
+You can compile a Scheme source file to a single archive file.
+You do this using the @code{compile-file} function.
+The result is a single file that you can move around and @code{load}
+just like the @code{.scm} source file.  You just specify the name
+of the archive file to the @code{load} procedure.
+Currently, the archive is a "zip" archive and has extension ".zip";
+a future release will probably use "Java Archive" (jar) files.
+The advantage of compiling to an archive is that it is simple
+and transparent.  A minor disadvantage is that it causes the
+Java "verifier" to be run when functions are loaded from it,
+which takes a little extra time.
+
+Alternatively, you can compile a Scheme source file to a
+collection of @samp{.class} files.
+You then use the standard Java class loading mechanism to load the code.
+The Java "verifier" does not need to get run, which makes
+loading a little faster.
+The compiled class files do have to be installed be installed somewhere
+in the @code{CLASSPATH}.
+
+@menu
+* Archive compilation::         Compiling Scheme to an archive file
+* Files compilation::           Compiling Scheme to a set of .class files
+* Application compilation::     Compiling Scheme to a standalone application
+@end menu
+
+@node Archive compilation, Files compilation, Compiling, Compiling
+@section Compiling Scheme to an archive file
+
+To byte-compile a file @samp{foo.scm} do:
+@example
+(compile-file "foo.scm" "foo")
+@end example
+
+This will create @samp{foo.zip}, which contains byte-compiled "j-code"
+that implements @samp{foo.scm}.
+
+You can later do:
+@example
+(load "foo")
+@end example
+
+This will load @samp{foo.zip}, which should have the same effect as
+loading @samp{foo.scm}, except you will get the byte-compiled versions.
+
+@node Files compilation,  Application compilation, Archive compilation, Compiling
+@section Compiling Scheme to a set of .class files
+
+Invoking @samp{kawa} (or @samp{java kawa.repl}) with
+the @samp{-C} flag will compile
+a @samp{.scm} source file into one or more @samp{.class} files.
+
+You run it as follows:
+@example
+kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main] -C @var{infile} ...
+@end example
+
+Note the @samp{-C} must come last, because @samp{Kawa} processes the
+arguments and options in order,
+
+Here:
+@table @samp
+@item -C @var{infile} ...
+The Scheme source files we want to compile.
+@item -d @var{outdirectory}
+The directory under which the resulting @samp{.class} files will be.
+The default is the current directory.
+@item -P @var{prefix}
+A string to prepend to the generated class names.
+The default is the empty string.
+@item -T @var{topname}
+The name of the "top" class - i.e. the one that contains the code
+for the top-level expressions and definitions.
+The default is generated from the @var{infile} and @var{prefix}.
+@item --main
+Generate a @code{main} method so that the resulting "top" class can
+be used as a stand-alone application. @xref{Application compilation}.
+@end table
+
+When you actually want to load the classes, the @var{outdirectory}
+must be in your @samp{CLASSPATH}.
+You can use the standard @code{load} function to load the code,
+by specifying the top-level class, either as a file name
+(relative to @var{outdirectory}) or a class name.
+E.g. if you did:
+@example
+kawa -d /usr/local/share/java -P my.lib. -T foo -C foosrc.scm
+@end example
+you can use either:
+@example
+(load "my.lib.foo")
+@end example
+or:
+@example
+(load "my/lib/foo.class")
+@end example
+
+If you are compiling a Scheme source file (say @samp{foosrc.scm})
+that uses macros defined in some other file (say @samp{macs.scm}),
+you need to make sure the definitions are visible to the compiler.
+One way to do that is with the @samp{-f}:
+@example
+kawa -f macs.scm -C foosrc.scm
+@end example
+
+@node Application compilation, , Files compilation, Compiling
+@section Compiling Scheme to a standalone application
+
+A Java application is a Java class with a special method
+(whose name is @code{main}).  The application can be invoked directly
+by naming it in the Java command.
+If you want to generate an application from a Scheme program,
+create a Scheme source file with the definitions you need, plus
+the top-level actions that you want the application to execute.
+You can compile in the regular way decribed in the previous section, but add
+the @code{--main} option.  For example,
+assuming your Scheme file is @code{MyProgram.scm}:
+@example
+kawa --main -C MyProgram.scm
+@end example
+This will create a @code{MyProgram.class} which you can either @code{load}
+(as decribed in the previous section), or invoke as an application:
+@example
+java MyProgram @var{[args]}
+@end example
+Your Scheme program can access the command-line arguments @var{args}
+by using the global variable @samp{command-line-arguments}.
+
+@node Extensions, Objects and Classes, Compiling, Top
 @chapter Extensions
 
 @menu
@@ -898,7 +1048,7 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
-@node Strings, Records, Logical Number Operations, Extensions
+@node Strings, Files, Logical Number Operations, Extensions
 @section Strings
 
 @defun string-upcase str
@@ -933,119 +1083,7 @@ are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
 @end defun
 
-@node Records, Files, Strings, Extensions
-@section Records
-
-The Record package provides a facility for users to define their own
-record data types.  Records are extensions of the class @code{Record}.
-These procedures use the Java 1.1 reflection facility.
-
-@defun make-record-type type-name field-names
-Returns a @dfn{record-type descriptor}, a value representing a new data
-type disjoint from all others.  The @var{type-name} argument must be a
-string, but is only used for debugging purposes (such as the printed
-representation of a record of the new type).  The @var{field-names}
-argument is a list of symbols naming the @dfn{fields} of a record of the
-new type.  It is an error if the list contains any duplicates.
-@end defun
-
-@c @defun make-record-sub-type type-name field-names rtd
-@c Returns a @dfn{record-type descriptor}, a value representing a new data
-@c type, disjoint from all others.  The @var{type-name} argument must be a
-@c string.  The @var{field-names} argument is a list of symbols naming the
-@c additional @dfn{fields} to be appended to @var{field-names} of
-@c @var{rtd}.  It is an error if the combinded list contains any
-@c duplicates.@refill
-@c
-@c Record-modifiers and record-accessors for @var{rtd} work for the new
-@c record-sub-type as well.  But record-modifiers and record-accessors for
-@c the new record-sub-type will not neccessarily work for @var{rtd}.@refill
-@c @end defun
-
-@defun record-constructor rtd [field-names]
-Returns a procedure for constructing new members of the type represented
-by @var{rtd}.  The returned procedure accepts exactly as many arguments
-as there are symbols in the given list, @var{field-names}; these are
-used, in order, as the initial values of those fields in a new record,
-which is returned by the constructor procedure.  The values of any
-fields not named in that list are unspecified.  The @var{field-names}
-argument defaults to the list of field names in the call to
-@code{make-record-type} that created the type represented by @var{rtd};
-if the @var{field-names} argument is provided, it is an error if it
-contains any duplicates or any symbols not in the default list.
-
-@c In Kawa, @var{rtd} may be any @code{Class} that has a public default
-@c constructor, as long as the @var{field-names} are public instance
-@c fields.  (The fields should have type @code{Object} -- unless you
-@c know what you are doing!)
-@end defun
-
-@defun record-predicate rtd
-Returns a procedure for testing membership in the type represented by
-@var{rtd}.  The returned procedure accepts exactly one argument and
-returns a true value if the argument is a member of the indicated record
-type; it returns a false value otherwise.
-
-@c In Kawa, the returned procedure checks if the argument is an instance
-@c of @var{rtd} or one of its sub-classes.
-@end defun
-
-@c @defun record-sub-predicate rtd
-@c Returns a procedure for testing membership in the type represented by
-@c @var{rtd} or its parents.  The returned procedure accepts exactly one
-@c argument and returns a true value if the argument is a member of the
-@c indicated record type or its parents; it returns a false value
-@c otherwise.@refill
-@c @end defun
-
-@defun record-accessor rtd field-name
-Returns a procedure for reading the value of a particular field of a
-member of the type represented by @var{rtd}.  The returned procedure
-accepts exactly one argument which must be a record of the appropriate
-type; it returns the current value of the field named by the symbol
-@var{field-name} in that record.  The symbol @var{field-name} must be a
-member of the list of field-names in the call to @code{make-record-type}
-that created the type represented by @var{rtd}.
-@end defun
-
-@defun record-modifier rtd field-name
-Returns a procedure for writing the value of a particular field of a
-member of the type represented by @var{rtd}.  The returned procedure
-accepts exactly two arguments: first, a record of the appropriate type,
-and second, an arbitrary Scheme value; it modifies the field named by
-the symbol @var{field-name} in that record to contain the given value.
-The returned value of the modifier procedure is unspecified.  The symbol
-@var{field-name} must be a member of the list of field-names in the call
-to @code{make-record-type} that created the type represented by @var{rtd}.
-@end defun
-
-@defun record? obj
-Returns a true value if @var{obj} is a record of any type and a false
-value otherwise.
-@end defun
-
-@defun record-type-descriptor record
-Returns a record-type descriptor representing the type of the given
-record.  That is, for example, if the returned descriptor were passed to
-@code{record-predicate}, the resulting predicate would return a true
-value when passed the given record.
-@end defun
-
-@defun record-type-name rtd
-Returns the type-name associated with the type represented by rtd.  The
-returned value is @code{eqv?} to the @var{type-name} argument given in
-the call to @code{make-record-type} that created the type represented by
-@var{rtd}.@refill
-@end defun
-
-@defun record-type-field-names rtd
-Returns a list of the symbols naming the fields in members of the type
-represented by @var{rtd}.  The returned value is @code{equal?} to the
-field-names argument given in the call to @code{make-record-type} that
-created the type represented by @var{rtd}.@refill
-@end defun
-
-@node Files, Ports, Records, Extensions
+@node Files, Ports, Strings, Extensions
 @section File System Interface
 
 @defun file-exists? filename
@@ -2110,208 +2148,245 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@node Compiling, Low-level functions, Extensions, Top
-@chapter Compiling Scheme code to byte-codes
+@node Objects and Classes, Low-level functions, Extensions, Top
+@chapter Object-oriented features
 
-All Scheme functions and source files are invisibly compiled
-into internal Java byte-codes.
-A traditional evaluator is only used for top-level directly entered
-expressions @emph{outside} a lambda.  (It would have been simpler
-to also byte-compile top-level expressions by surrounding them
-by a dummy lambda.  However, this would create a new Class object
-in the Java VM for every top-level expression.  This is undesirable
-unless you have a VM that can garbage collect Class objects.)
-
-To save speed when loading large Scheme source files, you probably
-want to pre-compile them and save them on your local disk.
-There are two ways to do this.
-
-You can compile a Scheme source file to a single archive file.
-You do this using the @code{compile-file} function.
-The result is a single file that you can move around and @code{load}
-just like the @code{.scm} source file.  You just specify the name
-of the archive file to the @code{load} procedure.
-Currently, the archive is a "zip" archive and has extension ".zip";
-a future release will probably use "Java Archive" (jar) files.
-The advantage of compiling to an archive is that it is simple
-and transparent.  A minor disadvantage is that it causes the
-Java "verifier" to be run when functions are loaded from it,
-which takes a little extra time.
-
-Alternatively, you can compile a Scheme source file to a
-collection of @samp{.class} files.
-You then use the standard Java class loading mechanism to load the code.
-The Java "verifier" does not need to get run, which makes
-loading a little faster.
-The compiled class files do have to be installed be installed somewhere
-in the @code{CLASSPATH}.
+Kawa provides various ways to define, create, and access Java objects.
+Here are the currently supported features.
 
 @menu
-* Archive compilation::         Compiling Scheme to an archive file
-* Files compilation::           Compiling Scheme to a set of .class files
-* Application compilation::     Compiling Scheme to a standalone application
-@end menu
-
-@node Archive compilation, Files compilation, Compiling, Compiling
-@section Compiling Scheme to an archive file
-
-To byte-compile a file @samp{foo.scm} do:
-@example
-(compile-file "foo.scm" "foo")
-@end example
-
-This will create @samp{foo.zip}, which contains byte-compiled "j-code"
-that implements @samp{foo.scm}.
-
-You can later do:
-@example
-(load "foo")
-@end example
-
-This will load @samp{foo.zip}, which should have the same effect as
-loading @samp{foo.scm}, except you will get the byte-compiled versions.
-
-@node Files compilation,  Application compilation, Archive compilation, Compiling
-@section Compiling Scheme to a set of .class files
-
-Invoking @samp{kawa} (or @samp{java kawa.repl}) with
-the @samp{-C} flag will compile
-a @samp{.scm} source file into one or more @samp{.class} files.
-
-You run it as follows:
-@example
-kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main] -C @var{infile} ...
-@end example
-
-Note the @samp{-C} must come last, because @samp{Kawa} processes the
-arguments and options in order,
-
-Here:
-@table @samp
-@item -C @var{infile} ...
-The Scheme source files we want to compile.
-@item -d @var{outdirectory}
-The directory under which the resulting @samp{.class} files will be.
-The default is the current directory.
-@item -P @var{prefix}
-A string to prepend to the generated class names.
-The default is the empty string.
-@item -T @var{topname}
-The name of the "top" class - i.e. the one that contains the code
-for the top-level expressions and definitions.
-The default is generated from the @var{infile} and @var{prefix}.
-@item --main
-Generate a @code{main} method so that the resulting "top" class can
-be used as a stand-alone application. @xref{Application compilation}.
-@end table
-
-When you actually want to load the classes, the @var{outdirectory}
-must be in your @samp{CLASSPATH}.
-You can use the standard @code{load} function to load the code,
-by specifying the top-level class, either as a file name
-(relative to @var{outdirectory}) or a class name.
-E.g. if you did:
-@example
-kawa -d /usr/local/share/java -P my.lib. -T foo -C foosrc.scm
-@end example
-you can use either:
-@example
-(load "my.lib.foo")
-@end example
-or:
-@example
-(load "my/lib/foo.class")
-@end example
-
-If you are compiling a Scheme source file (say @samp{foosrc.scm})
-that uses macros defined in some other file (say @samp{macs.scm}),
-you need to make sure the definitions are visible to the compiler.
-One way to do that is with the @samp{-f}:
-@example
-kawa -f macs.scm -C foosrc.scm
-@end example
-
-@node Application compilation, , Files compilation, Compiling
-@section Compiling Scheme to a standalone application
-
-A Java application is a Java class with a special method
-(whose name is @code{main}).  The application can be invoked directly
-by naming it in the Java command.
-If you want to generate an application from a Scheme program,
-create a Scheme source file with the definitions you need, plus
-the top-level actions that you want the application to execute.
-You can compile in the regular way decribed in the previous section, but add
-the @code{--main} option.  For example,
-assuming your Scheme file is @code{MyProgram.scm}:
-@example
-kawa --main -C MyProgram.scm
-@end example
-This will create a @code{MyProgram.class} which you can either @code{load}
-(as decribed in the previous section), or invoke as an application:
-@example
-java MyProgram @var{[args]}
-@end example
-Your Scheme program can access the command-line arguments @var{args}
-by using the global variable @samp{command-line-arguments}.
-
-@node Low-level functions, Reporting Bugs, Compiling, Top
-@chapter The Scheme-Java interface
-
-Kawa has extensive features so you can work with Java objects
-and call Java methods,
-
-@menu
-* Scheme types in Java::
-* Method operations::     Calling Java methods from Scheme
+* Records::
+* Allocating objects::
 * Field operations::      Accessing fields of Java objects
-* Array operations::      Low-level operations on Java arrays
+* Method operations::     Calling Java methods from Scheme
 * Anonymous classes::
-* Loading a ModuleBody::
-* Evaluating Scheme expressions from Java::
 @end menu
 
-@node Scheme types in Java, Method operations, , Low-level functions
-@section Scheme types in Java
+@node Records, , , Objects and Classes
+@section Records
 
-All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
+The Record package provides a facility for users to define their own
+record data types.  Records are extensions of the class @code{Record}.
+These procedures use the Java 1.1 reflection facility.
 
-Scheme symbols are implemented using @code{java.lang.String}.
-(Don't be confused by the fact the Scheme sybols are represented
-using Java Strings, while Scheme strings are represented by
-@code{kawa.lang.Scheme}.  It is just that the semantics of Java strings
-match Scheme symbols, but do not match mutable Scheme strings.)
-Interned symbols are presented as interned Strings.
-(Note that with JDK 1.1 string literals are automatically interned.)
+@defun make-record-type type-name field-names
+Returns a @dfn{record-type descriptor}, a value representing a new data
+type disjoint from all others.  The @var{type-name} argument must be a
+string, but is only used for debugging purposes (such as the printed
+representation of a record of the new type).  The @var{field-names}
+argument is a list of symbols naming the @dfn{fields} of a record of the
+new type.  It is an error if the list contains any duplicates.
+@end defun
 
-Scheme integers are implemented by @code{kawa.math.IntNum}.
-Use the make static function to create a new IntNum from an int or a long.
-Use the intValue or longValue methods to get the int or long value of
-an IntNum.
+@c @defun make-record-sub-type type-name field-names rtd
+@c Returns a @dfn{record-type descriptor}, a value representing a new data
+@c type, disjoint from all others.  The @var{type-name} argument must be a
+@c string.  The @var{field-names} argument is a list of symbols naming the
+@c additional @dfn{fields} to be appended to @var{field-names} of
+@c @var{rtd}.  It is an error if the combinded list contains any
+@c duplicates.@refill
+@c
+@c Record-modifiers and record-accessors for @var{rtd} work for the new
+@c record-sub-type as well.  But record-modifiers and record-accessors for
+@c the new record-sub-type will not neccessarily work for @var{rtd}.@refill
+@c @end defun
 
-A Scheme "flonum" is implemented by @code{kawa.math.DFloNum}.
+@defun record-constructor rtd [field-names]
+Returns a procedure for constructing new members of the type represented
+by @var{rtd}.  The returned procedure accepts exactly as many arguments
+as there are symbols in the given list, @var{field-names}; these are
+used, in order, as the initial values of those fields in a new record,
+which is returned by the constructor procedure.  The values of any
+fields not named in that list are unspecified.  The @var{field-names}
+argument defaults to the list of field names in the call to
+@code{make-record-type} that created the type represented by @var{rtd};
+if the @var{field-names} argument is provided, it is an error if it
+contains any duplicates or any symbols not in the default list.
 
-A Scheme pair is implemented by @code{kawa.lang.Pair}.
+@c In Kawa, @var{rtd} may be any @code{Class} that has a public default
+@c constructor, as long as the @var{field-names} are public instance
+@c fields.  (The fields should have type @code{Object} -- unless you
+@c know what you are doing!)
+@end defun
 
-A Scheme vector is implemented by @code{kawa.lang.Vector}.
+@defun record-predicate rtd
+Returns a procedure for testing membership in the type represented by
+@var{rtd}.  The returned procedure accepts exactly one argument and
+returns a true value if the argument is a member of the indicated record
+type; it returns a false value otherwise.
 
-Scheme characters are implemented using @code{kawa.lang.Char}.
+@c In Kawa, the returned procedure checks if the argument is an instance
+@c of @var{rtd} or one of its sub-classes.
+@end defun
 
-Scheme strings are implemented using @code{kawa.lang.FString}.
+@c @defun record-sub-predicate rtd
+@c Returns a procedure for testing membership in the type represented by
+@c @var{rtd} or its parents.  The returned procedure accepts exactly one
+@c argument and returns a true value if the argument is a member of the
+@c indicated record type or its parents; it returns a false value
+@c otherwise.@refill
+@c @end defun
 
-Scheme procedures are all sub-classes of @code{kawa.lang.Procedure}.
-Normally each function (lambda expression) in the source code is
-compiled to a separate sub-class of @samp{Procedure}.
-The "action" of a @samp{Procedure} is invoked by using one of
-the @samp{apply*} methods:  @samp{apply0}, @samp{apply1},
-@samp{apply2}, @samp{apply3}, @samp{apply4}, or @samp{applyN}.
-Various sub-class of @samp{Procedure} provide defaults
-for the various @samp{apply*} methods.  For example,
-a @samp{Procedure2} is used by 2-argument procedures.
-The @samp{Procedure2} class provides implementations of all
-the @samp{apply*} methods @emph{except} @samp{apply2},
-which must be provided by any class that extends @code{Procedure2}.
+@defun record-accessor rtd field-name
+Returns a procedure for reading the value of a particular field of a
+member of the type represented by @var{rtd}.  The returned procedure
+accepts exactly one argument which must be a record of the appropriate
+type; it returns the current value of the field named by the symbol
+@var{field-name} in that record.  The symbol @var{field-name} must be a
+member of the list of field-names in the call to @code{make-record-type}
+that created the type represented by @var{rtd}.
+@end defun
 
-@node Method operations, Field operations, Scheme types in Java, Low-level functions
+@defun record-modifier rtd field-name
+Returns a procedure for writing the value of a particular field of a
+member of the type represented by @var{rtd}.  The returned procedure
+accepts exactly two arguments: first, a record of the appropriate type,
+and second, an arbitrary Scheme value; it modifies the field named by
+the symbol @var{field-name} in that record to contain the given value.
+The returned value of the modifier procedure is unspecified.  The symbol
+@var{field-name} must be a member of the list of field-names in the call
+to @code{make-record-type} that created the type represented by @var{rtd}.
+@end defun
+
+@defun record? obj
+Returns a true value if @var{obj} is a record of any type and a false
+value otherwise.
+@end defun
+
+@defun record-type-descriptor record
+Returns a record-type descriptor representing the type of the given
+record.  That is, for example, if the returned descriptor were passed to
+@code{record-predicate}, the resulting predicate would return a true
+value when passed the given record.
+@end defun
+
+@defun record-type-name rtd
+Returns the type-name associated with the type represented by rtd.  The
+returned value is @code{eqv?} to the @var{type-name} argument given in
+the call to @code{make-record-type} that created the type represented by
+@var{rtd}.@refill
+@end defun
+
+@defun record-type-field-names rtd
+Returns a list of the symbols naming the fields in members of the type
+represented by @var{rtd}.  The returned value is @code{equal?} to the
+field-names argument given in the call to @code{make-record-type} that
+created the type represented by @var{rtd}.@refill
+@end defun
+
+@node Allocating objects, , , Objects and Classes
+@section  Allocating objects
+
+@defun make type args ...
+Constructs a new object instance of the specified @var{type},
+which must be either a @code{java.lang.Class} or a
+@code{<gnu.bytecode.ClassType>}.
+
+The @var{args ...} are passed to the constructor of the class type.
+If there is no applicable constructor, and the @var{args ...}
+consist of a set of (@var{keyword},@var{value})-pair,
+then the default constructor is called, and each
+(@var{keyword},@var{value})-pair is used to set the correspdong slot
+of the result, as if by:
+@code{(slot-set! @var{result} @var{keyword} @var{value})}.
+
+For example, the following are all equivalent:
+@example
+(set! p (make <java.awt.Point> 3 4))
+
+(set! p (make <java.awt.Point> y: 4 x: 3))
+
+(set! p (make <java.awt.Point>))
+(slot-set! p 'x 3)
+(set! (slot-ref p 'y) 4)
+@end example
+
+@end defun
+
+@node Field operations, , , Objects and Classes
+@section Accessing fields of Java objects
+
+Kawa has both a high-level interface and a low-level interface for accessing
+the fields of Java objects and static fields.
+The lower-level interfaces are macros that return functions.
+These functions can be inlined, producing efficient code.
+The higher-level functions are less verbose and more convenient.
+However, they can only access public fields, and they use the slower
+Java reflection facility.  (A possible future optimization might
+be for the compiler to inline direct field accesses when it knows
+that the object's class.)
+
+@subsection High-level operations on Object Fields
+
+@defun field object fieldname
+Get the instance field with the given @var{fieldname} from the given
+@var{Object}.  Returns the value of the field, which must be public.
+This procedure has a @code{setter}, and so can be used as the first
+operand to @code{set!}.
+
+If @var{name} is not a valid Java name, it is "mangled" into a Java name:
+For example, @code{"file-name"} is mangled to @code{"fileName"}.
+
+If there is no accessible field whose name is @code{"@var{fieldname}"},
+we look for a no-argument method whose name is @code{"get@var{Fieldname}"}.
+
+@end defun
+
+@defun static-field class fieldname
+Get the static field with the given @var{fieldname} from the given
+@var{class}.  Returns the value of the field, which must be public.
+This procedure has a @code{setter}, and so can be used as the first
+operand to @code{set!}.
+@end defun
+
+Examples:
+@example
+(static-field <java.lang.System> 'err)
+;; Copy the car field of b into a.
+(set! (field a 'car) (field b 'car))
+@end example
+
+@defun slot-ref object fieldname
+A synonym for @code{(field @var{object} @var{fieldname})}.
+@end defun
+
+@subsection Low-level Operations on Object Fields
+
+The following macros evaluate to procedures that can be used to
+access or change the fields of objects or static fields.
+The compiler can inline each to a single bytecode instruction
+(not counting type conversion).
+
+@deffn Syntax primitive-get-field class fname ftype
+Use this to access a field named @var{fname} having type @var{type} in
+class @var{class}.  Evaluates to a new one-argument procedure,
+whose argument is a reference to an object of the specified @var{class}.
+Calling that procedure returns the value of the specified field.
+@end deffn
+
+@deffn Syntax primitive-set-field class fname ftype
+Use this to change a field named @var{fname} having type @var{type} in
+class @var{class}.  Evaluates to a new two-argument procedure,
+whose first argument is a reference to an object of the
+specified @var{class}, and the second argument is the new value.
+Calling that procedure sets the field to the specified value.
+(This macro's name does not end in a @samp{!}, because it does not actually
+set the field.  Rather, it returns a function for setting the field.)
+@end deffn
+
+@deffn Syntax primitive-get-static class fname ftype
+Like @code{primitive-get-field}, but used to access static fields.
+Returns a zero-argument function, which when called returns
+the value of the static field.
+@end deffn
+
+@deffn Syntax primitive-set-static class fname ftype
+Like @code{primitive-set-field}, but used to modify static fields.
+Returns a one-argument function, which when called sets the
+value of the static field to the argument.
+@end deffn
+
+@node Method operations, , , Objects and Classes
 @section Calling Java methods from Scheme
 
 Kawa has both a low-level and a high-level 
@@ -2421,115 +2496,7 @@ Some examples using these primitives are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@node Field operations, Array operations, Method operations, Low-level functions
-@section Accessing fields of Java objects
-
-Kawa has both a high-level interface and a low-level interface for accessing
-the fields of Java objects and static fields.
-The lower-level interfaces are macros that return functions.
-These functions can be inlined, producing efficient code.
-The higher-level functions are less verbose and more convenient.
-However, they can only access public fields, and they use the slower
-Java reflection facility.  (A possible future optimization might
-be for the compiler to inline direct field accesses when it knows
-that the object's class.)
-
-@subsection High-level operations on Object Fields
-
-@defun field object fieldname
-Get the instance field with the given @var{fieldname} from the given
-@var{Object}.  Returns the value of the field, which must be public.
-This procedure has a @code{setter}, and so can be used as the first
-operand to @code{set!}.
-@end defun
-
-@defun static-field class fieldname
-Get the static field with the given @var{fieldname} from the given
-@var{class}.  Returns the value of the field, which must be public.
-This procedure has a @code{setter}, and so can be used as the first
-operand to @code{set!}.
-@end defun
-
-Examples:
-@example
-(static-field <java.lang.System> 'err)
-;; Copy the car field of b into a.
-(set! (field a 'car) (field b 'car))
-@end example
-
-@subsection Low-level Operations on Object Fields
-
-The following macros evaluate to procedures that can be used to
-access or change the fields of objects or static fields.
-The compiler can inline each to a single bytecode instruction
-(not counting type conversion).
-
-@deffn Syntax primitive-get-field class fname ftype
-Use this to access a field named @var{fname} having type @var{type} in
-class @var{class}.  Evaluates to a new one-argument procedure,
-whose argument is a reference to an object of the specified @var{class}.
-Calling that procedure returns the value of the specified field.
-@end deffn
-
-@deffn Syntax primitive-set-field class fname ftype
-Use this to change a field named @var{fname} having type @var{type} in
-class @var{class}.  Evaluates to a new two-argument procedure,
-whose first argument is a reference to an object of the
-specified @var{class}, and the second argument is the new value.
-Calling that procedure sets the field to the specified value.
-(This macro's name does not end in a @samp{!}, because it does not actually
-set the field.  Rather, it returns a function for setting the field.)
-@end deffn
-
-@deffn Syntax primitive-get-static class fname ftype
-Like @code{primitive-get-field}, but used to access static fields.
-Returns a zero-argument function, which when called returns
-the value of the static field.
-@end deffn
-
-@deffn Syntax primitive-set-static class fname ftype
-Like @code{primitive-set-field}, but used to modify static fields.
-Returns a one-argument function, which when called sets the
-value of the static field to the argument.
-@end deffn
-
-@node Array operations, Anonymous classes, Field operations, Low-level functions
-@section Low-level Operations on Java Arrays
-
-The following macros evaluate to procedures that can be used to
-manipulate primitive Java array objects.
-The compiler can inline each to a single bytecode instruction
-(not counting type conversion).
-
-@deffn Syntax primitive-array-new element-type
-Evaluates to a one-argument procedure.  Applying the resulting procedure to
-an integer count allocates a new Java array of the specified length,
-and whose elements have type @var{element-type}.
-@end deffn
-
-@deffn Syntax primitive-array-set element-type
-Evaluates to a three-argument procedure.  The first argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type};  the second argument is an index;  and the third
-argument is a value (coercible to @var{element-type}) which replaces
-the value specified by the index in the given array.
-@end deffn
-
-@deffn Syntax primitive-array-get element-type
-Evaluates to a two-argument procedure.  The first argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type};  the second argument is an index.
-Applying the procedure returns the element at the specified index.
-@end deffn
-
-@deffn Syntax primitive-array-new element-type
-Evaluates to a one-argument procedure.  The argument of
-the resulting procedure must be an array whose elements have type
-@var{element-type}.
-Applying the procedure returns the length of the array.
-@end deffn
-
-@node Anonymous classes, Loading a ModuleBody, Array operations, Low-level functions
+@node Anonymous classes, , , Objects and Classes
 @section Anonymous classes
 
 @deffn Syntax object (supers ...) field-or-method-decl ...
@@ -2569,7 +2536,97 @@ of the object.  It does include the surrounding lexical scope.
 It sort-of also includes the declared methods, but this is not working yet.
 @end deffn
 
-@node Loading a ModuleBody, Evaluating Scheme expressions from Java, Anonymous classes, Low-level functions
+@node Low-level functions, Reporting Bugs, Objects and Classes, Top
+@chapter The Scheme-Java interface
+
+Kawa has extensive features so you can work with Java objects
+and call Java methods.
+
+@menu
+* Scheme types in Java::
+* Array operations::      Low-level operations on Java arrays
+* Loading a ModuleBody::
+* Evaluating Scheme expressions from Java::
+@end menu
+
+@node Scheme types in Java, , , Low-level functions
+@section Scheme types in Java
+
+All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
+
+Scheme symbols are implemented using @code{java.lang.String}.
+(Don't be confused by the fact the Scheme sybols are represented
+using Java Strings, while Scheme strings are represented by
+@code{kawa.lang.Scheme}.  It is just that the semantics of Java strings
+match Scheme symbols, but do not match mutable Scheme strings.)
+Interned symbols are presented as interned Strings.
+(Note that with JDK 1.1 string literals are automatically interned.)
+
+Scheme integers are implemented by @code{kawa.math.IntNum}.
+Use the make static function to create a new IntNum from an int or a long.
+Use the intValue or longValue methods to get the int or long value of
+an IntNum.
+
+A Scheme "flonum" is implemented by @code{kawa.math.DFloNum}.
+
+A Scheme pair is implemented by @code{kawa.lang.Pair}.
+
+A Scheme vector is implemented by @code{kawa.lang.Vector}.
+
+Scheme characters are implemented using @code{kawa.lang.Char}.
+
+Scheme strings are implemented using @code{kawa.lang.FString}.
+
+Scheme procedures are all sub-classes of @code{kawa.lang.Procedure}.
+Normally each function (lambda expression) in the source code is
+compiled to a separate sub-class of @samp{Procedure}.
+The "action" of a @samp{Procedure} is invoked by using one of
+the @samp{apply*} methods:  @samp{apply0}, @samp{apply1},
+@samp{apply2}, @samp{apply3}, @samp{apply4}, or @samp{applyN}.
+Various sub-class of @samp{Procedure} provide defaults
+for the various @samp{apply*} methods.  For example,
+a @samp{Procedure2} is used by 2-argument procedures.
+The @samp{Procedure2} class provides implementations of all
+the @samp{apply*} methods @emph{except} @samp{apply2},
+which must be provided by any class that extends @code{Procedure2}.
+
+@node Array operations, , , Low-level functions
+@section Low-level Operations on Java Arrays
+
+The following macros evaluate to procedures that can be used to
+manipulate primitive Java array objects.
+The compiler can inline each to a single bytecode instruction
+(not counting type conversion).
+
+@deffn Syntax primitive-array-new element-type
+Evaluates to a one-argument procedure.  Applying the resulting procedure to
+an integer count allocates a new Java array of the specified length,
+and whose elements have type @var{element-type}.
+@end deffn
+
+@deffn Syntax primitive-array-set element-type
+Evaluates to a three-argument procedure.  The first argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type};  the second argument is an index;  and the third
+argument is a value (coercible to @var{element-type}) which replaces
+the value specified by the index in the given array.
+@end deffn
+
+@deffn Syntax primitive-array-get element-type
+Evaluates to a two-argument procedure.  The first argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type};  the second argument is an index.
+Applying the procedure returns the element at the specified index.
+@end deffn
+
+@deffn Syntax primitive-array-new element-type
+Evaluates to a one-argument procedure.  The argument of
+the resulting procedure must be an array whose elements have type
+@var{element-type}.
+Applying the procedure returns the length of the array.
+@end deffn
+
+@node Loading a ModuleBody, Evaluating Scheme expressions from Java, , Low-level functions
 @section Loading a ModuleBody
 
 The "top" class created by @code{kawa -C} (@pxref{Files compilation})
@@ -2720,8 +2777,10 @@ into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation approved
 by the author.
 
-@c @node Index, , License, Top
-@c @unnumbered Index
-@c @printindex fn
+@ifhtml
+@node Index, , License, Top
+@unnumbered Index
+@printindex fn
+@end ifhtml
 
 @bye

@@ -55,7 +55,7 @@ public class read_line extends ProcedureN
       }
     catch (java.io.IOException e)
       {
-	throw new RuntimeException ("I/O exception in read-line: " + e.toString ());
+	throw new WrappedException(e);
       }
   }
 

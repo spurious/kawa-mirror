@@ -74,6 +74,7 @@ floor.class \
 ceiling.class \
 truncate.class \
 round.class \
+rationalize.class \
 exp.class \
 log.class \
 sin.class \

@@ -186,6 +186,7 @@ public class Scheme extends Interpreter
       define_proc ("ceiling", "kawa.standard.ceiling");
       define_proc ("truncate", "kawa.standard.truncate");
       define_proc ("round", "kawa.standard.round");
+      define_proc ("rationalize", "kawa.standard.rationalize");
       define_proc ("exp", "kawa.standard.exp");
       define_proc ("log", "kawa.standard.log");
       define_proc ("sin", "kawa.standard.sin");

@@ -1,3 +1,11 @@
+2001-10-16  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
+
+	* Compilation.java (allocClass(ModuleExp)): Replaces 
+	allocClass(LambdaExp). Cut dead code accordingly.
+	* LambdaExp (getJavaName): Moved to ModuleExp.
+	(compile, setNameMethod, compileAlloc): Removed.
+	* ModuleExp (getJavaName): New method.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	* Compilation.java:  Added support --servlet.

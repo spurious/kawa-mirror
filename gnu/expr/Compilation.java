@@ -785,14 +785,11 @@ public class Compilation
     new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
 
-  ClassType allocClass (LambdaExp lexp)
+  ClassType allocClass (ModuleExp module)
   {
-    String name = lexp.getJavaName();
+    String name = module.getJavaName();
     name = generateClassName(name);
-    if (lexp instanceof ObjectExp)
-      return lexp.getCompiledClassType(this);
-    else
-      return addClass(lexp, new ClassType(name));
+    return addClass(module, new ClassType(name));
   }
 
   ClassType addClass (LambdaExp lexp, ClassType type)
@@ -1172,33 +1169,33 @@ public class Compilation
     return method;
   }
 
-  /** Compiles a function to a class. */
-  public final ClassType addClass (LambdaExp lexp)
+  /** Compiles a module to a class. */
+  public final ClassType addClass (ModuleExp module)
   {
     String name;
-    ClassType new_class = lexp.type;
+    ClassType new_class = module.type;
     if (new_class == typeProcedure)
-      new_class = allocClass(lexp);
+      new_class = allocClass(module);
     curClass = new_class;
 
-    String filename = lexp.getFile();
-    lexp.type = new_class;
+    String filename = module.getFile();
+    module.type = new_class;
     if (filename != null)
       new_class.setSourceFile (filename);
 
     int arg_count;
     char arg_letter;
     LambdaExp saveLambda = curLambda;
-    curLambda = lexp;
+    curLambda = module;
     Type[] arg_types;
-    if (lexp.isHandlingTailCalls() || usingCPStyle())
+    if (module.isHandlingTailCalls() || usingCPStyle())
       {
 	arg_count = 1;
 	arg_letter = '?';
 	arg_types = new Type[1];
 	arg_types[0] = typeCallContext;
       }
-    else if (lexp.min_args != lexp.max_args || lexp.min_args > 4
+    else if (module.min_args != module.max_args || module.min_args > 4
 	|| (fewerClasses && curClass == mainClass))
       {
 	arg_count = 1;
@@ -1208,7 +1205,7 @@ public class Compilation
       }
     else
       {
-	arg_count = lexp.min_args;
+	arg_count = module.min_args;
 	arg_letter = Character.forDigit (arg_count, 10);
 	arg_types = new Type[arg_count];
 	for (int i = arg_count;  --i >= 0; )
@@ -1222,12 +1219,12 @@ public class Compilation
 				    Access.PUBLIC);
 	method.init_param_slots ();
 	code = getCode();
-	code.emitPushInt(lexp.min_args | (lexp.max_args << 12));
+	code.emitPushInt(module.min_args | (module.max_args << 12));
 	code.emitReturn();
       }
 
-    Expression body = lexp.body;
-    Variable heapFrame = lexp.heapFrame;
+    Expression body = module.body;
+    Variable heapFrame = module.heapFrame;
 
     Method apply_method;
     boolean staticModule = false;
@@ -1240,16 +1237,16 @@ public class Compilation
           = curClass.addMethod ("step", arg_types, Type.void_type, 
                                 Access.PUBLIC|Access.FINAL);
       }
-    else if (lexp.isHandlingTailCalls())
+    else if (module.isHandlingTailCalls())
       {
 	apply_method
 	  = curClass.addMethod ("apply", arg_types, Type.void_type,
 				Access.PUBLIC|Access.FINAL);
       }
-    else if (lexp.isModuleBody())
+    else
       {
 	staticModule = true;
-	generateConstructor (lexp);
+	generateConstructor (module);
 	instanceField = curClass.addField("$instance", curClass,
 					  Access.STATIC|Access.FINAL);
 	apply_method = startClassInit();
@@ -1264,13 +1261,6 @@ public class Compilation
 	code.emitGoto(classInitLabel);
 	classBodyLabel.define(code);
       }
-    else
-      {
-	String apply_name = "apply"+arg_letter;
-	apply_method
-	  = curClass.addMethod (apply_name, arg_types, typeObject,
-				Access.PUBLIC|Access.FINAL);
-      }
     method = apply_method;
 
     // For each parameter, assign it to its proper slot.
@@ -1281,22 +1271,21 @@ public class Compilation
     code = getCode();
     // if (usingCPStyle())   code.addParamLocals();
 
-    thisDecl = method.getStaticFlag() ? null : lexp.declareThis(new_class);
-    if (lexp instanceof ModuleExp)
-      lexp.heapFrame = lexp.thisVariable;
+    thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
+    module.heapFrame = module.thisVariable;
     if (! (fewerClasses && curClass == mainClass))
-      lexp.allocChildClasses(this);
+      module.allocChildClasses(this);
 
-    if (lexp.isHandlingTailCalls() || usingCPStyle())
+    if (module.isHandlingTailCalls() || usingCPStyle())
       {
 	callStackContext = new Variable ("$ctx", typeCallContext);
-	Scope scope = lexp.scope;
+	Scope scope = module.scope;
 	scope.addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
 	callStackContext.setArtificial(true);
       }
 
-    int line = lexp.getLine();
+    int line = module.getLine();
     if (line > 0)
       code.putLineNumber(line);
 
@@ -1315,8 +1304,8 @@ public class Compilation
       }
     */
 
-    lexp.allocParameters(this);
-    lexp.enterFunction(this);
+    module.allocParameters(this);
+    module.enterFunction(this);
     if (usingCPStyle())
       {
 	//code.emitLoad(code.getArg(1));
@@ -1327,7 +1316,7 @@ public class Compilation
 
     try
       {
-	lexp.compileBody(this);
+	module.compileBody(this);
       }
     catch (Exception ex)
       {
@@ -1335,13 +1324,13 @@ public class Compilation
         ex.printStackTrace(System.err);
         System.exit(-1);
       }
-    lexp.compileEnd(this);
+    module.compileEnd(this);
 
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.
 
-    lexp.heapFrame = heapFrame;  // Restore heapFrame.
-    lexp.compileChildMethods(this);
+    module.heapFrame = heapFrame;  // Restore heapFrame.
+    module.compileChildMethods(this);
     if (usingCPStyle() || (fewerClasses && curClass == mainClass))
       {
 	code = getCode();
@@ -1349,7 +1338,7 @@ public class Compilation
       }
 
     if (Compilation.usingTailCalls && ! staticModule)
-      generateConstructor(lexp);
+      generateConstructor(module);
 
     if (curClass == mainClass // && ! immediate
 	&& (staticModule || clinitChain != null || literalsChain != null
@@ -1392,7 +1381,7 @@ public class Compilation
 
     curLambda = saveLambda;
 
-    if (generateMain && lexp.isModuleBody () && curClass == mainClass)
+    if (generateMain && curClass == mainClass)
       {
 	Type[] args = { new ArrayType(javaStringType) };
 	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,

@@ -25,6 +25,11 @@ public class ModuleExp extends LambdaExp
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
 
+  public String getJavaName ()
+  {
+    return name == null ? "lambda" : Compilation.mangleName (name);
+  }
+
   public ModuleExp ()
   {
   }

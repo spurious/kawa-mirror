@@ -297,11 +297,6 @@ public class LambdaExp extends ScopeExp
 
   public String getName () { return name; }
 
-  public String getJavaName ()
-  {
-    return name == null ? "lambda" : Compilation.mangleName (name);
-  }
-
   public LambdaExp outerLambda ()
   {
     return outer == null ? null : outer.currentLambda ();
@@ -446,55 +441,6 @@ public class LambdaExp extends ScopeExp
           return var;
         --i;
       }
-  }
-
-  public ClassType compile (Compilation comp)
-  {
-    ClassType saveClass = comp.curClass;
-    Method saveMethod = comp.method;
-    Variable saveCallContextContext = comp.callStackContext;
-    try
-      {
-	return comp.addClass (this);
-      }
-    finally
-      {
-	comp.curClass = saveClass;
-	comp.method = saveMethod;
-	comp.callStackContext = saveCallContextContext;
-      }
-  }
-
-  static Method setNameMethod = null;
-
-  public ClassType compileAlloc (Compilation comp)
-  {
-    ClassType new_class = compile (comp);
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitNew(new_class);
-    code.emitDup(new_class);
-    code.emitInvokeSpecial(new_class.constructor);
-    if (closureEnvField != null)
-      {
-	code.emitDup(new_class);
-	LambdaExp caller = outerLambda();
-	Variable closureEnv = getHeapLambda(caller).heapFrame;
-	code.emitLoad(closureEnv);
-	code.emitPutField(closureEnvField);
-      }
-
-    if (name != null && ! (this instanceof ClassExp))
-      {
-	// Call setName(name) on the result.
-	if (setNameMethod == null)
-	  setNameMethod
-	    = comp.typeProcedure.getDeclaredMethod("setName", 1);
-	code.emitDup(new_class);
-	code.emitPushString(name);
-	code.emitInvokeVirtual(setNameMethod);
-      }
-
-    return new_class;
   }
 
   public void compileEnd (Compilation comp)

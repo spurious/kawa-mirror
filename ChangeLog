@@ -1,3 +1,8 @@
+2005-02-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (find(String)):  Move 'run' call to ...
+	(find(Class, Environment)): ... here to also do run at compile-time.
+
 2005-01-31  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (namespaceResolve): Treat unbound

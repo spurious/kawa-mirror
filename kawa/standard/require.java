@@ -86,8 +86,6 @@ public class require extends Syntax
       {
 	Object value =
 	  find(Class.forName(typeName), Environment.getCurrent());
-	if (value instanceof Runnable)
-	  ((Runnable) value).run();
 	return value;
       }
     catch (java.lang.ClassNotFoundException ex)
@@ -115,6 +113,8 @@ public class require extends Syntax
 	  {
 	    value = ctype.newInstance();
 	    loc.set(value);
+	    if (value instanceof Runnable)
+	      ((Runnable) value).run();
 	  }
         catch (Exception ex)
           {

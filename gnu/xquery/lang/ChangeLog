@@ -1,3 +1,26 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (prologNamespaces): New field.
+	(pushNamespace): Add to prologNamespaces.
+	(parseNameSpec): Simplify, thanks to use of new SName type.
+	(castQName): New helper method.
+	(parseElementConstructor): Use MakeElement and MakeAttribute classes
+	rather than ElementConstructor and AttributeConstructor.
+	(parseMaybePrimaryExpr): Handle in-scope namespace nodes.
+	* XQuery.java: Define fn:QName function and xs:QName type/cast.
+
+	* XQResolveNames.java (walkApplyExp): Implement xs:Name cast.
+	Update for changes to use MakeElement and MakeAttribute classes
+	rather than ElementConstructor and AttributeConstructor.
+
+	* XQParser.java (parsePrimaryExpr): If missing expression, call
+	getRawToken to avoid the risk of an infinite loop.
+
+	* XQParser.java (parser); Field renamed to comp.
+	* XQuery.java (parse): Set resolver's parser field.
+
+	* XQuery.java (SCHEMA_NAMESPACE): New constant.
+
 2004-12-21  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (define_method): Set name of Procedure, for better

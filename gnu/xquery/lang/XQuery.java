@@ -31,6 +31,8 @@ public class XQuery extends Interpreter
     = "http://qexo.gnu.org/";
   public static final String LOCAL_NAMESPACE
     = "http://www.w3.org/2004/10/xquery-local-functions";
+  public static final String SCHEMA_NAMESPACE
+    = "http://www.w3.org/2001/XMLSchema";
   public static final Namespace xqueryFunctionNamespace
     = Namespace.getInstance(XQUERY_FUNCTION_NAMESPACE);
   public static final Namespace kawaFunctionNamespace
@@ -105,6 +107,7 @@ public class XQuery extends Interpreter
     tr.push(mexp);
     tr.mustCompileHere();
     ((XQParser) lexer).resolver = resolver;
+    resolver.parser =  (XQParser) lexer;
     if ((options & PARSE_ONE_LINE) != 0)
       {
 	Expression sexp = ((XQParser) lexer).parse(tr);
@@ -563,6 +566,7 @@ public class XQuery extends Interpreter
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringValue", "concat");
 
+    define_method("QName", "gnu.xquery.util.QNameUtils", "makeQName");
     define_method("local-name-from-QName", "gnu.xquery.util.QNameUtils",
 		  "localNameFromQName");
     define_method("namespace-uri-from-QName", "gnu.xquery.util.QNameUtils",
@@ -614,6 +618,7 @@ public class XQuery extends Interpreter
   static Object[] typeMap =
     { "string", Type.string_type,
       "boolean", Type.boolean_type,
+      "QName", "gnu.xml.SName",
       "integer", "gnu.math.IntNum",
       "positiveInteger", "gnu.math.IntNum",
       "nonPositiveInteger", "gnu.math.IntNum",

@@ -4,18 +4,23 @@
 package gnu.xquery.lang;
 import gnu.expr.*;
 import gnu.kawa.xml.*;
-import gnu.xml.NamespaceBinding;
+import gnu.xml.*;
 import gnu.mapping.*;
 import gnu.bytecode.ClassType;
 import gnu.kawa.reflect.*;
 
 public class XQResolveNames extends ResolveNames
 {
+  XQParser parser;
+
   /** Value of <code>getCode()</code> for <code>lastDecl</code>. */
   public static final int LAST_BUILTIN = -1;
 
   /** Value of <code>getCode()</code> for <code>positionDecl</code>. */
   public static final int POSITION_BUILTIN = -2;
+
+  /** Value of <code>xs:QName()</code> constructor. */
+  public static final int XS_QNAME_BUILTIN = -3;
 
   /** Declaration for the <code>fn:last()</code> function. */
   public static final Declaration lastDecl
@@ -24,6 +29,9 @@ public class XQResolveNames extends ResolveNames
   /** Declaration for the <code>fn:position()</code> function. */
   public static final Declaration positionDecl
     = makeBuiltin("position", POSITION_BUILTIN);
+
+  public static final Declaration xsQNameDecl
+    = makeBuiltin(Symbol.make(XQuery.SCHEMA_NAMESPACE, "QName"), XS_QNAME_BUILTIN);
 
   /** Create a <code>Declaration</code> for a builtin function. */
   public static Declaration makeBuiltin (String name, int code)
@@ -51,6 +59,7 @@ public class XQResolveNames extends ResolveNames
     super(comp);
     lookup.push(lastDecl);
     lookup.push(positionDecl);
+    lookup.push(xsQNameDecl);
   }
 
   public Namespace[] functionNamespacePath
@@ -262,10 +271,18 @@ public class XQResolveNames extends ResolveNames
     return result;
   }
 
+  NamespaceBinding constructorNamespaces;
+
   protected Expression walkApplyExp (ApplyExp exp)
   {
-    super.walkApplyExp(exp);
     Expression func = exp.getFunction();
+    NamespaceBinding namespaceSave = constructorNamespaces;
+    Object proc = exp.getFunctionValue();
+    if (proc instanceof MakeElement)
+      constructorNamespaces = ((MakeElement) proc).getNamespaceNodes();
+    super.walkApplyExp(exp);
+    constructorNamespaces = namespaceSave;
+    func = exp.getFunction();
     if (func instanceof ReferenceExp)
       {
 	Declaration decl = ((ReferenceExp) func).getBinding();
@@ -282,59 +299,72 @@ public class XQResolveNames extends ResolveNames
 		if (decl == null)
 		  error('e', "undefined context for " + sym.getName());
 		return new ReferenceExp(sym, decl);
+	      case XS_QNAME_BUILTIN:
+		{
+		  Expression[] args = exp.getArgs();
+		  // FIXME check that args.length == 1.
+		  if (args[0] instanceof QuoteExp)
+		    {
+		      try
+			{
+			  Object val = ((QuoteExp) args[0]).getValue();
+			  val = gnu.xquery.util.QNameUtils.resolveQName(val,
+							constructorNamespaces,
+							parser.prologNamespaces);
+			  return new QuoteExp(val);
+			}
+		      catch (RuntimeException ex)
+			{
+			  return getCompilation().syntaxError(ex.getMessage());
+			}
+		    }
+		  Expression[] xargs = {
+		    args[0],
+		    new QuoteExp(constructorNamespaces),
+		    new QuoteExp(parser.prologNamespaces) };
+		  gnu.bytecode.Method meth
+		    = (ClassType.make("gnu.xquery.util.QNameUtils")
+		       .getDeclaredMethod("resolveQName", 3));
+		  ApplyExp app = new ApplyExp(meth, xargs);
+		  app.setFlag(ApplyExp.INLINE_IF_CONSTANT);
+		  return app;
+		}
 	      }
 	  }
       }
-    Object proc = exp.getFunctionValue();
-    if (proc instanceof AttributeConstructor)
+    proc = exp.getFunctionValue();
+    if (proc instanceof MakeElement)
       {
-	AttributeConstructor cons = (AttributeConstructor) proc;
-	if (cons.getQName() == null)
-	  cons.setQName(namespaceResolve(cons.getXmlName(), false));
-      }
-    else if (proc instanceof ElementConstructor)
-      {
-	ElementConstructor cons = (ElementConstructor) proc;
-	if (cons.getQName() == null)
-	  {
-	    Compilation comp = getCompilation();
-	    int saveColumn = comp.getColumn();
-	    // Add 1 for the '<' to get the actual element name.
-	    if (saveColumn > 0)
-	      comp.setColumn(saveColumn+1);
-	    cons.setQName(namespaceResolve(cons.getXmlName(), false));
-	    comp.setColumn(saveColumn);
-	  }
+	MakeElement make = (MakeElement) proc;
 
 	// Add namespaces nodes that might be needed.
-	NamespaceBinding nsBindings = cons.getNamespaceNodes();
-	nsBindings = maybeAddNamespace(cons.getXmlName(),
-				       cons.getQName(), nsBindings);
+	NamespaceBinding nsBindings = make.getNamespaceNodes();
+	nsBindings = maybeAddNamespace(MakeElement.getTagName(exp),
+				       nsBindings);
 	Expression[] args = exp.getArgs();
 	for (int i = 0;  i < args.length;  i++)
 	  {
 	    Expression arg = args[i++];
-	    if (arg instanceof ApplyExp
-		&& (proc = ((ApplyExp) arg).getFunctionValue()) instanceof AttributeConstructor)
+	    if (arg instanceof ApplyExp)
 	      {
-		AttributeConstructor acons = (AttributeConstructor) proc;
-		nsBindings = maybeAddNamespace(acons.getXmlName(),
-					       acons.getQName(), nsBindings);
+		ApplyExp app = (ApplyExp) arg;
+		if (app.getFunction() == MakeAttribute.makeAttributeExp)
+		  nsBindings = maybeAddNamespace(MakeElement.getTagName(app),
+						 nsBindings);
 	      }
 	  }
 	if (nsBindings != null)
-	  cons.setNamespaceNodes(nsBindings);
+	  make.setNamespaceNodes(nsBindings);
       }
     return exp;
   }
 
-  static NamespaceBinding maybeAddNamespace(String sname, Symbol qname,
+  static NamespaceBinding maybeAddNamespace(SName qname,
 					    NamespaceBinding bindings)
   {
     if (qname == null) // Happens if prevously-reported unknown prefix.
       return bindings;
-    int colon = sname.indexOf(':');
-    String prefix = colon < 0 ? null : sname.substring(0, colon).intern();
+    String prefix = qname.getPrefix();
     String uri = qname.getNamespaceURI();
     return NamespaceBinding.maybeAdd(prefix, uri == "" ? null : uri, bindings);
   }

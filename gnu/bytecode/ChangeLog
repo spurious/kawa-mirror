@@ -1,3 +1,8 @@
+2003-04-25  Per Bothner  <per@bothner.com>
+
+	* ObjectType.java (getReflectClass):  Pass false to initialize argument
+	of Class.forName - but only if Java2 is selected.
+
 2003-04-21  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java:  Rewrite to use a Hashtable.

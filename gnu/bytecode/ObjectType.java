@@ -56,7 +56,14 @@ public class ObjectType extends Type
     try
       {
 	if (reflectClass == null)
-	  reflectClass = Class.forName(getInternalName().replace('/', '.'));
+	  {
+	    /* BEGIN JAVA2 - uses option 'initialize' argument */
+	    reflectClass = Class.forName(getInternalName().replace('/', '.'));
+	    /* END JAVA2 - uses option 'initialize' argument */
+	    /* BEGIN JAVA1 */
+	    // reflectClass = Class.forName(getInternalName().replace('/', '.'));
+	    /* END JAVA1 */
+	  }
         flags |= EXISTING_CLASS;
       }
     catch (java.lang.ClassNotFoundException ex)

@@ -1,5 +1,7 @@
 2005-03-17  Per Bothner  <per@bothner.com>
 
+	* Lisp2.java (importLocation): Add kludge to work aorund GCJ bug.
+
 	* Lisp2.java (importLocation): New method.
 	* CommonLisp.java (<init>): Use importLocation.
 

@@ -132,22 +132,29 @@ public abstract class Lisp2 extends LispLanguage
       return;
     Object val;
     loc = loc.getBase();
+    // Disable the following, for now.  It hangs when using GCJ.
+    // The problem appears to be with a _Jv_Field for a static field
+    // that is in a BSS segment; the address in the _Jv_Field doesn't
+    // get initialized.  FIXME.
+    /*
     if (loc instanceof FieldLocation
         && ((FieldLocation) loc).isProcedureOrSyntax())
       {
         environ.addLocation(name, EnvironmentKey.FUNCTION, loc);
+        return;
       }
-    else if ((val = loc.get(null)) != null)
+    */
+    try {
+    if ((val = loc.get(null)) != null)
       {
-        try {
         if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
           defun(name, val);
         else
           define(name.getName(), val);
-	} catch (Exception ex)
-	  {
-	    System.err.println("(Cannot import "+loc+"::"+loc.getClass().getName()+" from Scheme)");
-	  }
+      }
+    } catch (Exception ex)
+      {
+        System.err.println("(Cannot import "+loc+"::"+loc.getClass().getName()+" from Scheme)");
       }
   }
 }

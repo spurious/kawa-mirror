@@ -258,4 +258,18 @@ public class FindTailCalls extends ExpFullWalker
 	inTailContext = save;
       }
   }
+
+  public Object walkSynchronizedExp (SynchronizedExp exp)
+  {
+    boolean save = inTailContext;
+    try
+      {
+	inTailContext = false;
+	return super.walkSynchronizedExp(exp);
+      }
+    finally
+      {
+	inTailContext = save;
+      }
+  }
 }

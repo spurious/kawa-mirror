@@ -39,6 +39,7 @@ java_JAVA=\
   Special.java \
   StackTarget.java \
   Symbol.java \
+  SynchronizedExp.java \
   TailTarget.java \
   Target.java \
   TryExp.java \

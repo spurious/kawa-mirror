@@ -72,7 +72,7 @@ extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = reflect
+SUBDIRS = util reflect
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  Makefile.am Makefile.in

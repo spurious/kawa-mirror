@@ -37,9 +37,8 @@ public class Shell
 
 	    interpreter.errors = 0;
 
-	    LambdaExp lexp = new LambdaExp (ModuleBody.formals,
-					    new Pair (sexp, List.Empty),
-					    interpreter);
+	    LambdaExp lexp = new ModuleExp (new Pair (sexp, List.Empty),
+					    env);
 	    lexp.setName (Symbol.make ("atInteractiveLevel"));  // FIXME
 	    String filename = inp.getName ();
 	    if (filename == null)

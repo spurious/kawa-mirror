@@ -32,6 +32,8 @@ public class TestMisc
 
     evalTest("for $y in (4,5,2+4) return <b>{10+$y}</b>",
 	     "<b>14</b><b>15</b><b>16</b>");
+    evalTest("for $i in (1 to 10) where ($i mod 2)=1 return 20+$i",
+	     "21 23 25 27 29");
 
     evalTest("(3,4,5)[3]", "5");
     evalTest("1,((2,3)[false()]),5", "1 5");
@@ -163,6 +165,9 @@ public class TestMisc
     evalTest("namespace x1='XXX",
 	     "*** caught SyntaxException - <string>:1:18: "
 	     + "unexpected end-of-file in string");
+
+    evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
+	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");
 
     System.out.println("# of expected passes      " + expectedPasses);
     if (expectedFailures > 0)

@@ -1,3 +1,8 @@
+2002-01-21  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main): Add test for 'for'-'where'.
+	Add test for 'unescaped-data'.
+
 2002-01-07  Per Bothner  <per@bothner.com>
 
 	* tab.xml.in:  Add some CDATA and a comment to verify they work.

@@ -5,5 +5,7 @@ public interface Named
 {
   public String getName();
 
+  Object getSymbol ();
+
   public void setName (String name);
 }

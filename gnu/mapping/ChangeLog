@@ -1,3 +1,56 @@
+2004-12-05  Per Bothner  <per@bothner.com>
+
+	Rewrite of how symbols and environments are handled.
+	Locations are now separate from stateless Symbols.
+	* Symbol.java: Major rewrite.  Move some functionality to Location.
+	(constraint): Remove field - we no longer make use of Constraints.
+	* Namespace.java: New class.  Partially based on Environment.
+
+	* Location.java: Major re-write. No longer base class for Symbol.
+	* ConstantLocation.java: New class, replaces ConstantConstraint.
+	* NamedLocation.java: New abstract class, extends Location.
+	* IndirectableLocation.java: New abstract class.  Combines
+	functionality of IndirectableConstraint, TrivalCOntraint, and Symbol.
+	* PlainLocation.java: New class, extends IndirectableConstraint.
+	* SharedLocation.java: Similar to PlainLocation, but synchronized.
+	* UnboundLocation.java: New class, replaced UnboundConstraint.
+	* ProcLocation.java: Small update.
+
+	* PropertyLocation.java: New class, extends Location.
+
+	* Constraint.java: Removed class; replaced by Location.
+	* AliasConstraint.java: Likewise removed.
+	* ConstantConstraint.java: Likewise.
+	* IndirectConstraint.java: Likewise.
+	* TrivialConstraint.java: Likewise.
+	* UnboundConstraint.java: Likewise.
+	* Makefile.am: Update accordingly.
+
+	* EnvironmentKey.java: New interface for a (Symbol. property)-pair.
+	* KeyPair.java: New concrete classs implementing EnvironmentKey.
+
+	* Environment.java: Made abstract.   Changed to map EnvironmentKey
+	to Location, instead of String to Symbol.
+	* SimpleEnvironment.java: New class, extends Environment.
+	* InheritingEnvironment.java: New class, extends SimpleEnvironment.
+	* SymbolEnumeration.java: Removed class, replaced by ...
+	* LocationEnumeration.java: New class.
+	* NameMap.java: Changed to match new Environment.
+
+	Re-implemented fluid bindings.
+	* FluidBinding.java: Removed class.
+	* FluidConstraint.java: Likewise.
+	* CallContext.java (fluidBindings): Removed field.
+	(setFluids, resetFluids): Removed methods.
+	* Future.java (fluidBindings): Remove field.
+	(setFluids, resetFluids, getFluids): Removed methods.
+	(<init>, run): Redid creating of sub-Environment.
+
+	* Named.java (getSymbol): New method.
+
+	* UnboundSymbol.java: Removed RuntimeException class, replaced by ...
+	* UnboundLocationException.java: New class extends RuntimeException.
+
 2004-11-23  Per Bothner  <per@bothner.com>
 
 	* Environment.java (make): Comment out one of the new methods.

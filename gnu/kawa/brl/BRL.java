@@ -5,7 +5,6 @@ import gnu.kawa.lispexpr.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
-import gnu.text.*;
 
 public class BRL extends Scheme
 {

@@ -1,5 +1,8 @@
 2001-04-24  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (compileArgs):  Use compileNotePosition.
+	* Checkedtarget.java (emitCheckedCoerce):  Do putLineNumber.
+
 	* ApplyExp.java (getType):  Avoid infinite recursion.
 
 2001-04-23  Per Bothner  <per@bothner.com>

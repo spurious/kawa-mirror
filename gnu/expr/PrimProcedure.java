@@ -325,10 +325,10 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           arg_type = is_static ? argTypes[i + skipArg]
             : i==0 ? thisType
             : argTypes[i-1];
-	args[i].compile(comp,
-                        source == null
-                        ? CheckedTarget.getInstance(arg_type, name, i)
-                        : CheckedTarget.getInstance(arg_type, source, i));
+	Target target =
+	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
+	  : CheckedTarget.getInstance(arg_type, source, i);
+	args[i].compileNotePosition(comp, target);
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
       }

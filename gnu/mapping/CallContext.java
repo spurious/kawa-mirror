@@ -69,7 +69,7 @@ public class CallContext // implements Runnable
    * This a selector that only has meaning to the proc's Procedure.*/
   public int pc;
 
-  /* CPS: ??
+  /* CPS:
   CallFrame frame;
   */
 
@@ -224,15 +224,19 @@ public class CallContext // implements Runnable
   {
     for (;;)
       {
-	/** Cps
-	CallFrame frame = this.frame;
-	if (frame == null)
-	  break;
-	frame.step(this);
-	*/
 	Procedure proc = this.proc;
 	if (proc == null)
-	  break;
+	  {
+	    /* CPS:
+	    CallFrame fr = frame;
+	    if (fr == null)
+	      break;
+	    proc = fr.proc;
+	    frame = fr.previous;
+	    if (proc == null)
+	    */
+	      break;
+	  }
 	this.proc = null;
 	proc.apply(this);
       }
@@ -373,3 +377,15 @@ public class CallContext // implements Runnable
     this.baseUri = baseUri;
   }
 }
+
+/* CPS:
+class CallFrame
+{
+  Procedure proc;
+  CallFrame previous;
+  int saveVstackLen;
+
+  // Should probably be in sub-classes of ClassFrame:
+  Object[] values;
+}
+*/

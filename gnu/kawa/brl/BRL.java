@@ -69,19 +69,21 @@ public class BRL extends Scheme
     return new XMLPrinter(out, false);
   }
 
-  public Compilation parseFile (InPort port, boolean immediate,
-				gnu.text.SourceMessages messages)
+  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
+			   int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     Translator tr = new Translator (this, messages);
-    tr.immediate = immediate;
+    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
     BRLRead lexer = new BRLRead(port, messages);
     lexer.setBrlCompatible(isBrlCompatible());
+    if ((options & PARSE_ONE_LINE) != 0 && port instanceof TtyInPort)
+      lexer.setInteractive(true);
     boolean inString = true;
     Object sexp = lexer.brlReader.read(lexer, ']', 0);
     for (;;)

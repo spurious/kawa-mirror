@@ -157,6 +157,8 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int OP_EXCEPT    = 200 + 24 + 1; // 'except'
   static final int OP_UNION     = 200 + 24 + 2; // 'union'
 
+  static final int OP_NODE = 231; // 'node' followed by '('
+  static final int OP_TEXT = 232; // 'text' followed by '('
   
   /**
    * An encoding of the token type:
@@ -485,13 +487,30 @@ public class XQParser extends LispReader // should be extends Lexer
       getRawToken();
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
+	int next = nesting == 0 ? skipHSpace() : skipSpace();
+	if (next == '(')
+	  {
+	    int token = FNAME_TOKEN;
+	    switch (tokenBuffer[0])
+	      {
+	      case 'i':
+		if (match("if"))
+		  {
+		    unread();
+		    return curToken;
+		  }
+		break;
+	      case 'n':
+		if (match("node")) token = OP_NODE;
+		break;
+	      case 't':
+		if (match("text")) token = OP_TEXT;
+		break;
+	      }
+	    return curToken = token;
+	  }
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	curValue = name;
-	int next = nesting == 0 ? skipHSpace() : skipSpace();
-	if (next == '('
-	    && ! name.equals("if"))
-	  // FunctionCall or KindTest
-	  return curToken = FNAME_TOKEN;
 	if ((next == 'f' || next == 'F') && "define".equals(name))
 	  {
 	    unread();
@@ -697,6 +716,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    Expression exp2 = parseBinaryExpr(tokPriority+1);
 	    if (token == OP_AND)
 	      exp = new IfExp(exp, exp2, QuoteExp.falseExp);
+	    else if (token == OP_OR)
+	      exp = new IfExp(exp, QuoteExp.trueExp, exp2);
 	    else
 	      exp = makeBinary(token, exp, exp2);
 	  }
@@ -751,13 +772,6 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       return syntaxError("unimplemented non-relative PathExpr");
     return parseRelativePathExpr();
-  }
-
-  Expression parseNodeTest(int axis)
-      throws java.io.IOException, SyntaxException
-  {
-     Declaration dotDecl = parser.lookup("dot", -1);
-     return parseNodeTest(new ReferenceExp("dot", dotDecl), axis);
   }
 
   QName parseNameTest(String defaultNamespaceUri)
@@ -821,31 +835,68 @@ public class XQParser extends LispReader // should be extends Lexer
     return QName.make(uri, local);
   }
 
-  Expression parseNodeTest(Expression dot, int axis)
+  Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
+    Declaration dotDecl = parser.lookup("dot", -1);
+    Expression dot = new ReferenceExp("dot", dotDecl);
+    int token = peekOperand();
+    /*
+    if (token == NCNAME_TOKEN || token == QNAME_TOKEN 
+	|| token == NCNAME_COLON_TOKEN || token == OP_MUL)
+      {
+	QName qname = parseNameTest(defaultNamespace; // FIXME null if attribute
+      }
+    else
+    */
+    if (token == FNAME_TOKEN)
+      {
+      }
+
+    if (curToken == '@' && axis < 0)
+      {
+	getRawToken();
+	axis = AXIS_ATTRIBUTE;
+      }
+    
     Expression exp;
     if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT)
 	&&
 	(curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
-	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL))
+	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
+	 || curToken == OP_NODE || curToken == OP_TEXT))
       {
-	QName qname = parseNameTest(defaultNamespace);
-	Expression[] args = { dot, new QuoteExp(new ElementType(qname)) };
+	Object predicate;
+	if (curToken == OP_NODE || curToken == OP_TEXT)
+	  {
+	    if (curToken == OP_NODE)
+	      {
+		predicate = new NodeType("node");
+	      }
+	    else // if (curToken == OP_TEXT)
+	      {
+		predicate = new NodeType("text", NodeType.TEXT_OK);
+	      }
+	    if (getRawToken() != ')')
+	      return syntaxError("missing '()' after node test");
+	  }
+	else
+	  {
+	    QName qname = parseNameTest(defaultNamespace);
+	    predicate = new ElementType(qname);
+	  }
+	Expression[] args = { dot, new QuoteExp(predicate) };
 	Expression func
 	  = axis == AXIS_DESCENDANT ? funcNamedDescendants : funcNamedChildren;
 	exp = new ApplyExp(func, args);
       }
-    else if ((curToken == '@' && axis < 0) || axis == AXIS_ATTRIBUTE)
+    else if (axis == AXIS_ATTRIBUTE)
       {
-	if (axis < 0)
-	  getRawToken();
 	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN
 	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
 	  {
 	    QName qname = parseNameTest(null);
-	    Expression[] args = { dot, new QuoteExp(qname.getNamespaceURI()),
-				  new QuoteExp(qname.getLocalName()) };
+	    Expression[] args = { dot, new QuoteExp(qname), };
 	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
 			       args);
 	  }
@@ -1502,7 +1553,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    return parseNodeTest(-1);
 	  }
       }
-    else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@')
+    else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@'
+	     || token == OP_NODE || token == OP_TEXT)
       {
 	return parseNodeTest(-1);
       }

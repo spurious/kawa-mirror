@@ -1,3 +1,14 @@
+2002-04-08  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (OP_NODE, OP_TEXT):  New constants.
+	(peekOperand):  Check for "node(" and "text(".
+
+	* XQParser.java (parseBinaryExpr):  Handle OP_OR.
+
+	* XQParser.java (parseNodeTest):  Merge overloaded methods.
+	Process OP_NODE and OP_TEXT.
+	(parseMaybePrimaryExpr):  Process OP_NODE and OP_TEXT.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseNodeTest):  NamedChildren and NamedDescendant

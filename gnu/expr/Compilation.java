@@ -12,8 +12,19 @@ import java.util.zip.*;
 import java.util.Stack;
 // import java.util.jar.*; // Java2
 
+/** State for a single expression or module.
+ * For each top-level thing (expression or file) we compile or evaluate
+ * we create a new Compilation.
+ */
+
 public class Compilation
 {
+  /** True if the form is too complex to evaluate,and we must compile it.
+   * This is because it contains a construct we know how to compile, but not
+   * evaluate, and it it outside a function (which we always compile).
+   * This can be a let scope, or primitive procedure. */
+  public boolean mustCompile;
+
   /** Used by LambdaExp.getSelectorValue if need to allocate new selector. */
   int maxSelectorValue;
 
@@ -2080,17 +2091,7 @@ public class Compilation
    */
   public void mustCompileHere ()
   {
-    ScopeExp exp = current_scope;
-    for (;; exp = exp.outer)
-      {
-	if (exp == null)
-	  return;
-	if (exp instanceof ModuleExp)
-	  {
-	    ((ModuleExp) exp).mustCompile = true;
-	    return;
-	  }
-      }
+    mustCompile = true;
   }
 
   public ScopeExp currentScope() { return current_scope; }

@@ -1,3 +1,17 @@
+2004-10-27  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (mustCompile): Move field from here ...
+	* Compilation.java (mustCompile): ... to here.
+	(mustCompileHere): Is now much simpler.
+	* ModuleExp.java (evalModule):  Update accordingly.
+
+	* ModuleExp.java (dumpZipCounter):  Removed/replaced by ...
+	(interactiveCounter): ... new static field, updated by Shell.run.
+	(evalToClass): Use interactiveCounter instead of dumpZipCounter.
+
+	* ModuleExp.java (evalModul):  Don't print expression if mustCompile,
+	since then Compililation.compile takes care of it.
+
 2004-10-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileToFiles):  Move debugPrintExpr handling ...

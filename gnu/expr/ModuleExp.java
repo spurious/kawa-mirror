@@ -10,12 +10,6 @@ import gnu.text.*;
 
 public class ModuleExp extends LambdaExp
 {
-  /** True if the body is too complex to evaluate,and we must compile it.
-   * This is because it contains a construct we know how to compile, but not
-   * evaluate, and it it outside a lambda (which we always compile).
-   * This can be a let scope, or primitive procedure. */
-  public boolean mustCompile;
-
   public static boolean debugPrintExpr = false;
 
   public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
@@ -34,7 +28,15 @@ public class ModuleExp extends LambdaExp
 
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
-  public static int dumpZipCounter;
+
+  /** Numeric identifier for this interactive "command".
+   * Incremented by Shell.run, and used to set the module name,
+   * and maybe the name of the --debug-dump-zip output file.
+   * We increment and use this counter purely to ease debugging.
+   * (Since each module gets its own ClassLoader, they don't
+   * need to be named differently, and it doesn't matter
+   * if there is a race condition on the counter.) */
+  public static int interactiveCounter;
 
   ///** A cache if this has already been evaluated. */
   //Procedure thisValue;
@@ -60,8 +62,9 @@ public class ModuleExp extends LambdaExp
 	if (dumpZipPrefix != null)
 	  {
 	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
-	    if (dumpZipCounter >= 0)
-	      zipname.append(++dumpZipCounter);
+	    if (interactiveCounter >= 0)
+	      // Incremented by Shell.run.
+	      zipname.append(interactiveCounter);
 	    zipname.append(".zip");
 	    java.io.FileOutputStream zfout
 	      = new java.io.FileOutputStream(zipname.toString());
@@ -146,16 +149,16 @@ public class ModuleExp extends LambdaExp
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 
-	if (debugPrintExpr)
+	if (debugPrintExpr && ! comp.mustCompile)
 	  {
 	    OutPort dout = OutPort.outDefault();
-	    dout.println ("[Evaluating module \""+mexp.getName()+"\" mustCompile="+mexp.mustCompile+':');
+	    dout.println ("[Evaluating module \""+mexp.getName()+"\":");
 	    mexp.print(dout);
 	    dout.println(']');
 	    dout.flush();
 	  }
 
-	if (! mexp.mustCompile) // optimization - don't generate unneeded Class.
+	if (! comp.mustCompile) // optimization - don't generate unneeded Class.
 	  mexp.body.eval (env, ctx);
 	else
 	  {

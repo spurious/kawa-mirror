@@ -4,7 +4,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-/** Implementation of he standard Scheme let-syntax and letrec-syntax forms.
+/** Implementation of the standard Scheme let-syntax and letrec-syntax forms.
  * Not quite working yet. */
 
 public class let_syntax extends Syntax implements Printable

@@ -48,15 +48,18 @@ public class fluid_let extends Syntax implements Printable
 	String name;
 	Expression value;
 	Pair binding;
-	if (bind_pair.car instanceof String)
+	if (bind_pair.car instanceof String
+	    || bind_pair.car instanceof Binding)
 	  {
-	    name = (String) bind_pair.car;
+	    name = bind_pair.car.toString();
 	    value = defaultInit;
 	  }
 	else if (bind_pair.car instanceof Pair
-		 && (binding = (Pair) bind_pair.car).car instanceof String)
+		 && ((binding = (Pair) bind_pair.car).car instanceof String
+		     || binding.car instanceof Binding))
+		 
 	  {
-	    name = (String) binding.car;
+	    name = binding.car.toString();
 	    if (binding.cdr == LList.Empty)
 	      value = defaultInit;
 	    else if (! (binding.cdr instanceof Pair)

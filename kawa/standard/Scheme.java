@@ -851,11 +851,20 @@ public class Scheme extends Interpreter
         types.put ("readtable", ClassType.make("gnu.kawa.lispexpr.ReadTable"));
       }
     Type type = (Type) types.get(name);
-    if (type == null && name.startsWith("elisp:"))
+    if (type == null
+	&& (name.startsWith("elisp:") || name.startsWith("clisp:")))
       {
-	Class clas = getNamedType(name.substring(6)).getReflectClass();
-	type = Interpreter.getInstance("elisp").getTypeFor(clas);
-	types.put(name, type);
+	int colon = name.indexOf(':');
+	Class clas = getNamedType(name.substring(colon+1)).getReflectClass();
+	String lang = name.substring(0,colon);
+	Interpreter interp = Interpreter.getInstance(lang);
+	if (interp == null)
+	    throw new RuntimeException("unknown type '" + name
+				       + "' - unknown language '"
+				       + lang + '\'');
+	type = interp.getTypeFor(clas);
+	if (type != null)
+	  types.put(name, type);
       }
     return type;
   }

@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
+import gnu.mapping.Binding;
 import gnu.expr.*;
 import gnu.lists.*;
 
@@ -36,7 +37,7 @@ public class prim_method extends Syntax
     String str = obj.toString();
     if (obj instanceof FString)
       return Scheme.string2Type(str);
-    else if (obj instanceof String)
+    else if (obj instanceof String || obj instanceof Binding)
       {
         Type type = tr.getInterpreter().getTypeFor(tr.rewrite(obj));
 	if (type != null)

@@ -136,15 +136,17 @@ public class SyntaxPattern extends Pattern implements Externalizable
     String file = tr.getFile();
     if (file != null)
       {
-	System.err.print(" file ");
+	System.err.print(" file=");
 	System.err.print(file);
       }
     int line = tr.getLine();
     if (line != 0)
       {
-	System.err.print(" line ");
+	System.err.print(" line=");
 	System.err.print(line);
       }
+    System.err.print(" vars=");
+    System.err.print(varCount);
     System.err.println(':');
     disassemble();
     */
@@ -584,5 +586,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
     literals = (Object[]) in.readObject();
     program = (String)  in.readObject();
     varCount = in.readInt();
+  }
+
+  /** The compiler calls this method to implement syntax-case. */
+  public static Object[] allocVars (int varCount, Object[] outer)
+  {
+    Object[] vars = new Object[varCount];
+    if (outer != null)
+      System.arraycopy(outer, 0, vars, 0, outer.length);
+    return vars;
   }
 }

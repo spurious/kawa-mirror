@@ -31,6 +31,10 @@ public class Translator extends Compilation
    * from a <code>syntax-case</code>. */
   public PatternScope patternScope;
 
+  /** A variable to hold the matched values for syntax-case
+   * pattern variables. */
+  public Declaration matchArray;
+
   /** A stack of aliases pushed by <code>pushRenamedAlias</code>. */
   Stack renamedAliasStack;
 

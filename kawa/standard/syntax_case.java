@@ -47,9 +47,9 @@ public class syntax_case extends Syntax
 	  return tr.syntaxError("syntax-case:  bad clause list");
 	Pair pair = (Pair) clause;
 	PatternScope clauseScope = PatternScope.push(tr);
-	clauseScope.matchArray = work.matchArray;
+	clauseScope.matchArray = tr.matchArray;
 	tr.push(clauseScope);
-
+	int outerVarCount = clauseScope.pattern_names.size();
 	SyntaxPattern pattern
 	  = new SyntaxPattern(pair.car, work.literal_identifiers, tr);
 	int varCount = pattern.varCount();
@@ -60,13 +60,14 @@ public class syntax_case extends Syntax
 	Expression[] args = new Expression[4];
 	args[0] = new QuoteExp(pattern);
 	args[1] = new ReferenceExp(work.inputExpression);
-	args[2] = new ReferenceExp(work.matchArray);
+	args[2] = new ReferenceExp(tr.matchArray);
 	args[3] = new QuoteExp(IntNum.zero());
 	Expression tryMatch
 	  = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod), args);
 
-	Expression[] inits = new Expression[varCount];
-	for (int i = 0;  i < varCount;  i++)
+	int newVarCount = varCount - outerVarCount;
+	Expression[] inits = new Expression[newVarCount];
+	for (int i = newVarCount;  --i >= 0; )
 	  inits[i] = QuoteExp.undefined_exp;
 	clauseScope.inits = inits;
 
@@ -83,6 +84,7 @@ public class syntax_case extends Syntax
 	    output = new IfExp(fender, tr.rewrite(pair.car), new ExitExp(block));
 	  }
 	clauseScope.setBody(output);
+
 	tr.pop(clauseScope);
 	PatternScope.pop(tr);
 	block.setBody(new IfExp(tryMatch, clauseScope, new ExitExp(block)),
@@ -134,20 +136,28 @@ public class syntax_case extends Syntax
             linits[0] = input;
             LetExp let = new LetExp(linits);
             work.inputExpression = let.addDeclaration((String) null);
-            work.inputExpression.noteValue(linits[0]);
-            work.matchArray = let.addDeclaration((String) null);
-            work.primArrayGet = new ArrayGet(Type.pointer_type);
-            work.matchArray.setType(Compilation.objArrayType);
+            work.inputExpression.noteValue(linits[0]); 
+	    Declaration matchArrayOuter = tr.matchArray;
+	    Declaration matchArray = let.addDeclaration((String) null);
+            matchArray.setType(Compilation.objArrayType);
+            matchArray.setCanRead(true);
+	    tr.matchArray = matchArray;
             work.inputExpression.setCanRead(true);
-            work.matchArray.setCanRead(true);
             tr.push(let);
             let.body = rewriteClauses(obj, work, tr);
             tr.pop(let);
-            Procedure arrayNew = new ArrayNew(Type.pointer_type);
-            Expression[] args = new Expression[1];
+
+	    Method allocVars = ClassType.make("kawa.lang.SyntaxPattern")
+	      .getDeclaredMethod("allocVars", 2);
+            Expression[] args = new Expression[2];
             args[0] = new QuoteExp(IntNum.make(work.maxVars));
-            linits[1] = new ApplyExp(arrayNew, args);
-            work.matchArray.noteValue(linits[1]);
+	    if (matchArrayOuter == null)
+	      args[1] = QuoteExp.nullExp;
+	    else
+	      args[1] = new ReferenceExp(matchArrayOuter);
+            linits[1] = new ApplyExp(allocVars, args);
+            matchArray.noteValue(linits[1]);
+	    tr.matchArray = matchArrayOuter;
             return let;
           }
       }
@@ -175,11 +185,6 @@ class syntax_case_work
   /** A temporary to hold the value of the input expression. */
   Declaration inputExpression;
 
-  /** A variable to hold the matched values for the pattern variables. */
-  Declaration matchArray;
-
   /** The maximum of the varCount() for the patterns seen so far. */
   int maxVars;
-
-  ArrayGet primArrayGet;
 }

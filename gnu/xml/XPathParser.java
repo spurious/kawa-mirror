@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
+import gnu.lists.Convert;
 
 public class XPathParser implements XPathConstants
 {
@@ -603,7 +604,7 @@ public class XPathParser implements XPathConstants
 			getRawToken();
 		}
 		else if (token == '0') {
-			double val = Double.parseDouble(str.substring(tokenStart, index));
+			double val = Convert.parseDouble(str.substring(tokenStart, index));
 			short sval = (short) val;
 			if ((double) sval == val) {
 				emit(sval);

@@ -50,7 +50,7 @@ public class XPath implements XPathConstants
     if (value instanceof Number)
       return ((Number) value).doubleValue();
     else
-      return Double.parseDouble(stringValue(value));
+      return Convert.parseDouble(stringValue(value));
   }
 
   public static boolean booleanValue(Object value)
@@ -128,7 +128,7 @@ public class XPath implements XPathConstants
 	}
       else if (resultType == NUMBER_RESULT)
 	{
-	  context.numResult = Double.parseDouble(value);
+	  context.numResult = Convert.parseDouble(value);
 	  context.resultType = NUMBER_RESULT;
 	}
       /*

@@ -44,7 +44,7 @@ public class CompileFile extends Procedure2
 	try
 	  {
 	    obj = port.readSchemeObject ();
-	    if (obj == Interpreter.eofObject)
+	    if (obj == Sequence.eofValue)
 	      {
 		port.close ();
 		break;
@@ -77,7 +77,7 @@ public class CompileFile extends Procedure2
   public final Object apply2 (Object arg1, Object arg2)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    if (! (arg1 instanceof StringBuffer))
+    if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
     Interpreter interpreter = Interpreter.current ();
     LambdaExp lexp = read (arg1.toString (), Environment.user ());

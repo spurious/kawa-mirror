@@ -70,9 +70,7 @@ public class BRL extends Scheme
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    BRL interp = new BRL();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Language.setDefaults(new BRL());
   }
 
   public Expression makeBody(Expression[] exps)

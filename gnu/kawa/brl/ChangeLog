@@ -1,3 +1,7 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* BRL.java (registerEnvironment): Use new setDefaults method.
+
 2004-12-27  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: No longer need to force ../../../kawa to be made first.

@@ -83,9 +83,7 @@ public class XSLT extends XQuery
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    XSLT interp = new XSLT();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Language.setDefaults(new XSLT());
   }
 
   public static void defineCallTemplate(Symbol name,

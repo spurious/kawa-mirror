@@ -1,3 +1,7 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (registerEnvironment): Use new setDefaults method.
+
 2005-01-27  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (<init>): Move some functionality to XslTranslator.parse.

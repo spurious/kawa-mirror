@@ -21,7 +21,7 @@ public class InlineCalls extends ExpWalker
 	Object proc = ((QuoteExp) exp.func).getValue();
 	if (proc instanceof CanInline)
 	  {
-	    return ((CanInline) proc).inline(exp);
+	    return ((CanInline) proc).inline(exp, this);
 	  }
       }
     if (exp.func instanceof ReferenceExp)
@@ -35,7 +35,7 @@ public class InlineCalls extends ExpWalker
             if (proc instanceof QuoteExp)
               proc = ((QuoteExp) proc).getValue();
             if (proc instanceof CanInline)
-              return ((CanInline) proc).inline(exp);
+              return ((CanInline) proc).inline(exp, this);
             // if (proc instanceof Procedure)
 	    // {
 	    //   PrimProcedure mproc

@@ -1,3 +1,10 @@
+2002-07-21  Per Bothner  <per@bothner.com>
+
+	* CanInline.java (inline):  Take extra ExpWalker parameter.
+	* InlineCalls.java(walkApplyExp):  Pass extra parameter.
+
+	* ReferenceExp.java (print):  Don't lose if symbol is null.
+
 2002-07-02  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java (getInstance):  Handle type.isVoid() specially.

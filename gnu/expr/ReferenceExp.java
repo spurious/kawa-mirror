@@ -142,7 +142,8 @@ public class ReferenceExp extends Expression
   {
     ps.print("(Ref/");
     ps.print(id);
-    if (binding == null || symbol.toString() != binding.getName())
+    if (symbol != null
+	&& (binding == null || symbol.toString() != binding.getName()))
       {
 	ps.print('/');
 	SFormat.print (symbol, ps);

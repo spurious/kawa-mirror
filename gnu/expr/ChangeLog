@@ -1,3 +1,28 @@
+Sat Mar 20 11:25:01 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Declaration.java (pushIndirectBinding):  New method.
+	(initBinding):  Use pushIndirectBinding.
+	* LambdaExp.java (isClassGenerated):  Use isHandlingTailCalls.
+	(allocParameters, enterFunction):  Handle isIndirectBinding.
+	* ModuleBody.java (runAsMain):  Re-enable, for now.
+	* ObjectExp.java (<init>):  Call setCanRead to force class generation.
+	* PrimProcedure.java (compile):  Use new Type.isVoid().
+	* ReferenceExp.java (lookup):  Remove - no longer used.
+	(eval):  Just call env.getChecked.
+	(compile):  Use Binding.get rather than Environment.lookup.
+	* ApplyExp.java:  If function is a globally-bound symbol,
+	emit (get Binding).getProcedure().
+	* Compilation (getBindingField):  New method.
+	(typeBinding, getBindingMethod, getProcedureBindingMethod,
+	getBindingEnvironmentMethod, getCurrentEnvironmentMethod): New statics.
+	(addClass):  Move generateConstructor to end.
+	Emit code to allocate global Bindings.
+
+	* Compilation (scmProcedureType):  Renamed to typeProcedure.
+	(scmEnvironmentType):  Renamed to typeEnvironment.
+	* ApplyExp,java, LambdaExp.java, SetApplyExp.java:
+  	Update scmProcedureType -> typeProcedure.
+
 Sun Mar  7 17:28:59 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* ApplyExp.java (compileToArray, compile):  Handle full tailcalls.

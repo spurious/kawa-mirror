@@ -38,29 +38,14 @@ public class ReferenceExp extends Expression
     this.binding = binding;
   }
 
-  public static Object lookup(String name)
-  { return lookup(Environment.user(), name); }
-
-  /** Lookup on a symbol in a given environment.
-    * As a Kawa/Scheme extension, handles <TYPENAME> if otherwise undefined.
-    */
-  public static Object lookup(Environment env, String name)
-  {
-    Object val = env.get(name);
-    if (val == null)
-      throw new UnboundSymbol(name);
-    return val;
-  }
-
   public Object eval (Environment env)
   {
     if (binding != null)
       throw new Error("internal error: ReferenceExp.eval on lexical binding");
-    return lookup(env, symbol);
+    return env.getChecked(symbol);
   }
 
   private static ClassType thisType;
-  private static Method lookupMethod;
   static ClassType ctypeBinding = null;
   static Method getMethod = null;
 
@@ -87,8 +72,8 @@ public class ReferenceExp extends Expression
       }
     else
       {
-	comp.compileConstant (symbol);
-	code.emitInvokeStatic(comp.lookupGlobalMethod);
+	code.emitGetStatic(comp.getBindingField(symbol));
+	code.emitInvokeSpecial(Compilation.getBindingMethod);
       }
     target.compileFromStack(comp, getType());
   }

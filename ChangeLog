@@ -1,3 +1,7 @@
+2002-05-28  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/AutoloadSyntax.java (rewriteForm):  Set currentSyntax.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* kawa.repl (exitCounter):  New static field.

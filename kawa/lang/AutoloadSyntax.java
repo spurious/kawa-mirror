@@ -144,7 +144,16 @@ public class AutoloadSyntax extends Syntax implements Externalizable
 	    return tr.syntaxError (e.getMessage ());
 	  }
       }
-    return loaded.rewriteForm(form, tr);
+    Syntax saveSyntax = tr.currentSyntax;
+    tr.currentSyntax = loaded;
+    try
+      {
+	return loaded.rewriteForm(form, tr);
+      }
+    finally
+      {
+	tr.currentSyntax = saveSyntax;
+      }
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

@@ -25,9 +25,8 @@ public class DefineNamespace extends Syntax
       decl.setCanRead(true);
     Translator.setLine(decl, p1);
     Expression value = tr.rewrite_car (p2, false);
-    SetExp sexp = new SetExp (name, value);
+    SetExp sexp = new SetExp(decl, value);
     sexp.setDefining (true);
-    sexp.binding = decl;
     decl.noteValue(value);
     forms.addElement (sexp);
     return true;

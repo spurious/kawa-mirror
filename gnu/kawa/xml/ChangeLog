@@ -1,3 +1,8 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java: Use different SetExp constructor,
+	to avoid setting the 'binding' field, which will become private.
+
 2005-01-22  Per Bothner  <per@bothner.com>
 
 	* NodeType.java: Extend ObjectType, not ClassType.

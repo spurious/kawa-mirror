@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 55)
+(test-init "Miscellaneous" 56)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -188,3 +188,8 @@
 (define f7-20 ((cadr f6-100) 20)) 
 (define f8-10 ((caddr f7-20) 10)) 
 (test '(100 20 10 2) 'closure-test4 ((cadddr f8-10) 2)) 
+
+;; A bug reported by Edward Mandac <ed@texar.com>.
+(test "Done" 'do-future (do   ((test 'empty))
+			  (#t "Done")
+			(future (begin(set! test 'goodbye)))))

@@ -4,12 +4,12 @@
 		 (%defmacro (quote name) (lambda lambda-list form ...)))))
 
 (define (%defmacro name expander)
-  ((primitive-constructor "kawa.lang.DefMacro"
+  ((primitive-constructor <kawa.lang.DefMacro>
 			  (<symbol> <function>))
    name expander))
 
 (define (gentemp)
-  ((primitive-static-method "kawa.lang.Symbol" "gentemp"
+  ((primitive-static-method <kawa.lang.Symbol> "gentemp"
 			    <symbol> ())))
 
 (define-syntax when (syntax-rules ()
@@ -25,6 +25,24 @@
   (try-finally
    (thunk)
    (after)))
+
+(define (catch key thunk handler)
+  (try-catch (thunk)
+	     (ex <kawa.lang.NamedException>
+		 ((primitive-virtual-method
+		   <kawa.lang.NamedException> "applyHandler"
+		   <object> (<object> <function>))
+		  ex key handler))))
+
+;;; The one-argument case is a standard DSSSL procedure.
+;;; The multi-argument extension matches Guile.
+(define (error msg . args)
+  (set! msg (call-with-output-string (lambda (port) (display msg port))))
+  (set! args (map
+	      (lambda (arg)
+		(call-with-output-string (lambda (port) (write arg port))))
+	      args))
+  (apply throw 'misc-error msg args))
 
 (define-syntax fluid-let
   (syntax-rules ()

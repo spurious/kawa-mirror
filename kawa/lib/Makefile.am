@@ -85,8 +85,13 @@ SECONDARY_OBJS=\
   strings$$string__length.class \
   strings$$substring.class \
   syntax$$_Cdefmacro.class \
-  syntax$$gentemp.class \
+  syntax$$catch.class \
   syntax$$dynamic__wind.class \
+  syntax$$error.class \
+  syntax$$gentemp.class \
+  syntax$$lambda.class \
+  syntax$$lambda0.class \
+  syntax$$lambda1.class \
   thread$$exit.class \
   vectors$$list_2_vector.class \
   vectors$$vector__length.class \

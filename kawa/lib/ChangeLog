@@ -1,3 +1,9 @@
+Tue Jan 27 11:22:08 1998  Per Bothner  <bothner@cygnus.com>
+
+	* port.scm, syntax.scm:  Use <TYPENAME> in place of "TYPENAME".
+	* syntax.scm (catch, error):  New procedures.
+	* Makefile.am (SECONDARY_OBJS):  Update for new procedures.
+
 Wed Jan 21 12:34:12 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am, Makefile.in (SECONDARY_OBJS):  Adding missing strings

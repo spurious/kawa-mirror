@@ -502,7 +502,6 @@ public class Scheme extends LispInterpreter
       else
 	define ("command-parse", lookup("tokenize-string-to-string-array"));
       
-      // JDK 1.1 only:
       define_proc ("record-accessor", "kawa.lib.reflection");
       define_proc ("record-modifier", "kawa.lib.reflection");
       define_proc ("record-predicate", "kawa.lib.reflection");
@@ -512,6 +511,7 @@ public class Scheme extends LispInterpreter
       define_proc ("record-type-name", "kawa.lib.reflection");
       define_proc ("record-type-field-names", "kawa.lib.reflection");
       define_proc ("record?", "kawa.lib.reflection");
+      define_syntax("define-record-type", "gnu.kawa.slib.DefineRecordType");
 
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)

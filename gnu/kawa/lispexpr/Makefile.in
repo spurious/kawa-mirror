@@ -116,8 +116,10 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_JAVA = \
   LispReader.java \
   ReaderDispatch.java \
+  ReaderDispatchMacro.java \
   ReaderDispatchMisc.java \
   ReaderIgnoreRestOfLine.java \
+  ReaderMacro.java \
   ReaderMisc.java \
   ReaderParens.java \
   ReaderQuote.java \

@@ -1,3 +1,12 @@
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* ReaderDispatch.java (kind):  New field.
+	(getKind):  Return kind instead of hardwired value.
+	Change constructors to set kind.
+	* ReaderMacro.java:  New class, extends ReaderMisc.
+	* ReaderDispatchMacro.java:  New class, extends ReaderMisc.
+	* Makefile.am:  Update for new classes.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* LispReader.java:  Complete re-write, having the reader be

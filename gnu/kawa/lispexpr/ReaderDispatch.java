@@ -9,10 +9,11 @@ import gnu.mapping.Values;
 public class ReaderDispatch extends ReadTableEntry
 {
   RangeTable table = new RangeTable();
+  int kind;
 
   public int getKind()
   {
-    return ReadTable.NON_TERMINATING_MACRO;
+    return kind;
   }
 
   public void set(int key, Object value)
@@ -20,8 +21,20 @@ public class ReaderDispatch extends ReadTableEntry
     table.set(key, key, value);
   }
 
+  public ReadTableEntry lookup(int key)
+  {
+    return (ReadTableEntry) table.lookup(key, null);
+  }
+
   public ReaderDispatch()
   {
+    kind = ReadTable.TERMINATING_MACRO;
+  }
+
+  public ReaderDispatch(boolean nonTerminating)
+  {
+    this.kind = nonTerminating ? ReadTable.NON_TERMINATING_MACRO
+      : ReadTable.TERMINATING_MACRO;
   }
 
   public static ReaderDispatch getInitial()

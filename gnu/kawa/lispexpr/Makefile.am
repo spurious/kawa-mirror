@@ -7,8 +7,10 @@ include $(top_srcdir)/Make-rules
 java_JAVA=\
   LispReader.java \
   ReaderDispatch.java \
+  ReaderDispatchMacro.java \
   ReaderDispatchMisc.java \
   ReaderIgnoreRestOfLine.java \
+  ReaderMacro.java \
   ReaderMisc.java \
   ReaderParens.java \
   ReaderQuote.java \

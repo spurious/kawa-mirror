@@ -1,6 +1,14 @@
+2002-06-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (XML tools):  Document as-xml.  Mention XSLT support.
+	(Options):  Mention --xslt.
+
+	* kawa.texi (License):  Include AT&T fdlib license.
+
 2002-06-10  Per Bothner  <per@bothner.com>
 
-	* kawa.texi (Arrays): New node.
+	* kawa.texi (Arrays): New node.  Based on the SRFI-25 specification
+	by Jussi Piitulainen <jpiitula@ling.helsinki.fi>.
 
 	* kawa.texi (Anonymous classes):  Fix thinko.
 

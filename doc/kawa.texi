@@ -652,6 +652,15 @@ Set the default language to KRL, in BRL-compatibility mode.  See @ref{KRL}.
 Set the default language to the draft XML Query language.
 See the @uref{http://www.gnu.org/software/qexo/,Kawa-XQuery page}
 for more information.
+@item --xslt
+Set the default language to XSLT (XML Stylesheet Language Transformations).
+(The implementation is @emph{very} incomplete.)
+See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
+for more information.
+@item --output-format @var{format}
+@itemx --format @var{format}
+Change the default output format to that specified by @var{format}.
+See @ref{Named output formats} for more information and a list.
 @end table
 
 The following options control which calling conventions are used:
@@ -663,10 +672,6 @@ Use a calling convention that does not support proper tail recursion.
 Self-tail-recursion (i.e. a recursive call to the current function)
 is still implemented correctly, assuming that the called function
 is known at compile time.
-@item --output-format @var{format}
-@itemx --format @var{format}
-Change the default output format to that specified by @var{format}.
-See @ref{Named output formats} for more information and a list.
 @end table
 
 The default is currently @code{--no-full-tailcalls} because I believe it is
@@ -4436,6 +4441,16 @@ Create an "attribute", which is a name-value pair.
 For now, @var{name} should be a symbol
 @end defun
 
+@defun as-xml value
+Return a value (or multiple values) that when printed will
+print @var{value} in XML syntax.
+@example
+(require 'xml)
+(as-xml (make-element 'p "Some " (make-element 'em "text") "."))
+@end example
+prints @code{<p>Some <em>text</em>.</p>}.
+@end defun
+
 @subsection xquery language
 
 W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
@@ -4444,6 +4459,15 @@ If you start Kawa with the @code{--xquery} it selects the "XQuery"
 source language; this also prints output using XML syntax.
 See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
 for examples and more information.
+
+@subsection XSL transformations
+
+There is an experimental implementation of the XSLT (XML Stylesheet
+Language Transformations) language.  Selecting @code{--xslt} at the
+Kawa command line will parse a source file according to the syntax
+on an XSLT stylesheet.
+See the @uref{http://www.gnu.org/software/qexo/xslt.html,Kawa-XSLT page}
+for more information.
 
 @node Server-side scripts, Servlets, , XML tools
 @section Writing web-server-side Kawa scripts
@@ -4866,6 +4890,32 @@ You can negotiate some other (commercial) license with Per Bothner.
 
 In general, if the license of Kawa or associated packages causes
 difficulties, let me know.
+
+Kawa uses some math routines from fdlib's libf77, which bear the
+following copyright:
+
+@quotation
+Copyright 1990, 1991, 1992, 1993 by AT&T Bell Laboratories and Bellcore.
+ 
+Permission to use, copy, modify, and distribute this software
+and its documentation for any purpose and without fee is hereby
+granted, provided that the above copyright notice appear in all
+copies and that both that the copyright notice and this
+permission notice and warranty disclaimer appear in supporting
+documentation, and that the names of AT&T Bell Laboratories or
+Bellcore or any of their entities not be used in advertising or
+publicity pertaining to distribution of the software without
+specific, written prior permission.
+ 
+AT&T and Bellcore disclaim all warranties with regard to this
+software, including all implied warranties of merchantability
+and fitness.  In no event shall AT&T or Bellcore be liable for
+any special, indirect or consequential damages or any damages
+whatsoever resulting from loss of use, data or profits, whether
+in an action of contract, negligence or other tortious action,
+arising out of or in connection with the use or performance of
+this software.
+@end quotation
 
 @section Copyright for this manual
 

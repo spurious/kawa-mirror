@@ -579,7 +579,7 @@ public class XQuery extends Language
     defProcStFld("children", "gnu.xquery.util.Children", "children");
     defProcStFld("not", "kawa.standard.Scheme");
 
-    defaultNamespace = kawaFunctionNamespace;
+    defaultNamespace = qexoFunctionNamespace;
     defProcStFld("response-header", "gnu.kawa.slib.HTTP");
     defProcStFld("response-content-type", "gnu.kawa.slib.HTTP");
     defProcStFld("response-status", "gnu.kawa.slib.HTTP");

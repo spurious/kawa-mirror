@@ -1,5 +1,8 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: Declare 'make-parameter' and
+	'parameterize' from SRFI-39.
+
 	* kawa/standard/location.java (class LocationProc): Moved class to
 	new file gnu/mapping/LocationProc.java.
 

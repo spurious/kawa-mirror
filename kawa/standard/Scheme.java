@@ -524,6 +524,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
       define_syntax ("fluid-let", "kawa.standard.fluid_let");
       define_syntax("constant-fold", "kawa.standard.constant_fold");
+      defProcStFld("make-parameter", "kawa.lib.parameters");
+      defSntxStFld("parameterize", "kawa.lib.parameters");
 
       defProcStFld("compile-file", "kawa.lib.system");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");

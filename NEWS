@@ -1,3 +1,12 @@
+Implement SRFI-39 "Parameter-objects".  These are like anonymous
+fluid values and use the same implementation.
+
+Infer types of variables declared with a let.
+
+Character comparisons (such as char-=?, char-ci<?) implemented
+much more efficiently - and (if using Java5) work for character not
+in the Basic Multilingual Plane.
+
 XQuery:
 * Warn about old syntax.
 * Handle 'declare default collation'.  This is mainly a place-holder

@@ -1,24 +1,24 @@
 	README for kawa-0.3 release
 
-This docuemnts how to install and use Kawa, a Scheme system
+This documents how to install and use Kawa, a Scheme system
 implemented in Java, and that compiles into Java bytecodes.
 
 Unpacking and Installation -- quick overview
 ==========================
 The Kawa release normally comes as a gzip-compressed tar file.
-We assume you have managed to retrieve, and extract the files
+We assume you have managed to retrieve and extract the files
 and are reading this file ...
 
 First, you must configure the sources.  This you can do
-the same way you configure most other GNU software.  Normally,
+the same way you configure most other GNU software.  Normally
 you can just run the configure script with no arguments:
 
 	./configure
 
 This will specify that a later 'make install' will install the
-compiled .class files in /usr/local/java.  If you want them to be
-installed someplace else, such as $PREFIX/java, then specify
-that when you run configure:
+compiled .class files into /usr/local/java.  If you want them
+to be installed someplace else, such as $PREFIX/java, then
+specify that when you run configure:
 
 	./configure -- prefix $PREFIX
 
@@ -37,7 +37,7 @@ and your are using a Bourne-shell compatible shell
 	export PATH=$JDK/bin:$PATH
 	export CLASSPATH=.:$JDK/lib/classes.zip
 
-Thus you need to compile all the .jave source files.  Just run make:
+Thus you need to compile all the .java source files.  Just run make:
 
 	make
 
@@ -83,7 +83,7 @@ The file Compliance.html specifies which functions and syntax
 have been implemented so far.
 
 Beyond that, note that there is no tail-call-elimination.
-A future release will do at least tail-recursion-elmination
+A future release will do at least tail-recursion-elimination
 (when the system can determine that the function being called
 is the current function).
 
@@ -110,11 +110,23 @@ loading foo.scm, except you will get the byte-compiled versions.
 
 Actually, note that if you type a lambda expression to the
 read-eval-print loop, or there is one in a .scm file you load,
-those procedure will actually be compiled into bytecodes too
+those procedure will actually be compiled into bytecodes too.
 The evaluator (in the traditional sense) is only used for top-level
 expressions *outside* a lambda.  (It would have been more elegant
-to also byte-compile top-level expressions by surroudning them
+to also byte-compile top-level expressions by surrounding them
 by a dummy lambda.  However, this would create a new Class object
 in the Java VM for every top-level expression.  This is undesirable
 unless you hava a VM that can garbage collect Class objects.
 I believe Sun's VM does not.)
+
+Authors
+=======
+R. Alexander Milowski <sgml@winternet.com> wrote and released
+versions 0.1 and 0.2.  He is still actively involved.
+
+Per Bothner <bothner@cygnus.com> re-wrote the evaluator to
+use byte compilation, made many other changes, and released 0.3.
+
+If you have a problem or bug, for now send a report to the authors.
+If there is demand, we will set up a mailing list.
+Future announcements will be announced at least to comp.lang.scheme.

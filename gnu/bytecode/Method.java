@@ -42,7 +42,7 @@ public class Method {
   }
 
   private Type[] stack_types;
-  private int SP;  // Current stack size (in "words")  // FIXME make private
+  private int SP;  // Current stack size (in "words")
   private int max_stack;
   private int max_locals;
   int PC;
@@ -118,8 +118,9 @@ public class Method {
     if (used_locals == null)
       used_locals = new Variable[20+size];
     else if (max_locals + size >= used_locals.length) {
-      boolean[] new_locals = new boolean [2 * used_locals.length + size];
+      Variable[] new_locals = new Variable [2 * used_locals.length + size];
       System.arraycopy (used_locals, 0, new_locals, 0, max_locals);
+      used_locals = new_locals;
     }
     for (int j = 0; j < size; j++)
       {
@@ -266,6 +267,34 @@ public class Method {
   public final void put4(int i) {
     put1 (i >> 24);  put1 (i >> 16);  put1 (i >> 8);  put1 (i); }
 
+  final Type pop_stack_type () {
+    if (SP <= 0)
+      throw new Error("pop_stack_type called with empty stack");
+    Type type = stack_types[--SP];
+    if (type.size == 8)
+      if (pop_stack_type () != Type.void_type)
+	throw new Error("missing void type on stack");
+    return type;
+  }
+
+  final void push_stack_type (Type type) {
+    if (type == Type.void_type)
+      throw new Error ("pushing void type onto stack");
+    if (type.size == 8)
+      push_stack_type (Type.void_type);
+    if (stack_types == null)
+      stack_types = new Type[20];
+    else if (SP >= stack_types.length) {
+      Type[] new_array = new Type[2 * stack_types.length];
+      System.arraycopy (stack_types, 0, new_array, 0, SP);
+      stack_types = new_array;
+    }
+    stack_types[SP] = type;
+    SP++;
+    if (SP > max_stack)
+      max_stack = SP;
+  }
+
   public void push_int_const (int i) { compile_push_int (i); } //old
   public void compile_push_int (int i) {
     instruction_start_hook (3);
@@ -383,6 +412,23 @@ public class Method {
     push_stack_type (ctype);
   }
 
+  public void compile_checkcast (ArrayType atype)
+  {
+    instruction_start_hook (3);
+    pop_stack_type ();
+    put1 (192);  // checkcast
+    CpoolUtf8 name = CpoolUtf8.get_const (classfile, atype.signature);
+    put2 (classfile.get_class_const (name));
+    push_stack_type (atype);
+  }
+
+  public void maybe_compile_checkcast (ArrayType atype)
+  {
+    Type stack_type = stack_types[SP-1];
+    if (atype != stack_type)  // FIXME rather simple-minded, but safe.
+      compile_checkcast (atype);
+  }
+
   /** Store into an element of an array.
    * Must already have pushed the array reference, the index,
    * and the new value (in that order).
@@ -465,44 +511,87 @@ public class Method {
     push_stack_type (type2);
   }
 
+  /** Compile code to duplicate with offset.
+   * @param size the size of the stack item to duplicate (0, 1 or 2)
+   * @param offset where to insert the result (must be 1 or 2)
+   * The new words get inserted at stack[SP-size-offset]
+   */
+  public void compile_dup (int size, int offset)
+  {
+    if (size == 0)
+      return;
+    instruction_start_hook (1);
+    // copied1 and (optionally copied2) are the types of the duplicated words
+    Type copied1 = pop_stack_type ();
+    Type copied2 = null;
+    if (size == 1)
+      {
+	if (copied1.size > 4)
+	  throw new Error ("using dup for 2-word type");
+      }
+    else if (size == 2 && copied1.size <= 4)
+      {
+	copied2 = pop_stack_type ();
+	if (copied2.size > 4)
+	  throw new Error ("dup will cause invalid types on stack");
+      }
+    else
+      throw new Error ("invalid size to compile_dup");
+
+    int code;
+    // These are the types of the words (in any) that are "skipped":
+    Type skipped1 = null;
+    Type skipped2 = null;
+    if (offset == 0)
+      {
+	code = size == 1 ? 89 : 92;  // dup or dup2
+      }
+    else if (offset == 1)
+      {
+	code = size == 1 ? 90 : 93; // dup_x1 or dup2_x1
+	skipped1 = pop_stack_type ();
+	if (skipped1.size > 4)
+	  throw new Error ("dup will cause invalid types on stack");
+      }
+    else if (offset == 2)
+      {
+	code = size == 1 ? 91 : 94; // dup_x2 or dup2_x2
+	skipped1 = pop_stack_type ();
+	if (skipped1.size <= 4)
+	  {
+	    skipped2 = pop_stack_type ();
+	    if (skipped2.size > 4)
+	      throw new Error ("dup will cause invalid types on stack");
+	  }
+      }
+    else
+      throw new Error ("compile_dup:  invalid offset");
+
+    put1 (code);
+    if (copied2 != null)
+      push_stack_type (copied2);
+    push_stack_type (copied1);
+    if (skipped2 != null)
+      push_stack_type (skipped2);
+    if (skipped1 != null)
+      push_stack_type (skipped1);
+    if (copied2 != null)
+      push_stack_type (copied2);
+    push_stack_type (copied1);
+  }
+
   /**
    * Compile code to duplicate the top 1 or 2 words.
    * @param size number of words to duplicate
    */
   public void compile_dup (int size)
   {
-    instruction_start_hook (1);
-    Type type = pop_stack_type ();
-    if (size == 1)
-      {
-	if (type.size > 4)
-	  throw new Error ("using dup for 2-word type");
-	put1 (89);  // dup
-	push_stack_type (type);
-	push_stack_type (type);
-      }
-    else
-      {
-	put1 (92);  // dup2
-	if (type.size <= 4)
-	  {
-	    Type prev_type = pop_stack_type ();
-	    push_stack_type (prev_type);
-	    push_stack_type (type);
-	    push_stack_type (prev_type);
-	    push_stack_type (type);
-	  }
-	else
-	  {
-	    push_stack_type (type);
-	    push_stack_type (type);
-	  }
-      }
+    compile_dup (size, 0);
   }
 
   public void compile_dup (Type type)
   {
-    compile_dup (type.size > 4 ? 2 : 1);
+    compile_dup (type.size > 4 ? 2 : 1, 0);
   }
 
   /**
@@ -698,34 +787,6 @@ public class Method {
       put1 (176); // arreturn
   }
 
-  final Type pop_stack_type () {
-    if (SP <= 0)
-      throw new Error("pop_stack_type called with empty stack");
-    Type type = stack_types[--SP];
-    if (type.size == 8)
-      if (pop_stack_type () != Type.void_type)
-	throw new Error("missing void type on stack");
-    return type;
-  }
-
-  final void push_stack_type (Type type) {
-    if (type == Type.void_type)
-      throw new Error ("pushing void type onto stack");
-    if (type.size == 8)
-      push_stack_type (Type.void_type);
-    if (stack_types == null)
-      stack_types = new Type[20];
-    else if (SP >= stack_types.length) {
-      Type[] new_array = new Type[2 * stack_types.length];
-      System.arraycopy (stack_types, 0, new_array, 0, SP);
-      stack_types = new_array;
-    }
-    stack_types[SP] = type;
-    SP++;
-    if (SP > max_stack)
-      max_stack = SP;
-  }
-
   /*
   public Scope scope_start ();
   public scope_end ();
@@ -807,10 +868,11 @@ public class Method {
       throw new Error ("compile_invoke_static invoked on non-static method");
     instruction_start_hook (3);
     for (int i = method.arg_types.length;  --i >= 0; )
-      pop_stack_type ();
+      pop_stack_type (); 
     put1 (184);  // invokestatic
     put2 (CpoolRef.get_const (classfile, method).index);
-    push_stack_type (method.return_type);
+    if (method.return_type != Type.void_type)
+      push_stack_type (method.return_type);
   }
 
   private void compile_fieldop (Field field, int opcode)

@@ -4,7 +4,7 @@ import codegen.*;
 
 public class Field {
   byte[] name;  /* Utf8 */
-  Type type;
+  public Type type;
   int name_index; /* Index in constant table, or 0 if un-assigned */
   int signature_index; /* Index in constant table, or 0 if un-assigned */
   int constant_value_index; /* If non-0, cpool index of constant value. */
@@ -51,5 +51,11 @@ public class Field {
     if (constant_value_index > 0 && classfile.ConstantValue_name_index == 0)
       classfile.ConstantValue_name_index
 	= classfile.get_utf8_const ("ConstantValue");
+  }
+
+  public String strName ()
+  {
+    // FIXME - only works for ASCII names!
+    return name == null ? null : new String (name, 0);
   }
 }

@@ -1,3 +1,11 @@
+Tue Jul 16 23:18:20 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Field.java (strName):  New method.
+	* Method.java (assign_local):  Fix type lossage.
+	(compile_checkcast, maybe_compile_checkcast):  New methods for arrays.
+	(compile_dup):  Gneeralize to handle all the dup* instructions.
+	(compile_invoke_static):  Don't push_stack_type if returning void.
+
 Thu Jul 11 14:44:21 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* ClassType.java:  Add support for implementing interfaces.

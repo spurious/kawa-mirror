@@ -539,6 +539,8 @@ public class Scheme extends Interpreter
       define_syntax ("module-name", "kawa.standard.module_name");
       define_syntax ("module-extends", "kawa.standard.module_extends");
       define_syntax ("module-implements", "kawa.standard.module_implements");
+      define_syntax ("module-static", "kawa.standard.module_static");
+      define_syntax ("module-export", "kawa.standard.export");
 
       define_proc ("s8vector?", "kawa.lib.uniform");
       define_proc ("make-s8vector", "kawa.lib.uniform");
@@ -902,9 +904,15 @@ public class Scheme extends Interpreter
     int len = name.length();
     boolean mangled = false;
     boolean predicate = false;
+    boolean downCaseNext = false;
     for (int i = 0;  i < len;  i++)
       {
 	char ch = name.charAt(i);
+	if (downCaseNext)
+	  {
+	    ch = Character.toLowerCase(ch);
+	    downCaseNext = false;
+	  }
 	char d;
 	if (ch == 'i' && i == 0 && len > 2 && name.charAt(i+1) == 's'
 	    && ! Character.isLowerCase(d = name.charAt(i+2)))
@@ -930,6 +938,7 @@ public class Scheme extends Interpreter
 		sbuf.append(d);
 		i += 2;
 		mangled = true;
+		downCaseNext = true;
 		continue;
 	      }
 	    else if (c1 == 'T' && c2 == 'o' && i + 3 < len
@@ -938,6 +947,7 @@ public class Scheme extends Interpreter
 		sbuf.append("->");
 		i += 3;
 		mangled = true;
+		downCaseNext = true;
 		continue;
 	      }
 	  }

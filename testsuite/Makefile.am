@@ -1,7 +1,9 @@
 ## Process this with automake to create Makefile.in
 
 KAWALIB = ..
-KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa.sh
+DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../bin/kawa.sh
+ENABLE_GCJ_COMPILED_KAWA = ../bin/kawa-bin
+KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 all:
@@ -67,4 +69,4 @@ check-scribble: scribble.class
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
 CLEANFILES = tmp? *.log testing.zip *.class
-EXTRA_DIST = ppfile.out
+EXTRA_DIST = $(SOURCES) ppfile.out

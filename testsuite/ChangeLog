@@ -1,3 +1,7 @@
+2001-03-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Support for using gcj-compiled Kawa.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  Change expected result.

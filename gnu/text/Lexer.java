@@ -210,7 +210,7 @@ public class Lexer extends Reader
   public int getLineNumber() { return port.getLineNumber(); }
   public int getColumnNumber() { return port.getColumnNumber(); }
 
-  /** For building token of various kinds. */
+  /** For building tokens of various kinds. */
   public char[] tokenBuffer = new char[100];
 
   /** The number of chars of tokenBuffer that are used. */

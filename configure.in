@@ -1,14 +1,16 @@
 dnl Process this with autoconf to create configure
-AC_INIT(kawa.java)
+AC_INIT(kawac.java)
 
-jm_MAINTAINER_MODE
+AM_INIT_AUTOMAKE(kawa, 1.2alpha)
 
-PACKAGE=kawa
-VERSION=1.1alpha
+AM_MAINTAINER_MODE
+
+#PACKAGE=kawa
+#VERSION=2.0alpha
 AC_CONFIG_AUX_DIR(.)
 AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
+#AM_PROG_INSTALL
+#AC_PROG_MAKE_SET
 
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
@@ -18,4 +20,4 @@ dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], cl
 
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile testsuite/Makefile)
+AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile doc/Makefile testsuite/Makefile)

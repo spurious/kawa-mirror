@@ -1,3 +1,30 @@
+Sat Jan 25 12:00:08 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa.java:  Moved to kawa/repl.java.
+	* doc:  New directory.  Moved documentation there.
+	* Makefile.am, kawa/Makefile.am:  Updated.
+	* kawa/Makefile.am:  Create kawa shell-script.
+	* */Makefile.in: Update, using new automake version.
+
+	* kawa/lang/Eval.java (eval):  Change back to public.
+	* kawa/standard/Scheme.java (eval):  Update to changed Eval.eval.
+	
+	* kawa/lang/Translator.java (check_if_syntax, scan_body):  New methods.
+	(rewrite_body):  Re-write to handle internal definitions.
+	* kawa/standard/Scheme.java (beginSyntax, defineSyntax):  New statics.
+	* kawa/standard/define.java (rewrite):  Re-structure, and
+	handled internal definition as a set!.
+	* kawa/lang/SyntaxRule.java (execute_template):  Don't fully rewrite.
+	* kawa/lang/SyntaxRules.java (rewrite1):  New method.
+	* kawa/lang/ScopeExp.java (countDecls):  New method.
+
+	* kawa/standard/define_syntax.java:  Add rules to translation
+	environment, so macro will work when compiling.
+	* kawa/standard/load.java (loadSource):  Evaluate expressions
+	one by one, so macros will work.
+	* kawa/lang/Eval.java (eval):  Make private and add argument.
+	* kawa/lang/Translator.java (currentScope, addGlobal):  New methods.
+
 Tue Jan 21 18:12:53 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/{make_polar,angle}.java:  New Procedures.

@@ -10,6 +10,7 @@ java_sources = \
   CharBuffer.java \
   CharSeq.java \
   Consumer.java \
+  ConsumerWriter.java \
   Consumable.java \
   F32Vector.java \
   F64Vector.java \
@@ -24,6 +25,7 @@ java_sources = \
   PairWithPosition.java \
   PositionConsumer.java \
   PositionContainer.java \
+  PrintConsumer.java \
   S8Vector.java \
   S16Vector.java \
   S32Vector.java \

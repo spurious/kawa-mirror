@@ -86,10 +86,6 @@ public class Compilation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeBinding
     = ClassType.make("gnu.mapping.Binding", typeLocation);
-  static public ClassType typeBinding2
-    = ClassType.make("gnu.mapping.Binding2", typeBinding);
-  static final Field functionValueBinding2Field
-    = typeBinding2.addField ("functionValue", Type.pointer_type,Access.PUBLIC);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
@@ -130,8 +126,6 @@ public class Compilation
   static public final Method getBindingEnvironmentMethod
     = typeEnvironment.addMethod("getBinding", string1Arg,
 				typeBinding, Access.PUBLIC);
-  public static final Method getBinding2Method
-    = typeBinding2.getDeclaredMethod("getBinding2", 2);
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };

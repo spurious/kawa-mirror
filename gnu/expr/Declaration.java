@@ -240,10 +240,18 @@ public class Declaration
 
   public final boolean getCanWrite()
   { return (flags & CAN_WRITE) != 0; }
+
   public final void setCanWrite(boolean written)
   {
     if (written) flags |= CAN_WRITE;
     else flags &= ~CAN_WRITE;
+  }
+
+  public final void setCanWrite()
+  {
+    flags |= CAN_WRITE;
+    if (base != null)
+      base.setCanRead();
   }
 
   public void setName(String name)
@@ -256,6 +264,8 @@ public class Declaration
   public boolean ignorable()
   {
     if (getCanRead() || isPublic())
+      return false;
+    if (getCanWrite() && getFlag(IS_UNKNOWN))
       return false;
     if (! getCanCall())
       return true;
@@ -341,13 +351,13 @@ public class Declaration
     code.emitPushString(getName());
     if (makeBindingMethod == null)
       {
-	ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
 	Type[] args = new Type[2];
 	args[0] = Type.pointer_type;
 	args[1] = Type.string_type;
 	makeBindingMethod
-	  = typeBinding.addMethod("make", args, typeBinding,
-				  Access.PUBLIC|Access.STATIC);
+	  = Compilation.typeBinding.addMethod("make", args,
+					      Compilation.typeBinding,
+					      Access.PUBLIC|Access.STATIC);
       }
     code.emitInvokeStatic(makeBindingMethod);
   }
@@ -467,15 +477,9 @@ public class Declaration
 	|| getFlag(IS_UNKNOWN) // FIXME - should not be automatically static.
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
-    Type ftype;
-    if (isIndirectBinding())
-      {
-	ftype = comp.getInterpreter().hasSeparateFunctionNamespace()
-	  ? Compilation.typeBinding2 : Compilation.typeBinding;
-      }
-    else
-      ftype = value == null || typeSpecified ? getType()
-	: value.getType();
+    Type ftype = (isIndirectBinding() ? Compilation.typeBinding
+		  : value == null || typeSpecified ? getType()
+		  : value.getType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {

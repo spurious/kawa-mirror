@@ -66,7 +66,7 @@ public abstract class Interpreter
 		  }
 		catch (ClassNotFoundException ex)
 		  {
-		    // In the future, we may support langauges names that
+		    // In the future, we may support languages names that
 		    // can be implemented by more than one Interpreter,
 		    // so don't give up yet.
 		    break;

@@ -1,3 +1,23 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java (emit):  No longer deal with Binding2.
+	* Compilation.java (typeBinding2, functionValueBinding2Field,
+	getBinding2Method):  Removed as Binding2 was removed.
+	* Declaration.java (makeField):  No longer deal with Binding2.
+	* SetExp.java (eval):  No longer need to handle Binding2.
+
+	* Declaration.java (ignorable):  Return false if writing to unknown.
+	(setCanWrite()):  New method.	
+	* FindTailCalls.java (walkSetExp):  Use new method.
+
+	* InlineCalls.java:  Preliminary code to check argument count.
+
+	* ScopeExp.java (remove, lookup):  New methods.
+	(getDefine):  Check for IS_UNKNOWN flag.
+
+	* ReferenceExp.java (symbol):  Change type to Object so it
+	could be a Binding.
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (debugPrintFinalExpr):  New static field.

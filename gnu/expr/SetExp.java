@@ -97,9 +97,7 @@ public class SetExp extends Expression
       }
     else
       {
-	Binding bind = (getFlag(PREFER_BINDING2)
-			? Binding2.getBinding2(env, name)
-			: env.lookup (name));
+	Binding bind = env.lookup (name);
 	if (bind != null)
 	  env.put (name, new_val);
 	else

@@ -48,8 +48,6 @@ public class BindingInitializer extends Initializer
 	  code.emitPushString(name);
 	if (createNewBinding)
 	  code.emitInvokeStatic(makeBindingMethod);
-	else if (comp.getInterpreter().hasSeparateFunctionNamespace())
-	  code.emitInvokeStatic(comp.getBinding2Method);
 	else
 	  code.emitInvokeVirtual(comp.getBindingEnvironmentMethod);
       }

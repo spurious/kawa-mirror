@@ -277,7 +277,7 @@ public class FindTailCalls extends ExpWalker
   final Expression walkSetExp (Declaration decl, Expression value)
   {
     if (decl != null)
-      decl.setCanWrite(true);
+      decl.setCanWrite();
     if (decl != null && decl.getValue() == value && value instanceof LambdaExp
 	&& ! (value instanceof ObjectExp)
         && ! decl.isPublic())

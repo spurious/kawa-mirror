@@ -1,5 +1,7 @@
 2004-04-17  Per Bothner  <per@bothner.com>
 
+	* internals.xml:  Add missing <para> tags in <listitem>.
+
 	* kawa.texi, internals.xml:  Fix typos reported by Adam Warner
 	(bug report #8578).
 

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
+ "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <!--<!DOCTYPE article PUBLIC "-//Davenport//DTD DocBook V3.0//EN">-->
 <article id="Root">
 <artheader>
@@ -1908,27 +1910,27 @@ protocol, which is wrong.)</para>
 Advantages of this implementation include:
 <itemizedlist>
 <listitem>
+<para>
 No explicit dependency on any class in the the <literal>gnu.expr</literal>
 package.  All a class needs to be used in literals is to implement
 <classname>Externalizable</classname>, and provide a matching method
-for creating object instances.
+for creating object instances.</para>
 </listitem>
 <listitem>
-No need to write special code to handle literals.
+<para>
+No need to write special code to handle literals.</para>
 </listitem>
-<listitem>
+<listitem><para>
 Literals are re-created using efficient code at class initialization time.
-</listitem>
-<listitem>
+</para></listitem>
+<listitem><para>
 Automatically handles cycles and duplicate references.
 (Standard Scheme does not
 support self-referential constants, but for example Common Lisp does.
 See section 25.1.4 <quote>Similarity of Constants</quote> in
-<citation>CommonLisp2</citation>.)
-</listitem>
-<listitem>
-Only requires standard JDK 1.1 features.
-</listitem>
+<citation>CommonLisp2</citation>.)</para></listitem>
+<listitem><para>
+Only requires standard JDK 1.1 features.</para></listitem>
 </itemizedlist>
 </para>
 </sect2>

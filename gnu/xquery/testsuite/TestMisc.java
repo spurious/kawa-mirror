@@ -30,6 +30,16 @@ public class TestMisc
     evalTest("let $x:=3+4 return $x", "7");
     evalTest("let $x:=3+4 return <a>{$x}</a>", "<a>7</a>");
 
+    evalTest("some $x in (1, 2, 3), $y in (2, 3, 4)"
+	     + " satisfies $x + $y = 4",
+	     "true");
+    evalTest("every $x in (1, 2, 3), $y in (2, 3, 4)"
+	     + " satisfies $x + $y = 4",
+	     "false");
+    evalTest("every $x in (11, 12, 13), $y in (2, 3, 4)"
+	     + " satisfies $x > $y",
+	     "true");
+
     evalTest("for $y in (4,5,2+4) return <b>{10+$y}</b>",
 	     "<b>14</b><b>15</b><b>16</b>");
     evalTest("for $i in (1 to 10) where ($i mod 2)=1 return 20+$i",
@@ -298,6 +308,19 @@ public class TestMisc
     evalTest("(99 to 0)[5]", "95");
     evalTest("-10 to -2", "-10 -9 -8 -7 -6 -5 -4 -3 -2");
 
+    String some_elements =
+      "let $top := <top><a/><b/><c/><d/></top>,"
+      + " $a:=$top/a, $b:=$top/b, $c:=$top/c, $d:=$top/d return ";
+    evalNodeNames(some_elements+"($b, $a) union ($a, $b)", "a;b;");
+    evalNodeNames(some_elements+"($b, $a) union ($b, $c)", "a;b;c;");
+    evalNodeNames(some_elements+"($b, $a) intersect ($a, $b)", "a;b;");
+    evalNodeNames(some_elements+"($b, $a) intersect ($b, $c)", "b;");
+    evalNodeNames(some_elements+"($b, $a) except ($a, $b)", "");
+    evalNodeNames(some_elements+"($b, $a) except ($b, $c)", "a;");
+    evalNodeNames(some_elements+"($b, $a, $b, $d) intersect ($b, $d)", "b;d;");
+    evalNodeNames(some_elements+"($b, $a, $b, $d) except ($b, $d)", "a;");
+    evalNodeNames(some_elements+"($b, $a, $b, $d) except ()", "a;b;d;");
+
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:3: missing expression");
 
@@ -397,6 +420,12 @@ public class TestMisc
   private static void evalTestIdAttrs(String expr, String expected)
   {
     evalTest("for $x in (" + expr + ") return (string($x/@id),';')", expected);
+  }
+
+  private static void evalNodeNames(String expr, String expected)
+  {
+    evalTest("for $node in (" + expr + ") return concat(node-name($node),';')",
+	     expected);
   }
 
   public static void evalTest(String expr, String expected)

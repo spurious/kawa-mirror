@@ -1,3 +1,9 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main): 3 new tests for 'some/every ... satsifies'.
+	9 new tests for 'union/intersect/except'.
+	(evalNodeNames):  New convenience method.
+
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (eval):  Re-write to use parseFile rather than parse.

@@ -387,6 +387,14 @@ public class Scheme extends Interpreter
       define("primitive-constructor", new kawa.standard.prim_method(183));
       define("primitive-op1", new kawa.standard.prim_method());
 
+      define_proc("file-exists?", "kawa.lib.files");
+      define_proc("file-directory?", "kawa.lib.files");
+      define_proc("file-readable?", "kawa.lib.files");
+      define_proc("file-writable?", "kawa.lib.files");
+      define_proc("delete-file", "kawa.lib.files");
+      define_proc("rename-file", "kawa.lib.files");
+      define_proc("create-directory", "kawa.lib.files");
+      
       // JDK 1.1 only:
       define_proc ("record-accessor", "kawa.lib.reflection");
       define_proc ("record-modifier", "kawa.lib.reflection");

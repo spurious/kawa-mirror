@@ -10,6 +10,11 @@ public class load extends Procedure1 {
     super("load");
   }
 
+  /** Load using the name of a compile .class file. */
+  /* This should probably be re-written to use a ClassLoader, unless '.'
+   * is in the CLASSPATH, since it a bit ugly that load of a source file
+   * or .zip file reads a file (using a relative or absolute file name),
+   * while load of a compiled .class uses the classpath. */
   public final static Object loadClassFile (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
@@ -80,7 +85,16 @@ public class load extends Procedure1 {
       {
 	throw new GenericError ("load: file not found: " + name);
       }
-    return loadSource (new InPort (fstream, name), env);
+    Object result = loadSource (new InPort (fstream, name), env);
+    try
+      {
+	fstream.close();
+      }
+    catch (java.io.IOException ex)
+      {
+	throw new GenericError("failed to close \""+name+"\" after loading");
+      }
+    return result;
   }
 
   public final static Object loadSource (InPort port, Environment env)
@@ -121,10 +135,14 @@ public class load extends Procedure1 {
       return loadCompiled (name, env);
     if (name.endsWith (".scm"))
       return loadSource (name, env);
+    char file_separator = System.getProperty ("file.separator").charAt(0);
     if (name.endsWith (".class"))
       {
 	name = name.substring (0, name.length () - 6);
-	return loadClassFile (name.replace ('/', '.'), env);
+	name.replace ('/', '.');
+	if (file_separator != '/')
+	  name = name.replace (file_separator, '.');
+	return loadClassFile (name, env);
       }
     File file = new File (name);
     if (file.exists ())
@@ -170,17 +188,18 @@ public class load extends Procedure1 {
       }
     else
       {
-	String xname = name + ".zip";
+	String fname = name.replace ('.', file_separator);
+	String xname = fname + ".zip";
 	file = new File (xname);
 	if (file.exists ())
 	  return loadCompiled (xname, env);
 
-	xname = name + ".class";
+	xname = fname + ".class";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadClassFile (xname, env);
+	  return loadClassFile (name, env);
 
-	xname = name + ".scm";
+	xname = fname + ".scm";
 	file = new File (xname);
 	if (file.exists ())
 	  return loadSource (xname, env);

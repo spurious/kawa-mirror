@@ -69,6 +69,8 @@
 #endif
 #endif
 
+extern char * get_classpath();
+
 #ifndef JAVA
 #define JAVA "java"
 #endif

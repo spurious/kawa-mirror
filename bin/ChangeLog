@@ -1,3 +1,7 @@
+2002-02-11  Per Bothner  <per@bothner.com>
+
+	* kawa.c (get_classpath):  Add extern declaration to kill warning.
+
 2002-02-05  Per Bothner  <per@bothner.com>
 
 	* kawapath.c:  Get R_OK from unistd.h rather than fcntl.h.

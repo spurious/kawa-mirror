@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -688,7 +691,7 @@ public class Compilation
 	    if (! var.isSimple())
 	      var = var.nextVar();  // Skip xxIncoming fake fields.
 	  }
-	body = new ApplyExp(new QuoteExp(new PrimProcedure(method)), args);
+	body = new ApplyExp(new QuoteExp(new PrimProcedure(method, lexp)), args);
 	lexp.heapFrame = null;
       }
 

@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -897,7 +900,9 @@ public class LambdaExp extends ScopeExp
 		  }
 		// Now finish copying the incoming argument into its
 		// home location.
-		param.getType().emitCoerceFromObject(code);
+                Type type = param.getType();
+                if (type != Type.pointer_type)
+                  CheckedTarget.emitCheckedCoerce(comp, this, i, type);
 		if (param.isIndirectBinding())
 		  param.pushIndirectBinding(comp);
 		if (param.isSimple())

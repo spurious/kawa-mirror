@@ -12,6 +12,7 @@ java_JAVA=\
   BlockExp.java \
   CatchClause.java \
   ChainLambdas.java \
+  CheckedTarget.java \
   Compilable.java \
   Compilation.java \
   ConditionalTarget.java \

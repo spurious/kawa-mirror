@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 
 import gnu.bytecode.Type;

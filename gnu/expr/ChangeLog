@@ -1,3 +1,15 @@
+1999-08-06  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java:  New class, extends StackTarget.
+	* Makefile.am, Makefile.in:  Update accordingly.
+	* StackTarget.java (compileFromStack0):  New protected method.
+	* Compilation.java (addClass):  Specificy LambdaExp to PrimProcedure.
+	* LambdaExp.java (enterFunction):  Do checked coerce on argument.
+	* PrimProcedure.java (applyN):  Catch ClassCastException.
+	(<init>):  New overload.
+	(compile):  Catch ClassCastException.
+	(getVerboseName):  New method.
+
 1999-07-19  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  When doing a direct method call,

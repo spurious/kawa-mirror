@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import java.util.Hashtable;
@@ -13,6 +16,9 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
   Type[] argTypes;
   Method method;
   int op_code;
+
+  /** If non-null, the LambdaExp that this PrimProcedure implements. */
+  LambdaExp source;
 
   java.lang.reflect.Member member;
 
@@ -41,7 +47,14 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     Object[] rargs = new Object[arg_count];
     for (int i = 0;  i < arg_count; i++)
       {
-	rargs[i] = argTypes[i].coerceFromObject(args[i+this_count]);
+        try
+          {
+            rargs[i] = argTypes[i].coerceFromObject(args[i+this_count]);
+          }
+        catch (ClassCastException ex)
+          {
+            throw new WrongType(this, i, ex);
+          }
       }
     try
       {
@@ -104,6 +117,12 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
       }
   }
 
+  public PrimProcedure(Method method, LambdaExp source)
+  {
+    this(method);
+    this.source = source;
+  }
+
   public PrimProcedure(int opcode, Type retType, Type[] argTypes)
   {
     this.op_code = opcode;
@@ -155,7 +174,10 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	Type arg_type = is_static ? argTypes[i]
 	  : i==0 ? method.getDeclaringClass()
 	  : argTypes[i-1];
-	args[i].compile(comp, arg_type);
+	args[i].compile(comp,
+                        source == null
+                        ? CheckedTarget.getInstance(arg_type, getName(), i)
+                        : CheckedTarget.getInstance(arg_type, source, i));
       }
     
     if (method == null)
@@ -174,6 +196,13 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     String name = name();
     if (name != null)
       return name;
+    name = getVerboseName();
+    setName(name);
+    return name;
+  }
+
+  public String getVerboseName()
+  {
     StringBuffer buf = new StringBuffer(100);
     if (method == null)
       {
@@ -195,9 +224,7 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	buf.append(argTypes[i].getName());
       }
     buf.append(')');
-    name = buf.toString();
-    setName(name);
-    return name;
+    return buf.toString();
   }
 
 
@@ -206,7 +233,7 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     StringBuffer buf = new StringBuffer(100);
     buf.append(retType.getName());
     buf.append(' ');
-    buf.append(getName());
+    buf.append(getVerboseName());
     return buf.toString();
   }
 

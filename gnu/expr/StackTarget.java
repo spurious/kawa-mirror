@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Values;
@@ -15,10 +18,10 @@ public class StackTarget extends Target
             : new StackTarget(type));
   }
 
-  public void compileFromStack(Compilation comp, Type stackType)
+  protected boolean compileFromStack0(Compilation comp, Type stackType)
   {
     if (type == stackType)
-      return;
+      return true;
     CodeAttr code = comp.getCode();
     if (stackType.isVoid())
       {
@@ -28,12 +31,18 @@ public class StackTarget extends Target
     else if (stackType instanceof PrimType && type instanceof PrimType)
       {
 	code.emitConvert(stackType, type);
-	return;
+	return true;
       }
 
     if (stackType.isSubtype(type))
-      return;
+      return true;
     stackType.emitCoerceToObject(code);
-    type.emitCoerceFromObject(code);
+    return false;
+  }
+
+  public void compileFromStack(Compilation comp, Type stackType)
+  {
+    if (! compileFromStack0(comp, stackType))
+      type.emitCoerceFromObject(comp.getCode());
   }
 }

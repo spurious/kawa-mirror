@@ -16,7 +16,7 @@ SCMSOURCES_XML_ENABLED = XML.scm
 EXTRA_DIST = $(java_SCM) XML.scm
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
-all: Makefile ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) $(@GCJ_COMPILED_SELECTED@)
+all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 ../../../kawa/java-classes.stamp:
 	cd ../../../kawa; $(MAKE)

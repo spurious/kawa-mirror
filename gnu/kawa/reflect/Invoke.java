@@ -96,10 +96,10 @@ public class Invoke extends ProcedureN implements Inlineable
                      nargs - (kind == 'N' ? 1 : 2));
     if (kind == 'N')
       {
-        Object vars = proc.getVarBuffer();
-        RuntimeException ex = proc.match(vars, margs);
+        CallContext vars = new CallContext();
+        int err = proc.match(vars, margs);
         int len = nargs - 1;
-        if (ex == null)
+        if (err == 0)
           return proc.applyV(vars);
         else if ((len & 1) == 0)
           {
@@ -107,7 +107,7 @@ public class Invoke extends ProcedureN implements Inlineable
             for (i = 0;  i < len;  i += 2)
               {
                 if (! (margs[i] instanceof Keyword))
-                  throw ex;
+                  throw MethodProc.matchFailAsException(err, thisProc, args);
               }
 
             Object result = proc.apply0();
@@ -119,7 +119,7 @@ public class Invoke extends ProcedureN implements Inlineable
               }
             return result;
           }
-        throw ex;
+        throw MethodProc.matchFailAsException(err, thisProc, args);
       }
     return proc.applyN(margs);
   }

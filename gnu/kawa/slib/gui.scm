@@ -3,21 +3,49 @@
   (invoke-static <gnu.kawa.swingviews.SwingContainer>
 		 'makeActionListener proc))
 
-(define (button #!key
-		(label :: <String> #!null)
-		(image #!null)
-		(default #!null)
-		(oncommand #!null)
-		(disabled #f)
-		(accesskey #!null))
+(define-syntax process-keywords
+  (syntax-rules ()
+		((process-keywords obj args handle-keyword handle-non-keyword)
+		 (let ((num-args :: <int> (field args 'length)))
+		   (let loop ((i :: <int> 0))
+		     (if (< i num-args)
+			 (let ((arg ((primitive-array-get <object>) args i)))
+			   (cond ((instance? arg <gnu.expr.Keyword>)
+				  (handle-keyword obj
+						  (gnu.expr.Keyword:getName arg)
+						  ((primitive-array-get <object>) args (+ i 1)))
+				  (loop (+ i 2)))
+				 ((instance? arg <gnu.kawa.xml.KAttr>)
+				  (let* ((attr :: <gnu.kawa.xml.KAttr> arg)
+					 (name :: <java.lang.String> (invoke attr 'getName))
+					 (value (invoke attr 'getObjectValue)))
+				    (handle-keyword obj name value))
+				  (loop (+ i 1)))
+				 (else
+				  (handle-non-keyword obj arg)
+				  (loop (+ i 1)))))))))))
+
+(define-private (button-keyword (button :: <gnu.kawa.models.Button>)
+				(name :: <java.lang.String>)
+				value)
+  (cond ((eq? name 'label)
+	 (invoke button 'setLabel value))
+	((eq? name 'image)
+	 #t) ;; not implemented
+	((eq? name 'disabled)
+	 (invoke button 'setDisabled value))	 
+	((eq? name 'oncommand)
+	 (invoke button 'setAction value))
+	(else (error (format "unknown button attribute ~s" name)))))
+
+(define-private (button-non-keyword (button :: <gnu.kawa.models.Button>)
+				    arg)
+  #t)
+
+(define (button #!rest args  :: <object[]>)
   (let ((button :: <gnu.kawa.models.Button>
 		(make  <gnu.kawa.models.Button>)))
-    (if disabled
-	(invoke button 'setDisabled #t))
-    (if (not (eq? label #!null))
-	(invoke button 'setLabel label))
-    (if (not (eq? oncommand #!null))
-	(invoke button 'setAction oncommand))
+    (process-keywords button args button-keyword button-non-keyword)
     button))
 
 (define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
@@ -58,6 +86,15 @@
 (define-constant color-red :: <java.awt.Color>
   (static-field <java.awt.Color> 'RED))
 
+(define-private (frame-keyword (frame :: <gnu.kawa.swingviews.SwingFrame>)
+			       (name :: <java.lang.String>)
+			       value)
+  (cond ((eq? name 'title)
+	 (invoke frame 'setTitle value))
+	((eq? name 'menubar)
+	 (invoke frame 'setJMenuBar value))
+	(else (error (format "unknown frame attribute ~s" name)))))
+
 (define (frame #!rest args  :: <object[]>)
   :: <gnu.kawa.swingviews.SwingFrame>
     (let ((frame :: <gnu.kawa.swingviews.SwingFrame>
@@ -66,14 +103,16 @@
       (let loop ((i :: <int> 0))
 	(if (< i num-args)
 	    (let ((arg ((primitive-array-get <object>) args i)))
-	      (cond ((eq? arg title:)
-		     (invoke frame 'setTitle
-			     ((primitive-array-get <object>) args (+ i 1)))
+	      (cond ((instance? arg <gnu.expr.Keyword>)
+		     (frame-keyword frame (gnu.expr.Keyword:getName arg)
+				    ((primitive-array-get <object>) args (+ i 1)))
 		     (loop (+ i 2)))
-		    ((eq? arg menubar:)
-		     (invoke frame 'setJMenuBar
-			     ((primitive-array-get <object>) args (+ i 1)))
-		     (loop (+ i 2)))
+		    ((instance? arg <gnu.kawa.xml.KAttr>)
+		     (let* ((attr :: <gnu.kawa.xml.KAttr> arg)
+			    (name :: <java.lang.String> (invoke attr 'getName))
+			    (value (invoke attr 'getValue))) ;; FIXME
+		       (frame-keyword frame name value))
+		     (loop (+ i 1)))
 		    (else
 		     (invoke frame 'addComponent arg)
 		     (loop (+ i 1))))))

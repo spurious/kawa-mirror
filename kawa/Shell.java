@@ -7,23 +7,15 @@ import java.io.*;
 
 public class Shell
 {
-  protected java.io.PrintStream pout;
-  protected java.io.PrintStream perr;
-  kawa.lang.Interpreter interpreter;
-  boolean prompt;
-  boolean display;
-
-  public Shell (Interpreter interp, boolean pflag, boolean dflag)
+  public static void run (InPort inp, Interpreter interp,
+			  boolean pflag, boolean dflag)
   {
-    pout = interp.out;
-    perr = interp.err;
-    interpreter = interp;
-    prompt = pflag;
-    display = dflag;
-  }
+    java.io.PrintStream pout = interp.out;
+    java.io.PrintStream perr = interp.err;
+    kawa.lang.Interpreter interpreter = interp;
+    boolean prompt = pflag;
+    boolean display = dflag;
 
-  public int run()
-  {
     Environment env = new Environment (interpreter);
     for (;;)
       {
@@ -35,12 +27,12 @@ public class Shell
 		pout.flush();
 	      }
 
-	    Object sexp = interpreter.read();
+	    Object sexp = inp.readSchemeObject ();
 	    if (sexp==Interpreter.eofObject)
 	      {
 		if (prompt)
 		  pout.println ();
-		return 0;
+		return;
 	      }
 
 	    interpreter.errors = 0;
@@ -85,7 +77,7 @@ public class Shell
 	catch (kawa.lang.GenericError e)
 	  {
 	    perr.println();
-	    perr.println(e.message);
+	    perr.println(e.getMessage ());
 	    e.printStackTrace(perr);
 	  }
 	catch (java.lang.ClassCastException e)
@@ -114,4 +106,31 @@ public class Shell
 	  }
       }
   }
+
+  public static void runString (String str, Interpreter interp, boolean dflag)
+  {
+    InPort str_port = call_with_input_string.open_input_string (str);
+    run (str_port, interp, false, dflag);
+  }
+
+  public static void runFile (String fname, Interpreter interp,
+			      boolean dflag)
+  {
+    try
+      {
+	
+	InPort iport;
+	if (fname.equals ("-"))
+	  iport = InPort.inDefault ();
+	else
+	  iport = new InPort (new FileInputStream(fname), fname);
+	run (iport, interp, false, dflag);
+      }
+    catch (FileNotFoundException e)
+      {
+	System.out.println("Cannot open file "+fname);
+	System.exit(1);
+      }
+  }
+  
 }

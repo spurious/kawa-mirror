@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 import java.util.Vector;
 
 public class ClassMethods extends ProcedureN
@@ -104,7 +104,7 @@ public class ClassMethods extends ProcedureN
    * those possibly applicable next (argtype overlaps parameter types);
    * and ending with those definitely not applicable (some argtype does
    * overlap its parameter type).
-   * @return ((number of definitely applicabable methods) << 32
+   * @return ((number of definitely applicable methods) << 32
    *          + (number of possibly applicable methods.
    */
   public static long selectApplicable(PrimProcedure[] methods,

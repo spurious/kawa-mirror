@@ -2,7 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 
 public class SlotGet extends Procedure2 implements HasSetter, Inlineable
 {

@@ -2,7 +2,7 @@ package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 
 public class Invoke extends ProcedureN implements Inlineable
 {
@@ -270,18 +270,24 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
-		  {
-		    for (int i = 0;  i < okCount; i++)
-		      System.err.println("ok: "+methods[i]);
                   comp.error('w',
                              "more than one definitelty applicable method `"
-                             +name+"' in "+type.getName()+" ok:"+okCount);
-		  }
+                             +name+"' in "+type.getName());
               }
+	    else if (okCount == 0)
+	      {
+		comp.error('w',
+			   "no definitely applicable method `"
+			   +name+"' in "+type.getName());
+	      }
             else
-              comp.error('w',
-                         "more than one possibly applicable method `"
-                         +name+"' in "+type.getName());
+	      {
+		comp.error('w',
+			   "more than one possibly applicable method `"
+			   +name+"' in "+type.getName());
+		for (int i = 0;  i < okCount; )
+		  comp.error('w', "candidate: " + methods[i]);
+	      }
             if (index >= 0)
               {
                 Expression[] margs

@@ -1,3 +1,7 @@
+If the compiler can determine that all the operands of (+ ...)  or
+(- ...) are floating-point, then it will generate optimized code using
+Java primitive arithmetic.
+
 Guile-style keyword syntax '#:KEYWORD' is recognized.
 (Note this conflicts with Common Lisp syntax for uninterned symbols.)
 

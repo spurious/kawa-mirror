@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xslt;
@@ -97,7 +97,9 @@ public class XslTranslator extends Lexer implements Consumer
   {
     if (type instanceof QuoteExp)
       type = ((QuoteExp) type).getValue();
-    if (type instanceof ElementConstructor)
+    if (type instanceof XName)
+      type = ((XName) type).getQName();
+    else if (type instanceof ElementConstructor)
       type = ((ElementConstructor) type).getQName();
     if (! (type instanceof Symbol))
       return null;
@@ -124,7 +126,12 @@ public class XslTranslator extends Lexer implements Consumer
 	//templateLambda.setLine(declLine, declColumn);
       }
     nesting.append((char) elements.size());
-    push(ElementConstructor.make(typeName, (Symbol) type));
+    Symbol qname;
+    if (type instanceof XName)
+      qname = ((XName) type).getQName();
+    else
+      qname = (Symbol) type;
+    push(ElementConstructor.make(typeName, qname));
     /*
     String xslcommand = ...;
     Expression[] args;
@@ -156,7 +163,12 @@ public class XslTranslator extends Lexer implements Consumer
     // if (attributeName != null) ERROR();
     attributeName = attrName;
     attributeType = attrType;
-    attributeConstructor = AttributeConstructor.make(attrName, (Symbol) attrType);
+    Symbol qname;
+    if (attrType instanceof XName)
+      qname = ((XName) attrType).getQName();
+    else
+      qname = (Symbol) attrType;
+    attributeConstructor = AttributeConstructor.make(attrName, qname);
     attributeValue.setLength(0);
     nesting.append((char) elements.size());
     /*

@@ -26,8 +26,8 @@ OBJ=\
   ports.class \
   quantities.class \
   strings.class \
+  syntax.class \
   vectors.class \
-  when_unless.class \
   @EXTRA_OBJ@
 
 OBJ_1_0 = 

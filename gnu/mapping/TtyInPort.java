@@ -17,7 +17,7 @@ public class TtyInPort extends InPort
   /** Set the prompter function.
    * The argument is called when a new line is read.
    * It is passed one argument (this input port), and should return
-   * a string.  That string is printed as teh prompt string.  */
+   * a string.  That string is printed as the prompt string.  */
 
   public void setPrompter (Procedure prompter)
   {

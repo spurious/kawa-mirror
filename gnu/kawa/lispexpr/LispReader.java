@@ -492,11 +492,8 @@ public class LispReader extends Lexer
 		  return "no digits before fraction symbol '/'";
 		if (exp_seen != '\000' || decimal_point >= 0)
 		  return "fraction symbol '/' following exponent or '.'";
-		if (pos - digits_start < 18)
-		  numerator = IntNum.make(negative ? - lvalue : lvalue);
-		else
-		  numerator = IntNum.valueOf(buffer, digits_start,
-					     pos - digits_start, radix, negative);
+		numerator = valueOf(buffer, digits_start, pos - digits_start,
+				    radix, negative, lvalue);
 		digits_start = -1;
 		lvalue = 0;
 		negative = false;
@@ -536,10 +533,8 @@ public class LispReader extends Lexer
       }
     else
       {
-	IntNum iresult = pos - digits_start < 18
-	  ? IntNum.make(negative ? - lvalue : lvalue)
-	  : IntNum.valueOf(buffer, digits_start, pos - digits_start,
-			   radix, negative);
+	IntNum iresult = valueOf(buffer, digits_start, pos - digits_start,
+				 radix, negative, lvalue);
 	if (numerator == null)
 	  number = iresult;
 	else
@@ -716,6 +711,21 @@ public class LispReader extends Lexer
 	
       }
     return number;
+  }
+
+  private static IntNum valueOf (char[] buffer, int digits_start,
+				 int number_of_digits,
+				 int radix, boolean negative,
+				 long lvalue)
+  {
+    // It turns out that if number_of_digits + radix <= 28
+    // then the value will fit in a long without overflow,
+    // so we can use the value calculated in lvalue.
+    if (number_of_digits + radix <= 28)
+      return IntNum.make(negative ? - lvalue : lvalue);
+    else
+      return IntNum.valueOf(buffer, digits_start, number_of_digits,
+			    radix, negative);
   }
 
   protected Object returnSymbol(int startPos, int endPos)

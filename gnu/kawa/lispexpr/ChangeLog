@@ -1,3 +1,9 @@
+2003-08-14  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Move duplicated code to ...
+	(valueOf):  New method for parsing integer strings.
+	Fix logic for testing fits-in-long to account for radix.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (compare):  Fix thinko.

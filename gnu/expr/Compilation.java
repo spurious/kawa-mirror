@@ -1026,10 +1026,17 @@ public class Compilation
     zout.close ();
   }
 
+  // FIXME - make this settable, as it does make .class files bigger.
+  public static boolean emitSourceDebugExtAttr = true;
+
   public void addClass (ClassType new_class)
   {
     if (source_filename != null)
-      new_class.setSourceFile (source_filename);
+      {
+	if (emitSourceDebugExtAttr)
+	  new_class.setStratum(getInterpreter().getName());
+	new_class.setSourceFile(source_filename);
+      }
     if (classes == null)
       classes = new ClassType[20];
     else if (numClasses >= classes.length)
@@ -1277,7 +1284,7 @@ public class Compilation
 
 	    int line = source.getLine();
 	    if (line > 0)
-	      code.putLineNumber(line);
+	      code.putLineNumber(source.getFile(), line);
 
 	    Method primMethod = primMethods[methodIndex];
 	    Variable ctxVar = code.getArg(i == 5 ? 3 : i+2);
@@ -1412,7 +1419,7 @@ public class Compilation
 
 	    int line = source.getLine();
 	    if (line > 0)
-	      code.putLineNumber(line);
+	      code.putLineNumber(source.getFile(), line);
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
@@ -1611,7 +1618,7 @@ public class Compilation
 
 	    int line = source.getLine();
 	    if (line > 0)
-	      code.putLineNumber(line);
+	      code.putLineNumber(source.getFile(), line);
 
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
@@ -1874,7 +1881,7 @@ public class Compilation
 
     int line = module.getLine();
     if (line > 0)
-      code.putLineNumber(line);
+      code.putLineNumber(module.getFile(), line);
 
     if (curClass == mainClass && staticModule)
       {

@@ -1,5 +1,13 @@
 2004-12-24  Per Bothner  <per@bothner.com>
 
+	* Expression.java (compileWithPosition - 2 methods): Use new
+	putLineNumber method, also passing in the filename.
+	* Compilation.java: Likewise, various places.
+
+	* Compilation.java (emitSourceDebugExtAttr): New static.
+	(addClass): Optionally call setStratum, which causes a
+	SourceDebugExtension attribute to be generated.
+
 	* QuoteExp.java (print): If value is an Exprssion, just print short
 	toString format, since otherwise macro expansion can cause a cycle.
 

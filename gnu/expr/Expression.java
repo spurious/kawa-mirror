@@ -65,7 +65,7 @@ public abstract class Expression implements Printable
     int line = getLine ();
     if (line > 0)
       {
-        comp.method.compile_linenumber (line);
+        comp.getCode().putLineNumber(getFile(), line);
         compileNotePosition(comp, target, this);
       }
     else
@@ -80,7 +80,7 @@ public abstract class Expression implements Printable
     int line = position.getLine ();
     if (line > 0)
       {
-        comp.method.compile_linenumber (line);
+        comp.getCode().putLineNumber(position.getFile(), line);
         compileNotePosition(comp, target, position);
       }
     else

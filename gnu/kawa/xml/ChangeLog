@@ -1,3 +1,7 @@
+2003-02-13  Per Bothner  <per@bothner.com>
+
+	* Document.java (parse):  Call writeBaseUri if a TreeList.
+
 2003-01-09  Per Bothner  <per@bothner.com>
 
 	* Attributes.java:  Update for gnu.lists changes.

@@ -46,6 +46,8 @@ public class Document extends Procedure1
 		      new NamespaceResolver(out),
 		      messages);
     out.beginDocument();
+    if (out instanceof TreeList)
+      ((TreeList) out).writeBaseUri(url);
     parser.parse();
     if (messages.seenErrors())
       throw new SyntaxException(messages);

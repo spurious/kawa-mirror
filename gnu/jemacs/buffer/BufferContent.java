@@ -263,12 +263,11 @@ implements javax.swing.text.AbstractDocument.Content
       throw new BadLocationException("bad coun for remove", nitems);
     gapEnd += nitems;
 
-    GapUndoableEdit undo = new GapUndoableEdit();
+    GapUndoableEdit undo = new GapUndoableEdit(where);
     undo.content = this;
     undo.data = new String(array, gapEnd - nitems, nitems);
     undo.nitems = nitems;
     undo.isInsertion = false;
-    undo.startIndex = allocatePosition(where, BEFORE_MARK_KIND);
     return undo;
   }
 
@@ -344,12 +343,11 @@ implements javax.swing.text.AbstractDocument.Content
     str.getChars(0, slen, array, where);
     gapStart += slen;
 
-    GapUndoableEdit undo = new GapUndoableEdit();
+    GapUndoableEdit undo = new GapUndoableEdit(where);
     undo.content = this;
     undo.data = str;
     undo.nitems = slen;
     undo.isInsertion = true;
-    undo.startIndex = allocatePosition(where, BEFORE_MARK_KIND);
     return undo;
   }
 
@@ -465,7 +463,7 @@ implements javax.swing.text.AbstractDocument.Content
               {
                 if (ceil - start > 5000)
                   ceil = start + 5000;
-                Emacs.checkQuit();
+                Signal.checkQuit();
               }
             int i = indexOf(array, start, ceil, target);
             if (i >= 0)
@@ -495,7 +493,7 @@ implements javax.swing.text.AbstractDocument.Content
               {
                 if (start - floor > 5000)
                   floor = start - 5000;
-                Emacs.checkQuit();
+                Signal.checkQuit();
               }
             int i = lastIndexOf(array, start - 1, floor, target);
             if (i >= 0)
@@ -550,25 +548,18 @@ class GapUndoableEdit extends AbstractUndoableEdit
 
   String data;
 
-  int startIndex;
+  int startOffset;
   int nitems;
 
-  public void finalize()
+  GapUndoableEdit(int offset)
   {
-    content.freePosition(startIndex);
-  }
-
-  public void die()
-  {
-    super.die();
-    content.freePosition(startIndex);
-    startIndex = -1;
+    startOffset = offset;
   }
 
   private void doit(boolean isInsertion)
     throws BadLocationException
   {
-    int startOffset = content.positions[content.indexes[startIndex]];
+    //int startOffset = content.positions[content.indexes[startIndex]];
     if (isInsertion)
       {
         // FIXME returns useless Undo

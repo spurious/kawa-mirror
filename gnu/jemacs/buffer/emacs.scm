@@ -216,7 +216,7 @@
    window))
 
 (define (set-window-point (window :: <window>) position)
-  (invoke window 'setDot (invoke (window-buffer window) 'positionToOffset position)))
+  (invoke window 'setDot (invoke (invoke window 'getBuffer) 'positionToOffset position)))
 
 ;;; FRAMES
 
@@ -389,7 +389,7 @@
    marker))
 
 (define (set-marker (marker <gnu.jemacs.buffer.Marker>) position
-                    #!optional (buffer (current-buffer)))
+                    #!optional (buffer :: <buffer> (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "set" <void>
                              (<buffer> <int>))
    marker buffer (invoke buffer 'positionToOffset position)))
@@ -417,8 +417,9 @@
 		     (invoke buffer 'positionToOffset end)))
   (invoke buffer 'removeRegion start-offset end-offset)))
 
-(define (delete-char #!optional (count 1) killp (buffer (current-buffer)))
-  (invoke (as <buffer> buffer) 'deleteChar count))
+(define (delete-char #!optional (count :: <int> 1) killp
+		     (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'deleteChar count))
 
 (define (delete-backward-char #!optional (count 1) killp
 			      (buffer :: <buffer> (current-buffer)))
@@ -434,6 +435,9 @@
   (invoke buffer 'moveToColumn column force))
 
 ;;; DEFAULT BINDINGS
+
+(define (emacs-help)
+  (format #t "Sorry - no help available.~%~!"))
 
 (define-key global-map #(down) next-line)
 (define-key global-map #(up) previous-line)
@@ -459,6 +463,7 @@
 (define-key global-map "\C-x50" delete-frame)
 (define-key global-map "\C-x52" make-frame)
 (define-key global-map "\C-xo" other-window)
+(define-key global-map '(control h) emacs-help)
 
 (define (emacs)
   (set-buffer (get-buffer-create "*scratch*"))

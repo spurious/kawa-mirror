@@ -16,6 +16,12 @@ public class InsertAction extends javax.swing.text.TextAction
     buffer.keymap.pendingLength = 0;
     String command = event.getActionCommand();
     char ch = command.charAt(0);
-    buffer.insert(ch, count, buffer.inputStyle);
+    // We specifically want to suppress inserting BackSpace.
+    // The problem is that the backspace key-binding is triggered
+    // for the key-press, but we *also* get a key-typed actions, which
+    // ends up here.  There is probably a cleaner solution ...
+    if (ch >= ' ' || ch == '\n' || ch == '\t'
+	|| this != BufferKeymap.defaultInsertAction)
+      buffer.insert(ch, count, buffer.inputStyle);
   }
 }

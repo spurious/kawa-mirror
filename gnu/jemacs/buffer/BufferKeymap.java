@@ -23,9 +23,10 @@ public class BufferKeymap implements javax.swing.text.Keymap
     = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
   static Keymap globalKeymap
     = JTextComponent.addKeymap("global", defaultKeymap);
+  static InsertAction defaultInsertAction = new InsertAction(null);
   static
   {
-    globalKeymap.setDefaultAction(new InsertAction(null)) ;
+    globalKeymap.setDefaultAction(defaultInsertAction);
   }
   Keymap localKeymap;
   static int counter;
@@ -208,6 +209,25 @@ public class BufferKeymap implements javax.swing.text.Keymap
 
   public static KeyStroke asKeyStroke(Object key)
   {
+    int m = 0;
+    while (key instanceof Pair)
+      {
+	Pair pair = (Pair) key;
+	if (pair.cdr == LList.Empty)
+	  key = pair.car;
+	else
+	  {
+	    if (pair.car == "control")
+	      m |= java.awt.event.InputEvent.CTRL_MASK;
+	    if (pair.car == "meta")
+	      m |= java.awt.event.InputEvent.META_MASK;
+	    if (pair.car == "shift")
+	      m |= java.awt.event.InputEvent.SHIFT_MASK;
+	    if (pair.car == "alt")
+	      m |= java.awt.event.InputEvent.ALT_MASK;
+	    key = pair.cdr;
+	  }
+      }
     if (key instanceof Char)
       {
 	char value = ((Char) key).charValue();
@@ -217,13 +237,22 @@ public class BufferKeymap implements javax.swing.text.Keymap
       {
 	String name = (String) key;
 	if (name.length() == 1)
-	  return javax.swing.KeyStroke.getKeyStroke(name.charAt(0));
+	  {
+	    char ch = name.charAt(0);
+	    if (m == 0)
+	      return javax.swing.KeyStroke.getKeyStroke(ch);
+	    else
+	      {
+		ch = Character.toUpperCase(ch);
+		return javax.swing.KeyStroke.getKeyStroke(ch, m);
+	      }
+	  }
 	if (name == "backspace")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0);
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, m);
 	if (name == "prior")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, m);
 	if (name == "next")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, m);
 	return javax.swing.KeyStroke.getKeyStroke(name.toUpperCase());
       }
     return (KeyStroke) key;

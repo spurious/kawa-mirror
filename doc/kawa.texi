@@ -970,6 +970,51 @@ when passed some values, calls the @var{receiver} procedure
 with those values as arguments.
 @end defun
 
+@deffn Syntax let-values ((formals expression) ...) body
+Each @var{formals} should be a formal arguments list as for a @code{lambda},
+cf section 4.1.4 of the R5RS.
+
+The @var{expression}s are evaluated in the current environment, the
+variables of the @var{formals} are bound to fresh locations, the return
+values of the @var{expression}s are stored in the variables, the
+@var{body} is evaluated in the extended environment, and the values of
+the last expression of @var{body} are returned. The @var{body} is a
+"tail body", cf section 3.5 of the R5RS.
+
+The matching of each @var{formals} to values is as for the matching of
+@var{formals} to arguments in a @code{ambda} expression, and it is an
+error for an @var{expression} to return a number of values that does not
+match its corresponding @var{formals}.
+@example
+(let-values ((a b . c) (values 1 2 3 4)))
+  (list a b c))            --> (1 2 (3 4)) 
+
+(let ((a 'a) (b 'b) (x 'x) (y 'y))
+  (let-values (((a b) (values x y))
+               ((x y) (values a b)))
+    (list a b x y)))       --> (x y a b)
+@end example
+@end deffn
+
+@deffn Syntax let*-values ((formals expression) ...) body
+
+Each @var{formals} should be a formal arguments list as for a
+@code{lambda} expression, cf section 4.1.4 of the R5RS.
+
+@code{let*-values} is similar to @code{let-values}, but the bindings are
+performed sequentially from left to right, and the region of a binding
+indicated by (@var{formals} @var{expression}) is that part of the
+@code{let*-values} expression to the right of the binding. Thus the
+second binding is done in an environment in which the first binding is
+visible, and so on.
+@example
+(let ((a 'a) (b 'b) (x 'x) (y 'y))
+  (let*-values (((a b) (values x y))
+                ((x y) (values a b)))
+    (list a b x y)))       --> (x y x y)
+@end example
+@end deffn
+
 @node Special named constants, Keywords, Multiple values, Extensions
 @section Special named constants
 
@@ -1609,6 +1654,11 @@ this will be fixed in a future release (using Java2 features).
 
 @node Ports, Format, Files, Extensions
 @section Ports
+
+@defun current-error-port
+Return the port to which errors and warnings should be sent
+(the @dfn{standard error} in Unix and C terminology).
+@end defun
 
 @defun read-line [port [handle-newline]]
 Reads a line of input from @var{port}.
@@ -2282,7 +2332,7 @@ is equivalent to @code{(location @var{lvalue})}.
 This works both top-level and inside a function.
 @end deffn
 
-Some people mind find it helpful to think of a location
+Some people might find it helpful to think of a location
 as a settable @dfn{thunk}.  Others may find it useful to
 think of the @code{location} syntax as similar to the C @samp{&} operator;
 for the @samp{*} indirection operator, Kawa uses procedure application.
@@ -4016,8 +4066,8 @@ by the author.
 This manual has quoted from SRFI-6,
 which is Copyright (C) William D Clinger (1999). All Rights Reserved.
 
-The following notice applies to SRFI-6, which is quoted in this
-manual, but it does not apply to the manual as a whole:
+The following notice applies to SRFI-6 and SRFI-11, which is quoted in
+this manual, but it does not apply to the manual as a whole:
 
 @quotation
 This document and translations of it may be copied and furnished to

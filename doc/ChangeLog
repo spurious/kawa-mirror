@@ -1,3 +1,7 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Document let-values, let*-values, and current-error-port.
+
 2001-10-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Getting Kawa):  Mention mirrors, and other changes.

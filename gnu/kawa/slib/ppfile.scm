@@ -32,8 +32,8 @@
 	      (fun outport)
 	      (call-with-output-file outport fun))))
       (lambda (export)
-	(let ((old-load-pathname *load-pathname*))
-	  (set! *load-pathname* inport)
+	(let () ;; ((old-load-pathname *load-pathname*))
+	  ;;(set! *load-pathname* inport) ;; FIXME
 	  (letrec ((lp (lambda (c)
 			 (cond ((eof-object? c))
 			       ((char-whitespace? c)
@@ -62,9 +62,10 @@
 					   (set! c (peek-char port))))
 				    (lp c))))))))
 	    (lp (peek-char port)))
-	  (set! *load-pathname* old-load-pathname)))))))
+	  ;;(set! *load-pathname* old-load-pathname)
+	  ))))))
 
-(define (pprint-file ifile . optarg)
+(define (pprint-file ifile #!optional (oport (current-output-port)))
   (pprint-filter-file ifile
 		      (lambda (x) x)
-		      (if (null? optarg) (current-output-port) (car optarg))))
+		      oport))

@@ -1,0 +1,14 @@
+2000-03-06  Per Bothner  <per@bothner.com>
+
+	New directory.
+	* genwrite.scm:  Lower-case some symbols.
+	Use format to print unknown types.
+	* pp.scm (pp):  Merge with pp:pretty-print. Use #!optional.
+	* ppfile.scm:  Comment out (for now) *load-pathname* handling.
+	(pprint-file):  Use #!optional.
+	* printf.scm:  Remove require of string-case - not needed.
+	(stdio:parse-float, stdio:round-string, stdio:iprintf, stdio:fprintf):
+	Define as private.
+	(stdio:printf):  Merge/inline into printf.
+	(stdio:sprintf):  Merge/inline into sprintf.
+	* SLib.java:  New class.

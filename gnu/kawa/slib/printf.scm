@@ -17,7 +17,7 @@
 ;promotional, or sales literature without prior written consent in
 ;each case.
 
-(require 'string-case)
+;(require 'string-case)
 
 ;; Parse the output of NUMBER->STRING.
 ;; Returns a list: (sign-character digit-string exponent-integer)
@@ -25,7 +25,8 @@
 ;; with a "0", after which a decimal point should be understood.
 ;; If STR denotes a non-real number, 3 additional elements for the
 ;; complex part are appended.
-(define (stdio:parse-float str)
+
+(define-private (stdio:parse-float str)
   (let ((n (string-length str))
 	(iend 0))
     (letrec ((prefix
@@ -138,7 +139,7 @@
 ;; If STRIP-0S is not #F then trailing zeros will be stripped from the result.
 ;; In this case, STRIP-0S should be the minimum number of digits required
 ;; after the implied decimal point.
-(define (stdio:round-string str ndigs strip-0s)
+(define-private (stdio:round-string (str :: <string>) ndigs strip-0s)
   (let* ((n (- (string-length str) 1))
 	 (res
 	  (cond ((< ndigs 0) "")
@@ -184,7 +185,7 @@
 	      (loop (- i 1))))
 	res)))
 
-(define (stdio:iprintf out format-string . args)
+(define-private (stdio:iprintf out format-string . args)
   (cond
    ((not (equal? "" format-string))
     (let ((pos -1)
@@ -526,7 +527,7 @@
 		     (else (and (out #\%) (out fc) (out #\?) (loop args))))))))
 	 (else (and (out fc) (loop args)))))))))
 
-(define (stdio:fprintf port format . args)
+(define-private (stdio:fprintf port format . args)
   (let ((cnt 0))
     (apply stdio:iprintf
 	   (lambda (x)
@@ -536,10 +537,10 @@
 	   format args)
     cnt))
 
-(define (stdio:printf format . args)
+(define (printf format . args)
   (apply stdio:fprintf (current-output-port) format args))
 
-(define (stdio:sprintf str format . args)
+(define (sprintf str format . args)
   (let* ((cnt 0)
 	 (s (cond ((string? str) str)
 		  ((number? str) (make-string str))
@@ -573,8 +574,6 @@
 	  ((eqv? end cnt) s)
 	  (else (substring s 0 cnt)))))
 
-(define printf stdio:printf)
 (define fprintf stdio:fprintf)
-(define sprintf stdio:sprintf)
 
 ;;(do ((i 0 (+ 1 i))) ((> i 50)) (printf "%s\n" (sprintf i "%#-13a:%#13a:%-13.8a:" "123456789" "123456789" "123456789")))

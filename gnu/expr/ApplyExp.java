@@ -348,21 +348,18 @@ public class ApplyExp extends Expression
 	    compileToArray (exp.args, comp);
 	    code.emitInvoke(typeContext.getDeclaredMethod("setArgsN", 1));
 	  }
+	code.emitPutField(comp.procCallContextField);
 	if (exp.isTailCall())
 	  {
-	    // Stack: context, proc
-	    code.emitPutField(comp.procCallContextField);
 	    code.emitReturn();
 	  }
 	else if (target instanceof ConsumerTarget)
 	  {
-	    code.emitPutField(comp.procCallContextField);
 	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
 	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
 	  }
 	else
 	  {
-	    code.emitPutField(comp.procCallContextField);
 	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 0));
 	    target.compileFromStack(comp, Type.pointer_type);
 	  }

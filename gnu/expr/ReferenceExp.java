@@ -107,6 +107,7 @@ public class ReferenceExp extends Expression
   {
     if (target instanceof IgnoreTarget)
       return;
+    Type rtype = getType();
     CodeAttr code = comp.getCode();
     Declaration decl = Declaration.followAliases(binding);
     decl.load(comp);
@@ -117,16 +118,19 @@ public class ReferenceExp extends Expression
 	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
 	//   code.emitGetField(Compilation.functionValueBinding2Field);
 	else
-	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	  {
+	    code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	    rtype = Compilation.typeProcedure;
+      }
       }
     else if (decl.isFluid() && decl.field == null)
       code.emitGetField(FluidLetExp.valueField);
     if (target instanceof SeriesTarget
 	&& decl.getFlag(Declaration.IS_SINGLE_VALUE))
       // A kludge until we get a better type system.
-      ((SeriesTarget) target).compileFromStackSimple(comp, getType());
+      ((SeriesTarget) target).compileFromStackSimple(comp, rtype);
     else
-      target.compileFromStack(comp, getType());
+      target.compileFromStack(comp, rtype);
   }
 
   protected Expression walk (ExpWalker walker)

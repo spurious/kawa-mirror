@@ -1,3 +1,11 @@
+2002-02-15  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (compile):  Use Procedure type if appropriate.
+
+	* ApplyExp.java (compile):  Factor out common code.
+
+	* Interpreter.java (defineFunction):  New methods.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* Keyword.java (apply):  Emit attribute, not group.

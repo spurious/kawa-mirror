@@ -183,9 +183,24 @@ public abstract class Interpreter
   public Environment getEnvironment() { return environ; }
   public void setEnvironment(Environment environ) { this.environ = environ; }
 
+  /** Enter a value into the current environment. */
   public void define(String sym, Object p)
   {
     environ.define (sym, p);
+  }
+
+  /** Enter a named function into the current environment. */
+  public final void defineFunction(Named proc)
+  {
+    defineFunction(proc.getName(), proc);
+  }
+
+  /** Enter a function into the current environment.
+   * Same as define(name,proc) for Scheme, but not for (say) Common Lisp.
+   **/
+  public void defineFunction(String name, Object proc)
+  {
+    environ.define(name, proc);
   }
 
   /** Import all the public fields of an object. */

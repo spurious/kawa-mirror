@@ -1,13 +1,16 @@
 Tue Feb  3 12:57:50 1998  Per Bothner  <bothner@cygnus.com>
 
+	* configure.in, configure:  Set version to 1.5.95.
+
 	* kawa/GuiConsole.java (close):  Make non-private.
 	(Works around javac bug in some JDK versions.)
 	* kawa/Shell.java:  Better handling of WrongArguments.
 	* kawa/repl.java (main):  If compilation throws exception, print stack.
 	
-	* kawa/standard/{abs,complex_p.denominator,exp,log,make_polar,
-	make_rectangular,number_p,numerator,quantity_p,quotient,rational_p,
-	real_p,real_part,remainder,zero_p}.java:  Replaced by functions in lib.
+	* kawa/standard/{abs,angle,complex_p.denominator,exp,imag_part,log,
+	magnitude,make_polar,make_rectangular,number_p,numerator,quantity_p,
+	quotient,rational_p,real_p,real_part,remainder,zero_p}.java:
+	Replaced by functions in lib.
 	* kawa/standard.Scheme.java:  Many functions moved to kawa.lib.numbers.
 	* kawa/standard/Makefile.{am,in}:  Update for removed files.
 	* kawa/lang/PrimProcedure.java (getNamedType):  Add more logical names.

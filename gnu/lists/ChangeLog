@@ -1,3 +1,8 @@
+2001-04-04  Per Bothner  <per@bothner.com>
+
+	* VoidConsumer.java:  New class, implements Consumer.
+	* Makefile.am (java_sources):  Add VoidConsumer.java.
+
 2001-04-02  Per Bothner  <per@bothner.com>
 
 	* TreeList.java:  Make it extend AbstractSequence.

@@ -33,7 +33,8 @@ java_sources = \
   U8Vector.java \
   U16Vector.java \
   U32Vector.java \
-  U64Vector.java
+  U64Vector.java \
+  VoidConsumer.java
 
 java_BUILT = \
   AbstractSequence.java \

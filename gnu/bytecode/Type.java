@@ -239,6 +239,11 @@ public abstract class Type {
     return this_name;
   }
 
+  protected void setName (String name)
+  {
+    this_name = name;
+  }
+
   public static boolean isValidJavaTypeName (String name)
   {
     boolean in_name = false;

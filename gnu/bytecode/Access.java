@@ -15,10 +15,17 @@ public class Access {
   static public final short SUPER       = 0x0020;
   static public final short SYNCHRONIZED= 0x0020;
   static public final short VOLATILE    = 0x0040;
+  static public final short BRIDGE      = 0x0040;
   static public final short TRANSIENT   = 0x0080;
+  static public final short VARARGS     = 0x0080;
   static public final short NATIVE      = 0x0100;
   static public final short INTERFACE   = 0x0200;
   static public final short ABSTRACT    = 0x0400;
+  static public final short STRICT      = 0x0800;
+  static public final short SYNTHETIC   = 0x1000;
+  static public final short ANNOTATION  = 0x2000;
+  static public final short ENUM        = 0x4000;
+  // unassigned 0x8000
 
   public static String toString(int flags)
   {
@@ -38,18 +45,19 @@ public class Access {
     if ((flags & FINAL) != 0)       buf.append(" final");
     if ((flags & SYNCHRONIZED) != 0)
       buf.append(kind == 'C' ? " super" : " synchronized");
-    if ((flags & VOLATILE) != 0)    buf.append(" volatile");
-    if ((flags & TRANSIENT) != 0)   buf.append(" transient");
+    if ((flags & VOLATILE) != 0)
+      buf.append(kind == 'M' ? " bridge" : " volatile");
+    if ((flags & TRANSIENT) != 0)
+      buf.append(kind == 'M' ? " varargs" : " transient");
     if ((flags & NATIVE) != 0)      buf.append(" native");
     if ((flags & INTERFACE) != 0)   buf.append(" interface");
     if ((flags & ABSTRACT) != 0)    buf.append(" abstract");
-    int unknown = flags & ~(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL
-			    |SYNCHRONIZED|VOLATILE|NATIVE|INTERFACE|ABSTRACT);
-    if (unknown != 0)
-      {
-	buf.append(" 0x");
-	buf.append(Integer.toHexString(unknown));
-      }
+    if ((flags & STRICT) != 0)      buf.append(" strict");
+    if ((flags & ENUM) != 0)        buf.append(" enum");
+    if ((flags & SYNTHETIC) != 0)   buf.append(" synthetic");
+    if ((flags & ANNOTATION) != 0)  buf.append(" annotation");
+    // Only one unused bit left ...
+    if ((flags & 0x8000) != 0)      buf.append(" 0x8000");
     return buf.toString();
   }
 }

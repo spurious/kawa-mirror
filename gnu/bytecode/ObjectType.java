@@ -15,7 +15,7 @@ public class ObjectType extends Type
     size = 4;
   }
 
-  ObjectType (String name)
+  public ObjectType (String name)
   {
     this_name = name;
     size = 4;

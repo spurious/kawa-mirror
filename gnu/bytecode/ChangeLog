@@ -1,3 +1,15 @@
+2005-01-15  Per Bothner  <per@bothner.com>
+
+	* Access.java (BRIDGE, VARARGS, STRICT, SYNTHETIC, ANNOTATION):
+	Add new JDK 1.4 and 1.5 modifiers.
+	(toString(int,char)):  Update for new flags.
+
+	* Type.java (setName): New protected method.
+	* ObjectType.java (<init>(String)): Make public.  It makes more sense
+	for "funny" types like NodeType to be ObjectType but not ClassType.
+	To be used for gnu.NodeType.
+	* ClassType.java (setName): Stylistic improvement.
+
 2005-01-09  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (writeExternal): Simplify. Non-existing classes

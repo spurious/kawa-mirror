@@ -1,4 +1,4 @@
-(test-init "macros")
+(test-init "macros" 7)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 

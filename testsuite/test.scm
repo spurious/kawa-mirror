@@ -26,7 +26,7 @@
 ;;; send corrections or additions to jaffer@ai.mit.edu or
 ;;; Aubrey Jaffer, 84 Pleasant St., Wakefield MA 01880, USA
 
-(TEST-INIT "scm-test")(define errs '())
+(TEST-INIT "scm-test" 576)(define errs '())
 
 ;(define test
 ;  (lambda (expect fun . args)
@@ -934,7 +934,7 @@
 (SECTION 6 10 2)
 (test #\; peek-char this-file)
 (test #\; read-char this-file)
-(test '(TEST-INIT "scm-test") read this-file)
+(test '(TEST-INIT "scm-test" 576) read this-file)
 (test #\( peek-char this-file)
 (test '(define errs '()) read this-file)
 (close-input-port this-file)

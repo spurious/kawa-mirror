@@ -1,5 +1,5 @@
 ;;; POLYTYPE -- A polymorphic type inferencer for Scheme.
-(test-init "polytype")
+(test-init "polytype" 1)
 
 ;------------------------------------------------------------------------------
 ;

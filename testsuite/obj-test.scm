@@ -1,4 +1,4 @@
-(test-init "objects")
+(test-init "objects" 11)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))

@@ -201,14 +201,32 @@ public class TestMisc
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
 
-    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof node",
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof node()",
 	     "true true true");
-    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof text",
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof text ( )",
 	     "true false true");
-    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element a",
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element(a,*)",
 	     "false false false");
-    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element b",
+    evalTest("for $n in <a>xx<b/>yy</a>/node() return $n instanceof element(b,*)",
 	     "false true false");
+    // FIXME: evalTest("<a>xx<b/>yy</a>/node() instanceof node()", "false");
+    evalTest("<a>xx<b/>yy</a>/node() instanceof node()?", "false");
+    evalTest("<a>xx<b/>yy</a>/node() instanceof node()+", "true");
+    evalTest("<a>xx<b/>yy</a>/node() instanceof node()*", "true");
+    evalTest("<a>xx<b/>yy</a>/node() instanceof item()+", "true");
+    evalTest("(3,4,5) instanceof item()+", "true");
+    evalTest("('a','b') instanceof string+", "true");
+    evalTest("(2,3) instanceof string?", "false");
+    evalTest("(2,3) instanceof string+", "false");
+    evalTest("() instanceof string?", "true");
+    evalTest("() instanceof string+", "false");
+    evalTest("() instanceof string*", "true");
+    evalTest("('2') instanceof string?", "true");
+    evalTest("('2') instanceof string+", "true");
+    evalTest("('2') instanceof string*", "true");
+    evalTest("('2','3') instanceof string?", "false");
+    evalTest("('2','3') instanceof string+", "true");
+    evalTest("('2','3') instanceof string*", "true");
 
     evalTest("declare namespace Int='class:java.lang.Integer'\n"
 	     + "Int:toHexString(266)", "10a");

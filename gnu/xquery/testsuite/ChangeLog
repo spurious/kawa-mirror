@@ -1,3 +1,7 @@
+2003-05-13  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Update and add new tests for new type syntax.
+
 2003-05-10  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Add new test for string literal

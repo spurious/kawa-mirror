@@ -83,13 +83,11 @@
      <include name="gnu/lists/SeqPosition.java"/>
      <include name="gnu/lists/Sequence.java"/>
      <include name="gnu/lists/SimpleVector.java"/>
-     <include name="gnu/mapping/CallContext.java"/>
      <include name="gnu/xml/ParsedXMLHandler.java"/>
      <include name="gnu/xml/ParsedXMLHandlerByte.java"/>
      <include name="gnu/xml/QName.java"/>
      <include name="gnu/xml/XMLParserChar.java"/>
      <include name="gnu/xml/XMLParserByte.java"/>
-     <include name="gnu/kawa/xml/Focus.java"/>
      <include name="kawa/Version.java"/>
   </fileset>
   
@@ -97,6 +95,8 @@
      <include name="gnu/bytecode/ObjectType.java"/>
      <include name="gnu/mapping/CallContext.java"/>
      <include name="gnu/kawa/xml/Focus.java"/>
+     <include name="gnu/kawa/xml/ListItems.java"/>
+     <include name="gnu/kawa/xml/IteratorItems.java"/>
   </patternset>
 
   <target name="run" depends="classes">

@@ -1,3 +1,27 @@
+1999-04-23  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/lang/Translator.java (errors):  Removed field.
+	(messages):  New gnu.text.SourceMessages field.
+	(syntaxError):  Don't print messages;  invoke messages.error instead.
+	* kawa/lang/Eval.java (eval):  Create new SourceMessages.
+	(evalBody):  Add and use new SourceMessages parameter.
+	* kawa/lang/Lambda.java:  Update for new SourceMessages convention.
+	* kawa/lang/ScmRead.java (<init>):  New overload taking SourceMessages.
+	(readSymbol):  Handle `::' as a symbol, not a keyword.
+	(readObject):  Handle [ ... ].
+	* kawa/lang/CompileFile.java:  Use new SourceMessages conventions.
+	* kawa/standard/Scheme.java:  Declare new precedure subtype?.
+	(getNamedType):  Add character.
+	(eval):  Catch SyntaxException.
+	* kawa/standard/let.java:  Handle :: TYPE specifier.
+	* kawa/standard/letrec.java:  Handle :: TYPE specifier.
+	* kawa/standard/load.java:  Use new SourcesMessages class.
+	* kawa/Shell.java (run):  New new SourceMessages conventions.
+	* kawa/repl.java:  When compiling, catch SyntaxException.
+
+	* kawa/lang/SyntaxRule.java (execute_template):  Move DEBUGGING comment
+	* kawa/lang/SyntaxRules.java (expand):  ... to here.
+
 1999-04-22  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/standard/object.scm (rewrite):  Do setClassMethod on $finit$.

@@ -1,8 +1,19 @@
-Full-tail-call-elimination when using flag --full-tail-calls.
+Square brackets [ ... ] are allowed as a synonym of parentheses ( ... ).
+
+Kawa is now "properly tail-recursive" if you invoke it with the
+--full-tail-calls flag.  (Exception: the eval procedure does not
+perform proper tail calls, in violation of R5RS.  This will be
+fixed in a future release.)  Code compiled when --full-tail-calls is
+in effect is also properly tail-recursive.  Procedures compiled with
+--full-tail-calls can call procedures compiled without it, and vice
+versa (but of course without doing proper tail calls).  The default
+is still --no-full-tail-calls, partly because of performance concerns,
+partly because that provides better compatibility with Java
+conventions and tools.
 
 The keywords let (including named let), let*, and letrec support type
 specifiers for the declared variables  For example:
-	(let ((lst <list> (foo x))) (reverse lst))
+	(let ((lst :: <list> (foo x))) (reverse lst))
 
 Changes from Kawa 1.6.55 to 1.6.57
 ==================================

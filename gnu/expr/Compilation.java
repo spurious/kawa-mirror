@@ -1817,7 +1817,6 @@ public class Compilation
   {
     LetExp let = new LetExp(null);
     let.outer = current_scope;
-    System.err.println("letStart "+let+" pushed:"+current_scope);
     current_scope = let;
   }
 
@@ -1848,7 +1847,6 @@ public class Compilation
     LetExp let = (LetExp) current_scope;
     let.body = body;
     pop(let);
-    System.err.println("letDone "+let+" outer:"+current_scope);
     return let;
   }
 

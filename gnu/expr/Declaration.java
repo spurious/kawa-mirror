@@ -214,6 +214,9 @@ public class Declaration
   /** True if this is a field or method in a class definition. */
   public static final int FIELD_OR_METHOD = 0x100000;
 
+  /** Set if this declares a namespace prefix (as in XML namespaces). */
+  public static final int IS_NAMESPACE_PREFIX = 0x200000;
+
   protected int flags = IS_SIMPLE;
 
   public final boolean getFlag (int flag)
@@ -253,6 +256,11 @@ public class Declaration
   public final boolean isProcedureDecl () { return (flags & PROCEDURE) != 0; }
 
   public final void setProcedureDecl (boolean val) { setFlag(val, PROCEDURE); }
+
+  public final boolean isNamespaceDecl ()
+  {
+    return (flags & IS_NAMESPACE_PREFIX) != 0;
+  }   
 
   /** True if the value of the variable is the contents of a Symbol. */
   public final boolean isIndirectBinding()

@@ -1,3 +1,15 @@
+2003-12-24  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (getFunctionValue):  New method.
+
+	* Interpreter.java (NAMESPACE_PREFIX_NAMESPACE):  New constant.
+	* Declaration.java (IS_NAMESPACE_PREFIX):  New constant.
+	(isNamespaceDecl):  New constant.
+
+	* Compilation.java (<init>):  New constructor.
+
+	* Interpreter.java (read):  Remove unused method.
+
 2003-12-20  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (forNameHelper):  New field.

@@ -864,6 +864,14 @@ public class Compilation
     lexical = new NameLookup(interp);
   }
 
+  public Compilation (Interpreter interp, SourceMessages messages,
+		      NameLookup lexical)
+  {
+    this.interp = interp;
+    this.messages = messages;
+    this.lexical = lexical;
+  }
+
   /** Create a new Compilation environment.
    * @param lexp top-level function
    * @param classname name of top-level class to generate

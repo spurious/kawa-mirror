@@ -292,9 +292,6 @@ public abstract class Interpreter
     return environ.get (name);
   }
 
-  public abstract Object read (InPort in)
-    throws java.io.IOException, gnu.text.SyntaxException;
-
   public void print (Object obj, OutPort out)
   {
     print(obj, out, false);
@@ -471,6 +468,7 @@ public abstract class Interpreter
 
   public static final int VALUE_NAMESPACE = 1<<0;
   public static final int FUNCTION_NAMESPACE = 1<<1;
+  public static final int NAMESPACE_PREFIX_NAMESPACE = 1<<2;
 
   /** Return the namespace (e.g value or function) of a Declaration.
    * Return a bitmask of all the namespces "covered" by the Declaration.

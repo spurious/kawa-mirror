@@ -701,7 +701,7 @@ fi
 
 PACKAGE=kawa
 
-VERSION=1.6.67
+VERSION=1.6.68
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1196,6 +1196,9 @@ case ${with_awt} in
   *)  AWT_SELECTED=WITH_AWT ;;
 esac
   
+JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
+
+
 
 
 
@@ -1381,6 +1384,7 @@ s%@AWT_SELECTED@%$AWT_SELECTED%g
 s%@SWING_SELECTED@%$SWING_SELECTED%g
 s%@extra_java@%$extra_java%g
 s%@TOP_BUILDDIR@%$TOP_BUILDDIR%g
+s%@JEMACS_VERSION@%$JEMACS_VERSION%g
 
 CEOF
 EOF

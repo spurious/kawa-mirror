@@ -12,12 +12,33 @@ JAR = jar
 kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
-kawa-@VERSION@-compiled.jar:
-	$(JAR) cmf $(srcdir)/jar-manifest $@ \
-	  gnu/*/*.class gnu/*/*/*.class kawa/*.class kawa/*/*.class
+kawa-@VERSION@.jar:
+	srcdir=`(cd $(srcdir); /bin/pwd)` \
+	  && rm -rf tmpdir \
+	  && mkdir tmpdir \
+	  && cd tmpdir \
+	  && $$srcdir/configure \
+	  && $(MAKE) \
+	  && $(JAR) cmf $$srcdir/jar-manifest \
+	    ../kawa-@VERSION@.jar \
+	    `find . -name '*.class' -print` \
+	  && cd .. && rm -rf tmpdir
+
+jemacs-@JEMACS_VERSION@.jar:
+	srcdir=`(cd $(srcdir); /bin/pwd)` \
+	  && rm -rf tmpdir \
+	  && mkdir tmpdir \
+	  && cd tmpdir \
+	  && $$srcdir/configure --with-swing \
+	  && $(MAKE) \
+	  && $(JAR) cmf $$srcdir/gnu/jemacs/jar-manifest \
+	      ../jemacs-@JEMACS_VERSION@.jar \
+	      `find . -name '*.class' -print` \
+	  && cd .. && rm -rf tmpdir
 
 kawa-compiled.zip: kawa-@VERSION@-compiled.zip
-kawa-compiled.jar: kawa-@VERSION@-compiled.jar
+kawa.jar: kawa-@VERSION@-compiled.jar
+jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
@@ -76,7 +97,4 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
 
-foo:
-	for dir in $$(grep '^java_JAVA =' $$(find . -name Makefile -print)| sed -e 's|./\(.*\)/Makefile:.*|\1|' -e 's|/|\\|'); do \
-	  echo "%javac% %jcflags% $$dir\\*.java" >>tmp; \
-	done
+distall:  distcheck kawa.jar jemacs.jar

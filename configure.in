@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(doc/kawa.texi)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.67)
+AM_INIT_AUTOMAKE(kawa, 1.6.68)
 
 AM_MAINTAINER_MODE
 AC_PROG_CC
@@ -49,6 +49,8 @@ case ${with_awt} in
   *)  AWT_SELECTED=WITH_AWT ;;
 esac
   
+JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
+
 AC_SUBST(AWT_SELECTED)
 AC_SUBST(SWING_SELECTED)
 AC_SUBST(extra_java)
@@ -57,6 +59,7 @@ AC_SUBST(CC)
 AC_SUBST(CFLAGS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
+AC_SUBST(JEMACS_VERSION)
 AC_SUBST(SHELL)
 
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile

@@ -116,7 +116,7 @@ public class Shell
   }
 
   /** Return a Consumer that formats using the appropriate format.
-   * The format is choses depending on specified defaults.
+   * The format is chosen depending on specified defaults.
    * @param out The output where formatted output is sent to.
    */
   public static Consumer getOutputConsumer(OutPort out)

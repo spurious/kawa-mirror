@@ -1,5 +1,40 @@
 2004-07-31  Per Bothner  <per@bothner.com>
 
+	* CodeAttr.java (label):  Remove field.
+	(FIXUP_NONE, FIXUP_DEFINE, FIXUP_SWITCH, FIXUP_CASE, FIXUP_GOTO,
+	FIXUP_JSR, FIXUP_TRANFER, FIXUP_TRANFER2, FIXUP_DELETE3, FIXUP_MOVE,
+	FIXUP_MOVE_TO_END, FIXUP_TRY, FIXUP_CATCH, FIXUP_LINE_PC,
+	FIXUP_LINE_NUMBER):  New constants - fixup kinds.
+	(processFixups):  New big method - does what it says.
+	(finalize_labels):  Removed method.
+	(invert_opcode):  New method.
+	(reserve):  Don't need to check for "spring" to long jump.
+	(putLineNumber, emitTransfer, emitGoto.emitJsr):  Use new fixup
+	mechanism.
+	(addhandler):  Likewise.  Change parameters to take labels.
+	(emitGoto):  Remove 2-parameter version.
+	(emitTryStart, emitTryEnd):  Use no-argument Label constructor.
+	(fragments, fragmentStack):  Remove fields.
+	(beginFragment/endFragmenrt):  Use new fixup mechanism.
+	(assignConstants):  Don't need to handle fragments.  Do processFixups.
+	(readPC):  Remove field, and places that access it.
+	* Label.java (relocate_fixups, relocate_wide, emit_spring, emit,
+	emit_wide, add_fixup, add_wide_fixup, hasFixups):  Remove methods.
+	(next, fixups, wide_fixups, spring_position):  Remove fields.
+	(first_fixup):  New field.
+	(<init>):  New simplified constructors.
+	(define):  Change to note fixup_count and fixupAdd.
+	* Method.java (reachableHere):  Invoke CodeAttr's method.
+	* CodeAttr.java (unreachable_here):  Make private.
+	* SwitchState.java:  Use fixupChain to avoid goto to switch.
+	Also padding is now deferred to processFixups time.
+	* TryState.java (start_pc, end_pc):  Replace int fields by ...
+	(start_try, end_try):  ... new Label fields.
+	* CodeFragment.java:  Removed - replaced by new fragment mechanism.
+	* Makefile.am:  Remove CodeFragment.java.
+
+2004-07-31  Per Bothner  <per@bothner.com>
+
 	* Scope.java (start, end):  New fields
 	(start_pc, end_pc):  Remove fields - use start and end fields instead.
 	(<init>):  New constructor tkaing Labels.

@@ -24,8 +24,8 @@ public class TryState {
   /** If the SP > 0 when we entered the try, the stack is saved here. */
   Variable[] savedStack;
 
-  int start_pc;
-  int end_pc;
+  Label start_try;
+  Label end_try;
 
   /** If we are inside a try, the type of variable matched. */
   ClassType try_type;
@@ -34,7 +34,7 @@ public class TryState {
   {
     previous = code.try_stack;
     code.try_stack = this;
-    start_pc = code.PC;
+    start_try = code.getLabel();
   }
 
 }

@@ -100,7 +100,7 @@ public class Method implements AttrContainer {
   }
 
   /** True if control could reach here. */
-  public boolean reachableHere () { return !code.unreachable_here; }
+  public final boolean reachableHere () { return code.reachableHere(); }
 
   public Scope popScope () { return code.popScope(); }
 

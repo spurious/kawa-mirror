@@ -1,4 +1,4 @@
-// Copyright (c) 1998  Per M.A. Bothner.
+// Copyright (c) 1998, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -21,6 +21,7 @@ public class SwitchState
   Label defaultLabel;
   /* Location of the actual switch instruction. */
   Label switch_label;
+  Label cases_label;
   Type[] typeState;
 
   public int getMaxValue() { return maxValue; }
@@ -28,13 +29,14 @@ public class SwitchState
   public SwitchState(CodeAttr code)
   {
     switch_label = new Label(code);
+    cases_label = new Label(code);
 
     code.popType();  // pop switch value
 
     // Save stack types (except top int) into typeState
     typeState = code.saveStackTypeState(false);
 
-    code.emitGoto(switch_label);
+    code.fixupChain(cases_label, switch_label);
 
     numCases = 0;
   }
@@ -145,7 +147,8 @@ public class SwitchState
 	code.emitInvokeSpecial(con);
 	code.emitThrow();
       }
-    switch_label.define(code);
+    Label after_label = new Label(code);
+    code.fixupChain(switch_label, after_label);
     if (numCases <= 1)
       {
 	code.pushType(Type.int_type);
@@ -159,37 +162,39 @@ public class SwitchState
 	    code.emitPop(1);
 	  }
 	code.emitGoto(defaultLabel);
-	return;
       }
-    int start = code.PC;
-    int pad = (3 - start) & 3;
-    if (2 * numCases >= maxValue - minValue)
+    else if (2 * numCases >= maxValue - minValue)
       {
-	code.reserve(13 + pad + 4 * (maxValue - minValue + 1));
+	code.reserve(13 + 4 * (maxValue - minValue + 1));
+	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(170);  // tableswitch
-	while (--pad >= 0) code.put1(0);
-	defaultLabel.emit_wide(code, start);
+	code.fixupAdd(CodeAttr.FIXUP_CASE, defaultLabel);
+	code.PC += 4;
 	code.put4(minValue);
 	code.put4(maxValue);
 	int index = 0;
 	for (int i = minValue;  i <= maxValue;  i++)
 	  {
 	    Label lab = values[index] == i ? labels[index++] : defaultLabel;
-	    lab.emit_wide(code, start);
+	    code.fixupAdd(CodeAttr.FIXUP_CASE, lab);
+	    code.PC += 4;
 	  }
       }
     else
       {
-	code.reserve(9 + pad + 8 * numCases);
+	code.reserve(9 + 8 * numCases);
+	code.fixupAdd(CodeAttr.FIXUP_SWITCH, null);
 	code.put1(171);  // lookupswitch
-	while (--pad >= 0) code.put1(0);
-	defaultLabel.emit_wide(code, start);
+	code.fixupAdd(CodeAttr.FIXUP_CASE, defaultLabel);
+	code.PC += 4;
 	code.put4(numCases);
 	for (int index = 0;  index < numCases;  index++)
 	  {
 	    code.put4(values[index]);
-	    labels[index].emit_wide(code, start);
+	    code.fixupAdd(CodeAttr.FIXUP_CASE, labels[index]);
+	    code.PC += 4;
 	  }
       }
+    code.fixupChain(after_label, cases_label);
   }
 }

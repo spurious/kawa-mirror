@@ -35,28 +35,119 @@ public class CodeAttr extends Attribute implements AttrContainer
   int SP;  // Current stack size (in "words")
   private int max_stack;
   private int max_locals;
+  /** Current active length of code array.
+   * Note that processFixups may expand/contract the code array.  */
   int PC;
-  // readPC (which is <= PC) is a bound on locations that have been
-  // saved into labels or otherwise externally seen.
-  // Hence, we cannot re-arrange code upto readPC, but we can
-  // rearrange code between readPC and PC.
-  int readPC;
   byte[] code;
 
   /* The exception handler table, as a vector of quadruples
      (start_pc, end_pc, handler_pc, catch_type).
-     Only the first exception_table_length quadrules are defined. */
+     Only the first exception_table_length quadruples are defined. */
   short[] exception_table;
 
   /* The number of (defined) exception handlers (i.e. quadruples)
      in exception_table. */
   int exception_table_length;
 
-  /* A chain of labels.  Unsorted, except that the Label with
-     the lowest element in fixups must be the first one. */
-  Label labels;
+  /** Not a fixup - a no-op. */
+  static final int FIXUP_NONE = 0;
+  /** The definition of a label. */
+  static final int FIXUP_DEFINE = 1;
+  /** The offset points to a tableswitch/lookupswitch - handle padding. */
+  static final int FIXUP_SWITCH = 2;
+  /** The offset contains a label relative to the previous FIXUP_SWITCH. */
+  static final int FIXUP_CASE = 3;
+  /** The offset points to a goto instruction.
+   * This case up to FIXUP_TRANSFER2 must be contiguous
+   * - see the jump-to-jump optimization in processFixups. */
+  static final int FIXUP_GOTO = 4;
+  /** The offset points to a jsr instruction. */
+  static final int FIXUP_JSR = 5;
+  /** The offset points to a conditional transfer (if_xxx) instruction. */
+  static final int FIXUP_TRANSFER = 6;
+  /** A FIXUP_GOTO_, FIXUP_JSR, or FIXUP_TRANSFER that uses a 2-byte offset. */
+  static final int FIXUP_TRANSFER2 = 7;
+  /** The offsets points to 3 bytes that should be deleted. */
+  static final int FIXUP_DELETE3 = 8;
+  /** The following instructions are moved to later in the code stream.
+   * Instead the instructions starting at the fixup label are patching here.
+   * (If the fixup label is null, we're done.)
+   * This allows re-arranging code to avoid unneeded gotos.
+   * The following intstruction is the target of a later FIXUP_MOVE,
+   * and we'll insert then when we get to it. */
+  static final int FIXUP_MOVE = 9;
+  /** The following instructions are moved to the end of the code stream.
+   * Same as FIXUP_MOVE, but there is no explicit later FIXUP_MOVE that
+   * refers to the following instructions.  Created by beginFragment.
+   * The fixup_offset points to the end of the fragment.
+   * (The first processFixups patches these to FIXUP_MOVE.) */
+  static final int FIXUP_MOVE_TO_END = 10;
+  /** FIXUP_TRY with the following FIXUP_CATCH marks an exception handler.
+   * The label is the start of the try clause;
+   * the current offset marks the exception handler. */
+  static final int FIXUP_TRY = 11;
+  /** Second half of a FIXUP_TRY/FIXUP_CATCH pair.
+   * The label is the ed of the try clause;
+   * the current offset is the exception type as a constant pool index. */
+  static final int FIXUP_CATCH = 12;
+  /** With following FIXUP_LINE_NUMBER associates an offset with a line number.
+   * The fixup_offset is the code location; the fixup_label is null. */
+  static final int FIXUP_LINE_PC = 13;
+  /** With preceding FIXUP_LINE_PC associates an offset with a line number.
+   * The fixup_offset is the line number; the fixup_label is null. */
+  static final int FIXUP_LINE_NUMBER = 14;
+  int[] fixup_offsets;
+  Label[] fixup_labels;
+  int fixup_count;
 
-  CodeFragment fragments;
+  /** This causes a later processFixup to rearrange the code.
+   * The codet a target comes here, nstead of the following instructions. */
+  public final void fixupChain (Label here, Label target)
+  {
+    fixupAdd(CodeAttr.FIXUP_MOVE, 0, target);
+    here.define(this);
+  }
+
+  /** Add a fixup at this location.
+   * @param kind one of the FIXUP_xxx codes.
+   * @param label varies - typically the target of jump. */
+  public final void fixupAdd (int kind, Label label)
+  {
+    fixupAdd(kind, PC, label);
+  }
+
+  final void fixupAdd (int kind, int offset, Label label)
+  {
+    int count = fixup_count;
+    if (count == 0)
+      {
+	fixup_offsets = new int[30];
+	fixup_labels = new Label[30];
+      }
+    else if (fixup_count == fixup_offsets.length)
+      {
+	int new_length = 2 * count;
+	Label[] new_labels = new Label[new_length];
+	System.arraycopy (fixup_labels, 0, new_labels, 0, count);
+	fixup_labels = new_labels;
+	int[] new_offsets = new int[new_length];
+	System.arraycopy (fixup_offsets, 0, new_offsets, 0, count);
+	fixup_offsets = new_offsets;
+      }
+    fixup_offsets[count] = (offset << 4) | kind;
+    fixup_labels[count] = label;
+    fixup_count = count + 1;
+  }
+
+  private final int fixupOffset(int index)
+  {
+    return fixup_offsets[index] >> 4;
+  }
+
+  private final int fixupKind(int index)
+  {
+    return fixup_offsets[index] & 15;
+  }
 
   /** The stack of currently active conditionals. */
   IfState if_stack;
@@ -77,9 +168,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /* True if we cannot fall through to bytes[PC] -
      the previous instruction was an uncondition control transfer.  */
-  boolean unreachable_here;
+  private boolean unreachable_here;
   /** True if control could reach here. */
-  public boolean reachableHere () { return !unreachable_here; }
+  public final boolean reachableHere () { return !unreachable_here; }
   public final void setReachable(boolean val) { unreachable_here = !val; }
   public final void setUnreachable() { unreachable_here = true; }
 
@@ -100,13 +191,13 @@ public class CodeAttr extends Attribute implements AttrContainer
     * @param code the code bytes (which are not copied).
     * Implicitly calls setCodeLength(code.length). */
   public void setCode(byte[] code) {
-    this.code = code; this.PC = code.length; readPC = PC; }
+    this.code = code; this.PC = code.length; }
   /** Set the length the the code (instruction bytes) of this method.
     * That is the number of current used bytes in getCode().
     * (Any remaing bytes provide for future growth.) */
-  public void setCodeLength(int len) { PC = len; readPC = len;}
+  public void setCodeLength(int len) { PC = len;}
   /** Set the current lengthof the code (instruction bytes) of this method. */
-  public int getCodeLength() { readPC = PC;  return PC; }
+  public int getCodeLength() { return PC; }
 
   public CodeAttr (Method meth)
   {
@@ -125,15 +216,15 @@ public class CodeAttr extends Attribute implements AttrContainer
 	System.arraycopy (code, 0, new_code, 0, PC);
 	code = new_code;
       }
+  }
 
-    while (labels != null && labels.fixups != null) {
-      int oldest_fixup = labels.fixups[0];
-      int threshold = unreachable_here ? 30000 : 32000;
-      if (PC + bytes - oldest_fixup > threshold)
-	labels.emit_spring (this);
-      else
-	break;
-    }
+  /** Get opcode that implements NOT (x OPCODE y). */
+  byte invert_opcode (byte opcode)
+  {
+    if ((opcode >= 153 && opcode <= 166)
+	|| (opcode >= 198 && opcode <= 199))
+      return (byte) (opcode ^ 1);
+    throw new Error("unknown opcode to invert_opcode");
   }
 
   /**
@@ -156,6 +247,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     code[PC++] = (byte) (i);
     unreachable_here = false;
   }
+
   /**
    * Write a 32-bit int to the current code-stream
    * @param i the value to write
@@ -177,10 +269,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void putLineNumber (int linenumber)
   {
-    if (lines == null)
-      lines = new LineNumbersAttr(this);
-    readPC = PC;
-    lines.put(linenumber, PC);
+    fixupAdd(FIXUP_LINE_PC, null);
+    fixupAdd(FIXUP_LINE_NUMBER, linenumber, null);
   }
 
   public final void pushType(Type type)
@@ -250,7 +340,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public Label getLabel ()
   {
     boolean  unreachable = unreachable_here;
-    Label label = new Label(this);
+    Label label = new Label();
     label.define(this);
     unreachable_here = unreachable;
     return label;
@@ -1076,7 +1166,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("attempting to push dead variable");
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
-      throw new Error ("attempting to store in unassigned variable "+var.getName()
+      throw new Error ("attempting to store in unassigned "+var
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
     reserve(4);
@@ -1244,33 +1334,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   
   final void emitTransfer (Label label, int opcode)
   {
+    fixupAdd(FIXUP_TRANSFER, label);
     put1(opcode);
-    label.emit(this);
-  }
-
-  /** Compile an unconditional branch (goto) or a jsr.
-   * @param label target of the branch (must be in this method).
-   */
-  public final void emitGoto (Label label, int opcode)
-  {
-    reserve(5);
-    if (label.defined ())
-      {
-	readPC = PC;
-	int delta = label.position - PC;
-	if (delta < -32768)
-	  {
-	    put1(opcode-167);  // goto_w or jsr_w
-	    put4(delta);
-	  }
-	else
-	  {
-	    put1(opcode); // goto or jsr
-	    put2(delta);
-	  }
-      }
-    else
-      emitTransfer (label, opcode); // goto label or jsr label
+    PC += 2;
   }
 
   /** Compile an unconditional branch (goto).
@@ -1278,13 +1344,19 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitGoto (Label label)
   {
-    emitGoto(label, 167);
+    fixupAdd(FIXUP_GOTO, label);
+    reserve(3);
+    put1(167);
+    PC += 2;
     setUnreachable();
   }
 
   public final void emitJsr (Label label)
   {
-    emitGoto(label, 168);
+    fixupAdd(FIXUP_JSR, label);
+    reserve(3);
+    put1(168);
+    PC += 2;
   }
 
   public final void emitGotoIfCompare1 (Label label, int opcode)
@@ -1579,8 +1651,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	else if (SP != then_clause_stack_size)
 	  throw new Error("at PC "+PC+": SP at end of 'then' was " +
-			   then_clause_stack_size
-			   + " while SP at end of 'else' was " + SP);
+			  then_clause_stack_size
+			  + " while SP at end of 'else' was " + SP);
       }
     else if (unreachable_here)
       make_unreachable = true;
@@ -1800,15 +1872,17 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Add an exception handler. */
-  public void addHandler (int start_pc, int end_pc, int handler_pc,
-			  ClassType catch_type, ConstantPool constants)
+  public void addHandler (Label start_try, Label end_try,
+			  ClassType catch_type)
   {
+    ConstantPool constants = getConstants();
     int catch_type_index;
     if (catch_type == null)
       catch_type_index = 0;
     else
       catch_type_index = constants.addClass(catch_type).index;
-    addHandler(start_pc, end_pc, handler_pc, catch_type_index);
+    fixupAdd(FIXUP_TRY, start_try);
+    fixupAdd(FIXUP_CATCH, catch_type_index, end_try);
   }
 
   /** Beginning of code that has a cleanup handler.
@@ -1876,7 +1950,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	try_state.savedStack = savedStack;
       }
     if (has_finally)
-      try_state.finally_subr = new Label(this);
+      try_state.finally_subr = new Label();
   }
 
   public void emitTryEnd()
@@ -1885,15 +1959,14 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	if (try_stack.saved_result != null && reachableHere())
 	  emitStore(try_stack.saved_result);
-	try_stack.end_label = new Label(this);
+	try_stack.end_label = new Label();
 	if (reachableHere())
 	  {
 	    if (try_stack.finally_subr != null)
 	      emitJsr(try_stack.finally_subr);
 	    emitGoto(try_stack.end_label);
 	  }
-	readPC = PC;
-	try_stack.end_pc = PC;
+	try_stack.end_try = getLabel();
       }
   }
 
@@ -1905,9 +1978,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       emitCatchEnd();
     ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
-    readPC = PC;
-    addHandler(try_stack.start_pc, try_stack.end_pc,
-	       PC, type, getConstants());
+    addHandler(try_stack.start_try, try_stack.end_try, type);
     if (var != null)
       {
 	pushType(type);
@@ -1935,9 +2006,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitTryEnd();
     if (try_stack.try_type != null)
       emitCatchEnd();
-    readPC = PC;
     SP = 0;
-    try_stack.end_pc = PC;
+    try_stack.end_try = getLabel();
 
     pushScope();
     Type except_type = Type.pointer_type;
@@ -2018,58 +2088,288 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGoto(scope.start);
   }
 
-  /* Make sure the label with oldest fixup is first in labels. */
-  void reorder_fixups ()
+  public void processFixups ()
   {
-    Label prev = null;
-    Label cur;
-    Label oldest = null;
-    Label oldest_prev = null;
-    int oldest_fixup = PC+100;
-    for (cur = labels;  cur != null;  cur = cur.next)
-      {
-	if (cur.fixups != null && cur.fixups[0] < oldest_fixup)
-	  {
-	    oldest = cur;
-	    oldest_prev = prev;
-	    oldest_fixup = cur.fixups[0];
-	  }
-	prev = cur;
-      }
-    if (oldest != labels && oldest != null)
-      {
-	oldest_prev.next = oldest.next;
-	oldest.next = labels;
-	labels = oldest;
-      }
-  }
+    if (fixup_count == 0)
+      return;
 
-  public void finalize_labels ()
-  {
-    while (labels != null && labels.fixups != null)
-      labels.emit_spring (this);
-    for (Label label = labels;  label != null;  label = label.next)
+    // For each label, set it to its maximum limit, assuming all
+    // fixups causes the code the be expanded.  We need a prepass
+    // for this, since FIXUP_MOVEs can cause code to be reordered.
+    // Also, convert each FIXUP_MOVE_TO_END to FIXUP_MOVE.
+
+    int delta = 0;
+    int instruction_tail = fixup_count;
+    fixupAdd(CodeAttr.FIXUP_MOVE, 0, null);
+
+  loop1:
+   for (int i = 0;  ;  )
       {
-	if (label.fixups != null || label.wide_fixups != null)
-	  throw new Error ("undefined label");
-    }
+	int offset = fixup_offsets[i];
+	int kind = offset & 15;
+	offset >>= 4;
+	Label label = fixup_labels[i];
+	switch (kind)
+	  {
+	  case FIXUP_TRY:
+	  case FIXUP_LINE_PC:
+	    i++;
+	  case FIXUP_NONE:
+	  case FIXUP_CASE:
+	  case FIXUP_DELETE3:
+	    break;
+	  case FIXUP_DEFINE:
+	    label.position += delta;
+	    break;
+	  case FIXUP_SWITCH:
+	    delta += 3;  // May need to add up to 3 padding bytes.
+	    break;
+	  case FIXUP_GOTO:
+	    // The first test fails in this case:  GOTO L2; L1: L2:  FIXME
+	    if (label.first_fixup == i + 1
+		&& fixupOffset(i+1) == offset + 3)
+	      {
+		// Optimize: GOTO L; L:
+		fixup_offsets[i] = (offset << 4) | FIXUP_DELETE3;
+		fixup_labels[i] = null;
+		delta -= 3;
+		break;
+	      }
+	    // ... else fall through ...
+	  case FIXUP_JSR:
+	    if (PC >= 0x8000)
+	      delta += 2;  // May need to convert goto->goto_w, jsr->jsr_w.
+	    break;
+	  case FIXUP_TRANSFER:
+	    if (PC >= 0x8000)
+	      delta += 5;  // May need to add a goto_w.
+	    break;
+	  case FIXUP_MOVE_TO_END:
+	    fixup_labels[instruction_tail] = fixup_labels[i+1];
+	    instruction_tail = offset;
+	    // ... fall through ...
+	  case FIXUP_MOVE:
+	    int cur_pc = ((i+1) >= fixup_count ? PC
+			  : fixupOffset(fixup_labels[i+1].first_fixup));
+	    fixup_offsets[i] = (cur_pc << 4) | FIXUP_MOVE;
+	    if (label == null)
+	      break loop1;
+	    else
+	      {
+		i = label.first_fixup;
+		int next_pc = fixupOffset(i);
+		delta = (cur_pc + delta) - next_pc;
+		continue;
+	      }
+	  default:
+	    throw new Error("unexpected fixup");
+	  }
+	i++;
+      }
+    // Next a loop to fix the position of each label, and calculate
+    // the exact number of code bytes.
+
+    // Number of bytes to be inserted or (if negative) removed, so far.
+    int new_size = PC;
+    // Current delta between final PC and offset in generate code array.
+    delta = 0;
+  loop2:
+    for (int i = 0;  i < fixup_count;  )
+      {
+	int offset = fixup_offsets[i];
+	int kind = offset & 15;
+	Label label = fixup_labels[i];
+	if (label != null && label.position < 0)
+	  throw new Error ("undefined label "+label);
+	while (label != null
+	       && kind >= FIXUP_GOTO && kind <= FIXUP_TRANSFER2
+	       && label.first_fixup + 1 < fixup_count
+	       && (fixup_offsets[label.first_fixup + 1]
+		   == ((fixup_offsets[label.first_fixup] & 15) | FIXUP_GOTO)))
+	  {
+	    // Optimize  JUMP L; ... L:  GOTO X
+	    // (where the JUMP is any GOTO or other transfer)
+	    // by changing the JUMP L to JUMP X.
+	    label = fixup_labels[label.first_fixup + 1];
+	    fixup_labels[i] = label;
+	  }
+	offset = offset >> 4;
+	switch (kind)
+	  {
+	  case FIXUP_TRY:
+	  case FIXUP_LINE_PC:
+	    i++;
+	  case FIXUP_NONE:
+	  case FIXUP_CASE:
+	    break;
+	  case FIXUP_DELETE3:
+	    delta -= 3;
+	    new_size -= 3;
+	    break;
+	  case FIXUP_DEFINE:
+	    label.position = offset + delta;
+	    break;
+	  case FIXUP_SWITCH:
+	    int padding = 3 - (offset+delta) & 3;
+	    delta += padding;
+	    new_size += padding;
+	    break;
+	  case FIXUP_GOTO:
+	  case FIXUP_JSR:
+	  case FIXUP_TRANSFER:
+	    int rel = label.position - (offset+delta);
+	    if ((short) rel == rel)
+	      {
+		fixup_offsets[i] = (offset << 4) | FIXUP_TRANSFER2;
+	      }
+	    else
+	      {
+		delta += kind == FIXUP_TRANSFER ? 5 : 2;  // need goto_w
+		new_size += kind == FIXUP_TRANSFER ? 5 : 2;  // need goto_w
+	      }
+	    break;
+	  case FIXUP_MOVE:
+	    if (label == null)
+	      break loop2;
+	    else
+	      {
+		i = label.first_fixup;
+		int next_pc = fixupOffset(i);
+		delta = (offset + delta) - next_pc;
+		continue;
+	      }
+	  default:
+	    throw new Error("unexpected fixup");
+	  }
+	i++;
+      }
+
+    byte[] new_code = new byte[new_size];
+    int new_pc = 0;
+    int next_fixup_index = 0;
+    int next_fixup_offset = fixupOffset(0);
+  loop3:
+    for (int old_pc = 0;  ;  )
+      {
+	if (old_pc < next_fixup_offset)
+	  {
+	  new_code[new_pc++] = code[old_pc++];
+	  }
+	else
+	  {
+	    int kind = fixup_offsets[next_fixup_index] & 15;
+	    Label label = fixup_labels[next_fixup_index];
+	    switch (kind)
+	      {
+	      case FIXUP_NONE:
+	      case FIXUP_DEFINE:
+		break;
+	      case FIXUP_DELETE3:
+		old_pc += 3;
+		break;
+	      case FIXUP_TRANSFER2:
+		delta = label.position - new_pc;
+		new_code[new_pc++] = code[old_pc];
+		new_code[new_pc++] = (byte) (delta >> 8);
+		new_code[new_pc++] = (byte) (delta & 0xFF);
+		old_pc += 3;
+		break;
+	      case FIXUP_GOTO:
+	      case FIXUP_JSR:
+	      case FIXUP_TRANSFER:
+		delta = label.position - new_pc;
+		byte opcode = code[old_pc];
+		if (kind == FIXUP_TRANSFER)
+		  {
+		    // convert: IF_xxx L to IF_NOT_xxx Lt; GOTO L; Lt:
+		    opcode = invert_opcode(opcode);
+		    new_code[new_pc++] = opcode;
+		    new_code[new_pc++] = 0;
+		    new_code[new_pc++] = 8;  // 8 byte offset to Lt.
+		    opcode = (byte) 200;  // goto_w
+		  }
+		else
+		  {
+		    // Change goto to goto_w; jsr to jsr_w:
+		    opcode = (byte) (opcode + (200-167));
+		  }
+		new_code[new_pc++] = opcode;
+		new_code[new_pc++] = (byte) (delta >> 24);
+		new_code[new_pc++] = (byte) (delta >> 16);
+		new_code[new_pc++] = (byte) (delta >> 8);
+		new_code[new_pc++] = (byte) (delta & 0xFF);
+		old_pc += 3;
+		break;
+	      case FIXUP_SWITCH:
+		int padding = 3 - new_pc & 3;
+		int switch_start = new_pc;
+		new_code[new_pc++] = code[old_pc++];
+		while (--padding >= 0)
+		  new_code[new_pc++] = 0;
+		while (next_fixup_index < fixup_count
+		       && fixupKind(next_fixup_index + 1) == FIXUP_CASE)
+		  {
+		    next_fixup_index++;
+		    int offset = fixupOffset(next_fixup_index);
+		    while (old_pc < offset)
+		      new_code[new_pc++] = code[old_pc++];
+		    delta = (fixup_labels[next_fixup_index].position
+			     - switch_start);
+		    new_code[new_pc++] = (byte) (delta >> 24);
+		    new_code[new_pc++] = (byte) (delta >> 16);
+		    new_code[new_pc++] = (byte) (delta >> 8);
+		    new_code[new_pc++] = (byte) (delta & 0xFF);
+		    old_pc += 4;
+		  }
+		break;
+	      case FIXUP_TRY:
+		addHandler(fixup_labels[next_fixup_index].position,
+			   fixup_labels[next_fixup_index+1].position,
+			   new_pc,
+			   fixupOffset(next_fixup_index+1));
+		next_fixup_index++;
+		break;
+	      case FIXUP_LINE_PC:
+		if (lines == null)
+		  lines = new LineNumbersAttr(this);
+		next_fixup_index++;
+		lines.put(fixupOffset(next_fixup_index), new_pc);
+		break;
+	      case FIXUP_MOVE:
+		if (label == null)
+		  break loop3;
+		else
+		  {
+		    next_fixup_index = label.first_fixup;
+		    old_pc = fixupOffset(next_fixup_index);
+		    next_fixup_offset = old_pc;
+		    if (label.position != new_pc)
+		      throw new Error("bad pc");
+		    continue;
+		  }
+	      default:
+		throw new Error("unexpected fixup");
+	      }
+	    next_fixup_index++;
+	    next_fixup_offset = fixupOffset(next_fixup_index);
+	  }
+      }
+    if (new_size != new_pc)
+      throw new Error("PC confusion new_pc:"+new_pc+" new_size:"+new_size);
+    PC = new_size;
+    code = new_code;
+    fixup_count = 0;
+    fixup_labels = null;
+    fixup_offsets = null;
   }
 
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
-    for (;;)
-      {
-	CodeFragment frag = fragments;
-	if (frag == null)
-	  break;
-	fragments = frag.next;
-	frag.emit(this);
-      }
     if (locals != null && locals.container == null && ! locals.isEmpty())
       locals.addToFrontOf(this);
+    processFixups();
     Attribute.assignConstants(this, cl);
-    finalize_labels();
   }
 
   public final int getLength()
@@ -2141,10 +2441,92 @@ public class CodeAttr extends Attribute implements AttrContainer
     dst.printAttributes(this);
   }
 
-  public void disAssemble (ClassTypeWriter dst, int offset, int length)
+  /* DEBUGGING:
+  public void disAssembleWithFixups (ClassTypeWriter dst)
+  {
+    if (fixup_count == 0)
+      {
+	disAssemble(dst, 0, PC);
+	return;
+      }
+    int prev_pc = 0;
+    for (int i = 0;  i < fixup_count; )
+      {
+	int offset = fixup_offsets[i];
+	int kind = offset & 15;
+	Label label = fixup_labels[i];
+	offset = offset >> 4;
+	int pc = offset;
+	if (kind == FIXUP_MOVE || kind == FIXUP_MOVE_TO_END)
+	  pc = (i+1 >= fixup_count) ? PC : fixup_offsets[i+1] >> 4;
+	disAssemble(dst, prev_pc, offset);
+	prev_pc = pc;
+	dst.print("fixup#");  dst.print(i);
+	dst.print(" @");  dst.print(offset);
+	switch (kind)
+	  {
+	  case FIXUP_NONE:
+	    dst.println(" NONE");
+	    break;
+	  case FIXUP_DEFINE:
+	    dst.print(" DEFINE ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_SWITCH:
+	    dst.println(" SWITCH");
+	    break;
+	  case FIXUP_CASE:
+	    dst.println(" CASE");
+	    break;
+	  case FIXUP_GOTO:
+	    dst.print(" GOTO ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_TRANSFER:
+	    dst.print(" TRANSFER ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_TRANSFER2:
+	    dst.print(" TRANSFER2 ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_DELETE3:
+	    dst.println(" DELETE3");
+	    break;
+	  case FIXUP_MOVE:
+	    dst.print(" MOVE ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_MOVE_TO_END:
+	    dst.print(" MOVE_TO_END ");
+	    dst.println(label);
+	    break;
+	  case FIXUP_TRY:
+	    dst.print(" TRY start: ");
+	    dst.println(label);
+	    i++;
+	    dst.print(" - end: ");
+	    dst.print(fixup_labels[i]);
+	    dst.print(" type: ");
+	    dst.println(fixup_offsets[i] >> 4);
+	    break;
+	  case FIXUP_LINE_PC:
+	    dst.print(" LINE ");
+	    i++;
+	    dst.println(fixup_offsets[i] >> 4);
+	    break;
+	  default:
+	    dst.println(" kind:"+fixupKind(i)+" offset:"+fixupOffset(i)+" "+fixup_labels[i]);
+	  }
+	i++;
+      }
+  }
+  */
+
+  public void disAssemble (ClassTypeWriter dst, int start, int limit)
   {
     boolean wide = false;
-    for (int i = offset;  i < length; )
+    for (int i = start;  i < limit; )
       {
 	int oldpc = i++;
 	int op = code[oldpc] & 0xff;
@@ -2291,7 +2673,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      {
 		if (op < 172) //  [tableswitch] or [lookupswitch]
 		  {
-		    i = (i + 3) & ~3; // skip 0-3 byte padding.
+		    if (fixup_count == 0)
+		      i = (i + 3) & ~3; // skip 0-3 byte padding.
 		    int code_offset = readInt(i);  i += 4;
 		    if (op == 170)
 		      {
@@ -2472,53 +2855,22 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
-  CodeFragment fragmentStack = null;
-
-  public void beginFragment(boolean isHandler)
+  public int beginFragment (Label start, Label after)
   {
-    CodeFragment frag = new CodeFragment(this);
-    frag.next = fragmentStack;
-    fragmentStack = frag;
-    frag.length = PC;
-    frag.unreachable_save = unreachable_here;
-    unreachable_here = false;
-    if (isHandler)
-      frag.handlerIndex = exception_table_length - 1;
+    int i = fixup_count;
+    fixupAdd(FIXUP_MOVE_TO_END, after);
+    start.define(this);
+    return i;
   }
 
-  public void endFragment()
+  /** End a fragment.
+   * @param cookie the return value from the previous beginFragment.
+   */
+  public void endFragment (int cookie)
   {
-    CodeFragment frag = fragmentStack;
-    fragmentStack = frag.next;
-
-    frag.next = fragments;
-    fragments = frag;
-    int startPC = frag.length;
-    frag.length = PC - startPC;
-    frag.insns = new byte[frag.length];
-    System.arraycopy(code, startPC, frag.insns, 0, frag.length);
-    PC = startPC;
-    unreachable_here = frag.unreachable_save;
-
-    if (lines != null)
-      {
-	int l = 2 * lines.linenumber_count;
-	int j = l;
-	short[] linenumbers = lines.linenumber_table;
-	while (j > 0 && linenumbers[j - 2] >= startPC)
-	  j -= 2;
-	l -= j;
-	if (l > 0)
-	  {
-	    short[] fraglines = new short[l];
-	    for (int i = 0;  i < l;  i += 2)
-	      {
-		fraglines[i] = (short) ((linenumbers[j+i] & 0xffff) - startPC);
-		fraglines[i+1] = linenumbers[j+i+1];
-	      }
-	    frag.linenumbers = fraglines;
-	    lines.linenumber_count = j >> 1;
-	  }
-      }
+    fixup_offsets[cookie] = (fixup_count << 4) | FIXUP_MOVE_TO_END;
+    Label after = fixup_labels[cookie];
+    fixupAdd(FIXUP_MOVE, 0, null);
+    after.define(this);
   }
 }

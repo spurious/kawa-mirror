@@ -1,5 +1,8 @@
 2004-07-31  Per Bothner  <per@bothner.com>
 
+	* CheckedTarget.java (emitCheckedCoerce):  Use new Label-based
+	addHandler.  Use new beginFragment/endFragment methods.
+
 	* LambdaExp.java (enterFunction):  Use updated setStartPC method.
 
 2004-07-27  Chris Dean  <ctdean@sokitomi.com>

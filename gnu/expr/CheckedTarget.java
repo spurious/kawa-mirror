@@ -101,6 +101,8 @@ public class CheckedTarget extends StackTarget
     boolean isInTry = code.isInTry();
     initWrongType();
     int startPC = code.getPC();
+    Label startTry = new Label(code);
+    startTry.define(code);
     emitCoerceFromObject(type, comp);
 
     int endPC = code.getPC();
@@ -113,18 +115,16 @@ public class CheckedTarget extends StackTarget
     if (type == Type.tostring_type)
       return;
 
-    Label endLabel = null;
+    Label endTry = new Label(code);
+    endTry.define(code);
+
+    Label endLabel = new Label(code);
     if (isInTry)
-      {
-        endLabel = new Label(code);
-        code.emitGoto(endLabel);
-	endPC = code.getPC();
-      }
-    code.addHandler(startPC, endPC, isInTry ? endPC : -1,
-                    typeClassCastException,
-                    code.getConstants());
+      code.emitGoto(endLabel);
+    int fragment_cookie = 0;
     if (! isInTry)
-      code.beginFragment(true);
+      fragment_cookie = code.beginFragment(new Label(code), endLabel);
+    code.addHandler(startTry, endTry, typeClassCastException);
     // Push arguments:
     // ClassCastException is already pushed
     code.pushType(typeClassCastException);
@@ -149,6 +149,6 @@ public class CheckedTarget extends StackTarget
     if (isInTry)
       endLabel.define(code);
     else
-      code.endFragment();
+      code.endFragment(fragment_cookie);
   }
 }

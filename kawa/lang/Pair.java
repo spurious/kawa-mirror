@@ -195,4 +195,52 @@ public class Pair extends List implements Printable, Compilable
   {
     return new Pair (car, cdr);
   }
+
+  public Object[] toArray()
+  {
+    int len = length();
+    Object[] arr = new Object[len];
+    int i = 0;
+    Sequence rest = this;
+    for ( ;  i < len && rest instanceof Pair;  i++)
+    {
+      Pair pair = (Pair) rest;
+      arr[i] = pair.car;
+      rest = (Sequence) pair.cdr;
+    }
+    int prefix = i;
+    for ( ;  i < len;  i++)
+    {
+      arr[i] = rest.elementAt(i - prefix);
+    }
+    return arr;
+  }
+
+  public Object[] toArray(Object[] arr)
+  {
+    int alen = arr.length;
+    int len = length();
+    if (len > alen)
+    {
+      // FIXME Collection spec requires arr to keep same run-time type
+      arr = new Object[len];
+      alen = len;
+    }
+    int i = 0;
+    Sequence rest = this;
+    for ( ;  i < len && rest instanceof Pair;  i++)
+    {
+      Pair pair = (Pair) rest;
+      arr[i] = pair.car;
+      rest = (Sequence) pair.cdr;
+    }
+    int prefix = i;
+    for ( ;  i < len;  i++)
+    {
+      arr[i] = rest.elementAt(i - prefix);
+    }
+    if (len < alen)
+      arr[len] = null;
+    return arr;
+  }
 };

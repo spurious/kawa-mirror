@@ -111,6 +111,14 @@ public class FString extends Sequence implements Printable, Compilable
       System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
   }
 
+  /** Return a char[] contain the characters of this string.
+   * It is unspecified if the result is a copy or shares with this FString.
+   */
+  public char[] toCharArray()
+  {
+    return value;
+  }
+
   public int hashCode ()
   {
     /* Matches String.hashCode specification, as updated specification in

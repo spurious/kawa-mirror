@@ -1,5 +1,9 @@
 2000-01-24  Per Bothner  <per@bothner.com>
 
+	* lists.scm (cons):  New procedure, replaces kawa/standard/cons.java.
+	* vectors.scm (vector):  New procedure, replaces
+ 	kawa/standard/vector_v.java.
+
 	* numbers.scm (asin): New procedure, replaces kawa/standard/asin.java.
 	(acos): New procedure, replaces kawa/standard/acos.java.
 	* ports.scm (close-in-port):  New procedure, replaces

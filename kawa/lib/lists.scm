@@ -1,6 +1,9 @@
 (define (pair? x)
   (instance? x <pair>))
 
+(define (cons car cdr)
+  (make <pair> car cdr))
+
 (define (null? x)
   (eq? x '()))
 

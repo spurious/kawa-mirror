@@ -4,6 +4,9 @@
 (define (make-vector (k :: <int>) #!optional (fill #!undefined))
   (make <vector> k fill))
 
+(define (vector #!rest (args :: <Object[]>))
+  (make <vector> args))
+
 (define (vector-length x :: <vector>)
   (invoke x 'length))
 

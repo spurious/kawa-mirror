@@ -1,3 +1,7 @@
+2004-01-27  Rafael Jesus Alcantara Perez <rafa@dedaloingenieros.com>
+
+	* Pair.java (lastPair):  Fix thinko.
+
 2004-01-12  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (parentPos):  The begin-offset is just one word.

@@ -125,7 +125,7 @@ public class Pair extends LList implements Externalizable
     for (;;)
       {
 	Object next = pair.cdr;
-	if (cdr instanceof Pair)
+	if (next instanceof Pair)
 	  pair = (Pair) next;
 	else
 	  return pair;

@@ -71,4 +71,11 @@ public abstract class LispInterpreter extends Interpreter
     tr.finishModule(mexp, forms);
     return mexp;
   }
+
+  /** Combine a <body> consisting of a list of expression. */
+  public Expression makeBody(Expression[] exps)
+  {
+    return new BeginExp (exps);
+  }
+
 }

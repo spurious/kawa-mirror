@@ -1,5 +1,7 @@
 2002-01-23  Per Bothner  <per@bothner.com>
 
+	* LispInterpreter.java (makeBody):  New method.
+
 	* ReaderParens.java (readList):  Use Lexer's new eofError method.
 
 	* ScmRead.java:  Remove some unused import declarations.

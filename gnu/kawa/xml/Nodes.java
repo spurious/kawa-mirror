@@ -216,4 +216,31 @@ public class Nodes extends Values
     return SeqPosition.make((AbstractSequence) objects[getIntN(i+1)],
 			    getIntN(i+3));
   }
+
+  private static SeqPosition root (AbstractSequence seq, int ipos)
+  {
+    int end = seq.endPos();
+    for (;;)
+      {
+	int parent = seq.parentPos(ipos);
+	if (parent == end)
+	  return SeqPosition.make(seq, ipos);
+	ipos = parent;
+      }
+  }
+
+  /** Return the root node of the argument. */
+  public static SeqPosition root (Object node)
+  {
+    if (node instanceof AbstractSequence)
+      {
+	AbstractSequence seq = (AbstractSequence) node;
+	return root(seq, seq.startPos());
+      }
+    else
+      {
+	SeqPosition spos = (SeqPosition) node;
+	return root(spos.sequence, spos.getPos());
+      }
+  }
 }

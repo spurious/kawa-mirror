@@ -1,3 +1,7 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* NamedAttributes.java:  Fixed wrong "package" specifier.  Oops.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* NamespaceEnv.java:  New class extends Environment.

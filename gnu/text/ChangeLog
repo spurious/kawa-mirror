@@ -1,3 +1,9 @@
+2004-06-12  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (pushNesting, popNesting):  Moved from XQParser.
+	* LineBufferedReader.java (readState, getReadState):
+	Moved from gnu.mapping.InPort.
+
 2004-06-07  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (maybeOutput):  Clear currentBlock if needed.

@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -24,6 +24,33 @@ public class Lexer extends Reader
     this.port = port;
     this.messages = messages;
   }
+
+  /** Enter a nested expression.
+   * This is used in interactive mode to control whether to continue
+   * past end of line, depending on whether the expression is incomplete.
+   * @parm promptChar Used in prompt string to indicate type of nesting.
+   * @return The previous value of promptChar, to be passed to popNesting.
+   */
+  public char pushNesting (char promptChar)
+  {
+    nesting++;
+    LineBufferedReader port = getPort();
+    char save = port.readState;
+    port.readState = promptChar;
+    return save;
+  }
+
+  /** Exit a nested expression, reversing pushNesting
+   * @param save Saved values return by prior pushNesting
+   */
+  public void popNesting (char save)
+  {
+    LineBufferedReader port = getPort();
+    port.readState = save;
+    nesting--;
+  }
+
+  protected int nesting;
 
   public final LineBufferedReader getPort() { return port; }
 

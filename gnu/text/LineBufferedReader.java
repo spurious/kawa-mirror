@@ -1,3 +1,6 @@
+// Copyright (c) 2004  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.text;
 import java.io.*;
 
@@ -36,6 +39,13 @@ public class LineBufferedReader extends FilterReader
 
   /** The high-water mark for pos, at a reset or line start. */
   int highestPos;
+
+  public char readState = '\n';
+  /** Return a character that indicates what we are currently reading.
+    * Returns '\n' if we are not inside read; '\"' if reading a string;
+    * '|' if inside a comment; '(' if inside a list; and
+    * ' ' if otherwise inside a read. */
+  public char getReadState () { return readState; }
 
   private int flags;
 

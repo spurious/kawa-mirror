@@ -93,7 +93,15 @@ public class IntegerFormat extends ReportFormat
   public int format(Object[] args, int start, 
 		    Writer dst, FieldPosition fpos) 
     throws java.io.IOException
-  { 
+  {
+    return format((Object) args, start, dst, fpos);
+  }
+
+  public int format(Object arg, int start, 
+		    Writer dst, FieldPosition fpos) 
+    throws java.io.IOException
+  {
+    Object[] args = arg instanceof Object[] ? (Object[]) arg : null;
     int minWidth =  getParam(this.minWidth, 1, args, start);
     if (this.minWidth == PARAM_FROM_LIST)  start++;
     char padChar = getParam(this.padChar, ' ', args, start);
@@ -105,7 +113,8 @@ public class IntegerFormat extends ReportFormat
     boolean printCommas = (flags & SHOW_GROUPS) != 0;
     boolean padRight = (flags & PAD_RIGHT) != 0;
     boolean padInternal = padChar == '0';
-    Object arg = args[start];
+    if (args != null)
+      arg = args[start];
     IntNum iarg = asInteger(arg);
     if (iarg != null)
       {

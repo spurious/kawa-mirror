@@ -36,6 +36,18 @@ public abstract class ReportFormat extends Format
 			     Writer dst, FieldPosition fpos)
     throws java.io.IOException;
 
+  public int format(Object arg, int start, Writer dst, FieldPosition fpos)
+    throws java.io.IOException
+  {
+    if (arg instanceof Object[])
+      return format((Object[]) arg, start, dst, fpos);
+    else
+      {
+        Object[] args = { arg };
+        return format(args, start, dst, fpos);
+      }
+  }
+
   public StringBuffer format(Object obj, StringBuffer sbuf, FieldPosition fpos)
   {
     format((Object[]) obj, 0, sbuf, fpos);
@@ -137,7 +149,7 @@ public abstract class ReportFormat extends Format
     if (param == PARAM_FROM_COUNT)
       return args.length - start;
     if (param == PARAM_FROM_LIST)
-      return getParam(args[start], defaultValue);
+      return args == null ? defaultValue : getParam(args[start], defaultValue);
     if (param == PARAM_UNSPECIFIED)
       return defaultValue;
     // Need to mask off flags etc?

@@ -301,7 +301,7 @@ install-javadoc-html:
 	-mkdir $(HTML_HOME)/kawa
 	-mkdir $(HTML_HOME)/kawa/api
 	cd $(top_srcdir) && javadoc -d $(HTML_DOC_DIR) $(JAVADOC_PACKAGES)
-	cd $(HTML_DOC_DIR) && ln -s $(HTML_HOME)/javadoc-images images
+	-cd $(HTML_DOC_DIR) && ln -s $(HTML_HOME)/javadoc-images images
 
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt

@@ -20,11 +20,34 @@ class repl
 
   public static Vector commandLineArguments;
 
+  public static String homeDirectory;
+
+  static void checkInitFile ()
+  {
+    /* Set homeDirectory;  if first time called, run ~/.kawarc.scm. */
+    if (homeDirectory != null)
+      {
+	homeDirectory = System.getProperty ("user.home");
+	Object scmHomeDirectory;
+	if (homeDirectory != null)
+	  {
+	    scmHomeDirectory = new FString (homeDirectory);
+	    File initFile = new File(homeDirectory, ".kawarc.scm");
+	    if (initFile.exists())
+	      Shell.runFile(initFile.getPath());
+	  }
+	else
+	  scmHomeDirectory = Scheme.falseObject;
+	Environment.define_global(Symbol.make("home-directory"),
+				  scmHomeDirectory);
+      }
+  }
+
   public static void setArgs (String[] args, int arg_start)
   {
     Object[] array = new Object[args.length - arg_start];
     for (int i = arg_start;  i < args.length;  i++)
-      array[i - arg_start] = new StringBuffer (args[i]);
+      array[i - arg_start] = new FString (args[i]);
     commandLineArguments = new Vector (array);
     Environment.define_global (Symbol.make ("command-line-arguments"),
 			       commandLineArguments);
@@ -45,6 +68,8 @@ class repl
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    setArgs (args, iArg+1);
+	    if (arg.equals ("-c"))
+	      checkInitFile();
 	    Shell.runString (args[iArg], env, false);
 	    something_done = true;
 	  }
@@ -54,6 +79,7 @@ class repl
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    setArgs (args, iArg+1);
+	    checkInitFile();
 	    Shell.runFile (args[iArg]);
 	    something_done = true;
 	  }
@@ -61,6 +87,7 @@ class repl
 	  {
 	    iArg++;
 	    setArgs (args, iArg);
+	    checkInitFile();
 	    Shell.run (InPort.inDefault (), env, prompt, true);
 	    return;
 	  }
@@ -116,11 +143,13 @@ class repl
     if (iArg < args.length)
       {
 	setArgs (args, iArg+1);
+	checkInitFile();
 	Shell.runFile (args[iArg]);
       }
     else
       {
 	setArgs (args, iArg);
+	checkInitFile();
 	Shell.run (InPort.inDefault (), env, prompt, true);
       }
    }

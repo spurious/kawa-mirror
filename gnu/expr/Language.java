@@ -23,15 +23,15 @@ import java.lang.reflect.InvocationTargetException;
 
 public abstract class Language
 {
-  // FIXME should be a fluid variable!
-  static Language defaultLanguage = null;
+  protected static final ThreadLocation current
+    = new ThreadLocation(new Symbol("language"));
 
   public static Language getDefaultLanguage()
-  { return (Language) defaultLanguage; }
+  { return (Language) current.get(null); }
 
   public static void setDefaultLanguage(Language language)
   {
-    defaultLanguage = language;
+    current.set(language);
   }
 
   /**
@@ -587,10 +587,11 @@ public abstract class Language
 
   public static void setDefaults (Language lang)
   {
-    Language.setDefaultLanguage(lang);
     Environment env = lang.getEnvironment();
     Environment.setCurrent(env);
     Environment.setGlobal(env);
+    Language.setDefaultLanguage(lang);
+    current.setGlobal(lang);
   }
 
   public Procedure getPrompter()
@@ -708,7 +709,7 @@ public abstract class Language
 
   public void runAsApplication (String[] args)
   {
-    defaultLanguage = this;
+    setDefaultLanguage(this);
     if (environ == null)
       environ = Environment.make("interaction-environment."+(++env_counter));
     Environment.setCurrent(environ);

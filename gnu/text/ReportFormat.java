@@ -6,6 +6,17 @@ import java.io.CharArrayWriter;
 
 public abstract class ReportFormat extends Format
 {
+  /** Some Formats use this to indicate a parameter that is the
+   * extracted from the argment list. */
+  public static final int PARAM_FROM_LIST = 0xA0000000;
+
+  /** Some Formats use this to indicate a parameter that is the
+   * number of remaining paramaters. */
+  public static final int PARAM_FROM_COUNT = 0xB0000000;
+
+  /** Some Formats use this to indicate an unspecified parameter. */
+  public static final int PARAM_UNSPECIFIED = 0xC0000000;
+
   public static int result(int resultCode, int nextArg)
   {
     return (resultCode << 24) | nextArg;
@@ -106,7 +117,53 @@ public abstract class ReportFormat extends Format
 
   public Object parseObject(String text, java.text.ParsePosition status)
   {
-    throw new Error("ReportdFormat.parseObject - not implemented");
+    throw new Error("ReportFormat.parseObject - not implemented");
   }
 
+  public static int getParam(Object arg, int defaultValue)
+  {
+    if (arg instanceof Number)
+      return ((Number) arg).intValue();
+    if (arg instanceof Character)
+      return ((Character) arg).charValue();
+    if (arg instanceof Char)
+      return ((Char) arg).charValue();
+    //if (arg == null || arg == Boolean.FALSE || arg == Special.dfault)
+    return defaultValue;
+  }
+
+  protected static int getParam(int param, int defaultValue, Object[] args, int start)
+  {
+    if (param == PARAM_FROM_COUNT)
+      return args.length - start;
+    if (param == PARAM_FROM_LIST)
+      return getParam(args[start], defaultValue);
+    if (param == PARAM_UNSPECIFIED)
+      return defaultValue;
+    // Need to mask off flags etc?
+    return param;
+  }
+
+  protected static char getParam(int param, char defaultValue, Object[] args, int start)
+  {
+    return (char) getParam (param, (int) defaultValue, args, start);
+  }
+
+  /** Get the index'th parameter for the conversion specification specs[speci].
+   * Note that parameters are numbered from 1 to numParams(speci).
+   * The list of arguments to be converted is args, with the current index
+   * (as of the start of this conversion, i.e. not taking into account
+   * earlier PARAM_FROM_LIST paramaters for this conversion) in start.
+   * The default value (used if PARAM_UNSPECIFIED) is defaultValue.
+   */
+  /*
+  int getParam(int speci, int index, int defaultValue, Object[] args, int start)
+  {
+    int num_params = numParams(speci);
+    int param = index <= num_params ? specs[speci+index] : PARAM_UNSPECIFIED;
+    if (param == PARAM_FROM_LIST || param == PARAM_FROM_COUNT)
+      start += adjustArgsStart(speci, index);
+    return getParam(param, defaultValue, args, start);
+  }
+  */
 }

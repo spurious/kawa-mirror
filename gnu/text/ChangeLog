@@ -1,3 +1,14 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* Char.java:  New file, moved from gnu.kawa.util.
+	($Eq, $Ls, $Gt, $Ls$Eq, $Ls$gr):  New static methods.
+
+	* IntegerFormat.java:  New class, bases on old LispIntegerFormat
+	from kawa/standard/LispFormat.java.
+	* ReportFormat.java (PARAM_FROM_LIST, PARAM_FROM_COUNT,
+	PARAM_UNSPECIFIED):  Moved from kawa/standard/LispFormat.
+	(getFormat):  Static methods moved from LispFormat.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* CharArrayInPort.java:  Moved to gnu.mapping.

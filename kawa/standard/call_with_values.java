@@ -4,14 +4,18 @@ import gnu.mapping.*;
 
 public class call_with_values extends Procedure2
 {
+  public static Object callWithValues (Procedure producer, Procedure consumer)
+  {
+    Object values = producer.apply0();
+    if (values instanceof Values)
+      return ((Values) values).call_with(consumer);
+    else
+      return consumer.apply1(values);
+  }
+
   public Object apply2 (Object producer, Object consumer)
   {
-    Object values = ((Procedure) producer).apply0 ();
-    Procedure cons_proc = (Procedure) consumer;
-    if (values instanceof Values)
-      return ((Values) values).call_with (cons_proc);
-    else
-      return cons_proc.apply1 (values);
+    return callWithValues((Procedure) producer, (Procedure) consumer);
   }
 
   public void apply (CallStack stack)

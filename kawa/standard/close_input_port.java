@@ -8,7 +8,7 @@ public class close_input_port extends Procedure1
     try {
        ((InPort)arg1).close();
     } catch (java.io.IOException e) {
-      throw new RuntimeException(e.getMessage());
+      throw new WrappedException(e);
     }
     return Values.empty;
   }

@@ -1,3 +1,7 @@
+2001-08-17  Per Bothner  <per@bothner.com>
+
+	*  reflection.scm (record-type-name):  Update demangleName's class.
+
 2001-07-17  Per Bothner  <per@bothner.com>
 
 	* windows.scm:  New file, only compiled if --with-awt.

@@ -34,7 +34,7 @@
 
 (define (record-type-name (rtd :: <class-type>))
   (symbol->string
-   (invoke-static <kawa.standard.Scheme> 'demangleName
+   (invoke-static <gnu.expr.Compilation> 'demangleName
 		  (invoke rtd 'getName))))
 
 (define (record-type-field-names rtd)

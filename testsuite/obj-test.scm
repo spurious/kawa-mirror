@@ -223,10 +223,10 @@
 (test '(#t 5 6) my-func-t 5 6)
 
 (define-record-type pare
-  (kons x y)
+  (kons x y-part)
   pare?
   (x kar set-kar!)
-  (y kdr))
+  (y-part kdr))
 (test #t pare? (kons 1 2))
 (test #f pare? (cons 1 2))
 (test 1 kar (kons 1 2))

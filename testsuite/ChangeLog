@@ -1,3 +1,8 @@
+2003-05-13  Chris Dean <Chris.Dean@sokitomi.com>.
+
+	* obj-test.scm:  New test for a name mangling problem.
+	Detects bug fixed 05-16 (see gnu/kawa/reflect/ChangeLog).
+
 2003-04-28  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  New test based on bug reported 02-20 by

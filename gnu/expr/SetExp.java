@@ -141,11 +141,12 @@ public class SetExp extends Expression
 
     Object value;
     Declaration decl = binding;
-    if (! decl.isPrivate()
+    Expression declValue = decl.getValue();
+    if (declValue instanceof LambdaExp
 	&& decl.context instanceof ModuleExp
-	&& decl.getValue() instanceof LambdaExp
-	&& ((LambdaExp) decl.getValue()).getName() != null // FIXME
-	&& decl.getValue() == new_value)
+	&& (! decl.isPrivate() || declValue instanceof ClassExp)
+	&& ((LambdaExp) declValue).getName() != null // FIXME
+	&& declValue == new_value)
       {
 	((LambdaExp) new_value).compileSetField(comp);
       }

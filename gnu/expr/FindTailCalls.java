@@ -196,6 +196,7 @@ public class FindTailCalls extends ExpWalker
 	 child = child.nextSibling)
       {
 	if (child.getCanRead()
+	    || child.isClassMethod()
 	    || child.min_args != child.max_args)
 	  child.flags |= LambdaExp.CANNOT_INLINE;
 	else

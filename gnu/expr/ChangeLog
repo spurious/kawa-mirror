@@ -1,3 +1,12 @@
+2003-04-04  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walklambdaExp):  Set CANNOT_INLINE for
+	class methods.
+	* ModuleExp.java (allocFields):  A ClassExp always gets a field,
+	even if it is private.
+	* SetExp.java (compile):  Call compileSetField for a ClassExp
+	even if it is private.
+
 2003-03-29  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (emit):  Modify optimization of 200-06-09.

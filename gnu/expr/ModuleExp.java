@@ -229,9 +229,11 @@ public class ModuleExp extends LambdaExp
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
+	if (decl.field != null)
 	  continue;
-	if (decl.ignorable())
+	Expression value = decl.getValue();
+	if (((decl.isSimple() && ! decl.isPublic()) || decl.ignorable())
+	    && ! (value instanceof ClassExp))
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
@@ -239,7 +241,6 @@ public class ModuleExp extends LambdaExp
 	    && ((kawa.lang.Macro) decl.getConstantValue()).expander instanceof LambdaExp
 	    && ! decl.isPrivate())
 	  continue;  // Handled in SetExp.
-	Expression value = decl.getValue();
 	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);

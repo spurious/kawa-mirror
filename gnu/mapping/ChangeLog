@@ -1,3 +1,10 @@
+Sun Nov 15 21:26:14 1998  Per Bothner  <bothner@cygnus.com>
+
+	* NameMap.java:  New Procedure1 sub-class.
+	* Environment.java:  Extend NameMap.
+	* Environment.java:  Use System.identityHashCode, instead of
+	String.hashCode - for faster hashing.
+
 1998-08-28  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* Binding.java (make):  New static method (called from compiled code).

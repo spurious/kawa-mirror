@@ -6,7 +6,7 @@ package gnu.mapping;
  * @author	Per Bothner
  */
 
-public class Environment // extends [almost] java.util.Dictionary
+public class Environment extends NameMap
 {
   private Binding[] table;
 
@@ -16,24 +16,12 @@ public class Environment // extends [almost] java.util.Dictionary
 
   int time_stamp;
 
-  String name;
-
   /** The value of previous.time_stamp when this was created.
    * Newer Bindings in previous are ignored. */
   int previous_time_stamp;
 
   static final float threshold = (float) 0.7;
   static int num_bindings;
-
-  public final String getName ()
-  {
-    return name;
-  }
-
-  public final void setName (String name)
-  {
-    this.name = name;
-  }
 
   public static Environment user () { return current(); }
 
@@ -105,7 +93,7 @@ public class Environment // extends [almost] java.util.Dictionary
   public Binding lookup (String name)
   {
     int time_stamp = this.time_stamp;
-    int hash = name.hashCode ();
+    int hash = System.identityHashCode(name);
     for (Environment env = this;  env != null;  env = env.previous)
       {
 	Binding[] env_tab = env.table;
@@ -127,7 +115,7 @@ public class Environment // extends [almost] java.util.Dictionary
       rehash (2 * table.length);
 
     num_bindings++;
-    int hash = name.hashCode ();
+    int hash = System.identityHashCode(name);
     int index = (hash & 0x7FFFFFFF) % table.length;
 
     Binding binding = new Binding ();
@@ -157,7 +145,7 @@ public class Environment // extends [almost] java.util.Dictionary
 
 	for (Binding cur = table[i];  cur != null; )
 	  {
-	    int hash = cur.name.hashCode ();
+	    int hash = System.identityHashCode(cur.name);
 	    int new_index = (hash & 0x7FFFFFFF) % new_capacity;
 	    Binding next = cur.chain;
 	    cur.chain = new_table[new_index];
@@ -171,7 +159,7 @@ public class Environment // extends [almost] java.util.Dictionary
   public Object remove (String name)
   {
     int time_stamp = this.time_stamp;
-    int hash = name.hashCode ();
+    int hash = System.identityHashCode(name);
     Environment env = this;
     for ( ; ;  env = env.previous)
       {
@@ -200,7 +188,7 @@ public class Environment // extends [almost] java.util.Dictionary
 
   public void remove (Binding binding)
   {
-    int hash = binding.name.hashCode ();
+    int hash = System.identityHashCode(binding.name);
     int index = (hash & 0x7FFFFFFF) % table.length;
     Binding prev = null;
     for (Binding b = table[index];  b != null ; )
@@ -257,9 +245,10 @@ public class Environment // extends [almost] java.util.Dictionary
 
   public String toString ()
   {
-    return "#<environment "
-      + (name != null ? name : super.toString ())
-      + '>';
+    String name = getName();
+    if (name == null)
+      name = super.toString ();
+    return "#<environment " + name + '>';
   }
 
   /**

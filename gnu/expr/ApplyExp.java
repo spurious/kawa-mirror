@@ -323,7 +323,7 @@ public class ApplyExp extends Expression
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
-	method = comp.applymethods[args_length];
+        method = tail_recurse ? null : comp.applymethods[args_length];
       }
     else
       {

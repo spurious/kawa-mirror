@@ -90,7 +90,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DATA =  $(java_DATA)
 
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+DIST_COMMON =  README COPYING ChangeLog Makefile.am Makefile.in README
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \
@@ -110,7 +110,7 @@ Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
 install-javaDATA: $(java_DATA)
 	$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
 	  else if test -f $$p; then \
@@ -119,7 +119,7 @@ install-javaDATA: $(java_DATA)
 	done
 
 uninstall-javaDATA:
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  rm -f $(javadir)/$$p; \
 	done
 tags: TAGS

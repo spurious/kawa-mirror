@@ -4,6 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   Average.java \
+  BaseUri.java \
   BooleanValue.java \
   Children.java \
   Compare.java \

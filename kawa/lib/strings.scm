@@ -74,8 +74,8 @@
     (do ((i :: <int> 0 (+ i 1)))
 	((>= i len) result)
       (let ((pair :: <pair> list))
-	(string-set! result i (car pair))
-	(set! list (cdr pair))))))
+	(string-set! result i (field pair 'car))
+	(set! list (field pair 'cdr))))))
 
 (define (string-copy (str <abstract-string>)) :: <string>
   (make <string> str))

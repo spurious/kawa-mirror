@@ -1,3 +1,7 @@
+2005-03-16  Per Bothner  <per@bothner.com>
+
+	* strings.scm ((list->string): Inline car and cdr calls.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* windows.scm (scheme-window): Update Interpreter -> Language.

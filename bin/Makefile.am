@@ -8,9 +8,9 @@ READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
-ENABLE_GCJ_COMPILED_DEFS = -DGCJ_COMPILED
-DISABLE_GCJ_COMPILED_DEFS = -DKAWALIB='"$(datadir)/java"'
-DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS)
+WITH_GCJ_DEFS = -DGCJ_COMPILED
+WITHOUT_GCJ_DEFS = -DKAWALIB='"$(datadir)/java"'
+DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
@@ -25,35 +25,52 @@ kawa.sh:
 	mv tmp kawa.sh
 
 KAWA1_OFILES = \
-  gnu-bytecode.o \
-  gnu-lists.o \
-  gnu-expr.o \
-  gnu-kawa-functions.o \
-  gnu-kawa-lispexpr.o \
-  gnu-kawa-reflect.o \
-  gnu-kawa-util.o \
-  gnu-mapping.o \
-  gnu-math.o \
-  gnu-text.o \
-  kawa-lang.o \
-  kawa-repl.o \
-  kawa-standard.o
+  gnu-bytecode.lo \
+  gnu-lists.lo \
+  gnu-expr.lo \
+  gnu-kawa-functions.lo \
+  gnu-kawa-lispexpr.lo \
+  gnu-kawa-reflect.lo \
+  gnu-kawa-util.lo \
+  gnu-mapping.lo \
+  gnu-math.lo \
+  gnu-text.lo \
+  kawa-lang.lo \
+  kawa-repl.lo \
+  kawa-standard.lo
 
 KAWA2_OFILES = $(KAWA1_OFILES) \
   kawa-lib.o \
   gnu-kawa-slib.o \
   gnu-xml.o
 
-kawa1$(exeext): $(KAWA1_OFILES)
-	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl
+WITH_GCJ_LIBS =  libkawa.la
+WITHOUT_GCJ_LIBS =
+#lib_LTLIBRARIES = $(@GCJ_SELECTED@_LIBS)
+#EXTRA_LTLIBRARIES = libkawa.la
+if LIBKAWA
+lib_LTLIBRARIES     = libkawa.la
+endif
+#libkawa_la_LDFLAGS = -rpath $(libdir)
+libkawa_la_SOURCES = 
+libkawa_la_LIBADD = \
+  $(KAWA1_OFILES) \
+  gnu-ecmascript.lo \
+  gnu-xml.lo \
+  gnu-kawa-slib.lo \
+  kawa-lib.lo
 
-kawa-bin$(exeext): $(KAWA2_OFILES)
-	 gcj -o kawa-bin$(exeext) $(KAWA2_OFILES) --main=kawa.repl
+kawa1$(EXEEXT): $(KAWA1_OFILES)
+	../libtool --mode=link --tag=GCJ $(GCJ) \
+	  -o kawa1$(EXEEXT) $(KAWA1_OFILES) --main=kawa.repl
 
-ENABLE_GCJ_COMPILED = kawa-bin$(exeext)
-DISABLE_GCJ_COMPILED = kawa.sh
+kawa-bin$(EXEEXT): libkawa.la
+	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  libkawa.la --main=kawa.repl
 
-all: $(@GCJ_COMPILED_SELECTED@)
+WITH_GCJ_COMPILED = kawa-bin$(EXEEXT)
+WITHOUT_GCJ_COMPILED = kawa.sh
+
+all: $(@GCJ_SELECTED@)
 
 install-exec-local: install-exec-bindir
 

@@ -193,7 +193,6 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_sources = \
   AliasConstraint.java \
-  ApplyMethodContainer.java ApplyMethodProc.java \
   CallContext.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \

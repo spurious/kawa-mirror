@@ -4,7 +4,6 @@ include $(top_srcdir)/Make-rules
 
 java_sources=\
   AliasConstraint.java \
-  ApplyMethodContainer.java ApplyMethodProc.java \
   CallContext.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \

@@ -1,3 +1,9 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* ApplyMethodContainer.java:  Remove no-longer-used interface.
+	* ApplyMethodProc.java:  Remove no-longer-used class.
+	* Makefile.am:  Update accordingly.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* CallContext.java:  Remove unused import statements.

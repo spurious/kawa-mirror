@@ -1844,6 +1844,17 @@ In Kawa, a one-dimensional array whose lower bound is 0 is also a sequence.
 Furthermore, if such an array is simple (not created @code{share-array})
 it will be implemented using a @code{<vector>}.
 Uniform vectors and strings are also arrays in Kawa.
+For example:
+@example
+(share-array
+ (f64vector 1.0 2.0 3.0 4.0 5.0 6.0)
+ (shape 0 2 0 3)
+ (lambda (i j) (+ (* 2 i) j)))
+@end example
+evaluates to a two-dimensionsal array of @code{<double>}:
+@example
+#2a((1.0 2.0 3.0) (3.0 4.0 5.0))
+@end example
 
 @node Uniform vectors, Exceptions, Arrays, Extensions
 @section Uniform vectors

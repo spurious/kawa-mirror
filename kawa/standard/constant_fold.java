@@ -15,16 +15,7 @@ public class constant_fold extends Syntax
       {
 	ReferenceExp rexp = (ReferenceExp) exp;
 	if (rexp.getBinding() == null)
-	  {
-	    try
-	      {
-		return ReferenceExp.lookup(rexp.getName());
-	      }
-	    catch (Exception ex)
-	      {
-		return null;
-	      }
-	  }
+	  return Environment.user().get(rexp.getName());
       }
     return null;
   }

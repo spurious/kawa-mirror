@@ -3,7 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
-import java.io.PrintWriter;
+import java.io.*;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
@@ -13,13 +13,23 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   boolean inStartTag = false;
   boolean canonicalize = true;
   boolean htmlCompat = true;
-  boolean escapeText = true;
+  public boolean escapeText = true;
   boolean isHtml = false;
   Object style;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
   int prev = ' ';
+
+  public XMLPrinter (Writer out, boolean autoFlush)
+  {
+    super(out, autoFlush);
+  }
+
+  public XMLPrinter (Writer out)
+  {
+    super(out);
+  }
 
   public XMLPrinter (Consumer out)
   {

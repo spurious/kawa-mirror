@@ -71,6 +71,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void beginGroup(String name, Object type)
   {
+    closeStartTag();
     if (nesting >= namespaceLengthStack.length)
       {
 	int[] tmp = new int[2 * nesting];

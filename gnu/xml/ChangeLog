@@ -1,3 +1,10 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java (beginGroup):  Call closeStartTag.
+
+	* XMLPrinter.java (escapeText):  Make public.
+	(<init>):  New constructors.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java:  Re-write to inherit from PrintConsumer.

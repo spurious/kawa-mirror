@@ -1,3 +1,11 @@
+2002-05-18  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>):  Also load XStrings.
+
+	* XQParser.java (skipSpaceOrComment):  New method.
+	(peekNonSpace):  Call skipSpaceOrComment instead of skipSpace.
+	(parseFLWRExpression):  Likewise.
+
 2002-05-06  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parseFile):  Remove unused variable.

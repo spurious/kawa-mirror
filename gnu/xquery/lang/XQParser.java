@@ -41,6 +41,34 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
+  final int skipSpaceOrComment()
+    throws java.io.IOException, SyntaxException
+  {
+    for (;;)
+      {
+	int ch = read();
+	if (ch == '{')
+	  {
+	    ch = read();
+	     if (ch != '-')
+	       {
+		 unread(ch);
+		 return '{';
+	       }
+	    ch = read();
+	     if (ch != '-')
+	       {
+		 unread(ch);
+		 unread('-');
+		 return '{';
+	       }
+	     skipComment();
+	  }
+	else if (ch < 0 || ! Character.isWhitespace((char) ch))
+	  return ch;
+      }
+  }
+
   final void skipComment()
     throws java.io.IOException, SyntaxException
   {
@@ -76,7 +104,7 @@ public class XQParser extends LispReader // should be extends Lexer
   final int peekNonSpace(String message)
     throws java.io.IOException, SyntaxException
   {
-    int ch = skipSpace();
+    int ch = skipSpaceOrComment();
     if (ch < 0)
       eofError(message);
     unread(ch);
@@ -1650,9 +1678,9 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression body;
     if (curToken == ',')
       {
-	int next = skipSpace();
+	int next = skipSpaceOrComment();
 	if (next != '$')
-	  return syntaxError("missin $NAME after ','");
+	  return syntaxError("missing $NAME after ','");
 	body = parseFLWRExpression(isFor);
       }
     else

@@ -6,7 +6,6 @@ SUBDIRS = lang standard lib
 
 SUFFIXES = .java .class
 
-bin_SCRIPTS = kawa.sh
 bin_PROGRAMS = @kawa_bin@
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
@@ -38,8 +37,12 @@ kawa.sh:
 	chmod +x tmp
 	mv tmp kawa.sh
 
-DEFS = -DKAWALIB='"$(datadir)/java"'
-kawa_LDADD = -lreadline -lhistory -lncurses
+READLINE_INCLUDE_PATH =
+READLINE_LIB_PATH =
+kawa_EXTRA_LIBS = -lncurses  # For Linux
+#kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
+DEFS = -DKAWALIB='"$(datadir)/java"' $(READLINE_INCLUDE_PATH)
+kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 # Force repl.class to be built before sub-dirs.
 # Specifically, lib needs repl to compile scm files.
@@ -49,8 +52,8 @@ EXTRA_DIST = Version.java
 
 install-exec-local: install-exec-bindir
 
-install-exec-bindir: bin_SCRIPTS
+install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
 	if test "@kawa_bin@" = "" ; then \
-	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa.sh; \
+	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
 	fi

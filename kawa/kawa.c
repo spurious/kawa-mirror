@@ -30,10 +30,13 @@
 #define PREFER_TELNET_CONNECT 2
 
 #ifndef SUPPORT_PTY
-#define SUPPORT_PTY 1
+#define SUPPORT_PTY 0
 #endif
 #ifndef SUPPORT_TELNET
 #define SUPPORT_TELNET 1
+#endif
+#ifndef SUPPORT_TELNET_CLIENT
+#define SUPPORT_TELNET_CLIENT 0
 #endif
 
 #include <stdio.h>
@@ -660,7 +663,8 @@ main(int argc, char** argv)
 	      exit (-1);
 	    }
 	  namelen = 1;
-	  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &namelen, sizeof(int));
+	  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+		     (void*) &namelen, sizeof(int));
 	  port = 0;
 	  address.sin_port = htons(port);
 	  memset (&address.sin_addr, 0, sizeof (address.sin_addr));
@@ -714,6 +718,7 @@ main(int argc, char** argv)
 	  close (sock);
 	  sock = conn;
  	}
+#if SUPPORT_TELNET_CLIENT
       else
 	{
 	  if (inet_aton (hostname, &inaddr))
@@ -739,6 +744,7 @@ main(int argc, char** argv)
 
 	  connect (sock, (struct sockaddr *) &address, sizeof(address));
 	}
+#endif
       in_from_inferior_fd = sock;
       out_to_inferior_fd = sock;
 

@@ -266,10 +266,10 @@ public class Convert
     // We assume that if collections are available the Double.parseDouble
     // is also available.
     /* BEGIN JAVA2 */
-    // return Double.parseDouble(str);
+    return Double.parseDouble(str);
     /* END JAVA2 */
     /* BEGIN JAVA1 */
-    return Double.valueOf(str).doubleValue();
+    // return Double.valueOf(str).doubleValue();
     /* END JAVA1 */
   }
 }

@@ -4,7 +4,7 @@
 
 package gnu.lists;
 /* BEGIN JAVA2 */
-// import java.util.*;
+import java.util.*;
 /* END JAVA2 */
 
 /** A SimpleVector implement as a simple array plus a current size.
@@ -206,34 +206,34 @@ public abstract class SimpleVector extends AbstractSequence
   }
 
   /* BEGIN JAVA2 */
-  // public boolean addAll(int index, Collection c)
-  // {
-    // boolean changed = false;
-    // int count = c.size();
-    // setSize(size + count);
-    // shift(index, index + count, size - count - index);
-    // for (Iterator it = c.iterator();  it.hasNext(); )
-      // {
-	// set(index++, it.next());
-	// changed = true;
-      // }
-    // return changed;
-  // }
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
-  public boolean addAll(int index, Sequence c)
+  public boolean addAll(int index, Collection c)
   {
     boolean changed = false;
     int count = c.size();
     setSize(size + count);
     shift(index, index + count, size - count - index);
-    for (java.util.Enumeration it = c.elements();  it.hasMoreElements(); )
+    for (Iterator it = c.iterator();  it.hasNext(); )
       {
-	set(index++, it.nextElement());
+	set(index++, it.next());
 	changed = true;
       }
     return changed;
   }
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
+  // public boolean addAll(int index, Sequence c)
+  // {
+    // boolean changed = false;
+    // int count = c.size();
+    // setSize(size + count);
+    // shift(index, index + count, size - count - index);
+    // for (java.util.Enumeration it = c.elements();  it.hasMoreElements(); )
+      // {
+	// set(index++, it.nextElement());
+	// changed = true;
+      // }
+    // return changed;
+  // }
   /* END JAVA1 */
 
   protected abstract void clearBuffer(int start, int count);
@@ -300,49 +300,49 @@ public abstract class SimpleVector extends AbstractSequence
   }
 
   /* BEGIN JAVA2 */
-  // public boolean removeAll(Collection c)
-  // {
-    // boolean changed = false;
-    // int j = 0;
-    // for (int i = 0;  i < size;  i++)
-      // {
-        // Object value = get(i);
-        // if (c.contains(value))
-          // {
-            // changed = true;
-          // }
-	// else
-	// {
-	  // if (changed)
-	    // set(j, value);
-	  // j++;
-	// }
-      // }
-    // setSize(j);
-    // return changed;
-  // }
+  public boolean removeAll(Collection c)
+  {
+    boolean changed = false;
+    int j = 0;
+    for (int i = 0;  i < size;  i++)
+      {
+        Object value = get(i);
+        if (c.contains(value))
+          {
+            changed = true;
+          }
+	else
+	{
+	  if (changed)
+	    set(j, value);
+	  j++;
+	}
+      }
+    setSize(j);
+    return changed;
+  }
 
-  // public boolean retainAll(Collection c)
-  // {
-    // boolean changed = false;
-    // int j = 0;
-    // for (int i = 0;  i < size;  i++)
-      // {
-        // Object value = get(i);
-        // if (! c.contains(value))
-          // {
-            // changed = true;
-          // }
-	// else
-	  // {
-	    // if (changed)
-	      // set(j, value);
-	    // j++;
-	  // }
-      // }
-    // setSize(j);
-    // return changed;
-  // }
+  public boolean retainAll(Collection c)
+  {
+    boolean changed = false;
+    int j = 0;
+    for (int i = 0;  i < size;  i++)
+      {
+        Object value = get(i);
+        if (! c.contains(value))
+          {
+            changed = true;
+          }
+	else
+	  {
+	    if (changed)
+	      set(j, value);
+	    j++;
+	  }
+      }
+    setSize(j);
+    return changed;
+  }
   /* END JAVA2 */
 
   public void clear ()

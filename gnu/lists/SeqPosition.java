@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 public class SeqPosition
 implements
 /* BEGIN JAVA2 */
-    // java.util.ListIterator,
+    java.util.ListIterator,
 /* END JAVA2 */
     java.util.Enumeration
 {

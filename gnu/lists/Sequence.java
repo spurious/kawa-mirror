@@ -4,7 +4,7 @@
 
 package gnu.lists;
 /* BEGIN JAVA2 */
-// import java.util.*;
+import java.util.*;
 /* END JAVA2 */
 import java.io.*;
 
@@ -24,7 +24,7 @@ import java.io.*;
 public interface Sequence
 extends
     /* BEGIN JAVA2 */
-    // java.util.List,
+    java.util.List,
     /* END JAVA2 */
     Consumable
 {

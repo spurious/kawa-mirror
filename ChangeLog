@@ -1,3 +1,19 @@
+Fri Jun 21 00:03:34 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Declaration (context):  New field.
+	(Declaration):  Initialize index to -1.
+	* kawa/lang/ScopeExp.java (assign_space, add_decl):  New methods.
+	(shared, num_decls, space_needed):  New fields.
+	* kawa/lang/LambdaProcedure.java (applyN):  Always allocate
+	new frame using LambdaExp.space_needed field.
+	* kawa/lang/LetExp.java (eval):  Use Declaration.index when setting.
+	* kawa/lang/ReferenceExp.java (eval):  Search up lexical scope chain.
+	* kawa/lang/SetExp.java (eval):  Likewise.
+	* kawa/lang/LambdaExp.java (LambdaExp):  Use new ScopeExp.add_decl.
+	* kawa/standard/{let,letstar}.java (rewrite):  Likewise.
+	* kawa/lang/ApplyExp.java (print):  Fix thinko.
+	* kawa/lang/BeginExp.java (eval):  Fix typo.
+
 Wed Jun 19 17:00:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Sequence.java:  New abstract class.

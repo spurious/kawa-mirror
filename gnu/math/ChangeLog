@@ -1,5 +1,11 @@
 Thu Jan 15 13:42:16 1998  Alouatte Petrofsky <albatros@wco.com>
 
+	* Complex.java (imMinusOne):  New method.
+	(toString):  Minor fixes.
+	* DComplex.java (toString):  Print infinities and NaN using #i1/0 etc.
+	* DFloNum.java (constructor):  Make sure -0.0 is handled correctly.
+	(toString):  Print infinities and NaN using #i1/0 etc.
+
 	* IntNum.java (negate):  Change return value to boolean (for overflow).
 	(setNegative):  Fix so -2**63 works.
 

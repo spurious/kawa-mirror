@@ -14,12 +14,20 @@ public abstract class Complex extends Quantity
   }
 
   private static CComplex imOne;
+  private static CComplex imMinusOne;
 
   public static CComplex imOne()
   {
     if (imOne == null)
       imOne = new CComplex (IntNum.zero(), IntNum.one());
     return imOne;
+  }
+
+  public static CComplex imMinusOne()
+  {
+    if (imMinusOne == null)
+      imMinusOne = new CComplex (IntNum.zero(), IntNum.minusOne());
+    return imMinusOne;
   }
 
   public double doubleValue () { return re().doubleValue (); }
@@ -120,16 +128,18 @@ public abstract class Complex extends Quantity
   
   public String toString (int radix)
   {
-    String reString = re().toString(radix);
-    String imString = im().toString(radix);
-    if (imString.equals("0"))
-      return reString;
-    imString = imString + "i";
-    if (reString.equals("0"))
-      return imString;
+    // Note: The r4rs read syntax does not allow unsigned pure
+    // imaginary numbers, i.e. you must use +5i, not 5i.
+    // Although our reader allows the sign to be dropped, we always
+    // print it so that the number may be read by any r4rs system.
+    if (im().isZero ())
+      return re().toString(radix);
+    String imString = im().toString(radix) + "i";
     if (imString.charAt(0) != '-')
       imString = "+" + imString;
-    return reString + imString;
+    if (re().isZero())
+      return imString;
+    return re().toString(radix) + imString;
   }
 
   public static Complex neg (Complex x)

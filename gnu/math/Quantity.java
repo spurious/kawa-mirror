@@ -198,10 +198,9 @@ public abstract class Quantity extends Numeric
 
   public String toString (int radix)
   {
-    if (unit() == Unit.Empty)
-      return number().toString(radix);
-    if (radix != 10)
-      return "#d"+toString(10);
-    return unit().toString (number());
+    String str = number ().toString (radix);
+    if (unit () == Unit.Empty)
+      return str;
+    return str + unit ().toString ();
   }
 }

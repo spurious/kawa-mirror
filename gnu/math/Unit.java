@@ -174,14 +174,17 @@ public class Unit extends Quantity
     return toString (val.doubleValue());
   }
 
+  /*
   public String toString (Complex val)
   {
     String str = toString(val.re());
     RealNum im = val.im();
     if (im.isZero())
       return str;
+    // This conflicts with using '@' for polar notation.
     return  str + "@" + toString(im);
   }
+  */
 
   public String toString ()
   {

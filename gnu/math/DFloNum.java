@@ -19,8 +19,23 @@ public class DFloNum extends RealNum implements Compilable
 
   public DFloNum (String s) throws NumberFormatException
   {
-    Double d = new Double (s); // wasteful ...
+    Double d = Double.valueOf (s); // wasteful ...
     value = d.doubleValue ();
+
+    // We want "-0.0" to convert to -0.0, but the spec as of 1.1
+    // requires Double.valueOf to convert it to 0.0, because the
+    // method is defined to be equivalent to first computing the exact
+    // rational value and then converting to floating-point, and the
+    // exact rational value represented by either string "0.0" or
+    // "-0.0" is 0.
+    
+    // This is apparently a bug in the spec, which I've reported
+    // to sun.  As of 1.1, the sun implementation returns -0.0,
+    // but the linux port returns 0.0.
+    
+    // To be safe, we check for this case.
+    if (value == 0.0 && s.charAt (0) == '-')
+      value = -0.0;
   }
 
   public static DFloNum make (double value)
@@ -173,15 +188,20 @@ public class DFloNum extends RealNum implements Compilable
       return RatNum.make (mant, IntNum.shift (IntNum.one(), 1075 - exp));
   }
 
-  public String toString ()
-  {
-    return Double.toString (value);
-  }
-  public String toString (int radix)
-  {
-    // ignore radix - FIXME
-    return Double.toString (value);
-  }
+   public String toString ()
+   {
+    return (value == 1.0/0.0 ? "#i1/0"
+	    : value == -1.0/0.0 ? "#i-1/0"
+	    : Double.isNaN (value) ? "#i0/0"
+	    : Double.toString (value));
+   }
+
+   public String toString (int radix)
+   {
+    if (radix == 10)
+      return toString ();
+    return "#d" + toString ();
+   }
 
   static ClassType thisType;
   public static Method makeMethod;

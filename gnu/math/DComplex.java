@@ -38,6 +38,60 @@ public class DComplex extends Complex
 	  == Double.doubleToLongBits(y.imValue()));
   }
 
+  public String toString ()
+  {
+    String prefix = "";
+
+    String reString;
+    if (real == 1.0/0.0)
+      {
+	prefix = "#i"; reString = "1/0";
+      }
+    else if (real == -1.0/0.0)
+      {
+	prefix = "#i"; reString = "-1/0";
+      }
+    else if (Double.isNaN (real))
+      {
+	prefix = "#i"; reString = "0/0";
+      }
+    else
+      reString = Double.toString (real);
+
+    if (Double.doubleToLongBits (imag) == 0)  // i.e. imag is 0.0 and not -0.0
+      return prefix + reString;
+
+    String imString;
+    if (imag == 1.0/0.0)
+      {
+	prefix = "#i"; imString = "+1/0i";
+      }
+    else if (imag == -1.0/0.0)
+      {
+	prefix = "#i"; imString = "-1/0i";
+      }
+    else if (Double.isNaN (imag))
+      {
+	prefix = "#i"; imString = "+0/0i";
+      }
+    else
+      {
+	imString = Double.toString (imag) + "i";
+	if (imString.charAt (0) != '-')
+	  imString = "+" + imString;
+      }
+
+    return ((Double.doubleToLongBits (real) == 0 ? prefix : prefix + reString)
+            + imString);
+  }
+
+  public String toString (int radix)
+  {
+    if (radix == 10)
+      return toString ();
+    return "#d" + toString ();
+  }
+
   // All transcendental complex functions return DComplex
 
   public final Numeric neg () { return new DComplex (-real, -imag); }

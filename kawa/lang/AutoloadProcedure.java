@@ -59,8 +59,13 @@ public class AutoloadProcedure extends Procedure
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
-	if (name != null && Interpreter.lookup_global (name) == this)
-	  Interpreter.define_global (name, loaded);
+	if (name != null)
+	  {
+	    if (Interpreter.lookup_global (name) == this)
+	      Interpreter.define_global (name, loaded);
+	    if (loaded.name == null)
+	      loaded.name = name.toString ();
+	  }
       }
     catch (ClassNotFoundException ex)
       {	throw_error ("failed to find class "); }

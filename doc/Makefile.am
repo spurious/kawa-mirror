@@ -26,12 +26,11 @@ TEXI2PDF = texi2pdf
 	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) $<
 
 man_MANS = kawa.1
-kawa.1: kawa.man
+kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1
 
-SOURCES = kawa.man
-EXTRA_DIST = kawa.txt $(KAWA_HTMLS) scm2java.html \
+EXTRA_DIST = kawa.txt $(KAWA_HTMLS) scm2java.html kawa.man \
   kawa-tour.tex kawa-tour.ps Compliance.html mdate-sh
 info_TEXINFOS = kawa.texi kawa-tour.texi
 CLEANFILES = kawa.txt *.info kawa_toc.html $(KAWA_HTMLS) kawa1.tmp kawa.1

@@ -2998,7 +2998,7 @@ Returns a new instance of an anonymous (inner) class.
 @display
 @var{field-or-method} = @var{field-decl} | @var{method-decl}
 @var{field-decl} = (@var{field-name} [[@var{field-type}] @var{field-init}])
-@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [@var{rtype}] @var{body})
+@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
 @end display
 
 Returns a new instance of a unique (anonymous) class.

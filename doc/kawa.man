@@ -62,7 +62,7 @@ Enter an interactive read-evaluate-print in a new top-level window.
 If no options are specified, it is equivalent to
 .BR -s .
 .SH "SEE ALSO"
-.IR "http://www.cygnus.com/~bothner/kawa.html" ,
+.IR "http://ww.gnu.org/software/kawa/" ,
 the
 .B kawa
 home page, with the manual.
@@ -80,4 +80,4 @@ Commands that are executed when
 .B kawa
 is started.
 .SH AUTHOR
-Per Bothner <bothner@Cygnus.COM>.
+Per Bothner <per@bothner.com>.

@@ -4,6 +4,12 @@
 (define (output-port? x)
   (instance? x <output-port>))
 
+(define (current-input-port)
+  ((primitive-static-method <input-port> "inDefault" <input-port> ())))
+
+(define (current-output-port)
+  ((primitive-static-method <output-port> "outDefault" <output-port> ())))
+
 (define (call-with-input-string str proc)
   (let* ((port
 	  ((primitive-virtual-method <string> "open" <input-port> ())
@@ -70,6 +76,9 @@
   ((primitive-virtual-method <kawa.lang.TtyInPort> "setPrompter"
 			       <void> (<kawa.lang.Procedure>))
    port prompter))
+
+(define (close-output-port port)
+  ((primitive-virtual-method <output-port> "close" <void> ()) port))
 
 (define (transcript-on filename)
   ((primitive-static-method <output-port> "setLogFile" <void>

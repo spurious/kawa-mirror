@@ -227,7 +227,7 @@ public class Compilation
       }
   }
 
-  public void dumpLiterals ()
+  private void dumpLiterals ()
   {
     for (Literal literal = literalsChain;  literal != null;
 	 literal = literal.next)
@@ -437,6 +437,7 @@ public class Compilation
 	compileConstant (lexp.name);
 	constructor_method.compile_putfield (nameField);
       }
+    constructor_method.compile_return ();
 
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
     Method apply_method
@@ -615,14 +616,16 @@ public class Compilation
     if (method.reachableHere ())
       method.compile_return ();
 
-    if (! immediate && curClass == mainClass)
+    if (! immediate && curClass == mainClass && literalsChain != null)
       {
 	Method save_method = method;
-	method = constructor_method;
+	method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
+				     Access.PUBLIC|Access.STATIC);
+	method.init_param_slots ();
 	dumpLiterals ();
+	method.compile_return ();
 	method = save_method;
       }
-    constructor_method.compile_return ();
 
     method.popScope();
     curLambda = saveLambda;

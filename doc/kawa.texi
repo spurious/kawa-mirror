@@ -68,6 +68,12 @@ A new repository has been started at
 It includes pointer to an online copy of
 @uref{http://www.schemers.org/Documents/#standards,R5RS}.
 
+A nice quick introduction to Scheme can be found in
+@uref{http://www.cs.washington.edu/education/courses/341/CurrentQtr/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
+discusses Scheme implementation is
+@uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
+
+
 Javadoc generated @uref{http://sourceware.cygnus.com/kawa/api/,documentation of the Kawa classes} is also available.
 
 For copyright information on the software and documentation,

@@ -9,6 +9,8 @@ public class QuoteExp extends Expression
 {
   Object value;
 
+  public final Object getValue() { return value; }
+
   static public QuoteExp undefined_exp
   = new QuoteExp (Interpreter.undefinedObject);
 

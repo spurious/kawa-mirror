@@ -98,7 +98,7 @@ CompileFile.class \
 loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
-PrimProcedure.class \
+SpecialType.class PrimProcedure.class \
 Values.class \
 Promise.class \
 Future.class \

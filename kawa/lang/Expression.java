@@ -40,25 +40,7 @@ public abstract class Expression implements Printable
   public final void compile (Compilation comp, int flags, Type type)
   {
     compile (comp, flags);
-    if (type == Type.char_type)
-      { // We handle char specially, because Kawa does not use standard
-	// java.lang.Character type.
-	Char.initMakeMethods();
-	comp.method.compile_checkcast (Char.scmCharType);
-	comp.method.compile_invoke_virtual (Char.charValueMethod);
-      }
-    else if (type == Type.boolean_type)
-      {
-	gnu.bytecode.CodeAttr code = comp.getCode();
-	comp.compileConstant (Interpreter.falseObject);
-	comp.method.compile_ifneq ();
-	code.emitPushInt(1);
-	code.emitElse();
-	code.emitPushInt(0);
-	code.emitFi();
-      }
-    else
-      type.compileCoerceFromObject(comp.method);
+    type.emitCoerceFromObject(comp.getCode());
   }
 
   String filename;
@@ -84,6 +66,8 @@ public abstract class Expression implements Printable
     return filename;
   }
 
+  /** Get the line number of (the start of) this Expression.
+    * The "first" line is line 1. */
   public final int getLine ()
   {
     return position >> 12;

@@ -3,6 +3,7 @@ import gnu.bytecode.*;
 import java.util.Hashtable;
 import gnu.math.IntNum;
 import gnu.math.DFloNum;
+import kawa.standard.Scheme;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
@@ -17,36 +18,51 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 
   public final int opcode() { return op_code; }
 
-  public Object applyN (Object[] args)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  public int numArgs()
   {
+    int num = argTypes.length;
+    if (! getStaticFlag())
+      num++;
+    return num + (num << 12);
+  }
+
+  public Object applyN (Object[] args)
+  {
+    int arg_count = argTypes.length;
+    boolean is_constructor = op_code == 183;
+    ClassType this_type = method.getDeclaringClass();
+    boolean is_static = getStaticFlag();
+    int this_count = is_static ? 0 : 1;
+    Procedure.checkArgCount(this, args.length);
+    Object[] rargs = new Object[arg_count];
+    for (int i = 0;  i < arg_count; i++)
+      {
+	rargs[i] = argTypes[i].coerceFromObject(args[i+this_count]);
+      }
     try
       {
 	if (member == null)
 	  {
-	    Class clas = method.getDeclaringClass().getReflectClass();
-	    int i = argTypes.length;
-	    Class[] paramTypes = new Class[i];
-	    while (--i >= 0)
+	    Class clas = this_type.getReflectClass();
+	    Class[] paramTypes = new Class[arg_count];
+	    for (int i = arg_count; --i >= 0; )
 	      paramTypes[i] = argTypes[i].getReflectClass();
-	    if (op_code == 183)
+	    if (is_constructor)
 	      member = clas.getConstructor(paramTypes);
 	    else
 	      member = clas.getMethod(method.getName(), paramTypes);
 	  }
-	if (member instanceof java.lang.reflect.Constructor)
+	if (is_constructor)
 	  return ((java.lang.reflect.Constructor) member).newInstance(args);
 	else
 	  {
 	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
+	    Object result;
 	    if (method.getStaticFlag())
-	      return meth.invoke(null, args);
+	      result = meth.invoke(null, args);
 	    else
-	      {
-		Object[] rargs = new Object[args.length - 1];
-		System.arraycopy(args, 1, rargs, 0, args.length - 1);
-		return meth.invoke(args[0], rargs);
-	      }
+	      result = meth.invoke(this_type.coerceFromObject(args[0]), rargs);
+	    return retType.coerceToObject(result);
 	  }
       }
     catch (Exception ex)
@@ -103,14 +119,14 @@ public class PrimProcedure extends ProcedureN implements Inlineable
       {
 	types = new Hashtable ();
 	types.put ("void", Type.void_type);
-	types.put ("int", Type.int_type);
-	types.put ("char", Type.char_type);
-	types.put ("boolean", Type.boolean_type);
-	types.put ("byte", Type.byte_type);
-	types.put ("short", Type.short_type);
-	types.put ("long", Type.long_type);
-	types.put ("float", Type.float_type);
-	types.put ("double", Type.double_type);
+	types.put ("int", Scheme.intType);
+	types.put ("char", Scheme.charType);
+	types.put ("boolean", Scheme.booleanType);
+	types.put ("byte", Scheme.byteType);
+	types.put ("short", Scheme.shortType);
+	types.put ("long", Scheme.longType);
+	types.put ("float", Scheme.floatType);
+	types.put ("double", Scheme.doubleType);
 
 	types.put ("Object", Type.pointer_type);
 	types.put ("java.lang.Object", Type.pointer_type);
@@ -151,8 +167,7 @@ public class PrimProcedure extends ProcedureN implements Inlineable
     gnu.bytecode.CodeAttr code = comp.getCode();
     int arg_count = argTypes.length;
     boolean is_static = getStaticFlag();
-    if (exp.args.length != arg_count + (is_static ? 0 : 1))
-      throw new Error ("internal error - wrong number of arguments to primitive");
+    Procedure.checkArgCount(this, exp.args.length);
     if (opcode() == 183) // invokespecial == primitive-constructor
       {
 	ClassType type = method.getDeclaringClass();
@@ -170,7 +185,7 @@ public class PrimProcedure extends ProcedureN implements Inlineable
     if (method == null)
       comp.method.compile_primop (opcode(), exp.args.length, retType);
     else
-      comp.method.compile_invoke_method (method, opcode());
+      code.emitInvokeMethod(method, opcode());
 
     if (retType == Type.void_type)
       {
@@ -179,48 +194,16 @@ public class PrimProcedure extends ProcedureN implements Inlineable
       }
     else if ((flags & Expression.IGNORED) != 0)
       code.emitPop(1);
-    else if (retType instanceof ClassType)
-      return;
-    else if (retType instanceof ArrayType)
-      return;  // ??? Should we convert to FVector?
-    else if (retType == Type.int_type || retType == Type.short_type
-	     || retType == Type.byte_type)
-      {
-	IntNum.initMakeMethods();
-	comp.method.compile_invoke_static (IntNum.makeIntMethod);
-      }
-    else if (retType == Type.long_type)
-      {
-	IntNum.initMakeMethods();
-	comp.method.compile_invoke_static (IntNum.makeLongMethod);
-      }
-    else if (retType == Type.double_type || retType == Type.float_type)
-      {
-	comp.method.compile_convert (Type.double_type);
-	DFloNum.initMakeMethods();
-	comp.method.compile_invoke_static (DFloNum.makeMethod);
-      }
-    else if (retType == Type.char_type)
-      {
-	Char.initMakeMethods();
-	comp.method.compile_invoke_static (Char.makeCharMethod);
-      }
-    else if (retType == Type.boolean_type)
-      {
-	comp.method.compile_if_neq_0 ();
-	comp.compileConstant (Interpreter.trueObject);
-	code.emitElse();
-	comp.compileConstant (Interpreter.falseObject);
-	code.emitFi();
-      }
     else
-      throw new Error ("unimplemented return type");
+      retType.emitCoerceToObject(code);
   }
 
-  public String toString()
+  public String getName()
   {
+    String name = name();
+    if (name != null)
+      return name;
     StringBuffer buf = new StringBuffer(100);
-    buf.append(retType.getName());
     if (method == null)
       {
 	buf.append("<op ");
@@ -229,7 +212,6 @@ public class PrimProcedure extends ProcedureN implements Inlineable
       }
     else
       {
-	buf.append(' ');
 	buf.append(method.getDeclaringClass().getName());
 	buf.append('.');
 	buf.append(method.getName());
@@ -242,6 +224,18 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	buf.append(argTypes[i].getName());
       }
     buf.append(')');
+    name = buf.toString();
+    setName(name);
+    return name;
+  }
+
+
+  public String toString()
+  {
+    StringBuffer buf = new StringBuffer(100);
+    buf.append(retType.getName());
+    buf.append(' ');
+    buf.append(getName());
     return buf.toString();
   }
 

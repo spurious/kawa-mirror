@@ -204,6 +204,19 @@ public class Translator extends Object
       }
 
     int cdr_length = List.length (cdr);
+
+    if (func instanceof QuoteExp)
+      {
+	Object fval = ((QuoteExp) func).getValue();
+	if (fval instanceof Inlineable)
+	  {
+	    Procedure proc = (Procedure) fval;
+	    String msg = WrongArguments.checkArgCount(proc, cdr_length);
+	    if (msg != null)
+	      return syntaxError(msg);
+	  }
+      }
+
     Expression[] args = new Expression[cdr_length];
 
     for (int i = 0; i < cdr_length; i++)
@@ -239,7 +252,7 @@ public class Translator extends Object
 	    String tname = name.substring(1, len-1);
 	    if (gnu.bytecode.Type.isValidJavaTypeName(tname))
 	      {
-		gnu.bytecode.Type type = PrimProcedure.getNamedType(tname);
+		gnu.bytecode.Type type = PrimProcedure.string2Type(tname);
 		if (type != null)
 		  return new QuoteExp(type);
 	      }

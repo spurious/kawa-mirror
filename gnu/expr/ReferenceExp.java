@@ -12,11 +12,12 @@ import gnu.mapping.*;
 
 public class ReferenceExp extends Expression
 {
-  String symbol;
+  Object symbol;
   Declaration binding;
-  public String string_name () { return symbol; }
+  public String string_name () { return symbol.toString(); }
 
-  public final String getName() { return symbol; }
+  public final String getName() { return symbol.toString(); }
+  public final Object getSymbol() { return symbol; }
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }
 
@@ -53,12 +54,12 @@ public class ReferenceExp extends Expression
     setFlag(setting, PROCEDURE_NAME);
   }
 
-  public ReferenceExp (String symbol)
+  public ReferenceExp (Object symbol)
   {
     this.symbol = symbol;
   }
 
-  public ReferenceExp (String symbol, Declaration binding)
+  public ReferenceExp (Object symbol, Declaration binding)
   {
     this.symbol = symbol;
     this.binding = binding;
@@ -91,14 +92,15 @@ public class ReferenceExp extends Expression
           throw new Error("internal error: ReferenceExp.eval on lexical binding");
       }
     if (getDontDereference())
-      return env.getBinding(symbol);
+      return symbol instanceof Binding ? symbol : env.getBinding(symbol.toString());
     else if (getFlag(PREFER_BINDING2))
       {
-	Binding bind = Binding2.getBinding2(env, symbol);
-	return isProcedureName() ? bind.getProcedure() : bind.get();
+	Binding bind = symbol instanceof Binding ? (Binding) symbol
+	  : env.getBinding(symbol.toString());
+	return isProcedureName() ? bind.getFunctionValue() : bind.get();
       }
     else
-      return env.getChecked(symbol);
+      return env.getChecked(symbol.toString());
   }
 
   public void compile (Compilation comp, Target target)

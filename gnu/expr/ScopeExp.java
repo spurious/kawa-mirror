@@ -44,6 +44,30 @@ public abstract class ScopeExp extends Expression
     decl.context = this;
   }
 
+  public void remove (Declaration decl)
+  {
+    Declaration prev = null;
+    for (Declaration cur = firstDecl(); cur != null; cur = cur.nextDecl())
+      {
+	if (cur == decl)
+	  {
+	    remove(prev, decl);
+	    return;
+	  }
+	prev = decl;
+      }
+  }
+
+  public void remove (Declaration prev, Declaration decl)
+  {
+    if (prev == null)
+      decls = decl.next;
+    else
+      prev.next = decl.next;
+    if (last == decl)
+      last = prev;
+  }
+
   public ScopeExp () { scope = new Scope (); }
 
   /** The statically enclosing binding contour. */
@@ -77,6 +101,18 @@ public abstract class ScopeExp extends Expression
     return null;
   }
 
+  public Declaration lookup (String sym, Interpreter interp, int namespace)
+  {
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+	if (decl.name == sym
+	    && (interp.getNamespaceOf(decl) & namespace) != 0)
+	  return decl;
+      }
+    return null;
+  }
+
   /** Lookup a declaration, create a non-defining declaration if needed. */
   public Declaration getNoDefine (String name)
   {
@@ -97,6 +133,8 @@ public abstract class ScopeExp extends Expression
       decl = addDeclaration(name);
     else if (decl.getFlag(Declaration.NOT_DEFINING))
       decl.setFlag(false, Declaration.NOT_DEFINING);
+    else if (decl.getFlag(Declaration.IS_UNKNOWN))
+      decl.setFlag(false, Declaration.IS_UNKNOWN);
     else
       {
 	StringBuffer sbuf = new StringBuffer(200);

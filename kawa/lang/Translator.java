@@ -474,7 +474,7 @@ public class Translator extends Compilation
     if (! (pair instanceof PairWithPosition))
       return null;
     PairWithPosition ppair = (PairWithPosition) pair;
-    Object saved = positionPair;
+    Object saved;
     if (positionPair == null
 	|| positionPair.getFile() != getFile()
 	|| positionPair.getLine() != getLine()
@@ -483,6 +483,8 @@ public class Translator extends Compilation
 	saved = PairWithPosition.make(Special.eof, positionPair,
 				      getFile(), getLine(), getColumn());
       }
+    else
+      saved = positionPair;
     setLine(pair);
     positionPair = ppair;
     return saved;

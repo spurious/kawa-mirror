@@ -1,3 +1,10 @@
+2004-08-08  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/AutoloadProcedure.java (load):
+	ModuleBody is not always Runnable.
+
+	* kawa/lang/Translator.java (pushPositionOf):  Trivial optimization.
+
 2004-08-07  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/cxr.java:  Use new WrongType constructors.

@@ -84,7 +84,8 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 	if (loaded instanceof ModuleBody)
 	  {
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);
-	    ((ModuleBody)loaded).run();
+	    if (loaded instanceof Runnable)
+	      ((Runnable)loaded).run();
 	    Object value = env.getSymbol(name).getProcedure();
 	    if (value == null
 		|| !(value instanceof Procedure))

@@ -101,7 +101,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("cond", "kawa.lib.std_syntax");
       define_syntax ("case", "kawa.lib.std_syntax");
       define_syntax ("and", "kawa.lib.std_syntax");
-      define ("or", new kawa.standard.and_or (false, this));
+      define_syntax ("or", "kawa.lib.std_syntax");
       define_field("%let", "kawa.standard.let", "let");
       define_syntax ("let", "kawa.lib.std_syntax");
       define_syntax ("%let-decl", "kawa.lib.std_syntax");

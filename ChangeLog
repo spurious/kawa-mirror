@@ -1,3 +1,10 @@
+2004-11-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/and_or.java: Removed.
+	* kawa/standard/Makefile.am (java_sources): Remove and_or.java.
+	* kawa/standard/Scheme.java: Use definition of 'or' with macro
+	define in kawa.lib.std_syntax.
+
 2004-11-08  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxPattern.java (translate): Change MATCH_LENGTH

@@ -7,7 +7,6 @@ set_b.java \
 quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
 not.java \
-and_or.java \
 cxr.java \
 append.java \
 integer_p.java \

@@ -1,8 +1,8 @@
 package gnu.kawa.util;
 
-/**A position (between two characters) in an abstract string.
+/** A position (between two characters) in an abstract string.
  * Similar to javax.swing.text.Position.
- * 
+ */
 
 public class Position
 {

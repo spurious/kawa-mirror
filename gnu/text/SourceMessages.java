@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -14,7 +14,9 @@ public class SourceMessages
   // Number of errors (not counting warnings).  A value of 1000 is "fatal".
   private int errorCount = 0;
 
+  /** The first error or warning in a linked list. */
   SourceError firstError;
+  /** The last error or warning in a linked list. */
   SourceError lastError;
 
   public SourceError getErrors() { return firstError; }
@@ -55,27 +57,32 @@ public class SourceMessages
 	&& ! lastError.filename.equals(error.filename))
       lastPrevFilename = lastError;
     SourceError prev = lastPrevFilename;
-    for (;;)
+    if (error.severity == 'f')
+      prev = lastError;
+    else
       {
-	SourceError next;
-	if (prev == null)
-	  next = firstError;
-	else
-	  next = prev.next;
-	if (next == null)
-	  break;
-	if (error.line != 0 && next.line != 0)
-	  {
-	    if (error.line < next.line)
-	      break;
-	    if (error.line == next.line
-		&& error.column != 0 && next.column != 0)
-	      {
-		if (error.column < next .column)
-		  break;
-	      }
-	  }
-	prev = next;
+        for (;;)
+          {
+            SourceError next;
+            if (prev == null)
+              next = firstError;
+            else
+              next = prev.next;
+            if (next == null)
+              break;
+            if (error.line != 0 && next.line != 0)
+              {
+                if (error.line < next.line)
+                  break;
+                if (error.line == next.line
+                    && error.column != 0 && next.column != 0)
+                  {
+                    if (error.column < next .column)
+                      break;
+                  }
+              }
+            prev = next;
+          }
       }
     if (prev == null)
       {

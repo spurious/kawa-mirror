@@ -47,6 +47,7 @@ modulo.java \
 gcd.java \
 lcm.java \
 floor.java \
+fluid_let.java \
 ceiling.java \
 truncate.java \
 round.java \

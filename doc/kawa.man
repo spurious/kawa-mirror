@@ -34,7 +34,7 @@ For more information, read the
 .B kawa
 manual.
 In a Debian GNU/Linux distribution, you should find a copy in
-.IR /usr/doc/kawa/kawa_toc.html .
+.IR /usr/share/doc/kawa/index.html .
 
 .SH OPTIONS
 .TP

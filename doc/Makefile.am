@@ -12,8 +12,6 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
 KAWA_HTMLS = kawa/index.html
 $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) --html $<
-#	texi2html -menu -split_chapter $<
-kawa.html: kawa_toc.html
 GENERATED_HTML = $(KAWA_HTMLS)
 
 TEXI2PDF = texi2pdf
@@ -30,10 +28,10 @@ kawa.1: $(srcdir)/kawa.man
 ../kawa-doc-$(VERSION).tar.gz: kawa/index.html internals.html kawa-tour.ps
 	tar cf - kawa/*.html internals.html kawa-tour.ps|gzip -c --best >$@
 
-EXTRA_DIST = kawa.txt html scm2java.html kawa.man \
+EXTRA_DIST = kawa.txt scm2java.html kawa.man \
   kawa-tour.tex mdate-sh
 info_TEXINFOS = kawa.texi kawa-tour.texi
-CLEANFILES = kawa.txt *.info kawa_toc.html $(KAWA_HTMLS) kawa1.tmp kawa.1
+CLEANFILES = kawa.txt *.info kawa/*.html internals.html kawa1.tmp kawa.1
 
 HTML_HOME = $$HOME/public_html
 

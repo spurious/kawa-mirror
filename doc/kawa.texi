@@ -568,11 +568,12 @@ result (if there is a non-"void" result).
 
 @menu
 * Options::      Command-line arguments
+* Scripts::      Running Command Scripts
 * New-Window::   Running a Command Interpreter in a new Window
 * Exiting::      Exiting Kawa
 @end menu
 
-@node Options, New-Window, Running, Running
+@node Options, Scripts, Running, Running
 @section Command-line arguments
 
 @cindex options
@@ -708,7 +709,52 @@ then Kawa enters an interactive read-eval-print loop,
 but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
 @samp{-C}, or @samp{--} options were specified.
 
-@node New-Window, Exiting, Options, Running
+@node Scripts, New-Window, Options, Running
+@section Running Command Scripts
+
+Unix-like systems support a mechanism where a @dfn{script} can
+specify a programs that should execute it.  The convention
+is that the first line of the file should start with the two characters
+@samp{#!} followed by the absolute path of the program that should
+process (interpret) the script.
+
+This is convention works well for script languages that use @samp{#}
+to indicate the start of a comment, since the interpreter will
+automatically ignore the line specifying the interpreter filename.
+Scheme, however, uses @samp{#} for various special objects,
+and Kawa specifically uses @samp{#!} as a prefix for
+various @ref{Special named constants} such as @code{#!optional}.
+
+Kawa does recognize the three-character sequence @samp{#!/} at the
+beginning of a file as special, and ignores it.  So you can
+specify command interpreters, as long as you don't put a space
+between the @samp{#!} and the interpreter filename.
+Here is an example:
+@example
+#!/usr/local/bin/kawa
+(format #t "The time is ~s~%" (make <java.util.Date>))
+@end example
+
+If this file has the execute permission set and is in your @code{PATH},
+then you can execute it just my naming it on command line.  The
+system kernel will automatically execute @code{kawa}, passing it the
+filename as an argument.
+
+Note that the full path-name of the @code{kawa} interpreter
+must be hard-wired into the script.  This means you may have to edit
+the script depending on where Kawa is installed on your system.
+Another possible problem is that the interpreter must be an
+actual program, not a shell script. Depending on how you configure
+and install Kawa, @code{kawa} can be a real program or a script.
+You can avoid both problems by the @code{env} program, available on
+most modern Unix-like systems:
+
+@example
+#!/usr/bin/env kawa
+(format #t "The time is ~s~%" (make <java.util.Date>))
+@end example
+
+@node New-Window, Exiting, Scripts, Running
 @section Running a Command Interpreter in a new Window
 
 An alternative interface runs the Java read-eval-print-loop
@@ -2403,14 +2449,14 @@ Scheme format implementations.
 
 Returns @code{#t}, @code{#f} or a string; has side effect of printing
 according to @var{fmt}.  If @var{destination} is @code{#t},
-the output is to the current output port and @code{#t} is returned.  If
+the output is to the current output port and @code{#!void} is returned.  If
 @var{destination} is @code{#f}, a formatted string is returned as the
 result of the call.  If @var{destination} is a string,
 @var{destination} is regarded as the format string; @var{fmt} is
 then the first argument and the output is returned as a string. If
 @var{destination} is a number, the output is to the current error port
 if available by the implementation. Otherwise @var{destination} must be
-an output port and @code{#t} is returned.@refill
+an output port and @code{#!void} is returned.@refill
 
 @var{fmt} must be a string or an instance of @code{gnu.text.MessageFormat}
 or @code{java.text.MessageFormat}.  If @var{fmt} is a string,

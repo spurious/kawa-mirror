@@ -36,7 +36,7 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   boolean inAttribute;
 
   // This is where we save attributes while processing a begin element.
-  // It may be the final output if cons instanceof TreeList.
+  // It may be the final output if cons instanceof NodeTree.
   TreeList tlist;
 
   // The specified target Consumer that accepts the output.
@@ -274,8 +274,8 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   {
     this.base = out;
     this.cons = out;
-    if (cons instanceof TreeList)
-      this.tlist = (TreeList) out;
+    if (cons instanceof NodeTree)
+      this.tlist = (NodeTree) out;
     else
       tlist = new TreeList(); // just for temporary storage
 

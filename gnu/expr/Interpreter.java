@@ -21,6 +21,14 @@ public abstract class Interpreter
 
   public static Interpreter getInterpreter() { return defaultInterpreter; }
 
+  public static Language getDefaultLanguage()
+  { return (Language) defaultInterpreter; }
+
+  public static void setDefaultLanguage(Interpreter lang)
+  {
+    defaultInterpreter = lang;
+  }
+
   /**
    * List of known languages and their Interpreter classes.
    * Each element is one or more language names, or filename extensions,
@@ -649,8 +657,8 @@ public abstract class Interpreter
     Environment saveEnviron = Environment.getCurrent();
     if (saveEnviron != environ)
       Environment.setCurrent(environ);
-    Interpreter saveInterp = defaultInterpreter;
-    Interpreter.defaultInterpreter = this;
+    Language saveLang = getDefaultLanguage();
+    setDefaultLanguage(this);
     try
       {
 	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
@@ -660,7 +668,7 @@ public abstract class Interpreter
       {
 	if (saveEnviron != environ && saveEnviron != null)
 	  Environment.setCurrent(saveEnviron);
-	Interpreter.defaultInterpreter = saveInterp;
+	setDefaultLanguage(saveLang);
       }
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"

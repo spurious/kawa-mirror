@@ -1,5 +1,34 @@
 2000-08-17  Per Bothner  <per@bothner.com>
 
+	* SetExp.java (compile):  Add check for !comp.usingCPStyle().
+
+	* ApplyExp.java, Compilation.java, LambdaExp.java, TailTarget.java:
+	Renamed CallStack->CallContext, typeCallStack->typeCallContext etc.
+
+	* ApplyExp.java (compile):  Don't crash if incorrect number of args.
+
+	* Compilation.java (<init>):  Set mainClass before doing walks.
+
+	* Compilation.java (addClass):  New method, takes ClassType.
+	(allocClass(LambdaExp,String)):  Removed method.
+	(allocClass(LambdaExp)):  Use new addClass, but not for an ObjectExp.
+
+	* Compilation.java:  Some fixes towards the goal of call/cc support.
+	* LambdaExp.java:  Likewise.
+
+	* ConsumerTarget.java: New class, extends Target.
+	* Makefile.am (java_JAVA):  Add ConsumerTarget.java.
+	* LambdaExp.java (SEQUENCE_RESULT):  New flag.
+	(addMethodFor):  If SEQUENCE_RESULT is set, append "$C" to method name.
+	Also in that case, method returns void.
+	(compileAsMethod):  If SEQUENCE_RESULT set, target is ConsumerTarget.
+	
+	* GenericProc.java (getVarBuffer):  Removed method.
+	(match, applyV):  Update for new MethodProc api.
+	* ModuleMethod.java:  Similar updates.
+	* PrimProcedure.java:  Similar updates.
+	(getProcedureClass, getMethodFor):  New static methods.
+
 	* BeginExp.java (length):  New field.
 	Allow variable number of sub-Expressions.
 	(canonicalize, add):  New methods.

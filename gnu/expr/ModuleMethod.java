@@ -61,25 +61,26 @@ public class ModuleMethod extends MethodProc
     return module.applyN(this, args);
   }
 
-  public Object getVarBuffer()
-  {
-    return new Object[1];
-  }
-
   // FIXME - only checks argument length.
-  public RuntimeException match (Object vars, Object[] args)
+  public int match (CallContext ctx, Object[] args)
   {
     int argCount = args.length;
     int num = numArgs();
-    if (argCount < (num & 0xFFF)
-	|| (num >= 0 && argCount > (num >> 12)))
-      return new WrongArguments(this, argCount);
-    ((Object[]) vars)[0] = args;
-    return null;
+    int min = num & 0xFFF;
+    if (argCount < min)
+      return NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+        if (argCount > max)
+          return NO_MATCH_TOO_MANY_ARGS|max;
+      }
+    ctx.value1 = args;
+    return 0;
   }
 
-  public Object applyV(Object vars)
+  public Object applyV(CallContext ctx)
   {
-    return applyN((Object[]) ((Object[]) vars)[0]);
+    return applyN((Object[]) ctx.value1);
   }
 }

@@ -237,6 +237,14 @@ public class Compilation
       }
   }
 
+  public void compileConstant (Object value, Target target)
+  {
+    if (target instanceof IgnoreTarget)
+      return;
+    compileConstant(value);
+    target.compileFromStack(this, Type.pointer_type);
+  }
+
   private void dumpLiterals ()
   {
     for (Literal literal = literalsChain;  literal != null;
@@ -608,7 +616,7 @@ public class Compilation
 		    code.emitPushInt(i);
                     code.emitArrayLoad(scmObjectType);
 		    code.emitElse();
-		    lexp.defaultArgs[opt_i++].compile(this, 0);
+		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
 		    code.emitFi();
 		  }
 		else if (lexp.max_args < 0 && i == lexp.min_args + opt_args)
@@ -639,7 +647,7 @@ public class Compilation
 		    code.emitDup(1);
 		    code.emitGotoIf(199); // ifnonnull
 		    code.emitPop(1);
-		    lexp.defaultArgs[opt_i++].compile(this, 0);
+		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
 		    code.emitFi();
 		  }
 		// Now finish copying the incoming argument into its
@@ -656,7 +664,7 @@ public class Compilation
     lexp.start_label = new Label (method);
     lexp.start_label.define (method);
 
-    lexp.body.compile_with_linenumber (this, Expression.LAST);
+    lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())
       code.emitReturn();
 

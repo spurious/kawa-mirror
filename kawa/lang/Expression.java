@@ -18,29 +18,20 @@ public abstract class Expression implements Printable
 
   abstract public void print (java.io.PrintWriter ps);
 
-  /** If IGNORED is set in the flags passed to compile, the result is ignored.
-   * Hence, do not leave any result on the stack. */
-  public static final int IGNORED = 1;
-       
-  /** Set when compiling an expression that is executed last.
-   * I.e. if this is a call, it is a tail-call. */
-  public static final int LAST = 2;
-
-  abstract public void compile (Compilation comp, int flags);
+  public abstract void compile (Compilation comp, Target target);
 
   /** Same as compile, but emit line number beforehard. */
-  public final void compile_with_linenumber (Compilation comp, int flags)
+  public final void compileWithPosition(Compilation comp, Target target)
   {
     int line = getLine ();
     if (line > 0)
       comp.method.compile_linenumber (line);
-    compile (comp, flags);
+    compile(comp, target);
   }
 
-  public final void compile (Compilation comp, int flags, Type type)
+  public final void compile (Compilation comp, Type type)
   {
-    compile (comp, flags);
-    type.emitCoerceFromObject(comp.getCode());
+    compile (comp, new StackTarget(type));
   }
 
   String filename;

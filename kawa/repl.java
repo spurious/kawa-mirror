@@ -131,9 +131,9 @@ class repl
 						 compilationTopname))
 		  System.exit(-1);
 	      }
-	    catch (GenericError ex)
+	    catch (Throwable ex)
 	      {
-		System.err.println(ex.getMessage ());
+		ex.printStackTrace(System.err);
 		System.exit(-1);
 	      }
 	    something_done = true;

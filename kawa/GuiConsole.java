@@ -70,7 +70,7 @@ public class GuiConsole extends Frame implements ActionListener {
     thread.start();
   }
 
-  private void close () {
+  void close () {
     in_r.appendEOF();
     numConsoles--;
     dispose();

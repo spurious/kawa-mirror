@@ -101,9 +101,8 @@ public class Shell extends Procedure0
 	  }
 	catch (kawa.lang.WrongArguments e)
 	  {
-	    perr.println("Wrong arguments to procedure "+e.procname
-			 +",expected "+e.number+".");
-	    perr.println("usage: "+e.usage);
+	    if (e.usage != null)
+	      perr.println("usage: "+e.usage);
 	    e.printStackTrace(perr);
 	  }
 	catch (kawa.lang.WrongType e)

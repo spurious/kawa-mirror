@@ -4204,7 +4204,7 @@ treated as being in the package/namespace whose global unique name
 is the @var{namespace-uri}.
 
 The features is currently used for XML (to be documented).
-In XML terminolofy, a name containing a colon is a @dfn{qualified name}.
+In XML terminology, a name containing a colon is a @dfn{qualified name}.
 The part of the name before the colon is a @dfn{namespace prefix},
 which is an aliases for a locally-visible @dfn{namespace uri}.
 The latter is an arbitrary string, but for uniqueness it is

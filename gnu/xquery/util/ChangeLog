@@ -1,3 +1,8 @@
+2002-07-21  Per Bothner  <per@bothner.com>
+
+	* Compare.java, MakeElement.java (inline):  Update to take
+	extra ExpWalker parameter.
+
 2002-07-02  Per Bothner  <per@bothner.com>
 
 	* Compare.java (apply):  Mistaken assumption - String.compareTo does

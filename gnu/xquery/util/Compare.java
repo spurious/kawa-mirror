@@ -113,7 +113,7 @@ public class Compare extends Procedure2 implements CanInline
   public static final Compare $Ls   = make("<",TRUE_IF_LSS);
   public static final Compare $Ls$Eq= make("<=",TRUE_IF_LSS|TRUE_IF_EQU);
 
-  public Expression inline (ApplyExp exp /*, SourceMessages messages*/)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression folded = ApplyExp.inlineIfConstant(this, exp);
     if (folded != exp)

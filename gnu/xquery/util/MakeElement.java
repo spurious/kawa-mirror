@@ -65,7 +65,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
     endGroup(out, type);
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length;

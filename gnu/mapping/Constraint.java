@@ -6,7 +6,15 @@ package gnu.mapping;
 
 public abstract class Constraint
 {
-  public abstract Object get (Binding binding);
+  public abstract Object get (Binding binding, Object defaultValue);
+
+  public final Object get (Binding binding)
+  {
+    Object value = get(binding, Binding.UNBOUND);
+    if (value == Binding.UNBOUND)
+      throw new UnboundSymbol(binding.getName());
+    return value;
+  }
 
   public abstract void set (Binding binding, Object value);
 

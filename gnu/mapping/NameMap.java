@@ -5,9 +5,17 @@ package gnu.mapping;
 public abstract class NameMap extends Procedure1 implements HasSetter
   // implements java.util.Map
 {
-  public abstract Object getChecked (String key);
-
-  public abstract Object put (String key, Object value);
+  /** Get the value bound to the given name.
+   * @exception gnu.mapping.UnboundSymbol the name has no binding
+   * @see Environment#get(Object)
+   */
+  public final Object getChecked(String name)
+  {
+    Object value = get(name, Binding.UNBOUND);
+    if (value == Binding.UNBOUND)
+      throw new UnboundSymbol(name);
+    return value;
+  }
 
   /** Get the value bound to the given name.
    * Returns null if the name has no binding
@@ -16,15 +24,12 @@ public abstract class NameMap extends Procedure1 implements HasSetter
    */
   public final Object get (Object name)
   {
-    try
-      {
-	return getChecked((String) name);
-      }
-    catch (UnboundSymbol ex)
-      {
-	return null;
-      }
+    return get((String) name, null);
   }
+
+  public abstract Object get (String key, Object defaultValue);
+
+  public abstract Object put (String key, Object value);
 
   public Object apply1 (Object arg)
   {

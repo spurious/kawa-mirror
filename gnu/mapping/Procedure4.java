@@ -40,9 +40,9 @@ public abstract class Procedure4 extends Procedure
   }
 
   public abstract Object apply4(Object arg1,Object arg2,
-				Object arg3,Object arg4);
+				Object arg3,Object arg4) throws Throwable;
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     if (args.length != 4)
       throw new WrongArguments(this, args.length);

@@ -7,9 +7,18 @@ package gnu.mapping;
 
 public class AliasConstraint extends Constraint
 {
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
-    return ((Location) binding.value).get();
+    if (binding.value instanceof Binding)
+      return ((Binding) binding.value).get(defaultValue);
+    try
+      {
+	return ((Location) binding.value).get();
+      }
+    catch (UnboundSymbol ex)
+      {
+	return defaultValue;
+      }
   }
 
   public void set (Binding binding, Object value)

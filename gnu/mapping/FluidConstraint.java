@@ -32,11 +32,11 @@ public class FluidConstraint extends Constraint
     return null;
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     FluidBinding fl = find(binding);
     if (fl == null)
-      return savedConstraint.get(binding);
+      return savedConstraint.get(binding, defaultValue);
     else
       return fl.value;
   }

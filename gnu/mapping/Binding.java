@@ -25,6 +25,11 @@ public class Binding extends Location implements Externalizable
     return constraint.get(this);
   }
 
+  public final Object get (Object defaultValue)
+  {
+    return constraint.get(this, defaultValue);
+  }
+
   public Procedure getProcedure ()
   {
     try

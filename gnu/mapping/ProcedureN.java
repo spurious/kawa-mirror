@@ -17,19 +17,19 @@ public abstract class ProcedureN extends Procedure
       super(n);
   }
 
-  public Object apply0 ()
+  public Object apply0 () throws Throwable
   {
     return applyN(Values.noArgs);
   }
 
-  public Object apply1 (Object arg1)
+  public Object apply1 (Object arg1) throws Throwable
   {
     Object[] args = new Object[1];
     args[0] = arg1;
     return applyN (args);
   }
 
-   public Object apply2 (Object arg1,Object arg2)
+   public Object apply2 (Object arg1,Object arg2) throws Throwable
   {
     Object[] args = new Object[2];
     args[0] = arg1;
@@ -37,7 +37,7 @@ public abstract class ProcedureN extends Procedure
     return applyN (args);
   }
 
-  public Object apply3 (Object arg1, Object arg2, Object arg3)
+  public Object apply3 (Object arg1, Object arg2, Object arg3) throws Throwable
   {
     Object[] args = new Object[3];
     args[0] = arg1;
@@ -47,7 +47,7 @@ public abstract class ProcedureN extends Procedure
   }
 
   public Object apply4 (Object arg1, Object arg2,
-			Object arg3, Object arg4) 
+			Object arg3, Object arg4)  throws Throwable
   {
     Object[] args = new Object[4];
     args[0] = arg1;
@@ -57,5 +57,5 @@ public abstract class ProcedureN extends Procedure
     return applyN (args);
   }
 
-  public abstract Object applyN (Object[] args);
+  public abstract Object applyN (Object[] args) throws Throwable;
 }

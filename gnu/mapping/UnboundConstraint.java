@@ -45,7 +45,7 @@ public class UnboundConstraint extends Constraint
     this.environment = environment;
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     // Before reporting an error, check parent environment.
     Object value = binding.value;
@@ -54,7 +54,7 @@ public class UnboundConstraint extends Constraint
       binding.value = value = environment.previous.lookup(binding.getName());
     if (value != null)
       return ((Binding) value).get();
-    throw new UnboundSymbol(binding.getName());
+    return defaultValue;
   }
 
   public boolean isBound (Binding binding)

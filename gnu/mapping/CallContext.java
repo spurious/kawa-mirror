@@ -1,4 +1,4 @@
-package gnu.mapping;
+ package gnu.mapping;
 import gnu.math.*;
 import gnu.lists.*;
 
@@ -166,7 +166,7 @@ public class CallContext implements Runnable
       }
   }
 
-  public void run()
+  public void runUntilDone()  throws Throwable
   {
     for (;;)
       {
@@ -181,6 +181,26 @@ public class CallContext implements Runnable
 	  break;
 	this.proc = null;
 	proc.apply(this);
+      }
+  }
+
+  public void run()
+  {
+    try
+      {
+	runUntilDone();
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
       }
   }
 

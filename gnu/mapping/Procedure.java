@@ -38,18 +38,18 @@ public abstract class Procedure implements Named, Printable
     setName(n);
   }
 
-  public abstract Object applyN (Object[] args);
+  public abstract Object applyN (Object[] args) throws Throwable;
 
-  public abstract Object apply0 ();
+  public abstract Object apply0 () throws Throwable;
 
-  public abstract Object apply1 (Object arg1);
+  public abstract Object apply1 (Object arg1) throws Throwable;
 
-  public abstract Object apply2 (Object arg1,Object arg2);
+  public abstract Object apply2 (Object arg1,Object arg2) throws Throwable;
 
-  public abstract Object apply3 (Object arg1, Object arg2, Object arg3);
+  public abstract Object apply3 (Object arg1, Object arg2, Object arg3) throws Throwable;
 
   public abstract Object apply4(Object arg1,Object arg2,
-				Object arg3,Object arg4);
+				Object arg3,Object arg4) throws Throwable;
 
   /** Minimum number of arguments required. */
   public final int minArgs() { return numArgs() & 0xFFF; }
@@ -94,7 +94,7 @@ public abstract class Procedure implements Named, Printable
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */
 
-  public void apply (CallContext ctx)
+  public void apply (CallContext ctx) throws Throwable
   {
     Object result;
     int count = ctx.count;
@@ -147,17 +147,17 @@ public abstract class Procedure implements Named, Printable
   }
 
   /** If HasSetter, the Procedure is called in the LHS of an assignment. */
-  public void set0(Object result)
+  public void set0(Object result) throws Throwable
   {
     getSetter().apply1(result);
   }
 
-  public void set1(Object arg1, Object value)
+  public void set1(Object arg1, Object value) throws Throwable
   {
     getSetter().apply2(arg1, value);
   }
 
-  public void setN (Object[] args)
+  public void setN (Object[] args) throws Throwable
   {
     getSetter().applyN(args);
   }

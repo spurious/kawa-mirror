@@ -246,16 +246,17 @@ public class Environment extends NameMap
     Binding.hashDelete(table, log2Size, name);
   }
 
-  /** Get the value bound to the given name.
-   * @exception gnu.mapping.UnboundSymbol the name has no binding
-   * @see Environment#get(Object)
-   */
-  public Object getChecked(String name)
+  public final boolean isBound(String name)
   {
-    Binding binding = lookup (name);
+    return get(name, Binding.UNBOUND) != Binding.UNBOUND;
+  }
+
+  public Object get(String name, Object defaultValue)
+  {
+    Binding binding = lookup(name);
     if (binding == null)
-      throw new UnboundSymbol(name);
-    return binding.get ();
+      return defaultValue;
+    return binding.get(defaultValue);
   }
 
   /** Get the function binding for a symbol.

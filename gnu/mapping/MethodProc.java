@@ -86,7 +86,7 @@ public abstract class MethodProc extends ProcedureN
     // return match(vars) == 0 ? vars : null;
   }
 
-  public abstract Object applyV(CallContext ctx);
+  public abstract Object applyV(CallContext ctx) throws Throwable;
   // FUTURE:
   // ctx.run();
 
@@ -102,7 +102,7 @@ public abstract class MethodProc extends ProcedureN
     throw new WrongType(proc, arg, null);
   }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
     CallContext vars = new CallContext();

@@ -68,7 +68,7 @@ public class TtyInPort extends InPort
 		  }
 	      }
 	  }
-	catch (Exception ex)
+	catch (Throwable ex)
 	  { throw new java.io.IOException("Error when evaluating prompt:"
 					  + ex); }
       }

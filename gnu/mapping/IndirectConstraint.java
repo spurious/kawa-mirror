@@ -2,14 +2,44 @@ package gnu.mapping;
 
 public class IndirectConstraint extends Constraint
 {
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
-    return ((Procedure) binding.value).apply0();
+    try
+      {
+	return ((Procedure) binding.value).apply0();
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public void set (Binding binding, Object value)
   {
-    ((Procedure) (HasSetter) binding.value).set0(value);
+    try
+      {
+	((Procedure) (HasSetter) binding.value).set0(value);
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public static void define (String name, Procedure location)

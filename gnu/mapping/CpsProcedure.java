@@ -12,9 +12,9 @@ public abstract class CpsProcedure extends MethodProc
   {
   }
 
-  public abstract void apply (CallContext stack);
+  public abstract void apply (CallContext stack) throws Throwable;
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     int count = args.length;
     checkArgCount(this, count);
@@ -43,7 +43,7 @@ public abstract class CpsProcedure extends MethodProc
     return 0;
   }
 
-  public Object applyV(CallContext ctx)
+  public Object applyV(CallContext ctx) throws Throwable
   {
     Consumer consumerSave = ctx.consumer;
     ValueStack vstack = ctx.vstack;
@@ -52,7 +52,7 @@ public abstract class CpsProcedure extends MethodProc
     int oindexSave = vstack.oindex;
     try
       {
-	ctx.run();
+	ctx.runUntilDone();
 	return Values.make(vstack, dindexSave, vstack.gapStart);
       }
     finally

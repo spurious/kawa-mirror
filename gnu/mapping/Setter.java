@@ -21,6 +21,6 @@ public class Setter extends ProcedureN
     else return get_args + 0x1001;
   }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   { getter.setN(args);  return Values.empty; }
 }

@@ -11,7 +11,7 @@ public class Future extends Thread
   InPort in;
   OutPort out;
   OutPort err;
-  Exception exception;
+  Throwable exception;
 
   Procedure action;
 
@@ -58,7 +58,7 @@ public class Future extends Thread
       {
 	result = action.apply0 ();
       }
-    catch (Exception ex)
+    catch (Throwable ex)
       {
 	exception = ex;
       }

@@ -84,7 +84,7 @@ public class Values extends TreeList implements Printable, Externalizable
   }
 
   /** Apply a Procedure with these values as the arguments. */
-  public Object call_with (Procedure proc)
+  public Object call_with (Procedure proc) throws Throwable
   {
     return proc.applyN (toArray());
   }

@@ -1,3 +1,27 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* Constraint.java, AliasConstraint.java, ConstantConstraint.java,
+	FluidConstraint.java, IndirectConstraint.java, TrivialConstraint.java,
+	UnboundConstraint.java, Binding.java (get):   Now takes extra
+	defaultValue argument.
+	* NameMap.java (getChecked):  Make final, not abstract,
+	(get(String,Object)):  New abstract method.
+	* Environment.java (get):   New method takes defaultValue argument.
+	(isBound):  Make final.
+	(getChecked):  Moved to NameMap and made final
+
+	* Procedure.java, Procedure0.java, Procedure0or1.java, Procedure1.java,
+	Procedure1or2.java, Procedure2.java, Procedure3.java, Procedure4.java,
+	ProcedureN.java, CpsProcedure.java, MethodProc.java, Setter.java,
+	Setter0.java, Setter1.java (apply* methods, set* methods):
+	Now specify throws Throwable.
+	* Values.java (call_with):  Likewise.
+	* Future.java, ProcLocation.java, TtyInPort.java:  Catch Throwable.
+	* IndirectConstraint.java (get. set):  Catch and wrap Throwable.
+	* CallContext.java (runUntilDone):  New method, throw Throwable.
+	(run):  Use runUntilDone.  Catch Throwable.
+	* CpsProcedure.java (applyV):  Use new CallContext.runUntilDone method.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	* CallContext.java:  Remove 'final' attribute.

@@ -53,7 +53,7 @@ public class ConstantConstraint extends Constraint
     return true;
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     return binding.value;
   }

@@ -8,10 +8,10 @@ public class Setter0 extends Setter
 
   public int numArgs() { return 0x1001; }
 
-  public Object apply1(Object result)
+  public Object apply1(Object result) throws Throwable
   { getter.set0(result);  return Values.empty; }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   {
     int nargs = args.length;
     if (nargs != 1)

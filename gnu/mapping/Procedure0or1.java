@@ -21,9 +21,9 @@ public abstract class Procedure0or1 extends Procedure
 
   public int numArgs() { return 0x1000; }
 
-  public abstract Object apply0 ();
+  public abstract Object apply0 () throws Throwable;
 
-  public abstract Object apply1 (Object arg1);
+  public abstract Object apply1 (Object arg1) throws Throwable;
 
   public Object apply2 (Object arg1,Object arg2)
   {
@@ -40,7 +40,7 @@ public abstract class Procedure0or1 extends Procedure
     throw new WrongArguments(this, 4);
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     if (args.length == 0)
       return apply0 ();

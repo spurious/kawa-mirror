@@ -16,7 +16,25 @@ public class ProcLocation extends Location
     this.args = args;
   }
 
-  public Object get () { return proc.applyN(args); }
+  public Object get ()
+  {
+    try
+      {
+	return proc.applyN(args);
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
+  }
 
   public void set (Object value)
   {
@@ -24,6 +42,21 @@ public class ProcLocation extends Location
     Object[] xargs = new Object[len + 1];
     xargs[len] = value;
     System.arraycopy(args, 0, xargs, 0, len);
-    proc.setN(xargs);
+    try
+      {
+	proc.setN(xargs);
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 }

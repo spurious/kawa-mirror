@@ -14,6 +14,14 @@ import gnu.mapping.*;
 
 public abstract class Language extends Interpreter
 {
+  public static void setDefaults (Language lang)
+  {
+    Language.setDefaultLanguage(lang);
+    Environment env = lang.getEnvironment();
+    Environment.setCurrent(env);
+    Environment.setGlobal(env);
+  }
+
   public Procedure getPrompter()
   {
     Object property = null;

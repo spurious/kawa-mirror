@@ -73,21 +73,21 @@ public abstract class Interpreter
     languages = newLangs;
   }
 
-  public static Interpreter getInstanceFromFilenameExtension(String filename)
+  public static Language getInstanceFromFilenameExtension(String filename)
   {
     int dot = filename.lastIndexOf('.');
     if (dot > 0)
       {
-	Interpreter interp = Interpreter.getInstance(filename.substring(dot));
-	if (interp != null)
-	  return interp;
+	Language lang = Language.getInstance(filename.substring(dot));
+	if (lang != null)
+	  return lang;
       }
     return null;
   }
 
-  /** Look for an interpreter for a language with the given name or extension.
+  /** Look for a language with the given name or extension.
    * If name is null, look for the first language available. */
-  public static Interpreter getInstance (String name)
+  public static Language getInstance (String name)
   {
     int langCount = languages.length;
     for (int i = 0;  i < langCount;  i++)
@@ -122,7 +122,7 @@ public abstract class Interpreter
     gnu.lists.Convert.setInstance(KawaConvert.getInstance());
   }
 
-  public static Interpreter getInstance (String langName, Class langClass)
+  public static Language getInstance (String langName, Class langClass)
   {
     try
       {
@@ -141,7 +141,7 @@ public abstract class Interpreter
 	    method
 	      = langClass.getDeclaredMethod("getInstance", args);
 	  }
-	return (Interpreter) method.invoke(null, Values.noArgs);
+	return (Language) method.invoke(null, Values.noArgs);
       }
     catch (Exception ex)
       {

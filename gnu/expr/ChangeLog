@@ -1,3 +1,9 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	*  Interpreter.java (getInstance): Change return type.
+	(getInstanceFromFilenameExtension): Change return type and internals.
+	* Language.java (setDefaults): New static helper method.
+
 2005-02-16  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (setName): Move closer to getName and setSymbol.

@@ -20,7 +20,7 @@
 
 (define (minibuffer-depth) 0)  ;; FIXME
 
-;; Should use stf, not setq, and guard against duplicate evaluation.  FIXME.
+;; Should use setf, not setq, and guard against duplicate evaluation.  FIXME.
 (define-syntax push
   (syntax-rules ()
 		((push x place)

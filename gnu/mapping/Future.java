@@ -5,6 +5,8 @@ public class Future extends Thread
   Object result;
   Future parent;
 
+  public FluidBinding fluidBindings;
+
   Environment environment;
   InPort in;
   OutPort out;
@@ -36,7 +38,7 @@ public class Future extends Thread
     else
       parent_env = Environment.user();
       
-    environment = new Environment (parent_env);
+    environment = parent_env;
   }
 
   public void run ()
@@ -70,6 +72,36 @@ public class Future extends Thread
     return result;
   }
 
+  public void setFluids (FluidBinding new_fluids)
+  {
+    FluidBinding old_fluids = fluidBindings;
+    FluidBinding fluid = new_fluids;
+    for ( ; fluid != old_fluids;  fluid = fluid.previous)
+      {
+	Binding binding = fluid.binding;
+	Constraint constraint = binding.constraint;
+	if (constraint instanceof FluidConstraint)
+	  ((FluidConstraint) constraint).referenceCount++;
+	else
+	  binding.constraint = new FluidConstraint(constraint);
+      }
+    fluidBindings = new_fluids;
+  }
+
+  public void resetFluids (FluidBinding old_fluids)
+  {
+    FluidBinding new_fluids = fluidBindings;
+    FluidBinding fluid = new_fluids;
+    for ( ; fluid != old_fluids;  fluid = fluid.previous)
+      {
+	Binding binding = fluid.binding;
+	FluidConstraint constraint = (FluidConstraint) binding.constraint;
+	if (constraint.referenceCount-- <= 0)
+	  binding.constraint = constraint.savedConstraint;
+      }
+    fluidBindings = old_fluids;
+  }
+
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append ("#<future ");
@@ -78,4 +110,22 @@ public class Future extends Thread
     return buf.toString();
   }
 
+
+  static Future defaultContext = null;
+
+  static synchronized void getDefaultContext ()
+  {
+    if (defaultContext == null)
+      defaultContext = new Future(null);
+  }
+
+  public static Future getContext ()
+  {
+    Thread thread = Thread.currentThread();
+    if (thread instanceof Future)
+      return (Future)thread;
+    if (defaultContext == null)
+      getDefaultContext();
+    return defaultContext;
+  }
 }

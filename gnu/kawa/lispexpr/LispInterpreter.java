@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;
 import kawa.lang.Translator; // FIXME
+import gnu.mapping.Values;
 
 /** Interpreter sub-class for Lisp-like languages (including Scheme). */
 
@@ -27,8 +28,9 @@ public abstract class LispInterpreter extends Interpreter
       mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     String fname = lexer.getName();
     mexp.setFile(fname);
-    java.util.Vector forms = new java.util.Vector(20);
+    Values forms = new Values();
     tr.push(mexp);
+    int first = tr.formStack.size();
     LispReader reader = (LispReader) lexer;
     for (;;)
       {
@@ -39,13 +41,13 @@ public abstract class LispInterpreter extends Interpreter
 	      return null;  // FIXME
 	    break;
 	  }
-	if (! tr.scan_form (sexp, forms, mexp)
-	    || (options & PARSE_ONE_LINE) != 0)
+	tr.scanForm(sexp, mexp);
+	if ((options & PARSE_ONE_LINE) != 0)
 	  break;
       }
     if (lexer.peek() == ')')
       lexer.fatal("An unexpected close paren was read.");
-    tr.finishModule(mexp, forms);
+    tr.finishModule(mexp, first);
     return tr;
   }
 

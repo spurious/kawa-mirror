@@ -208,7 +208,7 @@ public class Environment extends NameMap
 
   public void remove (Binding binding)
   {
-    Binding.hashDelete(table, log2Size, binding.sym_name);
+    Binding.hashDelete(table, log2Size, binding.getName());
   }
 
   /** Get the value bound to the given name.

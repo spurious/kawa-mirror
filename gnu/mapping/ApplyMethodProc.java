@@ -62,7 +62,7 @@ public class ApplyMethodProc extends ProcedureN
 
   public static Object apply0Default(ApplyMethodProc method)
   {
-    return method.module.applyN(method, Procedure.noArgs);
+    return method.module.applyN(method, Values.noArgs);
   }
 
   public static Object apply1Default(ApplyMethodProc method, Object arg1)

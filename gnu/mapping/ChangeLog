@@ -1,3 +1,15 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* CharArrayInPort.java:  Moved from gnu.text.
+	* Makefile.am (java_JAVA):  Update accordingty.
+
+	* Procedure.java:  Remove non-private methods.
+	(noArgs)  Remove.
+	(sym_name):  Make private.
+	* ProcedureN.java (apply0):  Use Values.noArgs, not Procedure.noArgs.
+	* ApplyMethodProc.java (apply0Default):  Likewise.
+	* Environment.java (remove):  Use getName instead of sym_name. 
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* Environment.java (defineValue, getFunction, putFunction):  New.

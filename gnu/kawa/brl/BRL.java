@@ -62,7 +62,7 @@ public class BRL extends Scheme
     return lexer;
   }
 
-  public Consumer getOutputConsumer(OutPort out)
+  public Consumer getOutputConsumer(java.io.Writer out)
   {
     if (isBrlCompatible())
       return super.getOutputConsumer(out);

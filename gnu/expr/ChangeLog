@@ -1,3 +1,9 @@
+2003-05-31  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getOutputConsumer):  Generalize to take Writer.
+	(eval(String,PrintConsumer)):  Call getOutputConsumer.
+	(eval(Reader,Writer)):  Likewise,
+
 2003-05-30  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (declareClosureEnv):  Simplify - if inline-only,

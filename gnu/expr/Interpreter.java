@@ -337,10 +337,12 @@ public abstract class Interpreter
 
   public abstract FormatToConsumer getFormat(boolean readable);
 
-  public Consumer getOutputConsumer(OutPort out)
+  public Consumer getOutputConsumer(Writer out)
   {
-    out.objectFormat = getFormat(false);
-    return out;
+    OutPort oport = out instanceof OutPort ? (OutPort) out
+      : new OutPort(out);
+    oport.objectFormat = getFormat(false);
+    return oport;
   }
 
   public Environment getNewEnvironment ()
@@ -546,7 +548,7 @@ public abstract class Interpreter
   /** Evaluate a string and write the result value(s) on a Writer. */
   public final void eval (String string, Writer out) throws Throwable
   {
-    eval(string, out instanceof Consumer ? (Consumer) out : new OutPort(out));
+    eval(new CharArrayInPort(string), out);
   }
 
   /** Evaluate a string and write the result value(s) to a PrintConsumer.
@@ -554,7 +556,7 @@ public abstract class Interpreter
    * which are both Writer and Consumer. */
   public final void eval (String string, PrintConsumer out) throws Throwable
   {
-    eval(string, (Consumer) out);
+    eval(string, getOutputConsumer(out));
   }
 
   /** Evaluate a string and write the result value(s) to a Consumer. */
@@ -566,7 +568,7 @@ public abstract class Interpreter
   /** Read expressions from a Reader and write the result to a Writer. */
   public final void eval (Reader in, Writer out) throws Throwable
   {
-    eval(in, out instanceof Consumer ? (Consumer) out : new OutPort(out));
+    eval(in, getOutputConsumer(out));
   }
 
   /** Read expressions from a Reader and write the result to a Consumer. */

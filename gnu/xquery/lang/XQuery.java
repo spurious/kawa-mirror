@@ -233,7 +233,7 @@ public class XQuery extends Interpreter
     return writeFormat;
   }
 
-  public Consumer getOutputConsumer(OutPort out)
+  public Consumer getOutputConsumer(java.io.Writer out)
   {
     return new XMLPrinter(out, false);
   }

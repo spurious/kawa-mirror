@@ -1,18 +1,22 @@
-//Copyright (c) 2004 Christian Surlykke.
 //This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swt;
 
+import java.util.Iterator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-
 import gnu.jemacs.buffer.Buffer;
 import gnu.jemacs.buffer.EFrame;
+import gnu.lists.FString;
+import gnu.lists.FVector;
 import gnu.lists.LList;
+import gnu.lists.Pair;
 
 /**
  * @author Christian Surlykke
@@ -22,9 +26,8 @@ public class SwtFrame extends EFrame
 {
 
   private Shell shell;
-  private Display display;
   private SwtWindow swtWindow;
-  private Menu menu;
+  private Menu menubar;
   
   public SwtFrame ()
   {
@@ -40,39 +43,10 @@ public class SwtFrame extends EFrame
   {
     super(window);
     this.swtWindow = window;
-
-    Runnable uiThread = new Runnable() 
-    {
-      public void run()
-      {
-          display = new Display ();
-          shell = new Shell (display);
-          shell.setLayout(new FillLayout());
-          swtWindow.getReadyToShow(shell);
-          shell.open ();
-          
-          while (!shell.isDisposed ()) 
-          {
-            try
-            {
-              if (!display.readAndDispatch ())
-              {
-                display.sleep ();
-              }
-            }
-            catch (Exception e) 
-            {
-              e.printStackTrace();
-            }
-          }
-          display.dispose ();
-      }
-    };
-    
-    Thread thread = new Thread(uiThread);
-    thread.start();
+    shell = SwtHelper.newShell(SwtHelper.getDisplay(), new FillLayout());
+    swtWindow.getReadyToShow(shell);
   }
-  
+
   /**
    * @see gnu.jemacs.buffer.EFrame#isLive()
    */
@@ -107,9 +81,78 @@ public class SwtFrame extends EFrame
   /**
    * @see gnu.jemacs.buffer.EFrame#setMenu(gnu.lists.LList)
    */
-  public void setMenu(LList menu)
+  public void setMenu(LList list)
   {
-    // TODO
-  }
+    if (menubar != null)
+    {
+      SwtHelper.dispose(menubar);
+    }
 
+    menubar = SwtHelper.newMenu(shell, SWT.BAR );
+    setMenuHelper(menubar, list);
+    SwtHelper.setMenuBar(shell, menubar);
+  }
+  
+  /**
+   * Heavily inspired from gnu.jemacs.swing.SwingMenu
+   */
+  private void setMenuHelper(Menu parent, LList list)
+  {
+    
+    for (Iterator iter = list.iterator(); iter.hasNext();)
+    {
+      Object o = iter.next();
+      try
+      {
+        if (o == null) 
+        {
+          continue;
+        }
+        else if (o instanceof Pair)
+        {
+          FString menuName = (FString) ((Pair) o).car;
+          MenuItem menuItem = SwtHelper.newMenuItem(parent, SWT.CASCADE, menuName.toString(), null);
+          Menu subMenu = SwtHelper.newMenu(menuItem);
+          setMenuHelper(subMenu, (LList) ((Pair) o).cdr);
+          SwtHelper.setMenu(menuItem, subMenu);
+        }
+        else if (o instanceof FVector) 
+        {
+          FString menuItemName = (FString) ((FVector) o).get(0);
+          Object command = ((FVector) o).get(1);
+          SwtHelper.newMenuItem(parent, SWT.DROP_DOWN, menuItemName.toString(), new MenuCommandHandler(command));
+        }
+        else if (o instanceof FString) 
+        {
+         SwtHelper.newMenuItem(parent, SWT.SEPARATOR, null, null); 
+        }
+      }
+      catch (Exception e) 
+      {
+        System.err.println("SwtFrame.setMenu - problem with " + o);
+      }
+    }
+  }
+  
+  class MenuCommandHandler implements SelectionListener
+  {
+    private Object command;
+    
+    public MenuCommandHandler(Object command)
+    {
+      this.command = command;
+    }
+
+    public void widgetSelected(SelectionEvent e)
+    {
+      selectedWindow.handleCommand(command);
+    }
+
+    public void widgetDefaultSelected(SelectionEvent e)
+    {
+      selectedWindow.handleCommand(command);
+    }
+    
+  }
+  
 }

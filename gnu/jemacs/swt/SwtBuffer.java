@@ -1,4 +1,3 @@
-//Copyright (c) 2004 Christian Surlykke.
 //This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swt;
@@ -126,7 +125,6 @@ public class SwtBuffer extends Buffer
    */
   public void insertFile(Reader in) throws Exception
   {
-    (new Exception()).printStackTrace();
     bufferContent.insertFile(in, getDot());
   }
 

@@ -1,4 +1,3 @@
-//Copyright (c) 2004 Christian Surlykke.
 //This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swt;

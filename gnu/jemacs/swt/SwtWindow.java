@@ -1,4 +1,3 @@
-//Copyright (c) 2004 Christian Surlykke.
 //This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swt;
@@ -44,13 +43,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
    */
   public void getReadyToShow(Composite parent)
   {
-    styledText = new StyledText(parent, SWT.BORDER);
-    styledText.setContent(((SwtBuffer) getBuffer()).getBufferContent());
-    
-    styledText.addVerifyKeyListener(this);
-    styledText.addFocusListener(this);
-    styledText.addKeyListener(this);
-    styledText.addMouseListener(this);
+    styledText = SwtHelper.newStyledText(parent, SWT.V_SCROLL | SWT.H_SCROLL, swtBuffer.getBufferContent(), this);
   }
 
   
@@ -104,6 +97,17 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
   }
 
 
+  
+  public void handleCommand(Object command)
+  {
+    int oldDot = getBuffer().getDot();
+    super.handleCommand(command);
+    styledText.redraw();
+    if (oldDot != getBuffer().getDot())
+    {
+      styledText.showSelection();
+    }
+  }
   
   /**
    * @see gnu.jemacs.buffer.EWindow#setSelected()
@@ -224,6 +228,7 @@ public class SwtWindow extends EWindow implements VerifyKeyListener, FocusListen
     if (EWindow.getSelected() == this)  // Is this nessecary - aren't we always selected when this event arrives?
     {
       buffer.setDot(styledText.getCaretOffset());
+      styledText.showSelection();
     }
   }
 

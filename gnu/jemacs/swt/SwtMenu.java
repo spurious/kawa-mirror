@@ -1,4 +1,3 @@
-//Copyright (c) 2004 Christian Surlykke.
 //This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.swt;
@@ -13,7 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * @author Christian Surlykke - heavily inspired from gnu.jemacs.swing.SwingMenu
+ * @author Christian Surlykke
  *         26-07-2004
  */
 public class SwtMenu extends Menu implements EMenu

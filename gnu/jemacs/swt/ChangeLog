@@ -1,3 +1,25 @@
+2004-08-28  Christian Surlykke <christian@surlykke.dk>
+
+	Added menus to the SwtFrontend.
+	Removed meaningless copyright statements.
+	* BufferContent.java: Removed copyright statement.
+	* CommandDialog.java: Removed copyright statement.
+	* SwtBuffer.java: Removed copyright statement.
+	Removed a debug statement
+	* SwtFrame.java: Removed copyright statement.
+	Removed creation of Swt-GUI-thread from constructor.
+	Changed all calls to SWT to go through new class SwtHelper
+	Added implementation of SetMenu.
+	* SwtMenu.java: Removed copyright statement.
+	Removed meaningless comment.
+	* SwtToolkit.java: Removed copyright statement
+	* SwtWindow.java: Removed copyright statement.
+	Changed all calls to SWT to go through new class SwtHelper
+	Added override of EWindow.handleCommand to call 
+	StyledText.redraw and StyledText.showSelection after processing.
+	Added call of StyledText.showSelection to setSelected()
+	* SwtHelper.java: New class to act as layer between SWT and SwtJemacs.
+	     
 2004-08-04  Christian Surlykke <christian@surlykke.dk>
 
 	New preliminary GUI implementation, using SWT instead of Swing.

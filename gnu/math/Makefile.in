@@ -48,8 +48,10 @@ javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
   Numeric.class \
-  RealNum.class \
-  DFloNum.class \
+  Quantity.class DQuantity.class CQuantity.class \
+  Complex.class CComplex.class DComplex.class \
+  BaseUnit.class Unit.class MulUnit.class Dimensions.class \
+  RealNum.class DFloNum.class \
   RatNum.class \
   IntFraction.class \
   MPN.class \

@@ -1,9 +1,10 @@
 package kawa.math;
 import kawa.lang.*;
 
-public abstract class RealNum extends Numeric
+public abstract class RealNum extends Complex
 {
-  public abstract double doubleValue ();
+  public final RealNum re() { return this; }
+  public final RealNum im() { return IntNum.zero(); }
 
   public abstract boolean isNegative ();
 
@@ -19,9 +20,11 @@ public abstract class RealNum extends Numeric
     throw new IllegalArgumentException ();
   }
 
-  public boolean equ (Object x)
+  public boolean equals (Object obj)
   {
-    return compare (x) == 0;
+    if (obj == null || ! (obj instanceof RealNum))
+      return false;
+    return compare (obj) == 0;
   }
 
   public boolean grt (Object x)
@@ -52,10 +55,27 @@ public abstract class RealNum extends Numeric
     return result;
   }
 
+  public static RealNum add (RealNum x, RealNum y, int k)
+  {
+    return (RealNum)(x.add(y, k));
+  }
+
+  public static RealNum mul (RealNum x, RealNum y)
+  {
+    return (RealNum)(x.mul(y));
+  }
+
+  /* These are defined in Complex, but have to be overridden. */
+  public abstract Numeric add (Object obj, int k);
+  public abstract Numeric mul (Object obj);
+  public abstract Numeric div (Object obj);
+
   public Numeric abs ()
   {
     return isNegative () ? neg () : this;
   }
+
+  public final RealNum rneg() { return (RealNum) neg(); }
 
   public boolean isZero ()
   {

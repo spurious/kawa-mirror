@@ -39,36 +39,20 @@ public class IntFraction extends RatNum
     return RatNum.compare ((RatNum) x, this);
   }
 
-  public Numeric add (Object y)
+  public Numeric add (Object y, int k)
   {
     if (y instanceof RatNum)
-      return RatNum.plus (this, (RatNum) y);
+      return RatNum.add (this, (RatNum) y, k);
     if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this);
+    return ((Numeric)y).add_reversed (this, k);
   }
 
-  public Numeric add_reversed (Numeric x)
+  public Numeric add_reversed (Numeric x, int k)
   {
     if (! (x instanceof RatNum))
       throw new IllegalArgumentException ();
-    return RatNum.plus ((RatNum)x, this);
-  }
-
-  public Numeric sub (Object y)
-  {
-    if (y instanceof RatNum)
-      return RatNum.minus (this, (RatNum)y);
-    if (! (y instanceof Numeric))
-      throw new IllegalArgumentException ();
-    return ((Numeric)y).sub_reversed (this);
-  }
-
-  public Numeric sub_reversed (Numeric x)
-  {
-    if (! (x instanceof RatNum))
-      throw new IllegalArgumentException ();
-    return RatNum.minus ((RatNum)x, this);
+    return RatNum.add ((RatNum)x, this, k);
   }
 
   public Numeric mul (Object y)

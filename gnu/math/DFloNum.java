@@ -25,7 +25,7 @@ public class DFloNum extends RealNum implements Compilable
     return new DFloNum (value);
   }
 
-  public double doubleValue ()
+  public final double doubleValue ()
   {
     return value;
   }
@@ -44,35 +44,19 @@ public class DFloNum extends RealNum implements Compilable
 	  == Double.doubleToLongBits(value));
   }
 
-  public Numeric add (Object y)
+  public Numeric add (Object y, int k)
   {
     if (y instanceof RealNum)
-      return new DFloNum (value + ((RealNum)y).doubleValue ());
+      return new DFloNum (value + k * ((RealNum)y).doubleValue ());
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this);
+    return ((Numeric)y).add_reversed (this, k);
   }
 
-  public Numeric add_reversed (Numeric x)
+  public Numeric add_reversed (Numeric x, int k)
   {
     if (x instanceof RealNum)
-      return new DFloNum (((RealNum)x).doubleValue () + value);
-    throw new IllegalArgumentException ();
-  }
-
-  public Numeric sub (Object y)
-  {
-    if (y instanceof RealNum)
-      return new DFloNum (value - ((RealNum)y).doubleValue ());
-    if (!(y instanceof Numeric))
-      throw new IllegalArgumentException ();
-    return ((Numeric)y).sub_reversed (this);
-  }
-
-  public Numeric sub_reversed (Numeric x)
-  {
-    if (x instanceof RealNum)
-      return new DFloNum (((RealNum)x).doubleValue () - value);
+      return new DFloNum (((RealNum)x).doubleValue () + k * value);
     throw new IllegalArgumentException ();
   }
 
@@ -106,6 +90,11 @@ public class DFloNum extends RealNum implements Compilable
     if (x instanceof RealNum)
       return new DFloNum (((RealNum)x).doubleValue () / value);
     throw new IllegalArgumentException ();
+  }
+
+  public Numeric power (IntNum y)
+  {
+    return new DFloNum (Math.pow (doubleValue(), y.doubleValue()));
   }
 
   public boolean isNegative ()

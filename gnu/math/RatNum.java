@@ -59,29 +59,16 @@ public abstract class RatNum extends RealNum
     return RatNum.equals (this, (RatNum) obj);
   }
 
-  public static RatNum plus (RatNum x, RatNum y)
+  public static RatNum add (RatNum x, RatNum y, int k)
   {
     IntNum x_num = x.numerator();
     IntNum x_den = x.denominator();
     IntNum y_num = y.numerator();
     IntNum y_den = y.denominator();
     if (IntNum.equals (x_den, y_den))
-      return RatNum.make (IntNum.plus (x_num, y_num), x_den);
-    return RatNum.make (IntNum.plus (IntNum.times (y_den, x_num),
-				     IntNum.times (y_num, x_den)),
-			IntNum.times (x_den, y_den));
-  }
-
-  public static RatNum minus (RatNum x, RatNum y)
-  {
-    IntNum x_num = x.numerator();
-    IntNum x_den = x.denominator();
-    IntNum y_num = y.numerator();
-    IntNum y_den = y.denominator();
-    if (IntNum.equals (x_den, y_den))
-      return RatNum.make (IntNum.minus (x_num, y_num), x_den);
-    return RatNum.make (IntNum.minus (IntNum.times (y_den, x_num),
-				     IntNum.times (y_num, x_den)),
+      return RatNum.make (IntNum.add (x_num, y_num, k), x_den);
+    return RatNum.make (IntNum.add (IntNum.times (y_den, x_num),
+				    IntNum.times (y_num, x_den), k),
 			IntNum.times (x_den, y_den));
   }
 
@@ -97,43 +84,28 @@ public abstract class RatNum extends RealNum
 			IntNum.times (x.denominator(), y.numerator()));
   }
 
-  public static RatNum power (RatNum x, IntNum y)
+  public Numeric power (IntNum y)
   {
-    int i = y.ival;
-    if (y.words != null || i > 1000000 || i < -1000000)
+    boolean inv;
+    if (y.isNegative())
       {
-	IntNum xi;
-	if (x instanceof IntNum && (xi = (IntNum) x).words == null)
-	  {
-	    i = xi.ival;
-	    if (i == 0)
-	      return y.isNegative () ? RatNum.Infinity : (RatNum) x;
-	    if (i == 1)
-	      return xi;
-	    if (i == -1)
-	      return y.isOdd () ? xi : IntNum.one ();
-	  }
-	throw new ArithmeticException ("exponent too big");
+	inv = true;
+	y = IntNum.neg(y);
       }
-    return power (x, i);
-  }
-
-  public static RatNum power (RatNum x, int i)
-  {
-    if (i == 0)
-      return IntNum.one ();
-    if (x.isZero ())
-      return i < 0 ? RatNum.Infinity : (RatNum) x;
-    if (i < 0)
+    else
+      inv = false;
+    if (y.words == null)
       {
-	i = -i;
-	return RatNum.make (IntNum.power (x.denominator (), i),
-			    IntNum.power (x.numerator (), i));
+	IntNum num = IntNum.power (numerator(), y.ival);
+	IntNum den = IntNum.power (denominator(), y.ival);
+	return inv ? RatNum.make (den, num) : RatNum.make (num, den);
       }
-    if (x instanceof IntNum)
-      return IntNum.power ((IntNum) x, i);
-    return RatNum.make (IntNum.power (x.numerator (), i),
-			IntNum.power (x.denominator (), i));
+    double d = doubleValue();
+    boolean neg = d < 0.0 && y.isOdd();
+    d = Math.pow (d, y.doubleValue());
+    if (inv)
+      d = 1.0/d;
+    return new DFloNum (neg ? -d : d);
   }
 
   public final RatNum toExact ()
@@ -143,9 +115,6 @@ public abstract class RatNum extends RealNum
 
   public RealNum toInt (int rounding_mode)
   {
-    // FIXME - divide (..., ROUND) not implemented for bignums!
-    if (rounding_mode == ROUND)
-      return super.toInt (ROUND);
     return IntNum.quotient (numerator(), denominator(), rounding_mode);
   }
 
@@ -177,19 +146,14 @@ public abstract class RatNum extends RealNum
     RealNum fy = y.toInt (FLOOR);
     if (! x.grt(fx))
       return fx;
-    else if (fx.equ(fy))
+    else if (fx.equals(fy))
       {
 	RealNum n = (RealNum) IntNum.one().div(y.sub(fy));
 	RealNum d = (RealNum) IntNum.one().div(x.sub(fx));
-	return (RealNum) fx.add(IntNum.one().div(simplest_rational2 (n, d)));
+	return (RealNum) fx.add(IntNum.one().div(simplest_rational2 (n, d)),
+				1);
       }
     else
-      return (RealNum) fx.add(IntNum.one());
+      return (RealNum) fx.add(IntNum.one(), 1);
   }
-
-  public String toString ()
-  {
-    return toString (10);
-  }
-
 }

@@ -1,3 +1,26 @@
+Fri Jan  3 14:44:53 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Implemented units, quantities, and dimensions for measurements.
+	Implemented complex numbers.
+	* BaseUnit.java, CComplex.java, CQuantity.java, Complex.java,
+	DComplex.java, DFloNum.java, DQuantity.java, MulUnit.java,
+	Quantity.java, Unit.java:  New files.
+	* Makefile.am, Makefile.in:  Update accordingly.
+
+	* Numeric.java, RatNum.java, RatNum.java, IntFraction.java (add,
+	add_reversed):  Virtual and static methods changed to take extra
+	int parameter that second argument is multiplied by.
+	Likewise for static add/plus methods.
+	Rename generalized static plus functions to add.
+	(sub, sub_reversed):  Virtual methods removed.
+
+	* Numeric (div_inv, mul_ident, power):  New methods.
+	* IntNum.java (divide):  Implement ROUND mode for bignum.
+	* RatNum.java, IntNum.java (power):  Re-written.
+	* RealNum.java:  Now inherits from Complex.
+	(re, im, rneg):  New methods.
+	(equ):  Renamed to equals.
+
 Sun Dec 15 22:19:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* DFloNum.java (toExact):  New method.

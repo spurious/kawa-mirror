@@ -248,24 +248,24 @@ public class IntNum extends RatNum implements Compilable
   }
 
   /** Add two ints, yielding an IntNum. */
-  public static final IntNum plus (int x, int y)
+  public static final IntNum add (int x, int y)
   {
     return IntNum.make ((long) x + (long) y);
   }
 
   /** Add an IntNum and an int, yielding a new IntNum. */
-  public static IntNum plus (IntNum x, int y)
+  public static IntNum add (IntNum x, int y)
   {
     if (x.words == null)
-      return IntNum.plus (x.ival, y);
+      return IntNum.add (x.ival, y);
     IntNum result = new IntNum (0);
-    result.setPlus (x, y);
+    result.setAdd (x, y);
     return result.canonicalize ();
   }
 
   /** Set this to the sum of x and y.
    * OK if x==this. */
-  public void setPlus (IntNum x, int y)
+  public void setAdd (IntNum x, int y)
   {
     if (x.words == null)
       {
@@ -292,9 +292,9 @@ public class IntNum extends RatNum implements Compilable
   }
 
   /** Destructively add an int to this. */
-  public final void setPlus (int y)
+  public final void setAdd (int y)
   {
-    setPlus (this, y);
+    setAdd (this, y);
   }
 
   /** Destructively set the value of this to an int. */
@@ -347,98 +347,22 @@ public class IntNum extends RatNum implements Compilable
     words[ival++] = word;
   }
 
-  /** Destructively add y&0xffffffffL to this. */
-  /*
-  public void setPlusUnsigned (int y)
-  {
-    setPlusUnsigned (this, y);
-  }
-  */
-
-  /** Destructively set this to the sum of x and y&0xffffffffL.
-   * It is OK for x==this.*/
-  /*
-  public void setPlusUnsigned (IntNum x, int y)
-  {
-    long carry = (long) y & 0xffffffffL;
-    if (x.words == null)
-      {
-	set ((long) x.ival + carry);
-	return;
-      }
-    int i;
-    boolean neg = x.isNegative ();
-    realloc (x.ival + 1);
-    for (i = 0;  i < x.ival;  i++)
-      {
-	if (carry == 0)
-	  {
-	    for (; i < x.ival; i++)
-	      words[i] = x.words[i];
-	    ival = i;
-	    return;
-	  }
-	carry = ((long) x.words[i] & 0xffffffffL) + carry;
-	words[i] = (int) carry;
-	carry >>= 32;
-      }
-    if (neg)
-      carry--;
-    words[i] = (int) carry;
-    ival = IntNum.wordsNeeded (words, i);
-  }
-  */
-
-  /** Destructively set this to the difference of x and y&0xffffffffL.
-   * It is OK for x==this.*/
-  public void setMinusUnsigned (IntNum x, int y)
-  {
-    long carry = (long) y & 0xffffffffL;
-    if (x.words == null)
-      {
-	set ((long) x.ival - carry);
-	return;
-      }
-    throw new Error ("not implemented - setMinusUnsigned for bignum");
-    /*
-    ???;
-    int i;
-    boolean neg = x.isNegative ();
-    realloc (x.ival + 1);
-    for (i = 0;  i < x.ival;  i++)
-      {
-	carry = ((long) x.words[i] & 0xffffffffL) + carry;
-	words[i] = (int) carry;
-	carry >>= 32;
-      }
-    if (neg)
-      carry--;
-    words[i] = (int) carry;
-    ival = wordsNeeded (words, i);
-    */
-  }
-
-  /** Subtract two IntNums, yielding their difference as another IntNum. */
-  public static IntNum minus (IntNum x, IntNum y)
+  /** Add two IntNums, yielding their sum as another IntNum. */
+  public static IntNum add (IntNum x, IntNum y, int k)
   {
     if (x.words == null && y.words == null)
-      return IntNum.make ((long) x.ival - (long) y.ival);
-    // Inefficient.  FIXME.
-    return plus (x, IntNum.neg (y));
-  }
-
-  /** Add two IntNums, yielding their sum as another IntNum. */
-  public static IntNum plus (IntNum x, IntNum y)
-  {
-    if (x.words == null)
+      return IntNum.make ((long) x.ival + (long) k * (long) y.ival);
+    if (k != 1)
       {
-	if (y.words == null)
-	  return IntNum.plus (x.ival, y.ival);
+	if (k == -1)
+	  y = IntNum.neg (y);
 	else
-	  return IntNum.plus (y, x.ival);
+	  y = IntNum.times (y, IntNum.make (k));
       }
+    if (x.words == null)
+      return IntNum.add (y, x.ival);
     if (y.words == null)
-      return IntNum.plus (x, y.ival);
+      return IntNum.add (x, y.ival);
     // Both are big
     int len;
     if (y.ival > x.ival)
@@ -714,7 +638,17 @@ public class IntNum extends RatNum implements Compilable
 	      add_one = true;
 	    break;
 	  case ROUND:
-	    throw new Error ("ROUND mode not implemented for divide");
+	    // int cmp = compare (remainder<<1, abs(y));
+	    IntNum tmp = remainder == null ? new IntNum() : remainder;
+	    tmp.set (ywords, rlen);
+	    tmp = shift (tmp, 1);
+	    if (yNegative)
+	      tmp.setNegative();
+	    int cmp = compare (tmp, y);
+	    // Now cmp == compare(sign(y)*(remainder<<1), y)
+	    if (yNegative)
+	      cmp = -cmp;
+	    add_one = (cmp == 1) || (cmp == 0 && (xwords[0]&1) != 0);
 	  }
       }
     if (quotient != null)
@@ -728,7 +662,7 @@ public class IntNum extends RatNum implements Compilable
 	      quotient.setNegative ();
 	  }
 	else if (add_one)
-	  quotient.setPlus (1);
+	  quotient.setAdd (1);
       }
     if (remainder != null)
       {
@@ -789,6 +723,19 @@ public class IntNum extends RatNum implements Compilable
     return rem.canonicalize ();
   }
 
+  public Numeric power (IntNum y)
+  {
+    if (isOne())
+      return this;
+    if (isMinusOne())
+      return y.isOdd () ? this : IntNum.one ();
+    if (y.words == null && y.ival >= 0)
+      return power (this, y.ival);
+    if (isZero())
+      return y.isNegative () ? RatNum.Infinity : (RatNum) this;
+    return super.power (y);
+  }
+
   /** Calculate the integral power of an IntNum.
    * @param x the value (base) to exponentiate
    * @param y the exponent (must be non-negative)
@@ -836,11 +783,6 @@ public class IntNum extends RatNum implements Compilable
     if (negative)
       negate (rwords, rwords, rlen);
     return IntNum.make (rwords, rlen);
-  }
-
-  private static final long __umulsidi (int x, int y)
-  {
-    return ((long)x & 0xffffffffL) * ((long)y & 0xffffffffL);
   }
 
   /** Add an unsigned int to this.
@@ -1274,22 +1216,13 @@ public class IntNum extends RatNum implements Compilable
     return d;
   }
 
-  public Numeric add (Object y)
+  public Numeric add (Object y, int k)
   {
     if (y instanceof IntNum)
-      return IntNum.plus (this, (IntNum) y);
+      return IntNum.add (this, (IntNum) y, k);
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this);
-  }
-
-  public Numeric sub (Object y)
-  {
-    if (y instanceof IntNum)
-      return IntNum.minus (this, (IntNum) y);
-    if (!(y instanceof Numeric))
-      throw new IllegalArgumentException ();
-    return ((Numeric)y).sub_reversed (this);
+    return ((Numeric)y).add_reversed (this, k);
   }
 
   public Numeric mul (Object y)

@@ -13,6 +13,7 @@ java_sources = \
   Convert.java \
   F32Vector.java \
   F64Vector.java \
+  FilterConsumer.java \
   FString.java \
   FVector.java \
   GapVector.java \
@@ -20,6 +21,7 @@ java_sources = \
   LList.java \
   Pair.java \
   PairWithPosition.java \
+  PositionConsumer.java \
   PositionContainer.java \
   S8Vector.java \
   S16Vector.java \
@@ -30,6 +32,7 @@ java_sources = \
   Strings.java \
   TreeList.java \
   TreePosition.java \
+  TreePositionList.java \
   U8Vector.java \
   U16Vector.java \
   U32Vector.java \

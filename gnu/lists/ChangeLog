@@ -1,3 +1,39 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Sequence.java.in (isEmpty):  New method.
+	(EOF_VALUE, INT_U8_VALUE, INT_S8_VALUE, INT_U16_VALUE, INT_S16_VALUE,
+	INT_U32_VALUE, INT_S32_VALUE, INT_U64_VALUE, INT_S64_VALUE,
+	FLOAT_VALUE, DOUBLE_VALUE, BOOLEAN_VALUE, TEXT_BYTE_VALUE, CHAR_VALUE,
+	OBJECT_VALUE, GROUP_VALUE):  New constants.
+	* AbstractSequence.java.in (getNextKind, getNextTypeName,
+	getNextTypeObject):  New methods.
+	* SeqPosition.java.in (getNextKind, getNextTypeName,
+	getNextTypeObject):  New methods.
+	* SimpleVector.java.in (getNextKind, getElementKind):  New methods.
+	* GapVector.java (getNextKind): New method.
+	* FString.java, F32Vector.java, F64Vector.java, S16Vector.java,
+	S32Vector.java, S64Vector.java, S8Vector.java, U16Vector.java,
+	U32Vector.java, U64Vector.java, U8Vector.java (getElementKind):
+	New method.
+
+	* SubSequence.java (getNext, getPrevious):  Fix thinko.
+	(getNextKind):  New method.
+	* TreeList.java (endGroup, consumeRange):  Fix thinkos.
+	(makePosition, gotoChildrenStart, getNextKind, getNextTypeIndex,
+	getNextTypeName, getNextTypeObject, makeRelativePosition,
+	nextDataIndex):  New methods.
+
+	* TreePosition.java: Implement Cloneable.
+	(TreePosition(TreePosition)):  New copy constructor.
+	(clone, set):  New method.
+	(push):  Handle case of depth == -1.
+	(clear):  Improve.
+
+	* FilterConsumer.java:  New class, implements Consumer.
+	* PositionConsumer.java:  New interface.
+	* TreePositionList.java:  New class.
+	* Makefile.am:  Add new classes.
+
 2001-04-04  Per Bothner  <per@bothner.com>
 
 	* VoidConsumer.java:  New class, implements Consumer.

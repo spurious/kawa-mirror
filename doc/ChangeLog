@@ -1,3 +1,7 @@
+2004-10-07  Chris Dean  <ctdean@sokitomi.com>
+
+	* kawa.texi (Multiple values): Add missing "(".
+
 2004-08-05  Chris Dean  <ctdean@sokitomi.com>
 
 	* kawa.texi (Field operations):  Document "isName" fields.

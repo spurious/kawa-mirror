@@ -22,7 +22,7 @@ public class call_with_values extends Procedure2
   public void apply (CallContext stack) throws Throwable
   {
     Procedure.checkArgCount(this, 2);
-    Object[] args = stack.values;
+    Object[] args = stack.getArgs();
     Object values = ((Procedure) args[0]).apply0 ();
     Procedure consumer = (Procedure) args[1];
     if (values instanceof Values)

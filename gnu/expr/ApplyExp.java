@@ -4,6 +4,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.text.SourceMessages;
 
 /** This class is used to represent "combination" or "application".
  * A function and arguments are evaluated, and then the function applied.
@@ -14,7 +15,9 @@ public class ApplyExp extends Expression
 {
   Expression func;
   Expression[] args;
-  boolean tailCall;
+
+  public static final int TAILCALL = NEXT_AVAIL_FLAG;
+  public static final int INLINE_IF_CONSTANT = NEXT_AVAIL_FLAG << 1;
 
   /** Containing LambdaExp. */
   LambdaExp context;
@@ -27,8 +30,9 @@ public class ApplyExp extends Expression
   public final int getArgCount() { return args.length; }
   public void setFunction(Expression func) { this.func = func; }
   public void setArgs(Expression[] args) { this.args = args; }
-  public final boolean isTailCall() { return tailCall; }
-  public final void setTailCall(boolean tailCall) { this.tailCall = tailCall; }
+  public final boolean isTailCall() { return getFlag(TAILCALL); }
+  public final void setTailCall(boolean tailCall)
+  { setFlag(tailCall, TAILCALL); }
 
   /** If getFunction() is constant, return its value; otherwise null. */
   public final Object getFunctionValue()
@@ -266,7 +270,7 @@ public class ApplyExp extends Expression
 
     // Check for tail-recursion.
     boolean tail_recurse
-      = exp.tailCall
+      = exp.isTailCall()
       && func_lambda != null && func_lambda == comp.curLambda;
 
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
@@ -385,7 +389,7 @@ public class ApplyExp extends Expression
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Apply", ")", 2);
-    if (tailCall)
+    if (isTailCall())
       out.print (" [tailcall]");
     out.writeSpaceFill();
     printLineColumn(out);
@@ -458,6 +462,11 @@ public class ApplyExp extends Expression
     return type;
   }
 
+  public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
+  {
+    return inlineIfConstant(proc, walker.getCompilation().getMessages());
+  }
+
   /** Inline this ApplyExp if parameters are constant.
    * @param proc the procedure bound to this.func.
    * @param walker the inline contact - an InlineCalls instance, actually.
@@ -465,18 +474,26 @@ public class ApplyExp extends Expression
    *   otherwise this ApplyExp.
    * If applying proc throws an exception, print a warning on walker.messages.
    */
-  public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
+  public final Expression inlineIfConstant(Procedure proc, SourceMessages messages)
   {
     int len = args.length;
-    for (int i = len;  --i >= 0; )
-      {
-	if (! (args[i] instanceof QuoteExp))
-	  return this;
-      }
     Object[] vals = new Object[len];
     for (int i = len;  --i >= 0; )
       {
-	vals[i] = ((QuoteExp) (args[i])).getValue();
+	Expression arg = args[i];
+	if (arg instanceof ReferenceExp)
+	  {
+	    Declaration decl = ((ReferenceExp) arg).getBinding();
+	    if (decl != null)
+	      {
+		arg = decl.getValue();
+		if (arg == QuoteExp.undefined_exp)
+		  return this;
+	      }
+	  }
+	if (! (arg instanceof QuoteExp))
+	  return this;
+	vals[i] = ((QuoteExp) arg).getValue();
       }
     try
       {
@@ -484,8 +501,8 @@ public class ApplyExp extends Expression
       }
     catch (Throwable ex)
       {
-	if (walker.messages != null)
-	  walker.messages.error('w', "call to " + proc +
+	if (messages != null)
+	  messages.error('w', "call to " + proc +
 				" throws " + ex);
 	return this;
       }

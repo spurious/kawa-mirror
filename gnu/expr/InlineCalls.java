@@ -97,6 +97,12 @@ public class InlineCalls extends ExpWalker
 	  return noteError(msg);
 	if (proc instanceof CanInline)
 	  return ((CanInline) proc).inline(exp, this);
+	if (exp.getFlag(ApplyExp.INLINE_IF_CONSTANT))
+	  {
+	    Expression e = exp.inlineIfConstant(proc, this);
+	    if (e != exp)
+	      return walk(e);
+	  }
 	if (comp.inlineOk(proc))
 	  {
 	    if (proc instanceof Inlineable)
@@ -109,6 +115,8 @@ public class InlineCalls extends ExpWalker
 		ApplyExp nexp;
 		if (mproc.getStaticFlag() || decl == null)
 		  nexp = new ApplyExp(mproc, exp.args);
+		else if (decl.base == null)
+		  return exp;
 		else
 		  {
 		    Expression[] margs = new Expression[1 + nargs];

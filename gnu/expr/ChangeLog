@@ -1,3 +1,16 @@
+2004-12-02  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (tailCall): Turn field into flag.
+	(TAILCALL): New flag.
+	(isTailCall, setTailCall, compile): Modify appropriately.
+
+	* ApplyExp.java (INLINE_IF_CONSTANT): New flag.
+	(inlineIfConstant): Add overload.
+	Also recognize reference to constant.
+	* InlineCalls.java (walkApplyExp): Maybe call inlineIfConstant.
+
+	* InlineCalls.java (walkApplyExp): Check for null base of decl.
+
 2004-11-16  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkIfExp): Handle null else_clause.

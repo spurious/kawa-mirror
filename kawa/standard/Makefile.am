@@ -29,7 +29,7 @@ setcdr_b.class \
 cxr.class \
 null_p.class \
 list_p.class \
-list.class \
+list_v.class \
 length.class \
 append.class \
 reverse.class \

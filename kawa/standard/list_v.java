@@ -6,17 +6,12 @@ import kawa.lang.*;
  * @author Per Bothner
  */
 
-public class list extends ProcedureN
+public class list_v extends ProcedureN
 {
-  public list()
-  {
-    super("list");
-  }
-
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Object result = Interpreter.nullObject;
+    Object result = List.Empty;
     for (int i = args.length;  --i >= 0; )
       result = new Pair (args[i], result);
     return result;

@@ -124,7 +124,7 @@ public class Scheme extends Interpreter
       define_proc ("cddddr", "kawa.standard.cxr");
       define_proc ("null?", "kawa.standard.null_p");
       define_proc ("list?", "kawa.standard.list_p");
-      define_proc ("list", "kawa.standard.list");
+      define_proc ("list", "kawa.standard.list_v");
       define_proc ("length", "kawa.standard.length");
       define ("append", kawa.standard.append.appendProcedure);
       define_proc ("reverse", "kawa.standard.reverse");

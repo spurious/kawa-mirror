@@ -93,6 +93,9 @@ public class NamedChildrenFilter extends FilterConsumer
 	    return;
 	  }
       }
-    super.writeObject(val);
+    if (val instanceof Consumable)
+      ((Consumable) val).consume(this);
+    else
+      super.writeObject(val);
   }
 }

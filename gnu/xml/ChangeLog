@@ -1,3 +1,7 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* NamedChildrenFilter.java (writeObject):  Check if val is Consumable.
+
 2002-07-02  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java:  Replace all calls of writeRaw to super.write.

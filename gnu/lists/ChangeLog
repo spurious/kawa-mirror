@@ -1,3 +1,8 @@
+2003-10-07  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (equals):  If either operand is non-List
+	or non-Sequence, just compare using identity.
+
 2003-10-02  Per Bothner  <per@bothner.com>
 
 	* Sequence.java:  Move class EofClass to separate file.

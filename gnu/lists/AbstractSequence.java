@@ -700,14 +700,15 @@ public abstract class AbstractSequence
     // Compatible with the Collections specification.
     // FIXME should also depend on class?
     /* BEGIN JAVA2 */
-    if (! (o instanceof java.util.List))
-      return false;
+    if (! (this instanceof java.util.List)
+	|| ! (o instanceof java.util.List))
+      return this == o;
     Iterator it1 = iterator();
     Iterator it2 = ((java.util.List) o).iterator();
     /* END JAVA2 */
     /* BEGIN JAVA1 */
-    // if (! (o instanceof Sequence))
-      // return false;
+    // if (! (this instanceof Sequence) || ! (o instanceof Sequence))
+      // return this == o;
     // Enumeration it1 = elements();
     // Enumeration it2 = ((Sequence) o).elements();
     /* END JAVA1 */

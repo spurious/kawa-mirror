@@ -1,3 +1,8 @@
+Tue Jun 25 20:40:57 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* license.term:  New license Based on Tcl copyright.
+	* COPYING:  Removed.
+
 Fri Jun 21 00:03:34 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Declaration (context):  New field.

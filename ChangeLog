@@ -1,3 +1,15 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* Make-rules: New automake doesn't seem to set DIST_SOURCES from
+	SOURCES, so undefine SOURCES and define DISTFILES explicitly.
+
+	* configure.in: New --with-java-source flag, sets @JAVA_SOURCE@.
+	* Makefile.am (java1-java2-files): Rename to patch-source-list and
+	generailize to also look for JAVA5 and JAXP conditionals.
+	(selected-java-source, select-java5, dist-hook): New rules.
+	
+	* Makefile.am (makekawa.bar): Remove bit-rotted rule.
+
 2004-10-27  Per Bothner  <per@bothner.com>
 
 	* Shell.java (counter): Remove static field.

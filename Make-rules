@@ -14,7 +14,7 @@ TO_TOPDIR = $(top_builddir)
 ENABLE_GCJ_COMPILED = $(EXTRA_GCJ_COMPILED) $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 java_Java= $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
-SOURCES = $(java_sources) $(java_SCM)
+DISTFILES = $(DIST_COMMON)  $(java_sources) $(java_SCM) $(TEXINFOS) $(EXTRA_DIST)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl

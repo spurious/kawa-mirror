@@ -51,12 +51,17 @@ kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 kawa-doc-$(VERSION).tar.gz:  doc/kawa.texi doc/internals.xml doc/kawa-tour.texi
 	cd doc; $(MAKE) ../kawa-doc-$(VERSION).tar.gz
 
+dist-hook:
+	rm -f $(distdir)/patch-source-list
+	$(MAKE) srcdir=`pwd`/$(distdir) select-java2
+
 dist-kawa-@VERSION@.jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && $$srcdir/configure --with-servlet --with-sax2 --with-swing --with-awt \
+	  && rm $$srcdir/patch-source-list
+	  && $$srcdir/configure --with-servlet --with-sax2 --with-swing --with-awt --with-java-source=2\
 	  && $(MAKE) \
 	  && $(JAR) cmf $$srcdir/jar-manifest \
 	    ../kawa-@VERSION@.jar \
@@ -89,7 +94,7 @@ jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
-  libtool.m4 ltmain.sh \
+  libtool.m4 ltmain.sh patch-source-list selected-java-source \
   build.xml build.properties \
   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
@@ -146,54 +151,56 @@ uninstall-jar:
 $(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/configure.in
 	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/$(JAVATOP)kawa/Version.java.in >$@
 
-all-recursive:  $(JAVATOP)kawa/Version.java
+all-recursive:  $(JAVATOP)kawa/Version.java selected-java-source
 all: kawa-@VERSION@.jar
 
-makekawa.bat:  $(srcdir)/configure.in
-	echo "rem Build Kawa under Windows" >tmp
-	echo "rem You may need to change the following definitions:" >>tmp
-	echo "set javahome=c:\jdk1.2.1" >>tmp
-	echo "set javac=%javahome%\bin\javac" >>tmp
-	echo "set java=%javahome%\bin\java" >>tmp
-	echo "set jcflags=-g" >>tmp
-	for dir in `find . -name Makefile -print \
-	    | sed  -e 's|[.]/\(.*\)Makefile|\1|'`; do \
-	  test "`cd $(srcdir)/$$dir; echo *.java`" = "*.java"  \
-	    || (echo "%javac% %jcflags% $$dir*.java" \
-	      | sed -e 's|/|\\|g' >>tmp); \
-	done
-	echo 'cd kawa\lib' >>tmp
-	echo '%java% -classpath ..\.. kawa.repl -d ..\.. -P kawa.lib. -C' $$(cd kawa/lib; make -s list-sources) >>tmp
-	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
-	echo 'cd ..\..\gnu\kawa\slib' >>tmp
-	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.kawa.slib -C' $$(cd gnu/kawa/slib; make -s list-sources) >>tmp
-	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
-	echo 'cd ..\..\..\gnu\jemacs\lang' >>tmp
-	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.lang -C' $$(cd gnu/jemacs/lang; make -s list-sources) >>tmp
-	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
-	echo 'cd ..\..\..\gnu\jemacs\buffer' >>tmp
-	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
-	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
+selected-java-source:
+	@java_source=`cat $(srcdir)/selected-java-source 2>/dev/null || echo none`; \
+	if test "$$java_source" = "@JAVA_SOURCE@"; \
+	then echo current java-source is ok; \
+	elif test "@JAVA_SOURCE@" = 1; \
+	then $(MAKE) select-java1; \
+	elif test "@JAVA_SOURCE@" = 2; \
+	then $(MAKE) select-java2; \
+	elif test "@JAVA_SOURCE@" = 5; \
+	then $(MAKE) select-java5; \
+	else echo Unrecognized JAVA_SOURCE: @JAVA_SOURCE@; exit 1; \
+	fi
 
-$(srcdir)/java1-java2-files:
+$(srcdir)/patch-source-list:
 	(cd $(srcdir); \
-	find . -name '*.java' -exec grep -l 'BEGIN JAVA[12]' '{}' ';') > $@
+	find . -name '*.java' -exec \
+	   grep -lE 'BEGIN JAVA|BEGIN JAXP' '{}' ';') > $@
 
-select-java1: $(srcdir)/java1-java2-files
+select-java1: $(srcdir)/patch-source-list
 	cd $(srcdir); \
-	for file in `cat java1-java2-files`; do \
+	for file in `cat patch-source-list`; do \
 	echo Converting $$file to Java1; \
-        sed -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+        sed -e '/BEGIN JAVA[25]/,/END JAVA[25]/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+	    -e '/BEGIN JAXP/,/END JAXP/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
             -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)//[ ]*|\1|' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+	echo 1 >$(srcdir)/selected-java-source
 
-select-java2: $(srcdir)/java1-java2-files
+select-java2: $(srcdir)/patch-source-list
 	cd $(srcdir); \
-	for file in `cat java1-java2-files`; do \
+	for file in `cat patch-source-list`; do \
 	echo Converting $$file to Java2; \
-        sed -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+        sed -e '/BEGIN JAVA[15]/,/END JAVA[15]/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+	    -e '/BEGIN JAXP/,/END JAXP/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
             -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)//[ ]*|\1|' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+	echo 2 >$(srcdir)/selected-java-source
+
+select-java5: $(srcdir)/patch-source-list
+	cd $(srcdir); \
+	for file in `cat patch-source-list`; do \
+	echo Converting $$file to Java5; \
+        sed -e '/BEGIN JAVA1/,/END JAVA1/s|^\([[:space:]]*\)\([^/[:space:]]\)|\1// \2|' \
+            -e '/BEGIN JAXP 1.3/,/END JAXP 1.3/s|^\([[:space:]]*\)//[ ]*|\1|' \
+            -e '/BEGIN JAVA[25]/,/END JAVA[25]/s|^\([[:space:]]*\)//[ ]*|\1|' \
+	<$$file >$$file.tmp; mv $$file.tmp $$file; done
+	echo 5 >$(srcdir)/selected-java-source
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
   kawa-@VERSION@-src.zip jemacs.jar

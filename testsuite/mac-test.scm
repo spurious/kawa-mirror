@@ -1,4 +1,4 @@
-(test-init "macros" 14)
+(test-init "macros" 39)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -96,3 +96,39 @@
       (begin
 	(define-syntax test-ds2 (syntax-rules () ((test-ds2 x) (list 'x))))
 	(test-ds2 (t2))))
+
+(test '() 'cut-1 ((cut list)))
+(test '() 'cut-2  ((cut list <...>)))
+(test '(1) 'cut-3 ((cut list 1)))
+(test '(1) 'cut-4 ((cut list <>) 1))
+(test '(1) 'cut-5 ((cut list <...>) 1))
+(test '(1 2) 'cut-6 ((cut list 1 2)))
+(test '(1 2) 'cut-7 ((cut list 1 <>) 2))
+(test '(1 2) 'cut-8 ((cut list 1 <...>) 2))
+(test '(1 2 3 4) 'cut-9 ((cut list 1 <...>) 2 3 4))
+(test '(1 2 3 4) 'cut-10 ((cut list 1 <> 3 <>) 2 4))
+(test '(1 2 3 4 5 6) 'cut-11 ((cut list 1 <> 3 <...>) 2 4 5 6))
+(test '(ok) 'cut-12 (let* ((x 'wrong) (y (cut list x))) (set! x 'ok) (y)))
+(test 2 'cut-13
+      (let ((a 0))
+	(map (cut + (begin (set! a (+ a 1)) a) <>)
+	     '(1 2))
+	a))
+
+;; cutes
+(test '() 'cute-1 ((cute list)))
+(test '() 'cute-2 ((cute list <...>)))
+(test '(1) 'cute-3 ((cute list 1)))
+(test '(1) 'cute-4 ((cute list <>) 1))
+(test '(1) 'cute-5 ((cute list <...>) 1))
+(test '(1 2) 'cute-6 ((cute list 1 2)))
+(test '(1 2) 'cute-7 ((cute list 1 <>) 2))
+(test '(1 2) 'cute-8 ((cute list 1 <...>) 2))
+(test '(1 2 3 4) 'cute-9 ((cute list 1 <...>) 2 3 4))
+(test '(1 2 3 4) 'cute-10 ((cute list 1 <> 3 <>) 2 4))
+(test '(1 2 3 4 5 6) 'cute-11 ((cute list 1 <> 3 <...>) 2 4 5 6))
+(test 1 'cute-12
+      (let ((a 0))
+	(map (cute + (begin (set! a (+ a 1)) a) <>)
+	     '(1 2))
+	a))

@@ -1,3 +1,7 @@
+2003-01-24  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm:  Add 25 new tests, for cut and cute (from srfi-26).
+
 2002-11-20  Per Bothner  <bothner@bothner.com>
 
 	* misc-test.scm:  Add new tests for qualfied-symbol method invoke.

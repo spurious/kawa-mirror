@@ -199,7 +199,7 @@ public class ApplyExp extends Expression
 	      }
 
 	    pproc.compile(extraArg ? Type.void_type : null,
-			  args, comp, target);
+			  exp, comp, target);
 	    return;
 	  }
       }

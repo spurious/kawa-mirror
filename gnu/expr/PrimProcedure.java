@@ -49,6 +49,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int num = argTypes.length;
     if (! getStaticFlag())
       num++;
+    if (takesContext())
+      num--;
     return takesVarArgs() ? (num - 1) + (-1 << 12) : num + (num << 12);
   }
 
@@ -409,11 +411,13 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (arg_error != null)
       comp.error('e', arg_error);
 
-    compile(getStaticFlag() ? null : mclass, args, comp, target);
+    compile(getStaticFlag() ? null : mclass, exp, comp, target);
   }
 
-  public void compile (Type thisType, Expression[] args, Compilation comp, Target target)
+  public void compile (Type thisType, ApplyExp exp,
+		       Compilation comp, Target target)
   {
+    Expression[] args = exp.getArgs();
     gnu.bytecode.CodeAttr code = comp.getCode();
     Type stackType = retType;
     compileArgs(args, thisType, comp);
@@ -425,10 +429,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     else
       {
 	comp.loadCallContext();
-	if (target instanceof ConsumerTarget
-	    && ((ConsumerTarget) target).isContextTarget())
+	if (target instanceof IgnoreTarget
+	    || (target instanceof ConsumerTarget
+		&& ((ConsumerTarget) target).isContextTarget()))
 	  {
 	    code.emitInvokeMethod(method, opcode());
+	    if (! exp.isTailCall())
+	      {
+		comp.loadCallContext();
+		code.emitInvoke(Compilation.typeCallContext
+				.getDeclaredMethod("runUntilDone", 0));
+	      }
 	    return;
 	  }
 	else
@@ -513,8 +524,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public static Class getProcedureClass (Object pproc)
   {
     Class procClass;
-    if (pproc instanceof gnu.expr.ModuleMethod)
+    if (pproc instanceof ModuleMethod)
       procClass = ((ModuleMethod) pproc).module.getClass();
+    else if (pproc instanceof ApplyMethodProc)
+      procClass = ((ApplyMethodProc) pproc).module.getClass();
+    else if (pproc instanceof CpsMethodProc)
+      procClass = ((CpsMethodProc) pproc).module.getClass();
     else
       procClass = pproc.getClass();
     try
@@ -553,6 +568,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           return null;
         String mangledName = Compilation.mangleName(name);
         String mangledNameV = mangledName + "$V";
+        String mangledNameVX = mangledName + "$V$X";
+        String mangledNameX = mangledName + "$X";
 	boolean applyOk = true; // Also look for "apply" and "apply$V".
 	for (Method meth = procClass.getDeclaredMethods();
 	   meth != null;  meth = meth.getNext())
@@ -565,26 +582,17 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 		  continue;
 	      }
             String mname = meth.getName();
-            boolean variable;
 	    boolean isApply;
-	    if (mname.equals(mangledName))
+	    if (mname.equals(mangledName)
+		|| mname.equals(mangledNameV)
+		|| mname.equals(mangledNameX)
+		|| mname.equals(mangledNameVX))
 	      {
-		variable = false;
 		isApply = false;
 	      }
-            else if (mname.equals(mangledNameV))
+	    else if (applyOk
+		     && (mname.equals("apply") || mname.equals("apply$V")))
 	      {
-		variable = true;
-		isApply = false;
-	      }
-	    else if (applyOk && mname.equals("apply"))
-	      {
-		variable = false;
-		isApply = true;
-	      }
-            else if (applyOk && mname.equals("apply$V"))
-	      {
-		variable = true;
 		isApply = true;
 	      }
             else

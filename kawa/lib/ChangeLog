@@ -1,3 +1,7 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* package-info.java: New file, used by javadoc.
+
 2005-03-28  Per Bothner  <per@bothner.com>
 
 	* ports.scm (define-alias-parameter): Fix harmless typo.

@@ -1,3 +1,7 @@
+1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* obj-test.scm:  Yet another object regression test.
+
 1999-04-22  Per Bothner  <bothner@cygnus.com>
 
 	* obj-test.scm:  Add two more for tests for object - with fields.

@@ -39,9 +39,7 @@ public class Q2 extends Scheme
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Q2 interp = new Q2();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Language.setDefaults(new Q2());
   }
 
   public Expression makeBody(Expression[] exps)

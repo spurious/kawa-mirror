@@ -80,25 +80,29 @@ public abstract class RealNum extends Complex
   /** Converts a real to an integer, according to a specified rounding mode.
    * Note an inexact argument gives an inexact result, following Scheme.
    * See also RatNum.toExactInt. */
-  public RealNum toInt (int rounding_mode)
+  public static double toInt (double d, int rounding_mode)
   {
-    double d = doubleValue ();
     switch (rounding_mode)
       {
       case FLOOR:
-	d = Math.floor (d);
-	break;
+	return Math.floor(d);
       case CEILING:
-	d = Math.ceil (d);
-	break;
+	return Math.ceil(d);
       case TRUNCATE:
-	d = d < 0.0 ? Math.ceil (d) : Math.floor (d);
-	break;
+	return d < 0.0 ? Math.ceil (d) : Math.floor (d);
       case ROUND:
-	d -= Math.IEEEremainder (d, 1.0);
-	break;
+	return Math.rint(d);
+      default:  // Illegal rounding_mode
+	return d;
       }
-    return new DFloNum (d);
+  }
+
+  /** Converts a real to an integer, according to a specified rounding mode.
+   * Note an inexact argument gives an inexact result, following Scheme.
+   * See also RatNum.toExactInt. */
+  public RealNum toInt (int rounding_mode)
+  {
+    return new DFloNum(toInt(doubleValue(), rounding_mode));
   }
 
   public Complex exp ()

@@ -66,16 +66,16 @@ public class XName extends SName implements Externalizable
   }
 
   /* #ifdef JAXP-1.3 */
-  public Object readResolve() throws ObjectStreamException
-  {
-    Namespace ns = symbol.getNamespace();
-    if (ns instanceof NamespacePair)
-      {
-	NamespacePair np = (NamespacePair) ns;
-	return new XName(Symbol.make(np.realNamespace, symbol.getName()),
-			 ns.getName(), namespaceNodes);
-      }
-    return this;
-  }
+  // public Object readResolve() throws ObjectStreamException
+  // {
+  //   Namespace ns = symbol.getNamespace();
+  //   if (ns instanceof NamespacePair)
+  //     {
+  //       NamespacePair np = (NamespacePair) ns;
+  //       return new XName(Symbol.make(np.realNamespace, symbol.getName()),
+  //                        ns.getName(), namespaceNodes);
+  //     }
+  //   return this;
+  // }
   /* #endif */
 }

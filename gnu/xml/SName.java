@@ -122,7 +122,7 @@ public class SName
     /* #ifdef JAXP-1.3 */
     // String prefix = in.readUTF();
     // if (prefix == null || prefix.length() == 0)
-      // return;
+    //   return;
     // NamespacePair np = new NamespacePair(symbol.getNamespace(), prefix);
     // symbol = new Symbol(symbol.getName(), np);
     /* #endif */
@@ -131,14 +131,14 @@ public class SName
   /* #ifdef JAXP-1.3 */
   // public Object readResolve() throws ObjectStreamException
   // {
-    // Namespace ns = symbol.getNamespace();
-    // if (ns instanceof NamespacePair)
-      // {
-	// NamespacePair np = (NamespacePair) ns;
-	// return new SName(Symbol.make(np.realNamespace, symbol.getName()),
-			 // ns.getName());
-      // }
-    // return this;
+  //   Namespace ns = symbol.getNamespace();
+  //   if (ns instanceof NamespacePair)
+  //     {
+  //       NamespacePair np = (NamespacePair) ns;
+  //       return new SName(Symbol.make(np.realNamespace, symbol.getName()),
+  //                         ns.getName());
+  //     }
+  //   return this;
   // }
   /* #endif */
 }

@@ -1,3 +1,21 @@
+2004-12-05  Per Bothner  <per@bothner.com>
+
+	Update for new Symbol/Location handling.
+	* Lisp2.java (defun, getEnvPropertyFor): New methods.
+	(defineFunction, getNewEnvironment): Removed.
+	(getSymbol): Rename to asSymbol - to avoid confusion.
+	* CommonLisp.java (defun): Remove methods - moved to Lisp2.
+	(<init>): Various updates.
+	(defineFormFieldValue): Remove - no longer need to override.
+	* CLispReader.java: Update getSymbol->asSymbol.
+	* SymbolTable.java: Remove class.
+	* Makefile.am: Update accordingly.
+	* Symbols.java: Update methods.
+	(plistGet, plistPut, plistRemove): Moved to
+	gnu.mapping.PropertyLocation.
+	(setValueBinding, getPrintName): Remove methods.
+	* function.java (rewriteForm): Not that we PREFER_BINDING2.
+
 2004-11-10  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (CommonLisp): Remove definitions of 'and' and 'or'.

@@ -21,7 +21,7 @@ public class CLispReader extends LispReader
 
   protected Object makeSymbol (String name)
   {
-    return CommonLisp.getSymbol(name.intern());
+    return CommonLisp.asSymbol(name.intern());
   }
 
   public static Object readObject(InPort port)

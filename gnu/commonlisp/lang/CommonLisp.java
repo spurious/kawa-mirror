@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.commonlisp.lang;
@@ -57,46 +57,31 @@ public class CommonLisp extends Lisp2
 
   static CommonLisp instance;
 
-  protected void defun(String name, Object value)
-  {
-    Symbols.setFunctionBinding(environ, name, value);
-    if (value instanceof Named)
-      {
-	Named n = (Named) value;
-	if (n.getName() == null)
-	  n.setName(name);
-      }
-  }
-
-  private void defun(Procedure proc)
-  {
-    defun(proc.getName(), proc);
-  }
-
   static int lispCounter = 0;
 
   public CommonLisp()
   {
     Environment scmEnv = Scheme.builtin();
-    environ = SymbolTable.make("interaction-environment."+(++lispCounter));
+    environ = new SimpleEnvironment("interaction-environment."+(++lispCounter));
     Environment.setCurrent(environ);
 
     TRUE = environ.getSymbol("t");
-    TRUE.set(TRUE);
+    // TRUE.set(TRUE); FIXME
+    define("t", TRUE);
     define("nil", FALSE);
 
-    SymbolEnumeration e = scmEnv.enumerateAllSymbols();
+    LocationEnumeration e = scmEnv.enumerateAllLocations();
     while (e.hasMoreElements())
       {
-	Symbol b = e.nextSymbol();
-	Object val = b.get(null);
+	Location loc = e.nextLocation();
+	Object val = loc.get(null);
 	if (val != null)
 	  {
-	    String name = b.getName();
+	    Symbol name = ((NamedLocation) loc).getKeySymbol();
 	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
 	      defun(name, val);
 	    else
-	      define(name, val);
+	      define(name.getName(), val);
 	  }
       }
 
@@ -118,9 +103,9 @@ public class CommonLisp extends Lisp2
       }
 
     kawa.lang.Lambda lambda = new kawa.lang.Lambda();
-    lambda.setKeywords(getSymbol("&optional"),
-		       getSymbol("&rest"),
-		       getSymbol("&key"));
+    lambda.setKeywords(asSymbol("&optional"),
+		       asSymbol("&rest"),
+		       asSymbol("&key"));
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
     defun("defun", new defun(lambda));
@@ -142,6 +127,8 @@ public class CommonLisp extends Lisp2
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     defun("princ", displayFormat);
     defun("prin1", writeFormat);
+
+    defProcStFld("functionp", "gnu.commonlisp.lisp.PrimOps");
   }
 
   public static CommonLisp getInstance()
@@ -206,23 +193,6 @@ public class CommonLisp extends Lisp2
 	return Scheme.getNamedType(name);
       }
     return Type.make(clas);
-  }
-
-  /** Import all the public fields of an object. */
-  public void defineFromFieldValue(String name, Object part)
-    throws Throwable
-  {
-    if (part instanceof Named)
-      name = ((Named) part).getName();
-    else
-      name = name.intern();
-    if (part instanceof Symbol)
-      environ.addSymbol((Symbol) part);
-    else if (part instanceof Procedure
-	     || part instanceof kawa.lang.Syntax)
-      Symbols.setFunctionBinding(environ, name, part);
-    else
-      environ.define(name, part);
   }
 }
 

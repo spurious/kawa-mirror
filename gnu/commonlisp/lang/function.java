@@ -26,6 +26,7 @@ public class function extends Syntax
 	  {
 	    ReferenceExp rexp = new ReferenceExp(name);
 	    rexp.setProcedureName(true);
+	    rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	    return rexp;
 	  }
 	if (name instanceof Pair)

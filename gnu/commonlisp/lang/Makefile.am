@@ -11,7 +11,6 @@ java_sources = \
   prog1.java \
   setq.java \
   Symbols.java \
-  SymbolTable.java \
   UnwindProtect.java \
   CommonLisp.java
 

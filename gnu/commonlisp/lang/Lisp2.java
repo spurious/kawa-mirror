@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.commonlisp.lang;
@@ -6,6 +6,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
+import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispInterpreter;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
@@ -29,7 +30,7 @@ public abstract class Lisp2 extends LispInterpreter
   public void emitPushBoolean(boolean value, CodeAttr code)
   {
     if (value)
-      code.emitPushString("t");
+      code.emitGetStatic(ClassType.make("gnu.commonlisp.lang.Lisp2").getDeclaredField("TRUE"));
     else
       code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
   }
@@ -44,6 +45,15 @@ public abstract class Lisp2 extends LispInterpreter
     return true;
   }
 
+  public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
+  {
+    if (Compilation.typeProcedure.getReflectClass()
+	.isAssignableFrom(fld.getType())
+	|| value instanceof kawa.lang.Syntax)
+      return EnvironmentKey.FUNCTION;
+    return null;
+  }
+
   public int getNamespaceOf(Declaration decl)
   {
     // This is a kludge because the hygiene renameing in SyntaxRules
@@ -54,17 +64,12 @@ public abstract class Lisp2 extends LispInterpreter
     return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
   }
 
-  public void defineFunction(String name, Object proc)
-  {
-    Environment.defineFunction(environ, name, proc);
-  }
-
   /** Get a symbol for a given (interned) Java string. */
-  public static Object getSymbol (String name)
+  public static Object asSymbol (String name)
   {
     if (name == "nil")
       return FALSE;
-    return Environment.getCurrentSymbol(name);
+    return Environment.getCurrent().getSymbol(name);
     //return name;
   }
 
@@ -80,9 +85,30 @@ public abstract class Lisp2 extends LispInterpreter
     return getString(symbol.getName());
   }
 
-  public Environment getNewEnvironment ()
+  protected void defun(String name, Object value)
   {
-    return new SymbolTable(environ);
+    environ.define(getSymbol(name), EnvironmentKey.FUNCTION, value);
+    if (value instanceof Named)
+      {
+	Named n = (Named) value;
+	if (n.getName() == null)
+	  n.setName(name);
+      }
   }
 
+  protected void defun(Symbol sym, Object value)
+  {
+    environ.define(sym, EnvironmentKey.FUNCTION, value);
+    if (value instanceof Procedure)
+      {
+	Procedure n = (Procedure) value;
+	if (n.getSymbol() == null)
+	  n.setSymbol(sym);
+      }
+  }
+
+  private void defun(Procedure proc)
+  {
+    defun(proc.getName(), proc);
+  }
 }

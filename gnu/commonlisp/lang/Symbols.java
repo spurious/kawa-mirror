@@ -21,9 +21,13 @@ public class Symbols
   {
     if (sym == Lisp2.FALSE)
       return true;
-    Symbol symbol = sym instanceof Symbol ? (Symbol) sym
-      :Environment.getCurrent().lookup((String) sym);
-    return symbol != null && symbol.isBound();
+    Environment env = Environment.getCurrent();
+    Symbol symbol;
+    if (sym instanceof Symbol)
+      symbol = (Symbol) sym;
+    else
+      symbol = env.defaultNamespace().lookup((String) sym);
+    return symbol != null && env.isBound(symbol);
   }
   
   public static Symbol getSymbol(Environment env, Object sym)
@@ -31,7 +35,7 @@ public class Symbols
     if (sym == Lisp2.FALSE)
       sym = "nil";
     return sym instanceof Symbol ? (Symbol) sym
-      : env.getSymbol((String) sym);
+      : env.defaultNamespace().getSymbol((String) sym);
   }
 
   public static Symbol getSymbol(Object sym)
@@ -39,87 +43,29 @@ public class Symbols
     if (sym == Lisp2.FALSE)
       sym = "nil";
     return sym instanceof Symbol ? (Symbol) sym
-      : Environment.getCurrent().getSymbol((String) sym);
-  }
-
-  public static void setValueBinding(Object symbol, Object value)
-  {
-    getSymbol(symbol).set(value);
-  }
-
-  public static Object getPrintName(String sym)
-  {
-    return Lisp2.getString(sym);
+      : Namespace.getDefaultSymbol((String) sym); // FIXME
   }
 
   public static Object getPrintName(Object sym)
   {
-    return sym == Lisp2.FALSE ? "nil" : Lisp2.getString((String) sym);
+    return sym == Lisp2.FALSE ? "nil"
+      : Lisp2.getString(((Symbol) sym).getName());
   }
 
   public static Object getFunctionBinding (Object symbol)
   {
-    return getSymbol(symbol).getFunctionValue();
+    return Environment.getCurrent().getFunction(getSymbol(symbol));
   }
 
   public static Object getFunctionBinding (Environment environ, Object symbol)
   {
-    return getSymbol(environ, symbol).getFunctionValue();
+    return environ.getFunction(getSymbol(symbol));
   }
 
   public static void setFunctionBinding (Environment environ,
-					 Object symbol, Object value)
+					 Object symbol, Object newValue)
   {
-    getSymbol(environ, symbol).setFunctionValue(value);
+    environ.put(getSymbol(symbol), EnvironmentKey.FUNCTION, newValue);
   }
 
-  /**
-   * Given a property list and a key, find the corresponing property value.
-   */
-  public static Object plistGet(Object plist, Object prop, Object dfault)
-  {
-    while (plist instanceof Pair)
-      {
-	Pair pair = (Pair) plist;
-	if (pair.car == prop)
-	  return ((Pair) pair.cdr).car;
-      }
-    return dfault;
-  }
-
-  public static Object plistPut(Object plist, Object prop, Object value)
-  {
-    for (Object p = plist; p instanceof Pair; )
-      {
-	Pair pair = (Pair) p;
-	Pair next = (Pair) pair.cdr;
-	if (pair.car == prop)
-	  {
-	    next.car = value;
-	    return plist;
-	  }
-	p = next.cdr;
-      }
-    return new Pair(prop, new Pair(value, plist));
-  }
-
-  public static Object plistRemove(Object plist, Object prop)
-  {
-    Pair prev = null;
-    for (Object p = plist; p instanceof Pair; )
-      {
-	Pair pair = (Pair) p;
-	Pair next = (Pair) pair.cdr;
-	p = next.cdr;
-	if (pair.car == prop)
-	  {
-	    if (prev == null)
-	      return p;
-	    prev.cdr = p;
-	    return plist;
-	  }
-	prev = next;
-      }
-    return plist;
-  }
 }

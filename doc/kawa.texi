@@ -52,30 +52,20 @@ It is a re-write of Kawa 0.2, which was written by
 R. Alexander Milowski @w{<alex@@copsol.com>}.
 @end ifclear
 
-@ifhtml
-<a href="http://www.cygnus.com/~bothner/kawa.html">This</a>
-is the Kawa home-page.
-<a href="http://www.copsol.com/kawa/index.html">
-@end ifhtml
-@ifclear html
 The Kawa home page (which is currently just an on-line
 version of this document) is
-@url{http://www.cygnus.com/~bothner/kawa.html}.
-@end ifclear
-@uref{http://www.copsol.com/sgmlimpl/tools/kawa/index.html,Copsol's Kawa home-page}
-is not maintained by me and so may not be as current.
+@uref{http://www.cygnus.com/~bothner/kawa.html}.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
 has various useful information on Scheme.
-It includes a pointer to an online copy of
-@uref{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html,R4RS},
-but has not been updated for a while.
+but it is not very actively updated.
 A new repository has been started at
 @uref{http://www.schemers.org/,www.schemers.org}.
+It includes pointer to an online copy of
+@uref{http://www.schemers.org/Documents/#standards,R5RS}.
 
-Javadoc generated
-@uref{http://www.cygnus.com/~bothner/kawa/api/packages.html,documentation of the Kawa classes} is now available online.
+Javadoc generated @uref{http://sourceware.cygnus.com/kawa/api/,documentation of the Kawa classes} is also available.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -88,8 +78,8 @@ The two packages
 and @uref{http://www.cygnus.com/~bothner/gnu.math/,@code{gnu.math}} are used
 by Kawa, and distributed with it, but may be independently useful.
 
-The @uref{http://www.cygnus.com/~bothner/Freenix98/,98 Usenix paper}
-gives a technical overview of Kawa.
+For a technical overview of Kawa, see these
+@uref{http://sourceware.cygnus.com/kawa/papers/,papers}.
 
 @menu
 * Features::
@@ -161,6 +151,19 @@ A snapshot of the development tree is in
 These are all in the @uref{ftp://ftp.cygnus.com/pub/bothner,Kawa ftp site},
 which includes other versions and files, including a @code{.deb}
 Debian package file of Kawa.
+
+You can also check out the very latest version via anonymous cvs.
+@example
+cvs -d :pserver:anoncvs@@sourceware.cygnus.com:/cvs/kawa login
+     (password is ``anoncvs'')
+cvs -d :pserver:anoncvs@@sourceware.cygnus.com:/cvs/kawa co kawa
+@end example
+
+Once you have it checked out, you can update it with @code{cvs update}.
+
+You can also
+@uref{http://sourceware.cygnus.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
+the cvs archive} via cvsweb.
 
 @node Installation, Running, Getting Kawa, Top
 @chapter Building and installing Kawa

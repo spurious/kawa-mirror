@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -48,8 +48,12 @@ implements TypeValue, Externalizable, GroupPredicate
 
   public boolean isInstancePos (AbstractSequence seq, int ipos)
   {
-    return seq.getNextKind(ipos) == Sequence.GROUP_VALUE
-      && isInstance(seq, ipos, seq.getNextTypeObject(ipos));
+    int kind = seq.getNextKind(ipos);
+    if (kind == Sequence.GROUP_VALUE)
+      return isInstance(seq, ipos, seq.getNextTypeObject(ipos));
+    if (kind == Sequence.OBJECT_VALUE)
+      return isInstance(seq.getPosNext(ipos));
+    return false;
   }
 
   public boolean isInstance(AbstractSequence seq, int ipos, Object groupType)

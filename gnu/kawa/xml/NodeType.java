@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -45,6 +45,23 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
   public Type getImplementationType()
   {
     return typeSeqPosition;
+  }
+
+  public boolean isInstance (Object obj)
+  { 
+    if (obj instanceof AbstractSequence)
+      {
+	AbstractSequence seq = (AbstractSequence) obj;
+	int start = seq.startPos();
+	return isInstancePos(seq, start)
+	  && ! seq.hasNext(seq.nextPos(start));
+      }
+    else if (obj instanceof SeqPosition)
+      {
+	SeqPosition pos = (SeqPosition) obj;
+	return isInstancePos(pos.sequence, pos.getPos());
+      }
+    return false;
   }
 
   public boolean isInstancePos(AbstractSequence seq, int ipos)

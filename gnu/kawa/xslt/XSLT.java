@@ -76,8 +76,7 @@ public class XSLT extends XQuery
     // return null;
   /*
     XslTranslator xtr = new XslTranslator(mexp, messages, this);
-    XMLParser parser = new XMLParser(inp,
-				     new ParsedXMLToConsumer(new NamespaceResolver(xtr)));
+    XMLParser parser = new XMLParser(inp, new NamespaceResolver(xtr));
     return xtr;
     return null; // FIXME
   */
@@ -98,8 +97,8 @@ public class XSLT extends XQuery
     XslTranslator xtr = (XslTranslator) lexer;
     //XslTranslator xtr = new XslTranslator(mexp, messages, this);
     xtr.beginDocument(mexp);
-    XMLParser parser = new XMLParser(lexer.getPort(),
-				     new ParsedXMLToConsumer(new NamespaceResolver(xtr)));
+    XMLParser parser
+      = new XMLParser(lexer.getPort(), new NamespaceResolver(xtr), messages);
     parser.parse();
     // FIXME - need check for eof.
     xtr.endDocument();
@@ -118,8 +117,8 @@ public class XSLT extends XQuery
     tr.push(mexp);
     XslTranslator xtr = new XslTranslator(mexp, messages, this);
     xtr.beginDocument();
-    XMLParser parser = new XMLParser(port,
-				     new ParsedXMLToConsumer(new NamespaceResolver(xtr)));
+    XMLParser parser
+      = new XMLParser(port, new NamespaceResolver(xtr), messages);
     parser.parse();
     xtr.endDocument();
     tr.pop(mexp);
@@ -166,7 +165,7 @@ public class XSLT extends XQuery
   public static void process(String url, CallContext ctx)
     throws Throwable
   {
-    TreeList doc = Document.document(url);
+    TreeList doc = Document.parse(url);
     Focus pos = Focus.getCurrent();
     pos.push(doc, 0, null);
     process(doc, pos, ctx);

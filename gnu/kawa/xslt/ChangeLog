@@ -1,3 +1,8 @@
+2002-06-24  Per Bothner  <per@bothner.com>
+
+	* XSLT.java:  Update for moved/changed XMLParser class.
+	(process):  Document.document method is renamed to parse.
+
 2002-06-11  Per Bothner  <per@bothner.com>
 
 	New package - an implementation of XSLT.

@@ -31,7 +31,9 @@ public abstract class Expression implements Printable
 
   public final void compile (Compilation comp, Type type)
   {
-    compile (comp, new StackTarget(type));
+    compile (comp,
+	     type == Type.pointer_type ? Target.pushObject
+	     : new StackTarget(type));
   }
 
   abstract Object walk (ExpWalker walker);

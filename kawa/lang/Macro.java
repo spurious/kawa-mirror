@@ -92,6 +92,7 @@ public class Macro extends Syntax implements Printable, Externalizable
   /** Copy constructor. */
   public Macro (Macro old)
   {
+    name = old.name;
     expander = old.expander;
     capturedIdentifiers = old.capturedIdentifiers;
     templateIdentifiers = old.templateIdentifiers;

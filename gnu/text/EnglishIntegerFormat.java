@@ -1,7 +1,9 @@
 package gnu.text;
 import java.text.FieldPosition;
+import gnu.lists.*;
 
 public class EnglishIntegerFormat extends java.text.NumberFormat
+implements FormatToConsumer
 {
   private static EnglishIntegerFormat cardinalEnglish;
   private static EnglishIntegerFormat ordinalEnglish;
@@ -124,6 +126,28 @@ public class EnglishIntegerFormat extends java.text.NumberFormat
 	else if (exp1000 > 0)
 	  sbuf.append(power1000s[exp1000]);
       }
+  }
+
+  public void writeInt (int value, Consumer out)
+  {
+    writeLong(value, out);
+  }
+
+  public void writeLong (long value, Consumer out)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    format (value, sbuf, null);
+    out.writeChars(sbuf.toString());
+  }
+
+  public void writeObject (Object value, Consumer out)
+  {
+    writeLong(((Number) value).longValue(), out);
+  }
+
+  public void writeBoolean(boolean value, Consumer out)
+  {
+    writeLong(value ? 1 : 0, out);
   }
 
   public StringBuffer format(long num, StringBuffer sbuf, FieldPosition fpos)

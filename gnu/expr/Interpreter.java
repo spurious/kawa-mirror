@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
+import gnu.bytecode.Type;
 
 // WARNING many of the fields/method will be to Scheme instead.
 
@@ -144,7 +145,54 @@ public abstract class Interpreter
 
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
 
-  public abstract gnu.bytecode.Type getTypeFor(Class clas);
+  public abstract Type getTypeFor(Class clas);
+
+  public static Type string2Type (String name)
+  {
+    Type t;
+    if (name.endsWith("[]"))
+      {
+	t = string2Type(name.substring(0, name.length()-2));
+	if (t == null)
+	  return null;
+	t = gnu.bytecode.ArrayType.make(t);
+      }
+    else if (gnu.bytecode.Type.isValidJavaTypeName(name))
+      t = gnu.bytecode.Type.getType(name);
+    else
+      return null;
+    return t;
+  }
+
+  public Type getTypeFor(String name)
+  {
+    return  string2Type(name);
+  }
+
+  public Type getTypeFor(Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        Object cname = ((QuoteExp) exp).getValue();
+        if (cname instanceof Type)
+          return (Type) cname;
+        if (cname instanceof gnu.kawa.util.FString || cname instanceof String)
+          return gnu.bytecode.ClassType.make(cname.toString());
+      }
+    else if (exp instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) exp;
+        Declaration decl = rexp.getBinding();
+        if (decl != null)
+          return getTypeFor(decl.getValue());
+        String name = rexp.getName();
+        int len = name.length();
+        if (len > 2 && name.charAt(0) == '<'
+            && name.charAt(len-1) == '>')
+          return getTypeFor(name.substring(1, len-1));
+      }
+    return null;
+  }
 
   public void emitPushBoolean(boolean value, CodeAttr code)
   {

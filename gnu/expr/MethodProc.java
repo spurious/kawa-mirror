@@ -110,13 +110,14 @@ public abstract class MethodProc extends ProcedureN
       {
         Type t1 = proc1.getParameterType(i);
         Type t2 = proc2.getParameterType(i);
-        if (! t2.isSubtype(t1))
+	int comp = t1.compare(t2);
+        if (comp != 1)
           {
             not2 = true;
             if (not1)
               return null;
           }
-        if (! t1.isSubtype(t2))
+        if (comp != -1)
           {
             not1 = true;
             if (not2)

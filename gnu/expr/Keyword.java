@@ -1,9 +1,8 @@
 package gnu.expr;
-import gnu.bytecode.*;
 import gnu.mapping.Printable;
 import java.io.*;
 
-public class Keyword extends Object implements Printable, Compilable, Externalizable
+public class Keyword extends Object implements Printable, Externalizable
 {
   // Does not include final ':'.
   private String name;
@@ -105,8 +104,6 @@ public class Keyword extends Object implements Printable, Compilable, Externaliz
 
   public final String getName() { return name; }
   
-  static Method makeKeywordMethod;
-
   /**
    * @serialData Write the keyword name (without colons) using writeUTF.
    */
@@ -127,24 +124,4 @@ public class Keyword extends Object implements Printable, Compilable, Externaliz
     return make(name);
   }
 
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (makeKeywordMethod == null)
-      {
-	Type[] applyargs = new Type[1];
-	applyargs[0] = comp.javaStringType;
-	makeKeywordMethod =
-	  comp.scmKeywordType.addMethod ("make", applyargs,
-					  comp.scmKeywordType,
-					  Access.PUBLIC|Access.STATIC);
-      }
-    return new Literal (this, comp.scmKeywordType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPushString(((Keyword) literal.value).name);
-    code.emitInvokeStatic(makeKeywordMethod);
-  }
 }

@@ -178,6 +178,35 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     init(method);
   }
 
+  public PrimProcedure(Method method, Interpreter interpreter)
+  {
+    init(method);
+
+    // This stuff deals with that a language may have its own mapping
+    // from Java types to language types, for coercions and other reasons.
+    Type[] pTypes = method.getParameterTypes();
+    int nTypes = pTypes.length;
+    argTypes = null;
+    for (int i = nTypes;  --i >= 0; )
+      {
+	Type javaType = pTypes[i];
+	Type langType = interpreter.getTypeFor(javaType.getReflectClass());
+	if (javaType != langType)
+	  {
+	    if (argTypes == null)
+	      {
+		argTypes = new Type[nTypes];
+		System.arraycopy(pTypes, 0, argTypes, 0, nTypes); 
+	      }
+	    argTypes[i] = langType;
+	  }
+      }
+    if (argTypes == null)
+      argTypes = pTypes;
+    retType = op_code == 183 ? method.getDeclaringClass() :
+      interpreter.getTypeFor(method.getReturnType().getReflectClass());
+  }
+
   private void init(Method method)
   {
     this.method = method;

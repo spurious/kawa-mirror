@@ -75,10 +75,13 @@ public class SwingFrame extends EFrame
     StringBuffer sbuf = new StringBuffer(100);
     sbuf.append("#<frame #");
     sbuf.append(id);
-    sbuf.append(" size: ");
-    sbuf.append(jframe.getSize());
-    sbuf.append(" preferred: ");
-    sbuf.append(jframe.getPreferredSize());
+    if (jframe != null)
+      {
+	sbuf.append(" size: ");
+	sbuf.append(jframe.getSize());
+	sbuf.append(" preferred: ");
+	sbuf.append(jframe.getPreferredSize());
+      }
     sbuf.append('>');
     return sbuf.toString();
   }

@@ -86,6 +86,8 @@ positive_p.class \
 negative_p.class \
 odd_p.class \
 even_p.class \
+max.class \
+min.class \
 equal_oper.class \
 less_oper.class \
 lessequal_oper.class \
@@ -96,7 +98,11 @@ minus_oper.class \
 multiply_oper.class \
 divide_oper.class \
 abs.class \
+quotient.class \
+remainder.class \
+modulo.class \
 gcd.class \
+lcm.class \
 numerator.class \
 denominator.class \
 floor.class \

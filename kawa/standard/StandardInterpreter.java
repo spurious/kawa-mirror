@@ -151,12 +151,18 @@ public class StandardInterpreter extends Interpreter
       define_proc ("negative?", "kawa.standard.negative_p");
       define_proc ("odd?", "kawa.standard.odd_p");
       define_proc ("even?", "kawa.standard.even_p");
+      define_proc ("max", "kawa.standard.max");
+      define_proc ("min", "kawa.standard.min");
       define_proc ("+", "kawa.standard.plus_oper");
       define_proc ("-", "kawa.standard.minus_oper");
       define_proc ("*", "kawa.standard.multiply_oper");
       define_proc ("/", "kawa.standard.divide_oper");
       define_proc ("abs", "kawa.standard.abs");
+      define_proc ("quotient", "kawa.standard.quotient");
+      define_proc ("remainder", "kawa.standard.remainder");
+      define_proc ("modulo", "kawa.standard.modulo");
       define_proc ("gcd", "kawa.standard.gcd");
+      define_proc ("lcm", "kawa.standard.lcm");
       define_proc ("numerator", "kawa.standard.numerator");
       define_proc ("denominator", "kawa.standard.denominator");
       define_proc ("floor", "kawa.standard.floor");

@@ -13,3 +13,5 @@ java_JAVA=\
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
   RomanIntegerFormat.java EnglishIntegerFormat.java \
   CaseConvertFormat.java FlushFormat.java
+
+EXTRA_DIST = package.html

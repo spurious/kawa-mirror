@@ -60,4 +60,4 @@ java_JAVA=\
   TryExp.java \
   Undefined.java
 
-EXTRA_DIST = overview.html
+EXTRA_DIST = package.html

@@ -49,4 +49,4 @@ java_JAVA=\
   WrongArguments.java \
   WrongType.java
 
-EXTRA_DIST = overview.html
+EXTRA_DIST = package.html

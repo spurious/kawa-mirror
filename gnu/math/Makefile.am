@@ -20,4 +20,4 @@ java_JAVA=\
   FixedRealFormat.java \
   ExponentialFormat.java
 
-EXTRA_DIST = overview.html
+EXTRA_DIST = package.html

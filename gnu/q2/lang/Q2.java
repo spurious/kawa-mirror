@@ -6,6 +6,11 @@ import gnu.xml.*;
 import gnu.expr.*;
 import gnu.kawa.lispexpr.ReadTable;
 
+/** Support for the experimental Q2 language.
+ * See the <a href="http://www.gnu.org/software/kawa/q2/">web site</a>
+ * for information.
+ */
+
 public class Q2 extends Scheme
 {
   static Q2 instance;

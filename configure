@@ -17796,8 +17796,8 @@ while test -n "$ac_sources"; do
 done
           ac_config_links="$ac_config_links $ac_config_links_3"
 
-ac_sources="gnu/xquery/testsuite/reviews.xml.in"
-ac_dests="gnu/xquery/testsuite/reviews.xml"
+ac_sources="gnu/xquery/testsuite/report1.xml.in"
+ac_dests="gnu/xquery/testsuite/report1.xml"
 while test -n "$ac_sources"; do
   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
   set $ac_sources; ac_source=$1; shift; ac_sources=$*
@@ -17805,8 +17805,8 @@ while test -n "$ac_sources"; do
 done
           ac_config_links="$ac_config_links $ac_config_links_4"
 
-ac_sources="gnu/xquery/testsuite/items.xml.in"
-ac_dests="gnu/xquery/testsuite/items.xml"
+ac_sources="gnu/xquery/testsuite/reviews.xml.in"
+ac_dests="gnu/xquery/testsuite/reviews.xml"
 while test -n "$ac_sources"; do
   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
   set $ac_sources; ac_source=$1; shift; ac_sources=$*
@@ -17814,8 +17814,8 @@ while test -n "$ac_sources"; do
 done
           ac_config_links="$ac_config_links $ac_config_links_5"
 
-ac_sources="gnu/xquery/testsuite/bids.xml.in"
-ac_dests="gnu/xquery/testsuite/bids.xml"
+ac_sources="gnu/xquery/testsuite/items.xml.in"
+ac_dests="gnu/xquery/testsuite/items.xml"
 while test -n "$ac_sources"; do
   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
   set $ac_sources; ac_source=$1; shift; ac_sources=$*
@@ -17823,8 +17823,8 @@ while test -n "$ac_sources"; do
 done
           ac_config_links="$ac_config_links $ac_config_links_6"
 
-ac_sources="gnu/xquery/testsuite/users.xml.in"
-ac_dests="gnu/xquery/testsuite/users.xml"
+ac_sources="gnu/xquery/testsuite/bids.xml.in"
+ac_dests="gnu/xquery/testsuite/bids.xml"
 while test -n "$ac_sources"; do
   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
   set $ac_sources; ac_source=$1; shift; ac_sources=$*
@@ -17832,14 +17832,23 @@ while test -n "$ac_sources"; do
 done
           ac_config_links="$ac_config_links $ac_config_links_7"
 
-ac_sources="testsuite/scribble.html.in"
-ac_dests="testsuite/scribble.html"
+ac_sources="gnu/xquery/testsuite/users.xml.in"
+ac_dests="gnu/xquery/testsuite/users.xml"
 while test -n "$ac_sources"; do
   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
   set $ac_sources; ac_source=$1; shift; ac_sources=$*
   ac_config_links_8="$ac_config_links_8 $ac_dest:$ac_source"
 done
           ac_config_links="$ac_config_links $ac_config_links_8"
+
+ac_sources="testsuite/scribble.html.in"
+ac_dests="testsuite/scribble.html"
+while test -n "$ac_sources"; do
+  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
+  set $ac_sources; ac_source=$1; shift; ac_sources=$*
+  ac_config_links_9="$ac_config_links_9 $ac_dest:$ac_source"
+done
+          ac_config_links="$ac_config_links $ac_config_links_9"
 
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ac_config_files="$ac_config_files Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/xslt/Makefile gnu/kawa/sax/Makefile gnu/brl/Makefile gnu/kawa/brl/Makefile gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile gnu/jemacs/swing/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile gnu/xquery/Makefile gnu/xquery/lang/Makefile gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile gnu/kawa/ant/Makefile gnu/kawa/models/Makefile gnu/kawa/swingviews/Makefile doc/Makefile testsuite/Makefile bin/Makefile"
@@ -18544,6 +18553,7 @@ do
   "$ac_config_links_6" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_links_6" ;;
   "$ac_config_links_7" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_links_7" ;;
   "$ac_config_links_8" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_links_8" ;;
+  "$ac_config_links_9" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_links_9" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

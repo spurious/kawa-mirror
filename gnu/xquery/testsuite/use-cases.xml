@@ -1,7 +1,7 @@
 <testsuite>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q1</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q1</ident>
 
 <description>List books published by Addison-Wesley after 1991,
   including their year and title.</description>
@@ -31,7 +31,7 @@
 </test>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q2</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q2</ident>
 <description>Create a flat list of all the title-author pairs, with
   each pair enclosed in a "result" element.</description>
 <query>
@@ -75,7 +75,7 @@
 </test>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q3</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q3</ident>
 <description>For each book in the bibliography, list the title and
   authors, grouped inside a "result" element.</description>
 <query>
@@ -117,7 +117,7 @@
 </test>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q5</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q5</ident>
 <description>For each book found at both bn.com and amazon.com, list
 the title of the book and its price from each source.</description>
 <query><![CDATA[
@@ -158,7 +158,7 @@ the title of the book and its price from each source.</description>
 </test>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q6</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q6</ident>
 <description>For each book that has at least one author, list the title
 and first two authors, and an empty "et-al" element if the book has
 additional authors.</description>
@@ -216,7 +216,7 @@ additional authors.</description>
 </test>
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q9</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q9</ident>
 <description>In the document "books.xml", find all section or chapter titles
 that contain the word "XML", regardless of the level of nesting.</description>
 <NOTE>books.xml has been inlines to the $books variable.</NOTE>
@@ -258,7 +258,7 @@ return
 
 <!--
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q10</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q10</ident>
 <description>In the document "prices.xml", find the minimum price for
 each book, in the form of a "minprice" element with the book title as
 its title attribute.</description>
@@ -292,7 +292,7 @@ its title attribute.</description>
 -->
 
 <test>
-<ident>Use Case "XMP": Experiences and Exemplars: Q11</ident>
+<ident>Use Case "XMP" (Experiences and Exemplars) Q11</ident>
 <description>For each book with an author, return the book with its
 title and authors. For each book with an editor, return a reference
 with the book title and the editor's affiliation.</description>
@@ -356,7 +356,7 @@ with the book title and the editor's affiliation.</description>
 </test>
 
 <test>
-<ident>Use Case "TREE": Queries that preserve hierarchy: Q1</ident>
+<ident>Use Case "TREE" (Queries that preserve hierarchy) Q1</ident>
 <description><![CDATA[Prepare a (nested) table of contents for Book1, listing
 all the sections and their titles. Preserve the original attributes of
 each <section> element, if any.]]></description>
@@ -583,7 +583,51 @@ define function section_summary($s)
 </test>
 
 <test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q1</ident>
+<description>In the Procedure section of Report1, what Instruments were
+used in the second Incision?</description>
+<query>
+for $s in doc("report1.xml")//section[section.title = "Procedure"]
+return ($s//incision)[2]/instrument
+</query>
+<expect>
+<instrument>electrocautery</instrument>
+</expect>
+</test>
 
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q2</ident>
+<description>In the Procedure section of Report1, what are the
+first two Instruments to be used?</description>
+<query><![CDATA[
+for $s in doc("report1.xml")//section[section.title = "Procedure"]
+return ($s//instrument)[position()<=2]
+]]></query>
+<expect>
+<instrument>using electrocautery.</instrument>
+<instrument>electrocautery</instrument>
+</expect>
+</test>
+
+<!--
+FAILS - don't know why
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q3</ident>
+<description>In Report1, what Instruments were used in the first
+two Actions after the second Incision?</description>
+<query><![CDATA[
+let $i2 := (doc("report1.xml")//incision)[2]
+for $a in (doc("report1.xml")//action)[. >> $i2][position()<=2]
+return $a//instrument
+]]></query>
+<expect>
+<instrument>Hasson trocar</instrument>
+<instrument>trocar</instrument>
+</expect>
+</test>
+-->
+
+<test>
 <ident>Use Case "R" Q3 - Find cases where a user with a rating worse
 (alphabetically, greater) than "C" is offering an item with a reserve
 price of more than 1000.</ident>
@@ -618,6 +662,84 @@ return
   </result>
 </expect>
 </test>
+
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q4</ident>
+<description>List item numbers and descriptions of items that
+have no bids.</description>
+<query>
+<result>
+  {
+    for $i in doc("items.xml")//item_tuple
+    where empty(doc("bids.xml")//bid_tuple[itemno = $i/itemno])
+    return
+        <no_bid_item>
+            { $i/itemno }
+            { $i/description }
+        </no_bid_item>
+  }
+</result>
+</query>
+<expect>
+  <result>
+    <no_bid_item>
+        <itemno>1005</itemno>
+        <description>Tennis Racket</description>
+    </no_bid_item>
+    <no_bid_item>
+        <itemno>1006</itemno>
+        <description>Helicopter</description>
+    </no_bid_item>
+    <no_bid_item>
+        <itemno>1008</itemno>
+        <description>Broken Bicycle</description>
+    </no_bid_item>
+  </result>
+</expect>
+</test>
+
+<!-- FAILS because max does a string compare
+<test>
+<ident>Use Case "R" (Access to Relational Data) Q6</ident>
+<description>For each item whose highest bid is more than twice its
+reserve price, list the item number, description, reserve price,
+and highest bid.</description>
+<NOTE>may need explicit call to number added for the multiplication.</NOTE>
+<query><![CDATA[
+<result>
+  {
+    for $item in doc("items.xml")//item_tuple
+    let $b := doc("bids.xml")//bid_tuple[itemno = $item/itemno]
+    let $z := max($b/bid)
+    where $item/reserve_price * 2 < $z
+    return
+        <successful_item>
+            { $item/itemno }
+            { $item/description }
+            { $item/reserve_price }
+            <high_bid>{$z }</high_bid>
+         </successful_item>
+  }
+</result>
+]]></query>
+<expect>
+<result>
+    <successful_item>
+        <itemno>1002</itemno>
+        <description>Motorcycle</description>
+        <reserve_price>500</reserve_price>
+        <high_bid>1200.0</high_bid>
+    </successful_item>
+    <successful_item>
+        <itemno>1004</itemno>
+        <description>Tricycle</description>
+        <reserve_price>15</reserve_price>
+        <high_bid>40.0</high_bid>
+    </successful_item>
+</result>
+</expect>
+</test>
+-->
 
 <test>
 <ident>Use Case "R" Q11 - List the item number and description of the

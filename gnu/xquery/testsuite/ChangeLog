@@ -1,5 +1,9 @@
 2003-08-03  Per Bothner  <per@bothner.com>
 
+	* report1.xml.in:  New data file.
+	* Makefile.am (EXTRA_DIST):  Add report1.xml.in.
+	* use-cases.xml:  Add 3 more use cases: SEQ Q1, Q2; R Q4.
+
 	* TestMisc.java (main):  Fix/update some tests.
 	Add 4 tests for boundary whitespace and	declare xmlspace.
 	* maketab1.xql:  Add a now-needed xmlspace declaration.

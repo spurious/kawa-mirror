@@ -84,9 +84,12 @@ This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
 The two packages
-@uref{http://ww.cygnus.com/~bothner/gnu.bytecode/,@code{gnu.bytecode}}
+@uref{http://www.cygnus.com/~bothner/gnu.bytecode/,@code{gnu.bytecode}}
 and @uref{http://www.cygnus.com/~bothner/gnu.math/,@code{gnu.math}} are used
 by Kawa, and distributed with it, but may be independently useful.
+
+The @uref{http://www.cygnus.com/~bothner/Freenix98/,98 Usenix paper}
+gives a technical overview of Kawa.
 
 @menu
 * Features::
@@ -500,9 +503,11 @@ nor @code{letrec-syntax} are implemented.
 * Special named constants::
 * Optional and keyword lambda parameters::
 * Logical Number Operations::
+* Strings::
 * Records::
 * Files:: File System Interface
 * Ports::
+* Format:: Formatted Output (Common-Lisp-style)
 * Exceptions:: Signalling and recovering from exceptions
 * Eval and Environments::
 * Quantities::
@@ -658,7 +663,7 @@ otherwise to @code{#f}.  The @var{initializer} is evaluated in an
 environment in which all the previous formal parameters have been bound.
 @end itemize
 
-@node Logical Number Operations, Records, Optional and keyword lambda parameters, Extensions
+@node Logical Number Operations, Strings, Optional and keyword lambda parameters, Extensions
 @section Logical Number Operations
 
 These functions operate on the 2's complement binary representation
@@ -727,7 +732,42 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
-@node Records, Files, Logical Number Operations, Extensions
+@node Strings, Records, Logical Number Operations, Extensions
+@section Strings
+
+@defun string-upcase str
+Return a new string where the letters in @var{str} are replaced
+by their upper-case equivalents.
+@end defun
+
+@defun string-downcase str
+Return a new string where the letters in @var{str} are replaced
+by their lower-case equivalents.
+@end defun
+
+@defun string-capitalize str
+Return a new string where the letters in @var{str} that start a new word
+are replaced by their title-case equivalents, while non-initial letters
+are replaced by their lower-case equivalents.
+@end defun
+
+@defun string-upcase! str
+Destructively modify @var{str}, replacing the letters
+by their upper-case equivalents.
+@end defun
+
+@defun string-downcase! str
+Destructively modify @var{str}, replacing the letters
+by their upper-lower equivalents.
+@end defun
+
+@defun string-capitalize! str
+Destructively modify @var{str}, such that the letters that start a new word
+are replaced by their title-case equivalents, while non-initial letters
+are replaced by their lower-case equivalents.
+@end defun
+
+@node Records, Files, Strings, Extensions
 @section Records
 
 The Record package provides a facility for users to define their own
@@ -883,7 +923,7 @@ Unspecified what happens on error (such as exiting file with the same name).
 with scsh.)
 @end defun
 
-@node Ports, Exceptions, Files, Extensions
+@node Ports, Format, Files, Extensions
 @section Ports
 
 @defun call-with-input-string string proc
@@ -1005,7 +1045,50 @@ change the encoding temporarily:
 @end example
 @end defvar
 
-@node Exceptions, Eval and Environments, Ports, Extensions
+@node Format, Exceptions, Ports, Extensions
+@section Formatted Output (Common-Lisp-style)
+
+@defun format destination fmt . arguments
+An almost complete implementation of Common LISP format description
+according to the CL reference book @cite{Common LISP} from Guy L.
+Steele, Digital Press.  Backward compatible to most of the available
+Scheme format implementations.
+
+Returns @code{#t}, @code{#f} or a string; has side effect of printing
+according to @var{fmt}.  If @var{destination} is @code{#t},
+the output is to the current output port and @code{#t} is returned.  If
+@var{destination} is @code{#f}, a formatted string is returned as the
+result of the call.  If @var{destination} is a string,
+@var{destination} is regarded as the format string; @var{fmt} is
+then the first argument and the output is returned as a string. If
+@var{destination} is a number, the output is to the current error port
+if available by the implementation. Otherwise @var{destination} must be
+an output port and @code{#t} is returned.@refill
+
+@var{fmt} must be a string or an instance of @code{gnu.text.MessageFormat}
+or @code{java.text.MessageFormat}.  If @var{fmt} is a string,
+it is parsed as if by @code{parse-format}.
+@end defun
+
+@defun parse-format format-string
+Parses @code{format-string}, which is a string of the form of a Common LISP
+format description.  Returns an instance of @code{gnu.text.ReportFormat},
+which can be passed to the @code{format} function.
+@end defun
+
+A format string passed to @code{format} or @code{parse-format}
+consists of format directives (that start with @samp{~}),
+and regular characters (that are written directly to the destination).
+Most of the Common Lisp (and Slib) format directives are implemented.
+An important exception is that the floating-point directives
+@samp{E}, @samp{G}, and @samp{$} are not implemented, and @samp{F}
+is only supported if the number of digits after the decimal point
+is specified.  Also, neither tabulation, justification, nor pretty-printing
+are supported yet.
+
+Plus of course, we need documentation for @code{format}!
+
+@node Exceptions, Eval and Environments, Format, Extensions
 @section Signalling and recovering from exceptions
 
 @defun catch key thunk handler
@@ -1899,9 +1982,9 @@ difficulties, let me know.
 
 Here is the license for this manual:
 
-Copyright @copyright{} 1996, 1997 Per Bothner
+Copyright @copyright{} 1996, 1997, 1998 Per Bothner
 @*Parts of this manual were derived from the SLIB manual,
-copyright @copyright{} 1993, 1994 Todd R. Eigenschink and Aubrey Jaffer.
+copyright @copyright{} 1993-1998 Todd R. Eigenschink and Aubrey Jaffer.
 @*Parts of this manual were derived from ISO/EIC 10179:1996(E)
 (Document Style and Specifical Language) - unknown copyright.
 

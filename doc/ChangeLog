@@ -1,3 +1,9 @@
+Mon Jun 29 21:23:02 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Document string-upcase, string-downcase!, etc.
+	Start docuemnting format and parse-format.
+	Add reference to Freenix paper.
+
 Sun May 24 13:54:55 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Add some notes on building from source.

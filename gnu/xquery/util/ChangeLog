@@ -1,3 +1,7 @@
+2002-03-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (java_sources):  Remove mistakenly added MapDescendents.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* MinMax.java:  New class, extends Procedure1.

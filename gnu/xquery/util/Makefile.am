@@ -12,7 +12,6 @@ java_sources = \
   ItemAt.java \
   MakeAttribute.java \
   MakeElement.java \
-  MapDescendants.java \
   MinMax.java \
   NumberValue.java \
   Position.java \

@@ -1,3 +1,11 @@
+2001-09-13  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Fix typo in help text for --with-gcj.
+	Create tab.xml using AC_LINK_FILES rather than AC_OUTPUT.
+
+	* kawa/standard/define.java (scanForDefinitions):  Remove test for
+	usingTailCalls.
+
 2001-08-30  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Record.java (makeRecordType):  Use mangleIfNeeded.

@@ -16,7 +16,7 @@ AC_ARG_ENABLE(kawa-frontend,
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
 
 AC_ARG_WITH(gcj,
-  [  --gjc    Compile Kawa using GCJ (GNU Compiler for Java)])
+  [  --with-gjc    Compile Kawa using GCJ (GNU Compiler for Java)])
 
 AC_ARG_ENABLE(xml,
   [  --disable-xml            Don't build support for XML processing],
@@ -123,6 +123,7 @@ AC_SUBST(JEMACS_VERSION)
 AC_SUBST(SHELL)
 Make_rules="$srcdir/Make-rules"
 AC_SUBST_FILE(Make_rules)
+AC_LINK_FILES(gnu/xquery/testsuite/tab.xml.in, gnu/xquery/testsuite/tab.xml)
 
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
@@ -136,5 +137,4 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   gnu/xquery/Makefile gnu/xquery/lang/Makefile
   gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
-  gnu/xquery/testsuite/tab.xml
   doc/Makefile testsuite/Makefile bin/Makefile)

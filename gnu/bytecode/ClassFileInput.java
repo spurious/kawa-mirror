@@ -199,7 +199,7 @@ public class ClassFileInput extends DataInputStream
 	short[] numbers = new short[count];
 	for (int i = 0;  i < count;  i++)
 	  {
-	    numbers[i] = readUnsignedShort();
+	    numbers[i] = readShort();
 	  }
 	return new LineNumbersAttr(numbers, (CodeAttr) container);
       }
@@ -230,7 +230,7 @@ public class ClassFileInput extends DataInputStream
 	short[] data = new short[count]; 
 	for (int i = 0;  i < count;  i++)
 	  {
-	    data[i] = readUnsignedShort();
+	    data[i] = readShort();
 	  }
 	return new InnerClassesAttr(data, (ClassType) container);
      }

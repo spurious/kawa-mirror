@@ -4,8 +4,6 @@ AUTOMAKE_OPTIONS = foreign
 
 include $(top_srcdir)/Make-rules
 
-SUFFIXES = .java .class
-
 javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\

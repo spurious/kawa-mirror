@@ -20,6 +20,44 @@
 	(invoke button 'setAction oncommand))
     button))
 
+(define (fill (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
+  (make <gnu.kawa.models.FillShape> shape))
+
+(define (draw (shape :: <java.awt.Shape>)) ::  <gnu.kawa.models.Paintable>
+  (make <gnu.kawa.models.DrawShape> shape))
+
+(define (with-paint  (paint  :: <java.awt.Color>)
+		     (pic ::  <gnu.kawa.models.Paintable>))
+  (make  <gnu.kawa.models.WithPaint> pic paint))
+
+(define (with-composite  #!rest (arguments :: <Object[]>))
+  (gnu.kawa.models.WithComposite:make arguments))
+
+(define (composite-src-over #!optional (alpha :: <float> 1.0))
+  :: <java.awt.Composite>
+  (java.awt.AlphaComposite:getInstance
+   (static-field <java.awt.AlphaComposite> 'SRC_OVER)
+   alpha))
+
+(define (composite-src #!optional (alpha :: <float> 1.0))
+  :: <java.awt.Composite>
+  (java.awt.AlphaComposite:getInstance
+   (static-field <java.awt.AlphaComposite> 'SRC)
+   alpha))
+
+(define (read-image url) :: <java.awt.image.BufferedImage>
+  (javax.imageio.ImageIO:read (gnu.kawa.xml.Document:makeURL url)))
+
+(define (rotation (theta :: <double>)) :: <java.awt.geom.AffineTransform>
+  (java.awt.geom.AffineTransform:getRotateInstance theta))
+
+(define (with-transform  (transform  :: <java.awt.geom.AffineTransform>)
+		     (pic ::  <gnu.kawa.models.Paintable>))
+  (gnu.kawa.models.WithTransform:new pic transform))
+
+(define-constant color-red :: <java.awt.Color>
+  (static-field <java.awt.Color> 'RED))
+
 (define (frame #!key
 	       (title  :: <String> #!null)
 	       (menubar ::  <javax.swing.JMenuBar> #!null)
@@ -89,13 +127,3 @@
 	 path)
       (let ((pt ((primitive-array-get <object>) more-points i)))
 	(invoke path 'lineTo (real-part pt) (imag-part pt))))))
-
-(define (panel #!key
-	       (width :: <integer> 10)
-	       (height :: <integer> 10)
-	       contents)
-  :: <javax.swing.JPanel>
-  (let ((panel :: <javax.swing.JPanel>
-	       (make <javax.swing.JPanel>)))
-    (invoke panel 'setPreferredSize (make <java.awt.Dimension> width height))
-    panel))

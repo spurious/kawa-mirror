@@ -1,3 +1,8 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* QueueReader.java:  New classes, moved from kawa/lang.
+	* Makefile.am, Makefile.in (java_JAVA):  Add QueueReader.java.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* SourceMessages.java (errorCount):  Make private.

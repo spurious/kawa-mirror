@@ -1,3 +1,9 @@
+2001-02-26  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (doFixups):  Move method fixups to Method, CodeAttr.
+	* CodeAttr.java (assignConstants):  Handle CodeFragments, labels here.
+	* Method.java (assign_constants):  Rename to assignConstants.
+
 2000-11-21  Brain R. Lewis <brlewis@users.sourceforge.net>
 
 	* ArrayClassLoader.java:  Handle custom classloader by using

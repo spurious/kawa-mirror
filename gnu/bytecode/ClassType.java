@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -562,21 +562,8 @@ public class ClassType extends ObjectType implements AttrContainer {
     for (Field field = fields; field != null; field = field.next) {
       field.assign_constants (this);
     }
-    for (Method method = methods; method != null; method = method.next) {
-      CodeAttr code = method.code;
-      if (code == null)
-        continue;
-      for (;;)
-        {
-          CodeFragment frag = code.fragments;
-          if (frag == null)
-            break;
-          code.fragments = frag.next;
-          frag.emit(code);
-        }
-      method.assign_constants ();
-      method.code.finalize_labels ();
-    }
+    for (Method method = methods; method != null; method = method.next)
+      method.assignConstants();
     Attribute.assignConstants(this, this);
   }
 

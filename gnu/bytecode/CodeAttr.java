@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -1776,9 +1776,18 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void assignConstants (ClassType cl)
   {
     super.assignConstants(cl);
+    for (;;)
+      {
+	CodeFragment frag = fragments;
+	if (frag == null)
+	  break;
+	fragments = frag.next;
+	frag.emit(this);
+      }
     if (locals != null && locals.container == null && ! locals.isEmpty())
       locals.addToFrontOf(this);
     Attribute.assignConstants(this, cl);
+    finalize_labels();
   }
 
   public final int getLength()

@@ -255,7 +255,7 @@ public class Method implements AttrContainer {
     setSignature(sigConstant.string);
   }
 
-  void assign_constants ()
+  void assignConstants ()
   {
     ConstantPool constants = getConstants();
     if (name_index == 0 && name != null)

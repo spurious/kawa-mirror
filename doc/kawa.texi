@@ -1234,7 +1234,7 @@ the last expression of @var{body} are returned. The @var{body} is a
 "tail body", cf section 3.5 of the R5RS.
 
 The matching of each @var{formals} to values is as for the matching of
-@var{formals} to arguments in a @code{ambda} expression, and it is an
+@var{formals} to arguments in a @code{lambda} expression, and it is an
 error for an @var{expression} to return a number of values that does not
 match its corresponding @var{formals}.
 @example
@@ -1512,7 +1512,7 @@ You can of course also use the extended format in a @code{define}:
 @end display
 @display
 @var{req-opt-args} ::= @var{req-arg} ... [#!optional @var{opt-arg} ...]
-@var{rest-key-args} ::= [#!rest @var{rest-arg}] [#key @var{key-arg} ...]
+@var{rest-key-args} ::= [#!rest @var{rest-arg}] [#!key @var{key-arg} ...]
 @var{req-arg} ::= @var{variable} [:: @var{type}] | (@var{variable} [[::] @var{type}] )
 @var{opt-arg} ::= @var{arg-with-default}
 @var{key-arg} ::=  @var{arg-with-default}

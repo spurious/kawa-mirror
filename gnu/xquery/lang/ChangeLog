@@ -1,0 +1,6 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	New package gnu.xquery.lang.
+	* XQuery.java:  New class, extends Interpreter.
+	* XQParser.java:  New class, extends LispReader (for now).
+

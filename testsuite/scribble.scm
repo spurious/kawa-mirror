@@ -6,7 +6,7 @@
 
 (define (init) <void>
   (let ((applet :: <java.applet.Applet> (this)))
-    (invoke applet 'addMouseListener
+    (invoke (this) 'addMouseListener
 	    (object (<java.awt.event.MouseAdapter>)
 		    ((mousePressed (e :: <java.awt.event.MouseEvent>)) <void>
 		     (set! last-x (invoke e 'getX))

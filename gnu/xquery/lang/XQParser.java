@@ -740,7 +740,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseElementType()
       throws java.io.IOException, SyntaxException
   {
-    QName qname = parseNameTest(defaultNamespace);
+    QName qname = parseNameTest(defaultElementNamespace);
     getRawToken();
     return new QuoteExp(new ElementType(qname));
   }
@@ -936,7 +936,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (token == NCNAME_TOKEN || token == QNAME_TOKEN 
 	|| token == NCNAME_COLON_TOKEN || token == OP_MUL)
       {
-	QName qname = parseNameTest(defaultNamespace; // FIXME null if attribute
+	QName qname = parseNameTest(defaultElementNamespace; // FIXME null if attribute
       }
     else
     */
@@ -974,7 +974,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  {
-	    QName qname = parseNameTest(defaultNamespace);
+	    QName qname = parseNameTest(defaultElementNamespace);
 	    predicate = new ElementType(qname);
 	  }
 	Expression[] args = { dot, new QuoteExp(predicate) };
@@ -1343,7 +1343,7 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     nesting++;
     Vector vec = new Vector();
-    Expression element = parseNameSpec(defaultNamespace, false);
+    Expression element = parseNameSpec(defaultElementNamespace, false);
     vec.addElement(element);
     if (element == null)
       return syntaxError("missing NameSpec");
@@ -1928,7 +1928,8 @@ public class XQParser extends LispReader // should be extends Lexer
 
   Compilation parser;
 
-  String defaultNamespace = "";
+  String defaultElementNamespace = "";
+  String defaultFunctionNamespace = XQuery.XQUERY_FUNCTION_NAMESPACE;
   Hashtable namespaces = new Hashtable(50);
 
   /** Parse an expression.
@@ -2029,7 +2030,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		    error('w', "'declare function namespace' not implemented - ignored");
 		  }
 		else
-		  defaultNamespace = uri.toString();
+		  defaultElementNamespace = uri.toString();
 		return QuoteExp.voidExp;
 	      }
 	  }

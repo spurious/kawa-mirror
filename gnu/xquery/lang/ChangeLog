@@ -1,3 +1,8 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (defaultFunctionNamespace):  New field.
+	(defaultNamespace):  Rename field to defaultElementNamespace.
+
 2002-11-10  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (focusDefined):  New field.

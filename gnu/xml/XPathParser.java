@@ -4,6 +4,8 @@
 package gnu.xml;
 import gnu.lists.Convert;
 
+/** Parse an xpath expression, yielding an XPath object. */
+
 public class XPathParser implements XPathConstants
 {
 	String str;

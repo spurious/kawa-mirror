@@ -5,6 +5,8 @@ package gnu.xml;
 import gnu.lists.*;
 import java.io.PrintWriter;
 
+/** Print an event stream in XML format on a PrintWriter. */
+
 public class XMLPrinter implements Consumer
 {
   PrintWriter out;

@@ -4,6 +4,8 @@
 package gnu.xml;
 import gnu.lists.*;
 
+/** Process namespace attributes as received from an XML parser. */
+
 public class NamespaceResolver extends FilterConsumer
 {
   // List of (name, prefix, local) for begin and each attribute.

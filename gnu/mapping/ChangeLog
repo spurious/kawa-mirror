@@ -1,3 +1,8 @@
+2001-09-13  Per Bothner  <per@bothner.com>
+
+	* CpsMethodContainer.java (apply):  Change return type to void.
+	* CpsMethodProc.java (applyError):  New helper method.
+
 2001-08-15  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (print(String)):  Handle null string.

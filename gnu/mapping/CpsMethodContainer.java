@@ -8,5 +8,5 @@ package gnu.mapping;
 
 public interface CpsMethodContainer
 {
-  public Object apply(CpsMethodProc proc, CallContext context);
+  public void apply(CpsMethodProc proc, CallContext context);
 }

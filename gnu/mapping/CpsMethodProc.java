@@ -24,4 +24,12 @@ public class CpsMethodProc extends CpsProcedure
   {
     module.apply(this, context);
   }
+
+  /** Helper methods for default CpsMethodContainer actions. */
+
+  public void applyError()
+  {
+    throw new Error("internal error - bad selector for "+this);
+  }
+  
 }

@@ -30,6 +30,10 @@ public class TreePosition extends SeqPosition implements Cloneable
    * Note that getDepth returns depth+1; this should perhaps match. */
   int depth;
 
+  /** Start of stacks - anything below 'start' is ignored.
+   * This is useful for pushing/pop positions without object allocation. */
+  int start;
+
   public TreePosition()
   {
     depth = -1;
@@ -77,8 +81,9 @@ public class TreePosition extends SeqPosition implements Cloneable
     int i;
     for (i = 0;  i < depth;  i++)
       {
-	seq = position.sstack[i];
-	seq.copyPosition(position.istack[i], position.xstack[i],
+	int j = i + position.start;
+	seq = position.sstack[j];
+	seq.copyPosition(position.istack[j], position.xstack[j],
 			 this, depth - i);
       }
     seq = position.sequence;
@@ -94,7 +99,7 @@ public class TreePosition extends SeqPosition implements Cloneable
   /** Get the "root document". */
   public AbstractSequence getRoot()
   {
-    return depth == 0 ? sequence : sstack[0];
+    return depth == 0 ? sequence : sstack[start];
   }
 
   public Object getNext()
@@ -104,17 +109,18 @@ public class TreePosition extends SeqPosition implements Cloneable
 
   public void push(AbstractSequence child, int iposChild, Object xposChild)
   {
-    if (depth >= 0)
+    int d = depth + start;
+    if (d >= 0)
       {
-	if (depth == 0)
+	if (d == 0)
 	  {
 	    istack = new int[8];
 	    xstack = new Object[8];
 	    sstack = new AbstractSequence[8];
 	  }
-	else if (depth >= istack.length)
+	else if (d >= istack.length)
 	  {
-	    int ndepth = 2 * depth;
+	    int ndepth = 2 * d;
 	    int[] itemp = new int[ndepth];
 	    Object[] xtemp = new Object[ndepth];
 	    AbstractSequence[] stemp = new AbstractSequence[ndepth];
@@ -125,9 +131,9 @@ public class TreePosition extends SeqPosition implements Cloneable
 	    xstack = xtemp;
 	    sstack = stemp;
 	  }
-	sstack[depth] = sequence;
-	istack[depth] = ipos;
-	xstack[depth] = xpos;
+	sstack[d] = sequence;
+	istack[d] = ipos;
+	xstack[d] = xpos;
       }
     depth++;
     sequence = child;
@@ -150,9 +156,9 @@ public class TreePosition extends SeqPosition implements Cloneable
       }
     else
       {
-	sequence = sstack[depth];
-	ipos = istack[depth];
-	xpos = xstack[depth];
+	sequence = sstack[start+depth];
+	ipos = istack[start+depth];
+	xpos = xstack[start+depth];
       }
   }
 
@@ -219,6 +225,7 @@ public class TreePosition extends SeqPosition implements Cloneable
     int i = depth - up;
     if (i <= 0)
       return getRoot();
+    i += start;
     return sstack[i].getNext(istack[i], xstack[i]);
   }
 
@@ -286,7 +293,7 @@ public class TreePosition extends SeqPosition implements Cloneable
 
   public void dump()
   {
-    System.err.println("TreePosition dump depth:"+depth);
+    System.err.println("TreePosition dump depth:"+depth+" start:"+start);
     if (depth < 0)
       {
 	System.err.println("#- xpos:"+getPositionPtr(0));

@@ -1,3 +1,10 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (find(Object), find (Object,Object)):  Make public.
+
+	* TreePosition.java (depth):  New field.
+	(set, getRoot, push, popNoRelease, getAncestor, dump):  Use depth.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in (createPosition):  New semi-abstract method.

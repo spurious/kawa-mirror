@@ -314,7 +314,7 @@ implements Consumer, PositionConsumer, Consumable
     objects = tmp;
   }
 
-  protected int find(Object arg1)
+  public int find(Object arg1)
   {
     // FIXME - linear search!
     int i = 0;
@@ -339,7 +339,7 @@ implements Consumer, PositionConsumer, Consumable
     return len;
   }
 
-  protected int find(Object arg1, Object arg2)
+  public int find(Object arg1, Object arg2)
   {
     // FIXME - linear search!
     int i = 0;

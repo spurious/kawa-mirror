@@ -1,3 +1,7 @@
+2001-03-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Tweaks to work around missing automake support.
+
 2001-03-09  Per Bothner  <per@bothner.com>
 
 	* strings.scm:  Add lots of type declarations, mostly for return type.

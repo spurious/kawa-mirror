@@ -47,6 +47,12 @@ public class Namespace
     mask = capacity - 1;
   }
 
+  /** A kludge used for serializing SName. */
+  protected Namespace (String name, int dummy)
+  {
+    this.name = name;
+  }
+
   public static Namespace getDefault ()
   {
     return EmptyNamespace;

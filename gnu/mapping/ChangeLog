@@ -1,3 +1,7 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* Namespace.java: New protected constructor. Kludge used by SName.
+
 2004-12-20  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (name): Make field protected, for the sake of Keyword.

@@ -42,8 +42,6 @@ public class CpoolUtf8 extends CpoolEntry
   {
     if (verbosity > 0)
       dst.print("Utf8: ");
-    dst.print('\"');
-    dst.print(string);
-    dst.print('\"');
+    dst.printQuotedString(string);
   }
 };

@@ -586,6 +586,8 @@ public class ClassType extends ObjectType implements AttrContainer {
       method.write (dstr, this);
 
     Attribute.writeAll (this, dstr);
+
+    flags |= ADD_FIELDS_DONE | ADD_METHODS_DONE;
   }
 
   public void writeToFile (String filename)
@@ -600,7 +602,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   public void writeToFile ()
     throws java.io.IOException
   {
-    writeToFile (this_name.replace ('.', '/') + ".class");
+    writeToFile (this_name.replace ('.', File.separatorChar) + ".class");
   }
 
   public byte[] writeToArray ()

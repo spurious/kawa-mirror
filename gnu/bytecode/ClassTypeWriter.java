@@ -200,6 +200,29 @@ public class ClassTypeWriter extends PrintWriter
       }
   }
 
+  public final void printQuotedString (String string)
+  {
+    print('\"');
+    int len = string.length();
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = string.charAt(i);
+	if (ch == '\"')
+	  print("\\\"");
+	else if (ch >= ' ' && ch < 127)
+	  print(ch);
+	else if (ch == '\n')
+	  print("\\n");
+	else
+	  {
+	    print("\\u");
+	    for (int j = 4;  --j >= 0; )
+	      print(Character.forDigit((ch >> (j * 4)) & 15, 16));
+	  }
+      }
+    print('\"');
+  }
+
   public final void printConstantPool ()
   {
     CpoolEntry[] pool = ctype.constants.pool;

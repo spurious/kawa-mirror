@@ -224,6 +224,10 @@ public class ClassFileInput extends DataInputStream
 	  }
 	return attr;
       }
+    else if (name == "ConstantValue" && container instanceof Field)
+      {
+	return new ConstantValueAttr(readUnsignedShort());
+      }
     else if (name == "InnerClasses" && container instanceof ClassType)
       {
         int count = 4 * readUnsignedShort();

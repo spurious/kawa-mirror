@@ -28,7 +28,7 @@ CpoolUtf8.java \
 Location.java Field.java \
 Label.java IfState.java TryState.java SwitchState.java \
 Method.java \
-CodeAttr.java CodeFragment.java \
+CodeAttr.java CodeFragment.java ConstantValueAttr.java \
 LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
 PrimType.java \

@@ -1,3 +1,22 @@
+2000-04-12  Per Bothner  <per@bothner.com>
+
+	* ConstantValueAttr.java:  New class, extends Attribute,
+	* Makefile.am (java_JAVA):  Added ConstantValueAttr.java.
+	* ClassFileInput.java (readAttribute): Handle ConstantValue attribute. 
+	* ClassTypeWriter.java (printQuotedString):  New method.
+	* CpoolUtf8.java (print):  Use ClassTypeWriter's printQuotedString.
+	* Field.java (constant_value_index):  Remove field.
+	(write):  Replace constant_value_index usage by attribute handling.
+	(assign_constants):  Likewise.
+
+	* Field.java (sourceName, rfield):  New fields.
+	(getReflectField, setSourceName, getSourceName, searcField):  New.
+	* ClassType.java (writeToStream): Set ADD_FIELDS_DONE|ADD_METHODS_DONE.
+
+	* Field.java (getModifiers):  New method.
+
+	* ClassType.java (writeToFile):  Use File.separatorChar.
+
 2000-03-05  Per Bothner  <per@bothner.com>
 
 	* ZipLoader.java (loadClass):  Use DataInputStream.readFully to force

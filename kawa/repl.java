@@ -128,20 +128,23 @@ public class repl
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
-	    try
+	    for ( ; iArg < args.length;  iArg++)
 	      {
-		if (CompileFile.compile_to_files(args[iArg],
-						 compilationDirectory,
-						 compilationPrefix,
-						 compilationTopname))
-		  System.exit(-1);
+		try
+		  {
+		    if (CompileFile.compile_to_files(args[iArg],
+						     compilationDirectory,
+						     compilationPrefix,
+						     compilationTopname))
+		      System.exit(-1);
+		  }
+		catch (Throwable ex)
+		  {
+		    ex.printStackTrace(System.err);
+		    System.exit(-1);
+		  }
 	      }
-	    catch (Throwable ex)
-	      {
-		ex.printStackTrace(System.err);
-		System.exit(-1);
-	      }
-	    something_done = true;
+	    return;
 	  }
 	else if (args[iArg].equals("--main"))
 	  {

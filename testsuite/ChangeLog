@@ -1,3 +1,7 @@
+Mon Mar 29 23:27:21 1999  Per Bothner  <bothner@cygnus.com>
+
+	* obj-test.scm:  New test for object form as closure.
+
 Sun Mar 21 16:55:47 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* misc-test.scm:  Add tests for location and define-alias.

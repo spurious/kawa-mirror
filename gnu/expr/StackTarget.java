@@ -40,13 +40,17 @@ public class StackTarget extends Target
 	return true;
       }
 
-    stackType.emitCoerceToObject(code);
     if (stackType instanceof ArrayType)
       {
 	if (type == Type.pointer_type
 	    || "java.lang.Cloneable".equals(type.getName()))
 	  return true;
 	// FIXME should check if stackType is compatible array type.
+      }
+    else
+      {
+	stackType.emitCoerceToObject(code);
+	stackType = code.topType();
       }
     return type instanceof ClassType
       && stackType instanceof ClassType

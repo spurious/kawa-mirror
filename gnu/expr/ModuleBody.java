@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.kawa.reflect.ClassMemberConstraint;
 
 /**
  * Abstract class for the dummy top-level function of a module.
@@ -80,6 +81,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 	CallContext ctx = CallContext.getInstance();
 	ctx.values = Values.noArgs;
 	ctx.proc = this;
+	ClassMemberConstraint.defineAll(this, ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();

@@ -168,4 +168,30 @@ implements Array //, Consumable
     array.simple = false;
     return array;
   }
+
+  public static void toString (Array array, StringBuffer sbuf)
+  {
+    sbuf.append("#<array");
+    int r = array.rank();
+    for (int i = 0;  i < r;  i++)
+      {
+	sbuf.append(' ');
+	int lo = array.getLowBound(i);
+	int sz = array.getSize(i);
+	if (lo != 0)
+	  {
+	    sbuf.append(lo);
+	    sbuf.append(':');
+	  }
+	sbuf.append(lo+sz);
+      }
+    sbuf.append('>');
+  }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    toString(this, sbuf);
+    return sbuf.toString();
+  }
 }

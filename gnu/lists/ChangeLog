@@ -1,3 +1,7 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* GeneralArray.java (toString):  Two new methods.
+
 2003-03-13  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (consumeIRange):  Fix typo in BASE_URI handling.

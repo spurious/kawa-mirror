@@ -34,7 +34,7 @@
        #!null)))
 
 (define (null-environment)
-  (static-field <kawa.standard.Scheme> 'null_environment))
+  (static-field <kawa.standard.Scheme> 'nullEnvironment))
 
 (define (interaction-environment)
   (invoke-static <gnu.mapping.Environment> 'user))
@@ -46,7 +46,7 @@
 					   <java.lang.String> ()))))
 #|
 (define (scheme-window #!optional share)
-  ((primitive-constructor <kawa.GuiConsole> (<kawa.lang.Interpreter>))
+  ((primitive-constructor <kawa.GuiConsole> (<gnu.expr.Interpreter>))
    (if share
        ((primitive-constructor <kawa.standard.Scheme>(<gnu.mapping.Environment>))
 	(interaction-environment))

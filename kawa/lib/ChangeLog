@@ -1,3 +1,12 @@
+2000-02-01  Per Bothner  <per@bothner.com>
+
+	* misc.scm (null-environment):  Update field name used.
+
+	* numbers.scm (logtest):  Add missing arguments.
+	
+	* std_syntax.scm (and):  Re-structure to make it easier to generate
+	better code (by leveraging off ConditionalTarget).
+
 2000-01-24  Per Bothner  <per@bothner.com>
 
 	* numbers.scm (lognot, logop, logbit?, bit-extract, logtest, logcount,

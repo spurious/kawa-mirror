@@ -94,7 +94,7 @@
   (invoke-static <gnu.math.BitOps> 'extract i start end))
 
 (define (logtest (i :: <integer>) (j :: <integer>))
-  (invoke-static <gnu.math.BitOps> 'test))
+  (invoke-static <gnu.math.BitOps> 'test i j))
 
 (define (logcount (i :: <integer>))
   (invoke-static <gnu.math.BitOps> 'bitCount i))

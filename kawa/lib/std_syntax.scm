@@ -72,8 +72,8 @@
   (syntax-rules ()
 		((and) #t)
 		((and test) test)
-		((and test1 test2 ...)
-		 (if test1 (and test2 ...) #f))))
+		((and test1 test2 test3 ...)
+		 (and (if test1 test2 #f) test3 ...))))
 
 ;;; LET (including named let)
 

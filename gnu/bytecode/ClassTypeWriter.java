@@ -62,7 +62,7 @@ public class ClassTypeWriter extends PrintWriter
       }
   }
 
-  void printClassInfo ()
+  public void printClassInfo ()
   {
     println();
     print("Access flags:");
@@ -99,7 +99,7 @@ public class ClassTypeWriter extends PrintWriter
       }
   }
 
-  public final void printFields ()
+  public void printFields ()
   {
     println();
     print("Fields (count: ");
@@ -124,7 +124,7 @@ public class ClassTypeWriter extends PrintWriter
       }
   }
 
-  void printMethods()
+  public void printMethods()
   {
     println();
     print("Methods (count: ");
@@ -222,7 +222,7 @@ public class ClassTypeWriter extends PrintWriter
     print('\"');
   }
 
-  public final void printConstantPool ()
+  public void printConstantPool ()
   {
     CpoolEntry[] pool = ctype.constants.pool;
     int length = ctype.constants.count;

@@ -1,3 +1,11 @@
+2005-01-19  Per Bothner  <per@bothner.com>
+
+	* Access.java (CLASS_MODIFIERS, FIELD_MODIFIERS, METHOD_MODIFIERS):
+	New bit-mask constants.
+	(toString): Mask off inappropriate flags.
+
+	* ClassTypeWriter.java: Make some methods public.
+
 2005-01-15  Per Bothner  <per@bothner.com>
 
 	* Access.java (BRIDGE, VARARGS, STRICT, SYNTHETIC, ANNOTATION):

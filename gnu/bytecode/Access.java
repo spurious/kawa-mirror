@@ -27,6 +27,15 @@ public class Access {
   static public final short ENUM        = 0x4000;
   // unassigned 0x8000
 
+  public static final short CLASS_MODIFIERS
+    = (short)(PUBLIC|FINAL|SUPER|INTERFACE|ABSTRACT|SYNTHETIC|ANNOTATION|ENUM);
+  public static final short FIELD_MODIFIERS
+    = (short)(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL
+	      |VOLATILE|TRANSIENT|SYNTHETIC|ENUM);
+  public static final short METHOD_MODIFIERS
+    = (short)(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL|SYNCHRONIZED
+	      |BRIDGE|VARARGS|NATIVE|ABSTRACT|STRICT|SYNTHETIC);
+
   public static String toString(int flags)
   {
     return toString(flags, '\0');
@@ -37,6 +46,13 @@ public class Access {
    */
   public static String toString(int flags, char kind)
   {
+    short mask
+      = (kind == 'C' ? CLASS_MODIFIERS
+	 : kind == 'F' ? FIELD_MODIFIERS
+	 : kind == 'F' ? METHOD_MODIFIERS
+	 : (CLASS_MODIFIERS|FIELD_MODIFIERS|METHOD_MODIFIERS));
+    short bad_flags = (short) (flags & ~mask);
+    flags &= mask;
     StringBuffer buf = new StringBuffer();
     if ((flags & PUBLIC) != 0)      buf.append(" public");
     if ((flags & PRIVATE) != 0)     buf.append(" private");
@@ -56,8 +72,11 @@ public class Access {
     if ((flags & ENUM) != 0)        buf.append(" enum");
     if ((flags & SYNTHETIC) != 0)   buf.append(" synthetic");
     if ((flags & ANNOTATION) != 0)  buf.append(" annotation");
-    // Only one unused bit left ...
-    if ((flags & 0x8000) != 0)      buf.append(" 0x8000");
+    if (bad_flags != 0)
+      {
+	buf.append(" unknown-flags:0x");
+	buf.append(Integer.toHexString(bad_flags));
+      }
     return buf.toString();
   }
 }

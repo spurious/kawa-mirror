@@ -292,6 +292,11 @@ public class TestMisc
     evalTest("substring('metadata', 4, 3)", "ada");
     // evalTest("substring('metadata', -INF, 3)", "met");
 
+    evalTest("(1 to 20)[. mod 5 = 0]", "5 10 15 20");
+    evalTest("(1 to 20)[. mod 5 ge 3]", "3 4 8 9 13 14 18 19");
+    evalTest("(99 to 0)[5]", "95");
+    evalTest("-10 to -2", "-10 -9 -8 -7 -6 -5 -4 -3 -2");
+
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:3: missing expression");
 

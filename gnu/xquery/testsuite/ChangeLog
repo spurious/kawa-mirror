@@ -1,5 +1,7 @@
 2003-10-08  Per Bothner  <per@bothner.com>
 
+	* TestMisc.java (main):  Add 4 new tests.
+
 	* descend.xql:  Update for revised XQuery syntax.
 	* maketab1.xql:  Likewise.
 

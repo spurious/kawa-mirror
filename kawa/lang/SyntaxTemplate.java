@@ -1,6 +1,4 @@
 package kawa.lang;
-import kawa.lang.*;
-import gnu.bytecode.*;
 import gnu.lists.*;
 import java.io.*;
 import gnu.mapping.*;

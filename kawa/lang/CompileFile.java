@@ -3,7 +3,6 @@ import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.lists.*;
 
 /** Procedure to read and compile and entire file.
  * Creates a .zip archive containing the resulting classes.

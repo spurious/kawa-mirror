@@ -515,7 +515,7 @@ public class Lambda extends Syntax implements Printable
       {
 	if (cur.isAlias())
 	  {
-	    Declaration param = tr.getOriginalRef(cur).getBinding();
+	    Declaration param = Translator.getOriginalRef(cur).getBinding();
 	    lexp.replaceFollowing(prev, param);
 	    param.context = lexp;
 	    tr.pushRenamedAlias(cur);

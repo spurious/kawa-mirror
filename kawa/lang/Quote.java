@@ -96,7 +96,7 @@ public class Quote extends Syntax implements Printable
       return pair;
     else if (!(expanded_car instanceof Expression)
 	     && !(expanded_cdr instanceof Expression))
-      return tr.makePair(pair, expanded_car, expanded_cdr);
+      return Translator.makePair(pair, expanded_car, expanded_cdr);
     else
       {
 	Expression[] args = new Expression[2];

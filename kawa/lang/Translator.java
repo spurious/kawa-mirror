@@ -4,7 +4,6 @@ import gnu.expr.*;
 import gnu.kawa.reflect.StaticFieldLocation;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.LispInterpreter;

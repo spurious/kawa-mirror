@@ -1,11 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
-import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.math.IntNum;
 import gnu.bytecode.*;
-import gnu.kawa.reflect.*;
 
 public class syntax_case extends Syntax
 {

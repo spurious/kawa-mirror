@@ -5,6 +5,15 @@
 
 	* build.xml: Add support for #ifndef JAVA5.
 
+	* kawa/lang/Macro.java: Remove unneeded imports.
+	* kawa/lang/CompileFile.java: Likewise.
+	* kawa/lang/SyntaxTemplate.java: Likewise.
+	* kawa/lang/Translator.java: Likewise.
+	* kawa/standard/syntax_case.java: Likewise.
+	* kawa/lang/Lambda.java: Reference static method using class name,
+	to avoid ecj warning.
+	* kawa/lang/Quote.java: Likewise.
+
 2005-01-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxPattern.java (translate): Pass correct SyntaxForm.

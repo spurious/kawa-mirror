@@ -1,3 +1,12 @@
+2003-08-20  Per Bothner  <per@bothner.com>
+
+	* AddOp.java (classify):  New helper function.
+	(getReturnType):  Use classify.
+	* DivideOp.java:  Now implements CanInline.
+	(inline):  New method.
+
+	* DivideOp.java ($Sl):  Fix name to "/".
+
 2003-08-03  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (apply):  Use nextPos; don't use nextDataIndex.

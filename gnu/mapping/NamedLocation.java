@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
-import gnu.lists.*;
 
 /** A Location that can be used as an entry in an Environment. */
 

@@ -1,3 +1,10 @@
+2002-02-12  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (define):  If value is Named,
+	handle case where getName() returns null.
+
+	* Invoke.java (applyN):  Use CallContext.getInstance().
+
 2002-01-31  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inlineClassName):  New static method.

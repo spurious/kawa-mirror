@@ -131,10 +131,10 @@ public class ClassMemberConstraint extends Constraint
 		env.addBinding((Binding) value);
 		return;
 	      }
-	    if (value instanceof Named)
-	      name = ((Named) value).getName();
-	    else
-	      name = Compilation.demangleName(name, true);
+	    String vname
+	      = value instanceof Named ? ((Named) value).getName() : null;
+	    name = (vname != null ? vname
+		    : Compilation.demangleName(name, true));
 
 	    // The problem with the following is that we can't catch
 	    // set! to a constant (defined using define-contsant).  (Note we

@@ -111,7 +111,7 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
                      nargs - (kind == 'N' ? 1 : 2));
     if (kind == 'N')
       {
-        CallContext vars = new CallContext();
+        CallContext vars = CallContext.getInstance();
         int err = proc.match(vars, margs);
         int len = nargs - 1;
         if (err == 0)

@@ -2,12 +2,12 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-.SUFFIXES : .java .class
+SUFFIXES = .java .class
 
 JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
 
-%.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+.java.class:
+	cd $(srcdir); $(JAVAC) $(<F)
 
 javadir=$(prefix)/java/kawa/lang
 
@@ -40,8 +40,11 @@ Declaration.class \
 Environment.class \
 \
 Pattern.class \
+AnyPat.class \
 EqualPat.class \
 ListPat.class \
+ListRepeatPat.class \
+PairPat.class \
 VarListPat.class \
 \
 Printable.class \
@@ -49,18 +52,14 @@ Named.class \
 Sequence.class \
 List.class \
 Pair.class \
+PairWithPosition.class \
 print.class \
 Symbol.class \
 Vector.class \
-Executable.class \
-Syntaxable.class \
 Undefined.class \
 Lambda.class \
 LambdaProcedure.class \
 Quote.class \
-QuasiQuote.class \
-Unquote.class \
-UnquoteSplicing.class \
 Interpreter.class \
 Procedure.class \
 Procedure0.class \
@@ -72,9 +71,13 @@ Procedure0or1.class \
 Procedure1or2.class \
 ProcedureN.class \
 AutoloadProcedure.class \
+ModuleBody.class \
 Continuation.class \
 CalledContinuation.class \
 Syntax.class \
+SyntaxRule.class \
+SyntaxRules.class \
+AutoloadSyntax.class \
 Literal.class \
 Compilation.class \
 Compilable.class \

@@ -1,3 +1,7 @@
+2000-02-28  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Change .zip to .jar in some (not all) places.
+
 2000-02-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Options):  Note -f is like load now.

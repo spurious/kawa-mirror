@@ -242,24 +242,24 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you time and trouble of
 compiling the sources.
 
-The binary release comes as a @code{.zip} archive
-@samp{kawa-@value{VERSION}-compiled.zip}.
+The binary release comes as a @code{.jar} archive
+@samp{kawa-@value{VERSION}-compiled.jar}.
 
 You can unzip the archive, or you can use it as is.
 Assuming the latter, copy the archive to some suitable location,
-such as @code{/usr/local/lib/kawa-compiled.zip}.
+such as @code{/usr/local/lib/kawa-compiled.jar}.
 
 Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
 so it includes the Kawa archive.  On Unix, using a Bourne-style shell:
 @example
-CLASSPATH=/usr/local/lib/kawa-compiled.zip
+CLASSPATH=/usr/local/lib/kawa-compiled.jar
 export CLASSPATH
 @end example
 
 On Windows95/WindowsNT, you need to set @code{classpath} in a DOS console.
 For example:
 @example
-set classpath=\kawa\kawa-@value{VERSION}-compiled.zip
+set classpath=\kawa\kawa-@value{VERSION}-compiled.jar
 @end example
 
 Then to run Kawa do:

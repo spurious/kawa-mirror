@@ -395,8 +395,9 @@ public class Translator extends Compilation
   }
 
   /** Returns the length of a syntax list.
-   * Returns Integer.MIN_VALUE for cyclic lists,
-   * for impure lists returns the number of pairs before the "dot".
+   * Returns Integer.MIN_VALUE for cyclic lists.
+   * For impure lists returns the negative of one more than
+   * the number of pairs before the "dot".
    * Similar to LList.listLength, but descends into SyntaxForm. */
   public static int listLength(Object obj)
   {
@@ -415,7 +416,7 @@ public class Translator extends Compilation
 	if (fast == LList.Empty)
 	  return n;
 	if (! (fast instanceof Pair))
-	  return -(n+1);
+	  return -1-n;
 	n++;
 	Object next = ((Pair) fast).cdr;
 	while (next instanceof SyntaxForm)
@@ -423,7 +424,7 @@ public class Translator extends Compilation
 	if (next == LList.Empty)
 	  return n;
 	if (! (next instanceof Pair))
-	  return -(n+1);
+	  return -1-n;
 	slow = ((Pair)slow).cdr;
 	fast = ((Pair)next).cdr;
 	n++;

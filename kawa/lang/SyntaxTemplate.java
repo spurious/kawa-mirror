@@ -38,11 +38,11 @@ public class SyntaxTemplate implements Externalizable
   static final int BUILD_REPEAT = (3<<2)+3;
 
   /** Build a vector (an <code>FVector</code>) from following sub-expressions.
-   * Followed by a length N, then a VAR_NO, then for each I, where 0<=I<N:
+   * Followed by a length N, then 1+VAR_NO, then for each I, where 0<=I<N:
    * a length of the sub-expression for element I, followed by
    * the expression for element I itself.  If the pattern has elipsis,
    * then VAR_NO is a variable from which to get the repeat count; otherwise
-   * VAR_NO is 0. */
+   * VAR_NO is -1. */
   static final int BUILD_VECTOR = (5<<2)+3;
 
   /* A sub-expression to be repeated a pattern-determined number of times.
@@ -114,14 +114,12 @@ public class SyntaxTemplate implements Externalizable
 	  {
 	    int count = template_program.charAt(++i);
 	    int var_num = (short) template_program.charAt(++i);
-	    ps.println (" - BUILD_VECTOR count:"+count+" var:"+var_num);
+	    ps.println (" - BUILD_VECTOR count:"+count+" var:"+(var_num-1));
 	    int j = 0;
 	    i++;
-	    if (var_num >= 0)
-	      count++;
 	    while (j < count)
 	      {
-		int width = template_program.charAt(i);
+ 		int width = template_program.charAt(i);
 		ps.println("  " + i + ": width of element "+j+": "+width);
 		print_template_program(patternNames, ps,
 				       ++i, i += width);
@@ -147,7 +145,7 @@ public class SyntaxTemplate implements Externalizable
 	    ps.print(" - VAR[" + var_num + "]");
 	    if (patternNames != null
 		&& var_num >= 0 && var_num < patternNames.size())
-	      ps.print(": " + patternNames.elementAt(var_num)+"]");
+	      ps.print(": " + patternNames.elementAt(var_num));
 	    ps.println();
 	  }
 	else
@@ -211,7 +209,7 @@ public class SyntaxTemplate implements Externalizable
    * @param quote_nesting if inside a quote: -1; if inside n levels
    *   of quasiquote: n;  otherwise: 0
    * @param tr  the current Translator
-   * @return the index of a patterb variable (in <code>pattern_names</code>)
+   * @return the index of a pattern variable (in <code>pattern_names</code>)
    *   that is nested at least as much as <code>nesting</code>;
    *   if there is none such, -1 if there is any pattern variable or elipsis;
    *   and -2 if the is no pattern variable or elipsis.
@@ -310,7 +308,7 @@ public class SyntaxTemplate implements Externalizable
 		else
 		  var_num = ret2;
 		template_program.setCharAt(save_pc + 1, (char) (len - 2));
-		template_program.setCharAt(save_pc + 2, (char) ret2);
+		template_program.setCharAt(save_pc + 2, (char) (ret2 + 1));
 		i++;
 	      }
 	    if (ret2 > ret)
@@ -385,10 +383,11 @@ public class SyntaxTemplate implements Externalizable
   {
     Object result = execute(vars, (Translator) Compilation.getCurrent());
     /* DEBUGGING:
-       err.print("{Expansion of syntax template: ");
-       err.print(result);
-       err.println('}');
-       err.flush();
+    OutPort err = OutPort.errDefault();
+    err.print("{Expansion of syntax template: ");
+    err.print(result);
+    err.println('}');
+    err.flush();
     */
     return result;
   }
@@ -489,7 +488,7 @@ public class SyntaxTemplate implements Externalizable
     else if (ch == BUILD_VECTOR)
       {
 	int count = (int) template_program.charAt(++pc);
-	int var_num = (short) template_program.charAt(++pc);
+	int var_num = (short) template_program.charAt(++pc) - 1;
 	int var_count;
 	int size;
 	if (var_num < 0)

@@ -47,16 +47,18 @@ public class SyntaxPattern extends Pattern implements Externalizable
   static final int MATCH_PAIR = 4;
 
   /** The instruction <code>8*i+MATCH_LREPEAT</code> matches a repeated
-   * pattern.  Followed by followed by var_first, var_count,
-   * then ...
-   * Old: The pattern which is matched against a variable
-   * number of list head is at <code>pc+1</code>.
-   * The tail is matchesd <code>pc+1+i</ode>, which must be
-   * a <code>MATCH_NIL</code> or start with a <code>MATCH_LENGTH</code>. */
+   * pattern.  The repeated sub-pattern starts at <code>pc+1</code>,
+   * and is <code>i</code> chars long.  Following that (at <code>pc+1+i</code>)
+   * is the index of the first pattern variable in the sub-pattern,
+   * followed by the count of pattern variables in the sub-pattern.
+   * (Both are shifted left by 3 in case we need <code>MATCH_WIDE</code>).
+   * This is followed either by a <code>MATCH_NIL</code> (in which case
+   * all remaining elements must match the repeated sub-pattern),
+   * or by a <code>MATCH_LENGTH</code> (which must match the tail). */
   static final int MATCH_LREPEAT = 5;
 
   /** The instruction <code>8*i+MATCH_LENGTH</code> matches a pure list
-   * of length <code>2*i</code> or an impure list <code>2*i+1</code> pair.
+   * of length <code>2*i</code> or an impure list of <code>2*i+1</code> pairs.
    * It is followed by a pattern which must also match. */
   static final int MATCH_LENGTH = 6;
 
@@ -264,7 +266,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		      {
 			// Map a signed int to an unsigned.
 			restLength = restLength >= 0 ? restLength << 1
-			  : ((-restLength) << 1) + 1;
+			  : ((-restLength) << 1) - 1;
 			addInt(program, (restLength << 3) | MATCH_LENGTH);
 		      }
 		  }
@@ -389,20 +391,14 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		  o = ((SyntaxForm) o).form;
 		if (i == npairs)
 		  {
-		    if ((value&1) == 0)
-		      {
-			if (o == LList.Empty)
-			  break;
-			return false;
-		      }
-		    else
-		      {
-			return false;  // FIXME
-		      }
+		    if ((value&1) == 0 ? o != LList.Empty : o instanceof Pair)
+		      return false;
+		    break;
 		  }
-		else if (! (o instanceof Pair))
+		else if (o instanceof Pair)
+		  o = ((Pair) o).cdr;
+		else 
 		  return false;
-		o = ((Pair) o).cdr;
 	      }
 	    value = 0;
 	    continue;
@@ -410,17 +406,6 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    if (! (obj instanceof Pair))
 	      return false;
 	    p = (Pair) obj;
-
-	    /*
-	    opcode = (ch = program.charAt(pc++)) >> 3;
-	    while ((ch & 0x7) == MATCH_WIDE)
-	      opcode = (opcode << 13) | ((ch = program.charAt(pc++)) >> 3);
-
-	    if ((ch & 0x7) == MATCH_ANY)
-	      {
-	      }
-	    */
-
 	    if (! match(p.car, vars, start_vars, pc, syntax))
 	      return false;
 	    pc += value;
@@ -451,13 +436,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		while ((ch & 0x7) == MATCH_WIDE)
 		  value = (value << 13) | ((ch = program.charAt(pc++)) >> 3);
 		if ((value & 1) != 0)
-		  {
-		    listRequired = false;
-		    value--;
-		  }
+		  listRequired = false;
 		pairsRequired = value >> 1;
-		value = (value & 1) == 0 ? value >> 1
-		  : (1 - value) >> 1;
 	      }
 	    int pairsValue = Translator.listLength(obj);
 	    boolean listValue;
@@ -467,9 +447,9 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    else
 	      {
 		listValue = false;
-		pairsValue = -pairsValue;
+		pairsValue = -1-pairsValue;
 	      }
-	    if (listValue != listRequired || pairsValue < pairsRequired)
+	    if (pairsValue < pairsRequired || (listRequired && ! listValue))
 	      return false;
 	    int repeat_count = pairsValue - pairsRequired;
 	    Object[][] arrays = new Object[subvarN][];
@@ -493,7 +473,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    for (int j = 0;  j < subvarN;  j++)
 	      vars[subvar0+j] = arrays[j];
 	    value = 0;
-	    if (pairsRequired == 0)
+	    if (pairsRequired == 0 && listRequired)
 	      return true;
 	    continue;
 	  case MATCH_EQUALS:

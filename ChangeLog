@@ -1,3 +1,12 @@
+2004-11-08  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxPattern.java (translate): Change MATCH_LENGTH
+	encoding for non-pure lists.
+	(match): Fix MATCH_LENGTH and MATCH_LREPEAT handling.
+	* kawa/lang/SyntaxTemplate.java (BUILD_VECTOR): Since no repetition
+	uses a var_no of 0, add one to var_no for a repeated variable.
+	* kawa/lang/Translator.java (listLength): Minor optimization.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Syntax.java (rewriteForm, scanForm): New methods.

@@ -1,3 +1,8 @@
+Thu Jul 23 08:45:29 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (SUBDIRS):  Added mapping and expr.
+	(install-html, install-subdir-html):  New rules.
+
 Mon Jun 29 18:59:08 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am, Makefile.in (SUBDIRS):  Added text sub-package.

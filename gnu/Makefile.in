@@ -67,8 +67,10 @@ TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode math text ecmascript
+SUBDIRS = bytecode mapping text expr math ecmascript
 EXTRA_DIST = PACKAGES
+
+HTML_HOME = $$HOME/public_html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in
@@ -243,6 +245,19 @@ uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
+
+install-subdir-html:
+	-mkdir $(HTML_HOME)/gnu.$(DIR)
+	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.$(DIR)/index.html
+	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.$(DIR)/COPYING
+	chmod a+r $(HTML_HOME)/gnu.$(DIR)/*
+
+install-html:
+	for dir in bytecode math mapping; do \
+	  (cd $$dir; \
+	    $(MAKE) -f ../Makefile install-subdir-html \
+	      DIR=$$dir HTML_HOME="$(HTML_HOME)"); \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,7 @@
 2003-06-03  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (distall):  Add more stuff.
+
 	* kawa/standard/IfFeature.java (scanForDefinitions):  Call scan_form
 	on single form.  Fixes bug reported by Sven.Hartrumpf@FernUni-Hagen.de.
 

@@ -6,11 +6,6 @@ javadir=$(datadir)/java
 
 JAR = jar
 
-# Build a .zip archive from the compiled classes.
-
-kawa-@VERSION@-compiled.zip:
-	zip -q -r -n .class $@ kawa gnu -i '*.class'
-
 if WITH_SWING
 JAR_DEPS_SWING = \
   ./gnu/jemacs/buffer/java-classes.stamp \
@@ -198,5 +193,5 @@ select-java2: $(srcdir)/java1-java2-files
             -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)//[ ]*|\1|' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
 
-distall:  distcheck dist-kawa-@VERSION@.jar jemacs.jar
-
+distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
+  kawa-@VERSION@-src.zip jemacs.jar

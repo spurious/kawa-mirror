@@ -628,11 +628,6 @@ uninstall-info: uninstall-info-recursive
 	uninstall-info-recursive uninstall-local uninstall-recursive
 
 
-# Build a .zip archive from the compiled classes.
-
-kawa-@VERSION@-compiled.zip:
-	zip -q -r -n .class $@ kawa gnu -i '*.class'
-
 kawa-@VERSION@.jar: $(JAR_DEPS)
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
 	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
@@ -755,7 +750,8 @@ select-java2: $(srcdir)/java1-java2-files
             -e '/BEGIN JAVA2/,/END JAVA2/s|^\([[:space:]]*\)//[ ]*|\1|' \
 	<$$file >$$file.tmp; mv $$file.tmp $$file; done
 
-distall:  distcheck dist-kawa-@VERSION@.jar jemacs.jar
+distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \
+  kawa-@VERSION@-src.zip jemacs.jar
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

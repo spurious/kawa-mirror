@@ -1,5 +1,9 @@
 2000-03-06  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (makekawa.bat):  Add new scm sub-directories.
+	* gnu/{jawa/slib,jemacs/buffer,jemacs/lang}/Makefile.{am,in}:
+	Added list-sources target.
+
 	* configure.in, configure (AC_OUTPUT):  Add gnu/slib/Makefile.
 	* gnu/kawa/Makefile.am (SUBDIRS):  Add slib.
 

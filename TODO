@@ -1,5 +1,3 @@
-Report JDK-2 verification bug.
-
 compile-file should generate .jar, not .zip.
 Should perhaps take multiple file names.
 Update manual to removing .zip references.

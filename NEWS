@@ -1,3 +1,27 @@
+There is now working and useful module support, thought not all
+features are implemented.  The basic idea is that a module can be any
+class that has a default constructor (or all of whose fields and
+methods are static);  the public fields and methods of such a
+class are its exported definitions.  Compiling a Scheme file
+produces such a module.  Doing:
+	(require <classname>)
+will create an anonymous instance of <classname> (if needed), and add
+all its exported definitions to the current environment.  Note that if
+you import a class in a module you are compiling, then an instance of
+the module will be created at compile-time, and imported definitions
+are not re-imported.
+(For now you must compile a module, you cannot just load it.)
+
+The define-private keyword creates a module-local definition.
+
+The syntax:
+	(require 'keyword)
+is syntactic sugar for (require <classname>) where the classname
+is find is a "module catalog" (currently hard-wired).
+This provides compatibility with Slib.  The Slib "features"
+gen-write, pretty-print, pprint-file, and printf are now
+available in Kawa;  more will be added, depending on time and demand.
+
 Changes from Kawa 1.6.62 to 1.6.64
 ==================================
 A lot of improvements to JEmacs (see JEmacs.SourceForge.net).

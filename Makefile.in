@@ -382,12 +382,21 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo "set jcflags=-g" >>tmp
 	for dir in `find . -name Makefile -print \
 	    | sed  -e 's|[.]/\(.*\)Makefile|\1|'`; do \
-	  test "`cd $(srcdir)/$$dir; echo *.java`" == "*.java"  \
+	  test "`cd $(srcdir)/$$dir; echo *.java`" = "*.java"  \
 	    || (echo "%javac% %jcflags% $$dir*.java" \
 	      | sed -e 's|/|\\|g' >>tmp); \
 	done
 	echo 'cd kawa\lib' >>tmp
 	echo '%java% -classpath ..\.. kawa.repl -d ..\.. -P kawa.lib. -C' $$(cd kawa/lib; make -s list-sources) >>tmp
+	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
+	echo 'cd ..\..\gnu\kawa\slib' >>tmp
+	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.kawa.slib -C' $$(cd gnu/kawa/slib; make -s list-sources) >>tmp
+	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
+	echo 'cd ..\..\..\gnu\jemacs\lang' >>tmp
+	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.lang -C' $$(cd gnu/jemacs/lang; make -s list-sources) >>tmp
+	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
+	echo 'cd ..\..\..\gnu\jemacs\buffer' >>tmp
+	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
 
 foo:

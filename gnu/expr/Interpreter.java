@@ -13,13 +13,7 @@ import gnu.kawa.reflect.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 
-/**
- * Contains various language-dependent methods.
- * Also contains "global" state about the executation environment,
- * such as the global Environment.  There can be multiple Interpreters
- * associated with different threads, representing mutiple top-levels.
- * (However, this functionality is incomplete.)
- */
+/** This class is deprecated - use Language instead. */
 
 public abstract class Interpreter
 {

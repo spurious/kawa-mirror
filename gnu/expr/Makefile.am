@@ -35,6 +35,7 @@ java_sources = \
   Keyword.java \
   LambdaExp.java \
   LangExp.java \
+  Language.java \
   LetExp.java \
   Literal.java \
   LitTable.java \

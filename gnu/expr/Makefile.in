@@ -57,6 +57,7 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
+BYTECODE_VERSION = @BYTECODE_VERSION@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -237,6 +238,7 @@ java_sources = \
   Keyword.java \
   LambdaExp.java \
   LangExp.java \
+  Language.java \
   LetExp.java \
   Literal.java \
   LitTable.java \

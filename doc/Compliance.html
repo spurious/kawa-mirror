@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>Copernican Solutions Incorporated</TITLE>
+</HEAD>
+<BODY bgcolor="#ffffff">
+
+<H2>Conformance to R4RS:</H2>
+
+<TABLE BORDER>
+<TR><TD><STRONG>Procedure</STRONG></TD>
+    <TD><STRONG>Implemented/Version</STRONG></TD>
+    <TD><STRONG>Notes</STRONG></TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 4.1</STRONG>
+<TR><TD>quote<TD>yes/0.1<TD>
+<TR><TD>lambda<TD>yes/0.1<TD>
+<TR><TD>set!<TD>yes/0.1<TD>
+<TR><TD>set-car!<TD>yes/0.2<TD>
+<TR><TD>set-cdr!<TD>yes/0.2<TD>
+<TR><TD>if<TD>yes/0.1<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 4.2</STRONG>
+<TR><TD>cond<TD>no<TD>
+<TR><TD>case<TD>no<TD>
+<TR><TD>and<TD>yes/0.1<TD>
+<TR><TD>or<TD>yes/0.1<TD>
+<TR><TD>let<TD>yes/0.1<TD>
+<TR><TD>let*<TD>no<TD>
+<TR><TD>letrec<TD>no<TD>
+<TR><TD>begin<TD>yes/0.1<TD>
+<TR><TD>do<TD>no<TD>
+<TR><TD>delay<TD>no<TD>
+<TR><TD>quasiquote<TD>no<TD>
+<TR><TD>unquote<TD>no<TD>
+<TR><TD>unquote-splicing<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 5.1</STRONG>
+<TR><TD>define<TD>yes/0.1<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.1</STRONG>
+<TR><TD>not<TD>yes/0.1<TD>
+<TR><TD>boolean?<TD>yes/0.1<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.2</STRONG>
+<TR><TD>eqv?<TD>yes/0.1<TD>
+<TR><TD>eq?<TD>yes/0.1<TD>
+<TR><TD>equal?<TD>yes/0.1<TD>vectors and lists aren't recursively checked yet...
+
+<TR><TD COLSPAN=3><STRONG>Section 6.3</STRONG>
+<TR><TD>pair?<TD>yes/0.1<TD>
+<TR><TD>cons<TD>yes/0.1<TD>
+<TR><TD>car<TD>yes/0.1<TD>
+<TR><TD>cdr<TD>yes/0.1<TD>
+<TR><TD>set-car!<TD>yes/0.1<TD>
+<TR><TD>set-cdr!<TD>yes/0.1<TD>
+<TR><TD>caar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caaaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caaadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caaddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cadaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cadadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>caddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cadddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdaaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdaadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdadar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdaddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cddaar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cddadr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cdddar<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>cddddr<TD>yes/0.1<TD>Not implemented as a lambda procedure.
+<TR><TD>null?<TD>yes/0.1<TD>
+<TR><TD>list?<TD>yes/0.1<TD>
+<TR><TD>list<TD>yes/0.1<TD>
+<TR><TD>length<TD>yes/0.1<TD>
+<TR><TD>append<TD>yes/0.1<TD>
+<TR><TD>list-tail<TD>yes/0.1<TD>
+<TR><TD>list-ref<TD>yes/0.1<TD>
+<TR><TD>memq<TD>yes/0.1<TD>
+<TR><TD>memv<TD>yes/0.1<TD>
+<TR><TD>member<TD>yes/0.1<TD>
+<TR><TD>assq<TD>yes/0.1<TD>
+<TR><TD>assv<TD>yes/0.1<TD>
+<TR><TD>assoc<TD>yes/0.1<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.4</STRONG>
+<TR><TD>symbol?<TD>yes/0.1<TD>
+<TR><TD>symbol->string<TD>yes/0.1<TD>
+<TR><TD>string->symbol<TD>yes/0.1<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.5</STRONG>
+<TR><TD>number?<TD>yes/0.1<TD>
+<TR><TD>complex?<TD>no<TD>Complex numbers are not supported yet.
+<TR><TD>real?<TD>yes/0.1<TD>
+<TR><TD>rational?<TD>no<TD>Complex numbers are not supported yet.
+<TR><TD>integer?<TD>yes/0.1<TD>
+<TR><TD>exact?<TD>yes/0.1<TD>Currently, the same as integer?
+<TR><TD>inexact?<TD>yes/0.1<TD>Currently, the same as real?
+<TR><TD>zero?<TD>yes/0.1<TD>
+<TR><TD>positive?<TD>yes/0.1<TD>
+<TR><TD>negative?<TD>yes/0.1<TD>
+<TR><TD>odd?<TD>no<TD>
+<TR><TD>even?<TD>no<TD>
+<TR><TD>min<TD>no<TD>
+<TR><TD>max<TD>no<TD>
+<TR><TD>=<TD>yes/0.1<TD>
+<TR><TD><<TD>yes/0.1<TD>
+<TR><TD>><TD>yes/0.1<TD>
+<TR><TD><=<TD>yes/0.1<TD>
+<TR><TD>>=<TD>yes/0.1<TD>
+<TR><TD>+<TD>yes/0.1<TD>
+<TR><TD>*<TD>yes/0.1<TD>
+<TR><TD>-<TD>yes/0.1<TD>
+<TR><TD>/<TD>yes/0.1<TD>
+<TR><TD>quotient<TD>no<TD>
+<TR><TD>remainder<TD>no<TD>
+<TR><TD>modulo<TD>no<TD>
+<TR><TD>gcm<TD>no<TD>
+<TR><TD>lcm<TD>no<TD>
+<TR><TD>numerator<TD>no<TD>
+<TR><TD>denominator<TD>no<TD>
+<TR><TD>floor<TD>no<TD>
+<TR><TD>ceiling<TD>no<TD>
+<TR><TD>truncate<TD>no<TD>
+<TR><TD>round<TD>no<TD>
+<TR><TD>rationalize<TD>no<TD>
+<TR><TD>abs<TD>yes/0.2<TD>
+<TR><TD>exp<TD>no<TD>
+<TR><TD>log<TD>no<TD>
+<TR><TD>sin<TD>no<TD>
+<TR><TD>cos<TD>no<TD>
+<TR><TD>tan<TD>no<TD>
+<TR><TD>asin<TD>no<TD>
+<TR><TD>acos<TD>no<TD>
+<TR><TD>atan<TD>no<TD>
+<TR><TD>sqrt<TD>no<TD>
+<TR><TD>expt<TD>no<TD>
+<TR><TD>imag-part<TD>no<TD>
+<TR><TD>magnitude<TD>no<TD>
+<TR><TD>angle<TD>no<TD>
+<TR><TD>exact->inexact<TD>no<TD>
+<TR><TD>inexact->exact<TD>no<TD>
+<TR><TD>number->string<TD>no<TD>
+<TR><TD>string->number<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.6</STRONG>
+<TR><TD>char?<TD>yes/0.1<TD>
+<TR><TD>char=?<TD>yes/0.1<TD>
+<TR><TD>char<?<TD>yes/0.1<TD>
+<TR><TD>char<=?<TD>yes/0.1<TD>
+<TR><TD>char>?<TD>yes/0.1<TD>
+<TR><TD>char>=?<TD>yes/0.1<TD>
+<TR><TD>char-ci=?<TD>no<TD>
+<TR><TD>char-ci<?<TD>no<TD>
+<TR><TD>char-ci<=?<TD>no<TD>
+<TR><TD>char-ci>?<TD>no<TD>
+<TR><TD>char-ci>=?<TD>no<TD>
+<TR><TD>char-alphabetic?<TD>no<TD>
+<TR><TD>char-numeric?<TD>no<TD>
+<TR><TD>char-whitespace?<TD>no<TD>
+<TR><TD>char-upper-case?<TD>no<TD>
+<TR><TD>char-lower-case?<TD>no<TD>
+<TR><TD>char->integer<TD>no<TD>
+<TR><TD>integer->char<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.7</STRONG>
+<TR><TD>string?<TD>yes/0.1<TD>
+<TR><TD>make-string<TD>yes/0.1<TD>
+<TR><TD>string<TD>yes/0.1<TD>
+<TR><TD>string-length<TD>yes/0.1<TD>
+<TR><TD>string-ref<TD>yes/0.1<TD>
+<TR><TD>string-set!<TD>yes/0.1<TD>
+<TR><TD>string=?<TD>no<TD>
+<TR><TD>string<?<TD>no<TD>
+<TR><TD>string>?<TD>no<TD>
+<TR><TD>string<=?<TD>no<TD>
+<TR><TD>string>=?<TD>no<TD>
+<TR><TD>string-ci=?<TD>no<TD>
+<TR><TD>string-ci<?<TD>no<TD>
+<TR><TD>string-ci>?<TD>no<TD>
+<TR><TD>string-ci<=?<TD>no<TD>
+<TR><TD>string-ci>=?<TD>no<TD>
+<TR><TD>substring<TD>no<TD>
+<TR><TD>string->list<TD>no<TD>
+<TR><TD>list->string<TD>no<TD>
+<TR><TD>string-copy<TD>no<TD>
+<TR><TD>string-fill!<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.8</STRONG>
+<TR><TD>vector?<TD>yes/0.1<TD>
+<TR><TD>make-vector<TD>yes/0.1<TD>
+<TR><TD>vector<TD>yes/0.1<TD>
+<TR><TD>vector-length<TD>yes/0.1<TD>
+<TR><TD>vector-ref<TD>yes/0.1<TD>
+<TR><TD>vector-set!<TD>yes/0.1<TD>
+<TR><TD>vector->list<TD>no<TD>
+<TR><TD>list->vector<TD>no<TD>
+<TR><TD>vector-fill!<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.9</STRONG>
+<TR><TD>procedure?<TD>yes/0.1<TD>
+<TR><TD>apply<TD>yes/0.1<TD>
+<TR><TD>map<TD>no<TD>
+<TR><TD>for-each<TD>no<TD>
+<TR><TD>force<TD>no<TD>
+<TR><TD>call-with-current-continuation<TD>no<TD>
+
+<TR><TD COLSPAN=3><STRONG>Section 6.10</STRONG>
+<TR><TD>call-with-input-port<TD>no<TD>
+<TR><TD>input-port?<TD>no<TD>
+<TR><TD>output-port?<TD>no<TD>
+<TR><TD>current-input-port<TD>no<TD>
+<TR><TD>current-output-port<TD>no<TD>
+<TR><TD>with-input-from-file<TD>no<TD>
+<TR><TD>with-output-to-file<TD>no<TD>
+<TR><TD>open-input-file<TD>no<TD>
+<TR><TD>open-output-file<TD>no<TD>
+<TR><TD>close-input-file<TD>no<TD>
+<TR><TD>close-output-file<TD>no<TD>
+<TR><TD>read<TD>no<TD>
+<TR><TD>read-char<TD>no<TD>
+<TR><TD>peek-char<TD>no<TD>
+<TR><TD>eof-object?<TD>no<TD>
+<TR><TD>char-ready?<TD>no<TD>
+<TR><TD>write<TD>no<TD>
+<TR><TD>display<TD>no<TD>
+<TR><TD>newline<TD>no<TD>
+<TR><TD>write-char<TD>no<TD>
+<TR><TD>load<TD>no<TD>
+<TR><TD>transcript-on<TD>no<TD>
+<TR><TD>transcript-off<TD>no<TD>
+</TABLE>
+
+<H2>Additional Features</H2>
+
+<TABLE BORDER>
+<TR><TD COLSPAN=3><STRONG>Additional Features</STRONG>
+<TR><TD>when<TD>yes/0.1<TD>
+<TR><TD>unless<TD>yes/0.1<TD>
+</TABLE>
+
+<H2>Additional Notes</H2>
+
+<TABLE BORDER>
+<TR><TD COLSPAN=2><STRONG>Implementation Notes</STRONG>
+<TR><TD>Macros
+    <TD>Macro facilities have not been implemented.
+<TR><TD>Quasi-quotation
+    <TD>Quasi-quotation has not been implemented.
+<TR><TD>reader
+    <TD>The scheme reader may very well be quite flakey.
+</TABLE>
+
+</BODY>
+</HTML>

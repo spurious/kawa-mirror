@@ -1,0 +1,13 @@
+Complete R4RS procedures.
+
+The I/O interface should be made to be more native to java.  Maybe chuck the
+kawa.lang.iport and kawa.lang.oport?
+ 
+Complete the full scheme reader.
+
+Figure out quasi-quote, quote-unsplicing
+
+Add access to native java methods (sysExt is an example).
+
+Macros??
+

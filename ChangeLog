@@ -1,3 +1,10 @@
+2002-10-17  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/location.java (rewriteArg):  Removed.  No longer
+	needed now that Translator.rewrite doesn't create PrimProcedures.
+	(rewrite):  Replace rewriteArg cal by call to Translator.rewrite.
+	* kawa/standard/define_alias.java (rewrite):  Likewise.
+
 2002-09-28  Jim White  <jim@pagesmiths.com>
 
 	* build.xml: Compile .scm files for xml-classes.

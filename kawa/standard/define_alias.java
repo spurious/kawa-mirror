@@ -19,7 +19,7 @@ public class define_alias extends Syntax implements Printable
 	    Pair p2 = (Pair) p1.cdr;
 	    if (p2.cdr == LList.Empty)
 	      {
-		Expression arg = location.rewriteArg(p2.car, tr);
+		Expression arg = tr.rewrite(p2.car);
 		if (arg instanceof ReferenceExp)
 		  ((ReferenceExp) arg).setDontDereference(true);
 		else

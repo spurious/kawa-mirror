@@ -1,5 +1,8 @@
 2004-04-17  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (initScheme):  Fix typo.
+	Fixes bug #7666.
+
 	* configure.in: Fix help text typo reported by Pete Chown.
 	Fixes bug #7851.
 

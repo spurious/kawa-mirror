@@ -1,3 +1,22 @@
+2003-10-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (peekOperator):  Recognize 'except' and 'intersect'.
+	(makeBinary):  Handle OP_EXCEPT and OP_INTERSECT.
+	(parseUnionExpr, parseIntersectExceptExpr):  Call peekOperator.
+
+	* XQParser.java (parseExprSingle):  New method.
+	Use it where appropriate.
+
+	* XQParser.java (parseMaybePrimaryExpr):  Handle 'every' and 'some'.
+	(parseQuantifiedExpr):  New method.
+
+	* XQParser.java (setType):  New helper method
+	(parseFLWRExpression):  Call parseOptionalTypeDeclaration and setType.
+	(parseFLWRExpression):  Handle subsequence 'for/let' clauses.
+	(parseFLWRExpression):  Detect 'order' and print "not implemented".
+
+	* XQParser.java (tokenString):  New debug helper method.
+
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse):  Use Compilation.mangleURI for namespaces

@@ -629,6 +629,16 @@ public class XQParser extends LispReader // should be extends Lexer
 	    else if (match("union"))
 	      curToken = OP_UNION;
 	  }
+	else if (len == 6)
+	  {
+	    if (match("except"))
+	      curToken = OP_EXCEPT;
+	  }
+	else if (len == 9)
+	  {
+	    if (match("intersect"))
+	      curToken = OP_INTERSECT;
+	  }
 	else if (len == 10)
 	  {
 	    for (int i = 0; ;   i++)
@@ -874,12 +884,6 @@ public class XQParser extends LispReader // should be extends Lexer
 
   int count = 0;
 
-  Expression parseExpr()
-      throws java.io.IOException, SyntaxException
-  {
-    return parseSortExpr();
-  }
-
   static Expression makeBinary(Expression func,
 			       Expression exp1, Expression exp2)
   {
@@ -952,6 +956,13 @@ public class XQParser extends LispReader // should be extends Lexer
 	break;
       case OP_UNION:
 	func = makeFunctionExp("gnu.kawa.xml.UnionNodes", "unionNodes");
+	break;
+      case OP_INTERSECT:
+	func = makeFunctionExp("gnu.kawa.xml.IntersectNodes",
+			       "intersectNodes");
+	break;
+      case OP_EXCEPT:
+	func = makeFunctionExp("gnu.kawa.xml.IntersectNodes", "exceptNodes");
 	break;
       default:
 	return syntaxError("unimplemented binary op: "+op);
@@ -1045,6 +1056,14 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseDataType();
   }
 
+  public void setType (Declaration decl, Expression type)
+  {
+    if (type instanceof QuoteExp)
+      decl.setType((Type) ((QuoteExp) type).getValue());
+    else if (type != null)
+      error('w', "type is too complex");
+  }
+
   public Expression parseDataType()
       throws java.io.IOException, SyntaxException
   {
@@ -1121,6 +1140,18 @@ public class XQParser extends LispReader // should be extends Lexer
       return null;
   }
 
+  Expression parseExpr()
+      throws java.io.IOException, SyntaxException
+  {
+    return parseSortExpr();
+  }
+
+  final Expression parseExprSingle ()
+      throws java.io.IOException, SyntaxException
+  {
+    return parseBinaryExpr(priority(OP_OR));
+  }
+
   Expression parseBinaryExpr(int prio)
       throws java.io.IOException, SyntaxException
   {
@@ -1178,9 +1209,11 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression exp = parseIntersectExceptExpr();
-    while (curToken == OP_UNION)
+    for (;;)
       {
-	int op = curToken;
+	int op = peekOperator();
+	if (op != OP_UNION)
+	  break;
 	getRawToken();
 	Expression exp2 = parseIntersectExceptExpr();
 	exp = makeBinary(op, exp, exp2);
@@ -1192,9 +1225,11 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     Expression exp = parsePathExpr();
-    while (curToken == OP_INTERSECT || curToken == OP_EXCEPT)
+    for (;;)
       {
-	int op = curToken;
+	int op = peekOperator();
+	if (op != OP_INTERSECT && op != OP_EXCEPT)
+	  break;
 	getRawToken();
 	Expression exp2 = parsePathExpr();
 	exp = makeBinary(op, exp, exp2);
@@ -2219,22 +2254,16 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    // A FLWR-expression isn't technically a PrimaryExpr.
 	    // Does it matter?  FIXME.
-	    int forOrLet = -1;
-	    if (tokenBufferLength == 3)
-	      {
-		// FIXME:  use match(String)?
-		c1 = tokenBuffer[0];
-		c2 = tokenBuffer[1];
-		c3 = tokenBuffer[2];
-		if (c1 == 'l' && c2 == 'e' && c3 == 't')
-		  forOrLet = 0;
-		else if (c1 == 'f' && c2 == 'o' && c3 == 'r')
-		  forOrLet = 1;
-	      }
-	    if (forOrLet < 0)
+	    if (match("let"))
+	      exp = parseFLWRExpression(false);
+	    else if (match("for"))
+	      exp = parseFLWRExpression(true);
+	    else if (match("some"))
+	      exp = parseQuantifiedExpr(false);
+	    else if (match("every"))
+	      exp = parseQuantifiedExpr(true);
+	    else
 	      return syntaxError("invalid syntax - variable following name");
-	    curToken = '$';
-	    exp = parseFLWRExpression(forOrLet > 0);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn - 3);
 	    return exp;
@@ -2417,11 +2446,13 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     char saveNesting = pushNesting(isFor ? 'f' : 'l');
+    curToken = '$';
     Symbol name = parseVariable();
     if (name == null)
       return syntaxError("missing Variable token:"+curToken);
     getRawToken();
-    
+
+    Expression type = parseOptionalTypeDeclaration();
     ScopeExp sc;
     Expression[] inits = new Expression[1];
     Object posVar = null;
@@ -2463,9 +2494,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	LetExp let = new LetExp(inits);
 	sc = let;
       }
-    inits[0] = parseBinaryExpr(priority(OP_OR));
+    inits[0] = parseExprSingle();
     popNesting(saveNesting);
     Declaration decl = sc.addDeclaration(name);
+    setType(decl, type);
     if (isFor)
       {
 	decl.noteValue (null);  // Does not have a known value.
@@ -2486,6 +2518,20 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("missing $NAME after ','");
 	body = parseFLWRExpression(isFor);
       }
+    else if (match("for"))
+      {
+	getRawToken();
+	if (curToken != '$')
+	  return syntaxError("missing $NAME after 'for'");
+	body = parseFLWRExpression(true);
+      }
+    else if (match("let"))
+      {
+	getRawToken();
+	if (curToken != '$')
+	  return syntaxError("missing $NAME after 'let'");
+	body = parseFLWRExpression(false);
+      }
     else
       {
 	Expression cond;
@@ -2493,24 +2539,30 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (curToken == OP_WHERE)
 	  {
 	    getRawToken();
-	    cond = parseBinaryExpr(priority(OP_OR));
+	    cond = parseExprSingle();
 	  }
 	else if (match("where"))
 	  {
-	    cond = parseBinaryExpr(priority(OP_OR));
+	    cond = parseExprSingle();
 	  }
 	else
 	  cond = null;
 	popNesting(save);
+	boolean sawStable = match("stable");
+	if (sawStable)
+	  getRawToken();
+	if (match ("order"))
+	  return syntaxError("'order by' clause not implemented yet");
 	boolean sawReturn = match("return");
 	if (! sawReturn && ! match("let") && ! match("for"))
-	  return syntaxError("missing 'return' clause");
+	  return syntaxError("missing 'return' clause tok:"+curToken+" str: '"
+			     +new String(tokenBuffer,0,tokenBufferLength)+"'");
 	peekNonSpace("unexpected eof-of-file after 'return'");
 	int bodyLine = getLineNumber() + 1;
 	int bodyColumn = getColumnNumber() + 1;
 	if (sawReturn)
 	  getRawToken();
-	body = parseExpr();
+	body = parseExprSingle();
 	if (cond != null)
 	  {
 	    body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
@@ -2533,6 +2585,65 @@ public class XQParser extends LispReader // should be extends Lexer
       ((LetExp) sc).setBody(body);
     return sc;
 
+  }
+
+  /** Parse a some- or an every-expression.
+   * Assume the 'some'/'every'-token has been seen, and we've read '$'. */
+  public Expression parseQuantifiedExpr (boolean isEvery)
+      throws java.io.IOException, SyntaxException
+  {
+    char saveNesting = pushNesting(isEvery ? 'e' : 's');
+    curToken = '$';
+    Symbol name = parseVariable();
+    if (name == null)
+      return syntaxError("missing Variable token:"+curToken);
+    getRawToken();
+    
+    LambdaExp lexp = new LambdaExp(1);
+    Declaration decl = lexp.addDeclaration(name);
+    decl.noteValue (null);  // Does not have a known value.
+    decl.setFlag(Declaration.IS_SINGLE_VALUE);
+    setType(decl, parseOptionalTypeDeclaration());
+
+    if (match("in"))
+      getRawToken();
+    else
+      {	
+	if (curToken == COLON_EQUAL_TOKEN)
+	  getRawToken();
+	syntaxError("missing 'in' in QuantifiedExpr");
+      }
+    Expression[] inits = { parseExprSingle() };
+    popNesting(saveNesting);
+    parser.push(lexp);
+    Expression body;
+    if (curToken == ',')
+      {
+	getRawToken();
+	if (curToken != '$')
+	  return syntaxError("missing $NAME after ','");
+	body = parseQuantifiedExpr(isEvery);
+      }
+    else
+      {
+	boolean sawSatisfies = match("satisfies");
+	if (! sawSatisfies && ! match("every") && ! match("some"))
+	  return syntaxError("missing 'satisfies' clause");
+	peekNonSpace("unexpected eof-of-file after 'satisfies'");
+	int bodyLine = getLineNumber() + 1;
+	int bodyColumn = getColumnNumber() + 1;
+	if (sawSatisfies)
+	  getRawToken();
+	body = parseExprSingle();
+	body.setFile(getName());
+	body.setLine(bodyLine, bodyColumn);
+      }
+    parser.pop(lexp);
+    lexp.body = body;
+    Expression[] args = { lexp, inits[0]};  // SIC
+    return new ApplyExp(makeFunctionExp("gnu.xquery.util.ValuesEvery",
+					isEvery ? "every" : "some"),
+			args);
   }
 
   public Expression parseFunctionDefinition(int declLine, int declColumn)
@@ -2579,11 +2690,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		getRawToken();
 		lexp.min_args++;
 		lexp.max_args++;
-		Expression paramType = parseOptionalTypeDeclaration ();
-		if (paramType instanceof QuoteExp)
-		  param.setType((Type) ((QuoteExp) paramType).getValue());
-		else if (paramType != null)
-		  error('w', "parameter type too complex");
+		setType(param, parseOptionalTypeDeclaration());
 	      }
 	    if (curToken == ')')
 	      break;
@@ -2943,6 +3050,21 @@ public class XQParser extends LispReader // should be extends Lexer
     throws java.io.IOException, SyntaxException
   {
     return syntaxError(message, tokenWidth());
+  }
+
+  /** Helper method for debugging. */
+  String tokenString()
+  {
+    switch (curToken)
+      {
+      case NCNAME_TOKEN:
+      case QNAME_TOKEN:
+	return new String(tokenBuffer, 0, tokenBufferLength);
+      case EOF_TOKEN:
+	return "<EOF>";
+      default:
+	return Integer.toString(curToken);
+      }
   }
 
   private int tokenWidth()

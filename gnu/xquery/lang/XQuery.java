@@ -215,6 +215,8 @@ public class XQuery extends Interpreter
     define_method("starts-with", "gnu.xquery.util.StringValue", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringValue", "endsWith");
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
+
+    define("distinct-nodes", gnu.kawa.xml.SortNodes.sortNodes);
   }
 
   public static XQuery getInstance()

@@ -1,3 +1,7 @@
+2003-07-26  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>):  Add distinct-nodes function.
+
 2003-07-23  Terje Pedersen  <terje@brassforum.com>
 
 	* XQuery.java (<init>):  Define string-length, substring-before,

@@ -17,7 +17,7 @@ package gnu.lists;
 
 public class TreePosition extends SeqPosition implements Cloneable
 {
-  /** Used when dpsth==-1 to indicate the "entire" object.
+  /** Used when depth==-1 to indicate the "entire" object.
    * Usually an AbstractSequence, but need not be. */
   private Object xpos;
 

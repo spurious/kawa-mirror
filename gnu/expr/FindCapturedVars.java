@@ -45,7 +45,7 @@ public class FindCapturedVars extends ExpFullWalker
 
   public void capture(Declaration decl)
   {
-    if (decl.isStatic())
+    if (decl.isStatic() || ! (decl.getCanRead() || decl.getCanCall()))
       return;
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
@@ -54,19 +54,22 @@ public class FindCapturedVars extends ExpFullWalker
     if (curLambda == declLambda)
       return;
 
-    if (decl.getCanRead() || decl.getCanCall())
+    // The logic here is similar to that of decl.ignorable():
+    LambdaExp declValue;
+    if (decl.value == null || ! (decl.value instanceof LambdaExp))
+      declValue = null;
+    else
       {
-	// The logic here is similar to that of decl.ignorable():
-	LambdaExp declValue;
-	if (decl.value == null || ! (decl.value instanceof LambdaExp))
-	  declValue = null;
-	else
-	  {
-	    declValue = (LambdaExp) decl.value;
-	    if (declValue.isHandlingTailCalls() && !declValue.getInlineOnly())
-	      declValue = null;
-	  }
-
+        declValue = (LambdaExp) decl.value;
+        if (declValue.getInlineOnly())
+          return;
+        if (declValue.isHandlingTailCalls())
+          declValue = null;
+        else if (declValue == curLambda && ! decl.getCanRead())
+          return;
+      }
+    if (decl.getCanRead() || declValue == null)
+      {
 	LambdaExp heapLambda = curLambda;
 	heapLambda.setImportsLexVars();
 	LambdaExp parent = heapLambda.outerLambda();
@@ -75,10 +78,10 @@ public class FindCapturedVars extends ExpFullWalker
 	    heapLambda = outer;
 	    if (! decl.getCanRead() && declValue == outer)
 	      break;
-	    heapLambda.setNeedsStaticLink(true);
+	    heapLambda.setNeedsStaticLink();
 	    outer = heapLambda.outerLambda();
 	  }
-	if (decl.isSimple() && (decl.getCanRead() || declValue == null))
+	if (decl.isSimple())
 	  {
 	    if (declLambda.capturedVars == null)
 	      {

@@ -108,6 +108,9 @@ public class LambdaExp extends ScopeExp
     else flags &= ~INLINE_ONLY;
   }
 
+  public final boolean getNeedsClosureEnv ()
+  { return (flags & (NEEDS_STATIC_LINK|IMPORTS_LEX_VARS)) != 0; }
+
   /** True if a child lambda uses lexical variables from outside.
       Hence, a child heapFrame needs a staticLink to outer frames. */
   public final boolean getNeedsStaticLink ()
@@ -136,15 +139,27 @@ public class LambdaExp extends ScopeExp
 
     // If this needs an environment (closure), then its callers do too.
     if ((old & IMPORTS_LEX_VARS) == 0 && nameDecl != null)
+      setCallersNeedStaticLink();
+  }
+
+  public final void setNeedsStaticLink()
+  {
+    int old = flags;
+    flags |= NEEDS_STATIC_LINK;
+
+    // If this needs an environment (closure), then its callers do too.
+    if ((old & NEEDS_STATIC_LINK) == 0 && nameDecl != null)
+      setCallersNeedStaticLink();
+  }
+
+  void setCallersNeedStaticLink()
+  {
+    LambdaExp outer = outerLambda();
+    for (ApplyExp app = nameDecl.firstCall;  app != null;  app = app.nextCall)
       {
-	LambdaExp outer = outerLambda();
-	for (ApplyExp app = nameDecl.firstCall;
-	     app != null;  app = app.nextCall)
-	  {
-	    LambdaExp caller = app.context;
-	    for (; caller != outer; caller = caller.outerLambda())
-	      caller.setImportsLexVars();
-	  }
+        LambdaExp caller = app.context;
+        for (; caller != outer; caller = caller.outerLambda())
+          caller.setNeedsStaticLink();
       }
   }
 
@@ -192,7 +207,7 @@ public class LambdaExp extends ScopeExp
                 || (getCanRead()
                     && (isModuleBody () || ! outerLambda().isModuleBody()
                         || this instanceof ObjectExp
-                        || getImportsLexVars() || getNeedsStaticLink()))));
+                        || getNeedsClosureEnv()))));
   }
 
   public final boolean isHandlingTailCalls ()
@@ -294,12 +309,12 @@ public class LambdaExp extends ScopeExp
 	var.setParameter (true);  var.setArtificial (true);
 	thisVariable = var;
       }
-    return thisVariable;;
+    return thisVariable;
   }
 
   public Declaration declareClosureEnv()
   {
-    if (closureEnv == null && (getImportsLexVars() || getNeedsStaticLink()))
+    if (closureEnv == null && getNeedsClosureEnv())
       {
 	LambdaExp parent = outerLambda();
 	if (parent instanceof ObjectExp)
@@ -643,6 +658,7 @@ public class LambdaExp extends ScopeExp
   public void allocChildClasses (Compilation comp)
   {
     declareClosureEnv();
+
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       { 
@@ -658,8 +674,7 @@ public class LambdaExp extends ScopeExp
 
     allocFrame(comp);
 
-    if ((getImportsLexVars() || getNeedsStaticLink())
-	&& isClassGenerated())
+    if (getNeedsClosureEnv() && isClassGenerated())
       {
 	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
@@ -685,14 +700,15 @@ public class LambdaExp extends ScopeExp
 	  {
 	    boolean method_static;
 	    ObjectType closureEnvType;
-	    if (! (child.getImportsLexVars() || child.getNeedsStaticLink()))
+	    if (! child.getNeedsClosureEnv())
 	      closureEnvType = null;
-	    else if (heapFrame != null)
-	      closureEnvType = (ClassType) heapFrame.getType();
-	    else if (closureEnv != null)
-	      closureEnvType = (ClassType) closureEnv.getType();
-	    else
-	      closureEnvType = null;
+            else
+              {
+                LambdaExp owner = this;
+                while (owner.heapFrame == null)
+                  owner = owner.outerLambda();
+                closureEnvType = (ClassType) owner.heapFrame.getType();
+              }
 	    if (child.min_args != child.max_args)
 	      child.declareArgsArray();
 	    // generate_unique_name (new_class, child.getName());

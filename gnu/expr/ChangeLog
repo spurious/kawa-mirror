@@ -1,3 +1,18 @@
+1999-11-27  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (capture):  If the captured decl is an
+	inline-only procedure, we're done.  Likewise if we're calling ourself.
+	Fixes bugs reported by Walter C. Pelissero <wcp@lpds.sublink.org>.
+	Don't "capture" decl is it is a call-only variable.  (We don't
+	need a closureEnv for a call-only ufnction.)  Instead, rely on
+	new setCallersNeedStaticLink/setNeedsStaticLink() methods.
+	* LambdaExp.java (getNeedsClosureEnv):  New method.  Use it various
+ 	places instead of (getImportsLexVars() || getNeedsStaticLink()).
+	(setNeedsStaticLink()):  New method (overload).
+	(setCallersNeedStaticLink):  New helper method.
+	(declareThis): Remove duplicate semi-colon.
+	(allocChildClasses):  Keep searching parent chain for closureEnvType.
+
 1999-11-26  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileConstant): Coerce value to target type.

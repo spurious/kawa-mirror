@@ -105,8 +105,10 @@ public class SpecialType extends gnu.bytecode.PrimType
 	IntNum.initMakeMethods();
 	code.emitInvokeStatic(IntNum.makeLongMethod);
 	break;
-      case 'D':  case 'F':
-	code.emitConvert(Type.double_type);
+      case 'F':
+	code.emitConvert(Type.float_type, Type.double_type);
+	// ... fall through ...
+      case 'D':
 	DFloNum.initMakeMethods();
 	code.emitInvokeStatic(DFloNum.makeMethod);
 	break;

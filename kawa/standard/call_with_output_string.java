@@ -6,10 +6,10 @@ public class call_with_output_string extends Procedure1
 {
   public Object apply1 (Object proc)
   {
-    java.io.CharArrayWriter wr = new java.io.CharArrayWriter ();
-    OutPort port = new OutPort(wr, "<string>");
+    CharArrayOutPort port = new CharArrayOutPort();
     ((Procedure)proc).apply1 (port);
+    char[] chars = port.toCharArray();
     port.close ();
-    return new FString(wr.toCharArray());
+    return new FString(chars);
   }
 }

@@ -11,12 +11,7 @@ import gnu.mapping.*;
 
 public class plus_oper extends ProcedureN
 {
-  public static Object apply (Object arg1, Object arg2)
-  {
-    return ((Numeric) arg1).add(arg2);
-  }
-
-  public Object applyN (Object[] args)
+  public static Object apply$V(Object[] args)
   {
     int len = args.length;
     if (len == 0)
@@ -25,5 +20,10 @@ public class plus_oper extends ProcedureN
     for (int i = 1; i < len; i++)
       result = result.add (args[i]);
     return result;
-   }
+  }
+
+  public Object applyN (Object[] args)
+  {
+    return apply$V(args);
+  }
 }

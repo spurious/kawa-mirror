@@ -86,11 +86,11 @@ public class format extends ProcedureN
 
   public FString formatToString (Object[] args, int arg_offset)
   {
-    java.io.CharArrayWriter wr = new java.io.CharArrayWriter ();
-    OutPort port = new OutPort(wr, "<string>");
+    CharArrayOutPort port = new CharArrayOutPort();
     format(port, args, arg_offset);
+    char[] chars = port.toCharArray();
     port.close ();
-    return new FString(wr.toCharArray());
+    return new FString(chars);
   }
 
   public Object applyN (Object[] args)

@@ -67,6 +67,13 @@
   (write expect port)
   (newline port))
 
+#|
+(define-syntax test
+  (syntax-rules ()
+		((test expect fun . args)
+		 (cons #t (test1 (source-filename) (source-line) expect fun . args)))))
+|#
+
 (define (test expect fun . args)
   ((lambda (res)
      (cond ((equal? expect res)

@@ -53,9 +53,7 @@ public class Shell
 	    if (tr.errors == 0)
 	      {
 		Object result = mod.eval_module (env);
-		if (result == null)
-		  pout.println ("[null returned]\n");
-		else if (display && result != Scheme.voidObject)
+		if (display && result != Scheme.voidObject)
 		  {
 		    SFormat.print (result, pout);
 		    pout.println();

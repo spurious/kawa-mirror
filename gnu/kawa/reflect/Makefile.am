@@ -8,6 +8,7 @@ java_sources = \
   ArrayNew.java \
   ArraySet.java \
   ClassMemberConstraint.java \
+  ClassMethodProc.java \
   ClassMethods.java \
   InstanceOf.java \
   Invoke.java \

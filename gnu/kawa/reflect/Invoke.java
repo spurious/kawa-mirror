@@ -293,7 +293,33 @@ public class Invoke extends ProcedureN implements CanInline
       }
     else
       return walker.noteError("unknown invoke kind: " + kind);
+    return inline(exp, name, margsLength, argsStartIndex, objIndex,
+		  type, walker);
+  }
                 
+  public Expression inline (ApplyExp exp, String name,
+			    int margsLength, int argsStartIndex, int objIndex,
+			    ClassType type, ExpWalker walker)
+  {
+    Expression[] args = exp.getArgs();
+
+    // Add implicit staticLink for classes that need it.
+    // Doesn't yet handle: (define-namespace p <C>) (p:new)
+    if (kind == 'N' && argsStartIndex == 1
+	&& type instanceof PairClassType
+	&& ((PairClassType) type).getStaticLink() != null)
+      {
+	Expression[] cargs = { args[0] };
+	Expression[] xargs = new Expression[margsLength+1];
+	xargs[0] = new ApplyExp(ClassType.make("gnu.expr.PairClassType")
+				.getDeclaredMethod("getStaticLink", 0),
+				cargs);
+	System.arraycopy(args, argsStartIndex, xargs, 1, margsLength);
+	margsLength++;
+	argsStartIndex = 0;
+	args = xargs;
+      }
+
     if (type != null && name != null
 	// We can't generate <init> until we know whether it needs
 	// a lexical link, which we don't know until FindCapturedVars is run.

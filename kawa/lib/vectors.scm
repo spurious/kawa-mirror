@@ -29,8 +29,7 @@
 	(loop (cons (vector-ref vec i) result) i))))
 
 (define (list->vector (x :: <list>)) :: <vector>
-  ((primitive-constructor <vector> (<gnu.lists.Sequence>))
-   x))
+  (make <vector> x))
 
 (define (vector-fill! (vec :: <vector>) fill) :: <void>
   (invoke vec 'setAll fill))

@@ -517,19 +517,8 @@ public class Declaration
     if (getFlag(STATIC_SPECIFIED)
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
-    if (getFlag(IS_UNKNOWN))
-      {
-	// This is a kludge.  We really should set STATIC only of the module
-	// is static, in which case it should be safe to make it always FINAL.
-	// But for now we don't support non-static UNKNOWNs.  FIXME.
-	fflags |= Access.STATIC;
-	if (! (context instanceof ModuleExp
-	       && ((ModuleExp) context).isStatic()))
-	  fflags &= ~Access.FINAL;
-      }
     Type ftype = (isIndirectBinding() ? Compilation.typeBinding
-		  : value == null || typeSpecified ? getType()
-		  : value.getType());
+		  : getType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {
@@ -547,8 +536,8 @@ public class Declaration
       {
 	field.setConstantValue(((QuoteExp) value).getValue(), comp.mainClass);
       }
-    else if ((isIndirectBinding() || value != null)
-	     && ! getFlag(IS_UNKNOWN))
+    else if (isIndirectBinding()
+	     || (value != null && ! (value instanceof ClassExp)))
       {
 	BindingInitializer init = new BindingInitializer(this, field, value);
 	if ((fflags & Access.STATIC) != 0)

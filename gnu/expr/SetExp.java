@@ -145,21 +145,29 @@ public class SetExp extends Expression
 	((LambdaExp) new_value).compileSetField(comp);
       }
     else if (decl.context instanceof ModuleExp
-	     && (new_value instanceof QuoteExp)
-	     && ! decl.isPrivate() && ! comp.immediate
+	     && (new_value instanceof QuoteExp
+		 || decl.getFlag(Declaration.IS_CONSTANT))
+	     && isDefining()
 	     && decl.getValue() != null)
       { // This is handled in ModuleExp's allocFields method.
-      }
-    else if (decl.getFlag(Declaration.IS_SYNTAX)
-	     && decl.context instanceof ModuleExp
-	     && (value = ((kawa.lang.Macro)  decl.getConstantValue()).expander) instanceof LambdaExp
-	     && ! decl.isPrivate())
-      {
-	LambdaExp expander = (LambdaExp) value;
-	expander.flags |= LambdaExp.NO_FIELD;
-	expander.compileAsMethod(comp);
-	comp.mainLambda.addApplyMethod(expander);
-	decl.makeField(comp, new_value);
+	if (decl.getFlag(Declaration.IS_SYNTAX))
+	  {
+	    value = ((kawa.lang.Macro)  decl.getConstantValue()).expander;
+	    if (value instanceof LambdaExp)
+	      {
+		LambdaExp expander = (LambdaExp) value;
+		expander.flags |= LambdaExp.NO_FIELD;
+		expander.compileAsMethod(comp);
+		comp.mainLambda.addApplyMethod(expander);
+		decl.makeField(comp, new_value);
+	      }
+	  }
+	// Otherwise this is handled in ModuleExp's allocFields method.  But:
+	if (needValue)
+	  {
+	    decl.load(comp);
+	    valuePushed = true;
+	  }
       }
     else
       {
@@ -281,7 +289,7 @@ public class SetExp extends Expression
 
   protected void walkChildren (ExpWalker walker)
   {
-    new_value = (Expression) new_value.walk(walker);
+    new_value = (Expression) walker.walk(new_value);
   }
 
   public void print (OutPort out)

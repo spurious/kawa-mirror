@@ -167,7 +167,7 @@ public class ModuleExp extends LambdaExp
 		if (clas == null)
 		  return;
 		Object inst = clas.newInstance ();
-		
+
 		Procedure proc = (Procedure) inst;
 		if (proc.getName() == null)
 		  proc.setName (mexp.name);
@@ -212,10 +212,26 @@ public class ModuleExp extends LambdaExp
 
   void allocFields (Compilation comp)
   {
+    // We want the create the id$XXX Binding fields for unknowns first,
+    // because it is possible some later Declaration's initializer may depend
+    // on it.  Normally this is not an issue, as initializer are usually
+    // run as part of the "body" of the module, which is executed later.
+    // However, constant initializers are an exception - they are
+    // executed at init time.
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
 	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
+	  continue;
+	if (decl.getFlag(Declaration.IS_UNKNOWN))
+	  decl.makeField(comp, null);
+      }
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
+	  continue;
+	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
 	if (decl.getFlag(Declaration.IS_SYNTAX)
 	    && ((kawa.lang.Macro) decl.getConstantValue()).expander instanceof LambdaExp
@@ -228,8 +244,8 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-	    if (! (value instanceof QuoteExp)
-		|| ! decl.getFlag(Declaration.IS_CONSTANT) || comp.immediate)
+	    if (! decl.getFlag(Declaration.IS_CONSTANT)
+		|| value == QuoteExp.undefined_exp)
 	      value = null;
 	    decl.makeField(comp, value);
 	  }

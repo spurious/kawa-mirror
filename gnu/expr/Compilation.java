@@ -959,10 +959,20 @@ public class Compilation
 
     Initializer init;
     lexp.initChain = Initializer.reverse(lexp.initChain);
-    while ((init = lexp.initChain) != null)
+    if (lexp.initChain != null)
       {
-	lexp.initChain = init.next;
-	init.emit(this);
+	// Create dummy lambda, for its closureEnv.  This may be needed
+	// if init.value contains a reference that uses our heap frame.
+	LambdaExp save = curLambda;
+	curLambda = new LambdaExp();
+	curLambda.closureEnv = code.getArg(0);
+	curLambda.outer = save;
+	while ((init = lexp.initChain) != null)
+	  {
+	    lexp.initChain = init.next;
+	    init.emit(this);
+	  }
+	curLambda = save;
       }
 
     if (lexp instanceof ClassExp)

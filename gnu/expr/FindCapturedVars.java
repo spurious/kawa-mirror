@@ -89,37 +89,6 @@ public class FindCapturedVars extends ExpWalker
       }
     finally
       {
-	if (unknownDecls != null)
-	  {
-	    int count = unknownDecls.size();
-	    java.util.Enumeration e = unknownDecls.keys();
-	    int i = 0;
-	    Expression[] init = new Expression[1];
-	    LetExp let = new LetExp(init);
-	    Declaration env =
-	      let.addDeclaration("env$",
-				 Compilation.typeEnvironment);
-	    init[0] = new ApplyExp(Compilation.getCurrentEnvironmentMethod,
-				   Expression.noExpressions);
-	    env.setCanRead(true);
-	    env.noteValue(init[0]);
-	    Expression[] exps = new Expression[count+1];
-	    for (;  e.hasMoreElements();  i++)
-	      {
-		String id = (String) e.nextElement();
-		Declaration decl = (Declaration) unknownDecls.get(id);
-		Expression[] args = new Expression[2];
-		args[0] = new ReferenceExp(env);
-		args[1] = new QuoteExp(id);
-		SetExp set = new SetExp(decl, 
-					new ApplyExp(Compilation.getBindingEnvironmentMethod, args));
-		set.setDefining(true);
-		exps[i] = set;
-	      }
-	    exps[i] = currentModule.body;
-	    let.setBody(new BeginExp(exps));
-	    currentModule.body = let;
-	  }
 	currentModule = saveModule;
 	unknownDecls = saveDecls;
       }
@@ -177,8 +146,6 @@ public class FindCapturedVars extends ExpWalker
     if (! (decl.getCanRead() || decl.getCanCall()))
       return;
 
-    if (decl.getFlag(Declaration.IS_UNKNOWN))
-      return; // FIXME - for now, as long as unknows are static
     if (decl.field != null && decl.field.getStaticFlag())
       return;
     if (decl.getFlag(Declaration.IS_CONSTANT)
@@ -246,6 +213,22 @@ public class FindCapturedVars extends ExpWalker
           declValue = null;
 	else if (declValue == curLambda && ! decl.getCanRead())
           return;
+      }
+
+    if (decl.getFlag(Declaration.IS_UNKNOWN))
+      {
+	// Don't create a closure for a static function/class.
+	for (LambdaExp parent = curLambda; ; parent = parent.outerLambda())
+	  {
+	    if (parent == declLambda)
+	      break;
+	    if (parent.nameDecl != null
+		&& parent.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+	      {
+		decl.setFlag(Declaration.STATIC_SPECIFIED);
+		break;
+	      }
+	  }
       }
     if (decl.getFlag(Declaration.STATIC_SPECIFIED))
       decl.setSimple(false);
@@ -322,7 +305,6 @@ public class FindCapturedVars extends ExpWalker
 	decl = allocUnboundDecl(exp.getName());
 	exp.setBinding(decl);
       }
-    else // FIXME remove else when IS_UNKNOWN decls are non-static
     capture(Declaration.followAliases(decl));
     return exp;
   }
@@ -342,7 +324,6 @@ public class FindCapturedVars extends ExpWalker
 	decl = allocUnboundDecl(exp.getName());
 	exp.binding = decl;
       }
-    else // FIXME remove else when IS_UNKNOWN decls are non-static
     capture(Declaration.followAliases(decl));
     return super.walkSetExp(exp);
   }

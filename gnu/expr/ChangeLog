@@ -1,10 +1,27 @@
 2002-08-10  Per Bothner  <per@bothner.com>
 
+	* SetExp.java (walkChildren):  Use new ExpWalker walk method.
+
+	* Compilation.java (generateConstructor):  Create dummy LambdaExpr
+	for processing initChain.
+	* SetExp.java (compile):  Combine IS_SYNTAX case with QuoteExp case.
+	Also handle IS_CONSTANT here.  Allow private and immediate.
+	* Declaration.java (makeField):  Unknowns are no longer automatically
+	static.  If type not specified, don't infer it from value.
+	Do create BindingInitializer for unknowns.
+	* FindCapturedVars.java (walkModuleExp):  Don't generate SetExps
+	for unknowns - they should to be emitted earlier, in case of
+	mutual dependent modules (when they are implemented).
+	(capture):  Now need to handle captured unknowns - not always static.
+	However, force static if in a static function or class,
+	(walkReferenceExp, walkSetExp):  Unknowns are no longer always static.
+	* ModuleExp.java (allocFields):  Allocate unknowns first.
+
 	* ApplyExp.java (compile):  Don't call using tailcall-handling API
 	unless either call is a tail-call or target is ConsumerTarget.
 
 2002-08-09  Per Bothner  <per@bothner.com>
-
+(
 	* ModuleBody.java (runAsMain):  Do defineAll, so exported bindings
 	get placed in environment.
 

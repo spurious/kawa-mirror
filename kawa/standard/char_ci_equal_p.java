@@ -1,8 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
 
-/// The char-ci=? procedure
-/// @author R. Alexander Milowski
+/** The char-ci=? procedure
+ * @author R. Alexander Milowski
+ */
 
 public class char_ci_equal_p extends Procedure2
 {

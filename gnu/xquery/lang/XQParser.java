@@ -242,6 +242,25 @@ public class XQParser extends LispReader // should be extends Lexer
     return Character.isUnicodeIdentifierPart(ch) || ch == '-' || ch == '.';
   }
 
+  private int saveToken;
+  private Object saveValue;
+
+  public void mark ()
+    throws java.io.IOException
+  {
+    super.mark();
+    saveToken = curToken;
+    saveValue = curValue;
+  }
+
+  public void reset()
+    throws java.io.IOException
+  {
+    curToken = saveToken;
+    curValue = saveValue;
+    super.reset();
+  }
+
   int getRawToken()
       throws java.io.IOException, SyntaxException
   {
@@ -1569,14 +1588,34 @@ public class XQParser extends LispReader // should be extends Lexer
 			args);
   }
 
-  char matchConstructorKeyword ()
+  char matchConstructorKeyword (int next)
+      throws java.io.IOException, SyntaxException
   {
+    char kind;
     if (curToken == NCNAME_TOKEN)
       {
-	if (match("element"))  return 'e';
-	if (match("attribute"))  return 'a';
-	if (match("document"))  return 'd';
-	if (match("text"))  return 't';
+	if (match("element"))
+	  kind = 'e';
+	else if (match("attribute"))
+	  kind = 'a';
+	else if (match("document") && next == '{')
+	  kind = 'd';
+	else if (match("text") && next == '{')
+	  kind = 't';
+	else
+	  return '\0';
+	if (kind == 'e' || kind == 'a')
+	  {
+	    if (! isNameStart((char) next))
+	      return '\0';
+	    mark();
+	    getRawToken(); // Skip 'element' or 'attribute'.
+	    getRawToken(); // Skip NAME.
+	    if (curToken != '{')
+	      kind = '\0';
+	    reset();
+	  }
+	return kind;
       }
     return '\0';
   }
@@ -1774,8 +1813,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    exp.setLine(startLine, startColumn - 3);
 	    return exp;
 	  }
-	else if ((kind = matchConstructorKeyword()) != '\0'
-		 && (next == '{' || isNameStart((char) next)))
+	else if ((kind = matchConstructorKeyword(next)) != '\0')
 	  {
 	    if (next >= 0)
 	      unread();

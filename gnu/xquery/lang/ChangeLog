@@ -1,3 +1,10 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (mark, reset):  New methods.
+	(matchConstructorKeyword):  Now handles context dependency correctly,
+	parsing ahead using mark and reset if needed.
+	(parseMaybePrimaryExpr):  Let matchConstructorKeyword check context.
+
 2003-03-29  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (interpreter):  New field.

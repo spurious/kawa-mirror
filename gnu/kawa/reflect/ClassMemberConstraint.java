@@ -130,6 +130,8 @@ public class ClassMemberConstraint extends Constraint
 	  name = name.intern();
 	if (object instanceof Binding)
 	  env.addBinding((Binding) object);
+	else
+	  env.define(name, object);
       }
     else
       {

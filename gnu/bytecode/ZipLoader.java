@@ -41,13 +41,13 @@ public class ZipLoader extends ClassLoader
     if (index >= 0)
       clas = (Class) loadedClasses.elementAt(index+1);
     else if (zar == null)
-      clas = findSystemClass (name);
+      clas = Class.forName(name);
     else
       {
 	String member_name = name.replace ('.', '/') + ".class";
 	java.util.zip.ZipEntry member = zar.getEntry(member_name);
 	if (member == null)
-	  clas = findSystemClass (name);
+	  clas = Class.forName(name);
 	else
 	  {
 	    try

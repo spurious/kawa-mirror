@@ -1,3 +1,9 @@
+2000-11-21  Brain R. Lewis <brlewis@users.sourceforge.net>
+
+	* ArrayClassLoader.java:  Handle custom classloader by using
+	Class.forName() instead of findSystemClass().
+	* ZipLoader.java:  Likewise.
+
 2000-10-09  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (setExisting):  New method.

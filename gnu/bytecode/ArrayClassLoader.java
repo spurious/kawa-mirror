@@ -85,7 +85,7 @@ public class ArrayClassLoader extends ClassLoader
       {
 	if (index >= size)
 	  {
-	    clas = findSystemClass (name);
+	    clas = Class.forName(name);
 	    break;
 	  }
 	else if (name.equals (classNames[index]))

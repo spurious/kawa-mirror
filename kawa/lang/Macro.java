@@ -75,4 +75,32 @@ public class Macro extends Syntax
                               + getName() + "' threw " + ex);
       }
   }
+
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                    ScopeExp defs, Translator tr)
+  {
+    String save_filename = tr.current_filename;
+    int save_line = tr.current_line;
+    int save_column = tr.current_column;
+    Syntax saveSyntax = tr.currentSyntax;
+    try
+      {
+        if (st instanceof PairWithPosition)
+          {
+            PairWithPosition ppair = (PairWithPosition) st;
+            tr.current_filename = ppair.getFile ();
+            tr.current_line = ppair.getLine ();
+            tr.current_column = ppair.getColumn ();
+          }
+        tr.currentSyntax = this;
+        return tr.scan_form(expand(st, tr), forms, defs);
+      }
+    finally
+      {
+        tr.current_filename = save_filename;
+        tr.current_line = save_line;
+        tr.current_column = save_column;
+        tr.currentSyntax = saveSyntax;
+      }
+  }
 }

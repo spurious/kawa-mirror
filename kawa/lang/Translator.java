@@ -291,6 +291,7 @@ public class Translator extends Object
 	    if (name == null)
 	      break tryDirectCall;
 	    String mangledName = Compilation.mangleName(name);
+	    String mangledNameV = mangledName + "$V";
 	    for (int i = meths.length;  --i >= 0; )
 	      {
 		java.lang.reflect.Method meth = meths[i];
@@ -299,10 +300,16 @@ public class Translator extends Object
 		    != (Modifier.STATIC|Modifier.PUBLIC))
 		  continue;
 		String mname = meth.getName();
-		if (! mname.equals("apply") && ! mname.equals(mangledName))
+                boolean variable;
+                if (mname.equals("apply") || mname.equals(mangledName))
+                  variable = false;
+                else if (mname.equals("apply$V") || mname.equals(mangledNameV))
+                  variable = true;
+                else
 		  continue;
 		Class[] ptypes = meth.getParameterTypes();
-		if (ptypes.length != cdr_length)
+		if (variable ? ptypes.length - 1 > cdr_length
+                    : ptypes.length != cdr_length)
 		  continue;
 		// In the future, we may try to find the "best" match.
 		if (best != null)
@@ -396,151 +403,20 @@ public class Translator extends Object
 
   boolean scan_form (Object st, java.util.Vector forms, ScopeExp defs)
   {
-    for (;;)
+    // Process st.
+    if (! (st instanceof Pair))
+      forms.addElement (st);
+    else
       {
-        // Process st.
-        if (! (st instanceof Pair))
-          forms.addElement (st);
-        else
-          {
-            Pair st_pair = (Pair) st;
-            Object op = st_pair.car;
-            Syntax syntax = check_if_Syntax (op);
-
-            if (syntax != null && syntax instanceof Macro)
-              {
-                String save_filename = current_filename;
-                int save_line = current_line;
-                int save_column = current_column;
-                Syntax saveSyntax = currentSyntax;
-                try
-                  {
-                    if (st_pair instanceof PairWithPosition)
-                      {
-                        PairWithPosition ppair = (PairWithPosition) st_pair;
-                        current_filename = ppair.getFile ();
-                        current_line = ppair.getLine ();
-                        current_column = ppair.getColumn ();
-                      }
-                    currentSyntax = syntax;
-                    st = ((Macro) syntax).expand (st_pair, this);
-                  }
-                finally
-                  {
-                    current_filename = save_filename;
-                    current_line = save_line;
-                    current_column = save_column;
-                    currentSyntax = saveSyntax;
-                  }
-                continue;
-		}
-            else if (syntax == Scheme.beginSyntax)
-              {
-                if (! scan_body (st_pair.cdr, forms, defs))
-                  return false;
-              }
-            /*
-            else if (syntax == Scheme.defineSyntax
-                     && st_pair.cdr instanceof Pair
-                     && ! (current_scope instanceof ModuleExp))
-              {
-                Object name = ((Pair) st_pair.cdr).car;
-                if (name instanceof String)
-                  defs.addDeclaration((String) name);
-                else if (name instanceof Pair)
-                  {
-                    Pair name_pair = (Pair) name;
-                    if (name_pair.car instanceof String)
-                      defs.addDeclaration((String) name_pair.car);
-                  }
-                forms.addElement (st);
-              }
-            */
-            else if ((syntax == Scheme.defineSyntax
-                      || syntax == Scheme.defineSyntaxPrivate)
-                     // Later:  || syntax == Scheme.defineSyntax
-                     && st_pair.cdr instanceof Pair)
-              {
-                boolean makePrivate = syntax == Scheme.defineSyntaxPrivate;
-                Pair p = (Pair) st_pair.cdr;
-                Object name = p.car;
-                Declaration decl = null;
-                Pair declForm = null;
-                if (name instanceof String)
-                  {
-                    decl = new Declaration((String) name);
-                    declForm = makePair(p, decl, p.cdr);
-                    st = makePair(st_pair, syntax, declForm);
-                  }
-                else if (name instanceof Pair)
-                  {
-                    Pair name_pair = (Pair) name;
-                    if (name_pair.car instanceof String)
-                      {
-                        decl = new Declaration((String) name_pair.car);
-                        declForm = makePair(name_pair, decl, name_pair.cdr);
-                        p = makePair(p, declForm, p.cdr);
-                        st = makePair(st_pair, syntax, p);
-                      }
-		    }
-                if (decl != null)
-                  {
-                    if (defs instanceof ModuleExp)
-                      {
-                        mustCompileHere();
-                        push(decl);
-                        if (! makePrivate)
-                          {
-                            decl.setCanRead(true);
-                            // decl.setCanWrite(true);
-                          }
-                      }
-                    if (declForm instanceof PairWithPosition)
-                      {
-                        PairWithPosition declPos = (PairWithPosition) declForm;
-                        decl.setFile(declPos.getFile());
-                        decl.setLine(declPos.getLine(), declPos.getColumn());
-                      }
-                    defs.addDeclaration(decl);
-                  }
-                forms.addElement (st);
-              }
-            else if (syntax == Scheme.defineAliasSyntax
-                     && st_pair.cdr instanceof Pair
-                     && ! (current_scope instanceof ModuleExp)
-                     &&  ((Pair) st_pair.cdr).car instanceof String)
-              {
-                Object name = ((Pair) st_pair.cdr).car;
-                Type typeLocation = ClassType.make("gnu.mapping.Location");
-                Declaration decl
-                  = defs.addDeclaration((String) name, typeLocation);
-                decl.setIndirectBinding(true);
-                forms.addElement (st);
-              }
-            else if (syntax == Scheme.defineSyntaxSyntax
-                     && st_pair.cdr instanceof Pair
-                     && ! (current_scope instanceof ModuleExp)
-                     &&  ((Pair) st_pair.cdr).car instanceof String)
-              {
-                Pair p = (Pair) st_pair.cdr;
-                Object name = p.car;
-                if (! (p.car instanceof String)
-                    || ! (p.cdr instanceof Pair)
-                    || (p = (Pair) p.cdr).cdr != List.Empty)
-                  {
-                    forms.addElement(syntaxError("invalid syntax for define-syntax"));
-                    return false;
-                  }
-                Macro macro = new Macro((String) name, p.car);
-                defs.addDeclaration(macro);
-                p = makePair(st_pair, syntax, new Pair(macro, p));
-                forms.addElement (p);
-              }
-            else
-              forms.addElement (st);
-          }
-        return true;
+        Pair st_pair = (Pair) st;
+        Object op = st_pair.car;
+        Syntax syntax = check_if_Syntax (op);
+        if (syntax == null)
+          forms.addElement(st);
+        else if (! syntax.scanForDefinitions(st_pair, forms, defs, this))
+          return false;
       }
+    return true;
   }
 
   /** Recursive helper method for rewrite_body.
@@ -551,6 +427,7 @@ public class Translator extends Object
 
   public boolean scan_body (Object body, java.util.Vector forms, ScopeExp defs)
   {
+    boolean result = true;
     while (body != List.Empty)
       {
 	if (! (body instanceof Pair))
@@ -561,10 +438,10 @@ public class Translator extends Object
 	Pair pair = (Pair) body;
 	Object st = pair.car;
         if (! scan_form (st, forms, defs))
-          return false;
+          result = false;
 	body = pair.cdr;
       }
-    return true;
+    return result;
   }
 
   public static Pair makePair(Pair pair, Object car, Object cdr)
@@ -649,7 +526,7 @@ public class Translator extends Object
    * Insert decl into current_decls.
    * (Used at rewrite time, not eval time.)
    */
-  void push (Declaration decl)
+  public void push (Declaration decl)
   {
     String sym = decl.symbol();
     if (sym == null)

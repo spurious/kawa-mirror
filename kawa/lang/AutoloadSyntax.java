@@ -95,6 +95,24 @@ public class AutoloadSyntax extends Syntax
       { throw_error ("type error"); }
   }
 
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                     ScopeExp defs, Translator tr)
+  {
+    if (loaded == null)
+      {
+	try
+	  {
+	    load ();
+	  }
+	catch (RuntimeException e)
+	  {
+	    tr.syntaxError (e.getMessage ());
+            return false;
+	  }
+      }
+    return loaded.scanForDefinitions(st, forms, defs, tr);
+  }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     if (loaded == null)

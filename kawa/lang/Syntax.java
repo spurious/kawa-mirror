@@ -30,6 +30,7 @@ abstract public class Syntax extends Declaration implements Printable
    * @param tr the Translator that provides context
    * @return the re-written expression
    */
+
   public Expression rewrite (Object obj, Translator tr)
   {
     throw new InternalError("rewrite method not defined");
@@ -38,6 +39,20 @@ abstract public class Syntax extends Declaration implements Printable
   public Expression rewriteForm (Pair form, Translator tr)
   {
     return rewrite(form.cdr, tr);
+  }
+
+  /** Check if a statement is a definition, for initial pass.
+   * @param st the statement to check
+   * @param form where to append the (possibly-modified) statement
+   * @param defs where to add Declarations for found definitions
+   * @param tr the compilation state
+   * @return true on success
+   */
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                    ScopeExp defs, Translator tr)
+  {
+    forms.addElement(st);
+    return true;
   }
 
   public void print(java.io.PrintWriter ps)

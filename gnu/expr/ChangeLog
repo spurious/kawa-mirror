@@ -1,3 +1,8 @@
+2004-05-19  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass):  Restore curLambda *after* compileEnd.
+	Fixes Savannah bug #9010 "compilation of define-alias form causes NPE".
+
 2004-05-17  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (inlinedIn):  Our caller might be the outer lambda.

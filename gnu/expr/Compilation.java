@@ -1711,9 +1711,9 @@ public class Compilation
 	method = save_method;
       }
 
-    curLambda = saveLambda;
-
     module.compileEnd(this);
+
+    curLambda = saveLambda;
 
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.

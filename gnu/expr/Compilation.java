@@ -536,11 +536,43 @@ public class Compilation
 	  }
 	else
 	  {
-	    mangled.append ('_');
-	    mangled.append (Character.forDigit ((ch >> 12) & 15, 16));
-	    mangled.append (Character.forDigit ((ch >>  8) & 15, 16));
-	    mangled.append (Character.forDigit ((ch >>  4) & 15, 16));
-	    mangled.append (Character.forDigit ((ch      ) & 15, 16));
+	    switch (ch)
+	      {
+	      case '+':  mangled.append("$Pl");  break;
+	      case '-':  mangled.append("$Mn");  break;
+	      case '*':  mangled.append("$St");  break;
+	      case '/':  mangled.append("$Sl");  break;
+	      case '=':  mangled.append("$Eq");  break;
+	      case '<':  mangled.append("$Ls");  break;
+	      case '>':  mangled.append("$Gr");  break;
+	      case '@':  mangled.append("$At");  break;
+	      case '~':  mangled.append("$Tl");  break;
+	      case '%':  mangled.append("$Pc");  break;
+	      case '.':  mangled.append("$Dt");  break;
+	      case ',':  mangled.append("$Cm");  break;
+	      case '(':  mangled.append("$LP");  break;
+	      case ')':  mangled.append("$RP");  break;
+	      case '[':  mangled.append("$LB");  break;
+	      case ']':  mangled.append("$RB");  break;
+	      case '{':  mangled.append("$LC");  break;
+	      case '}':  mangled.append("$RC");  break;
+	      case '\'': mangled.append("$Sq");  break;
+	      case '"':  mangled.append("$Dq");  break;
+	      case '&':  mangled.append("$Am");  break;
+	      case '#':  mangled.append("$Nm");  break;
+	      case '?':  mangled.append("$Qu");  break;
+	      case '!':  mangled.append("$Ex");  break;
+	      case ':':  mangled.append("$Cl");  break;
+	      case ';':  mangled.append("$SC");  break;
+	      case '^':  mangled.append("$Up");  break;
+	      case '|':  mangled.append("$VB");  break;
+	      default:
+		mangled.append('$');
+		mangled.append(Character.forDigit ((ch >> 12) & 15, 16));
+		mangled.append(Character.forDigit ((ch >>  8) & 15, 16));
+		mangled.append(Character.forDigit ((ch >>  4) & 15, 16));
+		mangled.append(Character.forDigit ((ch      ) & 15, 16));
+	      }
 	  }
       }
     String mname = mangled.toString ();

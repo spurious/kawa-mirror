@@ -1,3 +1,7 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readToken):  Allow "illegal" character if escaped.
+
 2003-02-23  Per Bothner  <per@bothner.com>
 
 	* ScmRead.java (scmReadTable):  Remove static field.

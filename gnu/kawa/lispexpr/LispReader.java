@@ -181,6 +181,12 @@ public class LispReader extends Lexer
 	ReadTableEntry entry = getReadTable().lookup(ch);
 	if (entry == null)
 	  {
+	    if (inEscapes)
+	      {
+		tokenBufferAppend(TOKEN_ESCAPE_CHAR);
+		tokenBufferAppend(ch);
+		continue;
+	      }
 	    unread(ch);
 	    break;
 	  }

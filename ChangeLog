@@ -1,3 +1,8 @@
+2003-06-01  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Specify field name for
+	vector-append.  Fixes bug reported by Sven.Hartrumpf@FernUni-Hagen.de.
+
 2003-05-31  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (loadSource):  Don't call BaseUri.resolve

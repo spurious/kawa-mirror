@@ -1,3 +1,7 @@
+2002-02-20  Per Bothner  <per@bothner.com>
+
+	* config.sub, config.guess:  Updated from master versions.
+
 2002-02-16  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.98.

@@ -95,4 +95,5 @@
              <String>
              (format #f "{arg1: ~s arg2: ~s}" arg1 arg2)))))
 
-(test "{arg1: 23 arg2: 12}" 'object-with-closure-3 (symbol->string ((document-filter 23) 12)))
+(test "{arg1: 23 arg2: 12}" 'object-with-closure-3
+      (symbol->string ((document-filter 23) 12)))

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.0 from Makefile.am
+# Makefile.in generated automatically by automake 1.1g from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -37,6 +37,9 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -64,31 +67,29 @@ java_DATA=$(OBJ)
 SOURCES = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
-mkinstalldirs = $(top_srcdir)/mkinstalldirs
-DATA = $(java_DATA)
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+DATA =  $(java_DATA)
 
-DIST_COMMON = ChangeLog Makefile.am Makefile.in
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in
 
 
-PACKAGE = @PACKAGE@
-VERSION = @VERSION@
-
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST)
-DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \
+	$(TEXINFOS) $(MANS) $(EXTRA_DIST)
 
 TAR = tar
 default: all
 
 
 $(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake $(subdir)/Makefile
+	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
 
-Makefile: $(top_builddir)/config.status Makefile.in
-	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= ./config.status
+Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 install-javaDATA: $(java_DATA)
+	$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
 	list="$(java_DATA)"; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
@@ -106,38 +107,26 @@ tags: TAGS
 TAGS:
 
 
-subdir = kawa/math
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-distdir: $(DEP_DISTFILES)
-	if test "$(srcdir)" = "." && ln -s . linkdir ; then true; \
-	else \
-	  mkdir linkdir; \
-	  for dir in $(srcdir) . ; do \
-	    for file in `cd $$dir && echo *` ; do \
-	      test -f linkdir/$$file \
-	      || test -d $$dir/$$file \
-	      || ln $$dir/$$file linkdir/$$file 2> /dev/null \
-	      || cp -p $$dir/$$file linkdir/$$file; \
-	    done; \
-	  done; \
-	fi
-	for file in `cd linkdir && echo $(DISTFILES)`; do \
+
+subdir = kawa/math
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  test -f $(distdir)/$$file \
-	  || ln linkdir/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p linkdir/$$file $(distdir)/$$file; \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-	rm -rf linkdir
 info:
-
 dvi:
-
 check: all
-
 installcheck:
-
+install-info:
 install-exec: 
+	$(NORMAL_INSTALL)
 
 install-data: install-javaDATA
+	$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
@@ -160,7 +149,8 @@ clean-generic:
 
 distclean-generic:
 	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log $(CONFIG_HEADER) stamp-h
+	rm -f config.cache config.log stamp-h
+	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
 	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
@@ -177,9 +167,10 @@ maintainer-clean:  maintainer-clean-generic distclean
 	@echo "it deletes files that may require special tools to rebuild."
 
 .PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi check installcheck install-exec install-data install uninstall all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+dvi check installcheck install-info install-exec install-data install \
+uninstall all installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
 
 
 .java.class:
@@ -187,7 +178,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 all: $(OBJ)
 .SUFFIXES:
-.SUFFIXES: $(SUFFIXES)
+.SUFFIXES: .java .class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -37,6 +37,8 @@ public abstract class LispInterpreter extends Interpreter
   {
     kawa.lang.Translator tr = new  kawa.lang.Translator (Environment.user(), messages);
     ModuleExp mexp = new ModuleExp();
+    if (Compilation.generateAppletDefault)
+      mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);

@@ -1,0 +1,5 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	New package.
+	* LispReader.java:  Moved from gnu.text.
+	* ScmReader.java:  Moved from kawa.lang.

@@ -1,3 +1,7 @@
+2004-01-04  Per Bothner  <per@bothner.com>
+
+	* Document.java (parse):  Returns a KDocument rather than a NodeTree.
+
 2004-01-03  Per Bothner  <per@bothner.com>
 
 	* KNode.java:  New class, extends SeqPosition, implements Node.

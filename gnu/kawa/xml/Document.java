@@ -60,11 +60,11 @@ public class Document extends Procedure1
     out.endDocument();
   }
 
-  public static NodeTree parse (Object url) throws Throwable
+  public static KDocument parse (Object url) throws Throwable
   {
     NodeTree doc = new NodeTree();
     parse(url, doc);
-    return doc;
+    return new KDocument(doc, 0);
   }
 
   public Object apply1 (Object arg1) throws Throwable

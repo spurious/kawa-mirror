@@ -1,3 +1,7 @@
+2001-08-07  Brian Jones <cbj@gnu.org>
+
+	* LineNumbersAttr.java (getLineCount, getLineNumberTable): New methods.
+
 2001-07-16  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (booleanValue):  Make static.

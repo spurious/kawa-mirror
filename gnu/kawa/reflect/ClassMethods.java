@@ -153,7 +153,7 @@ public class ClassMethods extends ProcedureN
     PrimProcedure pproc = null;
     for (int i = 0;  i < methods.length;  i++)
       {
-        PrimProcedure cur = methods[i];;
+        PrimProcedure cur = methods[i];
         if (atypes != null)
           {
             int applicable = cur.isApplicable(atypes);

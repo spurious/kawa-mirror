@@ -557,7 +557,7 @@ public class Scheme extends LispInterpreter
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
-      define ("define-variable", new kawa.standard.define_variable());
+      define_syntax("define-variable", "kawa.standard.define_variable");
       define ("define-member-alias", new kawa.standard.define_member_alias());
       define ("require", new kawa.standard.require());
       define_syntax ("module-name", "kawa.standard.module_name");

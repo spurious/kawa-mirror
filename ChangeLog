@@ -1,3 +1,12 @@
+2003-11-05  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define.java (rewriteForm):  Complain if not in <body>.
+
+	* kawa/standard/define_variable.java (scanForDefinitions, rewriteForm):
+	Fix various problems.
+	* kawa/standard/Scheme.java (<init>):  Use define_syntax for
+	'define-variable'.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Replace call to old 'parse' method

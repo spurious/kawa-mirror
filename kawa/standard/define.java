@@ -91,6 +91,7 @@ public class define extends Syntax implements Printable
     Object name = null;
     Expression value = null;
     Declaration decl = null;
+    boolean not_in_body = false;
 
     if (obj instanceof Pair)
       {
@@ -104,6 +105,7 @@ public class define extends Syntax implements Printable
 	      {
 		name = p1.car;
 		value = tr.rewrite (p2.car);
+		not_in_body = true;
 	      }
 	  }
 	else if (p1.car instanceof Declaration && p1.cdr instanceof Pair)
@@ -130,6 +132,7 @@ public class define extends Syntax implements Printable
 	    if (p2.car instanceof String || p2.car instanceof Symbol)
 	      {
 		name = p2.car;
+		not_in_body = true;
               }
             else if (p2.car instanceof Declaration)
               {
@@ -153,6 +156,8 @@ public class define extends Syntax implements Printable
       }
     if (name == null)
       return tr.syntaxError ("invalid syntax for "+getName());
+    if (not_in_body)
+      return tr.syntaxError (getName() + " is only allowed in a <body>");
     SetExp sexp = new SetExp (name, value);
     sexp.setDefining (true);
     if (decl != null)

@@ -420,9 +420,21 @@ public class Compilation
 		// should print an ERROR.
 	      }
 	  }
+        try
+          {
+            value = type.coerceFromObject(value);
+          }
+        catch (Exception ex)
+          {
+            error('w', "cannot convert literal (of type "
+                  + value.getClass().getName() + ") to "
+                  + type.getName());
+          }
       }
     compileConstant(value);
-    target.compileFromStack(this, Type.pointer_type);
+    target.compileFromStack(this,
+                            value == null ? target.getType()
+                            : Type.make(value.getClass()));
   }
 
   private void dumpLiterals ()

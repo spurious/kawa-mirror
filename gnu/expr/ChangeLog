@@ -1,3 +1,9 @@
+1999-11-26  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileConstant): Coerce value to target type.
+	Tell compileFromStack that the current type is the value's class.
+	Suggested by Daniel Bonniot <bonniot@cma.ensmp.fr>.
+
 1999-11-16  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  Minor fix for tail-recursion with many

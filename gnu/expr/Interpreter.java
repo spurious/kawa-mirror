@@ -656,9 +656,11 @@ public abstract class Interpreter
   {
     Object val = sym.getFunctionValue(Symbol.UNBOUND);
     if (val == Symbol.UNBOUND)
-      val = sym.get(Symbol.UNBOUND);
-    if (val == Symbol.UNBOUND)
-      val = getInterpreter().getDefaultSymbolValue(sym, true);
+      {
+	val = sym.get(Symbol.UNBOUND);
+	if (val == Symbol.UNBOUND)
+	  val = getInterpreter().getDefaultSymbolValue(sym, true);
+      }
     return (Procedure) val;
   }
 

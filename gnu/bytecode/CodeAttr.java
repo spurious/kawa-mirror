@@ -197,7 +197,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error("popType called with empty stack "+getMethod());
     Type type = stack_types[--SP];
     if (type.size == 8)
-      if (popType () != Type.void_type)
+      if (! popType().isVoid())
 	throw new Error("missing void type on stack");
     return type;
   }

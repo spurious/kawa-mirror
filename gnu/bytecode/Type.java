@@ -216,7 +216,27 @@ public abstract class Type {
   /** Return true if this is a "subtype" of other. */
   public boolean isSubtype (Type other)
   {
-    return other.getReflectClass().isAssignableFrom(getReflectClass());
+    Class thisClass = getReflectClass();
+    Class otherClass = other.getReflectClass();
+    if (thisClass != null && otherClass != null)
+      return otherClass.isAssignableFrom(thisClass);
+    if (other == Type.pointer_type && this instanceof ObjectType)
+      return true;
+
+    if (this instanceof ClassType && other instanceof ClassType)
+      {
+	// If stackType inherits from target type, no coercion is needed.
+	ClassType baseClass = (ClassType) this;
+	while (baseClass != null)
+	  {
+	    if (baseClass == other)
+	      return true;
+	    baseClass = baseClass.getSuperclass();
+	  }
+      }
+    // FIXME - also need to check for implemented interfaces!
+
+    return false;
   }
 
   /** Return true iff t1[i].isSubtype(t2[i]) for all i. */

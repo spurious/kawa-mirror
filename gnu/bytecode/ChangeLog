@@ -1,3 +1,9 @@
+1999-07-15  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (popType):  Use Type.isVoid method.
+	* Type.java (isSubtype):  Add more logic for testing superclasses if
+	reflctive classes not available.
+
 1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* Variable.java (offset):  Make non-public.

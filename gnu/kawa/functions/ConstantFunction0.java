@@ -20,7 +20,7 @@ public class ConstantFunction0 extends Procedure0 implements CanInline
 
   public Object apply0() { return value; }
 
-  public Expression inline (ApplyExp exp /*, SourceMessages messages*/)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     int nargs = exp.getArgCount();
     if (nargs != 0)

@@ -25,7 +25,7 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     return gnu.kawa.reflect.Invoke.inlineClassName(exp, 0, Interpreter.defaultInterpreter);
   }

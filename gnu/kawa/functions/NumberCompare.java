@@ -144,7 +144,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
     return applyN(flags, args) ? Boolean.TRUE : Boolean.FALSE;
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression folded = ApplyExp.inlineIfConstant(this, exp);
     if (folded != exp)

@@ -91,7 +91,8 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
   /** Convert (PROC A B C) to (PROC (PROC A B) C) etc. */
 
   public static Expression pairwise(Procedure proc,
-                                    Expression rproc, Expression[] args)
+                                    Expression rproc, Expression[] args,
+				    ExpWalker walker)
   {
     int len = args.length;
     Expression prev = args[0];
@@ -102,21 +103,21 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
         args2[1] = args[i];
         ApplyExp next = new ApplyExp(rproc, args2);
         if (proc instanceof CanInline)
-          prev = ((CanInline) proc).inline(next);
+          prev = ((CanInline) proc).inline(next, walker);
         else
           prev = next;
       }
     return prev;
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression folded = ApplyExp.inlineIfConstant(this, exp);
     if (folded != exp)
       return folded;
     Expression[] args = exp.getArgs();
     if (args.length > 2)
-      return pairwise(this, exp.getFunction(), args);
+      return pairwise(this, exp.getFunction(), args, walker);
     if (args.length == 1 && plusOrMinus < 0)
       {
         Type type0 = args[0].getType();

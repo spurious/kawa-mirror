@@ -51,7 +51,7 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
       }
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
     if (args.length == 2

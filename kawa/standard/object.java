@@ -6,13 +6,12 @@ import java.util.Vector;
 
 public class object extends Syntax
 {
-  public Expression rewrite (Object obj, Translator tr)
+  public Expression rewriteForm (Pair form, Translator tr)
   {
-    tr.mustCompileHere();
-    String clname = null;
-    if (! (obj instanceof Pair))
+    if (! (form.cdr instanceof Pair))
       return tr.syntaxError("missing superclass specification in object");
-    Pair pair = (Pair) obj;
+    Pair pair = (Pair) form.cdr;
+    String clname = null;
     if (pair.car instanceof FString)
       {
 	clname = pair.car.toString();
@@ -20,6 +19,15 @@ public class object extends Syntax
 	  return tr.syntaxError("missing superclass specification after object class name");
 	pair = (Pair) pair.cdr;
       }
+    ObjectExp oexp = new ObjectExp();
+    // if (clname != null) oexp.setName(clname);
+    return rewriteClassDef(pair, oexp, tr);
+  }
+
+  public static Expression rewriteClassDef (Pair pair, ObjectExp oexp,
+					    Translator tr)
+  {
+    tr.mustCompileHere();
     int num_supers = List.list_length (pair.car);
     if (num_supers < 0)
       return tr.syntaxError("object superclass specification not a list");
@@ -37,14 +45,11 @@ public class object extends Syntax
 	superlist = superpair.cdr;
       }
     Object components = pair.cdr;
-    ObjectExp oexp = new ObjectExp();
-    if (clname != null)
-      oexp.setName(clname);
     LambdaExp method_list = null;
     LambdaExp last_method = null;
     // First pass (get Declarations).
     Vector inits = null;
-    for (obj = components;  obj != List.Empty;  )
+    for (Object obj = components;  obj != List.Empty;  )
       {
 	if (! (obj instanceof Pair)
 	    || ! ((pair = (Pair) obj).car instanceof Pair))
@@ -102,7 +107,7 @@ public class object extends Syntax
     // Second pass (rewrite method/initializer bodies).
     LambdaExp meth = method_list;
     int init_index = 0;
-    for (obj = components;  obj != List.Empty;  )
+    for (Object obj = components;  obj != List.Empty;  )
       {
 	pair = (Pair) obj;
 	obj = pair.cdr; // Next member.

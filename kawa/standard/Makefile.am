@@ -127,7 +127,7 @@ ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java makeProcLocation.java location.java \
 define_alias.java \
 ScmEnv.java Scheme.java \
-object.java static_field.java \
+object.java define_class.java static_field.java \
 TracedProcedure.java \
 null_env.java \
 user_env.java \

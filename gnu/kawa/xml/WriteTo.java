@@ -15,7 +15,7 @@ public class WriteTo extends Procedure2 // FIXME: implements Inlineable
   public static void writeTo(Object value, String fileName) throws Throwable
   {
     OutPort out = new OutPort(new java.io.FileWriter(fileName), fileName);
-    XMLPrinter consumer = new XMLPrinter(out);
+    XMLPrinter consumer = new XMLPrinter(out, false);
     Values.writeValues(value, consumer);
     out.close();
   }

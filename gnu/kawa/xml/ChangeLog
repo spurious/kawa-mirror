@@ -1,3 +1,7 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* WriteTo.java (writeTo):  Disambiguate XMLPrinter constructor.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (beginData):  New method.

@@ -1,3 +1,23 @@
+Thu Sep  5 00:00:13 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/{abs,append,apply,char_ci_greater_equal_p,
+	char_ci_greater_p,char_ci_less_equal_p,char_ci_less_p,char_equal_p,
+	char_greater_equal_p,char_greater_p,char_less_equal_p,char_less_p,
+	char_ready_p,define,equal_oper,greater_oper,greaterequal_oper,
+	less_oper,lessequal_oper,list_ref,list_tail,load,make_string,
+	make_vector,minus_oper,multiply_oper,negative_p,newline,not,
+	plus_oper,positive_p,read,reverse,setcar_b,setcdr_b,string,
+	string2symbol,string_length,string_ref,string_set_b,symbol2string,
+	vector_length,writechar,zero_p}.java:  Update to use Named.name().
+
+	* kawa/standard/{car,cdr}.java:  Named.name is now a method.
+	* kawa/standard/cxr.java:  New class.  Generalization of c[ad]*r.
+	* kawa/standard/caaaar,caaadr,caaar,caadar,caaddr,caadr,caar,cadaar,
+	cadadr,cadar,caddar,cadddr,caddr,cadr,cdaaar,cdaadr,cdaar,cdadar,
+	cdaddr,cdadr,cdar,cddaar,cddadr,cddar,cdddar,cddddr,cdddr,cddr}.java:
+	Removed - superseded by cxr.java.
+	* kawa/standard/{StandardInterpreter,Makefile.{am,in}}:  Update.
+
 Wed Sep  4 13:43:32 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files):  New function,

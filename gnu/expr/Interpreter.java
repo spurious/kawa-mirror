@@ -48,6 +48,13 @@ public abstract class Interpreter
       "gnu.commonlisp.lang.CommonLisp" }
   };
 
+  /** Get a list of all available languages */
+
+  public static String[][] getLanguages()
+  {
+    return languages;
+  }
+
   /** Look for an interpreter for a language with the given name or extension.
    * If name is null, look for the first language available. */
   public static Interpreter getInstance (String name)
@@ -253,7 +260,7 @@ public abstract class Interpreter
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
           return getTypeFor(decl.getValue());
         String name = rexp.getName();
-	Object val = Environment.current().get(name);
+	Object val = Environment.getCurrent().get(name);
 	if (val instanceof Type)
 	  return (Type) val;
         int len = name.length();

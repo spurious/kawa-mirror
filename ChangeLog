@@ -1,0 +1,10 @@
+Wed Jun 12 19:34:35 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Interpreter.java (trueObject, falseObject,
+	nullObject, undefinedObject):  Make static.
+	* kawa/lang/Procedure[01234].java:  Rename execute[0-4] -> apply[0-4].
+	Remove Interpreter and frame arguments.
+	* kawa/standards/*.java:  Change most execute methods to new apply
+	methods.  Use static references to get trueObject etc.
+
+	* Check in Kawa 0.2.

@@ -12,16 +12,6 @@ kawa-@VERSION@-compiled.zip:
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs
 
-# Work-around for automake problem:
-config.guess: $(srcdir)/../config.guess
-	ln -s $< .
-config.sub: $(srcdir)/../config.sub
-	ln -s $< .
-install-sh: $(srcdir)/../install-sh
-	ln -s $< .
-./mkinstalldirs: $(srcdir)/../mkinstalldirs
-	ln -s $< .
-
 HTML_HOME = $$HOME/public_html
 HTML_DOC_DIR = $(HTML_HOME)/kawa/api
 JAVADOC_PACKAGES = gnu.bytecode gnu.math kawa kawa.lang kawa.standard

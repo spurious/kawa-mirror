@@ -1,3 +1,11 @@
+Tue Dec 15 18:35:44 1998  Per Bothner  <bothner@cygnus.com>
+
+	Moved Kawa source repository to sourceware.cygnus.com.
+	* config.guess, config.sub, install-sh, missing, mkinstalldirs:
+	Copied over scripts shared by most GNU programs.
+	* Makefile.am (config,guess, config.sub, install-sh, mkinstalldirs):
+	Removed no-longer needed rules.
+
 Tue Dec 15 10:31:38 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/standard/object.java:  Support field declarations,

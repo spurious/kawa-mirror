@@ -80,7 +80,7 @@ public class LocalVarsAttr extends Attribute
     Variable var;
     while ((var = vars.nextVar ()) != null)
       {
-	if (var.isSimple () && var.name != null)
+	if (shouldEmit(var))
 	  local_variable_count++;
       }
     return local_variable_count;
@@ -110,6 +110,12 @@ public class LocalVarsAttr extends Attribute
       }
   }
 
+  private boolean shouldEmit (Variable var)
+  {
+    return (var.isSimple () && var.name != null
+	    && var.start_pc >= 0 && var.end_pc > var.start_pc);
+  }
+
   public void write (DataOutputStream dstr) throws java.io.IOException
   {
     VarEnumerator vars = allVars ();
@@ -118,7 +124,7 @@ public class LocalVarsAttr extends Attribute
 	    
     for (vars.reset (); (var = vars.nextVar ()) != null; )
       {
-	if (var.isSimple () && var.name != null)
+	if (shouldEmit(var))
 	  {
 	    dstr.writeShort (var.start_pc);
 	    dstr.writeShort (var.end_pc - var.start_pc);

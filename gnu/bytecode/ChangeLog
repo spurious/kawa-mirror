@@ -1,3 +1,11 @@
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* Scope.java (addVariable):  New different Variable constructor.
+
+	* LocalVarsAttr.java (shouldEmit):  New method.  Return false if
+	start_pc/end_pc are invalid.
+	(getCount, write):  Use shouldEmit.
+
 2000-04-21  Per Bothner  <per@bothner.com>
 
 	* PrimType.java:  New "copying" constructor.

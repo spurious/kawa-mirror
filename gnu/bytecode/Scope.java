@@ -35,9 +35,7 @@ public class Scope
 
   public Variable addVariable (CodeAttr code, Type type, String name)
   {
-    Variable var = new Variable ();
-    var.setType(type);
-    var.setName(name);
+    Variable var = new Variable(name, type);
     addVariable (code, var);
     return var;
    }

@@ -72,8 +72,8 @@ public class TestMisc
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>\n" +
 	     "<h:row>\n" +
-	     "<j:fld1>c1</j:fld1>\n" +
-	     "<h:fld2>33</h:fld2>\n" +
+	     "<j:fld1><![CDATA[c]]><![CDATA[1]]></j:fld1>\n" +
+	     "<h:fld2><![CDATA[33]]></h:fld2>\n" +
 	     "<j:fld3>44</j:fld3>\n" +
 	     "<k:fld1>c2</k:fld1>\n" +
 	     "</h:row>\n" +

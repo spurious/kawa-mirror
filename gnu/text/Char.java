@@ -19,7 +19,12 @@ import java.util.Hashtable;
  * Finally, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
-public class Char implements Externalizable
+public class Char
+  implements
+  /* BEGIN JAVA2 */
+  Comparable,
+  /* END JAVA2 */
+  Externalizable
 {
   // Leave open the possibility for characters beyond Unicode.
   int value;
@@ -251,6 +256,11 @@ public class Char implements Externalizable
   public Object readResolve() throws ObjectStreamException
   {
     return make(value);
+  }
+
+  public int compareTo(Object o)
+  {
+    return value - ((Char) o).value;
   }
 
   /**

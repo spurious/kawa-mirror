@@ -44,31 +44,15 @@ public class CompileFile extends Procedure2
   }
 
   public final Object apply2 (Object arg1, Object arg2)
+    throws Throwable
   {
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
     SourceMessages messages = new SourceMessages();
-    ModuleExp lexp;
-    try
-      {
-	lexp = read (arg1.toString (), messages);
-        if (messages.seenErrors())
-          throw new gnu.text.SyntaxException(messages);
-      }
-    catch (gnu.text.SyntaxException e)
-      {
-	// The '\n' is because a SyntaxException includes a line number,
-	// and it is better if that starts the line.  FIXME OBSOLETE
-	throw new GenericError ("read error reading file:\n" + e.toString ());
-      }
-    try
-      {
-	lexp.compileToArchive(arg2.toString());
-      }
-    catch (IOException ex)
-      {
-	throw new GenericError (ex.toString ());
-      }
+    ModuleExp lexp = read (arg1.toString (), messages);
+    if (messages.seenErrors())
+      throw new gnu.text.SyntaxException(messages);
+    lexp.compileToArchive(arg2.toString());
     return Interpreter.voidObject;
   }
 

@@ -1,3 +1,7 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (apply2):  Don't catch and re-throw.
+
 2002-01-13  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initScheme):  Define response-header.

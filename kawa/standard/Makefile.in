@@ -91,6 +91,7 @@ list_p.class \
 list.class \
 length.class \
 append.class \
+reverse.class \
 list_tail.class \
 list_ref.class \
 mem.class \
@@ -125,6 +126,15 @@ char_ci_less_p.class \
 char_ci_less_equal_p.class \
 char_ci_greater_p.class \
 char_ci_greater_equal_p.class \
+char_alphabetic_p.class \
+char_numeric_p.class \
+char_whitespace_p.class \
+char_upper_case_p.class \
+char_lower_case_p.class \
+char2integer.class \
+integer2char.class \
+char_upcase.class \
+char_downcase.class \
 string_p.class \
 make_string.class \
 string.class \

@@ -45,13 +45,13 @@ public class StandardInterpreter extends Interpreter
       equal = new kawa.standard.equal_p();
       define(equal.name,equal);
 
-      //-- Section 6.3
+      //-- Section 6.3  -- complete
       define_proc ("pair?", "kawa.standard.pair_p");
       define_proc ("cons", "kawa.standard.cons");
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
       define_proc ("set-car!", "kawa.standard.setcar_b");
-      define_proc ("set-cdr", "kawa.standard.setcdr_b");
+      define_proc ("set-cdr!", "kawa.standard.setcdr_b");
 
       define_proc ("caar", "kawa.standard.caar");
       define_proc ("cadr", "kawa.standard.cadr");
@@ -86,6 +86,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("list", "kawa.standard.list");
       define_proc ("length", "kawa.standard.length");
       define_proc ("append", "kawa.standard.append");
+      define_proc ("reverse", "kawa.standard.reverse");
       define_proc ("list-tail", "kawa.standard.list_tail");
       define_proc ("list-ref", "kawa.standard.list_ref");
 
@@ -102,7 +103,7 @@ public class StandardInterpreter extends Interpreter
       proc = new kawa.standard.ass("assoc",equal);
       define(proc.name,proc);
 
-      //-- Section 6.4
+      //-- Section 6.4  -- complete, including slashified read/write
       
       define_proc ("symbol?", "kawa.standard.symbol_p");
       define_proc ("symbol->string", "kawa.standard.symbol2string");
@@ -129,7 +130,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("/", "kawa.standard.divide_oper");
       define_proc ("abs", "kawa.standard.abs");
 
-      //-- Section 6.6
+      //-- Section 6.6  -- complete
       define_proc ("char?", "kawa.standard.char_p");
       define_proc ("char=?", "kawa.standard.char_equal_p");
       define_proc ("char<?", "kawa.standard.char_less_p");
@@ -141,6 +142,15 @@ public class StandardInterpreter extends Interpreter
       define_proc ("char-ci>?", "kawa.standard.char_ci_greater_p");
       define_proc ("char-ci<=?", "kawa.standard.char_ci_less_equal_p");
       define_proc ("char-ci>=?", "kawa.standard.char_ci_greater_equal_p");
+      define_proc ("char-alphabetic?", "kawa.standard.char_alphabetic_p");
+      define_proc ("char-numeric?", "kawa.standard.char_numeric_p");
+      define_proc ("char-whitespace?", "kawa.standard.char_whitespace_p");
+      define_proc ("char-upper-case?", "kawa.standard.char_upper_case_p");
+      define_proc ("char-lower-case?", "kawa.standard.char_lower_case_p");
+      define_proc ("char->integer", "kawa.standard.char2integer");
+      define_proc ("integer->char", "kawa.standard.integer2char");
+      define_proc ("char-upcase", "kawa.standard.char_upcase");
+      define_proc ("char-downcase", "kawa.standard.char_downcase");
       
       //-- Section 6.7
       proc = new kawa.standard.string_p();

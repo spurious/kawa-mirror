@@ -1,3 +1,7 @@
+2005-01-19  Dominique Boucher <dominique.boucher@nuecho.com>
+
+	* formatst.scm:  Add some more regression tests.
+
 2005-01-16  Per Bothner  <per@bothner.com>
 
 	* module3.scm: Added test for Savannah bug #11578, submitted

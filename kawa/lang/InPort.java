@@ -304,20 +304,6 @@ public class InPort extends FilterInputStream implements Printable
 		    new Pair(readSchemeObject (), Interpreter.nullObject));
   }
 
-  protected Object readUnquoteSplicing ()
-      throws java.io.IOException, SyntaxError
-  {
-    return new Pair(Interpreter.unquotesplicing_sym,
-		    new Pair (readSchemeObject (), Interpreter.nullObject));
-  }
-
-  protected Object readUnquote ()
-      throws java.io.IOException, SyntaxError
-  {
-    return new Pair(Interpreter.unquote_sym,
-		    new Pair (readSchemeObject (), Interpreter.nullObject));
-  }
-
   protected void skipWhitespaceAndComments()
       throws java.io.IOException
   {
@@ -417,9 +403,16 @@ public class InPort extends FilterInputStream implements Printable
 	    return readQuasiQuote();
 	  case ',':
 	    if (peekChar()=='@')
-	      return readUnquoteSplicing();
+	      {
+		skipChar ();
+		return new Pair(Interpreter.unquotesplicing_sym,
+				new Pair (readSchemeObject (),
+					  Interpreter.nullObject));
+	      }
 	    else
-	      return readUnquote();
+	      return new Pair(Interpreter.unquote_sym,
+			      new Pair (readSchemeObject (),
+					Interpreter.nullObject));
 	  case '+':
 	  case '-':
 	    int next = peekChar ();

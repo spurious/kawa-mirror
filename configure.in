@@ -35,6 +35,6 @@ AC_SUBST(VERSION)
 AC_SUBST(SHELL)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile
+  gnu/ecmascript/Makefile gnu/elisp/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile)

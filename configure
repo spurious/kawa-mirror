@@ -1283,7 +1283,7 @@ ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile
+  gnu/ecmascript/Makefile gnu/elisp/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
@@ -1380,7 +1380,7 @@ cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile
+  gnu/ecmascript/Makefile gnu/elisp/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile"}
 EOF

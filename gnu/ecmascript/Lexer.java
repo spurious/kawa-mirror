@@ -5,14 +5,13 @@ import kawa.lang.*;
   * Reads EcmaScript token from a InPort.
   */
 
-public class Lexer
+public class Lexer extends kawa.lang.Lexer
 {
-  InPort port;
   private boolean prevWasCR = false;
 
   public Lexer (InPort port)
   {
-    this.port = port;
+    super(port);
   }
 
   public final static kawa.lang.Char lparenToken = kawa.lang.Char.make('(');
@@ -70,16 +69,16 @@ public class Lexer
   }
 
   public Double getNumericLiteral (int c)
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException
   {
     int radix = 10;
     if (c == '0')
       {
-	c = port.read();
+	c = read();
 	if (c == 'x' || c == 'X')
 	  {
 	    radix = 16;
-	    c = port.read();
+	    c = read();
 	  }
 	else if (c == '.' || c == 'e' || c == 'E') ;
 	else
@@ -89,7 +88,7 @@ public class Lexer
     if (c >= 0)
       i--;   // Reset to position before current char c.
     port.pos = i;
-    long ival = port.readDigits(radix);
+    long ival = Lexer.readDigitsInBuffer(port, radix);
     boolean digit_seen = port.pos > i;
     if (digit_seen && port.pos < port.limit)
       {
@@ -106,7 +105,7 @@ public class Lexer
 	  }
       }
     if (radix != 10)
-      throw new ReadError (port, "invalid character in non-decimal number");
+      error("invalid character in non-decimal number");
     StringBuffer str = new StringBuffer (20);
     if (digit_seen)
       str.append(port.buffer, i, port.pos - i);
@@ -128,9 +127,12 @@ public class Lexer
 	  {
 	  case '.':
 	    if (point_loc >= 0)
-	      throw new ReadError (port, "duplicate '.' in number");
-	    point_loc = str.length ();
-	    str.append ('.');
+	      error("duplicate '.' in number");
+	    else
+	      {
+		point_loc = str.length ();
+		str.append ('.');
+	      }
 	    continue;
 	  case 'e':  case 'E':
 	    int next;
@@ -138,17 +140,17 @@ public class Lexer
 				 || Character.digit ((char)next, 10) >= 0))
 	      break;
 	    if (!digit_seen)
-	      throw new ReadError(port, "mantissa with no digits");
-	    exp = port.readOptionalExponent();
+	      error("mantissa with no digits");
+	    exp = readOptionalExponent();
 	    exp_seen = true;
-	    c = port.read();
+	    c = read();
 	    break;
 	  }
 	break;
       }
 
     if (c >= 0)
-      port.unread ();
+      port.unread();
 
     if (exp != 0)
       {
@@ -158,8 +160,8 @@ public class Lexer
     return new Double(str.toString ());
   }
 
-  public static String getStringLiteral (InPort port, char quote)
-    throws java.io.IOException, kawa.lang.ReadError
+  public String getStringLiteral (char quote)
+    throws java.io.IOException, SyntaxException
   {
     int i = port.pos;
     int start = i;
@@ -186,9 +188,9 @@ public class Lexer
 	if (ch == quote)
 	  return sbuf.toString();
 	if (ch < 0)
-	  throw new EofReadError(port, "unterminated string literal");
+	  eofError("unterminated string literal");
 	if (ch == '\n' || ch == '\r')
-	  throw new ReadError(port, "string literal not terminated before end of line");
+	  fatal("string literal not terminated before end of line");
 	if (ch == '\\')
 	  {
 	    ch = port.read();
@@ -196,9 +198,9 @@ public class Lexer
 	    switch (ch)
 	      {
 	      case -1:
-		throw new EofReadError(port, "eof following '\\' in string");
+		eofError("eof following '\\' in string");
 	      case '\n': case '\r':
-		throw new ReadError(port, "line terminator following '\\' in string");
+		fatal("line terminator following '\\' in string");
 	      case '\'':  case '\"':  case '\\':
 		break;
 	      case 'b':  ch = '\b';  break;
@@ -212,12 +214,15 @@ public class Lexer
 		  {
 		    int d = port.read();
 		    if (d < 0)
-		      throw new EofReadError(port, "eof following '\\"
-					     +((char)ch)+"' in string");
+		      eofError("eof following '\\"
+			       +((char)ch)+"' in string");
 		    d = Character.forDigit((char) d, 16);
 		    if (d < 0)
-		      throw new ReadError(port, "invalid char following '\\"
-					  +((char)ch)+"' in string");
+		      {
+			error("invalid char following '\\"
+			      +((char)ch)+"' in string");
+			val = '?';
+			break;		      }
 		    val = 16 * val + d;
 		  }
 		ch = val;
@@ -230,7 +235,7 @@ public class Lexer
 		  {
 		    int d = port.read();
 		    if (d < 0)
-		      throw new EofReadError(port, "eof in octal escape in string literal");
+		      eofError("eof in octal escape in string literal");
 		    d = Character.forDigit((char) d, 8);
 		    if (d < 0)
 		      {
@@ -248,7 +253,7 @@ public class Lexer
       }
   }
 
-  public static String getIdentifier (InPort port, int ch) 
+  public String getIdentifier (int ch) 
     throws java.io.IOException
   {
     int i = port.pos;
@@ -280,12 +285,12 @@ public class Lexer
 
 
   public Object maybeAssignment(Object token)
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
-    int ch = port.read();
+    int ch = read();
     if (ch == '=')
       {
-	throw new ReadError(port, "assignment operation not implemented");
+	error("assignment operation not implemented");
 	// return makeAssignmentOp(token);
       }
     if (ch >= 0)
@@ -312,9 +317,9 @@ public class Lexer
     */
 
   public Object getToken()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
-    int ch = port.read();
+    int ch = read();
     for (;;)
       {
 	if (ch < 0)
@@ -329,7 +334,7 @@ public class Lexer
 	if (ch == '\n' && ! prevWasCR)
 	  return eolToken;
 	prevWasCR = false;
-	ch = port.read();
+	ch = read();
       }
 
     switch (ch)
@@ -343,7 +348,7 @@ public class Lexer
       case '5':  case '6':  case '7':  case '8':  case '9':
 	return new QuoteExp(getNumericLiteral(ch));
       case '\'':  case '\"':
-	return new QuoteExp(getStringLiteral(port, (char) ch));
+	return new QuoteExp(getStringLiteral((char) ch));
       case '(':  return lparenToken;
       case ')':  return rparenToken;
       case '[':  return lbracketToken;
@@ -436,7 +441,7 @@ public class Lexer
       }
     if (Character.isJavaIdentifierStart((char) ch))
       {
-	String word = getIdentifier(port, ch).intern();
+	String word = getIdentifier(ch).intern();
 	Object token = checkReserved(word);
 	if (token != null)
 	  return token;
@@ -446,7 +451,7 @@ public class Lexer
   }
 
   public static Object getToken(InPort inp)
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     return new Lexer(inp).getToken();
   }

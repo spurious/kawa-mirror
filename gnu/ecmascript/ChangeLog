@@ -1,3 +1,8 @@
+Sun May 24 11:53:12 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Lexer.java:  New extends kawa.lang.Lexer.
+	* Parser.java:  Update for new Lexer error framework.
+
 Tue Apr 28 17:23:38 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Prompter.java:  New class.

@@ -19,7 +19,7 @@ public class Parser
   }
 
   public Expression parseConditionalExpression()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression exp1 = parseBinaryExpression(1);
     Object result = peekToken();
@@ -28,13 +28,13 @@ public class Parser
     skipToken();
     Expression exp2 = parseAssignmentExpression();
     if (getToken() != Lexer.colonToken)
-      throw new ReadError(port, "expected ':' in conditional expression");
+      return syntaxError("expected ':' in conditional expression");
     Expression exp3 = parseAssignmentExpression();
     return new IfExp(exp1, exp2, exp3);
   }
 
   public Expression parseAssignmentExpression()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression exp1 = parseConditionalExpression();
     Object token = peekToken();
@@ -48,7 +48,7 @@ public class Parser
 	    sex.setDefining(true);
 	    return sex;
 	  }
-	throw new ReadError(port, "unmplemented non-symbol ihs in assignment");
+	return syntaxError("unmplemented non-symbol ihs in assignment");
       }
     else
       {
@@ -65,7 +65,7 @@ public class Parser
   }
 
   public Expression parseExpression()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression[] exps = null;
     int nExps = 0;
@@ -97,7 +97,7 @@ public class Parser
    * A LineTerminator is considered a token.
    */
   public Object peekTokenOrLine()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     if (token == null)
       token = lexer.getToken();
@@ -108,7 +108,7 @@ public class Parser
    * LineTerminators are skipped until a non-eolToken is found.
    */
   public Object peekToken()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     if (token == null)
       token = lexer.getToken();
@@ -121,7 +121,7 @@ public class Parser
   }
 
   public Object getToken()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Object result = peekToken();
     skipToken();
@@ -139,7 +139,7 @@ public class Parser
 
   /** Skip an explicit or implicit semicolon. */
   public void getSemicolon()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     token = peekToken();
     if (token == Lexer.semicolonToken)
@@ -149,12 +149,12 @@ public class Parser
 	     || previous_token == Lexer.eolToken)
 	; // implicit ("inserted") semicolon
     else
-      throw new ReadError(port, "missing ';' after expression");
+      syntaxError("missing ';' after expression");
   }
 
 
   public Expression parsePrimaryExpression()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Object result = getToken();
     if (result instanceof QuoteExp)
@@ -180,7 +180,7 @@ public class Parser
   public final static Expression[] emptyArgs = { };
 
   public Expression[] parseArguments()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     skipToken();
     Object token = peekToken();
@@ -219,16 +219,17 @@ public class Parser
   }
 
   public String getIdentifier()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Object token = getToken();
     if (token instanceof String)
       return (String) token;
-    throw new ReadError(port, "missing identifier");
+    syntaxError("missing identifier");
+    return "??";
   }
 
   public Expression parseLeftHandSideExpression ()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     int newCount = 0;
     while (peekToken() == Lexer.newToken)
@@ -278,7 +279,7 @@ System.err.println("after parseArgs:"+peekToken());
   }
 
   public Expression parsePostfixExpression ()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression exp = parseLeftHandSideExpression();
     Object op = peekTokenOrLine();
@@ -291,7 +292,7 @@ System.err.println("after parseArgs:"+peekToken());
 
 
   public Expression parseUnaryExpression ()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     //Object op = peekTokenOrLine();
     // FIXME
@@ -326,7 +327,7 @@ System.err.println("after parseArgs:"+peekToken());
   }
 
   public Expression parseBinaryExpression(int prio)
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression exp1 = parseUnaryExpression();
     for (;;)
@@ -347,7 +348,7 @@ System.err.println("after parseArgs:"+peekToken());
   static Expression emptyStatement = new QuoteExp(Interpreter.voidObject);
 
   public Expression parseIfStatement()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     skipToken();
     Object token = getToken();
@@ -371,7 +372,7 @@ System.err.println("after parseArgs:"+peekToken());
   }
 
   public Expression parseFunctionDefinition()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     skipToken();
     String name = getIdentifier();
@@ -405,7 +406,7 @@ System.err.println("after parseArgs:"+peekToken());
   }
 
   public Expression parseBlock()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Expression[] exps = null;
     if (getToken() != Lexer.lbraceToken)
@@ -440,7 +441,7 @@ System.err.println("after parseArgs:"+peekToken());
   }
 
   public Expression parseStatement()
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, SyntaxException
   {
     Object token = peekToken();
     if (token instanceof Reserved)

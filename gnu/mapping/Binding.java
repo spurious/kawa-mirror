@@ -17,6 +17,15 @@ public class Binding extends Location
     this.value = value;
   }
 
+  // The compiler emits calls to this method.
+  public static Binding make (Object init, String name)
+  {
+    Binding binding = new Binding();
+    binding.value = init;
+    binding.name = name;
+    return binding;
+  }
+
   /** The (interned) name of the binding. */
   String name;
 

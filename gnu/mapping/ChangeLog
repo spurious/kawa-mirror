@@ -1,3 +1,7 @@
+1998-08-28  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Binding.java (make):  New static method (called from compiled code).
+
 Fri Jul 24 16:25:47 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ProcLocation.java:  New class.

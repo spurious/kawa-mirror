@@ -141,4 +141,6 @@ StandardInterpreter.class
 
 java_DATA=$(OBJ)
 
+CLEANFILES=$(OBJ)
+
 all: $(OBJ)

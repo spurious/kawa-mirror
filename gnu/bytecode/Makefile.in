@@ -63,6 +63,8 @@ Type.class \
 Variable.class 
 
 java_DATA=$(OBJ)
+
+CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 
@@ -168,7 +170,7 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-.SUFFIXES : .java .class
+.SUFFIXES: .java .class
 
 %.class: %.java
 	(cd $(srcdir); $(JAVAC) $<)

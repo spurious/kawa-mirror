@@ -49,6 +49,8 @@ javadir=$(prefix)/java/kawa
 OBJ = Shell.class
 
 java_DATA=$(OBJ)
+
+CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 

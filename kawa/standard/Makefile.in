@@ -173,6 +173,8 @@ or.class \
 StandardInterpreter.class 
 
 java_DATA=$(OBJ)
+
+CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 

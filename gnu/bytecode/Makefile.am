@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-.SUFFIXES : .java .class
+.SUFFIXES: .java .class
 
 JAVAC=javac -classpath ..:$$CLASSPATH -d @TOP_BUILDDIR@
 
@@ -30,6 +30,8 @@ Type.class \
 Variable.class 
 
 java_DATA=$(OBJ)
+
+CLEANFILES=$(OBJ)
 
 all: $(OBJ)
 

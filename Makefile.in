@@ -49,6 +49,8 @@ javadir=$(prefix)/java
 OBJ = kawa.class
 
 java_DATA=$(OBJ)
+
+CLEANFILES=$(OBJ)
 ACLOCAL = aclocal.m4
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)

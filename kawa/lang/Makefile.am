@@ -75,7 +75,9 @@ ProcedureN.class \
 Syntax.class \
 $(EXCEPTIONS)
 
-java_DATA=$(OBJ)
+java_DATA=$(OBJ) $(EXCEPTIONS)
+
+CLEANFILES=$(OBJ) $(EXCEPTIONS)
 
 all: $(OBJ)
 

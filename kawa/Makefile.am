@@ -17,6 +17,8 @@ OBJ = Shell.class
 
 java_DATA=$(OBJ)
 
+CLEANFILES=$(OBJ)
+
 all: $(OBJ)
 
 

@@ -108,7 +108,9 @@ ProcedureN.class \
 Syntax.class \
 $(EXCEPTIONS)
 
-java_DATA=$(OBJ)
+java_DATA=$(OBJ) $(EXCEPTIONS)
+
+CLEANFILES=$(OBJ) $(EXCEPTIONS)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 

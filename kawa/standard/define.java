@@ -34,7 +34,13 @@ public class define extends Syntax implements Printable
 		Symbol name = (Symbol) p2.car;
 		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, interp);
 		lexp.setName (name);
-		SetExp result = new SetExp (name(), lexp);
+		if (p2 instanceof PairWithPosition)
+		  {
+		    PairWithPosition pp = (PairWithPosition) p2;
+		    lexp.setFile (pp.getFile ());
+		    lexp.setLine (pp.getLine (), pp.getColumn ());
+		  }
+		SetExp result = new SetExp (name, lexp);
 		result.setDefining (true);
 		return result;
 	      }

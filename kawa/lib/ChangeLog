@@ -1,3 +1,8 @@
+Sat Mar  8 11:18:51 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* quantities.scm:  New file.  Define define-unit.
+	* Makefile.{am,in}:  Update.
+
 Mon Feb  3 17:36:41 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* characters.scm, vectors.scm:  New files.

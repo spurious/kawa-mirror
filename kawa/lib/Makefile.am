@@ -22,6 +22,7 @@ OBJ=\
   std_syntax.class \
   thread.class \
   characters.class \
+  quantities.class \
   vectors.class \
   when_unless.class
 

@@ -1,5 +1,4 @@
 package gnu.mapping;
-import gnu.math.*;
 import java.io.*;
 
 public class InPort extends gnu.text.LineBufferedReader implements Printable

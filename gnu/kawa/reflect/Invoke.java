@@ -92,7 +92,7 @@ public class Invoke extends ProcedureN implements CanInline
           mname = arg1.toString();
         else
           throw new WrongType(thisProc, 1, null);
-        mname = Compilation.mangleNameIfNeeded(mname);
+        mname = Compilation.mangleName(mname);
       }
     MethodProc proc
       = ClassMethods.apply(dtype, mname, null, null,

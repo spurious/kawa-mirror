@@ -1,3 +1,9 @@
+2003-05-04  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (applyN):  Revert 04-30 change.
+	* ClassMethods.java (apply):  Mangle method names non-reversibly.
+	(checkName):  Likewise.
+
 2003-04-30  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN):  Use mangleNameIfNeeded rather than plain

@@ -16,7 +16,7 @@ public class ClassMethods extends Procedure2
   public static MethodProc apply (String className, String methodName)
   {
     String mname = methodName.equals("new") ? "<init>"
-      : Compilation.mangleNameIfNeeded(methodName);
+      : Compilation.mangleName(methodName);
     ClassType methodClass = ClassType.make(className);
     MethodProc proc
       = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
@@ -229,7 +229,7 @@ public class ClassMethods extends Procedure2
 	  nam = ((Symbol) name).getName();
 	else
 	  return null;
-	return Compilation.mangleNameIfNeeded(nam);
+	return Compilation.mangleName(nam);
       }
     return null;
   }

@@ -61,9 +61,39 @@ public abstract class ModuleBody extends Procedure0
     return applyN(method, args);
   }
 
+  public Object apply4(ModuleMethod method,
+                       Object arg1, Object arg2, Object arg3, Object arg4)
+  {
+    Object[] args = new Object[4];
+    args[0] = arg1;
+    args[1] = arg2;
+    args[2] = arg3;
+    args[3] = arg4;
+    return applyN(method, args);
+  }
+
   public Object applyN(ModuleMethod method, Object[] args)
   {
-    throw new WrongArguments(method, args.length);
+    int count = args.length;
+    int num = method.numArgs();
+    if (count >= (num & 0xFFF)
+	&& (num < 0 || count <= (num >> 12)))
+      {
+        switch (count)
+          {
+          case 0:
+            return apply0(method);
+          case 1:
+            return apply1(method, args[0]);
+          case 2:
+            return apply2(method, args[0], args[1]);
+          case 3:
+            return apply3(method, args[0], args[1], args[2]);
+          case 4:
+            return apply4(method, args[0], args[1], args[2], args[3]);
+          }
+      }
+    throw new WrongArguments(method, count);
   }
 
 }

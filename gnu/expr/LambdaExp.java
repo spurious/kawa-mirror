@@ -188,7 +188,11 @@ public class LambdaExp extends ScopeExp
   public final boolean isClassGenerated ()
   {
     return (! getInlineOnly()
-	    && (getCanRead() || isHandlingTailCalls()));
+	    && (isHandlingTailCalls()
+                || (getCanRead()
+                    && (isModuleBody () || ! outerLambda().isModuleBody()
+                        || this instanceof ObjectExp
+                        || getImportsLexVars() || getNeedsStaticLink()))));
   }
 
   public final boolean isHandlingTailCalls ()
@@ -222,6 +226,16 @@ public class LambdaExp extends ScopeExp
     // The max_args > 0 is a hack to handle LambdaProecdure, which
     // currently always uses a single array argument.
     return min_args == max_args && max_args <= 4 && max_args > 0 ? max_args : 1;
+  }
+
+  /** If non-zero, the selector field of the ModuleMethod for this. */
+  int selectorValue;
+
+  int getSelectorValue(Compilation comp)
+  {
+    if (selectorValue == 0)
+      selectorValue = ++comp.maxSelectorValue;
+    return selectorValue;
   }
 
   /** Method used to implement this function. */
@@ -543,6 +557,36 @@ public class LambdaExp extends ScopeExp
 	    code.emitPutField(comp.callerCallFrameField);
 	  }
       }
+    else if (! isClassGenerated())
+      {
+	CodeAttr code = comp.getCode();
+	String methodJavaName = getJavaName();
+        compileAsMethod(comp);
+
+        code.emitNew(comp.typeModuleMethod);
+        code.emitDup(1);
+        PrimProcedure pproc = new PrimProcedure(primMethod, this);
+        comp.applyMethods.addElement(pproc);
+        int applyKind = min_args <= 4 && min_args == max_args ? min_args : 5;
+        comp.applyMethodsCount[applyKind]++;
+
+        code.emitPushThis();
+        code.emitPushInt(getSelectorValue(comp));
+        String name = getName();
+        if (name == null)
+          code.emitPushNull();
+        else
+          code.emitPushString(name);
+        code.emitPushInt(min_args | (max_args << 12));
+        Type[] constructor_args = { comp.typeModuleBody, Type.int_type,
+                                    comp.javaStringType, Type.int_type};
+        Method initModuleMethod
+          = comp.typeModuleMethod.addMethod("<init>", constructor_args,
+                                            Type.void_type,
+                                            Access.PUBLIC);
+        code.emitInvokeSpecial(initModuleMethod);
+        rtype = comp.typeModuleMethod;
+      }
     else if (parent != null && parent.heapFrameLambda == this)
       {
 	// When parent was entered, we allocated an instance of this
@@ -649,15 +693,23 @@ public class LambdaExp extends ScopeExp
 	      closureEnvType = (ClassType) closureEnv.getType();
 	    else
 	      closureEnvType = null;
-	    // generate_unique_name (new_class, child.getName());
-	    String child_name = child.getName();
-	    String method_name = "lambda"+(++comp.method_counter);
 	    if (child.min_args != child.max_args)
 	      child.declareArgsArray();
-	    if (child_name != null)
-	      method_name = method_name + comp.mangleName(child_name);
+	    // generate_unique_name (new_class, child.getName());
+	    String child_name = child.getName();
+            StringBuffer nameBuf = new StringBuffer(60);
+            if (! isModuleBody() || child_name == null)
+              {
+                nameBuf.append("lambda");
+                nameBuf.append(+(++comp.method_counter));
+              }
+            if (child_name != null)
+              nameBuf.append(comp.mangleName(child_name));
+            if (child.min_args != child.max_args)
+              nameBuf.append("$V");
 	    child.primMethod
-	      = child.addMethodFor(comp.curClass, method_name, closureEnvType);
+	      = child.addMethodFor(comp.curClass, nameBuf.toString(),
+                                   closureEnvType);
 	  }
       }
   }

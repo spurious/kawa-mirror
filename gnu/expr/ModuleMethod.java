@@ -47,6 +47,11 @@ public class ModuleMethod extends ProcedureN
     return module.apply3(this, arg1, arg2, arg3);
   }
 
+  public Object apply4(Object arg1, Object arg2, Object arg3, Object arg4)
+  {
+    return module.apply4(this, arg1, arg2, arg3, arg4);
+  }
+
   public Object applyN(Object[] args)
   {
     return module.applyN(this, args);

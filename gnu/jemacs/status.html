@@ -50,23 +50,25 @@ Only string argument implemented.  Most specifiers are ignored.
 One possible implementation is to examine the output from
 <code>new Throwable().printStackTrace(...)</code>.
 A possibly-more efficient implementation is to make it a macro for
-<code>(eq? (%buffer-current-command) --this-function--).
+<code>(eq? (%buffer-current-command) --this-function--)</code>.
 </ul>
 
 <h2>Common Lisp extensions</h2>
 
 <ul>
-<li>Default values for optional paramaters (works).
+<li>Default values for optional parameters (works).
 <li><code>typep</code>: Basic framework works; only (some) simple type
 names work.  Any Java fully-qualified Java classname be used as type specifier.
 Most type names cause <code>typep</code> to be inlined.
+<li>There is a almost-complete implementation of CL-style <code>format</code>
+which could be made available under the name <code>format*</code>
 </ul>
 
     <hr>
     <address><a href="mailto:per@bothner.com">Per Bothner</a></address>
 <!-- Created: Thu Jun 15 14:14:49 PDT 2000 -->
 <!-- hhmts start -->
-Last modified: Mon Jun 19 20:42:51 PDT 2000
+Last modified: Mon Jun 19 23:53:37 PDT 2000
 <!-- hhmts end -->
   </body>
 </html>

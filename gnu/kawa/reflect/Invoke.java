@@ -9,6 +9,8 @@ public class Invoke extends ProcedureN implements Inlineable
   /** 'N' - make (new);  'S' - invoke-static;  'V'  - non-static invoke. */
   char kind;
 
+  Interpreter interpreter;
+
   public static Invoke invoke = new Invoke("invoke", 'V');
   public static Invoke invokeStatic = new Invoke("invoke-static", 'S');
   public static Invoke make = new Invoke("make", 'N');
@@ -17,6 +19,14 @@ public class Invoke extends ProcedureN implements Inlineable
   {
     super(name);
     this.kind = kind;
+    this.interpreter = Interpreter.getInterpreter();
+  }
+
+  public Invoke(String name, char kind, Interpreter interpreter)
+  {
+    super(name);
+    this.kind = kind;
+    this.interpreter = interpreter;
   }
 
   public static Object invoke$V(Object[] args)
@@ -139,7 +149,8 @@ public class Invoke extends ProcedureN implements Inlineable
     PrimProcedure[] methods
     = ClassMethods.getMethods(ctype, mname,
                               kind == 'S' ? Access.STATIC : 0, Access.STATIC,
-                              kawa.standard.Scheme.getInstance());
+                              interpreter);
+
     long num = ClassMethods.selectApplicable(methods, atypes);
     cacheArgs = args;
     cacheDefinitelyApplicableMethodCount = (int) (num >> 32);
@@ -251,9 +262,13 @@ public class Invoke extends ProcedureN implements Inlineable
               {
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
+		  {
+		    for (int i = 0;  i < okCount; i++)
+		      System.err.println("ok: "+methods[i]);
                   comp.error('w',
                              "more than one definitelty applicable method `"
-                             +name+"' in "+type.getName());
+                             +name+"' in "+type.getName()+" ok:"+okCount);
+		  }
               }
             else
               comp.error('w',
@@ -284,7 +299,7 @@ public class Invoke extends ProcedureN implements Inlineable
       {
         Expression arg0 = args[0];
         Type type = (kind == 'V' ? arg0.getType()
-                     : kawa.standard.Scheme.exp2Type(arg0));
+                     : interpreter.getTypeFor(arg0));
         if (type instanceof ClassType)
           return (ClassType) type;
       }
@@ -307,7 +322,7 @@ public class Invoke extends ProcedureN implements Inlineable
       {
         Expression arg0 = args[0];
         Type type = (kind == 'V' ? arg0.getType()
-                     : kawa.standard.Scheme.exp2Type(arg0));
+                     : interpreter.getTypeFor(arg0));
         if (kind == 'N')
           return type == null ? Type.pointer_type : type;
         Object name = null;
@@ -339,6 +354,16 @@ public class Invoke extends ProcedureN implements Inlineable
   public static synchronized
   ApplyExp makeInvokeStatic(ClassType type, String name, Expression[] args)
   {
+    PrimProcedure method = getStaticMethod(type, name, args);
+    if (method == null)
+      throw new RuntimeException("missing or ambiguous method `" + name
+                                 + "' in " + type.getName());
+    return new ApplyExp(method, args);
+  }
+
+  public static synchronized PrimProcedure
+  getStaticMethod(ClassType type, String name, Expression[] args)
+  {
     PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 0);
     int okCount = invokeStatic.cacheDefinitelyApplicableMethodCount;
     int maybeCount = invokeStatic.cachePossiblyApplicableMethodCount;
@@ -351,9 +376,29 @@ public class Invoke extends ProcedureN implements Inlineable
       index = 0;
     else
       index = -1;
-    if (index < 0)
-      throw new RuntimeException("missing or ambiguous method `" + name
-                                 + "' in " + type.getName());
-    return new ApplyExp(methods[index], args);
+    return index < 0 ? null : methods[index];
+  }
+
+  public static synchronized PrimProcedure
+  getMethod(ClassType type, String name, boolean isStatic,
+	    Type[] argTypes, Interpreter interpreter)
+  {
+    PrimProcedure[] methods
+      = ClassMethods.getMethods(type, name,
+				isStatic ? Access.STATIC : 0, Access.STATIC,
+				interpreter);
+    long num = ClassMethods.selectApplicable(methods, argTypes);
+    int okCount = (int) (num >> 32);
+    int maybeCount = (int) num;
+    int index;
+    if (methods == null)
+      index = -1;
+    else if (okCount > 0)
+      index = MethodProc.mostSpecific(methods, okCount);
+    else if (maybeCount == 1)
+      index = 0;
+    else
+      index = -1;
+    return index < 0 ? null : methods[index];
   }
 }

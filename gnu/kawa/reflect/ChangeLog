@@ -1,3 +1,11 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (class MethodFilter):  New non-public class.
+	(getMethods):  Re-write to use ClassType's getMethods.
+	(selectMethod, getMethods, getConstructors):  Remove methods.
+	* Invoke.java (interpreter):  New field.  Use it.
+	(getStaticMethod, getMethod):  New methods.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):	Just use the new version of

@@ -1,9 +1,10 @@
 package gnu.kawa.reflect;
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.FString;
+import java.util.Vector;
 
 public class ClassMethods extends ProcedureN
 {
@@ -42,61 +43,59 @@ public class ClassMethods extends ProcedureN
     return result;
   }
 
-  /** Return the methods of a class wit the specified name and flag.
+  /** Return the methods of a class with the specified name and flag.
    * @return an array containing the methods.
    */
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
                                            int modifiers, int modmask,
                                            Interpreter interpreter)
   {
-    Class dclass = dtype.getReflectClass();
-    if (dclass == null)
-      throw new RuntimeException("no such class: "+dtype.getName());
-    boolean wantConstructor = mname.equals("<init>");
-    java.lang.reflect.Member[] methods;
-    if (wantConstructor)
-      methods = getConstructors(dclass, modifiers, modmask);
-    else
-      methods = getMethods(dclass, mname, modifiers, modmask);
-    GenericProc gproc = null;
-    PrimProcedure pproc = null;
-    PrimProcedure[] result = new PrimProcedure[methods.length];
-    for (int i = 0;  i < methods.length;  i++)
-      {
-        gnu.bytecode.Method method;
-        PrimProcedure cur;
-        if (wantConstructor)
-          {
-            java.lang.reflect.Constructor rmethod
-              = (java.lang.reflect.Constructor) methods[i];
-            Class[] rparams = rmethod.getParameterTypes();
-            int j = rparams.length;
-            Type[] params = new Type[j];
-            while (--j >= 0)
-              params[j] = interpreter.getTypeFor(rparams[j]);
-            method
-              = dtype.addMethod("<init>", rmethod.getModifiers(), params,
-                                Type.void_type);
-            cur = new PrimProcedure(method);
-            cur.setReturnType(dtype);
-          }
-        else
-          {
-            java.lang.reflect.Method rmethod
-              = (java.lang.reflect.Method) methods[i];
-            Class[] rparams = rmethod.getParameterTypes();
-            int j = rparams.length;
-            Type[] params = new Type[j];
-            while (--j >= 0)
-              params[j] = interpreter.getTypeFor(rparams[j]);
-            method
-              = dtype.addMethod(rmethod.getName(),
-                                rmethod.getModifiers(), params,
-                                interpreter.getTypeFor(rmethod.getReturnType()));
-            cur = new PrimProcedure(method);
-          }
-        result[i] = cur;
-      }
+    MethodFilter filter = new MethodFilter(mname, modifiers, modmask);
+    gnu.bytecode.Method[] methods
+      = dtype.getMethods(filter, ! "<init>".equals(mname));
+
+    // Remove over-ridden methods.
+    int mlength = methods.length;
+    for (int i = 1;  i < mlength; )
+    {
+      gnu.bytecode.Method method1 = methods[i];
+      ClassType class1 = method1.getDeclaringClass();
+      Type[] types1 = method1.getParameterTypes();
+      int tlen = types1.length;
+      for (int j = 0;  j < i;  j++)
+	{
+	  gnu.bytecode.Method method2 = methods[j];
+	  Type[] types2 = method2.getParameterTypes();
+	  if (tlen != types2.length)
+	    continue;
+	  int k;
+	  for (k = tlen;  --k >= 0;  )
+	    {
+	      if (types1[k] != types2[k])
+		break;
+	    }
+	  if (k >= 0)
+	    continue;
+	  if (class1.isSubtype(method2.getDeclaringClass()))
+	    methods[j] = method1;
+	  methods[i] = methods[mlength - 1];
+	  mlength--;
+	  // Re-do current i, since methods[i] replaced.
+	  break;
+	}
+      i++;
+    }
+
+    PrimProcedure[] result = new PrimProcedure[mlength];
+    int count = 0;
+    for (int i = mlength;  --i >= 0; )
+    {
+      gnu.bytecode.Method method = methods[i];
+      if ((method.getModifiers() & modmask) != modifiers)
+	continue;
+      PrimProcedure pproc = new PrimProcedure(method, interpreter);
+      result[count++] = pproc;
+    }
     return result;
   }
 
@@ -188,58 +187,6 @@ public class ClassMethods extends ProcedureN
     return pproc;
   }
 
-  /** Re-order method array in place so one with selected name are first.
-   * @return the number of methods whose names match. */
-  public static int selectMethods(java.lang.reflect.Member[] methods,
-                                  String mname, int modifiers, int modmask)
-  {
-    int n = methods.length;
-    String mnameV = mname+"$V";
-    int num = 0;
-    for (int i = 0;  i < n;  i++)
-      {
-        java.lang.reflect.Member method = methods[i];
-        if (mname != null)
-          {
-            String methodName = method.getName(); 
-            if (! mname.equals(methodName)
-                && ! mnameV.equals(methodName))
-              continue;
-          }
-        int mods = method.getModifiers();
-        if ((mods & modmask) != modifiers)
-          continue;
-        methods[i] = methods[num];
-        methods[num] = method;
-        num++;
-      }
-    return num;
-  }
-
-  public static java.lang.reflect.Method[]
-  getMethods(Class clas, String mname, int modifiers, int modmask)
-  {
-    java.lang.reflect.Method[] methods = clas.getMethods();
-    int nmethods = selectMethods(methods, mname, modifiers, modmask);
-    java.lang.reflect.Method[] matching
-    = new java.lang.reflect.Method[nmethods];
-    System.arraycopy(methods, 0, matching, 0, nmethods);
-    return matching;
-  }
-
-  public static java.lang.reflect.Constructor[]
-  getConstructors(Class clas, int modifiers, int modmask)
-  {
-    java.lang.reflect.Constructor[] methods = clas.getConstructors();
-    int nmethods = selectMethods(methods, null, modifiers, modmask);
-    if (nmethods == methods.length)
-      return methods;
-    java.lang.reflect.Constructor[] matching
-    = new java.lang.reflect.Constructor[nmethods];
-    System.arraycopy(methods, 0, matching, 0, nmethods);
-    return matching;
-  }
-
   static String checkName(Expression exp)
   {
     if (exp instanceof QuoteExp)
@@ -249,5 +196,29 @@ public class ClassMethods extends ProcedureN
           return Compilation.mangleName(name.toString());
       }
     return null;
+  }
+}
+
+class MethodFilter implements gnu.bytecode.Filter
+{
+  String name;
+  String nameV;
+  int modifiers;
+  int modmask;
+
+  public MethodFilter(String name, int modifiers, int modmask)
+  {
+    this.name = name;
+    this.nameV = name+"$V";
+    this.modifiers = modifiers;
+    this.modmask = modmask;
+  }
+
+  public boolean select(Object value)
+  {
+    gnu.bytecode.Method method = (gnu.bytecode.Method) value;
+    String mname = method.getName();
+    return ((method.getModifiers() & modmask) == modifiers)
+      && (mname.equals(name) || mname.equals(nameV));      
   }
 }

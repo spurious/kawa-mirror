@@ -1,3 +1,7 @@
+2001-09-20  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (compare):  All types are subtypes of Object.
+
 2001-09-14  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (promote):  Convert nullType to pointer_type;

@@ -153,6 +153,8 @@ public class PrimType extends Type {
           return -1;
         break;
       }
+    if (otherName.equals("java.lang.Object"))
+      return -1;
     return -2;
   }
 }

@@ -1,7 +1,29 @@
+define-alias of types can now be exported from a module.
+
+New --no-inline --inline=none option.
+
+You can use define-namespace to dedine "namespace aliases".
+This is used for the new short-hard syntax for method invocation:
+(define-namespace Int32 "class:'java.lang.Integer)
+(Int32:toHexString 255) => "ff"
+(Int32:toString (Int32:new "00255")) => "255"
+Alternatively, you can write:
+(java.lang.Integer:toHexString 255) => "ff"
+
+SRFI-9 (define-record-type) has been implemented, and compiled to a
+define-class, with efficient code.
+
 The configure option --with-collections is now the default.
 
 Changes since Kawa 1.6.99
 =========================
+
+Unknowns are no longer automatically static.
+
+If type not specified in a declaration, don't infer it from it initial value.
+If no return type is specified for a function, default to Object,
+rather than the return type of the body.  (The latter leads to
+undesirable different behaviour if definitions are re-arranged.)
 
 You can now define and use classes defined using object, define-class,
 and define-simple-class from the "interpreter", as well as the compiler.

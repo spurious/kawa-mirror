@@ -11,7 +11,7 @@ public class newline extends Procedure0or1
   public final Object apply0 ()
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    outPort.outDefault().println ();
+    OutPort.outDefault().println ();
     return Interpreter.voidObject;
   }
 

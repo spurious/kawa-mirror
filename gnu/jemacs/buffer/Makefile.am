@@ -16,13 +16,18 @@ java_WITH_SWING = \
   Command.java \
   FinalAction.java \
   Frame.java \
+  InfProcessMode.java \
+  InputStreamHandler.java \
   InsertAction.java \
   Marker.java \
   MarkerReader.java \
   Menu.java \
+  Mode.java \
   Modeline.java \
   PrefixAction.java \
+  ProcessMode.java \
   ReplBuffer.java \
+  TelnetMode.java \
   TooLongAction.java \
   Window.java
 

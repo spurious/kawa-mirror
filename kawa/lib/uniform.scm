@@ -15,7 +15,7 @@
 (define (s8vector-ref (v :: <s8vector>) (i :: <int>)) :: <int>
   (invoke v 'intAt i))
 
-(define (s8vector-set! (v :: <s8vector>) (i :: <int>) (x :: <int>) :: <void>
+(define (s8vector-set! (v :: <s8vector>) (i :: <int>) (x :: <int>)) :: <void>
   (invoke v 'setByteAt i x))
 
 (define (s8vector->list (v :: <s8vector>)) :: <list>

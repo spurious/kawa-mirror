@@ -896,6 +896,25 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
+@defun gentemp
+Returns a new (interned) symbol each time it is called.
+The symbol names are implementation-dependent.
+@end defun
+
+@defmac defmacro name lambda-list form ...
+Defines an old-style macro a la Common Lisp,
+and installs @code{(lambda @var{lambda-list} @var{form} ...)
+as the expansion function for @var{name}.
+When the translator sees an application of @var{name},
+the expansion function is called with the rest of the application
+as the actual arguments.  The resulting object must be a Scheme
+source form that is futher processed (it may be repeatedly macro-expanded).
+
+If you define a macro with @code{defmacro}, you (currently) cannot use
+the macro in the same compilation as the definition.
+This restrictions does not apply to macros defined by @code{define-syntax}.
+@end defun
+
 @node Miscellaneous,  , Threads, Extensions
 @subsection Miscellaneous
 

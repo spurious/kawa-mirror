@@ -7,7 +7,7 @@ import gnu.text.QueueReader;
 
 /** A Buffer for "read-eval-print"-style command processors. */
 
-public class ReplBuffer extends Buffer
+public class ReplBuffer extends gnu.jemacs.swing.SwingBuffer // FIXME
 {
   Marker processMark;
   BufferWriter processWriter;
@@ -45,7 +45,7 @@ public class ReplBuffer extends Buffer
     Segment segment = new Segment();
     try
       {
-        getText(markPos, pos - markPos, segment);
+        doc.getText(markPos, pos - markPos, segment);
       }
     catch (BadLocationException ex)
       {

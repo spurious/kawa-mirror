@@ -1,3 +1,34 @@
+2002-03-19  Per Bothner  <per@bothner.com>
+
+	Move some Swing-specific code into gnu.jemacs.swing.
+	* Buffer.java:  Make abstract.  Move Swing code to SwingBuffer.
+	Make some methods abstract.
+	* BufferKeymap.java:  Removed class - partly replaced by EKeymap.
+	* EKeymap.java: New class, extends RangeTable.
+	Move some keymap searching and command handling here, for now.
+	* Window.java:  Removed class, replaced by EWindow.
+	* EWindow.java:  New abstract class.
+	* EToolkit.java:  New abstract class.
+	* Frame.java:  Renamed to EFrame.java.
+	* EFrame.java:  Move Swing-specific code to SwingBuffer.
+	* InsertAction.java:  Removed, replaced by SelfInsertCommand.
+	* SelfInsertCommand.java:  New class, extends Procedure0or1.
+	* Command.java: Remove non-static fields and methods.
+	* Marker.java:  No longer implements javax.swing.text.swing.Position.
+	Move Swing-specific code out to other classes.
+	* MarkerReader.java:  Add kludgy cast to SwingBuffer.
+	* Modeline.java:  Update Window -> EWindow.
+	* ProcessMode.java:  Remove Swing-specific code.
+	(class ProcessDefaultAction):  Removed class.
+	(class ProcessInsertCommand):  New class, extends Procedure0.
+	* ReplBuffer.java:  Kludge update.
+	* TelnetMode.java:  Remove unneeded import.
+	* TooLongAction.java:  Kludge update.
+	* BufferWriter.java:  Kludge update.
+	* FinalAction.java:  Remove class.
+	* Makefile.am:  Update appropriately.
+	* emacs.scm:  Various updates.
+
 2001-11-26  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java (dump):  Minor improvement in positions printing.

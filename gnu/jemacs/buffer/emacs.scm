@@ -1,9 +1,10 @@
 (define-alias <marker> <gnu.jemacs.buffer.Marker>)
 (define-alias <process> <gnu.jemacs.buffer.ProcessMode>)
 (define-alias <buffer> <gnu.jemacs.buffer.Buffer>)
-(define-alias <window> <gnu.jemacs.buffer.Window>)
-(define-alias <frame> <gnu.jemacs.buffer.Frame>)
-(define-alias <keymap> <javax.swing.text.Keymap>)
+(define-alias <window> <gnu.jemacs.buffer.EWindow>)
+(define-alias <frame> <gnu.jemacs.buffer.EFrame>)
+(define-alias <keymap> <gnu.jemacs.buffer.EKeymap>)
+(define-alias <toolkit> <gnu.jemacs.buffer.EToolkit>)
 
 (define (set-size (win :: <java.awt.Component>) (w :: <int>) (h :: <int>))
   (invoke win w h))
@@ -29,12 +30,10 @@
 
 ;;; KEYMAPS
 (define (make-keymap #!optional name)
-  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
-                 (as <String> name)))
+  (make <keymap> (as <String> name)))
 
 (define (make-sparse-keymap #!optional name)
-  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
-                 (as <String> name)))
+  (make <keymap> (as <String> name)))
 
 (define (set-keymap-name keymap new-name) #!void)  ;; ignored FIXME
 
@@ -42,57 +41,50 @@
   (invoke keymap 'getName))
 
 (define (set-keymap-parent (keymap  :: <keymap>) parent)
-  (invoke keymap 'setResolveParent (or parent #!null)))
+  (invoke keymap 'setParent (or parent #!null)))
 
 (define (set-keymap-parents (keymap  :: <keymap>) parents)
-  (cond ((null? parents) (invoke keymap 'setResolveParent #!null))
-	((null? (cdr parents)) (invoke keymap 'setResolveParent (car parents)))
+  (cond ((null? parents) (invoke keymap 'setParent #!null))
+	((null? (cdr parents)) (invoke keymap 'setParent (car parents)))
 	(else (error "not implemented - more than one keymap parent"))))
 
 (define (keymap-parent (keymap :: <keymap>))
-  (invoke keymap 'getResolveParent))
+  (invoke keymap 'getParent))
 
 (define (keymap-parents keymap)
   (list (keymap-parent keymap)))
 
 (define (set-keymap-default-binding
 	 (keymap :: <keymap>) command)
-  (invoke keymap 'setDefaultAction
-	  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'asAction command)))
+  (invoke keymap 'setDefaultBinding command))
   
 (define (keymap-default-binding (keymap :: <keymap>))
-  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'asNonAction
-		 (invoke keymap 'getDefaultAction)))
+  (invoke keymap 'getDefaultBinding))
 
 (define global-map
-  (static-field <gnu.jemacs.buffer.BufferKeymap> 'globalKeymap))
+  (static-field <keymap> 'globalKeymap))
 
 (define esc-map
-  (static-field <gnu.jemacs.buffer.BufferKeymap> 'metaKeymap))
+  (static-field <keymap> 'metaKeymap))
 
 (define (current-global-map)
   global-map)
 
 (define (current-local-map #!optional (buffer :: <buffer> (current-buffer)))
-  (invoke (field buffer 'keymap) 'getLocalKeymap))
+  (invoke buffer 'getLocalKeymap))
 
 (define (use-local-map keymap #!optional (buffer :: <buffer> (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "setLocalKeymap"
-                             <void> (<keymap>))
-   (field buffer 'keymap)
-   keymap))
+  (invoke buffer 'setLocalKeymap keymap))
 
 (define (lookup-key (keymap :: <keymap>)
 		    (keys :: <gnu.lists.Sequence>)
 		    #!optional (accept-defaults :: <boolean> #f))
   (let ((binding
-         (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'lookupKey
-			keymap keys accept-defaults)))
+         (invoke keymap 'lookupKey keys accept-defaults)))
     (if (eq? binding #!null) #f binding)))
 
-(define (define-key keymap key binding)
-  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'defineKey
-		 keymap key binding))
+(define (define-key (keymap :: <keymap>) key binding)
+  (invoke keymap 'defineKey key binding))
 
 ;;; MENUS
 
@@ -195,16 +187,15 @@
 
 (define (get-buffer-create name)
   (let ((buf
-	 ((primitive-static-method  <buffer> "getBuffer"
-				    <buffer> (<String>))
-	  name)))
+	 (invoke-static  <buffer> 'getBuffer name)))
     (if (eq? buf #!null)
-	((primitive-constructor <buffer> (<String>)) name)
+	(let ((toolkit :: <toolkit> (get-toolkit)))
+	  (invoke toolkit 'newBuffer name))
 	buf)))
 
 (define (generate-new-buffer name)
-  ((primitive-constructor <buffer> (<String>))
-   (generate-new-buffer-name name)))
+  (let ((toolkit :: <toolkit> (get-toolkit)))
+    (invoke toolkit 'newBuffer (generate-new-buffer-name name))))
 
 ;;; WINDOWS
 
@@ -295,8 +286,12 @@
 
 ;;; FRAMES
 
+(define (get-toolkit) :: <toolkit>
+  (invoke-static <gnu.jemacs.buffer.EToolkit> 'getInstance))
+
 (define (make-frame #!optional (buffer :: <buffer> (current-buffer)))
-  (let ((frame (make <frame> buffer)))
+  (let* ((toolkit :: <toolkit> (get-toolkit))
+	 (frame (invoke toolkit 'newFrame buffer)))
     (set-menubar default-menubar)
     frame))
 
@@ -316,7 +311,7 @@
   (invoke frame 'getSelectedWindow))
 
 (define (selected-frame)
-  (invoke-static <gnu.jemacs.buffer.Frame> 'getSelectedFrame))
+  (invoke-static <frame> 'getSelectedFrame))
 
 ;;; POSITIONS
 
@@ -444,9 +439,9 @@
 
 ;;; TEXT
 
-(define (insert-char ch #!optional (count :: <int> 1)
+(define (insert-char ch #!optional (count '())
 		     (buffer :: <buffer> (current-buffer)))
-  (invoke buffer 'insert ch count #!null))
+  (invoke buffer 'insert ch (if (eq? count '()) 1 count) #!null))
 
 (define (insert #!rest (args :: <Object[]>))
   (let ((buffer :: <buffer> (current-buffer)))
@@ -467,7 +462,7 @@
 
 (define (delete-char #!optional (count :: <int> 1) killp
 		     (buffer :: <buffer> (current-buffer)))
-  (invoke buffer 'deleteChar count))
+  (invoke buffer 'removeChar count))
 
 (define (delete-backward-char #!optional (count 1) killp
 			      (buffer :: <buffer> (current-buffer)))

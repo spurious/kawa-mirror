@@ -2,7 +2,6 @@ package gnu.jemacs.buffer;
 import kawa.*;
 import gnu.mapping.*;
 import java.io.*;
-import javax.swing.text.*;
 
 public class TelnetMode extends ProcessMode
 {

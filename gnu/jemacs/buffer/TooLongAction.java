@@ -1,9 +1,9 @@
 package gnu.jemacs.buffer;
 import javax.swing.*;
 import javax.swing.text.*;
+import gnu.jemacs.swing.SwingWindow;
 
-/** A pseudo-action to wrap an integer.
- * Used by BufferKeymap.lookupKey. */
+/** A pseudo-action to wrap an integer. */
 
 public class TooLongAction extends javax.swing.AbstractAction
 {
@@ -20,8 +20,7 @@ public class TooLongAction extends javax.swing.AbstractAction
   public void actionPerformed(java.awt.event.ActionEvent event)
   {
     // Should never happen - ignore.
-    Buffer buffer = Window.getWindow(event).buffer;
-    buffer.keymap.pendingLength = 0;
+    SwingWindow.getWindow(event).pendingLength = 0;
   }
 
 }

@@ -7,9 +7,9 @@ import java.awt.*;
 // Any point to this now?
 public class Modeline extends javax.swing.JTextPane
 {
-  Window window;
+  EWindow window;
 
-  public Modeline(Window window, StyledDocument modelineDocument)
+  public Modeline(EWindow window, StyledDocument modelineDocument)
   {
     super(modelineDocument);
     this.window = window;

@@ -2,6 +2,7 @@ package gnu.jemacs.buffer;
 import javax.swing.text.*;
 import gnu.mapping.*;
 import java.io.*;
+import gnu.jemacs.swing.SwingBuffer;  // FIXME
 
 public class BufferReader extends InPort
 {
@@ -11,7 +12,7 @@ public class BufferReader extends InPort
 
   public BufferReader(Buffer buffer, int start, int count)
   {
-    this(buffer.content, buffer.getName(), start, count);
+    this(((SwingBuffer) buffer).content, buffer.getName(), start, count);
   }
 
   public BufferReader(BufferContent content, String name, int start, int count)

@@ -5,18 +5,18 @@ include $(top_srcdir)/Make-rules
 java_WITH_SWING = \
   Buffer.java \
   BufferContent.java \
-  BufferKeymap.java \
   BufferLocalConstraint.java \
   BufferReader.java \
   BufferWriter.java \
   CancelledException.java \
   Command.java \
-  FinalAction.java \
-  Frame.java \
+  EKeymap.java \
+  EFrame.java \
+  EToolkit.java \
+  EWindow.java \
   IgnoreAction.java \
   InfProcessMode.java \
   InputStreamHandler.java \
-  InsertAction.java \
   Marker.java \
   MarkerReader.java \
   Menu.java \
@@ -24,9 +24,9 @@ java_WITH_SWING = \
   Modeline.java \
   ProcessMode.java \
   ReplBuffer.java \
+  SelfInsertCommand.java \
   TelnetMode.java \
-  TooLongAction.java \
-  Window.java
+  TooLongAction.java
 
 java_sources = \
   $(java_@SWING_SELECTED@) \

@@ -1,6 +1,8 @@
 package gnu.jemacs.buffer;
-import javax.swing.text.*;
 import java.awt.Color;
+import javax.swing.*; // FIXME
+import javax.swing.text.*;  // FIXME
+import gnu.jemacs.swing.SwingBuffer;  // FIXME
 
 /** A Writer that writes at a Buffer's point or a Marker. */
 
@@ -37,7 +39,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
   public BufferWriter (Marker marker, boolean adjustPoint)
   {
     this.marker = marker;
-    this.stylePlain = marker.buffer.styles.addStyle("output", null);
+    this.stylePlain = ((SwingBuffer) marker.buffer).styles.addStyle("output", null);
     this.style = stylePlain;
     this.adjustPoint = adjustPoint;
     // StyleConstants.setItalic(this.style, true);
@@ -103,10 +105,10 @@ public class BufferWriter extends java.io.Writer implements Runnable
       }
     styleNameBuf.setLength(slen-1); // Remove final comma.
     styleName = styleNameBuf.toString();
-    style = marker.buffer.styles.getStyle(styleName);
+    style = ((SwingBuffer) marker.buffer).styles.getStyle(styleName);
     if (style != null)
       return;
-    style = marker.buffer.styles.addStyle(styleName, null);
+    style = ((SwingBuffer) marker.buffer).styles.addStyle(styleName, null);
     if (underline)
       StyleConstants.setUnderline(style, true);
     if (bold)
@@ -276,13 +278,13 @@ public class BufferWriter extends java.io.Writer implements Runnable
   }
 
   /** Delete characters - but only in current screen line. */
-  public void deleteChars(int count)
+  public void removeChars(int count)
   {
     int save = marker.getOffset();
     moveColumns(count);
     try
       {
-	marker.buffer.remove(save, marker.getOffset() - save);
+	((SwingBuffer) marker.buffer).doc.remove(save, marker.getOffset() - save);
       }
     catch (javax.swing.text.BadLocationException ex)
       {
@@ -302,7 +304,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
     if (insertMode)
       unTabifyRestOfLine();
     else if (marker.getOffset() < marker.buffer.maxDot())
-      deleteChars(1);
+      removeChars(1);
     AbstractDocument document = marker.buffer;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
@@ -319,8 +321,8 @@ public class BufferWriter extends java.io.Writer implements Runnable
     if (insertMode)
       unTabifyRestOfLine();
     else
-      deleteChars(len);
-    AbstractDocument document = marker.buffer;
+      removeChars(len);
+    AbstractDocument document = ((SwingBuffer) marker.buffer).doc;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert(new String(data, off, len), style);

@@ -1,8 +1,7 @@
 package gnu.jemacs.buffer;
-import javax.swing.text.*;
 import gnu.lists.*;
 
-public final class Marker extends SeqPosition implements Position
+public final class Marker extends SeqPosition
 {
   Buffer buffer;
 
@@ -19,7 +18,7 @@ public final class Marker extends SeqPosition implements Position
     if (buffer != null)
       {
 	if (marker.isPoint())
-	  init(buffer.content, buffer.curPosition.getDot(), true);
+	  init(buffer, buffer.getDot(), true);
 	else
 	  init(marker);
       }
@@ -27,7 +26,7 @@ public final class Marker extends SeqPosition implements Position
 
   public Marker (Buffer buffer, int offset, boolean isAfter)
   {
-    super(buffer.content, offset, isAfter);
+    super(buffer, offset, isAfter);
     this.buffer = buffer;
   }
 
@@ -36,7 +35,7 @@ public final class Marker extends SeqPosition implements Position
     if (buffer == null)
       return -1;
     else if (isPoint())
-      return buffer.curPosition.getDot();
+      return buffer.getDot();
     return nextIndex();
   }
 
@@ -68,7 +67,7 @@ public final class Marker extends SeqPosition implements Position
               msg = "Can't change buffer of point-marker: ";
             throw new Error(msg+this);
           }
-	buffer.curPosition.setDot(newPosition);
+	buffer.setDot(newPosition);
       }
     else
       {
@@ -85,101 +84,64 @@ public final class Marker extends SeqPosition implements Position
           newPosition = 0;
         else
           {
-            int newLength = newBuffer.content.length();
+            int newLength = newBuffer.length();
             if (newPosition > newLength)
               newPosition = newLength;
           }
-	buffer = newBuffer;
-	init(newBuffer.content, newPosition, false);
+	init(newBuffer, newPosition, false);
       }
   }
 
-  public void deleteChar(int count)
+  public void removeChar(int count)
   {
-    int point = getOffset();
-    try
-      {
-        if (count < 0)
-          {
-            count = - count;
-	    if (point - count < buffer.minDot())
-	      Signal.signal("Beginning of buffer");
-            point -= count;
-          }
-	else
-	  {
-	    if (point + count > buffer.maxDot())
-	      Signal.signal("End of buffer");
-	  }
-        buffer.remove(point, count);
-
-	// Should not be needed, but seems to be.  Otherwise, getDot()
-	// returns its *old* value, which is `count' characters too high.
-	// The problem seesm to be that Swing does not properly update
-	// a Windows's caret position when the underlying Document has text
-	// removed.  Unfortunately, this fix probably won't do the right
-	// thing for *other windows* that reference the same buffer.  FIXME.
-	// (Strangely, the correct thing seems to happen for insertions.)
-	buffer.setDot(point);
-      }
-    catch (javax.swing.text.BadLocationException ex)
-      {
-        throw new Error("bad location: "+ex);
-      }
+    if (isPoint())
+      buffer.removeChar(count);
+    else
+      buffer.remove(ipos, xpos, count);
   }
 
-  public void insert (String string, Style style)
+  public void insert (char[] data, int off, int len, Object style)
   {
-    if (style == null)
-      style = Buffer.defaultStyle;
     int point = getOffset();
-    try
-      {
-        buffer.insertString(point, string, style);
-      }
-    catch (javax.swing.text.BadLocationException ex)
-      {
-        throw new Error("bad location: "+ex);
-      }
+    buffer.insert(data, off, len, style, ipos, xpos);
+    point += len;
+    setDot(point);
+  }
+
+  public void insert (String string, Object style)
+  {
+    int point = getOffset();
+    if (isPoint())
+      buffer.insert(string, style);
+    else
+      buffer.insert(string, style, ipos, xpos);
     point += string.length();
     setDot(point);
   }
 
   /** Insert count copies of ch at the current position. */
-  public void insert (char ch, int count, Style style)
+  public void insert (char ch, int count, Object style)
   {
     if (count < 0)
       return;
-    if (style == null)
-      style = Buffer.defaultStyle;
-    int todo = count > 500 ? 500 : count;
-    StringBuffer sbuf = new StringBuffer(todo);
-    for (int i = todo;  --i >= 0; )
+    int n = count > 500 ? 500 : count;
+    StringBuffer sbuf = new StringBuffer(n);
+    for (int i = n;  --i >= 0; )
       sbuf.append(ch);
     String str = sbuf.toString();
-    int point = getOffset();
     for (;;)
       {
-	try
-	  {
-	    buffer.insertString(point, str, style);
-	  }
-	catch (javax.swing.text.BadLocationException ex)
-	  {
-	    throw new Error("bad location: "+ex);
-	  }
-	point += todo;
-	count -= todo;
+	insert(str, style);
+	count -= n;
 	if (count == 0)
 	  break;
 	if (count < 500)
 	  {
-	    todo = count;
-	    sbuf.setLength(todo);
+	    n = count;
+	    sbuf.setLength(n);
 	    str = sbuf.toString();
 	  }
       }
-    setDot(point);
   }
 
   public void forwardChar(int i)
@@ -315,14 +277,13 @@ public final class Marker extends SeqPosition implements Position
   public boolean isBeginningOfLine()
   {
     int offset = getOffset();
-    return offset == 0 || buffer.content.charAt(offset - 1) == '\n';
+    return offset == 0 || buffer.charAt(offset - 1) == '\n';
   }
 
   public boolean isEndOfLine()
   {
     int offset = getOffset();
-    BufferContent content = buffer.content;
-    return offset == content.length() || content.charAt(offset) == '\n';
+    return offset == buffer.length() || buffer.charAt(offset) == '\n';
   }
 
   public int hashCode()

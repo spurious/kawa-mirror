@@ -1,14 +1,16 @@
+// Copyright (c) 2002  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.jemacs.buffer;
-import javax.swing.text.*;
 import java.io.*;
 import java.awt.Color;
 import gnu.mapping.InPort;
-import gnu.lists.CharSeq;
+import gnu.lists.*;
 import gnu.text.Char;
-import gnu.lists.CharBuffer;
-import gnu.commonlisp.lang.Symbol;
+import gnu.commonlisp.lang.Symbol; // FIXME
+import javax.swing.text.*; // FIXME
 
-public class Buffer extends DefaultStyledDocument
+public abstract class Buffer extends AbstractSequence implements CharSeq
 {
   String name;
   String filename;
@@ -17,44 +19,27 @@ public class Buffer extends DefaultStyledDocument
 
   static Buffer current;
 
-  static javax.swing.text.StyleContext styles
-  = new javax.swing.text.StyleContext();
-  static Style defaultStyle = styles.addStyle("default",null);
-  Style inputStyle = defaultStyle;
-  static Style redStyle = styles.addStyle("red", null);
-  static Style blueStyle = styles.addStyle("blue", null);
-  static
-  {
-    String version = System.getProperty("java.version");
-    if (version != null
-	&& (version.startsWith("1.2") || version.startsWith("1.3")))
-      {
-	StyleConstants.setFontFamily(defaultStyle, "Lucida Sans TypeWriter");
-	StyleConstants.setFontSize(defaultStyle, 14);
-      }
-    StyleConstants.setForeground(redStyle, Color.red);
-    StyleConstants.setForeground(blueStyle, Color.blue);
-  }
-
-  Marker pointMarker;
-  Marker markMarker;
-
-  Caret curPosition = null;
-
-  BufferContent content;
-  StyledDocument modelineDocument;
-  public final BufferKeymap keymap = new BufferKeymap(this);
+  public Marker pointMarker;
+  public Marker markMarker;
 
   /** List of modes active for this buffer, mahor mode first. */
   Mode modes;
 
-  /** Map buffer names to buffer.s */
+  /** Map buffer names to buffers. */
   public static java.util.Hashtable buffers
   = new java.util.Hashtable(100);
 
   /** Map file names to buffer.s */
   public static java.util.Hashtable fileBuffers
   = new java.util.Hashtable(100);
+
+  EKeymap localKeymap;
+  public EKeymap[] activeKeymaps;
+  int activeLength;
+  // private EKeymap actual;
+  /* Count of initial Keymaps in activeKeymaps that have been eliminated,
+   * because of previous prefix keys. */
+  int eliminated = 0;
 
   public String getName() { return name; }
 
@@ -73,17 +58,19 @@ public class Buffer extends DefaultStyledDocument
     redrawModeline();
   }
 
+  /*
   public CharSeq getStringContent ()
   {
     return content;
   }
+  */
 
   public static Buffer findFile(String fname)
   {
     Buffer buffer = (Buffer) fileBuffers.get(fname);
     if (buffer == null)
       {
-        buffer = new Buffer(null);
+        buffer = EToolkit.getInstance().newBuffer(null);
         buffer.setFileName(fname);
 	buffer.encoding = System.getProperty("file.encoding", "UTF8");
         try
@@ -139,47 +126,16 @@ public class Buffer extends DefaultStyledDocument
       }
   }
 
-  public void redrawModeline()
-  {
-    try
-      {
-        modelineDocument.remove(0, modelineDocument.getLength());
-        
-        modelineDocument.insertString(0, "-----", redStyle);
-        modelineDocument.insertString(modelineDocument.getLength(),
-                                      "JEmacs: " + getName(),
-                                      blueStyle);
-        modelineDocument.insertString(modelineDocument.getLength(),
-                                      " ---",
-                                      redStyle);
-      }
-    catch (javax.swing.text.BadLocationException ex)
-      {
-        throw new Error("internal error in redraw-modeline- "+ex);
-      }
-  }
 
-  public Buffer(String name)
-  {
-    this(name, new BufferContent());
-  }
+  public abstract void redrawModeline ();
 
-  public Buffer(String name, BufferContent content)
+  public Buffer (String name)
   {
-    super(content, styles);
     this.name = name;
-    this.content = content;
 
-    pointMarker = new Marker(this, 0, true);
-    markMarker = new Marker();
-
-    modelineDocument
-      = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
-    // Needed for proper bidi (bi-directional text) handling.
-    // Does cause extra overhead, so should perhaps not be default.
-    // Instead only set it if we insert Hebrew/Arabic text?  FIXME.
-    putProperty("i18n", Boolean.TRUE);
-    redrawModeline();
+    activeKeymaps = new EKeymap[6];
+    activeLength = 1;
+    activeKeymaps[0] = EKeymap.globalKeymap;
   }
 
   public int checkMark()
@@ -197,7 +153,7 @@ public class Buffer extends DefaultStyledDocument
     current = buffer;
   }
 
-  public final int getDot()
+  public int getDot()
   {
     return pointMarker.getOffset();
   }
@@ -207,7 +163,7 @@ public class Buffer extends DefaultStyledDocument
     return 1 + getDot();
   }
 
-  public final void setDot(int i)
+  public void setDot(int i)
   {
     if (i > maxDot())
       throw new Error("set dot to "+i+ " max:"+maxDot());
@@ -224,11 +180,11 @@ public class Buffer extends DefaultStyledDocument
     return 0;
   }
 
-  public int maxDot()
-  {
-    // Subtract 1 for the content's final "\n".
-    return content.length() - 1;
-  }
+  public abstract int getLength();
+
+  public final int length() { return getLength(); }
+
+  public abstract int maxDot();
 
   public void forwardChar(int i)
   {
@@ -245,12 +201,25 @@ public class Buffer extends DefaultStyledDocument
     return "#<buffer \"" + name + "\">";
   }
 
-  public void insertString (String string, Style style)
+  /** Insert count copies of ch at position of (ipos, xpos). */
+  /*
+  public void insert (char ch, int count, Object style, int ipos, Object xpos)
   {
-    pointMarker.insert(string, style);
+  }
+  */
+
+  /** Insert string with given style at position pair. */
+  public abstract void insert (String string, Object style,
+			       int ipos, Object xpos);
+
+  /** Insert character with given style at position pair. */
+  public void insert (char[] chars, int offset, int count, Object style,
+		      int ipos, Object xpos)
+  {
+    insert(new String(chars, offset, count), style, ipos, xpos);
   }
 
-  public void insertAll (Object[] values, Style style)
+  public void insertAll (Object[] values, Object style)
   {
     int len = values.length;
     for (int i = 0;  i < len;  i++)
@@ -263,7 +232,12 @@ public class Buffer extends DefaultStyledDocument
       }
   }
 
-  public void insert (Object value, Style style)
+  public void insert (String string, Object style)
+  {
+    pointMarker.insert(string, style);
+  }
+
+  public void insert (Object value, Object style)
   {
     if (value instanceof Char)
       insert(((Char) value).charValue(), 1, style);
@@ -272,33 +246,23 @@ public class Buffer extends DefaultStyledDocument
   }
 
   /** Insert count copies of ch at point. */
-  public void insert (char ch, int count, Style style)
+  public void insert (char ch, int count)
+  {
+    pointMarker.insert(ch, count, null);
+  }
+
+  /** Insert count copies of ch at point. */
+  public void insert (char ch, int count, Object style)
   {
     pointMarker.insert(ch, count, style);
   }
 
-  public void deleteChar (int count)
+  public void removeChar (int count)
   {
-    pointMarker.deleteChar(count);
+    pointMarker.removeChar(count);
   }
 
-  public void removeRegion (int start, int end)
-    throws javax.swing.text.BadLocationException
-  {
-    remove(start, end - start);
-  }
-
-  public void removeAll ()
-  {
-    try
-      {
-	remove(0, maxDot());
-      }
-    catch (javax.swing.text.BadLocationException ex)
-      {
-	throw new gnu.mapping.WrappedException(ex);
-      }
-  }
+  public abstract void removeAll ();
 
   public Marker getPointMarker (boolean share)
   {
@@ -310,7 +274,7 @@ public class Buffer extends DefaultStyledDocument
     return markMarker;
   }
 
-  /** Convert an Emacs position (Marker, Position, or 1-origin integer)
+  /** Convert an Emacs position (Marker, or 1-origin integer)
    * to a (0-origin) buffer offset. */
   public int positionToOffset (Object position)
   {
@@ -321,26 +285,17 @@ public class Buffer extends DefaultStyledDocument
 	int goal = ((Number) position).intValue() - 1;
 	return goal < min ? min : goal > max ? max : goal;
       }
-    return ((Position) position).getOffset();
+    return ((Marker) position).getOffset();
   }
 
-  public void save(Writer out)
-    throws java.io.IOException, javax.swing.text.BadLocationException
+  public void writeTo(java.io.Writer str) throws java.io.IOException
   {
-    int length = getLength();
-    int todo = length;
-    Segment segment = new Segment();
-    int offset = 0;
-    while (offset < length)
-      {
-        int count = length;
-        if (count > 4096)
-          count = 4096;
-        getText(offset, count, segment);
-        out.write(segment.array, segment.offset, segment.count);
-        offset += count;
-      }
+    writeTo(0, length(), str);
   }
+
+  public abstract void insertFile(Reader in) throws Exception;
+
+  public abstract void save(Writer out) throws Exception;
 
   public void save()
   {
@@ -356,21 +311,6 @@ public class Buffer extends DefaultStyledDocument
     catch (Exception ex)
       {
         throw new RuntimeException("error save-buffer: "+ex);
-      }
-  }
-
-  public void insertFile(Reader in)
-    throws java.io.IOException, javax.swing.text.BadLocationException
-  {
-    char[] buffer = new char[2048];
-    int offset = getDot();
-    for (;;)
-      {
-        int count = in.read(buffer, 0, buffer.length);
-        if (count <= 0)
-          break;
-        insertString(offset, new String(buffer, 0, count), null);
-        offset += count;
       }
   }
 
@@ -450,10 +390,7 @@ public class Buffer extends DefaultStyledDocument
     return pointMarker.moveToColumn(column, force);
   }
 
-  public int lineStartOffset(int offset)
-  {
-    return (int) content.scan('\n', offset, minDot(), -1, true);
-  }
+  public abstract int lineStartOffset(int offset);
 
   public int lineStartOffset()
   {
@@ -476,14 +413,8 @@ public class Buffer extends DefaultStyledDocument
    * to the number of TARGETs left unfound, and return (shortage<<32|END).
    * @return (SHORTAGE<<32|POS)
   */
-  public final long scan(char target, int start, int end,
-                   int count, boolean allowQuit)
-  {
-    if (end == 0)
-      end = count > 0 ? content.length() - 1 : 0;
-    return content.scan(target, start, end, count, allowQuit);
-  }
-
+  public abstract long scan(char target, int start, int end,
+			    int count, boolean allowQuit);
   
   /** Find the position a give number of lines forward or backward.
    * A side-effect-free version of Emacs's forward-line function.
@@ -500,7 +431,7 @@ public class Buffer extends DefaultStyledDocument
     if (shortage > 0
 	&& (neg
 	    || (maxDot() > minDot() && pos != start
-		&& content.charAt(pos - 1) != '\n')))
+		&& charAt(pos - 1) != '\n')))
       shortage--;
     return ((long) (neg ? -shortage : shortage) << 32) | (long) pos;
   }
@@ -512,12 +443,12 @@ public class Buffer extends DefaultStyledDocument
     return (int) (value >> 32);
   }
 
-  public Window display(boolean notThisWindow, Frame frame)
+  public EWindow display(boolean notThisWindow, EFrame frame)
   {
     if (frame == null)
-      frame = Frame.getSelectedFrame();
-    Window selected = frame.getSelectedWindow();
-    Window window = frame.otherWindow(1);
+      frame = EFrame.getSelectedFrame();
+    EWindow selected = frame.getSelectedWindow();
+    EWindow window = frame.otherWindow(1);
     if (selected == window && notThisWindow)
       window = selected.split(-1, false);
     window.setBuffer(this);
@@ -542,44 +473,30 @@ public class Buffer extends DefaultStyledDocument
   {
     BufferLocalConstraint.make(Symbol.getBinding(symbol), all);
   }
-}
 
-/*
-class Leaf implements javax.swing.text.Element
-{
-  AttributeSet attributes;
-  Buffer buffer;
-  Element parent;
-  int startPosition;
-  int endPosition;
+  public abstract char charAt(int index);
 
-  public Leaf(Buffer buffer, Element parent, AttributeSet attributes,
-                     int startPosition, int endPosition)
+  public EKeymap getLocalKeymap() { return localKeymap; }
+
+  public void setLocalKeymap(EKeymap map)
   {
-    this.buffer = buffer;
-    this.parent = parent;
-    this.attributes = attributes;
-    this.startPosition = startPosition;
-    this.endPosition = endPosition;
+    // First remove the old local map.
+    if (localKeymap != null)
+      {
+        activeKeymaps[activeLength-2] = activeKeymaps[activeLength-1];
+        activeLength--;
+        localKeymap = null;
+      }
+    if (map != null)
+      {
+        activeKeymaps[activeLength] = activeKeymaps[activeLength-1];
+        activeKeymaps[activeLength-1]= map;
+        activeLength++;
+        localKeymap = map;
+      }
   }
-  public String getName() { return "content"; }
-  public int getElementIndex(int offset) { return 0; }
-  public Element getElement(int offset) { return null; }
-  public AttributeSet getAttributes() { return attributes; }
-  public Document getDocument() { return buffer;}
-  public Element getParentElement() { return parent; }
-  public boolean isLeaf() { return true; }
-  public int getElementCount() { return 0; }
-  public int getStartOffset()
-  { return buffer.content.getPositionOffset(startPosition); }
-  public int getEndOffset()
-  { return buffer.content.getPositionOffset(endPosition); }
 
-  public void finalize()
-  {
-    gnu.lists.CharBuffer content = buffer.content;
-    content.releasePosition(startPosition);
-    content.releasePosition(endPosition);
-  }
+  public abstract long savePointMark ();
+
+  public abstract void restorePointMark (long pointMark);
 }
-*/

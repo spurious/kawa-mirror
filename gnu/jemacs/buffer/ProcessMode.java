@@ -1,5 +1,7 @@
+// Copyright (c) 2002  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.jemacs.buffer;
-import javax.swing.text.*;
 import gnu.mapping.*;
 import java.io.*;
 
@@ -13,11 +15,11 @@ public class ProcessMode extends Mode
 
   static Procedure enterAction = new gnu.expr.PrimProcedure(gnu.bytecode.ClassType.make("gnu.jemacs.buffer.ProcessMode").getDeclaredMethod("enterAction", 0));
 
-  public static Keymap modeMap = BufferKeymap.makeEmptyKeymap("process");
+  public static EKeymap modeMap = new EKeymap("process");
   static
   {
-    BufferKeymap.defineKey(modeMap, "\n", enterAction);
-    modeMap.setDefaultAction(new ProcessDefaultAction());
+    modeMap.defineKey("\n", enterAction);
+    modeMap.setDefaultBinding(new ProcessInsertCommand());
   }
 
   public Marker getProcessMark ()
@@ -41,11 +43,9 @@ public class ProcessMode extends Mode
 	    buffer.insert('\n', 1, null);
 	    int pos = buffer.getDot();
 	    int markPos = processMark.getOffset();
-	    Segment segment = new Segment();
-	    buffer.getText(markPos, pos - markPos, segment);
+
+	    buffer.writeTo(markPos, pos - markPos, toInferior);
 	    processMark.setDot(pos);
-	    System.err.println("sent to inf: (pos:"+pos+" pmark:"+markPos+") "+segment.count+" \""+new String(segment.array, segment.offset, segment.count)+"\"");
-	    toInferior.write(segment.array, segment.offset, segment.count);
 	  }
 	else
 	  toInferior.write('\r');
@@ -74,34 +74,22 @@ public class ProcessMode extends Mode
     str.writeTo(toInferior);
     toInferior.flush();
   }
-}
 
-class ProcessDefaultAction extends javax.swing.text.TextAction
-{
-  public ProcessDefaultAction()
+  public void selfInsert()
   {
-    super(null);
+    EWindow window = EWindow.getSelected();
+    insert((char) window.pendingKeys[window.pendingLength], 1);
   }
 
-  public void actionPerformed(java.awt.event.ActionEvent event)
+  public void insert(char ch, int count)
   {
-    insert(event);
-  }
-
-  public static void insert(java.awt.event.ActionEvent event)
-  {
-    int count = 1;  // Get C-u prefix.  FIXME.
-    Buffer buffer = Window.getWindow(event).buffer;
-    buffer.keymap.pendingLength = 0;
-    String command = event.getActionCommand();
-    char ch = command.charAt(0);
-    ProcessMode pmode = ProcessMode.getProcessMode(buffer);
-    if (! pmode.lineMode)
+    if (! lineMode)
       {
 	try
 	  {
-	    pmode.toInferior.write(ch);
-	    pmode.toInferior.flush();
+	    while (--count >= 0)
+	      toInferior.write(ch);
+	    toInferior.flush();
 	  }
 	catch (Exception ex)
 	  {
@@ -109,6 +97,25 @@ class ProcessDefaultAction extends javax.swing.text.TextAction
 	  }
       }
     else
-      buffer.insert(ch, count, buffer.inputStyle);
+      buffer.insert(ch, count);
+  }
+}
+
+class ProcessInsertCommand extends Procedure0
+{
+  public Object getProperty (Object key, Object defaultValue)
+  {
+    if (key == "emacs-interactive")
+      return "*";
+    return super.getProperty(key, defaultValue);
+  }
+
+  public Object apply0 ()
+  {
+    EWindow window = EWindow.getSelected();
+    Buffer buffer = window.buffer;
+    ProcessMode pmode = ProcessMode.getProcessMode(buffer);
+    pmode.insert((char) window.pendingKeys[window.pendingLength], 1);
+    return Values.empty;
   }
 }

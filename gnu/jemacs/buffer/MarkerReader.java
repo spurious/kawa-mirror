@@ -22,7 +22,7 @@ public class MarkerReader extends InPort
   {
     super(gnu.text.NullReader.nullReader, buffer.getName());
     this.marker = marker;
-    content = buffer.content;
+    content = ((gnu.jemacs.swing.SwingBuffer) buffer).content;
     this.buffer = content.getArray();
   }
 

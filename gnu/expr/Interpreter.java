@@ -429,6 +429,11 @@ public abstract class Interpreter
     return null;
   }
 
+  /** Used when defining a namespace alias (prefix), in the XML sense.
+   * Define in a namespace prefix NS is equivalent to defining a constant
+   * named NAMESPACE_PREFIX+"NS" whose value is teh namespace URI. */
+  public static final String NAMESPACE_PREFIX = "$Namespace$";
+
   public static final int VALUE_NAMESPACE = 1<<0;
   public static final int FUNCTION_NAMESPACE = 1<<1;
 

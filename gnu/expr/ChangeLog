@@ -1,5 +1,7 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* Interpreter.java (NAMESPACE_PREFIX):  New constant.
+
 	* ReferenceExp (getName):  If name is a Symbol, use Symbol.getName.
 	* Interpreter.java (asType):  Likewise.
 	* LambdaExp.java (setName):  New method.

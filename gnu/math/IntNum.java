@@ -825,6 +825,8 @@ public class IntNum extends RatNum implements Externalizable
 
   public static IntNum remainder (IntNum x, IntNum y)
   {
+    if (y.isZero())
+      return x;
     IntNum rem = new IntNum ();
     divide (x, y, null, rem, TRUNCATE);
     return rem.canonicalize ();
@@ -832,6 +834,8 @@ public class IntNum extends RatNum implements Externalizable
 
   public static IntNum modulo (IntNum x, IntNum y)
   {
+    if (y.isZero())
+      return x;
     IntNum rem = new IntNum ();
     divide (x, y, null, rem, FLOOR);
     return rem.canonicalize ();

@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = kawa
+SUBDIRS = codegen kawa
 
 .SUFFIXES : .java .class
 

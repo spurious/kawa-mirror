@@ -1,3 +1,8 @@
+Tue Jul  2 11:23:44 1996  Anthony Green  <green@csk3.cygnus.com>
+
+	* Makefile.am, Makefile.in: New files to support building codegen
+ 	package.
+
 Mon Jul  1 23:11:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Access.java, ArrayType.java, ClassType.java, CpoolClass.java,

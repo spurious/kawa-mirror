@@ -1,3 +1,8 @@
+Tue Jul  2 11:34:24 1996  Anthony Green  <green@csk3.cygnus.com>
+
+	* Makefile.am, Makefile.in, configure.in: Added the codegen
+ 	directory to the build procedure.
+
 Fri Jun 28 17:47:12 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/cond.java:  Re-write to use recursion.

@@ -40,7 +40,7 @@ transform = @program_transform_name@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = kawa
+SUBDIRS = codegen kawa
 
 JAVAC=javac -classpath .:$$CLASSPATH -d @TOP_BUILDDIR@
 
@@ -53,8 +53,8 @@ ACLOCAL = aclocal.m4
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 
-DIST_COMMON = ChangeLog Makefile.am Makefile.in aclocal.m4 configure \
-configure.in install-sh mkinstalldirs
+DIST_COMMON = ChangeLog Makefile.am Makefile.in TODO aclocal.m4 \
+configure configure.in install-sh mkinstalldirs
 
 
 PACKAGE = @PACKAGE@

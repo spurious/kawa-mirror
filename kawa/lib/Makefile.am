@@ -27,6 +27,7 @@ OBJ=\
   files.class \
   keywords.class \
   ports.class \
+  misc.class \
   quantities.class \
   strings.class \
   syntax.class \
@@ -62,9 +63,17 @@ SECONDARY_OBJS=\
   keywords$$keyword_2_string.class \
   keywords$$keyword_P.class \
   keywords$$string_2_keyword.class \
+  ports$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \
+  ports$$input__port__column__number.class \
+  ports$$input__port__line__number.class \
+  ports$$input__port__prompter.class \
   ports$$newline.class \
+  ports$$set__input__port__line__number_B.class \
+  ports$$set__input__port__prompter_B.class \
+  ports$$transcript__off.class \
+  ports$$transcript__on.class \
   strings$$make__string.class \
   strings$$string__length.class \
   syntax$$_Cdefmacro.class \

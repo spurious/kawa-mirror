@@ -1,14 +1,14 @@
 (define (keyword? object)
-  ((primitive-static-method "kawa.lang.Keyword" "isKeyword"
-			    "boolean" ("Object"))
+  ((primitive-static-method <keyword> "isKeyword"
+			    "boolean" (<object>))
    object))
 
 (define (keyword->string keyword)
-  ((primitive-virtual-method "kawa.lang.Keyword" "toSchemeString"
-			     "kawa.lang.FString" ())
+  ((primitive-virtual-method <keyword> "toSchemeString"
+			     <string> ())
    keyword))
 
 (define (string->keyword string)
-  ((primitive-static-method "kawa.lang.Keyword" "make"
-			    "kawa.lang.Keyword" ("String"))
+  ((primitive-static-method <keyword> "make"
+			    <keyword> ("String"))
    string))

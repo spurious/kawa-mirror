@@ -1,3 +1,13 @@
+Mon Jun 23 22:48:37 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* misc.scm:  New file.
+	* *.scm:  Update to (mostly) use <>-type type specifications.
+	* ports.scm:  New functions default-prompter, input-port-prompter,
+	set-input-port-prompter!, transcript-on, transcript-off,
+	input-port-line-number, set-input-port-line-number!,
+	input-port-column-number.
+	* Makefile.am, Makefile.in:  Update.
+
 Mon May 26 12:34:29 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* files.scm:  New file.

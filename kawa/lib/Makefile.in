@@ -65,6 +65,7 @@ OBJ=\
   files.class \
   keywords.class \
   ports.class \
+  misc.class \
   quantities.class \
   strings.class \
   syntax.class \

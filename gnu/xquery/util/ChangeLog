@@ -1,3 +1,7 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* IntegerRange.java:  New class; extends CpsProcedure.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* Children.java:  New class, extends CpsProcedure.

@@ -8,6 +8,7 @@ java_sources = \
   AppendValues.java \
   Children.java \
   Document.java \
+  IntegerRange.java \
   MakeAttribute.java \
   MakeElement.java \
   NamedChildren.java \

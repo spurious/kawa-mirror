@@ -1,3 +1,7 @@
+2003-12-20  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm, classes1.scm:  Test new field initialization features.
+
 2003-11-10  Per Bothner  <per@bothner.com>
 
 	* testing.scm (report-fail):  Only use string-append if

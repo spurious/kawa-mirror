@@ -191,9 +191,9 @@
 (require <classes2>)
 
 (define IsClass2-value (make <IdClass2>))
-(test 1 slot-ref IsClass2-value 'var1)
-(test 2 slot-ref IsClass2-value 'var2)
-(test 3 get-new-count)
+(test 3 slot-ref IsClass2-value 'var1)
+(test 4 slot-ref IsClass2-value 'var2)
+(test 5 get-new-count)
 
 (define obj1 (make <SimpleA>))
 (test 4 slot-ref obj1 'a)
@@ -260,7 +260,7 @@
 
 (define (create-main-frame)
   (object ()
-   (myField init-form:
+   (myField init:
         (format #f "this: ~a\n" (this))
         )))
 (define main-frame (create-main-frame))

@@ -1,0 +1,120 @@
+	README for kawa-0.3 release
+
+This docuemnts how to install and use Kawa, a Scheme system
+implemented in Java, and that compiles into Java bytecodes.
+
+Unpacking and Installation -- quick overview
+==========================
+The Kawa release normally comes as a gzip-compressed tar file.
+We assume you have managed to retrieve, and extract the files
+and are reading this file ...
+
+First, you must configure the sources.  This you can do
+the same way you configure most other GNU software.  Normally,
+you can just run the configure script with no arguments:
+
+	./configure
+
+This will specify that a later 'make install' will install the
+compiled .class files in /usr/local/java.  If you want them to be
+installed someplace else, such as $PREFIX/java, then specify
+that when you run configure:
+
+	./configure -- prefix $PREFIX
+
+You will need a working Java system.
+The program 'java' is the Java interpreter.
+The program 'javac' is the Java compiler.
+They must both be in your PATH.
+
+You also need to set CLASSPATH so it includes both the
+current directory, and the standard Java library.
+
+If you have the Java Developer's Kit in directory $JDK,
+and your are using a Bourne-shell compatible shell
+(/bin/sh, ksh, bash, or other) you can set both variables thus:
+
+	export PATH=$JDK/bin:$PATH
+	export CLASSPATH=.:$JDK/lib/classes.zip
+
+Thus you need to compile all the .jave source files.  Just run make:
+
+	make
+
+You can now test the system by running Kawa in place:
+
+	java kawa
+
+or you can install the compiled files:
+
+	make install
+
+This will install your classes into $PREFIX/java (and its
+sub-directories).  Here $PREFIX is the directory you specified
+to configure with the --prefix option, or /usr/local if you
+did not specify a --prefix option.
+
+To use the installed files, you need to set CLASSPATH so
+that $PREFIX/java is on the path:
+
+	export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
+
+Running Kawa
+============
+
+The interface to Kawa is typical of Scheme interpreters.
+You start it by typing:
+
+	java kawa
+
+(Remember, the Java interpreter must be on your PATH,
+and the kawa.class file must be in your CLASSPATH.)
+
+You will then get the "kawa>" prompt, which means you are
+in the Java read-evel-print-loop.  If you type a Scheme
+expression, Kawa will evaluate it.  Kawa will then print the
+result (if there is a non-"void" result).
+
+To exit Kawa, type the end-of-file character (normally ctrl/D).
+
+Scheme restrictions
+===================
+The file Compliance.html specifies which functions and syntax
+have been implemented so far.
+
+Beyond that, note that there is no tail-call-elimination.
+A future release will do at least tail-recursion-elmination
+(when the system can determine that the function being called
+is the current function).
+
+Also, call-with-current-continuation is only "upwards" (?).
+I.e. once a continuation has been exited, it cannot be invoked.
+These restricted continuations can be used to implement catch/throw
+(such as the examples in R4RS), but not co-routines or backtracking.
+
+Compilation
+===========
+To byte-compile a file foo.scm do:
+
+	(compile-file "foo.scm" "foo")
+
+This will create "foo.zip", which contains bytecompiled "j-code"
+that implemented "foo.scm".
+
+You can later do:
+
+	(load "foo")
+
+This will load foo.zip, which should have the same effect as
+loading foo.scm, except you will get the byte-compiled versions.
+
+Actually, note that if you type a lambda expression to the
+read-eval-print loop, or there is one in a .scm file you load,
+those procedure will actually be compiled into bytecodes too
+The evaluator (in the traditional sense) is only used for top-level
+expressions *outside* a lambda.  (It would have been more elegant
+to also byte-compile top-level expressions by surroudning them
+by a dummy lambda.  However, this would create a new Class object
+in the Java VM for every top-level expression.  This is undesirable
+unless you hava a VM that can garbage collect Class objects.
+I believe Sun's VM does not.)

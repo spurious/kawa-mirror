@@ -128,8 +128,21 @@ public class FieldLocation extends ClassMemberLocation
     this.decl = decl;
   }
 
+  public Field getField ()
+  {
+    return type.getDeclaredField(mname);
+  }
+
+  /** Get the type of the field. */
+  public Type getFType ()
+  {
+    return type.getDeclaredField(mname).getType();
+  }
+
   public synchronized Declaration getDeclaration ()
   {
+    if ((flags & KIND_FLAGS_SET) == 0)
+      setKindFlags();
     Declaration d = decl;
     if (d == null)
       {

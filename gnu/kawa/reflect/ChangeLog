@@ -1,3 +1,9 @@
+2005-03-24  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (getField, getFType): New methods.
+
+	* FieldLocation.java (getDeclaration): Do setKindFlags if needed.
+
 2005-03-23  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (PROCEDURE, SYNTAX, KIND_FLAGS_SET): New flags.

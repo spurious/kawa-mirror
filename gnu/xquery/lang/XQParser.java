@@ -2401,7 +2401,6 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == OP_LSS)
       {
-	startColumn--;  // Subtract 1 for '<'.
 	int next = read();
 	if (next == '/')
 	  {
@@ -2412,6 +2411,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	      msg = "saw end tag '</" + new String(tokenBuffer, 0, tokenBufferLength) + ">' not in an element constructor";
 	    else
 	      msg = "saw end tag '</' not in an element constructor";
+	    curLine = startLine;
+	    curColumn = startColumn;
 	    exp = syntaxError(msg);
 	    while (curToken != OP_GRT && curToken != EOF_TOKEN && curToken != EOL_TOKEN)
 	      getRawToken();
@@ -2482,7 +2483,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	if (name.equals("typeswitch"))
 	  return parseTypeSwitch();
-	startColumn -= tokenBufferLength;
 	char save = pushNesting('(');
 	getRawToken();
 	Vector vec = new Vector(10);

@@ -21,7 +21,7 @@ import gnu.math.IntNum;
 
 /** The XQuery language. */
 
-public class XQuery extends Interpreter
+public class XQuery extends Language
 {
   public static final String XQUERY_FUNCTION_NAMESPACE
     = "http://www.w3.org/2004/10/xpath-functions";
@@ -504,7 +504,6 @@ public class XQuery extends Interpreter
 	loadClass("kawa.lib.lists");
 	loadClass("kawa.lib.strings");
 	loadClass("gnu.commonlisp.lisp.PrimOps");
-	loadClass("gnu.kawa.slib.HTTP");
 	loadClass("gnu.kawa.slib.XStrings");
       }
     catch (Throwable ex)
@@ -579,6 +578,28 @@ public class XQuery extends Interpreter
     // FIXME - should be imported?
     defProcStFld("children", "gnu.xquery.util.Children", "children");
     defProcStFld("not", "kawa.standard.Scheme");
+
+    defaultNamespace = kawaFunctionNamespace;
+    defProcStFld("response-header", "gnu.kawa.slib.HTTP");
+    defProcStFld("response-content-type", "gnu.kawa.slib.HTTP");
+    defProcStFld("response-status", "gnu.kawa.slib.HTTP");
+    defProcStFld("error-response", "gnu.kawa.slib.HTTP");
+    defProcStFld("current-servlet", "gnu.kawa.slib.HTTP");
+    defProcStFld("current-servlet-context", "gnu.kawa.slib.HTTP");
+    defProcStFld("current-servlet-config", "gnu.kawa.slib.HTTP");
+    defProcStFld("servlet-context-realpath", "gnu.kawa.slib.HTTP");
+    defProcStFld("get-response", "gnu.kawa.slib.HTTP");
+    defProcStFld("get-request", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-method", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-uri", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-url", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-path-info", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-path-translated", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-servlet-path", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-query-string", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-parameter", "gnu.kawa.slib.HTTP");
+    defProcStFld("request-parameters", "gnu.kawa.slib.HTTP");
+    defaultNamespace = xqueryFunctionNamespace;
   }
 
   public static XQuery getInstance()

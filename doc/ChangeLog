@@ -1,3 +1,7 @@
+2001-09-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (set-input-port-line-number!):  Fix typo.
+
 2001-08-24  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes):  New node.

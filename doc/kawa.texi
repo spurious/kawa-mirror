@@ -1720,7 +1720,7 @@ Deprecated; replaced by @code{(+ 1 (port-line @var{port}))}.
 
 @defun set-input-port-line-number! port num
 Set line number of the current line of @var{port} to @var{num}.
-Deprecated;  replaced by @code{(set-port-line @var{port} (- @var{num} 1))}.
+Deprecated;  replaced by @code{(set-port-line! @var{port} (- @var{num} 1))}.
 @end defun
 
 @defun input-port-column-number port 

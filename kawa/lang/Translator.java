@@ -354,7 +354,7 @@ public class Translator extends Parser
       {
 	Binding binding = lookup(exp);
 	Object value = resolve(binding, function);
-        boolean separate = getInterpreter().hasSeparateFunctionNamespace();
+	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
 	Declaration decl = null;
         if (value instanceof Declaration) // ?? FIXME
           {

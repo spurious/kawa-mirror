@@ -1,3 +1,7 @@
+2003-11-03  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitIfIntEqZero):  New method.
+
 2003-10-28  Per Bothner  <per@bothner.com>
 
 	* dump-main.cc:  Belatedly remove unused file.

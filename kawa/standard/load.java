@@ -10,7 +10,7 @@ public class load extends Procedure1 {
     super("load");
   }
 
-  public final static Object loadClassFile (String name)
+  public final static Object loadClassFile (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
@@ -19,8 +19,7 @@ public class load extends Procedure1 {
 	Object inst = clas.newInstance ();
 	if (! (inst instanceof Procedure0))
 	  throw new GenericError ("load - class is not an Procedure0");
-	Procedure0 proc = (Procedure0) inst;
-	return proc.apply0 ();
+	return ((ModuleBody)inst).run (env);
       }
     catch (ClassNotFoundException ex)
       {
@@ -36,7 +35,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static Object loadCompiled (String name)
+  public final static Object loadCompiled (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
@@ -49,9 +48,7 @@ public class load extends Procedure1 {
 	ZipArchive zar = new ZipArchive (name, "r");
 	ZipLoader loader = new ZipLoader (zar);
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
-	Object inst = clas.newInstance ();
-	Procedure0 proc = (Procedure0) inst;
-	return proc.apply0 ();
+	return ((ModuleBody) clas.newInstance ()).run (env);
       }
     catch (java.io.IOException ex)
       {
@@ -71,7 +68,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static Object loadSource (String name)
+  public final static Object loadSource (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     FileInputStream fstream;
@@ -83,37 +80,42 @@ public class load extends Procedure1 {
       {
 	throw new GenericError ("load: file not found: " + name);
       }
-    return loadSource (new InPort (fstream, name));
+    return loadSource (new InPort (fstream, name), env);
   }
 
-  public final static Object loadSource (InPort port)
+  public final static Object loadSource (InPort port, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Interpreter interpreter = Interpreter.current ();
-    Environment env = new Environment (interpreter);
+    Interpreter interpreter = env.interpreter ();
     int save_errors = interpreter.errors;
     LambdaExp lexp = CompileFile.read (port, env);
-    lexp.setName (Symbol.make ("atFileLevel"));
+    lexp.setName (Symbol.make (LambdaExp.fileFunctionName));
     if (interpreter.errors > save_errors)
       throw new GenericError ("syntax errors during load");
-    Procedure proc = (Procedure) lexp.eval (env);
-    return proc.apply0 ();
+    return ((ModuleBody) lexp.eval (env)).run (env);
   }
 
   public final Object apply1 (Object arg1)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
+    return apply2 (arg1, Environment.current ());
+  }
+
+  public final Object apply2 (Object arg1, Object arg2)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    Environment env = (Environment) arg2;
     if (! (arg1 instanceof StringBuffer))
       throw new WrongType (this.name(), 1, "file name");
     String name = arg1.toString ();
     if (name.endsWith (".zip"))
-      return loadCompiled (name);
+      return loadCompiled (name, env);
     if (name.endsWith (".scm"))
-      return loadSource (name);
+      return loadSource (name, env);
     if (name.endsWith (".class"))
       {
 	name = name.substring (0, name.length () - 6);
-	return loadClassFile (name.replace ('/', '.'));
+	return loadClassFile (name.replace ('/', '.'), env);
       }
     File file = new File (name);
     if (file.exists ())
@@ -137,7 +139,7 @@ public class load extends Procedure1 {
 			if (char3 == '\004')
 			  {
 			    port.close ();
-			    return loadCompiled (name);
+			    return loadCompiled (name, env);
 			  }
 			port.unreadChar ();  // unread char3
 		      }
@@ -146,7 +148,7 @@ public class load extends Procedure1 {
 		port.unreadChar ();  // unread char 1
 	      }
 	    port.unreadChar ();  // unread char 0
-	    return loadSource (port);
+	    return loadSource (port, env);
 	  }
 	catch (java.io.FileNotFoundException e)
 	  {
@@ -162,17 +164,17 @@ public class load extends Procedure1 {
 	String xname = name + ".zip";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadCompiled (xname);
+	  return loadCompiled (xname, env);
 
 	xname = name + ".class";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadClassFile (xname);
+	  return loadClassFile (xname, env);
 
 	xname = name + ".scm";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadSource (xname);
+	  return loadSource (xname, env);
       }
     throw new GenericError ("load:  " + name + " - not found");
   }

@@ -74,7 +74,7 @@
     ((%lang-boolean value)
      (make <gnu.expr.QuoteExp>
        (invoke
-	(invoke-static <gnu.expr.Interpreter> 'getInterpreter)
+	(gnu.expr.Language:getDefaultLanguage)
 	'booleanObject value)))))
 
 ;;; AND

@@ -1,3 +1,8 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* windows.scm (scheme-window): Update Interpreter -> Language.
+	* std_syntax (%lang-boolean): Likewise.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* ports.scm (define-alias-parameter): New helper macro.

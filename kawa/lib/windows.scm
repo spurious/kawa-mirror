@@ -1,9 +1,9 @@
 (define (scheme-window #!optional share)
-  (let* ((interp :: <gnu.expr.Interpreter>
-		 (invoke-static <gnu.expr.Interpreter> 'getInterpreter))
+  (let* ((language :: <gnu.expr.Language>
+		 (invoke-static <gnu.expr.Language> 'getDefaultLanguage))
 	 (env :: <gnu.mapping.Environment>
 	      (if share (interaction-environment)
-		  (invoke interp 'getNewEnvironment))))
-    ((primitive-constructor <kawa.GuiConsole> (<gnu.expr.Interpreter>
+		  (invoke language 'getNewEnvironment))))
+    ((primitive-constructor <kawa.GuiConsole> (<gnu.expr.Language>
 					       <gnu.mapping.Environment>))
-     interp env)))
+     language env)))

@@ -7,14 +7,36 @@ import gnu.lists.*;
 
 public class NamedDescendants extends CpsProcedure
 {
- public static final NamedDescendants namedDescendants
-   = new NamedDescendants();
+  public static final NamedDescendants namedDescendants
+   = new NamedDescendants(false);
+
+  public static final NamedDescendants namedDescendantsOrSelf
+   = new NamedDescendants(true);
+
+  boolean orSelf;
+
+  public NamedDescendants (boolean orSelf)
+  {
+    this.orSelf = orSelf;
+  }
 
   public static void namedDescendants(NodePredicate predicate,
 				      TreeList list, int pos,
-				      Consumer consumer)
+				      Consumer consumer, boolean orSelf)
   {
     int limit = list.nextDataIndex(pos);
+    if (orSelf && predicate.isInstance(list, pos << 1, null))
+      {
+	if (consumer instanceof PositionConsumer)
+	  ((PositionConsumer) consumer).writePosition(list, pos << 1, null);
+	else
+	  {
+	    int next = list.nextNodeIndex(pos, -1 >>> 1);
+	    if (pos == next)
+	      next = list.nextDataIndex(pos);
+	    list.consumeRange(pos, next, consumer);
+	  }
+      }
     for (;;)
       {
 	pos = list.nextMatchingChild(pos, predicate, limit);
@@ -28,24 +50,23 @@ public class NamedDescendants extends CpsProcedure
 	    if (pos == next)
 	      next = list.nextDataIndex(pos);
 	    list.consumeRange(pos, next, consumer);
-	    pos = next;
 	  }
       }
   }
 
-  public static void namedDescendants (NodePredicate predicate,
-				       Object node, Consumer consumer)
+  public static void namedDescendants (NodePredicate predicate, Object node,
+				       Consumer consumer, boolean orSelf)
     throws Throwable
   {
     if (node instanceof TreeList)
       {
-	namedDescendants(predicate, (TreeList) node, 0, consumer);
+	namedDescendants(predicate, (TreeList) node, 0, consumer, orSelf);
       }
     else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedDescendants(predicate, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  namedDescendants(predicate, (TreeList) pos.sequence, pos.ipos >> 1, consumer, orSelf);
       }
   }
 
@@ -65,14 +86,14 @@ public class NamedDescendants extends CpsProcedure
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedDescendants(predicate, tlist.getNext(index << 1, null), consumer);
+	      namedDescendants(predicate, tlist.getNext(index << 1, null), consumer, orSelf);
 	    else
-	      namedDescendants(predicate, tlist, index, consumer);
+	      namedDescendants(predicate, tlist, index, consumer, orSelf);
 	    index = tlist.nextDataIndex(index);
 	  }
       }
     else
-      namedDescendants(predicate, node, consumer);
+      namedDescendants(predicate, node, consumer, orSelf);
   }
 }
 

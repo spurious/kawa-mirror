@@ -90,7 +90,7 @@ public class NodeType extends ClassType implements NodePredicate, Externalizable
   {
     SeqPosition pos = coerceOrNull(obj, kinds);
     if (pos == null)
-      throw new ClassCastException();
+      throw new ClassCastException("coerce from "+obj.getClass());
     return pos;
   }
 

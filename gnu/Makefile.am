@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 SUBDIRS = bytecode math lists text mapping $(XML_SUBDIR) expr \
-	kawa commonlisp ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
+	kawa commonlisp q2 ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
 	$(SWING_SUBDIRS)
 if ENABLE_XML
 XML_SUBDIR = xml

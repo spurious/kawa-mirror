@@ -171,7 +171,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 
 SUBDIRS = bytecode math lists text mapping $(XML_SUBDIR) expr \
-	kawa commonlisp ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
+	kawa commonlisp q2 ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
 	$(SWING_SUBDIRS)
 
 @ENABLE_XML_TRUE@XML_SUBDIR = xml
@@ -192,7 +192,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = ChangeLog Makefile.am Makefile.in
 DIST_SUBDIRS = bytecode math lists text mapping xml expr kawa commonlisp \
-	ecmascript brl xquery jemacs
+	q2 ecmascript brl xquery jemacs
 all: all-recursive
 
 .SUFFIXES:

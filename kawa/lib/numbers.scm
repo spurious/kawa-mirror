@@ -1,103 +1,113 @@
-(define (number? x) (instance? x <number>))
-(define (quantity? x) (instance? x <quantity>))
-(define (complex? x) (instance? x <complex>))
-(define (real? x) (instance? x <real>))
-(define (rational? x) (instance? x <rational>))
+(define (number? x) :: <boolean> (instance? x <number>))
+(define (quantity? x) :: <boolean>  (instance? x <quantity>))
+(define (complex? x) :: <boolean>  (instance? x <complex>))
+(define (real? x) :: <boolean> (instance? x <real>))
+(define (rational? x)  :: <boolean> (instance? x <rational>))
 ;;;(define (integer? x) ...)
 
-(define (zero? (x <number>))
+(define (zero? (x :: <number>)) :: <boolean> 
   ((primitive-virtual-method <number> "isZero" <boolean> ())
    x))
-(define (negative? (x <real>))
+
+(define (negative? (x :: <real>)) :: <boolean> 
   ((primitive-virtual-method <real> "isNegative" <boolean> ())
    x))
-(define (odd? (x <integer>))
+
+(define (odd? (x :: <integer>)) :: <boolean> 
   ((primitive-virtual-method <integer> "isOdd" <boolean> ())
    x))
-(define (even? (x <integer>))
+
+(define (even? (x :: <integer>)) :: <boolean> 
   (not (odd? x)))
 
-(define (abs (x <number>))
-  ((primitive-virtual-method <number> "abs" <number> ())
-   x))
-(define (quotient (x <integer>) (y <integer>))
-  ((primitive-static-method <integer> "quotient" <integer>
-			    (<integer> <integer>))
-   x y))
-(define (remainder x y)
-  ((primitive-static-method <integer> "remainder" <integer>
-			    (<integer> <integer>))
-   x y))
+(define (abs (x :: <number>)) :: <number>
+  (invoke x 'abs))
 
-(define (numerator (x <integer>) (y <integer>))
-  ((primitive-virtual-method <rational> "numerator" <integer> ()) x))
+(define (quotient (x :: <integer>) (y :: <integer>)) :: <integer>
+  (invoke-static <integer> 'quotient x y))
 
-(define (denominator (x <integer>))
-  ((primitive-virtual-method <rational> "denominator" <integer> ()) x))
+(define (remainder (x :: <integer>) (y :: <integer>)) :: <integer>
+  (invoke-static <integer> 'remainder x y))
 
-(define (exp (x <complex>))
-  ((primitive-virtual-method <complex> "exp" <complex> ())  x))
-(define (log (x <complex>))
-  ((primitive-virtual-method <complex> "log" <complex> ())  x))
+(define (numerator (x :: <rational>)) :: <integer>
+  (invoke x 'numerator))
+
+(define (denominator (x :: <rational>)) :: <integer>
+  (invoke x 'denominator))
+
+(define (floor (x :: <real>)) :: <real>
+  (invoke x 'toInt (static-field <number> 'FLOOR)))
+
+(define (ceiling (x :: <real>)) :: <real>
+  (invoke x 'toInt (static-field <number> 'CEILING)))
+
+(define (truncate (x :: <real>)) :: <real>
+  (invoke x 'toInt (static-field <number> 'TRUNCATE)))
+
+(define (round (x :: <real>)) :: <real>
+  (invoke x 'toInt (static-field <number> 'ROUND)))
+
+(define (exp (x :: <complex>)) :: <complex>
+  (invoke x 'exp))
+
+(define (log (x :: <complex>)) :: <complex>
+  (invoke x 'log))
 
 ;;; These are only implemented for <real> arguments.
-(define (sin (x <real>))
-  (invoke-static <java.lang.Math> "sin" x))
-;                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-;                  x)))
-(define (cos (x <real>))
-  (invoke-static <java.lang.Math> "cos"
-                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-                  x)))
-(define (tan (x <real>))
-  (invoke-static <java.lang.Math> "tan"
-                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-                  x)))
+(define (sin (x :: <double>)) :: <double>
+  (invoke-static <java.lang.Math> 'sin x))
 
-(define (asin (x :: <double>))
+(define (cos (x :: <double>)) :: <double>
+  (invoke-static <java.lang.Math> 'cos x))
+
+(define (tan (x :: <double>)) :: <double>
+  (invoke-static <java.lang.Math> 'tan x))
+
+(define (asin (x :: <double>)) :: <double>
   (invoke-static <java.lang.Math> 'asin x))
 
-(define (acos (x :: <double>))
+(define (acos (x :: <double>)) :: <double>
   (invoke-static <java.lang.Math> 'acos x))
 
-(define (make-rectangular (x <real>) (y <real>))
-  ((primitive-static-method <complex> "make" <complex> (<real> <real>))  x y))
-(define (make-polar (x <double>) (y <double>))
-  ((primitive-static-method <complex> "polar" <gnu.math.DComplex>
-			    (<double> <double>))
-   x y))
-(define (real-part (x <complex>))
-  ((primitive-virtual-method <complex> "re" <real> ())  x))
-(define (imag-part (x <complex>))
-  ((primitive-static-method <quantity> "make" <quantity>
-			    (<complex> <gnu.math.Unit>))
-   ((primitive-virtual-method <quantity> "im" <real> ())  x)
-   ((primitive-virtual-method <quantity> "unit" <gnu.math.Unit> ()) x)))
-(define (magnitude (x <number>))
-  ((primitive-virtual-method <number> "abs" <number> ())
-   x))
-(define (angle (x <complex>))
-  ((primitive-virtual-method <complex> "angle" <real>
- ())
-   ((primitive-virtual-method <quantity> "number" <complex> ()) x)))
+(define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
+  (invoke-static <complex> 'make x y))
 
-(define (lognot (i :: <integer>))
+(define (make-polar (x :: <double>) (y :: <double>)) :: <gnu.math.DComplex>
+  (invoke-static <complex> 'polar x y))
+
+(define (real-part (x :: <complex>)) :: <real>
+  (invoke x 're))
+
+(define (imag-part (x :: <complex>)) :: <real>
+  (invoke x 'im))
+
+(define (magnitude (x :: <number>)) :: <number>
+  (invoke x 'abs))
+
+(define (angle (x :: <complex>)) :: <real>
+  (invoke (invoke x 'number) 'angle))
+
+(define (arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
+  (invoke-static <integer> 'shift value amount))
+
+(define (lognot (i :: <integer>)) :: <integer>
   (invoke-static <gnu.math.BitOps> 'not i))
 
-(define (logop (op :: <int>) (i :: <integer>) (j :: <integer>))
+(define (logop (op :: <int>) (i :: <integer>) (j :: <integer>)) :: <integer>
   (invoke-static <gnu.math.BitOps> 'bitOp op i j))
 
-(define (logbit? (i :: <integer>) (bitno :: <int>))
+(define (logbit? (i :: <integer>) (bitno :: <int>)) :: <boolean>
   (invoke-static <gnu.math.BitOps> 'bitValue i bitno))
 
 (define (bit-extract (i :: <integer>) (start :: <int>) (end :: <int>))
+  :: <integer>
   (invoke-static <gnu.math.BitOps> 'extract i start end))
 
 (define (logtest (i :: <integer>) (j :: <integer>))
   (invoke-static <gnu.math.BitOps> 'test i j))
 
-(define (logcount (i :: <integer>))
+(define (logcount (i :: <integer>)) :: <int>
   (invoke-static <gnu.math.BitOps> 'bitCount i))
 
-(define (integer-length (i :: <integer>))
+(define (integer-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))

@@ -1,3 +1,9 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* numbers.scm:  Add (new-style) type specificiers.
+	Replace some ((primitive-virtual-method ...)) by (invoke ...).
+	(floor, ceiling, truncate, round, arithmetic-shift):  New procedures.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* characters.scm (char=?, char<?, char>?, char<=?, char>=?,

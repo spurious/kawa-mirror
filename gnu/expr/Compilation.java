@@ -155,10 +155,6 @@ public class Compilation
   public static Type[] apply2args = { typeObject, typeObject };
   public static Type[] applyNargs = { objArrayType };
 
-  public static final Method makeNullPairMethod
-  = scmPairType.addMethod ("makePair", apply0args, scmPairType,
-			     Access.PUBLIC|Access.STATIC);
-  public static Method makePairMethod;
   static Method checkArgCountMethod;
 
   public static Method apply0method = typeProcedure.addMethod
@@ -184,9 +180,6 @@ public class Compilation
 						typeObject, Access.PUBLIC);
     applyNmethod = typeProcedure.addMethod ("applyN", applyNargs,
 						typeObject, Access.PUBLIC);
-    makePairMethod = scmPairType.addMethod ("makePair", apply2args,
-					     scmPairType,
-					     Access.PUBLIC|Access.STATIC);
     Type[] args = new Type[2];
     args[0] = typeProcedure;
     args[1] = Type.int_type;

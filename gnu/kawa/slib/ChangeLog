@@ -1,3 +1,8 @@
+2004-06-12  Per Bothner  <per@bothner.com>
+
+	* gui.scm (frame):  Process args list "manually", since we want
+	to allow content to be multiple values in Q2.
+
 2004-05-17  Per Bothner  <per@bothner.com>
 
 	* srfi1.scm (lset-xor!):  Fix argument order bug.

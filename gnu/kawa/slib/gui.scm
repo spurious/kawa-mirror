@@ -58,12 +58,30 @@
 (define-constant color-red :: <java.awt.Color>
   (static-field <java.awt.Color> 'RED))
 
-(define (frame #!key
-	       (title  :: <String> #!null)
-	       (menubar ::  <javax.swing.JMenuBar> #!null)
-	       contents)
+(define (frame #!rest args  :: <object[]>)
   :: <gnu.kawa.swingviews.SwingFrame>
-  (make  <gnu.kawa.swingviews.SwingFrame> title menubar contents))
+    (let ((frame :: <gnu.kawa.swingviews.SwingFrame>
+		 (make  <gnu.kawa.swingviews.SwingFrame> #!null #!null #!void))
+	  (num-args :: <int> (field args 'length)))
+      (let loop ((i :: <int> 0))
+	(if (< i num-args)
+	    (let ((arg ((primitive-array-get <object>) args i)))
+	      (cond ((eq? arg title:)
+		     (invoke frame 'setTitle
+			     ((primitive-array-get <object>) args (+ i 1)))
+		     (loop (+ i 2)))
+		    ((eq? arg menubar:)
+		     (invoke frame 'setJMenuBar
+			     ((primitive-array-get <object>) args (+ i 1)))
+		     (loop (+ i 2)))
+		    (else
+		     (invoke frame 'addComponent arg)
+		     (loop (+ i 1))))))
+	(invoke frame 'pack)
+	(invoke frame 'show)
+	frame)))
+
+
 
 (define (menubar #!rest args  :: <object[]>)
     :: <javax.swing.JMenuBar>

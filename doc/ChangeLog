@@ -1,5 +1,7 @@
 2002-03-21  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Lists):  New node.
+
 	* Makefile.am (AUTOMAKE_OPTIONS):  Remove cygnus options - it
 	does work wellto have just this directory be 'cygnus' style, even
 	though I consider it a mistake to leave the *.info files in $srcdir.

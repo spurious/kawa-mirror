@@ -114,9 +114,14 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public ClassType getSuperclass ()
   {
-    if (superClass == null && reflectClass != null
-        && this != Type.pointer_type)
-      superClass = (ClassType) make(reflectClass.getSuperclass());
+    if (superClass == null && reflectClass != null)
+      {
+        Class superReflectClass = reflectClass.getSuperclass();
+        // Neither Object nor interfaces have a superclass.
+        // I.e. equivalent to if(this!=Type.pointer_type && !isInterface()).
+        if (superReflectClass != null)
+          superClass = (ClassType) make(superReflectClass);
+      }
     return superClass;
  }
 
@@ -128,7 +133,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   { this.interfaces = interfaces; }
 
   public final boolean isInterface()
-  { return (access_flags & Access.INTERFACE) != 0; }
+  { return (getModifiers() & Access.INTERFACE) != 0; }
 
   public ClassType () { }
 
@@ -156,6 +161,8 @@ public class ClassType extends ObjectType implements AttrContainer {
   /** Get the fields of this class. */
   public final Field getFields()
   {
+    if ((flags & (ADD_FIELDS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
+      addFields();
     return fields;
   }
 

@@ -1,3 +1,13 @@
+1999-12-16  Luke Gorrie <luke@vegetable.org>
+
+	* ClassType.java (getSuperclass):  Check for null superclass.
+
+1999-12-16  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (isInterface):  Use getModifiers().
+
+	* ClassType.java (getFields):  Call addFields if an existing class.
+
 1999-12-02  Per Bothner  <per@bothner.com>
 
 	* Attribute.java (addToFrontOf):  New method.

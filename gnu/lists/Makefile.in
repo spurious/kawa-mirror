@@ -221,6 +221,7 @@ java_sources = \
   GeneralArray1.java \
   GroupPredicate.java \
   LList.java \
+  LListPosition.java \
   NodePredicate.java \
   Pair.java \
   PairWithPosition.java \

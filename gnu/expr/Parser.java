@@ -17,14 +17,22 @@ public abstract class Parser
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
-  /** Note that we have seen a construct that must be compiled, not evaluated.
-   * If we are not inside a lambda (which is always compiled), but
-   * only inside the outer-most ModuleExp, note that it must be compiled. */
+  /**
+   * Note that we have seen a construct that must be compiled, not evaluated.
+   */
   public void mustCompileHere ()
   {
-    LambdaExp lambda = currentLambda ();
-    if (lambda instanceof ModuleExp)
-      ((ModuleExp)lambda).mustCompile = true;
+    ScopeExp exp = current_scope;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return;
+	if (exp instanceof ModuleExp)
+	  {
+	    ((ModuleExp) exp).mustCompile = true;
+	    return;
+	  }
+      }
   }
 
   public ScopeExp currentScope() { return current_scope; }

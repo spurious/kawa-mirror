@@ -104,6 +104,7 @@ Kawa is a full Scheme implementation.  It implements almost
 all of R4RS (for exceptions @pxref{Restrictions}), plus some extensions.
 It provides @code{define-syntax} from the R4RS appendix,
 and (from the draft R5RS) eval and multiple values.
+By default, symbols are case sensitive.
 
 It is completely written in Java.  Scheme functions and files
 are automatically compiled into Java byte-codes, providing
@@ -119,8 +120,7 @@ the Scheme-derived ISO-standard Document Style Semantics and Specification
 Language for SGML.  Of the core expression language, the only features
 missing are character properties, @code{external-procedure},
 the time-relationed procedures, and character name escapes in
-string literals.  Also, Kawa is not generally tail-recursive,
-and literal unescaped symbols are case-insensitive (folded to lower-case).
+string literals.  Also, Kawa is not generally tail-recursive.
 From the full expression language, Kawa additionally is missing
 @code{format-number}, @code{format-numer-list}, and language objects.
 Quantities, keyword values, and the expanded @code{lambda} form
@@ -436,6 +436,7 @@ nor @code{letrec-syntax} are implemented.
 * Records::
 * Files:: File System Interface
 * Ports::
+* Exceptions:: Signalling and recovering from exceptions
 * Eval and Environments::
 * Quantities::
 * Threads::
@@ -818,7 +819,7 @@ Unspecified what happens on error (such as exiting file with the same name).
 with scsh.)
 @end defun
 
-@node Ports, Eval and Environments, Files, Extensions
+@node Ports, Exceptions, Files, Extensions
 @subsection Ports
 
 @defun call-with-input-string string proc
@@ -875,7 +876,43 @@ which must be a (non-binary) input port.
 The initial column is column 1.
 @end defun
 
-@node Eval and Environments, Quantities, Ports, Extensions
+@defvar symbol-read-case
+A symbol that controls how @code{read} handles letters when reading a symbol.
+(Letter following a @samp{\} are unchanged in all cases.)
+If the first letter is @samp{U}, then letters in symbols are upper-cased.
+If the first letter is @samp{D} or @samp{L}, then letters
+in symbols are down-cased.
+If the first letter is @samp{I}, then the case of letters in symbols
+is inverted.
+Otherwise (the default), the letter is not changed.
+@end defvar
+
+@node Exceptions, Eval and Environments, Ports, Extensions
+@subsection Signalling and recovering from exceptions
+
+@deffn Syntax try-finally body handler
+Evaluate @var{body}, and return its result.
+However, before it returns, evaluate @var{handler}.
+Even if @var{body} returns abnormally (by throwing an exception),
+@var{handler} is evaluated.
+
+(This is implemented just like Java's @code{try}-@code{finally}.)
+@end deffn
+
+@defun dynamic-wind in-guard thunk out-guard
+All three arguments must be 0-argument procedures.
+First calls @var{in-guard}, then @var{thunk}, then @var{out-guard}.
+The result of the expression is that of @var{thunk}.
+If @var{thunk} is exited abnormally (by throwing an exception or
+invoking a continuation), @var{out-guard} is called.
+
+If the continuation of the dynamic-wind is re-entered (which
+is not yet possible in Kawa), the @var{in-guard} is called again.
+
+This function will be in R5RS.
+@end defun
+
+@node Eval and Environments, Quantities, Exceptions, Extensions
 @subsection Eval and Environments
 
 @defun eval expression [environment]
@@ -916,6 +953,16 @@ Return true @code{#t} if there is a binding for @var{symbol}
 in @var{environment};  otherwise returns @code{#f}.
 @end defun
 
+@deffn Syntax fluid-let ((variable init) ...) body ...
+Evaluate the @var{init} expressions.
+Then modify the dynamic bindings for the @var{variables} to the
+values of the @var{init} expressions, and evaluate the @var{body} expressions.
+Return the result of the last expression in @var{body}.
+Before returning, restore the original bindings.
+The temporary bindings are only visible in the current thread, and its
+descendent threads.
+@end deffn
+
 @node Quantities, Threads, Eval and Environments, Extensions
 @subsection Quantities
 
@@ -955,10 +1002,10 @@ You can specify a string instead of @var{unit}, such as @code{"cm"}
 or @code{"s"} (seconds).
 @end defun
 
-@defmac define-unit unit-name expression
+@deffn Syntax define-unit unit-name expression
 Define @var{unit-name} as a unit (that can be used in literals)
 equal to the quantity @var{expression}.
-@end defmac
+@end deffn
 
 @node Threads, Standard Types, Quantities, Extensions
 @subsection Threads
@@ -973,9 +1020,9 @@ thread-safe.  There are no per-thread bindings, and
 the current input and output parts are global.
 That needs to change.
 
-@defmac future expression
+@deffn Syntax future expression
 Creates a new thread that evaluates @var{expression}.
-@end defmac
+@end deffn
 
 @defun force thread
 The standard @code{force} function has generalized to also work
@@ -1056,7 +1103,7 @@ Returns a new (interned) symbol each time it is called.
 The symbol names are implementation-dependent.
 @end defun
 
-@defmac defmacro name lambda-list form ...
+@deffn Syntax defmacro name lambda-list form ...
 Defines an old-style macro a la Common Lisp,
 and installs @code{(lambda @var{lambda-list} @var{form} ...)}
 as the expansion function for @var{name}.
@@ -1068,7 +1115,7 @@ source form that is futher processed (it may be repeatedly macro-expanded).
 If you define a macro with @code{defmacro}, you (currently) cannot use
 the macro in the same compilation as the definition.
 This restriction does not apply to macros defined by @code{define-syntax}.
-@end defmac
+@end deffn
 
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.
@@ -1093,15 +1140,15 @@ Calls the @var{proc} (which must be a procedure), using as arguments
 the @var{arg1}... values plus all the elements of @var{args}.
 @end defun
 
-@defmac when condition form...
+@deffn Syntax when condition form...
 If @var{condition} is true, evaluate each @var{form} in order,
 returning the value of the last one.
-@end defmac
+@end deffn
 
-@defmac unless condition form...
+@deffn Syntax unless condition form...
 If @var{condition} is false, evaluate each @var{form} in order,
 returning the value of the last one.
-@end defmac
+@end deffn
 
 @defun vector-append @var{arg}...
 Creates a new vector, containing the elements from all the @var{arg}s
@@ -1293,28 +1340,28 @@ can be converted to and from Scheme characters.  The type
 if and only if the actual argument is @code{#f}.
 The return type @code{<void>} indicates that no value is returned.
 
-@defmac primitive-constructor class (argtype ...)
+@deffn Syntax primitive-constructor class (argtype ...)
 Returns a new anonymous procedure, which when called will create
 a new object of the specified class, and will then call the
 constructor matching the specified argument types.
-@end defmac
+@end deffn
 
-@defmac primitive-virtual-method class method rtype (argtype ...)
+@deffn Syntax primitive-virtual-method class method rtype (argtype ...)
 Returns a new anonymous procedure, which when called will
 invoke the instance method whose name is the string @var{method}
 in the class whose name is @var{class}.
-@end defmac
+@end deffn
 
-@defmac primitive-static-method class method rtype (argtype ...)
+@deffn Syntax primitive-static-method class method rtype (argtype ...)
 Returns a new anonymous procedure, which when called will
 invoke the static method whose name is the string @var{method}
 in the class whose name is @var{class}.
-@end defmac
+@end deffn
 
-@defmac primitive-interface-method interface method rtype (argtype ...)
+@deffn Syntax primitive-interface-method interface method rtype (argtype ...)
 Returns a new anonymous procedure, which when called will
 invoke the matching method from the interface whose name is @var{interface}.
-@end defmac
+@end deffn
 
 The macros return procedure values, just like @code{lambda},
 but the procedures are @emph{not} first-class.  Currently, they can

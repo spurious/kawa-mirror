@@ -1,3 +1,8 @@
+Sun Dec 14 22:55:44 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Macros are now "Syntax".
+	Document symbol-read-case, try-finally, dynamic-wind, and fluid-let.
+
 Sun Nov  2 16:51:32 1997  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Various minor updates.

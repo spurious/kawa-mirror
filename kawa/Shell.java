@@ -118,6 +118,10 @@ public class Shell
 	else
 	  kawa.standard.load.apply(fname,env);
       }
+    catch (gnu.text.SyntaxException e)
+      {
+	e.printAll(OutPort.errDefault(), 20);
+      }
     catch (FileNotFoundException e)
       {
 	System.err.println("Cannot open file "+fname);

@@ -5,6 +5,10 @@ import gnu.lists.*;
 
 public class module_compile_options extends Syntax
 {
+  public static final module_compile_options module_compile_options
+    = new module_compile_options();
+  static { module_compile_options.setName("module-compile-options"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

@@ -10,6 +10,9 @@ import gnu.expr.*;
 
 public class syntax_error extends Syntax
 {
+  public static final syntax_error syntax_error = new syntax_error();
+  static { syntax_error.setName("%syntax-error"); }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     StringBuffer buffer = new StringBuffer ();

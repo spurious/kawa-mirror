@@ -5,6 +5,9 @@ import gnu.lists.*;
 
 public class export extends Syntax
 {
+  public static final export module_export = new export();
+  static { module_export.setName("module-export"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

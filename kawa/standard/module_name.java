@@ -5,6 +5,9 @@ import gnu.lists.*;
 
 public class module_name extends Syntax
 {
+  public static final module_name module_name = new module_name();
+  static { module_name.setName("module-name"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object arg = ((Pair) form.cdr).car;

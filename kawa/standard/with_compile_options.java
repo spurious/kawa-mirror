@@ -8,6 +8,10 @@ import java.util.Stack;
 
 public class with_compile_options extends Syntax
 {
+  public static final with_compile_options with_compile_options
+    = new with_compile_options();
+  static { with_compile_options.setName("with-compile-options"); }
+
   public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
     Stack stack = new Stack();

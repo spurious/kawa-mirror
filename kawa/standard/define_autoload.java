@@ -11,10 +11,16 @@ import gnu.kawa.lispexpr.*;
 
 public class define_autoload extends Syntax
 {
+  public static final define_autoload define_autoload
+    = new define_autoload("define-autoload", false);
+  public static final define_autoload define_autoloads_from_file
+    = new define_autoload("define-autoloads-from-file", true);
+
   boolean fromFile;
 
-  public define_autoload (boolean fromFile)
+  public define_autoload (String name, boolean fromFile)
   {
+    super(name);
     this.fromFile = fromFile;
   }
 

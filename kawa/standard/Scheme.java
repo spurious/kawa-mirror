@@ -32,19 +32,6 @@ public class Scheme extends LispLanguage
     define (name, new AutoloadProcedure (name, className, this));
   }
 
-  protected void define_syntax (String name, Syntax proc)
-  {
-    if (proc.getName() == null)
-      proc.setName(name);
-    define(name, proc);
-  }
-
-  /* Define a Syntax to be autoloaded. */
-  protected void define_syntax (String name, String className)
-  {
-    define (name, new AutoloadSyntax (name, className, environ));
-  }
-
   public static Environment nullEnvironment;
   public static Environment r4Environment;
   public static Environment r5Environment;
@@ -378,7 +365,8 @@ public class Scheme extends LispLanguage
       defProcStFld("set-input-port-prompter!", "kawa.lib.ports");
       defProcStFld("base-uri", "kawa.lib.misc");
 
-      define_syntax ("%syntax-error", "kawa.standard.syntax_error");
+      defProcStFld("%syntax-error", "kawa.standard.syntax_error",
+                   "syntax_error");
 
       r4Environment.setLocked();
       r5Environment = Environment.make("r5rs-environment", r4Environment);
@@ -405,8 +393,11 @@ public class Scheme extends LispLanguage
       defSntxStFld("define-private", "kawa.lib.prim_syntax");
       defSntxStFld("define-constant", "kawa.lib.prim_syntax");
 
-      define_syntax("define-autoload", new define_autoload(false));
-      define_syntax("define-autoloads-from-file", new define_autoload(true));
+      defSntxStFld("define-autoload",
+                   "kawa.standard.define_autoload", "define_autoload");
+      defSntxStFld("define-autoloads-from-file",
+                   "kawa.standard.define_autoload",
+                   "define_autoloads_from_file");
 
       defProcStFld("exit", "kawa.lib.thread");
 
@@ -584,15 +575,21 @@ public class Scheme extends LispLanguage
       defSntxStFld("define-member-alias", "kawa.standard.define_member_alias",
                    "define_member_alias");
       defSntxStFld("require", "kawa.standard.require", "require");
-      define_syntax ("module-name", "kawa.standard.module_name");
-      define_syntax ("module-extends", "kawa.standard.module_extends");
-      define_syntax ("module-implements", "kawa.standard.module_implements");
-      define_syntax ("module-static", "kawa.standard.module_static");
-      define_syntax ("module-export", "kawa.standard.export");
-      define_syntax ("module-compile-options",
-		     "kawa.standard.module_compile_options");
-      define_syntax ("with-compile-options",
-		     "kawa.standard.with_compile_options");
+      defSntxStFld("module-name", "kawa.standard.module_name",
+                   "module_name");
+      defSntxStFld("module-extends", "kawa.standard.module_extends",
+                   "module_extends");
+      defSntxStFld("module-implements", "kawa.standard.module_implements",
+                   "module_implements");
+      defSntxStFld("module-static", "kawa.standard.module_static",
+                   "module_static");
+      defSntxStFld("module-export", "kawa.standard.export", "module_export");
+      defSntxStFld("module-compile-options",
+                   "kawa.standard.module_compile_options",
+                   "module_compile_options");
+      defSntxStFld("with-compile-options",
+                   "kawa.standard.with_compile_options",
+                   "with_compile_options");
 
       defProcStFld("array?", "kawa.lib.arrays");
       defProcStFld("array-rank", "kawa.lib.arrays");

@@ -1,5 +1,21 @@
 2005-03-20  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (define_syntax): Remove - no longer used.
+
+	* kawa/standard/define_autoload.java) <init>: Pass Syntax name in.
+	(define_autoload, define_autoloads_from_file): New static fields.
+	* kawa/standard/export.java (module_export): Likewise.
+	* kawa/standard/module_compile_options.java
+	(module_compile_options): Likewise.
+	* kawa/standard/module_extends.java (module_extends): Likewise.
+	* kawa/standard/module_implements.java (module_implements): Likewise.
+	* kawa/standard/module_name.java (module_name): Likewise.
+	* kawa/standard/module_static.java (module_static): Likewise.
+	* kawa/standard/syntax_error.java (syntax_error); Likewise.
+	* kawa/standard/with_compile_options.java (with_compile_options):
+	Likewise.
+	* kawa/standard/Scheme.java: Change define_syntax -> defSntxStFld.
+
 	* kawa/standard/define_class.java: New constructor.
 	(define_class, define_simple_class): New static "instance" fields.
 	* kawa/standard/constant_fold.java (constant_fold): Likewise.

@@ -6,6 +6,10 @@ import gnu.bytecode.*;
 
 public class module_implements extends Syntax
 {
+  public static final module_implements module_implements
+    = new module_implements();
+  static { module_implements.setName("module-implements"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object args = form.cdr;

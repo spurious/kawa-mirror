@@ -45,7 +45,7 @@ public class ReplBuffer extends Buffer
     Segment segment = new Segment();
     try
       {
-        document.getText(markPos, pos - markPos, segment);
+        getText(markPos, pos - markPos, segment);
       }
     catch (BadLocationException ex)
       {

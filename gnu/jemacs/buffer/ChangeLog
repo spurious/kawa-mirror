@@ -1,3 +1,19 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* Buffer.java:  Now extends DefaultStyledDocument.
+	(document):  Removed field.
+	(getContent):  Removed method, replaced by following method.
+	(getStringContent):  New method.
+	(remove):  Removed, since now inherited.
+	various:  Replated 'document' by 'this' (usually implicit).
+	* BufferWriter.java:  Likewise.
+	* Marker.java:  Likewise.
+	* ProcessMode.java:  Likewise.
+	* ReplBuffer.java:  Likewise.
+	* Window.java:  Likewise.
+
+	* Buffer.java (<clinit>):  Default style depends on java.version.
+
 2000-04-23  Per Bothner  <per@bothner.com>
 
 	* Marker.java (Marker(Marker)):  Fix it.

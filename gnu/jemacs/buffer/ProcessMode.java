@@ -42,7 +42,7 @@ public class ProcessMode extends Mode
 	    int pos = buffer.getDot();
 	    int markPos = processMark.getOffset();
 	    Segment segment = new Segment();
-	    buffer.document.getText(markPos, pos - markPos, segment);
+	    buffer.getText(markPos, pos - markPos, segment);
 	    processMark.setDot(pos);
 	    System.err.println("sent to inf: (pos:"+pos+" pmark:"+markPos+") "+segment.count+" \""+new String(segment.array, segment.offset, segment.count)+"\"");
 	    toInferior.write(segment.array, segment.offset, segment.count);

@@ -28,7 +28,7 @@ public class Window extends javax.swing.JTextPane
    */
   public Window(Buffer buffer, boolean wantModeline)
   {
-    super(buffer.document);
+    super(buffer);
     if (wantModeline)
       modeline = new Modeline(this, buffer.modelineDocument);
     setBuffer(buffer);
@@ -131,7 +131,7 @@ public class Window extends javax.swing.JTextPane
   {
     if (this.buffer == buffer)
       return;
-    setDocument(buffer.document);
+    setDocument(buffer);
     setKeymap(buffer.keymap);
     if (modeline != null)
       modeline.setDocument(buffer.modelineDocument);

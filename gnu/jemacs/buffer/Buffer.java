@@ -3,8 +3,9 @@ import javax.swing.text.*;
 import java.io.*;
 import java.awt.Color;
 import gnu.mapping.InPort;
+import gnu.kawa.util.AbstractString;
 
-public class Buffer
+public class Buffer extends DefaultStyledDocument
 {
   String name;
   String filename;
@@ -21,8 +22,13 @@ public class Buffer
   static Style blueStyle = styles.addStyle("blue", null);
   static
   {
-    StyleConstants.setFontFamily(defaultStyle, "Lucida Sans TypeWriter");
-    StyleConstants.setFontSize(defaultStyle, 14);
+    String version = System.getProperty("java.version");
+    if (version != null
+	&& (version.startsWith("1.2") || version.startsWith("1.3")))
+      {
+	StyleConstants.setFontFamily(defaultStyle, "Lucida Sans TypeWriter");
+	StyleConstants.setFontSize(defaultStyle, 14);
+      }
     StyleConstants.setForeground(redStyle, Color.red);
     StyleConstants.setForeground(blueStyle, Color.blue);
   }
@@ -38,7 +44,6 @@ public class Buffer
   int charWidth;
 
   BufferContent content;
-  DefaultStyledDocument document;
   StyledDocument modelineDocument;
   public final BufferKeymap keymap = new BufferKeymap(this);
 
@@ -57,8 +62,6 @@ public class Buffer
 
   public String getFileName() { return filename; }
 
-  public BufferContent getContent() { return content; }
-
   public void setFileName(String fname)
   {
     if (filename != null && fileBuffers.get(filename) == this)
@@ -70,6 +73,11 @@ public class Buffer
     buffers.put(name, this);
     fileBuffers.put(filename, this);
     redrawModeline();
+  }
+
+  public AbstractString getStringContent ()
+  {
+    return content;
   }
 
   public static Buffer findFile(String fname)
@@ -155,14 +163,18 @@ public class Buffer
 
   public Buffer(String name)
   {
+    this(name, new BufferContent());
+  }
+
+  public Buffer(String name, BufferContent content)
+  {
+    super(content, styles);
     this.name = name;
-    content = new BufferContent();
+    this.content = content;
 
     pointMarker = new Marker(this, 0, BufferContent.AFTER_MARK_KIND);
 
-    document = new javax.swing.text.DefaultStyledDocument(content, styles);
-
-    java.awt.Font defaultFont = document.getFont(defaultStyle);
+    java.awt.Font defaultFont = getFont(defaultStyle);
     java.awt.FontMetrics fm
       = java.awt.Toolkit.getDefaultToolkit().getFontMetrics(defaultFont);
     charHeight = fm.getHeight();
@@ -173,7 +185,7 @@ public class Buffer
     // Needed for proper bidi (bi-directional text) handling.
     // Does cause extra overhead, so should perhaps not be default.
     // Instead only set it if we insert Hebrew/Arabic text?  FIXME.
-    document.putProperty("i18n", Boolean.TRUE);
+    putProperty("i18n", Boolean.TRUE);
     redrawModeline();
   }
 
@@ -272,23 +284,17 @@ public class Buffer
     pointMarker.deleteChar(count);
   }
 
-  public void remove (int start, int count)
-    throws javax.swing.text.BadLocationException
-  {
-    document.remove(start, count);
-  }
-
   public void removeRegion (int start, int end)
     throws javax.swing.text.BadLocationException
   {
-    document.remove(start, end - start);
+    remove(start, end - start);
   }
 
   public void removeAll ()
   {
     try
       {
-	document.remove(0, maxDot());
+	remove(0, maxDot());
       }
     catch (javax.swing.text.BadLocationException ex)
       {
@@ -318,7 +324,7 @@ public class Buffer
   public void save(Writer out)
     throws java.io.IOException, javax.swing.text.BadLocationException
   {
-    int length = document.getLength();
+    int length = getLength();
     int todo = length;
     Segment segment = new Segment();
     int offset = 0;
@@ -327,7 +333,7 @@ public class Buffer
         int count = length;
         if (count > 4096)
           count = 4096;
-        document.getText(offset, count, segment);
+        getText(offset, count, segment);
         out.write(segment.array, segment.offset, segment.count);
         offset += count;
       }
@@ -360,7 +366,7 @@ public class Buffer
         int count = in.read(buffer, 0, buffer.length);
         if (count <= 0)
           break;
-        document.insertString(offset, new String(buffer, 0, count), null);
+        insertString(offset, new String(buffer, 0, count), null);
         offset += count;
       }
   }

@@ -121,7 +121,7 @@ public final class Marker implements Position
 	    if (point + count > buffer.maxDot())
 	      Signal.signal("End of buffer");
 	  }
-        buffer.document.remove(point, count);
+        buffer.remove(point, count);
 
 	// Should not be needed, but seems to be.  Otherwise, getDot()
 	// returns its *old* value, which is `count' characters too high.
@@ -145,7 +145,7 @@ public final class Marker implements Position
     int point = getOffset();
     try
       {
-        buffer.document.insertString(point, string, style);
+        buffer.insertString(point, string, style);
       }
     catch (javax.swing.text.BadLocationException ex)
       {
@@ -172,7 +172,7 @@ public final class Marker implements Position
       {
 	try
 	  {
-	    buffer.document.insertString(point, str, style);
+	    buffer.insertString(point, str, style);
 	  }
 	catch (javax.swing.text.BadLocationException ex)
 	  {

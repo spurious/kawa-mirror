@@ -282,7 +282,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
     moveColumns(count);
     try
       {
-	marker.buffer.document.remove(save, marker.getOffset() - save);
+	marker.buffer.remove(save, marker.getOffset() - save);
       }
     catch (javax.swing.text.BadLocationException ex)
       {
@@ -303,7 +303,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
       unTabifyRestOfLine();
     else if (marker.getOffset() < marker.buffer.maxDot())
       deleteChars(1);
-    AbstractDocument document= marker.buffer.document;
+    AbstractDocument document = marker.buffer;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert((char) x, 1, x == '\n' ? stylePlain : style);
@@ -320,7 +320,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
       unTabifyRestOfLine();
     else
       deleteChars(len);
-    AbstractDocument document= marker.buffer.document;
+    AbstractDocument document = marker.buffer;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert(new String(data, off, len), style);

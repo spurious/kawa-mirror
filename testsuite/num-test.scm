@@ -29,6 +29,7 @@
 (SECTION "convert")
 (test 10000000000 inexact->exact (exact->inexact 10000000000))
 (test 0 inexact->exact 0.0)
+(Test 123451/10 rationalize (inexact->exact 12345.1) (inexact->exact 0.00001))
 
 (SECTION "magnitude")
 (test 4.0 magnitude 4.)

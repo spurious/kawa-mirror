@@ -1,3 +1,9 @@
+Sun Nov  2 10:05:19 1997  Per Bothner  <bothner@cygnus.com>
+
+	* num-test.scm:  Add a test for inexact->exact and rationalize.
+	* Makefile.am:  Pre-compile testing.scm to testing.zip.
+	Always do check-obj; remove MISC_1_1.
+
 Thu May 29 15:08:42 1997  Per Bothner  <bothner@cygnus.com>
 
 	* num-test.scm:  Add some tests for magnitude.

@@ -3,30 +3,32 @@
 JAVA=java
 KAWALIB = ..
 KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa
-KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
-
-MISC_1_1 = check-obj
+KAWATEST = $(KAWA) -e '(load "testing.zip")'
 
 all:
 
-check:  check-scm check-num check-mac check-misc @EXTRA_MISC@
+check:  check-scm check-num check-mac check-misc check-obj
 
-check-scm:
+testing.zip: $(srcdir)/testing.scm
+	$(KAWA) -e '(compile-file "'$(srcdir)/testing.scm'" "testing.zip")'
+
+
+check-scm: testing.zip
 	rm -rf tmp?
 	$(KAWATEST) -e '(define this-file-name "$(srcdir)/test.scm")' \
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
-check-num:
+check-num: testing.zip
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
 
-check-misc:
+check-misc: testing.zip
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
-check-mac:
+check-mac: testing.zip
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
-check-obj:
+check-obj: testing.zip
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \

@@ -3,7 +3,6 @@ import kawa.lang.*;
 
 /**
  * The Syntax transformer that re-writes the "define" Scheme primitive.
- * Currently, only handles top-level definitions.
  * @author	Per Bothner
  */
 

@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.Field;
-import codegen.Access;
-import codegen.ClassType;
+import gnu.bytecode.Field;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
 
 public class cons extends Procedure2 implements Compilable
 {
@@ -25,8 +25,8 @@ public class cons extends Procedure2 implements Compilable
     if (consConstant == null)
       {
 	ClassType thisType = new ClassType ("kawa.standard.cons");
-	consConstant = thisType.new_field ("consProcedure", thisType,
-					   Access.PUBLIC|Access.STATIC);
+	consConstant = thisType.addField("consProcedure", thisType,
+					 Access.PUBLIC|Access.STATIC);
       }
     return new Literal (this, consConstant, comp);
   }

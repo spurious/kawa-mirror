@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.Field;
-import codegen.Access;
-import codegen.ClassType;
+import gnu.bytecode.Field;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
 
 /**
  * Implement the Scheme extended function "vector-append".
@@ -63,8 +63,8 @@ public class vector_append extends ProcedureN implements Compilable
     if (vappendConstant == null)
       {
 	ClassType thisType = new ClassType ("kawa.standard.vector_append");
-	vappendConstant = thisType.new_field ("vappendProcedure", thisType,
-					      Access.PUBLIC|Access.STATIC);
+	vappendConstant = thisType.addField("vappendProcedure", thisType,
+					    Access.PUBLIC|Access.STATIC);
       }
     return new Literal (this, vappendConstant, comp);
   }

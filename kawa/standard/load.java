@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 import java.io.*;
-import codegen.ZipArchive;
-import codegen.ZipLoader;
+import gnu.bytecode.ZipArchive;
+import gnu.bytecode.ZipLoader;
 
 public class load extends Procedure1 {
   public load ()

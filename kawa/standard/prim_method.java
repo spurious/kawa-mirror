@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.Access;
-import codegen.ClassType;
-import codegen.Type;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Type;
 
 // OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
 // 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))

@@ -30,7 +30,7 @@ public class let extends Syntax implements Printable
 	  return tr.syntaxError ("let binding is not a pair");
 	if (! (bind_match[0] instanceof Symbol))
 	  return tr.syntaxError("variable in let binding is not a symbol");
-	Declaration decl = let.add_decl ((Symbol) bind_match[0]);
+	Declaration decl = let.addDeclaration((Symbol) bind_match[0]);
 	inits[i] = tr.rewrite (bind_match[1]);
 	decl.noteValue (inits[i]);
 	bindings = bind_pair.cdr;

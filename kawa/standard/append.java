@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.Field;
-import codegen.Access;
-import codegen.ClassType;
+import gnu.bytecode.Field;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
 
 /**
  * Implement the Scheme standard function "append".
@@ -59,8 +59,8 @@ public class append extends ProcedureN implements Compilable
     if (appendConstant == null)
       {
 	ClassType thisType = new ClassType ("kawa.standard.append");
-	appendConstant = thisType.new_field ("appendProcedure", thisType,
-					     Access.PUBLIC|Access.STATIC);
+	appendConstant = thisType.addField("appendProcedure", thisType,
+					   Access.PUBLIC|Access.STATIC);
       }
     return new Literal (this, appendConstant, comp);
   }

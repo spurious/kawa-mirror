@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.*;
+import gnu.bytecode.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "letrec" primitive.
@@ -32,7 +32,7 @@ public class letrec extends Syntax implements Printable
 	  return tr.syntaxError ("letrec binding is not 2-element list");
 	if (! (bind_match[0] instanceof Symbol))
 	  return tr.syntaxError ("letrec variable is not an identifier");
-	let.add_decl ((Symbol) bind_match[0]);
+	let.addDeclaration((Symbol) bind_match[0]);
 	inits[i] = QuoteExp.undefined_exp;
 	orig_inits[i] = bind_match[1];
 	bindings = bind_pair.cdr;

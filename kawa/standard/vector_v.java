@@ -1,8 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
-import codegen.Field;
-import codegen.Access;
-import codegen.ClassType;
+import gnu.bytecode.Field;
+import gnu.bytecode.Access;
+import gnu.bytecode.ClassType;
 
 public class vector_v extends ProcedureN implements Compilable
 {
@@ -25,8 +25,8 @@ public class vector_v extends ProcedureN implements Compilable
     if (vectorConstant == null)
       {
 	ClassType thisType = new ClassType ("kawa.standard.vector_v");
-	vectorConstant = thisType.new_field ("vectorProcedure", thisType,
-					     Access.PUBLIC|Access.STATIC);
+	vectorConstant = thisType.addField("vectorProcedure", thisType,
+					   Access.PUBLIC|Access.STATIC);
       }
     return new Literal (this, vectorConstant, comp);
   }

@@ -1,8 +1,21 @@
+2003-10-07  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (staticTable):  New static field.
+	(findLiteral):  If not in literalTable, try staticTable, and if that
+	fails, search public static final fields of class.
+	Remove various special cases, such as values.empty.
+	* Compilation (voidConstant, undefinedConstant, emptyConstant,
+	eofConstant):  Remove no-longer needed static fields.
+	(compileConstantToField):  New helper method.
+	(compileConstant):  Use it.
+	* Interpreter.java (trueObject, falseObject, undefinedObject,
+	voidObject):  Remove unused static fields.
+
 2003-10-02  Per Bothner  <per@bothner.com>
 
 	* Undefined.java (undef):  Rename field to undefined, and make it
 	public, final, and initialized.
-	(getInstance):   Just return the value of theundefined field.
+	(getInstance):   Just return the value of the undefined field.
 
 2003-09-18  Per Bothner  <per@bothner.com>
 

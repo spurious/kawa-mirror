@@ -15,6 +15,8 @@ public class LitTable implements ObjectOutput
 
   Hashtable literalTable = new Hashtable (100);
 
+  static Hashtable staticTable =  new Hashtable (100);
+
   int literalsCount;
 
   /** Rembembers literals to initialize (in <clinit>). */
@@ -239,30 +241,58 @@ public class LitTable implements ObjectOutput
     if (value == null)
       return Literal.nullLiteral;
     Literal literal = (Literal) literalTable.get(value);
-    if (literal == null)
+    if (literal != null)
+      return literal;
+    if (comp.immediate)
+      return new Literal (value, this);
+    Class valueClass = value.getClass();
+    Type valueType = Type.make(valueClass);
+
+    synchronized (staticTable)
       {
-	if (value instanceof Boolean)
+	literal = (Literal) staticTable.get(value);
+	if (literal == null || literal.value != value)
 	  {
-	    boolean val = ((Boolean)value).booleanValue ();
-	    literal = new Literal (value,
-				   val ? comp.trueConstant : comp.falseConstant,
-				   this);
+	    if (valueType instanceof ClassType
+		&& staticTable.get(valueClass) == null)
+	      {
+		// This is a convention to note that we've scanned valueType.
+		staticTable.put(valueClass, valueClass);
+		// Add all the static final public fields to staticTable.
+		int needed_mod = Access.STATIC | Access.FINAL | Access.PUBLIC;
+		for (Field fld = ((ClassType) valueType).getFields();
+		     fld != null;  fld = fld.getNext())
+		  {
+		    int mods = fld.getModifiers();
+		    if ((mods & needed_mod) == needed_mod)
+		      {
+			try
+			  {
+			    java.lang.reflect.Field rfld = fld.getReflectField();
+			    Object litValue = rfld.get(null);
+			    if (litValue == null
+				|| ! valueClass.isInstance(litValue))
+			      continue;
+			    Literal lit = new Literal (litValue, fld, this);
+			    staticTable.put(litValue, lit);
+			    staticTable.put(lit, litValue);
+			    if (value == litValue)
+			      literal = lit;
+			  }
+			catch (Throwable ex)
+			  {
+			    error("caught "+ex+" getting static field "+fld);
+			  }
+		      }
+		  }
+	      }
 	  }
-	else if (value == gnu.mapping.Values.empty)
-	  literal = new Literal (value, Compilation.voidConstant, this);
-	else if (value == gnu.lists.LList.Empty)
-	  literal = new Literal (value, Compilation.emptyConstant, this);
-	else if (value == gnu.lists.Sequence.eofValue)
-	  literal = new Literal (value, Compilation.eofConstant, this);
-	else if (value instanceof Undefined)
-	  literal = new Literal (value, Compilation.undefinedConstant, this);
-	else if (comp.immediate)
-	  {
-	    literal = new Literal (value, this);
-	  }
-	else
-	  literal = new Literal (value, Type.make(value.getClass()), this);
       }
+
+    if (literal != null)
+      literalTable.put(value, literal);
+    else
+      literal = new Literal (value, valueType, this);
     return literal;
   }
 

@@ -28,13 +28,6 @@ public abstract class Interpreter
 
   public static Interpreter getInterpreter() { return defaultInterpreter; }
 
-  // These will be moved from here.  FIXME
-  static public final Boolean  trueObject = Boolean.TRUE;
-  static public final Boolean  falseObject = Boolean.FALSE;
-
-  static public final Undefined undefinedObject = new Undefined().getInstance();
-  static public final Object voidObject = Values.empty;
-
   static public final String quote_sym = "quote";
   static public final String unquote_sym = "unquote";
   static public final String unquotesplicing_sym = "unquote-splicing";

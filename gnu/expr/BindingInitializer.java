@@ -25,7 +25,9 @@ public class BindingInitializer extends Initializer
     this.decl = decl;
     next = comp.initChain;
     comp.initChain = this;
-    Type ftype = value == null ? Compilation.typeBinding : value.getType();
+    Type ftype = value != null ? value.getType()
+      : comp.getInterpreter().hasSeparateFunctionNamespace()
+      ? Compilation.typeBinding2 : Compilation.typeBinding;
     field = comp.mainClass.addField (fname, ftype, fflags);
     decl.field = field;
   }
@@ -51,6 +53,8 @@ public class BindingInitializer extends Initializer
 	  code.emitPushString(name);
 	if (createNewBinding)
 	  code.emitInvokeStatic(makeBindingMethod);
+	else if (comp.getInterpreter().hasSeparateFunctionNamespace())
+	  code.emitInvokeStatic(comp.getBinding2Method);
 	else
 	  code.emitInvokeVirtual(comp.getBindingEnvironmentMethod);
       }

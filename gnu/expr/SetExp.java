@@ -26,6 +26,8 @@ public class SetExp extends Expression
   static private int DEFINING_FLAG = 1;
   static private int GLOBAL_FLAG = 2;
   static private int HAS_VALUE = 4;
+  static private int PROCEDURE = 8;
+  static private int SET_IF_UNBOUND = 16;
 
   public final boolean isDefining ()
   {
@@ -39,14 +41,23 @@ public class SetExp extends Expression
 
   /** True if evaluating the SetExp yields the value of the RHS. */
   public final boolean getHasValue()
-  {
-    return (flags & HAS_VALUE) != 0;
-  }
+  { return (flags & HAS_VALUE) != 0; }
 
   public final void setHasValue (boolean value)
-  {
-    if (value) flags |= HAS_VALUE; else flags &= ~HAS_VALUE;
-  }
+  { if (value) flags |= HAS_VALUE; else flags &= ~HAS_VALUE; }
+
+  /** True if this is a functon definition ("defun"). */
+  public final boolean isFuncDef()
+  { return (flags & PROCEDURE) != 0; }
+
+  public final void setFuncDef (boolean value)
+  { if (value) flags |= PROCEDURE; else flags &= ~PROCEDURE; }
+
+  public final boolean isSetIfUnbound()
+  { return (flags & SET_IF_UNBOUND) != 0; }
+
+  public final void setSetIfUnbound (boolean value)
+  { if (value) flags |= SET_IF_UNBOUND; else flags &= ~SET_IF_UNBOUND; }
 
   public SetExp (Declaration decl, Expression val)
   {
@@ -62,6 +73,17 @@ public class SetExp extends Expression
 
   public Object eval (Environment env)
   {
+    if (isSetIfUnbound())
+      {
+	Binding binding = env.getBinding(name);
+	if (! binding.isBound())
+	  binding.set(new_value.eval (env));
+	if (getHasValue())
+	  return name;
+	else
+	  return Values.empty; //FIXME Interpreter.noValue
+      }
+
     Object new_val = new_value.eval (env);
 
     if (binding != null
@@ -90,7 +112,7 @@ public class SetExp extends Expression
 	&& ((LambdaExp) new_value).getInlineOnly())
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
-
+    // FIXME - handle isSetIfUnbound
     boolean needValue = getHasValue() && ! (target instanceof IgnoreTarget);
     if (needValue && binding != null)
       throw new Error("SetExp.compile: not implemented - return value");
@@ -181,8 +203,18 @@ public class SetExp extends Expression
 	new_value.compile (comp, Target.pushObject);
 	if (needValue)
 	  code.emitDup(1, 1);  // dup_x1
-	code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
-			      : comp.putGlobalMethod);
+	Method method;
+	if (isDefining())
+	  {
+	    if (isFuncDef()
+		&& comp.getInterpreter().hasSeparateFunctionNamespace())
+	      method = comp.defineFunctionMethod;
+	    else
+	      method = comp.defineGlobalMethod;
+	  }
+	else
+	  method = comp.putGlobalMethod;
+	code.emitInvokeStatic(method);
       }
 
     if (! needValue)

@@ -143,6 +143,7 @@ public class Declaration
   static final int IS_FLUID = 16;
   static final int PRIVATE = 32;
   static final int IS_SIMPLE = 64;
+  static final int PROCEDURE = 128;
   protected int flags = IS_SIMPLE;
 
   public final void setFlag (boolean setting, int flag)
@@ -166,13 +167,16 @@ public class Declaration
 
   public final void setFluid (boolean fluid) { setFlag(fluid, IS_FLUID); }
 
+  public final boolean isProcedureDecl () { return (flags & PROCEDURE) != 0; }
+
+  public final void setProcedureDecl (boolean val) { setFlag(val, PROCEDURE); }
+
   /** True if the value of the variable is the contents of a Binding. */
   public final boolean isIndirectBinding()
   { return (flags & INDIRECT_BINDING) != 0; }
   public final void setIndirectBinding(boolean indirectBinding)
   {
-    if (indirectBinding) flags |= INDIRECT_BINDING;
-    else flags &= ~INDIRECT_BINDING;
+    setFlag(indirectBinding, INDIRECT_BINDING);
   }
 
   /* Note:  You probably want to use !ignorable(). */

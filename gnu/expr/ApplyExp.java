@@ -30,11 +30,7 @@ public class ApplyExp extends Expression
 
   public Object eval (Environment env)
   {
-    Procedure proc;
-    if (func instanceof ReferenceExp)
-      proc = env.getBinding(((ReferenceExp) func).symbol).getProcedure();
-    else
-      proc = (Procedure) func.eval(env);
+    Procedure proc = (Procedure) func.eval(env);
     int n = args.length;
     Object[] vals = new Object[n];
     for (int i = 0; i < n; i++)
@@ -61,7 +57,7 @@ public class ApplyExp extends Expression
     CodeAttr code = comp.getCode();
     if (args.length == 0)
       {
-	code.emitGetStatic(Compilation.noArgsProcedureField);
+	code.emitGetStatic(Compilation.noArgsField);
 	return;
       }
     LambdaExp caller = comp.curLambda;
@@ -296,18 +292,7 @@ public class ApplyExp extends Expression
       }
 
     if (!tail_recurse)
-      {
-	Expression func = exp.func;
-	ReferenceExp rfunc;
-	if (func instanceof ReferenceExp	
-	    && (rfunc = (ReferenceExp) func).binding == null)
-	  {
-	    code.emitGetStatic(comp.getBindingField(rfunc.symbol));
-	    code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
-	  }
-	else
-	  func.compile (comp, new StackTarget(comp.typeProcedure));
-      }
+      exp.func.compile (comp, new StackTarget(comp.typeProcedure));
 
     boolean toArray
       = (tail_recurse ? func_lambda.min_args != func_lambda.max_args

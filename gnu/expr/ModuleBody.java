@@ -2,7 +2,12 @@ package gnu.expr;
 import gnu.mapping.*;
 
 /**
- * Abstract class for the dummy top-level function of a module. */
+ * Abstract class for the dummy top-level function of a module.
+ *
+ * This provides the functionality of gnu.mapping.ApplyMethodContainer,
+ * but it is class rather than an interface (thus ModuleMethod can use
+ * faster virtual method calls instead of slower interface calls).
+ */
 
 public abstract class ModuleBody extends Procedure0
 {
@@ -18,8 +23,6 @@ public abstract class ModuleBody extends Procedure0
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain (String[] args)
   {
-    // FIXME gnu.exp should not explicitly reference kawa.standard!
-    Environment.setCurrent(new kawa.standard.Scheme().getEnvironment());
     kawa.repl.setArgs(args, 0);
     apply0();
   }

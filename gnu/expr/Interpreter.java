@@ -44,6 +44,13 @@ public abstract class Interpreter
     return Values.empty;
   }
 
+  /** True if functions are in a separate anme space from variable.
+   * Is true for e.g. Common Lisp, Emacs Lisp;  false for Scheme. */
+  public boolean hasSeparateFunctionNamespace()
+  {
+    return false;
+  }
+
   protected Environment environ;
 
   public Environment getEnvironment() { return environ; }
@@ -84,4 +91,8 @@ public abstract class Interpreter
     return getTypeFor(clas).coerceToObject(obj);
   }
 
+  // The compiler finds registerEnvironment by using reflection.
+  //
+  // public static void registerEnvironment()
+  // { Environment.setCurrent(new ...().getEnvironment()); }
 }

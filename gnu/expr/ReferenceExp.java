@@ -24,11 +24,36 @@ public class ReferenceExp extends Expression
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;
 
-  boolean dontDereference;
+  private static int DONT_DEREFERENCE = 1;
+  private static int PROCEDURE_NAME = 2;
+  int flags;
+
   /* If true, must have binding.isBinding().  Don't dereference Binding. */
-  public final boolean getDontDereference() { return  dontDereference; }
-  public final void setDontDereference(boolean dontDereference)
-  { this.dontDereference = dontDereference; }
+  public final boolean getDontDereference()
+  {
+    return (flags & DONT_DEREFERENCE) != 0;
+  }
+
+  public final void setDontDereference(boolean setting)
+  {
+    if (setting) flags |= DONT_DEREFERENCE;
+    else flags &= ~DONT_DEREFERENCE;
+  }
+
+  /** True if this identifier appears in "function call position".
+   * If so, it should be interpreted as a function name, which makes a
+   * difference for languages (like Common Lisp) that have two name spaces. */
+  public final boolean isProcedureName()
+  {
+    return (flags & PROCEDURE_NAME) != 0;
+  }
+
+  /** Note if this identifier appears in "function call position". */
+  public final void setProcedureName(boolean setting)
+  {
+    if (setting) flags |= PROCEDURE_NAME;
+    else flags &= ~PROCEDURE_NAME;
+  }
 
   public ReferenceExp (String symbol)
   {
@@ -52,6 +77,15 @@ public class ReferenceExp extends Expression
     if (binding != null
         && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       throw new Error("internal error: ReferenceExp.eval on lexical binding");
+    Binding bind = env.lookup(symbol);
+    if (isProcedureName() && bind instanceof Binding2)
+      {
+	Object result = ((Binding2) bind).functionValue;
+	if (result != null)
+	  return result;
+      }
+    else if (bind != null)
+      return bind.get();
     return env.getChecked(symbol);
   }
 
@@ -83,7 +117,12 @@ public class ReferenceExp extends Expression
 	    lexp.loadHeapFrame(comp);
 	    code.emitGetField(field);
 	  }
-	code.emitInvokeVirtual(Compilation.getLocationMethod);
+	if (! isProcedureName())
+	  code.emitInvokeVirtual(Compilation.getLocationMethod);
+	else if (! comp.getInterpreter().hasSeparateFunctionNamespace())
+	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
+	else
+	  code.emitGetField(Compilation.functionValueBinding2Field);
       }
     target.compileFromStack(comp, getType());
   }

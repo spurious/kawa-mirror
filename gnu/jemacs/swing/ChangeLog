@@ -1,5 +1,14 @@
 2002-03-24  Per Bothner  <per@bothner.com>
 
+	* BufferContent.java:  Moved here from gnu.jemacs.buffer.
+	* BufferReader.java:  Moved here from gnu.jemacs.buffer.
+	* MarkerReader.java:  Moved here from gnu.jemacs.buffer.
+	* Makefile.am (java_sources);  Update accordingly.
+
+	* SwingBuffer.java (openReader):  New method, implements abstract.
+	* SwingToolkit.java (getFace, setUnderlone, setBold, setForeground,
+	setBackground):  New methods, implementing EToolkit abtract methods.
+
 	* SwingWindow.java (<init>):  Call addKeyListener here, instead of ...
 	(setBuffer):  ... here, which causes it to be called too many times.
 

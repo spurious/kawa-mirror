@@ -150,6 +150,9 @@ DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' \
 
 
 java_sources = \
+  BufferContent.java \
+  BufferReader.java \
+  MarkerReader.java \
   SwingBuffer.java \
   SwingFrame.java \
   SwingToolkit.java \
@@ -160,7 +163,7 @@ PACKAGE_FNAME = gnu-jemacs-swing
 subdir = gnu/jemacs/swing
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-DIST_COMMON = Makefile.am Makefile.in
+DIST_COMMON = ChangeLog Makefile.am Makefile.in
 SOURCES = $(java_sources) $(java_SCM)
 
 all: all-am

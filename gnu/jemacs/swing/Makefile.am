@@ -3,6 +3,9 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  BufferContent.java \
+  BufferReader.java \
+  MarkerReader.java \
   SwingBuffer.java \
   SwingFrame.java \
   SwingToolkit.java \

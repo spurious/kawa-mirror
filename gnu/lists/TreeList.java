@@ -714,26 +714,26 @@ public class TreeList extends AbstractSequence
   }
 
   /* #ifdef JAVA5 */
-  // public Appendable append (char c)
+  // public TreeList append (char c)
   // {
-    // writeChar(c);
-    // return this;
+  //   writeChar(c);
+  //   return this;
   // }
 
-  // public Appendable append (CharSequence csq)
+  // public TreeList append (CharSequence csq)
   // {
-    // if (csq == null)
-      // csq = "null";
-    // return append(csq, 0, csq.length());
+  //   if (csq == null)
+  //     csq = "null";
+  //   return append(csq, 0, csq.length());
   // }
 
-  // public Appendable append (CharSequence csq, int start, int end)
+  // public TreeList append (CharSequence csq, int start, int end)
   // {
-    // if (csq == null)
-      // csq = "null";
-    // for (int i = start; i < end;  i++)
-      // append(csq.charAt(i));
-    // return this;
+  //   if (csq == null)
+  //     csq = "null";
+  //   for (int i = start; i < end;  i++)
+  //     append(csq.charAt(i));
+  //   return this;
   // }
   /* #endif */
 

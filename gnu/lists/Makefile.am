@@ -42,6 +42,7 @@ java_sources = \
   SeqPosition.java \
   Sequence.java \
   SimpleVector.java \
+  SubCharSeq.java \
   SubSequence.java \
   StableVector.java \
   Strings.java \

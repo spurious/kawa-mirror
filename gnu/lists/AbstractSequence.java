@@ -1,11 +1,8 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2005  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-/* #ifdef JAVA2 */
 import java.util.*;
-/* #endif */
-import java.util.Enumeration;
 
 /**
  * An AbstractSequence is used to implement Sequences, and almost all
@@ -75,9 +72,39 @@ public abstract class AbstractSequence
     return new UnsupportedOperationException(text);
     /* #endif */
     /* #ifndef JAVA2 */
-    // throw new RuntimeException(text);
+    // return new RuntimeException(text);
     /* #endif */
   }
+
+  public AbstractSequence append (char c)
+  {
+    throw unsupported("append");
+  }
+
+  /* #ifdef JAVA5 */
+  // public AbstractSequence append (CharSequence csq)
+  //   throws java.io.IOException
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   return append(csq, 0, csq.length());
+  // }
+
+  // public AbstractSequence append (CharSequence csq, int start, int end)
+  //   throws java.io.IOException
+  // {
+  //   if (csq instanceof CharSeq)
+  //     ((CharSeq) csq).writeTo(start, end - start, (Appendable) this);
+  //   else
+  //     {
+  //       if (csq == null)
+  //         csq = "null";
+  //       for (int i = start; i < end;  i++)
+  //         append(csq.charAt(i));
+  //     }
+  //   return this;
+  // }
+  /* #endif */
 
   public Object set(int index, Object element)
   {
@@ -258,8 +285,8 @@ public abstract class AbstractSequence
     int pos = createPos(index, false);
     for (Iterator it = c.iterator();  it.hasNext(); )
       {
-	pos = addPos(pos, it.next());
-	changed = true;
+        pos = addPos(pos, it.next());
+        changed = true;
       }
     releasePos(pos);
     return changed;
@@ -268,20 +295,20 @@ public abstract class AbstractSequence
   /* #ifndef JAVA2 */
   // public boolean addAll(Sequence c)
   // {
-    // return addAll(size(), c);
+  //   return addAll(size(), c);
   // }
 
   // public boolean addAll(int index, Sequence c)
   // {
-    // boolean changed = false;
-    // int pos = createPos(index, false);
-    // for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
-      // {
-	// pos = addPos(pos, getPosPrevious(iter));
-	// changed = true;
-      // }
-    // releasePos(pos);
-    // return changed;
+  //   boolean changed = false;
+  //   int pos = createPos(index, false);
+  //   for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
+  //     {
+  //       pos = addPos(pos, getPosPrevious(iter));
+  //       changed = true;
+  //     }
+  //   releasePos(pos);
+  //   return changed;
   // }
   /* #endif */
 
@@ -717,20 +744,20 @@ public abstract class AbstractSequence
     /* #endif */
     /* #ifndef JAVA2 */
     // if (! (this instanceof Sequence) || ! (o instanceof Sequence))
-      // return this == o;
+    //   return this == o;
     // Enumeration it1 = elements();
     // Enumeration it2 = ((Sequence) o).elements();
     /* #endif */
     for (;;)
       {
-	/* #ifdef JAVA2 */
+        /* #ifdef JAVA2 */
         boolean more1 = it1.hasNext();
         boolean more2 = it2.hasNext();
-	/* #endif */
-	/* #ifndef JAVA2 */
+        /* #endif */
+        /* #ifndef JAVA2 */
         // boolean more1 = it1.hasMoreElements();
         // boolean more2 = it2.hasMoreElements();
-	/* #endif */
+        /* #endif */
         if (more1 != more2)
           return false;
         if (! more1)

@@ -14,6 +14,9 @@ implements CharSeq, Externalizable, Consumable
   /* #ifdef JAVA2 */
   , Comparable
   /* #endif */
+  /* #ifdef JAVA5 */
+  // , Appendable
+  /* #endif */
 {
   public char[] data;
   protected static char[] empty = new char[0];
@@ -242,9 +245,11 @@ implements CharSeq, Externalizable, Consumable
   {
     return new String (data, start, end - start);
   }
-  // If JDK1.4 compatible:
-  // public java.lang.CharSequence subSequence(int start, int end)
-  // { return substring(start, end); }
+
+  public CharSeq subSequence(int start, int end)
+  {
+    return new FString(data, start, end-start);
+  }
 
   public void setCharAt (int index, char ch)
   {
@@ -367,6 +372,67 @@ implements CharSeq, Externalizable, Consumable
       out.write(data, i, end - i);
   }
 
+  /* #ifdef JAVA5 */
+  // public FString append (char c)
+  // {
+  //   int sz = size;
+  //   char[] d;
+  //   if (sz >= data.length)
+  //     {
+  //       d = new char[sz < 60 ? 120 : 2 * sz];
+  //       System.arraycopy(data, 0, d, 0, sz);
+  //       data = d;
+  //     }
+  //   else
+  //     d = data;
+  //   d[sz] = c;
+  //   size = sz + 1;
+  //   return this;
+  // }
+
+  // public FString append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   return append(csq, 0, csq.length());
+  // }
+
+  // public FString append (CharSequence csq, int start, int end)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   /* FIXME optimize to use getChars if csq is a CharSeq. */
+  //   for (int i = start; i < end;  i++)
+  //     append(csq.charAt(i));
+  //   return this;
+  // }
+
+  // public void writeTo(int start, int count, Appendable dest)
+  //    throws java.io.IOException
+  // {
+  //   if (dest instanceof java.io.Writer)
+  //     {
+  //       try
+  //         {
+  //           ((java.io.Writer) dest).write(data, start, count);
+  //         }
+  //       catch (java.io.IOException ex)
+  //         {
+  //           throw new RuntimeException(ex);
+  //         }
+  //     }
+  //   else
+  //     {
+  //       dest.append(this, start, start+count);
+  //     }
+  // }
+
+  // public void writeTo(Appendable dest) throws java.io.IOException
+  // {
+  //   writeTo(0, size, dest);
+  // }
+  /* #endif */
+  /* #ifndef JAVA5 */
   public void writeTo(int start, int count, java.io.Writer dest)
     throws java.io.IOException
   {
@@ -377,6 +443,7 @@ implements CharSeq, Externalizable, Consumable
   {
     dest.write(data, 0, size);
   }
+  /* #endif */
 
   /**
    * @serialData Write 'size' (using writeInt),

@@ -6,7 +6,12 @@ import java.io.*;
 
 /** A Consumer that extends a PrintWriter.  Useful for formatting. */
 
-public class PrintConsumer extends PrintWriter implements Consumer
+public class PrintConsumer extends PrintWriter
+  implements
+  /* #ifdef JAVA5 */
+  // Appendable,
+  /* #endif */
+   Consumer
 {
   public PrintConsumer(Consumer out, boolean autoFlush)
   {
@@ -32,6 +37,30 @@ public class PrintConsumer extends PrintWriter implements Consumer
   protected void startNumber()
   {
   }
+
+  /* #ifdef JAVA5 */
+  // public PrintConsumer append (char c)
+  // {
+  //   writeChar(c);
+  //   return this;
+  // }
+
+  // public PrintConsumer append (CharSequence csq)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   return append(csq, 0, csq.length());
+  // }
+
+  // public PrintConsumer append (CharSequence csq, int start, int end)
+  // {
+  //   if (csq == null)
+  //     csq = "null";
+  //   for (int i = start; i < end;  i++)
+  //     append(csq.charAt(i));
+  //   return this;
+  // }
+  /* #endif */
 
   public void writeChar(int v)
   {

@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2005  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -66,6 +66,18 @@ public class CharBuffer extends StableVector implements CharSeq
       index += gapEnd - gapStart;
     string.setCharAt(index, value);
   }
+
+  /* #ifdef JAVA5 */
+  // public SubCharSeq subSequence(int start, int end)
+  // {
+  //   int sz = size();
+  //   if (start < 0 || end < start || end > sz)
+  //     throw new IndexOutOfBoundsException();
+  //   return new SubCharSeq(this,
+  //                         base.createPos(start, false),
+  //                         base.createPos(end, true));
+  // }
+  /* #endif */
 
   public void fill(int fromIndex, int toIndex, char value)
   {
@@ -143,6 +155,23 @@ public class CharBuffer extends StableVector implements CharSeq
 	return sbuf.toString();
       }
   }
+
+  /* #ifdef JAVA5 */
+  // public void writeTo(int start, int count, Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   if (dest instanceof java.io.Writer)
+  //     writeTo(start, count, (java.io.Writer) dest);
+  //   else
+  //     dest.append(this, start, start+count);
+  // }
+
+  // public void writeTo(Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   writeTo(0, size(), dest);
+  // }
+  /* #endif */
 
   public void writeTo(int start, int count, java.io.Writer dest)
     throws java.io.IOException

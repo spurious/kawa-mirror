@@ -1,5 +1,17 @@
 2005-01-07  Per Bothner  <per@bothner.com>
 
+	* CharSeq.java: #ifdef JAVA5 also extend CharSequence.
+	(writeTo): If Java 5, output is Appendable, not Writer.
+	* SubCharSeq.java: New class extends SubSequence implements CharSeq.
+	* Makefile.am: Update accordingly.
+	* AbstractSequence.java (append): New Java5 methods.
+	* CharBuffer.java (subSequence, writeTo): New Java 5 methods.
+	* FString.java: #ifdfe JAVA5, implement Appendable.
+	(subSequence, append, writeTo): New Java 5 methods.
+	* PrintConsumer.java: #ifdef JAVA5, implement Appendable.
+	(append): New Jav5 methods.
+	* TreeList.java (append): Make methods return more specific TreeList.
+
 	* LList.java: Partially de-tabify.
 	* SimpleVector.java: Likewise.
 	* SubSequence.java (get): Check index in range.

@@ -3,9 +3,11 @@ import gnu.text.*;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
+import java.text.NumberFormat;
 import java.io.Writer;
 import gnu.math.*;
 import kawa.lang.*;
+import gnu.mapping.OutPort;
 
 /** A representation of a parsed Common Lisp-style format. */
 
@@ -135,17 +137,32 @@ public class LispFormat extends CompoundFormat
 	  case 'P':
 	    fmt = LispPluralFormat.getInstance(seenColon, seenAt);
 	    break;
+	  case 'E':
 	  case 'F':
-	    LispRealFormat rfmt = new LispRealFormat();
-	    rfmt.width = getParam(stack, speci);
-	    rfmt.precision = getParam(stack, speci+1);
-	    rfmt.scale = getParam(stack, speci+2);
-	    rfmt.overflowChar = getParam(stack, speci+3);
-	    rfmt.padChar = getParam(stack, speci+4);
-	    rfmt.showPlus = seenAt;
-	    fmt = rfmt;
+	  case 'G':
+	  case '$':
+	    LispRealFormat dfmt = new LispRealFormat();
+	    dfmt.op = ch;
+	    dfmt.arg1 = getParam(stack, speci);
+	    dfmt.arg2 = getParam(stack, speci+1);
+	    dfmt.arg3 = getParam(stack, speci+2);
+	    dfmt.arg4 = getParam(stack, speci+3);
+	    if (ch != '$')
+	      {
+		dfmt.arg5 = getParam(stack, speci+4);
+		if (ch == 'E' || ch == 'G')
+		  {
+		    dfmt.arg6 = getParam(stack, speci+5);
+		    dfmt.arg7 = getParam(stack, speci+6);
+		  }
+	      }
+	    dfmt.showPlus = seenAt;
+	    dfmt.internalPad = seenColon;
+	    if (dfmt.argsUsed == 0)
+	      fmt = dfmt.resolve(null, 0);
+	    else
+	      fmt = dfmt;
 	    break;
-	  case 'E':  case 'G':  case '$':  // FIXME
 	  case 'A':  case 'S':
 	    fmt = ObjectFormat.getInstance(ch == 'S');
 	    if (numParams > 0)
@@ -272,13 +289,15 @@ public class LispFormat extends CompoundFormat
 	      litbuf.append(ch);
 	    if (! seenColon)
 	      {
-		for (;;)
+		while (i < limit)
 		  {
 		    ch = format[i++];
 		    if (! Character.isWhitespace(ch))
-		      break;
+		      {
+			i--;
+			break;
+		      }
 		  }
-		i--;
 	      }
 	    continue;
 	  case '!':
@@ -287,7 +306,20 @@ public class LispFormat extends CompoundFormat
 	  case 'T':
 	    param1 = getParam(stack, speci);
 	    param2 = getParam(stack, speci+1);
-	    fmt = new LispTabulateFormat(param1, param2, seenAt);
+	    param3 = getParam(stack, speci+2);
+	    fmt = new LispTabulateFormat(param1, param2, param3, seenAt);
+	    break;
+	  case '&':
+	    param1 = getParam(stack, speci);
+	    fmt = new LispFreshlineFormat(param1);
+	    break;
+	  case '_':  // FIXME actually conditional newline
+	    param1 = getParam(stack, speci);
+	    if (param1 == PARAM_UNSPECIFIED)
+	      param1 = 1;
+	    charVal = seenColon && seenAt ? '\n' : ' ';
+	    fmt = LispCharacterFormat.getInstance(charVal, param1,
+						  false, false);
 	    break;
 	  case '~':
 	    if (numParams == 0)
@@ -296,7 +328,6 @@ public class LispFormat extends CompoundFormat
 		continue;
 	      }
 	    /* ... otherwise fall through ... */
-	  case '&':  // should actually do (fresh-line) FIXME
 	  case '|':
 	  case '%':
 	    int count = getParam(stack, speci);
@@ -305,7 +336,7 @@ public class LispFormat extends CompoundFormat
 	    // EXTENSION:  Allow repeating other characters than '~'.
 	    charVal = getParam(stack, speci+1);
 	    if (charVal == PARAM_UNSPECIFIED) 
-	      charVal = ch == '|' ? '\f' : ch == '%' || ch == '&' ? '\n' : '~';
+	      charVal = ch == '|' ? '\f' : ch == '%' ? '\n' : '~';
 	    fmt = LispCharacterFormat.getInstance(charVal, count,
 						  false, false);
 	    break;
@@ -449,7 +480,7 @@ public class LispFormat extends CompoundFormat
    * Note that parameters are numbered from 1 to numParams(speci).
    * The list of arguments to be converted is args, with the current index
    * (as of the start of this conversion, i.e. not taking into account
-   * earlier PARAM_FROM_LIST paramaters for thsi conversion) in start.
+   * earlier PARAM_FROM_LIST paramaters for this conversion) in start.
    * The default value (used if PARAM_UNSPECIFIED) is defaultValue.
    */
   /*
@@ -760,14 +791,14 @@ class LispObjectFormat extends ReportFormat
 		    Writer dst, FieldPosition fpos) 
     throws java.io.IOException
   {
-    int minWidth = LispFormat.getParam(this.minWidth, 0, args, start); 
-    if (this.minWidth == LispFormat.PARAM_FROM_LIST)  start++; 
-    int colInc = LispFormat.getParam(this.colInc, 1, args, start); 
-    if (this.colInc == LispFormat.PARAM_FROM_LIST)  start++; 
-    int minPad = LispFormat.getParam(this.minPad, 0, args, start); 
-    if (this.minPad == LispFormat.PARAM_FROM_LIST)  start++; 
-    char padChar = LispFormat.getParam(this.padChar, ' ', args, start); 
-    if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++; 
+    int minWidth = LispFormat.getParam(this.minWidth, 0, args, start);
+    if (this.minWidth == LispFormat.PARAM_FROM_LIST)  start++;
+    int colInc = LispFormat.getParam(this.colInc, 1, args, start);
+    if (this.colInc == LispFormat.PARAM_FROM_LIST)  start++;
+    int minPad = LispFormat.getParam(this.minPad, 0, args, start);
+    if (this.minPad == LispFormat.PARAM_FROM_LIST)  start++;
+    char padChar = LispFormat.getParam(this.padChar, ' ', args, start);
+    if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++;
     return gnu.text.PadFormat.format(base, args, start, dst,
 				     padChar, minWidth, colInc, minPad,
 				     where, fpos);
@@ -1078,17 +1109,45 @@ class LispRepositionFormat extends ReportFormat
   }
 }
 
+class LispFreshlineFormat  extends ReportFormat
+{
+  int count;
+
+  public LispFreshlineFormat (int count)
+  {
+    this.count = count;
+  }
+
+  public int format(Object[] args, int start, Writer dst, FieldPosition fpos)  
+    throws java.io.IOException 
+  {
+    int count = LispFormat.getParam(this.count, 1, args, start);
+    if (this.count == LispFormat.PARAM_FROM_LIST)  start++;
+    int column = -1;
+    if (dst instanceof OutPort)
+      column = ((OutPort) dst).getColumnNumber();
+    if (column == 0)
+      count--;
+    while (--count >= 0)
+      dst.write('\n');
+    return start; 
+  }
+}
+
 class LispTabulateFormat extends ReportFormat
 {
   boolean relative;
   int colnum;
   int colinc;
+  int padChar;
 
-  public LispTabulateFormat(int colnum, int colinc, boolean relative)
+  public LispTabulateFormat(int colnum, int colinc,
+			    int padChar, boolean relative)
   {
     this.colnum = colnum;
     this.colinc = colinc;
     this.relative = relative;
+    this.padChar = padChar;
   }
 
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)  
@@ -1098,80 +1157,150 @@ class LispTabulateFormat extends ReportFormat
     if (this.colnum == LispFormat.PARAM_FROM_LIST)  start++;
     int colinc = LispFormat.getParam(this.colinc, 1, args, start);
     if (this.colinc == LispFormat.PARAM_FROM_LIST)  start++;
-    // FIXME - need to figure out dst's current column number!
-    if (! relative)
-      colnum = 2;
-    while (--colnum >= 0)
-      dst.write(' ');
+    // Extension from SLIB:
+    char padChar = LispFormat.getParam(this.padChar, ' ', args, start); 
+    if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++; 
+    int column = -1;
+    if (dst instanceof OutPort)
+      column = ((OutPort) dst).getColumnNumber();
+    int spaces;
+    if (column >= 0)
+      {
+	if (! relative)
+	  {
+	    if (column < colnum)
+	      spaces = colnum - column;
+	    else if (colinc <= 0)
+	      spaces = 0;
+	    else
+	      spaces = colinc - (column - colnum) % colinc;
+	  }
+	else
+	  {
+	    spaces = colnum + colinc - (column + colnum) % colinc;
+	  }
+      }
+    else
+      {
+	spaces = relative ? colnum : 2;
+      }
+    while (--spaces >= 0)
+      dst.write(padChar);
     return start;
   }
 }
 
-/* Incomplete support for ~F (requires explicit precision). */
+/* Support for ~F, ~$, ~E, ~G. */
 
 class LispRealFormat extends ReportFormat
 {
   char op;
-  int width;
-  int precision;
-  int scale;
-  int overflowChar;
-  int padChar;
+  int arg1;
+  int arg2;
+  int arg3;
+  int arg4;
+  int arg5;
+  int arg6;
+  int arg7;
   boolean showPlus;
+  boolean internalPad;
+  /** Twice the number of args consumed; odd if any arg is PARAM_FROM_COUNT. */
+  int argsUsed;
+
+  LispRealFormat()
+  {
+    argsUsed = (arg1 == LispFormat.PARAM_FROM_COUNT
+		|| arg2 == LispFormat.PARAM_FROM_COUNT
+		|| arg3 == LispFormat.PARAM_FROM_COUNT
+		|| arg4 == LispFormat.PARAM_FROM_COUNT
+		|| arg5 == LispFormat.PARAM_FROM_COUNT
+		|| arg6 == LispFormat.PARAM_FROM_COUNT
+		|| arg7 == LispFormat.PARAM_FROM_COUNT) ? 1 : 0;
+    if (arg1 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg2 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg3 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg4 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg5 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg6 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+    if (arg7 == LispFormat.PARAM_FROM_LIST) argsUsed += 2;
+  }
+
+  public Format resolve (Object[] args, int start)
+  {
+    if (op == '$')
+      {
+	FixedRealFormat mfmt = new FixedRealFormat();
+	int decimals = LispFormat.getParam(this.arg1, 2, args, start);
+	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
+	int digits = LispFormat.getParam(this.arg2, 1, args, start);
+	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
+	int width = LispFormat.getParam(this.arg3, 0, args, start);
+	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
+	char padChar = LispFormat.getParam(this.arg4, ' ', args, start);
+	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
+
+	mfmt.setMaximumFractionDigits(decimals);
+	mfmt.setMinimumIntegerDigits(digits);
+	mfmt.width = width;
+	mfmt.padChar = padChar;
+	mfmt.internalPad = internalPad;
+	mfmt.showPlus = showPlus;
+	return mfmt;
+      }
+    else if (op == 'F')
+      {
+	FixedRealFormat mfmt = new FixedRealFormat();
+	int width = LispFormat.getParam(this.arg1, 0, args, start);
+	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
+	int decimals = LispFormat.getParam(this.arg2, -1, args, start);
+	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
+	int scale = LispFormat.getParam(this.arg3, 0, args, start);
+	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
+	mfmt.overflowChar = LispFormat.getParam(this.arg4, '\0', args, start);
+	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
+	char padChar = LispFormat.getParam(this.arg5, ' ', args, start);
+	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
+	mfmt.setMaximumFractionDigits(decimals);
+	mfmt.setMinimumIntegerDigits(0);
+	mfmt.width = width;
+	mfmt.scale = scale;
+	mfmt.padChar = padChar;
+	mfmt.internalPad = internalPad;
+	mfmt.showPlus = showPlus;
+	return mfmt;
+      }
+    else // if (op == 'E' || op == 'G')
+      {
+	ExponentialFormat efmt = new ExponentialFormat();
+	efmt.width = LispFormat.getParam(this.arg1, 0, args, start);
+	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.fracDigits = LispFormat.getParam(this.arg2, -1, args, start);
+	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.expDigits = LispFormat.getParam(this.arg3, 0, args, start);
+	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.intDigits = LispFormat.getParam(this.arg4, 1, args, start);
+	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.overflowChar = LispFormat.getParam(this.arg5, '\0', args, start);
+	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.padChar = LispFormat.getParam(this.arg6, ' ', args, start);
+	if (this.arg6 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.exponentChar = LispFormat.getParam(this.arg7, 'E', args, start);
+	if (this.arg7 == LispFormat.PARAM_FROM_LIST)  start++;
+	efmt.general = op == 'G';
+	efmt.showPlus = showPlus;
+	return efmt;
+      }
+  }
 
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
     throws java.io.IOException
   {
-    int width = LispFormat.getParam(this.width, -1, args, start);
-    if (this.width == LispFormat.PARAM_FROM_LIST)  start++;
-    int precision = LispFormat.getParam(this.precision, -1, args, start);
-    if (this.precision == LispFormat.PARAM_FROM_LIST)  start++;
-    int scale = LispFormat.getParam(this.scale, 0, args, start);
-    if (this.scale == LispFormat.PARAM_FROM_LIST)  start++;
-    char padChar = LispFormat.getParam(this.padChar, ' ', args, start); 
-    if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++; 
-    char overflowChar = LispFormat.getParam(this.overflowChar,
-					    '\uFFFF', args, start); 
-    if (this.overflowChar == LispFormat.PARAM_FROM_LIST)  start++; 
-    double value = ((Number) args[start++]).doubleValue();
-    if (precision >= 0)
-      {
-	java.text.DecimalFormat fmt
-	  = new java.text.DecimalFormat();
-	// FIXME what if current locale uses ',' for decmal point?
-	fmt.setDecimalSeparatorAlwaysShown(true);
-	if (scale == 2)
-	  fmt.setMultiplier(100);
-	else if (scale == 3)
-	  fmt.setMultiplier(1000);
-	else if (scale != 0)
-	  value = value * Math.pow(10.0, (double) scale);
-	if (showPlus)
-	  fmt.setPositivePrefix("+");
-	fmt.setMinimumFractionDigits(precision);
-	fmt.setMaximumFractionDigits(precision);
-	String str = fmt.format(value);
-	int str_len = str.length();
-	if (width > 0)
-	  {
-	    if (str_len < width)
-	      {
-		for (int i = width - str_len;  --i >= 0; )
-		  dst.write(padChar);
-	      }
-	    else if (str_len > width && overflowChar != '\uFFFF')
-	      {
-		for (int i = width;  --i >= 0; )
-		  dst.write(overflowChar);
-		return start;
-	      }
-	  }
-	print(dst, str);
-	return start;
-      }
-    if (scale != 0)
-      value = value * Math.pow(10.0, (double) scale);
-    print(dst, Double.toString(value));
+    StringBuffer sbuf = new StringBuffer(100);
+    Format fmt = resolve(args, start);
+    start += argsUsed >> 1;
+    RealNum value = (RealNum) args[start++];
+    fmt.format(value, sbuf, fpos);
+    dst.write(sbuf.toString());
     return start;
   }
 }

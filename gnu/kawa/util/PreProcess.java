@@ -231,7 +231,26 @@ public class PreProcess
 	if (arg.charAt(0) == '+')
 	  pp.keywords.put(arg.substring(1), Boolean.TRUE);
 	else if (arg.charAt(0) == '-')
-	  pp.keywords.put(arg.substring(1), Boolean.FALSE);
+	  {
+	    int eq = arg.indexOf('=');
+	    if (eq > 1)
+	      {
+		String keyword
+		  = arg.substring(arg.charAt(1) == '-' ? 2 :1, eq);
+		String value = arg.substring(eq+1);
+		Boolean b = Boolean.FALSE;
+		if (value.equalsIgnoreCase("true"))
+		  b = Boolean.TRUE;
+		else if (! value.equalsIgnoreCase("false"))
+		  {
+		    System.err.println("invalid value "+value+" for "+keyword);
+		    System.exit(-1);
+		  }
+		pp.keywords.put(keyword, b);
+	      }
+	    else
+	      pp.keywords.put(arg.substring(1), Boolean.FALSE);
+	  }
 	else
 	  {
 	    try

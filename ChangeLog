@@ -1,3 +1,10 @@
+1999-08-07  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/GetFieldProc.java (compile):  Don't inline if class was
+ 	loaded with an ArrayClassLoader.
+	* kawa/lang/SetFieldProc.java (compile):  Likewise.
+	* kawa/lang/Record.java (toString):  Don't print static fields.
+	
 1999-08-06  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Revert use of javatop macro.

@@ -91,7 +91,13 @@ public class Compare extends Procedure2 implements CanInline
       }
     String str1 = StringValue.stringValue(arg1);
     String str2 = StringValue.stringValue(arg2);
-    return ((1 << (3 + str1.compareTo(str2))) & flags) != 0;
+    int comp = str1.compareTo(str2);
+    if (comp < 0)
+      return (flags & TRUE_IF_LSS+TRUE_IF_NEQ) != 0;
+    else if (comp > 0)
+      return (flags & TRUE_IF_GRT+TRUE_IF_NEQ) != 0;
+    else
+      return (flags & TRUE_IF_EQU) != 0;
   }
 
   public Object apply2 (Object arg1, Object arg2)

@@ -7,9 +7,11 @@ java_sources = \
   BooleanValue.java \
   Children.java \
   Compare.java \
+  IndexOf.java \
   IntegerRange.java \
   IsEmptySequence.java \
   ItemAt.java \
+  LastIndexOf.java \
   MakeAttribute.java \
   MakeElement.java \
   MinMax.java \

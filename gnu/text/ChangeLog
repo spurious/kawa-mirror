@@ -1,3 +1,8 @@
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	* NullReader.java, CharArrayInPort.java:  Moved from kawa/lang.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new files.
+
 1999-10-20  Bruce Lewis  <brlewis@alum.mit.edu>
 
 	* gnu/text/LispReader.java: readListBody now takes an int

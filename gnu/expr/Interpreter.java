@@ -200,15 +200,38 @@ public abstract class Interpreter
     environ.define(name, ClassMethods.apply(cname, mname));
   }
 
+  // to be removed.
   protected void define_field (String name, String cname, String fname)
   {
     StaticFieldConstraint.define(environ, name, cname, fname);
   }
 
+  // to be removed.
   protected void define_field (String name, String cname)
   {
     StaticFieldConstraint.define(environ, name, cname,
 				 Compilation.mangleNameIfNeeded(name));
+  }
+
+  /** Declare in the current Environment a procedure bound to a static field.
+   * @param name the procedure's source-level name.
+   * @param cname the name of the class containing the field.
+   * @param fname the name of the field, which should be a static
+   *   final field whose type extends gnu.mapping.Procedure.
+   */
+  protected void defProcStFld(String name, String cname, String fname)
+  {
+    StaticFieldConstraint.define(environ, name, cname, fname);
+  }
+
+  /** Declare in the current Environment a procedure bound to a static field.
+   * @param name the procedure's source-level name.
+   * @param cname the name of the class containing the field.
+   * The name of the field is the manling of <code>name</code>.
+   */
+  protected void defProcStFld(String name, String cname)
+  {
+    defProcStFld(name, cname, Compilation.mangleNameIfNeeded(name));
   }
 
   /** Enter a named function into the current environment. */

@@ -7,7 +7,7 @@ EXTRA_GCJ_INPUTS =  *.class
 EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
 
 if ENABLE_XML
-XML_SCM = XML.scm
+XML_SCM = XML.scm XStrings.scm
 endif
 if ENABLE_SERVLET
 SERVLET_SCM = HTTP.scm

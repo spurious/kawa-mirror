@@ -1,3 +1,8 @@
+2002-05-18  Per Bothner  <per@bothner.com>
+
+	* XStrings.scm:  New file, containing substring and string-length.
+	* Makefile.am (XML_SCM):  Add XStrings.scm.
+
 2002-05-06  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm (request-servlet-path):  New function.

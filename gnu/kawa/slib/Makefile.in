@@ -153,7 +153,7 @@ PACKAGE_FNAME = gnu-kawa-slib
 EXTRA_GCJ_INPUTS = *.class
 EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
 
-@ENABLE_XML_TRUE@XML_SCM = XML.scm
+@ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm
 @ENABLE_SERVLET_TRUE@SERVLET_SCM = HTTP.scm
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm srfi1.scm readtable.scm \
   $(XML_SCM) $(SERVLET_SCM)

@@ -132,7 +132,7 @@ public abstract class ScopeExp extends Expression
     if (decl == null)
       {
 	decl = addDeclaration(name);
-	decl.setFlag(Declaration.NOT_DEFINING);
+	decl.flags |= Declaration.NOT_DEFINING | Declaration.IS_UNKNOWN;
       }
     return decl;
   }
@@ -143,10 +143,9 @@ public abstract class ScopeExp extends Expression
     Declaration decl = lookup(name);
     if (decl == null)
       decl = addDeclaration(name);
-    else if (decl.getFlag(Declaration.NOT_DEFINING))
-      decl.setFlag(false, Declaration.NOT_DEFINING);
-    else if (decl.getFlag(Declaration.IS_UNKNOWN))
-      decl.setFlag(false, Declaration.IS_UNKNOWN);
+    else if ((decl.flags & (Declaration.NOT_DEFINING | Declaration.IS_UNKNOWN))
+	     != 0)
+      decl.flags &= ~ (Declaration.NOT_DEFINING|Declaration.IS_UNKNOWN);
     else
       {
 	StringBuffer sbuf = new StringBuffer(200);

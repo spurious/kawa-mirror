@@ -162,6 +162,13 @@ public class Declaration
     return ((QuoteExp) value).getValue();
   }
 
+  /** This prefix is prepended to field names for unknown names. */
+  static final String UNKNOWN_PREFIX = "id$";
+
+  /** This prefix is used in field names for a declaration that has
+   * both EXTERNAL_ACCESS and IS_PRIVATE set. */
+  public static final String PRIVATE_PREFIX = "$Prvt$";
+
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -184,6 +191,11 @@ public class Declaration
 
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
+
+  /** This flag bit is set if this can be be acceessed from other modules.
+   * Ignored unless PRIVATE.
+   * Used for an exported macro that references a non-exported name. */
+  public static final int EXTERNAL_ACCESS = 0x80000;
 
   protected int flags = IS_SIMPLE;
 
@@ -486,9 +498,13 @@ public class Declaration
   {
     setSimple(false);
     String fname = getName();
+    boolean external_access = (flags & EXTERNAL_ACCESS+PRIVATE)
+      == EXTERNAL_ACCESS+PRIVATE;
     fname = Compilation.mangleName(fname);
     if (getFlag(IS_UNKNOWN))
-      fname = "id$" + fname;
+      fname = UNKNOWN_PREFIX + fname;
+    if (external_access)
+      fname = PRIVATE_PREFIX + fname;
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
@@ -496,7 +512,7 @@ public class Declaration
       setIndirectBinding(true);
     if (isIndirectBinding() || isConstant)
       fflags |= Access.FINAL;
-    if (! isPrivate())
+    if (! isPrivate() || external_access)
       fflags |= Access.PUBLIC;
     if (getFlag(STATIC_SPECIFIED)
 	|| (isConstant && value instanceof QuoteExp))

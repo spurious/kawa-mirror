@@ -1,5 +1,11 @@
 2002-05-28  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (UNKNOWN_PREFIX. PRIVATE_PREFIX, EXTERNAL_ACCESS):
+	New constants.
+	(makeField):  Pre-pend PRIVATE_PREFIX if appropriate.
+	* ScopeExp.java (getNoDefine):  Also set IS_UNKNOWN.
+	(getDefine):  Clear both NOT_DEFINING an IS_UNKNOWN.
+
 	* LetExp.java (print):  Print Declaration, not just its name.
 	* ReferenceExp.java (print):  Print Declaration if known.
 	* SetExp.java (print):  Likewise.

@@ -80,8 +80,12 @@ public class Declaration extends Variable
     if (field != null)
       {
         if (! field.getStaticFlag())
-          loadOwningObject(comp);
-	code.emitGetField(field);
+          {
+            loadOwningObject(comp);
+            code.emitGetField(field);
+          }
+        else
+          code.emitGetStatic(field);
       }
     else
       code.emitLoad(this);

@@ -115,7 +115,10 @@ public class SetExp extends Expression
             if (! field.getStaticFlag())
               binding.loadOwningObject(comp);
 	    new_value.compile (comp, field.getType());
-	    code.emitPutField(field);
+            if (field.getStaticFlag())
+              code.emitPutStatic(field);
+            else
+              code.emitPutField(field);
             /*
             if (binding.context instanceof ModuleExp && ! binding.isPrivate())
               {

@@ -1,7 +1,12 @@
+1999-12-05  Daniel Bonniot <bonniot@cma.ensmp.fr>
+
+	* Declaration.java (load):  Call emitPutStatic if appropriate.
+	* SetExp.java (compile):  Likewise.
+
 1999-11-28  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (capture):  When chasing down callers of
-	inline-only functions, wach out for infinite cycles.
+	inline-only functions, watch out for infinite cycles.
 	* FindTailCalls.java (walkLambdaExp): If child has one *or zero*
  	callers, mark it as inline-only.
 

@@ -1,6 +1,6 @@
 ;;; For now these are written in Scheme.
 ;;; They should be re-written in Common Lisp, but there are still some
-;;; limitations in the Common Lisp supprt making that difficult.
+;;; limitations in the Common Lisp support making that difficult.
 
 (define (car x)
   (if (eq? x '()) x (slot-ref (as <pair> x) 'car)))
@@ -37,33 +37,33 @@
 ;; mapatoms
 ;; unintern
 
-;;(define (symbol-plist symbol)
-;;  (invoke-static <gnu.commonlisp.lang.Symbols> 'getPropertyList symbol))
+(define (symbol-plist symbol)
+ (gnu.mapping.PropertyLocation:getPropertyList symbol))
 
-;;(define (setplist symbol plist)
-;;  (invoke-static <gnu.commonlisp.lang.Symbols> 'setPropertyList symbol plist)
-;;  plist)
+(define (setplist symbol plist)
+  (gnu.mapping.PropertyLocation:setPropertyList symbol plist)
+  plist)
 
 (define (plist-get plist prop #!optional default)
-  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistGet plist prop default))
+  (gnu.mapping.PropertyLocation:plistGet plist prop default))
 
 (define (plist-put plist prop value)
-  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistPut plist prop value))
+  (gnu.mapping.PropertyLocation:plistPut plist prop value))
 
 (define (plist-remprop plist prop)
-  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistRemove plist prop))
+  (gnu.mapping.PropertyLocation:plistRemove plist prop))
 
 (define (plist-member plist prop)
   (if (eq?
-       (invoke-static <gnu.commonlisp.lang.Symbols> 'plistGet plist prop #!void)
+       (gnu.mapping.PropertyLocation:plistGet plist prop #!void)
        #!void)
       '() 't))
 
 (define (get (symbol :: <gnu.mapping.Symbol>) property #!optional (default '()))
-  (invoke symbol 'getProperty property default))
+  (gnu.mapping.PropertyLocation:getProperty symbol property default))
 
-(define (put (symbol :: <gnu.mapping.Symbol>) property value)
-  (invoke symbol 'setProperty property value))
+(define (put symbol property value)
+  (gnu.mapping.PropertyLocation:putProperty symbol property value))
 
 ;; VARIABLES
 
@@ -71,14 +71,14 @@
 ;;     binding nor a global value.
 
 (define (symbol-value sym)
-  (invoke (invoke-static <gnu.commonlisp.lang.Symbols> 'getSymbol sym) 'get))
+  (invoke (gnu.mapping.Environment:getCurrent) 'get (invoke-static <gnu.commonlisp.lang.Symbols> 'getSymbol sym)))
 
 ;; setq
 
 ;(define (make-symbol NAME)  ...)
 
 (define (set symbol value)
-  (invoke-static <gnu.commonlisp.lang.Symbols> 'setValueBinding symbol value))
+  (invoke (gnu.mapping.Environment:getCurrent) 'put (invoke-static <gnu.commonlisp.lang.Symbols> 'getSymbol sym) value))
 
 #|
 (define (add-to-list symbol value)
@@ -153,3 +153,6 @@
 
 (define (char-to-string ch)
   (make <string> 1 (invoke-static <gnu.commonlisp.lang.CommonLisp> 'asChar ch)))
+
+(define (functionp x) <clisp:boolean>
+  (instance? x <function>))

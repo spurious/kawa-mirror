@@ -340,7 +340,6 @@ public class Translator extends Object
 
   /**
    * Re-write a Scheme <body> in S-expression format into internal form.
-   * Does not yet handle internal defines.
    */
 
   public Expression rewrite_body (Object exp)

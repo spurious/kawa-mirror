@@ -165,7 +165,6 @@ public class Lambda extends Syntax implements Printable
               }
           }
 	else if (pair.car instanceof Pair
-                 && mode != Special.rest
 		 && (p = (Pair) pair.car).car instanceof String
 		 && p.cdr instanceof Pair)
           {
@@ -225,7 +224,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else
 	  {
-	    tr.syntaxError ("parameter is neither name nor (name default)");
+	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)");
 	    return;
 	  }
 	if (mode == Special.optional || mode == Special.key)
@@ -241,18 +240,20 @@ public class Lambda extends Syntax implements Printable
           }
 	if (typeSpec != null)
 	  decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
+	else if (mode == Special.rest)
+	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.
 	tr.push(decl);
       }
     if (bindings instanceof String)
       {
 	Declaration decl = lexp.addDeclaration ((String) bindings);
+	decl.setType(Compilation.scmListType);
 	decl.noteValue (null);  // Does not have a known value.
 	tr.push(decl);
       }
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
-
     // Syntatic sugar:  <TYPE> BODY --> (as <TYPE> BODY)
     lexp.body = tr.rewrite_body (body);
     if (lexp.body instanceof BeginExp)

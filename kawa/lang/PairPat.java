@@ -33,9 +33,8 @@ public class PairPat extends Pattern implements Printable, Compilable
     if (! (obj instanceof Pair))
       return false;
     Pair pair = (Pair) obj;
-    if (! car.match (pair.car, vars, start_vars))
-      return false;
-    return cdr.match (pair.cdr, vars, start_vars + car_count);
+    return (car.match (pair.car, vars, start_vars)
+	    && cdr.match (pair.cdr, vars, start_vars + car_count));
   }
 
   public void print(java.io.PrintWriter ps)

@@ -1,3 +1,9 @@
+2003-09-30  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (INT_FOLLOWS):  Make public - used by CallContext.
+
+	* TreeList.java (getPosNextInt):  New method.
+
 2003-09-24  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (copyToList):  Revert use of gnu.xml.NodeTree.

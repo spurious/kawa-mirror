@@ -137,7 +137,7 @@ implements Consumer, PositionConsumer, Consumable
    * [INT_FOLLOWS]
    * [word1], [word2]:  The big-endian bits of the integer.
    */
-  static final int INT_FOLLOWS = 0xF102;
+  public static final int INT_FOLLOWS = 0xF102;
 
   /** A 64-bit long integer.
    *
@@ -1320,6 +1320,22 @@ implements Consumer, PositionConsumer, Consumable
   private Object copyToList(int startPosition, int endPosition)
   {
     return new TreeList(this, startPosition, endPosition);
+  }
+
+  /** Return following value (like getPosNext), as an integer. */
+  public int getPosNextInt (int ipos)
+  {
+    int index = posToDataIndex(ipos);
+    if (index < data.length)
+      {
+	char datum = data[index];
+	if (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+	    && datum <= INT_SHORT_ZERO + MAX_INT_SHORT)
+	  return datum-INT_SHORT_ZERO;
+	if (datum == INT_FOLLOWS)
+	  return getIntN(index+1);
+      }
+    return ((Number) getPosNext(ipos)).intValue();
   }
 
   public Object getPosNext(int ipos)

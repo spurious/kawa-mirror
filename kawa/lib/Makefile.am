@@ -24,7 +24,7 @@ misc.class: $(srcdir)/misc.scm
 	  -e '(define-syntax %V (syntax-rules () ((%V) "@VERSION@")))' \
 	  -d ../.. -P $(subdir). -C $(srcdir)/misc.scm
 
-javadir=$(prefix)/java/$(subdir)
+javadir=$(datadir)/java/$(subdir)
 
 OBJ=\
   std_syntax.class \
@@ -69,6 +69,7 @@ SECONDARY_OBJS=\
   keywords$$string_2_keyword.class \
   misc$$environment__bound_P.class \
   misc$$scheme__implementation__version.class \
+  misc$$scheme__window.class \
   numbers$$abs.class \
   numbers$$angle.class \
   numbers$$complex_P.class \

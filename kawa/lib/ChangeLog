@@ -1,3 +1,8 @@
+Fri Feb  6 17:24:02 1998  Per Bothner  <bothner@cygnus.com>
+
+	* misc.scm (scheme-window):  New procedure.
+	* Makefile.am, Makefile.in:  Update.
+
 Tue Feb  3 16:41:25 1998  Per Bothner  <bothner@cygnus.com>
 
 	* numbers.scm:  New file with lots of procedures.

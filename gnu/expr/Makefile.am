@@ -14,6 +14,7 @@ java_sources = \
   ChainLambdas.java \
   CheckedTarget.java \
   ClassExp.java \
+  ClassInitializer.java \
   Compilation.java \
   ConditionalTarget.java \
   ConsumerTarget.java \
@@ -41,6 +42,7 @@ java_sources = \
   ModuleBody.java \
   ModuleMethod.java \
   ModuleExp.java \
+  PairClassType.java \
   ObjectExp.java \
   QuoteExp.java \
   Parser.java \

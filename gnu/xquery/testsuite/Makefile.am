@@ -11,7 +11,7 @@ java_sources = TestMisc.java TestSuite.java
 EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in \
-  bids.xml.in users.xml.in items.xml.in
+  bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
 
 all:
 
@@ -37,6 +37,10 @@ check-maketab1:  maketab1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
 	@if diff -b $(srcdir)/tab.html tmp2; then echo '# maketab1 test passes'; else echo FAIL maketab1 test; fi
 
+# FIXME - this does not do the correct thing
+check-desc:
+	$(KAWA) --xquery -e 'document("gnu/xquery/testsuite/bib.xml")//*[1]'
+
 multab.class:  multab.xql
 	$(KAWA) --main --xquery -C $<
 
@@ -51,4 +55,10 @@ check-descend:  descend.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) descend >tmpdesc
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
 
-check:  check-misc check-suite check-maketab1 check-multab check-descend
+check-format-users:
+	$(KAWA) --xslt $(srcdir)/format-users.xsl users.xml \
+	  |sed 's/^ *//'>tmp-format-users.html
+	@if diff -b -B $(srcdir)/exp-format-users.html tmp-format-users.html; then echo '#  format-users test passes'; else echo FAIL format-users test; fi
+
+check:  check-misc check-suite check-maketab1 check-multab check-descend \
+	  check-format-users

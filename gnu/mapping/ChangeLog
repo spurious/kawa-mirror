@@ -1,3 +1,8 @@
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	* Values.java (values):  Renamed to getValues.
+	(values$V):  New method.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* SysInPort.java (fill):  Fix logic error, whihc broke transcripts.

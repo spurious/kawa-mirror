@@ -19,9 +19,14 @@ public class Values implements Printable
   }
 
   /** Get the values encapsulated. */
-  public Object[] values ()
+  public Object[] getValues ()
   {
     return vals;
+  }
+
+  public static Object values$V(Object[] vals)
+  {
+    return make(vals);
   }
 
   public static Object make (Object[] vals)

@@ -1,5 +1,9 @@
 2005-02-07  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (namespaceResolve): If Uri is bound to
+	a constant ClassType create a ClassMethodProc.
+	Fixes the second test-case for Savannah bug #11822.
+
 	* kawa/standard/Scheme.java: Change class-methods to use defProcStFld.
 
 	* kawa/standard/require.java (makeDeclInModule): Set value to

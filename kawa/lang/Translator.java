@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.reflect.StaticFieldLocation;
+import gnu.kawa.reflect.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
@@ -569,7 +569,20 @@ public class Translator extends Compilation
 	if (dval instanceof QuoteExp)
 	  {
 	    Object val = ((QuoteExp) dval).getValue();
-	    String uri = val.toString();
+	    String uri;
+	    if (val instanceof ClassType)
+	      {
+		// Perhaps this should be if (true)? I.e. map class:method
+		// to a method value even if not in function position?
+		// Or would we rather use that syntax to access fields?  FIXME
+		if (function)
+		  return new QuoteExp(ClassMethodProc.make((ClassType) val,
+							   local));
+		else
+		  uri = "class:"+((ClassType) val).getName();
+	      }
+	    else
+	      uri = val.toString();
 	    sym = Symbol.make(uri, local);
 	  }
 	else

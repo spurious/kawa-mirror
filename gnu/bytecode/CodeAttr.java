@@ -1650,6 +1650,13 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitCheckcast (Type type)
   {
+    if (type instanceof ClassType)
+      {
+	Type top = topType();
+	if (top instanceof ClassType
+	    && ((ClassType) top).isSubclass((ClassType) type))
+	  return;
+      }
     emitCheckcast(type, 192);
     pushType(type);
   }

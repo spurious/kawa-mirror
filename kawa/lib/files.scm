@@ -39,7 +39,7 @@
       (write-char ch out))))
 
 (define (create-directory dirname)
-  ((primitive-virtual-method "java.io.File" "mkdir" "boolean" ())
+  ((primitive-virtual-method <java.io.File> "mkdir" <boolean> ())
    (->pathname dirname)))
 
 ; Taken from MIT Scheme

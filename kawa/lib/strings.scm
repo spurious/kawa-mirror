@@ -6,7 +6,7 @@
    ((primitive-virtual-method <object> "toString" <String> ()) x)
    ((primitive-virtual-method <object> "toString" <String> ()) y)))
 
-(define (make-string n #!optional (ch #\Space))
+(define (make-string (n :: <int>) #!optional (ch #\Space))
   (make <string> n ch))
 
 (define (string-length (str <string>))

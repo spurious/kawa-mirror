@@ -4,7 +4,7 @@
                  (define-syntax name
                    (lambda (__arg)
                      (syntax-case __arg ()
-                                  ((__name . pattern) form ...)))))))
+                                  ((__name . pattern) (begin form ...))))))))
 
 (define (%defmacro form rule)
   (rule (car (form 'form))))

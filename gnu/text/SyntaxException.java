@@ -1,10 +1,21 @@
+// Copyright (c) 2003  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.text;
 
-/** Used to signal a non-recoverable (fatal) syntax error. */
+/** Used to signal a non-recoverable (fatal) syntax error.
+ * Can also be used to signal a syntax error from embedded parsers,
+ * such as an <code>eval</code> or </code>execute</code> method,
+ * or well-formedness errors when reading an XML document.
+ */
 
 public class SyntaxException extends Exception
 {
+  /** If non-null, an extra one-line message printed before the messages.
+   * Can be used to provide extra context.  */
   String header;
+
+  /** One or more error messages that triggered this exception. */
   SourceMessages messages;
 
   public SyntaxException(SourceMessages messages)
@@ -18,7 +29,11 @@ public class SyntaxException extends Exception
     this.messages = messages;
   }
 
+  /** If non-null, an extra one-line message printed before the messages.
+   * Can be used to provide extra context.  */
   public final String getHeader() { return header; }
+
+  /** Set the header returned by <code>getHeader</code>. */
   public final void setHeader(String header) { this.header = header; }
 
   public SourceMessages getMessages () { return messages; }

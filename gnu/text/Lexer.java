@@ -5,7 +5,7 @@ package gnu.text;
 import java.io.*;
 
 /**
- * Framework for implementing lexical scanners.
+ * Framework for implementing lexical scanners and parsers.
  * @author	Per Bothner
  */
 

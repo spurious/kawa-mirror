@@ -3,7 +3,11 @@
 
 package gnu.text;
 
-/** A collection of (zero or more) SourceErrors. */
+/** A collection of (zero or more) SourceErrors.
+ * Has a "current line number" which clients can use as the default line
+ * number, or clients can explicitly provide a line number.
+ * Does not handle localization of messages.
+ */
 
 public class SourceMessages
 {
@@ -25,8 +29,10 @@ public class SourceMessages
   /** Get the number of errors (not counting warnings). */
   public int getErrorCount() { return errorCount; }
 
+  /** Clear the error count (only). */
   public void clearErrors() { errorCount = 0; }
 
+  /** Clear the contained errors and warnings. */
   public void clear()
   {
     firstError = lastError = null;
@@ -36,6 +42,7 @@ public class SourceMessages
   // The last SourceError with a *differnt* filename than prev has.
   SourceError lastPrevFilename = null;
 
+  /** Link in an error. */
   public void error(SourceError error)
   {
     if (error.severity == 'f')
@@ -84,18 +91,32 @@ public class SourceMessages
       lastError = error;
   }
 
+  /** Record a new error.
+   * @param serverity is the seriousness of the error
+   *  - one of 'w' (for warning), 'e' (for error), or 'f' (for fatal error)
+   * @param filename the name or URL of the file containing the error
+   * @param line the (1-origin) line number or 0 if unknown
+   * @param column the (1-origin) column number or 0 if unknown
+   * @param message the error message
+   */
   public void error(char severity, String filename, int line, int column,
 		    String message)
   {
     error(new SourceError(severity, filename, line, column, message));
   }
 
+  /** Record a new error at the current default source file location.
+   * @param serverity is the seriousness of the error
+   *  - one of 'w' (for warning), 'e' (for error), or 'f' (for fatal error)
+   * @param message the error message
+   */
   public void error(char severity, String message)
   {
     error(new SourceError(severity, current_filename,
 			  current_line, current_column, message));
   }
 
+  /** Print all the error messages to a PrintStream. */
   public void printAll(java.io.PrintStream out, int max)
   {
     for (SourceError err = firstError;
@@ -105,6 +126,7 @@ public class SourceMessages
       }
   }
 
+  /** Print all the error messages to a PrintWriter. */
   public void printAll(java.io.PrintWriter out, int max)
   {
     for (SourceError err = firstError;
@@ -114,6 +136,10 @@ public class SourceMessages
       }
   }
 
+  /** Convert this to a String containing the recorded errors.
+   * @param max the maximum number of error error to list
+   * @return a String with one '\n'-terminated line per recorded error
+   */
   public String toString(int max)
   {
     if (firstError == null)
@@ -128,9 +154,10 @@ public class SourceMessages
     return buffer.toString();
   }
 
-  /** Returns true if an error was seen.  Prints and clears the messages.
+  /** Checks if an error was seen; if so, prints and clears the messages.
    * @param out where to write the error message to
-   * @param max maximum number of messages to print (can be 0) */
+   * @param max maximum number of messages to print (can be 0)
+   */
   public boolean checkErrors(java.io.PrintWriter out, int max)
   {
     if (firstError != null)
@@ -144,7 +171,7 @@ public class SourceMessages
     return false;
   }
 
-  /** Returns true if an error was seen.  Prints and clears the messages
+  /** Checks if an error was seen; if so, prints and clears the messages.
    * @param out where to write the error message to
    * @param max maximum number of messages to print (can be 0) */
   public boolean checkErrors(java.io.PrintStream out, int max)
@@ -160,14 +187,21 @@ public class SourceMessages
     return false;
   }
 
+  /** The default filename to use for a new error. */
   public final String getFile() { return current_filename; }
+  /** The default line number to use for a new error. */
   public final int getLine() { return current_line; }
+  /** The default column number to use for a new error. */
   public final int getColumn() { return current_column; }
 
+  /** Set the default filename to use for a new error. */
   public void setFile(String filename) { current_filename = filename; }
+  /** Set the default line number to use for a new error. */
   public void setLine(int line) { current_line = line; }
+  /** Set the default column number to use for a new error. */
   public void setColumn(int column) { current_column = column; }
 
+  /** Set the default filename, line and column to use for a new error. */
   public void setLine(String filename, int line, int column)
   {
     current_filename = filename;

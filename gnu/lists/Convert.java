@@ -17,6 +17,26 @@ public class Convert
 
   public static void setInstance(Convert value) { instance = value; };
 
+  public Object booleanToObject(boolean value)
+  {
+    return value ? Boolean.TRUE : Boolean.FALSE;
+  }
+
+  public boolean objectToBoolean(Object obj)
+  {
+    return ! (obj instanceof Boolean) || ((Boolean) obj).booleanValue();
+  }
+
+  public static Object toObject(boolean value)
+  {
+    return instance.booleanToObject(value);
+  }
+
+  public static boolean toBoolean(Object obj)
+  {
+    return instance.objectToBoolean(obj);
+  }
+
   public Object charToObject(char ch)
   {
     return new Character(ch);

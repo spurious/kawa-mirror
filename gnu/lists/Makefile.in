@@ -115,6 +115,7 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_sources = \
   Array.java \
+  BitVector.java \
   CharBuffer.java \
   CharSequence.java \
   Consumer.java \

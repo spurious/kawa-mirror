@@ -1,3 +1,11 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* Convert.java (booleanToObject, objectToBoolean):  New methods.
+	(toObject, toBoolean):  New static methods.
+
+	* BitVector.java:  New class, extends SimpleVector.
+	* Makefile.am:  Update accordingly.
+
 2001-04-10  Per Bothner  <per@bothner.com>
 
 	* TreePosition.java (copy constructor):  Positions are numbered

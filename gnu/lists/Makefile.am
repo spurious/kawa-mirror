@@ -6,6 +6,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   Array.java \
+  BitVector.java \
   CharBuffer.java \
   CharSequence.java \
   Consumer.java \

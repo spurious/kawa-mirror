@@ -207,7 +207,7 @@ public class FindCapturedVars extends ExpWalker
         curLambda = curReturn.context;
         chain = chain.nextSibling;
       }
-    if (Compilation.usingCPStyle())
+    if (comp.usingCPStyle())
       {
 	if (curLambda instanceof ModuleExp)
 	  return;

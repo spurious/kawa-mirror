@@ -6,9 +6,10 @@ package gnu.expr;
 
 public class FindTailCalls extends ExpWalker
 {
-  public static void findTailCalls (Expression exp)
+  public static void findTailCalls (Expression exp, Compilation comp)
   {
     FindTailCalls walker = new FindTailCalls();
+    walker.setContext(comp);
     walker.walk(exp);
   }
 
@@ -217,7 +218,7 @@ public class FindTailCalls extends ExpWalker
 	  {
 	    ApplyExp caller = child.returnContinuation;
 	    if (caller != LambdaExp.unknownContinuation
-		&& ! Compilation.usingCPStyle())
+		&& ! comp.usingCPStyle())
 	      {
 		child.setInlineOnly(true);
 	      }

@@ -68,7 +68,7 @@ public class Compilation
   /** Support for full continuations.  Not implemented. */
   public static final int CALL_WITH_CONTINUATIONS = 4;
 
-  public static boolean usingCPStyle()
+  public boolean usingCPStyle()
   { return defaultCallConvention == CALL_WITH_CONTINUATIONS; }
   public boolean usingTailCalls()
   { return defaultCallConvention >= CALL_WITH_TAILCALLS; }
@@ -895,7 +895,7 @@ public class Compilation
     PushApply.pushApply(lexp);
     InlineCalls.inlineCalls(lexp, this);
     ChainLambdas.chainLambdas(lexp, this);
-    FindTailCalls.findTailCalls(lexp);
+    FindTailCalls.findTailCalls(lexp, this);
     lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp, this);
 

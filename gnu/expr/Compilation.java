@@ -24,6 +24,10 @@ public class Compilation
 
   int method_counter;
 
+  /* When multiple procedures are compiled into a single method,
+     we use a switch to jump to the correct part of the method. */
+  SwitchState fswitch;
+
   // Various standard classes
   static public ClassType scmObjectType = Type.pointer_type;
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
@@ -415,6 +419,10 @@ public class Compilation
     source_filename = lexp.filename;
     classPrefix = prefix;
     this.immediate = immediate;
+    
+    // Do various code re-writes and optimization.
+    ChainLambdas.chainLambdas(lexp);
+    PushApply.pushApply(lexp);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp);
@@ -445,19 +453,27 @@ public class Compilation
 
   ClassType allocClass (LambdaExp lexp)
   {
-    String name = lexp.name == null? "lambda" : lexp.name;
+    String name = lexp.getJavaName();
     name = generateClassName(name);
     return allocClass(lexp, name);
   }
 
   ClassType allocClass (LambdaExp lexp, String name)
   {
-    ClassType type = new ClassType(name);
-    ClassType superType
-      = lexp.isModuleBody () ? typeModuleBody
-      : lexp.min_args != lexp.max_args || lexp.min_args > 4 ? typeProcedureN
-      : typeProcedureArray[lexp.min_args];
-    type.setSuper (superType);
+    ClassType type;
+    if (lexp instanceof ObjectExp)
+      {
+	type = lexp.getCompiledClassType();
+      }
+    else
+      {
+	type = new ClassType(name);
+	ClassType superType
+	  = lexp.isModuleBody () ? typeModuleBody
+	  : lexp.min_args != lexp.max_args || lexp.min_args > 4 ? typeProcedureN
+	  : typeProcedureArray[lexp.min_args];
+	type.setSuper (superType);
+      }
 
     lexp.type = type;
     addClass(type);

@@ -535,7 +535,7 @@ fi
 
 
 PACKAGE=kawa
-VERSION=0.35
+VERSION=0.4
 ac_aux_dir=
 for ac_dir in . $srcdir/.; do
   if test -f $ac_dir/install-sh; then
@@ -765,7 +765,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -807,7 +807,7 @@ CEOF
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

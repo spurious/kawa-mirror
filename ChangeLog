@@ -1,3 +1,28 @@
+Thu Sep 12 16:22:47 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Literal.java:  Make flags public.
+	(emit):  Do flags|=ALLOCATED|INITIALIZED when done, so
+	class-specific code does not have to.
+	* kawa/lang/{AnyPat,Char,EqualPat,ListRepeatPat,Literal,Pair,PairPat,
+	Symbol,SyntaxRule,SyntaxRules,Vector}.java: Remove now-redundant
+	setting of Literal.flags.
+	* kawa/lang/InPort.java (readNumber):  Only recognize float if decimal.
+	Return new kawa.math.IntNum and kawa.math.DFloNum object.
+	* kawa/lang/Environment.java (frames, lookup):  Removed - unsued.
+	* kawa/lang/Interpreter.java:  Remove unused eval functions.
+	Define quote and lambda in StandardInterpreter, not here.
+	* kawa/lang/Procedure1or2.java:  Add default constructor.
+	* kawa/{,lang,standard,lib}/Makefile.{am,in}:  Add EXTRA_DIST rule.
+	Use $*.java instead of possibly-less-portable $(<F).
+	* kawa/Makefile.{am,in} (SUBDIRS):  Add math sub-directory.
+	* kawa/configure{.in,} (AC_OUTPUT):  Add kawa/math/Makefile.
+
+	* kawa/standard/*.java:  Update to use new Numeric classes.
+	* kawa/standard/{acos,asin,atan,cos,denominator,even_p,exact_p,
+	exp,expt,inexact_p,log,number2string,odd_p,rational_p,sin,sqrt,
+	tan}.java:   New classes for number functions.
+	* kawa/standard/Makefile.{am,in} (OBJ):  Add new classes.
+
 Sun Sep  8 21:23:33 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in (VERSION):  Set to 0.4.

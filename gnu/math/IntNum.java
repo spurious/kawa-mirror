@@ -1068,6 +1068,36 @@ public class IntNum extends RatNum implements Compilable
     return IntNum.equals (this, (IntNum) obj);
   }
 
+  public static IntNum valueOf (char[] buf, int offset, int length,
+				int radix, boolean negative)
+  {
+    int byte_len = 0;
+    byte[] bytes = new byte[length];
+    for (int i = 0;  i < length;  i++)
+      {
+	char ch = buf[offset + i];
+	if (ch == '-')
+	  negative = true;
+	else if (ch == '_' || (byte_len == 0 && (ch == ' ' || ch == '\t')))
+	  continue;
+	else
+	  {
+	    int digit = Character.digit(ch, radix);
+	    if (digit < 0)
+	      break;
+	    bytes[byte_len++] = (byte) digit;
+	  }
+      }
+    int chars_per_word = MPN.chars_per_word(radix);
+    IntNum result = IntNum.alloc((byte_len + 1) / chars_per_word + 1);
+    result.ival = MPN.set_str(result.words, bytes, byte_len, radix);
+    if (result.ival == 0 || result.words[result.ival-1] < 0)
+      result.words[result.ival++] = 0;
+    if (negative)
+      result.setNegative ();
+    return result.canonicalize ();
+  }
+
   public static IntNum valueOf (String s, int radix)
        throws NumberFormatException
   {

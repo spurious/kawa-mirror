@@ -1,3 +1,7 @@
+Mon Feb 16 15:54:54 1998  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java (valueOf):  New overloaded method.
+
 Tue Feb  3 12:53:54 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java, DFlotNum.java:  Update calls to gnu.bytecode methods.

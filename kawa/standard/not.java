@@ -10,10 +10,14 @@ import gnu.expr.*;
 public class not extends Procedure1 implements Inlineable
 {
   Interpreter interpreter;
+  public QuoteExp trueExp;
+  public QuoteExp falseExp;
 
   public not(Interpreter interpreter)
   {
     this.interpreter = interpreter;
+    trueExp = new QuoteExp(interpreter.booleanObject(true));
+    falseExp = new QuoteExp(interpreter.booleanObject(false));
   }
 
   public Object apply1 (Object arg1)
@@ -28,7 +32,7 @@ public class not extends Procedure1 implements Inlineable
       {
 	ConditionalTarget ctarget = (ConditionalTarget) target;
 	ConditionalTarget sub_target
-	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue);
+	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue, interpreter);
 	sub_target.trueBranchComesFirst = ! ctarget.trueBranchComesFirst;
 	arg.compile(comp, sub_target);
 	return;
@@ -42,7 +46,7 @@ public class not extends Procedure1 implements Inlineable
       }
     else
       {
-	IfExp.compile(arg, QuoteExp.falseExp, QuoteExp.trueExp, comp, target);
+	IfExp.compile(arg, falseExp, trueExp, comp, target);
       }
   }
 

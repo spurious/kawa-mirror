@@ -8,13 +8,11 @@ import gnu.mapping.*;
 
 public class apply extends ProcedureN
 {
-  private Object[] getArguments (Object[] args)
+  private static Object[] getArguments (Object[] args, int skip)
   {
     int count = args.length;
-    if (count < 2)
-      throw new WrongArguments(this.name(),2,"(apply proc [args] args)");
-    if (! (args[0] instanceof Procedure))
-      throw new WrongType(this.name(),1,"procedure");
+    if (count < skip + 1)
+      throw new WrongArguments("apply",2,"(apply proc [args] args) [count:"+count+" skip:"+skip+"]");
     Object last = args[count-1];
     int last_count;
     if (last instanceof Object[])
@@ -29,12 +27,12 @@ public class apply extends ProcedureN
     else
       last_count = -1;
     if (last_count < 0)
-      throw new WrongType(this.name(), count, "sequence");
-    int numArgs = last_count + (count - 2);
+      throw new WrongType("apply", count, "sequence");
+    int numArgs = last_count + (count - skip - 1);
     Object[] proc_args = new Object[numArgs];
     int i;
-    for (i = 0; i < count - 2; i++)
-      proc_args[i] = args[i+1];
+    for (i = 0; i < count - skip - 1; i++)
+      proc_args[i] = args[i+skip];
     if (last instanceof Object[])
       {
 	System.arraycopy((Object[]) last, 0,
@@ -59,15 +57,20 @@ public class apply extends ProcedureN
     return proc_args;
   }
 
+  public static Object applyN(Procedure proc, Object[] args)
+  {
+    return proc.applyN(getArguments(args, 0));
+  }
+
   public Object applyN (Object[] args)
   {
-    return ((Procedure) args[0]).applyN(getArguments(args));
+    return ((Procedure) args[0]).applyN(getArguments(args, 1));
   }
 
   public void apply (CallStack stack)
   {
     Object[] args = stack.args;
     stack.proc = (Procedure) args[0];
-    stack.args = getArguments(args);
+    stack.args = getArguments(args, 1);
   }
 }

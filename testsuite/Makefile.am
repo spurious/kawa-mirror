@@ -1,6 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-JAVA=java
 KAWALIB = ..
 KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa
 KAWATEST = $(KAWA) -e '(load "testing.zip")'

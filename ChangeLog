@@ -1,3 +1,36 @@
+Sat Apr  4 17:53:18 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Char.java (toString):  New method.
+
+	* kawa/lang/ConditionalTarget.java:  New Target class.
+	* kawa/lang/Compilation.java (compileConstant):
+	Handle ConditionalTarget.
+	* kawa/lang/QuoteExp.java (voidExp, trueExp):  New statics.
+	* kawa/lang/IfExp.java (compile):  Re-write to use ConditionalTarget.
+
+	* kawa/lang/TryExp.java (compile):  Let CodeAttr handle saving result.
+
+	* kawa/lang/Future.java (<init>):  Initialize in, out, and err fields.
+	(waitForResult):  Simplify exception handling.
+
+	* */Makefile.am:  Re-write to compile all out-of-date *.java at once.
+
+	Changes for gnu.ecmascript:
+	* kawa/lang/LineBufferedReader.java (pos, limit, buffer):  Make public.
+	* kawa/lang/InPort.java (readOptionalExponent):  Make public.
+	* kawa/lang/EofReadError.java (<init>):  Make public.
+	* kawa/lang/Compilation.java (trueConstant, falseConstant):  Likewise.
+
+	* kawa/standard/{eq_p, not}.java:  Inline; handle ConditionalTarget.
+	* kawa/standard/Scheme.java (initScheme):  Get 'and from kawa.lib.
+	Added port-line, port-column, and set-port-line! (from Guile).
+
+	* kawa/repl.java (main):  Allow multiple source files after -C flag.
+
+	* kawa/Version.java.in:  Use VERSION instead of @VERSION@ as template.
+	* Makefile.am (Version.java):  New generated at build time.
+	(EXTRA_DIST):  Also distribute generated Version.java.
+	
 Fri Mar 13 22:11:59 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/Target.java:  New abstract class - represents the

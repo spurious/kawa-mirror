@@ -1,3 +1,30 @@
+Changes since Kawa 1.6.1
+========================
+The compile virtual method in Expression now takes a Target object,
+representing the "destination".  The special ConditionalTarget is
+used to evaluate the test of an 'if expression.  This allows us to
+generate much better code for and, or, eq?, not and nested if
+inside an if.
+
+Added port-line, port-column, and set-port-line! to match Guile.
+
+The Makefiles have been written so all out-of-date .java (or .scm).
+files in a directory are compiled using a single invocation of
+javac (or kawa).  Building Kawa should now be much faster.
+(But note that this depends on unreleased recent autoamke changes.)
+
+How the Kawa version number is compiled into Kawa was changed
+to make it easier for people who want to build from source on
+non-Unix-like systems.
+
+A new gnu.ecmascript package contains an extremely incomplete implementation
+of ECMSScript, the ECMA standardized version of JavaScript.  It includes
+an ECMAScript lexer (basically complete), parser (the framework is
+there but most of the language is missing), incomplete expression evaluation,
+and a read-eval-print-loop (for testing only).
+
+Changes in Kawa 1.6.1
+=====================
 Improved Kawa home page with extra links, pointer to Java-generated api docs,
 and homepages for gnu.math and gnu.bytecode.
 

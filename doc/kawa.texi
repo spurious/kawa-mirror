@@ -2381,10 +2381,8 @@ The interface is similar to the standard @code{delay}/@code{force},
 where a thread is basically the same as a promise, except that
 evaluation may be in parallel.
 
-So far, little or no effort has been made into making Kawa
-thread-safe.  There are no per-thread bindings, and
-the current input and output parts are global.
-That needs to change.
+So far, only modest effort has been made into making Kawa
+thread-safe.
 
 @deffn Syntax future expression
 Creates a new thread that evaluates @var{expression}.

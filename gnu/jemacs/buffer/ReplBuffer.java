@@ -24,7 +24,6 @@ public class ReplBuffer extends Buffer
     inputStyle = redStyle;
 
     processMark = new Marker(this, 0, false);
-    repl = this;
     processWriter = new BufferWriter(processMark, true);
     in_r = new QueueReader ();
     out = new OutPort(processWriter, true, true);

@@ -32,6 +32,9 @@ Implement let-syntax and letrec-syntax.
 Implement syntax-case.
 Possibly re-write macro syntax to use syntactic closures.
 
+Implement system open-input-pipe open-output-pipe close-pipe.
+Implement read-line; other Guile port operations.
+
 Implement infrastructure for other languages,
 and at least one other language.
 

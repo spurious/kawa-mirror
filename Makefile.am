@@ -5,9 +5,8 @@ SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
 
 # Build a .zip archive from the compiled classes.
-# Assumes you have done a 'make install' first.
 
 kawa-@VERSION@-compiled.zip:
-	(cd $(javadir); zip -r -n .class - kawa gnu) > $@
+	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs

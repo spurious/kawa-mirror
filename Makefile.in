@@ -276,10 +276,9 @@ maintainer-clean
 
 
 # Build a .zip archive from the compiled classes.
-# Assumes you have done a 'make install' first.
 
 kawa-@VERSION@-compiled.zip:
-	(cd $(javadir); zip -r -n .class - kawa gnu) > $@
+	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

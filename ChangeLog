@@ -1,3 +1,34 @@
+Thu Feb 19 18:36:18 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am, Makefile.in (kawa-@VERSION@-compiled.zip):  Build
+	archive from .class files in ".", not installed ones.
+
+	* kawa/lang/InPort.java:  New constructors controlling char conversion.
+	(convertToReader, openFile):  New static methods. 
+	(readChar, readString):  Always convert CR and CRLF to LF.
+	* kawa/lang/TtyInPort.java:  Always convert CR and CRLF to LF.
+	* kawa/standard/open_input_file.java:  Simplify - logic
+	for selection char encoding is now in InPort.openFile.
+	* kawa/lang/CompileFile.java (read):  Use new InPort.openFile method.
+	* kawa/Shell.java (runFile):  Likewise.
+	* kawa/standard/call_with_input_file.java (apply2):  Likewise.
+	* kawa/standard/with_input_from_file.java:  Likewise.
+	* kawa/standard/load.java (loadSource, apply2):  Likewise.
+
+Wed Feb 18 22:12:13 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/standard/open_input_file.java:  If binary file, do setBuffer.
+	Do setConvertCR(true) for text files.
+	* kawa/lang/LineBufferedReader.java:  Fix so line and column numbers
+	will be correct for CRLF is seen, even if !getConvertCR().
+	* kawa/lang/InPort.java (skipWhitespaceAndComments):  '\r'
+	terminates comments starting with ';'.
+	* kawa/lang/FString.java (open):  Return plain InPort (to match
+	call-with-input-string in kawa.lib).
+	* kawa/lang/CharArrayInPort.java (read):  Remove bad optimization.
+
+	* kawa/lang/PrimProcedure.java:  Remove second <float> definition.
+
 Mon Feb 16 16:01:37 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am (EXTRA_DIST):  Add Debian source package files.
@@ -21,7 +52,7 @@ Mon Feb 16 16:01:37 1998  Per Bothner  <bothner@cygnus.com>
 	* kawa/lang/InPort.java:  Efficiency improvements.
  	(readDigits):  New method.
 	* kawa/lang/TtyInPort.java (fill):  New method, replaces readHook.
-	* kawa/lang/{CharArrayInPort.java,NullReader.java}:  New classed.
+	* kawa/lang/{CharArrayInPort.java,NullReader.java}:  New classes.
 	* kawa/lang/{Makefile.am,Makefile.in} (OBJ):  Update for new classes.
 	* kawa/lang/FString.java (open):  New method.
 	* kawa/standard/string2number.java (parse):  Use CharArrayInPort.

@@ -14,7 +14,6 @@ public class LambdaExp extends ScopeExp
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
   int max_args;
-  private boolean is_module_body;
 
   // True if this contains a nested ScopeExp.
   boolean hasNestedScopes;
@@ -23,10 +22,7 @@ public class LambdaExp extends ScopeExp
   public static String fileFunctionName = "atFileLevel";
 
   /** True iff this is the dummy top-level function of a module body. */
-  public final boolean isModuleBody () { return is_module_body; }
-  /** Set the state of isModuleBody (). */
-  public final void setModuleBody (boolean is_module_body)
-  { this.is_module_body = is_module_body; }
+  public final boolean isModuleBody () { return this instanceof ModuleExp; }
 
   public final boolean variable_args () { return max_args < 0; }
 
@@ -59,9 +55,6 @@ public class LambdaExp extends ScopeExp
    */
   public LambdaExp (Object formals, Object body, Interpreter interp)
   {
-    if (formals == ModuleBody.formals)
-      setModuleBody (true);
-
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
     for (; bindings instanceof Pair; min_args++)
@@ -95,8 +88,6 @@ public class LambdaExp extends ScopeExp
       {
 	Pair bind_pair = (Pair) bindings;
 	Declaration decl = add_decl ((Symbol) bind_pair.car);
-	if (isModuleBody ())
-	  decl.type = Compilation.scmEnvironmentType;
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
 	bindings = bind_pair.cdr;
@@ -110,11 +101,6 @@ public class LambdaExp extends ScopeExp
     push (interp);
     this.body = interp.rewrite_body (body);
     pop (interp);
-  }
-
-  public LambdaExp (List body, Environment env)
-  {
-    this (ModuleBody.formals, body, env.interpreter());
   }
 
   /** If non-null, this is the Field that contains the static link. */

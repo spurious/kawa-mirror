@@ -34,6 +34,7 @@ QuoteExp.class \
 ReferenceExp.class \
 ScopeExp.class \
 SetExp.class \
+ModuleExp.class \
 \
 Declaration.class \
 Location.class \

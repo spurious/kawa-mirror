@@ -48,7 +48,7 @@ public class CompileFile extends Procedure2
       {
 	throw new GenericError ("I/O exception reading file: " + e.toString ());
       }
-    LambdaExp lexp = new LambdaExp (body, env);
+    LambdaExp lexp = new ModuleExp (body, env);
     lexp.filename = port.getName ();
     return lexp;
   }

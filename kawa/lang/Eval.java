@@ -21,7 +21,7 @@ public class Eval extends Procedure1or2
   public static Object eval (Object sexpr, Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    return eval (new LambdaExp (new Pair (sexpr, List.Empty), env), env);
+    return eval (new ModuleExp (new Pair (sexpr, List.Empty), env), env);
   }
 
   public Object apply1 (Object arg1)

@@ -13,8 +13,6 @@ public class set_b extends Syntax implements Printable
 
   static private Pattern pattern = new ListPat (2, 2);
 
-
-
   public Expression rewrite (Object obj, Translator tr)
   {
     Object [] match = pattern.match (obj);
@@ -56,7 +54,7 @@ public class set_b extends Syntax implements Printable
     if (binding != null && binding instanceof String)
       return new SetExp ((String) binding, value);
     SetExp sexp = new SetExp (sym, value);
-    sexp.binding = tr.resolve (sym, (Declaration) binding);
+    sexp.binding = (Declaration) binding;
     if (sexp.binding != null)
       sexp.binding.noteValue (value);
     return sexp;

@@ -24,6 +24,7 @@ public class PrimApplyExp extends ApplyExp
   public void compile (Compilation comp, int flags)
   {
     Type[] arg_types = proc.argTypes;
+    gnu.bytecode.CodeAttr code = comp.getCode();
     int arg_count = arg_types.length;
     boolean is_static = proc.getStaticFlag();
     if (args.length != arg_count + (is_static ? 0 : 1))
@@ -31,8 +32,8 @@ public class PrimApplyExp extends ApplyExp
     if (proc.opcode() == 183) // invokespecial == primitive-constructor
       {
 	ClassType type = proc.method.getDeclaringClass();
-	comp.method.compile_new (type);
-	comp.method.compile_dup (type);
+	code.emitNew(type);
+	code.emitDup(type);
       }
     for (int i = 0; i < args.length; ++i)
       {
@@ -54,7 +55,7 @@ public class PrimApplyExp extends ApplyExp
 	  comp.compileConstant (Interpreter.voidObject);
       }
     else if ((flags & IGNORED) != 0)
-      comp.method.compile_pop (1);
+      code.emitPop(1);
     else if (retType instanceof ClassType)
       return;
     else if (retType instanceof ArrayType)
@@ -85,9 +86,9 @@ public class PrimApplyExp extends ApplyExp
       {
 	comp.method.compile_if_neq_0 ();
 	comp.compileConstant (Interpreter.trueObject);
-	comp.method.compile_else ();
+	code.emitElse();
 	comp.compileConstant (Interpreter.falseObject);
-	comp.method.compile_fi ();
+	code.emitFi();
       }
     else
       throw new Error ("unimplemented return type");

@@ -254,6 +254,7 @@ public class LambdaExp extends ScopeExp
   {
     if ((flags & IGNORED) != 0)
       return;
+    gnu.bytecode.CodeAttr code = comp.getCode();
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;
     ClassType new_class;
@@ -273,8 +274,8 @@ public class LambdaExp extends ScopeExp
       thisVar.setType(new_class);
     else
        throw new Error("internal error - 'this' is not first arg");
-    comp.method.compile_new (new_class);
-    comp.method.compile_dup (new_class);
+    code.emitNew(new_class);
+    code.emitDup(new_class);
     if (staticLink != null)
       {
 	Declaration frame = outerLambda().heapFrame;
@@ -292,9 +293,10 @@ public class LambdaExp extends ScopeExp
       = comp.mainClass.addMethod ("setLiterals", comp.applyNargs,
 				   Type.void_type, Access.PUBLIC);
     setLiterals_method.init_param_slots ();
-    setLiterals_method.compile_push_value (setLiterals_method.find_arg (1));
-    setLiterals_method.compile_putstatic (comp.literalsField);
-    setLiterals_method.compile_return ();
+    CodeAttr code = setLiterals_method.getCode();
+    setLiterals_method.compile_push_value(code.getArg(1));
+    code.emitPutStatic(comp.literalsField);
+    code.emitReturn();
   }
 
   public Object eval (Environment env)

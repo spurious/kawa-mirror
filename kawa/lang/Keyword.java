@@ -84,7 +84,8 @@ public class Keyword extends Object implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
-    comp.method.compile_push_string (((Keyword)literal.value).name);
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    code.emitPushString(((Keyword) literal.value).name);
     comp.method.compile_invoke_static (makeKeywordMethod);
   }
 }

@@ -64,33 +64,35 @@ public class SetExp extends Expression
      stack) into the variable decl. */
   static public void compile_store (Declaration decl, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (decl.isSimple ())
-      comp.method.compile_store_value (decl);
+      code.emitStore(decl);
     else
       {
 	ReferenceExp.compile_load (decl.baseVariable, comp);
 	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	comp.method.compile_swap ();
-	comp.method.compile_push_int (decl.offset);
-	comp.method.compile_swap ();
+	code.emitSwap();
+	code.emitPushInt(decl.offset);
+	code.emitSwap();
 	comp.method.compile_array_store (Compilation.scmObjectType);
       }
   }
 
   public void compile (Compilation comp, int flags)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (binding != null)
       {
 	if (binding.isSimple ())
 	  {
 	    new_value.compile (comp, 0);
-	    comp.method.compile_store_value (binding);
+	    code.emitStore(binding);
 	  }
 	else
 	  {
 	    ReferenceExp.compile_load (binding.baseVariable, comp);
 	    comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	    comp.method.compile_push_int (binding.offset);
+	    code.emitPushInt(binding.offset);
 	    new_value.compile (comp, 0);
 	    comp.method.compile_array_store (Compilation.scmObjectType);
 	  }

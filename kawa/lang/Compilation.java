@@ -19,6 +19,8 @@ public class Compilation
   /** The current method. */
   public Method method;
 
+  public final CodeAttr getCode() { return method.getCode(); }
+
   // Various standard classes
   static public ClassType scmObjectType = new ClassType ("java.lang.Object");
   static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
@@ -208,19 +210,20 @@ public class Compilation
    */
   public void compileConstant (Object value)
   {
+    gnu.bytecode.CodeAttr code = getCode();
     if (value == null)
-      method.compile_push_null();
+      code.emitPushNull();
     else if (value instanceof String && ! immediate)
-      method.compile_push_string ((String) value);
+      code.emitPushString((String) value);
     else
       {
 	Literal literal = findLiteral (value);
 	if (literal.field == null)
 	  literal.assign (this);
-	method.compile_getstatic (literal.field);
+	code.emitGetStatic(literal.field);
 	if (literal.field == literalsField)
 	  {
-	    method.compile_push_int (literal.index);
+	    code.emitPushInt(literal.index);
 	    method.compile_array_load (scmObjectType);
 	    method.maybe_compile_checkcast (literal.type);
 	  }
@@ -416,18 +419,18 @@ public class Compilation
 						    apply0args, Type.void_type,
 						    Access.PUBLIC);
 
+    method = constructor_method;
     constructor_method.init_param_slots ();
     constructor_method.compile_push_this ();
     constructor_method.compile_invoke_special (superConstructor);
+    CodeAttr code = getCode();
     if (constructor_takes_staticLink)
       {
 	constructor_method.compile_push_this ();
-	Variable staticLinkArg = constructor_method.find_arg (1);
+	Variable staticLinkArg = code.getArg(1);
 	constructor_method.compile_push_value (staticLinkArg);
-	constructor_method.compile_putfield (lexp.staticLinkField);
+	code.emitPutField(lexp.staticLinkField);
       }
-
-    method = constructor_method;
 
     // If immediate, we cannot set the function name in the constructor,
     // since setLiterals has not been called yet (ecept for nested fnctions).
@@ -435,16 +438,15 @@ public class Compilation
       {
 	constructor_method.compile_push_this ();
 	compileConstant (lexp.name);
-	constructor_method.compile_putfield (nameField);
+	code.emitPutField(nameField);
       }
-    constructor_method.compile_return ();
+    code.emitReturn();
 
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
     Method apply_method
       = curClass.addMethod (apply_name, arg_types, scmObjectType,
 			     Access.PUBLIC|Access.FINAL);
     method = apply_method;
-
 
     // If incomingMap[i] is non-null, it means that the user's i'th
     // formal parameter (numbering the left-most one as 0) is captured
@@ -459,6 +461,7 @@ public class Compilation
     // Below, we assign the value to the slot.
     int i = 0;
     method.initCode();
+    code = getCode();
     for (Variable var = lexp.firstVar ();  var != null;  var = var.nextVar ())
       {
 	if (! (var instanceof Declaration) || ! var.isParameter ())
@@ -471,7 +474,7 @@ public class Compilation
 	    // just allocate it in the incoming register.  This case also
 	    // handles the artificial "this" and "argsArray" variables.
 	    if (! var.isAssigned ()
-		&& ! method.assign_local (var, i))
+		&& ! var.reserveLocal(i, code))
 	      throw new Error ("internal error assigning parameters");
 	  }
 	else if (argsArray != null)
@@ -491,7 +494,7 @@ public class Compilation
 	    Declaration incoming = lexp.addDeclaration (incoming_name);
 	    incoming.setArtificial (true);
 	    incoming.setParameter (true);
-	    if (! method.assign_local (incoming, i))
+	    if (! incoming.reserveLocal(i, code))
 	      throw new Error ("internal error assigning parameters");
 	    incoming.baseVariable = decl;
 	    // Subtract 1, so we don't count the "this" variable.
@@ -500,19 +503,19 @@ public class Compilation
 	i++;
       }
 
-    method.enterScope (lexp.scope);
+    code.enterScope (lexp.scope);
 
     if (lexp.heapFrame != null)
       {
-	method.compile_push_int (lexp.frameSize);
-	method.compile_new_array (scmObjectType);
-	method.compile_store_value (lexp.heapFrame);
+	code.emitPushInt(lexp.frameSize);
+	code.emitNewArray(scmObjectType);
+	code.emitStore(lexp.heapFrame);
       }
 
     if (lexp.staticLink != null)
       {
 	method.compile_push_this ();
-	method.compile_getfield (lexp.staticLinkField);
+	getCode().emitGetField(lexp.staticLinkField);
 	SetExp.compile_store (lexp.staticLink, this);
       }
 
@@ -540,7 +543,7 @@ public class Compilation
 		if (!param.isSimple ())
 		  {
 		    ReferenceExp.compile_load (param.baseVariable, this);
-		    method.compile_push_int (param.offset);
+		    code.emitPushInt(param.offset);
 		  }
 		// This part of the code pushes the incoming argument.
 		if (argsArray == null)
@@ -551,28 +554,28 @@ public class Compilation
 		else if (i < lexp.min_args)
 		  { // This is a required parameter, in argsArray[i].
 		    method.compile_push_value (argsArray);
-		    method.compile_push_int (i);
+		    code.emitPushInt(i);
 		    method.compile_array_load (scmObjectType);
 		  }
 		else if (i < lexp.min_args + opt_args)
 		  { // An optional parameter
-                    method.compile_push_int(i);
+		    code.emitPushInt(i);
 		    method.compile_push_value(argsArray);
-		    method.compile_arraylength();
+		    code.emitArrayLength();
 		    method.compile_ifi_lt();
 		    method.compile_push_value(argsArray);
-                    method.compile_push_int(i);
+		    code.emitPushInt(i);
                     method.compile_array_load(scmObjectType);
-		    method.compile_else();
+		    code.emitElse();
 		    lexp.defaultArgs[opt_i++].compile(this, 0);
-		    method.compile_fi();
+		    code.emitFi();
 		  }
 		else if (lexp.max_args < 0 && i == lexp.min_args + opt_args)
 		  {
 		    // This is the "rest" parameter (i.e. following a "."):
 		    // Convert argsArray[i .. ] to a list.
 		    method.compile_push_value(argsArray);
-		    method.compile_push_int(i);
+		    code.emitPushInt(i);
 		    method.compile_invoke_static(makeListMethod);
 		  }
 		else
@@ -589,19 +592,19 @@ public class Compilation
 						      Access.PUBLIC|Access.STATIC);
 		      }
 		    method.compile_push_value(argsArray);
-		    method.compile_push_int(lexp.min_args + opt_args);
+		    code.emitPushInt(lexp.min_args + opt_args);
 		    compileConstant(lexp.keywords[key_i++]);
 		    method.compile_invoke_static(searchForKeywordMethod);
-		    method.compile_dup(1);
+		    code.emitDup(1);
 		    method.compile_goto_if (199); // ifnonnull
-		    method.compile_pop(1);
+		    code.emitPop(1);
 		    lexp.defaultArgs[opt_i++].compile(this, 0);
-		    method.compile_fi();
+		    code.emitFi();
 		  }
 		// Now finish copying the incoming argument into its
 		// home location.
 		if (param.isSimple ())
-		  method.compile_store_value (param);
+		  code.emitStore(param);
 		else
 		  method.compile_array_store (Compilation.scmObjectType);
 	      }
@@ -614,7 +617,7 @@ public class Compilation
 
     lexp.body.compile_with_linenumber (this, Expression.LAST);
     if (method.reachableHere ())
-      method.compile_return ();
+      code.emitReturn();
 
     if (! immediate && curClass == mainClass && literalsChain != null)
       {
@@ -623,7 +626,7 @@ public class Compilation
 				     Access.PUBLIC|Access.STATIC);
 	method.init_param_slots ();
 	dumpLiterals ();
-	method.compile_return ();
+	getCode().emitReturn();
 	method = save_method;
       }
 

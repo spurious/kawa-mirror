@@ -27,6 +27,7 @@ public class ApplyExp extends Expression
   public void compile (Compilation comp, int flags)
   {
     Method applymethod;
+    gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
 
     if (func instanceof ReferenceExp)
@@ -73,7 +74,7 @@ public class ApplyExp extends Expression
 	  args[i].compile (comp, 0);
 	for (int i = args.length;  --i >= 0; )
 	  SetExp.compile_store (func_lambda.getArg (i), comp);
-	comp.method.compile_goto (func_lambda.start_label);
+	code.emitGoto(func_lambda.start_label);
 	return;
       }
 
@@ -85,12 +86,12 @@ public class ApplyExp extends Expression
       }
     else
       {
-	comp.method.compile_push_int (args.length);
-	comp.method.compile_new_array (comp.scmObjectType);
+	code.emitPushInt(args.length);
+	code.emitNewArray(comp.scmObjectType);
 	for (int i = 0; i < args.length; ++i)
 	  {
-	    comp.method.compile_dup (comp.objArrayType);
-	    comp.method.compile_push_int (i);
+	    code.emitDup(comp.objArrayType);
+	    code.emitPushInt(i);
 	    args[i].compile (comp, 0);
 	    comp.method.compile_array_store (comp.scmObjectType);
 	  }
@@ -103,7 +104,7 @@ public class ApplyExp extends Expression
       }
     comp.method.compile_invoke_virtual (applymethod);
     if ((flags & IGNORED) != 0)
-      comp.method.compile_pop (1);
+      code.emitPop(1);
   }
 
   public void print (java.io.PrintWriter ps)

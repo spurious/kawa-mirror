@@ -144,9 +144,10 @@ public class FString extends Sequence implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
-    comp.method.compile_new (scmStringType);
-    comp.method.compile_dup (scmStringType);
-    comp.method.compile_push_string (toString ());
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    code.emitNew(scmStringType);
+    code.emitDup(scmStringType);
+    code.emitPushString(toString ());
     comp.method.compile_invoke_special (initFStringMethod);
   }
 

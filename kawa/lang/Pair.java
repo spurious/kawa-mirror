@@ -153,13 +153,14 @@ public class Pair extends List implements Printable, Compilable
 	    // depended on the value of the Literal (i.e a circularity).
 	    // Just initialize car and cdr.
 	    // Emit:  this.cdr = pop();  this.car = pop();  push this;
-	    comp.method.compile_getstatic (literal.field);
-	    comp.method.compile_dup (1, 1);  // emit dup_x1
-	    comp.method.compile_swap ();
-	    comp.method.compile_putfield (Compilation.cdrField);
-	    comp.method.compile_dup (1, 1);  // emit dup_x1
-	    comp.method.compile_swap ();
-	    comp.method.compile_putfield (Compilation.carField);
+	    gnu.bytecode.CodeAttr code = comp.getCode();
+	    code.emitGetStatic(literal.field);
+	    code.emitDup(1, 1);  // emit dup_x1
+	    code.emitSwap();
+	    code.emitPutField(Compilation.cdrField);
+	    code.emitDup(1, 1);  // emit dup_x1
+	    code.emitSwap();
+	    code.emitPutField(Compilation.carField);
 	  }
 	else
 	  {

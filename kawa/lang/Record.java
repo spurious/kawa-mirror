@@ -103,9 +103,10 @@ public class Record
       = superClass.addMethod ("<init>", Type.typeArray0,
 			       Type.void_type, Access.PUBLIC);
     constructor.init_param_slots ();
+    gnu.bytecode.CodeAttr code = constructor.getCode();
     constructor.compile_push_this ();
     constructor.compile_invoke_special (superConstructor);
-    constructor.compile_return ();
+    code.emitReturn();
 
     while (fnames != List.Empty)
       {

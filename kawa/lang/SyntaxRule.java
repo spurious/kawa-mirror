@@ -416,14 +416,15 @@ public class SyntaxRule implements Compilable
   public void emit (Literal literal, Compilation comp)
   {
     literal.check_cycle ();
-    comp.method.compile_new (thisType);
-    comp.method.compile_dup (thisType);
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    code.emitNew(thisType);
+    code.emitDup(thisType);
     comp.emitLiteral (pattern);
     comp.emitLiteral (pattern_nesting);
     comp.emitLiteral (template_program);
     comp.emitLiteral (template_identifiers);
     comp.emitLiteral (literal_values);
-    comp.method.compile_push_int (max_nesting);
+    code.emitPushInt(max_nesting);
     comp.method.compile_invoke_special (initSyntaxRuleMethod);
   }
 }

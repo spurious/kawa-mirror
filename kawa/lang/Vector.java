@@ -72,14 +72,15 @@ public class Vector extends Sequence implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     // FIXME - should just comp.findLiteral (value) - but handle circularity!
     int len = value.length;
     // Allocate the Vector object
-    comp.method.compile_new (scmVectorType);
-    comp.method.compile_push_int (len);
-    comp.method.compile_new_array (comp.scmObjectType);
+    code.emitNew(scmVectorType);
+    code.emitPushInt(len);
+    code.emitNewArray(comp.scmObjectType);
     // Stack contents:  ..., Vector, array
-    comp.method.compile_dup (2, 0);  // dup2
+    code.emitDup(2, 0);  // dup2
     // Stack contents:  ..., Vector, array, Vector, array
     comp.method.compile_invoke_special (initVectorMethod);
     literal.flags |= Literal.ALLOCATED;
@@ -88,15 +89,15 @@ public class Vector extends Sequence implements Printable, Compilable
     // Initialize the Vector elements.
     for (int i = 0;  i < len;  i++)
       {
-	comp.method.compile_dup (scmVectorType);
-	comp.method.compile_push_int (i);
+	code.emitDup(scmVectorType);
+	code.emitPushInt(i);
 	comp.emitLiteral (value[i]);
 	// Stack contents:  ..., Vector, array, array, i, value[i]
 	comp.method.compile_array_store (comp.scmObjectType);
 	// Stack contents:  ..., Vector, array
       }
     // Remove no-longer-needed array from stack:
-    comp.method.compile_pop (1);
+    code.emitPop(1);
   }
 
   public void print(java.io.PrintWriter ps)

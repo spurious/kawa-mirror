@@ -45,12 +45,13 @@ public abstract class Expression implements Printable
       }
     else if (type == Type.boolean_type)
       {
+	gnu.bytecode.CodeAttr code = comp.getCode();
 	comp.compileConstant (Interpreter.falseObject);
 	comp.method.compile_ifneq ();
-	comp.method.compile_push_int(1);
-	comp.method.compile_else ();
-	comp.method.compile_push_int(0);
-	comp.method.compile_fi ();
+	code.emitPushInt(1);
+	code.emitElse();
+	code.emitPushInt(0);
+	code.emitFi();
       }
     else
       type.compileCoerceFromObject(comp.method);

@@ -40,19 +40,20 @@ public class IfExp extends Expression
 
   public void compile (Compilation comp, int flags)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     test.compile (comp, 0);
     comp.compileConstant (Interpreter.falseObject);
     comp.method.compile_ifneq ();
     then_clause.compile_with_linenumber (comp, flags);
     if (else_clause != null || (flags & IGNORED) == 0)
       {
-	comp.method.compile_else ();
+	code.emitElse();
 	if (else_clause != null)
 	  else_clause.compile_with_linenumber (comp, flags);
 	else
 	  comp.compileConstant (Interpreter.voidObject);
       }
-    comp.method.compile_fi ();
+    code.emitFi();
   }
 
   public void print (java.io.PrintWriter ps)

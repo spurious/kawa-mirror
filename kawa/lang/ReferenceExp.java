@@ -39,11 +39,12 @@ public class ReferenceExp extends Expression
 
   static public void compile_load (Declaration decl, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (decl.baseVariable != null)
       {
 	compile_load (decl.baseVariable, comp);  // recursive!
 	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	comp.method.compile_push_int (decl.offset);
+	code.emitPushInt(decl.offset);
 	comp.method.compile_array_load (Compilation.scmObjectType);
       }
     else
@@ -57,7 +58,7 @@ public class ReferenceExp extends Expression
 	    for ( ; lambda != declLambda;  lambda = lambda.outerLambda ())
 	      {
 		comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-		comp.method.compile_push_int (lambda.staticLink.offset);
+		code.emitPushInt(lambda.staticLink.offset);
 		comp.method.compile_array_load (Compilation.scmObjectType);
 		// Invariant:  The stack top contains lambda.staticLink.
 	      }

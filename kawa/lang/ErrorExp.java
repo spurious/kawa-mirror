@@ -31,6 +31,6 @@ public class ErrorExp extends Expression
   {
     // Should never happen!
     if ((flags & IGNORED) == 0)
-      comp.method.compile_push_null ();
+      comp.getCode().emitPushNull();
   }
 }

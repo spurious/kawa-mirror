@@ -32,18 +32,19 @@ public class LetExp extends ScopeExp
 
   public void compile (Compilation comp, int flags)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
     for (int i = 0; i < inits.length; i++)
       inits[i].compile (comp, 0);
 
-    comp.method.enterScope (scope);
+    code.enterScope (scope);
 
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstVar ());
 
     body.compile_with_linenumber (comp, flags);
-    comp.method.popScope ();
+    code.popScope ();
   }
 
   public void print (java.io.PrintWriter ps)

@@ -83,15 +83,16 @@ public class Literal
   /** Emit code to re-create this Literal's value, an Object array. */
   void emitArray (Compilation comp, Type element_type)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     Object[] array = (Object[]) value;
     int len = array.length;
-    comp.method.compile_push_int (len);
-    comp.method.compile_new_array (element_type);
+    code.emitPushInt(len);
+    code.emitNewArray(element_type);
     flags |= Literal.ALLOCATED;
     for (int i = 0;  i < len;  i++)
       {
-	comp.method.compile_dup (1);
-	comp.method.compile_push_int (i);
+	code.emitDup(1);
+	code.emitPushInt(i);
 	comp.emitLiteral (array[i]);
 	// Stack contents:  ..., array, array, i, array[i]
 	comp.method.compile_array_store (comp.scmObjectType);
@@ -101,10 +102,11 @@ public class Literal
 
   void emit (Compilation comp, boolean ignore)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (value instanceof String)
       {
 	if (! ignore)
-	  comp.method.compile_push_string (value.toString ());
+	  code.emitPushString(value.toString ());
 	return;
       }
     if ((flags & ALLOCATED) != 0)
@@ -112,16 +114,16 @@ public class Literal
 	if ((flags & ASSIGNED) == 0 || field == null)
 	  throw new Error ("internal error in Literal.emit");
 	if (! ignore)
-	  comp.method.compile_getstatic (field);
+	  code.emitGetStatic(field);
 	return;
       }
     if (value instanceof Compilable)
       ((Compilable) value).emit (this, comp);
     else if (value instanceof Integer)
       {
-	comp.method.compile_new (comp.javaIntegerType);
-	comp.method.compile_dup (comp.javaIntegerType);
-	comp.method.compile_push_int (((Integer)value).intValue ());
+	code.emitNew(comp.javaIntegerType);
+	code.emitDup(comp.javaIntegerType);
+	code.emitPushInt(((Integer)value).intValue ());
 	comp.method.compile_invoke_special (comp.initIntegerMethod);
       }
     else if (value instanceof String[])
@@ -132,18 +134,18 @@ public class Literal
       {
 	System.err.print ("Unimplemented compileConstant for ");
 	System.err.println (value.getClass ());
-	comp.method.compile_getstatic (Compilation.undefinedConstant);
+	code.emitGetStatic(Compilation.undefinedConstant);
       }
     flags |= ALLOCATED|INITIALIZED;
     if (field != null && (flags & ASSIGNED) == 0)
       {
 	if (! ignore)
-	  comp.method.compile_dup (Compilation.scmPairType);
-	comp.method.compile_putstatic (field);
+	  code.emitDup(Compilation.scmPairType);
+	code.emitPutStatic(field);
 	flags |= ASSIGNED;
       }
     else if (ignore)
-      comp.method.compile_pop (1);
+      code.emitPop(1);
   }
 
   /** Utility function to check for circular literals dependencies.

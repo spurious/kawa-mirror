@@ -251,19 +251,20 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     literal.check_cycle ();
     int len = rules.length;
     // Allocate the SyntaxRules object
-    comp.method.compile_new (thisType);
-    comp.method.compile_dup (1);  // dup
+    code.emitNew(thisType);
+    code.emitDup(1);  // dup
     comp.emitLiteral (literal_identifiers);
-    comp.method.compile_push_int (len);
-    comp.method.compile_new_array (SyntaxRule.thisType);
+    code.emitPushInt(len);
+    code.emitNewArray(SyntaxRule.thisType);
     // Initialize the SyntaxRule elements.
     for (int i = 0;  i < len;  i++)
       {
-	comp.method.compile_dup (1);  // dup
-	comp.method.compile_push_int (i);
+	code.emitDup(1);  // dup
+	code.emitPushInt(i);
 	comp.emitLiteral (rules[i]);
 	// Stack contents:  ..., this,this,literals, array, array, i, rules[i]
 	comp.method.compile_array_store (SyntaxRule.thisType);

@@ -78,10 +78,10 @@ public class ReaderParens extends ReadTableEntry
 	    int line = port.getLineNumber();
 	    int column = port.getColumnNumber();
 	    ch = port.read();
-	    if (ch < 0)
-	       lexer.eofError("unexpected EOF in list");
 	    if (ch == close)
 	      break;
+	    if (ch < 0)
+	       lexer.eofError("unexpected EOF in list");
 	    ReadTableEntry entry;
 	    if (ch == '.')
 	      {

@@ -1,3 +1,7 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SED_REFERENCES_SUBS): Moved to Make-rules.
+
 2002-02-15  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST):  Leave out redundant $(java_sources).

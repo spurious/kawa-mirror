@@ -18,7 +18,7 @@ public class HttpPrinter extends FilterConsumer
   StringBuffer sbuf = new StringBuffer(100);
   String currentHeader;
 
-  String sawContentType;
+  protected String sawContentType;
 
   OutputStream ostream;
   OutPort writer;

@@ -1,3 +1,8 @@
+2002-02-14  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java (sawContentType):  Make protected, for used
+	by ServletPrinter.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* ElementConstructor.java (apply): Check if body object is Consumable.

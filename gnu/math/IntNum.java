@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
@@ -1505,7 +1505,7 @@ public class IntNum extends RatNum implements Externalizable
     ival = i;
   }
 
-  public IntNum readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return canonicalize();
   }

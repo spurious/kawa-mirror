@@ -27,13 +27,13 @@ public abstract class Quantity extends Numeric
    */
   public RealNum im () { return number().im(); }
 
-  /** The value of the imaginary component, as a double.
+  /** The value of the real component, as a double.
    * This is relative to the unit().dims - i.e. unit().doubleValue()
    * is factored in.
    * A final alias for the virtual doubleValue. */
   public final double reValue() { return doubleValue(); }
 
-  /** The value of the real component, as a double.
+  /** The value of the imaginary component, as a double.
    * This is relative to the unit().dims - i.e. unit().doubleValue()
    * is factored in.
    * A final alias for the virtual doubleImagValue. */

@@ -1,0 +1,8 @@
+2002-03-19  Per Bothner  <per@bothner.com>
+
+	New package.
+	* SwingBuffer.java:  New class, extends Buffer.
+	* SwingFrame.java:  New class, extends EFrame.
+	* SwingToolkit.java:  New class, extends EToolkit.
+	* SwingWindow.java:  New class, extends EWindow.
+	* Makefile.am:  New file.

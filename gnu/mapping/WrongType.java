@@ -1,6 +1,9 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.mapping;
 
-public class WrongType extends RuntimeException
+public class WrongType extends WrappedException
 {
   //-- number of the argument, 0-origin
   // ARG_UNKNOWN mean unknown argument number
@@ -17,10 +20,10 @@ public class WrongType extends RuntimeException
   //-- Procedure name that threw the exception
   public String procname;
   public Procedure proc;
-  public ClassCastException castExcept;
 
   public WrongType(String name, int n, String u)
   {
+    super(null, null);
     procname = name;
     number = n - 1;
     typeExpected = u;
@@ -28,17 +31,17 @@ public class WrongType extends RuntimeException
 
   public WrongType(Procedure proc, int n, ClassCastException ex)
   {
+    super(ex);
     this.proc = proc;
     this.procname = proc.getName();
     this.number = n;
-    this.castExcept = ex;
   }
 
   public WrongType(String procname, int n, ClassCastException ex)
   {
+    super(ex);
     this.procname = procname;
     this.number = n;
-    this.castExcept = ex;
   }
 
   /** This interface is designed for a compact call sequence. */
@@ -79,10 +82,11 @@ public class WrongType extends RuntimeException
         sbuf.append(procname);
         sbuf.append("' has wrong type");
       }
-    if (castExcept != null)
+    Exception ex = getException();
+    if (ex != null)
       {
         sbuf.append(" (");
-        sbuf.append(castExcept.getMessage());
+        sbuf.append(ex.getMessage());
         sbuf.append(')');
       }
     return sbuf.toString();

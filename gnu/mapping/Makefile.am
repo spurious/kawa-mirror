@@ -41,6 +41,7 @@ java_JAVA=\
   TtyInPort.java \
   UnboundSymbol.java \
   Values.java \
+  WrappedException.java \
   WrongArguments.java \
   WrongType.java
 

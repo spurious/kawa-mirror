@@ -1,3 +1,9 @@
+1999-08-26  Per Bothner  <per@bothner.com>
+
+	* WrappedException.java:  New class; inherits from RuntimeException.
+	* WrongType.java:  Change to inheirt from WrappedException.
+	* Makefile.am, Makefile.in (java_JAVA):  Added WrappedException.java.
+
 1999-08-18  Per Bothner  <per@bothner.com>
 
 	* Named.java (name):  Always call getName().

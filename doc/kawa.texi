@@ -131,18 +131,18 @@ Quantities, keyword values, and the expanded @code{lambda} form
 
 The current sources release is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.4.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.4.tar.gz}.
 @end ifclear
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.4-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.4-compiled.zip}.
 @end ifclear
 
 @c A snapshot of the development tree is
@@ -190,8 +190,8 @@ for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS
 from @url{http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html}.
 @end ifclear
 
-The program 'java' is the Java interpreter.
-The program 'javac' is the Java compiler,
+The program @code{java} is the Java interpreter.
+The program @code{javac} is the Java compiler,
 and is needed if you want to compile the source release yourself.
 Both programs must be in your @code{PATH}.
 
@@ -698,7 +698,7 @@ Returns a procedure for testing membership in the type represented by
 returns a true value if the argument is a member of the indicated record
 type; it returns a false value otherwise.
 
-In Kawa, the retured procedure checks if the argument is an instance
+In Kawa, the returned procedure checks if the argument is an instance
 of @var{rtd} or one of its sub-classes.
 @end defun
 
@@ -896,6 +896,9 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
+@node Miscellaneous,  , Threads, Extensions
+@subsection Miscellaneous
+
 @defun gentemp
 Returns a new (interned) symbol each time it is called.
 The symbol names are implementation-dependent.
@@ -912,11 +915,8 @@ source form that is futher processed (it may be repeatedly macro-expanded).
 
 If you define a macro with @code{defmacro}, you (currently) cannot use
 the macro in the same compilation as the definition.
-This restrictions does not apply to macros defined by @code{define-syntax}.
+This restriction does not apply to macros defined by @code{define-syntax}.
 @end defmac
-
-@node Miscellaneous,  , Threads, Extensions
-@subsection Miscellaneous
 
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.
@@ -1258,6 +1258,14 @@ changes to Kawa, and announcing snapshots.  If you wish to subscribe
 @section License
 
 This is the license for the Kawa software:
+
+Note that the Kawa distribution includes two packages @code{gnu.bytecode}
+and @code{gnu.math} which have different terms than Kawa itself
+(but which impose no restrictions as long as you do not modify
+those two packages).
+
+In general, If the license of Kawa or asociated packages causes
+difficulties, let me know.
 
 @include license.terms
 

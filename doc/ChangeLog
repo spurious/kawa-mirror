@@ -1,3 +1,7 @@
+Wed May  7 08:46:46 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa.texi:  Various minor fixes and updates (including URLs).
+
 Tue Mar 18 14:13:49 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa.texi:  Docuemnt DSSSL expression language compliance;

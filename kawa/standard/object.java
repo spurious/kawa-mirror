@@ -2,6 +2,7 @@ package kawa.standard;
 import gnu.expr.*;
 import kawa.lang.*;
 import gnu.bytecode.*;
+import java.util.Vector;
 
 public class object extends Syntax
 {
@@ -40,6 +41,8 @@ public class object extends Syntax
       oexp.setName(clname);
     LambdaExp method_list = null;
     LambdaExp last_method = null;
+    // First pass (get Declarations).
+    Vector inits = null;
     for (obj = components;  obj != List.Empty;  )
       {
 	if (! (obj instanceof Pair)
@@ -48,7 +51,7 @@ public class object extends Syntax
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String)
-	  {
+	  { // Field declaration.
 	    Object type = null;
 	    Declaration decl = oexp.addDeclaration((String) pair.car);
 	    decl.setSimple(false);
@@ -62,12 +65,17 @@ public class object extends Syntax
 		    pair = (Pair) pair.cdr;
 		    init = pair.car;
 		  }
+		if (inits == null)
+		  inits = new Vector (20);
+		inits.addElement(decl);
 	      }
 	    if (type != null)
 	      decl.setType(prim_method.exp2Type(type, tr));
+	    decl.setCanRead(true);
+	    decl.setCanWrite(true);
 	  }
 	else if (pair.car instanceof Pair)
-	  {
+	  { // Method declaration.
 	    Pair mpair = (Pair) pair.car;
 	    if (! (mpair.car instanceof String))
 	      return tr.syntaxError("missing method name");
@@ -88,24 +96,61 @@ public class object extends Syntax
     oexp.firstChild = method_list;
     oexp.supers = supers;
     tr.push(oexp);
+
+    // Second pass (rewrite method/initializer bodies).
     LambdaExp meth = method_list;
+    int init_index = 0;
     for (obj = components;  obj != List.Empty;  )
       {
 	pair = (Pair) obj;
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String)
-	  {
+	  { // Method declaration.
+	    Object type = null;
+	    if (pair.cdr instanceof Pair)
+	      {
+		pair = (Pair) pair.cdr;
+		Object init = pair.car;
+		if (pair.cdr instanceof Pair)
+		  {
+		    type = init;
+		    pair = (Pair) pair.cdr;
+		    init = pair.car;
+		  }
+		Declaration decl = (Declaration) inits.elementAt(init_index);
+		Expression initValue = tr.rewrite(init);
+		SetExp sexp = new SetExp (decl.getName(), initValue);
+		sexp.binding = decl;
+		decl.noteValue(initValue);
+		inits.setElementAt(sexp, init_index++);
+System.err.println("add init for "+decl.getName()+" - "+initValue);
+	      }
 	  }
 	else if (pair.car instanceof Pair)
-	  {
+	  { // Method declaration.
 	    Pair mpair = (Pair) pair.car;
 	    LambdaExp lexp = meth;
 	    meth = meth.nextSibling;
-	    Lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+ 	    Lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
 	  }
 	else
 	  return tr.syntaxError("invalid field/method definition");
+      }
+    if (inits != null)
+      {
+	int len = inits.size();
+	Expression[] assignments = new Expression[len+1];
+	inits.copyInto((Object[]) assignments);
+	assignments[len] = QuoteExp.voidExp;
+	BeginExp bexp = new BeginExp(assignments);
+	LambdaExp initMethod = new LambdaExp(bexp);
+	tr.push(initMethod);
+	initMethod.setName("$finit$");
+	oexp.initMethod = initMethod;
+	initMethod.nextSibling = oexp.firstChild;
+	oexp.firstChild = initMethod;
+	tr.pop(initMethod);
       }
     tr.pop(oexp);
     return oexp;

@@ -1,3 +1,7 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CLEANFILES):  Removed redundant macro.
+
 2001-03-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (ENABLE_GCJ_COMPILED):  Remove scm-classes.stamp

@@ -21,8 +21,6 @@ scm-classes.stamp:  ../../../kawa/classjava.stamp
 ../../../kawa/classjava.stamp:
 	cd ../../../kawa; $(MAKE)
 
-CLEANFILES = *.class *.stamp
-
 # Used to generate makekawa.bat in ../../.. .
 list-sources:
 	echo $(SCMSOURCES)

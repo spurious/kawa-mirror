@@ -195,12 +195,11 @@ public class ClassFileInput extends DataInputStream
       }
     else if (name == "LineNumberTable" && container instanceof CodeAttr)
       {
-        int count = readUnsignedShort();
-	short[] numbers = new short[2 * count];
+        int count = 2 * readUnsignedShort();
+	short[] numbers = new short[count];
 	for (int i = 0;  i < count;  i++)
 	  {
-	    numbers[2 * i] = readShort();
-	    numbers[2 * i + 1] = readShort();
+	    numbers[i] = readShort();
 	  }
 	return new LineNumbersAttr(numbers, (CodeAttr) container);
       }
@@ -225,6 +224,16 @@ public class ClassFileInput extends DataInputStream
 	  }
 	return attr;
       }
+    else if (name == "InnerClasses" && container instanceof ClassType)
+      {
+        int count = 4 * readUnsignedShort();
+	short[] data = new short[count]; 
+	for (int i = 0;  i < count;  i++)
+	  {
+	    data[i] = readShort();
+	  }
+	return new InnerClassesAttr(data, (ClassType) container);
+     }
     else
       {
 	byte[] data = new byte[length];

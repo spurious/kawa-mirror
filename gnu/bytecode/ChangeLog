@@ -1,3 +1,18 @@
+Mon Jun 22 18:33:13 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Access.java (toString):  Print unrecognized flags as hex value.
+	* ClassTypeWriter.java (printClassInfo):  Don't print hex access flags.
+	* CpoolClass.java (getStringName):  New method.
+
+	* Label.java:  Fix bugs in how relocations were implemented.
+
+	* ClassFileInput.java (readAttribute):  Handle "InnerClasses".
+	* InnerClassesAttr.java:  New, for JDK 1.1 "InnerClasses" attribute.
+	* SwitchState.java:  New - state for a switch statement.
+	* Makefile.am:  Add new classes.
+
+
+
 Mon Apr 27 13:18:01 1998  Jeff Haynes  <jhaynes@dascom.com>
 
         * ClassType.java, ConstantPool.java, CpoolClass.java, CpoolUtf8.java,

@@ -26,10 +26,10 @@ CpoolRef.java \
 CpoolString.java \
 CpoolUtf8.java \
 Location.java Field.java \
-Label.java IfState.java TryState.java \
+Label.java IfState.java TryState.java SwitchState.java \
 Method.java \
 CodeAttr.java \
-LineNumbersAttr.java LocalVarsAttr.java \
+LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
 PrimType.java \
 Scope.java \

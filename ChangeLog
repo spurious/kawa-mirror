@@ -1,3 +1,8 @@
+2000-10-09  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/prim_method.java (rewrite):  Load reflectClass here;
+	emit diagnostic message on failure.
+
 2000-10-02  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (scanForDefinitions):  If imported field

@@ -1,5 +1,8 @@
 2000-10-09  Per Bothner  <per@bothner.com>
 
+	* ObjectType.java (setExisting):  New method.
+	* Type.java (getType):  Don't try to load reflectClass yet.
+
 	* ObjectType.java (getInternalName):  New method.
 	(getNameOrSignature):  Removed, replaced by getInternalName.
 	(getReflectClass):  Update to use getInternalName.

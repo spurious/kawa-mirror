@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -57,14 +57,7 @@ public abstract class Type {
 	else
 	  {
 	    ClassType cl = new ClassType(name);
-	    try
-	      {
-		cl.reflectClass = Class.forName(name);
-		cl.flags |= ClassType.EXISTING_CLASS;
-	      }
-	    catch (java.lang.ClassNotFoundException ex)
-	      {
-	      }
+            cl.flags |= ClassType.EXISTING_CLASS;
 	    type = cl;
 	  }
 	mapNameToType.put(name, type);

@@ -1,3 +1,6 @@
+// Copyright (c) 1997, 2000  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.bytecode;
 
 /**
@@ -24,6 +27,12 @@ public class ObjectType extends Type
   // A ClassType that we can expect to have a corresponding reflectClass.
   final static int EXISTING_CLASS = 4;
   int flags;
+
+  public final void setExisting(boolean existing)
+  {
+    if (existing) flags |= EXISTING_CLASS;
+    else flags &= ~ EXISTING_CLASS;
+  }
 
   /** Returns class name if a class type, signature if an array type.
    * In both cases, uses '/' rather than '.' after packages prefixes.

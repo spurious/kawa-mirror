@@ -539,7 +539,7 @@ System.err.println("after parseArgs:"+peekToken());
 	    SFormat.print(result, out);
 	    out.println();
 	  }
-	catch (Exception ex)
+	catch (Throwable ex)
 	  {
 	    System.err.println("caught exception:"+ex);
 	    ex.printStackTrace(System.err);

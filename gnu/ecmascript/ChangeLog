@@ -1,3 +1,7 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* Parser.java (main):   Catch Throwable as eval may now throw it.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* Lexer.java, Parser.java:  Update gnu.kawa.util.Sequence to gnu.lists.

@@ -29,14 +29,31 @@ public class letrec extends Syntax implements Printable
     for (i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
-	Object[] bind_match = pattern2.match (bind_pair.car);
-	if (bind_match == null)
-	  return tr.syntaxError ("letrec binding is not 2-element list");
-	if (! (bind_match[0] instanceof String))
-	  return tr.syntaxError ("letrec variable is not an identifier");
-	let.addDeclaration((String) bind_match[0]);
+
+	if (! (bind_pair.car instanceof Pair))
+	  return tr.syntaxError ("letrec binding is not a list");
+	Pair binding = (Pair) bind_pair.car;
+	if (! (binding.car instanceof String))
+	  return tr.syntaxError("letrec variable is not an identifier");
+	String name = (String) binding.car;
+	if (! (binding.cdr instanceof Pair))
+	  return tr.syntaxError("let has no value for `"+name+"'");
+	Declaration decl = let.addDeclaration(name);
+	binding = (Pair) binding.cdr;
+	Object init;
+	if (binding.cdr == List.Empty)
+	  {
+	    init = binding.car;
+	  }
+	else if (binding.cdr instanceof Pair)
+	  {
+	    decl.setType(kawa.standard.prim_method.exp2Type(binding.car, tr));
+	    init = ((Pair) binding.cdr).car;
+	  }
+	else
+	  return tr.syntaxError("let binding for `"+name+"' is improper list");
 	inits[i] = QuoteExp.nullExp;
-	orig_inits[i] = bind_match[1];
+	orig_inits[i] = init;
 	bindings = bind_pair.cdr;
       }
     tr.push(let);

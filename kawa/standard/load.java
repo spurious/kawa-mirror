@@ -13,13 +13,16 @@ public class load extends Procedure1 {
    * while load of a compiled .class uses the classpath. */
   public final static Object loadClassFile (String name, Environment env)
   {
+    Environment orig_env = Environment.getCurrent();
     try
       {
+	if (env != orig_env)
+	  Environment.setCurrent(env);
 	Class clas = Class.forName (name);
 	Object inst = clas.newInstance ();
 	if (! (inst instanceof Procedure0))
 	  throw new RuntimeException ("load - class is not an Procedure0");
-	return ((ModuleBody)inst).run (env);
+	return ((ModuleBody)inst).run();
       }
     catch (ClassNotFoundException ex)
       {
@@ -33,12 +36,20 @@ public class load extends Procedure1 {
       {
 	throw new RuntimeException ("class illegal access: in load");
       }
+    finally
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
+      }
   }
 
   public final static Object loadCompiled (String name, Environment env)
   {
+    Environment orig_env = Environment.getCurrent();
     try
       {
+	if (env != orig_env)
+	  Environment.setCurrent(env);
 	File zfile = new File (name);
 	if (!zfile.exists ())
 	  throw new RuntimeException ("load: "+name+" - not found");
@@ -46,7 +57,11 @@ public class load extends Procedure1 {
 	  throw new RuntimeException ("load: "+name+" - not readable");
 	ZipLoader loader = new ZipLoader (name);
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
-	return ((ModuleBody) clas.newInstance ()).run (env);
+	Object proc = clas.newInstance ();
+	if (proc instanceof ModuleBody)
+	  return ((ModuleBody) proc).run();
+	else
+	  return ((CallFrame) proc).apply0();
       }
     catch (java.io.IOException ex)
       {
@@ -63,6 +78,11 @@ public class load extends Procedure1 {
     catch (IllegalAccessException ex)
       {
 	throw new RuntimeException ("class illegal access: in load");
+      }
+    finally
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
       }
   }
 
@@ -103,7 +123,7 @@ public class load extends Procedure1 {
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (tr.errors > 0)
 	  throw new RuntimeException ("syntax errors during load");
-	return ((ModuleBody) mexp.eval (env)).run (env);
+	return mexp.evalModule(env);
       }
   }
 

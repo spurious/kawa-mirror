@@ -187,7 +187,7 @@ target_vendor = @target_vendor@
 SUFFIXES = .java .class .scm .el .lisp
 javadir = $(datadir)/java/$(subdir)
 JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@conf_classpath@@pathsep@$$CLASSPATH
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@@conf_classpath@$$CLASSPATH
 JAVAROOT = $(top_builddir)
 JAR = fastjar
 OFILES_DIR = $(TO_TOPDIR)/bin
@@ -399,20 +399,18 @@ java-classes.stamp: $(java_Java)
 	echo timestamp > java-classes.stamp
 
 scm-classes.stamp: $(java_SCM)
-	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	$(CLASSPATH_ENV) \
 	  $(KAWA1) -d $(top_builddir) --module-static $(SCM_COMPILE_FLAGS) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. -C $?
 	echo timestamp > scm-classes.stamp
 
 clisp-classes.stamp: $(java_CLISP)
-	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
-	  $(KAWA1) -d $(top_builddir) \
+	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --clisp -C $?
 	echo timestamp > clisp-classes.stamp
 
 elisp-classes.stamp: $(java_ELISP)
-	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
-	  $(KAWA1) -d $(top_builddir) \
+	$(CLASSPATH_ENV) $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 

@@ -1,3 +1,7 @@
+2003-05-22  Bruce R. Lewis <brlewis@ALUM.MIT.EDU>.
+
+	* mac-test.scm:  New test case.
+
 2003-05-18  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm (fie-6):  New test, from Petter Oesterlund.

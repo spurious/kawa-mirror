@@ -1,4 +1,4 @@
-(test-init "macros" 41)
+(test-init "macros" 42)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -147,3 +147,12 @@
     (let loop ((size :: <int> 10))
       (+ size x)))))
 (test 14 'test-colon (test-colon 4))
+
+(define-syntax one
+  (syntax-rules ()
+		((one var)
+		 (begin
+		   (define extra 1)
+		   (define var extra)))))
+(one xx1)
+(test 1 'one xx1)

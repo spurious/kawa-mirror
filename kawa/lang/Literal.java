@@ -38,6 +38,8 @@ public class Literal
   /** The static final field that contains the value of the literal. */
   Field field;
 
+  /** Assign a static Field to hold the value of this Literal.
+   * This supports the same value being used multiple times or cyclically. */
   void assign (Compilation comp)
   {
     index = comp.literalsCount++;
@@ -85,6 +87,26 @@ public class Literal
       }
   }
 
+  /** Emit code to re-create this Literal's value, an Object array. */
+  void emitArray (Compilation comp, Type element_type)
+  {
+    Object[] array = (Object[]) value;
+    int len = array.length;
+    comp.method.compile_push_int (len);
+    comp.method.compile_new_array (element_type);
+    flags |= Literal.ALLOCATED;
+    for (int i = 0;  i < len;  i++)
+      {
+	comp.method.compile_dup (1);
+	comp.method.compile_push_int (i);
+	comp.emitLiteral (array[i]);
+	// Stack contents:  ..., array, array, i, array[i]
+	comp.method.compile_array_store (comp.scmObjectType);
+	// Stack contents:  ..., array
+      }
+    flags |= Literal.INITIALIZED;
+  }
+
   void emit (Compilation comp, boolean ignore)
   {
     if ((flags & ALLOCATED) != 0)
@@ -114,6 +136,15 @@ public class Literal
 	comp.method.compile_invoke_nonvirtual (comp.initStringBufferMethod);
 	flags |= Literal.ALLOCATED|Literal.INITIALIZED;
       }
+    else if (value instanceof String)
+      {
+	comp.method.compile_push_string (value.toString ());
+	flags |= Literal.ALLOCATED|Literal.INITIALIZED;
+      }
+    else if (value instanceof Symbol[])
+      emitArray (comp, comp.scmSymbolType);
+    else if (value instanceof Object[])
+      emitArray (comp, comp.scmObjectType);
     else
       {
 	System.err.print ("Unimplemented compileConstant for ");
@@ -129,6 +160,17 @@ public class Literal
       }
     else if (ignore)
       comp.method.compile_pop (1);
+  }
+
+  /** Utility function to check for circular literals dependencies.
+   * Use this in a Compilable.emit method circularities are not allowed
+   * (perhaps because it it not worth the trouble to handle them). */
+  void check_cycle ()
+  {
+    if ((flags & ALLOCATING) != 0)
+      throw new Error ("circularity in emit - not supported for class "
+		       + value.getClass().getName());
+    flags |= ALLOCATING;
   }
 }
 

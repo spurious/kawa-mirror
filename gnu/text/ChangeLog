@@ -1,3 +1,7 @@
+2004-06-07  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (maybeOutput):  Clear currentBlock if needed.
+
 2004-05-28  Per Bothner  <per@bothner.com>
 
 	* CompoundFormat.java (format):  Check for missing argument.

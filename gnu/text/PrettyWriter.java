@@ -840,6 +840,7 @@ public class PrettyWriter extends java.io.Writer
 	      }
 	    break;
 	  case QUEUED_OP_BLOCK_START_TYPE:
+	    int start = next;
 	    int end = queueInts[next + QUEUED_OP_SECTION_START_SECTION_END];
 	    // Convert relative offset to absolute index:
 	    end = end > 0 ? (end + next) % queueInts.length : -1;
@@ -864,10 +865,11 @@ public class PrettyWriter extends java.io.Writer
 		//log("reallyStartLogicalBlock: "+blockDepth+" at:"+next);
 		reallyStartLogicalBlock (posnColumn(queueInts[next + QUEUED_OP_POSN]),
 					 prefix, suffix);
-					 
 	      }
 	    else // Don't know.
 	      break loop;
+	    if (currentBlock == start)
+	      currentBlock = -1;
 	    break;
 	  case QUEUED_OP_BLOCK_END_TYPE:
 	    //log("reallyEndLogicalBlock: "+blockDepth+" at:"+next);

@@ -18,7 +18,7 @@ public class DefineNamespace extends Syntax
     String sym = null;
     if (name instanceof String)
       {
-	sym = (NamespaceEnv.NAMESPACE_PREFIX + name).intern();
+	sym = (Interpreter.NAMESPACE_PREFIX + name).intern();
 	Declaration decl = defs.getDefine(sym, 'w', tr);
 	tr.pushBinding(sym, decl);
 	decl.setFlag(Declaration.IS_CONSTANT);

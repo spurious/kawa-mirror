@@ -3,14 +3,12 @@
 
 package gnu.kawa.xml;
 import gnu.mapping.*;
+import gnu.expr.Interpreter;
 
 /** Helper Environment used by Scheme to resolve "NAMESPACE:NAME". */ 
 
 public class NamespaceEnv extends Environment
 {
-  /** A namespace PREFIX is a declaration of NAMESPACE_PREFIX+"PREFIX". */
-  public static final String NAMESPACE_PREFIX = "$Namespace$";
-
   Environment mainEnv;
 
   public NamespaceEnv (Environment mainEnv)
@@ -30,7 +28,7 @@ public class NamespaceEnv extends Environment
 	  }
 	String prefix = name.substring(0, i);
 	Object nsValue
-	  = mainEnv.get((NAMESPACE_PREFIX+prefix).intern(), null);
+	  = mainEnv.get((Interpreter.NAMESPACE_PREFIX+prefix).intern(), null);
 	if (nsValue != null)
 	  {
 	    String localName = name.substring(i+1);

@@ -1,5 +1,9 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* NamespaceEnv.java (NAMESPACE_PREFIX):  Moved to Interpreter.
+	(get):  Update acordingly.
+	* DefineNamespace.java (scanForDefinitions):  Likewise.
+
 	* AttributeConstructor.java, ElementConstructor.java, ElementType.java,
 	NamedAttributes.java:  Use gnu.mapping.Symbol instead of gnu.xml.QName.
 

@@ -6,6 +6,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 /** Wrapper class to allow a Servlet to be run as a CGI script.
  * Invoked as:
@@ -246,9 +247,36 @@ implements HttpServletRequest, HttpServletResponse,
     return -1;
   }
 
+  public int getLocalPort()
+  {
+    return getServerPort();  // is this resonable?
+  }
+
+  public String getLocalAddr ()
+  {
+    try
+      {
+	return InetAddress.getByName(getLocalName()).getHostAddress();
+      }
+    catch (UnknownHostException ex)
+      {
+	return "127.0.0.1";
+      }
+  }
+
+  public String getLocalName ()
+  {
+    return getServerName();  // is this resonable?
+  }
+
+  public int getRemotePort()
+  {
+    return -1;  // FIXME
+  }
+
   public boolean isSecure()
   {
-    return false;  // FIXME
+    return getServerPort() == 443; // FIXME
   }
 
   public String getServerName()
@@ -271,13 +299,11 @@ implements HttpServletRequest, HttpServletResponse,
   }
 
   public String getCharacterEncoding () { return characterEncoding; }
+
   public void setCharacterEncoding(String enc)
-    throws java.io.UnsupportedEncodingException // FIXME
   {
     characterEncoding = enc;
   }
-
-
 
   public void setContentType(String type)
   {

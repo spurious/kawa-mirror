@@ -1,3 +1,11 @@
+2003-11-16  Per Bothner  <per@bothner.com>
+
+	* CGIServletWrapper.java (getLocalPort, getLocalName, getRemotePort):
+	New methods required by Servlets 2.4.
+	(setCharacterEncoding):  Remove throws clause, for 2.4 compatibility.
+
+	* CGIServletWrapper.java (isSecure):  More real implementation.
+
 2003-10-29  Gerardo Jorvilleur <magoghm@Prodigy.net.mx>
 
 	* KawaServlet.java (doPost):   New method.

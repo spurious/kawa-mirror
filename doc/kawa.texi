@@ -442,6 +442,26 @@ to started.  This option allows you to connect using any
 Telnet client program to a remote "Kawa server".
 @end table
 
+The following options control which calling conventions are used:
+@table @samp
+@item --full-tailcalls
+Use a calling convention that supports proper tail recursion.
+@item --no-full-tailcalls
+Use a calling convention that does not support proper tail recursion.
+Self-tail-recursion (i.e. a recursive call to the current function)
+is still implemented correctly, assuming that the called function
+is known at compile time.
+@end table
+
+The default is currently @code{--no-full-tailcalls} because I believe it is
+faster (though I have not done any measurements yet).
+It is also closer to the Java call model, so may be better for people
+primarily interested in using Kawa for scripting Java systems.
+
+Both calling convention can co-exist:  Code compiled
+with @code{--full-tailcalls} can call code compiled
+with @code{--no-full-tailcalls} and vice versa.
+
 The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, and @samp{--main}
 are used to compile a Scheme file; see @ref{Files compilation}.
 The option @samp{--connect @var{portnum}} is only used by
@@ -527,6 +547,7 @@ nor @code{letrec-syntax} are implemented.
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
 * Exceptions:: Signalling and recovering from exceptions
+* Locations::
 * Eval and Environments::
 * Quantities::
 * Threads::
@@ -1132,7 +1153,7 @@ are supported yet.
 
 Plus of course, we need documentation for @code{format}!
 
-@node Exceptions, Eval and Environments, Format, Extensions
+@node Exceptions, Locations, Format, Extensions
 @section Signalling and recovering from exceptions
 
 @defun catch key thunk handler
@@ -1223,7 +1244,67 @@ is not yet possible in Kawa), the @var{in-guard} is called again.
 This function will be in R5RS.
 @end defun
 
-@node Eval and Environments, Quantities, Exceptions, Extensions
+@node Locations, Eval and Environments, Exceptions, Extensions
+@section Locations
+
+A @dfn{location} is a place where a value can be stored.
+An @dfn{lvalue} is an expression that refers to a location.
+(The name "lvalue" refers to the fact that the left operand
+of @code{set!} is an lvalue.)
+The only kind of lvalue in standard Scheme is a @dfn{variable}.
+Kawa also allows @dfn{computed lvalues}.  These are procedure
+calls used in "lvalue context", such as the left operand of @code{set!}.
+
+You can only use procedures that have an associated @dfn{setter}.
+In that case, @code{(set! (f arg ...) value)}
+is equivalent to @code{((setter f) value arg ...)}
+(It is possible the definition will change
+to @code{((setter f) arg ... value)} if Guile goes for that.)
+Currently, only a few procedures have associated @code{setter}s,
+and only builtin procedures written in Java can have @code{setter}s.
+
+For example:
+@example
+(set! (car x) 10)
+@end example
+is equivalent to:
+@example
+(set-car! x 10)
+@end example
+
+Kawa also gives you access to locations as first-class values:
+
+@deffn Syntax (location lvalue)
+Returns a location object for the given @var{lvalue}.
+You can get its value (by applying it, as if it were a procedure),
+and you can set its value (by using @code{set!} on the application).
+The @var{lvalue} can be a local or global variable, or a procedure
+call using a procedure that has a @code{setter}.
+@example
+(define x 100)
+(define lx (location x))
+(set! (lx) (cons 1 2)) ;; set x to (1 . 2)
+(lx)  ;; returns (1 . 2)
+(define lc (location (car x)))
+(set! (lc) (+ 10 (lc)))
+;; x is now (11 . 2)
+@end example
+@end deffn
+
+@deffn Syntax (define-alias variable lvalue)
+Define @var{variable} as an alias for @var{lvalue}.
+In other words, makes it so that @code{(location @var{variable})}
+is equivalent to @code{(location @var{lvalue})}.
+This currently only works at top-level.  (Kawa has the basic support for local
+aliases, but the syntactic support is not implemented yet.)
+@end deffn
+
+Some people mind find it helpful to think of a location
+as a settable @dfn{thunk}.  Others may find it useful to
+think of the @code{location} syntax as similar to the C @samp{&} operator;
+for the @samp{*} indirection operator, Kawa uses procedure application.
+
+@node Eval and Environments, Quantities, Locations, Extensions
 @section Eval and Environments
 
 @defun eval expression [environment]

@@ -35,4 +35,5 @@ public interface CharSequence extends Sequence
 
   public void writeTo(java.io.Writer str) throws java.io.IOException;
 
+  public void consume(int start, int count, Consumer out);
 }

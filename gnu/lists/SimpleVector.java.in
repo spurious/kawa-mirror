@@ -13,13 +13,13 @@ import java.util.*;
  * array, ignoring the 'size' field.
  *
  * Can be used to implement CommonLisp simple vectors, but all simple
- * vectors are also adjustable (realloate buffer)
+ * vectors are also adjustable (by re-allocating the buffer)
  * and have a fill pointer (the size field). */
 
 public abstract class SimpleVector extends AbstractSequence implements Sequence
 {
   /** The (current) number of elements.
-   * Must always have size() >= 0 && size() < getBufferLength(). */
+   * Must always have size() >= 0 && size() <= getBufferLength(). */
   public int size;
 
   public final int size() { return size; }
@@ -88,9 +88,15 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
 
   public Object get(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     return getBuffer(index);
+  }
+
+  protected  Object getNext(int ipos, Object xpos)
+  {
+    int index = ipos >>> 1;
+    return index >= size ? eofValue : getBuffer(index);
   }
 
   public int intAtBuffer(int index)
@@ -100,14 +106,14 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
 
   public int intAt(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     return intAtBuffer(index);
   }
 
   public long longAt(int index)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     return longAtBuffer(index);
   }
@@ -121,7 +127,7 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
 
   public Object set(int index, Object value)
   {
-    if (index > size)
+    if (index >= size)
       throw new IndexOutOfBoundsException();
     Object old = getBuffer(index);
     setBuffer(index, value);
@@ -319,8 +325,21 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
 
   /** This is convenience hack for printing "uniform vectors" (srfi 4).
    * It may go away without notice! */
-   public String getTag() { return null; }
+  public String getTag() { return null; }
 
+  public void consume(int start, int length, Consumer out)
+  {
+    consume(start << 1, null, (start + length) << 1, null, out);
+  }
+
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    int index = ipos >>> 1;
+    if (index >= size)
+      return false;
+    out.writeObject(getBuffer(index));
+    return true;
+  }
 
   protected void consume(int iposStart, Object xposStart,
 			 int iposEnd, Object xposEnd, Consumer out)

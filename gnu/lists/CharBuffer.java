@@ -107,6 +107,25 @@ public class CharBuffer extends StableVector implements CharSequence
     gapStart += len;
   }
 
+  public void consume(int start, int count, Consumer dest)
+  {
+    char[] array = string.data;
+    if (start < gapStart)
+      {
+	int count0 = gapStart - start;
+	if (count0 > count)
+	  count0 = count;
+	dest.write(array, start, count0);
+	count -= count0;
+	start += count;
+      }
+    if (count > 0)
+      {
+	start += gapEnd - gapStart;
+	dest.write(array, start, count);
+      }
+  }
+
   public void writeTo(int start, int count, java.io.Writer dest)
     throws java.io.IOException
   {

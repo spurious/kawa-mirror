@@ -44,6 +44,9 @@ public class SourceMessages
   // The last SourceError with a *differnt* filename than prev has.
   SourceError lastPrevFilename = null;
 
+  /** True if we should sort messages by line number. */
+  public boolean sortMessages;
+
   /** Link in an error. */
   public void error(SourceError error)
   {
@@ -57,7 +60,7 @@ public class SourceMessages
 	&& ! lastError.filename.equals(error.filename))
       lastPrevFilename = lastError;
     SourceError prev = lastPrevFilename;
-    if (error.severity == 'f')
+    if (! sortMessages || error.severity == 'f')
       prev = lastError;
     else
       {

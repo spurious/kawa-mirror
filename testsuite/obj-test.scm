@@ -1,4 +1,4 @@
-(test-init "objects" 12)
+(test-init "objects" 13)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -18,7 +18,7 @@
 
 (test 20 'set! (begin (set! (z 'im) 15) (+ (z 're) (z 'im))))
 
-(test 2 'object-with-closure
+(test 2 'object-with-closure-1
       (length (let*
 		  ((name 'x)
 		   (obj (object (<java.util.zip.Adler32>))))
@@ -33,3 +33,25 @@
 					   (display name) 
 					   (newline)))))))
 		  (opt 3)))))
+
+(define (object-with-closure-2 c-name)
+  (let* ((c-path (symbol->string c-name)) 
+	 (c-obj (object (<java.lang.Object>)))) 
+    (letrec ((opt (lambda (args) 
+		    (if (pair? args) 
+			(begin 
+			  (let ((listener
+				 (object (<java.lang.Object>
+					  <java.awt.event.ItemListener>) 
+					 ((itemStateChanged (arg <java.awt.event.ItemEvent>)) 
+					  <void> 
+					  (display "listener of checkbutton ") 
+					  (display c-name) 
+					  (display arg) 
+					  (newline))))) 
+			    (list c-obj listener)) 
+			  (opt (cddr args)))))))
+      (opt (list )))
+    c-path))
+
+(test ".x.c" object-with-closure-2 '.x.c)

@@ -300,6 +300,7 @@ public class Compilation
   {
     ClassType sup = module.getSuperType();
     return (sup != null ? sup
+	    : usingCPStyle() ? typeCallFrame
 	    : generateApplet ? typeApplet
 	    : generateServlet ? typeServlet
 	    : typeModuleBody);
@@ -1273,9 +1274,9 @@ public class Compilation
     // if (usingCPStyle())   code.addParamLocals();
 
     thisDecl = method.getStaticFlag() ? null : module.declareThis(new_class);
+    module.closureEnv = module.thisVariable;
     module.heapFrame = module.thisVariable;
-    if (! (fewerClasses && curClass == mainClass))
-      module.allocChildClasses(this);
+    module.allocChildClasses(this);
 
     if (module.isHandlingTailCalls() || usingCPStyle())
       {
@@ -1313,6 +1314,9 @@ public class Compilation
 	code.emitLoad(callStackContext);
         code.emitGetField(pcCallContextField);
         fswitch = new SwitchState(code);
+	Label l = new Label(code);
+	l.define(code);
+	fswitch.addCase(0, l, code);
       }
 
     try
@@ -1405,7 +1409,7 @@ public class Compilation
   }
 
   public static boolean usingCPStyle() { return usingCPStyle; }
-  public static boolean usingTailCalls() { return usingTailCalls; }
+  public boolean usingTailCalls() { return usingTailCalls; }
 
   int localFieldIndex; 
   public Field allocLocalField (Type type, String name)

@@ -63,7 +63,7 @@ public class LambdaExp extends ScopeExp
       as long as they all are ultimately called from the same place.)
       This is used to see if we can inline the function at its unique
       call site. */
-  ApplyExp returnContinuation;
+  public ApplyExp returnContinuation;
 
   /** If non-null, a Declaration whose value is (only) this LambdaExp. */
   Declaration nameDecl;
@@ -513,9 +513,13 @@ public class LambdaExp extends ScopeExp
 
   public Field compileSetField (Compilation comp)
   {
-    compileAsMethod(comp);
-
-    getHeapLambda(outer).addApplyMethod(this);
+    if (comp.usingCPStyle())
+      compile(comp, Type.pointer_type);
+    else
+      {
+	compileAsMethod(comp);
+	getHeapLambda(outer).addApplyMethod(this);
+      }
 
     return (new ProcInitializer(this, comp)).field;
   }
@@ -531,13 +535,14 @@ public class LambdaExp extends ScopeExp
     Type rtype;
     CodeAttr code = comp.getCode();
 
-    if (Compilation.fewerClasses && ! getImportsLexVars())
+    if (comp.usingCPStyle())
       {
 	//	Label func_start = new Label(code);
 	Label func_end = new Label(code);
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = this;
 	type = saveLambda.type;
+	closureEnv = saveLambda.closureEnv;
         /*
 	if (comp.usingCPStyle())
 	  {
@@ -568,11 +573,10 @@ public class LambdaExp extends ScopeExp
 	code.restoreStackTypeState(stackTypes);
 	ClassType ctype = comp.curClass;
 	rtype = ctype;
-	code.emitNew(ctype);
 	/*
+	code.emitNew(ctype);
 	code.emitDup(ctype);
 	code.emitInvokeSpecial(ctype.constructor);
-	*/
 	code.emitDup(ctype);
 	code.emitPushInt(pc);
 	code.emitPutField(comp.saved_pcCallFrameField);
@@ -594,6 +598,7 @@ public class LambdaExp extends ScopeExp
 	    code.emitPushThis();
 	    code.emitPutField(comp.callerCallFrameField);
 	  }
+	*/
       }
     else
       { LambdaExp outer = outerLambda();
@@ -860,6 +865,9 @@ public class LambdaExp extends ScopeExp
 
     declareClosureEnv();
 
+    if (comp.usingCPStyle() && comp.curClass == comp.mainClass)
+      return;
+
     allocFrame(comp);
 
     for (LambdaExp child = firstChild;  child != null;
@@ -921,11 +929,11 @@ public class LambdaExp extends ScopeExp
   void allocParameters (Compilation comp)
   {
     CodeAttr code = comp.getCode();
+
     int i = 0;
     int j = 0;
 
-    if ((isHandlingTailCalls() || comp.usingCPStyle())
-	 && ! isModuleBody())
+    if (isHandlingTailCalls() && ! isModuleBody() && ! comp.usingCPStyle())
       {
 	comp.callStackContext = new Variable ("$ctx", comp.typeCallContext);
 	// Variable thisVar = isStaic? = null : declareThis(comp.curClass);
@@ -939,7 +947,7 @@ public class LambdaExp extends ScopeExp
     if (argsArray != null && isHandlingTailCalls())
       {
         code.emitLoad(comp.callStackContext);
-        code.emitGetField(comp.argsCallContextField);
+	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("getArgs", 0));
         code.emitStore(argsArray);
       }
 
@@ -1079,7 +1087,7 @@ public class LambdaExp extends ScopeExp
 	    Type paramType = param.getType();
 	    Type stackType
 	      = (mainMethod == null || plainArgs >= 0 ? Type.pointer_type
-		 : mainMethod.getParameterTypes()[i]);
+		 : paramType);
 	    // If the parameter is captured by an inferior lambda,
 	    // then the incoming parameter needs to be copied into its
 	    // slot in the heapFrame.  Thus we emit an aaload instruction.
@@ -1379,7 +1387,10 @@ public class LambdaExp extends ScopeExp
 	out.print('/');
       }
     out.print(id);
-    out.print("/ (");
+    out.print('/');
+    out.writeSpaceFill();
+    printLineColumn(out);
+    out.print('(');
     Special prevMode = null;
     int i = 0;
     int opt_i = 0;
@@ -1398,11 +1409,11 @@ public class LambdaExp extends ScopeExp
 	else
 	  mode = Special.key;
 	if (i > 0)
-	  out.print(' ');
+	   out.writeSpaceFill();
 	if (mode != prevMode)
 	  {
 	    out.print(mode);
-	    out.print(' ');
+	    out.writeSpaceFill();
 	  }
 	Expression defaultArg = null;
 	if (mode == Special.optional || mode == Special.key)

@@ -66,20 +66,8 @@ public class ApplyExp extends Expression
 	return;
       }
     LambdaExp caller = comp.curLambda;
-    if (args.length == caller.min_args
-	&& args.length == caller.max_args
-	&& caller.isHandlingTailCalls())
-      {
-	// Re-use caller's argsArray.
-	// code.emitLoad(caller.declareArgsArray());  FIXME
-	code.emitLoad(comp.callStackContext);
-	code.emitGetField(Compilation.argsCallContextField);
-      }
-    else
-      {
-	code.emitPushInt(args.length);
-	code.emitNewArray(Type.pointer_type);
-      }
+    code.emitPushInt(args.length);
+    code.emitNewArray(Type.pointer_type);
     for (int i = 0; i < args.length; ++i)
       {
 	Expression arg = args[i];
@@ -253,7 +241,6 @@ public class ApplyExp extends Expression
           }
       }
 
-    /*
     if (comp.usingCPStyle())
       {
 	  {
@@ -300,14 +287,15 @@ public class ApplyExp extends Expression
 		  }
 	      }
 
+	    /* FIXME
 	    // Load result from stack.value to target.
 	    code.emitLoad(comp.callStackContext);
 	    code.emitGetField(comp.valueCallContextField);
 	    target.compileFromStack(comp, Type.pointer_type);
+	    */
 	  }
 	return;
       }
-    */
 
     // Check for tail-recursion.
     boolean tail_recurse
@@ -337,18 +325,47 @@ public class ApplyExp extends Expression
 	return;
       }
 
-    if (comp.curLambda.isHandlingTailCalls() && exp.isTailCall()
+    if (comp.curLambda.isHandlingTailCalls()
 	&& ! comp.curLambda.getInlineOnly())
       {
-	code.emitLoad(comp.callStackContext);
-	code.emitDup(comp.callStackContext.getType());
+	ClassType typeContext = comp.typeCallContext;
 	exp_func.compile(comp, new StackTarget(comp.typeProcedure));
-	code.emitPutField(comp.procCallContextField);
-	code.emitDup(comp.callStackContext.getType());
+	code.emitLoad(comp.callStackContext);
+	code.emitDupX();
+	// Stack:  context, proc, context
+	if (! exp.isTailCall())
+	  code.emitDupX();
 	//  evaluate args to frame-locals vars;  // may recurse! 
-	compileToArray (exp.args, comp);
-	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("setArgsN", 1));
-	code.emitReturn();
+	if (args_length <= 4)
+	  {
+	    for (int i = 0; i < args_length; ++i)
+	      exp.args[i].compile(comp, Target.pushObject);
+	    code.emitInvoke(typeContext.getDeclaredMethod("setArgs",
+							  args_length));
+	  }
+	else
+	  {
+	    compileToArray (exp.args, comp);
+	    code.emitInvoke(typeContext.getDeclaredMethod("setArgsN", 1));
+	  }
+	if (exp.isTailCall())
+	  {
+	    // Stack: context, proc
+	    code.emitPutField(comp.procCallContextField);
+	    code.emitReturn();
+	  }
+	else if (target instanceof ConsumerTarget)
+	  {
+	    code.emitPutField(comp.procCallContextField);
+	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
+	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
+	  }
+	else
+	  {
+	    code.emitPutField(comp.procCallContextField);
+	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 0));
+	    target.compileFromStack(comp, Type.pointer_type);
+	  }
 	return;
       }
 
@@ -407,6 +424,7 @@ public class ApplyExp extends Expression
     if (tailCall)
       out.print (" [tailcall]");
     out.writeSpaceFill();
+    printLineColumn(out);
     func.print(out);
     for (int i = 0; i < args.length; ++i)
       {

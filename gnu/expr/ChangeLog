@@ -1,10 +1,30 @@
 2001-11-18  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (compile):  If isHandlingTailCalls use CallContext
+	even for non-TailCalls (so CallContext gets passed through).
+	(compileToArray):  Thus we can no longer re-use ctx.values.
+	* Compilation.java (usingTailCalls):  Make non-static.
+	(getModuleSuperType):  Handle usingCPStyle() case.
+	(addClass):  Some tweaks for usingCPStyle() case.
+	* FindCapturedVars.java (walkApplyExp):  Skip optimization to avoid
+	function lambda if usingTailCalls, at least for now.
+	* LambdaExp.java:  Tweaks for usingCPStyle() case.
+	(allocParameters):  If isHandlingTailCalls() use getArgs method.
+
+	* LambdaExp.java (enterFunction):  Use decl's parameter type,
+	rather than the method's type, which is the implementation type.
+
+	* LambdaExp.java (returnContinuation):  Make public, for ValuesMap.
+
+	* ModuleBody.java (runAsMain):  Call runUntilDone rather than run,
+	which wraps exceptions.  Instead, catch and print exceptions here.
+	
 	* PrimProcedure.java (<init>): Don't set interface flag as it prevents
 	future getModifiers calls from getting the reflectClass's modifiers.
 	
 	* Expression.java (printLineColumn):  New method.
-	* BeginExp.java, LetExp.java, SetExp.java (print): Use printLineColumn.
+	* ApplyExp.java, BeginExp.java, LambdaExp.java, LetExp.java,
+	SetExp.java (print): Use printLineColumn.
 
 	* SetExp.java (getNewValue):  New method.
 

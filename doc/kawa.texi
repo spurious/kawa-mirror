@@ -1104,6 +1104,11 @@ visible, and so on.
 @end example
 @end deffn
 
+@defun values-append arg1 ...
+The values resulting from evaluating each argument are appended
+together.
+@end defun
+
 @node Special named constants, Keywords, Multiple values, Extensions
 @section Special named constants
 
@@ -4010,6 +4015,14 @@ System.out.println(x);
 Kawa has a number of experimental features for working with XML.
 These are built on the concepts of the @code{gnu.lists} package.
 
+@menu
+* Server-side scripts::  Writing web-server-side Kawa scripts
+* Servlets::             Installing Kawa programs as Servlets
+* CGI scripts::          Installing Kawa programs as CGI scripts
+* HTTP requests::        Functions for accessing HTTP requests
+* HTTP response::        Functions for generating HTTP response
+@end menu
+
 @subsection Scheme functions
 
 @defun make-element tag [attribute ...] child ...
@@ -4039,23 +4052,6 @@ Create an "attribute", which is a name-value pair.
 For now, @var{name} should be a symbol
 @end defun
 
-@subsection Compiling to a Servlet
-
-You can compile a Scheme file to a @code{Servlet}, and run it
-in a servlet engine (a Servlet-aware web server).
-For example, the example under @code{make-element} can
-be saved in a file @code{CurDate.scm}, and compiled:
-@example
-kawa --servlet -C CurDate.scm
-@end example
-If you have Tomcat 4.x installed, and you want @code{CurDate} to be
-part of the @code{myutils} "web application", copy @code{CurDate*.class}
-into @code{$CATALINA_HOME/webapps/myutils/WEB-INF/classes/}.
-You also need to copy Kawa somewhere where Tomcat can find it,
-for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
-You can then run the @code{CurDate} servlet using the URL
-@url{http://localhost::8080/myutils/servlet/CurDate}.
-
 @subsection xquery language
 
 W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
@@ -4064,6 +4060,208 @@ If you start Kawa with the @code{--xquery} it selects the "XQuery"
 source language; this also prints output using XML syntax.
 See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery home page}
 for examples and more information.
+
+@node Server-side scripts, Servlets, , XML tools
+@section Writing web-server-side Kawa scripts
+
+You can take a Kawa program, in any supported language,
+and run it as either servlet engine (using a web server
+that supports servlets), or as a "CGI script" on most web servers.
+
+Here is a simple program @code{hello.scm}:
+@example
+(require 'http) ; Required for Scheme, though not BRL/KRL.
+(response-content-type 'text/html) ; Optional
+(make-element 'p
+  "The request URL was: " (request-url))
+(make-element 'p
+  (let ((query (request-query-string)))
+    (if query
+      "There was no query string."
+      (values-append "The query string was: " query))))
+@end example
+
+The same program using KRL is shorter:
+@example
+<p>The request URL was: [(request-url)]</p>
+<p>[(let ((query (request-query-string)))
+    (if query
+      ]There was no query string.[
+      ]The query string was: [query]))</p>
+@end example
+
+You can also use XQuery:
+@example
+<p>The request URL was: @{request-url()@}</p>
+<p>@{let $query := request-query-string() return
+    if (query)
+    then "There was no query string."
+    else "The query string was: ",query@}</p>
+@end example
+
+Either way, you compile your program to a servlet:
+@example
+kawa --servlet -C hello.scm
+@end example
+or:
+@example
+kawa --servlet --krl -C hello.krl
+@end example
+or:
+@example
+kawa --servlet --xquery -C hello.xql
+@end example
+
+The next two sections will explain how you can install this script
+as either a servlet or a CGI script.
+
+@node Servlets, CGI scripts, Server-side scripts, XML tools
+@section Installing Kawa programs as Servlets
+
+You can compile a Scheme file to a @code{Servlet}, and run it
+in a servlet engine (a Servlet-aware web server).
+I assume you have compiled your program to a servlet as
+descrbibed in the previous section.
+
+If you have Tomcat 4.x installed, and you want @code{hello} to be
+part of the @code{myutils} "web application", copy @code{hello*.class}
+into @code{$CATALINA_HOME/webapps/myutils/WEB-INF/classes/}.
+You also need to copy Kawa somewhere where Tomcat can find it,
+for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
+You can then run the @code{hello} servlet using the URL
+@url{http://localhost::8080/myutils/servlet/hello}.
+
+@node CGI scripts, HTTP requests, Servlets, XML tools
+@section Installing Kawa programs as CGI scripts
+
+The recommended way to have a web-server run a Kawa program
+as a CGI script is to compile the Kawa program to a servlet
+(as explained in @ref{Server-side scripts}, and then use
+Kawa's supplied CGI-to-servlet bridge.
+
+First, compile your program to one or more class files
+as explain in @ref{Server-side scripts}.  For example:
+@example
+kawa --servlet --xquery -C hello.xql
+@end example
+
+Then copy the resulting @code{.class} files to your server's
+CGI directory.  On Red Hat GNU/Linux, you can do the following (as root):
+@example
+cp hello*.class /var/www/cgi-bin/
+@end example
+
+Next find the @code{cgi-servlet} program that Kawa builds and installs.
+If you installed Kawa in the default place, it will be in
+@code{/usr/local/bin/cgi-servlet}.
+(You'll have this if you installed Kawa from source, but not
+if your just using Kawa @code{.jar} file.)
+Copy this program into the same CGI directory:
+@example
+cp /usr/local/bin/cgi-servlet /var/www/cgi-bin/
+@end example
+
+You can link instead of copying:
+@example
+ln -s /usr/local/bin/cgi-servlet /var/www/cgi-bin/
+@end example
+However, because of security issues this may not work, so it is
+safer to copy the file.  However, if you already have a copy
+of @code{cgi-servlet} in the CGI-directory, it is safe to make
+a hard link instead of making an extra copy.
+
+Make sure the files have the correct permissions:
+@example
+chmod a+r /var/www/cgi-bin/hello*.class /var/www/cgi-bin/hello
+chmod a+x /var/www/cgi-bin/hello
+@end example
+
+Now you should be able to run the Kawa program,
+using the URL @url{http://localhost/cgi-bin/hello}.
+The performance may be pretty bad, mainly because of the
+start-up time of the Java VM.  That is why servlets are
+preferred.  Using the CGI interface can still be useful
+for testing or when you can't run servlets.  We hope to
+soon be able to run Kawa CGI scripts compiled using GCJ,
+which should have much reduced start-up time, making
+Kawa servlets more practical.
+
+@node HTTP requests, HTTP response, CGI scripts, XML tools
+@section Functions for accessing HTTP requests
+
+The following functions are useful for accessing
+properties of a HTT request, in a Kawa program that is
+run either as a servlet or a CGI script.  These functions
+can be used from plain Scheme, from KRL (whether
+in BRL-compatible mode or not), and from XQuery.
+
+If using plain Scheme, you need to do the following
+before using these functions.
+@example
+(require 'http)
+@end example
+This is not needed for KRL or XQuery.  (FIXME?)
+
+@defun request-method
+Returns the method of the HTTP request, usually @code{"GET"}
+or @code{"POST"}.  Corresponds to the CGI variable @code{REQUEST_METHOD}.
+@end defun
+
+@defun request-path-info
+Corresponds to the CGI variable @code{PATH_INFO}.
+@end defun
+
+@defun request-path-translated
+Corresponds to the CGI variable @code{PATH_TRANSLATED}.
+@end defun
+
+@defun request-uri
+Returns the URI of the request, not including the query string,
+or server specification.
+The is the combination of CGI variables @code{SCRIPT_NAME}
+and @code{PATH_INFO}.
+@end defun
+
+@defun request-url
+Returns the complete URL of the request, except the query string.
+@end defun
+
+@defun request-query-string
+Returns the query string from an HTTP request.  The query string is
+the part of the request URL after a quetion mark.
+Returns false if there was no query string.
+Corresponds to the CGI variable @code{QUERY_STRING}.
+@end defun
+
+@node HTTP response, , HTTP requests, XML tools
+@section Functions for generating HTTP responses
+
+@defun unescaped-data data
+Creates a special value which causes @code{data} to be printed,
+as is, without normal escaping.  For example, when the output format
+is XML, then printing @code{"<?xml>"} prints as @code{&lt;?xml&gt;},
+but @code{(unescaped-data "<?xml>")} prints as  @code{<?xml>}.
+@end defun
+
+If using plain Scheme, you need to do the following
+before using these functions.
+@example
+(require 'http)
+@end example
+This is not needed for KRL or XQuery.  (FIXME?)
+
+@defun response-header key value
+Create the response header @samp{@var{key}: @var{value}} in the HTTP
+response.  It is unspecified whether this works by setting a side-effect,
+or whether it creates a creates a "response header" value (of some
+unspecified type), so you should place this where it can "print"
+its value to the response output stream.
+@end defun
+
+@defun response-content-type type
+Species the content-type of teh result - for example @code{"text/plain"}.
+Convenience functions for @code{(response-header "Content-Type" @var{type})}.
+@end defun
 
 @node KRL, Mailing lists,  XML tools, Top
 @chapter KRL - The Kawa Report Language for generating XML/HTML

@@ -157,6 +157,16 @@ implements CharSeq, Externalizable, Consumable
       System.arraycopy(data, srcBegin, dst, dstBegin, srcEnd - srcBegin);
   }
 
+  public void getChars (int srcBegin, int srcEnd, StringBuffer dst)
+  {
+    if (srcBegin < 0 || srcBegin > srcEnd)
+      throw new StringIndexOutOfBoundsException(srcBegin);
+    if (srcEnd > size)
+      throw new StringIndexOutOfBoundsException(srcEnd);
+    if (srcBegin < srcEnd)
+      dst.append(data, srcBegin, srcEnd - srcBegin);
+  }
+
   /** Return a char[] contain the characters of this string.
    * It is unspecified if the result is a copy or shares with this FString.
    */

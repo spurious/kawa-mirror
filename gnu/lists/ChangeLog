@@ -1,3 +1,7 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* FString.java (getChars):  New method, writes to StringBuffer.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (dump):  Better output for POSITION_TRIPLE_FOLLOWS.

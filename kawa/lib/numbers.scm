@@ -42,14 +42,16 @@
       (invoke-static <integer> 'remainder x y)
       (if (zero? y)
 	  (if (exact? y) x (exact->inexact x))
-	  (- x (/ x y) 'toInt (static-field <number> 'TRUNCATE)))))
+	  (- x (* (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))
+		  y)))))
 
 (define (modulo (x :: <real>) (y :: <real>)) :: <real>
   (if (and (instance? x <integer>) (instance? y <integer>))
       (invoke-static <integer> 'modulo x y)
       (if (zero? y)
 	  (if (exact? y) x (exact->inexact x))
-	  (- x (/ x y) 'toInt (static-field <number> 'FLOOR)))))
+	  (- x (* (invoke (/ x y) 'toInt (static-field <number> 'FLOOR))
+		  y)))))
 
 (define (numerator (x :: <rational>)) :: <integer>
   (invoke x 'numerator))

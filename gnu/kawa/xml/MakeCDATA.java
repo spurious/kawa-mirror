@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner
+// Copyright (c) 2004  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -8,14 +8,15 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
-public class TextConstructor extends CpsProcedure // NodeConstructor
+public class MakeCDATA extends CpsProcedure // NodeConstructor
 {
-  public static final TextConstructor textConstructor = new TextConstructor();
+  public static final MakeCDATA makeCDATA
+    = new MakeCDATA();
 
   public void apply (CallContext ctx)
   {
     Consumer saved = ctx.consumer;
-    Consumer out = NodeConstructor.pushNodeContext(ctx);
+    XConsumer out = NodeConstructor.pushNodeContext(ctx);
     try
       {
 	StringBuffer sbuf = new StringBuffer();
@@ -26,9 +27,12 @@ public class TextConstructor extends CpsProcedure // NodeConstructor
 	    if (arg == endMarker)
 	      break;
 	    StringValue.stringValue(arg, sbuf);
-	    out.writeChars(sbuf.toString());
-	    sbuf.setLength(0);
 	  }
+	int n = sbuf.length();
+	char[] chars = new char[n];
+	sbuf.getChars(0, n, chars, 0);
+	System.err.println("writeCDATA["+sbuf+"] to "+out.getClass().getName());
+	out.writeCDATA(chars, 0, n);
       }
     finally
       {

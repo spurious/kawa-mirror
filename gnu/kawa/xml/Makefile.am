@@ -9,7 +9,6 @@ java_sources = \
   Attributes.java \
   AttributeConstructor.java \
   AttributeType.java \
-  CDataConstructor.java \
   ChildAxis.java \
   CoerceNodes.java \
   CommentConstructor.java \
@@ -36,7 +35,10 @@ java_sources = \
   KProcessingInstruction.java \
   KText.java \
   ListItems.java \
+  MakeCDATA.java \
+  MakeProcInst.java \
   MakeResponseHeader.java \
+  MakeText.java \
   MakeUnescapedData.java \
   NamespaceEnv.java \
   NodeCompare.java \
@@ -51,7 +53,6 @@ java_sources = \
   SelfAxis.java \
   SortNodes.java \
   SortedNodes.java \
-  TextConstructor.java \
   TreeScanner.java \
   UnionNodes.java \
   WriteTo.java \

@@ -214,7 +214,7 @@ test1.class:  test1.xql
 
 check-test1:  test1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) test1 >tmp1
-	diff -b $(srcdir)/expected1.xml tmp1
+	@if diff -b $(srcdir)/expected1.xml tmp1; then echo '# test1 test passes'; else echo FAIL test1 test; fi
 
 maketab1.class:  maketab1.xql
 	$(KAWA) --main --xquery -C $<
@@ -223,7 +223,7 @@ maketab1.class:  maketab1.xql
 # interpreter gij.  Instead, should compile to native.
 check-maketab1:  maketab1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
-	diff -b $(srcdir)/tab.html tmp2
+	@if diff -b $(srcdir)/tab.html tmp2; then echo '# maketab1 test passes'; else echo FAIL maketab1 test; fi
 
 multab.class:  multab.xql
 	$(KAWA) --main --xquery -C $<

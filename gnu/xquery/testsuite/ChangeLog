@@ -1,3 +1,8 @@
+2001-09-25  Per Bothner  <per@bothner.com>
+
+	* multab.xql: Remove no-longer-needed outermost parens.
+	* Makefile.am (check-test1, check-maketab1):  Better output.
+
 2001-09-24  Per Bothner  <per@bothner.com>
 
 	* multab.xql:  New test - generate multiplication table.

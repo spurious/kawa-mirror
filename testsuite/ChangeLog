@@ -1,3 +1,8 @@
+2000-02-29  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm (test-nesting-3):  New test, triggers bug reported
+	by Bruce R. Lewis; now fixed.
+
 2000-02-25  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Added two more tests for #!optional.

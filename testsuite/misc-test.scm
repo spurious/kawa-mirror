@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 84)
+(test-init "Miscellaneous" 85)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -282,6 +282,13 @@
   (let ((bar2 34))
     (lambda () (lambda () bar2))))
 (test 34 ((test-nesting-2)))
+
+(define (test-nesting-3 k l m n o)
+  (define (foo a b c d e f)
+    (list a b c d e f k l m n o))
+  (foo foo (+ k k) (+ k l) (+ k m) (+ k n) (+ k o)))
+(test '(20 21 22 23 24 10 11 12 13 14) 'test-nesting-3
+      (cdr (test-nesting-3 10 11 12 13 14)))
 
 ;;; Testcase from  "Walter C. Pelissero" <wcp@lpds.sublink.org>:
 (test #t procedure?

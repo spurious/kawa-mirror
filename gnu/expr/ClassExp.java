@@ -224,7 +224,7 @@ public class ClassExp extends LambdaExp
 	    else
 	      {
 		String fname
-		  = Compilation.mangleNameIfNeeded(decl.getName(), true);
+		  = Compilation.mangleNameIfNeeded(decl.getName());
 		decl.field
 		  = instanceType.addField(fname, decl.getType(), flags);
 		decl.setSimple(false);

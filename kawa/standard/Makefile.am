@@ -40,10 +40,8 @@ ass.class \
 symbol_p.class \
 symbol2string.class \
 string2symbol.class \
-number_p.class \
-real_p.class \
-rational_p.class \
-integer_p.class \
+number_p.class quantity_p.class complex_p.class \
+real_p.class rational_p.class integer_p.class \
 exact_p.class \
 inexact_p.class \
 zero_p.class \
@@ -85,6 +83,8 @@ acos.class \
 atan.class \
 sqrt.class \
 expt.class \
+make_rectangular.class \
+real_part.class imag_part.class \
 exact2inexact.class \
 inexact2exact.class \
 number2string.class \
@@ -182,6 +182,7 @@ begin.class \
 ifp.class \
 values_v.class \
 call_with_values.class \
+make_quantity.class quantity2number.class quantity2unit.class \
 Scheme.class \
 null_env.class \
 user_env.class \

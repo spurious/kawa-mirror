@@ -152,7 +152,8 @@ public class Scheme extends Interpreter
 
       //-- Section 6.5
       define_proc ("number?", "kawa.standard.number_p");
-      define_proc ("complex?", "kawa.standard.real_p");  // For now
+      define_proc ("quantity?", "kawa.standard.number_p");
+      define_proc ("complex?", "kawa.standard.complex_p");
       define_proc ("real?", "kawa.standard.real_p");
       define_proc ("rational?", "kawa.standard.rational_p");
       define_proc ("integer?", "kawa.standard.integer_p");
@@ -197,6 +198,9 @@ public class Scheme extends Interpreter
       define_proc ("atan", "kawa.standard.atan");
       define_proc ("sqrt", "kawa.standard.sqrt");
       define_proc ("expt", "kawa.standard.expt");
+      define_proc ("make-rectangular", "kawa.standard.make_rectangular");
+      define_proc ("real-part", "kawa.standard.real_part");
+      define_proc ("imag-part", "kawa.standard.imag_part");
       define_proc ("exact->inexact", "kawa.standard.exact2inexact");
       define_proc ("inexact->exact", "kawa.standard.inexact2exact");
       define_proc ("number->string", "kawa.standard.number2string");
@@ -343,6 +347,10 @@ public class Scheme extends Interpreter
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
+
+      define_proc ("quantity->number", "kawa.standard.quantity2number");
+      define_proc ("quantity->unit", "kawa.standard.quantity2unit");
+      define_proc ("make-quantity", "kawa.standard.make_quantity");
    }
 
   /** Evalutate Scheme expressions from string.

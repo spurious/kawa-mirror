@@ -1,3 +1,8 @@
+2003-05-21  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main):  Test case.
+	Bug reported 05-18 by Seshukumar_Adiraju@infosys.com.
+
 2003-05-13  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Update and add new tests for new type syntax.

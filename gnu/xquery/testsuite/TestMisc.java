@@ -201,6 +201,12 @@ public class TestMisc
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
 
+    // Testcase from <Seshukumar_Adiraju@infosys.com>:
+    evalTest("let $books := "
+	     + "<books><book id='book1'/><book id='book2'/></books> "
+	     + "for $book in $books/book return <p>{string($book/@id)}</p>",
+	     "<p>book1</p><p>book2</p>");
+
     evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof node()",
 	     "true true true");
     evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof text ( )",

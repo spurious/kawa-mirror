@@ -1,3 +1,10 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* Future.java (initEnvironment): Removed field, for parent Environment.
+	(environment): New field, for child environment.
+	(run): Move allocation of child Environment from here ...
+	(<init>): ... to here.  This avoids a race condition.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java (makePrivate): New factory method.

@@ -1,7 +1,7 @@
 package kawa.lang;
 
 // An undefined symbol was evaled.
-public class UnboundSymbol extends Exception
+public class UnboundSymbol extends RuntimeException
 {
   public String symbol;
 

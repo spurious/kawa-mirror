@@ -123,7 +123,7 @@ public class Translator extends Object
   /** Note that we have seen a construct that must be compiled, not evaluated.
    * If we are not inside a lambda (which is always compiled), but
    * only inside the outer-most ModuleExp, note that it must be compiled. */
-  void mustCompileHere ()
+  public void mustCompileHere ()
   {
     LambdaExp lambda = currentLambda ();
     if (lambda instanceof ModuleExp)

@@ -1,0 +1,25 @@
+2000-10-11  Per Bothner  <per@bothner.com>
+
+	New package, for Procedures for Scheme/Lisp.
+	* Apply.java:  Renamed from kawa/standard/apply.java.
+	(apply):  New static field.
+	* Assoc.java:  Renamed from kawa/standard/ass.java.
+	* Format.java : Renamed from kawa/standard/format.java.
+	* IsEq.java:  Renamed from kawa/standard/eq_p.java.
+	(<init>):  Add name parameter.
+	* IsEqual.java:  Renamed from kawa/standard/equal_p.java.
+	(<init>):  Add name parameter.
+	* IsEqv.java:  Renamed from kawa/standard/eqv_p.java.
+	(<init>):  Add name parameter.
+	* LispFormat.java:  Renamed from kawa/standard/LispFormat.java.
+	* MakeList.java:  Renamed from kawa/standard/list_v.java.
+	(list):  New static field.
+	* Member.java:  Renamed from kawa/standard/mem.java.
+	* ObjectFormat.java:  Renamed from kawa/standard/ObjectFormat.java.
+	* ParseFormat.java:  Renamed from kawa/standard/ParseFormat.java.
+	* Setter.java:  Renamed from kawa/standard/setter.java.
+	Now implements gnu.expr.CanInline.
+	(inline):  new method.
+	(setterProcedure):  Field renamed to setter.
+	(setter):  New static method.
+	* Makefile.am, Makefile.in:  New files.

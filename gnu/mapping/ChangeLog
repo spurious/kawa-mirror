@@ -1,3 +1,7 @@
+2001-04-07  Otto, Marcus <Otto_Marcus@ph-ludwigsburg.de>
+
+	* CpsProcedure.java (applyN):  Check argument count.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* OutPort.java: Implement gnu.lists.Consumer.

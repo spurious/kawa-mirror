@@ -15,6 +15,11 @@ public abstract class CpsProcedure extends MethodProc
 
   public Object applyN (Object[] args)
   {
+    int count = args.length;
+    int num = this.numArgs();
+    if (count < (num & 0xFFF)
+        || (num >= 0 && count > (num >> 12)))
+      throw new WrongArguments(this, count);
     CallContext stack = new CallContext();
     stack.values = args;
     stack.proc = this;

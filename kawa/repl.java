@@ -130,6 +130,22 @@ public class repl extends Procedure0or1
 			       commandLineArguments);
   }
 
+  public static Interpreter getInterpreterFromFilenameExtension(String name)
+  {
+    if (Interpreter.defaultInterpreter == null)
+      {
+	Interpreter interp
+	  = Interpreter.getInstanceFromFilenameExtension(name);
+	if (interp != null)
+	  {
+	    Interpreter.defaultInterpreter = interp;
+	    Environment.setCurrent(interp.getEnvironment());
+	    return interp;
+	  }
+      }
+    return getInterpreter();
+  }
+
   public static Interpreter getInterpreter()
   {
     if (Interpreter.defaultInterpreter == null)
@@ -168,10 +184,11 @@ public class repl extends Procedure0or1
 	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    getInterpreter();
+	    String filename = args[iArg];
+	    getInterpreterFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    Shell.runFile (args[iArg]);
+	    Shell.runFile (filename);
 	    something_done = true;
 	  }
 	else if (arg.equals("\\"))
@@ -242,7 +259,7 @@ public class repl extends Procedure0or1
 			  }
 		      }
 		  }
-		getInterpreter();
+		getInterpreterFromFilenameExtension(filename);
 		freader = InPort.openFile(fstream, filename);
 		// FIXME adjust line number
 		setArgs(args, iArg+1);
@@ -319,12 +336,12 @@ public class repl extends Procedure0or1
 	else if (arg.equals ("-C"))
 	  {
 	    ++iArg;
-	    getInterpreter();
 	    if (iArg == maxArg)
 	      bad_option (arg);
 	    for ( ; iArg < maxArg;  iArg++)
 	      {
 		arg = args[iArg];
+		getInterpreterFromFilenameExtension(arg);
 		try
 		  {
 		    System.err.println("(compiling "+arg+")");
@@ -528,15 +545,17 @@ public class repl extends Procedure0or1
 	int iArg = processArgs(args, 0, args.length);
 	if (iArg < 0)
 	  return;
-	getInterpreter();
 	if (iArg < args.length)
 	  {
+	    String filename = args[iArg];
+	    getInterpreterFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
-	    Shell.runFile (args[iArg]);
+	    Shell.runFile (filename);
 	  }
 	else
 	  {
+	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
 	    Shell.run(Interpreter.defaultInterpreter);

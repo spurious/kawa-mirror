@@ -26,6 +26,7 @@ public class require extends Syntax
     map("printf", SLIB_PREFIX + "printf");
     map("xml", SLIB_PREFIX + "XML");
     map("readtable", SLIB_PREFIX + "readtable");
+    map("http", "gnu.kawa.servlet.HTTP");
   }
 
   public static String mapFeature(String featureName)
@@ -213,8 +214,8 @@ public class require extends Syntax
 	sexp.setDefining(true);
 	action = sexp;
       }
-    else if (isRunnable)
-      action = dofind;
+    else if (isRunnable) // Need to make sure 'run' is invoked.
+      action = gnu.kawa.functions.Convert.makeCoercion(dofind, Type.void_type);
     else
       action = QuoteExp.voidExp;
     forms.addElement(action);

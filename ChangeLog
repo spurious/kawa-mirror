@@ -1,3 +1,14 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (getInterpreterFromFilenameExtension):  New static.
+	(processArgs, main):  Use filename extension to select language.
+
+	* kawa/standard/reequire:  Handle (require 'http).
+
+	* kawa/standard/reequire (scanForDefinitions):  Coerce find call
+	to void if we're not actually using it (to prevent it being
+	printed when we're compiling with implicit values-append).
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* build.xml:  Add enable-xml flag, to build xml-related classes.

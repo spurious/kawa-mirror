@@ -16,19 +16,16 @@ public class LetExp extends ScopeExp
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    int n = decls.length;
-    Object[] values = new Object[n];
-    for (int i = 0; i < n; i++)
-      values[i] = inits[i].eval (env);
-    Environment new_env = new Environment (values, this, env);
-    return body.eval (new_env);
+    Object[] values = shared ? env.values : new Object[space_needed];
+    for (int i = 0; i < num_decls; i++)
+      values[decls[i].index] = inits[i].eval (env);
+    return body.eval (shared ? env : new Environment (values, this, env));
   }
 
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%let (");
-    int n = decls.length;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < num_decls; i++)
       {
 	if (i > 0)
 	  ps.print(" ");

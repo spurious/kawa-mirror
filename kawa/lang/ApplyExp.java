@@ -36,7 +36,7 @@ public class ApplyExp extends Expression
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%apply ");
-    kawa.lang.print.print (func, ps);
+    func.print (ps);
     for (int i = 0; i < args.length; ++i)
       {
 	ps.print(" ");
@@ -46,4 +46,3 @@ public class ApplyExp extends Expression
   }
 
 }
-

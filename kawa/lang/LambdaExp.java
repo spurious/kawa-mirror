@@ -41,22 +41,17 @@ public class LambdaExp extends ScopeExp
 				"(lambda formals body) [invalid formals]");
 
     decls = new Declaration[min_args + (max_args < 0 ? 1 : 0)];
-    int index = 0;
     bindings = formals;
     while (bindings instanceof Pair)
       {
 	Pair bind_pair = (Pair) bindings;
-	decls[index] = new Declaration ((Symbol) bind_pair.car);
-	decls[index].index = index;
-	index++;
+	add_decl ((Symbol) bind_pair.car);
 	bindings = bind_pair.cdr;
       }
     if (bindings instanceof Symbol)
       {
-	decls[index] = new Declaration ((Symbol) bindings);
-	decls[index].index = index;
+	add_decl ((Symbol) bindings);
       }
-
     push (interp);
     this.body = interp.rewrite_body (body);
     pop (interp);

@@ -10,13 +10,15 @@ public class Declaration
   /** The name of the new variable. */
   Symbol sym;
 
-  /** The variable's index in an Environment frame. */
+  ScopeExp context;
+
+  /** The variable's index in an Environment frame, or -1 if unassigned. */
   public int index;
 
   /** If non-null, the Declaration that we "shadow" (hide). */
   Declaration shadowed;
 
-  public Declaration (Symbol s) { sym = s; }
+  public Declaration (Symbol s) { sym = s;  index = -1; }
 
   public String string_name () { return sym.toString (); }
 

@@ -21,8 +21,15 @@ public class SetExp extends Expression
   {
     Object new_val = new_value.eval (env);
 
-    if (binding != null && env.values != null)
-      env.values[binding.index] = new_val;
+    if (binding != null)
+      {
+	ScopeExp scope = binding.context;
+	while (scope.shared)
+	  scope = scope.outer;
+	while (env.scope != scope)
+	  env = env.outer;
+	env.values[binding.index] = new_val;
+      }
     else
       env.interp.define (name, new_val);
     return Interpreter.undefinedObject;

@@ -16,8 +16,15 @@ public class ReferenceExp extends Expression
   public Object eval (Environment env)
        throws kawa.lang.UnboundSymbol
   {
-    if (binding != null && env.values != null)
-      return env.values[binding.index];
+    if (binding != null)
+      {
+	ScopeExp scope = binding.context;
+	while (scope.shared)
+	  scope = scope.outer;
+	while (env.scope != scope)
+	  env = env.outer;
+	return env.values[binding.index];
+      }
     Object val = env.interp.lookup (symbol);
     if (val == null)
       throw new UnboundSymbol(symbol.toString ());

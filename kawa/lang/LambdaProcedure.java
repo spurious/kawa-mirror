@@ -24,19 +24,16 @@ public class LambdaProcedure extends ProcedureN
     if (args.length < lexpr.min_args
 	|| (lexpr.max_args >= 0 && args.length > lexpr.max_args))
       throw new WrongArguments(this.name,lexpr.min_args,"(?)");
-    Object[] frame;
+    Object[] frame = new Object[lexpr.space_needed];
+    System.arraycopy (args, 0, frame, 0, lexpr.min_args);
     if (lexpr.max_args < 0) // Variable-arity procedure
       {
-	frame = new Object[lexpr.min_args + 1];
-	System.arraycopy (args, 0, frame, 0, lexpr.min_args);
 	// The last parameter gets a list of the remaining arguments.
 	Object list = Interpreter.nullObject;
 	for (int i = args.length;  --i >= lexpr.min_args; )
 	  list = new Pair (args[i], list);
 	frame[lexpr.min_args] = list;
       }
-    else
-      frame = args;
     return lexpr.body.eval (new Environment (frame, lexpr, environment));
   }
 

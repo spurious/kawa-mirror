@@ -18,7 +18,7 @@ public class BeginExp extends Expression
   {
     int n = exps.length;
     int i;
-    for (i = 0; i < i - 1; i++)
+    for (i = 0; i < n - 1; i++)
       exps[i].eval (env);
     return exps[i].eval (env);
   }

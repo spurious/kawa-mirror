@@ -115,6 +115,11 @@ public class Environment // extends [somewhat] java.util.Dictionary
     return null;
   }
 
+  public final Binding define (String name, Object value)
+  {
+    return define (Symbol.make (name), value);
+  }
+
   public Binding define (Symbol name, Object value)
   {
     if (num_bindings >= table.length * threshold)

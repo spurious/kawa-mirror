@@ -117,11 +117,12 @@ public class Interpreter extends Object
 
   public Expression rewrite_body (Object exp)
   {
-    int count = List.length (exp);
+    int count = List.list_length (exp);
     if (count == 1)
       return rewrite (((Pair)exp).car);
-    else if (count == 0)
-      return syntaxError ("body with no expressions");
+    else if (count <= 0)
+      return syntaxError (count == 0 ? "body with no expressions"
+			   : "body is not a proper list");
     else
       {
 	Expression[] exps = new Expression [count];

@@ -1,3 +1,9 @@
+2003-10-02  Per Bothner  <per@bothner.com>
+
+	* Undefined.java (undef):  Rename field to undefined, and make it
+	public, final, and initialized.
+	(getInstance):   Just return the value of theundefined field.
+
 2003-09-18  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (<init>(Method,LambdaExp)):  Re-set retType.

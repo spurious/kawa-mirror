@@ -4,12 +4,10 @@ import gnu.mapping.*;
 import java.io.PrintWriter;
 
 public class Undefined extends Object implements Printable {
-  static private Undefined undef = null;
+  public static final Undefined undefined = new Undefined();
   static public Undefined getInstance()
   {
-    if (undef == null)
-      undef = new Undefined();
-    return undef;
+    return undefined;
   }
 
    public Undefined() {

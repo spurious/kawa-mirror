@@ -18,4 +18,4 @@ dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], cl
 
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile)
+AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/math/Makefile kawa/standard/Makefile kawa/lib/Makefile testsuite/Makefile)

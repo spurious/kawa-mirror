@@ -1,3 +1,37 @@
+Sun Dec 15 22:29:30 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure, configure.in:  Support new testsuite directory.
+
+	* kawa/standard/{ceiling,floor,round,truncate}.java:  Use new
+	RealNum.toInt virtual method.	
+	* kawa/standard/inexact2exact.java:  Use new RealNum.toExact.
+
+	* kawa/standard/rationalize.java:  New procedure.
+	* kawa/standard/{Makefile.{am,in},Scheme.java}:  Update accordingly.
+
+Fri Dec 13 15:57:47 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Environment.java (define):  New overloaded method.
+	* kawa/lang/Interpreter.java (rewrite_body):  Use List.list_length.
+
+	* kawa/lang/InPort.java (read):  Catch IOException from in.available.
+	(Needed on some Java implementations.)
+	(readSymbol, readSchemeNumber, readSchemeObject):  Provide and use
+ 	overloaded versions that are passed next character, avoiding backup.
+	(readString):  Handle C-style and Java-style escapes.
+	(readListBody):  New, re-written from readList, with new interface.
+	* kawa/lang/CompileFile.java (read):  Use InPort.readListBody.
+	* kawa/lang/LambdaExp.java:  New constructor for ModuleBody,
+	* kawa/lang/Eval.java (eval):  New overloaded versions.
+
+	* kawa/standard/{bit_extract.logand,logbit_p,logcount,logior,lognot,
+	logop,logtest,logxor}.java:  New procedures.
+	* kawa/standard/{Makefile.am,Makefile.in,Scheme.java}:  Update.
+
+	* kawa/standard/expt.java:  Simplify - use RatNum.power.
+	* kawa/standard/eqv_p.java (eqv_p):  Rename to isEqv.
+	* kawa/standard/exact2inexact.java:  Use RealNum.doubleValue,
+
 Sun Nov 24 13:04:49 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/SFormat.java:  New class.

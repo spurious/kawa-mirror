@@ -465,9 +465,13 @@ public class Compilation
   }
 
 
-  private void emitLiterals()
+  private void emitLiterals(Method emitLiteralsMethod)
   {
-    if (! immediate && litTable.literalsChain != null)
+    method = emitLiteralsMethod;
+    // We need to startCode even if there are no literals,
+    // once we've created the emitLiteralsMethod.
+    CodeAttr code = method.startCode();
+    if (litTable.literalsChain != null)
       {
 	try
 	  {
@@ -479,6 +483,7 @@ public class Compilation
 	    ex.printStackTrace(System.err);
 	  }
       }
+    code.emitReturn();
   }
 
   private void dumpInitializers (Initializer inits)
@@ -1678,15 +1683,8 @@ public class Compilation
       }
     Method emitLiteralsMethod = null;
 
-    if (curClass == mainClass
-	&& (staticModule || clinitChain != null
-	    || litTable.literalsChain != null || module.applyMethods != null
-	    || generateMain || generateApplet || generateServlet))
+    if (curClass == mainClass)
       {
-	emitLiteralsMethod
-	  = curClass.addMethod("$literals$", Access.PRIVATE|Access.STATIC,
-			       Type.typeArray0, Type.void_type);
-
 	Method save_method = method;
 
 	startClassInit();
@@ -1698,7 +1696,13 @@ public class Compilation
 	    code.emitInvokeSpecial(curClass.constructor);
 	    code.emitPutStatic(instanceField);
 	  }
-	code.emitInvokeStatic(emitLiteralsMethod);
+	if (! immediate)
+	  {
+	    emitLiteralsMethod
+	      = curClass.addMethod("$literals$", Access.PRIVATE|Access.STATIC,
+				   Type.typeArray0, Type.void_type);
+	    code.emitInvokeStatic(emitLiteralsMethod);
+	  }
 	dumpInitializers(clinitChain);
 
 	if (staticModule && ! generateMain && ! immediate)
@@ -1727,12 +1731,7 @@ public class Compilation
       }
 
     if (emitLiteralsMethod != null)
-      {
-	method = emitLiteralsMethod;
-	code = method.startCode();
-	emitLiterals();
-	code.emitReturn();
-      }
+      emitLiterals(emitLiteralsMethod);
 
     if (generateMain && curClass == mainClass)
       {

@@ -1,3 +1,10 @@
+2004-06-08  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (emitLiterals):  Merge some stuff from caller.
+	(addClass):  Simplify - almost always create $literals$ method.
+	Simplify call to emitLiterals.
+	Fixes Savannah bug #9158 "defmacro & archive/files compilation broken".
+
 2004-05-19  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (addClass):  Restore curLambda *after* compileEnd.

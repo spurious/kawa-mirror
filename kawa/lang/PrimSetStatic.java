@@ -65,4 +65,9 @@ public class PrimSetStatic extends Procedure1 implements Inlineable
     code.emitPutStatic(field);
     comp.compileConstant(Interpreter.voidObject, target);
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return Type.void_type;
+  }
 }

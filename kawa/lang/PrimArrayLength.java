@@ -24,4 +24,9 @@ public class PrimArrayLength extends Procedure1 implements Inlineable
     code.emitArrayLength();
     target.compileFromStack(comp, kawa.standard.Scheme.intType);
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return kawa.standard.Scheme.intType;
+  }
 }

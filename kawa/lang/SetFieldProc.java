@@ -77,4 +77,9 @@ public class SetFieldProc extends Procedure2 implements Inlineable
     code.emitPutField(field);
     comp.compileConstant(Interpreter.voidObject, target);
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return Type.void_type;
+  }
 }

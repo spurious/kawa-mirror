@@ -28,4 +28,9 @@ public class PrimArraySet extends Procedure3 implements Inlineable
     comp.getCode().emitArrayStore(element_type);
     comp.compileConstant(Interpreter.voidObject, target);
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return Type.void_type;
+  }
 }

@@ -45,8 +45,7 @@ public class RelativeStep extends MethodProc implements CanInline
       {
 	it = values.nextPos(it);
 	Object dot = values.getPosPrevious(it);
-	ctx.setArgs(dot, IntNum.make(pos), countObj);
-	proc.apply(ctx);
+	proc.check3(dot, IntNum.make(pos), countObj, ctx);
 	ctx.runUntilDone();
       }
     nodes.consume(out);

@@ -36,8 +36,7 @@ public class ValuesEvery extends MethodProc
 	Values values = (Values) val;
 	while ((ipos = values.nextPos(ipos)) != 0)
 	  {
-	    ctx.setArgs(values.getPosPrevious(ipos));
-	    ctx.proc = proc;
+	    proc.check1(values.getPosPrevious(ipos), ctx);
 	    ok = BooleanValue.booleanValue(ctx.runUntilValue());
 	    if (ok != matchAll)
 	      break;
@@ -45,8 +44,7 @@ public class ValuesEvery extends MethodProc
       }
     else
       {
-	ctx.setArgs(val);
-	ctx.proc = proc;
+	proc.check1(val, ctx);
 	ok = BooleanValue.booleanValue(ctx.runUntilValue());
       }
     ctx.consumer.writeBoolean(ok);

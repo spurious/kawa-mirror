@@ -1,3 +1,9 @@
+2004-10-23  Per Bothner  <per@bothner.com>
+
+	* WrongType.java (ARG_CAST): New constant.
+	(make*2): New methods take argValue parameter.
+	(getMessage): Rework logic to work well for ARG_CAST.
+
 2004-08-24  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (openFile): New static method.

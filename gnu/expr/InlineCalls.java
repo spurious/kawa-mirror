@@ -23,7 +23,7 @@ public class InlineCalls extends ExpWalker
       lambda = (LambdaExp) exp.func;
     Expression func = exp.func;
     Declaration decl = null;
-    if (exp.func instanceof ReferenceExp)
+    if (func instanceof ReferenceExp)
       {
         decl = ((ReferenceExp) exp.func).binding;
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))

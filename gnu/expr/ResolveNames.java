@@ -3,25 +3,47 @@
 
 package gnu.expr;
 
-/** This resolves references to lexical Declarations. */
+/** This resolves references to lexical Declarations.
+ * So far it is only use for XQuery, which overrides it. */
 
 public class ResolveNames extends ExpWalker
 {
-  NameLookup lookup;
+  protected NameLookup lookup;
 
-  public static void resolveNames(Expression exp, NameLookup lookup)
+  public ResolveNames ()
   {
-    ResolveNames walker = new ResolveNames();
-    walker.lookup = lookup;
-    walker.walk(exp);
+  }
+
+  public ResolveNames (Compilation comp)
+  {
+    setContext(comp);
+    lookup = comp.lexical;
+  }
+
+  public void resolveModule(ModuleExp exp)
+  {
+    push(exp);
+    exp.walkChildren(this);
+    // Note we don't do lookup.pop(exp).  This is so top-level
+    // declarations remain for future uses of the same Lexer.
+  }
+
+  protected void push (ScopeExp exp)
+  {
+    lookup.push(exp);
   }
 
   protected Expression walkScopeExp (ScopeExp exp)
   {
-    lookup.push(exp);
+    push(exp);
     exp.walkChildren(this);
     lookup.pop(exp);
     return exp;
+  }
+
+  public Declaration lookup (Expression exp, Object symbol, boolean function)
+  {
+    return lookup.lookup(symbol, function);
   }
 
   protected Expression walkReferenceExp (ReferenceExp exp)
@@ -29,7 +51,7 @@ public class ResolveNames extends ExpWalker
     Declaration decl = exp.getBinding();
     if (decl == null)
       {
-	decl = lookup.lookup(exp.getSymbol(), exp.isProcedureName());
+	decl = lookup(exp, exp.getSymbol(), exp.isProcedureName());
 	if (decl != null)
 	  exp.setBinding(decl);
       } 
@@ -38,13 +60,8 @@ public class ResolveNames extends ExpWalker
 
   protected Expression walkSetExp (SetExp exp)
   {
-    Declaration decl = exp.binding;
-    if (decl == null)
-      {
-	decl = lookup.lookup(exp.getSymbol(), exp.isFuncDef());
-	if (decl != null)
-	  exp.binding = decl;
-      }
+    if (exp.binding == null)
+      exp.binding = lookup(exp, exp.getSymbol(), exp.isFuncDef());
     return super.walkSetExp(exp);
   }
 }

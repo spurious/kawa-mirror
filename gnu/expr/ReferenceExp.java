@@ -72,7 +72,7 @@ public class ReferenceExp extends Expression
   public ReferenceExp (Declaration binding)
   {
     this.binding = binding;
-    this.symbol = binding.getName();
+    this.symbol = binding.getSymbol();
   }
 
   public Object eval (Environment env)

@@ -1,3 +1,15 @@
+2003-12-25  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (ReferenceExp):  Use decl's getSymbol, not getName.
+
+	* ResolveNames.java (<init>):  New constructors.
+	(resolveModule):  New helper method.
+	(resolveNames):  Remove static method
+	(walkScopeExp):  Split initial lookup.push into separate ...
+	(push): ... new method that can be overridden.
+	(walkReferenceExp, setExp):  Split lookup.lookup into separate ...
+	(lookup): ... new method that can be overridden.
+
 2003-12-24  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (getFunctionValue):  New method.

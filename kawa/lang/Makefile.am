@@ -47,12 +47,12 @@ VarListPat.class \
 \
 Printable.class \
 Named.class \
-snull.class \
-pair.class \
+List.class \
+Pair.class \
 print.class \
 iport.class \
 oport.class \
-symbol.class \
+Symbol.class \
 vector.class \
 Executable.class \
 Syntaxable.class \
@@ -71,6 +71,7 @@ Procedure1.class \
 Procedure2.class \
 Procedure3.class \
 Procedure4.class \
+Procedure1or2.class \
 ProcedureN.class \
 Syntax.class \
 $(EXCEPTIONS)

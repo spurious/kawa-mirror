@@ -9,10 +9,9 @@ import java.util.Vector;
 import kawa.lang.Printable; 
 import kawa.lang.Executable; 
 import kawa.lang.Syntaxable; 
-import kawa.lang.snull;
 import kawa.lang.iport;
 import kawa.lang.oport;
-import kawa.lang.symbol;
+import kawa.lang.Symbol;
 import kawa.lang.Exit;
 
 // Exceptions
@@ -35,7 +34,7 @@ public class Interpreter extends Object
   static public Boolean  trueObject = new Boolean(true);
   static public Boolean  falseObject = new Boolean(false);
 
-  static public snull  nullObject = new kawa.lang.snull();
+  static public List nullObject = List.Empty;
   static public Undefined undefinedObject = new kawa.lang.Undefined();
 
   private final int EOFChar = -1;
@@ -46,12 +45,12 @@ public class Interpreter extends Object
   private boolean initialized;
 
   // Global environment.
-  // Currently maps String -> Object;  should probably be symbol -> Object.
+  // Currently maps String -> Object;  should probably be Symbol -> Object.
   protected java.util.Hashtable globals;
   
-  static protected symbol lambda_sym = symbol.intern ("lambda");
+  static protected Symbol lambda_sym = Symbol.intern ("lambda");
   static protected Lambda lambda = new Lambda ();
-  static protected symbol quote_sym = symbol.intern ("quote");
+  static protected Symbol quote_sym = Symbol.intern ("quote");
   static protected Quote quote = new Quote();
 
   // Map name to Declaration.
@@ -98,7 +97,7 @@ public class Interpreter extends Object
     globals.put(name,p);
   }
 
-  public void define(symbol sym, Object p)
+  public void define(Symbol sym, Object p)
   {
     globals.put(sym.toString (),p);
   }
@@ -108,27 +107,27 @@ public class Interpreter extends Object
     return globals.get(name);
   }
 
-  public Object lookup(symbol name)
+  public Object lookup(Symbol name)
   {
     return globals.get(name.toString ());
   }
 
-   public kawa.lang.pair copy(kawa.lang.pair list) {
-      kawa.lang.pair newlist = new kawa.lang.pair(list.car,list.cdr);
-      kawa.lang.pair current = newlist;
-      while (list.cdr instanceof kawa.lang.pair) {
-         list = (kawa.lang.pair)list.cdr;
-         kawa.lang.pair pair = new kawa.lang.pair(list.car,list.cdr);
-         current.cdr = pair;
-         current = pair;
+   public Pair copy(Pair list) {
+      Pair newlist = new Pair(list.car,list.cdr);
+      Pair current = newlist;
+      while (list.cdr instanceof Pair) {
+         list = (Pair)list.cdr;
+         Pair Pair = new Pair(list.car,list.cdr);
+         current.cdr = Pair;
+         current = Pair;
       }
       current.cdr = list.cdr;
       return newlist;
    }
 
-   public kawa.lang.pair lastpair(kawa.lang.pair list) {
-      while (list.cdr instanceof kawa.lang.pair) {
-         list = (kawa.lang.pair)list.cdr;
+   public Pair lastPair(Pair list) {
+      while (list.cdr instanceof Pair) {
+         list = (Pair)list.cdr;
       }
       return list;
    }
@@ -337,7 +336,7 @@ public class Interpreter extends Object
          if (c=='.') {
             int next;
             if ((next = ip.peek())!=EOFChar && java.lang.Character.isSpace((char)next)) {
-               //-- Read the cdr for the pair
+               //-- Read the cdr for the Pair
                cdr = read(ip);
                skipWhitespaceAndComments(ip);
                if (ip.read()!=')') {
@@ -357,7 +356,7 @@ public class Interpreter extends Object
       } else {
          ip.flushPeek();
       }
-      return new kawa.lang.pair(car,cdr);
+      return new Pair(car,cdr);
    }
 
    protected Object readString(iport ip)
@@ -422,9 +421,9 @@ public class Interpreter extends Object
              MalformedList,
              NotImplemented
    {
-      return new kawa.lang.pair(
+      return new Pair(
          quote_sym,
-         new kawa.lang.pair(
+         new Pair(
             read(ip),
             nullObject
          )
@@ -442,9 +441,9 @@ public class Interpreter extends Object
              MalformedList,
              NotImplemented
    {
-      return new kawa.lang.pair(
+      return new Pair(
          quasiquote,
-         new kawa.lang.pair(
+         new Pair(
             read(ip),
             nullObject
          )
@@ -462,9 +461,9 @@ public class Interpreter extends Object
              MalformedList,
              NotImplemented
    {
-      return new kawa.lang.pair(
+      return new Pair(
          unquotesplicing,
-         new kawa.lang.pair(
+         new Pair(
             read(ip),
             nullObject
          )
@@ -482,9 +481,9 @@ public class Interpreter extends Object
              MalformedList,
              NotImplemented
    {
-      return new kawa.lang.pair(
+      return new Pair(
          unquote,
-         new kawa.lang.pair(
+         new Pair(
             read(ip),
             nullObject
          )
@@ -541,7 +540,7 @@ public class Interpreter extends Object
       if (bindex!=0) {
          java.lang.String symname = java.lang.String.copyValueOf(buffer,0,bindex);
 	 symname = symname.toLowerCase();  // if we're case-folding
-	 return kawa.lang.symbol.intern (symname);
+	 return Symbol.intern (symname);
       } else {
          return nullObject;
       }
@@ -718,7 +717,7 @@ public class Interpreter extends Object
   {
     int count = kawa.standard.length.length (exp);
     if (count == 1)
-      return rewrite (((pair)exp).car);
+      return rewrite (((Pair)exp).car);
     else if (count == 0)
       throw new WrongArguments ("<body>", 1, "body with no expressions");
     else
@@ -726,7 +725,7 @@ public class Interpreter extends Object
 	Expression[] exps = new Expression [count];
 	for (int i = 0; i < count; i++)
 	  {
-	    pair exp_pair = (kawa.lang.pair) exp;
+	    Pair exp_pair = (Pair) exp;
 	    exps[i] = rewrite (exp_pair.car);
 	    exp = exp_pair.cdr;
 	  }
@@ -741,17 +740,17 @@ public class Interpreter extends Object
   public Expression rewrite (Object exp)
        throws WrongArguments
   {
-    if (exp instanceof kawa.lang.pair)
+    if (exp instanceof Pair)
       {
-	pair p = (pair)exp;
+	Pair p = (Pair)exp;
 	Object car = p.car;
 	Object cdr = p.cdr;
 	if (car instanceof Syntax)
 	  return ((Syntax)car).rewrite (cdr, this);
 
-	if (car instanceof symbol)
+	if (car instanceof Symbol)
 	  {
-	    Object binding = lookup ((symbol) car);
+	    Object binding = lookup ((Symbol) car);
 	    if (binding instanceof Syntax)
 	      return ((Syntax)binding).rewrite (cdr, this);
 	  }
@@ -761,15 +760,15 @@ public class Interpreter extends Object
 	Expression[] args = new Expression[cdr_length];
 	for (int i = 0; i < cdr_length; i++)
 	  {
-	    pair cdr_pair = (pair) cdr;
+	    Pair cdr_pair = (Pair) cdr;
 	    args[i] = rewrite (cdr_pair.car);
 	    cdr = cdr_pair.cdr;
 	  }
 	return new ApplyExp (rewrite (car), args);
       }
-    else if (exp instanceof symbol)
+    else if (exp instanceof Symbol)
       {
-	ReferenceExp rexp = new ReferenceExp ((kawa.lang.symbol)exp);
+	ReferenceExp rexp = new ReferenceExp ((Symbol)exp);
 	Declaration decl = (Declaration) current_decls.get (rexp.symbol);
 	if (decl != null)
 	  rexp.binding = decl;

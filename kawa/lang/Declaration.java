@@ -8,7 +8,7 @@ package kawa.lang;
 public class Declaration
 {
   /** The name of the new variable. */
-  symbol sym;
+  Symbol sym;
 
   /** The variable's index in an Environment frame. */
   public int index;
@@ -16,7 +16,7 @@ public class Declaration
   /** If non-null, the Declaration that we "shadow" (hide). */
   Declaration shadowed;
 
-  public Declaration (symbol s) { sym = s; }
+  public Declaration (Symbol s) { sym = s; }
 
   public String string_name () { return sym.toString (); }
 

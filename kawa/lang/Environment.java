@@ -43,7 +43,7 @@ public class Environment
    * @param sym the name of the binding to search for
    * @return the value of the binding, or null if not found
    */
-  Object lookup (symbol sym)
+  Object lookup (Symbol sym)
   {
     Environment env = this;
     while (env != null && env.scope != null)

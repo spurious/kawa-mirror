@@ -32,7 +32,7 @@ public class LambdaProcedure extends ProcedureN
 	// The last parameter gets a list of the remaining arguments.
 	Object list = Interpreter.nullObject;
 	for (int i = args.length;  --i >= lexpr.min_args; )
-	  list = new pair (args[i], list);
+	  list = new Pair (args[i], list);
 	frame[lexpr.min_args] = list;
       }
     else

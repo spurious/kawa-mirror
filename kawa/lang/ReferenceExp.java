@@ -7,11 +7,11 @@ package kawa.lang;
 
 public class ReferenceExp extends Expression
 {
-  symbol symbol;
+  Symbol symbol;
   Declaration binding;
   public String string_name () { return symbol.toString (); }
 
-  public ReferenceExp (kawa.lang.symbol sym) { symbol = sym; }
+  public ReferenceExp (Symbol symbol) { this.symbol = symbol; }
 
   public Object eval (Environment env)
        throws kawa.lang.UnboundSymbol

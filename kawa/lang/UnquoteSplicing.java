@@ -10,8 +10,8 @@ public class UnquoteSplicing extends Named implements Syntaxable {
    public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object arglist) 
       throws kawa.lang.WrongArguments
    {
-      if (arglist instanceof kawa.lang.pair) {
-         return ((kawa.lang.pair)arglist).car;
+      if (arglist instanceof Pair) {
+         return ((Pair)arglist).car;
       } else {
          throw new kawa.lang.WrongArguments(this.name,1,"(unquote-splicing obj)");
       }

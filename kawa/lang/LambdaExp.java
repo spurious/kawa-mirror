@@ -21,7 +21,7 @@ public class LambdaExp extends ScopeExp
 
   /**
    * Higher-level constructor, that does the re-writing.
-   * @pparam formals the formal parameter list (or symbol)
+   * @param formals the formal parameter list (or symbol)
    * @param body the body of the procedure
    * @param interp the (Scheme) interpreter
    */
@@ -30,11 +30,11 @@ public class LambdaExp extends ScopeExp
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
-    for (; bindings instanceof pair; min_args++)
-      bindings = ((pair)bindings).cdr;
-    if (bindings instanceof snull)
+    for (; bindings instanceof Pair; min_args++)
+      bindings = ((Pair)bindings).cdr;
+    if (bindings == List.Empty)
       max_args = min_args;
-    else if (bindings instanceof symbol)
+    else if (bindings instanceof Symbol)
       max_args = -1;
     else
       throw new WrongArguments ("lambda", 2,
@@ -43,17 +43,17 @@ public class LambdaExp extends ScopeExp
     decls = new Declaration[min_args + (max_args < 0 ? 1 : 0)];
     int index = 0;
     bindings = formals;
-    while (bindings instanceof pair)
+    while (bindings instanceof Pair)
       {
-	pair bind_pair = (pair) bindings;
-	decls[index] = new Declaration ((symbol) bind_pair.car);
+	Pair bind_pair = (Pair) bindings;
+	decls[index] = new Declaration ((Symbol) bind_pair.car);
 	decls[index].index = index;
 	index++;
 	bindings = bind_pair.cdr;
       }
-    if (bindings instanceof symbol)
+    if (bindings instanceof Symbol)
       {
-	decls[index] = new Declaration ((symbol) bindings);
+	decls[index] = new Declaration ((Symbol) bindings);
 	decls[index].index = index;
       }
 

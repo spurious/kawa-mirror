@@ -43,7 +43,7 @@ public abstract class ScopeExp extends Expression
    * @param sym the name of the Declaration sought
    * @return the matching Declaration, if found;  otherwise null
    */
-  Declaration lookup (symbol sym)
+  Declaration lookup (Symbol sym)
   {
     for (int i = decls.length; --i >= 0; )
       {

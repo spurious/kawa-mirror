@@ -2,12 +2,12 @@ package kawa.lang;
 
 import java.io.PrintStream;
 
-public class symbol extends Object implements Printable
+public class Symbol extends Object implements Printable
 {
   private java.lang.String name;
 
   // Note:  No public constructor!
-  private symbol(java.lang.String n)
+  private Symbol (java.lang.String n)
   {
     name = new java.lang.String(n);
   }
@@ -22,15 +22,15 @@ public class symbol extends Object implements Printable
   }
 
   /**
-   * Create or find a symbol with a given name.
-   * @param name the print-name of the desired symbol
-   * @return a symbol with the given name, newly created iff none such exist
+   * Create or find a Symbol with a given name.
+   * @param name the print-name of the desired Symbol
+   * @return a Symbol with the given name, newly created iff none such exist
    */
-  static public symbol intern (String name)
+  static public Symbol intern (String name)
   {
-    symbol symbol = (symbol) symbolTable.get (name);
+    Symbol symbol = (Symbol) symbolTable.get (name);
     if (symbol == null) {
-      symbol = new symbol (name);
+      symbol = new Symbol (name);
       symbolTable.put (name, symbol);
     }
     return symbol;

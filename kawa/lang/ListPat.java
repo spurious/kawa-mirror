@@ -27,9 +27,9 @@ public class ListPat extends Pattern
     int i;
     for (i = 0; i < max_length; i++)
       {
-	if (obj instanceof kawa.lang.pair)
+	if (obj instanceof Pair)
 	  {
-	    kawa.lang.pair p = (kawa.lang.pair)obj;
+	    Pair p = (Pair)obj;
 	    result[i] = p.car;
 	    obj = p.cdr;
 	  }

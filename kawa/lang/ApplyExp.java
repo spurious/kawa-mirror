@@ -20,9 +20,9 @@ public class ApplyExp extends Expression
     if (! (rator instanceof kawa.lang.Procedure))
       {
 	System.err.print("[Obsolete-style ApplyExp.eval]\n");
-	Object randsarg = kawa.lang.Interpreter.nullObject;
+	Object randsarg = List.Empty;
 	for (int i = args.length; --i >= 0; )
-	  randsarg = new pair (args[i].eval (env), randsarg);
+	  randsarg = new Pair (args[i].eval (env), randsarg);
 	return env.interp.apply(rator,randsarg, env.frames);
       }
 

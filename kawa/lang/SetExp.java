@@ -7,13 +7,13 @@ package kawa.lang;
 public class SetExp extends Expression
 {
   /** The name of the variable to set. */
-  kawa.lang.symbol name;
+  Symbol name;
   /** If non-null, the local Declaration that matches name. */
   public Declaration binding;
   /** The new value to assign to the variable. */
   Expression new_value;
 
-  public SetExp (symbol sym, Expression val)
+  public SetExp (Symbol sym, Expression val)
   { name = sym;  new_value = val; }
 
   public Object eval (Environment env)

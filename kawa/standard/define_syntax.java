@@ -55,11 +55,14 @@ public class define_syntax extends Syntax
 	rule = new ApplyExp(new PrimProcedure(makeMethod), args);
       }
     decl.noteValue(rule);
+    decl.setProcedureDecl(true);
 
     if (decl.context instanceof ModuleExp)
       {
         SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
+	if (tr.getInterpreter().hasSeparateFunctionNamespace())
+	  result.setFuncDef(true);
         return result;
       }
     else

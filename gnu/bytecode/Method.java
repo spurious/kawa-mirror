@@ -71,16 +71,6 @@ public class Method implements AttrContainer {
 
   public Scope popScope () { return code.popScope(); }
 
-  /** Assign a local variable to a given slot.
-   * @param local the Variable to assign
-   * @param slot the local variable slot desired
-   * @deprecated
-   * @return true iff we succeeded (i.e. the slot was unused) */
-  public boolean assign_local (Variable local, int slot)
-  {
-    return local.reserveLocal(slot, code);
-  }
-
   /**
    * Allocate slots for a local variable (or parameter).
    * @param local the variable we need to allocate

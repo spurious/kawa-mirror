@@ -25,8 +25,8 @@ class kawa
 
   public static void main(String args[])
   {
-    kawa.standard.StandardInterpreter interpreter =
-      new kawa.standard.StandardInterpreter(
+    kawa.standard.Scheme interpreter =
+      new kawa.standard.Scheme(
 	    InPort.inDefault (),
 	    OutPort.outDefault (),
 	    OutPort.errDefault ()

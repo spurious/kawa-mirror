@@ -42,8 +42,8 @@ class kawac
     if (infile == null)
       usage ();
 
-    kawa.standard.StandardInterpreter interpreter =
-      new kawa.standard.StandardInterpreter(InPort.inDefault (),
+    kawa.standard.Scheme interpreter =
+      new kawa.standard.Scheme(InPort.inDefault (),
 					    OutPort.outDefault (),
 					    OutPort.errDefault ()
          );

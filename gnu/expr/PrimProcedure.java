@@ -91,7 +91,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       {
 	try
 	  {
-	    thisValue = method.getDeclaringClass().coerceFromObject(ctx.getArgAsObject(0));
+	    thisValue = method.getDeclaringClass().coerceFromObject(ctx.getNextArg());
 	  }
 	catch (ClassCastException ex)
           {
@@ -104,7 +104,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       {
         try
           {
-            Object arg = ctx.getArgAsObject(i);
+            Object arg = ctx.getNextArg();
             Type type = i < fixArgs ? argTypes[i-this_count] : elementType;
             if (type != Type.pointer_type)
               arg = type.coerceFromObject(arg);

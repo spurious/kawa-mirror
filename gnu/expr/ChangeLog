@@ -1,5 +1,9 @@
 2003-06-13  Per Bothner  <per@bothner.com>
 
+	* Keyword.java (apply):  Use CallContext's getNextArg
+	method rather than getArgAsObject, which will be deprecated.
+	* PrimProcedure.java (match):  Likewise.
+
 	* Interpreter.java (eval):  Fix incorrect instanceof test.
 
 2003-06-06  Per Bothner  <per@bothner.com>

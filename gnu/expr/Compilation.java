@@ -10,6 +10,14 @@ public class Compilation
   public ClassType mainClass;
 
   public LambdaExp curLambda;
+  public Declaration thisDecl;
+
+  /** If true, minimize the number of classes generated.
+   * Do this even if it makes things a little slower. */
+  public static boolean fewerClasses;
+
+  public static boolean usingCPStyle;
+  public static boolean usingTailCalls = false;
 
   ClassType[] classes;
   int numClasses;
@@ -27,6 +35,11 @@ public class Compilation
   /* When multiple procedures are compiled into a single method,
      we use a switch to jump to the correct part of the method. */
   SwitchState fswitch;
+
+  Field fswitchIndex;
+  Variable argsArray;
+  /** The actual parameter of the current CallFrame.step(CallStack) method. */
+  Variable callStackContext;
 
   // Various standard classes
   static public ClassType scmObjectType = Type.pointer_type;
@@ -161,6 +174,38 @@ public class Compilation
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
 
+  /* Classes, fields, and methods used wgen usingCPStyle". */
+  public static ClassType typeCallStack
+    = ClassType.make("gnu.mapping.CallStack");
+  public static Method popCallStackMethod
+    = typeCallStack.addMethod("pop", apply0args, Type.void_type,
+			      Access.PUBLIC);
+  public static Field noArgsProcedureField
+    = scmProcedureType.addField("noArgs", objArrayType,
+				Access.PUBLIC|Access.STATIC);
+  public static Field valueCallStackField
+    = typeCallStack.addField("value", Type.pointer_type, Access.PUBLIC);
+  public static Field pcCallStackField
+    = typeCallStack.addField("pc", Type.int_type, Access.PROTECTED);
+  public static ClassType typeCpsProcedure
+    = ClassType.make("gnu.mapping.CpsProcedure");
+  public static ClassType typeCallFrame
+    = ClassType.make("gnu.mapping.CallFrame");
+  public static Field numArgsCallFrameField
+    = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
+  public static Field argsCallStackField
+    = typeCallStack.addField("args", objArrayType, Access.PROTECTED);
+  public static Field procCallStackField
+    = typeCallStack.addField("proc", scmProcedureType, Access.PROTECTED);
+  public static Field callerCallFrameField
+    = typeCallFrame.addField("caller", typeCallFrame, Access.PROTECTED);
+  public static Field saved_pcCallFrameField
+    = typeCallFrame.addField("saved_pc", Type.int_type, Access.PROTECTED);
+  private static Type[] applyCpsArgs = { typeCallStack};
+  public static Method applyCpsMethod
+    = scmProcedureType.addMethod("apply", applyCpsArgs, Type.void_type,
+				 Access.PUBLIC);
+
   public static ClassType[] typeProcedureArray = {
     typeProcedure0, typeProcedure1, typeProcedure2, typeProcedure3,
     typeProcedure4 };
@@ -209,7 +254,11 @@ public class Compilation
 	    int len = array.length;
 	    literal = new Literal (value, objArrayType, this);
 	    for (int i = array.length;  --i >= 0; )
-	      findLiteral (array[i]);
+	      {
+		Object element = array[i];
+		if (element != null)
+		  findLiteral(element);
+	      }
 	  }
 	else
 	  literal = new Literal (value, scmObjectType, this);
@@ -441,7 +490,8 @@ public class Compilation
     PushApply.pushApply(lexp);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
-    FindCapturedVars.findCapturedVars(lexp);
+    if (! usingCPStyle)
+      FindCapturedVars.findCapturedVars(lexp);
 
     mainClass = allocClass (lexp, classname);
     literalTable = new Hashtable (100);
@@ -483,7 +533,10 @@ public class Compilation
 	type = new ClassType(name);
 	ClassType superType
 	  = lexp.isModuleBody () ? typeModuleBody
-	  : lexp.min_args != lexp.max_args || lexp.min_args > 4 ? typeProcedureN
+	  : usingCPStyle ? typeCallFrame
+	  : lexp.isHandlingTailCalls() ? typeCpsProcedure
+	  : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+	  ? typeProcedureN
 	  : typeProcedureArray[lexp.min_args];
 	type.setSuper (superType);
       }
@@ -501,6 +554,7 @@ public class Compilation
     Method constructor_method = clas.addMethod("<init>", Access.PUBLIC,
 					       apply0args, Type.void_type);
     clas.constructor = constructor_method;
+
     Method superConstructor
       = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
 				       apply0args, Type.void_type);
@@ -532,16 +586,9 @@ public class Compilation
     if (new_class == scmProcedureType)
       new_class = allocClass(lexp);
     curClass = new_class;
-    lexp.allocChildClasses(this);
+    if (! (fewerClasses && curClass == mainClass))
+      lexp.allocChildClasses(this);
 
-    /* CPS:
-    if (usingCPSstyle())
-      {
-	code = ...;
-	push "pc" argument;
-	fswitch = new SwitchState(code);
-      }
-    */
     String filename = lexp.getFile();
     lexp.type = new_class;
     if (filename != null)
@@ -552,7 +599,15 @@ public class Compilation
     LambdaExp saveLambda = curLambda;
     curLambda = lexp;
     Type[] arg_types;
-    if (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+    if (lexp.isHandlingTailCalls())
+      {
+	arg_count = 1;
+	arg_letter = '?';
+	arg_types = new Type[1];
+	arg_types[0] = typeCallStack;
+      }
+    else if (lexp.min_args != lexp.max_args || lexp.min_args > 4
+	|| (fewerClasses && curClass == mainClass))
       {
 	arg_count = 1;
 	arg_letter = 'N';
@@ -566,8 +621,6 @@ public class Compilation
 	arg_types = new Type[arg_count];
 	for (int i = arg_count;  --i >= 0; )
 	  arg_types[i] = scmObjectType;
-	if (lexp.isModuleBody ())
-	  arg_types[0] = Compilation.scmEnvironmentType;
       }
 
     generateConstructor (curClass, lexp);
@@ -585,24 +638,17 @@ public class Compilation
 
     for (LambdaExp child = lexp.firstChild;  child != null; )
       {
-	if (! child.getCanRead() && ! child.getInlineOnly())
+	if (! child.getCanRead() && ! child.getInlineOnly()
+	    && ! child.isHandlingTailCalls())
 	  {
-	    ClassType method_class;
 	    boolean method_static;
-	    int method_flags;
-	    if (! child.getImportsLexVars())
-	      {
-		method_class = new_class;
-		method_flags = Access.PUBLIC|Access.STATIC;
-	      }
+	    ObjectType closureEnvType;
+	    if (lexp.heapFrame == null
+		|| ! (child.getImportsLexVars() || child.getNeedsStaticLink()))
+	      closureEnvType = null;
 	    else
-	      {
-		//method_class = lexp.heapFrameLambda.getCompiledClassType();
-		method_class = (ClassType) lexp.heapFrame.getType();
-		method_flags = Access.PUBLIC;
-		child.declareThis(method_class);
-	      }
-	    // generate_unique_name (method_class, child.getName());
+	      closureEnvType = (ClassType) lexp.heapFrame.getType();
+	    // generate_unique_name (new_class, child.getName());
 	    String child_name = child.getName();
 	    String method_name = "lambda"+(++method_counter);
 	    if (child.min_args != child.max_args)
@@ -610,7 +656,7 @@ public class Compilation
 	    if (child_name != null)
 	      method_name = method_name + mangleName(child_name);
 	    child.primMethod
-	      = child.addMethodFor (method_class, method_name, method_flags);
+	      = child.addMethodFor (new_class, method_name, closureEnvType);
 	  }
 	child = child.nextSibling;
       }
@@ -619,12 +665,15 @@ public class Compilation
     Declaration heapFrame = lexp.heapFrame;
 
     if (lexp.min_args == lexp.max_args && ! lexp.isModuleBody ()
-	&& ! lexp.getImportsLexVars())
+	&& ! lexp.getImportsLexVars() && ! lexp.getNeedsStaticLink()
+	&& ! lexp.isHandlingTailCalls())
       {
 	Expression[] args = new Expression[lexp.max_args];
 
-	Method method = lexp.addMethodFor (curClass, "apply",
-					   Access.PUBLIC|Access.STATIC);
+	String // methodJavaName = lexp.getJavaName();
+	//if (methodJavaName.equals(curClass.getName()))
+	  methodJavaName = "apply";
+	Method method = lexp.addMethodFor(curClass, methodJavaName, null);
 	this.method = method;
 	method.initCode();
 	code = getCode();
@@ -635,9 +684,7 @@ public class Compilation
 	  : rtype == Type.void_type ? Target.Ignore
 	  : new TailTarget(rtype);
 	body.compileWithPosition(this, target);
-	if (method.reachableHere ())
-	  code.emitReturn();
-	method.popScope();
+	lexp.compileEnd(this);
 
 	// Set up for compiling regular virtual applyX method.
 	// It just calls the static method we just finished with.
@@ -662,10 +709,22 @@ public class Compilation
 	lexp.heapFrame = null;
       }
 
-    String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
-    Method apply_method
-      = curClass.addMethod (apply_name, arg_types, scmObjectType,
-			     Access.PUBLIC|Access.FINAL);
+    Method apply_method;
+    if (lexp.isModuleBody())
+      apply_method
+	  = curClass.addMethod ("run", arg_types, Type.pointer_type,
+				Access.PUBLIC|Access.FINAL);
+    else if (lexp.isHandlingTailCalls())
+      apply_method
+	= curClass.addMethod ("apply", arg_types, Type.void_type,
+			      Access.PUBLIC|Access.FINAL);
+    else
+      {
+	String apply_name = "apply"+arg_letter;
+	apply_method
+	  = curClass.addMethod (apply_name, arg_types, scmObjectType,
+				Access.PUBLIC|Access.FINAL);
+      }
     method = apply_method;
 
     // For each parameter, assign it to its proper slot.
@@ -675,12 +734,48 @@ public class Compilation
     method.initCode();
     code = getCode();
 
-    Variable var = lexp.declareThis(new_class);
+    thisDecl = lexp.declareThis(new_class);
+    Variable var = thisDecl;
+
+    if (lexp.isHandlingTailCalls())
+      {
+	Declaration decl = new Declaration ("stack", typeCallStack);
+	Scope scope = lexp.scope;
+	scope.addVariableAfter(thisDecl, decl);
+	decl.setParameter(true);
+	decl.setArtificial(true);
+	callStackContext = decl;
+      }
+
     Variable argsArray;
-    if (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+    if (lexp.isHandlingTailCalls() || lexp.min_args != lexp.max_args || lexp.min_args > 4
+	|| (fewerClasses && curClass == mainClass))
       argsArray = lexp.declareArgsArray();
     else
-    	argsArray = null;
+      argsArray = null;
+
+    //if (! usingCPStyle)
+    //      lexp.declareClosureEnv();
+
+    if (usingCPStyle() || (fewerClasses && curClass == mainClass))
+      {
+	code = getCode();
+	if (lexp.isHandlingTailCalls())
+	  {
+	    fswitchIndex = pcCallStackField;
+	    callStackContext.reserveLocal(1, code);
+	    code.emitLoad(callStackContext);
+	  }
+	else
+	  {
+	    fswitchIndex = curClass.addField("PC", Type.int_type);
+	    code.emitPushThis();
+	  }
+	code.emitGetField(fswitchIndex);
+	fswitch = new SwitchState(code);
+	fswitch.addCase(0, code);
+	this.argsArray = argsArray;
+      }
 
     int line = lexp.getLine();
     if (line > 0)
@@ -702,15 +797,18 @@ public class Compilation
     lexp.allocParameters(this, argsArray);
     lexp.enterFunction(this, argsArray);
 
-    body.compileWithPosition(this, Target.returnObject);
-    if (method.reachableHere ())
-      code.emitReturn();
-    method.popScope();
+    body.compileWithPosition(this,
+			     lexp.isModuleBody () ? Target.pushObject
+			     : Target.returnObject);
+    lexp.compileEnd(this);
+    if (Compilation.fewerClasses) // FIXME
+      method.popScope(); // Undoes pushScope in method.initCode.
 
     lexp.heapFrame = heapFrame;  // Restore heapFrame.
     for (LambdaExp child = lexp.firstChild;  child != null; )
       {
-	if (! child.getCanRead() && ! child.getInlineOnly())
+	if (! child.getCanRead() && ! child.getInlineOnly()
+	    && ! child.isHandlingTailCalls())
 	  {
 	    Method save_method = method;
 	    LambdaExp save_lambda = curLambda;
@@ -729,14 +827,17 @@ public class Compilation
 	      : rtype == Type.void_type ? Target.Ignore
 	      : new TailTarget(rtype);
 	    child.body.compileWithPosition(this, target);
-	    if (method.reachableHere ())
-	      getCode().emitReturn();
-	    method.popScope();
+	    child.compileEnd(this);
 	    method = save_method;
 	    curClass = new_class;
 	    curLambda = save_lambda;
 	  }
 	child = child.nextSibling;
+      }
+    if (usingCPStyle() || (fewerClasses && curClass == mainClass))
+      {
+	code = getCode();
+	fswitch.finish(code);
       }
 
     if (! immediate && curClass == mainClass && literalsChain != null)
@@ -774,8 +875,20 @@ public class Compilation
     return new_class;
   }
 
-  public boolean usingCPSstyle() { return false; }
+  public static boolean usingCPStyle() { return usingCPStyle; }
+  public static boolean usingTailCalls() { return usingTailCalls; }
 
-  /* When usingCPSstyle(), the switch statement selecting the correct func. */
-  // CPS: public SwitchState fswitch;
+  int localFieldIndex; 
+  public Field allocLocalField (Type type, String name)
+  {
+    if (name == null)
+      name = "tmp_"+(++localFieldIndex);
+    Field field = curClass.addField(name, type, 0);
+    return field;
+  }
+
+  public void freeLocalField (Field field)
+  {
+    // FIXME
+  }
 }

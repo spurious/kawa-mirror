@@ -32,6 +32,14 @@ public class LetExp extends ScopeExp
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
 
+    if (comp.usingCPStyle())
+      { 
+	for (Variable var = firstVar (); var != null; var = var.nextVar ())
+	  {
+	    ((Declaration) var).assignField(comp);
+	  }
+     }
+
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
     Variable var = firstVar();

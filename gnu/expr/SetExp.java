@@ -12,7 +12,7 @@ public class SetExp extends Expression
 
   /** The name of the variable to set. */
   String name;
-  /** If non-null, the local Declaration that matches name. */
+  /** If non-null, the local Declaration this refers to. */
   public Declaration binding;
   /** The new value to assign to the variable. */
   Expression new_value;
@@ -43,7 +43,8 @@ public class SetExp extends Expression
     new_value = val;
 
     if ("%do%loop".equals(decl.symbol())
-	&& val instanceof LambdaExp)
+	&& val instanceof LambdaExp
+	&& ! Compilation.usingCPStyle())
       ((LambdaExp) val).setInlineOnly(true);
   }
 

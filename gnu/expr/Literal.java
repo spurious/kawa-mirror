@@ -88,9 +88,12 @@ public class Literal
     flags |= Literal.ALLOCATED;
     for (int i = 0;  i < len;  i++)
       {
+	Object value = array[i];
+	if (value == null)
+	  continue;
 	code.emitDup(1);
 	code.emitPushInt(i);
-	comp.emitLiteral (array[i]);
+	comp.emitLiteral (value);
 	// Stack contents:  ..., array, array, i, array[i]
 	code.emitArrayStore(comp.scmObjectType);
 	// Stack contents:  ..., array

@@ -66,6 +66,14 @@ public class Declaration extends Variable
     getContext().currentLambda().loadHeapFrame(comp);
   }
 
+  static int fieldNum;
+  public void assignField (Compilation comp)
+  {
+    setSimple(false);
+    String name = comp.mangleName(getName())+'_'+(++fieldNum);
+    field = comp.curClass.addField(name, getType(), 0);
+  }
+
   public void load (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -144,8 +152,14 @@ public class Declaration extends Variable
   // rename to isAccessed?
   public boolean ignorable()
   {
-    return ! getCanRead()
-      && (! getCanCall() || (value != null && value instanceof LambdaExp));
+    if (getCanRead())
+      return false;
+    if (! getCanCall())
+      return true;
+    if (value == null || ! (value instanceof LambdaExp))
+      return false;
+    LambdaExp lexp = (LambdaExp) value;
+    return ! lexp.isHandlingTailCalls() || lexp.getInlineOnly();
   }
 
   /** List of ApplyExp where this declaration is the function called.

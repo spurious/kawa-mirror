@@ -113,14 +113,14 @@ public class ObjectExp extends LambdaExp
 	    //method_class = heapFrameLambda.getCompiledClassType();
 	    //method_class = (ClassType) heapFrame.getType();
 	    method_class = type;
-	    method_flags = Access.PUBLIC;
 	    child.declareThis(method_class);
 
 	    // generate_unique_name (method_class, child.getName());
 	    String child_name = child.getName();
 	    String method_name = comp.mangleName(child_name);
 	    child.primMethod
-	      = child.addMethodFor (method_class, method_name, method_flags);
+	      = child.addMethodFor (method_class, method_name, null);
+	    child.primMethod.setModifiers(Access.PUBLIC);
 	    child = child.nextSibling;
 	  }
 
@@ -140,9 +140,7 @@ public class ObjectExp extends LambdaExp
 	      : rtype == Type.void_type ? Target.Ignore
 	      : new TailTarget(rtype);
 	    child.body.compileWithPosition(comp, target);
-	    if (comp.method.reachableHere ())
-	      comp.getCode().emitReturn();
-	    comp.method.popScope();
+	    compileEnd(comp);
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;

@@ -8,10 +8,10 @@ public abstract class ModuleBody extends Procedure0
 {
   public Object apply0 ()
   {
-    return run (Environment.current ());
+    return run();
   }
 
-  public abstract Object run (Environment env);
+  public abstract Object run ();
 
   /** This is invoked by main when ModuleBody is compiled with --main. */
   /*

@@ -69,9 +69,16 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	    return retType.coerceToObject(result);
 	  }
       }
+    catch (java.lang.reflect.InvocationTargetException ex)
+      {
+	Throwable th = ex.getTargetException();
+	if (th instanceof RuntimeException)
+	  throw (RuntimeException) th;
+	throw new RuntimeException(th.toString());
+      }
     catch (Exception ex)
       {
-	throw new RuntimeException("apply not implemented for PrimProcedure - " + ex);
+	throw new RuntimeException("apply not implemented for PrimProcedure "+this+" - "+ ex);
       }
   }
 

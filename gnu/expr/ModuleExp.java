@@ -18,9 +18,12 @@ public class ModuleExp extends LambdaExp
    * This can be a let scope, or primitive procedure. */
   public boolean mustCompile;
 
+  public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
+  public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
+  public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
+
   public ModuleExp ()
   {
-    declareThis(null);
   }
 
   public final Object evalModule (Environment env)
@@ -51,13 +54,24 @@ public class ModuleExp extends LambdaExp
   public final ClassType[] getInterfaces() { return interfaces; }
   public final void setInterfaces(ClassType[] s) { interfaces = s; }
 
+  public final boolean isStatic ()
+  {
+    return (getFlag(ModuleExp.STATIC_SPECIFIED)
+	    || (gnu.expr.Compilation.moduleStatic > 0
+		&& ! getFlag(ModuleExp.NONSTATIC_SPECIFIED)));
+  }
+
   void allocFields (Compilation comp)
   {
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.isPrivate())
+	if (decl.isSimple() && ! decl.isPublic())
 	  continue;
+	if (decl instanceof kawa.lang.Macro
+	    && ((kawa.lang.Macro) decl).expander instanceof LambdaExp
+	    && ! decl.isPrivate())
+	  continue;  // Handled in SetExp.
 	Expression value = decl.getValue();
 	if (value instanceof LambdaExp)
 	  {
@@ -69,7 +83,6 @@ public class ModuleExp extends LambdaExp
 	else
 	  {
 	    new BindingInitializer(decl, comp);
-	    decl.setIndirectBinding(true);
 	  }
       }
   }
@@ -154,6 +167,8 @@ public class ModuleExp extends LambdaExp
       }
     zout.close ();
   }
+
+  Object walk (ExpWalker walker) { return walker.walkModuleExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

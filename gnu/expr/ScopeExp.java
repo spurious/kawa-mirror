@@ -57,6 +57,60 @@ public abstract class ScopeExp extends Expression
     return null;
   }
 
+  /** Lookup a declaration, create a non-defining declaration if needed. */
+  public Declaration getNoDefine (String name)
+  {
+    Declaration decl = lookup(name);
+    if (decl == null)
+      {
+	decl = addDeclaration(name);
+	decl.setFlag(Declaration.NOT_DEFINING);
+      }
+    return decl;
+  }
+
+  /** Add a new Declaration, with a message if there is an existing one. */
+  public Declaration getDefine (String name, char severity, Parser parser)
+  {
+    Declaration decl = lookup(name);
+    if (decl == null)
+      decl = addDeclaration(name);
+    else if (decl.getFlag(Declaration.NOT_DEFINING))
+      decl.setFlag(false, Declaration.NOT_DEFINING);
+    else
+      {
+	StringBuffer sbuf = new StringBuffer(200);
+	sbuf.append("duplicate definition for '");
+	sbuf.append(name);
+	int oldLine = decl.getLine();
+	if (oldLine <= 0)
+	  sbuf.append('\'');
+	else
+	  {
+	    sbuf.append("\' (overrides ");
+	    String oldFile = decl.getFile();
+	    if (oldFile == null || oldFile.equals(parser.getFile()))
+	      sbuf.append("line ");
+	    else
+	      {
+		sbuf.append(oldFile);
+		sbuf.append(':');
+	      }
+	    sbuf.append(oldLine);
+	    int oldColumn = decl.getColumn();
+	    if (oldColumn > 0)
+	      {
+		sbuf.append(':');
+		sbuf.append(oldColumn);
+	      }
+	    sbuf.append(')');
+	  }
+	parser.error(severity, sbuf.toString());
+	decl = addDeclaration(name);
+      }
+    return decl;
+  }
+
   /**
    * Create a new declaration in the current Scope.
    * @param name name (interned) to give to the new Declaration.

@@ -9,8 +9,16 @@ public class ProcInitializer extends Initializer
   {
     field = lexp.allocFieldFor(comp);
     proc = lexp;
-    next = comp.initChain;
-    comp.initChain = this;
+    if ((field.getModifiers() & Access.STATIC) != 0)
+      {
+	next = comp.clinitChain;
+	comp.clinitChain = this;
+      }
+    else
+      {
+	next = comp.initChain;
+	comp.initChain = this;
+      }
   }
 
   /** Create and load a ModuleMethod for the given procedure. */
@@ -21,7 +29,10 @@ public class ProcInitializer extends Initializer
     code.emitNew(procClass);
     code.emitDup(1);
 
-    code.emitPushThis();
+    if (comp.method.getStaticFlag())
+      code.emitGetStatic(comp.instanceField);
+    else
+      code.emitPushThis();
     code.emitPushInt(proc.getSelectorValue(comp));
     String name = proc.getName();
     if (name == null)

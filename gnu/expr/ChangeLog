@@ -1,3 +1,55 @@
+2000-05-27  Per Bothner  <per@bothner.com>
+
+	Support (module-static ...) and (module-export ...).
+	* ExpWalker.java (walkModuleExp):  New method.
+	* ModuleExp.java (<init>):  Don't declareThis here.
+	(isStatic, walk):  New methods.
+	(allocFields):  Alloc field if !isSimple even if private.
+	Add special test (kludge) for Macro.
+	Don't setIndirectBinding here (do it in BindingInitializer instead).
+	(EXPORT_SPECIFIED, EXPORT_SPECIFIED, NONSTATIC_SPECIFIED):  new flags.
+	* FindTailCalls.java (walkDecls, walkModuleExp):  New methods.
+	* ScopeExp.java (getDefine, getNoDefine):  New methods.
+	* Declaration.java (fieldNum, assignField):  Unused, removed.
+	(NOT_DEFINING, EXPORT_SPECIFIED, STATIC_SPECIFIED, NONSTATIC_SPECIFIED,
+	TYPE_SPECIFIED, IS_CONSTANT):  New flag constants.
+	(getFlag, setFlag, needsInit):  New methods.
+	(setCanRead, setCanCall):  New method overloading.
+	(needInit):  New method.
+	* LambdaExp.java (NEXT_AVAIL_FLAG):  New constant.
+	(declareClosureEnv):  Check if parent is ModuleExp.
+	(allocFieldFor, addMethodFor):  Check if decl has STATIC_SPECIFIED.
+	(allodFrame, enterFunction):  Check if ModuleExp.
+	* ObjectExp.java (getType):  New method.
+	(getCompiledClassType):  Now does not handle superclasses.
+	* FindCapturedVars.java (capture):  Handle STATIC_SPECIFIED.
+	If declaration has a 'base', handle it even if non-simple.
+	* ModuleBody.java (run):  Make non-abstract.
+	* Compilation.java (moduleStatic):  New static field.
+	(instanceField):  New field.
+	(allocClass):  Don't addClass if ModuleExp (since already done).
+	(initBindingFields, startClassInit):  New method.
+	(addClass, generateConstructor):  Call initBindingFields.
+	(addClass):  Some extra complications to handle static modules.
+	* ChainLambdas.java (comp):  New Compilation field.
+	(walkObjectExp):  Create and name ClassType for ObjectExp.
+	* ProcInitializer.java:  If field is static, link on initChain.
+	(emitLoadModuleMethod):  If method static get comp's instanceField.
+	* BindingInitializer.java:  Handle static vars and explicit types.
+	* LetExp.java (store_rest, compile):  Use new Declaration needs_init.
+
+	* Compilation.java (mangleName):  Uppercase following $-escape.
+	Handle special characters in switch statement.
+
+	More efficient handling of simple aliases.
+	* Declaration.java (followAliases):  New method.
+	(allocateVariable):  Call it.
+	* FindTailCalls.java (walkApplyExp, walkReferenceExp, walkSetExp):
+	Call Declaration.followAliases.
+	* FindCapturedVars.java:  Likewise.
+	* SetExp.java (compile):  Call Declaration.followAliases.
+	* ReferenceExp.java (compile):  Likewise.
+
 2000-05-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (makeNullPairMethod, makePairMethod):  Removed.

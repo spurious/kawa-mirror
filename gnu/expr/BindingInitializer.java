@@ -19,17 +19,42 @@ public class BindingInitializer extends Initializer
   {
     String fname = Compilation.mangleName(decl.getName());
     this.value = value;
-    int fflags = Access.FINAL;
+    int fflags = 0;
+    if (decl.isPublic()
+	&& ! decl.getFlag(Declaration.TYPE_SPECIFIED))
+      decl.setIndirectBinding(true);
+    if (decl.isIndirectBinding()
+	|| decl.getFlag(Declaration.IS_CONSTANT))
+      fflags |= Access.FINAL;
     if (! decl.isPrivate())
       fflags |= Access.PUBLIC;
+    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
+      fflags |= Access.STATIC;
     this.decl = decl;
-    next = comp.initChain;
-    comp.initChain = this;
-    Type ftype = value != null ? value.getType()
-      : comp.getInterpreter().hasSeparateFunctionNamespace()
-      ? Compilation.typeBinding2 : Compilation.typeBinding;
+    Type ftype;
+    if (decl.isIndirectBinding())
+      {
+	ftype = comp.getInterpreter().hasSeparateFunctionNamespace()
+	  ? Compilation.typeBinding2 : Compilation.typeBinding;
+      }
+    else
+      ftype = value != null ? value.getType() : decl.getType();
     field = comp.mainClass.addField (fname, ftype, fflags);
     decl.field = field;
+
+    if (decl.isIndirectBinding() || value != null)
+      {
+	if ((fflags & Access.STATIC) != 0)
+	  {
+	    next = comp.clinitChain;
+	    comp.clinitChain = this;
+	  }
+	else
+	  {
+	    next = comp.initChain;
+	    comp.initChain = this;
+	  }
+      }
   }
 
   boolean createNewBinding = false;

@@ -1,12 +1,17 @@
 package gnu.expr;
 
-/** Sets up the firstChild/nextSibling links of each LambdaExp. */
+/** Sets up the firstChild/nextSibling links of each LambdaExp.
+ * Also generates a class name for each ObjectExp and registers each class.
+ */
 
 public class ChainLambdas extends ExpFullWalker
 {
-  public static void chainLambdas (Expression exp)
+  Compilation comp;
+
+  public static void chainLambdas (Expression exp, Compilation comp)
   {
     ChainLambdas walker = new ChainLambdas();
+    walker.comp = comp;
     exp.walk(walker);
     //or:  walter.walkExpression(exp);
   }
@@ -45,6 +50,10 @@ public class ChainLambdas extends ExpFullWalker
       }
 
     super.walkObjectExp(exp);
+
+    // Give name to object class.
+    exp.getCompiledClassType(comp);
+    comp.addClass(exp.type);
     return exp;
   }
 }

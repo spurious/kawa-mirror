@@ -25,7 +25,7 @@ public class LetExp extends ScopeExp
     if (decl != null)
       {
 	store_rest (comp, decl.nextDecl());
-	if (! decl.ignorable())
+	if (decl.needsInit())
 	  decl.initBinding(comp);
       }
   }
@@ -51,7 +51,7 @@ public class LetExp extends ScopeExp
       {
 	Target varTarget;
         decl.allocateVariable(code);
-	if (decl.ignorable())
+	if (! decl.needsInit())
 	  varTarget = Target.Ignore;
 	else
 	  {

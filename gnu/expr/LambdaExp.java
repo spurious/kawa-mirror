@@ -107,6 +107,7 @@ public class LambdaExp extends ScopeExp
   static final int METHODS_COMPILED = 128;
   static final int NO_FIELD = 256;
   static final int DEFAULT_CAPTURES_ARG = 512;
+  protected static final int NEXT_AVAIL_FLAG = 1024;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -364,7 +365,8 @@ public class LambdaExp extends ScopeExp
 	  : parent.closureEnv;
 	if (parent.heapFrameLambda == this || isClassMethod())
 	  closureEnv = declareThis(type);
-	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink())
+	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
+		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;
 	else if (! isClassGenerated() && ! getInlineOnly())
 	  {
@@ -515,9 +517,13 @@ public class LambdaExp extends ScopeExp
     String name = getName();
     String fname = name == null ? "lambda" : Compilation.mangleName(name);
     int fflags = Access.FINAL;
-    if (nameDecl != null && ! nameDecl.isPrivate()
-	&& nameDecl.context instanceof ModuleExp)
-      fflags |= Access.PUBLIC;
+    if (nameDecl != null && nameDecl.context instanceof ModuleExp)
+      {
+	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+	  fflags |= Access.STATIC;
+	if (! nameDecl.isPrivate())
+	  fflags |= Access.PUBLIC;
+      }
     else
       fname = fname + "$Fn" + ++comp.localFieldIndex;
     Type rtype = Compilation.getMethodProcType(comp.mainClass);
@@ -650,8 +656,6 @@ public class LambdaExp extends ScopeExp
     String name = getName();
     StringBuffer nameBuf = new StringBuffer(60);
     LambdaExp outer = outerLambda();
-    if (comp.generateApplet && outer instanceof ModuleExp)
-      closureEnv = declareThis(ctype);
     if (! (outer.isModuleBody() || outer instanceof ObjectExp)
 	|| name == null)
       {
@@ -666,10 +670,29 @@ public class LambdaExp extends ScopeExp
     int numStubs = ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
-    int mflags = (isClassMethod() || thisVariable != null) ? Access.PUBLIC
-      : closureEnvType == null ? Access.PUBLIC|Access.STATIC
-      : closureEnvType == ctype ? Access.PUBLIC
-      : Access.STATIC;
+
+    boolean isStatic;
+    if (isClassMethod() || thisVariable != null || closureEnvType == ctype)
+      isStatic = false;
+    else if (nameDecl == null)
+      isStatic = true;
+    else if (nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED))
+      isStatic = false;
+    else if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+      isStatic = true;
+    else if (nameDecl.context instanceof ModuleExp)
+      {
+	ModuleExp mexp = (ModuleExp) nameDecl.context;
+	isStatic = mexp.getSuperType() == null && mexp.getInterfaces() == null;
+      }
+    else
+      isStatic = true;
+    int mflags = (isStatic ? Access.STATIC : 0)
+      + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
+
+    if (! isStatic)
+      closureEnv = declareThis(ctype);
+
     Type rtype = body.getType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
     name = nameBuf.toString();
@@ -826,7 +849,9 @@ public class LambdaExp extends ScopeExp
     if (heapFrame != null)
       {
 	ClassType frameType;
-	if (heapFrameLambda != null)
+	if (this instanceof ModuleExp)
+	  frameType = getCompiledClassType(comp);
+	else if (heapFrameLambda != null)
 	  {
 	    frameType = heapFrameLambda.getCompiledClassType(comp);
 	  }
@@ -921,10 +946,10 @@ public class LambdaExp extends ScopeExp
 	    Type dtype = decl.getType();
 	    decl.field = frameType.addField (mname, decl.getType());
 	  }
-	if (closureEnv != null && heapFrame != null) 
+	if (closureEnv != null && heapFrame != null)
 	  staticLinkField = frameType.addField("staticLink",
 					       closureEnv.getType());
-        if (! (heapFrameLambda instanceof ModuleExp))
+        if (! (this instanceof ModuleExp))
           {
             if (heapFrameLambda != null)
               heapFrameLambda.compileAlloc(comp);

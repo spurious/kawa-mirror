@@ -23,12 +23,21 @@ public class ObjectExp extends LambdaExp
 
   public ClassType getCompiledClassType(Compilation comp)
   {
-    if (type == null)
+    if (getType().getName() == null)
       {
 	String name = getName();
 	if (name == null)
 	  name = "object";
-	type = new ClassType(comp.generateClassName(name));
+	type.setName(comp.generateClassName(name));
+      }
+    return type;
+  }
+
+  public Type getType()
+  {
+    if (type == null)
+      {
+	type = new ClassType();
 	if (supers == null || supers.length == 0)
 	  type.setSuper(Type.pointer_type);
 	else

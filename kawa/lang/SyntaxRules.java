@@ -196,7 +196,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       {
 	SyntaxRule rule = rules[i];
 	// check that literals have correct binding - FIXME!!
-	if (rule.pattern.match (obj, vars, 0) >= 0)
+	if (rule.pattern.match (obj, vars, 0))
 	  {
 	    /* DEBUGGING:
 	    System.err.print ("{Matched variables: ");

@@ -17,16 +17,16 @@ abstract public class Pattern
   public Object[] match (Object obj)
   {
     Object[] vars = new Object [varCount ()];
-    return (match (obj, vars, 0) < 0) ? null : vars;
+    return match (obj, vars, 0) ? vars : null;
   }
 
   /** Match this Pattern against an Object.
    * @param obj the Object to match against
    * @param vars the "pattern variable" values extracted from obj go here
    * @param start_vars where in vars to strt putting the varCount() values
-   * @return -1 on failure or varCount() on success.
+   * @return true iff the match succeeded.
    */
-  abstract public int match (Object obj, Object[] vars, int start_vars);
+  abstract public boolean match (Object obj, Object[] vars, int start_vars);
 
   abstract public int varCount ();
 }

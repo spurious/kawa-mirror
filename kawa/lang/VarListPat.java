@@ -10,11 +10,11 @@ public class VarListPat extends Pattern {
 
   /** Succeeds of obj is a list with at least min_length elements.
    * @param obj the object to match against
-   * @return -1 on failure; on success min_length+1.
+   * @return true if the match succeeded.
    * The elements vars[start_vars .. start_vars + min_length] contain
    * the first min_length elements of obj followed by the
    * min_length'th cdr of obj. */
-  public int match (Object obj, Object[] vars, int start_vars)
+  public boolean match (Object obj, Object[] vars, int start_vars)
   {
     int i;
     for (i = 0; i < min_length; i++)
@@ -26,10 +26,10 @@ public class VarListPat extends Pattern {
 	    obj = p.cdr;
 	  }
 	else
-	  return -1;
+	  return false;
       }
     vars [start_vars + i] = obj;
-    return min_length + 1;
+    return true;
   }
 
   public int varCount () { return min_length + 1; }

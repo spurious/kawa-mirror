@@ -17,8 +17,8 @@ public class EqualPat extends Pattern implements Printable, Compilable
 
   static public EqualPat make (Object obj) { return new EqualPat (obj); }
 
-  public int match (Object obj, Object[] vars, int start_vars) {
-    return value.equals (obj) ? 0 : -1;
+  public boolean match (Object obj, Object[] vars, int start_vars) {
+    return value.equals (obj);
   }
 
   public int varCount () { return 0; }

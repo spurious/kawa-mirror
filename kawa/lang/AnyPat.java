@@ -18,10 +18,10 @@ public class AnyPat extends Pattern implements Printable, Compilable
     ps.print ("#<match any>");
   }
 
-  public int match (Object obj, Object[] vars, int start_vars)
+  public boolean match (Object obj, Object[] vars, int start_vars)
   {
     vars[start_vars] = obj;
-    return 1;
+    return true;
   }
 
   public int varCount () { return 1; }

@@ -8,11 +8,14 @@ public class PairPat extends Pattern implements Printable, Compilable
 {
   Pattern car;
   Pattern cdr;
+  private int car_count, cdr_count;
 
   public PairPat (Pattern car, Pattern cdr)
   {
     this.car = car;
     this.cdr = cdr;
+    car_count = car.varCount ();
+    cdr_count = cdr.varCount ();
   }
 
   public static PairPat make (Pattern car, Pattern cdr)
@@ -20,16 +23,14 @@ public class PairPat extends Pattern implements Printable, Compilable
     return new PairPat (car, cdr);
   }
 
-  public int match (Object obj, Object[] vars, int start_vars)
+  public boolean match (Object obj, Object[] vars, int start_vars)
   {
     if (! (obj instanceof Pair))
-      return -1;
+      return false;
     Pair pair = (Pair) obj;
-    int car_match = car.match (pair.car, vars, start_vars);
-    if (car_match < 0)
-      return -1;
-    int cdr_match = cdr.match (pair.cdr, vars, start_vars + car_match);
-    return cdr_match < 0 ? -1 : car_match + cdr_match;
+    if (! car.match (pair.car, vars, start_vars))
+      return false;
+    return cdr.match (pair.cdr, vars, start_vars + car_count);
   }
 
   public void print(java.io.PrintStream ps)
@@ -41,7 +42,7 @@ public class PairPat extends Pattern implements Printable, Compilable
     ps.print ('>');
   }
 
-  public int varCount () { return car.varCount () + cdr.varCount (); }
+  public int varCount () { return car_count + cdr_count; }
 
   static public ClassType classPairPat;
   static Method makePairPatMethod;

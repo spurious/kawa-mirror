@@ -11,7 +11,6 @@ GenericError.java\
 NamedException.java
 
 java_JAVA=\
-QueueReader.java \
 ScmRead.java \
 \
 Pattern.java \
@@ -38,8 +37,6 @@ CompileFile.java \
 loadcompiled.java \
 SpecialType.java \
 SyntaxForm.java \
-PrimGetStatic.java PrimSetStatic.java \
-PrimArrayNew.java PrimArrayLength.java PrimArraySet.java PrimArrayGet.java\
 Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)

@@ -257,6 +257,8 @@ public class ScmRead extends gnu.text.LispReader
       return Values.empty;
     if (name.equals("default"))
       return Special.dfault;
+    if (name.equals("undefined"))
+      return Interpreter.undefinedObject;
     if (name.equals("null"))
       return null;
     error("unknown named constant #!"+name);

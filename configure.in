@@ -8,6 +8,13 @@ AM_EXEEXT
 
 AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
+AC_ARG_ENABLE(kawa-frontend,
+  [  --enable-kawa-frontend   Build "kawa" front-end program using readline],
+  enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
+if test $enable_kawa_frontend = yes ; then
+  kawa_bin=kawa
+fi
+
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
@@ -15,12 +22,17 @@ JAVA=${JAVA-java}
 JAVAC=${JAVAC-javac}
 AC_SUBST(JAVA)
 AC_SUBST(JAVAC)
+AC_SUBST(kawa_bin)
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
-AC_SUBST(TOP_BUILDDIR)
+AC_PROG_CC
 
+AC_SUBST(TOP_BUILDDIR)
+AC_SUBST(CC)
+AC_SUBST(CFLAGS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
+AC_SUBST(SHELL)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/ecmascript/Makefile

@@ -211,9 +211,14 @@ public class TestMisc
     failureExpectedNext = "fix space handling in constructors";
     evalTest("let $x := <a>{3,4}{5,6}</a> return <b>{$x, $x}</b>",
 	     "<ba><a>3 45 6</a><a>3 45 6</a></b>");
-    evalTest("for $n in <a><?xq doit?>abc<!--a comment--></a>/node()"
+    evalTest("for $n in <a><?xq doit?>abc<![CDATA[<X>]]>d<!--a comment--></a>/node()"
 	     + " return ($n,';')",
-	     "<?xq doit?>;abc;<!--a comment-->;");
+	     "<?xq doit?>;abc<![CDATA[<X>]]>d;<!--a comment-->;");
+    evalTest("for $n in <a><?xq doit?>abc<![CDATA[<X>]]>d<!--a comment--></a>/node()"
+	     + " return (string($n),';')",
+	     "doit;abc&lt;X&gt;d;a comment;");
+    evalTest("string(<a><?xq doit?>abc<![CDATA[<X>]]>d<!--a comment--></a>)",
+	     "abc&lt;X&gt;d");
 
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX';\n <xx:a>XX</xx:a>",

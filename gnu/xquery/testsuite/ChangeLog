@@ -1,7 +1,7 @@
 2004-05-29  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Some extra tests for ingnorable space,
-	comments, pi-data in element constructors.
+	comments, pi-data, CDATA in element constructors.
 
 2004-05-28  Per Bothner  <per@bothner.com>
 

@@ -23,3 +23,8 @@
 
 ;;; This caused a spurious warning in earlier releases.
 (test '(1 2 3) 'let (let ((x (lambda l l))) (x 1 2 3)))
+
+;;; test old reader bugs 
+(test '(b) cdr '(a .(b))) 
+(test "foo" cdr '(a ."foo")) 
+(test 'a car '(a #||#)) 

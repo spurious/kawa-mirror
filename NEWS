@@ -1,5 +1,26 @@
+class-methods, invoke-static, define-private
+
+There is now some low-level support for generic procedures.
+
+The R5RS primitives let-syntax and letrec-syntax for defining local
+syntax extensions (macros) should now work.  Also define-syntax works
+as an internal definition.  All of these should now be properly
+"hygienic".  (There is one known exception:  symbols listed among the
+literals lists are matched as raw symbols, rather that checking that
+the symbol has the same binding, if any, as at the defining site.)
+The plan is to support general functions as hygienic rewriters, as in
+the Chez Scheme "syntax-case" system;  as one part of that plan, the
+syntax-case primitive is available, but so far without any of the
+supporting machinary to support hygiene.
+
+The read-line procedure was added.  This allows you to efficiently
+read a line from an input port.  The interface is the same as scsh
+and Guile.
+
 Changes from Kawa 1.6.58 to 1.6.59
 ==================================
+define-alias now works both top-level and inside a function.
+
 Optimized eqv? so if one of the arguments is constant and
 not Char or Numeric, inline it the same way eq? is.
 (This helps case when the labels are symbols,

@@ -1,3 +1,78 @@
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (error):  New method.
+	(syntaxError):  Use new method.
+	(rewrite_pair):  If car is Syntax, then apply_rewrite.
+	(scan_form);  New method, with code moved from scan_body.
+	(finishModule):  New method.
+	* kawa/lang/Interpreter.java (getName):  New method.
+	* kawa/lang/CompileFile.java (read):  Now read each line, and
+	does Translator.scan_form separate on each statement.
+	(read, readBody):  No long throw SyntaxException.
+	(compile_to_files):  Takes SourceMessages parameter;  returns void.
+	* kawa/repl.java:  Use new compile_to_files interface.
+
+	* Shell.java (run):  Skip whitespace in case read is called.
+
+	* kawa/lang/Macro.java (expand):  Add quotes in error message.
+
+	* kawa/lang/ScmRead.java (readNumber):  A quantity like 12in is
+ 	no longer a literal, but returns a form like (* 12 in$unit).
+	(readString):  Use readEscape.
+	* kawa/standard/ScmEnv.java:  Also handle UNITNAME$unit.
+
+	* kawa/standard/location.java (rewrite):  Handle static bindings.
+
+	* kawa/standard/Scheme.java:  Define read-line and define-private.
+	(eval):  Update for new CompileFile.readBody interface.
+	(makeModuleExp):  Use scan_body instead of lambda.rewrite.
+	(getNamedType):  "java.lang.String" is no longer bound to
+ 	Type.string_type (though "String" still is).
+	* kawa/standard/define_syntax.java (rewrite):  Handle the case when
+	the macro "name" is a Declaration (created by Translator.scan_form).
+	* kawa/standard/define.java:  Likewise.
+	Also add support for define-private.
+
+	* kawa/standard/read_line.java:  New class;  extends ProcedureN.
+	* kawa/standard/Makefile.am (java_JAVA):  Add read_line.
+
+	* kawa/lang/Sequence.java (toArray):  Use an Emueration.
+	* kawa/lang/List.java (list1, list2, list3):  New convenience methods.
+	* kawa/lang/FString.java:  Do two new constructors.
+	
+1999-08-26  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Interpreter.java (getTypeFor):  New abstract method
+	* kawa/standard/Scheme.java (getTypeFor):  New method.
+
+	* kawa/lang/Syntax.java:  Now inherits from Declaration.
+	* kawa/lang/AutoloadSyntax.java:  Replace each name() by getName().
+	* kawa/standard/prim_method.java:  Likewise.
+	* kawa/standard/Scheme.java (define_syntax):  New methods needed.
+
+	* kawa/lang/Macro.java:  Merge in functionality of DefMacro.
+	* kawa/lang/DefMacro.java:  Removed - subsumed by Macro.
+	* kawa/lang/Makefile.am, Makefile.in (java_JAVA): Remove DefMacro.java.
+	(<init>):  Re-do correspondingly.
+	* kawa/lang/SyntaxRule.java (captured_decls):  New field.
+	(<init>):  Save current visible local Declarations in captured_decls.
+	(execute_template):  Map renamed symbol to captured decl, if any.
+	* kawa/lang/Translator.java (getGlobalEnvironment):  New method.
+	(push, pop):  Immediately return if Declaration's name is null.
+	(getBinding):  If lexical binding is Syntax, return that.
+	(rewrite_pair):  Simpler test if car is non-lexically bound to Syntax.
+	If no lexical binding, don't call getBinding;  just check global env.
+	(scan_body):  Handle define-alias.
+
+	* kawa/standard/define.java (rewrite):  Re-organize.
+	* kawa/standard/define_alias.java:  Now also handle non-top-level uses.
+	* kawa/standard/define_syntax.java:  Replace DefMacro uses by Macro.
+	* kawa/standard/let_syntax.java:  Now also handles letrec-syntax.
+
+	* kawa/standard/class_methods.java:  New class; extends ProcedureN.
+	* kawa/standard/Makefile.am (java_JAVA):  Add class_methods.java.
+	* kawa/standard/Scheme.java:  Update accordingly.
+
 1999-08-22  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote (rewrite): Don't use Patterns.

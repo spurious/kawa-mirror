@@ -1,7 +1,23 @@
 TO BE DONE FOR 2.0:
 
-Remove DefMacro - merge with Macro?
+Implement SRFI 0: Feature-based conditional expansion construct 
+Implement SRFI 4: Homogeneous numeric vector datatypes 
+Implement SRFI 6: Basic String Ports 
+
 Fix scheme-window in misc.scm.
+
+Finish define-unit and related cleanups.
+It it a problem that (say) 2in is no longer a literal?
+Perhaps a lazy Unit that is resolved at run-time or rewrite-time?
+How about:  LazyQuantity extends DQuantity, where unit() is
+looked up "as needed" at run time (and may thus fail).  Translator will
+handle it specially, and look it up in the compile-time environment.
+LazyQuantity may be useful for Units that are not fixed (such as money).
+
+define-syntax and friends are not properly hygienic when checking
+literals:  symbols listed among the literals lists are matched as
+raw symbols, rather that checking that the symbol has the same
+binding, if any, as at the defining site.
 
 Why is start pc==0 in LocalVariableTable?
 
@@ -13,6 +29,16 @@ exact->inexact only implemented for RealNums, not other Complex.
 Fix scheme-window so #!eof closes window.
 
 Option(s) to control/disable inlining.
+
+Change ModuleMethod to inherit from MethodProc.
+
+Change Declaration so it no longer inherits from Variable.
+(Instead, maybe it should inherit from constraint.)
+Insyead use getVariable() { return (Variable)field; }
+Then we can get rid of the sym field and the symbol method,
+because getName() would be source name, while getVariable.getName()
+is mangled name.  Would also allow us to allocate Variables
+while generating byteocde, which is cleaner and more flexible,
 
 Implement source-filename source-line source-column macros.
 Macro-expansions lose line number information.

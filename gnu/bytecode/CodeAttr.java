@@ -2221,5 +2221,26 @@ public class CodeAttr extends Attribute implements AttrContainer
     System.arraycopy(code, startPC, frag.insns, 0, frag.length);
     PC = startPC;
     unreachable_here = frag.unreachable_save;
+
+    if (lines != null)
+      {
+	int l = 2 * lines.linenumber_count;
+	int j = l;
+	short[] linenumbers = lines.linenumber_table;
+	while (j > 0 && linenumbers[j - 2] >= startPC)
+	  j -= 2;
+	l -= j;
+	if (l > 0)
+	  {
+	    short[] fraglines = new short[l];
+	    for (int i = 0;  i < l;  i += 2)
+	      {
+		fraglines[i] = (short) ((linenumbers[j+i] & 0xffff) - startPC);
+		fraglines[i+1] = linenumbers[j+i+1];
+	      }
+	    frag.linenumbers = fraglines;
+	    lines.linenumber_count = j >> 1;
+	  }
+      }
   }
 }

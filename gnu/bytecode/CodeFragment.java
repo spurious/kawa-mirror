@@ -19,6 +19,9 @@ public class CodeFragment extends Label
 {
   CodeFragment next;
   byte[] insns;
+
+  /** Length of code fragments (in instruction bytes), after genetaing code.
+   * (While generating code for this fragment, length is the start PC.) */
   int length;
 
   /** If handlerIndex >= 0, it is the index in the exception_table
@@ -27,6 +30,9 @@ public class CodeFragment extends Label
 
   /** Used to save value of unreachable_here from the CodeAttr. */
   boolean unreachable_save;
+
+  /** Pairs of (relative PC, linenumber). */
+  short[] linenumbers;
 
   public CodeFragment(CodeAttr cattr)
   {
@@ -41,6 +47,11 @@ public class CodeFragment extends Label
     define(cattr);
     if (handlerIndex >= 0)
       cattr.exception_table[4 * handlerIndex + 2] = (short) cattr.PC;
+    if (linenumbers != null)
+      {
+	for (int i = 0;  i < linenumbers.length;  i += 2)
+	  cattr.lines.put(linenumbers[i+1], linenumbers[i] + cattr.PC);
+      }
     cattr.PC += length;
   }
 }

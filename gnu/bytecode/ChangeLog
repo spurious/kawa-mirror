@@ -1,3 +1,9 @@
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* CodeFragment.java (linenumbers):  New field.
+	(emit):  Also emit linenumbers.
+	* CodeAttr.java (endFragment):  Save linenumbers in fragment.
+
 2001-04-07  Thomas Kirk  <tk@research.att.com>
 
 	* ZipLoader.java (loadAllClasses):  New method to force load

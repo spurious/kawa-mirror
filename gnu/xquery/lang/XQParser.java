@@ -696,10 +696,41 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
 	  {
 	    String name = new String(tokenBuffer, 0, tokenBufferLength);;
-	    Expression[] args = { exp, new QuoteExp(name.intern()) };
+	    Expression[] args = { exp, new QuoteExp(""),
+				  new QuoteExp(name.intern()) };
+	    System.err.println("path name:"+name);
 	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
 			       args);
 	    getRawToken();
+	  }
+	else if (curToken == OP_MUL)
+	  {
+	    Expression[] args = { exp, QuoteExp.nullExp, QuoteExp.nullExp };
+	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
+			       args);
+	    getRawToken();
+	  }
+	else if (curToken == '@')
+	  {
+	    getRawToken();
+	    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+	      {
+		String name = new String(tokenBuffer, 0, tokenBufferLength);;
+		Expression[] args = { exp, new QuoteExp(""),
+				      new QuoteExp(name.intern()) };
+		exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
+				   args);
+		getRawToken();
+	      }
+	    else if (curToken == OP_MUL)
+	      {
+		Expression[] args = { exp, QuoteExp.nullExp, QuoteExp.nullExp };
+		exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
+				   args);
+		getRawToken();
+	      }
+	    else
+	      return syntaxError("missing name or '*' after '@'");
 	  }
 	else
 	  exp = makeBinary(op, exp, parseStepExpr());
@@ -822,7 +853,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
-	return new QuoteExp(name);  // FIXME
+	return new QuoteExp(name.intern());  // FIXME
       }
     else if (curToken == '{')
       {

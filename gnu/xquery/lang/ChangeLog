@@ -1,3 +1,9 @@
+2001-10-17  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseRelativePathExpr):  Handle PATH/*, PATH/@ATTR,
+	PATH/ATTR.  Update for changed/moved implementation.
+	(parseNameSpec):  Intern name.
+
 2001-10-02  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parseFile):  Handle multiple top-level "statements".

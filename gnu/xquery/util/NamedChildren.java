@@ -4,14 +4,17 @@
 package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.xml.*;
 
 public class NamedChildren extends CpsProcedure
 {
   public static final NamedChildren namedChildren = new NamedChildren();
   
-  public int numArgs() { return 0x2002; }
+  public int numArgs() { return 0x3003; }
 
-  public static void namedChildren (Object name, TreeList tlist, int index, Consumer consumer)
+  public static void namedChildren (String namespaceURI, String localName,
+				    TreeList tlist, int index,
+				    Consumer consumer)
   {
     int child = tlist.gotoChildrenStart(index);
     while (child >= 0)
@@ -24,8 +27,21 @@ public class NamedChildren extends CpsProcedure
 	if (kind == Sequence.GROUP_VALUE || kind == Sequence.DOCUMENT_VALUE)
 	  {
 	    Object curName = tlist.getNextTypeObject(ipos, null);
-	    curName = curName.toString().intern();  // FIXME
-	    if (curName == name)
+	    String curNamespaceURI;
+	    String curLocalName;
+	    if (curName instanceof QName)
+	      {
+		QName qname = (QName) curName;
+		curNamespaceURI = qname.getNamespaceURI();
+		curLocalName = qname.getLocalName();
+	      }
+	    else
+	      {
+		curNamespaceURI = "";
+		curLocalName = curName.toString().intern();  // FIXME
+	      }
+	    if ((localName == curLocalName || localName == null)
+		&& (namespaceURI == curNamespaceURI || namespaceURI == null))
 	      {
 		if (consumer instanceof PositionConsumer)
 		  ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
@@ -37,17 +53,17 @@ public class NamedChildren extends CpsProcedure
       }
   }
 
-  public static void namedChildren (Object name, Object node, Consumer consumer)
+  public static void namedChildren (String namespaceURI, String localName, Object node, Consumer consumer)
   {
     if (node instanceof TreeList)
       {
-	namedChildren(name, (TreeList) node, 0, consumer);
+	namedChildren(namespaceURI, localName, (TreeList) node, 0, consumer);
       }
     else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedChildren(name, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  namedChildren(namespaceURI, localName, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
       }
   }
 
@@ -55,7 +71,8 @@ public class NamedChildren extends CpsProcedure
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    Object name = ctx.getNextArg();
+    String namespaceURI = (String) ctx.getNextArg();
+    String localName = (String) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {
@@ -67,13 +84,13 @@ public class NamedChildren extends CpsProcedure
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedChildren(name, tlist.getNext(index << 1, null), consumer);
+	      namedChildren(namespaceURI, localName, tlist.getNext(index << 1, null), consumer);
 	    else
-	      namedChildren(name, tlist, index, consumer);
+	      namedChildren(namespaceURI, localName, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);
 	  }
       }
     else
-      namedChildren(name, node, consumer);
+      namedChildren(namespaceURI, localName, node, consumer);
   }
 }

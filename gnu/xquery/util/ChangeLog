@@ -1,3 +1,7 @@
+2001-10-17  Per Bothner  <per@bothner.com>
+
+	* NamedChildren.java:  Turn into a 3-argument procedure.
+
 2001-10-02  Per Bothner  <per@bothner.com>
 
 	* IsEmptySequence.java:  New class; extends Procedure1.

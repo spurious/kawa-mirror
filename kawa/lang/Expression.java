@@ -90,4 +90,10 @@ public abstract class Expression implements Printable
     return position & ((1 << 12) - 1);
   }
 
+  /** Return the Type used to represent the values of this Expression. */
+  public Type getType()
+  {
+    return Type.pointer_type;
+  }
+
 }

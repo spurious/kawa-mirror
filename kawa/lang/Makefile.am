@@ -40,6 +40,7 @@ ReferenceExp.class \
 ScopeExp.class \
 SetExp.class \
 ModuleExp.class \
+TryExp.class \
 \
 Declaration.class \
 Location.class \

@@ -303,6 +303,21 @@ public class ScmRead extends LispReader
     return readNumber (read (), radix);
   }
 
+  /** Resolve a unit name, if possible.
+   * Returns null if the unit name is unknown. */
+  public Object lookupUnit (String name)
+  {
+    name = (name + "$unit").intern();
+    try
+      {
+	return Environment.getCurrent().getChecked(name);
+      }
+    catch (UnboundSymbol ex)
+      {
+	return name;
+      }
+  }
+
   public Object readNumber (int c, int radix)
        throws java.io.IOException
   {
@@ -336,38 +351,6 @@ public class ScmRead extends LispReader
       radix = explicit_radix;
 
     Complex cnum = readComplex (c, radix, exactness);
-    
-    /*
-    Unit unit = null;
-    if (radix == 10)
-      {
-	c = peek ();
-	while (Character.isLowerCase ((char)c)
-	       || Character.isUpperCase ((char)c))
-	  {
-	    skip();
-	    String word = readAlphaWord (c);
-	    Unit u = Unit.lookup (word);
-	    if (u == null)
-	      error("unknown unit: " + word);
-	    int power;
-	    try {
-	      power = readOptionalExponent ();
-	    } catch (ClassCastException e) {
-	      error("unit exponent too large");
-	      power = 1;
-	    }
-	    if (power != 1)
-	      u = Unit.pow (u, power);
-	    if (unit == null)
-	      unit = u;
-	    else
-	      unit = Unit.mul (unit, u);
-	    c = peek ();
-	  }
-      }
-    return unit == null ? cnum : Quantity.make (cnum, unit);
-    */
     Object unit = null;
     if (radix == 10)
       {
@@ -377,14 +360,14 @@ public class ScmRead extends LispReader
 	  {
 	    skip();
 	    String word = readAlphaWord (c);
-	    Object u = (word+"$unit").intern();
+	    Object u = lookupUnit(word);
 	    int power;
 	    try {
 	      if (peek() == '^')
 		{
 		  skip();
 		  c = peek();
-		  if (c != '-' && c != '-'
+		  if (c != '-' && c != '+'
 		      && Character.digit((char)c, 10) < 0)
 		    error("missing exponent following unit " + word + '^');
 		}
@@ -395,9 +378,16 @@ public class ScmRead extends LispReader
 	    }
 	    // "expt" and "*" are too open to name clashes. FIXME.
 	    if (power != 1)
-              u = LList.list3("expt", u, IntNum.make(power));
+	      {
+		if (u instanceof Unit)
+		  u = Unit.pow((Unit) u, power);
+		else
+		  u = LList.list3("expt", u, IntNum.make(power));
+	      }
 	    if (unit == null)
 	      unit = u;
+	    else if (u instanceof Unit && unit instanceof Unit)
+	      unit = Unit.mul((Unit) unit, (Unit) u);
 	    else
 	      unit = LList.list3("*", unit, u);
 	    c = peek ();
@@ -411,6 +401,8 @@ public class ScmRead extends LispReader
 
     if (unit == null)
       return cnum;
+    else if (unit instanceof Unit)
+      return Quantity.make(cnum, (Unit) unit);
     else
       return LList.list3("*", cnum, unit);
   }

@@ -1,3 +1,8 @@
+2003-07-21  Per Bothner  <per@bothner.com>
+
+	* gui.scm:  Rewrite to make use of gnu.kawa.models and
+	gnu.kawa.swingviews.
+
 2003-05-31  Chris Dean  <ctdean@mercedsystems.com>
 
 	* srfi1.scm (iota):   Fix default for optional step parameter.

@@ -1,10 +1,7 @@
 (define (make-action-listener proc)
   :: <java.awt.event.ActionListener>
-  (if (instance? proc <java.awt.event.ActionListener>)
-      proc
-      (object (<java.awt.event.ActionListener>)
-	      ((actionPerformed (e :: <java.awt.event.ActionEvent>)) :: <void>
-	       (proc)))))
+  (invoke-static <gnu.kawa.swingviews.SwingContainer>
+		 'makeActionListener proc))
 
 (define (button #!key
 		(label :: <String> #!null)
@@ -13,32 +10,22 @@
 		(oncommand #!null)
 		(disabled #f)
 		(accesskey #!null))
-  :: <javax.swing.JButton>
-  (let ((button :: <javax.swing.JButton>
-		(make  <javax.swing.JButton>)))
+  (let ((button :: <gnu.kawa.models.Button>
+		(make  <gnu.kawa.models.Button>)))
     (if disabled
-	(invoke button 'setEnabled #f))
+	(invoke button 'setDisabled #t))
     (if (not (eq? label #!null))
-	(invoke button 'setText label))
+	(invoke button 'setLabel label))
     (if (not (eq? oncommand #!null))
-	(invoke button 'addActionListener (make-action-listener oncommand)))
+	(invoke button 'setAction oncommand))
     button))
 
 (define (frame #!key
 	       (title  :: <String> #!null)
 	       (menubar ::  <javax.swing.JMenuBar> #!null)
 	       contents)
-  :: <javax.swing.JFrame>
-  (let ((frame :: <javax.swing.JFrame>
-	       (make  <javax.swing.JFrame>)))
-    (if (not (eq? title #!null))
-	(invoke frame 'setTitle title))
-    (if (not (eq? menubar #!null))
-	(invoke frame 'setJMenuBar menubar))
-    (invoke (invoke frame 'getContentPane) 'add contents)
-    (invoke frame 'pack)
-    (invoke frame 'show)
-    frame))
+  :: <gnu.kawa.swingviews.SwingFrame>
+  (make  <gnu.kawa.swingviews.SwingFrame> title menubar contents))
 
 (define (menubar #!rest args  :: <object[]>)
     :: <javax.swing.JMenuBar>
@@ -88,3 +75,27 @@
     (if (not (eq? oncommand #!null))
 	(invoke menuitem 'addActionListener (make-action-listener oncommand)))
     menuitem))
+
+(define (polygon initial #!rest (more-points :: <object[]>))
+  (let ((path :: <java.awt.geom.GeneralPath>
+	      (make <java.awt.geom.GeneralPath>))
+	(n-points :: <int>
+		  ((primitive-array-length <object>) more-points)))
+    (invoke path 'moveTo
+	    (real-part initial) (imag-part initial))
+    (do ((i :: <int> 0 (+ i 1)))
+	((>= i n-points)
+	 (invoke path 'closePath)
+	 path)
+      (let ((pt ((primitive-array-get <object>) more-points i)))
+	(invoke path 'lineTo (real-part pt) (imag-part pt))))))
+
+(define (panel #!key
+	       (width :: <integer> 10)
+	       (height :: <integer> 10)
+	       contents)
+  :: <javax.swing.JPanel>
+  (let ((panel :: <javax.swing.JPanel>
+	       (make <javax.swing.JPanel>)))
+    (invoke panel 'setPreferredSize (make <java.awt.Dimension> width height))
+    panel))

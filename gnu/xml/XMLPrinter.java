@@ -5,12 +5,14 @@ package gnu.xml;
 import gnu.lists.*;
 import java.io.*;
 import gnu.text.Char;
+import gnu.mapping.OutPort;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
 public class XMLPrinter extends PrintConsumer
   implements PositionConsumer, XConsumer
 {
+  boolean printPretty = false;
   boolean inAttribute = false;
   boolean inStartTag = false;
   boolean needXMLdecl = false;
@@ -114,27 +116,49 @@ public class XMLPrinter extends PrintConsumer
   public void writeChar(int v)
   {
     closeTag();
+    if (printPretty && (v == ' ' || v == '\t'))
+      {
+	if (prev != ' ')
+	  {
+	    ((OutPort) out).writeSpaceFill();
+	    prev = ' ';
+	  }
+	return;
+      }
     if (prev == WORD)
       {
 	if (isWordChar((char) v))
-	  super.write(' ');
+	  {
+	    super.write(' ');
+	    if (printPretty)
+	      ((OutPort) out).writeBreakFill();
+	  }
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
     if (! escapeText)
-      super.write((char) v);
-    else if (v == '<' && ! (isHtml && inAttribute))
-      super.write("&lt;");
-    else if (v == '>')
-      super.write("&gt;");
-    else if (v == '&')
-      super.write("&amp;");
-    else if (v == '\"' && inAttribute)
-      super.write("&quot;");
-    else if (v >= 127)
-      super.write("&#"+v+";");
+      {
+	super.write((char) v);
+	prev = v;
+      }
     else
-      super.write((char) v);
-    prev = v;
+      {
+	prev = ';';
+	if (v == '<' && ! (isHtml && inAttribute))
+	  super.write("&lt;");
+	else if (v == '>')
+	  super.write("&gt;");
+	else if (v == '&')
+	  super.write("&amp;");
+	else if (v == '\"' && inAttribute)
+	  super.write("&quot;");
+	else if (v >= 127)
+	  super.write("&#"+v+";");
+	else
+	  {
+	    super.write((char) v);
+	    prev = v;
+	  }
+      }
   }
 
   private void startWord()
@@ -155,6 +179,10 @@ public class XMLPrinter extends PrintConsumer
   {
     if (inStartTag && ! inAttribute)
       {
+	if (printPretty)
+	  {
+	    ((OutPort) out).endLogicalBlock("");
+	  }
 	super.write('>');
 	inStartTag = false;
 	prev = '>';
@@ -182,6 +210,13 @@ public class XMLPrinter extends PrintConsumer
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
+    if (printPretty)
+      {
+	OutPort pout = (OutPort) out;
+	if (prev == '>')
+	  pout.writeBreakLinear();
+	pout.startLogicalBlock("", "", 2);
+      }
     super.write('<');
     super.write(typeName);
     NamespaceBinding groupBindings = null;
@@ -250,6 +285,8 @@ public class XMLPrinter extends PrintConsumer
     if (isHtml
 	&& ("script".equals(typeName) || "style".equals(typeName)))
       escapeText = false;
+    if (printPretty)
+      ((OutPort) out).startLogicalBlock("", "", 1);
   }
 
   static final String HtmlEmptyTags
@@ -266,8 +303,22 @@ public class XMLPrinter extends PrintConsumer
   {
     if (canonicalize && ! htmlCompat)
       closeTag();
+    if (printPretty)
+      {
+	OutPort pout = (OutPort) out;
+	if (! inStartTag && prev == '>')
+	  {
+	    pout.setIndentation(0, false);
+	    pout.writeBreakLinear();
+	  }
+	pout.endLogicalBlock("");
+      }
     if (inStartTag)
       {
+	if (printPretty)
+	  {
+	    ((OutPort) out).endLogicalBlock("");
+	  }
 	super.write(isHtml
 		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
 		 : (htmlCompat ? " />" : "/>"));
@@ -282,7 +333,6 @@ public class XMLPrinter extends PrintConsumer
     prev = '>';
     if (isHtml && ! escapeText
 	&& ("script".equals(typeName) || "style".equals(typeName)))
-
       escapeText = true;
 
     namespaceBindings = namespaceSaveStack[--groupNesting];
@@ -297,6 +347,8 @@ public class XMLPrinter extends PrintConsumer
       super.write('"');
     inAttribute = true;
     super.write(' ');
+    if (printPretty)
+      ((OutPort) out).writeBreakFill();
     super.write(attrName);
     super.write("=\"");
     prev = ' ';

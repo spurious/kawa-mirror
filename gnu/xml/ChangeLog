@@ -1,3 +1,7 @@
+2004-05-18  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java:  Add pretty-printing support.
+
 2004-05-05  Per Bothner  <per@bothner.com>
 
 	* ParsedXMLHandler.java.in (emitCDATA):  New method.

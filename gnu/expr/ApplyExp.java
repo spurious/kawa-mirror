@@ -134,8 +134,8 @@ public class ApplyExp extends Expression
       }
 
     if (args_length <= 4
-	&& (! tail_recurse
-	    || func_lambda.min_args == func_lambda.max_args))
+	|| (tail_recurse
+	    && func_lambda.min_args == func_lambda.max_args))
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
@@ -156,15 +156,12 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	if (func_lambda.argsArray == null)
-	  {
-	    store_rest (comp, func_lambda.firstVar ());
-	  }
-	else
-	  {
-	    // FIXME Inefficient temporary implementation.
-	    code.emitLoad(func_lambda.argsArray);
-	  }
+	Variable params = func_lambda.firstVar();
+	if (params.getName() == "this")
+	  params = params.nextVar();
+	if (params.getName() == "argsArray")
+	  params = params.nextVar();
+	popParams (code, params, args_length);
 	code.emitTailCall(false, func_lambda.scope);
 	return;
       }
@@ -197,6 +194,17 @@ public class ApplyExp extends Expression
 	store_rest (comp, vars.nextVar ());
 	if (! vars.isArtificial())
 	  ((Declaration) vars).initBinding(comp);
+      }
+  }
+
+  private static void popParams (CodeAttr code, Variable vars, int count)
+  {
+    if (count > 0)
+      {
+	if (! vars.isSimple())
+	  vars = vars.nextVar();
+	popParams (code, vars.nextVar (), count - 1);
+	code.emitStore(vars);
       }
   }
 

@@ -1,3 +1,10 @@
+Sat Aug 29 09:16:01 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (compile):  Fix problems with tails-calls.
+	* Compilation.java (addClass):  Fix procedure prologue for tails-calls.
+
+	* Declaration.java (toString):  Print with name and new uid.
+
 1998-08-28  Per Bothner  <bothner@cygnus.com>
 
 	* ExpWalker.java, ExpFullWalker.java, FindTailCalls.java,

@@ -499,19 +499,11 @@ public class Compilation
 	code.emitReturn();
       }
 
-
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
     Method apply_method
       = curClass.addMethod (apply_name, arg_types, scmObjectType,
 			     Access.PUBLIC|Access.FINAL);
     method = apply_method;
-
-    // If incomingMap[i] is non-null, it means that the user's i'th
-    // formal parameter (numbering the left-most one as 0) is captured
-    // by an inferior lambda, so it needs to be saved in the heapFrame.
-    // The incoming variable is incomingMap[i], which is in register (i+1)
-    // (since the unnamed "this" parameter is in register 0).
-    Declaration incomingMap[] = new Declaration[lexp.min_args];
 
     // For each parameter, assign it to its proper slot.
     // If a parameter !isSimple(), we cannot assign it to a local slot,
@@ -528,60 +520,86 @@ public class Compilation
 
     int line = lexp.getLine();
     if (line > 0)
-      method.compile_linenumber (line);
+      code.putLineNumber(line);
 
-    for ( ;  var != null;  var = var.nextVar ())
+    if (arg_letter == 'N')
       {
-	if (! (var instanceof Declaration) || ! var.isParameter ())
-	  continue;
-	// i is the register to use for the current parameter
-	Declaration decl = (Declaration) var;
-	if (var.isSimple ())
+	argsArray.reserveLocal(1, code);
+
+	if (true) // If generating code to check number of arguments
 	  {
-	    // For a simple parameter not captured by an inferior lambda,
-	    // just allocate it in the incoming register.  This case also
-	    // handles the artificial "this" and "argsArray" variables.
-	    if (! var.isAssigned ()
-		&& ! var.reserveLocal(i, code))
-	      throw new Error ("internal error assigning parameters");
+	    code.emitPushThis();
+	    code.emitLoad(argsArray);
+	    code.emitArrayLength();
+	    code.emitInvokeStatic(checkArgCountMethod);
 	  }
-	else if (argsArray != null)
-	  {
-	    // The incoming value is an element in the argsArray variable
-	    // (or many elements in the case of a "rest" parameter).
-	    // We do not need to do anything here (but see below).
-	  }
-	else
-	  {
-	    // This variable was captured by an inner lambda.
-	    // It's home location is in the heapFrame.
-	    // Later, we copy it from it's incoming register
-	    // to its home location heapFrame.  Here we just create and
-	    // assign a Variable for the incoming (register) value.
-	    String incoming_name = (var.getName ()+"Incoming").intern();
-	    Declaration incoming = lexp.addDeclaration (incoming_name);
-	    incoming.setArtificial (true);
-	    incoming.setParameter (true);
-	    if (! incoming.reserveLocal(i, code))
-	      throw new Error ("internal error assigning parameters");
-	    //incoming.baseVariable = decl;
-	    // Subtract 1, so we don't count the "this" variable.
-	    incomingMap[i-1] = incoming;
-	  }
-	i++;
       }
 
-    if (arg_letter == 'N'
-	 // && If generating code to check number of arguments
-	)
+    while (var != null)
       {
-	code.emitPushThis();
-	code.emitLoad(argsArray);
-	code.emitArrayLength();
-	code.emitInvokeStatic(checkArgCountMethod);
+	if (var instanceof Declaration && var.isParameter ())
+	  {
+	    // i is the register to use for the current parameter
+	    Declaration decl = (Declaration) var;
+	    if (var.isSimple ())
+	      {
+		// For a simple parameter not captured by an inferior lambda,
+		// just allocate it in the incoming register.  This case also
+		// handles the artificial "this" and "argsArray" variables.
+		if (! var.isAssigned ()
+		    && ! var.reserveLocal(i, code))
+		  throw new Error ("internal error assigning parameters");
+	      }
+	    else if (lexp.min_args != lexp.max_args)
+	      {
+		// The incoming value is an element in the argsArray variable
+		// (or many elements in the case of a "rest" parameter).
+		// We do not need to do anything here (but see below).
+	      }
+	    else
+	      {
+		// This variable was captured by an inner lambda.
+		// It's home location is in the heapFrame.
+		// Later, we copy it from it's incoming register
+		// to its home location heapFrame.  Here we just create and
+		// assign a Variable for the incoming (register) value.
+		String incoming_name = (var.getName ()+"Incoming").intern();
+		decl = new Declaration(incoming_name);
+		lexp.scope.addVariableAfter(var, decl);
+		decl.setArtificial (true);
+		decl.setParameter (true);
+		if (! decl.isAssigned () && ! decl.reserveLocal(i, code))
+		  throw new Error ("internal error assigning parameters");
+	      }
+	    
+	    // If the only reason we are using an argsArray is because there
+	    // are more than 4 arguments, copy the arguments in local register.
+	    // Then forget about the args array.  We do this first, before
+	    // the label that tail-recursion branches back to.
+	    // This way, a self-tail-call knows where to leave the argumnents.
+	    if (argsArray != null && lexp.min_args == lexp.max_args
+		&& ! var.isArtificial())
+	      {
+		if (! decl.isAssigned () && ! decl.reserveLocal(i, code))
+		  throw new Error ("internal error assigning parameters");
+		code.emitLoad(argsArray);
+		// The first two slots are "this" and "argsArray".
+		code.emitPushInt(i-2);
+		code.emitArrayLoad(scmObjectType);
+		code.emitStore(decl);
+	      }
+	    if (var != decl)
+	      var = decl;  // Skip "incomingXxx" before next iteration.
+	    i++;
+	  }
+	var = var.nextVar();
       }
 
+    // Tail-calls loop back to here! 
     code.enterScope (lexp.scope);
+
+    if (lexp.min_args == lexp.max_args)
+      argsArray = null;
 
     if (lexp.heapFrameLambda != null)
       {
@@ -602,7 +620,7 @@ public class Compilation
       {
 	if (var.isParameter () && ! var.isArtificial ())
 	  {
-	    if (argsArray != null || incomingMap[i] != null)
+	    if (argsArray != null || ! var.isSimple())
 	      {
 		// If the parameter is captured by an inferior lambda,
 		// then the incoming parameter needs to be copied into its
@@ -617,8 +635,8 @@ public class Compilation
 		// This part of the code pushes the incoming argument.
 		if (argsArray == null)
 		  {
-		    // Simple case:  Incoming register is in incomingMap[i]:
-		    code.emitLoad(incomingMap[i]);
+		    // Simple case:  Use Incoming register.
+		    code.emitLoad(param.nextVar());
 		  }
 		else if (i < lexp.min_args)
 		  { // This is a required parameter, in argsArray[i].
@@ -682,7 +700,6 @@ public class Compilation
 	  }
       }
 
-    code.beginScope();
     lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())
       code.emitReturn();

@@ -268,6 +268,11 @@ public class LambdaExp extends ScopeExp
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
       }
+    Variable thisVar = firstVar();
+    if (thisVar.getName() == "this")
+      thisVar.setType(new_class);
+    else
+       throw new Error("internal error - 'this' is not first arg");
     comp.method.compile_new (new_class);
     comp.method.compile_dup (new_class);
     if (staticLink != null)

@@ -55,7 +55,7 @@ public class SchemeLoader extends ClassLoader
 	    if (clas == null)
 	      {
 		byte[] bytes = classBytes[index];
-		clas = defineClass (bytes, 0, bytes.length);
+		clas = defineClass (name, bytes, 0, bytes.length);
 		loadedClasses[index] = clas;
 		classBytes[index] = null;  // To help garbage collector.
 	      }

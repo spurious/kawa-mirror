@@ -898,7 +898,7 @@ implements Consumer, Consumable
       case OBJECT_REF_FOLLOWS:
 	return objects[getIntN(index+1)];
       default:
-	throw unsupported("getNext");
+	throw unsupported("getNext, code="+Integer.toHexString(datum));
       }
   }
 

@@ -105,8 +105,6 @@ public class load extends Procedure1 {
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Environment env = (Environment) arg2;
-    if (! (arg1 instanceof StringBuffer))
-      throw new WrongType (this.name(), 1, "file name");
     String name = arg1.toString ();
     if (name.endsWith (".zip"))
       return loadCompiled (name, env);
@@ -126,7 +124,7 @@ public class load extends Procedure1 {
 	    InPort port = new InPort (fstream);
 	    int char0 = port.readChar ();
 	    if (char0 == -1)
-	      return Interpreter.eofObject;
+	      return Sequence.eofValue;
 	    if (char0 == 'P')
 	      {
 		int char1 = port.readChar ();

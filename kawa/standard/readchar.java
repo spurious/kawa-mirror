@@ -17,7 +17,7 @@ public class readchar extends Procedure0or1
       {
 	int ch = port.readChar ();
 	if (ch < 0)
-	  return Interpreter.eofObject;
+	  return Sequence.eofValue;
 	if (peeking)
 	  port.unreadChar ();
 	return Char.make (ch);

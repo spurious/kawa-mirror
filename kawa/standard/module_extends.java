@@ -12,6 +12,7 @@ public class module_extends extends Syntax
     Type base = prim_method.exp2Type(((Pair) form.cdr).car, tr);
     ModuleExp module = tr.getModule();
     module.setSuperType((ClassType) base);
+    module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     return QuoteExp.voidExp;
   }
 }

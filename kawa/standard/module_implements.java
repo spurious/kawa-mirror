@@ -22,6 +22,7 @@ public class module_implements extends Syntax
       }
     ModuleExp module = tr.getModule();
     module.setInterfaces(interfaces);
+    module.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     return QuoteExp.voidExp;
   }
 }

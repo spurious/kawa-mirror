@@ -520,8 +520,8 @@ public class Translator extends Parser
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	else if ((mexp.getFlag(ModuleExp.NONSTATIC_SPECIFIED)
 		  && ! decl.getFlag(Declaration.STATIC_SPECIFIED))
-		 || (gnu.expr.Compilation.moduleStatic < 0
-		     && ! mexp.getFlag(ModuleExp.STATIC_SPECIFIED)))
+		 || gnu.expr.Compilation.moduleStatic < 0
+		 || mexp.getFlag(ModuleExp.SUPERTYPE_SPECIFIED))
 	  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
       }
     if (! moduleStatic)

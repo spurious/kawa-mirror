@@ -86,13 +86,12 @@ public class load extends Procedure1 {
   public final static Object loadSource (InPort port, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Interpreter interpreter = env.interpreter ();
-    int save_errors = interpreter.errors;
-    LambdaExp lexp = CompileFile.read (port, env);
-    lexp.setName (Symbol.make (LambdaExp.fileFunctionName));
-    if (interpreter.errors > save_errors)
+    Translator tr = new Translator (env);
+    ModuleExp mexp = CompileFile.read (port, tr);
+    mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
+    if (tr.errors > 0)
       throw new GenericError ("syntax errors during load");
-    return ((ModuleBody) lexp.eval (env)).run (env);
+    return ((ModuleBody) mexp.eval (env)).run (env);
   }
 
   public final Object apply1 (Object arg1)

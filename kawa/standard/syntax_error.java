@@ -8,7 +8,7 @@ import kawa.lang.*;
 
 public class syntax_error extends Syntax
 {
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     StringBuffer buffer = new StringBuffer ();
     int words = 0;
@@ -27,6 +27,6 @@ public class syntax_error extends Syntax
 	  buffer.append (' ');
 	buffer.append (obj);
       }
-    return interp.syntaxError (buffer.toString ());
+    return tr.syntaxError (buffer.toString ());
   }
 }

@@ -15,25 +15,24 @@ public class and_or extends Syntax implements Printable
     this.is_and = is_and;
   }
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     if (obj == List.Empty)
-      return new QuoteExp (is_and ? Interpreter.trueObject
-			   : Interpreter.falseObject);
+      return new QuoteExp (Scheme.boolObject (is_and));
     if (! (obj instanceof Pair))
-      return interp.syntaxError ("non-list arguments to and/or");
+      return tr.syntaxError ("non-list arguments to and/or");
     Pair pair = (Pair) obj;
     if (pair.cdr == List.Empty)
-      return interp.rewrite (pair.car);
+      return tr.rewrite (pair.car);
     Expression[] inits = new Expression[1];
     LetExp let = new LetExp (inits);
     Symbol temp_name = Symbol.generate ();
     Declaration temp_decl = let.add_decl (temp_name);
-    inits[0] = interp.rewrite (pair.car);
+    inits[0] = tr.rewrite (pair.car);
     temp_decl.noteValue (inits[0]);
-    let.push (interp);
+    let.push (tr);
     Expression temp_exp = new ReferenceExp (temp_name, temp_decl);
-    Expression rest = rewrite (pair.cdr, interp); // self-recurse
+    Expression rest = rewrite (pair.cdr, tr); // self-recurse
     Expression then_clause, else_clause;
     if (is_and)
       {
@@ -46,7 +45,7 @@ public class and_or extends Syntax implements Printable
 	else_clause = rest;
       }
     let.body = new IfExp (temp_exp, then_clause, else_clause);
-    let.pop (interp);
+    let.pop (tr);
     return let;
   }
 

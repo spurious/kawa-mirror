@@ -351,6 +351,9 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 	$(JAVAC) -d ../.. $<
 
 all: $(OBJ)
+
+all_one: $(SOURCES)
+	$(JAVAC) -d ../.. $?
 .SUFFIXES:
 .SUFFIXES: $(SUFFIXES)
 

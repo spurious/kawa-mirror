@@ -10,13 +10,13 @@ public class ifp extends Syntax implements Printable
 {
   static private Pattern pattern = new ListPat (2, 3);
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     Object [] match = pattern.match (obj);
     if (match == null)
-      return interp.syntaxError ("invalid syntax for if");
-    return new IfExp (interp.rewrite (match[0]),
-		      interp.rewrite (match[1]),
-		      interp.rewrite (match[2]));
+      return tr.syntaxError ("invalid syntax for if");
+    return new IfExp (tr.rewrite (match[0]),
+		      tr.rewrite (match[1]),
+		      tr.rewrite (match[2]));
   }
 }

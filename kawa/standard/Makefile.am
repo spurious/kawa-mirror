@@ -196,3 +196,6 @@ SOURCES = $(OBJ:.class=.java)
 CLEANFILES=$(OBJ)
 
 all: $(OBJ)
+
+all_one: $(SOURCES)
+	$(JAVAC) -d ../.. $?

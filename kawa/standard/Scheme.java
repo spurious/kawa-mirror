@@ -3,6 +3,33 @@ import kawa.lang.*;
 
 public class Scheme extends Interpreter
 {
+  // transitional hack FIXME
+  private static Environment env;
+  public static Environment curEnvironment ()
+  {
+    return env;
+  }
+
+  public void define(String name, Object p)
+  {
+    env.put (Symbol.make (name), p);
+  }
+
+  public void define(Symbol sym, Object p)
+  {
+    env.define (sym, p);
+  }
+
+  public Object lookup(java.lang.String name)
+  {
+    return env.get (Symbol.make (name));
+  }
+
+  public Object lookup(Symbol name)
+  {
+    return env.get (name);
+  }
+
   final void define_proc (Named proc)
   {
     define (proc.name (), proc);
@@ -27,10 +54,16 @@ public class Scheme extends Interpreter
   static Environment r5_environment;
   static Environment user_environment;
 
-  public Scheme (InPort i, OutPort o, OutPort e)
+  // FIX transitinal hack - should create new user env each time
+  public static Environment makeEnvironment ()
   {
-      super(i,o,e);
+    if (user_environment == null)
+      new Scheme ();
+    return user_environment;
+  }
 
+  public Scheme ()
+  {
       kawa.lang.Named proc;
       kawa.lang.Named syn;
 
@@ -39,7 +72,7 @@ public class Scheme extends Interpreter
       kawa.lang.Procedure2 equal;
 
       // (null-environment)
-      null_environment = new Environment (this);
+      null_environment = new Environment ();
       null_environment.setName ("null-environment");
       env = null_environment;
 
@@ -370,7 +403,8 @@ public class Scheme extends Interpreter
   public static Object eval (InPort port, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    return Eval.eval (CompileFile.read (port, env), env);
+    Translator tr = new Translator (env);
+    return Eval.eval (CompileFile.read (port, tr), tr);
   }
 
   /** Evalutate Scheme expressions from an "S expression."

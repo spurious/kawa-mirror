@@ -12,10 +12,10 @@ public class let extends Syntax implements Printable
 {
   static private Pattern pattern2 = new ListPat (2);
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))
-      return interp.syntaxError ("missing let arguments");
+      return tr.syntaxError ("missing let arguments");
     Pair pair = (Pair) obj;
     Object bindings = pair.car;
     Object body = pair.cdr;
@@ -27,17 +27,17 @@ public class let extends Syntax implements Printable
 	Pair bind_pair = (Pair) bindings;
 	Object[] bind_match = pattern2.match (bind_pair.car);
 	if (bind_match == null)
-	  return interp.syntaxError ("let binding is not a pair");
+	  return tr.syntaxError ("let binding is not a pair");
 	if (! (bind_match[0] instanceof Symbol))
-	  return interp.syntaxError("variable in let binding is not a symbol");
+	  return tr.syntaxError("variable in let binding is not a symbol");
 	Declaration decl = let.add_decl ((Symbol) bind_match[0]);
-	inits[i] = interp.rewrite (bind_match[1]);
+	inits[i] = tr.rewrite (bind_match[1]);
 	decl.noteValue (inits[i]);
 	bindings = bind_pair.cdr;
       }
-    let.push (interp);
-    let.body = interp.rewrite_body (body);
-    let.pop (interp);
+    let.push (tr);
+    let.body = tr.rewrite_body (body);
+    let.pop (tr);
     return let;
   }
 }

@@ -9,7 +9,7 @@ import kawa.lang.*;
 
 public class define extends Syntax implements Printable
 {
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     if (obj instanceof Pair)
       {
@@ -20,7 +20,7 @@ public class define extends Syntax implements Printable
 	    if (p2.cdr == List.Empty)
 	      {
 		SetExp result = new SetExp ((Symbol)p1.car,
-					    interp.rewrite (p2.car));
+					    tr.rewrite (p2.car));
 		result.setDefining (true);
 		return result;
 	      }
@@ -31,7 +31,7 @@ public class define extends Syntax implements Printable
 	    if (p2.car instanceof Symbol)
 	      {
 		Symbol name = (Symbol) p2.car;
-		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, interp);
+		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
 		  {
@@ -45,6 +45,6 @@ public class define extends Syntax implements Printable
 	      }
 	  }
       }
-    return interp.syntaxError ("invalid syntax for define");
+    return tr.syntaxError ("invalid syntax for define");
   }
 }

@@ -13,42 +13,42 @@ public class quasiquote extends Syntax implements Printable
     return val instanceof Expression ? (Expression) val : new QuoteExp (val);
   }
 
-  Object expand_pair (Pair pair, int depth, Interpreter interp)
+  Object expand_pair (Pair pair, int depth, Translator tr)
   {
-    if (pair.car == Interpreter.quasiquote_sym)
+    if (pair.car == Scheme.quasiquote_sym)
       depth++;
-    else if (pair.car == Interpreter.unquote_sym)
+    else if (pair.car == Scheme.unquote_sym)
       {
 	depth--;
 	Pair pair_cdr;
 	if (! (pair.cdr instanceof Pair)
 	    || (pair_cdr = (Pair) pair.cdr).cdr != List.Empty)
-	  return interp.syntaxError ("invalid used of " + pair.car +
+	  return tr.syntaxError ("invalid used of " + pair.car +
 				     " in quasiquote template");
 	if (depth == 0)
-	  return interp.rewrite (pair_cdr.car);
+	  return tr.rewrite (pair_cdr.car);
       }
-    else if (pair.car == Interpreter.unquotesplicing_sym && depth >= 0)
-      return interp.syntaxError ("invalid used of " + pair.car +
+    else if (pair.car == Scheme.unquotesplicing_sym && depth >= 0)
+      return tr.syntaxError ("invalid used of " + pair.car +
 				 " in quasiquote template");
-    Object expanded_cdr = expand (pair.cdr, depth, interp);
+    Object expanded_cdr = expand (pair.cdr, depth, tr);
     Pair pair_car;
     if (pair.car instanceof Pair
-	&& (pair_car = (Pair)pair.car).car == Interpreter.unquotesplicing_sym
+	&& (pair_car = (Pair)pair.car).car == Scheme.unquotesplicing_sym
 	&& --depth == 0)
       {
 	Pair pair_car_cdr;
 	if (! (pair_car.cdr instanceof Pair)
 	    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != List.Empty)
-	  return interp.syntaxError ("invalid used of " + pair_car.car +
+	  return tr.syntaxError ("invalid used of " + pair_car.car +
 				     " in quasiquote template");
 	Procedure append = kawa.standard.append.appendProcedure;
 	Expression[] args = new Expression[2];
-	args[0] = interp.rewrite (pair_car_cdr.car);
+	args[0] = tr.rewrite (pair_car_cdr.car);
 	args[1] = coerceExpression (expanded_cdr);
 	return new ApplyExp (new QuoteExp (append), args);
       }
-    Object expanded_car = expand (pair.car, depth, interp);
+    Object expanded_car = expand (pair.car, depth, tr);
     if (expanded_car == pair.car && expanded_cdr == pair.cdr)
       return pair;
     else if (!(expanded_car instanceof Expression)
@@ -67,14 +67,14 @@ public class quasiquote extends Syntax implements Printable
   /** Backquote-expand a template.
    * @param template the quasiquoted template to expand
    * @param depth the (net) number of quasiquotes we are inside
-   * @param interp the rewrite context
+   * @param tr the rewrite context
    * @return the expanded Expression (the result can be a non-expression,
    *   in which case it is implicitly in a QuoteExp).
    */
-  Object expand (Object template, int depth, Interpreter interp)
+  Object expand (Object template, int depth, Translator tr)
   {
     if (template instanceof Pair)
-      return expand_pair ((Pair) template, depth, interp);
+      return expand_pair ((Pair) template, depth, tr);
     else if (template instanceof kawa.lang.Vector)
       {
 	kawa.lang.Vector vector = (kawa.lang.Vector) template;
@@ -94,20 +94,20 @@ public class quasiquote extends Syntax implements Printable
 	    Pair pair;
 	    if (element instanceof Pair
 		&& ((pair = (Pair)element).car
-		    == Interpreter.unquotesplicing_sym)
+		    == Scheme.unquotesplicing_sym)
 		&& --element_depth == 0)
 	      {
 		Pair pair_cdr;
 		if (! (pair.cdr instanceof Pair)
 		    || (pair_cdr = (Pair) pair.cdr).cdr != List.Empty)
-		  return interp.syntaxError ("invalid used of " + pair.car +
+		  return tr.syntaxError ("invalid used of " + pair.car +
 					     " in quasiquote template");
-		buffer[i] = interp.rewrite (pair_cdr.car);
+		buffer[i] = tr.rewrite (pair_cdr.car);
 		state[i] = 3;
 	      }
 	    else
 	      {
-		buffer [i] = expand (element, element_depth, interp);
+		buffer [i] = expand (element, element_depth, tr);
 		if (buffer[i] == element)
 		  state[i] = 0;
 		else if (buffer[i] instanceof Expression)
@@ -154,12 +154,12 @@ public class quasiquote extends Syntax implements Printable
       return template;
   }
 
-  public Expression rewrite (Object obj, Interpreter interp)
+  public Expression rewrite (Object obj, Translator tr)
   {
     Pair pair;
     if (! (obj instanceof Pair)
 	|| (pair = (Pair) obj).cdr != List.Empty)
-      return interp.syntaxError ("wrong number of arguments to quasiquote");
-    return coerceExpression (expand (pair.car, 1, interp));
+      return tr.syntaxError ("wrong number of arguments to quasiquote");
+    return coerceExpression (expand (pair.car, 1, tr));
   }
 }

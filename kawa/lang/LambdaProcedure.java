@@ -24,7 +24,7 @@ public class LambdaProcedure extends ProcedureN
   {
     if (args.length < lexpr.min_args
 	|| (lexpr.max_args >= 0 && args.length > lexpr.max_args))
-      throw new WrongArguments(this.name,lexpr.min_args,"(?)");
+      throw new WrongArguments(this.name().toString(), lexpr.min_args,"(?)");
     Object[] frame = new Object[lexpr.frameSize];
     Environment new_env = new Environment (frame, lexpr, environment);
     if (lexpr.heapFrame != null)

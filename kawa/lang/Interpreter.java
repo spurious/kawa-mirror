@@ -7,8 +7,6 @@ import java.util.Vector;
 
 //-- kawa Primitives
 import kawa.lang.Printable; 
-import kawa.lang.Executable; 
-import kawa.lang.Syntaxable; 
 import kawa.lang.Symbol;
 
 // Exceptions
@@ -44,10 +42,6 @@ public class Interpreter extends Object
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
-  protected QuasiQuote      quasiquote;
-  protected Unquote         unquote;
-  protected UnquoteSplicing unquotesplicing;
-
   public InPort in;
   public OutPort out;
   public OutPort err;
@@ -69,15 +63,9 @@ public class Interpreter extends Object
 
       globals         = new java.util.Hashtable();
       current_decls   = new java.util.Hashtable();
-      quasiquote      = new kawa.lang.QuasiQuote();
-      unquote         = new kawa.lang.Unquote();
-      unquotesplicing = new kawa.lang.UnquoteSplicing();
 
       define(lambda_sym, lambda);
       define(quote_sym, quote);
-      define(quasiquote.name,quasiquote);
-      define(unquote.name,unquote);
-      define(unquotesplicing.name,unquotesplicing);
    }
 
   public void define(String name, Object p)
@@ -95,7 +83,7 @@ public class Interpreter extends Object
   {
     Object result = curInterpreter.lookup (name);
     if (result == null)
-      throw new UnboundSymbol(name.toString ());
+      throw new UnboundSymbol(name);
     return result;
   }
 
@@ -170,7 +158,7 @@ public class Interpreter extends Object
     if (count == 1)
       return rewrite (((Pair)exp).car);
     else if (count == 0)
-      throw new WrongArguments ("<body>", 1, "body with no expressions");
+      return syntaxError ("body with no expressions");
     else
       {
 	Expression[] exps = new Expression [count];
@@ -187,6 +175,18 @@ public class Interpreter extends Object
   Syntax current_syntax;
   Object current_syntax_args;
   Expression errorExp = new ErrorExp ("unknown syntax error");
+  String current_filename;
+  int current_line;
+  int current_column;
+
+  final Expression rewrite_car (Pair pair)
+       throws WrongArguments
+  {
+    if (pair instanceof PairWithPosition)
+      return rewrite_with_position (pair.car, (PairWithPosition) pair);
+    else
+      return rewrite (pair.car);
+  }
 
   /**
    * Apply a Syntax object.
@@ -225,7 +225,19 @@ public class Interpreter extends Object
   public Expression syntaxError (String message)
   {
     errors++;
-    System.err.print ("syntax error: ");
+    if (current_line > 0)
+      {
+	if (current_filename != null)
+	  System.err.print (current_filename);
+	System.err.print (':');
+	System.err.print (current_line);
+	if (current_column > 1)
+	  {
+	    System.err.print (':');
+	    System.err.print (current_column);
+	  }
+	System.err.print (": ");
+      }
     System.err.println (message);
     return new ErrorExp (message);
   }
@@ -233,10 +245,10 @@ public class Interpreter extends Object
   /** Resolve a symbol to a Declaration.
    * May cause the Declaration to be "captured" in a closure ("heapFrame").
    * @param sym the symbol whose Declaration we want
+   * @param decl the current lexical binding, if any
    * @return the Declaration, or null if there no lexical Declaration */
-  public Declaration resolve (Symbol sym)
+  public Declaration resolve (Symbol sym, Declaration decl)
   {
-    Declaration decl = (Declaration) current_decls.get (sym);
     if (decl != null)
       {
 	LambdaExp curLambda = currentLambda ();
@@ -259,42 +271,53 @@ public class Interpreter extends Object
     return decl;
   }
 
+  public Expression rewrite_pair (Pair p)
+       throws WrongArguments
+  {
+    Object car = p.car;
+    Object cdr = p.cdr;
+    if (car instanceof Syntax)
+      return apply_rewrite ((Syntax)car, cdr);
+
+    if (car instanceof Symbol)
+      {
+	Object binding = lookup ((Symbol) car);
+	if (binding instanceof Syntax)
+	  return apply_rewrite ((Syntax) binding, cdr);
+      }
+
+    int cdr_length = kawa.standard.length.length (cdr);
+
+    Expression func = rewrite_car (p);
+    Expression[] args = new Expression[cdr_length];
+    for (int i = 0; i < cdr_length; i++)
+      {
+	Pair cdr_pair = (Pair) cdr;
+	args[i] = rewrite_car (cdr_pair);
+	cdr = cdr_pair.cdr;
+      }
+    return new ApplyExp (func, args);
+  }
+
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */
   public Expression rewrite (Object exp)
        throws WrongArguments
   {
-    if (exp instanceof Pair)
-      {
-	Pair p = (Pair)exp;
-	Object car = p.car;
-	Object cdr = p.cdr;
-	if (car instanceof Syntax)
-	  return apply_rewrite ((Syntax)car, cdr);
-
-	if (car instanceof Symbol)
-	  {
-	    Object binding = lookup ((Symbol) car);
-	    if (binding instanceof Syntax)
-	      return apply_rewrite ((Syntax) binding, cdr);
-	  }
-
-	int cdr_length = kawa.standard.length.length (cdr);
-
-	Expression[] args = new Expression[cdr_length];
-	for (int i = 0; i < cdr_length; i++)
-	  {
-	    Pair cdr_pair = (Pair) cdr;
-	    args[i] = rewrite (cdr_pair.car);
-	    cdr = cdr_pair.cdr;
-	  }
-	return new ApplyExp (rewrite (car), args);
-      }
+    if (exp instanceof PairWithPosition)
+      return rewrite_with_position (exp, (PairWithPosition) exp);
+    else if (exp instanceof Pair)
+      return rewrite_pair ((Pair) exp);
     else if (exp instanceof Symbol)
       {
 	Symbol sym = (Symbol) exp;
-	return new ReferenceExp (sym, resolve (sym));
+	Object binding = current_decls.get (sym);
+	// Hygenic macro expansion may bind a renamed (uninterned) Symbol
+	// to the original Symbol.  Here, use the original Symbol.
+	if (binding != null && binding instanceof Symbol)
+	  return new ReferenceExp ((Symbol) binding);
+	return new ReferenceExp (sym, resolve (sym, (Declaration) binding));
       }
     else if (exp instanceof Expression)
       return (Expression) exp;
@@ -302,6 +325,39 @@ public class Interpreter extends Object
       return null;
     else
       return new QuoteExp (exp);
+  }
+
+  public Expression rewrite_with_position (Object exp, PairWithPosition pair)
+       throws WrongArguments
+  {
+    String save_filename = current_filename;
+    int save_line = current_line;
+    int save_column = current_column;
+    Expression result;
+    try
+      {
+	String exp_file = pair.getFile ();
+	int exp_line = pair.getLine ();
+	int exp_column = pair.getColumn ();
+	current_filename = exp_file;
+	current_line = exp_line;
+	current_column = exp_column;
+	if (exp == pair)
+	  result = rewrite_pair (pair);  // To avoid a cycle
+	else
+	  result = rewrite (exp);
+	if (result.getFile () == null)
+	  result.setFile (exp_file);
+	if (result.getLine () == 0)
+	  result.setLine (exp_line, exp_column);
+      }
+    finally
+      {
+	current_filename = save_filename;
+	current_line = save_line;
+	current_column = save_column;
+      }
+    return result;
   }
 
 }

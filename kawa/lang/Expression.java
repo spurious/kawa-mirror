@@ -23,4 +23,37 @@ public abstract class Expression implements Printable
 
   abstract public void compile (Compilation comp, int flags);
 
+  String filename;
+  int position;
+
+  final void setFile (String filename)
+  {
+    this.filename = filename;
+  }
+
+  final void setLine (int lineno, int colno)
+  {
+    position = (lineno << 12) + colno;
+  }
+
+  final void setLine (int lineno)
+  {
+    setLine (lineno, 0);
+  }
+
+  final String getFile ()
+  {
+    return filename;
+  }
+
+  final int getLine ()
+  {
+    return position >> 12;
+  }
+
+  final int getColumn ()
+  {
+    return position & ((1 << 12) - 1);
+  }
+
 }

@@ -6,8 +6,12 @@ package kawa.lang;
  * @author	Per Bothner
  */
 
-abstract public class Syntax
+abstract public class Syntax extends Named implements Printable
 {
+  public Syntax () { super (); }
+
+  public Syntax (Symbol name) { super (name); }
+
   /**
    * Re-write an expression that is an "application" of this Syntax object.
    * @param obj the arguments to this "application" (i.e. the cdr of
@@ -17,4 +21,15 @@ abstract public class Syntax
    */
   abstract public Expression rewrite (Object obj, Interpreter interp)
     throws kawa.lang.WrongArguments;
+
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print("#<syntax ");
+    Symbol name = this.name ();
+    if (name == null)
+      ps.print ("<unnamed>");
+    else
+      ps.print(name);
+    ps.print ('>');
+  }
 }

@@ -1,3 +1,7 @@
+2005-03-11  Per Bothner  <per@bothner.com>
+
+	* LispLanguage.java (defSntxStFld): Call FieldLocation's setSyntax.
+
 2005-03-07  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Update Interpreter -> Language.

@@ -63,8 +63,10 @@ public abstract class LispLanguage extends Language
   {
     Object property
       = hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION : null;
-    StaticFieldLocation.define(environ, environ.getSymbol(name), property,
-			       cname, fname);
+    StaticFieldLocation loc = 
+      StaticFieldLocation.define(environ, environ.getSymbol(name), property,
+				 cname, fname);
+    loc.setSyntax();
   }
 
   protected void defSntxStFld(String name, String cname)

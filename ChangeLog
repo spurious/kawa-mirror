@@ -1,5 +1,15 @@
 2003-04-14  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Macro.java (capturedDeclarations):  Change type.
+	(captureDecls):  Allocate capturedDeclarations as Declaration array.
+	* kawa/lang/SyntaxRules.java (<init>):  Update accordingly.
+	(expand):  Create an aliad Declaration, and push that in the
+	Translator lexical scope, instead of the original symbol.
+	* kawa/lang/Translator.java (matches):  Update accordingly.
+	(resolve):  Allow first parameter to be a String.
+	(getBinding, rewrite):  Update and  re-organize.
+	(pushBinding):  Remove and inline into push(Declaration).
+	(popBinding):  Make private.
 	* kawa/standard/define_alias.java (scanForDefinitions):  Use
 	Translator's push method instead of pushBinding.
 	* kawa/standard/define_syntax.java (scanForDefinitions):   Likewise.

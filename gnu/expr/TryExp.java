@@ -66,6 +66,8 @@ public class TryExp extends Expression
     code.emitTryCatchEnd();
   }
 
+  Object walk (ExpWalker walker) { return walker.walkTryExp(this); }
+
   public void print (java.io.PrintWriter ps)
   {
     ps.print("(%try ");

@@ -11,9 +11,12 @@ public class ApplyExp extends Expression
 {
   Expression func;
   Expression[] args;
+  boolean tailCall;
 
   public final Expression getFunction() { return func; }
   public final Expression[] getArgs() { return args; }
+  public final boolean isTailCall() { return tailCall; }
+  public final void setTailCall(boolean tailCall) { this.tailCall = tailCall; }
 
   public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
 
@@ -98,10 +101,31 @@ public class ApplyExp extends Expression
       }
     */
 
+    int args_length = exp.args.length;
+
     // Check for tail-recursion.
     boolean tail_recurse
       = (target instanceof TailTarget)
       && func_lambda != null && func_lambda == comp.curLambda;
+
+    if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
+	&& func_lambda.min_args == args_length)
+      {
+	for (int i = 0; i < args_length; ++i)
+	  exp.args[i].compile (comp, Target.pushObject);
+	LambdaExp saveLambda = comp.curLambda;
+	comp.curLambda = func_lambda;
+	code.enterScope (func_lambda.scope);
+	/* Assign the initial values to the proper variables, in reverse order. */
+	store_rest (comp, func_lambda.firstVar ());
+	code.beginScope(); // ???
+
+	func_lambda.body.compileWithPosition(comp, Target.returnObject);
+	code.popScope();
+	comp.curLambda = saveLambda;
+	target.compileFromStack(comp, Type.pointer_type);
+	return;
+      }
 
     if (!tail_recurse)
       {
@@ -109,10 +133,9 @@ public class ApplyExp extends Expression
 	code.emitCheckcast(comp.scmProcedureType);
       }
 
-    int args_length = exp.args.length;
     if (args_length <= 4
-	|| (tail_recurse
-	    && func_lambda.min_args == func_lambda.max_args))
+	&& (! tail_recurse
+	    || func_lambda.min_args == func_lambda.max_args))
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
@@ -133,16 +156,29 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	code.emitTailCall(true);
+	if (func_lambda.argsArray == null)
+	  {
+	    store_rest (comp, func_lambda.firstVar ());
+	  }
+	else
+	  {
+	    // FIXME Inefficient temporary implementation.
+	    code.emitLoad(func_lambda.argsArray);
+	  }
+	code.emitTailCall(false, func_lambda.scope);
 	return;
       }
     code.emitInvokeVirtual(applymethod);
     target.compileFromStack(comp, Type.pointer_type);
   }
 
+  Object walk (ExpWalker walker) { return walker.walkApplyExp(this); }
+
   public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%apply ");
+    if (tailCall)
+      ps.print ("[tailcall] ");
     func.print (ps);
     for (int i = 0; i < args.length; ++i)
       {
@@ -150,6 +186,18 @@ public class ApplyExp extends Expression
 	args[i].print (ps);
       }
     ps.print(")");
+  }
+
+  /* Recursive helper routine, to store the values on the stack
+   * into the variables in vars, in reverse order. */
+  private static void store_rest (Compilation comp, Variable vars)
+  {
+    if (vars != null)
+      {
+	store_rest (comp, vars.nextVar ());
+	if (! vars.isArtificial())
+	  ((Declaration) vars).initBinding(comp);
+      }
   }
 
 }

@@ -50,9 +50,4 @@ public class letstar extends Syntax implements Printable
       throw new kawa.lang.WrongArguments("let*",2,"(let* bindings body)");
     return rewrite (match[0], match[1], interp);
   }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin let*>");
-  }
 }

@@ -9,8 +9,6 @@ import kawa.lang.*;
 
 public class cond extends Syntax implements Printable
 {
-  static private Pattern pattern = new VarListPat (1);
-
   public Expression rewrite (Object obj, Interpreter interp)
        throws kawa.lang.WrongArguments
   {
@@ -45,10 +43,5 @@ public class cond extends Syntax implements Printable
 		      interp.rewrite_body (then_part),
 		      else_part == Interpreter.nullObject ? null
 		      : rewrite (else_part, interp));
-  }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin cond>");
   }
 }

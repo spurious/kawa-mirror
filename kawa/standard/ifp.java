@@ -20,9 +20,4 @@ public class ifp extends Syntax implements Printable
 		      interp.rewrite (match[1]),
 		      interp.rewrite (match[2]));
   }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin if>");
-  }
 }

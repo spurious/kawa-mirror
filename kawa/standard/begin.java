@@ -13,9 +13,4 @@ public class begin extends Syntax implements Printable
   {
     return interp.rewrite_body (obj);
   }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin begin>");
-  }
 }

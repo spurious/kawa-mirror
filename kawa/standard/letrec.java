@@ -52,9 +52,4 @@ public class letrec extends Syntax implements Printable
     let.pop (interp);
     return let;
   }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin letrec>");
-  }
 }

@@ -21,15 +21,13 @@ public class set_b extends Syntax implements Printable
       return interp.syntaxError ("first set! argument is not a variable name");
     Symbol sym = (Symbol) match[0];
     Expression value = interp.rewrite (match[1]);
+    Object binding = interp.current_decls.get (sym);
+    if (binding != null && binding instanceof Symbol)
+      return new SetExp ((Symbol) binding, value);
     SetExp sexp = new SetExp (sym, value);
-    sexp.binding = interp.resolve (sym);
+    sexp.binding = interp.resolve (sym, (Declaration) binding);
     if (sexp.binding != null)
       sexp.binding.noteValue (value);
     return sexp;
-  }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin set!>");
   }
 }

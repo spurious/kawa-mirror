@@ -10,6 +10,11 @@ import gnu.mapping.WrongArguments;
 
 public class greater_oper extends ProcedureN
 {
+  public static boolean apply (Object arg1, Object arg2)
+  {
+    return ((Numeric)arg1).grt(arg2);
+  }
+
   public Object applyN (Object[] args)
   {
     if (args.length < 2)

@@ -10,6 +10,11 @@ import gnu.mapping.*;
 
 public class multiply_oper extends ProcedureN
 {
+  public static Object apply (Object arg1, Object arg2)
+  {
+    return ((Numeric) arg1).mul(arg2);
+  }
+
   public Object applyN (Object[] args)
   {
     int len = args.length;

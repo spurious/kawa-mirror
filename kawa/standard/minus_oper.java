@@ -9,6 +9,16 @@ import gnu.mapping.*;
 
 public class minus_oper extends ProcedureN
 {
+  public static Object apply (Object arg1)
+  {
+    return ((Numeric) arg1).neg();
+  }
+
+  public static Object apply (Object arg1, Object arg2)
+  {
+    return ((Numeric) arg1).sub(arg2);
+  }
+
   public Object applyN (Object[] args)
   {
     Numeric result = (Numeric) args[0];

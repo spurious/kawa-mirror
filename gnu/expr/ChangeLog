@@ -1,3 +1,7 @@
+2005-03-27  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compile): Don't declareThis is STATIC_SPECIFIED.
+
 2005-03-25  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java (create): New factory method.

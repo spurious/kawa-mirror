@@ -391,7 +391,8 @@ public class ClassExp extends LambdaExp
 	    LambdaExp save_lambda = comp.curLambda;
 	    comp.method = child.getMainMethod();
 	    //comp.curClass = comp.method.getDeclaringClass();
-	    child.declareThis(comp.curClass);
+            if (! child.nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+              child.declareThis(comp.curClass);
 	    comp.curClass = instanceType;
 	    comp.curLambda = child;
 	    comp.method.initCode();

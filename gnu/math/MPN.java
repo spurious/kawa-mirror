@@ -473,7 +473,7 @@ class MPN
     return xlen > ylen ? 1 : xlen < ylen ? -1 : cmp (x, y, xlen);
   }
 
-  /* Shift x[x_start:x_start+len-1]count bits to the "right"
+  /* Shift x[x_start:x_start+len-1] count bits to the "right"
    * (i.e. divide by 2**count).
    * Store the len least significant words of the result at dest.
    * The bits shifted out to the right are returned.
@@ -498,6 +498,23 @@ class MPN
     return retval;
   }
 
+  /* Shift x[x_start:x_start+len-1] count bits to the "right"
+   * (i.e. divide by 2**count).
+   * Store the len least significant words of the result at dest.
+   * OK if dest==x.
+   * Assumes: 0 <= count < 32
+   * Same as rshift, but handles count==0 (and has no return value).
+   */
+  public static void rshift0 (int[] dest, int[] x, int x_start,
+			      int len, int count)
+  {
+    if (count > 0)
+      rshift(dest, x, x_start, len, count);
+    else
+      for (int i = 0;  i < len;  i++)
+	dest[i] = x[i + x_start];
+  }
+
   /** Return the long-truncated value of right shifting.
   * @param x a two's-complement "bignum"
   * @param len the number of significant words in x
@@ -520,20 +537,6 @@ class MPN
 	w1 = (w1 >>> count) | (w2 << (32-count));
       }
     return ((long)w1 << 32) | ((long)w0 & 0xffffffffL);
-  }
-
-  /* Shift x[0:len-1]count bits to the "right" (i.e. divide by 2**count).
-   * Store the len least significant words of the result at dest.
-   * OK if dest==x.
-   * OK if count > 32 (but must be >= 0).
-   */
-  public static void rshift (int[] dest, int[] x, int len, int count)
-  {
-    int word_count = count >> 5;
-    count &= 31;
-    rshift (dest, x, word_count, len, count);
-    while (word_count < len)
-      dest[word_count++] = 0;
   }
 
   /* Shift x[0:len-1] left by count bits, and store the len least
@@ -616,8 +619,8 @@ class MPN
 
     // Temporarily devide both x and y by 2**sh.
     len -= initShiftWords;
-    MPN.rshift (x, x, initShiftWords, len, initShiftBits);
-    MPN.rshift (y, y, initShiftWords, len, initShiftBits);
+    MPN.rshift0 (x, x, initShiftWords, len, initShiftBits);
+    MPN.rshift0 (y, y, initShiftWords, len, initShiftBits);
 
     int[] odd_arg; /* One of x or y which is odd. */
     int[] other_arg; /* The other one can be even or odd. */

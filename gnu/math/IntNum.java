@@ -654,12 +654,7 @@ public class IntNum extends RatNum implements Compilable
 	MPN.divide (xwords, xlen, ywords, ylen);
 	rlen = ylen;
 	if (remainder != null || rounding_mode != TRUNCATE)
-	  {
-	    if (nshift == 0)
-	      System.arraycopy (xwords, 0, ywords, 0, rlen);
-	    else
-	      MPN.rshift (ywords, xwords, 0, rlen, nshift);
-	  }
+	  MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
 
 	qlen = xlen+1-ylen;
 	if (quotient != null)
@@ -987,7 +982,7 @@ public class IntNum extends RatNum implements Compilable
 	  {
 	    if (words == null || words.length < d_len)
 	      realloc (d_len);
-	    MPN.rshift (words, x.words, word_count, d_len, count);
+	    MPN.rshift0 (words, x.words, word_count, d_len, count);
 	    ival = d_len;
 	    if (neg)
 	      words[ival-1] |= -1 << (32 - count);

@@ -371,10 +371,8 @@ public class BitOps
     else
       {
 	x_len -= startWord;
-	if ((startBit &= 31) != 0)
-	  MPN.rshift (buf, x.words, startWord, x_len, startBit);
-	else
-	  System.arraycopy (x.words, startWord, buf, 0, x_len);
+	startBit &= 31;
+	MPN.rshift0 (buf, x.words, startWord, x_len, startBit);
       }
     x_len = length >> 5;
     buf[x_len] &= ~((-1) << length);

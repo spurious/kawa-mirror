@@ -1,3 +1,13 @@
+2000-04-29  Per Bothner  <per@bothner.com>
+
+	* MPN.java (rshift0):  New method, handles zero shift count.
+	(gcd):  Use rshift0 rather than rshift.
+	* IntNum.java (setShiftRight):  Likewise.
+	(divide):  Simplify by using rshift0.
+	* BitOps.java (extract):  Likewise.
+
+	* MPN.java (rshift(int[],int[],int,int)):  Remove unused method.
+
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	Various tweaks for better javadoc processing.

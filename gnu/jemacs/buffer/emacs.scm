@@ -61,10 +61,10 @@
 (define (keymap-default-binding (keymap :: <keymap>))
   (invoke keymap 'getDefaultBinding))
 
-(define global-map
+(define-variable global-map
   (static-field <keymap> 'globalKeymap))
 
-(define esc-map
+(define-variable esc-map
   (static-field <keymap> 'metaKeymap))
 
 (define (current-global-map)

@@ -1,3 +1,7 @@
+2005-02-25  Per Bothner  <per@bothner.com>
+
+	* emacs.scm (global-map, esc-map): Define using define-variable.
+
 2005-01-07  Per Bothner  <per@bothner.com>
 
 	* Buffer. java (getStringContent): New abstract (uncommented) method.

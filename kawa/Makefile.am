@@ -16,9 +16,14 @@ kawa_SOURCES = kawa.c
 
 javadir=$(datadir)/java/$(subdir)
 
+java_WITH_AWT = \
+  GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
+
 java_JAVA = Shell.java repl.java Version.java \
   TelnetInputStream.java TelnetOutputStream.java TelnetConnection.java Telnet.java\
-  GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
+  $(java_@AWT_SELECTED@)
+
+EXTRA_JAVA = $(java_WITH_AWT)
 
 CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
 SOURCES = $(java_JAVA) Version.java.in kawa.c

@@ -148,7 +148,17 @@ public class repl extends Procedure0or1
 	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    new kawa.GuiConsole(Interpreter.defaultInterpreter, Environment.getCurrent());
+	    // Do this instead of just new GuiConsole in case we have
+	    // configured --without-awt.
+	    try
+	      {
+		Class.forName("kawa.GuiConsole").newInstance();
+	      }
+	    catch (Exception ex)
+	      {
+		System.err.println("failed to create Kawa window: "+ex);
+		System.exit (-1);
+	      }
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))

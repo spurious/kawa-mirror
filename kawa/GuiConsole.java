@@ -8,7 +8,7 @@ import gnu.mapping.*;
 import gnu.expr.Interpreter;
 import kawa.standard.Scheme;
 
-/** A Frame containing a Kwa read-eval-print loop.
+/** A Frame containing a Kawa read-eval-print loop.
   * @author Albert Ting <alt@artisan.com> (original base)
   * @author Per Bothner (extensive changes).
   */
@@ -36,6 +36,11 @@ public class GuiConsole extends Frame implements ActionListener {
   public static void main(String[] args) {
     Interpreter interp = new Scheme();
     new GuiConsole(interp, interp.getNewEnvironment());
+  }
+
+  public GuiConsole()
+  {
+    this(Interpreter.defaultInterpreter, Environment.getCurrent());
   }
 
   public GuiConsole(Interpreter interp, Environment environment) {

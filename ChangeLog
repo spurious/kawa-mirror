@@ -1,3 +1,8 @@
+1999-04-09  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Translator.java (systemClassLoader):  New private field.
+	(rewrite_pair):  Compare with systemClassLoader.
+
 Wed Apr  7 21:52:19 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/lang/Translator.java (isLexical):  New method.

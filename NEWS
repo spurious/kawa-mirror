@@ -1,3 +1,8 @@
+Changes from Kawa 1.6.53 to 1.6.54
+==================================
+Created new packages gnu.mapping and gnu.expr.  Many classes were
+moved from kawa.lang to the new packages.
+
 Changes from Kawa 1.6.52 to 1.6.53
 ==================================
 The new package gnu.text contains facilities for reading, formatting,

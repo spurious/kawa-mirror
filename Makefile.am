@@ -25,5 +25,4 @@ install-javadoc-html:
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
-	cd gnu/bytecode;  make install-html HTML_HOME="$(HTML_HOME)"
-	cd gnu/math;  make install-html HTML_HOME="$(HTML_HOME)"
+	cd gnu;  make install-html HTML_HOME="$(HTML_HOME)"

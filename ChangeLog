@@ -1,3 +1,17 @@
+Tue Jul 21 23:19:35 1998  Per Bothner  <bothner@cygnus.com>
+
+	* gnu/mapping, gnu/expr:  New packages.
+	* kawa/lang:  Moved many classes from here to gnu.mapping or gnu.expr.
+	* kawa/{,lang,standard}:  Update import statements.
+	* configure.in (AC_OUTPUT):  Add gnu/{mapping,expr}/Makefile.
+	* Makefile.am (install-html):  Simplify to call gnu/Makefile.
+	* kawa/lang/SchemeLoader.java:
+	Moved to gnu/bytecode/ArrayClassLoader.java.
+	* kawa/standard/Scheme (makeModuleExp):  New function.
+	* kawa/standard:  Some functions moved to kawa.lib.
+	
+	* configure.in:  Set version to 1.6.54.
+
 Sun Jun 28 23:07:49 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.6.53.

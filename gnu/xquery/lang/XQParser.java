@@ -2771,7 +2771,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		namespaces.put(prefix, uri);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
-		  parser.getModule().setName(uri);
+		  parser.getModule().setName(Compilation.mangleURI(uri));
 		return QuoteExp.voidExp;
 	      }
 	  }
@@ -2809,8 +2809,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  parseSeparator();
  	ModuleExp module = parser.getModule();
 	Vector forms = new Vector();
-	Type type = gnu.expr.Interpreter.string2Type(uri);
-	System.err.println("import uri:"+uri+" type"+type);
+	ClassType type = ClassType.make(Compilation.mangleURI(uri));
 	kawa.standard.require.importDefinitions(type, uri, forms, module, parser);
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);

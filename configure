@@ -14,6 +14,8 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --enable-maintainer-mode enable make rules and dependencies not useful
                           (and sometimes confusing) to the casual installer"
+ac_help="$ac_help
+  --with-jdk11            Assume JDK1.1 (or compatible) class libraries"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -552,7 +554,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:556: checking for a BSD compatible install" >&5
+echo "configure:558: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -618,7 +620,7 @@ cat >> confdefs.h <<EOF
 EOF
 
 echo $ac_n "checking whether build environment is sane""... $ac_c" 1>&6
-echo "configure:622: checking whether build environment is sane" >&5
+echo "configure:624: checking whether build environment is sane" >&5
 echo timestamp > conftestfile
 # Do this in a subshell so we don't clobber the current shell's
 # arguments.  FIXME: maybe try `-L' hack like GETLOADAVG test?
@@ -652,7 +654,7 @@ test "$program_suffix" != NONE &&
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:656: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:658: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -680,7 +682,7 @@ fi
 
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6
-echo "configure:684: checking whether to enable maintainer-specific portions of Makefiles" >&5
+echo "configure:686: checking whether to enable maintainer-specific portions of Makefiles" >&5
     # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
@@ -738,10 +740,29 @@ test "$program_suffix" != NONE &&
 # sed with no file args requires a program.
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
+# Check whether --with-jdk11 or --without-jdk11 was given.
+if test "${with_jdk11+set}" = set; then
+  withval="$with_jdk11"
+  :
+fi
+
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
+JAVA=${JAVA-java}
+JAVAC=${JAVAC-javac}
+
+
 TOP_BUILDDIR=`pwd`
+
+case ${with_jdk11} in
+  yes)  JAVA_VERSION=1_1;;
+  no)  JAVA_VERSION=1_0;;
+  *)  JAVA_VERSION=1_0;;
+esac
+EXTRA_OBJ='$(OBJ_'${JAVA_VERSION}')'
+EXTRA_MISC='$(MISC_'${JAVA_VERSION}')'
+
 
 
 
@@ -897,7 +918,12 @@ s%@PACKAGE@%$PACKAGE%g
 s%@VERSION@%$VERSION%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@MAINT@%$MAINT%g
+s%@JAVA@%$JAVA%g
+s%@JAVAC@%$JAVAC%g
 s%@TOP_BUILDDIR@%$TOP_BUILDDIR%g
+s%@EXTRA_OBJ@%$EXTRA_OBJ%g
+s%@EXTRA_MISC@%$EXTRA_MISC%g
+s%@JAVA_VERSION@%$JAVA_VERSION%g
 
 CEOF
 EOF

@@ -14,7 +14,7 @@ The file NEWS summarizes recent changes.
 
 Kawa's copyright is in doc/license.terms.
 
-The file Compliance.html summarizes divergence from the R4RS.
+The file doc/Compliance.html summarizes divergence from the R4RS.
 
 	--Per Bothner
 Cygnus Support     bothner@cygnus.com

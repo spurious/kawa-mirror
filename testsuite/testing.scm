@@ -1,3 +1,38 @@
+;; Copyright 1996, 1997, 1998 Per Bothner.
+;;
+;; Usage:
+;; (load "testing.scm")
+;; (test-init "Miscellaneous" 2)
+;; (test '(3 4 5 6) (lambda x x) 3 4 5 6)
+;; (test '(a b c . d) 'dot '(a . (b . (c . d))))
+;; (test-report)
+;;
+;; test-init:  The first argument is the name of the test.
+;; A log is written to (string-append NAME ".log").
+;; The second (optional) argument is the total number of tests;
+;; at the end an error is written if the actual count does not match.
+;;
+;; test:  The first argument is the expected result.
+;; The second argument is either a procecure applied to the remaining
+;; arguments;  or it is a symbol (used when reporting), in which case
+;; the third argument is matched against the first.
+;; The resulting values are matched using equal?.
+;;
+;; section:  You can divide your tests into "sections" with the section
+;; procedure.  The arguments of the previous section are displayed if any
+;; errors are reported.
+;;
+;; test-report:  Called at end to print a summary.
+;;
+;; fail-unexpected:  If non-null, if means the following test is
+;; expected to fail.  The actual value should be string explaining
+;; the failure.  For example:
+;; (set! fail-expected "sqrt of negative number not supported")
+;; (test "+2.0i" number->string (sqrt -4))
+;;
+;; verbose:  If true, all tests are wroitten to standard output,
+;; not just to the log file.
+
 (define verbose #f)
 
 (define pass-count 0)

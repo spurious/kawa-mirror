@@ -1024,9 +1024,10 @@ public class PrettyWriter extends java.io.Writer
   {
     maybeOutput(false);
     expandTabs(-1);
-    //System.err.println("{FORCED:"+bufferFillPointer+"}");
+    bufferStartColumn = getColumnNumber();
     out.write(buffer, 0, bufferFillPointer);
-    //System.err.println("FLUSH: depth:"+blockDepth+" preLen:"+getPrefixLength()+" col:"+bufferStartColumn);
+    bufferFillPointer = 0;
+    queueSize = 0;
   }
 
   public void flush()

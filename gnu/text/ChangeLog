@@ -4,9 +4,8 @@
 	Rename constant to QUEUED_OP_NOP_TYPE.
 	(indexColumn, dumpQueue, outputPartialLine):  If queued op is
 	QUEUED_OP_NOP_TYPE, there is no posn, so skip it.
-	(forcePrettyOutput):  Don't reset bufferStartColumn and
-	bufferFillPointer.  This matches pprint.lisp and avoids an
-	ArrayIndexOutOfBoundsException, though I can't say I understand it.
+	(forcePrettyOutput):  Clear queueSize.  This avoids a future
+	ArrayIndexOutOfBoundsException.
 
 2002-07-21  Per Bothner  <per@bothner.com>
 

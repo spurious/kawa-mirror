@@ -1,3 +1,7 @@
+2003-05-31  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Add a parameter type specifier to avoid warning.
+
 2003-05-22  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm:  New testcases based on bug reported

@@ -449,7 +449,7 @@
 (define (long-to-hex (x :: <long>)) (Long:toHexString x))
 (test '|10e| long-to-hex 270)
 (test '|123| Long:toString (Long:new '00123))
-(define (to-int-string x) (java.lang.Object:toString (Long:new x)))
+(define (to-int-string x :: <long>) (java.lang.Object:toString (Long:new x)))
 (test '|124| to-int-string '00124)
 
 ;;; Based on bug report 2002-12-3 from Petter &Ouml;sterlund <petos@fyrplus.se>

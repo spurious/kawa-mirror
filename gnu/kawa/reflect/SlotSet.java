@@ -38,7 +38,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
   public static void apply (boolean isStatic, Object obj, String name, Object value)
   {
-    Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
+    Language language = Language.getDefaultLanguage();
     boolean illegalAccess = false;
     name = gnu.expr.Compilation.mangleNameIfNeeded(name);
     Class clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
@@ -50,7 +50,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 	    && (field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
 	  ((Location) field.get(obj)).set(value);
 	else
-	  field.set(obj, interpreter.coerceFromObject(ftype, value));
+	  field.set(obj, language.coerceFromObject(ftype, value));
         return;
       }
     catch (java.lang.NoSuchFieldException ex)
@@ -81,7 +81,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         java.lang.reflect.Method setmethod
           = clas.getMethod(setName, setArgTypes);
         Object[] args = new Object[1];
-        args[0] = interpreter.coerceFromObject(setArgTypes[0], value);
+        args[0] = language.coerceFromObject(setArgTypes[0], value);
         setmethod.invoke(obj, args);
         return;
       }

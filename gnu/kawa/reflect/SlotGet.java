@@ -46,13 +46,13 @@ public class SlotGet extends Procedure2
   {
     if (! (name instanceof String) && ! (name instanceof FString))
       throw WrongType.make(null, this, 2, name);
-    Interpreter interpreter = Interpreter.getInterpreter();
+    Language language = Language.getDefaultLanguage();
     String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
     if (clas.isArray() && "length".equals(fname))
       {
 	int length = java.lang.reflect.Array.getLength(obj);
-	return interpreter.coerceToObject(length);
+	return language.coerceToObject(length);
       }
     boolean illegalAccess = false;
     java.lang.reflect.Field field;
@@ -78,7 +78,7 @@ public class SlotGet extends Procedure2
 		    != 0))
 	      result = ((Location) result).get();
 	    else
-	      result = interpreter.coerceToObject(field.getType(), result);
+	      result = language.coerceToObject(field.getType(), result);
             return result;
           }
         catch (IllegalAccessException ex)
@@ -109,7 +109,7 @@ public class SlotGet extends Procedure2
           throw new RuntimeException("cannot call non-static getter method `"
                                      + mname + "' using `" + getName() + '\'');
         Object result = getmethod.invoke(obj, Values.noArgs);
-        result = interpreter.coerceToObject(getmethod.getReturnType(), result);
+        result = language.coerceToObject(getmethod.getReturnType(), result);
         return result;
       }
     catch (java.lang.reflect.InvocationTargetException ex2)
@@ -260,10 +260,10 @@ public class SlotGet extends Procedure2
 	    if ("gnu.mapping.Symbol".equals(ftype.getName())
 		&& (modifiers & Access.FINAL) != 0)
 	      code.emitInvokeVirtual(Compilation.getLocationMethod);
-	    Interpreter interpreter = Interpreter.getInterpreter();
+	    Language language = Language.getDefaultLanguage();
 	    Class fclass = ftype.getReflectClass();
 	    if (fclass != null)
-	      ftype = interpreter.getTypeFor(fclass);
+	      ftype = language.getTypeFor(fclass);
 	    target.compileFromStack(comp, ftype);
             return;
           }

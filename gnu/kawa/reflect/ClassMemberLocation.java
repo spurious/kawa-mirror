@@ -145,7 +145,7 @@ public class ClassMemberLocation extends Location
   }
 
   public static void define (Object instance, java.lang.reflect.Field rfield,
-			     String uri, Interpreter interp, Environment env)
+			     String uri, Language language, Environment env)
     throws IllegalAccessException
   {
     Object fvalue = rfield.get(instance);
@@ -173,7 +173,7 @@ public class ClassMemberLocation extends Location
     else
       {
 	if (isFinal)
-	  property = interp.getEnvPropertyFor(rfield, fvalue);
+	  property = language.getEnvPropertyFor(rfield, fvalue);
 	loc = new ClassMemberLocation(instance, rfield);
       }
     env.addLocation(sym, property, loc);
@@ -182,12 +182,12 @@ public class ClassMemberLocation extends Location
   public static void defineAll(Object instance, Environment env)
     throws IllegalAccessException
   {
-    defineAll(instance, null, Interpreter.getInterpreter(), env);
+    defineAll(instance, null, Language.getDefaultLanguage(), env);
   }
 
   /** Import all the public fields of an object. */
   public static void defineAll(Object instance, String uri,
-			       Interpreter interp, Environment env)
+			       Language language, Environment env)
     throws IllegalAccessException
   {
     Class clas = instance.getClass();
@@ -197,7 +197,7 @@ public class ClassMemberLocation extends Location
 	java.lang.reflect.Field field = fields[i];
 	if (field.getName().startsWith(Declaration.PRIVATE_PREFIX))
 	      continue;
-	define(instance, field, uri, interp, env);
+	define(instance, field, uri, language, env);
       }
   }
 }

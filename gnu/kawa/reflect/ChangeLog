@@ -1,3 +1,9 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java: Update Interpreter -> Language.
+	* SlotGet.java: Likewise.
+	* SlotSet.java: Likewise.
+
 2005-03-03  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (getInstance, setInstance): New methods.

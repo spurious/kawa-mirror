@@ -1,3 +1,7 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java: Update Interpreter -> Language.
+
 2004-08-11  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java (run): New abstract method, replaces ...

@@ -40,9 +40,9 @@ extends HttpServlet
     ctx.servlet = this;
     ctx.values = Values.noArgs;
 
-    /* FIXME should use fluid binding!
-    gnu.expr.Interpreter interp = gnu.expr.Interpreter.getInterpreter();
-    String lang = interp.getName();
+    /* FIXME should use fluid binding - or ThreadLocation!
+    gnu.expr.Language language = gnu.expr.Language.getDefaultLanguage();
+    String lang = language.getName();
     Environment env = Environment.getCurrent();
     if (lang == "XQuery")
       {

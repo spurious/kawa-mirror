@@ -193,7 +193,8 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_sources = \
   XQuery.java \
-  XQParser.java
+  XQParser.java \
+  XQResolveNames.java
 
 
 PACKAGE_FNAME = gnu-xquery-lang

@@ -29,6 +29,11 @@ public class XQuery extends Interpreter
     = "http://kawa.gnu.org/";
   static boolean charIsInt = false;
 
+  /** Pseudo-namespace "prefix" for the default element namespace. */
+  public static final String DEFAULT_ELEMENT_PREFIX = "elements$";
+  /** Pseudo-namespace "prefix" for the default function namespace. */
+  public static final String DEFAULT_FUNCTION_PREFIX = "functions$";
+
   public static gnu.math.Numeric asNumber(Object arg)
   {
     if (arg instanceof Char)
@@ -57,9 +62,7 @@ public class XQuery extends Interpreter
 
   public gnu.text.Lexer getLexer(InPort inp, SourceMessages messages)
   {
-    XQParser parser = new XQParser(inp, messages);
-    parser.interpreter = this;
-    return parser;
+    return new XQParser(inp, messages, this);
   }
 
   /** Special parser flag used by <code>evalToFocusProc</code>. */
@@ -69,12 +72,13 @@ public class XQuery extends Interpreter
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, lexer.getMessages());
+    Compilation tr = new Compilation(this, lexer.getMessages(),
+				     ((XQParser) lexer).lexical);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    tr.mustCompileHere();
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(lexer.getName());
     tr.push(mexp);
+    tr.mustCompileHere();
     if ((options & PARSE_ONE_LINE) != 0)
       {
 	Expression sexp = ((XQParser) lexer).parse(tr);
@@ -118,13 +122,25 @@ public class XQuery extends Interpreter
 	  }
       }
     tr.pop(mexp);
-    ResolveNames.resolveNames(mexp, tr.lexical);
+    
+    if (false)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println ("[Before name-resolving \""+mexp.getName()+"\":");
+	mexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
+    new XQResolveNames(tr).resolveModule(mexp);
     return tr;
   }
 
   public int getNamespaceOf(Declaration decl)
   {
-    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
+    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE
+      : decl.isNamespaceDecl() ? NAMESPACE_PREFIX_NAMESPACE
+      : VALUE_NAMESPACE;
   }
 
   public void define(String sym, Object p)
@@ -531,12 +547,6 @@ public class XQuery extends Interpreter
     XQuery interp = new XQuery();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
-  }
-
-  public Object read (InPort in)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    return XQParser.readObject(in);
   }
 
   public static final XMLFormat writeFormat = new XMLFormat();

@@ -1,3 +1,32 @@
+2003-12-25  Per Bothner  <per@bothner.com>
+
+	Handle namespace declaration attributes.
+	* XQResolveNames.java:  New class, extends gnu.expr.ResolveNames.
+	* Makefile.am (java_sources):  Add XQResolveNames.java.
+	* XQParser.java (lexical):  New field.
+	(<init>):  New XQuery pamameter.  Allocate and set lexical field.
+	(pushNamespace, lookupNamespace, makeNamespaceDecl):  New methods.
+	(pushStandardNamespaces):  Use pushNamespace.
+	(parseElementConstructor):  Recognize namespace declaration
+	attributes.  Defer namespace resolution until XQResolveNames.
+	Remove support here for calculated element/attribute names.
+	(parseVariableDeclaration):  New method.
+	(parseTypeSwitch, parseFLWRExpression, parseQuantifiedExpr,
+	parseFunctionDefinition, parse):  Use parseVariableDeclaration.
+	(namespaces):  Remove field.
+	(namespaceBindings):  New field.
+	(parse):  Don't checks for "$request" or $reply" (for servlets) here.
+	Instead use ne XQResolveNames's new walkReferenceExp method.
+	* XQuery.java (getLexer):  Use new XQParser constructor.
+	(DEFAULT_ELEMENT_PREFIX, DEFAULT_FUNCTION_PREFIX):  New constants.
+	(parse):  Use new Compilation constructor, passing it lexer's lexical.
+	Do mustCompileHere after pushing ModuleExp, or it has no effect.
+	Use new XQResolveNames constructor and new resolveModule method.
+	(getNamespaceOf):  Also check if decl isNamespaceDecl.
+
+	* XQuery.java (read):  Remove unused method.
+	* XQParser.java (readObject):  Likewise.
+
 2003-11-14  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  New use StringValue.concat$V.

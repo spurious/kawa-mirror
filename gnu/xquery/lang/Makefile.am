@@ -4,7 +4,8 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   XQuery.java \
-  XQParser.java
+  XQParser.java \
+  XQResolveNames.java
 
 PACKAGE_FNAME = gnu-xquery-lang
 

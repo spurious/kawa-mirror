@@ -11,6 +11,7 @@ import gnu.expr.*;
 import java.util.Vector;
 import java.util.Hashtable;
 import gnu.kawa.xml.*;
+import gnu.xml.NamespaceBinding;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.kawa.reflect.OccurrenceType;
@@ -40,6 +41,8 @@ public class XQParser extends LispReader // should be extends Lexer
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
+
+  NameLookup lexical;
 
   int nesting;
 
@@ -809,27 +812,45 @@ public class XQParser extends LispReader // should be extends Lexer
     return curToken;
   }
 
+  Declaration pushNamespace(String prefix, String uri)
+  {
+    Declaration decl = makeNamespaceDecl (prefix, uri);
+    lexical.push(decl);
+    return decl;
+  }
+
+  // MOST CALLS TO THIS METHOD ARE WRONG!
+  // We need to defer this to XQResolveNames.
+  String lookupNamespace (String prefix)
+  {
+    String uri = namespaceBindings.resolve(prefix);
+    if (uri != null)
+      return uri;
+    String nssym = (Interpreter.NAMESPACE_PREFIX + prefix).intern();
+    Declaration decl = lexical.lookup(nssym, -1);
+    if (decl == null)
+      return null;
+    return decl.getConstantValue().toString();
+  }
+
   private void pushStandardNamespaces ()
   {
-    namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
-    namespaces.put("xs", "http://www.w3.org/2001/XMLSchema");
-    namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-    namespaces.put("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
-    namespaces.put("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);
-    namespaces.put("qexo", XQuery.KAWA_FUNCTION_NAMESPACE);
-    namespaces.put("local", "http://www.w3.org/2003/08/xquery-local-functions");
+    pushNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+    pushNamespace("xs", "http://www.w3.org/2001/XMLSchema");
+    pushNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    pushNamespace("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
+    pushNamespace("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);
+    pushNamespace("qexo", XQuery.KAWA_FUNCTION_NAMESPACE);
+    pushNamespace("local", "http://www.w3.org/2003/08/xquery-local-functions");
   }
 
-  public XQParser (InPort port)
-  {
-    this(port, null);
-  }
-
-  public XQParser(InPort port, SourceMessages messages)
+  public XQParser(InPort port, SourceMessages messages, XQuery interp)
   {
     super(port, messages);
-    pushStandardNamespaces();
+    interpreter = interp;
+    lexical = new NameLookup(interp);
     nesting = 1;
+    pushStandardNamespaces();
   }
 
   public void setInteractive(boolean v)
@@ -840,12 +861,6 @@ public class XQParser extends LispReader // should be extends Lexer
   }
   
   protected ReadTable getReadTable () { return xqlReadTable; }
-
-  public static Object readObject(InPort port)
-      throws java.io.IOException, SyntaxException
-  {
-    return (new XQParser(port)).readObject();
-  }
 
   public static ReadTable xqlReadTable;
   static
@@ -1273,7 +1288,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	colon++;
 	local = new String(tokenBuffer, colon,
 				  tokenBufferLength - colon);
-	uri = (String) namespaces.get(prefix);
+	uri = (String) lookupNamespace(prefix);
 	if (uri == null)
 	  syntaxError("unknown namespace '" + prefix + "'");
       }
@@ -1314,7 +1329,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    syntaxError("invalid characters after 'NCName:'");
 	    return Symbol.make(defaultNamespaceUri, prefix);
 	  }
-	uri = (String) namespaces.get(prefix);
+	uri = (String) lookupNamespace(prefix);
 	if (uri == null)
 	  syntaxError("unknown namespace '" + prefix + "'");
 	local = null;
@@ -1846,6 +1861,17 @@ public class XQParser extends LispReader // should be extends Lexer
       return null;
   }
 
+  Declaration makeNamespaceDecl (String prefix, String uri)
+  {
+    String sym = (Interpreter.NAMESPACE_PREFIX + prefix).intern();
+    Declaration decl = new Declaration(sym);
+    decl.setType(gnu.bytecode.Type.tostring_type);
+    decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);
+    decl.setPrivate(true);
+    decl.noteValue(new QuoteExp(uri));
+    return decl;
+  }
+
   /** Parse ElementConstructor.
    * Assume initial '<' has been processed.
    * Reads through end of the end tag.  FIXME
@@ -1853,12 +1879,17 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseElementConstructor()
       throws java.io.IOException, SyntaxException
   {
+    // Note that we cannot do namespace resolution at parse time,
+    // because of constructs like this:  <a x="{$x:v}" xmlns:x="xx"/>
+    // Instead we defer namespaced lookup until XQResolveNames.  (Mostly -
+    // some places still incorrectly do premature namespace resolution.)
+    if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
+      return syntaxError("expected QName after '<'");
+    String startTag = new String(tokenBuffer, 0, tokenBufferLength);
+    ElementConstructor start = ElementConstructor.make(startTag, null);
     Vector vec = new Vector();
-    Expression element = parseNameSpec(defaultElementNamespace, false);
-    vec.addElement(element);
-    if (element == null)
-      return syntaxError("missing NameSpec");
     Expression[] args;
+    NamespaceBinding namespaceOuter = namespaceBindings;
     int ch;
     for (;;)
       {
@@ -1868,16 +1899,29 @@ public class XQParser extends LispReader // should be extends Lexer
 	unread(ch);
 	getRawToken();
 	int vecSize = vec.size();
-	Expression makeAttr = parseNameSpec("", true);
-	if (makeAttr == null)
+	if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
 	  break;
-	if (! (makeAttr instanceof QuoteExp)
-	    || !
-	    (((QuoteExp)makeAttr).getValue() instanceof AttributeConstructor))
+	String attrName = new String(tokenBuffer, 0, tokenBufferLength);
+	String defininingNamespace = null;
+	Symbol attrQName = null;
+	if (curToken == NCNAME_TOKEN)
 	  {
-	    vec.addElement(makeAttr);
-	    makeAttr = makeFunctionExp("gnu.xquery.util.MakeAttribute", "makeAttribute");
+	    if (attrName.equals("xmlns"))
+	      defininingNamespace = "";
+	    else
+	      attrQName = Symbol.make("", attrName);
 	  }
+	else
+	  {
+	    if (attrName.startsWith("xmlns:"))
+	      defininingNamespace = attrName.substring(6).intern();
+	    else
+	      attrQName = null;
+	  }
+	Expression makeAttr
+	  = defininingNamespace != null ? null
+	  : new QuoteExp(AttributeConstructor.make(attrName, attrQName));
+
 	ch = skipSpace();
 	if (ch != '=')
 	  return syntaxError("missing '=' after attribute");
@@ -1886,11 +1930,33 @@ public class XQParser extends LispReader // should be extends Lexer
 	  vec.addElement(stringValue(parseEnclosedExpr()));
 	else
 	  parseContent((char) ch, vec);
-	args = new Expression[vec.size() - vecSize];
-	for (int i = args.length;  --i>= 0; )
-	  args[i] = (Expression) vec.elementAt(vecSize + i);
-	vec.setSize(vecSize);
-	vec.addElement(new ApplyExp(makeAttr, args));
+	int n = vec.size() - vecSize;
+	if (defininingNamespace != null)
+	  {
+	    String ns = "";
+	    if (n == 0)
+	      ns = "";
+	    else if (n > 1 || ! (vec.elementAt(vecSize) instanceof QuoteExp))
+	      syntaxError("enclosed expression not allowed in namespace declaration");
+	    else
+	      ns = ((QuoteExp) vec.elementAt(vecSize)).getValue()
+		.toString().intern();
+	    vec.setSize(vecSize);
+	    if (defininingNamespace == "")
+	      defininingNamespace = null;
+	    namespaceBindings
+	      = new NamespaceBinding(defininingNamespace,
+				     ns == "" ? null : ns,
+				     namespaceBindings);
+	  }
+	else
+	  {
+	    args = new Expression[n];
+	    for (int i = n;  --i >= 0; )
+	      args[i] = (Expression) vec.elementAt(vecSize + i);
+	    vec.setSize(vecSize);
+	    vec.addElement(new ApplyExp(makeAttr, args));
+	  }
       }
     boolean empty = false;
     if (ch == '/')
@@ -1913,13 +1979,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    getRawToken();
 	    if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
 	      return syntaxError("invalid tag syntax after '</'");
-	    if (! (element instanceof QuoteExp))
-	      return syntaxError("'<{'expression'}>' must be closed by '</>'");
 	    String tag = new String(tokenBuffer, 0, tokenBufferLength);
-	    Object start = ((QuoteExp) element).getValue();
-	    String startTag = start instanceof ElementConstructor
-	      ? ((ElementConstructor) start).getXmlName()
-	      : start.toString();
 	    if (! (tag.equals(startTag)))
 	      return syntaxError("'<"+startTag+">' closed by '</"+tag+">'");
 	    ch = skipSpace();
@@ -1929,8 +1989,32 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     args = new Expression[vec.size()];
     vec.copyInto(args);
-    return new ApplyExp(makeFunctionExp("gnu.xquery.util.MakeElement", "makeElement"),
-			args);
+    Expression result = new ApplyExp(new QuoteExp(start), args);
+
+    // Reverse current set of namespace bindings to match input order.
+   NamespaceBinding nsBindings
+     = namespaceBindings.reversePrefix(namespaceOuter);
+    if (namespaceOuter != nsBindings)
+      {
+	int count = nsBindings.count(namespaceOuter);
+	Expression [] inits = new Expression[count];
+	LetExp let = new LetExp(inits);
+	int i = 0;
+	for (NamespaceBinding ns = nsBindings;
+	     ns != namespaceOuter;  ns = ns.getNext())
+	  {
+	    Declaration decl = makeNamespaceDecl(ns.getPrefix(), ns.getUri());
+	    let.addDeclaration(decl);
+	    inits[i++] = decl.getValue();
+	  }
+
+	let.setBody(result);
+	result = let;
+	namespaceBindings = namespaceOuter;
+      }
+    if (nsBindings != NamespaceBinding.predefinedXML)
+      start.setNamespaceNodes(nsBindings);
+    return result;
   }
 
   Expression parseExprSequence(int rightToken)
@@ -1965,18 +2049,17 @@ public class XQParser extends LispReader // should be extends Lexer
       return syntaxError("missing ')' after 'typeswitch' selector");
     getRawToken();
     Object varName = null;
+    Declaration decl;
     Vector vec = new Vector();
     vec.addElement(selector);
-    Object argName;
     while (match("case"))
       {
 	pushNesting('c');
 	getRawToken();
-	argName = "(arg)";
 	if (curToken == '$')
 	  {
-	    argName = parseVariable();
-	    if (argName == null)
+	    decl = parseVariableDeclaration();
+	    if (decl == null)
 	      return syntaxError("missing Variable after '$'");
 	    getRawToken();
 	    if (match("as"))
@@ -1984,12 +2067,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	    else
 	      error('e', "missing 'as'");
 	  }
-	Expression caseType = parseDataType();
+	else
+	  decl = new Declaration("(arg)");
+	decl.setType((Type) ((QuoteExp) parseDataType()).getValue());
 	popNesting('t');
 	LambdaExp lexp = new LambdaExp(1);
-	Declaration decl = lexp.addDeclaration(argName,  // FIXME cast
-					       (Type) ((QuoteExp) caseType).getValue());
-
+	lexp.addDeclaration(decl);
 	if (match("return"))
 	  getRawToken();
 	else
@@ -2002,16 +2085,17 @@ public class XQParser extends LispReader // should be extends Lexer
 	parser.pop(lexp);
 	vec.addElement(lexp);
       }
-    argName = "(arg)";
     if (curToken == '$')
       {
-	argName = parseVariable();
-	if (argName == null)
+	decl = parseVariableDeclaration();
+	if (decl == null)
 	  return syntaxError("missing Variable after '$'");
 	getRawToken();
       }
+    else
+      decl = new Declaration("(arg)");
     LambdaExp lexp = new LambdaExp(0);
-    Declaration decl = lexp.addDeclaration(argName,  Type.pointer_type);
+    lexp.addDeclaration(decl);
     if (match("default"))
       {
 	getRawToken();
@@ -2141,25 +2225,10 @@ public class XQParser extends LispReader // should be extends Lexer
     */
     else if (token == '$')
       {
-	Symbol name = parseVariable();
+	Object name = parseVariable();
 	if (name == null)
 	  return syntaxError("missing Variable");
-	Declaration decl = parser.lookup(name, -1);
-	exp = null;
-	if (decl == null && prevPrefix == null)
-	  {
-	    String sname = name.getName();
-	    if ("request".equals(sname))
-	      exp = makeFunctionExp("gnu.kawa.servlet.GetRequest",
-				    "getRequest");
-	    if ("response".equals(sname))
-	      exp = makeFunctionExp("gnu.kawa.servlet.GetResponse",
-				    "getResponse");
-	    if (exp != null)
-	      exp = new ApplyExp(exp, Expression.noExpressions);
-	  }
-	if (exp == null)
-	  exp = new ReferenceExp(name, decl);
+	exp = new ReferenceExp(name);
       }
     else if (token == FNAME_TOKEN)
       {
@@ -2171,7 +2240,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    String prefix = new String(tokenBuffer, 0, colon);
 	    colon++;
 	    local = new String(tokenBuffer, colon, tokenBufferLength - colon);
-	    uri = (String) namespaces.get(prefix);
+	    uri = (String) lookupNamespace(prefix);
 	    if (uri == null)
 	      {
 		try
@@ -2282,6 +2351,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    Expression func;
 	    if (kind == 'e' || kind == 'a')
 	      {
+		// FIXME - rethink this after next spec revision, which
+		// will hopefully clarify namespace management here.
 		Expression element
 		  = parseNameSpec(defaultElementNamespace, kind == 'a');
 		if (element == null)
@@ -2420,7 +2491,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	prevPrefix = prefix;
 	colon++;
 	local = new String(tokenBuffer, colon, tokenBufferLength - colon);
-	uri = (String) namespaces.get(prefix);
+	uri = (String) lookupNamespace(prefix);
 	if (uri == null)
 	  syntaxError("unknown namespace '" + prefix + "'");
       }
@@ -2435,14 +2506,36 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   /** Parse a Variable. */
-  public Symbol parseVariable ()
+  public Object parseVariable ()
       throws java.io.IOException, SyntaxException
   {
     if (curToken == '$')
       getRawToken();
     else
       syntaxError("missing '$' before variable name");
-    return resolveQName("");
+    String str = new String(tokenBuffer, 0, tokenBufferLength);
+    // Note we cannot do namespace resolution here - see comment in
+    // parseElementConstructor.
+    if (curToken == QNAME_TOKEN)
+      return str;
+    else if (curToken == NCNAME_TOKEN)
+      return Symbol.make("", str);
+    else
+      return null;
+  }
+
+  public Declaration parseVariableDeclaration ()
+      throws java.io.IOException, SyntaxException
+  {
+    Object name = parseVariable();
+    if (name == null)
+      return null;
+    Declaration decl = new Declaration(name);
+    decl.setFile(getName());
+    decl.setLine(getLineNumber() + 1,
+		 getColumnNumber() + 1 - tokenBufferLength);
+    //System.err.println ("parsed "+decl+" line:"+decl.getLine()+" col:"+decl.getColumn());
+    return decl;
   }
 
   /** Parse a let- or a for-expression.
@@ -2452,15 +2545,15 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     char saveNesting = pushNesting(isFor ? 'f' : 'l');
     curToken = '$';
-    Symbol name = parseVariable();
-    if (name == null)
-      return syntaxError("missing Variable token:"+curToken);
+    Declaration decl = parseVariableDeclaration();
+    if (decl == null)
+      return syntaxError("missing Variable - saw "+tokenString());
     getRawToken();
 
     Expression type = parseOptionalTypeDeclaration();
     ScopeExp sc;
     Expression[] inits = new Expression[1];
-    Object posVar = null;
+    Declaration posDecl = null;
     if (isFor)
       {
 	boolean sawAt = match("at");
@@ -2470,11 +2563,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	    getRawToken();
 	    if (curToken == '$')
 	      {
-		posVar = parseVariable();
+		posDecl = parseVariableDeclaration();
 		getRawToken();
 	      }
-	    if (posVar == null)
-	      syntaxError("missing Variable");
+	    if (posDecl == null)
+	      syntaxError("missing Variable after 'at'");
 	  }
 	sc = lexp;
 	if (match("in"))
@@ -2501,20 +2594,21 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     inits[0] = parseExprSingle();
     popNesting(saveNesting);
-    Declaration decl = sc.addDeclaration(name);
+    parser.push(sc);
+    sc.addDeclaration(decl);
     setType(decl, type);
     if (isFor)
       {
 	decl.noteValue (null);  // Does not have a known value.
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
-    if (posVar != null)
+    if (posDecl != null)
       {
-	Declaration posDecl = sc.addDeclaration(posVar, Type.int_type);
+	sc.addDeclaration(posDecl);
+	posDecl.setType(Type.int_type);
 	posDecl.noteValue(null);
 	posDecl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
-    parser.push(sc);
     Expression body;
     if (curToken == ',')
       {
@@ -2599,13 +2693,13 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     char saveNesting = pushNesting(isEvery ? 'e' : 's');
     curToken = '$';
-    Symbol name = parseVariable();
-    if (name == null)
+    Declaration decl = parseVariableDeclaration();
+    if (decl == null)
       return syntaxError("missing Variable token:"+curToken);
     getRawToken();
     
     LambdaExp lexp = new LambdaExp(1);
-    Declaration decl = lexp.addDeclaration(name);
+    lexp.addDeclaration(decl);
     decl.noteValue (null);  // Does not have a known value.
     decl.setFlag(Declaration.IS_SINGLE_VALUE);
     setType(decl, parseOptionalTypeDeclaration());
@@ -2685,13 +2779,12 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	for (;;)
 	  {
-	    Symbol pname = parseVariable();
-	    if (pname == null)
+	    Declaration param = parseVariableDeclaration();
+	    if (param == null)
 	      error("missing parameter name");
 	    else
 	      {
-		Declaration param = lexp.addDeclaration(pname);
-		parser.push(param);
+		lexp.addDeclaration(param);
 		getRawToken();
 		lexp.min_args++;
 		lexp.max_args++;
@@ -2727,7 +2820,7 @@ public class XQParser extends LispReader // should be extends Lexer
 
   String defaultElementNamespace = "";
   String defaultFunctionNamespace = XQuery.XQUERY_FUNCTION_NAMESPACE;
-  Hashtable namespaces = new Hashtable(50);
+  NamespaceBinding namespaceBindings = NamespaceBinding.predefinedXML;
 
   void parseSeparator ()
     throws java.io.IOException, SyntaxException
@@ -2798,12 +2891,12 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == DECLARE_VARIABLE_TOKEN)
       {
 	getRawToken();
-	Symbol name = parseVariable();
-	if (name == null)
+	Declaration decl = parseVariableDeclaration();
+	if (decl == null)
 	  return syntaxError("missing Variable");
+	parser.currentScope().addDeclaration(decl);
 	getRawToken();
 	Expression type = parseOptionalTypeDeclaration();
-	Declaration decl = parser.currentScope().addDeclaration(name);
 	parser.push(decl);
 	if ("local".equals(prevPrefix))
 	  {
@@ -2880,11 +2973,14 @@ public class XQParser extends LispReader // should be extends Lexer
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri in namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
-		namespaces.put(prefix, uri);
+		Declaration decl = pushNamespace(prefix, uri);
+		parser.mainLambda.addDeclaration(decl);
 		parseSeparator();
 		if (command == MODULE_NAMESPACE_TOKEN)
 		  parser.getModule().setName(Compilation.mangleURI(uri));
-		return QuoteExp.voidExp;
+		SetExp sexp = new SetExp(decl, decl.getValue());
+		sexp.setDefining (true);
+		return sexp;
 	      }
 	  }
       }
@@ -2909,9 +3005,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	if (curToken != STRING_TOKEN)
 	  return syntaxError("missing uri in namespace declaration");
-	String uri = new String(tokenBuffer, 0, tokenBufferLength);
+	String uri = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	if (prefix != null)
-	  namespaces.put(prefix, uri);
+	  parser.mainLambda.addDeclaration(pushNamespace(prefix, uri));
 	getRawToken();
 	if (match("at"))
 	  {
@@ -2957,11 +3053,22 @@ public class XQParser extends LispReader // should be extends Lexer
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
+		String prefix;
 		if (forFunctions)
-		  defaultFunctionNamespace = uri;
+		  {
+		    prefix = XQuery.DEFAULT_FUNCTION_PREFIX;
+		    defaultFunctionNamespace = uri;
+		  }
 		else
-		  defaultElementNamespace = uri;
-		return QuoteExp.voidExp;
+		  {
+		    prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
+		    defaultElementNamespace = uri;
+		  }
+		Declaration decl = makeNamespaceDecl(prefix, uri);
+		parser.mainLambda.addDeclaration(decl);
+		SetExp sexp = new SetExp(decl, decl.getValue());
+		sexp.setDefining (true);
+		return sexp;
 	      }
 	  }
       }

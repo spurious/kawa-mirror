@@ -434,3 +434,7 @@
 (define systime-1 (systime))
 (define systime-2 (systime))
 (test #t >= systime-2 systime-1)
+
+;; Bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.
+(define (fl-f y) (+ 10 y))
+(fluid-let ((fl-x 2)) (fl-f 1))

@@ -3,6 +3,8 @@
 
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
+import java.awt.Color;
+import javax.swing.text.*;
 
 public class SwingToolkit extends EToolkit
 {
@@ -14,5 +16,34 @@ public class SwingToolkit extends EToolkit
   public Buffer newBuffer (String name)
   {
     return new SwingBuffer(name);
+  }
+
+  public Object getFace(String name, boolean create)
+  {
+    Style style = SwingBuffer.styles.getStyle(name);
+    if (style == null && create)
+      style = SwingBuffer.styles.addStyle(name, null);
+    return style;
+  }
+
+  public void setUnderline(Object face, boolean underline)
+  {
+    StyleConstants.setUnderline((Style) face, underline);
+  }
+
+  public void setBold(Object face, boolean bold)
+  {
+    StyleConstants.setBold((Style) face, bold);
+  }
+
+
+  public void setForeground (Object face, Color foreground)
+  {
+    StyleConstants.setForeground((Style) face, foreground);
+  }
+
+  public void setBackground (Object face, Color background)
+  {
+    StyleConstants.setBackground((Style) face, background);
   }
 }

@@ -4,6 +4,7 @@
 package gnu.jemacs.swing;
 import java.io.*;
 import gnu.jemacs.buffer.*;
+import gnu.mapping.*;
 import javax.swing.text.*;
 import java.awt.Color;
 
@@ -320,4 +321,11 @@ public class SwingBuffer extends Buffer
     // Restore mark - FIXME
     // content.releasePosition(markPosition);
   }
+
+  public InPort openReader (int start, int count)
+  {
+    return new BufferReader(this, start, count);
+  }
+
+
 }

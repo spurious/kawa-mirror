@@ -1,5 +1,7 @@
 2003-04-19  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (compileAsMethod):  Fix call to deprecated method.
+
 	* Compilation.java (lexical):  New field, moved from Translation.
 	(<init>):  Initialize lexical field.
 	(pus, pop):  Also call corresponding operations on lexical.

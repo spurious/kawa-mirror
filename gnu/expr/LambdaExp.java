@@ -1269,8 +1269,7 @@ public class LambdaExp extends ScopeExp
 	comp.method = primMethods[i];
 	if (i < numStubs)
 	  {
-	    comp.method.init_param_slots();
-	    CodeAttr code = comp.getCode();
+	    CodeAttr code = comp.method.startCode();
 	    int toCall = i + 1;
 	    while (toCall < numStubs
 		   && defaultArgs[toCall] instanceof QuoteExp)

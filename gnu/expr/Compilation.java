@@ -1304,6 +1304,10 @@ public class Compilation
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
+	    int line = source.getLine();
+	    if (line > 0)
+	      code.putLineNumber(line);
+
 	    Method primMethod = primMethods[methodIndex];
 	    Type[] primArgTypes = primMethod.getParameterTypes();
 	    int nargs = primArgTypes.length;

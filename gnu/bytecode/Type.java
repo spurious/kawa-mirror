@@ -112,8 +112,6 @@ public abstract class Type {
 	    type = cl;
 	    mapNameToType.put(name, type);
 	  }
-	if (reflectClass.isInterface())
-	  ((ClassType) type).access_flags |= Access.INTERFACE;
       }
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
@@ -343,7 +341,8 @@ public abstract class Type {
    * we mean that all instance of A can be "widened" to B.
    * More formally, A.compare(B) returns:
    *  1: all B values can be converted to A without a coercion failure
-   *     (i.e. a ClassCastException or overflow), but not vice versa.
+   *     (i.e. a ClassCastException or overflow or major loss of information),
+   *     but not vice versa.
    *  0: all A values can be converted to B without a coercion failure
    *     and vice versa;
    * -1: all A values can be converted to B without a coercion failure

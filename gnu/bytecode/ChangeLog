@@ -1,3 +1,11 @@
+2001-11-17  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getPackageName):  New method.
+	(getMethods):  New overload uses Vector.
+
+	* Type.java (make):  Don't set interface flag here since it prevents
+	future getModifiers calls from getting the reflectClass's modifiers. 
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* ArrayType.java (getImplementationType):  New method

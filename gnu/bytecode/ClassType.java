@@ -114,6 +114,13 @@ public class ClassType extends ObjectType implements AttrContainer {
     return superClass;
   }
 
+  public String getPackageName()
+  {
+    String name = getName();
+    int index = name.indexOf('.');
+    return index < 0 ? name : name.substring(0, index);
+  }
+
   /**
    * @return the interfaces this class is declared to implement
    * (not those inherited from its superclass/superinterfaces).
@@ -403,6 +410,7 @@ public class ClassType extends ObjectType implements AttrContainer {
    * @param result array to place selected methods in
    * @param offset start of where in result to place result
    * @return number of methods placed in result array
+   * @deprecated
    */
   public int getMethods (Filter filter, int searchSupers,
 			 Method[] result, int offset)
@@ -430,6 +438,51 @@ public class ClassType extends ObjectType implements AttrContainer {
 	    for (int i = 0;  i < interfaces.length;  i++)
 	      count += interfaces[i].getMethods(filter, searchSupers,
 						result, offset+count);
+	  }
+      }
+    return count;
+  }
+
+  /** Helper to get methods satisfying a filtering predicate.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @param result Vector to add selected methods in
+   * @param context If non-null, skip if class not visible in context.
+   * @return number of methods placed in result array
+   */
+  public int getMethods (Filter filter, int searchSupers, Vector result,
+			 ClassType context)
+  {
+    int count = 0;
+    for (ClassType ctype = this;  ctype != null;
+	 ctype = ctype.getSuperclass())
+    {
+      if (context == null
+	  || (ctype.getModifiers() & Access.PUBLIC) != 0
+	  || context.getPackageName().equals(ctype.getPackageName()))
+	{
+	  for (Method meth = ctype.getDeclaredMethods();
+	       meth != null;  meth = meth.getNext())
+	    if (filter.select(meth))
+	      {
+		if (result != null)
+		  result.addElement(meth);
+		count++;
+	      }
+	}
+      if (searchSupers == 0)
+	break;
+    }
+    if (searchSupers > 1)
+      {
+	ClassType[] interfaces = getInterfaces();
+	if (interfaces != null)
+	  {
+	    for (int i = 0;  i < interfaces.length;  i++)
+	      count += interfaces[i].getMethods(filter, searchSupers,
+						result, context);
 	  }
       }
     return count;

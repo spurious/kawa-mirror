@@ -1,5 +1,7 @@
 2001-04-26  Per Bothner  <per@bothner.com>
 
+	* configure.in:  Set version to 1.6.90.
+
 	Change most Makefile.am back to worked with released automake.
 	This means include of Make-rules must be handled by automake, which
 	is less ideal, but automake snapshots are too buggy.

@@ -1,3 +1,5 @@
+Changes from Kawa 1.6.70 to 1.6.90.
+==================================
 The reader (for Scheme and Lisp) has been re-written to be table-driven,
 based on the design of Common Lisp readtables.
 
@@ -20,12 +22,12 @@ which each "frame" is an instance of ModuleBody, just like for
 top-level functions.  This sometimes reduces the number of classes
 generated, but more importantly it simplifies the implementation.
 
-A new gnu.kawa.xml package (whose name is likely to change) contains
-XML-related code, currently an XML parser and printer.
-The new class gnu.kawa.util.TreeList (alias <document>) is useful
-for compactly representing nested structures, including XML documents.
-If you (require 'xml) you will get Scheme interfaces (print-as-xml
-and parse-xml-from-url) to these classes.
+A new gnu.xml package contains XML-related code, currently an XML
+parser and printer, plus some XPath support.  The class
+gnu.lists.TreeList (alias <document>) is useful for compactly
+representing nested structures, including XML documents.  If you
+(require 'xml) you will get Scheme interfaces (print-as-xml and
+parse-xml-from-url) to these classes.
 
 New package gnu.kawa.functions, for primitive functions (written in Java).
 

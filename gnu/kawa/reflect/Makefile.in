@@ -77,7 +77,7 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_JAVA =    ClassMethods.java   Invoke.java   SlotGet.java   SlotSet.java   StaticField.java
+java_JAVA =    ClassMethods.java   Invoke.java   SlotGet.java   SlotSet.java
 
 
 KAWA = $(JAVA) kawa.repl

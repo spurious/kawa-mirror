@@ -785,6 +785,26 @@ public class CodeAttr extends Attribute implements AttrContainer
     if_stack = if_stack.previous;
   }
 
+  public void emitCheckcast (Type type)
+  {
+    reserve(3);
+    popType();
+    put1(192);  // checkcast
+    if (type instanceof ArrayType)
+      {
+	ArrayType atype = (ArrayType) type;
+	CpoolUtf8 name = getConstants().addUtf8(atype.signature);
+	putIndex2(getConstants().addClass(name));
+      }
+    else if (type instanceof ClassType)
+      {
+	putIndex2(getConstants().addClass((ClassType) type));
+      }
+    else
+      throw new Error ("unimplemented type in compile_checkcast");
+    pushType(type);
+  }
+
   public final void emitThrow ()
   {
     popType();

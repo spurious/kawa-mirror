@@ -127,22 +127,7 @@ public class Method implements AttrContainer {
 
   public void compile_checkcast (Type type)
   {
-    prepareCode(3);
-    pop_stack_type ();
-    code.put1(192);  // checkcast
-    if (type instanceof ArrayType)
-      {
-	ArrayType atype = (ArrayType) type;
-	CpoolUtf8 name = getConstants().addUtf8(atype.signature);
-	code.putIndex2(getConstants().addClass(name));
-      }
-    else if (type instanceof ClassType)
-      {
-	code.putIndex2(getConstants().addClass((ClassType) type));
-      }
-    else
-      throw new Error ("unimplemented type in compile_checkcast");
-    push_stack_type (type);
+    code.emitCheckcast (type);
   }
 
   public void maybe_compile_checkcast (Type type)

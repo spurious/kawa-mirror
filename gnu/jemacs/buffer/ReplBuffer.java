@@ -1,5 +1,6 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
+import gnu.expr.Interpreter;
 import kawa.lang.*;
 import kawa.standard.Scheme;
 import javax.swing.text.*;

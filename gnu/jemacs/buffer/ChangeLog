@@ -1,3 +1,7 @@
+2000-02-01  Per Bothner  <per@bothner.com>
+
+	* ReplBuffer.java:  Now need to import gnu.expr.Interpreter.
+
 2000-01-24  Per Bothner  <per@bothner.com>
 
 	* ReplBuffer.java:  Fix kawa.lang.QueueReader ->gnu.text.QueueReader.

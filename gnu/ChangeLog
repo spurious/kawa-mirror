@@ -1,3 +1,8 @@
+2002-02-13  Per Bothner  <per@bothner.com>
+
+	* blr/progfun.scm:  Move to gnu.kawa.brl.
+	* brl/Makefile.am (java_SCM):  Update accordingly.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* brl:  New directory - modules imported from BRL.

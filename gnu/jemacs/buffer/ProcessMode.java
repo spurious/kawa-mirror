@@ -19,7 +19,12 @@ public class ProcessMode extends Mode
   static
   {
     modeMap.defineKey("\n", enterAction);
-    modeMap.setDefaultBinding(new ProcessInsertCommand());
+    modeMap.defineKey("\r", enterAction);
+    modeMap.defineKey("return", enterAction);
+    Object insert = new ProcessInsertCommand();
+    //    modeMap.setDefaultBinding(insert);
+    modeMap.set(' ', 126, insert);
+    modeMap.set(128, 255, insert);
   }
 
   public Marker getProcessMark ()

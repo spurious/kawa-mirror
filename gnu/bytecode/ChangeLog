@@ -1,3 +1,9 @@
+Sat Mar 20 10:59:28 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Type.java (getSize, isVoid):  New methods.
+	* CodeAttr.java (pushType, emitInvokeMethod, emitReturn):
+	Handle other void types (size==0) besides Type.void_type.
+
 1999-03-13  Geoff Berry  <gcb@duke.edu>
 
 	* SwitchState.java (addDefault(Label,CodeAttr)): New method.

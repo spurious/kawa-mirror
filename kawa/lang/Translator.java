@@ -125,16 +125,6 @@ public class Translator extends Parser
     return new ErrorExp (message);
   }
 
-  /** Enter a global definition.
-   * This allows macro definitions to be used in the same Translation
-   * as the define-syntax.
-   */
-
-  public void addGlobal (String name, Object value)
-  {
-    env.put (name, value);
-  }
-
   /**
    * @param function true if obj is in function-call position (i.e. first).
    */
@@ -142,17 +132,21 @@ public class Translator extends Parser
   {
     if (obj instanceof String)
       {
-	String sym = (String) obj;
-	Binding binding = environ.lookup (sym);
+	String name = (String) obj;
+	// Same logic as in rewrite(Object,boolean)..
+	Binding binding = environ.lookup(name);
 	if (binding == null)
-	  binding = env.lookup(sym);
-        else if (binding.isBound())
-          {
-            // Check for hygiene re-naming.
-            Object val1 = binding.getValue();
-            if (val1 instanceof String)
-              binding = env.lookup((String) val1);
-          }
+	  binding = env.lookup(name);
+	else if (binding.isBound())
+	  {
+	    Object val1 = binding.getValue();
+            // Check for hygiene re-naming - see SyntaxRule.execute_template.
+	    if (val1 instanceof String)
+	      {
+		name = (String) val1;
+		binding = env.lookup(name);
+	      }
+	  }
 	if (binding == null)
 	  obj = null;
 	else if (function)
@@ -172,19 +166,12 @@ public class Translator extends Parser
 	binding = null;
         if (obj != null)
 	  {
-            /*
-	    // Hygenic macro expansion may bind a renamed (uninterned) symbol
-	    // to the original symbol.  Here, use the original symbol.
-	    if (obj instanceof String)
-	      binding = env.lookup((String) obj);
-	    else
-            */
             if (obj instanceof Declaration
 		     && ! isLexical((Declaration) obj))
 	      obj = null;
 	  }
 	else
-	  binding = env.lookup(sym);
+	  binding = env.lookup(name);
 	if (binding != null && binding.isBound())
 	  return binding.get();
 	return null;
@@ -220,7 +207,7 @@ public class Translator extends Parser
 	if (decl == null)
 	  {
             String name = ref.getName();
-            Binding binding = env.lookup((String) name);
+            Binding binding = env.lookup(name);
 	    if (binding != null)
 	      proc = binding.getFunctionValue();
 	    if (proc instanceof Syntax)
@@ -321,6 +308,8 @@ public class Translator extends Parser
     else if (exp instanceof String)
       {
 	String name = (String) exp;
+	// Same logic as in getBinding.  The duplication is difficult to avoid,
+	// because there are two results: Binding and name may is changed.
 	Binding binding = environ.lookup(name);
         if (binding == null)
 	  binding = env.lookup(name);
@@ -645,6 +634,11 @@ public class Translator extends Parser
   public void pushBinding(String name, Object value)
   {
     Object old = environ.put(name, value);
+    // It is possible the same Declaration may be pushed twice:  Once
+    // in scanForDefinitions and once by pushDecls.  With some care
+    // this could probably be avoided.  FIXME.
+    if (value == old)
+      return;
     shadowStack.push(old);
     shadowStack.push(name);
   }

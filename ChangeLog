@@ -1,3 +1,18 @@
+2000-12-02  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Macro.java (getExpander):  New method.
+	* kawa/lang/Translator.java (addGlobal):  Removed method.
+	(getBinding):  Lookup using hygiene-resolved name.
+	(pushBinding):  Do nothing if new value is name as old.
+	
+	* kawa/standard/define.java (scanForDefinitions):  Do pushBinding.
+	* kawa/standard/define_unit.java:  Do pushBinding, not addGlobal.
+	* kawa/standard/define_syntax.java:  Likewise.
+	* kawa/standard/require.java (scanForDefinitions):  Likewise.
+	Also if value is a Macro, call bind on it.
+
+	* kawa/standard/open_output_file.java (openOutputFile):  New static.
+
 2000-11-21  Matthias Radestock <matthias@lshift.net>
 
 	* kawa/standard/load.java (apply): Removes an incorrect fall-through

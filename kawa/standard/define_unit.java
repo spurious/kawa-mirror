@@ -48,7 +48,7 @@ public class define_unit extends Syntax
 	    if (unit != null)
 	      {
 		// Add to translation environment, so read will find it.
-		tr.addGlobal(name, unit);
+		tr.pushBinding(name, unit);
 		decl.noteValue(new QuoteExp(unit));
 	      }
 	    p = tr.makePair(p, decl, p.cdr);
@@ -98,8 +98,6 @@ public class define_unit extends Syntax
 	if (value instanceof QuoteExp
 	    && (quantity = ((QuoteExp) value).getValue()) instanceof Quantity)
 	  {
-	    tr.addGlobal(name, quantity);  // Add to translation environment.
-
 	    value = new QuoteExp(Unit.make(unit, (Quantity) quantity));
 	  }
 	else

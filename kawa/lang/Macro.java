@@ -8,6 +8,11 @@ public class Macro extends Syntax implements Printable, Externalizable
 {
   public Expression expander;
 
+  public Expression getExpander()
+  {
+    return expander;
+  }
+
   public static Macro make (String name, Procedure expander)
   {
     Macro mac = new Macro(name, expander);
@@ -69,7 +74,8 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     try
       {
-        Procedure pr = (Procedure) expander.eval(tr.getGlobalEnvironment());
+        Procedure pr
+	  = (Procedure) getExpander().eval(tr.getGlobalEnvironment());
         SyntaxForm sform = new SyntaxForm();
         sform.form = form;
         sform.tr = tr;

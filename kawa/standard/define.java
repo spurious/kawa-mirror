@@ -51,6 +51,7 @@ public class define extends Syntax implements Printable
     if (sym != null)
       {
 	Declaration decl = defs.getDefine(sym, 'w', tr);
+	tr.pushBinding(sym, decl);
 	if (makePrivate)
 	  decl.setPrivate(true);
 	if (makeConstant)

@@ -154,10 +154,14 @@ public class require extends Syntax
 		    if (! isStatic)
 		      fdecl.base = decl;
 		    fdecl.field = fld;
-		    fdecl.noteValue(new QuoteExp(fvalue));
+		    if (fvalue instanceof Macro)
+		      ((Macro) fvalue).bind(fdecl);
+		    else
+		      fdecl.noteValue(new QuoteExp(fvalue));
 		    fdecl.setPrivate(true);
 		    fdecl.setSimple(false);
 		    defs.addDeclaration(fdecl);
+		    tr.pushBinding(fdname, fdecl);  // Add to translation env.
 		  }
 		catch (Exception ex)
 		  {

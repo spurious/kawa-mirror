@@ -38,21 +38,6 @@ public class define_syntax extends Syntax
       }
     else
       {
-        // Add rule to translation environment.
-        tr.addGlobal(name, decl);
-
-        // Add rule to execution environment.
-	if (tr.immediate)
-	  {
-	    if (! (rule instanceof QuoteExp))
-	      {
-		Expression args[] = new Expression[2];
-		args[0] = new QuoteExp(macro);
-		args[1] = rule;
-		return new ApplyExp(new PrimProcedure(setExpanderMethod), args);
-	      }
-	    return QuoteExp.voidExp;
-	  }
 	if (! (rule instanceof QuoteExp)
 	    || ! (((QuoteExp) rule).getValue() instanceof java.io.Externalizable))
 	  {
@@ -92,6 +77,8 @@ public class define_syntax extends Syntax
 
     p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
+
+    tr.pushBinding(name, decl);
     return true;
   }
 }

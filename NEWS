@@ -1,3 +1,6 @@
+Internal change:  If a variable reference is unknwon, create a Declaration
+instance with the IS_UNKNOWN flag to represent an imported binding.
+
 Added a hook for constant-folding and other optimization/inlining at
 traversal (ExpWalker) time.  Optimization of + and - procedures to
 use primitive Java operations when the operands are primitive types.

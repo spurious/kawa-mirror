@@ -1565,7 +1565,22 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitTryStart(boolean has_finally, Type result_type)
   {
+    Variable[] savedStack;
+    if (SP > 0)
+      {
+	savedStack = new Variable[SP];
+	int i = 0;
+	while (SP > 0)
+	  {
+	    Variable var = addLocal(topType());
+	    emitStore(var);
+	    savedStack[i++] = var;
+	  }
+      }
+    else
+      savedStack = null;
     TryState try_state = new TryState(this);
+    try_state.savedStack = savedStack;
     if (result_type != null && result_type.size == 0) // void
       result_type = null;
     if (result_type != null || SP > 0)
@@ -1573,17 +1588,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 	pushScope();
 	if (result_type != null)
 	  try_state.saved_result = addLocal(result_type);
-      }
-    if (SP > 0)
-      {
-	try_state.savedStack = new Variable[SP];
-	int i = 0;
-	while (SP > 0)
-	  {
-	    Variable var = addLocal(topType());
-	    emitStore(var);
-	    try_state.savedStack[i++] = var;
-	  }
       }
     if (has_finally)
       try_state.finally_subr = new Label(this);

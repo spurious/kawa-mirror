@@ -1,3 +1,7 @@
+Tue May 20 22:16:36 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* num-test.scm:  Add two tests for recently-fixed bugs.
+
 Tue Mar 25 19:37:14 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* mac-test.scm:  Add a test for demacro and gentemp.

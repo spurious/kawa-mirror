@@ -1,3 +1,11 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (parseFile):  Remove unused variable.
+
+	* XQParser.java (stringValue, booleanValue):  Make public.
+
+	* XQParser.java (parseFLWRExpression):  Fix typo "let" -> "for".
+
 2002-04-19  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  Define "avg" and "sum".

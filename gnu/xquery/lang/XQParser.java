@@ -1181,7 +1181,7 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   /** Coerce the value of an expresison to a string value. */
-  Expression stringValue(Expression exp)
+  public static Expression stringValue(Expression exp)
   {
     Expression[] args = { exp };
     Expression string
@@ -1190,7 +1190,7 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   /** Coerce the value of an expresison to a boolean value. */
-  Expression booleanValue(Expression exp)
+  public static Expression booleanValue(Expression exp)
   {
     Expression[] args = { exp };
     Expression string
@@ -1670,7 +1670,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	else
 	  cond = null;
 	boolean sawReturn = match("return");
-	if (! sawReturn && ! match("let") && ! match("let"))
+	if (! sawReturn && ! match("let") && ! match("for"))
 	  return syntaxError("missing 'return' clause");
 	peekNonSpace("unexpected eof-of-file after 'return'");
 	int bodyLine = getLineNumber() + 1;

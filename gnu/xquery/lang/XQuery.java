@@ -76,7 +76,6 @@ public class XQuery extends Interpreter
     gnu.expr.Parser tr = new gnu.expr.Parser(messages);
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
-    java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
     XQParser lexer = (XQParser) getLexer(port, messages);
     lexer.nesting = 1;

@@ -25,6 +25,11 @@
 	* TooLongAction.java: Moved to gnu.jemacs.swing package.
 	* Makefile.am:  Updated accordingly.
 
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* Mode.java:  Extend ModuleBody instead of implementing to-be-removed
+	ApplyMethodContainer.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* Buffer.java:  Remove unused import statements.

@@ -38,6 +38,45 @@ public class ArrayClassLoader extends ClassLoader
     this.classNames = classNames;
   }
 
+  private void reserve(int count)
+  {
+    if (count <= 0)
+      return;
+    int newLength = size < count ? size + count : 2 * size;
+    if (loadedClasses == null)
+      loadedClasses = new Class[newLength];
+    else if (size + count > loadedClasses.length)
+      {
+        Class[] loadedClassesNew = new Class[newLength];
+        System.arraycopy(loadedClasses, 0, loadedClassesNew, 0, size);
+        loadedClasses = loadedClassesNew;
+      }
+    if (classBytes == null)
+      classBytes = new byte[newLength][];
+    else if (size + count > classBytes.length)
+      {
+        byte[][] classBytesNew = new byte[newLength][];
+        System.arraycopy(classBytes, 0, classBytesNew, 0, size);
+        classBytes = classBytesNew;
+      }
+    if (classNames == null)
+      classNames = new String[newLength];
+    else if (size + count > classNames.length)
+      {
+        String[] classNamesNew = new String[newLength];
+        System.arraycopy(classNames, 0, classNamesNew, 0, size);
+        classNames = classNamesNew;
+      }
+  }
+
+  public void addClass(String name, byte[] bytes)
+  {
+    reserve(1);
+    classNames[size] = name == null ? ("lambda"+size) : name;
+    classBytes[size] = bytes;
+    size++;
+  }
+
   public Class loadClass (String name, boolean resolve)
        throws ClassNotFoundException
   {

@@ -1,3 +1,7 @@
+1999-08-08  Per Bothner  <per@bothner.com>
+
+	* ArrayClassLoader.java (addClass): New method.
+
 1999-08-06  Per Bothner  <per@bothner.com>
 
 	* CodeFragment.java:  New class.

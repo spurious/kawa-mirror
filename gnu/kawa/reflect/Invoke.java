@@ -4,7 +4,7 @@ import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
 
-public class Invoke extends ProcedureN implements Inlineable
+public class Invoke extends ProcedureN implements CanInline, Inlineable
 {
   /** 'N' - make (new);  'S' - invoke-static;  'V'  - non-static invoke. */
   char kind;
@@ -205,6 +205,37 @@ public class Invoke extends ProcedureN implements Inlineable
         fields[i] = slot != null ? slot : name;
       }
     return fields;
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    return kind == 'V' ? exp : inlineClassName(exp, 0, interpreter);
+  }
+
+  /** Resolve class specifier to ClassType at inline time.
+   * This is an optimization to avoid having a module-level binding
+   * created for the class name. */
+
+  public static Expression inlineClassName (ApplyExp exp, int carg,
+					    Interpreter interpreter)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length > carg)
+      {
+	Type type = interpreter.getTypeFor(args[carg]);
+	ClassType ctype;
+	if (type instanceof PairClassType)
+	  ctype = ((PairClassType) type).instanceType;
+        else if (type instanceof ClassType)
+	  ctype = (ClassType) type;
+	else
+	  return exp;
+	Expression[] nargs = new Expression[args.length];
+	System.arraycopy(args, 0, nargs, 0, args.length);
+	nargs[carg] = new QuoteExp(ctype);
+	return new ApplyExp(exp.getFunction(), nargs);
+      }
+    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

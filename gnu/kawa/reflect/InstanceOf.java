@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class InstanceOf extends Procedure2 implements Inlineable
+public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 {
   Interpreter interpreter;
 
@@ -26,6 +26,11 @@ public class InstanceOf extends Procedure2 implements Inlineable
 
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method instanceMethod;
+
+  public Expression inline (ApplyExp exp)
+  {
+    return Invoke.inlineClassName(exp, 1, interpreter);
+  }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {

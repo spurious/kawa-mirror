@@ -5,7 +5,8 @@ import gnu.bytecode.*;
 import gnu.lists.FString;
 import gnu.kawa.lispexpr.LangPrimType;
 
-public class SlotGet extends Procedure2 implements HasSetter, Inlineable
+public class SlotGet extends Procedure2
+  implements HasSetter, CanInline, Inlineable
 {
   static Class[] noClasses = { };
 
@@ -162,6 +163,14 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
         return method;
       }
     return null;
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    if (isStatic)
+      return Invoke.inlineClassName (exp, 0, Interpreter.defaultInterpreter);
+    else
+      return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -3,7 +3,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
-public class SlotSet extends Procedure3 implements Inlineable
+public class SlotSet extends Procedure3 implements CanInline, Inlineable
 {
   /** True if this is a "static-field" operation. */
   boolean isStatic;
@@ -176,6 +176,14 @@ public class SlotSet extends Procedure3 implements Inlineable
           code.emitInvokeVirtual(method);
         return;
       }
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    if (isStatic)
+      return Invoke.inlineClassName (exp, 0, Interpreter.defaultInterpreter);
+    else
+      return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

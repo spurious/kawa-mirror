@@ -1,3 +1,12 @@
+2002-01-31  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inlineClassName):  New static method.
+	* Invoke.java:  Implement CanInline.
+	(inline): New method calls inlineClassName
+	* InstanceOf.java:  Likewise.
+	* SlotGet.java:  Likewise.
+	* SlotSet.java:  Likewise.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java:  New class, implements XQuery 'typeswitch'.

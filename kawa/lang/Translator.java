@@ -141,6 +141,16 @@ public class Translator extends Object
     env.put (name, value);
   }
 
+  /** Note that we have seen a construct that must be compiled, not evaluated.
+   * If we are not inside a lambda (which is always compiled), but
+   * only inside the outer-most ModuleExp, note that it must be compiled. */
+  void mustCompileHere ()
+  {
+    LambdaExp lambda = currentLambda ();
+    if (lambda instanceof ModuleExp)
+      ((ModuleExp)lambda).mustCompile = true;
+  }
+
   /** Check if Object is Syntax, or bound to Syntax.
    * @param obj the value to check
    * @return the Syntax bound to obj, or null.
@@ -194,6 +204,7 @@ public class Translator extends Object
 	    boolean is_static = proc.getStaticFlag();
 	    if (args.length != proc.getParameterTypes().length + (is_static ? 0 : 1))
 	      return syntaxError ("wrong number of arguments to primitive");
+	    mustCompileHere();
 	    return new PrimApplyExp (qfunc, args);
 	  }
       }

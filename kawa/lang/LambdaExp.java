@@ -15,9 +15,6 @@ public class LambdaExp extends ScopeExp
   // Maximum number of actual arguments;  -1 if variable.
   int max_args;
 
-  // True if this contains a nested ScopeExp.
-  boolean hasNestedScopes;
-
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
 

@@ -103,13 +103,10 @@ public abstract class ScopeExp extends Expression
   public void push (Translator tr)
   {
     outer = tr.current_scope;
-    if (outer != null && // FIXME
-	! (this instanceof LambdaExp))
+    if (! (this instanceof LambdaExp)) // which implies: outer != null
       {
 	shared = true;
-	LambdaExp lambda = currentLambda ();
-	if (lambda != null)
-	  lambda.hasNestedScopes = true;
+	tr.mustCompileHere();
       }
     tr.current_scope = this;
     push_decls (tr);

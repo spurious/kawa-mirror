@@ -6,6 +6,7 @@ java_sources=\
   CGIServletWrapper.java \
   GetRequest.java \
   GetResponse.java \
+  KawaPageServlet.java \
   KawaServlet.java \
   ServletCallContext.java \
   ServletPrinter.java

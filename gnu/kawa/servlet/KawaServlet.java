@@ -52,8 +52,17 @@ extends HttpServlet implements CpsMethodContainer
     */
 
     ctx.consumer.beginDocument();
-    apply(ctx);
-    ctx.run();
+    try
+      {
+	apply(ctx);
+	ctx.run();
+      }
+    catch (Throwable throwable)
+      {
+	// Clear partial output on an error.
+	response.resetBuffer();
+	throw new ServletException(throwable);
+      }
     ctx.consumer.endDocument();
   }
 
@@ -61,6 +70,6 @@ extends HttpServlet implements CpsMethodContainer
   {
   }
 
-  public abstract void apply(CallContext context);
+  public abstract void apply(CallContext context)  throws Throwable;
 }
 

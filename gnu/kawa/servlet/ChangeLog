@@ -1,3 +1,11 @@
+2003-02-20  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java:  New class.  Contributed by Ivelin Ivanov
+	<ivelin@apache.org> and Tom Reilly <treilly@macromedia.com>.
+	* KawaServlet.java (doGet):  Catch exceptions.
+	(apply(CallContext)):  Add throws specification.
+	* Makefile.am (java_sources):  Added KawaPageServlet.java.
+
 2002-07-29  Per Bothner  <per@bothner.com>
 
 	* ServletCallContext.java:  Make class public.

@@ -1,3 +1,8 @@
+2003-04-06  Per Bothner  <per@bothner.com>
+
+	* ObjectFormat.java (print):  New static help method.
+	(format):  Use latter instead of SFormat.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeList):  Use our writeObject method.

@@ -5,6 +5,8 @@ import java.util.*;
 import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.mapping.*;
+import kawa.standard.Scheme;
+import gnu.lists.FormatToConsumer;
 
 public class ObjectFormat extends ReportFormat
 {
@@ -51,6 +53,26 @@ public class ObjectFormat extends ReportFormat
     return format(args, start, dst, maxChars, readable);
   }
 
+  private static void print (Object obj, OutPort out,
+			     boolean readable)
+  {
+    boolean saveReadable = out.printReadable;
+    FormatToConsumer saveFormat = out.objectFormat;
+    try
+      {
+	out.printReadable = readable;
+	DisplayFormat format
+	  = readable ? Scheme.writeFormat : Scheme.displayFormat;
+	out.objectFormat = format;
+	format.writeObject(obj, (gnu.lists.Consumer) out);
+      }
+    finally
+      {
+	out.printReadable = saveReadable;
+	out.objectFormat = saveFormat;
+      }
+  }
+
   /**
    * Return false iff truncation.
    */
@@ -60,24 +82,13 @@ public class ObjectFormat extends ReportFormat
   {
     if (maxChars < 0 && dst instanceof OutPort)
       {
-	OutPort oport = (OutPort) dst;
-	boolean saveReadable = oport.printReadable;
-	try
-	  {
-	    oport.printReadable = readable;
-	    SFormat.print(arg, oport);
-	  }
-	finally
-	  {
-	    oport.printReadable = saveReadable;
-	  }
+	print(arg, (OutPort) dst, readable);
 	return true;
       }
     else if (maxChars < 0 && dst instanceof CharArrayWriter)
       {
 	OutPort oport = new OutPort(dst);
-	oport.printReadable = readable;
-	SFormat.print(arg, oport);
+	print(arg, oport, readable);
 	oport.flush();
 	return true;
       }
@@ -85,8 +96,7 @@ public class ObjectFormat extends ReportFormat
       {
 	CharArrayWriter wr = new CharArrayWriter();
 	OutPort oport = new OutPort(wr);
-	oport.printReadable = readable;
-	SFormat.print(arg, oport);
+	print(arg, oport, readable);
 	oport.flush();
 	int len = wr.size();
 	if (maxChars < 0 || len <= maxChars)

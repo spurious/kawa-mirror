@@ -368,7 +368,7 @@ public class Translator extends Compilation
                       decl.setFlag(Declaration.IS_SYNTAX);
                   }
               }
-            else
+            else if (Compilation.inlineOk)
               {
                 decl = Declaration.getDeclaration(proc);
               }

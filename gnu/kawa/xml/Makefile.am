@@ -6,6 +6,7 @@ AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
   Attributes.java \
+  AttributeConstructor.java \
   ElementConstructor.java \
   NamedAttributes.java \
   NamespaceEnv.java \

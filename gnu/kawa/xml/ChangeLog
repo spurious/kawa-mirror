@@ -1,3 +1,15 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* ElementConstructor.java (compile):  Fix off-by-one error.
+
+	* ElementConstructor.java (getmlName,getQName, getnNmespaceURI,
+	getLocalName, getPrefix, toString):  New helper methods.
+	* AttributeConstructor.java:  New class, extends CpsProcedure.
+	* Makefile.am (java_sources):  Add AttributeConstructor.java.
+
+	* NamespaceEnv.java (NAMESPACE_PREFIX):  New constant.
+	(get):  Use NAMESPACE_PREFIX.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* OutputAsXML.java:  New class, extends CpsProcedure.

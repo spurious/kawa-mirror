@@ -9,7 +9,7 @@ import java.io.*;
 import gnu.xml.*;
 import gnu.lists.*;
 
-public class ElementConstructor extends CpsProcedure
+public class AttributeConstructor extends CpsProcedure
 implements Inlineable, Externalizable
 {
   /** XML source name - e.g. "PREFIX:LOCAL". */
@@ -33,17 +33,17 @@ implements Inlineable, Externalizable
     return sname.substring(0, colon);
   }
 
-  public static ElementConstructor make(String sname, QName qname)
+  public static AttributeConstructor make(String sname, QName qname)
   {
-    ElementConstructor result = new ElementConstructor();
+    AttributeConstructor result = new AttributeConstructor();
     result.sname = sname.intern();
     result.qname = qname;
     return result;
   }
 
-  public static ElementConstructor make(String sname, String namespaceURI, String localName)
+  public static AttributeConstructor make(String sname, String namespaceURI, String localName)
   {
-    ElementConstructor result = new ElementConstructor();
+    AttributeConstructor result = new AttributeConstructor();
     result.sname = sname.intern();
     result.qname = QName.make(namespaceURI, localName);
     return result;
@@ -53,18 +53,16 @@ implements Inlineable, Externalizable
   {
     Consumer out = ctx.consumer;
     int nargs = ctx.count;
-    out.beginGroup(sname, qname);
+    out.beginAttribute(sname, qname);
     for (int i = 0;  i < nargs;  i++)
       {
 	Object arg = ctx.getArgAsObject(i);
-	/*
-	  if (arg instanceof Consumable)
+	if (arg instanceof Consumable)
 	  ((Consumable) arg).consume(out);
-	  else
-	*/
-	out.writeObject(arg);
+	else
+	  out.writeObject(arg);
       }
-    out.endGroup(sname);
+    out.endAttribute();
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -79,12 +77,11 @@ implements Inlineable, Externalizable
 	code.emitLoad(consumer);
 	comp.compileConstant(sname, Target.pushObject);
 	comp.compileConstant(qname, Target.pushObject);
-	code.emitInvokeInterface(beginGroupMethod);
+	code.emitInvokeInterface(beginAttributeMethod);
 	for (int i = 0;  i < nargs;  i++)
 	  args[i].compile(comp, target);
 	code.emitLoad(consumer);
-	comp.compileConstant(sname, Target.pushObject);
-	code.emitInvokeInterface(endGroupMethod);
+	code.emitInvokeInterface(endAttributeMethod);
       }
     else if (target instanceof IgnoreTarget)
       ApplyExp.compile(exp, comp, target);
@@ -99,14 +96,14 @@ implements Inlineable, Externalizable
 
   public String toString()
   {
-    return "#<ElementConstructor "+sname+" :: "+qname+'>';
+    return "#<AttributeConstructor "+sname+" :: "+qname+'>';
   }
 
 
-  static final Method beginGroupMethod
-    = Compilation.typeConsumer.getDeclaredMethod("beginGroup", 2);
-  static final Method endGroupMethod
-    = Compilation.typeConsumer.getDeclaredMethod("endGroup", 1);
+  static final Method beginAttributeMethod
+    = Compilation.typeConsumer.getDeclaredMethod("beginAttribute", 2);
+  static final Method endAttributeMethod
+    = Compilation.typeConsumer.getDeclaredMethod("endAttribute", 0);
 
   public void writeExternal(ObjectOutput out) throws IOException
   {

@@ -8,6 +8,9 @@ import gnu.mapping.*;
 
 public class NamespaceEnv extends Environment
 {
+  /** A namespace PREFIX is a declaration of NAMESPACE_PREFIX+"PREFIX". */
+  public static final String NAMESPACE_PREFIX = "$Namespace$";
+
   Environment mainEnv;
 
   public NamespaceEnv (Environment mainEnv)
@@ -21,8 +24,8 @@ public class NamespaceEnv extends Environment
     if (i >= 0)
       {
 	String prefix = name.substring(0, i);
-
-	Object nsValue = mainEnv.get(("xmlns:"+prefix).intern(), null);
+	Object nsValue
+	  = mainEnv.get((NAMESPACE_PREFIX+prefix).intern(), null);
 	if (nsValue != null)
 	  {
 	    String localName = name.substring(i+1);

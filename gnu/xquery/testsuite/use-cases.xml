@@ -337,13 +337,50 @@ define function section_summary($s)
 </expect>
 </test>
 
-<!--
+<test>
+
+<ident>Use Case "R" Q3 - Find cases where a user with a rating worse
+(alphabetically, greater) than "C" is offering an item with a reserve
+price of more than 1000.</ident>
+<query><![CDATA[
+<result>
+{
+    for $u in document("users.xml")//user_tuple
+return
+    for $i in document("items.xml")//item_tuple
+    where $u/rating > "C" 
+       and $i/reserve_price > 1000 
+       and $i/offered_by = $u/userid
+    return
+        <warning>
+{ $u/name }
+            { $u/rating }
+            { $i/description }
+            { $i/reserve_price }
+        </warning>
+}
+</result>
+]]>
+</query>
+<expect>
+  <result>
+    <warning>
+      <name>Dee Linquent</name>
+        <rating>D</rating>
+        <description>Helicopter</description>
+        <reserve_price>50000</reserve_price>
+    </warning>
+  </result>
+</expect>
+</test>
+
 <test>
 <ident>Use Case "R" Q11 - List the item number and description of the
 item(s) that received the highest bid ever recorded, and the amount of
 that bid.</ident>
+<NOTE>explicitly cast using number before calling max</NOTE>
 <query><![CDATA[
-let $highbid := max(document("bids.xml")//bid_tuple/bid)
+let $highbid := <bid>{max(for $b in document("bids.xml")//bid_tuple/bid return number($b))}</bid>
 return
     <result>
       {
@@ -372,7 +409,6 @@ return
   </result>
 </expect>
 </test>
--->
 
 <test>
 <ident>Use Case "PARTS" - Recursive Parts Explosion: Q1 inline data</ident>

@@ -1,3 +1,9 @@
+2002-03-07  Per Bothner  <per@bothner.com>
+
+	* bids.xml.in, items.xml.in, users.xml.in:  New test data files.
+	* Makefile.am (EXTRA_DIST):  Add new files.
+	* use-cases.xml:  Import 2 more test cases from W3C Use Cases.
+
 2002-02-12  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (eval):  Call CallContext.getInstance.

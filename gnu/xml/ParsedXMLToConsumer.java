@@ -4,8 +4,6 @@
 package gnu.xml;
 import gnu.lists.Consumer;
 import gnu.lists.TreeList;
-import java.net.URL;
-import gnu.mapping.Symbol;
 import gnu.mapping.Symbol;
 
 public class ParsedXMLToConsumer extends ParsedXMLHandler

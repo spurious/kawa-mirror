@@ -1,6 +1,7 @@
 package gnu.kawa.reflect;
 import gnu.kawa.reflect.ClassMemberLocation;
-import gnu.bytecode.*;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
 import gnu.mapping.*;
 import gnu.expr.*;
 

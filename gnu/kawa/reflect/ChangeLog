@@ -1,3 +1,9 @@
+2005-01-07  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (apply2): Update to use non-deprecated method.
+
+	* StaticFieldLocation.java: Split imports to avoid gcj 3.4.2 bug.
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* ClassMemberLocation.java (define): Minor non-functional tweaks.

@@ -45,7 +45,7 @@ public class SlotGet extends Procedure2
   public Object apply2 (Object obj, Object name)
   {
     if (! (name instanceof String) && ! (name instanceof FString))
-      throw WrongType.make(null, this, 1);
+      throw WrongType.make(null, this, 2, name);
     Interpreter interpreter = Interpreter.getInterpreter();
     String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();

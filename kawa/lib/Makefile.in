@@ -48,21 +48,42 @@ SUFFIXES = .java .scm .class
 JAVA = java
 JAVAFLAGS = -classpath ../..:$$CLASSPATH
 
-JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
+JAVAC = javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
+KAWA = $(JAVA) $(JAVAFLAGS) kawa.repl
 
 javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
   std_syntax.class \
   thread.class \
+  characters.class \
+  vectors.class \
   when_unless.class
 
-java_DATA=$(OBJ)
+# These are generated automatically when the $(OBJ) files are built,
+# but they also need to be installed.
+# The funny names are because the Scheme functions names get "mangled"
+# into valid Java class names.
+SECONDARY_OBJS=\
+  char_002d_003einteger.class\
+  char_002ddowncase.class\
+  char_002dlower_002dcase_003f.class\
+  char_002dnumeric_003f.class\
+  char_002dupcase.class\
+  char_002dupper_002dcase_003f.class\
+  char_002dwhitespace_003f.class\
+  integer_002d_003echar.class\
+  list_002d_003evector.class\
+  vector_002dlength.class\
+  vector_002dref.class\
+  vector_002dset_0021.class
+
+java_DATA=$(OBJ) $(SECONDARY_OBJS)
 
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.scm)
 
-CLEANFILES=$(OBJ)
+CLEANFILES = *.class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DATA =  $(java_DATA)
@@ -78,7 +99,7 @@ default: all
 
 
 $(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
+	cd $(top_srcdir) && automake --strictness=foreign $(subdir)/Makefile
 
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -108,7 +129,7 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = kawa/lib
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
@@ -117,7 +138,6 @@ info:
 dvi:
 check: all
 installcheck:
-install-info:
 install-exec: 
 	$(NORMAL_INSTALL)
 
@@ -163,17 +183,16 @@ maintainer-clean:  maintainer-clean-generic distclean
 	@echo "it deletes files that may require special tools to rebuild."
 
 .PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi check installcheck install-info install-exec install-data install \
-uninstall all installdirs mostlyclean-generic distclean-generic \
-clean-generic maintainer-clean-generic clean mostlyclean distclean \
-maintainer-clean
+dvi check installcheck install-exec install-data install uninstall all \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
 	$(JAVAC) -d ../.. $<
 
 .scm.class:
-	$(JAVA) $(JAVAFLAGS) kawac -d ../.. $< $(subdir).
+	$(KAWA) -d ../.. -P $(subdir). -C $< 
 
 all: $(OBJ)
 .SUFFIXES:

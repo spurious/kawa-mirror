@@ -1,3 +1,8 @@
+Mon Feb  3 17:36:41 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* characters.scm, vectors.scm:  New files.
+	* Makefile.am: Upadte.  Use new $KAWA.
+
 Mon Jan 20 16:45:20 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* std_syntax.scm (do):  Handle sequence of exit commands.

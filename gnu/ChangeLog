@@ -1,5 +1,7 @@
 2002-06-11  Per Bothner  <per@bothner.com>
 
+	* kawa/Makefile.am (SUBDIRS):  Add xslt and sax, if enabled.
+
 	* Makefile.am (EXTRA_DIST):  Don't list PACKAGES.
 
 2002-05-14  Per Bothner  <per@bothner.com>

@@ -968,12 +968,29 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitMul () { emitBinop (104); }
   public final void emitDiv () { emitBinop (108); }
   public final void emitRem () { emitBinop (112); }
-  public final void emitShl () { emitBinop (120); }
-  public final void emitShr () { emitBinop (122); }
-  public final void emitUshr() { emitBinop (124); }
   public final void emitAnd () { emitBinop (126); }
   public final void emitIOr () { emitBinop (128); }
   public final void emitXOr () { emitBinop (130); }
+
+  public final void emitShl () { emitShift (120); }
+  public final void emitShr () { emitShift (122); }
+  public final void emitUshr() { emitShift (124); }
+
+  private void emitShift (int base_code)
+  {
+    Type type2 = popType().promote();
+    Type type1_raw = popType();
+    Type type1 = type1_raw.promote();
+
+    if (type1 != Type.int_type && type1 != Type.long_type)
+      throw new Error ("the value shifted must be an int or a long");
+
+    if (type2 != Type.int_type)
+      throw new Error ("the amount of shift must be an int");
+
+    emitTypedOp(base_code, type1);
+    pushType(type1_raw);
+  }
 
   public final void emitNot(Type type)
   {

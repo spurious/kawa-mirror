@@ -34,12 +34,9 @@ implements Sequence, PositionConsumer, PositionContainer
     return size;
   }
 
-  protected void
-  makePosition(int index, boolean isAfter,
-	       PositionContainer posSet, int posNumber)
+  public int createPosition(int index, boolean isAfter)
   {
-    posSet.setPosition(posNumber, (index << 1) | (isAfter ? 1 : 0), null);
-    posSet.setSequence(posNumber, this);
+    return (index << 1) | (isAfter ? 1 : 0);
   }
 
   /*

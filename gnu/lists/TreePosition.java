@@ -44,7 +44,7 @@ public class TreePosition extends SeqPosition implements Cloneable
 
   public TreePosition(AbstractSequence seq, int index)
   {
-    seq.makePosition(index, false, this, 0);
+    super(seq, index, false);
   }
 
   public TreePosition (TreePosition pos)

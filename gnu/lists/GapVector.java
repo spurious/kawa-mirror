@@ -162,14 +162,12 @@ public class GapVector extends AbstractSequence implements Sequence
     remove(0, null, base.getBufferLength() << 1, null);
   }
 
-  protected void makePosition(int index, boolean isAfter,
-			      PositionContainer posSet, int posNumber)
+  public int createPosition(int index, boolean isAfter)
   {
     if (index > gapStart)
       index += gapEnd - gapStart;
     // if (index == gapStart && isAfter) index = gapEnd; ??
-    posSet.setPosition(posNumber, (index << 1) | (isAfter ? 1 : 0), null);
-    posSet.setSequence(posNumber, this); // FIXME - handled by caller?
+    return (index << 1) | (isAfter ? 1 : 0);
   }
 
   protected boolean isAfter(int ipos, Object xpos)

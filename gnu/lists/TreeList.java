@@ -683,9 +683,7 @@ implements Consumer, PositionConsumer, Consumable
       }
   }
 
-  protected void
-  makePosition(int index, boolean isAfter,
-	       PositionContainer posSet, int posNumber)
+  public int createPosition(int index, boolean isAfter)
   {
     int i = 0;
     while (--index >= 0)
@@ -694,8 +692,7 @@ implements Consumer, PositionConsumer, Consumable
 	if (i < 0)
 	  throw new IndexOutOfBoundsException();
       }
-    posSet.setPosition(posNumber, (i << 1) | (isAfter ? 1 : 0), null);
-    posSet.setSequence(posNumber, this);
+    return (i << 1) | (isAfter ? 1 : 0);
   }
 
   public boolean gotoChildrenStart(TreePosition pos)
@@ -1142,7 +1139,15 @@ implements Consumer, PositionConsumer, Consumable
 
   public int stringValue(int index, StringBuffer sbuf)
   {
-    return stringValue(false, index, sbuf);
+    int next = nextNodeIndex(index, -1 >>> 1);
+    if (next > index)
+      {
+	while (index < next && index >= 0)
+	  index = stringValue(false, index, sbuf);
+	return index;
+      }
+    else
+      return stringValue(false, index, sbuf);
   }
 
   public int stringValue(boolean inGroup, int index, StringBuffer sbuf)

@@ -361,6 +361,17 @@ public abstract class AbstractSequence
   }
 
   /** Generate a position at a given index.
+   * The result is a position cookie that must be free'd with releasePosition.
+   * @param index offset from beginning of desired position
+   * @param isAfter should the position have the isAfter property
+   * @exception IndexOutOfBoundsException if index is out of bounds
+   */
+  public int createPosition(int index, boolean isAfter)
+  {
+    throw unsupported("createPosition");
+  }
+
+  /** Generate a position at a given index.
    * @param index offset from beginning of desired position
    * @param isAfter should the position have the isAfter property
    * @param posSet where to store the generated position
@@ -368,9 +379,13 @@ public abstract class AbstractSequence
    *   position there should be alread released, if needed.
    * @exception IndexOutOfBoundsException if index is out of bounds
    */
-  protected abstract void
+  protected void
   makePosition(int index, boolean isAfter,
-	       PositionContainer posSet, int posNumber);
+	       PositionContainer posSet, int posNumber)
+  {
+    posSet.setPosition(posNumber, createPosition(index, isAfter), null);
+    posSet.setSequence(posNumber, this); // FIXME - handled by caller?
+  }
 
   /** Generate a position relative to an existing position.
    * @param istart int part of initial position

@@ -1,3 +1,20 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java.in (createPosition):  New semi-abstract method.
+	(makePosition):  New default implementation uses createPosition.
+	* GapVector.java (makePosition):  Remove - just use inherited default.
+	(createPosition):  New method.
+	* SimpleVector.java.in (makePosition):  Likewise remove.
+	(createPosition):  New method.
+	* StableVector.java (makePosition):  Likewise remove.
+	* TreePositionList.java (makePosition):  Likewise remove.
+	(createPosition):  New method.
+	* TreePosition.java (<init>):  Just call super constructor.
+	* TreeList.java (makePosition):  Likewise remove.
+	(createPosition):  New method.
+
+	* TreeList.java (stringValue):  Use nextNodeIndex.
+
 2002-04-06  Per Bothner  <per@bothner.com>
 
 	* NodePredicate.java:  New class, extends ElementPredicate.

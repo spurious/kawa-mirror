@@ -5271,7 +5271,7 @@ as the inverted quote string @code{]mystring[}, and both are instances
 of the type @code{<string>}.
 In KRL @code{"mystring"} is a normal Scheme string of type @code{<string>},
 but @code{]mystring[} is special type that suppresses output escaping.
-(It is equivalent to @code{(unescaped-data "mystring")}.
+(It is equivalent to @code{(unescaped-data "mystring")}.)
 @item
 When BRL writes out a string, it does not do any processing
 to escape special characters like @code{<}.  However, KRL in its default
@@ -5284,9 +5284,9 @@ or by using the @code{unescaped-data} function.
 Various Scheme syntax forms, including @code{lambda},
 take a @code{<body>}, which is a list of one or more declarations and
 expressions.  In normal Scheme and in BRL the value of a @code{<body>}
-is the value of the last expression.  In KRL the value of a @code{<body>})
+is the value of the last expression.  In KRL the value of a @code{<body>}
 is the concatenation of all the values of the expressions,
-as if using @code{values-append}
+as if using @code{values-append}.
 @item
 In BRL a word starting with a colon is a keyword.
 In KRL a word starting with a colon is an identifier, which by

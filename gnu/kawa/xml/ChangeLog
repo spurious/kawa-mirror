@@ -1,3 +1,7 @@
+2001-11-24  Jim White <jim@pagesmiths.com>
+
+	* Attributes.java:  Fix/update 'package' declaration.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* ElementConstructor.java (compile):  Use compileWithPosition.

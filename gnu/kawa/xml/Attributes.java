@@ -1,7 +1,7 @@
 // Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
-package gnu.xquery.util;
+package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
 

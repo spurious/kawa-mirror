@@ -1,60 +1,58 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_OUTPUT):  Added gnu/kawa/lispexpr/Makefile.
+	* gnu/Makefile.am (SUBDIRS):  Do text before mapping, now that text
+	no longer depends on mapping (but mapping still depends on text).
+	* kawa/lang/CompileFile.java:  LispReader moved to gnu.kawa.lispexpr.
+	* kawa/lang/ScmRead.java:  Moved to gnu.kawa.lispexpr.
+	* kawa/lang/Makefile.am:  Updated accordingly.
+	* kawa/standard/Scheme.java:  Update imports.
+	* kawa/Shell.java:  LispReader moved to gnu.kawa.lispexpr.
+
+	* kawa/lang/Translator.java (finishModule):  If SUPERTYPE_SPECIFIED,
+	force declaration to be non-static.
+	* kawa/standard/module_extends.java:  Set SUPERTYPE_SPECIFIED.
+	* kawa/standard/module_implements.java:  Likewise.
+	
+	* kawa/standard/read.java: Use RuntimeException or WrappedException
+	instead of semi-deprecated GenericException.
+	* kawa/standard/call_with_input_file.java:  Likewise.
+	* kawa/standard/call_with_output_file.java: Likewise.
+	* kawa/standard/make.java: Likewise.
+	* kawa/standard/scheme_env.java: Likewise.
+	* kawa/standard/string2number.java: Likewise.
+	* kawa/standard/with_input_from_file.java: Likewise.
+
 2000-05-27  Per Bothner  <per@bothner.com>
 
-	* M ChangeLog
-M NEWS
-M TODO
-cvs server: Updating debian
-cvs server: Updating doc
-M doc/Makefile.am
-M doc/Makefile.in
-M doc/kawa.texi
-cvs server: Updating gnu
-M gnu/expr/BindingInitializer.java
-M gnu/expr/ChainLambdas.java
-M gnu/expr/Compilation.java
-M gnu/expr/Declaration.java
-M gnu/expr/ExpWalker.java
-M gnu/expr/FindCapturedVars.java
-M gnu/expr/FindTailCalls.java
-M gnu/expr/LambdaExp.java
-M gnu/expr/LetExp.java
-M gnu/expr/ModuleBody.java
-M gnu/expr/ModuleExp.java
-M gnu/expr/ObjectExp.java
-M gnu/expr/ReferenceExp.java
-M gnu/expr/ScopeExp.java
-M gnu/expr/SetExp.java
-M gnu/kawa/reflect/ClassMemberConstraint.java
-cvs server: Updating gnu/kawa/slib
-M gnu/kawa/slib/ppfile.scm
-M kawa/lang/Lambda.java
-M kawa/lang/Macro.java
-M kawa/lang/Syntax.java
-M kawa/lang/Translator.java
-cvs server: Updating kawa/lib
-M kawa/lib/files.scm
-M kawa/lib/lists.scm
-M kawa/lib/strings.scm
-M kawa/lib/trace.scm
-M kawa/lib/uniform.scm
-M kawa/lib/vectors.scm
-cvs server: Updating kawa/standard
-M kawa/standard/Makefile.am
-M kawa/standard/Makefile.in
-M kawa/standard/Scheme.java
-M kawa/standard/define.java
-M kawa/standard/define_alias.java
-M kawa/standard/define_syntax.java
-M kawa/standard/let.java
-M kawa/standard/letrec.java
-M kawa/standard/require.java
-M kawa/standard/set_b.java
-cvs server: Updating testsuite
-M testsuite/misc-test.scm
-M testsuite/num-test.scm
-M testsuite/obj-test.scm
-M testsuite/test.scm
+	* kawa/repl.java (main):  New --module-static flag.
+	* kawa/lang/Syntax.java (<init>):  Set TYPE_SPECIFIED and IS_CONSTANT.
+	* kawa/lang/Macro.java (setExpander):  New method.
+	* kawa/lang/Lambda.java (rewrite):  Maybe set TYPE_SPECIFIED on param.
+	* kawa/lang/Translator.java (finishModule):  Process static and
+	export specification.
 
+	* kawa/standard/module_static.java:  New class; extends Syntax.
+	* kawa/standard/export.java:  New class; extends Syntax.
+	* kawa/standard/Makefile.am (java_JAVA):  Add new files.
+	* kawa/standard/Scheme.java (initScheme):  Add module-static and
+	module-export.
+
+	* kawa/standard/Scheme.java (demangleName):  Fix to handle
+	minor changes in Compilation.mangleName.
+
+	* kawa/standard/define.java:  Handle optional type-specifier.
+	* kawa/standard/define_alias.java:  If aliased expression is a simple
+	name, don't call rewrite (which does setIndirectBinding).
+	(scanForDefinitions):  Don't set decl type until rewrite.
+	* kawa/standard/define_syntax.java:  If immediate, call Macro's
+	setExpander method, re-using current Macro.
+	* kawa/standard/let.java (rewrite): Set TYPE_SPECIFIED in Declaration.
+	* kawa/standard/letrec.java:  Likewise.
+	* kawa/standard/require.java (find):  Fix typo.
+	(scanForDefinitions):  Note that Declaration is not simple.
+	Note mustCompileHere.
+	* kawa/standard/set_b.java:  Do followAliases.
 
 2000-05-22  Per Bothner  <per@bothner.com>
 

@@ -387,6 +387,7 @@ public class Scheme extends LispInterpreter
 		   "callWithValues");
       defSntxStFld("let-values", "kawa.lib.syntax");
       defSntxStFld("let*-values", "kawa.lib.syntax");
+      defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));

@@ -1,3 +1,7 @@
+2004-12-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheem.java (initScheme): Define 'case-lambda'.
+
 2004-12-18  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxRules.java (<init>):  Allow an empty list in

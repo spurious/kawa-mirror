@@ -1,3 +1,7 @@
+Tue Apr 28 21:53:13 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm (port-line, port-column): Make port argument required.
+
 Sat Apr  4 21:10:56 1998  Per Bothner  <bothner@cygnus.com>
 
 	* misc.scm (scheme-implementation-version):  Re-implement to use

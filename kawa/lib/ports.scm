@@ -28,7 +28,7 @@
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
-(define (port-line #!optional (port (current-input-port)))
+(define (port-line port)
   ((primitive-virtual-method <kawa.lang.LineBufferedReader> "getLineNumber"
 			     <int> ())
    port))
@@ -43,7 +43,7 @@
 (define (set-input-port-line-number! port num)
   (set-port-line port (- num 1)))
 
-(define (port-column #!optional (port (current-input-port)))
+(define (port-column port)
   ((primitive-virtual-method <kawa.lang.LineBufferedReader>
 			     "getColumnNumber" <int> ())
    port))

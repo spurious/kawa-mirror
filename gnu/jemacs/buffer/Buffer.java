@@ -6,6 +6,7 @@ import gnu.mapping.InPort;
 import gnu.lists.CharSequence;
 import gnu.text.Char;
 import gnu.lists.CharBuffer;
+import gnu.commonlisp.lang.Symbol;
 
 public class Buffer extends DefaultStyledDocument
 {
@@ -532,6 +533,15 @@ public class Buffer extends DefaultStyledDocument
     return new Leaf(this, parent, attributes, p0, p1);
   }
   */
+
+  /**
+   * @param all true if make-variable-buffer-local,
+   *  false if make-local-variable FIXME
+   */
+  public static void makeBufferLocal(Object symbol, boolean all)
+  {
+    BufferLocalConstraint.make(Symbol.getBinding(symbol), all);
+  }
 }
 
 /*

@@ -17,7 +17,7 @@ public class Command extends javax.swing.text.TextAction
   {
     super(name);
     if (command instanceof String)
-      command = gnu.jemacs.lang.Symbol.getBinding((String) command);
+      command = gnu.commonlisp.lang.Symbol.getBinding((String) command);
     this.command = command;
     this.key = key;
   }
@@ -47,9 +47,14 @@ public class Command extends javax.swing.text.TextAction
     for (;;)
       {
 	if (command instanceof String)
-	  command = gnu.jemacs.lang.Symbol.getBinding(command);
-	if (command instanceof Binding2)
-	  command = ((Binding2) command).functionValue;
+	  command = gnu.commonlisp.lang.Symbol.getBinding(command);
+	if (command instanceof Binding)
+	  {
+	    Binding bind = (Binding) command;
+	    command = bind.getFunctionValue(null);
+	    if (command == null)
+	      command = bind.getValue();
+	  }
 	else
 	  return command;
 	if (--count < 0)
@@ -63,7 +68,7 @@ public class Command extends javax.swing.text.TextAction
   {
     try
       {
-	if (command instanceof String || command instanceof Binding2)
+	if (command instanceof String || command instanceof Binding)
           {
             Object resolved = resolveSymbol(command);
             if (resolved == null)
@@ -203,12 +208,12 @@ public class Command extends javax.swing.text.TextAction
   public void actionPerformed(java.awt.event.ActionEvent event)
   {
     Object comm = command;
-    if (comm instanceof Binding2)
+    if (comm instanceof Binding)
       {
         comm = resolveSymbol(comm);
         if (comm == null)
           throw new Error("no function defined for "
-                          + ((Binding2) command).getName());
+                          + ((Binding) command).getName());
       }
     if (comm instanceof TextAction)
       ((TextAction) comm).actionPerformed(event);

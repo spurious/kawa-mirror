@@ -1,5 +1,10 @@
+Added open-input-string from SRFI-6.
+
 Changes from Kawa 1.6.59 to 1.6.60
 ==================================
+There is a new package gnu.kawa.reflect.  Some classes
+that used to be in kawa.lang or kawa.standard are now there.
+
 The procedures slot-ref and slot-set! are now available.
 They are equivalent to the existing `field', but reading
 a field `x' will look for `getX' method if there is no public
@@ -26,7 +31,7 @@ actually calls the "best"-matching method.  An example:
         (invoke-static <java.lang.Thread> 'sleep 100)
 
 Many fewer classes are now generated when compiling a Scheme file.
-It used to be that each top-level procedure got cmpiled to its
+It used to be that each top-level procedure got compiled to its
 own class;  that is no longer the case.  The change should
 lead to faster startup and less resource use, but procedure
 application will probably be noticably slower (though not so much

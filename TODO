@@ -26,6 +26,8 @@ literals:  symbols listed among the literals lists are matched as
 raw symbols, rather that checking that the symbol has the same
 binding, if any, as at the defining site.
 
+Complain if syntax or macro is used in other than function-call position.
+
 Why is start pc==0 in LocalVariableTable?
 
 Let LineBufferedReader pos, limit, buffer be private,

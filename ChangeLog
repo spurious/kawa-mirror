@@ -1,3 +1,59 @@
+1999-10-25  Per Bothner  <per@bothner.com>
+
+	* Makefile.am, Makefile.in (makekawa.bat):  Depend on configure.in.
+	* configure.in, configure:  Set version to 1.6.61.
+
+	* doc/kawa.texi:  Document `invoke'.
+	* NEWS, TODO:  Updates.
+
+	* kawa/lang/Syntax.java (scanForDefinitions):  New method.
+	* kawa/lang/AutoloadSyntax.java (scanForDefinitions):  New method.
+	* kawa/lang/Macro.java (scanForDefinitions):  New method.
+	* kawa/lang/Translator.java
+ 	(rewrite_pair):  Handle varargs method (apply$V and NAME$V).
+	(scan_form):  Rewr-ite to use new Syntax.scanForDefinitions.
+	More logic specific to a syntax to the corresponding method.
+	* kawa/standard/begin.java (scanForDefinitions):  New method.
+	* kawa/standard/define.java (scanForDefinitions):  New method.
+	* kawa/standard/define_alias.java (scanForDefinitions):  New method.
+	* kawa/standard/define_syntax.java (scanForDefinitions):  New method.
+	* kawa/standard/Scheme.java (defineSyntax, defineSyntaxPrivate,
+	beginSyntax, defineAliasSyntax, defineSyntaxSyntax):  Remove fields.
+	(initScheme):  Fix typo "kawa.lib.number" -> "kawa.lib.numbers".
+	Add "open-input-string" (SRFI-6), "define-class", "invoke".
+
+	* kawa/standard/object.java (rewriteClassDef):  New method.
+	* kawa/standard/define_class.java:  New class.
+	* kawa/standard/{Makefile.am,Makefile.in} (java_JAVA):  Update.
+
+	* kawa/standard/read_line.java (apply):  Re-throw a WrappedException.
+
+	* kawa/standard/make_future.java (apply1):  Future Procedure
+	no longer is necessarily a Procedure1.
+
+1999-10-13  Walter C. Pelissero <wcp@demon.db.de>
+
+	* kawa/standard/TracedProcedure.java:  Catch RuntimeException,
+	print to trace output, and re-throw.
+
+1999-10-13  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/TracedProcedure.java:  Indent output.
+
+1999-10-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/TracedProcedure.java:  Indent nested calls.
+
+1999-10-07    	Walter C. Pelissero <wcp@demon.db.de>.
+
+	* kawa/standard/Scheme.java:  Fix typo number -> numbers.
+
+1999-10-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/make_future.java:  Future action is now Procedure,
+	not necessarily Procedure0.
+  	Fixes bug reported by Walter C. Pelissero <wcp@demon.db.de>.
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.60.

@@ -1,3 +1,7 @@
+Sat Jan  2 19:35:56 1999  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (KAWA):  Use ../kawa/kawa.sh, not ../kawa/kawa.
+
 Sat Oct 17 14:45:07 1998  Per Bothner  <bothner@cygnus.com>
 
 	* misc-test.scm:  Add a test for new synchronized form.

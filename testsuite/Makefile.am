@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 KAWALIB = ..
-KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa
+KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa.sh
 KAWATEST = $(KAWA) -e '(load "testing.zip")'
 
 all:

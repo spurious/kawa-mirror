@@ -205,7 +205,7 @@ public class ELisp extends Lisp2
   {
     ELisp interp = new ELisp();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 
   public Object read (InPort in)

@@ -1,3 +1,7 @@
+2004-01-09  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (registerEnvironment):  Update setCurrent to setGlobal.
+
 2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* ELisp.java (<init>):  Use new string-append implementation.

@@ -75,7 +75,7 @@ public class BRL extends Scheme
   {
     BRL interp = new BRL();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 
   public Expression makeBody(Expression[] exps)

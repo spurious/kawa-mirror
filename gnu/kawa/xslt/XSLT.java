@@ -93,7 +93,7 @@ public class XSLT extends XQuery
   {
     XSLT interp = new XSLT();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 
   public static void defineCallTemplate(Symbol name,

@@ -1,5 +1,10 @@
 2001-11-23  Per Bothner  <per@bothner.com>
 
+	* CheckedTarget.java (emitCheckedCoerce)  If target type is
+	tostring_target, don't need to catch cast exception.
+	* StackTarget.java (compileFromStack0):  Use isSubclass rather than
+	isSubtype to check that we don't need to emit a conversion.
+
 	* PrimProcedure.java:  Remove unneeded variable.
 	* ConsumerTarget.java:  Use Compilation.typeConsumer.
 

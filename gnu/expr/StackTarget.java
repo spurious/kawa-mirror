@@ -40,7 +40,16 @@ public class StackTarget extends Target
       }
 
     stackType.emitCoerceToObject(code);
-    return type instanceof ClassType && stackType.isSubtype(type);
+    if (stackType instanceof ArrayType)
+      {
+	if (type == Type.pointer_type
+	    || "java.lang.Cloneable".equals(type.getName()))
+	  return true;
+	// FIXME should check if stackType is compatible array type.
+      }
+    return type instanceof ClassType
+      && stackType instanceof ClassType
+      && ((ClassType) stackType).isSubclass((ClassType) type);
   }
 
   public static void convert(Compilation comp, Type stackType, Type targetType)

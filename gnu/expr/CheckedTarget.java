@@ -110,6 +110,10 @@ public class CheckedTarget extends StackTarget
     if (endPC == startPC)
       return;
 
+    // Can never raise an exception, so we don't need to catch it.
+    if (type == Type.tostring_type)
+      return;
+
     Label endLabel = null;
     if (isInTry)
       {

@@ -234,7 +234,7 @@ public abstract class Interpreter
           return getTypeFor((Class) spec);
         if (spec instanceof String || spec instanceof Binding)
           return getTypeFor(spec.toString());
-        if (spec instanceof gnu.lists.CharSequence)
+        if (spec instanceof CharSeq)
           return gnu.bytecode.ClassType.make(spec.toString());
       }
     return (Type) spec;

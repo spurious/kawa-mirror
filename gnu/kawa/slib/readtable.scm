@@ -79,6 +79,4 @@
   (let* ((disp-entry :: <gnu.kawa.lispexpr.ReaderDispatch>
 		     (invoke readtable 'lookup disp-char))
 	 (sub-entry (invoke disp-entry 'lookup sub-char)))
-    (eq? sub-entry #!null #f sub-entry)))
-
-    
+    (if (eq? sub-entry #!null) #f sub-entry)))

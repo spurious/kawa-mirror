@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class ClassType extends Type implements AttrContainer {
+public class ClassType extends ObjectType implements AttrContainer {
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
@@ -15,7 +15,7 @@ public class ClassType extends Type implements AttrContainer {
    * but not one where you are about to generate code for.
    * @param name the name of the class (e..g. "java.lang.String").
    */
-  static ClassType make(String name)
+  public static ClassType make(String name)
   {
     if (classTable == null)
       classTable = new java.util.Hashtable();
@@ -102,19 +102,7 @@ public class ClassType extends Type implements AttrContainer {
 
   public ClassType[] getInterfaces() { return interfaces; }
 
-  /** Get the java.lang.Class object for the representation type. */
-  public Class getReflectClass()
-  {
-    try
-      {
-	if (reflectClass == null)
-	  reflectClass = Class.forName(getName());
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-      }
-    return reflectClass;
-  }
+  public String getNameOrSignature() { return getName(); }
 
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
@@ -124,7 +112,6 @@ public class ClassType extends Type implements AttrContainer {
   public ClassType (String class_name)
   {
     super();
-    size = 4;
     setName(class_name);
   }
 
@@ -142,6 +129,18 @@ public class ClassType extends Type implements AttrContainer {
 
   /** Constant pool index of "LineNumberTable". */
   int LineNumberTable_name_index;
+
+  /** Find a field with the given name,or null. */
+  public Field getField(String name)
+  {
+    Field field;
+    for (field = fields;   field != null;  field = field.next)
+      {
+	if (name.equals(field.name))
+	  return field;
+      }
+    return null;
+  }
 
   /**
    * Add a new field to this class.
@@ -194,10 +193,43 @@ public class ClassType extends Type implements AttrContainer {
     return method;
   }
 
+  // deprecated:
   public Method addMethod (String name,
 			   Type[] arg_types, Type return_type,
 			   int flags) {
-    Method method = new Method (this, flags);
+    return addMethod(name, flags, arg_types, return_type);
+  }
+
+  /** Add a method to this ClassType.
+    * If an existing method matches, return that.  Otherwise, create
+    * a new one.
+    * In contrast, the other addMethod methods always create new Methods. */
+  public Method addMethod (String name, int flags,
+			   Type[] arg_types, Type return_type)
+  {
+    Method method;
+    for (method = methods;  method != null;  method = method.next)
+      {
+	if (! name.equals(method.getName())
+	    || ! return_type.equals(method.getReturnType())
+	    || flags != method.access_flags)
+	  continue;
+	Type[] method_args = method.getParameterTypes();
+	if (arg_types == method_args)
+	  return method;
+	int i = arg_types.length;
+	if (i != method_args.length)
+	  continue;
+	while (-- i >= 0)
+	  {
+	    if (arg_types[i] != method_args[i])
+	      break;
+	  }
+	if (i < 0)
+	  return method;
+      }
+
+    method = new Method (this, flags);
     method.setName(name);
     method.arg_types = arg_types;
     method.return_type = return_type;
@@ -342,15 +374,6 @@ public class ClassType extends Type implements AttrContainer {
       }
     }
     return buffer;
-  }
-
-  /** Compile (in given method) cast from Object to this Type. */
-  public void emitCoerceFromObject (CodeAttr code)
-  {
-    if (this == Type.string_type)
-      code.emitInvokeVirtual(Type.toString_method);
-    else if (this != Type.pointer_type)
-      code.emitCheckcast(this);
   }
 
   public String toString()

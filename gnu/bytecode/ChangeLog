@@ -1,3 +1,17 @@
+Mon Mar  2 22:56:44 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Type.java (make):  New static method.
+	* ArrayType.java (getComponentType):  New method.
+	* ClassType.java (getField):  New method.
+	(addMethod):  Re-use existing Method if there is a match.
+ 	(getReflectClass, emitCoerceFromObject):  Move to ObjectType.
+	* ObjectType.java:  New abstract class.
+	* Makefile.am, Makefile.in (OBJ):  Added ObjectType.class.
+
+	* CodeAttr (emitTypedOp):  New private method.
+	(emitArrayStore, emitArrayLoad, emitNewArray):  New methods.
+	* Method.java (compile_array_store, compile_array_load):  Removed.
+
 Mon Feb 23 22:50:46 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (emitConvert):  Fix thinko - s/to_sig/from_sig/.

@@ -3,26 +3,19 @@
 
 package gnu.bytecode;
 
-public class ArrayType extends Type
+public class ArrayType extends ObjectType
 {
   public Type elements;
 
   public ArrayType (Type elements)
   {
-    super (elements.getName() + "[]", "[" + elements.getSignature());
+    this_name = elements.getName() + "[]";
+    setSignature("[" + elements.getSignature());
     this.elements = elements;
   }
 
-  public Class getReflectClass()
-  {
-    try
-      {
-	if (reflectClass == null)
-	  reflectClass = Class.forName(getSignature());
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-      }
-    return reflectClass;
-  }
+  public Type getComponentType() { return elements; }
+
+  public String getNameOrSignature() { return getSignature(); }
+
 }

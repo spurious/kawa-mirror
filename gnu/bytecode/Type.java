@@ -15,13 +15,25 @@ public class Type {
 
   Type () { }
 
+  public static Type make(Class reflectClass)
+  {
+    Type type;
+    if (reflectClass.isArray())
+      type = new ArrayType(Type.make(reflectClass.getComponentType()));
+    else if (reflectClass.isPrimitive())
+      throw new Error("not implemented - make(primitive type)"); // FIXME
+    else
+      type = new ClassType(reflectClass.getName());
+    type.reflectClass = reflectClass;
+    return type;
+  }
+
   public final String getSignature () { return signature; }
   protected void setSignature(String sig) { this.signature = sig; }
 
   Type (String nam, String sig) {
     this_name = nam;
     signature = sig;
-    size = 4;
   }
 
   public Type promote () {
@@ -207,7 +219,7 @@ public class Type {
   /** Compile code to coerce/convert from Object to this type. */
   public void emitCoerceFromObject (CodeAttr code)
   {
-    throw new Error ("unimplemented emitCoerceFromObject");
+    throw new Error ("unimplemented emitCoerceFromObject for "+this);
   }
 
   static public Type byte_type = new PrimType ("byte", "B", 1,

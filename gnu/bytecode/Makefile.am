@@ -18,7 +18,7 @@ OBJ=\
 Access.class \
 Attribute.class \
 AttrContainer.class \
-ArrayType.class \
+ObjectType.class ArrayType.class \
 ClassType.class \
 ConstantPool.class \
 CpoolClass.class \

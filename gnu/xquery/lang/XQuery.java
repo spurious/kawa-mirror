@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -125,7 +125,6 @@ public class XQuery extends Interpreter
     Environment scmEnv = Scheme.builtin();
     environ = new Environment(scmEnv);
     environ.setName ("interaction-environment."+(++envCounter));
-    Environment.setCurrent(environ);
     ModuleBody.setMainPrintValues(true);
 
     /*
@@ -145,6 +144,8 @@ public class XQuery extends Interpreter
     if (instance == null)
       instance = this;
 
+    Environment saveEnv = Environment.getCurrent();
+    Environment.setCurrent(environ);
     try
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
@@ -160,6 +161,10 @@ public class XQuery extends Interpreter
 	// Ignore.  We get a ClassNotFoundException if gnu.kawa.slib.HTTP
 	// was not built.  We get a NoClassDefFoundError if gnu.kawa.slib.HTTP
 	// can't find servlets in the classpath.
+      }
+    finally
+      {
+	Environment.setCurrent(saveEnv);
       }
 
     define("define", new kawa.standard.set_b());
@@ -191,24 +196,16 @@ public class XQuery extends Interpreter
   public static XQuery getInstance()
   {
     if (instance == null)
-      {
-        Environment saveEnv = Environment.getCurrent();
-        try
-          {
-            instance = new XQuery();
-          }
-        finally
-          {
-            Environment.setCurrent(saveEnv);
-          }
-      }
+      instance = new XQuery();
     return instance;
   }
 
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Interpreter.defaultInterpreter = new XQuery();
+    XQuery interp = new XQuery();
+    Interpreter.defaultInterpreter = interp;
+    Environment.setCurrent(interp.getEnvironment());
   }
 
   public Object read (InPort in)

@@ -1,3 +1,6 @@
+// Copyright (c) 2000, 2001  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.kawa.functions;
 import gnu.math.IntNum;
 import gnu.math.Numeric;

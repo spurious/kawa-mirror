@@ -8,6 +8,7 @@ java_sources=\
   AddOp.java \
   Apply.java \
   Assoc.java \
+  DisplayFormat.java \
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
   MakeProcedure.java \

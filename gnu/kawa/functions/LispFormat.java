@@ -932,13 +932,16 @@ class LispFreshlineFormat  extends ReportFormat
   {
     int count = getParam(this.count, 1, args, start);
     if (this.count == LispFormat.PARAM_FROM_LIST)  start++;
-    int column = -1;
-    if (dst instanceof OutPort)
-      column = ((OutPort) dst).getColumnNumber();
-    if (column == 0)
-      count--;
-    while (--count >= 0)
-      dst.write('\n');
+    if (count > 0)
+      {
+	if (dst instanceof OutPort)
+	  {
+	    ((OutPort) dst).freshLine();
+	    count--;
+	  }
+	while (--count >= 0)
+	  dst.write('\n');
+      }
     return start; 
   }
 }

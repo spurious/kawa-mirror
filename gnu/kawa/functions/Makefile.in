@@ -99,7 +99,7 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_sources =    AddOp.java   Apply.java   Assoc.java   IsEq.java IsEqual.java IsEqv.java   MakeList.java   MakeProcedure.java   Member.java   Setter.java   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
+java_sources =    AddOp.java   Apply.java   Assoc.java   DisplayFormat.java   IsEq.java IsEqual.java IsEqv.java   MakeList.java   MakeProcedure.java   Member.java   Setter.java   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
 
 PACKAGE_FNAME = gnu-kawa-functions

@@ -1,3 +1,15 @@
+2003-05-30  Per Bothner  <per@bothner.com>
+
+	* lists.scm (car, cdr)  Use syntactic trick to give name to getter
+	methods that are passed to define-procedure.
+	* misc.scm (procedure-property):  Likewise.
+	* ports.scm (port-line, input-port-line-number, input-port=promoter):
+	Likewise.
+	* vectors.scm (vector-ref):  Likewise.
+
+	* syntax.scm (%defmacro):  Inline car, since it isn't defined until
+	lists.scm, which is compiled later.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* ports.scm (write-char):  Don't use writeSchemeObejct method.

@@ -63,16 +63,20 @@
 
 (define-procedure port-line
   setter: set-port-line!
-  (lambda ((port :: <gnu.text.LineBufferedReader>))
-    (invoke port 'getLineNumber)))
+  (begin
+    (define (port-line (port :: <gnu.text.LineBufferedReader>))
+      (invoke port 'getLineNumber))
+    port-line))
 
 (define (set-input-port-line-number! port num)
   (set-port-line! port (- num 1)))
 
 (define-procedure input-port-line-number
   setter: set-input-port-line-number!
-  (lambda ((port :: <gnu.text.LineBufferedReader>))
-    (+ 1 (port-line port))))
+  (begin
+    (define (input-port-line-number (port :: <gnu.text.LineBufferedReader>))
+      (+ 1 (port-line port)))
+    input-port-line-number))
 
 (define (port-column port)
   ((primitive-virtual-method <gnu.text.LineBufferedReader>
@@ -98,8 +102,10 @@
 
 (define-procedure input-port-prompter
   setter: set-input-port-prompter!
-  (lambda ((port :: <gnu.mapping.TtyInPort>))
-    (invoke port 'getPrompter)))
+  (begin
+    (define (input-port-prompter (port :: <gnu.mapping.TtyInPort>))
+      (invoke port 'getPrompter))
+    input-port-prompter))
 
 (define (close-input-port (port :: <input-port>))
   (invoke port 'close))

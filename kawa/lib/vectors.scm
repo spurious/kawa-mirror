@@ -15,8 +15,10 @@
 
 (define-procedure vector-ref
   setter: vector-set!
-  (lambda ((vector :: <vector>) (k :: <int>))
-    (invoke vector 'get k)))
+  (begin
+    (define (vector-ref (vector :: <vector>) (k :: <int>))
+      (invoke vector 'get k))
+    vector-ref))
 
 (define (vector->list (vec :: <vector>)) :: <list>
   (let loop ((result :: <list> '())

@@ -48,8 +48,10 @@
 
 (define-procedure procedure-property
   setter: set-procedure-property!
-  (lambda ((proc :: <procedure>) key #!optional default)
-    (invoke proc 'getProperty key default)))
+  (begin
+    (define (procedure-property (proc :: <procedure>) key #!optional default)
+      (invoke proc 'getProperty key default))
+    procedure-property))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

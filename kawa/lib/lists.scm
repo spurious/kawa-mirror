@@ -19,15 +19,19 @@
 
 (define-procedure car
   setter: set-car!
-  (lambda ((x :: <pair>))
-    ((primitive-get-field <pair> 'car <Object>)
-     x)))
+  (begin
+    ;; Using just a lambda would not give it a name,
+    ;; so it would use use "lambda" for a WrongType exception.
+    (define (car (x :: <pair>))
+      (field x 'car))
+    car))
 
 (define-procedure cdr
   setter: set-cdr!
-  (lambda ((x :: <pair>))
-    ((primitive-get-field <pair> 'cdr <Object>)
-     x)))
+  (begin
+    (define (cdr (x :: <pair>))
+      (field x 'cdr))
+    cdr))
 
 (define (length list :: <list>) :: <int>
   (invoke-static <list> 'length list))

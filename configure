@@ -14,8 +14,6 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --enable-maintainer-mode enable make rules and dependencies not useful
                           (and sometimes confusing) to the casual installer"
-ac_help="$ac_help
-  --with-jdk11            Assume JDK1.1 (or compatible) class libraries"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -554,7 +552,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:558: checking for a BSD compatible install" >&5
+echo "configure:556: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -609,7 +607,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
 
 PACKAGE=kawa
 
-VERSION=1.5.90
+VERSION=1.5.91
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -623,7 +621,7 @@ cat >> confdefs.h <<EOF
 EOF
 
 echo $ac_n "checking whether build environment is sane""... $ac_c" 1>&6
-echo "configure:627: checking whether build environment is sane" >&5
+echo "configure:625: checking whether build environment is sane" >&5
 # Just in case
 sleep 1
 echo timestamp > conftestfile
@@ -670,7 +668,7 @@ test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
 missing_dir=`cd $ac_aux_dir && pwd`
 echo $ac_n "checking for working aclocal""... $ac_c" 1>&6
-echo "configure:674: checking for working aclocal" >&5
+echo "configure:672: checking for working aclocal" >&5
 # Run test in a subshell; some versions of sh will print an error if
 # an executable is not found, even if stderr is redirected.
 # Redirect stdin to placate older versions of autoconf.  Sigh.
@@ -683,7 +681,7 @@ else
 fi
 
 echo $ac_n "checking for working autoconf""... $ac_c" 1>&6
-echo "configure:687: checking for working autoconf" >&5
+echo "configure:685: checking for working autoconf" >&5
 # Run test in a subshell; some versions of sh will print an error if
 # an executable is not found, even if stderr is redirected.
 # Redirect stdin to placate older versions of autoconf.  Sigh.
@@ -696,7 +694,7 @@ else
 fi
 
 echo $ac_n "checking for working automake""... $ac_c" 1>&6
-echo "configure:700: checking for working automake" >&5
+echo "configure:698: checking for working automake" >&5
 # Run test in a subshell; some versions of sh will print an error if
 # an executable is not found, even if stderr is redirected.
 # Redirect stdin to placate older versions of autoconf.  Sigh.
@@ -709,7 +707,7 @@ else
 fi
 
 echo $ac_n "checking for working autoheader""... $ac_c" 1>&6
-echo "configure:713: checking for working autoheader" >&5
+echo "configure:711: checking for working autoheader" >&5
 # Run test in a subshell; some versions of sh will print an error if
 # an executable is not found, even if stderr is redirected.
 # Redirect stdin to placate older versions of autoconf.  Sigh.
@@ -722,7 +720,7 @@ else
 fi
 
 echo $ac_n "checking for working makeinfo""... $ac_c" 1>&6
-echo "configure:726: checking for working makeinfo" >&5
+echo "configure:724: checking for working makeinfo" >&5
 # Run test in a subshell; some versions of sh will print an error if
 # an executable is not found, even if stderr is redirected.
 # Redirect stdin to placate older versions of autoconf.  Sigh.
@@ -735,7 +733,7 @@ else
 fi
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:739: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:737: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -763,7 +761,7 @@ fi
 
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6
-echo "configure:767: checking whether to enable maintainer-specific portions of Makefiles" >&5
+echo "configure:765: checking whether to enable maintainer-specific portions of Makefiles" >&5
     # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
@@ -781,19 +779,19 @@ fi
   
 
 echo $ac_n "checking for Cygwin32 environment""... $ac_c" 1>&6
-echo "configure:785: checking for Cygwin32 environment" >&5
+echo "configure:783: checking for Cygwin32 environment" >&5
 if eval "test \"`echo '$''{'am_cv_cygwin32'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 790 "configure"
+#line 788 "configure"
 #include "confdefs.h"
 
 int main() {
 int main () { return __CYGWIN32__; }
 ; return 0; }
 EOF
-if { (eval echo configure:797: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+if { (eval echo configure:795: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
   am_cv_cygwin32=yes
 else
@@ -811,7 +809,7 @@ CYGWIN32=
 test "$am_cv_cygwin32" = yes && CYGWIN32=yes
 
 echo $ac_n "checking for executable suffix""... $ac_c" 1>&6
-echo "configure:815: checking for executable suffix" >&5
+echo "configure:813: checking for executable suffix" >&5
 if eval "test \"`echo '$''{'am_cv_exeext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -875,12 +873,6 @@ test "$program_suffix" != NONE &&
 # sed with no file args requires a program.
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
-# Check whether --with-jdk11 or --without-jdk11 was given.
-if test "${with_jdk11+set}" = set; then
-  withval="$with_jdk11"
-  :
-fi
-
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
@@ -889,16 +881,6 @@ JAVAC=${JAVAC-javac}
 
 
 TOP_BUILDDIR=`pwd`
-
-case ${with_jdk11} in
-  yes)  JAVA_VERSION=1_1;;
-  no)  JAVA_VERSION=1_0;;
-  *)  JAVA_VERSION=1_0;;
-esac
-EXTRA_OBJ='$(OBJ_'${JAVA_VERSION}')'
-EXTRA_MISC='$(MISC_'${JAVA_VERSION}')'
-
-
 
 
 
@@ -1062,9 +1044,6 @@ s%@EXEEXT@%$EXEEXT%g
 s%@JAVA@%$JAVA%g
 s%@JAVAC@%$JAVAC%g
 s%@TOP_BUILDDIR@%$TOP_BUILDDIR%g
-s%@EXTRA_OBJ@%$EXTRA_OBJ%g
-s%@EXTRA_MISC@%$EXTRA_MISC%g
-s%@JAVA_VERSION@%$JAVA_VERSION%g
 
 CEOF
 EOF

@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.5.90)
+AM_INIT_AUTOMAKE(kawa, 1.5.91)
 
 AM_MAINTAINER_MODE
 AM_EXEEXT
@@ -10,7 +10,6 @@ AM_EXEEXT
 #VERSION=2.0alpha
 AC_CONFIG_AUX_DIR(.)
 AC_ARG_PROGRAM
-AC_ARG_WITH(jdk11,[  --with-jdk11            Assume JDK1.1 (or compatible) class libraries])
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
@@ -22,16 +21,6 @@ AC_SUBST(JAVAC)
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
 AC_SUBST(TOP_BUILDDIR)
-case ${with_jdk11} in
-  yes)  JAVA_VERSION=1_1;;
-  no)  JAVA_VERSION=1_0;;
-  *)  JAVA_VERSION=1_0;;
-esac
-EXTRA_OBJ='$(OBJ_'${JAVA_VERSION}')'
-EXTRA_MISC='$(MISC_'${JAVA_VERSION}')'
-AC_SUBST(EXTRA_OBJ)
-AC_SUBST(EXTRA_MISC)
-AC_SUBST(JAVA_VERSION)
 
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)

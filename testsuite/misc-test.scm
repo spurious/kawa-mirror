@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 88)
+(test-init "Miscellaneous" 94)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -406,3 +406,17 @@
 (test '("line" "line" "line" "line")
       test-read-line
       test-read-split)
+
+(define plus10 (make-procedure foo: 33 name: 'Plus10
+                            method: (lambda (x y) (+ x y 10))
+                            method: (lambda () 10)))
+(test 50 plus10 30 10)
+(test 10 plus10)
+;;(test 10 'plus10-error
+;;      (try-catch (plus10 3) (ex <java.lang.Exception> "error")))
+(test 33 procedure-property plus10 'foo)
+(set-procedure-property! plus10 'foo 44)
+(test 44 procedure-property plus10 'foo)
+(test "#<procedure Plus10>" 'plus10-name1 (format "~s" plus10))
+(set-procedure-property! plus10 'name 'PlusTen)
+(test "#<procedure PlusTen>" 'plus10-name2 (format "~s" plus10))

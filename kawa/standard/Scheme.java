@@ -262,10 +262,10 @@ public class Scheme extends Interpreter
       define_proc ("lcm", "kawa.standard.lcm");
       define_proc ("numerator", "kawa.lib.numbers");
       define_proc ("denominator", "kawa.lib.numbers");
-      define_proc ("floor", "kawa.standard.floor");
-      define_proc ("ceiling", "kawa.standard.ceiling");
-      define_proc ("truncate", "kawa.standard.truncate");
-      define_proc ("round", "kawa.standard.round");
+      define_proc ("floor", "kawa.lib.numbers");
+      define_proc ("ceiling", "kawa.lib.numbers");
+      define_proc ("truncate", "kawa.lib.numbers");
+      define_proc ("round", "kawa.lib.numbers");
       define_proc ("rationalize", "kawa.standard.rationalize");
       define_proc ("exp", "kawa.lib.numbers");
       define_proc ("log", "kawa.lib.numbers");
@@ -427,10 +427,8 @@ public class Scheme extends Interpreter
 
       define_proc ("exit", "kawa.lib.thread");
 
-      String sym = "arithmetic-shift";
-      proc = new AutoloadProcedure (sym, "kawa.standard.ashift");
-      define (sym, proc);
-      define ("ash", proc);
+      define_field("arithmetic-shift", "kawa.lib.numbers", "arithmeticShift");
+      define_field("ash", "kawa.lib.numbers", "arithmeticShift");
       define_proc ("logand", "kawa.standard.logand");
       define_proc ("logior", "kawa.standard.logior");
       define_proc ("logxor", "kawa.standard.logxor");

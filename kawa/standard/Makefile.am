@@ -32,11 +32,7 @@ divide_oper.java \
 modulo.java \
 gcd.java \
 lcm.java \
-floor.java \
 fluid_let.java \
-ceiling.java \
-truncate.java \
-round.java \
 rationalize.java \
 atan.java \
 sqrt.java \
@@ -76,7 +72,7 @@ load.java \
 constant_fold.java \
 map.java \
 callcc.java \
-logand.java logior.java logxor.java ashift.java \
+logand.java logior.java logxor.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
 require.java module_extends.java module_implements.java module_name.java \

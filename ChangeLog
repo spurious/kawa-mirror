@@ -1,13 +1,13 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/{ceiling.java,floor.java,round.java,truncate.java,
+	ashift.java}:  Replaced by new procedures in kawa/lib/numbers.scm.
+	* kawa/standard/Scheme.java:  Update accordingly.
+	* kawa/standard/Makefile.am (java_JAVA):  Remove removed classes.
+
 	* configure.in:  Set version to 1.6.71.
 	(AC_OUTPUT):  Add gnu/kawa/functions/Makefile.
 
-	* kawa/standard/StaticFieldConstraint.java:  New class,
-	extends ClassMemberConstraint.
-	* kawa/standard/convert.java (instance):  Sttaic field renamed ...
-	(as):  ... new field, now allocated at <clinit>-time.
-	(getInstance):  Always return the 'as' field.
 	* kawa/standard/apply.java:  Moved to gnu/kawa/functions/Apply.java.
 	* kawa/standard/format.java:  Moved to gnu/kawa/functions/Format.java.
 	* kawa/standard/ObjectFormat.java:  Moved to gnu/kawa/functions.
@@ -24,6 +24,11 @@
 	* kawa/standard/not.java (<init>(Interpreter,String)): New constructor.
 	* kawa/standard/prim_method.java (rewrite):  More robust;
 	diagnostic for missing class.
+	* kawa/standard/convert.java (instance):  Sttaic field renamed ...
+	(as):  ... new field, now allocated at <clinit>-time.
+	(getInstance):  Always return the 'as' field.
+	* kawa/standard/StaticFieldConstraint.java:  New class,
+	extends ClassMemberConstraint.
 	* kawa/standard/Scheme.java (define_field):  New methods.
 	(instanceOf, not, isEq, isEqv, isEqual, memq, memv, member, assq,
 	assv, assoc):  New static fields for standard Procedures.

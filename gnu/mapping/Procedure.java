@@ -126,7 +126,7 @@ public abstract class Procedure implements Named, Printable
 	    break;
 	  }
       }
-    ctx.value = result;
+    ctx.writeValue(result);
   }
 
   public Procedure getSetter()

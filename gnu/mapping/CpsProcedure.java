@@ -1,4 +1,5 @@
 package gnu.mapping;
+import gnu.lists.*;
 
 public abstract class CpsProcedure extends MethodProc
 {
@@ -23,8 +24,7 @@ public abstract class CpsProcedure extends MethodProc
     CallContext stack = new CallContext();
     stack.values = args;
     stack.proc = this;
-    stack.run();
-    return stack.value;
+    return applyV(stack);
   }
 
   // FIXME - only checks argument length.
@@ -48,7 +48,21 @@ public abstract class CpsProcedure extends MethodProc
 
   public Object applyV(CallContext ctx)
   {
-    ctx.run();
-    return ctx.value;
+    Consumer consumerSave = ctx.consumer;
+    ValueStack vstack = ctx.vstack;
+    ctx.consumer = vstack;
+    int dindexSave = vstack.gapStart;
+    int oindexSave = vstack.oindex;
+    try
+      {
+	ctx.run();
+	return Values.make(vstack, dindexSave, vstack.gapStart);
+      }
+    finally
+      {
+	ctx.consumer = consumerSave;
+	vstack.gapStart = dindexSave;
+	vstack.oindex = oindexSave;
+      }
   }
 }

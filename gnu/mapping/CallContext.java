@@ -1,9 +1,11 @@
 package gnu.mapping;
 import gnu.math.*;
+import gnu.lists.*;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
 public class CallContext implements Runnable
+    // extends ValueStack ??? FIXME
 {
   public Procedure proc;
 
@@ -14,10 +16,14 @@ public class CallContext implements Runnable
   /** The program location in the current procedure. */
   public int pc;
 
-  /** Function results are left here. */
-  public Object value; // FIXME
+  /** Default place for function results.
+   * In the future, function arguments will also use vstack. */
+  public ValueStack vstack = new ValueStack();  // ?? super
+  /** Function results are written to this Consumer.
+   * This may point to vstack - or some other Consumer. */
+  public Consumer consumer = vstack;
 
-  /** Used for passing parameters and result. */
+  /** Used for passing parameters.  (Will be replaced by vstack.) */
   public Object value1;
   public Object value2;
   public Object value3;
@@ -137,5 +143,18 @@ public class CallContext implements Runnable
 	this.proc = null;
 	proc.apply(this);
       }
+  }
+
+  /** Write values (of function result) to current consumer. */
+  public void writeValue(Object value)
+  {
+    if (value instanceof Values)
+      {
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  writeValue(values[i]);
+      }
+    else
+      consumer.writeObject(value);
   }
 }

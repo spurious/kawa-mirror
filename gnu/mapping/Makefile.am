@@ -47,6 +47,7 @@ java_sources=\
   TtyInPort.java \
   UnboundSymbol.java \
   Values.java \
+  ValueStack.java \
   WrappedException.java \
   WrongArguments.java \
   WrongType.java

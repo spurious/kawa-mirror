@@ -1,3 +1,16 @@
+2001-05-08  Per Bothner  <per@bothner.com>
+
+	Change full-tailcalls calling convention so result is Consumer.
+	* Values.java (make(Sequence), make(TreeList)):  New static methods.
+	* ValueStack.java:  New class, extends TreeList.
+	* Makefile.am (java_sources):  Update accordingly.
+	* CallContext.java (value):  Removed field.
+	(vstack, consumer):  New fields.
+	(writeValue):  New method.
+	* Procedure.java (apply(CallContext):  Use new writeValue method.
+	* CpsProcedure.java (applyN):  Use applyV method.
+	(applyV):  Get result from context's vstack.
+
 2001-04-07  Otto, Marcus <Otto_Marcus@ph-ludwigsburg.de>
 
 	* CpsProcedure.java (applyN):  Check argument count.

@@ -57,29 +57,49 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+GCJ_SELECTED = @GCJ_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
+LIBGCJ_CFLAGS = @LIBGCJ_CFLAGS@
+LIBGCJ_CXXFLAGS = @LIBGCJ_CXXFLAGS@
+LIBGCJ_JAVAFLAGS = @LIBGCJ_JAVAFLAGS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
 SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
+libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_sources =    AliasConstraint.java   ApplyMethodContainer.java ApplyMethodProc.java   Binding.java   Binding2.java   BindingEnumeration.java   Constraint.java UnboundConstraint.java TrivialConstraint.java   IndirectConstraint.java   CallFrame.java CallContext.java CpsProcedure.java   CpsMethodContainer.java CpsMethodProc.java   Environment.java   FluidBinding.java   FluidConstraint.java   Future.java   HasSetter.java   InPort.java   Location.java   LogWriter.java   MethodProc.java   NameMap.java   Named.java   OutPort.java   CharArrayInPort.java   CharArrayOutPort.java   Printable.java   ProcLocation.java   Procedure.java   Procedure0.java   Procedure0or1.java   Procedure1.java   Procedure1or2.java   Procedure2.java   Procedure3.java   Procedure4.java   ProcedureN.java   SFormat.java   Setter.java   Setter0.java   Setter1.java   SysInPort.java   TtyInPort.java   UnboundSymbol.java   Values.java   WrappedException.java   WrongArguments.java   WrongType.java
+java_sources =    AliasConstraint.java   ApplyMethodContainer.java ApplyMethodProc.java   Binding.java   Binding2.java   BindingEnumeration.java   Constraint.java UnboundConstraint.java TrivialConstraint.java   IndirectConstraint.java   CallFrame.java CallContext.java CpsProcedure.java   CpsMethodContainer.java CpsMethodProc.java   Environment.java   FluidBinding.java   FluidConstraint.java   Future.java   HasSetter.java   InPort.java   Location.java   LogWriter.java   MethodProc.java   NameMap.java   Named.java   OutPort.java   CharArrayInPort.java   CharArrayOutPort.java   Printable.java   ProcLocation.java   Procedure.java   Procedure0.java   Procedure0or1.java   Procedure1.java   Procedure1or2.java   Procedure2.java   Procedure3.java   Procedure4.java   ProcedureN.java   SFormat.java   Setter.java   Setter0.java   Setter1.java   SysInPort.java   TtyInPort.java   UnboundSymbol.java   Values.java   ValueStack.java   WrappedException.java   WrongArguments.java   WrongType.java
 
 
 EXTRA_DIST = package.html
@@ -169,6 +189,7 @@ clean-am:  clean-generic mostlyclean-am
 clean: clean-am
 
 distclean-am:  distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 

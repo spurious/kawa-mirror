@@ -15,12 +15,20 @@ public abstract class ModuleBody extends Procedure0
       run(ctx);
   }
 
+  protected boolean runDone;
+
   public void run (CallContext ctx)  throws Throwable
   {
   }
 
   public void run ()
   {
+    synchronized (this)
+      {
+        if (runDone)
+          return;
+        runDone = true;
+      }
     run (VoidConsumer.instance);
   }
 

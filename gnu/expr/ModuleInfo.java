@@ -9,8 +9,6 @@ public class ModuleInfo
 
   Object instance;
 
-  boolean needsRun;
-
   public static ModuleInfo find (String className)
   {
     Environment env = Environment.getCurrent();
@@ -29,6 +27,13 @@ public class ModuleInfo
       }
   }
 
+  public static void register (Object instance)
+  {
+    String cname = instance.getClass().getName();
+    ModuleInfo info = find(cname);
+    info.instance = instance;
+  }
+
   public synchronized Object getInstance ()
   {
     Object inst = instance;
@@ -44,11 +49,18 @@ public class ModuleInfo
 	  {
 	    throw new WrappedException("cannot find module " + cname, ex);
 	  }
+
 	try
 	  {
-	    inst = clas.newInstance();
-	    if (inst instanceof Runnable)
-	      needsRun = true;
+	    try
+	      {
+		inst = clas.getDeclaredField("$instance").get(null);
+	      }
+	    catch (NoSuchFieldException ex)
+	      {
+		// Not a static module - create a new instance.
+		inst = clas.newInstance();
+	      }
 	  }
 	catch (Throwable ex)
 	  {
@@ -63,14 +75,8 @@ public class ModuleInfo
   public Object getRunInstance ()
   {
     Object inst = getInstance();
-    synchronized (this)
-      {
-	if (needsRun)
-	  {
-	    needsRun = false;
-	    ((Runnable) inst).run();
-	  }
-      }
+    if (inst instanceof Runnable)
+      ((Runnable) inst).run();
     return inst;
   }
 }

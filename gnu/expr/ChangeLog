@@ -1,3 +1,10 @@
+2002-05-18  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField):  Always mangle, but not reversible.
+	Needed for compatibility with Scheme.define_field.
+
+	* ApplyExp.java (compile):  Don't inline if INDIRECT_BINDING.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* ModuleBody.java (runAsMain):  Call kawa.repl's exitDecrement.

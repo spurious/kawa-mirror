@@ -14,7 +14,7 @@ public class LambdaProcedure extends ProcedureN
 
   public LambdaProcedure (LambdaExp lexp, Environment env)
   {
-    super ("<lambda>");
+    super (lexp.name == null ? "<lambda>" : lexp.name);
     lexpr = lexp;  environment = env;
   }
 
@@ -35,10 +35,5 @@ public class LambdaProcedure extends ProcedureN
 	frame[lexpr.min_args] = list;
       }
     return lexpr.body.eval (new Environment (frame, lexpr, environment));
-  }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<kawa.lang.LambdaProcedure>");
   }
 }

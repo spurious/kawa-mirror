@@ -1,32 +1,23 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongType;
+public class char_greater_p extends Procedure2
+{
+  public char_greater_p()
+  {
+    super("char>?");
+  }
 
-import kawa.lang.Procedure2;
-
-public class char_greater_p extends kawa.lang.Procedure2 {
-   public kawa.standard.char_greater_p() {
-      super("char>?");
-   }
-
-   public Object apply2 (Object arg1, Object arg2)
-       throws kawa.lang.WrongType
-   {
-      if (arg1 instanceof java.lang.Character) {
-         if (arg2 instanceof java.lang.Character) {
-            if (((java.lang.Character)arg1).charValue()>
-                ((java.lang.Character)arg2).charValue()) {
-               return kawa.lang.Interpreter.trueObject;
-            } else {
-               return kawa.lang.Interpreter.falseObject;
-            }
-         } else {
-            throw new kawa.lang.WrongType(this.name,2,"character");
-         }
-      } else {
-         throw new kawa.lang.WrongType(this.name,1,"character");
-      }
-   }
-
+  public Object apply2(Object arg1, Object arg2)
+       throws WrongType
+  {
+    if (! (arg1 instanceof Char))
+      throw new WrongType(this.name,1,"character");
+    if (! (arg2 instanceof Char))
+      throw new WrongType(this.name,2,"character");
+    if (((Char)arg1).intValue () > ((Char)arg2).intValue())
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
+  }
 }

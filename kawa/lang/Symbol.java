@@ -12,6 +12,22 @@ public class Symbol extends Object implements Printable
     name = new java.lang.String(n);
   }
 
+  public static final Symbol makeUninterned (String s)
+  {
+    return new Symbol (s);
+  }
+
+  private static int gensym_counter;
+
+  /**
+   * Generate a new un-interned Symbol with a unique name.
+   * @return the new Symbol
+   */
+  public static final Symbol generate ()
+  {
+    return new Symbol ("GS." + Integer.toString(++gensym_counter));
+  }
+
   private static java.util.Hashtable symbolTable = new java.util.Hashtable ();
 
   public int hashCode () { return name.hashCode (); }
@@ -26,7 +42,7 @@ public class Symbol extends Object implements Printable
    * @param name the print-name of the desired Symbol
    * @return a Symbol with the given name, newly created iff none such exist
    */
-  static public Symbol intern (String name)
+  static public Symbol make (String name)
   {
     Symbol symbol = (Symbol) symbolTable.get (name);
     if (symbol == null) {
@@ -34,6 +50,11 @@ public class Symbol extends Object implements Printable
       symbolTable.put (name, symbol);
     }
     return symbol;
+  }
+
+  static public final Symbol intern (String name)
+  {
+    return make (name);
   }
 
   public void print(java.io.PrintStream ps)

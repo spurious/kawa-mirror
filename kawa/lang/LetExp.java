@@ -1,5 +1,4 @@
 package kawa.lang;
-import kawa.lang.*;
 
 /**
  * Class used to implement "let" syntax (and variants) for Scheme.

@@ -25,11 +25,15 @@ public class define extends Syntax implements Printable
 	  {
 	    Pair p2 = (Pair) p1.car;
 	    if (p2.car instanceof Symbol)
-	      return new SetExp ((Symbol) p2.car,
-				 new LambdaExp (p2.cdr, p1.cdr, interp));
+	      {
+		Symbol name = (Symbol) p2.car;
+		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, interp);
+		lexp.setName (name.toString ());
+		return new SetExp (name, lexp);
+	      }
 	  }
       }
-    throw new kawa.lang.WrongArguments("define",1,"(define ...)");
+    return interp.syntaxError ("invalid syntax for define");
   }
 
   public void print(java.io.PrintStream ps)

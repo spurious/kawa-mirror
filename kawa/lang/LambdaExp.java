@@ -7,6 +7,7 @@ package kawa.lang;
 
 public class LambdaExp extends ScopeExp
 {
+  String name;
   Expression body;
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
@@ -17,6 +18,11 @@ public class LambdaExp extends ScopeExp
 			  int min, int max)
   {
     decls = params;  body = bod;  min_args = min;  max_args = max;
+  }
+
+  public void setName (String name)
+  {
+    this.name = name;
   }
 
   /**

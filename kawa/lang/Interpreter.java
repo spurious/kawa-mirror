@@ -9,25 +9,13 @@ import java.util.Vector;
 import kawa.lang.Printable; 
 import kawa.lang.Executable; 
 import kawa.lang.Syntaxable; 
-import kawa.lang.iport;
-import kawa.lang.oport;
 import kawa.lang.Symbol;
 import kawa.lang.Exit;
 
 // Exceptions
-import kawa.lang.EOFInString;
-import kawa.lang.EOFInComment;
-import kawa.lang.InvalidPoundConstruct;
-import kawa.lang.UnexpectedCloseParen;
-import kawa.lang.NumberTooLong;
-import kawa.lang.InvalidCharacterName;
-import kawa.lang.MalformedList;
 import kawa.lang.UnboundSymbol;
 import kawa.lang.WrongArguments;
 import kawa.lang.WrongType;
-
-// To be fixed things
-import kawa.lang.NotImplemented;
 
 public class Interpreter extends Object
 {
@@ -36,13 +24,8 @@ public class Interpreter extends Object
 
   static public List nullObject = List.Empty;
   static public Undefined undefinedObject = new kawa.lang.Undefined();
-
-  private final int EOFChar = -1;
-  private char buffer[];
-  private char ibuffer[];
-  private int bufferLength;
-  private int bindex;
-  private boolean initialized;
+  static public Undefined voidObject = new kawa.lang.Undefined();
+  static public Symbol eofObject = Symbol.makeUninterned ("#EOF");
 
   // Global environment.
   // Currently maps String -> Object;  should probably be Symbol -> Object.
@@ -50,34 +33,39 @@ public class Interpreter extends Object
   
   static protected Symbol lambda_sym = Symbol.intern ("lambda");
   static protected Lambda lambda = new Lambda ();
-  static protected Symbol quote_sym = Symbol.intern ("quote");
+  static public Symbol quote_sym = Symbol.make ("quote");
+  static public Symbol unquote_sym = Symbol.make ("unquote");
+  static public Symbol unquotesplicing_sym = Symbol.make ("unquote-splicing");
+  static public Symbol quasiquote_sym = Symbol.intern ("quasiquote");
   static protected Quote quote = new Quote();
 
   // Map name to Declaration.
   public java.util.Hashtable current_decls;
-  kawa.lang.ScopeExp current_scope;
+  ScopeExp current_scope;
 
   protected QuasiQuote      quasiquote;
   protected Unquote         unquote;
   protected UnquoteSplicing unquotesplicing;
 
-  public kawa.lang.iport in;
-  public kawa.lang.oport out;
-  public kawa.lang.oport err;
+  public InPort in;
+  public OutPort out;
+  public OutPort err;
 
-  public Interpreter(
-      kawa.lang.iport i,
-      kawa.lang.oport o,
-      kawa.lang.oport e
-    ) {
+  static Interpreter curInterpreter;
 
+  static public Interpreter current ()
+  {
+    return curInterpreter;
+  }
+
+  public Interpreter(InPort i, OutPort o, OutPort e)
+  {
       in = i;
       out = o;
       err = e;
 
-      bufferLength    = 1024;
-      buffer          = new char[bufferLength];
-      ibuffer         = new char[bufferLength];
+      curInterpreter = this;
+
       globals         = new java.util.Hashtable();
       current_decls   = new java.util.Hashtable();
       quasiquote      = new kawa.lang.QuasiQuote();
@@ -168,544 +156,11 @@ public class Interpreter extends Object
      throw new GenericError ("interp.eval called!");
    }
  
-   public Object read()
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      return read(in);
-   }
-
-   public Object read(iport ip)
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      //System.out.println("interpreter.read():");
-      int c;
-      while (true) {
-         c = ip.peek();
-         while (java.lang.Character.isSpace((char)c)) {
-            ip.flushPeek();
-            c = ip.peek();
-         } 
-         switch (c) {
-            case EOFChar:
-               return nullObject;
-            case ';':
-               do {
-                  c = ip.read();
-                  if (c==EOFChar) {
-                     return nullObject;
-                  }
-               } while (c!='\n');
-            break;
-            case ')':
-               throw new UnexpectedCloseParen();
-            case '(':
-               ip.flushPeek();
-               return readList(ip);
-            case '"':
-               ip.flushPeek();
-               return readString(ip);
-            case '\'':
-               ip.flushPeek();
-               return readQuote(ip);
-            case '`':
-               ip.flushPeek();
-               return readQuasiQuote(ip);
-            case ',':
-               ip.flushPeek();
-               if (ip.peek()=='@') {
-                  return readUnquoteSplicing(ip);
-               } else {
-                  return readUnquote(ip);
-               }
-            case '+':
-            case '-':
-               if (java.lang.Character.isDigit((char)ip.peek())) {
-                  return readNumber(ip);
-               } else {
-                  return readSymbol(ip);
-               }
-            case '#':
-               ip.flushPeek();
-               switch (ip.read()) {
-                  case '(':
-                     return readVector(ip);
-                  case '\\':
-                     return readCharacter(ip);
-                  case 't':
-                     return trueObject;
-                  case 'f':
-                     return falseObject;
-                  case 'x':
-                     return readHexNumber(ip);
-                  case 'b':
-                     return readBinaryNumber(ip);
-                  case 'o':
-                     return readOctalNumber(ip);
-                  case '|':
-                     boolean notAtEnd = true;
-                     do {
-                        c = ip.read();
-                        if (c==EOFChar) {
-                           throw new EOFInComment();
-                        }
-                        if (c=='|' && ip.read()=='#') {
-                           notAtEnd = false;
-                        }
-                     } while (notAtEnd);
-                  break;
-                  default:
-                     throw new InvalidPoundConstruct();
-               }
-            break;
-            default:
-               if (java.lang.Character.isDigit((char)c)) {
-                  return readNumber(ip);
-               } else {
-                  return readSymbol(ip);
-               }
-         }
-      } 
-   }
-
-   protected void skipWhitespaceAndComments(iport ip)
-      throws java.io.IOException
-   {
-      
-      boolean notAtEnd = true;
-      int c;
-      while (notAtEnd) {
-         while ((c = ip.peek())!=EOFChar && java.lang.Character.isSpace((char)c)) {
-            ip.flushPeek();
-         }
-         if (c==';') {
-            while ((c = ip.read())!='\n' && c!=EOFChar);
-         } else {
-            notAtEnd = false;
-         }
-      }
-
-      ip.unpeek();
-      
-   }
-
-
-   protected Object readList(iport ip)
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      //System.out.println("interpreter.readList():");
-      skipWhitespaceAndComments(ip);
-      //-- null Primitive
-      int c;
-      if ((c = ip.peek())==')') {
-         ip.flushPeek();
-         return nullObject;
-      }
-
-      ip.unpeek();
-
-      //-- Car of the list
-      Object car = read(ip);
-      Object cdr = nullObject;
-      skipWhitespaceAndComments(ip);
-
-      if ((c = ip.peek())!=')') {
-         if (c=='.') {
-            int next;
-            if ((next = ip.peek())!=EOFChar && java.lang.Character.isSpace((char)next)) {
-               //-- Read the cdr for the Pair
-               cdr = read(ip);
-               skipWhitespaceAndComments(ip);
-               if (ip.read()!=')') {
-                  throw new MalformedList();
-               }
-            } else {
-               //-- Read the rest of the list
-               ip.unpeek();
-               ip.unpeek();
-               cdr = readList(ip);
-            }
-         } else {
-            //-- Read the read of the list
-            ip.unpeek();
-            cdr = readList(ip);
-         }           
-      } else {
-         ip.flushPeek();
-      }
-      return new Pair(car,cdr);
-   }
-
-   protected Object readString(iport ip)
-      throws EOFInString,
-             java.io.IOException
-   {
-      java.lang.StringBuffer obj = new java.lang.StringBuffer();
-      boolean inString = true;
-      int c;
-      bindex = 0;
-      do {
-         c = ip.read();
-         switch (c) {
-            case '"':
-               inString = false;
-            break;
-            case '\\':
-               switch (c = ip.read()) {
-                  case '"':
-                  case '\\':
-                     buffer[bindex++] = (char)c;
-                  break;
-                  default:
-                     if (c==EOFChar) {
-                        // Throw EOF in String exception
-                        throw new EOFInString();
-                     } else {
-                        buffer[bindex++] = '\\';
-                        buffer[bindex++] = (char)c;
-                     }
-                  break;
-               }
-            break;
-            default:
-               if (c==EOFChar) {
-                  // Throw EOF in string exception
-                  throw new EOFInString();
-               } else {
-                  buffer[bindex++] = (char)c;
-                  if (bindex>bufferLength) {
-                     obj.append(buffer);
-                     bindex = 0;
-                  }
-               }
-            break;
-         }
-      } while (inString);
-      if (bindex!=0) {
-         obj.append(buffer,0,bindex);
-      }
-      return obj;
-   }
-
-   protected Object readQuote(iport ip) 
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      return new Pair(
-         quote_sym,
-         new Pair(
-            read(ip),
-            nullObject
-         )
-      );
-   }
-
-   protected Object readQuasiQuote(iport ip) 
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      return new Pair(
-         quasiquote,
-         new Pair(
-            read(ip),
-            nullObject
-         )
-      );
-   }
-
-   protected Object readUnquoteSplicing(iport ip) 
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      return new Pair(
-         unquotesplicing,
-         new Pair(
-            read(ip),
-            nullObject
-         )
-      );
-   }
-
-   protected Object readUnquote(iport ip) 
-      throws java.io.IOException,
-             UnexpectedCloseParen,
-             EOFInString,
-             EOFInComment,
-             InvalidPoundConstruct,
-             NumberTooLong,
-             InvalidCharacterName,
-             MalformedList,
-             NotImplemented
-   {
-      return new Pair(
-         unquote,
-         new Pair(
-            read(ip),
-            nullObject
-         )
-      );
-   }
-
-   protected Object readNumber(iport ip) 
-      throws java.io.IOException,
-             NumberTooLong
-   {
-      Object obj = nullObject;
-      int c = ip.read();
-
-      boolean isFloat = false;
-      bindex = 0;
-      if (c=='+') {
-         buffer[bindex++] = (char)c;
-         c = ip.read();
-      } else if (c=='-') {
-         buffer[bindex++] = (char)c;
-         c = ip.read();
-      }
-      do {
-         if (bindex>bufferLength) {
-            throw new NumberTooLong();
-         } else if (c=='.' || c=='e' || c=='E') {
-            isFloat = true;
-         }
-         buffer[bindex++] = (char)c;
-      } while (java.lang.Character.isDigit((char)(c = ip.read())) || c=='.' || c=='e' || c=='E');
-
-      ip.putback(c);
-
-      if (isFloat) {
-         obj = Double.valueOf(java.lang.String.copyValueOf(buffer,0,bindex));
-      } else {
-         obj = Integer.valueOf(java.lang.String.copyValueOf(buffer,0,bindex));
-      }
-      return obj;
-   }
-
-   protected Object readSymbol(iport ip) 
-      throws java.io.IOException 
-   {
-      bindex = 0;
-      int c;
-      while (!java.lang.Character.isSpace((char)(c = ip.read())) &&
-             c!=')' && c!='(' && c!='"' && c!=';' && c!=EOFChar) {
-         buffer[bindex++] = (char)java.lang.Character.toLowerCase((char)c);
-      }
-      if (c!=EOFChar) {
-         ip.putback(c);
-      }
-      if (bindex!=0) {
-         java.lang.String symname = java.lang.String.copyValueOf(buffer,0,bindex);
-	 symname = symname.toLowerCase();  // if we're case-folding
-	 return Symbol.intern (symname);
-      } else {
-         return nullObject;
-      }
-   }
-
-   protected Object readVector(iport ip) throws NotImplemented {
-      throw new NotImplemented();
-   }
-
-   protected boolean matches(iport ip,java.lang.String s)
-      throws java.io.IOException
-   {
-      int length = s.length();
-      int i;
-      for (i=0; i<length; i++) {
-         if (java.lang.Character.toLowerCase((char)ip.read())!=s.charAt(i)) {
-            break;
-         }
-      }
-      if (i<length) {
-         return false;
-      } else {
-         // TODO: Should check to see if there is garbage on the end
-         return true;
-      }
-   }
-
-   protected Object readCharacter(iport ip)
-      throws java.io.IOException,
-             InvalidCharacterName
-   {
-      int c;
-      int nc;
-      Object obj = nullObject;
-      switch (c = ip.read()) {
-         case 'n': // newline
-         case 'N':
-            nc = ip.peek();
-            if (nc=='e' || nc=='E') {
-               ip.flushPeek();
-               if (matches(ip,"wline")) {
-                  obj = new java.lang.Character('\n');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 's': // space
-         case 'S':
-            nc = ip.peek();
-            if (nc=='p' || nc=='P') {
-               ip.flushPeek();
-               if (matches(ip,"ace")) {
-                  obj = new java.lang.Character(' ');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 'r': // rubout
-         case 'R':
-            nc = ip.peek();
-            if (nc=='u' || nc=='U') {
-               ip.flushPeek();
-               if (matches(ip,"bout")) {
-                  obj = new java.lang.Character((char)0x7f);
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else if (nc=='e' || nc=='E') {
-               ip.flushPeek();
-               if (matches(ip,"turn")) {
-                  obj = new java.lang.Character('\r');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 'p': // page
-         case 'P':
-            nc = ip.peek();
-            if (nc=='a' || nc=='A') {
-               ip.flushPeek();
-               if (matches(ip,"ge")) {
-                  obj = new java.lang.Character('\f');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 't': // tab
-         case 'T':
-            nc = ip.peek();
-            if (nc=='a' || nc=='A') {
-               ip.flushPeek();
-               if (matches(ip,"ab")) {
-                  obj = new java.lang.Character('\t');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 'b': // backspace
-         case 'B':
-            nc = ip.peek();
-            if (nc=='a' || nc=='A') {
-               ip.flushPeek();
-               if (matches(ip,"ckspace")) {
-                  obj = new java.lang.Character('\b');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         case 'l': // linefeed
-         case 'L':
-            nc = ip.peek();
-            if (nc=='i' || nc=='I') {
-               ip.flushPeek();
-               if (matches(ip,"nefeed")) {
-                  obj = new java.lang.Character('\n');
-               } else {
-                  throw new InvalidCharacterName();
-               }
-            } else {
-               ip.unpeek();
-               obj = new java.lang.Character((char)c);
-            }
-         break;
-         default:
-            obj = new java.lang.Character((char)c);
-         break;
-      }
-      return obj;
-   }
-
-   protected Object readHexNumber(iport ip) throws NotImplemented {
-      throw new NotImplemented();
-   }
-
-   protected Object readOctalNumber(iport ip) throws NotImplemented {
-      throw new NotImplemented();
-   }
-
-   protected Object readBinaryNumber(iport ip) throws NotImplemented {
-      throw new NotImplemented();
-   }
+  public Object read()
+      throws java.io.IOException, SyntaxError
+  {
+    return in.readSchemeObject ();
+  }
 
   /**
    * Re-write a Scheme <body> in S-expression format into internal form.
@@ -733,10 +188,55 @@ public class Interpreter extends Object
       }
   }
 
+  Syntax current_syntax;
+  Object current_syntax_args;
+  Expression errorExp = new ErrorExp ("unknown syntax error");
+
+  /**
+   * Apply a Syntax object.
+   * @param syntax the Syntax object whose rewrite method we call
+   * @param args the syntax arguments (the cdr of the syntax form)
+   * @return the re-written form as an Expression object
+   */
+  Expression apply_rewrite (Syntax syntax, Object args)
+       throws WrongArguments
+  {
+    Syntax save_syntax = syntax;
+    Object save_args = args;
+    current_syntax = syntax;
+    current_syntax_args = args;
+    Expression exp = errorExp;
+    try
+      {
+	exp = syntax.rewrite (args, this);
+      }
+    finally
+      {
+	current_syntax = save_syntax;
+	current_syntax_args = save_args;
+      }
+    return exp;
+  }
+
+  /** Count of errors seen (at compile time). */
+  public int errors;
+
+  /**
+   * Handle syntax errors (at rewrite time).
+   * @param message an error message to print out
+   * @return an ErrorExp
+   */
+  public Expression syntaxError (String message)
+  {
+    errors++;
+    System.err.print ("syntax error: ");
+    System.err.println (message);
+    return new ErrorExp (message);
+  }
+
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */
-
   public Expression rewrite (Object exp)
        throws WrongArguments
   {
@@ -746,13 +246,13 @@ public class Interpreter extends Object
 	Object car = p.car;
 	Object cdr = p.cdr;
 	if (car instanceof Syntax)
-	  return ((Syntax)car).rewrite (cdr, this);
+	  return apply_rewrite ((Syntax)car, cdr);
 
 	if (car instanceof Symbol)
 	  {
 	    Object binding = lookup ((Symbol) car);
 	    if (binding instanceof Syntax)
-	      return ((Syntax)binding).rewrite (cdr, this);
+	      return apply_rewrite ((Syntax) binding, cdr);
 	  }
 
 	int cdr_length = kawa.standard.length.length (cdr);

@@ -6,7 +6,7 @@ package kawa.lang;
  * @author	Per Bothner
  */
 
-public abstract class Expression
+public abstract class Expression implements Printable
 {
   abstract public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError;

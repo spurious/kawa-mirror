@@ -1,16 +1,16 @@
 package kawa.standard;
 import kawa.lang.*;
-             
-public class char_p extends Procedure1
+
+public class eof_object_p extends Procedure1
 {
-  public char_p()
+  public eof_object_p ()
   {
-    super("char?");
+    super ("eof-object?");
   }
 
   public Object apply1 (Object arg1)
   {
-    if (arg1 instanceof Char)
+    if (arg1 == Interpreter.eofObject)
       return Interpreter.trueObject;
     else
       return Interpreter.falseObject;

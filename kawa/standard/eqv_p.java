@@ -20,8 +20,6 @@ public class eqv_p extends kawa.lang.Procedure2
       return (((Double)arg1).equals((Double)arg2));
     else if (arg1 instanceof Integer && arg2 instanceof Integer)
       return ((Integer)arg1).intValue () == ((Integer)arg2).intValue ();
-    else if (arg1 instanceof Character && arg2 instanceof Character)
-      return ((Character)arg1).charValue() == ((Character)arg2).charValue ();
     return false;
    }
 

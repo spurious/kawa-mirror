@@ -3,11 +3,13 @@ import kawa.lang.*;
 
 public class StandardInterpreter extends Interpreter
 {
-   public kawa.standard.StandardInterpreter(
-      kawa.lang.iport i,
-      kawa.lang.oport o,
-      kawa.lang.oport e
-    ) {
+  final void define_proc (Named proc)
+  {
+    define (proc.name, proc);
+  }
+
+  public kawa.standard.StandardInterpreter(InPort i, OutPort o, OutPort e)
+  {
       super(i,o,e);
 
       kawa.lang.Named proc;
@@ -223,6 +225,16 @@ public class StandardInterpreter extends Interpreter
       proc = new kawa.standard.apply();
       define(proc.name,proc);
 
+      //-- Section 6.10
+      define_proc (new read ());           // read
+      define_proc (new readchar (false));  // read-char
+      define_proc (new readchar (true));   // peek-char
+      define_proc (new eof_object_p ());   // eof-object?
+      define_proc (new write(true));       // write
+      define_proc (new write(false));      // display
+      define_proc (new writechar ());      // write-char
+
+      define_proc (new load ());           // load
 
       //-- (let ((n obj)...) e1 ... )
       define("let", new kawa.standard.let());

@@ -1,41 +1,32 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongType;
-import kawa.lang.GenericError;
+public class string_set_b extends Procedure3
+{
+  public string_set_b()
+  {
+    super("string-set!");
+  }
 
-import kawa.lang.Procedure3;
-
-public class string_set_b extends kawa.lang.Procedure3 {
-   public kawa.standard.string_set_b() {
-      super("string-set!");
-   }
-
-   public Object apply3 (Object arg1, Object arg2, Object arg3)
-     throws kawa.lang.WrongType,
-            kawa.lang.GenericError
-   {
-      if (arg1 instanceof java.lang.StringBuffer) {
-         if (arg2 instanceof java.lang.Integer) {
-            if (arg3 instanceof java.lang.Character) {
-               try {
-                  ((java.lang.StringBuffer)arg1).setCharAt(
-                    (int)((java.lang.Integer)arg2).intValue(),
-                    ((java.lang.Character)arg3).charValue()
-                  );
-                  return kawa.lang.Interpreter.undefinedObject;
-               } catch (StringIndexOutOfBoundsException e) {
-                  throw new kawa.lang.GenericError("String index out of bounds.");
-               }
-            } else {
-               throw new kawa.lang.WrongType(this.name,3,"character");
-            }
-         } else {
-            throw new kawa.lang.WrongType(this.name,2,"integer");
-         }
-      } else {
-         throw new kawa.lang.WrongType(this.name,1,"string");
+  public Object apply3 (Object arg1, Object arg2, Object arg3)
+       throws WrongType, GenericError
+  {
+    if (! (arg1 instanceof StringBuffer))
+      throw new WrongType(this.name,1,"string");
+    StringBuffer str = (StringBuffer) arg1;
+    if (! (arg2 instanceof Integer))
+      throw new WrongType(this.name,2,"integer");
+    if (! (arg3 instanceof Char))
+      throw new WrongType(this.name,3,"character");
+    try
+      {
+	str.setCharAt((int)((Integer)arg2).intValue(),
+		      ((Char)arg3).charValue());
+	return kawa.lang.Interpreter.voidObject;
       }
-   }
-
+    catch (StringIndexOutOfBoundsException e)
+      {
+	throw new GenericError("String index out of bounds.");
+      }
+  }
 }

@@ -5,7 +5,7 @@ package kawa.lang;
  * @author  Per Bothner
  */
 
-public abstract class Procedure extends Named implements Executable 
+public abstract class Procedure extends Named implements Executable, Printable
 {
   public Procedure(java.lang.String n)
   {
@@ -69,4 +69,11 @@ public abstract class Procedure extends Named implements Executable
      }
      return applyN (args);
    }
+
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print ("#<procedure ");
+    ps.print (name ());
+    ps.print ('>');
+  }
 }

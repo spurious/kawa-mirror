@@ -98,6 +98,12 @@ vector.class \
 vector_length.class \
 vector_ref.class \
 vector_set_b.class \
+read.class \
+readchar.class \
+eof_object_p.class \
+write.class \
+writechar.class \
+load.class \
 procedure_p.class \
 apply.class \
 exit.class \

@@ -15,7 +15,7 @@ public class ifp extends Syntax implements Printable
   {
     Object [] match = pattern.match (obj);
     if (match == null)
-      throw new kawa.lang.WrongArguments("if",2,"(if test exp [exp])");
+      return interp.syntaxError ("invalid syntax for if");
     return new IfExp (interp.rewrite (match[0]),
 		      interp.rewrite (match[1]),
 		      interp.rewrite (match[2]));

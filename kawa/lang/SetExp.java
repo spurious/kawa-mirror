@@ -32,7 +32,7 @@ public class SetExp extends Expression
       }
     else
       env.interp.define (name, new_val);
-    return Interpreter.undefinedObject;
+    return Interpreter.voidObject;
   }
 
   public void print (java.io.PrintStream ps)

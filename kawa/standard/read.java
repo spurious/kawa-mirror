@@ -22,7 +22,7 @@ public class read extends Procedure0or1 {
       {
 	return ((InPort)arg1).readSchemeObject ();
       }
-    catch (SyntaxError e)
+    catch (ReadError e)
       {
 	throw new GenericError ("syntax error in read: " + e.toString ());
       }

@@ -9,7 +9,7 @@ JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 .java.class:
 	$(JAVAC) -d ../.. $<
 
-javadir=$(prefix)/java/kawa/standard
+javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
 set_b.class \
@@ -61,6 +61,7 @@ minus_oper.class \
 multiply_oper.class \
 divide_oper.class \
 abs.class \
+gcd.class \
 numerator.class \
 denominator.class \
 floor.class \
@@ -80,6 +81,7 @@ expt.class \
 exact2inexact.class \
 inexact2exact.class \
 number2string.class \
+string2number.class \
 char_p.class \
 char_equal_p.class \
 char_less_p.class \
@@ -135,7 +137,6 @@ vector_append.class \
 force.class \
 make_promise.class \
 call_with_input_file.class \
-call_with_input_string.class \
 call_with_output_file.class \
 current_input_port.class \
 current_output_port.class \
@@ -154,6 +155,8 @@ open_input_file.class \
 open_output_file.class \
 close_input_port.class \
 close_output_port.class \
+call_with_input_string.class \
+call_with_output_string.class \
 load.class \
 procedure_p.class \
 apply.class \
@@ -174,7 +177,8 @@ StandardInterpreter.class
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 

@@ -156,6 +156,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("*", "kawa.standard.multiply_oper");
       define_proc ("/", "kawa.standard.divide_oper");
       define_proc ("abs", "kawa.standard.abs");
+      define_proc ("gcd", "kawa.standard.gcd");
       define_proc ("numerator", "kawa.standard.numerator");
       define_proc ("denominator", "kawa.standard.denominator");
       define_proc ("floor", "kawa.standard.floor");
@@ -175,6 +176,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("exact->inexact", "kawa.standard.exact2inexact");
       define_proc ("inexact->exact", "kawa.standard.inexact2exact");
       define_proc ("number->string", "kawa.standard.number2string");
+      define_proc ("string->number", "kawa.standard.string2number");
 
       //-- Section 6.6  -- complete
       define_proc ("char?", "kawa.standard.char_p");
@@ -246,11 +248,9 @@ public class StandardInterpreter extends Interpreter
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
 
-      //-- Section 6.10 [complete except for char-ready? and transcript-on/off]
+      //-- Section 6.10 [complete except for transcript-on/off]
       define_proc ("call-with-input-file",
 		   "kawa.standard.call_with_input_file");
-      define_proc ("call-with-input-string",  //Extension
-		   "kawa.standard.call_with_input_string");
       define_proc ("call-with-output-file",
 		   "kawa.standard.call_with_output_file");
       define_proc ("input-port?", "kawa.standard.input_port_p.java");
@@ -269,11 +269,16 @@ public class StandardInterpreter extends Interpreter
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
       define_proc ("eof-object?", "kawa.standard.eof_object_p");
+      define_proc ("char-ready?", "kawa.standard.char_ready_p");
       define_proc (new write(true));       // write
       define_proc (new write(false));      // display
       define_proc ("write-char", "kawa.standard.writechar");
       define_proc ("newline", "kawa.standard.newline");
       define_proc ("load", "kawa.standard.load");
+      define_proc ("call-with-input-string",  // Extension
+		   "kawa.standard.call_with_input_string");
+      define_proc ("call-with-output-string",  // Extension
+		   "kawa.standard.call_with_output_string");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 

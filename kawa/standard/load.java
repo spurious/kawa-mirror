@@ -48,7 +48,7 @@ public class load extends Procedure1 {
 	  throw new GenericError ("load: "+name+" - not readable");
 	ZipArchive zar = new ZipArchive (name, "r");
 	ZipLoader loader = new ZipLoader (zar);
-	Class clas = loader.loadClass ("Top", true);
+	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	Object inst = clas.newInstance ();
 	Procedure0 proc = (Procedure0) inst;
 	return proc.apply0 ();
@@ -91,49 +91,13 @@ public class load extends Procedure1 {
   {
     Interpreter interpreter = Interpreter.current ();
     Environment env = new Environment (interpreter);
-    Object last = Interpreter.voidObject;
-    for (;;)
-      {
-	Object obj;
-	try
-	  {
-	    obj = port.readSchemeObject ();
-	    if (obj == Interpreter.eofObject)
-	      {
-		port.close ();
-		break;
-	      }
-	  }
-	catch (ReadError e)
-	  {
-	    // The '\n' is because a ReadError includes a line number,
-	    // and it is better if that starts the line.
-	    throw new GenericError ("read error in load:\n" + e.toString ());
-	  }
-	catch (SyntaxError e)
-	  {
-	    throw new GenericError ("syntax error in load: " + e.toString ());
-	  }
-	catch (java.io.IOException e)
-	  {
-	    throw new GenericError ("I/O exception in load: " + e.toString ());
-	  }
-	int save_errors = interpreter.errors;
-	Expression exp;
-	try
-	  {
-	    interpreter.errors = 0;
-	    exp = interpreter.rewrite (obj);
-	    if (interpreter.errors > 0)
-	      throw new GenericError ("syntax error during load");
-	  }
-	finally
-	  {
-	    interpreter.errors = save_errors;
-	  }
-	last = exp.eval (env);
-      }
-    return last;
+    int save_errors = interpreter.errors;
+    LambdaExp lexp = CompileFile.read (port, env);
+    lexp.setName (Symbol.make ("atFileLevel"));
+    if (interpreter.errors > save_errors)
+      throw new GenericError ("syntax errors during load");
+    Procedure proc = (Procedure) lexp.eval (env);
+    return proc.apply0 ();
   }
 
   public final Object apply1 (Object arg1)

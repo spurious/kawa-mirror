@@ -1,5 +1,6 @@
 Mon Sep 16 10:55:39 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* DFloNum.java (makeLiteral, emit):  Implement Compilable.
 	* Numeric.java (FLOOR, CEILING, TRUNCATE, ROUND):  New constants.
 	* RealNum.java (max, min):  New methods.
 	* IntNum.java (isOdd):  Check low-order word, not high-order word!

@@ -5,7 +5,7 @@ import codegen.ClassType;
 import codegen.Access;
 import codegen.Type;
 
-public class DFloNum extends RealNum // implements Compilable
+public class DFloNum extends RealNum implements Compilable
 {
   double value;
 
@@ -18,6 +18,11 @@ public class DFloNum extends RealNum // implements Compilable
   {
     Double d = new Double (s); // wasteful ...
     value = d.doubleValue ();
+  }
+
+  public static DFloNum make (double value)
+  {
+    return new DFloNum (value);
   }
 
   public double doubleValue ()
@@ -114,4 +119,25 @@ public class DFloNum extends RealNum // implements Compilable
     return Double.toString (value);
   }
 
+  static ClassType thisType;
+  static Method makeMethod;
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    if (thisType == null)
+      {
+	thisType = new ClassType ("kawa.math.DFloNum");
+	Type[] args = new Type[1];
+	args[0] = Type.double_type;
+	makeMethod = thisType.new_method ("make", args, thisType,
+					     Access.PUBLIC|Access.STATIC);
+      }
+    return new Literal (this, thisType, comp);
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    comp.method.compile_push_double (value);
+    comp.method.compile_invoke_static (makeMethod);
+  }
 }

@@ -139,7 +139,7 @@ public class object extends Syntax
 	      }
 	    int nKeywords = 0;
 	    Object init = null;
-	    Object initForm = null;
+	    Pair initPair = null;
 	    while (args instanceof Pair)
 	      {
 		pair = (Pair) args;
@@ -180,7 +180,7 @@ public class object extends Syntax
 			// doesn't include this class;
 			// in the case of 'init: EXPR' it does.
 			if (key != initKeyword)
-			  initForm = init;
+			  initPair = pair;
 		      }
 		    else if (key == init_keywordKeyword)
 		      {
@@ -263,7 +263,7 @@ public class object extends Syntax
 		  = allocationFlag == Declaration.STATIC_SPECIFIED;
 		inits.addElement(decl != null ? (Object) decl
 				 : isStatic ? Boolean.TRUE : Boolean.FALSE);
-		inits.addElement(initForm);
+		inits.addElement(initPair);
 	      }
 	    if (decl == null)
 	      {
@@ -339,7 +339,7 @@ public class object extends Syntax
       {
 	Object init = inits.elementAt(i);
 	if (init != null)
-	  inits.setElementAt(tr.rewrite(init), i);
+	  inits.setElementAt(tr.rewrite_car((Pair) init, false), i);
       }
     
     tr.push(oexp);
@@ -382,7 +382,7 @@ public class object extends Syntax
 		Object type = null;
 		int nKeywords = 0;
 		Object args = pair_car instanceof Keyword ? pair : pair.cdr;
-		Object init = null;
+		Pair initPair = null;
 		while (args instanceof Pair)
 		  {
 		    pair = (Pair) args;
@@ -403,25 +403,25 @@ public class object extends Syntax
 				 || key == init_formKeyword
 				 || key == init_valueKeyword)
 			  {
-			    init = value;
+			    initPair = pair;
 			  }
 			else
 			  {
 			    // handled in first pass.
 			  }
 		      }
-		    else if (args == LList.Empty && init == null)
+		    else if (args == LList.Empty && initPair == null)
 		      {
 			// CLtL:2 explicitly prohibits this as an extension.
-			init = key;
+			initPair = pair;
 		      }
-		    else if (args instanceof Pair
-			     && nKeywords == 0 && init == null && type == null
+		    else if (args instanceof Pair && nKeywords == 0
+			     && initPair == null && type == null
 			     && (pair = (Pair) args).cdr == LList.Empty)
 		      {
 			// Backward compatibility.
 			type = key;
-			init = pair.car;
+			initPair = pair;
 			args = pair.cdr;
 		      }
 		    else
@@ -431,14 +431,14 @@ public class object extends Syntax
 		      }
 		    tr.popPositionOf(savedPos2);
 		  }
-		if (init != null)
+		if (initPair != null)
 		  {
 		    boolean isStatic;
 		    Object d = inits.elementAt(init_index++);
 		    Expression initValue
 		      = (Expression) inits.elementAt(init_index++);
 		    if (initValue == null)
-		      initValue = tr.rewrite(init);
+		      initValue = tr.rewrite_car(initPair, memberSyntax);
 		    if (d instanceof Declaration)
 		      {
 			Declaration decl = (Declaration) d;

@@ -2,11 +2,9 @@
   (syntax-rules ()
 		((%do-trace proc flag)
 		 (set! proc
-		       ((primitive-static-method
-			 <kawa.standard.TracedProcedure> "doTrace"
-			 <kawa.standard.TracedProcedure>
-			 (<function> <boolean>))
-			proc flag)))))
+		       (invoke-static
+			 <function.standard.TracedProcedure> 'doTrace
+			 proc flag)))))
 
 (define-syntax trace
   (syntax-rules ()

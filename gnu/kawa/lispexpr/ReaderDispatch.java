@@ -82,7 +82,7 @@ public class ReaderDispatch extends ReadTableEntry
     ReadTableEntry entry = (ReadTableEntry) table.lookup(ch, null);
     if (entry == null)
       {
-	in.error("invalid dispatch character");
+	in.error("invalid dispatch character '"+((char) ch)+'\'');
 	return Values.empty;
       }
     return entry.read(in, ch, count);

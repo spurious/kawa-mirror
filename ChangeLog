@@ -1,3 +1,10 @@
+2001-03-22  Per Bothner  <per@bothner.com>
+
+	* repl.java (checkInitFile):  Set home-directory variable *before*
+	running init file.
+
+	* Shell.java (run):  Fix logic for EOF testing,
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	Many changes to handlenew gnu.lists package.

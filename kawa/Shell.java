@@ -50,12 +50,16 @@ public class Shell
 	    PairWithPosition body = new PairWithPosition(inp,
 							 null, LList.Empty);
 	    Object sexp = ((LispReader) lexer).readObject(); // FIXME
+	    if (sexp == Sequence.eofValue)
+	      return;
 
             // Skip whitespace, in case somebody calls (read-char) or similar.
             for (;;)
               {
                 int ch = inp.read();
-                if (ch < 0 || ch == '\r' || ch == '\n')
+                if (ch < 0)
+		  return;
+                if (ch == '\r' || ch == '\n')
                   break;
                 if (ch != ' ' && ch != '\t')
                   {
@@ -64,8 +68,6 @@ public class Shell
                   }
               }
 
-	    if (sexp == Sequence.eofValue)
-	      return;
 	    body.car = sexp;
 	    /* If the errors were minor, we could perhaps try to
 	       do Translation (to check for more errors)  .  ??? */

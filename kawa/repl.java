@@ -49,6 +49,7 @@ public class repl extends Procedure0or1
     /* Set homeDirectory;  if first time called, run ~/.kawarc.scm. */
     if (homeDirectory == null)
       {
+	File initFile = null;
 	homeDirectory = System.getProperty ("user.home");
 	Object scmHomeDirectory;
 	if (homeDirectory != null)
@@ -58,13 +59,13 @@ public class repl extends Procedure0or1
 	    String kawarc_name =
 	      "/".equals(file_separator) ? ".kawarc.scm"
 	      : "kawarc.scm";
-	    File initFile = new File(homeDirectory, kawarc_name);
-	    if (initFile.exists())
-	      Shell.runFile(initFile.getPath());
+	    initFile = new File(homeDirectory, kawarc_name);
 	  }
 	else
 	  scmHomeDirectory = Scheme.falseObject;
 	Environment.define_global("home-directory", scmHomeDirectory);
+	if (initFile != null && initFile.exists())
+	  Shell.runFile(initFile.getPath());
       }
   }
 

@@ -18,28 +18,31 @@ public class ListPat extends Pattern
   /**
    * Succeeds if obj is a list of length [min_length..max_length].
    * @param obj the object to match against
-   * @return null on failure; on success, an array of the elements of the list.
-   * The result has length max_length; if obj is shorter, missing elements
-   * are set to default_value. */
-  public Object[] match (Object obj)
+   * @return -1 on failure;  max_vars on success
+   * On success, max_length values from the elements of the list are placed
+   * in vars (starting at start_vars); if obj is shorter, missing elements
+   * are set to default_value.
+   */
+  public int match (Object obj, Object[] vars, int start_vars)
   {
-    Object[] result = new Object[max_length];
     int i;
     for (i = 0; i < max_length; i++)
       {
 	if (obj instanceof Pair)
 	  {
 	    Pair p = (Pair)obj;
-	    result[i] = p.car;
+	    vars [start_vars + i] = p.car;
 	    obj = p.cdr;
 	  }
 	else if (i < min_length)
-	  return null;
+	  return -1;
 	else
 	  break;
       }
     for ( ; i < max_length; i++)
-      result[i] = default_value;
-    return result;
+      vars [start_vars + i] = default_value;
+    return max_length;
   }
+
+  public int varCount () { return max_length; }
 }

@@ -1,3 +1,8 @@
+2001-06-19  Per Bothner  <per@bothner.com>
+
+	* Invoke.java:  Handle method name symbol implemented using Binding.
+	* ClassMethods.java:  Likewise.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* ArrayLength.java:  Update to use LangPrimType.

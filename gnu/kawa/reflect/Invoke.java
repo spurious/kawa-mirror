@@ -65,7 +65,8 @@ public class Invoke extends ProcedureN implements Inlineable
           arg0 = Type.make((Class) arg0);
         if (arg0 instanceof ClassType)
           dtype = (ClassType) arg0;
-        else if (arg0 instanceof String || arg0 instanceof FString)
+        else if (arg0 instanceof String || arg0 instanceof FString
+		 || arg0 instanceof Binding)
           dtype = ClassType.make(arg0.toString());
         else
           throw new WrongType(thisProc, 0, null);
@@ -75,7 +76,8 @@ public class Invoke extends ProcedureN implements Inlineable
     else
       {
         Object arg1 = args[1];
-        if (arg1 instanceof String || arg1 instanceof FString)
+        if (arg1 instanceof String || arg1 instanceof FString
+	    || arg1 instanceof Binding)
           mname = arg1.toString();
         else
           throw new WrongType(thisProc, 1, null);
@@ -344,7 +346,8 @@ public class Invoke extends ProcedureN implements Inlineable
                  && args[1] instanceof QuoteExp)
           name = ((QuoteExp) args[1]).getValue();
         if (type instanceof ClassType
-            && (name instanceof FString || name instanceof String))
+            && (name instanceof FString || name instanceof String
+		|| name instanceof Binding))
           {
             PrimProcedure[] methods = getMethods((ClassType) type,
                                                  name.toString(), args,

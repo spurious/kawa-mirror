@@ -1,6 +1,23 @@
+#|
+(define (equal? x y)
+  (or (eq? x y)
+      (and (not (eq? x #!null))
+	   ((primitive-virtual-method <object> "equals" <boolean> (<object>))
+	    x y))))
+|#
+
+(define (boolean? x)
+  (instance? x <java.lang.Boolean>))
+
+(define (symbol? x)
+  (instance? x <java.lang.String>))
+
+(define (procedure? x)
+  (instance? x <function>))
+
 (define (environment-bound? env sym)
-  (not (eq? ((primitive-virtual-method "kawa.lang.Environment" "lookup"
-                                       "kawa.lang.Binding"
+  (not (eq? ((primitive-virtual-method "gnu.mapping.Environment" "lookup"
+                                       "gnu.mapping.Binding"
                                        (<symbol>))
              env sym)
        #!null)))
@@ -14,6 +31,6 @@
 (define (scheme-window #!optional share)
   ((primitive-constructor <kawa.GuiConsole> (<kawa.lang.Interpreter>))
    (if share
-       ((primitive-constructor <kawa.standard.Scheme>(<kawa.lang.Environment>))
+       ((primitive-constructor <kawa.standard.Scheme>(<gnu.mapping.Environment>))
 	(interaction-environment))
        ((primitive-constructor <kawa.standard.Scheme> ())))))

@@ -17,6 +17,9 @@ Major re-write of symbol and namespace handling.  A Symbol is now immutable,
 consisting of a "print-name" and a pointer to a Namespace (package).
 An Environment is a mapping from Symbol to Location.
 
+Rename Interpreter to Language (unfinished) and
+LispInterpreter to LispLanguage.
+
 Constant-time property list operations.
 
 Namespace-prefix are now always resolved at compile-time, never at run-time.

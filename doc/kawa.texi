@@ -1485,7 +1485,7 @@ a @samp{.scm} source file into one or more @samp{.class} files.
 
 You run it as follows:
 @example
-kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main] -C @var{infile}
+kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main] -C @var{infile} ...
 @end example
 
 Note the @samp{-C} must come last, because @samp{Kawa} processes the
@@ -1493,8 +1493,8 @@ arguments and options in order,
 
 Here:
 @table @samp
-@item -C @var{infile}
-The Scheme source file we want to compile.
+@item -C @var{infile} ...
+The Scheme source files we want to compile.
 @item -d @var{outdirectory}
 The directory under which the resulting @samp{.class} files will be.
 The default is the current directory.

@@ -42,6 +42,16 @@ public class BeginExp extends Expression
     return exp;
   }
 
+  public static final Expression canonicalize(Expression[] exps)
+  {
+    int len = exps.length;
+    if (len == 0)
+      return QuoteExp.voidExp;
+    if (len == 1)
+      return canonicalize(exps[0]);
+    return new BeginExp(exps);
+  }
+
   public final void add(Expression exp)
   {
     if (exps == null)

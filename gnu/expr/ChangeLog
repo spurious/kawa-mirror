@@ -1,5 +1,10 @@
 2003-10-12  Per Bothner  <per@bothner.com>
 
+	* BeginExp.java (canonicalize):  New static method.
+
+	* Inlinecalls.java (walkApplyExp):  If procedure is Inlineable,
+	replace reference by quoted value.
+
 	* Compilation.java (mangleURI):  New static method.
 
 2003-10-11  Per Bothner  <per@bothner.com>

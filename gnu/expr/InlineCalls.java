@@ -84,7 +84,6 @@ public class InlineCalls extends ExpWalker
 	      func = new QuoteExp(fval);
 	    decl = null;
 	  }
-		 
       }
     if (func instanceof QuoteExp)
       {
@@ -101,6 +100,8 @@ public class InlineCalls extends ExpWalker
 	  return ((CanInline) proc).inline(exp, this);
 	if (comp.inlineOk(proc))
 	  {
+	    if (proc instanceof Inlineable)
+	      return new ApplyExp(proc, exp.getArgs());
 	    PrimProcedure mproc
 	      = PrimProcedure.getMethodFor(proc, decl, exp.args,
 					   comp.getInterpreter());

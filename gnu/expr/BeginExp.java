@@ -12,6 +12,8 @@ public class BeginExp extends Expression
 {
   Expression[] exps;
 
+  public BeginExp () { }
+
   public BeginExp (Expression[] ex) { exps = ex; }
 
   public BeginExp(Expression exp0, Expression exp1)
@@ -21,7 +23,9 @@ public class BeginExp extends Expression
     exps[1] = exp1;
   }
 
-  public Expression[] getExpressions() { return exps; }
+  public final Expression[] getExpressions() { return exps; }
+
+  public final void setExpressions(Expression[] exps) { this.exps = exps; }
 
   public Object eval (Environment env)
   {

@@ -1,3 +1,9 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (<init>):  New default constructor.
+	(setExpressions):  New method.
+	(getExpression):  Make private.
+
 2000-01-22  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java:  New class, inherits from Initializer.

@@ -32,6 +32,7 @@
   (invoke readtable 'set char
 	  (make <gnu.kawa.lispexpr.ReaderMacro> function non-terminating)))
 
+#|
 (define (get-macro-character
 	 (char :: <char>)
 	 #!optional
@@ -53,6 +54,7 @@
 		 (invoke entry 'read (stream->lexer stream) char 1))
 	       non-terminating)
 	      (values #f))))))
+|#
 
 (define (make-dispatch-macro-character
 	 (char :: <char>)

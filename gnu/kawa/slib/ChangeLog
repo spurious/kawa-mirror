@@ -1,3 +1,7 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* readtable.scm (get-macro-character):  Comment out for now.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* XML.scm (as-xml):  New definition.

@@ -372,6 +372,7 @@ public class Translator extends Compilation
 			String uri = ((QuoteExp) dval).getValue().toString();
 			return rewrite(Symbol.make(uri, local), function);
 		      }
+		    decl = null;
 		  }
 		else
 		  {

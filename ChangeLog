@@ -1,5 +1,9 @@
 2004-08-08  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite):  Don't set decl if no uri.
+
+2004-08-08  Per Bothner  <per@bothner.com>
+
 	* kawa/lang/CalledContinuation.java (values):  A continuation
 	can take multiple values.
 	* kawa/lang/Continuation.java:  Extend MethodProc, not ProcedureN.

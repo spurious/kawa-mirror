@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import kawa.lang.*;
 
 /* The abstract class of rational numbers. */
 

@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import kawa.lang.*;
 
 /** Implementation of exact rational numbers as fractions of IntNums.
  * @author Per Bothner

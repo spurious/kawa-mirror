@@ -18,10 +18,4 @@ java_JAVA=\
   IntNum.java \
   BitOps.java
 
-HTML_HOME = $$HOME/public_html
-
-install-html:
-	-mkdir $(HTML_HOME)/gnu.math
-	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.math/index.html
-	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.math/COPYING
-	chmod a+r $(HTML_HOME)/gnu.bytecode/*
+EXTRA_DIST = overview.html

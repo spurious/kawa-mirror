@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import kawa.lang.*;
+import gnu.expr.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;

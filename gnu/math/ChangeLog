@@ -1,3 +1,15 @@
+Thu Jul 23 07:54:54 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Dimensions.java (<init>):  Fix missing variable re-initialization.
+
+	* DFloNum.java, IntNum.java:  Update imports.
+	* IntFraction.java, RatNum.java, RealNum.java: Removed unneeded import.
+	* Makefile.am (install-html):  Subsumed by ../Makefile.am.
+
+Wed Jul 22 19:59:59 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Dimensions.java (<init>):  Fix bug (counters not re-initialized).
+
 Wed Jun 24 18:59:48 1998  Per Bothner  <bothner@cygnus.com>
 
 	* RealNum.java (toExactInt):  New methods.

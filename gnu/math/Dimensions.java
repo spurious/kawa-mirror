@@ -71,9 +71,10 @@ public class Dimensions
     this.hash_code = hash_code;
     for (a_i = 0;  a.bases[a_i] != endDummy;  a_i++) ;
     for (b_i = 0;  b.bases[b_i] != endDummy;  b_i++) ;
-    bases = new BaseUnit[a_i+b_i+1];
-    powers = new short[a_i+b_i+1];
-    int t_i = 0;
+    int t_i = a_i + b_i + 1;
+    bases = new BaseUnit[t_i];
+    powers = new short[t_i];
+    a_i = b_i = t_i = 0;
     for (;;)
       {
 	BaseUnit a_base = a.bases[a_i];

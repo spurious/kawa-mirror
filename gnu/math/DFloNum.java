@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import kawa.lang.*;
+import gnu.expr.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
@@ -275,4 +275,84 @@ public class DFloNum extends RealNum implements Compilable
     code.emitPushDouble(value);
     code.emitInvokeStatic(makeMethod);
   }
+
+  /*
+  static final int mine_e = -1024;
+  static final long bp_1 = 1L << 52;
+
+  static ?? flonum_digits (foubel v, long f, int e)
+  {
+    boolean round_p = (f & 1) == 0;
+    if (e >= 0)
+      {
+	IntNum be = 1L << e;   // ???
+	if (f != bp_1)
+	  return scale (f * be * 2 (?), 2, be, be, 0, round_p, round_p, v);
+	else
+	  return scale (f * be * 4 (?), 4, 2 * be, b2, 0, round_p, round_p, v);
+      }
+    else
+      {
+	if (e == min_e || f != bp_1)
+	  return scale (f * 2 (?), 2 ** (1 - 3), 1, 1, 0, round_p, round_p, v);
+	else
+	  return scale (f * 4 (?), 2 ** (2 - e), 2, 1, 0, round_p, round_p, v);
+      }
+  }
+
+  static ?? scale (IntNum r, IntNum s, IntNum m_plus, IntNum m_minus,
+		   int k, boolean low_ok?, boolean high_ok, double v)
+  {
+    int est = (int) Math.ceil(log10(v) - 1e-10);
+    if (est >= 0)
+      return fixup(r, s * expt10(est), m_plus, m_minus, est, low_ok, high_ok);
+    else
+      {
+	IntNum scale = expt10(-ext);
+	return fixup(r * scale, s, scale * m_plus, scale * m_minus,
+		     est, low_ok, high_ok);
+      }
+  }
+
+  static ?? fixup (IntNum r, IntNum s, IntNum m_plus, IntNum m_minus,
+		   int k, boolean low_ok, boolean high_ok)
+  {
+    ...;
+  }
+
+  static ?? generate (IntNum r, IntNum s, IntNum m_plus, IntNum m_minus,
+		      boolean low_ok, boolean high_ok)
+  {
+    IntNum d = new IntNum(), r = new IntNum();
+    IntNum.divide (r, s, d, r, mode?);
+    d = d.canonicalize();
+    r = r.canonicalize();
+    boolean tc1 = ?;
+    boolean tc2 = ?;
+  }
+
+  static IntNum expt10 = null;
+
+  static IntNum expt10 (int k)
+  {
+    if (expt10 == null)
+      {
+	expt10 = new IntNum[326];
+	int i = 0;
+	IntNum v = IntNum.one();
+	for (; ; i++)
+	  {
+	    expt10[i] = v;
+	    if (i == 325)
+	      break;
+	    v = IntNum.times(v, 10);
+	  }
+      }
+    return expt10[k];
+  }
+
+  static double InvLog10 = 1.0 / Math.log(10);
+  
+  static double log10 (double x) { return Math.log(x) * InvLog10; }
+  */
 }

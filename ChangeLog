@@ -1,3 +1,7 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/read_line.java (apply2): Update WrongType call.
+
 2005-03-06  Per Bothner  <per@bothner.com>
 
 	* ltmain.sh: New from CVS (patched) libtool 2.1a.

@@ -39,7 +39,7 @@ public class read_line extends ProcedureN
       }
     catch (ClassCastException ex)
       {
-        throw WrongType.make(ex, this, 0);
+        throw WrongType.make(ex, this, 1, arg1);
       }
     try
       {
@@ -47,7 +47,7 @@ public class read_line extends ProcedureN
       }
     catch (ClassCastException ex)
       {
-        throw WrongType.make(ex, this, 1);
+        throw WrongType.make(ex, this, 2, arg2);
       }
     try
       {

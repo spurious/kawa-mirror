@@ -1,5 +1,5 @@
 ;(load "/home/bothner/kawa-bin/testsuite/testing.zip")
-(test-init "elisp language" 22)
+(test-init "elisp language" 23)
 
 (setq y 100)
 (defun foo1 (x)
@@ -33,10 +33,8 @@
 (integer-format-test-2 "[45          ][-45         ]" "[%-12d]" 45 -45)
 (integer-format-test-2 "[ 45         ][-45         ]" "[%- 12d]" 45 -45)
 (integer-format-test-2 "[+45         ][-45         ]" "[%-+12d]" 45 -45)
-(setq fail-expected t)
 (integer-format-test-2 "[        0045][       -0045]" "[%12.4d]" 45 -45)
-(setq fail-expected t)
-(integer-format-test-2 "[0045        ][-0045       ]" "[%012.4d]" 45 -45)
+(integer-format-test-2 "[0045        ][-0045       ]" "[%-12.4d]" 45 -45)
 ;; Test %x:
 (setq neg45 (logand -45 #xffffffff))
 (integer-format-test-2 "[          2d][    ffffffd3]" "[%12x]" 45 neg45)
@@ -45,7 +43,6 @@
 (integer-format-test-2 "[0X000000002D][0X00FFFFFFD3]" "[%#012X]" 45 neg45)
 (integer-format-test-2 "[2d          ][ffffffd3    ]" "[%-12x]" 45 neg45)
 (integer-format-test-2 "[0x2d        ][0xffffffd3  ]" "[%-#12x]" 45 neg45)
-(setq fail-expected t)
 (integer-format-test-2 "[        002d][    ffffffd3]" "[%12.4x]" 45 neg45)
-;; This one looks like a typo - investage it!
-;;(integer-format-test-2 "[0x002d      ][ffffffd3    ]" "[%-#12.4x]" 45 neg45)
+;; Harbison&Steele (4th ed) have a typo here.
+(integer-format-test-2 "[0x002d      ][0xffffffd3  ]" "[%-#12.4x]" 45 neg45)

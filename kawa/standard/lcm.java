@@ -1,6 +1,5 @@
 package kawa.standard;
 import gnu.math.IntNum;
-import gnu.math.Numeric;
 import gnu.mapping.*;
 
 /**

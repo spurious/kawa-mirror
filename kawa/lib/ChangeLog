@@ -1,5 +1,7 @@
 2000-01-23  Per Bothner  <per@bothner.com>
 
+	* misc.scm (values):  New procedure.
+
 	* files.scm (create-directory):  Style fix.
 
 	* strings.scm (make-string):  Declare count to be <int>.

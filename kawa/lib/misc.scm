@@ -23,6 +23,9 @@
 (define (procedure? x)
   (instance? x <function>))
 
+(define (values #!rest (args :: <Object[]>))
+  (invoke-static <gnu.mapping.Values> 'make args))
+
 (define (environment-bound? env sym)
   (not (eq? ((primitive-virtual-method "gnu.mapping.Environment" "lookup"
                                        "gnu.mapping.Binding"

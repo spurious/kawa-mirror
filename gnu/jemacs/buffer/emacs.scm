@@ -182,11 +182,8 @@
 			    <String> (<String>))
    starting-name))
 
-(define (buffer-file-name #!optional (buffer (current-buffer)))
-  (let ((name
-         ((primitive-virtual-method <buffer> "getFileName"
-                                    <java.lang.String> ())
-          buffer)))
+(define (buffer-file-name #!optional (buffer :: <buffer> (current-buffer)))
+  (let ((name (invoke buffer 'getFileName)))
     (if (eq? name #!null)
         #f
         (symbol->string name))))
@@ -246,11 +243,9 @@
   (invoke window 'getNextWindowInFrame 1))
 
 ;; Emacs allows some special values for frame.
-(define (other-window #!optional (count 1) (frame (selected-frame)))
+(define (other-window #!optional (count :: <int> 1) (frame :: <frame> (selected-frame)))
   (select-window
-   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getNextWindowInFrame"
-                              <gnu.jemacs.buffer.Window> (<int>))
-    (frame-selected-window frame) count)))
+   (invoke (frame-selected-window frame) 'getNextWindowInFrame 1)))
 
 (define (window-buffer #!optional (window :: <window> (selected-window)))
   (invoke window 'getBuffer))
@@ -312,15 +307,13 @@
 (define (frame-live? (frame :: <frame>))
   (invoke frame 'isLive))
 
-(define (window-frame #!optional (window (selected-window)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getFrame"
-                             <gnu.jemacs.buffer.Frame> ())
-   window))
+(define (window-frame #!optional (window :: <window> (selected-window)))
+  :: <frame>
+  (invoke window 'getFrame))
 
-(define (frame-selected-window #!optional (frame (selected-frame)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "getSelectedWindow"
-                             <gnu.jemacs.buffer.Window> ())
-   frame))
+(define (frame-selected-window #!optional (frame :: <frame> (selected-frame)))
+  :: <window>
+  (invoke frame 'getSelectedWindow))
 
 (define (selected-frame)
   (invoke-static <gnu.jemacs.buffer.Frame> 'getSelectedFrame))

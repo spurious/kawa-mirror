@@ -1,3 +1,10 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* tab.xml.in:  Add some attributes so we can test for that.
+	* TestMisc.java:  New class with many small tests.
+	* test1.xql, expected1.xml:  Removed - subsumed by TestMisc.java.
+	* Makefile.am: Update accordingly.
+
 2001-10-02  Per Bothner  <per@bothner.com>
 
 	* descend.xql:  New test program.

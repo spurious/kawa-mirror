@@ -4,17 +4,19 @@ ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 CLEANFILES = tmp* *.log testing.zip *.class
 
-SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql tab.html \
+SOURCES = tab.xml.in maketab1.xql tab.html \
   multab.xql expectedmul.xml descend.xql
+
+@Make_rules@
 
 all:
 
-test1.class:  test1.xql
-	$(KAWA) --main --xquery -C $<
+TestMisc.class:  TestMisc.java
+	$(CLASSPATH_ENV) $(JAVAC) -d . $(JAVACFLAGS) $<
+#$(JAVAC) -g -d . $<
 
-check-test1:  test1.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) test1 >tmp1
-	@if diff -b $(srcdir)/expected1.xml tmp1; then echo '# test1 test passes'; else echo FAIL test1 test; fi
+check-misc: TestMisc.class
+	CLASSPATH=.:$(KAWALIB) $(JAVA) TestMisc
 
 maketab1.class:  maketab1.xql
 	$(KAWA) --main --xquery -C $<
@@ -39,4 +41,4 @@ check-descend:  descend.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) descend >tmpdesc
 	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
 
-check:  check-test1 check-maketab1 check-multab check-descend
+check:  check-misc check-maketab1 check-multab check-descend

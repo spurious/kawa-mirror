@@ -24,10 +24,11 @@ public class Type {
     size = 4;
   }
 
-  Type (String nam, String sig, int siz) {
+  Type (String nam, String sig, int siz, Class reflectClass) {
     this_name = nam;
     signature = sig;
     size = siz;
+    this.reflectClass = reflectClass;
   }
 
   public Type promote () {
@@ -175,18 +176,27 @@ public class Type {
       throw new Error ("unimplemented compileCoerceFromObject");
   }
 
-  static public Type byte_type = new Type ("byte", "B", 1);
-  static public Type short_type = new Type ("short", "S", 2);
-  static public Type int_type = new Type ("int", "I", 4);
-  static public Type long_type = new Type ("long", "J", 8);
+  static public Type byte_type = new Type ("byte", "B", 1,
+					   java.lang.Byte.TYPE);
+  static public Type short_type = new Type ("short", "S", 2,
+					    java.lang.Short.TYPE);
+  static public Type int_type = new Type ("int", "I", 4,
+					  java.lang.Integer.TYPE);
+  static public Type long_type = new Type ("long", "J", 8,
+					   java.lang.Long.TYPE);
 
-  static public Type float_type = new Type ("float", "F", 4);
-  static public Type double_type = new Type ("double", "D", 8);
+  static public Type float_type = new Type ("float", "F", 4,
+					    java.lang.Float.TYPE);
+  static public Type double_type = new Type ("double", "D", 8,
+					     java.lang.Double.TYPE);
 
-  static public Type boolean_type = new Type ("boolean", "Z", 1);
-  static public Type char_type = new Type ("char", "C", 2);
+  static public Type boolean_type = new Type ("boolean", "Z", 1,
+					      java.lang.Boolean.TYPE);
+  static public Type char_type = new Type ("char", "C", 2,
+					   java.lang.Character.TYPE);
 
-  static public Type void_type = new Type ("void", "V", 0);
+  static public Type void_type = new Type ("void", "V", 0,
+					   java.lang.Void.TYPE);
 
   static public ClassType pointer_type = new ClassType ("java.lang.Object");
   static public ClassType string_type = new ClassType ("java.lang.String");
@@ -211,4 +221,13 @@ public class Type {
   static public Method booleanValue_method
   = boolean_ctype.addMethod ("booleanValue", typeArray0,
 			      boolean_type, Access.PUBLIC);
+
+  protected Class reflectClass;
+
+  /** Get the java.lang.Class object for the representation type. */
+  public java.lang.Class getReflectClass()
+  {
+    return reflectClass;
+  }
+
 }

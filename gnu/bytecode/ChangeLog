@@ -1,3 +1,13 @@
+Sun Jan 11 15:51:51 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitFinallyStart): Re-set end_pc.
+
+	* Type.java (reflectClass):  New field.
+	(getReflectClass):  New method.
+	(<init>):  Take extra reflectClass argument.
+	* ClassType.java (getReflectClass, toString):  New methods.
+	* ArrayType.java (getReflectClass):  New method.
+	
 Sun Dec 14 15:55:22 1997  Per Bothner  <bothner@cygnus.com>
 
 	* ClassFileInput.java (readClassType):

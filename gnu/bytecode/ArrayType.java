@@ -12,4 +12,17 @@ public class ArrayType extends Type
     super (elements.getName() + "[]", "[" + elements.getSignature());
     this.elements = elements;
   }
+
+  public Class getReflectClass()
+  {
+    try
+      {
+	if (reflectClass == null)
+	  reflectClass = Class.forName(getSignature());
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+      }
+    return reflectClass;
+  }
 }

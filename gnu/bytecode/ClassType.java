@@ -102,6 +102,20 @@ public class ClassType extends Type implements AttrContainer {
 
   public ClassType[] getInterfaces() { return interfaces; }
 
+  /** Get the java.lang.Class object for the representation type. */
+  public Class getReflectClass()
+  {
+    try
+      {
+	if (reflectClass == null)
+	  reflectClass = Class.forName(getName());
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+      }
+    return reflectClass;
+  }
+
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
 
@@ -337,5 +351,10 @@ public class ClassType extends Type implements AttrContainer {
       method.compile_invoke_virtual (Type.toString_method);
     else if (this != Type.pointer_type)
       method.compile_checkcast (this);
+  }
+
+  public String toString()
+  {
+    return "ClassType " + getName();
   }
 }

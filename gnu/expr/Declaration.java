@@ -148,31 +148,26 @@ public class Declaration
         if (field == null)
           throw new Error("internal error: cannot take location of "+this);
         Method meth;
+        ClassType ltype;
         if (field.getStaticFlag())
           {
-            ClassType typeStaticFieldLocation
-              = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
-            meth = typeStaticFieldLocation.getDeclaredMethod("make", 2);
+            ltype = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
+            meth = ltype.getDeclaredMethod("make", 2);
           }
         else
           {
-            ClassType typeFieldLocation
-              = ClassType.make("gnu.kawa.reflect.FieldLocation");
-            meth = typeFieldLocation.getDeclaredMethod("make", 3);
+            ltype = ClassType.make("gnu.kawa.reflect.FieldLocation");
+            meth = ltype.getDeclaredMethod("make", 3);
 
-            if ((flags & ReferenceExp.DEFER_DECL_BASE) != 0)
-              code.emitPushNull();
+            if (owner != null)
+              owner.load(null, 0, comp, Target.pushObject);
             else
-              {
-                if (owner != null)
-                  owner.load(null, 0, comp, Target.pushObject);
-                else
-                  loadOwningObject(comp);
-              }
+              loadOwningObject(comp);
           }
         comp.compileConstant(field.getDeclaringClass().getName());
         comp.compileConstant(field.getName());
         code.emitInvokeStatic(meth);
+        rtype = ltype;
       }
     else
       {
@@ -362,6 +357,10 @@ public class Declaration
   public static final int PACKAGE_ACCESS = 0x8000000;
 
   public static final int IS_DYNAMIC = 0x10000000;
+
+  /** Initialize in <code>&lt;init&gt;</code>/<code>&lt;clinit&gt;</code>
+   * rather than in <code>run</code>/<code>$run$</code>. */
+  public static final int EARLY_INIT = 0x20000000;
 
   protected int flags = IS_SIMPLE;
 
@@ -729,7 +728,10 @@ public class Declaration
       fflags |= Access.FINAL;
     Type ftype = getType().getImplementationType();
     if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))
-      ftype = Compilation.typeLocation;
+      if (getFlag(EARLY_INIT) && isAlias())
+        ftype = ClassType.make("gnu.kawa.reflect.FieldLocation");
+      else
+        ftype = Compilation.typeLocation;
     String fname = getName();
     fname = Compilation.mangleNameIfNeeded(fname);
     if (getFlag(IS_UNKNOWN))
@@ -760,20 +762,12 @@ public class Declaration
 	    return;
 	  }
       }
-    if (isIndirectBinding()
-	     || (value != null && ! (value instanceof ClassExp)))
+    // The EARLY_INIT case is handled in SetExp.compile.
+    if (! getFlag(EARLY_INIT)
+	&& (isIndirectBinding()
+	    || (value != null && ! (value instanceof ClassExp))))
       {
-	BindingInitializer init = new BindingInitializer(this, value);
-	if ((fflags & Access.STATIC) != 0)
-	  {
-	    init.next = comp.clinitChain;
-	    comp.clinitChain = init;
-	  }
-	else
-	  {
-	    init.next = comp.mainLambda.initChain; // FIXME why mainLambda?
-	    comp.mainLambda.initChain = init;
-	  }
+	BindingInitializer.create(this, value, comp);
       }
   }
 

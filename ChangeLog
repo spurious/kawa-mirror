@@ -1,3 +1,13 @@
+2005-03-25  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (find):  No longer do 'run'.
+	(importDefinitions): SET EARLY_INIT on both instance and alias decls.
+	No longer set DEFER_DECL_BASE.
+	We now find/create the module instance at initialization time, but
+	'find' no longer does 'run', so emit coe to call 'run'.
+	(makeDeclInModule): If value is FieldLocation, do getDeclaration.
+	This re-fixes Savannah bug #11822.
+
 2005-03-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/sleep.java: Now no longer extends Procedure1.

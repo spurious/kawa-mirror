@@ -130,7 +130,12 @@ public class SetExp extends AccessExp
     Object value;
     Declaration decl = binding;
     Expression declValue = decl.getValue();
-    if (declValue instanceof LambdaExp
+    if (decl.getFlag(Declaration.EARLY_INIT)
+	&& isDefining() && ! decl.ignorable())
+      {
+	BindingInitializer.create(decl, new_value, comp);
+      }
+    else if (declValue instanceof LambdaExp
 	&& decl.context instanceof ModuleExp
 	&& (! decl.isPrivate() || declValue instanceof ClassExp)
 	&& ((LambdaExp) declValue).getName() != null // FIXME
@@ -144,22 +149,6 @@ public class SetExp extends AccessExp
              && isDefining()
              && declValue != null)
       { // This is handled in ModuleExp's allocFields method.  But:
-        if (new_value instanceof ReferenceExp
-            && ((ReferenceExp) new_value).getFlag(ReferenceExp.DEFER_DECL_BASE)
-            && isDefining() && ! decl.ignorable())
-          {
-            Declaration context = ((ReferenceExp) new_value).context;
-            ClassType typeClassMemberLocation
-              = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
-            Method setInstance
-              = (typeClassMemberLocation
-                 .getDeclaredMethod("setInstance", 1));
-            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
-                      comp, Target.pushObject);
-            context.load(null, 0, comp, Target.pushObject);
-            code.emitInvokeVirtual(setInstance);
-          }
-        // MAYBE do: setInstance here; FIXME
         if (needValue)
           {
             decl.load(null, 0, comp, Target.pushObject);

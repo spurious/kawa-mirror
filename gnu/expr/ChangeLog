@@ -1,3 +1,18 @@
+2005-03-25  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java (create): New factory method.
+	* Declaration.java (load): Minor code re-arranging,makes it easier
+	to set correct stack type in variable rtype.
+	* Declaration.java (load): No longer need to DEFER_DECL_BASE, since we
+	now get inported module instances at init time, rather than 'run' time.
+	(EARLY_INIT): New flag.
+	(makeField): Set type to more precise FieldLocation if applicable.
+	Using BindingInitializer - but not if EARLY_INIT.
+	* SetExp.java (compile): Remove DEFER_DECL_BASE special handling,
+	but add special handling for EARLY_INIT instead.
+	* ReferenceExp.java (DEFER_DECL_BASE): Defer no-longer-used flag.
+	This re-fixes Savannah bug #11822.
+
 2005-03-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (push): Set STATIC_SPECIFIED if immediate module.

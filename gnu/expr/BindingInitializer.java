@@ -10,6 +10,24 @@ public class BindingInitializer extends Initializer
   static final Method makeSymbolMethod
   = Compilation.typeSymbol.getDeclaredMethod("makeUninterned", 1);
 
+  /** Create a BindingInitializer and link it into the correct
+   * intializer chain. */
+  public static void create (Declaration decl, Expression value,
+                             Compilation comp)
+  {
+    BindingInitializer init = new BindingInitializer(decl, value);
+    if (decl.field != null && decl.field.getStaticFlag())
+      {
+        init.next = comp.clinitChain;
+        comp.clinitChain = init;
+      }
+    else
+      {
+        init.next = comp.mainLambda.initChain; // FIXME why mainLambda?
+        comp.mainLambda.initChain = init;
+      }
+  }
+
   public BindingInitializer(Declaration decl, Expression value)
   {
     this.decl = decl;

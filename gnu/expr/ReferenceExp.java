@@ -23,10 +23,6 @@ public class ReferenceExp extends AccessExp
   public static final int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
   public static final int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
   public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
-  /** Used for a non-static FieldDeclaration used for import aliases.
-   * We want to allocate the FieldLocation at init time, but defer the
-   * instance pointer until the module body (run). */
-  public static final int DEFER_DECL_BASE = NEXT_AVAIL_FLAG << 3;
 
   /* If true, must have binding.isIndirectBinding().  Don't dereference it. */
   public final boolean getDontDereference()

@@ -6,7 +6,6 @@ import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
-import gnu.kawa.reflect.Invoke;
 import gnu.kawa.functions.Convert;
 import java.util.*;
 
@@ -85,7 +84,7 @@ public class require extends Syntax
 
   public static Object find(String typeName)
   {
-    return ModuleInfo.find(typeName).getRunInstance();
+    return ModuleInfo.find(typeName).getInstance();
   }
 
   public boolean scanForDefinitions (Pair st, Vector forms,
@@ -188,6 +187,11 @@ public class require extends Syntax
 		    sexp.setLine(tr);
 		    sexp.setDefining(true);
 		    forms.addElement(sexp);
+                    decl.setFlag(Declaration.EARLY_INIT);
+                    // If Runnable, we need to set decl value in initializer,
+                    // and later 'run' it, so it needs to be stored in a field.
+                    if (isRunnable)
+                      decl.setSimple(false);
 		  }
               }
 	    java.lang.reflect.Field rfield;
@@ -334,10 +338,9 @@ public class require extends Syntax
 		if (! immediate)
 		  {
 		    SetExp sexp = new SetExp(adecl, fexp);
+                    adecl.setFlag(Declaration.EARLY_INIT);
 		    sexp.setDefining(true);
 		    forms.addElement(sexp);
-                    if (! isStatic && fref != null)
-                      fref.setFlag(ReferenceExp.DEFER_DECL_BASE);
 		  }
 		adecl.noteValue(fexp);
 		adecl.setFlag(Declaration.IS_IMPORTED);
@@ -363,22 +366,25 @@ public class require extends Syntax
 					  new Expression[] {
 					    new QuoteExp(info)}));
 	  }
-	else if (instance == null) // Need to make sure 'run' is invoked.
-	  {
-            if (instanceField != null)
-              { //Optimization
-                args = new Expression[]
-                  { new QuoteExp(type), new QuoteExp("$instance") };
-                args = new Expression[]
-                  { new ApplyExp(SlotGet.staticField, args) };
-                Method run
-                  = Compilation.typeRunnable.getDeclaredMethod("run", 0);
-                dofind = new ApplyExp(run, args);
+	else
+          {
+            Method run = Compilation.typeRunnable.getDeclaredMethod("run", 0);
+            if (decl != null) // Need to make sure 'run' is invoked.
+              dofind = new ReferenceExp(decl);
+            else
+              {
+                if (instanceField != null)
+                  { //Optimization
+                    args = new Expression[]
+                      { new QuoteExp(type), new QuoteExp("$instance") };
+                    dofind = new ApplyExp(SlotGet.staticField, args);
+                  }
+                //else
+                //dofind = Convert.makeCoercion(dofind, Type.void_type);
               }
-	    else
-              dofind = Convert.makeCoercion(dofind, Type.void_type);
-	    dofind.setLine(tr);
-	    forms.addElement(dofind);
+            dofind = new ApplyExp(run, new Expression[] { dofind });
+            dofind.setLine(tr);
+            forms.addElement(dofind);
 	  }
       }
     tr.mustCompileHere();
@@ -445,6 +451,19 @@ public class require extends Syntax
       fdecl.setFlag(Declaration.STATIC_SPECIFIED);
     if (isFinal && ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
+    else if (isFinal && fvalue instanceof FieldLocation
+             && isStatic) // for now
+      {
+	FieldLocation floc = (FieldLocation) fvalue;
+        Declaration vdecl = floc.getDeclaration();
+        ReferenceExp fref = new ReferenceExp(fdecl);
+        fref.setDontDereference(true);
+        fdecl.noteValue(fref);
+        if (vdecl.isProcedureDecl())
+          fdecl.setProcedureDecl(true);
+        if (vdecl.getFlag(Declaration.IS_SYNTAX))
+          fdecl.setSyntax();
+      }
     else
       fdecl.noteValue(null);
     fdecl.setSimple(false);

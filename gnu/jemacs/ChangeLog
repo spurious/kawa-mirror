@@ -1,3 +1,7 @@
+2000-06-18  Per Bothner  <per@bothner.com>
+
+	* status.html:  New documentation file.
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* testsuite:  New directory.

@@ -157,7 +157,7 @@
                      (invoke obj2 'two))))
 
 (define internal-node-name list)
-(require <module1>)
+(require <module2>)
 (test 4 list-length-1 '(a b c d))
 (test 2 list-length-3 '(a b))
 (test 0 length (classify))

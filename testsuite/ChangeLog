@@ -1,3 +1,10 @@
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* module1.scm:  Move most of the definitions to module2.scm.
+	* module2.scm:  New file.  New test from Jocelyn Paine.
+	* Makefile.am:  Update to make module2.class.
+	* obj-test.scm:  Require module2 instead of module1.
+
 2001-09-15  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  New test, for bug reported by Jocelyn Paine.

@@ -1029,6 +1029,8 @@ to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
 Emit a warning if the code references a variable which is neither in
 lexical scope nor in the compile-time dynamic (global) environment.
 This is useful for catching typos.
+(A @code{define-variable} form can be used to silence warnings.
+It declares to the compiler that a variable is to be resolved dynamically.)
 @end table
 
 An option can be followed by a value, as
@@ -4348,6 +4350,21 @@ If the definition is at module level, then the compiler
 will create a @code{final} field with the given name and type.
 The @var{value} is evaluated as normal; however, if it is a
 compile-time constant, it defaults to being static.
+@end deffn
+
+@deffn Syntax define-variable name [init]
+If @var{init} is specified and @var{name} does not have a global variable
+binding, then @var{init} is evaluated, and @var{name} bound to the result.
+Otherwise, the value bound to @var{name} does not change.
+(Note that @var{init} is not evaluated
+if @var{name} does have a global variable binding.)
+
+Also, declares to the compiler that @var{name} will be looked up
+in the dynamic environment. This can be useful for shutting up
+warnings from @code{--warn-undefined-variable}.
+
+This is similar to the Common Lisp @code{defvar} form.
+However, the Kawa version is (currently) only allowed at module level.
 @end deffn
 
 @deffn Syntax define-namespace name namespace-uri

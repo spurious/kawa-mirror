@@ -59,6 +59,22 @@ public class GenericProc extends MethodProc
       maxArgs = n;
   }
 
+  /*
+  public int applyIfMatches (CallContext ctx) throws Throwable
+  {
+    int r = NO_MATCH;
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = applyIfMatches(ctx);
+	if (code == 0)
+	  return 0;
+	// FIXME: r = combine(r, code);
+      }
+    return r;
+  }
+  */
+
   public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);

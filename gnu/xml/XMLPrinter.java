@@ -161,7 +161,7 @@ public class XMLPrinter implements Consumer, PositionConsumer
     else
       {
 	startWord();
-	out.writeChars(v.toString());
+	out.writeChars(v == null ? "(null)" : v.toString());
       }
   }
 

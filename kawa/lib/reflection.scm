@@ -97,7 +97,7 @@
 		  ctype fname ftype 1 #|PUBLIC|#))))
 (define-syntax primitive-set-field
   (syntax-rules ()
-		((primitive-put-field ctype fname ftype)
+		((primitive-set-field ctype fname ftype)
 		 (constant-fold
 		  (primitive-constructor
 		   <kawa.lang.SetFieldProc>
@@ -107,7 +107,7 @@
 
 (define-syntax primitive-get-static
   (syntax-rules ()
-		((primitive-get-field ctype fname ftype)
+		((primitive-get-static ctype fname ftype)
 		 (constant-fold
 		  (primitive-constructor
 		   <kawa.lang.PrimGetStatic>
@@ -116,7 +116,7 @@
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 (define-syntax primitive-set-static
   (syntax-rules ()
-		((primitive-put-field ctype fname ftype)
+		((primitive-set-static ctype fname ftype)
 		 (constant-fold
 		  (primitive-constructor
 		   <kawa.lang.PrimSetStatic>

@@ -87,8 +87,6 @@ public class ReferenceExp extends Expression
     else
       {
 	comp.compileConstant (symbol);
-	if (comp.immediate)
-	  comp.method.compile_checkcast (comp.scmSymbolType);
 	code.emitInvokeStatic(comp.lookupGlobalMethod);
       }
     target.compileFromStack(comp, getType());

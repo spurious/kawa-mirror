@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.xml.*;
 import org.xml.sax.*;
 import gnu.mapping.Symbol;
+import gnu.text.Char;
 
 /** Forward Consumer events to a SAX2 ContentHandler.
  */
@@ -201,8 +202,7 @@ public class ContentConsumer implements Consumer, Attributes
 
   public void endGroup(String typeName)
   {
-    if (numAttributes >= 0)
-      endStartTag();
+    endStartTag();
     nesting--;
     int i = 3 * nesting;
     try
@@ -284,10 +284,18 @@ public class ContentConsumer implements Consumer, Attributes
 
   public void writeObject(Object v)
   {
-    if (inStartTag == 1)
-      endStartTag();
     // Maybe prepend ' '?  FIXME
-    strBuffer.append(v);
+    if (v instanceof Consumable)
+      ((Consumable) v).consume(this);
+    else if (v instanceof SeqPosition)
+      {
+	SeqPosition pos = (SeqPosition) v;
+	pos.sequence.consumeNext(pos.ipos, this);
+      }
+    else if (v instanceof Char)
+      writeChar(((Char) v).intValue());
+    else
+      writeChars(v == null ? "(null)" : v.toString());
   }
 
   public void writeBoolean(boolean v)

@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 2000, 2003  Per M.A. Bothner.
+// Copyright (c) 1997, 2000, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -425,29 +425,34 @@ public abstract class Type {
 
   static public ClassType string_type = ClassType.make("java.lang.String");
   /* The String type. but coercion is handled by toString. */
-  static public ClassType tostring_type = new ClassType("java.lang.String");
+  public static final ClassType tostring_type
+    = new ClassType("java.lang.String");
 
-  static public ClassType pointer_type = ClassType.make("java.lang.Object");
-  static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
-  static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
-  static public Type[] typeArray0 = new Type[0];
-  static public Method toString_method
-  = pointer_type.getDeclaredMethod("toString", 0);
-  static public ClassType number_type = ClassType.make("java.lang.Number");
-  static public Method intValue_method
-  = number_type.addMethod ("intValue", typeArray0,
+  public static final ClassType pointer_type
+    = ClassType.make("java.lang.Object");
+  public static final ClassType boolean_ctype
+    = ClassType.make("java.lang.Boolean");
+  public static final ClassType throwable_type
+    = ClassType.make("java.lang.Throwable");
+  public static final Type[] typeArray0 = new Type[0];
+  public static final Method toString_method
+    = pointer_type.getDeclaredMethod("toString", 0);
+  public static final ClassType number_type
+    = ClassType.make("java.lang.Number");
+  public static final Method intValue_method
+    = number_type.addMethod("intValue", typeArray0,
 			    int_type, Access.PUBLIC);
-  static public Method longValue_method
-  = number_type.addMethod ("longValue", typeArray0,
+  public static final Method longValue_method
+    = number_type.addMethod("longValue", typeArray0,
 			    long_type, Access.PUBLIC);
-  static public Method floatValue_method
-  = number_type.addMethod ("floatValue", typeArray0,
+  public static final Method floatValue_method
+    = number_type.addMethod("floatValue", typeArray0,
 			    float_type, Access.PUBLIC);
-  static public Method doubleValue_method
-  = number_type.addMethod ("doubleValue", typeArray0,
+  public static final Method doubleValue_method
+    = number_type.addMethod("doubleValue", typeArray0,
 			    double_type, Access.PUBLIC);
-  static public Method booleanValue_method
-  = boolean_ctype.addMethod ("booleanValue", typeArray0,
+  public static final Method booleanValue_method
+    = boolean_ctype.addMethod("booleanValue", typeArray0,
 			      boolean_type, Access.PUBLIC);
 
   protected Class reflectClass;

@@ -1,5 +1,7 @@
 2004-11-22  Per Bothner  <per@bothner.com>
 
+	* Type.java (tostring_type, pointer_type, ...): Make final.
+
 	* ClassType.java (writeExternal): Better error message.
 
 2004-08-05  Per Bothner  <per@bothner.com>

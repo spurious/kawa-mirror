@@ -34,6 +34,7 @@ java_sources = \
   KawaConvert.java \
   Keyword.java \
   LambdaExp.java \
+  LangExp.java \
   LetExp.java \
   Literal.java \
   LitTable.java \

@@ -66,7 +66,7 @@ public class LambdaExp extends ScopeExp
   public ApplyExp returnContinuation;
 
   /** If non-null, a Declaration whose value is (only) this LambdaExp. */
-  Declaration nameDecl;
+  public Declaration nameDecl;
 
   /** If non-null, this is a Field that is used for implementing lexical closures.
    * If getName() is "closureEnv", it is our parent's heapFrame,
@@ -714,7 +714,13 @@ public class LambdaExp extends ScopeExp
     boolean isStatic;
     // 'I' if initMethod ($finit$); 'C' if clinitMethod (<clinit>).
     char isInitMethod = '\0';
-    if (isClassMethod())
+    if (nameDecl != null
+	&& nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED))
+      isStatic = false;
+    else if (nameDecl != null
+	     && nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+      isStatic = true;
+    else if (isClassMethod())
       {
 	if (outer instanceof ClassExp)
 	  {
@@ -733,13 +739,7 @@ public class LambdaExp extends ScopeExp
       }
     else if (thisVariable != null || closureEnvType == ctype)
       isStatic = false;
-    else if (nameDecl == null)
-      isStatic = true;
-    else if (nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED))
-      isStatic = false;
-    else if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
-      isStatic = true;
-    else if (nameDecl.context instanceof ModuleExp)
+    else if (nameDecl != null && nameDecl.context instanceof ModuleExp)
       {
 	ModuleExp mexp = (ModuleExp) nameDecl.context;
 	isStatic = mexp.getSuperType() == null && mexp.getInterfaces() == null;
@@ -763,8 +763,10 @@ public class LambdaExp extends ScopeExp
     boolean withContext
       = (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
 	 && isInitMethod == '\0');
-   int mflags = (isStatic ? Access.STATIC : 0)
-      + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
+    int mflags = isStatic ? Access.STATIC : 0;
+    if (nameDecl != null)
+      mflags
+	|= nameDecl.getAccessFlags(nameDecl.isPrivate() ? 0 : Access.PUBLIC);
     if (isInitMethod != '\0')
       {
 	if (isStatic)
@@ -1539,7 +1541,7 @@ public class LambdaExp extends ScopeExp
 
   /** If non-null, the type of values returned by this function.
    * If null, the return type has not been set or calculated yet. */
-  protected Type returnType;
+  public Type returnType;
 
   /** The return type of this function, i.e the type of its returned values. */
   public final Type getReturnType()

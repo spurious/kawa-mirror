@@ -81,6 +81,8 @@ public class ExpWalker
   {
     return walkLetExp(exp);
   }
+  protected Expression walkLangExp (LangExp exp)
+  { return walkExpression(exp); }
 
   LambdaExp currentLambda = null;
 

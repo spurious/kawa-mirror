@@ -1,3 +1,13 @@
+2004-02-12  Per Bothner  <per@bothner.com>
+
+	* LangExp.java:  New class, extends Expression.
+	* Makefile.am:  Update accordingly.
+	* ExpWalker.java (walkLangExp):  New method.
+
+	* LambdaExp.java (addMethodFor):  Set access flags from nameDecl.
+
+	* LambdaExp.java (nameDecl, returnType):  Make public, for Lambda.
+
 2004-02-11  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileToFiles):  Don't outputClass after error.

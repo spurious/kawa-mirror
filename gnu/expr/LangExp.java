@@ -1,0 +1,34 @@
+// Copyright (c) 2004  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.expr;
+import gnu.mapping.*;
+
+/** A language-specific expression. */
+
+public class LangExp extends Expression
+{
+  Object hook;
+
+  public Object getLangValue () { return hook; }
+  public void setLangValue (Object value) { hook = value; }
+
+  public LangExp () { }
+
+  public LangExp (Object value) { this.hook = value; }
+
+  public void print (OutPort out)
+  {
+    out.print("(LangExp ???)");
+  }
+
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkLangExp(this);
+  }
+
+  public void compile (Compilation comp, Target target)
+  {
+    throw new RuntimeException("compile called on LangExp");
+  }
+}

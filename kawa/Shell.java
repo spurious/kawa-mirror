@@ -14,6 +14,141 @@ import gnu.lists.*;
 
 public class Shell
 {
+  private static Class[] noClasses = { };
+  private static  Class[] boolClasses = { Boolean.TYPE };
+  private static  Class[] xmlPrinterClasses
+    = {gnu.lists.Consumer.class,  java.lang.Object.class };
+  private static  Class[] httpPrinterClasses
+    = {gnu.mapping.OutPort.class };
+  private static Object portArg = "(port)";
+
+  /** A table of names of known output formats.
+   * For each entry, the first Object is the format name.
+   * The next entries are a class name, the name of a static method in that
+   * class, and the parameter types (as a Class[] suitable for getMethod).
+   * The remain values are arguments (passed to invoke), except that if an
+   * argument is the spacial value portArg, it is replaced by the
+   * destination OutPort. */
+   
+  static Object[][] formats =
+    {
+      { "scheme", "gnu.kawa.functions.DisplayFormat",
+	"getSchemeFormat", boolClasses,
+	Boolean.FALSE },
+      { "readable-scheme", "gnu.kawa.functions.DisplayFormat", 
+	"getSchemeFormat", boolClasses,
+	Boolean.TRUE },
+      { "elisp", "gnu.kawa.functions.DisplayFormat",
+	"getEmacsLispFormat", boolClasses,
+	Boolean.FALSE },
+      { "readable-elisp", "gnu.kawa.functions.DisplayFormat",
+	"getEmacsLispFormat", boolClasses,
+	Boolean.TRUE },
+      { "clisp", "gnu.kawa.functions.DisplayFormat",
+	"getCommonLispFormat", boolClasses,
+	Boolean.FALSE },
+      { "readable-clisp", "gnu.kawa.functions.DisplayFormat",
+	"getCommonLispFormat", boolClasses,
+	Boolean.TRUE },
+      { "commonlisp", "gnu.kawa.functions.DisplayFormat",
+	"getCommonLispFormat", boolClasses,
+	Boolean.FALSE },
+      { "readable-commonlisp", "gnu.kawa.functions.DisplayFormat",
+	"getCommonLispFormat", boolClasses,
+	Boolean.TRUE },
+      { "xml", "gnu.xml.XMLPrinter",
+	"make", xmlPrinterClasses,
+	portArg, null },
+      { "html", "gnu.xml.XMLPrinter",
+	"make", xmlPrinterClasses,
+	portArg, "html" },
+      { "xhtml", "gnu.xml.XMLPrinter",
+	"make", xmlPrinterClasses,
+	portArg, "xhtml" },
+      { "cgi", "gnu.kawa.xml.HttpPrinter",
+	"make", httpPrinterClasses,
+	portArg },
+      { "ignore", "gnu.lists.VoidConsumer",
+	"getInstance", noClasses },
+      { null }
+    };
+
+  public static String defaultFormatName;
+  public static Object[] defaultFormatInfo;
+  public static java.lang.reflect.Method defaultFormatMethod;
+
+  /** Specify the default output format.
+   * @param name The name of the format, as an entry in the formats table.
+   */
+  public static void setDefaultFormat(String name)
+  {
+    name = name.intern();
+    defaultFormatName = name;
+    for (int i = 0;  ;  i++)
+      {
+	Object[] info = formats[i];
+	Object iname = info[0];
+	if (iname == null)
+	  {
+	    System.err.println ("kawa: unknown output format '"+name+"'");
+	    System.exit (-1);
+	  }
+	else if (iname == name)
+	  {
+	    defaultFormatInfo = info;
+	    try
+	      {
+		Class formatClass = Class.forName((String) info[1]);
+		defaultFormatMethod
+		  = formatClass.getMethod((String) info[2], (Class[]) info[3]);
+		
+	      }
+	    catch (Throwable ex)
+	      {
+		System.err.println("kawa:  caught "+ex+" while looking for format '"+name+"'");
+		System.exit (-1);
+	      }
+	    break;
+	  }
+      }
+    if (! defaultFormatInfo[1].equals("gnu.lists.VoidConsumer"))
+      ModuleBody.setMainPrintValues(true);
+  }
+
+  /** Return a Consumer that formats using the appropriate format.
+   * The format is choses depending on specified defaults.
+   * @param out The output where formatted output is sent to.
+   */
+  public static Consumer getOutputConsumer(OutPort out)
+  {
+    Object[] info = defaultFormatInfo;
+    if (out == null)
+      return VoidConsumer.getInstance();
+    else if (info == null)
+      return Interpreter.getInterpreter().getOutputConsumer(out);
+    try
+      {
+	Object args[] = new Object[info.length - 4];
+	System.arraycopy(info, 4, args, 0, args.length);
+	for (int i = args.length;  --i >= 0; )
+	  if (args[i] == portArg)
+	    args[i] = out;
+	Object format = defaultFormatMethod.invoke(null, args);
+	if (format instanceof FormatToConsumer)
+	  {
+	    out.objectFormat = (FormatToConsumer) format;
+	    return out;
+	  }
+	else
+	  return (Consumer) format;
+      }
+    catch (Throwable ex)
+      {
+	throw new RuntimeException("cannot get output-format '"
+				   + defaultFormatName + "' - caught " + ex);
+      }
+  }
+
   public static void run (Interpreter interp)
   {
     run(interp, interp.getEnvironment());
@@ -35,16 +170,33 @@ public class Shell
   public static void run (Interpreter interp,  Environment env,
 			  InPort inp, OutPort pout, OutPort perr)
   {
+    Consumer out;
+    FormatToConsumer saveFormat = null;
+    if (pout != null)
+      saveFormat = pout.objectFormat;
+    out = getOutputConsumer(pout);
+    try
+      {
+	run(interp, env, inp, out, perr);
+      }
+    finally
+      {
+	if (pout != null)
+	  pout.objectFormat = saveFormat;
+      }
+  }
+
+  public static void run (Interpreter interp,  Environment env,
+			  InPort inp, Consumer out, OutPort perr)
+  {
     SourceMessages messages = new SourceMessages();
     Lexer lexer = interp.getLexer(inp, messages);
     CallContext ctx = new CallContext();
-    FormatToConsumer saveFormat = null;
-    if (pout == null)
-      ctx.consumer = new VoidConsumer();
-    else
+    Consumer saveConsumer = null;
+    if (out != null)
       {
-	saveFormat = pout.objectFormat;
-	ctx.consumer = interp.getOutputConsumer(pout);
+	saveConsumer = ctx.consumer;
+	ctx.consumer = out;
       }
     try
       {
@@ -103,8 +255,8 @@ public class Shell
       }
     finally
       {
-	if (pout != null)
-	  pout.objectFormat = saveFormat;
+	if (out != null)
+	  ctx.consumer = saveConsumer;
       }
   }
 

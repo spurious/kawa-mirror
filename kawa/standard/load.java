@@ -6,8 +6,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
-import gnu.lists.Sequence;
-import gnu.lists.VoidConsumer;
+import gnu.lists.*;
 
 public class load extends Procedure1 {
   /** Load using the name of a compile .class file. */
@@ -121,15 +120,17 @@ public class load extends Procedure1 {
     throws SyntaxException, Throwable
   {
     boolean print = ModuleBody.getMainPrintValues();
+    Interpreter interp = Interpreter.getInterpreter();
+    Consumer out = (print ? kawa.Shell.getOutputConsumer(OutPort.outDefault())
+		    : new VoidConsumer());
+    out.beginDocument();
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more efficient.
     // Unfortunately, it is difficult to get macros to work properly.
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run(Interpreter.defaultInterpreter, env, port,
-		       print ? OutPort.outDefault() : null,
-		       OutPort.errDefault());
+	kawa.Shell.run(interp, env, port, out, OutPort.errDefault());
       }
     else
       {
@@ -139,13 +140,11 @@ public class load extends Procedure1 {
 	if (messages.seenErrors())
 	  throw new SyntaxException(messages);
 	CallContext ctx = new CallContext();
-	if (print)
-	  ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(OutPort.outDefault());
-	else
-	  ctx.consumer = new VoidConsumer();
+	ctx.consumer = out;
 	ctx.values = Values.noArgs;
 	mexp.evalModule(env, ctx);
       }
+    out.endDocument();
   }
 
   public final Object apply1 (Object arg1)

@@ -1,3 +1,15 @@
+2002-01-13  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Define response-header.
+	* kawa/Shell.java (format):  New static table.
+	(setDefaultFormat, getOutputConsumer):  New static methods.
+	(run):  New overload taking an output Consumer instead of an OutPort.
+	* kawa/repl.java (processArgs):  New method.
+	New code to handle "\\" and "--output-format" or "--format".
+	(main):  Use processArgs.
+	* kawa/standard/load.java (loadSource):  Use getOutputConsumer.
+	Wrap body in a beginDocument/endDocument pair.
+
 2002-01-07  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files): Do mangleNameIfNeeded.

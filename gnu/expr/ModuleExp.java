@@ -18,6 +18,8 @@ public class ModuleExp extends ClassExp
    * This can be a let scope, or primitive procedure. */
   public boolean mustCompile;
 
+  public static boolean debugPrintExpr = false;
+
   public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
@@ -161,6 +163,16 @@ public class ModuleExp extends ClassExp
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
+
+	if (debugPrintExpr)
+	  {
+	    OutPort dout = OutPort.outDefault();
+	    dout.println ("[Evaluating module \""+getName()+"\" mustCompile="+mustCompile+':');
+	    this.print(dout);
+	    dout.println(']');
+	    dout.flush();
+	  }
+
 	if (! mustCompile) // optimization - don't generate unneeded Class.
 	  body.eval (env, ctx);
 	else
@@ -239,6 +251,16 @@ public class ModuleExp extends ClassExp
 	  }
       }
 
+    if (debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + getName()
+		      + " top:" + topname + " prefix=" + prefix + " :");
+	this.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
     /* DEBUGGING:
     OutPort perr = OutPort.errDefault();
     perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
@@ -315,27 +337,30 @@ public class ModuleExp extends ClassExp
     return walker.walkModuleExp(this);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print("(#%module/");
+    out.startLogicalBlock("(Module/", ")", 2);
     if (name != null)
       {
-	ps.print(name);
-	ps.print('/');
+	out.print(name);
+	out.print('/');
       }
-    ps.print(id);
-    ps.println("/ (");
+    out.print(id);
+    out.print('/');
+    out.writeSpaceFill();
+    out.startLogicalBlock("(", false, ")");
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	ps.print("  ");
-	ps.println(decl);
+	out.print(decl);
+	out.writeSpaceFill();
       }
-    ps.print(") ");
+    out.endLogicalBlock(")");
+    out.writeSpaceLinear();
     if (body == null)
-      ps.print("<null body>");
+      out.print("<null body>");
     else
-      body.print (ps);
-    ps.print(")");
+      body.print (out);
+    out.endLogicalBlock(")");
   }
 }

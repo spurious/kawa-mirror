@@ -26,6 +26,9 @@ public class Compilation
    * Do this even if it makes things a little slower. */
   public static boolean fewerClasses;
 
+  /** If true, print out final expressions after optimizations etc. */
+  public static boolean debugPrintFinalExpr;
+
   public static boolean usingCPStyle;
   public static boolean usingTailCalls = false;
 
@@ -612,14 +615,6 @@ public class Compilation
     mainClass = new ClassType(classname);
     mainLambda = lexp;
 
-    /* DEBUGGING:
-    OutPort perr = OutPort.errDefault();
-    perr.println ("[Expression after parsing:");
-    lexp.print (perr);
-    perr.println();
-    perr.flush();
-    */
-
     // Do various code re-writes and optimization.
     PushApply.pushApply(lexp);
     InlineCalls.inlineCalls(lexp);
@@ -627,6 +622,15 @@ public class Compilation
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp);
+
+    if (debugPrintFinalExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println ("[Compiling final "+lexp.getName()+" class="+classname+':');
+	lexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
 
     mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);

@@ -16,7 +16,7 @@ public class SaveExcursion extends Syntax
   public static ClassType typeBuffer
     = ClassType.make("gnu.jemacs.buffer.Buffer");
 
-  public SaveExcursion(boolean bufferObly)
+  public SaveExcursion(boolean bufferOnly)
   {
     this.bufferOnly = bufferOnly;
   }

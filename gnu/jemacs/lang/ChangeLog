@@ -1,3 +1,8 @@
+2003-02-08  Per Bothner  <per@bothner.com>
+
+	* SaveExcursion.java (<init>):  Fix typo.
+	Reported by Knut Wannheden <d96knut@dtek.chalmers.se>.
+
 2002-07-28  Per Bothner  <per@bothner.com>
 
 	* CatchableException.java: New class, extends RuntimeException.

@@ -65,10 +65,12 @@ public class Options
       {
     	if (argument == null
 	    || argument.equals("1")
+	    || argument.equals("on")
 	    || argument.equals("yes")
 	    || argument.equals("true"))
 	  return Boolean.TRUE;
 	if (argument.equals("0")
+	    || argument.equals("off")
 	    || argument.equals("no")
 	    || argument.equals("false"))
 	  return Boolean.FALSE;
@@ -107,7 +109,7 @@ public class Options
 	if (! (value instanceof Boolean))
 	  {
 	    error("value for option "+key
-		  +" must be boolean or yes/no/true/false/1/0",
+		  +" must be boolean or yes/no/true/false/on/off/1/0",
 		  messages);
 	    return;
 	  }
@@ -144,7 +146,7 @@ public class Options
     if (value == null)
       {
 	if ((info.kind & BOOLEAN_OPTION) != 0)
-	  return "value of option "+key+" must be yes/no/true/false/1/0";
+	  return "value of option "+key+" must be yes/no/true/false/on/off/1/0";
       }
     if (valueTable == null)
       valueTable = new Hashtable();

@@ -1,3 +1,7 @@
+2003-10-20  Per Bothner  <per@bothner.com>
+
+	* Options.java (valueOf):  Allow "on"/"off" for boolean options.
+
 2003-10-19  Per Bothner  <per@bothner.com>
 
 	* Options.java (valueTable, infoTable):  Only allocate when needed.

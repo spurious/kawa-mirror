@@ -29,8 +29,10 @@ public class define_alias extends Syntax implements Printable
       ((ReferenceExp) arg).setDontDereference(true);
     else
       arg = location.rewrite(arg, tr);
+    tr.mustCompileHere(); // For simplicity.
     tr.push(decl);
     SetExp sexp = new SetExp(decl, arg);
+    tr.setLineOf(sexp);
     decl.noteValue(arg);
     sexp.setDefining (true);
     if (! (arg instanceof ReferenceExp))

@@ -1,6 +1,7 @@
 package kawa.standard;
 import gnu.mapping.*;
 import gnu.math.Unit;
+import gnu.kawa.reflect.ClassMethods;
 
 /** An Environment that does special handling for names of the form "<TYPE>".
  * I.e. if an identifier of the form is unbound, then get a matching Type.
@@ -11,36 +12,11 @@ import gnu.math.Unit;
  * is that 2in is no longer a literal.)
  */
 
-public class ScmEnv extends Environment
+public class ScmEnv extends InheritingEnvironment
 {
-  Environment[] extras;
-  int  numExtras;
-
-  /** Add an extra Environment that also gets searched. */
-  public final void addExtra(Environment env)
+  public ScmEnv (String name, Environment previous)
   {
-    if (extras == null)
-      {
-	extras = new Environment[4];
-	extras[0] = env;
-	numExtras = 1;
-      }
-    else
-      {
-	if (numExtras > extras.length)
-	  {
-	    Environment[] tmp = new Environment[2 * numExtras];
-	    System.arraycopy(extras, 0, tmp, 0, numExtras);
-	    extras = tmp;
-	  }
-	extras[numExtras++] = env;
-      }
-  }
-
-  public ScmEnv (Environment previous)
-  {
-    super (previous);
-    unboundConstraint = new ScmEnvConstraint(this);
+    super(name, previous);
   }
 
   static gnu.bytecode.Type getType (String name)
@@ -54,63 +30,23 @@ public class ScmEnv extends Environment
     return null;
   }
 
-  public Object get (String name, Object defaultValue)
+  public NamedLocation lookupExtend (Symbol name, Object property, int hash)
   {
-    Symbol symbol = lookup(name);
-    Object value = symbol == null ? defaultValue : symbol.get(defaultValue);
-    if (value != defaultValue
-	|| (defaultValue != Symbol.UNBOUND
-	    && super.get(name, Symbol.UNBOUND) != Symbol.UNBOUND))
-      return value;
-
-    if (symbol != null)
+    String nam = name.getName();
+    if (property == null)
       {
-	symbol = AliasConstraint.followAliases(symbol);
-	if (symbol != null)
-	  name = symbol.getName();
+	Object val = null;
+	String uri = name.getNamespaceURI();
+	if (uri != null && uri.startsWith("class:"))
+	  val = ClassMethods.apply(uri.substring(6), nam);
+	else if (nam.endsWith("$unit"))
+	  val = Unit.lookup(nam.substring(0, nam.length()-5));
+	else 
+	  val = getType(nam);
+	if (val != null)
+	  return define(name, property, hash, val);
       }
-
-    if (name.endsWith("$unit"))
-      {
-	Unit unit = Unit.lookup(name.substring(0, name.length()-5));
-	if (unit != null)
-	  return unit;
-      }
-    gnu.bytecode.Type type = getType(name);
-    if (type != null)
-      return type;
-
-    for (int i = numExtras;  --i >= 0; )
-      {
-	value = extras[i].get(name, Symbol.UNBOUND);
-	if (value != Symbol.UNBOUND)
-	  return value;
-      }
-    return defaultValue;
-  }
-
-}
-
-class ScmEnvConstraint extends UnboundConstraint
-{
-  public ScmEnvConstraint (Environment environment)
-  {
-    super(environment);
-  }
-
-  public Object get (Symbol symbol, Object defaultValue)
-  {
-    String name = symbol.getName();
-    if (name.endsWith("$unit"))
-      {
-        Unit unit = Unit.lookup(name.substring(0, name.length()-5));
-        if (unit != null)
-          return unit;
-      }
-    gnu.bytecode.Type type = ScmEnv.getType(name);
-    if (type == null)
-      return defaultValue;
-    set(symbol, type);
-    return type;
+    
+    return null;
   }
 }

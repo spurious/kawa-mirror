@@ -61,23 +61,11 @@ public class define extends Syntax implements Printable
     boolean makeConstant = (options & 8) != 0;
 
     ScopeExp scope = tr.currentScope();
-    Declaration alias;
-    if (nameSyntax != null && nameSyntax.scope != scope)
-      {
-	ScopeExp templateScope = nameSyntax.scope;
-	alias = new Declaration(name);
-	alias.setAlias(true);
-	alias.setPrivate(true);
-	alias.context = templateScope;
-	templateScope.addDeclaration(alias);
-	name = new String(name.toString());
-      }
-    else
-      alias = null;
-    Declaration decl = defs.getDefine(name, 'w', tr);
-    if (alias != null)
-      alias.noteValue(new ReferenceExp(decl));
-    tr.push(decl);
+    if (name instanceof String)
+      name = tr.namespaceResolve((String) name);
+
+    Declaration decl = tr.define(name, nameSyntax, defs);
+    name = decl.getSymbol();
     if (makePrivate)
       {
 	decl.setFlag(Declaration.PRIVATE_SPECIFIED);

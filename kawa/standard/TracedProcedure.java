@@ -11,9 +11,8 @@ public class TracedProcedure extends ProcedureN
   public Procedure proc;
   boolean enabled;
 
-  static Symbol indentation
-  = Symbol.makeUninterned(gnu.math.IntNum.zero(), "indentation");
   static int indentationStep = 2;
+  static Symbol curIndentSym = new Symbol("current-indentation", null);
 
   public TracedProcedure (Procedure proc, boolean enable)
   {
@@ -49,7 +48,17 @@ public class TracedProcedure extends ProcedureN
   {
     if (enabled)
       {
-        int curIndent = ((IntNum) indentation.getValue()).intValue();
+	Environment env = Environment.getCurrent();
+	Location curIndentLoc = env.getLocation(curIndentSym);
+	Object oldIndent = curIndentLoc.get(null);
+        int curIndent;
+	if (! (oldIndent instanceof IntNum))
+	  {
+	    curIndent = 0;
+	    curIndentLoc.set(IntNum.zero());
+	  }
+	else
+	  curIndent = ((IntNum) oldIndent).intValue();
 	PrintWriter out = OutPort.errDefault();
 	String name = getName();
 	if (name == null)
@@ -71,14 +80,11 @@ public class TracedProcedure extends ProcedureN
 
         // Now do the actual call, but with the indentation incremented.
         CallContext context = CallContext.getInstance();
-        FluidBinding oldBindings = context.fluidBindings;
         IntNum newIndentation = IntNum.make(curIndent+indentationStep);
-        FluidBinding newBindings
-          = new FluidBinding(oldBindings, newIndentation, indentation);
 	Object result;
+	Object save = curIndentLoc.setWithSave(newIndentation);
         try
           {
-            context.setFluids(newBindings);
             result = proc.applyN(args);
           }
         catch (RuntimeException e)
@@ -89,7 +95,7 @@ public class TracedProcedure extends ProcedureN
           }
         finally
           {
-            context.resetFluids(oldBindings);
+	    curIndentLoc.setRestore(save);
           }
 
         // Print the result (indented).

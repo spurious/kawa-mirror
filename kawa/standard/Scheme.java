@@ -29,7 +29,7 @@ public class Scheme extends LispInterpreter
   /** Define a procedure to be autoloaded. */
   protected void define_proc (String name, String className)
   {
-    define (name, new AutoloadProcedure (name, className, environ));
+    define (name, new AutoloadProcedure (name, className, this));
   }
 
   protected void define_syntax (String name, Syntax proc)
@@ -41,16 +41,6 @@ public class Scheme extends LispInterpreter
 
   /* Define a Syntax to be autoloaded. */
   protected void define_syntax (String name, String className)
-  {
-    define (name, new AutoloadSyntax (name, className, environ));
-  }
-
-  /** Declare in the current Environment a Syntax bound to a static field.
-   * @param name the procedure's source-level name.
-   * @param cname the name of the class containing the field.
-   */
-
-  protected void defSntxStFld(String name, String className)
   {
     define (name, new AutoloadSyntax (name, className, environ));
   }
@@ -91,8 +81,8 @@ public class Scheme extends LispInterpreter
       Named syn;
 
       // (null-environment)
-      nullEnvironment = new Environment ();
-      nullEnvironment.setName ("null-environment");
+      nullEnvironment = Environment.make("null-environment");
+
       environ = nullEnvironment;
 
       Lambda lambda = new kawa.lang.Lambda();
@@ -108,35 +98,31 @@ public class Scheme extends LispInterpreter
       define_syntax ("set!", "kawa.standard.set_b");
 
       // Section 4.2  -- complete
-      define_syntax ("cond", "kawa.lib.std_syntax");
-      define_syntax ("case", "kawa.lib.std_syntax");
-      define_syntax ("and", "kawa.lib.std_syntax");
-      define_syntax ("or", "kawa.lib.std_syntax");
-      define_syntax ("%let", kawa.standard.let.let);
-      define_syntax ("let", "kawa.lib.std_syntax");
-      define_syntax ("%let-decl", "kawa.lib.std_syntax");
-      define_syntax ("%let-init", "kawa.lib.std_syntax");
-      define_syntax ("let*", "kawa.lib.std_syntax");
-      define_syntax ("letrec", "kawa.lib.std_syntax");
+      defSntxStFld("cond", "kawa.lib.std_syntax");
+      defSntxStFld("case", "kawa.lib.std_syntax");
+      defSntxStFld("and", "kawa.lib.std_syntax");
+      defSntxStFld("or", "kawa.lib.std_syntax");
+      defSntxStFld("%let", "kawa.standard.let", "let");
+      defSntxStFld("let", "kawa.lib.std_syntax");
+      defSntxStFld("let*", "kawa.lib.std_syntax");
+      defSntxStFld("letrec", "kawa.lib.std_syntax");
 
       define ("begin", new kawa.standard.begin());
-      define_syntax ("do", "kawa.lib.std_syntax");
-      define_syntax ("delay", "kawa.lib.std_syntax");
-      define_proc ("%make-promise", "kawa.lib.std_syntax");
+      defSntxStFld("do", "kawa.lib.std_syntax");
+      defSntxStFld("delay", "kawa.lib.std_syntax");
+      defProcStFld("%make-promise", "kawa.lib.std_syntax");
       define_syntax ("quasiquote", "kawa.standard.quasiquote");
 
       //-- Section 5  -- complete [except for internal definitions]
 
       // Appendix (and R5RS)
-      define_syntax ("define-syntax", "kawa.lib.prim_syntax");
-      define ("%define-syntax", new kawa.standard.define_syntax ());
-      define ("syntax-rules", new kawa.standard.syntax_rules ());
+      defSntxStFld("define-syntax", "kawa.lib.prim_syntax");
       define ("syntax", new kawa.standard.syntax ());
       define ("let-syntax", new kawa.standard.let_syntax (false));
       define ("letrec-syntax", new kawa.standard.let_syntax (true));
 
-      r4Environment = new Environment (nullEnvironment);
-      r4Environment.setName ("r4rs-environment");
+      nullEnvironment.setLocked();
+      r4Environment = Environment.make("r4rs-environment", nullEnvironment);
       environ = r4Environment;
 
       //-- Section 6.1  -- complete
@@ -392,9 +378,10 @@ public class Scheme extends LispInterpreter
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
-      r5Environment = new Environment (r4Environment);
-      r5Environment.setName ("r5rs-environment");
+      r4Environment.setLocked();
+      r5Environment = Environment.make("r5rs-environment", r4Environment);
       environ = r5Environment;
+
       defProcStFld("values", "kawa.lib.misc");
       defProcStFld("call-with-values", "kawa.standard.call_with_values",
 		   "callWithValues");
@@ -408,11 +395,12 @@ public class Scheme extends LispInterpreter
       defProcStFld("interaction-environment", "kawa.lib.misc");
       defProcStFld("dynamic-wind", "kawa.lib.misc");
 
-      kawaEnvironment = new Environment (r5Environment);
+      r5Environment.setLocked();
+      kawaEnvironment = Environment.make("kawa-environment", r5Environment);
       environ = kawaEnvironment;
  
-      defSntxStFld ("define-private", "kawa.lib.prim_syntax");
-      defSntxStFld ("define-constant", "kawa.lib.prim_syntax");
+      defSntxStFld("define-private", "kawa.lib.prim_syntax");
+      defSntxStFld("define-constant", "kawa.lib.prim_syntax");
 
       define_syntax("define-autoload", new define_autoload(false));
       define_syntax("define-autoloads-from-file", new define_autoload(true));
@@ -477,7 +465,7 @@ public class Scheme extends LispInterpreter
       defProcStFld("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
       defProcStFld("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
       defProcStFld("field", "gnu.kawa.reflect.SlotGet");
-      defProcStFld("class-methods", "gnu.kawa.reflect.ClassMethods");
+      define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
       defProcStFld("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
       defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
@@ -489,6 +477,10 @@ public class Scheme extends LispInterpreter
       define ("%define-macro",
 	      new kawa.standard.define_syntax("define-macro", false));
       define ("syntax-case", new kawa.standard.syntax_case ());
+      define ("%define-syntax", new kawa.standard.define_syntax ());
+      define ("syntax-rules", new kawa.standard.syntax_rules ());
+      defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
+      defProcStFld("syntax-body->expression", "kawa.lib.prim_syntax");
 
       defProcStFld("file-exists?", "kawa.lib.files");
       defProcStFld("file-directory?", "kawa.lib.files");
@@ -506,12 +498,9 @@ public class Scheme extends LispInterpreter
 
       defProcStFld("system", "kawa.lib.system");
       defProcStFld("make-process", "kawa.lib.system");
-      define_proc("tokenize-string-to-string-array", "kawa.lib.system");
-      define_proc("tokenize-string-using-shell", "kawa.lib.system");
-      if ("/".equals(System.getProperty("file.separator")))
-	define ("command-parse", lookup("tokenize-string-using-shell"));
-      else
-	define ("command-parse", lookup("tokenize-string-to-string-array"));
+      defProcStFld("tokenize-string-to-string-array", "kawa.lib.system");
+      defProcStFld("tokenize-string-using-shell", "kawa.lib.system");
+      defProcStFld("command-parse", "kawa.lib.system");
       
       defProcStFld("record-accessor", "kawa.lib.reflection");
       defProcStFld("record-modifier", "kawa.lib.reflection");
@@ -535,6 +524,7 @@ public class Scheme extends LispInterpreter
       defProcStFld("scheme-implementation-version", "kawa.lib.misc");
       defProcStFld("scheme-window", "kawa.lib.windows");
       defSntxStFld("define-procedure", "kawa.lib.syntax");
+      defProcStFld("add-procedure-properties", "kawa.lib.syntax");
       defProcStFld("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       defProcStFld("procedure-property", "kawa.lib.misc");
@@ -684,9 +674,11 @@ public class Scheme extends LispInterpreter
       defSntxStFld("cut", "gnu.kawa.slib.cut");
       defSntxStFld("cute", "gnu.kawa.slib.cut");
 
-      define_proc ("emacs", "gnu.jemacs.buffer.emacs");
-      define_proc ("node", "gnu.kawa.xml.MakeTreeNode");
+      defProcStFld("emacs", "gnu.jemacs.buffer.emacs");
       defSntxStFld("cond-expand", "kawa.lib.syntax");
+      defSntxStFld("%cond-expand", "kawa.lib.syntax");
+ 
+      kawaEnvironment.setLocked();
   }
 
   static int scheme_counter = 0;
@@ -723,24 +715,8 @@ public class Scheme extends LispInterpreter
   {
     if (kawaEnvironment == null)
       initScheme();
-    ScmEnv environ = new ScmEnv (kawaEnvironment);
-    environ.setName ("interaction-environment."+(++scheme_counter));
-
-    // Do: environ.addExtra(new NamespaceEnv(environ))
-    // but without requiring that NamespaceEnv be available at compile-time.
-    try
-      {
-	Class typeNamespaceEnv = Class.forName("gnu.kawa.xml.NamespaceEnv");
-	Class[] argTypes = { Class.forName("gnu.mapping.Environment") };
-	java.lang.reflect.Constructor constr
-	  = typeNamespaceEnv.getDeclaredConstructor(argTypes);
-	Environment[] args = { environ };
-	environ.addExtra((Environment) constr.newInstance(args));
-      }
-    catch (Throwable ex)
-      {
-      }
-    return environ;
+    return new ScmEnv ("interaction-environment."+(++scheme_counter),
+		       kawaEnvironment);
   }
 
   /** Evalutate Scheme expressions from string.
@@ -978,6 +954,6 @@ public class Scheme extends LispInterpreter
   {
     Scheme interp = new Scheme();
     Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Environment.setCurrent(interp.getEnvironment());
   }
 }

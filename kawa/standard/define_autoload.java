@@ -43,20 +43,12 @@ public class define_autoload extends Syntax
 	return false;
       }
     Object names = p.car;
-    Object type = null;
     Object filename = null;
     if (p.cdr instanceof Pair)
       {
 	p = (Pair) p.cdr;
-	if (p.car == "::" && p.cdr instanceof Pair
-	    && ((Pair) p.cdr).cdr instanceof Pair)
-	  {
-	    p = (Pair) p.cdr;
-	    type = p.car;
-	    p = (Pair) p.cdr;
-	  }
 	filename = p.car;
-	return process(names, type, filename, forms, defs, tr);
+	return process(names, filename, forms, defs, tr);
       }
     tr.syntaxError("invalid syntax for define-autoload");
     return false;
@@ -190,7 +182,7 @@ public class define_autoload extends Syntax
 		      {
 			name = ((Pair)pair.cdr).car.toString();
 			value = new AutoloadProcedure(name, filename,
-						      tr.getGlobalEnvironment());
+						      tr.getInterpreter());
 		      }
 		    else
 		      tr.error('w', "unsupported ;;;###autoload followed by: "
@@ -201,6 +193,8 @@ public class define_autoload extends Syntax
 			Expression ex = new QuoteExp(value);
 			decl.setFlag(Declaration.IS_CONSTANT);
 			decl.noteValue(ex);
+			decl.setProcedureDecl(true);
+			decl.setType(Compilation.typeProcedure);
 		      }
 		  }
 		lineStart = false;
@@ -229,15 +223,15 @@ public class define_autoload extends Syntax
       }
   }
 
-  public static boolean process(Object names, Object type, Object filename,
+  public static boolean process(Object names, Object filename,
 			       java.util.Vector forms,
 			       ScopeExp defs, Translator tr)
   {
     if (names instanceof Pair)
       {
 	Pair p = (Pair) names;
-	return (process(p.car, type, filename, forms, defs, tr)
-		&& process(p.cdr, type, filename, forms, defs, tr));
+	return (process(p.car, filename, forms, defs, tr)
+		&& process(p.cdr, filename, forms, defs, tr));
       }
     if (names == LList.Empty)
       return true;
@@ -268,23 +262,12 @@ public class define_autoload extends Syntax
       {
 	String name = (String) names;
 	Declaration decl = defs.getDefine(name, 'w', tr);
-	Object value;
 	if (filename instanceof String
 	    && (len = (fn = (String) filename).length()) > 2
 	    && fn.charAt(0) == '<' && fn.charAt(len-1) == '>')
 	  filename = fn.substring(1, len-1);
-	if (type == "<syntax>" || type == "<macro>")
-	  value = new AutoloadSyntax(name, filename.toString(),
-				     tr.getGlobalEnvironment());
-	else if (type == "<procedure>" || type == "<interactive>"
-		 || type == null)
-	  value = new AutoloadProcedure(name, filename.toString(),
-					tr.getGlobalEnvironment());
-	else
-	  {
-	    tr.syntaxError("unknown autoload type: " + type);
-	    return false;
-	  }
+	Object value = new AutoloadProcedure(name, filename.toString(),
+					     tr.getInterpreter());
 	Expression ex = new QuoteExp(value);
 	decl.setFlag(Declaration.IS_CONSTANT);
 	decl.noteValue(ex);

@@ -1,3 +1,8 @@
+2004-08-05  Chris Dean  <ctdean@sokitomi.com>
+
+	* SlotGet.java (Inlineable):  Check for "isFname" methods.
+	* SlotSet.java (Inlineable):  Likewise.
+
 2004-08-08  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN):  Use new matchN method.  Don't use applyV.

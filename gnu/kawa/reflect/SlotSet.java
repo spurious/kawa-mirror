@@ -61,12 +61,19 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       }
 
     // Try looking for a method "setFname" instead.
-    // First look for "getName", to get the "field type".
-    String getName = ClassExp.slotToMethodName("get", name);
+    // First look for "getName" or "isName", to get the "field type".
     try
       {
-        java.lang.reflect.Method getmethod
-          = clas.getMethod(getName, SlotGet.noClasses);
+        java.lang.reflect.Method getmethod = null;
+    
+        try {
+          String getName = ClassExp.slotToMethodName("get", name);
+          getmethod = clas.getMethod(getName, SlotGet.noClasses);
+        } catch (Exception getEx) {
+          String getName = ClassExp.slotToMethodName("is", name);
+          getmethod = clas.getMethod(getName, SlotGet.noClasses);
+        }
+        
 	String setName = ClassExp.slotToMethodName("set", name);
         Class[] setArgTypes = new Class[1];
         setArgTypes[0] = getmethod.getReturnType();
@@ -117,9 +124,14 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         if (field != null)
           return field;
 
-        // Try looking for a method "getFname" instead:
+        // Try looking for a method "getName" or "isName" instead:
         String getName = ClassExp.slotToMethodName("get", name);
         gnu.bytecode.Method method = clas.getMethod(getName, Type.typeArray0);
+        if (method == null)
+          {
+            getName = ClassExp.slotToMethodName("is", name);
+            method = clas.getMethod(getName, Type.typeArray0);
+          }
         if (method == null)
           return null;
         Type ftype = method.getReturnType();

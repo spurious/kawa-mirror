@@ -89,12 +89,20 @@ public class SlotGet extends Procedure2
           }
       }
 
-    // Try looking for a method "getFname" instead:
-    String mname = ClassExp.slotToMethodName("get", fname);
+    // Try looking for a method "getFname" or "isFname" instead:
     try
       {
-        java.lang.reflect.Method getmethod
-          = clas.getMethod(mname, noClasses);
+        String mname = null;
+        java.lang.reflect.Method getmethod = null;
+        
+        try {
+          mname = ClassExp.slotToMethodName("get", fname);
+          getmethod = clas.getMethod(mname, noClasses);
+        } catch (Exception getEx) {
+          mname = ClassExp.slotToMethodName("is", fname);
+          getmethod = clas.getMethod(mname, noClasses);
+        }
+
         if (isStatic
             && (getmethod.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0)
           throw new RuntimeException("cannot call non-static getter method `"

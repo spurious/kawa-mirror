@@ -1,3 +1,7 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA):  Update to use ../../../bin/kawa.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* lang-test.lisp:  New test for separate name spaces.

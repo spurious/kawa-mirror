@@ -10,7 +10,6 @@ import kawa.lang.Printable;
 import kawa.lang.Executable; 
 import kawa.lang.Syntaxable; 
 import kawa.lang.Symbol;
-import kawa.lang.Exit;
 
 // Exceptions
 import kawa.lang.UnboundSymbol;
@@ -92,10 +91,11 @@ public class Interpreter extends Object
   }
 
   public static Object lookup_global (Symbol name)
+       throws UnboundSymbol
   {
     Object result = curInterpreter.lookup (name);
     if (result == null)
-      new UnboundSymbol(name.toString ());
+      throw new UnboundSymbol(name.toString ());
     return result;
   }
 
@@ -132,24 +132,6 @@ public class Interpreter extends Object
          list = (Pair)list.cdr;
       }
       return list;
-   }
-
-   public Object apply(Object rator,Object rands,java.util.Vector frames)
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError,
-             kawa.lang.UnboundSymbol
-   {
-      if (rator instanceof kawa.lang.Executable) {
-         Executable proc = (Executable)rator;
-         return proc.execute(this,frames,rands);
-      } else if (rator instanceof kawa.lang.Syntaxable) {
-         Syntaxable s = (Syntaxable)rator;
-         return s.execute(this,frames,rands);
-      } else {
-         //-- TODO: Must handle closures and continuations
-         return undefinedObject;
-      }
    }
 
    public Object eval(Object obj) 

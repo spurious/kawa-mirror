@@ -7,7 +7,7 @@ import gnu.expr.*;
 
 /** A Lexer to reading S-expressions in generic Lisp-like syntax. */
 
-public abstract class LispReader extends Lexer
+public class LispReader extends Lexer
 {
   public LispReader(LineBufferedReader port)
   {

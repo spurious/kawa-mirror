@@ -1,3 +1,7 @@
+2002-02-13  Per Bothner  <per@bothner.com>
+
+	* LispReader.java:  Make non-abstract.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (makeBody):  New method.

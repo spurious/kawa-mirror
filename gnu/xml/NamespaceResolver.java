@@ -24,8 +24,8 @@ public class NamespaceResolver extends FilterConsumer
   /** True if currently processing an atribute value.. */
   boolean inAttribute;
 
-  // This is where save attributes while processing a begin element.
-  // It may be the final output if cons instancedof TreeList.
+  // This is where we save attributes while processing a begin element.
+  // It may be the final output if cons instanceof TreeList.
   TreeList tlist;
 
   // The specified target Consumer that accepts the output.
@@ -36,8 +36,8 @@ public class NamespaceResolver extends FilterConsumer
   String[] namespaceStack;
 
   // Length of active part of namespaceStack.
-  // This is twice the number of namespace declarations seem (including
-  // the predefined one for "xml"), since we push but the prefix and the uri.
+  // This is twice the number of namespace declarations seen (including
+  // the predefined one for "xml"), since we push both the prefix and the uri.
   int namespaceStackLength;
 
   // For each beginGroup seen (and not yet seen the endGroup),
@@ -174,7 +174,8 @@ public class NamespaceResolver extends FilterConsumer
 	    || (prefix == null && nsPrefix == null))
 	  return namespaceStack[i+1];
       }
-    return null; // ??
+    // if (prefix != null) ERROR;  // FIXME 
+    return "";
   }
 
   int indexHashMask = (1 << 5) - 1;
@@ -250,7 +251,7 @@ public class NamespaceResolver extends FilterConsumer
 	  {
 	    int index = getIndex(name, type);
 	    if (i == 0)
-	      tlist.setIntN(tlist.gapEnd + 2, index);
+	      tlist.setIntN(tlist.gapEnd + 1, index);
 	    else if (! isNsNode || namespacePrefixes)
 	      tlist.setIntN(startIndexes[i] + 1, index);
 	  }

@@ -1,3 +1,11 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* QName.java.in (make):  LocalName can be null (for XQuery '*').
+
+	* NamespaceResolver.java (endAttributes);  Fix off-by-one bug.
+
+	* NamespaceResolver.java (resolve):  Return "" if no namespace.
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (out):  Changed form PrintWriter to Consumer.

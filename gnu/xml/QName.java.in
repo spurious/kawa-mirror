@@ -19,14 +19,16 @@ import java.lang.ref.*;
 
 public class QName implements Externalizable
 {
-  /** The namespace URI if it exists (as an interned String), else null. */
+  /** The namespace URI if it exists (as an interned String).
+   * If there is no namespace, then the empty string.
+   * Null is used for "*" when matching to mean any namespace. */
   public final String getNamespaceURI()
   {
     return namespaceURI;
   }
 
   /** The local name of a qualified name, as an interned String.
-   * If namespaceURI is null, this is the fully-qualified name. */
+   * If namespaceURI is empty, this is the fully-qualified name. */
   public final String getLocalName()
   {
     return localName;
@@ -122,7 +124,7 @@ public class QName implements Externalizable
    */
   public static synchronized QName make(String namespaceURI, String localName)
   {
-    int hash = localName.hashCode();
+    int hash = localName == null? 0 : localName.hashCode();
     int index = hashSearch(table, log2Size,
 			   namespaceURI, localName, hash);
     @QTableElement@ element = table[index];
@@ -140,7 +142,9 @@ public class QName implements Externalizable
 @endif WITHOUT REFERENCES@
     if (namespaceURI != null)
       namespaceURI = namespaceURI.intern();
-     QName qnew = new QName(namespaceURI, localName.intern());
+    if (localName != null)
+      localName = localName.intern();
+     QName qnew = new QName(namespaceURI, localName);
      enter(qnew, index);
      return qnew;
   }

@@ -219,12 +219,17 @@ public class Declaration
    * both EXTERNAL_ACCESS and IS_PRIVATE set. */
   public static final String PRIVATE_PREFIX = "$Prvt$";
 
-  /** This bit is set if to get the actual value you have to reference
-   * a <code>gnu.mapping.Location</code>.  I.e. this Declarations's
-   * <code>var</code> or <code>field</code> does not contain the Declaration's
-   * value diretly, but rather yields a Location that contains the Declaration's value.
-   */
+  /** If this flag is set then to get the actual value you have to dereference
+   * a <code>gnu.mapping.Location</code>.  I.e. this <code>Declaration</code>'s
+   * <code>var</code> or <code>field</code> does not contain the
+   * <code>Declaration</code>'s value directly, but rather yields a
+   * <code>Location</code> that contains the <code>Declaration</code>'s value.
+   * Note that this flag indicates the <em>representation</em>:
+   * The result of <code>getValue()</code> is not the location, but the 
+   * semantic value. after dereferencing.  Likewise <code>getType</code> is
+   * the value after de-referencing, not a <code>Location</code> sub-class. */
   static final int INDIRECT_BINDING = 1;
+
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
   static final int CAN_WRITE = 8;

@@ -231,8 +231,6 @@ public class Invoke extends ProcedureN implements Inlineable
                                        comp, Target.pushObject);
                         for (int i = 0;  i < slots.length;  i++)
                           {
-                            System.err.println("i:"+i+" alen:"+args.length
-                                               +" slen:"+slots.length);
                             code.emitDup(type);
                             SlotSet.compileSet(this, type,
                                                args[2 * i + 2],

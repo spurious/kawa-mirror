@@ -1,3 +1,16 @@
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (typeApplyMethodContainer):  New static field.
+	(generateApplyMethods):  If applet. implement ApplyMethodContent.
+	Add generateApplyMethodContainer local variable.
+	* LambdaExp.java (addMethodFor):  Set closureEnv for applets.
+	Make method non-static if thisVariable is set.
+
+	* ThisExp.java:  New class; extends ReferenceExp.
+	* Makefile.am, Makefile.in (java_JAVA):  Added ThisExp.java.
+	* ExpWalker.java (walkThisExp):  New virtual method.
+	* FindCapturedVars.java (walkThisExp):  New method.
+
 2000-02-11  Per Bothner  <per@bothner.com>
 
 	* BindingInitializer.java:  Create Binding2 instead of Binding

@@ -56,6 +56,7 @@ java_JAVA=\
   SynchronizedExp.java \
   TailTarget.java \
   Target.java \
+  ThisExp.java \
   TryExp.java \
   Undefined.java
 

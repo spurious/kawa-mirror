@@ -194,6 +194,13 @@ public class FindCapturedVars extends ExpFullWalker
    return exp;
   }
 
+  public Object walkThisExp (ThisExp exp)
+  {
+    // FIXME - not really right, but works in simple cases.
+    getCurrentLambda ().setImportsLexVars();
+    return exp;
+  }
+
   public Object walkSetExp (SetExp exp)
   {
     if (exp.binding != null)

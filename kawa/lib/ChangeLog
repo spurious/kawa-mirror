@@ -1,6 +1,7 @@
 Mon Jan 19 16:05:29 1998  Per Bothner  <bothner@cygnus.com>
 
-	* ports.scm (input-port-read-state, copy-file):  New procedures.
+	* files.scm (copy-file):  New procedure.
+	* ports.scm (input-port-read-state):  New procedure.
 	(default-prompter):  Use input-port-read-state.
 	* Makefile.am, Makefile.in:  Update for new procedures.
 

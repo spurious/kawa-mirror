@@ -454,7 +454,7 @@ public class InPort extends FilterInputStream implements Printable
 	    break;
 	  }
       } while (inString);
-    return obj;
+    return new FString (obj);
   }
 
   protected Object readQuote (Symbol func_symbol)
@@ -554,7 +554,7 @@ public class InPort extends FilterInputStream implements Printable
 	switch (c)
 	  {
 	  case -1:
-	    return Interpreter.eofObject;
+	    return Sequence.eofValue;
 	  case ';':
 	    do
 	      {

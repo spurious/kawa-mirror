@@ -54,6 +54,7 @@ Sequence.class \
 List.class \
 Pair.class \
 PairWithPosition.class \
+FString.class \
 print.class \
 Symbol.class \
 Vector.class \

@@ -129,14 +129,6 @@ public class Literal
 	comp.method.compile_push_int (((Integer)value).intValue ());
 	comp.method.compile_invoke_nonvirtual (comp.initIntegerMethod);
       }
-    else if (value instanceof StringBuffer)
-      {
-	comp.method.compile_new (comp.scmStringType);
-	comp.method.compile_dup (comp.scmStringType);
-	StringBuffer string = (StringBuffer) value;
-	comp.method.compile_push_string (value.toString ());
-	comp.method.compile_invoke_nonvirtual (comp.initStringBufferMethod);
-      }
     else if (value instanceof String)
       {
 	comp.method.compile_push_string (value.toString ());

@@ -23,7 +23,7 @@ public class Compilation
   static public ClassType scmObjectType = new ClassType ("java.lang.Object");
   static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
   static public ClassType scmSymbolType = new ClassType ("kawa.lang.Symbol");
-  static public ClassType scmStringType = new ClassType ("java.lang.StringBuffer");
+  static public ClassType scmSequenceType = new ClassType ("kawa.lang.Sequence");
   static public ClassType javaStringType = new ClassType ("java.lang.String");
   static public ClassType javaIntegerType = new ClassType ("java.lang.Integer");
   static public ClassType scmListType = new ClassType ("kawa.lang.List");
@@ -59,7 +59,7 @@ public class Compilation
   = scmInterpreterType.new_field ("undefinedObject", scmUndefinedType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field eofConstant
-  = scmInterpreterType.new_field ("eofObject", scmSymbolType,
+  = scmSequenceType.new_field ("eofValue", scmSymbolType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nameField
   = scmNamedType.new_field ("sym_name", scmSymbolType, Access.PUBLIC);
@@ -68,8 +68,8 @@ public class Compilation
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
   static Method makeListMethod;
-  static Method initStringBufferMethod;
   static Type[] int1Args = { Type.int_type };
+  static Type[] string1Arg = { javaStringType };
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -80,14 +80,9 @@ public class Compilation
 						    int1Args, Type.void_type,
 						    Access.PUBLIC);
 
-    Type[] string1Arg = { javaStringType };
     makeSymbolMethod = scmSymbolType.new_method ("make", string1Arg,
 						 scmSymbolType,
 						 Access.PUBLIC|Access.STATIC);
-    initStringBufferMethod = scmStringType.new_method ("<init>", string1Arg,
-						       Type.void_type,
-						       Access.PUBLIC);
-
     Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
       = scmInterpreterType.new_method ("lookup_global", sym1Arg,
@@ -192,7 +187,7 @@ public class Compilation
 	  }
 	else if (value == Interpreter.voidObject)
 	  literal = new Literal (value, voidConstant, this);
-	else if (value == Interpreter.eofObject)
+	else if (value == Sequence.eofValue)
 	  literal = new Literal (value, eofConstant, this);
 	else if (value == Interpreter.nullObject)
 	  literal = new Literal (value, nullConstant, this);
@@ -279,9 +274,17 @@ public class Compilation
 	char ch = name.charAt (i);
 	// This function is probably not quite enough ...
 	// (Note the verifier may be picky about class names.)
-	if (ch == '.' || ch == '/' || ch == '-' || ch == '%')
-	  ch = '_';
-	mangled.append (ch);
+	if (Character.isLowerCase (ch) || Character.isUpperCase (ch)
+	    || Character.isDigit (ch))
+	  mangled.append (ch);
+	else
+	  {
+	    mangled.append ('_');
+	    mangled.append (Character.forDigit ((ch >> 12) & 15, 16));
+	    mangled.append (Character.forDigit ((ch >>  8) & 15, 16));
+	    mangled.append (Character.forDigit ((ch >>  4) & 15, 16));
+	    mangled.append (Character.forDigit ((ch      ) & 15, 16));
+	  }
       }
     return mangled.toString ();
   }

@@ -1,3 +1,21 @@
+2003-09-14  Per Bothner  <per@bothner.com>
+
+	* AncestorAxis.java:  New class, extends TreeScanner.
+	* AncestorOrSelfAxis.java:  Likewise.
+	* FollowingAxis.java:  Likewise.
+	* FollowingSiblingAxis.java:  Likewise.
+	* PrecedingAxis.java:  Likewise.
+	* PrecedingSiblingAxis.java:  Likewise.
+
+	* ChildAxis.java (scan):  Re-write to use nextMatching.
+	* DescendantAxis.java (scan):  Likewise.
+	* DescendantOrSelfAxis.java (scan):  Likewise.
+
+	* NamedAttributes.java:  Removed - no longer used.
+	* NamedChildren.java:  Likewise.
+	* NamedDescendants.java:  Likewise.
+	* Makefile.am:  Update accordingly.
+
 2003-09-09  Per Bothner  <per@bothner.com>
 
 	* CoerceNodes.java:  New class, extends Procedure1.

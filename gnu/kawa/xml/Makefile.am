@@ -3,6 +3,8 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  AncestorAxis.java \
+  AncestorOrSelfAxis.java \
   AttributeAxis.java \
   Attributes.java \
   AttributeConstructor.java \
@@ -17,14 +19,13 @@ java_sources = \
   ElementConstructor.java \
   ElementType.java \
   Focus.java \
+  FollowingAxis.java \
+  FollowingSiblingAxis.java \
   HttpPrinter.java \
   IteratorItems.java \
   ListItems.java \
   MakeResponseHeader.java \
   MakeUnescapedData.java \
-  NamedAttributes.java \
-  NamedChildren.java \
-  NamedDescendants.java \
   NamespaceEnv.java \
   NodeCompare.java \
   NodeName.java \
@@ -32,6 +33,8 @@ java_sources = \
   NodeType.java \
   OutputAsXML.java \
   ParentAxis.java \
+  PrecedingAxis.java \
+  PrecedingSiblingAxis.java \
   SelfAxis.java \
   SortNodes.java \
   SortedNodes.java \

@@ -19,11 +19,24 @@ public class DescendantOrSelfAxis extends TreeScanner
   {
     if (type.isInstancePos(seq, ipos))
       out.writePosition(seq, ipos);
-    ipos = seq.firstChildPos(ipos);
-    while (ipos != 0)
+    if (! (seq instanceof TreeList))
+      { // AbstractSequence's nextMatching does not support descend.  FIXME.
+	ipos = seq.firstChildPos(ipos);
+	while (ipos != 0)
+	  {
+	    scan(seq, ipos, out);
+	    ipos = seq.nextPos(ipos);
+	  }
+	return;
+      }
+    int limit = seq.nextPos(ipos);
+    int child = ipos;
+    for (;;)
       {
-	scan(seq, ipos, out);
-	ipos = seq.nextPos(ipos);
+	child = seq.nextMatching(child, type, limit, true);
+	if (child == 0)
+	  break;
+	out.writePosition(seq, child);
       }
   }
 }

@@ -1,7 +1,7 @@
 package gnu.lists;
 import java.io.*;
 
-/** A Pair with the file name and position it was read from. */
+/** A <code>Pair</code> with the file name and position it was read from. */
 
 public class PairWithPosition extends Pair
 {

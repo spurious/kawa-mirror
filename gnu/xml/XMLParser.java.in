@@ -166,14 +166,34 @@ public class @XMLParser@
             // "Subroutine" for reading a Name.
             for (;;)
               {
-		// Update for XML 2nd ed.   FIXME
-                if ((ch >= 'a' && ch <= 'z')
-                    || (ch >= 'A' && ch <= 'Z')
-		    || ch == '_' || ch == ':'
-                    || (pos > start
-			&& (ch >= '0' && ch <= '9')
-			|| ch == '.' || ch == '-'))
-                  {
+		// XML 1.1 candidate recommendation:
+		// [2] Char    ::=    #x9 | #xA | #xD | [#x20-#x7E] | #x85
+		//   | [#xA0-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+		// [4]  NameStartChar := ":" | [A-Z] | "_" | [a-z] |
+		//   [#xC0-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] |
+		//   [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] |
+		//   [#x3001-#xD7FF] | [#xF900-#xEFFFF]
+		// [4a] NameChar := NameStartChar | "-" | "." | [0-9] | #xB7 |
+		//   [#x0300-#x036F] | [#x203F-#x2040]
+                if ((ch >= 'a' && ch <= 'z') ||
+		    (ch >= 'A' && ch <= 'Z') ||
+		    ch == '_' || ch == ':' ||
+		    (ch >= 0xC0 && (ch <= 0x2FF ||
+				    (ch >= 0x370 &&
+				     ((ch <= 0x1FFF && ch != 0x37E) ||
+				      (ch >= 0x200C &&
+				       (ch <= 0x200D ||
+					(ch >= 0x2070 && ch <= 0x218F)||
+					(ch >= 0x2C00 && ch <= 0x2FEF) ||
+					(ch >= 0x3001 && ch <= 0xD7FF) ||
+					(ch >= 0xF900 && ch <= 0xFFFD))))))) ||
+		    (pos > start &&
+		     (ch >= '0' && ch <= '9') ||
+		      ch == '.' || ch == '-' ||
+		     ch == 0xB7 ||
+		     (ch > 0x300 &&
+		      (ch <= 0x36F || (ch >= 0x203F && ch <= 0x2040)))))
+		  {
                   }
                 else
                   {

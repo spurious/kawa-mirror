@@ -1,3 +1,8 @@
+2003-04-12  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java.in (parse):  Handle Names according to XML 1.1
+	candidate, allowing many other characters.
+
 2003-01-28  Per Bothner  <per@bothner.com>
 
 	* VariableProvider.java:  Removed - superceded more-or-less by XQuery.

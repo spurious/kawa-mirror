@@ -5,7 +5,7 @@ package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
 
-public class Attributes extends CpsProcedure
+public class Attributes extends MethodProc
 {
   public static final Attributes attributes = new Attributes();
   

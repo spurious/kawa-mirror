@@ -1,3 +1,17 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* Attributes.java:  Extend MethodProc instead of CpsProcedure.
+	* CommentConstructor.java:  Likewise.
+	* IteratorItems.java:  Likewise.
+	* ListItems.java:  Likewise.
+	* MakeCDATA.java:  Likewise.
+	* MakeProcInst.java:  Likewise.
+	* MakeResponseHeader.java:  Likewise.
+	* MakeText.java:  Likewise.
+	* NodeConstructor.java:  Likewise.
+	* OutputAsXML.java:  Likewise.
+	* TreeScanner.java:  Likewise.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* AttributeConstructor.java:  Remove unused import statements.

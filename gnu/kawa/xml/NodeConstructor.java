@@ -8,7 +8,7 @@ import gnu.expr.*;
 import gnu.xml.*;
 import gnu.lists.*;
 
-public abstract class NodeConstructor extends CpsProcedure
+public abstract class NodeConstructor extends MethodProc
 implements Inlineable
 {
   public abstract void compileToNode (ApplyExp exp, Compilation comp,

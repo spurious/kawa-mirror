@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 /* A function that maps an Iterator into the sequence of ite elements. */
 
-public class IteratorItems extends CpsProcedure
+public class IteratorItems extends MethodProc
 {
   public static IteratorItems iteratorItems = new IteratorItems();
 

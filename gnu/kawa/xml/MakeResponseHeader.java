@@ -9,7 +9,7 @@ import gnu.mapping.*;
  * It is implemented by report an attribute objects.
  * Document-level attributes are otherwise not valid. */
 
-public class MakeResponseHeader extends CpsProcedure
+public class MakeResponseHeader extends MethodProc
 {
   public static MakeResponseHeader makeResponseHeader
     = new MakeResponseHeader();

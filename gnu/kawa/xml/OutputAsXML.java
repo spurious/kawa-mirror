@@ -10,7 +10,7 @@ import gnu.xml.*;
  * The result Consumer is typically an OutPort.
  */
 
-public class OutputAsXML extends CpsProcedure
+public class OutputAsXML extends MethodProc
 {
    public int numArgs() { return 0x1001; }
 

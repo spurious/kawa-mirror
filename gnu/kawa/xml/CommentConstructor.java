@@ -6,7 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
-public class CommentConstructor extends CpsProcedure // NodeConstructor
+public class CommentConstructor extends MethodProc // NodeConstructor
 {
   public static final CommentConstructor commentConstructor
     = new CommentConstructor();

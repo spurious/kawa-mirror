@@ -6,7 +6,7 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xquery.util.StringValue;  // FIXME bad dependency
 
-public class MakeText extends CpsProcedure // NodeConstructor
+public class MakeText extends MethodProc // NodeConstructor
 {
   public static final MakeText makeText = new MakeText();
 

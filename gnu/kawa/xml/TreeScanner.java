@@ -14,7 +14,7 @@ import java.io.*;
  * of the argument that match the 'type' NodePredicate.
  */
 
-public abstract class TreeScanner extends CpsProcedure
+public abstract class TreeScanner extends MethodProc
   implements Externalizable
 {
   public NodePredicate type;

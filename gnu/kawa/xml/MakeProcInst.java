@@ -5,7 +5,7 @@ package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
 
-public class MakeProcInst extends CpsProcedure // NodeConstructor
+public class MakeProcInst extends MethodProc // NodeConstructor
 {
   public static final MakeProcInst makeProcInst
     = new MakeProcInst();

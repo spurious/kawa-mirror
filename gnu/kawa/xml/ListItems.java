@@ -11,7 +11,7 @@ import java.util.List;
 
 /* A function that maps a List into the sequence of ite elements. */
 
-public class ListItems extends CpsProcedure
+public class ListItems extends MethodProc
 {
   public static ListItems listItems = new ListItems();
 

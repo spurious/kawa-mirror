@@ -26,4 +26,11 @@ public class ErrorExp extends Expression
     ps.print (message);
     ps.print (")");
   }
+
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    // Should never happen!
+    if (!ignore_result)
+      comp.method.compile_push_null ();
+  }
 }

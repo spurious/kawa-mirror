@@ -1,5 +1,9 @@
 2005-03-03  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (SUBDIR): Some re-ordering to reduce dependencies.
+	Specifically, jemacs and commonlisp import scheme functions, including
+	ones in gnu.kawa.slib, so we sant to compile them later.
+
 	* kawa/standard/Scheme.java: Function 'children' has been moved.
 
 2005-02-24  Per Bothner  <per@bothner.com>

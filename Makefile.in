@@ -64,8 +64,8 @@ DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
 	gnu/mapping gnu/xml gnu/kawa/xml gnu/kawa/xslt gnu/expr \
 	gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions \
 	gnu/kawa/lispexpr gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant \
-	gnu/kawa/models gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
-	gnu/jemacs gnu/kawa/swingviews gnu/kawa/slib gnu/xquery \
+	gnu/kawa/models gnu/kawa/swingviews kawa gnu/kawa/slib \
+	gnu/commonlisp gnu/q2 gnu/ecmascript gnu/jemacs gnu/xquery \
 	gnu/brl gnu/kawa/brl bin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -220,16 +220,18 @@ target_vendor = @target_vendor@
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant gnu/kawa/models \
-  gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
-  $(SWING_SUBDIRS) gnu/kawa/slib $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
+  gnu/kawa/models $(SWINGVIEWS_SUBDIRS) \
+  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
 
 @ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
 @ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
 @ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
 @ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = gnu/kawa/servlet
-@WITH_SWING_TRUE@SWING_SUBDIRS = gnu/jemacs gnu/kawa/swingviews
+@WITH_SWING_TRUE@SWINGVIEWS_SUBDIRS = gnu/kawa/swingviews
+@WITH_SWING_TRUE@JEMACS_SUBDIRS = gnu/jemacs
 javadir = $(datadir)/java
 JAR = jar
 @WITH_SWING_TRUE@JAR_DEPS_SWING = \

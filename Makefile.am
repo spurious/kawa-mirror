@@ -3,9 +3,10 @@
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
-  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant gnu/kawa/models \
-  gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
-  $(SWING_SUBDIRS) gnu/kawa/slib $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant \
+  gnu/kawa/models $(SWINGVIEWS_SUBDIRS) \
+  kawa gnu/kawa/slib gnu/commonlisp gnu/q2 gnu/ecmascript \
+  $(JEMACS_SUBDIRS) $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
 if ENABLE_XML
 XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
 BRL_SUBDIRS = gnu/brl gnu/kawa/brl
@@ -18,7 +19,8 @@ if ENABLE_SERVLET
 SERVLET_SUBDIRS = gnu/kawa/servlet
 endif
 if WITH_SWING
-SWING_SUBDIRS = gnu/jemacs gnu/kawa/swingviews
+SWINGVIEWS_SUBDIRS = gnu/kawa/swingviews
+JEMACS_SUBDIRS = gnu/jemacs
 endif
 javadir=$(datadir)/java
 

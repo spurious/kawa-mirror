@@ -124,8 +124,6 @@ public class ClassMemberConstraint extends Constraint
 	  }
 	if (object instanceof Named)
 	  name = ((Named) object).getName();
-	else if (object instanceof kawa.lang.Syntax) // FIXME
-	  name = ((kawa.lang.Syntax) object).getName();
 	else
 	  name = name.intern();
 	if (object instanceof Binding)

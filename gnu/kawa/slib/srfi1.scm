@@ -267,11 +267,27 @@
 
 ;;; (unfold not-pair? car cdr lis values)
 
-(define (list-copy lis)				
+;;; Re-written to be non-recursive (sorry!).  --Per
+
+(define (list-copy (lis :: <list>)) :: <list>
+  (let* ((null :: <list> '())
+	 (result :: <list> null)
+	 (prev :: <list> null))
+    (let recur ((lis :: <list> lis))
+      (if (pair? lis)
+	  (let ((p :: <pair> (cons (car lis) '())))
+	    (if (eq? prev null)
+		(set! result p)
+		(set-cdr! prev p))
+	    (set! prev p)
+	    (recur (cdr lis)))
+	  result))))
+#|
   (let recur ((lis lis))			
     (if (pair? lis)				
 	(cons (car lis) (recur (cdr lis)))	
-	lis)))					
+	lis)))	
+|#				
 
 ;;; IOTA count [start step]	(start start+step ... start+(count-1)*step)
 

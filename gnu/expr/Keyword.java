@@ -3,7 +3,7 @@ import gnu.mapping.*;
 import java.io.*;
 import gnu.lists.*;
 
-public class Keyword extends CpsProcedure implements Printable, Externalizable
+public class Keyword implements Printable, Externalizable
 {
   // Does not include final ':'.
   private String name;
@@ -124,24 +124,4 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
   {
     return make(name);
   }
-
-  public void apply (CallContext ctx)
-  {
-    Consumer out = ctx.consumer;
-    String tag = getName();
-    out.beginAttribute(tag, this);
-    Object endMarker = Symbol.UNBOUND;
-    for (;;)
-      {
-	Object arg = ctx.getNextArg(endMarker);
-	if (arg == endMarker)
-	  break;
-	if (arg instanceof Consumable)
-	  ((Consumable) arg).consume(out);
-	else
-	  out.writeObject(arg);
-      }
-    out.endAttribute();
-  }
-
 }

@@ -19,7 +19,7 @@ JAVAC = javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 
 # This redundant rule is needed for some versions of make, but not GNU make.
 repl.class:  $(srcdir)/repl.java
-	$(JAVAC) -d . $<
+	$(JAVAC) -d .. $<
 
 javadir=$(prefix)/java/$(subdir)
 

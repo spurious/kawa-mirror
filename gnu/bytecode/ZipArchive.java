@@ -238,14 +238,6 @@ public class ZipArchive
       }
   }
 
-  public byte[] contents (ZipMember zmember) throws IOException
-  {
-    file.seek (zmember.fileStart ());
-    byte[] result = new byte[zmember.compressed_size];
-    file.readFully (result);
-    return result;
-  }
-
   private static void usage ()
   {
     System.err.println ("zipfile [ptxq] archive [file ...]");
@@ -257,7 +249,7 @@ public class ZipArchive
     if (command.equals ("t"))
       zmember.print (System.out);
     else if (command.equals ("p"))
-      System.out.write (contents (zmember));
+      System.out.write(zmember.getData(this));
     else if (command.equals ("x"))
       {
 	String file_name = zmember.strName ();
@@ -272,7 +264,7 @@ public class ZipArchive
 	if (file_name.charAt (file_name.length () - 1) != '/')
 	  {
 	    FileOutputStream memfile = new FileOutputStream (mem_file);
-	    memfile.write (contents (zmember));
+	    memfile.write (zmember.getData(this));
 	    memfile.close ();
 	  }
       }

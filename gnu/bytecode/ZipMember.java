@@ -44,4 +44,12 @@ public class ZipMember
     return match_name.equals (strName ());
   }
 
+  public byte[] getData (ZipArchive archive) throws IOException
+  {
+    archive.file.seek (fileStart());
+    byte[] result = new byte[compressed_size];
+    archive.file.readFully (result);
+    return result;
+  }
+
 };

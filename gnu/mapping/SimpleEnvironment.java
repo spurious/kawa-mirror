@@ -187,10 +187,21 @@ public class SimpleEnvironment extends Environment
     NamedLocation nloc = lookupDirect(name, property, hash);
     if (loc == nloc)
       return nloc;
-    if (nloc == null)
+    boolean bound = (nloc != null);
+    if (! bound)
       nloc = addUnboundLocation(name, property, hash);
-    if (! (loc.isBound() ? getCanDefine() : getCanRedefine()))
-      redefineError(name, property, nloc);
+    if ((flags & CAN_DEFINE+CAN_REDEFINE) != CAN_DEFINE+CAN_REDEFINE)
+      {
+	if (bound)
+	  bound = nloc.isBound();
+	// We do this redundant testing to avoid invoking isBound,
+	// which may be expensive and/or cause needless errors, such in the
+	// case of a lazy ClassMemberLocation referring to a missing class.
+	if (bound
+	    ? ((flags & CAN_REDEFINE) == 0)
+	    : ((flags & CAN_DEFINE) == 0) && loc.isBound());
+	  redefineError(name, property, nloc);
+      }
     nloc.base = loc;
     nloc.value = IndirectableLocation.INDIRECT_FLUIDS;
     return nloc;

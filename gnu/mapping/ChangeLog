@@ -1,3 +1,7 @@
+2005-01-21  Per Bothner  <per@bothner.com>
+
+	* SimpleEnvironment.java (addLocation): Defer isBound() invocation.
+
 2005-01-16  Per Bothner  <per@bothner.com>
 
 	* IndirectableLocation.java (INDIRECT_FLUIDS): New constant.

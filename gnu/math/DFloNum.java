@@ -154,6 +154,30 @@ public class DFloNum extends RealNum implements Compilable
     return value == 0.0;
   }
 
+  /** Converts to the closest exact rational value. */
+  public static RatNum toExact (double value)
+  {
+    if (Double.isInfinite (value))
+      return value >= 0.0 ? RatNum.Infinity : RatNum.NegInfinity;
+    if (Double.isNaN (value))
+      throw new ArithmeticException ("cannot convert NaN to exact rational");
+    long bits = Double.doubleToLongBits (value);
+    boolean neg = bits < 0;
+    int exp = (int) (bits >> 52) & 0x7FF;
+    bits &= 0xfffffffffffffL;
+    if (exp == 0)
+      bits <<= 1;
+    else
+      bits |= 0x10000000000000L;
+    IntNum two = IntNum.make(2);
+    RatNum result;
+    if (exp >= 1075)
+      result = IntNum.power (two, exp - 1075);
+    else
+      result = new IntFraction (IntNum.one(), IntNum.power (two, 1075 - exp));
+    return RatNum.times (IntNum.make (neg ? -bits : bits), result);
+  }
+
   public String toString ()
   {
     return Double.toString (value);

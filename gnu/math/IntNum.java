@@ -753,11 +753,26 @@ public class IntNum extends RatNum implements Compilable
       }
   }
 
-  public static IntNum quotient (IntNum x, IntNum y)
+  public static IntNum quotient (IntNum x, IntNum y, int rounding_mode)
   {
     IntNum quotient = new IntNum ();
-    divide (x, y, quotient, null, TRUNCATE);
+    divide (x, y, quotient, null, rounding_mode);
     return quotient.canonicalize ();
+  }
+
+  public static IntNum quotient (IntNum x, IntNum y)
+  {
+    return quotient (x, y, TRUNCATE);
+  }
+
+  public IntNum toExactInt (int rounding_mode)
+  {
+    return this;
+  }
+
+  public RealNum toInt (int rounding_mode)
+  {
+    return this;
   }
 
   public static IntNum remainder (IntNum x, IntNum y)

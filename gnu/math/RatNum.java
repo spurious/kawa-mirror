@@ -44,6 +44,21 @@ public abstract class RatNum extends RealNum
 			   IntNum.times (y.numerator (), x.denominator ()));
   }
 
+  /* Assumes x and y are both canonicalized. */
+  public static boolean equals (RatNum x, RatNum y)
+  {
+    return IntNum.equals (x.numerator(), y.numerator())
+      && IntNum.equals (x.denominator(), y.denominator());
+  }
+
+  /* Assumes this and obj are both canonicalized. */
+  public boolean equals (Object obj)
+  {
+    if (obj == null || ! (obj instanceof RatNum))
+      return false;
+    return RatNum.equals (this, (RatNum) obj);
+  }
+
   public static RatNum plus (RatNum x, RatNum y)
   {
     IntNum x_num = x.numerator();
@@ -84,11 +99,6 @@ public abstract class RatNum extends RealNum
 
   public static RatNum power (RatNum x, IntNum y)
   {
-    if (y.isZero ())
-      return IntNum.one ();
-    if (x.isZero ())
-      return y.isNegative () ? RatNum.Infinity : (RatNum) x;
-    
     int i = y.ival;
     if (y.words != null || i > 1000000 || i < -1000000)
       {
@@ -96,6 +106,8 @@ public abstract class RatNum extends RealNum
 	if (x instanceof IntNum && (xi = (IntNum) x).words == null)
 	  {
 	    i = xi.ival;
+	    if (i == 0)
+	      return y.isNegative () ? RatNum.Infinity : (RatNum) x;
 	    if (i == 1)
 	      return xi;
 	    if (i == -1)
@@ -103,6 +115,15 @@ public abstract class RatNum extends RealNum
 	  }
 	throw new ArithmeticException ("exponent too big");
       }
+    return power (x, i);
+  }
+
+  public static RatNum power (RatNum x, int i)
+  {
+    if (i == 0)
+      return IntNum.one ();
+    if (x.isZero ())
+      return i < 0 ? RatNum.Infinity : (RatNum) x;
     if (i < 0)
       {
 	i = -i;
@@ -113,6 +134,56 @@ public abstract class RatNum extends RealNum
       return IntNum.power ((IntNum) x, i);
     return RatNum.make (IntNum.power (x.numerator (), i),
 			IntNum.power (x.denominator (), i));
+  }
+
+  public final RatNum toExact ()
+  {
+    return this;
+  }
+
+  public RealNum toInt (int rounding_mode)
+  {
+    // FIXME - divide (..., ROUND) not implemented for bignums!
+    if (rounding_mode == ROUND)
+      return super.toInt (ROUND);
+    return IntNum.quotient (numerator(), denominator(), rounding_mode);
+  }
+
+  public IntNum toExactInt (int rounding_mode)
+  {
+    return IntNum.quotient (numerator(), denominator(), rounding_mode);
+  }
+
+  /** Calcaulte the simplest rational between two reals. */
+  public static RealNum rationalize (RealNum x, RealNum y)
+  {
+    // This algorithm is copied from C-Gambit, copyright Marc Feeley.
+    if (x.grt (y))
+      return simplest_rational2 (y, x);
+    else if (! (y.grt(x)))
+      return x;
+    else if (x.sign() > 0)
+      return simplest_rational2 (x, y);
+    else if (y.isNegative ())
+      return (RealNum) (simplest_rational2 ((RealNum)y.neg(),
+					    (RealNum)x.neg())).neg();
+    else
+      return IntNum.zero ();
+  }
+  private static RealNum simplest_rational2 (RealNum x, RealNum y)
+  {
+    RealNum fx = x.toInt (FLOOR);
+    RealNum fy = y.toInt (FLOOR);
+    if (! x.grt(fx))
+      return fx;
+    else if (fx.equ(fy))
+      {
+	RealNum n = (RealNum) IntNum.one().div(y.sub(fy));
+	RealNum d = (RealNum) IntNum.one().div(x.sub(fx));
+	return (RealNum) fx.add(IntNum.one().div(simplest_rational2 (n, d)));
+      }
+    else
+      return (RealNum) fx.add(IntNum.one());
   }
 
   public String toString ()

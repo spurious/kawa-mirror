@@ -61,4 +61,36 @@ public abstract class RealNum extends Numeric
   {
     return sign () == 0;
   }
+
+  /** Convert to an exact number.
+   * Implements the Scheme inexact->exact (for real numbers).
+   */
+  public RatNum toExact ()
+  {
+    return DFloNum.toExact (doubleValue ());
+  }
+
+  /** Converts a real to an integer, according to a specified rounding mode.
+   * Note an inexact argument gives an inexact result, following Scheme.
+   * See also RatNum.toExactInt. */
+  public RealNum toInt (int rounding_mode)
+  {
+    double d = doubleValue ();
+    switch (rounding_mode)
+      {
+      case FLOOR:
+	d = Math.floor (d);
+	break;
+      case CEILING:
+	d = Math.ceil (d);
+	break;
+      case TRUNCATE:
+	d = d < 0.0 ? Math.ceil (d) : Math.floor (d);
+	break;
+      case ROUND:
+	d -= Math.IEEEremainder (d, 1.0);
+	break;
+      }
+    return new DFloNum (d);
+  }
 }

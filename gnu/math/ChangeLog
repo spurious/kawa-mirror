@@ -1,3 +1,12 @@
+Sun Dec 15 22:19:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* DFloNum.java (toExact):  New method.
+	* IntNum.java (toInt, toExactInt):  New methods.
+	(quotient):  Add more general overloaded variant.
+	* RatNum.java (power):  New overloaded variant.
+	(equals, to Exact, toInt, toExactInt, rationalize):  New methods.
+	* RealNum.java (toExact, toInt):  New methods.
+
 Fri Dec 13 15:10:38 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* BitOps.java:  New class, implementing "bit-wise integer functions".

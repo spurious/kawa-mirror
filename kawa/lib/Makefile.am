@@ -40,6 +40,7 @@ EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 # The funny names are because the Scheme functions names get "mangled"
 # into valid Java class names.
 SECONDARY_OBJS=\
+  _0025defmacro.class\
   char_002d_003einteger.class\
   char_002ddowncase.class\
   char_002dlower_002dcase_003f.class\
@@ -50,6 +51,7 @@ SECONDARY_OBJS=\
   eof_002dobject_003f.class\
   exit.class\
   force_002doutput.class\
+  gentemp.class\
   integer_002d_003echar.class\
   keyword_002d_003estring.class\
   keyword_003f.class\

@@ -1,7 +1,7 @@
 (define-syntax defmacro
   (syntax-rules ()
 		((defmacro name lambda-list form ...)
-		 (%defmacro name (lambda lambda-list form ...)))))
+		 (%defmacro (quote name) (lambda lambda-list form ...)))))
 
 (define (%defmacro name expander)
   ((primitive-constructor "kawa.lang.DefMacro"

@@ -1,3 +1,14 @@
+Wed Apr  7 21:52:19 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/lang/Translator.java (isLexical):  New method.
+	(getBinding, rewrite):  Call isLexical.
+	* kawa/standard/fluid_let.java:  New Syntax class.
+	* kawa/standard/Makefile.am (java_JAVA):  Add fluid_let.java.
+	* kawa/standard/Scheme.java:  fluid-let is now written in Java.
+	* kawa/standard/let.java (pattern2):  Remove unused static field.
+	* kawa/standard/location.java (rewrite):  Check that !isFluid().
+	* kawa/standard/set_b.java (rewrite):  Check that decl is lexical.
+
 Tue Mar 30 17:52:57 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa/standard/object.java (rewrite):  Call LambdaExp.setClassMethod.

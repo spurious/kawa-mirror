@@ -1,8 +1,6 @@
 package gnu.jemacs.lang;
 import kawa.lang.*;
-import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.jemacs.buffer.*;
 import gnu.kawa.reflect.Invoke;

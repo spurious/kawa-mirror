@@ -88,7 +88,7 @@ public class ELisp extends Lisp2
     define("nil", FALSE);
 
     SymbolEnumeration e
-      = Scheme.getInstance().builtin().enumerateAllSymbols();
+      = Scheme.builtin().enumerateAllSymbols();
     while (e.hasMoreElements())
       {
 	Symbol b = e.nextSymbol();

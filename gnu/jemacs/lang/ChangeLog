@@ -1,3 +1,9 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* ELisp.java:  Use static syntax to access static fields/methods.
+	* defcustom.java:  Likewise.
+	* SaveExcursion.java:  Remove unused import statements.
+
 2004-02-15  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody):  Now need to rewrite default args here.

@@ -155,7 +155,7 @@ public class Record extends NameMap
   public static ClassType makeRecordType (String name, LList fnames)
   {
     ClassType superClass = ClassType.make("kawa.lang.Record");
-    String mangledName = Compilation.mangleName(name);
+    String mangledName = Compilation.mangleNameIfNeeded(name);
     ClassType clas = new ClassType(mangledName);
     clas.setSuper(superClass);
     clas.access_flags = Access.PUBLIC;
@@ -188,7 +188,7 @@ public class Record extends NameMap
 	Pair pair = (Pair) fnames;
 	String fname = pair.car.toString();
 	//fnamesBuf.append(fname);  fnamesBuf.append('\n');
-	fld = clas.addField(Compilation.mangleName(fname),
+	fld = clas.addField(Compilation.mangleNameIfNeeded(fname),
 			    Type.pointer_type, Access.PUBLIC);
 	fld.setSourceName(fname.intern());
 	fnames = (LList) pair.cdr;

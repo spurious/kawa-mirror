@@ -1,3 +1,7 @@
+2001-08-30  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Record.java (makeRecordType):  Use mangleIfNeeded.
+
 2001-08-24  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (pushPositionOf, popPositionOf):

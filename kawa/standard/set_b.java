@@ -21,6 +21,7 @@ public class set_b extends Syntax implements Printable
 
     if (match[0] instanceof Pair)
       {
+	// FIXME use location.rewrite_arg.
 	// rewrite (set! (proc . args) rhs) => ((setter proc) rhs . args)
 	// NOTE: this does not preserve evaluation order!
 	Pair pair = (Pair) match[0];
@@ -54,9 +55,15 @@ public class set_b extends Syntax implements Printable
     if (binding != null && binding instanceof String)
       return new SetExp ((String) binding, value);
     SetExp sexp = new SetExp (sym, value);
-    sexp.binding = (Declaration) binding;
-    if (sexp.binding != null)
-      sexp.binding.noteValue (value);
+    if (binding != null)
+      {
+	Declaration decl = (Declaration) binding;
+	if (tr.isLexical(decl))
+	  {
+	    sexp.binding = decl;
+	    decl.noteValue (value);
+	  }
+      }
     return sexp;
   }
 }

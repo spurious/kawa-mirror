@@ -1316,8 +1316,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitGotoIfCompare2 (Label label, int logop)
   { 
-    if( logop < 155 || logop > 158 )
-      throw new Error ("emitGotoIfCompare2: logop must be one of iflt, ifgt, ifle, ifge");
+    if( logop < 153 || logop > 158 )
+      throw new Error ("emitGotoIfCompare2: logop must be one of ifeq...ifle");
     
     Type type2 = popType().promote();
     Type type1 = popType().promote();

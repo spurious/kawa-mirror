@@ -160,6 +160,17 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
       }
     if (args.length == 2)
       {
+	return primInline(plusOrMinus > 0 ? 96 /* iadd */ : 100 /* isub */,
+			  exp);
+      }
+    return exp;
+  }
+
+  public static Expression primInline (int opcode, ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 2)
+      {
         Type type0 = args[0].getType();
         Type type1 = args[1].getType();
         if (type0 instanceof PrimType && type1 instanceof PrimType)
@@ -167,7 +178,6 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
             char sig0 = type0.getSignature().charAt(0);
             char sig1 = type1.getSignature().charAt(0);
             Type type = null;
-            int opcode = 0;
             if (sig0 == 'V' || sig0 == 'Z' || sig0 == 'C'
                 || sig1 == 'V' || sig1 == 'Z' || sig1 == 'C')
               {
@@ -175,22 +185,21 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
               }
             else if (sig0 == 'D' || sig1 == 'D')
               {
-                opcode = plusOrMinus > 0 ? 99 /* dadd */ : 103 /* dsub */;
+                opcode += 3;
                 type = LangPrimType.doubleType;
               }
             else if (sig0 == 'F' || sig1 == 'F')
               {
-                opcode = plusOrMinus > 0 ? 98 /* fadd */ : 102 /* fsub */;
+                opcode += 2;
                 type = LangPrimType.floatType;
               }
             else if (sig0 == 'J' || sig1 == 'J')
               {
-                opcode = plusOrMinus > 0 ? 97 /* ladd */ : 101 /* lsub */;
+                opcode += 1;
                 type = LangPrimType.longType;
               }
             else
               {
-                opcode = plusOrMinus > 0 ? 96 /* iadd */ : 100 /* isub */;
                 type = LangPrimType.intType;
               }
             if (type != null)
@@ -224,9 +233,9 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
       }
     Type type = getReturnType(args);
     Type ttype = target.getType();
-    if (len == 1)
+    if (len == 1 || target instanceof IgnoreTarget)
       {
-	// FIXME
+	// FIXME implement optimization for unary
 	ApplyExp.compile(exp, comp, target);
 	return;
       }

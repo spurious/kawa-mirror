@@ -23,14 +23,10 @@ public class ConstantFunction0 extends Procedure0 implements CanInline
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     int nargs = exp.getArgCount();
-    if (nargs != 0)
+    if (nargs != 0 && walker != null)
       {
-	/*
-	String message = WrongArguments(this, nargs);
-	ExrrorExp exp = new ErrorExp(message);
-	messages.error('w', filename, lne, column, message);
-	*/
-	return exp;
+	String message = WrongArguments.checkArgCount(this, nargs);
+	return walker.noteError(message);
       }
     return new QuoteExp(value);
   }

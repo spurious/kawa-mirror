@@ -1,6 +1,8 @@
 package gnu.kawa.functions;
 import gnu.math.IntNum;
 import gnu.math.Numeric;
+import gnu.expr.*;
+import gnu.bytecode.*;
 import gnu.mapping.*;
 
 /**
@@ -8,7 +10,7 @@ import gnu.mapping.*;
  * @author Per Bothner
  */
 
-public class MultiplyOp extends ProcedureN
+public class MultiplyOp extends ProcedureN implements CanInline
 {
   public static final MultiplyOp $St = new MultiplyOp("*");
 
@@ -32,4 +34,18 @@ public class MultiplyOp extends ProcedureN
       result = result.mul (args[i]);
     return result;
    }
+
+  public Expression inline (ApplyExp exp, ExpWalker walker)
+  {
+    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    if (folded != exp)
+      return folded;
+    Expression[] args = exp.getArgs();
+    if (args.length > 2)
+      return AddOp.pairwise(this, exp.getFunction(), args, walker);
+    if (args.length == 2)
+      return AddOp.primInline(104, exp);
+		
+    return exp;
+  }
 }

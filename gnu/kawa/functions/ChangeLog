@@ -1,3 +1,12 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* ConstantFunction0.java (inline):  Do check argument count.
+
+	* AddOp.java (primInlin, retType):  New static method.
+	(inline):  Call primInline.
+	* MultiplyOp.java:  Implement CanInline.
+	(inline):  New method - use AddOp.primInline.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* AddOp.java, AppendValues.java, ConstantFunction0.java, Convert.java,

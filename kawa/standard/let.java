@@ -54,7 +54,7 @@ public class let extends Syntax implements Printable
 	  return tr.syntaxError ("let binding is not a pair:"+bind_pair_car);
 	Pair binding = (Pair) bind_pair_car;
 	Object name = binding.car;
-	ScopeExp templateScope;
+	TemplateScope templateScope;
 	if (name instanceof SyntaxForm)
 	  {
 	    SyntaxForm sf = (SyntaxForm) name;

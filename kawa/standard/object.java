@@ -76,16 +76,12 @@ public class object extends Syntax
     LambdaExp last_method = null;
     // First pass (get Declarations).
     Vector inits = new Vector(20);
-    SyntaxForm componentsSyntax = null;
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	// The SyntaxForm scopes aren't used in scanClassDef, but they are
 	// used in rewriteClassDef, and might as well make the code the same.
 	while (obj instanceof SyntaxForm)
-	  {
-	    componentsSyntax = (SyntaxForm) obj;
-	    obj = componentsSyntax.form;
-	  }
+	  obj = ((SyntaxForm) obj).form;
 	if (! (obj instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -93,12 +89,8 @@ public class object extends Syntax
 	  }
 	pair = (Pair) obj;
 	Object pair_car = pair.car;
-	SyntaxForm memberSyntax = componentsSyntax;
 	while (pair_car instanceof SyntaxForm)
-	  {
-	    memberSyntax = (SyntaxForm) pair_car;
-	    pair_car = memberSyntax.form;
-	  }
+	  pair_car = ((SyntaxForm) pair_car).form;
 	if (! (pair_car instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
@@ -108,12 +100,8 @@ public class object extends Syntax
 	Object savedPos1 = tr.pushPositionOf(pair);
 	pair = (Pair) pair_car;
 	pair_car = pair.car;
-	SyntaxForm memberCarSyntax = memberSyntax;
 	while (pair_car instanceof SyntaxForm)
-	  {
-	    memberCarSyntax = (SyntaxForm) pair_car;
-	    pair_car = memberCarSyntax.form;
-	  }
+	  pair_car = ((SyntaxForm) pair_car).form;
 	if (pair_car instanceof String || pair_car instanceof Symbol
 	    || pair_car instanceof Keyword)
 	  { // Field declaration.
@@ -463,10 +451,19 @@ public class object extends Syntax
 	    else if (pair_car instanceof Pair)
 	      { // Method declaration.
 		ScopeExp save_scope = tr.currentScope();
-		if (memberCarSyntax != null)
-		  tr.setCurrentScope(memberCarSyntax.scope);
-		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr);
-		if (memberCarSyntax != null)
+		// If we saw a TemplateScope (in a SyntaxForm) specific to the
+		// formal parameters,  pass it to rewrite so it can create a
+		// renamed alias.  A TemplateScope that covers the formals
+		// *and* the body we handle using setCurrentScope.
+		if (memberSyntax != null)
+		  tr.setCurrentScope(memberSyntax.scope);
+		lambda.rewrite(meth, ((Pair) pair_car).cdr, pair.cdr, tr,
+			       memberCarSyntax != null
+			       && (memberSyntax == null
+				   || memberCarSyntax.scope != memberSyntax.scope)
+			       ? memberCarSyntax.scope
+			       : null);
+		if (memberSyntax != null)
 		  tr.setCurrentScope(save_scope);
 		meth = meth.nextSibling;
 	      }

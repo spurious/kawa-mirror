@@ -9,7 +9,7 @@ public class SyntaxForm implements Externalizable
 {
   public Object form;
 
-  public ScopeExp scope;
+  public TemplateScope scope;
 
   // PairPosition pos;
 
@@ -18,11 +18,11 @@ public class SyntaxForm implements Externalizable
   int id = ++counter;
   */
 
-  public SyntaxForm ()
+  private SyntaxForm ()
   {
   }
 
-  public static SyntaxForm make (Object form, ScopeExp scope)
+  public static SyntaxForm make (Object form, TemplateScope scope)
   {
     SyntaxForm sf = new SyntaxForm();
     sf.form = form;
@@ -53,13 +53,14 @@ public class SyntaxForm implements Externalizable
     return sf;
   }
 
-  /** Create a SyntaxForm with specified form, and given syntatic context.
+  /** Create a syntax object with specified form, and given syntatic context.
    * Used to implement datum->syntax-object in the syntax-case API.
    * @param template If this is a SyntaxForm, use its scope;
    *   otherwise use the current Compilation's current scope.
+   *   (This means just returning the form as-is.)
    * @param form The value (S-expression form) to use.
    */
-  public static SyntaxForm makeWithTemplate (Object template, Object form)
+  public static Object makeWithTemplate (Object template, Object form)
   {
     if (form instanceof SyntaxForm)
       return (SyntaxForm) form;
@@ -70,7 +71,7 @@ public class SyntaxForm implements Externalizable
 	  return sform;
 	return sform.fromDatum(form);
       }
-    return make(form, Compilation.getCurrent().currentScope());
+    return form;
   }
 
   public SyntaxForm fromDatumIfNeeded (Object form)
@@ -116,6 +117,6 @@ public class SyntaxForm implements Externalizable
     throws IOException, ClassNotFoundException
   {
     form = in.readObject();
-    scope = (ScopeExp) in.readObject();
+    scope = (TemplateScope) in.readObject();
   }
 }

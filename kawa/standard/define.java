@@ -83,7 +83,7 @@ public class define extends Syntax implements Printable
 	Object formals = p4.car;
 	Object body = p4.cdr;
 	Translator.setLine(lexp, p1);
-	lambda.rewrite(lexp, formals, tr);
+	lambda.rewriteFormals(lexp, formals, tr, null);
 	Object realBody = lambda.rewriteAttrs(lexp, body, tr);
 	if (realBody != body)
 	  p2 = new Pair(p2.car, new Pair(p3.car, new Pair(formals, realBody)));

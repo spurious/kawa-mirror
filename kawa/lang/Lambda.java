@@ -44,16 +44,27 @@ public class Lambda extends Syntax implements Printable
    * @param body the body of the procedure
    * @param tr the (Scheme) Translator
    */
-  public void rewrite(LambdaExp lexp, Object formals, Object body, Translator tr)
+  public void rewrite(LambdaExp lexp, Object formals, Object body,
+		      Translator tr, TemplateScope templateScopeRest)
   {
-    rewrite(lexp, formals, tr);
+    rewriteFormals(lexp, formals, tr, templateScopeRest);
+    if (body instanceof PairWithPosition)
+      lexp.setFile(((PairWithPosition) body).getFile());
+    body = rewriteAttrs(lexp, body, tr);
+    rewriteBody(lexp, body, tr);
+  }
+  public void rewrite(LambdaExp lexp, Object formals, Object body,
+		      Translator tr)
+  {
+    rewriteFormals(lexp, formals, tr, null);
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
     body = rewriteAttrs(lexp, body, tr);
     rewriteBody(lexp, body, tr);
   }
 
-  public void rewrite(LambdaExp lexp, Object formals, Translator tr)
+  public void rewriteFormals(LambdaExp lexp, Object formals,
+		      Translator tr, TemplateScope templateScopeRest)
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
@@ -168,7 +179,6 @@ public class Lambda extends Syntax implements Printable
     opt_args = 0;
     key_args = 0;
     Object mode = null;
-    ScopeExp templateScopeRest = null;
     for (; ;  bindings = pair.cdr)
       {
 	if (bindings instanceof SyntaxForm)
@@ -179,7 +189,7 @@ public class Lambda extends Syntax implements Printable
 	    // as well as the cdr - i.e. the remaining bindings.
 	    templateScopeRest = sf.scope;
 	  }
-	ScopeExp templateScope = templateScopeRest;
+	TemplateScope templateScope = templateScopeRest;
 	if (! (bindings instanceof Pair))
 	  break;
 	pair = (Pair) bindings;

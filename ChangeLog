@@ -1,5 +1,20 @@
 2005-02-20  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Lambda.java (rewrite(LambdaExp,Object,Translator): Rename
+	to rewriteFormals, and add TemplateScope parameter.
+	Make type of local templateScope more precise.
+	(rewrite(LambdaExp,Object,Object,Translator,TemplateScope)): New.
+	* kawa/standard/define.java (scanForm): Update rewrite->rewriteFormals.
+	* kawa/lang/SyntaxForm.java (scope): Make type of field more precise.
+	(<init>): Make private.
+	(makeWithTemplate): Return argument if we don't have a SyntaxForm.
+	* kawa/lang/SyntaxTemplate.java (execute, executeToList): Make
+	templateScope parameter more precise.
+	* kawa/standard/let.java (rewrite): Likewise for templateScope local.
+	* kawa/standard/object.java (scanClassDef): Simplify - we don't need
+	to remember template scopes here.
+	(rewriteClassDef): See added comment.
+
 	* kawa/standard/location.java (makeProcLocation$V): Can now simplify
 	if proc is a LocationProc.
 

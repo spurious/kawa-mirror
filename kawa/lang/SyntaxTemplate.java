@@ -432,7 +432,7 @@ public class SyntaxTemplate implements Externalizable
    * Normally the result is a single Pair, BUILD_DOTS can return zero
    * or many Pairs. */
   LList executeToList (int pc, Object[] vars, int nesting, int[] indexes,
-			Translator tr, ScopeExp templateScope)
+			Translator tr, TemplateScope templateScope)
   {
     int pc0 = pc;
     int ch = template_program.charAt(pc);
@@ -480,7 +480,7 @@ public class SyntaxTemplate implements Externalizable
    * the iteration index for the i'level of nesting
    */
   Object execute (int pc, Object[] vars, int nesting, int[] indexes,
-		  Translator tr, ScopeExp templateScope)
+		  Translator tr, TemplateScope templateScope)
   {
     int ch = template_program.charAt(pc);
     /* DEBUGGING:

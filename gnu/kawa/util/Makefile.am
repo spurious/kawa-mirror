@@ -6,6 +6,7 @@ AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
   ConsumeProc.java \
+  AbstractFormat.java \
   RangeTable.java
 
 PACKAGE_FNAME = gnu-kawa-util

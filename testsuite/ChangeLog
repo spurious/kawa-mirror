@@ -1,3 +1,7 @@
+2005-02-11  Dean Ferreyra  <dferreyra@igc.org>
+
+	* misc-test.scm: New testcase for Savannah bug #11801.
+
 2005-02-10  Per Bothner  <per@bothner.com>
 
 	* r5rs_pitfall.scm: New testsuite, slightly modified fro Kawa.

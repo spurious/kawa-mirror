@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 128)
+(test-init "Miscellaneous" 129)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -569,3 +569,26 @@
 (require 'list-lib)
 
 (test '(1 3) 'filter!-test (filter! odd? (iota 5)))
+
+;; Test fluid-let in the presence of threads
+(define-variable *X* #f)
+
+(define (get-*X*)
+  *X*)
+
+;; Should return '(1 2)
+(define (fluid-let-and-threads)
+  (let* ((t1 (future
+              (begin
+                (fluid-let ((*X* 1))
+                  (sleep 0.5)
+                  (get-*X*)))))
+         (t2 (future
+              (begin
+                (sleep 0.25)
+                (fluid-let ((*X* 2))
+                  (sleep 0.5)
+                  (get-*X*))))))
+    (list (force t1) (force t2))))
+
+(test '(1 2) fluid-let-and-threads)

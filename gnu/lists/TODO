@@ -1,0 +1,10 @@
+LList.add(PositionContainer posSet, int posNumber, Object value)
+
+Does SeqIterator.remove work for SimpleVector, GapVector, StableVector?
+
+TreeList should extend AbstractSequence and implement Sequence.
+
+Should U64Vector (etc) extend S64Vector (etc)?  Would share some code,
+but I don't think a U64Vector "is-a" S64Vector.
+
+PositionSet class (subsumes DOM NodeSet).

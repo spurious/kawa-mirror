@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>The gnu.lists package</title>
+  </head>
+
+  <body>
+    <h1>The gnu.lists package</h1>
+
+<p>Contains utilty classes and interfaces for sequences (lists), arrays, and trees.</p>
+<p>Features:
+<ul>
+<li>
+The classes and interfaces are compatible with the Java2 Collections
+framework, but do not rquire them.  A configuration option allows you
+to specify whether Sequence extends java.util.List or not.</li>
+<li>
+Positions in a Sequence and iterators are the same kind of object,
+and are represented using magic cookies.  In most collections frameworks,
+when you define a new class that implements a sequence, you would
+typically define a new iterator class as well.  You never do that
+with <code>gnu.lists</code>; instead you implement suitable methods
+in the sequence class itself.  This approach may seem strange, but it has
+important performance advantages, especially in applications
+where you want to go up and down nested sequences (i.e. in trees, such
+as XML elements), or remember sets of positions (such as XML node-sets).</li>
+<li>
+The classes are designed for efficiency, especially concentrating on
+minimizing object allocation.</li>
+<li>
+The framework supports general muli-dimensional arrays.</li>
+<li>
+The package is self-contained; it does not depend on classes or
+features not in JDK 1.1.</li>
+<li>
+Various useful sequence implementations, including Lisp-style linked
+lists; arrays with various element types; adjustable arrays that use a
+"buffer-gap" to make insertions and deletions more efficient; and
+adjustable arrays that automatically update positions on insertions
+and deletions.</li>
+<li> The <code>TreeList</code> class can compactly represent
+a nested hetrogenous tree.  One intended usage is as a very efficient
+representation for XML data.</li>
+<li>
+The <code>Consumer</code> interface is an abstraction of "data sinks" -
+objects that can receive data and do something with them.  It is
+similar to SAX's DocumentHandler but at a more abstract (and sometimes
+more efficient) level.
+</ul>
+
+    <hr>
+    <address><a href="mailto:per@bothner.com">Per Bothner</a></address>
+<!-- Created: Thu Mar  8 12:32:37 PST 2001 -->
+<!-- hhmts start -->
+Last modified: Thu Mar  8 13:07:14 PST 2001
+<!-- hhmts end -->
+  </body>
+</html>

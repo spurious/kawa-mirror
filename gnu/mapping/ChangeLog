@@ -1,3 +1,7 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* Values.java:  Update for new gnu.lists APIs.
+
 2002-12-11  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (toString):  Also display getNamespaceURI() if non-empty.

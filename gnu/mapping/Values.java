@@ -78,9 +78,9 @@ public class Values extends TreeList implements Printable, Externalizable
 	|| (next = list.nextDataIndex(startPosition)) <= 0)
       return empty;
     if (next == endPosition || list.nextDataIndex(next) < 0)
-      return list.getNext(startPosition << 1, null); // Singleton value
+      return list.getPosNext(startPosition << 1); // Singleton value
     Values vals = new Values();
-    list.consumeRange(startPosition, endPosition, vals);
+    list.consumeIRange(startPosition, endPosition, vals);
     return vals;
   }
 
@@ -94,7 +94,7 @@ public class Values extends TreeList implements Printable, Externalizable
 	if (gapStart == 0)
 	  return empty;
 	if (nextDataIndex(0) == gapStart) // Singleton value.
-	  return getNext(0, null);
+	  return getPosNext(0);
       }
     return this;
   }
@@ -111,7 +111,7 @@ public class Values extends TreeList implements Printable, Externalizable
       return super.equals(obj);
     if (size() != 0)
       return false;
-    Object x = getNext(0, null);
+    Object x = getPosNext(0);
     return x != null && x.equals(obj);
   }
 
@@ -181,7 +181,7 @@ public class Values extends TreeList implements Printable, Externalizable
   public static Object nextValue(Object values, int curIndex)
   {
     if (values instanceof Values)
-      return ((Values) values).getNext(curIndex << 1, null);
+      return ((Values) values).getPosNext(curIndex << 1);
     else
       return values;
   }

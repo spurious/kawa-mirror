@@ -80,40 +80,17 @@ public class XSLT extends XQuery
   */
   }
 
-  public Compilation parse(Environment env, Lexer lexer)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    lexer.clearErrors();
-    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    gnu.text.SourceMessages messages = lexer.getMessages();
-    Compilation tr = new Compilation(this, messages);
-    tr.immediate = true;
-    ModuleExp mexp = new ModuleExp();
-    mexp.setFile(lexer.getName());
-    tr.push(mexp);
-    tr.mustCompileHere();
-    XslTranslator xtr = (XslTranslator) lexer;
-    //XslTranslator xtr = new XslTranslator(mexp, messages, this);
-    xtr.beginDocument(mexp);
-    XMLParser parser = new XMLParser(lexer.getPort(), messages, xtr);
-    parser.parse();
-    // FIXME - need check for eof.
-    xtr.endDocument();
-    tr.pop(mexp);
-    return tr;
-  }
-
-  public Compilation parseFile (InPort port, boolean immediate,
-				gnu.text.SourceMessages messages)
+  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
+			   int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     Compilation tr = new Compilation(this, messages);
-    tr.immediate = immediate;
-    tr.mustCompileHere();
+    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     tr.push(mexp);
+    tr.mustCompileHere();
     XslTranslator xtr = new XslTranslator(mexp, messages, this);
     xtr.beginDocument();
     XMLParser parser = new XMLParser(port, messages, xtr);

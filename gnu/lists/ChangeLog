@@ -1,3 +1,32 @@
+2001-08-15  Per Bothner  <per@bothner.com>
+
+	* Sequence.java.in (DOCUMENT_VALUE):  New constant.
+
+	* AbstractSequence.java.in (toArray):  Removed debugging catch.
+
+	* SeqPosition.java.in (make):  New static method
+	* TreeList.java (consumeRange):  On POSITION_TRIPLE_FOLLOWS
+	create new SeqPostion, not TreePosition.
+	(getNext):  Likewise.
+
+	* TreePosition.java (stringValue):  New methods.
+
+	* TreeList.java (nextDataIndex):  Fix off-by-one error.
+
+	* SeqPosition.java.in (toString):  New method
+
+	* TreeList.java (BEGIN_DOCUMENT):  New constant.
+	(beginDocument, endDocument):  New methods.
+	(consumeRange, getNextKind, getNextTypeObject, nextDataIndex,
+	dump):  Handle BEGIN_DOCUMENT.
+
+	* TreeList.java (size):  Re-write to use nextDataIndex rather
+	than less efficient and broken consumeRange.
+	(gotoChildrenStart(int)):  New overloaded method.
+	(consumeRange):  Remove maxSteps parameter.
+	(consumeNext):  Use nextDataIndex.
+	(getNextKind, getNextTypeObject):  Make public.
+
 2001-07-15  Per Bothner  <per@bothner.com>
 
 	* Consumer.java:  Replace endAttributes by endAttribute.

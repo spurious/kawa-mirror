@@ -62,6 +62,16 @@ implements
     seq.makePosition(offset, isAfter, this, 0);
   }
 
+  /** Creates a new SeqPosition, from a position triple.
+   * The position triple is copied (using copyPosition).
+   */
+  public static SeqPosition make(AbstractSequence seq, int ipos, Object xpos)
+  {
+    SeqPosition pos = new SeqPosition();
+    seq.copyPosition(ipos, xpos, pos, 0);
+    return pos;
+  }
+
   public final void gotoStart(AbstractSequence seq)
   {
     if (sequence != null)
@@ -258,6 +268,13 @@ implements
   public void finalize()
   {
     release();
+  }
+
+  public String toString()
+  {
+    return "{" + sequence.getClass().getName()
+      + "@" + System.identityHashCode(sequence)
+      + " ipos: " + ipos + " xpos: " + xpos + "}";
   }
 }
 // This is for people using the Emacs editor:

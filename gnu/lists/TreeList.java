@@ -85,6 +85,7 @@ implements Consumer, PositionConsumer, Consumable
   // 0xF10D A B: OBJECT_REF_FOLLOWS:  The object in objects[(A,B)].
   // 0xF10E A B: POSITION_REF_FOLLOWS:  The TreePosition in objects[(A,B)].
   // 0xF10F A B C D E F: POSITION_TRIPLE_FOLLOWS
+  // 0xF110 BEGIN_DOCUMENT
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -111,7 +112,7 @@ implements Consumer, PositionConsumer, Consumable
   static final char POSITION_REF_FOLLOWS = 0xF10E;
 
   /** A position triple referenceing som eother "nodes".
-   * Followed by index of squence (2 chars), ipos (1 chars), and
+   * Followed by index of squence (2 chars), ipos (2 chars), and
    * index of xpos or -1 if xpos==null (2 chars). */
   static final char POSITION_TRIPLE_FOLLOWS = 0xF10F;
 
@@ -174,6 +175,11 @@ implements Consumer, PositionConsumer, Consumable
   /** The end of an attributes of a node. */
   static final int END_ATTRIBUTE = 0xF10A;
 
+  /** Beginning of a document.
+   * No parameters.  Used to distinguish a document from its element node.
+   */
+  static final int BEGIN_DOCUMENT = 0xF110;
+
   /** Beginning of a group, compact form.
    *
    * [BEGIN_GROUP_SHORT + index], where objects[index] is the group's
@@ -195,7 +201,7 @@ implements Consumer, PositionConsumer, Consumable
    *
    * [END_GROUP_SHORT]
    * [begin_offset], the unsigned absolute value of the offset to the
-   *   matching BEGIN.  (This is the same as the match end_offset.)
+   *   matching BEGIN.  (This is the same as the matching end_offset.)
    *
    */
   static final int END_GROUP_SHORT = 0xF10B;
@@ -407,6 +413,16 @@ implements Consumer, PositionConsumer, Consumable
     beginGroup(find(typeName, type));
   }
 
+  public void beginDocument()
+  {
+    ensureSpace(1);
+    data[gapStart++] = BEGIN_DOCUMENT;
+  }
+
+  public void endDocument()
+  {
+  }
+
   public void beginGroup(int index)
   {
     ensureSpace(3 + 7);
@@ -592,17 +608,12 @@ implements Consumer, PositionConsumer, Consumable
   public int size()
   {
     int size = 0;
-    int pos = 0;
-    int end = data.length;
-    Consumer ignore = VoidConsumer.getInstance();
+    int i = 0;
     for (;;)
       {
-	if (pos == gapStart)
-	  pos = gapEnd;
-	if (pos == end)
+	i = nextDataIndex(i);
+	if (i < 0)
 	  return size;
-	// FIXME does not work if we allow comment() entries!
-	pos = consumeRange(pos, end, 1, ignore);
 	size++;
       }
   }
@@ -624,18 +635,28 @@ implements Consumer, PositionConsumer, Consumable
 
   public boolean gotoChildrenStart(TreePosition pos)
   {
-    int index = pos.ipos >> 1;
+    int index = gotoChildrenStart(pos.ipos >> 1);
+    if (index < 0)
+      return false;
+    pos.push(this, index << 1, null);
+    return true;
+  }
+
+  public int gotoChildrenStart(int index)
+  {
     if (index >= gapStart)
       index += gapEnd - gapStart;
     if (index == data.length)
-      return false;
+      return -1;
     char datum = data[index];
     if ((datum >= BEGIN_GROUP_SHORT
 	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
 	|| datum == BEGIN_GROUP_LONG)
       index += 3;
+    else if (datum == BEGIN_DOCUMENT)
+      return index + 1;
     else
-      return false;
+      return -1;
     for (;;)
       {
 	if (index >= gapStart)
@@ -651,8 +672,7 @@ implements Consumer, PositionConsumer, Consumable
 	else
 	  break;
       }
-    pos.push(this, index << 1, null);
-    return true;
+    return index;
   }
 
   public Object get (int index)
@@ -664,12 +684,14 @@ implements Consumer, PositionConsumer, Consumable
   {
     if (! hasNext(ipos, xpos))
       return false;
-    consumeRange(ipos >>> 1, data.length, 1, out);
+    int start = ipos >> 1;
+    int end = nextDataIndex(start);
+    if (end >= 0)
+      consumeRange(start, end, out);
     return true;
   }
 
-  public int consumeRange(int startPosition, int endPosition, int maxSteps,
-			  Consumer out)
+  public int consumeRange(int startPosition, int endPosition, Consumer out)
   {
     int pos = startPosition;
     int limit = startPosition <= gapStart && endPosition > gapStart ? gapStart
@@ -689,20 +711,12 @@ implements Consumer, PositionConsumer, Consumable
 	      break;
 	  }
 
-	if (maxSteps >= 0)
-	  {
-	    if (maxSteps == 0)
-	      break;
-	    maxSteps--;
-	  }
 	char datum = data[pos++];
 
 	if (datum <= MAX_CHAR_SHORT)
 	  {
 	    int start = pos - 1;
-	    int lim;
-	    if (maxSteps < 0 || (lim = start + maxSteps) < limit)
-	      lim = limit;
+	    int lim = limit;
 	    for (;;)
 	      {
 		if (pos >= lim)
@@ -746,6 +760,8 @@ implements Consumer, PositionConsumer, Consumable
 	  }
 	switch (datum)
 	  {
+	  case BEGIN_DOCUMENT:
+	    continue;
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
 	    out.writeBoolean(datum != BOOL_FALSE);
@@ -767,11 +783,8 @@ implements Consumer, PositionConsumer, Consumable
 	      if (out instanceof PositionConsumer)
 		((PositionConsumer) out).writePosition(seq, ipos, xpos);
 	      else
-		{
-		  TreePosition tpos = new TreePosition();
-		  tpos.push(seq, ipos, xpos);
-		  out.writeObject(tpos);
-		}
+		out.writeObject(SeqPosition.make(seq, ipos, xpos));
+	      pos += 6;
 	    }
 	    continue;
 	  case POSITION_REF_FOLLOWS:
@@ -828,6 +841,7 @@ implements Consumer, PositionConsumer, Consumable
 	    pos += 4;
 	    continue;
 	  default:
+	    dump();
 	    throw new Error("unknown code:"+(int) datum);
 	  }
       }
@@ -846,7 +860,7 @@ implements Consumer, PositionConsumer, Consumable
       && ch != END_GROUP_LONG;
   }
 
-  protected int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos, Object xpos)
   {
     int index = ipos >>> 1;
     if (index >= gapStart)
@@ -883,6 +897,8 @@ implements Consumer, PositionConsumer, Consumable
       case CHAR_FOLLOWS:
       case CHAR_PAIR_FOLLOWS:
 	return Sequence.CHAR_VALUE;
+      case BEGIN_DOCUMENT:
+	return Sequence.DOCUMENT_VALUE;
       case BEGIN_GROUP_LONG:
 	return Sequence.GROUP_VALUE;
       case END_GROUP_SHORT:
@@ -921,7 +937,7 @@ implements Consumer, PositionConsumer, Consumable
     return index < 0 ? null : (String) objects[index];
   }
 
-  protected Object getNextTypeObject(int ipos, Object xpos)
+  public Object getNextTypeObject(int ipos, Object xpos)
   {
     int index = getNextTypeIndex(ipos, xpos);
     return index < 0 ? null : objects[index+1];
@@ -952,6 +968,8 @@ implements Consumer, PositionConsumer, Consumable
       return Convert.toObject(datum-INT_SHORT_ZERO);
     switch (datum)
       {
+      case BEGIN_DOCUMENT:
+	return this;  // ???
       case BOOL_FALSE:
       case BOOL_TRUE:
 	return Convert.toObject(datum != BOOL_FALSE);
@@ -984,9 +1002,111 @@ implements Consumer, PositionConsumer, Consumable
       case OBJECT_REF_FOLLOWS:
 	return objects[getIntN(index+1)];
       case POSITION_TRIPLE_FOLLOWS: //FIXME
+	AbstractSequence seq = (AbstractSequence) objects[getIntN(index+1)];
+	ipos = getIntN(index+3);
+	int xpos_index = getIntN(index+5);
+	xpos = xpos_index < 0 ? null : objects[xpos_index];
+	return SeqPosition.make(seq, ipos, xpos);
       default:
 	throw unsupported("getNext, code="+Integer.toHexString(datum));
       }
+  }
+
+  public int stringValue(int index, StringBuffer sbuf)
+  {
+    Object value = null;
+    int doChildren = 0;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return -1;
+    char datum = data[index];
+    index++;
+    if (datum <= MAX_CHAR_SHORT)
+      {
+	sbuf.append(datum);
+	return index;
+      }
+    if (datum >= OBJECT_REF_SHORT
+	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+      {
+	value = objects[datum-OBJECT_REF_SHORT];
+      }
+    else if (datum >= BEGIN_GROUP_SHORT
+	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      {
+	doChildren = index + 2;
+	index = data[index] + index + 1;
+      }
+    else if ((datum & 0xFF00) == BYTE_PREFIX)
+      {
+	sbuf.append(datum & 0xFF);
+	return index;
+      }
+    else if (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+	&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT)
+      {
+	sbuf.append((int) datum - INT_SHORT_ZERO);
+	return index;
+      }
+    else
+      {
+	switch (datum)
+	  {
+	  case BOOL_FALSE:
+	  case BOOL_TRUE:
+	    sbuf.append(datum != BOOL_FALSE);
+	    return index;
+	  case INT_FOLLOWS:
+	    sbuf.append(getIntN(index+1));
+	    return index + 2;
+	  case LONG_FOLLOWS:
+	    sbuf.append(getLongN(index+1));
+	    return index + 4;
+	  case FLOAT_FOLLOWS:
+	    sbuf.append(Float.intBitsToFloat(getIntN(index+1)));
+	    return index + 2;
+	  case DOUBLE_FOLLOWS:
+	    sbuf.append(Double.longBitsToDouble(getLongN(index+1)));
+	    return index + 4;
+	  case CHAR_FOLLOWS:
+	    sbuf.append(data[index+1]);
+	    return index + 1;
+	  case BEGIN_DOCUMENT:
+	    doChildren = 1;
+	    index = data.length;
+	    break;
+	  case BEGIN_GROUP_LONG:
+	    doChildren = index + 3;
+	    int j = getIntN(index);
+	    j += j < 0 ? data.length : index-1;
+	    index = j + 7;
+	    break;
+	  case END_GROUP_SHORT:
+	  case END_GROUP_LONG:
+	  case END_ATTRIBUTE:
+	    return -1;
+	  case BEGIN_ATTRIBUTE_LONG:
+	    return -1; // FIXME	
+	  case POSITION_REF_FOLLOWS:
+	  case POSITION_TRIPLE_FOLLOWS:
+	  case OBJECT_REF_FOLLOWS:
+	  case CHAR_PAIR_FOLLOWS:
+	  default:
+	    throw new Error("unimplemented");
+	  }
+      }
+    if (value != null)
+      sbuf.append(value);
+    if (doChildren > 0)
+      {
+	do
+	  {
+	    doChildren = stringValue(doChildren, sbuf);
+	  }
+	while (doChildren >= 0);
+      }
+    return index;
   }
 
   protected void makeRelativePosition(int istart, Object xstart,
@@ -1022,9 +1142,11 @@ implements Consumer, PositionConsumer, Consumable
       return pos;
     if (datum >= BEGIN_GROUP_SHORT
 	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return data[pos] + pos + 2;
+      return data[pos] + pos + 1;
     switch (datum)
       {
+      case BEGIN_DOCUMENT:
+	return data.length;
       case BOOL_FALSE:
       case BOOL_TRUE:
 	return pos;
@@ -1055,11 +1177,6 @@ implements Consumer, PositionConsumer, Consumable
       default:
 	throw new Error("unknown code:"+(int) datum);
       }
-  }
-
-  public void consumeRange(int startPosition, int endPosition, Consumer out)
-  {
-    consumeRange(startPosition, endPosition, -1, out);
   }
 
   public void consume(Consumer out)
@@ -1145,14 +1262,15 @@ implements Consumer, PositionConsumer, Consumable
 				  +Double.longBitsToDouble(l));
 			toskip = 4;
 			break;
+		      case BEGIN_DOCUMENT:
+			out.print("=BEGIN_DOCUMENT");
+			break;
 		      case BOOL_FALSE: out.print("= false");  break;
 		      case BOOL_TRUE:  out.print("= true");  break;
 		      case CHAR_FOLLOWS:
 			out.print("=CHAR_FOLLOWS"); toskip = 1;  break;
 		      case CHAR_PAIR_FOLLOWS:
 			out.print("=CHAR_PAIR_FOLLOWS"); toskip = 2;  break;
-		      case POSITION_TRIPLE_FOLLOWS:
-			toskip = 6;  break;
 		      case POSITION_REF_FOLLOWS:
 		      case OBJECT_REF_FOLLOWS:
 			toskip = 2;  break;
@@ -1192,10 +1310,25 @@ implements Consumer, PositionConsumer, Consumable
 			toskip = 4;
 			break;
 		      case END_ATTRIBUTE: out.print("=END_ATTRIBUTE"); break;
+		      case POSITION_TRIPLE_FOLLOWS:
+			out.println("=POSITION_TRIPLE_FOLLOWS");
+			toskip = 6;
+			/*
+			AbstractSequence seq = (AbstractSequence) objects[getIntN(i+1)];
+			ipos = getIntN(i+3);
+			int xpos_index = getIntN(i+5);
+			xpos = xpos_index < 0 ? null : objects[xpos_index];
+			*/
+			break;
 		      }
 		  }
 	      }
 	    out.println();
+	    if (false && toskip > 0)
+	      {
+		i += toskip;
+		toskip = 0;
+	      }
 	  }
       }
   }

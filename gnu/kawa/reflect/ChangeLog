@@ -1,3 +1,12 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java (getInstance, setInstance): New methods.
+	(make): Remove method.
+	* FieldLocation.java: Mew class, extends ClassMemberLocation.
+	* Makefile.am: Update accordingly.
+	* StaticFieldLocation.java: Changed to extend FieldLocation.
+	(decl, value, getDeclaration): Moved to FieldLocation.
+
 2005-03-02  Per Bothner  <per@bothner.com>
 
 	* InstanceOf.java (emitIsInstance): Update getInterpreter->getLanguage.

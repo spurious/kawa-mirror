@@ -10,6 +10,7 @@ java_sources = \
   ClassMemberLocation.java \
   ClassMethodProc.java \
   ClassMethods.java \
+  FieldLocation.java \
   InstanceOf.java \
   Invoke.java \
   OccurrenceType.java \

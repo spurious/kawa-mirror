@@ -17,6 +17,9 @@ public class ClassMemberLocation extends Location
   String mname;
   java.lang.reflect.Field rfield;
 
+  public final Object getInstance () { return instance; }
+  public final void setInstance (Object obj) { instance = obj; }
+
   public ClassMemberLocation(Object instance, ClassType type, String mname)
   {
     this.instance = instance;
@@ -68,7 +71,7 @@ public class ClassMemberLocation extends Location
           }
         catch (java.lang.NoSuchFieldException ex)
           {
-	    throw new UnboundLocationException(null, "Unbound lolcation "
+	    throw new UnboundLocationException(null, "Unbound location "
 					       + " - no field " + mname
 					       + " in " + type.getName());
           }
@@ -108,7 +111,7 @@ public class ClassMemberLocation extends Location
       }
     catch (IllegalAccessException ex)
       {
-        throw new WrappedException(ex);
+	throw WrappedException.wrapIfNeeded(ex);
       }
   }
 
@@ -134,7 +137,7 @@ public class ClassMemberLocation extends Location
       }
     catch (IllegalAccessException ex)
       {
-	throw new WrappedException(ex);
+	throw WrappedException.wrapIfNeeded(ex);
       }
     // This is a bit of a kludge  FIXME.
     //setLocation(loc, new TrivialLocation(getEnvironment(loc)));
@@ -196,10 +199,5 @@ public class ClassMemberLocation extends Location
 	      continue;
 	define(instance, field, uri, interp, env);
       }
-  }
-
-  public static ClassMemberLocation make (/*Object name,*/ Object instance, String cname, String fldName)
-  {
-    return new ClassMemberLocation(/*name,*/ instance, ClassType.make(cname), fldName);
   }
 }

@@ -24,20 +24,20 @@ public class LetExp extends ScopeExp
       }
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
     for (int i = 0; i < inits.length; i++)
-      inits[i].compile (comp, 0);
+      inits[i].compile (comp, Target.pushObject);
 
     code.enterScope (scope);
 
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstVar ());
 
-    body.compile_with_linenumber (comp, flags);
+    body.compileWithPosition(comp, target);
     code.popScope ();
   }
 

@@ -48,7 +48,7 @@ public class PrimGetStatic extends Procedure0 implements Inlineable
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     if (field == null)
       {
@@ -59,7 +59,6 @@ public class PrimGetStatic extends Procedure0 implements Inlineable
       }
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitGetStatic(field);
-    if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
+    target.compileFromStack(comp, field.getType());
   }
 }

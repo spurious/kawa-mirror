@@ -27,21 +27,21 @@ public class ApplyExp extends Expression
     return ((Procedure)rator).applyN (vals);
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     if (func instanceof QuoteExp)
       {
 	Object proc = ((QuoteExp) func).value;
 	if (proc instanceof Inlineable)
 	  {
-	    ((Inlineable) proc).compile(this, comp, flags);
+	    ((Inlineable) proc).compile(this, comp, target);
 	    return;
 	  }
       }
-    compile(this, comp, flags);
+    compile(this, comp, target);
   }
 
-  public static void compile (ApplyExp exp, Compilation comp, int flags)
+  public static void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Method applymethod;
     gnu.bytecode.CodeAttr code = comp.getCode();
@@ -75,12 +75,12 @@ public class ApplyExp extends Expression
 
     // Check for tail-recursion.
     boolean tail_recurse
-      = (flags & LAST) != 0
+      = (target instanceof TailTarget)
       && func_lambda != null && func_lambda == comp.curLambda;
 
     if (!tail_recurse)
       {
-	exp.func.compile (comp, 0);
+	exp.func.compile (comp, Target.pushObject);
 	comp.method.compile_checkcast (comp.scmProcedureType);
       }
 
@@ -89,7 +89,7 @@ public class ApplyExp extends Expression
 	&& func_lambda.min_args == func_lambda.max_args)
       {
 	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, 0);
+	  exp.args[i].compile (comp, Target.pushObject);
 	for (int i = args_length;  --i >= 0; )
 	  SetExp.compile_store (func_lambda.getArg (i), comp);
 	code.emitGoto(func_lambda.start_label);
@@ -99,7 +99,7 @@ public class ApplyExp extends Expression
     if (args_length <= 4)
       {
 	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, 0);
+	  exp.args[i].compile (comp, Target.pushObject);
 	applymethod = comp.applymethods[args_length];
       }
     else
@@ -110,7 +110,7 @@ public class ApplyExp extends Expression
 	  {
 	    code.emitDup(comp.objArrayType);
 	    code.emitPushInt(i);
-	    exp.args[i].compile (comp, 0);
+	    exp.args[i].compile (comp, Target.pushObject);
 	    code.emitArrayStore(comp.scmObjectType);
 	  }
 	applymethod = comp.applyNmethod;
@@ -121,8 +121,7 @@ public class ApplyExp extends Expression
 	return;
       }
     code.emitInvokeVirtual(applymethod);
-    if ((flags & IGNORED) != 0)
-      code.emitPop(1);
+    target.compileFromStack(comp, Type.pointer_type);
   }
 
   public void print (java.io.PrintWriter ps)

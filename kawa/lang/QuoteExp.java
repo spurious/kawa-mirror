@@ -23,10 +23,9 @@ public class QuoteExp extends Expression
     return value;
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
-    if ((flags & IGNORED) == 0)
-      comp.compileConstant (value);
+    comp.compileConstant(value, target);
   }
 
   public void print (java.io.PrintWriter ps)

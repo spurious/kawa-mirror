@@ -78,14 +78,14 @@ public class SetExp extends Expression
       }
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (binding != null)
       {
 	if (binding.isSimple ())
 	  {
-	    new_value.compile (comp, 0);
+	    new_value.compile (comp, Target.pushObject);
 	    code.emitStore(binding);
 	  }
 	else
@@ -93,7 +93,7 @@ public class SetExp extends Expression
 	    ReferenceExp.compile_load (binding.baseVariable, comp);
 	    comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	    code.emitPushInt(binding.offset);
-	    new_value.compile (comp, 0);
+	    new_value.compile (comp, Target.pushObject);
 	    code.emitArrayStore(Compilation.scmObjectType);
 	  }
       }
@@ -101,12 +101,11 @@ public class SetExp extends Expression
       {
 	comp.compileConstant (name);
 	comp.method.maybe_compile_checkcast (comp.scmSymbolType);
-	new_value.compile (comp, 0);
+	new_value.compile (comp, Target.pushObject);
 	code.emitInvokeStatic(comp.defineGlobalMethod);
       }
 
-    if ((flags & IGNORED) == 0)
-      comp.compileConstant (Interpreter.voidObject);
+    comp.compileConstant(Interpreter.voidObject, target);
   }
 
   public void print (java.io.PrintWriter ps)

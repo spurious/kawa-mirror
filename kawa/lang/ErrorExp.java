@@ -27,10 +27,8 @@ public class ErrorExp extends Expression
     ps.print (")");
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     // Should never happen!
-    if ((flags & IGNORED) == 0)
-      comp.getCode().emitPushNull();
   }
 }

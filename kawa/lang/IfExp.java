@@ -38,20 +38,20 @@ public class IfExp extends Expression
       return Interpreter.voidObject;
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    test.compile (comp, 0);
-    comp.compileConstant (Interpreter.falseObject);
+    test.compile (comp, Target.pushObject);
+    comp.compileConstant(Interpreter.falseObject);
     code.emitIfNEq();
-    then_clause.compile_with_linenumber (comp, flags);
-    if (else_clause != null || (flags & IGNORED) == 0)
+    then_clause.compileWithPosition(comp, target);
+    if (else_clause != null || target != Target.Ignore)
       {
 	code.emitElse();
 	if (else_clause != null)
-	  else_clause.compile_with_linenumber (comp, flags);
+	  else_clause.compileWithPosition(comp, target);
 	else
-	  comp.compileConstant (Interpreter.voidObject);
+	  comp.compileConstant(Interpreter.voidObject, target);
       }
     code.emitFi();
   }

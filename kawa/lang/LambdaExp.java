@@ -250,9 +250,9 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
-    if ((flags & IGNORED) != 0)
+    if (target instanceof IgnoreTarget)
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
     ClassType saveClass = comp.curClass;
@@ -274,6 +274,7 @@ public class LambdaExp extends ScopeExp
     if (staticLink != null)
       code.emitLoad(outerLambda().heapFrame);
     code.emitInvokeSpecial(new_class.constructor);
+    target.compileFromStack(comp, new_class);
   }
 
   void compile_setLiterals (Compilation comp)

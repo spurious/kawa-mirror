@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 /**
  * This class represents a variable reference (an identifier).
@@ -97,9 +98,9 @@ public class ReferenceExp extends Expression
   private static ClassType thisType;
   private static Method lookupMethod;
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
-    if ((flags & IGNORED) != 0)
+    if (target instanceof IgnoreTarget)
       return;
     if (binding != null)
       compile_load (binding, comp);
@@ -125,6 +126,7 @@ public class ReferenceExp extends Expression
 	else
 	  comp.getCode().emitInvokeStatic(comp.lookupGlobalMethod);
       }
+    target.compileFromStack(comp, Type.pointer_type);
   }
 
   public void print (java.io.PrintWriter ps)

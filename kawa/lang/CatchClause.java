@@ -21,12 +21,12 @@ public class CatchClause extends ScopeExp
   public final Expression getBody() { return body; }
   public final void setBody(Expression body) { this.body = body; }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.enterScope (scope);
     code.emitCatchStart(firstVar());
-    body.compile_with_linenumber (comp, flags);
+    body.compileWithPosition(comp, target);
     code.emitCatchEnd();
     code.popScope ();
   }

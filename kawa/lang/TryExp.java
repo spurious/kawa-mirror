@@ -41,13 +41,13 @@ public class TryExp extends Expression
       }
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
     boolean has_finally = finally_clause != null;
     // Non-null if we need a temporary to save the result.
     Variable saved_result;
-    if (has_finally && (flags & Expression.IGNORED) == 0)
+    if (has_finally && ! (target instanceof IgnoreTarget))
       {
 	code.pushScope();
 	saved_result = code.addLocal(getType());
@@ -55,7 +55,7 @@ public class TryExp extends Expression
     else
       saved_result = null;
     code.emitTryStart(has_finally);
-    try_clause.compile_with_linenumber(comp, flags);
+    try_clause.compileWithPosition(comp, target);
     if (saved_result != null)
       code.emitStore(saved_result);
     code.emitTryEnd();
@@ -63,13 +63,13 @@ public class TryExp extends Expression
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())
       {
-	catch_clause.compile(comp, flags);
+	catch_clause.compile(comp, target);
       }
 
     if (finally_clause != null)
       {
 	code.emitFinallyStart();
-	finally_clause.compile_with_linenumber(comp, flags|Expression.IGNORED);
+	finally_clause.compileWithPosition(comp, Target.Ignore);
 	code.emitFinallyEnd();
       }
     code.emitTryCatchEnd();

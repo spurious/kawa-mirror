@@ -50,9 +50,9 @@ public class GetFieldProc extends Procedure1 implements Inlineable
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.args[0].compile(comp, 0, ctype);
+    exp.args[0].compile(comp, ctype);
     if (field == null)
       {
 	field = ctype.getField(fname);
@@ -62,7 +62,6 @@ public class GetFieldProc extends Procedure1 implements Inlineable
       }
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitGetField(field);
-    if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
+    target.compileFromStack(comp, field.getType());
   }
 }

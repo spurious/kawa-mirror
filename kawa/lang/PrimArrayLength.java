@@ -15,14 +15,11 @@ public class PrimArrayLength extends Procedure1 implements Inlineable
     return gnu.math.IntNum.make(java.lang.reflect.Array.getLength(array));
   }
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.args[0].compile(comp, 0, new ArrayType(element_type));
+    exp.args[0].compile(comp, new ArrayType(element_type));
     CodeAttr code = comp.getCode();
     code.emitArrayLength();
-    if ((flags & Expression.IGNORED) == 0)
-      kawa.standard.Scheme.intType.emitCoerceToObject(code);
-    else
-      code.emitPop(1);
+    target.compileFromStack(comp, kawa.standard.Scheme.intType);
   }
 }

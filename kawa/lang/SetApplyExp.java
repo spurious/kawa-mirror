@@ -20,10 +20,10 @@ public class SetApplyExp extends ApplyExp
     func = new ApplyExp(setterProcedure, setter_args);
   }
 
-  public static void compile (ApplyExp exp, Compilation comp, int flags)
+  public static void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    ((ApplyExp) exp.func).args[0].compile(comp, 0);
+    ((ApplyExp) exp.func).args[0].compile(comp, Target.pushObject);
     comp.method.compile_checkcast (comp.scmProcedureType);
     // Number of arguments, not counting the rhs value.
     int args_length = exp.args.length - 1;
@@ -38,8 +38,8 @@ public class SetApplyExp extends ApplyExp
     if (args_length <= 1)
       {
 	for (int i = 1; i <= args_length; ++i)
-	  exp.args[i].compile (comp, 0);
-	exp.args[0].compile (comp, 0);
+	  exp.args[i].compile (comp, Target.pushObject);
+	exp.args[0].compile (comp, Target.pushObject);
 	if (args_length == 2)
 	  code.emitSwap();
       }
@@ -52,15 +52,12 @@ public class SetApplyExp extends ApplyExp
 	    code.emitDup(comp.objArrayType);
 	    int index = i == args_length ? 0 : i + 1;
 	    code.emitPushInt(index);
-	    exp.args[index].compile (comp, 0);
+	    exp.args[index].compile (comp, Target.pushObject);
 	    code.emitArrayStore(comp.scmObjectType);
 	  }
       }
-
     code.emitInvokeVirtual(getSetMethod(args_length));
-    if ((flags & IGNORED) != 0)
-      code.emitPop(1);
-    
+    comp.compileConstant(Interpreter.voidObject, target);
   }
 
   static synchronized Method getSetMethod (int arg_count)

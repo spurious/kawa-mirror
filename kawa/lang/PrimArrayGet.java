@@ -14,13 +14,12 @@ public class PrimArrayGet extends Procedure2 implements Inlineable
   {
     return java.lang.reflect.Array.get(array, ((Number) index).intValue());
   }
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    exp.args[0].compile(comp, 0, new ArrayType(element_type));
-    exp.args[1].compile(comp, 0, Type.int_type);
+    exp.args[0].compile(comp, new ArrayType(element_type));
+    exp.args[1].compile(comp, Type.int_type);
     CodeAttr code = comp.getCode();
     code.emitArrayLoad(element_type);
-    if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
+    target.compileFromStack(comp, element_type);
   }
 }

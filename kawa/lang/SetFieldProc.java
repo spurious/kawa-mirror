@@ -53,7 +53,7 @@ public class SetFieldProc extends Procedure2 implements Inlineable
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     if (field == null)
       {
@@ -62,11 +62,10 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
-    exp.args[0].compile(comp, 0, ctype);
-    exp.args[1].compile(comp, 0, field.getType());
+    exp.args[0].compile(comp, ctype);
+    exp.args[1].compile(comp, field.getType());
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPutField(field);
-    if ((flags & Expression.IGNORED) == 0)
-      comp.compileConstant (Interpreter.voidObject);
+    comp.compileConstant(Interpreter.voidObject, target);
   }
 }

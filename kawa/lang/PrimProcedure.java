@@ -173,7 +173,7 @@ public class PrimProcedure extends ProcedureN implements Inlineable
     return t;
   }
 
-  public void compile (ApplyExp exp, Compilation comp, int flags)
+  public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     int arg_count = argTypes.length;
@@ -190,7 +190,7 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	Type arg_type = is_static ? argTypes[i]
 	  : i==0 ? method.getDeclaringClass()
 	  : argTypes[i-1];
-	exp.args[i].compile (comp, 0, arg_type);
+	exp.args[i].compile(comp, arg_type);
       }
     
     if (method == null)
@@ -199,14 +199,9 @@ public class PrimProcedure extends ProcedureN implements Inlineable
       code.emitInvokeMethod(method, opcode());
 
     if (retType == Type.void_type)
-      {
-	if ((flags & Expression.IGNORED) == 0)
-	  comp.compileConstant (Interpreter.voidObject);
-      }
-    else if ((flags & Expression.IGNORED) != 0)
-      code.emitPop(1);
+      comp.compileConstant(Interpreter.voidObject, target);
     else
-      retType.emitCoerceToObject(code);
+      target.compileFromStack(comp, retType);
   }
 
   public String getName()

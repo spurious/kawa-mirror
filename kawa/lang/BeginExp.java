@@ -23,12 +23,12 @@ public class BeginExp extends Expression
     return exps[i].eval (env);
   }
 
-  public void compile (Compilation comp, int flags)
+  public void compile (Compilation comp, Target target)
   {
     int n = exps.length, i;
     for (i = 0; i < n - 1; i++)
-      exps[i].compile_with_linenumber (comp, IGNORED);
-    exps[i].compile_with_linenumber (comp, flags);
+      exps[i].compileWithPosition(comp, Target.Ignore);
+    exps[i].compileWithPosition(comp, target);
   }
 
   public void print (java.io.PrintWriter ps)

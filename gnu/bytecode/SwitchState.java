@@ -32,26 +32,11 @@ public class SwitchState
     code.popType();  // pop switch value
 
     // Save stack types (except top int) into typeState
-    if (code.SP > 0)
-      {
-	typeState = new Type[code.SP];
-	System.arraycopy(code.stack_types, 0, typeState, 0, code.SP);
-      }
+    typeState = code.saveStackTypeState(false);
 
     code.emitGoto(switch_label);
 
     numCases = 0;
-  }
-
-  void restoreStack(CodeAttr code)
-  {
-    if (typeState == null)
-      code.SP = 0;
-    else
-      {
-	code.SP = typeState.length;
-	System.arraycopy(typeState, 0, code.stack_types, 0, code.SP);
-      }
   }
 
   /** Emit a new case, for the given value, whose label is here. */
@@ -60,7 +45,7 @@ public class SwitchState
     Label label = new Label(code);
     boolean ok = addCase (value, label, code);
     label.define(code);
-    restoreStack(code);
+    code.restoreStackTypeState(typeState);
     return ok;
   }
 
@@ -69,7 +54,7 @@ public class SwitchState
     Label label = new Label(code);
     label.define(code);
     defaultLabel = label;
-    restoreStack(code);
+    code.restoreStackTypeState(typeState);
   }
 
   /** Add a new case.
@@ -143,10 +128,10 @@ public class SwitchState
       {
 	defaultLabel = new Label(code);
 	defaultLabel.define(code);
-	code.emitPushString("bad case value!");
 	ClassType ex = ClassType.make("java.lang.RuntimeException");
 	code.emitNew(ex);
 	code.emitDup(ex);
+	code.emitPushString("bad case value!");
 	Type[] args = { Type.string_type };
 	Method con = ex.addMethod("<init>", Access.PUBLIC,
 				  args, Type.void_type);

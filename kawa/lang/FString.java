@@ -173,7 +173,7 @@ public class FString extends Sequence implements Printable, Compilable
   }
 
   /** Return a new InPort that reads characters from this string. */
-  public CharArrayInPort open ()
+  public InPort open ()
   { return new CharArrayInPort(value, value.length); }
 
 }

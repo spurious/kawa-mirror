@@ -801,7 +801,7 @@ public class InPort extends LineBufferedReader implements Printable
 		c = read ();
 		if (c < 0)
 		  return;
-		if (c == '\n')
+		if (c == '\n' || c == '\r')
 		  break;
 	      }
 	  }

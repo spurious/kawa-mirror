@@ -51,22 +51,36 @@ public class OutPort extends PrintWriter implements Printable
 
   static public OutPort outDefault ()
   {
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      return ((Future) thread).out;
     return out;
   }
 
   static public void setOutDefault (OutPort o)
   {
-    out = o;
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      ((Future) thread).out = o;
+    else
+      out = o;
   }
 
   static public OutPort errDefault ()
   {
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      return ((Future) thread).err;
     return err;
   }
 
   static public void setErrDefault (OutPort e)
   {
-    err = e;
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      ((Future) thread).err = e;
+    else
+      err = e;
   }
 
   public void echo (char[] buf, int off, int len)  throws java.io.IOException

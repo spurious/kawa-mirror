@@ -44,12 +44,19 @@ public class InPort extends LineBufferedReader implements Printable
 
   static public InPort inDefault ()
   {
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      return ((Future) thread).in;
     return inp;
   }
 
   static public void setInDefault (InPort in)
   {
-    inp = in;
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      ((Future) thread).in = in;
+    else
+      inp = in;
   }
 
   /* Compatibility. */
@@ -227,15 +234,17 @@ public class InPort extends LineBufferedReader implements Printable
     return str.toString();
   }
 
-  /** Read an optional signed int.
-   * If there is no int in the input stream, return 1.
+  /** Read an optional signed integer.
+   * If there is no integer in the input stream, return 1.
+   * For excessively large exponents, return Integer.MIN_VALUE
+   * or Integer.MAX_VALUE.
    */
-
   int readOptionalExponent()
        throws java.io.IOException, ReadError
   {
     int sign = read();
     boolean neg = false;
+    boolean overflow = false;
     int c;
     if (sign == '+' || sign == '-')
       c = read();
@@ -253,12 +262,15 @@ public class InPort extends LineBufferedReader implements Printable
       }
     else
       {
+	int max = (Integer.MAX_VALUE - 9) / 10;
 	for (;;)
 	  {
 	    c = read();
 	    int d = Character.digit ((char)c, 10);
 	    if (d < 0)
 	      break;
+	    if (value > max)
+	      overflow = true;
 	    value = 10 * value + d;
 	  }
       }
@@ -266,183 +278,322 @@ public class InPort extends LineBufferedReader implements Printable
       unread();
     if (sign == '-')
       value = -value;
+    if (overflow)
+      return sign == '-' ? Integer.MIN_VALUE : Integer.MAX_VALUE;
     return value;
   }
 
-  /** Read a number (with a <prefix> in Scheme syntax from this.
-   * @param radix the radix/base specified, or zero if it specified.
-   * @param exactness 'i' if #i was seen;  'e' if #i was seen;  else ' '
-   *  (currently ignored)
+  /** Read a number from this.
+   * Actually reads a quantity, which is a complex number and an optional unit.
+   * @param radix the default radix
+   * This can be overridden by an explicit radix in the number.
    * @return the number read
    */
 
-  public Numeric readSchemeNumber(int radix, char exactness)
+  public Numeric readSchemeNumber (int radix)
        throws java.io.IOException, ReadError
   {
-    return readSchemeNumber (read(), radix, exactness);
+    return readSchemeNumber (read (), radix);
   }
 
-  public Numeric readSchemeNumber(int c, int radix, char exactness)
+  public Numeric readSchemeNumber (int c, int radix)
        throws java.io.IOException, ReadError
   {
+    char exactness = ' ';
+    int explicit_radix = 0;
     while (c == '#')
       {
-	c = read();
+	c = read ();
 	switch (c)
 	  {
 	  case 'e':
 	  case 'i':
 	    if (exactness != ' ')
-	      throw new ReadError (this,  "extra exactness specifier (#"+
-				   (char)c+")");
+	      throw new ReadError
+		(this, "extra exactness specifier (#" + (char)c + ")");
 	    exactness = (char) c;
 	    break;
 	  case 'x':
+	  case 'd':
 	  case 'o':
 	  case 'b':
-	    if (radix != 0)
-	      throw new ReadError (this,  "extra radix specifier (#"+
-				   (char)c+")");
-	    radix = c == 'x' ? 16 : c == 'o' ? 8 : 2;
+	    if (explicit_radix != 0)
+	      throw new ReadError
+		(this, "extra radix specifier (#" + (char)c + ")");
+	    explicit_radix = c == 'x' ? 16 : c == 'd' ? 10 : c == 'o' ? 8 : 2;
 	    break;
 	  default:
 	    throw new ReadError (this,  "unrecognized #-construct in number");
 	  }
 	c = read ();
       }
-    if (radix == 0)
-      radix = 10;
-    Quantity num = readSchemeReal (c, radix, exactness);
-    c = read();
-    if (c == '@')
-      {
-	Quantity im = readSchemeReal (read(), radix, exactness);
-	return Quantity.add (num, Quantity.mul (im, Complex.imOne()), 1);
-      }
-    else if (c == '+')
-      {
-	Quantity im = readSchemeReal (read(), radix, exactness);
-	return Quantity.add (num, im, 1);
-      }
-    else if (c == '-')
-      {
-	Quantity im = readSchemeReal (read(), radix, exactness);
-	return Quantity.add (num, im, -1);
-      }
-    else if (Character.isLowerCase ((char)c)
+    if (explicit_radix != 0)
+      radix = explicit_radix;
+
+    Complex cnum = readSchemeComplex (c, radix, exactness);
+    
+    c = read ();
+    Unit unit = null;
+    if (radix == 10)
+      while (Character.isLowerCase ((char)c)
 	     || Character.isUpperCase ((char)c))
-      {
-	throw new ReadError (this,
-			     "unexpected latter '"+((char)c)+"'after number");
-      }
-    else if (c >= 0)
-      unread();
-    return num;
+	{
+	  String word = readAlphaWord (c);
+	  Unit u = Unit.lookup (word);
+	  if (u == null)
+	    throw new ReadError (this, "unknown unit: " + word);
+	  int power;
+	  try {
+	    power = readOptionalExponent ();
+	  } catch (ClassCastException e) {
+	    throw new ReadError (this, "unit exponent too large");
+	  }
+	  if (power != 1)
+	    u = Unit.pow (u, power);
+	  if (unit == null)
+	    unit = u;
+	  else
+	    unit = Unit.mul (unit, u);
+	  c = read ();
+	}
+
+    if (c >= 0)
+      unread ();
+
+    return unit == null ? cnum : Quantity.make (cnum, unit);
   }
 
-  /* This actually also handles a real followed by 'i' - for now. */
-  public Quantity readSchemeReal(int c, int radix, char exactness)
+  Complex readSchemeComplex (int c, int radix, char exactness)
        throws java.io.IOException, ReadError
   {
-    int isFloat = 0;  // 1 if seen '.'; 2 if seen exponent
-    StringBuffer str = new StringBuffer(20);
-    if (c=='+')
+    int next;
+    if (((c == '+') || (c == '-'))
+	&& (((next = peek ()) == 'i') || (next == 'I')))
       {
-	c = read();
-      }
-    else if (c=='-')
-      {
-	str.append ((char) c);
-	c = read ();
-      }
-
-    int digits = 0;
-    Unit unit = null;
-    boolean imaginary = false;
-    for (;;)
-      {
-	int next;
-	if (Character.digit ((char)c, radix) >= 0)
-	  digits++;
-	else if (c == '.')
-	  {
-	    if (isFloat > 0)
-	      throw new ReadError (this, "unexpected '.' in number");
-	    isFloat = 1;
-	  }
-	else if (radix == 10 && isFloat < 2
-		 && (c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l'||
-		     c == 'E' || c == 'S' || c == 'F' || c == 'D' || c == 'L')
-		 && ((next = peek()) == '+' || next == '-'
-		     || Character.digit((char)next, 10) >= 0))
-	  {
-	    isFloat = 2;
-	    str.append('e');
-	    str.append(readOptionalExponent());
-	    c = read();
-	    break;
-	  }
-	else // catches EOF
-	  break;
-	str.append((char) c);
-	c = read();
-      }
-    if (digits == 0)
-      throw new ReadError (this, "number constant with no digits");
-    if (c == '/')
-      {
-	c = peek ();
-	if (Character.digit ((char)c, radix) < 0)
-	  throw new ReadError (this,"\"/\" in rational not followed by digit");
-	Numeric denominator = readSchemeReal(read(), radix, 'e');
-	if (isFloat > 0 || ! (denominator instanceof IntNum))
-	  throw new ReadError (this, "invalid fraction");
-	return RatNum.make (IntNum.valueOf(str.toString (), radix),
-			    (IntNum) denominator);
+	read ();
+	if (exactness == 'i')
+	  return new DComplex (0, (c == '+') ? 1 : -1);
+	else
+	  return (c == '+') ? Complex.imOne () : Complex.imMinusOne ();
       }
     
-    while (radix == 10
-	   && (Character.isLowerCase ((char)c)
-	       || Character.isUpperCase ((char)c)))
+    RealNum num = readSchemeReal (c, radix, exactness);
+    c = read ();
+    switch (c)
       {
-	String word = readAlphaWord (c);
-	if (word.length() == 1 && (c == 'i' || c == 'I'))
+      case 'i': case 'I':
+	/* A pure imaginary number.
+	 * But if a unit follows, assume the i is part of its name.
+	 * This makes it possible to use 12in as 12 inches, not 12i
+	 * n's.  To get 12i n's, use 0+12in.
+	 * The output methods do not account for this, so read-write
+	 * invariance is broken.
+	 * We really need a better syntax for quantities, like number*unit.
+	 * (Another problem is 1 hertz, which prints as 1s-1, but that reads 
+	 * as 0.1)
+	 */
+	if (Character.isLowerCase ((char)(next = peek()))
+	    || Character.isUpperCase ((char)next))
 	  {
-	    imaginary = true;
-	    c = read();
-	    break;
+	    unread();
+	    return num;
+	  }
+	return Complex.make (IntNum.zero (), num);
+
+
+      case '@':
+	/* polar notation */
+	RealNum angle = readSchemeReal (read (), radix, exactness);
+
+	/* r4rs requires 0@1.0 to be inexact zero, even if (make-polar
+	 * 0 1.0) is exact zero, so check for this case.  */
+	if (num.isZero () && !angle.isExact ())
+	  return new DFloNum (0.0);
+
+	return Complex.polar (num, angle);
+	
+      case '+': case '-': 
+	/* rectangular notation */
+	RealNum im;
+	if (((next = peek ()) == 'i') || (next == 'I'))
+	  {
+	    im = (c == '+') ? IntNum.one () : IntNum.minusOne ();
+	    read ();
 	  }
 	else
 	  {
-	    Unit u = Unit.lookup (word);
-	    if (u == null)
-	      throw new ReadError (this, "unknown unit: " + word);
-	    int power = readOptionalExponent();
-	    if (power != 1)
-	      u = Unit.pow (u, power);
-	    if (unit == null)
-	      unit = u;
-	    else
-	      unit = Unit.mul(unit, u);
-	    c = read();
-	    if (exactness != 'e')
-	      isFloat = 1;
+	    im = readSchemeReal (c, radix, exactness);
+	    if ((c = read ()) != 'i' && c != 'I')
+	      throw new ReadError (this, "no i in rectangular complex number");
 	  }
+	return Complex.make (num, im);
       }
-    if (c >= 0)
-      unread();
 
-    RealNum rnum;
-    if (isFloat == 0 && exactness != 'i')
-      rnum = IntNum.valueOf(str.toString (), radix);
+    if (c >= 0)
+      unread ();
+    return num;
+  }
+
+  RealNum readSchemeReal (int c, int radix, char exactness)
+       throws java.io.IOException, ReadError
+  {
+    StringBuffer str = new StringBuffer (20);
+    boolean negative = false;
+   /* location of decimal point in str.  */
+    int point_loc = -1;
+    int exp = 0;
+
+    if (c=='+')
+      c = read ();
+    else if (c=='-')
+      {
+	str.append ('-');
+	negative = true;
+	c = read ();
+      }
+
+    boolean hash_seen = false;
+    boolean digit_seen = false;
+    boolean exp_seen = false;
+    for (;; c = read ())
+      {
+	if (Character.digit ((char)c, radix) >= 0)
+	  {
+	    if (hash_seen)
+	      throw new ReadError (this, "digit after '#' in number");
+	    digit_seen = true;
+	    str.append ((char) c);
+	    continue;
+	  }
+	switch (c)
+	  {
+	  case '#':
+	    if (!hash_seen)
+	      {
+		if (radix != 10)
+		  throw new ReadError (this, "'#' in non-decimal number");
+		if (!digit_seen)
+		  throw new ReadError
+		    (this, "'#' with no preceeding digits in number");
+		hash_seen = true;
+	      }
+	    str.append ('0');
+	    digit_seen = true;
+	    continue;
+	  case '.':
+	    if (radix != 10)
+	      throw new ReadError (this, "'.' in non-decimal number");
+	    if (point_loc >= 0)
+	      throw new ReadError (this, "duplicate '.' in number");
+	    point_loc = str.length ();
+	    str.append ('.');
+	    continue;
+	  case 'e': case 's': case 'f': case 'd': case 'l':
+	  case 'E': case 'S': case 'F': case 'D': case 'L':
+	    int next;
+	    if (!(radix == 10 && ((next = peek ()) == '+' || next == '-'
+				  || Character.digit ((char)next, 10) >= 0)))
+	      break;
+	    if (!digit_seen)
+	      throw new ReadError (this, "mantissa with no digits");
+	    exp = readOptionalExponent ();
+	    exp_seen = true;
+	    c = read ();
+	    break;
+	  }
+	break;
+      }
+
+    if (c == '/')
+      {
+	if (hash_seen || exp_seen || point_loc != -1)
+	  throw new ReadError (this, "exponent, '#', or '.' in numerator");
+	if (!digit_seen)
+	  throw new ReadError (this, "numerator with no digits");
+	IntNum numer = IntNum.valueOf (str.toString (), radix);
+	str.setLength (0);
+	c = read ();
+	if (Character.digit ((char)c, radix) < 0)
+	  throw new ReadError (this, "denominator with no digits");
+	do
+	  {
+	    str.append ((char) c);
+	    c = read ();
+	  }
+	while (Character.digit ((char)c, radix) >= 0);
+	if (c >= 0)
+	  unread ();
+	
+	IntNum denom = IntNum.valueOf (str.toString (), radix);
+
+	// Check for zero denominator values: 0/0, n/0, and -n/0
+	// (i.e. NaN, Infinity, and -Infinity).
+	if (denom.isZero ())
+	  {
+	    if (exactness == 'i')
+	      {
+		double zero = 0.0; // work-around for a javac bug.
+		return new DFloNum ((numer.isZero () ? 0.0
+				     : negative ? -1.0 : 1.0)
+				    / zero);
+	      }
+	    else if (numer.isZero())
+	      throw new ReadError (this, "0/0 is undefined");
+	  }
+
+	if (exactness != 'i')
+	  return (RatNum.make (numer, denom));
+
+	// For inexact, we make a RatNum and let it do the division.
+	// This doesn't work for #i-0/1, because it's the same
+	// rational number as #i0/1, so we check for that.
+	return new DFloNum (numer.isZero () ? (negative ? -0.0 : 0.0)
+			    : RatNum.make (numer, denom).doubleValue ());
+
+      }
+    
+    if (c >= 0)
+      unread ();
+
+    if (!digit_seen)
+      throw new ReadError (this, "real number (or component) with no digits");
+
+    if (exactness == 'i'
+	|| exactness == ' ' && (hash_seen || exp_seen || point_loc != -1))
+      {
+	if (radix == 10)
+	  {
+	    if (exp != 0)
+	      {
+		str.append('e');
+		str.append(exp);
+	      }
+	    return new DFloNum(str.toString ());
+	  }
+	IntNum inum = IntNum.valueOf (str.toString (), radix);
+	return new DFloNum (inum.isZero () ? (negative ? -0.0 : 0.0)
+			    : inum.doubleValue ());
+      }
+
+    if (point_loc == -1 && ! exp_seen)
+      return IntNum.valueOf (str.toString (), radix);
+
+    /* Parse an exact with a decimal point or exponent.  */
+    IntNum mant;
+    if (point_loc == -1)
+      mant = IntNum.valueOf (str.toString ());
     else
       {
-	rnum = new DFloNum (str.toString ());
-	if (exactness == 'e')
-	  rnum = rnum.toExact();
+	String s = str.toString ();
+	mant = IntNum.valueOf (s.substring (0, point_loc)
+                               + s.substring (point_loc + 1, s.length ()));
+	point_loc = s.length () - (point_loc + 1);  // # of decimals
+	if (exp < 0 && Integer.MIN_VALUE + point_loc >= exp)
+	  throw new ReadError(this, "exponent overflow");
+	exp -= point_loc;
       }
-    Complex cnum = imaginary ? Complex.make (IntNum.zero(),rnum) : rnum;
-    return unit == null ? cnum : Quantity.make (cnum, unit);
+    return (mant.isZero () ? mant
+	    : (RealNum)(mant.mul (IntNum.power(IntNum.make (10), exp))));
   }
 
   /**
@@ -704,8 +855,8 @@ public class InPort extends LineBufferedReader implements Printable
 	  case '-':
 	    next = peek ();
 	    if (Character.isDigit((char) next)
-		 || (c != '.' && next == '.'))
-	      return readSchemeNumber(c, 0, ' ');
+		 || (c != '.' && (next == '.' || next == 'i' || next == 'I')))
+	      return readSchemeNumber(c, 10);
 	    else
 	      return readSymbol(c, getReadCase());
 	  case '#':
@@ -723,14 +874,13 @@ public class InPort extends LineBufferedReader implements Printable
 	      case 'f':
 		return Interpreter.falseObject;
 	      case 'x':
-		return readSchemeNumber(16, ' ');
-	      case 'b':
-		return readSchemeNumber (2, ' ');
+	      case 'd':
 	      case 'o':
-		return readSchemeNumber (8, ' ');
+	      case 'b':
 	      case 'i':
 	      case 'e':
-		return readSchemeNumber (0, (char) next);
+		unread ();
+		return readSchemeNumber ('#', 10);
 	      case '|':
 		int commentNesting = 1;
 		saveReadState = readState;
@@ -768,7 +918,7 @@ public class InPort extends LineBufferedReader implements Printable
             break;
 	  default:
 	    if (Character.isDigit((char)c))
-	      return readSchemeNumber(c, 0, ' ');
+	      return readSchemeNumber (c, 10);
 	    else
 	      return readSymbol(c, getReadCase());
 	  }

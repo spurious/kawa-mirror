@@ -6,7 +6,7 @@ import java.io.*;
   * You can seek backwards to the start of the line preceding the
   * current position (or the mark, if that has been set).
   * You can use seek with a negative offset, or unread.
-  * You can also use peek to look atteh next character without moving.
+  * You can also use peek to look at the next character without moving.
   *
   * The method getColumnNumber gives you the current column.
   *
@@ -14,7 +14,7 @@ import java.io.*;
   * This is especially useful for interactive streams (e.g. prompting).
   *
   * It would be nice if we could inherit from LineNumberReader.
-  * That may be possible in theory, but it is buffer dufficult and
+  * That may be possible in theory, but it is difficult and
   * expensive (because we don't get access to BufferedReader's buffer).
   */
 
@@ -26,6 +26,11 @@ public class LineBufferedReader extends FilterReader
   int pos;
 
   int limit;
+
+  /** True if CR and CRLF should be converted to LF. */
+  boolean convertCR = true;
+
+  public void setConvertCR(boolean convertCR) { this.convertCR = convertCR; }
 
   // The current line number (at start of buffer).
   int lineNumber;
@@ -152,13 +157,14 @@ public class LineBufferedReader extends FilterReader
     if (ch == '\n')
       {
 	lineStartPos = pos;
-	if (pos > 1 && buffer[pos-2] == '\r')
+	if (convertCR && pos > 1 && buffer[pos-2] == '\r')
 	  return read();
       }
     if (ch == '\r')
       {
 	lineStartPos = pos;
-	return '\n';
+	if (convertCR)
+	  return '\n';
       }
     return ch;
   }

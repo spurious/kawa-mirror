@@ -1,3 +1,7 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* testing.scm (test):  Add commented-out debugging hook.
+
 2004-05-23  Per Bothner  <per@bothner.com>
 
 	New testcase, based on Chris Dean's testcase for Savannah bug #8837.

@@ -144,7 +144,9 @@
        (cond-expand (kawa
 		     (try-catch
 		      (apply fun args)
-		      (ex <java.lang.Throwable> ex)))
+		      (ex <java.lang.Throwable>
+			  ;; (invoke ex 'printStackTrace) ;; for DEBUGGING
+			  ex)))
 		    (else
 		     (apply fun args)))
        (car args))))

@@ -103,7 +103,7 @@ an online copy of R4RS
 Kawa is a full Scheme implementation.  It implements almost
 all of R4RS (for exceptions @pxref{Restrictions}), plus some extensions.
 It provide @code{define-syntax} from the R4RS appendex,
-and multiple values (from the draft R5RS).
+and (from the draft R5RS) eval and multiple values.
 
 It is completely written in Java.  Scheme functions and files
 are automatically compiled into Java byte-codes, providing
@@ -161,7 +161,7 @@ Alternatively, you can install the pre-compiled binary distribution.
 
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) JDK 1.0.x from JavaSoft (Sun).
+(JDK) version 1.0.x from JavaSoft (Sun).
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
@@ -179,7 +179,7 @@ from @url{http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html}.
 The program 'java' is the Java interpreter.
 The program 'javac' is the Java compiler,
 and is needed if you want to compile the source release yourself.
-Both programs must both be in your @code{PATH}.
+Both programs must be in your @code{PATH}.
 
 You also need to set @code{CLASSPATH} so it includes both the
 current directory, and the standard Java library.
@@ -261,6 +261,11 @@ make
 You can now test the system by running Kawa in place:
 @example
 java kawa
+@end example
+
+or you can run the test suite:
+@example
+(cd testsuite;  make check)
 @end example
 
 or you can install the compiled files:
@@ -724,13 +729,30 @@ One of those actions is to define the procedure @code{handle-my-device}.
 
 The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
+Some details (such as the @samp{throws} lists) may changes,
+someting will continue to be supported. 
+
+@deftypefn {Static method} Object Scheme.eval (InPort @var{port}, Environment @var{env})
+Read expressions from @var{port}, and evaluate them in the
+@var{env} environment, until end-of-file is reached.
+Return the value of the last expression,
+or @code{Interpreter.voidObject} if there is no expression.
+@end deftypefn
+
+@deftypefn {Static method} Object Scheme.eval (String @var{string}, Environment @var{env})
+Read expressions from @var{string}, and evaluate them in the
+@var{env} environment, until the end of the string is reached.
+Return the value of the last expression,
+or @code{Interpreter.voidObject} if there is no expression.
+@end deftypefn
 
 @deftypefn {Static method} Object Scheme.eval (Object @var{sexpr}, Environment @var{env})
+The @var{sexpr} is an S-expression (as may be returned by @code{read}).
+Evaluate it in the @var{env} environment, and return the result.
 @end deftypefn
-@deftypefn {Static method} Object Scheme.eval (InPort @var{port}, Environment @var{env})
-@end deftypefn
-@deftypefn {Static method} Object Scheme.eval (String @var{string}, Environment @var{env})
-@end deftypefn
+
+For the @code{Environment} in most cases you could use
+@samp{Environment.current()}.
 
 @node Reporting Bugs, License, Primitive functions, Top
 @section Reporting Bugs

@@ -9,9 +9,11 @@ import java.util.Hashtable;
 import gnu.text.SourceMessages;
 import gnu.kawa.util.*;
 import gnu.kawa.lispexpr.*;
+import gnu.kawa.reflect.ClassMemberConstraint;
 
 public class Scheme extends Interpreter
 {
+
   protected void define_proc (Named proc)
   {
     define (proc.getName (), proc);
@@ -37,6 +39,16 @@ public class Scheme extends Interpreter
     define(name, proc);
   }
 
+  protected void define_field (String name, String cname, String fname)
+  {
+    StaticFieldConstraint.define(environ, name, cname, fname);
+  }
+
+  protected void define_field (String name, String cname)
+  {
+    StaticFieldConstraint.define(environ, name, cname, name);
+  }
+
   /* Define a Syntax to be autoloaded. */
   protected void define_syntax (String name, String className)
   {
@@ -60,10 +72,29 @@ public class Scheme extends Interpreter
 
   static Scheme instance;
 
+  public static gnu.kawa.reflect.InstanceOf instanceOf;
+  public static not not;
+  public static gnu.kawa.functions.IsEq isEq;
+  public static gnu.kawa.functions.IsEqv isEqv;
+  public static gnu.kawa.functions.IsEqual isEqual;
+  public static gnu.kawa.functions.Member memq;
+  public static gnu.kawa.functions.Member memv;
+  public static gnu.kawa.functions.Member member;
+  public static gnu.kawa.functions.Assoc assq;
+  public static gnu.kawa.functions.Assoc assv;
+  public static gnu.kawa.functions.Assoc assoc;
+
   public static Scheme getInstance()
   {
+    try
+      {
     if (kawaEnvironment == null)
       new Scheme ();
+      }
+    catch (Throwable ex)
+      {
+        ex.printStackTrace(System.err);
+      }
     return instance;
   }
 
@@ -78,10 +109,6 @@ public class Scheme extends Interpreter
   {
       Named proc;
       Named syn;
-
-      Procedure2 eqv;
-      Procedure2 eq;
-      Procedure2 equal;
 
       // (null-environment)
       nullEnvironment = new Environment ();
@@ -136,16 +163,13 @@ public class Scheme extends Interpreter
       environ = r4Environment;
 
       //-- Section 6.1  -- complete
-      define_proc ("not", new kawa.standard.not(this));
+      define_field("not", "kawa.standard.Scheme");
       define_proc ("boolean?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
-      eqv = new kawa.standard.eqv_p(this);
-      define_proc("eqv?", eqv);
-      eq = new kawa.standard.eq_p(this);
-      define_proc("eq?", eq);
-      equal = new kawa.standard.equal_p(this);
-      define_proc("equal?", equal);
+      define_field("eq?", "kawa.standard.Scheme", "isEq");
+      define_field("eqv?", "kawa.standard.Scheme", "isEqv");
+      define_field("equal?", "kawa.standard.Scheme", "isEqual");
 
       //-- Section 6.3  -- complete
       define_proc("pair?", "kawa.lib.lists");
@@ -185,25 +209,19 @@ public class Scheme extends Interpreter
       define_proc ("cddddr", "kawa.standard.cxr");
       define_proc ("null?", "kawa.lib.lists");
       define_proc ("list?", "kawa.standard.list_p");
-      define_proc ("list", "kawa.standard.list_v");
+      define_field("list", "gnu.kawa.functions.MakeList");
       define_proc ("length", "kawa.lib.lists");
       define_proc ("append", "kawa.standard.append");
       define_proc ("reverse", "kawa.standard.reverse");
       define_proc ("list-tail", "kawa.standard.list_tail");
       define_proc ("list-ref", "kawa.standard.list_ref");
 
-      proc = new kawa.standard.mem("memq",eq);
-      define(proc.getName (), proc);
-      proc = new kawa.standard.mem("memv",eqv);
-      define(proc.getName (), proc);
-      proc = new kawa.standard.mem("member",equal);
-      define(proc.getName (), proc);
-      proc = new kawa.standard.ass("assq",eq);
-      define(proc.getName (), proc);
-      proc = new kawa.standard.ass("assv",eqv);
-      define(proc.getName (), proc);
-      proc = new kawa.standard.ass("assoc",equal);
-      define(proc.getName (), proc);
+      define_field("memq", "kawa.standard.Scheme");
+      define_field("memv", "kawa.standard.Scheme");
+      define_field("member", "kawa.standard.Scheme");
+      define_field("assq", "kawa.standard.Scheme");
+      define_field("assv", "kawa.standard.Scheme");
+      define_field("assoc", "kawa.standard.Scheme");
 
       //-- Section 6.4  -- complete, including slashified read/write
       
@@ -232,8 +250,8 @@ public class Scheme extends Interpreter
       define_proc ("even?", "kawa.lib.numbers");
       define_proc ("max", "kawa.standard.max");
       define_proc ("min", "kawa.standard.min");
-      define_proc ("+", "kawa.standard.plus_oper");
-      define_proc ("-", "kawa.standard.minus_oper");
+      define_proc ("+", gnu.kawa.functions.AddOp.$Pl);
+      define_proc ("-", gnu.kawa.functions.AddOp.$Mn);
       define_proc ("*", "kawa.standard.multiply_oper");
       define_proc ("/", "kawa.standard.divide_oper");
       define_proc ("abs", "kawa.lib.numbers");
@@ -334,7 +352,7 @@ public class Scheme extends Interpreter
 
       //-- Section 6.9  -- complete [except restricted call/cc]
       define_proc ("procedure?", "kawa.lib.misc");
-      define_proc ("apply", "kawa.standard.apply");
+      define_field("apply", "gnu.kawa.functions.Apply", "apply");
       define_proc (new map (true));        // map
       define_proc (new map (false));       // for-each
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
@@ -455,8 +473,8 @@ public class Scheme extends Interpreter
       define_proc("throw", "kawa.standard.throw_name");
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.syntax");
-      define_proc("as", kawa.standard.convert.getInstance());
-      define_proc("instance?", new gnu.kawa.reflect.InstanceOf(this));
+      define_proc("as", kawa.standard.convert.as);
+      define_field("instance?", "kawa.standard.Scheme", "instanceOf");
       define_syntax("synchronized", "kawa.standard.synchronizd");
       object objectSyntax = new kawa.standard.object(lambda);
       define_syntax("object", objectSyntax);
@@ -529,7 +547,7 @@ public class Scheme extends Interpreter
 
       define_proc ("gentemp", "kawa.lib.syntax");
       define_syntax ("defmacro", "kawa.lib.syntax");
-      define_proc("setter", kawa.standard.setter.setterProcedure);
+      define_field("setter", "gnu.kawa.functions.Setter", "setter");
 
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
@@ -538,10 +556,9 @@ public class Scheme extends Interpreter
       define_syntax ("trace", "kawa.lib.trace");
       define_syntax ("untrace", "kawa.lib.trace");
 
-      define_proc ("format", "kawa.standard.format");
-      define_proc ("parse-format", parseFormat);
-      //define_proc("emacs:parse-format", new kawa.standard.ParseFormat(true));
-      define_proc("emacs:read", "kawa.lib.emacs");
+      define_field("format", "gnu.kawa.functions.Format");
+      define_field("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
+      define_proc("emacs:read", "kawa.lib.emacs"); //
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
@@ -643,6 +660,7 @@ public class Scheme extends Interpreter
       define_proc ("list->f64vector", "kawa.lib.uniform");
 
       define_proc ("emacs", "gnu.jemacs.buffer.emacs");
+      define_proc ("node", "gnu.kawa.xml.MakeTreeNode");
   }
 
   static int scheme_counter = 0;
@@ -656,7 +674,20 @@ public class Scheme extends Interpreter
     environ = new ScmEnv (kawaEnvironment);
     environ.setName ("interaction-environment."+(++scheme_counter));
     if (instance == null)
-      instance = this;
+      {
+        instance = this;
+        instanceOf = new gnu.kawa.reflect.InstanceOf(this, "instance?");
+        not = new not(this, "not");
+        isEq = new gnu.kawa.functions.IsEq(this, "eq?");
+        isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?");
+        isEqual = new gnu.kawa.functions.IsEqual(this, "equal?");
+        memq = new gnu.kawa.functions.Member("memq", isEq);
+        memv = new gnu.kawa.functions.Member("memv", isEqv);
+        member = new gnu.kawa.functions.Member("member", isEqual);
+        assq = new gnu.kawa.functions.Assoc("assq", isEq);
+        assv = new gnu.kawa.functions.Assoc("assv", isEqv);
+        assoc = new gnu.kawa.functions.Assoc("assoc", isEqual);
+      }
   }
 
   public Scheme (Environment environ)
@@ -755,8 +786,6 @@ public class Scheme extends Interpreter
       }
     out.flush();
   }
-
-  public static Procedure1 parseFormat = new ParseFormat(false);
 
   /** If exp is a "constant" Type, return that type, otherwise return null. */
   public static Type getTypeValue (Expression exp)

@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
 import gnu.mapping.*;
@@ -18,6 +17,12 @@ public class not extends Procedure1 implements Inlineable
     this.interpreter = interpreter;
     trueExp = new QuoteExp(interpreter.booleanObject(true));
     falseExp = new QuoteExp(interpreter.booleanObject(false));
+  }
+
+  public not(Interpreter interpreter, String name)
+  {
+    this(interpreter);
+    setName(name);
   }
 
   public Object apply1 (Object arg1)

@@ -75,17 +75,51 @@ public class prim_method extends Syntax
 	int opcode = ((Number)(match[1])).intValue();
 	proc = new PrimProcedure(opcode, rtype, args);
       }
-    else if (op_code == 183)  // primitive-constructor
-      {
-	proc = new PrimProcedure((ClassType) rtype, args);
-      }
     else
       {
-	Pair p;
-	if (match[1] instanceof Pair && (p = (Pair) match[1]).car == "quote")
-	  match[1] = ((Pair) p.cdr).car;
-	ClassType cl = (ClassType) exp2Type(match[0], tr);
-	proc = new PrimProcedure(op_code, cl, match[1].toString(), rtype,args);
+        ClassType cl = null;
+        Type ctype;
+        int carg;
+        if (op_code == 183)
+          {
+            carg = 2;
+            ctype = rtype;
+          }
+        else
+          {
+            carg = 0;
+            ctype = exp2Type(match[0], tr);
+          }
+        try
+          {
+            cl = (ClassType) ctype;
+            cl.getReflectClass();
+          }
+        catch (Exception ex)
+          {
+            char code;
+            if (cl == null)
+              code = 'e';
+            else
+              {
+                code = 'w';
+                ((ClassType) cl).setExisting(false);
+              }
+            tr.error(code, "unknown class: " + match[carg]);
+          }
+        if (op_code == 183)  // primitive-constructor
+          {
+            proc = new PrimProcedure(cl, args);
+          }
+        else
+          {
+            Pair p;
+            if (match[1] instanceof Pair
+                && (p = (Pair) match[1]).car == "quote")
+              match[1] = ((Pair) p.cdr).car;
+            proc = new PrimProcedure(op_code, cl,
+                                     match[1].toString(), rtype, args);
+          }
       }
     return new QuoteExp(proc);
   }

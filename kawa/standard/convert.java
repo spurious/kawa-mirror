@@ -8,13 +8,12 @@ import gnu.expr.*;
 
 public class convert extends Procedure2 implements Inlineable
 {
-  static convert instance = null;
+  public static final convert as = new convert();
+  static { as.setName("as"); }
 
   public static convert getInstance ()
   {
-    if (instance == null)
-      instance = new convert();
-    return instance;
+    return as;
   }
 
   public Object apply2 (Object arg1, Object arg2)

@@ -12,20 +12,14 @@ quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
 not.java \
 and_or.java \
-eqv_p.java \
-eq_p.java \
-equal_p.java \
 car.java \
 cdr.java \
 cxr.java \
 list_p.java \
-list_v.java \
 append.java \
 reverse.java \
 list_tail.java \
 list_ref.java \
-mem.java \
-ass.java \
 integer_p.java \
 exact_p.java \
 inexact_p.java \
@@ -33,8 +27,6 @@ positive_p.java \
 max.java \
 min.java \
 NumberCompare.java \
-plus_oper.java \
-minus_oper.java \
 multiply_oper.java \
 divide_oper.java \
 modulo.java \
@@ -81,7 +73,7 @@ open_input_file.java \
 open_output_file.java \
 call_with_output_string.java \
 load.java \
-apply.java constant_fold.java \
+constant_fold.java \
 map.java \
 callcc.java \
 logand.java logior.java logxor.java ashift.java \
@@ -99,10 +91,10 @@ make_quantity.java quantity2number.java quantity2unit.java \
 make_future.java sleep.java \
 try_catch.java try_finally.java synchronizd.java \
 convert.java \
-ParseFormat.java format.java LispFormat.java ObjectFormat.java \
-setter.java make.java location.java \
+make.java location.java \
 define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \
+StaticFieldConstraint.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java \
 TracedProcedure.java \

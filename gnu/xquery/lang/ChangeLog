@@ -1,3 +1,10 @@
+2003-11-09  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (PARSE_WITH_FOCUS):  New flag.
+	(parse):  Check for PARSE_WITH_FOCUS.
+	(applyWithFocus, applyWithFocus$X, evalToFocusProc, evalWithFocus,
+	evalWithFocus$X):  New methods.
+
 2003-11-08  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parse):  Update to take a Lexer rather than an InPort.

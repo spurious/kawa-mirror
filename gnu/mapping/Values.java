@@ -37,7 +37,7 @@ public class Values extends TreeList implements Printable, Externalizable
     return make(vals);
   }
 
-  public static Object make ()
+  public static Values make ()
   {
     return new Values();
   }

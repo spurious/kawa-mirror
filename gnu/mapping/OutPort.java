@@ -8,7 +8,7 @@ import gnu.lists.*;
  * An extended PrintWriter.
  */
 
-public class OutPort extends java.io.PrintWriter implements Printable, Consumer
+public class OutPort extends PrintConsumer implements Printable
 {
   String name;
   private Writer base;
@@ -312,35 +312,6 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   //public void writeChar(int v);
 
-  public void writeBoolean(boolean v)
-  {
-    print(v);
-  }
-
-  public void writeFloat(float v)
-  {
-    print(v);
-  }
-
-  public void writeDouble(double v)
-  {
-    print(v);
-  }
-
-  public void writeInt(int v)
-  {
-    print(v);
-  }
-
-  public void writeLong(long v)
-  {
-    print(v);
-  }
-
-  public void beginDocument() { }
-
-  public void endDocument() { }
-
   public void beginGroup(String typeName, Object type)
   {
     if (objectFormat != null)
@@ -376,18 +347,6 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
   {
     prev = WORD;
     print(' ');  // FIXME
-  }
-
-  public void writeObject(Object v)
-  {
-    print(v);
-  }
-
-  /** True if consumer is ignoring rest of group.
-   * The producer can use this information to skip ahead. */
-  public boolean ignoring()
-  {
-    return false;
   }
 
   public void writeChars(String str)

@@ -1,3 +1,7 @@
+2002-01-24  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseElementConstructor):  Handle ATTR={EXPR} syntax.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (interactive): Moved to super-class Lexer.

@@ -1160,7 +1160,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (ch != '=')
 	  return syntaxError("missing '=' after attribute");
 	ch = skipSpace();
-	parseContent(ch, vec);
+	if (ch == '{')
+	  vec.addElement(parseEnclosedExpr());
+	else
+	  parseContent(ch, vec);
 	args = new Expression[vec.size() - vecSize];
 	for (int i = args.length;  --i>= 0; )
 	  args[i] = (Expression) vec.elementAt(vecSize + i);

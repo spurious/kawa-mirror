@@ -69,7 +69,7 @@ public class Scheme extends LispLanguage
     return instance;
   }
 
-  public static synchronized Environment builtin ()
+  public static Environment builtin ()
   {
     return kawaEnvironment;
   }

@@ -7,6 +7,9 @@ import gnu.bytecode.*;
 
 public class syntax_case extends Syntax
 {
+  public static final syntax_case syntax_case = new syntax_case();
+  static { syntax_case.setName("syntax-case"); }
+
   PrimProcedure call_error;
 
   Expression rewriteClauses (Object clauses, syntax_case_work work,

@@ -8,6 +8,9 @@ import java.util.*;
 
 public class syntax extends Syntax
 {
+  public static final syntax syntax = new syntax();
+  static { syntax.setName("syntax"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     /* #ifdef JAVA2 */

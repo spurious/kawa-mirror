@@ -8,6 +8,9 @@ import gnu.lists.*;
 
 public class define_variable extends Syntax implements Printable
 {
+  public static final define_variable define_variable = new define_variable();
+  static { define_variable.setName("define-variable"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

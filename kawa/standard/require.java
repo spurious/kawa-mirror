@@ -12,6 +12,9 @@ import java.util.*;
 
 public class require extends Syntax
 {
+  public static final require require = new require();
+  static { require.setName("require"); }
+
   /* NOTE on handling mutually recursive modules:
 
      How can Kawa compile two or more modules that mutually require

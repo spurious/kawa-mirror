@@ -20,6 +20,8 @@ import gnu.lists.*;
 
 public class define extends Syntax implements Printable
 {
+  public static final define defineRaw = new define(Scheme.lambda);
+
   Lambda lambda;
 
   String getName (int options)

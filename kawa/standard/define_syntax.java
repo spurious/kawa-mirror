@@ -7,6 +7,12 @@ import gnu.lists.*;
 
 public class define_syntax extends Syntax
 {
+  public static final define_syntax define_macro
+    = new define_syntax("%define-macro", false);
+
+  public static final define_syntax define_syntax
+    = new define_syntax("%define-syntax", true);
+
   public define_syntax ()
   {
     this.hygienic = true;

@@ -1,3 +1,23 @@
+2005-03-20  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/begin.java (begin): New static "instance" field.
+	* kawa/standard/define.java (defineRaw): Likewise.
+	* kawa/standard/define_alias.java (define_alias): Likewise.
+	* kawa/standard/define_member_alias.java (define_member_alias):
+	Likewise.
+	* kawa/standard/define_syntax.java (define_macro, define_syntax):
+	Likewise.
+	* kawa/standard/define_variable.java (define_variable): Likewise.
+	* kawa/standard/let_syntax.java (let_syntax, letrec_syntax): Likewise.
+	* kawa/standard/location.java (location): Likewise.
+	* kawa/standard/require.java (require): Likewise.
+	* kawa/standard/set_b.java (set): Likewise.
+	* kawa/standard/syntax.java (syntax): Likewise.
+	* kawa/standard/syntax_case.java (syntax_case):: Likewise.
+	* kawa/standard/syntax_rules.java (syntax_rules): Likewise.
+	* kawa/standard/Scheme.java: Use new static instances to replace some
+	define/define_syntax calls by defSntxStFld.
+
 2005-03-18  Per Bothner  <per@bothner.com>
 
 	* build.xml: Pass --module-static-run instead of --module-static.

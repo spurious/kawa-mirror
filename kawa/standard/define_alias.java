@@ -7,6 +7,9 @@ import gnu.bytecode.*;
 
 public class define_alias extends Syntax implements Printable
 {
+  public static final define_alias define_alias = new define_alias();
+  static { define_alias.setName("define-alias"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

@@ -10,10 +10,16 @@ import java.util.Stack;
 
 public class let_syntax extends Syntax implements Printable
 {
+  public static final let_syntax let_syntax
+    = new let_syntax(false, "let-syntax");
+  public static final let_syntax letrec_syntax
+    = new let_syntax(true, "letrec-syntax");
+
   boolean recursive;
 
-  public let_syntax(boolean recursive)
+  public let_syntax(boolean recursive, String name)
   {
+    super(name);
     this.recursive = recursive;
   }
 

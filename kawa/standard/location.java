@@ -14,6 +14,9 @@ import gnu.kawa.reflect.Invoke;
 
 public class location extends Syntax implements Printable
 {
+  public static final location location = new location();
+  static { location.setName("location"); }
+
   static private Pattern pattern = new ListPat (2, 2);
 
   public Expression rewrite (Object obj, Translator tr)

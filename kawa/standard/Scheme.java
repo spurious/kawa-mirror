@@ -88,15 +88,15 @@ public class Scheme extends LispLanguage
 
       environ = nullEnvironment;
 
-      define_syntax ("lambda", lambda);
+      defSntxStFld("lambda", "kawa.standard.Scheme", "lambda");
 
       //-- Section 4.1  -- complete
       defProcStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
-      define_syntax("%define", new kawa.standard.define(lambda));
+      defProcStFld("%define", "kawa.standard.define", "defineRaw");
       defSntxStFld("define", "kawa.lib.prim_syntax");
 
       defSntxStFld("if", "kawa.lib.prim_syntax");
-      define_syntax ("set!", "kawa.standard.set_b");
+      defSntxStFld ("set!", "kawa.standard.set_b", "set");
 
       // Section 4.2  -- complete
       defSntxStFld("cond", "kawa.lib.std_syntax");
@@ -108,7 +108,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("let*", "kawa.lib.std_syntax");
       defSntxStFld("letrec", "kawa.lib.std_syntax");
 
-      define ("begin", new kawa.standard.begin());
+      defSntxStFld("begin", "kawa.standard.begin", "begin");
       defSntxStFld("do", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
       defProcStFld("%make-promise", "kawa.lib.std_syntax");
@@ -118,9 +118,10 @@ public class Scheme extends LispLanguage
 
       // Appendix (and R5RS)
       defSntxStFld("define-syntax", "kawa.lib.prim_syntax");
-      define ("syntax", new kawa.standard.syntax ());
-      define ("let-syntax", new kawa.standard.let_syntax (false));
-      define ("letrec-syntax", new kawa.standard.let_syntax (true));
+      defSntxStFld("syntax", "kawa.standard.syntax", "syntax");
+      defSntxStFld("let-syntax", "kawa.standard.let_syntax", "let_syntax");
+      defSntxStFld("letrec-syntax", "kawa.standard.let_syntax",
+                   "letrec_syntax");
 
       nullEnvironment.setLocked();
       r4Environment = Environment.make("r4rs-environment", nullEnvironment);
@@ -570,11 +571,14 @@ public class Scheme extends LispLanguage
       defProcStFld("keyword?", "kawa.lib.keywords");
       defProcStFld("keyword->string", "kawa.lib.keywords");
       defProcStFld("string->keyword", "kawa.lib.keywords");
-      define_syntax ("location", "kawa.standard.location");
-      define ("define-alias", new kawa.standard.define_alias());
-      define_syntax("define-variable", "kawa.standard.define_variable");
-      define ("define-member-alias", new kawa.standard.define_member_alias());
-      define ("require", new kawa.standard.require());
+      defSntxStFld("location", "kawa.standard.location", "location");
+      defSntxStFld("define-alias", "kawa.standard.define_alias",
+                   "define_alias");
+      defSntxStFld("define-variable", "kawa.standard.define_variable",
+                   "define_variable");
+      defSntxStFld("define-member-alias", "kawa.standard.define_member_alias",
+                   "define_member_alias");
+      defSntxStFld("require", "kawa.standard.require", "require");
       define_syntax ("module-name", "kawa.standard.module_name");
       define_syntax ("module-extends", "kawa.standard.module_extends");
       define_syntax ("module-implements", "kawa.standard.module_implements");

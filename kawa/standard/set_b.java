@@ -20,6 +20,9 @@ public class set_b extends Syntax implements Printable
 
   static private Pattern pattern = new ListPat (2, 2);
 
+  public static final set_b set = new set_b();
+  static { set.setName("set!"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object o1 = form.cdr;

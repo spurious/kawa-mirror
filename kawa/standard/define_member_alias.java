@@ -7,6 +7,10 @@ import gnu.bytecode.*;
 
 public class define_member_alias extends Syntax
 {
+  public static final define_member_alias define_member_alias
+    = new define_member_alias();
+  static { define_member_alias.setName("define-member-alias"); }
+
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)

@@ -11,6 +11,9 @@ import gnu.lists.*;
 
 public class begin extends Syntax implements Printable
 {
+  public static final begin begin = new begin();
+  static { begin.setName("begin"); }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     return tr.rewrite_body (obj);

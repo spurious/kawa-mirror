@@ -7,6 +7,9 @@ import gnu.expr.*;
 
 public class syntax_rules extends Syntax
 {
+  public static final syntax_rules syntax_rules = new syntax_rules();
+  static { syntax_rules.setName("syntax-rules"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Pair pair = (Pair) form.cdr;

@@ -683,7 +683,6 @@ public class Scheme extends LispLanguage
       defSntxStFld("cut", "gnu.kawa.slib.cut");
       defSntxStFld("cute", "gnu.kawa.slib.cut");
 
-      defProcStFld("emacs", "gnu.jemacs.buffer.emacs");
       defSntxStFld("cond-expand", "kawa.lib.syntax");
       defSntxStFld("%cond-expand", "kawa.lib.syntax");
  

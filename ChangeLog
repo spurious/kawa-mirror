@@ -1,5 +1,9 @@
 2005-03-03  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: Remove definition of 'emacs' fnction - it
+	doesn't work for Scheme, and causes order-dependency awkwardness when
+	compiling CommonLisp/ELisp.
+
 	* Makefile.am (SUBDIR): Some re-ordering to reduce dependencies.
 	Specifically, jemacs and commonlisp import scheme functions, including
 	ones in gnu.kawa.slib, so we sant to compile them later.

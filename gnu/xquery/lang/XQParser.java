@@ -1620,11 +1620,42 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == FNAME_TOKEN)
       {
-	String name = new String(tokenBuffer, 0, tokenBufferLength);
-	if (name.equals("typeswitch"))
-	  return parseTypeSwitch();;
+	int colon = tokenBufferLength;
+	while (--colon >= 0 && tokenBuffer[colon] != ':') ;
+	Object name;
+	if (colon >= 0)
+	  {
+	    String prefix = new String(tokenBuffer, 0, colon);
+	    colon++;
+	    String local
+	      = new String(tokenBuffer, colon, tokenBufferLength - colon);
+	    String uri = (String) namespaces.get(prefix);
+	    if (uri == null)
+	      {
+		try
+		  {
+		    Class clas = Class.forName(prefix);
+		    uri = "class:" + prefix;
+		  }
+		catch (Exception ex)
+		  {
+		    syntaxError("unknown namespace '" + prefix + "'");
+		    name = new Symbol(local.intern());
+		  }
+	      }
+	    name = Symbol.make(uri, local);
+	  }
+	else
+	  {
+	    String str = new String(tokenBuffer, 0, tokenBufferLength);
+	    if (str.equals("typeswitch"))
+	      return parseTypeSwitch();
+	    if (defaultFunctionNamespace == "")
+	      name = str.intern(); // kludge
+	    else
+	      name = Symbol.make(defaultFunctionNamespace, str);
+	  }
 	startColumn -= tokenBufferLength;
-	name = name.intern();
 	nesting++;
 	getRawToken();
 	Vector vec = new Vector(10);
@@ -1644,7 +1675,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	Expression[] args = new Expression[vec.size()];
 	vec.copyInto(args);
 	Declaration decl = parser.lookup(name, Interpreter.FUNCTION_NAMESPACE);
-	exp = new ApplyExp(new ReferenceExp(name, decl), args);
+	if (decl == null && name instanceof Symbol)
+	  exp = InlineCalls.rewriteToInvocation((Symbol) name, args);
+	else
+	  exp = null;
+	if (exp == null)
+	  exp = new ApplyExp(new ReferenceExp(name, decl), args);
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	nesting--;

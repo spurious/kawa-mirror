@@ -1,5 +1,8 @@
 2002-11-20  Per Bothner  <bothner@bothner.com>
 
+	* XQparser.java (parseMaybePrimaryExpr):  Check if function names
+	a method invocation.
+
 	* XQuery.java (<init>):  Recover from missing servlet classes.
 
 2002-11-16  Per Bothner  <per@bothner.com>

@@ -341,17 +341,16 @@ public class Compilation
 
   String source_filename;
 
-  public Compilation (ModuleExp mexp, String classname, String prefix)
-  {
-    source_filename = mexp.filename;
-    classPrefix = prefix;
-    addClass (mexp, classname);
-  }
-
-  public Compilation (LambdaExp lexp, String classname, boolean immediate)
+  public Compilation (LambdaExp lexp, String classname, String prefix,
+		      boolean immediate)
   {
     source_filename = lexp.filename;
+    classPrefix = prefix;
     this.immediate = immediate;
+
+    FindTailCalls.findTailCalls(lexp);
+    FindCapturedVars.findCapturedVars(lexp);
+
     addClass (lexp, classname);
   }
 
@@ -430,20 +429,43 @@ public class Compilation
 		       : "gnu.mapping.Procedure" + arg_letter);
     curClass.setSuper (superType);
 
-    Type[] constructor_args = apply0args;
-    boolean constructor_takes_staticLink = false;
-    if (lexp.staticLink != null)
+    if (lexp.getImportsLexVars())
       {
-	lexp.staticLinkField = curClass.addField ("staticLink", objArrayType);
-	if (lexp.outerLambda () != null)
+	LambdaExp parent = lexp.outerLambda();
+	LambdaExp heapFrameLambda = parent.heapFrameLambda;
+	if (heapFrameLambda != lexp && heapFrameLambda != null)
 	  {
-	    constructor_args = applyNargs;
-	    constructor_takes_staticLink = true;
+	    ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
+	    lexp.staticLinkField
+	      = curClass.addField ("closureEnv", heapFrameType);
+	  }
+	// otherwise: closureEnv==this.
+	else if (parent.getImportsLexVars())
+	  {
+	    Type slinkType = parent.outerLambda()
+	      .heapFrameLambda.getCompiledClassType();
+	    lexp.staticLinkField = curClass.addField ("staticLink", slinkType);
 	  }
       }
 
+    for (Declaration decl = lexp.capturedVars; decl != null;
+	 decl = decl.nextCapturedVar)
+      {
+	String dname = mangleName(decl.getName());
+	String mname = dname;
+	// Check for existing field with name name.  Probably overkill.
+	for (int i = 0; ; i++)
+	  {
+	    Field fld = curClass.getField(mname);
+	    if (fld == null)
+	      break;
+	    mname = dname + 1;
+	  }
+	decl.field = curClass.addField (mname, decl.getType());
+      }
+
     Method constructor_method = curClass.addMethod ("<init>",
-						     constructor_args,
+						     apply0args,
 						     Type.void_type,
 						     Access.PUBLIC);
     curClass.constructor = constructor_method;
@@ -456,13 +478,6 @@ public class Compilation
     CodeAttr code = getCode();
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
-    if (constructor_takes_staticLink)
-      {
-	code.emitPushThis();
-	Variable staticLinkArg = code.getArg(1);
-	code.emitLoad(staticLinkArg);
-	code.emitPutField(lexp.staticLinkField);
-      }
 
     // If immediate, we cannot set the function name in the constructor,
     // since setLiterals has not been called yet (ecept for nested functions).
@@ -505,7 +520,6 @@ public class Compilation
     int i = 0;
     method.initCode();
     code = getCode();
-
     Variable var = lexp.firstVar();
     if (var.getName() == "this")
       var.setType(new_class);
@@ -550,7 +564,7 @@ public class Compilation
 	    incoming.setParameter (true);
 	    if (! incoming.reserveLocal(i, code))
 	      throw new Error ("internal error assigning parameters");
-	    incoming.baseVariable = decl;
+	    //incoming.baseVariable = decl;
 	    // Subtract 1, so we don't count the "this" variable.
 	    incomingMap[i-1] = incoming;
 	  }
@@ -569,18 +583,10 @@ public class Compilation
 
     code.enterScope (lexp.scope);
 
-    if (lexp.heapFrame != null)
+    if (lexp.heapFrameLambda != null)
       {
-	code.emitPushInt(lexp.frameSize);
-	code.emitNewArray(scmObjectType);
+	lexp.heapFrameLambda.compileAlloc(this);
 	code.emitStore(lexp.heapFrame);
-      }
-
-    if (lexp.staticLink != null)
-      {
-	method.compile_push_this ();
-	getCode().emitGetField(lexp.staticLinkField);
-	SetExp.compile_store (lexp.staticLink, this);
       }
 
     // For each non-artificial parameter, copy it from its incoming
@@ -606,8 +612,7 @@ public class Compilation
 		Declaration param = (Declaration) var;
 		if (!param.isSimple ())
 		  {
-		    ReferenceExp.compile_load (param.baseVariable, this);
-		    code.emitPushInt(param.offset);
+		    param.loadOwningObject(this);
 		  }
 		// This part of the code pushes the incoming argument.
 		if (argsArray == null)
@@ -671,12 +676,13 @@ public class Compilation
 		if (param.isSimple ())
 		  code.emitStore(param);
 		else
-		  code.emitArrayStore(Compilation.scmObjectType);
+		  code.emitPutField(param.field);
 	      }
 	    i++;
 	  }
       }
 
+    code.beginScope();
     lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())
       code.emitReturn();

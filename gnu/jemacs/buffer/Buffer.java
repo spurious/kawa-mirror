@@ -2,6 +2,7 @@ package gnu.jemacs.buffer;
 import javax.swing.text.*;
 import java.io.*;
 import java.awt.Color;
+import gnu.mapping.InPort;
 
 public class Buffer
 {
@@ -22,8 +23,8 @@ public class Buffer
     StyleConstants.setForeground(blueStyle, Color.blue);
   }
 
-  /** Value of point (0-orgin), when curPosition is null. */
-  int point;
+  Marker pointMarker;
+
   Caret curPosition = null;
 
   BufferContent content;
@@ -141,6 +142,12 @@ public class Buffer
   {
     this.name = name;
     content = new BufferContent();
+
+    pointMarker = new Marker();
+    pointMarker.buffer = this;
+    pointMarker.index
+      = content.allocatePosition(0, BufferContent.AFTER_MARK_KIND);
+
     document = new javax.swing.text.DefaultStyledDocument(content, styles);
 
     modelineDocument
@@ -160,7 +167,7 @@ public class Buffer
 
   public final int getDot()
   {
-    return curPosition == null ? point : curPosition.getDot();
+    return pointMarker.getOffset();
   }
 
   public int getPoint()
@@ -170,9 +177,9 @@ public class Buffer
 
   public final void setDot(int i)
   {
-    point = i;
-    if (curPosition != null)
-      curPosition.setDot(i);
+    if (i > maxDot())
+      throw new Error("set dot to "+i+ " max:"+maxDot());
+    pointMarker.set(this, i);
   }
 
   public final void setPoint(int i)
@@ -193,22 +200,27 @@ public class Buffer
 
   public void forwardChar(int i)
   {
-    if (curPosition != null)
-      point = curPosition.getDot();
+    int point = getDot();
+    int max = maxDot();
+    if (point + i > max)
+      {
+	point = max;
+	Signal.signal("End of buffer");
+      }
     point += i;
-    if (curPosition != null)
-      curPosition.setDot(point);
+    setDot(point);
   }
 
   public void backwardChar(int i)
   {
-    if (curPosition != null)
-      point = curPosition.getDot();
+    int point = getDot();
+    if (point < i)
+      {
+	point = 0;
+	Signal.signal("Beginning of buffer");
+      }
     point -= i;
-    if (point < 0)
-      Signal.signal("Beginning of buffer");
-    if (curPosition != null)
-      curPosition.setDot(point);
+    setDot(point);
   }
 
   public String toString()
@@ -232,19 +244,47 @@ public class Buffer
     pointMarker.deleteChar(count);
   }
 
-  Marker pointMarker = makePointMarker();
-
-  private Marker makePointMarker ()
+  public void remove (int start, int count)
+    throws javax.swing.text.BadLocationException
   {
-    Marker marker = new Marker();
-    marker.buffer = this;
-    marker.index = Marker.POINT_POSITION_INDEX;
-    return marker;
+    document.remove(start, count);
+  }
+
+  public void removeRegion (int start, int end)
+    throws javax.swing.text.BadLocationException
+  {
+    document.remove(start, end - start);
+  }
+
+  public void removeAll ()
+  {
+    try
+      {
+	document.remove(0, maxDot());
+      }
+    catch (javax.swing.text.BadLocationException ex)
+      {
+	throw new gnu.mapping.WrappedException(ex);
+      }
   }
 
   public Marker getPointMarker (boolean share)
   {
     return share ? pointMarker : new Marker(pointMarker);
+  }
+
+  /** Convert an Emacs position (Marker, Position, or 1-origin integer)
+   * to a (0-origin) buffer offset. */
+  public int positionToOffset (Object position)
+  {
+    if (position instanceof Number)
+      {
+	int min = minDot();
+	int max = maxDot();
+	int goal = ((Number) position).intValue() - 1;
+	return goal < min ? min : goal > max ? max : goal;
+      }
+    return ((Position) position).getOffset();
   }
 
   public void save(Writer out)
@@ -306,6 +346,105 @@ public class Buffer
       {
         throw new RuntimeException("error reading file \""+filename+"\": "+ex);
       }
+  }
+
+  int tabWidth = 8;
+
+  public int charWidth (char ch, int column)
+  {
+    if (ch < 0x3000)
+      {
+	// Combining forma should probably be 0.
+	if (ch < ' ')
+	  {
+	    if (ch == '\t')
+	      return (((column + tabWidth) / tabWidth) * tabWidth) - column;
+	    return 0;
+	  }
+      }
+    else
+      {
+	if (ch < 0xD800 // CJK Ideographs
+	    || (ch >= 0xFF01 && ch <= 0xFF5E)  // Fullwidth ASCII.
+	    || (ch >= 0xFFe0 && ch <= 0xFFE6)) // Fullwidth punctuation.
+	  return 2;
+	if (ch < 0xE000)
+	  return 0;  // Surrogates.
+      }
+    return 1;
+  }
+
+  public int countColumns(char[] chars, int start, int count, int initial)
+  {
+    while (--count >= 0)
+      initial += charWidth (chars[start++], initial);
+    return initial;
+  }
+
+  public int currentColumn()
+  {
+    return currentColumn(getDot());
+  }
+
+  /** Return the column number at a specified offset. */
+  public int currentColumn(int offset)
+  {
+    int lineStart = lineStartOffset(offset);
+    BufferReader port = new BufferReader(this, lineStart, offset - lineStart);
+    int column = 0;
+    while (port.read() >= 0)
+      {
+	// Subtract one from pos, to undo the read we just did.
+	int start = port.pos - 1;
+	column = countColumns(port.buffer, start, port.limit - start, column);
+	port.pos = port.limit;
+      }
+    return column;
+  }
+
+  // force is currently ignored FIXME
+  public int moveToColumn(int column, boolean force)
+  { 
+    int lineStart = lineStartOffset(getDot());
+    BufferReader port
+      = new BufferReader(this, lineStart, maxDot() - lineStart);
+    int resultColumn = 0;
+    int offset = lineStart;
+    for (;;)
+      {
+	int ch = port.read();
+	if (ch < 0 || ch == '\n')
+	  {
+	    if (force)
+	      {
+		// FIXME
+	      }
+	    break;
+	  }
+	int width = charWidth((char) ch, resultColumn);
+	offset++;
+	resultColumn += width;
+	if (resultColumn >= column)
+	  {
+	    if (resultColumn > column && force)
+	      {
+		// FIXME
+	      }
+	    break;
+	  }
+      }
+    setDot(offset);
+    return resultColumn;
+  }
+
+  public int lineStartOffset(int offset)
+  {
+    return (int) content.scan('\n', offset, minDot(), -1, true);
+  }
+
+  public int lineStartOffset()
+  {
+    return lineStartOffset(getDot());
   }
 
   /** Search in BUF for COUNT instances of the character TARGET between START and END.

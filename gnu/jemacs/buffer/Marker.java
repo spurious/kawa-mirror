@@ -40,7 +40,7 @@ public final class Marker implements Position
     if (buffer == null)
       return -1;
     else if (index == POINT_POSITION_INDEX)
-      return buffer.getDot();
+      return buffer.curPosition.getDot();
     return buffer.content.positions[buffer.content.indexes[index]];
   }
 
@@ -72,7 +72,7 @@ public final class Marker implements Position
               msg = "Can't change buffer of point-marker: ";
             throw new Error(msg+this);
           }
-        buffer.setDot(newPosition);
+	buffer.curPosition.setDot(newPosition);
       }
     else
       {

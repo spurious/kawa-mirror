@@ -30,9 +30,9 @@ implements javax.swing.text.AbstractDocument.Content
    * another is the pseudo-mark representing the Emacs insertion point. */
   public static final int AFTER_MARK_KIND = 2;
 
-  protected char[] array;
-  protected int gapStart;
-  protected int gapEnd;
+  char[] array;
+  int gapStart;
+  int gapEnd;
 
   /** Number of marks whose kind is BEFORE_MARK_KIND. */
   private int numBeforePositions() { return firstPosition[1]; }
@@ -51,7 +51,7 @@ implements javax.swing.text.AbstractDocument.Content
    * perhaps be physical indexes, counting a possible gap. */
   int[] positions;
 
-  /** Each Marker (and in the future each Position) has an index into
+  /** Each Marker and each Position has an index into
    * this table, which specifies an index in positions. */
   int[] indexes;
 
@@ -150,7 +150,7 @@ implements javax.swing.text.AbstractDocument.Content
   public void freePositionIndex(int offset)
   {
     System.arraycopy(positions, offset+1, positions, offset,
-                     numPositions() - 1);
+                     numPositions() - (offset + 1));
     for (int i = indexes.length; --i >= 0; )
       {
         if (indexes[i] > offset)
@@ -375,6 +375,7 @@ implements javax.swing.text.AbstractDocument.Content
 
   public void dump()
   {
+    System.err.println("Buffer Content dump.  length:"+length());
     System.err.print("before gap: \"");
     System.err.print(new String(array, 0, gapStart));
     System.err.println("\" (gapStart:"+gapStart+" gapEnd:"+gapEnd+')');
@@ -506,7 +507,7 @@ implements javax.swing.text.AbstractDocument.Content
               start = floor;
           }
   
-        if (start > gapEnd)
+        if (start >= gapEnd)
           start -= gapEnd - gapStart;
         if (count != 0)
           return ((long) (- count) << 32) | start;

@@ -1,7 +1,7 @@
 package gnu.jemacs.buffer;
 import javax.swing.text.*;
 
-/** A Writer that writes at a Buffer's poit or a Marker. */
+/** A Writer that writes at a Buffer's point or a Marker. */
 
 public class BufferWriter extends java.io. Writer
 {

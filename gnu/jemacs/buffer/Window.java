@@ -91,6 +91,9 @@ public class Window extends javax.swing.JTextPane
     frame.selectedWindow = this;
     Frame.selectedFrame = frame;
     buffer.curPosition = getCaret();
+    if (buffer.pointMarker.index >= 0)
+      buffer.content.freePosition(buffer.pointMarker.index);
+    buffer.pointMarker.index = Marker.POINT_POSITION_INDEX;
     Buffer.setCurrent(buffer);
   }
 
@@ -102,7 +105,10 @@ public class Window extends javax.swing.JTextPane
 
   void unselect()
   {
-    buffer.point = buffer.curPosition.getDot();
+    int point = buffer.curPosition.getDot();
+    int kind = BufferContent.AFTER_MARK_KIND;
+    int index = buffer.content.allocatePosition(point, kind);
+    buffer.pointMarker.index = index;
     buffer.curPosition = null;
     // ?? selected = null;
   }
@@ -138,6 +144,11 @@ public class Window extends javax.swing.JTextPane
   public void setPoint(int point)
   {
     getCaret().setDot(point - 1);
+  }
+
+  public void setDot(int offset)
+  {
+    getCaret().setDot(offset);
   }
 
   public Window split (int lines, boolean horizontal)

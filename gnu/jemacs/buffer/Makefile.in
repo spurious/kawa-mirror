@@ -66,6 +66,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 SHELL = @SHELL@
+SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 extra_java = @extra_java@
@@ -77,17 +78,22 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   Signal.java   TooLongAction.java   Window.java
+java_WITH_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferReader.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   MarkerReader.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   Signal.java   TooLongAction.java   Window.java
 
 
-EXTRA_JAVA = $(java_SWING)
+EXTRA_JAVA = $(java_WITH_SWING)
 
-java_JAVA =    @extra_java@   Emacs.java
+java_JAVA =    $(java_@SWING_SELECTED@)   Emacs.java
 
 
 EXTRA_DIST = emacs.scm overview.html
 
 KAWA = $(JAVA) kawa.repl
+KAWAFLAGS = -P gnu.jemacs.buffer. -C
+
+SCMSOURCES = emacs.scm
+
+CLEANFILES = *.class *.stamp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 JAVACFLAGS = 
@@ -98,7 +104,7 @@ DIST_COMMON =  $(java_JAVA) ChangeLog Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
@@ -187,6 +193,7 @@ installdirs:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
@@ -222,7 +229,16 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-all: Makefile classjava.stamp
+scmclasses.stamp: $(SCMSOURCES)
+	cd ../../../kawa; $(MAKE) 
+	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
+	echo timestamp > scmclasses.stamp
+
+scm_WITH_SWING: scmclasses.stamp
+
+scm_WITHOUT_SWING:
+
+all: Makefile classjava.stamp scm_@SWING_SELECTED@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

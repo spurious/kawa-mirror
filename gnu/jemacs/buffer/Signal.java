@@ -30,4 +30,12 @@ public class Signal extends RuntimeException
   {
     System.err.println(msg);
   }
+
+  public String toString()
+  {
+    if (data == null)
+      return name;
+    else
+      return name+": "+data;
+  }
 }

@@ -4,6 +4,7 @@ import gnu.math.IntNum;
 import javax.swing.*;
 import javax.swing.text.*;
 import gnu.kawa.util.*;
+import java.awt.event.KeyEvent;
 
 /** This manages the keymaps active for a given buffer.
  *
@@ -211,6 +212,19 @@ public class BufferKeymap implements javax.swing.text.Keymap
       {
 	char value = ((Char) key).charValue();
 	return javax.swing.KeyStroke.getKeyStroke(value);
+      }
+    if (key instanceof String)
+      {
+	String name = (String) key;
+	if (name.length() == 1)
+	  return javax.swing.KeyStroke.getKeyStroke(name.charAt(0));
+	if (name == "backspace")
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0);
+	if (name == "prior")
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+	if (name == "next")
+	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+	return javax.swing.KeyStroke.getKeyStroke(name.toUpperCase());
       }
     return (KeyStroke) key;
   }

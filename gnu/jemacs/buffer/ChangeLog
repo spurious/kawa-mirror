@@ -1,3 +1,41 @@
+2000-02-19  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (point):  Removed - use pointMarker.getOffset() instead.
+	(<init>):  Initialize pointMarker here, to a regular marker.
+	(getDot):  Just call pointMarker.getOffset.
+	(setDot):  Just call pointMarker.set.
+	(forwardChar, backwardChar):  Don't use/set curPosition or point.
+	* Window.java (setDot):  New method.
+	(setSelected, unselect):  Update buffer's curPosition and pointMarker.
+	* Marker.java (getOffset):  Call buffer.curPosition.getDot directly.
+	(set):  Call buffer.curPosition.setDot directly.
+	
+	* Buffer.java (remove, removeRegion, removeAll):  New edit methods.
+
+	* Buffer.java (positionToOffset):  New convenience function.
+
+	* BufferReader.java:  New class, extends InPort.
+	* MarkerReader.java:  New class, extends InPort.
+	* Buffer.java (tabWidth):  New field.
+	(charWidth, countColumns, currentColumn, moveToColumn,
+	lineStartOffset):  New methods.
+
+	* BufferContent.java (freePositionIndex):  Fix math error.
+	(array, gapStart, gapEnd):  Make default protection.
+	(scan):  Fix off-by-one error.
+
+	* BufferKeymap.java (asKeyStroke):  Handle named keys.
+
+	* Makefile.am:  New Swing configuration scheme uses @SWING_SELECTED@.
+	(java_SWING):  Renamed to java_WITH_SWING. Add new classes.
+	(scmclasses.stamp):  New rules to compile emacs.scm.
+
+	* Signal.java (toString):  New method.
+
+	* emacs.scm (goto-line, next-line, previous-line, move-line, insert,
+	erase-buffer, delete-region, delete-char, delete-backward-char,
+	current-column, move-to-column):  New procedures.
+
 2000-02-11  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java (gapContent):  Fix some small but critical bugs.

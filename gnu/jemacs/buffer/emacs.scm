@@ -39,9 +39,8 @@
 (define (current-global-map)
   global-map)
 
-(define (current-local-map #!optional (buffer (current-buffer)))
-  (invoke (field (as <buffer> buffer) 'keymap)
-          'getLocalKeymap))
+(define (current-local-map #!optional (buffer :: <buffer> (current-buffer)))
+  (invoke (field buffer 'keymap) 'getLocalKeymap))
 
 (define (use-local-map keymap #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "setLocalKeymap"
@@ -216,9 +215,8 @@
   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getPoint" <int> ())
    window))
 
-(define (set-window-point window position)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "setPoint" <void> (<int>))
-   window position))
+(define (set-window-point (window :: <window>) position)
+  (invoke window 'setDot (invoke (window-buffer window) 'positionToOffset position)))
 
 ;;; FRAMES
 
@@ -266,7 +264,8 @@
   (- (invoke buffer 'maxDot) (invoke buffer 'minDot)))
 
 (define (goto-char position #!optional (buffer :: <buffer> (current-buffer)))
-  (invoke buffer 'setPoint position))
+  (invoke buffer 'setDot (invoke buffer 'positionToOffset position))
+  (invoke buffer 'getDot))
 
 (define (forward-char #!optional (count 1) (buffer (current-buffer)))
   ((primitive-virtual-method <buffer> "forwardChar" <void> (<int>))
@@ -297,6 +296,11 @@
          (shortage (arithmetic-shift pos-shortage -32))
          (pos (as <int> pos-shortage)))
     (if (zero? shortage) pos (+ pos 1))))
+
+;; FIXME - ineffecient!
+(define (goto-line line #!optional (buffer  :: <buffer> (current-buffer)))
+  (goto-char (point-min buffer) buffer)
+  (forward-line (- line 1) buffer))
 
 (define (beginning-of-line
          #!optional
@@ -333,7 +337,31 @@
     (invoke buffer 'setDot pos)
     (if negp (- shortage) shortage)))
 
+(define (next-line #!optional (count 1) (buffer :: <buffer> (current-buffer)))
+  (move-line count))
+
+(define (previous-line #!optional (count 1) (buffer :: <buffer> (current-buffer)))
+  (move-line (- count)))
+
+(define (move-line arg #!optional (buffer ::  <buffer> (current-buffer)))
+  (let ((goal-column (current-column buffer)))
+    (forward-line arg buffer)
+    (move-to-column goal-column #f buffer)))
+
+;;; POSITIONS/EXCURSIONS
+
 ;;; MARKERS
+
+(define-syntax save-excursion
+  (syntax-rules ()
+		((save-excursion form ...)
+		 (let* ((save-buffer (current-buffer))
+			(save-point (point save-buffer)))
+		   (try-finally
+		    (begin form ...)
+		    (begin
+		      (set-buffer save-buffer)
+		      (goto-char save-point save-buffer)))))))
 
 (define (make-marker)
   (make <gnu.jemacs.buffer.Marker>))
@@ -364,22 +392,58 @@
                     #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "set" <void>
                              (<buffer> <int>))
-   marker buffer (- position 1)))
+   marker buffer (invoke buffer 'positionToOffset position)))
 
 ;;; TEXT
 
-(define (insert-char ch count #!optional (buffer (current-buffer)))
+(define (insert-char ch #!optional (count 1) (buffer (current-buffer)))
   ((primitive-virtual-method <buffer> "insert" <void>
 			     (<char> <int> <javax.swing.text.Style>))
    buffer ch count #!null))
 
+(define (insert str
+		#!optional (buffer :: <buffer> (current-buffer)))
+  ;; FIXME char of str is a character
+  (invoke buffer 'insert (invoke str 'toString) #!null))
+
+(define (erase-buffer #!optional (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'removeAll))
+
+(define (delete-region start end
+		       #!optional (buffer  :: <buffer> (current-buffer)))
+  (let ((start-offset :: <int>
+		      (invoke buffer 'positionToOffset start))
+	 (end-offset :: <int>
+		     (invoke buffer 'positionToOffset end)))
+  (invoke buffer 'removeRegion start-offset end-offset)))
+
 (define (delete-char #!optional (count 1) killp (buffer (current-buffer)))
   (invoke (as <buffer> buffer) 'deleteChar count))
 
+(define (delete-backward-char #!optional (count 1) killp
+			      (buffer :: <buffer> (current-buffer)))
+  (delete-char (- count) killp buffer))
+
+;;; TEXT/COLUMNS
+
+(define (current-column #!optional (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'currentColumn))
+
+(define (move-to-column column
+			#!optional force (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'moveToColumn column force))
+
 ;;; DEFAULT BINDINGS
 
+(define-key global-map #(down) next-line)
+(define-key global-map #(up) previous-line)
+(define-key global-map #(backspace) delete-backward-char)
+(define-key global-map #(left) backward-char)
+(define-key global-map #(right) forward-char)
 (define-key global-map "\C-a" beginning-of-line)
 (define-key global-map "\C-b" backward-char)
+(define-key global-map "\C-n" next-line)
+(define-key global-map "\C-p" previous-line)
 (define-key global-map "\C-d" delete-char)
 (define-key global-map "\C-e" end-of-line)
 (define-key global-map "\C-f" forward-char)

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner
+// Copyright (c) 2001, 2004  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
@@ -56,4 +56,8 @@ public abstract class LispInterpreter extends Interpreter
     return new BeginExp (exps);
   }
 
+  public Expression makeApply (Expression func, Expression[] args)
+  {
+    return new ApplyExp(func, args);
+  }
 }

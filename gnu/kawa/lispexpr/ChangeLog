@@ -1,3 +1,7 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (makeApply):  New method - used by Translator.
+
 2004-02-12  Per Bothner  <per@bothner.com>
 
 	* ReadTable.java (lookup):  Unknown characters are "constituent".

@@ -259,6 +259,7 @@ public abstract class Type {
   static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType string_type = ClassType.make("java.lang.String");
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
+  static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
   static public Type[] typeArray0 = new Type[0];
   static public Method toString_method
   = pointer_type.addMethod ("toString", typeArray0,

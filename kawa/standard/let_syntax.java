@@ -58,6 +58,7 @@ public class let_syntax extends Syntax implements Printable
 	tr.currentMacroDefinition = macros[i];
         inits[i] = tr.rewrite(transformers[i]);
 	macros[i].expander = inits[i];
+	decls[i].noteValue(new QuoteExp(macros[i]));
       }
     tr.currentMacroDefinition = savedMacro;
     if (! recursive)

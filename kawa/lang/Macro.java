@@ -25,7 +25,7 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     Macro mac = new Macro(decl.getSymbol());
     mac.capturedIdentifiers = new java.util.Vector ();
-    mac.bind(decl);
+    decl.setSyntax();
     return mac;
   }
 
@@ -73,13 +73,6 @@ public class Macro extends Syntax implements Printable, Externalizable
     capturedDeclarations = decls;
   }
 
-  public void bind(Declaration decl)
-  {
-    decl.setSimple(false);
-    decl.setFlag(Declaration.IS_CONSTANT | Declaration.IS_SYNTAX);
-    decl.noteValue(new QuoteExp(this));
-  }
-
   public void setExpander (Procedure expander)
   {
     this.expander = new QuoteExp(expander);
@@ -104,12 +97,6 @@ public class Macro extends Syntax implements Printable, Externalizable
     super(name);
     //setType(thisType);
     this.expander = new QuoteExp(expander);
-  }
-
-  public Macro(Object name, Expression lexp)
-  {
-    super(name);
-    this.expander = lexp;
   }
 
   public Macro(Object name)

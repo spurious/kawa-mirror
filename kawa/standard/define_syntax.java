@@ -27,44 +27,43 @@ public class define_syntax extends Syntax
         return tr.syntaxError(getName()+" not in a statement list");
       }
     Object name = decl.getSymbol();
-    Macro macro = (Macro) decl.getConstantValue();
     if (! (pair.cdr instanceof Pair))
       return tr.syntaxError("Missing transformation for "+form.car);
     pair = (Pair) pair.cdr;
-    Object expander = macro.expander;;
-    if (! (expander instanceof Procedure)
-	&& ! (expander instanceof Expression))
+    Macro savedMacro = tr.currentMacroDefinition;
+    Macro macro = Macro.make(decl);
+    tr.currentMacroDefinition = macro;
+    Expression rule = tr.rewrite_car(pair, false);
+    tr.currentMacroDefinition = savedMacro;
+    macro.expander = rule;
+
+    Object expander;
+    if (rule instanceof QuoteExp
+	&& (expander = ((QuoteExp) rule).getValue()) instanceof Procedure
+	&& expander instanceof java.io.Externalizable)
       {
-	Macro savedMacro = tr.currentMacroDefinition;
-	tr.currentMacroDefinition = macro;
-	expander = tr.rewrite(macro.expander);
-	tr.currentMacroDefinition = savedMacro;
-	macro.expander = expander;
-      }
-    if (! (decl.context instanceof ModuleExp))
-      {
-	return QuoteExp.voidExp;
+	macro.setExpander((Procedure) expander);
+	rule = new QuoteExp(macro);
       }
     else
       {
-	if (expander instanceof QuoteExp)
-	  expander = ((QuoteExp) expander).getValue();
-	Expression rule;
-	if (expander instanceof Procedure
-	    && expander instanceof java.io.Externalizable)
-	  rule = new QuoteExp(macro);
-	else
-	  {
-	    Expression args[] = new Expression[2];
-	    args[0] = new QuoteExp(name);
-	    args[1] = expander instanceof Expression ? (Expression) expander
-	      : new QuoteExp (expander);
-	    rule = new ApplyExp(new PrimProcedure(makeMethod), args);
-	  }
+	if (rule instanceof LambdaExp)
+	  ((LambdaExp) rule).setFlag(LambdaExp.NO_FIELD);
+	Expression args[] = new Expression[2];
+	args[0] = new QuoteExp(name);
+	args[1] = rule;
+	rule = new ApplyExp(new PrimProcedure(makeMethod), args);
+      }
+    decl.noteValue(rule);
+
+    if (decl.context instanceof ModuleExp)
+      {
         SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
         return result;
       }
+    else
+      return QuoteExp.voidExp;
   }
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
@@ -87,8 +86,6 @@ public class define_syntax extends Syntax
 
     Declaration decl = defs.getDefine(name, 'w', tr);
     decl.setType(typeMacro);
-    Macro macro = Macro.make(decl);
-    macro.expander = p.car;
     p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
 

@@ -1,3 +1,17 @@
+2004-03-03  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Macro.java (bind):  Remove method.
+	(make):  Call Declaration's setSyntax instead of bind.
+	(<init>(Object,Expression)):  Remove constructor.
+	* kawa/standard/define_syntax.java (scanForDefinitions):  Defer
+	allocation of new Macro until rewrite time.
+	(rewrite):  Simpler and cleaner logic.  We don't note the value of
+	Declaration as being a constant Macro when it isn't.
+	* kawa/standard/let_syntax.java (rewrite):  Add call to noteValue,
+	since Macro constructor no longer does it.
+	* kawa/standard/require.java (importDefinitions):  Call noteValue and
+	setSynax for Macro declaration in place of Macro's removed bind.
+
 2004-02-21  Per Bothner  <per@bothner.com>
 
 	* build.xml (build.selectjava):  Add gnu/math/RealNum.java.

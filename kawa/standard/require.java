@@ -275,7 +275,8 @@ public class require extends Syntax
 			// Copy the Macro, as we will be modifying it later.
 			Macro mac = new Macro((Macro) fvalue);
 			fvalue = mac;
-			mac.bind(fdecl);
+			fdecl.setSyntax();
+			fdecl.noteValue(new QuoteExp(mac));
 			if (macros == null)
 			  macros = new Vector();
 			macros.addElement(fvalue);

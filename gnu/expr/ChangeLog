@@ -1,5 +1,10 @@
 1999-08-26  Per Bothner  <per@bothner.com>
 
+	* GenericProc.java:  New class;  inherits from ProcedureN.
+	* MethodProc.java:  New class;  inherits from ProcedureN.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new .java files.
+	* PrimProcedure.java:   Re-organized to inherit from MethodProc.
+
 	* Declaration.java (sym, value):  Make fields protected.
 	(<init>):  New protected empty constructor (for kawa.lang.Syntax).
 

@@ -10,7 +10,7 @@ import gnu.mapping.*;
 
 /** A primitive Procedure implemented by a plain Java method. */
 
-public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
+public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 {
   Type retType;
   Type[] argTypes;
@@ -36,31 +36,42 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
     return num + (num << 12);
   }
 
-  public Object applyN (Object[] args)
+  public RuntimeException match (Object vars, Object[] args)
   {
+    int nargs = args.length;
+    Object[] rargs = (Object[]) vars;
+    if (rargs.length != nargs)
+      return new WrongArguments(this, nargs);
     int arg_count = argTypes.length;
-    boolean is_constructor = op_code == 183;
-    ClassType this_type = method.getDeclaringClass();
-    boolean is_static = getStaticFlag();
-    int this_count = is_static ? 0 : 1;
-    Procedure.checkArgCount(this, args.length);
-    Object[] rargs = new Object[arg_count];
-    for (int i = 0;  i < arg_count; i++)
+    int this_count = nargs - arg_count; // 0 if static, 1 otherwise.
+    if (this_count != 0)
+      rargs[0] = method.getDeclaringClass().coerceFromObject(args[0]);
+    for (int i = this_count;  i < nargs; i++)
       {
         try
           {
-            rargs[i] = argTypes[i].coerceFromObject(args[i+this_count]);
+            rargs[i] = argTypes[i-this_count].coerceFromObject(args[i]);
           }
         catch (ClassCastException ex)
           {
-            throw new WrongType(this, i, ex);
+            return new WrongType(this, i, ex);
           }
       }
+    return null;
+  }
+
+  public Object applyV (Object vars)
+  {
+    Object[] rargs = (Object[]) vars;
+    int arg_count = argTypes.length;
+    boolean is_constructor = op_code == 183;
+    boolean is_static = getStaticFlag();
+
     try
       {
 	if (member == null)
 	  {
-	    Class clas = this_type.getReflectClass();
+	    Class clas = method.getDeclaringClass().getReflectClass();
 	    Class[] paramTypes = new Class[arg_count];
 	    for (int i = arg_count; --i >= 0; )
 	      paramTypes[i] = argTypes[i].getReflectClass();
@@ -78,8 +89,12 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 	    if (method.getStaticFlag())
 	      result = meth.invoke(null, rargs);
 	    else
-	      result = meth.invoke(this_type.coerceFromObject(args[0]), rargs);
-	    return retType.coerceToObject(result);
+              {
+                Object[] pargs = new Object[arg_count];
+                System.arraycopy(rargs, 1, pargs, 0, arg_count);
+                result = meth.invoke(rargs[0], pargs);
+              }
+            return retType.coerceToObject(result);
 	  }
       }
     catch (java.lang.reflect.InvocationTargetException ex)

@@ -25,6 +25,7 @@ java_JAVA=\
   FindCapturedVars.java \
   FindTailCalls.java \
   FluidLetExp.java \
+  GenericProc.java \
   IfExp.java \
   IgnoreTarget.java \
   Inlineable.java \
@@ -32,6 +33,7 @@ java_JAVA=\
   LambdaExp.java \
   LetExp.java \
   Literal.java \
+  MethodProc.java \
   ModuleBody.java \
   ModuleExp.java \
   ObjectExp.java \

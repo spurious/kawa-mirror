@@ -74,6 +74,11 @@ public class Method implements AttrContainer {
     return (access_flags & Access.STATIC) != 0;
   }
 
+  public final boolean isAbstract()
+  {
+    return (access_flags & Access.ABSTRACT) != 0;
+  }
+
   public int getModifiers ()
   {
     return access_flags;
@@ -281,6 +286,7 @@ public class Method implements AttrContainer {
   {
     return name;
   }
+
   public final void setName(String name)
   {
     this.name = name;

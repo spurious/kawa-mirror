@@ -1,3 +1,15 @@
+2001-08-15  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getSuperclass):  Don't call getReflectClass of
+	this is an interface or is Object.
+
+	* ClassType.java (setInterface):  New method.
+
+	* ClassType.java (getMethods(Filter,int)):  New method overloads.
+	(countMethods):  New method.
+	
+	* Method.java (isAbstract):  New method.
+
 2001-08-07  Brian Jones <cbj@gnu.org>
 
 	* LineNumbersAttr.java (getLineCount, getLineNumberTable): New methods.

@@ -3,6 +3,7 @@
 
 package gnu.bytecode;
 import java.io.*;
+import java.util.Vector;
 
 public class ClassType extends ObjectType implements AttrContainer {
   public static final int minor_version = 3;
@@ -103,13 +104,12 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public ClassType getSuperclass ()
   {
-    if (superClass == null && getReflectClass() != null)
+    if (superClass == null
+	&& ! isInterface()
+	&& ! ("java.lang.Object".equals(getName()))
+ 	&& getReflectClass() != null)
       {
-        Class superReflectClass = reflectClass.getSuperclass();
-        // Neither Object nor interfaces have a superclass.
-        // I.e. equivalent to if(this!=Type.pointer_type && !isInterface()).
-        if (superReflectClass != null)
-          superClass = (ClassType) make(superReflectClass);
+	superClass = (ClassType) make(reflectClass.getSuperclass());
       }
     return superClass;
   }
@@ -158,6 +158,12 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public final boolean isInterface()
   { return (getModifiers() & Access.INTERFACE) != 0; }
+
+  public final void setInterface(boolean val)
+  {
+    if (val) access_flags |= Access.INTERFACE;
+    else access_flags &= ~Access.INTERFACE;
+  }
 
   public ClassType () { }
 
@@ -296,7 +302,7 @@ public class ClassType extends ObjectType implements AttrContainer {
   {
     return methods;
   }
- 
+
   public final int getMethodCount() {
     return methods_count;
   }
@@ -357,8 +363,49 @@ public class ClassType extends ObjectType implements AttrContainer {
     return methods;
   }
 
-  /** Get methods matching the given filter. */
+  /** Count methods matching a given filter.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @return number of methods that match
+   */
+  public final int countMethods (Filter filter, int searchSupers)
+  {
+    return getMethods(filter, searchSupers, null, 0);
+  }
+
   public Method[] getMethods (Filter filter, boolean searchSupers)
+  {
+    return getMethods(filter, searchSupers ? 1 : 0);
+  }
+
+  /** Get methods matching a given filter.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @return a fresh array containing the methods satisfying the filter
+   */
+  public Method[] getMethods (Filter filter, int searchSupers)
+  {
+    int count = getMethods(filter, searchSupers, null, 0);
+    Method[] result = new Method[count];
+    getMethods(filter, searchSupers, result, 0);
+    return result;
+  }
+
+  /** Helper to get methods satisfying a filtering predicate.
+   * @param filter to select methods to return
+   * @param searchSupers 0 if only current class should be searched,
+   *   1 if superclasses should also be searched,
+   *   2 if super-interfaces should also be search
+   * @param result array to place selected methods in
+   * @param offset start of where in result to place result
+   * @return number of methods placed in result array
+   */
+  public int getMethods (Filter filter, int searchSupers,
+			 Method[] result, int offset)
   {
     int count = 0;
     for (ClassType ctype = this;  ctype != null;
@@ -367,23 +414,25 @@ public class ClassType extends ObjectType implements AttrContainer {
       for (Method meth = ctype.getDeclaredMethods();
 	   meth != null;  meth = meth.getNext())
 	if (filter.select(meth))
-	  count++;
-      if (! searchSupers)
+	  {
+	    if (result != null)
+	      result[offset + count] = meth;
+	    count++;
+	  }
+      if (searchSupers == 0)
 	break;
     }
-    Method[] methods = new Method[count];
-    count = 0;
-    for (ClassType ctype = this;  ctype != null;
-	 ctype = ctype.getSuperclass())
-    {
-      for (Method meth = ctype.getDeclaredMethods();
-	   meth != null;  meth = meth.getNext())
-	if (filter.select(meth))
-	  methods[count++] = meth;
-      if (! searchSupers)
-	break;
-    }
-    return methods;
+    if (searchSupers > 1)
+      {
+	ClassType[] interfaces = getInterfaces();
+	if (interfaces != null)
+	  {
+	    for (int i = 0;  i < interfaces.length;  i++)
+	      count += interfaces[i].getMethods(filter, searchSupers,
+						result, offset+count);
+	  }
+      }
+    return count;
   }
 
   public Method getDeclaredMethod(String name, Type[] arg_types)

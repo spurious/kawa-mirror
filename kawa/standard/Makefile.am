@@ -103,9 +103,7 @@ char_ci_greater_p.class \
 char_ci_greater_equal_p.class \
 char_alphabetic_p.class \
 string_p.class \
-make_string.class \
 string_v.class \
-string_length.class \
 string_ref.class \
 string_set_b.class \
 string2list.class \
@@ -140,10 +138,8 @@ with_input_from_file.class \
 with_output_to_file.class \
 read.class \
 readchar.class \
-eof_object_p.class \
 char_ready_p.class \
 write.class \
-newline.class \
 writechar.class \
 input_port_p.class \
 output_port_p.class \
@@ -158,7 +154,6 @@ procedure_p.class \
 apply.class \
 map.class \
 callcc.class \
-exit.class \
 logand.class logior.class logxor.class lognot.class logop.class \
 logbit_p.class logtest.class logcount.class \
 ashift.class bit_extract.class int_length.class \
@@ -173,6 +168,7 @@ values_v.class \
 call_with_values.class \
 make_quantity.class quantity2number.class quantity2unit.class \
 make_future.class sleep.class \
+error.class \
 Scheme.class \
 null_env.class \
 user_env.class \

@@ -270,9 +270,9 @@ public class Scheme extends Interpreter
       
       //-- Section 6.7  -- complete
       define_proc ("string?", "kawa.standard.string_p");
-      define_proc ("make-string", "kawa.standard.make_string");
+      define_proc ("make-string", "kawa.lib.strings");
       define_proc ("string", "kawa.standard.string_v");
-      define_proc ("string-length", "kawa.standard.string_length");
+      define_proc ("string-length", "kawa.lib.strings");
       define_proc ("string-ref", "kawa.standard.string_ref");
       define_proc ("string-set!", "kawa.standard.string_set_b");
 
@@ -336,17 +336,18 @@ public class Scheme extends Interpreter
       define_proc ("read", "kawa.standard.read");
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
-      define_proc ("eof-object?", "kawa.standard.eof_object_p");
+      define_proc ("eof-object?", "kawa.lib.ports");
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
       define_proc (new write(true));       // write
       define_proc (new write(false));      // display
       define_proc ("write-char", "kawa.standard.writechar");
-      define_proc ("newline", "kawa.standard.newline");
+      define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");
       define_proc ("call-with-input-string",  // Extension
 		   "kawa.standard.call_with_input_string");
       define_proc ("call-with-output-string",  // Extension
 		   "kawa.standard.call_with_output_string");
+      define_proc ("force-output", "kawa.lib.ports");  // Extension
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
@@ -363,7 +364,7 @@ public class Scheme extends Interpreter
       user_environment = new Environment (r5_environment);
       user_environment.setName ("interaction-environment");
       env = user_environment;
-      define_proc ("exit", "kawa.standard.exit");
+      define_proc ("exit", "kawa.lib.thread");
 
       Symbol sym = Symbol.make ("arithmetic-shift");
       proc = new AutoloadProcedure (sym, "kawa.standard.ashift");
@@ -380,9 +381,22 @@ public class Scheme extends Interpreter
       define_proc ("bit-extract", "kawa.standard.bit_extract");
       define_proc ("integer-length", "kawa.standard.int_length");
 
-      define ("primitive-virtual-method",new kawa.standard.prim_method(false));
-      define ("primitive-static-method", new kawa.standard.prim_method(true));
-      define ("primitive-op1", new kawa.standard.prim_method());
+      define("primitive-virtual-method",new kawa.standard.prim_method(182));
+      define("primitive-static-method", new kawa.standard.prim_method(184));
+      define("primitive-interface-method", new kawa.standard.prim_method(185));
+      define("primitive-constructor", new kawa.standard.prim_method(183));
+      define("primitive-op1", new kawa.standard.prim_method());
+
+      // JDK 1.1 only:
+      define_proc ("record-accessor", "kawa.lib.reflection");
+      define_proc ("record-modifier", "kawa.lib.reflection");
+      define_proc ("record-predicate", "kawa.lib.reflection");
+      define_proc ("record-constructor", "kawa.lib.reflection");
+      define_proc ("make-record-type", "kawa.lib.reflection");
+      define_proc ("record-type-descriptor", "kawa.lib.reflection");
+      define_proc ("record-type-name", "kawa.lib.reflection");
+      define_proc ("record-type-field-names", "kawa.lib.reflection");
+      define_proc ("record?", "kawa.lib.reflection");
 
       //-- (when cond exp ...)
       define_syntax ("when", "kawa.lib.when_unless");
@@ -400,6 +414,11 @@ public class Scheme extends Interpreter
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
+      define_proc ("error", "kawa.standard.error");
+
+      define_proc ("keyword?", "kawa.lib.keywords");
+      define_proc ("keyword->string", "kawa.lib.keywords");
+      define_proc ("string->keyword", "kawa.lib.keywords");
    }
 
   /** Evalutate Scheme expressions from string.

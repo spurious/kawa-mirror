@@ -8,7 +8,7 @@ import kawa.lang.*;
 
 public class ifp extends Syntax implements Printable
 {
-  static private Pattern pattern = new ListPat (2, 3);
+  static private Pattern pattern = new ListPat (2, 3, Values.empty);
 
   public Expression rewrite (Object obj, Translator tr)
   {

@@ -1,3 +1,8 @@
+1999-12-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Scheme types in Java):  Fix kawa.math -> gnu.math.
+	(Formals):  Document NAME :: TYPE syntax (barely).
+
 1999-11-18  Per Bothner  <per@bothner.com>
 
 	* license.terms:  Remove.  Replaced by by ../COPYING.

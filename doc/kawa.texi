@@ -71,7 +71,7 @@ It includes pointer to an online copy of
 @uref{http://www.schemers.org/Documents/#standards,R5RS}.
 
 A nice quick introduction to Scheme can be found in
-@uref{http://www.cs.washington.edu/education/courses/341/CurrentQtr/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
+@uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
 discusses Scheme implementation is
 @uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
@@ -879,9 +879,10 @@ You can of course also use the extended format in a @code{define}:
 @display
 @var{req-opt-args} = @var{req-arg} ... [#!optional @var{opt-arg} ...]
 @var{rest-key-args} = [#!rest @var{rest-arg}] [#key @var{key-arg} ...]
-@var{req-arg} = @var{variable} | (@var{variable} @var{type})
-@var{opt-arg} = @var{variable} | (@var{variable} @var{initializer} [@var{type}])
-@var{key-arg} = @var{variable} | (@var{variable} @var{initializer} [@var{type}])
+@var{req-arg} = @var{variable} [:: @var{type}] | (@var{variable} @var{type})
+@var{opt-arg} = @var{arg-with-default}
+@var{key-arg} =  @var{arg-with-default}
+@var{arg-with-default} = @var{variable} [:: @var{type}] | (@var{variable} @var{initializer} [@var{type}]) | (@var{variable} :: @var{type} [@var{initializer}])
 @var{rest-arg} = @var{variable}
 @end display
 
@@ -2658,12 +2659,12 @@ match Scheme symbols, but do not match mutable Scheme strings.)
 Interned symbols are presented as interned Strings.
 (Note that with JDK 1.1 string literals are automatically interned.)
 
-Scheme integers are implemented by @code{kawa.math.IntNum}.
+Scheme integers are implemented by @code{gnu.math.IntNum}.
 Use the make static function to create a new IntNum from an int or a long.
 Use the intValue or longValue methods to get the int or long value of
 an IntNum.
 
-A Scheme "flonum" is implemented by @code{kawa.math.DFloNum}.
+A Scheme "flonum" is implemented by @code{gnu.math.DFloNum}.
 
 A Scheme pair is implemented by @code{kawa.lang.Pair}.
 

@@ -30,10 +30,6 @@ public class LambdaExp extends ScopeExp
   public Keyword[] keywords;
   public Expression[] defaultArgs;
 
-  static int counter;
-  /** Unique id number, to ease print-outs and debugging. */
-  int id = ++counter;
-
   /** A list of Declarations, chained using Declaration's nextCapturedVar.
     * All the Declarations are allocated in the current heapFrame. */
   Declaration capturedVars;
@@ -537,8 +533,13 @@ public class LambdaExp extends ScopeExp
             if (! ((ModuleExp) nameDecl.context).isStatic())
               fflags &= ~Access.FINAL;
           }
-	if (! nameDecl.isPrivate())
+	boolean external_access
+	  = ((nameDecl.flags & Declaration.EXTERNAL_ACCESS+Declaration.PRIVATE)
+	     == Declaration.EXTERNAL_ACCESS+Declaration.PRIVATE);
+	if (! nameDecl.isPrivate() || external_access)
 	  fflags |= Access.PUBLIC;
+	if (external_access)
+	  fname = Declaration.PRIVATE_PREFIX + fname;
       }
     else
       {
@@ -1492,6 +1493,7 @@ public class LambdaExp extends ScopeExp
     int opt_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
+
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
@@ -1589,7 +1591,9 @@ public class LambdaExp extends ScopeExp
     if (returnType == null)
       {
 	returnType = Type.pointer_type;  // To guards against cycles.
-	returnType = body.getType();
+	// body may not be set if define scan'd but not yet rewrit'ten.
+	if (body != null)
+	  returnType = body.getType();
       }
     return returnType;
   }

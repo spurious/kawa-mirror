@@ -1,5 +1,16 @@
 2004-11-05  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (count, id): Move to ScopeExp.
+	* ScopeExp.java (counter, id): New fields.
+	(toString): New method.
+
+	* LambdaExp.java (allocFieldFor): Take into account EXTERNAL_ACCESS.
+
+	* LambdaExp.java (getRetunrType): A little safety addition.
+
+	* ScopeExp.java (replaceFollowing, nesting): New methods.
+	(remove): Fix bug using wrong variable.
+
 	* ModuleExp.java (alwaysCompile): New static flag.
 	(evalModule): Use new flag, and eliminate extra tests.
 

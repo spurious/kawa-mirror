@@ -44,6 +44,27 @@ public abstract class ScopeExp extends Expression
     decl.context = this;
   }
 
+  /** Replace the <code>prev.next</code> by <code>newDecl</code>.
+   * If <code>prev==null</code>, replace the first decl. */
+  public void replaceFollowing (Declaration prev, Declaration newDecl)
+  {
+    Declaration oldDecl;
+    if (prev == null)
+      {
+	oldDecl = decls;
+	decls = newDecl;
+      }
+    else
+      {
+	oldDecl = prev.next;
+	prev.next = newDecl;
+      }
+    newDecl.next = oldDecl.next;
+    if (last == oldDecl)
+      last = newDecl;
+    oldDecl.next = null;
+  }
+
   public void remove (Declaration decl)
   {
     Declaration prev = null;
@@ -54,7 +75,7 @@ public abstract class ScopeExp extends Expression
 	    remove(prev, decl);
 	    return;
 	  }
-	prev = decl;
+	prev = cur;
       }
   }
 
@@ -220,8 +241,25 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
+  public static int nesting (ScopeExp sc)
+  {
+    int n = 0;
+    while (sc != null)
+      {
+	sc = sc.outer;
+	n++;
+      }
+    return n;
+  }
+
   protected Expression walk (ExpWalker walker)
   {
     return walker.walkScopeExp(this);
   }
+
+  public String toString() { return getClass().getName()+"#"+id; }
+
+  static int counter;
+  /** Unique id number, to ease print-outs and debugging. */
+  public int id = ++counter;
 }

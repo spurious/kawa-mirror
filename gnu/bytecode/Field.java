@@ -149,4 +149,13 @@ public class Field extends Location implements AttrContainer {
     attr.addToFrontOf(this);
   }
 
+  public String toString()
+  {
+    StringBuffer sbuf = new StringBuffer(100);
+    sbuf.append("Field:");
+    sbuf.append(getDeclaringClass().getName());
+    sbuf.append('.');
+    sbuf.append(name);
+    return sbuf.toString();
+  }
 }

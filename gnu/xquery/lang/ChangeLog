@@ -1,5 +1,7 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (parseFunctionDefinition):  Parse QName function name.
+
 	* XQParser.java, XQuery.java:  Use gnu.mapping.Symbol instead of
 	gnu.xml.QName.
 

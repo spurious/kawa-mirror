@@ -1867,9 +1867,30 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
-    if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
+    Object name;
+    if (curToken == QNAME_TOKEN)
+      {
+	int colon = tokenBufferLength;
+	while (tokenBuffer[--colon] != ':') ;
+	String prefix = new String(tokenBuffer, 0, colon);
+	colon++;
+	String local = new String(tokenBuffer, colon,
+				  tokenBufferLength - colon);
+	String uri = (String) namespaces.get(prefix);
+	if (uri == null)
+	  syntaxError("unknown namespace '" + prefix + "'");
+	name = Symbol.make(uri, local);
+      }
+    else if (curToken == NCNAME_TOKEN)
+      {
+	String str = new String(tokenBuffer, 0, tokenBufferLength);
+	if (defaultFunctionNamespace == "")
+	  name = str.intern(); // kludge
+	else
+	  name = Symbol.make(defaultFunctionNamespace, str);
+      }
+    else
       return syntaxError("missing function name");
-    String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -2029,6 +2050,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		if (forFunctions)
 		  {
 		    error('w', "'declare function namespace' not implemented - ignored");
+		  defaultFunctionNamespace = uri.toString();
 		  }
 		else
 		  defaultElementNamespace = uri.toString();

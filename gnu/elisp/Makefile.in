@@ -68,6 +68,7 @@ PACKAGE = @PACKAGE@
 SHELL = @SHELL@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign
@@ -76,7 +77,7 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_JAVA =    ELispReader.java
+java_JAVA =    ELisp.java   ELispReader.java
 
 
 KAWA = $(JAVA) kawa.repl

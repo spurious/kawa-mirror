@@ -15,7 +15,7 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
 
   public int numArgs() { return 0xFFFFF001; }
 
-  public static void beginAttribute(Object type, Consumer out)
+  public static void beginAttribute(Consumer out, Object type)
   {
     String name;
     if (type instanceof AttributeConstructor)
@@ -41,7 +41,7 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
   {
     Object type = ctx.getNextArg();
     Consumer out = ctx.consumer;
-    beginAttribute(type, out);
+    beginAttribute(out, type);
     Object endMarker = Special.dfault;
     for (;;)
       {

@@ -1,3 +1,9 @@
+2002-08-18  Per Bothner  <per@bothner.com>
+
+	* MakeAttribute.java (beginAttribute):  Swap argument order, for
+	consistency with compile and also MakeElement's beginGroup.
+	(apply):  Fix beginAttribute call to match.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* Compare.java, MakeElement.java (inline):  Update to take

@@ -1,3 +1,40 @@
+Thu May 21 21:38:24 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Lexer.java:  New class (extends Reader).
+	* kawa/lang/ScmRead.java:  New class (extends Lexer).
+	* kawa/lang/SourceError.java:  New class.
+	* kawa/lang/SyntaxException.java:  New class (extends Exception).
+	* kawa/lang/ReadError.java:  No longer used.
+	* kawa/lang/EofReadError.java:  No longer used.
+	* kawa/lang/InPort.java:  Scheme reader methods now in ScmRead,
+	* kawa/lang/Interpreter.java (read):  New throws SyntaxException.
+	* kawa/lang/Makefile.am:  Update for new and removed classes.
+	* kawa/standard/read.java:  Update for new reader.
+	* kawa/standard/string2number.java (parse):  Update for new reader.
+	Optimize - don't convert <string> to <String> to char[].
+	* Shell.java:  Changes for new Lexer framework.
+
+	* */Makefile.in:  Update for automake 1.3.
+
+	* kawa/lang/LambdaExp.java (<init>):  Handle #!null as default arg.
+
+	* kawa/lang/CompileFile.java (readBody):  New method.
+	* kawa/lang/Eval.java (eval):  Re-organize methods.
+ 	(evalBody):  New method.  Save and restore current Environment.
+	* kawa/lang/ModuleExp.java (eval_module):  Rename to evalModule.
+	* kawa/standard/Scheme.java (eval):  Use Eval.readBody.
+
+	* kawa/lang/PrimProcedure.java (getNamedType): Add <record>, <type>,
+	and <class-type>.
+	* kawa/lang/Record.java (makeRecordType):  Return ClassType, not Class.
+	(typeFieldNames):  New overload taking ClassType.
+	* kawa/lang/RecordConstructor.java (numArgs):  New method.
+	(applyN):  Throw WrongArguments if wrong number of arguments.
+	(getname):  New method.
+	(<init>):  New constructor takes ClassType (overloaded with Class).
+	* kawa/lang/SetFieldProc.java (<init>):  Add overload taking ClassType.
+	* kawa/lang/GetFieldProc.java:  Likewise.
+
 Tue Apr 28 21:58:49 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/Makefile.am: Change AUTOMAKE_OPTIONS to cygnus.

@@ -1,3 +1,20 @@
+Changes since Kawa 1.6.51
+=========================
+The "record" feature has been changed to that a "record-type descriptor"
+is now a gnu.bytecode.ClassType (a <record-type>), rather than a
+java.lang.Class.  Thus make-record-type now returns a <record-type>,
+not a Class, and record-type-descriptor takes a <record-type>,
+not a Class.
+
+More robust Eval interfaces.
+
+New Lexer abstract class.  New ScmRead class (which extends Lexer)
+now contains the Scheme reader (moved from Inport).
+Now read errors are kept in queue, and can be recovered from.
+
+Comparing an exact rational and an inexact real (double) is now done
+as if by first converting the double to exact, to satisfy R5RS.
+
 Changes since Kawa 1.6.1
 ========================
 The compile virtual method in Expression now takes a Target object,

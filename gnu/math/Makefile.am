@@ -40,6 +40,7 @@ all: $(OBJ)
 HTML_HOME = $$HOME/public_html
 
 install-html:
-	-mkdir $(HTML_HOME)/gnu.byte
+	-mkdir $(HTML_HOME)/gnu.math
 	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.math/index.html
 	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.math/COPYING
+	chmod a+r $(HTML_HOME)/gnu.bytecode/*

@@ -98,3 +98,8 @@ Inline calls to simple methods, especially builtins.
 Ties in with module specifications (to determine which bindings are builtin).
 
 Load should take an optional environment argument.
+
+Quantities:
+Arithmetic involving Units should return Units.
+Printing a Unit should return something readable, maybe:
+  (quantity->unit 1cm) -> "1cm". while 1cm -> "1.0cm".

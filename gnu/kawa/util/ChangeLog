@@ -1,0 +1,13 @@
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	New directory.
+	* Sequence.java, Pair.java, PairWithPosition.java, FString.java,
+	Char.java:  Moved from kawa/lang.
+	* LList.java:  Renamed from kawa/lang/List.java.
+	* FVector.java:  Renamed from kawa/lang/Vector.java.
+	* Makefile.am, Makefile.in:  New files.
+
+	* UniformVector.java:  New abstract class.
+	* S8Vector.java, S16Vector.java, S32Vector.java, S64Vector.java,
+	U8Vector.java, U16Vector.java, U32Vector.java, U64Vector.java,
+	F32Vector.java, F64Vctor.java:  New uniform vector classes.

@@ -476,7 +476,7 @@ implements javax.swing.text.AbstractDocument.Content
           }
         if (start > gapEnd)
           start -= gapEnd - gapStart;
-        return (count << 32) | start;
+        return ((long) count << 32) | start;
       }
     else
       {

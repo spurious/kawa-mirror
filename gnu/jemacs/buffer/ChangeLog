@@ -1,5 +1,8 @@
 1999-12-06  Per Bothner  <per@bothner.com>
 
+	* BufferContent.java (scan):  Add missing int->long cast.
+	* emacs.java (point-at-eol):  Use buffer,getDot directly.
+
 	* Buffer.java (getContent, minDot, maxDot, deleteChar, scan):  New.
 	* BufferContent.java:  No longer extends GapContent;  now just
 	implements AbstractDocument.Content.

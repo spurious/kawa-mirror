@@ -250,9 +250,8 @@
 
 ;;; POSITIONS
 
-(define (point #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <buffer> "getPoint" <int> ())
-   buffer))
+(define (point #!optional (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'getPoint))
 
 (define (point-min #!optional (buffer :: <buffer> (current-buffer)))
   (+ (invoke buffer 'minDot) 1))
@@ -293,7 +292,7 @@
   <int>
   (let* ((pos-shortage
           (invoke buffer 'scan
-                  #\Newline (- (point buffer) 1)
+                  #\Newline (invoke buffer 'getDot)
                   0 (- count (if (> count 0) 0 1)) #t))
          (shortage (arithmetic-shift pos-shortage -32))
          (pos (as <int> pos-shortage)))

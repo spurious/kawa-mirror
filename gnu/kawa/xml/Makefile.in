@@ -214,6 +214,7 @@ java_sources = \
   NamedChildren.java \
   NamedDescendants.java \
   NamespaceEnv.java \
+  NodeCompare.java \
   NodeName.java \
   NodeType.java \
   OutputAsXML.java \

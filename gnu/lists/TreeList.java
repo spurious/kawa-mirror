@@ -1607,31 +1607,23 @@ implements Consumer, PositionConsumer, Consumable
       }
   }
 
-  /** Get matching matching child or descendent.
-   * This does a depth-first traversal.
-   * @param pos starting index
-   * @param predicate test to apply to selected elements
-   * @param limit stop if pos reaches here
-   * @return index of next match or -1 if none found
-   */
-  public final int nextMatchingChild(int pos, ElementPredicate predicate, int limit)
+  public int nextMatching(int startPos, ElementPredicate predicate,
+			  int endPos, boolean descend)
   {
-    int start = pos;
-    if (limit == -1)
-      limit = data.length;
+    int start = posToDataIndex(startPos);
+    int limit = posToDataIndex(endPos);
+    int pos = start;
     if (predicate instanceof NodePredicate)
       pos = nextNodeIndex(pos, limit);
-    boolean checkAttribute; // true if attribute nodes could match.
+    boolean checkAttribute = false; // true if attribute nodes could match.
     boolean checkAll;
     boolean checkNode;
     boolean checkText;
     boolean checkGroup; // true if group nodes could match.
-    boolean descend = true;
     if (predicate instanceof GroupPredicate)
       {
 	checkNode = true;
 	checkGroup = true;
-	checkAttribute = false;
 	checkText = false;
 	checkAll = false;
       }
@@ -1639,7 +1631,6 @@ implements Consumer, PositionConsumer, Consumable
       {
 	checkNode = true;
 	checkGroup = false;
-	checkAttribute = true;
 	checkText = false;
 	checkAll = false;
       }
@@ -1648,7 +1639,6 @@ implements Consumer, PositionConsumer, Consumable
 	checkAll = ! (predicate instanceof NodePredicate);
 	checkNode = true;
 	checkGroup = true;
-	checkAttribute = true;
 	checkText = true;
       }
     int next;
@@ -1657,7 +1647,7 @@ implements Consumer, PositionConsumer, Consumable
 	if (pos == gapStart)
 	  pos = gapEnd;
 	if (pos >= limit)
-	  return -1;
+	  return 0;
 	int j;
 	char datum = data[pos];
 	if (datum <= MAX_CHAR_SHORT
@@ -1667,7 +1657,11 @@ implements Consumer, PositionConsumer, Consumable
 		&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT))
 	  {
 	    if (checkText && predicate.isInstancePos(this, pos << 1))
-	      return pos;
+	      {
+		if (pos >= gapEnd)
+		  pos -= gapEnd - gapStart;
+		return pos << 1;
+	      }
 	    next = pos + 1;
 	    continue;
 	  }
@@ -1691,6 +1685,8 @@ implements Consumer, PositionConsumer, Consumable
 	    next = pos + 2;
 	    continue;
 	  case END_GROUP_SHORT:
+	    if (! descend)
+	      return 0;
 	    next = pos + 2;
 	    continue;
 	  case POSITION_PAIR_FOLLOWS:
@@ -1698,10 +1694,14 @@ implements Consumer, PositionConsumer, Consumable
 	    if (checkText) break;
 	    continue;
 	  case END_GROUP_LONG:
+	    if (! descend)
+	      return 0;
 	    next = pos + 7;
 	    continue;
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
+	    if (! descend)
+	      return 0;
 	    next = pos + 1;
 	    continue;
 	  case BEGIN_ATTRIBUTE_LONG:
@@ -1741,7 +1741,7 @@ implements Consumer, PositionConsumer, Consumable
 		if (descend)
 		  next = pos + 3;
 		else
-		  next = pos + data[pos+1];
+		  next = pos + data[pos+1] + 2;
 		if (checkGroup) break;
 	      }
 	    else
@@ -1749,7 +1749,11 @@ implements Consumer, PositionConsumer, Consumable
 	    continue;
 	  }
 	if (pos > start && predicate.isInstancePos(this, pos << 1))
-	  return pos;
+	  {
+	    if (pos >= gapEnd)
+	      pos -= gapEnd - gapStart;
+	    return pos << 1;
+	  }
       }
   }
 

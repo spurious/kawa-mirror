@@ -141,6 +141,29 @@ public abstract class AbstractSequence
     return -1;
   }
 
+  /** Get next matching child or descendent.
+   * @param startPos starting position
+   * @param predicate test to apply to selected elements
+   * @param endPos stop before endPos
+   * @param descend if true do depth-first traversal.
+   * @return poistion of next match or 0 if none found
+   */
+  public int nextMatching(int startPos, ElementPredicate type,
+			  int endPos, boolean descend)
+  {
+    if (descend)
+      throw unsupported("nextMatching with descend");
+    int ipos = startPos;
+    for (;;)
+      {
+	if (compare(ipos, endPos) >= 0)
+	  return 0;
+	ipos = nextPos(ipos);
+	if (type.isInstancePos(this, ipos))
+	  return ipos;
+      }
+  }
+
   /** See java.util.List. */
   public boolean contains(Object o)
   {

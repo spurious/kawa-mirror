@@ -1,3 +1,8 @@
+2005-01-05  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getDeclaredMethod): Compare argument types
+	by comparing signatures, not by identity.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java: Change "select" (preprocessor) syntax.

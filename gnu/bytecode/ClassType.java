@@ -561,7 +561,9 @@ public class ClassType extends ObjectType
 	  continue;
 	while (-- i >= 0)
 	  {
-	    if (arg_types[i] != method_args[i])
+	    String need_sig = arg_types[i].getSignature();
+	    String meth_sig = method_args[i].getSignature();
+	    if (! meth_sig.equals(need_sig))
 	      break;
 	  }
 	if (i < 0)
@@ -596,7 +598,7 @@ public class ClassType extends ObjectType
     for (;;)
       {
         Method method = cl.getDeclaredMethod(name, arg_types);
-        if (method != null)
+	if (method != null)
           return method;
         cl = cl.getSuperclass();
         if (cl == null)

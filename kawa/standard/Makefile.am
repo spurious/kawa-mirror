@@ -15,7 +15,6 @@ and_or.java \
 cxr.java \
 list_p.java \
 append.java \
-reverse.java \
 list_tail.java \
 list_ref.java \
 integer_p.java \

@@ -207,7 +207,8 @@ public class Scheme extends Interpreter
       define_field("list", "gnu.kawa.functions.MakeList");
       define_proc ("length", "kawa.lib.lists");
       define_proc ("append", "kawa.standard.append");
-      define_proc ("reverse", "kawa.standard.reverse");
+      define_proc ("reverse", "kawa.lib.lists");
+      define_proc ("reverse!", "kawa.lib.lists");  // Not R5RS.
       define_proc ("list-tail", "kawa.standard.list_tail");
       define_proc ("list-ref", "kawa.standard.list_ref");
 

@@ -1,3 +1,8 @@
+2004-12-02  Per Bothner  <per@bothner.com>
+
+	* misc.scm (force): Converted to Scheme from kawa.standard.force.
+	* thread.scm (%make-future): Converted from kawa.standard.make_future.
+
 2004-11-14  Per Bothner  <per@bothner.com>
 
 	* misc.scm (scheme-report-environment): Function converted from Java.

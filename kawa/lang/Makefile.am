@@ -38,7 +38,7 @@ Eval.java \
 AutoloadProcedure.java \
 Continuation.java \
 CalledContinuation.java \
-Syntax.java \
+Syntax.java Macro.java \
 SyntaxRule.java \
 SyntaxRules.java \
 DefMacro.java \

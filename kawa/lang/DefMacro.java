@@ -2,7 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class DefMacro extends Syntax
+public class DefMacro extends Macro
 {
   Procedure expander;
 
@@ -20,7 +20,7 @@ public class DefMacro extends Syntax
     Environment.define_global(sym, this);
   }
 
-  public Expression rewrite (Object obj, Translator tr)
+  public Object expand (Object obj, Translator tr)
   {
     int count = List.length(obj);
     /* DEBUGGING:
@@ -43,7 +43,7 @@ public class DefMacro extends Syntax
 	SFormat.print (expansion, System.err);
 	System.err.println ('}');
 	*/
-	return tr.rewrite(expansion);
+	return expansion;
       }
     catch (Exception ex)
       {

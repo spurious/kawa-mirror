@@ -321,7 +321,8 @@ public class Scheme extends LispInterpreter
       define_proc ("vector-fill!", "kawa.lib.vectors");
       // Extension:
       define_field("vector-append", "kawa.standard.vector_append", "vectorAppend");
-      define_proc ("values-append", "gnu.kawa.functions.AppendValues");
+      define_field("values-append", "gnu.kawa.functions.AppendValues",
+		   "appendValues");
 
       //-- Section 6.9  -- complete [except restricted call/cc]
       define_proc ("procedure?", "kawa.lib.misc");

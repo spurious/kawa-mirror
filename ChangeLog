@@ -5,6 +5,9 @@
 
 2003-10-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (initScheme):  Use define_field to
+	define 'values-append', since it allows better optimization.
+
 	* kawa/standard/require.java (scanForDefinitions):  Split most into
 	new method importDefinitions - used for XQuery modules.
 	(importDefinitions):  New static method.  Take module namespace.

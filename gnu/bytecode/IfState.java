@@ -19,7 +19,7 @@ public class IfState {
   /** The stack size before the "then" clause. */
   int start_stack_size;
 
-  /** The types that were pused by the then-clause. */
+  /** The types that were pushed by the then-clause. */
   Type[] then_stacked_types;
 
   public IfState (Method method)

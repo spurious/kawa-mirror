@@ -35,6 +35,7 @@ java_JAVA=\
   Literal.java \
   MethodProc.java \
   ModuleBody.java \
+  ModuleMethod.java \
   ModuleExp.java \
   ObjectExp.java \
   QuoteExp.java \

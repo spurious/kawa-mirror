@@ -1,3 +1,9 @@
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* ModuleMethod.java:  New class, which extends ProcedureN.
+	* ModuleBody.java:  New apply methods that take a ModuleMethod.
+	* Makefile.am, Makefile.in (java_JAVA):  Add ModuleMethod.java.
+
 1999-08-26  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java:  New class;  inherits from ProcedureN.

@@ -22,4 +22,48 @@ public abstract class ModuleBody extends Procedure0
     apply0();
   }
 
+  /**
+   * A subclass will typically override this like:
+   * switch (method.selector) {
+   *   case 3:  return function3();
+   *   case 5:  return function5();
+   *   default:  super.apply0(method);
+   * }
+   */
+
+  public Object apply0(ModuleMethod method)
+  {
+    return applyN(method, Procedure.noArgs);
+  }
+
+  public Object apply1(ModuleMethod method, Object arg1)
+  {
+    Object[] args = new Object[1];
+    args[0] = arg1;
+    return applyN(method, args);
+  }
+
+  public Object apply2(ModuleMethod method, Object arg1, Object arg2)
+  {
+    Object[] args = new Object[2];
+    args[0] = arg1;
+    args[1] = arg2;
+    return applyN(method, args);
+  }
+
+  public Object apply3(ModuleMethod method,
+                       Object arg1, Object arg2, Object arg3)
+  {
+    Object[] args = new Object[3];
+    args[0] = arg1;
+    args[1] = arg2;
+    args[2] = arg3;
+    return applyN(method, args);
+  }
+
+  public Object applyN(ModuleMethod method, Object[] args)
+  {
+    throw new WrongArguments(method, args.length);
+  }
+
 }

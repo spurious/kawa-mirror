@@ -1,3 +1,13 @@
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.59.
+
+	* kawa/standard/TracedProcedure.java:  New ProcedureN class.
+	* kawa/standard/Makefile.am (java_JAVA):  Add TracedProcedure.java.
+	* kawa/standard/ObjectFormat.java (format):  New overload.
+	* kawa/standard/Scheme.java (initScheme):  Define call/cc (alias),
+	system-tmpdir, make-temporary-file, trace, untrace.
+
 1999-07-16  Per Bothner  <per@bothner.com>
 
 	* kawa/GuiConsole.java (<init>):  Create a kawa.repl, not a kawa.Shell.

@@ -1,3 +1,13 @@
+Changes from Kawa 1.6.58 to 1.6.59
+==================================
+New macros trace and untrace for tracing procedures.
+After executing (trace PROCEDURE), debugging output will
+be written (to the standard error port) every time PROCEDURE
+is called, with the parameters and return value.  Use
+(untrace PROCEDURE) to turn tracing off.
+
+New utility functions (system-tmpdir) and (make-temporary-file [format]).
+
 A new (unfinished) framework supports multiple languages.  The
 command-line option --elisp selects Emacs Lisp, while --scheme
 (the default) selects Scheme.  (The only difference so far is the

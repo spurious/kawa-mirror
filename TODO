@@ -18,6 +18,9 @@ Implement source-filename source-line source-column macros.
 Macro-expansions lose line number information.
 Fix when switching to syntatic closures.
 
+All function calls in kawa.lib that call standard or library functions
+should be resolved statically (inlined or direct methods calls).
+
 Make all the primitive-XXX macros be procedures, once we have better inlining.
 E.g.: (primitive-virtual-method <TYPE> "NAME" <RTYPE> (<ARG1> ...))
 becomes: (prim-virtual-method <TYPE> 'NAME <RTYPE> <ARG1> ...)
@@ -28,7 +31,7 @@ Support persistence and serialization of Scheme values.
 
 Replace use of ZipArchive by jar files.
 
-Implement full call-cc and tail-calls by re-writing as in RScheme.
+Implement full call-cc by re-writing.
 This would be slower, so should be optional, probably not the default.
 
 Compile a module with top-level function definitions to a single class
@@ -85,12 +88,8 @@ Printing SyntaxError prints error log.
 Make it easier to plug in other source languages.
 Implement Emacs Lisp reader and primitives.
 
-Implement heapFrame, static link etc as references to objects,
-not arrays.  Make consistent with JDK1.1 inner classes extension.
-Better naming convention for inner lambdas. (I.e. fix kawa.lib.lambda.)
-
-Make #!null more robust.  Allow (global) variables to be bound to #!null
-without being considered to be undefined.
+Make closure representation consistent with inner classes wrt
+use of Attributes (for possible improved debugging).
 
 Optionally issue a warning if a symbol is rebound.
 
@@ -160,6 +159,14 @@ class ObjectExp
     walker.postObjectExp(this);
   }
 }
+
+JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
+
+Rewrite (make-temporary-file) to use File.createTempFile.
+
+Replace kawa.lang.Sequence with java.util.List.
+
+Possibly replace GuiConsole to use JTextPane (or gnu.emacs.Window).
 
 BENCHMARKS
 http://www.ccs.neu.edu/home/will/Twobit/kvwbenchmarks.html

@@ -499,7 +499,7 @@ Set the default language to Scheme.
 (This is the default unless you select another language.)
 @item --elisp
 Set the default language to Emacs Lisp.
-(This is not very useful yet - little beyond the parser works.)
+(The implementation is quite incomplete.)
 @end table
 
 The following options control which calling conventions are used:

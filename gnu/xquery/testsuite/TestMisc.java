@@ -54,8 +54,9 @@ public class TestMisc
     evalTest("1,((2 to 4)[true()]),5", "1 2 3 4 5");
     evalTest("(for $y in (5,4) return <b>{10+$y}</b>)[2]", "<b>14</b>");
 
+    String tabNsNodes = " xmlns:h=\"H\" xmlns:j=\"J\" xmlns:k=\"J\"";
     evalTest("doc('tab.xml')/result",
-	     "<result>\n" +
+	     "<result"+tabNsNodes+">\n" +
 	     "<row>\n" +
 	     "<fld1>a1</fld1>\n" +
 	     "<fld2 align=\"right\">12</fld2>\n" +
@@ -72,27 +73,28 @@ public class TestMisc
 	     "</h:row>\n" +
 	     "</result>");
     evalTest("doc('tab.xml')/result/row/fld2",
-	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
     evalTest("doc('tab.xml')/result/row[fld2]",
-	     "<row>\n" +
+	     "<row"+tabNsNodes+">\n" +
 	     "<fld1>a1</fld1>\n" +
-	     "<fld2 align=\"right\">12</fld2>\n" +
-	     "</row><row>\n" +
+	     "<fld2 align=\"right\">12</fld2>\n</row>" +
+	     "<row"+tabNsNodes+">\n" +
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
     evalTest("doc('tab.xml')/result/row/*",
-	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
+	     "<fld1"+tabNsNodes+">a1</fld1><fld2"+tabNsNodes+" align=\"right\">12</fld2><fld1"+tabNsNodes+" align=\"left\">b1</fld1><fld2"+tabNsNodes+" align=\"right\">22</fld2>");
 
     evalTest("doc('tab.xml')/result/row[2]",
-	     "<row>\n" +
+	     "<row"+tabNsNodes+">\n" +
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
     evalTest("for $x in doc('tab.xml')/result/row[2]/node()" +
 	     "  return ('[',$x,']')",
-	     "[\n][<fld1 align=\"left\">b1</fld1>][\n" +
-	     "][<fld2 align=\"right\">22</fld2>][\n]");
+	     "[\n][<fld1"+tabNsNodes+" align=\"left\">b1</fld1>][\n" +
+	     "][<fld2"+tabNsNodes+" align=\"right\">22</fld2>][\n]");
     evalTest("for $x in doc('tab.xml')/result/row[2]/text()" +
 	     "  return ('[',$x,']')",
 	     "[\n][\n][\n]");
@@ -100,7 +102,8 @@ public class TestMisc
 	     "  return ('[',$x,']')",
 	     "[\n][b1][\n][22][\n]");
     evalTest("doc('tab.xml')/result/row/*[2]",
-	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     + "<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
 
     evalTest("for $x in <T>r1<fld1>a1</fld1><fld3/>r2<fld2>12</fld2></T>" +
 	     "  /node()" +
@@ -108,16 +111,22 @@ public class TestMisc
 	     "[r1][<fld1>a1</fld1>][<fld3 />][r2][<fld2>12</fld2>]");
 
     evalTest("(doc('tab.xml')/result/row/*)[2]",
-	     "<fld2 align=\"right\">12</fld2>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>");
     evalTest("(doc('tab.xml')/result/row/*)[2 to 3]",
-	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     +" <fld1"+tabNsNodes+" align=\"left\">b1</fld1>");
     evalTest("(doc('tab.xml')/result/row/*)[position()>1]",
-	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     +"<fld1"+tabNsNodes+" align=\"left\">b1</fld1>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
     evalTest("(doc('tab.xml')/result/row/*)[position()>1][2]",
-	     "<fld1 align=\"left\">b1</fld1>");
+	     "<fld1"+tabNsNodes+" align=\"left\">b1</fld1>");
 
     evalTest("doc('tab.xml')/result/row/(fld2,fld1)",
-	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
+	     "<fld1"+tabNsNodes+">a1</fld1>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     +"<fld1"+tabNsNodes+" align=\"left\">b1</fld1>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
 
     evalTest("string-value(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
@@ -139,20 +148,21 @@ public class TestMisc
     evalTest("string(<a>{'aa''bb&#88;cc&#x5a;dd'}</a>)", "aa'bbXccZdd");
 
     evalTest("doc('tab.xml')/result/row[fld1]",
-	     "<row>\n" +
+	     "<row"+tabNsNodes+">\n" +
 	     "<fld1>a1</fld1>\n" +
-	     "<fld2 align=\"right\">12</fld2>\n" +
-	     "</row><row>\n" +
+	     "<fld2 align=\"right\">12</fld2>\n</row>" +
+	     "<row"+tabNsNodes+">\n" +
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
     evalTest("doc('tab.xml')/result/row[fld3]", "");
     evalTest("doc('tab.xml')/result/row/fld1[@align]",
-	     "<fld1 align=\"left\">b1</fld1>");
+	     "<fld1"+tabNsNodes+" align=\"left\">b1</fld1>");
     evalTest("doc('tab.xml')/result/row/fld2[@align]",
-	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
+	     "<fld2"+tabNsNodes+" align=\"right\">12</fld2>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">22</fld2>");
     evalTest("'a',doc('tab.xml')/result/row/fld1[@align='left']",
-	     "a<fld1 align=\"left\">b1</fld1>");
+	     "a<fld1"+tabNsNodes+" align=\"left\">b1</fld1>");
     evalTest("'a',doc('tab.xml')/result/row/fld1[@align='right']", "a");
 
     evalTest("let $x:=12,\n" +
@@ -230,15 +240,18 @@ public class TestMisc
 	     "\nc1\n33\n44\nc2\n");
 
     evalTest("doc('tab.xml')/result/row[1]/descendant::*",
-	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
+	     "<fld1"+tabNsNodes+">a1</fld1>"
+	     +"<fld2"+tabNsNodes+" align=\"right\">12</fld2>");
     evalTest("for $x in doc('tab.xml')/result/row[1]/descendant::node() return ($x,';')",
-	     "\n;<fld1>a1</fld1>;a1;\n;<fld2 align=\"right\">12</fld2>;12;\n;");
+	     "\n;<fld1"+tabNsNodes+">a1</fld1>;a1;\n;"
+	     + "<fld2"+tabNsNodes+" align=\"right\">12</fld2>;12;\n;");
     evalTest("doc('tab.xml')/result/row[1]/descendant::text()",
 	     "a112");
     evalTest("doc('tab.xml')/result/row[1]/descendant-or-self::*",
-	     "<row><fld1>a1</fld1>"
+	     "<row"+tabNsNodes+"><fld1>a1</fld1>"
 	     + "<fld2 align=\"right\">12</fld2></row>"
-	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
+	     + "<fld1"+tabNsNodes+">a1</fld1>"
+	     + "<fld2"+tabNsNodes+" align=\"right\">12</fld2>");
 
     // Based on bugs reported by Francois Leygues <vizawalou@wanadoo.fr>:
     evalTest("let $bx := <b x='xx'></b> return"

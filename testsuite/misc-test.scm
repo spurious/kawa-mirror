@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 57)
+(test-init "Miscellaneous" 61)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -204,3 +204,22 @@
 (test "Done" 'do-future (do   ((test 'empty))
 			  (#t "Done")
 			(future (begin(set! test 'goodbye)))))
+
+(define p1 (cons 9 45))
+(define-alias p2 p1)
+(define-alias p2car (car p2))
+(set! p2car 40)
+(test '(40 . 45) 'test-alias-1 p1)
+(define p1-cdr-loc (location (cdr p1)))
+(set! (p1-cdr-loc) 50)
+(set! (car p2) 49)
+(test '(49 . 50) 'test-alias-2 p2)
+(test '(49 . 50) 'test-alias-3 ((location p1)))
+
+(define (test-location-local x)
+  (let* ((xl (location x))  ;; test location of formal parameter x
+	 (z (xl))
+	 (zl (location z))) ;; test location of local variable z
+    (set! (xl) (+ (zl) 100))
+    x))
+(test 110 test-location-local 10)

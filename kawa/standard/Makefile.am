@@ -4,10 +4,10 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 .java.class:
-	cd $(srcdir); $(JAVAC) $*.java
+	$(JAVAC) -d ../.. $<
 
 javadir=$(prefix)/java/kawa/standard
 
@@ -63,6 +63,10 @@ divide_oper.class \
 abs.class \
 numerator.class \
 denominator.class \
+floor.class \
+ceiling.class \
+truncate.class \
+round.class \
 exp.class \
 log.class \
 sin.class \
@@ -73,6 +77,8 @@ acos.class \
 atan.class \
 sqrt.class \
 expt.class \
+exact2inexact.class \
+inexact2exact.class \
 number2string.class \
 char_p.class \
 char_equal_p.class \

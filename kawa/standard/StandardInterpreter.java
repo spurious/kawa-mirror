@@ -158,6 +158,10 @@ public class StandardInterpreter extends Interpreter
       define_proc ("abs", "kawa.standard.abs");
       define_proc ("numerator", "kawa.standard.numerator");
       define_proc ("denominator", "kawa.standard.denominator");
+      define_proc ("floor", "kawa.standard.floor");
+      define_proc ("ceiling", "kawa.standard.ceiling");
+      define_proc ("truncate", "kawa.standard.truncate");
+      define_proc ("round", "kawa.standard.round");
       define_proc ("exp", "kawa.standard.exp");
       define_proc ("log", "kawa.standard.log");
       define_proc ("sin", "kawa.standard.sin");
@@ -168,6 +172,8 @@ public class StandardInterpreter extends Interpreter
       define_proc ("atan", "kawa.standard.atan");
       define_proc ("sqrt", "kawa.standard.sqrt");
       define_proc ("expt", "kawa.standard.expt");
+      define_proc ("exact->inexact", "kawa.standard.exact2inexact");
+      define_proc ("inexact->exact", "kawa.standard.inexact2exact");
       define_proc ("number->string", "kawa.standard.number2string");
 
       //-- Section 6.6  -- complete

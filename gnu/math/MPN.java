@@ -585,7 +585,7 @@ class MPN
   /** Calculate Greatest Common Divisior of x[0:len-1] and y[0:len-1].
     * Assumes both arguments are non-zero.
     * Leaves result in x, and returns len of result.
-    * Also destroys y (actually sets it to a copy of the reuslt). */
+    * Also destroys y (actually sets it to a copy of the result). */
 
   public static int gcd (int[] x, int[] y, int len)
   {

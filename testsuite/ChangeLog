@@ -1,3 +1,7 @@
+2003-03-06  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST):  Add module3.scm.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	New test based on a bug reported by <Chris.Dean@sokitomi.com>.

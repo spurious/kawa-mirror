@@ -753,11 +753,11 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseRelativePathExpr();
   }
 
-  Expression parseNodeTest()
+  Expression parseNodeTest(int axis)
       throws java.io.IOException, SyntaxException
   {
      Declaration dotDecl = parser.lookup("dot", -1);
-     return parseNodeTest(new ReferenceExp("dot", dotDecl));
+     return parseNodeTest(new ReferenceExp("dot", dotDecl), axis);
   }
 
   QName parseNameTest(String defaultNamespaceUri)
@@ -821,21 +821,26 @@ public class XQParser extends LispReader // should be extends Lexer
     return QName.make(uri, local);
   }
 
-  Expression parseNodeTest(Expression dot)
+  Expression parseNodeTest(Expression dot, int axis)
       throws java.io.IOException, SyntaxException
   {
     Expression exp;
-    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
-	|| curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
+    if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT)
+	&&
+	(curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
+	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL))
       {
 	QName qname = parseNameTest(defaultNamespace);
 	Expression[] args = { dot, new QuoteExp(qname.getNamespaceURI()),
 			      new QuoteExp(qname.getLocalName()) };
-	exp = new ApplyExp(funcNamedChildren, args);
+	Expression func
+	  = axis == AXIS_DESCENDANT ? funcNamedDescendants : funcNamedChildren;
+	exp = new ApplyExp(func, args);
       }
-    else if (curToken == '@')
+    else if ((curToken == '@' && axis < 0) || axis == AXIS_ATTRIBUTE)
       {
-	getRawToken();
+	if (axis < 0)
+	  getRawToken();
 	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN
 	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
 	  {
@@ -846,8 +851,10 @@ public class XQParser extends LispReader // should be extends Lexer
 			       args);
 	  }
 	else
-	  return syntaxError("missing name or '*' after '@'");
+	  return syntaxError("missing name or '*' after '@' or attribute::");
       }
+    else if (axis >= 0)
+      return syntaxError("unsupported axis '"+axisNames[axis]+"::'");
     else
       return null;
     getRawToken();
@@ -861,6 +868,7 @@ public class XQParser extends LispReader // should be extends Lexer
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	int op = curToken;
+	boolean descendants = curToken == SLASHSLASH_TOKEN;
 	getRawToken();
 
 	LambdaExp lexp = new LambdaExp(1);
@@ -884,13 +892,17 @@ public class XQParser extends LispReader // should be extends Lexer
 		&& ((ReferenceExp) args[0]).getBinding() == decl)
 	      {
 		args[0] = exp;
-		exp = aexp;
+		if (descendants)
+		  func = funcNamedDescendants;
+		exp = new ApplyExp (func, args);
 		handled = true;
 	      }
 	  }
 
 	if (! handled)
 	  {
+	    if (descendants)
+	      return syntaxError("// not implemented except as //NAME");
 	    Expression[] args = { lexp, exp };
 	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
 					       "valuesMap"),
@@ -903,13 +915,14 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseStepExpr()
       throws java.io.IOException, SyntaxException
   {
-    if (curToken >= OP_AXIS_FIRST
-	&& curToken < OP_AXIS_FIRST + COUNT_OP_AXIS)
+    int axis = peekOperand() - OP_AXIS_FIRST;
+    if (axis  >= 0 && axis < COUNT_OP_AXIS)
       {
-	// return parseAxisStepExpr();
-	return syntaxError("parseAxiStepExpr not implemented");
+	getRawToken();
+	return parseStepQualifiers(parseNodeTest(axis));
       }
-    return parseOtherStepExpr();
+    else
+      return parseOtherStepExpr();
   }
 
   Expression parseStepQualifiers(Expression exp)
@@ -1282,7 +1295,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	Declaration decl = lexp.addDeclaration(argName,  // FIXME cast
 					       (Type) ((QuoteExp) caseType).getValue());
 
-	//getRawToken();
 	if (match("return"))
 	  getRawToken();
 	else
@@ -1479,12 +1491,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (next >= 0)
 	      unread();
-	    return parseNodeTest();
+	    return parseNodeTest(-1);
 	  }
       }
     else if (token == OP_MUL || token == NCNAME_COLON_TOKEN || token == '@')
       {
-	return parseNodeTest();
+	return parseNodeTest(-1);
       }
     else
       return null;
@@ -1588,12 +1600,14 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  cond = null;
-	if (! match("return"))
+	boolean sawReturn = match("return");
+	if (! sawReturn && ! match("let") && ! match("let"))
 	  return syntaxError("missing 'return' clause");
 	peekNonSpace("unexpected eof-of-file after 'return'");
 	int bodyLine = getLineNumber() + 1;
 	int bodyColumn = getColumnNumber() + 1;
-	getRawToken();
+	if (sawReturn)
+	  getRawToken();
 	body = parseExpr();
 	if (cond != null)
 	  {
@@ -1866,7 +1880,9 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   static final Expression funcNamedChildren
-    = makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren");
+    = makeFunctionExp("gnu.kawa.xml.NamedChildren", "namedChildren");
+  static final Expression funcNamedDescendants
+    = makeFunctionExp("gnu.kawa.xml.NamedDescendants", "namedDescendants");
 
   public void error(String message)
   {

@@ -1,3 +1,13 @@
+2002-02-05  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNodeTest):  Take axis parameter.
+	Handle child::, attribute::NAME, and descendant::NAME; else error.
+	(parseRelativePathExpr):  Handle EXPR//NAME.
+	(parseStepExpr):  Pass axis to parseNodeTest.
+
+	* XQParser.java (parseFLWRExpression):  Allow ellding of 'return'
+	if body is another 'let' or 'for'.
+
 2002-01-31  Per Bothner  <per@bothner.com>
 
 	* XQuery (<init>):  Also do loadClass of gnu.kawa.servlet.HTTP.

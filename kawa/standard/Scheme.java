@@ -396,6 +396,13 @@ public class Scheme extends Interpreter
 		  new kawa.standard.prim_method(183));
       define_proc("primitive-op1",
 		  new kawa.standard.prim_method());
+      define_proc("primitive-get-field", "kawa.lib.reflection");
+      define_proc("primitive-set-field", "kawa.lib.reflection");
+      define_proc("primitive-get-static", "kawa.lib.reflection");
+      define_proc("primitive-set-static", "kawa.lib.reflection");
+      define_proc("primitive-array-get", "kawa.lib.reflection");
+      define_proc("primitive-array-set", "kawa.lib.reflection");
+      define_proc("primitive-array-length", "kawa.lib.reflection");
       define_proc("primitive-throw", new kawa.standard.prim_throw());
       define_syntax("try-finally", "kawa.standard.try_finally");
       define_syntax("try-catch", "kawa.standard.try_catch");
@@ -414,6 +421,7 @@ public class Scheme extends Interpreter
       define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
+      define("symbol-read-case", "P");
       
       // JDK 1.1 only:
       define_proc ("record-accessor", "kawa.lib.reflection");

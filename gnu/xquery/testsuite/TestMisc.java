@@ -34,6 +34,10 @@ public class TestMisc
 	     "<b>14</b><b>15</b><b>16</b>");
     evalTest("for $i in (1 to 10) where ($i mod 2)=1 return 20+$i",
 	     "21 23 25 27 29");
+    evalTest("for $car at $i in ('Ford', 'Chevy')," +
+	     "$pet at $j in ('Cat', 'Dog') " +
+	     "return ($i, '/', $car, '/', $j, '/', $pet, ';')",
+	     "1/Ford/1/Cat;1/Ford/2/Dog;2/Chevy/1/Cat;2/Chevy/2/Dog;");
 
     evalTest("(3,4,5)[3]", "5");
     evalTest("1,((2,3)[false()]),5", "1 5");
@@ -234,10 +238,10 @@ public class TestMisc
     evalTest("element r {let $y := <b x='1'/>"
 	     + " let $x:=<a>{$y}</a> return $x/b/@x}",
 	     "<r x=\"1\" />");
-    evalTest("define function x(){<a><b x='1'/><b x='2'/></a>}"
+    evalTest("declare function x(){<a><b x='1'/><b x='2'/></a>}"
 	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
-    evalTest("define function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>}"
+    evalTest("declare function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>}"
 	     + " let $st := s()/a return ("
 	     + " '[',$st/@x ,'] [',$st ,']')",
 	     "[ x=\"2\"] [<a x=\"2\" />]");
@@ -278,8 +282,8 @@ public class TestMisc
     evalTest("declare namespace Int='class:java.lang.Integer'\n"
 	     + "Int:toHexString(266)", "10a");
     evalTest("declare namespace File='class:java.io.File'\n"
-	     + "define function make-file ($x as string) {File:new($x)}\n"
-	     + "define function parent ($x) {java.io.File:getParent($x)}\n"
+	     + "declare function make-file ($x as string) {File:new($x)}\n"
+	     + "declare function parent ($x) {java.io.File:getParent($x)}\n"
 	     + "parent(make-file('dir/mine.txt'))", "dir");
     evalTest("java.lang.Integer:toHexString(255)", "ff");
 

@@ -1,3 +1,8 @@
+2003-09-10  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  New test for 'at' clause in FLWOR.
+	Update 'define function' to declare function'.
+
 2003-08-03  Per Bothner  <per@bothner.com>
 
 	* report1.xml.in:  New data file.

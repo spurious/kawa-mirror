@@ -1,12 +1,11 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.54)
+AM_INIT_AUTOMAKE(kawa, 1.6.55)
 
 AM_MAINTAINER_MODE
 AM_EXEEXT
 
-AC_CONFIG_AUX_DIR(.)
 AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
 #AM_PROG_INSTALL

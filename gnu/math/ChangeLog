@@ -1,3 +1,9 @@
+Sat Mar  8 08:29:33 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Unit.java (define):  New static method.
+	(cm, im):  Fix typos.
+	* Numeric.java (sub): Make final.
+
 Mon Feb  3 17:09:07 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* DFloNum.java (makeMethod):  Make public.

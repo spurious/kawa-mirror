@@ -10,7 +10,7 @@ public abstract class Numeric extends java.lang.Number
   public abstract Numeric add (Object obj, int k);
 
   public final Numeric add (Object obj) { return add (obj, 1); }
-  public Numeric sub (Object obj) { return add (obj, -1); }
+  public final Numeric sub (Object obj) { return add (obj, -1); }
 
   public abstract Numeric mul (Object obj);
 

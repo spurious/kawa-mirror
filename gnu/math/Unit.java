@@ -125,6 +125,13 @@ public class Unit extends Quantity
     this (name, factor * base.doubleValue(), base.dimensions());
   }
 
+  public static Unit define (String name, Quantity value)
+  {
+    if (value.imValue() != 0.0)
+      throw new ArithmeticException("defining "+name+" using complex value");
+    return new Unit (name, value.reValue(), value.unit().dimensions());
+  }
+
   public Complex number() { return new DFloNum(factor); }
   public boolean isExact () { return false; }
   public final boolean isZero () { return false; }
@@ -208,8 +215,8 @@ public class Unit extends Quantity
   public static final BaseUnit meter = new BaseUnit ("m", "Length");
   public static final BaseUnit second = new BaseUnit ("s", "Time");
   public static final BaseUnit gram = new BaseUnit ("g", "Mass");
-  public static final Unit cm = new Unit ("cm", 0.100, meter);
-  public static final Unit mm = new Unit ("cm", 0.10, cm);
+  public static final Unit cm = new Unit ("cm", 0.01, meter);
+  public static final Unit mm = new Unit ("mm", 0.1, cm);
   public static final Unit in = new Unit ("in", 0.0254, meter);
   public static final Unit pt = new Unit ("pt", 0.0003527778, meter);
   public static final Unit pica = new Unit ("pica", 0.004233333, meter);

@@ -29,9 +29,12 @@ CpoolUtf8 extends CpoolEntry
 	  for (entry = hash_tab[index]; entry != null; entry = entry.next)
 	    {
 	      if (h == entry.hash
-		  && entry instanceof CpoolUtf8
-		  && ((CpoolUtf8)entry).str.equals (s))
-		return (CpoolUtf8)entry;
+		  && entry instanceof CpoolUtf8)
+		{
+		  CpoolUtf8 utf = (CpoolUtf8)entry;
+		  if (Scope.equals (utf.str, s))
+		    return utf;
+		}
 	    }
 	}
       return new CpoolUtf8 (classfile, h, s);

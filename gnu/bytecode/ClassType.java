@@ -8,7 +8,10 @@ public class ClassType extends Type {
   String this_name;
   int this_class;
   int super_class; // constant pool index of super class, or -1 if unknown
+  int[] interfacesImplemented;
   public int access_flags;
+
+  boolean emitDebugInfo = true;
 
 //  public Method new_method (String name, String signature, int flags);
 //  public Method new_method (String name, Type return_ type,
@@ -98,6 +101,18 @@ public class ClassType extends Type {
     return set_super (superClass.this_name);
   }
 
+  public void setInterfaces (ClassType[] interfaces)
+  { int n = interfaces.length;
+    interfacesImplemented = new int [n];
+    for (int i = 0;  i < n;  i++)
+      {
+	String name = interfaces[i].this_name.replace ('.', '/');
+	CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
+	CpoolClass class_entry = CpoolClass.get_const (this, name_entry);
+	interfacesImplemented[i] = class_entry.index;
+      }
+  }
+
   public ClassType () {
     super_class = -1;
   }
@@ -114,6 +129,8 @@ public class ClassType extends Type {
   Field last_field;
   int ConstantValue_name_index;  // Constant pool index of "ConstantValue"
   int Code_name_index;  // Constant pool index of "Code"
+  /** Constant pool index of "LocalVariableTable". */
+  int LocalVariableTable_name_index;
 
   /**
    * Add a new field to this class.
@@ -148,6 +165,7 @@ public class ClassType extends Type {
   Method methods;
   int methods_count;
   Method last_method;
+  public Method constructor;
 
   Method new_method () {
     return new Method (this, 0);
@@ -210,7 +228,15 @@ public class ClassType extends Type {
     dstr.writeShort (access_flags);
     dstr.writeShort (this_class);
     dstr.writeShort (super_class);
-    dstr.writeShort (0);  // interfaces_count
+    if (interfacesImplemented == null)
+      dstr.writeShort (0);  // interfaces_count
+    else
+      {
+	int interfaces_count = interfacesImplemented.length;
+	dstr.writeShort (interfaces_count);
+	for (i = 0;  i < interfaces_count; i++)
+	  dstr.writeShort (interfacesImplemented[i]);
+      }
 
     dstr.writeShort (fields_count);
     for (Field field = fields;  field != null;  field = field.next)

@@ -1,3 +1,19 @@
+Thu Jul 11 14:44:21 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* ClassType.java:  Add support for implementing interfaces.
+	* CpoolUtf8.java (get_const):  Use proper equals to compare bytes.
+	* Method.java:  Support emitting debug info: LocalVariableTable.
+	New methods enterScope, assign_local.
+	New methods compile_new, compile_array_load, compile_swap,
+	copile_store_value, compile_{get,put}{field,static},
+	* Scope.java:  Renamed field prev -> parent.
+	New fields nextSibling, firstChile, lastChild.
+	New method linkChild (to enter in tree).
+	* VarEnumerator.java:  New class.
+	* Makefile.am, Makefile.in:  Add VarEnumerator.class.
+	* Variable.java: New fields offset, flags, name_index, signature_index.
+	New methods for accessing flags and iterating.
+
 Tue Jul  2 11:23:44 1996  Anthony Green  <green@csk3.cygnus.com>
 
 	* Makefile.am, Makefile.in: New files to support building codegen

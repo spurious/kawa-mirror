@@ -42,7 +42,7 @@ public class Method {
   }
 
   private Type[] stack_types;
-  private int SP;  // Cyrrent stack size (in "words")
+  private int SP;  // Current stack size (in "words")  // FIXME make private
   private int max_stack;
   private int max_locals;
   int PC;
@@ -53,24 +53,38 @@ public class Method {
   Variable[] used_locals;
   public Scope current_scope;
   Scope parameter_scope;
-  Scope dead_scopes;
 
   public Scope push_scope () {
     Scope scope = new Scope ();
-    scope.start_pc = PC;
-    scope.prev = current_scope;
-    current_scope = scope;
+    enterScope (scope);
     return scope;
+  }
+
+  public void enterScope (Scope scope) {
+    scope.start_pc = PC;
+    scope.linkChild (current_scope);
+    current_scope = scope;
+    for (Variable var = scope.firstVar ();  var != null;  var = var.nextVar ())
+      {
+	if (var.isSimple ())
+	  {
+	    if (! var.isAssigned ())
+	      allocate_local (var);
+	    else if (used_locals[var.offset] == null)
+	      used_locals[var.offset] = var;
+	    else if (used_locals[var.offset] != var)
+	      throw new Error ("inconsistent local variable assignments for "
++var.strName()+" at "+var.offset+" != "+used_locals[var.offset]);
+	  }
+      }
   }
 
   public Scope pop_scope () {
     Scope scope = current_scope;
-    current_scope = scope.prev;
+    current_scope = scope.parent;
     scope.end_pc = PC;
-    scope.prev = dead_scopes;
-    dead_scopes = scope;
     for (Variable var = scope.vars; var != null; var = var.next) {
-      if (! var.dead ())
+      if (var.isSimple () && ! var.dead ())
 	kill_local (var);
     }
     return scope;
@@ -82,7 +96,7 @@ public class Method {
    * @return the Variable, or null if not found (in any scope of this Method).
    */
   Variable lookup (byte[] name) {
-    for (Scope scope = current_scope; scope != null;  scope = scope.prev) {
+    for (Scope scope = current_scope; scope != null;  scope = scope.parent) {
       Variable var = scope.lookup (name);
       if (var != null)
 	return var;
@@ -94,12 +108,12 @@ public class Method {
     return lookup (ClassType.to_utf8 (name));
   }
 
-  /**
-   * Allocate slots for a local variable (or parameter).
-   * @param local the variable ew need to allocate
-   * @return the index of the (first) slot.
-   */
-  public int allocate_local (Variable local) {
+  /** Assign a local variable to a given slot.
+   * @param local the Variable to assign
+   * @param slot the local variable slot desired
+   * @return true iff we succeeded (i.e. the slot was unused) */
+  public boolean assign_local (Variable local, int slot)
+  {
     int size = local.type.size > 4 ? 2 : 1;
     if (used_locals == null)
       used_locals = new Variable[20+size];
@@ -107,29 +121,43 @@ public class Method {
       boolean[] new_locals = new boolean [2 * used_locals.length + size];
       System.arraycopy (used_locals, 0, new_locals, 0, max_locals);
     }
-    for (int i = 0; ; i++) {
-      int j;
-      for (j = 0; j < size; j++) {
-	if (used_locals[i+j] != null)
-	  break;
+    for (int j = 0; j < size; j++)
+      {
+	if (used_locals[slot+j] != null)
+	  return false;
       }
-      if (j == size) {
-	for (j = 0; j < size; j++)
-	  used_locals[i + j] = local;
-	if (i + size > max_locals)
-	  max_locals = i + size;
-	return i;
+    for (int j = 0; j < size; j++)
+      used_locals[slot + j] = local;
+    if (slot + size > max_locals)
+      max_locals = slot + size;
+    local.offset = slot;
+    return true;
+  }
+
+  /**
+   * Allocate slots for a local variable (or parameter).
+   * @param local the variable we need to allocate
+   * @return the index of the (first) slot.
+   */
+  public void allocate_local (Variable local)
+  {
+    for (int i = 0; ; i++)
+      {
+	if (assign_local (local, i))
+	  {
+//System.err.println ("allocate_local for "+local+"("+local.strName()+")=>"+i);
+	    return;
+	  }
       }
-    }
   }
 
   public void init_param_slots ()
   {
     if ((access_flags & Access.STATIC) == 0)
-      new_local (classfile);
+      new_local (classfile).setParameter (true);
     int arg_count = arg_types.length;
     for (int i = 0;  i < arg_count;  i++) {
-      new_local (arg_types[i]);
+      new_local (arg_types[i]).setParameter (true);
     }
   }
 
@@ -299,6 +327,19 @@ public class Method {
     put1 (type_code);
   }
 
+  /**
+   * Invoke new on a class type.
+   * Does not call the constructor!
+   * @param type the desired new object type
+   */
+  public void compile_new (ClassType type)
+  {
+    instruction_start_hook (3);
+    put1 (187); // new
+    put2 (classfile.get_class_const (type));
+    push_stack_type (type);
+  }
+
   /** Compile code to allocate a new array.
    * The size shold have been already pushed on the stack.
    * @param type type of the array elements
@@ -345,6 +386,7 @@ public class Method {
   /** Store into an element of an array.
    * Must already have pushed the array reference, the index,
    * and the new value (in that order).
+   * Stack:  ..., array, index, value => ...
    */
   public void compile_array_store (Type element_type)
   {
@@ -361,6 +403,26 @@ public class Method {
     else if (element_type == Type.boolean_type) put1 (79);  // iastore ???
     else if (element_type == Type.char_type)    put1 (85);  // castore
     else                                        put1 (83);  // aastore
+  }
+
+  /** Load an element from an array.
+   * Must already have pushed the array and the index (in that order):
+   * Stack:  ..., array, index => ..., value */
+  public void compile_array_load (Type element_type)
+  {
+    instruction_start_hook (1);
+    pop_stack_type ();  // Pop index
+    pop_stack_type ();  // Pop array reference
+    if      (element_type == Type.byte_type)    put1 (51);  // baload
+    else if (element_type == Type.short_type)   put1 (53);  // saload
+    else if (element_type == Type.int_type)     put1 (46);  // iaload
+    else if (element_type == Type.long_type)    put1 (47);  // laload
+    else if (element_type == Type.float_type)   put1 (48);  // faload
+    else if (element_type == Type.double_type)  put1 (49);  // daload
+    else if (element_type == Type.boolean_type) put1 (46);  // iaload
+    else if (element_type == Type.char_type)    put1 (52);  // caload
+    else                                        put1 (50);  // aaload
+    push_stack_type (element_type);
   }
 
   /**
@@ -389,6 +451,18 @@ public class Method {
 	else
 	  put1 (87); // pop
       }
+  }
+
+  public void compile_swap ()
+  {
+    instruction_start_hook (1);
+    Type type1 = pop_stack_type ();
+    Type type2 = pop_stack_type ();
+    if (type1.size > 4 || type2.size > 4)
+      throw new Error ("compile_swap:  not allowed for long or double");
+    push_stack_type (type1);
+    put1 (95);  // swap
+    push_stack_type (type2);
   }
 
   /**
@@ -440,9 +514,11 @@ public class Method {
     if (var.dead ())
       throw new Error ("attempting to push dead variable");
     int offset = var.offset;
+    if (offset < 0 || !var.isSimple ())
+      throw new Error ("attempting to load from unassigned variable "+var
++" simple:"+var.isSimple ()+", offset: "+offset);
     Type type = var.type.promote ();
     int code;
-//System.err.println ("push_var " + var.strName () + ", offset: " +var.offset);
     instruction_start_hook (4);
     if (type == Type.int_type)
       code = 0; // iload??
@@ -455,18 +531,53 @@ public class Method {
     else
       code = 4; // aload??
     if (offset <= 3)
-    put1 (26 + 4 * code + offset);  // [ilfda]load_[0123]
-    else if (offset < 256) {
-      put1 (21 + code);
-      put1 (offset);
-    }
-    else {
-      put1 (196); // wide
-      put1 (offset >> 8);
-      put1 (21 + code);
-      put1 (offset);
-    }
+      put1 (26 + 4 * code + offset);  // [ilfda]load_[0123]
+    else
+      {
+	if (offset >= 256)
+	  {
+	    put1 (196); // wide
+	    put1 (offset >> 8);
+	  }
+	put1 (21 + code);  // [ilfda]load
+	put1 (offset);
+      }
     push_stack_type (var.type);
+  }
+
+  public void compile_store_value (Variable var)
+  {
+    if (var.dead ())
+      throw new Error ("attempting to push dead variable");
+    int offset = var.offset;
+    if (offset < 0 || !var.isSimple ())
+      throw new Error ("attempting to store in unassigned variable");
+    Type type = var.type.promote ();
+    int code;
+    instruction_start_hook (4);
+    pop_stack_type ();
+    if (type == Type.int_type)
+      code = 0; // istore??
+    else if (type == Type.long_type)
+      code = 1; // lstore??
+    else if (type == Type.float_type)
+      code = 2; // float??
+    else if (type == Type.double_type)
+      code = 3; // dstore??
+    else
+      code = 4; // astore??
+    if (offset <= 3)
+      put1 (59 + 4 * code + offset);  // [ilfda]store_[0123]
+    else
+      {
+	if (offset >= 256)
+	  {
+	    put1 (196); // wide
+	    put1 (offset >> 8);
+	  }
+	put1 (54 + code);  // [ilfda]store
+	put1 (offset);
+      }
   }
 
   public void compile_push_this ()
@@ -587,9 +698,6 @@ public class Method {
       put1 (176); // arreturn
   }
 
-  //  final void compile_getfield (Field field) {
-  //  }
-
   final Type pop_stack_type () {
     if (SP <= 0)
       throw new Error("pop_stack_type called with empty stack");
@@ -601,6 +709,8 @@ public class Method {
   }
 
   final void push_stack_type (Type type) {
+    if (type == Type.void_type)
+      throw new Error ("pushing void type onto stack");
     if (type.size == 8)
       push_stack_type (Type.void_type);
     if (stack_types == null)
@@ -623,9 +733,6 @@ public class Method {
   public Variable free_temp (Variable temp_var);
 
   public void push_long_const (long i);
-  public void return ();
-  public void pop_to_local (Variable);
-  public void push_local (Variable);
 
   public void if_start ();
   public void if_then ();
@@ -672,7 +779,8 @@ public class Method {
     else
       put1 (183);  // invokenonvirtual
     put2 (CpoolRef.get_const (classfile, method).index);
-    push_stack_type (method.return_type);
+    if (method.return_type != Type.void_type)
+      push_stack_type (method.return_type);
   }
 
   /** Compile a virtual method call.
@@ -705,17 +813,55 @@ public class Method {
     push_stack_type (method.return_type);
   }
 
-  public void compile_getstatic (Field field)
+  private void compile_fieldop (Field field, int opcode)
   {
     instruction_start_hook (3);
-    put1 (178);  // invokevirtual
+    put1 (opcode);
     put2 (CpoolRef.get_const (classfile, field).index);
+  }
+
+  /** Compile code to get a static field value.
+   * Stack:  ... => ..., value */
+
+  public void compile_getstatic (Field field)
+  {
     push_stack_type (field.type);
+    compile_fieldop (field, 178);  // getstatic
+  }
+
+  /** Compile code to get a non-static field value.
+   * Stack:  ..., objectref => ..., value */
+
+  public void compile_getfield (Field field)
+  {
+    pop_stack_type ();
+    push_stack_type (field.type);
+    compile_fieldop (field, 180);  // getfield
+  }
+
+  /** Compile code to put a static field value.
+   * Stack:  ..., value => ... */
+
+  public void compile_putstatic (Field field)
+  {
+    pop_stack_type ();
+    compile_fieldop (field, 179);  // putstatic
+  }
+
+  /** Compile code to put a non-static field value.
+   * Stack:  ..., objectref, value => ... */
+
+  public void compile_putfield (Field field)
+  {
+    pop_stack_type ();
+    pop_stack_type ();
+    compile_fieldop (field, 181);  // putfield
   }
 
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {
+    Variable var;
     boolean have_code = PC > 0;
     short attributes_count = have_code ? (short) 1 : (short) 0;
     dstr.writeShort (access_flags);
@@ -723,16 +869,53 @@ public class Method {
     dstr.writeShort (signature_index);
     dstr.writeShort (attributes_count);
 
-    if (have_code) {
-      dstr.writeShort (classfile.Code_name_index);
-      dstr.writeInt (12 + PC + 8 * exception_table_length);
-      dstr.writeShort (max_stack);
-      dstr.writeShort (max_locals);
-      dstr.writeInt (PC);
-      dstr.write (code, 0, PC);
-      dstr.writeShort (exception_table_length);
-      dstr.writeShort (0);  // attributes_count
-    }
+    if (have_code)
+      {
+	int local_variable_count = 0;
+	VarEnumerator vars = null;
+	if (classfile.emitDebugInfo)
+	  {
+	    vars = parameter_scope.allVars ();
+	    while ((var = vars.nextVar ()) != null)
+	      {
+		if (var.isSimple () && var.name != null)
+		  local_variable_count++;
+	      }
+	  }
+	
+	short code_attributes_count
+	  = local_variable_count > 0 ? (short) 1 : (short) 0;
+	int code_attribute_size = 12 + PC + 8 * exception_table_length;
+	if (local_variable_count > 0)
+	  code_attribute_size += 8 + 10 * local_variable_count;
+	dstr.writeShort (classfile.Code_name_index);
+	dstr.writeInt (code_attribute_size);
+	dstr.writeShort (max_stack);
+	dstr.writeShort (max_locals);
+	dstr.writeInt (PC);
+	dstr.write (code, 0, PC);
+	dstr.writeShort (exception_table_length);
+	dstr.writeShort (code_attributes_count);
+
+	if (local_variable_count > 0)
+	  {
+	    dstr.writeShort (classfile.LocalVariableTable_name_index);
+	    dstr.writeInt (2 + 10 * local_variable_count);
+	    dstr.writeShort (local_variable_count);
+	    
+	    for (vars.reset (); (var = vars.nextVar ()) != null; )
+	      {
+		if (var.isSimple () && var.name != null)
+		  {
+		    dstr.writeShort (var.start_pc);
+		    dstr.writeShort (var.end_pc - var.start_pc);
+		    dstr.writeShort (var.name_index);
+		    dstr.writeShort (var.signature_index);
+		    dstr.writeShort (var.offset);
+		  }
+	      }
+	  }
+      }
   }
 
   private byte[] signature;
@@ -767,6 +950,28 @@ public class Method {
 
     if (PC > 0 && classfile.Code_name_index == 0)
       classfile.Code_name_index = classfile.get_utf8_const ("Code");
+
+    if (classfile.emitDebugInfo)
+      {
+	if (classfile.LocalVariableTable_name_index == 0)
+	  classfile.LocalVariableTable_name_index
+	    = classfile.get_utf8_const ("LocalVariableTable");
+
+	VarEnumerator vars = parameter_scope.allVars ();
+	Variable var;
+	while ((var = vars.nextVar ()) != null)
+	  {
+	    if (var.isSimple () && var.name != null)
+	      {
+		if (var.name_index == 0)
+		  var.name_index = classfile.get_utf8_const (var.name);
+		if (var.signature_index == 0)
+		  var.signature_index
+		    = classfile.get_utf8_const (var.type.signature);
+	      }
+	  }
+	
+      }
 
     if (signature_index == 0)
       signature_index = classfile.get_utf8_const (getSignature ());

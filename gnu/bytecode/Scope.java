@@ -2,14 +2,34 @@ package codegen;
 import java.io.*;
 import codegen.*;
 
-public class Scope {
-  Scope prev;
+public class Scope
+{
+  /** The enclosing scope. */
+  Scope parent;
+  Scope nextSibling;
+  Scope firstChild, lastChild;
+
   int start_pc;
   int end_pc;
   Variable vars;
   Variable last_var;
   //  Variable lookup (String name);
+  public final Variable firstVar () { return vars; }
 
+  public VarEnumerator allVars () { return new VarEnumerator (this); }
+
+  /** Link this scope as the next child of its parent scope. */
+  public void linkChild (Scope parent)
+  {
+    this.parent = parent;
+    if (parent == null)
+      return;
+    if (parent.lastChild == null)
+      parent.firstChild = this;
+    else
+      parent.lastChild.nextSibling = this;
+    parent.lastChild = this;
+  }
 
   Variable new_var (Method method, Type type, byte[] name)
   {
@@ -20,16 +40,21 @@ public class Scope {
     return var;
    }
 
-  public void add_var (Method method, Variable var)
+  public void add_var (Variable var)
   {
-    var.start_pc = method.PC;
     if (last_var == null)
       vars = var;
     else
       last_var.next = var;
     last_var = var;
-    var.offset = method.allocate_local (var);
-//System.err.println ("add_var " + var.strName () + ", offset: " + var.offset);
+  }
+
+  public void add_var (Method method, Variable var)
+  {
+    var.start_pc = method.PC;
+    add_var (var);
+    if (var.isSimple ())
+      method.allocate_local (var);
   }
 
   /**

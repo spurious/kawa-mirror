@@ -97,6 +97,13 @@ class repl
 	    Shell.run(interp);
 	    return;
 	  }
+	else if (args[iArg].equals ("-w"))
+	  {
+	    setArgs (args, iArg);
+	    checkInitFile();
+	    new kawa.GuiConsole(interp);
+	    something_done = true;
+	  }
 	else if (args[iArg].equals ("-d"))
 	  {
 	    iArg++;

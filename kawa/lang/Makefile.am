@@ -36,6 +36,8 @@ ScopeExp.class \
 SetExp.class \
 \
 Declaration.class \
+Location.class \
+Binding.class \
 Environment.class \
 \
 Pattern.class \
@@ -59,6 +61,7 @@ Undefined.class \
 Lambda.class \
 Quote.class \
 Interpreter.class \
+Eval.class \
 Procedure.class \
 Procedure0.class \
 Procedure1.class \

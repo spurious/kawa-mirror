@@ -270,7 +270,7 @@ public abstract class Interpreter
       }
     catch (Exception ex)
       {
-	throw new WrappedException(ex);
+	throw new WrappedException("cannot load "+name, ex);
       }
   }
 

@@ -1568,6 +1568,18 @@ public class XQParser extends LispReader // should be extends Lexer
 			args);
   }
 
+  char matchConstructorKeyword ()
+  {
+    if (curToken == NCNAME_TOKEN)
+      {
+	if (match("element"))  return 'e';
+	if (match("attribute"))  return 'a';
+	if (match("document"))  return 'd';
+	if (match("text"))  return 't';
+      }
+    return '\0';
+  }
+
   /**
    * Try to parse a PrimaryExpr.
    * @return an Expression, or null if no PrimaryExpr was seen.
@@ -1580,6 +1592,7 @@ public class XQParser extends LispReader // should be extends Lexer
     int token = peekOperand();
     Expression exp;
     int c1, c2, c3;
+    char kind;
     if (token == '(')
       {
 	getRawToken();
@@ -1758,6 +1771,58 @@ public class XQParser extends LispReader // should be extends Lexer
 	    exp = parseFLWRExpression(forOrLet > 0);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn - 3);
+	    return exp;
+	  }
+	else if ((kind = matchConstructorKeyword()) != '\0'
+		 && (next == '{' || isNameStart((char) next)))
+	  {
+	    if (next >= 0)
+	      unread();
+	    getRawToken();  // Skip 'element'.
+	    Vector vec = new Vector();
+	    Expression func;
+	    if (kind == 'e' || kind == 'a')
+	      {
+		Expression element
+		  = parseNameSpec(defaultElementNamespace, kind == 'a');
+		if (element == null)
+		  return syntaxError("missing element/attribute name");
+		vec.addElement(element);
+		if (kind == 'e')
+		  func = makeFunctionExp("gnu.xquery.util.MakeElement", "makeElement");
+		else
+		  func = makeFunctionExp("gnu.xquery.util.MakeAttribute", "makeAttribute");
+		getRawToken();
+	      }
+	    else if (kind == 'd')
+	      func = makeFunctionExp("gnu.kawa.xml.DocumentConstructor",
+				     "documentConstructor");
+	    else /* kind == 't' */
+	      func = makeFunctionExp("gnu.kawa.xml.TextConstructor",
+				     "textConstructor");
+	    char saveReadState = pushNesting('{');
+	    peekNonSpace("unexpected end-of-file after '{'");
+	    if (curToken != '{')
+	      return syntaxError("missing '{'");
+	    getRawToken();
+	    if (curToken != '}')
+	      {
+		vec.addElement(parseExpr());
+		while (curToken == ',')
+		  {
+		    getRawToken();
+		    vec.addElement(parseExpr());
+		  }
+	      }
+	    popNesting(saveReadState);
+	    if (curToken != '}')
+	      return syntaxError("missing '}'");
+	    Expression[] args = new Expression[vec.size()];
+	    vec.copyInto(args);
+	    exp = new ApplyExp(func, args);
+	    exp.setFile(getName());
+	    exp.setLine(startLine, startColumn);
+	    getRawToken();
 	    return exp;
 	  }
 	else if (next == '(' && tokenBufferLength == 2

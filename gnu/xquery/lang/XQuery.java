@@ -193,6 +193,7 @@ public class XQuery extends Interpreter
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     define_field("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_field("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
+    define_field("node-name", "gnu.kawa.xml.NodeName", "nodeName");
   }
 
   public static XQuery getInstance()

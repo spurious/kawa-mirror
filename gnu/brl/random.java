@@ -44,6 +44,6 @@ public class random extends Procedure1 {
 		    throw new GenericError ("I/O exception in brl-random: "
 					    + e.toString ());
 		}
-	throw new WrongType (this.getName(), 0, "real");
+	throw new WrongType (this, 1, arg1, "real");
     }
 }

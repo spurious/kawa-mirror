@@ -68,58 +68,66 @@
 (define-syntax primitive-array-new
   (syntax-rules ()
 		((primitive-array-new element-type)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimArrayNew> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-set
   (syntax-rules ()
 		((primitive-array-set element-type)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimArraySet> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-get
   (syntax-rules ()
 		((primitive-array-get element-type)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimArrayGet> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-length
   (syntax-rules ()
 		((primitive-array-length element-type)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimArrayLength> (<gnu.bytecode.Type>))
 		  element-type))))
 
 (define-syntax primitive-get-field
   (syntax-rules ()
 		((primitive-get-field ctype fname ftype)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.GetFieldProc>
-		   (<gnu.bytecode.ClassType> <symbol> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 1 #|PUBLIC|#))))
 (define-syntax primitive-set-field
   (syntax-rules ()
 		((primitive-put-field ctype fname ftype)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.SetFieldProc>
-		   (<gnu.bytecode.ClassType> <symbol> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 1 #|PUBLIC|#))))
 
 (define-syntax primitive-get-static
   (syntax-rules ()
 		((primitive-get-field ctype fname ftype)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimGetStatic>
-		   (<gnu.bytecode.ClassType> <symbol> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 (define-syntax primitive-set-static
   (syntax-rules ()
 		((primitive-put-field ctype fname ftype)
-		 ((primitive-constructor
+		 (constant-fold
+		  (primitive-constructor
 		   <kawa.lang.PrimSetStatic>
-		   (<gnu.bytecode.ClassType> <symbol> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))

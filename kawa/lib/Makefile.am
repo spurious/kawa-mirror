@@ -28,6 +28,7 @@ javadir=$(datadir)/java/$(subdir)
 
 OBJ=\
   std_syntax.class \
+  reflection.class \
   thread.class \
   characters.class \
   files.class \
@@ -39,7 +40,7 @@ OBJ=\
   strings.class \
   syntax.class \
   vectors.class \
-  reflection.class
+  system.class
 
 # These are generated automatically when the $(OBJ) files are built,
 # but they also need to be installed.

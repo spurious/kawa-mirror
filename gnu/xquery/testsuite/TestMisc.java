@@ -156,6 +156,11 @@ public class TestMisc
 	     + " ($a is $a, $a << $b, $b >> $b,"
 	     + "  $a isnot $b, $b, $b0, $b is $b0)",
 	     "true true false true <b /> <b /> false");
+    evalTest("let $a := <a at1='val1'><b/><c/></a>,"
+	     + " $b := $a/b, $c := $a/c return"
+	     + " for $n in distinct-nodes(($c, $a/@at1, $a, $c, $b, $b, $c))"
+	     + " return ('[', $n, ']')",
+	     "[<a at1=\"val1\"><b /><c /></a>][ at1=\"val1\"][<b />][<c />]");
 
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");

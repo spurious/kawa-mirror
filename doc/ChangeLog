@@ -1,3 +1,8 @@
+Sun May 24 12:31:07 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Fix/update some URLs.
+	Update description of record feature.  (A RTD is now a Class.)
+
 Tue Apr 28 21:55:07 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi (port-column, port-line, set-port-line!):  New.

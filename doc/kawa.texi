@@ -67,9 +67,12 @@ is not maintained by me and so may not be as current.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
-has various useful information on Scheme, including a pointer to
-an online copy of
-@uref{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html,R4RS}.
+has various useful information on Scheme.
+It includes a pointer to an online copy of
+@uref{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html,R4RS},
+but has not been updated for a while.
+A new repository has been started at
+@uref{http://www.schemers.org/,www.schemers.org}.
 
 Javadoc generated
 @uref{http://www.cygnus.com/~bothner/kawa/api/packages.html,documentation of the Kawa classes} is now available online.
@@ -80,9 +83,10 @@ see @ref{License}.
 This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
-The two packages @uref{../gnu.bytecode/,@code{gnu.bytecode}}
-and @uref{../gnu.math/,@code{gnu.math}} are used by Kawa,
-and distributed with it, but may be independently useful.
+The two packages
+@uref{http://ww.cygnus.com/~bothner/gnu.bytecode/,@code{gnu.bytecode}}
+and @uref{http://www.cygnus.com/~bothner/gnu.math/,@code{gnu.math}} are used
+by Kawa, and distributed with it, but may be independently useful.
 
 @menu
 * Features::
@@ -712,9 +716,8 @@ Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (-
 @node Records, Files, Logical Number Operations, Extensions
 @section Records
 
-The Record package provides a facility for user to define their own
-record data types.  A record type is implemented as Java Class
-object, and records are extensions of the class @code{Record}.
+The Record package provides a facility for users to define their own
+record data types.  Records are extensions of the class @code{Record}.
 These procedures use the Java 1.1 reflection facility.
 
 @defun make-record-type type-name field-names
@@ -724,10 +727,6 @@ string, but is only used for debugging purposes (such as the printed
 representation of a record of the new type).  The @var{field-names}
 argument is a list of symbols naming the @dfn{fields} of a record of the
 new type.  It is an error if the list contains any duplicates.
-
-In Kawa, returns a newly-created @code{Class} object that extends
-the @code{Record} class.  Each record field is implemented as
-a public Java instance field.
 @end defun
 
 @c @defun make-record-sub-type type-name field-names rtd
@@ -755,10 +754,10 @@ argument defaults to the list of field names in the call to
 if the @var{field-names} argument is provided, it is an error if it
 contains any duplicates or any symbols not in the default list.
 
-In Kawa, @var{rtd} may be any @code{Class} that has a public default
-constructor, as long as the @var{field-names} are public instance
-fields.  (The fields should have type @code{Object} -- unless you
-know what you are doing!)
+@c In Kawa, @var{rtd} may be any @code{Class} that has a public default
+@c constructor, as long as the @var{field-names} are public instance
+@c fields.  (The fields should have type @code{Object} -- unless you
+@c know what you are doing!)
 @end defun
 
 @defun record-predicate rtd
@@ -767,8 +766,8 @@ Returns a procedure for testing membership in the type represented by
 returns a true value if the argument is a member of the indicated record
 type; it returns a false value otherwise.
 
-In Kawa, the returned procedure checks if the argument is an instance
-of @var{rtd} or one of its sub-classes.
+@c In Kawa, the returned procedure checks if the argument is an instance
+@c of @var{rtd} or one of its sub-classes.
 @end defun
 
 @c @defun record-sub-predicate rtd
@@ -786,11 +785,8 @@ accepts exactly one argument which must be a record of the appropriate
 type; it returns the current value of the field named by the symbol
 @var{field-name} in that record.  The symbol @var{field-name} must be a
 member of the list of field-names in the call to @code{make-record-type}
-that created the type represented by @var{rtd}.  (In Kawa,
-the @var{field-name} can be any public non-final Object field
-of the @code{Class} @var{rtd}.)
+that created the type represented by @var{rtd}.
 @end defun
-
 
 @defun record-modifier rtd field-name
 Returns a procedure for writing the value of a particular field of a
@@ -800,25 +796,19 @@ and second, an arbitrary Scheme value; it modifies the field named by
 the symbol @var{field-name} in that record to contain the given value.
 The returned value of the modifier procedure is unspecified.  The symbol
 @var{field-name} must be a member of the list of field-names in the call
-to @code{make-record-type} that created the type represented by
-@var{rtd}.  (In Kawa,
-the @var{field-name} can be any public non-final Object field
-of the @code{Class} @var{rtd}.)
+to @code{make-record-type} that created the type represented by @var{rtd}.
 @end defun
 
 @defun record? obj
 Returns a true value if @var{obj} is a record of any type and a false
 value otherwise.
-
-In Kawa, this is true if @var{obj} is an instance of @code{kawa.lang.Record}.
 @end defun
 
 @defun record-type-descriptor record
 Returns a record-type descriptor representing the type of the given
 record.  That is, for example, if the returned descriptor were passed to
 @code{record-predicate}, the resulting predicate would return a true
-value when passed the given record.  In Kawa, @var{record} may be any object,
-and the value returned is the class of the object.
+value when passed the given record.
 @end defun
 
 @defun record-type-name rtd

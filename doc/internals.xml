@@ -2,7 +2,7 @@
 <!--<!DOCTYPE article PUBLIC "-//Davenport//DTD DocBook V3.0//EN">-->
 <article>
 <artheader>
-<title>Kawa: Compiling Scheme to Java</title>
+<title>Kawa internals: Compiling Scheme to Java</title>
 <authorgroup>
 <author>
 <firstname>Per </firstname><surname>Bothner</surname>
@@ -58,11 +58,13 @@ of JavaScript) is under construction.  Other languages, including
 Emacs Lisp, are also being considered.</para>
 -->
 <para>
-The Kawa home page is
-<literal>http://www.cygnus.com/~bothner/kawa.html</literal>.
+For information on getting and using Kawa, see the
+<ulink url="http://www.gnu.org/software/kawa/">Kawa home page</ulink>.
 </para>
 <para>
-An earlier version of this paper was presented at Usenix in June 1998.
+This document is based on a paper presented November 1998.
+Kawa has seen many changes since then, but alas, this document
+has not kept pace.
 </para>
 <!-- Old abstract:
 Kawa is an implementation of the Scheme programming language
@@ -134,7 +136,7 @@ Emacs Lisp is also planned.</para>
 <para>
 Scheme <citation>R5RS</citation> is a simple yet powerful language.
 It is a non-pure functional
-language (<ForeignPhrase><Abbrev>i.e.</Abbrev></ForeignPhrase> it has
+language (<foreignphrase><abbrev>i.e.</abbrev></foreignphrase> it has
 first-class functions, lexical scoping, non-lazy evaluation, and side
 effects).  It has dynamic typing, and usually has an
 interactive read-evaluate-print interface.  The dynamic
@@ -311,7 +313,7 @@ The Scheme boolean type is one where we use a standard Java type, in
 this case <classname>Boolean</classname> (strictly speaking
 <classname>java.lang.Boolean</classname>).  The
 Scheme constants <literal>#f</literal> and <literal>#t</literal> are
-mapped into static fields (<ForeignPhrase><Abbrev>i.e.</Abbrev></ForeignPhrase>
+mapped into static fields (<foreignphrase><abbrev>i.e.</abbrev></foreignphrase>
 constants) <literal>Boolean.FALSE</literal> and
 <literal>Boolean.TRUE</literal>.</para>
 <para>
@@ -378,7 +380,7 @@ public class <classname>Pair</classname> extends List
 }
 </programlisting>
 <para>
-Used for Scheme pairs, <ForeignPhrase><Abbrev>i.e.</Abbrev></ForeignPhrase>
+Used for Scheme pairs, <foreignphrase><abbrev>i.e.</abbrev></foreignphrase>
 all non-empty lists.</para>
 <programlisting>
 public class <classname>PairWithPosition</classname> extends Pair
@@ -639,7 +641,7 @@ The DSSSL language <citation>DSSSL</citation> is a dialect of Scheme used
 to process SGML documents.  DSSSL has <quote>quantities</quote> in addition
 to real and integer numbers.  Since DSSSL is used to format documents,
 it provides length values that are a multiple of a meter
-(<ForeignPhrase><Abbrev>e.g.</Abbrev></ForeignPhrase> <literal>0.2m</literal>),
+(<foreignphrase><abbrev>e.g.</abbrev></foreignphrase> <literal>0.2m</literal>),
 as well as derived units like <literal>cm</literal> and
 <literal>pt</literal> (point).
 A DSSSL quantity is a product of a dimension-less number with an integral
@@ -883,7 +885,7 @@ If the compiler notices that the class of the procedure
 provides a static method with the right name (<function>apply</function>),
 and the right number of parameters, then it generates a direct call
 to that static method.  This is not inlining
-<ForeignPhrase>per se</ForeignPhrase>, but it does by-pass the
+<foreignphrase>per se</foreignphrase>, but it does by-pass the
 (currently significant) overhead of looking up the name in the global
 symbol-table, casting the value to a procedure, and then making a
 virtual function call.  Also, because the procedure is replaced
@@ -1211,7 +1213,7 @@ The result is one or more Scheme forms (S-expressions), usually lists.
 If reading commands interactively, only a single form is read;
 if reading from a file or string, all the forms are read until
 end-of-file or end-of-string;  in either case, the result is treated as the
-body of a dummy function (<ForeignPhrase><Abbrev>i.e.</Abbrev></ForeignPhrase>
+body of a dummy function (<foreignphrase><abbrev>i.e.</abbrev></foreignphrase>
 a <classname>ModuleBody</classname>).</para>
 </listitem></varlistentry>
 <varlistentry><term>Semantic analysis</term>
@@ -1631,7 +1633,7 @@ and <literal>eq?</literal>.</para>
 <para>
 Finally, <classname>TailTarget</classname> is like a
 <classname>StackTarget</classname>, but in <quote>tail</quote> position.
-(<ForeignPhrase><Abbrev>I.e.</Abbrev></ForeignPhrase> it is the last thing done
+(<foreignphrase><abbrev>I.e.</abbrev></foreignphrase> it is the last thing done
 in a function.)  It is used to do (restricted) tail-recursion-elimination.
 </para>
 -->
@@ -1782,24 +1784,24 @@ for a each (different) <literal>QuoteExp</literal> in the body we are compiling.
 The code compiled for a <literal>QuoteExp</literal> then just needs
 to load the value from the corresponding static field.
 The tricky part is making sure that the static field gets
-initialized (when the top-level class is loaded) to the
-value of the quoted form.</para>
+initialized when the top-level class is loaded to the
+value of the literal.  This is easy when compiling for immediate
+execution: after the compiled class has been loaded and initialized, we use
+reflection to set the field to the literal value.  When compiling
+to a class file, things are harder.</para>
 <para>
 The basic idea is that for:</para>
 <programlisting>
 (define (foo) '(3 . 4))
 </programlisting>
 <para>
-we compile:</para>
+we compile the equivalent of:</para>
 <programlisting>
 class <classname>foo</classname> extends Procedure0
 {
-  Object static lit1;
-  public static
-  { // Initializer
-    lit1 = new Pair(IntNum.make(3),
-                    IntNum.make(4));
-  }
+  Object static lit1
+    = Pair.make(IntNum.make(3),
+                IntNum.make(4));
   public Object apply0()
   { return lit1; }
 }
@@ -1814,54 +1816,121 @@ Procedure fooPr
 Object result = fooPr.apply0 ();
 </programlisting>
 <para>
-How does the Kawa compiler generate the appropriate <literal>new Pair</literal>
-expression as shown above?  A class whose instances may appear
-in a quoted form implements the <literal>Compilable</literal> interface:</para>
-<programlisting>
-interface <classname>Compilable</classname>
-{
-  Literal makeLiteral(Compilation comp);
-  void emit(Literal l, Compilation comp);
-}
-</programlisting>
+How does the Kawa compiler generate the appropriate <literal>Pair.make</literal>
+expression as shown above?  In earlier versions of Kawa, a class whose
+instances could be literals implemented
+the <literal>Compilable</literal> interface.  Then the compiler just called
+the methods in <literal>Compilable</literal>, and these would generate the
+code needed to re-create the literal.
+This had the advantage that the compiler was not limited to a few
+classes of literals it knew about.  One problem is that it caused
+cross-package dependencies, since any class that could be a literal
+has to implement <classname>gnu.expr.Compilable</classname>.
+Another problem was that writing the <classname>Compilable</classname>
+methods required knowing how <literal>gnu.bytecode</literal> works.</para>
 <para>
-The <literal>makeLiteral</literal> creates a <literal>Literal</literal> object
-that represents the value of <literal>this</literal> object.
-That <literal>Literal</literal> is later passed to <literal>emit</literal>, which emits
-bytecode instructions that (when evaluated) cause a value
-equal to <literal>this</literal> to be pushed on the Java evaluation stack.</para>
+The key insight is that saving compile-time literals and then restoring
+them at run-time is a kind of <quote>object persistence</quote>, similar
+to that offered by Java serialization.  One option considered was to
+use standard serialization, but that required some way to store the
+serialized data in a class file.
+The article <ulink
+url="http://java.sun.com/products/jfc/tsc/articles/persistence/">Long-Term
+Persistence for JavaBeans</ulink> suggested an alternative.
+I realized that using <classname>Externalizable</classname> classes provided
+the more abstract serialization we needed.</para>
 <para>
-This two-part protocol may be overkill, but it makes it
-possible to combine duplicate constants and it also
-supports circularly defined constants.  (Standard Scheme does not
-support self-referential constants, but Common Lisp does.
+Let us start with a summary:  An object that can be a literal must implement
+the <classname>java.io.Externalizable</classname> interface.  When the
+compiler need to generate a reference to a literal value, it calls the
+object's <function>writeExternal</function> method.  The
+<function>writeExternal</function> method expects an argument that
+implements the <classname>java.io.ObjectOutput</classname> interface.
+The actual argument is a <classname>LitTable</classname> object owned
+by the compiler.  A <function>writeExternal</function> method
+can call the standard <classname>ObjectOutput</classname> methods, such
+as <function>writeObject</function>, <function>writeInt</function>,
+and so on.  The <classname>LitTable</classname> remembers the
+values that were passed to it in these <function>writeObject</function>,
+<function>writeInt</function>, etc calls, and creates an
+<quote>argument list</quote> from those values.  When the
+<function>writeExternal</function> returns, the <classname>LitTable</classname>
+will take the argument list, and look for a matching constructor in
+the literal's class, using reflection.  It will also look for methods named
+<function>make</function> or <function>set</function>.
+If found, the compiler will generate a call to the matching method.
+Simple values in the argument list will be pushed on the JVM stack directly;
+object references will use values generated using previous
+calls to <function>writeExternal</function>.</para>
+<para>
+Here are more details on how the compiler selects which method
+to invoke to re-create an object.
+If the compiler detects a recursive <function>writeObject</function> call
+with the object as an argument while <function>writeExternal</function>
+is called on the object, then the object cyclically references itself.
+In that case, the compiler must take care to construct the object so
+that the cycle gets reproduced at run-time.
+This is done by first generating a call to the default constructor,
+and saving the result in a static field.  The argument list is evaluated,
+with recursive references using the saved static field.  Then we
+call a method to properly initialize the object using the evaluated
+argument list.  The compiler looks for a method named <function>set</function>
+with a parameter list matching the argument list.  If there is no such
+method, the compiler gives up.  (In the future, we could use JavaBeans
+introspection, or look for a Java2 <classname>ObjectStreamField</classname> to
+determine how to set the properties.)</para>
+<para>
+If an object does not have a cycle, the compiler first looks for a
+matching static method named <function>make</function>.  If it
+does not find one, it looks a matching constructor.  In the latter
+case, the compiler must also check to see if there is
+a zero-argument <function>readResolve</function> method, which Java 2
+serialization uses to replace an object by a canonical object.
+(Kawa does not require Java 2, but <classname>LitTable</classname>
+does respect this Java 2 extension to serialization.)
+As a last resort, the compiler looks for a default constructor
+followed by <function>set</function>, as in the cycle case.</para>
+<para>The <function>writeExternal</function> method of some classes
+may generate a variable number of values.
+Therefore, if a constructor or method takes an array parameter, then
+<classname>LitTable</classname> will consider it as matching the
+argument list if the latter contains an <classname>int</classname>
+(written using <function>writeInt</function>) followed by that
+number of arguments of the component type of the array.
+(One could argue that this feature is an unneeded kludge, since
+there is the alternative that <function>writeExternal</function>
+could just call <function>writeObject</function>
+with a single array argument, instead of calling
+<function>writeObject</function> a variable number of times.
+However, that would expose the internal array into the externalization
+protocol, which is wrong.)</para>
+<para>
+Advantages of this implementation include:
+<itemizedlist>
+<listitem>
+No explicit dependency on any class in the the <literal>gnu.expr</literal>
+package.  All a class needs to be used in literals is to implement
+<classname>Externalizable</classname>, and provide a matching method
+for creating object instances.
+</listitem>
+<listitem>
+No need to write special code to handle literals.
+</listitem>
+<listitem>
+Literals are re-created using efficient code at class initialization time.
+</listitem>
+<listitem>
+Automatically handles cycles and duplicate references.
+(Standard Scheme does not
+support self-referential constants, but for example Common Lisp does.
 See section 25.1.4 <quote>Similarity of Constants</quote> in
-<citation>CommonLisp2</citation>.)</para>
-<para>
-It is possible that the <literal>Compilable</literal> interface will
-be replaced  or augmented with JDK 1.1's serialization feature.</para>
-<para>
-If we are compiling for immediate execution, we do not need
-to generate code to regenerate the literal.  In fact, we want to
-re-use the literal from the original source form.
-The problem is passing the source literal to the byte-compiled class.
-To do that, we use the <classname>CompiledProc</classname> interface.</para>
-<programlisting>
-interface <classname>CompiledProc</classname>
-{
-  public abstract void setLiterals
-    (Object[] values);
-}
-</programlisting>
-<para>
-An immediate class compiled from a top-level form implements
-the <literal>CompiledProc</literal> form.  After an instance of the <literal>ModuleBody</literal>
-has been created, it is coerced to a <literal>CompiledProc</literal>, and
-<literal>setLiterals</literal> is called.  The argument to <literal>setLiterals</literal>
-is an array of the necessary literal values, and the method
-that implements it in the compiled code causes the array of literal
-values to be saved in the <literal>ModuleBody</literal> instance, so it can
-be accessed by the compiled code.</para>
+<citation>CommonLisp2</citation>.)
+</listitem>
+<listitem>
+Only requires standard JDK 1.1 features.
+</listitem>
+</itemizedlist>
+</para>
 </sect2>
 </sect1>
 

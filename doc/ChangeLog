@@ -1,3 +1,16 @@
+2000-06-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Reporting Bugs):  Node renamed to Mailing lists.
+	(Procedures):  New node.  Move "Formals" node here, as well apply
+	and constant-file.  Document procedure properties and make-procedure.
+	(Quantities):  Document define-base-unit. Minor updates.
+	(Modules classes):  Add new Definitions subsection.  Document
+	define-private and define-constant.
+	
+	* internals.xml:  Lower-case all element tags.
+	Change title.  Update URL.
+	Re-write documentation on how literals are compiled.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* doc/kawa.texi (Files compilation):  Document --module-static.

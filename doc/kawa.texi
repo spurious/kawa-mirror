@@ -107,7 +107,7 @@ For a technical overview of Kawa, see these
 * Types::
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
-* Reporting Bugs::       The Kawa Mailing List
+* Mailing lists::        Where to report bugs, discuss changes, etc
 * Projects::             Projects using Kawa
 * License::
 * Index::
@@ -820,7 +820,7 @@ Sorry, Java is needed.</applet>
 * Multiple values::
 * Keywords::
 * Special named constants::
-* Formals:: Extended formal arguments list
+* Procedures::
 * Quantities::
 * Logical Number Operations::
 * Strings::
@@ -890,7 +890,7 @@ The Java @code{null} value.  This is not really a Scheme value,
 but is useful when interfacing to low-level Java code.
 @end defvr
 
-@node Keywords, Formals, Special named constants, Extensions
+@node Keywords, Procedures, Special named constants, Extensions
 @section Keywords
 
 Keywords are similar to symbols.  The main difference is that keywords are
@@ -929,8 +929,95 @@ Returns the keyword whose name is @var{string}.
 (The @var{string} does not include a final @code{#\:}.)
 @end defun
 
-@node Formals, Quantities, Keywords, Extensions
-@section Extended Formal Arguments List
+@node Procedures, Quantities, Keywords, Extensions
+@section Procedures
+
+@defun apply proc [arg1 ...] args
+@var{Args} must be a sequence (list, vector, or string) or a
+primitive Java array.
+(This is an extension over standard Scheme, which requires that
+@var{args} be a list.)
+Calls the @var{proc} (which must be a procedure), using as arguments
+the @var{arg1}... values plus all the elements of @var{args}.
+@end defun
+
+@deffn Syntax constant-fold proc arg1 ...
+Same as @code{(@var{proc} @var{arg1} ...)}, unless @var{proc} and
+all the following arguments are compile-time constants.
+(That is:  They are either constant, or symbols that have a global
+binding and no lexical binding.)  In that case, @var{proc}
+is applied to the arguments at compile-time, and the result replaces
+the @code{constant-fold} form.  If the application raises an exception,
+a compile-time error is reported.
+For example:
+@example
+(constant-fold vector 'a 'b 'c)
+@end example
+is equivalent to @code{(quote #(a b c))}, assuming @code{vector}
+has not been re-bound.
+@end deffn
+
+@subsection Procedure properties
+
+You can associate arbitrary @dfn{properties} with any procedure.
+Each property is a (@var{key}, @var{value})-pair.  Usually the
+@var{key} is a symbol, but it can be any object.
+
+The system uses certain internal properties:
+@code{'name} refers to the name used when a procedure is printed;
+@code{'emacs-interactive} is used to implement Emacs @code{interactive}
+specification;
+@code{'setter} will be (not yet implemented) used to associate a @code{setter} prcedure.
+
+@defun procedure-property proc key [default]
+Get the property value corresponding to the given @var{key}.
+If @var{proc} has no property with the given @var{key},
+return @var{default} (which defaults to @code{#f}) instead.
+@end defun
+
+@defun set-procedure-property! proc key value
+Associate the given @var{value} with the @var{key} property of @var{proc}.
+@end defun
+
+To change the print name of the standard @code{+} procedure (probably
+not a good idea!), you could do:
+@example
+(set-procedure-property! + 'name 'PLUS)
+@end example
+Note this @emph{only} changes the name property used for printing:
+@example
++ => #<procedure PLUS>
+(+ 2 3) => 5
+(PLUS 3 4) => ERROR
+@end example
+
+@subsection Generic (dynamically overloaded) procedures
+
+A @dfn{generic procedure} is a collection of @dfn{method procedures}.
+(A "method procedure" is not the same as a Java method, but
+the terms are related.)
+You can call a generic procedure, which selects the "closest
+match" among the component method procedures:  I.e. the most specific
+method procedure that is applicable give the actual arguments.
+
+@defun make-procededure [keyword: value]... method...
+Create a generic procedure given the specific methods.
+You can also specify property values for the result.
+
+The @var{keyword}s specify how the arguments are used.
+A @code{method:} keyword is optional and specifies that the following
+argument is a method.
+A @code{name:} keyword specifies the name of the resulting procedure,
+when used for printing.
+Unrecognized keywords are used to set the procedure properties of the result.
+@example
+(define plus10 (make-procedure foo: 33 name: 'Plus10
+                            method: (lambda (x y) (+ x y 10))
+                            method: (lambda () 10)))
+@end example
+@end defun
+
+@subsection Extended Formal Arguments List
 
 The formal arguments list of a lambda expression has two
 extendsions over standard Scheme:
@@ -1011,7 +1098,7 @@ is @samp{<} and the last is @samp{>}), then tha specifies the
 functions return type.  It is syntactic sugar for
 @code{(as <TYPE> (begin BODY))}.
 
-@node Quantities, Logical Number Operations, Formals, Extensions
+@node Quantities, Logical Number Operations, Procedures, Extensions
 @section Quantities
 
 As a super-class of numbers, Kawa also provides quantities.
@@ -1025,7 +1112,7 @@ which only has length-derived quantities.
 
 The precise syntax of quantity literals may change,
 but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
-and @code{4cm2} (4 square centimeters).
+and @code{4cm^2} (4 square centimeters).
 
 @defun quantity? object
 True iff @var{object} is a quantity.  Note that all numbers are
@@ -1053,9 +1140,20 @@ You can specify a string instead of @var{unit}, such as @code{"cm"}
 or @code{"s"} (seconds).
 @end defun
 
+@deffn Syntax define-base-unit unit-name dimension
+Define @var{unit-name} as a base (primitive) unit,
+which is used to measure along the specified @var{dimension}.
+@example
+(define-base-unit dollar "Money")
+@end example
+@end deffn
+
 @deffn Syntax define-unit unit-name expression
 Define @var{unit-name} as a unit (that can be used in literals)
 equal to the quantity @var{expression}.
+@example
+(define-unit cent 0.01dollar)
+@end example
 @end deffn
 
 @node Logical Number Operations, Strings, Quantities, Extensions
@@ -2258,31 +2356,6 @@ You can create multiple top-level window that can co-exist.
 They run in separate threads.
 @end defun
 
-@defun apply proc [arg1 ...] args
-@var{Args} must be a sequence (list, vector, or string) or a
-primitive Java array.
-(This is an extension over standard Scheme, which requires that
-@var{args} be a list.)
-Calls the @var{proc} (which must be a procedure), using as arguments
-the @var{arg1}... values plus all the elements of @var{args}.
-@end defun
-
-@deffn Syntax constant-fold proc arg1 ...
-Same as @code{(@var{proc} @var{arg1} ...)}, unless @var{proc} and
-all the following arguments are compile-time constants.
-(That is:  They are either constant, or symbols that have a global
-binding and no lexical binding.)  In that case, @var{proc}
-is applied to the arguments at compile-time, and the result replaces
-the @code{constant-fold} form.  If the application raises an exception,
-a compile-time error is reported.
-For example:
-@example
-(constant-fold vector 'a 'b 'c)
-@end example
-is equivalent to @code{(quote #(a b c))}, assuming @code{vector}
-has not been re-bound.
-@end deffn
-
 @deffn Syntax when condition form...
 If @var{condition} is true, evaluate each @var{form} in order,
 returning the value of the last one.
@@ -2499,6 +2572,10 @@ If @var{type} is not specified, it defaults to @code{<object>}.
 @deffn Syntax letrec ((name [:: type] init) ...) body
 @end deffn
 
+@deffn Syntax define [:: type] value
+@end deffn
+
+See also @code{define-private}, and @code{define-constant}.
 
 @node Objects Classes and Modules, Low-level functions, Types, Top
 @chapter Object, Classes and Modules
@@ -2958,11 +3035,6 @@ Note that it is an error if there is no definition for @var{name}
 in the current module, or if it is defined using @code{define-private}.
 @end deffn
 
-@deffn Syntax define-private name [:: type] value
-@deffnx Syntax define-private (name formals) body
-Same as @code{define}, except that @code{name} is not exported.
-@end deffn
-
 In this module, @code{fact} is public and @code{worker} is private:
 @example
 (module-export fact)
@@ -2975,6 +3047,26 @@ Alternatively, you can write:
 (define-private (worker x) ...)
 (define (fact x) ...)
 @end example
+
+@subsection Definitions
+
+In addition to @code{define} (which can take an optional type specifier),
+Kawa has some extra definition forms.
+
+@deffn Syntax define-private name [:: type] value
+@deffnx Syntax define-private (name formals) body
+Same as @code{define}, except that @code{name} is not exported.
+@end deffn
+
+@deffn Syntax define-constant name [:: type] value
+Definites @var{name} to have the given @var{value}.
+The value is readonly, and you cannot assign to it.
+(This is not fully enforced.)
+If the definition is at module level, then the compiler
+will create a @code{final} field with the given name and type.
+If @var{value} is evaluated as normal; however, if it is a
+compile-time constant, it defaults to being static.
+@end deffn
 
 @subsection How a module becomes a class
 
@@ -3024,6 +3116,10 @@ By default, there is some indirection:  The value of the Scheme variable
 is not that of the field itself.  Instead, the field is a
 @code{gnu.mapping.Binding} object, and the value Scheme variable is
 defined to be the value stored in the @code{Binding}.
+Howewer, if you specify an explicit type, then the field will
+have the specified type, instead of being a @code{Binding}.
+The indirection using @code{Binding} is also avoided if you use
+@code{define-constant}.
 
 If the Scheme definition defines a procedure (which is not re-assigned
 in the module), then the compiler assumes the variable as bound as a
@@ -3145,7 +3241,7 @@ which yields the implementing @code{<@var{classname}>}.
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
-@node Low-level functions, Reporting Bugs, Objects Classes and Modules, Top
+@node Low-level functions, Mailing lists, Objects Classes and Modules, Top
 @chapter The Scheme-Java interface
 
 Kawa has extensive features so you can work with Java objects
@@ -3422,8 +3518,8 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node Reporting Bugs, Projects, Low-level functions, Top
-@chapter Reporting Bugs and the Kawa Mailing List
+@node Mailing lists, Projects, Low-level functions, Top
+@chapter Mailing lists
 
 If you have a problem installing or using Kawa,
 send mail to @code{kawa@@sourceware.cygnus.com}
@@ -3439,12 +3535,15 @@ send mail to the address following @code{mailto:} in the
 Messages to the mailing list are now
 @uref{http://sourceware.cygnus.com/ml/kawa/, archived}.
 
-@node Projects, License, Reporting Bugs, Top
+There is a separate mailing list for @uref{http://www.JEmacs.net,JEmacs}.
+See the @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,information page}.
+
+@node Projects, License, Mailing lists, Top
 @chapter Projects using Kawa
 
 JEmacs is included in the Kawa distribution.  It is a project to
 re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
-It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
+It has its own @uref{http://www.jemacs.net/,home-page}.
 
 BRL ("the Beautiful Report Language") is a database-oriented language
 to embed in HTML and other markup.

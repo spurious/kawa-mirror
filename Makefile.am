@@ -198,17 +198,17 @@ gnu/kawa/util/PreProcess.class: $(srcdir)/gnu/kawa/util/PreProcess.java
 
 select-java1: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(JAVA) gnu.kawa.util.PreProcess -JAVA2 -JAVA5 -JAXP-1.3 \
-	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 1 >$(srcdir)/selected-java-source
 
 select-java2: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 -JAVA5 -JAXP-1.3 \
-	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 2 >$(srcdir)/selected-java-source
 
 select-java5: $(srcdir)/patch-source-list gnu/kawa/util/PreProcess.class
 	$(JAVA) gnu.kawa.util.PreProcess +JAVA2 +JAVA5 +JAXP-1.3 \
-	  `sed -e 's|[^ ]*|$(srcdir)/\0|' < $(srcdir)/patch-source-list`
+	  `sed -e 's|\([^ ]*\)|$(srcdir)/\1|' < $(srcdir)/patch-source-list`
 	echo 5 >$(srcdir)/selected-java-source
 
 distall:  distcheck dist-kawa-@VERSION@.jar kawa-doc-$(VERSION).tar.gz \

@@ -1,3 +1,8 @@
+2005-01-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (select-java1, select-java2, select-java5): Fix sed
+	pattern to work with BSD sed (as on OS X) as well as GNU sed.
+
 2005-01-08  Per Bothner  <per@bothner.com>
 
 	* build.xml (build-tools): Also compile gnu/kawa/util/PreProcess.java.

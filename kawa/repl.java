@@ -92,7 +92,9 @@ public class repl extends Procedure0or1
 
   public static void main(String args[])
   {
-    gnu.text.WriterManager.instance.registerShutdownHook();
+    boolean shutdownRegistered =
+      gnu.text.WriterManager.instance.registerShutdownHook();
+    boolean windowStarted = false;
     try
       {
 	int iArg = 0;
@@ -142,6 +144,7 @@ public class repl extends Procedure0or1
 		try
 		  {
 		    Class.forName("kawa.GuiConsole").newInstance();
+		    windowStarted = true;
 		  }
 		catch (Exception ex)
 		  {
@@ -371,8 +374,11 @@ public class repl extends Procedure0or1
       }
     finally
       {
-	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
-	gnu.mapping.OutPort.runCleanups();
+	if (! shutdownRegistered && ! windowStarted)
+	  {
+	    // Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
+	    gnu.mapping.OutPort.runCleanups();
+	  }
       }
    }
 

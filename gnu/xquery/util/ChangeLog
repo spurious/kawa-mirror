@@ -1,7 +1,7 @@
 2003-07-23  Terje Pedersen  <terje@brassforum.com>
 
 	* StringValue.java (stringLength, substringBefore, substringAfter,
-	translate, stringPad, contains, startsWith, endsWith, strinJoin ):
+	translate, stringPad, contains, startsWith, endsWith, stringJoin):
 	New standard functions.
 
 2003-07-16  Per Bothner  <per@bothner.com>

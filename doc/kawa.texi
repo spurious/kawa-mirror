@@ -131,18 +131,18 @@ Quantities, keyword values, and the expanded @code{lambda} form
 
 The current sources release is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.4.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.5.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.4.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.5.tar.gz}.
 @end ifclear
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.4-compiled.zip">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.5-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.4-compiled.zip}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.5-compiled.zip}.
 @end ifclear
 
 @c A snapshot of the development tree is
@@ -353,11 +353,19 @@ java kawa.repl -e '(display (+ 12 4))(newline)'
 @end example
 Either causes Kawa to print @samp{16}, and then exit.
 
+If there is a file in the user's home directory named @code{.kawarc.scm},
+it is executed on startup.  This is done before the read-eval-print loop
+or before the first @code{-f} or @code{-c} argument.  (It is not run
+for a @code{-e} command, to allow you to set options to override
+the defaults.)
+
 @table @samp
 @item -e @var{expr}
 Kawa evaluates @var{expr}, which contains one or more Scheme expressions.
+Does not cause the @code{~/.kawarc.scm} init file to be run.
 @item -c @var{expr}
-Same as @samp{-e @var{expr}}.
+Same as @samp{-e @var{expr}}, except that it
+does cause the @code{~/.kawarc.scm} init file to be run.
 @item -f @var{filename}
 Kawa reads and evaluates expressions from the file named by @var{filename}.
 If @var{filename} is @samp{-}, standard input is read (with no prompting).
@@ -381,6 +389,10 @@ but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
 The remaining arguments (following any switches processed by Kawa itself)
 are assigned to the global variable @samp{command-line-arguments},
 which is a vector of strings.
+@end defvar
+
+@defvar home-directory
+A string containing the home directory of the user.
 @end defvar
 
 @node Restrictions, Extensions, Running, Top
@@ -422,6 +434,7 @@ nor @code{letrec-syntax} are implemented.
 * Optional and keyword lambda parameters::
 * Logical Number Operations::
 * Records::
+* Files:: File System Interface
 * Ports::
 * Eval and Environments::
 * Quantities::
@@ -639,7 +652,7 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
-@node Records, Ports, Logical Number Operations, Extensions
+@node Records, Files, Logical Number Operations, Extensions
 @subsection Records
 
 The Record package provides a facility for user to define their own
@@ -766,7 +779,46 @@ field-names argument given in the call to @code{make-record-type} that
 created the type represented by @var{rtd}.@refill
 @end defun
 
-@node Ports, Eval and Environments, Records, Extensions
+@node Files, Ports, Records, Extensions
+@subsection File System Interface
+
+@defun file-exists? filename
+Returns true iff the file named @var{filename} actually exists.
+@end defun
+
+@defun file-directory? filename
+Returns true iff the file named @var{filename} actually exists
+and is a directory.
+@end defun
+
+@defun file-readable? filename
+Returns true iff the file named @var{filename} actually exists
+and can be read from.
+@end defun
+
+@defun file-writable? filename
+Returns true iff the file named @var{filename} actually exists
+and can be writen to.
+(Undefined if the @var{filename} does not exist,
+but the file can be created in the directory.)
+@end defun
+
+@defun delete-file filename
+Delete the file named @var{filename}.
+@end defun
+
+@defun rename-file oldname newname
+Renames the file named @var{oldname} to @var{newname}.
+@end defun
+
+@defun create-directory dirname
+Create a new directory named @var{dirname}.
+Unspecified what happens on error (such as exiting file with the same name).
+(Currently returns @code{#f} on error, but may change to be more compatible
+with scsh.)
+@end defun
+
+@node Ports, Eval and Environments, Files, Extensions
 @subsection Ports
 
 @defun call-with-input-string string proc

@@ -450,9 +450,11 @@
         <include name="vectors.scm"/>
         <include name="uniform.scm"/>
         <include name="arrays.scm"/>
-        <include name="system.scm"/>
         <include name="trace.scm"/>
         <include name="windows.scm"/>
+      </fileset>
+      <fileset id="lib-scm-3rd" dir="${src.dir}/kawa/lib">
+        <include name="system.scm"/>
       </fileset>
 
   <target name="check-lib-scm-classes">
@@ -460,6 +462,7 @@
       <mapper type="glob" from="*.scm" to="*.class"/>
       <srcfiles refid="lib-scm-1st"/> 
       <srcfiles refid="lib-scm-2nd"/>
+      <srcfiles refid="lib-scm-3rd"/>
     </uptodate>
   </target>
 
@@ -474,6 +477,7 @@
       <arg line="-P kawa.lib. --module-static -C"/>
       <fileset refid="lib-scm-1st"/>
       <fileset refid="lib-scm-2nd"/>
+      <fileset refid="lib-scm-3rd"/>
     </apply>
   </target>
   

@@ -1,3 +1,7 @@
+2003-06-06  Jim White  <jim@pagesmiths.com>
+
+	* build.xml:  Make system.scm get compiled after vectors.scm.
+
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (distall):  Add more stuff.

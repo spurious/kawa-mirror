@@ -7,10 +7,15 @@ import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
+import java.io.*;
 
-public class DFloNum extends RealNum implements Compilable
+public class DFloNum extends RealNum implements Compilable, Externalizable
 {
   double value;
+
+  public DFloNum ()
+  {
+  }
 
   public DFloNum (double value)
   {
@@ -264,6 +269,20 @@ public class DFloNum extends RealNum implements Compilable
 	makeMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }
+  }
+
+  /**
+   * @serialData Writes the number as a double (using writeDouble).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeDouble(value);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    value = in.readDouble();
   }
 
   public Literal makeLiteral (Compilation comp)

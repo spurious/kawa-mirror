@@ -1,3 +1,12 @@
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* CComplex.java:  Make implement java.io.Externalizable.
+	(writeExternal, readExternal, default constructor):  Added new methods.
+	* DComplex.java:  Likewise.
+	* DFloNum.java:  Likewise.
+	* IntFraction.java:  Likewise.
+	* IntNum.java:  Likewise.  Also add readResolve method.
+
 2000-04-29  Per Bothner  <per@bothner.com>
 
 	* MPN.java (rshift0):  New method, handles zero shift count.

@@ -7,12 +7,13 @@ import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
+import java.io.*;
 
 /** A class for infinite-precision integers.
  * @author Per Bothner
  */
 
-public class IntNum extends RatNum implements Compilable
+public class IntNum extends RatNum implements Compilable, Externalizable
 {
   /** All integers are stored in 2's-complement form.
    * If words == null, the ival is the value of this IntNum.
@@ -1494,4 +1495,62 @@ public class IntNum extends RatNum implements Compilable
     else
       return MPN.intLength (words, ival);
   }
+
+  /**
+   * @serialData If the value is in the range (int)0xC000000 .. 0x7fffffff
+   * (inclusive) write out the value (using writeInt).
+   * Otherwise, write (using writeInt) (0x80000000|nwords), where nwords is
+   * the number of words following.  The words are the minimal
+   * 2's complement big-endian representation of the value, written using
+   * writeint.
+   * (Even if the current value is not canonlicalized, the output is).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int nwords = words == null ? 1 : wordsNeeded(words, ival);
+    if (nwords <= 1)
+      {
+	int i = words == null ? ival : words.length == 0 ? 0 : words[0];
+	if (i >= (int)0xC000000)
+	  out.writeInt(i);
+	else
+	  {
+	    out.writeInt(0x80000001);
+	    out.writeInt(i);
+	  }
+      }
+    else
+      {
+	out.writeInt(0x80000000|nwords);
+	while (--nwords >= 0)
+	  out.writeInt(words[nwords]);
+      }
+    
+  }
+ 
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int i = in.readInt();
+    if (ival <= (int) 0xC0000000)
+      {
+	i &= 0x7fffffff;
+	if (i == 1)
+	  i = in.readInt();
+	else
+	  {
+	    int[] w = new int[i];
+	    for (int j = i;  --j >= 0; )
+	      w[j] = in.readInt();
+	    words = w;
+	  }
+      }
+    ival = i;
+  }
+
+  public IntNum readResolve() throws ObjectStreamException
+  {
+    return canonicalize();
+  }
+
 }

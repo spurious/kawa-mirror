@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.io.*;
 
 /** A complex number using rectangular (Cartesian) plain double values.
  * @author Per Bothner
@@ -10,10 +11,14 @@ package gnu.math;
  * Also see below for copyrights for functions taken from fdlib and f2c.
  */
 
-public class DComplex extends Complex
+public class DComplex extends Complex implements Externalizable
 { 
   double real;
   double imag;
+
+  public DComplex ()
+  {
+  }
 
   public DComplex (double real, double imag)
   {
@@ -354,5 +359,22 @@ public class DComplex extends Complex
 	w *= t1;
       }
     return w;
+  }
+
+  /**
+   * @serialData Writes the real part, followed by the imaginary part.
+   *   Both are written as doubles (using writeDouble).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeDouble(real);
+    out.writeDouble(imag);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    real = in.readDouble();
+    imag = in.readDouble();
   }
 }

@@ -2,15 +2,20 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.io.*;
 
 /** Implementation of exact rational numbers a ratio of two IntNums.
  * @author Per Bothner
  */
 
-public class IntFraction extends RatNum
+public class IntFraction extends RatNum implements Externalizable
 {
   IntNum num;
   IntNum den;
+
+  IntFraction ()
+  {
+  }
 
   IntFraction (IntNum num, IntNum den)
   {
@@ -135,5 +140,25 @@ public class IntFraction extends RatNum
   public String toString (int radix)
   {
     return num.toString (radix) + '/' + den.toString ();
+  }
+
+  /**
+   * @serialData Write the (canonicalized) numerator and denominator IntNums.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(num);
+    out.writeObject(den);
+  }
+
+  /**
+   * @serialData Read the numerator and denominator as IntNums.
+   *   Assumes they have no common factors.
+   */
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    num = (IntNum) in.readObject();
+    den = (IntNum) in.readObject();
   }
 }

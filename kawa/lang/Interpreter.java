@@ -32,10 +32,11 @@ import kawa.lang.NotImplemented;
 
 public class Interpreter extends Object {
 
-   public java.lang.Boolean   trueObject;
-   public java.lang.Boolean   falseObject;
-   public kawa.lang.snull  nullObject;
-   public kawa.lang.Undefined undefinedObject;
+   static public Boolean  trueObject = new Boolean(true);
+   static public Boolean  falseObject = new Boolean(false);
+
+   static public snull  nullObject = new kawa.lang.snull();
+   static public Undefined undefinedObject = new kawa.lang.Undefined();
 
    private final int EOFChar = -1;
    private char buffer[];
@@ -71,10 +72,6 @@ public class Interpreter extends Object {
       bufferLength    = 1024;
       buffer          = new char[bufferLength];
       ibuffer         = new char[bufferLength];
-      trueObject      = new java.lang.Boolean(true);
-      falseObject     = new java.lang.Boolean(false);
-      nullObject      = new kawa.lang.snull();
-      undefinedObject = new kawa.lang.Undefined();
       symbolTable     = new java.util.Hashtable();
       executionFrames = new java.util.Vector();
       globals         = new java.util.Hashtable();

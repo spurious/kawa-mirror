@@ -9,7 +9,7 @@ public abstract class Procedure3 extends Named implements Executable {
       super(n);
    }
 
-   public abstract Object execute3(kawa.lang.Interpreter i,java.util.Vector frames,Object arg1,Object arg2,Object arg3)
+   public abstract Object apply3 (Object arg1, Object arg2, Object arg3)
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType,
              kawa.lang.GenericError,
@@ -33,7 +33,7 @@ public abstract class Procedure3 extends Named implements Executable {
             if (p2.cdr instanceof kawa.lang.pair) {
                kawa.lang.pair p3 = (kawa.lang.pair)p1.cdr;
                if (p3.cdr instanceof kawa.lang.snull) {
-                  return execute3(i,frames,p1.car,p2.car,p3.car);
+                  return apply3 (p1.car, p2.car,p3.car);
                }
             }
          }

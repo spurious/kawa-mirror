@@ -9,7 +9,7 @@ public abstract class Procedure0 extends Named implements Executable {
       super(n);
    }
 
-   public abstract Object execute0(kawa.lang.Interpreter i,java.util.Vector frames)
+   public abstract Object apply0 ()
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType,
              kawa.lang.GenericError,
@@ -26,7 +26,7 @@ public abstract class Procedure0 extends Named implements Executable {
              kawa.lang.UnboundSymbol
    {
       if (list instanceof kawa.lang.snull) {
-         return execute0(i,frames);
+         return apply0 ();
       } 
       throw new kawa.lang.WrongArguments(this.name,0,"(?)");
    }

@@ -9,7 +9,14 @@ public abstract class Procedure2 extends Named implements Executable {
       super(n);
    }
 
-   public abstract Object execute2(kawa.lang.Interpreter i,java.util.Vector frames,Object arg1,Object arg2)
+  /*   public abstract Object execute2(kawa.lang.Interpreter i,java.util.Vector frames,Object arg1,Object arg2)
+      throws kawa.lang.WrongArguments,
+             kawa.lang.WrongType,
+             kawa.lang.GenericError,
+             kawa.lang.UnboundSymbol;
+	     */
+
+   public abstract Object apply2 (Object arg1,Object arg2)
       throws kawa.lang.WrongArguments,
              kawa.lang.WrongType,
              kawa.lang.GenericError,
@@ -31,7 +38,7 @@ public abstract class Procedure2 extends Named implements Executable {
          if (p1.cdr instanceof kawa.lang.pair) {
             kawa.lang.pair p2 = (kawa.lang.pair)p1.cdr;
             if (p2.cdr instanceof kawa.lang.snull) {
-               return execute2(i,frames,p1.car,p2.car);
+               return apply2 (p1.car,p2.car);
             }
          }
       } 

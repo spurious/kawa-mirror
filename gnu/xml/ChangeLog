@@ -1,3 +1,8 @@
+2002-01-13  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (style):  New field.
+	(make): Static method - takes a style parameter.
+
 2002-01-07  Per Bothner  <per@bothner.com>
 
 	* NamedChildrenFilter.java:  New class, extends FilterConsumer.

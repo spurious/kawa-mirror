@@ -14,6 +14,9 @@ public class XMLPrinter implements Consumer, PositionConsumer
   boolean inStartTag = false;
   boolean canonicalize = true;
   boolean htmlCompat = true;
+  boolean escapeText = true;
+  boolean isHtml = false;
+  Object style;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
@@ -22,6 +25,22 @@ public class XMLPrinter implements Consumer, PositionConsumer
   public XMLPrinter (Consumer out)
   {
     this.out = out;
+  }
+
+  public static XMLPrinter make(Consumer out, Object style)
+  {
+    XMLPrinter xout = new XMLPrinter(out);
+    xout.style = style;
+    if ("html".equals(style))
+      {
+	xout.isHtml = true;
+	xout.htmlCompat = true;
+      }
+    if ("xhtml".equals(style))
+      xout.htmlCompat = true;
+    if ("plain".equals(style))
+      xout.escapeText = false;
+    return xout;
   }
 
   protected static final boolean isWordChar(char ch)
@@ -43,7 +62,9 @@ public class XMLPrinter implements Consumer, PositionConsumer
 	  out.writeChar(' ');
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
-    if (v == '<')
+    if (! escapeText)
+      out.writeChar((char) v);
+    else if (v == '<' && ! (isHtml && inAttribute))
       writeRaw("&lt;");
     else if (v == '>')
       writeRaw("&gt;");
@@ -114,6 +135,19 @@ public class XMLPrinter implements Consumer, PositionConsumer
     out.writeChar('<');
     writeRaw(typeName);
     inStartTag = true;
+    if (isHtml
+	&& ("script".equals(typeName) || "style".equals(typeName)))
+      escapeText = false;
+  }
+
+  static final String HtmlEmptyTags
+  = "/area/base/basefont/br/col/frame/hr/img/input/isindex/link/meta/para/";
+
+  public static boolean isHtmlEmptyElementTag(String name)
+  {
+    int index = HtmlEmptyTags.indexOf(name);
+    return index > 0 && HtmlEmptyTags.charAt(index-1) == '/'
+      && HtmlEmptyTags.charAt(index+name.length()) == '/';
   }
 
   public void endGroup(String typeName)
@@ -122,7 +156,9 @@ public class XMLPrinter implements Consumer, PositionConsumer
       closeTag();
     if (inStartTag)
       {
-	writeRaw(htmlCompat ? " />" : "/>");
+	writeRaw(isHtml
+		 ? (isHtmlEmptyElementTag(typeName) ? ">" : "></"+typeName+">")
+		 : (htmlCompat ? " />" : "/>"));
 	inStartTag = false;
       }
     else
@@ -132,6 +168,9 @@ public class XMLPrinter implements Consumer, PositionConsumer
 	writeRaw(">");
       }
     prev = '>';
+    if (isHtml && ! escapeText
+	&& ("script".equals(typeName) || "style".equals(typeName)))
+      escapeText = true;
   }
 
   /** Write a attribute for the current group.

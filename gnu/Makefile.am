@@ -2,11 +2,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS_WITH_SWING = commonlisp jemacs
 SUBDIRS = bytecode math lists text mapping expr $(XML_SUBDIRS) \
-	kawa ecmascript $(SUBDIRS_@SWING_SELECTED@)
+	kawa commonlisp ecmascript $(SWING_SUBDIRS)
 if ENABLE_XML
 XML_SUBDIRS = xml
+endif
+if WITH_SWING
+SWING_SUBDIRS = jemacs
 endif
 EXTRA_DIST = PACKAGES
 

@@ -196,6 +196,15 @@ public class TestMisc
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
 
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof node",
+	     "true true true");
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof text",
+	     "true false true");
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element a",
+	     "false false false");
+    evalTest("for $n in children(<a>xx<b/>yy</a>) return $n instanceof element b",
+	     "false true false");
+
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:4: missing PrimaryExpr");
 

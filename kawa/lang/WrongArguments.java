@@ -1,6 +1,5 @@
 package kawa.lang;
 
-// An undefined symbol was evaled.
 public class WrongArguments extends Exception {
    //-- negative indicates that the right number of arguments was used
    public int number;

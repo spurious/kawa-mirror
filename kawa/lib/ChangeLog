@@ -1,7 +1,9 @@
 2004-12-24  Per Bothner  <per@bothner.com>
 
-	* std_syntax.scm (syntax-object->datum, datum->syntax-object): New.
-	(with-syntax, include): New functions, imported from psyntax.ss.
+	* std_syntax.scm (with-syntax): New syntax, converted from psyntax.ss.
+	(syntax-object->datum, datum->syntax-object): New functions.
+	* files.scm (include): New syntax, imported from psyntax.ss.
+	(include-relative): New syntax.
 
 2004-12-18  Per Bothner  <per@bothner.com>
 

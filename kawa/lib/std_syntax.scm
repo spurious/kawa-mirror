@@ -1,7 +1,7 @@
 ;;; Definitions for some standard syntax.
 
 (module-export cond case and or let let* letrec do delay %make-promise
-	       syntax-object->datum datum->syntax-object with-syntax include)
+	       syntax-object->datum datum->syntax-object with-syntax)
 
 ;;; COND
 
@@ -227,12 +227,10 @@
 	x)))
 
 (define (datum->syntax-object template-identifier obj)
-  (if (instance? template-identifier <kawa.lang.SyntaxForm>)
-      (kawa.lang.SyntaxForm:fromDatumIfNeeded template-identifier obj)
-      obj))<
+  (kawa.lang.SyntaxForm:makeWithTemplate template-identifier obj))
 
-;;; The definitions of with-syntax and include are based on those fromhe
-;;; portable implementation of syntax-case psyntax.ss.
+;;; The definition of include is based on that in the portable implementation
+;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.
 ;;; Copyright (c) 1992-2002 Cadence Research Systems
 ;;; Permission to copy this software, in whole or in part, to use this
 ;;; software for any lawful purpose, and to redistribute this software
@@ -255,19 +253,3 @@
      ((with-syntax ((out in) ...) e1 e2 ...)
       (syntax-case (list in ...) ()
 		   ((out ...) (begin e1 e2 ...))))))
-
-(define-syntax include
-  (lambda (x)
-    (define read-file
-      (lambda (fn k)
-        (let ((p (open-input-file fn)))
-          (let f ()
-            (let ((x (read p)))
-              (if (eof-object? x)
-                  (begin (close-input-port p) '())
-                  (cons (datum->syntax-object k x) (f))))))))
-    (syntax-case x ()
-      ((k filename)
-       (let ((fn (syntax-object->datum (syntax filename))))
-         (with-syntax (((exp ...) (read-file fn (syntax k))))
-           (syntax (begin exp ...))))))))

@@ -75,3 +75,56 @@
       (if (file-exists? fname)
 	  (loop)
 	  fname))))
+
+;;; The definition of include is based on that in the portable implementation
+;;; of syntax-case psyntax.ss, whixh is again based on Chez Scheme.
+;;; Copyright (c) 1992-2002 Cadence Research Systems
+;;; Permission to copy this software, in whole or in part, to use this
+;;; software for any lawful purpose, and to redistribute this software
+;;; is granted subject to the restriction that all copies made of this
+;;; software must include this copyright notice in full.  This software
+;;; is provided AS IS, with NO WARRANTY, EITHER EXPRESS OR IMPLIED,
+;;; INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY
+;;; OR FITNESS FOR ANY PARTICULAR PURPOSE.  IN NO EVENT SHALL THE
+;;; AUTHORS BE LIABLE FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES OF ANY
+;;; NATURE WHATSOEVER.
+(define-syntax include
+  (lambda (x)
+    (define read-file
+      (lambda (fn k)
+        (let ((p (open-input-file fn)))
+          (let f ()
+            (let ((x (read p)))
+              (if (eof-object? x)
+                  (begin (close-input-port p) '())
+                  (cons (datum->syntax-object k x) (f))))))))
+    (syntax-case x ()
+      ((k filename)
+       (let ((fn (syntax-object->datum (syntax filename))))
+         (with-syntax (((exp ...) (read-file fn (syntax k))))
+           (syntax (begin exp ...))))))))
+
+(define-syntax (include-relative x)
+  (syntax-case x ()
+	       ((_ filename)
+		(let ((path-pair (syntax-object->datum (syntax (filename)))))
+		  (list
+		   (datum->syntax-object (syntax filename) 'include)
+		   (datum->syntax-object
+		    (syntax filename)
+		    (make <string>
+		     (gnu.kawa.functions.BaseUri:resolve
+		      (car path-pair)
+		      (gnu.lists.PairWithPosition:getFile path-pair)))))))))
+
+#|
+(define-syntax source-file
+  (lambda (x)
+    (syntax-case x ()
+		 ((_ form)
+		  (let ((form (syntax-object->datum (syntax (form)))))
+		    (if (instance? form <gnu.lists.PairWithPosition>)
+			(list (quote quote)
+			      (datum->syntax-object form (gnu.lists.PairWithPosition:getFile form)))
+			#f))))))
+|#

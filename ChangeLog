@@ -1,3 +1,7 @@
+2004-07-31  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java:  Update copyright year printed by --version.
+
 2004-07-27  Chris Dean  <ctdean@sokitomi.com>
 
 	* kawa/repl.java: Print out compilation options

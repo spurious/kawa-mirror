@@ -1,3 +1,9 @@
+2003-10-16  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (options):  New static field.
+	(currentOptions):  New field.
+	(getBooleanOption):  New helper method,
+	
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* BeginExp.java (canonicalize):  New static method.

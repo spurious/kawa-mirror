@@ -34,6 +34,19 @@ public class Compilation
   /** If true, print out final expressions after optimizations etc. */
   public static boolean debugPrintFinalExpr;
 
+  public static Options options = new Options();
+  public Options currentOptions = new Options(options);
+  static {
+    options.add("warn-undefined-variable", Options.BOOLEAN_OPTION,
+		"emit a warning there is no compiler-visible binding for a variable");
+  }
+
+  /** Get a named boolean option. */
+  public final boolean getBooleanOption (String key)
+  {
+    return currentOptions.getBoolean(key);
+  }
+
   /** The default calling convention.
    * One of the following CALL_WITHG_xxx values. */
   public static int defaultCallConvention;

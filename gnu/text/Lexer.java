@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
-import gnu.math.*;
 import java.io.*;
 
 /**

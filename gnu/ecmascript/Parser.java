@@ -3,7 +3,7 @@ import java.util.Vector;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.Sequence;
+import gnu.lists.Sequence;
 
 public class Parser
 {

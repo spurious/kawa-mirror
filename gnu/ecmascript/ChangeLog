@@ -1,3 +1,7 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* Lexer.java, Parser.java:  Update gnu.kawa.util.Sequence to gnu.lists.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* Lexer.java:  Update import as Char has moved.

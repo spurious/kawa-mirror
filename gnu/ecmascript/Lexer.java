@@ -1,7 +1,7 @@
 package gnu.ecmascript;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.Sequence;
+import gnu.lists.Sequence;
 import gnu.text.Char;
 
 /**

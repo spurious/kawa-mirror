@@ -1,3 +1,20 @@
+Changed the code generation used when --full-tailcalls.  It now is
+closer to that used by default, in that we don't generate a class for
+each non-inlined procedure.  In both cases calling an unknown
+procedure involves executing a switch statement to select a method.
+In addition to generating fewer classes and simplifying one of the
+more fragile parts of Kawa, it is also a step towards how full
+continuations will be implemented.
+
+Changed the convention for name "mangling" - i.e. how Scheme names are
+mapped into Java names.  Now, if a Scheme name is a valid Java name it
+is used as is; otherwise a reversible mangling using "$" characters is
+used.  Thus the Scheme names '< and '$Leq are both mapped into the
+same Java name "$Leq".  However, other names not containing "$" should
+no longer clash, including pairs like "char-letter?" and "charLetter?"
+and "isCharLetter" which used to be all mapped to "isCharLetter".  Now
+only names containing "$" can be ambiguous.
+
 If the compiler can determine that all the operands of (+ ...)  or
 (- ...) are floating-point, then it will generate optimized code using
 Java primitive arithmetic.

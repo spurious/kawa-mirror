@@ -1,3 +1,8 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (setShiftRight):  Avoid undefined shift by 32.
+	Fixes bug found by Hans Boehm Hans <hans_boehm@hp.com> for libgcj.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (add, sub):  New static convenience methods.

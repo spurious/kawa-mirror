@@ -1008,7 +1008,7 @@ public class IntNum extends RatNum implements Externalizable
 	    MPN.rshift0 (words, x.words, word_count, d_len, count);
 	    ival = d_len;
 	    if (neg)
-	      words[d_len-1] |= -1 << (32 - count);
+	      words[d_len-1] |= -2 << (31 - count);
 	  }
       }
   }

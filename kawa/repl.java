@@ -41,29 +41,41 @@ public class repl extends Procedure0or1
     System.exit (-1);
   }
 
+  public static void printOption(PrintStream out, String option, String doc)
+  {
+    out.print(" ");
+    out.print(option);
+
+    int len = option.length() + 1;
+    for (int i = 0; i < 30 - len; ++i)
+      out.print(" ");
+    out.print(" ");
+    out.println(doc);
+  }
+  
   public static void printOptions(PrintStream out)
   {
     out.println("Usage: [java kawa.repl | kawa] [options ...]");
     out.println();
     out.println(" Generic options:");
-    out.println(" --help                    Show help about options");
-    out.println(" --author                  Show author information");
-    out.println(" --version                 Show version information");
+    printOption(out, "--help", "Show help about options");
+    printOption(out, "--author", "Show author information");
+    printOption(out, "--version", "Show version information");
     out.println();
     out.println(" Options");
-    out.println(" -e <expr>                 Evaluate expression <expr>");
-    out.println(" -c <expr>                 Same as -e, but make sure ~/.kawarc.scm is run first");
-    out.println(" -f <filename>             File to interpret");
-    out.println(" -s | --                   Start reading commands interactively from console");
-    out.println(" -w                        Launch the interpreter in a GUI window");
-    out.println(" --server <port>           Start a server accepting telnet connections on <port>");
-    out.println(" --debug-dump-zip          Compiled interactive expressions to a zip archive");
-    out.println(" --debug-print-expr        Print generated internal expressions");
-    out.println(" --debug-print-final-expr  Print expression after any optimizations");
-    out.println(" --[no-]full-tailcalls     (Don't) use full tail-calls");
-    out.println(" -C <filename> ...         Compile named files to Java class files");
-    out.println(" --output-format <format>  Use <format> when printing top-level output");
-    out.println(" --<language>              Select source language, one of:");
+    printOption(out, "-e <expr>", "Evaluate expression <expr>");
+    printOption(out, "-c <expr>", "Same as -e, but make sure ~/.kawarc.scm is run first");
+    printOption(out, "-f <filename>", "File to interpret");
+    printOption(out, "-s| --", "Start reading commands interactively from console");
+    printOption(out, "-w", "Launch the interpreter in a GUI window");
+    printOption(out, "--server <port>", "Start a server accepting telnet connections on <port>");
+    printOption(out, "--debug-dump-zip", "Compiled interactive expressions to a zip archive");
+    printOption(out, "--debug-print-expr", "Print generated internal expressions");
+    printOption(out, "--debug-print-final-expr", "Print expression after any optimizations");
+    printOption(out,"--[no-]full-tailcalls", "(Don't) use full tail-calls");
+    printOption(out, "-C <filename> ...", "Compile named files to Java class files");
+    printOption(out, "--output-format <format>", "Use <format> when printing top-level output");
+    printOption(out,"--<language>", "Select source language, one of:");
     String[][] languages = Interpreter.getLanguages();
     for (int i = 0; i < languages.length; i++)
       {
@@ -78,14 +90,22 @@ public class repl extends Procedure0or1
 	out.println();
       }
     out.println(" Compilation options, must be specified before -C");
-    out.println(" -d <dirname>              Directory to place .class files in");
-    out.println(" -P <prefix>               Prefix to prepand to class names");
-    out.println(" -T <topname>              name to give ot top-level class");
+    printOption(out, "-d <dirname>", "Directory to place .class files in");
+    printOption(out, "-P <prefix>", "Prefix to prepand to class names");
+    printOption(out, "-T <topname>", "name to give to top-level class");
     
-    out.println(" --main                    Generate an application, with a main method");
-    out.println(" --applet                  Generate an applet");
-    out.println(" --servlet                 Generate a servlet");
-    out.println(" --module-static           Top-leval definitions are by default static");
+    printOption(out, "--main", "Generate an application, with a main method");
+    printOption(out, "--applet", "Generate an applet");
+    printOption(out, "--servlet", "Generate a servlet");
+    printOption(out, "--module-static", "Top-leval definitions are by default static");
+
+    Vector keys = Compilation.options.keys();
+    for (int i = 0; i < keys.size(); ++i)
+      {
+        String name = (String) keys.get(i);
+        printOption(out, "--" + name, Compilation.options.getDoc(name));
+      }
+        
     out.println();
     out.println("For more information go to:  http://www.gnu.org/software/kawa/");
   }

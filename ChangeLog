@@ -1,3 +1,7 @@
+2004-07-27  Chris Dean  <ctdean@sokitomi.com>
+
+	* kawa/repl.java: Print out compilation options
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* kawa/GuiConsole.java:  Remove unused import statements.

@@ -29,6 +29,9 @@ public class TestMisc
     evalTest("3<5", "true");
     evalTest("let $x:=3+4 return $x", "7");
     evalTest("let $x:=3+4 return <a>{$x}</a>", "<a>7</a>");
+    // We resolve $request and $response to servlet request/response,
+    // but only when they're not lexially bound.
+    evalTest("let $request:=2, $response:=3 return ($request+$response)", "5");
 
     evalTest("some $x in (1, 2, 3), $y in (2, 3, 4)"
 	     + " satisfies $x + $y = 4",

@@ -46,7 +46,7 @@ CompileFile.java \
 loadcompiled.java \
 SpecialType.java \
 SyntaxForm.java \
-PrimGetStatic.java PrimSetStatic.java InvokeStatic.java \
+PrimGetStatic.java PrimSetStatic.java \
 PrimArrayNew.java PrimArrayLength.java PrimArraySet.java PrimArrayGet.java\
 Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \

@@ -55,4 +55,15 @@ public abstract class Interpreter
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
 
   public abstract gnu.bytecode.Type getTypeFor(Class clas);
+
+  public Object coerceFromObject(Class clas, Object obj)
+  {
+    return getTypeFor(clas).coerceFromObject(obj);
+  }
+
+  public Object coerceToObject(Class clas, Object obj)
+  {
+    return getTypeFor(clas).coerceToObject(obj);
+  }
+
 }

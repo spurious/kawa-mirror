@@ -1,5 +1,10 @@
 Tue Jan 21 18:12:53 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* kawa/standard/{make_polar,angle}.java:  New Procedures.
+	* kawa/standard/Makefile.{am,in}:  Add make_polar and angle.
+	* kawa/standard/Scheme.java:  Liekwise.  Add magnitude as abs synonym.
+	* kawa/standard/{exp,expt,,log,sqrt}.java:  Re-implement.
+
 	* kawa/lang/Pattern.java (match):  Change return type to boolean.
 	* kawa/lang/{AnyPat,EqualPat,ListPat,ListRepeatPat,PairPat,
 	VarListPat}.java (match):  Update return type and value.

@@ -1,4 +1,4 @@
-// Copyright (c) 1996-2000  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -20,8 +20,22 @@ public class Environment extends NameMap
 
   Environment previous;
 
+  boolean locked;
+
   protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
-  protected Constraint unboundConstraint = new UnboundConstraint(this);
+  protected UnboundConstraint unboundConstraint = new UnboundConstraint(this);
+  protected ConstantConstraint constantConstraint;
+
+  /** True if this environment is locked - bindings cannot be added or removed. */
+  public final boolean isLocked()
+  {
+    return locked;
+  }
+
+  public final void setLocked(boolean locked)
+  {
+    this.locked = locked;
+  }
 
   public static Environment user () { return current(); }
 
@@ -48,8 +62,8 @@ public class Environment extends NameMap
   public static void defineFunction (Environment env,
 				     String name, Object new_value)
   {
-    Binding2 binding = Binding2.getBinding2(env, name);
-    binding.functionValue = new_value;
+    Binding binding = env.getBinding(name);
+    binding.constraint.setFunctionValue(binding, new_value);
   }
 
   /** Define name (interned) to have a given value. */
@@ -105,6 +119,19 @@ public class Environment extends NameMap
     Binding binding = lookup(name);
     if (binding != null)
       return binding;
+    /* FIXME
+    int hash = System.identityHashCode(name);
+    int index = Binding.hashSearch(table, log2Size,mask, name, hash);
+    Binding binding = table[index];
+    if (binding != null && binding != Binding.hashDELETED)
+      return binding;
+    if (locked)
+      {
+	if (previous == null)
+	  throw new UnboundSymbol(name);
+	return previous.getBinding(name);
+      }
+    */
     binding = addBinding(name, null);
     binding.constraint = unboundConstraint;
     return binding;
@@ -195,6 +222,9 @@ public class Environment extends NameMap
       {
 	if (env == null)
 	  return null;
+	if (locked)
+	  throw new IllegalStateException("attempt to remove variable: "
+					  + name + " locked environment");
 	Binding[] env_tab = env.table;
 	Named old = Binding.hashDelete(env.table, env.log2Size, name);
 	if (old != null)
@@ -209,7 +239,11 @@ public class Environment extends NameMap
 
   public void remove (Binding binding)
   {
-    Binding.hashDelete(table, log2Size, binding.getName());
+    String name = binding.getName();
+    if (locked)
+      throw new IllegalStateException("attempt to remove variable: "
+				      + name + " locked environment");
+    Binding.hashDelete(table, log2Size, name);
   }
 
   /** Get the value bound to the given name.

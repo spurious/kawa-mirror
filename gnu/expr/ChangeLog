@@ -1,3 +1,21 @@
+2000-04-13  Per Bothner  <per@bothner.com>
+
+	* SetExp (eval, compile):  If define-alias, create an AliasConstraint.
+	* Declaration.java (IS_ALIAS):  New flag.
+	(isAlias, setAlias):  New methods.
+	* ReferenceExp.java (eval, compile, getType):  Handle case when
+	getDontDereference() is true.  (Return Location instead.)
+	
+	* ModuleExp.java (compileToFiles):  If module name is specified,
+	always set topname from module name (even if compound).
+	Set prefix from module name only if prefix is not specified.
+	Use File.mkdirs to create missing output directories.
+
+	* Interpreter.java (coerceToObject(int)):  New method.
+
+	* Compilation.java (mangleName): Change mangling for '!', '->', '%'.
+	(demangle2):  New static method.
+
 2000-03-21  Per Bothner  <per@bothner.com>
 
 	* gnu/expr/Compilation.java (typeRunnable):  New static.

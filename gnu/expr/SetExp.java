@@ -91,7 +91,13 @@ public class SetExp extends Expression
         && ! (binding.isStatic() && ! binding.isPrivate()))
       throw new Error ("internal error - SetExp.eval with lexical binding");
     if (isDefining ())
-      env.define (name, new_val);
+      {
+	if (binding != null && binding.isAlias())
+	  AliasConstraint.define(env.getBinding(name),
+				 (gnu.mapping.Location) new_val);
+	else
+	  env.define (name, new_val);
+      }
     else
       {
 	Binding bind = (getFlag(PREFER_BINDING2)
@@ -164,6 +170,16 @@ public class SetExp extends Expression
       {
 	if (binding.ignorable())
 	  new_value.compile (comp, Target.Ignore);
+	// FIXME combine next two case?  In that case,
+	// where should isDefining() && ! binding.isPublic() be handled?
+	else if (binding.isAlias() && isDefining() && binding.isPublic())
+	  {
+	    binding.load(comp);
+	    new_value.compile (comp, Target.pushObject);
+	    Method meth = ClassType.make("gnu.mapping.AliasConstraint")
+	      .getDeclaredMethod("define", 2);
+	    code.emitInvokeStatic(meth);
+	  }
 	else if (binding.isIndirectBinding()
 		 && (! isDefining() || binding.isPublic()))
 	  {

@@ -73,7 +73,9 @@ public class ReferenceExp extends Expression
     if (binding != null
         && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       throw new Error("internal error: ReferenceExp.eval on lexical binding");
-    if (getFlag(PREFER_BINDING2))
+    if (getDontDereference())
+      return env.getBinding(symbol);
+    else if (getFlag(PREFER_BINDING2))
       {
 	Binding bind = Binding2.getBinding2(env, symbol);
 	return isProcedureName() ? bind.getProcedure() : bind.get();
@@ -110,7 +112,9 @@ public class ReferenceExp extends Expression
 	    lexp.loadHeapFrame(comp);
 	    code.emitGetField(field);
 	  }
-	if (! isProcedureName())
+	if (getDontDereference())
+	  { }
+	else if (! isProcedureName())
 	  code.emitInvokeVirtual(Compilation.getLocationMethod);
 	else //if (! comp.getInterpreter().hasSeparateFunctionNamespace())
 	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
@@ -136,6 +140,7 @@ public class ReferenceExp extends Expression
   public final gnu.bytecode.Type getType()
   {
     return (binding == null || binding.isFluid()) ? Type.pointer_type
+      : getDontDereference() ? Compilation.typeLocation
       : binding.getType();
   }
 

@@ -150,6 +150,7 @@ public class Declaration
   static final int PRIVATE = 32;
   static final int IS_SIMPLE = 64;
   static final int PROCEDURE = 128;
+  static final int IS_ALIAS = 256;
   protected int flags = IS_SIMPLE;
 
   public final void setFlag (boolean setting, int flag)
@@ -167,6 +168,9 @@ public class Declaration
   {
     setFlag(isPrivate, PRIVATE);
   }
+
+  public final boolean isAlias() { return (flags & IS_ALIAS) != 0; }
+  public final void setAlias(boolean flag) { setFlag(flag, IS_ALIAS); }
 
   /** True if this is a fluid binding (in a FluidLetExp). */
   public final boolean isFluid () { return (flags & IS_FLUID) != 0; }

@@ -13,7 +13,9 @@ public class InlineCalls extends ExpWalker
   protected Expression walkApplyExp(ApplyExp exp)
   {
     super.walkApplyExp(exp);
-
+    LambdaExp lambda = null;
+    if (exp.func instanceof LambdaExp)
+      lambda = (LambdaExp) exp.func;
     if (exp.func instanceof QuoteExp)
       {
 	Object proc = ((QuoteExp) exp.func).getValue();
@@ -25,25 +27,35 @@ public class InlineCalls extends ExpWalker
     if (exp.func instanceof ReferenceExp)
       {
         Declaration decl = ((ReferenceExp) exp.func).binding;
-        //    System.err.println("Inline Call "+exp.func+" decl:"+decl);
-        if (decl != null)
-          {
+        if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
+	  {
             Object proc = decl.getValue();
+	    if (proc instanceof LambdaExp) 
+	      lambda = (LambdaExp) proc;
             if (proc instanceof QuoteExp)
               proc = ((QuoteExp) proc).getValue();
-            //            System.err.println("walk apply "+decl+" val:"+proc);
             if (proc instanceof CanInline)
               return ((CanInline) proc).inline(exp);
-            /*
-              if (proc instanceof Procedure)
-              {
-              PrimProcedure mproc
-	      = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
-              if (mproc != null)
-	      return new QuoteExp(mproc);
-              }
-            */
-          }
+            // if (proc instanceof Procedure)
+	    // {
+	    //   PrimProcedure mproc
+	    //    = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
+	    //   if (mproc != null)
+	    //     return new QuoteExp(mproc);
+	    // }
+	  }
+      }
+    if (lambda != null)
+      {
+	int args_length = exp.args.length;
+        String msg = null;
+	if (args_length < lambda.min_args)
+          msg = "too few args for ";
+	else if (lambda.max_args >= 0 && args_length > lambda.max_args)
+          msg = "too many args "+args_length+" for ";
+	// FIXME make error message
+	if (msg != null)
+	  System.err.println("bad call: "+msg+lambda.getName());
       }
     return exp;
   }

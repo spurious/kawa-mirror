@@ -1108,6 +1108,18 @@ this will be fixed in a future release (using Java2 features).
 @node Ports, Format, Files, Extensions
 @section Ports
 
+@defun read-line [port [handle-newline]]
+Reads a line of input from @var{port}.
+The @var{handle-newline} parameter determines what is done with
+terminating end-of-line delimiter.
+The default, @code{'trim}, ignores the delimiter;
+@code{'peek} leaves the delimiter in the input stream;
+@code{'concat} appends the delimiter to the returned value;
+and @code{'split} returns the delimiter as a second value.
+You can use the last three options to tell if the string was
+terminated by end-or-line or by end-of-file.
+@end defun
+
 @defun call-with-input-string string proc
 Create an input port that gets its data from @var{string},
 call @var{proc} with that port as its one argument, and return
@@ -1727,8 +1739,7 @@ call using a procedure that has a @code{setter}.
 Define @var{variable} as an alias for @var{lvalue}.
 In other words, makes it so that @code{(location @var{variable})}
 is equivalent to @code{(location @var{lvalue})}.
-This currently only works at top-level.  (Kawa has the basic support for local
-aliases, but the syntactic support is not implemented yet.)
+This works both top-level and inside a function.
 @end deffn
 
 Some people mind find it helpful to think of a location

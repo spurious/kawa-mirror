@@ -24,7 +24,7 @@ Wed Apr  7 17:40:40 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* FluidBinding.java:  New class.
 	* FluidConstraint.java:  new Constraint class.
-	* Makefile.am (java_JAVA), Makefile.in:  Upadte for new classes.
+	* Makefile.am (java_JAVA), Makefile.in:  Update for new classes.
 	* Future.java (<init>):  Use parent Environment;  don't create new one.
 	(setFluids, resetFluids, getContext):  New methods.
 	* Binding.java (<init>):  New constructor.

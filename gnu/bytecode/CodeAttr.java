@@ -919,6 +919,18 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitFieldop(field, 181);  // putfield
   }
 
+  /** Comptes the number of stack words taken by a list of types. */
+  private int words(Type[] types)
+  {
+    int res = 0;
+    for (int i=types.length; --i >= 0; )
+      if (types[i].size > 4)
+       res+=2;
+      else
+       res++;
+    return res;
+  }
+
   public void emitInvokeMethod (Method method, int opcode)
   {
     reserve(opcode == 185 ? 5 : 3);
@@ -933,7 +945,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     putIndex2(getConstants().addMethodRef(method));
     if (opcode == 185)  // invokeinterface
       {
-	put1(arg_count);
+	put1(words(method.arg_types)+1); // 1 word for 'this'
 	put1(0);
       }
     while (--arg_count >= 0)
@@ -1022,7 +1034,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     setUnreachable();
   }
 
-  //public final void compile_goto_ifeq (Label label, boolean invert)
   public final void emitGotoIfEq (Label label, boolean invert)
   {
     Type type2 = popType().promote();
@@ -1052,7 +1063,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	     && (sig2 == 'L' || sig2 == '['))
       opcode = 165;  // if_acmpeq (inverted: if_acmpne)
     else
-      throw new Error ("non-matching types to compile_goto_ifeq");
+      throw new Error ("non-matching types to emitGotoIfEq");
     if (invert)
       opcode++;
     emitTransfer (label, opcode);
@@ -1400,7 +1411,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
       }
     if (op < 0)
-      throw new Error ("unsupported Method.compile_convert");
+      throw new Error ("unsupported CodeAttr.emitConvert");
     reserve(1);
     popType();
     put1(op);

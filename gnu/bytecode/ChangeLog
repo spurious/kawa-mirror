@@ -1,3 +1,10 @@
+2000-03-02  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+
+	* CodeAttr.java (words):  New private method.
+	(emitInvokeMethod):  Use new words method.
+
+	* CodeAttr.java:  Update two error messages.
+
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	Various tweaks for better javadoc processing.

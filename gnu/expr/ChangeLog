@@ -1,3 +1,8 @@
+2003-05-04  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (lexical):  Make non-final.  Having it final
+	triggers a bug in JDK 1.1.8's javac, and it doesn't need to be final.
+
 2003-04-30  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (rewriteToInvocation):  Make non-static.

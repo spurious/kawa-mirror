@@ -1748,7 +1748,7 @@ public class Compilation
   }
 
   /** Current lexical scope - map name to Declaration. */
-  public final NameLookup lexical;
+  public NameLookup lexical;
 
   protected ScopeExp current_scope;
 

@@ -253,6 +253,9 @@ public abstract class Interpreter
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
           return getTypeFor(decl.getValue());
         String name = rexp.getName();
+	Object val = Environment.current().get(name);
+	if (val instanceof Type)
+	  return (Type) val;
         int len = name.length();
         if (len > 2 && name.charAt(0) == '<'
             && name.charAt(len-1) == '>')

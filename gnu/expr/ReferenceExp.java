@@ -138,7 +138,7 @@ public class ReferenceExp extends Expression
     ps.print(")");
   }
 
-  public final gnu.bytecode.Type getType()
+  public gnu.bytecode.Type getType()
   {
     return (binding == null || binding.isFluid()) ? Type.pointer_type
       : getDontDereference() ? Compilation.typeLocation

@@ -1,3 +1,20 @@
+2001-08-24  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getType0:  Don't call declareParts.
+	(partsDeclared):  New field.
+	(getCompiledClassType):  Call declareParts if not already called.
+	Always mangle name, even if simple, if name is not a valid Java name.
+	* Compilation.java (isValidJavaName):  New static helper method.
+	* Compilation.java (addClass): Emit class initializers even
+	when immediate, to handle define-class.
+	* Declaration.java (makeField):  Use reversible mangling.
+	* Interpreter.java (getTypeFor):  Try looking up type name in
+	current Environment.
+	* ReferenceExp.java (getType):  Make non-final.
+	* ThisExp.java (context):  New field.
+	(<init>):  New constructor.
+	(getType):  New method.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (getCompiledClassType):  Map "<TNAME>" to "TNAME" here.

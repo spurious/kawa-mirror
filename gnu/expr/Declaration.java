@@ -477,7 +477,7 @@ public class Declaration
     String fname = getName();
     if (getFlag(IS_UNKNOWN))
       fname = "id$" + fname;
-    fname = Compilation.mangleName(fname);
+    fname = Compilation.mangleName(fname, true);
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);

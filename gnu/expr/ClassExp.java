@@ -101,7 +101,12 @@ public class ClassExp extends LambdaExp
 
   public ClassType getCompiledClassType(Compilation comp)
   {
-    if (getType().getName() == null)
+    if (! partsDeclared)
+      {
+	getType();
+	declareParts();
+      }
+    if (type.getName() == null)
       {
 	String name = getName();
 	if (name == null)
@@ -115,6 +120,8 @@ public class ClassExp extends LambdaExp
 	  }
 	if (! isSimple() || this instanceof ObjectExp)
 	  name = comp.generateClassName(name);
+	else if (! comp.isValidJavaName(name))
+	  name = comp.mangleName(name, true);
 	type.setName(name);
       }
     return type;
@@ -184,15 +191,17 @@ public class ClassExp extends LambdaExp
   public Type getType()
   {
     if (type == null)
-      {
-	setTypes();
-	declareParts();
-      }
+      setTypes();
     return type;
   }
 
+  boolean partsDeclared;
+
   public void declareParts()
   {
+    if (partsDeclared)
+      return;
+    partsDeclared = true;
     for (Declaration decl = firstDecl();
 	 decl != null;  decl = decl.nextDecl())
       {

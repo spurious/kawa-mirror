@@ -456,6 +456,17 @@ public class Compilation
     return mangleName(name, false);
   }
 
+  public static boolean isValidJavaName(String name)
+  {
+    int len = name.length();
+    if (len == 0 || ! Character.isJavaIdentifierStart(name.charAt(0)))
+      return false;
+    for (int i = len;  --i > 0; )
+      if (! Character.isJavaIdentifierPart(name.charAt(i)))
+	return false;
+    return true;
+  }
+
   /** Convert a string to a safe Java identifier.
    * @param reversible if we shoudl use an invertible mapping. */
   public static String mangleName (String name, boolean reversible)
@@ -1318,7 +1329,7 @@ public class Compilation
     if (Compilation.usingTailCalls && ! staticModule)
       generateConstructor(lexp);
 
-    if (curClass == mainClass && ! immediate
+    if (curClass == mainClass // && ! immediate
 	&& (staticModule || clinitChain != null || literalsChain != null))
       {
 	Method save_method = method;

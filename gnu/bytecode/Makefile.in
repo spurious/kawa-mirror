@@ -53,6 +53,7 @@ ClassType.class \
 CpoolClass.class \
 CpoolEntry.class \
 CpoolInt.class \
+CpoolLong.class \
 CpoolNameAndType.class \
 CpoolRef.class \
 CpoolString.class \

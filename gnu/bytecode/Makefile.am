@@ -18,6 +18,7 @@ ClassType.class \
 CpoolClass.class \
 CpoolEntry.class \
 CpoolInt.class \
+CpoolLong.class \
 CpoolNameAndType.class \
 CpoolRef.class \
 CpoolString.class \
@@ -34,6 +35,8 @@ ZipMember.class \
 ZipLoader.class
 
 java_DATA=$(OBJ)
+
+EXTRA_DIST = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 

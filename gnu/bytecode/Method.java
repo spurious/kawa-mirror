@@ -321,6 +321,30 @@ public class Method {
     push_stack_type (Type.int_type);
   }
 
+  public void compile_push_long (long i)
+  {
+    if (i == 0 || i == 1)
+      {
+	instruction_start_hook (1);
+	put1 (9 + (int) i);  // lconst_0 .. lconst_1
+      }
+    else if ((long) (int) i == i)
+      {
+	compile_push_int ((int) i);
+	instruction_start_hook (1);
+	pop_stack_type ();
+	put1 (133); // i2l
+      }
+    else
+      {
+	instruction_start_hook (3);
+	int j = CpoolLong.get_const (classfile, i).index;
+      	put1 (20); // ldc2w
+	put2 (j);
+      }
+    push_stack_type (Type.long_type);
+  }
+
   public void compile_push_string (byte[] str)
   {
     instruction_start_hook (3);

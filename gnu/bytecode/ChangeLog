@@ -1,3 +1,10 @@
+Thu Sep 12 17:21:20 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* CpoolLong.java:  New class, for CONSTANT_Long.
+	* Method.java (compile_push_long):  New method.
+	* codegen/Makefile.{am,in}:  Add EXTRA_DIST rule.
+	Use $*.java instead of possibly-less-portable $(<F).
+
 Sun Sep  8 22:26:14 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Makefile.{am,in} (JAVAC): Fix -classpath argument.

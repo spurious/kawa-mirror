@@ -96,14 +96,12 @@ Keymap for characters following C-c.")
 
 ;; FSFmacs cmds.c
 
-#|
 (let ((n 33))
   (while (<= n 255)
     (if (not (= n 127))
         (define-key global-map n 'self-insert-command))
     (setq n (1+ n))))
 (define-key global-map " " 'self-insert-command)
-|#
 
 (define-key global-map "\C-a" 'beginning-of-line)
 (define-key global-map "\C-b" 'backward-char-command)
@@ -195,7 +193,8 @@ Keymap for characters following C-c.")
 ;(define-key global-map "\C-xw" 'widen)
 
 ;;;(define-key global-map "\C-j" 'newline-and-indent)
-;;(define-key global-map "\C-m" 'newline)
+(define-key global-map "\C-m" 'newline)
+(define-key global-map 'return 'newline)
 (define-key global-map "\C-o" 'open-line)
 (define-key global-map "\M-\C-o" 'split-line)
 (define-key global-map "\C-q" 'quoted-insert)

@@ -144,6 +144,10 @@ function called interactively."
 |#
 
 (defun newline (&optional arg)
+  (interactive "*P")
+  (insert-char ?\C-j arg))
+#|
+(defun newline (&optional arg)
   "Insert a newline, and move to left margin of the new line if it's blank.
 The newline is marked with the text-property `hard'.
 With arg, insert that many newlines.
@@ -220,6 +224,7 @@ In Auto Fill mode, if no numeric arg, break the preceding line if it's long."
     (if (and (listp sticky) (not (memq 'hard sticky)))
 	(put-text-property from (point) 'rear-nonsticky
 			   (cons 'hard sticky)))))
+|#
 
 (defun open-line (arg)
   "Insert a newline and leave point before it.

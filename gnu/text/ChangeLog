@@ -1,3 +1,9 @@
+2002-06-26  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (skip):  More robust newline handling.
+	The old implementation got line numbers off.
+	(read(char[],int,int)):  Likewise.
+
 2002-06-18  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (reserve):  Fix logic error.

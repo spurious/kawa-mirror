@@ -292,27 +292,51 @@ public class LineBufferedReader extends FilterReader
 
   public int read (char[] cbuf, int off, int len) throws java.io.IOException
   {
-    if (len <= 0)
-      return len;
-    int c;
-    int i = off;
+    // Same logic as in skip(n), when n>0.
+    int ch;
     if (pos >= limit)
+      ch = '\0';
+    else if (pos > 0)
+      ch = buffer[pos-1];
+    else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
+      ch = '\n';
+    else
+      ch = '\0';
+    int to_do = len;
+    while (to_do > 0)
       {
-	c = read();
-	if (c < 0)
-	  return -1;
-	cbuf[i++] = (char) c;
-      }
-    while (--len > 0 && pos < limit)
-      {
-	c = buffer[pos];
-	if (c == '\r' || c == '\n')
-	  c = read();
+	if (ch == '\n' || ch == '\r' || pos >= limit)
+	  {
+	    ch = read();
+	    if (ch < 0)
+	      {
+		len -= to_do;
+		return len <= 0 ? -1 : len;
+	      }
+	    cbuf[off++] = (char) ch;
+	    to_do--;
+	  }
 	else
-	  pos++;
-	cbuf[i++] = (char) c;
+	  {
+	    int p = pos;
+	    int lim = limit;
+	    if (to_do < lim - p)
+	      lim = p + to_do;
+	    while (p < lim)
+	      {
+		ch = buffer[p];
+		// For simplicity and correctness we defer handling of
+		// newlines (including previous character) to read().
+		if (ch == '\n' || ch == '\r')
+		  break;
+		cbuf[off++] = (char) ch;
+		p++;
+	      }
+	    to_do -= p - pos;
+	    pos = p;
+	  }
       }
-    return i - off;
+    return len;
   }
 
   public String getName ()
@@ -493,26 +517,46 @@ public class LineBufferedReader extends FilterReader
       }
     else
       {
+	// Same logic as in read(char[],int,int).
 	int to_do = n;
+	int ch;
+	if (pos >= limit)
+	  ch = '\0';
+	else if (pos > 0)
+	  ch = buffer[pos-1];
+	else if ((flags & PREV_WAS_CR) != 0 || lineStartPos >= 0)
+	  ch = '\n';
+	else
+	  ch = '\0';
 	while (to_do > 0)
 	  {
-	    int ch;
-	    int i = pos;
-	    int count = limit - i;
-	    if (count > to_do)
-	      count = to_do;
-	    while (--count >= 0 
-		   && (ch = buffer[i]) != '\r' && ch != '\n')
-	      i++;
-	    to_do -= i - pos;
-	    if (to_do <= 0)
-	      break;
-	    ch = read();
-	    if (ch < 0)
-	      break;
-	    to_do--;
+	    if (ch == '\n' || ch == '\r' || pos >= limit)
+	      {
+		ch = read();
+		if (ch < 0)
+		  return n - to_do;
+		to_do--;
+	      }
+	    else
+	      {
+		int p = pos;
+		int lim = limit;
+		if (to_do < lim - p)
+		  lim = p + to_do;
+		while (p < lim)
+		  {
+		    ch = buffer[p];
+		    // For simplicity and correctness we defer handling of
+		    // newlines (including previous character) to read().
+		    if (ch == '\n' || ch == '\r')
+		      break;
+		    p++;
+		  }
+		to_do -= p - pos;
+		pos = p;
+	      }
 	  }
-	return n - to_do;
+	return n;
       }
   }
 

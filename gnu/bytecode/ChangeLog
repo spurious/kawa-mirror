@@ -1,3 +1,8 @@
+2002-02-01  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (sourcefile):  Remove unused field.
+	Reported by Daniel Bonniot  <bonniot@users.sourceforge.net>.
+
 2002-01-31  Per Bothner  <per@bothner.com>
 
 	* ClassType.java:  Implement Externalizable.

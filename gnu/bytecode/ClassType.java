@@ -49,8 +49,6 @@ public class ClassType extends ObjectType
 
   public static final ClassType[] noClasses = { };
 
-  String sourcefile;
-
   boolean emitDebugInfo = true;
 
   ConstantPool constants;

@@ -1,3 +1,7 @@
+Mon Jan 19 17:09:38 1998  Per Bothner  <bothner@cygnus.com>
+
+	* num-test.scm:  Add some more regression tests.
+
 Sun Dec 14 17:02:02 1997  Per Bothner  <bothner@cygnus.com>
 
 	* Update for symbol-read-case, defaulting to 'P.

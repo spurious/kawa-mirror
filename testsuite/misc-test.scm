@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 97)
+(test-init "Miscellaneous" 103)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -438,3 +438,14 @@
 ;; Bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.
 (define (fl-f y) (+ 10 y))
 (fluid-let ((fl-x 2)) (fl-f 1))
+
+(test '|10a| 'to-hex-1 (java.lang.Integer:toHexString 266))
+(define (to-hex (x :: <int>)) (java.lang.Integer:toHexString x))
+(test '|10b| to-hex 267)
+(define-namespace Long "class:java.lang.Long")
+(test '|10d| 'to-hex-1 (Long:toHexString 269))
+(define (long-to-hex (x :: <long>)) (Long:toHexString x))
+(test '|10e| long-to-hex 270)
+(test '|123| Long:toString (Long:new '00123))
+(define (to-int-string x) (java.lang.Object:toString (Long:new x)))
+(test '|124| to-int-string '00124)

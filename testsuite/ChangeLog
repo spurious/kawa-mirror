@@ -1,3 +1,7 @@
+2002-11-20  Per Bothner  <bothner@bothner.com>
+
+	* misc-test.scm:  Add new tests for qualfied-symbol method invoke.
+
 2002-11-10  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm: New test from Wen-Chun Ni <wcn@tbcommerce.com>.

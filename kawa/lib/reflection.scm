@@ -32,10 +32,10 @@
 			      <java.lang.Class> ())
     object)))
 
-(define (record-type-name rtd)
+(define (record-type-name (rtd :: <class-type>))
   (symbol->string
-   ((primitive-virtual-method <class-type> "getName" <String> ())
-    rtd)))
+   (invoke-static <kawa.standard.Scheme> 'demangleName
+		  (invoke rtd 'getName))))
 
 (define (record-type-field-names rtd)
   ((primitive-static-method <record> "typeFieldNames"

@@ -58,6 +58,7 @@ class repl
 
   public static void main(String args[])
   {
+    Interpreter interp = new Scheme();
     Environment env = Scheme.makeEnvironment ();
     Environment.define_global("symbol-read-case", "P");
 
@@ -74,7 +75,7 @@ class repl
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
-	    Shell.runString (args[iArg], env);
+	    Shell.runString (args[iArg], interp);
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -92,7 +93,7 @@ class repl
 	    iArg++;
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(env);
+	    Shell.run(interp);
 	    return;
 	  }
 	else if (args[iArg].equals ("-d"))
@@ -154,7 +155,7 @@ class repl
       {
 	setArgs (args, iArg);
 	checkInitFile();
-	Shell.run(env);
+	Shell.run(interp);
       }
    }
 }

@@ -5,33 +5,73 @@ import kawa.standard.*;
 
 import java.io.*;
 
-public class Shell
+public class Shell extends Procedure0
 {
-  public static void run (Environment env)
+  Interpreter interp;
+  InPort in;
+  OutPort out, err;
+
+  public Shell (Interpreter interp, InPort in, OutPort out, OutPort err)
+  {
+    this.interp = interp;
+    this.in = in;
+    this.out = out;
+    this.err = err;
+  }
+
+  public Object apply0 ()
+  {
+    InPort saveIn = InPort.inDefault();
+    OutPort saveOut = OutPort.outDefault();
+    OutPort saveErr = OutPort.errDefault();
+    try
+      {
+	OutPort.setOutDefault(out);
+	OutPort.setErrDefault(err);
+	InPort.setInDefault(in);
+
+	if (in instanceof TtyInPort)
+	  {
+	    Object prompter = interp.environ.get ("default-prompter");
+	    if (prompter != null && prompter instanceof Procedure)
+	      ((TtyInPort)in).setPrompter((Procedure) prompter);
+	  }
+	run(interp, in, out, err);
+	return Scheme.voidObject;
+      }
+    finally
+      {
+	OutPort.setOutDefault(saveOut);
+	OutPort.setErrDefault(saveErr);
+	InPort.setInDefault(saveIn);
+      }
+  }
+
+  public static void run (Interpreter interp)
   {
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Object prompter = env.get ("default-prompter");
+	Object prompter = interp.environ.get ("default-prompter");
 	if (prompter != null && prompter instanceof Procedure)
 	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
       }
 
-    run(env, inp, OutPort.outDefault());
+    run(interp, inp, OutPort.outDefault(), OutPort.errDefault());
   }
 
-  public static void run (Environment env, InPort inp, OutPort pout)
+  public static void run (Interpreter interp,
+			  InPort inp, OutPort pout, OutPort perr)
   {
+    Environment env = interp.environ;
     Translator tr = new Translator (env);
-    OutPort perr = OutPort.errDefault();
     for (;;)
       {
 	try
 	  {
-	    Object sexp = inp.readSchemeObject ();
+	    Object sexp = interp.read(inp);
 	    if (sexp == Sequence.eofValue)
 	      return;
-
 	    tr.errors = 0;
 
 	    String filename = inp.getName ();
@@ -52,24 +92,8 @@ public class Shell
 	    if (tr.errors == 0)
 	      {
 		Object result = mod.eval_module (env);
-		if (pout != null && result != Scheme.voidObject)
-		  {
-		    if (result instanceof Values)
-		      {
-			Object[] results = ((Values) result).values();
-			for (int i = 0;  i < results.length;  i++)
-			  {
-			    SFormat.print (results[i], pout);
-			    pout.println();
-			  }
-		      }
-		    else
-		      {
-			SFormat.print (result, pout);
-			pout.println();
-		      }
-		    pout.flush();
-		  }
+		if (pout != null)
+		  interp.print(result, pout);
 	      }
 	  }
 	catch (kawa.lang.WrongArguments e)
@@ -101,10 +125,10 @@ public class Shell
       }
   }
 
-  public static void runString (String str, Environment env)
+  public static void runString (String str, Interpreter interp)
   {
     InPort str_port = call_with_input_string.open_input_string (str);
-    run (env, str_port, null);
+    run (interp, str_port, null, OutPort.errDefault());
   }
 
   public static void runFile (String fname)

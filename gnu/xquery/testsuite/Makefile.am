@@ -2,10 +2,10 @@ KAWALIB = ../../..
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
-CLEANFILES = tmp? *.log testing.zip *.class
+CLEANFILES = tmp* *.log testing.zip *.class
 
 SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql tab.html \
-  multab.xql expectedmul.xml
+  multab.xql expectedmul.xml descend.xql
 
 all:
 
@@ -29,8 +29,14 @@ multab.class:  multab.xql
 	$(KAWA) --main --xquery -C $<
 
 check-multab:  multab.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) multab >tmp3
-	@if diff -b $(srcdir)/expectedmul.xml tmp3; then echo '# multab test passes'; else echo FAIL multab test; fi
+	CLASSPATH=.:$(KAWALIB) $(JAVA) multab >tmpmul
+	@if diff -b $(srcdir)/expectedmul.xml tmpmul; then echo '# multab test passes'; else echo FAIL multab test; fi
 
-check:  check-test1 check-maketab1 check-multab
+descend.class:  descend.xql
+	$(KAWA) --main --xquery -C $<
 
+check-descend:  descend.class
+	CLASSPATH=.:$(KAWALIB) $(JAVA) descend >tmpdesc
+	@if diff -b $(srcdir)/expdescend.xml tmpdesc; then echo '# descend test passes'; else echo FAIL descend test; fi
+
+check:  check-test1 check-maketab1 check-multab check-descend

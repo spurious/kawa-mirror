@@ -460,6 +460,8 @@ public class require extends Syntax
     if ((fld.getModifiers() & Access.FINAL) != 0
 	&& ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
+    else
+      fdecl.noteValue(null);
     fdecl.setSimple(false);
     fdecl.field = fld;
     //if ((fld.getModifiers() & Access.FINAL) != 0)

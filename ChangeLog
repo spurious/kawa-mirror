@@ -1,3 +1,8 @@
+2005-01-16  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (makeDeclInModule): Clear the value
+	of the imported decl if it isn't constant.
+
 2005-01-12  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (namespaceResolve(String)): Don't look

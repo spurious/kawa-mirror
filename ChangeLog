@@ -1,3 +1,7 @@
+2000-08-31  Emmanuel Castro <castro@lirmm.fr>
+
+	* kawa/standard/require (finf):  Fix typo in error message.
+
 2000-10-13  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Syntax.java:  No longer extend Declaration.

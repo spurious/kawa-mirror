@@ -17,7 +17,7 @@ public class require extends Syntax
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	throw new WrappedException("canot find module "+typeName, ex);
+	throw new WrappedException("cannot find module " + typeName, ex);
       }
   }
 

@@ -1,3 +1,10 @@
+2004-06-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/object.java (throwsKeyword):  New constant.
+	* kawa/lang/Lambda.java (rewrite):  Do pushPositionOf and
+	popPositionOf around each parameter for better error messages.
+	(rewriteAttrs):  Handle throws specification.
+
 2004-05-10  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/object.java (scanClassDef, rewriteClassDef):  Improved

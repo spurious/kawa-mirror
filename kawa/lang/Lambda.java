@@ -167,6 +167,7 @@ public class Lambda extends Syntax implements Printable
 	    mode = pair.car;
 	    continue;
 	  }
+	Object savePos = tr.pushPositionOf(pair);
 	Object name;
 	Object defaultValue = defaultDefault;
 	Pair typeSpecPair = null;
@@ -278,6 +279,7 @@ public class Lambda extends Syntax implements Printable
 	else if (mode == restKeyword)
 	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.
+	tr.popPositionOf(savePos);
       }
     if (bindings instanceof String || bindings instanceof Symbol)
       {
@@ -306,9 +308,9 @@ public class Lambda extends Syntax implements Printable
 	  attrName = null;
 	else if (! (attrName instanceof Keyword))
 	  break;
-	Expression attrExpr = tr.rewrite_car(pair2, false);
 	if (attrName == null)
 	  {
+	    Expression attrExpr = tr.rewrite_car(pair2, false);
 	    gnu.bytecode.Type rtype
 	      = tr.getInterpreter().getTypeFor(attrExpr);
 	    if (rtype != null)
@@ -316,6 +318,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else if (attrName == kawa.standard.object.accessKeyword)
 	  {
+	    Expression attrExpr = tr.rewrite_car(pair2, false);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
 		      || attrValue instanceof FString))
@@ -346,6 +349,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else if (attrName == kawa.standard.object.allocationKeyword)
 	  {
+	    Expression attrExpr = tr.rewrite_car(pair2, false);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
 		      || attrValue instanceof FString))
@@ -368,6 +372,33 @@ public class Lambda extends Syntax implements Printable
 			     + value);
 		  }
 		allocationFlagName = value;
+	      }
+	  }
+	else if (attrName == kawa.standard.object.throwsKeyword)
+	  {
+	    int count = LList.listLength(attrValue, false);
+	    if (count < 0)
+	      tr.error('e', "throws: not followed by a list");
+	    else
+	      {
+		ReferenceExp[] exps = new ReferenceExp[count];
+		for (int i = 0;  i < count; i++)
+		  {
+		    pair2 = (Pair) attrValue;
+		    Expression throwsExpr = tr.rewrite_car(pair2, false);
+		    if (throwsExpr instanceof ReferenceExp)
+		      {
+			exps[i] = (ReferenceExp) throwsExpr;
+		      }
+		    else
+		      {
+			Object savePos = tr.pushPositionOf(pair2);
+			tr.error('e', "throws not followed by a classname");
+			tr.popPositionOf(savePos);
+		      }
+		    attrValue = pair2.cdr; 
+		  }
+		lexp.setExceptions(exps);
 	      }
 	  }
 	else

@@ -10,6 +10,7 @@ public class object extends Syntax
 {
   Lambda lambda;
   public static final Keyword accessKeyword = Keyword.make("access");
+  public static final Keyword throwsKeyword = Keyword.make("throws");
   static final Keyword typeKeyword = Keyword.make("type");
   public static final Keyword allocationKeyword = Keyword.make("allocation");
   static final Keyword initKeyword = Keyword.make("init");

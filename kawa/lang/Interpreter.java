@@ -21,7 +21,20 @@ public abstract class Interpreter
   }
 
 
-  public /* FOR NOW */ Environment environ;
+  protected Environment environ;
+
+  public Environment getEnvironment() { return environ; }
+  public void setEnvironment(Environment environ) { this.environ = environ; }
+
+  public void define(String sym, Object p)
+  {
+    environ.define (sym, p);
+  }
+
+  public Object lookup(String name)
+  {
+    return environ.get (name);
+  }
 
   public abstract Object read (InPort in)
     throws java.io.IOException, kawa.lang.ReadError;

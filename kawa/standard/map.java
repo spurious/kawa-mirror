@@ -1,12 +1,14 @@
 package kawa.standard;
 import gnu.kawa.util.*;
 import gnu.mapping.*;
+import gnu.expr.*;
+import gnu.kawa.functions.IsEq;
 
 /** Implement the Scheme standard functions "map" and "for-each".
  * @author Per Bothner
  */
 
-public class map  extends gnu.mapping.ProcedureN
+public class map  extends gnu.mapping.ProcedureN implements CanInline
 {
   /** True if we should collect the result into a list. */
   boolean collect;
@@ -95,4 +97,81 @@ public class map  extends gnu.mapping.ProcedureN
       }
   }
 
+  public Expression inline (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    if (nargs < 2)
+      return exp;  // ERROR
+
+    if (collect)
+      return exp;  // INLINE NOT IMPLEMENTED;
+    nargs--;
+
+    // First an outer (let ((%proc PROC)) L2), where PROCS is args[0].
+    Expression[] inits1 = new Expression[1];
+    inits1[0] = args[0];
+    LetExp let1 = new LetExp(inits1);
+    Declaration procDecl
+      = let1.addDeclaration("%proc", Compilation.typeProcedure);
+    procDecl.noteValue(args[0]);
+
+    // Then an inner L2=(let ((%loop (lambda (argi ...) ...))) (%loop ...))
+    Expression[] inits2 = new Expression[1];
+    LetExp let2 = new LetExp(inits2);
+    let1.setBody(let2);
+    LambdaExp lexp = new LambdaExp(nargs);
+    inits2[0] = lexp;
+    Declaration loopDecl = let2.addDeclaration("%loop");
+    loopDecl.noteValue(lexp);
+
+    // Finally in anner L3=(let ((parg1 (as <pair> arg1)) ...) ...)
+    Expression[] inits3 = new Expression[nargs];
+    LetExp let3 = new LetExp(inits3);
+
+    QuoteExp empty = new QuoteExp(LList.Empty);
+    Declaration[] largs = new Declaration[nargs];
+    Declaration[] pargs = new Declaration[nargs];
+    IsEq isEq = new IsEq(null, "eq?");
+    for (int i = 0;  i < nargs;  i++)
+      {
+	String argName = "arg"+i;
+	largs[i] = lexp.addDeclaration(argName);
+	pargs[i] = let3.addDeclaration(argName, Compilation.typePair);
+	inits3[i] = new ReferenceExp(largs[i]);
+	pargs[i].noteValue(inits3[i]);
+      }
+    Expression[] doArgs = new Expression[nargs];
+    Expression[] recurseArgs = new Expression[nargs];
+    for (int i = 0;  i < nargs;  i++)
+      {
+	Expression[] carArgs = new Expression[2];
+	Expression[] cdrArgs = new Expression[2];
+	carArgs[0] = new ReferenceExp(pargs[i]);
+	cdrArgs[0] = new ReferenceExp(pargs[i]);
+	carArgs[1] = new QuoteExp("car");
+	cdrArgs[1] = new QuoteExp("cdr");
+	doArgs[i] = new ApplyExp(gnu.kawa.reflect.SlotGet.field, carArgs);
+	recurseArgs[i] = new ApplyExp(gnu.kawa.reflect.SlotGet.field, cdrArgs);
+      }
+    ApplyExp doit = new ApplyExp(new ReferenceExp(procDecl), doArgs);
+    Expression recurse = new ApplyExp(new ReferenceExp(loopDecl), recurseArgs);
+    lexp.body = new BeginExp(doit, recurse);
+    let3.setBody(lexp.body);
+    lexp.body = let3;
+    Expression[] initArgs = new Expression[nargs];
+    for (int i = nargs;  --i >= 0; )
+      {
+	Expression[] compArgs = new Expression[2];
+	compArgs[0] = new ReferenceExp(largs[i]);
+	compArgs[1] = empty;
+	lexp.body = new IfExp(new ApplyExp(isEq, compArgs),
+			      lexp.body, QuoteExp.voidExp);
+	initArgs[i] = args[i+1];
+      }
+
+    let2.setBody(new ApplyExp(new ReferenceExp(loopDecl), initArgs));
+
+    return let1;
+  }
 }

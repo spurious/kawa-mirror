@@ -1,5 +1,10 @@
-Internal change:  If a variable reference is unknwon, create a Declaration
+The for-each procedure is now inlined.
+
+Internal changes:
+* If a variable reference is unknown, create a Declaration
 instance with the IS_UNKNOWN flag to represent an imported binding.
+* The ExpWalker framework for "tree walking" Expressions had a bit of
+reorganization.
 
 Added a hook for constant-folding and other optimization/inlining at
 traversal (ExpWalker) time.  Optimization of + and - procedures to

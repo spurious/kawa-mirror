@@ -1,3 +1,11 @@
+2000-12-11  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (map, forEach):  New fields.
+	(<init>):  Initialize map and forEach fields.
+	(initScheme):  Defie map, for-each using define_field.
+	* kawa/standard/map.java:  Implement CanInline.
+	(inline):  New methods, to implement CanInline.
+	
 2000-12-09  Per Bothner  <per@bothner.com>
 
 	Patch from Matthias Radestock <matthias@lshift.net>:

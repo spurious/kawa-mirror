@@ -207,28 +207,6 @@ New syntax:
 (listener [(EXTRA-INTERFACE ...)]
   ((METHOD-NAME ... EVENT-ARG-NAME [:: EVENT-TYPE]) ...))
 
-IMPROVED ExpWalker INTERFACE
-
-The actual logic for walk an expression in in the Expression sub-class
-itself.  The ExpWalker has a pair of preXXXExp and postXXXExp methods:
-class ExpWalker
-{
-  public Object preLambdaExp (LambdaExp exp) { return preScopeExp(exp); } 
-  public Object postLambdaExp (LambdaExp exp) { return postScopeExp(exp); } 
-  public Object preObjectExp (ObjectExp exp) { return preLambdaExp(exp); } 
-  public Object postObjectExp (ObjectExp exp) { return postLambdaExp(exp); } 
-}
-class ObjectExp
-{
-  public Object walk (ExpWalker walker)
-  {
-    walker.preObjectExp(this);
-    for each method
-      method.walk(walker);
-    walker.postObjectExp(this);
-  }
-}
-
 SYMBOLS
 If we have pre-process environments, (define exit ...) should only re-define
 exit in the current environment, not all.

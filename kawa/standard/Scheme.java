@@ -74,6 +74,8 @@ public class Scheme extends Interpreter
 
   public static gnu.kawa.reflect.InstanceOf instanceOf;
   public static not not;
+  public static kawa.standard.map map;
+  public static kawa.standard.map forEach;
   public static gnu.kawa.functions.IsEq isEq;
   public static gnu.kawa.functions.IsEqv isEqv;
   public static gnu.kawa.functions.IsEqual isEqual;
@@ -346,8 +348,8 @@ public class Scheme extends Interpreter
       //-- Section 6.9  -- complete [except restricted call/cc]
       define_proc ("procedure?", "kawa.lib.misc");
       define_field("apply", "gnu.kawa.functions.Apply", "apply");
-      define_proc (new map (true));        // map
-      define_proc (new map (false));       // for-each
+      define_field("map", "kawa.standard.Scheme", "map");
+      define_field("for-each", "kawa.standard.Scheme", "forEach");
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("call/cc", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
@@ -669,6 +671,8 @@ public class Scheme extends Interpreter
         instance = this;
         instanceOf = new gnu.kawa.reflect.InstanceOf(this, "instance?");
         not = new not(this, "not");
+        map = new map(true);
+	forEach = new map(false);
         isEq = new gnu.kawa.functions.IsEq(this, "eq?");
         isEqv = new gnu.kawa.functions.IsEqv(this, "eqv?");
         isEqual = new gnu.kawa.functions.IsEqual(this, "equal?");

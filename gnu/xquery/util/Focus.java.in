@@ -4,6 +4,8 @@
 
 package gnu.xquery.util;
 import gnu.lists.*;
+import gnu.bytecode.*;
+import gnu.expr.*;
 import gnu.math.IntNum;
 
 public final class Focus extends SeqPosition
@@ -32,8 +34,19 @@ static Focus current = new Focus();
 @endif WITHOUT REFERENCES@
   }
 
-  int position;
+  long position;
   IntNum contextPosition;
   int size;
   IntNum contextSize;
+
+  public static void compileGetCurrent(Compilation comp)
+  {
+    // FIXME This should be optimized so it only done once per method.
+    CodeAttr code = comp.getCode();
+    code.emitInvoke(getCurrentFocusMethod);
+  }
+
+  public static final ClassType TYPE = ClassType.make("gnu.xquery.util.Focus");
+  static final Method getCurrentFocusMethod
+    = TYPE.getDeclaredMethod("getCurrent", 0);
 }

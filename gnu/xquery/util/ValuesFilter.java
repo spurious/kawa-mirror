@@ -42,20 +42,24 @@ public class ValuesFilter extends CpsProcedure
   {
     Object values = ctx.getNextArg();
     Procedure proc = (Procedure) ctx.getNextArg();
-    long count = 0;
     int index = 0;
     Consumer out = ctx.consumer;
+    Focus focus = Focus.getCurrent();
+    long savePosition = focus.position;
+    long position = 0;
     for (;;)
       {
 	int next = Values.nextIndex(values, index);
 	if (next < 0)
 	  break;
 	Object value = Values.nextValue(values, index);
-	count++;
-	if (matches(proc.apply1(value), count))
+	position++;
+	focus.position = position;
+	if (matches(proc.apply1(value), position))
 	  out.writeObject(value);
 	index = next;
       }
+    focus.position = savePosition;
   }
 
   public static final ValuesFilter valuesFilter = new ValuesFilter();

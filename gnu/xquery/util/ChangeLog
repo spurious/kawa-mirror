@@ -1,3 +1,13 @@
+2002-03-07  Per Bothner  <per@bothner.com>
+
+	* MinMax.java:  New class, extends Procedure1.
+	* Position.java:  New class, extends Procedure0.
+	* Makefile.am:  Update accordingly.
+	* Focus.java.in (compileGetCurrent):  New static helper method.
+
+	* Focus.java.in (position):  Change type from int to long.
+	* ValuesFilter.java (apply):  Update current Focus's position field.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* Focus.java.in:  New sed-processed class, extends SeqPosition.

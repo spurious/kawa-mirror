@@ -59,11 +59,10 @@ public class set_b extends Syntax implements Printable
     if (binding instanceof Declaration)
       {
 	Declaration decl = (Declaration) binding;
-	if (tr.isLexical(decl))
-	  {
-	    sexp.binding = decl;
-	    decl.noteValue (value);
-	  }
+	sexp.binding = decl;
+	decl = Declaration.followAliases(decl);
+	if (decl != null)
+	  decl.noteValue (value);
       }
     return sexp;
   }

@@ -24,30 +24,27 @@ public class define extends Syntax implements Printable
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
     Object name = p.car;
-    Pair name_pair = null;
+    Pair namePair = p;
     String sym = null;
+    boolean function = false;
     if (name instanceof String)
       {
 	sym = (String) name;
       }
     else if (name instanceof Pair)
       {
-        name_pair = (Pair) name;
-        if (name_pair.car instanceof String)
-	  sym = (String) name_pair.car;
+        namePair = (Pair) name;
+        if (namePair.car instanceof String)
+	  sym = (String) namePair.car;
+	function = true;
       }
     if (sym != null)
       {
-	Declaration decl = defs.lookup(sym);
-	if (decl == null)
-	  {
-	    decl = new Declaration(sym);
-	    defs.addDeclaration(decl);
-	  }
-	else
-	  tr.error('w', "duplicate declaration for `"+sym+"'");
-	Object declForm = name_pair == null ? (Object) decl
-	  : (Object) tr.makePair(name_pair, decl, name_pair.cdr);
+	Declaration decl = defs.getDefine(sym, 'w', tr);
+	if (makePrivate)
+	  decl.setPrivate(true);
+	Object declForm = (! function) ? (Object) decl
+	  : (Object) tr.makePair(namePair, decl, namePair.cdr);
 	p = tr.makePair(p, declForm, p.cdr);
 	st = tr.makePair(st, this, p);
         if (defs instanceof ModuleExp)
@@ -61,12 +58,7 @@ public class define extends Syntax implements Printable
 		  decl.setCanWrite(true);
               }
           }
-        if (declForm instanceof PairWithPosition)
-          {
-            PairWithPosition declPos = (PairWithPosition) declForm;
-            decl.setFile(declPos.getFile());
-            decl.setLine(declPos.getLine(), declPos.getColumn());
-          }
+	Translator.setLine(decl, namePair);
       }
     forms.addElement (st);
     return true;
@@ -93,10 +85,18 @@ public class define extends Syntax implements Printable
 	  }
 	else if (p1.car instanceof Declaration && p1.cdr instanceof Pair)
 	  {
+	    decl = (Declaration) p1.car;
 	    Pair p2 = (Pair) p1.cdr;
+	    Pair p3;
+	    if ("::" == p2.car && p2.cdr instanceof Pair
+		&& (p3 = (Pair) p2.cdr).cdr instanceof Pair)
+	      {
+		decl.setType(kawa.standard.prim_method.exp2Type(p3.car, tr));
+		decl.setFlag(Declaration.TYPE_SPECIFIED);
+		p2 = (Pair) p3.cdr;
+	      }
 	    if (p2.cdr == LList.Empty)
 	      {
-		decl = (Declaration) p1.car;
                 name = decl.getName();
 		value = tr.rewrite (p2.car);
 	      }
@@ -132,8 +132,6 @@ public class define extends Syntax implements Printable
       return tr.syntaxError ("invalid syntax for "+getName());
     SetExp sexp = new SetExp (name, value);
     sexp.setDefining (true);
-    if (makePrivate)
-      decl.setPrivate(true);
     if (decl != null)
       {
 	sexp.binding = decl;

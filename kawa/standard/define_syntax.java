@@ -9,6 +9,8 @@ public class define_syntax extends Syntax
 {
   static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
   static Method makeMethod = typeMacro.getDeclaredMethod("make", 2);
+  static Method setExpanderMethod
+    = typeMacro.getDeclaredMethod("setExpander", 1);
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
@@ -44,6 +46,17 @@ public class define_syntax extends Syntax
         tr.addGlobal(name, macro);
 
         // Add rule to execution environment.
+	if (tr.immediate)
+	  {
+	    if (! (rule instanceof QuoteExp))
+	      {
+		Expression args[] = new Expression[2];
+		args[0] = new QuoteExp(macro);
+		args[1] = rule;
+		return new ApplyExp(new PrimProcedure(setExpanderMethod), args);
+	      }
+	    return QuoteExp.voidExp;
+	  }
 	if (! (rule instanceof QuoteExp)
 	    || ! (((QuoteExp) rule).getValue() instanceof java.io.Externalizable))
 	  {

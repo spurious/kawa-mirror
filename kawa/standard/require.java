@@ -28,7 +28,7 @@ public class require extends Syntax
 
   public static Object find(Class ctype, Environment env)
   {
-    String mangledName = ctype.getName() + "#instance";
+    String mangledName = ctype.getName() + "$instance";
     Binding binding = env.getBinding(mangledName);
     Object value;
     synchronized (binding)
@@ -158,7 +158,7 @@ public class require extends Syntax
 		fdecl.field = fld;
 		fdecl.noteValue(new QuoteExp(fvalue));
 		fdecl.setPrivate(true);
-		//fdecl.setSimple(false);
+		fdecl.setSimple(false);
 		defs.addDeclaration(fdecl);
 	      }
           }
@@ -178,6 +178,7 @@ public class require extends Syntax
       }
     else
       forms.addElement(QuoteExp.voidExp);
+    tr.mustCompileHere();
     return true;
   }
 

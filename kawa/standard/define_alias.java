@@ -20,11 +20,16 @@ public class define_alias extends Syntax implements Printable
 	    if (p2.cdr == LList.Empty)
 	      {
 		Expression arg = location.rewriteArg(p2.car, tr);
-		Expression loc = location.rewrite(arg, tr);
-		SetExp sexp = new SetExp(name, loc);
+		if (arg instanceof ReferenceExp)
+		  ((ReferenceExp) arg).setDontDereference(true);
+		else
+		  arg = location.rewrite(arg, tr);
+		SetExp sexp = new SetExp(name, arg);
 		sexp.binding = decl;
-		decl.noteValue(loc);
+		decl.noteValue(arg);
 		sexp.setDefining (true);
+		if (! (arg instanceof ReferenceExp))
+		  decl.setType(ClassType.make("gnu.mapping.Location"));
 		return sexp;
 	      }
 	  }
@@ -40,8 +45,7 @@ public class define_alias extends Syntax implements Printable
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
     Object name = p.car;
-    Type typeLocation = ClassType.make("gnu.mapping.Location");
-    Declaration decl = defs.addDeclaration((String) name, typeLocation);
+    Declaration decl = defs.addDeclaration((String) name);
     decl.setIndirectBinding(true);
     decl.setAlias(true);
     st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));

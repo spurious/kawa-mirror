@@ -55,6 +55,7 @@ public class letrec extends Syntax implements Printable
 	else if (binding.cdr instanceof Pair)
 	  {
 	    decl.setType(kawa.standard.prim_method.exp2Type(binding.car, tr));
+	    decl.setFlag(Declaration.TYPE_SPECIFIED);
 	    init = ((Pair) binding.cdr).car;
 	  }
 	else

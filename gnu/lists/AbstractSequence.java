@@ -400,11 +400,11 @@ public abstract class AbstractSequence
   }
 
   /**
-   * Get the offset from the beginning corresponding to a position pair.
+   * Get the offset from the beginning corresponding to a position cookie.
    */
   protected int nextIndex(int ipos)
   {
-    throw unsupported("nextIndex");
+    return getIndexDifference(ipos, startPos());
   }
 
   protected int fromEndIndex(int ipos)

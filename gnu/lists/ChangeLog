@@ -1,3 +1,8 @@
+2003-09-09  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (nextIndex):  Use getIndexDifference.
+	* TreeList.java (getIndexDifference):  New method.
+
 2003-09-04  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (dump):  Print attribute type as well as name.

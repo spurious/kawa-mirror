@@ -1816,7 +1816,7 @@ implements Consumer, PositionConsumer, Consumable
       case DOUBLE_FOLLOWS:
 	return pos + 4;
       default:
-	throw new Error("unknown code:"+(int) datum);
+	throw new Error("unknown code:"+Integer.toHexString((int) datum));
       }
   }
 
@@ -1857,6 +1857,25 @@ implements Consumer, PositionConsumer, Consumable
     int i1 = posToDataIndex(ipos1);
     int i2 = posToDataIndex(ipos2);
     return i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
+  }
+
+  protected int getIndexDifference(int ipos1, int ipos0)
+  {
+    int i0 = posToDataIndex(ipos0);
+    int i1 = posToDataIndex(ipos1);
+    boolean negate = false;
+    if (i0 > i1)
+      {
+	negate = true;
+	int i = i1;  i1 = i0;  i0 = i;
+      }
+    int i = 0;
+    while (i0 < i1)
+      {
+	i0 = nextDataIndex(i0);
+	i++;
+      }
+    return negate ? -i : i;
   }
 
   public int hashCode()

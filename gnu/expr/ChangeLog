@@ -1,5 +1,7 @@
 2002-12-16  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (compileTarget):  Better handling of Values.
+
 	* Interpreter.java (eval(String,PrintConsumer)):  New method overload.
 
 2002-11-23  Per Bothner  <per@bothner.com>

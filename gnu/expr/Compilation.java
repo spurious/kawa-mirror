@@ -352,11 +352,14 @@ public class Compilation
   {
     if (target instanceof IgnoreTarget)
       return;
-    if (target instanceof ConsumerTarget)
+    if (value instanceof Values
+	&& (target instanceof ConsumerTarget
+	    || target instanceof SeriesTarget))
       {
-	if (value == Values.empty)
-	  return;
-	// else FIXME
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  compileConstant(values[i], target);
+	return;
       }
     if (target instanceof ConditionalTarget)
       {

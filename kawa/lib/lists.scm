@@ -50,3 +50,53 @@
 ;; Not in R5RS, but is in Guile (with extra mystery argument).
 (define (reverse! (list :: <list>)) :: <list>
   (invoke-static <list> 'reverseInPlace list))
+
+(define (memq x list)
+  (let lp ((lst list))
+    (and (instance? lst <pair>)
+	 (if (eq? x ((primitive-get-field <pair> 'car <Object>) lst)) lst
+	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+
+(define (memv x list)
+  (let lp ((lst list))
+    (and (instance? lst <pair>)
+	 (if (eqv? x ((primitive-get-field <pair> 'car <Object>) lst)) lst
+	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+
+;;;  The optional test argument is an srfi-1 extension.
+(define (member x list #!optional (test :: <procedure> equal?))
+  (let lp ((lst list))
+    (and (instance? lst <pair>)
+	 (if (test x ((primitive-get-field <pair> 'car <Object>) lst)) lst
+	     (lp ((primitive-get-field <pair> 'cdr <Object>) lst))))))
+
+(define (assq x list)
+  (let lp ((list list))
+    (if (eq? list '())
+	 #f
+	(let ((pair :: <pair>
+		    ((primitive-get-field <pair> 'car <Object>) list)))
+	  (if (eq? ((primitive-get-field <pair> 'car <Object>) pair) x)
+	      pair
+	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))
+
+(define (assv x list)
+  (let lp ((list list))
+    (if (eq? list '())
+	 #f
+	(let ((pair :: <pair>
+		    ((primitive-get-field <pair> 'car <Object>) list)))
+	  (if (eqv? ((primitive-get-field <pair> 'car <Object>) pair) x)
+	      pair
+	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))
+
+;;;  The optional test argument is an srfi-1 extension.
+(define (assoc x list #!optional (test :: <procedure> equal?))
+  (let lp ((list list))
+    (if (eq? list '())
+	 #f
+	(let ((pair :: <pair>
+		    ((primitive-get-field <pair> 'car <Object>) list)))
+	  (if (test ((primitive-get-field <pair> 'car <Object>) pair) x)
+	      pair
+	      (lp ((primitive-get-field <pair> 'cdr <Object>) list)))))))

@@ -1,3 +1,11 @@
+2002-03-21  Per Bothner  <per@bothner.com>
+
+	* lists.scm (memq, memv, member, assq, assv, assoc): New procedures.
+
+	* syntax.scm (cond-expand):  New syntax, from srfi-0.
+
+	* syntax.scm (receive):  New syntax, from srfi-8.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* ports.scm (current-input-port):  New procedure.

@@ -556,6 +556,14 @@ public class Translator extends Compilation
 		    return aexp;
 		  }
 	      }
+	    else
+	      {
+		String name = ref.getName();
+		int nlen = name.length();
+		if (nlen > 2 && name.charAt(0) == '<'
+		    && name.charAt(nlen-1) == '>')
+		  dval = new QuoteExp("class:" + name.substring(1, nlen-1));
+	      }
 	  }
 
 	if (dval instanceof QuoteExp)

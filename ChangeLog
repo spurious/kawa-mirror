@@ -1,3 +1,8 @@
+2005-01-31  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (namespaceResolve): Treat unbound
+	identifier <name> as equivalent to "class:name".
+
 2005-01-30  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (compile_to_files): Don't generate

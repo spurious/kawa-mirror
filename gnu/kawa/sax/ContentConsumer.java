@@ -101,18 +101,6 @@ public class ContentConsumer implements Consumer, Attributes
     return i < 0 ? null : attributes[4 * i + 3];
   }
 
-  /*
-  public String getValue(String name)
-  {
-    for (int i = numAttributes;  --i >= 0; )
-      {
-	if (attributes[2 * i].equals(name))
-	  return attributes[2 * i + 1];
-      }
-    return null;
-  }
-  */
-
   void endStartTag()
   {
     if (inStartTag != 1)
@@ -127,7 +115,7 @@ public class ContentConsumer implements Consumer, Attributes
 	error("startElement", ex);
       }
     // Is this desirable, for the sake of GC?
-    for (i = 2 * numAttributes;  --i >= 0; )
+    for (i = 4 * numAttributes;  --i >= 0; )
       attributes[i] = null;
     numAttributes = 0;
     inStartTag = 0;
@@ -157,21 +145,25 @@ public class ContentConsumer implements Consumer, Attributes
 
   public void beginAttribute(String attrName, Object attrType)
   {
-    int i = 2 * numAttributes;
+    int i = 4 * numAttributes;
     if (i >= attributes.length)
       {
 	String[] tmp = new String[2 * i];
 	System.arraycopy(attributes, 0, tmp, 0, i);
 	attributes = tmp;
       }
+    String namespaceURI = ((Symbol) attrType).getNamespaceURI();
+    String localName = ((Symbol) attrType).getLocalName();
     attributes[i] = attrName;
+    attributes[i+1] = namespaceURI;
+    attributes[i+2] = localName;
     numAttributes++;
     inStartTag = 2;
   }
 
   public void endAttribute()
   {
-    attributes[2 * numAttributes + 1] = strBuffer.toString();
+    attributes[4 * numAttributes - 1] = strBuffer.toString();
     strBuffer.setLength(0);
     inStartTag = 1;
   }

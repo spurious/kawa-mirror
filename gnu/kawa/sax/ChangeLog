@@ -1,3 +1,8 @@
+2003-06-05  Per Bothner  <per@bothner.com>
+
+	* ContentConsumer.java:  Fix some small bugs.
+	(beginAttribute):  Grab localname and uri.
+
 2003-05-31  Per Bothner  <per@bothner.com>
 
 	* ContentConsumer.java (endGroup):  Remove incorrect/redundant test.

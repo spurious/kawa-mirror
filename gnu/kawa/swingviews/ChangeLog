@@ -1,3 +1,7 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* package.html: New file, for javadoc.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* SwingFrame.java (add): Renamed to addComponent and made public.

@@ -82,44 +82,7 @@ public class require extends Syntax
 
   public static Object find(String typeName)
   {
-    try
-      {
-	return find(Class.forName(typeName), Environment.getCurrent());
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-	throw new WrappedException("cannot find module " + typeName, ex);
-      }
-  }
-
-  public static Object find(ClassType type, Environment env)
-  {
-    return find(type.getReflectClass(), env);
-  }
-
-  public static Object find(Class ctype, Environment env)
-  {
-    String mangledName = (ctype.getName() + "$instance").intern();
-    Symbol symbol = env.getSymbol(mangledName);
-    Location loc = env.getLocation(symbol);
-    Object value;
-    synchronized (loc)
-      {
-	if (loc.isBound())
-	  return loc.get();
-	try
-	  {
-	    value = ctype.newInstance();
-	    loc.set(value);
-	    if (value instanceof Runnable)
-	      ((Runnable) value).run();
-	  }
-        catch (Exception ex)
-          {
-            throw new WrappedException(ex);
-          }
-      }
-    return value;
+    return ModuleInfo.find(typeName).getRunInstance();
   }
 
   public boolean scanForDefinitions (Pair st, Vector forms,
@@ -184,6 +147,7 @@ public class require extends Syntax
     boolean isRunnable = t.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
+    ModuleInfo info = ModuleInfo.find(tname);
     Expression[] args = { new QuoteExp(tname) };
     Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
     dofind.setLine(tr);
@@ -207,7 +171,7 @@ public class require extends Syntax
 	    boolean isStatic = (flags & Access.STATIC) != 0;
             if (! isStatic && instance == null)
               {
-                instance = find((ClassType) type, Environment.getCurrent());
+                instance = info.getInstance();
 		String iname = tname.replace('.', '$') + "$instance";
 		decl = new Declaration(iname, type);
 		decl.setPrivate(true);
@@ -384,12 +348,10 @@ public class require extends Syntax
       {
 	if (immediate)
 	  {
-	    if (instance == null)
-	      instance = find((ClassType) type, Environment.getCurrent());
-	    forms.addElement(new ApplyExp(Compilation.typeRunnable
-					  .getDeclaredMethod("run", 0),
+	    forms.addElement(new ApplyExp(ClassType.make("gnu.expr.ModuleInfo")
+					  .getDeclaredMethod("getRunInstance", 0),
 					  new Expression[] {
-					    new QuoteExp(instance)}));
+					    new QuoteExp(info)}));
 	  }
 	else if (instance == null) // Need to make sure 'run' is invoked.
 	  {

@@ -1,3 +1,12 @@
+2005-02-15  Per Bothner  <per@bothner.com>
+
+	Use ModuleInfo to make sure 'run' is only done once, even if immediate.
+	* kawa/standard/requier.java (find(String)): Use ModuleInfo.find.
+	(find(ClassType, Environment), find(Class, Environment)): Remove.
+	(importDefinitions): If instance is needed, manage it with ModuleInfo.
+	If run is needed in immediate mode, use ModuleInfo's getRunInstance
+	so run gets run only once, and at run-time, not compile-time.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java (expand): Add extra test since Expression

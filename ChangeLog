@@ -1,10 +1,11 @@
 2005-03-04  Per Bothner  <per@bothner.com>
 
-	* kawa/repl.java: Update Interpreter->Lanuguage various places.
+	* kawa/repl.java: Update Interpreter->Language various places.
 	* kawa/Shell.java: Likewise.
 	* kawa/GuiConsole.java: Likewise.
 	* kawa/TelnetRepl.java: Likewise.
 	* kawa/lang/Lambda.java: Likewise.
+	* kawa/lang/AutoloadProcedure.java: Likewise.
 	* kawa/lang/CompileFile.java: Likewise.
 	* kawa/standard/Scheme.java: Likewise.
 	* kawa/standard/define_autoload.java: Likewise.

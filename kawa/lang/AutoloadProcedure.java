@@ -19,7 +19,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
    * and that is expected to define the Procedure in the global environment. */
   String className;
 
-  Interpreter interp;
+  Language language;
 
   /** The loaded procedure, or null if it has not yet been loaded. */
   Procedure loaded;
@@ -34,11 +34,11 @@ public class AutoloadProcedure extends Procedure implements Externalizable
     this.className = className;
   }
 
-  public AutoloadProcedure (String name, String className, Interpreter interp)
+  public AutoloadProcedure (String name, String className, Language language)
   {
     super(name);
     this.className = className;
-    this.interp = interp;
+    this.language = language;
   }
 
   public void print(java.io.PrintWriter ps)
@@ -84,11 +84,11 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 	  {
 	    try
 	      {
-		Object property = (interp.hasSeparateFunctionNamespace()
+		Object property = (language.hasSeparateFunctionNamespace()
 				   ? EnvironmentKey.FUNCTION
 				   : null);
 		// Should use something like isFunctionBound FIXME
-		Environment env = interp.getEnvironment();
+		Environment env = language.getEnvironment();
 		Symbol sym = (name instanceof Symbol ? (Symbol) name
 			      : env.getSymbol(name.toString()));
 		env.put(sym, property, loaded);

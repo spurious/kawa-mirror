@@ -1,3 +1,18 @@
+Wed Jul 22 18:05:23 1998  Per Bothner  <bothner@cygnus.com>
+
+	* characters.scm (char-alphabetic?):  New function.
+	* keywords.scm (keyword->string):  Rewrite to not use removed method.
+	* misc.scm (boolean? symbol?, procedure?):  New functions.
+	* lists.scm:  New file.
+	* Makefile.am (java_SCM):  Add lists.scm.
+	* numbers.scm (negative?, odd?, even?):  New functions.
+	* ports.scm (current-input-port, current-output-port,
+	close-output-port port):  New procedures.
+	* std_syntax.scm (%make-promise):  New procedure.
+	* strings.scm (string=?):  New function.
+	* syntax.scm, others:  Update for classes moved from kawa.lang to gnu.
+	* reflection.scm:  Fix inconsistent macro names.
+
 Mon Jun 29 11:27:16 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ports.scm:  Update for LineBufferedReader moved to gnu.text.

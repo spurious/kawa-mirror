@@ -6,7 +6,7 @@
 		  (quote name) (lambda lambda-list form ...)))))
 
 (define (gentemp)
-  ((primitive-static-method <kawa.lang.Symbol> "gentemp"
+  ((primitive-static-method <gnu.expr.Symbol> "gentemp"
 			    <symbol> ())))
 
 (define-syntax when (syntax-rules ()
@@ -45,21 +45,21 @@
   (syntax-rules ()
 		((fluid-let ((variable init) ...) . exprs)
 		 (let* ((old-env ((primitive-static-method
-				   "kawa.lang.Environment" "getCurrent"
-				   "kawa.lang.Environment" ())))
+				   "gnu.mapping.Environment" "getCurrent"
+				   "gnu.mapping.Environment" ())))
 			(new-env ((primitive-constructor
-				   "kawa.lang.Environment"
-				   ("kawa.lang.Environment")) old-env)))
+				   "gnu.mapping.Environment"
+				   ("gnu.mapping.Environment")) old-env)))
 		   (begin
-		     ((primitive-virtual-method "kawa.lang.Environment"
-						"define" "kawa.lang.Binding"
+		     ((primitive-virtual-method "gnu.mapping.Environment"
+						"define" "gnu.mapping.Binding"
 						("String" <object>))
 		      new-env 'variable init) ...)
 		   ((primitive-static-method
-		     "kawa.lang.Environment" "setCurrent"
-		     "void" ("kawa.lang.Environment")) new-env)
+		     "gnu.mapping.Environment" "setCurrent"
+		     "void" ("gnu.mapping.Environment")) new-env)
 		   (try-finally
 		    (begin . exprs)
 		    ((primitive-static-method
-		      "kawa.lang.Environment" "setCurrent"
-		      "void" ("kawa.lang.Environment")) old-env))))))
+		      "gnu.mapping.Environment" "setCurrent"
+		      "void" ("gnu.mapping.Environment")) old-env))))))

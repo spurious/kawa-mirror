@@ -1,3 +1,8 @@
+2004-11-08  Per Bothner  <per@bothner.com>
+
+	* maketab1.xql: Use child:: axis, not non-standard children function.
+	* tab.html: Whitespace-tweak expected output.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main): Add tests for node-name, local-name-from-QName,

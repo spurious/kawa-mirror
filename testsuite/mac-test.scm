@@ -1,4 +1,4 @@
-(test-init "macros" 42)
+(test-init "macros" 45)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -148,6 +148,7 @@
       (+ size x)))))
 (test 14 'test-colon (test-colon 4))
 
+;; Bug reported by 2003-05-22 by Bruce R. Lewis <brlewis@ALUM.MIT.EDU>.
 (define-syntax one
   (syntax-rules ()
 		((one var)
@@ -156,3 +157,22 @@
 		   (define var extra)))))
 (one xx1)
 (test 1 'one xx1)
+
+;; Bug reported by 2003-05-22 by Bruce R. Lewis <brlewis@ALUM.MIT.EDU>.
+(define-syntax lit1
+  (syntax-rules (literal)
+		((lit1 literal)
+		 "worked")
+		((lit1 a)
+		 (lit1 literal))))
+(test "worked" 'lit1 (lit1 20))
+
+;; Based on bug reported 2003-05-19 by Sven.Hartrumpf@FernUni-Hagen.de
+(test "no-bogus-feature" 'cond-expand-not-1
+      (cond-expand ((not bogus-feature)
+		    "no-bogus-feature")
+		   (else "has-bogus-feature")))
+(test "has-srfi-4" 'cond-expand-not-2
+      (cond-expand ((not srfi-4)
+		    "no-srfi-4")
+		   (else "has-srfi-4")))

@@ -1,6 +1,11 @@
+2003-05-22  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm:  New testcases based on bug reported
+	2003-05-19 by Sven.Hartrumpf@FernUni-Hagen.de.
+
 2003-05-22  Bruce R. Lewis <brlewis@ALUM.MIT.EDU>.
 
-	* mac-test.scm:  New test case.
+	* mac-test.scm:  Two new test cases.
 
 2003-05-18  Per Bothner  <per@bothner.com>
 

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.3 from Makefile.am
+# Makefile.in generated automatically by automake 1.3b from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -32,7 +32,7 @@ mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
 
-DISTDIR =
+DESTDIR =
 
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -287,10 +287,10 @@ uninstall-man1:
 	done
 install-man: $(MANS)
 	@$(NORMAL_INSTALL)
-	$(MAKE) install-man1
+	$(MAKE) $(AM_MAKEFLAGS) install-man1
 uninstall-man:
 	@$(NORMAL_UNINSTALL)
-	$(MAKE) uninstall-man1
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-man1
 tags: TAGS
 TAGS:
 
@@ -306,11 +306,10 @@ distdir: $(DISTFILES)
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-	$(MAKE) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-info
+	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-info
 info: $(INFO_DEPS)
 dvi: $(DVIS)
 check:
-	$(MAKE)
 installcheck:
 install-info: install-info-am
 install-exec: 
@@ -325,25 +324,21 @@ install: install-exec install-data all
 uninstall: uninstall-man
 
 install-strip:
-	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(mandir)/man1
 
 
 mostlyclean-generic:
-	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
-	-rm -f Makefile $(DISTCLEANFILES)
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
-	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean:  mostlyclean-vti mostlyclean-aminfo mostlyclean-generic
 
 clean:  clean-vti clean-aminfo clean-generic mostlyclean

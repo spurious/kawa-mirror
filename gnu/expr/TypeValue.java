@@ -15,7 +15,7 @@ public interface TypeValue
 
   /** Emit code for 'if (INCOMING instanceof THIS_TYPE) DECL = INCOMING ...'
    * This method is designed for 'typeswitch' applications, where this
-   * call is the first part of a conditional, so it much be followed
+   * call is the first part of a conditional, so it must be followed
    * by calls to emitElse and emitFi.
    * @param incoming Contains the value we are testing to see if it has the
    *        the type of 'this'.  If null, use top-of-stack.

@@ -89,6 +89,13 @@ public class Declaration extends Variable
    * If the variable can be set more than once, then value is null. */
   Expression value = QuoteExp.undefined_exp;
 
+  private boolean indirectBinding;
+
+  /** True if the value of the variable is the contents of a Binding. */
+  public final boolean isIndirectBinding() { return this.indirectBinding; }
+  public final void setIndirectBinding(boolean indirectBinding)
+  { this.indirectBinding = indirectBinding; }
+
   public void noteValue (Expression value)
   {
     // We allow assigning a real value after undefined ...

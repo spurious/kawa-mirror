@@ -83,10 +83,10 @@ public class ObjectType extends Type
    * Throw a ClassCastException when this is not possible. */
   public Object coerceFromObject (Object obj)
   {
-    if (this == Type.tostring_type)
-      return obj.toString();
     if (obj != null)
       {
+	if (this == Type.tostring_type)
+	  return obj.toString();
         Class clas = getReflectClass();
         Class objClass = obj.getClass();
         if (! clas.isAssignableFrom(objClass))
@@ -101,7 +101,21 @@ public class ObjectType extends Type
   public void emitCoerceFromObject (CodeAttr code)
   {
     if (this == Type.tostring_type)
-      code.emitInvokeVirtual(Type.toString_method);
+      {
+	// This would be nice but it doesn't verify, alas!
+	// code.reserve(4);
+	// code.emitDup();
+	// code.put1(198); // ifnull
+	// code.put2(6);  // skip after emitInvokeVirtual.
+	// code.emitInvokeVirtual(Type.toString_method);
+	code.emitDup();
+	code.emitIfNull();
+	code.emitPop(1);
+	code.emitPushNull();
+	code.emitElse();
+	code.emitInvokeVirtual(Type.toString_method);
+	code.emitFi();
+      }
     else if (this != Type.pointer_type)
       code.emitCheckcast(this);
   }

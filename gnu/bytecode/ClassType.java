@@ -802,6 +802,11 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public final boolean isSubclass(ClassType other)
   {
+    if (other.isInterface())
+      return implementsInterface(other);
+    if ((this == tostring_type && other == string_type)
+	|| (this == string_type && other == tostring_type))
+      return true;
     ClassType baseClass = this;
     while (baseClass != null)
       {
@@ -826,24 +831,16 @@ public class ClassType extends ObjectType implements AttrContainer {
     if (name != null && name.equals(other.getName()))
       return 0;
     ClassType cother = (ClassType) other;
-    if (this.isInterface())
-      {
-	if (cother.implementsInterface(this))
-	  return 1;
-	if (cother.isInterface() && this.implementsInterface(cother))
-	  return -1;
-	return -2;
-      }
-    if (cother.isInterface())
-      {
-	if (this.implementsInterface(cother))
-	  return -1;
-	return -2;
-      }
     if (isSubclass(cother))
       return -1;
     if (cother.isSubclass(this))
       return 1;
+    if (this == tostring_type)
+      return 1;
+    if (cother == tostring_type)
+      return -1;
+    if (this.isInterface() || cother.isInterface())
+      return -2;
     return -3;
   }
 

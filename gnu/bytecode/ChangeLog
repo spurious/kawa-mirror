@@ -1,3 +1,13 @@
+2001-11-23  Per Bothner  <per@bothner.com>
+
+	* ClassType.java  (isSubclass):  Handle other class an interface,
+	(compare):  Simplify, due to above change.
+
+	* ClassType.java  (isSubclass):  Special test for tostring_type.
+	(compare):  Likewise.
+	* ObjectType.java (coerceFromObject):  Allow null when tostring_type.
+	(emitCoerceFromObject):  Emit code that tests input for null.
+
 2001-11-21  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (noClasses):  New static field.

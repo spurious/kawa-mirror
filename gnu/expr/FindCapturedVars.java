@@ -67,6 +67,16 @@ public class FindCapturedVars extends ExpWalker
       }
   }
 
+  protected Expression walkClassExp (ClassExp exp)
+  {
+    Expression ret = super.walkClassExp(exp);
+    // Make sure <init> has been declared, in case we need to invoke it.
+    // However, this is only safe to do if ! getNeedsClosureEnv().  FIXME.
+    if (! exp.getNeedsClosureEnv())
+      Compilation.getConstructor(exp.instanceType, exp);
+    return ret;
+  }
+
   protected Expression walkModuleExp (ModuleExp exp)
   {
     ModuleExp saveModule = currentModule;

@@ -1029,7 +1029,7 @@ public class LambdaExp extends ScopeExp
 	    Type dtype = decl.getType();
 	    decl.field = frameType.addField (mname, decl.getType());
 	  }
-	if (closureEnv != null && heapFrame != null)
+	if (closureEnv != null)
 	  staticLinkField = frameType.addField("staticLink",
 					       closureEnv.getType());
         if (! (this instanceof ModuleExp) && ! (this instanceof ClassExp))

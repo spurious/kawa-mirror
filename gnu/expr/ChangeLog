@@ -1,3 +1,12 @@
+2002-06-18  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (slotToMethodName):  Do Compilation.mangleNameIfNeeded.
+
+	* FindCapturedVars.java (walkClassExp):  New method.
+	  Fixes bug reported by Jocelyn Paine.
+
+	* LambdaExp.java (enterFunction): Remove redundant test.
+
 2002-06-11  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add "xslt".

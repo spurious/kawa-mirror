@@ -486,6 +486,7 @@ public class ClassExp extends LambdaExp
   /** Mangle a "slot" name to a get- or set- method name. */
   public static String slotToMethodName(String prefix, String sname)
   {
+    sname = Compilation.mangleNameIfNeeded(sname);
     StringBuffer sbuf = new StringBuffer(sname.length()+3);
     sbuf.append(prefix);
     sbuf.append(Character.toTitleCase(sname.charAt(0)));

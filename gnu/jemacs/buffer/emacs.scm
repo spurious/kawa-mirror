@@ -28,7 +28,6 @@
 (define read-from-minibuffer read-dialog)
 
 ;;; KEYMAPS
-
 (define (make-keymap #!optional name)
   (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
                  (as <String> name)))
@@ -340,7 +339,7 @@
 (define (buffer-end flag #!optional (buffer :: <buffer> (current-buffer)))
   ((if (<= flag 0) point-min point-max) buffer))
 
-(define (buffer-size #!optional (buffer :: <buffer> (current-buffer)))
+(define (buffer-size #!optional (buffer :: <buffer> (current-buffer))) :: <int>
   (- (invoke buffer 'maxDot) (invoke buffer 'minDot)))
 
 (define (goto-char position #!optional (buffer :: <buffer> (current-buffer)))
@@ -359,9 +358,10 @@
 
 (define (point-at-bol
          #!optional
-         (n  :: <int> 1)
+         (n  1)
          (buffer  :: <buffer> (current-buffer)))
   <int>
+  (if (eq? n '()) (set! n 1))
   (+ 1 (as <int> (invoke buffer 'forwardLine (- n 1) (invoke buffer 'getDot)))))
 
 (define (point-at-eol #!optional (count  :: <int> 1)
@@ -382,7 +382,7 @@
 
 (define (beginning-of-line
          #!optional
-         (n  :: <int> 1)
+         (n  1)
          (buffer :: <buffer> (current-buffer))) <void>
   (invoke buffer 'setPoint (point-at-bol n buffer)))
 
@@ -459,8 +459,10 @@
   (let ((buffer :: <buffer> (current-buffer)))
     (invoke buffer 'insertAll args #!null)))
 
-(define (erase-buffer #!optional (buffer :: <buffer> (current-buffer)))
-  (invoke buffer 'removeAll))
+(define (erase-buffer #!optional buffer '())
+  (let ((buf :: <buffer> (if (eq? buffer '()) (current-buffer)
+                             (get-buffer buffer))))
+    (invoke buf 'removeAll)))
 
 (define (delete-region start end
 		       #!optional (buffer  :: <buffer> (current-buffer)))

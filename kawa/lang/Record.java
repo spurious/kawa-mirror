@@ -203,14 +203,7 @@ public class Record extends NameMap
     byte[][] arrays = new byte[1][];
     String[] names = new String[1];
     names[0] = mangledName;
-    try
-      {
-	arrays[0] = clas.writeToArray();
-      }
-    catch (java.io.IOException ex)
-      {
-	throw new InternalError (ex.toString());
-      }
+    arrays[0] = clas.writeToArray();
     ArrayClassLoader loader = new ArrayClassLoader(names, arrays);
     try
       {

@@ -1,3 +1,8 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Record.java (makeRecordType):  No longer need to
+	catch java.io.IOException, since writeToArray now takes care of it.
+
 2002-03-21  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewrite):  Check for mis-placed '::'.

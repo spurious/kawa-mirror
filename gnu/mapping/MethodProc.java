@@ -10,7 +10,7 @@ import gnu.bytecode.Type;
 public abstract class MethodProc extends ProcedureN
 {
   /** The parameter types.
-   * USually either an Type[] or a String encoding. */
+   * Usually either an Type[] or a String encoding. */
   protected Object argTypes;
 
   /** Test if method is applicable to an invocation with given arguments.

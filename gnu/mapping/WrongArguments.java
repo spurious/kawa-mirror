@@ -29,7 +29,7 @@ public class WrongArguments extends IllegalArgumentException {
     else
       return null;
     StringBuffer buf = new StringBuffer(100);
-    buf.append("call to `");
+    buf.append("call to '");
     String pname = proc.getName();
     buf.append(pname != null ? pname : proc.getClass().getName());
     buf.append("' has too ");

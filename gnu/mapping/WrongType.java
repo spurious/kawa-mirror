@@ -61,7 +61,7 @@ public class WrongType extends WrappedException
     StringBuffer sbuf = new StringBuffer(100);
     if (number == ARG_VARNAME)
       {
-        sbuf.append("Value for variable `");
+        sbuf.append("Value for variable '");
         sbuf.append(procname);
         sbuf.append("' has wrong type");
       }
@@ -78,7 +78,7 @@ public class WrongType extends WrappedException
             sbuf.append('#');
             sbuf.append(number);
           }
-        sbuf.append(" to `");
+        sbuf.append(" to '");
         sbuf.append(procname);
         sbuf.append("' has wrong type");
       }

@@ -1,3 +1,8 @@
+2001-11-23  Per Bothner  <per@bothner.com>
+
+	* WrongArguments.java:  Use 'name' not `name' in error messages.
+	* WrongType.java:  Likewise.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (runUntilValue):  Two new methods.

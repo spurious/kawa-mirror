@@ -634,7 +634,7 @@ public class XQuery extends Interpreter
   }
   */
 
-  /** Mangle an XML as specified by JAXB. */
+  /** Mangle an XML name as specified by JAXB. */
   static void mangle (String name, int start, int length,
 		      StringBuffer sbuf, char mode)
   {

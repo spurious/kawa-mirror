@@ -186,7 +186,8 @@ public class XQuery extends Interpreter
       }
 
     define("define", new kawa.standard.set_b());
-    define("document", gnu.xquery.util.Document.document);
+    define("document", gnu.kawa.xml.Document.document);
+    define("unescaped-data", gnu.kawa.xml.MakeUnescapedData.unescapedData);
     define("item-at", gnu.xquery.util.ItemAt.itemAt);
     define("count", gnu.kawa.functions.CountValues.countValues);
     define("sublist", gnu.xquery.util.SubList.subList);

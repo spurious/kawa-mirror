@@ -1,3 +1,8 @@
+2002-01-21  Per Bothner  <per@bothner.com>
+
+	* XQuery (<init>):  Update for moved of class Document.
+	Add definition for "unescaped-data".
+
 2002-01-19  Per Bothner  <per@bothner.com>
 
 	* XQuery.java:  Update for move of WriteTo class.

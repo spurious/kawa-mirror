@@ -1,3 +1,9 @@
+2004-08-07  Per Bothner  <per@bothner.com>
+
+	* Apply.java (getArgument):  Make non-static.
+	Update WrongType construction.
+	(applyN):  Rename static to doApply.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java:  Extend MethodProc instead of CpsProcedure.

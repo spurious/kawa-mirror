@@ -11,7 +11,7 @@ public class Apply extends ProcedureN
   public static final Apply apply = new Apply();
   static { apply.setName("apply"); }
 
-  private static Object[] getArguments (Object[] args, int skip)
+  private Object[] getArguments (Object[] args, int skip)
   {
     int count = args.length;
     if (count < skip + 1)
@@ -30,7 +30,7 @@ public class Apply extends ProcedureN
     else
       last_count = -1;
     if (last_count < 0)
-      throw new WrongType("apply", count, "sequence");
+      throw new WrongType(this, count, last, "sequence or array");
     int numArgs = last_count + (count - skip - 1);
     Object[] proc_args = new Object[numArgs];
     int i;
@@ -60,9 +60,9 @@ public class Apply extends ProcedureN
     return proc_args;
   }
 
-  public static Object applyN(Procedure proc, Object[] args) throws Throwable
+  public static Object doApply(Procedure proc, Object[] args) throws Throwable
   {
-    return proc.applyN(getArguments(args, 0));
+    return proc.applyN(apply.getArguments(args, 0));
   }
 
   public Object applyN (Object[] args) throws Throwable

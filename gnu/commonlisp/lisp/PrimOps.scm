@@ -106,7 +106,7 @@
 		 symbol object))
 
 (define (apply func #!rest (args :: <Object[]>))
-  (invoke-static <gnu.kawa.functions.Apply> 'applyN
+  (invoke-static <gnu.kawa.functions.Apply> 'doApply
 		 (as <function>
 		     (if (symbol? func) (symbol-function func) func))
 		 args))

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -174,6 +174,26 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
     if (next == Empty)
       return eofValue;
     return ((Pair) next).car;
+  }
+
+  public Object getPrevious(int ipos, Object xpos)
+  {
+    int isAfter = (ipos & 1);
+    if (isAfter > 0)
+      xpos = xpos == null ? this : ((Pair) xpos).cdr;
+    else if (xpos == null)
+      return eofValue;
+    if (xpos == Empty)
+      return eofValue;
+    return ((Pair) xpos).car;
+  }
+
+  protected void setPrevious(int ipos, Object xpos, Object value)
+  {
+    int isAfter = (ipos & 1);
+    if (isAfter > 0)
+      xpos = xpos == null ? this : ((Pair) xpos).cdr;
+    ((Pair) xpos).car = value;
   }
 
   public Object get (int index)

@@ -1,3 +1,5 @@
+Changes from Kawa 1.6.96 to 1.6.97.
+==================================
 Changed lots of error messages to use pairs of single quotes rather
 than starting with a backquote (accent grave):  'name' instead of `name'.
 Many newer fonts make the latter look bad, so it is now discouraged.

@@ -108,18 +108,18 @@ public abstract class Procedure implements Named
 	    result = apply0();
 	    break;
 	  case 1:
-	    result = apply1(ctx.getArgAsObject(0));
+	    result = apply1(ctx.getNextArg());
 	    break;
 	  case 2:
-	    result = apply2(ctx.getArgAsObject(0), ctx.getArgAsObject(1));
+	    result = apply2(ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  case 3:
-	    result = apply3(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
-			    ctx.getArgAsObject(2));
+	    result = apply3(ctx.getNextArg(), ctx.getNextArg(),
+			    ctx.getNextArg());
 	    break;
 	  case 4:
-	    result = apply4(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
-			    ctx.getArgAsObject(2), ctx.getArgAsObject(3));
+	    result = apply4(ctx.getNextArg(), ctx.getNextArg(),
+			    ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  default:
 	    result = applyN(ctx.getArgs());

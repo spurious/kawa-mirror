@@ -1,3 +1,9 @@
+2003-07-10  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (getArgAsObject):  Make non-public.
+	(getArgs):  Use getNextArg instead of getArgAsObject.
+	* Procedure.java (apply):  Likewise.
+
 2003-05-30  Per Bothner  <per@bothner.com>
 
 	* WrongType.java (getMessage):  Don't print causes's message if null.

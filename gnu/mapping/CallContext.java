@@ -112,7 +112,7 @@ public class CallContext implements Runnable
   final static int ARG_IN_IVALUE1 = 5;
   final static int ARG_IN_IVALUE2 = 6;
 
-  public Object getArgAsObject(int i)
+  Object getArgAsObject(int i)
   {
     if (i < 8)
       {
@@ -233,10 +233,10 @@ public class CallContext implements Runnable
       return values;
     else
       {
-	int i = count;
-	Object[] args = new Object[i];
-	while (--i >= 0)
-	  args[i] = getArgAsObject(i);
+	int n = count;
+	Object[] args = new Object[n];
+	for (int i = 0;  i < n;  i++)
+	  args[i] = getNextArg();
 	return args;
       }
   }

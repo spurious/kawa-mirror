@@ -28,11 +28,12 @@ Method.class \
 Scope.class \
 Type.class \
 Variable.class \
-VarEnumerator.class
+VarEnumerator.class \
+ZipArchive.class
 
 java_DATA=$(OBJ)
 
-CLEANFILES=$(OBJ)
+CLEANFILES=$(OBJ) ZipMember.class
 
 all: $(OBJ)
 

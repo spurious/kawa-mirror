@@ -61,11 +61,12 @@ Method.class \
 Scope.class \
 Type.class \
 Variable.class \
-VarEnumerator.class
+VarEnumerator.class \
+ZipArchive.class
 
 java_DATA=$(OBJ)
 
-CLEANFILES=$(OBJ)
+CLEANFILES=$(OBJ) ZipMember.class
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DATA = $(java_DATA)
 

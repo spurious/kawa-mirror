@@ -1,4 +1,4 @@
-(test-init "Objects" 99)
+(test-init "Objects" 100)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -192,6 +192,8 @@
 (test 24 'factorial-4 factorial-4)
 
 (test 1062806400000 'namespace-syntax-test (namespace-syntax-call))
+
+(test 'Z check-fluid-let 'Z)
 
 (define IsClass2-value (make <IdClass2>))
 (require <classes1>)

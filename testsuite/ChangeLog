@@ -1,3 +1,9 @@
+2005-01-16  Per Bothner  <per@bothner.com>
+
+	* module3.scm: Added test for Savannah bug #11578, submitted
+	by Dean Ferreyra from Merced Systems.
+	* obj-test.scm: Invoke said test.
+
 2005-01-09  Per Bothner  <per@bothner.com>
 
 	* HelloCgiX.xql: Update to current XQuery syntax.

@@ -42,3 +42,10 @@
 (define (my-compare a b)
   (timestamp:myCompareTo (as <MyTimestamp> a)
                          (as <MyTimestamp> b)))
+
+;; Test for Savannah bug #11578
+(define *VAR* 'A)
+(define (get-var) *VAR*)
+(define (check-fluid-let sym)
+  (fluid-let ((*VAR* sym))
+    (get-var)))

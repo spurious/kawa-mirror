@@ -66,7 +66,7 @@
    port line))
 
 (define (set-input-port-line-number! port num)
-  (set-port-line port (- num 1)))
+  (set-port-line! port (- num 1)))
 
 (define (port-column port)
   ((primitive-virtual-method <gnu.text.LineBufferedReader>

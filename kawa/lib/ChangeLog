@@ -1,3 +1,7 @@
+Weiqi Gao <weiqigao@networkusa.net>
+
+	* ports.scm (set-input-port-line-number!):  Fix typo.
+
 2001-08-30  Per Bothner  <per@bothner.com>
 
 	* reflection.scm (record-type-name):  Assume reversible mangling.

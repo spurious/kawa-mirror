@@ -1,7 +1,15 @@
 2005-01-05  Per Bothner  <per@bothner.com>
 
+	* Type.java (array_type): New field.
+	* ArrayType.java (make(Type)): Use array_type of argument.
+	(make(String)): New non-public static method.
+	* Type.java (getType): Use ArrayType.make(String).
+	(signatureToType): Use ArrayType.make(Type).
+
+	* Type.java (hashCode): New method.
+
 	* ClassType.java (getDeclaredMethod): Compare argument types
-	by comparing signatures, not by identity.
+	by comparing signatures, not only by identity.
 
 2005-01-02  Per Bothner  <per@bothner.com>
 

@@ -561,8 +561,12 @@ public class ClassType extends ObjectType
 	  continue;
 	while (-- i >= 0)
 	  {
-	    String need_sig = arg_types[i].getSignature();
-	    String meth_sig = method_args[i].getSignature();
+	    Type meth_type = method_args[i];
+	    Type need_type = arg_types[i];
+	    if (meth_type == need_type)
+	      continue;
+	    String meth_sig = meth_type.getSignature();
+	    String need_sig = need_type.getSignature();
 	    if (! meth_sig.equals(need_sig))
 	      break;
 	  }

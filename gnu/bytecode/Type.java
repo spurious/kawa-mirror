@@ -12,6 +12,8 @@ public abstract class Type {
    */
   int size;
 
+  ArrayType array_type;
+
   protected Type () { }
 
   /** The type used to implement types not natively understood by the JVM.
@@ -49,8 +51,7 @@ public abstract class Type {
       {
 	if (name.endsWith("[]"))
 	  {
-	    type = getType(name.substring(0, name.length()-2));
-	    type = new ArrayType(type, name);
+	    type = ArrayType.make(name);
 	  }
 	else
 	  {
@@ -155,7 +156,7 @@ public abstract class Type {
     if (c == '[')
       {
 	type = signatureToType(sig, off+1, len-1);
-	return type == null ? null : new ArrayType(type);
+	return type == null ? null : ArrayType.make(type);
       }
     if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
       return ClassType.make(sig.substring(off+1,len-1+off).replace('/', '.'));
@@ -471,5 +472,11 @@ public abstract class Type {
   public String toString()
   {
     return "Type " + getName();
+  }
+
+  public int hashCode()
+  {
+    String name = toString();
+    return name == null ? 0 : name.hashCode ();
   }
 }

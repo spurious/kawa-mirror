@@ -25,17 +25,29 @@ public class ArrayType extends ObjectType
     return elements == eltype ? this : make(eltype);
   }
 
+  /** Name assumed to end with "[]". */
+  static ArrayType make(String name)
+  {
+    Type elements = Type.getType(name.substring(0, name.length()-2));
+    ArrayType array_type = elements.array_type;
+    if (array_type == null)
+      {
+	array_type = new ArrayType(elements, name);
+	elements.array_type = array_type;
+      }
+    return array_type;
+  }
+
   /** Find or create an ArrayType for the specified element type. */
   public static ArrayType make(Type elements)
   {
-    String name = elements.getName() + "[]";
-    ArrayType type = (ArrayType) Type.lookupType(name);
-    if (type == null || type.elements != elements)
+    ArrayType array_type = elements.array_type;
+    if (array_type == null)
       {
-	type = new ArrayType(elements, name);
-	mapNameToType.put(name, type);
+	array_type = new ArrayType(elements, elements.getName() + "[]");
+	elements.array_type = array_type;
       }
-    return type;
+    return array_type;
   }
 
   public Type getComponentType() { return elements; }

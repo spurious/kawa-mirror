@@ -5,7 +5,7 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.bytecode.ClassType;
-import gnu.kawa.lispexpr.LispInterpreter;
+import gnu.kawa.lispexpr.LispLanguage;
 
 /**
  * The Syntax transformer that re-writes the "quote" "quasiquote" primitive.
@@ -56,9 +56,9 @@ public class Quote extends Syntax implements Printable
   {
     if (depth == QUOTE_DEPTH)
       ;
-    else if (tr.matches(pair.car, LispInterpreter.quasiquote_sym))
+    else if (tr.matches(pair.car, LispLanguage.quasiquote_sym))
       depth++;
-    else if (tr.matches(pair.car, LispInterpreter.unquote_sym))
+    else if (tr.matches(pair.car, LispLanguage.unquote_sym))
       {
 	depth--;
 	Pair pair_cdr;
@@ -69,7 +69,7 @@ public class Quote extends Syntax implements Printable
 	if (depth == 0)
 	  return tr.rewrite_car(pair_cdr, syntax);
       }
-    else if (tr.matches(pair.car, LispInterpreter.unquotesplicing_sym)
+    else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym)
 	     && depth >= 0)
       return tr.syntaxError ("invalid used of " + pair.car +
 				 " in quasiquote template");
@@ -77,7 +77,7 @@ public class Quote extends Syntax implements Printable
     if (pair.car instanceof Pair && depth != QUOTE_DEPTH)
       {
 	Pair pair_car = (Pair)pair.car;
-	if (tr.matches(pair_car.car, LispInterpreter.unquotesplicing_sym)
+	if (tr.matches(pair_car.car, LispLanguage.unquotesplicing_sym)
 	    && --depth == 0)
 	  {
 	    Pair pair_car_cdr;
@@ -161,7 +161,7 @@ public class Quote extends Syntax implements Printable
 	    Pair pair;
 	    if (element instanceof Pair && depth != QUOTE_DEPTH
 		&& tr.matches((pair = (Pair)element).car,
-			      LispInterpreter.unquotesplicing_sym)
+			      LispLanguage.unquotesplicing_sym)
 		&& --element_depth == 0)
 	      {
 		Pair pair_cdr;

@@ -11,7 +11,7 @@ import gnu.kawa.lispexpr.*;
 import gnu.lists.FormatToConsumer;
 import gnu.kawa.functions.DisplayFormat;
 
-public class Scheme extends LispInterpreter
+public class Scheme extends LispLanguage
 {
 
   protected void define_proc (Named proc)
@@ -90,7 +90,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("lambda", lambda);
 
       //-- Section 4.1  -- complete
-      defProcStFld(LispInterpreter.quote_sym, "kawa.lang.Quote", "plainQuote");
+      defProcStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
       define_syntax("%define", new kawa.standard.define(lambda));
       defSntxStFld("define", "kawa.lib.prim_syntax");
 

@@ -6,7 +6,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
-import gnu.kawa.lispexpr.LispInterpreter;
+import gnu.kawa.lispexpr.LispLanguage;
 import java.util.*;
 
 /** Used to translate from source to Expression.
@@ -142,7 +142,7 @@ public class Translator extends Compilation
 
   final boolean selfEvaluatingSymbol (Object obj)
   {
-    return ((LispInterpreter) getLanguage()).selfEvaluatingSymbol(obj);
+    return ((LispLanguage) getLanguage()).selfEvaluatingSymbol(obj);
   }
 
   /** True iff a form matches a literal symbol. */
@@ -400,7 +400,7 @@ public class Translator extends Compilation
     if (save_scope != current_scope)
       setCurrentScope(save_scope);
 
-    return ((LispInterpreter) getLanguage()).makeApply(func, args);
+    return ((LispLanguage) getLanguage()).makeApply(func, args);
   }
 
   public static Object stripSyntax (Object obj)
@@ -1097,7 +1097,7 @@ public class Translator extends Compilation
 	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
 			      exps);
 	else
-	  return ((LispInterpreter) getLanguage()).makeBody(exps);
+	  return ((LispLanguage) getLanguage()).makeBody(exps);
       }
   }
 

@@ -1053,6 +1053,11 @@ implements Consumer, PositionConsumer, Consumable
 
   public int stringValue(int index, StringBuffer sbuf)
   {
+    return stringValue(false, index, sbuf);
+  }
+
+  public int stringValue(boolean inGroup, int index, StringBuffer sbuf)
+  {
     Object value = null;
     int doChildren = 0;
     if (index >= gapStart)
@@ -1115,8 +1120,8 @@ implements Consumer, PositionConsumer, Consumable
 	    doChildren = 1;
 	    index = data.length;
 	    break;
-	  case BEGIN_GROUP_LONG:
-	    doChildren = index + 3;
+	  case BEGIN_GROUP_LONG:	
+	    doChildren = index + 2;
 	    int j = getIntN(index);
 	    j += j < 0 ? data.length : index-1;
 	    index = j + 7;
@@ -1126,7 +1131,11 @@ implements Consumer, PositionConsumer, Consumable
 	  case END_ATTRIBUTE:
 	    return -1;
 	  case BEGIN_ATTRIBUTE_LONG:
-	    return -1; // FIXME	
+	    if (! inGroup)
+	      doChildren = index + 4;
+	    int end = getIntN(index+2);
+	    index = end + (end < 0 ? data.length + 1 : index);
+	    break;
 	  case POSITION_REF_FOLLOWS:
 	  case POSITION_TRIPLE_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
@@ -1141,7 +1150,7 @@ implements Consumer, PositionConsumer, Consumable
       {
 	do
 	  {
-	    doChildren = stringValue(doChildren, sbuf);
+	    doChildren = stringValue(true, doChildren, sbuf);
 	  }
 	while (doChildren >= 0);
       }

@@ -1,3 +1,7 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (stringValue):  Make attributes and long groups work.
+
 2001-10-25  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in (getNextKind, getNextTypeName,

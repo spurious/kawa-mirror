@@ -1,3 +1,7 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Standard Types):  Add note about #f and #t representation.
+
 2003-07-15  Chris Dean  <Chris.Dean@mercedsystems.com>
 
 	* kawa.texi (Method operations):  Document new invoke-special function.

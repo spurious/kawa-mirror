@@ -3385,6 +3385,8 @@ corresponding Scheme number classes.  Similarly, @code{<char>}
 can be converted to and from Scheme characters.  The type
 @code{boolean} matches any object, and the result is @code{false}
 if and only if the actual argument is @code{#f}.
+(The value @code{#f} is identical to @code{Boolean.FALSE},
+and @code{#t} is identical to @code{Boolean.TRUE}.)
 The return type @code{<void>} indicates that no value is returned.
 
 A type specifier can also be a fully-qualified Java class name

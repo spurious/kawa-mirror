@@ -27,12 +27,12 @@ public class ReadError extends Exception
       name = "<unknown>";
     buffer.append (name);
     buffer.append (':');
-    buffer.append (port.getLineNumber ());
+    buffer.append (port.getLineNumber() + 1);
     int column = port.getColumnNumber ();
     if (column >= 0)
       {
 	buffer.append (':');
-	buffer.append (column);
+	buffer.append (column + 1);
       }
     buffer.append (": ");
     buffer.append (message);

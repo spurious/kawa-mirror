@@ -37,6 +37,8 @@ public class CompileFile extends Procedure2
     try
       {
 	body = port.readListBody ();
+	if (port.peek() == ')')
+	  throw new ReadError (port, "An unexpected close paren was read.");
       }
     catch (ReadError e)
       {

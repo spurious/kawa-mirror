@@ -772,6 +772,9 @@ public class InPort extends LineBufferedReader implements Printable
 	int c = peek ();
 	if (c == ')' || c < 0)
 	  break;
+	int line = getLineNumber ();
+	int column = getColumnNumber ();
+
 	skip ();
 	if (c == '.')
 	  {
@@ -800,12 +803,9 @@ public class InPort extends LineBufferedReader implements Printable
 	      }
 	  }
 
-	int line = getLineNumber ();
-	int column = getColumnNumber ();
-
 	Object car = readSchemeObject (c);
 	PairWithPosition pair = new PairWithPosition (this, car, List.Empty);
-	pair.setLine (line, column);
+	pair.setLine(line + 1, column + 1);
 	pair.setFile (getName ());
 	if (last == null)
 	  list = pair;

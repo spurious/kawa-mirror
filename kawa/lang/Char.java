@@ -5,6 +5,7 @@ import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 import gnu.bytecode.Access;
 import gnu.bytecode.Type;
+import kawa.standard.Scheme;
 
 /**
  * A wrapper for characters.
@@ -144,7 +145,7 @@ public class Char implements Printable, Compilable
 						 Access.PUBLIC|Access.STATIC);
 	charValueMethod = scmCharType.addMethod ("charValue",
 						  Type.typeArray0,
-						  Type.char_type,
+						  Scheme.charType,
 						  Access.PUBLIC);
       }
   }
@@ -159,6 +160,6 @@ public class Char implements Printable, Compilable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPushInt(((Char) literal.value).intValue ());
-    comp.method.compile_invoke_static (makeCharMethod);
+    code.emitInvokeStatic(makeCharMethod);
   }
 }

@@ -37,14 +37,18 @@ public class ApplyExp extends Expression
 	    return;
 	  }
       }
+    compile(this, comp, flags);
+  }
 
+  public static void compile (ApplyExp exp, Compilation comp, int flags)
+  {
     Method applymethod;
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
 
-    if (func instanceof ReferenceExp)
+    if (exp.func instanceof ReferenceExp)
       {
-	Declaration func_decl = ((ReferenceExp)func).binding;
+	Declaration func_decl = ((ReferenceExp)exp.func).binding;
 	if (func_decl != null && func_decl.value != null
 	    && func_decl.value instanceof LambdaExp)
 	  {
@@ -52,14 +56,14 @@ public class ApplyExp extends Expression
 	    // but we do not have the right information until
 	    // the rewrite pass is finished.
 	    func_lambda = (LambdaExp) func_decl.value;
-	    if (args.length < func_lambda.min_args)
+	    if (exp.args.length < func_lambda.min_args)
 	      {
 		System.err.print ("warning:  too few args for ");
 		System.err.println (func_decl.string_name ());
 		func_lambda = null;
 	      }
 	    else if (func_lambda.max_args >= 0
-		     && args.length > func_lambda.max_args)
+		     && exp.args.length > func_lambda.max_args)
 	      {
 		System.err.print ("warning:  too many args for ");
 		System.err.println (func_decl.string_name ());
@@ -75,36 +79,37 @@ public class ApplyExp extends Expression
 
     if (!tail_recurse)
       {
-	func.compile (comp, 0);
+	exp.func.compile (comp, 0);
 	comp.method.compile_checkcast (comp.scmProcedureType);
       }
 
+    int args_length = exp.args.length;
     if (tail_recurse
 	&& func_lambda.min_args == func_lambda.max_args)
       {
-	for (int i = 0; i < args.length; ++i)
-	  args[i].compile (comp, 0);
-	for (int i = args.length;  --i >= 0; )
+	for (int i = 0; i < args_length; ++i)
+	  exp.args[i].compile (comp, 0);
+	for (int i = args_length;  --i >= 0; )
 	  SetExp.compile_store (func_lambda.getArg (i), comp);
 	code.emitGoto(func_lambda.start_label);
 	return;
       }
 
-    if (args.length <= 4)
+    if (args_length <= 4)
       {
-	for (int i = 0; i < args.length; ++i)
-	  args[i].compile (comp, 0);
-	applymethod = comp.applymethods[args.length];
+	for (int i = 0; i < args_length; ++i)
+	  exp.args[i].compile (comp, 0);
+	applymethod = comp.applymethods[args_length];
       }
     else
       {
-	code.emitPushInt(args.length);
+	code.emitPushInt(args_length);
 	code.emitNewArray(comp.scmObjectType);
-	for (int i = 0; i < args.length; ++i)
+	for (int i = 0; i < args_length; ++i)
 	  {
 	    code.emitDup(comp.objArrayType);
 	    code.emitPushInt(i);
-	    args[i].compile (comp, 0);
+	    exp.args[i].compile (comp, 0);
 	    comp.method.compile_array_store (comp.scmObjectType);
 	  }
 	applymethod = comp.applyNmethod;
@@ -114,7 +119,7 @@ public class ApplyExp extends Expression
 	comp.method.compile_tailcall (true);
 	return;
       }
-    comp.method.compile_invoke_virtual (applymethod);
+    code.emitInvokeVirtual(applymethod);
     if ((flags & IGNORED) != 0)
       code.emitPop(1);
   }

@@ -58,7 +58,7 @@ public class TestMisc
     evalTest("(for $y in (5,4) return <b>{10+$y}</b>)[2]", "<b>14</b>");
     evalTest("for $a in (<a><b c='1' d='3'/><b c='2' d='6'/></a>)/b/@c"
 	     + " return concat('c: ', $a, ' d: ', $a/../@d, ';')",
-	     "c: 2 d: 6;c: 1 d: 3;");
+	     "c: 1 d: 3;c: 2 d: 6;");
 
     String tabNsNodes = " xmlns:h=\"H\" xmlns:j=\"J\" xmlns:k=\"J\"";
     evalTest("doc('tab.xml')/result",

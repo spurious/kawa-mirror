@@ -8,6 +8,13 @@
   (b :: <int> init-form: 6 allocation: class:)
   (n22 :: <int> init-value: 22 allocation: 'static access: 'protected)
   (hyphenated-field? init-value: "yes")
+
+  (mHappy init: #t)
+  ((isHappy) :: <boolean>
+   mHappy)
+  ((setHappy val :: <boolean>) :: <void>
+   (set! mHappy val))
+
   ((lambda-method1)
    (lambda (x) (make-vector 1 x))) ; This lambda doesn't "capture" anything.
   ((lambda-method2 n)

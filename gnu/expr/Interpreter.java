@@ -55,6 +55,21 @@ public abstract class Interpreter
     return languages;
   }
 
+  /** Add a language to the list.
+   *
+   * @param langMapping is a language definition, the first index
+   *  is the language name, subsequent indexes are file types that
+   *  might cause the language to be used and the final index is the
+   *  name of the class that implements the language.
+   */
+  public static void registerLanguage(String[] langMapping)
+  {
+    String[][] newLangs = new String[languages.length + 1][];
+    System.arraycopy(languages, 0, newLangs, 0, languages.length);
+    newLangs[newLangs.length - 1] = langMapping;
+    languages = newLangs;
+  }
+
   /** Look for an interpreter for a language with the given name or extension.
    * If name is null, look for the first language available. */
   public static Interpreter getInstance (String name)

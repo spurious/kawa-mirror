@@ -1,5 +1,17 @@
 2005-02-20  Per Bothner  <per@bothner.com>
 
+	* ConstrainedLocation.java: New class, extends Location.
+	* ReadOnlyLocation.java: New class, extends ConstrainedLocation.
+	* ConstantLocation.java: Removed unused class.
+	* Makefile.am: Update accordingly.
+	* LocationProc.java (makeNamed): New factory method.
+	(converter): Remove field - use ConstrainedLocation instead.
+	(pushConverter): New method.
+	(<init>(Location.Procedure)): Use pushConverter.
+	(set0): Simplify since we don't have a converter.
+	* ProcLocation.java (setWithSave, setRemove): Remove no-longer
+	needed methods, thanks to location.makeProcLocation$V optimization.
+
 	* ThreadLocation.java (DYNAMIC): Can't use static property for all
 	anonymous ThreadLocations, since it might not be unique.  So remove.
 	(unlink): New field, to control if went should unlink when finalizing.

@@ -1,3 +1,52 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java:  Change methods to return void.
+	(loadCompiled):  Call defineAll method in ClassMemberConstraint
+ 	to import public fields.
+	* kawa/lang/AutoloadProcedure.java (load):  Likewise.
+	* kawa/lang/AutoloadSyntax.java (load):  Likewise.
+
+	* kawa/lang/Macro.java:  No longer use inherited value field.
+	Now implement Compilable and Printable.
+ 	(transformer):  Removed field.
+	(expander):  New Expression field.
+	(print):  New method (to implement Printable).
+	(makeLiteral, emit):  New methods (to implement Compilable).
+	* kawa/standard/define_syntax.java:  Change for new Macro handling.
+	* kawa/standard/let_syntax.java (rewrite):  Likewise - save
+	tranbsformers in local array, not in Macro.transformer.
+
+	* kawa/lang/Translator.java (push, pop):  Use pushBinding. popBinding.
+	(push):  Do mustCompileHere() for all scopes except ModuleExp.
+
+	* kawa/standard/call_with_values.java (callWithValues):  New static.
+
+	* kawa/standard/close_input_port.java (apply1):  Use WrappedException.
+
+	* kawa/standard/define.java (scanForDefinitions):  Re-structure.
+	Sometimes do setCanWrite on decl when we don't want default inlining.
+	In that case, set decl's value to null.
+
+	* kawa/lang/NamedException.java (toString):  Trivial optimization.
+	* kawa/lang/PairPat.java (match):  Stylistic simplification.
+
+	* kawa/lang/Lambda.java (rewrite):  Set (default) type of #!rest arg.
+	Allow #!rest arg to have a type.
+	* kawa/standard/values_v.java:  Removed.
+	* kawa/standard/Scheme.java (initScheme):  Don't declare it either.
+	* kawa/standard/location.java (makeProcLocation$V):  New static method.
+	(rewrite):  Call makeProcLocation$V instead of %makeProcLocation.
+	* kawa/standard/makeProcLocation.java:  Removed.
+	* kawa/standard/Scheme.java (initScheme):  Remove %makeProcLocation;
+	now get `values' from kawa.lib.misc.
+	* kawa/standard/Makefile.am (java_JAVA):  Update accordingly.
+
+	* kawa/standard/format.java (format, formatToString):  Make static.
+	(format$V):  New static method.
+
+	* kawa/standard/list_v.java:  Implement Inlinable.
+	(compile, getReturnType):  New methods.
+
 1999-12-27  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewrite):  Don't call setParameter.

@@ -1,5 +1,19 @@
 Document SRFI 4: Homogeneous numeric vector datatypes 
 
+Re-store code to check argument count when applyN is involved.
+(in Compilation and maybe ApplyExp).
+
+Optional arguments that are non-constant but "simple" should also
+be implemnted by overloading.
+
+BindingInitializer.emit: global Environment should be cached
+
+quasi-quote:  cons etc should be called directly.
+
+idN$NAME - should not be static.
+
+Add --inline and --no-inline flags.
+
 TO BE DONE FOR 2.0:
 
 Implement SRFI 0: Feature-based conditional expansion construct 

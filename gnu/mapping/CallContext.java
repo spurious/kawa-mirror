@@ -164,6 +164,37 @@ public class CallContext implements Runnable
     return ((Number) getArgAsObject(next++)).intValue();
   }
 
+  /** Get remaining arguments as an array. */
+  public final Object[] getRestArgsArray ()
+  {
+    Object[] args = new Object[count - next];
+    int i = 0;
+    while (next < count)
+      {
+	args[i++] = getArgAsObject(next++);
+      }
+    return args;
+  }
+
+  /** Get remaining arguments as a list.
+   * Used for Scheme and Lisp rest args. */
+  public final LList getRestArgsList ()
+  {
+    LList nil = LList.Empty;
+    LList list = nil;
+    Pair last = null;
+    while (next < count)
+      {
+	Pair pair = new Pair(getArgAsObject(next++), nil);
+	if (last == null)
+	  list = pair;
+	else
+	  last.cdr = pair;
+	last = pair;
+      }
+    return list;
+  }
+
   /** Note that we are done with the input arguments.
    * Throw WrongArguments if there are unprocessed arguments.
    */

@@ -210,7 +210,17 @@ public class SyntaxRules extends Macro implements Printable, Compilable
 	      }
 	    System.err.println ('}');
 	    */
-	    return rule.execute_template (vars, tr);
+	    Object expansion = rule.execute_template (vars, tr);
+	    /* DEBUGGING:
+	    OutPort err = OutPort.errDefault();
+	    err.print("{Expansion of ");
+	    err.print(literal_identifiers[0]);
+	    err.print(": ");
+	    SFormat.print(expansion, err);
+	    err.println('}');
+	    err.flush();
+	    */
+	    return expansion;
 	  }
       }
     return tr.syntaxError ("no matching syntax-rule for "

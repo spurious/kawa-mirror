@@ -1,3 +1,7 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* jar-manifest:  New file (used in top-level Makefile).
+
 2000-06-18  Per Bothner  <per@bothner.com>
 
 	* status.html:  New documentation file.

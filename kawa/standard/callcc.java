@@ -17,7 +17,7 @@ public class callcc extends Procedure1
   public Object apply1 (Object arg1)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Procedure proc = (Procedure) arg1;
+    Procedure proc;
     try
       {
 	proc = (Procedure) arg1;

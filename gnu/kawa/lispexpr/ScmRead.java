@@ -6,7 +6,7 @@ import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.util.Vector;
 
 /** A class to read Scheme forms (S-expressions). */
@@ -187,7 +187,7 @@ public class ScmRead extends LispReader
     return Char.make((char)c);
   }
 
-  UniformVector readUniformVector(char kind)
+  SimpleVector readSimpleVector(char kind)
       throws java.io.IOException, SyntaxException
   {
     int size = readOptionalExponent();
@@ -195,15 +195,15 @@ public class ScmRead extends LispReader
         || (kind == 'f' && size < 32)
         || read() != '(')
       {
-        error("invalid uniform vector syntax");
+        error("invalid simple vector syntax");
         return null;
       }
     Object list = readList(')');
-    UniformVector vec = null;
-    int len = LList.list_length(list);
+    SimpleVector vec = null;
+    int len = LList.listLength(list, false);
     if (len <= 0)
       {
-        error("invalid elements in uniform vector syntax");
+        error("invalid elements in simple vector syntax");
         return null;
       }
     Sequence q = (Sequence) list;
@@ -850,11 +850,11 @@ public class ScmRead extends LispReader
 	      case 'f':
                 next = peek();
                 if (Character.isDigit((char) next))
-                  return readUniformVector('f');
+                  return readSimpleVector('f');
 		return Interpreter.falseObject;
               case 's':
               case 'u':
-                return readUniformVector((char) next);
+                return readSimpleVector((char) next);
 	      case 'x':
 	      case 'd':
 	      case 'o':

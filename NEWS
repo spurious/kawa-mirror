@@ -1,4 +1,7 @@
-The way top-level definitions (including Scheme procedures) are mapping
+Imported implementation of cut and cute from SRFI-26
+(Notation for Specializing Parameters without Currying).
+
+The way top-level definitions (including Scheme procedures) are mapped
 into Java fields is changed to use a mostly reversible mapping.
 
 define-alias of types can now be exported from a module.

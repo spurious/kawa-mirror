@@ -1,3 +1,8 @@
+2004-07-19  Per Bothner  <per@bothner.com>
+
+	* internals.xml:  Many small updates/fixes.
+	Fix links to bibliography entties, and use ulink for URLs.
+
 2004-06-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes):  Document new throws: specifier.

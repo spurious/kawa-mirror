@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.1//EN"
- "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
-<!--<!DOCTYPE article PUBLIC "-//Davenport//DTD DocBook V3.0//EN">-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <article id="Root">
 <artheader>
 <title>Kawa internals: Compiling Scheme to Java</title>
@@ -86,7 +85,7 @@ as a <quote>tour</quote> of the Java classes used in the implementation.
 <para>
 While Java is a decent programming language, 
 the reason for the <quote>Java explosion</quote> is largely
-due to the Java Virtual Machine.  The JVM allows
+due to the Java Virtual Machine, and the many packages for it.  The JVM allows
 programs to be distributed easily and efficiently in the form of
 portable bytecodes, which can run on a wide variety of architectures
 and in web browsers.  These advantages are largely
@@ -95,7 +94,9 @@ number of efforts to run other languages on the JVM, even though the
 JVM is very clearly designed and optimized for Java.
 Kawa is both a toolkit for compiling other languages into Java
 bytecodes, and an implementation of the Scheme language
-implemented in Java.
+implemented in Java.  Kawa also incorporates Qexo, an implementation
+of the XQuery language, and JEmacs, a partial implementation of the
+Emacs Lisp extension language.
 <!--
 Many are especially interested in more high-level, dynamic
 <quote>scripting</quote> languages to use in a project in conjunction
@@ -129,14 +130,9 @@ Scheme programs get access to the large library of standard Java classes.
 </para></listitem>
 </itemizedlist>
 </para>
-<para>
-Kawa is intended to be a multi-langauge implementation toolkit.
-While only Scheme is currently supported, an implementation of
-ECMAScript (JavaScript) is coming along.
-Emacs Lisp is also planned.</para>
 <!--
 <para>
-Scheme <citation>R5RS</citation> is a simple yet powerful language.
+Scheme <xref linkend="R5RS"/> is a simple yet powerful language.
 It is a non-pure functional
 language (<foreignphrase><abbrev>i.e.</abbrev></foreignphrase> it has
 first-class functions, lexical scoping, non-lazy evaluation, and side
@@ -147,18 +143,13 @@ evaluation) may be a better match for the dynamic Java
 environment (interpreted bytecodes, dynamic loading) than Java is!</para>
 <para>
 ECMAScript is the name of the dialect of JavaScript defined
-by ECMA standard 262 <citation>ECMAScript</citation>,
+by ECMA standard 262 <xref linkend="ECMAScript"/>,
 which standardizes JavaScript's core language only,
 with no input/output or browser/document interface. 
 It defines a very dynamic object-based language
 based on prototype inheritance, rather than classes.
 A number of new or proposed Web standards are based on ECMAScript.</para>
 -->
-<para>
-<!--Information and source code will be available
-from <ulink url="http://www.cygnus.com/~bothner/kawa.html">here</ulink>.-->
-(Note that Kawa is also the name of an unrelated commercial Java
-development environment.)</para>
 </sect1>
 
 <sect1 id="History"><title>History</title>
@@ -187,9 +178,9 @@ plus that Java was more likely to be strategic long-term.</para>
 The customer agreed to using Java, and I started active development June 1996.
 As a base, I used the Kawa Scheme interpreter written
 by R. Alexander Milowski.  He needed an object-oriented
-Scheme interpreter to implement DSSSL <citation>DSSSL</citation>,
+Scheme interpreter to implement DSSSL <xref linkend="DSSSL"/>,
 a Scheme-like environment for expressing style, formatting,
-and other processing of SGML <citation>SGML</citation> documents.
+and other processing of SGML <xref linkend="SGML"/> documents.
 DSSSL is an subset of <quote>pure</quote> Scheme with some extensions.
 <!--  [See http://www.edu.uni-klu.ac.at/~nmikula] -->
 Kawa 0.2 was a simple interpreter which was far from
@@ -199,7 +190,7 @@ of the original code has by now been re-written.</para>
 Kawa 1.0 was released to our customer and <quote>the Net</quote>
 September 1996. Development has continued since then, at a less intense pace!
 The long-term goal is an object-oriented environment that harmoniously
-integrates Scheme, Java, ECMAScript, and other languages. </para>
+integrates Scheme, Java, XQuery, and other languages. </para>
 </sect1>
 
 <sect1 id="Basic"><title>Basic implementation strategy</title>
@@ -272,7 +263,7 @@ classes used to implement Scheme values.</para>
 </sect1>
 <sect1 id="Objects"><title>Objects and Values</title>
 <para>
-Java <citation>JavaSpec</citation> has primitive types (such as
+Java <xref linkend="JavaSpec"/> has primitive types (such as
 32-bit <classname>int</classname>) as well reference types.
 If a variable has a reference
 type, it means that it can contain references (essentially pointers)
@@ -284,7 +275,7 @@ this means that all classes inherit from a distinguished class
 <classname>java.lang.Object</classname> (or just
 <classname>Object</classname> for short).</para>
 <para>
-Standard Scheme <citation>R5RS</citation>
+Standard Scheme <xref linkend="R5RS"/>
 has a fixed set of types, with no way of creating new types.  It has
 run-time typing, which means that types are not declared, and a
 variable can contain values of different types at different times.  The
@@ -327,20 +318,23 @@ to represent Scheme values.
 </para>
 <sect2 id="Collections"><title>Collections</title>
 <para>
-Kawa has a rudimentary hierarchy of collection classes.
+Kawa has a hierarchy of collection classes, which extend the
+Java2 Collections framework.
+(It is possible to build Kawa so it does not require the Java2 Collections
+classes, which are not available in JDK 1.1.x.)
 <programlisting>
-class <classname>Sequence</classname>
+interface <emphasis role="bold">Sequence</emphasis>
 { ...;
-  abstract public int length();
-  abstract public Object elementAt(int i);
+  abstract public int size();
+  abstract public Object get(int i);
 }
 </programlisting>
 </para>
 <para>
-A <classname>Sequence</classname> is the abstract class that includes
+Classes that implement <classname>Sequence</classname> include
 lists, vectors, and strings.
 <programlisting>
-class <classname>FString</classname> extends Sequence
+class <emphasis role="bold">FString</emphasis> implements Sequence
 { ...;
   char[] value;
 }
@@ -350,7 +344,7 @@ class <classname>FString</classname> extends Sequence
    Used to implement fixed-length mutable strings (array of Unicode
 character).  This is used to represent Scheme strings.
 <programlisting>
-class <classname>FVector</classname> extends Sequence
+class <emphasis role="bold">FVector</emphasis> implements Sequence
 { ...;
   Object[] value;
 }
@@ -362,10 +356,10 @@ Used to implement fixed-length mutable general one-dimensional array
 of <classname>Object</classname>.
 This is used to represent Scheme vectors.</para>
 <programlisting>
-public class <classname>List</classname> extends Sequencw
+public class <emphasis role="bold">LList</emphasis> extends Sequencw
 { ...;
-  protected List () { }
-  static public List Empty = new List ();
+  protected LList () { }
+  static public LList Empty = new LList ();
 } 
 </programlisting>
 <para>
@@ -375,7 +369,7 @@ value <literal>List.Empty</literal>.
 Non-empty-lists are implemented using <classname>Pair</classname> objects.
 </para>
 <programlisting>
-public class <classname>Pair</classname> extends List
+public class <emphasis role="bold">Pair</emphasis> extends LList
 { ...;
   public Object car;
   public Object cdr;
@@ -385,7 +379,7 @@ public class <classname>Pair</classname> extends List
 Used for Scheme pairs, <foreignphrase><abbrev>i.e.</abbrev></foreignphrase>
 all non-empty lists.</para>
 <programlisting>
-public class <classname>PairWithPosition</classname> extends Pair
+public class <emphasis role="bold">PairWithPosition</emphasis> extends Pair
 { ...;
 }
 </programlisting>
@@ -398,15 +392,13 @@ such a sequences implemented as a seekable disk file;
 lazily evaluated sequences; hash tables;  APL-style
 multi-dimensional arrays; stretchy buffers.
 (Many of these ideas were implemented in my earlier experimental
-language <literal>Q</literal> -- see <citation>Bothner88</citation> and
-<literal>ftp://ftp.cygnus.com/pub/bothner/Q/</literal>.
-I will also integrate the Kawa collections into the new JDK 1.2
-collections framework.</para>
+language <literal>Q</literal> -- see <xref linkend="Bothner88"/> and
+<ulink url="http://per.bothner.com/software/#Q"/>.</para>
 </sect2>
 
 <sect2 id="Top-level"><title>Top-level environments</title>
 <programlisting>
-class <classname>Environment</classname>
+class <emphasis role="bold">Environment</emphasis>
 { ...;
 }
 </programlisting>
@@ -463,7 +455,7 @@ class <classname>Quantity</classname>, a sub-class of
 <classname>Number</classname> we will discuss later.
 </para>
 <programlisting>
-public class <classname>Complex</classname> extends Quantity
+public class <emphasis role="bold">Complex</emphasis> extends Quantity
 { ...;
   public abstract RealNum re();
   public abstract RealNum im();
@@ -478,7 +470,7 @@ optimized <classname>DComplex</classname> where the components
 are represented by <classname>double</classname> fields.
 </para>
 <programlisting>
-public class <classname>RealNum</classname> extends Complex
+public class <emphasis role="bold">RealNum</emphasis> extends Complex
 { ...;
   public final RealNum re()
   { return this; }
@@ -489,7 +481,7 @@ public class <classname>RealNum</classname> extends Complex
 </programlisting>
 
 <programlisting>
-public class <classname>DFloNum</classname> extends RealNum
+public class <emphasis role="bold">DFloNum</emphasis> extends RealNum
 { ...;
   double value;
 }
@@ -498,7 +490,7 @@ public class <classname>DFloNum</classname> extends RealNum
 Concrete class for double-precision (64-bit) floating-point real numbers.
 </para>
 <programlisting>
-public class <classname>RatNum</classname> extends RealNum
+public class <emphasis role="bold">RatNum</emphasis> extends RealNum
 { ...;
   public abstract IntNum numerator();
   public abstract IntNum denominator();
@@ -509,7 +501,7 @@ public class <classname>RatNum</classname> extends RealNum
 has two sub-classes:  <classname>IntFraction</classname>
 and <classname>IntNum</classname>.</para>
 <programlisting>
-public class <classname>IntFraction</classname> extends RatNum
+public class <emphasis role="bold">IntFraction</emphasis> extends RatNum
 { ...;
   IntNum num;
   IntNum den;
@@ -520,7 +512,7 @@ The <classname>IntFraction</classname> class implements fractions in the
 obvious way.  Exact real infinities are identified with the
 fractions <literal>1/0</literal> and <literal>-1/0</literal>.</para>
 <programlisting>
-public class <classname>IntNum</classname> extends RatNum
+public class <emphasis role="bold">IntNum</emphasis> extends RatNum
 { ...;
   int ival;
   int[] words;
@@ -551,7 +543,7 @@ logical and bit-fiddling operations.</para></listitem>
 Use of all 32 bits of each <quote>big-digit</quote> word, which
 is the <quote>expected</quote> space-efficient representation.
 More importantly, it is compatible with the <literal>mpn</literal> routines
-from the Gnu Multi-Precision library (<literal>gmp</literal>) <citation>gmp</citation>.
+from the Gnu Multi-Precision library <xref linkend="gmp"/>.
 The <literal>mpn</literal> routines are low-level algorithms that work
 on unsigned pre-allocated bignums;  they have been transcribed
 into Java in the <literal>MPN</literal> class.  If better efficiency is
@@ -600,10 +592,10 @@ and solved it using <quote>coercive generality</quote>:  Each number class
 has a generality number, and operands of lower generality are
 converted to the class with the higher generality.
 This is inefficient because of all the conversions and
-temporary objects (see <citation>Budd91Arith</citation>), and it is limited
+temporary objects (see <xref linkend="Budd91Arith"/>), and it is limited
 to what extent you can add new kinds of number types.</para>
 <para>
-In <quote>double dispatch</quote> <citation>Ingalls86</citation>
+In <quote>double dispatch</quote> <xref linkend="Ingalls86"/>
 the expression <literal>x-y</literal>
 is implemented as <literal>x.sub(y)</literal>.  Assuming the (run-time)
 class of <literal>x</literal> is <literal>Tx</literal> and that of <literal>y</literal> is <literal>Ty</literal>,
@@ -639,7 +631,7 @@ having to modify existing ones.</para>
 
 <sect2 id="Quantities"><title>Quantities</title>
 <para>
-The DSSSL language <citation>DSSSL</citation> is a dialect of Scheme used
+The DSSSL language <xref linkend="DSSSL"/> is a dialect of Scheme used
 to process SGML documents.  DSSSL has <quote>quantities</quote> in addition
 to real and integer numbers.  Since DSSSL is used to format documents,
 it provides length values that are a multiple of a meter
@@ -658,7 +650,7 @@ and seconds).  Quantities are implemented by the abstract class
 product of a <classname>Unit</classname> and a pure number.
 The number can be an arbitrary complex number.</para>
 <programlisting>
-public class <classname>Quantity</classname> extends Number
+public class <emphasis role="bold">Quantity</emphasis> extends Number
 { ...;
   public Unit unit()
   { return Unit.Empty; }
@@ -666,7 +658,7 @@ public class <classname>Quantity</classname> extends Number
 }
 </programlisting>
 <programlisting>
-public class <classname>CQuantity</classname> extends Quantity
+public class <emphasis role="bold">CQuantity</emphasis> extends Quantity
 { ...;
   Complex num;
   Unit unt;
@@ -681,7 +673,7 @@ A <literal>CQuantity</literal> is a concrete class that implements general
 <literal>Quantities</literal>.  But usually we don't need that much generality,
 and instead use <literal>DQuanity</literal>.</para>
 <programlisting>
-public class <classname>DQuantity</classname> extends Quantity
+public class <emphasis role="bold">DQuantity</emphasis> extends Quantity
 { ...;
   double factor;
   Unit unt;
@@ -693,7 +685,7 @@ public class <classname>DQuantity</classname> extends Quantity
 </programlisting>
 
 <programlisting>
-public class <classname>Unit</classname>
+public class <emphasis role="bold">Unit</emphasis>
 { ...;
   String name; // Optional.
   Dimensions dims;
@@ -706,7 +698,7 @@ and one or more primitive units, combined into a <classname>Dimensions</classnam
 The <classname>Unit</classname> may have a name (such as <quote><literal>kg</literal></quote>), which is
 used for printing, and when parsing literals.</para>
 <programlisting>
-public class <classname>BaseUnit</classname> extends Unit
+public class <emphasis role="bold">BaseUnit</emphasis> extends Unit
 { ...;
   int index;
 }
@@ -719,7 +711,7 @@ for identification and comparison purposes.  Two <literal>BaseUnit</literal>s
 have the same <literal>index</literal> if and only if they are the same <literal>BaseUnit</literal>.</para>
 
 <programlisting>
-public class <classname>Dimensions</classname>
+public class <emphasis role="bold">Dimensions</emphasis>
 {
   BaseUnit[] bases;
   short[] powers;
@@ -778,7 +770,7 @@ Scheme has procedures as first-class values.
 Java does not.  However, we can simulate procedure values,
 by overriding of virtual methods.</para>
 <programlisting>
-class <classname>Procedure</classname>
+class <emphasis role="bold">Procedure</emphasis>
 { ...;
   public abstract Object applyN
     (Object[] args);
@@ -806,7 +798,7 @@ throwing an exception if it is passed the wrong number of
 arguments.  However, there are utility classes
 <literal>Procedure0</literal> to <literal>Procedure4</literal> and <literal>ProcedureN</literal>:</para>
 <programlisting>
-class <classname>Procedure1</classname> extends Procedure
+class <emphasis role="bold">Procedure1</emphasis> extends Procedure
 {
   public Object applyN(Object[] args)
   {
@@ -828,7 +820,7 @@ class <classname>Procedure1</classname> extends Procedure
 Primitive procedures are generally written in Java as
 sub-classes of these helper classes. For example:</para>
 <programlisting>
-class <classname>car</classname> extends Procedure1
+class <emphasis role="bold">car</emphasis> extends Procedure1
 { // Return first element of list.
   public Object apply1(Object arg1)
     { return ((Pair) arg1).car; }
@@ -850,7 +842,7 @@ treated as if they were nested inside a dummy procedure.
 They are compiled as sub-classes of <literal>ModuleBody</literal>:
 </para>
 <programlisting>
-class <classname>ModuleBody</classname> extends Procedure0
+class <emphasis role="bold">ModuleBody</emphasis> extends Procedure0
 { ...;
   public Object apply0()
   { return run(Environment.current());}
@@ -1261,7 +1253,7 @@ The abstract <literal>Expression</literal> class represents partially processed 
 These are in principle independent of the source language,
 though there are still some Scheme assumptions wired in.</para>
 <programlisting>
-class <classname>Expression</classname>
+class <emphasis role="bold">Expression</emphasis>
 { ...;
   public abstract Object eval
     (Environment e);
@@ -1280,7 +1272,7 @@ specified by the <classname>Target</classname> parameter.
 This is usually the Java evaluation stack,
 but we will go into more detail later.</para>
 <programlisting>
-class <classname>QuoteExp</classname> extends Expression
+class <emphasis role="bold">QuoteExp</emphasis> extends Expression
 { ...;
   Object value;
   public QuoteExp(Object val)
@@ -1296,7 +1288,7 @@ class <classname>QuoteExp</classname> extends Expression
 A <literal>QuoteExp</literal> represents a literal (self-evaluating form),
 or a quoted form.</para>
 <programlisting>
-class <classname>ReferenceExp</classname> extends Expression
+class <emphasis role="bold">ReferenceExp</emphasis> extends Expression
 { ...;
   Symbol symbol;
   Declaration binding;
@@ -1308,7 +1300,7 @@ The <literal>symbol</literal> is the source form identifier.
 If <literal>binding</literal> is non-null, it is the lexical
 binding of the identifier.</para>
 <programlisting>
-class <classname>ApplyExp</classname> extends Expression
+class <emphasis role="bold">ApplyExp</emphasis> extends Expression
 { ...;
   Expression func;
   Expression[] args;
@@ -1318,7 +1310,7 @@ class <classname>ApplyExp</classname> extends Expression
 An <literal>ApplyExp</literal> is an application of a procedure <literal>func</literal>
 to an argument list <literal>args</literal>.</para>
 <programlisting>
-class <classname>ScopeExp</classname> extends Expression
+class <emphasis role="bold">ScopeExp</emphasis> extends Expression
 { ...;
   ScopeExp outer;  // Surrounding scope.
   public Declaration add_decl(Symbol name)
@@ -1330,7 +1322,7 @@ A <literal>ScopeExp</literal> is a abstract class that represents a lexical
 scoping construct.  Concrete sub-classes are <literal>LetExp</literal>
 (used for a <literal>let</literal> binding form) and <literal>LambdaExp</literal>.</para>
 <programlisting>
-class <classname>LambdaExp</classname> extends ScopeExp
+class <emphasis role="bold">LambdaExp</emphasis> extends ScopeExp
 { ...;
   Symbol name; // Optional.
   Expression body;
@@ -1360,7 +1352,7 @@ and generates a <literal>ModuleExp</literal>, which is a top-level expression.
 This is done using a <literal>Translator</literal>, which keeps track of
 lexical bindings and other translation state.</para>
 <programlisting>
-class <classname>Translator</classname>
+class <emphasis role="bold">Translator</emphasis>
 { ...;
   public Expression rewrite(Object exp)
   { ... }
@@ -1377,7 +1369,7 @@ the given <literal>message</literal>.</para>
 
 <sect2 id="Syntax-and-Macros"><title>Syntax and Macros</title>
 <programlisting>
-class <classname>Syntax</classname>
+class <emphasis role="bold">Syntax</emphasis>
 { ...;
   public abstract Expression rewrite
     (Object obj, Translator tr);
@@ -1392,7 +1384,7 @@ method is called.</para>
 <para>
 As an example, this trivial class implements <literal>quote</literal>:</para>
 <programlisting>
-class <classname>quote</classname> extends Syntax
+class <emphasis role="bold">quote</emphasis> extends Syntax
 { ...;
   public Expression rewrite
     (Object obj, Translator tr)
@@ -1405,7 +1397,7 @@ class <classname>quote</classname> extends Syntax
 Much more complicated is the <literal>Syntax</literal> that implements
 <literal>define-syntax</literal>.</para>
 <programlisting>
-class <classname>define_syntax</classname> extends Syntax
+class <emphasis role="bold">define_syntax</emphasis> extends Syntax
 { ...;
   public Expression rewrite
     (Object obj, Translator tr)
@@ -1417,7 +1409,7 @@ The result is a <literal>SyntaxRules</literal> object, which contains an encoded
 representation of the patterns and templates in the <literal>syntax-rules</literal>.
 This is in its own right a <literal>Syntax</literal> object.</para>
 <programlisting>
-class <classname>SyntaxRules</classname> extends Syntax
+class <emphasis role="bold">SyntaxRules</emphasis> extends Syntax
 { ...;
   SyntaxRule[] rules;
   public Expression rewrite
@@ -1495,7 +1487,7 @@ with lexical binding in the evaluator.</para>
 <para>
 A <literal>ModuleExp</literal> represents a top-level form:</para>
 <programlisting>
-class <classname>ModuleExp</classname> extends LambdaExp
+class <emphasis role="bold">ModuleExp</emphasis> extends LambdaExp
 { ...;
   public Object eval_module
       (Environment env) {
@@ -1523,7 +1515,7 @@ A <classname>Compilation</classname> object manages the classes, methods, and
 temporary state generated as a result of compiling a
 single top-level <literal>ModuleExp</literal>.</para>
 <programlisting>
-class <classname>Compilation</classname>
+class <emphasis role="bold">Compilation</emphasis>
 { ...;
   ClassType[] classes;
   boolean immediate;
@@ -1575,7 +1567,7 @@ the <function>compile</function> method;  the <classname>Target</classname>
 specifies where to leave the result.
 </para>
 <programlisting>
-public abstract class <classname>Target</classname>
+public abstract class <emphasis role="bold">Target</emphasis>
 { ...;
   public abstract void compileFromStack
     (Compilation comp, Type stackType);
@@ -1614,7 +1606,7 @@ otherwise, it generates code to do the type conversion.</para>
 Things get more interesting when we come to
 <classname>ConditionalTarget</classname>.</para>
 <programlisting>
-public class <classname>ConditionalTarget</classname>
+public class <emphasis role="bold">ConditionalTarget</emphasis>
     extends Target
 { ...;
   public Label ifTrue, ifFalse;
@@ -1648,7 +1640,7 @@ The <literal>ClassType</literal> and <literal>Method</literal> classes are in a 
 interface to code generation and Java <literal>.class</literal> files.
 It is essentially independent of Scheme or the rest of Kawa.</para>
 <programlisting>
-class <classname>ClassType</classname> extends Type
+class <emphasis role="bold">ClassType</emphasis> extends Type
 { ...;
   CpoolEntry[] constant_pool;
   Method methods; // List of methods.
@@ -1676,7 +1668,7 @@ pool entries.</para>
 When the <classname>ClassType</classname> has been fully built, the
 <function>writeToFile</function> method
 can be used to write out the contents into a file.
-The result has the format of a <literal>.class</literal> file <citation>JavaVmSpec</citation>.
+The result has the format of a <literal>.class</literal> file <xref linkend="JavaVMSpec"/>.
 Alternatively, the class can be written
 to an internal byte array (that has the same layout as a <literal>.class</literal>
 file) using the <function>writeToArray</function> method.
@@ -1687,7 +1679,7 @@ general <function>writeToStream</function>.</para>
 <para>
 Each method is represented by a <literal>Method</literal> object.</para>
 <programlisting>
-class <classname>Method</classname> implements AttrContainer
+class <emphasis role="bold">Method</emphasis> implements AttrContainer
 { ...;
   Type[] arg_types;
   Type return_type;
@@ -1705,7 +1697,7 @@ do not understand them).  Each class file may have a set of top-level
 attributes.  In addition, each field and method may have attributes.
 Some standard attributes may have nested sub-attributes.</para>
 <programlisting>
-public abstract class <classname>Attribute</classname>
+public abstract class <emphasis role="bold">Attribute</emphasis>
 { ...;
   AttrContainer container;
   String name;
@@ -1722,7 +1714,7 @@ occurs in a method and has the name <literal>"Code"</literal>.  It
 contains the actual bytecode instructions of a non-native non-abstract method,
 and we represent it using <classname>CodeAttr</classname>.</para>
 <programlisting>
-class <classname>CodeAttr</classname> extends Attribute
+class <emphasis role="bold">CodeAttr</emphasis> extends Attribute
 { ...;
   Variable addLocal(Type t, String name)
   { ... }
@@ -1799,7 +1791,7 @@ The basic idea is that for:</para>
 <para>
 we compile the equivalent of:</para>
 <programlisting>
-class <classname>foo</classname> extends Procedure0
+class foo extends Procedure0
 {
   Object static lit1
     = Pair.make(IntNum.make(3),
@@ -1928,7 +1920,7 @@ Automatically handles cycles and duplicate references.
 (Standard Scheme does not
 support self-referential constants, but for example Common Lisp does.
 See section 25.1.4 <quote>Similarity of Constants</quote> in
-<citation>CommonLisp2</citation>.)</para></listitem>
+<xref linkend="CommonLisp2"/>.)</para></listitem>
 <listitem><para>
 Only requires standard JDK 1.1 features.</para></listitem>
 </itemizedlist>
@@ -1968,7 +1960,7 @@ types that are represented using the same class.</para></listitem>
 <para>
 Kawa represents types using instances of <classname>Type</classname>:</para>
 <programlisting>
-public abstract class <classname>Type</classname>
+public abstract class <emphasis role="bold">Type</emphasis>
 { ...;
   String signature;  // encoded type name
   int size;
@@ -1986,7 +1978,7 @@ is called by the compiler to emit a run-time test.
 Note that the earlier mentioned <classname>ClassType</classname>
 extends <classname>Type</classname>.</para>
 <para>
-Kawa follows the convention (used in RScheme <citation>RScheme</citation>
+Kawa follows the convention (used in RScheme <xref linkend="RScheme"/>
 and other Scheme dialects) that identifiers of the form
 <function>&lt;<replaceable>typename</replaceable>&gt;</function>
 are used to name types.  For example Scheme vectors are
@@ -2151,7 +2143,7 @@ not slow down code that does not use the feature, which is most
 Scheme code.  Kawa uses a helper class <classname>Values</classname>:
 </para>
 <programlisting>
-class <classname>Values</classname>
+class <emphasis role="bold">Values</emphasis>
 { ...
   private Object[] vals;
   public static final Values empty
@@ -2200,7 +2192,7 @@ are implemented using Java exceptions, and can be used to
 prematurely exit (throw), but not to implement co-routines
 (which should use threads anyway).</para>
 <programlisting>
-class <classname>callcc</classname> extends Procedure1
+class <emphasis role="bold">callcc</emphasis> extends Procedure1
 { ...;
   public Object apply1(Object arg1)
   {
@@ -2238,7 +2230,7 @@ after <literal>callcc</literal> returns.
 make sure the stacks are moved to the heap, so they can be
 returned to an an arbitarry future time.)</para>
 <programlisting>
-class <classname>Continuation</classname> extends Procedure1
+class <emphasis role="bold">Continuation</emphasis> extends Procedure1
 { ...;
   public Object apply1(Object arg1)
   {
@@ -2253,7 +2245,7 @@ that is passed to <literal>callcc</literal>'s argument;
 when it is invoked, it throws a <literal>CalledContinuation</literal>
 that contains the continuation and the value returned.</para>
 <programlisting>
-class <classname>CalledContinuation</classname>
+class <emphasis role="bold">CalledContinuation</emphasis>
     extends RuntimeException
 { ...;
   Object value;
@@ -2302,7 +2294,7 @@ assembly language kludges.
 Hence, you cannot use the C or Java stack for the call stack, but
 instead have to explicitly manage the call graph and return
 addresses.  Such re-writing has been done before for
-ML <citation>MLtoC</citation> and Scheme <citation>RScheme</citation>.
+ML <xref linkend="MLtoC"/> and Scheme <xref linkend="RScheme"/>.
 </para>
 <para>
 In Java we have the extra complication that we do not have function addresess,
@@ -2315,7 +2307,7 @@ others the <quote>CPS</quote> (Continuation Passing Style) calling convention.
 The rest of this section explains the
 <emphasis>planned</emphasis> CPS calling convention.</para>
 <programlisting>
-public abstract class <classname>CpsFrame</classname>
+public abstract class <emphasis role="bold">CpsFrame</emphasis>
 {
   CpsFrame caller;
   int saved_pc;
@@ -2334,7 +2326,7 @@ multiple threads, and in fact one <classname>CpsContext</classname>
 is allocated each time a regular (non-CPS) method calls a procedure that uses
 the CPS calling convention.</para>
 <programlisting>
-public class <classname>CpsContext</classname>
+public class <emphasis role="bold">CpsContext</emphasis>
 {
   CpsFrame frame;
   int pc;
@@ -2453,9 +2445,8 @@ In one sense benchmarking Kawa is meaningless, because performance
 will vary so much depending on the underlying Java implementation.
 One can even take the compiled bytecode files and translate them
 to native code, factoring out the Java interpreter altogether.
-For example, my company Cygnus Solutions is implementing a
-Java implementation based on Gcc <citation>GccJava</citation>;
-it will be able to speed up compiled Kawa code substantially.</para>
+For example, the Gcc-based Java implementation GCJ <xref linkend="GccJava"/>;
+can speed up compiled Kawa code substantially.</para>
 <para>
 While the goal of Kawa is not maximum performance, it would be
 reassuring if its speed is at least comparable to other Scheme
@@ -2545,7 +2536,7 @@ to plug in new parsers, pre-defined functions, data types, and output
 formatting.  That will make it easier to add new languages
 and dialects.
 Of special interest is re-implementing some of the ideas and syntax
-from my earlier Q language  <citation>Bothner88</citation>. These include a
+from my earlier Q language  <xref linkend="Bothner88"/>. These include a
 line-oriented syntax with fewer parentheses, and high-level
 sequence and array operations (as in APL).</para>
 <para>
@@ -2560,7 +2551,7 @@ There is very  preliminary threads support in Kawa.
 It provides an interface to Java threads that looks
 somewhat like <literal>delay</literal>, except that the delayed expression
 is evaluated in a new thread.  (The model is similar to to the
-<quote>futures</quote> concept of MultiScheme <citation>Miller87</citation>,
+<quote>futures</quote> concept of MultiScheme <xref linkend="Miller87"/>,
 but there is no implicit force, at least yet.)  Some
 of the core classes (such <literal>Environment</literal>
 and <literal>Translator</literal>) now support threads
@@ -2590,7 +2581,7 @@ but have to co-exist with Java.</para>
 <bibliography id="Bibliography">
 <title>Bibliography</title>
 
-<biblioentry>
+<biblioentry id="Bothner88">
 <abbrev>Bothner88</abbrev>
 <authorgroup>
 <author><firstname>Per</firstname> <surname>Bothner</surname></author>
@@ -2601,7 +2592,7 @@ Department of Computer Science, Stanford University</bibliomisc>
 <pubdate>1988</pubdate>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="Budd91Arith">
 <abbrev>Budd91Arith</abbrev>
 <authorgroup>
 <author><firstname>Timothy</firstname> <surname>Budd</surname></author>
@@ -2612,7 +2603,7 @@ Department of Computer Science, Stanford University</bibliomisc>
 <pubdate>February 1996</pubdate>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="CommonLisp2">
 <abbrev>CommonLisp2</abbrev>
 <authorgroup>
 <author><firstname>Guy L.</firstname> <surname>Steele Jr.</surname></author>
@@ -2623,7 +2614,7 @@ Department of Computer Science, Stanford University</bibliomisc>
 <pubdate>1990</pubdate>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="DSSSL">
 <abbrev>DSSSL</abbrev>
 <authorgroup><corpauthor>International Standards Organization</corpauthor></authorgroup>
 <title>Document Style Semantics and Specification Language</title>
@@ -2631,14 +2622,14 @@ Department of Computer Science, Stanford University</bibliomisc>
 <bibliomisc>International Standard ISO/IEC 10179:1996(E)</bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="ECMAScript">
 <abbrev>ECMAScript</abbrev>
 <authorgroup><corpauthor>ECMA</corpauthor></authorgroup>
 <title>ECMAScript Language Specification</title>
-<bibliomisc><literal>http://www.ecma.ch/stand/ecma-262.htm</literal></bibliomisc>
+<bibliomisc><ulink uref="http://www.ecma.ch/stand/ecma-262.htm"/></bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="GccJava">
 <abbrev>GccJava</abbrev>
 <authorgroup>
 <author><firstname>Per</firstname> <surname>Bothner</surname></author>
@@ -2647,10 +2638,10 @@ Department of Computer Science, Stanford University</bibliomisc>
 <bibliomisc>IEEE Compcon 1997 Proceedings</bibliomisc>
 <pagenums>174-178</pagenums>
 <pubdate>February 1997</pubdate>
-<bibliomisc>See also <literal>http://www.cygnus.com/product/javalang</literal></bibliomisc>
+<bibliomisc>See also <ulink url="http://gcc.gnu.org/java/"/></bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="gmp">
 <abbrev>gmp</abbrev>
 <authorgroup>
 <author><firstname>Torbj&#xf6;rn</firstname> <surname>Granlund</surname>
@@ -2661,7 +2652,7 @@ Department of Computer Science, Stanford University</bibliomisc>
 on most GNU archives.)</bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="Ingalls86">
 <abbrev>Ingalls86</abbrev>
 <authorgroup>
 <author><firstname>Daniel</firstname> <surname>Ingalls</surname></author>
@@ -2673,7 +2664,7 @@ on most GNU archives.)</bibliomisc>
 </biblioentry>
 
 <!-- <bookbiblio>
-<biblioentry>
+<biblioentry id="Gcc">
 <abbrev>Gcc</abbrev>
 <authorgroup>
 <author><firstname>Richard</firstname> <surname>Stallman</surname></author>
@@ -2684,7 +2675,7 @@ on most GNU archives.)</bibliomisc>
 </biblioentry>
 -->
 
-<biblioentry>
+<biblioentry id="JavaSpec">
 <abbrev>JavaSpec</abbrev>
 <!--<bookbiblio>-->
 <authorgroup>
@@ -2698,7 +2689,7 @@ on most GNU archives.)</bibliomisc>
 <!--</bookbiblio>-->
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="JavaVMSpec">
 <abbrev>JavaVMSpec</abbrev>
 <!--<bookbiblio>-->
 <authorgroup>
@@ -2711,25 +2702,25 @@ on most GNU archives.)</bibliomisc>
 <!--</bookbiblio>-->
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="Kaffe">
 <abbrev>Kaffe</abbrev>
 <authorgroup>
 <author><firstname>Tim</firstname> <surname>Wilkinson</surname></author>
 </authorgroup>
 <title>Kaffe - a free virtual machine to run Java code</title>
-<bibliomisc><literal>http://www.kaffe.org/</literal></bibliomisc>
+<bibliomisc><ulink uref="http://www.kaffe.org/"/></bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="Kawa">
 <abbrev>Kawa</abbrev>
 <authorgroup>
 <author><firstname>Per</firstname> <surname>Bothner</surname></author>
 </authorgroup>
 <title>Kawa, the Java-based Scheme System</title>
-<bibliomisc><literal>http://www.cygnus.com/~bothner/kawa.html</literal></bibliomisc>
+<bibliomisc><ulink uref="http://www.gnu.org/software/kawa/"/></bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="Miller87">
 <abbrev>Miller87</abbrev>
 <authorgroup>
 <author><firstname>James</firstname> <surname>Miller</surname></author>
@@ -2740,7 +2731,7 @@ Department of Electrical Engineering and Computer Science, MIT</bibliomisc>
 <pubdate>1987</pubdate>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="MLtoC">
 <abbrev>MLtoC</abbrev>
 <authorgroup>
 <author><firstname>David</firstname> <surname>Tarditi</surname></author>
@@ -2755,7 +2746,7 @@ Department of Electrical Engineering and Computer Science, MIT</bibliomisc>
 <pagenums>161-177</pagenums>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="R5RS">
 <abbrev>R5RS</abbrev>
 <title>Revised<superscript>5</superscript> Report on the Algorithmic Language Scheme</title>
 <authorgroup>
@@ -2767,17 +2758,17 @@ Department of Electrical Engineering and Computer Science, MIT</bibliomisc>
 <pubdate>1998</pubdate>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="RScheme">
 <abbrev>RScheme</abbrev>
 <authorgroup>
 <author><firstname>Donovan</firstname> <surname>Kolbly</surname></author>
 <author><firstname>Paul</firstname> <surname>Wilson</surname></author>
 <author><surname>others</surname></author>
 </authorgroup>
-<bibliomisc><literal>http://www.rscheme.org/</literal></bibliomisc>
+<bibliomisc><ulink uref="http://www.rscheme.org/"/></bibliomisc>
 </biblioentry>
 
-<biblioentry>
+<biblioentry id="SGML">
 <abbrev>SGML</abbrev>
 <authorgroup><corpauthor>International Standards Organization</corpauthor></authorgroup>
 <title>SGML (Standard Generalized Markup Language) ISO 8879</title>

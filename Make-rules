@@ -16,8 +16,6 @@ java_Java= $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java) $(EXTRA_GCJ_DEPS)
 SOURCES = $(java_sources) $(java_SCM)
 CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
-clean:
-	rm -f $(CLEANFILES)
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)

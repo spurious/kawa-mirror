@@ -6,6 +6,8 @@
 	* kawa/standard/letrec.java: Removed, no longer needed.
 	* kawa/standard/Makefile.am (java_sources): Remove letrec.java.
 
+	* Make-rules:  Remove bogus 'clean' rule.
+
 2004-09-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/ifp.java (allowElseList): New flag.

@@ -1,3 +1,7 @@
+Tue Jan 20 10:26:42 1998  Alberto Petrofsky  <albatros@wco.com>
+
+	* misc-test.scm: Add some reader regression tests.
+
 Mon Jan 19 17:09:38 1998  Per Bothner  <bothner@cygnus.com>
 
 	* num-test.scm:  Add some more regression tests.

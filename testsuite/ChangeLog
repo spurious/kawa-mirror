@@ -1,3 +1,8 @@
+2005-01-25  Per Bothner  <per@bothner.com>
+
+	* HelloCgiX.xql: Add qexo prefix to request-query-string, to test
+	that it works both with and without the prefix.
+
 2005-01-19  Dominique Boucher <dominique.boucher@nuecho.com>
 
 	* formatst.scm:  Add some more regression tests.

@@ -18,13 +18,16 @@ public class define_class extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    Pair p;
-    Object name;
-    if (! (st.cdr instanceof Pair)
-	|| ! ((name = (p = (Pair) st.cdr).car) instanceof String
-	      || name instanceof Symbol))
+    Object st_cdr = st.cdr;
+    while (st_cdr instanceof SyntaxForm)
+      st_cdr = ((SyntaxForm) st_cdr).form;
+    if (! (st_cdr instanceof Pair))
       return super.scanForDefinitions(st, forms, defs, tr);
-    if (! (p instanceof Pair))
+    Pair p = (Pair) st_cdr;
+    Object name = p.car;
+    while (name instanceof SyntaxForm)
+      name = ((SyntaxForm) name).form;
+    if (! (name instanceof String || name instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
     Declaration decl = defs.getDefine(name, 'w', tr);
     if (p instanceof PairWithPosition)

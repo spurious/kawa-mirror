@@ -91,14 +91,10 @@ public class Scheme extends LispInterpreter
 
       //-- Section 4.1  -- complete
       define (LispInterpreter.quote_sym, new Quote ());
-      define_syntax("define", new kawa.standard.define(lambda, false));
-      define_syntax("define-private",
-                    new kawa.standard.define(lambda, true));
-      define_syntax("define-constant",
-                    new kawa.standard.define(lambda, false, true));
-      define_syntax("define-autoload", new define_autoload(false));
-      define_syntax("define-autoloads-from-file", new define_autoload(true));
-      define_syntax ("if", "kawa.standard.ifp");
+      define_syntax("%define", new kawa.standard.define(lambda));
+      define_syntax ("define", "kawa.lib.prim_syntax");
+
+      define_syntax ("if", "kawa.lib.prim_syntax");
       define_syntax ("set!", "kawa.standard.set_b");
 
       // Section 4.2  -- complete
@@ -122,9 +118,10 @@ public class Scheme extends LispInterpreter
       //-- Section 5  -- complete [except for internal definitions]
 
       // Appendix (and R5RS)
-      define ("define-syntax", new kawa.standard.define_syntax ());
+      define_syntax ("define-syntax", "kawa.lib.prim_syntax");
+      define ("%define-syntax", new kawa.standard.define_syntax ());
       define ("syntax-rules", new kawa.standard.syntax_rules ());
-      define ("syntax-case", new kawa.standard.syntax_case ());
+      define ("syntax", new kawa.standard.syntax ());
       define ("let-syntax", new kawa.standard.let_syntax (false));
       define ("letrec-syntax", new kawa.standard.let_syntax (true));
 
@@ -402,6 +399,12 @@ public class Scheme extends LispInterpreter
 
       kawaEnvironment = new Environment (r5Environment);
       environ = kawaEnvironment;
+ 
+      define_syntax ("define-private", "kawa.lib.prim_syntax");
+      define_syntax ("define-constant", "kawa.lib.prim_syntax");
+
+      define_syntax("define-autoload", new define_autoload(false));
+      define_syntax("define-autoloads-from-file", new define_autoload(true));
 
       define_proc ("exit", "kawa.lib.thread");
 
@@ -444,14 +447,14 @@ public class Scheme extends LispInterpreter
       define_syntax("primitive-array-length", "kawa.lib.reflection");
       define_proc("subtype?", "kawa.lib.reflection");
       define_field("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
-      define_syntax("try-finally", "kawa.standard.try_finally");
-      define_syntax("try-catch", "kawa.standard.try_catch");
+      define_syntax("try-finally", "kawa.lib.syntax");
+      define_syntax("try-catch", "kawa.lib.prim_syntax");
       define_proc("throw", "kawa.standard.throw_name");
       define_proc("catch", "kawa.lib.syntax");
       define_proc("error", "kawa.lib.misc");
       define_proc("as", gnu.kawa.functions.Convert.as);
       define_field("instance?", "kawa.standard.Scheme", "instanceOf");
-      define_syntax("synchronized", "kawa.standard.synchronizd");
+      define_syntax("synchronized", "kawa.lib.syntax");
       object objectSyntax = new kawa.standard.object(lambda);
       define_syntax("object", objectSyntax);
       define_syntax("define-class",
@@ -459,17 +462,22 @@ public class Scheme extends LispInterpreter
       define_syntax("define-simple-class",
                     new kawa.standard.define_class(objectSyntax, true));
       define_syntax("this", "kawa.standard.thisRef");
-      define_proc("make", gnu.kawa.reflect.Invoke.make);
+      define_field("make", "gnu.kawa.reflect.Invoke", "make");
       define_field("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
       define_field("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
       define_field("field", "gnu.kawa.reflect.SlotGet");
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
       define_field("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
-      define_proc("invoke", gnu.kawa.reflect.Invoke.invoke);
+      define_field("invoke", "gnu.kawa.reflect.Invoke", "invoke");
 
       define_field("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
       define_field("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
+
+      define ("define-macro", "kawa.lib.syntax");
+      define ("%define-macro",
+	      new kawa.standard.define_syntax("define-macro", false));
+      define ("syntax-case", new kawa.standard.syntax_case ());
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");

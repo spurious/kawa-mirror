@@ -2,54 +2,70 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.mapping.Values;
 import java.util.Vector;
 import java.util.Stack;
 
 public class with_compile_options extends Syntax
 {
-  public boolean scanForDefinitions (Pair st, Vector forms,
-                                     ScopeExp defs, Translator tr)
+  public void scanForm (Pair form, ScopeExp defs, Translator tr)
   {
     Stack stack = new Stack();
-    Object rest = getOptions(st.cdr, stack, this, tr);
-    if (rest != LList.Empty)
+    Object rest = getOptions(form.cdr, stack, this, tr);
+    if (rest == LList.Empty)
+      return;
+    if (rest == form.cdr)
       {
-	int oldCount = forms.size();
-	tr.scan_body(rest, forms, defs);
-	int newCount = forms.size();
-	Vector newForms = new Vector(newCount - oldCount);
-	for (int i = oldCount;  i < newCount;  i++)
-	  newForms.addElement(forms.elementAt(i));
-	forms.setSize(oldCount);
-	forms.addElement(LList.list4(this, stack, newForms, defs));
+	tr.scanBody(rest, defs);
+	return;
       }
+    int first = tr.formStack.size();
+    tr.scanBody(rest, defs);
+    rest = LList.Empty;
+    while (tr.formStack.size() > first)
+      rest = new Pair(tr.formStack.pop(), rest);
+    rest = new Pair(stack, rest);
     tr.currentOptions.popOptionValues(stack);
-    return true;
+    tr.formStack.add(Translator.makePair(form, form.car, rest));
   }
 
   public static Object getOptions (Object form, Stack stack,
-				      Syntax syntax, Translator tr)
+				   Syntax command, Translator tr)
   {
     boolean seenKey = false;
     gnu.text.Options options = tr.currentOptions;
-    while (form instanceof Pair)
+    SyntaxForm syntax = null;
+    for (;;)
       {
-	Pair pair = (Pair) form;
-	if (! (pair.car instanceof Keyword))
+	while (form instanceof SyntaxForm)
+	  {
+	    syntax = (SyntaxForm) form;
+	    form = syntax.form;
+	  }
+	if (! (form instanceof Pair))
 	  break;
-	String key = ((Keyword) pair.car).getName();
+	Pair pair = (Pair) form;
+	Object pair_car = Translator.stripSyntax(pair.car);
+	if (! (pair_car instanceof Keyword))
+	  break;
+	String key = ((Keyword) pair_car).getName();
 	seenKey = true;
 	Object savePos = tr.pushPositionOf(pair);
 	try
 	  {
 	    form = pair.cdr;
+	    while (form instanceof SyntaxForm)
+	      {
+		syntax = (SyntaxForm) form;
+		form = syntax.form;
+	      }
 	    if (! (form instanceof Pair))
 	      {
 		tr.error('e', "keyword " + key + " not followed by value");
 		return LList.Empty;
 	      }
 	    pair = (Pair) form;
-	    Object value = pair.car;
+	    Object value = Translator.stripSyntax(pair.car);
 	    form = pair.cdr;
 	    Object oldValue = options.getLocal(key);
 	    if (options.getInfo(key) == null)
@@ -81,62 +97,44 @@ public class with_compile_options extends Syntax
 	  }
       }
     if (! seenKey)
-      tr.error('e', "no option keyword in "+syntax.getName());
-    return form;
+      tr.error('e', "no option keyword in "+command.getName());
+    return tr.wrapSyntax(form, syntax);
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Expression result;
+    Object rest;
     Stack stack;
     Object obj = form.cdr;
-  rewrite:
+    Pair p;
     if (obj instanceof Pair
-	&& ((Pair) obj).car instanceof Stack)
+	&& (p = (Pair) obj).car instanceof Stack)
       {
-	form = (Pair) obj;
-	stack = (Stack) form.car;
-	obj = form.cdr;
-	if (obj instanceof Pair)
-	  {
-	    form = (Pair) obj;
-	    Vector forms = (Vector) form.car;
-	    obj = form.cdr;
-	    if (form.car instanceof Vector && obj instanceof Pair)
-	      {
-		form = (Pair) obj;
-		ScopeExp defs = (ScopeExp) form.car;
-		if (form.cdr == LList.Empty)
-		  {
-		    tr.currentOptions.pushOptionValues(stack);
-		    result = tr.makeBody(forms, defs);
-		    tr.currentOptions.popOptionValues(stack);
-		    break rewrite;
-		  }
-	      }
-	  }
-	return tr.syntaxError("internal error handling "+getName());
+	stack = (Stack) p.car;
+	rest = p.cdr;
+	tr.currentOptions.pushOptionValues(stack);
       }
     else
       {
 	stack = new Stack();
-	Object rest = getOptions(obj, stack, this, tr);
-	try
-	  {
-	    result = tr.rewrite_body(rest);
-	  }
-	finally
-	  {
-	    tr.currentOptions.popOptionValues(stack);
-	  }
+	rest = getOptions(obj, stack, this, tr);
       }
-    BeginExp bresult;
-    if (result instanceof BeginExp)
-      bresult = (BeginExp) result;
-    else
-      bresult = new BeginExp (new Expression[] { result });
-    bresult.setCompileOptions(stack);
-    return bresult;
+
+    try
+      {
+	Expression result = tr.rewrite_body(rest);
+	BeginExp bresult;
+	if (result instanceof BeginExp)
+	  bresult = (BeginExp) result;
+	else
+	  bresult = new BeginExp (new Expression[] { result });
+	bresult.setCompileOptions(stack);
+	return bresult;
+      }
+    finally
+      {
+	tr.currentOptions.popOptionValues(stack);
+      }
   }
 }
 

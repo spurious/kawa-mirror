@@ -35,6 +35,21 @@
 	* kawa/standard/syntax_error.java (error): New static method.
 	* kawa/standard/let.java: Re-write.
 	* kawa/standard/let_syntax.java: Likewise.
+	* kawa/standard/IfFeature.java: No longer extends Syntax.
+	Just contains static help methods.
+	* kawa/standard/begin.java (scanForDefinitions): Replace by scanForm.
+	* kawa/standard/define.java: Re-shuffle.  Simplify parsing by
+	using define-syntax.  OTOH, have to deal with SyntaxForm.
+	* kawa/standard/define_class.java: Handle SyntaxForm - incompletely.
+	* kawa/standard/define_syntax.java: Also use for %define-macro.
+	* kawa/standard/ifp.java: Removed - now implemented in prim_syntax.scm.
+	* kawa/standard/object.java: Handle SyntaxForm - incompletely.
+	* kawa/standard/try_catch.java: No longer implement Syntax.
+	* kawa/standard/synchronizd.java:  Removed - now in prim_syntax.scm.
+	* kawa/standard/try_finally.java: Likewise.
+	* kawa/standard/with_compile_options.java: Handle SyntaxForms.
+	* kawa/standard/Makefile.am: Update accordingly.
+	* kawa/standard/Scheme.java: Various updates.
 
 2004-11-06  Per Bothner  <per@bothner.com>
 

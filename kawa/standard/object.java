@@ -51,7 +51,7 @@ public class object extends Syntax
   public Object[] scanClassDef (Pair pair, ClassExp oexp, Translator tr)
   {
     tr.mustCompileHere();
-    int num_supers = LList.listLength(pair.car, false);
+    int num_supers = Translator.listLength(pair.car);
     if (num_supers < 0)
       {
 	tr.error('e', "object superclass specification not a list");
@@ -61,6 +61,11 @@ public class object extends Syntax
     Object superlist = pair.car;
     for (int i = 0;  i < num_supers;  i++)
       {
+	while (superlist instanceof SyntaxForm)
+	  {
+	    // FIXME - need to pass syntax.
+	    superlist = ((SyntaxForm) superlist).form;
+	  }
 	Pair superpair = (Pair) superlist;
 	supers[i] = tr.rewrite(superpair.car);
 	superlist = superpair.cdr;
@@ -74,20 +79,34 @@ public class object extends Syntax
     Vector inits = new Vector(20);
     for (Object obj = components;  obj != LList.Empty;  )
       {
-	if (! (obj instanceof Pair)
-	    || ! ((pair = (Pair) obj).car instanceof Pair))
+	// FIXME need to set current scope from SyntaxForm.
+	while (obj instanceof SyntaxForm)
+	  obj = ((SyntaxForm) obj).form;
+	if (! (obj instanceof Pair))
+	  {
+	    tr.error('e', "object member not a list");
+	    return null;
+	  }
+	pair = (Pair) obj;
+	Object pair_car = pair.car;
+	while (pair_car instanceof SyntaxForm)
+	  pair_car = ((SyntaxForm) pair_car).form;
+	if (! (pair_car instanceof Pair))
 	  {
 	    tr.error('e', "object member not a list");
 	    return null;
 	  }
 	obj = pair.cdr; // Next member.
 	Object savedPos1 = tr.pushPositionOf(pair);
-	pair = (Pair) pair.car;
-	if (pair.car instanceof String || pair.car instanceof Symbol
-	    || pair.car instanceof Keyword)
+	pair = (Pair) pair_car;
+	pair_car = pair.car;
+	while (pair_car instanceof SyntaxForm)
+	  pair_car = ((SyntaxForm) pair_car).form;
+	if (pair_car instanceof String || pair_car instanceof Symbol
+	    || pair_car instanceof Keyword)
 	  { // Field declaration.
 	    Pair typePair = null;
-	    Object sname = pair.car;
+	    Object sname = pair_car;
 	    Object args;
 	    Declaration decl;
 	    int allocationFlag = 0;
@@ -254,9 +273,9 @@ public class object extends Syntax
 		decl.setCanWrite(true);
 	      }
 	  }
-	else if (pair.car instanceof Pair)
+	else if (pair_car instanceof Pair)
 	  { // Method declaration.
-	    Pair mpair = (Pair) pair.car;
+	    Pair mpair = (Pair) pair_car;
 	    Object mname = mpair.car;
 	    if (! (mname instanceof String)
 		&& ! (mname instanceof Symbol))
@@ -323,18 +342,27 @@ public class object extends Syntax
     int finit_index = 0;   // Output index in inits vector.
     for (Object obj = components;  obj != LList.Empty;  )
       {
+	// FIXME need to set current scope from SyntaxForm.
+	while (obj instanceof SyntaxForm)
+	  obj = ((SyntaxForm) obj).form;
 	Pair pair = (Pair) obj;
 	Object savedPos1 = tr.pushPositionOf(pair);
+	Object pair_car = pair.car;
+	while (pair_car instanceof SyntaxForm)
+	  pair_car = ((SyntaxForm) pair_car).form;
 	try
 	  {
 	    obj = pair.cdr; // Next member.
-	    pair = (Pair) pair.car;
-	    if (pair.car instanceof String || pair.car instanceof Symbol
-		|| pair.car instanceof Keyword)
+	    pair = (Pair) pair_car;
+	    pair_car = pair.car;
+	    while (pair_car instanceof SyntaxForm)
+	      pair_car = ((SyntaxForm) pair_car).form;
+	    if (pair_car instanceof String || pair_car instanceof Symbol
+		|| pair_car instanceof Keyword)
 	      { // Field declaration.
 		Object type = null;
 		int nKeywords = 0;
-		Object args = pair.car instanceof Keyword ? pair : pair.cdr;
+		Object args = pair_car instanceof Keyword ? pair : pair.cdr;
 		Object init = null;
 		while (args instanceof Pair)
 		  {
@@ -412,9 +440,9 @@ public class object extends Syntax
 		      inits.setElementAt(initValue, finit_index++);
 		  }
 	      }
-	    else if (pair.car instanceof Pair)
+	    else if (pair_car instanceof Pair)
 	      { // Method declaration.
-		Pair mpair = (Pair) pair.car;
+		Pair mpair = (Pair) pair_car;
 		LambdaExp lexp = meth;
 		meth = meth.nextSibling;
 		Object body = lambda.skipAttrs(lexp, pair.cdr, tr);

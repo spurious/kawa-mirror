@@ -238,18 +238,18 @@ map.java \
 callcc.java \
 logand.java logior.java logxor.java \
 define.java \
-define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
+define_syntax.java syntax_rules.java let_syntax.java \
+syntax.java syntax_case.java \
 require.java module_extends.java module_implements.java module_name.java \
 module_compile_options.java with_compile_options.java \
 module_static.java export.java define_unit.java \
 syntax_error.java \
 let.java \
 begin.java \
-ifp.java \
 call_with_values.java \
 make_quantity.java quantity2number.java quantity2unit.java \
 make_future.java sleep.java \
-try_catch.java try_finally.java synchronizd.java \
+try_catch.java \
 make.java location.java \
 define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \

@@ -4,8 +4,20 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 
-public class IfFeature extends Syntax implements Printable
+public class IfFeature
 {
+  public static boolean testFeature (Object form)
+  {
+    if (form instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) form;
+	form = sf.form;
+      }
+    if (form instanceof String)
+      return hasFeature((String) form);
+    return false;  // FIXME - return error
+  }
+
   public static boolean hasFeature (String name)
   {
     if (name == "kawa")
@@ -36,26 +48,5 @@ public class IfFeature extends Syntax implements Printable
     if (name == "srfi-30") // Nested Multi-line Comments.
       return true;
     return false;
-  }
-
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                    ScopeExp defs, Translator tr)
-  {
-    Object [] match = ListPat.match(3, 3, null, st.cdr);
-    if (match == null || ! (match[0] instanceof String))
-      {
-	forms.addElement(tr.syntaxError("invalid syntax for cond-expand"));
-	return false;
-      }
-    return tr.scan_form(match[hasFeature((String) match[0]) ? 1 : 2],
-			forms, defs);
-  }
-
-  public Expression rewrite (Object obj, Translator tr)
-  {
-    Object [] match = ListPat.match(3, 3, null, obj);
-    if (match == null || ! (match[0] instanceof String))
-      return tr.syntaxError ("invalid syntax for cond-expand");
-    return tr.rewrite(match[hasFeature((String) match[0]) ? 1 : 2]);
   }
 }

@@ -7,57 +7,37 @@ import gnu.mapping.*;
 import gnu.expr.*;
 
 /**
- * The Syntax transformer that re-writes "try-catch".
- * (try-catch try-clause (var type exp*)+)
- * @author	Per Bothner
+ * Utility method for try-catch.
  */
 
-public class try_catch extends Syntax implements Printable
+public class try_catch
 {
-  public Expression rewrite (Object obj, Translator tr)
+  public static Expression rewrite (Object try_part, Object clauses)
   {
-    if (! (obj instanceof Pair))
-      return tr.syntaxError("missing try-clause in try-catch");
-    Pair pair = (Pair) obj;
-    TryExp try_exp = new TryExp (tr.rewrite(pair.car), null);
-
-    CatchClause last = null;
-    for (;;)
+    Translator tr = (Translator) Compilation.getCurrent();
+    Expression try_part_exp = tr.rewrite(try_part);
+    CatchClause prev = null;
+    CatchClause chain = null;
+    FVector vec = (FVector) clauses;
+    int n = vec.size();
+    for (int i = 0;  i < n;  i++)
       {
-	obj = pair.cdr;
-	if (obj == LList.Empty)
-	  break;
-	if (! (obj instanceof Pair))
-	  return tr.syntaxError("improper list in try-catch");
-	pair = (Pair) obj;
-	Object try_obj = pair.car;
-	if (try_obj instanceof Pair)
-	  {
-	    Pair try_pair = (Pair) try_obj;
-	    Object name = try_pair.car;
-	    if (! (name instanceof String) && ! (name instanceof Symbol))
-	      return tr.syntaxError("invalid identifier of catch clause");
-	    try_obj = try_pair.cdr;
-	    if (try_obj instanceof Pair)
-	      {
-		try_pair = (Pair) try_obj;
-		Type type = tr.exp2Type (try_pair);
-		if (! (type instanceof ClassType))
-		  return tr.syntaxError("catch clause type not a class type");
-		CatchClause clause = new CatchClause (name, (ClassType) type);
-		tr.push(clause);
-		clause.setBody(tr.rewrite_body(try_pair.cdr));
-		tr.pop(clause);
-		if (last == null)
-		  try_exp.setCatchClauses(clause);
-		else
-		  last.setNext(clause);
-		last = clause;
-		continue;
-	      }
-	  }
-	return tr.syntaxError("invalid syntax for catch clause in try-catch");
+	Expression cl = tr.rewrite(vec.get(i));
+	if (cl instanceof ErrorExp)
+	  return cl;
+	if (! (cl instanceof LetExp))
+	  return tr.syntaxError("internal error with try-catch");
+	CatchClause ccl = new CatchClause((LetExp) cl);
+	if (prev == null)
+	  chain = ccl;
+	else
+	  prev.setNext(ccl);
+	prev = ccl;
       }
-    return try_exp;
+    if (try_part_exp instanceof ErrorExp)
+      return try_part_exp; 
+    TryExp texp = new TryExp(try_part_exp, null);
+    texp.setCatchClauses(chain);
+    return texp;
   }
 }

@@ -8,32 +8,63 @@ import gnu.lists.*;
 
 public class define_syntax extends Syntax
 {
+  public define_syntax ()
+  {
+    this.hygienic = true;
+  }
+
+  public define_syntax (Object name, boolean hygienic)
+  {
+    super(name);
+    this.hygienic = hygienic;
+  }
+
   static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
   static Method makeMethod = typeMacro.getDeclaredMethod("make", 2);
+  static Method makeNonHygienicMethod
+    = typeMacro.getDeclaredMethod("makeNonHygienic", 2);
   static Method setExpanderMethod
     = typeMacro.getDeclaredMethod("setExpander", 1);
 
+  boolean hygienic;
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
-    Pair pair;
-    Declaration decl;
-    try
+    return tr.syntaxError("define-syntax not in a body");
+  }
+
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                     ScopeExp defs, Translator tr)
+  {
+    SyntaxForm syntax = null;
+    Object st_cdr = st.cdr;
+    while (st_cdr instanceof SyntaxForm)
       {
-        pair = (Pair) form.cdr;
-        decl = (Declaration) pair.car;
+	syntax = (SyntaxForm) st_cdr;
+	st_cdr = syntax.form;
       }
-    catch (Exception ex)
+    Object name = Translator.safeCar(st_cdr);
+    if (! (name instanceof String || name instanceof Symbol))
       {
-        return tr.syntaxError(getName()+" not in a statement list");
+        forms.addElement(tr.syntaxError("Missing macro name for "+Translator.safeCar(st)));
+        return false;
       }
-    Object name = decl.getSymbol();
-    if (! (pair.cdr instanceof Pair))
-      return tr.syntaxError("Missing transformation for "+form.car);
-    pair = (Pair) pair.cdr;
+    Object p = Translator.safeCdr(st_cdr);
+    if (p == null || Translator.safeCdr(p) != LList.Empty)
+      {
+        forms.addElement(tr.syntaxError("invalid syntax for "+getName()));
+        return false;
+      }
+
+    Declaration decl = defs.getDefine(name, 'w', tr);
+    decl.setType(typeMacro); 
+    tr.push(decl);
+
     Macro savedMacro = tr.currentMacroDefinition;
     Macro macro = Macro.make(decl);
+    macro.setHygienic(hygienic);
     tr.currentMacroDefinition = macro;
-    Expression rule = tr.rewrite_car(pair, false);
+    Expression rule = tr.rewrite_car((Pair) p, false);
     tr.currentMacroDefinition = savedMacro;
     macro.expander = rule;
 
@@ -52,7 +83,7 @@ public class define_syntax extends Syntax
 	Expression args[] = new Expression[2];
 	args[0] = new QuoteExp(name);
 	args[1] = rule;
-	rule = new ApplyExp(new PrimProcedure(makeMethod), args);
+	rule = new ApplyExp(new PrimProcedure(hygienic ? makeMethod : makeNonHygienicMethod), args);
       }
     decl.noteValue(rule);
     decl.setProcedureDecl(true);
@@ -63,36 +94,10 @@ public class define_syntax extends Syntax
         result.setDefining (true);
 	if (tr.getInterpreter().hasSeparateFunctionNamespace())
 	  result.setFuncDef(true);
-        return result;
-      }
-    else
-      return QuoteExp.voidExp;
-  }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
-  {
-    Pair p;
-    Object name;
-    if (! (st.cdr instanceof Pair)
-        || ! ((name = (p = (Pair) st.cdr).car) instanceof String
-	      || name instanceof Symbol))
-      {
-        forms.addElement(tr.syntaxError("Missing macro name for "+st.car));
-        return false;
-      }
-    if (! (p.cdr instanceof Pair) || (p = (Pair) p.cdr).cdr != LList.Empty)
-      {
-        forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));
-        return false;
+	tr.formStack.addElement(result);
       }
 
-    Declaration decl = defs.getDefine(name, 'w', tr);
-    decl.setType(typeMacro);
-    p = Translator.makePair(st, this, new Pair(decl, p));
-    forms.addElement (p);
-
-    tr.push(decl);
     return true;
   }
 }

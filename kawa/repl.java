@@ -186,6 +186,7 @@ public class repl extends Procedure0or1
 	      }
 	    else if (arg.equals ("-w"))
 	      {
+		iArg++;
 		getInterpreter();
 		setArgs (args, iArg);
 		checkInitFile();

@@ -234,11 +234,12 @@ public class Translator extends Parser
 
             Class procClass = PrimProcedure.getProcedureClass(pproc);
             gnu.bytecode.Field procField;
-            if (procClass != null)
+	    String pname = pproc.getName();
+            if (procClass != null && pname != null)
               {
                 ClassType procType = (ClassType) Type.make(procClass);
-                String fname = Compilation.mangleName(pproc.getName());
-                procField = procType.getDeclaredField(fname);
+                procField
+		  = procType.getDeclaredField(Compilation.mangleName(pname));
               }
             else
               procField = null;

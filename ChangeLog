@@ -1,3 +1,10 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main):  Need to increment iArg on -w.
+
+	* kawa/lang/Translator.java (rewrite_pair):  Don't crash if we
+	get a Procedure with a null name.
+
 2001-11-27  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (JAVADOC_PACKAGES):  Add new packages.

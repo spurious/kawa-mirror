@@ -48,18 +48,18 @@ public class ClassFileInput extends DataInputStream
 
   public void readClassInfo () throws IOException
   {
-    ctype.access_flags = readShort();
+    ctype.access_flags = readUnsignedShort();
     CpoolClass clas;
     String name;
 
-    ctype.thisClassIndex = readShort();
+    ctype.thisClassIndex = readUnsignedShort();
     clas = (CpoolClass) ctype.constants.getForced(ctype.thisClassIndex,
 						  ConstantPool.CLASS);
     name = clas.name.string;
     ctype.this_name = name.replace('/', '.');
     ctype.setSignature("L"+name+";");
 
-    ctype.superClassIndex = readShort();
+    ctype.superClassIndex = readUnsignedShort();
     if (ctype.superClassIndex == 0)
       ctype.setSuper((ClassType) null);
     else
@@ -70,12 +70,12 @@ public class ClassFileInput extends DataInputStream
 	ctype.setSuper(name.replace('/', '.'));
       }
 
-    int nInterfaces = readShort();
+    int nInterfaces = readUnsignedShort();
     ctype.interfaces = new ClassType[nInterfaces];
     ctype.interfaceIndexes = new int[nInterfaces];
     for (int i = 0;  i < nInterfaces;  i++)
       {
-	ctype.interfaceIndexes[i] = readShort();
+	ctype.interfaceIndexes[i] = readUnsignedShort();
 	clas = (CpoolClass) ctype.constants.getForced(ctype.superClassIndex,
 						      ConstantPool.CLASS);
 	name = clas.name.string;
@@ -85,7 +85,7 @@ public class ClassFileInput extends DataInputStream
 
   public int readAttributes () throws IOException
   {
-    int count = readShort() & 0xFFFF;
+    int count = readUnsignedShort();
     for (int i = 0;  i < count;  i++)
       readAttribute();
     return count;
@@ -93,7 +93,7 @@ public class ClassFileInput extends DataInputStream
 
   public void readAttribute () throws IOException
   {
-    int index = readShort() & 0xFFFF;
+    int index = readUnsignedShort();
     int length = readInt();
     int read = 0;
     while (read < length)
@@ -112,13 +112,13 @@ public class ClassFileInput extends DataInputStream
 
   public void readFields () throws IOException
   {
-    int nFields = readShort();
+    int nFields = readUnsignedShort();
     ConstantPool constants = ctype.constants;
     for (int i = 0;  i < nFields;  i++)
       {
-	short flags = readShort();
-	short nameIndex = readShort();
-	short descriptorIndex = readShort();
+	int flags = readUnsignedShort();
+	int nameIndex = readUnsignedShort();
+	int descriptorIndex = readUnsignedShort();
 	CpoolUtf8 nameConstant = (CpoolUtf8)
 	  constants.getForced(nameIndex, ConstantPool.UTF8);
 	CpoolUtf8 sigConstant = (CpoolUtf8)
@@ -132,13 +132,13 @@ public class ClassFileInput extends DataInputStream
 
   public void readMethods () throws IOException
   {
-    int nMethods = readShort();
+    int nMethods = readUnsignedShort();
     ConstantPool constants = ctype.constants;
     for (int i = 0;  i < nMethods;  i++)
       {
-	short flags = readShort();
-	short nameIndex = readShort();
-	short descriptorIndex = readShort();
+	int flags = readUnsignedShort();
+	int nameIndex = readUnsignedShort();
+	int descriptorIndex = readUnsignedShort();
 	CpoolUtf8 nameConstant = (CpoolUtf8)
 	  constants.getForced(nameIndex, ConstantPool.UTF8);
 	CpoolUtf8 sigConstant = (CpoolUtf8)
@@ -155,8 +155,8 @@ public class ClassFileInput extends DataInputStream
     System.exit(-1);
   }
 
-  /** Reads a .class file, and prints out the conents to System.out.
-   * Very rudimentary - prints out constant pool, and field and method
+  /** Reads a .class file, and prints out the contents to System.out.
+   * Very rudimentary - prints out the constant pool, and field and method
    * names and types, but no attributes (i.e. no dis-assembly yet).
    * @param args One argument - the name of a .class file.
    */

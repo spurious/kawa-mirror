@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
+import java.io.PrintWriter;
 import java.io.PrintStream;
 
 /** This class prints out in contents of a ClassType in human-readable form.
@@ -10,18 +11,31 @@ import java.io.PrintStream;
  * @author Per Bothner <bothner@cygnus>
  */
 
-public class ClassTypeWriter extends PrintStream
-//FUTURE: extends PrintWriter
+public class ClassTypeWriter extends PrintWriter
 {
   ClassType ctype;
   int flags;
   boolean printConstants = true;
+
+  public ClassTypeWriter (ClassType ctype, PrintWriter stream, int flags)
+  {
+    super(stream);
+    this.ctype = ctype;
+    this.flags = flags;
+  }
 
   public ClassTypeWriter (ClassType ctype, PrintStream stream, int flags)
   {
     super(stream);
     this.ctype = ctype;
     this.flags = flags;
+  }
+
+  public static void print (ClassType ctype, PrintWriter stream, int flags)
+  {
+    ClassTypeWriter writer = new ClassTypeWriter (ctype, stream, flags);
+    writer.print();
+    writer.flush();
   }
 
   public static void print (ClassType ctype, PrintStream stream, int flags)

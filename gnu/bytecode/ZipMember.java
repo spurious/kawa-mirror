@@ -26,8 +26,8 @@ public class ZipMember
 
   public void print (PrintStream ps)
   {
-    System.out.write (name, 0, name.length);
-    System.out.println (" size: "+compressed_size+" position: "+fileStart ());
+    ps.write (name, 0, name.length);
+    ps.println (" size: "+compressed_size+" position: "+fileStart ());
   }
 
   public String strName ()

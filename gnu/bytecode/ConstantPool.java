@@ -290,7 +290,7 @@ public class ConstantPool
 	  case INTEGER:
 	  case FLOAT: entry = new CpoolValue1(tag);  break;
 	  case LONG:
-	  case DOUBLE: entry = new CpoolValue2(tag);
+	  case DOUBLE: entry = new CpoolValue2(tag);  break;
 	  case CLASS: entry = new CpoolClass(); break;
 	  case STRING: entry = new CpoolString(); break;
 	  case FIELDREF:
@@ -311,7 +311,7 @@ public class ConstantPool
   public ConstantPool (java.io.DataInputStream dstr)
        throws java.io.IOException
   {
-    count = dstr.readShort() - 1;
+    count = dstr.readUnsignedShort() - 1;
     pool = new CpoolEntry[count+1];
     for (int i = 1;  i <= count;  i++)
       {
@@ -329,27 +329,28 @@ public class ConstantPool
 	  case LONG:
 	  case DOUBLE:
 	    ((CpoolValue2) entry).value = dstr.readLong();
+	    i++;
 	    break;
 	  case CLASS:
 	    ((CpoolClass) entry).name =
-	      (CpoolUtf8) getForced(dstr.readShort(), UTF8);
+	      (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);
 	    break;
 	  case STRING:
 	    ((CpoolString) entry).str =
-	      (CpoolUtf8) getForced(dstr.readShort(), UTF8);
+	      (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);
 	    break;
 	  case FIELDREF:
 	  case METHODREF:
 	  case INTERFACE_METHODREF:
 	    CpoolRef ref = (CpoolRef) entry;
-	    ref.clas = (CpoolClass) getForced(dstr.readShort(), CLASS);
+	    ref.clas = (CpoolClass) getForced(dstr.readUnsignedShort(), CLASS);
 	    ref.nameAndType = (CpoolNameAndType)
-	      getForced(dstr.readShort(), NAME_AND_TYPE);
+	      getForced(dstr.readUnsignedShort(), NAME_AND_TYPE);
 	    break;
 	  case NAME_AND_TYPE:
 	    CpoolNameAndType ntyp = (CpoolNameAndType) entry;
-	    ntyp.name = (CpoolUtf8) getForced(dstr.readShort(), UTF8);
-	    ntyp.type = (CpoolUtf8) getForced(dstr.readShort(), UTF8);
+	    ntyp.name = (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);
+	    ntyp.type = (CpoolUtf8) getForced(dstr.readUnsignedShort(), UTF8);
 	    break;
 	  }
       }

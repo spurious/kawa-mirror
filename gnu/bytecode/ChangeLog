@@ -1,4 +1,13 @@
-Sun Mar 30 22:54:48 1997  Per Bothner  <bothner@deneb.cygnus.com>
+Sun Jun 22 14:00:10 1997  Per Bothner  <bothner@cygnus.com>
+
+	* ConstantPool.java:  Add missing break, missing increment.
+	Replace most readShort by readUnsignedShort.
+	* ClassFileInput.java:  Likewise.
+ 	Fixes from Jay Krell <jay.krell@cornell.edu>.
+	* ClassTypeWriter.java:  Change to extend PrintWriter, not PrintStream.
+	* ZipMember.java (print):  Fix to use ps argument, not System.out.
+
+Sun Mar 30 22:54:48 1997  Per Bothner  <bothner@cygnus.com>
 
 	* LICENSE:  New file - and new license!
 	* *.java:  Added copyright notice.

@@ -124,7 +124,7 @@ ifp.java \
 values_v.java call_with_values.java \
 make_quantity.java quantity2number.java quantity2unit.java \
 make_future.java sleep.java \
-try_catch.java try_finally.java \
+try_catch.java try_finally.java synchronizd.java \
 convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java makeProcLocation.java location.java \

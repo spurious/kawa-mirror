@@ -1,3 +1,7 @@
+2002-06-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java:  Define srfi-25 array functions.
+
 2002-06-02  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_alias.java (scanForDefinitions):

@@ -571,6 +571,17 @@ public class Scheme extends LispInterpreter
       define_syntax ("module-static", "kawa.standard.module_static");
       define_syntax ("module-export", "kawa.standard.export");
 
+      define_field("array?", "kawa.lib.arrays");
+      define_field("array-rank", "kawa.lib.arrays");
+      define_field("make-array", "kawa.lib.arrays");
+      define_field("array", "kawa.lib.arrays");
+      define_field("array-start", "kawa.lib.arrays");
+      define_field("array-end", "kawa.lib.arrays");
+      define_field("shape", "kawa.lib.arrays");
+      define_field("array-ref", "gnu.kawa.functions.ArrayRef", "arrayRef");
+      define_field("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
+      define_field("share-array", "kawa.lib.arrays");
+
       define_proc ("s8vector?", "kawa.lib.uniform");
       define_proc ("make-s8vector", "kawa.lib.uniform");
       define_proc ("s8vector", "kawa.lib.uniform");

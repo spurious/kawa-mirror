@@ -5,7 +5,8 @@ include $(top_srcdir)/Make-rules
 java_sources = \
   SwingButton.java \
   SwingFrame.java \
-  SwingContainer.java
+  SwingContainer.java \
+  SwingPaintable.java
 
 PACKAGE_FNAME = gnu-kawa-swingviews
 GCJ_INPUTS =  $(java_Java)

@@ -194,7 +194,8 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
   SwingButton.java \
   SwingFrame.java \
-  SwingContainer.java
+  SwingContainer.java \
+  SwingPaintable.java
 
 
 PACKAGE_FNAME = gnu-kawa-swingviews

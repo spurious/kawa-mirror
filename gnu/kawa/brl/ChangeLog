@@ -1,3 +1,7 @@
+2002-02-14  Per Bothner  <per@bothner.com>
+
+	* BRL.java (<init>):  Update path to progfun in loadClass argument.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* progfun.scm:  Moved from gnu.brl.

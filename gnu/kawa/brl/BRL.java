@@ -19,7 +19,7 @@ public class BRL extends Scheme
     try
       {
 	loadClass("gnu.brl.stringfun");
-	loadClass("gnu.brl.progfun");
+	loadClass("gnu.kawa.brl.progfun");
 	loadClass("gnu.kawa.servlet.HTTP");
       }
     catch (java.lang.ClassNotFoundException ex)

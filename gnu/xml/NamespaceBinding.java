@@ -2,10 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
+import java.io.*;
 
 /** A "namespace node" as a link in a linked list. */
 
-public final class NamespaceBinding
+public final class NamespaceBinding implements Externalizable
 {
   /** Namespace prefix.  An interned String.
    * A default namespace declaration is represented using null. */
@@ -20,6 +21,13 @@ public final class NamespaceBinding
 
   int depth;
 
+  public final String getPrefix () { return prefix; }
+  public final String getUri () { return uri; }
+  public final NamespaceBinding getNext () { return next; }
+  public final void setPrefix (String prefix) { this.prefix = prefix; }
+  public final void setUri (String uri) { this.uri = uri; }
+  public final void setNext (NamespaceBinding next) { this.next = next; }
+
   //  public NamespaceBinding () { }
 
   public NamespaceBinding (String prefix, String uri, NamespaceBinding next)
@@ -33,6 +41,10 @@ public final class NamespaceBinding
   public static final NamespaceBinding predefinedXML
   = new NamespaceBinding("xml", "http://www.w3.org/XML/1998/namespace", null);
 
+  /** Resolve a prefix.
+   * @param prefix an interned namespace prefix to search for.
+   * @return a uri or null if not bound
+   */
   public String resolve (String prefix)
   {
     for (NamespaceBinding ns = this;  ns != null;  ns = ns.next)
@@ -97,8 +109,65 @@ public final class NamespaceBinding
     return prev;
   }
 
+  /** Return the number of bindings before the <code>fencePost</code>. */
+  public int count (NamespaceBinding fencePost)
+  {
+    int count = 0;
+    for (NamespaceBinding ns = this;  ns != fencePost;  ns = ns.next)
+      count++;
+    return count;
+  }
+
+  /** Append a new NamespaceBinding if not redundant. */
+  public static NamespaceBinding maybeAdd(String prefix, String uri,
+					  NamespaceBinding bindings)
+  {
+    if (bindings == null)
+      {
+	if (uri == null)
+	  return bindings;
+	bindings = predefinedXML;
+      }
+    String found = bindings.resolve(prefix);
+    if (found == null ? uri == null : found.equals(uri))
+      return bindings;
+    return new NamespaceBinding(prefix, uri, bindings);
+  }
+
+  /** Return a String showing just a single namespace binding. */
   public String toString()
   {
     return "Namespace{"+prefix+"="+uri+", depth:"+depth+"}";
   }
+
+  /** Return a String showing the full namespace binding list. */
+  public String toStringAll()
+  {
+    StringBuffer sbuf = new StringBuffer("Namespaces{");
+    for (NamespaceBinding ns = this;  ns != null;  ns = ns.next)
+      {
+	sbuf.append(ns.prefix);
+	sbuf.append("=\"");
+	sbuf.append(ns.uri);
+	sbuf.append(ns == null ? "\"" : "\", ");
+      }
+    sbuf.append('}');
+    return sbuf.toString();
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeUTF(prefix);
+    out.writeUTF(uri);
+    out.writeObject(next);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    prefix = in.readUTF();
+    uri = in.readUTF();
+    next = (NamespaceBinding) in.readObject();
+  }
+
 }

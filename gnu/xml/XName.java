@@ -3,15 +3,20 @@
 
 package gnu.xml;
 import gnu.mapping.*;
+import java.io.*;
 
 /** A QName with namespace nodes [and future optional type annotation]. */
 
-public class XName
+public class XName implements Externalizable
 {
   Symbol qname;
   NamespaceBinding namespaceNodes;
 
-  public Symbol getQName () { return qname; }
+  public final Symbol getQName () { return qname; }
+  public final void setQName (Symbol qname) { this.qname = qname; }
+  public final NamespaceBinding getNamespaceNodes () { return namespaceNodes; }
+  public final void setNamespaceNodes (NamespaceBinding nodes)
+  { this.namespaceNodes = nodes; }
 
   public final String getNamespaceURI()
   {
@@ -33,4 +38,16 @@ public class XName
     return null;
   }
 
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(qname);
+    out.writeObject(namespaceNodes);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    qname = (Symbol) in.readObject();
+    namespaceNodes = (NamespaceBinding) in.readObject();
+  }
 }

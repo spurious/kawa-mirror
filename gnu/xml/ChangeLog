@@ -1,3 +1,13 @@
+2003-12-24  Per Bothner  <per@bothner.com>
+
+	* XName.java:  Implement Externalizable.
+	(writeExternal, readExternal):  New methods.
+	(setQName, getNamespaceNodes, setNamespaceNodes):  New methods.
+	* NamespaceBinding.java:  Implement Externalizable.
+	(writeExternal, readExternal):  New methods.
+	(getPrefix, getUri, getNext, setPrefix, setUri, setNext):  New methods.
+	(count, maybeAdd, toStringAll):  New methods.
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (toString):  New method.

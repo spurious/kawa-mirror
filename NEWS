@@ -1,3 +1,5 @@
+Changes from Kawa 1.6.95 to 1.6.96.
+==================================
 A new compilation flag --servlet generates a Servlet which can be
 deployed in a servlet engin like Tomcat.  This is experimental,
 but it seesm to work for both Scheme source and XQuery source.

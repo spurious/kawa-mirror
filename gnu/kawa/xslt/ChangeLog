@@ -1,3 +1,8 @@
+2003-09-04  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (parse, parseFile):  Change defaultCallConvention
+	to new CALL_WITH_CONSUMER.
+
 2003-05-02  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (parser, parseFile):  Use new XMLParser constructors.

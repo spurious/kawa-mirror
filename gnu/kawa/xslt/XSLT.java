@@ -84,7 +84,7 @@ public class XSLT extends XQuery
     throws java.io.IOException, gnu.text.SyntaxException
   {
     lexer.clearErrors();
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     gnu.text.SourceMessages messages = lexer.getMessages();
     Compilation tr = new Compilation(messages);
     tr.immediate = true;
@@ -107,7 +107,7 @@ public class XSLT extends XQuery
 				gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     Compilation tr = new Compilation(messages);
     tr.immediate = immediate;
     tr.mustCompileHere();

@@ -1,3 +1,7 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* printf.scm:  Merge new version from Slib.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	* XML.scm (print-as-xml):  Removed - now "builtin".

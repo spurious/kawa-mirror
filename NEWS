@@ -1,4 +1,10 @@
-base-uri;  document generalized; load takes YRL; load-relative
+Various XQuery changes, based on the May '02 specification.
+- Implemented the trace function.
+- Implemented the new comment syntax.
+- Expanded string literal syntax, with references and doubled quotes.
+- Allow doc as synonym for document function.
+
+base-uri;  document generalized; load takes URL; load-relative
 
 Imported implementation of cut and cute from SRFI-26
 (Notation for Specializing Parameters without Currying).

@@ -3,8 +3,10 @@ Optimize NumberCompare further.
 For doc: AUTOMAKE_OPTIONS = cygnus
 document eval methods
 
+Static modules should not implement Runnable.  (Change ModuleBody)
+
 BEFORE KAWA 1.7?
-* Make sure build.xml works (fix various HTTP.scm, brl, etc)
+* SRFI-9 (define-record-type) constructurs should not use reflection.
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * Interpreter.getInterpreter should get current thread's.
 * define-namespace should work lexically
@@ -96,10 +98,8 @@ Fix scheme-window in misc.scm.
 Generate better code for `(and test1 test2 test3)'.
 [See maybe-report-section in testing.scm]
 
-Lexer should implement mark/reset.
-
 Module compilation:
-* Allocated selctor indexes "densely" within each applyX method
+* Allocated selector indexes "densely" within each applyX method
 of a ModuleBody, so tableswitch gets used, rather than lookupswitch.
 
 define-syntax and friends are not properly hygienic when checking
@@ -169,8 +169,6 @@ OTHER:
 Provide a way to compile a Scheme program into an Applet class (with
 init/start/stor/pain/etc methods).  Also provide a stripped down
 "kawa-run.zip", without eval, load, or compiler.
-
-Implement modules.
 
 Update to match kawa-tour:
   Vector -> FVector
@@ -251,9 +249,37 @@ JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 
 Rewrite (make-temporary-file) to use File.createTempFile.
 
-gnu.mapping.Binding should implement java.util.Map.Entry.
+gnu.mapping.Symbol should implement java.util.Map.Entry.
 
 Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).
+
+JEMACS
+
+Make it so that JEmacs does not require Swing.  There is a start in
+that gnu.jemacs.buffer mostly contains toolkit-independentcode, and
+gnu.jemacs.swing contains Swing-specific implementations.  This
+separation shoudl be finished, and we should add one or more
+implementation on other toolskits:
+- using Gnome2 (http://developer.gnome.org/doc/API/2.0/gtk/textwidget.html)
+text widgets with Pango (http://developer.gnome.org/doc/API/2.0/pango/);
+- one that uses the SWT toolkit (http://www.eclipse.org/articles/) 
+that is part of the Eclipse project (http://www.eclipse.org);
+- one that uses plain AWT;
+- and one that works on plain terminals, perhaps using charva
+(http://www.pitman.co.za/projects/charva/).
+It is important that JEmacs be able to run well using Free Software only,
+and it cannot do hat as long it depends on Swing, until there is a
+free re-implementation of a suitable Swing subset.
+Note that the Buffer class should be a pure "model" which is toolkit
+independent:  we want to be able to display the same buffer in both
+a Swing Window and a telnet window at the same time.
+
+The JEmacs widgets should be integrated into the gnu/kawa/slib/gui.scm
+design.
+
+Should implement Common Lisp-style "type specifiers" and declarations.
+This would make it practical to write-lower level code that calls Java
+methods directly in ELisp (and Common Lisp), without having to use Scheme.
 
 BENCHMARKS
 http://www.ccs.neu.edu/home/will/Twobit/kvwbenchmarks.html

@@ -3,7 +3,7 @@ import kawa.lang.*;
 
 /** Implement the standard Scheme procedures "c[ad]*r". */
 
-public class cxr extends Procedure1
+public class cxr extends Procedure1 implements HasSetter
 {
   /** The number of car or cdr operations to apply. */
   int count;
@@ -49,5 +49,25 @@ public class cxr extends Procedure1
 	arg1 = (m & 1) != 0 ? pair.cdr : pair.car;
       }
     return arg1;
+  }
+
+  public void set1 (Object value, Object list)
+  {
+    if (count == 0)
+      program (name().toString ());
+    int m = mask;
+    Pair pair;
+    for (int i = count;  --i > 0;  m >>= 1)
+      {
+	if (! (list instanceof Pair) )
+	    throw new kawa.lang.WrongType(this.name (), 1, "list");
+	pair = (Pair) list;
+	list = (m & 1) != 0 ? pair.cdr : pair.car;
+      }
+    pair = (Pair) list;
+    if ((m & 1) != 0)
+      pair.cdr = value;
+    else
+      pair.car = value;
   }
 }

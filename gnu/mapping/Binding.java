@@ -35,12 +35,16 @@ public final class Binding extends Location
     return ! (constraint instanceof UnboundConstraint);  // FIXME
   }
 
+  public Binding (String name)
+  {
+    setName(name); 
+  }
+
   // The compiler emits calls to this method.
   public static Binding make (Object init, String name)
   {
-    Binding binding = new Binding();
+    Binding binding = new Binding(name);
     binding.value = init;
-    binding.setName(name);
     binding.constraint = new TrivialConstraint(null);
     return binding;
   }
@@ -107,7 +111,7 @@ public final class Binding extends Location
 
   public int hashCode ()
   {
-    Object value = constraint.get(this);
-    return getName().hashCode() ^ (value == null ? 0 : value.hashCode());
+    // Note:  The hashCode should not depend on the value.
+    return System.identityHashCode(this); // ^ System.identityHashCode(env);
   }
 }

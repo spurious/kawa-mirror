@@ -12,6 +12,8 @@ java_JAVA=\
   IndirectConstraint.java \
   CallFrame.java CallStack.java CpsProcedure.java \
   Environment.java \
+  FluidBinding.java \
+  FluidConstraint.java \
   Future.java \
   HasSetter.java \
   InPort.java \

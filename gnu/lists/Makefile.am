@@ -38,6 +38,7 @@ java_sources = \
   U16Vector.java \
   U32Vector.java \
   U64Vector.java \
+  UnescapedData.java \
   VoidConsumer.java
 
 java_BUILT = \

@@ -242,7 +242,7 @@ public class Compilation
     return null;
   }
 
-  /** If non-null: a prefix for generateClassNam to prepend to names. */
+  /** If non-null: a prefix for generateClassName to prepend to names. */
   public String classPrefix;
 
   /** Convert a string to a safe class name. */
@@ -256,8 +256,24 @@ public class Compilation
 	// This function is probably not quite enough ...
 	// (Note the verifier may be picky about class names.)
 	if (Character.isLowerCase (ch) || Character.isUpperCase (ch)
-	    || Character.isDigit (ch))
-	  mangled.append (ch);
+	    || Character.isDigit (ch) || ch == '_')
+	  mangled.append(ch);
+	else if (ch == '!')
+	  mangled.append("_B");
+	else if (ch == '?')
+	  mangled.append("_P");
+	else if (ch == '%')
+	  mangled.append("_C");
+	else if (ch == '-')
+	  {
+	    if (i + 1 < len && name.charAt(i+1) == '>')
+	      {
+		mangled.append("_2_");
+		i++;
+	      }
+	    else
+	      mangled.append ("__");
+	  }
 	else
 	  {
 	    mangled.append ('_');
@@ -277,7 +293,9 @@ public class Compilation
   public String generateClassName (String hint)
   {
     hint = mangleClassName (hint);
-    if (classPrefix != null)
+    if (mainClass != null)
+      hint = mainClass.getName() + '$' + hint;
+    else if (classPrefix != null)
       hint = classPrefix + hint;
     if (findNamedClass (hint) == null)
       return hint;

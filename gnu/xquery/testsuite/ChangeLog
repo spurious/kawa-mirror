@@ -1,3 +1,7 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  A bunch of new tests, plus removed expected failure.
+
 2001-11-01  Per Bothner  <per@bothner.com>
 
 	* tab.xml.in:  Add some attributes so we can test for that.

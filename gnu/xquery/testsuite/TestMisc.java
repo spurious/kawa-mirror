@@ -30,7 +30,7 @@ public class TestMisc
 
     evalTest("(3,4,5)[3]", "5");
     evalTest("1,((2,3)[false()]),5", "1 5");
-    evalTest("1,((2,3)[true()]),5", "1 2 3 5");
+    evalTest("1,((2 to 4)[true()]),5", "1 2 3 4 5");
     evalTest("(for $y in (5,4) return <b>{10+$y}</b>)[2]", "<b>14</b>");
 
     evalTest("document(\"tab.xml\")/result",
@@ -64,12 +64,41 @@ public class TestMisc
     evalTest("document(\"tab.xml\")/result/row/*[2]",
 	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
 
-    failureExpectedNext = "";
     evalTest("(document(\"tab.xml\")/result/row/*)[2]",
 	     "<fld2 align=\"right\">12</fld2>");
+    evalTest("(document(\"tab.xml\")/result/row/*)[2 to 3]",
+	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1>");
 
     evalTest("document(\"tab.xml\")/result/row/(fld2,fld1)",
 	     "<fld2 align=\"right\">12</fld2><fld1>a1</fld1><fld2 align=\"right\">22</fld2><fld1 align=\"left\">b1</fld1>");
+
+    evalTest("string-value(document('tab.xml'))",
+	     "\n\na1\n12\n\n\nb1\n22\n\n\n");
+    evalTest("string(document('tab.xml'))",
+	     "\n\na1\n12\n\n\nb1\n22\n\n\n");
+    evalTest("string(document('tab.xml')/result/row/fld1/@align)", "left");
+    evalTest("string(document('tab.xml')/result/row/fld2/@align)",
+	     "rightright");
+
+    evalTest("<a>aab</a> ='aab'", "true");
+    evalTest("<a>abc</a>='abb'", "false");
+
+    evalTest("document(\"tab.xml\")/result/row[fld1]",
+	     "<row>\n" +
+	     "<fld1>a1</fld1>\n" +
+	     "<fld2 align=\"right\">12</fld2>\n" +
+	     "</row><row>\n" +
+	     "<fld1 align=\"left\">b1</fld1>\n" +
+	     "<fld2 align=\"right\">22</fld2>\n" +
+	     "</row>");
+    evalTest("document(\"tab.xml\")/result/row[fld3]", "");
+    evalTest("document(\"tab.xml\")/result/row/fld1[@align]",
+	     "<fld1 align=\"left\">b1</fld1>");
+    evalTest("document(\"tab.xml\")/result/row/fld2[@align]",
+	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
+    evalTest("'a',document(\"tab.xml\")/result/row/fld1[@align='left']",
+	     "a<fld1 align=\"left\">b1</fld1>");
+    evalTest("'a',document(\"tab.xml\")/result/row/fld1[@align='right']", "a");
 
     evalTest("let $x:=12,\n" +
 	     "    $y:=<a>{$x+$x}</a>\n" +

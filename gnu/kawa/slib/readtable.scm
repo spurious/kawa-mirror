@@ -1,7 +1,7 @@
-;; Common Lisp has *readtable* variaable, which is settable.
+;; Common Lisp has *readtable* variable, which is settable.
+;; FIXME - should be a parameter object.
 (define (current-readtable) :: <readtable>
   (invoke-static <readtable> 'getCurrent))
-;; (define (set-current-readtable! (readtable :: <readtable>)) ...)
 
 ;; Common Lisp has readtablep
 (define (readtable? obj) :: <boolean>

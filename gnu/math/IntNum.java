@@ -656,7 +656,7 @@ public class IntNum extends RatNum implements Externalizable
 	rlen = ylen;
         MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
 
-	qlen = xlen+1-ylen;
+	qlen = xlen + 1 - ylen;
 	if (quotient != null)
 	  {
 	    for (int i = 0;  i < qlen;  i++)
@@ -996,7 +996,7 @@ public class IntNum extends RatNum implements Externalizable
 	    MPN.rshift0 (words, x.words, word_count, d_len, count);
 	    ival = d_len;
 	    if (neg)
-	      words[ival-1] |= -1 << (32 - count);
+	      words[d_len-1] |= -1 << (32 - count);
 	  }
       }
   }

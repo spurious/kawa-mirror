@@ -1,3 +1,7 @@
+2001-02-26  Per Bothner  <per@bothner.com>
+
+	* IntNum.java:  Minor style tweaks.
+
 2000-09-21  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (divide):  Zero-extend results if high-order bit set.

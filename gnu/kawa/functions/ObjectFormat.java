@@ -12,7 +12,7 @@ public class ObjectFormat extends ReportFormat
 {
   /** Maxiumum number of characters to show.
    * Truncate any following characters.
-   * The value -1 means "no limit". */
+   * The value PARAM_UNSPECIFIED means "no limit". */
   int maxChars;
   boolean readable;
 
@@ -38,7 +38,7 @@ public class ObjectFormat extends ReportFormat
   public ObjectFormat(boolean readable)
   {
     this.readable = readable;
-    maxChars = -1;
+    maxChars = PARAM_UNSPECIFIED;
   }
 
   public ObjectFormat(boolean readable, int maxChars)
@@ -50,6 +50,8 @@ public class ObjectFormat extends ReportFormat
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)
     throws java.io.IOException
   {
+    int maxChars = getParam(this.maxChars, -1, args, start);
+    if (this.maxChars == PARAM_FROM_LIST)  start++;
     return format(args, start, dst, maxChars, readable);
   }
 
@@ -75,6 +77,7 @@ public class ObjectFormat extends ReportFormat
 
   /**
    * Return false iff truncation.
+   * @param maxChars maximum number of characters; -1 means unlimited
    */
   public static boolean format(Object arg, Writer dst,
 			       int maxChars, boolean readable)

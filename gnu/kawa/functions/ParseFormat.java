@@ -116,17 +116,22 @@ public class ParseFormat extends Procedure1
         else if (ch == '*')
           width = PARAM_FROM_LIST;
 
-	int precision = -1;
+	int precision = PARAM_UNSPECIFIED;
 	if (ch == '.')
 	  {
-	    precision = 0;
-	    for (;;)
+	    if (ch == '*')
+	      precision = PARAM_FROM_LIST;
+	    else
 	      {
-		ch = fmt.read();
-		digit = Character.digit((char) ch, 10);
-		if (digit < 0)
-		  break;
-		precision = 10 * precision + digit;
+		precision = 0;
+		for (;;)
+		  {
+		    ch = fmt.read();
+		    digit = Character.digit((char) ch, 10);
+		    if (digit < 0)
+		      break;
+		    precision = 10 * precision + digit;
+		  }
 	      }
 	  }
 
@@ -165,9 +170,18 @@ public class ParseFormat extends Procedure1
               fflags |= IntegerFormat.PAD_RIGHT;
             if ((flags & SEEN_SPACE) != 0)
               fflags |= IntegerFormat.SHOW_SPACE;
-	    format = IntegerFormat.getInstance(base, width,
-                                               padChar, PARAM_UNSPECIFIED,
-                                               PARAM_UNSPECIFIED, fflags);
+	    if (precision != PARAM_UNSPECIFIED)
+	      {
+		flags &= ~ SEEN_ZERO;
+		fflags |= IntegerFormat.MIN_DIGITS;
+		format = IntegerFormat.getInstance(base, precision,
+						   '0', PARAM_UNSPECIFIED,
+						   PARAM_UNSPECIFIED, fflags);
+	      }
+	    else
+	      format = IntegerFormat.getInstance(base, width,
+						 padChar, PARAM_UNSPECIFIED,
+						 PARAM_UNSPECIFIED, fflags);
             break;
 	  case 'e':
 	  case 'f':

@@ -1,3 +1,10 @@
+2003-11-10  Per Bothner  <per@bothner.com>
+
+	* ParseFormat.java (parseFormat):  Allow '*' for precision.
+	Handle printf-style precision in integer formats.
+	* ObjectFormat.java (maxChar):  New defaults to PARAM_UNSPECIFIED.
+	(format - non-static):  Handle PARAM_FROM_LIST etc.
+
 2003-10-19  Per Bothner  <per@bothner.com>
 
 	* AddOp.java (classify):  Fix logic for non-float non-integer reals.

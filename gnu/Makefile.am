@@ -2,10 +2,11 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = bytecode math lists text mapping expr \
-	kawa commonlisp ecmascript $(XML_SUBDIRS) $(SWING_SUBDIRS)
+SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
+	kawa commonlisp ecmascript $(XQUERY_SUBDIR) $(SWING_SUBDIRS)
 if ENABLE_XML
-XML_SUBDIRS = xml xquery
+XML_SUBDIR = xml
+XQUERY_SUBDIR = xquery
 endif
 if WITH_SWING
 SWING_SUBDIRS = jemacs

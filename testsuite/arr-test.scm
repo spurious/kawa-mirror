@@ -1,4 +1,4 @@
-(test-init "arrays" 163)
+(test-init "arrays" 164)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -379,3 +379,9 @@
     (test 1 array-ref sub 4)
     (test 2 array-ref sub 5)
     (test 3 array-ref sub 6)))
+
+;; Bug reported by Chris Dean <ctdean@mercedsystems.com>
+
+(define a-2-9 (make-array (shape 0 2 0 9)))
+(array-set! a-2-9 1 3 'e)
+(test 'e array-ref a-2-9 1 3)

@@ -1,3 +1,7 @@
+2004-02-21  Per Bothner  <per@bothner.com>
+
+	* build.xml (build.selectjava):  Add gnu/math/RealNum.java.
+
 2004-02-15  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewrite):  Refactor so rewrite can be called

@@ -87,6 +87,7 @@
   
   <patternset id="build.selectjava">
      <include name="gnu/bytecode/ObjectType.java"/>
+     <include name="gnu/math/RealNum.java"/>
      <include name="gnu/lists/AbstractSequence.java"/>
      <include name="gnu/lists/Convert.java"/>
      <include name="gnu/lists/SeqPosition.java"/>

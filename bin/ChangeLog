@@ -1,0 +1,5 @@
+2001-03-23  Per Bothner  <per@bothner.com>
+
+	New directory.
+	* kawa.c:  Moved from ../kawa.
+	* Makefile.am:  New file.

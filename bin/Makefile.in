@@ -1,0 +1,365 @@
+# Makefile.in generated automatically by automake 1.4c from Makefile.am
+
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_FLAG =
+INSTALL_HEADER = $(INSTALL_DATA)
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+
+@SET_MAKE@
+AMDEP = @AMDEP@
+AMINCLUDE = @AMINCLUDE@
+AMTAR = @AMTAR@
+AWK = @AWK@
+AWT_SELECTED = @AWT_SELECTED@
+CC = @CC@
+CFLAGS = @CFLAGS@
+DEPDIR = @DEPDIR@
+EXEEXT = @EXEEXT@
+GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
+JEMACS_VERSION = @JEMACS_VERSION@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+SHELL = @SHELL@
+SWING_SELECTED = @SWING_SELECTED@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+VERSION = @VERSION@
+XML_SELECTED = @XML_SELECTED@
+extra_java = @extra_java@
+install_sh = @install_sh@
+kawa_bin = @kawa_bin@
+
+
+bin_PROGRAMS = @kawa_bin@
+EXTRA_PROGRAMS = kawa
+noinst_SCRIPTS = kawa.sh
+kawa_SOURCES = kawa.c
+CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+
+READLINE_INCLUDE_PATH = 
+READLINE_LIB_PATH = 
+kawa_EXTRA_LIBS = -lncurses  # For Linux
+#kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
+ENABLE_GCJ_COMPILED_DEFS = -DGCJ_COMPILED
+DISABLE_GCJ_COMPILED_DEFS = -DKAWALIB='"$(datadir)/java"'
+DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS) -Dxxx
+kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
+
+KAWA1_OFILES = \
+  gnu-bytecode.o \
+  gnu-lists.o \
+  gnu-expr.o \
+  gnu-kawa-functions.o \
+  gnu-kawa-lispexpr.o \
+  gnu-kawa-reflect.o \
+  gnu-kawa-util.o \
+  gnu-mapping.o \
+  gnu-math.o \
+  gnu-text.o \
+  kawa-lang.o \
+  kawa-repl.o \
+  kawa-standard.o
+
+
+KAWA2_OFILES = $(KAWA1_OFILES) \
+  kawa-lib.o \
+  gnu-kawa-slib.o \
+  gnu-kawa-xml.o
+
+
+ENABLE_GCJ_COMPILED = kawa-bin$(exeext)
+DISABLE_GCJ_COMPILED = kawa.sh
+subdir = bin
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+EXTRA_PROGRAMS =  kawa$(EXEEXT)
+bin_PROGRAMS =  @kawa_bin@
+PROGRAMS =  $(bin_PROGRAMS)
+
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+am_kawa_OBJECTS =  kawa.o
+kawa_OBJECTS =  $(am_kawa_OBJECTS)
+kawa_DEPENDENCIES = 
+kawa_LDFLAGS = 
+SCRIPTS =  $(noinst_SCRIPTS)
+
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+DIST_SOURCES =  $(kawa_SOURCES)
+depcomp = 
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+
+GZIP_ENV = --best
+SOURCES = $(kawa_SOURCES)
+OBJECTS = $(am_kawa_OBJECTS)
+
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .c .o
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus bin/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+
+
+mostlyclean-binPROGRAMS:
+
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean-binPROGRAMS:
+
+
+maintainer-clean-binPROGRAMS:
+
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
+	    echo "  $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f"; \
+	     $(INSTALL_PROGRAM) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(bindir)/$$f; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f="`echo $$p|sed -e 's/$(EXEEXT)$$//' -e '$(transform)' -e 's/$$/$(EXEEXT)/'`"; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+distclean-compile:
+	-rm -f *.tab.c
+
+kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES)
+	@rm -f kawa$(EXEEXT)
+	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
+.c.o:
+	$(COMPILE) -c $<
+
+tags: TAGS
+
+
+ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	mkid -fID $$unique $(LISP)
+
+TAGS: $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+		$(TAGS_FILES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
+	unique=`for i in $$list; do \
+	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	  done | \
+	  $(AWK) '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || etags $(ETAGS_ARGS) $$tags  $$unique $(LISP)
+
+GTAGS:
+	here=`CDPATH=: && cd $(top_builddir) && pwd` \
+	  && cd $(top_srcdir) \
+	  && gtags -i $$here
+
+distclean-tags:
+	-rm -f TAGS ID
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -d $$d/$$file; then \
+	    cp -pR $$d/$$file $(distdir) \
+	    || exit 1; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
+	  fi; \
+	done
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am:
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-info-am: 
+install-info: install-info-am
+install-exec-am: install-binPROGRAMS install-exec-local
+install-exec: install-exec-am
+
+install-data-am:
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-binPROGRAMS
+uninstall: uninstall-am
+all-am: Makefile $(PROGRAMS) $(SCRIPTS)
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(bindir)
+
+
+mostlyclean-generic:
+
+
+clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f Makefile.in
+clean: clean-am
+
+clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+
+distclean: distclean-am
+
+distclean-am: clean-am distclean-binPROGRAMS distclean-compile \
+	distclean-generic distclean-tags
+
+maintainer-clean: maintainer-clean-am
+
+maintainer-clean-am: distclean-am maintainer-clean-binPROGRAMS \
+	maintainer-clean-generic
+
+mostlyclean: mostlyclean-am
+
+mostlyclean-am: mostlyclean-binPROGRAMS mostlyclean-compile \
+	mostlyclean-generic
+
+.PHONY: all all-am all-redirect check check-am clean clean-binPROGRAMS \
+	clean-generic distclean distclean-binPROGRAMS distclean-compile \
+	distclean-generic distclean-tags distdir dvi dvi-am info \
+	info-am install install-am install-binPROGRAMS install-data \
+	install-data-am install-exec install-exec-am install-exec-local \
+	install-info install-info-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-binPROGRAMS maintainer-clean-generic \
+	mostlyclean mostlyclean-binPROGRAMS mostlyclean-compile \
+	mostlyclean-generic tags uninstall uninstall-am \
+	uninstall-binPROGRAMS
+
+$(READLINE_INCLUDE_PATH)
+
+kawa.sh:
+	echo '#!/bin/sh' >tmp
+	echo 'KAWALIB=$${KAWALIB-$(datadir)/java}' >>tmp
+	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+	echo 'export CLASSPATH' >>tmp
+	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+	chmod +x tmp
+	mv tmp kawa.sh
+
+kawa1$(exeext): $(KAWA1_OFILES)
+	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl
+
+kawa-bin$(exeext): $(KAWA2_OFILES)
+	 gcj -o kawa-bin$(exeext) $(KAWA2_OFILES) --main=kawa.repl
+
+all: $(@GCJ_COMPILED_SELECTED@)
+
+install-exec-local: install-exec-bindir
+
+install-exec-bindir: $(noninst_SCRIPTS)
+	$(mkinstalldirs) $(bindir)
+	if test "@kawa_bin@" = "" ; then \
+	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
+	fi
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+

@@ -376,7 +376,7 @@ public abstract class Type {
     return obj;
   }
 
-  /** Compile code to convert an object (on the stack) to this Type. */
+  /** Compile code to convert a object of this type on the stack to Object. */
   public void emitCoerceToObject (CodeAttr code)
   {
   }

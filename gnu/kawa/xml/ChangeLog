@@ -1,7 +1,7 @@
 2003-05-21  Per Bothner  <per@bothner.com>
 
 	* NamedAttributes.java (namedAttributes):  Use posToDataIndex.
-	Fixes bug repored 05-18 by Seshukumar_Adiraju@infosys.com.
+	Fixes bug reported 05-18 by Seshukumar_Adiraju@infosys.com.
 
 2003-05-04  Per Bothner  <per@bothner.com>
 

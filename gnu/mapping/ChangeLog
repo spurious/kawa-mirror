@@ -1,0 +1,10 @@
+Wed Jul 22 21:42:42 1998  Per Bothner  <bothner@cygnus.com>
+
+	New directory.  Files mostly moved from ../../kawa/lang.
+
+	* Location:  Now inherit from Procedure0.
+	(get, set):  Make abstract, rather than final.
+	(value):  Remove.  (Moved to Binding sub-class.)
+	(apply0, set0):  New methods defined in terms of get, set.
+	* Binding (value):  New field (moved from base class).
+	(get, set):  New overriding methods.

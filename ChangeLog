@@ -1,3 +1,11 @@
+2005-03-28  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java: Initalize various static fields,
+	including 'instance', in a static block, so they can be final.
+	(initScheme): Make private.  Remove unused proc and syn variable.
+	(nullEnvironment): Initialize in <clinit>, rather than initScheme.
+	* kawa/GuiConsole.java (main): Update to use Scheme.getInstance().
+
 2005-03-25  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (find):  No longer do 'run'.

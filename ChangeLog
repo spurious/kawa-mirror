@@ -1,3 +1,14 @@
+Wed Jun 19 17:00:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Sequence.java:  New abstract class.
+	* kawa/lang/List.java:  Now inherits from Sequence.
+	* kawa/lang/Makefile.am:  Update accordingly.
+	* kawa/lang/Pair.java (equalds, length, elementAt):  New methods.
+	* kawa/lang/vector.java -> Vector.java:  Renamed and re-implemented.
+	* kawa/standard/equal_p.java:  Re-implement to use equals method.
+	* kawa/standard/{make_vector,vector,vector_length,vector_p}.java,
+	kawa/standard/{vector_ref,vector_set_b}.java:  Use new Vector class.
+	
 Wed Jun 19 10:16:59 1996  Per Bothner  <bothner@deneb.cygnus.com>
 	
 	* kawa/lang/symbol.java -> Symbol.java:  Renamed class.

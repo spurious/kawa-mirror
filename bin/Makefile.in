@@ -170,9 +170,9 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 @WITH_GCJ_TRUE@bin_SCRIPTS = gckawa
+@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin kawa
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin
 @ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@KAWAPROGS = kawa
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin kawa
 
 bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 

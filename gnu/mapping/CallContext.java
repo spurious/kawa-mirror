@@ -293,7 +293,7 @@ public class CallContext implements Runnable
   /** Setup routine before calling a method that takes a CallContext.
    * The compiler emits a call to this before a call to a method that takes
    * a CallContext, when it wants the function result as an Object.
-   * It pushes the CallContest state so it can uses tthe vstack for a
+   * It pushes the CallContest state so it can uses the vstack for a
    * temporary, After the method, getFromContext extract the method's result
    * from the vstack and restores the state.
    */

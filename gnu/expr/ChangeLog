@@ -1,3 +1,7 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* Expression.java (makeGetField):  New static convenience method.
+
 2000-12-11  Per Bothner  <per@bothner.com>
 
 	* Expression.java (walk):  Make protected and change return type to

@@ -24,7 +24,7 @@ public class define_class extends Syntax
 	|| ! ((name = (p = (Pair) st.cdr).car) instanceof String
 	      || name instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
-    Declaration decl = new Declaration(name);
+    Declaration decl = defs.getDefine(name, 'w', tr);
     ClassExp oexp = new ClassExp();
     decl.noteValue(oexp);
     if (isSimple)
@@ -44,7 +44,6 @@ public class define_class extends Syntax
         decl.setFile(declPos.getFile());
         decl.setLine(declPos.getLine(), declPos.getColumn());
       }
-    defs.addDeclaration(decl);
     st = tr.makePair(st, this, declForm);
     forms.addElement (st);
     return true;

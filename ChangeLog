@@ -1,3 +1,7 @@
+2003-04-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_class.java (scanForDefinitions):  Use getDefine.
+
 2003-04-01  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/set_b.java (rewrite):  Handle Symbol assignee.

@@ -33,16 +33,6 @@ public class QueueReader extends Reader
       pos = mark;
   }
 
-  public void append (String str)
-  {
-    append (str.toCharArray());
-  }
-
-  public void append(char[] chars)
-  {
-    append(chars, 0, chars.length);
-  }
-
   void resize (int len)
   {
     int cur_size = limit - pos;
@@ -58,6 +48,16 @@ public class QueueReader extends Reader
     pos -= mark;
     mark = 0;
     limit = cur_size;
+  }
+
+  public void append (String str)
+  {
+    append (str.toCharArray());
+  }
+
+  public void append(char[] chars)
+  {
+    append(chars, 0, chars.length);
   }
 
   public synchronized void append(char[] chars, int off, int len)

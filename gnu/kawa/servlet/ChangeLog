@@ -1,3 +1,8 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm:  Moved to gnu/kawa/slib.
+	* Makefile.am:  Simplify accordingly.
+
 2002-02-14  Per Bothner  <per@bothner.com>
 
 	* CGIServletWrapper.java:  Implement ServletContext.

@@ -1,3 +1,10 @@
+2004-05-04  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readSimpleVector): Allow zero-length
+	uniform/simple vectors.
+
+	* LispReader.java (isPotentialNumber):  Minor cleanup.
+
 2004-04-20  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (isPotentialNumber):  Allow initial '_' for symbols.

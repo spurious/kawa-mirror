@@ -288,14 +288,13 @@ public class LispReader extends Lexer
 	  }
 	else if (ch == '#')
 	  return true;
-	else if (Character.isLetter(ch) || ch == '/')
+	else if (Character.isLetter(ch) || ch == '/'
+		 || ch == '_' || ch == '^')
  	  {
+	    // CommonLisp defines _123 (and ^123) as a "potential number";
+	    // most implementations seem to define it as a symbol.
+	    // Scheme does defines it as a symbol.
 	    if (i == start)
-	      return false;
-	  }
-	else if (ch == '_' || ch == '^')
- 	  {
-	    if (i == start /* && ! common_lisp? */)
 	      return false;
 	  }
 	else if (ch != '.')
@@ -1156,7 +1155,7 @@ public class LispReader extends Lexer
       }
     Object list = ReaderParens.readList(reader, '(', -1, ')');
     int len = LList.listLength(list, false);
-    if (len <= 0)
+    if (len < 0)
       {
         reader.error("invalid elements in uniform vector syntax");
         return null;

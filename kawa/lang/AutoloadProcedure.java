@@ -44,9 +44,10 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
-    if (name () != null)
+    String name = getName();
+    if (name != null)
       {
-	ps.print (name ());
+	ps.print (name);
 	// ps.print (' ');
       }
     /*
@@ -64,16 +65,17 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   private void throw_error (String prefix)
   {
     loaded = null;
+    String name = getName();
     throw new RuntimeException (prefix + className
 				+ " while autoloading "
-				+ (name () == null ? "" : name().toString ()));
+				+ (name == null ? "" : name.toString ()));
   }
 
   /** Load the class named in className. */
   void load ()
   {
     Environment env = this.env != null ? this.env : Environment.getCurrent();
-    String name = this.name();
+    String name = this.getName();
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
@@ -101,8 +103,8 @@ public class AutoloadProcedure extends Procedure implements Externalizable
 	    catch (UnboundSymbol ex)
 	      {
 	      }
-	    if (loaded.name () == null)
-	      loaded.setName (name);
+	    if (loaded.getName() == null)
+	      loaded.setName(name);
 	  }
       }
     catch (ClassNotFoundException ex)
@@ -156,7 +158,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
     if (loaded == null)
       load ();
     if (loaded instanceof AutoloadProcedure)
-	  throw new InternalError("circularity in autoload of "+name());
+	  throw new InternalError("circularity in autoload of "+getName());
     return loaded.applyN (args);
   }
 

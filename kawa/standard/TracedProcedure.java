@@ -118,7 +118,7 @@ public class TracedProcedure extends ProcedureN
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
-    String n = name ();
+    String n = getName();
     if (n == null)
       ps.print ("<unnamed>");
     else

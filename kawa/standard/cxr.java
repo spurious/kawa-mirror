@@ -40,12 +40,12 @@ public class cxr extends Procedure1 implements HasSetter
   public Object apply1 (Object arg1)
   {
     if (count == 0)
-      program (name().toString ());
+      program(getName().toString());
     int m = mask;
     for (int i = count;  --i >= 0;  m >>= 1)
       {
 	if (! (arg1 instanceof Pair) )
-	    throw new WrongType(this.name (), 1, "list");
+	    throw new WrongType(this.getName(), 1, "list");
 	Pair pair = (Pair) arg1;
 	arg1 = (m & 1) != 0 ? pair.cdr : pair.car;
       }
@@ -55,13 +55,13 @@ public class cxr extends Procedure1 implements HasSetter
   public void set1 (Object list, Object value)
   {
     if (count == 0)
-      program (name().toString ());
+      program (getName().toString());
     int m = mask;
     Pair pair;
     for (int i = count;  --i > 0;  m >>= 1)
       {
 	if (! (list instanceof Pair) )
-	    throw new WrongType(this.name (), 1, "list");
+	    throw new WrongType(this.getName(), 1, "list");
 	pair = (Pair) list;
 	list = (m & 1) != 0 ? pair.cdr : pair.car;
       }

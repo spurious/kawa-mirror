@@ -49,7 +49,7 @@ public class CompileFile extends Procedure2
     throws Throwable
   {
     if (! (arg1 instanceof FString))
-      throw new WrongType (this.name (), 1, "file name");
+      throw new WrongType (this.getName(), 1, "file name");
     SourceMessages messages = new SourceMessages();
     Compilation comp = read (arg1.toString (), messages);
     comp.compileToArchive(comp.getModule(), arg2.toString());

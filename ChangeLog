@@ -1,3 +1,12 @@
+2003-04-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/AutoloadProcedure.java:  Call Procedure's getName
+	method instead of deprecated name method.
+	* kawa/lang/CompileFile.java:  Likewise.
+	* kawa/standard/TracedProcedure.java:  Likewise.
+	* kawa/standard/cxr.java:  Likewise.
+	* kawa/standard/readchar.java:  Likewise.
+
 2003-04-19  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (lexical):  Now in Compilation.

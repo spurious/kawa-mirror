@@ -312,7 +312,7 @@ public class LList extends ExtSequence
       {
 	out.writeChar(' ');
 	out.writeChars(". ");
-	out.writeObject(list);
+	out.writeObject(checkNonList(list));
       }
     out.endGroup(typeName);
   }
@@ -427,12 +427,18 @@ public class LList extends ExtSequence
 	else
 	  {
 	    sbuf.append(". ");
-	    sbuf.append(rest);
+            sbuf.append(checkNonList(rest));
 	    break;
 	  }
 	i++;
       }
     sbuf.append(')');
     return sbuf.toString();
+  }
+
+  /** Helper to protect against pathological LLists (neithr Pair nor Empty). */
+  public static Object checkNonList (Object rest)
+  {
+    return rest instanceof LList ? "#<not a pair>" : rest;
   }
 }

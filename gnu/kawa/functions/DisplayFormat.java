@@ -86,7 +86,7 @@ public class DisplayFormat extends AbstractFormat
       {
 	out.writeSpaceFill();
 	out.writeChars(". ");
-	writeObject(list, (Consumer) out);
+	writeObject(LList.checkNonList(list), (Consumer) out);
       }
     out.endLogicalBlock(")");
   }

@@ -65,7 +65,12 @@ public class NamedAttributes extends CpsProcedure
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedAttributes(qname, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  {
+	    TreeList tlist = (TreeList) pos.sequence;
+	    namedAttributes(qname, tlist,
+			    tlist.posToDataIndex(pos.ipos),
+			    consumer);
+	  }
       }
   }
 

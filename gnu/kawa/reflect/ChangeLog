@@ -1,3 +1,7 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (checkName):  Use Symbol's getName, not toString.
+
 2002-11-10  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (kind):  New otpions 's' is static methods only;  'S' is

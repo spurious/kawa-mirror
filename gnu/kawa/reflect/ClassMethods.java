@@ -197,9 +197,14 @@ public class ClassMethods extends ProcedureN
     if (exp instanceof QuoteExp)
       {
         Object name = ((QuoteExp) exp).getValue();
-        if (name instanceof FString || name instanceof String
-	    || name instanceof Symbol)
-          return Compilation.mangleNameIfNeeded(name.toString());
+	String nam;
+        if (name instanceof FString || name instanceof String)
+	  nam = name.toString();
+	else if (name instanceof Symbol)
+	  nam = ((Symbol) name).getName();
+	else
+	  return null;
+	return Compilation.mangleNameIfNeeded(nam);
       }
     return null;
   }

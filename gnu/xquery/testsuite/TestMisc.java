@@ -122,6 +122,8 @@ public class TestMisc
     evalTest("<a>aab</a> ='aab'", "true");
     evalTest("<a>abc</a>='abb'", "false");
 
+    evalTest("string(<a>{'aa''bb&#88;cc&#x5a;dd'}</a>)", "aa'bbXccZdd");
+
     evalTest("document(\"tab.xml\")/result/row[fld1]",
 	     "<row>\n" +
 	     "<fld1>a1</fld1>\n" +
@@ -228,7 +230,7 @@ public class TestMisc
 	     "*** caught SyntaxException - <string>:1:26: "
 	     + "unexpected end-of-file in string");
 
-    evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
+    evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");
     printSummary();
   }

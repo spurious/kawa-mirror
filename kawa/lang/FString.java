@@ -90,6 +90,13 @@ public class FString extends Sequence implements Printable, Compilable
     value[index] = ch;
   }
 
+  /** Set all the elements to a given character. */
+  public final void fill (char ch)
+  {
+    for (int i = value.length;  --i >= 0; )
+      value[i] = ch;
+  }
+
   public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)
   {
     if (srcBegin < 0 || srcBegin > srcEnd)

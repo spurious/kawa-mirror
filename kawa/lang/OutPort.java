@@ -43,10 +43,10 @@ public class OutPort extends PrintWriter implements Printable
   public boolean printReadable;
 
   // For now, these are static.  They should probably be thread-local.
-  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.err))), true, "<stdout>");
+  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, "<stdout>");
   private static OutPort out = outInitial;
 
-  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), "<stderr>");
+  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, "<stderr>");
   private static OutPort err = errInitial;
 
   static public OutPort outDefault ()
@@ -75,6 +75,33 @@ public class OutPort extends PrintWriter implements Printable
       ((LogWriter)base).echo(buf, off, len);
   }
 
+  static Writer logFile;
+
+  public static void closeLogFile ()  throws java.io.IOException
+  {
+    if (logFile != null)
+      {
+	logFile.close();
+	logFile = null;
+      }
+    if (outInitial.base instanceof LogWriter)
+      ((LogWriter)outInitial.base).setLogFile((Writer) null);
+    if (errInitial.base instanceof LogWriter)
+      ((LogWriter)errInitial.base).setLogFile((Writer) null);
+  }
+
+  public static void setLogFile (String name)  throws java.io.IOException
+  {
+    if (logFile != null)
+      closeLogFile();
+    logFile = new PrintWriter(new BufferedWriter(new FileWriter(name)));
+    if (outInitial.base instanceof LogWriter)
+      ((LogWriter)outInitial.base).setLogFile(logFile);
+    if (errInitial.base instanceof LogWriter)
+      ((LogWriter)errInitial.base).setLogFile(logFile);
+  }
+
+  /*
   public void closeLogFile ()  throws java.io.IOException
   {
     if (base instanceof LogWriter)
@@ -86,6 +113,7 @@ public class OutPort extends PrintWriter implements Printable
     if (base instanceof LogWriter)
       ((LogWriter)base).setLogFile(name);
   }
+  */
 
   /**
    * Write a character value to a byte-stream.

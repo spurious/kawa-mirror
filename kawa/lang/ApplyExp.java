@@ -38,7 +38,6 @@ public class ApplyExp extends Expression
 	    // These error message should really be done earlier,
 	    // but we do not have the right information until
 	    // the rewrite pass is finished.
-	    String func_name = func_decl.string_name ();
 	    func_lambda = (LambdaExp) func_decl.value;
 	    if (args.length < func_lambda.min_args)
 	      {

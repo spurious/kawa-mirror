@@ -32,4 +32,7 @@
 (define-variable dvar1 11)
 (define-variable dvar2)
 (define-variable dvar3 13)
-(define dvar-test-1 (list dvar1 dvar2 dvar3))
+(define dvar-test-1
+  (with-compile-options warn-undefined-variable: #t
+			(list dvar1 dvar2 dvar3)))
+

@@ -1,6 +1,7 @@
 2003-11-05  Per Bothner  <per@bothner.com>
 
 	* module3.scm, obj-test.scm:  Test define-variable syntax form.
+	(dvar-test-1):  Add with-compile-options form.
 
 2003-10-19  Per Bothner  <per@bothner.com>
 

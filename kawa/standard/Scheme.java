@@ -8,6 +8,13 @@ public class Scheme extends Interpreter
     define (proc.name (), proc);
   }
 
+  final void define_proc (String name, Named proc)
+  {
+    if (proc.getName() == null)
+      proc.setName(name);
+    define(name, proc);
+  }
+
   /* Define a procedure to be autoloaded. */
   final void define_proc (String name, String className)
   {
@@ -362,12 +369,22 @@ public class Scheme extends Interpreter
       define_proc ("bit-extract", "kawa.standard.bit_extract");
       define_proc ("integer-length", "kawa.standard.int_length");
 
-      define("primitive-virtual-method",new kawa.standard.prim_method(182));
-      define("primitive-static-method", new kawa.standard.prim_method(184));
-      define("primitive-interface-method", new kawa.standard.prim_method(185));
-      define("primitive-constructor", new kawa.standard.prim_method(183));
-      define("primitive-op1", new kawa.standard.prim_method());
+      define_proc("primitive-virtual-method",
+		  new kawa.standard.prim_method(182));
+      define_proc("primitive-static-method",
+		  new kawa.standard.prim_method(184));
+      define_proc("primitive-interface-method",
+		  new kawa.standard.prim_method(185));
+      define_proc("primitive-constructor",
+		  new kawa.standard.prim_method(183));
+      define_proc("primitive-op1",
+		  new kawa.standard.prim_method());
+      define_proc("primitive-throw", "kawa.standard.prim_throw");
       define_syntax("try-finally", "kawa.standard.try_finally");
+      define_syntax("try-catch", "kawa.standard.try_catch");
+      define_proc("throw", "kawa.standard.throw_name");
+      define_proc("catch", "kawa.lib.syntax");
+      define_proc("error", "kawa.lib.syntax");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -410,7 +427,6 @@ public class Scheme extends Interpreter
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
-      define_proc ("error", "kawa.standard.error");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");

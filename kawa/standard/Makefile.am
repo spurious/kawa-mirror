@@ -17,7 +17,7 @@ javadir=$(prefix)/java/$(subdir)
 OBJ=\
 set_b.class \
 quasiquote.class \
-prim_method.class \
+prim_method.class prim_throw.class throw_name.class \
 not.class \
 boolean_p.class \
 and_or.class \
@@ -168,8 +168,7 @@ values_v.class \
 call_with_values.class \
 make_quantity.class quantity2number.class quantity2unit.class \
 make_future.class sleep.class \
-try_finally.class \
-error.class \
+try_catch.class try_finally.class \
 Scheme.class \
 null_env.class \
 user_env.class \

@@ -5,18 +5,26 @@ import java.io.*;
  * An OutputStream that handles characters (rather than just bytes).
  */
 
-public class OutPort extends PrintStream
+public class OutPort extends PrintStream implements Printable
 {
+  String name;
+
   public OutPort (OutputStream out)
   {
     super (out);
   }
 
+  public OutPort (OutputStream out, String name)
+  {
+    super (out);
+    this.name = name;
+  }
+
   public boolean printReadable;
 
   // For now, these are static.  They should probably be thread-local.
-  private static OutPort out = new OutPort (System.out);
-  private static OutPort err = new OutPort (System.err);
+  private static OutPort out = new OutPort (System.out, "<stdout>");
+  private static OutPort err = new OutPort (System.err, "<stderr>");
 
   static public OutPort outDefault ()
   {
@@ -115,5 +123,16 @@ public class OutPort extends PrintStream
       {
 	printReadable = saveReadable;
       }
+  }
+
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print ("#<output-port");
+    if (name != null)
+      {
+	ps.print (' ');
+	ps.print (name);
+      }
+    ps.print ('>');
   }
 }

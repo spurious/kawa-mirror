@@ -5,7 +5,7 @@ import java.io.*;
  * An InputStream that handles characters (rather than just bytes).
  */
 
-public class InPort extends FilterInputStream
+public class InPort extends FilterInputStream implements Printable
 {
   protected byte[] buffer;
 
@@ -13,13 +13,21 @@ public class InPort extends FilterInputStream
 
   int limit;
 
+  String name;
+
   public InPort (InputStream in)
   {
     super (in);
   }
 
+  public InPort (InputStream in, String name)
+  {
+    super (in);
+    this.name = name;
+  }
+
   // For now, this is static.  It should probably be thread-local.
-  private static InPort inp = new InPort (System.in);
+  private static InPort inp = new InPort (System.in, "<stdin>");
 
   static public InPort inDefault ()
   {
@@ -463,4 +471,14 @@ public class InPort extends FilterInputStream
       }
   }
 
+  public void print(java.io.PrintStream ps)
+  {
+    ps.print ("#<input-port");
+    if (name != null)
+      {
+	ps.print (' ');
+	ps.print (name);
+      }
+    ps.print ('>');
+  }
 }

@@ -19,8 +19,6 @@ expt.java \
 string2number.java \
 string_v.java \
 vector_append.java \
-with_input_from_file.java \
-with_output_to_file.java \
 read.java \
 readchar.java \
 read_line.java \

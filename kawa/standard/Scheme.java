@@ -78,8 +78,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("lambda", "kawa.standard.Scheme", "lambda");
 
       //-- Section 4.1  -- complete
-      defProcStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
-      defProcStFld("%define", "kawa.standard.define", "defineRaw");
+      defSntxStFld(LispLanguage.quote_sym, "kawa.lang.Quote", "plainQuote");
+      defSntxStFld("%define", "kawa.standard.define", "defineRaw");
       defSntxStFld("define", "kawa.lib.prim_syntax");
 
       defSntxStFld("if", "kawa.lib.prim_syntax");
@@ -99,7 +99,7 @@ public class Scheme extends LispLanguage
       defSntxStFld("do", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
       defProcStFld("%make-promise", "kawa.lib.std_syntax");
-      defProcStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
+      defSntxStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
 
       //-- Section 5  -- complete [except for internal definitions]
 
@@ -322,10 +322,8 @@ public class Scheme extends LispLanguage
       defProcStFld("output-port?", "kawa.lib.ports");
       defProcStFld("current-input-port", "kawa.lib.ports");
       defProcStFld("current-output-port", "kawa.lib.ports");
-      define_proc ("with-input-from-file",
-		   "kawa.standard.with_input_from_file");
-      define_proc ("with-output-to-file",
-		   "kawa.standard.with_output_to_file");
+      defProcStFld("with-input-from-file", "kawa.lib.ports");
+      defProcStFld("with-output-to-file", "kawa.lib.ports");
       defProcStFld("open-input-file", "kawa.lib.ports");
       defProcStFld("open-output-file", "kawa.lib.ports");
       defProcStFld("close-input-port", "kawa.lib.ports");
@@ -427,9 +425,9 @@ public class Scheme extends LispLanguage
                    "kawa.standard.prim_method", "static_method");
       defSntxStFld("primitive-interface-method",
                    "kawa.standard.prim_method", "interface_method");
-      defProcStFld("primitive-constructor",
+      defSntxStFld("primitive-constructor",
                    "kawa.standard.prim_method", "constructor");
-      defProcStFld("primitive-op1",
+      defSntxStFld("primitive-op1",
                    "kawa.standard.prim_method", "op1");
       defSntxStFld("primitive-get-field", "kawa.lib.reflection");
       defSntxStFld("primitive-set-field", "kawa.lib.reflection");
@@ -549,7 +547,7 @@ public class Scheme extends LispLanguage
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
       defSntxStFld("future", "kawa.lib.thread");
-      define_proc ("sleep", "kawa.standard.sleep");
+      defProcStFld("sleep", "kawa.lib.thread");
 
       defSntxStFld("trace", "kawa.lib.trace");
       defSntxStFld("untrace", "kawa.lib.trace");

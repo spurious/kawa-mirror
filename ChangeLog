@@ -1,3 +1,13 @@
+2005-03-23  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/sleep.java: Now no longer extends Procedure1.
+	(apply1): Renamed to static function sleep.
+	* kawa/standard/with_input_from_file.java: Remove; rewritten in Scheme.
+	* kawa/standard/with_output_to_file.java: Likewise.
+	* kawa/standard/Makefile.am (java_sources): Update accordingly.
+	* kawa/standard/Scheme.java: Update appropriately.
+	Fix some defProcStFld that should be defSntxStFld.
+
 2005-03-22  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (writeFormat, displayFormat): Do setName.

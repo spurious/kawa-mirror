@@ -5,11 +5,10 @@ import gnu.mapping.*;
 
 /** Implements the extended procedure "sleep". */
 
-public class sleep extends Procedure1
+public class sleep
 {
-  public Object apply1 (Object arg1)
+  public static void sleep (Quantity q)
    {
-     Quantity q = (Quantity) arg1;
      Unit u = q.unit();
      double seconds;
      // If q is either dimensionless or its unit is a multiple of Unit.second:
@@ -28,7 +27,6 @@ public class sleep extends Procedure1
        {
 	 throw new GenericError("sleep was interrupted");
        }
-     return Values.empty;
    }
   
 }

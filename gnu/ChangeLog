@@ -1,3 +1,10 @@
+1999-08-08  Per Bothner  <per@bothner.com>
+
+	* jemacs:  New package gnu.jemacs.
+	Move gnu.elisp to gnu.jemacs.text.
+	Move gnu.emacs to gnu.jemacs.buffer.
+	* Makefile.am, Makefile.in (SUBDIRS):  Update accordingly.
+
 1999-06-20  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SUBDIRS):  Add emacs.

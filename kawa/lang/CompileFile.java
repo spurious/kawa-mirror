@@ -3,6 +3,7 @@ import java.io.*;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.SourceMessages;
 
 /** Procedure to read and compile and entire file.
  * Creates a .zip archive containing the resulting classes.
@@ -17,6 +18,7 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (String name, Translator tr)
+    throws gnu.text.SyntaxException
   {
     try
       {
@@ -35,28 +37,18 @@ public class CompileFile extends Procedure2
       }
   }
 
-  public static final Object readBody (InPort port)
+  public static final Object readBody (InPort port, SourceMessages messages)
+    throws gnu.text.SyntaxException
   {
     Object body;
     try
       {
-	ScmRead lexer = new ScmRead(port);
+	ScmRead lexer = new ScmRead(port, messages);
 	body = lexer.readListBody ();
-	gnu.text.SourceError errors = lexer.getErrors();
-	if (errors != null)
-	  {
-	    String msg = errors.toString();
-	    lexer.checkErrors(null, 0);
-	    throw new GenericError("read errors seen reading file: "+msg);
-	  }
+	if (messages.seenErrors())
+	  throw new gnu.text.SyntaxException(lexer.getMessages());
 	if (port.peek() == ')')
 	  lexer.fatal("An unexpected close paren was read.");
-      }
-    catch (gnu.text.SyntaxException e)
-      {
-	// The '\n' is because a SyntaxException includes a line number,
-	// and it is better if that starts the line.  FIXME OBSOLETE
-	throw new GenericError ("read error reading file:\n" + e.toString ());
       }
     catch (java.io.IOException e)
       {
@@ -66,8 +58,10 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (InPort port, Translator tr)
+    throws gnu.text.SyntaxException
   {
-    return kawa.standard.Scheme.makeModuleExp(readBody(port), tr);
+    return kawa.standard.Scheme.makeModuleExp(readBody(port, tr.getMessages()),
+					      tr);
   }
 
   public final Object apply2 (Object arg1, Object arg2)
@@ -75,7 +69,17 @@ public class CompileFile extends Procedure2
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
     Translator tr = new Translator ();
-    ModuleExp lexp = read (arg1.toString (), tr);
+    ModuleExp lexp;
+    try
+      {
+	lexp = read (arg1.toString (), tr);
+      }
+    catch (gnu.text.SyntaxException e)
+      {
+	// The '\n' is because a SyntaxException includes a line number,
+	// and it is better if that starts the line.  FIXME OBSOLETE
+	throw new GenericError ("read error reading file:\n" + e.toString ());
+      }
     try
       {
 	lexp.compileToArchive(arg2.toString());
@@ -97,6 +101,7 @@ public class CompileFile extends Procedure2
    */
   public static boolean compile_to_files (String inname, String directory,
 					  String prefix, String topname)
+    throws gnu.text.SyntaxException
   {
     if (topname == null)
       {
@@ -109,10 +114,11 @@ public class CompileFile extends Procedure2
 	if (prefix != null)
 	  topname = prefix + short_name;
       }
-    Translator tr = new Translator (Environment.user());
+    SourceMessages messages = new SourceMessages();
+    Translator tr = new Translator (Environment.user(), messages);
     ModuleExp mexp = read (inname, tr);
-    if (tr.errors > 0)
-      return true;
+    if (messages.checkErrors(OutPort.errDefault(), 50))
+      throw new gnu.text.SyntaxException(messages);
 
     try
       {

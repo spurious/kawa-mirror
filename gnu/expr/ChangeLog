@@ -1,3 +1,8 @@
+2004-08-06  Per Bothner  <per@bothner.com>
+
+	* CheckedTarget.java (emitCheckedCoerce):  Argument numbering
+	has been changed to 1-orgin.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* ModuleBody.java:  Extend Procedure0 instead of CpsProcedure.

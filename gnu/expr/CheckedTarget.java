@@ -142,7 +142,7 @@ public class CheckedTarget extends StackTarget
       code.emitPushThis();
     else
       code.emitPushString(procname == null ? "lambda" : procname);
-    code.emitPushInt(argno);
+    code.emitPushInt(argno+1);
     code.emitInvokeStatic(thisIsProc ? makeWrongTypeProcMethod
                           : makeWrongTypeStringMethod);
     code.emitThrow();

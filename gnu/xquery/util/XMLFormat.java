@@ -82,4 +82,10 @@ public class XMLFormat extends AbstractFormat
     else
       write (obj.toString(), out);
   }
+
+  public void format (Object value, Consumer out)
+  {
+    gnu.xml.XMLPrinter xout = new gnu.xml.XMLPrinter(out);
+    xout.writeObject(value);
+  }
 }

@@ -33,6 +33,8 @@ public class ValuesFilter extends CpsProcedure
 	    index = next;
 	  }
       }
+    if (result instanceof TreeList)
+      return ! ((TreeList) result).isEmpty();
     throw new Error("unimplemented condition type"); // FIXME
   }
 

@@ -215,14 +215,29 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length;
+    CodeAttr code = comp.getCode();
+
+
+    if (nargs == 3 && target instanceof ConsumerTarget
+	&& ! (args[0] instanceof ReferenceExp))
+      {
+	code.pushScope();
+	Variable newConsumer = code.addLocal(typeNamedChildrenFilter);
+	args[1].compile(comp, comp.typeString);  // Push namespaceURI.
+	args[2].compile(comp, comp.typeString);  // Push localName.
+	code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
+	code.emitInvokeStatic(makeNamedChildrenFilterMethod);
+	code.emitStore(newConsumer);
+	args[0].compileWithPosition(comp, new ConsumerTarget(newConsumer));
+	code.popScope();
+	return;
+      }
 
     if (nargs == 3
 	&& (target instanceof SeriesTarget
 	    	    || target instanceof ConsumerTarget
 ))
       {
-	CodeAttr code = comp.getCode();
-
 	Variable child = target instanceof SeriesTarget ? code.addLocal(typeSeqPosition) : null;
 	Type retAddrType = Type.pointer_type;
 	Variable retAddr = code.addLocal(retAddrType);
@@ -307,6 +322,10 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     return Compilation.typeObject;
   }
 
+  static final ClassType typeNamedChildrenFilter
+    = ClassType.make("gnu.xml.NamedChildrenFilter");
+  static final Method makeNamedChildrenFilterMethod
+  = typeNamedChildrenFilter.getDeclaredMethod("make", 3);
   static final ClassType typeNamedChildren
     = ClassType.make("gnu.xquery.util.NamedChildren");
   static final ClassType typeSeqPosition = NodeType.nodeType;

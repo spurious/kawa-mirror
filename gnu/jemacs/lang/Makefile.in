@@ -99,7 +99,7 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_WITH_SWING =    ELisp.java   ELispReader.java   AddOp.java   DivideOp.java   ObArray.java   Symbol.java   NumberCompare.java   SaveExcursion.java   defcustom.java defgroup.java   lambda.java
+java_WITH_SWING =    ELisp.java   ELispReader.java   AddOp.java   DivideOp.java   ObArray.java   Print.java   Symbol.java   NumberCompare.java   SaveExcursion.java   defcustom.java defgroup.java   lambda.java
 
 
 java_sources =    While.java   $(java_@SWING_SELECTED@)

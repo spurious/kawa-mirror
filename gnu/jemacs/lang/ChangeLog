@@ -1,3 +1,15 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java (static):  Remove ']' from elispReadTable.
+	Needed ot make sure ']' is not treated as a constituent.
+
+	* Print.java:  New class, extends DisplayFormat.
+	* Makefile.am (java_WITH_SWING):  Add Print.java.
+	* ELisp.java (writeFormat, displayFormat):  New fields.
+	(getFormat): New method.
+	(<init>):  Define procedures prin1 and princ.
+	(print):  Removed method.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* ELisp.java:  Update to use LangPrimType.

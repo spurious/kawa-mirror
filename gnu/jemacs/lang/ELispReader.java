@@ -31,6 +31,7 @@ public class ELispReader extends CLispReader
   {
     elispReadTable = ReadTable.getInitial();
     elispReadTable.set('[', new ReaderVector(']'));
+    elispReadTable.remove(']');
     elispReadTable.set('?', new ELispReadTableEntry('?'));
   }
 }

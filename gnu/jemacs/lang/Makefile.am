@@ -10,6 +10,7 @@ java_WITH_SWING =\
   AddOp.java \
   DivideOp.java \
   ObArray.java \
+  Print.java \
   Symbol.java \
   NumberCompare.java \
   SaveExcursion.java \

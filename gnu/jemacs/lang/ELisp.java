@@ -8,6 +8,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.commonlisp.lang.CommonLisp;
+import gnu.kawa.functions.DisplayFormat;
 
 // Should perhaps inherit from CommonLisp, but getInstance (different
 // return types) is a problem.  Perhaps have both inherit from "Lisp2"?  FIXME
@@ -238,6 +239,8 @@ public class ELisp extends Interpreter
     defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
     defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
+    defun("princ", displayFormat);
+    defun("prin1", writeFormat);
     try
       {
 	loadClass("gnu.jemacs.lisp.primitives", environ);
@@ -290,25 +293,12 @@ public class ELisp extends Interpreter
     return ELispReader.readObject(in);
   }
 
-  public void print (Object value, OutPort out)
+  static final DisplayFormat writeFormat = new Print(true);
+  static final DisplayFormat displayFormat = new Print(false);
+
+  public FormatToConsumer getFormat(boolean readable)
   {
-    if (value == Scheme.voidObject)
-      return;
-    if (value instanceof Values)
-      {
-	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  {
-	    SFormat.print (values[i], out);
-	    out.println();
-	  }
-      }
-    else
-      {
-	SFormat.print (value, out);
-	out.println();
-      }
-    out.flush();
+    return readable ? writeFormat : displayFormat;
   }
 
   LangPrimType booleanType;

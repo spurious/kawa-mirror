@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -31,13 +32,13 @@ public class set_b extends kawa.lang.Syntax2 {
                Object p = frame.get(s.name);
                if (p!=null) {
                   frame.put(s.name,o);
-                  return i.undefinedObject;
+                  return kawa.lang.Interpreter.undefinedObject;
                }
             } 
          }
          if (i.lookup(s.name)!=null) {
             i.define(s.name,o);
-            return i.undefinedObject;
+            return kawa.lang.Interpreter.undefinedObject;
          } else {
             throw new kawa.lang.UnboundSymbol(s.name);
          }

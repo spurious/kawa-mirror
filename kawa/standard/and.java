@@ -27,9 +27,9 @@ public class and extends kawa.lang.Named implements kawa.lang.Executable {
             index++;
          }
          if (b) {
-            return i.trueObject;
+            return kawa.lang.Interpreter.trueObject;
          } else {
-            return i.falseObject;
+            return kawa.lang.Interpreter.falseObject;
          }
       } else {
          throw new kawa.lang.WrongArguments(this.name,1,"(and obj ...)");

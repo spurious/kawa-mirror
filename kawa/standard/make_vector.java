@@ -23,7 +23,7 @@ public class make_vector extends kawa.lang.Named implements kawa.lang.Executable
 
          if (pair.car instanceof java.lang.Integer) {
             int count = ((java.lang.Integer)pair.car).intValue();
-            Object o = i.nullObject;
+            Object o = kawa.lang.Interpreter.nullObject;
             if (pair.cdr instanceof kawa.lang.pair) {
                kawa.lang.pair second = (kawa.lang.pair)pair.cdr;
                if (second.cdr instanceof kawa.lang.snull) {

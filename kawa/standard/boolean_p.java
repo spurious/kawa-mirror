@@ -11,16 +11,13 @@ public class boolean_p extends kawa.lang.Procedure1 {
       super("boolean?");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) throws kawa.lang.WrongArguments 
+   public Object apply1 (Object arg1)
+     throws kawa.lang.WrongArguments 
    {
       if (arg1 instanceof java.lang.Boolean) {
-         return i.trueObject;
+         return kawa.lang.Interpreter.trueObject;
       } else {
-         return i.falseObject;
+         return kawa.lang.Interpreter.falseObject;
       }
    }
 

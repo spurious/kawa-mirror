@@ -7,17 +7,12 @@ public class eq_p extends kawa.lang.Procedure2 {
       super("eq?");
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) 
+   public Object apply2(Object arg1, Object arg2) 
    {
       if (arg1==arg2) {
-         return i.trueObject;
+         return kawa.lang.Interpreter.trueObject;
       } else {
-         return i.falseObject;
+         return kawa.lang.Interpreter.falseObject;
       }
    }
 }

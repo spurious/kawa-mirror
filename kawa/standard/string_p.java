@@ -7,16 +7,12 @@ public class string_p extends kawa.lang.Procedure1 {
       super("string?");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) 
+   public Object apply1 (Object arg1)
    {
      if (arg1 instanceof java.lang.StringBuffer) {
-        return i.trueObject;
+        return kawa.lang.Interpreter.trueObject;
      } else {
-        return i.falseObject;
+        return kawa.lang.Interpreter.falseObject;
      }
    }
 }

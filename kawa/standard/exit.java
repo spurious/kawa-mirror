@@ -8,10 +8,7 @@ public class exit extends kawa.lang.Procedure0 {
       super("exit");
    }
 
-   public Object execute0(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames
-   )
+   public Object apply0 ()
    {
       return new kawa.lang.Exit();
    }

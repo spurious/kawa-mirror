@@ -17,7 +17,7 @@ public class when extends kawa.lang.Named implements kawa.lang.Syntaxable {
          kawa.lang.pair pair = (kawa.lang.pair)formo;
          java.lang.Boolean cond = (java.lang.Boolean)i.eval(pair.car,frames);
 
-         Object result = i.undefinedObject;
+         Object result = kawa.lang.Interpreter.undefinedObject;
          if (cond.booleanValue()) {
             while (pair.cdr instanceof kawa.lang.pair) {
                pair = (kawa.lang.pair)pair.cdr;

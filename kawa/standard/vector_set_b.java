@@ -7,17 +7,12 @@ public class vector_set_b extends kawa.lang.Procedure3 {
       super("vector-set!");
    }
 
-   public Object execute3(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2,
-      Object arg3
-   ) throws kawa.lang.GenericError
+   public Object apply3 (Object arg1, Object arg2, Object arg3)
+     throws kawa.lang.GenericError
    {
       try {
          ((kawa.lang.vector)arg1).value.setElementAt(arg3,((java.lang.Integer)arg2).intValue());
-         return i.undefinedObject;
+         return kawa.lang.Interpreter.undefinedObject;
       } catch (ArrayIndexOutOfBoundsException e) {
          throw new kawa.lang.GenericError("vector index out of bounds.");
       }

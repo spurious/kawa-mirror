@@ -7,12 +7,8 @@ public class list_tail extends kawa.lang.Procedure2 {
       super("list-tail");
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongArguments,
+   public Object apply2 (Object arg1, Object arg2)
+     throws kawa.lang.WrongArguments,
             kawa.lang.WrongType,
             kawa.lang.GenericError
    {

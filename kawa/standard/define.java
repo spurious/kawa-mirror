@@ -19,7 +19,7 @@ public class define extends kawa.lang.Syntax2 {
    {
       kawa.lang.symbol sym = (kawa.lang.symbol)arg1;
       i.define(sym.name,i.eval(arg2,frames));
-      return i.undefinedObject;
+      return kawa.lang.Interpreter.undefinedObject;
 
    }
 

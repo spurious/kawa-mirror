@@ -10,11 +10,7 @@ public class abs extends kawa.lang.Procedure1 {
       super("abs");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) throws kawa.lang.WrongType
+   public Object apply1 (Object arg1) throws kawa.lang.WrongType
    {
       if (arg1 instanceof java.lang.Integer) {
          if (((java.lang.Integer)arg1).intValue()<0) {

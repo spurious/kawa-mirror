@@ -13,17 +13,13 @@ public class list_ref extends kawa.lang.Procedure2 {
       list_tail = proc;
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongArguments,
+   public Object apply2 (Object arg1, Object arg2)
+     throws kawa.lang.WrongArguments,
             kawa.lang.WrongType,
             kawa.lang.GenericError,
             kawa.lang.UnboundSymbol
    {
-      Object tail = list_tail.execute2(i,frames,arg1,arg2);
+      Object tail = list_tail.apply2 (arg1, arg2);
 
       if (tail instanceof kawa.lang.pair) {
          return ((kawa.lang.pair)tail).car;

@@ -34,7 +34,7 @@ public class letrec extends kawa.lang.Named implements kawa.lang.Syntaxable {
                       binding.cdr instanceof kawa.lang.pair) {
                      kawa.lang.pair vpair = (kawa.lang.pair)binding.cdr;
                      if (vpair.cdr instanceof kawa.lang.snull) {
-                        frame.put(((kawa.lang.symbol)binding.car).name,i.falseObject);
+                        frame.put(((kawa.lang.symbol)binding.car).name,kawa.lang.Interpreter.falseObject);
                      } else {
                         throw new kawa.lang.GenericError("Malformed let binding.");
                      }
@@ -61,7 +61,7 @@ public class letrec extends kawa.lang.Named implements kawa.lang.Syntaxable {
             //-- Add frame to execution frames
             frames.addElement(frame);
 
-            Object result = i.undefinedObject;
+            Object result = kawa.lang.Interpreter.undefinedObject;
             while (obj2 instanceof kawa.lang.pair) {
                kawa.lang.pair pair = (kawa.lang.pair)obj2;
                result = i.eval(pair.car,frames);

@@ -11,11 +11,8 @@ public class caaar extends kawa.lang.Procedure1 {
       super("caaar");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) throws kawa.lang.WrongType,
+   public Object apply1 (Object arg1)
+     throws kawa.lang.WrongType,
             kawa.lang.GenericError
    {
       if (arg1 instanceof kawa.lang.pair) {

@@ -1,4 +1,5 @@
 package kawa.standard;
+import kawa.lang.*;
 
 //-- Exceptions
 import kawa.lang.WrongArguments;
@@ -12,19 +13,16 @@ public class not extends kawa.lang.Procedure1 {
       super("not");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) throws kawa.lang.WrongArguments,
+   public Object apply1 (Object arg1)
+     throws kawa.lang.WrongArguments,
             kawa.lang.WrongType
    {
       if (arg1 instanceof java.lang.Boolean) {
          java.lang.Boolean b = (java.lang.Boolean)arg1;
          if (b.booleanValue()) {
-            return i.falseObject;
+            return kawa.lang.Interpreter.falseObject;
          } else {
-            return i.trueObject;
+            return kawa.lang.Interpreter.trueObject;
          }
       } else {
          throw new kawa.lang.WrongType(this.name,1,"boolean");

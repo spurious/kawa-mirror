@@ -10,12 +10,7 @@ public class string_ref extends kawa.lang.Procedure2 {
       super("string-ref");
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongType,
+   public Object apply2 (Object arg1, Object arg2) throws kawa.lang.WrongType,
             kawa.lang.GenericError
    {
       if (arg1 instanceof java.lang.StringBuffer) {

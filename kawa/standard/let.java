@@ -52,7 +52,7 @@ public class let extends kawa.lang.Named implements kawa.lang.Syntaxable {
             //-- Add frame to execution frames
             frames.addElement(frame);
 
-            Object result = i.undefinedObject;
+            Object result = kawa.lang.Interpreter.undefinedObject;
             while (obj2 instanceof kawa.lang.pair) {
                kawa.lang.pair pair = (kawa.lang.pair)obj2;
                result = i.eval(pair.car,frames);
@@ -71,7 +71,7 @@ public class let extends kawa.lang.Named implements kawa.lang.Syntaxable {
 
             kawa.lang.pair arguments = null;
             kawa.lang.pair larg = null;
-            Object values = i.nullObject;
+            Object values = kawa.lang.Interpreter.nullObject;
             kawa.lang.pair lval = null;
 
             if (p.car instanceof kawa.lang.pair && p.cdr instanceof kawa.lang.pair) {
@@ -85,17 +85,17 @@ public class let extends kawa.lang.Named implements kawa.lang.Syntaxable {
                         kawa.lang.pair vpair = (kawa.lang.pair)binding.cdr;
                         if (vpair.cdr instanceof kawa.lang.snull) {
                            if (larg==null) {
-                              arguments = new kawa.lang.pair(binding.car,i.nullObject);
+                              arguments = new kawa.lang.pair(binding.car,kawa.lang.Interpreter.nullObject);
                               larg = arguments;
                            } else {
-                              larg.cdr = new kawa.lang.pair(binding.car,i.nullObject);
+                              larg.cdr = new kawa.lang.pair(binding.car,kawa.lang.Interpreter.nullObject);
                               larg = (kawa.lang.pair)larg.cdr;
                            }
                            if (lval==null) {
-                              lval = new kawa.lang.pair(vpair.car,i.nullObject);
+                              lval = new kawa.lang.pair(vpair.car,kawa.lang.Interpreter.nullObject);
                               values = lval;
                            } else {
-                              lval.cdr = new kawa.lang.pair(vpair.car,i.nullObject);
+                              lval.cdr = new kawa.lang.pair(vpair.car,kawa.lang.Interpreter.nullObject);
                               lval = (kawa.lang.pair)lval.cdr;
                            }
                         } else {

@@ -14,12 +14,8 @@ public class mem extends kawa.lang.Procedure2 {
       usage = new java.lang.String("("+name+" obj list)");
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongArguments,
+   public Object apply2 (Object arg1, Object arg2)
+     throws kawa.lang.WrongArguments,
             kawa.lang.WrongType,
             kawa.lang.GenericError,
             kawa.lang.UnboundSymbol
@@ -28,7 +24,8 @@ public class mem extends kawa.lang.Procedure2 {
           kawa.lang.pair list = (kawa.lang.pair)arg2;
 
           do {
-             java.lang.Boolean check = (java.lang.Boolean)compare.execute2(i,frames,list.car,arg1);
+             java.lang.Boolean check
+	       = (java.lang.Boolean)compare.apply2 (list.car, arg1);
 
              if (check.booleanValue()) {
                 return list;
@@ -42,9 +39,9 @@ public class mem extends kawa.lang.Procedure2 {
 
          } while (list!=null);
 
-         return i.falseObject;
+         return kawa.lang.Interpreter.falseObject;
       } else if (arg2 instanceof kawa.lang.snull) {
-         return i.falseObject;
+         return kawa.lang.Interpreter.falseObject;
       } else {
          throw new kawa.lang.WrongType(this.name,2,"list");
       }

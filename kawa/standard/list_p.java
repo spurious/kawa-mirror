@@ -7,11 +7,7 @@ public class list_p extends kawa.lang.Procedure1 {
       super("list?");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) 
+   public Object apply1 (Object arg1)
    {
       if (arg1 instanceof kawa.lang.pair) {
          kawa.lang.pair p = (kawa.lang.pair)arg1;
@@ -19,12 +15,12 @@ public class list_p extends kawa.lang.Procedure1 {
             p = (kawa.lang.pair)p.cdr;
          }
          if (p.cdr instanceof kawa.lang.snull) {
-            return i.trueObject;
+            return kawa.lang.Interpreter.trueObject;
          } else {
-            return i.falseObject;
+            return kawa.lang.Interpreter.falseObject;
          }
       } else {
-         return i.falseObject;
+         return kawa.lang.Interpreter.falseObject;
       }
    }
 

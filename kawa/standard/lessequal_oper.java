@@ -42,9 +42,9 @@ public class lessequal_oper extends kawa.lang.Named implements kawa.lang.Executa
                count++;
             }
             if (retval) {
-               return i.trueObject;
+               return kawa.lang.Interpreter.trueObject;
             } else {
-               return i.falseObject;
+               return kawa.lang.Interpreter.falseObject;
             }
          } else {
             throw new kawa.lang.WrongArguments(this.name,2,"(<= x1 x2 ...)");

@@ -11,13 +11,8 @@ public class string_set_b extends kawa.lang.Procedure3 {
       super("string-set!");
    }
 
-   public Object execute3(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2,
-      Object arg3
-   ) throws kawa.lang.WrongType,
+   public Object apply3 (Object arg1, Object arg2, Object arg3)
+     throws kawa.lang.WrongType,
             kawa.lang.GenericError
    {
       if (arg1 instanceof java.lang.StringBuffer) {
@@ -28,7 +23,7 @@ public class string_set_b extends kawa.lang.Procedure3 {
                     (int)((java.lang.Integer)arg2).intValue(),
                     ((java.lang.Character)arg3).charValue()
                   );
-                  return i.undefinedObject;
+                  return kawa.lang.Interpreter.undefinedObject;
                } catch (StringIndexOutOfBoundsException e) {
                   throw new kawa.lang.GenericError("String index out of bounds.");
                }

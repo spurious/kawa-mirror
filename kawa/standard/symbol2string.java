@@ -10,11 +10,8 @@ public class symbol2string extends kawa.lang.Procedure1 {
       super("symbol->string");
    }
 
-   public Object execute1(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1
-   ) throws kawa.lang.WrongType
+   public Object apply1 (Object arg1)
+     throws kawa.lang.WrongType
    {
       if (arg1 instanceof kawa.lang.symbol) {
          return new java.lang.StringBuffer(((kawa.lang.symbol)arg1).name);

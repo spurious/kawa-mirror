@@ -10,20 +10,16 @@ public class char_equal_p extends kawa.lang.Procedure2 {
       super("char=?");
    }
 
-   public Object execute2(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arg1,
-      Object arg2
-   ) throws kawa.lang.WrongType
+   public Object apply2(Object arg1, Object arg2)
+       throws kawa.lang.WrongType
    {
       if (arg1 instanceof java.lang.Character) {
          if (arg2 instanceof java.lang.Character) {
             if (((java.lang.Character)arg1).charValue()==
                 ((java.lang.Character)arg2).charValue()) {
-               return i.trueObject;
+               return kawa.lang.Interpreter.trueObject;
             } else {
-               return i.falseObject;
+               return kawa.lang.Interpreter.falseObject;
             }
          } else {
             throw new kawa.lang.WrongType(this.name,2,"character");

@@ -4,7 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources=\
   CallContext.java \
-  ConstantLocation.java \
+  ConstrainedLocation.java \
   Environment.java \
   EnvironmentKey.java \
   Future.java \
@@ -38,6 +38,7 @@ java_sources=\
   ProcedureN.java \
   ProcLocation.java \
   PropertyLocation.java \
+  ReadOnlyLocation.java \
   Setter.java \
   Setter0.java \
   Setter1.java \

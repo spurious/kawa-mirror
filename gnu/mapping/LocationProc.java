@@ -9,12 +9,6 @@ package gnu.mapping;
  */
 public class LocationProc extends Procedure0or1 implements HasSetter
 {
-  // FIXME Having the converter as part of the LocationProc is ugly.
-  // For one thing, it messes up ProcLocation.
-  // Instead, the 'loc' should be a "constrained Location".
-  // In that case kawa.standard.location.makeProcLocation$V could be
-  // optimized to return a ProcLocation of the argument is a LocationProc.
-  Procedure converter;
   Location loc;
 
   public LocationProc (Location loc)
@@ -22,10 +16,23 @@ public class LocationProc extends Procedure0or1 implements HasSetter
     this.loc = loc;
   }
 
+  public static LocationProc makeNamed (Symbol name, Location loc)
+  {
+    LocationProc lproc = new LocationProc(loc);
+    lproc.setSymbol(name);
+    return lproc;
+  }
+
   public LocationProc (Location loc, Procedure converter)
   {
     this.loc = loc;
-    this.converter = converter;
+    if (converter != null)
+      pushConverter(converter);
+  }
+
+  public void pushConverter (Procedure converter)
+  {
+    loc = ConstrainedLocation.make(loc, converter);
   }
 
   public Object apply0 () throws Throwable
@@ -41,8 +48,6 @@ public class LocationProc extends Procedure0or1 implements HasSetter
 
   public void set0 (Object value) throws Throwable
   {
-    if (converter != null)
-      value = converter.apply1(value);
     loc.set(value);
   }
 
@@ -66,5 +71,11 @@ public class LocationProc extends Procedure0or1 implements HasSetter
     loc.setRestore(oldValue);
   }
 
-  public String toString () { return "#<location-proc "+loc+">"; }
+  public String toString ()
+  {
+    Object n = getSymbol();
+    if (n != null)
+      return super.toString();
+    return "#<location-proc "+loc+">";
+  }
 }

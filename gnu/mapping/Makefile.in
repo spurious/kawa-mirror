@@ -207,7 +207,7 @@ ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
   CallContext.java \
-  ConstantLocation.java \
+  ConstrainedLocation.java \
   Environment.java \
   EnvironmentKey.java \
   Future.java \
@@ -241,6 +241,7 @@ java_sources = \
   ProcedureN.java \
   ProcLocation.java \
   PropertyLocation.java \
+  ReadOnlyLocation.java \
   Setter.java \
   Setter0.java \
   Setter1.java \

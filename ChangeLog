@@ -1,5 +1,8 @@
 2005-02-20  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/location.java (makeProcLocation$V): Can now simplify
+	if proc is a LocationProc.
+
 	* kawa/standard/require.java (importDefinitions): Remove duplicate
 	setAlias and setIndirectBinding calls.
 

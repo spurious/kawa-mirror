@@ -55,6 +55,8 @@ public class location extends Syntax implements Printable
   public static Location
   makeProcLocation$V (Procedure proc, Object[] args)
   {
+    if (proc instanceof LocationProc && args.length == 0)
+      return ((LocationProc) proc).getLocation();
     return new ProcLocation(proc, args);
   }
 

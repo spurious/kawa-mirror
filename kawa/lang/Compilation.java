@@ -256,8 +256,10 @@ public class Compilation
   /** If non-null: a prefix for generateClassName to prepend to names. */
   public String classPrefix;
 
-  /** Convert a string to a safe class name. */
-  public static String mangleClassName (String name)
+  /** Convert a string to a safe Java identifier.
+   * This is not invertible (since '_' is passed unchanged).
+   * This should be fixed. */
+  public static String mangleName (String name)
   {
     int len = name.length ();
     StringBuffer mangled = new StringBuffer (len);
@@ -303,7 +305,7 @@ public class Compilation
    */
   public String generateClassName (String hint)
   {
-    hint = mangleClassName (hint);
+    hint = mangleName (hint);
     if (mainClass != null)
       hint = mainClass.getName() + '$' + hint;
     else if (classPrefix != null)

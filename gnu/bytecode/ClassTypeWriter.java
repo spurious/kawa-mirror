@@ -312,4 +312,80 @@ public class ClassTypeWriter extends PrintStream
 	print('>');
       }
   }
+
+  // THE REMAINING CODE IS THE SKELTON OF AN UNFINISHED DIS-ASSEMBLER.
+
+  /*
+  public void printIntField (int value, int width)
+  {
+    String str = Integer.toString(value);
+    for (int i = width - str.length();  --i >= 0; ) print(' ');
+    print(str);
+  }
+
+  public void printConstantRef(int index)
+  {
+    print('#');
+    print(index);
+    print('=');
+    CpoolEntry[] pool = ctype.constants.pool;
+    CpoolEntry entry;
+    if (pool == null || index < 0 || index >= pool.length
+	|| (entry = pool[index]) == null)
+      print("<invalid constant index>");
+    else
+      {
+	print('<');
+	entry.print(this, 1);
+	print('>');
+      }
+  }
+  */
+
+  /* These private variable are "global shared" state used by
+   * printDisassemble and its utility methods.
+   * In general, that is a bad idea.  However, since it only makes
+   * sense to disassemble one method at a time in a single ClassTypeWriter
+   * (because ClassTypeWriter is an extension of Writer),
+   * it seems harmless.  It might be cleaner to use a nested class,
+   * but that seems hard to justify. */
+  /*
+  private int current_pc;
+  private Method current_method;
+
+  private int get_index(int length) { ...}
+
+  private int get_immediate_1 () { ... }
+
+  public final void printDisassemble (Method method)
+  {
+    current_method = method;
+    for (current_pc = 0;  current_pc < PC;  current_pc++)
+      {
+	printIntField(pc, 3); print(": ");
+	int op = code[pc]);
+        print(Op.name(op));
+	switch (op)
+	  {
+	  case 18: // lcd1
+	  case 19: // lcd2
+	    int index = get_index(op == 18 ? 1 : 2);
+	    print(' ');
+	    printConstantRef(index);
+	    break;
+	  case 21: // iload
+	  case 22: // lload
+	    int reg = get_immediate_1();  // !!!
+	    print(' ');
+	    print(reg);
+	    break;
+	  case 95:  // iadd
+	  case 96:  // ladd
+	    break;
+	  }
+	println();
+      }
+  }
+  */
+
 }

@@ -1,14 +1,15 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure1;
+/** Implement the standard Scheme procedure "string-copy". */
 
-public class string_copy extends kawa.lang.Procedure1 {
-   public string_copy() {
-      super("string-copy");
-   }
-
-   public Object apply1 (Object arg1)
-   {
-      return new java.lang.StringBuffer(((java.lang.StringBuffer)arg1).toString());
-   }
+public class string_copy extends Procedure1
+{
+  public Object apply1 (Object arg1)
+  {
+    if (arg1 instanceof FString)
+      return ((FString)arg1).copy ();
+    else
+      return new FString (arg1.toString().toCharArray());
+  }
 }

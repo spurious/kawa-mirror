@@ -11,7 +11,7 @@ public class with_output_to_file extends Procedure2
   public Object apply2 (Object string, Object proc)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    String fname = ((StringBuffer)string).toString();
+    String fname = string.toString();
 
     try {
       java.io.OutputStream is = new java.io.FileOutputStream(fname);

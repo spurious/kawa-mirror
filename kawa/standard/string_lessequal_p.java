@@ -1,21 +1,15 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure2;
+/** Implement the standard Scheme procedure "string<=?". */
 
-public class string_lessequal_p extends kawa.lang.Procedure2 {
-   public string_lessequal_p() {
-      super("string<=?");
-   }
-
-   public Object apply2 (Object arg1, Object arg2)
-   {
-      if (((java.lang.StringBuffer)arg1).toString().compareTo(
-             ((java.lang.StringBuffer)arg2).toString()
-          )<=0) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
-   }
-
+public class string_lessequal_p extends Procedure2
+{
+  public Object apply2 (Object arg1, Object arg2)
+  {
+    if (arg1.toString().compareTo(arg2.toString()) <= 0)
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
+  }
 }

@@ -92,6 +92,8 @@
      <include name="gnu/lists/SeqPosition.java"/>
      <include name="gnu/lists/Sequence.java"/>
      <include name="gnu/lists/SimpleVector.java"/>
+     <include name="gnu/lists/FVector.java"/>
+     <include name="gnu/lists/LList.java"/>
      <include name="gnu/mapping/CallContext.java"/>
      <include name="gnu/kawa/xml/Focus.java"/>
      <include name="gnu/kawa/xml/ListItems.java"/>

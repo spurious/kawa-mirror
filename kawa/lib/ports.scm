@@ -10,6 +10,10 @@
 (define (eof-object? obj)
   (eq? obj #!eof))
 
+(define (input-port-read-state port)
+  ((primitive-virtual-method "kawa.lang.InPort" "getReadState" <char> ())
+   port))
+
 (define (input-port-line-number port)
   (+ 1
      ((primitive-virtual-method "kawa.lang.LineBufferedReader" "getLineNumber"
@@ -28,9 +32,14 @@
        port))))
 
 (define (default-prompter port)
-  (string-append "#|kawa:"
-		 (number->string (input-port-line-number port))
-		 "#| "))
+  (let ((state (input-port-read-state port)))
+    (if (char=? state #\Newline)
+	""
+	(string-append (if (char=? state #\Space)
+			   "#|kawa:"
+			   (string-append "#|" (make-string 1 state) "---:"))
+		       (number->string (input-port-line-number port))
+		       "|# "))))
 
 (define (input-port-prompter port)
   ((primitive-virtual-method "kawa.lang.TtyInPort" "getPrompter"
@@ -48,3 +57,13 @@
 
 (define (transcript-off)
   ((primitive-static-method "kawa.lang.OutPort" "closeLogFile" <void> ())))
+
+(define (copy-file from to)
+  (let ((in (open-input-file from))
+	(out (open-output-file to)))
+    (do ((ch (read-char in) (read-char in)))
+	((eof-object? ch)
+	 (close-output-port out)
+	 (close-input-port in)
+	 #!void)
+      (write-char ch out))))

@@ -66,12 +66,14 @@ SECONDARY_OBJS=\
   keywords$$string_2_keyword.class \
   misc$$environment__bound_P.class \
   misc$$scheme__implementation__version.class \
+  ports$$copy__file.class \
   ports$$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \
   ports$$input__port__column__number.class \
   ports$$input__port__line__number.class \
   ports$$input__port__prompter.class \
+  ports$$input__port__read__state.class \
   ports$$newline.class \
   ports$$set__input__port__line__number_B.class \
   ports$$set__input__port__prompter_B.class \

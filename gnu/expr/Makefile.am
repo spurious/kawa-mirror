@@ -15,7 +15,6 @@ java_JAVA=\
   ChainLambdas.java \
   CheckedTarget.java \
   ClassExp.java \
-  Compilable.java \
   Compilation.java \
   ConditionalTarget.java \
   Declaration.java \
@@ -37,6 +36,7 @@ java_JAVA=\
   LambdaExp.java \
   LetExp.java \
   Literal.java \
+  LitTable.java \
   MethodProc.java \
   ModuleBody.java \
   ModuleMethod.java \

@@ -15,22 +15,22 @@ public class Literal extends Initializer
   public Type type;
   
   public int flags;
-  /** Flag used to indicate intent to allocate the value.
-   * The ALLOCATING flag is true if someone has committed to allocate
-   * the value, but has not necessarily finished doing so.
-   * The flag is used to detect circularities. */
-  public static final int ALLOCATING = 1;
 
-  /** Bit in flags used to indicate the value has been allocated.
-   * I.e. it has been allocated, but it is not necessarily initialized. */
-  public static final int ALLOCATED = 2;
+  /** Set at the beginning of the call to writeObject. */
+  static final int WRITING = 1;
 
-  /** Bit in flags indicates that the value has been fully initialized. */
-  public static final int INITIALIZED = 4;
+  /** Set at the end of the call to writeObject. */
+  static final int WRITTEN = 2;
 
-  /* The ASSIGNED flag is set iff code has been emitted to assign the
-   * value of the literal to the Field. */
-  public static final int ASSIGNED = 8;
+  static final int CYCLIC = 4;
+
+  /** In pass 2, object has been at least allocated. */
+  static final int EMITTED = 8;
+
+  /** Values produced by calling writeObject on value. */
+  Object[] argValues;
+  /** Types produced by calling writeObject on value. */
+  Type[] argTypes;
 
   public static final Literal nullLiteral
     = new Literal(null, Type.pointer_type);
@@ -82,7 +82,7 @@ public class Literal extends Initializer
     comp.literalTable.put (value, this);
     this.field = field;
     this.type = field.getType();
-    flags = ALLOCATED|INITIALIZED|ASSIGNED;
+    flags = WRITTEN|EMITTED;
   }
 
   public Literal (Object value, Type type, Compilation comp)
@@ -92,104 +92,27 @@ public class Literal extends Initializer
     this.type = type;
   }
 
-  private Literal (Object value, Type type)
+  Literal (Object value, Type type)
   {
     this.value = value;
     this.type = type;
   }
 
-  /** Emit code to re-create this Literal's value, an Object array. */
-  void emitArray (Compilation comp, Type element_type)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    Object[] array = (Object[]) value;
-    int len = array.length;
-    code.emitPushInt(len);
-    code.emitNewArray(element_type);
-    flags |= Literal.ALLOCATED;
-    for (int i = 0;  i < len;  i++)
-      {
-	Object value = array[i];
-	if (value == null)
-	  continue;
-	code.emitDup(1);
-	code.emitPushInt(i);
-	comp.emitLiteral (value);
-	// Stack contents:  ..., array, array, i, array[i]
-	code.emitArrayStore(comp.typeObject);
-	// Stack contents:  ..., array
-      }
-  }
-
   public void emit(Compilation comp)
   {
-    if (! comp.immediate && (flags & Literal.INITIALIZED) == 0)
-      emit (comp, true);
-  }
-
-  void emit (Compilation comp, boolean ignore)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    if (value == null)
+    if (! comp.immediate && comp.litTable == null)
       {
-	if (! ignore)
-	  code.emitPushNull();
-	return;
+	comp.litTable = new LitTable(comp);
+	try
+	  {
+	    comp.litTable.emit();
+	  }
+	catch (Throwable ex)
+	  {
+	    comp.error('e', "Literals: Internal error:" + ex);
+	    ex.printStackTrace(System.err);
+	  }
       }
-    if (value instanceof String)
-      {
-	if (! ignore)
-	  code.emitPushString(value.toString ());
-	return;
-      }
-    if ((flags & ALLOCATED) != 0)
-      {
-	if ((flags & ASSIGNED) == 0 || field == null)
-	  throw new Error ("internal error in Literal.emit");
-	if (! ignore)
-	  code.emitGetStatic(field);
-	return;
-      }
-    if (value instanceof Compilable)
-      ((Compilable) value).emit (this, comp);
-    else if (value instanceof Integer)
-      {
-	code.emitNew(comp.javaIntegerType);
-	code.emitDup(comp.javaIntegerType);
-	code.emitPushInt(((Integer)value).intValue ());
-	code.emitInvokeSpecial(comp.initIntegerMethod);
-      }
-    else if (value instanceof String[])
-      emitArray (comp, comp.typeString);
-    else if (value instanceof Object[])
-      emitArray (comp, comp.typeObject);
-    else
-      {
-	comp.error('e', "unimplemented support for compiling "
-		   + value.getClass().getName() + " literals");
-	code.emitGetStatic(Compilation.undefinedConstant);
-      }
-    flags |= ALLOCATED|INITIALIZED;
-    if (field != null && (flags & ASSIGNED) == 0)
-      {
-	if (! ignore)
-	  code.emitDup(Compilation.scmPairType);
-	code.emitPutStatic(field);
-	flags |= ASSIGNED;
-      }
-    else if (ignore)
-      code.emitPop(1);
-  }
-
-  /** Utility function to check for circular literals dependencies.
-   * Use this in a Compilable.emit method if circularities are not allowed
-   * (perhaps because it it not worth the trouble to handle them). */
-  public void check_cycle ()
-  {
-    if ((flags & ALLOCATING) != 0)
-      throw new Error ("circularity in emit - not supported for class "
-		       + value.getClass().getName());
-    flags |= ALLOCATING;
   }
 }
 

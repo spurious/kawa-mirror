@@ -99,6 +99,9 @@ public class Compilation
   static final Field undefinedConstant
     = typeInterpreter.addField ("undefinedObject", scmUndefinedType,
 				Access.PUBLIC|Access.STATIC);
+  static final Field emptyConstant
+    = scmListType.addField ("Empty", scmListType,
+			    Access.PUBLIC|Access.STATIC);
   static final Field nameField
     = typeProcedure.addField ("sym_name", scmSymbolType, Access.PROTECTED);
   static Method initIntegerMethod;
@@ -270,6 +273,8 @@ public class Compilation
   /** True if we should generate a main(String[]) method. */
   public boolean generateMain = generateMainDefault;
 
+  LitTable litTable;
+
   public static boolean generateAppletDefault = false;
   /** True if we should generate an Applet. */
   public boolean generateApplet = generateAppletDefault;
@@ -296,15 +301,7 @@ public class Compilation
     if (value == null)
       return Literal.nullLiteral;
     Literal literal = (Literal) literalTable.get (value);
-    if (literal != null)
-      {
-	// This value is used multiple times (perhaps recursively),
-	// so do allocate a LitN Field for it.
-	// However, String literals are shared in the constant pool instead.
-	if (literal.field == null && ! (literal.value instanceof String))
-	  literal.assign (this);
-      }
-    else
+    if (literal == null)
       {
 	if (value instanceof Boolean)
 	  {
@@ -315,53 +312,18 @@ public class Compilation
 	  }
 	else if (value == Values.empty)
 	  literal = new Literal (value, voidConstant, this);
+	else if (value == gnu.kawa.util.LList.Empty)
+	  literal = new Literal (value, emptyConstant, this);
 	else if (value instanceof Undefined)
 	  literal = new Literal (value, undefinedConstant, this);
 	else if (immediate)
 	  {
 	    literal = new Literal (value, this);
 	  }
-	else if (value instanceof Compilable)
-	  literal = ((Compilable) value).makeLiteral (this);
-	else if (value instanceof Object[])
-	  {
-	    Object[] array = (Object[]) value;
-	    int len = array.length;
-	    if (len == 0 && ! (value instanceof String[]))
-	      literal = new Literal(value, noArgsField, this);
-	    else
-	      {
-		literal = new Literal (value, objArrayType, this);
-		for (int i = len;  --i >= 0; )
-		  {
-		    Object element = array[i];
-		    if (element != null)
-		      findLiteral(element);
-		  }
-	      }
-	  }
 	else
 	  literal = new Literal (value, Type.make(value.getClass()), this);
       }
     return literal;
-  }
-
-  /** Emit code to push a value.
-   * Only used when compiling to a file, and for internal use.
-   * Must previously have called findLiteral (to detect cycles).
-   */
-  public void emitLiteral (Object value)
-  {
-    gnu.bytecode.CodeAttr code = getCode();
-    if (value == null)
-      code.emitPushNull();
-    else
-      {
-	Literal literal = (Literal) literalTable.get (value);
-	if (literal == null)
-	  throw new Error ("emitLiteral called without previous findLiteral");
-	literal.emit (this, false);
-      }
   }
 
   /** Emit code to "evaluate" a compile-time constant.

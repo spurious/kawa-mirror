@@ -1,3 +1,30 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* LitTable.java:  New class, manages the literals of a Compilation.
+	* Compilable.java:   Removed, no longer used.
+	* Makefile.am (java_JAVA):  Update accordingly.
+	* Literal.java (argVlaues, argTypes0:  New fields.
+	(ALLOCATING, ALLOCATED, INITIALIZED, ASSIGNED):  Removed flags values.
+	(WRITING, WRITTEN, CYCLIC, EMITTED):  New flags values.
+	(emitArray, emit(Compilation,boolean)):  Remove now-unused methods.
+	* Compilation.java (scmListType):  Renamed to typeLList.
+	(emptyConstant):  New Field field.
+	(litTable):  New field.
+	(findLiteral):  Nothing to do now if we already have literal.
+	No special handling for Compilable or Object[].
+	(emitLiteral):  Remove unused now-methods.
+
+	* Interpreter.java (getTypeFor):  New methods.
+	(string2Type):  New static method, based on method in Scheme class.
+ 	
+	* Keyword.java:  No longer implements Compilable.
+	* Special.java:  No longer implements Compilable.
+
+	* PrimProcedure.java (<init>(Method, Interpreter):  New constructor.
+
+	* MethodProc.java (mostSpecific):  Use Type.compare once instead
+	of isSubtype twice.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* Keyword.java:  Implement java.io.Externalizable

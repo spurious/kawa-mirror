@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 86)
+(test-init "Miscellaneous" 88)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -385,3 +385,24 @@
 
 (test 15 'tail-call (let loop ((a 1) (b 2) (c 3) (d 4) (e 5) (f 6))
   (if (> a 10) b (loop b c d e f (+ a b c)))))
+
+;;; read-line should handle CR, LF and CRLF equally
+(section "read-line")
+
+(define (test-read-split port)
+  (call-with-values (lambda () (read-line port 'split))
+    (lambda x (car x))))
+
+(define (test-read-line proc)
+  (call-with-input-string
+   "line\rline\nline\r\nline"
+   (lambda (strport)
+     (list (proc strport) (proc strport) (proc strport) (proc strport)))))
+
+(test '("line" "line" "line" "line")
+      test-read-line
+      read-line)
+
+(test '("line" "line" "line" "line")
+      test-read-line
+      test-read-split)

@@ -1,3 +1,11 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check1):  Always at least compile scribbe.scm.
+
+2000-06-09  Bruce Lewis  <brlewis@alum.mit.edu>
+
+	* misc-test.scm:  Two new read-line tests.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check-ppfile):  New test, for slib/ppfile.scm.

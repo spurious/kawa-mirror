@@ -11,7 +11,7 @@ check:
 	$(MAKE) check1
 	$(MAKE) check2 OPTIONS=--full-tailcalls
 
-check1:  check-num check-format check-ppfile
+check1:  check-num check-format check-ppfile scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm

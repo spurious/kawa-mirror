@@ -2,6 +2,11 @@ Mon Jan 19 14:44:09 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.5.93.
 
+	* kawa/lang/Compilation.java (mangleClassName):  Renamed to mangleName.
+	* kawa/lang/LambdaExp.java:  Update.
+	* kawa/lang/Declaration.java (constructor):  Set Variable.name to
+	mangled name (with mangleName), while Declaration.sym is source name.
+
 	* kawa/Shell.java:  Extend Procedure0, so it can be passed to Future.
 	Add contsructur, various fields, and make methods non-static.
 	Remove code now in Scheme (read and print methods).

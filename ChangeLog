@@ -1,3 +1,11 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (getNamedType):  The type <String>
+	is now Type.tostring_type rather than Type.string_type.
+
+	* kawa/standard/Scheme.java (initScheme):  Define let-values
+	and let*-values.  [srfi-11]
+
 2001-11-01  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_namespace.java:  New class; extends Syntax.

@@ -405,6 +405,8 @@ public class Scheme extends LispInterpreter
       environ = r5Environment;
       define_proc ("values", "kawa.lib.misc");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
+      define_field("let-values", "kawa.lib.syntax");
+      define_field("let*-values", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
@@ -857,7 +859,7 @@ public class Scheme extends LispInterpreter
 
 	types.put ("Object", Type.pointer_type);
 	types.put ("java.lang.Object", Type.pointer_type);
-	types.put ("String", Type.string_type);
+	types.put ("String", Type.tostring_type);
 
 	types.put ("object", Type.pointer_type);
 	types.put ("number", ClassType.make("gnu.math.Numeric"));

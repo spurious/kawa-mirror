@@ -10,13 +10,8 @@ import gnu.lists.*;
  * @author	Per Bothner
  */
 
-public class CompileFile extends Procedure2
+public class CompileFile
 {
-  public CompileFile ()
-  {
-    super ("compile-file");
-  }
-
   public static final Compilation read (String name, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
@@ -29,11 +24,11 @@ public class CompileFile extends Procedure2
       }
     catch (java.io.FileNotFoundException e)
       {
-	throw new GenericError ("compile-file: file not found: " + name);
+	throw new WrappedException("compile-file: file not found: " + name, e);
       }
     catch (java.io.IOException e)
       {
-	throw new GenericError(name.toString());
+	throw new WrappedException("compile-file: read-error: " + name, e);
       }
   }
 
@@ -41,19 +36,6 @@ public class CompileFile extends Procedure2
     throws java.io.IOException, gnu.text.SyntaxException
   {
     return Interpreter.getInterpreter().parse(port, messages, 0);
-  }
-
-  public final Object apply2 (Object arg1, Object arg2)
-    throws Throwable
-  {
-    if (! (arg1 instanceof FString))
-      throw new WrongType (this.getName(), 1, "file name");
-    SourceMessages messages = new SourceMessages();
-    Compilation comp = read (arg1.toString (), messages);
-    comp.compileToArchive(comp.getModule(), arg2.toString());
-    if (messages.seenErrors())
-      throw new gnu.text.SyntaxException(messages);
-    return Values.empty;
   }
 
   /** Compile a Scheme source file to one or more .class file.

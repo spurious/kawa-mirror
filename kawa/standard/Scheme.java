@@ -511,7 +511,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("fluid-let", "kawa.standard.fluid_let");
       define_syntax("constant-fold", "kawa.standard.constant_fold");
 
-      define_proc ("compile-file", "kawa.lang.CompileFile");
+      define_proc ("compile-file", "kawa.lib.system");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
       define_proc ("environment-bound?", "kawa.lib.misc");
       define_proc ("scheme-implementation-version", "kawa.lib.misc");

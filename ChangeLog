@@ -1,3 +1,10 @@
+2004-08-06  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java:  New longer implements Procedure2.
+	(apply2): Convert to Scheme and move to kawa.lib.system.
+	(read):  Use WrappedException instead of GenericFile.
+	* kawa/standard/Scheme.java:  Change location of compile-file.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (counter):  New field.

@@ -1,3 +1,8 @@
+2005-03-16  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java (defineAll): Skip PRIVATE_PREFIX and
+	"*$instance" fields.
+
 2005-03-11  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (PROCEDURE, SYNTAX): New constants.

@@ -195,7 +195,9 @@ public class ClassMemberLocation extends Location
     for (int i = fields.length;  --i >= 0; )
       {
 	java.lang.reflect.Field field = fields[i];
-	if (field.getName().startsWith(Declaration.PRIVATE_PREFIX))
+	String fname = field.getName();
+	if (fname.startsWith(Declaration.PRIVATE_PREFIX)
+	    || fname.endsWith("$instance"))
 	      continue;
 	define(instance, field, uri, language, env);
       }

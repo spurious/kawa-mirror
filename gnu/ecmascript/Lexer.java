@@ -19,24 +19,55 @@ public class Lexer
   public final static kawa.lang.Char rparenToken = kawa.lang.Char.make(')');
   public final static kawa.lang.Char lbraceToken = kawa.lang.Char.make('{');
   public final static kawa.lang.Char rbraceToken = kawa.lang.Char.make('}');
+  public final static kawa.lang.Char lbracketToken = kawa.lang.Char.make('[');
+  public final static kawa.lang.Char rbracketToken = kawa.lang.Char.make(']');
   public final static kawa.lang.Char dotToken = kawa.lang.Char.make('.');
   public final static kawa.lang.Char condToken = kawa.lang.Char.make('?');
   public final static kawa.lang.Char commaToken = kawa.lang.Char.make(',');
   public final static kawa.lang.Char colonToken = kawa.lang.Char.make(':');
   public final static kawa.lang.Char equalToken = kawa.lang.Char.make('=');
+  public final static kawa.lang.Char tildeToken = kawa.lang.Char.make('~');
+  public final static kawa.lang.Char notToken = kawa.lang.Char.make('!');
   public final static kawa.lang.Char semicolonToken = kawa.lang.Char.make(';');
   public final static Object eolToken = kawa.lang.Char.make('\n');
   public final static Object eofToken = Sequence.eofValue;
+  public final static Reserved elseToken
+  = new Reserved("else", Reserved.ELSE_TOKEN);
+  public final static Reserved newToken
+  = new Reserved("new", Reserved.NEW_TOKEN);
 
-  /*
-  static java.util.Hashtable reserved = new java.util.Hashtable();
-  private static void reserve(Reserved op) { reserve.put(op.name, op); }
-  static {
-    reserve(Reserved.plusOp);
-    reserve(Reserved.minusOp);
-    reserve(Reserved.timesOp);
+  static java.util.Hashtable reserved;
+  static synchronized void initReserved()
+  {
+    if (reserved == null)
+      {
+	reserved = new java.util.Hashtable (20);
+	reserved.put("null", new QuoteExp(null));
+	reserved.put("true", new QuoteExp(java.lang.Boolean.TRUE));
+	reserved.put("false", new QuoteExp(java.lang.Boolean.FALSE));
+
+	reserved.put("var", new Reserved("var", Reserved.VAR_TOKEN));
+	reserved.put("if", new Reserved("if", Reserved.IF_TOKEN));
+	reserved.put("while", new Reserved("while", Reserved.WHILE_TOKEN));
+	reserved.put("for", new Reserved("for", Reserved.FOR_TOKEN));
+	reserved.put("continue",
+		     new Reserved("continue", Reserved.CONTINUE_TOKEN));
+	reserved.put("break", new Reserved("break", Reserved.BREAK_TOKEN));
+	reserved.put("return", new Reserved("return", Reserved.RETURN_TOKEN));
+	reserved.put("with", new Reserved("with", Reserved.WITH_TOKEN));
+	reserved.put("function",
+		     new Reserved("function", Reserved.FUNCTION_TOKEN));
+	reserved.put("this", new Reserved("this", Reserved.THIS_TOKEN));
+	reserved.put("else", elseToken);
+	reserved.put("new", newToken);
+      }
   }
-  */
+  public static Object checkReserved(String name)
+  {
+    if (reserved == null)
+      initReserved();
+    return reserved.get(name);
+  }
 
   public Double getNumericLiteral (int c)
     throws java.io.IOException, kawa.lang.ReadError
@@ -247,6 +278,21 @@ public class Lexer
     return sbuf.toString();
   }
 
+
+  public Object maybeAssignment(Object token)
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    int ch = port.read();
+    if (ch == '=')
+      {
+	throw new ReadError(port, "assignment operation not implemented");
+	// return makeAssignmentOp(token);
+      }
+    if (ch >= 0)
+      port.unread_quick();
+    return token;
+  }
+
   /**
     * Returns the next token.
     * Returns: <dl>
@@ -300,40 +346,100 @@ public class Lexer
 	return new QuoteExp(getStringLiteral(port, (char) ch));
       case '(':  return lparenToken;
       case ')':  return rparenToken;
+      case '[':  return lbracketToken;
+      case ']':  return rbracketToken;
       case '{':  return lbraceToken;
       case '}':  return rbraceToken;
       case '?':  return condToken;
       case ':':  return colonToken;
       case ';':  return semicolonToken;
       case ',':  return commaToken;
-      case '=':  return equalToken;
+      case '=':
+	if (port.peek() == '=')
+	  {
+	    port.skip_quick();
+	    return Reserved.opEqual;
+	  }
+	return equalToken;
+      case '!':
+	if (port.peek() == '=')
+	  {
+	    port.skip_quick();
+	    return Reserved.opNotEqual;
+	  }
+	return notToken;
+      case '~':
+	return tildeToken;
+      case '*':	return maybeAssignment(Reserved.opTimes);
+      case '/':	return maybeAssignment(Reserved.opDivide);
+      case '^':	return maybeAssignment(Reserved.opBitXor);
+      case '%':	return maybeAssignment(Reserved.opRemainder);
       case '+':
-	return Reserved.plusOp;
+	if (port.peek() == '+')
+	  {
+	    port.skip_quick(); 
+            return maybeAssignment(Reserved.opPlusPlus); 
+	  }
+	return maybeAssignment(Reserved.opPlus);
       case '-':
-	return Reserved.minusOp;
-      case '*':
-	return Reserved.timesOp;
+	if (port.peek() == '-')
+	  {
+	    port.skip_quick(); 
+            return maybeAssignment(Reserved.opMinusMinus); 
+	  }
+	return maybeAssignment(Reserved.opMinus);
+      case '&':
+	if (port.peek() == '&')
+	  {
+	    port.skip_quick(); 
+            return maybeAssignment(Reserved.opBoolAnd); 
+	  }
+	return maybeAssignment(Reserved.opBitAnd);
+      case '|':
+	if (port.peek() == '|')
+	  {
+	    port.skip_quick(); 
+            return maybeAssignment(Reserved.opBoolOr); 
+	  }
+	return maybeAssignment(Reserved.opBitOr);
+      case '>':
+	ch = port.peek();
+	switch (ch)
+	  {
+	  case '>':
+	    port.skip_quick();
+	    if (port.peek() == '>')
+	      {
+		port.skip_quick();
+		return maybeAssignment(Reserved.opRshiftUnsigned);
+	      }
+	    return maybeAssignment(Reserved.opRshiftSigned);
+	  case '=':
+	    port.skip_quick();
+	    return Reserved.opGreaterEqual;
+	  default:
+	    return Reserved.opGreater;
+	  }
       case '<':
 	ch = port.peek();
 	switch (ch)
 	  {
 	  case '<':
 	    port.skip_quick();
-	    return Reserved.lshiftOp;
+	    return maybeAssignment(Reserved.opLshift);
+	  case '=':
+	    port.skip_quick();
+	    return Reserved.opLessEqual;
 	  default:
-	    return Reserved.lessOp;
+	    return Reserved.opLess;
 	  }
       }
     if (Character.isJavaIdentifierStart((char) ch))
       {
 	String word = getIdentifier(port, ch).intern();
-	if (word == "null")
-	  return new QuoteExp(null);
-	if (word == "false")
-	  return new QuoteExp(java.lang.Boolean.FALSE);
-	if (word == "true")
-	  return new QuoteExp(java.lang.Boolean.TRUE);
-	// FIXME handle reserved identifiers
+	Object token = checkReserved(word);
+	if (token != null)
+	  return token;
 	return word;
       }
     return kawa.lang.Char.make((char) ch);

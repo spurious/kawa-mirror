@@ -1,3 +1,7 @@
+2002-09-27  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (inlineOk):  Ignore flag if nested procedure.
+
 2002-09-26  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (IS_ALIAS):  Make public.

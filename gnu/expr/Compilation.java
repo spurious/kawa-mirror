@@ -329,6 +329,13 @@ public class Compilation
 
   public boolean inlineOk (Expression proc)
   {
+    if (proc instanceof LambdaExp)
+      {
+	// The compiler gets confused if we turn off inlining for nested
+	// procedures - and they can't be rebound anyway.
+	if (! (((LambdaExp) proc).currentLambda() instanceof ModuleExp))
+	  return true;
+      }
     return inlineOk;
   }
 

@@ -1,3 +1,13 @@
+2003-11-20  Per Bothner  <per@bothner.com>
+
+	* BRL.java (parse):  Remove - use inherited method instead.
+	* BRLReaderString.java (read):  Return on '\n' if isInteractive().
+	Emit error if nested and eof seen.
+	Call saveExpressionStartPosition to note location of '['.
+	* BRLRead.java (saveExpressionStartPosition):  New helper method.
+	(readObject):  Defer literal text handling to BRLReaderString.
+	Emit "unmatched '['" error here.  Various other fixes.
+
 2003-11-06  Per Bothner  <per@bothner.com>
 
 	* BRL.java (parse):  Update to take a Lexer rather than an InPort.

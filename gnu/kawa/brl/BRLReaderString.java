@@ -13,13 +13,16 @@ public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry
 {
   public Object read (Lexer in, int ch, int count)
       throws java.io.IOException
-    {
+  {
 	int startPos = in.tokenBufferLength;
 	LineBufferedReader port = in.getPort();
 	char saveReadState = '\0';
 	int c = ch;
 	int prev;
 	char endch;
+	String startFile = port.getName();
+	int startLine = port.getLineNumber();
+	int startColumn = port.getColumnNumber();
 
 	switch((char)ch)
 	    {
@@ -72,15 +75,32 @@ public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry
 					port.skip();
 				    }
 				else
-				    {
-					inString = false;
-					saveReadState = '\n';
-				    }
+				  {
+				    inString = false;
+				    saveReadState = '\n';
+				    if (in instanceof BRLRead)
+				      ((BRLRead) in).saveExpressionStartPosition();
+				  }
 			    }
+			else if (c == '\n' && in.isInteractive()
+				 && ((BRLRead) in).nesting == 0)
+			  {
+			    port.unread();
+			    inString = false;
+			    in.tokenBufferAppend(c);
+			  }
 			else
 			    {
 				if (c < 0)
+				  {
 				    inString = false;
+				    if (! in.isInteractive()
+					&& ((BRLRead) in).nesting > 0)
+				      in.error('e',
+					       startFile, startLine + 1,
+					       startColumn,
+					       "nested literal text starting here was not ended by a '['");
+				  }
 				else
 				    in.tokenBufferAppend(c);
 			    }

@@ -9,6 +9,14 @@ import gnu.lists.*;
 
 public class BRLRead extends LispReader
 {
+  int nesting;
+
+  /** True if in literal text (even if nested inside an escaped expression). */
+  public boolean inLiteral ()
+  {
+    return ((InPort) port).readState == ']';
+  }
+
   void init()
   {
     initialColonIsKeyword = false;
@@ -35,57 +43,35 @@ public class BRLRead extends LispReader
   {
     int startPos = tokenBufferLength;
     InPort port = (InPort) getPort();
-    char saveReadState = port.readState;
+    int saveNesting = nesting;
     try
       {
 	for (;;)
 	  {
 	    int ch = port.read();
-	    if (saveReadState == ']')
+	    if (ch < 0)
 	      {
-		if (ch == '[')
-		  {
-		    if (port.peek() == '[')
-		      {
-			port.read();
-			tokenBufferAppend(ch);
-			continue;
-		      }
-		    else
-		      {
-			saveReadState = '\n';
-		      }
-		  }
-		else if (ch == '\n' && isInteractive())
-		  {
-		    port.unread();
-		    tokenBufferAppend(ch);
-		  }
-		else if (ch >= 0)
-		  {
-		    tokenBufferAppend(ch);
-		    continue;
-		  }
-		int length = tokenBufferLength - startPos;
-		if (length > 0)
-		  {
-		    if (isBrlCompatible())
-		      return new FString(tokenBuffer, startPos, length);
-		    else
-		      return new UnescapedData(new String(tokenBuffer,
-							  startPos, length));
-		  }
-		else if (ch < 0)
+		if (port.readState != ']' && ! isInteractive())
+		  error('e', expressionStartFile,
+			expressionStartLine + 1, expressionStartColumn,
+			"an unmatched '[' was read");
 		  return Sequence.eofValue; // FIXME;
+	      }
+	    if (port.readState == ']')
+	      {
+		port.unread();
+		Object value = brlReader.read(this, ']', 1);
+		if (ch == '[' && value == BRL.emptyForm)
+		  continue;
+		return value;
 	      }
 	    else
 	      {
-		if (ch < 0)
-		  return Sequence.eofValue; // FIXME;
 		if (ch == ']')
-		  saveReadState = ']';
+		  port.readState = ']';
 		else
 		  {
+		    nesting++;
 		    Object value = readValues(ch);
 		    if (value != Values.empty)
 		      {
@@ -93,14 +79,16 @@ public class BRLRead extends LispReader
 			  value = Values.empty;
 			return value;
 		      }
+		    nesting = saveNesting;
 		  }
 	      }
 	  }
       }
     finally
       {
+	nesting = saveNesting;
 	tokenBufferLength = startPos;
-	((InPort) port).readState = saveReadState;
+	//((InPort) port).readState = saveReadState;
       }
   }
 
@@ -126,6 +114,18 @@ public class BRLRead extends LispReader
   {
     brlCompatible = compat;
     initialColonIsKeyword = compat;
+  }
+
+  /** Record '[' location for error messages. */ 
+  String expressionStartFile;
+  int expressionStartLine;
+  int expressionStartColumn;
+
+  void saveExpressionStartPosition()
+  {
+    expressionStartFile = port.getName();
+    expressionStartLine = port.getLineNumber();
+    expressionStartColumn = port.getColumnNumber();
   }
 
   public static ReadTable brlReadTable;

@@ -70,33 +70,6 @@ public class BRL extends Scheme
     return new XMLPrinter(out, false);
   }
 
-  public Compilation parse(Lexer lexer, int options)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    InPort port = (InPort) lexer.getPort();
-    Translator tr = new Translator (this, lexer.getMessages());
-    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = new ModuleExp();
-    mexp.setFile(lexer.getName());
-    java.util.Vector forms = new java.util.Vector(20);
-    tr.push(mexp);
-    boolean inString = true;
-    Object sexp = ((BRLRead) lexer).brlReader.read(lexer, ']', 0);
-    for (;;)
-      {
-	if (sexp == Sequence.eofValue)
-	  break;
-	if (sexp != emptyForm
-	    && ! tr.scan_form (sexp, forms, mexp))
-	  break;
-	sexp = ((BRLRead) lexer).readObject(); // FIXME
-      }
-    if (port.getReadState() != ']')
-      lexer.fatal("An unmatched '[' was read.");
-    tr.finishModule(mexp, forms);
-    return tr;
-  }
-
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {

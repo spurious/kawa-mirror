@@ -534,6 +534,8 @@ public class Translator extends Parser
     Expression body;
     if (nforms == 1)
       body = rewrite(forms.elementAt(0));
+    else if (nforms == 0)
+      body = QuoteExp.voidExp; 
     else
       {
 	Expression[] exps = new Expression [nforms];

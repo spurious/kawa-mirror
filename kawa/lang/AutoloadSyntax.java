@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
 /**
  * Implement autoloading of Syntax (including macros).
@@ -9,7 +10,7 @@ import gnu.kawa.util.*;
  * @author	Per Bothner
  */
 
-public class AutoloadSyntax extends Syntax
+public class AutoloadSyntax extends Syntax implements Externalizable
 {
   /** The name of the class that defines the macro/builtin.
    * It must be the name of a class in the CLASSPATH (for example:
@@ -21,6 +22,10 @@ public class AutoloadSyntax extends Syntax
 
   /** The loaded syntax, or null if it has not yet been loaded. */
   Syntax loaded;
+
+  public AutoloadSyntax ()
+  {
+  }
 
   public AutoloadSyntax (String name, String className)
   {
@@ -140,5 +145,18 @@ public class AutoloadSyntax extends Syntax
 	  }
       }
     return loaded.rewriteForm(form, tr);
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+    out.writeObject(className);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName((String) in.readObject());
+    className = (String) in.readObject();
   }
 }

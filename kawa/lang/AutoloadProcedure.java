@@ -1,6 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
 /**
  * Implement autoloading of Procedures.
@@ -8,7 +9,7 @@ import gnu.expr.*;
  * @author	Per Bothner
  */
 
-public class AutoloadProcedure extends Procedure
+public class AutoloadProcedure extends Procedure implements Externalizable
 {
   /** The name of the class that defines the procedure.
    * It must be the name of a class in the CLASSPATH (for example:
@@ -20,6 +21,10 @@ public class AutoloadProcedure extends Procedure
 
   /** The loaded procedure, or null if it has not yet been loaded. */
   Procedure loaded;
+
+  public AutoloadProcedure ()
+  {
+  }
 
   public AutoloadProcedure (String name, String className)
   {
@@ -146,5 +151,18 @@ public class AutoloadProcedure extends Procedure
     if (loaded instanceof HasSetter)
       return loaded.getSetter();
     return super.getSetter();
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+    out.writeObject(className);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName((String) in.readObject());
+    className = (String) in.readObject();
   }
 }

@@ -298,6 +298,10 @@ public abstract class Type {
    */
   public static Type lowestCommonSuperType(Type t1, Type t2)
   {
+    if (t1 == neverReturnsType)
+      return t2;
+    if (t2 == neverReturnsType)
+      return t1;
     if (t1 == null || t2 == null)
      return null;
 
@@ -405,6 +409,10 @@ public abstract class Type {
     = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
+
+  /** The "return type" of an expression that never returns, e.g. a throw. */
+  public static final PrimType neverReturnsType
+    = new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
 
   static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType string_type = ClassType.make("java.lang.String");

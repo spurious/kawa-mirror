@@ -1,0 +1,4 @@
+Makefile
+*.class
+scm-classes.stamp
+java-classes.stamp

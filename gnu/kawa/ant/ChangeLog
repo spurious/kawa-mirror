@@ -1,0 +1,10 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  New file.
+
+2001-11-18  Jim White <jim@pagesmiths.com>
+
+	New directory - tools for building Kawa using Ant.
+	* Kawa.java:  New class; extends MatchingTask.
+	* XCopy.java:  New class; extends Copy.
+	* LineStripperSet.java:  New class; extends FilterSet.

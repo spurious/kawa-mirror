@@ -242,7 +242,7 @@ public class Invoke extends ProcedureN implements CanInline
 	Expression[] nargs = new Expression[args.length];
 	System.arraycopy(args, 0, nargs, 0, args.length);
 	nargs[carg] = new QuoteExp(type);
-	return new ApplyExp(exp.getFunction(), nargs);
+	return new ApplyExp(exp.getFunction(), nargs).setLine(exp);
       }
     return exp;
   }
@@ -316,15 +316,15 @@ public class Invoke extends ProcedureN implements CanInline
                     else
                       {
                         PrimProcedure method = methods[0];
-			exp = new ApplyExp(method, new Expression[0]);
+			ApplyExp e = new ApplyExp(method, new Expression[0]);
                         for (int i = 0;  i < slots.length;  i++)
                           {
 			    Expression[] sargs
-			      = { exp, new QuoteExp(slots[i]), args[2 * i + 2] };
-			    exp = new ApplyExp(SlotSet.setFieldReturnObject,
-					       sargs);
+			      = { e, new QuoteExp(slots[i]), args[2 * i + 2] };
+			    e = new ApplyExp(SlotSet.setFieldReturnObject,
+					     sargs);
                          }
-			return exp;
+			return e.setLine(exp);
                       }
                   }
                 else
@@ -392,7 +392,7 @@ public class Invoke extends ProcedureN implements CanInline
                                  margs, i,
                                  nargs - (kind == 'N' ? 1 : 2));
                 PrimProcedure method = methods[index];
-                return new ApplyExp(method, margs);
+                return new ApplyExp(method, margs).setLine(exp);
               }
           }
       }

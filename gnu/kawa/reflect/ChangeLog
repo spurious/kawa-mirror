@@ -1,3 +1,7 @@
+2003-06-06  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inlineClassName, inline): Call ApplyExp.setLine.
+
 2003-05-17  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (applyN, applyN):  Use Symbol's getName method.

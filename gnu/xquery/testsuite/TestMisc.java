@@ -282,7 +282,7 @@ public class TestMisc
     OutPort err = OutPort.errDefault();
     SourceMessages messages = new SourceMessages();
     Lexer lexer = interp.getLexer(in, messages);
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     ctx.consumer = interp.getOutputConsumer(out);
 
     for (;;)

@@ -781,7 +781,9 @@ implements Consumer, PositionConsumer, Consumable
     if (! hasNext(ipos, xpos))
       return false;
     int start = ipos >> 1;
-    int end = nextDataIndex(start);
+    int end = nextNodeIndex(start, -1 >>> 1);
+    if (end == start)
+      end = nextDataIndex(start);
     if (end >= 0)
       consumeRange(start, end, out);
     return true;
@@ -792,7 +794,6 @@ implements Consumer, PositionConsumer, Consumable
     int pos = startPosition;
     int limit = startPosition <= gapStart && endPosition > gapStart ? gapStart
       : endPosition;
-    //System.err.println("consumeRange from "+pos+" to "+limit);
     int index;
     for (;;)
       {
@@ -959,7 +960,7 @@ implements Consumer, PositionConsumer, Consumable
       return false;
     char ch = data[index];
     return ch != END_ATTRIBUTE && ch != END_GROUP_SHORT
-      && ch != END_GROUP_LONG;
+      && ch != END_GROUP_LONG && ch != END_DOCUMENT;
   }
 
   public int getNextKind(int ipos, Object xpos)
@@ -1271,84 +1272,193 @@ implements Consumer, PositionConsumer, Consumable
     posSet.setPosition(posNumber, (pos << 1) | (isAfter ? 1 : 0), null);
   }
 
+  /** Skip all primitive content nodes. */
+  public final int nextNodeIndex (int pos, int limit)
+  {
+   int pos0=pos;
+   if ((limit | 0x80000000) == -1) // kludge
+     limit = data.length;
+    for (;;)
+      {
+	if (pos == gapStart)
+	  pos = gapEnd;
+	if (pos >= limit)
+	  return pos;
+	int j;
+	if (pos<0||pos>=data.length)
+	  System.err.println("bad pos:"+pos+" limit:"+limit+" len:"+data.length);
+	char datum = data[pos];
+	if (datum <= MAX_CHAR_SHORT
+	    || (datum >= OBJECT_REF_SHORT
+		&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+	    || (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+		&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT)
+	    || (datum & 0xFF00) == BYTE_PREFIX)
+	  {
+	    pos++;
+	    continue;
+	  }
+	if (datum >= BEGIN_GROUP_SHORT
+	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	  return pos;
+	switch (datum)
+	  {
+	  case BEGIN_DOCUMENT:
+	  case BEGIN_GROUP_LONG:
+	  case BEGIN_ATTRIBUTE_LONG:
+	    return pos;
+	  case END_GROUP_SHORT:
+	  case END_GROUP_LONG:
+	  case END_ATTRIBUTE:
+	  case END_DOCUMENT:
+	    return pos;
+	  default:
+	    pos = nextDataIndex(pos);
+	    continue;
+	  }
+      }
+  }
+
   /** Get matching matching child or descendent.
    * This does a depth-first traversal.
    * @param pos starting index
-   * @param predicate test to apply to groups
+   * @param predicate test to apply to selected elements
    * @param limit stop if pos reaches here
    * @return index of next match or -1 if none found
    */
-  public final int nextMatchingChild(int pos, GroupPredicate predicate, int limit)
+  public final int nextMatchingChild(int pos, ElementPredicate predicate, int limit)
   {
     int start = pos;
     if (limit == -1)
       limit = data.length;
-    for (;;)
+    if (predicate instanceof NodePredicate)
+      pos = nextNodeIndex(pos, limit);
+    boolean checkAttribute; // true if attribute nodes could match.
+    boolean checkAll;
+    boolean checkNode;
+    boolean checkText;
+    boolean checkGroup; // true if group nodes could match.
+    boolean descend = true;
+    if (predicate instanceof GroupPredicate)
+      {
+	checkNode = true;
+	checkGroup = true;
+	checkAttribute = false;
+	checkText = false;
+	checkAll = false;
+      }
+    else if (predicate instanceof AttributePredicate)
+      {
+	checkNode = true;
+	checkGroup = false;
+	checkAttribute = true;
+	checkText = false;
+	checkAll = false;
+      }
+    else
+      {
+	checkAll = ! (predicate instanceof NodePredicate);
+	checkNode = true;
+	checkGroup = true;
+	checkAttribute = true;
+	checkText = true;
+      }
+    int next;
+    for (;; pos = next)
       {
 	if (pos == gapStart)
 	  pos = gapEnd;
 	if (pos >= limit)
 	  return -1;
 	int j;
-	char datum = data[pos++];
+	char datum = data[pos];
 	if (datum <= MAX_CHAR_SHORT
 	    || (datum >= OBJECT_REF_SHORT
 		&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
 	    || (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
 		&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT))
-	  continue;
+	  {
+	    if (checkText && predicate.isInstance(this, pos << 1, null))
+	      return pos;
+	    next = pos + 1;
+	    continue;
+	  }
 	switch (datum)
 	  {
 	  case BEGIN_DOCUMENT:
-	  case BOOL_FALSE:
-	  case BOOL_TRUE:
+	    next = pos + 3;
+	    if (checkNode) break;
 	    continue;
 	  case POSITION_REF_FOLLOWS:
 	  case OBJECT_REF_FOLLOWS:
 	  case CHAR_PAIR_FOLLOWS:
 	  case INT_FOLLOWS:
-	    pos += 2;
+	    next = pos + 3;
+	    if (checkText) break;
 	    continue;
 	  case CHAR_FOLLOWS:
+	    next = pos + 2;
+	    continue;
 	  case END_GROUP_SHORT:
-	    pos++;
+	    next = pos + 2;
 	    continue;
 	  case POSITION_TRIPLE_FOLLOWS:
+	    next = pos + 7;
+	    if (checkText) break;
+	    continue;
 	  case END_GROUP_LONG:
-	    pos += 6;
+	    next = pos + 7;
 	    continue;
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
+	    next = pos + 1;
 	    continue;
 	  case BEGIN_ATTRIBUTE_LONG:
-	    j = getIntN(pos+2);
-	    pos = j + j < 0 ? data.length + 1 : pos;
+	    if (checkNode)
+	      {
+		j = getIntN(pos+3);
+		next = j + 1 + (j < 0 ? data.length : pos);
+	      }
+	    else
+	      next = pos + 5;
+	    if (checkAttribute) break;
+	    continue;
+	  case BOOL_FALSE:
+	  case BOOL_TRUE:
+	    next = pos + 1;
+	    if (checkText) break;
 	    continue;
 	  case LONG_FOLLOWS:
 	  case DOUBLE_FOLLOWS:
-	    pos += 4;
+	    next = pos + 5;
+	    if (checkText) break;
+	    continue;
+	  case BEGIN_GROUP_LONG:
+	    if (descend)
+	      next = pos + 3;
+	    else
+	      {
+		j = getIntN(pos+1);
+		next = j + (j < 0 ? data.length :  pos) + 7;
+	      }
+	    if (checkGroup) break;
 	    continue;
 	  default:
 	    if (datum >= BEGIN_GROUP_SHORT
 		&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-	      j = datum - BEGIN_GROUP_SHORT;
-	    else if (datum == BEGIN_GROUP_LONG)
 	      {
-		j = getIntN(pos);
-		j = getIntN(j + j < 0 ? data.length + 1: pos);
+		if (descend)
+		  next = pos + 3;
+		else
+		  next = pos + data[pos+1];
+		if (checkGroup) break;
 	      }
 	    else
 	      throw new Error("unknown code:"+(int) datum);
-	    if (pos == start + 1)
-	      {
-		pos += 2;
-		continue;
-	      }
-	    if (predicate.isInstance(this, (pos - 1) << 1, null))
-	      return pos - 1;
-	    pos += 2;
 	    continue;
 	  }
+	if (pos > start && predicate.isInstance(this, pos << 1, null))
+	  return pos;
       }
   }
 

@@ -4,6 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   Array.java \
+  AttributePredicate.java \
   BitVector.java \
   CharBuffer.java \
   CharSeq.java \
@@ -21,6 +22,7 @@ java_sources = \
   GeneralArray.java \
   GroupPredicate.java \
   LList.java \
+  NodePredicate.java \
   Pair.java \
   PairWithPosition.java \
   PositionConsumer.java \

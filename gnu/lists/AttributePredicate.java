@@ -3,12 +3,12 @@
 
 package gnu.lists;
 
-/** A predicate that (only) matches a GROUP_VALUE.
- * If using XML terminology:  only matches element nodes.
+/** A predicate that (only) matches a ATTRIBUTE_VALUE.
+ * If using XML terminology:  only matches attribute nodes.
  */
 
-public interface GroupPredicate extends NodePredicate
+public interface AttributePredicate extends NodePredicate
 {
   public boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
-			    Object groupType);
+			    Object attributeType);
 }

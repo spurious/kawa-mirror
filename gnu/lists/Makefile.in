@@ -151,6 +151,7 @@ DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' \
 
 java_sources = \
   Array.java \
+  AttributePredicate.java \
   BitVector.java \
   CharBuffer.java \
   CharSeq.java \
@@ -168,6 +169,7 @@ java_sources = \
   GeneralArray.java \
   GroupPredicate.java \
   LList.java \
+  NodePredicate.java \
   Pair.java \
   PairWithPosition.java \
   PositionConsumer.java \

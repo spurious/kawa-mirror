@@ -1,5 +1,17 @@
 2002-04-06  Per Bothner  <per@bothner.com>
 
+	* NodePredicate.java:  New class, extends ElementPredicate.
+	* GroupPredicate.java:  Change to extend NodePredicate.
+	* AttributePredicate.java:  New class, extends NodePredicate.
+	* Makefile.am (java_sources);  Add new classes.
+	* TreeList.java (nextMatchingChild):  Generalize to take en
+	ElementPredicate instead of a GroupPredicate.
+
+	* TreeList.java (nextNodeIndex):  New method.
+	(consumeNext):  Call  nextNodeIndex.
+
+	* TreeList.java (hasNext):  Return false also for END_DOCUMENT.
+
 	* AbstractSequence.java.in (hasNext):  Make public.
 	* GapVector.java (hasNext):  Likewise.
 	* LList.java (hasNext):  Likewise.

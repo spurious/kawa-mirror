@@ -83,7 +83,7 @@ module1a.class: $(srcdir)/module1a.scm
 module2.class: $(srcdir)/module2.scm module1.class module1a.class
 	$(KAWA) -C $(srcdir)/module2.scm
 
-module3.class: $(srcdir)/module3.scm module1.class
+module3.class: $(srcdir)/module3.scm module1.class MyTimestamp.class
 	$(KAWA) -C $(srcdir)/module3.scm
 
 classes1.class: $(srcdir)/classes1.scm
@@ -145,6 +145,9 @@ check-MySAXApp: MySAXApp.class
 	  else echo FAIL MySAXApp test; fi
 
 MyFunc.class MyModule.class: $(srcdir)/MyFunc.java $(srcdir)/MyModule.java
+	CLASSPATH=..:. $(JAVAC) -g -d . $?
+
+MyDate.class MyTimestamp.class: $(srcdir)/MyDate.java $(srcdir)/MyTimestamp.java
 	CLASSPATH=..:. $(JAVAC) -g -d . $?
 
 APPLETVIEWER = appletviewer

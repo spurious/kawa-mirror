@@ -36,3 +36,9 @@
   (with-compile-options warn-undefined-variable: #t
 			(list dvar1 dvar2 dvar3)))
 
+(define-namespace timestamp
+  "class:MyTimestamp")
+
+(define (my-compare a b)
+  (timestamp:myCompareTo (as <MyTimestamp> a)
+                         (as <MyTimestamp> b)))

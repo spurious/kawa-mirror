@@ -1,4 +1,4 @@
-(test-init "Objects" 90)
+(test-init "Objects" 91)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -182,6 +182,10 @@
 (set! dvar1 1)
 (test '(1 3 13) list dvar1 dvar2 dvar3)
 (test 0 list-length-4 '())
+
+(define ts1 (make <MyTimestamp> 10 1))
+(define ts2 (make <MyTimestamp> 10 2))
+(test #t < (my-compare ts1 ts2) 0)
 
 (test 24 'factorial-4 factorial-4)
 

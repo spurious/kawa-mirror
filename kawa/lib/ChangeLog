@@ -1,8 +1,12 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* lists.scm (reverse, reverse!):  New procedures.
+
 2000-12-09  Per Bothner  <per@bothner.com>
 
 	* lists.scm:  Add return type specifiers.
 	* syntax.scm (error):  Move from here ...
-	* misc.scm (error):  ... to here to solve soem order dependencies.
+	* misc.scm (error):  ... to here to solve some order dependencies.
 
 2000-10-13  Per Bothner  <per@bothner.com>
 

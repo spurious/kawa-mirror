@@ -57,56 +57,49 @@ public class XQuery extends Interpreter
     return parser;
   }
 
-  public Compilation parse(Environment env, Lexer lexer)
+  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
+			   int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    gnu.text.SourceMessages messages = lexer.getMessages();
     Compilation tr = new Compilation(this, messages);
-    ModuleExp mexp = new ModuleExp();
-    tr.push(mexp);
+    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     tr.mustCompileHere();
-    tr.immediate = true;
-    lexer.clearErrors();
-    Expression sexp = ((XQParser) lexer).parse(tr);
-    if (sexp == null)
-      return null;
-    mexp.body = sexp;
-    tr.pop(mexp);
-    ResolveNames.resolveNames(mexp, tr.lexical);
-    return tr;
-  }
-
-  public Compilation parseFile (InPort port, boolean immediate,
-				gnu.text.SourceMessages messages)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, messages);
-    tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     tr.push(mexp);
     XQParser lexer = (XQParser) getLexer(port, messages);
     lexer.nesting = 1;
-    Vector exps = new Vector(10);
-    for (;;)
+    if ((options & PARSE_ONE_LINE) != 0)
       {
+	if (port instanceof TtyInPort)
+	  lexer.setInteractive(true);
 	Expression sexp = lexer.parse(tr);
 	if (sexp == null)
-	  break;
-	exps.addElement(sexp);
+	  return null;
+	mexp.body = sexp;
       }
-    int nexps = exps.size();
-    if (nexps == 0)
-      mexp.body = QuoteExp.voidExp;
-    else if (nexps == 1)
-      mexp.body = (Expression) exps.elementAt(0);
     else
       {
-	Expression[] arr = new Expression[nexps];
-	exps.copyInto(arr);
-	mexp.body = new BeginExp(arr);
+	Vector exps = new Vector(10);
+	for (;;)
+	  {
+	    Expression sexp = lexer.parse(tr);
+	    if (sexp == null)
+	      break;
+	    exps.addElement(sexp);
+	  }
+	int nexps = exps.size();
+	if (nexps == 0)
+	  mexp.body = QuoteExp.voidExp;
+	else if (nexps == 1)
+	  mexp.body = (Expression) exps.elementAt(0);
+	else
+	  {
+	    Expression[] arr = new Expression[nexps];
+	    exps.copyInto(arr);
+	    mexp.body = new BeginExp(arr);
+	  }
       }
     tr.pop(mexp);
     ResolveNames.resolveNames(mexp, tr.lexical);

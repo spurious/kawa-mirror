@@ -1046,7 +1046,7 @@ Optional Packages:
   --with-gjc              Compile Kawa using GCJ (GNU Compiler for Java)
   --with-swing            Assume Swing (Java Foundation Classes) is available
   --with-awt              Assume AWT is available (default on)
-  --with-sax2             Assume AWT is available
+  --with-sax2             Assume SAX2 is available
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]

@@ -145,9 +145,9 @@ public class Scheme extends LispInterpreter
 
       //-- Section 6.3  -- complete
       define_proc("pair?", "kawa.lib.lists");
-      define_proc("cons", "kawa.lib.lists");
-      define_proc ("car", "kawa.lib.lists");
-      define_proc ("cdr", "kawa.lib.lists");
+      define_field("cons", "kawa.lib.lists");
+      define_field("car", "kawa.lib.lists");
+      define_field("cdr", "kawa.lib.lists");
       define_proc ("set-car!", "kawa.lib.lists");
       define_proc ("set-cdr!", "kawa.lib.lists");
 
@@ -315,7 +315,7 @@ public class Scheme extends LispInterpreter
       define_proc ("make-vector", "kawa.lib.vectors");
       define_proc ("vector", "kawa.lib.vectors");
       define_proc ("vector-length", "kawa.lib.vectors");
-      define_proc ("vector-ref", "kawa.lib.vectors");
+      define_field("vector-ref", "kawa.lib.vectors");
       define_proc ("vector-set!", "kawa.lib.vectors");
       define_proc ("list->vector", "kawa.lib.vectors");
       define_field("vector->list", "kawa.lib.vectors");
@@ -373,16 +373,16 @@ public class Scheme extends LispInterpreter
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
 
-      define_proc ("port-line", "kawa.lib.ports");
-      define_proc ("set-port-line!", "kawa.lib.ports");
-      define_proc ("port-column", "kawa.lib.ports");
-      define_proc ("current-error-port", "kawa.lib.ports");
+      define_field("port-line", "kawa.lib.ports");
+      define_field("set-port-line!", "kawa.lib.ports");
+      define_field("port-column", "kawa.lib.ports");
+      define_field("current-error-port", "kawa.lib.ports");
       define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
       define_proc ("set-input-port-line-number!", "kawa.lib.ports");
       define_proc ("input-port-column-number", "kawa.lib.ports");
       define_proc ("input-port-read-state", "kawa.lib.ports");
       define_proc ("default-prompter", "kawa.lib.ports");
-      define_proc ("input-port-prompter", "kawa.lib.ports");
+      define_field("input-port-prompter", "kawa.lib.ports");
       define_proc ("set-input-port-prompter!", "kawa.lib.ports");
       define_field("base-uri", "kawa.lib.misc");
 
@@ -519,7 +519,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("define-procedure", "kawa.lib.syntax");
       define_field("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
-      define_proc ("procedure-property", "kawa.lib.misc");
+      define_field("procedure-property", "kawa.lib.misc");
       define_proc ("set-procedure-property!", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");

@@ -1,3 +1,12 @@
+2003-05-31  Vladimir Tsichevski  <wowa@jet.msk.su>
+
+	* configure.in: Fix documentation typo AWT -> SAX2.
+
+2003-05-31  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Use define_field instead of
+	define_proc for define-procedure builtins for partial inlining.
+
 2003-05-22  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/EqualPat.java (match):  Generalize 2003-04-21 fix

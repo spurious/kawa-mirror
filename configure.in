@@ -35,7 +35,7 @@ AC_ARG_WITH(awt,
   [  --with-awt              Assume AWT is available (default on)])
 
 AC_ARG_WITH(sax2,
-  [  --with-sax2             Assume AWT is available])
+  [  --with-sax2             Assume SAX2 is available])
 
 AC_PROG_CC
 AC_PROG_CXX

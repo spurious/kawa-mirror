@@ -1,3 +1,34 @@
+2000-03-17  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run):  Kludge to work with ELisp.
+	* kawa/lang/AutoloadProcedure.java (load):  Likewise.
+	* kawa/lang/AutoloadSyntax.java (load):  Likewise.
+	* kawa/lang/Translator.java (getInterpreter):  New field.
+	(rewrite_pair, rewrite):  More kludges for ELisp.
+
+	* kawa/lang/CompileFile.java (readBody, read):  Get correct lexer
+	via the default Interpreter.
+	(compile_to_files):  Know about .el file extension.
+
+	* kawa/standard/NumberCompare.java:  New generalized compare class.
+	Has appropriate mangled static fields and methods.
+	* kawa/standard/{equal_oper.java,greater_oper.java,less_oper.java,
+	greaterequal_oper.java,lessequal_oper.java}: Subsumed by NumberCompare.
+	* kawa/standard/Makefile.am (java_JAVA):  Update class list.
+	* kawa/standard/write.java:  Replaced by kawa/lib/port.scm.
+	* kawa/standard/writechar.java:  Replaced by kawa/lib/port.scm.
+	* kawa/standard/Scheme.java (initScheme):  Update accordingly.
+
+	* kawa/standard/fluid_let.java:  Support ELisp `let' and `let*'.
+	(start, defaultInit):  New fields, for Elisp support.
+	* kawa/standard/load.java (loadSource):  Don't hard-wire Scheme.
+	* kawa/standard/prim_method.java (rewrite):  Allow 'xx for method name.
+	* kawa/standard/require.java:  Default package as compilationPrefix.
+
+	* kawa/standard/string_append.java (stringAppend$V): New static method.
+	* kawa/standard/number2string.java (format):  Renamed to apply.
+	* kawa/standard/char_equal_p.java (apply):  New static method.
+
 2000-03-06  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (makekawa.bat):  Add new scm sub-directories.

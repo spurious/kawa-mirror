@@ -1,3 +1,8 @@
+You can now specify characters using their Unicode value:  #\u05d0 is alef.
+
+Kawa now uses a more mnemonic name mangling Scheme.  For example,
+a Scheme function named `<=' would get compiled to method `$Ls$Eq'.
+
 There is now working and useful module support, thought not all
 features are implemented.  The basic idea is that a module can be any
 class that has a default constructor (or all of whose fields and
@@ -21,6 +26,7 @@ is find is a "module catalog" (currently hard-wired).
 This provides compatibility with Slib.  The Slib "features"
 gen-write, pretty-print, pprint-file, and printf are now
 available in Kawa;  more will be added, depending on time and demand.
+See the package directory gnu/kawa/slib for what is available.
 
 Changes from Kawa 1.6.62 to 1.6.64
 ==================================

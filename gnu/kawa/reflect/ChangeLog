@@ -1,3 +1,9 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* ClassMethodProc.java: Update Interpreter->Language.
+	* ClassMethods.java: Likewise.
+	* Invoke.java: Likewise.
+
 2005-02-07  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (classMethods): New static field.

@@ -10,7 +10,7 @@ public class Invoke extends ProcedureN implements CanInline
       's' - like 'S' but only allow static method; 'V'  - non-static invoke. */
   char kind;
 
-  Interpreter interpreter;
+  Language language;
 
   public static final Invoke invoke = new Invoke("invoke", 'V');
   public static final Invoke invokeStatic = new Invoke("invoke-static", 'S');
@@ -21,14 +21,14 @@ public class Invoke extends ProcedureN implements CanInline
   {
     super(name);
     this.kind = kind;
-    this.interpreter = Interpreter.getInterpreter();
+    this.language = Language.getDefaultLanguage();
   }
 
-  public Invoke(String name, char kind, Interpreter interpreter)
+  public Invoke(String name, char kind, Language language)
   {
     super(name);
     this.kind = kind;
-    this.interpreter = interpreter;
+    this.language = language;
   }
 
   public static Object invoke$V(Object[] args) throws Throwable
@@ -190,7 +190,7 @@ public class Invoke extends ProcedureN implements CanInline
                                 kind == 's' ? Access.STATIC : 0,
                                 kind == 'S' ? 0 : Access.STATIC,
                                 kind == 'P',
-                                caller, interpreter);
+                                caller, language);
     
     long num = ClassMethods.selectApplicable(methods, atypes);
     cacheArgs = args;
@@ -231,11 +231,11 @@ public class Invoke extends ProcedureN implements CanInline
 					    InlineCalls walker)
   {
     Compilation comp = walker.getCompilation();
-    Interpreter interpreter = comp.getInterpreter();
+    Language language = comp.getLanguage();
     Expression[] args = exp.getArgs();
     if (args.length > carg)
       {
-	Type type = interpreter.getTypeFor(args[carg]);
+	Type type = language.getTypeFor(args[carg]);
 	if (type instanceof PairClassType)
 	  type = ((PairClassType) type).instanceType;
 	else if (! (type instanceof Type))
@@ -482,8 +482,7 @@ public class Invoke extends ProcedureN implements CanInline
     if (args.length > 0)
       {
         Expression arg0 = args[0];
-        Type type = (kind == 'V' ? arg0.getType()
-                     : interpreter.getTypeFor(arg0));
+        Type type = (kind == 'V' ? arg0.getType() : language.getTypeFor(arg0));
 	if (type instanceof PairClassType)
 	  return ((PairClassType) type).instanceType;
         if (type instanceof ClassType)

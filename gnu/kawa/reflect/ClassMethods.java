@@ -59,10 +59,9 @@ public class ClassMethods extends Procedure2
    */
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
                                            int modifiers, int modmask,
-                                           ClassType caller,
-                                           Interpreter interpreter)
+                                           ClassType caller, Language language)
   {
-    return getMethods(dtype,mname,modifiers,modmask,false, caller, interpreter);
+    return getMethods(dtype,mname,modifiers,modmask,false, caller, language);
   }
 
   private static int removeRedundantMethods(Vector methods)
@@ -109,7 +108,7 @@ public class ClassMethods extends Procedure2
                                            int modifiers, int modmask,
                                            boolean is_special,
                                            ClassType caller,
-                                           Interpreter interpreter)
+                                           Language language)
   {
     MethodFilter filter = new MethodFilter(mname, modifiers, modmask, caller);
     boolean named_class_only = is_special || "<init>".equals(mname);
@@ -126,7 +125,7 @@ public class ClassMethods extends Procedure2
     for (int i = mlength;  --i >= 0; )
     {
       Method method = (Method) methods.elementAt(i);
-      PrimProcedure pproc = new PrimProcedure(method, is_special, interpreter);
+      PrimProcedure pproc = new PrimProcedure(method, is_special, language);
       result[count++] = pproc;
     }
     return result;
@@ -179,9 +178,9 @@ public class ClassMethods extends Procedure2
                                  Type rtype, Type[] atypes,
                                  int modifiers, int modmask)
   {
-    Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
+    Language language = Language.getDefaultLanguage();
     PrimProcedure[] methods = getMethods(dtype, mname, modifiers, modmask,
-					 null, interpreter);
+					 null, language);
     GenericProc gproc = null;
     PrimProcedure pproc = null;
     for (int i = 0;  i < methods.length;  i++)

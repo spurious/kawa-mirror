@@ -31,7 +31,7 @@ public class ClassMethodProc extends GenericProc
     String mname = methodName.equals("new") ? "<init>"
       : Compilation.mangleName(methodName);
 
-    add(ClassMethods.getMethods(ctype, mname, 0, 0, null, Interpreter.getInterpreter()));
+    add(ClassMethods.getMethods(ctype, mname, 0, 0, null, Language.getDefaultLanguage()));
     return methods;
   }
 

@@ -11,7 +11,7 @@ import gnu.math.IntNum;
 import gnu.kawa.functions.AddOp;
 import gnu.kawa.functions.ValuesMap;
 
-public class ValuesFilter extends CpsProcedure implements CanInline
+public class ValuesFilter extends MethodProc implements CanInline
 {
   /** 'F' if following a ForwardStep; 'R' if following a ReverseStep;
    * 'R' if following a PrimaryExpr. */

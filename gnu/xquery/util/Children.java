@@ -5,7 +5,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 
-public class Children extends CpsProcedure
+public class Children extends MethodProc
 {
   public static final Children children = new Children();
   

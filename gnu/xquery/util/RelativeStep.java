@@ -15,7 +15,7 @@ import gnu.kawa.functions.*;
  * (relative-step E1 (lambda (dot position last) E2)).
  */
 
-public class RelativeStep extends CpsProcedure implements CanInline
+public class RelativeStep extends MethodProc implements CanInline
 {
   public static final RelativeStep relativeStep = new RelativeStep();
 

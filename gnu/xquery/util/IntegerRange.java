@@ -6,13 +6,13 @@ import gnu.lists.*;
 import gnu.math.IntNum;
 import gnu.mapping.*;
 
-public class IntegerRange extends CpsProcedure // implements Inlineable
+public class IntegerRange extends MethodProc // implements Inlineable
 {
   public static final IntegerRange integerRange = new IntegerRange("to");
 
   public IntegerRange(String name)
   {
-    super(name);
+    setName(name);
   }
 
   public static final IntNum MIN_INT = IntNum.make(Integer.MIN_VALUE);

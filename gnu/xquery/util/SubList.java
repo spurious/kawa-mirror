@@ -8,7 +8,7 @@ import gnu.lists.*;
 /** Extracts a sub-range from a value sequence.
  * Implements XQuery 'sublist'. */
 
-public class SubList extends CpsProcedure
+public class SubList extends MethodProc
 {
   public static final SubList subList = new SubList();
 

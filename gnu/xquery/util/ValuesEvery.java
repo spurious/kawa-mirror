@@ -11,7 +11,7 @@ import gnu.mapping.*;
  * the second argument is a sequence of values to pass to the former.
  */
 
-public class ValuesEvery extends CpsProcedure
+public class ValuesEvery extends MethodProc
 {
   public static final ValuesEvery every = new ValuesEvery(true);
   public static final ValuesEvery some = new ValuesEvery(false);

@@ -1,4 +1,4 @@
-(test-init "objects" 16)
+(test-init "objects" 17)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -87,3 +87,12 @@
     c-path))
 
 (test ".x.c" object-with-closure-2 '.x.c)
+
+(define (document-filter arg1)
+  (lambda (arg2)
+    (object ()
+            ((toString)
+             <String>
+             (format #f "{arg1: ~s arg2: ~s}" arg1 arg2)))))
+
+(test "{arg1: 23 arg2: 12}" 'object-with-closure-3 (symbol->string ((document-filter 23) 12)))

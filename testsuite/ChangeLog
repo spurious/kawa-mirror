@@ -1,3 +1,7 @@
+1999-08-17  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  Another object regression test.
+
 1999-07-19  Per Bothner  <per@bothner.com>
 
 	* Makefile.am, Makefile.in (SOURCES):  Add formatst.scm.

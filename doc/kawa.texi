@@ -693,6 +693,9 @@ be used as a stand-alone application. @xref{Application compilation}.
 @item --applet
 The resulting class inherits from @code{java.applet.Applet},
 and can be used as an applet.  @xref{Applet compilation}.
+@item --module-static
+If no @code{module-static} is specified, generate a static module
+(as if @code{(module-static #t)} were specified. @xref{Module classes}.
 @end table
 
 When you actually want to load the classes, the @var{outdirectory}
@@ -948,15 +951,16 @@ You can of course also use the extended format in a @code{define}:
 
 @display
 @var{formal-arguments} =
-@var{req-opt-args} (@var{rest-key-args} | . @var{rest-arg})
+    @var{req-opt-args} (@var{rest-key-args} | . @var{rest-arg})
 @end display
 @display
 @var{req-opt-args} = @var{req-arg} ... [#!optional @var{opt-arg} ...]
 @var{rest-key-args} = [#!rest @var{rest-arg}] [#key @var{key-arg} ...]
-@var{req-arg} = @var{variable} [:: @var{type}] | (@var{variable} @var{type})
+@var{req-arg} = @var{variable} [:: @var{type}] | (@var{variable} [[::] @var{type}] )
 @var{opt-arg} = @var{arg-with-default}
 @var{key-arg} =  @var{arg-with-default}
-@var{arg-with-default} = @var{variable} [:: @var{type}] | (@var{variable} @var{initializer} [@var{type}]) | (@var{variable} :: @var{type} [@var{initializer}])
+@var{arg-with-default} = @var{variable} [:: @var{type}]
+    | ( @var{variable} [:: @var{type} [@var{initializer}] | @var{initializer} [[::] @var{type}]] )
 @var{rest-arg} = @var{variable}
 @end display
 
@@ -2901,10 +2905,6 @@ It sort-of also includes the declared methods, but this is not working yet.
 @node Module classes, , Anonymous classes, Objects Classes and Modules
 @section Modules and how they are compiled to classes
 
-(The Kawa module system is under construction.  There are undoubtedly bugs,
-not all of the planned features are implemented yet, and the design
-may change as we get more experience with it.)
-
 A @dfn{module} is a set of definitions that the module @dfn{exports},
 as well as some @dfn{actions} (expressions evaluated for their side effect).
 The top-level forms in a Scheme source file compile a module;
@@ -2917,7 +2917,7 @@ There are two kinds of module class:
 A @dfn{static module} is a class (or gets compiled to a class)
 all of whose public fields a static, and that does not have a
 public constructor.  A JVM can only have a single global instance of
-a static module.  (Static modules are not yet implemented.)
+a static module.
 An @dfn{instance module} has a public default constructor,
 and usually has at least one non-static public field.
 There can be multiple instances
@@ -2932,6 +2932,49 @@ In fact, any Java class class that has the properties of either
 an instance module or a static module, is a module, and can be
 loaded or imported as such;  the class need not have written
 using Scheme.
+
+@subsection Name visibility
+
+The definitions that a module exports are accessible to other modules.
+These are the "public" definitions, to use Java terminology.
+By default, all the identifiers declared at the top-level of a module
+are exported, except those defined using @code{define-private}.
+However, a major purpose of using modules is to control the set of
+names exported.  One reason is to reduce the chance of accidental
+name conflicts between separately developed modules.  An even more
+important reason is to enforce an interface:  Client modules should
+only use the names that are part of a documented interface, and should
+not use internal implementation procedures (since those may change).
+
+If there is a @code{module-export} declaration in the module, then
+only those names listed in a @code{module-export} are exported.
+There can be more than one @code{module-export}, and they can be
+anywhere in the Scheme file.  As a matter of good style, I recommend
+a single @code{module-export} near the beginning of the file.
+
+@deffn Syntax module-export name ...
+Make the definition for each @var{name} be exported.
+Note that it is an error if there is no definition for @var{name}
+in the current module, or if it is defined using @code{define-private}.
+@end deffn
+
+@deffn Syntax define-private name [:: type] value
+@deffnx Syntax define-private (name formals) body
+Same as @code{define}, except that @code{name} is not exported.
+@end deffn
+
+In this module, @code{fact} is public and @code{worker} is private:
+@example
+(module-export fact)
+(define (worker x) ...)
+(define (fact x) ...)
+@end example
+
+Alternatively, you can write:
+@example
+(define-private (worker x) ...)
+(define (fact x) ...)
+@end example
 
 @subsection How a module becomes a class
 
@@ -2949,22 +2992,22 @@ sripped off).  That can be overridden by the @code{-T} Kawa
 command-line flag.  The package-prefix specified by the @code{-P}
 flag is prepended to give the fully-qualified class name.
 
-@deffn module-name <name>
+@deffn Syntax module-name <name>
 Sets the name of the generated class, overriding the default.
 If there is no @samp{.} in the @var{name}, the package-prefix
 (specified by the @code{-P} Kawa command-line flag) is prepended.
 @end deffn
 
-The base class of the generated module class is unspecified;
+By default, the base class of the generated module class is unspecified;
 you cannot count on it being more specific than @code{Object}.
 However, you can override it with @code{module-extends}.
 
-@deffn module-extends <class>
+@deffn Syntax module-extends <class>
 Specifies that the class generated from the immediately surrounding
 module should extend (be a sub-class of) the class @code{<@var{class}>}.
 @end deffn
 
-@deffn module-implements <interface> ...
+@deffn Syntax module-implements <interface> ...
 Specifies that the class generated from the immediately surrounding
 module should implement the interfaces listed.
 @end deffn
@@ -2975,7 +3018,7 @@ are actually provided, and have the correct signatures.  This will
 hopefully be fixed, but for now, if you are forgot a method, you will
 probably get a verifier error
 
-For each top-level non-private definition the compiler creates a
+For each top-level exported definition the compiler creates a
 corresponding public field with a similar (mangled) name.
 By default, there is some indirection:  The value of the Scheme variable
 is not that of the field itself.  Instead, the field is a
@@ -3007,17 +3050,48 @@ generate a "variable argument list" method.  This is a method whose
 last parameter is either an array or a @code{<list>}, and whose
 name has @code{$V} appended to indicate the last parameter is a list.
 
-A method will be static iff it doesn't need to reference non-static
-fields or methods of the module instance.  In that case, the corresponding
-field will also be static.   A future extension will support for
-precise control over which components are static, and will support
-creation of static modules (all of whose public fields are static).
-For now, you can only generate instance methods.
-
 Top-leval macros (defined using either @code{define-syntax}
 or @code{defmacro}) create a field whose type is currently a sub-class of
 @code{kawa.lang.Syntax};  this allows importing modules to detect
 that the field is a macro and apply the macro at compile time.
+
+@deffn Syntax module-static name ...
+@deffnx Syntax module-static @code{#t}
+@deffnx Syntax module-static @code{#f}
+Control whether the generated fields and methods are static.
+If @code{#t} is specified, then the module will be a static module,
+@emph{all} definitions will be static, and the module body is evaluated
+in the class's static initializer.
+Otherwise, the module is an instance module.  However, the @var{name}s
+that are explicitly listed will be compiled to static fields and methods.
+If @code{#f} is specified, then all exported names will be compiled
+to non-static (instance) fields and methods.
+
+By default, if no @code{module-static} is specified, the following rules apply:
+@enumerate
+@item
+If there is a @code{module-extends} or @code{module-implements}
+declaration, then @code{(module-static #f)} is implied.
+@item
+If the @code{--module-static} command-line parameter is specified,
+then @code{(module-static #t)} is implied.
+@item
+(Not yet implemented: If there are no top-level actions and all
+definitions are procedure definitions, macro definitions, or
+constant definitions, then @code{(module-static #t)} is implied.)
+@item
+Otherwise, a method will be static iff it doesn't need to reference non-static
+fields or methods of the module instance.  In that case, the corresponding
+field will also be static.
+@end enumerate
+
+Note @code{(module-static #t)} usually produces more efficient
+code, and is recommended if a module contains only procedure or macro
+definitions.  (This may become the default.)
+However, a static module means that all environments in a JVM
+share the same bindings, which you may not want if you use
+multiple top-level environments.
+@end deffn
 
 Unfortuntely, the Java class verifier does not allow fields to have
 arbitrary names.  Therefore, the name of a field that represents a
@@ -3308,6 +3382,11 @@ The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
 (Some details (such as the @samp{throws} lists) may change.)
 
+@deftypefn {Static method} void Scheme.registerEnvironment ()
+Initializes the Scheme environment.  Maybe needed if you
+try to load a module compiled from a Scheme source file.
+@end deftypefn
+
 @deftypefn {Static method} Object Scheme.eval (InPort @var{port}, Environment @var{env})
 Read expressions from @var{port}, and evaluate them in the
 @var{env} environment, until end-of-file is reached.
@@ -3428,7 +3507,7 @@ GNU General Public License for more details.
 
 These classes are free software.  You can use and re-distribute a class
 without restriction (in source or binary form) as long as you use a
-version has not been modified in any way from a version released
+version that has not been modified in any way from a version released
 by Per Bothner, Cygnus Solutions, or the Free Software Foundation.
 You may make and distribute a modified version, provided you follow
 the terms of the GNU General Public License; either version 2,

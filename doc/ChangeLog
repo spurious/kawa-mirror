@@ -1,3 +1,13 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* doc/kawa.texi (Files compilation):  Document --module-static.
+	(Module classes):  Document module-export, module-static.
+	(Scheme.registerEnvironment):  Add documentation.
+	
+	* internals.xml:  New internals manual.  (For now, essentially
+	the "KawaLisp98" paper, with little or no changes.)
+	* Makefile.am:  Added some rules to process internals.xml.
+
 2000-04-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Projects):  New section on projects using Kawa.

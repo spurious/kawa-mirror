@@ -45,3 +45,27 @@ install-html:
 	cp kawa_toc.html $(HTML_HOME)/kawa/index.html
 	sed -e 's|HREF="kawa_|HREF="kawa/kawa_|g' -e 's|HREF="../|HREF="|g' \
 		<kawa_toc.html >$(HTML_HOME)/kawa.html
+
+XSL_CLASSPATH = /home/bothner/Java/xalan_1_0_0/xalan.jar:/home/bothner/Java/xalan_1_0_0/xerces.jar:$$CLASSPATH
+XSL = $(JAVA) org.apache.xalan.xslt.Process
+
+internals.html: $(srcdir)/internals.xml
+	CLASSPATH=$(XSL_CLASSPATH) \
+	$(XSL) -IN $(srcdir)/internals.xml \
+	  -XSL /home/bothner/sgml/docbook/html/docbook.xsl \
+	  -OUT internals.html
+
+TransformToLatex.class:
+	ln -s /home/bothner/public_html/papers/Freenix00/TransformToLatex.class .
+usenix.sty:
+	ln -s /home/bothner/public_html/papers/Freenix00/usenix.sty .
+
+internals.tex: $(srcdir)/internals.xml TransformToLatex.class
+	CLASSPATH=$(XSL_CLASSPATH) \
+	  $(JAVA) TransformToLatex $(srcdir)/internals.xml /home/bothner/public_html/papers/Freenix00/docbook-to-latex.xsl internals.tex
+
+internals.dvi: internals.tex usenix.sty
+	latex internals.tex
+
+internals.ps: internals.dvi
+	dvips -o internals.ps internals.dvi

@@ -330,6 +330,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void enterScope (Scope scope)
   {
+    scope.start_pc = PC;
     locals.enterScope(scope);
   }
 
@@ -345,6 +346,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     return scope;
   }
 
+  public void beginScope()  // Is this needed?
+  { locals.current_scope.start_pc = PC; }
 
   public Scope popScope () {
     Scope scope = locals.current_scope;
@@ -750,7 +753,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("attempting to push dead variable");
     int offset = var.offset;
     if (offset < 0 || !var.isSimple ())
-      throw new Error ("attempting to store in unassigned variable");
+      throw new Error ("attempting to store in unassigned variable"+var.getName()
+		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote ();
     reserve(4);
     popType();
@@ -1067,7 +1071,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       { // There was no 'else' clause.
 	if (reachableHere ()
 	    && SP != if_stack.start_stack_size)
-	  throw new Error ("then clause grows stack with no else clause");
+	  throw new Error("at PC "+PC+" then clause grows stack with no else clause");
       }
     else if (if_stack.then_stacked_types != null)
       {
@@ -1081,7 +1085,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    SP = then_clause_stack_size;
 	  }
 	else if (SP != then_clause_stack_size)
-	  throw new Error ("SP at end of 'then' was " +
+	  throw new Error("at PC "+PC+": SP at end of 'then' was " +
 			   then_clause_stack_size
 			   + " while SP at end of 'else' was " + SP);
       }
@@ -1394,8 +1398,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile a tail-call to position 0 of the current procewure.
-   * If pop_args is true, copy argument registers (except this) from stack. */
-  public void emitTailCall (boolean pop_args)
+   * @param pop_args if true, copy argument registers (except this) from stack.
+   * @param scope Scope whose start we jump back to. */
+  public void emitTailCall (boolean pop_args, Scope scope)
   {
     if (pop_args)
       {
@@ -1410,7 +1415,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
       }
     reserve(5);
-    int delta = - PC;
+    int start_pc = scope.start_pc;
+    int delta = start_pc - PC;
     if (delta < -32768)
       {
 	put1(200);  // goto_w
@@ -1456,10 +1462,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       labels.emit_spring (this);
     for (Label label = labels;  label != null;  label = label.next)
       {
-	if (!label.defined ())
+	if (label.fixups != null || label.wide_fixups != null)
 	  throw new Error ("undefined label");
-	if (label.fixups != null)
-	  throw new Error ("internal error: finalize_labels");
     }
   }
 

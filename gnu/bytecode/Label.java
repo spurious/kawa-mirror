@@ -268,6 +268,13 @@ public class Label {
     wide_fixups = new_fixups;
   }
 
+  /** Return true if there are references to this Label.
+      We assume !defined(). */
+  public boolean hasFixups()
+  {
+    return fixups != null || wide_fixups != null;
+  }
+
   /**
    * Emit a reference to the current label.
    * @param method the current method

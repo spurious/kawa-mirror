@@ -1,3 +1,10 @@
+1998-08-28  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (beginScope):  New method.
+	(enterScope):  Note PC in start_pc.
+	(emitTailCall):  Take extra Scope argument.
+	* Label.java (hasFixups): New method.
+
 Wed Jul 29 09:47:09 1998  PARMELAN Edouard <parmee@postecss.ncrfran.france.ncr.com>
 
 	* ClassTypeWritter,java (printSignature):  Add missing commas.

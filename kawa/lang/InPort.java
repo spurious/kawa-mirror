@@ -527,7 +527,10 @@ public class InPort extends FilterInputStream implements Printable
 	      c = Character.toLowerCase ((char)c);
 	    else
 	      c = 0;
-	    if (c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l')
+	    int next;
+	    if ((c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l')
+		&& ((next = peekChar()) == '+' || next == '-'
+		    || Character.digit((char)next, 10) >= 10))
 	      {
 		c = 'e';
 		isFloat = true;

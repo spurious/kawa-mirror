@@ -19,6 +19,11 @@ public class Quote extends Syntax implements Printable
     obj = pair.car;
     if (obj instanceof SyntaxForm)
       obj = ((SyntaxForm) obj).form;
+    /*
+    Doing namespaceResolve is probably desirable, but need to be recursive.
+    if (val instanceof String)
+      val = tr.namespaceResolve((String) val);
+    */
     return new QuoteExp(obj);
   }
 

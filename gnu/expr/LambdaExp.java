@@ -522,8 +522,9 @@ public class LambdaExp extends ScopeExp
 		&& ! nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED)))
           {
             fflags |= Access.STATIC;
-            // If there is no instanceField, then the field gets initialized in
-            // <init>, not <clinit>, which is bad for a "static final" field.
+            // If there is no moduleInstanceVar, then the field gets
+	    // initialized in <init>, not <clinit>,
+	    // which is bad for a "static final" field.
             if (! ((ModuleExp) nameDecl.context).isStatic())
               fflags &= ~Access.FINAL;
           }

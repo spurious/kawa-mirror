@@ -1,3 +1,12 @@
+2004-08-01  Per Bothner  <per@bothner.com>
+
+	Optimization in <clinit>:  Change $instance from field to variable.
+	* Compilation.java (instanceField):  Remove Field field, replaced by
+	(moduleInstanceVar):  ... new Variable field.
+	(addClass):  Allocate moduleInstanceVar in a local Scope.
+	* ProcInitializer.java (<init>):  Don't check instanceField.
+	(emitLoadModuleMethod):  Use moduleInstanceVar.
+
 2004-07-31  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (emitLiterals):  Inline and remove method.

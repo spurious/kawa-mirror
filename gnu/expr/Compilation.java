@@ -25,7 +25,7 @@ public class Compilation
   public Variable thisDecl;
 
   /** Contains "$instance" if the module is static; otherwise null. */
-  Field instanceField;
+  Variable moduleInstanceVar;
 
   /** If true, minimize the number of classes generated.
    * Do this even if it makes things a little slower. */
@@ -1636,8 +1636,6 @@ public class Compilation
     if (curClass == mainClass && staticModule)
       {
 	generateConstructor (module);
-	instanceField = curClass.addField("$instance", curClass,
-					  Access.STATIC|Access.FINAL);
       }
 
     module.allocParameters(this);
@@ -1672,27 +1670,33 @@ public class Compilation
 
 	initMethod = startClassInit();
 	code = getCode();
-	if (staticModule)
-	  {
-	    code.emitNew(curClass);
-	    code.emitDup(curClass);
-	    code.emitInvokeSpecial(curClass.constructor);
-	    code.emitPutStatic(instanceField);
-	  }
 	if (! immediate)
 	  {
 	    startLiterals = new Label(code);
 	    afterLiterals = new Label(code);
 	    code.fixupChain(afterLiterals, startLiterals);
 	  }
+	Scope initScope = null;
+	if (staticModule)
+	  {
+	    initScope = code.pushScope();
+	    moduleInstanceVar = initScope.addVariable(code,
+						      curClass, "$instance");
+	    code.emitNew(curClass);
+	    code.emitDup(curClass);
+	    code.emitInvokeSpecial(curClass.constructor);
+	    code.emitStore(moduleInstanceVar);
+	  }
 	dumpInitializers(clinitChain);
 
 	if (staticModule && ! generateMain && ! immediate)
 	  {
-	    code.emitGetStatic(instanceField);
+	    code.emitLoad(moduleInstanceVar);
 	    code.emitInvokeStatic(getCallContextInstanceMethod);
 	    code.emitInvokeVirtual(apply_method);
 	  }
+	if (initScope != null)
+	  code.popScope();
 	code.emitReturn();
 	method = save_method;
       }

@@ -40,6 +40,9 @@ transform = @program_transform_name@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
+EXTRA_OBJ = @EXTRA_OBJ@
+JAVA_VERSION = @JAVA_VERSION@
+EXTRA_MISC = @EXTRA_MISC@
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -57,9 +60,18 @@ OBJ=\
   std_syntax.class \
   thread.class \
   characters.class \
+  keywords.class \
+  ports.class \
   quantities.class \
+  strings.class \
   vectors.class \
-  when_unless.class
+  when_unless.class \
+  @EXTRA_OBJ@
+
+OBJ_1_0 = 
+OBJ_1_1 = reflection.class
+
+EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 
 # These are generated automatically when the $(OBJ) files are built,
 # but they also need to be installed.
@@ -73,11 +85,33 @@ SECONDARY_OBJS=\
   char_002dupcase.class\
   char_002dupper_002dcase_003f.class\
   char_002dwhitespace_003f.class\
+  eof_002dobject_003f.class\
+  exit.class\
+  force_002doutput.class\
   integer_002d_003echar.class\
+  keyword_002d_003estring.class\
+  keyword_003f.class\
+  keywords.class\
   list_002d_003evector.class\
+  make_002dstring.class\
+  newline.class\
+  string_002d_003ekeyword.class\
+  string_002dlength.class\
   vector_002dlength.class\
   vector_002dref.class\
-  vector_002dset_0021.class
+  vector_002dset_0021.class\
+  @EXTRA_MISC@
+
+MISC_1_1 = \
+  make_002drecord_002dtype.class\
+  record_002daccessor.class\
+  record_002dconstructor.class\
+  record_002dmodifier.class\
+  record_002dpredicate.class\
+  record_002dtype_002ddescriptor.class\
+  record_002dtype_002dfield_002dnames.class\
+  record_002dtype_002dname.class\
+  record_003f.class
 
 java_DATA=$(OBJ) $(SECONDARY_OBJS)
 
@@ -100,7 +134,7 @@ default: all
 
 
 $(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake --strictness=foreign $(subdir)/Makefile
+	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
 
 Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
 	cd $(top_builddir) \
@@ -130,7 +164,7 @@ distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 subdir = kawa/lib
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
-	  d=$(srcdir); \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  test -f $(distdir)/$$file \
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
@@ -139,6 +173,7 @@ info:
 dvi:
 check: all
 installcheck:
+install-info:
 install-exec: 
 	$(NORMAL_INSTALL)
 
@@ -184,9 +219,10 @@ maintainer-clean:  maintainer-clean-generic distclean
 	@echo "it deletes files that may require special tools to rebuild."
 
 .PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi check installcheck install-exec install-data install uninstall all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+dvi check installcheck install-info install-exec install-data install \
+uninstall all installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
 
 
 .java.class:

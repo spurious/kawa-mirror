@@ -109,7 +109,7 @@
 		 (letrec ((loop
 			   (lambda (name ...)
 			     (if test
-				 (begin (if #f #f) . result)
+				 (begin #!void . result)
 				 (begin commands ...
 					(loop (%do-step name . step) ...))))))
 		   (loop init ...)))))

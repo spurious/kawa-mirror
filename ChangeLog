@@ -1,3 +1,12 @@
+Sun Nov 24 13:04:49 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/SFormat.java:  New class.
+	* kawa/lang/print.java:  Moved print to SFormat.  Removed.
+	* kawa/lang/Makefile.{am,in}:  Update accordingly.
+	* kawa/lang/{Equalpat,LambdaExp,ListRepeatPat,OutPort,Pair,PairPat,
+	Promise,QuoteExp,ReferenceExp,SetExp,SyntaxRule,SyntaxRules,Values,
+	Vector}.java, kawa/Shell.java:  Replace print.print by SFormat.print.
+
 Wed Nov 20 23:02:32 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/InPort.java (available):  Handle IOException.

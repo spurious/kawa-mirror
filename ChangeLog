@@ -1,8 +1,11 @@
 Fri Jan  1 22:13:41 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
+	* configure.in:  Set version to 1.6.57.
+	* Makefile.am, Makefile.in (install-javadoc-html):  New rules.
+
 	* kawa/TelnetConnection.java:  New class - for telnet connection.
 	* kawa/TelnetInputStream.java:  New class.
-	* kawa/TelnetOutputStream.java:  New class..
+	* kawa/TelnetOutputStream.java:  New class.
 	* kawa/Telnet.java:  New class - a mini-client for telnet.
 	* kawa/kawa.c:  New front-end driver for Kawa.
 	* kawa/Makefile.am:  Support building and installing kawa front-end.

@@ -184,6 +184,7 @@ public class IntNum extends RatNum implements Externalizable
     return top > 0 ? 1 : top < 0 ? -1 : 0;
   }
 
+  /** Return -1, 0, or 1, depending on which value is greater. */
   public static int compare (IntNum x, IntNum y)
   {
     if (x.words == null && y.words == null)
@@ -194,9 +195,32 @@ public class IntNum extends RatNum implements Externalizable
       return x_negative ? -1 : 1;
     int x_len = x.words == null ? 1 : x.ival;
     int y_len = y.words == null ? 1 : y.ival;
-    if (x_len != y_len)
+    if (x_len != y_len) // We assume x and y are canonicalized.
       return (x_len > y_len)!=x_negative ? 1 : -1;
     return MPN.cmp (x.words, y.words, x_len);
+  }
+ 
+  /** Return -1, 0, or 1, depending on which value is greater. */
+ public static int compare (IntNum x, long y)
+  {
+    long x_word;
+    if (x.words == null)
+      x_word = x.ival;
+    else
+      {
+	boolean x_negative = x.isNegative ();
+	boolean y_negative = y < 0;
+	if (x_negative != y_negative)
+	  return x_negative ? -1 : 1;
+	int x_len = x.words == null ? 1 : x.ival;
+	if (x_len == 1)
+	  x_word = x.words[0];
+	else if (x_len == 2)
+	  x_word = x.longValue();
+	else // We assume x is canonicalized.
+	  return x_negative ? -1 : 1;
+      }
+    return x_word < y ? -1 : x_word > y ? 1 : 0;
   }
 
   public int compare (Object obj)

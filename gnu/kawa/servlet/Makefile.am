@@ -5,6 +5,8 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_sources=\
+  GetRequest.java \
+  GetResponse.java \
   KawaServlet.java
 
 PACKAGE_FNAME = gnu-kawa-servlet

@@ -1,7 +1,6 @@
 package kawa.lang;
 
-// An undefined symbol was evaled.
-public class WrongType extends Exception {
+public class WrongType extends RuntimeException {
    //-- number of the argument
    public int number;
    //-- type of the argument

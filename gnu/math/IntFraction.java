@@ -3,7 +3,7 @@
 
 package gnu.math;
 
-/** Implementation of exact rational numbers as fractions of IntNums.
+/** Implementation of exact rational numbers a ratio of two IntNums.
  * @author Per Bothner
  */
 

@@ -3,7 +3,7 @@
 
 package gnu.math;
 
-/* The abstract class of rational numbers. */
+/** The abstract class of rational numbers. */
 
 public abstract class RatNum extends RealNum
 {

@@ -1,3 +1,8 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
 1999-12-10  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (makeU):  New static method.

@@ -1,3 +1,7 @@
+2003-04-19  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* misc-test.scm:  New tests for overloading and instance?.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* classes1.scm (<SimpleA>):  Add two methods that return lambdas.

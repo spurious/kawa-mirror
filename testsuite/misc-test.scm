@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 103)
+(test-init "Miscellaneous" 108)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -408,10 +408,12 @@
       test-read-split)
 
 (define plus10 (make-procedure foo: 33 name: 'Plus10
-                            method: (lambda (x y) (+ x y 10))
+                            method: (lambda (x y)
+				      (+ x (if (number? y) y 0) 10))
                             method: (lambda () 10)))
 (test 50 plus10 30 10)
 (test 10 plus10)
+(test 12 plus10 2 #!null)
 ;;(test 10 'plus10-error
 ;;      (try-catch (plus10 3) (ex <java.lang.Exception> "error")))
 (test 33 procedure-property plus10 'foo)
@@ -449,3 +451,9 @@
 (test '|123| Long:toString (Long:new '00123))
 (define (to-int-string x) (java.lang.Object:toString (Long:new x)))
 (test '|124| to-int-string '00124)
+
+;; Test instance?
+(test #t instance? 1 <number>)
+(test #t instance? "x" <string>)
+(test #f instance? "x" <number>)
+(test #f instance? #!null <string>)

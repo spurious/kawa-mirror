@@ -1,3 +1,8 @@
+2003-03-06  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.7beta1.
+	* build.xml (version.release):  Set to 1.7beta1.
+
 2003-03-03  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java (relative):  New boolean field.

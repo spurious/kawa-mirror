@@ -5279,30 +5279,42 @@ to KRL, even in BRL-compatibility mode.
 @end itemize
 
 @node Mailing lists, Support, KRL, Top
-@chapter Mailing lists
+@chapter Where to report bugs, discuss changes, etc
 
-If you have a problem installing or using Kawa,
-send mail to @code{kawa@@sources.redhat.com}
+@section Reporting bugs
 
-This mailing list is used for reporting bugs, patches, discussing
-changes to Kawa, and announcing snapshots.  If you wish to subscribe,
-send a blank message request to @code{kawa-subscribe@@sources.redhat.com}.
+To report a bug or feature request for Kawa (including Qexo or JEmacs), it is
+best to use the @uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa,
+bug-submission page}.
+You can browse and comment on existing bug reports
+using the @uref{http://savannah.gnu.org/bugs/?group=kawa, Kawa Bugzilla page}.
+
+When a bug report is created or modified, mail is automatically sent to the
+@email{bug-kawa@@gnu.org} list.  You can subscribe, unsubscribe, or browse
+the archives through the
+@uref{http://mail.gnu.org/mailman/listinfo/bug-kawa,
+@code{bug-kawa} web interface}.
+
+@section General Kawa email and discussion
+
+The general Kawa email list is @email{kawa@@sources.redhat.com}.
+This mailing list is used for announcements, questions, patches,
+and general discussion relating to Kawa.  If you wish to subscribe,
+send a blank message request to @email{kawa-subscribe@@sources.redhat.com}.
 To unsubscribe, send a blank message to
-@code{kawa-unsubscribe@@sources.redhat.com}.  (If your mail is forwarded,
-send mail to the address following @code{mailto:} in the
-@code{List-Unsubscribe} line in the messages you get from the list.)
+@email{kawa-unsubscribe@@sources.redhat.com}.
+(If your mail is forwarded and you're not sure which email address you're
+subscribed as send mail to the address following @code{mailto:} in the
+@code{List-Unsubscribe} line in the headers of the messages you get from
+the list.)
 
-Messages to the mailing list are now
-@uref{http://sources.redhat.com/ml/kawa/, archived}.
+You can browse the @uref{http://sources.redhat.com/ml/kawa/,
+archive of past messages}.
 
 There are separate mailing lists for
 @uref{http://mail.gnu.org/mailman/listinfo/qexo-general, Qexo}
 and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
 
-Bugs should now preferably be reported using the Bugzilla database
-at @uref{http://savannah.gnu.org/bugs/?group=kawa}.
-Submit a new bug at:
-@uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa}.
 
 @node Support, Projects, Mailing lists, Top
 @chapter Technical Support for Kawa

@@ -347,6 +347,13 @@ implements
       }
     sbuf.append(" ipos: ");
     sbuf.append(ipos);
+    /*
+    if (sequence instanceof TreeList)
+      {
+	sbuf.append(" index: ");
+	sbuf.append(((TreeList) sequence).posToDataIndex(ipos));
+      }
+    */
     sbuf.append('}');
     return sbuf.toString();
   }

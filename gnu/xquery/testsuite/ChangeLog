@@ -1,3 +1,9 @@
+2003-11-09  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (matchTest): New method
+	(evalTest):  Use matchTest.
+	(main):  Added 4 tests for evalWithFocus.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (eval): Replace 'parseFile' call by call to new

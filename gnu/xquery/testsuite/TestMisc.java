@@ -8,7 +8,7 @@ import gnu.text.*;
 public class TestMisc
 {
   static { XQuery.registerEnvironment(); }
-  static Interpreter interp = Interpreter.getInterpreter();
+  static XQuery interp = XQuery.getInstance();
   static Environment env = Environment.getCurrent();
 
   static int expectedPasses = 0;
@@ -370,6 +370,39 @@ public class TestMisc
 		    +"section[@id='s1']/(//chapter)",
 		    "c1;c2;");
 
+    evalTest("declare namespace XQuery = 'class:gnu.xquery.lang.XQuery';"
+	     + "XQuery:eval-with-focus(XQuery:getInstance(),"
+	     + "  '<r pos=\"{position()}\">{.}</r>', (<b/>, 3))",
+	     "<r pos=\"1\"><b /></r><r pos=\"2\">3</r>");
+    evalTest("declare namespace XQuery = 'class:gnu.xquery.lang.XQuery';"
+	     + "XQuery:eval-with-focus(XQuery:getInstance(),"
+	     + "  '<r pos=\"{position()}\">{.}</r>', <b/>, 3, 4)",
+	     "<r pos=\"3\"><b /></r>");
+    Object r;
+    String e = "<r pos='{position()}' size='{last()}'>{.}</r>";
+    try
+      {
+	r = interp.evalWithFocus(e, interp.eval("2,3,4"));
+      }
+    catch (Throwable ex)
+      {
+	r = ex;
+      }
+    matchTest(e, r,
+	      "<r pos=\"1\" size=\"3\">2</r>, "
+	      + "<r pos=\"2\" size=\"3\">3</r>, "
+	      + "<r pos=\"3\" size=\"3\">4</r>");
+    try
+      {
+	r = interp.evalWithFocus(e, interp.eval("<b/>"), 4, 10);
+      }
+    catch (Throwable ex)
+      {
+	r = ex;
+      }
+    matchTest(e, r,
+	      "<r pos=\"4\" size=\"10\"><b/></r>");
+
     printSummary();
   }
 
@@ -443,28 +476,44 @@ public class TestMisc
 
   public static void evalTest(String expr, String expected)
   {
-    String result;
-    Throwable throwable = null;
+    Object result;
     try
       {
 	result = eval(expr);
       }
     catch (Throwable ex)
       {
-	if (ex instanceof WrappedException)
-	  {
-	    throwable = ((WrappedException) ex).getException();
-	    if (throwable != null)
-	      ex = throwable;
-	  }
-	throwable = ex;
-	// throwable.printStackTrace();
-	if (ex instanceof SyntaxException)
-	  result = "*** caught SyntaxException - "
-	    + ((SyntaxException) ex).getMessages().getErrors();
-	else
-	  result = "*** caught " + ex.getClass().getName() + " ***";
+	result = ex;
       }
+    matchTest(expr, result, expected);
+  }
+
+  public static void matchTest(String expr, Object returned, String expected)
+  {
+    String result;
+    Throwable throwable;
+    if (returned instanceof Throwable)
+      {
+	if (returned instanceof WrappedException)
+	  {
+	    throwable = ((WrappedException) returned).getException();
+	    if (throwable != null)
+	      returned = throwable;
+	  }
+	throwable = (Throwable) returned;
+	// throwable.printStackTrace();
+	if (returned instanceof SyntaxException)
+	  result = "*** caught SyntaxException - "
+	    + ((SyntaxException) returned).getMessages().getErrors();
+	else
+	  result = "*** caught " + returned.getClass().getName() + " ***";
+      }
+    else
+      {
+	result = returned.toString();
+	throwable = null;
+      }
+
     boolean failureExpected = failureExpectedNext != null;
     if (matches(expected, result))
       {

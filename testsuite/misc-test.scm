@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 95)
+(test-init "Miscellaneous" 96)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -423,3 +423,8 @@
 
 (define (return-null) #!null)
 (test #!null return-null)
+
+;;; Based on bug report 2002-3-1 from Petter Österlund <petos@fyrplus.se>
+(define (fie-1) (fie-2) (fie-3))
+(define (fie-4) (fie-3) (fie-3)) 
+(test #t 'names (and (procedure? fie-1) (procedure? fie-4)))

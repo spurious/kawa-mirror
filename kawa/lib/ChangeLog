@@ -1,3 +1,7 @@
+Mon Mar 31 17:06:25 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* quantities.scm: Update kawa.math -> gnu.math various places.
+
 Tue Mar 25 15:35:36 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* when_unless.scm -> syntax.scm:  Rename.

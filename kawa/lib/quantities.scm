@@ -3,8 +3,8 @@
   (syntax-rules ()
 		((define-syntax unit-name expression)
 		 (begin
-		   ((primitive-static-method "kawa.math.Unit" "define"
-					     "kawa.math.Unit"
-					     ("String" "kawa.math.Quantity"))
+		   ((primitive-static-method "gnu.math.Unit" "define"
+					     "gnu.math.Unit"
+					     ("String" "gnu.math.Quantity"))
 		    'unit-name expression)
 		   #!void))))

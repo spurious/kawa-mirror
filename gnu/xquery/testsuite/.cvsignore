@@ -1,0 +1,11 @@
+Makefile
+*.class
+*.log
+tmp*
+bib.xml
+bids.xml
+book1.xml
+items.xml
+reviews.xml
+tab.xml
+users.xml

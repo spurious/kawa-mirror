@@ -1,3 +1,8 @@
+2003-04-14  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java (scanForDefinitions):  Use Translator's
+	push method instead of pushBinding.
+
 2003-03-04  Per Bothner  <per@bothner.com>
 
 	* DocumentConstructor.java:  New class, extends CpsProcedure.

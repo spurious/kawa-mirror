@@ -20,7 +20,7 @@ public class DefineNamespace extends Syntax
       {
 	sym = (Interpreter.NAMESPACE_PREFIX + name).intern();
 	Declaration decl = defs.getDefine(sym, 'w', tr);
-	tr.pushBinding(sym, decl);
+	tr.push(decl);
 	decl.setFlag(Declaration.IS_CONSTANT);
 	p = tr.makePair(p, decl, p.cdr);
 	st = tr.makePair(st, this, p);

@@ -66,7 +66,7 @@
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
 
-(define *temp-file-number* 1)
+(define-private *temp-file-number* 1)
 ; From MzLib.  Scsh has (create-temp-file [prefix]).
 ; This is not safe from race conditions!
 ; Fix this using new Java2 File.createTempFile.  FIXME.

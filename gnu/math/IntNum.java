@@ -654,8 +654,7 @@ public class IntNum extends RatNum implements Externalizable
 	  xwords[xlen++] = 0;
 	MPN.divide (xwords, xlen, ywords, ylen);
 	rlen = ylen;
-	if (remainder != null || rounding_mode != TRUNCATE)
-	  MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
+        MPN.rshift0 (ywords, xwords, 0, rlen, nshift);
 
 	qlen = xlen+1-ylen;
 	if (quotient != null)
@@ -663,6 +662,12 @@ public class IntNum extends RatNum implements Externalizable
 	    for (int i = 0;  i < qlen;  i++)
 	      xwords[i] = xwords[i+ylen];
 	  }
+      }
+
+    if (ywords[rlen-1] < 0)
+      {
+        ywords[rlen] = 0;
+        rlen++;
       }
 
     // Now the quotient is in xwords, and the remainder is in ywords.
@@ -695,6 +700,11 @@ public class IntNum extends RatNum implements Externalizable
       }
     if (quotient != null)
       {
+        if (xwords[qlen-1] < 0)
+          {
+            xwords[qlen] = 0;
+            qlen++;
+          }
 	quotient.set (xwords, qlen);
 	if (qNegative)
 	  {

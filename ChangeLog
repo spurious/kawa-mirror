@@ -1,5 +1,12 @@
 2003-10-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (scanForDefinitions):  Split most into
+	new method importDefinitions - used for XQuery modules.
+	(importDefinitions):  New static method.  Take module namespace.
+	Note if decl is a procedure decl.
+
+	* kawa/standard/Scheme.java (<init>):  Specify field for "ash".
+
 	* kawa/lang/SetFieldProc.java:  Use Values.empty directly instead of
 	via Interpreter.voidObject.
 

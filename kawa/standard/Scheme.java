@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import gnu.text.SourceMessages;
 import gnu.kawa.util.*;
 import gnu.kawa.lispexpr.*;
-import gnu.kawa.reflect.ClassMemberConstraint;
 import gnu.lists.FormatToConsumer;
 import gnu.kawa.functions.DisplayFormat;
 
@@ -409,7 +408,7 @@ public class Scheme extends LispInterpreter
       define_proc ("exit", "kawa.lib.thread");
 
       define_field("arithmetic-shift", "kawa.lib.numbers");
-      define_field("ash", "kawa.lib.numbers");
+      define_field("ash", "kawa.lib.numbers", "arithmetic$Mnshift");
       define_proc ("logand", "kawa.standard.logand");
       define_proc ("logior", "kawa.standard.logior");
       define_proc ("logxor", "kawa.standard.logxor");

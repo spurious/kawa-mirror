@@ -82,7 +82,7 @@ public class require extends Syntax
     try
       {
 	Object value =
-	  find(Class.forName(typeName), Environment.getCurrent()); 
+	  find(Class.forName(typeName), Environment.getCurrent());
 	if (value instanceof Runnable)
 	  ((Runnable) value).run();
 	return value;
@@ -120,16 +120,13 @@ public class require extends Syntax
     return value;
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+  public boolean scanForDefinitions (Pair st, Vector forms,
                                      ScopeExp defs, Translator tr)
   {
-    boolean immediate = tr.immediate && defs instanceof ModuleExp;
-    Interpreter interp = tr.getInterpreter();
     Object name = ((Pair) st.cdr).car;
     // Type type = Scheme.expType(tr.rewrite(name));
     Type type = null;
     Pair p;
-    Hashtable ftable = null;
     if (name instanceof Pair && (p = (Pair) name).car == "quote")
       {
 	name = p.cdr;
@@ -171,6 +168,15 @@ public class require extends Syntax
 	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
+    return importDefinitions(type, null, forms, defs, tr);
+  }
+
+  public static boolean importDefinitions (Type type, String uri, Vector forms,
+					   ScopeExp defs, Compilation tr)
+  {
+    Interpreter interp = tr.getInterpreter();
+    boolean immediate = tr.immediate && defs instanceof ModuleExp;
+    Hashtable ftable = null;
     String tname = type.getName();
     Object instance = null;
     ClassType t = (ClassType) type;
@@ -217,7 +223,9 @@ public class require extends Syntax
 	      }
 	    if (immediate)
 	      {
-		ClassMemberConstraint.define(fname, instance, rfield, Environment.getCurrent());
+		ClassMemberConstraint.define(fname, instance, rfield,
+					     uri == null ? Environment.getCurrent()
+					     : Environment.getInstance(uri));
 	      }
 	    else
 	      {
@@ -237,13 +245,23 @@ public class require extends Syntax
 		    // But if the binding is re-exported (or EXTERNAL_ACCESS
 		    // gets set), then we need a separate declaration.
 		    // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
-		    Declaration adecl = defs.getDefine(fdname, 'w', tr);
+		    Object aname;
+		    if (uri == null)
+		      aname = fdname;
+		    else
+		      aname = Symbol.make(uri, fdname);
+		    Declaration adecl = defs.getDefine(aname, 'w', tr);
 		    Declaration fdecl = new Declaration(fdname, dtype);
 		    ReferenceExp fref = new ReferenceExp(fdecl);
 		    SetExp sexp = new SetExp(adecl, fref);
 		    sexp.setDefining(true);
                     if (isAlias || ftype.isSubtype(Compilation.typeSymbol))
                       fdecl.setIndirectBinding(true);
+		    if (type.isSubtype(Compilation.typeProcedure))
+		      {
+			adecl.setProcedureDecl(true);
+			fdecl.setProcedureDecl(true);
+		      }
 		    if (isAlias)
 		      fdecl.setAlias(true);
 		    if (! isStatic || fvalue instanceof Macro)

@@ -1,4 +1,4 @@
-(test-init "Objects" 77)
+(test-init "Objects" 80)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -251,3 +251,9 @@
 (define main-frame (create-main-frame))
 (test (format #f "this: ~a\n" main-frame) field main-frame 'myField)
 
+;; Test for Savannah bug #4289
+(define pa-data (pa-new 10))
+(pa-setter pa-data 5 99)
+(test 99 pa-getter pa-data 5)
+(test #!null pa-getter pa-data 6)
+(test 10 pa-length pa-data)

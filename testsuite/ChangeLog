@@ -1,3 +1,9 @@
+2003-07-12  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* module3.scm: Added functions to test compile time bug of
+    	primitive-array-*, Savannah bug #4289
+	* obj-test.scm: Test the primitive-array-* functions.
+
 2003-07-11  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* misc-test.scm:  New test for 'fluid-let' with 'future'.

@@ -1,3 +1,8 @@
+2003-09-24  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitTryStart):  Clean up internal logic.  Fix bug
+	where testing for non-zero SP would never true at that point.
+
 2003-07-16  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* PrimType.java (compare):  Guard againt null otherName.

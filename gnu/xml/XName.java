@@ -7,10 +7,8 @@ import java.io.*;
 
 /** A QName with namespace nodes [and future optional type annotation]. */
 
-public class XName implements Externalizable
-		   // Maybe: extends javax.xml.namespace.QName, if JAVA5
+public class XName extends SName implements Externalizable
 {
-  Symbol qname;
   NamespaceBinding namespaceNodes;
 
   public XName ()
@@ -19,24 +17,29 @@ public class XName implements Externalizable
 
   public XName (Symbol qname, NamespaceBinding namespaceNodes)
   {
-    this.qname = qname;
+    super(qname, "");
     this.namespaceNodes = namespaceNodes;
   }
 
-  public final Symbol getQName () { return qname; }
-  public final void setQName (Symbol qname) { this.qname = qname; }
+  public XName (Symbol qname, String prefix, NamespaceBinding namespaceNodes)
+  {
+    super(qname, prefix);
+    this.namespaceNodes = namespaceNodes;
+  }
+
+  public XName (SName name, NamespaceBinding namespaceNodes)
+  {
+    this(name.symbol, name.getPrefix(), namespaceNodes);
+  }
+
   public final NamespaceBinding getNamespaceNodes () { return namespaceNodes; }
   public final void setNamespaceNodes (NamespaceBinding nodes)
   { this.namespaceNodes = nodes; }
 
-  public final String getNamespaceURI()
-  {
-    return qname.getNamespaceURI();
-  }
-
+  /** @deprecated */
   public final String getLocalName()
   {
-    return qname.getName();
+    return getLocalPart();
   }
 
   String lookupNamespaceURI (String prefix)
@@ -51,14 +54,28 @@ public class XName implements Externalizable
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    out.writeObject(qname);
+    super.writeExternal(out);
     out.writeObject(namespaceNodes);
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    qname = (Symbol) in.readObject();
+    super.readExternal(in);
     namespaceNodes = (NamespaceBinding) in.readObject();
   }
+
+  /* #ifdef JAXP-1.3 */
+  public Object readResolve() throws ObjectStreamException
+  {
+    Namespace ns = symbol.getNamespace();
+    if (ns instanceof NamespacePair)
+      {
+	NamespacePair np = (NamespacePair) ns;
+	return new XName(Symbol.make(np.realNamespace, symbol.getName()),
+			 ns.getName(), namespaceNodes);
+      }
+    return this;
+  }
+  /* #endif */
 }

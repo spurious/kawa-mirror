@@ -1,3 +1,11 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* SName.java: New class.
+	* Makefile.am: Update accordingly.
+	* XName.java: Modify to extends SName.
+	* ParsedXMLToConsumer.java (closeTag): Pass prefix to new XName.
+	* NodeTree.java (posLocalName): Update a getLocalName to getLocalPart.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* XName.java (<init>): New constructor.

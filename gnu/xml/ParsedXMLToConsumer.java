@@ -147,7 +147,9 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 		  }
 		info.uri = uri;
 		info.qname = Symbol.make(uri, local);
-		type = new XName(info.qname, namespaceBindings);
+		type = new XName(info.qname,
+				 prefix == null ? "" : prefix,
+				 namespaceBindings);
 		info.type = type;
 		break;
 	      }

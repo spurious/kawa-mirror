@@ -108,7 +108,7 @@ public class NodeTree extends TreeList
   {
     Object type = getNextTypeObject(ipos);
     if (type instanceof XName)
-      return ((XName) type).getLocalName();
+      return ((XName) type).getLocalPart();
     if (type instanceof Symbol)
       return ((Symbol) type).getLocalName();
     return getNextTypeName(ipos);

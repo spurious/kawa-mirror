@@ -103,6 +103,16 @@ public class LList extends Sequence implements Printable, Compilable
 
   public static LList makeList (Object[] vals, int offset)
   {
+    /* DEBUGGING:
+    System.err.print("makeList([");
+    for (int i = 0;  i < vals.length; i++)
+      {
+	if (i > 0)
+	  System.err.print(", ");
+	System.err.print(vals[i]);
+      }
+    System.err.println("], "+offset+")");
+    */
     LList result = LList.Empty;
     for (int i = vals.length - offset;  --i >= 0; )
       result = new Pair (vals[offset+i], result);
@@ -157,6 +167,30 @@ public class LList extends Sequence implements Printable, Compilable
   public static Pair list3(Object arg1, Object arg2, Object arg3)
   {
     return new Pair(arg1, new Pair(arg2, new Pair(arg3, LList.Empty)));
+  }
+
+  public static Pair list4(Object arg1, Object arg2, Object arg3, Object arg4)
+  {
+    return new Pair(arg1, new Pair(arg2,
+				   new Pair(arg3, new Pair (arg4,
+							    LList.Empty))));
+  }
+
+  /** Utility function used by compiler when inlining `list'. */
+  public static Pair chain1 (Pair old, Object arg1)
+  {
+    Pair p1 = new Pair(arg1, LList.Empty);
+    old.cdr = p1;
+    return p1;
+  }
+
+  /** Utility function used by compiler when inlining `list'. */
+  public static Pair chain4 (Pair old, Object arg1, Object arg2,
+		      Object arg3, Object arg4)
+  {
+    Pair p4 = new Pair(arg4, LList.Empty);
+    old.cdr = new Pair(arg1, new Pair(arg2, new Pair(arg3, p4)));
+    return p4;
   }
 }
 

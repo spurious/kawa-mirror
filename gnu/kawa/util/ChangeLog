@@ -1,3 +1,7 @@
+2000-01-22  Per Bothner  <per@bothner.com>
+
+	* LList.java (list4, chain1, chain4):  New static methods.
+
 1999-12-10  Per Bothner  <per@bothner.com>
 
 	New directory.

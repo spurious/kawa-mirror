@@ -231,6 +231,8 @@ public class ModuleExp extends LambdaExp
       {
 	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
 	  continue;
+	if (decl.ignorable())
+	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
 	if (decl.getFlag(Declaration.IS_SYNTAX)

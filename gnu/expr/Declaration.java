@@ -187,7 +187,8 @@ public class Declaration
   public static final int IS_CONSTANT = 0x4000;
   public static final int IS_SYNTAX = 0x8000;
   public static final int IS_UNKNOWN = 0x10000;
-  public static final int PRIVATE_SPECIFIED = 0x20000;
+  public static final int IS_IMPORTED = 0x20000;
+  public static final int PRIVATE_SPECIFIED = 0x40000;
 
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
@@ -483,6 +484,9 @@ public class Declaration
   {
     while (decl != null && decl.isAlias())
       {
+	if (decl.getFlag(IS_IMPORTED)
+	    && (decl.flags & (EXPORT_SPECIFIED|EXTERNAL_ACCESS)) != 0)
+	  break;
 	Expression declValue = decl.getValue();
 	if (! (declValue instanceof ReferenceExp))
 	  break;
@@ -517,9 +521,18 @@ public class Declaration
     if (getFlag(STATIC_SPECIFIED)
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
-    Type ftype = (isAlias() ? Compilation.typeLocation
-		  : isIndirectBinding() ? Compilation.typeBinding
-		  : getType());
+    Type ftype;
+    if (isAlias())
+      {
+	Declaration adecl = followAliases(this);
+	if (adecl != null && adecl.getFlag(IS_CONSTANT))
+	  ftype = adecl.getType();
+	else
+	  ftype = Compilation.typeLocation;
+      }
+    else
+      ftype = (isIndirectBinding() ? Compilation.typeBinding
+	       : getType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {

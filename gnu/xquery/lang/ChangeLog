@@ -1,3 +1,14 @@
+2003-10-11  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (resolveQName, parserVariable):  New methods.
+	(parseMaybePrimaryExpr):  Use parseVariable for '$' VarName.
+	Set curToken before parseFLWRExpression.
+	(parseFLWRExpression):  Use parseVariable.
+	(parseFLWRExpression):  Use resolveQName and parseVariable.
+	(parse):  For 'declare variable' use parseVariable.
+	Check if 'local:' prefix and set privacy flag appropriately.
+	(parseTypeSwitch):  Update typeswitch syntax - handling of 'as'.
+
 2003-10-09  Per Bothner  <per@bothner.com>
 
 	* XQParser.java	(parseFLWRExpression/3):  Inline into single caller.

@@ -1927,25 +1927,23 @@ public class XQParser extends LispReader // should be extends Lexer
     Object varName = null;
     Vector vec = new Vector();
     vec.addElement(selector);
-    if (match("as"))
-      {
-	getRawToken();
-	if (curToken == '$')
-	  {
-	    getRawToken();
-	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-	      varName
-		= new String(tokenBuffer, 0, tokenBufferLength).intern();
-	  }
-	if (varName == null)
-	  return syntaxError("missing Variable after 'as' clause");
-	getRawToken();
-      }
-    String argName = varName == null ? "$arg$" : varName.toString();
+    Object argName;
     while (match("case"))
       {
 	pushNesting('c');
 	getRawToken();
+	argName = "(arg)";
+	if (curToken == '$')
+	  {
+	    argName = parseVariable();
+	    if (argName == null)
+	      return syntaxError("missing Variable after '$'");
+	    getRawToken();
+	    if (match("as"))
+	      getRawToken();
+	    else
+	      error('e', "missing 'as'");
+	  }
 	Expression caseType = parseDataType();
 	popNesting('t');
 	LambdaExp lexp = new LambdaExp(1);
@@ -1964,7 +1962,16 @@ public class XQParser extends LispReader // should be extends Lexer
 	parser.pop(lexp);
 	vec.addElement(lexp);
       }
+    argName = "(arg)";
+    if (curToken == '$')
+      {
+	argName = parseVariable();
+	if (argName == null)
+	  return syntaxError("missing Variable after '$'");
+	getRawToken();
+      }
     LambdaExp lexp = new LambdaExp(0);
+    Declaration decl = lexp.addDeclaration(argName,  Type.pointer_type);
     if (match("default"))
       {
 	getRawToken();
@@ -2094,25 +2101,18 @@ public class XQParser extends LispReader // should be extends Lexer
     */
     else if (token == '$')
       {
-	int next = peek();
-	if (next < 0 || Character.isWhitespace((char) next))
-	  return syntaxError("missing name after variable-name operator '$'");
-	getRawToken();
-	/*
-	token = peekOperand();
-	if (start != tokenStart || token != QNAME_TOKEN)
-	  emit(curValue);
-	exp = new QuoteExp(???);
-	*/
-	String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
+	Symbol name = parseVariable();
+	if (name == null)
+	  return syntaxError("missing Variable");
 	Declaration decl = parser.lookup(name, -1);
 	exp = null;
-	if (decl == null)
+	if (decl == null && prevPrefix == null)
 	  {
-	    if (name == "request")
+	    String sname = name.getName();
+	    if ("request".equals(sname))
 	      exp = makeFunctionExp("gnu.kawa.servlet.GetRequest",
 				    "getRequest");
-	    if (name == "response")
+	    if ("response".equals(sname))
 	      exp = makeFunctionExp("gnu.kawa.servlet.GetResponse",
 				    "getResponse");
 	    if (exp != null)
@@ -2233,6 +2233,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    if (forOrLet < 0)
 	      return syntaxError("invalid syntax - variable following name");
+	    curToken = '$';
 	    exp = parseFLWRExpression(forOrLet > 0);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn - 3);
@@ -2367,23 +2368,63 @@ public class XQParser extends LispReader // should be extends Lexer
     return true;
   }
 
+  String prevPrefix;
+
+  /** Extract a Symbol from the current NCNAME_TOKEN or QNAME_TOKEN.
+    * Returns a Symbol or null if curToken is neither.
+   */
+  public Symbol resolveQName (String defaultNamespace)
+      throws java.io.IOException, SyntaxException
+  {
+    prevPrefix = null;
+    String local, uri;
+    if (curToken == QNAME_TOKEN)
+      {
+	int colon = tokenBufferLength;
+	while (tokenBuffer[--colon] != ':') ;
+	String prefix = new String(tokenBuffer, 0, colon);
+	prevPrefix = prefix;
+	colon++;
+	local = new String(tokenBuffer, colon, tokenBufferLength - colon);
+	uri = (String) namespaces.get(prefix);
+	if (uri == null)
+	  syntaxError("unknown namespace '" + prefix + "'");
+      }
+    else if (curToken == NCNAME_TOKEN)
+      {
+	local = new String(tokenBuffer, 0, tokenBufferLength);
+	uri = defaultNamespace;
+      }
+    else
+      return null;
+    return Symbol.make(uri, local);
+  }
+
+  /** Parse a Variable. */
+  public Symbol parseVariable ()
+      throws java.io.IOException, SyntaxException
+  {
+    if (curToken == '$')
+      getRawToken();
+    else
+      syntaxError("missing '$' before variable name");
+    return resolveQName("");
+  }
+
   /** Parse a let- or a for-expression.
    * Assume the 'let'/'for'-token has been seen, and we've read '$'. */
   public Expression parseFLWRExpression (boolean isFor)
       throws java.io.IOException, SyntaxException
   {
     char saveNesting = pushNesting(isFor ? 'f' : 'l');
-    getRawToken();
-    String name;
-    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-      name = new String(tokenBuffer, 0, tokenBufferLength).intern();
-    else
+    Symbol name = parseVariable();
+    if (name == null)
       return syntaxError("missing Variable token:"+curToken);
     getRawToken();
     
     ScopeExp sc;
     Expression[] inits = new Expression[1];
-    String posVar = null;
+    Object posVar = null;
     if (isFor)
       {
 	boolean sawAt = match("at");
@@ -2392,15 +2433,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    getRawToken();
 	    if (curToken == '$')
-	      getRawToken();
-	    else
-	      syntaxError("missing '$'");
-	    // FIXME handle QNAME_TOKEN
-	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-	      posVar = new String(tokenBuffer, 0, tokenBufferLength).intern();
-	    else
-	      return syntaxError("missing Variable");
-	    getRawToken();
+	      {
+		posVar = parseVariable();
+		getRawToken();
+	      }
+	    if (posVar == null)
+	      syntaxError("missing Variable");
 	  }
 	sc = lexp;
 	if (match("in"))
@@ -2443,8 +2481,8 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression body;
     if (curToken == ',')
       {
-	int next = skipSpace();
-	if (next != '$')
+	getRawToken();
+	if (curToken != '$')
 	  return syntaxError("missing $NAME after ','");
 	body = parseFLWRExpression(isFor);
       }
@@ -2500,28 +2538,11 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
-    boolean isLocal = false;
     String local, uri;
-    if (curToken == QNAME_TOKEN)
-      {
-	int colon = tokenBufferLength;
-	while (tokenBuffer[--colon] != ':') ;
-	String prefix = new String(tokenBuffer, 0, colon);
-	isLocal = prefix.equals("local");
-	colon++;
-	local = new String(tokenBuffer, colon, tokenBufferLength - colon);
-	uri = (String) namespaces.get(prefix);
-	if (uri == null)
-	  syntaxError("unknown namespace '" + prefix + "'");
-      }
-    else if (curToken == NCNAME_TOKEN)
-      {
-	local = new String(tokenBuffer, 0, tokenBufferLength);
-	uri = defaultFunctionNamespace;
-      }
-    else
+    Object name = resolveQName(defaultFunctionNamespace);
+    if (name == null)
       return syntaxError("missing function name");
-    Object name = Symbol.make(uri, local);
+    boolean isLocal = "local".equals(prevPrefix);
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -2548,14 +2569,11 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	for (;;)
 	  {
-	    if (curToken != '$')
-	      error("missing '$' before parameter name");
+	    Symbol pname = parseVariable();
+	    if (pname == null)
+	      error("missing parameter name");
 	    else
-	      getRawToken();
-	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
 	      {
-		String pname
-		  = new String(tokenBuffer, 0, tokenBufferLength).intern();
 		Declaration param = lexp.addDeclaration(pname);
 		parser.push(param);
 		getRawToken();
@@ -2567,8 +2585,6 @@ public class XQParser extends LispReader // should be extends Lexer
 		else if (paramType != null)
 		  error('w', "parameter type too complex");
 	      }
-	    else
-	      error("missing parameter name");
 	    if (curToken == ')')
 	      break;
 	    if (curToken != ',')
@@ -2669,21 +2685,33 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     if (curToken == DECLARE_VARIABLE_TOKEN)
       {
-	String name;
 	getRawToken();
-	if (curToken == '$')
-	  getRawToken();
-	else
-	  syntaxError("missing '$'");
-	if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-	  name = new String(tokenBuffer, 0, tokenBufferLength).intern();
-	else
+	Symbol name = parseVariable();
+	if (name == null)
 	  return syntaxError("missing Variable");
 	getRawToken();
 	Expression type = parseOptionalTypeDeclaration();
 	Declaration decl = parser.currentScope().addDeclaration(name);
 	parser.push(decl);
+	if ("local".equals(prevPrefix))
+	  {
+	    decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+	    decl.setPrivate(true);
+	  }
+	else
+	  {
+	    decl.setCanRead(true);
+	    //decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
+	  }
+	decl.setFlag(Declaration.IS_CONSTANT);
 	Expression init = null;
+	boolean sawEq = false;
+	if (curToken == OP_EQU || curToken == COLON_EQUAL_TOKEN)
+	  {
+	    error("declare variable should not use '=' or ':=' - skipped");
+	    getRawToken();
+	    sawEq = true;
+	  }
 	if (curToken == '{')
 	  {
 	    init = parseEnclosedExpr();
@@ -2695,15 +2723,17 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  {
-	    error('e', "expected {expression} or external");
-	    if (curToken == OP_EQU || curToken == COLON_EQUAL_TOKEN)
-	      getRawToken();
 	    // This leave curToken pointing at the token *following* the
 	    // expression, but parse is not supposed to read ahead like that.
 	    // Luckily, this is only a problem in the error recovery case,
 	    // when it is usually harmless.  We could fix it by supressing
 	    // the getRawToken in parseMaybePrimaryExpr, which is non-trivial.
 	    init = parseMaybePrimaryExpr();
+	    Expression err = null;
+	    if (! sawEq || init == null)
+	      err = syntaxError("expected {expression} or external");
+	    if (init == null)
+	      init = err;
 	  }
 	SetExp sexp = new SetExp(decl, init);
 	sexp.setDefining(true);
@@ -2780,6 +2810,7 @@ public class XQParser extends LispReader // should be extends Lexer
  	ModuleExp module = parser.getModule();
 	Vector forms = new Vector();
 	Type type = gnu.expr.Interpreter.string2Type(uri);
+	System.err.println("import uri:"+uri+" type"+type);
 	kawa.standard.require.importDefinitions(type, uri, forms, module, parser);
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);

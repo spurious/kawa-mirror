@@ -104,10 +104,29 @@ public class PrettyWriter extends java.io.Writer
    * to output the buffer. The length is stored in the logical block stack. */
   char[] suffix = new char[initialBufferSize];
 
+  // We have a queue of pending operations.  This is primarily stored
+  // in the circular buffer queueInts.  There are different kinds of
+  // operation types, and each operation can require a variable number
+  // of elements in the buffer, depending on the operation type.  Given
+  // an operation at 'index', the type operation type code is
+  // 'getQueueType(index)' (one of the QUEUED_OP_XXX_TYPE macros
+  // below), and the number of elements in the buffer is
+  // 'getQueueSize(index)' (one of the QUEUED_OP_XXX_SIZE values
+  // below).  You can think of the various QUEUED_OP_XXX_TYPEs as
+  // "sub-classes" of queued operations, but instead of creating
+  // actual Java objects, we allocate the objects' fields in the
+  // queueInts and QueueStrings arrays, to avoid expensive object
+  // allocation.  The special QUEUED_OP_NOP_TYPE is a used as a
+  // marker for when there isn't enough space in the rest of buffer,
+  // so we have to wrap around to the start.  The other QUEUED_OP_XXX
+  // macros are the offsets of the various "fields" relative to the
+  // start index.
+      
   static final int QUEUE_INIT_ALLOC_SIZE = 300; // FIXME
   int[] queueInts = new int[QUEUE_INIT_ALLOC_SIZE];
   /** For simplicity, queueStrings is the same size as queueInts. */
   String[] queueStrings = new String[QUEUE_INIT_ALLOC_SIZE];
+  /** Index in queueInts and queueStrings of oldest enqueued operation. */
   int queueTail;
   /** Number of elements (in queueInts and queueStrings) in use. */
   int queueSize;
@@ -125,7 +144,7 @@ public class PrettyWriter extends java.io.Writer
 
   /** A dummy queue item used at the high end of the queue buffer
    * when there isn't enough space for the needed queue item. */
-  static final int QUEUED_OP_DUMMY_TYPE = 0;
+  static final int QUEUED_OP_NOP_TYPE = 0;
 
   /** "Abstract" type for beginning of section.
    * A section is from a block-start to a newline, from a newline to
@@ -413,7 +432,7 @@ public class PrettyWriter extends java.io.Writer
     int oldLength = queueInts.length;
     int endAvail = oldLength - queueTail - queueSize;
     if (endAvail > 0 && size > endAvail)
-      enqueue (QUEUED_OP_DUMMY_TYPE, endAvail);
+      enqueue (QUEUED_OP_NOP_TYPE, endAvail);
     if (queueSize + size > oldLength)
       {
 	int newLength = enoughSpace(oldLength, size);
@@ -593,7 +612,7 @@ public class PrettyWriter extends java.io.Writer
       return colinc - (column - origin) % colinc;
   }
 
-  int indexColumn(int index) // DONE
+  int indexColumn(int index)
   {
     int column = bufferStartColumn;
     int sectionStart = getSectionColumn();
@@ -602,22 +621,22 @@ public class PrettyWriter extends java.io.Writer
     int todo = queueSize;
     while (todo > 0)
       {
-	// If at end of queueInt, or it's a 1-word QUEUED_OP_DUMMY_TYPE, skip.
-	if (op >= queueInts.length - 1)
+	// If at end of queueInts, skip.
+	if (op >= queueInts.length)
 	  op = 0;
-	int posn = queueInts[op + QUEUED_OP_POSN];
-	if (posn >= endPosn)
-	  break;
 	int type = getQueueType(op);
-	if (type == QUEUED_OP_TAB_TYPE)
+	if (type != QUEUED_OP_NOP_TYPE)
 	  {
-	    column += computeTabSize(op, sectionStart,
-				     column + posnIndex (posn));
-	  }
-	else if (type == QUEUED_OP_NEWLINE_TYPE
-		 || type == QUEUED_OP_BLOCK_START_TYPE)
-	  {
-	    sectionStart = column + posnIndex(queueInts[op + QUEUED_OP_POSN]);
+	    int posn = queueInts[op + QUEUED_OP_POSN];
+	    if (posn >= endPosn)
+	      break;
+	    if (type == QUEUED_OP_TAB_TYPE)
+	      column += computeTabSize(op, sectionStart,
+				       column + posnIndex (posn));
+	    else if (type == QUEUED_OP_NEWLINE_TYPE
+		     || type == QUEUED_OP_BLOCK_START_TYPE)
+	      sectionStart
+		= column + posnIndex(queueInts[op + QUEUED_OP_POSN]);
 	  }
 	int size = getQueueSize(op);
 	todo -= size;
@@ -973,6 +992,15 @@ public class PrettyWriter extends java.io.Writer
   {
     int fillPtr = bufferFillPointer;
     int tail = queueTail;
+    while (queueSize > 0 && getQueueType(tail) == QUEUED_OP_NOP_TYPE)
+      {
+	int size = getQueueSize(tail);
+	queueSize -= size;
+	tail += size;
+	if (tail == queueInts.length)
+	  tail = 0;
+	queueTail = tail;
+      }
     int count = queueSize > 0 ? posnIndex (queueInts[tail + QUEUED_OP_POSN])
       : fillPtr;
     int newFillPtr = fillPtr - count;
@@ -997,9 +1025,7 @@ public class PrettyWriter extends java.io.Writer
     maybeOutput(false);
     expandTabs(-1);
     //System.err.println("{FORCED:"+bufferFillPointer+"}");
-    bufferStartColumn = getColumnNumber();
     out.write(buffer, 0, bufferFillPointer);
-    bufferFillPointer = 0;
     //System.err.println("FLUSH: depth:"+blockDepth+" preLen:"+getPrefixLength()+" col:"+bufferStartColumn);
   }
 
@@ -1090,10 +1116,19 @@ public class PrettyWriter extends java.io.Writer
 	    out.print("(block-end)");  break;
 	  case QUEUED_OP_TAB_TYPE:  out.print("(tab)");
 	    break;
+	  case QUEUED_OP_NOP_TYPE:
+	    out.print("(nop)");  break;
 	  }
 	out.print(" size:");  out.print(size);
 	out.print(";  @");  out.print(start+QUEUED_OP_POSN);
-	out.print(": posn:");  out.println(queueInts[start+QUEUED_OP_POSN]);
+	if (type != QUEUED_OP_NOP_TYPE)
+	  {
+	    out.print(": posn:");
+	    int posn = queueInts[start+QUEUED_OP_POSN];
+	    out.print(posn);
+	    out.print(" index:");
+	    out.println(posnIndex(posn));
+	  }
 	if (type == QUEUED_OP_NEWLINE_TYPE
 	    || type == QUEUED_OP_BLOCK_START_TYPE)
 	    

@@ -452,6 +452,8 @@ public class InPort extends FilterInputStream implements Printable
       }
     if (c >= 0)
       unreadChar();
+    if (sign == '-')
+      value = -value;
     return value;
   }
 
@@ -503,7 +505,7 @@ public class InPort extends FilterInputStream implements Printable
     if (c == '@')
       {
 	Quantity im = readSchemeReal (readChar(), radix, exactness);
-	return Quantity.add (num, Quantity.mul (im, Complex.imOne), 1);
+	return Quantity.add (num, Quantity.mul (im, Complex.imOne()), 1);
       }
     else if (c == '+')
       {
@@ -530,7 +532,7 @@ public class InPort extends FilterInputStream implements Printable
   public Quantity readSchemeReal(int c, int radix, char exactness)
        throws java.io.IOException, ReadError
   {
-    boolean isFloat = false;
+    int isFloat = 0;  // 1 if seen '.'; 2 if seen exponent
     StringBuffer str = new StringBuffer(20);
     if (c=='+')
       {
@@ -547,51 +549,31 @@ public class InPort extends FilterInputStream implements Printable
     boolean imaginary = false;
     for (;;)
       {
+	int next;
 	if (Character.digit ((char)c, radix) >= 0)
 	  digits++;
-	else if (radix == 10
-		 && (Character.isLowerCase ((char)c)
-		     || Character.isUpperCase ((char)c)))
-	  {
-	    String word = readAlphaWord (c);
-	    if (word.length() == 1)
-	      c = Character.toLowerCase ((char)c);
-	    else
-	      c = 0;
-	    int next;
-	    if ((c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l')
-		&& ((next = peekChar()) == '+' || next == '-'
-		    || Character.digit((char)next, 10) >= 10))
-	      {
-		c = 'e';
-		isFloat = true;
-	      }
-	    else if (c == 'i')
-	      {
-		imaginary = true;
-		c = readChar();
-		break;
-	      }
-	    else
-	      {
-		unit = Unit.lookup (word);
-		if (unit == null)
-		  throw new ReadError (this, "unknown unit: " + word);
-		int power = readOptionalExponent();
-		if (power != 1)
-		  unit = Unit.pow (unit, power);
-		c = readChar();
-		if (exactness != 'e')
-		  isFloat = true;
-		break;
-	      }
-	  }
 	else if (c == '.')
-	  isFloat = true;
+	  {
+	    if (isFloat > 0)
+	      throw new ReadError (this, "unexpected '.' in number");
+	    isFloat = 1;
+	  }
+	else if (radix == 10 && isFloat < 2
+		 && (c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l'||
+		     c == 'E' || c == 'S' || c == 'F' || c == 'D' || c == 'L')
+		 && ((next = peekChar()) == '+' || next == '-'
+		     || Character.digit((char)next, 10) >= 0))
+	  {
+	    isFloat = 2;
+	    str.append('e');
+	    str.append(readOptionalExponent());
+	    c = readChar();
+	    break;
+	  }
 	else // catches EOF
 	  break;
-	str.append ((char) c);
-	c = readChar ();
+	str.append((char) c);
+	c = readChar();
       }
     if (digits == 0)
       throw new ReadError (this, "number constant with no digits");
@@ -601,16 +583,45 @@ public class InPort extends FilterInputStream implements Printable
 	if (Character.digit ((char)c, radix) < 0)
 	  throw new ReadError (this,"\"/\" in rational not followed by digit");
 	Numeric denominator = readSchemeReal(readChar(), radix, 'e');
-	if (isFloat || ! (denominator instanceof IntNum))
+	if (isFloat > 0 || ! (denominator instanceof IntNum))
 	  throw new ReadError (this, "invalid fraction");
 	return RatNum.make (IntNum.valueOf(str.toString (), radix),
 			    (IntNum) denominator);
+      }
+    
+    while (radix == 10
+	   && (Character.isLowerCase ((char)c)
+	       || Character.isUpperCase ((char)c)))
+      {
+	String word = readAlphaWord (c);
+	if (word.length() == 1 && (c == 'i' || c == 'I'))
+	  {
+	    imaginary = true;
+	    c = readChar();
+	    break;
+	  }
+	else
+	  {
+	    Unit u = Unit.lookup (word);
+	    if (u == null)
+	      throw new ReadError (this, "unknown unit: " + word);
+	    int power = readOptionalExponent();
+	    if (power != 1)
+	      u = Unit.pow (u, power);
+	    if (unit == null)
+	      unit = u;
+	    else
+	      unit = Unit.mul(unit, u);
+	    c = readChar();
+	    if (exactness != 'e')
+	      isFloat = 1;
+	  }
       }
     if (c >= 0)
       unreadChar();
 
     RealNum rnum;
-    if (!isFloat && exactness != 'i')
+    if (isFloat == 0 && exactness != 'i')
       rnum = IntNum.valueOf(str.toString (), radix);
     else
       {

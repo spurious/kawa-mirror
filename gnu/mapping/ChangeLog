@@ -1,3 +1,14 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (threadMap):  New static Hashtable field.
+	(getInstanceForCurrentThread, getInstance, setInstance):
+	New static methods.
+	* CpsProcedure.java (applyN):  Use (or create) CallContext associated
+	with this thread.
+
+	* Future.java (context):  New CallContext field.
+	(getCallContext, setCallContext):  New methods.
+
 2002-01-07  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (beginDocument, endDocument):  New methods.

@@ -1,12 +1,49 @@
  package gnu.mapping;
 import gnu.math.*;
 import gnu.lists.*;
+import java.util.Hashtable;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
 public class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
+  static Hashtable threadMap = new Hashtable(50);
+
+  /** Get or create a CallContext for the current thread. */
+  public static CallContext getInstanceForCurrentThread()
+  {
+    Thread thread = Thread.currentThread();
+    CallContext ctx = getInstance(thread);
+    if (ctx == null)
+      {
+	ctx = new CallContext();
+	setInstance(thread, ctx);
+      }
+    return ctx;
+  }
+
+  /** Get the CallContext associated with the current thread.
+      Return null if no CallContext has been associated with this thread. */
+  public static final CallContext getInstance(Thread thread)
+  {
+    if (thread instanceof Future)
+      return ((Future) thread).getCallContext();
+    else
+      return  (CallContext) threadMap.get(thread);
+  }
+
+  /** Set the CallContext associated with the current thread. */
+  public static final void setInstance(Thread thread, CallContext ctx)
+  {
+    if (thread instanceof Future)
+      ((Future) thread).setCallContext(ctx);
+    else if (ctx == null)
+      threadMap.remove(thread);
+    else
+      threadMap.put(thread, ctx);
+  }
+
   public Procedure proc;
 
   /* CPS: ??

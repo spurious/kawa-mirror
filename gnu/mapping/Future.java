@@ -4,6 +4,7 @@ public class Future extends Thread
 {
   Object result;
   Future parent;
+  CallContext context;
 
   public FluidBinding fluidBindings;
 
@@ -51,6 +52,13 @@ public class Future extends Thread
       
     environment = parent_env;
   }
+
+  /** Get the CallContext we use for this Thread. */
+  public final CallContext getCallContext() { return context; }
+
+  /** Set the CallContext we use for this Thread. */
+  public final void setCallContext(CallContext context)
+  { this.context = context; }
 
   public void run ()
   {

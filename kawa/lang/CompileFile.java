@@ -33,43 +33,22 @@ public class CompileFile extends Procedure2
   public static final LambdaExp read (InPort port, Environment env)
        throws GenericError
   {
-    Interpreter interpreter = env.getInterpreter ();
-
-    List body = List.Empty;
-    Pair last = null;
-
-    for (;;)
+    List body;
+    try
       {
-	Object obj;
-	try
-	  {
-	    obj = port.readSchemeObject ();
-	    if (obj == Sequence.eofValue)
-	      {
-		port.close ();
-		break;
-	      }
-	  }
-	catch (ReadError e)
-	  {
-	    // The '\n' is because a ReadError includes a line number,
-	    // and it is better if that starts the line.
-	    throw new GenericError ("read error reading file:\n" + e.toString ());
-	  }
-	catch (java.io.IOException e)
-	  {
-	    throw new GenericError ("I/O exception reading file: " + e.toString ());
-	  }
-	Pair cur = new Pair (obj, List.Empty);
-	if (last == null)
-	  body = cur;
-	else
-	  last.cdr = cur;
-	last = cur;
-
+	body = port.readListBody ();
       }
-
-    LambdaExp lexp = new LambdaExp (ModuleBody.formals, body, interpreter);
+    catch (ReadError e)
+      {
+	// The '\n' is because a ReadError includes a line number,
+	// and it is better if that starts the line.
+	throw new GenericError ("read error reading file:\n" + e.toString ());
+      }
+    catch (java.io.IOException e)
+      {
+	throw new GenericError ("I/O exception reading file: " + e.toString ());
+      }
+    LambdaExp lexp = new LambdaExp (body, env);
     lexp.filename = port.getName ();
     return lexp;
   }

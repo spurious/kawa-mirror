@@ -112,6 +112,11 @@ public class LambdaExp extends ScopeExp
     pop (interp);
   }
 
+  public LambdaExp (List body, Environment env)
+  {
+    this (ModuleBody.formals, body, env.interpreter());
+  }
+
   /** If non-null, this is the Field that contains the static link. */
   Field staticLinkField;
 

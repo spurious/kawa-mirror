@@ -154,7 +154,15 @@ public class InPort extends FilterInputStream implements Printable
 	else
 	  save_start = linestart;
 
-	int avail = in.available ();
+	int avail;
+	try
+	  {
+	    avail = in.available ();
+	  }
+	catch (java.io.IOException ex)
+	  {
+	    avail = 0;
+	  }
 	if (buffer == null)
 	  buffer = new byte[avail >= 1024 ? 1024 : 256];
 	else
@@ -280,10 +288,15 @@ public class InPort extends FilterInputStream implements Printable
   Symbol readSymbol ()
        throws java.io.IOException, ReadError
   {
+    return readSymbol (readChar ());
+  }
+
+  Symbol readSymbol (int c)
+       throws java.io.IOException, ReadError
+  {
     StringBuffer str = new StringBuffer (30);
     for (;;)
       {
-	int c = readChar ();
 	if (c < 0)
 	  break;
 	char ch = (char)c;
@@ -303,6 +316,7 @@ public class InPort extends FilterInputStream implements Printable
 	else
 	  ch = Character.toLowerCase (ch);
 	str.append (ch);
+	c = readChar ();
       }
     return Symbol.make (str.toString ());
   }
@@ -320,8 +334,7 @@ public class InPort extends FilterInputStream implements Printable
     int origc = c;
     if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
       {
-	unreadChar ();
-	Symbol name = readSymbol ();
+	Symbol name = readSymbol (c);
         int i = Char.charNames.length; 
         for ( ; ; ) {
            if (--i < 0) {
@@ -356,8 +369,12 @@ public class InPort extends FilterInputStream implements Printable
   public Numeric readSchemeNumber(int radix, char exactness)
        throws java.io.IOException, ReadError
   {
-    int c = readChar();
+    return readSchemeNumber (readChar(), radix, exactness);
+  }
 
+  public Numeric readSchemeNumber(int c, int radix, char exactness)
+       throws java.io.IOException, ReadError
+  {
     while (c == '#')
       {
 	c = readChar();
@@ -444,6 +461,7 @@ public class InPort extends FilterInputStream implements Printable
     int c;
     do
       {
+	int next, v;
 	c = readChar();
 	switch (c)
 	  {
@@ -453,18 +471,60 @@ public class InPort extends FilterInputStream implements Printable
 	  case '\\':
 	    switch (c = readChar())
 	      {
+	      case 'a':  c = '\007';  break;
+	      case 'b':  c = '\b';    break;
+	      case 'f':  c = '\f';    break;
+	      case 'n':  c = '\n';    break;
+	      case 'r':  c = '\r';    break;
+	      case 't':  c = '\t';    break;
+	      case 'v':  c = '\013';  break;
+
+	      case 'u':
+		c = 0;
+		for (int i = 4;  --i >= 0; )
+		  {
+		    v = readChar ();
+		    if (v < 0)
+		      throw new EofReadError (this,
+					      "premature EOF in \\u escape");
+		    v = Character.digit ((char) v, 16);
+		    if (v < 0)
+		      throw new ReadError (this,
+					   "non-hex character following \\u");
+		    c = 16 * c + v;
+		  }
+		break;
+	      case '0':  case '1':  case '2':  case '3':
+	      case '4':  case '5':  case '6':  case '7':
+		c = Character.digit ((char) c, 8);
+		if ((next = readChar ()) >= 0)
+		  {
+		    if ((v = Character.digit ((char) next, 8)) < 0)
+		      unreadChar ();
+		    else
+		      {
+			c = c * 8 + v;
+			if ((next = readChar ()) >= 0)
+			  {
+			    if ((v = Character.digit ((char) next, 8)) >= 0)
+			      c = c * 8 + v;
+			    else
+			      unreadChar ();
+			  }
+		      }
+		  }
+		break;
+	      case '\n':  continue;
 	      case '"':
 	      case '\\':
-		obj.append ((char) c);
 		break;
 	      default:
 		if (c < 0)
 		  throw new EofReadError (this,
 					  "unexpected EOF in string literal");
-		obj.append ('\\');
-		obj.append ((char)c);
-		break;
+		throw new ReadError (this, "bad string escape");
 	      }
+	    obj.append ((char) c);
             break;
 	  default:
 	    if (c < 0)
@@ -509,66 +569,78 @@ public class InPort extends FilterInputStream implements Printable
     unreadChar ();
   }
 
+  /** Read a list (possibly improper) of zero or more Scheme forms.
+   * Assumes '(' has been read.  Does not read the final ')'.
+   */
+  protected List readListBody ()
+       throws java.io.IOException, ReadError
+  {
+    Pair last = null;
+    List list = List.Empty;
+
+    for (;;)
+      {
+	skipWhitespaceAndComments();
+	int c = peekChar ();
+	if (c == ')' || c < 0)
+	  break;
+	skipChar ();
+	if (c == '.')
+	  {
+	    int next = peekChar ();
+	    if (next < 0)
+	      throw new EofReadError (this, ". followed by EOF");
+	    if (Character.isSpace((char)next))
+	      {
+		if (last == null)
+		  throw new ReadError (this, ". at start of list");
+		//-- Read the cdr for the Pair
+		Object cdr = readSchemeObject ();
+		skipWhitespaceAndComments();
+		if (peekChar () != ')')
+		  throw new ReadError (this, ". OBJECT not followed by )");
+		last.cdr = cdr;
+		return list;
+	      }
+	  }
+
+	int line = getLineNumber ();
+	int column = getColumnNumber ();
+
+	Object car = readSchemeObject (c);
+	PairWithPosition pair = new PairWithPosition (this, car, List.Empty);
+	pair.setLine (line, column);
+	pair.setFile (getName ());
+	if (last == null)
+	  list = pair;
+	else
+	  last.cdr = pair;
+	last = pair;
+      }
+    return list;
+  }
+
   protected List readList ()
        throws java.io.IOException, ReadError
   {
-    skipWhitespaceAndComments();
-    //-- null Primitive
-    int c;
-    if ((c = peekChar())==')')
-      {
-	skipChar ();
-	return List.Empty;
-      }
-
-    int line = getLineNumber ();
-    int column = getColumnNumber ();
-    
-    //-- Car of the list
-    Object car = readSchemeObject ();
-    Object cdr = Interpreter.nullObject;
-    skipWhitespaceAndComments();
-
-    c = readChar ();
+    List list = readListBody ();
+    int c = readChar ();
     if (c < 0)
-      throw new EofReadError (this, "unexpected EOF in list");
-    if (c != ')')
-      {
-	int next;
-	if (c == '.'
-	    && (next = peekChar ()) >= 0
-	    && Character.isSpace((char)next))
-	  {
-	    //-- Read the cdr for the Pair
-	    cdr = readSchemeObject ();
-	    skipWhitespaceAndComments();
-	    if (readChar ()!=')')
-	      throw new ReadError (this, "Malformed list.");
-	  }
-	else
-	  {
-	    //-- Read the read of the list
-	    unreadChar ();
-	    cdr = readList();
-	  }           
-      }
-    // if (???) return new Pair (car, cdr);
-    // else  FIXME
-    {
-      PairWithPosition pair = new PairWithPosition (this, car, cdr);
-      pair.setLine (line, column);
-      pair.setFile (getName ());
-      return pair;
-    }
+	throw new EofReadError (this, "unexpected EOF in list");
+    return list;
   }
 
   public Object readSchemeObject ()
       throws java.io.IOException, ReadError
   {
-    int c, next;
-    while (true)
+    return readSchemeObject (readChar ());
+  }
+  public Object readSchemeObject (int c)
+      throws java.io.IOException, ReadError
+  {
+    for (;;)
       {
-	c = readChar ();
+	int next;
 	while (Character.isSpace((char)c))
 	  c = readChar ();
 	switch (c)
@@ -603,14 +675,15 @@ public class InPort extends FilterInputStream implements Printable
 	    else
 	      func = Interpreter.unquote_sym;
 	    return readQuote (func);
+	  case '.':
 	  case '+':
 	  case '-':
 	    next = peekChar ();
-	    unreadChar ();
-	    if (Character.isDigit((char) next))
-	      return readSchemeNumber(0, ' ');
+	    if (Character.isDigit((char) next)
+		 || (c != '.' && next == '.'))
+	      return readSchemeNumber(c, 0, ' ');
 	    else
-	      return readSymbol();
+	      return readSymbol(c);
 	  case '#':
 	    next = readChar();
 	    switch (next)
@@ -649,12 +722,12 @@ public class InPort extends FilterInputStream implements Printable
 	      }
             break;
 	  default:
-	    unreadChar ();
 	    if (Character.isDigit((char)c))
-	      return readSchemeNumber(0, ' ');
+	      return readSchemeNumber(c, 0, ' ');
 	    else
-	      return readSymbol();
+	      return readSymbol(c);
 	  }
+	c = readChar ();
       }
   }
 

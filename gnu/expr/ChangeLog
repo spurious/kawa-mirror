@@ -1,3 +1,7 @@
+2003-03-28  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (define_method):  New method.
+
 2003-03-15  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (pushIndirectBinding):  Update to use named

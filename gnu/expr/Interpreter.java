@@ -1,10 +1,11 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
+import gnu.bytecode.Method;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
@@ -198,6 +199,20 @@ public abstract class Interpreter
   public void define(String sym, Object p)
   {
     environ.define (sym, p);
+  }
+
+  /** Enter a function into the current environment.
+   * The function is implemented using a static method.
+   * @param name the language-level name of the function.
+   * @param cname the fully-qualified name of the class containing the method.
+   * @param mname the name of the static method.
+   * @param nargs the number of parameter taken by the method.
+   */
+  protected void define_method(String name, String cname,
+			       String mname, int nargs)
+  {
+    Method meth = ClassType.make(cname).getDeclaredMethod(mname, nargs);
+    environ.define(name, new PrimProcedure(meth));
   }
 
   protected void define_field (String name, String cname, String fname)

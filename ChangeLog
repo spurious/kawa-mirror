@@ -1,3 +1,11 @@
+Thu May 29 14:34:45 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/standard/apply.java (applyN):  Generalize to general sequences.
+	* kawa/standard/load.java.  Fix thinko.  (Reported by Jay Krell.)
+
+	* kawa/lang/PrimProcedure.java (string2Type):  Handle array types.
+	* kawa/lang/PrimApplyExp.java (compile):  Allow array return type.
+
 Mon May 26 12:11:52 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in, configure (VERSION):  Set to 1.5.

@@ -9,6 +9,8 @@ rename-file, create-diretory, and the variable home-directory.
 
 Fixed some small bugs, mainly in gnu.math and in load.
 
+Generalize apply to accept an arbitrary Sequence, or a primitive Java array.
+
 Changes from Kawa 1.2 to 1.4
 ============================
 The codegen package has been renamed gnu.bytecode.

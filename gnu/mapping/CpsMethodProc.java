@@ -18,11 +18,50 @@ public class CpsMethodProc extends CpsProcedure
     setName(name);
   }
 
+  public CpsMethodProc(CpsMethodContainer module, int selector,
+			String name, int numArgs, Object argTypes)
+  {
+    this.module = module;
+    this.selector = selector;
+    this.numArgs = numArgs;
+    setName(name);
+    this.argTypes = argTypes;
+  }
+
+  /*
+  protected void resolveParameterTypes()
+  {
+  }
+  */
+
   public int numArgs() { return numArgs; }
+
+  /*
+  public final int match (CallContext ctx, Object[] args)
+  {
+    ctx.setArgsN(args);
+    return modele.match(this, ctx);
+  }
+  */
 
   public void apply (CallContext context)
   {
     module.apply(this, context);
+    /*
+    int code = module.match(this, context);
+    if (code == 0)
+      module.apply(this, context);
+    else
+      {
+	int arg = (short) code;
+	code &= 0xffff0000;
+	if (code == NO_MATCH_TOO_FEW_ARGS || code == NO_MATCH_TOO_MANY_ARGS)
+	  throw new WrongArguments(this, context.count);
+	if (code != NO_MATCH_BAD_TYPE)
+	  arg = WrongType.ARG_UNKNOWN;
+	throw new WrongType(this, arg, null);
+      }
+    */
   }
 
   /** Helper methods for default CpsMethodContainer actions. */

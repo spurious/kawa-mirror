@@ -22,8 +22,7 @@ public class FluidConstraint extends Constraint
 
   FluidBinding find (Binding binding)
   {
-    Future context = Future.getContext();
-    FluidBinding fl = context.fluidBindings;
+    FluidBinding fl = Future.getFluids();
     for (; fl != null;  fl = fl.previous)
       {
 	if (fl.binding == binding)

@@ -9,6 +9,10 @@ import gnu.bytecode.Type;
 
 public abstract class MethodProc extends ProcedureN
 {
+  /** The parameter types.
+   * USually either an Type[] or a String encoding. */
+  protected Object argTypes;
+
   /** Test if method is applicable to an invocation with given arguments.
    * Returns -1 if no; 1 if yes; 0 if need to check at run-time. */
   public int isApplicable(Type[] argTypes)
@@ -43,9 +47,23 @@ public abstract class MethodProc extends ProcedureN
     return min + 1;
   }
 
+  static final Type[] unknownArgTypes = { Type.pointer_type };
+
+  /** Figure out or decode the parameter types, setting argTypes. */
+  protected void resolveParameterTypes()
+  {
+    argTypes = unknownArgTypes;
+  }
+
   public Type getParameterType(int index)
   {
-    return Type.pointer_type;
+    if (! (argTypes instanceof Type[]))
+      resolveParameterTypes();
+
+    Type[] atypes = (Type[]) argTypes;
+    if (index >= atypes.length)
+      index = atypes.length - 1;
+    return atypes[index];
   }
 
   /** Match the incoming arguments.

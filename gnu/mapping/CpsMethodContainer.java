@@ -9,4 +9,6 @@ package gnu.mapping;
 public interface CpsMethodContainer
 {
   public void apply(CpsMethodProc proc, CallContext context);
+
+  // public int match(CpsMethodProc proc, CallContext context);
 }

@@ -1,3 +1,13 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* Future.java (getFluids):  New method.
+	* FluidConstraint.java (find):  Use Future's new getFluids methods.
+
+	* MethodProc.java (argTypes):  New field.
+	(resolveParameterTypes):  New method.
+	(getParameterType):  Invoke resolveParameterTypes.
+	* CpsMethodProc.java (<init>): New overload sets argTypes.
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* Values.java (writeValues):  New static method.

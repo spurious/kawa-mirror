@@ -130,6 +130,30 @@ public class Future extends Thread
       defaultContext = new Future(null);
   }
 
+  /** Get chain of FluidBindings for the current thread (if a Future).
+   * Should fix to work with other threads. */
+
+  public static FluidBinding getFluids()
+  {
+    Thread thread = Thread.currentThread();
+    /*
+    for (;;)
+      {
+	if (thread instanceof Future)
+	  return ((Future)thread).fluidBindings;
+	FluidBinding fl = ....get(thread);
+	if (fl != null)
+	  return fl;
+	thread = thread.getParent();
+      }
+    */
+    if (thread instanceof Future)
+      return ((Future)thread).fluidBindings;
+    if (defaultContext == null)
+      getDefaultContext();
+    return defaultContext.fluidBindings;
+  }
+
   public static Future getContext ()
   {
     Thread thread = Thread.currentThread();

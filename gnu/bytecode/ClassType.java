@@ -281,6 +281,66 @@ public class ClassType extends ObjectType implements AttrContainer {
     return meth;
   }
 
+  /** Use reflection to add all the declared methods of this class.
+   * Does not add constructors nor private or package-private methods.
+   * Does not check for duplicate (already-known) methods.
+   * @param clas should be the same as getReflectClass(). */
+  public void addMethods(Class clas)
+  {
+    java.lang.reflect.Method[] methods;
+    try
+      {
+        methods = clas.getDeclaredMethods();
+      }
+    catch (SecurityException ex)
+      {
+        methods = clas.getMethods();
+      }
+    int count = methods.length;
+    System.err.println("addMethods("+clas+") #"+ count);
+    for (int i = 0;  i < count;  i++)
+      {
+        java.lang.reflect.Method method = methods[i];
+        if (! method.getDeclaringClass().equals(clas))
+          continue;
+        int modifiers = method.getModifiers();
+        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
+          continue;
+        Class[] paramTypes = method.getParameterTypes();
+        int j = paramTypes.length;
+        Type[] args = new Type[j];
+        while (--j >= 0)
+          args[j] = Type.make(paramTypes[j]);
+        addMethod(method.getName(), modifiers,
+                  args, Type.make(method.getReturnType()));
+      }
+  }
+
+  public Method[] getMatchingMethods(String name, Type[] paramTypes, int flags)
+  {
+    System.err.println(""+this+".getMatchingMethods("+name);
+    int i = getMethodCount();
+    int nMatches = 0;
+    java.util.Vector matches = new java.util.Vector(10);
+    for (Method method = methods;  method != null;  method = method.getNext())
+    {
+      if (! name.equals(method.getName()))
+        continue;
+      if ((flags & Access.STATIC) != (method.access_flags & Access.STATIC))
+        continue;
+      if ((flags & Access.PUBLIC) > (method.access_flags & Access.PUBLIC))
+        continue;
+      Type[] mtypes = method.arg_types;
+      if (mtypes.length != paramTypes.length)
+        continue;
+      nMatches++;
+      matches.addElement(method);
+    }
+    Method[] result = new Method[nMatches];
+    matches.copyInto(result);
+    return result;
+  }
+
   /** Do various fixups after generating code but before we can write it out.
    * This includes assigning constant pool indexes where needed,
    * finalizing labels, etc. */

@@ -168,11 +168,6 @@ public class ZipArchive
     return zmemb;
   }
 
-  public ZipMember append (byte[] name, byte[] contents) throws IOException
-  {
-    return append(new String(name, 0), contents);
-  }
-
   public ZipMember append (String name, byte[] contents) throws IOException
   {
     int len = name.length ();

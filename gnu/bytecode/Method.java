@@ -312,6 +312,12 @@ public class Method implements AttrContainer {
 
   public String toString()
   {
-    return getDeclaringClass() + "." + name + getSignature();
+    StringBuffer sbuf = new StringBuffer(100);
+    sbuf.append(getDeclaringClass());
+    sbuf.append(' ');
+    sbuf.append(name);
+    if (arg_types != null)
+      sbuf.append(getSignature());
+    return sbuf.toString();
   }
 };

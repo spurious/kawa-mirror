@@ -74,6 +74,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   boolean unreachable_here;
   /** True if control could reach here. */
   public boolean reachableHere () { return !unreachable_here; }
+  public final void setReachable(boolean val) { unreachable_here = !val; }
+  public final void setUnreachable() { unreachable_here = true; }
 
   /** Get the maximum number of words on the operand stack in this method. */
   public int getMaxStack() { return max_stack; }
@@ -638,7 +640,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /** Compile code to allocate a new array.
-   * The size shold have been already pushed on the stack.
+   * The size should have been already pushed on the stack.
    * @param type type of the array elements
    */
   public void emitNewArray (Type element_type, int dims)
@@ -663,7 +665,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	emitNewArray(code);
       }
-    else if (element_type instanceof ClassType)
+    else if (element_type instanceof ObjectType)
       {
 	reserve(3);
 	put1(189); // anewarray

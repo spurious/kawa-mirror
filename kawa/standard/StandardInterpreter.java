@@ -242,17 +242,11 @@ public class StandardInterpreter extends Interpreter
       //-- (unless cond exp ...)
       syn = new kawa.standard.unless();
       define(syn.name,syn);
-      //-- (and obj ...)
-      proc = new kawa.standard.and();
-      define(proc.name,proc);
-      //-- (or obj ...)
-      proc = new kawa.standard.or();
-      define(proc.name,proc);
 
+      define ("or", new kawa.standard.and_or (false));
+      define ("and", new kawa.standard.and_or (true));
       
-      //-- (exit)
-      proc = new kawa.standard.exit();
-      define(proc.name,proc);
+      define_proc ("exit", "kawa.standard.exit");
 
       define_proc ("compile-func", "kawa.lang.compilefune");
       define_proc ("compile-file", "kawa.lang.CompileFile");

@@ -49,6 +49,7 @@ set_b.class \
 not.class \
 boolean_p.class \
 cond.class \
+and_or.class \
 eqv_p.class \
 eq_p.class \
 equal_p.class \
@@ -199,8 +200,6 @@ begin.class \
 ifp.class \
 when.class \
 unless.class \
-and.class \
-or.class \
 StandardInterpreter.class 
 
 java_DATA=$(OBJ)

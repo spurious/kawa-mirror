@@ -1,6 +1,7 @@
 package kawa.standard;
 import gnu.mapping.*;
 import java.io.PrintWriter;
+import gnu.math.IntNum;
 
 /** A TracedProcedure is a Procedure wrapper that writes trace output. */
 
@@ -8,6 +9,10 @@ public class TracedProcedure extends ProcedureN
 {
   public Procedure proc;
   boolean enabled;
+
+  static Binding indentation
+  = Binding.make(gnu.math.IntNum.zero(), "indentation");
+  static int indentationStep = 2;
 
   public TracedProcedure (Procedure proc, boolean enable)
   {
@@ -33,14 +38,24 @@ public class TracedProcedure extends ProcedureN
       }
   }
 
+  static void indent(int i, PrintWriter out)
+  {
+    while (--i >= 0)
+      out.print(' ');
+  }
+
   public Object applyN(Object[] args)
   {
     if (enabled)
       {
+        int curIndent = ((IntNum) indentation.getValue()).intValue();
 	PrintWriter out = OutPort.errDefault();
 	String name = getName();
 	if (name == null)
 	  name = "??";
+
+        // Print the call arguments (indented).
+        indent(curIndent, out);
 	out.print("call to ");
 	out.print(name);
 	int len = args.length;
@@ -52,7 +67,32 @@ public class TracedProcedure extends ProcedureN
 	    put(args[i], out);
 	  }
 	out.println(")");
-	Object result = proc.applyN(args);
+
+        // Now do the actual call, but with the indentation incremented.
+        gnu.mapping.Future context = gnu.mapping.Future.getContext();
+        FluidBinding oldBindings = context.fluidBindings;
+        IntNum newIndentation = IntNum.make(curIndent+indentationStep);
+        FluidBinding newBindings
+          = new FluidBinding(oldBindings, newIndentation, indentation);
+	Object result;
+        try
+          {
+            context.setFluids(newBindings);
+            result = proc.applyN(args);
+          }
+        catch (RuntimeException e)
+          {
+            indent(curIndent, out);
+            out.println("procedure " + name + " throws exception " + e);
+            throw e;
+          }
+        finally
+          {
+            context.resetFluids(oldBindings);
+          }
+
+        // Print the result (indented).
+        indent(curIndent, out);
 	out.print("return from ");
 	out.print(name);
 	out.print(" => ");

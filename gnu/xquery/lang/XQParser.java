@@ -1812,12 +1812,14 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (! isNameStart((char) next))
 	      return '\0';
+	    unread(); // unread 'next' in case it is a single character.
 	    mark();
 	    getRawToken(); // Skip 'element' or 'attribute'.
 	    getRawToken(); // Skip NAME.
 	    if (curToken != '{')
 	      kind = '\0';
 	    reset();
+	    read(); // re-read 'next' since caller expects it.
 	  }
 	return kind;
       }

@@ -1,3 +1,23 @@
+2003-05-08  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (skipComment):  Now handles (:new-style:) comments.
+	(skipOldComment):  New method to handle {--old-style--} comments.
+	(skipSpaceOrComment, getRawToken):  Handle either style of comment.
+	(peekOperand): A NAME '(' followed by ':' is not an FNAME.
+	* XQuery.java (Prompter.apply1):  Use new-style comment syntax.
+
+	* XQParser.java (COLON_EQUAL_TOKEN):  New constant.
+	(getRawToken):  If ':' is followed by '=' return COLON_EQUAL_TOKEN.
+	If NCNAME ':' is followed by '=' return NCNAME_TOKEN, and back up.
+	(parseFLWRExpression):  No need to check for NCNAME_COLON_TOKEN.
+
+	* XQParser.java (parseEnclosedExpr):  More error-tolerant parsing.
+	(parseIfExp):  Recover from missing 'then' or 'else'.
+	(parseFLWRExpression):  Recover from ':=' / 'in' confusion.
+
+	* XQuery.java (<init>):  Allow 'doc' as synonym for 'document'.
+	New 'trace' method.
+
 2003-04-21  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parse, parseFile):  Do ResolveNames.

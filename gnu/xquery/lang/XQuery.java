@@ -173,6 +173,7 @@ public class XQuery extends Interpreter
 
     define("define", new kawa.standard.set_b());
     define("document", gnu.kawa.xml.Document.document);
+    define("doc", gnu.kawa.xml.Document.document);  // kludge
     define("unescaped-data", gnu.kawa.xml.MakeUnescapedData.unescapedData);
     define("item-at", gnu.xquery.util.ItemAt.itemAt);
     define("count", gnu.kawa.functions.CountValues.countValues);
@@ -192,6 +193,7 @@ public class XQuery extends Interpreter
     define("string", gnu.xquery.util.StringValue.string);
     define("concat", new kawa.standard.string_append());
 
+    define_method("trace", "gnu.xquery.util.Debug", "trace");
     define("write-to", gnu.kawa.xml.WriteTo.writeTo);
     define_field("iterator-items",
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
@@ -280,7 +282,9 @@ class Prompter extends Procedure1
       state = ' ';
     if (state == '<')
       return "<!--" + line + "-->";
+    else if (state == ':')
+      return "- (:" + line + ":) ";
     else
-      return "{--" + state + line + "--} ";
+      return "(: " + state + line + ":) ";
   }
 }

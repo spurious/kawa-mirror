@@ -73,7 +73,13 @@ public class XQParser extends LispReader // should be extends Lexer
     for (;;)
       {
 	int ch = read();
-	if (ch == '{')
+	if (ch == '(')
+	  {
+	    if (! checkNext(':'))
+	      return '(';
+	    skipComment();
+	  }
+	else if (ch == '{')
 	  {
 	    ch = read();
 	     if (ch != '-')
@@ -88,14 +94,14 @@ public class XQParser extends LispReader // should be extends Lexer
 		 unread('-');
 		 return '{';
 	       }
-	     skipComment();
+	     skipOldComment();
 	  }
 	else if (ch < 0 || ! Character.isWhitespace((char) ch))
 	  return ch;
       }
   }
 
-  final void skipComment()
+  final void skipOldComment()
     throws java.io.IOException, SyntaxException
   {
     int seenDashes = 0;
@@ -111,6 +117,39 @@ public class XQParser extends LispReader // should be extends Lexer
 	  eofError("non-terminated comment starting at line "+startLine);
 	else
 	  seenDashes = 0;
+      }
+  }
+
+  final void skipComment()
+    throws java.io.IOException, SyntaxException
+  {
+    int startLine = getLineNumber() + 1;
+    int prev = 0;
+    int commentNesting = 0;
+    char saveReadState = pushNesting(':');
+    for (;;)
+      {
+	int ch = read();
+	if (ch == ':')
+	  {
+	    if (prev == '(')
+	      {
+		commentNesting++;
+		ch = 0;
+	      }
+	  }
+	else if (ch == ')' && prev == ':')
+	  {
+	    if (commentNesting == 0)
+	      {
+		popNesting(saveReadState);
+		return;
+	      }
+	    --commentNesting;
+	  }
+	else if (ch < 0)
+	  eofError("non-terminated comment starting at line "+startLine);
+	prev = ch;
       }
   }
 
@@ -144,6 +183,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int STRING_TOKEN = '"';
   static final int SLASHSLASH_TOKEN = 'D';
   static final int DOTDOT_TOKEN = '2';
+  static final int COLON_EQUAL_TOKEN = 'L'; // ":="
   static final int COLONCOLON_TOKEN = 'X';
 
   /** A non-qualified (simple) name (NCName).
@@ -275,14 +315,17 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (nesting <= 0)
 	      return curToken = EOL_TOKEN;
 	  }
+	else if (next == '(')
+	  {
+	    if (checkNext(':'))
+	      skipComment();
+	    else
+	      return curToken = '(';
+	  }
 	else if (next == '{')
 	  {
-	    next = read();
-	    if (next != '-')
-	      {
-		unread(next);
-		return curToken = '{';
-	      }
+	    if (! checkNext('-'))
+	      return curToken = '{';
 	    next = read();
 	    if (next != '-')
 	      {
@@ -291,7 +334,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		unread();
 		return curToken = '{';
 	      }
-	    skipComment();
+	    skipOldComment();
 	  }
 	else if (next != ' ' && next != '\t')
 	  break;
@@ -300,8 +343,12 @@ public class XQParser extends LispReader // should be extends Lexer
     char ch = (char) next;
     switch (ch)
       {
-      case '(':  case ')':  case '[':  case ']':  case '}':
-      case '$':  case '@':  case ',':  case ':':
+      case ')':  case '[':  case ']':  case '}':
+      case '$':  case '@':  case ',':
+	break;
+      case ':':
+	if (checkNext('='))
+	  ch = COLON_EQUAL_TOKEN;
 	break;
       case '|':
 	ch = OP_UNION;
@@ -457,6 +504,11 @@ public class XQParser extends LispReader // should be extends Lexer
 			  }
 			ch = QNAME_TOKEN;
 		      }
+		    else if (ch == '=')
+		      {
+			unread(ch);
+			ch = NCNAME_TOKEN;
+		      }
 		    else
 		      ch = NCNAME_COLON_TOKEN;
 		  }
@@ -601,7 +653,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
-	if (next == '(')
+	if (next == '(' && peek() != ':')
 	  {
 	    int token = FNAME_TOKEN;
 	    switch (tokenBuffer[0])
@@ -1351,17 +1403,25 @@ public class XQParser extends LispReader // should be extends Lexer
     int startColumn = getColumnNumber() + 1;
     getRawToken();
     Expression exp = parseExpr();
-    //do { getRawToken(); } while (curToken == EOL_TOKEN);
-    while (curToken == ',')
+    for (;;)
       {
+	if (curToken == '}')
+	  break;
+	if (curToken == EOF_TOKEN || curToken == ')' || curToken == ']')
+	  {
+	    exp = syntaxError("missing '}'");
+	    break;
+	  }
+	if (curToken != ',')
+	  {
+	    exp = syntaxError("missing '}' or ','");
+	  }
 	getRawToken();
 	exp = makeExprSequence(exp, parseExpr());
       }
     exp.setFile(getName());
     exp.setLine(startLine, startColumn);
     popNesting(saveReadState);
-    if (curToken != '}')
-      return syntaxError("missing '}'");
     return exp;
   }
 
@@ -1901,14 +1961,16 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken != NCNAME_TOKEN
 	|| tokenBufferLength != 4
 	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("then"))
-      return syntaxError("missing 'then'");
-    getRawToken();
+      syntaxError("missing 'then'");
+    else
+      getRawToken();
     Expression thenPart = parseExpr();
     if (curToken != NCNAME_TOKEN
 	|| tokenBufferLength != 4
 	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("else"))
-      return syntaxError("missing 'else'");
-    getRawToken();
+      syntaxError("missing 'else'");
+    else
+      getRawToken();
     popNesting(save);
     Expression elsePart = parseExpr();
     return new IfExp(booleanValue(cond), thenPart, elsePart);
@@ -2017,29 +2079,35 @@ public class XQParser extends LispReader // should be extends Lexer
     char save = pushNesting(isFor ? 'f' : 'l');
     getRawToken();
     String name;
-    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN
-	|| curToken == NCNAME_COLON_TOKEN)
+    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
       name = new String(tokenBuffer, 0, tokenBufferLength).intern();
     else
       return syntaxError("missing Variable token:"+curToken);
-    if (curToken == NCNAME_COLON_TOKEN)
-      curToken = ':';
-    else
-      getRawToken();
+    getRawToken();
     
     if (isFor)
       {
 	char ch;
-	if (! match("in"))
-	  return syntaxError("missing 'in' in 'for' clause");
+	if (match("in"))
+	  getRawToken();
+	else
+	  {	
+	    if (curToken == COLON_EQUAL_TOKEN)
+	      getRawToken();
+	    syntaxError("missing 'in' in 'for' clause");
+	  }
       }
     else
       {
-	if (curToken != ':'
-	    || getRawToken() != OP_EQU)
-	  return syntaxError("missing ':=' in 'let' clause");
+	if (curToken == COLON_EQUAL_TOKEN)
+	  getRawToken();
+	else
+	  {	
+	    if (match("in"))
+	      getRawToken();
+	    syntaxError("missing ':=' in 'let' clause");
+	  }
       }
-    getRawToken();
     Expression value = parseBinaryExpr(priority(OP_OR));
     popNesting(save);
     return parseFLWRExpression(isFor, name, value);

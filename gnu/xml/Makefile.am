@@ -38,7 +38,7 @@ java_BUILT = \
 
 BUILT_SOURCES = $(java_BUILT)
 java_Java= $(java_BUILT) $(java_sources)
-EXTRA_DIST = $(java_sources) \
+EXTRA_DIST = package.html \
   XMLParser.java.in ParsedXMLHandler.java.in QName.java.in
 
 FROM_XMLParser = $(DONT_EDIT_SUBS) \

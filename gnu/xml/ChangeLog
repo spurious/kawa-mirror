@@ -1,3 +1,8 @@
+2002-02-15  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST):  Leave out redundant $(java_sources).
+	Add package.html.
+
 2002-02-14  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (writeObject):  Check for gnu.text.Char.

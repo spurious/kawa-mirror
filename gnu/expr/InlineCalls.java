@@ -156,6 +156,28 @@ public class InlineCalls extends ExpWalker
     return exp;
   }
 
+  protected Expression walkLetExp (LetExp exp)
+  {
+    Declaration decl = exp.firstDecl();
+    for (int i = 0; i < exp.inits.length; i++, decl = decl.nextDecl())
+      {
+	Expression init0 = exp.inits[i];
+	Expression init = walk(init0);
+	exp.inits[i] = init;
+	Expression dvalue = decl.value;
+	if (dvalue == init0)
+	  {
+	    decl.value = dvalue = init;
+	    if (! decl.getFlag(Declaration.TYPE_SPECIFIED))
+	      decl.setType(dvalue.getType());
+	  }
+      }
+
+    if (exitValue == null)
+      exp.body = (Expression) walk(exp.body);
+    return exp;
+  }
+
   protected Expression walkSetExp (SetExp exp)
   {
     Declaration decl = exp.binding;

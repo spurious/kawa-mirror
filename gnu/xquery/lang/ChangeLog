@@ -1,3 +1,27 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (FNAME_TOKEN):  New constant.
+	(peekOperand):  Check for FuncName here.
+	(parseMaybePrimaryExpr):  This we no longer check for FuncName here.
+	Instead, we recognize FNAME_TOKEN.
+
+	* XQParser.java (makeBinary):  Make static.
+	(makeExprSequence):  New static helper method.
+	(parseBinaryExpr):  Return on unexpected '</'.
+	(parseRelativePathExpr):  Handle EXP/name.
+	(parseContent):  Add missing getRawToken.
+	(parseEnclosedExpr):  Handle an ExprSequence.
+	(parseMaybePrimaryExpr):  Use makeExprSequence.
+	Add explicit check for eof.
+	Emit error message if we saw '</'.
+
+	* XQParser.java (parseFLWRExpression):  Re-write to make 'for' work.
+	* XQuery.java (parse):  Lexer's parse methods return null on eof.
+	(<init>): Define new function string-value.
+
+	* XQuery.java (<init>):  Set flag so module body will print values.
+	(registerEnvironment): No longer need to do so here.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	New package gnu.xquery.lang.

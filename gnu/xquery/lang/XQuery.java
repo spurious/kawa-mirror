@@ -54,8 +54,8 @@ public class XQuery extends Interpreter
     tr.immediate = true;
     lexer.clearErrors();
     Expression sexp = ((XQParser) lexer).parse(tr);
-    if (sexp == Sequence.eofValue)
-      return null; // FIXME
+    if (sexp == null)
+      return null;
     mexp.body = sexp;
     tr.pop(mexp);
     return mexp;
@@ -133,6 +133,7 @@ public class XQuery extends Interpreter
     environ = new Environment(scmEnv);
     environ.setName ("interaction-environment."+(++envCounter));
     Environment.setCurrent(environ);
+    ModuleBody.setMainPrintValues(true);
 
     /*
     BindingEnumeration e = scmEnv.enumerateAllBindings();
@@ -167,6 +168,7 @@ public class XQuery extends Interpreter
 
     define("define", new kawa.standard.set_b());
     define("document", gnu.xquery.util.Document.document);
+    define("string-value", gnu.xquery.util.StringValue.stringValue);
   }
 
   public static XQuery getInstance()
@@ -192,7 +194,6 @@ public class XQuery extends Interpreter
     XQuery interp = new XQuery();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
-    ModuleBody.setMainPrintValues(true);
   }
 
   public Object read (InPort in)

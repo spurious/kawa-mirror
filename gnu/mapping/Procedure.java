@@ -7,7 +7,7 @@ package gnu.mapping;
 
 public abstract class Procedure implements Named, Printable
 {
-  protected static Object[] noArgs = Values.noArgs;
+  protected static final Object[] noArgs = Values.noArgs;
 
   protected String sym_name;
 

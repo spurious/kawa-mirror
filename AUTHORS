@@ -1,0 +1,5 @@
+R. Alexander Milowski wrote the original Kawa, as an interpreter.
+Per Bothner re-wrote Kawa as a compiler, and the current Kawa has
+probably none of Milowski's code left - only the name remains.
+Other people have contributed small amounts - see ChangeLog entries.
+

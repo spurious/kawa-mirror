@@ -1,3 +1,8 @@
+2003-05-31  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/load.java (loadSource):  Don't call BaseUri.resolve
+	if name is absolute.
+
 2003-05-31  Vladimir Tsichevski  <wowa@jet.msk.su>
 
 	* configure.in: Fix documentation typo AWT -> SAX2.

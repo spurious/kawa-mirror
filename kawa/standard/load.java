@@ -114,12 +114,14 @@ public class load extends Procedure1 {
     try
       {
 	InPort fstream;
-	if (BaseUri.hasScheme(name) || relative)
+	boolean nameAbsolute = BaseUri.hasScheme(name);
+	if (nameAbsolute || relative)
 	  {
-	    if (relative)
-	      name = BaseUri.resolve(name, CallContext.getInstance().getBaseUri());
-	    else
-	      name = BaseUri.resolve(name, CallContext.getBaseUriDefault());
+	    if (! nameAbsolute)
+	      {
+		String base = CallContext.getInstance().getBaseUri();
+		name = BaseUri.resolve(name, base);
+	      }
 	    URL url = new URL(name);
 	    InputStream in = url.openConnection().getInputStream();
 	    fstream = InPort.openFile(new BufferedInputStream(in), name);

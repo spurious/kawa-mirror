@@ -25,6 +25,7 @@ CpoolRef.class \
 CpoolString.class \
 CpoolUtf8.class \
 Field.class \
+IfState.class \
 Label.class \
 Method.class \
 Scope.class \

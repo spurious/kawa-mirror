@@ -790,6 +790,74 @@ public class Method {
     compile_goto_ifeq (label, true);
   }
 
+  /** The stack of currently active conditionals. */
+  IfState if_stack;
+
+  /** Compile start of a conditional:  if (x != y) ...
+   * The values of x and y must already have been pushed. */
+  public final void compile_ifneq ()
+  {
+    IfState new_if = new IfState (this);
+    compile_goto_ifeq (new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of else clause. */
+  public final void compile_else ()
+  {
+    Label else_label = if_stack.end_label;
+    Label end_label = new Label (this);
+    if_stack.end_label = end_label;
+    if (reachableHere ())
+      {
+	int stack_growth = SP-if_stack.start_stack_size;
+	if_stack.then_stacked_types = new Type[stack_growth];
+	System.arraycopy (stack_types, if_stack.start_stack_size,
+			  if_stack.then_stacked_types, 0, stack_growth);
+	compile_goto (end_label);
+      }
+    while (SP != if_stack.start_stack_size)
+      pop_stack_type ();
+    else_label.define (this);
+    if_stack.doing_else = true;    
+  }
+
+  /** Compile end of conditional. */
+  public final void compile_fi ()
+  {
+    boolean make_unreachable = false;
+    if (! if_stack.doing_else)
+      { // There was no 'else' clause.
+	if (reachableHere ()
+	    && SP != if_stack.start_stack_size)
+	  throw new Error ("then clause grows stack with no else clause");
+      }
+    else if (if_stack.then_stacked_types != null)
+      {
+	int then_clause_stack_size
+	  = if_stack.start_stack_size + if_stack.then_stacked_types.length;
+	if (! reachableHere ())
+	  {
+	    System.arraycopy (if_stack.then_stacked_types, 0,
+			      stack_types, if_stack.start_stack_size,
+			      if_stack.then_stacked_types.length);
+	    SP = then_clause_stack_size;
+	  }
+	else if (SP != then_clause_stack_size)
+	  throw new Error ("SP at end of 'then' was " +
+			   then_clause_stack_size
+			   + " while SP at end of 'else' was " + SP);
+      }
+    else if (unreachable_here)
+      make_unreachable = true;
+
+    if_stack.end_label.define (this);
+    if (make_unreachable)
+      unreachable_here = true;
+    // Pop the if_stack.
+    if_stack = if_stack.previous;
+  }
+
   /**
    * Compile an unconditional branch (goto).
    * @param label target of the branch (must be in this method).
@@ -852,10 +920,6 @@ public class Method {
 
   public void push_long_const (long i);
 
-  public void if_start ();
-  public void if_then ();
-  public void if_else ();
-  public void if_end ();
   */
 
   // public final void compile_int_add () { put1 (96); pop_stack_type ();}
@@ -886,6 +950,7 @@ public class Method {
       throw new Error ("bad type in binary operation");
     push_stack_type (type1_raw);
   }
+
   public void compile_invoke_method (Method method, int opcode)
   {
     instruction_start_hook (3);

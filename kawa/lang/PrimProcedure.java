@@ -140,7 +140,6 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	types.put ("real", new ClassType("gnu.math.RealNum"));
 	types.put ("rational", new ClassType("gnu.math.RatNum"));
 	types.put ("integer", new ClassType("gnu.math.IntNum"));
-	types.put ("float", new ClassType("gnu.math.DFloNum"));
 	types.put ("symbol", new ClassType("java.lang.String"));
 	types.put ("keyword", new ClassType("kawa.lang.Keyword"));
 	types.put ("list", new ClassType("kawa.lang.List"));

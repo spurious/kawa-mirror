@@ -18,7 +18,7 @@ public class greater_oper extends ProcedureN
       {
 	Object arg1 = args[i];
 	Object arg2 = args[i+1];
-	if (! ((RealNum)arg1).grt (arg2))
+	if (! ((Numeric)arg1).grt (arg2))
 	  return Interpreter.falseObject;
       }
     return Interpreter.trueObject;

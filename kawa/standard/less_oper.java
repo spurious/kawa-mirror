@@ -18,7 +18,7 @@ public class less_oper extends ProcedureN
       {
 	Object arg1 = args[i];
 	Object arg2 = args[i+1];
-	if (! ((RealNum)arg2).grt (arg1))
+	if (! ((Numeric)arg2).grt (arg1))
 	  return Interpreter.falseObject;
       }
     return Interpreter.trueObject;

@@ -1,3 +1,12 @@
+Thu May 21 23:55:14 1998  Per Bothner  <bothner@cygnus.com>
+
+	* characters.scm:  Use <TYPE> rather than "TYPE" specifications.
+
+	* reflection.scm:  A Record Type Descriptor is now a ClassType,
+	rather than a Class.
+
+	* syntax.scm (defmacro):  Inline call to %defmacro.
+
 Tue Apr 28 21:53:13 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ports.scm (port-line, port-column): Make port argument required.

@@ -1,53 +1,45 @@
 ;;; RECORDS
 
 (define (make-record-type name fnames)
-  ((primitive-static-method "kawa.lang.Record" "makeRecordType"
-			    "java.lang.Class" ("String" "kawa.lang.List"))
+  ((primitive-static-method <record> "makeRecordType"
+			    <class-type> (<String> <list>))
    name fnames))
 
-(define (record-constructor cl #!optional (flds (record-type-field-names cl)))
-  ((primitive-constructor "kawa.lang.RecordConstructor"
-			  ("java.lang.Class" "Object"))
+(define (record-constructor cl #!optional (flds #!null))
+  ((primitive-constructor <kawa.lang.RecordConstructor>
+			  (<class-type> <object>))
    cl flds))
 
 (define (record-accessor class fname)
-  ((primitive-constructor "kawa.lang.GetFieldProc"
-			  ("java.lang.Class" "String"))
+  ((primitive-constructor "kawa.lang.GetFieldProc" (<class-type> "String"))
    class fname))
 
 (define (record-modifier class fname)
-  ((primitive-constructor "kawa.lang.SetFieldProc"
-			  ("java.lang.Class" "String"))
+  ((primitive-constructor <kawa.lang.SetFieldProc> (<class-type> "String"))
    class fname))
 
 (define (record? obj)
-  ((primitive-static-method "kawa.lang.Record" "isRecord"
-			    "boolean" ("Object"))
-   obj))
+  (instance? obj <record>))
 
-(define (record-predicate class)
+(define (record-predicate rtype)
   (lambda (object)
-    ((primitive-virtual-method "java.lang.Class" "isAssignableFrom"
-			       "boolean" ("java.lang.Class"))
-     class
-     ((primitive-virtual-method "java.lang.Object" "getClass"
-				"java.lang.Class" ())
-      object))))
+    ((primitive-virtual-method <type> "isInstance" <boolean> (<object>))
+     rtype object)))
 
 (define (record-type-descriptor object)
-  ((primitive-virtual-method "java.lang.Object" "getClass"
-			     "java.lang.Class" ())
-   object))
+  ((primitive-static-method <type> "make" <type> (<java.lang.Class>))
+   ((primitive-virtual-method <object> "getClass"
+			      <java.lang.Class> ())
+    object)))
 
 (define (record-type-name rtd)
-  ((primitive-constructor "kawa.lang.FString" ("String"))
-   ((primitive-virtual-method "java.lang.Class" "getName"
-			      "String" ())
+  (symbol->string
+   ((primitive-virtual-method <class-type> "getName" <String> ())
     rtd)))
 
 (define (record-type-field-names rtd)
-  ((primitive-static-method "kawa.lang.Record" "typeFieldNames"
-			   "kawa.lang.List" ("java.lang.Class"))
+  ((primitive-static-method <record> "typeFieldNames"
+			    <list> (<class-type>))
    rtd))
 
 #| THESE CAN BE FUNCTIONS WHEN WE HAVE BETTER INLINING:

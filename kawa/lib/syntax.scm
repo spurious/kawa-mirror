@@ -1,12 +1,9 @@
 (define-syntax defmacro
   (syntax-rules ()
 		((defmacro name lambda-list form ...)
-		 (%defmacro (quote name) (lambda lambda-list form ...)))))
-
-(define (%defmacro name expander)
-  ((primitive-constructor <kawa.lang.DefMacro>
-			  (<symbol> <function>))
-   name expander))
+		 ((primitive-constructor <kawa.lang.DefMacro> 
+					 (<symbol> <function>)) 
+		  (quote name) (lambda lambda-list form ...)))))
 
 (define (gentemp)
   ((primitive-static-method <kawa.lang.Symbol> "gentemp"

@@ -28,7 +28,8 @@ public class QName implements Externalizable
   }
 
   /** The local name of a qualified name, as an interned String.
-   * If namespaceURI is empty, this is the fully-qualified name. */
+   * If namespaceURI is empty, this is the fully-qualified name.
+   * Null is used for "*" when matching to mean any local name. */
   public final String getLocalName()
   {
     return localName;
@@ -36,7 +37,7 @@ public class QName implements Externalizable
 
   public int hashCode()
   {
-    return localName.hashCode();
+    return localName == null ? 0 :  localName.hashCode();
   }
 
   public boolean equals(Object other)

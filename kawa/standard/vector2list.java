@@ -19,7 +19,7 @@ public class vector2list extends Procedure1
 
      int len = v.length();
 
-     kawa.lang.List result = Interpreter.nullObject;
+     kawa.lang.List result = List.Empty;
      for (int t=len-1; t>=0; t--) {
         result = new Pair(v.elementAt(t),result);
      }

@@ -4,23 +4,25 @@ import codegen.Access;
 import codegen.ClassType;
 import codegen.Type;
 
-// (primitive-static-method "class" "method" "rettype" ("argtype" ...))
-// (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))
-// (primitive-op1 opcode "rettype"  ("argtype" ...))
+// OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
+// 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))
+// 183: (primitive-constructor "class" ("argtype ...))
+// 184: (primitive-static-method "class" "method" "rettype" ("argtype" ...))
+// 185: (primitive-interface-method "class" "method" "rettype" ("argtype" ...))
 
 class prim_method extends Syntax
 {
+  static private Pattern pattern2 = new ListPat (2);
   static private Pattern pattern3 = new ListPat (3);
   static private Pattern pattern4 = new ListPat (4);
 
-  // 0: primitive-op1
-  // 1: primitive-virtual-method
-  // 2: primitive-static-method
-  int kind;
+  int op_code;
 
-  public prim_method (boolean isStatic)
+  int opcode () { return op_code; }
+
+  public prim_method (int opcode)
   {
-    kind = isStatic ? 2 : 1;
+    op_code = opcode;
   }
 
   public prim_method ()
@@ -30,9 +32,11 @@ class prim_method extends Syntax
   public Expression rewrite (Object obj, Translator tr)
   {
     Object[] match = new Object [4];
-    if (! (kind == 0 ? pattern3.match(obj, match, 1)
-	   : pattern4.match(obj, match, 0)))
-      return tr.syntaxError ("wrong number of arguments to "+name());
+    if (! (op_code == 0 ? pattern3.match(obj, match, 1)
+	   : op_code == 183 ? pattern2.match(obj, match, 2) // constructor
+	   : pattern4.match(obj, match, 0))) // virtual or static
+      return tr.syntaxError ("wrong number of arguments to "+name()
+			     +"(opcode:"+op_code+")");
 
     List argp = (List) match[3];
 
@@ -46,17 +50,20 @@ class prim_method extends Syntax
       }
     Type rtype = PrimProcedure.string2Type(match[2].toString());
     PrimProcedure proc;
-    if (kind == 0)
+    if (op_code == 0)
       {
 	int opcode = ((Number)(match[1])).intValue();
 	proc = new PrimProcedure(opcode, rtype, args);
+      }
+    else if (op_code == 183)  // primitive-constructor
+      {
+	proc = new PrimProcedure((ClassType) rtype, args);
       }
     else
       {
 	ClassType cl = (ClassType)
 	  PrimProcedure.string2Type (match[0].toString());
-	proc = new PrimProcedure (cl, match[1].toString(), rtype, args,
-				  kind == 2 ? Access.STATIC : 0);
+	proc = new PrimProcedure(op_code, cl, match[1].toString(), rtype,args);
       }
     return new QuoteExp(proc);
   }

@@ -35,7 +35,7 @@ public abstract class ObjectType extends Type
   {
     if (this == Type.string_type)
       return obj.toString();
-    if (getReflectClass().isAssignableFrom(obj.getClass()))
+    if (obj == null || getReflectClass().isAssignableFrom(obj.getClass()))
       return obj;
     throw new ClassCastException("don't know how to coerce "
 				 + obj.getClass().getName() + " to "

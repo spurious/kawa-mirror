@@ -9,7 +9,7 @@ public class ProcInitializer extends Initializer
   {
     field = lexp.allocFieldFor(comp);
     proc = lexp;
-    if ((field.getModifiers() & Access.STATIC) != 0)
+    if (comp.instanceField != null)
       {
 	next = comp.clinitChain;
 	comp.clinitChain = this;
@@ -63,7 +63,11 @@ public class ProcInitializer extends Initializer
 		Object val = proc.properties[i+1];
 		code.emitDup(1);
 		comp.compileConstant(key);
-		((Expression) val).compile(comp, Target.pushObject);
+                Target target = Target.pushObject;
+                if (val instanceof Expression)
+                  ((Expression) val).compile(comp, target);
+                else
+                  comp.compileConstant(val, target);
 		Method m = comp.typeProcedure.getDeclaredMethod("setProperty",
 								2);
 		code.emitInvokeVirtual(m);

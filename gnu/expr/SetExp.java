@@ -136,6 +136,7 @@ public class SetExp extends Expression
     // to generate fields for module-level definitions;  this is how
     // bindings are exported from modules.
 
+    Object value;
     if (binding != null && ! binding.isPrivate() && ! comp.usingCPStyle()
 	&& binding.context instanceof ModuleExp
 	&& binding.getValue() instanceof LambdaExp
@@ -151,12 +152,13 @@ public class SetExp extends Expression
 	     && binding.getValue() != null)
       { // This is handled in ModuleExp's allocFields method.
       }
-    else if (binding instanceof kawa.lang.Macro
+    else if (binding != null
+             && binding.getFlag(Declaration.IS_SYNTAX)
 	     && binding.context instanceof ModuleExp
-	     && ((kawa.lang.Macro) binding).expander instanceof LambdaExp
+	     && (value = ((kawa.lang.Macro)  binding.getConstantValue()).expander) instanceof LambdaExp
 	     && ! binding.isPrivate())
       {
-	LambdaExp expander = (LambdaExp) ((kawa.lang.Macro) binding).expander;
+	LambdaExp expander = (LambdaExp) value;
 	if (! expander.isHandlingTailCalls())
 	  {
 	    expander.flags |= LambdaExp.NO_FIELD;

@@ -135,6 +135,14 @@ public class Declaration
 
   public final Expression getValue() { return value; }
 
+  /** If getValue() is a constant, return the constant value, otherwise null. */
+  public final Object getConstantValue()
+  {
+    if (! (value instanceof QuoteExp))
+      return null;
+    return ((QuoteExp) value).getValue();
+  }
+
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -151,6 +159,7 @@ public class Declaration
   public static final int NONSTATIC_SPECIFIED = 0x1000;
   public static final int TYPE_SPECIFIED = 0x2000;
   public static final int IS_CONSTANT = 0x4000;
+  public static final int IS_SYNTAX = 0x8000;
 
   protected int flags = IS_SIMPLE;
 

@@ -30,7 +30,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   /** Return true iff the last parameter is a "rest" argument. */
   public boolean takesVarArgs()
   {
-    return method.getName().endsWith("$V");
+    return method != null && method.getName().endsWith("$V");
   }
 
   public int numArgs()

@@ -70,8 +70,8 @@ public class ModuleExp extends LambdaExp
       {
 	if ((decl.isSimple() && ! decl.isPublic()) || decl.field != null)
 	  continue;
-	if (decl instanceof kawa.lang.Macro
-	    && ((kawa.lang.Macro) decl).expander instanceof LambdaExp
+	if (decl.getFlag(Declaration.IS_SYNTAX)
+	    && ((kawa.lang.Macro) decl.getConstantValue()).expander instanceof LambdaExp
 	    && ! decl.isPrivate())
 	  continue;  // Handled in SetExp.
 	Expression value = decl.getValue();

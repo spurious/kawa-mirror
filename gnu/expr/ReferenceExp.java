@@ -20,6 +20,8 @@ public class ReferenceExp extends Expression
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }
 
+  public final void setBinding(Declaration decl) { binding = decl; }
+
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;
@@ -70,9 +72,24 @@ public class ReferenceExp extends Expression
 
   public Object eval (Environment env)
   {
-    if (binding != null
-        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
-      throw new Error("internal error: ReferenceExp.eval on lexical binding");
+    if (binding != null)
+      {
+        if (binding.field != null && binding.field.getStaticFlag())
+          {
+            try
+              {
+                Object value = binding.field.getReflectField().get(null);
+                if (! (value instanceof Binding))
+                  return value;
+                // otherwise not implemented!
+              }
+            catch (Exception ex)
+              {
+              }
+          }
+        if ( ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
+          throw new Error("internal error: ReferenceExp.eval on lexical binding");
+      }
     if (getDontDereference())
       return env.getBinding(symbol);
     else if (getFlag(PREFER_BINDING2))

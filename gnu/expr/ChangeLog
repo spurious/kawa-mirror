@@ -1,3 +1,8 @@
+Sun Nov 15 21:31:59 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ReferenceExp.java (lookup):  Remove magic for Scheme <TYPE>
+	(that is now handled by kawa.standard.ScmEnv).
+
 Sat Oct 17 13:23:50 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* SynchronizedExp.java:  New class.

@@ -1,7 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import kawa.standard.Scheme;  // FIXME
 
 /**
  * This class represents a variable reference (an identifier).
@@ -48,17 +47,7 @@ public class ReferenceExp extends Expression
   {
     Object val = env.get(name);
     if (val == null)
-      {
-	int len = name.length();
-	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
-	  {
-	    String tname = name.substring(1, len-1);
-	    gnu.bytecode.Type type = Scheme.string2Type(tname);
-	    if (type != null && type.getReflectClass() != null)
-	      return type;
-	  }
-	throw new UnboundSymbol(name);
-      }
+      throw new UnboundSymbol(name);
     return val;
   }
 

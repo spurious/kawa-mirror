@@ -184,8 +184,7 @@ public class XQuery extends Interpreter
     throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    ctx.setArgs(item, IntNum.make(position),IntNum.make(size));
-    ctx.proc = proc;
+    proc.check3(item, IntNum.make(position),IntNum.make(size), ctx);
     Consumer save = ctx.consumer;
     try
       {
@@ -214,8 +213,7 @@ public class XQuery extends Interpreter
     int oldIndex = ctx.startFromContext();
     try
       {
-	ctx.setArgs(item, IntNum.make(position),IntNum.make(size));
-	ctx.proc = proc;
+	proc.check3(item, IntNum.make(position),IntNum.make(size), ctx);
 	return ctx.getFromContext(oldIndex);
       }
     catch (Throwable ex)
@@ -297,8 +295,7 @@ public class XQuery extends Interpreter
 	IntNum size = IntNum.make(count);
 	for (int i = 1;  ;  i++)
 	  {
-	    ctx.setArgs(v.getPosNext(ipos), IntNum.make(i), size);
-	    ctx.proc = proc;
+	    proc.check3(v.getPosNext(ipos), IntNum.make(i), size, ctx);
 	    ctx.runUntilDone();
 	    if (i == count)
 	      break;
@@ -308,8 +305,7 @@ public class XQuery extends Interpreter
     else
       {
 	IntNum one = IntNum.one();
-	ctx.setArgs(values, one, one);
-	ctx.proc = proc;
+	proc.check3(values, one, one, ctx);
 	ctx.runUntilDone();
       }
   }
@@ -439,8 +435,7 @@ public class XQuery extends Interpreter
     throws Throwable
   {
     Procedure proc = evalToFocusProc(expr);
-    ctx.setArgs(item, IntNum.make(position), IntNum.make(size));
-    ctx.proc = proc;
+    proc.check3(item, IntNum.make(position), IntNum.make(size), ctx);
   }
 
   public XQuery()

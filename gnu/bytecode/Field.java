@@ -29,6 +29,26 @@ public class Field extends Location implements AttrContainer {
     owner = ctype;
   }
 
+  public final ClassType getDeclaringClass()
+  {
+    return owner;
+  }
+
+  public final void setStaticFlag (boolean is_static) {
+    if (is_static)
+      flags |= Access.STATIC;
+    else
+      flags ^= ~Access.STATIC;
+  }
+
+  public final boolean getStaticFlag () {
+    return (flags & Access.STATIC) != 0;
+  }
+
+  public final int getFlags() {
+    return flags;
+  }
+  
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {

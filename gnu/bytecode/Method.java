@@ -280,4 +280,9 @@ public class Method implements AttrContainer {
   {
     return next;
   }
+
+  public String toString()
+  {
+    return getDeclaringClass() + "." + name + getSignature();
+  }
 };

@@ -566,6 +566,10 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.int_type);
   }
 
+  /* Returns an integer in the range 0 (for 'int') through 4 (for object
+     reference) to 7 (for 'short') which matches the pattern of how JVM
+     opcodes typically depend on the operand type. */
+
   private int adjustTypedOp  (Type type)
   {
     switch (type.getSignature().charAt(0))
@@ -703,6 +707,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(retType);
   }
 
+  void emitMaybeWide (int opcode, int index)
+  {
+    if (index >= 256)
+      {
+	put1(196); // wide
+	put1(opcode);
+	put2(index);
+      }
+    else
+      {
+	put1(opcode);
+	put1(index);
+      }
+  }
+
   /**
    * Comple code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
@@ -721,15 +740,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (offset <= 3)
       put1(26 + 4 * kind + offset);  // [ilfda]load_[0123]
     else
-      {
-	if (offset >= 256)
-	  {
-	    put1(196); // wide
-	    put1(offset >> 8);
-	  }
-	put1(21 + kind);  // [ilfda]load
-	put1(offset);
-      }
+      emitMaybeWide(21 + kind, offset); // [ilfda]load
     pushType(var.getType());
   }
 
@@ -747,15 +758,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (offset <= 3)
       put1(59 + 4 * kind + offset);  // [ilfda]store_[0123]
     else
-      {
-	if (offset >= 256)
-	  {
-	    put1(196); // wide
-	    put1(offset >> 8);
-	  }
-	put1(54 + kind);  // [ilfda]store
-	put1(offset);
-      }
+      emitMaybeWide(54 + kind, offset); // [ilfda]store
   }
 
 
@@ -1548,6 +1551,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	while (++j <= 3) dst.print(' ');
 	dst.print(str);
 	dst.print(": ");
+	// We do a rough binary partition of the opcodes.
 	if (op < 120)
 	  {
 	    if (op < 87)
@@ -1593,7 +1597,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		    if (index >= 0) { dst.write('_');  dst.print(index); }
 		    else if (index == -1)
 		      {
-			if (wide) { index = readUnsignedShort(i); index += 2; }
+			if (wide) { index = readUnsignedShort(i); i += 2; }
 			else { index = code[i] & 0xff; i++; }
 			wide = false;
 			dst.print(' ');
@@ -1651,7 +1655,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		  }
 		else if (op < 153) // op >= 148 [lcmp] && op <= 152 [dcmpg]
 		  print("lcmp;fcmpl;fcmpg;dcmpl;dcmpg;", op-148, dst);
-		else
+		else if (op < 169)
 		  {
 		    if (op < 159)
 		      {
@@ -1665,10 +1669,19 @@ public class CodeAttr extends Attribute implements AttrContainer
 			print("eq;ne;lt;ge;gt;le;", op-159, dst);
 		      }
 		    else
-		      print("goto;jsr;ret;", op-167, dst);
+		      print("goto;jsr;", op-167, dst);
 		    int delta = (short) readUnsignedShort(i);
 		    i += 2;
 		    dst.print(' ');  dst.print(oldpc+delta);
+		  }
+		else
+		  {
+		    int index;
+		    dst.print("ret ");
+		    if (wide) { index = readUnsignedShort(i); index += 2; }
+		    else { index = code[i] & 0xff; i++; }
+		    wide = false;
+		    dst.print(index);
 		  }
 	      }
 	    else

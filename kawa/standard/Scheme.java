@@ -399,9 +399,9 @@ public class Scheme extends Interpreter
       define_proc ("record?", "kawa.lib.reflection");
 
       //-- (when cond exp ...)
-      define_syntax ("when", "kawa.lib.when_unless");
+      define_syntax ("when", "kawa.lib.syntax");
       //-- (unless cond exp ...)
-      define_syntax ("unless", "kawa.lib.when_unless");
+      define_syntax ("unless", "kawa.lib.syntax");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
@@ -410,6 +410,9 @@ public class Scheme extends Interpreter
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
       define_proc ("make-quantity", "kawa.standard.make_quantity");
       define_syntax ("define-unit", "kawa.lib.quantities");
+
+      define_proc ("gentemp", "kawa.lib.syntax");
+      define_syntax ("defmacro", "kawa.lib.syntax");
 
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");

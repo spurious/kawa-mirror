@@ -1,3 +1,8 @@
+2001-03-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  The automake Java support does not handle "built"
+	Java sources, so roll our own.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	New package.

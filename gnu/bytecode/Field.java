@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -44,14 +47,16 @@ public class Field {
     }
   }
   
-  void assign_constants (ClassType classfile) {
+  void assign_constants (ClassType classfile)
+  {
+    ConstantPool constants = classfile.constants;
     if (name_index == 0 && name != null)
-      name_index = classfile.get_utf8_const (name);
+      name_index = constants.addUtf8(name).index;
     if (signature_index == 0 && type != null)
-      signature_index = classfile.get_utf8_const (type.signature);
+      signature_index = constants.addUtf8(type.signature).index;
     if (constant_value_index > 0 && classfile.ConstantValue_name_index == 0)
       classfile.ConstantValue_name_index
-	= classfile.get_utf8_const ("ConstantValue");
+	= constants.addUtf8("ConstantValue").index;
   }
 
   public final String getName ()

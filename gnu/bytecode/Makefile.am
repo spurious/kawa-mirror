@@ -15,11 +15,11 @@ OBJ=\
 Access.class \
 ArrayType.class \
 ClassType.class \
+ConstantPool.class \
 CpoolClass.class \
 CpoolEntry.class \
-CpoolInt.class \
-CpoolLong.class \
-CpoolDouble.class \
+CpoolValue1.class \
+CpoolValue2.class \
 CpoolNameAndType.class \
 CpoolRef.class \
 CpoolString.class \
@@ -34,7 +34,9 @@ Variable.class \
 VarEnumerator.class \
 ZipArchive.class \
 ZipMember.class \
-ZipLoader.class
+ZipLoader.class \
+ClassFileInput.class \
+ClassTypeWriter.class
 
 java_DATA=$(OBJ)
 

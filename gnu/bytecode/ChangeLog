@@ -1,3 +1,21 @@
+Sun Mar 30 22:54:48 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* LICENSE:  New file - and new license!
+	* *.java:  Added copyright notice.
+
+	* Access.java (toString):  New static method.
+	* ClassFileInput.java:  New class for reading .class files.
+	* ClassType.java"  Remove get_*_const methods.
+	Rename various fields.  Avoid creating constant pool until needed.
+	* ClassTypeWriter.java:  New class, for printing a ClassType.
+	* ConstantPool.java:  New class - manage constant pool.
+	* Cpool*.java:  Add getTag method.  Rename hash_of to hashCode.
+	Add print methods, and new default constructors.
+	* CpoolInt.java, CpoolFloat.java:  Combined into CpoolValue1.java.
+	* CpoolLong.java, CpoolDouble.java:  Combined into CpoolValue2.java.
+	* Type.java (signatureToPrimitive, signatureToType, signatureLength,
+	signatureToName):  New methods.
+
 Tue Mar 25 13:26:29 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	Move this package from codegen to gnu.bytecode.

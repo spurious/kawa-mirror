@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -5,119 +8,107 @@ public class ClassType extends Type {
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
-  int this_class;
-  int super_class; // constant pool index of super class, or -1 if unknown
-  int[] interfacesImplemented;
+  static java.util.Hashtable classTable;
+
+  /** Find a ClassType with the given name, or create a new one.
+   * Use this for "library classes", where you need the field/method types,
+   * but not one where you are about to generate code for.
+   * @param name the name of the class (e..g. "java.lang.String").
+   */
+  static ClassType make(String name)
+  {
+    if (classTable == null)
+      classTable = new java.util.Hashtable();
+    ClassType cl = (ClassType) classTable.get(name);
+    if (cl == null)
+      {
+	cl = new ClassType(name);
+	classTable.put(name, cl);
+      }
+    return cl;
+  }
+
+  int thisClassIndex;
+
+  /** The super (base) class of the current class.
+   * X.superClass == X means the superClass has not been specified,
+   * and defaults to java.lang.Object.
+   * X.superClass == null means X has no super class, which implies
+   * that X == java.lang.Object. */
+  ClassType superClass = this;
+  /** The constant pool index of the superClass, or -1 if unassigned. */
+  int superClassIndex = -1;
+
+  ClassType[] interfaces;
+  int[] interfaceIndexes;
   public int access_flags;
 
+  String sourcefile;
   /** The index of the SourceFile attribute (if > 0). */ 
-  int sourcefile_index;
+  int sourcefileIndex;
 
   boolean emitDebugInfo = true;
 
-  // Constant-pool-related fields. */
+  ConstantPool constants;
 
-  /** The entries in the constant pool.
-   * The first element (constant_pool[0]) is an unused dummy. */
-  CpoolEntry[] constant_pool;
+  public final ConstantPool getConstants () { return constants; }
 
-  /** Number of elements in the constant pool, not counting
-   * the initial dummy element (with index 0). */
-  int constant_pool_count;
-
-  CpoolEntry[] constant_pool_hash;
-
-  /** Get index in constant pool of a CONSTANT_Utf8 constant,
-    * Re-use existing constant if there is one;  otherwise allocate new entry.
-   * @param value of constant (as Unicode String)
-   */
-  public int get_utf8_const (String str) {
-    return CpoolUtf8.get_const (this, str).index;
-  }
-
-  public int get_class_const (ClassType ctype)
+  public final CpoolEntry getConstant(int i)
   {
-    return CpoolClass.get_const (this, ctype.this_name).index;
+    if (constants == null || constants.pool == null
+	|| i > constants.count)
+      return null;
+    return constants.pool[i];
   }
 
-  public int get_class_const (CpoolUtf8 name)
-  {
-    return CpoolClass.get_const (this, name).index;
-  }
-  public int get_class_const (int name_index) {
-    return get_class_const ((CpoolUtf8)constant_pool[name_index]);
-  }
-  public int get_int_const (int i) {
-    return CpoolInt.get_const (this, i).index;
-  }
+  /** Return the modifiers (access flags) for this class. */
+  public final int getModifiers() { return access_flags; }
 
-  /**
-   * Sets the name of the class being defined in this classfile.
+  /** Set the modifiers (access flags) for this class. */
+  public final void setModifiers(int flags) { access_flags = flags; }
+
+  /** Sets the name of the class being defined in this classfile.
    * @param name the name to give to the class
-   * @return the the constant pool entry for the class
    */
-  CpoolClass setName (String name)
+  void setName (String name)
   {
     this_name = name;
     name = name.replace ('.', '/');
     setSignature("L"+name+";");
-    CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
-    CpoolClass class_entry = CpoolClass.get_const (this, name_entry);
-    this_class = class_entry.index;
-    return class_entry;
   }
 
   /** Set the name of the SourceFile associated with this class. */
   public void setSourceFile (String name)
   {
-    sourcefile_index = CpoolUtf8.get_const (this, name).index;
+    sourcefile = name;
   }
 
   /**
    * Set the superclass of the is class.
-   * param name name of super class, or null if this is "Object".
+   * @param name name of super class, or null if this is "Object".
    */
-  public CpoolClass setSuper (String name) {
-    if (name == null) {
-      super_class = 0;
-      return null;
-    }
-    else {
-      name = name.replace ('.', '/');
-      CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
-      CpoolClass class_entry = CpoolClass.get_const (this, name_entry);
-      super_class = class_entry.index;
-      return class_entry;
-    }
+  public void setSuper (String name)
+  {
+    setSuper(name == null ? null : ClassType.make(name));
   }
 
-  public CpoolClass setSuper (ClassType superClass)
+  public void setSuper (ClassType superClass)
   {
-    return setSuper (superClass.this_name);
+    this.superClass = superClass;
   }
+
+  public ClassType[] getInterfaces() { return interfaces; }
 
   public void setInterfaces (ClassType[] interfaces)
-  { int n = interfaces.length;
-    interfacesImplemented = new int [n];
-    for (int i = 0;  i < n;  i++)
-      {
-	String name = interfaces[i].this_name.replace ('.', '/');
-	CpoolUtf8 name_entry = CpoolUtf8.get_const (this, name);
-	CpoolClass class_entry = CpoolClass.get_const (this, name_entry);
-	interfacesImplemented[i] = class_entry.index;
-      }
-  }
+  { this.interfaces = interfaces; }
 
-  public ClassType () {
-    super_class = -1;
-  }
+  public ClassType () { }
+
   public ClassType (String class_name)
   {
     super();
     size = 4;
     setName(class_name);
-
-    super_class = -1;
   }
 
   Field fields;
@@ -199,9 +190,55 @@ public class ClassType extends Type {
     return method;
   }
 
-  public void doFixups () {
-    if (super_class < 0)
-      setSuper ("java.lang.Object");
+  public Method addMethod (String name,  String signature, int flags)
+  {
+    int len = signature.length();
+    if (len < 3 || signature.charAt(0) != '(')
+      throw new ClassFormatError("bad method signature");
+    int pos = 1;
+    java.util.Stack types = new java.util.Stack();
+    for (;;)
+      {
+	int arg_sig_len = Type.signatureLength(signature, pos);
+	if (arg_sig_len < 0)
+	  {
+	    if (pos < len && signature.charAt(pos) == ')')
+	      break;
+	    throw new ClassFormatError("bad method signature");
+	  }
+	String arg_sig = signature.substring(pos, pos+arg_sig_len);
+	Type arg_type = Type.signatureToType(arg_sig);
+	types.push(arg_type);
+	pos += arg_sig_len;
+      }
+    Type[] arg_types = new Type[types.size()];
+    for (int i = types.size();  --i >= 0; )
+      arg_types[i] = (Type) types.pop();
+    Type rtype = Type.signatureToType(signature.substring(pos+1));
+    return addMethod(name, arg_types, rtype, flags);
+  }
+
+  /** Do various fixups after generating code but before we can write it out.
+   * This includes assigning constant pool indexes where needed,
+   * finalizing labels, etc. */
+  public void doFixups ()
+  {
+    if (constants == null)
+      constants = new ConstantPool();
+    if (thisClassIndex == 0)
+      thisClassIndex = constants.addClass(this).index;
+    if (superClass == this)
+      setSuper((ClassType) null);
+    if (superClassIndex < 0)
+      superClassIndex = superClass == null ? 0
+	: constants.addClass(superClass).index;
+    if (interfaces != null && interfaceIndexes == null)
+      {
+	int n = interfaces.length;
+	interfaceIndexes = new int [n];
+	for (int i = 0;  i < n;  i++)
+	  interfaceIndexes[i] = constants.addClass(interfaces[i]).index;
+      }
     for (Field field = fields; field != null; field = field.next) {
       field.assign_constants (this);
     }
@@ -209,12 +246,17 @@ public class ClassType extends Type {
       method.assign_constants ();
       method.finalize_labels ();
     }
+    if (sourcefile != null)
+      sourcefileIndex = constants.addUtf8(sourcefile).index;
+    if (SourceFile_name_index == 0 && sourcefileIndex > 0)
+      SourceFile_name_index = constants.addUtf8("SourceFile").index;
+
   }
 
   public void writeToStream (OutputStream stream)
     throws java.io.IOException
   {
-    DataOutputStream dstr = new DataOutputStream (stream);
+    java.io.DataOutputStream dstr = new java.io.DataOutputStream (stream);
     int i;
 
     doFixups ();
@@ -224,24 +266,22 @@ public class ClassType extends Type {
     dstr.writeShort (major_version);
 
     // Write out the constant pool.
-    dstr.writeShort (constant_pool_count+1);
-    for (i = 1; i <= constant_pool_count; i++) {
-	CpoolEntry entry = constant_pool[i];
-	if (entry != null)
-	    entry.write (dstr);
-    }
+    if (constants == null)
+      dstr.writeShort (1);
+    else
+      constants.write(dstr);
 
     dstr.writeShort (access_flags);
-    dstr.writeShort (this_class);
-    dstr.writeShort (super_class);
-    if (interfacesImplemented == null)
+    dstr.writeShort (thisClassIndex);
+    dstr.writeShort (superClassIndex);
+    if (interfaceIndexes == null)
       dstr.writeShort (0);  // interfaces_count
     else
       {
-	int interfaces_count = interfacesImplemented.length;
+	int interfaces_count = interfaceIndexes.length;
 	dstr.writeShort (interfaces_count);
 	for (i = 0;  i < interfaces_count; i++)
-	  dstr.writeShort (interfacesImplemented[i]);
+	  dstr.writeShort (interfaceIndexes[i]);
       }
 
     dstr.writeShort (fields_count);
@@ -252,13 +292,13 @@ public class ClassType extends Type {
     for (Method method = methods;  method != null;  method = method.next)
       method.write (dstr, this);
 
-    int attributes_count = sourcefile_index > 0 ? 1 : 0;
+    int attributes_count = sourcefileIndex > 0 ? 1 : 0;
     dstr.writeShort (attributes_count);
-    if (sourcefile_index > 0)
+    if (sourcefileIndex > 0)
       {
 	dstr.writeShort (SourceFile_name_index);
 	dstr.writeInt (2);
-	dstr.writeShort (sourcefile_index);
+	dstr.writeShort (sourcefileIndex);
       }
   }
 

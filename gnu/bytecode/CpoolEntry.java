@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -17,12 +20,14 @@ abstract public class CpoolEntry
   /** A hashvalue so we do not get duplicate constant pool entries. */
   int hash;
 
-  /** This entry's index in the constant pool of the owning ClassType. */
+  /** This entry's index in the constant pool. */
   public int index;
 
   /** The next entry in the same hash bucket
-   * (of the owning ClassType's constant_pool_hash). */
+   * (of the owning ConstantPool's hashTab). */
   CpoolEntry next;
+
+  public abstract int getTag();
 
   public int hashCode () { return hash; }
 
@@ -30,55 +35,66 @@ abstract public class CpoolEntry
        throws java.io.IOException;
 
   /**
-   * Enter current element into classfile.constant_pool_hash hash table.
+   * Enter current element into cpool.hashTab.
    */
-  private void add_hashed (ClassType classfile)
+  private void add_hashed (ConstantPool cpool)
   {
-    CpoolEntry[] hash_tab = classfile.constant_pool_hash;
-    int index = (hash & 0x7FFFFFFF) % hash_tab.length;
-    next = hash_tab[index];
-    hash_tab[index] = this;
+    CpoolEntry[] hashTab = cpool.hashTab;
+    int index = (hash & 0x7FFFFFFF) % hashTab.length;
+    next = hashTab[index];
+    hashTab[index] = this;
   }
 
-  public CpoolEntry (ClassType classfile, int h)
+  protected CpoolEntry () { }
+
+  public CpoolEntry (ConstantPool cpool, int h)
   {
      hash = h;
-     index = ++classfile.constant_pool_count;
+     if (cpool.locked)
+       throw new Error("adding new entry to locked contant pool");
+     index = ++cpool.count;
 
-     // (Re-)allocate the classfile.constant_pool array if need be.
-     if (classfile.constant_pool == null)
-	classfile.constant_pool = new CpoolEntry[60];
-     else if (index >= classfile.constant_pool.length) {
-       int old_size = classfile.constant_pool.length;
-       int new_size = 2 * classfile.constant_pool.length;
+     // (Re-)allocate the cpool.pool array if need be.
+     if (cpool.pool == null)
+	cpool.pool = new CpoolEntry[60];
+     else if (index >= cpool.pool.length) {
+       int old_size = cpool.pool.length;
+       int new_size = 2 * cpool.pool.length;
        int i;
        CpoolEntry[] new_pool = new CpoolEntry[new_size];
        for (i = 0; i < old_size; i++) {
-	 new_pool[i] = classfile.constant_pool[i];
+	 new_pool[i] = cpool.pool[i];
        }
-       classfile.constant_pool = new_pool;
+       cpool.pool = new_pool;
      }
 
-     // Re-hash classfile.constant_pool_hash hash_table if needed.
-     if (classfile.constant_pool_hash == null)
-       classfile.constant_pool_hash = new CpoolEntry[101];
+     // Re-hash cpool.hashTab hash_table if needed.
+     if (cpool.hashTab == null)
+       cpool.hashTab = new CpoolEntry[101];
      else {
-       int old_size = classfile.constant_pool_hash.length;
+       int old_size = cpool.hashTab.length;
        if (index >= 0.60 * old_size) {
 	 CpoolEntry[] new_hash = new CpoolEntry[2 * old_size + 1];
-	 classfile.constant_pool_hash = new_hash;
+	 cpool.hashTab = new_hash;
 	 int i;
 	 for (i = 0; i < old_size; i++) {
-	   CpoolEntry entry = classfile.constant_pool[i];
+	   CpoolEntry entry = cpool.pool[i];
 	   if (entry != null)
-	     entry.add_hashed (classfile);
+	     entry.add_hashed (cpool);
 	 }
        }
      }
 
-     // Enter into classfile.constant_pool array.
-     classfile.constant_pool[index] = this;
-     // Enter into classfile.constant_pool_hash hash table.
-     add_hashed (classfile);
+     // Enter into cpool.constant_pool array.
+     cpool.pool[index] = this;
+     // Enter into cpool.hashTab hash table.
+     add_hashed (cpool);
    }
+
+  /** Print this constant pool entry.
+   * If verbosity==0, print very tersely (no extraneous text).
+   * If verbosity==1, prefix the type of the constant.
+   * If verbosity==2, add more descriptive text. */
+
+  public abstract void print (ClassTypeWriter dst, int verbosity);
 };

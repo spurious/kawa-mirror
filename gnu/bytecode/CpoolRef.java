@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -15,69 +18,22 @@ CpoolRef extends CpoolEntry
    * CONSTANT_InterfaceMethodref (11).
    */
   int tag;
+  public int getTag() { return tag; }
 
-  private CpoolRef (ClassType classfile, int hash, int tag,
-		    CpoolClass clas, CpoolNameAndType nameAndType)
+  CpoolRef (int tag) { this.tag = tag; }
+
+  CpoolRef (ConstantPool cpool, int hash, int tag,
+	    CpoolClass clas, CpoolNameAndType nameAndType)
   {
-    super (classfile, hash);
+    super (cpool, hash);
     this.tag = tag;
     this.clas = clas;
     this.nameAndType = nameAndType;
   }
 
-  final static int hash_of (CpoolClass clas, CpoolNameAndType nameAndType)
+  final static int hashCode (CpoolClass clas, CpoolNameAndType nameAndType)
   {
     return clas.hash ^ nameAndType.hash;
-  }
-
-  public static CpoolRef
-  get_const (ClassType classfile, int tag,
-	     CpoolClass clas, CpoolNameAndType nameAndType)
-  {
-    int h = hash_of (clas, nameAndType);
-
-    // Check if we already have a matching CONSTANT_Integer.
-    CpoolEntry[] hash_tab = classfile.constant_pool_hash;
-    if (hash_tab != null) {
-      int index = (h & 0x7FFFFFFF) % hash_tab.length;
-      CpoolEntry entry;
-      for (entry = hash_tab[index]; entry != null; entry = entry.next) {
-	if (h == entry.hash
-	    && entry instanceof CpoolRef)
-	  {
-	    CpoolRef ref = (CpoolRef) entry;
-	    if (ref.tag == tag
-		&& ref.clas == clas
-		&& ref.nameAndType== nameAndType)
-	      return ref;
-	  }
-      }
-    }
-    return new CpoolRef (classfile, h, tag, clas, nameAndType);
-  }
-
-  public static CpoolRef
-  get_const (ClassType classfile, Method method)
-  {
-    CpoolClass clas
-      = CpoolClass.get_const (classfile, method.classfile.this_name);
-    int tag;
-    if ((method.getDeclaringClass().access_flags & Access.INTERFACE) == 0)
-      tag = 10; // CONSTANT_Methodref
-    else
-      tag = 11; // CONSTANT_InterfaceMethodref
-    CpoolNameAndType nameType = CpoolNameAndType.get_const (classfile, method);
-    return get_const (classfile, tag, clas, nameType);
-  }
-
-  public static CpoolRef
-  get_const (ClassType classfile, Field field)
-  {
-    CpoolClass clas
-      = CpoolClass.get_const (classfile, field.owner.this_name);
-    int tag = 9;  // CONSTANT_Fieldref
-    CpoolNameAndType nameType = CpoolNameAndType.get_const (classfile, field);
-    return get_const (classfile, tag, clas, nameType);
   }
 
   void write (DataOutputStream dstr) throws java.io.IOException
@@ -87,5 +43,39 @@ CpoolRef extends CpoolEntry
     dstr.writeShort (nameAndType.index);
   }
 
+  public void print (ClassTypeWriter dst, int verbosity)
+  {
+    String str;
+    switch (tag)
+      {
+      case 9:   str = "Field";  break;
+      case 10:  str = "Method";  break;
+      case 11:  str = "InterfaceMethod";  break;
+      default:  str = "<Unknown>Ref";  break;
+      }
+    if (verbosity > 0)
+      {
+	dst.print(str);
+	if (verbosity == 2)
+	  {
+	    dst.print(" class: ");
+	    dst.printOptionalIndex(clas);
+	  }
+	else
+	  dst.print( ' ');
+      }
+    clas.print(dst, 0);
+    if (verbosity < 2)
+      dst.print('.');
+    else
+      {
+	dst.print(" name_and_type: ");
+	dst.printOptionalIndex(nameAndType);
+	dst.print('<');
+      }
+    nameAndType.print(dst, 0);
+    if (verbosity == 2)
+      dst.print('>');
+  }
 }
 

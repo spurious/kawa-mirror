@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -29,6 +32,112 @@ public class Type {
 
   public Type promote () {
     return size < 4 ? int_type : this;
+  }
+
+  /** Returns the primitive typecorresponding to a signature character. */
+  public static Type signatureToPrimitive(char sig)
+  {
+    switch(sig)
+      {
+      case 'B':  return Type.byte_type;
+      case 'C':  return Type.char_type;
+      case 'D':  return Type.double_type;
+      case 'F':  return Type.float_type;
+      case 'S':  return Type.short_type;
+      case 'I':  return Type.int_type;
+      case 'J':  return Type.long_type;
+      case 'Z':  return Type.boolean_type;
+      case 'V':  return Type.void_type;
+      }
+    return null;
+  }
+
+  public static Type signatureToType(String sig)
+  {
+    int len = sig.length();
+    if (len == 0)
+      return null;
+    char c = sig.charAt(0);
+    Type type;
+    if (len == 1)
+      {
+	type = signatureToPrimitive(c);
+	if (type != null)
+	  return type;
+      }
+    if (c == '[')
+      {
+	type = signatureToType(sig.substring(1));
+	return new ArrayType(type);
+      }
+    if (c == 'L' && len > 2 && sig.indexOf(';') == len-1)
+      return ClassType.make(sig.substring(1,len-1).replace('/', '.'));
+    return null;
+  }
+
+  /** Return the length of the signature starting at a given string position.
+   * Returns -1 for an invalid signature. */
+  public static int signatureLength (String sig, int pos)
+  {
+    int len = sig.length();
+    if (len <= pos)
+      return -1;
+    char c = sig.charAt(pos);
+    int arrays = 0;
+    while (c == '[')
+      {
+	arrays++;
+	pos++;
+	c = sig.charAt(pos);
+      }
+    if (signatureToPrimitive(c) != null)
+      return arrays+1;
+    if (c == 'L')
+      {
+	int end = sig.indexOf(';', pos);
+	if (end > 0)
+	  return arrays + end + 1 - pos;
+      }
+    return -1;
+  }
+
+  public static int signatureLength (String sig)
+  {
+    return signatureLength(sig, 0);
+  }
+
+  /** Returns the Java-level type name from a given signature.
+   * Returns null for an invalid signature. */
+  public static String signatureToName(String sig)
+  {
+    int len = sig.length();
+    if (len == 0)
+      return null;
+    char c = sig.charAt(0);
+    Type type;
+    if (len == 1)
+      {
+	type = signatureToPrimitive(c);
+	if (type != null)
+	  return type.getName();
+      }
+    if (c == '[')
+      {
+	int arrays = 1;
+	if (arrays < len && sig.charAt(arrays) == '[')
+	  arrays++;
+	sig = signatureToName(sig.substring(arrays));
+	if (sig == null)
+	  return null;
+	StringBuffer buf = new StringBuffer(50);
+	buf.append(sig);
+	while (--arrays >= 0)
+	  buf.append("[]");
+	return buf.toString();
+      }
+    if (c == 'L' && len > 2 && sig.indexOf(';') == len-1)
+      return sig.substring(1,len-1).replace('/', '.');
+    return null;
   }
 
   public final String getName ()

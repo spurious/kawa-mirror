@@ -1,3 +1,6 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
@@ -44,6 +47,11 @@ public class Method {
 
   public final boolean getStaticFlag () {
     return (access_flags & Access.STATIC) != 0;
+  }
+
+  public final ConstantPool getConstants ()
+  {
+    return classfile.constants;
   }
     
 
@@ -156,6 +164,8 @@ public class Method {
 
   public void init_param_slots ()
   {
+    if (classfile.constants == null)
+      classfile.constants = new ConstantPool();
     if ((access_flags & Access.STATIC) == 0)
       addLocal (classfile).setParameter (true);
     int arg_count = arg_types.length;
@@ -313,7 +323,7 @@ public class Method {
       put1 (17); // sipush
       put2 (i);
     } else {
-      int j = classfile.get_int_const (i);
+      int j = getConstants().addInt(i).index;
       if (j < 256) {
 	put1 (18); // ldc1
 	put1 (j);
@@ -342,7 +352,7 @@ public class Method {
     else
       {
 	instruction_start_hook (3);
-	int j = CpoolLong.get_const (classfile, i).index;
+	int j = getConstants().addLong(i).index;
       	put1 (20); // ldc2w
 	put2 (j);
       }
@@ -374,7 +384,7 @@ public class Method {
     else
       {
 	instruction_start_hook (3);
-	int j = CpoolDouble.get_const (classfile, x).index;
+	int j = getConstants().addDouble(x).index;
       	put1 (20); // ldc2w
 	put2 (j);
       }
@@ -384,8 +394,7 @@ public class Method {
   public void compile_push_string (String str)
   {
     instruction_start_hook (3);
-    CpoolUtf8 bytes = CpoolUtf8.get_const (classfile, str);
-    int index = CpoolString.get_const (classfile, bytes).index;
+    int index = getConstants().addString(str).index;
     if (index < 256)
       {
 	put1 (18); // ldc1
@@ -429,7 +438,7 @@ public class Method {
   {
     instruction_start_hook (3);
     put1 (187); // new
-    put2 (classfile.get_class_const (type));
+    put2(getConstants().addClass(type).index);
     push_stack_type (type);
   }
 
@@ -459,8 +468,8 @@ public class Method {
     else if (element_type instanceof ClassType)
       {
 	instruction_start_hook (3);
-	put1 (189); // anewarray
-	put2 (classfile.get_class_const ((ClassType) element_type));
+	put1(189); // anewarray
+	put2(getConstants().addClass((ClassType) element_type).index);
       }
     else
       throw new Error ("unimplemented type in compile_new_array");
@@ -475,12 +484,12 @@ public class Method {
     if (type instanceof ArrayType)
       {
 	ArrayType atype = (ArrayType) type;
-	CpoolUtf8 name = CpoolUtf8.get_const (classfile, atype.signature);
-	put2 (classfile.get_class_const (name));
+	CpoolUtf8 name = getConstants().addUtf8(atype.signature);
+	put2(getConstants().addClass(name).index);
       }
     else if (type instanceof ClassType)
       {
-	put2 (classfile.get_class_const ((ClassType) type));
+	put2(getConstants().addClass((ClassType) type).index);
       }
     else
       throw new Error ("unimplemented type in compile_checkcast");
@@ -1081,8 +1090,8 @@ public class Method {
 	("compile_invoke_xxx static flag mis-match method.flags="+method.access_flags);
     if (!is_invokestatic)
       arg_count++;
-    put1 (opcode);  // invokevirtual, invokespecial, or invokestatic
-    put2 (CpoolRef.get_const (classfile, method).index);
+    put1(opcode);  // invokevirtual, invokespecial, or invokestatic
+    put2(getConstants().addMethodRef(method).index);
     if (opcode == 185)  // invokeinterface
       {
 	put1(arg_count);
@@ -1149,9 +1158,9 @@ public class Method {
 
   private void compile_fieldop (Field field, int opcode)
   {
-    instruction_start_hook (3);
-    put1 (opcode);
-    put2 (CpoolRef.get_const (classfile, field).index);
+    instruction_start_hook(3);
+    put1(opcode);
+    put2(getConstants().addFieldRef(field).index);
   }
 
   /** Compile code to get a static field value.
@@ -1312,27 +1321,23 @@ public class Method {
 
   void assign_constants ()
   {
+    ConstantPool constants = getConstants();
     if (name_index == 0 && name != null)
-      name_index = classfile.get_utf8_const (name);
+      name_index = constants.addUtf8(name).index;
 
     if (PC > 0 && classfile.Code_name_index == 0)
-      classfile.Code_name_index = classfile.get_utf8_const ("Code");
-
-    if (classfile.SourceFile_name_index == 0
-	&& classfile.sourcefile_index > 0)
-      classfile.SourceFile_name_index
-	= classfile.get_utf8_const ("SourceFile");
+      classfile.Code_name_index = constants.addUtf8("Code").index;
 
     if (classfile.emitDebugInfo)
       {
 	if (classfile.LineNumberTable_name_index == 0
 	     && linenumber_count > 0)
 	  classfile.LineNumberTable_name_index
-	    = classfile.get_utf8_const ("LineNumberTable");
+	    = constants.addUtf8("LineNumberTable").index;
 
 	if (classfile.LocalVariableTable_name_index == 0)
 	  classfile.LocalVariableTable_name_index
-	    = classfile.get_utf8_const ("LocalVariableTable");
+	    = constants.addUtf8("LocalVariableTable").index;
 
 	VarEnumerator vars = parameter_scope.allVars ();
 	Variable var;
@@ -1341,17 +1346,17 @@ public class Method {
 	    if (var.isSimple () && var.name != null)
 	      {
 		if (var.name_index == 0)
-		  var.name_index = classfile.get_utf8_const (var.name);
+		  var.name_index = constants.addUtf8(var.getName()).index;
 		if (var.signature_index == 0)
 		  var.signature_index
-		    = classfile.get_utf8_const (var.getType().signature);
+		    = constants.addUtf8(var.getType().signature).index;
 	      }
 	  }
 	
       }
 
     if (signature_index == 0)
-      signature_index = classfile.get_utf8_const (getSignature ());
+      signature_index = constants.addUtf8(getSignature()).index;
   }
 
   public ClassType getDeclaringClass() { return classfile; }

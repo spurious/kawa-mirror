@@ -1,7 +1,11 @@
+// Copyright (c) 1997  Cygnus Solutions, Inc.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
 package gnu.bytecode;
 import java.io.*;
 
 /** Access flags. */
+/* When using JDK 1.1, replace this class by java.lang.reflec.Modifiers. */
 
 public class Access {
   static public final short PUBLIC      = 0x0001;
@@ -15,5 +19,21 @@ public class Access {
   static public final short NATIVE      = 0x0100;
   static public final short INTERFACE   = 0x0200;
   static public final short ABSTRACT    = 0x0400;
-}
 
+  public static String toString(int flags)
+  {
+    StringBuffer buf = new StringBuffer();
+    if ((flags & PUBLIC) != 0)      buf.append(" public");
+    if ((flags & PRIVATE) != 0)     buf.append(" private");
+    if ((flags & PROTECTED) != 0)   buf.append(" protected");
+    if ((flags & STATIC) != 0)      buf.append(" static");
+    if ((flags & FINAL) != 0)       buf.append(" final");
+    if ((flags & SYNCHRONIZED) != 0)buf.append(" synchronized");
+    if ((flags & VOLATILE) != 0)    buf.append(" volatile");
+    if ((flags & TRANSIENT) != 0)   buf.append(" transient");
+    if ((flags & NATIVE) != 0)      buf.append(" native");
+    if ((flags & INTERFACE) != 0)   buf.append(" interface");
+    if ((flags & ABSTRACT) != 0)    buf.append(" abstract");
+    return buf.toString();
+  }
+}

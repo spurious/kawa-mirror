@@ -167,9 +167,8 @@ public abstract class Procedure implements Named, Printable
     ps.print ("#<procedure ");
     String n = getName();
     if (n == null)
-      ps.print ("<unnamed>");
-    else
-      ps.print (n);
+      n = getClass().getName();
+    ps.print (n);
     ps.print ('>');
   }
 

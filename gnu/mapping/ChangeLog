@@ -1,3 +1,7 @@
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* Procedure.java (toString):  If no name, use class name instead.
+
 2001-09-13  Per Bothner  <per@bothner.com>
 
 	* CpsMethodContainer.java (apply):  Change return type to void.

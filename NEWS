@@ -1,3 +1,6 @@
+Changes from Kawa 1.7 to 1.7.90.
+================================
+
 XQuery:
 * 'M to N' is now empty if M > N, following the November '03 draft.
 * New Java api for evaluating Java expression with a given context sequence

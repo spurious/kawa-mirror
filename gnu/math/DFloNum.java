@@ -228,6 +228,6 @@ public class DFloNum extends RealNum implements Compilable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPushDouble(value);
-    comp.method.compile_invoke_static (makeMethod);
+    code.emitInvokeStatic(makeMethod);
   }
 }

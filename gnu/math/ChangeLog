@@ -1,3 +1,7 @@
+Tue Feb  3 12:53:54 1998  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java, DFlotNum.java:  Update calls to gnu.bytecode methods.
+
 Thu Jan 15 13:42:16 1998  Alcibiades Petrofsky <albatros@wco.com>
 
 	* Complex.java (imMinusOne):  New method.

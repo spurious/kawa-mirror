@@ -1141,12 +1141,12 @@ public class IntNum extends RatNum implements Compilable
     if (words == null)
       {
 	code.emitPushInt(ival);
-	comp.method.compile_invoke_static (makeIntMethod);
+	code.emitInvokeStatic(makeIntMethod);
       }
     else if (ival <= 2)
       {
 	code.emitPushLong(longValue ());
-	comp.method.compile_invoke_static (makeLongMethod);
+	code.emitInvokeStatic(makeLongMethod);
       }
     else
       throw new Error ("IntNum.emit for bignum - not implemented");

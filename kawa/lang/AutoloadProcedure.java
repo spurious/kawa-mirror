@@ -8,13 +8,12 @@ package kawa.lang;
 
 public class AutoloadProcedure extends Procedure
 {
-  /** If non-null, this is the name of the procedure. */
-  Symbol name;
-
   /** The name of the class that defines the procedure.
    * It must be the name of a class in the CLASSPATH (for example:
    * "kawa.standard.list"), and the class must extend Procedure,
-   * and have a default constructor.*/
+   * and have a default constructor.
+   * If the Procedure is a ModuleMody, apply0() is applied,
+   * and that is expected to define the Procedure in the global environment. */
   String className;
 
   /** The loaded procedure, or null if it has not yet been loaded. */
@@ -22,17 +21,16 @@ public class AutoloadProcedure extends Procedure
 
   public AutoloadProcedure (Symbol name, String className)
   {
-    super();
-    this.name = name;
+    super(name);
     this.className = className;
   }
 
   public void print(java.io.PrintStream ps)
   {
     ps.print ("#<procedure ");
-    if (name != null)
+    if (name () != null)
       {
-	ps.print (name);
+	ps.print (name ());
 	ps.print (' ');
       }
     if (loaded != null)
@@ -49,22 +47,33 @@ public class AutoloadProcedure extends Procedure
   {
     throw new GenericError (prefix + className
 				+ " while autoloading "
-				+ (name == null ? "" : name.toString ()));
+				+ (name () == null ? "" : name().toString ()));
   }
 
   /** Load the class named in className. */
   void load ()
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
+    Symbol name = this.name ();
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
-	if (name != null)
+	if (loaded instanceof ModuleBody)
+	  {
+	    loaded.apply0 ();
+	    Object value = Interpreter.lookup_global (name);
+	    if (value == null
+		|| !(value instanceof Procedure))
+	      throw_error
+		("invalid ModuleBody class - does not define " + name);
+	    loaded = (Procedure) value;
+	  }
+	else if (name != null)
 	  {
 	    if (Interpreter.lookup_global (name) == this)
 	      Interpreter.define_global (name, loaded);
-	    if (loaded.name == null)
-	      loaded.name = name.toString ();
+	    if (loaded.name () == null)
+	      loaded.setName (name);
 	  }
       }
     catch (ClassNotFoundException ex)

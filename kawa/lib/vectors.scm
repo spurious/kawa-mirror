@@ -10,16 +10,13 @@
 (define (vector-length x :: <vector>) :: <int>
   (invoke x 'size))
 
-(define (vector-ref
-         (vector <vector>)
-         (k <int>))
-  (invoke vector 'get k))
-
-(define (vector-set!
-         (vector <vector>)
-         (k <int>)
-         obj) :: <void>
+(define (vector-set! (vector <vector>) (k <int>) obj) :: <void>
   (invoke vector 'set k obj))
+
+(define-procedure vector-ref
+  setter: vector-set!
+  (lambda ((vector :: <vector>) (k :: <int>))
+    (invoke vector 'get k)))
 
 (define (vector->list (vec :: <vector>)) :: <list>
   (let loop ((result :: <list> '())

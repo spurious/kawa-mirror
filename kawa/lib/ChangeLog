@@ -1,3 +1,10 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* ports.scm (port-line, input-port-line-number, input-port-prompter):
+	Define define-procedure, and specify setter.
+	* misc.scm (procedure-property):  Likewise.
+	* vectors.scm (vector-ref):  Likewise.
+
 2002-10-14  Per Bothner  <per@bothner.com>
 
 	* misc.scm (environment-bound?):  Fix implementation.

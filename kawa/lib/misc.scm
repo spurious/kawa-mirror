@@ -43,11 +43,13 @@
    (primitive-constructor <string> (<java.lang.String>))
    (constant-fold (primitive-static-method <kawa.Version> "getVersion"
 					   <java.lang.String> ()))))
-(define (procedure-property (proc :: <procedure>) key #!optional default)
-  (invoke proc 'getProperty key default))
-
 (define (set-procedure-property! proc :: <procedure> key value)
   (invoke proc 'setProperty key value))
+
+(define-procedure procedure-property
+  setter: set-procedure-property!
+  (lambda ((proc :: <procedure>) key #!optional default)
+    (invoke proc 'getProperty key default)))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

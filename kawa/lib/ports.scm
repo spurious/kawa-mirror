@@ -56,20 +56,23 @@
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
-(define (port-line port)
-  ((primitive-virtual-method <gnu.text.LineBufferedReader> "getLineNumber"
-			     <int> ())
-   port))
-(define (input-port-line-number port)
-  (+ 1 (port-line port)))
-
 (define (set-port-line! port line)
   ((primitive-virtual-method <gnu.text.LineBufferedReader> "setLineNumber"
 			     <void> (<int>))
    port line))
 
+(define-procedure port-line
+  setter: set-port-line!
+  (lambda ((port :: <gnu.text.LineBufferedReader>))
+    (invoke port 'getLineNumber)))
+
 (define (set-input-port-line-number! port num)
   (set-port-line! port (- num 1)))
+
+(define-procedure input-port-line-number
+  setter: set-input-port-line-number!
+  (lambda ((port :: <gnu.text.LineBufferedReader>))
+    (+ 1 (port-line port))))
 
 (define (port-column port)
   ((primitive-virtual-method <gnu.text.LineBufferedReader>
@@ -89,15 +92,14 @@
 		       (number->string (input-port-line-number port))
 		       "|# "))))
 
-(define (input-port-prompter port)
-  ((primitive-virtual-method <gnu.mapping.TtyInPort> "getPrompter"
-			       <gnu.mapping.Procedure> ())
-   port))
+(define (set-input-port-prompter!
+	 (port :: <gnu.mapping.TtyInPort>) (prompter :: <procedure>))
+  (invoke port 'setPrompter prompter))
 
-(define (set-input-port-prompter! port prompter)
-  ((primitive-virtual-method <gnu.mapping.TtyInPort> "setPrompter"
-			       <void> (<gnu.mapping.Procedure>))
-   port prompter))
+(define-procedure input-port-prompter
+  setter: set-input-port-prompter!
+  (lambda ((port :: <gnu.mapping.TtyInPort>))
+    (invoke port 'getPrompter)))
 
 (define (close-input-port (port :: <input-port>))
   (invoke port 'close))

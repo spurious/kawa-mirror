@@ -1,3 +1,8 @@
+Wed Jan 21 12:34:12 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am, Makefile.in (SECONDARY_OBJS):  Adding missing strings
+	classes strings$$string__copy_B and strings$$string__fill_B.
+
 Mon Jan 19 16:05:29 1998  Per Bothner  <bothner@cygnus.com>
 
 	* files.scm (copy-file):  New procedure.

@@ -80,7 +80,10 @@ SECONDARY_OBJS=\
   ports$$transcript__off.class \
   ports$$transcript__on.class \
   strings$$make__string.class \
+  strings$$string__copy_B.class \
+  strings$$string__fill_B.class \
   strings$$string__length.class \
+  strings$$substring.class \
   syntax$$_Cdefmacro.class \
   syntax$$gentemp.class \
   syntax$$dynamic__wind.class \

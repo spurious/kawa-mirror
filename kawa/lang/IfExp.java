@@ -42,26 +42,17 @@ public class IfExp extends Expression
   {
     test.compile (comp, 0);
     comp.compileConstant (Interpreter.falseObject);
-    Label else_label = new Label (comp.method);
-    comp.method.compile_goto_ifeq (else_label);
+    comp.method.compile_ifneq ();
     then_clause.compile_with_linenumber (comp, flags);
-    Label end_label;
-    if (else_clause == null && (flags & IGNORED) != 0)
-      end_label = null;
-    else
+    if (else_clause != null || (flags & IGNORED) == 0)
       {
-	end_label = new Label (comp.method);
-	if (comp.method.reachableHere ())
-	  comp.method.compile_goto (end_label);
+	comp.method.compile_else ();
+	if (else_clause != null)
+	  else_clause.compile_with_linenumber (comp, flags);
+	else
+	  comp.compileConstant (Interpreter.voidObject);
       }
-
-    else_label.define (comp.method);
-    if (else_clause != null)
-      else_clause.compile_with_linenumber (comp, flags);
-    else if ((flags & IGNORED) == 0)
-      comp.compileConstant (Interpreter.voidObject);
-    if (end_label != null)
-      end_label.define (comp.method);
+    comp.method.compile_fi ();
   }
 
   public void print (java.io.PrintStream ps)

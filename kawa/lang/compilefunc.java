@@ -224,7 +224,8 @@ public class compilefunc
     lexp.start_label.define (comp.method);
 
     lexp.body.compile_with_linenumber (comp, Expression.LAST);
-    comp.method.compile_return ();
+    if (comp.method.reachableHere ())
+      comp.method.compile_return ();
 
     if (! comp.immediate && comp.curClass == comp.mainClass)
       {

@@ -24,7 +24,7 @@ public class InvokeStatic extends ProcedureN implements Inlineable
     return applyN(this, args);
   }
 
-  public static Object applyN (Procedure thisProc, Object[] args)
+  private static Object applyN (Procedure thisProc, Object[] args)
   {
     int len = args.length;
     Procedure.checkArgCount(thisProc, len);

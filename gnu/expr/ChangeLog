@@ -1,3 +1,8 @@
+2002-10-22  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* Compilation.java (compileConstant(Object,Target)): Convert integer
+	constants when the target is type short or type byte.
+
 2002-10-20  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (followAliases):  If decl is an import decl created

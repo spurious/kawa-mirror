@@ -711,7 +711,7 @@ public class PrettyWriter extends java.io.Writer
     int available = length - fillPtr;
     if (available > 0)
       return available;
-    else if (fillPtr > lineLength)
+    else if (isPrettyPrinting && fillPtr > lineLength)
       {
 	if (! maybeOutput(false))
 	  outputPartialLine();

@@ -1,3 +1,9 @@
+2001-07-06  Thomas Kirk  <tk@research.att.com>
+
+	* PrettyWriter.java(ensureSpaceInBuffer): Don't call
+	outputPartialLine when isPrettyPrinting is false (e.g. when
+	printing to a CharArrayOutPort).	
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java: New class, extends Writer.

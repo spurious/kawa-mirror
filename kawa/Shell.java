@@ -7,31 +7,30 @@ import java.io.*;
 
 public class Shell
 {
-  public static void run (InPort inp, Environment env,
-			  String prompt, boolean dflag)
+  public static void run (Environment env)
+  {
+    InPort inp = InPort.inDefault ();
+    if (inp instanceof TtyInPort)
+      {
+	Object prompter = env.get (Symbol.make ("default-prompter"));
+	if (prompter != null && prompter instanceof Procedure)
+	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
+      }
+
+    run(env, inp, OutPort.outDefault());
+  }
+
+  public static void run (Environment env, InPort inp, OutPort pout)
   {
     Translator tr = new Translator (env);
-    java.io.PrintStream pout = OutPort.outDefault();
-    java.io.PrintStream perr = OutPort.errDefault();
-    boolean display = dflag;
-
+    OutPort perr = OutPort.errDefault();
     for (;;)
       {
 	try
 	  {
-            if (prompt != null)
-	      {
-		pout.print(prompt);
-		pout.flush();
-	      }
-
 	    Object sexp = inp.readSchemeObject ();
 	    if (sexp == Sequence.eofValue)
-	      {
-		if (prompt != null)
-		  pout.println ();
-		return;
-	      }
+	      return;
 
 	    tr.errors = 0;
 
@@ -53,10 +52,22 @@ public class Shell
 	    if (tr.errors == 0)
 	      {
 		Object result = mod.eval_module (env);
-		if (display && result != Scheme.voidObject)
+		if (pout != null && result != Scheme.voidObject)
 		  {
-		    SFormat.print (result, pout);
-		    pout.println();
+		    if (result instanceof Values)
+		      {
+			Object[] results = ((Values) result).values();
+			for (int i = 0;  i < results.length;  i++)
+			  {
+			    SFormat.print (results[i], pout);
+			    pout.println();
+			  }
+		      }
+		    else
+		      {
+			SFormat.print (result, pout);
+			pout.println();
+		      }
 		    pout.flush();
 		  }
 	      }
@@ -90,10 +101,10 @@ public class Shell
       }
   }
 
-  public static void runString (String str, Environment env, boolean dflag)
+  public static void runString (String str, Environment env)
   {
     InPort str_port = call_with_input_string.open_input_string (str);
-    run (str_port, env, null, dflag);
+    run (env, str_port, null);
   }
 
   public static void runFile (String fname)

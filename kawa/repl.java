@@ -7,7 +7,6 @@ import java.io.*;
 
 class repl
 {
-  public static String prompt = "kawa>";
   public static String compilationDirectory = null;
   public static String compilationTopname = null;
   public static String compilationPrefix = null;
@@ -48,7 +47,8 @@ class repl
     Object[] array = new Object[args.length - arg_start];
     for (int i = arg_start;  i < args.length;  i++)
       array[i - arg_start] = new FString (args[i]);
-    commandLineArguments = new Vector (array);
+    commandLineArguments = new Vector (array);  // FIXME scsh has list
+    // FIXME scsh also has command-line proc
     Environment.define_global (Symbol.make ("command-line-arguments"),
 			       commandLineArguments);
   }
@@ -70,7 +70,7 @@ class repl
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
-	    Shell.runString (args[iArg], env, false);
+	    Shell.runString (args[iArg], env);
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -88,7 +88,7 @@ class repl
 	    iArg++;
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run (InPort.inDefault (), env, prompt, true);
+	    Shell.run(env);
 	    return;
 	  }
 	else if (args[iArg].equals ("-d"))
@@ -150,7 +150,7 @@ class repl
       {
 	setArgs (args, iArg);
 	checkInitFile();
-	Shell.run (InPort.inDefault (), env, prompt, true);
+	Shell.run(env);
       }
    }
 }

@@ -40,10 +40,10 @@ import java.io.*;
  * we get out of range.  A "spring" is a trivial basic block that
  * contains only a single wide goto.  The branches that are close to
  * the limit are patched to point to the "spring" instead.  Before
- * every instruction Method.instruction_start_hook is called.
- * It checks if there are any pending banches that are getting close
- * to the limit for 2-byte offsets, in which case it calls Label.emit_spring
- * to generate the spring.
+ * every instruction CodeAttr.reserve is called.  It checks if there
+ * are any pending banches that are getting close to the limit for
+ * 2-byte offsets, in which case it calls Label.emit_spring to
+ * generate the spring.
  *
  * Note that we may also need a spring even if the target is known,
  * if we need a 2-byte offset, and the target is too far away.
@@ -67,8 +67,8 @@ public class Label {
   // Elements that are -1 provide room to grow.
   // For an element fi in fixups (where fi >= 0), the 2-byte
   // sequence code[fi]:code[fi+1] will need to be adjusted (relocated) by
-  // the relative position of this Label, or alternatively spring_postion.
-  // After relcocation, code[fi]:code[fi+1] will be a reference to 
+  // the position of this Label, or alternatively spring_postion.
+  // After relocation, code[fi]:code[fi+1] will be a reference to 
   // this label (usually a PC-relative reference).
   // The lowest element fi (>= 0) is first, but fixups is otherwise unsorted.
   // Normally, if defined(), then fixups is null.
@@ -100,18 +100,18 @@ public class Label {
 
   /* Make all narrow fixups for this label point (relatively) to target. */
   final private void relocate_fixups (CodeAttr code, int target)
- {
+  {
     if (fixups == null)
       return;
     for (int i = fixups.length; --i >= 0; )
       {
 	int pos = fixups[i];
-	/* Adjust the 2-byte offset at pos in method by (target-pos). */
+	/* Adjust the 2-byte offset at pos in method by target. */
 	if (pos >= 0)
 	  {
 	    byte[] insns = code.getCode();
-	    int code_val = ((insns[pos] & 0xFF) << 8) | (insns[pos+1] & 0xFF);
-	    code_val += target - pos;
+	    int code_val = (insns[pos] << 8) | (insns[pos+1] & 0xFF);
+	    code_val += target;
 	    if (code_val < -32768 || code_val >= 32768)
 	      throw new Error ("overflow in label fixup");
 	    insns[pos] = (byte) (code_val >> 8);
@@ -123,14 +123,14 @@ public class Label {
     fixups = null;
   }
 
-  /* Adjust the 4-byte offset at pos in method by (target-pos). */
+  /* Adjust the 4-byte offset at pos in method by target. */
   static final void relocate_wide (CodeAttr code, int pos, int target) {
     if (pos >= 0) {
       byte[] insns = code.getCode();
       int code_val
 	= ((insns[pos] & 0xFF) << 24) | ((insns[pos+1] & 0xFF) << 16)
 	| ((insns[pos+2] & 0xFF) << 8) | (insns[pos+3] & 0xFF);
-      code_val += target-pos;
+      code_val += target;
       insns[pos] = (byte) (code_val >> 24);
       insns[pos+1] = (byte) (code_val >> 16);
       insns[pos+2] = (byte) (code_val >> 8);
@@ -204,12 +204,11 @@ public class Label {
     spring_position = code.PC;
     relocate_fixups (code, spring_position);
     code.put1 (200);  // goto_w
-    add_wide_fixup (code.PC);
-    code.put4 (1);
+    emit_wide(code, spring_position);
     code.readPC = code.PC;
   }
 
-  /* Save a fixup so we can later backpatch code[method.PC..method.PC+1]. */
+  /* Save a fixup so we can later backpatch code[PC..PC+1]. */
   private void add_fixup (CodeAttr code)
   {
     int PC = code.PC;
@@ -290,21 +289,22 @@ public class Label {
       }
     } else
       add_fixup (code);
-    code.put2 (1);
+    code.put2 (delta);
   }
 
   /**
    * Emit a wide reference to the current label.
-   * @param method the current method
+   * @param code the current method
+   * @param start_pc the PC at the start of this instruction
    * Emit the reference as a 4-byte difference relative to PC-offset.
    */
-  public void emit_wide (CodeAttr code, int start_offset)
+  public void emit_wide (CodeAttr code, int start_pc)
   {
-    int delta = 1 - code.PC;
+    int delta = -start_pc;
     if (defined ())
       delta += position;
     else
       add_wide_fixup (code.PC);
-    code.put4 (start_offset);
+    code.put4 (delta);
   }
 }

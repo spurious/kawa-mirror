@@ -66,10 +66,8 @@ public class ClassTypeWriter extends PrintWriter
   void printClassInfo ()
   {
     println();
-    print("Access flags: 0x");
+    print("Access flags:");
     int modifiers = ctype.getModifiers();
-    print(Integer.toHexString(modifiers));
-    print('=');
     print(Access.toString(modifiers));
     println();
     print("This class: ");

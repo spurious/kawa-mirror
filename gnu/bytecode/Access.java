@@ -34,6 +34,13 @@ public class Access {
     if ((flags & NATIVE) != 0)      buf.append(" native");
     if ((flags & INTERFACE) != 0)   buf.append(" interface");
     if ((flags & ABSTRACT) != 0)    buf.append(" abstract");
+    int unknown = flags & ~(PUBLIC|PRIVATE|PROTECTED|STATIC|FINAL
+			    |SYNCHRONIZED|VOLATILE|NATIVE|INTERFACE|ABSTRACT);
+    if (unknown != 0)
+      {
+	buf.append(" 0x");
+	buf.append(Integer.toHexString(unknown));
+      }
     return buf.toString();
   }
 }

@@ -423,8 +423,16 @@ public class Scheme extends Interpreter
       define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
-      define_proc("system", "kawa.lib.system");
       define("symbol-read-case", "P");
+
+      define_proc("system", "kawa.lib.system");
+      define_proc("make-process", "kawa.lib.system");
+      define_proc("tokenize-string-to-string-array", "kawa.lib.system");
+      define_proc("tokenize-string-using-shell", "kawa.lib.system");
+      if ("/".equals(System.getProperty("file.separator")))
+	define ("command-parse", lookup("tokenize-string-using-shell"));
+      else
+	define ("command-parse", lookup("tokenize-string-to-string-array"));
       
       // JDK 1.1 only:
       define_proc ("record-accessor", "kawa.lib.reflection");

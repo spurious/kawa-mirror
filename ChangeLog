@@ -1,3 +1,8 @@
+2004-03-08  Per Bothner  <per@bothner.com>
+
+	* build.xml (build.selectjava):  Add gnu/mapping/Symbol.java
+	and gnu/text/Char.java.
+
 2004-03-03  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java (bind):  Remove method.

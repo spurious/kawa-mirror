@@ -9,6 +9,9 @@ public class QuoteExp extends Expression
 {
   Object value;
 
+  static public QuoteExp undefined_exp
+  = new QuoteExp (Interpreter.undefinedObject);
+
   public QuoteExp (Object val) { value = val; }
   
   public Object eval (Environment env)
@@ -16,9 +19,9 @@ public class QuoteExp extends Expression
     return value;
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
-    if (!ignore_result)
+    if ((flags & IGNORED) == 0)
       comp.compileConstant (value);
   }
 

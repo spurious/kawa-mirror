@@ -76,31 +76,31 @@ public class SetExp extends Expression
       }
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
     if (binding != null)
       {
 	if (binding.isSimple ())
 	  {
-	    new_value.compile (comp, false);
+	    new_value.compile (comp, 0);
 	    comp.method.compile_store_value (binding);
 	  }
 	else
 	  {
 	    ReferenceExp.compile_load (binding.baseVariable, comp);
 	    comp.method.compile_push_int (binding.offset);
-	    new_value.compile (comp, false);
+	    new_value.compile (comp, 0);
 	    comp.method.compile_array_store (Compilation.scmObjectType);
 	  }
       }
     else
       {
 	comp.compileConstant (name);
-	new_value.compile (comp, false);
+	new_value.compile (comp, 0);
 	comp.method.compile_invoke_static (comp.defineGlobalMethod);
       }
 
-    if (!ignore_result)
+    if ((flags & IGNORED) == 0)
       comp.compileConstant (Interpreter.voidObject);
   }
 

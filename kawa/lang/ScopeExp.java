@@ -34,8 +34,14 @@ public abstract class ScopeExp extends Expression
   public void assign_space ()
   {
     ScopeExp alloc_scope = this;
-    while (! (alloc_scope instanceof LambdaExp))
+    LambdaExp cur_lambda = null;
+    for (;;)
       {
+	if (alloc_scope instanceof LambdaExp)
+	  {
+	    cur_lambda = (LambdaExp) alloc_scope;
+	    break;
+	  }
 	ScopeExp alloc_outer = alloc_scope.outer;
 	if (alloc_outer == null)
 	  break;
@@ -46,14 +52,17 @@ public abstract class ScopeExp extends Expression
 	Declaration decl = (Declaration) var;
 	if (decl.offset < 0)
 	  {
-	    if (! decl.isSimple ())
+	    if (! decl.isSimple () || cur_lambda == null)
 	      {
 		/* A variable captured by an inner Lambda is allocated
 		   in the heap frame. */
 		if (alloc_scope.heapFrame == null)
-		  alloc_scope.heapFrame
-		    = alloc_scope.add_decl (Symbol.make ("heapFrame"),
-					    Compilation.objArrayType);
+		  {
+		    alloc_scope.heapFrame
+		      = alloc_scope.add_decl (Symbol.make ("heapFrame"),
+					      Compilation.objArrayType);
+		    alloc_scope.heapFrame.setArtificial (true);
+		  }
 		decl.baseVariable = alloc_scope.heapFrame;
 		decl.offset = alloc_scope.frameSize++;
 	      }

@@ -12,7 +12,6 @@ public class LetExp extends ScopeExp
   public Expression body;
 
   public LetExp (Expression[] i) { inits = i; }
-  //  public LetExp (Declaration[] d, Expression[] i) { decls = d;  inits = i; }
 
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
@@ -39,19 +38,19 @@ public class LetExp extends ScopeExp
       }
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
     /* Compile all they initializations, leaving the results
        on the stack (in reverse order).  */
     for (int i = 0; i < inits.length; i++)
-      inits[i].compile (comp, false);
+      inits[i].compile (comp, 0);
 
     comp.method.enterScope (scope);
 
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstVar ());
 
-    body.compile (comp, ignore_result);
+    body.compile (comp, flags);
     comp.method.pop_scope ();
   }
 
@@ -61,16 +60,22 @@ public class LetExp extends ScopeExp
     Variable var = firstVar ();
     int i = 0;
     
-    for (; var != null; i++, var = var.nextVar ())
+    for (; var != null; var = var.nextVar ())
       {
 	if (i > 0)
 	  ps.print(" ");
 	ps.print("(");
 	ps.print(((Declaration) var).string_name());
-	if (inits[i] != null)
+	ps.print(" ");
+	if (var.isArtificial ())
+	  ps.print ("<artificial>");
+	else
 	  {
-	    ps.print(" ");
-	    inits[i].print (ps);
+	    if (inits[i] == null)
+	      ps.print ("<null>");
+	    else
+	      inits[i].print (ps);
+	    i++;
 	  }
 	ps.print(")");
       }

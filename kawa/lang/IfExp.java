@@ -38,26 +38,27 @@ public class IfExp extends Expression
       return Interpreter.undefinedObject;
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
-    test.compile (comp, false);
+    test.compile (comp, 0);
     comp.compileConstant (Interpreter.falseObject);
     Label else_label = new Label (comp.method);
     comp.method.compile_goto_ifeq (else_label);
-    then_clause.compile (comp, ignore_result);
+    then_clause.compile (comp, flags);
     Label end_label;
-    if (else_clause == null && ignore_result)
+    if (else_clause == null && (flags & IGNORED) != 0)
       end_label = null;
     else
       {
 	end_label = new Label (comp.method);
-	comp.method.compile_goto (end_label);
+	if (comp.method.reachableHere ())
+	  comp.method.compile_goto (end_label);
       }
 
     else_label.define (comp.method);
     if (else_clause != null)
-      else_clause.compile (comp, ignore_result);
-    else if (! ignore_result)
+      else_clause.compile (comp, flags);
+    else if ((flags & IGNORED) == 0)
       comp.compileConstant (Interpreter.undefinedObject);
     if (end_label != null)
       end_label.define (comp.method);

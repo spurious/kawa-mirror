@@ -27,10 +27,10 @@ public class ErrorExp extends Expression
     ps.print (")");
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
     // Should never happen!
-    if (!ignore_result)
+    if ((flags & IGNORED) != 0)
       comp.method.compile_push_null ();
   }
 }

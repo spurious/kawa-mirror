@@ -13,6 +13,14 @@ public abstract class Expression implements Printable
 
   abstract public void print (java.io.PrintStream ps);
 
-  abstract public void compile (Compilation comp, boolean ignore_result);
+  /** If IGNORED is set in the flags passed to compile, the result is ignored.
+   * Hence, do not leave any result on the stack. */
+  public static final int IGNORED = 1;
+       
+  /** Set when compiling an expression that is executed last.
+   * I.e. if this is a call, it is a tail-call. */
+  public static final int LAST = 2;
+
+  abstract public void compile (Compilation comp, int flags);
 
 }

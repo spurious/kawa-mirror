@@ -71,9 +71,9 @@ public class ReferenceExp extends Expression
       }
   }
 
-  public void compile (Compilation comp, boolean ignore_result)
+  public void compile (Compilation comp, int flags)
   {
-    if (ignore_result)
+    if ((flags & IGNORED) != 0)
       return;
     if (binding != null)
       compile_load (binding, comp);

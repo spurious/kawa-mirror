@@ -27,19 +27,46 @@ public class ConsumerTarget extends Target
       exp.compile(comp, target);
     else
       {
-	CodeAttr code = comp.getCode();
-	Scope scope = code.pushScope();
-	Variable values = scope.addVariable(code, comp.typeValues, null);
-	ConsumerTarget ctarget = new ConsumerTarget(values);
-	code.emitInvokeStatic(comp.typeValues.getDeclaredMethod("make", 0));
-	code.emitStore(values);
-	exp.compile(comp, ctarget);
-	code.emitLoad(values);
-	code.emitInvokeVirtual(comp.typeValues.getDeclaredMethod("canonicalize", 0));
-	code.popScope();
-	target.compileFromStack(comp, Compilation.typeValues);
+	ClassType typeValues = comp.typeValues;
+	compileUsingConsumer(exp, comp, target,
+			     typeValues.getDeclaredMethod("make", 0),
+			     typeValues.getDeclaredMethod("canonicalize", 0));
       }
   }
+
+  public static void compileUsingConsumer (Expression exp, Compilation comp,
+					   Target target,
+					   Method makeMethod,
+					   Method resultMethod)
+  {
+    CodeAttr code = comp.getCode();
+    Scope scope = code.pushScope();
+    Type ctype;
+    if (makeMethod.getName() == "<init>")
+      {
+	ClassType cltype = makeMethod.getDeclaringClass();
+	ctype = cltype;
+	code.emitNew(cltype);
+	code.emitDup(ctype);
+	code.emitInvoke(makeMethod);
+      }
+    else
+      {
+	ctype = makeMethod.getReturnType();
+	code.emitInvokeStatic(makeMethod);
+      }
+    Variable consumer = scope.addVariable(code, ctype, null);
+    ConsumerTarget ctarget = new ConsumerTarget(consumer);
+    code.emitStore(consumer);
+    exp.compile(comp, ctarget);
+    code.emitLoad(consumer);
+    if (resultMethod != null)
+      code.emitInvoke(resultMethod);
+    code.popScope();
+    target.compileFromStack(comp, resultMethod == null ? ctype
+			    : resultMethod.getReturnType());
+  }
+
 
   public void compileFromStack(Compilation comp, Type stackType)
   {

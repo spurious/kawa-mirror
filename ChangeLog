@@ -1,5 +1,26 @@
 Wed Jan 21 12:37:10 1998  Per Bothner  <bothner@cygnus.com>
 
+	General cleanup of how Environments work, especially how they
+	interact with Interpreters (i.e. Scheme) and Futures.
+	* kawa/lang/Environment.java (global):  New static.
+	(getCurrent, setCurrrent):  If current thread is not a Future,
+ 	get/set global, rather than Scheme.env.
+	* kawa/lang/Future.java:  New constuctor, with given Environment.
+	* kawa/lang/Interpreter.java (environ):  Make protected.
+	(getEnvironment, setEnvironment):  New methods.
+	(define, lookup):  Moved here from kawa/standard/Scheme.java.
+	* kawa/standard/Scheme.java (builtin):  New static method.
+ 	(curEnvironment, setEnvironment, makeEnvironment):  Removed.
+	(env):  Removed static field.
+	(initcheme):  Use environ, in place of env.
+	(constructor):  Re-write more cleanly.
+	* kawa/standard/user_env.java:  Use Environment.user().
+	* kawa/Shell.java (apply):  Set and restore current Environment.
+	* kawa/repl.java (main):  Fix for new Scheme interface.
+	* kawa/GuiConsole.java (constructor):  Add new Scheme environment
+	to Future (instead of creating a new one).
+	(main):  Update for new ENvironment conventions.	
+
 	* kawa/{Makefile.am,Makefile.in} (SECONDARY_OBJS):
 	Remove GuiConsole$$_MenuAction.class.
 	* kawa/TextAreaWriter.java (write(String)):  New method.

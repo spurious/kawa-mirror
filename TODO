@@ -1,7 +1,6 @@
 TO BE DONE FOR 1.6:
 
-Implement Environment properly.  Support threads and modules.
-Get GuiConsole working for multiple windows.
+Document GuiConsole.
 
 Provide a low-level Scheme interface to catch Java exceptions.
 Implement a higher-level Scheme catch/throw interface.
@@ -41,6 +40,8 @@ Implement infrastructure for other languages,
 and at least one other language.
 
 OTHER:
+
+Implement modules.
 
 Update to match kawa-tour:
   Vector -> FVector

@@ -114,7 +114,7 @@ implements TypeValue, Externalizable, GroupPredicate
     return pos;
   }
 
-  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  protected void emitCoerceOrNullMethod(Variable incoming, Compilation comp)
   {
     CodeAttr code = comp.getCode();
     if (incoming != null)
@@ -122,34 +122,6 @@ implements TypeValue, Externalizable, GroupPredicate
     code.emitPushString(qname.getNamespaceURI());
     code.emitPushString(qname.getLocalName());
     code.emitInvokeStatic(coerceOrNullMethod);
-    if (decl != null)
-      {
-	code.emitDup();
-	decl.compileStore(comp);
-      }
-    code.emitIfNotNull();
-  }
-
-  public void emitIsInstance(Variable incoming,
-			     Compilation comp, Target target)
-  {
-    if (target instanceof ConditionalTarget)
-      {
-	ConditionalTarget ctarget = (ConditionalTarget) target;
-	CodeAttr code = comp.getCode();
-	if (incoming != null)
-	  code.emitLoad(incoming);
-	code.emitPushString(qname.getNamespaceURI());
-	code.emitPushString(qname.getLocalName());
-	code.emitInvokeStatic(coerceOrNullMethod);
-	if (ctarget.trueBranchComesFirst)
-	  code.emitGotoIfCompare1(ctarget.ifFalse, 198); // ifnull
-	else
-	  code.emitGotoIfCompare1(ctarget.ifTrue, 199); // ifnonnull
-	ctarget.emitGotoFirstBranch(code);
-      }
-    else
-      gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
   }
 
   public static final ClassType typeElementType
@@ -173,5 +145,10 @@ implements TypeValue, Externalizable, GroupPredicate
     if (name.length() > 0)
       setName(name);
     qname = (QName) in.readObject();
+  }
+
+  public String toString ()
+  {
+    return "ElementType " + qname;
   }
 }

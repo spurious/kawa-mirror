@@ -1,3 +1,11 @@
+2002-07-28  Per Bothner  <per@bothner.com>
+
+	* NodeType.java:  Also implement TypeValue.
+	(toString):  New method.
+	(emitCoerceOrNullMethod, emitTestIf, emitIsInstance):  New methods.
+	* ElementType.java (emitTestIf, emitIsInstance):  Moved up to NodeType.
+	(emitCoerceOrNullMethod):  New protected method, overrides NodeType.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* MakeUnescapedData.java (inline):  Take extra ExpWalker parameter.

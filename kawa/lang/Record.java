@@ -139,7 +139,7 @@ public class Record extends Procedure1 implements HasSetter
     ps.print(toString());
   }
 
-  public static Class makeRecordType (String name, List fnames)
+  public static ClassType makeRecordType (String name, List fnames)
   {
     ClassType superClass = new ClassType("kawa.lang.Record");
     ClassType clas = new ClassType(name);
@@ -178,7 +178,9 @@ public class Record extends Procedure1 implements HasSetter
     SchemeLoader loader = new SchemeLoader(names, arrays);
     try
       {
-	return loader.loadClass (name, true);
+	Class reflectClass = loader.loadClass (name, true);
+	Type.registerTypeForClass(reflectClass, clas);
+	return clas;
       }
     catch (ClassNotFoundException ex)
       {
@@ -193,5 +195,10 @@ public class Record extends Procedure1 implements HasSetter
     for (int i = fields.length;  --i >= 0; )
       list = new Pair (Symbol.make(fields[i].getName()), list);
     return list;
+  }
+
+  public static List typeFieldNames (ClassType ctype)
+  {
+    return typeFieldNames(ctype.getReflectClass());
   }
 }

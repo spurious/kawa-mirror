@@ -11,9 +11,15 @@ public class GetFieldProc extends Procedure1 implements Inlineable
   gnu.bytecode.Field field;
   java.lang.reflect.Field reflectField;
 
-  GetFieldProc (Class clas, String fname) throws GenericError
+  GetFieldProc (Class clas, String fname)
   {
     ctype = (ClassType) gnu.bytecode.Type.make(clas);
+    this.fname = fname;
+  }
+
+  public GetFieldProc (ClassType ctype, String fname)
+  {
+    this.ctype = ctype;
     this.fname = fname;
   }
 

@@ -149,6 +149,9 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	types.put ("function", new ClassType("kawa.lang.Procedure"));
 	types.put ("input-port", new ClassType("kawa.lang.InPort"));
 	types.put ("output-port", new ClassType("kawa.lang.OutPort"));
+	types.put ("record", new ClassType("kawa.lang.Record"));
+	types.put ("type", new ClassType("gnu.bytecode.Type"));
+	types.put ("class-type", new ClassType("gnu.bytecode.ClassType"));
       }
     return (Type) types.get(name);
   }

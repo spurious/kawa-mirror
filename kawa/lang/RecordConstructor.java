@@ -1,5 +1,6 @@
 package kawa.lang;
 import java.lang.reflect.Field;
+import gnu.bytecode.ClassType;
 
 public class RecordConstructor extends ProcedureN
 {
@@ -36,38 +37,20 @@ public class RecordConstructor extends ProcedureN
       }
   }
 
-  public RecordConstructor (Class clas, Object fieldsList) throws GenericError
+  public RecordConstructor (ClassType ctype, Object fieldsList)
   {
-    this.clas = clas;
-    int nfields = List.length(fieldsList);
-    this.fields = new Field[nfields];
-    for (int i = 0;  i < nfields;  i++)
-      {
-	Pair pair = (Pair) fieldsList;
-	String fname = pair.car.toString();
-	try
-	  {
-	    this.fields[i] = clas.getField(fname);
-	  }
-	catch (NoSuchFieldException ex)
-	  {
-	    throw new GenericError ("no such field "+fname+" in "+clas.getName());
-	  }
-	fieldsList = pair.cdr;
-      }
+    this(ctype.getReflectClass(), fieldsList);
   }
 
-  /*
-  public RecordConstructor (Class clas, Object fieldsList) throws GenericError
+  public RecordConstructor (Class clas, Object fieldsList)
   {
     this.clas = clas;
-    if (fieldsList == List.Empty)
+    if (fieldsList == null)
       {
 	 this.fields = clas.getDeclaredFields();
       }
     else
       {
-	fieldsList = ((Pair) fieldsList).car;
 	int nfields = List.length(fieldsList);
 	this.fields = new Field[nfields];
 	for (int i = 0;  i < nfields;  i++)
@@ -86,10 +69,19 @@ public class RecordConstructor extends ProcedureN
 	  }
       }
   }
-  */
+
+  public int numArgs()
+  {
+    int nargs = fields.length;
+    return (nargs<<12)|nargs;
+  }
+
+  public String getName()
+  {
+    return clas.getName()+" constructor";
+  }
 
   public Object applyN (Object[] args)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Object obj;
     try
@@ -106,7 +98,7 @@ public class RecordConstructor extends ProcedureN
 	throw new GenericError (ex.toString());
       }
     if (args.length != fields.length)
-      throw new GenericError("wrong number of arguments to record constructor");
+      throw new WrongArguments(this, args.length);
     for (int i = 0;  i < args.length;  i++)
       {
 	Field fld = fields[i];

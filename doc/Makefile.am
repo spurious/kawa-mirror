@@ -15,7 +15,8 @@ KAWA_HTML_PARTS = kawa_1.html kawa_2.html kawa_3.html kawa_4.html \
 	kawa_10.html kawa_11.html
 KAWA_HTMLS = kawa_toc.html $(KAWA_HTML_PARTS)
 $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
-	texi2html -menu -split_chapter $<
+	$(MAKEINFO) -I$(srcdir) --html $<
+#	texi2html -menu -split_chapter $<
 kawa.html: kawa_toc.html
 GENERATED_HTML = $(KAWA_HTMLS)
 

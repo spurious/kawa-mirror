@@ -2,7 +2,7 @@ package kawa;
 import gnu.expr.*;
 import gnu.mapping.*;
 
-class TelnetRepl extends Procedure0
+public class TelnetRepl extends Procedure0
 {
   // close when finished.
   java.net.Socket socket;
@@ -39,7 +39,7 @@ class TelnetRepl extends Procedure0
       @param client A client that has connected to us,
       and that wants to use the telnet protocol to talk to a
       Scheme read-eval-print-loop. */
-  static void serve (Interpreter interp, java.net.Socket client)
+  public static void serve (Interpreter interp, java.net.Socket client)
     throws java.io.IOException
   {
     Telnet conn = new Telnet(client, true);

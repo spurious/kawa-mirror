@@ -8,6 +8,13 @@ public class StandardInterpreter extends Interpreter
     define (proc.name, proc);
   }
 
+  /* Define a procedure to be autoloaded. */
+  final void define_proc (String name, String className)
+  {
+    Symbol symbol = Symbol.make (name);
+    define (symbol, new AutoloadProcedure (symbol, className));
+  }
+
   public kawa.standard.StandardInterpreter(InPort i, OutPort o, OutPort e)
   {
       super(i,o,e);
@@ -27,10 +34,8 @@ public class StandardInterpreter extends Interpreter
       define("cond",new kawa.standard.cond());
 
       //-- Section 6.1
-      proc = new kawa.standard.not();
-      define(proc.name,proc);
-      proc = new kawa.standard.boolean_p();
-      define(proc.name,proc);
+      define_proc ("not", "kawa.standard.not");
+      define_proc ("boolean?", "kawa.standard.boolean_p");
 
       //-- Section 6.2
       eqv = new kawa.standard.eqv_p();
@@ -41,88 +46,49 @@ public class StandardInterpreter extends Interpreter
       define(equal.name,equal);
 
       //-- Section 6.3
-      proc = new kawa.standard.pair_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.cons();
-      define(proc.name,proc);
-      proc = new kawa.standard.car();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdr();
-      define(proc.name,proc);
-      proc = new kawa.standard.setcar_b();
-      define(proc.name,proc);
-      proc = new kawa.standard.setcdr_b();
-      define(proc.name,proc);
-      proc = new kawa.standard.caar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.caaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.caadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cadar();
-      define(proc.name,proc);
-      proc = new kawa.standard.caddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cddar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.caaaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.caaadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.caadar();
-      define(proc.name,proc);
-      proc = new kawa.standard.caaddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cadaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cadadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.caddar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cadddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdaaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdaadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdadar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdaddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cddaar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cddadr();
-      define(proc.name,proc);
-      proc = new kawa.standard.cdddar();
-      define(proc.name,proc);
-      proc = new kawa.standard.cddddr();
-      define(proc.name,proc);
-      proc = new kawa.standard.null_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.list_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.list();
-      define(proc.name,proc);
-      proc = new kawa.standard.length();
-      define(proc.name,proc);
-      proc = new kawa.standard.append();
-      define(proc.name,proc);
-      proc = new kawa.standard.list_tail();
-      define(proc.name,proc);
-      proc = new kawa.standard.list_ref((kawa.lang.Procedure2)proc);
-      define(proc.name,proc);
+      define_proc ("pair?", "kawa.standard.pair_p");
+      define_proc ("cons", "kawa.standard.cons");
+      define_proc ("car", "kawa.standard.car");
+      define_proc ("cdr", "kawa.standard.cdr");
+      define_proc ("set-car!", "kawa.standard.setcar_b");
+      define_proc ("set-cdr", "kawa.standard.setcdr_b");
+
+      define_proc ("caar", "kawa.standard.caar");
+      define_proc ("cadr", "kawa.standard.cadr");
+      define_proc ("cdar", "kawa.standard.cdar");
+      define_proc ("cddr", "kawa.standard.cddr");
+      define_proc ("caaar", "kawa.standard.caaar");
+      define_proc ("caadr", "kawa.standard.caadr");
+      define_proc ("cadar", "kawa.standard.cadar");
+      define_proc ("caddr", "kawa.standard.caddr");
+      define_proc ("cdaar", "kawa.standard.cdaar");
+      define_proc ("cdadr", "kawa.standard.cdadr");
+      define_proc ("cddar", "kawa.standard.cddar");
+      define_proc ("cdddr", "kawa.standard.cdddr");
+      define_proc ("caaaar", "kawa.standard.caaaar");
+      define_proc ("caaadr", "kawa.standard.caaadr");
+      define_proc ("caadar", "kawa.standard.caadar");
+      define_proc ("caaddr", "kawa.standard.caaddr");
+      define_proc ("cadaar", "kawa.standard.cadaar");
+      define_proc ("cadadr", "kawa.standard.cadadr");
+      define_proc ("caddar", "kawa.standard.caddar");
+      define_proc ("cadddr", "kawa.standard.cadddr");
+      define_proc ("cdaaar", "kawa.standard.cdaaar");
+      define_proc ("cdaadr", "kawa.standard.cdaadr");
+      define_proc ("cdadar", "kawa.standard.cdadar");
+      define_proc ("cdaddr", "kawa.standard.cdaddr");
+      define_proc ("cddaar", "kawa.standard.cddaar");
+      define_proc ("cddadr", "kawa.standard.cddadr");
+      define_proc ("cdddar", "kawa.standard.cdddar");
+      define_proc ("cddddr", "kawa.standard.cddddr");
+      define_proc ("null?", "kawa.standard.null_p");
+      define_proc ("list?", "kawa.standard.list_p");
+      define_proc ("list", "kawa.standard.list");
+      define_proc ("length", "kawa.standard.length");
+      define_proc ("append", "kawa.standard.append");
+      define_proc ("list-tail", "kawa.standard.list_tail");
+      define_proc ("list-ref", "kawa.standard.list_ref");
+
       proc = new kawa.standard.mem("memq",eq);
       define(proc.name,proc);
       proc = new kawa.standard.mem("memv",eqv);
@@ -137,48 +103,31 @@ public class StandardInterpreter extends Interpreter
       define(proc.name,proc);
 
       //-- Section 6.4
-      proc = new kawa.standard.symbol_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.symbol2string();
-      define(proc.name,proc);
-      proc = new kawa.standard.string2symbol();
-      define(proc.name,proc);
+      
+      define_proc ("symbol?", "kawa.standard.symbol_p");
+      define_proc ("symbol->string", "kawa.standard.symbol2string");
+      define_proc ("string->symbol", "kawa.standard.string2symbol");
 
       //-- Section 6.5
-      proc = new kawa.standard.number_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.real_p();
-      define(proc.name,proc);
+      define_proc ("number?", "kawa.standard.number_p");
+      define_proc ("real?", "kawa.standard.real_p");
       define("inexact?",proc);
       proc = new kawa.standard.integer_p();
       define(proc.name,proc);
       define("exact?",proc);
-      proc = new kawa.standard.zero_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.positive_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.negative_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.equal_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.less_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.lessequal_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.greater_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.greaterequal_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.plus_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.minus_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.multiply_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.divide_oper();
-      define(proc.name,proc);
-      proc = new kawa.standard.abs();
-      define(proc.name,proc);
+      define_proc ("zero?", "kawa.standard.zero_p");
+      define_proc ("positive?", "kawa.standard.positive_p");
+      define_proc ("negative?", "kawa.standard.negative_p");
+      define_proc ("=", "kawa.standard.equal_oper");
+      define_proc ("<", "kawa.standard.less_oper");
+      define_proc ("<=", "kawa.standard.lessequal_oper");
+      define_proc (">", "kawa.standard.greater_oper");
+      define_proc (">=", "kawa.standard.greaterequal_oper");
+      define_proc ("+", "kawa.standard.plus_oper");
+      define_proc ("-", "kawa.standard.minus_oper");
+      define_proc ("*", "kawa.standard.multiply_oper");
+      define_proc ("/", "kawa.standard.divide_oper");
+      define_proc ("abs", "kawa.standard.abs");
 
       //-- Section 6.6
       proc = new kawa.standard.char_p();
@@ -241,41 +190,32 @@ public class StandardInterpreter extends Interpreter
       define(proc.name,proc);
 
       //-- Section 6.8
-      proc = new kawa.standard.vector_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.make_vector();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector_length();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector_ref();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector_set_b();
-      define(proc.name,proc);
-      proc = new kawa.standard.list2vector();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector2list();
-      define(proc.name,proc);
-      proc = new kawa.standard.vector_fill_b();
-      define(proc.name,proc);
+      define_proc ("vector?", "kawa.standard.vector_p");
+      define_proc ("make-vector", "kawa.standard.make_vector");
+      define_proc ("vector", "kawa.standard.vector");
+      define_proc ("vector-length", "kawa.standard.vector_length");
+      define_proc ("vector-ref", "kawa.standard.vector_ref");
+      define_proc ("vector-set!", "kawa.standard.vector_set_b");
+      define_proc ("list->vector", "kawa.standard.list2vector");
+      define_proc ("vector->list", "kawa.standard.vector2list");
+      define_proc ("vector-fill!", "kawa.standard.vector_fill_b");
 
       //-- Section 6.9
-      proc = new kawa.standard.procedure_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.apply();
-      define(proc.name,proc);
+      define_proc ("procedure?", "kawa.standard.procedure_p");
+      define_proc ("apply", "kawa.standard.apply");
+      define_proc (new map (true));        // map
+      define_proc (new map (false));       // for-each
+      define_proc ("call-with-current-continuation", "kawa.standard.callcc");
 
       //-- Section 6.10
-      define_proc (new read ());           // read
+      define_proc ("read", "kawa.standard.read");
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
-      define_proc (new eof_object_p ());   // eof-object?
       define_proc (new write(true));       // write
       define_proc (new write(false));      // display
-      define_proc (new writechar ());      // write-char
-
-      define_proc (new load ());           // load
+      define_proc ("write-char", "kawa.standard.writechar");
+      define_proc ("newline", "kawa.standard.newline");
+      define_proc ("load", "kawa.standard.load");
 
       //-- (let ((n obj)...) e1 ... )
       define("let", new kawa.standard.let());

@@ -122,10 +122,13 @@ read.class \
 readchar.class \
 eof_object_p.class \
 write.class \
+newline.class \
 writechar.class \
 load.class \
 procedure_p.class \
 apply.class \
+map.class \
+callcc.class \
 exit.class \
 define.class \
 let.class \

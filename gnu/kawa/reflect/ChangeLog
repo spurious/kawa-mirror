@@ -1,3 +1,8 @@
+1999-12-27  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (<init>):  New constructor.
+	(define):  New static method.
+
 1999-12-06  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (getMethods):  Set cacheArgs *after* recursive call done.

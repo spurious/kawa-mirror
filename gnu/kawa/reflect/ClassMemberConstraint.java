@@ -26,6 +26,13 @@ public class ClassMemberConstraint extends Constraint
     this.name = name;
   }
 
+  public ClassMemberConstraint(Type type, gnu.bytecode.Field field)
+  {
+    this.type = type;
+    this.field = field;
+    this.name = field.getName();
+  }
+
   void setup()
   {
     if (rfield == null)
@@ -81,6 +88,18 @@ public class ClassMemberConstraint extends Constraint
 	setValue(binding, object);
 	setConstraint(binding,
                       new ClassMemberConstraint(object.getClass(), fname));
+      }
+  }
+
+  public static void define (String name, Object object,
+                             gnu.bytecode.Field field, Environment env)
+  {
+    Binding binding = env.getBinding(name);
+    synchronized (binding)
+      {
+	setValue(binding, object);
+	setConstraint(binding,
+                      new ClassMemberConstraint(field.getType(), field));
       }
   }
 

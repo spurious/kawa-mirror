@@ -50,11 +50,11 @@ public class ZipLoader extends ClassLoader
 	  {
 	    try
 	      {
-		int size = (int) member.getSize();
+		int member_size = (int) member.getSize();
 		java.io.InputStream strm = zar.getInputStream(member);
-		byte[] bytes = new byte[size];
+		byte[] bytes = new byte[member_size];
 		strm.read(bytes);
-		clas = defineClass (name, bytes, 0, size);
+		clas = defineClass (name, bytes, 0, member_size);
 		loadedClasses.addElement(name);
 		loadedClasses.addElement(clas);
 		if (2 * size == loadedClasses.size())

@@ -1,3 +1,7 @@
+Tue Mar 30 17:52:57 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/object.java (rewrite):  Call LambdaExp.setClassMethod.
+
 Sat Mar 20 11:23:48 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* configure.in (AC_OUTPUT), configure:  Add gnu/elisp/Makefile.
@@ -22,6 +26,8 @@ Sat Mar 20 11:23:48 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 	* kawa/standard/call_with_values.java (apply(CallStack)):  New method.
 	* kawa/standard/location.java (rewriteArg):  New static method.
 	(rewrite):  Handle macros and both global and local variables.
+	* kawa/standard/constant_fold.java (checkConstant):  Just call
+	get(Object) - which does not throw exception if undefined.
 	
 	* kawa/standard/define_alias.java:  New Syntax sub-class.
 	* kawa/standard/Makefile.am (jav_JAVA):  Add define_alias.java.

@@ -1,4 +1,4 @@
-// Copyright (c) 1996-2000, 2002  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2002, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -6,8 +6,13 @@ import java.io.*;
 
 /** A Symbol is a Location in an Environment object. */
 
-public class Symbol extends Location implements Externalizable
-    // implements java.util.Map.Entry
+public class Symbol extends Location
+  implements
+  /* BEGIN JAVA2 */
+  Comparable,
+  java.util.Map.Entry,
+  /* END JAVA2 */
+  Externalizable
 {
   public final String getNamespaceURI()
   {
@@ -173,6 +178,14 @@ public class Symbol extends Location implements Externalizable
     Object old = constraint.get(this);
     constraint.set(this, value);
     return old;
+  }
+
+  public int compareTo(Object o)
+  {
+    Symbol other = (Symbol) o;
+    if (getNamespaceURI() != other.getNamespaceURI())
+      throw new IllegalArgumentException("comparing Symbols in different namespaces");
+    return getLocalName().compareTo(other.getLocalName());
   }
 
   /** Just tests for identity.

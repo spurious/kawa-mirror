@@ -1,3 +1,14 @@
+1998-08-28  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in (AC_CONFIG_AUX_DIR):  Removed.
+	Set version to 1.6.55.
+	* install-sh, mkinstalldirs:  Removed, now gotten from .. .
+
+	* kawa/lang/Translator.java (resolve):  Remove.
+	* kawa.standard/location.java:  New Syntax.
+	* kawa/standard/Makefile.am, kawa/standard/Scheme.java:  Update.
+	* kawa/standard/{define.java,set_b}.java:  Translator.resolve is now gone.
+
 Mon Aug  3 13:21:22 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/FString.java (hashCode):  Fix typo:  32 -> 31.

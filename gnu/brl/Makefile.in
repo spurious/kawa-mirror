@@ -109,6 +109,7 @@ SOURCES = $(java_SCM) $(java_sources)
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 java_SCM = progfun.scm stringfun.scm
+EXTRA_DIST = $(java_SCM)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  Makefile.am Makefile.in

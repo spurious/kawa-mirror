@@ -11,15 +11,17 @@ bin_SCRIPTS = kawa
 # Sufix for batch files.
 BAT=
 
+# Use an environment variable for CLASSPATH so we pick up standard classes:
+CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
+JAVAC = javac
 JAVA = java
-JAVAC = javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 
 .java.class:
-	$(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
 
 # This redundant rule is needed for some versions of make, but not GNU make.
 repl.class:  $(srcdir)/repl.java
-	$(JAVAC) -d .. $<
+	$(CLASSPATH_ENV) $(JAVAC) -d .. $<
 
 javadir=$(prefix)/java/$(subdir)
 

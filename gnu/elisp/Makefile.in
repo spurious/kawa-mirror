@@ -78,8 +78,6 @@ javadir = $(datadir)/java/$(subdir)
 
 java_JAVA =    ELispReader.java
 
-java_SCM =    streams.scm
-
 
 KAWA = $(JAVA) kawa.repl
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -218,10 +216,7 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-streams.class:  $(java_SCM)
-	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) -P gnu.elisp. -C $?
-
-all: Makefile classjava.stamp streams.class
+all: Makefile classjava.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

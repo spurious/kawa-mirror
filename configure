@@ -1011,7 +1011,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gjc              Compile Kawa using GCJ (GNU Compiler for Java)
-  --with-java-collections Assume Java collections (java.util.List) is available
+--without-java-collections Don't assume Java collections (java.util.List) is available]
   --without-java-references  Don't use java.lang.ref
   --with-swing            Assume Swing (Java Foundation Classes) is available
   --with-awt              Assume AWT is available (default on)
@@ -1996,8 +1996,11 @@ fi;
 # Check whether --with-java-collections or --without-java-collections was given.
 if test "${with_java_collections+set}" = set; then
   withval="$with_java_collections"
-
+  with_java_collections=$withval
+else
+  with_java_collections=yes
 fi;
+
 
 
 # Check whether --with-java-references or --without-java-references was given.
@@ -3883,7 +3886,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3886 "configure"' > conftest.$ac_ext
+  echo '#line 3889 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7562,7 +7565,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7565 "configure"
+#line 7568 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -7660,7 +7663,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 7663 "configure"
+#line 7666 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10767,7 +10770,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10770 "configure"
+#line 10773 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10865,7 +10868,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 10868 "configure"
+#line 10871 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13495,7 +13498,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13498 "configure"
+#line 13501 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13593,7 +13596,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13596 "configure"
+#line 13599 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

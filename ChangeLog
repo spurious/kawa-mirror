@@ -1,4 +1,8 @@
-2002-11-20  Per Bothner  <bothner@bothner.com>
+2002-11-23  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Make --with-collections the default.
+
+002-11-20  Per Bothner  <bothner@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Turn an identifier with a
 	colon and matching namespace into a Symbol.

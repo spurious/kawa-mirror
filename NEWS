@@ -1,3 +1,5 @@
+The configure option --with-collections is now the default.
+
 Changes since Kawa 1.6.99
 =========================
 

@@ -257,7 +257,7 @@ public class require extends Syntax
 		    sexp.setDefining(true);
                     if (isAlias || ftype.isSubtype(Compilation.typeSymbol))
                       fdecl.setIndirectBinding(true);
-		    if (type.isSubtype(Compilation.typeProcedure))
+		    else if (ftype.isSubtype(Compilation.typeProcedure))
 		      {
 			adecl.setProcedureDecl(true);
 			fdecl.setProcedureDecl(true);

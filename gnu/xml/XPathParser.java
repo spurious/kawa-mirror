@@ -408,7 +408,7 @@ public class XPathParser implements XPathConstants
 		}
 	}
 
-	/** Parse a "Step" in the cpsth grammar.
+	/** Parse a "Step" in the xpath grammar.
 	 * Returns true if a Step was seen;  false otherwise.
 	 * The generated code is meant to be executed in a purely forward
 	 * direction; it is *not* Reverse Polish Notation, unless wordcode

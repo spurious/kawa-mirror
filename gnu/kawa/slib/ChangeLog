@@ -1,3 +1,7 @@
+2004-07-11  Chris Dean  <ctdean@sokitomi.com>
+
+	* srfi1.scm: Many functions written to be tail recursive.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* gui.scm (frame):  Process args list "manually", since we want

@@ -505,10 +505,10 @@
 ;;; take & drop
 
 (define (take lis k :: <integer>)
-  (let recur ((lis lis) (k k))
-    (if (zero? k) '()
-	(cons (car lis)
-	      (recur (cdr lis) (- k 1))))))
+  (let recur ((lis lis) (k k) (res '()))
+    (if (zero? k) 
+        (reverse! res)
+        (recur (cdr lis) (- k 1) (cons (car lis) res)))))
 
 (define (drop lis k :: <integer>)
   (let iter ((lis lis) (k k))
@@ -594,10 +594,10 @@
 ;      (list-tail lis k)))
 
 (define (split-at x k :: <integer>)
-  (let recur ((lis x) (k k))
-    (if (zero? k) (values '() lis)
-	(receive (prefix suffix) (recur (cdr lis) (- k 1))
-	  (values (cons (car lis) prefix) suffix)))))
+  (let recur ((prefix '()) (suffix x) (k k))
+    (if (zero? k) 
+        (values (reverse! prefix) suffix)
+        (recur (cons (car suffix) prefix) (cdr suffix) (- k 1)))))
 
 (define (split-at! x k :: <integer>)
   (if (zero? k) (values '() x)
@@ -766,6 +766,13 @@
 		      (values (cons a cars) (cons d cdrs))))))
 	    (values '() '()))))))
 
+;;; Return the %cars+cdrs result as a pair instead of a multiple value
+;;; return.  Kawa finds it easier to optimize a tail recursive loop
+;;; when the %cars+cdrs logic is called this way.
+(define-private (%cars+cdrs/pair lists)
+  (let-values (((cars cdrs) (%cars+cdrs lists)))
+    (cons cars cdrs)))
+
 ;;; Like %CARS+CDRS, but we pass in a final elt tacked onto the end of the
 ;;; cars list. What a hack.
 (define-private (%cars+cdrs+ lists cars-final)
@@ -790,6 +797,9 @@
 	      (values (cons a cars) (cons d cdrs)))))
 	(values '() '()))))
 
+(define-private (%cars+cdrs/no-test/pair lists)
+  (let-values (((cars cdrs) (%cars+cdrs/no-test lists)))
+    (cons cars cdrs)))
 
 ;;; count
 ;;;;;;;;;
@@ -798,11 +808,17 @@
 
       ;; N-ary case
       (let lp ((list1 list1) (lists lists) (i 0))
-	(if (null-list? list1) i
-	    (receive (a-s d-s) (%cars+cdrs lists)
+	(if (null-list? list1) 
+            i
+            (let* ((split (%cars+cdrs/pair lists))
+                   (a-s (car split))
+                   (d-s (cdr split)))
 	      (if (null? a-s) i
-		  (lp (cdr list1) d-s
-		      (if (apply pred (car list1) a-s) (+ i 1) i))))))
+		  (lp (cdr list1) 
+                      d-s
+		      (if (apply pred (car list1) a-s)
+                          (+ i 1) 
+                          i))))))
 
       ;; Fast path
       (let lp ((lis list1) (i 0))
@@ -827,14 +843,15 @@
 	(if (pair? (cdr maybe-tail-gen))
 	    (apply error "Too many arguments" unfold p f g seed maybe-tail-gen)
 
-	    (let recur ((seed seed))
-	      (if (p seed) (tail-gen seed)
-		  (cons (f seed) (recur (g seed)))))))
+	    (let recur ((seed seed) (res '()))
+	      (if (p seed) 
+                  (append-reverse! res (tail-gen seed))
+                  (recur (g seed) (cons (f seed) res))))))
 
-      (let recur ((seed seed))
-	(if (p seed) '()
-	    (cons (f seed) (recur (g seed)))))))
-      
+      (let recur ((seed seed) (res '()))
+	(if (p seed) 
+            (reverse! res)
+	    (recur (g seed) (cons (f seed) res))))))
 
 (define (fold kons :: <procedure> knil lis1 . lists)
   (if (pair? lists)
@@ -904,27 +921,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (append-map f lis1 . lists)
-  (really-append-map append-map  append  f lis1 lists))
-(define (append-map! f lis1 . lists) 
-  (really-append-map append-map! append! f lis1 lists))
-
-(define (really-append-map who appender f :: <procedure> lis1 lists)
   (if (pair? lists)
-      (receive (cars cdrs) (%cars+cdrs (cons lis1 lists))
-	(if (null? cars) '()
-	    (let recur ((cars cars) (cdrs cdrs))
-	      (let ((vals (apply f cars)))
-		(receive (cars2 cdrs2) (%cars+cdrs cdrs)
-		  (if (null? cars2) vals
-		      (appender vals (recur cars2 cdrs2))))))))
+      (apply append! (apply map (cons f (cons lis1 lists))))
+      (apply append! (map f lis1))))
 
-      ;; Fast path
-      (if (null-list? lis1) '()
-	  (let recur ((elt (car lis1)) (rest (cdr lis1)))
-	    (let ((vals (f elt)))
-	      (if (null-list? rest) vals
-		  (appender vals (recur (car rest) (cdr rest)))))))))
-
+(define (append-map! f lis1 . lists)
+  (if (pair? lists)
+      (apply append! (apply map! (cons f (cons lis1 lists))))
+      (apply append! (map! f lis1))))
 
 (define (pair-for-each proc :: <procedure> lis1 . lists)
   (if (pair? lists)
@@ -947,7 +951,9 @@
   (if (pair? lists)
       (let lp ((lis1 lis1) (lists lists))
 	(if (not (null-list? lis1))
-	    (receive (heads tails) (%cars+cdrs/no-test lists)
+            (let* ((split (%cars+cdrs/no-test/pair lists))
+                   (heads (car split))
+                   (tails (cdr split)))
 	      (set-car! lis1 (apply f (car lis1) heads))
 	      (lp (cdr lis1) tails))))
 
@@ -959,19 +965,25 @@
 ;;; Map F across L, and save up all the non-false results.
 (define (filter-map f :: <procedure> lis1 . lists)
   (if (pair? lists)
-      (let recur ((lists (cons lis1 lists)))
+      (let recur ((lists (cons lis1 lists)) (res '()))
 	(receive (cars cdrs) (%cars+cdrs lists)
-	  (if (pair? cars)
-	      (cond ((apply f cars) => (lambda (x) (cons x (recur cdrs))))
-		    (else (recur cdrs))) ; Tail call in this arm.
-	      '())))
-	    
+                 (if (not-pair? cars)
+                     (reverse! res)
+                     (let ((head (apply f cars)))
+                       (if head
+                           (recur cdrs (cons head res))
+                           (recur cdrs res))))))
       ;; Fast path.
-      (let recur ((lis lis1))
-	(if (null-list? lis) lis
-	    (let ((tail (recur (cdr lis))))
-	      (cond ((f (car lis)) => (lambda (x) (cons x tail)))
-		    (else tail)))))))
+      (let recur ((lis lis1) (res '()))
+        (if (null-list? lis) 
+            (reverse! res)
+            (let ((head (f (car lis)))
+                  (tail (cdr lis)))
+              (if head
+                  (recur tail (cons head res))
+                  (recur tail res)))))))
+
+
 
 
 ;;; Map F across lists, guaranteeing to go left-to-right.
@@ -1002,20 +1014,19 @@
 ;;; FILTER, REMOVE, PARTITION and their destructive counterparts do not
 ;;; disorder the elements of their argument.
 
-;; This FILTER shares the longest tail of L that has no deleted elements.
-;; If Scheme had multi-continuation calls, they could be made more efficient.
+;; Simple filter that uses cons even if the tail of the list can be
+;; shared
 
-(define (filter pred :: <procedure> lis)			; Sleazing with EQ? makes this
-; one faster.
-  (let recur ((lis lis))		
-    (if (null-list? lis) lis			; Use NOT-PAIR? to handle dotted lists.
+(define (filter pred :: <procedure> lis) 
+  (let recur ((lis lis) (res '()))
+    (if (null-list? lis) 
+        (reverse! res)
 	(let ((head (car lis))
 	      (tail (cdr lis)))
 	  (if (pred head)
-	      (let ((new-tail (recur tail)))	; Replicate the RECUR call so
-		(if (eq? tail new-tail) lis
-		    (cons head new-tail)))
-	      (recur tail))))))			; this one can be a tail call.
+              (recur tail (cons head res))
+              (recur tail res))))))
+
 
 ;;; Another version that shares longest tail.
 ;(define (filter pred lis)
@@ -1089,20 +1100,15 @@
 
 
 
-;;; Answers share common tail with LIS where possible; 
-;;; the technique is slightly subtle.
-
 (define (partition pred :: <procedure> lis)
-  (let recur ((lis lis))
-    (if (null-list? lis) (values lis lis)	; Use NOT-PAIR? to handle dotted lists.
-	(let ((elt (car lis))
+  (let loop ((lis lis) (in '()) (out '()))
+    (if (null-list? lis)
+        (values (reverse! in) (reverse! out))
+        (let ((head (car lis))
 	      (tail (cdr lis)))
-	  (receive (in out) (recur tail)
-	    (if (pred elt)
-		(values (if (pair? out) (cons elt in) lis) out)
-		(values in (if (pair? in) (cons elt out) lis))))))))
-
-
+          (if (pred head)
+              (loop tail (cons head in) out)
+              (loop tail in (cons head out)))))))
 
 ;(define (partition! pred lis)			; Things are much simpler
 ;  (let recur ((lis lis))			; if you are willing to
@@ -1116,6 +1122,28 @@
 ;                        (values in lis))))))))
 
 
+;; A simple version of PARTITION! that Kawa can compile down to
+;; iterative code.  It's possible to make this slightly more efficient
+;; but it doesn't seem to run much faster.  We are not careful about
+;; running set-cdr!.
+(define (partition! pred :: <procedure> lis)
+  (let ((in-head (cons 'tmp '())) (out-head (cons 'tmp '())))
+    (let loop ((in in-head) (out out-head) (lis lis))
+      (if (not-pair? lis)
+          (begin
+            (set-cdr! in '())
+            (set-cdr! out '())
+            (values (cdr in-head) (cdr out-head)))
+	(if (pred (car lis))
+              (begin
+                (set-cdr! in lis)
+                (loop lis out (cdr lis)))
+              (begin
+                (set-cdr! out lis)
+                (loop in lis (cdr lis))))))))
+
+
+#|
 ;;; This implementation of PARTITION!
 ;;; - doesn't cons, and uses no stack;
 ;;; - is careful not to do redundant SET-CDR! writes, as writes to memory are
@@ -1150,7 +1178,7 @@
 				     (lp lis (cdr lis)))
 				 (set-cdr! in-prev lis)))))) ; Done.
 
-	;; Crank up the scan&splice loops.
+	Crank up the scan&splice loops.
 	(if (pred (car lis))
 	    ;; LIS begins in-list. Search for out-list's first pair.
 	    (let lp ((prev-l lis) (l (cdr lis)))
@@ -1166,8 +1194,7 @@
 		     (scan-in l prev-l (cdr l))
 		     (values l lis))		; Done.
 		    (else (lp l (cdr l)))))))))
-
-
+|#
 ;;; Inline us, please.
 (define (remove  pred l) (filter  (lambda (x) (not (pred x))) l))
 (define (remove! pred l) (filter! (lambda (x) (not (pred x))) l))
@@ -1294,13 +1321,13 @@
 	     lis)))
 
 (define (span pred :: <procedure> lis)
-  (let recur ((lis lis))
-    (if (null-list? lis) (values '() '())
-	(let ((x (car lis)))
-	  (if (pred x)
-	      (receive (prefix suffix) (recur (cdr lis))
-		(values (cons x prefix) suffix))
-	      (values '() lis))))))
+  (let loop ((lis lis) (res '()))
+    (if (null-list? lis)
+        (values (reverse! res) lis)
+        (let ((head (car lis)))
+          (if (pred head)
+              (loop (cdr lis) (cons head res))
+              (values (reverse! res) lis))))))
 
 (define (span! pred :: <procedure> lis)
   (if (or (null-list? lis) (not (pred (car lis)))) (values '() lis)
@@ -1323,7 +1350,9 @@
       (receive (heads tails) (%cars+cdrs (cons lis1 lists))
 	(and (pair? heads)
 	     (let lp ((heads heads) (tails tails))
-	       (receive (next-heads next-tails) (%cars+cdrs tails)
+               (let* ((split (%cars+cdrs/pair tails))
+                      (next-heads (car split))
+                      (next-tails (cdr split)))
 		 (if (pair? next-heads)
 		     (or (apply pred heads) (lp next-heads next-tails))
 		     (apply pred heads)))))) ; Last PRED app is tail call.

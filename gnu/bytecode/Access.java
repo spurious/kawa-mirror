@@ -13,6 +13,7 @@ public class Access {
   static public final short PROTECTED   = 0x0004;
   static public final short STATIC      = 0x0008;
   static public final short FINAL       = 0x0010;
+  static public final short SUPER       = 0x0020;
   static public final short SYNCHRONIZED= 0x0020;
   static public final short VOLATILE    = 0x0040;
   static public final short TRANSIENT   = 0x0080;

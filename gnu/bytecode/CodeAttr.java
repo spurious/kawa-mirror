@@ -1004,7 +1004,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     int opcode;
     if ((method.access_flags & Access.STATIC) != 0)
       opcode = 184;   // invokestatic
-    else if (getMethod().classfile.isInterface())
+    else if (method.classfile.isInterface())
       opcode = 185;   // invokeinterface
     else
       opcode = 182;   // invokevirtual
@@ -1341,7 +1341,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	int growth = SP-if_stack.start_stack_size;
 	if_stack.stack_growth = growth;
-	if (growth >= 0)
+	if (growth > 0)
 	  {
 	    if_stack.then_stacked_types = new Type[growth];
 	    System.arraycopy (stack_types, if_stack.start_stack_size,

@@ -15,6 +15,18 @@ public abstract class Type {
 
   Type () { }
 
+  /** The type used to implement types not natively understood by the JVM.
+
+   * Usually, the identity function.  However, a language might handle
+   * union types or template types or type expression scalculated at
+   * run time.  In that case return the type used at the JVM level,
+   * and known at compile time.
+   */
+  public Type getImplementationType()
+  {
+    return this;
+  }
+
   // Maps java.lang.Class to corresponding Type.
   static java.util.Hashtable mapClassToType;
 
@@ -126,7 +138,7 @@ public abstract class Type {
 
   /** Returns the primitive type corresponding to a signature character.
    * @return a primitive type, or null if there is no such type. */
-  public static Type signatureToPrimitive(char sig)
+  public static PrimType signatureToPrimitive(char sig)
   {
     switch(sig)
       {

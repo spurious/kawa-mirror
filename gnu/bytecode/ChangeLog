@@ -1,3 +1,16 @@
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* Access.java (SUPER):  New constant.
+
+	* CodeAttr.java (emitInvoke):  Was testing isInterface on wrong class.
+
+	* CodeAttr.java (emitElse):  Fix bug (null pointer access)
+	reported by Felix S Klock II <pnkfelix@MIT.EDU>.
+
+	* Type.java (signatureToPrimitive):  Change return type.
+
+	* Type.java (getImplementationType):  New method.
+
 2001-08-15  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getSuperclass):  Don't call getReflectClass of

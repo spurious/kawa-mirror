@@ -7,14 +7,26 @@ import gnu.bytecode.*;
 // Should be moved to some other package?  FIXME
 
 /** A class type implemented as a pair of an interface and a class.
- * This is how true muliplte inheritance can be implemented.
+ * This is how true multiple inheritance can be implemented.
  */
 
 public class PairClassType extends ClassType
 {
+  // FIXME should probably inherit from ObjectType or even Type
+  // rather than ClassType, and have an interfaceType field,
+  // which getImplementationType would return
+  /*
+  public ClassType interfaceType;
+  public Type getImplementationType()
+  {
+    return interfaceType;
+  }
+  String name;
+  */
+
   Object staticLink;
 
-  public ClassType reflectInstanceClass;
+  public ClassType instanceType;
 
   public PairClassType()
   {
@@ -27,8 +39,7 @@ public class PairClassType extends ClassType
     access_flags |= Access.INTERFACE;
     reflectClass = reflectInterface;
     registerTypeForClass(reflectInterface, this);
-    this.reflectInstanceClass = (ClassType) Type.make(reflectInstanceClass);
-    //Type.mapNameToType.put(getName(), this);
+    this.instanceType = (ClassType) Type.make(reflectInstanceClass);
   }
 
   public static PairClassType make(Class reflectInterface,

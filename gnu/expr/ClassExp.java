@@ -106,7 +106,16 @@ public class ClassExp extends LambdaExp
 	String name = getName();
 	if (name == null)
 	  name = "object";
-	type.setName(comp.generateClassName(name));
+	else
+	  {
+	    int nlen = name.length();
+	    if (nlen > 2
+		&& name.charAt(0) == '<' && name.charAt(nlen-1) == '>')
+	      name = name.substring(1, nlen-1);
+	  }
+	if (! isSimple() || this instanceof ObjectExp)
+	  name = comp.generateClassName(name);
+	type.setName(name);
       }
     return type;
   }
@@ -137,15 +146,15 @@ public class ClassExp extends LambdaExp
 	if (! isSimple())
 	  {
 	    PairClassType ptype = new PairClassType();
-	      type = ptype;
+	    type = ptype;
 	    setMakingClassPair(true);
-	    instanceType = new gnu.bytecode.ClassType();
+	    instanceType = new ClassType();
 	    type.setInterface(true);
 	    ClassType[] interfaces = { type };
 	    // Can we better.  FIXME.
 	    instanceType.setSuper(Type.pointer_type);
 	    instanceType.setInterfaces(interfaces);
-	    ptype.reflectInstanceClass = instanceType;
+	    ptype.instanceType = instanceType;
 	  }
 	else
 	  instanceType = type = new ClassType();
@@ -156,6 +165,7 @@ public class ClassExp extends LambdaExp
 	instanceType = type = new ClassType();
 	type.setSuper(superType);
       }
+    instanceType.setModifiers(Access.SUPER);
 
     if (j > 0)
       {
@@ -189,22 +199,24 @@ public class ClassExp extends LambdaExp
 	// If the declaration derives from a method, don't create field.
 	if (decl.getCanRead())
 	  {
+	    int flags = Access.PUBLIC;
+	    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
+	      flags |= Access.STATIC;
 	    if (isMakingClassPair())
 	      {
-		Type ftype = Type.pointer_type;
+		flags |= Access.ABSTRACT;
+		Type ftype = decl.getType().getImplementationType();
 		type.addMethod(slotToMethodName("get", decl.getName()),
-			       Access.PUBLIC|Access.ABSTRACT,
-			       Type.typeArray0, ftype);
+			       flags, Type.typeArray0, ftype);
 		Type[] stypes = { ftype };
 		type.addMethod(slotToMethodName("set",decl.getName()),
-			       Access.PUBLIC|Access.ABSTRACT,
-			       stypes, Type.void_type);
+			       flags, stypes, Type.void_type);
 	      }
 	    else
 	      {
 		decl.field
 		  = instanceType.addField(decl.getName(), decl.getType(),
-					  Access.PUBLIC);
+					  flags);
 		decl.setSimple(false);
 	      }
 	  }
@@ -213,9 +225,51 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
-	child.addMethodFor(type, null, null);
+	if (child != initMethod || ! isMakingClassPair())
+	  child.addMethodFor(type, null, null);
 	if (isMakingClassPair())
 	  child.addMethodFor(instanceType, null, type);
+      }
+  }
+
+  /** Return implementation method matching name and param types.
+   * Used when compiling a pair class and generating a concrete method
+   * implementing an interface method, to find static implementation method
+   * in this or super implementation class we need to call.
+   * @param interfaceType search the implementation classes corresponding
+   *   to this interface type and its super-interfaces.
+   * @param mname method name to look for.
+   * @param paramTypes method types to look for.
+   * @param vec where to place found methods
+   * If a method is found, don't search super-interfaces, as the found method
+   * is more specific and overrides any that might in super-interfaces.
+   */
+  void getImplMethods(ClassType interfaceType,
+		      String mname, Type[] paramTypes, Vector vec)
+  {
+    ClassType implType;
+    if (type instanceof PairClassType)
+      implType = ((PairClassType) interfaceType).instanceType;
+    else
+      {
+	String implTypeName = interfaceType.getName() + "$class";
+	implType = ClassType.make(implTypeName);
+      }
+    Type[] itypes = new Type[paramTypes.length + 1];
+    itypes[0] = interfaceType;
+    System.arraycopy (paramTypes, 0, itypes, 1, paramTypes.length);
+    Method implMethod = implType.getDeclaredMethod(mname, itypes);
+    if (implMethod != null)
+      {
+	int count = vec.size();
+	if (count == 0 || ! vec.elementAt(count-1).equals(implMethod))
+	  vec.add(implMethod);
+      }
+    else
+      {
+	ClassType[] superInterfaces = interfaceType.getInterfaces();
+	for (int i = 0;  i < superInterfaces.length;  i++)
+	  getImplMethods(superInterfaces[i], mname, paramTypes, vec);
       }
   }
 
@@ -318,22 +372,30 @@ public class ClassExp extends LambdaExp
 	      }
 	    else
 	      {
-		Method impl = instanceType.addMethod(mname, Access.PUBLIC,
-						     ptypes, rtype);
-		impl.init_param_slots ();
-		code = impl.getCode();
-		for (Variable var = code.getCurrentScope().firstVar();
-		     var != null;  var = var.nextVar())
-		  code.emitLoad(var);
-		Type[] itypes = new Type[ptypes.length+1];
-		itypes[0] = type;
-		System.arraycopy (ptypes, 0, itypes, 1, ptypes.length);
-		// FIXME does not handle inherited methods!!!
-		Method imethod = instanceType.addMethod(mname,
-							Access.PUBLIC|Access.STATIC,
-							itypes, rtype);
-		code.emitInvokeStatic(imethod);
-		code.emitReturn();
+		Vector vec = new Vector();
+		getImplMethods(type, mname, ptypes, vec);
+		if (vec.size() != 1)
+		  {
+		    // FIXME - need better error message!
+		    String msg = vec.size() == 0
+		      ? "missing implementation for "
+		      : "ambiguous implementation for ";
+		    comp.error('e', msg+meth);
+		  }
+		else
+		  {
+		    Method impl = instanceType.addMethod(mname, Access.PUBLIC,
+							 ptypes, rtype);
+		    impl.init_param_slots ();
+		    code = impl.getCode();
+		    for (Variable var = code.getCurrentScope().firstVar();
+			 var != null;  var = var.nextVar())
+		      code.emitLoad(var);
+		    Method imethod = (Method) vec.elementAt(0);
+		    System.err.println("make impl "+impl+" calls "+imethod);
+		    code.emitInvokeStatic(imethod);
+		    code.emitReturn();
+		  }
 	      }
 	  }
 

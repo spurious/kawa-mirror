@@ -417,7 +417,7 @@ java-classes.stamp: $(java_Java)
 
 scm-classes.stamp: $(java_SCM)
 	$(CLASSPATH_ENV) \
-	  $(KAWA1) -d $(top_builddir) --module-static $(SCM_COMPILE_FLAGS) \
+	  $(KAWA1) -d $(top_builddir) --module-static-run $(SCM_COMPILE_FLAGS) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. -C $?
 	echo timestamp > scm-classes.stamp
 

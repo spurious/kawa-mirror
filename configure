@@ -4295,7 +4295,7 @@ TOP_BUILDDIR=`pwd`
 
 
 macro_version='2.1a'
-macro_revision='1.1863'
+macro_revision='1.1886'
 
 
 
@@ -9352,7 +9352,7 @@ _LT_EOF
 	  ;;
 	pgf77* | pgf90* )		# Portland Group f77 and f90 compilers
 	  whole_archive_flag_spec=
-	  tmp_addflag=' -fpic' ;;
+	  tmp_addflag=' -fpic -Mnomain' ;;
 	ecc*,ia64* | icc*,ia64*)	# Intel C compiler on ia64
 	  tmp_addflag=' -i_dynamic' ;;
 	efc*,ia64* | ifort*,ia64*)	# Intel Fortran compiler on ia64
@@ -9365,8 +9365,6 @@ _LT_EOF
 
         if test "x$supports_anon_versioning" = xyes; then
           archive_expsym_cmds='$ECHO "{ global:" > $output_objdir/$libname.ver~cat $export_symbols | sed -e "s/\(.*\)/\1;/" >> $output_objdir/$libname.ver~$ECHO "local: *; };" >> $output_objdir/$libname.ver~$CC -shared'"$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
-        else
-          archive_expsym_cmds=$archive_cmds
         fi
       else
         ld_shlibs=no
@@ -9958,7 +9956,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	allow_undefined_flag=' -expect_unresolved \*'
 	archive_cmds='$CC -shared${allow_undefined_flag} $libobjs $deplibs $compiler_flags -msym -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib'
 	archive_expsym_cmds='for i in `cat $export_symbols`; do printf "%s %s\\n" -exported_symbol "\$i" >> $lib.exp; done; $ECHO "-hidden">> $lib.exp~
-	$CC -shared${allow_undefined_flag} -input $lib.exp $compiler_flags $libobjs $deplibs -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${objdir}/so_locations -o $lib~$RM $lib.exp'
+	$CC -shared${allow_undefined_flag} -input $lib.exp $compiler_flags $libobjs $deplibs -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib~$RM $lib.exp'
 
 	# Both c and cxx compiler support -rpath directly
 	hardcode_libdir_flag_spec='-rpath $libdir'
@@ -11867,7 +11865,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
         case $cc_basename in
           CC)
   	    # SGI C++
-  	    archive_cmds_CXX='$CC -shared -all -multigot $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${objdir}/so_locations -o $lib'
+  	    archive_cmds_CXX='$CC -shared -all -multigot $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib'
 
   	    # Archives containing C++ object files must be created using
   	    # "CC -ar", where "CC" is the IRIX C++ compiler.  This is
@@ -11878,7 +11876,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
           *)
   	    if test "$GXX" = yes; then
   	      if test "$with_gnu_ld" = no; then
-  	        archive_cmds_CXX='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${objdir}/so_locations -o $lib'
+  	        archive_cmds_CXX='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${output_objdir}/so_locations -o $lib'
   	      else
   	        archive_cmds_CXX='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` -o $lib'
   	      fi
@@ -12060,15 +12058,15 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	    case $host in
 	      osf3*)
 	        allow_undefined_flag_CXX=' ${wl}-expect_unresolved ${wl}\*'
-	        archive_cmds_CXX='$CC -shared${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $soname `test -n "$verstring" && $ECHO ${wl}-set_version $verstring` -update_registry ${objdir}/so_locations -o $lib'
+	        archive_cmds_CXX='$CC -shared${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname $soname `test -n "$verstring" && $ECHO ${wl}-set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib'
 	        hardcode_libdir_flag_spec_CXX='${wl}-rpath ${wl}$libdir'
 		;;
 	      *)
   	        allow_undefined_flag_CXX=' -expect_unresolved \*'
-	        archive_cmds_CXX='$CC -shared${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -msym -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${objdir}/so_locations -o $lib'
+	        archive_cmds_CXX='$CC -shared${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -msym -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib'
 	        archive_expsym_cmds_CXX='for i in `cat $export_symbols`; do printf "%s %s\\n" -exported_symbol "\$i" >> $lib.exp; done~
 	          $ECHO "-hidden">> $lib.exp~
-	          $CC -shared$allow_undefined_flag $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -msym -soname $soname -Wl,-input -Wl,$lib.exp  `test -n "$verstring" && $ECHO -set_version	$verstring` -update_registry $objdir/so_locations -o $lib~
+	          $CC -shared$allow_undefined_flag $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -msym -soname $soname -Wl,-input -Wl,$lib.exp  `test -n "$verstring" && $ECHO -set_version	$verstring` -update_registry ${output_objdir}/so_locations -o $lib~
 	          $RM $lib.exp'
 	        hardcode_libdir_flag_spec_CXX='-rpath $libdir'
 		;;
@@ -12091,10 +12089,10 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	      allow_undefined_flag_CXX=' ${wl}-expect_unresolved ${wl}\*'
 	      case $host in
 	        osf3*)
-	          archive_cmds_CXX='$CC -shared -nostdlib ${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${objdir}/so_locations -o $lib'
+	          archive_cmds_CXX='$CC -shared -nostdlib ${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${output_objdir}/so_locations -o $lib'
 		  ;;
 	        *)
-	          archive_cmds_CXX='$CC -shared -nostdlib ${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-msym ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${objdir}/so_locations -o $lib'
+	          archive_cmds_CXX='$CC -shared -nostdlib ${allow_undefined_flag} $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags ${wl}-msym ${wl}-soname ${wl}$soname `test -n "$verstring" && $ECHO ${wl}-set_version ${wl}$verstring` ${wl}-update_registry ${wl}${output_objdir}/so_locations -o $lib'
 		  ;;
 	      esac
 
@@ -12732,11 +12730,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12735: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12733: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12739: \$? = $ac_status" >&5
+   echo "$as_me:12737: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12823,11 +12821,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12826: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12824: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12830: \$? = $ac_status" >&5
+   echo "$as_me:12828: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12874,11 +12872,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12877: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12875: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12881: \$? = $ac_status" >&5
+   echo "$as_me:12879: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13975,11 +13973,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13978: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13976: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13982: \$? = $ac_status" >&5
+   echo "$as_me:13980: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14256,11 +14254,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14259: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14257: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14263: \$? = $ac_status" >&5
+   echo "$as_me:14261: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14347,11 +14345,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14350: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14348: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14354: \$? = $ac_status" >&5
+   echo "$as_me:14352: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14398,11 +14396,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14401: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14399: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14405: \$? = $ac_status" >&5
+   echo "$as_me:14403: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14620,7 +14618,7 @@ _LT_EOF
 	  ;;
 	pgf77* | pgf90* )		# Portland Group f77 and f90 compilers
 	  whole_archive_flag_spec_GCJ=
-	  tmp_addflag=' -fpic' ;;
+	  tmp_addflag=' -fpic -Mnomain' ;;
 	ecc*,ia64* | icc*,ia64*)	# Intel C compiler on ia64
 	  tmp_addflag=' -i_dynamic' ;;
 	efc*,ia64* | ifort*,ia64*)	# Intel Fortran compiler on ia64
@@ -14633,8 +14631,6 @@ _LT_EOF
 
         if test "x$supports_anon_versioning" = xyes; then
           archive_expsym_cmds_GCJ='$ECHO "{ global:" > $output_objdir/$libname.ver~cat $export_symbols | sed -e "s/\(.*\)/\1;/" >> $output_objdir/$libname.ver~$ECHO "local: *; };" >> $output_objdir/$libname.ver~$CC -shared'"$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
-        else
-          archive_expsym_cmds_GCJ=$archive_cmds_GCJ
         fi
       else
         ld_shlibs_GCJ=no
@@ -15226,7 +15222,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	allow_undefined_flag_GCJ=' -expect_unresolved \*'
 	archive_cmds_GCJ='$CC -shared${allow_undefined_flag} $libobjs $deplibs $compiler_flags -msym -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib'
 	archive_expsym_cmds_GCJ='for i in `cat $export_symbols`; do printf "%s %s\\n" -exported_symbol "\$i" >> $lib.exp; done; $ECHO "-hidden">> $lib.exp~
-	$CC -shared${allow_undefined_flag} -input $lib.exp $compiler_flags $libobjs $deplibs -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${objdir}/so_locations -o $lib~$RM $lib.exp'
+	$CC -shared${allow_undefined_flag} -input $lib.exp $compiler_flags $libobjs $deplibs -soname $soname `test -n "$verstring" && $ECHO -set_version $verstring` -update_registry ${output_objdir}/so_locations -o $lib~$RM $lib.exp'
 
 	# Both c and cxx compiler support -rpath directly
 	hardcode_libdir_flag_spec_GCJ='-rpath $libdir'
@@ -18238,7 +18234,7 @@ done
 # Libtool was configured on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005
 # Free Software Foundation, Inc.
 #
 # This file is part of GNU Libtool:

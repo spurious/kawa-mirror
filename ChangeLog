@@ -1,5 +1,10 @@
 2005-03-17  Per Bothner  <per@bothner.com>
 
+	* ltmain.sh: New version of cvs libtool (2.1a).
+	* Make-rules (scm-classes.stamp): Use --module-static-run
+	instead of --module-static.
+	* aclocal.m4, configure, */Makefile.in: Re-geneate.
+
 	* kawa/repl.java (processArgs): Don't setDefaultLanguage until
 	default Environment has been set.
 

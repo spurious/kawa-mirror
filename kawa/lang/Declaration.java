@@ -54,8 +54,8 @@ import gnu.bytecode.*;
 
 public class Declaration extends Variable
 {
-  /** The (interned) name of the new variable. */
-  // Redundant with Variable.name, except sym is interned.  FIXME */
+  /** The (interned) name of the new variable.
+   * This is the source-level (non-mangled) name. */
   String sym;
 
   public final String symbol () { return sym; }
@@ -98,7 +98,9 @@ public class Declaration extends Variable
   public Declaration (String s)
   {
     sym = s;
-    name = s;
+    name = Compilation.mangleName(s);
+    if (s.equals(name))
+      name = s;
     setType(Type.pointer_type);
   }
 

@@ -1,4 +1,4 @@
-(test-init "macros" 82)
+(test-init "macros" 83)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -295,6 +295,22 @@
 (test 3 'mzscheme-lang-12.3.5-3 (def-and-use x 3))
 (set! fail-expected "mzscheme-lang-12.3.5-4 is 2 but should be 3")
 (test 3 'mzscheme-lang-12.3.5-4 x)
+
+;; Example from Chez Scheme User's Guide by Kent Dybvig:
+(define-syntax loop
+  (lambda (x)
+    (syntax-case x ()
+      ((k e ...)
+       (with-syntax ((break (datum->syntax-object (syntax k) 'break)))
+          (syntax (call-with-current-continuation
+                    (lambda (break)
+                      (let f () e ... (f))))))))))
+(test '(a a a) 'test-loop-macro
+      (let ((n 3) (ls '()))
+	(loop
+	 (if (= n 0) (break ls))
+	 (set! ls (cons 'a ls))
+	 (set! n (- n 1)))))
 
 (define-syntax check-matching
   (syntax-rules ()

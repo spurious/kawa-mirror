@@ -1,3 +1,7 @@
+2004-12-24  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm: New test, from Chez Scheme User's Guide.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm: Add new tests for double elipsis in template.

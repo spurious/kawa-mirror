@@ -1,3 +1,10 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java:  Extend CLispreader rather than LispReader.
+	(readObject):  Fix thinko - create ELispReader rather than ScmRead.
+	(isDelimiter, readAtom0, readAtom, readInteger):  Remove - not used.
+	(makeNil, makePair, setCdr):  Remove - use inherited version.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* ELispReader.java:  Re-write to use new readtable-based LispReader.

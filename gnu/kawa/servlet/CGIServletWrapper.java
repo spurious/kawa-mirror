@@ -24,6 +24,8 @@ implements HttpServletRequest, HttpServletResponse,
   PrintStream out = System.out;
   Vector headers = new Vector();
   String sawContentType;
+  int statusCode = 0;
+  String statusString;
   String servletName;
 
   public static void main(String[] args)
@@ -323,12 +325,14 @@ implements HttpServletRequest, HttpServletResponse,
 
   public void sendError(int i, String str)
   {
-    // ignore FIXME
+    statusCode = i;
+    statusString = str;
   }
 
   public void sendError(int i)
   {
-    // ignore FIXME
+    statusCode = i;
+    statusString = null;
   }
 
   public void sendRedirect(String str)
@@ -345,6 +349,17 @@ implements HttpServletRequest, HttpServletResponse,
 
   private void printHeaders()
   {
+    if (statusCode != 0)
+      {
+	out.print("Status: ");
+	out.print(statusCode);
+	if (statusString != null)
+	  {
+	    out.print(' ');
+	    out.print(statusString);
+	  }
+	out.println();
+      }
     if (sawContentType == null)
       setContentType("text/html"); // FIXME
     int num = headers.size();
@@ -399,12 +414,14 @@ implements HttpServletRequest, HttpServletResponse,
 
   public void setStatus(int i)
   {
-    // ignore FIXME
+    statusCode = i;
+    statusString = null;
   }
 
   public void setStatus(int i, String str)
   {
-    // ignore FIXME
+    statusCode = i;
+    statusString = str;
   }
 
   public String getScheme()

@@ -34,6 +34,45 @@ public class ServletPrinter extends HttpPrinter
 	super.sawContentType = value;
 	response.setContentType(value);
       }
+    else if (label.equalsIgnoreCase("Status"))
+      {
+	int lval = value.length();
+	int code = 0;
+	int i;
+	for (i = 0;  i < lval;  i++)
+	  {
+	    if (i >= lval)
+	      {
+		try
+		  {
+		    response.sendError(code);
+		  }
+		catch (java.io.IOException ex)
+		  {
+		    System.err.println("caught "+ex);
+		  }
+		break;
+	      }
+	    char ch = value.charAt(i);
+	    int digit = Character.digit(ch, 10);
+	    if (digit >= 0)
+	      code = 10 * code + digit;
+	    else
+	      {
+		if (ch == ' ')
+		  i++;
+		try
+		  {
+		response.sendError(code, value.substring(i));
+		  }
+		catch (java.io.IOException ex)
+		  {
+		    System.err.println("caught "+ex);
+		  }
+		break;
+	      }
+	  }
+      }
     else
       response.addHeader(label, value);
   }

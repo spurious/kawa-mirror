@@ -1,3 +1,17 @@
+2002-07-29  Per Bothner  <per@bothner.com>
+
+	* ServletCallContext.java:  Make class public.
+	(getServletCallContext, getRequest, getResponse, getServlet,
+	getServletConfig, getServletContext):  New static methods.
+	* GetResponse.java:  Implement Inlineable.
+	(compile, getReturnType):  New methods.
+	(getReponse):  New static method.
+
+	* ServletPrinter.java (addHeader):  Handle "Status", calling sendError.
+	* CGIServletWrapper.java (statusCode, statusString):  New fields.
+	(sendError, setStatus):  Provide implementations.
+	(printHeaders):  Handle non-null statusCode.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm:  Moved to gnu/kawa/slib.

@@ -8,6 +8,9 @@ public class InlineCalls extends ExpWalker
 {
   Compilation comp;
 
+  /** Get the Compilation associated with this walker. */
+  public Compilation getCompilation () { return comp; }
+
   public static void inlineCalls (Expression exp, Compilation comp)
   {
     InlineCalls walker = new InlineCalls();

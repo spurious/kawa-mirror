@@ -1,3 +1,9 @@
+Sat Sep  7 13:00:07 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* {ClassType,Method}.java:  Support emitting "SourceFile" attribute.
+	(setSourceFile):  New method to set SourceFile.
+	* Method.java (compile_checkcast):  Combine overloaded methods.
+
 Tue Sep  3 19:44:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* ZipArchive.java:  Move ZipMember to ...

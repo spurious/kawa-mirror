@@ -405,30 +405,31 @@ public class Method {
     push_stack_type (Type.pointer_type);
   }
 
-  public void compile_checkcast (ClassType ctype)
+  public void compile_checkcast (Type type)
   {
     instruction_start_hook (3);
     pop_stack_type ();
     put1 (192);  // checkcast
-    put2 (classfile.get_class_const (ctype));
-    push_stack_type (ctype);
+    if (type instanceof ArrayType)
+      {
+	ArrayType atype = (ArrayType) type;
+	CpoolUtf8 name = CpoolUtf8.get_const (classfile, atype.signature);
+	put2 (classfile.get_class_const (name));
+      }
+    else if (type instanceof ClassType)
+      {
+	put2 (classfile.get_class_const ((ClassType) type));
+      }
+    else
+      throw new Error ("unimplemented type in compile_checkcast");
+    push_stack_type (type);
   }
 
-  public void compile_checkcast (ArrayType atype)
-  {
-    instruction_start_hook (3);
-    pop_stack_type ();
-    put1 (192);  // checkcast
-    CpoolUtf8 name = CpoolUtf8.get_const (classfile, atype.signature);
-    put2 (classfile.get_class_const (name));
-    push_stack_type (atype);
-  }
-
-  public void maybe_compile_checkcast (ArrayType atype)
+  public void maybe_compile_checkcast (Type type)
   {
     Type stack_type = stack_types[SP-1];
-    if (atype != stack_type)  // FIXME rather simple-minded, but safe.
-      compile_checkcast (atype);
+    if (type != stack_type)  // FIXME rather simple-minded, but safe.
+      compile_checkcast (type);
   }
 
   /** Store into an element of an array.
@@ -1079,6 +1080,11 @@ public class Method {
 
     if (PC > 0 && classfile.Code_name_index == 0)
       classfile.Code_name_index = classfile.get_utf8_const ("Code");
+
+    if (classfile.SourceFile_name_index == 0
+	&& classfile.sourcefile_index > 0)
+      classfile.SourceFile_name_index
+	= classfile.get_utf8_const ("SourceFile");
 
     if (classfile.emitDebugInfo)
       {

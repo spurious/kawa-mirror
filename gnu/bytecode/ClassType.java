@@ -11,6 +11,9 @@ public class ClassType extends Type {
   int[] interfacesImplemented;
   public int access_flags;
 
+  /** The index of the SourceFile attribute (if > 0). */ 
+  int sourcefile_index;
+
   boolean emitDebugInfo = true;
 
 //  public Method new_method (String name, String signature, int flags);
@@ -83,6 +86,12 @@ public class ClassType extends Type {
     return class_entry;
   }
 
+  /** Set the name of the SourceFile associated with this class. */
+  public void setSourceFile (String name)
+  {
+    sourcefile_index = CpoolUtf8.get_const (this, name).index;
+  }
+
   /**
    * Set the superclass of the is class.
    * param name name of super class, or null if this is "Object".
@@ -143,6 +152,9 @@ public class ClassType extends Type {
 
   /** Constant pool index of "LineNumberTable". */
   int LineNumberTable_name_index;
+
+  /** Constant pool index of "SourceFile". */
+  int SourceFile_name_index;
 
   /**
    * Add a new field to this class.
@@ -258,7 +270,14 @@ public class ClassType extends Type {
     for (Method method = methods;  method != null;  method = method.next)
       method.write (dstr, this);
 
-    dstr.writeShort (0);  // attributes_count
+    int attributes_count = sourcefile_index > 0 ? 1 : 0;
+    dstr.writeShort (attributes_count);
+    if (sourcefile_index > 0)
+      {
+	dstr.writeShort (SourceFile_name_index);
+	dstr.writeInt (2);
+	dstr.writeShort (sourcefile_index);
+      }
   }
 
   public void emit_to_file (String filename)

@@ -1,4 +1,4 @@
-(test-init "macros" 48)
+(test-init "macros" 49)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -201,3 +201,19 @@
      (or-with-keyword-test default-value: #f))))
 
 (test 'ok 'or-with-keyword-test (or-with-keyword-test #f default-value: 'ok))
+
+;; Al Petrofsky posting to comp.lang.scheme 2002-03-03:
+(test "(1 2 3 a)" 'letrec-test
+      (format #f "~S"
+	      (let ((a 1))
+		(letrec-syntax
+		 ((foo (syntax-rules ()
+				     ((_ b)
+				      (bar a b))))
+		  (bar (syntax-rules ()
+				     ((_ c d)
+				      (cons c (let ((c 3))
+					(list d c 'c)))))))
+		 (let ((a 2))
+		   (foo a))))))
+

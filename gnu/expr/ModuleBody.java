@@ -66,19 +66,22 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 	  {
 	    OutPort out = OutPort.outDefault();
 	    ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(out);
-	    ctx.run();
+	    ctx.runUntilDone();
 	    out.freshLine();
 	  }
 	else
 	  {
 	    ctx.consumer = new VoidConsumer();
-	    ctx.run();
+	    ctx.runUntilDone();
 	  }
-      }
-    finally
-      {
 	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
 	gnu.mapping.OutPort.runCleanups();
+      }
+    catch (Throwable ex)
+      {
+	ex.printStackTrace();
+	gnu.mapping.OutPort.runCleanups();
+	System.exit(-1);
       }
   }
 

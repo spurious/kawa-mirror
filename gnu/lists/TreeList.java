@@ -2071,6 +2071,20 @@ implements XConsumer, PositionConsumer, Consumable
     consumeIRange(0, data.length, out);
   }
 
+  public void statistics ()
+  {
+    java.io.PrintWriter out = new java.io.PrintWriter(System.out);
+    statistics(out);
+    out.flush();
+  }
+
+  public void statistics (java.io.PrintWriter out)
+  {
+    out.print("data array length: ");  out.println(data.length);
+    out.print("data array gap: ");  out.println(gapEnd-gapStart);
+    out.print("object array length: ");  out.println(objects.length);
+  }
+
   // /* DEBUGGING
   public void dump ()
   {

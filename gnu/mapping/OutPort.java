@@ -1,11 +1,13 @@
 package gnu.mapping;
 import java.io.*;
+import java.text.*;
+import gnu.text.*;
 
 /**
  * An extended PrintWriter.
  */
 
-public class OutPort extends PrintWriter implements Printable
+public class OutPort extends java.io.PrintWriter implements Printable
 {
   String name;
   private Writer base;
@@ -165,6 +167,72 @@ public class OutPort extends PrintWriter implements Printable
       {
 	printReadable = saveReadable;
       }
+  }
+
+  /** If non-null, use this to print numbers. */
+  java.text.NumberFormat numberFormat;
+
+  java.text.Format objectFormat;
+
+  public void print(char v)
+  {
+    super.print(v);
+  }
+
+  public void print(int v)
+  {
+    if (numberFormat == null)
+      super.print(v);
+    else
+      print(numberFormat.format((long) v));
+  }
+
+  public void print(long v)
+  {
+    if (numberFormat == null)
+      super.print(v);
+    else
+      print(numberFormat.format(v));
+  }
+
+  public void print(double v)
+  {
+    if (numberFormat == null)
+      super.print(v);
+    else
+      print(numberFormat.format(v));
+  }
+
+  public void print(float v)
+  {
+    if (numberFormat == null)
+      super.print(v);
+    else
+      print(numberFormat.format((double) v));
+  }
+
+  public void print(String v)
+  {
+    super.print(v);
+  }
+
+  public void print(Object v)
+  {
+    if (objectFormat == null)
+      super.print(v);
+    else if (objectFormat instanceof ReportFormat)
+      {
+        try
+          {
+            ((ReportFormat) objectFormat).format(v, 0, this, null);
+          }
+        catch (IOException ex)
+          {
+            throw new WrappedException(ex);
+          }
+      }
+    else
+      print(objectFormat.format(v));
   }
 
   public void print(java.io.PrintWriter ps)

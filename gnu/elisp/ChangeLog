@@ -1,3 +1,7 @@
+1999-06-20  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java (readSymbol):  Don't recognize keywords.
+
 Sun Mar 21 18:17:43 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* streams.sc:  Removed (merged into kawa/lib/emacs.scm).

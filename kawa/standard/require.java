@@ -1,7 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
-import gnu.mapping.Location; // As opposed to gnu.bytecode.Locatio
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.expr.*;

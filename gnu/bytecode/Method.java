@@ -201,7 +201,6 @@ public class Method implements AttrContainer {
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {
-    Variable var;
     dstr.writeShort (access_flags);
     dstr.writeShort (name_index);
     dstr.writeShort (signature_index);

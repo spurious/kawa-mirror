@@ -1,3 +1,7 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* Method.java (write):  Remove unused Variable var.
+
 1999-09-02  Per Bothner  <per@bothner.com>
 
 	* CodeFragment.java (unreachable_save):  New feld.

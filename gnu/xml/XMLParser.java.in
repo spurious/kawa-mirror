@@ -415,6 +415,9 @@ public class @XMLParser@
             state = EXPECT_NAME_MODIFIER + ATTRIBUTE_SEEN_NAME_STATE;
             continue mainLoop;
           case ATTRIBUTE_SEEN_NAME_STATE:
+            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
+		|| ch == '\u0085' || ch == '\u2028')
+              break handleChar;
             out.emitBeginAttribute(buffer, start, length);
 	    start = limit;
             if (ch == '=')
@@ -422,9 +425,6 @@ public class @XMLParser@
                 state = ATTRIBUTE_SEEN_EQ_STATE;
                 break handleChar;
               }
-            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
-		|| ch == '\u0085' || ch == '\u2028')
-              break handleChar; // FIXME - re-calls emitBeginAttribute
             message = "missing or misplaced '=' after attribute name";
             state = SAW_ERROR;
             continue mainLoop;

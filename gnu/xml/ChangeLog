@@ -1,3 +1,7 @@
+2002-02-05  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java.in (parse):  Handle space after attribute name.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* NamespaceResolver.java (beginGroup):  Call closeStartTag.

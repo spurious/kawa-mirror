@@ -22,7 +22,6 @@ java_sources=\
   Member.java \
   Setter.java \
   ValuesMap.java \
-  WriteTo.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
 PACKAGE_FNAME = gnu-kawa-functions

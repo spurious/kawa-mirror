@@ -1,3 +1,9 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* WriteTo.java:  Moved to gnu.kawa.xml.
+	Otherwith --with-gcj fails building kawa1.
+	* Makefile.am:  Update accordingly.
+
 2002-01-13  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (getEmacsLispFormat, getCommonLispFormat,

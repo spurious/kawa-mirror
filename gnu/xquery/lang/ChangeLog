@@ -1,3 +1,12 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (stringValue):  New method.
+	(parseContent, parseElementConstructor):  Coerce attributesto string.
+
+	* XQuery.java (defineAll, loadClass):  Moved to Interpreter, and
+	make non-static.
+	(<init>):  Update to no longer explicitly pass environ to loadClass.
+
 2002-01-24  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseElementConstructor):  Handle ATTR={EXPR} syntax.
@@ -11,7 +20,7 @@
 
 2002-01-21  Per Bothner  <per@bothner.com>
 
-	* XQuery (<init>):  Update for moved of class Document.
+	* XQuery.java (<init>):  Update for moved of class Document.
 	Add definition for "unescaped-data".
 
 2002-01-19  Per Bothner  <per@bothner.com>

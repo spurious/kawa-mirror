@@ -1001,7 +1001,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	    else
 	      {
 		unread(next);
-		result.addElement(parseEnclosedExpr());
+		Expression exp = parseEnclosedExpr();
+		if (delimiter != '<')
+		  exp = stringValue(exp);
+		result.addElement(exp);
 	      }
 	  }
 	else if (next == '}')
@@ -1024,7 +1027,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    unread(next);
 	    getRawToken();
-	    result.addElement(parseElementConstructor());
+	    Expression exp = parseElementConstructor();
+	    if (delimiter != '<')
+	      exp = stringValue(exp);
+	    result.addElement(exp);
 	  }
 	else if (next == delimiter)
 	  break;
@@ -1102,6 +1108,15 @@ public class XQParser extends LispReader // should be extends Lexer
     return exp;
   }
 
+  /** Coerce the value of an expresison to a string value. */
+  Expression stringValue(Expression exp)
+  {
+    Expression[] args = { exp };
+    Expression string
+      = makeFunctionExp("gnu.xquery.util.StringValue", "string");
+    return new ApplyExp(string, args);
+  }
+
   Expression parseNameSpec(String defaultNamespaceUri, boolean attribute)
       throws java.io.IOException, SyntaxException
   {
@@ -1161,7 +1176,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("missing '=' after attribute");
 	ch = skipSpace();
 	if (ch == '{')
-	  vec.addElement(parseEnclosedExpr());
+	  vec.addElement(stringValue(parseEnclosedExpr()));
 	else
 	  parseContent(ch, vec);
 	args = new Expression[vec.size() - vecSize];

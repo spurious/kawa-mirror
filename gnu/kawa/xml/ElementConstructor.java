@@ -4,6 +4,7 @@
 package gnu.kawa.xml;
 import gnu.bytecode.*;
 import gnu.mapping.*;
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.expr.*;
 import java.io.*;
 import gnu.xml.*;
@@ -90,7 +91,7 @@ implements Externalizable
     try
       {
 	out.beginGroup(sname, type);
-	Object endMarker = Symbol.UNBOUND;
+	Object endMarker = Location.UNBOUND;
 	for (;;)
 	  {
 	    Object arg = ctx.getNextArg(endMarker);

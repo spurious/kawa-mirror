@@ -3,6 +3,7 @@
 
 package gnu.kawa.xml;
 import gnu.mapping.*;
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
@@ -18,7 +19,7 @@ public class DocumentConstructor extends NodeConstructor
     Consumer out = pushNodeContext(ctx);
     try
       {
-	Object endMarker = Symbol.UNBOUND;
+	Object endMarker = Location.UNBOUND;
 	out.beginDocument();
 	for (;;)
 	  {

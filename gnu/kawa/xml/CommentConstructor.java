@@ -18,7 +18,7 @@ public class CommentConstructor extends MethodProc // NodeConstructor
     try
       {
 	StringBuffer sbuf = new StringBuffer();
-	Object endMarker = Symbol.UNBOUND;
+	Object endMarker = Location.UNBOUND;
 	for (int i = 0;; i++)
 	  {
 	    Object arg = ctx.getNextArg(endMarker);

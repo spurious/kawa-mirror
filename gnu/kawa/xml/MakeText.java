@@ -17,7 +17,7 @@ public class MakeText extends MethodProc // NodeConstructor
     try
       {
 	StringBuffer sbuf = new StringBuffer();
-	Object endMarker = Symbol.UNBOUND;
+	Object endMarker = Location.UNBOUND;
 	for (;;)
 	  {
 	    Object arg = ctx.getNextArg(endMarker);

@@ -88,7 +88,7 @@ public class QName implements Externalizable
 @endif WITH REFERENCES@
 @if WITHOUT REFERENCES@
      if (element.namespaceURI == namespaceURI
-	 && element.localName == localName))
+	 && element.localName == localName)
       return index;
 @endif WITHOUT REFERENCES@
     int avail = -1;
@@ -156,7 +156,7 @@ public class QName implements Externalizable
 @endif WITH REFERENCES@
 @if WITHOUT REFERENCES@
     table[index] = element;
-@endif WITH REFERENCES@
+@endif WITHOUT REFERENCES@
     count++;
 
     // Rehash if over 2/3 full.

@@ -1,3 +1,7 @@
+2001-11-16  Jim White  <jim@pagesmiths.com>
+
+	* QName.java.in:  Fix syntax errors in WITHOUT REFERENCES case.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* QName.java.in (make):  LocalName can be null (for XQuery '*').

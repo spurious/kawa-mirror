@@ -1,5 +1,9 @@
 2003-11-02  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (peekOperator):  Return if EOL_TOKEN and 0 nesting.
+	This fixes parseUnionExpr and parseIntersectExceptExpr.
+	(parseBinaryExpr):  Trivial tweak.
+
 	* XQuery.java (parse, parseFile):  Combined to single 'parse' method.
 
 2003-10-30  Per Bothner  <per@bothner.com>

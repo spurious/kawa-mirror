@@ -565,7 +565,11 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     while (curToken == EOL_TOKEN)
-      getRawToken();
+      {
+	if (nesting == 0)
+	  return EOL_TOKEN;
+	getRawToken();
+      }
     if (curToken == NCNAME_TOKEN)
       {
 	int len = tokenBufferLength;
@@ -1160,11 +1164,11 @@ public class XQParser extends LispReader // should be extends Lexer
     exp = parseUnaryExpr();
     for (;;)
       {
-	if (nesting == 0 && curToken == EOL_TOKEN)
-	  return exp;
 	int token = peekOperator();
-	if (token == OP_LSS && peek() == '/')
-	  return exp;  // Makes for better error handling.
+	if (token == EOL_TOKEN
+	    // Following makes for better error handling.
+	    || (token == OP_LSS && peek() == '/'))
+	  return exp;  
 	int tokPriority = priority(token);
 	if (tokPriority < prio || tokPriority > (OP_MOD >> 2))
 	  return exp;

@@ -499,7 +499,6 @@ public class Compilation
   public final ClassType addClass (LambdaExp lexp)
   {
     String name;
-    boolean main = mainClass == null;
     ClassType new_class = lexp.type;
     if (new_class == scmProcedureType)
       new_class = allocClass(lexp);

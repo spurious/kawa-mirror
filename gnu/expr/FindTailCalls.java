@@ -188,7 +188,7 @@ public class FindTailCalls extends ExpFullWalker
 	if (exp.defaultArgs != null)
 	  exp.defaultArgs = walkExps(exp.defaultArgs);
 	inTailContext = true;
-	if (exitValue == null)
+	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
 
 	// Put list of children in proper order.

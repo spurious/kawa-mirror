@@ -383,43 +383,76 @@ public class IntNum extends RatNum implements Compilable
     return IntNum.make ((long) x * (long) y);
   }
 
+  public static final IntNum times (IntNum x, int y)
+  {
+    if (y == 0)
+      return zero();
+    if (y == 1)
+      return x;
+    int[] xwords = x.words;
+    int xlen = x.ival;
+    if (xwords == null)
+      return IntNum.make ((long) xlen * (long) y);
+    boolean negative;
+    IntNum result = IntNum.alloc (xlen+1);
+    if (xwords[xlen-1] < 0)
+      {
+	negative = true;
+	negate(result.words, xwords, xlen);
+	xwords = result.words;
+      }
+    else
+      negative = false;
+    if (y < 0)
+      {
+	negative = !negative;
+	y = -y;
+      }
+    result.words[xlen] = MPN.mul_1 (result.words, xwords, xlen, y);
+    result.ival = xlen+1;
+    if (negative)
+      result.setNegative ();
+    return result.canonicalize ();
+  }
+
   public static final IntNum times (IntNum x, IntNum y)
   {
-    if (x.words == null && y.words == null)
-      return times (x.ival, y.ival);
+    if (y.words == null)
+      return times(x, y.ival);
+    if (x.words == null)
+      return times(y, x.ival);
     boolean negative = false;
+    int[] xwords;
+    int[] ywords;
+    int xlen = x.ival;
+    int ylen = y.ival;
     if (x.isNegative ())
       {
 	negative = true;
-	x = IntNum.neg (x);
+	xwords = new int[xlen];
+	negate(xwords, x.words, xlen);
+      }
+    else
+      {
+	negative = false;
+	xwords = x.words;
       }
     if (y.isNegative ())
       {
 	negative = !negative;
-	y = IntNum.neg (y);
-      }
-    int[] xwords = x.words;
-    int[] ywords = y.words;
-    int xlen = x.ival;
-    int ylen = y.ival;
-    // Swap if x is shorter then y.
-    if (xwords == null || (ywords != null && xlen < ylen))
-      {
-	xwords = ywords;  ywords = x.words;
-	xlen = ylen;  ylen = x.ival;
-      }
-    IntNum result;
-    if (ywords == null)
-      {
-	result = IntNum.alloc (xlen+1);
-	result.words[xlen] = MPN.mul_1 (result.words, xwords, xlen, ylen);
-	ylen = 1;
+	ywords = new int[ylen];
+	negate(ywords, y.words, ylen);
       }
     else
+      ywords = y.words;
+    // Swap if x is shorter then y.
+    if (xlen < ylen)
       {
-	result = IntNum.alloc (xlen+ylen);
-	MPN.mul (result.words, xwords, xlen, ywords, ylen);
+	int[] twords = xwords;  xwords = ywords;  ywords = twords;
+	int tlen = xlen;  xlen = ylen;  ylen = tlen;
       }
+    IntNum result = IntNum.alloc (xlen+ylen);
+    MPN.mul (result.words, xwords, xlen, ywords, ylen);
     result.ival = xlen+ylen;
     if (negative)
       result.setNegative ();
@@ -1347,7 +1380,7 @@ public class IntNum extends RatNum implements Compilable
   }
 
   /** Set dest[0:len-1] to the negation of src[0:len-1].
-   * Return true if overflow (i.e. in src is -2**(32*len-1)).
+   * Return true if overflow (i.e. if src is -2**(32*len-1)).
    * Ok for src==dest. */
   public static boolean negate (int[] dest, int[] src, int len)
   {

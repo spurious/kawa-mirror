@@ -140,8 +140,48 @@ public class DFloNum extends RealNum implements Compilable
     return x > y ? 1 : x < y ? -1 : x == y ? 0 : -2;
   }
 
+  /** Compare (x_num/x_den) with toExact(y). */
+  public static int compare(IntNum x_num, IntNum x_den, double y)
+  {
+    if (Double.isNaN (y))
+      return -2;
+    if (Double.isInfinite (y))
+      {
+	int result = y >= 0.0 ? -1 : 1;
+	if (! x_den.isZero()) 
+	  return result;  // x is finite
+	if (x_num.isZero()) 
+	  return -2;  // indeterminate x
+	result >>= 1;
+	return x_num.isNegative() ? result : ~result;
+      }
+    else
+      {
+	long bits = Double.doubleToLongBits (y);
+	boolean neg = bits < 0;
+	int exp = (int) (bits >> 52) & 0x7FF;
+	bits &= 0xfffffffffffffL;
+	if (exp == 0)
+	  bits <<= 1;
+	else
+	  bits |= 0x10000000000000L;
+	IntNum y_num = IntNum.make (neg ? -bits : bits);
+	if (exp >= 1075)
+	  y_num = IntNum.shift (y_num, exp - 1075);
+	else
+	  x_num = IntNum.shift (x_num, 1075 - exp);
+	return IntNum.compare (x_num, IntNum.times (y_num, x_den));
+      }
+  }
+
   public int compare (Object obj)
   {
+    if (obj instanceof RatNum)
+      {
+	RatNum y_rat = (RatNum) obj;
+	int i = compare(y_rat.numerator(), y_rat.denominator(), value);
+	return i < -1 ? i : -i;
+      }
     if (obj instanceof RealNum)
       return compare (value, ((RealNum)obj).doubleValue ());
     if (! (obj instanceof RealNum))
@@ -153,6 +193,11 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (!(x instanceof RealNum))
       throw new IllegalArgumentException ();
+    if (x instanceof RatNum)
+      {
+	RatNum x_rat = (RatNum) x;
+	return compare(x_rat.numerator(), x_rat.denominator(), value);
+      }
     return compare (((RealNum)x).doubleValue (), value);
   }
 

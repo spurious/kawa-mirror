@@ -1,3 +1,7 @@
+2002-06-11  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add "xslt".
+
 2002-06-05  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (setTypes):  Always explicitly do setInterfaces.

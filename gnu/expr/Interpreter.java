@@ -51,6 +51,7 @@ public abstract class Interpreter
     { "brl", ".brl", "gnu.kawa.brl.BRL" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
     { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
+    { "xslt", "xsl", ".xsl", "gnu.kawa.xslt.XSLT" },
     { "commonlisp", "common-lisp", "clisp", "lisp",
       ".lisp", ".lsp", ".cl",
       "gnu.commonlisp.lang.CommonLisp" }

@@ -521,15 +521,6 @@ public class Translator extends Compilation
 	    return Symbol.make(uri, local);
 	  }
       }
-    try // FIXME - not here
-      {
-	Class cl = Class.forName(prefix);
-	return Symbol.make("class:"+prefix, local);
-      }
-    catch (Exception ex)
-      {
-      }
-    //error('e', "unknown namespace prefix '"+prefix+'\'');
     return str;
   }
 
@@ -585,10 +576,14 @@ public class Translator extends Compilation
 	  {
 	    try
 	      {
-		Class cl = Class.forName(prefix);
+		/* #ifdef JAVA2 */
+		Class cl = Class.forName(prefix, false, getClass().getClassLoader());
+		/* #else */
+		// Class cl = Class.forName(prefix);
+		/* #endif */
 		sym = Symbol.make("class:"+prefix, local);
 	      }
-	    catch (Exception ex)
+	    catch (Throwable ex)
 	      {
 		return null;
 	      }

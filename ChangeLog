@@ -1,5 +1,10 @@
 2005-01-12  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (namespaceResolve(String)): Don't look
+	for class matching prefix here.
+	(namespaceResolve(String,boolean)): If JAVA2, look for class matching
+	prefix without initializing the class.
+
 	* kawa/lang/Translator.java (makeBody): Don't make AppendValues call
 	here since it causes Scheme begin at top-level to mis-behave.
 

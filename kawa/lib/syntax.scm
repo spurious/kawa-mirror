@@ -5,11 +5,6 @@
 					 (<symbol> <function>)) 
 		  (quote name) (lambda lambda-list form ...)))))
 
-(define-syntax location
-  (syntax-rules ()
-		((location (func . args))
-		 (%makeProcLocation func . args))))
-
 (define (gentemp)
   ((primitive-static-method <gnu.expr.Symbol> "gentemp"
 			    <symbol> ())))

@@ -2,7 +2,10 @@
 
 JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
+#KAWA = $(JAVA) $(JAVAFLAGS) kawa.repl
+KAWA = KAWALIB=.. ../kawa/kawa
 KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
+KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
 
 all:
 

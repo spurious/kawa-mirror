@@ -1,3 +1,7 @@
+Mon Feb  3 22:58:45 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Makefile.am:  KAWATEST now uses kawa shell script.
+
 Sat Jan 25 15:45:14 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* test.scm:  Internal define is no longer expected to fail.

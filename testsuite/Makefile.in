@@ -43,7 +43,10 @@ VERSION = @VERSION@
 
 JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
+#KAWA = $(JAVA) $(JAVAFLAGS) kawa.repl
+KAWA = KAWALIB=.. ../kawa/kawa
 KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
+KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm
 CLEANFILES = tmp?

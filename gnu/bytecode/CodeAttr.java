@@ -254,6 +254,35 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(type2);
   }
 
+  /** Emit code to duplicate the top element of the stack. */
+  public void emitDup ()
+  {
+    reserve(1);
+
+    Type type = topType();
+    put1 (type.size <= 4 ? 89 : 92); // dup or dup2
+    pushType (type);
+  }
+
+  /** Emit code to duplicate the top element of the stack
+      and place the copy before the previous element. */
+  public void emitDupX ()
+  {
+    reserve(1);
+
+    Type type = popType();
+    Type skipedType = popType();
+
+    if (skipedType.size <= 4)
+      put1 (type.size <= 4 ? 90 : 93); // dup_x1 or dup2_x1
+    else
+      put1 (type.size <= 4 ? 91 : 94); // dup_x2 or dup2_x2
+
+    pushType (type);
+    pushType (skipedType);
+    pushType (type);
+  }
+
   /** Compile code to duplicate with offset.
    * @param size the size of the stack item to duplicate (1 or 2)
    * @param offset where to insert the result (must be 0, 1, or 2)

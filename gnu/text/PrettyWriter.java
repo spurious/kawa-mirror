@@ -363,7 +363,7 @@ public class PrettyWriter extends java.io.Writer
     return addr;
   }
 
-  /** Calculate howmuch space to allocate for a buffer.
+  /** Calculate how much space to allocate for a buffer.
    * @param current the current size of the buffer
    * @param want how much more space is needed
    */
@@ -959,7 +959,7 @@ public class PrettyWriter extends java.io.Writer
       }
     System.arraycopy(buffer, amountToConsume, newBuffer, prefixLen,
 		     fillPtr - amountToConsume);
-    System.arraycopy(prefix, 0, buffer, 0, prefixLen);
+    System.arraycopy(prefix, 0, newBuffer, 0, prefixLen);
     bufferFillPointer = newFillPtr;
     bufferOffset += shift;
     if (! isLiteral)

@@ -1,3 +1,8 @@
+2002-06-02  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (outputLine):  Copy prefix to new buffer, not
+	original one.  Fixes bug reported by Mirko.Luedde@Computer.Org.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* Char.java (toString):  Print char in Java format, e.g. "'\t'".

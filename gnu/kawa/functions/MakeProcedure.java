@@ -55,7 +55,6 @@ public class MakeProcedure extends ProcedureN implements CanInline
     if (countMethods == 1 && method instanceof LambdaExp)
       {
         LambdaExp proc = (LambdaExp) method;
-        System.err.println("inline makeProc count:"+countMethods+" name:"+name);
         for (int i = 0;  i < alen;  i++)
           {
             Expression arg = args[i];

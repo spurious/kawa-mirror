@@ -1,6 +1,7 @@
 2003-03-29  Per Bothner  <per@bothner.com>
 
 	* StringValue.java (lowerCase, upperCase, substring):  New methods.
+	Based on a patch from Jim Smith <jim@pagesmiths.com>.
 
 2003-03-15  Per Bothner  <per@bothner.com>
 

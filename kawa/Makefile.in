@@ -40,7 +40,9 @@ transform = @program_transform_name@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang standard lib
+SUBDIRS = lang math standard lib
+
+SUFFIXES = .java .class
 
 JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
@@ -49,6 +51,8 @@ javadir=$(prefix)/java/kawa
 OBJ = Shell.class
 
 java_DATA=$(OBJ)
+
+EXTRA_DIST = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
@@ -232,13 +236,12 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-.SUFFIXES : .java .class
-
-%.class: %.java
-	cd $(srcdir); $(JAVAC) $(<F)
+.java.class:
+	cd $(srcdir); $(JAVAC) $*.java
 
 all: $(OBJ)
 .SUFFIXES:
+.SUFFIXES: $(SUFFIXES)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,3 +1,36 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.71.
+	(AC_OUTPUT):  Add gnu/kawa/functions/Makefile.
+
+	* kawa/standard/StaticFieldConstraint.java:  New class,
+	extends ClassMemberConstraint.
+	* kawa/standard/convert.java (instance):  Sttaic field renamed ...
+	(as):  ... new field, now allocated at <clinit>-time.
+	(getInstance):  Always return the 'as' field.
+	* kawa/standard/apply.java:  Moved to gnu/kawa/functions/Apply.java.
+	* kawa/standard/format.java:  Moved to gnu/kawa/functions/Format.java.
+	* kawa/standard/ObjectFormat.java:  Moved to gnu/kawa/functions.
+	* kawa/standard/TracedProcedure.java:  Add import for ObjectFormat.
+	* kawa/standard/ParseFormat.java:  Moved to gnu/kawa/functions.
+	* kawa/standard/LispFormat.java:  Moved to gnu/kawa/functions.
+	* kawa/standard/ass.java:  Moved to gnu/kawa/functions/Assoc.java.
+	* kawa/standard/eq_p.java:  Moved to gnu/kawa/functions/IsEq.java.
+	* kawa/standard/equal_p.java: Moved to gnu/kawa/functions/IsEqual.java.
+	* kawa/standard/eqv_p.java:  Moved to gnu/kawa/functions/IsEqv.java.
+	* kawa/standard/list_v.java: Moved to gnu/kawa/functions/MakeList.java.
+	* kawa/standard/mem.java:  Moved to gnu/kawa/functions/Member.java.
+	* kawa/standard/setter.java:  Moved to gnu/kawa/functions/Setter.java.
+	* kawa/standard/not.java (<init>(Interpreter,String)): New constructor.
+	* kawa/standard/prim_method.java (rewrite):  More robust;
+	diagnostic for missing class.
+	* kawa/standard/Scheme.java (define_field):  New methods.
+	(instanceOf, not, isEq, isEqv, isEqual, memq, memv, member, assq,
+	assv, assoc):  New static fields for standard Procedures.
+	(initScheme):  Numerous updates.
+	(parseFormat):  Removed static field.  (Use field in ParseFormat.)
+	* kawa/standard/Makefile.am:  Numerous updates.
+
 2000-10-09  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/prim_method.java (rewrite):  Load reflectClass here;

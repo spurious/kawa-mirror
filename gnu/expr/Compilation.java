@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -835,11 +835,17 @@ public class Compilation
     */
 
     compile(mexp, topname, prefix);
+    outputClass(directory);
+  }
+
+  public void outputClass (String directory) throws IOException
+  {
+    char dirSep = File.separatorChar;
     for (int iClass = 0;  iClass < numClasses;  iClass++)
       {
 	ClassType clas = classes[iClass];
 	String out_name
-	  = (directory + clas.getName().replace('.', File.separatorChar)
+	  = (directory + clas.getName().replace('.', dirSep)
 	     + ".class");
 	String parent = new File(out_name).getParent();
 	if (parent != null)

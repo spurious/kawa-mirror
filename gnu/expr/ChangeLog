@@ -1,3 +1,9 @@
+2003-02-20  Tom Reilly <treilly@macromedia.com>
+
+	* Compilation.java (outputClass):  Made separate method,
+	for use by gnu.kawa.servlet.KawaPageServlet.
+	(compileToFiles):  Call outputClass.
+
 2003-02-19  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (getCompiledClassType):  Add package prefixes to

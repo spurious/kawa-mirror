@@ -335,8 +335,8 @@ files into your Java develipment environment, and having it
 compile them, will handle most of the needed work.  You then
 need to compile the builtin Scheme procedures:
 @example
-cd kawa/lib
-%KAWA% -d ../.. -P kawa.lib. -C *.scm
+cd kawa\lib
+%KAWA% -d ..\.. -P kawa.lib. -C *.scm
 @end example
 
 @node Running, Restrictions, Installation, Top

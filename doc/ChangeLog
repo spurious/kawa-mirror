@@ -1,3 +1,7 @@
+Sun Nov 15 21:34:01 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  In Windows example, use back-slashes.
+
 Sat Oct 17 14:34:03 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi: Document new synchronized syntax.

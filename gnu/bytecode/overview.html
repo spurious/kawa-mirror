@@ -15,6 +15,10 @@ It is used by
 to compile Scheme into bytecodes;  it should be useful
 for other languages that need to be compiled into Java bytecodes.
 (An interesting exercise would be an interactive Java expression evaluator.)
+The classes here are relatively low-level.  If you want to use them
+to generate bytecode from a high-level language, it is better to
+use the <a href="http:../gnu/expr/">gnu.expr</a> package, which works
+at the expression level, and handles all the code-generation for you.
 <p>
 Javadoc generated
 <a href="http:../kawa/api/Package-gnu.bytecode.html">documentation</a>
@@ -31,7 +35,7 @@ incrementally and on the fly.
 A <code>ClassType</code> has a list of <code>Field</code> objects;
 new ones can be added using
 the various <code>addField</code> methods.  A <code>ClassType</code>
-manages a <code?ConstantPool</code>.
+manages a <code>ConstantPool</code>.
 A <code>ClassType</code> also has a list of <code>Method</code> objects;
 new ones can be created by the various <code>addMethod</code> objects.
 <p>
@@ -108,7 +112,7 @@ or to the <a href="mailto:kawa@cygnus.com">Kawa mailing list</a>.
     <address><a href="mailto:bothner@cygnus.com">Per Bothner</a></address>
 <!-- Created: Wed Mar  4 14:59:52 PST 1998 -->
 <!-- hhmts start -->
-Last modified: Tue Mar 10 10:23:18 PST 1998
+Last modified: Sat Nov  7 10:44:50 PST 1998
 <!-- hhmts end -->
   </body>
 </html>

@@ -165,6 +165,7 @@ JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 Rewrite (make-temporary-file) to use File.createTempFile.
 
 Replace kawa.lang.Sequence with java.util.List.
+gnu.mapping.Binding should implement java.util.Map.Entry.
 
 Possibly replace GuiConsole to use JTextPane (or gnu.emacs.Window).
 

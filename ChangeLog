@@ -1,3 +1,11 @@
+1999-08-08  Per Bothner  <per@bothner.com>
+
+	* configure.in, configure (AC_OUTPUT):  Update for gnu.jemacs change.
+	* kawa.repl (setInterpreter):  Update ELisp package prefix.
+
+	* kawa/lang/ListPat.java:  New static match methods.
+	* kawa/standard/ifp.java (rewrite):  Use static ListPat.match method.
+
 1999-08-07  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/GetFieldProc.java (compile):  Don't inline if class was

@@ -1,5 +1,7 @@
 Changes from Kawa 1.6.58 to 1.6.59
 ==================================
+The Emacs-related packages are now grouped under a new gnu.jemacs package.
+
 Improved framework for catching errors.  This means improved error
 messages when passing a parameter of the wrong type.  Many standard
 procedures have been improved.

@@ -97,7 +97,7 @@ public class repl extends Procedure0or1
     if (name.equals("scheme"))
       defaultInterpreter = Scheme.getInstance();
     else if (name.equals("elisp") || name.equals("emacs"))
-      defaultInterpreter = gnu.elisp.ELisp.getInstance();
+      defaultInterpreter = gnu.jemacs.lang.ELisp.getInstance();
     else
       bad_option(name);
     if (previous == null)

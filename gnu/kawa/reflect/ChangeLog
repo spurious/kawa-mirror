@@ -1,5 +1,16 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* ClassMemberConstraint.java (field):  Remove field;  don't use
+	gnu.bytecode.Field; only java.lang.reflect.Field.
+
+	* Invoke.java (invoke, invokeStatic, make):  Make fields final.
+
+	* Invoke.java (compile):  Catch missing-class exception; emit warning.
+
+	* SlotGet.java (set2):  Swap argument order for new setter convention.
+
+	* SlotGet.java (compile):  Inline final static int fields.
+
 	* InstanceOf.java (<init>):  New constructor.
 
 2000-08-17  Per Bothner  <per@bothner.com>

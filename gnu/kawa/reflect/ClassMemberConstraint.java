@@ -1,6 +1,7 @@
 package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.bytecode.Type;
+import gnu.bytecode.ClassType;
 
 /** A Constraint whose value is that of a named field/method of an object.
  * The object used is the owning Binding's value.
@@ -9,12 +10,11 @@ import gnu.bytecode.Type;
 
 public class ClassMemberConstraint extends Constraint
 {
-  Type type;
+  ClassType type;
   String name;
-  gnu.bytecode.Field field;
   java.lang.reflect.Field rfield;
 
-  public ClassMemberConstraint(Type type, String name)
+  public ClassMemberConstraint(ClassType type, String name)
   {
     this.type = type;
     this.name = name;
@@ -22,15 +22,18 @@ public class ClassMemberConstraint extends Constraint
 
   public ClassMemberConstraint(Class clas, String name)
   {
-    this.type = Type.make(clas);
+    this.type = (ClassType) Type.make(clas);
     this.name = name;
   }
 
-  public ClassMemberConstraint(Type type, gnu.bytecode.Field field)
+  public String getName()
   {
-    this.type = type;
-    this.field = field;
-    this.name = field.getName();
+    return name;
+  }
+
+  public ClassType getDeclaringClass()
+  {
+    return type;
   }
 
   public ClassMemberConstraint(java.lang.reflect.Field field)
@@ -94,18 +97,6 @@ public class ClassMemberConstraint extends Constraint
 	setValue(binding, object);
 	setConstraint(binding,
                       new ClassMemberConstraint(object.getClass(), fname));
-      }
-  }
-
-  public static void define (String name, Object object,
-                             gnu.bytecode.Field field, Environment env)
-  {
-    Binding binding = env.getBinding(name);
-    synchronized (binding)
-      {
-	setValue(binding, object);
-	setConstraint(binding,
-                      new ClassMemberConstraint(field.getType(), field));
       }
   }
 

@@ -11,9 +11,9 @@ public class Invoke extends ProcedureN implements Inlineable
 
   Interpreter interpreter;
 
-  public static Invoke invoke = new Invoke("invoke", 'V');
-  public static Invoke invokeStatic = new Invoke("invoke-static", 'S');
-  public static Invoke make = new Invoke("make", 'N');
+  public static final Invoke invoke = new Invoke("invoke", 'V');
+  public static final Invoke invokeStatic = new Invoke("invoke-static", 'S');
+  public static final Invoke make = new Invoke("make", 'N');
 
   public Invoke(String name, char kind)
   {
@@ -194,7 +194,15 @@ public class Invoke extends ProcedureN implements Inlineable
         int okCount, maybeCount;
         synchronized (this)
           {
-            methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
+            try
+              {
+                methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
+              }
+            catch (Exception ex)
+              {
+                comp.error('w', "unknown class: " + type.getName());
+                methods = null;
+              }
             okCount = cacheDefinitelyApplicableMethodCount;
             maybeCount = cachePossiblyApplicableMethodCount;
           }

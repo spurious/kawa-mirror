@@ -131,7 +131,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     set2(args[0], args[1], args[2]);
   }
 
-  public void set2 (Object value, Object obj, Object name)
+  public void set2 (Object obj, Object name, Object value)
   {
     SlotSet.apply(obj, (String) name, value);
   }
@@ -181,7 +181,8 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
-            boolean isStaticField = field.getStaticFlag();
+            int modifiers = field.getModifiers();
+            boolean isStaticField = (modifiers & Access.STATIC) != 0;
             if (isStatic && ! isStaticField)
               comp.error('e', ("cannot access non-static field `" + name
                                + "' using `" + getName() + '\''));
@@ -189,7 +190,33 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
                             isStaticField ? Target.Ignore
                             : Target.pushValue(ctype));
             if (isStaticField)
-              code.emitGetStatic(field); 
+              {
+                boolean inlined = false;
+                Type ftype = field.getType();
+                if ((modifiers & Access.FINAL) != 0
+                    && ftype instanceof PrimType)
+                  {
+                    // We inline int final fields.
+                    // Other kinds of final fields are less obviously a win.
+                    char sig = ftype.getSignature().charAt(0);
+                    if (sig != 'F' && sig != 'D' && sig != 'J')
+                      {
+                        try
+                          {
+                            java.lang.reflect.Field rfield
+                              = field.getReflectField();
+                            int val = rfield.getInt(null);
+                            code.emitPushInt(val);
+                            inlined = true;
+                          }
+                        catch (Exception ex)
+                          {
+                          }
+                      }
+                  }
+                if (! inlined)
+                  code.emitGetStatic(field); 
+              }
             else
               code.emitGetField(field);
 	    target.compileFromStack(comp, field.getType());

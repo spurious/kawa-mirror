@@ -1,3 +1,8 @@
+Sat Jan  2 12:47:22 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa.texi:  Document --server and --client flags, as well
+	as --enable-kawa-frontend configure flag.
+
 Wed Dec 23 16:01:01 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* kawa.texi (Anonymous classes):  Updated, more information.

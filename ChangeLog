@@ -1,3 +1,7 @@
+2003-10-18  Jim White  <jim@pagesmiths.com>
+
+	* build.xml:  Handle gnu/kawa/models and gnu/kawa/swingviews.
+
 2003-10-16  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/AutoloadSyntax.java (load):  Give Syntax object a name.

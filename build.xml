@@ -673,6 +673,8 @@
       <include name="gnu/jemacs/buffer/"/>
       <include name="gnu/jemacs/lang/"/>
       <include name="gnu/jemacs/swing/"/>
+      <include name="gnu/kawa/models/"/>
+      <include name="gnu/kawa/swingviews/"/>
     </javac>
   </target>
    

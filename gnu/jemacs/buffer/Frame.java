@@ -91,7 +91,7 @@ public class Frame extends javax.swing.JFrame
 
   public Window otherWindow(int count)
   {
-    return selectedWindow.getNextWindowInFrame(count);;
+    return selectedWindow.getNextWindowInFrame(count);
   }
 
   public String ask(String prompt)

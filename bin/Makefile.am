@@ -40,12 +40,23 @@ KAWA1_OFILES = \
   gnu-mapping.lo \
   gnu-math.lo \
   gnu-text.lo \
+  gnu-commonlisp-lang.lo \
   kawa-lang.lo \
   kawa-repl.lo \
   kawa-standard.lo
 
+gnu-commonlisp-lang.lo:
+	cd ../gnu/commonlisp/lang && $(MAKE)
+kawa-lang.lo:
+	cd ../kawa/lang && $(MAKE)
+kawa-standard.lo:
+	cd ../kawa/standard && $(MAKE)
+kawa-repl.lo:
+	cd ../kawa && $(MAKE) ../bin/kawa-repl.lo
+
 KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES) \
   kawa-lib.o \
+  gnu-commonlisp-lisp.o \
   gnu-kawa-slib.o
 
 WITH_GCJ_LIBS =  libkawa.la
@@ -62,6 +73,7 @@ libkawa_la_LIBADD = \
   gnu-ecmascript.lo \
   $(LIBADD_XML) \
   gnu-kawa-slib.lo \
+  gnu-commonlisp-lisp.lo \
   kawa-lib.lo
 
 kawa1$(EXEEXT): $(KAWA1_OFILES)

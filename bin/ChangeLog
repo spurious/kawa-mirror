@@ -1,3 +1,9 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA1_OFILES):  Added gnu-commonlisp-lang.lo.
+	(KAWA2_OFILES):  Add gnu-commonlisp-lisp.o.
+	(XXX.lo):  New rules to control recursion.
+
 2001-06-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Only link gnu-xml.o/gnu-xml.lo if ENABLE_XML is true.

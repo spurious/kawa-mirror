@@ -1,3 +1,13 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Update classes used for eq and equal.
+	Use NumberCompare static fields.
+	* NumberCompare.java (makeGrt, makeGEq, MakeLss, makeLEq):  Removed
+	static methods.
+	($Eq, $Gr, $Gr$Eq, $Ls, $Ls$Eq):  New static fields.
+	* MiscOps.scm (format):  Update format -> Format class path.
+	* SymbolOps.scm (apply):  Update apply -> Apply class path.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Make some classes unconditionally (even if no swing).

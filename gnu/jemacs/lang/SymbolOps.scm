@@ -92,7 +92,7 @@
   symbol)
 
 (define (apply func #!rest (args :: <Object[]>))
-  (invoke-static 'kawa.standard.apply 'applyN
+  (invoke-static 'gnu.kawa.functions.Apply 'applyN
 		 (if (symbol? func) (symbol-function func) func)
 		 args))
 

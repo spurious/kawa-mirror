@@ -18,25 +18,11 @@ public class NumberCompare extends ProcedureN
   static final int TRUE_IF_NEQ = 1;
   int flags;
 
-  public static NumberCompare makeGrt(String name)
-  {
-    return make(name, TRUE_IF_GRT);
-  }
-
-  public static NumberCompare makeGEq(String name)
-  {
-    return make(name, TRUE_IF_GRT|TRUE_IF_EQU);
-  }
-
-  public static NumberCompare makeLss(String name)
-  {
-    return make(name, TRUE_IF_LSS);
-  }
-
-  public static NumberCompare makeLEq(String name)
-  {
-    return make(name, TRUE_IF_LSS|TRUE_IF_EQU);
-  }
+  public static final NumberCompare $Eq   = make("=",TRUE_IF_EQU);
+  public static final NumberCompare $Gr   = make(">",TRUE_IF_GRT);
+  public static final NumberCompare $Gr$Eq= make(">=",TRUE_IF_GRT|TRUE_IF_EQU);
+  public static final NumberCompare $Ls   = make("<",TRUE_IF_LSS);
+  public static final NumberCompare $Ls$Eq= make("<=",TRUE_IF_LSS|TRUE_IF_EQU);
 
   public static NumberCompare make(String name, int flags)
   {

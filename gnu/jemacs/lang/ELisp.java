@@ -199,11 +199,11 @@ public class ELisp extends Interpreter
     defun(AddOp.$Pl); // "+"
     defun(AddOp.$Mn); // "-"
     defun(DivideOp.$Sl); // "/"
-    defun(NumberCompare.makeLss("<"));
-    defun(NumberCompare.makeLss("<"));
-    defun(NumberCompare.makeLEq("<="));
-    defun(NumberCompare.makeGrt(">"));
-    defun(NumberCompare.makeGEq(">="));
+    defun(NumberCompare.$Eq);
+    defun(NumberCompare.$Ls);
+    defun(NumberCompare.$Gr);
+    defun(NumberCompare.$Ls$Eq);
+    defun(NumberCompare.$Gr$Eq);
 
     lambda lambda = new gnu.jemacs.lang.lambda();
     lambda.setKeywords("&optional", "&rest", "&key");
@@ -231,8 +231,8 @@ public class ELisp extends Interpreter
     Procedure not = new kawa.standard.not(this);
     defun("not", not);
     defun("null", not);
-    defun("eq", new kawa.standard.eq_p(this));
-    defun("equal", new kawa.standard.equal_p(this));
+    defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
+    defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     try
       {

@@ -20,21 +20,21 @@ public class CpsMethodProc extends CpsProcedure
   }
 
   public CpsMethodProc(CpsMethodContainer module, int selector,
-			String name, int numArgs)
+		       Object name, int numArgs)
   {
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setName(name);
+    setSymbol(name);
   }
 
   public CpsMethodProc(CpsMethodContainer module, int selector,
-			String name, int numArgs, Object argTypes)
+		       Object name, int numArgs, Object argTypes)
   {
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setName(name);
+    setSymbol(name);
     this.argTypes = argTypes;
   }
 

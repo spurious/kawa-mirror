@@ -18,12 +18,12 @@ public class ApplyMethodProc extends ProcedureN
   private int numArgs;
 
   public ApplyMethodProc(ApplyMethodContainer module, int selector,
-                      String name, int numArgs)
+			 Object name, int numArgs)
   {
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setName(name);
+    setSymbol(name);
   }
 
   public int numArgs() { return numArgs; }

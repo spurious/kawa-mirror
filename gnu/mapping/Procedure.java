@@ -15,13 +15,26 @@ public abstract class Procedure implements Named
 
   public String getName()
   {
-    return (String) getProperty(nameKey, null);
+    Object symbol = getProperty(nameKey, null);
+    return symbol == null ? null
+      : symbol instanceof Symbol ? ((Symbol) symbol).getName()
+      : symbol.toString();
+  }
+
+  public Object getSymbol()
+  {
+    return getProperty(nameKey, null);
   }
 
   /** @deprecated */
   public final String name()
   {
     return getName();
+  }
+
+  public final void setSymbol (Object name)
+  {
+    setProperty(nameKey, name);
   }
 
   public final void setName (String name)

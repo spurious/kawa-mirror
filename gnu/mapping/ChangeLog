@@ -1,5 +1,10 @@
 2003-10-07  Per Bothner  <per@bothner.com>
 
+	* Procedure.java (getSymbol, setSymbol):  New methods.
+	(getName):  Check for a Symbol as the name property.
+	* ApplyMethodProc.java (<init>):  Name can be a Symbol or a String.
+	* CpsMethodProc.java (<init):  Likewise.
+
 	* Environment.java (setPrevious):  New method.
 
 	* Values.java (equals):  Remove - for now use inherited method,

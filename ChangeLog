@@ -1,3 +1,32 @@
+Sun Jun 22 14:07:48 1997  Per Bothner  <bothner@cygnus.com>
+
+	Use JDK1.1 I/O characters-oriented Reader/Writer classes.
+	* kawa/lang/*.java (print):  Update .PrintStream -> PrintWriter.
+	Update FileInputStream -> FileReader.
+	* kawa/standard/*.java (print):  Likewise.
+	* kawa/lang/LineBufferedReader.java:  New class extends FilterReader.
+	* kawa/lang/InPort.java:  Much functionality now in LineBufferedReader.
+	Use read instead of readChar.
+	* kawa/lang/LogWriter.java:  New class - extends FilterWriter.
+	* kawa/lang/Compilation.java (compileConstant):  Handle null.
+	* kawa/lang/TtyInPort.java:  New class extends InPort.
+	* kawa/lang/OutPort.java:  Now inherits from PrintWriter.
+	* kawa/lang/SFormat.java:  Substantial re-write.
+
+	* kawa/lang/PrimProcedure.java (getNamedType):  New worker function
+	for string2Type.  Support RScheme/Dylan-style names (e.g. <symbol>).
+	* kawa/lang/Translator.java:  Recognize <symbol> etc.
+	* kawa/standard/Scheme.java:  Add new procedures.
+	* kawa/standard/call_with_input_string.java:  Can now simplify.
+	* kawa/standard/call_with_input_string.java:  Can now simplify.
+	* kawa/standard/call_with_output_string.java:  Likewise.
+	* kawa/standard/char_ready_p.java:  Handle both Reader and InputStream.
+	* kawa/standard/readchar.java:  Likewise.
+
+	* kawa/Shell.java (run):  New (overloaded) method.
+	Re-write to new I/O implementation.  (Prompt handled by Reader itself.)
+	* kawa/repl.java:  Re-write for new I/O.
+
 Thu May 29 14:34:45 1997  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/standard/apply.java (applyN):  Generalize to general sequences.

@@ -1,3 +1,20 @@
+Changes since Kawa 1.5
+======================
+Ports now use the JDK 1.1 character-based Reader and Writer classes,
+rather than the byte-oriented InputStream and OutputStream classes.
+This supports different reading and writing different character
+encodings, [depending on what? FIXME]
+FIXME need to also support binary files.
+
+An interactive input port now has a prompt function associated with it.
+It is settable with set-input-port-prompter!.  The prompt function
+takes one argument (the input port), and returns a prompt string.
+There are also user functions for inquiing about the current line
+and column number of an input port.
+
+The R4RS prcedures transcript-on and transcript-off are implemented.
+[FIXME System.err not properly handled.]
+
 Changes from Kawa 1.4 to 1.5
 ============================
 Execute a ~/.kawarc.scm file on startup, if it exists.

@@ -15,7 +15,7 @@ We depend on some hacks to automake:
 - distdir also searches current dir
 Try to get automake maintainers to accept these.
 
-Implement Environment properly.  Support threads, fluidvars, and modules.
+Implement Environment properly.  Support threads, fluid-let, and modules.
 
 Extend gnu.bytecode to support exception handlers.
 Provide a low-level Scheme interface to catch Java exceptions.
@@ -35,8 +35,9 @@ Printing SyntaxError prints error log.
 
 Replace use of ZipArchive by jar files (once JDK 1.1 is out).
 
-Perhaps add #|...|# comments.  (Supposedly SCM and others have them.)
-
 Implement heapFrame, static link etc as references to objects,
 not arrays.  Make consistent with JDK1.1 inner classes extension.
 Better naming convention for inner lambdas. (I.e. fix kawa.lib.lambda.)
+
+Make #!null more robust.  Allow (global) variables to be bound to #!null
+without being considered to be undefined.

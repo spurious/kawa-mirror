@@ -1,5 +1,8 @@
 Changes from Kawa 1.6.58 to 1.6.59
 ==================================
+Simplified, documented, and tested (!) procedure for building Kawa
+from source under Windows (95/98/NT).
+
 New macros trace and untrace for tracing procedures.
 After executing (trace PROCEDURE), debugging output will
 be written (to the standard error port) every time PROCEDURE

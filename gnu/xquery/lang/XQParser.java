@@ -273,6 +273,9 @@ public class XQParser extends LispReader // should be extends Lexer
 
   static final int OP_NODE = 231; // 'node' followed by '('
   static final int OP_TEXT = 232; // 'text' followed by '('
+  static final int OP_COMMENT = 233; // 'comment' followed by '('
+  static final int OP_PI = 234;   // 'processing-instruction' '('
+  static final int OP_DOCUMENT = 235; // 'document-node' '('
   
   public static boolean isNameStart(char ch)
   {
@@ -542,6 +545,41 @@ public class XQParser extends LispReader // should be extends Lexer
     return ch;
   }
 
+  /** Scan untl a given delimiter.
+   * On success, text upto the delimiter is in then tokenBuffer (with
+   * tokenBufferLength marking its length); the delimiter is not included.
+   */
+  public void getDelimited(String delimiter)
+      throws java.io.IOException, SyntaxException
+  {
+    int dlen = delimiter.length();
+    char last = delimiter.charAt(dlen-1);
+    for (;;)
+      {
+	int ch = read();
+	if (ch < 0)
+	  eofError("unexpected end-of-file looking for '"+delimiter+'\'');
+	int dstart, j;
+	// Look for a match for the last delimiter character.
+	if (ch == last
+	    && (dstart = tokenBufferLength - (j = dlen - 1)) >= 0)
+	  {
+	    // Check that the initial part of the delimiter has also been seen.
+	    do
+	      {
+		if (j == 0)
+		  {
+		    tokenBufferLength = dstart;
+		    return;
+		  }
+		j--;
+	      }
+	    while (tokenBuffer[dstart+j] == delimiter.charAt(j));
+	  }
+	tokenBufferAppend((char) ch);
+      }
+  }
+
   public void appendNamedEntity(String name)
   {
     name = name.intern();
@@ -711,6 +749,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	    int token = FNAME_TOKEN;
 	    switch (tokenBuffer[0])
 	      {
+	      case 'c':
+		if (match("comment")) token = OP_COMMENT;
+		break;
+	      case 'd':
+		if (match("document-node")) token = OP_DOCUMENT;
+		break;
 	      case 'i':
 		if (match("if"))
 		  {
@@ -720,6 +764,9 @@ public class XQParser extends LispReader // should be extends Lexer
 		break;
 	      case 'n':
 		if (match("node")) token = OP_NODE;
+		break;
+	      case 'p':
+		if (match("processing-instruction")) token = OP_PI;
 		break;
 	      case 't':
 		if (match("text")) token = OP_TEXT;
@@ -1131,6 +1178,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	    parseSimpleKindType();
 	    return textNodeTest;
 	  }
+	if (match("comment"))
+	  {
+	    parseSimpleKindType();
+	    return commentNodeTest;
+	  }
 	if (match("document-node"))
 	  {
 	    parseSimpleKindType();
@@ -1150,6 +1202,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    parseSimpleKindType();
 	    return Type.pointer_type;
+	  }
+	if (match("processing-instruction"))
+	  {
+	    parseSimpleKindType();
+	    // FIXME don't support processing-instruction(target)
+	    return piNodeTest;
 	  }
 	String tname = new String(tokenBuffer, 0, tokenBufferLength);
 	getRawToken();
@@ -1787,10 +1845,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    else
 	      {
-		if (checkNext('/'))
+		next = read();
+		if (next == '/')
 		  break;
-		getRawToken();
-		result.addElement(parseElementConstructor());
+		result.addElement(parseXMLConstructor(next));
 		tokenBufferLength = 0;
 	      }
 	  }
@@ -1892,8 +1950,59 @@ public class XQParser extends LispReader // should be extends Lexer
     return decl;
   }
 
-  /** Parse ElementConstructor.
+  /** Parse an ElementConstructor or other constructs starting with '<'.
    * Assume initial '<' has been processed.
+   * @param next next character (after '<').
+   */
+  Expression parseXMLConstructor(int next)
+      throws java.io.IOException, SyntaxException
+  {
+    Expression exp;
+    if (next == '!')
+      {
+	next = read();
+	if (next == '-' && peek() == '-')
+	  {
+	    skip();
+	    getDelimited("-->");
+	    Expression[] args =
+	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.CommentConstructor",
+					       "commentConstructor"),
+			       args);
+	  }
+	else if (next == '[' && read() == 'C' && read() == 'D'
+		 && read() == 'A' && read() == 'T' && read() == 'A'
+		 && read() == '[')
+	  {
+	    getDelimited("]]>");
+	    Expression[] args =
+	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.TextConstructor",
+					       "textConstructor"),
+			       args);
+	  }
+	else
+	  exp = syntaxError("'<!' must be followed by '--' or '[CDATA['");
+      }
+    else if (next == '?')
+      {
+	exp = syntaxError("<? (processing instructions) not implemented");
+      }
+    else
+      {
+	unread(next);
+	getRawToken();
+	char saveReadState = pushNesting('<');
+	exp = parseElementConstructor();
+	popNesting(saveReadState);
+      }
+    return exp;
+  }
+
+  /** Parse ElementConstructor.
+   * Assume initial '<' has been processed,
+   * and we're looking at the next token..
    * Reads through end of the end tag.  FIXME
    */
   Expression parseElementConstructor()
@@ -2161,6 +2270,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	  kind = 'd';
 	else if (match("text") && next == '{')
 	  kind = 't';
+	else if (match("comment") && next == '{')
+	  kind = 'c';
+	/*
+	else if (match("processing-instruction") && next == '{')
+	  kind = 'p';
+	*/
 	else
 	  return '\0';
 	if (next != '{' && (kind == 'e' || kind == 'a'))
@@ -2206,8 +2321,8 @@ public class XQParser extends LispReader // should be extends Lexer
     else if (token == OP_LSS)
       {
 	startColumn--;  // Subtract 1 for '<'.
-	getRawToken();
-	if (curToken == '/')
+	int next = read();
+	if (next == '/')
 	  {
 	    getRawToken();
 	    String msg;
@@ -2221,11 +2336,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	      getRawToken();
 	    return exp;
 	  }
-	char saveReadState = pushNesting('<');
-	exp = parseElementConstructor();
-	exp.setFile(getName());
-	exp.setLine(startLine, startColumn);
-	popNesting(saveReadState);
+	else 
+	  {
+	    exp = parseXMLConstructor(next);
+	    exp.setFile(getName());
+	    exp.setLine(startLine, startColumn);
+	  }
       }
     else if (token == STRING_TOKEN)
       {
@@ -2392,6 +2508,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	    else if (kind == 'd')
 	      func = makeFunctionExp("gnu.kawa.xml.DocumentConstructor",
 				     "documentConstructor");
+	    else if (kind == 'c')
+	      func = makeFunctionExp("gnu.kawa.xml.CommentConstructor",
+				     "commentConstructor");
 	    else /* kind == 't' */
 	      func = makeFunctionExp("gnu.kawa.xml.TextConstructor",
 				     "textConstructor");
@@ -3180,8 +3299,14 @@ public class XQParser extends LispReader // should be extends Lexer
 
   static final NodeType documentNodeTest
   = new NodeType("document-node", NodeType.DOCUMENT_OK);
-  static final NodeType textNodeTest = new NodeType("text", NodeType.TEXT_OK);
-  static final NodeType anyNodeTest = new NodeType("node");
+  static final NodeType textNodeTest
+    = new NodeType("text", NodeType.TEXT_OK);
+  static final NodeType commentNodeTest
+    = new NodeType("comment", NodeType.COMMENT_OK);
+  static final NodeType piNodeTest
+    = new NodeType("processing-instruction", NodeType.PI_OK);
+  static final NodeType anyNodeTest
+    = new NodeType("node");
 
   public void error(String message)
   {

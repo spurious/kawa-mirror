@@ -1,5 +1,17 @@
 2004-05-08  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (OP_COMMENT, OP_PI, OP_DOCUMENT):  New token codes.
+	(peekOperand):  Recognize these new token kinds.
+	(getDelimited):  New method.
+	(parseItemType):  Recognize comment and processing-instruction.
+	(parseXMLConstructor):  New method.
+	(parseContent, parseMaybePrimaryExpr):  Use parseXMLConstructor.
+	(matchConstructorKeyword):  Recognize 'comment {'.
+	(parseMaybePrimaryExpr):  Use CommentConstructor for 'comment {'.
+	(commentNodeTest, piNodeTest):  New static NodeType fields.
+
+2004-05-08  Per Bothner  <per@bothner.com>
+
 	* XQuery.java (mangle):  Two new static methods - currently unused.
 
 2004-03-09  Per Bothner  <per@bothner.com>

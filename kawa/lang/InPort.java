@@ -16,12 +16,19 @@ public class InPort extends LineBufferedReader implements Printable
     this.name = name;
   }
 
-  public InPort (InputStream in)
+  public InPort (Reader in)
   {
     super (in);
   }
 
-  public InPort (Reader in)
+  public InPort (Reader in, String name)
+  {
+    this (in);
+    this.name = name;
+    this.name = name;
+  }
+
+  public InPort (InputStream in)
   {
     super (in);
   }
@@ -32,10 +39,39 @@ public class InPort extends LineBufferedReader implements Printable
     this.name = name;
   }
 
-  public InPort (Reader in, String name)
+  public static Reader convertToReader (InputStream in, Object conv)
   {
-    this (in);
-    this.name = name;
+    if (conv != null && conv != Boolean.TRUE)
+      {
+	String enc = (conv == Boolean.FALSE ? "8859_1" : conv.toString());
+	try
+	  {
+	    return new java.io.InputStreamReader(in, enc);
+	  }
+	catch (java.io.UnsupportedEncodingException ex)
+	  {
+	    throw new RuntimeException("unknown character encoding: "+enc);
+	  }
+      }
+    return new java.io.InputStreamReader(in);
+  }
+
+  public InPort (InputStream in, String name, Object conv)
+    throws java.io.UnsupportedEncodingException
+  {
+    this (convertToReader(in, conv), name);
+    if (conv == Boolean.FALSE)
+      {
+	// Use a fixed-size buffer.  This prevents really-long "lines"
+	// from causing the buffer to grow to accomodate them.
+	try
+	  {
+	    setBuffer(new char[2048]);
+	  }
+	catch (java.io.IOException ex) { /* ignored */ }
+      }
+    else
+      setConvertCR(true);
   }
 
   // For now, this is static.  It should probably be thread-local.
@@ -59,11 +95,20 @@ public class InPort extends LineBufferedReader implements Printable
       inp = in;
   }
 
-  /* Compatibility. */
-  public int readChar ()
-       throws java.io.IOException
+  public static InPort openFile(String fname)
+    throws java.io.UnsupportedEncodingException,
+           java.io.FileNotFoundException
   {
-    return read ();
+    java.io.InputStream strm = new java.io.FileInputStream(fname);
+    strm = new java.io.BufferedInputStream(strm);
+    return openFile(strm, fname);
+  }
+
+  public static InPort openFile(InputStream strm, String fname)
+    throws java.io.UnsupportedEncodingException
+  {
+    return new InPort(strm, fname,
+		      Environment.user().get("port-char-encoding"));
   }
 
   final boolean isDelimiter (char ch)
@@ -185,6 +230,12 @@ public class InPort extends LineBufferedReader implements Printable
               c = origc;
            }
         }
+      }
+    else if (origc == '\r')
+      {
+	c = '\n';
+	if (peek() == '\n')
+	  skip_quick();
       }
     return Char.make((char)c);
   }
@@ -659,20 +710,23 @@ public class InPort extends LineBufferedReader implements Printable
   {
     StringBuffer obj = new StringBuffer ();
     boolean inString = true;
-    int c;
+    int c = '\"';
+    int prev;
     do
       {
 	int next, v;
 
+	prev = c;
+
 	// Read next char - inline the common case.
-	if (this.pos < this.limit)
+	if (prev == '\r')
 	  {
-	    c = this.buffer[this.pos];
-	    if (c == '\n' || c == '\r')
-	      c = read();
-	    else
-	      this.pos++;
+	    c = read();
+	    if (c == '\n')
+	      continue;
 	  }
+	else if (this.pos < this.limit && prev != '\n')
+	  c = this.buffer[this.pos++];
 	else
 	  c = read();
 
@@ -681,55 +735,66 @@ public class InPort extends LineBufferedReader implements Printable
 	  case '"':
 	    inString = false;
             break;
+	  case '\r':
+	    obj.append('\n');
+	    continue;
 	  case '\\':
 	    switch (c = read())
 	      {
-	      case 'a':  c = '\007';  break;
-	      case 'b':  c = '\b';    break;
-	      case 'f':  c = '\f';    break;
-	      case 'n':  c = '\n';    break;
-	      case 'r':  c = '\r';    break;
-	      case 't':  c = '\t';    break;
-	      case 'v':  c = '\013';  break;
+	      case 'a':  v = '\007';  break;
+	      case 'b':  v = '\b';    break;
+	      case 'f':  v = '\f';    break;
+	      case 'n':  v = '\n';    break;
+	      case 'r':  v = '\r';    break;
+	      case 't':  v = '\t';    break;
+	      case 'v':  v = '\013';  break;
 
 	      case 'u':
-		c = 0;
+		v = 0;
 		for (int i = 4;  --i >= 0; )
 		  {
-		    v = read ();
-		    if (v < 0)
+		    c = read ();
+		    if (c < 0)
 		      throw new EofReadError (this,
 					      "premature EOF in \\u escape");
-		    v = Character.digit ((char) v, 16);
-		    if (v < 0)
+		    int d = Character.digit ((char) c, 16);
+		    if (d < 0)
 		      throw new ReadError (this,
 					   "non-hex character following \\u");
-		    c = 16 * c + v;
+		    v = 16 * v + d;
 		  }
 		break;
 	      case '0':  case '1':  case '2':  case '3':
 	      case '4':  case '5':  case '6':  case '7':
-		c = Character.digit ((char) c, 8);
-		if ((next = read ()) >= 0)
+		v = c - '0';
+		if ((next = read()) >= 0)
 		  {
-		    if ((v = Character.digit ((char) next, 8)) < 0)
-		      unread ();
+		    next -= '0';
+		    if ((char) next > '\007')
+		      unread_quick();
 		    else
 		      {
-			c = c * 8 + v;
-			if ((next = read ()) >= 0)
+			v = v * 8 + next;
+			if ((next = read()) >= 0)
 			  {
-			    if ((v = Character.digit ((char) next, 8)) >= 0)
-			      c = c * 8 + v;
+			    next -= '0';
+			    if ((char) next > '\007')
+			      unread_quick();
 			    else
-			      unread ();
+			      v = v * 8 + next;
 			  }
 		      }
 		  }
 		break;
-	      case '\n':  continue;
+	      case '\r':
+		if (peek() == '\n')
+		  skip_quick();
+		continue;
+	      case '\n':
+		continue;
 	      case '"':
 	      case '\\':
+		v = c;
 		break;
 	      default:
 		if (c < 0)
@@ -737,7 +802,7 @@ public class InPort extends LineBufferedReader implements Printable
 					  "unexpected EOF in string literal");
 		throw new ReadError (this, "bad string escape");
 	      }
-	    obj.append ((char) c);
+	    obj.append ((char) v);
             break;
 	  default:
 	    if (c < 0)
@@ -945,8 +1010,6 @@ public class InPort extends LineBufferedReader implements Printable
     for (;;)
       {
 	int next;
-	while (Character.isWhitespace((char)c))
-	  c = read ();
 	switch (c)
 	  {
 	  case -1:
@@ -957,7 +1020,7 @@ public class InPort extends LineBufferedReader implements Printable
 		c = read();
 		if (c < 0) // EOF
 		  return List.Empty;
-	      } while (c!='\n');
+	      } while (c != '\n' && c!= '\r');
             break;
 	  case ')':
 	    throw new ReadError (this, "An unexpected close paren was read.");
@@ -1036,7 +1099,9 @@ public class InPort extends LineBufferedReader implements Printable
 	      }
             break;
 	  default:
-	    if (Character.isDigit((char)c))
+	    if (Character.isWhitespace((char)c))
+	      break;
+	    else if (Character.isDigit((char)c))
 	      return readSchemeNumber (c, 10);
 	    else
 	      return readSymbol(c, getReadCase());

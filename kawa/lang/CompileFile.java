@@ -17,17 +17,21 @@ public class CompileFile extends Procedure2
   public static final ModuleExp read (String name, Translator tr)
        throws GenericError
   {
-    FileReader fstream;
     try
       {
-	fstream = new FileReader (name);
+	InPort fstream = InPort.openFile(name);
+	ModuleExp result = read(fstream, tr);
+	fstream.close();
+	return result;
       }
     catch (java.io.FileNotFoundException e)
       {
 	throw new GenericError ("compile-file: file not found: " + name);
       }
-
-    return read (new InPort (fstream, name), tr);
+    catch (java.io.IOException e)
+      {
+	throw new GenericError(name.toString());
+      }
   }
 
   public static final ModuleExp read (InPort port, Translator tr)

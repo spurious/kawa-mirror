@@ -27,12 +27,14 @@ public class TtyInPort extends InPort
   public TtyInPort (InputStream in, String name, OutPort tie)
   {
     super(in, name);
+    setConvertCR(true);
     this.tie = tie;
   }
 
   public TtyInPort (Reader in, String name, OutPort tie)
   {
     super(in, name);
+    setConvertCR(true);
     this.tie = tie;
   }
 

@@ -108,14 +108,16 @@ XML_SELECTED = @XML_SELECTED@
 am__include = @am__include@
 am__quote = @am__quote@
 extra_java = @extra_java@
+filesep = @filesep@
 install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
-UFFIXES = .java .class .scm .el .lisp
+pathsep = @pathsep@
+SUFFIXES = .java .class .scm .el .lisp
 
 javadir = $(datadir)/java/$(subdir)
 JAVACFLAGS = 
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT)@pathsep@$(srcdir)@filesep@$(JAVAROOT)@pathsep@$$CLASSPATH
 JAVAROOT = $(top_builddir)
 JAR = fastjar
 OFILES_DIR = $(TO_TOPDIR)/bin
@@ -228,6 +230,7 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
+.SUFFIXES: .java .class .scm .el .lisp
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -1,3 +1,34 @@
+Changes since Kawa 1.6.99
+=========================
+
+You can now define and use classes defined using object, define-class,
+and define-simple-class from the "interpreter", as well as the compiler.
+Also, a bug where inherited fields did not get initialized has been fixed.
+
+There are several new procedures useful for servlets.
+
+Numerical comparisions (<, <=, etc) now generates optimized bytecode
+if the types of the operands have certain known types. including
+efficient code for <int>, <long>, <double>, and <integer>.
+Much more code can now (with type declaration) be written just as
+efficiently in Scheme as in Java.
+
+There have been some internal re-arranging of how Expressions are
+processed.  The Scheme-specific Translator type now inherits from
+Compilation, which replaces the old Parser class.  A Complation is now
+allocated much earlier, as part of parsing, and includes a
+SourceMessages object.  SourcesMessages now includes (default) line
+number, which is used by Compilation for the "current" line numbers.
+The ExpWalker class includes a SourceMessages instance (which it gets
+from the Compilation).  CanInline.inline method now takes ExpWalker
+parameter.  Checking of the number or parameters, and mapping known
+procedures to Java methods are now both done during the inlining pass.
+
+The user-visible effect is that Kawa can now emit error mesages more
+cleanly more places;  the inlining pass can be more agressive, and
+can emit better error messages, which yields better type information.
+This gives us better code with fewer warnings about unknown methods.
+
 Changes from Kawa 1.6.98 to 1.6.99.
 ==================================
 

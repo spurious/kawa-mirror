@@ -461,14 +461,14 @@ public class Scheme extends Interpreter
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
       define_syntax("define-class", "kawa.standard.define_class");
-      define_proc("make", gnu.kawa.reflect.MakeInstance.make);
-      define_proc("slot-ref", "gnu.kawa.reflect.SlotGet");
+      define_proc("make", gnu.kawa.reflect.Invoke.make);
+      define_proc("slot-ref", gnu.kawa.reflect.SlotGet.field);
       define_proc("slot-set!", "gnu.kawa.reflect.SlotSet");
-      define_proc("field", "gnu.kawa.reflect.SlotGet");
+      define_proc("field", gnu.kawa.reflect.SlotGet.field);
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
-      define_proc("static-field", "kawa.standard.static_field");
-      define_proc("invoke", "gnu.kawa.reflect.Invoke");
-      define_proc("invoke-static", gnu.kawa.reflect.InvokeStatic.invokeStatic);
+      define_proc("static-field", gnu.kawa.reflect.SlotGet.staticField);
+      define_proc("invoke", gnu.kawa.reflect.Invoke.invoke);
+      define_proc("invoke-static", gnu.kawa.reflect.Invoke.invokeStatic);
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -754,7 +754,7 @@ public class Scheme extends Interpreter
 	t = new ArrayType(t);
       }
     else if (gnu.bytecode.Type.isValidJavaTypeName(name))
-      t = new ClassType (name);
+      t = ClassType.make(name);
     else
       return null;
     types.put (name, t);

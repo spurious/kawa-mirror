@@ -130,14 +130,11 @@ public class Declaration
       }
   }
 
-  /** If non-null, the Declaration that we "shadow" (hide). */
-  public Object shadowed;  /* Either a Declaration or a String. */
-
   /** If non-null, the single expression used to set this variable.
    * If the variable can be set more than once, then value is null. */
   protected Expression value = QuoteExp.undefined_exp;
 
-  public Expression getValue() { return value; }
+  public final Expression getValue() { return value; }
 
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
@@ -153,6 +150,9 @@ public class Declaration
     if (setting) flags |= flag;
     else flags &= ~flag;
   }
+
+  public final boolean isPublic()
+  { return context instanceof ModuleExp && (flags & PRIVATE) == 0; }
 
   public final boolean isPrivate() { return (flags & PRIVATE) != 0; }
 
@@ -203,6 +203,7 @@ public class Declaration
       return false;
     if (! getCanCall())
       return true;
+    Expression value = getValue();
     if (value == null || ! (value instanceof LambdaExp))
       return false;
     LambdaExp lexp = (LambdaExp) value;
@@ -210,7 +211,7 @@ public class Declaration
   }
 
   public boolean isStatic()
-  { // This will soon be wrong.  FIXME.
+  { // This will soon be wrong.  FIXME.  Probably use isPublic instead.
     return context instanceof ModuleExp && ! isPrivate();
   }
 

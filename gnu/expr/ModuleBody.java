@@ -11,6 +11,8 @@ public abstract class ModuleBody extends Procedure0
     return run();
   }
 
+  // Should return void.  FIXME
+  // The problem is eval needs to return a result.
   public abstract Object run ();
 
   /** This is invoked by main when ModuleBody is compiled with --main. */

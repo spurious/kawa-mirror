@@ -53,21 +53,10 @@ public class Translator extends Compilation
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
 
-  public Translator (Environment env, SourceMessages messages)
+  public Translator (Interpreter interp, SourceMessages messages)
   {
-    super(messages);
-    this.env = env;
-  }
-
-  public Translator (Environment env)
-  {
-    super(new SourceMessages());
-    this.env = env;
-  }
-
-  public Translator ()
-  {
-    this (Environment.user());
+    super(interp, messages);
+    this.env = interp.getEnvironment();
   }
 
   public final Environment getGlobalEnvironment() { return env; }
@@ -174,19 +163,6 @@ public class Translator extends Compilation
         decl.setIndirectBinding(true);
       }
     return decl;
-  }
-
-  Object resolve(Object name, boolean function)
-  {
-    Symbol symbol = name instanceof String ? env.lookup((String) name)
-      : (Symbol) name;
-    if (symbol == null)
-      return null;
-    if (function && getInterpreter().hasSeparateFunctionNamespace())
-      return symbol.getFunctionValue(null);
-    if (symbol.isBound())
-      return symbol.getValue();
-    return null;
   }
 
   /**

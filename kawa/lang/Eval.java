@@ -68,12 +68,16 @@ public class Eval extends Procedure1or2
 			       SourceMessages messages, CallContext ctx)
     throws Throwable
   {
-    Environment orig_env = Environment.getCurrent();
+    Interpreter interp = Interpreter.getInterpreter();
+    Environment saveInterpEnv = interp.getEnvironment();
+    Environment saveGlobalEnv = Environment.getCurrent();
     try
       {
-	if (env != orig_env)
+	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
-	Translator tr = new Translator (env, messages);
+	if (env != saveInterpEnv)
+	  interp.setEnvironment(env);
+	Translator tr = new Translator(interp, messages);
 	ModuleExp mod = gnu.kawa.lispexpr.LispInterpreter.makeModuleExp(body, tr);
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());
@@ -85,8 +89,10 @@ public class Eval extends Procedure1or2
       }
     finally
       {
-	if (env != orig_env)
-	  Environment.setCurrent(orig_env);
+	if (env != saveGlobalEnv)
+	  Environment.setCurrent(saveGlobalEnv);
+	if (env != saveInterpEnv)
+	  interp.setEnvironment(saveInterpEnv);
       }
   }
 

@@ -1,5 +1,11 @@
 2003-10-19  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Eval.java (evalBody):  Need to pass Interpreter
+	to new Translator.
+	* kawa/lang/Translator.java (<init>):  Take Interpreter.
+	Remove unused constructors.
+	(resolve):  Moved to super class Compilation.
+
 	* kawa/standard/module_compile_options.java:  New class extends Syntax.
 	* kawa/standard/with_compile_options.java:  New class extends Syntax.
 	* kawa/standard/Makefile.am:  Update accordingly.

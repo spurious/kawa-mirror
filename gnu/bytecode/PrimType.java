@@ -10,6 +10,13 @@ public class PrimType extends Type {
     Type.registerTypeForClass(reflectClass, this);
   }
 
+  protected PrimType(PrimType type)
+  {
+    super(type.this_name, type.signature);
+    size = type.size;
+    reflectClass = type.reflectClass;
+  }
+
   public Object coerceFromObject (Object obj)
   {
     if (obj.getClass() == reflectClass)

@@ -1,3 +1,7 @@
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* PrimType.java:  New "copying" constructor.
+
 2000-04-12  Per Bothner  <per@bothner.com>
 
 	* ConstantValueAttr.java:  New class, extends Attribute,

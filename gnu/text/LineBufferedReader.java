@@ -315,8 +315,12 @@ public class LineBufferedReader extends FilterReader
     int to_do = len;
     while (to_do > 0)
       {
-	if (ch == '\n' || ch == '\r' || pos >= limit)
+	if (pos >= limit || ch == '\n' || ch == '\r')
 	  {
+	    // Return if there is no more in the input buffer, and we got
+	    // at least one char.  This is desirable for interactive input.
+	    if (pos >= limit && to_do < len)
+	      return len - to_do;
 	    ch = read();
 	    if (ch < 0)
 	      {

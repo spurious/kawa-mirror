@@ -1,3 +1,8 @@
+2005-01-19  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (read): Return before buffer full if
+	input buffer exhausted and we got at least one char.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (NEWLINE_SPACE): New newline-kind.

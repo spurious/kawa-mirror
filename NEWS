@@ -1,3 +1,7 @@
+A new synchonized form allows you to synchronize on an arbitrary Java
+object, and execute some forms while having an exclusive lock on the
+object.  (The syntax matches that used by Skij.)
+
 Changes from Kawa 1.6.53 to 1.6.55
 ==================================
 New --debug-dump-zip option writes out a .zip file for compilation.

@@ -1,3 +1,13 @@
+Sat Oct 17 14:16:05 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/synchronizd.java:  New Syntax.
+	* kawa/standard/Makefile.{am,in} (java_JAVA):  Add synchronizd.java.
+	* kawa/standard/Makefile.in
+	* kawa/standard/Scheme.java:  Define synchronized syntax.
+
+	* kawa/standard/not.java (compile):  Use new emitNot interface.
+	* kawa/lang/SpecialType.java (emitCoerceToObject):  Update emitConvert.
+
 Fri Sep 11 22:29:26 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/repl.java (main):  Handle new --debug-dump-zip option.

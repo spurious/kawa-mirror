@@ -1,3 +1,7 @@
+2000-12-09  Per Bothner  <per@bothner.com>
+
+	* ObArray.java (getBinding):  New method.
+
 2000-11-21    <per@bothner.com>
 
 	* Makefile.am, Makefile.in (EXTRA_DIST):  Include $(EXTRA_JAVA).

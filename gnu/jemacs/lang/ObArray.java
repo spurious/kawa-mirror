@@ -70,4 +70,9 @@ public class ObArray extends Environment
   {
     super(previous);
   }
+
+  public Binding getBinding (String name)
+  {
+    return Binding2.getBinding2(this, name);
+  }
 }

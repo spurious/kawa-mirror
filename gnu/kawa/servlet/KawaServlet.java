@@ -14,12 +14,22 @@ extends HttpServlet implements CpsMethodContainer
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
   {
-    ServletCallContext ctx = new ServletCallContext();
+    CallContext ct = CallContext.getOnlyInstance();
+    ServletCallContext ctx;
+    if (ct instanceof ServletCallContext)
+      {
+	ctx = (ServletCallContext) ct;
+      }
+    else
+      {
+	ctx = new ServletCallContext();
+	CallContext.setInstance(ctx);
+      }
+    ctx.consumer = new ServletPrinter(response);  // FIXME - should re-use
     ctx.request = request;
     ctx.response = response;
     ctx.servlet = this;
     ctx.values = Values.noArgs;
-    ctx.consumer = new ServletPrinter(response);
 
     /* FIXME should use fluid binding!
     gnu.expr.Interpreter interp = gnu.expr.Interpreter.getInterpreter();

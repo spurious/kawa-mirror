@@ -16,7 +16,8 @@ import java.io.*;
  */
 
 public class CGIServletWrapper extends ServletOutputStream
-implements HttpServletRequest, HttpServletResponse, ServletConfig
+implements HttpServletRequest, HttpServletResponse,
+  ServletConfig, ServletContext
 {
   byte buffer[] = null;
   int bufpos = 0;
@@ -217,6 +218,7 @@ implements HttpServletRequest, HttpServletResponse, ServletConfig
 	url.append(':');
 	url.append(port);
       }
+    url.append('/');
     url.append(getRequestURI());
     return url;
   }
@@ -591,12 +593,12 @@ implements HttpServletRequest, HttpServletResponse, ServletConfig
 
   public Enumeration getInitParameterNames()
   {
-    return null;  // FIXME
+    return nullEnumeration;
   }
 
   public ServletContext getServletContext()
   {
-    return null;  // FIXME
+    return this;
   }
 
   public String getServletName()
@@ -604,4 +606,29 @@ implements HttpServletRequest, HttpServletResponse, ServletConfig
     return servletName;
   }
 
+  // ServletContext methods:
+
+  public ServletContext getContext (String path) { return null; }
+
+  public int getMajorVersion () { return 2; }
+  public int getMinorVersion () { return 3; }
+  public String getMimeType (String file) { return null; }
+
+  public java.util.Set getResourcePaths (String path) { return null; }
+  public java.net.URL getResource (String path) { return null; }
+  public java.io.InputStream getResourceAsStream (String path) { return null; }
+
+  public RequestDispatcher getNamedDispatcher (String path) { return null; }
+  public Servlet getServlet (String name) { return null; }
+  static final Enumeration nullEnumeration
+    = new gnu.lists.SeqPosition(gnu.lists.LList.Empty, 0, false);
+  public Enumeration getServlets () { return nullEnumeration; }
+  public Enumeration getServletNames () { return nullEnumeration; }
+
+  public void log (String message) { }
+  public void log (Exception ex, String mgs) { }
+  public void log (String msg, Throwable ex) { }
+  public String getServerInfo () { return "Kawa CGI/servlet wrapper";}
+
+  public java.lang.String getServletContextName () { return null; }
 }

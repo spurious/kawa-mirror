@@ -13,6 +13,7 @@ java_sources=\
   ServletPrinter.java
 
 PACKAGE_FNAME = gnu-kawa-servlet
+SCM_COMPILE_FLAGS = --full-tailcalls
 GCJ_INPUTS =  $(java_Java)
 SOURCES = $(java_SCM) $(java_sources)
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)

@@ -29,15 +29,16 @@ public class ServletPrinter extends HttpPrinter
 
   public void addHeader(String label, String value)
   {
-    super.addHeader(label, value);
     if (label.equalsIgnoreCase("Content-type"))
-      response.setContentType(value);
+      {
+	super.sawContentType = value;
+	response.setContentType(value);
+      }
     else
       response.addHeader(label, value);
   }
 
-  public void printHeader(String label, String value)
-    throws java.io.IOException
+  public void printHeaders()
   {
   }
 }

@@ -1,3 +1,16 @@
+2002-02-14  Per Bothner  <per@bothner.com>
+
+	* CGIServletWrapper.java:  Implement ServletContext.
+	Add necessary methods.
+	(getServletContext):  Return this.
+	(getRequestURL):  Emit '/' between server-name and request-uri.
+	* KawaServlet.java (doGet):  Call CallContext.setInstance if need be.
+	* Makefile.am (SCM_COMPILE_FLAGS):  Specify --full-tailcalls.
+	* ServletPrinter.java (addHeader):  Maybe set super.sawContentType,
+	but don't call super's addHeader.
+	(PrintHeaders):  New, empty method.
+	(printHeader):  Removed - no longer needed.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java )doGet):  Don't call CallContext.setInstance.

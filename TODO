@@ -4,7 +4,11 @@ Make all apply, eval, etc method do 'throws Exception'.
 
 Perhaps CallFrame should extend ModuleBody.
 
-BEFORE KAWA 1.7:
+BEFORE KAWA 1.7?
+* Fluid variables should work for non-Future threads.
+* define-namespace should work lexically
+* CL reader interface
+* More define-class functionality?
 * Finish modules: define-module?  constructor arguments?
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).

@@ -1,3 +1,19 @@
+You can now build Kawa from source using the Ant build system (from
+Apache's Jakarta project), as an alternative to using the traditional
+configure+make system.  An advantage of Ant is that it works on
+most Java systems, without requiring a Unix shell and commands.
+Specifically, this makes it easy to build kawa under MS-Windows.
+Thanks to James White for contributing this support.
+
+The syntax ':NAME' no longer by default reads as a keyword,
+but as a symbol, to allow convenient XML syntax.
+
+define-namespace
+
+Added (current-error-port) which does the obvious.
+
+let-values from srfi-11
+
 All the abstract apply* and eval* methods now specify 'throws Throwable'.
 A bunch of code was changed to match.  The main visible advantage is
 that the throw and primitive-throw procedures work for any Throwable

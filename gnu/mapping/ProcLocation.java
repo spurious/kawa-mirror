@@ -16,7 +16,7 @@ public class ProcLocation extends Location
     this.args = args;
   }
 
-  public Object get ()
+  public Object get (Object defaultValue)
   {
     try
       {
@@ -58,5 +58,10 @@ public class ProcLocation extends Location
       {
 	throw new WrappedException(ex);
       }
+  }
+
+  public boolean isBound ()
+  {
+    return true;
   }
 }

@@ -1,3 +1,41 @@
+Tue Jun 18 12:19:46 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Expression.java:  New abstract class.
+	* kawa/lang/{ApplyExp,BeginExp,IfExp,LambdaExp,LetExp,QuoteExp,
+	ReferenceExp,ScopeExp,SetExp}.java:  New sub-classes of Expression.
+	* kawa/lang/Pattern.java:  New abstract class (for pattern matching).
+	* kawa/lang/{ListPat,VarListPat}.java:  New sub-classes of Pattern.
+	* kawa/lang/{Declaration,Environment}.java:  New classes.
+	* kawa/lang/Procedure.java:  New abstract class.
+	* kawa/lang/Procedure{0,1,2,3,4}.java:  Re-written to extend Procedure.
+	* kawa/lang/ProcedureN.java:  New sub-class of Procedure.
+	* kawa/lang/LambdaProcedure.java:  Re-written to extend Procedure.
+
+	* kawa/lang/Syntax.java:  New abstract class.
+	* kawa/lang/Syntax{0,1,2,3,4}.java:  Removed.  No longer used.
+	* kawa/lang/{Lambda,Quote}.java:  Re-written to extend Syntax.
+	* kawa/lang/print.java:  Handle null Object.
+	* kawa/lang/symbol.java:  Re-write to intern in hashTable,
+	and removed public constructor.
+	* kawa/lang/Interpreter.java:  New methods: rewrite and rewrite_body.
+	Removed some no-longer used stuff, and added some minor stuff.
+
+	* kawa/Shell.java:  Re-write raw expression before eval.
+	Print message if null returned.  Re-indent.
+
+	* kawa/standard/{begin,define,ifp,let,set_b}.java:
+	Re-write as sub-class of Syntax.
+	* kawa/standard/letstar.java:  Syntax sub-class for "let*".
+	* kawa/standard/length.java:  Add static int-returning "work" function.
+	* kawa/standard/{equal_p,eqv_p}.java:  Add similar boolean function.
+	* kawa/standard/{list,plus_oper}.java: Re-written to extend ProcedureN.
+	* kawa/standard/string2symbol.java:  Should not fold case.
+	* kawa/standard/StandardInterpreter.java:  Update accordingly.
+	
+M kawa/lang/Makefile
+	M kawa/standard/Makefile
+
+
 Wed Jun 12 22:06:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/print.java:  New class, with just a print method (for now).

@@ -9,8 +9,7 @@ public class open_input_file extends Procedure1
     String fname = arg1.toString();
 
     try {
-      java.io.InputStream is = new java.io.FileInputStream(fname);
-      return new InPort(is, fname);
+      return new InPort(new java.io.FileReader(fname), fname);
     } catch (java.io.FileNotFoundException e) {
        throw new GenericError ("file not found: " + fname);
     }

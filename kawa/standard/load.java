@@ -76,10 +76,10 @@ public class load extends Procedure1 {
   public final static Object loadSource (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    FileInputStream fstream;
+    FileReader fstream;
     try
       {
-	fstream = new FileInputStream (name);
+	fstream = new FileReader (name);
       }
     catch (java.io.FileNotFoundException e)
       {
@@ -106,7 +106,7 @@ public class load extends Procedure1 {
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run (port, env, null, false);
+	kawa.Shell.run (env, port, null);
 	return Scheme.voidObject;
       }
     else
@@ -131,7 +131,7 @@ public class load extends Procedure1 {
   {
     Environment env = (Environment) arg2;
     String name = arg1.toString ();
-    if (name.endsWith (".zip"))
+    if (name.endsWith (".zip") || name.endsWith(".jar"))
       return loadCompiled (name, env);
     if (name.endsWith (".scm"))
       return loadSource (name, env);
@@ -149,33 +149,41 @@ public class load extends Procedure1 {
       {
 	try
 	  {
-	    FileInputStream fstream = new FileInputStream (name);
-	    InPort port = new InPort (fstream);
-	    int char0 = port.readChar ();
+	    InputStream fs = new BufferedInputStream (new FileInputStream (name));
+	    fs.mark(5);
+	    int char0 = fs.read ();
 	    if (char0 == -1)
 	      return Sequence.eofValue;
 	    if (char0 == 'P')
 	      {
-		int char1 = port.readChar ();
+		int char1 = fs.read ();
 		if (char1 == 'K')
 		  {
-		    int char2 = port.readChar ();
+		    int char2 = fs.read ();
 		    if (char2 == '\003')
 		      {
-			int char3 = port.readChar ();
+			int char3 = fs.read ();
 			if (char3 == '\004')
 			  {
-			    port.close ();
+			    fs.close ();
 			    return loadCompiled (name, env);
 			  }
-			port.unreadChar ();  // unread char3
 		      }
-		    port.unreadChar ();  // unread char2
 		  }
-		port.unreadChar ();  // unread char 1
 	      }
-	    port.unreadChar ();  // unread char 0
-	    return loadSource (port, env);
+	    fs.reset();
+	    InPort src = new InPort(fs, name);
+	    Object result = loadSource (src, env);
+	    try
+	      {
+		src.close();
+	      }
+	    catch (java.io.IOException ex)
+	      {
+		throw new GenericError("failed to close \""+name
+				       +"\" after loading");
+	      }
+	    return result;
 	  }
 	catch (java.io.FileNotFoundException e)
 	  {
@@ -190,6 +198,10 @@ public class load extends Procedure1 {
       {
 	String fname = name.replace ('.', file_separator);
 	String xname = fname + ".zip";
+	file = new File (xname);
+	if (file.exists ())
+	  return loadCompiled (xname, env);
+	xname = fname + ".jar";
 	file = new File (xname);
 	if (file.exists ())
 	  return loadCompiled (xname, env);

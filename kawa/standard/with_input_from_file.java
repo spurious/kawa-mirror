@@ -14,8 +14,7 @@ public class with_input_from_file extends Procedure2
     String fname = string.toString();
 
     try {
-      java.io.InputStream is = new java.io.FileInputStream(fname);
-      InPort port = new InPort(is, fname);
+      InPort port = new InPort(new java.io.FileReader(fname), fname);
       Object result;
       InPort save_port = InPort.inDefault ();
       try

@@ -9,7 +9,7 @@ public class open_output_file extends Procedure1
     String fname = arg1.toString();
 
     try {
-      java.io.OutputStream os = new java.io.FileOutputStream(fname);
+      java.io.Writer os = new java.io.FileWriter(fname);
       return new OutPort(os, fname);
     } catch (java.io.IOException e) {
       throw new GenericError(e.getMessage());

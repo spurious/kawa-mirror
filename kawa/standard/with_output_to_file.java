@@ -14,7 +14,7 @@ public class with_output_to_file extends Procedure2
     String fname = string.toString();
 
     try {
-      java.io.OutputStream is = new java.io.FileOutputStream(fname);
+      java.io.Writer is = new java.io.FileWriter(fname);
       OutPort port = new OutPort(is, fname);
       Object result;
       OutPort save_port = OutPort.outDefault ();

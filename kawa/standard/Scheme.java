@@ -349,6 +349,15 @@ public class Scheme extends Interpreter
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
 
+      define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
+      define_proc ("set-input-port-line-number!", "kawa.lib.ports");
+      define_proc ("input-port-column-number", "kawa.lib.ports");
+      define_proc ("default-prompter", "kawa.lib.ports");
+      define_proc ("input-port-prompter", "kawa.lib.ports");
+      define_proc ("set-input-port-prompter!", "kawa.lib.ports");
+      define_proc ("transcript-off", "kawa.lib.ports");
+      define_proc ("transcript-on", "kawa.lib.ports");
+
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
       r5_environment = new Environment (r4_environment);

@@ -2,33 +2,30 @@ package kawa.standard;
 import kawa.lang.*;
 
 public class char_ready_p extends Procedure0or1 {
-  public char_ready_p ()
-  {
-    super("char-ready?");
-  }
-
   public final Object apply0 ()
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return apply1 (InPort.inDefault ());
   }
-
-  public final Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  
+  public static boolean ready (Object arg1)
   {
-    if (! (arg1 instanceof InPort))
-      throw new WrongType (this.name(), 1, "input port");
-    // FIXME should return #t if EOF was seen.
     try
       {
-	if (((InPort) arg1).available () > 0)
-	  return Interpreter.trueObject;
+	if (arg1 instanceof java.io.InputStream)
+	  return ((java.io.InputStream) arg1).available () > 0;
+	else if (arg1 instanceof java.io.Reader)
+	  return ((java.io.Reader)arg1).ready();
 	else
-	  return Interpreter.falseObject;
+	  throw new ClassCastException("invalid argument to char-ready?");
       }
-    catch (java.io.IOException e)
+    catch (java.io.IOException ex)
       {
-	throw new GenericError ("caught I/O exception: " + e);
+	return false;
       }
+  }
+
+  public final Object apply1 (Object arg1)
+  {
+    return Scheme.boolObject(ready(arg1));
   }
 }

@@ -1,19 +1,12 @@
 package kawa.standard;
 import kawa.lang.*;
+import java.io.CharArrayReader;
              
 public class call_with_input_string extends Procedure2
 {
   public static InPort open_input_string (String string)
   {
-    // FIXME:  This is rather clumsy.  We first write the String to a
-    // byte array, and then read it back.  This is to handle
-    // non-Ascii characters.  A more generalized InPort would be better.
-    java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream ();
-    OutPort tmp = new OutPort (bout);
-    tmp.print (string);
-    java.io.ByteArrayInputStream is =
-      new java.io.ByteArrayInputStream (bout.toByteArray ());
-    return new InPort(is, "<string>");
+    return new InPort(new CharArrayReader(string.toCharArray()), "<string>");
   }
 
   public Object apply2 (Object string, Object proc)

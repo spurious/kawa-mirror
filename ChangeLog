@@ -4,7 +4,7 @@ Fri Sep 11 22:29:26 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/CalledContinuation.java:  Make fields public.
 	* kawa/lang/Continuation.java (callcc):  Replaced by callcc.apply.
-	& kawa/standard/callcc.java (apply):  New static method.
+	* kawa/standard/callcc.java (apply):  New static method.
 
 	* kawa/lang/Lambda.java:  Don't add argsArray yet.
 	Handle parameter type specification.

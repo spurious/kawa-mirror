@@ -43,6 +43,10 @@ public class Compilation
   ClassType[] classes;
   int numClasses;
 
+  /** When immediate, the ClassLoader we will load the compiled
+   * classes from. */
+  ArrayClassLoader loader;
+
   /** True if the compiled result will be immediately loaded. */ 
   public boolean immediate;
 
@@ -964,17 +968,66 @@ public class Compilation
     if (lexp instanceof ClassExp)
       {
 	ClassExp cexp = (ClassExp) lexp;
-	LambdaExp initMethod = cexp.initMethod;
-	if (initMethod != null)
-	  {
-	    code.emitPushThis();
-	    code.emitInvoke(initMethod.getMainMethod());
-	  }
+	callInitMethods(cexp.getCompiledClassType(this), new Vector(10));
       }
 
     code.emitReturn();
     method = save_method;
     curClass = save_class;
+  }
+
+  /** In an <init> for a generated ClassExp, emit $finit$ calls.
+   * This recursively traverses superclasses, and also calls their $finit$.
+   * @param clas Class to search for $finit$, and to serach supertypes.
+   * @param seen array of seen classes, to avoid duplicate $finit$ calls.
+   */
+  private void callInitMethods (ClassType clas, Vector seen)
+  {
+    if (clas == null)
+      return;
+
+    String name = clas.getName();
+    if ("java.lang.Object".equals(name))
+      return;
+    // Check for duplicates.
+    for (int i = seen.size();  --i >= 0; )
+      if (((ClassType) seen.elementAt(i)).getName() == name)
+	return;
+    seen.addElement(clas);
+
+    callInitMethods(clas.getSuperclass(), seen);
+    ClassType[] interfaces = clas.getInterfaces();
+    if (interfaces != null)
+      {
+	int n = interfaces.length;
+	for (int i = 0;  i < n;  i++)
+	  callInitMethods(interfaces[i], seen);
+      }
+
+    int clEnvArgs = 1;
+    if (clas instanceof PairClassType)
+      clas = ((PairClassType) clas).instanceType;
+    else if (clas.isInterface())
+      {
+	try
+	  {
+	    clas = ((ClassType)
+		    Type.make(Class.forName(clas.getName() + "$class")));
+	  }
+	catch (Throwable ex)
+	  {
+	    return;
+	  }
+      }
+    else
+      clEnvArgs = 0;
+    Method meth = clas.getDeclaredMethod("$finit$", clEnvArgs);
+    if (meth != null)
+      {
+	CodeAttr code = getCode();
+	code.emitPushThis();
+	code.emitInvoke(meth);
+      }
   }
 
   /** Generate ModuleBody's apply0 .. applyN methods.
@@ -1602,6 +1655,20 @@ public class Compilation
 	  return decl;
       }
     return null;
+  }
+
+  /** Called for classes referenced in bytecode.
+   * Since this only does something when immediate, we only care about
+   * classes referenced in the bytecode when immediate.
+   * It is used to ensure that we can inherit from classes defines when in
+   * immediate mode (in Scheme using define-class or similar).
+   */
+  public void usedClass (ClassType clas)
+  {
+    if (loader != null && clas.isExisting())
+      {
+	loader.addClass(clas.getReflectClass());
+      }
   }
 
   public SourceMessages getMessages() { return messages; }

@@ -282,6 +282,18 @@ public class ClassExp extends LambdaExp
       }
   }
 
+  /** Call comp.usedClass on the first arguments's supertypes. */
+  private static void usedSuperClasses(ClassType clas, Compilation comp)
+  {
+    comp.usedClass(clas.getSuperclass());
+    ClassType[] interfaces = clas.getInterfaces();
+    if (interfaces != null)
+      {
+	for (int i = interfaces.length;  --i >= 0; )
+	  comp.usedClass(interfaces[i]);
+      }
+  }
+
   public ClassType compile (Compilation comp)
   {
     ClassType saveClass = comp.curClass;
@@ -290,6 +302,10 @@ public class ClassExp extends LambdaExp
       {
 	ClassType new_class = getCompiledClassType(comp);
 	comp.curClass = new_class;
+
+	usedSuperClasses(type, comp);
+	if (type != instanceType)
+	  usedSuperClasses(instanceType, comp);
 
 	String filename = getFile();
 	if (filename != null)

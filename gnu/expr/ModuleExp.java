@@ -48,18 +48,16 @@ public class ModuleExp extends LambdaExp
       {
 	String class_name = mexp.getJavaName ();
 	comp.immediate = true;
+	ArrayClassLoader loader = new ArrayClassLoader ();
+	comp.loader = loader;
+
 	comp.compile(mexp, class_name, null);
 	if (messages.seenErrors())
 	  return null;
 
 	byte[][] classes = new byte[comp.numClasses][];
-	String[] classNames = new String[comp.numClasses];
-	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  {
-	    ClassType clas = comp.classes[iClass];
-	    classNames[iClass] = clas.getName ();
-	    classes[iClass] = clas.writeToArray ();
-	  }
+
+	java.util.zip.ZipOutputStream zout = null;
 	if (dumpZipPrefix != null)
 	  {
 	    StringBuffer zipname = new StringBuffer(dumpZipPrefix);
@@ -68,22 +66,32 @@ public class ModuleExp extends LambdaExp
 	    zipname.append(".zip");
 	    java.io.FileOutputStream zfout
 	      = new java.io.FileOutputStream(zipname.toString());
-	    java.util.zip.ZipOutputStream zout
-	      = new java.util.zip.ZipOutputStream(zfout);
-	    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	    zout = new java.util.zip.ZipOutputStream(zfout);
+	  }
+
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  {
+	    ClassType clas = comp.classes[iClass];
+	    String className = clas.getName ();
+	    byte[] classBytes = clas.writeToArray ();
+	    loader.addClass(className, classBytes);
+
+	    if (zout != null)
 	      {
-		String clname
-		  = classNames[iClass].replace ('.', '/') + ".class";
+		String clname = className.replace ('.', '/') + ".class";
 		java.util.zip.ZipEntry zent
 		  = new java.util.zip.ZipEntry (clname);
-		zent.setSize(classes[iClass].length);
+		zent.setSize(classBytes.length);
 		java.util.zip.CRC32 crc = new java.util.zip.CRC32();
-		crc.update(classes[iClass]);
+		crc.update(classBytes);
 		zent.setCrc(crc.getValue());
 		zent.setMethod(java.util.zip.ZipEntry.STORED);
 		zout.putNextEntry(zent);
-		zout.write(classes[iClass]);
+		zout.write(classBytes);
 	      }
+	  }
+	if (zout != null)
+	  {
 	    zout.close ();
 	  }
 
@@ -92,7 +100,6 @@ public class ModuleExp extends LambdaExp
 	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
 	*/
 
-	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
 	Class clas = loader.loadClass (class_name, true);
 	/* Pass literal values to the compiled code. */
 	for (Literal init = comp.litTable.literalsChain;  init != null;

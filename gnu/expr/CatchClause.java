@@ -34,6 +34,11 @@ public class CatchClause extends ScopeExp
     code.popScope ();
   }
 
+  protected void walkChildren(ExpWalker walker)
+  {
+    body = body.walk(walker);
+  }
+
   public void print (OutPort ps)
   {
     ps.print("(Catch ? ");

@@ -86,7 +86,7 @@ public class TryExp extends Expression
     CatchClause catch_clause = catch_clauses;
     while (walker.exitValue == null && catch_clause != null)
       {
-	catch_clause.body = catch_clause.body.walk(walker);
+	catch_clause.walk(walker);
 	catch_clause = catch_clause.getNext();
       }
 

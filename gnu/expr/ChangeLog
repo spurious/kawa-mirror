@@ -1,3 +1,12 @@
+ 2002-01-29  Daniel Bonniot  <bonniot@users.sourceforge.net>
+ 
+ 	* LambdaExp.java (addMethodFor): Rename conflicting methods in the same
+ 	class.
+ 
+2002-01-26  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* TryExp.java, CatchClause.java:  Visit catch clauses during a walk.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add "brl".

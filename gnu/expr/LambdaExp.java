@@ -780,30 +780,34 @@ public class LambdaExp extends ScopeExp
 		 && (((ModuleExp) outer)
 		     .getFlag(ModuleExp.SUPERTYPE_SPECIFIED))));
 	name = nameBuf.toString();
-	if (! classSpecified)
-	  {
-	    // If the base class or interfaces were not explicitly
-	    // specified, then any existing matching method (such as "run"
-	    // or "apply") is a conflict.  So rename the method.
-	    int renameCount = 0;
-	    int len = nameBuf.length();
-	  retry:
-	    for (;;)
-	      {
-		for (ClassType t = ctype;  t != null; t = t.getSuperclass ())
-		  {
-		    if (t.getDeclaredMethod(name, atypes) != null)
-		      {
-			nameBuf.setLength(len);
-			nameBuf.append('$');
-			nameBuf.append(++renameCount);
-			name = nameBuf.toString();
-			continue retry;
-		      }
-		  }
-		break;
-	      }
-	  }
+	{
+	  // Rename the method if an existing method has the same
+	  // name and type in this class.
+	  // Additionally, if the base class or interfaces were not explicitly
+	  // specified, then search super-classes for conflicting methods
+	  // (such as "run" or "apply").
+	  int renameCount = 0;
+	  int len = nameBuf.length();
+	retry:
+	  for (;;)
+	    {
+	      for (ClassType t = ctype;  t != null; t = t.getSuperclass ())
+		{
+		  if (t.getDeclaredMethod(name, atypes) != null)
+		    {
+		      nameBuf.setLength(len);
+		      nameBuf.append('$');
+		      nameBuf.append(++renameCount);
+		      name = nameBuf.toString();
+		      continue retry;
+		    }
+		  if (classSpecified)
+		    // Do not search in super-classes
+		    break;
+		}
+	      break;
+	    }
+	}
 	primMethods[i] = ctype.addMethod(name, atypes, rtype, mflags);
       }
   }

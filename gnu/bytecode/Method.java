@@ -137,48 +137,6 @@ public class Method implements AttrContainer {
       code.emitCheckcast(type);
   }
 
-  /** Store into an element of an array.
-   * Must already have pushed the array reference, the index,
-   * and the new value (in that order).
-   * Stack:  ..., array, index, value => ...
-   */
-  public void compile_array_store (Type element_type)
-  {
-    prepareCode(1);
-    pop_stack_type ();  // Pop new values
-    pop_stack_type ();  // Pop index
-    pop_stack_type ();  // Pop array reference
-    if      (element_type == Type.byte_type)    code.put1(84);  // bastore
-    else if (element_type == Type.short_type)   code.put1(86);  // sastore
-    else if (element_type == Type.int_type)     code.put1(79);  // iastore
-    else if (element_type == Type.long_type)    code.put1(80);  // lastore
-    else if (element_type == Type.float_type)   code.put1(81);  // fastore
-    else if (element_type == Type.double_type)  code.put1(82);  // dastore
-    else if (element_type == Type.boolean_type) code.put1(84);  // bastore
-    else if (element_type == Type.char_type)    code.put1(85);  // castore
-    else                                        code.put1(83);  // aastore
-  }
-
-  /** Load an element from an array.
-   * Must already have pushed the array and the index (in that order):
-   * Stack:  ..., array, index => ..., value */
-  public void compile_array_load (Type element_type)
-  {
-    prepareCode(1);
-    pop_stack_type ();  // Pop index
-    pop_stack_type ();  // Pop array reference
-    if      (element_type == Type.byte_type)    code.put1(51);  // baload
-    else if (element_type == Type.short_type)   code.put1(53);  // saload
-    else if (element_type == Type.int_type)     code.put1(46);  // iaload
-    else if (element_type == Type.long_type)    code.put1(47);  // laload
-    else if (element_type == Type.float_type)   code.put1(48);  // faload
-    else if (element_type == Type.double_type)  code.put1(49);  // daload
-    else if (element_type == Type.boolean_type) code.put1(51);  // baload
-    else if (element_type == Type.char_type)    code.put1(52);  // caload
-    else                                        code.put1(50);  // aaload
-    push_stack_type (element_type);
-  }
-
   /**
    * Comple code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
@@ -364,9 +322,9 @@ public class Method implements AttrContainer {
 
   public ClassType getDeclaringClass() { return classfile; }
 
-  public Type getReturnType() { return return_type; }
+  public final Type getReturnType() { return return_type; }
 
-  public Type[] getParameterTypes() { return arg_types; }
+  public final Type[] getParameterTypes() { return arg_types; }
 
   public final String getName ()
   {

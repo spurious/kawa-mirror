@@ -512,6 +512,47 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.int_type);
   }
 
+  private void emitTypedOp (int op, Type type)
+  {
+    reserve(1);
+    switch (type.getSignature().charAt(0))
+      {
+      case 'I':/*op = op;*/  break;
+      case 'J':  op += 1;  break;  // long
+      case 'F':  op += 2;  break;  // float
+      case 'D':  op += 3;  break;  // double
+      default:   op += 4;  break;  // object
+      case 'B': case 'Z':  op += 5;  break;  // byte or boolean
+      case 'C':  op += 6;  break;  // char
+      case 'S':  op += 7;  break;  // short
+      }
+    put1(op);
+  }
+
+  /** Store into an element of an array.
+   * Must already have pushed the array reference, the index,
+   * and the new value (in that order).
+   * Stack:  ..., array, index, value => ...
+   */
+  public void emitArrayStore (Type element_type)
+  {
+    popType();  // Pop new value
+    popType();  // Pop index
+    popType();  // Pop array reference
+    emitTypedOp(79, element_type);
+  }
+
+  /** Load an element from an array.
+   * Must already have pushed the array and the index (in that order):
+   * Stack:  ..., array, index => ..., value */
+  public void emitArrayLoad (Type element_type)
+  {
+    popType();  // Pop index
+    popType();  // Pop array reference
+    emitTypedOp(46, element_type);
+    pushType(element_type);
+  }
+
   /**
    * Invoke new on a class type.
    * Does not call the constructor!
@@ -532,22 +573,23 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitNewArray (Type element_type)
   {
     popType();
-    if (element_type == Type.byte_type)
-      emitNewArray (8);
-    else if (element_type == Type.short_type)
-      emitNewArray (9);
-    else if (element_type == Type.int_type)
-      emitNewArray (10);
-    else if (element_type == Type.long_type)
-      emitNewArray (11);
-    else if (element_type == Type.float_type)
-      emitNewArray (6);
-    else if (element_type == Type.double_type)
-      emitNewArray (7);
-    else if (element_type == Type.boolean_type)
-      emitNewArray (4);
-    else if (element_type == Type.char_type)
-      emitNewArray (5);
+    if (element_type instanceof PrimType)
+      {
+	int code;
+	switch (element_type.getSignature().charAt(0))
+	  {
+	  case 'B':  code =  8;  break;
+	  case 'S':  code =  9;  break;
+	  case 'I':  code = 10;  break;
+	  case 'J':  code = 11;  break;
+	  case 'F':  code =  6;  break;
+	  case 'D':  code =  7;  break;
+	  case 'Z':  code =  4;  break;
+	  case 'C':  code =  5;  break;
+	  default:   throw new Error("bad PrimType in emitNewArray");
+	  }
+	emitNewArray(code);
+      }
     else if (element_type instanceof ClassType)
       {
 	reserve(3);

@@ -44,7 +44,7 @@ public class TestMisc
     evalTest("1,((2 to 4)[true()]),5", "1 2 3 4 5");
     evalTest("(for $y in (5,4) return <b>{10+$y}</b>)[2]", "<b>14</b>");
 
-    evalTest("document(\"tab.xml\")/result",
+    evalTest("doc('tab.xml')/result",
 	     "<result>\n" +
 	     "<row>\n" +
 	     "<fld1>a1</fld1>\n" +
@@ -61,9 +61,9 @@ public class TestMisc
 	     "<k:fld1>c2</k:fld1>\n" +
 	     "</h:row>\n" +
 	     "</result>");
-    evalTest("document(\"tab.xml\")/result/row/fld2",
+    evalTest("doc('tab.xml')/result/row/fld2",
 	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
-    evalTest("document(\"tab.xml\")/result/row[fld2]",
+    evalTest("doc('tab.xml')/result/row[fld2]",
 	     "<row>\n" +
 	     "<fld1>a1</fld1>\n" +
 	     "<fld2 align=\"right\">12</fld2>\n" +
@@ -71,25 +71,25 @@ public class TestMisc
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
-    evalTest("document(\"tab.xml\")/result/row/*",
+    evalTest("doc('tab.xml')/result/row/*",
 	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
 
-    evalTest("document(\"tab.xml\")/result/row[2]",
+    evalTest("doc('tab.xml')/result/row[2]",
 	     "<row>\n" +
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
-    evalTest("for $x in document(\"tab.xml\")/result/row[2]/node()" +
+    evalTest("for $x in doc('tab.xml')/result/row[2]/node()" +
 	     "  return ('[',$x,']')",
 	     "[\n][<fld1 align=\"left\">b1</fld1>][\n" +
 	     "][<fld2 align=\"right\">22</fld2>][\n]");
-    evalTest("for $x in document(\"tab.xml\")/result/row[2]/text()" +
+    evalTest("for $x in doc('tab.xml')/result/row[2]/text()" +
 	     "  return ('[',$x,']')",
 	     "[\n][\n][\n]");
-    evalTest("for $x in document(\"tab.xml\")/result/row[2]//text()" +
+    evalTest("for $x in doc('tab.xml')/result/row[2]//text()" +
 	     "  return ('[',$x,']')",
 	     "[\n][b1][\n][22][\n]");
-    evalTest("document(\"tab.xml\")/result/row/*[2]",
+    evalTest("doc('tab.xml')/result/row/*[2]",
 	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
 
     evalTest("for $x in <T>r1<fld1>a1</fld1><fld3/>r2<fld2>12</fld2></T>" +
@@ -97,24 +97,24 @@ public class TestMisc
 	     "    return ('[',$x,']')",
 	     "[r1][<fld1>a1</fld1>][<fld3 />][r2][<fld2>12</fld2>]");
 
-    evalTest("(document(\"tab.xml\")/result/row/*)[2]",
+    evalTest("(doc('tab.xml')/result/row/*)[2]",
 	     "<fld2 align=\"right\">12</fld2>");
-    evalTest("(document(\"tab.xml\")/result/row/*)[2 to 3]",
+    evalTest("(doc('tab.xml')/result/row/*)[2 to 3]",
 	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1>");
-    evalTest("(document(\"tab.xml\")/result/row/*)[position()>1]",
+    evalTest("(doc('tab.xml')/result/row/*)[position()>1]",
 	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
-    evalTest("(document(\"tab.xml\")/result/row/*)[position()>1][2]",
+    evalTest("(doc('tab.xml')/result/row/*)[position()>1][2]",
 	     "<fld1 align=\"left\">b1</fld1>");
 
-    evalTest("document(\"tab.xml\")/result/row/(fld2,fld1)",
+    evalTest("doc('tab.xml')/result/row/(fld2,fld1)",
 	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
 
-    evalTest("string-value(document('tab.xml'))",
+    evalTest("string-value(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
-    evalTest("string(document('tab.xml'))",
+    evalTest("string(doc('tab.xml'))",
 	     "\n\na1\n12\n\n\nb1\n22\n\n\nc1\n33\n44\nc2\n\n\n");
-    evalTest("string(document('tab.xml')/result/row/fld1/@align)", "left");
-    evalTest("string(document('tab.xml')/result/row/fld2/@align)",
+    evalTest("string(doc('tab.xml')/result/row/fld1/@align)", "left");
+    evalTest("string(doc('tab.xml')/result/row/fld2/@align)",
 	     "rightright");
  
     evalTest("for $x in children(<a>xy{3+4}kl<c>def</c>{9}{11}</a>)" +
@@ -128,7 +128,7 @@ public class TestMisc
 
     evalTest("string(<a>{'aa''bb&#88;cc&#x5a;dd'}</a>)", "aa'bbXccZdd");
 
-    evalTest("document(\"tab.xml\")/result/row[fld1]",
+    evalTest("doc('tab.xml')/result/row[fld1]",
 	     "<row>\n" +
 	     "<fld1>a1</fld1>\n" +
 	     "<fld2 align=\"right\">12</fld2>\n" +
@@ -136,14 +136,14 @@ public class TestMisc
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
-    evalTest("document(\"tab.xml\")/result/row[fld3]", "");
-    evalTest("document(\"tab.xml\")/result/row/fld1[@align]",
+    evalTest("doc('tab.xml')/result/row[fld3]", "");
+    evalTest("doc('tab.xml')/result/row/fld1[@align]",
 	     "<fld1 align=\"left\">b1</fld1>");
-    evalTest("document(\"tab.xml\")/result/row/fld2[@align]",
+    evalTest("doc('tab.xml')/result/row/fld2[@align]",
 	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
-    evalTest("'a',document(\"tab.xml\")/result/row/fld1[@align='left']",
+    evalTest("'a',doc('tab.xml')/result/row/fld1[@align='left']",
 	     "a<fld1 align=\"left\">b1</fld1>");
-    evalTest("'a',document(\"tab.xml\")/result/row/fld1[@align='right']", "a");
+    evalTest("'a',doc('tab.xml')/result/row/fld1[@align='right']", "a");
 
     evalTest("let $x:=12,\n" +
 	     "    $y:=<a>{$x+$x}</a>\n" +
@@ -203,29 +203,29 @@ public class TestMisc
 	     + "string((<top><x1:ab>X1</x1:ab><x2:cd>X2</x2:cd></top>)/*:cd)",
 	     "X2");
     evalTest("declare namespace h='H';\n"
-	     + "string(document(\"tab.xml\")/result/h:row)",
+	     + "string(doc('tab.xml')/result/h:row)",
 	     "\nc1\n33\n44\nc2\n");
     evalTest("declare namespace xx='H';\n"
-	     + "string(document(\"tab.xml\")/result/xx:row)",
+	     + "string(doc('tab.xml')/result/xx:row)",
 	     "\nc1\n33\n44\nc2\n");
-    evalTest("string(document(\"tab.xml\")/result/*:row)",
+    evalTest("string(doc('tab.xml')/result/*:row)",
 	     "\na1\n12\n\nb1\n22\n\nc1\n33\n44\nc2\n");
-    evalTest("string(document(\"tab.xml\")/result/*:row/*:fld1)",
+    evalTest("string(doc('tab.xml')/result/*:row/*:fld1)",
 	     "a1b1c1c2");
     evalTest("declare namespace k='J';\n"
-	     + "string(document(\"tab.xml\")/result/*:row/k:fld1)",
+	     + "string(doc('tab.xml')/result/*:row/k:fld1)",
 	     "c1c2");
     evalTest("declare namespace k='J';\n"
-	     + "string(document(\"tab.xml\")/result/*:row[k:fld1])",
+	     + "string(doc('tab.xml')/result/*:row[k:fld1])",
 	     "\nc1\n33\n44\nc2\n");
 
-    evalTest("document(\"tab.xml\")/result/row[1]/descendant::*",
+    evalTest("doc('tab.xml')/result/row[1]/descendant::*",
 	     "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
-    evalTest("for $x in document(\"tab.xml\")/result/row[1]/descendant::node() return ($x,';')",
+    evalTest("for $x in doc('tab.xml')/result/row[1]/descendant::node() return ($x,';')",
 	     "\n;<fld1>a1</fld1>;a1;\n;<fld2 align=\"right\">12</fld2>;12;\n;");
-    evalTest("document(\"tab.xml\")/result/row[1]/descendant::text()",
+    evalTest("doc('tab.xml')/result/row[1]/descendant::text()",
 	     "a112");
-    evalTest("document(\"tab.xml\")/result/row[1]/descendant-or-self::*",
+    evalTest("doc('tab.xml')/result/row[1]/descendant-or-self::*",
 	     "<row><fld1>a1</fld1>"
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
@@ -301,6 +301,27 @@ public class TestMisc
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &amp;oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",
 	     "<?---><b><![CDATA[saw]]> an &oslash;</b>");
+
+    evalTestIdAttrs("doc('outline.xml')/book/part/chapter/ancestor::*",
+		    "b1;P1;");
+    evalTestIdAttrs("doc('outline.xml')/book/part/"
+		    +"chapter/ancestor-or-self::node()",
+		    ";b1;P1;c1;c2;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"section[@id='s1']/following-sibling::*",
+		    "s2;s3;");
+    evalTestIdAttrs("doc('outline.xml')//chapter/self::*",
+		    "c1;c2;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"para[@id='p31']/preceding::*",
+		    "s1;s11;s2;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"section[@id='s5']/preceding-sibling::*",
+		    "s4;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"chapter[@id='c1']/following::*",
+		    "c2;s4;s5;");
+
     printSummary();
   }
 
@@ -359,6 +380,11 @@ public class TestMisc
 	      quote = 0;
 	  }
       }
+  }
+
+  private static void evalTestIdAttrs(String expr, String expected)
+  {
+    evalTest("for $x in (" + expr + ") return (string($x/@id),';')", expected);
   }
 
   public static void evalTest(String expr, String expected)

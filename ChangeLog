@@ -1,3 +1,7 @@
+2003-09-14  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_LINK_FILES):  Add gnu/xquery/testsuite/outline.xml.
+
 2003-09-08  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Resolve hygiene using

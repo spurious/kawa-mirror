@@ -1,3 +1,14 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): If immediate,make fields final and
+	static, but do initialization in <init>, not <clinit>.
+	* SetExp.java (compile): Make immediate mode more consistent
+	with non-immediate mode by removing two tests.
+	(allocFields): Can avoid immediate-mode kludge.
+	* Interpreter.java (getEnvPropertyFor): New method.
+	* ModuleExp.java (evalModule):Import declarations from immediate-mode
+	modules by iterating over module's declarations..
+
 2004-12-27  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (isStatic): New method.

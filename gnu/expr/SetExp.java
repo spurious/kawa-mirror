@@ -145,7 +145,6 @@ public class SetExp extends Expression
     Declaration decl = binding;
     Expression declValue = decl.getValue();
     if (declValue instanceof LambdaExp
-	&& ! comp.immediate
 	&& decl.context instanceof ModuleExp
 	&& (! decl.isPrivate() || declValue instanceof ClassExp)
 	&& ((LambdaExp) declValue).getName() != null // FIXME
@@ -154,11 +153,10 @@ public class SetExp extends Expression
 	((LambdaExp) new_value).compileSetField(comp);
       }
     else if (decl.context instanceof ModuleExp
-	     && ! comp.immediate
 	     && (new_value instanceof QuoteExp
 		 || decl.getFlag(Declaration.IS_CONSTANT))
 	     && isDefining()
-	     && decl.getValue() != null)
+	     && declValue != null)
       { // This is handled in ModuleExp's allocFields method.  But:
 	if (needValue)
 	  {

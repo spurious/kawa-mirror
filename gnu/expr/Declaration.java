@@ -209,6 +209,11 @@ public class Declaration
    * both EXTERNAL_ACCESS and IS_PRIVATE set. */
   public static final String PRIVATE_PREFIX = "$Prvt$";
 
+  /** This bit is set if to get the actual value you have to reference
+   * a <code>gnu.mapping.Location</code>.  I.e. this Declarations's
+   * <code>var</code> or <code>field</code> does not contain the Declaration's
+   * value diretly, but rather yields a Location that contains the Declaration's value.
+   */
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -318,9 +323,13 @@ public class Declaration
     return (flags & IS_NAMESPACE_PREFIX) != 0;
   }   
 
-  /** True if the value of the variable is the contents of a Location. */
+  /** True if the value of the variable is the contents of a Location.
+   * @see #INDIRECT_BINDING */
   public final boolean isIndirectBinding()
   { return (flags & INDIRECT_BINDING) != 0; }
+
+  /** Note that the value of the variable is the contents of a Location.
+   * @see #INDIRECT_BINDING */
   public final void setIndirectBinding(boolean indirectBinding)
   {
     setFlag(indirectBinding, INDIRECT_BINDING);
@@ -623,15 +632,22 @@ public class Declaration
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
     if (isPublic() && ! isConstant && ! typeSpecified)
       setIndirectBinding(true);
-    if (isIndirectBinding() || isConstant)
-      fflags |= Access.FINAL;
     if (! isPrivate() || external_access)
       fflags |= Access.PUBLIC;
-    if (isStatic()
+    // In immediate mode there is no point in making module fields non-static,
+    // and making them static is more efficient.  In that case we make the
+    // fields non-final, since they may get set in <init> rather than <clinit>
+    // (see below), and setting final static fields in non-static methods
+    // has been known to break incorrect VMs (and it is kind of gross).
+    if (comp.immediate
+	|| isStatic()
 	|| (isConstant && value instanceof QuoteExp)
 	|| (value instanceof ClassExp
 	    && ! ((LambdaExp) value).getNeedsClosureEnv()))
       fflags |= Access.STATIC;
+    if ((isIndirectBinding() || isConstant)
+	&& ! comp.immediate)
+      fflags |= Access.FINAL;
     Type ftype;
     if (isAlias())
       {
@@ -677,7 +693,11 @@ public class Declaration
 	     || (value != null && ! (value instanceof ClassExp)))
       {
 	BindingInitializer init = new BindingInitializer(this, field, value);
-	if ((fflags & Access.STATIC) != 0)
+	// In immediate mode we can't initialize variables in <clinit>,
+	// even though the field is static.  This is because the literals
+	// (which might be needed by the initializer) are passed in using
+	// reflection, which cannot be done before class initialization.
+	if ((fflags & Access.STATIC) != 0 && ! comp.immediate)
 	  {
 	    init.next = comp.clinitChain;
 	    comp.clinitChain = init;

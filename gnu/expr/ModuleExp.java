@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
 import java.io.*;
 import gnu.kawa.reflect.ClassMemberLocation;
@@ -116,6 +117,7 @@ public class ModuleExp extends LambdaExp
 	*/
 
 	Class clas = loader.loadClass (class_name, true);
+	comp.mainClass.setReflectClass(clas);
 	/* Pass literal values to the compiled code. */
 	for (Literal init = comp.litTable.literalsChain;  init != null;
 	     init = init.next)
@@ -190,8 +192,47 @@ public class ModuleExp extends LambdaExp
 		Procedure proc = (Procedure) inst;
 		if (proc.getName() == null)
 		  proc.setName (mexp.name);
-		//thisValue = proc;
+
 		mod = (ModuleBody) inst;
+
+		// Import declarations defined in module into the Environment.
+		for (Declaration decl = mexp.firstDecl();
+		     decl != null;  decl = decl.nextDecl())
+		  {
+		    Object dname = decl.getName();
+		    if (decl.isPrivate() || dname == null)
+		      continue;
+		    Field fld = decl.field;
+		    Location loc
+		      = new ClassMemberLocation(inst, fld.getDeclaringClass(),
+						fld.getName());
+		    Symbol sym = dname instanceof Symbol ? (Symbol) dname
+		      : Symbol.make("", dname.toString().intern());
+		    Object property = comp.getInterpreter()
+		      .getEnvPropertyFor(decl);
+		    if (decl.getFlag(Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
+		      {
+			Expression dvalue = decl.getValue();
+			Object value;
+			if (dvalue instanceof QuoteExp
+			    && dvalue != QuoteExp.undefined_exp)
+			  value = ((QuoteExp) dvalue).getValue();
+			else
+			  value = loc.get();
+			if (decl.isIndirectBinding())
+			  env.addLocation(sym, property, (Location) value);
+			else
+			  env.define(sym, property, value);
+		      }
+		    else
+		      {
+			if (decl.isIndirectBinding())
+			  loc = (Location) loc.get();
+			// else perhaps use a StaticFieldLocation?  FIXME
+			// Perhaps set loc.decl = decl?
+			env.addLocation(sym, property, loc);
+		      }
+		  }
 	      }
 	    catch (InstantiationException ex)
 	      {
@@ -201,12 +242,6 @@ public class ModuleExp extends LambdaExp
 	      {
 		throw new RuntimeException("class illegal access: in lambda eval");
 	      }
-	    // Doing defineAll is tricky, because we need to be careful to
-	    // not "import" LitXx fields.  Instead, we force declarations to
-	    // indirect, and allocate the Location at compile-time in
-	    // Declaration.load.  A cleaner solution would be to do a selective
-	    // defineAll, to only import real declarations.  FIXME.
-	    //ClassMemberLocation.defineAll(mod, null,  comp.getInterpreter(), env);
 	    mod.run(ctx);
 	  }
 	ctx.runUntilDone();
@@ -261,19 +296,13 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
-	if (comp.immediate)
-	  {
-	    // This is a bit of a kludge.  See Declaration.load.
-	    decl.setIndirectBinding(true);
-	    decl.setSimple(false);
-	  }
-	else if (value instanceof LambdaExp && ! (value instanceof ClassExp))
+	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }
 	else
 	  {
-	    if (! decl.getFlag(Declaration.IS_CONSTANT|Declaration.IS_ALIAS)
+	    if (! decl.getFlag(Declaration.IS_CONSTANT)
 		|| value == QuoteExp.undefined_exp)
 	      value = null;
 	    decl.makeField(comp, value);

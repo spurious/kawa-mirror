@@ -295,6 +295,13 @@ public abstract class Interpreter
     return null;
   }
 
+  public Object getEnvPropertyFor (Declaration decl)
+  {
+    if (hasSeparateFunctionNamespace() && decl.isProcedureDecl())
+      return EnvironmentKey.FUNCTION;
+    return null;
+  }
+
   public void loadClass(String name)
     throws java.lang.ClassNotFoundException
   {

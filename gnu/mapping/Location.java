@@ -1,3 +1,6 @@
+// Copyright (c) 1998  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.mapping;
 
 /** A Location is an abstract cell/location/variable with a value. */

@@ -30,7 +30,12 @@ public class FindCapturedVars extends ExpWalker
 	    if (value instanceof LambdaExp)
 	      {
 		LambdaExp lexp = (LambdaExp) value;
-		if (! lexp.getNeedsClosureEnv())
+		LambdaExp cur = getCurrentLambda();
+		if (! lexp.getNeedsClosureEnv()
+		    // However, if --full-tailcalls was specified and this
+		    // is a call to the current function, we will
+		    // need a static link, for now.  FIXME.
+		    && ! (lexp == cur && Compilation.usingTailCalls))
 		  skipFunc = true;
 	      }
 	  }
@@ -233,7 +238,7 @@ public class FindCapturedVars extends ExpWalker
           return;
         if (declValue.isHandlingTailCalls())
           declValue = null;
-        else if (declValue == curLambda && ! decl.getCanRead())
+	else if (declValue == curLambda && ! decl.getCanRead())
           return;
       }
     if (decl.getFlag(Declaration.STATIC_SPECIFIED))
@@ -258,32 +263,10 @@ public class FindCapturedVars extends ExpWalker
 	  }
 	if (decl.isSimple())
 	  {	
-	    if (declLambda instanceof ModuleExp
-		|| declLambda instanceof ClassExp)
+	    if (declLambda.capturedVars == null
+		&& ! (declLambda instanceof ModuleExp
+		      || declLambda instanceof ClassExp))
 	      {
-		declLambda.heapFrameLambda = declLambda;
-	      }
-	    else if (declLambda.capturedVars == null)
-	      {
-		if (! Compilation.usingTailCalls
-		    || heapLambda instanceof ClassExp)
-		  ;
-		else if (heapLambda.isClassGenerated())
-		  declLambda.heapFrameLambda = heapLambda;
-		else
-		  {
-		    for (LambdaExp child = declLambda.firstChild; ;
-			 child = child.nextSibling)
-		      {
-			if (child == null)
-			  break;
-			if (child.isClassGenerated())
-			  {
-			    declLambda.heapFrameLambda = child;
-			    break;
-			  }
-		      }
-		  }
 		declLambda.heapFrame = new gnu.bytecode.Variable("heapFrame");
 		declLambda.heapFrame.setArtificial(true);
 	      }

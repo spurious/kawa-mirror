@@ -1,3 +1,42 @@
+2001-09-13  Per Bothner  <per@bothner.com>
+
+	Reimplement --full-tailcalls to generate CpsMethodContainer.
+	* LambdaExp.java (heapFrameLambda):  Removed field.
+	(declareClosureEnv, allocFrame):  Don't test heapFrameLambda.
+	(isClassGenerated):  No need to test for isHandlingTailCalls.
+	(compileAlloc, compileEnd):  Likewise.
+	(compile):  Simplify, remove cases no longer needed.
+	(addMethodFor):  This is now also used if usingTailCalls, so modify.
+	(allocChildClasses, enterFunction):  Remove no-longer-used code.
+	(allocParameters):  Allocate $ctx parameter if handling tail-calls.
+	(compileBody):  Get $ctx parameter from comp's callStackContext.
+	(walkChildren):  Split into two methods ...
+	(walkChildrenOnly, walkProperties):  New methods.
+	* ApplyExp.java (compile):  No longer special-case handling
+	of inline calls when --full-tailcalls.
+	(popParams):  Also skip $ctx variable.
+	* ChainLambdas.java (walkLambdaExp):  Split call to walkScopeExp
+	so walkProperties is not scope of this lambda.
+	* Compilation.java (getMethodProcType):  Extra case for usingTailCalls.
+	(getConstructor):  No longer need to spacial-case usingTailCalls.
+	(generateConstructor):  Likewise.
+	(generateApplyMethods):  Handle usingTailCalls.
+	(addClass):  Rename parameter "stack" to "$ctx".
+	(compileConstant):  Do nothing if empty and target is ConsumerTarget.
+	* FindCapturedVars.java (walkApplyExp):  Do walk function part
+	if --full-tailcalls and calling to current function, for now.
+	(capture):  Never set heapFrameLambda.
+	* FindTailCalls.java (walkModuleExp):  No longer needed.
+	(walkLambdaExp):  Call walkDecls at the appropriate time.
+	* ReferenceExp.java (compile):  If fluid and field is null then
+	load has alreadyloaded the value, so don't get the value field.
+	* SetExp.java (compile):  Remove --full-tailcall Syntax special test.
+	* ClassExp.java (compile):  Don't test heapFrameLambda.
+
+	* ClassExp.java (getImplMethods):  Make static.
+	Fix thinko, change reference to type field to interfaceType parameter.
+	If incoming interfaceType is not an interface, return immediately.
+
 2001-08-30  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (mangleNameIfNeeded):  New method.

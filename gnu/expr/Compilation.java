@@ -286,7 +286,8 @@ public class Compilation
 
   public static final ClassType getMethodProcType(ClassType modClass)
   {
-    return modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
+    return usingTailCalls ? typeCpsMethodProc
+      : modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
       : typeApplyMethodProc;
   }
 
@@ -357,6 +358,12 @@ public class Compilation
   {
     if (target instanceof IgnoreTarget)
       return;
+    if (target instanceof ConsumerTarget)
+      {
+	if (value == Values.empty)
+	  return;
+	// else FIXME
+      }
     if (target instanceof ConditionalTarget)
       {
 	ConditionalTarget ctarg = (ConditionalTarget) target;
@@ -806,9 +813,7 @@ public class Compilation
 
   public final Method getConstructor (LambdaExp lexp)
   {
-    ClassType clas = (Compilation.usingTailCalls ? curClass
-		      : lexp.getHeapFrameType());
-    return getConstructor(clas, lexp);
+    return getConstructor(lexp.getHeapFrameType(), lexp);
   }
 
   public static final Method getConstructor (ClassType clas, LambdaExp lexp)
@@ -826,7 +831,7 @@ public class Compilation
 
   public final void generateConstructor (LambdaExp lexp)
   {
-    generateConstructor (Compilation.usingTailCalls ? curClass : lexp.getHeapFrameType(), lexp);
+    generateConstructor (lexp.getHeapFrameType(), lexp);
   }
 
   public final void generateConstructor (ClassType clas, LambdaExp lexp)
@@ -890,10 +895,10 @@ public class Compilation
     ClassType procType
       = Compilation.usingTailCalls ? typeCpsMethodProc
       : generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
-    if (generateApplyMethodContainer)
-      curClass.addInterface(typeApplyMethodContainer);
     if (Compilation.usingTailCalls)
       curClass.addInterface(typeCpsMethodContainer);
+    else if (generateApplyMethodContainer)
+      curClass.addInterface(typeApplyMethodContainer);
     Method save_method = method;
     CodeAttr code = null;
     for (int i = Compilation.usingTailCalls ? 5 : 0;  i < 6; i++)
@@ -959,7 +964,7 @@ public class Compilation
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     Type.pointer_type,
+					     Compilation.usingTailCalls ? (Type) Type.void_type : (Type) Type.pointer_type,
 					     Access.PUBLIC);
 		method.init_param_slots();
 		code = getCode();
@@ -1091,35 +1096,48 @@ public class Compilation
 		    code.emitPushInt(singleArgs);
 		    code.emitInvokeStatic(Compilation.makeListMethod);
 		  }
+		else if (lastArgType == typeCallContext)
+		  code.emitLoad(code.getArg(2));
 		else
-		  throw new RuntimeException("unsupported #!rest type");
+		  throw new RuntimeException("unsupported #!rest type:"+lastArgType);
               }
 
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
-	    Target.pushObject.compileFromStack(this,
-					       primMethod.getReturnType());
+	    if (! usingTailCalls)
+	      Target.pushObject.compileFromStack(this,
+						 primMethod.getReturnType());
 	    code.emitReturn();
           }
 	if (needThisApply)
 	  {
 	    aswitch.addDefault(code);
-	    int nargs = i > 4 ? 2 : i + 1;
-	      nargs++;
-	    for (int k = generateApplyMethodContainer ? 1 : 0;
-		 k < nargs;  k++)
-	      code.emitLoad(code.getArg(k));
-	    if (generateApplyMethodContainer)
+	    if (usingTailCalls)
 	      {
-		mname = mname + "Default";
-		Method defMethod
-		  = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
-		code.emitInvokeStatic(defMethod);
+		code.emitLoad(code.getArg(1));
+		Method errMethod
+		  = typeCpsMethodProc.getDeclaredMethod("applyError", 0);
+		code.emitInvokeVirtual(errMethod);
 	      }
 	    else
 	      {
-		code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
+		int nargs = i > 4 ? 2 : i + 1;
+		nargs++;
+		for (int k = generateApplyMethodContainer ? 1 : 0;
+		     k < nargs;  k++)
+		  code.emitLoad(code.getArg(k));
+		if (generateApplyMethodContainer)
+		  {
+		    mname = mname + "Default";
+		    Method defMethod
+		      = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
+		    code.emitInvokeStatic(defMethod);
+		  }
+		else
+		  {
+		    code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
+		  }
 	      }
 	    code.emitReturn();
 	    aswitch.finish(code);
@@ -1258,7 +1276,6 @@ public class Compilation
     // if (usingCPStyle())   code.addParamLocals();
 
     thisDecl = method.getStaticFlag() ? null : lexp.declareThis(new_class);
-    Variable var = thisDecl;
     if (lexp instanceof ModuleExp)
       lexp.heapFrame = lexp.thisVariable;
     if (! (fewerClasses && curClass == mainClass))
@@ -1266,7 +1283,7 @@ public class Compilation
 
     if (lexp.isHandlingTailCalls() || usingCPStyle())
       {
-	callStackContext = new Variable ("stack", typeCallContext);
+	callStackContext = new Variable ("$ctx", typeCallContext);
 	Scope scope = lexp.scope;
 	scope.addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);

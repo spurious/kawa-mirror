@@ -44,7 +44,18 @@ public class ChainLambdas extends ExpWalker
 	parent.firstChild = exp;
       }
 
-    walkScopeExp(exp);
+    ScopeExp saveScope = currentScope;
+    try
+      {
+	exp.outer = currentScope;
+	currentScope = exp;
+	exp.walkChildrenOnly(this);
+      }
+    finally
+      {
+	currentScope = saveScope;
+      }
+    exp.walkProperties(this);
 
     // Put list of children in proper order.
     LambdaExp prev = null, child = exp.firstChild;

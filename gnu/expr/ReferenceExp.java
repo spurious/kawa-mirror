@@ -119,7 +119,7 @@ public class ReferenceExp extends Expression
 	else
 	  code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
       }
-    else if (decl.isFluid())
+    else if (decl.isFluid() && decl.field == null)
       code.emitGetField(FluidLetExp.valueField);
     target.compileFromStack(comp, getType());
   }

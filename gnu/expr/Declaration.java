@@ -15,8 +15,7 @@ import gnu.mapping.Named;
  * If a local variable is captured by an inner lambda, the
  * variable is stored in a field of the LambdaExp's heapFrame variable.
  * (The latter declaration has isSimple and isArtificial true.)
- * The heapFrame reference is an instance of the LambdaExp's heapFrameLambda;
- * the Declaration's field specifies the Field used.
+ * The Declaration's field specifies the Field used.
  *
  * If a function takes a fixed number of parameters, at most four,
  * then the arguments are passed in Java registers 1..4.

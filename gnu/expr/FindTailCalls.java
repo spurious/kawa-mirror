@@ -96,13 +96,6 @@ public class FindTailCalls extends ExpWalker
     return super.walkFluidLetExp(exp);
   }
 
-  protected Expression walkModuleExp (ModuleExp exp)
-  {
-    super.walkLambdaExp(exp);
-    walkDecls(exp);
-    return exp;
-  }
-
   protected Expression walkLetExp (LetExp exp)
   {
     int n = exp.inits.length; 
@@ -188,6 +181,8 @@ public class FindTailCalls extends ExpWalker
 	inTailContext = save;
 	currentLambda = parent;
       }
+
+    walkDecls(exp);
 
     for (LambdaExp child = exp.firstChild;  child != null;
 	 child = child.nextSibling)

@@ -329,10 +329,7 @@ public class ApplyExp extends Expression
 	popParams (code, func_lambda, false);
 	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
-	if (Compilation.usingTailCalls)
-	  code.popScope();
-	else
-	  func_lambda.compileEnd(comp);
+	func_lambda.compileEnd(comp);
 	// comp.method.popScope();
 	func_lambda.compileChildMethods(comp);
 	comp.curLambda = saveLambda;
@@ -424,13 +421,15 @@ public class ApplyExp extends Expression
     Variable params = lexp.scope.firstVar();
     if (params != null && params.getName() == "this")
       params = params.nextVar();
+    if (params != null && params.getName() == "$ctx")
+      params = params.nextVar();
     if (params != null && params.getName() == "argsArray")
       {
-        if (toArray)
-          {
-            popParams (code, params, 1);
-            return;
-          }
+	if (toArray)
+	  {
+	    popParams (code, params, 1);
+	    return;
+	  }
         params = params.nextVar();
       }
     popParams (code, params, lexp.min_args);

@@ -254,12 +254,14 @@ public class ClassExp extends LambdaExp
    * If a method is found, don't search super-interfaces, as the found method
    * is more specific and overrides any that might in super-interfaces.
    */
-  void getImplMethods(ClassType interfaceType,
-		      String mname, Type[] paramTypes, Vector vec)
+  static void getImplMethods(ClassType interfaceType,
+			     String mname, Type[] paramTypes, Vector vec)
   {
     ClassType implType;
-    if (type instanceof PairClassType)
+    if (interfaceType instanceof PairClassType)
       implType = ((PairClassType) interfaceType).instanceType;
+    else if (! interfaceType.isInterface())
+      return;
     else
       {
 	String implTypeName = interfaceType.getName() + "$class";
@@ -300,7 +302,7 @@ public class ClassExp extends LambdaExp
 	comp.curLambda = this;
 
 	allocFrame(comp);
-	if (getNeedsStaticLink() && saveLambda.heapFrameLambda != this)
+	if (getNeedsStaticLink())
 	  {
             Variable parentFrame = saveLambda.heapFrame != null
               ? saveLambda.heapFrame

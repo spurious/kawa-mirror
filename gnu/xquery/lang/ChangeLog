@@ -1,3 +1,9 @@
+2003-10-09  Per Bothner  <per@bothner.com>
+
+	* XQParser.java	(parseFLWRExpression/3):  Inline into single caller.
+	(parseFunctionDefinition):  make function static only if module is.
+	* XQuery.java (parse, parseFile):  Revert change making modules static.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (peekOperator):  Handle ValueComp operators 'eq' ...

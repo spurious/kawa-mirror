@@ -2367,10 +2367,20 @@ public class XQParser extends LispReader // should be extends Lexer
     return true;
   }
 
-  public Expression parseFLWRExpression (boolean isFor,
-					 String name, char saveNesting)
+  /** Parse a let- or a for-expression.
+   * Assume the 'let'/'for'-token has been seen, and we've read '$'. */
+  public Expression parseFLWRExpression (boolean isFor)
       throws java.io.IOException, SyntaxException
   {
+    char saveNesting = pushNesting(isFor ? 'f' : 'l');
+    getRawToken();
+    String name;
+    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+      name = new String(tokenBuffer, 0, tokenBufferLength).intern();
+    else
+      return syntaxError("missing Variable token:"+curToken);
+    getRawToken();
+    
     ScopeExp sc;
     Expression[] inits = new Expression[1];
     String posVar = null;
@@ -2487,23 +2497,6 @@ public class XQParser extends LispReader // should be extends Lexer
 
   }
 
-  /** Parse a let- or a for-expression.
-   * Assume the 'let'/'for'-token has been seen, and we've read '$'. */
-  public Expression parseFLWRExpression (boolean isFor)
-      throws java.io.IOException, SyntaxException
-  {
-    char saveNesting = pushNesting(isFor ? 'f' : 'l');
-    getRawToken();
-    String name;
-    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
-      name = new String(tokenBuffer, 0, tokenBufferLength).intern();
-    else
-      return syntaxError("missing Variable token:"+curToken);
-    getRawToken();
-    
-    return parseFLWRExpression(isFor, name, saveNesting);
-  }
-
   public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
@@ -2543,7 +2536,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	decl.setFlag(Declaration.PRIVATE_SPECIFIED);
 	decl.setPrivate(true);
       }
-    decl.setFlag(Declaration.STATIC_SPECIFIED);
+    if (parser.getModule().isStatic())
+      decl.setFlag(Declaration.STATIC_SPECIFIED);
     parser.push(decl);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
@@ -2783,7 +2777,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else if (curToken != ';')
 	  parseSeparator();
-	ModuleExp module = parser.getModule();
+ 	ModuleExp module = parser.getModule();
 	Vector forms = new Vector();
 	Type type = gnu.expr.Interpreter.string2Type(uri);
 	kawa.standard.require.importDefinitions(type, uri, forms, module, parser);

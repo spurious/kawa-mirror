@@ -64,7 +64,6 @@ public class XQuery extends Interpreter
     gnu.text.SourceMessages messages = lexer.getMessages();
     Compilation tr = new Compilation(messages);
     ModuleExp mexp = new ModuleExp();
-    mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
     tr.push(mexp);
     tr.mustCompileHere();
     tr.immediate = true;
@@ -86,7 +85,6 @@ public class XQuery extends Interpreter
     Compilation tr = new Compilation(messages);
     tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
-    mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
     mexp.setFile(port.getName());
     tr.push(mexp);
     XQParser lexer = (XQParser) getLexer(port, messages);

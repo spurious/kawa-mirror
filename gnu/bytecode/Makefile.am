@@ -29,7 +29,6 @@ Type.java \
 Variable.java \
 VarEnumerator.java \
 ZipArchive.java \
-ZipMember.java \
 ZipLoader.java \
 ArrayClassLoader.java \
 ClassFileInput.java \

@@ -1,3 +1,12 @@
+2003-10-09  Per Bothner  <per@bothner.com>
+
+	* ZipArchive.java:  Remove all fields and non-static methods,
+	leaving only main and usage/copy, which main uses.
+	There is no point any more, given the existence of java.util.zip.
+	(main):  Implement 'q' command using ZipOutputStream and ZipEntry.
+	* ZipMember.java:  Remove file.  No longer used.
+	* Makefile.am:  Update accordingly.
+
 2003-09-30  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitWithCleanupStart, emitWithCleanupCatch,

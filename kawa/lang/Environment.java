@@ -10,6 +10,8 @@ public class Environment // extends [almost] java.util.Dictionary
 {
   private Binding[] table;
 
+  private static Environment global;
+
   Environment previous;
 
   int time_stamp;
@@ -59,18 +61,16 @@ public class Environment // extends [almost] java.util.Dictionary
     Thread thread = Thread.currentThread ();
     if (thread instanceof Future)
       return ((Future)thread).environment;
-    return kawa.standard.Scheme.curEnvironment ();
+    return global;
   }
 
   public static void setCurrent (Environment env)
   {
     Thread thread = Thread.currentThread ();
     if (thread instanceof Future)
-      {
-	((Future)thread).environment = env;
-      }
+      ((Future) thread).environment = env;
     else
-      kawa.standard.Scheme.setEnvironment (env);
+      global = env;
   }
 
   public Environment ()

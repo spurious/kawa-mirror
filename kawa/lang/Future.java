@@ -13,6 +13,13 @@ public class Future extends Thread
 
   Procedure0 action;
 
+  public Future (Procedure0 action, Environment environment)
+  {
+    this.action = action;
+    Thread parent_thread = Thread.currentThread();
+    this.environment = environment;
+  }
+
   public Future (Procedure0 action)
   {
     this.action = action;

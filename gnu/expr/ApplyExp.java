@@ -204,17 +204,14 @@ public class ApplyExp extends Expression
 	    int extraArg = 0;
 	    Type[] argTypes = method.getParameterTypes();
 	    // ?? Procedure.checkArgCount(this, args.length); // FIXME
-	    LambdaExp parent = func_lambda.outerLambda();
 	    if (! is_static || func_lambda.declareClosureEnv() != null)
 	      {
 		if (is_static)
 		  extraArg = 1;
 		if (comp.curLambda == func_lambda)
 		  code.emitLoad(func_lambda.closureEnv);  // Recursive call.
-		else if (parent.heapFrame != null || parent.closureEnv == null)
-		  parent.loadHeapFrame(comp);
 		else
-		  code.emitLoad(parent.closureEnv);
+		  func_lambda.outerLambda().loadHeapFrame(comp);
 	      }
 
 	    boolean varArgs = func_lambda.restArgType() != null;

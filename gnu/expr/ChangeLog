@@ -1,3 +1,9 @@
+2000-08-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  If direct method call needs closure,
+	just call loadHeapFrame on parent.  This is a simplification
+	which allows Dorai Sitaram pregexp package to work.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Add ".cl" extension for Common Lisp.

@@ -1,3 +1,7 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (syntaxError): Move here from Translator.
+
 2004-12-20  Per Bothner  <per@bothner.com>
 
 	* Keyword.java:  New extends Symbol.

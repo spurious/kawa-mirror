@@ -2222,6 +2222,17 @@ public class Compilation
 		   msg1 + decl.getName() + msg2);
   }
 
+  /**
+   * Handle syntax errors (at rewrite time).
+   * @param message an error message to print out
+   * @return an ErrorExp
+   */
+  public Expression syntaxError (String message)
+  {
+    error('e', message);
+    return new ErrorExp (message);
+  }
+
   public final String getFile() { return messages.getFile(); }
   public final int getLine() { return messages.getLine(); }
   public final int getColumn() { return messages.getColumn(); }

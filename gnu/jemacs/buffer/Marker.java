@@ -1,5 +1,6 @@
 package gnu.jemacs.buffer;
 import gnu.lists.*;
+import gnu.mapping.*;
 
 public final class Marker extends SeqPosition
 {
@@ -178,35 +179,41 @@ public final class Marker extends SeqPosition
   public int moveToColumn(int column, boolean force)
   { 
     int lineStart = buffer.lineStartOffset(getOffset());
-    BufferReader port
-      = new BufferReader(buffer, lineStart, buffer.maxDot() - lineStart);
+    InPort port = buffer.openReader(lineStart, buffer.maxDot() - lineStart);
     int resultColumn = 0;
-    int offset = lineStart;
-    for (;;)
+    try
       {
-	int ch = port.read();
-	if (ch < 0 || ch == '\n')
+	int offset = lineStart;
+	for (;;)
 	  {
-	    if (force)
+	    int ch = port.read();
+	    if (ch < 0 || ch == '\n')
 	      {
-		// FIXME
+		if (force)
+		  {
+		    // FIXME
+		  }
+		break;
 	      }
-	    break;
-	  }
-	int width = buffer.charWidth((char) ch, resultColumn);
-	offset++;
-	resultColumn += width;
-	if (resultColumn >= column)
-	  {
-	    if (resultColumn > column && force)
+	    int width = buffer.charWidth((char) ch, resultColumn);
+	    offset++;
+	    resultColumn += width;
+	    if (resultColumn >= column)
 	      {
-		// FIXME
+		if (resultColumn > column && force)
+		  {
+		    // FIXME
+		  }
+		break;
 	      }
-	    break;
 	  }
+	setDot(offset);
+	return resultColumn;
       }
-    setDot(offset);
-    return resultColumn;
+    catch (java.io.IOException ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public int forwardLine(int lines)

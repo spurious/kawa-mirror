@@ -1,5 +1,27 @@
 2002-03-24  Per Bothner  <per@bothner.com>
 
+	* BufferWriter.java:  Factor out Swing dependencies.
+	* EToolkit.java (getFace, setUnderlone, setBold, setForeground,
+	setBackground):  New abstract methods. 
+	* InputStreamHandler.java:  Remove unneeded import.
+	* Buffer.java (openReader):  New abstract method.
+	(currentColumn):  Use openReader method.
+	* Marker.java (moveToColumn):  Likewise.
+
+	* BufferContent.java:  Moved to gnu.buffer.swing.
+	* BufferReader.java:  Moved to gnu.buffer.swing.
+	* MarkerReader.java:  Moved to gnu.buffer.swing.
+
+	* ProcessMode.java (<clinit>):  Don't use setDefaultBinding.
+	Define enterAction for "\r" and "return".  
+
+	+ ReplBuffer.java:  Removed - use ReplMode instead.
+	* ReplMode.java:  New class - extends ProcessMode.
+	* emacs.scm:  Remove ReplBuffer stuff to use ReplMode instead.
+	* Makefile.am: Update accordingly.
+
+	* emacs.scm (window-pixel-height, window-pixel-widt):  Fix.
+
 	* BufferWriter.java (write1):  Handle '\t', and ignore (for now) '\r'.
 
 2002-03-19  Per Bothner  <per@bothner.com>

@@ -1,7 +1,6 @@
 package gnu.jemacs.buffer;
 import java.io.*;
 import gnu.mapping.*;
-import javax.swing.text.*;
 
 /** Insert input from an InputStream into a buffer.
  * This is typically output from an inferior process. */

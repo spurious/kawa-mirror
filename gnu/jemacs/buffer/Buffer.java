@@ -4,7 +4,7 @@
 package gnu.jemacs.buffer;
 import java.io.*;
 import java.awt.Color;
-import gnu.mapping.InPort;
+import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.Char;
 import gnu.commonlisp.lang.Symbol; // FIXME
@@ -372,17 +372,24 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   /** Return the column number at a specified offset. */
   public int currentColumn(int offset)
   {
-    int lineStart = lineStartOffset(offset);
-    BufferReader port = new BufferReader(this, lineStart, offset - lineStart);
-    int column = 0;
-    while (port.read() >= 0)
+    try
       {
-	// Subtract one from pos, to undo the read we just did.
-	int start = port.pos - 1;
-	column = countColumns(port.buffer, start, port.limit - start, column);
-	port.pos = port.limit;
+	int lineStart = lineStartOffset(offset);
+	InPort port = openReader(lineStart, offset - lineStart);
+	int column = 0;
+	while (port.read() >= 0)
+	  {
+	    // Subtract one from pos, to undo the read we just did.
+	    int start = port.pos - 1;
+	    column = countColumns(port.buffer, start, port.limit - start, column);
+	    port.pos = port.limit;
+	  }
+	return column;
       }
-    return column;
+    catch (java.io.IOException ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public int moveToColumn(int column, boolean force)
@@ -495,6 +502,8 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
         localKeymap = map;
       }
   }
+
+  public abstract InPort openReader (int start, int count);
 
   public abstract long savePointMark ();
 

@@ -1,16 +1,13 @@
 package gnu.jemacs.buffer;
 import java.awt.Color;
-import javax.swing.*; // FIXME
-import javax.swing.text.*;  // FIXME
-import gnu.jemacs.swing.SwingBuffer;  // FIXME
 
 /** A Writer that writes at a Buffer's point or a Marker. */
 
 public class BufferWriter extends java.io.Writer implements Runnable
 {
   Marker marker;
-  Style style;
-  Style stylePlain;
+  Object style;
+  Object stylePlain;
   boolean adjustPoint;
 
   /** We are not handling escape sequences. */
@@ -39,7 +36,8 @@ public class BufferWriter extends java.io.Writer implements Runnable
   public BufferWriter (Marker marker, boolean adjustPoint)
   {
     this.marker = marker;
-    this.stylePlain = ((SwingBuffer) marker.buffer).styles.addStyle("output", null);
+    EToolkit toolkit = EToolkit.getInstance();
+    this.stylePlain = toolkit.getFace("output", true);
     this.style = stylePlain;
     this.adjustPoint = adjustPoint;
     // StyleConstants.setItalic(this.style, true);
@@ -105,18 +103,17 @@ public class BufferWriter extends java.io.Writer implements Runnable
       }
     styleNameBuf.setLength(slen-1); // Remove final comma.
     styleName = styleNameBuf.toString();
-    style = ((SwingBuffer) marker.buffer).styles.getStyle(styleName);
+    EToolkit toolkit = EToolkit.getInstance();
+    style = toolkit.getFace(styleName, false);
     if (style != null)
       return;
-    style = ((SwingBuffer) marker.buffer).styles.addStyle(styleName, null);
-    if (underline)
-      StyleConstants.setUnderline(style, true);
-    if (bold)
-      StyleConstants.setBold(style, true);
+    style = toolkit.getFace(styleName, true);
+    toolkit.setUnderline(style, underline);
+    toolkit.setBold(style, bold);
     if (foreground != null)
-      StyleConstants.setForeground(style, foreground);
+      toolkit.setForeground(style, foreground);
     if (background != null)
-      StyleConstants.setBackground(style, background);
+      toolkit.setBackground(style, background);
   }
 
   private String name;
@@ -282,14 +279,7 @@ public class BufferWriter extends java.io.Writer implements Runnable
   {
     int save = marker.getOffset();
     moveColumns(count);
-    try
-      {
-	((SwingBuffer) marker.buffer).doc.remove(save, marker.getOffset() - save);
-      }
-    catch (javax.swing.text.BadLocationException ex)
-      {
-        throw new Error("bad location: "+ex);
-      }
+    marker.removeChar(marker.getOffset() - save);
   }
 
   /** Move some number of columns right (or left if count < 0). */
@@ -322,7 +312,6 @@ public class BufferWriter extends java.io.Writer implements Runnable
       unTabifyRestOfLine();
     else
       removeChars(len);
-    AbstractDocument document = ((SwingBuffer) marker.buffer).doc;
     boolean mustAdjustPoint
       = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert(new String(data, off, len), style);

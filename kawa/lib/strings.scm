@@ -14,28 +14,45 @@
   (invoke string 'charAt k))
 
 (define (string-set! (string :: <abstract-string>) (k <int>) (char <char>))
+  :: <void>
   (invoke string 'setCharAt k char))
 
-(define (substring (str <string>) (start <int>) (end <int>))
-  ((primitive-virtual-method <string> "copy" <string> (<int> <int>))
-   str start end))
+(define (substring (str <abstract-string>) (start <int>) (end <int>))
+  (make <string> str start (- end start)))
+
+(define (string->list (str :: <abstract-string>)) :: <list>
+  (let loop ((result :: <list> '())
+	     (i :: <int> (string-length str)))
+    (set! i (- i 1))
+    (if (< i 0)
+	result
+	(loop (cons (string-ref str i) result) i))))
+
+(define (list->string (list :: <list>)) :: <string>
+  (let* ((len :: <int> (length list))
+	 (result :: <string> (make <string> len)))
+    (do ((i :: <int> 0 (+ i 1)))
+	((>= i len) result)
+      (let ((pair :: <pair> list))
+	(string-set! result i (car pair))
+	(set! list (cdr pair))))))
 
 (define (string-copy (str <abstract-string>))
-  (invoke str 'copy))
+  (make <string> str))
 
 (define (string-fill! (str <abstract-string>) (ch <char>))
   (invoke str 'fill ch))
 
 (define (string-upcase! (str :: <abstract-string>))
-  (invoke str 'makeUpperCase)
+  (invoke-static <gnu.lists.Strings> 'makeUpperCase str)
   str)
 
 (define (string-downcase! (str :: <abstract-string>))
-  (invoke str 'makeLowerCase)
+  (invoke-static <gnu.lists.Strings> 'makeLowerCase str)
   str)
 
 (define (string-capitalize! (str :: <abstract-string>))
-  (invoke str 'makeCapitalize)
+  (invoke-static <gnu.lists.Strings> 'makeCapitalize str)
   str)
 
 (define (string-upcase (str :: <abstract-string>))

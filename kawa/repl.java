@@ -5,7 +5,7 @@ import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 

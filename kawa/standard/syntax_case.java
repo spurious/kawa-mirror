@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.math.IntNum;

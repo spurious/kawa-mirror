@@ -1,3 +1,14 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* lists.scm (list-tail, list-ref, list?):  New procedures.
+	* numbers.scm (exact?, inexact?, number->string):  New procedures.
+	* ports.scm (open-input-string, call-with-input-string):  Re-written,
+	since strings no longer implement open method.
+	* strings.scm (string->list, list->string):  New procedures.
+	* vectors.scm (vector):  New procedure.
+	* uniform,scm, vectors.scm, strings.scm:  Various updates due to
+	change to using new gnu.lists package.
+
 2000-12-13  Per Bothner  <per@bothner.com>
 
 	* lists.scm (reverse, reverse!):  New procedures.

@@ -2,7 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.kawa.functions.Setter;
 

@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 import gnu.text.Char;
 import gnu.mapping.*;
 

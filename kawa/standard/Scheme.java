@@ -46,7 +46,7 @@ public class Scheme extends Interpreter
 
   protected void define_field (String name, String cname)
   {
-    StaticFieldConstraint.define(environ, name, cname, name);
+    StaticFieldConstraint.define(environ, name, cname, Compilation.mangleName(name));
   }
 
   /* Define a Syntax to be autoloaded. */
@@ -203,14 +203,14 @@ public class Scheme extends Interpreter
       define_proc ("cdddar", "kawa.standard.cxr");
       define_proc ("cddddr", "kawa.standard.cxr");
       define_proc ("null?", "kawa.lib.lists");
-      define_proc ("list?", "kawa.standard.list_p");
+      define_field("list?", "kawa.lib.lists");
       define_field("list", "gnu.kawa.functions.MakeList");
       define_proc ("length", "kawa.lib.lists");
       define_proc ("append", "kawa.standard.append");
       define_proc ("reverse", "kawa.lib.lists");
       define_proc ("reverse!", "kawa.lib.lists");  // Not R5RS.
-      define_proc ("list-tail", "kawa.standard.list_tail");
-      define_proc ("list-ref", "kawa.standard.list_ref");
+      define_field("list-tail", "kawa.lib.lists");
+      define_field("list-ref", "kawa.lib.lists");
 
       define_field("memq", "kawa.standard.Scheme");
       define_field("memv", "kawa.standard.Scheme");
@@ -232,8 +232,8 @@ public class Scheme extends Interpreter
       define_proc ("real?", "kawa.lib.numbers");
       define_proc ("rational?", "kawa.lib.numbers");
       define_proc ("integer?", "kawa.standard.integer_p");
-      define_proc ("exact?", "kawa.standard.exact_p");
-      define_proc ("inexact?", "kawa.standard.inexact_p");
+      define_field("exact?", "kawa.lib.numbers");
+      define_field("inexact?", "kawa.lib.numbers");
       define_proc ("=", NumberCompare.$Eq);
       define_proc ("<", NumberCompare.$Ls);
       define_proc (">", NumberCompare.$Gr);
@@ -281,7 +281,7 @@ public class Scheme extends Interpreter
       define_proc ("angle", "kawa.lib.numbers");
       define_proc ("exact->inexact", "kawa.standard.exact2inexact");
       define_proc ("inexact->exact", "kawa.standard.inexact2exact");
-      define_proc ("number->string", "kawa.standard.number2string");
+      define_proc ("number->string", "kawa.lib.numbers");
       define_proc ("string->number", "kawa.standard.string2number");
 
       //-- Section 6.6  -- complete
@@ -328,8 +328,8 @@ public class Scheme extends Interpreter
 
       define_proc ("substring", "kawa.lib.strings");
       define_proc ("string-append", "kawa.standard.string_append");
-      define_proc ("string->list", "kawa.standard.string2list");
-      define_proc ("list->string", "kawa.standard.list2string");
+      define_field("string->list", "kawa.lib.strings");
+      define_field("list->string", "kawa.lib.strings");
       define_proc ("string-copy", "kawa.lib.strings");
       define_proc ("string-fill!", "kawa.lib.strings");
 
@@ -341,7 +341,7 @@ public class Scheme extends Interpreter
       define_proc ("vector-ref", "kawa.lib.vectors");
       define_proc ("vector-set!", "kawa.lib.vectors");
       define_proc ("list->vector", "kawa.lib.vectors");
-      define_proc ("vector->list", "kawa.standard.vector2list");
+      define_field("vector->list", "kawa.lib.vectors");
       define_proc ("vector-fill!", "kawa.lib.vectors");
       // Extension:
       define_proc ("vector-append", "kawa.standard.vector_append");
@@ -832,12 +832,12 @@ public class Scheme extends Interpreter
 	types.put ("integer", ClassType.make("gnu.math.IntNum"));
 	types.put ("symbol", ClassType.make("java.lang.String"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
-	types.put ("list", ClassType.make("gnu.kawa.util.LList"));
-	types.put ("pair", ClassType.make("gnu.kawa.util.Pair"));
-	types.put ("string", ClassType.make("gnu.kawa.util.FString"));
-	types.put ("abstract-string", ClassType.make("gnu.kawa.util.AbstractString"));
+	types.put ("list", ClassType.make("gnu.lists.LList"));
+	types.put ("pair", ClassType.make("gnu.lists.Pair"));
+	types.put ("string", ClassType.make("gnu.lists.FString"));
+	types.put ("abstract-string", ClassType.make("gnu.lists.CharSequence"));
 	types.put ("character", ClassType.make("gnu.text.Char"));
-	types.put ("vector", ClassType.make("gnu.kawa.util.FVector"));
+	types.put ("vector", ClassType.make("gnu.lists.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("procedure", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
@@ -848,17 +848,17 @@ public class Scheme extends Interpreter
 	types.put ("type", ClassType.make("gnu.bytecode.Type"));
 	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
 
-        types.put ("s8vector", ClassType.make("gnu.kawa.util.S8Vector"));
-        types.put ("u8vector", ClassType.make("gnu.kawa.util.U8Vector"));
-        types.put ("s16vector", ClassType.make("gnu.kawa.util.S16Vector"));
-        types.put ("u16vector", ClassType.make("gnu.kawa.util.U16Vector"));
-        types.put ("s32vector", ClassType.make("gnu.kawa.util.S32Vector"));
-        types.put ("u32vector", ClassType.make("gnu.kawa.util.U32Vector"));
-        types.put ("s64vector", ClassType.make("gnu.kawa.util.S64Vector"));
-        types.put ("u64vector", ClassType.make("gnu.kawa.util.U64Vector"));
-        types.put ("f32vector", ClassType.make("gnu.kawa.util.F32Vector"));
-        types.put ("f64vector", ClassType.make("gnu.kawa.util.F64Vector"));
-        types.put ("document", ClassType.make("gnu.kawa.util.TreeList"));
+        types.put ("s8vector", ClassType.make("gnu.lists.S8Vector"));
+        types.put ("u8vector", ClassType.make("gnu.lists.U8Vector"));
+        types.put ("s16vector", ClassType.make("gnu.lists.S16Vector"));
+        types.put ("u16vector", ClassType.make("gnu.lists.U16Vector"));
+        types.put ("s32vector", ClassType.make("gnu.lists.S32Vector"));
+        types.put ("u32vector", ClassType.make("gnu.lists.U32Vector"));
+        types.put ("s64vector", ClassType.make("gnu.lists.S64Vector"));
+        types.put ("u64vector", ClassType.make("gnu.lists.U64Vector"));
+        types.put ("f32vector", ClassType.make("gnu.lists.F32Vector"));
+        types.put ("f64vector", ClassType.make("gnu.lists.F64Vector"));
+        types.put ("document", ClassType.make("gnu.lists.TreeList"));
       }
     Type type = (Type) types.get(name);
     if (type == null && name.startsWith("elisp:"))

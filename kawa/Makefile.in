@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -103,6 +104,8 @@ ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 TO_TOPDIR = $(top_builddir)
 GCJ_DEPS = $(java_JAVA)
 
+CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
+
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
@@ -126,8 +129,6 @@ java_JAVA = Shell.java repl.java Version.java \
 
 
 EXTRA_JAVA = $(java_WITH_AWT)
-
-CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
 SOURCES = $(java_JAVA) Version.java.in kawa.c
 
 PACKAGE_FNAME = kawa-repl

@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.lang.Error;  // To work around case-fold bug in some compilers.
 import gnu.mapping.*;
 
@@ -23,10 +23,10 @@ public class vector_append extends ProcedureN
       {
 	Object arg = args[i];
 	if (arg instanceof FVector)
-	  length += ((FVector)arg).length();
+	  length += ((FVector)arg).size();
 	else
 	  {
-	    int n = LList.list_length (arg);
+	    int n = LList.listLength(arg, false);
 	    if (n < 0)
 	      throw new WrongType ("vector-append", i, "list or vector");
 	    length += n;
@@ -40,9 +40,9 @@ public class vector_append extends ProcedureN
 	if (arg instanceof FVector)
 	  {
 	    FVector vec = (FVector) arg;
-	    int vec_length = vec.length ();
+	    int vec_length = vec.size();
 	    for (int j = 0;  j < vec_length;  j++)
-	      result[position++] = vec.elementAt (j);
+	      result[position++] = vec.get(j);
 	  }
 	else if (arg instanceof Pair)
 	  {

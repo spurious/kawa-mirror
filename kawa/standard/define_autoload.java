@@ -4,7 +4,7 @@
 package kawa.standard;
 import gnu.expr.*;
 import kawa.lang.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.File;
 import gnu.mapping.*;
 import gnu.text.*;
@@ -29,7 +29,7 @@ public class define_autoload extends Syntax
       {
 	for (;;)
 	  {
-	    if (! (p.car instanceof gnu.kawa.util.FString))
+	    if (! (p.car instanceof FString))
 	      break;
 	    if (! scanFile(p.car.toString(), defs, tr))
 	      return false;

@@ -3,7 +3,7 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class define_syntax extends Syntax
 {

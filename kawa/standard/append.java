@@ -1,6 +1,6 @@
 package kawa.standard;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /**
  * Implement the Scheme standard function "append".

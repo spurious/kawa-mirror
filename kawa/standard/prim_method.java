@@ -4,7 +4,7 @@ import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 // OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
 // 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))
@@ -60,7 +60,7 @@ public class prim_method extends Syntax
       return tr.syntaxError ("missing/invalid parameter list in "+getName());
     LList argp = (LList) match[3];
 
-    int narg = argp.length();
+    int narg = argp.size();
     Type[] args = new Type[narg];
     for (int i = 0;  i < narg;  i++)
       {

@@ -2,7 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "fluid-let" primitive.

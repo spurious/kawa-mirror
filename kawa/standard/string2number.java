@@ -1,7 +1,7 @@
 package kawa.standard;
 import gnu.math.*;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.kawa.lispexpr.*;
 
 public class string2number extends Procedure1or2
@@ -11,9 +11,10 @@ public class string2number extends Procedure1or2
     try
       {
 	InPort iport;
+	/* FIXME
 	if (str instanceof FString)
 	  iport = ((FString) str).open();
-	else
+	  else */
 	  iport = new CharArrayInPort(str.toString());
 	ScmRead lexer = new ScmRead(iport);
 	Object result = lexer.readNumber(radix);

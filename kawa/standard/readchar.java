@@ -1,6 +1,6 @@
 package kawa.standard;
 import gnu.text.Char;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.Reader;
 import java.io.InputStream;
 import gnu.mapping.Procedure0or1;

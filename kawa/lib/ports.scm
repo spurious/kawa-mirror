@@ -26,9 +26,9 @@
   (invoke port 'writeSchemeObject ch #f))
 
 ;; SRFI-6
-(define (open-input-string string)
-  ((primitive-virtual-method <string> "open" <input-port> ())
-   string))
+(define (open-input-string (str :: <string>)) :: <input-port>
+  (make <gnu.mapping.CharArrayInPort>
+    (field str 'data) (field str 'size)))
 
 (define (open-output-string) <string-output-port>
   ((primitive-constructor  <string-output-port> ())))
@@ -39,10 +39,10 @@
                               <char[]> ())
     output-port)))
 
-(define (call-with-input-string str proc)
+(define (call-with-input-string (str :: <string>) proc)
   (let* ((port
-	  ((primitive-virtual-method <string> "open" <input-port> ())
-	   str))
+	  (make <gnu.mapping.CharArrayInPort>
+	    (field str 'data) (field str 'size)))
 	 (result (proc port)))
     (close-input-port port)
     result))

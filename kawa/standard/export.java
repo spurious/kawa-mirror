@@ -1,7 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class export extends Syntax
 {

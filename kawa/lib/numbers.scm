@@ -7,6 +7,12 @@
 (define (rational? x)  :: <boolean> (instance? x <rational>))
 ;;;(define (integer? x) ...)
 
+(define (exact? x) :: <boolean> 
+  (and (instance? x <number>) (invoke (as <number> x) 'isExact)))
+
+(define (inexact? x) :: <boolean>
+  (and (instance? x <number>) (not (invoke (as <number> x) 'isExact))))
+
 (define (zero? (x :: <number>)) :: <boolean> 
   ((primitive-virtual-method <number> "isZero" <boolean> ())
    x))
@@ -113,3 +119,8 @@
 
 (define (integer-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))
+
+(define (number->string arg #!optional (radix :: <int> 10))
+  (make <string>
+    ((primitive-virtual-method <number> 'toString <String> (<int>))
+     arg radix)))

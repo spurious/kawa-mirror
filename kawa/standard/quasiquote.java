@@ -2,7 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.kawa.reflect.Invoke;
 import gnu.bytecode.ClassType;
 
@@ -81,7 +81,7 @@ public class quasiquote extends Syntax implements Printable
     else if (template instanceof FVector)
       {
 	FVector vector = (FVector) template;
-	int n = vector.length ();
+	int n = vector.size();
 	Object[] buffer = new Object[n];
 	// For each element, the state is one of these four:
 	// 0: the expanded element is the same as the original
@@ -92,7 +92,7 @@ public class quasiquote extends Syntax implements Printable
 	byte max_state = 0;
 	for (int i = 0;  i < n; i++)
 	  {
-	    Object element = vector.elementAt (i);
+	    Object element = vector.get(i);
 	    int element_depth = depth;
 	    Pair pair;
 	    if (element instanceof Pair

@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.functions.IsEq;

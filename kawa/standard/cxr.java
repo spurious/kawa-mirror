@@ -2,7 +2,7 @@ package kawa.standard;
 import gnu.mapping.Procedure1;
 import gnu.mapping.HasSetter;
 import gnu.mapping.WrongType;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** Implement the standard Scheme procedures "c[ad]*r". */
 

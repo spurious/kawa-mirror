@@ -11,13 +11,8 @@ prim_method.java prim_throw.java throw_name.java \
 not.java \
 and_or.java \
 cxr.java \
-list_p.java \
 append.java \
-list_tail.java \
-list_ref.java \
 integer_p.java \
-exact_p.java \
-inexact_p.java \
 positive_p.java \
 max.java \
 min.java \
@@ -34,11 +29,8 @@ sqrt.java \
 expt.java \
 exact2inexact.java \
 inexact2exact.java \
-number2string.java \
 string2number.java \
 string_v.java \
-string2list.java \
-list2string.java \
 string_ci_equal_p.java \
 string_lessthan_p.java \
 string_lessequal_p.java \
@@ -49,7 +41,6 @@ string_ci_lessequal_p.java \
 string_ci_greaterthan_p.java \
 string_ci_greaterequal_p.java \
 string_append.java \
-vector2list.java \
 vector_append.java \
 force.java \
 call_with_input_file.java \

@@ -38,6 +38,15 @@
 	(let ((pair :: <pair> arg))
 	  (loop (cdr pair) (cons (car pair) result))))))
 
+(define (list-tail list (count :: <int>))
+  (invoke-static <list> 'listTail list count))
+
+(define (list-ref list (index :: <int>))
+  (car (list-tail list index)))
+
+(define (list? obj) :: <boolean>
+  (>= (invoke-static <list> 'listLength obj #f) 0))
+
 ;; Not in R5RS, but is in Guile (with extra mystery argument).
 (define (reverse! (list :: <list>)) :: <list>
   (invoke-static <list> 'reverseInPlace list))

@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
 import gnu.text.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** Utility functions (static methods) for kawa.repl.
  * Should probably be merged with kawa.repl.  FIXME. */

@@ -1,7 +1,7 @@
 package kawa.standard;
 import gnu.expr.*;
 import kawa.lang.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.bytecode.*;
 import java.util.Vector;
 
@@ -36,7 +36,7 @@ public class object extends Syntax
                                      Translator tr)
   {
     tr.mustCompileHere();
-    int num_supers = LList.list_length (pair.car);
+    int num_supers = LList.listLength(pair.car, false);
     if (num_supers < 0)
       return tr.syntaxError("object superclass specification not a list");
     Expression[] supers = new Expression[num_supers];

@@ -1,5 +1,5 @@
 package kawa.standard;
-import gnu.kawa.util.FString;
+import gnu.lists.FString;
 import gnu.mapping.*;
              
 public class call_with_output_string extends Procedure1

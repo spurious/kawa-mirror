@@ -2,7 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** "define-variable" is like define, but ignored if variable already bound. */
 

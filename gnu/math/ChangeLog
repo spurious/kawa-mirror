@@ -1,3 +1,7 @@
+Sun May 24 12:50:43 1998  Per Bothner  <bothner@cygnus.com>
+
+	* *.java:  Renamed xxx_reversed methods to xxxReversed.
+
 Thu May 21 10:21:33 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntFraction (doubleValue):  Minor optimization and extra comment.

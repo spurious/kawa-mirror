@@ -113,11 +113,11 @@ public abstract class Quantity extends Numeric
   public int compare (Object obj)
   {
     if (! (obj instanceof Quantity))
-      return ((Numeric) obj).compare_reversed(this);
+      return ((Numeric) obj).compareReversed(this);
     return compare(this, (Quantity) obj);
   }
 
-  public int compare_reversed (Numeric x)
+  public int compareReversed (Numeric x)
   {
     if (x instanceof Quantity)
       return compare((Quantity)x, this);
@@ -143,10 +143,10 @@ public abstract class Quantity extends Numeric
   {
     if (y instanceof Quantity)
       return add (this, (Quantity) y, k);
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed (this, k);
   }
 
-  public Numeric add_reversed (Numeric x, int k)
+  public Numeric addReversed (Numeric x, int k)
   {
     if (x instanceof Quantity)
       return add ((Quantity)x, this, k);
@@ -165,10 +165,10 @@ public abstract class Quantity extends Numeric
   {
     if (y instanceof Quantity)
       return mul (this, (Quantity) y);
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed (this);
   }
 
-  public Numeric mul_reversed (Numeric x)
+  public Numeric mulReversed (Numeric x)
   {
     if (x instanceof Quantity)
       return mul ((Quantity)x, this);
@@ -186,10 +186,10 @@ public abstract class Quantity extends Numeric
   {
     if (y instanceof Quantity)
       return div (this, (Quantity) y);
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed (this);
   }
 
-  public Numeric div_reversed (Numeric x)
+  public Numeric divReversed (Numeric x)
   {
     if (x instanceof Quantity)
       return div ((Quantity)x, this);

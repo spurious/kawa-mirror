@@ -186,7 +186,7 @@ public class IntNum extends RatNum implements Compilable
       return compare (this, (IntNum) obj);
     if (! (obj instanceof RealNum))
       throw new IllegalArgumentException ();
-    return ((RealNum)obj).compare_reversed (this);
+    return ((RealNum)obj).compareReversed (this);
   }
 
   public final boolean isOdd ()
@@ -1329,7 +1329,7 @@ public class IntNum extends RatNum implements Compilable
       return IntNum.add (this, (IntNum) y, k);
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed (this, k);
   }
 
   public Numeric mul (Object y)
@@ -1338,7 +1338,7 @@ public class IntNum extends RatNum implements Compilable
       return IntNum.times (this, (IntNum) y);
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed (this);
   }
 
   public Numeric div (Object y)
@@ -1351,7 +1351,7 @@ public class IntNum extends RatNum implements Compilable
       }
     if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed (this);
   }
 
   /** Copy the abolute value of this into an array of words.

@@ -57,10 +57,10 @@ public class DQuantity extends Quantity
       return new DQuantity (factor + k * ((RealNum)y).doubleValue (), unit());
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed(this, k);
   }
 
-  public Numeric add_reversed (Numeric x, int k)
+  public Numeric addReversed (Numeric x, int k)
   {
     if (dimensions() == Dimensions.Empty && x instanceof RealNum)
       return new DFloNum (((RealNum)x).doubleValue () + k * factor);
@@ -75,10 +75,10 @@ public class DQuantity extends Quantity
       return new DQuantity (factor * ((RealNum)y).doubleValue (), unit());
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed(this);
   }
 
-  public Numeric mul_reversed (Numeric x)
+  public Numeric mulReversed (Numeric x)
   {
     if (x instanceof RealNum)
       return new DQuantity (((RealNum)x).doubleValue () * factor, unit());
@@ -99,10 +99,10 @@ public class DQuantity extends Quantity
       return new DQuantity (factor / ((RealNum)y).doubleValue (), unit());
     if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed(this);
   }
 
-  public Numeric div_reversed (Numeric x)
+  public Numeric divReversed (Numeric x)
   {
     if (x instanceof RealNum)
       return new DQuantity (((RealNum)x).doubleValue () / factor,

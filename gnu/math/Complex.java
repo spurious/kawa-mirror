@@ -109,7 +109,7 @@ public abstract class Complex extends Quantity
   public int compare (Object obj)
   {
     if (! (obj instanceof Complex))
-      return ((Numeric) obj).compare_reversed(this);
+      return ((Numeric) obj).compareReversed(this);
     return compare(this, (Complex) obj);
   }
 
@@ -159,10 +159,10 @@ public abstract class Complex extends Quantity
   {
     if (y instanceof Complex)
       return add (this, (Complex) y, k);
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed(this, k);
   }
 
-  public Numeric add_reversed (Numeric x, int k)
+  public Numeric addReversed (Numeric x, int k)
   {
     if (x instanceof Complex)
       return add ((Complex)x, this, k);
@@ -185,10 +185,10 @@ public abstract class Complex extends Quantity
   {
     if (y instanceof Complex)
       return mul (this, (Complex) y);
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed(this);
   }
 
-  public Numeric mul_reversed (Numeric x)
+  public Numeric mulReversed (Numeric x)
   {
     if (x instanceof Complex)
       return mul ((Complex)x, this);
@@ -219,10 +219,10 @@ public abstract class Complex extends Quantity
   {
     if (y instanceof Complex)
       return div (this, (Complex) y);
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed(this);
   }
 
-  public Numeric div_reversed (Numeric x)
+  public Numeric divReversed (Numeric x)
   {
     if (x instanceof Complex)
       return div ((Complex)x, this);

@@ -32,10 +32,10 @@ public class IntFraction extends RatNum
       return RatNum.compare (this, (RatNum) obj);
     if (! (obj instanceof RealNum))
       throw new IllegalArgumentException ();
-    return ((RealNum)obj).compare_reversed (this);
+    return ((RealNum)obj).compareReversed(this);
   }
 
-  public int compare_reversed (Numeric x)
+  public int compareReversed (Numeric x)
   {
     if (!(x instanceof RatNum))
       throw new IllegalArgumentException ();
@@ -48,10 +48,10 @@ public class IntFraction extends RatNum
       return RatNum.add (this, (RatNum) y, k);
     if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed(this, k);
   }
 
-  public Numeric add_reversed (Numeric x, int k)
+  public Numeric addReversed (Numeric x, int k)
   {
     if (! (x instanceof RatNum))
       throw new IllegalArgumentException ();
@@ -64,10 +64,10 @@ public class IntFraction extends RatNum
       return RatNum.times (this, (RatNum)y);
     if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed(this);
   }
 
-  public Numeric mul_reversed (Numeric x)
+  public Numeric mulReversed (Numeric x)
   {
     if (! (x instanceof RatNum))
       throw new IllegalArgumentException ();
@@ -80,10 +80,10 @@ public class IntFraction extends RatNum
       return RatNum.divide (this, (RatNum)y);
     if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed(this);
   }
 
-  public Numeric div_reversed (Numeric x)
+  public Numeric divReversed (Numeric x)
   {
     if (! (x instanceof RatNum))
       throw new IllegalArgumentException ();

@@ -106,7 +106,7 @@ public class DComplex extends Complex
 	return new DComplex (real + k * yc.reValue(),
 			     imag + k * yc.imValue());
       }
-    return ((Numeric)y).add_reversed (this, k);
+    return ((Numeric)y).addReversed(this, k);
   }
 
   public Numeric mul (Object y)
@@ -123,7 +123,7 @@ public class DComplex extends Complex
 	  }
 	return Complex.mul (this, yc);
       }
-    return ((Numeric)y).mul_reversed (this);
+    return ((Numeric)y).mulReversed(this);
   }
 
   public Numeric div (Object y)
@@ -134,7 +134,7 @@ public class DComplex extends Complex
 	return div (real, imag,
 		    yc.doubleValue(), yc.doubleImagValue());
       }
-    return ((Numeric)y).div_reversed (this);
+    return ((Numeric)y).divReversed(this);
   }
 
   public static DComplex power (double x_re, double x_im,

@@ -44,7 +44,7 @@ public abstract class Numeric extends java.lang.Number
     return -3;
   }
 
-  public int compare_reversed (Numeric x)
+  public int compareReversed (Numeric x)
   {
     throw new IllegalArgumentException ();
   }
@@ -67,17 +67,17 @@ public abstract class Numeric extends java.lang.Number
   }
 
   /** Calculate x+k&this. */
-  public Numeric add_reversed (Numeric x, int k)
+  public Numeric addReversed (Numeric x, int k)
   {
     throw new IllegalArgumentException ();
   }
 
-  public Numeric mul_reversed (Numeric x)
+  public Numeric mulReversed (Numeric x)
   {
     throw new IllegalArgumentException ();
   }
 
-  public Numeric div_reversed (Numeric x)
+  public Numeric divReversed (Numeric x)
   {
     throw new IllegalArgumentException ();
   }

@@ -43,10 +43,10 @@ public class Scheme extends Interpreter
     define (name, new AutoloadSyntax (name, className));
   }
 
-  static Environment null_environment;
-  static Environment r4_environment;
-  static Environment r5_environment;
-  protected static Environment kawa_environment;
+  public static Environment nullEnvironment;
+  static Environment r4Environment;
+  static Environment r5Environment;
+  protected static Environment kawaEnvironment;
 
   public static SpecialType byteType
     = new SpecialType ("byte", "B", 1, java.lang.Byte.TYPE);
@@ -72,16 +72,16 @@ public class Scheme extends Interpreter
 
   public static Scheme getInstance()
   {
-    if (kawa_environment == null)
+    if (kawaEnvironment == null)
       new Scheme ();
     return instance;
   }
 
   public static synchronized Environment builtin ()
   {
-    if (kawa_environment == null)
+    if (kawaEnvironment == null)
       new Scheme ();
-    return kawa_environment;
+    return kawaEnvironment;
   }
 
   public void initScheme ()
@@ -94,9 +94,9 @@ public class Scheme extends Interpreter
       Procedure2 equal;
 
       // (null-environment)
-      null_environment = new Environment ();
-      null_environment.setName ("null-environment");
-      environ = null_environment;
+      nullEnvironment = new Environment ();
+      nullEnvironment.setName ("null-environment");
+      environ = nullEnvironment;
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new Quote ());
@@ -109,7 +109,7 @@ public class Scheme extends Interpreter
       define_syntax ("cond", "kawa.lib.std_syntax");
       define_syntax ("case", "kawa.lib.std_syntax");
       define_syntax ("and", "kawa.lib.std_syntax");
-      define ("or", new kawa.standard.and_or (false));
+      define ("or", new kawa.standard.and_or (false, this));
       define_syntax ("%let", "kawa.standard.let");
       define_syntax ("let", "kawa.lib.std_syntax");
       define_syntax ("%let-decl", "kawa.lib.std_syntax");
@@ -133,12 +133,12 @@ public class Scheme extends Interpreter
       define ("let-syntax", new kawa.standard.let_syntax (false));
       define ("letrec-syntax", new kawa.standard.let_syntax (true));
 
-      r4_environment = new Environment (null_environment);
-      r4_environment.setName ("r4rs-environment");
-      environ = r4_environment;
+      r4Environment = new Environment (nullEnvironment);
+      r4Environment.setName ("r4rs-environment");
+      environ = r4Environment;
 
       //-- Section 6.1  -- complete
-      define_proc ("not", new kawa.standard.not());
+      define_proc ("not", new kawa.standard.not(this));
       define_proc ("boolean?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
@@ -394,9 +394,9 @@ public class Scheme extends Interpreter
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
-      r5_environment = new Environment (r4_environment);
-      r5_environment.setName ("r5rs-environment");
-      environ = r5_environment;
+      r5Environment = new Environment (r4Environment);
+      r5Environment.setName ("r5rs-environment");
+      environ = r5Environment;
       define_proc ("values", "kawa.lib.misc");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_proc ("eval", "kawa.lang.Eval");
@@ -406,8 +406,8 @@ public class Scheme extends Interpreter
       define_proc ("interaction-environment", "kawa.lib.misc");
       define_proc ("dynamic-wind", "kawa.lib.syntax");
 
-      kawa_environment = new Environment (r5_environment);
-      environ = kawa_environment;
+      kawaEnvironment = new Environment (r5Environment);
+      environ = kawaEnvironment;
 
       define_proc ("exit", "kawa.lib.thread");
 
@@ -635,9 +635,9 @@ public class Scheme extends Interpreter
 
   public Scheme ()
   {
-    if (kawa_environment == null)
+    if (kawaEnvironment == null)
       initScheme();
-    environ = new ScmEnv (kawa_environment);
+    environ = new ScmEnv (kawaEnvironment);
     environ.setName ("interaction-environment."+(++scheme_counter));
     if (instance == null)
       instance = this;
@@ -648,11 +648,16 @@ public class Scheme extends Interpreter
     this.environ = environ;
   }
 
+  public String getName()
+  {
+    return "Scheme";
+  }
+
   public Environment getNewEnvironment ()
   {
-    if (kawa_environment == null)
+    if (kawaEnvironment == null)
       initScheme();
-    Environment environ = new ScmEnv (kawa_environment);
+    Environment environ = new ScmEnv (kawaEnvironment);
     environ.setName ("interaction-environment."+(++scheme_counter));
     return environ;
   }

@@ -11,9 +11,9 @@ public class scheme_env extends Procedure1
   {
     int version = IntNum.intValue (arg1);
     if (version == 5)
-      return Scheme.r5_environment;
+      return Scheme.r5Environment;
     if (version == 4)
-      return Scheme.r4_environment;
+      return Scheme.r4Environment;
     throw new GenericError ("scheme-report-environment version must be 4 or 5");
   }
 }

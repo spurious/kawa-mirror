@@ -315,23 +315,16 @@ public class Lambda extends Syntax implements Printable
 	if (len > 1 && (sawColons || exps[0] instanceof ReferenceExp))
 	  {
 	    Expression rexp = exps[0];
-	    gnu.bytecode.Type rtype = tr.getInterpreter().getTypeFor(rexp);
-	    if (rtype != null)
+	    len--;
+	    if (len == 1)
+	      lexp.body = exps[1];
+	    else
 	      {
-                len--;
-                Expression value;
-                if (len == 1)
-                  value = exps[1];
-                else
-                  {
-                    Expression[] new_body = new Expression[len];
-                    System.arraycopy(exps, 1, new_body, 0, len);
-                    value = new BeginExp(new_body);
-                  }
-                lexp.body = Convert.makeCoercion(value, rexp);
-		lexp.body.setLine(bexp);
-		lexp.setReturnType(rtype);
+		Expression[] new_body = new Expression[len];
+		System.arraycopy(exps, 1, new_body, 0, len);
+		lexp.body = new BeginExp(new_body);
 	      }
+	    Convert.setCoercedReturnValue(lexp, rexp, tr.getInterpreter());
 	  }
       }
     tr.pop(lexp);

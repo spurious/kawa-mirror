@@ -1,3 +1,8 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody):  Use new setCoercedReturnValue
+	helper method in Convert.
+
 2003-07-22  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add Makefiles in gnu/kawa/models

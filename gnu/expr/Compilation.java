@@ -996,11 +996,11 @@ public class Compilation
     if (zar_file.exists ())
       zar_file.delete ();
     ZipOutputStream zout;
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (makeJar)
       zout = new java.util.jar.JarOutputStream(new FileOutputStream(zar_file));
     else
-    /* END JAVA2 */
+    /* #endif */
       {
 	zout = new ZipOutputStream (new FileOutputStream (zar_file));
 	zout.setMethod(ZipOutputStream.STORED); // no compression

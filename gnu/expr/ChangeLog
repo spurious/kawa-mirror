@@ -1,3 +1,7 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* Compilation.java: Change "select" (preprocessor) syntax.
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): If immediate,make fields final and

@@ -182,7 +182,7 @@ implements XConsumer, PositionConsumer, Consumable
    * [length] 2 shorts.
    * [comment text], (length) number of characters.
    */
-  static final int PROCESSING_INSTRUCTION = 0xF114;
+  protected static final int PROCESSING_INSTRUCTION = 0xF114;
 
   /** A CDATA node follows.
    * [CDATA_SECTION]

@@ -1,5 +1,7 @@
 2004-05-20  Per Bothner  <per@bothner.com>
 
+	* TreeList.java (PROCESSING_INSTRUCTION):  Make protected.
+
 	* Sequence.java (CDATA_VALUE):  New constant.
 	* TreeList.java (getNextKind):  Return CDATA_VALUE if CDATA_SECTION.
 

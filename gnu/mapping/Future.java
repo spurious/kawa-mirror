@@ -11,8 +11,6 @@ public class Future extends Thread
   OutPort err;
   Throwable exception;
 
-  FluidBinding initBindings;
-
   Procedure action;
 
   public Future (Procedure action, Environment environment)
@@ -26,10 +24,10 @@ public class Future extends Thread
   {
     this.action = action;
     this.initEnvironment = environment;
+    ((SimpleEnvironment) environment).makeShared();
     this.in = in;
     this.out = out;
     this.err = err;
-    initBindings = getFluids();
   }
 
   public Future (Procedure action)
@@ -45,8 +43,7 @@ public class Future extends Thread
     try
       {
 	context = CallContext.getInstance();
-	context.fluidBindings = initBindings;
-	context.curEnvironment = initEnvironment;
+	context.curEnvironment = Environment.make(getName(), initEnvironment);
 	result = action.apply0 ();
       }
     catch (Throwable ex)
@@ -74,35 +71,11 @@ public class Future extends Thread
     return result;
   }
 
-  /**
-   * @deprecated
-   */
-  public final void setFluids (FluidBinding new_fluids)
-  {
-    context.setFluids(new_fluids);
-  }
-
-  /**
-   * @deprecated
-   */
-  public final void resetFluids (FluidBinding old_fluids)
-  {
-    context.resetFluids(old_fluids);
-  }
-
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append ("#<future ");
     buf.append(getName());
     buf.append(">");
     return buf.toString();
-  }
-
-  /** Get chain of FluidBindings for the current thread (if a Future).
-   * Should fix to work with other threads. */
-
-  public static FluidBinding getFluids()
-  {
-    return CallContext.getInstance().fluidBindings;
   }
 }

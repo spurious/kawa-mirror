@@ -333,44 +333,6 @@ public class CallContext // implements Runnable
     Values.writeValues(value, consumer);
   }
 
-  public FluidBinding fluidBindings;
-
-  public void setFluids (FluidBinding new_fluids)
-  {
-    FluidBinding old_fluids = fluidBindings;
-    FluidBinding fluid = new_fluids;
-    for ( ; fluid != old_fluids;  fluid = fluid.previous)
-      {
-	Symbol symbol = fluid.symbol;
-	synchronized (symbol)
-	  {
-	    Constraint constraint = symbol.constraint;
-	    if (constraint instanceof FluidConstraint)
-	      ((FluidConstraint) constraint).referenceCount++;
-	    else
-	      symbol.constraint = new FluidConstraint(constraint);
-	  }
-      }
-    fluidBindings = new_fluids;
-  }
-
-  public void resetFluids (FluidBinding old_fluids)
-  {
-    FluidBinding new_fluids = fluidBindings;
-    FluidBinding fluid = new_fluids;
-    for ( ; fluid != old_fluids;  fluid = fluid.previous)
-      {
-	Symbol symbol = fluid.symbol;
-	synchronized (symbol)
-	  {
-	    FluidConstraint constraint = (FluidConstraint) symbol.constraint;
-	    if (constraint.referenceCount-- <= 0)
-	      symbol.constraint = constraint.savedConstraint;
-	  }
-      }
-    fluidBindings = old_fluids;
-  }
-
   protected String baseUri;
   protected static String baseUriDefault;
 

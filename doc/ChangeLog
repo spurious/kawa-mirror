@@ -1,3 +1,9 @@
+Thu Nov 26 11:51:37 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi (Formals):  Describe parameter and return type specs.
+	(Field operations):  Describe field and static-field functions.
+	(Anonymous classes):  New node - describe object syntax.
+
 Sun Nov 15 21:34:01 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  In Windows example, use back-slashes.

@@ -10,23 +10,8 @@ import gnu.mapping.*;
  * @author	Per Bothner
  */
 
-public class ReferenceExp extends Expression
+public class ReferenceExp extends AccessExp
 {
-  Object symbol;
-  Declaration binding;
-  public String string_name () { return symbol.toString(); }
-
-  public final String getName()
-  {
-    return symbol instanceof Symbol ? ((Symbol) symbol).getName()
-      : symbol.toString();
-  }
-  public final Object getSymbol() { return symbol; }
-  /** If non-null, the local Declaration this refers to. */
-  public final Declaration getBinding() { return binding; }
-
-  public final void setBinding(Declaration decl) { binding = decl; }
-
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;

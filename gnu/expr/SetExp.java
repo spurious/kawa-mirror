@@ -10,26 +10,13 @@ import gnu.bytecode.*;
  * @author	Per Bothner
  */
 
-public class SetExp extends Expression
+public class SetExp extends AccessExp
 {
-  private int flags;
-
-  /** The name of the variable to set - either a String or a Symbol. */
-  Object symbol;
-  /** If non-null, the local Declaration this refers to. */
-  public Declaration binding;
   /** The new value to assign to the variable. */
   Expression new_value;
 
   public SetExp (Object symbol, Expression val)
   { this.symbol = symbol;  new_value = val; }
-
-  public final String getName()
-  {
-    return symbol instanceof Symbol ? ((Symbol) symbol).getName()
-      : symbol.toString();
-  }
-  public final Object getSymbol() { return symbol; }
 
   /** Get the Expression for calculating the new ("right-hand") value. */
   public final Expression getNewValue() { return new_value; }

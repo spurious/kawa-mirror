@@ -1,3 +1,13 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* AccessExp.java: New class, extends Expression.
+	* Makefile.am: Update accordingly.
+	* ReferenceExp.java (symbol, binding): Move fields to AccessExp.
+	(getName, getSymbol, getBinding, setBinding): Likewise.
+	* SetExp.java: Ditto.
+
+	* SetExp.java (flags): Remove private field - use inherited field.
+
 2005-02-11  Per Bothner  <per@bothner.com>
 
 	Any non-alias indirect field should use ThreadLocation for

@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  AccessExp.java \
   ApplyExp.java \
   BeginExp.java \
   BindingInitializer.java \

@@ -1,5 +1,7 @@
 BEFORE 1.8
-* implement fn:reverse
+* implement fn:reverse, fn:distinct-values
+* rename sublist to subsequence.  deprecate sublist, item-at
+* Should complain if user-defined function called with too many args.
 * Compilation: not implemented mustConvert restarg
 * XQuery distinguish qexo: kawa: fn: default function namespaces.
 * Implement/document external functions, variables.
@@ -11,6 +13,12 @@ BEFORE 1.8
 
 Optimize NumberCompare further.
 document eval methods
+
+BRL/KRL:
+* sitedefs.scm should be loaded
+* brl function should write to output, not be identity.
+The default output-pourt shold be re-directed.
+It should be the same as the ctx.consumer.
 
 BEFORE KAWA 1.8?
 * SRFI-9 (define-record-type) constructurs should not use reflection.

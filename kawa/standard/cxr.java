@@ -40,12 +40,13 @@ public class cxr extends Procedure1
   {
     if (count == 0)
       program (name().toString ());
-    for (int i = count;  --count >= 0;  mask >>= 1)
+    int m = mask;
+    for (int i = count;  --i >= 0;  m >>= 1)
       {
 	if (! (arg1 instanceof Pair) )
 	    throw new kawa.lang.WrongType(this.name (), 1, "list");
 	Pair pair = (Pair) arg1;
-	arg1 = (mask & 1) != 0 ? pair.cdr : pair.car;
+	arg1 = (m & 1) != 0 ? pair.cdr : pair.car;
       }
     return arg1;
   }

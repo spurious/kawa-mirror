@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
 .java.class:
 	cd $(srcdir); $(JAVAC) $(<F)
@@ -16,7 +16,6 @@ set_b.class \
 quasiquote.class \
 not.class \
 boolean_p.class \
-cond.class \
 and_or.class \
 eqv_p.class \
 eq_p.class \
@@ -109,6 +108,8 @@ vector2list.class \
 list2vector.class \
 vector_fill_b.class \
 vector_append.class \
+force.class \
+make_promise.class \
 call_with_input_file.class \
 call_with_output_file.class \
 current_input_port.class \
@@ -136,6 +137,7 @@ callcc.class \
 exit.class \
 define.class \
 define_syntax.class \
+syntax_error.class \
 let.class \
 letrec.class \
 letstar.class \

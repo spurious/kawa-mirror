@@ -38,12 +38,16 @@ public class StandardInterpreter extends Interpreter
       define_syntax ("set!", "kawa.standard.set_b");
 
       // Section 4.2
-      define_syntax ("cond", "kawa.standard.cond");
+      define_syntax ("cond", "kawa.lib.cond");
+      define_syntax ("case", "kawa.lib.case");
       define ("or", new kawa.standard.and_or (false));
       define ("and", new kawa.standard.and_or (true));
       define_syntax ("begin", "kawa.standard.begin");
       define_syntax ("do", "kawa.lib.do");
       define_syntax ("quasiquote", "kawa.standard.quasiquote");
+      define_proc ("%make-promise", "kawa.standard.make_promise");
+      define_syntax ("delay", "kawa.lib.delay");
+      define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
       //-- Section 6.1
       define_proc ("not", "kawa.standard.not");
@@ -204,12 +208,13 @@ public class StandardInterpreter extends Interpreter
       // Extension:
       define ("vector-append", kawa.standard.vector_append.vappendProcedure);
 
-      //-- Section 6.9
+      //-- Section 6.9  -- complete [except restricted call/cc]
       define_proc ("procedure?", "kawa.standard.procedure_p");
       define_proc ("apply", "kawa.standard.apply");
       define_proc (new map (true));        // map
       define_proc (new map (false));       // for-each
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
+      define_proc ("force", "kawa.standard.force");
 
       //-- Section 6.10
       define_proc ("call-with-input-file",
@@ -238,8 +243,8 @@ public class StandardInterpreter extends Interpreter
       define_proc ("newline", "kawa.standard.newline");
       define_proc ("load", "kawa.standard.load");
 
-      //-- (let ((n obj)...) e1 ... )
-      define_syntax ("let", "kawa.standard.let");
+      define_syntax ("%let", "kawa.standard.let");
+      define_syntax ("let", "kawa.lib.let");
       //-- (let* ((n obj)...) e1 ... )
       define_syntax ("let*", "kawa.standard.letstar");
       //-- (letrec ((n obj)...) e1 ... )

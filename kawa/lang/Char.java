@@ -102,7 +102,7 @@ public class Char implements Printable, Compilable
 
   static char[] charNameValues = { ' ', '\t', '\n', '\n'
 				   ,'\r', '\f', '\b',
-				   '\033', '\177', '\177', '\0' };
+				   '\033', '\177', '\177', '\007', '\0' };
   static String[] charNames = { "space",
 				"tab",
 				"newline",
@@ -113,6 +113,7 @@ public class Char implements Printable, Compilable
 				"esc",
 				"del",
 				"rubout",
+				"bel",
 				"nul"};
 
   public String toString ()

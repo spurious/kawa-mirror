@@ -77,25 +77,58 @@
 
 ;;; LET (including named let)
 
-(define-syntax let (syntax-rules ()
-		    ((let (bindings ...) body ...)
-		     (%let (bindings ...) body ...))
-		    ((let name ((var init) ...) body ...)
-		     ((letrec ((name (lambda (var ...)
-				       body ...)))
-			name)
-		      init ...))))
+(define-syntax %let-lambda1
+  (syntax-rules ()
+		((%let-lambda1 ((var type init) . in) out body)
+		 (%let-lambda1 in ((var type) . out) body))
+		((%let-lambda1 ((var init) . in) out body)
+		 (%let-lambda1 in (var . out) body))
+		((%let-lambda1 () out body)
+		 (%let-lambda2 out () body))))
 
+;;; This is just to reverse the argument list yielded by %let-lambda1.
+(define-syntax %let-lambda2
+  (syntax-rules ()
+		((%let-lambda2 (arg . in) out body)
+		 (%let-lambda2 in (arg . out) body))
+		((%let-lambda2 () out body)
+		 (lambda out . body))))
+
+(define-syntax %let-init
+  (syntax-rules ()
+		((%let-init (var init))
+		 init)
+		((%let-init (var type init))
+		 init)
+		((%let-init (var))
+		 (%syntax-error "let binding with no value"))
+		((%let-init (var a b c))
+		 (%syntax-error
+		  "let binding must have syntax: (var [type] init)"))))
+
+(define-syntax let
+  (syntax-rules ()
+		((let (binding ...) . body)
+		 (%let (binding ...) . body))
+		; Alternative definition would be simpler, but makes more
+		; work for compiler to optimize it - and still doesn't
+		; do quite as well.
+		;((%let-lambda1 (binding ...) () body)
+		;(%let-init binding) ...))
+		((let name (binding ...) . body)
+		 ((letrec ((name (%let-lambda1 (binding ...) () body)))
+		    name)
+		  (%let-init binding) ...))))
 
 ;;; LET*
 
 (define-syntax let* (syntax-rules ()
 				 ((let* () . body) (%let () . body))
-				 ((let* ((var init)) . body)
-				  (%let ((var init)) . body))
-				 ((let* ((var init) . bindings) . body)
-				  (%let ((var init))
-					(let* bindings . body)))
+				 ((let* (var-init) . body)
+				  (%let (var-init) . body))
+				 ((let* (var-init . bindings) . body)
+				  (%let (var-init)
+				    (let* bindings . body)))
 				 ((let* bindings . body)
 				  (%syntax-error
 				   "invalid bindings list in let*"))
@@ -127,7 +160,7 @@
 ;;; DELAY
 
 (define (%make-promise x)
-  ((primitive-constructor <kawa.lang.Promise> (<gnu.mapping.Procedure0>)) x))
+  ((primitive-constructor <kawa.lang.Promise> (<gnu.mapping.Procedure>)) x))
 
 (define-syntax delay (syntax-rules ()
 				   ((delay expression)

@@ -39,11 +39,13 @@ public class PairWithPosition extends Pair
     return position & ((1 << 12) - 1);
   }
 
+  /** Get the line number of (the start of) this pair.
+    * The "first" line is line 1. */
   public PairWithPosition (InPort port, Object car, Object cdr)
   {
     super (car, cdr);
     filename = port.getName ();
-    setLine (port.getLineNumber (), port.getColumnNumber ());
+    setLine (port.getLineNumber() + 1, port.getColumnNumber() + 1);
   }
 
   public PairWithPosition (Object car, Object cdr)

@@ -194,7 +194,7 @@ public class PrimProcedure extends ProcedureN implements Inlineable
       }
     
     if (method == null)
-      comp.method.compile_primop (opcode(), exp.args.length, retType);
+      code.emitPrimop (opcode(), exp.args.length, retType);
     else
       code.emitInvokeMethod(method, opcode());
 

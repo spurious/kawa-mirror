@@ -7,6 +7,6 @@ java_sources = \
   XSLT.java \
   XslTranslator.java
 
-PACKAGE_FNAME = gnu-kawaxslt
+PACKAGE_FNAME = gnu-kawa-xslt
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

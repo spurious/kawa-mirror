@@ -1,3 +1,7 @@
+2003-02-01  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (PACKAGE_FNAME):  Fix typo.
+
 2003-01-09  Per Bothner  <per@bothner.com>
 
 	* XSLT.java:  Update for gnu.lists changes.

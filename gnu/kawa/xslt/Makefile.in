@@ -159,7 +159,7 @@ java_sources = \
   XslTranslator.java
 
 
-PACKAGE_FNAME = gnu-kawaxslt
+PACKAGE_FNAME = gnu-kawa-xslt
 subdir = gnu/kawa/xslt
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =

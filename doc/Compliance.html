@@ -41,7 +41,8 @@
 <TR><TD>or<TD>yes/0.1<TD>
 <TR><TD><STRONG>Section 4.2.2</STRONG>
     <TD COLSPAN=2><STRONG>Binding constructs</STRONG>
-<TR><TD>let<TD>yes/0.1<TD>
+<TR><TD>let<TD>yes/0.1<TD>Also "named" let
+<TR><TD>named let<TD>yes/0.4<TD>
 <TR><TD>let*<TD>yes/0.3<TD>
 <TR><TD>letrec<TD>yes/0.3<TD>
 <TR><TD><STRONG>Section 4.2.3</STRONG>
@@ -50,14 +51,15 @@
 <TR><TD><STRONG>Section 4.2.4</STRONG>
     <TD COLSPAN=2><STRONG>Iteration</STRONG>
 <TR><TD>do<TD>yes/0.4<TD>
+<TR><TD>named let<TD>no<TD>
 <TR><TD><STRONG>Section 4.2.5</STRONG>
     <TD COLSPAN=2><STRONG>Sequencing</STRONG>
 <TR><TD>delay<TD>no<TD>
 <TR><TD><STRONG>Section 4.2.6</STRONG>
     <TD COLSPAN=2><STRONG>Quasiquotation</STRONG>
 <TR><TD>quasiquote<TD>yes/0.4<TD>
-<TR><TD>unquote<TD>no<TD>
-<TR><TD>unquote-splicing<TD>no<TD>
+<TR><TD>unquote<TD>yes/0.4<TD>
+<TR><TD>unquote-splicing<TD>yes/0.4<TD>
 
 <TR><TD><STRONG>Section 5</STRONG>
     <TD COLSPAN=2><STRONG>Program Structure</STRONG>
@@ -255,7 +257,7 @@
 <TR><TD>apply<TD>yes/0.1<TD>
 <TR><TD>map<TD>yes/0.3<TD>
 <TR><TD>for-each<TD>yes/0.3<TD>
-<TR><TD>force<TD>no<TD>
+<TR><TD>force<TD>yes/0.4<TD>
 <TR><TD>call-with-current-continuation<TD>restricted/0.3<TD>Only "upward"
 
 <TR><TD><STRONG>Section 6.10</STRONG>
@@ -292,6 +294,7 @@
 <TR><TD COLSPAN=3><STRONG>Additional Features</STRONG>
 <TR><TD>values<TD>yes/0.4<TD>
 <TR><TD>call-with-values<TD>yes/0.4<TD>
+<TR><TD>define-syntax<TD>yes/0.4<TD>literals are not hygienic
 <TR><TD>when<TD>yes/0.1<TD>
 <TR><TD>unless<TD>yes/0.1<TD>
 </TABLE>

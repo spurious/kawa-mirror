@@ -1,3 +1,28 @@
+Sun Sep  8 21:23:33 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in (VERSION):  Set to 0.4.
+	* {,kawa/,kawa/lang/,kawa/standard/}Makefile.{am,in} (JAVA):
+	Fix -classpath argument.
+	* kawa/lang/GenericError.java:  Fix to pass message to super.
+	* kawa/lang/InPort.java (skipWhitespaceAndComments, readList):
+	Handle unexpected EOF.
+	* kawa/lang/LambdaExp.java (eval):  Mangle class name.
+	* kawa/lang/Compilation.java (mangleClassName):  New function.
+	(generateClassName):  Use it.
+	* kawa/lang/Makefile.{am,in}:  Add Promise.class.
+	* kawa/lang/Promise.java:  New class for Scheme promise objects.
+	* kawa/lang/SyntaxRule.java (translate_template):  Don't
+	rename identifiers inside quote or quasiquote.
+	* kawa/lang/SyntaxRules.java (init):  Mark linenumber info.
+	* kawa/standard/cond.java:  Removed.  (Replaced by ../lib/cond.scm.)
+	* kawa/standard/Makefile.{am,in}:  Add new classes.  Remove cond.
+	* kawa/standard/StandardInterpreter.java:
+	Use macro version of cond and let from ../lib.
+	Add new functions and macros.
+	* kawa/standard/cxr.java:  Fix bugs that trashed fields.
+	* kawa/standard/{force,make_promise}.java:  New Procedure1 classes.
+	* kawa/standard/syntax_error.java:  New syntax.
+
 Sat Sep  7 12:11:18 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Mostly fixes to improve stack traces.

@@ -1,3 +1,12 @@
+1999-07-15  Per Bothner  <per@bothner.com>
+
+	* Elisp.java:  Now extends kawa.standard.Scheme (for now).
+	(getSymbol):  Change return type to Object.
+	Return a String (instead of Binding), except 'nil is List.Empty.
+	(getString):  Return an FString, rather than a String.
+ 	(getLexer, getInstance):  New methods.
+	* ELispReader.java (<init>(InPort, SourceMessages)):  New constructor.
+
 1999-06-23  Per Bothner  <per@bothner.com>
 
 	* ELisp.java:  New class.

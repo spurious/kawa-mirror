@@ -14,6 +14,11 @@ public class ELispReader extends gnu.text.LispReader
     super(port);
   }
 
+  public ELispReader(InPort port, SourceMessages messages)
+  {
+    super(port, messages);
+  }
+  
   Object readSymbol ()
        throws java.io.IOException
   {

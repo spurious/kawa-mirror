@@ -35,10 +35,6 @@ public class CharArrayInPort extends InPort
   {
     if (pos >= limit)
       return -1;
-    char ch = buffer[pos];
-    if (ch == '\r' || ch == '\n')
-      return read();
-    pos++;
-    return ch;
+    return super.read();
   }
 }

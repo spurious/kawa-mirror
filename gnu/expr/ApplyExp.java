@@ -1,3 +1,6 @@
+// Copyright (c) 2003  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -449,16 +452,21 @@ public class ApplyExp extends Expression
 
   public static Expression inlineIfConstant(Procedure proc, ApplyExp exp)
   {
-    int len = exp.args.length;
+    return exp.inlineIfConstant(proc, (ExpWalker) null);
+  }
+
+  public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
+  {
+    int len = args.length;
     for (int i = len;  --i >= 0; )
       {
-	if (! (exp.args[i] instanceof QuoteExp))
-	  return exp;
+	if (! (args[i] instanceof QuoteExp))
+	  return this;
       }
     Object[] vals = new Object[len];
     for (int i = len;  --i >= 0; )
       {
-	vals[i] = ((QuoteExp) (exp.args[i])).getValue();
+	vals[i] = ((QuoteExp) (args[i])).getValue();
       }
     try
       {
@@ -466,8 +474,10 @@ public class ApplyExp extends Expression
       }
     catch (Throwable ex)
       {
-	// Should emit error message or warning.  FIXME. 
-	return null;
+	if (walker.messages != null)
+	  walker.messages.error('w', "call to " + proc +
+				" throws " + ex);
+	return this;
       }
   }
 }

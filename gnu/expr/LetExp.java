@@ -105,6 +105,8 @@ public class LetExp extends ScopeExp
     
     for (; decl != null;  decl = decl.nextDecl())
       {
+	if (i > 0)
+	  out.writeSpaceFill();
 	out.startLogicalBlock("(", false, ")");
 	decl.printInfo(out);
 	out.writeSpaceFill();

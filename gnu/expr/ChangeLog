@@ -1,3 +1,7 @@
+2003-03-06  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (print):  Add a writeSpaceFill call.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (addMethodFor):  DOn't set closureEnv.

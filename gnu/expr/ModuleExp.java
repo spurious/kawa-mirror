@@ -43,6 +43,14 @@ public class ModuleExp extends LambdaExp
       }
   }
 
+  ClassType superType;
+  ClassType[] interfaces;
+
+  public final ClassType getSuperType() { return superType; }
+  public final void setSuperType(ClassType s) { superType = s; }
+  public final ClassType[] getInterfaces() { return interfaces; }
+  public final void setInterfaces(ClassType[] s) { interfaces = s; }
+
   void allocFields (Compilation comp)
   {
     for (Declaration decl = firstDecl();
@@ -73,6 +81,18 @@ public class ModuleExp extends LambdaExp
       directory = "";
     else if (directory.charAt(directory.length() - 1) != '/')
       directory = directory + '/';
+    String name = getName();
+    if (name != null)
+      {
+	int index = name.lastIndexOf('.');
+	if (index < 0)
+	  topname = name;
+	else
+	  {
+	    prefix = name.substring(0, index);
+	    topname = name.substring(index+1);
+	  }
+      }
     Compilation comp = new Compilation(this, topname, prefix, false);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       {

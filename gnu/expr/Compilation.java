@@ -64,6 +64,7 @@ public class Compilation
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
   public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
+  static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeInterpreter
@@ -273,14 +274,16 @@ public class Compilation
   /** True if we should generate an Applet. */
   public boolean generateApplet = generateAppletDefault;
 
-  public final ClassType getMethodProcType()
+  public static final ClassType getMethodProcType(ClassType modClass)
   {
-    return generateApplet ? typeApplyMethodProc : typeModuleMethod;
+    return modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
+      : typeApplyMethodProc;
   }
 
-  public final ClassType getModuleSuperType()
+  public final ClassType getModuleSuperType(ModuleExp module)
   {
-    return generateApplet ? typeApplet : typeModuleBody;
+    ClassType sup = module.getSuperType();
+    return sup != null ? sup : generateApplet ? typeApplet : typeModuleBody;
   }
 
   public Interpreter getInterpreter()
@@ -655,13 +658,21 @@ public class Compilation
     else
       {
 	type = new ClassType(name);
-	ClassType superType
-	  = lexp.isModuleBody () ? getModuleSuperType()
-	  : usingCPStyle ? typeCallFrame
-	  : lexp.isHandlingTailCalls() ? typeCpsProcedure
-	  : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
-	  ? typeProcedureN
-	  : typeProcedureArray[lexp.min_args];
+	ClassType superType;
+	if (lexp.isModuleBody ())
+	  {
+	    ModuleExp module = (ModuleExp) lexp;
+	    superType = getModuleSuperType(module);
+	    ClassType[] interfaces = module.getInterfaces();
+	    if (interfaces != null)
+	      type.setInterfaces(interfaces);
+	  }
+	else
+	  superType = (usingCPStyle ? typeCallFrame
+		       : lexp.isHandlingTailCalls() ? typeCpsProcedure
+		       : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+		       ? typeProcedureN
+		       : typeProcedureArray[lexp.min_args]);
 	type.setSuper (superType);
       }
 
@@ -745,7 +756,10 @@ public class Compilation
     int numApplyMethods = applyMethods.size();
     if (numApplyMethods == 0)
       return;
-    boolean generateApplyMethodContainer = generateApplet;
+    boolean generateApplyMethodContainer
+      = ! (curClass.getSuperclass().isSubtype(typeProcedure));
+    ClassType procType
+      = generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
     if (generateApplyMethodContainer)
       curClass.addInterface(typeApplyMethodContainer);
     Method save_method = method;
@@ -804,7 +818,6 @@ public class Compilation
 		    applyArgs = new Type[2];
 		    applyArgs[1] = objArrayType;
 		  }
-		ClassType procType = getMethodProcType();
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
 					     Type.pointer_type,
@@ -958,7 +971,9 @@ public class Compilation
 	      code.emitLoad(code.getArg(k));
 	    if (generateApplyMethodContainer)
 	      {
-		Method defMethod = typeApplyMethodProc.getDeclaredMethod(mname+"Default", applyArgs);
+		mname = mname + "Default";
+		Method defMethod
+		  = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
 		code.emitInvokeStatic(defMethod);
 	      }
 	    else
@@ -1033,9 +1048,17 @@ public class Compilation
 
     Method apply_method;
     if (lexp.isModuleBody())
-      apply_method
-	  = curClass.addMethod ("run", arg_types, Type.pointer_type,
+      {
+	Type rtype = Type.pointer_type;
+	if (curClass.getSuperclass() != typeModuleBody)
+	  {
+	    curClass.addInterface(typeRunnable);
+	    rtype = Type.void_type;
+	  }
+	apply_method
+	  = curClass.addMethod ("run", arg_types, rtype,
 				Access.PUBLIC|Access.FINAL);
+      }
     else if (lexp.isHandlingTailCalls())
       apply_method
 	= curClass.addMethod ("apply", arg_types, Type.void_type,

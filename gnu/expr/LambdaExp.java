@@ -520,7 +520,7 @@ public class LambdaExp extends ScopeExp
       fflags |= Access.PUBLIC;
     else
       fname = fname + "$Fn" + ++comp.localFieldIndex;
-    Type rtype = comp.getMethodProcType();
+    Type rtype = Compilation.getMethodProcType(comp.mainClass);
     Field field = comp.mainClass.addField (fname, rtype, fflags);
     if (nameDecl != null)
       nameDecl.field = field;

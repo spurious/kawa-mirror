@@ -17,7 +17,7 @@ public class ProcInitializer extends Initializer
   public static void emitLoadModuleMethod(LambdaExp proc, Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    ClassType procClass = comp.getMethodProcType();
+    ClassType procClass = Compilation.getMethodProcType(comp.curClass);
     code.emitNew(procClass);
     code.emitDup(1);
 

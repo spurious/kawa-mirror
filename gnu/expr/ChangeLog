@@ -1,3 +1,18 @@
+2000-03-21  Per Bothner  <per@bothner.com>
+
+	* gnu/expr/Compilation.java (typeRunnable):  New static.
+	(allocClass):  Handle explicit super-class and interfaces.
+	(generateApplyMethods):  Set generateApplyMethodContainer whenever
+	super class is not Procedure.
+	(addClass):  Handle "run" method differently if explicit superclass.
+	(getMethodProcType):  Made static;  takes ClassType argument.
+	(getModuleSuperType):  Take ModuleExp parameter, check its supertype.
+	* LambdaExp.java (allocFieldFor):   Update getMethodProcType call.
+	* ProcInitializer.java (emitLoadModuleMethod):  Likewise.
+	* gnu/expr/ModuleExp.java (superType, interfaces):  New field.
+	(getSuperType, setSuperType, getInterfaces, setInterfaces):  New.
+	(compileToFiles):  Handle explicit specified module name.
+
 2000-03-12  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (mangleName):  Add manglings for ascii characters.

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 71)
+(test-init "Miscellaneous" 72)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -291,3 +291,6 @@
     (set! (xl) (+ (zl) 100))
     x))
 (test 110 test-location-local 10)
+
+(test 15 'tail-call (let loop ((a 1) (b 2) (c 3) (d 4) (e 5) (f 6))
+  (if (> a 10) b (loop b c d e f (+ a b c)))))

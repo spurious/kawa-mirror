@@ -1,3 +1,8 @@
+1999-11-16  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Added test for "too many args?" bug
+	reported by Walter C. Pelissero" <wcp@pop.systemy.it>.
+
 1999-11-15  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Add some tests for SRFI-6 string-port procedures.

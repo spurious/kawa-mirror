@@ -226,6 +226,7 @@ implements CharSeq, Externalizable, Consumable
     int total = size;
     for (int i = startIndex; i < args.length; ++i)
       total += ((FString) args[i]).size;
+    if (data.length < total)
     setBufferLength(total);
     
     for (int i = startIndex; i < args.length; ++i)

@@ -139,7 +139,7 @@ public class load extends Procedure1 {
     if (name.endsWith (".class"))
       {
 	name = name.substring (0, name.length () - 6);
-	name.replace ('/', '.');
+	name = name.replace ('/', '.');
 	if (file_separator != '/')
 	  name = name.replace (file_separator, '.');
 	return loadClassFile (name, env);

@@ -29,7 +29,7 @@ public class Variable extends Location implements java.util.Enumeration {
   static final int UNASSIGNED = -1;
   /** The local variable slot number used by this variable.
    * Not used (by the codegen layer) if !isSimple(). */
-  public int offset = UNASSIGNED;
+  int offset = UNASSIGNED;
   /** Returns true iff assigned to a local variable slot.
    * Only relevant if isSimple (). */
   public final boolean isAssigned () { return offset != UNASSIGNED; }

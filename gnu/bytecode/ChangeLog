@@ -1,3 +1,7 @@
+1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Variable.java (offset):  Make non-public.
+
 1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* ZipMember.java:  Inherit from java.util.zip.ZipEntry.

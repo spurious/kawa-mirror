@@ -3,7 +3,7 @@ import java.lang.reflect.Field;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 
-public class Record extends Procedure1 implements HasSetter
+public class Record extends NameMap
 {
   public String getTypeName()
   {
@@ -34,9 +34,8 @@ public class Record extends Procedure1 implements HasSetter
     return hash;
   }
 
-  public Object apply1 (Object arg)
+  public Object get (String fname)
   {
-    String fname = (String) arg;
     Class clas = getClass();
     java.lang.reflect.Field fld;
     try
@@ -55,17 +54,21 @@ public class Record extends Procedure1 implements HasSetter
       }
   }
 
-  public void set1 (Object value, Object arg)
-  { set1(this, value, (String) arg); }
+  public Object put (String fname, Object value)
+  {
+    return set1 (this, value, fname);
+  }
 
-  public static void set1 (Object record, Object value, String fname)
+  public static Object set1 (Object record, Object value, String fname)
   {
     Class clas = record.getClass();
     java.lang.reflect.Field fld;
     try
       {
 	fld = clas.getField (fname);
+	Object old = fld.get(record);
 	fld.set(record, value);
+	return old;
       }
     catch (NoSuchFieldException ex)
       {

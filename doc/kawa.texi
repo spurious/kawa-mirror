@@ -1654,8 +1654,8 @@ In the function body, the parameter has the specified type.
 
 If @var{rtype} (the first form of the function body) is an unbound
 identifier of the form @code{<TYPE>} (that is the first character
-is @samp{<} and the last is @samp{>}), then tha specifies the
-functions return type.  It is syntactic sugar for
+is @samp{<} and the last is @samp{>}), then that specifies the
+function's return type.  It is syntactic sugar for
 @code{(as <TYPE> (begin BODY))}.
 
 @deffn Syntax cut slot-or-expr slot-or-expr* [@code{<...>}]
@@ -4127,12 +4127,12 @@ in the Guile and Stk dialects of Scheme.
 @display
 @var{field-or-method} ::= @var{field-decl} | @var{method-decl}
 @var{field-decl} ::= (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
-@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{body})
+@var{method-decl} ::= ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] [@var{option-keyword} @var{option-value}]* @var{body})
 @end display
 Defines a new class named @var{name}.  If @code{define-simple-class} is
 used, creates a normal Java class named @var{name} in the current package.
 (If @var{name} has the form @code{<xyx>} the Java implementation
-type is named @code{xyz}.)  If @code{define-class} the implementation is
+type is named @code{xyz}.)  For @code{define-class} the implementation is
 unspecified.  In most cases, the compiler creates a class pair,
 consisting of a Java interface and a Java implementation class.
 
@@ -4170,6 +4170,12 @@ This is the default.
 You can use a keyword like @code{class:} or a string like @code{"class"}
 if you prefer instead of a quoted symbol like @code{'class};
 the latter is recommended.
+@item @code{access:} @var{kind}
+Specifies the Java access permission on the field.
+Can be one of @code{'private}, @code{'protected},
+@code{'public} (which is the default in Kawa),
+or @code{'package} (which the default "unnamed" permission
+in Java code).
 @item @code{init:} @var{expr}
 An expression used to initialize the slot.
 The expression is evaluated in a scope that includes the field and
@@ -4213,6 +4219,17 @@ or is otherwise the type of the @var{body}.
 Currently, the @var{formal-arguments} cannot contain optional, rest,
 or keyword parameters.  (The plan is to allow optional parameters,
 implemented using multiple overloaded methods.)
+
+A @var{method-decl} in @code{define-static-field}
+can have the following @var{option-keyword}s:
+@table @asis
+@item @code{access:} @var{kind}
+Specifies the Java access permission on the method.
+Can be one of @code{'private}, @code{'protected},
+@code{'public}, or @code{'package}.
+@item @code{allocation:} @var{kind}
+If @var{kind} is @code{'class} or @code{'static} creates a static method.
+@end table
 
 The scope of the @var{body} of a method includes the @var{field-decl}s
 of the object.  It does include the surrounding lexical scope.

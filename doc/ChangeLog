@@ -1,3 +1,8 @@
+2004-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes):  Document access: options
+	and method allocation: option.
+
 2003-12-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Defining new classes):  Document new features for

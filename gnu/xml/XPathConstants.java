@@ -30,7 +30,7 @@ public interface XPathConstants
    * Word-code usage:
    * (code to evaluate step1 - in forward direction, not RPN))
    * ...
-   * (code to evaluate stepn - in forward direction, not RPN))
+   * (code to evaluate stepN - in forward direction, not RPN))
    * [start of step1, relative to OP_LOCATIONPATH pc]
    * ...
    * [start of stepN, relative to OP_LOCATIONPATH pc]

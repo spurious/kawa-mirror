@@ -245,6 +245,11 @@ public class LambdaExp extends ScopeExp
     return type;
   }
 
+  public void setType (ClassType type)
+  {
+    this.type = type;
+  }
+
   /** Number of argument variable actually passed by the caller.
    * For functions that accept more than 4 argument, or take a variable number,
    * this is 1, since in that all arguments are passed in a single array. */
@@ -522,6 +527,9 @@ public class LambdaExp extends ScopeExp
     int fflags = Access.FINAL;
     if (nameDecl != null && nameDecl.context instanceof ModuleExp)
       {
+	boolean external_access = nameDecl.needsExternalAccess();
+	if (external_access)
+	  fname = Declaration.PRIVATE_PREFIX + fname;
 	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED)
 	    || (comp.immediate
 		&& ! nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED)))
@@ -533,13 +541,8 @@ public class LambdaExp extends ScopeExp
             if (! ((ModuleExp) nameDecl.context).isStatic())
               fflags &= ~Access.FINAL;
           }
-	boolean external_access
-	  = ((nameDecl.flags & Declaration.EXTERNAL_ACCESS+Declaration.PRIVATE)
-	     == Declaration.EXTERNAL_ACCESS+Declaration.PRIVATE);
 	if (! nameDecl.isPrivate() || external_access)
 	  fflags |= Access.PUBLIC;
-	if (external_access)
-	  fname = Declaration.PRIVATE_PREFIX + fname;
       }
     else
       {
@@ -758,6 +761,15 @@ public class LambdaExp extends ScopeExp
       isStatic = true;
 
     StringBuffer nameBuf = new StringBuffer(60);
+    int mflags = isStatic ? Access.STATIC : 0;
+    if (nameDecl != null)
+      {
+	if (nameDecl.needsExternalAccess())
+	  mflags |=  Access.PUBLIC;
+	else
+	  mflags |= nameDecl.getAccessFlags(nameDecl.isPrivate() ? 0
+					    : Access.PUBLIC);
+      }
     if (! (outer.isModuleBody() || outer instanceof ClassExp)
 	|| name == null)
       {
@@ -773,10 +785,6 @@ public class LambdaExp extends ScopeExp
     boolean withContext
       = (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
 	 && isInitMethod == '\0');
-    int mflags = isStatic ? Access.STATIC : 0;
-    if (nameDecl != null)
-      mflags
-	|= nameDecl.getAccessFlags(nameDecl.isPrivate() ? 0 : Access.PUBLIC);
     if (isInitMethod != '\0')
       {
 	if (isStatic)

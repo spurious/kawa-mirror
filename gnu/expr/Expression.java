@@ -168,6 +168,17 @@ public abstract class Expression implements Printable
     return filename;
   }
 
+  /** Set line number from current position in <code>Compilation</code>. */
+  public void setLine (Compilation comp)
+  {
+    int line = comp.getLine();
+    if (line != 0)
+      {
+	setFile(comp.getFile());
+	setLine(line, comp.getColumn());
+      }
+  }
+
   /** Get the line number of (the start of) this Expression.
     * The "first" line is line 1. */
   public final int getLine ()

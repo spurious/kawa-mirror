@@ -13,7 +13,7 @@ public abstract class ScopeExp extends Expression
 
   private Scope scope;
 
-  public final Declaration firstDecl () { return decls; }
+  public Declaration firstDecl () { return decls; }
 
   public Scope getVarScope ()
   {

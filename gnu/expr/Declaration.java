@@ -44,12 +44,21 @@ import gnu.mapping.*;
 public class Declaration
 {
   static int counter;
-  /** Unique id number, to ease print-outs and debugging. */
+  /** Unique id number, to ease print-outs and debugging.
+   * If negative, a code to specify a builtin function. */
   protected int id = ++counter;
 
   /** The name of the new variable, either an interned String or a Symbol.
    * This is the source-level (non-mangled) name. */
   Object symbol;
+
+  public void setCode (int code)
+  {
+    if (code >= 0) throw new Error("code must be negative");
+    this.id = code;
+  }
+
+  public int getCode () { return id; }
 
   public ScopeExp context;
 
@@ -222,8 +231,13 @@ public class Declaration
 
   /** This flag bit is set if this can be be acceessed from other modules.
    * Ignored unless PRIVATE.
-   * Used for an exported macro that references a non-exported name. */
+   * Used when an exported macro references a non-exported name. */
   public static final int EXTERNAL_ACCESS = 0x80000;
+
+  public final boolean needsExternalAccess ()
+  {
+    return (flags & EXTERNAL_ACCESS+PRIVATE) == EXTERNAL_ACCESS+PRIVATE;
+  }
 
   /** True if this is a field or method in a class definition. */
   public static final int FIELD_OR_METHOD = 0x100000;
@@ -236,6 +250,8 @@ public class Declaration
   public static final int PROTECTED_ACCESS = 0x2000000;
   public static final int PUBLIC_ACCESS = 0x4000000;
   public static final int PACKAGE_ACCESS = 0x8000000;
+
+  public static final int IS_DYNAMIC = 0x10000000;
 
   protected int flags = IS_SIMPLE;
 
@@ -433,8 +449,7 @@ public class Declaration
 
   public Declaration (Object name, Field field)
   {
-    setName(name);
-    setType(field.getType());
+    this(name, field.getType());
     this.field = field;
     setSimple(false);
   }
@@ -550,7 +565,7 @@ public class Declaration
     int line = getLine();
     if (line != 0)
       {
-	sbuf.append("l=");
+	sbuf.append("/line:");
 	sbuf.append(line);
 	int column = getColumn();
 	if (column != 0)
@@ -605,14 +620,7 @@ public class Declaration
   public void makeField(Compilation comp, Expression value)
   {
     setSimple(false);
-    String fname = getName();
-    boolean external_access = (flags & EXTERNAL_ACCESS+PRIVATE)
-      == EXTERNAL_ACCESS+PRIVATE;
-    fname = Compilation.mangleNameIfNeeded(fname);
-    if (getFlag(IS_UNKNOWN))
-      fname = UNKNOWN_PREFIX + fname;
-    if (external_access)
-      fname = PRIVATE_PREFIX + fname;
+    boolean external_access = needsExternalAccess();
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);
@@ -639,6 +647,18 @@ public class Declaration
     else
       ftype = (isIndirectBinding() ? Compilation.typeSymbol
 	       : getType().getImplementationType());
+
+    String fname = getName();
+    fname = Compilation.mangleNameIfNeeded(fname);
+    if (getFlag(IS_UNKNOWN))
+      fname = UNKNOWN_PREFIX + fname;
+    if (external_access)
+      fname = PRIVATE_PREFIX + fname;
+    int nlength = fname.length();
+    int counter = 0;
+    while (comp.mainClass.getDeclaredField(fname) != null)
+      fname = fname.substring(0, nlength) + '$' + (++ counter);
+
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {

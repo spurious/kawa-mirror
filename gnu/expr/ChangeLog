@@ -1,5 +1,16 @@
 2004-12-05  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (getCode, setCode): New methods.
+ 	* Declaration.java (needsExternalAccess): New helper method.
+	(makeField): Use it.
+	(makeField): Check for existing field to guards against duplicates.
+	* LambdaExp.java (allocFieldFor): Use needsExternalAccess.
+	(addMethodFor): Check needsExternalAccess().
+	* Declaration.java (IS_DYNAMIC): New constant.
+	* Expression.java (setLine): New method.
+	* LambdaExp.java (setType): New type.
+	* ScopeExp.java (firstDecl): Make non-final, for the sake of ModuleExp.
+
 	* GenericProc.java (methods): Make protected, for new ClassMethodProc.
 	(add): New method overloading.  Make synchronized.
 	Fix bug where minArgs didn't get changed from 0.

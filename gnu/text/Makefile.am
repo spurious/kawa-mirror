@@ -5,12 +5,12 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_sources = \
-  Char.java \
+  Char.java PrettyWriter.java \
   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
   QueueReader.java SourceMessages.java NullReader.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
   IntegerFormat.java RomanIntegerFormat.java EnglishIntegerFormat.java \
-  CaseConvertFormat.java FlushFormat.java
+  CaseConvertFormat.java FlushFormat.java WriterManager.java
 
 EXTRA_DIST = package.html
 

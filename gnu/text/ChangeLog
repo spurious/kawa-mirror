@@ -1,3 +1,12 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java: New class, extends Writer.
+
+	* WriterManager.java:  New class.
+	* Makefile.am (java_sources):  Add new classes.
+
+	* EnglishIntegerFormat.java:  Experimental FormatConsumer support.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* Char.java (nameToChar):  Try looking for named char, ignoring case.

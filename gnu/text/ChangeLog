@@ -1,3 +1,9 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* SyntaxException.java (header):  New field.
+	(getHeader, setHeader):  New methods.
+	(printAll):  First print header, if non-null.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (interactive):  New field.

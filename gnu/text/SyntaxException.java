@@ -4,6 +4,7 @@ package gnu.text;
 
 public class SyntaxException extends Exception
 {
+  String header;
   SourceMessages messages;
 
   public SyntaxException(SourceMessages messages)
@@ -11,10 +12,15 @@ public class SyntaxException extends Exception
     this.messages = messages;
   }
 
+  public final String getHeader() { return header; }
+  public final void setHeader(String header) { this.header = header; }
+
   public SourceMessages getMessages () { return messages; }
 
   public void printAll(java.io.PrintWriter out, int max)
   {
+    if (header != null)
+      out.println(header);
     messages.printAll(out, max);
   }
 

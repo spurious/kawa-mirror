@@ -32,5 +32,5 @@ check-obj:
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm check-misc.scm
+  obj-test.scm misc-test.scm
 CLEANFILES = tmp?

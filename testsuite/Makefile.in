@@ -55,7 +55,7 @@ KAWATEST = $(KAWA) -f "$(srcdir)/testing.scm"
 MISC_1_1 = check-obj
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm check-misc.scm
+  obj-test.scm misc-test.scm
 CLEANFILES = tmp?
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

@@ -3,3 +3,9 @@
 Makefile
 cgi-servlet
 kawa.sh
+*.lo
+libkawa.la
+gckawa
+kawa-bin
+kawa
+kawa1

@@ -11,6 +11,7 @@ java_JAVA=\
   ApplyMethodContainer.java ApplyMethodProc.java \
   Binding.java \
   Binding2.java \
+  BindingEnumeration.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   IndirectConstraint.java \
   CallFrame.java CallStack.java CpsProcedure.java \

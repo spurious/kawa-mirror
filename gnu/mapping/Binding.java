@@ -18,7 +18,7 @@ public class Binding extends Location
     return constraint.get(this);
   }
 
-  public final Procedure getProcedure ()
+  public Procedure getProcedure ()
   {
     return constraint.getProcedure(this);
   }
@@ -102,7 +102,7 @@ public class Binding extends Location
     Binding e2 = (Binding) o;
     String e1Key = getName();
     String e2Key = e2.getName();
-    // This is quite following the Collections spec, but we assume keys
+    // This is not quite following the Collections spec, but we assume keys
     // are interned, or if they are not, that they are seen as unequal.
     if (e1Key != e2Key)
       return false;
@@ -114,6 +114,7 @@ public class Binding extends Location
   public int hashCode ()
   {
     // Note:  The hashCode should not depend on the value.
+    // This is contrary to the Map.Entry specification.
     return System.identityHashCode(this); // ^ System.identityHashCode(env);
   }
 

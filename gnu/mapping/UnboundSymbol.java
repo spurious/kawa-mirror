@@ -10,4 +10,11 @@ public class UnboundSymbol extends RuntimeException
     super ("Unbound symbol " + symbol);
     this.symbol = symbol;
   }
+
+  public UnboundSymbol(String symbol, String message)
+  {
+    super (message);
+    this.symbol = symbol;
+  }
+  
 }

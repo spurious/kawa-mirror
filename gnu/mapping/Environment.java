@@ -11,8 +11,8 @@ package gnu.mapping;
 
 public class Environment extends NameMap
 {
-  private Binding[] table;
-  private int log2Size;
+  Binding[] table;
+  int log2Size;
   private int mask;
   int num_bindings;
 
@@ -236,6 +236,18 @@ public class Environment extends NameMap
   public Object put (Object name, Object value)
   {
     return put ((String) name, value);
+  }
+
+  /** Does not enumerate inherited Bindings. */
+  public BindingEnumeration enumerateBindings()
+  {
+    return new BindingEnumeration(table, 1 << log2Size);
+  }
+
+  /** Does enumerate inherited Bindings. */
+  public BindingEnumeration enumerateAllBindings()
+  {
+    return new BindingEnumeration(this);
   }
 
   public String toString ()

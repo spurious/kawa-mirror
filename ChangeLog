@@ -1,6 +1,8 @@
 2001-10-17  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add gnu/kawa/xml/Makefile.
+	* kawa/standard/Scheme.java:  Declare "attributes" procedure.
+	* kawa/standard/ScmEnv.java (getChecked):  Look for "ns-alias:name".
 
 2001-10-16  Per Bothner  <per@bothner.com>
 

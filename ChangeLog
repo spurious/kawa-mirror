@@ -1,3 +1,9 @@
+2002-01-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java:  Also define 'unescaped-data'.
+
+	* acinclude.m4:  New check-in.
+
 2002-01-19  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (apply2):  Don't catch and re-throw.

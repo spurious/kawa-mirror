@@ -560,6 +560,7 @@ public class Scheme extends LispInterpreter
       define_field("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
       define_field("children", "gnu.xquery.util.Children", "children");
       define_field("attributes", "gnu.kawa.xml.Attributes");
+      define_field("unescaped-data", "gnu.kawa.xml.UnescapedData");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");

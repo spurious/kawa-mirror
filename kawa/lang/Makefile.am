@@ -83,6 +83,7 @@ compilefunc.class \
 loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
+Values.class \
 $(EXCEPTIONS)
 
 java_DATA=$(OBJ) $(EXCEPTIONS)

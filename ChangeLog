@@ -1,3 +1,10 @@
+2000-08-16  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main):  The --cps flag also sets usingTailCalls.
+	
+	* kawa/GuiConsole.java (<init>):  Set autoflush for default out
+	and err Writers.  Fix from Emmanuel Castro <castro@lirmm.fr>.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  If separate name spaces,

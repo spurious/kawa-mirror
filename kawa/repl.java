@@ -303,6 +303,7 @@ public class repl extends Procedure0or1
 	else if (arg.equals("--cps"))
 	  {
 	    gnu.expr.Compilation.fewerClasses = true;
+	    gnu.expr.Compilation.usingTailCalls = true;
 	    gnu.expr.Compilation.usingCPStyle = true;
 	  }
 	else if (arg.equals("--full-tailcalls"))

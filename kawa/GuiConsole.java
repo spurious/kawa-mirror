@@ -53,8 +53,8 @@ public class GuiConsole extends Frame implements ActionListener {
     window_number++;
     numConsoles++;
 
-    out_p = new OutPort(message.getStdout(),"<msg_stdout>");
-    err_p = new OutPort(message.getStderr(),"<msg_stderr>");
+    out_p = new OutPort(message.getStdout(), true, "<msg_stdout>");
+    err_p = new OutPort(message.getStderr(), true, "<msg_stderr>");
     InPort in_p = new GuiInPort(in_r, "<msg_stdin>", out_p, message);
 
     this.setLayout(new BorderLayout(0,0));

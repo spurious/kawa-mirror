@@ -12,6 +12,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import gnu.kawa.xml.*;
 import gnu.bytecode.Type;
+import gnu.kawa.reflect.OccurrenceType;
 
 /** A class to read xquery forms. */
 
@@ -329,7 +330,7 @@ public class XQParser extends LispReader // should be extends Lexer
     switch (ch)
       {
       case ')':  case '[':  case ']':  case '}':
-      case '$':  case '@':  case ',':
+      case '$':  case '@':  case ',':  case '?':
 	break;
       case ':':
 	if (checkNext('='))
@@ -840,12 +841,72 @@ public class XQParser extends LispReader // should be extends Lexer
     return exp;
   }
 
-  public Expression parseElementType()
+  private void  parseSimpleKindType ()
+    throws java.io.IOException, SyntaxException
+  {
+    getRawToken();
+    if (curToken == '(')
+      {
+	getRawToken();
+	if (curToken == ')')
+	  getRawToken();
+	else
+	  error("expected ')'");
+      }
+    else
+      warnOldStyleKindTest();
+  }
+
+  public Type parseElementType ()
       throws java.io.IOException, SyntaxException
   {
-    Symbol qname = parseNameTest(defaultElementNamespace);
-    getRawToken();
-    return new QuoteExp(new ElementType(qname));
+    Symbol qname;
+    if (curToken == '(')
+      {
+	getRawToken();
+	if (curToken == ')')
+	  {
+	    qname = new Symbol(null);
+	    getRawToken();
+	  }
+	else
+	  {
+	    qname = parseNameTest(defaultElementNamespace);
+	    getRawToken();
+	    if (curToken == ',')
+	      {
+		getRawToken();
+		Symbol tname = parseNameTest(defaultElementNamespace);
+		getRawToken();
+	      }
+	    if (curToken == ')')
+	      getRawToken();
+	    else
+	      error("expected ')' after element");
+	  }
+      }
+    else
+      {
+	warnOldStyleKindTest();
+	if (curToken == QNAME_TOKEN || curToken == OP_MUL
+	    || curToken == NCNAME_TOKEN || curToken == NCNAME_COLON_TOKEN)
+	  {
+	    qname = parseNameTest(defaultElementNamespace);
+	    getRawToken();
+	  }
+	else
+	  qname = new Symbol(null);
+      }
+    return new ElementType(qname);
+  }
+
+  private boolean warnedOldStyleKindTest;
+  private void warnOldStyleKindTest()
+  {
+    if (warnedOldStyleKindTest)
+      return;
+    error('w', "old-style KindTest - first one here");
+    warnedOldStyleKindTest = true;
   }
 
   /** Parse: ["as" SequenceType] */
@@ -861,28 +922,77 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseDataType()
       throws java.io.IOException, SyntaxException
   {
-    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+    Type type = parseItemType();
+    int min, max;
+    if (type == null)
+      return syntaxError("bad syntax - expected DataType");
+    if (curToken == '?')
       {
-	String tname = new String(tokenBuffer, 0, tokenBufferLength);
-	getRawToken();
-	if ("element".equalsIgnoreCase(tname))
-	  {
-	    return parseElementType();
-	  }
-	if ("text".equalsIgnoreCase(tname))
-	  return new QuoteExp(textNodeTest);
-	if ("node".equalsIgnoreCase(tname))
-	  return new QuoteExp(anyNodeTest);
-	Type type = interpreter.getTypeFor(tname); 
-	if (type == null)
-	  type = gnu.bytecode.ClassType.make(tname);
-	return new QuoteExp(type);
+	min = 0;
+	max = 1;
+      }
+    else if (curToken == OP_ADD)
+      {
+	min = 1;
+	max = -1;
+      }
+    else if (curToken == OP_MUL)
+      {
+	min = 0;
+	max = -1;
       }
     else
       {
-	getRawToken();
-	return syntaxError("bad syntax - expected DataType");
+	min = 1;
+	max = 1;
       }
+    if (min != max)
+      {
+	getRawToken();
+	return new QuoteExp(new OccurrenceType(type, min, max));
+      }
+    return new QuoteExp(type);
+  }
+
+  public Type parseItemType()
+      throws java.io.IOException, SyntaxException
+  {
+    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+      {
+	if (match("element"))
+	  {
+	    getRawToken();
+	    return parseElementType();
+	  }
+	if (match("text"))
+	  {
+	    parseSimpleKindType();
+	    return textNodeTest;
+	  }
+	if (match("node"))
+	  {
+	    parseSimpleKindType();
+	    return anyNodeTest;
+	  }
+	if (match("empty"))
+	  {
+	    parseSimpleKindType();
+	    return Type.void_type;
+	  }
+	if (match("item"))
+	  {
+	    parseSimpleKindType();
+	    return Type.pointer_type;
+	  }
+	String tname = new String(tokenBuffer, 0, tokenBufferLength);
+	getRawToken();
+	Type type = interpreter.getTypeFor(tname); 
+	if (type == null)
+	  type = gnu.bytecode.ClassType.make(tname);
+	return type;
+      }
+    else
+      return null;
   }
 
   Expression parseBinaryExpr(int prio)

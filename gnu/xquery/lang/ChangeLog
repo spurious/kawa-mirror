@@ -1,3 +1,10 @@
+2003-05-13  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Handle new KindType syntax of May '03 draft.
+	(parseSimpleKindType, warnOldStyleKindTest. parseItemtype):  New.
+	(parseElementType):  Handle new syntax.
+	(parseDataType):  Handle new syntax.  Use OccurrenceType.
+
 2003-05-10  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (checkNext):  Moved to Lexer, and made public.

@@ -1,3 +1,44 @@
+Fri Sep 26 21:34:39 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/Symbol:  This is now a helper class, with no instances.
+	Scheme symbols are now represented by java.lang.String objects.
+	All methods are static.  Also, add some debugging utilities.
+	* kawa/lang/Interpreter.java (trueObject, falseObject):
+	Use Boolean.TRUE and Boolean.FALSE.
+	* kawa/lang/PrimProcedure.java:  Update <symbol> to String.
+	Add <function>.
+	* kawa/*/*.java:  Change Symbol parameters and variables to String.
+  	Remove duplicates methods.  Replace Symbol.make("xxx") by plain "xxx".
+	* kawa/lang/Compilation.java:  Update replacing Symbol by String.
+	* kawa/lang/Environment.java (remove(Binding)):  Fix bug when chained.
+	(remove(String), remove(Object)):  New overloaded methods.
+	* kawa/lang/SyntaxRule.java (indexOf):  New method.
+	* kawa/lang/Translator.java (syntaxError):  Use OutPort.errDefault()
+	instead of System.err.
+	(current_decls):  Change from Hashtable to Environment.
+
+	* kawa/standard/{substring,string_copy,string_fill_b}.java:
+	Removed.  Replaced by kawa/lib/strings.scm.
+	* kawa/standard/Makefile.am:  Removed old classes.
+	* kawa/standard/Scheme.java:  Update for new string and symbol code.
+	* kawa/standard/real_part.java:  Fix thinko.
+
+	* kawa/lang/FString.java (fill):  New method.
+	* kawa/lang/ApplyExp.java (compile):  Remove unused variable func_name.
+	* kawa/lang/Nameable.java:  Removed - not used.
+	* kawa/lang/OutPort.java (errInitial):  Set autoflush.
+	(outInitial):  Initialize using System.out, not System.err.
+	(setLogFile, closeLogFile):  New methods.
+	* ALL/Makefile.in:  Re-generate using automake 1.2.
+
+Wed Jul  2 16:26:35 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/*:  Change representation of (interned) Scheme symbols
+	to interned java.lang.String.
+	* kawa/standard/*, kawa/Shell.java:  Likewise.
+	* kawa/lang/Interpreter.java (falseObject, trueObject):
+	Use Boolean.FALSE and Boolean.TRUE.  Make static fields final.
+
 Sun Jun 22 14:07:48 1997  Per Bothner  <bothner@cygnus.com>
 
 	Use JDK1.1 I/O characters-oriented Reader/Writer classes.

@@ -13,6 +13,9 @@ An overview of how Kawa works is in doc/kawa-tour.ps.
 The file NEWS summarizes recent changes.
 
 Kawa's copyright is in doc/license.terms.
+(The Kawa distribution includes the packages gnu.bytecode and gnu.math,
+which have different terms - but which impose no restrictions as long as
+you do not modify those two packages).
 
 The file doc/Compliance.html summarizes divergence from the R4RS.
 

@@ -91,11 +91,14 @@ public class ClassMemberConstraint extends Constraint
     try
       {
         rfield.set(getValue(binding), value);
+	return;
       }
     catch (IllegalAccessException ex)
       {
-        throw new WrappedException(ex);
       }
+    // This is a bit of a kludge  FIXME.
+    setConstraint(binding, new TrivialConstraint(getEnvironment(binding)));
+    setValue(binding, value);
   }
 
   public static void define (String name, Object object, String fname)

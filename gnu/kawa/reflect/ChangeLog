@@ -1,3 +1,8 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (set):  If we cannot set the field,
+	change the constraint to a TrivialConstraint (kludge).
+
 2001-08-30  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (checkName):  Use mangleNameIfNeeded.

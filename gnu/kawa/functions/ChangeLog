@@ -1,3 +1,12 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* LispFormat.java <Init>: Handle ~W (Write) and ~Y (pretty-printing,
+	from SRFI-48), if not quite correctly.
+	Handle ~<...~:> (Logical Block) and I (Indent).
+	(LispIndentFormat): New non-public class, extends ReportFormat.
+	(LispPrettyFormat): New non-public class, extends ReportFormat.
+	(LispNewlineFormat.printNewline): Call writeBreak.
+
 2004-11-20  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java (resolve): Fix various problems.

@@ -158,8 +158,10 @@ public class LispFormat extends CompoundFormat
 	    else
 	      fmt = dfmt;
 	    break;
-	  case 'A':  case 'S':
-	    fmt = ObjectFormat.getInstance(ch == 'S');
+	  case 'A':  case 'S':  case 'W':
+	  case 'Y':  // SRFI-48 "yuppify" (pretty-print)
+	    // We don't distinguish between ~S and ~W.  FIXME.
+	    fmt = ObjectFormat.getInstance(ch != 'A');
 	    if (numParams > 0)
 	      {
 		minWidth = getParam(stack, speci);
@@ -226,6 +228,62 @@ public class LispFormat extends CompoundFormat
 	      lfmt.body = popFormats(stack, start_nesting + 2, speci);
 	    start_nesting = ((IntNum) stack.pop()).intValue();
 	    continue;
+	  case '<':
+	    LispPrettyFormat pfmt = new LispPrettyFormat();
+	    pfmt.seenAt = seenAt;
+	    if (seenColon)
+	      {
+		pfmt.prefix = "(";
+		pfmt.suffix = ")";
+	      }
+	    else
+	      {
+		pfmt.prefix = "";
+		pfmt.suffix = "";
+	      }
+	    stack.setSize(speci);
+	    stack.push(pfmt);
+	    stack.push(IntNum.make(start_nesting));
+	    stack.push(IntNum.make(choices_seen));
+	    start_nesting = speci;
+	    choices_seen = 0;
+	    continue;
+	  case '>':
+	    if (start_nesting < 0
+		|| ! (stack.elementAt(start_nesting)
+		      instanceof LispPrettyFormat))
+	      throw new ParseException("saw ~> without matching ~<", i);
+	    fmt = popFormats(stack, start_nesting + 3 + choices_seen, speci);
+	    stack.push(fmt);
+	    pfmt = (LispPrettyFormat) stack.elementAt(start_nesting);
+	    pfmt.segments = getFormats(stack, start_nesting + 3, stack.size());
+	    stack.setSize(start_nesting + 3);
+	    start_nesting = ((IntNum) stack.pop()).intValue();
+	    start_nesting = ((IntNum) stack.pop()).intValue();
+	    if (seenColon)
+	      { // Logical Block for pretty-printing
+		int nsegments = pfmt.segments.length;
+		if (nsegments > 3)
+		  throw new ParseException("too many segments in Logical Block format", i);
+		if (nsegments >= 2)
+		  {
+		    if (! (pfmt.segments[0] instanceof LiteralFormat))
+		      throw new ParseException("prefix segment is not literal", i);
+		    pfmt.prefix = ((LiteralFormat) pfmt.segments[0]).content();
+		    pfmt.body = pfmt.segments[1];
+		  }
+		else
+		  pfmt.body = pfmt.segments[0];
+		if (nsegments >=3)
+		  {
+		    if (! (pfmt.segments[2] instanceof LiteralFormat))
+		      throw new ParseException("suffix segment is not literal", i);
+		    pfmt.suffix = ((LiteralFormat) pfmt.segments[2]).content();
+		  }
+	      }
+	    else // Justification
+	      throw new ParseException("not implemented: justfication i.e. ~<...~>", i);
+	    continue;
 	  case '[':
 	    LispChoiceFormat afmt = new LispChoiceFormat();
 	    afmt.param = getParam(stack, speci);
@@ -251,6 +309,18 @@ public class LispFormat extends CompoundFormat
 		    afmt = (LispChoiceFormat) stack.elementAt(start_nesting);
 		    if (seenColon)
 		      afmt.lastIsDefault = true;
+		    fmt = popFormats(stack,
+				     start_nesting + 3 + choices_seen, speci);
+		    stack.push(fmt);
+		    choices_seen++;
+		    continue;
+		  }
+		else if (stack.elementAt(start_nesting)
+		    instanceof LispPrettyFormat)
+		  {
+		    pfmt = (LispPrettyFormat) stack.elementAt(start_nesting);
+		    if (seenAt)
+		      pfmt.perLine = true;
 		    fmt = popFormats(stack,
 				     start_nesting + 3 + choices_seen, speci);
 		    stack.push(fmt);
@@ -307,6 +377,12 @@ public class LispFormat extends CompoundFormat
 	  case '&':
 	    param1 = getParam(stack, speci);
 	    fmt = new LispFreshlineFormat(param1);
+	    break;
+	  case 'I': // Indent
+	    param1 = getParam(stack, speci);
+	    if (param1 == PARAM_UNSPECIFIED)
+	      param1 = 0;
+	    fmt = LispIndentFormat.getInstance(param1, seenColon);
 	    break;
 	  case '_': // conditional newline
 	    param1 = getParam(stack, speci);
@@ -581,8 +657,7 @@ class LispCharacterFormat extends ReportFormat
   }
 }
 
-/** Handle formatting of newline ~% and ~_ format operator.
- * format operators. */
+/** Handle formatting of newline ~% and ~_ format operator. */
 
 class LispNewlineFormat extends ReportFormat
 {
@@ -618,18 +693,42 @@ class LispNewlineFormat extends ReportFormat
   public static void printNewline(int kind, Writer dst)
     throws java.io.IOException
   {
-    /*
-    if (dst instanceof OutPort)
-      {
-	((OutPort) dst).writeBreak(kind);
-      }
-    else
-    */
-    if (dst instanceof java.io.PrintWriter)
+    if (dst instanceof OutPort && kind != PrettyWriter.NEWLINE_LITERAL)
+      ((OutPort) dst).writeBreak(kind);
+    else if (dst instanceof java.io.PrintWriter)
       // May make a difference if autoflush.  // FIXME flush if OutPort?
       ((java.io.PrintWriter) dst).println();
     else
       dst.write(line_separator);
+  }
+}
+
+/** Handle formatting of ~I (indent) format operator. */
+
+class LispIndentFormat extends ReportFormat
+{
+  boolean current;
+
+  int columns;
+
+  public static LispIndentFormat
+  getInstance(int columns, boolean current)
+  {
+    LispIndentFormat fmt = new LispIndentFormat();
+    fmt.columns = columns;
+    fmt.current = current;
+    return fmt;
+  }
+
+  public int format(Object[] args, int start, 
+		    Writer dst, FieldPosition fpos) 
+    throws java.io.IOException
+  {
+    int columns = getParam(this.columns, 0, args, start);
+    if (this.columns == LispFormat.PARAM_FROM_LIST)  start++;
+    if (dst instanceof OutPort)
+      ((OutPort) dst).setIndentation(columns, current);
+    return start;
   }
 }
 
@@ -770,6 +869,69 @@ class LispEscapeFormat extends ReportFormat
   public final static int ESCAPE_ALL = 0xF2;
 }
 
+/** Handle <code>~&lt;...~&gt;</code> - pretty-printing logical block.
+ * (Justification is not implemented.) */
+
+class LispPrettyFormat extends ReportFormat
+{
+  Format[] segments;
+  Format body;
+  String prefix;
+  String suffix;
+  boolean perLine;
+  boolean seenAt;
+
+  public int format(Object[] args, int start,
+                    Writer dst, FieldPosition fpos)  
+    throws java.io.IOException
+  {
+    String pre = prefix;
+    String suf = suffix;
+    OutPort out = dst instanceof OutPort ? (OutPort) dst : null;
+    try
+      {
+	if (seenAt)
+	  {
+	    if (out != null)
+	      out.startLogicalBlock(pre, perLine, suffix);
+	    start = ReportFormat.format(body, args, start, dst, fpos);
+	  }
+	else
+	  {
+	    Object curArg = args[start];
+	    Object[] curArr = LispFormat.asArray(curArg);
+	    if (curArr == null)
+	      pre = suf = "";
+	    if (out != null)
+	      out.startLogicalBlock(pre, perLine, suffix);
+	    if (curArr == null)
+	      ObjectFormat.format(curArg, dst, -1, true);
+	    else
+	      ReportFormat.format(body, curArr, 0, dst, fpos);
+	    start++;
+	  }
+      }
+    finally
+      {
+	if (out != null)
+	  out.endLogicalBlock(suf);
+      }
+    return start;
+  }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append("LispPrettyFormat[");
+    sbuf.append("prefix: \""); sbuf.append(prefix);
+    sbuf.append("\", suffix: \"");  sbuf.append(suffix);
+    sbuf.append("\", body: ");
+    sbuf.append(body);
+    sbuf.append("]");
+    return sbuf.toString();
+  }
+}
+
 class LispIterationFormat extends ReportFormat
 {
   int maxIterations;
@@ -786,12 +948,10 @@ class LispIterationFormat extends ReportFormat
   {
     for (int i = 0; ; i++)
       {
-	//System.err.println("it:"+i+" start:"+start+" maxIt:"+maxIterations);
 	if (i == maxIterations && maxIterations != -1)
 	  break;
 	if (start == args.length && (i > 0 || ! atLeastOnce))
 	  break;
-	//System.err.println("loop:i:"+i+ " start:"+start);
 	if (seenColon)
 	  {
 	    Object curArg = args[start];
@@ -859,55 +1019,17 @@ class LispIterationFormat extends ReportFormat
 	else
 	  format(body, maxIterations, curArgs, 0, 
 		 dst, seenColon, atLeastOnce);
-	//System.err.println("after-start:"+(start+1)+" len:"+args.length);
 	return start + 1;
       }
-    /*
-    Object[] curArgs;
-    int curStart;
-    if (seenAt)
-      {
-	curArgs = args;
-	curStart = start;
-      }
-    else
-      {
-	Object arg = args[start];
-	curArgs = LispFormat.asArray(arg);
-	if (curArgs == null)
-	  {
-	    dst.write("{"+arg+"}".toString());
-	    maxIterations = 0;
-	  }
-	curStart = 0;
-      }      
-    */
-    /*
-    for (int i = 0; ; i++)
-      {
-	//System.err.println("it:"+i+" curStart:"+curStart);
-	if (i == maxIterations && maxIterations != -1)
-	  break;
-	if (curStart == curArgs.length && (i > 0 || ! atLeastOnce))
-	  break;
-	//System.err.println("loop:i:"+i+ " curStart:"+curStart);
-	if (seenColon)
-	  {
-	    Object curArg = curArgs[curStart];
-	    Object[] curArr = LispFormat.asArray(curArg);
-	    if (curArr == null)
-	      { // ?
-	      }
-	    ReportFormat.format(body, curArr, 0, dst, fpos);
-	    curStart++;
-	  }
-	else
-	  curStart = ReportFormat.format(body, curArgs, curStart, dst, fpos);
-	if (curStart < 0)
-	  break;
-      }
-    return seenAt ? curStart : start+1;
-    */
+  }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append("LispIterationFormat[");
+    sbuf.append(body);
+    sbuf.append("]");
+    return sbuf.toString();
   }
 }
 

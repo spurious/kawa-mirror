@@ -13,6 +13,7 @@ import java.util.Hashtable;
 import gnu.kawa.xml.*;
 import gnu.bytecode.Type;
 import gnu.kawa.reflect.OccurrenceType;
+import gnu.kawa.functions.Convert;
 
 /** A class to read xquery forms. */
 
@@ -27,6 +28,8 @@ public class XQParser extends LispReader // should be extends Lexer
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
 
   int nesting;
+
+  boolean preserveBoundarySpace;
 
   /** Enter a nested expression.
    * This is used in interactive mode to control whether to continue
@@ -207,6 +210,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int FNAME_TOKEN = 'F';
 
   static final int DECLARE_NAMESPACE_TOKEN = 'M'; // <"declare" "namespace">
+  static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
   static final int DEFAULT_ELEMENT_TOKEN = 'N'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
   static final int DEFINE_FUNCTION_TOKEN = 'P'; // <"define" "function">
@@ -601,6 +605,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	      curToken = OP_WHERE;
 	    else if (match("isnot"))
 	      curToken = OP_ISNOT;
+	    else if (match("union"))
+	      curToken = OP_UNION;
 	  }
 	else if (len == 10)
 	  {
@@ -706,6 +712,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  case 'v':
 	    if (lookingAt("define", /*"v"+*/ "ariable"))
 	      return curToken = DEFINE_VARIABLE_TOKEN;
+	    break;
+	  case 'x':
+	    if (lookingAt("declare", /*"x"+*/ "mlspace"))
+	      return curToken = DECLARE_XMLSPACE_TOKEN;
 	    break;
 	  }
 	if (next >= 0)
@@ -843,6 +853,7 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   Expression makeBinary(int op, Expression exp1, Expression exp2)
+      throws java.io.IOException, SyntaxException
   {
     Expression func;
     switch (op)
@@ -895,8 +906,11 @@ public class XQParser extends LispReader // should be extends Lexer
       case OP_RANGE_TO:
 	func = makeFunctionExp("gnu.xquery.util.IntegerRange", "integerRange");
 	break;
+      case OP_UNION:
+	func = makeFunctionExp("gnu.kawa.xml.UnionNodes", "unionNodes");
+	break;
       default:
-	return new ErrorExp("unimplemented binary op: "+op);
+	return syntaxError("unimplemented binary op: "+op);
       }
     return makeBinary(func, exp1, exp2);
   }
@@ -1526,14 +1540,18 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     tokenBufferLength = 0;
+    boolean preserve = preserveBoundarySpace || delimiter != '<';
     for (;;)
       {
 	int next = read();
 	if ((next < 0 || next == '{' || next == delimiter)
 	    && tokenBufferLength > 0)
 	  {
-	    String str = new String(tokenBuffer, 0, tokenBufferLength);
-	    result.addElement(new QuoteExp(str));
+	    if (preserve)
+	      {
+		String str = new String(tokenBuffer, 0, tokenBufferLength);
+		result.addElement(new QuoteExp(str));
+	      }
 	    tokenBufferLength = 0;
 	  }
 	if (next < 0)
@@ -1542,7 +1560,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    next = read();
 	    if (next == '{')
-	      tokenBufferAppend('{');
+	      {
+		tokenBufferAppend('{');
+		preserve = true;
+	      }
 	    else
 	      {
 		unread(next);
@@ -1557,7 +1578,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    next = read();
 	    if (next == '}')
-	      tokenBufferAppend('}');
+	      {
+		tokenBufferAppend('}');
+		preserve = true;
+	      }
 	    else
 	      {
 		error("unexpected '}' in element content");
@@ -1583,9 +1607,16 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
 	else if (next == '&')
-	  parseEntityOrCharRef();
+	  {
+	    parseEntityOrCharRef();
+	    preserve = true;
+	  }
 	else
-	  tokenBufferAppend((char) next);
+	  {
+	    if (! preserve)
+	      preserve = ! Character.isWhitespace((char) next);
+	    tokenBufferAppend((char) next);
+	  }
       }
   }
 
@@ -2390,9 +2421,12 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     getRawToken();
     focusDefined = false;
+    Expression retType = parseOptionalTypeDeclaration ();
     lexp.body = parseEnclosedExpr();
     focusDefined = true;
     parser.pop(lexp);
+    if (retType != null)
+      Convert.setCoercedReturnValue(lexp, retType, interpreter);
     SetExp sexp = new SetExp (name, lexp);
     sexp.setDefining (true);
     sexp.binding = decl;
@@ -2573,6 +2607,20 @@ public class XQParser extends LispReader // should be extends Lexer
 		return QuoteExp.voidExp;
 	      }
 	  }
+      }
+    if (curToken == DECLARE_XMLSPACE_TOKEN)
+      {
+	getRawToken();
+	if (curToken != OP_EQU)
+	  return syntaxError("missing '=' in xmlspace declaration");
+	getRawToken();
+	if (match("preserve"))
+	  preserveBoundarySpace = true;
+	else if (match("skip"))
+	  preserveBoundarySpace = false;
+	else
+	  return syntaxError("xmlspace declaration must be preserve or strip");
+	return QuoteExp.voidExp;
       }
 
     Expression exp = parseExprSequence(EOF_TOKEN);

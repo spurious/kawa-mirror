@@ -1,3 +1,22 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (XQUERY_FUNCTION_NAMESPACE):  Update URL.
+
+	* XQParser.java (peekOperator):  Map 'union' to OP_UNION.
+	(makeBinary):  Implement OP_UNION using UnionNodes class.
+
+	* XQParserjava (makeBinary):  Return syntaxError if unimplemented op.
+	Updates throws specifier to allow this.
+
+	* XQParser.java (preserveBoundarySpace):  New field.
+	(DECLARE_XMLSPACE_TOKEN):  New constant.
+	(peekOperand):  Map 'declare' 'xmlspace' to DECLARE_XMLSPACE_TOKEN.
+	(parseContent):  Skip boundary whitespace if appropriate.
+	(parse):  Parse xmlspace declaration.
+
+	* XQParser.java (parseFunctionDefinition):  Handle optional return
+	type declaration using Convert.setCoercedReturnValue.
+
 2003-07-26  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  Add distinct-nodes function.

@@ -1,11 +1,13 @@
-// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 import java.io.*;
 import java.util.Vector;
 
-public class ClassType extends ObjectType implements AttrContainer {
+public class ClassType extends ObjectType 
+  implements AttrContainer, Externalizable
+{
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
@@ -848,4 +850,35 @@ public class ClassType extends ObjectType implements AttrContainer {
   {
     return "ClassType " + getName();
   }
+
+  /**
+   * @serialData Write the class name (as given by getName()) using writeUTF.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    String name = getName();
+    Type found = lookupType(name);
+    if (found != this)
+      throw new IOException("serializing ClassType not in class table not impleemented");
+    else
+      out.writeUTF(name);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName(in.readUTF());
+    flags |= ClassType.EXISTING_CLASS;
+  }
+
+  public Object readResolve() throws ObjectStreamException
+  {
+    String name = getName();
+    Type found = lookupType(name);
+    if (found != null)
+      return found;
+    mapNameToType.put(name, this);
+    return this;
+  }
+
 }

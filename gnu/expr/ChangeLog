@@ -1,3 +1,8 @@
+2004-11-10  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass): If static, name apply_method "$run$",
+	and make it private, to avoid Jikes complaining about inheritance.
+
 2004-11-05  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (count, id): Move to ScopeExp.

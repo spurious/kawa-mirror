@@ -71,6 +71,6 @@ public class Special extends Object implements Printable, Compilable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPushString(((Special) literal.value).name);
-    comp.method.compile_invoke_static (makeMethod);
+    code.emitInvokeStatic(makeMethod);
   }
 }

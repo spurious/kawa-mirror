@@ -43,7 +43,7 @@ public class IfExp extends Expression
     gnu.bytecode.CodeAttr code = comp.getCode();
     test.compile (comp, 0);
     comp.compileConstant (Interpreter.falseObject);
-    comp.method.compile_ifneq ();
+    code.emitIfNEq();
     then_clause.compile_with_linenumber (comp, flags);
     if (else_clause != null || (flags & IGNORED) == 0)
       {

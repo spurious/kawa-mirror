@@ -133,13 +133,14 @@ public class Pair extends List implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if ((literal.flags & Literal.ALLOCATING) != 0)
       {
 	// We have detected a circularity.
 	// Resolve it by only allocating the Pair, leaving the car and cdr
 	// as null.  They will be set later by one of our callers.
 	// Emit:  push makePair()  (same as new Pair (null, null)
-	comp.method.compile_invoke_static (Compilation.makeNullPairMethod);
+	code.emitInvokeStatic(Compilation.makeNullPairMethod);
 	literal.flags |= Literal.ALLOCATED;
       }
     else
@@ -153,7 +154,6 @@ public class Pair extends List implements Printable, Compilable
 	    // depended on the value of the Literal (i.e a circularity).
 	    // Just initialize car and cdr.
 	    // Emit:  this.cdr = pop();  this.car = pop();  push this;
-	    gnu.bytecode.CodeAttr code = comp.getCode();
 	    code.emitGetStatic(literal.field);
 	    code.emitDup(1, 1);  // emit dup_x1
 	    code.emitSwap();
@@ -166,7 +166,7 @@ public class Pair extends List implements Printable, Compilable
 	  {
 	    // The normal case - no circularities detected.
 	    // emit:  push new Pair (pop(), pop())
-	    comp.method.compile_invoke_static  (Compilation.makePairMethod);
+	    code.emitInvokeStatic(Compilation.makePairMethod);
 	  }
       }
   }

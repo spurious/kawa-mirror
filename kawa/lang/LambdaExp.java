@@ -273,7 +273,7 @@ public class LambdaExp extends ScopeExp
     code.emitDup(new_class);
     if (staticLink != null)
       code.emitLoad(outerLambda().heapFrame);
-    comp.method.compile_invoke_special (new_class.constructor);
+    code.emitInvokeSpecial(new_class.constructor);
   }
 
   void compile_setLiterals (Compilation comp)

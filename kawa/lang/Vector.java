@@ -82,7 +82,7 @@ public class Vector extends Sequence implements Printable, Compilable
     // Stack contents:  ..., Vector, array
     code.emitDup(2, 0);  // dup2
     // Stack contents:  ..., Vector, array, Vector, array
-    comp.method.compile_invoke_special (initVectorMethod);
+    code.emitInvokeSpecial(initVectorMethod);
     literal.flags |= Literal.ALLOCATED;
 
     // Stack contents:  ..., Vector, array

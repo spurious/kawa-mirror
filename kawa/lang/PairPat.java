@@ -70,6 +70,6 @@ public class PairPat extends Pattern implements Printable, Compilable
     literal.check_cycle ();
     comp.emitLiteral (car);
     comp.emitLiteral (cdr);
-    comp.method.compile_invoke_static (makePairPatMethod);
+    comp.getCode().emitInvokeStatic(makePairPatMethod);
   }
 }

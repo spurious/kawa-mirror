@@ -86,6 +86,6 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
   {
     literal.check_cycle ();
     comp.emitLiteral (element_pattern);
-    comp.method.compile_invoke_static (makeListRepeatMethod);
+    comp.getCode().emitInvokeStatic(makeListRepeatMethod);
   }
 }

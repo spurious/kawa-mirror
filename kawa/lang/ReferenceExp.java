@@ -82,7 +82,7 @@ public class ReferenceExp extends Expression
 	comp.compileConstant (symbol);
 	if (comp.immediate)
 	  comp.method.compile_checkcast (comp.scmSymbolType);
-	comp.method.compile_invoke_static (comp.lookupGlobalMethod);
+	comp.getCode().emitInvokeStatic(comp.lookupGlobalMethod);
       }
   }
 

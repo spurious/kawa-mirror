@@ -124,7 +124,7 @@ public class Literal
 	code.emitNew(comp.javaIntegerType);
 	code.emitDup(comp.javaIntegerType);
 	code.emitPushInt(((Integer)value).intValue ());
-	comp.method.compile_invoke_special (comp.initIntegerMethod);
+	code.emitInvokeSpecial(comp.initIntegerMethod);
       }
     else if (value instanceof String[])
       emitArray (comp, comp.javaStringType);

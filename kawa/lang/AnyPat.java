@@ -43,6 +43,6 @@ public class AnyPat extends Pattern implements Printable, Compilable
 
   public void emit (Literal literal, Compilation comp)
   {
-    comp.method.compile_invoke_static (makeAnyPatMethod);
+    comp.getCode().emitInvokeStatic(makeAnyPatMethod);
   }
 }

@@ -46,7 +46,7 @@ public abstract class Procedure extends Named implements Printable
     * @exception kawa.lang.WrongArguments there are too many or too
     *     few actual arguments
     */
-  public static void checkArgs(Procedure proc, int argCount)
+  public static void checkArgCount(Procedure proc, int argCount)
   {
     int num = proc.numArgs();
     if (argCount < (num & 0xFFF)

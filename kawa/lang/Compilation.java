@@ -100,6 +100,8 @@ public class Compilation
 			     Access.PUBLIC|Access.STATIC);
   static Method makePairMethod;
 
+  static Method checkArgCountMethod;
+
   public static Method apply0method = scmProcedureType.addMethod
   ("apply0", apply0args, scmObjectType, Access.PUBLIC|Access.FINAL);
 
@@ -108,7 +110,7 @@ public class Compilation
   public static Method apply3method;
   public static Method apply4method;
   public static Method applyNmethod;
-  static Type[] apply1args = { scmObjectType };
+  public static Type[] apply1args = { scmObjectType };
 
   static
   {
@@ -133,6 +135,12 @@ public class Compilation
     makePairMethod = scmPairType.addMethod ("makePair", apply2args,
 					     scmPairType,
 					     Access.PUBLIC|Access.STATIC);
+    Type[] args = new Type[2];
+    args[0] = scmProcedureType;
+    args[1] = Type.int_type;
+    checkArgCountMethod
+      = scmProcedureType.addMethod("checkArgCount", args, Type.void_type,
+				   Access.PUBLIC|Access.STATIC);
   }
 
   public static Method[] applymethods = {
@@ -423,12 +431,12 @@ public class Compilation
 
     method = constructor_method;
     constructor_method.init_param_slots ();
-    constructor_method.compile_push_this ();
-    constructor_method.compile_invoke_special (superConstructor);
     CodeAttr code = getCode();
+    code.emitPushThis();
+    code.emitInvokeSpecial(superConstructor);
     if (constructor_takes_staticLink)
       {
-	constructor_method.compile_push_this ();
+	code.emitPushThis();
 	Variable staticLinkArg = code.getArg(1);
 	code.emitLoad(staticLinkArg);
 	code.emitPutField(lexp.staticLinkField);
@@ -443,6 +451,17 @@ public class Compilation
 	code.emitPutField(nameField);
       }
     code.emitReturn();
+
+    if (arg_letter == 'N')
+      {
+	method = curClass.addMethod("numArgs", apply0args, Type.int_type,
+				    Access.PUBLIC);
+	method.init_param_slots ();
+	code = getCode();
+	code.emitPushInt(lexp.min_args | (lexp.max_args << 12));
+	code.emitReturn();
+      }
+
 
     String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
     Method apply_method
@@ -470,6 +489,10 @@ public class Compilation
       var.setType(new_class);
     else
        throw new Error("internal error - 'this' is not first arg");
+
+    int line = lexp.getLine();
+    if (line > 0)
+      method.compile_linenumber (line);
 
     for ( ;  var != null;  var = var.nextVar ())
       {
@@ -510,6 +533,16 @@ public class Compilation
 	    incomingMap[i-1] = incoming;
 	  }
 	i++;
+      }
+
+    if (arg_letter == 'N'
+	 // && If generating code to check number of arguments
+	)
+      {
+	code.emitPushThis();
+	code.emitLoad(argsArray);
+	code.emitArrayLength();
+	code.emitInvokeStatic(checkArgCountMethod);
       }
 
     code.enterScope (lexp.scope);
@@ -571,7 +604,7 @@ public class Compilation
 		    code.emitPushInt(i);
 		    code.emitLoad(argsArray);
 		    code.emitArrayLength();
-		    method.compile_ifi_lt();
+		    code.emitIfIntLt();
 		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
                     method.compile_array_load(scmObjectType);
@@ -585,7 +618,7 @@ public class Compilation
 		    // Convert argsArray[i .. ] to a list.
 		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
-		    method.compile_invoke_static(makeListMethod);
+		    code.emitInvokeStatic(makeListMethod);
 		  }
 		else
 		  { // Keyword argument.
@@ -603,9 +636,9 @@ public class Compilation
 		    code.emitLoad(argsArray);
 		    code.emitPushInt(lexp.min_args + opt_args);
 		    compileConstant(lexp.keywords[key_i++]);
-		    method.compile_invoke_static(searchForKeywordMethod);
+		    code.emitInvokeStatic(searchForKeywordMethod);
 		    code.emitDup(1);
-		    method.compile_goto_if (199); // ifnonnull
+		    code.emitGotoIf(199); // ifnonnull
 		    code.emitPop(1);
 		    lexp.defaultArgs[opt_i++].compile(this, 0);
 		    code.emitFi();

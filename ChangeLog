@@ -1,3 +1,55 @@
+Sat Jul 20 11:25:05 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/Shell.java:  Re-structure.
+
+	* kawa/standard/{and,or}.java:  Remove old-style implementations.
+	* kawa/standard/{and_or,with_output_to_file}.java:  New classes.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}:  Update.
+	
+	* kawa/standard/{let,letstar,letrec,set_b}.java (rewrite):
+	Call Declaration.noteValue.
+	* kawa/standard/minus_oper.java (applyN):  Fix sign/logic error.
+	
+	* kawa/lang/Interpreter.java (apply):  Remove obsolete method.
+	(lookup_global):  Fix typeo.
+
+	Implement tail-recursion-elimination (and fix more bugs).
+	* kawa/lang/Expression.java (compile):  Changed to take flag mask
+	instead of boolean. Added IGNORED and LAST.
+	* kawa/lang/{ApplyExp,BeginExp,ErrorExp,IfExp,LambdaExp,LetExp,
+	QuoteExp,ReferenceExp,SetExp}.java:  Update definitions and
+	uses of compile methods accordingly.
+	* kawa/lang/IfExp.java (compile): Only goto end_label if reachableHere.
+	* kawa/lang/ApplyExp.java (compile):  Check for and optimize
+	tail-recursion.
+	* kawa/lang/LambdaExp.java (argsArray): New, replaces local array_args.
+	* kawa/lang/LambdaExp.java:  Call noteValue appropriately,
+	* kawa/lang/LambdaExp.java (getArgs):  New method.
+	* kawa/lang/LetExp.java (print):  Deal with artificial Variables.
+	* kawa/lang/QuoteExp.java (undefined_exp):  New static field.
+
+	* kawa/lang/Declaration.java (value):  New field.
+	(noteValue):  New method.
+
+	* kawa/lang/compilefunc.java (compile):  Set start_label.
+	
+	* kawa/lang/Compilation.java:  Make int1Args a field, not a local.
+
+	* kawa/standard/exit.java:  Take optional status.  Call System.exit.
+	* kawa/lang/Exit.java:  Removed.  No longer needed.
+	* kawa/lang/{Makefile.am,Makefile.in}  Remove Exit.class.
+	
+	* kawa/lang/ScopeExp.java (assign_space):  If outside any lambda,
+	make all variables non-simple (and allocate a heapFrame).
+	
+	* kawa/lang/Named.java:  Don't make pointless copy of name.
+	* kawa/lang/Procedure.java:  Deafult is name is now null.
+	* kawa/lang/Procedure0or1.java:  Add default constructor.
+	* kawa/lang/AutoloadProcedure.java (load):  If we have a name but
+	the loaded Procedure has none, use the former for the latter.
+	* kawa/standard/{plus_oper,minus_oper,multiply_oper,divide_oper).java:
+	Remove constructor.  Naming is handled by autoloader.
+
 Sat Jul 20 17:40:46 1996  Anthony Green  <green@csk3.cygnus.com>
 
 	* */Makefile.am, */Makefile.in: srcdir is no longer 

@@ -1,24 +1,76 @@
 package gnu.jemacs.buffer;
+import javax.swing.text.*;
+import java.io.*;
 
 public class Buffer
 {
   String name;
   String filename;
+  //boolean modified;
 
   static javax.swing.text.StyleContext styles
   = new javax.swing.text.StyleContext();
+  Style inputStyle = styles.addStyle("input", null);
 
   /** Value of point (0-orgin), when curPosition is null. */
   int point;
-  javax.swing.text.Caret curPosition = null;
+  Caret curPosition = null;
 
-  javax.swing.text.GapContent content;
-  javax.swing.text.DefaultStyledDocument document;
+  BufferContent content;
+  DefaultStyledDocument document;
+  DefaultStyledDocument modelineDocument;
+  public final BufferKeymap keymap = new BufferKeymap(this);
 
+  /** Map buffer names to buffer.s */
   public static java.util.Hashtable buffers
   = new java.util.Hashtable(100);
 
+  /** Map file names to buffer.s */
+  public static java.util.Hashtable fileBuffers
+  = new java.util.Hashtable(100);
+
   public String getName() { return name; }
+
+  public String getFileName() { return filename; }
+
+  public void setFileName(String fname)
+  {
+    if (filename != null && fileBuffers.get(filename) == this)
+      fileBuffers.remove(filename);
+    if (name != null && buffers.get(name) == this)
+      buffers.remove(name);
+    filename = fname;
+    name = generateNewBufferName(new java.io.File(fname).getName());
+    buffers.put(name, this);
+    fileBuffers.put(filename, this);
+    redrawModeline();
+  }
+
+  public static Buffer findFile(String fname)
+  {
+    Buffer buffer = (Buffer) fileBuffers.get(fname);
+    if (buffer == null)
+      {
+        buffer = new Buffer(null);
+        buffer.setFileName(fname);
+        try
+          {
+            Reader in = new FileReader(fname);
+            buffer.insertFile(in);
+            in.close();
+          }
+        catch (java.io.FileNotFoundException ex)
+          {
+            Signal.message("New file");
+          }
+        catch (Exception ex)
+          {
+            throw new RuntimeException("error reading file \"" + fname
+                                       + "\": " + ex);
+          }
+      }
+    return buffer;
+  }
 
   public static Buffer getBuffer(String name)
   {
@@ -53,11 +105,27 @@ public class Buffer
       }
   }
 
+  public void redrawModeline()
+  {
+    try
+      {
+        modelineDocument.remove(0, modelineDocument.getLength());
+        modelineDocument.insertString(0, "---JEmacs: " + getName() + " ---", null);
+      }
+    catch (javax.swing.text.BadLocationException ex)
+      {
+        throw new Error("internal error in redraw-modeline- "+ex);
+      }
+  }
+
   public Buffer(String name)
   {
     this.name = name;
-    content = new javax.swing.text.GapContent();
+    content = new BufferContent();
     document = new javax.swing.text.DefaultStyledDocument(content, styles);
+    modelineDocument
+      = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
+    redrawModeline();
   }
 
   public final int getDot()
@@ -107,41 +175,92 @@ public class Buffer
     return "#<buffer \"" + name + "\">";
   }
 
-  /** Insert count copies of ch at point. */
-  public void insert (char ch, int count)
+  public void insert (String string, Style style)
   {
-    if (count < 0)
-      return;
-    int todo = count > 500 ? 500 : count;
-    StringBuffer sbuf = new StringBuffer(todo);
-    for (int i = todo;  --i >= 0; )
-      sbuf.append(ch);
-    String str = sbuf.toString();
-    if (curPosition != null)
-      point = curPosition.getDot();
+    pointMarker.insert(string, style);
+  }
+
+  /** Insert count copies of ch at point. */
+  public void insert (char ch, int count, Style style)
+  {
+    pointMarker.insert(ch, count, style);
+  }
+
+  Marker pointMarker = makePointMarker();
+
+  private Marker makePointMarker ()
+  {
+    Marker marker = new Marker();
+    marker.buffer = this;
+    marker.index = Marker.POINT_POSITION_INDEX;
+    return marker;
+  }
+
+  public Marker getPointMarker (boolean share)
+  {
+    return share ? pointMarker : new Marker(pointMarker);
+  }
+
+  public void save(Writer out)
+    throws java.io.IOException, javax.swing.text.BadLocationException
+  {
+    int length = document.getLength();
+    int todo = length;
+    Segment segment = new Segment();
+    int offset = 0;
+    while (offset < length)
+      {
+        int count = length;
+        if (count > 4096)
+          count = 4096;
+        document.getText(offset, count, segment);
+        out.write(segment.array, segment.offset, segment.count);
+        offset += count;
+      }
+  }
+
+  public void save()
+  {
+    try
+      {
+        Writer out = new FileWriter(filename);
+        save(out);
+        out.close();
+      }
+    catch (Exception ex)
+      {
+        throw new RuntimeException("error save-buffer: "+ex);
+      }
+  }
+
+  public void insertFile(Reader in)
+    throws java.io.IOException, javax.swing.text.BadLocationException
+  {
+    char[] buffer = new char[2048];
+    int offset = getDot();
     for (;;)
       {
-	try
-	  {
-	    document.insertString(point, str, null);
-	  }
-	catch (javax.swing.text.BadLocationException ex)
-	  {
-	    throw new Error("bad location: "+ex);
-	  }
-	point += todo;
-	count -= todo;
-	if (count == 0)
-	  break;
-	if (count < 500)
-	  {
-	    todo = count;
-	    sbuf.setLength(todo);
-	    str = sbuf.toString();
-	  }
+        int count = in.read(buffer, 0, buffer.length);
+        if (count <= 0)
+          break;
+        document.insertString(offset, new String(buffer, 0, count), null);
+        offset += count;
       }
-    if (curPosition != null)
-      curPosition.setDot(point);
+    setDot(offset);
+  }
+
+  public void insertFile(String filename)
+  {
+    try
+      {
+        Reader in = new FileReader(filename);
+        insertFile(in);
+        in.close();
+      }
+    catch (Exception ex)
+      {
+        throw new RuntimeException("error reading file \""+filename+"\": "+ex);
+      }
   }
 
   /*

@@ -27,7 +27,8 @@ public class ModuleMethod extends MethodProc
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
-    setName(name);
+    if (name != null)
+      setName(name);
   }
 
   /** Figure out parameter types.

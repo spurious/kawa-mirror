@@ -61,8 +61,9 @@ public class GuiConsole extends Frame implements ActionListener {
     setSize(700,500);
     setVisible(true);
 
-    thread = new Future (new kawa.Shell(interp, in_p, out_p, err_p),
-			 interp.getEnvironment());
+    Environment env = interp.getEnvironment();
+    thread = new Future (new kawa.repl(interp),
+			 env, in_p, out_p, err_p);
     thread.start();
   }
 

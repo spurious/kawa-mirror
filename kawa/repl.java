@@ -7,15 +7,34 @@ import gnu.expr.*;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
-public class repl
+public class repl extends Procedure0or1
 {
   public static String compilationDirectory = null;
   public static String compilationTopname = null;
   public static String compilationPrefix = null;
 
+  Interpreter interp;
+
+  public repl(Interpreter interp)
+  {
+    this.interp = interp;
+  }
+
+  public Object apply0 ()
+  {
+    Shell.run(interp, Environment.getCurrent());
+    return Scheme.voidObject;
+  }
+
+  public Object apply1(Object env)
+  {
+    Shell.run(interp, (Environment) env);
+    return Scheme.voidObject;
+  }
+
   static void bad_option (String str)
   {
-    System.err.println ("kawa: bad option '" + str + "'");
+    System.err.println ("kawa: bad option `" + str + "'");
     System.exit (-1);
   }
 
@@ -58,11 +77,35 @@ public class repl
 			       commandLineArguments);
   }
 
+  static Interpreter defaultInterpreter = null;
+
+  public static Interpreter getInterpreter()
+  {
+    if (defaultInterpreter == null)
+      {
+	defaultInterpreter = new Scheme();
+	Environment.setCurrent(defaultInterpreter.getEnvironment());
+      }
+    return defaultInterpreter;
+  }
+
+  public static void setInterpreter(String name)
+  {
+    Interpreter previous = defaultInterpreter; 
+    if (name.length() > 2 && name.charAt(0) == '-')
+      name = name.substring(name.charAt(1) == '-' ? 2 :1);
+    if (name.equals("scheme"))
+      defaultInterpreter = Scheme.getInstance();
+    else if (name.equals("elisp") || name.equals("emacs"))
+      defaultInterpreter = gnu.elisp.ELisp.getInstance();
+    else
+      bad_option(name);
+    if (previous == null)
+      Environment.setCurrent(defaultInterpreter.getEnvironment());
+  }
+
   public static void main(String args[])
   {
-    Interpreter interp = new Scheme();
-    Environment.setCurrent(interp.getEnvironment());
-
     int iArg = 0;
     boolean something_done = false;
     for ( ;  iArg < args.length;  iArg++)
@@ -73,10 +116,11 @@ public class repl
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
+	    getInterpreter();
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
-	    Shell.runString (args[iArg], interp);
+	    Shell.runString(args[iArg], defaultInterpreter, Environment.getCurrent());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -84,6 +128,7 @@ public class repl
 	    iArg++;
 	    if (iArg == args.length)
 	      bad_option (arg);
+	    getInterpreter();
 	    setArgs (args, iArg+1);
 	    checkInitFile();
 	    Shell.runFile (args[iArg]);
@@ -92,16 +137,18 @@ public class repl
 	else if (arg.equals ("-s") || arg.equals ("--"))
 	  {
 	    iArg++;
+	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(interp);
+	    Shell.run(defaultInterpreter, Environment.getCurrent());
 	    return;
 	  }
 	else if (arg.equals ("-w"))
 	  {
+	    getInterpreter();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    new kawa.GuiConsole(interp);
+	    new kawa.GuiConsole(defaultInterpreter);
 	    something_done = true;
 	  }
 	else if (arg.equals ("-d"))
@@ -128,6 +175,7 @@ public class repl
 	else if (arg.equals ("-C"))
 	  {
 	    ++iArg;
+	    getInterpreter();
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    for ( ; iArg < args.length;  iArg++)
@@ -157,6 +205,7 @@ public class repl
 	  }
 	else if (arg.equals("--connect"))
 	  {
+	    getInterpreter();
 	    ++iArg;
 	    if (iArg == args.length)
 	      bad_option (arg);
@@ -194,6 +243,7 @@ public class repl
 	  }
 	else if (arg.equals("--server"))
 	  {
+	    getInterpreter();
 	    ++iArg;
 	    if (iArg == args.length)
 	      bad_option (arg);
@@ -225,7 +275,7 @@ public class repl
 		    System.err.println("got connection from "
 				       +client.getInetAddress()
 				       +" port:"+client.getPort());
-		    serveTelnet(client);
+		    serveTelnet(defaultInterpreter, client);
 		  }
 	      }
 	    catch (java.io.IOException ex)
@@ -233,6 +283,8 @@ public class repl
 		throw new Error(ex.toString());
 	      }
 	  }
+	else if (arg.equals("--elisp") || arg.equals("--scheme") || args.equals("emacs"))
+	  setInterpreter(arg);
 	else if (arg.equals("--main"))
 	  {
 	    Compilation.generateMainDefault = true;
@@ -272,7 +324,7 @@ public class repl
       }
     if (something_done)
       return;
-
+    getInterpreter();
     if (iArg < args.length)
       {
 	setArgs (args, iArg+1);
@@ -283,7 +335,7 @@ public class repl
       {
 	setArgs (args, iArg);
 	checkInitFile();
-	Shell.run(interp);
+	Shell.run(defaultInterpreter);
       }
    }
 
@@ -291,7 +343,8 @@ public class repl
       @param client A client that has connected to us,
       and that wants to use the telnet protocol to talk to a
       Scheme read-eval-print-loop. */
-  static void serveTelnet (java.net.Socket client) throws java.io.IOException
+  static void serveTelnet (Interpreter interp, java.net.Socket client)
+    throws java.io.IOException
   {
     TelnetConnection conn = new TelnetConnection(client, true);
     java.io.OutputStream sout = conn.getOutputStream();
@@ -299,15 +352,52 @@ public class repl
     OutPort out = new OutPort(sout);
     TtyInPort in = new TtyInPort(sin, "<stdin>", out);
     /*
+    conn.request(TelnetConnection.DO, TelnetConnection.EOF);
     conn.request(TelnetConnection.DO, TelnetConnection.NAWS);
     conn.request(TelnetConnection.DO, TelnetConnection.TTYPE);
     conn.request(TelnetConnection.DO, TelnetConnection.LINEMODE);
     */
 
-    Interpreter my_interp = new Scheme();
-    Shell shell = new Shell(my_interp, in, out, out);
-    shell.socket = client;
-    Thread thread = new Future(shell, my_interp.getEnvironment());
+    System.err.println("create new Future");
+    Thread thread = new Future(new SocketRepl(interp, client),
+			       interp.getEnvironment(),
+			       in, out, out);
+    System.err.println("start new Future");
     thread.start();
+    System.err.println("Future started");
   }
 }
+
+class SocketRepl extends Procedure0
+{
+  // close when finished.
+  java.net.Socket socket;
+
+  Interpreter interp;
+
+  public SocketRepl(Interpreter interp, java.net.Socket socket)
+  {
+    this.interp = interp;
+    this.socket = socket;
+  }
+
+  public Object apply0 ()
+  {
+    try
+      {
+	Shell.run(interp, Environment.getCurrent());
+	return Scheme.voidObject;
+      }
+    finally
+      {
+	try
+	  {
+	    socket.close();
+	  }
+	catch (java.io.IOException ex)
+	  {
+	  }
+      }
+  }
+}
+

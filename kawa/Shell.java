@@ -6,85 +6,37 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
 import gnu.text.SourceMessages;
+import gnu.text.Lexer;
 
-public class Shell extends Procedure0
+/** Utility functions (static methods) for kawa.repl.
+ * Should probably be merged with kawa.repl.  FIXME. */
+
+public class Shell
 {
-  Interpreter interp;
-  InPort in;
-  OutPort out, err;
-
-  // If non-null, close when finished.
-  java.net.Socket socket;
-
-  public Shell (Interpreter interp, InPort in, OutPort out, OutPort err)
-  {
-    this.interp = interp;
-    this.in = in;
-    this.out = out;
-    this.err = err;
-  }
-
-  public Object apply0 ()
-  {
-    InPort saveIn = InPort.inDefault();
-    OutPort saveOut = OutPort.outDefault();
-    OutPort saveErr = OutPort.errDefault();
-    Environment saveEnv = Environment.getCurrent();
-    try
-      {
-	OutPort.setOutDefault(out);
-	OutPort.setErrDefault(err);
-	InPort.setInDefault(in);
-	Environment.setCurrent(interp.getEnvironment());
-
-	if (in instanceof TtyInPort)
-	  {
-	    Object prompter = interp.lookup("default-prompter");
-	    if (prompter != null && prompter instanceof Procedure)
-	      ((TtyInPort)in).setPrompter((Procedure) prompter);
-	  }
-	run(interp, in, out, err);
-	return Scheme.voidObject;
-      }
-    finally
-      {
-	OutPort.setOutDefault(saveOut);
-	OutPort.setErrDefault(saveErr);
-	InPort.setInDefault(saveIn);
-	Environment.setCurrent(saveEnv);
-	if (socket != null)
-	  {
-	    try
-	      {
-		socket.close();
-	      }
-	    catch (java.io.IOException ex)
-	      {
-	      }
-	  }
-      }
-  }
-
   public static void run (Interpreter interp)
+  {
+    run(interp, interp.getEnvironment());
+  }
+
+  public static void run (Interpreter interp, Environment env)
   {
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Object prompter = interp.lookup("default-prompter");
+	Object prompter = env.get("default-prompter");
 	if (prompter != null && prompter instanceof Procedure)
 	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
       }
 
-    run(interp, inp, OutPort.outDefault(), OutPort.errDefault());
+    run(interp, env, inp, OutPort.outDefault(), OutPort.errDefault());
   }
 
-  public static void run (Interpreter interp,
+  public static void run (Interpreter interp,  Environment env,
 			  InPort inp, OutPort pout, OutPort perr)
   {
-    Environment env = interp.getEnvironment();
     SourceMessages messages = new SourceMessages();
     Translator tr = new Translator(env, messages);
-    ScmRead lexer = new ScmRead(inp, messages);
+    Lexer lexer = interp.getLexer(inp, messages);
     for (;;)
       {
 	try
@@ -92,7 +44,7 @@ public class Shell extends Procedure0
 	    lexer.clearErrors();
 	    PairWithPosition body = new PairWithPosition(inp,
 							 null, List.Empty);
-	    Object sexp = lexer.readObject();
+	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
 	    if (sexp == Sequence.eofValue)
 	      return;
 	    body.car = sexp;
@@ -143,9 +95,9 @@ public class Shell extends Procedure0
       }
   }
 
-  public static void runString (String str, Interpreter interp)
+  public static void runString (String str, Interpreter interp, Environment env)
   {
-    run (interp, new CharArrayInPort(str), null, OutPort.errDefault());
+    run(interp, env, new CharArrayInPort(str), null, OutPort.errDefault());
   }
 
   public static void runFile (String fname)

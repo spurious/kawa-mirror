@@ -5,7 +5,7 @@ import gnu.bytecode.ClassType;
 import gnu.expr.Compilation;
 
 /** A Constraint whose value is that of a named field/method of an object.
- * The object used is the owning Binding's value.
+ * The object is used as the owning Binding's value.
  * (For now, only fields are supported.)
  */
 
@@ -126,6 +126,13 @@ public class ClassMemberConstraint extends Constraint
 	try
 	  {
 	    Object value = field.get(object);
+	    if (field.getType().getName() == "gnu.mapping.Location")
+	      { // Handles exported aliases:
+		name = Compilation.demangleName(name, true).intern();
+		Binding binding = env.getBinding(name);
+		AliasConstraint.define(binding, (Location) value);
+		return;
+	      }
 	    if (value instanceof Binding)
 	      {
 		env.addBinding((Binding) value);
@@ -137,8 +144,8 @@ public class ClassMemberConstraint extends Constraint
 		    : Compilation.demangleName(name, true));
 
 	    // The problem with the following is that we can't catch
-	    // set! to a constant (defined using define-contsant).  (Note we
-	    // do want to allow a new define, at leastwhen interactive.)
+	    // set! to a constant (defined using define-constant).  (Note we
+	    // do want to allow a new define, at least when interactive.)
 	    // However, if we always use a ClassMemberConstraint then
 	    // some hitherto-valid Scheme programs will break:  Since it
 	    // will also prohibit re-assigning to a procedure defined

@@ -1,3 +1,9 @@
+Mon Sep 16 11:09:40 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Makefile.{am,in}: (javadir):  Use $(subdir)
+	{DEP_,}DISTFILES):  Do not include DATA (i.e. *.class).
+	Replace generated EXTRA_DIST with ditto SOURCES.
+
 Thu Sep 12 17:21:20 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* CpoolLong.java:  New class, for CONSTANT_Long.

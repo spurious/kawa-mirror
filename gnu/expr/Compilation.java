@@ -1023,7 +1023,7 @@ public class Compilation
 
   /** In an <init> for a generated ClassExp, emit $finit$ calls.
    * This recursively traverses superclasses, and also calls their $finit$.
-   * @param clas Class to search for $finit$, and to serach supertypes.
+   * @param clas Class to search for $finit$, and to search supertypes.
    * @param seen array of seen classes, to avoid duplicate $finit$ calls.
    */
   private void callInitMethods (ClassType clas, Vector seen)
@@ -1040,7 +1040,9 @@ public class Compilation
 	return;
     seen.addElement(clas);
 
-    callInitMethods(clas.getSuperclass(), seen);
+    // Recusive call to emit $finit$ of super-types.  However, don't do that
+    // for clas.getSuperclass(), because our <init> will automatically call
+    // the super-class's <init>, which will call its $finit$.
     ClassType[] interfaces = clas.getInterfaces();
     if (interfaces != null)
       {

@@ -1,3 +1,9 @@
+2003-08-09  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (callInitMethods):  Don't call recursively
+	on superclass - that gets handled by super's <init>.
+	Fixes Savannah bug #4540.
+
 2003-08-06  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (comp):  New field.

@@ -5,6 +5,10 @@ import gnu.lists.*;
 
 public class DefineNamespace extends Syntax
 {
+  public static final DefineNamespace define_namespace
+    = new DefineNamespace();
+  static { define_namespace.setName("define-namespace"); }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {

@@ -4,9 +4,9 @@ public abstract class ConsumeProc extends gnu.mapping.ProcedureN
 {
 	public Object applyN (Object[] args)
 	{
-		Collector collector = new Collector();
+		TreeList collector = new TreeList();
 		applyN(collector, args);
-		return collector.getResult();
+		return collector;
 	}
 
 	public abstract void applyN (Consumer consumer, Object[] args);

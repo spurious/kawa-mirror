@@ -9,7 +9,6 @@ javadir=$(datadir)/java/$(subdir)
 java_JAVA=\
   AbstractString.java \
   CharBuffer.java \
-  Collector.java \
   Consumable.java \
   ConsumeProc.java \
   Consumer.java \
@@ -28,6 +27,7 @@ java_JAVA=\
   S64Vector.java \
   Sequence.java \
   SubString.java \
+  TreeList.java \
   U8Vector.java \
   U16Vector.java \
   U32Vector.java \

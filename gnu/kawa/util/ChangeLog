@@ -1,3 +1,16 @@
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	* TreeList.java:  New class.
+	* ConsumeProc.java (applyN):  Use a TreeList instead of Collector.
+	* Collector.java:  Removed.
+	* gnu/kawa/util/Consumer.java (beginGroup):  Add new typeName argument.
+	(beginAttributes):  Liekwise.
+	(endGroup):  Make argument be a type-name String.
+	(endAttribute):  Removed method.
+	(endAttributes):  New method.
+	(writeChars(AbstractString)):  Removed.
+	* Makefile.am (java_JAVA):  Update accordingly.
+
 2000-12-13  Per Bothner  <per@bothner.com>
 
 	* LList.java (reverseInPlace):  New static method.

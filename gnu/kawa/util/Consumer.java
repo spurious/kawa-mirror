@@ -13,13 +13,15 @@ public interface Consumer
 	public void writeInt(int v);
 	public void writeLong(long l);
 
-	public void beginGroup(Object tag);
-	public void endGroup(Object tag);
+	public void beginGroup(String typeName, Object type);
+	public void endGroup(String typeName);
 
 	/** Write a attribute for the current group.
 	 * This is only allowed immediately after a beginGroup. */
-	public void beginAttribute(Object name);
-	public void endAttribute(Object name);
+	public void beginAttribute(String attrName, Object attrType);
+
+	/** No more attributes in this group. */
+	public void endAttributes();
 
 	public void writeObject(Object v);
 
@@ -28,7 +30,7 @@ public interface Consumer
 	public boolean ignoring();
 
 	public void writeChars(String str);
-	public void writeChars(AbstractString str);
+	// public void writeChars(AbstractString str);
 	public void write(char[] buf, int off, int len);
 }
 

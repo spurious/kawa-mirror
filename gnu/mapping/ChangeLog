@@ -1,3 +1,7 @@
+2000-02-01  Per Bothner  <per@bothner.com>
+
+	* Binding.java (getConstraint, getFunctionValue):  New methods.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* Binding.java (trivialConstraint):  New static field.

@@ -2,7 +2,7 @@ package gnu.mapping;
 
 /** A Binding is a Location in an Environment object. */
 
-public final class Binding extends Location
+public class Binding extends Location
     // implements java.util.Map.Entry
 {
   /** The current value of the binding. */
@@ -23,6 +23,11 @@ public final class Binding extends Location
   public final void set (Object value)
   {
     constraint.set(this, value);
+  }
+
+  public final Constraint getConstraint()
+  {
+    return constraint;
   }
 
   public final void setConstraint (Constraint constraint)
@@ -220,5 +225,17 @@ public final class Binding extends Location
 	  }
       }
     return countInserted;
+  }
+
+  public final Object getFunctionValue()
+  {
+    // Kludge  FIXME
+    Constraint constraint = Constraint.getConstraint(this);
+    if (constraint instanceof gnu.jemacs.lang.SymbolConstraint)
+      return ((gnu.jemacs.lang.SymbolConstraint) constraint).getFunctionBinding(this);
+    else if (isBound())
+      return get();
+    else
+      return null;
   }
 }

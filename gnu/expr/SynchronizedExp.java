@@ -32,8 +32,10 @@ public class SynchronizedExp extends Expression
     code.emitStore(objvar); 
     code.emitMonitorEnter();
     code.emitTryStart(false,
-		      target instanceof IgnoreTarget ? null
+		      (target instanceof IgnoreTarget
+		       || target instanceof ConsumerTarget) ? null
 		      : target.getType());
+
     body.compileWithPosition(comp, target); 
     code.emitLoad(objvar);
     code.emitMonitorExit();

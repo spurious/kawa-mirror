@@ -1,3 +1,7 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* SynchronizedExp.java (compile):  Check for a ConsumerTarget.
+
 2001-07-16  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (languages):  Added xquery.

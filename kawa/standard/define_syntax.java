@@ -33,8 +33,7 @@ public class define_syntax extends Syntax
     return tr.syntaxError("define-syntax not in a body");
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
     SyntaxForm syntax = null;
     Object st_cdr = st.cdr;
@@ -43,20 +42,34 @@ public class define_syntax extends Syntax
 	syntax = (SyntaxForm) st_cdr;
 	st_cdr = syntax.form;
       }
-    Object name = Translator.safeCar(st_cdr);
+    Object p = st_cdr;
+    Object name;
+    if (p instanceof Pair)
+      {
+	Pair pp = (Pair) p;
+	name = pp.car;
+	p = pp.cdr;
+      }
+    else
+      name = null;
+    SyntaxForm nameSyntax = syntax;
+    while (name instanceof SyntaxForm)
+      {
+	nameSyntax = (SyntaxForm) name;
+	name = nameSyntax.form;
+      }
     if (! (name instanceof String || name instanceof Symbol))
       {
-        forms.addElement(tr.syntaxError("Missing macro name for "+Translator.safeCar(st)));
-        return false;
+        tr.formStack.addElement(tr.syntaxError("missing macro name for "+Translator.safeCar(st)));
+        return;
       }
-    Object p = Translator.safeCdr(st_cdr);
     if (p == null || Translator.safeCdr(p) != LList.Empty)
       {
-        forms.addElement(tr.syntaxError("invalid syntax for "+getName()));
-        return false;
+        tr.formStack.addElement(tr.syntaxError("invalid syntax for "+getName()));
+        return;
       }
 
-    Declaration decl = defs.getDefine(name, 'w', tr);
+    Declaration decl = tr.define(name, nameSyntax, defs);
     decl.setType(typeMacro); 
     tr.push(decl);
 
@@ -64,7 +77,7 @@ public class define_syntax extends Syntax
     Macro macro = Macro.make(decl);
     macro.setHygienic(hygienic);
     tr.currentMacroDefinition = macro;
-    Expression rule = tr.rewrite_car((Pair) p, false);
+    Expression rule = tr.rewrite_car((Pair) p, syntax);
     tr.currentMacroDefinition = savedMacro;
     macro.expander = rule;
 
@@ -91,7 +104,5 @@ public class define_syntax extends Syntax
 
 	tr.formStack.addElement(result);
       }
-
-    return true;
   }
 }

@@ -1,3 +1,20 @@
+2004-12-26  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxPattern.java (literalIdentifierEq,
+	getLiteralsList): New static methods.
+	(translate): Use literalIdentifierEq.
+	* kawa/standard/syntax_rules.java: (rewriteForm): Use new
+	SyntaxPattern.getLiteralsList method.
+	* kawa/standard/syntax_case.java: (rewriteForm): Likewise.
+
+	* kawa/lang/SyntaxRule.java (<init>): Take extra SyntaxForm parameter.
+	* kawa/lang/SyntaxTemplate.java: Likewise.
+	(convert_template): Pass extra SyntaxForm parameter.
+	* kawa/standard/syntax.java: Fix to pass null SyntaxForm.
+	* kawa/standard/define_syntax.java (scanForDefinitions): Replace by ...
+	(scanForm): New method.  Fix lacking handling of SyntaxForm.
+	* kawa/lang/SyntaxRules.java (<init>):  Likewise.
+
 2004-12-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java: New syntax "include-relative".

@@ -33,7 +33,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
-    int rules_count = LList.listLength(srules, false);
+    int rules_count = Translator.listLength(srules);
     if (rules_count < 0)
       {
 	rules_count = 0;
@@ -42,16 +42,32 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
     Macro macro = tr.currentMacroDefinition;
+    // SyntaxForm, if any, wrapping rest of rules list.
+    SyntaxForm rules_syntax = null;
     for (int i = 0;  i < rules_count;  i++, srules = rules_pair.cdr)
       {
+	while (srules instanceof SyntaxForm)
+	  {
+	    rules_syntax = (SyntaxForm) srules;
+	    srules = rules_syntax.form;
+	  }
 	rules_pair = (Pair) srules;
 
+	// SyntaxForm, if any, wrapping the current rule.
+	SyntaxForm rule_syntax = rules_syntax;
 	Object syntax_rule = rules_pair.car;
+	while (syntax_rule instanceof SyntaxForm)
+	  {
+	    rule_syntax = (SyntaxForm) syntax_rule;
+	    syntax_rule = rule_syntax.form;
+	  }
 	if (! (syntax_rule instanceof Pair))
 	  {
 	    tr.syntaxError ("missing pattern in " + i + "'th syntax rule");
 	    return;
 	  }
+	// SyntaxForm, if any, wrapping the current rule's pattern.
+	SyntaxForm pattern_syntax = rule_syntax;
 	Pair syntax_rule_pair = (Pair) syntax_rule;
 	Object pattern = syntax_rule_pair.car;
 
@@ -61,13 +77,21 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 
 	try
 	  {
+	    // SyntaxForm, if any, wrapping the current rule's template.
+	    SyntaxForm template_syntax = rule_syntax;
 	    tr.setLine(syntax_rule_pair);
-	    if (! (syntax_rule_pair.cdr instanceof Pair))
+	    syntax_rule = syntax_rule_pair.cdr;
+	    while (syntax_rule instanceof SyntaxForm)
+	      {
+		template_syntax = (SyntaxForm) syntax_rule;
+		syntax_rule = template_syntax.form;
+	      }
+	    if (! (syntax_rule instanceof Pair))
 	      {
 		tr.syntaxError ("missing template in " + i + "'th syntax rule");
 		return;
 	      }
-	    syntax_rule_pair = (Pair) syntax_rule_pair.cdr;
+	    syntax_rule_pair = (Pair) syntax_rule;
 	    if (syntax_rule_pair.cdr != LList.Empty)
 	      {
 		tr.syntaxError ("junk after "+i+"'th syntax rule");
@@ -78,36 +102,37 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    PatternScope patternScope = PatternScope.push(tr);
 	    tr.push(patternScope);
 
-	    if (! (pattern instanceof Pair)
-		|| ! (((Pair)pattern).car instanceof String))
-	      {
-		tr.syntaxError ("pattern does not start with name");
-		return;
-	      }
-	    // ?? FIXME
-            literal_identifiers[0] = ((Pair)pattern).car;
-
-	    StringBuffer programbuf = new StringBuffer();
-	    SyntaxForm syntax = null;
 	    while (pattern instanceof SyntaxForm)
 	      {
-		syntax = (SyntaxForm) pattern;
-		pattern = syntax.form;
+		pattern_syntax = (SyntaxForm) pattern;
+		pattern = pattern_syntax.form;
 	      }
+
+	    StringBuffer programbuf = new StringBuffer();
 
 	    // In R5RS syntax-rules, the initial name is neither a
 	    // pattern variable or a literal identifier, so ingore it.
 	    if (pattern instanceof Pair)
 	      {
+		// ?? FIXME
+		literal_identifiers[0] = ((Pair)pattern).car;
+
 		Pair p = (Pair) pattern;
 		programbuf.append((char) ((1 << 3) | SyntaxPattern.MATCH_PAIR));
 		programbuf.append((char) SyntaxPattern.MATCH_IGNORE);
 		pattern = p.cdr;
 	      }
+	    else
+	      {
+		// Identifier macro? FIXME
+		tr.syntaxError ("pattern does not start with name");
+		return;
+	      }
 	    SyntaxPattern spattern = new SyntaxPattern(programbuf, pattern,
-					     syntax, literal_identifiers, tr);
+					     pattern_syntax, literal_identifiers, tr);
 
-	    this.rules[i] = new SyntaxRule(spattern, template, tr);
+	    this.rules[i] = new SyntaxRule(spattern,
+					   template, template_syntax, tr);
 
 	    PatternScope.pop(tr);
 	    tr.pop();
@@ -192,37 +217,48 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	boolean matched = pattern.match (obj, vars, 0);
 	if (matched)
 	  {
-	    /* DEBUGGING:
-	    OutPort err = OutPort.errDefault();
-	    StringBuffer sb = new StringBuffer();
-	    sb.append("{Expand "+macro + " rule#" + i
-		      +" - matched variables: ");
-	    for (int j = 0;  j < rule.pattern.varCount;  j++)
+	    if (true)  // DEBUGGING
 	      {
-		if (j > 0)  sb.append("; ");
-		sb.append(j);  sb.append(": ");
-		printElement(vars[j], sb);
+		/*
+		OutPort err = OutPort.errDefault();
+		StringBuffer sb = new StringBuffer();
+		sb.append("{Expand "+macro + " rule#" + i
+			  +" - matched variables: ");
+		for (int j = 0;  j < rule.pattern.varCount;  j++)
+		  {
+		    if (j > 0)  sb.append("; ");
+		    sb.append(j);  sb.append(": ");
+		    printElement(vars[j], sb);
+		  }
+		sb.append('}');
+		err.println(sb);
+		err.flush();
+		*/
 	      }
-	    sb.append('}');
-	    err.println(sb);
-	    err.flush();
-	    END DEBUGGING */
 
-	    /* DEBUGGING:
-	    err.print("Expanding ");  err.println(literal_identifiers[0]);
-	    rule.print_template_program(null, err);
-	    err.flush();
-	    */
+	    if (true)
+	      {
+		/* DEBUGGING:
+		OutPort err = OutPort.errDefault();
+		err.print("Expanding ");  err.println(literal_identifiers[0]);
+		rule.print_template_program(null, err);
+		err.flush();
+		*/
+	      }
 	    Object expansion = rule.execute(vars, tr);
 
-	    /* DEBUGGING:
-	    err.print("{Expansion of ");
-	    err.print(macro);
-	    err.print(": ");
-	    err.print(expansion);
-	    err.println('}');
-	    err.flush();
-	    */
+	    if (false) // DEBUGGING:
+	      {
+		OutPort err = OutPort.errDefault();
+		err.print("{Expansion of ");
+		err.print(macro);
+		err.println(":");
+		err.startLogicalBlock("  ", "}", 2);
+		kawa.standard.Scheme.writeFormat.writeObject(expansion, err);
+		err.endLogicalBlock("}");
+		err.println();
+		err.flush();
+	      }
 	    return expansion;
 	  }
       }

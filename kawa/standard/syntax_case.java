@@ -110,26 +110,8 @@ public class syntax_case extends Syntax
         if (obj instanceof Pair)
           {
             form = (Pair) obj;
-            obj = form.car;
-            int num_literals = LList.length(obj);
-            work.literal_identifiers = new Object [num_literals + 1];
-            work.literal_identifiers[0] = null; // FIXME
-            for (int i = 0;  i < num_literals;  i++)
-              {
-                Pair lit_pair = (Pair) obj;
-		Object savePos = tr.pushPositionOf(obj);
-		try
-		  {
-		    if (! (lit_pair.car instanceof String))
-		      return tr.syntaxError ("syntax-case: non-symbol in literals list");
-		  }
-		finally
-		  {
-		    tr.popPositionOf(savePos);
-		  }
-                work.literal_identifiers[i+1] = lit_pair.car;
-                obj = lit_pair.cdr;
-              }
+	    work.literal_identifiers
+	      = SyntaxPattern.getLiteralsList(form.car, null, tr);
             obj = form.cdr;
 
             Expression[] linits = new Expression[2];

@@ -17,7 +17,7 @@ public class syntax extends Syntax
     if (! (form.cdr instanceof Pair)
 	|| (form = (Pair) (form.cdr)).cdr != LList.Empty)
       return tr.syntaxError("syntax forms requires a single form");
-    SyntaxTemplate template = new SyntaxTemplate(form.car, tr);
+    SyntaxTemplate template = new SyntaxTemplate(form.car, null, tr);
     Expression matchArray = QuoteExp.nullExp;
     PatternScope patternScope = tr.patternScope;
     if (patternScope != null && patternScope.matchArray != null)

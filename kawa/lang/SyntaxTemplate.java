@@ -164,7 +164,7 @@ public class SyntaxTemplate implements Externalizable
     this.max_nesting = max_nesting;
   }
 
-  public SyntaxTemplate (Object template, Translator tr)
+  public SyntaxTemplate (Object template, SyntaxForm syntax, Translator tr)
   {
     this.currentScope = tr.currentScope();
     this.patternNesting = tr == null || tr.patternScope == null ? ""
@@ -177,7 +177,8 @@ public class SyntaxTemplate implements Externalizable
     /* BEGIN JAVA2 */
     IdentityHashMap seen = new IdentityHashMap();
     /* END JAVA2 */
-    convert_template(template, program, 0, literals_vector, seen, false, tr);
+    convert_template(template, syntax,
+		     program, 0, literals_vector, seen, false, tr);
     this.template_program = program.toString();
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
@@ -209,6 +210,7 @@ public class SyntaxTemplate implements Externalizable
    *   and -2 if the is no pattern variable or elipsis.
    */
   public int convert_template (Object form,
+			       SyntaxForm syntax,
 			       StringBuffer template_program,
 			       int nesting,
 			       java.util.Vector literals_vector,
@@ -216,6 +218,11 @@ public class SyntaxTemplate implements Externalizable
 			       boolean isVector,
 			       Translator tr)
   {
+    while (form instanceof SyntaxForm)
+      {
+	syntax = (SyntaxForm) form;
+	form = syntax.form;
+      }
     /* BEGIN JAVA2 */
     if (form instanceof Pair || form instanceof FVector)
       {
@@ -252,7 +259,7 @@ public class SyntaxTemplate implements Externalizable
 	    rest = p.cdr;
 	    template_program.append((char) BUILD_DOTS); // to be patched.
 	  }
-	int ret_car = convert_template(car, template_program,
+	int ret_car = convert_template(car, syntax, template_program,
 				       nesting + num_dots3,
 				       literals_vector, seen, false, tr);
 
@@ -261,7 +268,8 @@ public class SyntaxTemplate implements Externalizable
 	    int delta = template_program.length() - save_pc - 1;
 	    template_program.setCharAt(save_pc,
 				       (char)((delta<<3)+BUILD_CONS));
-	    ret_cdr = convert_template (rest, template_program, nesting,
+	    ret_cdr = convert_template (rest, syntax,
+					template_program, nesting,
 					literals_vector, seen, isVector, tr);
 	  }
 	if (num_dots3 > 0)
@@ -294,7 +302,7 @@ public class SyntaxTemplate implements Externalizable
     else if (form instanceof FVector)
       {
 	template_program.append((char) BUILD_VECTOR);
-	return convert_template(LList.makeList((FVector) form),
+	return convert_template(LList.makeList((FVector) form), syntax,
 				template_program, nesting,
 				literals_vector, seen, true, tr);
       }

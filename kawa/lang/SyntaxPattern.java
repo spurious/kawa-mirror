@@ -335,10 +335,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  {
 	    for (int j = literal_identifiers.length;  --j >= 0; )
 	      {
-		// NOTE - should also generate check that the binding of the
-		// pattern at macro definition time matches that at macro
-		// application type. FIXME.
-		if (literal_identifiers[j] == pattern)
+		ScopeExp scope = syntax == null ? tr.currentScope()
+		  : syntax.scope;
+		if (literalIdentifierEq(pattern, scope,
+					literal_identifiers[j]))
 		  {
 		    int i = SyntaxTemplate.indexOf(literals, pattern);
 		    if (i < 0)
@@ -595,5 +595,71 @@ public class SyntaxPattern extends Pattern implements Externalizable
     if (outer != null)
       System.arraycopy(outer, 0, vars, 0, outer.length);
     return vars;
+  }
+
+  public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
+					     Object literal2)
+  {
+    if (literal2 instanceof SyntaxForm)
+      {
+	SyntaxForm syntax = (SyntaxForm) literal2;
+	return literalIdentifierEq(id1, sc1, syntax.form, syntax.scope);
+      }
+    return literalIdentifierEq(id1, sc1, literal2, null);
+  }
+
+  public static boolean literalIdentifierEq (Object id1, ScopeExp sc1,
+					     Object id2, ScopeExp sc2)
+  {
+    if (id1 != id2)
+      return false;
+    if (sc1 instanceof ModuleExp)
+      sc1 = null;
+    if (sc2 instanceof ModuleExp)
+      sc2 = null;
+    if (sc1 == sc2)
+      return true;
+    // FIXME
+    return true;
+  }
+
+  /** Parse the literals list in a syntax-rules or syntax-case. */
+  public static Object[] getLiteralsList (Object list,
+					  SyntaxForm syntax, Translator tr)
+  {
+    Object savePos = tr.pushPositionOf(list);
+    int count = Translator.listLength(list);
+    if (count < 0)
+      {
+	tr.error('e', "missing or malformed literals list");
+	count = 0;
+      }
+    Object[] literals = new Object[count + 1];
+    for (int i = 1;  i <= count;  i++)
+      {
+	while (list instanceof SyntaxForm)
+	  {
+	    syntax = (SyntaxForm) list;
+	    list = syntax.form;
+	  }
+	Pair pair = (Pair) list;
+	tr.pushPositionOf(pair);
+	Object literal = pair.car;
+	Object wrapped;
+	if (literal instanceof SyntaxForm)
+	  {
+	    wrapped = literal;
+	    literal = (( SyntaxForm) literal).form;
+	  }
+	else
+	  wrapped = literal; // FIXME
+	if (! (literal instanceof String 
+               || literal instanceof gnu.mapping.Symbol))
+          tr.error('e', "non-symbol '"+literal+"' in literals list");
+	literals[i] = wrapped;
+	list = pair.cdr;
+      }
+    tr.popPositionOf(savePos);
+    return literals;
   }
 }

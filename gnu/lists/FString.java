@@ -275,12 +275,16 @@ implements CharSequence, Externalizable, Consumable
 
   public void consume(Consumer out)
   {
-    String typeName = "#text"; 
-    String type = typeName;
-    out.beginGroup(typeName, type);
-    out.endAttributes();
     out.write(data, 0, data.length);
-    out.endGroup(typeName);
+  }
+
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    int index = ipos >>> 1;
+    if (index >= size)
+      return false;
+    out.writeChar(data[index]);
+    return true;
   }
 
   protected void consume(int iposStart, Object xposStart,

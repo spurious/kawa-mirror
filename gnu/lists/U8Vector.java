@@ -123,6 +123,15 @@ public class U8Vector extends SimpleVector implements Externalizable
 
   public String getTag() { return "u8"; }
 
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    int index = ipos >>> 1;
+    if (index >= size)
+      return false;
+    out.writeInt(data[index] & 0xff);
+    return true;
+  }
+
   public void consume(int iposStart, Object xposStart,
 		      int iposEnd, Object xposEnd, Consumer out)
   {
@@ -131,7 +140,7 @@ public class U8Vector extends SimpleVector implements Externalizable
     int i = iposStart >>> 1;
     int end = iposEnd >>> 1;
     for (;  i < end;  i++)
-      out.writeInt(data[i]);
+      out.writeInt(data[i] & 0xff);
   }
 
   /**

@@ -612,9 +612,12 @@ implements Consumer, Consumable
     throw unsupported("get");
   }
 
-  public int consumeStep(int startPosition, Consumer out)
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
   {
-    return consumeRange(startPosition, data.length, 1, out);
+    if (! hasNext(ipos, xpos))
+      return false;
+    consumeRange(ipos >>> 1, data.length, 1, out);
+    return true;
   }
 
   public int consumeRange(int startPosition, int endPosition, int maxSteps,

@@ -165,30 +165,6 @@ public class Pair extends LList implements Externalizable
       return false;
   }
 
-  /*
-  static public final void printNoParen (Pair p, java.io.PrintWriter ps)
-  {
-    for (;;)
-      {
-	SFormat.print (p.car, ps);
-	Object cdr = p.cdr;
-	if (cdr == null || cdr == LList.Empty)
-	  break;
-	if (cdr instanceof Pair)
-	  {
-	    ps.print(" ");
-	    p = (Pair)cdr;
-	  }
-	else
-	  {
-	    ps.print(" . ");
-	    SFormat.print (cdr, ps);
-	    break;
-	  }
-      }
-  }
-  */
-
   public static Pair make (Object car, Object cdr)
   {
     return new Pair (car, cdr);

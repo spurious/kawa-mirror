@@ -129,6 +129,15 @@ implements Externalizable, Consumable
        data[i] = new_value;
   }
 
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    int index = ipos >>> 1;
+    if (index >= size)
+      return false;
+    out.writeObject(data[index]);
+    return true;
+  }
+
   public void consume(Consumer out)
   {
     String typeName = "#vector"; 
@@ -140,21 +149,6 @@ implements Externalizable, Consumable
       out.writeObject(data[i]);
     out.endGroup(typeName);
   }
-
-  /*
-  public void print(java.io.PrintWriter ps)
-  {
-    int size = size;
-    ps.print("#(");
-    for (int t=0; t<size; t++)
-      {
-	if (t!=0)
-	  ps.print(" ");
-	SFormat.print (data[t], ps);
-      }
-    ps.print(")");
-  }
-  */
 
   /**
    * @serialData Write the number of elements (using writeInt), followed by

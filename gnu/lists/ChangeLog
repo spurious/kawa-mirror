@@ -1,3 +1,32 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* CharSequence.java (consume(int,int,Consumer)):  New method.
+	* CharBuffer.java (consume):  Implement.
+	* SimpleVector.java.in (consume):  Likewise.
+
+	* SimpleVector.java.in (get, intAt, longAt, set):
+	Fix off-by-one errors: > should be >=.
+
+	* SimpleVector.java.in (getNext):  New method.
+
+	* AbstractSequence.java.in (consumeNext):  New method.
+	(consume):  Fix to use nextElement.
+	* U8Vector.java, F32Vector.java, F64Vector.java, U8Vector.java,
+	S16Vector.java, S32Vector.java, S64Vector.java, S8Vector.java,
+	U16Vector.java, U32Vector.java, U64Vector.java, U8Vector.java,
+	FString.java, SimpleVector.java.in (consumeNext):  New methods.
+	* TreeList.java (consumeStep):  Replaced by new consumeNext method.
+
+	* U16Vector.java, U8Vector.java (consume):  Mask off value.
+
+	* FString.java (consume):  Just do plain write.
+
+	* FormatToConsumer.java:  New interface.
+	* Makefile.am (java_sources):  Add FormatToConsumer.java.
+
+	* LList.java (print):  Remove unused method.
+	(consume):  Re-write to generate more robust output.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (getNext):  Better error for default unsupported case.

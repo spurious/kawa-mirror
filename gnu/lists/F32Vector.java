@@ -124,6 +124,15 @@ public class F32Vector extends SimpleVector  implements Externalizable
 
   public String getTag() { return "f32"; }
 
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    int index = ipos >>> 1;
+    if (index >= size)
+      return false;
+    out.writeFloat(data[index]);
+    return true;
+  }
+
   public void consume(int iposStart, Object xposStart,
 		      int iposEnd, Object xposEnd, Consumer out)
   {

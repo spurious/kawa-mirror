@@ -774,6 +774,16 @@ public abstract class AbstractSequence
   }
 @endif WITH COLLECTIONS@
 
+  /** Copy an element specified by a position pair to a Consumer.
+   * @return if hasNext(ipos, xpos). */
+  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  {
+    if (! hasNext(ipos, xpos))
+      return false;
+    out.writeObject(getNext(ipos, xpos));
+    return true;
+  }
+
   protected void consume(int iposStart, Object xposStart,
 			 int iposEnd, Object xposEnd, Consumer out)
   {
@@ -783,9 +793,9 @@ public abstract class AbstractSequence
     copyPosition(iposStart, xposStart, it, 0);
     while (! equals(it.ipos, it.xpos, iposEnd, xposEnd))
       {
-	out.writeObject(getNext(it.ipos, it.xpos));
 	if (! it.hasNext())
 	  throw new RuntimeException();
+	out.writeObject(it.nextElement());
       }
     it.finalize();
   }

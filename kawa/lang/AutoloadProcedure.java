@@ -139,4 +139,13 @@ public class AutoloadProcedure extends Procedure
 	  throw new InternalError("circularity in autoload of "+name());
     return loaded.applyN (args);
   }
+
+  public Procedure getSetter()
+  {
+    if (loaded == null)
+      load ();
+    if (loaded instanceof HasSetter)
+      return loaded.getSetter();
+    return super.getSetter();
+  }
 }

@@ -93,7 +93,7 @@ LetExp.class \
 QuoteExp.class \
 ReferenceExp.class \
 ScopeExp.class \
-SetExp.class \
+SetExp.class SetApplyExp.class \
 ModuleExp.class \
 TryExp.class CatchClause.class \
 \
@@ -137,6 +137,7 @@ Procedure0or1.class \
 Procedure1or2.class \
 ProcedureN.class \
 AutoloadProcedure.class \
+HasSetter.class Setter.class Setter0.class Setter1.class \
 ModuleBody.class \
 Continuation.class \
 CalledContinuation.class \

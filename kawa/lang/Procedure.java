@@ -63,6 +63,34 @@ public abstract class Procedure extends Named implements Printable
    */
   public int numArgs() { return 0xfffff000; }
 
+  public Procedure getSetter()
+  {
+    if (! (this instanceof HasSetter))
+      throw new GenericError("procedure "+name()+ "has no setter");
+    int num_args = numArgs();
+    if (num_args == 0x0000)
+      return new Setter0(this);
+    if (num_args == 0x1001)
+      return new Setter1(this);
+    return new Setter(this);
+  }
+
+  /** If HasSetter, the Procedure is called in the LHS of an assignment. */
+  public void set0(Object result)
+  {
+    getSetter().apply1(result);
+  }
+
+  public void set1(Object result, Object arg1)
+  {
+    getSetter().apply2(result, arg1);
+  }
+
+  public void setN (Object[] args)
+  {
+    getSetter().applyN(args);
+  }
+
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");

@@ -70,6 +70,7 @@ public class Compilation
   
   static Type[] int1Args = { Type.int_type };
   static Type[] string1Arg = { javaStringType };
+  public static Type[] sym1Arg = string1Arg;
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -80,7 +81,6 @@ public class Compilation
 						    int1Args, Type.void_type,
 						    Access.PUBLIC);
 
-    Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
       = scmEnvironmentType.addMethod ("lookup_global", sym1Arg,
 				       scmObjectType,
@@ -92,8 +92,10 @@ public class Compilation
 				       Access.PUBLIC|Access.STATIC);
   }
 
-  static Type[] apply0args = Type.typeArray0;
-  static Type[] applyNargs = { objArrayType };
+  public static Type[] apply0args = Type.typeArray0;
+  public static Type[] apply1args = { scmObjectType };
+  public static Type[] apply2args = { scmObjectType, scmObjectType };
+  public static Type[] applyNargs = { objArrayType };
 
   static final Method makeNullPairMethod
   = scmPairType.addMethod ("makePair", apply0args, scmPairType,
@@ -110,28 +112,21 @@ public class Compilation
   public static Method apply3method;
   public static Method apply4method;
   public static Method applyNmethod;
-  public static Type[] apply1args = { scmObjectType };
 
   static
   {
     apply1method = scmProcedureType.addMethod ("apply1", apply1args,
-						scmObjectType,
-						Access.PUBLIC|Access.FINAL);
-    Type[] apply2args = { scmObjectType, scmObjectType };
+						scmObjectType, Access.PUBLIC);
     apply2method = scmProcedureType.addMethod ("apply2", apply2args,
-						scmObjectType,
-						Access.PUBLIC|Access.FINAL);
+						scmObjectType, Access.PUBLIC);
     Type[] apply3args = { scmObjectType, scmObjectType, scmObjectType };
     apply3method = scmProcedureType.addMethod ("apply3", apply3args,
-						scmObjectType,
-						Access.PUBLIC|Access.FINAL);
+						scmObjectType, Access.PUBLIC);
     Type[] apply4args = { scmObjectType , scmObjectType, scmObjectType, scmObjectType};
     apply4method = scmProcedureType.addMethod ("apply4", apply4args,
-						scmObjectType,
-						Access.PUBLIC|Access.FINAL);
+						scmObjectType, Access.PUBLIC);
     applyNmethod = scmProcedureType.addMethod ("applyN", applyNargs,
-						scmObjectType,
-						Access.PUBLIC|Access.FINAL);
+						scmObjectType, Access.PUBLIC);
     makePairMethod = scmPairType.addMethod ("makePair", apply2args,
 					     scmPairType,
 					     Access.PUBLIC|Access.STATIC);

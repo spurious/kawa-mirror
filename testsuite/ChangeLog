@@ -1,3 +1,7 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Added tests for call-with-values and values.
+
 2000-01-22  Per Bothner  <per@bothner.com>
 
 	* testing.scm (setion):  Return implied #!void rather than #t.

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 80)
+(test-init "Miscellaneous" 82)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -20,6 +20,9 @@
 
 (define-unit ft 12in)
 (test 18in + 6in 1ft)
+
+(test 5 call-with-values (lambda () (values 4 5)) (lambda (a b) b))
+(test -1 call-with-values * -)
 
 ;;; This caused a spurious warning in earlier releases.
 (test '(1 2 3) 'let (let ((x (lambda l l))) (x 1 2 3)))

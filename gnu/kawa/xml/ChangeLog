@@ -1,3 +1,10 @@
+2003-05-02  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java (<init>):  New constructors automatically
+	allocate a NamespaceResolver.
+	* Document.java (parse):  Use new XMLParser constructor.
+	Pass 'header' to SyntaxException constructor.
+
 2003-04-30  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions):  Set namespace

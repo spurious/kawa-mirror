@@ -95,8 +95,7 @@ public class XSLT extends XQuery
     XslTranslator xtr = (XslTranslator) lexer;
     //XslTranslator xtr = new XslTranslator(mexp, messages, this);
     xtr.beginDocument(mexp);
-    XMLParser parser
-      = new XMLParser(lexer.getPort(), new NamespaceResolver(xtr), messages);
+    XMLParser parser = new XMLParser(lexer.getPort(), messages, xtr);
     parser.parse();
     // FIXME - need check for eof.
     xtr.endDocument();
@@ -117,8 +116,7 @@ public class XSLT extends XQuery
     tr.push(mexp);
     XslTranslator xtr = new XslTranslator(mexp, messages, this);
     xtr.beginDocument();
-    XMLParser parser
-      = new XMLParser(port, new NamespaceResolver(xtr), messages);
+    XMLParser parser = new XMLParser(port, messages, xtr);
     parser.parse();
     xtr.endDocument();
     tr.pop(mexp);

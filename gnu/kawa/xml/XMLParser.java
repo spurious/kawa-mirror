@@ -11,12 +11,43 @@ public class XMLParser extends XMLParserChar
 {
   SourceMessages messages;
 
+  public XMLParser(LineBufferedReader reader, SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    this(reader, new NamespaceResolver(out), messages, out);
+    
+  }
+
+  private XMLParser(LineBufferedReader reader, NamespaceResolver resolver,
+		    SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    super(null, 0, 0, new ParsedXMLToConsumer(resolver));
+    in = reader;
+    this.messages = messages;
+    resolver.setParser(this);
+  }
+
   public XMLParser(LineBufferedReader reader, Consumer out, SourceMessages messages)
     throws java.io.IOException
   {
     super(null, 0, 0, new ParsedXMLToConsumer(out));
     in = reader;
     this.messages = messages;
+  }
+
+  public XMLParser(URL url, SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    this(url, new NamespaceResolver(out), messages, out);
+  }
+
+  private XMLParser(URL url, NamespaceResolver resolver,
+		    SourceMessages messages, Consumer out)
+    throws java.io.IOException
+  {
+    this(url, resolver, messages);
+    resolver.setParser(this);
   }
 
   public XMLParser(URL url, Consumer out, SourceMessages messages)

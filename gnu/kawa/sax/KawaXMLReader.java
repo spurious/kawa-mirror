@@ -73,7 +73,7 @@ implements XMLReader, Locator
       reader = new InputStreamReader(input.getByteStream());
     SourceMessages messages = new SourceMessages();
     XMLParser parser = new XMLParser(new LineBufferedReader(reader),
-				     new NamespaceResolver(this), messages);
+				     messages, this);
     beginDocument();
     parser.parse();
     String err = messages.toString(20);

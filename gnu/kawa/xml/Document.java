@@ -49,16 +49,14 @@ public class Document extends Procedure1
   {
     URL url = makeURL(name, null);
     SourceMessages messages = new SourceMessages();
-    XMLParser parser
-      = new XMLParser(url,
-		      new NamespaceResolver(out),
-		      messages);
+    XMLParser parser = new XMLParser(url, messages, out);
     out.beginDocument();
     if (out instanceof TreeList)
       ((TreeList) out).writeBaseUri(url);
     parser.parse();
     if (messages.seenErrors())
-      throw new SyntaxException(messages);
+      throw new SyntaxException("document function read invalid XML",
+				messages);
     out.endDocument();
   }
 

@@ -57,8 +57,11 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
   {
     String name = (data == null ? names[depth-1] 
 		   : new String(data, start, length));
-    names[depth-1] = null;  // For the sake of Gc.
-    depth--;
+    if (depth > 0) // Sanity check, in case of error.
+      {
+	names[depth-1] = null;  // For the sake of Gc.
+	depth--;
+      }
     out.endGroup(name);
   }
 

@@ -1,3 +1,13 @@
+2003-05-02  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java (parser, mismatchReported):  New field.
+	(setParser):  New method.
+	(endGroup):  Call parser's error if mismatch.
+	* ParsedXMLToConsumer.java (emitEndElement):  Add sanity check.
+
+	* XMLParser.java.in (parse):  Set this.pos before calling
+	emitBeginElement and emitEndElement, for better error reporting.
+
 2003-04-12  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java.in (parse):  Handle Names according to XML 1.1

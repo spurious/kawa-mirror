@@ -9,6 +9,8 @@ import gnu.mapping.Symbol;
 
 public class NamespaceResolver extends FilterConsumer
 {
+  XMLParserChar parser;
+
   // List of (name, prefix, local) for begin and each attribute.
   // Used while processing a single start tag.
   // We always have nameStack.length == 3 * startIndexes.length.
@@ -68,6 +70,11 @@ public class NamespaceResolver extends FilterConsumer
     namespaceStack[0] = "xml";
     namespaceStack[1] = "http://www.w3.org/XML/1998/namespace";
     namespaceStackLength = 2;
+  }
+
+  public void setParser (XMLParserChar parser)
+  {
+    this.parser = parser;
   }
 
   public void beginGroup(String name, Object type)
@@ -250,9 +257,21 @@ public class NamespaceResolver extends FilterConsumer
     attrCount = 0;
   }
 
+  boolean mismatchReported;
+
   public void endGroup(String typeName)
   {
     closeStartTag();
+    if (! typeName.equals(nameStack[0]) && ! mismatchReported)
+      {
+	mismatchReported = true;
+	int nlen = typeName.length() + 3;
+	parser.pos -= nlen;
+	parser.error('e', "</" + typeName+"> matching <"+nameStack[0]+">");
+	parser.pos += nlen;
+      }
+    if (nesting <= 0)
+      return; // Only if error.
     nesting--;
     namespaceStackLength = namespaceLengthStack[nesting];
     base.endGroup(typeName);

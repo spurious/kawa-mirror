@@ -71,7 +71,10 @@ public class CompileFile extends Procedure2
 
     try
       {
-	File zar_file = new File (arg2.toString () + ".zip");
+	String fname = arg2.toString ();
+	if (! fname.endsWith (".zip"))
+	  fname = fname + ".zip";
+	File zar_file = new File (fname);
 	if (zar_file.exists ())
 	  zar_file.delete ();
 	ZipArchive zar = new ZipArchive (zar_file, "rw");

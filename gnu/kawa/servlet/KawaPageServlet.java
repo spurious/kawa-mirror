@@ -89,8 +89,8 @@ public class KawaPageServlet extends KawaServlet
 	    if (messages.seenErrors())
 	      {
 		ctx.response.reset();
-		PrintWriter writer = ctx.response.getWriter();
-		writer.print(messages.toString(20));
+		ServletOutputStream out = ctx.response.getOutputStream();
+		out.print(messages.toString(20));
 		return null;
 	      }
 

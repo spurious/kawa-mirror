@@ -1,3 +1,10 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getProcedure):  Use getOutputStream instead
+	of getWriter.to avoid a possible IllegalStateException.
+
+	* ServletCallContext.java (getBaseUri):  New method.
+
 2003-02-20  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java:  New class.  Contributed by Ivelin Ivanov

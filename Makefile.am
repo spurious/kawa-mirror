@@ -56,7 +56,7 @@ dist-kawa-@VERSION@.jar:
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
 	  && cd tmpdir \
-	  && $$srcdir/configure --enable-servlet --with-sax2 --with-swing --with-awt \
+	  && $$srcdir/configure --with-servlet --with-sax2 --with-swing --with-awt \
 	  && $(MAKE) \
 	  && $(JAR) cmf $$srcdir/jar-manifest \
 	    ../kawa-@VERSION@.jar \

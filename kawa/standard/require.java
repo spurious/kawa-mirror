@@ -150,6 +150,7 @@ public class require extends Syntax
     ModuleInfo info = ModuleInfo.find(tname);
     Expression[] args = { new QuoteExp(tname) };
     Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
+    Field instanceField = null;
     dofind.setLine(tr);
     ModuleExp mod = new ModuleExp();
     // Should skip if immediate.  FIXME
@@ -206,8 +207,14 @@ public class require extends Syntax
 	    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
 	    Declaration fdecl = makeDeclInModule(mod, fvalue, fld, language);
 	    Object fdname = fdecl.getSymbol();
-	    if (fname.startsWith(Declaration.PRIVATE_PREFIX))
-	      continue;
+            if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+              continue;
+            if (fname.endsWith("$instance"))
+              {
+                if (isStatic && fname.equals("$instance"))
+                  instanceField = fld;
+                continue;
+              }
 	    /*
             if (tr.immediate && defs instanceof ModuleExp)
               {
@@ -355,7 +362,18 @@ public class require extends Syntax
 	  }
 	else if (instance == null) // Need to make sure 'run' is invoked.
 	  {
-	    dofind = Convert.makeCoercion(dofind, Type.void_type);
+            if (instanceField != null)
+              { //Optimization
+                args = new Expression[]
+                  { new QuoteExp(type), new QuoteExp("$instance") };
+                args = new Expression[]
+                  { new ApplyExp(SlotGet.staticField, args) };
+                Method run
+                  = Compilation.typeRunnable.getDeclaredMethod("run", 0);
+                dofind = new ApplyExp(run, args);
+              }
+	    else
+              dofind = Convert.makeCoercion(dofind, Type.void_type);
 	    dofind.setLine(tr);
 	    forms.addElement(dofind);
 	  }

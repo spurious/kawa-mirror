@@ -538,6 +538,10 @@ public class repl extends Procedure0or1
 	  {
 	    gnu.expr.Compilation.moduleStatic = 1;
 	  }
+        else if (arg.equals("--module-static-run"))
+          {
+            gnu.expr.Compilation.moduleStatic = 2;
+          }
 	else if (arg.equals("--fewer-classes"))
 	  {
 	    gnu.expr.Compilation.fewerClasses = true;

@@ -3,7 +3,7 @@
 		((%do-trace proc flag)
 		 (set! proc
 		       (invoke-static
-			 <function.standard.TracedProcedure> 'doTrace
+			 <kawa.standard.TracedProcedure> 'doTrace
 			 proc flag)))))
 
 (define-syntax trace

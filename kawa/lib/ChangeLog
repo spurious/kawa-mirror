@@ -1,5 +1,7 @@
 2000-05-28  Per Bothner  <per@bothner.com>
 
+	* trace.scm (%do-trace):  Fix typo.
+
 	* Makefile.am (JAVACFLAGS):  Add --module-static flag.
 
 	* trace.scm (%do-trace):  Incorrect primitive-static-method replaced

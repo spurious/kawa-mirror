@@ -1,3 +1,7 @@
+2003-04-05  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* kawa.texi:  Fix two typos.
+
 2003-01-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Top):  Update Alexander Milowski's email address.

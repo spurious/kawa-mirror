@@ -2177,7 +2177,7 @@ Raise an error with key @code{misc-error} and a message constructed by
 displaying @var{msg} and writing @var{args}.
 This normally prints a stack trace, and brings you back to
 the top level, or exits kawa if you are not running interactively.
-This procedure is part of SRFI-25 and other Scheme implementations.
+This procedure is part of SRFI-23, and other Scheme implementations.
 @end deffn
 
 @defun primitive-throw exception
@@ -2961,7 +2961,7 @@ print a number as a Roman numeral.
 print a number as an ``old fashioned'' Roman numeral.
 @item @code{~:R}
 print a number as an ordinal English number.
-@item @code{~:@@R}
+@item @code{~R}
 print a number as a cardinal English number.
 @item @code{~P}
 Plural.

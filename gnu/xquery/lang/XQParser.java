@@ -883,6 +883,27 @@ public class XQParser extends LispReader // should be extends Lexer
 			args);
   }
 
+  Expression parseExprSequence()
+      throws java.io.IOException, SyntaxException
+  {
+    if (curToken == ')' || curToken == EOF_TOKEN)
+      return QuoteExp.voidExp;
+    Expression exp = null;
+    for (;;)
+      {
+	Expression exp1 = parseExpr();
+	exp = exp == null ? exp1 : makeExprSequence(exp, exp1);
+	if (curToken == ')' || curToken == EOF_TOKEN)
+	  break;
+	if (nesting == 0 && curToken == EOL_TOKEN)
+	  return exp;
+	if (curToken != ',')
+	  error("missing ')'");
+	getRawToken();
+      }
+    return exp;
+  }
+
   /**
    * Try to parse a PrimaryExpr.
    * @return an Expression, or null if no PrimaryExpr was seen.
@@ -896,26 +917,11 @@ public class XQParser extends LispReader // should be extends Lexer
     if (token == '(')
       {
 	getRawToken();
-	if (curToken == ')')
-	  exp = QuoteExp.voidExp;
-	else
-	  {
-	    exp = null;
-	    for (;;)
-	      {
-		nesting++;
-		Expression exp1 = parseExpr();
-		exp = exp == null ? exp1 : makeExprSequence(exp, exp1);
-		nesting--;
-		if (curToken == ')')
-		  break;
-		if (curToken == EOF_TOKEN)
-		  eofError("missing ')' - unexpected end-of-file");
-		if (curToken != ',')
-		  error("missing ')'");
-		getRawToken();
-	      }
-	  }
+	nesting++;
+	exp = parseExprSequence();
+	nesting--;
+	if (curToken == EOF_TOKEN)
+	  eofError("missing ')' - unexpected end-of-file");
       }
     else if (token == OP_LSS)
       {
@@ -1205,7 +1211,7 @@ public class XQParser extends LispReader // should be extends Lexer
     this.parser = parser;
     if (getRawToken() == EOF_TOKEN)
       return null;
-    Expression exp = parseExpr();
+    Expression exp = parseExprSequence();
     if (curToken == EOL_TOKEN)
       unread('\n');
     return exp;

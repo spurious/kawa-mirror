@@ -25,7 +25,6 @@ in the modules "ModuleBody" class, with the same (mangled) name.
 The compiler can in many cases call the appropriate method directly.
 Usually, each method takes a fixed number of arguments, which means
 we save the overhead of creating an array for the arguments.
-[FIXME - for now this only done when the default value if constant.]
 
 A top-level procedure declared using the form
 	(define (NAME ARS ...) BODY ..)

@@ -31,7 +31,7 @@ END-INFO-DIR-ENTRY
 @unnumbered The Kawa Scheme system, by Per Bothner
 @end ifinfo
 
-Kawa is a Scheme environment, written in java,
+Kawa is a Scheme environment, written in Java,
 and that compiles Scheme code into Java byte-codes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
@@ -99,7 +99,7 @@ an online copy of R4RS
 
 Kawa is a full Scheme implementation.  It implements almost
 all of R4RS (for exceptions @pxref{Restrictions}), plus some extensions.
-It provide @code{define-syntax} from the R4RS appendex,
+It provides @code{define-syntax} from the R4RS appendix,
 and (from the draft R5RS) eval and multiple values.
 
 It is completely written in Java.  Scheme functions and files
@@ -116,27 +116,28 @@ Kawa is written in an object-oriented style.
 
 The current sources release is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.0.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.0.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz}.
 @end ifclear
 
 The pre-compiled @code{.class} files are in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.0-compiled.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.0-compiled.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.tar.gz}.
 @end ifclear
 
-A snapshot of the development tree is
-@ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz">here</a>.
-@end ifhtml
-@ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz}.
-@end ifclear
+@c A snapshot of the development tree is
+@c @ifhtml
+@c <a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz">here</a>.
+@c @end ifhtml
+@c @ifclear html
+@c @url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz}.
+@c @end ifclear
+@c @end comment
 
 @node Installation, Running, Getting Kawa, Top
 @section Building and installing Kawa
@@ -159,8 +160,10 @@ Alternatively, you can install the pre-compiled binary distribution.
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) version 1.0.x from JavaSoft (Sun).
-(@emph{Note:} Kawa is @emph{not} supported on JDK 1.1 beta3,
-due to bugs in the latter!)
+(Kawa has also been reported to work with JDK 1.1, Kaffe,
+Semantec Cafe, and J++.)
+@c (@emph{Note:} Kawa is @emph{not} supported on JDK 1.1 beta3,
+@c due to bugs in the latter!)
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
@@ -302,10 +305,10 @@ just do:
 @example
 kawa
 @end example
-However, @samp{kawa} only works on Unix-like systems.
+However, @samp{kawa} only works if you have a Unix-like shell.
 
 To run Kawa manually, you must start a Java interpreter.
-This depends on the Java interpreter.
+How you do this depends on the Java interpreter.
 For JavaSoft's JDK, you must have the Java interpreter
 in your @code{PATH}.
 You must also make sure that the @code{kawa/repl.class} file,
@@ -330,13 +333,17 @@ You can pass various flags to Kawa, for example:
 @example
 kawa -e '(display (+ 12 4))(newline)'
 @end example
-This causes Kawa to print @samp{16}, and then exit.
+or:
+@example
+java kawa.repl -e '(display (+ 12 4))(newline)'
+@end example
+Either causes Kawa to print @samp{16}, and then exit.
 
 @table @samp
-@item -c @var{expr}
-Kawa evaluates @var{expr}, which contains one or more Scheme expressions.
 @item -e @var{expr}
-Same as @samp{-c @var{expr}}.
+Kawa evaluates @var{expr}, which contains one or more Scheme expressions.
+@item -c @var{expr}
+Same as @samp{-e @var{expr}}.
 @item -f @var{filename}
 Kawa reads and evaluates expressions from the file named by @var{filename}.
 If @var{filename} is @samp{-}, standard input is read (with no prompting).
@@ -396,6 +403,8 @@ nor @code{letrec-syntax} are implemented.
 
 @subsection Multiple values
 
+The multiple-value feature will be in R5RS.
+
 @defun values object ...
 Delivers all of its arguments to its continuation.
 @end defun
@@ -431,7 +440,7 @@ Returns the bit-wise logical inverse of the argument.
 @end defun
 
 @defun logop op x y
-Perfoam one of the 16 bitwise operations of @var{x} and @var{y},
+Perform one of the 16 bitwise operations of @var{x} and @var{y},
 depending on @var{op}.
 @end defun
 
@@ -442,7 +451,7 @@ but is more efficient.
 @end defun
 
 @defun logbit? i pos
-Returns @code{#t} iff @var{i} has a one in the bit numbered @var{pos}.
+Returns @code{#t} iff the bit numbered @var{pos} in @var{i} is one.
 @end defun
 
 @defun arithmetic-shift i j
@@ -463,7 +472,7 @@ If @var{i} is negative, count number of 0-bits.
 @end defun
 
 @defun integer-length i
-Return number of bits needed to represent @var{i} if @var{i} is unsigned.
+Return number of bits needed to represent @var{i} in an unsigned field.
 Regardless of the sign of @var{i}, return one less than the number of bits
 needed for a field that can represent @var{i} as a two's complement integer.
 @end defun
@@ -636,10 +645,9 @@ The result is a single file that you can move around and @code{load}
 just like the @code{.scm} source file.  You just specify the name
 of the archive file to the @code{load} procedure.
 Currently, the archive is a "zip" archive and has extension ".zip";
-a future release will probably use "Java Archive" (jar) files,
-once support from that has been released from JavaSoft.
+a future release will probably use "Java Archive" (jar) files.
 The advantage of compiling to an archive is that it is simple
-and transparent.  A disadvantage is that it causes the
+and transparent.  A minor disadvantage is that it causes the
 Java "verifier" to be run when functions are loaded from it,
 which takes a little extra time.
 
@@ -678,7 +686,8 @@ loading @samp{foo.scm}, except you will get the byte-compiled versions.
 @node Files compilation,  , Archive compilation, Compiling
 @subsection Compiling Scheme to a set of .class files
 
-Invoking @samp{kawa} with the @samp{-C} flag will compile
+Invoking @samp{kawa} (or @samp{java kawa.repl}) with
+the @samp{-C} flag will compile
 a @samp{.scm} source file into one or more @samp{.class} files.
 
 You run it as follows:
@@ -746,7 +755,7 @@ values after JDK 1.1 is released.)
 Scheme integers are implemented by @code{kawa.math.IntNum}.
 Use the make static function to create a new IntNum from an int or a long.
 Use the intValue or longValue methods to get the int or long value of
-an IntNum.  There is partial support for bignums.
+an IntNum.
 
 A Scheme "flonum" is implemented by @code{kawa.math.DFloNum}.
 
@@ -756,9 +765,7 @@ A Scheme vector is implemented by @code{kawa.lang.Vector}.
 
 Scheme characters are implemented using @code{kawa.lang.Char}.
 
-Scheme strings are @emph{currently} implemented using
-@code{java.lang.StringBuffer}.  This will probably be
-changed to use a new sub-class of @code{kawa.lang.Sequence}.
+Scheme strings are implemented using @code{kawa.lang.FString}.
 
 Scheme procedures are all sub-classes of @code{kawa.lang.Procedure}.
 Normally each function (lambda expression) in the source code is
@@ -819,7 +826,7 @@ eased in a future Kawa release (which will use the new
 Java reflective facilities).  Note also that neither macro
 checks that there really is a method that matches the specification.
 
-Some examples using these primitives are are @samp{vectors.scm}
+Some examples using these primitives are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
@@ -879,8 +886,7 @@ One of those actions is to define the procedure @code{handle-my-device}.
 
 The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
-Some details (such as the @samp{throws} lists) may changes,
-someting will continue to be supported. 
+(Some details (such as the @samp{throws} lists) may change.)
 
 @deftypefn {Static method} Object Scheme.eval (InPort @var{port}, Environment @var{env})
 Read expressions from @var{port}, and evaluate them in the

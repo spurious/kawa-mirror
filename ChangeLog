@@ -1,5 +1,10 @@
 2003-04-21  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/EqualPat.java (match):  Add a kludge to for '::'.
+	Fixes bug reported 04-11 by Vladimir Tsichevski <wowa@jet.msk.su>.
+
+	* kawa/lang/SyntaxRules.java (<init>):  Better debugging output.
+
 	* kawa/lang/AutoloadProcedure.java:  Call Procedure's getName
 	method instead of deprecated name method.
 	* kawa/lang/CompileFile.java:  Likewise.

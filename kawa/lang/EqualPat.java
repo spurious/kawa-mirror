@@ -18,8 +18,16 @@ public class EqualPat extends Pattern implements Printable, Externalizable
 
   static public EqualPat make (Object obj) { return new EqualPat (obj); }
 
-  public boolean match (Object obj, Object[] vars, int start_vars) {
-    return value.equals (obj);
+  public boolean match (Object obj, Object[] vars, int start_vars)
+  {
+    if (value.equals (obj))
+      return true;
+    // We should be using Translator's matches routine, but the current
+    // Translator isn't available, so here is a special-purpose kludge.
+    if (value == "::" && obj instanceof Symbol
+	&& value.equals(((Symbol) obj).getName()))
+      return true;
+    return false;
   }
 
   public int varCount () { return 0; }

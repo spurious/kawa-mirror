@@ -112,7 +112,9 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 				capturedIdentifiers, tr);
 	    /* DEBUGGING:
 	    OutPort err = OutPort.errDefault();
-	    err.println ("{translated template:");
+	    err.print("{translated template for macro ");
+	    err.print(literal_identifiers[0]);
+	    err.println(':');
 	    this.rules[i].print_template_program (capturedIdentifiers, err);
 	    err.println ('}');
 	    */

@@ -1,6 +1,6 @@
 Mon Jun 29 18:59:08 1998  Per Bothner  <bothner@cygnus.com>
 
-	* Makefile.am, Makefile.in (SUBDIRS):  Added text.
+	* Makefile.am, Makefile.in (SUBDIRS):  Added text sub-package.
 
 Sat Apr  4 17:43:34 1998  Per Bothner  <bothner@cygnus.com>
 

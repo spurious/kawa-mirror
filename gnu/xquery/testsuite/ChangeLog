@@ -1,3 +1,7 @@
+2003-09-18  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Two tests for absolute path expressions.
+
 2003-09-14  Per Bothner  <per@bothner.com>
 
 	* outline.xml.in:  New data file.

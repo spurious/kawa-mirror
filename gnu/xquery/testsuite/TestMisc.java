@@ -321,6 +321,12 @@ public class TestMisc
     evalTestIdAttrs("doc('outline.xml')//"
 		    +"chapter[@id='c1']/following::*",
 		    "c2;s4;s5;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"section[@id='s1']/(/book)",
+		    "b1;");
+    evalTestIdAttrs("doc('outline.xml')//"
+		    +"section[@id='s1']/(//chapter)",
+		    "c1;c2;");
 
     printSummary();
   }

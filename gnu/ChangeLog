@@ -1,3 +1,8 @@
+2004-12-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am: Removed - SUBDIRS "folded into" toplevel Makefile.am.
+	* kawa/Makefile.am: Likewise.
+
 2004-08-07  Per Bothner  <per@bothner.com>
 
 	* brl/random.java (apply1): Use new WrongType constructors.

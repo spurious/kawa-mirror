@@ -1,3 +1,17 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* Binding.java (trivialConstraint):  New static field.
+	(chain):  Removed field.
+	(hashDELETED):  New static,
+	(hashSearch, hashSearch, hashGet, hashSet, hashDelete,
+	hashInsertAll):  New static utility methods.
+	* Environment.java:  Change to manage hash index collisions using
+	"double hashing" and "open addressing" rather than "chaining".
+	(lookup):  Use Binding.hashSearch.
+	(remove):  Use Binding.hashDelete.
+	(addBinding(name, value)):  New method.
+	* UnboundConstraint.java (set):  Handle null environment.
+
 1999-12-24  Per Bothner  <per@bothner.com>
 
 	* Environment.java (put):  If was unbound, returns old value as null.

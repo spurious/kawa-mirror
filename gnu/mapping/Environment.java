@@ -9,6 +9,9 @@ package gnu.mapping;
 public class Environment extends NameMap
 {
   private Binding[] table;
+  private int log2Size;
+  private int mask;
+  int num_bindings;
 
   private static Environment global;
 
@@ -16,9 +19,6 @@ public class Environment extends NameMap
 
   protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
   protected Constraint unboundConstraint = new UnboundConstraint(this);
-
-  static final float threshold = (float) 0.7;
-  int num_bindings;
 
   public static Environment user () { return current(); }
 
@@ -66,12 +66,17 @@ public class Environment extends NameMap
 
   public Environment ()
   {
-    this (60);
+    this(64);
   }
 
-  public Environment (int initialCapacity)
+  public Environment (int capacity)
   {
-    table = new Binding[initialCapacity];
+    log2Size = 4;
+    while (capacity > (1 << log2Size))
+      log2Size++;
+    capacity = 1 << log2Size;
+    table = new Binding[capacity];
+    mask = capacity - 1;
   }
 
   public Environment (Environment previous)
@@ -110,14 +115,11 @@ public class Environment extends NameMap
   {
     for (Environment env = this;  env != null;  env = env.previous)
       {
-	Binding[] env_tab = env.table;
-	int index = (hash & 0x7FFFFFFF) % env_tab.length;
-	for (Binding binding = env_tab[index];
-	     binding != null;  binding = binding.chain)
-	  {
-	    if (binding.sym_name == name)
-	      return binding;
-	  }
+	int index = Binding.hashSearch(env.table, env.log2Size, env.mask,
+				       name, hash);
+	Binding element = env.table[index];
+	if (element != null && element != Binding.hashDELETED)
+	  return element;
       }
     return null;
   }
@@ -129,72 +131,47 @@ public class Environment extends NameMap
     return binding;
   }
 
+  public void addBinding(Binding binding)
+  {
+    // Rehash if over 2/3 full.
+    if (3 * num_bindings >= 2 * table.length)
+      rehash();
+    if (Binding.hashSet(table, log2Size, binding) == null)
+      num_bindings++;
+  }
+
   public Binding addBinding (String name, Object value)
   {
-    if (num_bindings >= table.length * threshold)
-      rehash (2 * table.length);
-
-    num_bindings++;
-    int hash = System.identityHashCode(name);
-    int index = (hash & 0x7FFFFFFF) % table.length;
-
     Binding binding = new Binding(name);
     binding.constraint = trivialConstraint;
     binding.value = value;
-    binding.chain = table[index];
-    table[index] = binding;
+    addBinding(binding);
     return binding;
   }
 
-  void rehash (int new_capacity)
+  void rehash ()
   {
+    int new_capacity = 2 * table.length;
     Binding[] new_table = new Binding[new_capacity];
-    for (int i = table.length;  --i >= 0;)
-      {
-	// First reverse the chain of bindings, do we can handle oldest first
-	Binding prev = null;
-	for (Binding cur = table[i];  cur != null; )
-	  {
-	    Binding next = cur.chain;
-	    cur.chain = prev;
-	    prev = cur;
-	    cur = next;
-	  }
-	table[i] = prev;
 
-	for (Binding cur = table[i];  cur != null; )
-	  {
-	    int hash = System.identityHashCode(cur.sym_name);
-	    int new_index = (hash & 0x7FFFFFFF) % new_capacity;
-	    Binding next = cur.chain;
-	    cur.chain = new_table[new_index];
-	    new_table[new_index] = cur;
-	    cur = next;
-	  }
-      }
+    Binding.hashInsertAll(new_table, log2Size + 1,
+			  table, log2Size);
     table = new_table;
+    log2Size++;
+    mask = (mask << 1) | 1;
   }
 
   public Object remove (String name)
   {
-    int hash = System.identityHashCode(name);
     Environment env = this;
     for ( ; ;  env = env.previous)
       {
 	if (env == null)
 	  return null;
 	Binding[] env_tab = env.table;
-	int index = (hash & 0x7FFFFFFF) % env_tab.length;
-	for (Binding binding = env_tab[index];
-	     binding != null;  binding = binding.chain)
-	  {
-	    if (binding.sym_name == name)
-	      {
-		Object old = binding.get(); 
-		env.remove(binding);
-		return old;
-	      }
-	  }
+	Named old = Binding.hashDelete(env.table, env.log2Size, name);
+	if (old != null)
+	  return old;
       }
   }
 
@@ -205,24 +182,7 @@ public class Environment extends NameMap
 
   public void remove (Binding binding)
   {
-    int hash = System.identityHashCode(binding.sym_name);
-    int index = (hash & 0x7FFFFFFF) % table.length;
-    Binding prev = null;
-    for (Binding b = table[index];  b != null ; )
-      {
-	Binding next = b.chain;
-	if (b == binding)
-	  {
-	    if (prev == null)
-	      table[index] = next;
-	    else
-	      prev.chain = next;
-	    num_bindings--;
-	    return;
-	  }
-	prev = b;
-	b = next;
-      }
+    Binding.hashDelete(table, log2Size, binding.sym_name);
   }
 
   /** Get the value bound to the given name.

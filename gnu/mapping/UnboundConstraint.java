@@ -26,7 +26,9 @@ public class UnboundConstraint extends Constraint
     synchronized (binding)
       {
 	if (binding.constraint == this)
-	  binding.setConstraint(environment.trivialConstraint);
+	  binding.setConstraint(environment == null
+				? Binding.trivialConstraint
+				: environment.trivialConstraint);
 	binding.constraint.set(binding, value);
       }
   }

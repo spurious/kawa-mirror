@@ -5,6 +5,9 @@ import kawa.lang.*;
 
 public class thisRef extends Syntax
 {
+  public static final thisRef thisSyntax = new thisRef();
+  static { thisSyntax.setName("this"); }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     if (form.cdr == LList.Empty)

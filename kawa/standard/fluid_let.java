@@ -11,6 +11,9 @@ import gnu.lists.*;
 
 public class fluid_let extends Syntax implements Printable
 {
+  public static final fluid_let fluid_let = new fluid_let();
+  static { fluid_let.setName("fluid-set"); }
+
   /** True if bindings should be evaluated sequentionally, as in ELisp let*. */
   boolean star;
 

@@ -5,14 +5,23 @@ import gnu.bytecode.Type;
 import gnu.expr.*;
 import gnu.lists.*;
 
-// OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
-// 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))
-// 183: (primitive-constructor "class" ("argtype ...))
-// 184: (primitive-static-method "class" "method" "rettype" ("argtype" ...))
-// 185: (primitive-interface-method "class" "method" "rettype" ("argtype" ...))
-
 public class prim_method extends Syntax
 {
+  public static final prim_method virtual_method = new prim_method(182);
+  static { virtual_method.setName("primitive-virtual-method"); }
+
+  public static final prim_method static_method = new prim_method(184);
+  static { static_method.setName("primitive-static-method"); }
+
+  public static final prim_method interface_method = new prim_method(185);
+  static { interface_method.setName("primitive-interface-method"); }
+
+  public static final prim_method constructor = new prim_method(183);
+  static { constructor.setName("primitive-constructor"); }
+
+  public static final prim_method op1 = new prim_method();
+  static { op1.setName("primitive-op1"); }
+
   static private Pattern pattern2 = new ListPat (2);
   static private Pattern pattern3 = new ListPat (3);
   static private Pattern pattern4 = new ListPat (4);

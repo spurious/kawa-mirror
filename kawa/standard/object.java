@@ -7,6 +7,10 @@ import gnu.mapping.Symbol;
 
 public class object extends Syntax
 {
+  public static final object objectSyntax
+    = new kawa.standard.object(Scheme.lambda);
+  static { objectSyntax.setName("object"); }
+
   Lambda lambda;
   public static final Keyword accessKeyword = Keyword.make("access");
   public static final Keyword throwsKeyword = Keyword.make("throws");

@@ -7,6 +7,9 @@ import gnu.expr.*;
 
 public class constant_fold extends Syntax
 {
+  public static final constant_fold constant_fold = new constant_fold();
+  static { constant_fold.setName("constant-fold"); }
+
   static Object checkConstant(Expression exp, Translator tr)
   {
     if (exp instanceof QuoteExp)

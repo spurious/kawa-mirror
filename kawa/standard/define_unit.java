@@ -10,6 +10,11 @@ import gnu.bytecode.*;
 
 public class define_unit extends Syntax
 {
+  public static final define_unit define_unit = new define_unit(false);
+  static { define_unit.setName("define-unit"); }
+  public static final define_unit define_base_unit = new define_unit(true);
+  static { define_base_unit.setName("define-base-unit"); }
+
   /** True if this is define-base-unit, false if define-unit. */
   boolean base;
 

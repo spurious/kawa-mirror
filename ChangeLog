@@ -1,5 +1,16 @@
 2005-03-20  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_class.java: New constructor.
+	(define_class, define_simple_class): New static "instance" fields.
+	* kawa/standard/constant_fold.java (constant_fold): Likewise.
+	* kawa/standard/fluid_let.java (fluid_let): Likewise.
+	* kawa/standard/object.java (objetSyntax): Likewise.
+	* kawa/standard/define_unit.java (define_unit, define_base_unit):
+	Likewis.
+	* kawa/standard/prim_method.java (virtual_method, static_method,
+	interface_method, constructor, op1): Likewise.
+	* kawa/standard/Scheme.java: Update to use defSntxStFld.
+
 	* kawa/standard/begin.java (begin): New static "instance" field.
 	* kawa/standard/define.java (defineRaw): Likewise.
 	* kawa/standard/define_alias.java (define_alias): Likewise.

@@ -6,12 +6,24 @@ import gnu.mapping.Symbol;
 
 public class define_class extends Syntax
 {
+  public static final define_class define_class
+    = new define_class("define-class", false);
+  public static final define_class define_simple_class
+    = new define_class("define-simple-class", true);
+
   boolean isSimple;
   object objectSyntax;
 
   define_class (object objectSyntax, boolean isSimple)
   {
     this.objectSyntax = objectSyntax;
+    this.isSimple = isSimple;
+  }
+
+  define_class (String name, boolean isSimple)
+  {
+    super(name);
+    this.objectSyntax = object.objectSyntax;
     this.isSimple = isSimple;
   }
 

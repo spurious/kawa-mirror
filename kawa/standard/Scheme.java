@@ -430,15 +430,16 @@ public class Scheme extends LispLanguage
       defProcStFld("string-upcase", "kawa.lib.strings");
       defProcStFld("string-downcase", "kawa.lib.strings");
       defProcStFld("string-capitalize", "kawa.lib.strings");
-      define_syntax("primitive-virtual-method",
-                    new kawa.standard.prim_method(182));
-      define_syntax("primitive-static-method",
-                    new kawa.standard.prim_method(184));
-      define_syntax("primitive-interface-method",
-                    new kawa.standard.prim_method(185));
-      define_syntax("primitive-constructor",
-                    new kawa.standard.prim_method(183));
-      define_syntax("primitive-op1", new kawa.standard.prim_method());
+      defSntxStFld("primitive-virtual-method",
+                   "kawa.standard.prim_method", "virtual_method");
+      defSntxStFld("primitive-static-method",
+                   "kawa.standard.prim_method", "static_method");
+      defSntxStFld("primitive-interface-method",
+                   "kawa.standard.prim_method", "interface_method");
+      defProcStFld("primitive-constructor",
+                   "kawa.standard.prim_method", "constructor");
+      defProcStFld("primitive-op1",
+                   "kawa.standard.prim_method", "op1");
       defSntxStFld("primitive-get-field", "kawa.lib.reflection");
       defSntxStFld("primitive-set-field", "kawa.lib.reflection");
       defSntxStFld("primitive-get-static", "kawa.lib.reflection");
@@ -457,13 +458,12 @@ public class Scheme extends LispLanguage
       defProcStFld("as", "gnu.kawa.functions.Convert", "as");
       defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
       defSntxStFld("synchronized", "kawa.lib.syntax");
-      object objectSyntax = new kawa.standard.object(lambda);
-      define_syntax("object", objectSyntax);
-      define_syntax("define-class",
-                    new kawa.standard.define_class(objectSyntax, false));
-      define_syntax("define-simple-class",
-                    new kawa.standard.define_class(objectSyntax, true));
-      define_syntax("this", "kawa.standard.thisRef");
+      defSntxStFld("object", "kawa.standard.object", "objectSyntax");
+      defSntxStFld("define-class", "kawa.standard.define_class",
+                   "define_class");
+      defSntxStFld("define-simple-class", "kawa.standard.define_class",
+                   "define_simple_class");
+      defSntxStFld("this", "kawa.standard.thisRef", "thisSyntax");
       defProcStFld("make", "gnu.kawa.reflect.Invoke", "make");
       defProcStFld("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
       defProcStFld("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
@@ -477,12 +477,14 @@ public class Scheme extends LispLanguage
       defProcStFld("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
       defProcStFld("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
 
-      define ("define-macro", "kawa.lib.syntax");
-      define ("%define-macro",
-	      new kawa.standard.define_syntax("define-macro", false));
-      define ("syntax-case", new kawa.standard.syntax_case ());
-      define ("%define-syntax", new kawa.standard.define_syntax ());
-      define ("syntax-rules", new kawa.standard.syntax_rules ());
+      defSntxStFld("define-macro", "kawa.lib.syntax");
+      defSntxStFld("%define-macro", "kawa.standard.define_syntax",
+                   "define_macro");
+      defSntxStFld("syntax-case", "kawa.standard.syntax_case", "syntax_case");
+      defSntxStFld("%define-syntax", "kawa.standard.define_syntax",
+                   "define_syntax");
+      defSntxStFld("syntax-rules", "kawa.standard.syntax_rules",
+                   "syntax_rules");
       defProcStFld("syntax-object->datum", "kawa.lib.std_syntax");
       defProcStFld("datum->syntax-object", "kawa.lib.std_syntax");
       defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
@@ -524,8 +526,9 @@ public class Scheme extends LispLanguage
 
       defSntxStFld("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       defSntxStFld("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
-      define_syntax ("fluid-let", "kawa.standard.fluid_let");
-      define_syntax("constant-fold", "kawa.standard.constant_fold");
+      defSntxStFld("fluid-let", "kawa.standard.fluid_let", "fluid_let");
+      defSntxStFld("constant-fold", "kawa.standard.constant_fold",
+                   "constant_fold");
       defProcStFld("make-parameter", "kawa.lib.parameters");
       defSntxStFld("parameterize", "kawa.lib.parameters");
 
@@ -544,9 +547,11 @@ public class Scheme extends LispLanguage
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
       define_proc ("make-quantity", "kawa.standard.make_quantity");
-      define_syntax ("define-unit", new kawa.standard.define_unit(false));
-      define_syntax ("define-namespace", "gnu.kawa.lispexpr.DefineNamespace");
-      define_syntax ("define-base-unit", new kawa.standard.define_unit(true));
+      defSntxStFld("define-namespace", "gnu.kawa.lispexpr.DefineNamespace",
+                   "define_namespace");
+      defSntxStFld("define-unit", "kawa.standard.define_unit", "define_unit");
+      defSntxStFld("define-base-unit", "kawa.standard.define_unit",
+                   "define_base_unit");
 
       defProcStFld("gentemp", "kawa.lib.syntax");
       defSntxStFld("defmacro", "kawa.lib.syntax");

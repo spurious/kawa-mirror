@@ -132,16 +132,19 @@ public class Translator extends Compilation
   /** True iff a form matches a literal symbol. */
   public boolean matches(Object form, String literal)
   {
-    // Check for hygiene re-naming - see SyntaxRule.execute_template.
     if (form instanceof Symbol)
-      form = environ.get(form);
+      {
+	// Check for hygiene re-naming - see SyntaxRule.execute_template.
+	Declaration decl = (Declaration) environ.get(form);
+	if (decl != null && decl.getValue() instanceof ReferenceExp)
+	  form = ((ReferenceExp) decl.getValue()).getSymbol();
+      }
     return form == literal;
   }
 
   public Declaration lookup(Object name, int namespace)
   {
-    Object binding = environ.get(name);
-    Declaration decl = (Declaration) binding;
+    Declaration decl = (Declaration) environ.get(name);
     if (decl != null
 	&& (getInterpreter().getNamespaceOf(decl) & namespace) != 0)
       return decl;
@@ -165,8 +168,10 @@ public class Translator extends Compilation
     return decl;
   }
 
-  Object resolve(Symbol symbol, boolean function)
+  Object resolve(Object name, boolean function)
   {
+    Symbol symbol = name instanceof String ? env.lookup((String) name)
+      : (Symbol) name;
     if (symbol == null)
       return null;
     if (function && getInterpreter().hasSeparateFunctionNamespace())
@@ -183,24 +188,35 @@ public class Translator extends Compilation
   {
     if (obj instanceof String || obj instanceof Symbol)
       {
-	Object value = environ.get(obj);
-	Symbol symbol = null;
-	if (value instanceof Declaration)
+	Declaration decl = (Declaration) environ.get(obj);
+	if (decl != null)
 	  {
-	    nameToLookup = ((Declaration) value).getSymbol();
-	    obj = value;
+	    if (decl.isAlias() && decl.getValue() instanceof ReferenceExp)
+	      {
+		// Handle hygiene re-naming - see SyntaxRules.java.expand.
+		ReferenceExp rexp = (ReferenceExp) decl.getValue();
+		decl = rexp.getBinding();
+		obj = rexp.getSymbol();
+		nameToLookup = obj;
+		if (decl == null)
+		  {
+		    obj = resolve(obj, function);
+		  }
+		else
+		  {
+		    obj = decl;
+		  }
+	      }
+	    else
+	      {
+		nameToLookup = decl.getSymbol();
+		obj = decl;
+	      }
 	  }
 	else
 	  {
-	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
-	    if (value instanceof String)
-	      obj = value;
 	    nameToLookup = obj;
-	    if (obj instanceof Symbol)
-	      symbol = (Symbol) obj;
-	    else
-	      symbol = env.lookup(obj.toString());
-	    obj = resolve(symbol, function);
+	    obj = resolve(obj, function);
 	  }
         if (obj instanceof Syntax)
           return obj;
@@ -219,7 +235,7 @@ public class Translator extends Compilation
 	  }
 	else
 	  {
-	    symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
+	    Symbol symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
 	      : env.lookup(nameToLookup.toString());
 	    if (symbol != null && symbol.isBound())
 	      return symbol.get();
@@ -336,10 +352,9 @@ public class Translator extends Compilation
       return rewrite_pair ((Pair) exp);
     else if (exp instanceof String || exp instanceof Symbol)
       {
-	Object value = environ.get(exp);
-	Declaration decl = null;
+	Declaration decl = (Declaration) environ.get(exp);
 	Symbol symbol = null;
-	if (exp instanceof String && ! (value instanceof Declaration))
+	if (exp instanceof String && decl == null)
 	  {
 	    String str = (String) exp;
 	    int colon = str.indexOf(':');
@@ -361,9 +376,9 @@ public class Translator extends Compilation
 		  }
 		else
 		  {
-		    value = resolve(env.lookup(xprefix.intern()), function);
-		    if (value != null)
-		      return rewrite(Symbol.make(value.toString(), local),
+		    Object v = resolve(env.lookup(xprefix.intern()), function);
+		    if (v != null)
+		      return rewrite(Symbol.make(v.toString(), local),
 				     function);
 		    try
 		      {
@@ -377,23 +392,29 @@ public class Translator extends Compilation
 		  }
 	      }
 	  }
-	if (value instanceof Declaration)
+	if (decl != null)
 	  {
-	    decl = (Declaration) value;
 	    nameToLookup = decl.getSymbol();
+	    exp = null;
+	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
+	    if (decl.isAlias() && decl.getValue() instanceof ReferenceExp)
+	      {
+		ReferenceExp rexp = (ReferenceExp) decl.getValue();
+		decl = rexp.getBinding();
+		if (decl == null)
+		  {
+		    exp = rexp.getSymbol();
+		    nameToLookup = exp;
+		  }
+	      }
 	  }
 	else
 	  {
-	    // Handle hygiene re-naming - see SyntaxRules.java.expand.
-	    if (value instanceof String)
-	      exp = value;
 	    nameToLookup = exp;
-	    if (exp instanceof Symbol)
-	      symbol = (Symbol) exp;
-	    else
-	      symbol = env.lookup(exp.toString());
 	  }
-	value = resolve(symbol, function);
+	symbol = exp instanceof String ? env.lookup((String) exp)
+	  : (Symbol) exp;
+	Object value = resolve(symbol, function);
 	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
         if (decl != null)
           {
@@ -439,7 +460,7 @@ public class Translator extends Compilation
               }
           }
 	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
-	    && decl.isProcedureDecl())
+	    && decl.isProcedureDecl() && ! function)
 	  return syntaxError("not implemented: variable reference to a method");
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
 	if (separate)
@@ -747,10 +768,17 @@ public class Translator extends Compilation
    */
   public void push (Declaration decl)
   {
-    Object sym = decl.getSymbol();
-    if (sym == null)
+    Object name = decl.getSymbol();
+    if (name == null)
       return;
-    pushBinding(sym, decl);
+    Object old = environ.put(name, decl);
+    // It is possible the same Declaration may be pushed twice:  Once
+    // in scanForDefinitions and once by pushDecls.  With some care
+    // this could probably be avoided.  FIXME.
+    if (decl == old)
+      return;
+    shadowStack.push(old);
+    shadowStack.push(name);
   }
 
   /** Remove this from Translator.environ.
@@ -797,20 +825,7 @@ public class Translator extends Compilation
     current_scope = scope.outer;
   }
 
-  /** Note a new binding, remembering old binding in the shadowStack. */
-  public void pushBinding(Object name, Object value)
-  {
-    Object old = environ.put(name, value);
-    // It is possible the same Declaration may be pushed twice:  Once
-    // in scanForDefinitions and once by pushDecls.  With some care
-    // this could probably be avoided.  FIXME.
-    if (value == old)
-      return;
-    shadowStack.push(old);
-    shadowStack.push(name);
-  }
-
-  public boolean popBinding()
+  private boolean popBinding()
   {
     Object name = shadowStack.pop();
     if (name == null)

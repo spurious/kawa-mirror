@@ -19,7 +19,7 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   /** Declarations captured at macro definition time.
    * The binding (if any) for templateIdentifiers[i] is capturedDeclarations[i]. */
-  Object[] capturedDeclarations;
+  Declaration[] capturedDeclarations;
 
   public static Macro make (Declaration decl)
   {
@@ -57,7 +57,7 @@ public class Macro extends Syntax implements Printable, Externalizable
     for (int i = capturedFields.length();  --i >= 0; )
       if (capturedFields.charAt(i) == ';')
         numFields++;
-    Object[] decls = new Declaration[numFields];
+    Declaration[] decls = new Declaration[numFields];
     int start = 0;
     for (int i = 0;  i < numFields; i++)
       {

@@ -126,21 +126,17 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     calculate_maxVars (num_identifiers);
     macro.templateIdentifiers = new String[num_identifiers];
     capturedIdentifiers.copyInto(macro.templateIdentifiers);
-    macro.capturedDeclarations = new Object[num_identifiers];
+    macro.capturedDeclarations = new Declaration[num_identifiers];
     for (int j = num_identifiers;  --j >= 0; )
       {
 	String name = macro.templateIdentifiers[j];
-	Object binding = tr.environ.get(name);
-	if (binding instanceof Declaration)
+	Declaration decl =  (Declaration) tr.environ.get(name);
+	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
-	    Declaration decl = (Declaration) binding;
-	    if (! decl.getFlag(Declaration.IS_UNKNOWN))
-              {
-                decl.setCanRead(true);
-                decl.setFlag(Declaration.EXTERNAL_ACCESS);
-	      }
+	    decl.setCanRead(true);
+	    decl.setFlag(Declaration.EXTERNAL_ACCESS);
 	  }
-	macro.capturedDeclarations[j] = binding;
+	macro.capturedDeclarations[j] = decl;
       }
   }
 
@@ -251,9 +247,18 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		String name = macro.templateIdentifiers[j];
 		Symbol renamed_symbol = new Symbol(name);
 		vars[rule.num_variables + j] = renamed_symbol;
-		Object captured = macro.capturedDeclarations == null ? null
+		Declaration captured
+		  = macro.capturedDeclarations == null ? null
 		  : macro.capturedDeclarations[j];
-		tr.environ.put(renamed_symbol, captured == null ? name : captured);
+		Declaration alias = new Declaration(renamed_symbol);
+		ReferenceExp ref;
+		if (captured != null)
+		  ref = new ReferenceExp(captured);
+		else
+		  ref = new ReferenceExp(name);
+		alias.noteValue(ref);
+		alias.setAlias(true);
+		tr.push(alias);
 	      }
 	    Object expansion = rule.execute_template (0, vars, 0, indexes, tr, form);
 

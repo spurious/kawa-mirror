@@ -195,6 +195,7 @@ public class ContentConsumer implements Consumer, Attributes
   public void endGroup(String typeName)
   {
     endStartTag();
+    flushStrBuffer();
     nesting--;
     int i = 3 * nesting;
     try

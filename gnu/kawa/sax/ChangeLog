@@ -1,3 +1,7 @@
+2003-06-27  Per Bothner  <per@bothner.com>
+
+	* ContentConsumer.java (endGroup):  Add flushStrBuffer call.
+
 2003-06-05  Per Bothner  <per@bothner.com>
 
 	* ContentConsumer.java:  Fix some small bugs.

@@ -1,3 +1,11 @@
+1999-07-15  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  Check real parent (even if inline), when
+	seeing if we need to pass a closure when calling a method directly.	
+	* LambdaExp.java (allocFrame):  When allocating closureEnvField, check
+ 	real parent (even if inline).  Inline functions can have heapFrame.
+	(enterFunction):  Fix logic bug when renaming duplicate field.
+
 1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* LetExp.java (compile):  Target for init expr is decl type.

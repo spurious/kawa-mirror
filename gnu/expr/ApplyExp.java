@@ -154,7 +154,7 @@ public class ApplyExp extends Expression
 	    int extraArg = 0;
 	    Type[] argTypes = method.getParameterTypes();
 	    // ?? Procedure.checkArgCount(this, args.length);
-	    LambdaExp parent = func_lambda.outerLambdaNotInline();
+	    LambdaExp parent = func_lambda.outerLambda();
 	    if ((parent.heapFrame != null
 		 && (func_lambda.getImportsLexVars()
 		     || func_lambda.getNeedsStaticLink()))

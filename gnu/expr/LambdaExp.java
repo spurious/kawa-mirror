@@ -635,7 +635,7 @@ public class LambdaExp extends ScopeExp
     if ((getImportsLexVars() || getNeedsStaticLink())
 	&& isClassGenerated())
       {
-	LambdaExp parent = outerLambdaNotInline();
+	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
 
 	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
@@ -751,13 +751,13 @@ public class LambdaExp extends ScopeExp
 	  {
 	    String dname = comp.mangleName(decl.getName());
 	    String mname = dname;
-	    // Check for existing field with name name.  Probably overkill.
-	    for (int i = 0; ; i++)
+	    // Check for existing field with same name.
+	    for (int i = 0; ; )
 	      {
 		Field fld = frameType.getField(mname);
 		if (fld == null)
 		  break;
-		mname = dname + 1;
+		mname = dname + '_' + ++i;
 	      }
 	    Type dtype = decl.getType();
 	    decl.field = frameType.addField (mname, decl.getType());

@@ -32,7 +32,7 @@ public abstract class ObjectType extends Type
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-        if ((flags | EXISTING_CLASS) != 0)
+        if ((flags & EXISTING_CLASS) != 0)
           throw new RuntimeException("no such class: "+getName());
       }
     return reflectClass;

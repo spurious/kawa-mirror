@@ -41,9 +41,9 @@ public class IfExp extends Expression
   {
     Interpreter interpreter = getInterpreter();
     if (interpreter.isTrue((test.eval(ctx))))
-      ctx.proc = then_clause;
+      then_clause.match0(ctx);
     else if (else_clause != null)
-      ctx.proc = else_clause;
+      else_clause.match0(ctx);
   }
 
   public void compile (Compilation comp, Target target)

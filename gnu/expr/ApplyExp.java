@@ -62,14 +62,12 @@ public class ApplyExp extends Expression
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Procedure proc = (Procedure) func.eval(ctx);
+    Object proc = func.eval(ctx);
     int n = args.length;
     Object[] vals = new Object[n];
     for (int i = 0; i < n; i++)
       vals[i] = args[i].eval(ctx);
-    if (proc == null)
-      throw new NullPointerException();
-    proc.checkN(vals, ctx);
+    ((Procedure) proc).checkN(vals, ctx);
   }
 
   public static void compileToArray(Expression[] args, Compilation comp)

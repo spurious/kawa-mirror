@@ -16,6 +16,13 @@ public abstract class Expression extends Procedure0 implements Printable
 			        + getClass() + ".eval called");
   }
 
+  public final int match0 (CallContext ctx)
+  {
+    ctx.proc = this;
+    ctx.pc = 0;
+    return 0;
+  }
+
   public final Object apply0 () throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
@@ -34,7 +41,7 @@ public abstract class Expression extends Procedure0 implements Printable
     int start = ctx.startFromContext();
     try
       {
-	apply(ctx);
+	match0(ctx);
 	return ctx.getFromContext(start);
       }
     catch (Throwable ex)

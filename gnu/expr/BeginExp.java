@@ -123,7 +123,7 @@ public class BeginExp extends Expression
       {
 	ctx.consumer = consumerSave;
       }
-    ctx.proc = exps[i];
+    exps[i].match0(ctx);
   }
 
   public void pushOptions (Compilation comp)

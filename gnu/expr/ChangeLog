@@ -1,3 +1,12 @@
+2005-02-15  Per Bothner  <per@bothner.com>
+
+	* Expression.java (match0): New method.
+	(eval(CallContext)): Use match0.
+	* BeginExp.java (apply): Use match0 to setup tail-call.
+	* IfExp.java (apply): Likewise.
+	
+	* ApplyExp.java (apply): Defer Procedure cast.
+
 2005-02-14  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule): Fix think eval -> apply.

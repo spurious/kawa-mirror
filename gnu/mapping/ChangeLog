@@ -1,3 +1,7 @@
+2004-08-14  Per Bothner  <per@bothner.com>
+
+	* CallFrame.java:  Remove unused class.
+
 2004-08-06  Per Bothner  <per@bothner.com>
 
 	* Procedure.java:  New API, especially for --full-tailcalls.

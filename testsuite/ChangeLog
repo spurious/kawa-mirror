@@ -1,3 +1,7 @@
+2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* misc-test.scm:  Added string-append/shared tests
+
 2003-11-05  Per Bothner  <per@bothner.com>
 
 	* module3.scm, obj-test.scm:  Test define-variable syntax form.
@@ -17,7 +21,7 @@
 2003-09-11  Per Bothner  <per@bothner.com>
 
 	* testing.scm (test):  Catch exception.
-	* misc-test.scm:  New generic procedure tests. One is expected to fsil.
+	* misc-test.scm:  New generic procedure tests. One is expected to fail.
 
 2003-09-08  Per Bothner  <per@bothner.com>
 

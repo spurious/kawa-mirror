@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 121)
+(test-init "Miscellaneous" 126)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -547,3 +547,11 @@
 
 (define (not-a) ((lambda (x) (not x)) 'a))
 (test #f not-a)
+
+;;; Test SRFI-13 string-append/shared
+(let ((str "abc"))
+  (test "" string-append/shared)
+  (test "" string-append/shared "")
+  (test "abc" string-append/shared str)
+  (test "abc123xy" string-append/shared str "123" "xy")
+  (test #t equal? "abc123xy" str))

@@ -19,6 +19,7 @@ kawa_SOURCES = kawa.c kawapath.c
 cgi_servlet_SOURCES = cgi-servlet.c kawapath.c
 kawa_bin_SOURCES =
 CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
+LIBTOOL = $(top_builddir)/libtool
 
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =

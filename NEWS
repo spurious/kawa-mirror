@@ -1,4 +1,8 @@
-The for-each procedure is now inlined.
+The map and for-each procedure is now inlined.  This is most especially
+beneficial when it allows the mapped-over procedure to also be inlined,
+such as when that procedure is a lambda expression.
+
+The reverse! procedure was added.
 
 Internal changes:
 * If a variable reference is unknown, create a Declaration

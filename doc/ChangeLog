@@ -1,3 +1,10 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Change sourceware.cygnus.com to sources.redhat.com.
+	Added new subsection on using IBM's Jikes compiler.
+	(Miscellaneous):  Document new function reverse!.
+	(Procedures):  Fix typo in name of make-procedure.
+
 2000-08-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Update url for Kawa on Mac.

@@ -1,3 +1,17 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline):  Inline map as well as for-each.
+
+	* kawa/standard/quasiquote.java (expand_pair):  Call LList.make
+	rather than kawa.lib.lists.cons.
+	(consType):  Removed static field.
+
+	* kawa/standard/Scheme.java (initScheme):  Add "reverse!".
+	The reverse function is now in kawa.lib.lists.
+	* kawa/standard/reverse.java:  Removed.
+	* kawa/standard/Makefile.am (java_JAVA):  Removed reverse.java.
+
+
 2000-12-13  Emmanuel Castro <castro@lirmm.fr>
 
 	* kawa/standard/Scheme.java (initScheme):  'error' is now in

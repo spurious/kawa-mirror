@@ -76,7 +76,7 @@ discusses Scheme implementation is
 @uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
 
-Javadoc generated @uref{http://sourceware.cygnus.com/kawa/api/,documentation of the Kawa classes} is also available.
+Javadoc generated @uref{http://sources.redhat.com/kawa/api/,documentation of the Kawa classes} is also available.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -85,16 +85,16 @@ This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
 The packages
-@uref{http://sourceware.cygnus.com/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
-@uref{http://sourceware.cygnus.com/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
-@uref{http://sourceware.cygnus.com/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
-@uref{http://sourceware.cygnus.com/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
+@uref{http://sources.redhat.com/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
+@uref{http://sources.redhat.com/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
+@uref{http://sources.redhat.com/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
+@uref{http://sources.redhat.com/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
 and
-@uref{http://sourceware.cygnus.com/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
+@uref{http://sources.redhat.com/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
 are used by Kawa, and distributed with it, but may be independently useful.
 
 For a technical overview of Kawa, see these
-@uref{http://sourceware.cygnus.com/kawa/papers/,papers}.
+@uref{http://sources.redhat.com/kawa/papers/,papers}.
 
 Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 
@@ -361,12 +361,32 @@ export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
 
+@subsection Using the Jikes compiler
+
+@uref{http://oss.software.ibm.com/developerworks/opensource/jikes/project/,Jikes}
+is a Java source-to-bytecode compiler that is much faster than Sun's
+@code{javac}.  (Note that this only speeds up building Kawa from source, not
+actually running Kawa.)
+The instructions for using jikes are as above, except that you
+need to specify Jikes at @code{configure} time, setting the @code{JAVAC}
+environment variable.  If @code{jikes} is in your execution path, do:
+@example
+JAVAC=jikes ./configure
+@end example
+
+You also need to inform Jikes where it should find the standard Java classes
+(since Jikes is a compiler only).  For example:
+@example
+CLASSPATH=.:/opt/jdk1.3/jre/lib/rt.jar
+export CLASSPATH
+@end example
+
 @subsection Building Kawa under Windows
 
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
 environment.  If you want to build Kawa from source under Windows
 (95, 98, or NT), you could use a Unix empulation package, such
-as the free @uref{http://sourceware.cygnus.com/cygwin/,Cygwin}.
+as the free @uref{http://sources.redhat.com/cygwin/,Cygwin}.
 However, there are some problems with filenames that make this
 more complicated than it should be.
 
@@ -379,7 +399,7 @@ Download the Kawa source distribution @code{kawa-@value{VERSION}.tar.gz}.
 @item
 Extract the files using an appropriate tool.
 (I did @code{tar xzf kawa-@value{VERSION}.tar.gz}, using the @code{tar}
-that is part of @uref{http://sourceware.cygnus.com/cygwin/, Cygwin}.
+that is part of @uref{http://sources.redhat.com/cygwin/, Cygwin}.
 If there are alternative commonly-available tools, please let me
 know about them.)
 @item
@@ -1014,7 +1034,7 @@ You can call a generic procedure, which selects the "closest
 match" among the component method procedures:  I.e. the most specific
 method procedure that is applicable give the actual arguments.
 
-@defun make-procededure [keyword: value]... method...
+@defun make-procedure [keyword: value]... method...
 Create a generic procedure given the specific methods.
 You can also specify property values for the result.
 
@@ -2380,6 +2400,14 @@ If @var{condition} is false, evaluate each @var{form} in order,
 returning the value of the last one.
 @end deffn
 
+@defun reverse! list
+The result is a list consisting of the elements of @var{list} in reverse order.
+No new pairs are allocated, instead the pairs of @var{list} are re-used,
+with @code{cdr} cells of @var{list} reversed in place.  Note that if @var{list}
+was pair, it becomes the last pair of the reversed result.
+
+@end defun
+
 @defun vector-append @var{arg}...
 Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
@@ -3545,18 +3573,18 @@ System.out.println(x);
 @chapter Mailing lists
 
 If you have a problem installing or using Kawa,
-send mail to @code{kawa@@sourceware.cygnus.com}
+send mail to @code{kawa@@sources.redhat.com}
 
 This mailing list is used for reporting bugs, patches, discussing
 changes to Kawa, and announcing snapshots.  If you wish to subscribe,
-send a blank message request to @code{kawa-subscribe@@sourceware.cygnus.com}.
+send a blank message request to @code{kawa-subscribe@@sources.redhat.com}.
 To unsubscribe, send a blank message to
 @code{kawa-unsubscribe@@sourcware.cygnus.com}.  (If your mail is forwarded,
 send mail to the address following @code{mailto:} in the
 @code{List-Unsubscribe} line in the messages you get form the list.)
 
 Messages to the mailing list are now
-@uref{http://sourceware.cygnus.com/ml/kawa/, archived}.
+@uref{http://sources.redhat.com/ml/kawa/, archived}.
 
 There is a separate mailing list for @uref{http://www.JEmacs.net,JEmacs}.
 See the @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,information page}.

@@ -59,6 +59,13 @@ public class InPort extends LineBufferedReader implements Printable
     return read ();
   }
 
+  char readState = '\n';
+  /** Return a character that indicates what we are currently reading.
+    * Returns '\n' if we are not inside read; '\"' if reading a string;
+    * '|' if inside a comment; '(' if inside a list; and
+    * ' ' if otherwise inside a read. */
+  public char getReadState () { return readState; }
+
   Object readSymbol ()
        throws java.io.IOException, ReadError
   {
@@ -612,21 +619,40 @@ public class InPort extends LineBufferedReader implements Printable
   protected List readList ()
        throws java.io.IOException, ReadError
   {
-    List list = readListBody ();
-    int c = read ();
-    if (c < 0)
-	throw new EofReadError (this, "unexpected EOF in list");
-    return list;
+    char saveReadState = readState;
+    readState = '(';
+    try
+      {
+	List list = readListBody ();
+	int c = read ();
+	if (c < 0)
+	  throw new EofReadError (this, "unexpected EOF in list");
+	return list;
+      }
+    finally
+      {
+	readState = saveReadState;
+      }
   }
 
   public Object readSchemeObject ()
       throws java.io.IOException, ReadError
   {
-    return readSchemeObject (read ());
+    char saveReadState = readState;
+    readState = ' ';
+    try
+      {
+	return readSchemeObject (read ());
+      }
+    finally
+      {
+	readState = saveReadState;
+      }
   }
   public Object readSchemeObject (int c)
       throws java.io.IOException, ReadError
   {
+    char saveReadState;
     for (;;)
       {
 	int next;
@@ -649,7 +675,16 @@ public class InPort extends LineBufferedReader implements Printable
 	  case '(':
 	    return readList();
 	  case '"':
-	    return readString();
+	    saveReadState = readState;
+	    readState = '\"';
+	    try
+	      {
+		return readString();
+	      }
+	    finally
+	      {
+		readState = saveReadState;
+	      }
 	  case '\'':
 	    return readQuote(Interpreter.quote_sym);
 	  case '`':
@@ -698,24 +733,34 @@ public class InPort extends LineBufferedReader implements Printable
 		return readSchemeNumber (0, (char) next);
 	      case '|':
 		int commentNesting = 1;
-		do {
-		  c = read();
-		  if (c == '|')
-		    {
-		      c = read();
-		      if (c == '#')
-			commentNesting--;
-		    }
-		  else if (c == '#')
-		    {
-		      c = read();
-		      if (c == '|')
-			commentNesting++;
-		    }
-		  if (c < 0)
-		    throw new EofReadError (this,
-					    "unexpected eof in #| comment.");
-		} while (commentNesting > 0);
+		saveReadState = readState;
+		readState = '|';
+		try
+		  {
+		    do
+		      {
+			c = read();
+			if (c == '|')
+			  {
+			    c = read();
+			    if (c == '#')
+			      commentNesting--;
+			  }
+			else if (c == '#')
+			  {
+			    c = read();
+			    if (c == '|')
+			      commentNesting++;
+			  }
+			if (c < 0)
+			  throw new EofReadError (this,
+					 "unexpected eof in #| comment.");
+		      } while (commentNesting > 0);
+		  }
+		finally
+		  {
+		    readState = saveReadState;
+		  }
 		break;
 	      default:
 		throw new ReadError (this, "An invalid #-construct was read.");

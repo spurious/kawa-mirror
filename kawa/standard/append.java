@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
+import java.lang.Error;  // To work around case-fold bug in some compilers.
 
 /**
  * Implement the Scheme standard function "append".

@@ -1,3 +1,7 @@
+2004-11-16  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (XQuery): Use defProcStFld instead of define_field.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>): Add definitions for local-name-from-QName,

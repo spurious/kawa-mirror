@@ -503,10 +503,10 @@ public class XQuery extends Interpreter
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     define("write-to", gnu.kawa.xml.WriteTo.writeTo);
-    define_field("iterator-items",
+    defProcStFld("iterator-items",
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
-    define_field("list-items", "gnu.kawa.xml.ListItems", "listItems");
-    define_field("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
+    defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
+    defProcStFld("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
     define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
     define_method("root", "gnu.kawa.xml.Nodes", "root");
     define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");

@@ -4,8 +4,6 @@
 package gnu.lists;
 
 /** A sequence where each element is a character.
- * Note:  It appears that JDK 1.4 will have a new interface
- * java.lang.CharSequence, with charAt length, subSequence, and toString.
  */
 
 public interface CharSeq

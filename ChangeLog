@@ -1,5 +1,10 @@
 2002-02-13  Per Bothner  <per@bothner.com>
 
+	* Make-rules (scm-classes.stamp):  Use SCM_COMPILE_FLAGS.
+
+	* kawa/lang/Translator.java (makeBody):  Take extra ScopeExp arg.
+	If argument is a ModuleExp, wrap in append-values.
+
 	* kawa/lang/Translator.java (lookup, resolve):  New methods.
 	(getBinding, rewrite):  Using new methods reduces code duplication. 
 

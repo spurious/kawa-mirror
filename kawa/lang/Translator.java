@@ -582,7 +582,7 @@ public class Translator extends Parser
         defs.inits = inits;
 	push(defs);
       }
-    Expression body = makeBody(forms);
+    Expression body = makeBody(forms, null);
     if (ndecls == 0)
       return body;
     defs.body = body;
@@ -591,7 +591,7 @@ public class Translator extends Parser
   }
 
   /** Combine a list of zero or more expression forms info a "body". */
-  public Expression makeBody(java.util.Vector forms)
+  public Expression makeBody(java.util.Vector forms, ScopeExp scope)
   {
     int nforms = forms.size();
     if (nforms == 0)
@@ -603,7 +603,11 @@ public class Translator extends Parser
 	Expression[] exps = new Expression [nforms];
 	for (int i = 0; i < nforms; i++)
 	  exps[i] = rewrite (forms.elementAt(i));
-	return ((LispInterpreter) getInterpreter()).makeBody(exps);
+	if (scope instanceof ModuleExp)
+	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
+			      exps);
+	else
+	  return ((LispInterpreter) getInterpreter()).makeBody(exps);
       }
   }
 
@@ -658,7 +662,7 @@ public class Translator extends Parser
     int nforms = forms.size();
     int ndecls = mexp.countDecls();
     pushDecls(mexp);
-    mexp.body = makeBody(forms);
+    mexp.body = makeBody(forms, mexp);
     pop(mexp);
     /* DEBUGGING:
     OutPort err = OutPort.errDefault ();

@@ -41,8 +41,8 @@ java-classes.stamp: $(java_Java)
 
 scm-classes.stamp: $(java_SCM)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
-	  $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --module-static -C $?
+	  $(KAWA1) -d $(top_builddir) --module-static $(SCM_COMPILE_FLAGS) \
+	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. -C $?
 	echo timestamp > scm-classes.stamp
 
 clisp-classes.stamp: $(java_CLISP)

@@ -62,6 +62,8 @@ public class QuoteExp extends Expression
   {
     out.startLogicalBlock("(Quote", ")", 2);
     out.writeSpaceLinear();
+    if (value instanceof Expression)
+      value = value.toString(); // To avoid cycles.
     gnu.lists.FormatToConsumer saveFormat = out.objectFormat;
     try
       {

@@ -49,6 +49,7 @@ public class ExitExp extends Expression
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Exit", false, ")");
+    out.writeSpaceFill();
     if (block == null || block.label == null)
       out.print("<unknown>");
     else

@@ -157,8 +157,17 @@ public class ClassMemberConstraint extends Constraint
 		env.addSymbol((Symbol) value);
 		return;
 	      }
+	    if (value instanceof Procedure)
+	      {
+		Object symbol = ((Procedure) value).getSymbol();
+		if (symbol instanceof Symbol)
+		  {
+		    ((Symbol) symbol).setFunctionValue(value);
+		    return;
+		  }
+	      }
 	    String vname
-	      = value instanceof Named ? ((Named) value).getName() : null;
+    	      = value instanceof Named ? ((Named) value).getName() : null;
 	    name = (vname != null ? vname
 		    : Compilation.demangleName(name, true));
 

@@ -352,6 +352,16 @@ public class BufferWriter extends java.io.Writer implements Runnable
 	  state = SEEN_ESC_STATE;
 	else if (ch == '\b')
 	  moveColumns(-1);
+	else if (ch == '\t')
+	  {
+	    int col = marker.currentColumn();
+	    marker.moveToColumn(col + 8 - (col & 7), true);
+	  }
+	else if (ch == '\r')
+	  {
+	    // FIXME - until we handle '\n' more generally.
+	    // marker.moveToColumn(0, false);
+	  }
 	else
 	  System.err.println("received ctrl-"+(char)(ch+64));
       }

@@ -1,3 +1,7 @@
+2002-03-24  Per Bothner  <per@bothner.com>
+
+	* BufferWriter.java (write1):  Handle '\t', and ignore (for now) '\r'.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	Move some Swing-specific code into gnu.jemacs.swing.

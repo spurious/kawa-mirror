@@ -93,6 +93,8 @@ public class BeginExp extends Expression
   public void print (OutPort out)
   {
     out.startLogicalBlock("(Begin", ")", 2);
+    out.writeSpaceFill();
+    printLineColumn(out);
     int n = length;
     for (int i = 0; i < n; i++)
       { 

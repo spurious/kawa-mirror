@@ -33,7 +33,29 @@ public abstract class Expression implements Printable
 	out.flush();
       }
   }
+
   public abstract void print (OutPort ps);
+
+  /**
+   * Print line and column number if specified.
+   * This is a helper routineintended for use by print(OutPort).
+   */
+  public void printLineColumn(OutPort out)
+  {
+    int line = getLine ();
+    if (line > 0)
+      {
+	out.print("line:");
+	out.print(line);
+	int column = getColumn();
+	if (column != 0)
+	  {
+	    out.print(':');
+	    out.print(column);
+	  }
+	out.writeSpaceFill();
+      }
+  }
 
   public abstract void compile (Compilation comp, Target target);
 

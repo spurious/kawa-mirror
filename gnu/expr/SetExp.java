@@ -25,6 +25,9 @@ public class SetExp extends Expression
 
   public final String getName() { return name; }
 
+  /** Get the Expression for calculating the new ("right-hand") value. */
+  public final Expression getNewValue() { return new_value; }
+
   static private int DEFINING_FLAG = NEXT_AVAIL_FLAG;
   static private int GLOBAL_FLAG = NEXT_AVAIL_FLAG << 1;
   public static  int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
@@ -133,7 +136,7 @@ public class SetExp extends Expression
 
     Object value;
     Declaration decl = binding;
-    if (! decl.isPrivate() && ! comp.usingCPStyle()
+    if (! decl.isPrivate()
 	&& decl.context instanceof ModuleExp
 	&& decl.getValue() instanceof LambdaExp
 	&& ((LambdaExp) decl.getValue()).getName() != null // FIXME
@@ -285,6 +288,7 @@ public class SetExp extends Expression
   {
     out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);
     out.writeSpaceFill();
+    printLineColumn(out);
     SFormat.print(name, out); // FIXME
     out.writeSpaceLinear();
     new_value.print(out);

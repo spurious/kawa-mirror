@@ -1,3 +1,12 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* Expression.java (printLineColumn):  New method.
+	* BeginExp.java, LetExp.java, SetExp.java (print): Use printLineColumn.
+
+	* SetExp.java (getNewValue):  New method.
+
+	* SetExp.java (compile):  Do compileSetField even if usingCPStyle.
+
 2001-11-14  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (match):  Look for best match, not first.

@@ -33,7 +33,7 @@ public class Special extends Object implements Printable, Compilable
 
   public void print(java.io.PrintWriter ps)
   {
-    Symbol.print(name, ps);
+    ps.print(name);
   }
 
   static public ClassType thisType;

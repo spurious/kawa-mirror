@@ -214,7 +214,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   /** Compile arguments and push unto stack.
    * @param args arguments to evaluate and push.
-   * @param thisType If we care calling a non-static function,
+   * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
    *   If thisType==Type.void_type, ignore argType[0].
    *   If this_type==null, no special handling of args[0] or argTypes[0].
@@ -269,12 +269,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    boolean is_static = getStaticFlag();
-    Expression[] args = exp.getArgs();
-
-    String arg_error = WrongArguments.checkArgCount(this, args.length);
-    if (arg_error != null)
-      comp.error('e', arg_error);
 
     if (opcode() == 183) // invokespecial == primitive-constructor
       {
@@ -282,7 +276,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	code.emitNew(type);
 	code.emitDup(type);
       }
-    compileArgs(args, is_static ? null : method.getDeclaringClass(), argTypes,
+
+    Expression[] args = exp.getArgs();
+    String arg_error = WrongArguments.checkArgCount(this, args.length);
+    if (arg_error != null)
+      comp.error('e', arg_error);
+
+    compile(getStaticFlag() ? null : method.getDeclaringClass(), args, comp, target);
+  }
+
+  public void compile (Type thisType, Expression[] args, Compilation comp, Target target)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    compileArgs(args, thisType, argTypes,
 		takesVarArgs(), getName(), source, comp);
     
     if (method == null)
@@ -315,9 +321,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   private static ClassLoader systemClassLoader
   = PrimProcedure.class.getClassLoader();
 
+  public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
+  {
+    return getMethodFor(pproc, null, args);
+  }
+
   /** Search for a matching static method in a procedure's class.
    * @return a PrimProcedure that is suitable, or null. */
-  public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
+  public static PrimProcedure getMethodFor (Procedure pproc, Declaration decl,
+					    Expression[] args)
   {
     Class procClass;
     if (pproc instanceof gnu.expr.ModuleMethod)
@@ -334,7 +346,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
         String name = pproc.getName();
         if (name == null)
           return null;
-        String mangledName = Compilation.mangleName(name);
+        String mangledName
+	  = decl == null || decl.field == null ? Compilation.mangleName(name)
+	  : decl.field.getName();
         String mangledNameV = mangledName + "$V";
         for (int i = meths.length;  --i >= 0; )
           {
@@ -342,7 +356,10 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             int mods = meth.getModifiers();
             if ((mods & (Access.STATIC|Access.PUBLIC))
                 != (Access.STATIC|Access.PUBLIC))
-              continue;
+	      {
+		if (decl == null || decl.base == null)
+		  continue;
+	      }
             String mname = meth.getName();
             boolean variable;
             if (mname.equals("apply") || mname.equals(mangledName))

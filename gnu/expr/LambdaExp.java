@@ -343,10 +343,7 @@ public class LambdaExp extends ScopeExp
   /** For an INLINE_ONLY function, return the function it gets inlined in. */
   public LambdaExp getCaller ()
   {
-    LambdaExp caller = this;
-    while (caller.getInlineOnly())
-      caller = caller.returnContinuation.context;
-    return caller;
+    return returnContinuation.context;
   }
 
   Variable thisVariable;
@@ -824,7 +821,7 @@ public class LambdaExp extends ScopeExp
               {
                 LambdaExp owner = this;
                 while (owner.heapFrame == null)
-                  owner = owner.outerLambda();
+		  owner = owner.outerLambda();
                 closureEnvType = (ClassType) owner.heapFrame.getType();
               }
 	    child.addMethodFor(comp, closureEnvType);
@@ -897,8 +894,8 @@ public class LambdaExp extends ScopeExp
   void enterFunction (Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    // Tail-calls loop back to here!
 
+    // Tail-calls loop back to here!
     scope.setStartPC(code.getPC());
 
     if (closureEnv != null && ! closureEnv.isParameter()
@@ -975,6 +972,7 @@ public class LambdaExp extends ScopeExp
     // If plainArgs>=0, it is the number of arguments *not* in argsArray.
     int plainArgs = -1;
     int defaultStart = 0;
+    Method mainMethod = getMainMethod();
 
     for (Declaration param = firstDecl();  param != null; param = param.nextDecl())
       {
@@ -995,7 +993,9 @@ public class LambdaExp extends ScopeExp
 	    || param.isIndirectBinding())
 	  {
 	    Type paramType = param.getType();
-	    Type stackType = Type.pointer_type;
+	    Type stackType
+	      = (mainMethod == null || plainArgs >= 0 ? Type.pointer_type
+		 : mainMethod.getParameterTypes()[i]);
 	    // If the parameter is captured by an inferior lambda,
 	    // then the incoming parameter needs to be copied into its
 	    // slot in the heapFrame.  Thus we emit an aaload instruction.
@@ -1326,7 +1326,7 @@ public class LambdaExp extends ScopeExp
 	Object inst = clas.newInstance ();
 
 	Procedure proc = (Procedure) inst;
-	if (proc.name () == null)
+	if (proc.getName() == null)
 	  proc.setName (this.name);
         thisValue = proc;
 	return inst;

@@ -173,7 +173,12 @@ public class FindCapturedVars extends ExpFullWalker
 	    outer = heapLambda.outerLambda();
 	  }
 	if (decl.isSimple())
-	  {
+	  {	
+	    if (decl.base != null)
+	      {
+		decl.base.setCanRead(true);
+		capture(decl.base);
+	      }
 	    if (declLambda instanceof ModuleExp)
 	      {
 		declLambda.heapFrame = declLambda.thisVariable;

@@ -268,7 +268,7 @@ public class FindTailCalls extends ExpFullWalker
       decl.setCanWrite(true);
     if (decl != null && decl.getValue() == value && value instanceof LambdaExp
 	&& ! (value instanceof ObjectExp)
-        && ! (decl.context instanceof ModuleExp))
+        && ! decl.isPublic())
       {
 	LambdaExp lexp = (LambdaExp) value; 
 	walkLambdaExp(lexp, false);

@@ -1,3 +1,24 @@
+2000-03-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  Handle identifier bound to declaration
+	with constant value (as created by `require').
+	* Declaration.java *base):  New field.
+	(loadOwningObject):  If base is non-null, load that.
+	* FindCapturedVars.java (capture):  If captured Declaration has a
+	null-null base, mark it as readable, and capture it as well.
+	* PrimProcedure.java (compile):  Split into two methods.
+	(getMethodFor):  Likewise.
+
+	* LambdaExp.java (getCaller):  Don't loop looking for inlined callers.
+
+	* LambdaExp.java (enterFunction):  Use main methods parameter
+	types to set stack type.
+
+	* FindTailCalls (walkSetExp):  Check for decl.isPublic, rather
+	if the context is a ModuleExp (which doesn't work for private decls).
+
+	* Special.java (print):  Just print the name.
+
 2000-03-02  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java (emitCheckedCoerce):  Don't add handler if we

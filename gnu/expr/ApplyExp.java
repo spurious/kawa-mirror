@@ -108,6 +108,7 @@ public class ApplyExp extends Expression
 
   public static void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    int args_length = exp.args.length;
     Method method;
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
@@ -121,7 +122,7 @@ public class ApplyExp extends Expression
       }
     else if (exp.func instanceof ReferenceExp) 
       { 
-        Declaration func_decl = ((ReferenceExp)exp.func).binding; 
+        Declaration func_decl = ((ReferenceExp)exp.func).binding;
         if (func_decl != null)
 	  {
 	    Expression value = func_decl.getValue();
@@ -130,11 +131,31 @@ public class ApplyExp extends Expression
 		func_lambda = (LambdaExp) value;
 		func_name = func_decl.getName();
 	      }
+	    if (value != null && value instanceof QuoteExp) 
+	      {
+		Procedure proc = (Procedure) ((QuoteExp) value).getValue();
+		String arg_error = WrongArguments.checkArgCount(proc, args_length);
+		if (arg_error != null)
+		  comp.error('e', arg_error);
+		else
+		  {
+		    PrimProcedure pproc
+		      = PrimProcedure.getMethodFor(proc, func_decl, exp.args);
+		    if (pproc != null)
+		      {
+			if (! pproc.getStaticFlag())
+			  func_decl.base.load(comp);
+			pproc.compile(null, exp.args, comp, target);
+			return;
+		      }
+		  }
+	      }
 	  }
       }
     else if (exp.func instanceof QuoteExp)
       {
         Object proc = ((QuoteExp) exp.func).getValue();
+
         // If it wasn't inlineable, we already checked for this in Translator.
         if (proc instanceof Inlineable)
           {
@@ -148,24 +169,25 @@ public class ApplyExp extends Expression
               }
           }
       }
+
     if (func_lambda != null)
       {
 	// These error message should really be done earlier,
 	// but we do not have the right information until
 	// the rewrite pass is finished.
-	if (exp.args.length < func_lambda.min_args)
+	if (args_length < func_lambda.min_args)
 	  {
             comp.error('w', "too few args for " + func_name);
 	    func_lambda = null;
 	  }
 	else if (func_lambda.max_args >= 0
-		 && exp.args.length > func_lambda.max_args)
+		 && args_length > func_lambda.max_args)
 	  {
             comp.error('w', "too many args for " + func_name);
 	    func_lambda = null;
 	  }
 	else if (! func_lambda.isHandlingTailCalls()
-		 && (method = func_lambda.getMethod(exp.args.length)) != null)
+		 && (method = func_lambda.getMethod(args_length)) != null)
 	  {
 	    boolean is_static = method.getStaticFlag();
 	    Expression[] args = exp.getArgs();
@@ -249,8 +271,6 @@ public class ApplyExp extends Expression
 	  }
 	return;
       }
-
-    int args_length = exp.args.length;
 
     // Check for tail-recursion.
     boolean tail_recurse

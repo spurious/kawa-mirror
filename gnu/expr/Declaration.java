@@ -79,12 +79,18 @@ public class Declaration
   /** Used to link Declarations in a LambdaExp's capturedVars list. */
   Declaration nextCapturedVar;
 
-  Field field;
+  /** If non-null, field is relative to base. */
+  public Declaration base;
+
+  public Field field;
 
   /** If this is a field in some object, load a reference to that object. */
   public void loadOwningObject (Compilation comp)
   {
-    getContext().currentLambda().loadHeapFrame(comp);
+    if (base != null)
+      base.load(comp);
+    else
+      getContext().currentLambda().loadHeapFrame(comp);
   }
 
   static int fieldNum;

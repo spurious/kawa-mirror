@@ -2,14 +2,9 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import gnu.expr.*;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import java.io.*;
 
-public class DFloNum extends RealNum implements Compilable, Externalizable
+public class DFloNum extends RealNum implements Externalizable
 {
   double value;
 
@@ -256,21 +251,6 @@ public class DFloNum extends RealNum implements Compilable, Externalizable
     return "#d" + toString ();
    }
 
-  static ClassType thisType;
-  public static Method makeMethod;
-
-  public static void initMakeMethods ()
-  {
-    if (thisType == null)
-      {
-	thisType = ClassType.make("gnu.math.DFloNum");
-	Type[] args = new Type[1];
-	args[0] = Type.double_type;
-	makeMethod = thisType.addMethod ("make", args, thisType,
-					     Access.PUBLIC|Access.STATIC);
-      }
-  }
-
   /**
    * @serialData Writes the number as a double (using writeDouble).
    */
@@ -283,19 +263,6 @@ public class DFloNum extends RealNum implements Compilable, Externalizable
     throws IOException, ClassNotFoundException
   {
     value = in.readDouble();
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    initMakeMethods ();
-    return new Literal (this, thisType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPushDouble(value);
-    code.emitInvokeStatic(makeMethod);
   }
 
   /*

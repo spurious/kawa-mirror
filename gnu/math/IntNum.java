@@ -2,18 +2,13 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import gnu.expr.*;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import java.io.*;
 
 /** A class for infinite-precision integers.
  * @author Per Bothner
  */
 
-public class IntNum extends RatNum implements Compilable, Externalizable
+public class IntNum extends RatNum implements Externalizable
 {
   /** All integers are stored in 2's-complement form.
    * If words == null, the ival is the value of this IntNum.
@@ -116,6 +111,11 @@ public class IntNum extends RatNum implements Compilable, Externalizable
     num.words = words;
     num.ival = len;
     return num;
+  }
+
+  public static IntNum make (int[] words)
+  {
+    return make(words, words.length);
   }
 
   /** Allocate a new non-shared IntNum.
@@ -1218,49 +1218,6 @@ public class IntNum extends RatNum implements Compilable, Externalizable
     return IntNum.valueOf (s, 10);
   }
 
-  static ClassType thisType;
-  public static Method makeIntMethod;
-  public static Method makeLongMethod;
-
-  public static void initMakeMethods ()
-  {
-    if (thisType == null)
-      {
-	thisType = ClassType.make("gnu.math.IntNum");
-	Type[] args = new Type[1];
-	args[0] = Type.int_type;
-	makeIntMethod = thisType.addMethod ("make", args, thisType,
-					     Access.PUBLIC|Access.STATIC);
-	args = new Type[1];
-	args[0] = Type.long_type;
-	makeLongMethod = thisType.addMethod ("make", args, thisType,
-					     Access.PUBLIC|Access.STATIC);
-      }
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    initMakeMethods ();
-    return new Literal (this, thisType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    if (words == null)
-      {
-	code.emitPushInt(ival);
-	code.emitInvokeStatic(makeIntMethod);
-      }
-    else if (ival <= 2)
-      {
-	code.emitPushLong(longValue ());
-	code.emitInvokeStatic(makeLongMethod);
-      }
-    else
-      throw new Error ("IntNum.emit for bignum - not implemented");
-  }
-
   public double doubleValue ()
   {
     if (words == null)
@@ -1503,7 +1460,7 @@ public class IntNum extends RatNum implements Compilable, Externalizable
    * the number of words following.  The words are the minimal
    * 2's complement big-endian representation of the value, written using
    * writeint.
-   * (Even if the current value is not canonlicalized, the output is).
+   * (Even if the current value is not canonicalized, the output is).
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {
@@ -1511,7 +1468,7 @@ public class IntNum extends RatNum implements Compilable, Externalizable
     if (nwords <= 1)
       {
 	int i = words == null ? ival : words.length == 0 ? 0 : words[0];
-	if (i >= (int)0xC000000)
+	if (i >= (int)0xC0000000)
 	  out.writeInt(i);
 	else
 	  {

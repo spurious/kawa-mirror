@@ -1,3 +1,16 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (make(int[]):  New method.
+	
+	* DFloNum.java:  No longer implement Compilable.
+	* IntNum.java:  Likewise.
+
+	* IntFraction.java (<init>(IntNum, IntNum)):  Make public.
+
+	* Unit.java:  Implement Externalizable.
+	* CQuantity.java:  Likewise.
+	* DQuantity.java:  Likewise.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* CComplex.java:  Make implement java.io.Externalizable.

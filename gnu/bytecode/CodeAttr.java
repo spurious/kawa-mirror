@@ -1390,6 +1390,37 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack = try_stack.previous;
   }
 
+  /** Compile a tail-call to position 0 of the current procewure.
+   * If pop_args is true, copy argument registers (except this) from stack. */
+  public void emitTailCall (boolean pop_args)
+  {
+    if (pop_args)
+      {
+	Method meth = getMethod();
+	int arg_slots = ((meth.access_flags & Access.STATIC) != 0) ? 0 : 1;
+	for (int i = meth.arg_types.length;  --i >= 0; )
+	  arg_slots += meth.arg_types[i].size > 4 ? 2 : 1;
+	for (int i = meth.arg_types.length;  --i >= 0; )
+	  {
+	    arg_slots -= meth.arg_types[i].size > 4 ? 2 : 1;
+	    emitStore(locals.used [arg_slots]);
+	  }
+      }
+    reserve(5);
+    int delta = - PC;
+    if (delta < -32768)
+      {
+	put1(200);  // goto_w
+	put4(delta);
+      }
+    else
+      {
+	put1(167); // goto
+	put2(delta);
+      }
+    unreachable_here = true;
+  }
+
   /* Make sure the label with oldest fixup is first in labels. */
   void reorder_fixups ()
   {

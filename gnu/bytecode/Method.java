@@ -173,46 +173,6 @@ public class Method implements AttrContainer {
     code.emitPushThis();
   }
 
-  /*
-  public Scope scope_start ();
-  public scope_end ();
-  public Variable new_temp (String name);
-  public Variable free_temp (Variable temp_var);
-
-  public void push_long_const (long i);
-
-  */
-
-  /** Compile a tail-call to position 0 of the current procewure.
-   * If pop_args is true, copy argument registers (except this) from stack. */
-  public void compile_tailcall (boolean pop_args)
-  {
-    if (pop_args)
-      {
-	int arg_slots = ((access_flags & Access.STATIC) != 0) ? 0 : 1;
-	for (int i = arg_types.length;  --i >= 0; )
-	  arg_slots += arg_types[i].size > 4 ? 2 : 1;
-	for (int i = arg_types.length;  --i >= 0; )
-	  {
-	    arg_slots -= arg_types[i].size > 4 ? 2 : 1;
-	    code.emitStore(code.locals.used [arg_slots]);
-	  }
-      }
-    prepareCode(5);
-    int delta = - code.PC;
-    if (delta < -32768)
-      {
-	code.put1(200);  // goto_w
-	code.put4(delta);
-      }
-    else
-      {
-	code.put1(167); // goto
-	code.put2(delta);
-      }
-    code.unreachable_here = true;
-  }
-
   public void compile_linenumber (int linenumber)
   {
     if (code == null)

@@ -1,3 +1,8 @@
+Mon Jun 29 18:56:04 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Method.java (compile_tailcall):  Replaced by ...
+	* CodeAttr.java (emitTailCall):   ... new method.
+
 Thu Jun 25 22:40:05 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (stack_types):  Make non-private (for SwitchState).

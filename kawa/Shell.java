@@ -12,6 +12,9 @@ public class Shell extends Procedure0
   InPort in;
   OutPort out, err;
 
+  // If non-null, close when finished.
+  java.net.Socket socket;
+
   public Shell (Interpreter interp, InPort in, OutPort out, OutPort err)
   {
     this.interp = interp;
@@ -48,6 +51,16 @@ public class Shell extends Procedure0
 	OutPort.setErrDefault(saveErr);
 	InPort.setInDefault(saveIn);
 	Environment.setCurrent(saveEnv);
+	if (socket != null)
+	  {
+	    try
+	      {
+		socket.close();
+	      }
+	    catch (java.io.IOException ex)
+	      {
+	      }
+	  }
       }
   }
 

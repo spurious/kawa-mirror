@@ -67,7 +67,7 @@ public class QuoteExp extends Expression
     gnu.lists.FormatToConsumer saveFormat = out.objectFormat;
     try
       {
-	out.objectFormat = Interpreter.getInterpreter().getFormat(true);
+	out.objectFormat = Language.getDefaultLanguage().getFormat(true);
 	out.print(value);
       }
     finally

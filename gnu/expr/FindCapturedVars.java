@@ -310,7 +310,7 @@ public class FindCapturedVars extends ExpWalker
     Object key = name;
     if (function && name instanceof Symbol)
       {
-	if (! getCompilation().getInterpreter().hasSeparateFunctionNamespace())
+	if (! getCompilation().getLanguage().hasSeparateFunctionNamespace())
 	  function = false;
 	else // FIXME maybe just use gnu.lists.Pair and remove KeyPair class?
 	  key = new KeyPair((Symbol) name, EnvironmentKey.FUNCTION);
@@ -350,7 +350,7 @@ public class FindCapturedVars extends ExpWalker
       }
     if (decl.getFlag(Declaration.IS_UNKNOWN))
       {
-	Type type = getCompilation().getInterpreter().getTypeFor(exp);
+	Type type = getCompilation().getLanguage().getTypeFor(exp);
 	if (type instanceof Externalizable)
 	  return new QuoteExp(type);
 

@@ -72,13 +72,13 @@ public class ModuleMethod extends MethodProc
 	  }
 	if (method != null)
 	  {
-	    Interpreter interp = Interpreter.getInterpreter();
+	    Language lang = Language.getDefaultLanguage();
 	    Class[] parameterClasses = method.getParameterTypes();
 	    int numParamTypes = parameterClasses.length;
 	    gnu.bytecode.Type[] atypes = new gnu.bytecode.Type[numParamTypes];
 	    for (int i = numParamTypes;  --i >= 0; )
 	      {
-		atypes[i] = interp.getTypeFor(parameterClasses[i]);
+		atypes[i] = lang.getTypeFor(parameterClasses[i]);
 	      }
 	    this.argTypes = atypes;
 	  }

@@ -109,7 +109,7 @@ public class InlineCalls extends ExpWalker
 	      return new ApplyExp(proc, exp.getArgs());
 	    PrimProcedure mproc
 	      = PrimProcedure.getMethodFor(proc, decl, exp.args,
-					   comp.getInterpreter());
+					   comp.getLanguage());
 	    if (mproc != null)
 	      {
 		ApplyExp nexp;

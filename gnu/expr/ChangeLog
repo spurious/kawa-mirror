@@ -1,5 +1,14 @@
 2005-02-24  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (getLanguage): Change return type to Language.
+	* IfExp.java (getInterpreter): Change to getLanguage.
+	* ClassExp.java: Update Interpreter -> Language etc.
+	* FindCapturedVars.java: Likewise.
+	* InlineCalls.java: Likewise.
+	* ModuleMethod.java: Likewise.
+	* PrimProcedure.java: Likewise.
+	* QuoteExp.java: Likewise.
+
 	*  Interpreter.java (getInstance): Change return type.
 	(getInstanceFromFilenameExtension): Change return type and internals.
 	* Language.java (setDefaults): New static helper method.

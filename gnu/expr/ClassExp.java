@@ -169,7 +169,7 @@ public class ClassExp extends LambdaExp
     int j = 0;
     for (int i = 0;  i < len;  i++)
       {
-	Type st = Interpreter.getInterpreter().getTypeFor(supers[i]);
+	Type st = Language.getDefaultLanguage().getTypeFor(supers[i]);
 	if (st == null || ! (st instanceof ClassType))
 	  {
 	    String msg = "invalid super type";

@@ -203,19 +203,19 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public PrimProcedure(java.lang.reflect.Method method,
 		       Class thisClass, Class[] parameterClasses,
-		       Interpreter interpreter)
+		       Language language)
   {
     Type[] parameterTypes = new Type[parameterClasses.length];
     Type[] implParameterTypes = new Type[parameterClasses.length];
     for (int i = parameterClasses.length;  --i >= 0; )
       {
-	Type ptype = interpreter.getTypeFor(parameterClasses[i]);
+	Type ptype = language.getTypeFor(parameterClasses[i]);
 	parameterTypes[i] = ptype;
 	implParameterTypes[i] = ptype.getImplementationType();
       }
-    Type returnType = interpreter.getTypeFor(method.getReturnType());
+    Type returnType = language.getTypeFor(method.getReturnType());
     Type implReturnType = returnType.getImplementationType();
-    ClassType thisType = (ClassType) interpreter.getTypeFor(thisClass);
+    ClassType thisType = (ClassType) language.getTypeFor(thisClass);
     Method meth = thisType.addMethod(method.getName(), method.getModifiers(),
 				     implParameterTypes, implReturnType);
     init(meth);
@@ -223,11 +223,10 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     retType = op_code == 183 ? meth.getDeclaringClass() : returnType;
   }
 
-  public PrimProcedure(java.lang.reflect.Method method,
-		       Interpreter interpreter)
+  public PrimProcedure(java.lang.reflect.Method method, Language language)
   {
     this(method, method.getDeclaringClass(),
-	 method.getParameterTypes(), interpreter);
+	 method.getParameterTypes(), language);
   }
 
   public PrimProcedure(Method method)
@@ -235,7 +234,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     init(method);
   }
 
-  public PrimProcedure(Method method, Interpreter interpreter)
+  public PrimProcedure(Method method, Language language)
   {
     init(method);
 
@@ -247,7 +246,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     for (int i = nTypes;  --i >= 0; )
       {
 	Type javaType = pTypes[i];
-	Type langType = interpreter.getTypeFor(javaType.getReflectClass());
+	Type langType = language.getTypeFor(javaType.getReflectClass());
 	if (javaType != langType)
 	  {
 	    if (argTypes == null)
@@ -261,13 +260,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (argTypes == null)
       argTypes = pTypes;
     retType = op_code == 183 ? method.getDeclaringClass() :
-      interpreter.getTypeFor(method.getReturnType().getReflectClass());
+      language.getTypeFor(method.getReturnType().getReflectClass());
   }
 
-  public PrimProcedure(Method method, boolean is_special,
-                       Interpreter interpreter)
+  public PrimProcedure(Method method, boolean is_special, Language language)
   {
-    this(method, interpreter);
+    this(method, language);
     if (is_special) {
       this.is_special = true;
       op_code = 183;
@@ -522,24 +520,23 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
   {
-    return getMethodFor(pproc, null, args, Interpreter.getInterpreter());
+    return getMethodFor(pproc, null, args, Language.getDefaultLanguage());
   }
 
   /** Search for a matching static method in a procedure's class.
    * @return a PrimProcedure that is suitable, or null. */
   public static PrimProcedure getMethodFor (Procedure pproc, Declaration decl,
 					    Expression[] args,
-					    Interpreter interpreter)
+					    Language language)
   {
     int nargs = args.length;
     Type[] atypes = new Type[nargs];
     for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
-    return getMethodFor(pproc, decl, atypes, interpreter);
+    return getMethodFor(pproc, decl, atypes, language);
   }
 
   public static PrimProcedure getMethodFor (Procedure pproc, Declaration decl,
-					    Type[] atypes,
-					    Interpreter interpreter)
+					    Type[] atypes, Language language)
   {
     if (pproc instanceof GenericProc)
       {
@@ -568,7 +565,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (pclass == null)
       return null;
     return getMethodFor((ClassType) Type.make(pclass), pproc.getName(),
-			decl, atypes, interpreter);
+			decl, atypes, language);
   }
 
   public static Class getProcedureClass (Object pproc)
@@ -592,25 +589,25 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   /** Get PrimProcedure for matching method in given class. */
   public static PrimProcedure
   getMethodFor (Class procClass, String name, Declaration decl,
-                Expression[] args, Interpreter interpreter)
+                Expression[] args, Language language)
   {
     return getMethodFor((ClassType) Type.make(procClass),
-			name, decl, args, interpreter);
+			name, decl, args, language);
   }
 
   public static PrimProcedure
   getMethodFor (ClassType procClass, String name, Declaration decl,
-                Expression[] args, Interpreter interpreter)
+                Expression[] args, Language language)
   {
     int nargs = args.length;
     Type[] atypes = new Type[nargs];
     for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
-    return getMethodFor(procClass, name, decl, atypes, interpreter);
+    return getMethodFor(procClass, name, decl, atypes, language);
   }
 
   public static PrimProcedure
   getMethodFor (ClassType procClass, String name, Declaration decl,
-		Type[] atypes, Interpreter interpreter)
+		Type[] atypes, Language language)
   {
     PrimProcedure best = null;
     int bestCode = -1;
@@ -661,7 +658,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 		    bestIsApply = false;
 		  }
 	      }
-	    PrimProcedure prproc = new PrimProcedure(meth, interpreter);
+	    PrimProcedure prproc = new PrimProcedure(meth, language);
 	    prproc.setName(name);
 	    int code = prproc.isApplicable(atypes);
 	    if (code < 0 || code < bestCode)

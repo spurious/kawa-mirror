@@ -21,26 +21,26 @@ public class IfExp extends Expression
     test = i;  then_clause = t;  else_clause = e;
   }
 
-  protected final Interpreter getInterpreter()
+  protected final Language getLanguage()
   {
-    return Interpreter.defaultInterpreter; // FIXME
+    return Language.getDefaultLanguage(); // FIXME
   }
 
   public Object eval (Environment env) throws Throwable
   {
-    Interpreter interpreter = getInterpreter();
-    if (interpreter.isTrue((test.eval (env))))
+    Language language = getLanguage();
+    if (language.isTrue((test.eval (env))))
       return then_clause.eval (env);
     else if (else_clause != null)
       return else_clause.eval (env);
     else
-      return interpreter.noValue();
+      return language.noValue();
   }
 
   public void apply (CallContext ctx) throws Throwable
   {
-    Interpreter interpreter = getInterpreter();
-    if (interpreter.isTrue((test.eval(ctx))))
+    Language language = getLanguage();
+    if (language.isTrue((test.eval(ctx))))
       then_clause.match0(ctx);
     else if (else_clause != null)
       else_clause.match0(ctx);
@@ -57,7 +57,7 @@ public class IfExp extends Expression
 			      Expression else_clause,
 			      Compilation comp, Target target)
   {
-    Interpreter interpreter = comp.getInterpreter();
+    Language language = comp.getLanguage();
     gnu.bytecode.CodeAttr code = comp.getCode();
     Label trueLabel, falseLabel;
     boolean trueInherited, falseInherited;
@@ -68,7 +68,7 @@ public class IfExp extends Expression
       {
 	falseInherited = true;
 	Object value = ((QuoteExp) else_clause).getValue();
-	if (interpreter.isTrue(value))
+	if (language.isTrue(value))
 	  falseLabel = ((ConditionalTarget) target).ifTrue;
 	else
 	  falseLabel = ((ConditionalTarget) target).ifFalse;
@@ -100,7 +100,7 @@ public class IfExp extends Expression
 	trueLabel = new Label(code); 
       }
     ConditionalTarget ctarget
-      = new ConditionalTarget(trueLabel, falseLabel, interpreter);
+      = new ConditionalTarget(trueLabel, falseLabel, language);
     if (trueInherited)
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);

@@ -2057,7 +2057,7 @@ public class Compilation
   }
 
   protected Language language;
-  public Interpreter getLanguage() { return language; }
+  public Language getLanguage() { return language; }
   /** @deprecated */
   public Interpreter getInterpreter() { return language; }
   public Environment getEnvironment() { return language.getEnvironment(); }

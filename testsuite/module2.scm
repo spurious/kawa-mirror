@@ -1,5 +1,5 @@
 (module-export list-length-1 list-length-3 classify
-	       length-diff1 length-diff2 length-diff3 make-literal)
+	       length-diff1 length-diff2 length-diff3 make-literal make-pair)
 (require <module1>)
 (define (list-length-1 x) :: <integer>
   (list-length-2 x))
@@ -36,3 +36,6 @@
   (cond
    ((boolean? value) (make-boolean-literal value))
    (else (format #t "Illegal value: ~A~%" value))))
+
+(define (make-pair x y)
+  (make <pair> car: x cdr: y))

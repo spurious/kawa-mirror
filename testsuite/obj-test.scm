@@ -1,4 +1,4 @@
-(test-init "Objects" 65)
+(test-init "Objects" 66)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -168,6 +168,8 @@
 
 ;; Test bug reported by Jocelyn Paine.
 (test '(boolean #t) make-literal #t)
+
+(test '(3 . 4) make-pair 3 4)
 
 (require <classes1>)
 (require <classes2>)

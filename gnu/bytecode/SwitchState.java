@@ -53,6 +53,11 @@ public class SwitchState
   {
     Label label = new Label(code);
     label.define(code);
+    addDefault(label, code);
+  }
+
+  public void addDefault(Label label, CodeAttr code)
+  {
     defaultLabel = label;
     code.restoreStackTypeState(typeState);
   }
@@ -96,17 +101,19 @@ public class SwitchState
     else
       {
 	// Binary search.
+	int low = 0;
+	int hi = numCases - 1;
 	copyBefore = 0;
-	int num = numCases;
-	while (num > 1)
-	  {
-	    int half = num >> 1;
-	    int mid = copyBefore + half;
-	    if (value >= values[mid])
-	      copyBefore = mid;
-	    num = half;
-	  }
-	if (value == values[copyBefore])
+	while (low <= hi)
+	{
+	  copyBefore = (low + hi) >> 1;
+	  if (old_values[copyBefore] >= value)
+	    hi = copyBefore - 1;
+	  else
+	    low = ++ copyBefore;
+	}
+
+	if (value == old_values[copyBefore])
 	  return false;
       }
     int copyAfter = numCases - copyBefore;
@@ -139,9 +146,9 @@ public class SwitchState
 	code.emitThrow();
       }
     switch_label.define(code);
-    code.pushType(Type.int_type);
     if (numCases <= 1)
       {
+	code.pushType(Type.int_type);
 	if (numCases == 1)
 	  {
 	    code.emitPushInt(minValue);

@@ -1,0 +1,7 @@
+2003-07-21  Per Bothner  <per@bothner.com>
+
+	New package.
+	* SwingButton.java:  New class, extends JButton.
+	* SwingFrame.java:  New class, extends JFrame.
+	* SwingContainer.java:  New class, extends JContainer.
+	* Makefile.am:  New file.

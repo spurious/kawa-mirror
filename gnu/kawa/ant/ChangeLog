@@ -1,3 +1,8 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS):  No longer foreign.
+	(EXTRA_DIST):  Merge in files that used to be in SOURCES.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES):  New macro.

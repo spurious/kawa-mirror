@@ -1,3 +1,13 @@
+2003-07-23  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (OP_IS, OP_ISNOT, OP_GRTGRT, OP_LSSLSS):  New tokens.
+	(OP_xxx):  Renumber, at least for now.
+	(getRawToken):  Recognize '>>' as OP_GRTGRT and '<<' as OP_LSSLSS.
+	(peekOperator):  Recognis 'is' and 'isnot'.
+	(makeBinary):  Handle new tokens.
+
+	* XQParser.java (parseMaybePrimaryExpr):  Intern string literal.
+
 2003-07-17  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (matchConstructorKeyword):  Fix bug reported

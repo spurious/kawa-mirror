@@ -238,24 +238,29 @@ public class XQParser extends LispReader // should be extends Lexer
   // Token types for binary operators.
   // When used as a token code, get the priority by shifting 2 right.
   static final int OP_WHERE     = 196;
-  static final int OP_OR        = 200;          // 'or'
-  static final int OP_AND       = 200 + 4;      // 'and'
-  static final int OP_EQU       = 200 + 8;      // '='
-  static final int OP_NEQ       = 200 + 8 + 1;  // '!='
-  static final int OP_INSTANCEOF= 200 + 8 + 2;  // 'instanceof'
-  static final int OP_RANGE_TO  = 200 + 8 + 3;  // 'to'
-  static final int OP_LSS       = 200 + 12;     // '<'
-  static final int OP_GRT       = 200 + 12 + 1; // '>'
-  static final int OP_LEQ       = 200 + 12 + 2; // '<='
-  static final int OP_GEQ       = 200 + 12 + 3; // '>='
-  static final int OP_ADD       = 200 + 16;     // '+'
-  static final int OP_SUB       = 200 + 16 + 1; // '-'
-  static final int OP_MUL       = 200 + 20;     // '*'
-  static final int OP_DIV       = 200 + 20 + 1; // 'div'
-  static final int OP_MOD       = 200 + 20 + 2; // 'mod'
-  static final int OP_INTERSECT = 200 + 24;     // 'intersect'
-  static final int OP_EXCEPT    = 200 + 24 + 1; // 'except'
-  static final int OP_UNION     = 200 + 24 + 2; // 'union'
+  static final int OP_BASE      = 400;
+  static final int OP_OR        = OP_BASE;          // 'or'
+  static final int OP_AND       = OP_BASE + 4;      // 'and'
+  static final int OP_EQU       = OP_BASE + 8;      // '='
+  static final int OP_NEQ       = OP_BASE + 8 + 1;  // '!='
+  static final int OP_INSTANCEOF= OP_BASE + 8 + 2;  // 'instanceof'
+  static final int OP_RANGE_TO  = OP_BASE + 8 + 3;  // 'to'
+  static final int OP_LSS       = OP_BASE + 12;     // '<'
+  static final int OP_GRT       = OP_BASE + 12 + 1; // '>'
+  static final int OP_LEQ       = OP_BASE + 12 + 2; // '<='
+  static final int OP_GEQ       = OP_BASE + 12 + 3; // '>='
+  static final int OP_IS        = OP_BASE + 16;     // 'is'
+  static final int OP_ISNOT     = OP_BASE + 16 + 1; // 'isnot'
+  static final int OP_GRTGRT    = OP_BASE + 16 + 2; // '>>'
+  static final int OP_LSSLSS    = OP_BASE + 16 + 3; // '<<'
+  static final int OP_ADD       = OP_BASE + 20;     // '+'
+  static final int OP_SUB       = OP_BASE + 20 + 1; // '-'
+  static final int OP_MUL       = OP_BASE + 24;     // '*'
+  static final int OP_DIV       = OP_BASE + 24 + 1; // 'div'
+  static final int OP_MOD       = OP_BASE + 24 + 2; // 'mod'
+  static final int OP_INTERSECT = OP_BASE + 28;     // 'intersect'
+  static final int OP_EXCEPT    = OP_BASE + 28 + 1; // 'except'
+  static final int OP_UNION     = OP_BASE + 28 + 2; // 'union'
 
   static final int OP_NODE = 231; // 'node' followed by '('
   static final int OP_TEXT = 232; // 'text' followed by '('
@@ -364,10 +369,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	ch = OP_EQU;
 	break;
       case '>':
-	ch = checkNext('=') ? (char) OP_GEQ : (char) OP_GRT;
+	ch = checkNext('=') ? (char) OP_GEQ
+	  : checkNext('>') ? (char) OP_GRTGRT : (char) OP_GRT;
 	break;
       case '<':
-	ch = checkNext('=') ? (char) OP_LEQ : (char) OP_LSS;
+	ch = checkNext('=') ? (char) OP_LEQ
+	  : checkNext('<') ? (char) OP_LSSLSS : (char) OP_LSS;
 	break;
       case '.':
 	if (checkNext('.'))
@@ -564,6 +571,8 @@ public class XQParser extends LispReader // should be extends Lexer
 		  curToken = OP_OR;
 		else if (c1 == 't' && tokenBuffer[1] == 'o')
 		  curToken = OP_RANGE_TO;
+		else if (c1 == 'i' && tokenBuffer[1] == 's')
+		  curToken = OP_IS;
 	      }
 	    else
 	      {
@@ -590,6 +599,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (match("where"))
 	      curToken = OP_WHERE;
+	    else if (match("isnot"))
+	      curToken = OP_ISNOT;
 	  }
 	else if (len == 10)
 	  {
@@ -773,7 +784,39 @@ public class XQParser extends LispReader // should be extends Lexer
     xqlReadTable = ReadTable.getInitial();
   }
 
-  private static final int priority(int opcode) { return opcode >> 2; }
+  private static final int priority(int opcode)
+  {
+    /* FIXME:  Future!
+    switch (opcode)
+      {
+      case ',':
+      case ')':
+      case -1:
+      case OP_OR:
+	return OP_BASE >> 2;
+      case OP_AND:
+	return (OP_BASE + 4) >> 2;
+      case OP_EQU:  case OP_NEQ:
+      case OP_INSTANCEOF:  case OP_RANGE_TO:
+	return (OP_BASE + 8) >> 2;
+      case OP_LSS:  case OP_GRT:  case OP_LEQ:  case OP_GEQ:
+	return (OP_BASE + 12) >> 2;
+      case OP_IS:  case OP_ISNOT:
+      case OP_GRTGRT:  case OP_LSSLSS:
+	return (OP_BASE + 16) >> 2;
+      case OP_ADD:  case OP_SUB:
+	return (OP_BASE + 20) >> 2;
+      case OP_MUL: case OP_DIV:  case OP_MOD:
+	return (OP_BASE + 24) >> 2;
+      case OP_INTERSECT:  case OP_EXCEPT:  case OP_UNION:
+	return (OP_BASE + 28) >> 2;
+      default:
+	//System.err.println("unknown priorty for "+opcode);
+	return 0;
+      }
+    */
+    return opcode >> 2;
+  }
 
   int count = 0;
 
@@ -836,6 +879,18 @@ public class XQParser extends LispReader // should be extends Lexer
 	break;
       case OP_GEQ:
 	func = makeFunctionExp("gnu.xquery.util.Compare", ">=");
+	break;
+      case OP_IS:
+	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Eq", "is");
+	break;
+      case OP_ISNOT:
+	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Ne", "isnot");
+	break;
+      case OP_GRTGRT:
+	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Gr", ">>");
+	break;
+      case OP_LSSLSS:
+	func = makeFunctionExp("gnu.kawa.xml.NodeCompare", "$Ls", "<<");
 	break;
       case OP_RANGE_TO:
 	func = makeFunctionExp("gnu.xquery.util.IntegerRange", "integerRange");
@@ -1874,7 +1929,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == STRING_TOKEN)
       {
-	exp = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength));
+	exp = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength).intern());
       }
     else if (token == INTEGER_TOKEN)
       {

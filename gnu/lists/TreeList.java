@@ -718,7 +718,14 @@ implements Consumer, PositionConsumer, Consumable
 
   public Object get (int index)
   {
-    throw unsupported("get");
+    int i = 0;
+    while (--index >= 0)
+      {
+	i = nextDataIndex(i);
+	if (i < 0)
+	  throw new IndexOutOfBoundsException();
+      }
+    return getNext(i << 1, null);
   }
 
   public boolean consumeNext(int ipos, Object xpos, Consumer out)

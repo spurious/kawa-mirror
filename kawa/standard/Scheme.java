@@ -687,8 +687,6 @@ public class Scheme extends LispInterpreter
       kawaEnvironment.setLocked();
   }
 
-  static int scheme_counter = 0;
-
   public Scheme ()
   {
     if (Interpreter.defaultInterpreter == null)
@@ -721,7 +719,7 @@ public class Scheme extends LispInterpreter
   {
     if (kawaEnvironment == null)
       initScheme();
-    return new ScmEnv ("interaction-environment."+(++scheme_counter),
+    return new ScmEnv ("interaction-environment."+(++env_counter),
 		       kawaEnvironment);
   }
 

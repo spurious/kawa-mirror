@@ -1,5 +1,8 @@
 2005-01-22  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (scheme_counter): Remove static field.
+	(getNewEnvironment): Use inherited env_counter instead.
+
 	* configure.in: Make AC_PROG_LIBTOOL unconditional, since needed
 	for bin/cgi-servlet.
 

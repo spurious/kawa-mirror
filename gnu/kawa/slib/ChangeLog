@@ -1,3 +1,10 @@
+2002-03-21  Per Bothner  <per@bothner.com>
+
+	* srfi1.scm:  New file.  SRFI-1 list-library reference implementation
+	written by Olin Shivers <shivers@ai.it.edu>.  Various Kawa tweaks
+	by Marco Vezzoli <marco.vezzoli@st.com> and myself.
+	* Makefile.am (java_SCM):  Add srfi1.scm.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm:  Moved from gnu/kawa/servlet.

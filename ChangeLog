@@ -1,3 +1,7 @@
+2004-08-04  Christian Surlykke <christian@surlykke.dk>
+
+	* build.xml: Added jemacs-swt-classes task.
+
 2004-08-10  Per Bothner  <per@bothner.com>
 
 	* configure.in: Change conf_classpath so the pathsep comes after

@@ -682,6 +682,12 @@
     </javac>
   </target>
    
+  <target name="jemacs-swt-classes" depends="jemacs-classes">
+    <javac srcdir="${src.dir}" destdir="${build.classes}">
+      <include name="gnu/jemacs/swt/"/>
+    </javac>
+  </target>
+
   <target name="jemacs-classes" 
           depends="build-settings, java-classes
             , jemacs-java-classes

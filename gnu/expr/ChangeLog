@@ -1,5 +1,7 @@
 2004-11-16  Per Bothner  <per@bothner.com>
 
+	* InlineCalls.java (walkIfExp): Handle null else_clause.
+
 	* Interpreter.java (define_field): Remove unused methods.
 
 2004-11-15  Per Bothner  <per@bothner.com>

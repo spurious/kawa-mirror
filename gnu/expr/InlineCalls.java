@@ -143,7 +143,7 @@ public class InlineCalls extends ExpWalker
 	if (interpreter.isTrue(((QuoteExp) test).getValue()))
 	  return exp.then_clause;
 	else
-	  return exp.else_clause;
+	  return exp.else_clause == null ? QuoteExp.voidExp : exp.else_clause;
       }
     return exp;
   }

@@ -1,0 +1,6 @@
+2002-05-21  Per Bothner  <per@bothner.com>
+
+	New package.
+	* ConsumeSAXHandler.java:  New class.
+	* ContentConsumer.java:  New class.
+ 	* KawaXMLReader.java:  New class.

@@ -8,10 +8,10 @@ import gnu.lists.*;
 
 public class cxr extends Procedure1 implements HasSetter
 {
-  /** The number of car or cdr operations to apply. */
-  int count;
-  /** Whether an operation should be a car or a cdr.
-   * The i'th operation is a cdr iff (mask >> i) & 1 is true. */
+  /** An encoding of the car/cdr operations to be done.
+      The count of car or cdr operations to apply is the high-order short.
+      Whether an operation should be a car or a cdr:
+      The i'th operation is a cdr iff (mask >> i) & 1 is true. */
   int mask;
 
   /** Set count and mask from a function name of the form "c[ad]*r". */
@@ -35,17 +35,16 @@ public class cxr extends Procedure1 implements HasSetter
 	    c++;
 	  }
       }
-    mask = m;
-    // Note we have to set count last, to avoid a race condition.
-    count = c;
+    // Set the mask as an atomic operation.
+    mask = (c << 16) | m;
   }
 
   public Object apply1 (Object arg1)
   {
-    if (count == 0)
+    if (mask == 0)
       program(getName().toString());
     int m = mask;
-    for (int i = count;  --i >= 0;  m >>= 1)
+    for (int i = (m >> 16);  --i >= 0;  m >>= 1)
       {
 	if (! (arg1 instanceof Pair) )
 	    throw new WrongType(this.getName(), 1, "list");
@@ -57,11 +56,11 @@ public class cxr extends Procedure1 implements HasSetter
 
   public void set1 (Object list, Object value)
   {
-    if (count == 0)
+    if (mask == 0)
       program (getName().toString());
     int m = mask;
     Pair pair;
-    for (int i = count;  --i > 0;  m >>= 1)
+    for (int i = (m >> 16);  --i > 0;  m >>= 1)
       {
 	if (! (list instanceof Pair) )
 	    throw new WrongType(this.getName(), 1, "list");

@@ -1,5 +1,8 @@
 2004-05-06  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/cxr.java (count):  Replace field by high-order
+	16 bits, so that setting mask+count is atomic.
+
 	* kawa/standard/cxr.java (program):  Fix race condition.
 	Partly fixes bug #8817.
 

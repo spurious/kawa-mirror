@@ -1,3 +1,7 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* FString.java (import):  CharArrayInPort is now in gnu.mapping.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* Char.java:  No longer implements Compilable.

@@ -1,7 +1,6 @@
 package gnu.kawa.util;
 import java.io.*;
 import gnu.mapping.*;
-import gnu.text.CharArrayInPort;
 
 /** Representation of fixed-length mutable character strings.
  * Used for the Scheme string type.

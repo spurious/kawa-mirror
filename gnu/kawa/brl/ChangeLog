@@ -1,0 +1,8 @@
+2002-01-23  Per Bothner  <per@bothner.com>
+
+	New package - an experimental re-implemntation of BRL.
+	* BRL.java:  New class, extends Scheme.
+	(Prompter):  New class, extends Procedure1.
+	* BRLRead.java:  New class, extends LispReader.
+	* BRLReaderString.java:  New class, extends ReadTableEntry.
+	* Makefile.am:  New file.

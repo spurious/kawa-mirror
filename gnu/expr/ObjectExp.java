@@ -12,6 +12,8 @@ public class ObjectExp extends LambdaExp
   public ObjectExp ()
   {
     type = null;
+    // Make sure we actually generate a class.
+    setCanRead(true);
   }
 
   public String getJavaName ()

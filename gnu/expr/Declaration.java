@@ -201,25 +201,34 @@ public class Declaration extends Variable
 
   Method makeBindingMethod = null;
 
+  /** Create a Binding object, given that isIndirectBinding().
+      Assume the initial value is already pushed on the stack;
+      leaves initialized Binding object on stack.  */
+  public void pushIndirectBinding (Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    code.emitPushString(symbol());
+    if (makeBindingMethod == null)
+      {
+	ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
+	Type[] args = new Type[2];
+	args[0] = Type.pointer_type;
+	args[1] = Type.string_type;
+	makeBindingMethod
+	  = typeBinding.addMethod("make", args, typeBinding,
+				  Access.PUBLIC|Access.STATIC);
+      }
+    code.emitInvokeStatic(makeBindingMethod);
+  }
+
   /** Generate code to initialize the location for this.
       Assume the initial value is already pushed on the stack. */
   public void initBinding (Compilation comp)
   {
     if (isIndirectBinding())
       {
+	pushIndirectBinding(comp);
 	CodeAttr code = comp.getCode();
-	code.emitPushString(symbol());
-	if (makeBindingMethod == null)
-	  {
-	    ClassType typeBinding = ClassType.make("gnu.mapping.binding");
-	    Type[] args = new Type[2];
-	    args[0] = Type.pointer_type;
-	    args[1] = Type.string_type;
-	    makeBindingMethod
-	      = typeBinding.addMethod("make", args, typeBinding,
-				      Access.PUBLIC|Access.STATIC);
-	  }
-	code.emitInvokeStatic(makeBindingMethod);
 	code.emitStore(this);
       }
     else

@@ -32,7 +32,7 @@ public class LetExp extends ScopeExp
 
   public void compile (Compilation comp, int flags)
   {
-    /* Compile all they initializations, leaving the results
+    /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
     for (int i = 0; i < inits.length; i++)
       inits[i].compile (comp, 0);

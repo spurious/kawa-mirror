@@ -66,6 +66,8 @@ public class Keyword extends Object implements Printable, Compilable
     return null;
   }
 
+  public String getName() { return name; }
+  
   static Method makeKeywordMethod;
 
   public Literal makeLiteral (Compilation comp)

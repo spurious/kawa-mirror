@@ -1,7 +1,7 @@
 package kawa.lang;
 
 public class Named extends Object {
-  public String sym_name;
+  protected String sym_name;
 
   public Named ()
   {

@@ -1,0 +1,8 @@
+2002-06-11  Per Bothner  <per@bothner.com>
+
+	New package - an implementation of XSLT.
+	* TemplateTable.java:  New class.
+	* XSLT.java:  New class; an Interpreter.
+	* XslTranslator.java:  New class, a parser for XSLT stylesheets.
+	* Makefile.am:  New file.
+

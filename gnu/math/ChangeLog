@@ -1,3 +1,7 @@
+Thu May 21 10:21:33 1998  Per Bothner  <bothner@cygnus.com>
+
+	* IntFraction (doubleValue):  Minor optimization and extra comment.
+
 Fri May 15 21:41:06 1998  Per Bothner  <bothner@cygnus.com>
 
 	* DFloNum.java (compare(IntNum,IntNum,double)):  Exactly compare

@@ -117,14 +117,19 @@ public class IntFraction extends RatNum
     int exp = 0;
     if (num_len < den_len + 54)
       {
-	n = IntNum.shift (num, den_len + 54 - num_len);
-	exp = - (den_len + 54 - num_len);
+	exp = den_len + 54 - num_len;
+	n = IntNum.shift (num, exp);
+	exp = - exp;
       }
+
+    // Divide n (which is shifted num) by den, using truncating division,
+    // and return quot and remainder.
     IntNum quot = new IntNum ();
     IntNum remainder = new IntNum ();
     IntNum.divide (n, den, quot, remainder, TRUNCATE);
     quot = quot.canonicalize ();
     remainder = remainder.canonicalize ();
+
     return quot.roundToDouble (exp, neg, !remainder.isZero ());
   }
 

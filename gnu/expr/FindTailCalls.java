@@ -175,7 +175,7 @@ public class FindTailCalls extends ExpFullWalker
 	else
 	  {
 	    ApplyExp caller = child.returnContinuation;
-	    if (caller != null && caller != LambdaExp.unknownContinuation
+	    if (caller != LambdaExp.unknownContinuation
 		&& ! Compilation.usingCPStyle())
 	      {
 		child.setInlineOnly(true);

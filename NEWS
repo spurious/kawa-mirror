@@ -1,20 +1,27 @@
-Moved kawa to kawa/repl, which means you have to run Kawa
-by saying "java kawa.repl" instead of "java kawa".
+Changes in 1.2 since 1.0
+========================
+
+Moved kawa class to kawa/repl.  Merged in kawac (compiler)
+functionality.  A 'kawa' shell-script is now created.
+This is now the preferred interface to both the interactive
+evaluator and the compiler (on Unix-like systems).
+
+Now builds "without a snag" using Cafe 1.51 under Win95.
+(Symantec JIT (ver 2.00b19) requires disabling JIT - JAVA_COMPCMD=disable.)
+Compiles under JDK 1.1 beta (with some warnings).
 
 Documentation moved to doc directory.
 There is now an internals overview, in doc/kawa-tour.ps.
 
+Added primitives to make it easy to call arbitrary Java methods
+from Scheme.
+
 Internal define is implemented.
+
+Rough support for multiple threads is implemented.
 
 Quantities (with units) are implemented (as in DSSSL).
 Complex numbers are implemented (except {,a}{sin,cos,tan}).
-
-A 'kawa' shell-script is now created.
-
-Changes since 1.0:
-==================
-Now builds "without a snag" using Cafe 1.51 under Win95.
-(Symantec JIT (ver 2.00b19) requires disabling JIT - JAVA_COMPCMD=disable.)
 
 Logical operations on exact integers have been implemented.
 These include all the logical functions from Guile.

@@ -1,5 +1,7 @@
 Mon Feb  3 17:05:29 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
+	* configure.in (VERSION):  Set to 1.2 beta.
+
 	* kawa/repl.java:  Merge in kawac features.
 	* kawac.java:  Remove - no longer needed.
 	* Makefile.am:  Simplify, since we no longer have any .java files here.

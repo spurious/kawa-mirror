@@ -1,4 +1,4 @@
-Update to match kawa-paper:
+Update to match kawa-tour:
   Vector -> FVector
   Quote -> quote  (also Lambda -> lambda)
   SyntaxRule.match should use Pattern.
@@ -8,8 +8,6 @@ Should SyntaxRule inherit from Pattern?
 Complete R4RS procedures.
   transcript-on transcript-off
   trig functions for complex numbers
-
-Add nicer way to access native java methods.
 
 We depend on some hacks to automake:
 - info files make in builddir, not $(srcdir)
@@ -37,3 +35,5 @@ Printing SyntaxError prints error log.
 Replace use of ZipArchive by jar files (once JDK 1.1 is out).
 
 Perhaps add #|...|# comments.  (Supposedly SCM and others have them.)
+
+Need a way for kawac to pre-load other files for the sake of macros.

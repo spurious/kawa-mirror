@@ -1,3 +1,13 @@
+1999-04-22  Per Bothner  <bothner@cygnus.com>
+
+	* Compilation.java (addClass):  Remove (commented-out) call to
+ 	declareClosureEnv.
+	* FindTailCalls.java (walkSetExp):  Don't call walkLambdaExp if the
+	value is an ObjectExp.
+	* expr/LambdaExp.java (declareClosureEnv):  If isClassMethod(),
+	then the closureEnv variable is "this".
+	* expr/ObjectExp.java (compile):  Create staticLinkField if needed.
+
 1999-04-15  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* Compilation.java (addClass):  Don't create primitive methods here.

@@ -1,3 +1,8 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkApplyExp):  If function is append-values,
+	then last operand may be a tail-call.
+
 2003-10-07  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (staticTable):  New static field.
@@ -8,6 +13,7 @@
 	eofConstant):  Remove no-longer needed static fields.
 	(compileConstantToField):  New helper method.
 	(compileConstant):  Use it.
+	Fixes Savannah bug #5651.
 	* Interpreter.java (trueObject, falseObject, undefinedObject,
 	voidObject):  Remove unused static fields.
 

@@ -24,6 +24,7 @@ public class FindTailCalls extends ExpWalker
     try
       {
 	inTailContext = false;
+	boolean isAppendValues = false;
 	if (exp.func instanceof ReferenceExp)
 	  {
 	    ReferenceExp func = (ReferenceExp) exp.func;
@@ -44,6 +45,10 @@ public class FindTailCalls extends ExpWalker
 	    walkLambdaExp(lexp, false);
 	    lexp.setCanCall(true);
 	  }
+	else if (exp.func instanceof QuoteExp
+		 && (((QuoteExp) exp.func).getValue()
+		     == gnu.kawa.functions.AppendValues.appendValues))
+	  isAppendValues = true;
 	else
 	  exp.func = (Expression) exp.func.walk(this);
 	if (lexp != null)
@@ -56,7 +61,15 @@ public class FindTailCalls extends ExpWalker
 	    else
 	      lexp.returnContinuation = LambdaExp.unknownContinuation;
 	  }
-	exp.args = walkExps(exp.args);
+	if (isAppendValues && exp.args.length > 0)
+	  {
+	    int last = exp.args.length - 1;
+	    exp.args = walkExps(exp.args, last);
+	    inTailContext = save;
+	    exp.args[last] = walk(exp.args[last]);
+	  }
+	else
+	  exp.args = walkExps(exp.args);
 	return exp;
       }
     finally
@@ -217,7 +230,7 @@ public class FindTailCalls extends ExpWalker
 	  continue;
 	// We can inline child if it is a member of a set of functions
 	// which can all be inlined in the same method, and for which
-	// all callers are known and members of the same,
+	// all callers are known and members of the same set,
 	// and each function has at most one caller that is not a tail-call.
 	// FIXME  Basic algorithm:
 	/*

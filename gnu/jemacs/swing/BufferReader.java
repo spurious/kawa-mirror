@@ -1,6 +1,5 @@
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
-import javax.swing.text.*;
 import gnu.mapping.*;
 import java.io.*;
 import gnu.jemacs.swing.SwingBuffer;  // FIXME

@@ -318,7 +318,8 @@ implements java.awt.event.FocusListener,
 
   protected void getCharSize()
   {
-    java.awt.Font defaultFont = ((SwingBuffer) buffer).doc.getFont(((SwingBuffer) buffer).defaultStyle);
+    java.awt.Font defaultFont
+      = ((SwingBuffer) buffer).doc.getFont(SwingBuffer.defaultStyle);
     java.awt.FontMetrics fm
       = jtextpane.getGraphics().getFontMetrics(defaultFont);
     charHeight = fm.getHeight();

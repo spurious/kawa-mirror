@@ -1,6 +1,5 @@
 package gnu.jemacs.swing;
 import gnu.jemacs.buffer.*;
-import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 import gnu.lists.*;

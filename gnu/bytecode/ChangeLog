@@ -1,3 +1,10 @@
+2004-07-31  Per Bothner  <per@bothner.com>
+
+	* Variable.java (LIVE_FLAG):  New constant.
+	(dead):  Use LIVE_FLAG.
+	(reserveLocal):  Set LIVE_FLAG.
+	(freeLocal):  Clean LIVE_FLAG.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* CodeFragment.java:  Remove useless import statements.

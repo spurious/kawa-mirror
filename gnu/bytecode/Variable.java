@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -39,6 +39,7 @@ public class Variable extends Location implements java.util.Enumeration
   /* The ARTIFICIAL_FLAG bits marks internals variables.
      PARAMETER_FLAG|ARTIFICIAL_FLAG means an incoming parameter. */
   private static final int ARTIFICIAL_FLAG = 0x4;
+  private static final int LIVE_FLAG = 0x8;
 
   static final int UNASSIGNED = -1;
   /** The local variable slot number used by this variable.
@@ -51,7 +52,7 @@ public class Variable extends Location implements java.util.Enumeration
   int start_pc;
   int end_pc;
 
-  final boolean dead () { return end_pc > 0; }
+  final boolean dead () { return (flags & LIVE_FLAG) == 0; }
 
   private void setFlag (boolean setting, int flag)
   {
@@ -116,6 +117,7 @@ public class Variable extends Location implements java.util.Enumeration
     if (varIndex + size > code.getMaxLocals())
       code.setMaxLocals(varIndex + size);
     offset = varIndex;
+    flags |= LIVE_FLAG;
     return true;
   }
 
@@ -130,14 +132,13 @@ public class Variable extends Location implements java.util.Enumeration
     for (int i = 0; ; i++)
       {
 	if (reserveLocal (i, code))
-	  {
-	    return;
-	  }
+	  return;
       }
   }
 
   public void freeLocal (CodeAttr code)
   {
+    flags &= ~LIVE_FLAG;
     end_pc = code.PC;
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)

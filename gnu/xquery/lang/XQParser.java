@@ -2921,7 +2921,7 @@ public class XQParser extends LispReader // should be extends Lexer
     lexp.setLine(declLine, declColumn);
     lexp.setName(name);
     Declaration decl = comp.currentScope().addDeclaration(name);
-    if (comp.getModule().isStatic())
+    if (comp.isStatic())
       decl.setFlag(Declaration.STATIC_SPECIFIED);
     comp.push(decl);
     decl.setCanRead(true);

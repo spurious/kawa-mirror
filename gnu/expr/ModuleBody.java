@@ -77,8 +77,7 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
     gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {
-	CallContext ctx = CallContext.setMainContext();
-	//CallContext.setInstance(thread, ctx);
+	CallContext ctx = CallContext.getInstance();
 	ctx.values = Values.noArgs;
 	ctx.proc = this;
 	if (getMainPrintValues())

@@ -107,7 +107,7 @@ This package has nothing to do with the
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
 * License::
-* Index::
+* Overall Index::	 Index of functions, macros, concepts, and more.
 @end menu
 
 @node Features, Getting Kawa, Top, Top
@@ -636,10 +636,13 @@ Does not cause the @code{~/.kawarc.scm} init file to be run.
 @item -c @var{expr}
 Same as @samp{-e @var{expr}}, except that it
 does cause the @code{~/.kawarc.scm} init file to be run.
-@item -f @var{filename}
-Kawa reads and evaluates expressions from the file named by @var{filename}.
-If @var{filename} is @samp{-}, standard input is read (with no prompting).
-Otherwise, is equivalent to evaluating @samp{(load "@var{filename}")}.
+@item -f @var{filename-or-url}
+Kawa reads and evaluates expressions from the file named
+by @var{filename-or-url}.  If the latter is @samp{-},
+standard input is read (with no prompting).  Otherwise,
+it is equivalent to evaluating @samp{(load "@var{filename-or-url}")}.
+The @var{filename-or-url} is interpreted as a URL
+if it is absolute - it starts with a "URI scheme" like @code{http:}.
 @item -s
 @itemx --
 The global variable @samp{command-line-arguments} is set to the remaining
@@ -2359,6 +2362,27 @@ Before returning, restore the original bindings.
 The temporary bindings are only visible in the current thread, and its
 descendent threads.
 @end deffn
+
+@defun base-uri [node]
+If @var{node} is specified, returns the base-URI property
+of the @var{node}.  If the @var{node} does not have the base-URI
+property, returns @code{#f}.
+(The XQuery version returns the empty sequence in that case.)
+
+In the zero-argument case, returns the "base URI" of the current context.
+By default the base URI is the current working directory (as a URL).
+While a source file is @code{load}ed, the base URI is temporarily
+set to the URL of the document.
+@end defun
+
+@defun load path
+The @var{path} can be an (absolute) URL or a filename.
+@end defun
+
+@defun load-relative path
+Same as @code{load}, except that @var{path} is a
+URI that is relative to the context's current base URI.
+@end defun
 
 @node Debugging, Threads, Eval and Environments, Extensions
 @section Debugging
@@ -5177,7 +5201,7 @@ You can find more about Nice at @uref{http://nice.sourceforge.net}.
 For more information feel free to contact
 Daniel Bonniot (@w{@code{d.bonniot@@mail.dotcom.fr}}).
 
-@node License, Index, Projects, Top
+@node License, Overall Index, Projects, Top
 @chapter License
 
 @section License for the Kawa software
@@ -5327,7 +5351,9 @@ followed, or as required to translate it into languages other than
 English.
 @end quotation
 
-@node Index,  , License, Top
+@c I'd prefer to call this node plain "Index", but that causes a clash
+@c with index.html when generating HTML on case-insenstive file systems.
+@node Overall Index,  , License, Top
 @unnumbered Index
 @printindex cp
 

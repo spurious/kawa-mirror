@@ -1,3 +1,11 @@
+2003-05-31  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Index): Name renamed to 'Overall Index', to avoid
+	a name clash with 'index.html' on case-insensitive filesystems.
+
+	* kawa.texi (Options):  Note that -f can take a URL.
+	(Eval and Environments):  Document base-uri, load and load-relative.
+	
 2003-05-17  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* kawa.texi (Multiple values, Procedures):  Fix two more typos.

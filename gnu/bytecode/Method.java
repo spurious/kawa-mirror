@@ -107,7 +107,7 @@ public class Method implements AttrContainer {
   /**
    * Allocate slots for a local variable (or parameter).
    * @param local the variable we need to allocate
-   * @return the index of the (first) slot.
+   * @result the index of the (first) slot.
    * @deprecated
    */
   public void allocate_local (Variable local)

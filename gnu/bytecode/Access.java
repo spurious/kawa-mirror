@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-import java.io.*;
 
 /** Access flags. */
 /* When using JDK 1.1, replace this class by java.lang.reflec.Modifiers. */

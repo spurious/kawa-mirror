@@ -277,7 +277,7 @@ public class Label {
 
   /**
    * Emit a reference to the current label.
-   * @param method the current method
+   * @param code the CodeAttr of the current method
    * Emit the reference as a 2-byte difference relative to PC-1.
    */
    

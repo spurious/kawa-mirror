@@ -882,7 +882,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /** Compile code to allocate a new array.
    * The size should have been already pushed on the stack.
-   * @param type type of the array elements
+   * @param element_type type of the array elements
    */
   public void emitNewArray (Type element_type, int dims)
   {

@@ -5,7 +5,6 @@ package gnu.bytecode;
 import java.io.InputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.FileInputStream;
 
 /** Class to read a ClassType from a DataInputStream (.class file).
  * @author Per Bothner

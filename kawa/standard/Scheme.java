@@ -845,6 +845,7 @@ public class Scheme extends LispInterpreter
 	types.put ("long", LangPrimType.longType);
 	types.put ("float", LangPrimType.floatType);
 	types.put ("double", LangPrimType.doubleType);
+	types.put ("never-returns", Type.neverReturnsType);
 
 	types.put ("Object", Type.pointer_type);
 	types.put ("java.lang.Object", Type.pointer_type);

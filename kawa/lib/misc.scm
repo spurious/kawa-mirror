@@ -31,7 +31,10 @@
              env sym)
        #!null)))
 
-(define (null-environment)
+;; The version number is not optiona according to R5RS.
+;; But since earlier versions of this implementation took 0 arguments,
+;; we'll make it optional for backwards compatibility, at least for now.
+(define (null-environment #!optional version)
   (static-field <kawa.standard.Scheme> 'nullEnvironment))
 
 (define (interaction-environment)

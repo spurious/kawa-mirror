@@ -44,17 +44,10 @@ See the summary
 of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
 
 The author of Kawa is
-@ifhtml
-<a href="http://www.bothner.com/~per/">Per Bothner</a>
-<tt>&lt;<a href="mailto:per@bothner.com">per@bothner.com</a>&gt;</tt>.
-It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
-<tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>.
-@end ifhtml
-@ifclear html
-Per Bothner @w{<per@@bothner.com>}.
-It is a re-write of Kawa 0.2, which was written by
-R. Alexander Milowski @w{<alex@@copsol.com>}.
-@end ifclear
+@uref{http://www.bothner.com/per/,Per Bothner}
+@uref{mailto:per@@bothner.com}.
+Kawa is a re-write of Kawa 0.2, which was written by
+R. Alexander Milowski @uref{mailto:alex@@copsol.com}.
 
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.

@@ -7,8 +7,7 @@ import java.awt.event.*;
 import java.text.*;
 import java.util.*;
 
-/**
- * simple TextArea that always scrolls to the bottom.  Also creates an
+/** Simple TextArea that always scrolls to the bottom.  Also creates an
  * out and err PrintWriter so that you can redirect stdout/stderr to
  * these streams, using the System.setOut/setErr methods.
  *
@@ -79,7 +78,6 @@ public class MessageArea extends TextArea implements KeyListener {
   }
 
   public void keyPressed(KeyEvent e) {
-System.err.println("keypressed");
     int code = e.getKeyCode();
     if (code == KeyEvent.VK_ENTER)
       {
@@ -87,11 +85,9 @@ System.err.println("keypressed");
       }
   }
   public void keyReleased(KeyEvent e) {
-System.err.println("keyreleased");
   }
 
   public void keyTyped(KeyEvent e) {
-System.err.println("keytyped");
   }
 
   public PrintWriter getStdout() {

@@ -1,5 +1,7 @@
 2004-11-08  Per Bothner  <per@bothner.com>
 
+	* mac-test.scm: More macro pattern-matching tests.
+
 	* mac-test.scm: A bunch of new tests.
 	Test cases from Savannah bugs #9483 and #10561, which now work.
 

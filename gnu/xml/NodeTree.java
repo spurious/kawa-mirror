@@ -5,6 +5,7 @@ package gnu.xml;
 import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.kawa.xml.KNode;
+import gnu.xml.XName;
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -110,7 +111,57 @@ public class NodeTree extends TreeList
       return ((XName) type).getLocalName();
     if (type instanceof Symbol)
       return ((Symbol) type).getLocalName();
-    return null;
+    return getNextTypeName(ipos);
+  }
+
+  public boolean posIsDefaultNamespace (int ipos, String namespaceURI)
+  {
+    throw new Error("posIsDefaultNamespace not implemented");
+  }
+
+  public String posLookupNamespaceURI (int ipos, String prefix)
+  {
+    boolean seenDocument = false;
+    int plen = prefix.length();
+    for (;;)
+      {
+	int kind = getNextKind(ipos);
+	switch (kind)
+	  {
+	  case Sequence.DOCUMENT_VALUE:
+	    if (seenDocument)
+	      return null;
+	    ipos = posFirstChild(ipos);
+	    // Avoid a loop bouncing between document and its element.
+   	    seenDocument = true;
+	    continue;
+	  case Sequence.GROUP_VALUE:
+	    Object type = getNextTypeObject(ipos);
+	    if (type instanceof XName)
+	      return ((XName) type).lookupNamespaceURI(prefix);
+	    else if (type instanceof Symbol)
+	      {
+		String name = getNextTypeName(ipos);
+		if (prefix != null && name != null && name.length() > plen
+		    && name.charAt(plen) == ':' && name.startsWith(prefix))
+		  return ((Symbol) type).getNamespaceURI();
+		else if (prefix == null && name != null
+			 && name.indexOf(':') < 0)
+		  return ((Symbol) type).getNamespaceURI();
+	      }
+	    /* ... else fall through ... */
+	  default:
+	    int parent = parentPos(ipos);
+	    if (parent == -1)
+	      return null;
+	    ipos = parent;
+	  }
+      }
+  }
+
+  public String posLookupPrefix (int ipos, String namespaceURI)
+  {
+    throw new Error("posLookupPrefix not implemented");
   }
 
   public int posFirstChild(int ipos)

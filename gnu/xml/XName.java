@@ -8,9 +8,20 @@ import java.io.*;
 /** A QName with namespace nodes [and future optional type annotation]. */
 
 public class XName implements Externalizable
+		   // Maybe: extends javax.xml.namespace.QName, if JAVA5
 {
   Symbol qname;
   NamespaceBinding namespaceNodes;
+
+  public XName ()
+  {
+  }
+
+  public XName (Symbol qname, NamespaceBinding namespaceNodes)
+  {
+    this.qname = qname;
+    this.namespaceNodes = namespaceNodes;
+  }
 
   public final Symbol getQName () { return qname; }
   public final void setQName (Symbol qname) { this.qname = qname; }
@@ -28,7 +39,7 @@ public class XName implements Externalizable
     return qname.getName();
   }
 
-  String lookupPrefix(String prefix)
+  String lookupNamespaceURI (String prefix)
   {
     for (NamespaceBinding ns = namespaceNodes;  ns != null;  ns = ns.next)
       {

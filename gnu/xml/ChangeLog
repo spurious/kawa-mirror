@@ -1,3 +1,12 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* XName.java (<init>): New constructor.
+	(lookupPrefix): Rename to lookupNamespaceURI for consistency with DOM3.
+	* ParsedXMLToConsumer.java (closeStartTag): Use new XName constructor.
+	* NodeTree.java (posIsDefaultNamespace, posLookupNamespaceURI,
+	posLookupPrefix): New methods.
+	(posLocalName): Fall back to getNextTypeName.
+
 2004-05-20  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (posTarget):  New method.

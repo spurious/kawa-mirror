@@ -44,4 +44,29 @@ public class callcc extends Procedure1
     return apply (proc);
   }
 
+  /*
+  public void apply (CallStack stack)
+  {
+    kawa.lang.Continuation cont = new Continuation ();
+    cont.frame = stack.proc;
+    cont.pc = stack.pc;
+    stack.value = cont;
+  }
+  */
 }
+
+/*
+class Continuation extends CpsProcedure
+{
+  Procedure frame;
+  int pc;
+
+  public void apply (CallStack stack)
+  {
+    Object result = Values.make(stack.args);
+    stack.pc = pc;
+    stack.proc = frame;
+    stack.result = result;
+  }
+}
+*/

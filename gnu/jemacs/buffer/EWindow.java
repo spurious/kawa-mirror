@@ -11,7 +11,7 @@ public abstract class EWindow
   public Modeline modeline;
   public EFrame frame;
   public Buffer buffer;
- 
+
   protected int[] pendingKeys = null;
   protected int pendingLength = 0;
 
@@ -56,6 +56,8 @@ public abstract class EWindow
   {
     return frame;
   }
+
+  public final void setFrame(EFrame frame) { this.frame = frame; }
 
   public Buffer getBuffer()
   {
@@ -105,9 +107,16 @@ public abstract class EWindow
   protected final void unlink()
   {
     if (frame.firstWindow == this)
-      frame.firstWindow = nextWindow;
+      {
+	if (nextWindow == this)
+	  frame.firstWindow = null;
+	else
+	  frame.firstWindow = nextWindow;
+      }
     nextWindow.prevWindow = prevWindow;
     prevWindow.nextWindow = nextWindow;
+    prevWindow = this;
+    nextWindow = this;
   }
 
   /** Return the next/previous window in the cyclic order of windows.
@@ -149,7 +158,6 @@ public abstract class EWindow
   {
     EFrame frame = this.frame;
     deleteNoValidate();
-    unlink();
     if (frame.getFirstWindow() == null)
       frame.delete();
     else
@@ -166,6 +174,7 @@ public abstract class EWindow
         else
           frame.selectedWindow = next;
       }
+    unlink();
     frame = null;
   }
 

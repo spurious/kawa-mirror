@@ -40,11 +40,12 @@ public abstract class EFrame
 
   public void delete()
   {
-    for (EWindow cur = getFirstWindow(); cur != null; )
+    for (;;)
       {
-        EWindow next = cur.getNextWindow(true);
-        cur.deleteNoValidate();
-        cur = next;
+	EWindow win = firstWindow;
+	if (win == null)
+	  break;
+        win.deleteNoValidate();
       }
     if (this == selectedFrame)
       selectedFrame = null;

@@ -45,7 +45,7 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 	  }
 	catch (NoSuchFieldException ex)
 	  {
-	    throw new GenericError ("no such field "+fname+" in "+clas.getName());
+	    throw new RuntimeException ("no such field "+fname+" in "+clas.getName());
 	  }
       }
     try
@@ -54,13 +54,12 @@ public class GetFieldProc extends Procedure1 implements Inlineable
       }
     catch (IllegalAccessException ex)
       {
-	throw new GenericError("illegal access for field "+fname);
+	throw new RuntimeException("illegal access for field "+fname);
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  private gnu.bytecode.Field getField ()
   {
-    exp.getArgs()[0].compile(comp, ctype);
     if (field == null)
       {
 	field = ctype.getField(fname);
@@ -68,8 +67,20 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
+    return field;
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    exp.getArgs()[0].compile(comp, ctype);
+    getField();
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitGetField(field);
     target.compileFromStack(comp, field.getType());
+  }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return getField().getType();
   }
 }

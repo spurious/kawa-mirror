@@ -203,11 +203,6 @@ public class InPort extends FilterInputStream
     return Char.make((char)c);
   }
 
-  protected Object readVector() throws SyntaxError
-  {
-    throw new SyntaxError("vector syntax #(...) not implemented");
-  }
-
   protected Object readNumber(int radix)
        throws java.io.IOException, SyntaxError
   {
@@ -340,7 +335,7 @@ public class InPort extends FilterInputStream
     unreadChar ();
   }
 
-  protected Object readList ()
+  protected List readList ()
       throws java.io.IOException, SyntaxError
   {
      skipWhitespaceAndComments();
@@ -349,7 +344,7 @@ public class InPort extends FilterInputStream
      if ((c = peekChar())==')')
        {
          skipChar ();
-         return Interpreter.nullObject;
+         return List.Empty;
        }
 
      //-- Car of the list
@@ -378,7 +373,7 @@ public class InPort extends FilterInputStream
 	     cdr = readList();
 	   }           
        }
-     return new Pair(car,cdr);
+     return new Pair (car,cdr);
   }
 
   public Object readSchemeObject ()
@@ -429,7 +424,7 @@ public class InPort extends FilterInputStream
 	    switch (readChar()) 
 	      {
 	      case '(':
-		return readVector();
+		return readList ().toVector ();
 	      case '\\':
 		return readCharacter();
 	      case 't':

@@ -120,11 +120,15 @@ public class SetExp extends Expression
 	&& target instanceof IgnoreTarget
 	&& ((LambdaExp) new_value).getInlineOnly())
       return;
+    Type type;
     gnu.bytecode.CodeAttr code = comp.getCode();
     // FIXME - handle isSetIfUnbound
     boolean needValue = getHasValue() && ! (target instanceof IgnoreTarget);
-    if (needValue && binding != null)
-      throw new Error("SetExp.compile: not implemented - return value");
+
+    // set the following to true if the value has been pushed.
+    // this is used to detect not implemented cases.
+    // when all cases are implemented, remove this.
+    boolean valuePushed = false;
 
     // This code is kind of kludgy, because it handles a number of
     // different cases:  assignments and definitions to both local and
@@ -199,9 +203,13 @@ public class SetExp extends Expression
 	  }
 	else if (decl.isSimple ())
 	  {
-	    new_value.compile (comp, decl.getType());
+            type = decl.getType();
+	    new_value.compile (comp, type);
 	    if (needValue)
-	      code.emitDup(1, 0);  // dup
+              {
+                code.emitDup(type);  // dup or dup2
+                valuePushed = true;
+              }
 	    Variable var = decl.getVariable();
 	    if (var == null)
 	      var = decl.allocateVariable(code);
@@ -212,19 +220,37 @@ public class SetExp extends Expression
 	    Field field = decl.field;
             if (! field.getStaticFlag())
               decl.loadOwningObject(comp);
-	    new_value.compile (comp, field.getType());
+            type = field.getType();
+	    new_value.compile (comp, type);
             if (field.getStaticFlag())
-              code.emitPutStatic(field);
+              {
+                if (needValue)
+                  {
+                    code.emitDup(type);
+                    valuePushed = true;
+                  }
+                code.emitPutStatic(field);
+              }
             else
-              code.emitPutField(field);
+              { 
+                if (needValue)
+                  {
+                    code.emitDupX();
+                    valuePushed = true;
+                  }
+                code.emitPutField(field);
+              }
 	  }
       }
     else
       {
 	comp.compileConstant (name);
 	new_value.compile (comp, Target.pushObject);
-	if (needValue)
-	  code.emitDup(1, 1);  // dup_x1
+        if (needValue)
+          {
+            code.emitDupX();
+            valuePushed = true;
+          }
 	Method method;
 	if (isDefining())
 	  {
@@ -238,6 +264,9 @@ public class SetExp extends Expression
 	  method = comp.putGlobalMethod;
 	code.emitInvokeStatic(method);
       }
+
+    if (needValue && ! valuePushed)
+      throw new Error("SetExp.compile: not implemented - return value");
 
     if (needValue)
       target.compileFromStack(comp, getType());

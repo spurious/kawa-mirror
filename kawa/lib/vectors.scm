@@ -1,13 +1,13 @@
-(define (vector? x)
+(define (vector? x) :: <boolean>
   (instance? x <vector>))
 
-(define (make-vector (k :: <int>) #!optional (fill #!undefined))
+(define (make-vector (k :: <int>) #!optional (fill #!undefined)) :: <vector>
   (make <vector> k fill))
 
-(define (vector #!rest (args :: <Object[]>))
+(define (vector #!rest (args :: <Object[]>)) :: <vector>
   (make <vector> args))
 
-(define (vector-length x :: <vector>)
+(define (vector-length x :: <vector>) :: <int>
   (invoke x 'size))
 
 (define (vector-ref
@@ -18,7 +18,7 @@
 (define (vector-set!
          (vector <vector>)
          (k <int>)
-         obj)
+         obj) :: <void>
   (invoke vector 'set k obj))
 
 (define (vector->list (vec :: <vector>)) :: <list>
@@ -29,9 +29,9 @@
 	result
 	(loop (cons (vector-ref vec i) result) i))))
 
-(define (list->vector (x <list>))
+(define (list->vector (x :: <list>)) :: <vector>
   ((primitive-constructor <vector> (<gnu.lists.Sequence>))
    x))
 
-(define (vector-fill! (vec :: <vector>) fill)
+(define (vector-fill! (vec :: <vector>) fill) :: <void>
   (invoke vec 'setAll fill))

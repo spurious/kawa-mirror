@@ -1,3 +1,8 @@
+2002-06-25  Per Bothner  <per@bothner.com>
+
+	* uniform.scm:  Add missing type specifiers.
+	* vectors.scm:  Add missing type specifiers.
+
 2002-06-10  Per Bothner  <per@bothner.com>
 
 	* arrays.scm:  New file, with procedures for SRFI-25.

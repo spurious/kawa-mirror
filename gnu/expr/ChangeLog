@@ -1,5 +1,8 @@
 1999-12-06  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java (compile):  If too few/many arguments,
+	call comp.error instead of throwing WrongArguments.
+
 1999-12-06  Bruce R. Lewis  <brlewis@alum.mit.edu>
 
 	* ModuleExp.java (compileToArchive):  Re-write to use java.util.zip.*

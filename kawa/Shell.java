@@ -42,75 +42,84 @@ public class Shell
     Translator tr = new Translator(env, messages);
     tr.immediate = true;
     Lexer lexer = interp.getLexer(inp, messages);
-    for (;;)
+    CallContext ctx = new CallContext();
+    FormatToConsumer saveFormat = null;
+    if (pout == null)
+      ctx.consumer = new VoidConsumer();
+    else
       {
-	try
+	saveFormat = pout.objectFormat;
+	pout.objectFormat = interp.getFormat(false);
+	ctx.consumer = pout;
+      }
+    try
+      {
+	for (;;)
 	  {
-	    lexer.clearErrors();
-	    PairWithPosition body
-	      = PairWithPosition.make(null, LList.Empty,
-				      inp.getName(),
-				      inp.getLineNumber() + 1,
-				      inp.getColumnNumber() + 1);
-	    Object sexp = ((LispReader) lexer).readObject(); // FIXME
-	    if (sexp == Sequence.eofValue)
-	      return;
+	    try
+	      {
+		lexer.clearErrors();
+		PairWithPosition body
+		  = PairWithPosition.make(null, LList.Empty,
+					  inp.getName(),
+					  inp.getLineNumber() + 1,
+					  inp.getColumnNumber() + 1);
+		Object sexp = ((LispReader) lexer).readObject(); // FIXME
+		if (sexp == Sequence.eofValue)
+		  return;
 
-            // Skip whitespace, in case somebody calls (read-char) or similar.
-	    int ch;
-            for (;;)
-              {
-                ch = inp.read();
-                if (ch < 0 || ch == '\r' || ch == '\n')
-                  break;
-                if (ch != ' ' && ch != '\t')
-                  {
-                    inp.unread();
-                    break;
-                  }
-              }
+		// Skip whitespace, in case somebody calls (read-char) or similar.
+		int ch;
+		for (;;)
+		  {
+		    ch = inp.read();
+		    if (ch < 0 || ch == '\r' || ch == '\n')
+		      break;
+		    if (ch != ' ' && ch != '\t')
+		      {
+			inp.unread();
+			break;
+		      }
+		  }
 
-	    body.car = sexp;
-	    /* If the errors were minor, we could perhaps try to
-	       do Translation (to check for more errors)  .  ??? */
-	    ModuleExp mod = Scheme.makeModuleExp(body, tr);
-	    mod.setName("atInteractiveLevel");  // FIXME
-	    if (lexer.checkErrors(perr, 20))
-	      continue;
+		body.car = sexp;
+		/* If the errors were minor, we could perhaps try to
+		   do Translation (to check for more errors)  .  ??? */
+		ModuleExp mod = Scheme.makeModuleExp(body, tr);
+		mod.setName("atInteractiveLevel");  // FIXME
+		if (lexer.checkErrors(perr, 20))
+		  continue;
 
-	    /* DEBUGGING:
-	    perr.print ("[Re-written expression: ");
-	    mod.print (perr);
-	    perr.print ("\nbefore eval<"+mod.getClass().getName()+">");
-	    perr.println();
-	    perr.flush();
-	    */
-
-	    Object result = mod.evalModule (env);
-	    if (pout != null)
-	      interp.print(result, pout);
-	    if (ch < 0)
-	      break;
+		mod.evalModule(env, ctx);
+		ctx.run();
+		if (ch < 0)
+		  break;
+	      }
+	    catch (WrongArguments e)
+	      {
+		if (e.usage != null)
+		  perr.println("usage: "+e.usage);
+		e.printStackTrace(perr);
+	      }
+	    catch (java.lang.ClassCastException e)
+	      {
+		perr.println("Invalid parameter, was: "+ e.getMessage());
+		e.printStackTrace(perr);
+	      }
+	    catch (gnu.text.SyntaxException e)
+	      {
+		e.printAll(perr, 20);
+	      }
+	    catch (Exception e)
+	      {
+		e.printStackTrace(perr);
+	      }
 	  }
-	catch (WrongArguments e)
-	  {
-	    if (e.usage != null)
-	      perr.println("usage: "+e.usage);
-	    e.printStackTrace(perr);
-	  }
-	catch (java.lang.ClassCastException e)
-	  {
-	    perr.println("Invalid parameter, was: "+ e.getMessage());
-	    e.printStackTrace(perr);
-	  }
-	catch (gnu.text.SyntaxException e)
-	  {
-	    e.printAll(perr, 20);
-	  }
-	catch (Exception e)
-	  {
-	    e.printStackTrace(perr);
-	  }
+      }
+    finally
+      {
+	if (pout != null)
+	  pout.objectFormat = saveFormat;
       }
   }
 

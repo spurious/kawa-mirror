@@ -20,4 +20,8 @@ public class ExpWalker
   { return walkExpression(exp); }
   public Object walkSynchronizedExp (SynchronizedExp exp)
     { return walkExpression(exp); }
+
+  public Object walkBlockExp(BlockExp exp) { return walkExpression(exp); }
+  public Object walkExitExp(ExitExp exp) { return walkExpression(exp); }
+  public Object walkFluidLetExp(FluidLetExp exp) { return walkLetExp(exp); }
 }

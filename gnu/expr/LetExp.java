@@ -59,6 +59,11 @@ public class LetExp extends ScopeExp
     code.popScope ();
   }
 
+  public final gnu.bytecode.Type getType()
+  {
+    return body.getType();
+  }
+
   Object walk (ExpWalker walker) { return walker.walkLetExp(this); }
 
   public void print (java.io.PrintWriter ps)

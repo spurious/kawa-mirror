@@ -112,7 +112,19 @@ public class Declaration extends Variable
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
   static final int CAN_WRITE = 8;
+  static final int IS_FLUID = 16;
   int flags;
+
+  public final void setFlag (boolean setting, int flag)
+  {
+    if (setting) flags |= flag;
+    else flags &= ~flag;
+  }
+
+  /** True if this is a fluid binding (in a FluidLetExp). */
+  public final boolean isFluid () { return (flags & IS_FLUID) != 0; }
+
+  public final void setFluid (boolean fluid) { setFlag(fluid, IS_FLUID); }
 
   /** True if the value of the variable is the contents of a Binding. */
   public final boolean isIndirectBinding()
@@ -124,21 +136,11 @@ public class Declaration extends Variable
   }
 
   /* Note:  You probably want to use !ignorable(). */
-  public final boolean getCanRead()
-  { return (flags & CAN_READ) != 0; }
-  public final void setCanRead(boolean read)
-  {
-    if (read) flags |= CAN_READ;
-    else flags &= ~CAN_READ;
-  }
+  public final boolean getCanRead() { return (flags & CAN_READ) != 0; }
+  public final void setCanRead(boolean read) { setFlag(read, CAN_READ); }
 
-  public final boolean getCanCall()
-  { return (flags & CAN_CALL) != 0; }
-  public final void setCanCall(boolean called)
-  {
-    if (called) flags |= CAN_CALL;
-    else flags &= ~CAN_CALL;
-  }
+  public final boolean getCanCall() { return (flags & CAN_CALL) != 0; }
+  public final void setCanCall(boolean called) { setFlag(called, CAN_CALL); }
 
   public final boolean getCanWrite()
   { return (flags & CAN_WRITE) != 0; }

@@ -69,6 +69,8 @@ public class ReferenceExp extends Expression
 	      }
 	    code.emitInvokeVirtual (getMethod);
 	  }
+	else if (binding.isFluid())
+	  code.emitGetField(FluidLetExp.valueField);
       }
     else
       {
@@ -91,7 +93,8 @@ public class ReferenceExp extends Expression
 
   public final gnu.bytecode.Type getType()
   {
-    return binding == null ? Type.pointer_type : binding.getType();
+    return (binding == null || binding.isFluid()) ? Type.pointer_type
+      : binding.getType();
   }
 
   public String toString()

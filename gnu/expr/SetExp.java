@@ -94,6 +94,12 @@ public class SetExp extends Expression
 	      }
 	    code.emitInvokeVirtual (setMethod);
 	  }
+	else if (binding.isFluid())
+	  {
+	    binding.load(comp);
+	    new_value.compile(comp, Type.pointer_type);
+	    code.emitPutField(FluidLetExp.valueField);
+	  }
 	else if (binding.isSimple ())
 	  {
 	    new_value.compile (comp, binding.getType());
@@ -117,6 +123,11 @@ public class SetExp extends Expression
       }
 
     comp.compileConstant(Values.empty, target);
+  }
+
+  public final gnu.bytecode.Type getType()
+  {
+    return Type.void_type;
   }
 
   Object walk (ExpWalker walker) { return walker.walkSetExp(this); }

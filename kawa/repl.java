@@ -4,6 +4,7 @@ import kawa.standard.*;
 import java.io.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.SourceMessages;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
@@ -183,16 +184,18 @@ public class repl extends Procedure0or1
 		arg = args[iArg];
 		try
 		  {
-		    if (CompileFile.compile_to_files(arg,
-						     compilationDirectory,
-						     compilationPrefix,
-						     compilationTopname))
+                    System.err.println("(compiling "+arg+")");
+                    SourceMessages messages = new SourceMessages();
+
+		    CompileFile.compile_to_files(arg,
+                                                 compilationDirectory,
+                                                 compilationPrefix,
+                                                 compilationTopname,
+                                                 messages);
+                    boolean sawErrors = messages.seenErrors();
+                    messages.checkErrors(System.err, 50);
+                    if (sawErrors)
 		      System.exit(-1);
-		  }
-		catch (gnu.text.SyntaxException ex)
-		  {
-		    ex.printAll(OutPort.errDefault(), 50);
-		    System.exit(-1);
 		  }
 		catch (Throwable ex)
 		  {

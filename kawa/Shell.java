@@ -45,6 +45,20 @@ public class Shell
 	    PairWithPosition body = new PairWithPosition(inp,
 							 null, List.Empty);
 	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
+
+            // Skip whitespace, in case somebody calls (read-char) or similar.
+            for (;;)
+              {
+                int ch = inp.read();
+                if (ch < 0 || ch == '\r' || ch == '\n')
+                  break;
+                if (ch != ' ' && ch != '\t')
+                  {
+                    inp.unread();
+                    break;
+                  }
+              }
+
 	    if (sexp == Sequence.eofValue)
 	      return;
 	    body.car = sexp;

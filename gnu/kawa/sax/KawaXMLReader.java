@@ -4,13 +4,18 @@
 package gnu.kawa.sax;
 import org.xml.sax.*;
 import gnu.xml.*;
+import gnu.kawa.xml.XMLParser;
 import java.io.*;
+import gnu.text.*;
 
 /** An implementation of SAX2 XMLReader.
  */
 
-public class KawaXMLReader extends ContentConsumer implements XMLReader
+public class KawaXMLReader extends ContentConsumer
+implements XMLReader, Locator
 {
+  XMLParser xmlParser;
+
   public boolean getFeature (String name)
   {
     return false;
@@ -66,14 +71,40 @@ public class KawaXMLReader extends ContentConsumer implements XMLReader
     Reader reader = input.getCharacterStream();
     if (reader == null)
       reader = new InputStreamReader(input.getByteStream());
-    XMLParser parser = new XMLParser(reader,
-				     new ParsedXMLToConsumer(new NamespaceResolver(this)));
+    SourceMessages messages = new SourceMessages();
+    XMLParser parser = new XMLParser(new LineBufferedReader(reader),
+				     new NamespaceResolver(this), messages);
     beginDocument();
     parser.parse();
+    String err = messages.toString(20);
+    if (err != null)
+      throw new SAXParseException(err, this);
     endDocument();
   }
 
   public void parse (String systemId)
   {
+  }
+
+  public String getPublicId()
+  {
+    return null;
+  }
+
+  public String getSystemId()
+  {
+    return xmlParser.getName(); // ???
+  }
+
+  public int getColumnNumber()
+  {
+    int column = xmlParser.getColumnNumber();
+    return column <= 0 ? -1 : column + 1;
+  }
+
+  public int getLineNumber()
+  {
+    int line = xmlParser.getLineNumber();
+    return line <= 0 ? -1 : line + 1;
   }
 }

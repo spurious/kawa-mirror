@@ -44,6 +44,15 @@ public class ThreadLocation extends Location
     this.global = global;
   }
 
+  /** Create a fresh ThreadLocation, independent of other ThreaDLocations.
+   * Creates new unique EnvironmentKey, using a unique property key.
+   * @param name used for printing, but not identification.
+   */
+  public static ThreadLocation makePrivate (Symbol name)
+  {
+    return new ThreadLocation(name);
+  }
+
   /** Set the default/global value. */
   public void setGlobal (Object value)
   {

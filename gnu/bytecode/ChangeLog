@@ -1,3 +1,10 @@
+2003-03-13  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (getSP):  New method.
+
+	* CodeAttr.java (emitPushString):  Don't do redundant pushType
+	if we call emitPushNull.
+
 2002-11-19  Daniel Bonniot  <bonniot@users.sourceforge.net>
 
 	* CodeAttr.java (emitSwap):  Handle two word values.

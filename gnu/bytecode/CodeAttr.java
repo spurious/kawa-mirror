@@ -68,6 +68,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final int getPC() { return PC; }
 
+  public final int getSP() { return SP; }
+
   public final ConstantPool getConstants ()
   {
     return getMethod().classfile.constants;
@@ -685,8 +687,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	      emitInvokeVirtual(Type.string_type.getDeclaredMethod("intern", 0));
 	    return;
 	  }
+	pushType(Type.string_type);
       }
-    pushType(Type.string_type);
   }
 
   public void emitPushNull ()

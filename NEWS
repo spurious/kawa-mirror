@@ -1,3 +1,31 @@
+New command-line option \ ("meta-arg").
+
+Handling of Unix script header #!/PROGRAM.
+
+You can now take the same Kawa "web" program (written in Scheme, KRL/BRL,
+or XQuery) and run it as either a servlet or a CGI script.
+
+There are a number of new functions for accessing HTTP requests and
+generating HTTP responses.
+
+Kawa now supports a new experimental programming KRL (the "Kawa Report
+Language").  You select this language using --krl on teh Kawa command
+link.  It allows Scheme code to be inside template files, like HTML
+pages, using a syntax based on BRL (brl.sourceforge.net).  However,
+KRL has soem experimental changes to both BRL and standard Scheme.
+There is also a BRL-compatibile mode, selected using --brl, though
+that currently only supports a subset of BRL functions.
+
+If language is not explicitly specified and you're running a source
+file (e.g. "java kawa.repl myscript.xql"), Kawa tried to derive the
+language from the the filename extension (e.g. "xql").  It still defaults
+to Scheme if there is no extension or the extension is unrecognized.
+
+New command-line option --output-format alias --format can be used to
+over-ride the format used to write out top-level (repl, load) values.
+
+XMLPrinter can now print in (non-well-formed-XML) HTML.
+
 Changes from Kawa 1.6.96 to 1.6.97.
 ==================================
 Changed lots of error messages to use pairs of single quotes rather

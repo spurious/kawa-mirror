@@ -9,6 +9,7 @@ BEFORE KAWA 1.7?
 * define-namespace should work lexically
 * CL reader interface
 * More define-class functionality?
+* define-class should work for repl - need shared ArrayClassLoader
 * Finish modules: define-module?  constructor arguments?
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).

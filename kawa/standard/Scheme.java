@@ -80,11 +80,11 @@ public class Scheme extends Interpreter
 
       //-- Section 6.2  -- complete
       eqv = new kawa.standard.eqv_p();
-      define(eqv.name (), eqv);
+      define("eqv?", eqv);
       eq = new kawa.standard.eq_p();
-      define(eq.name (), eq);
+      define("eq?", eq);
       equal = new kawa.standard.equal_p();
-      define(equal.name (), equal);
+      define("equal?", equal);
 
       //-- Section 6.3  -- complete
       define_proc ("pair?", "kawa.standard.pair_p");

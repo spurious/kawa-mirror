@@ -2,13 +2,10 @@ package kawa.standard;
 import kawa.lang.*;
 import kawa.math.*;
 
+/** Implement that standard Scheme function "eqv?". */
+
 public class eqv_p extends Procedure2
 {
-  public kawa.standard.eqv_p()
-  {
-    super("eqv?");
-  }
-
   public boolean eqv_p (Object arg1, Object arg2) 
   {
     if (arg1==arg2)

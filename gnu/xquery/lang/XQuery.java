@@ -7,11 +7,11 @@ import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.xquery.util.*;
 import gnu.xml.*;
-import gnu.kawa.reflect.ClassMethods;
+import gnu.kawa.reflect.ClassMethodProc;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import java.io.Reader;
@@ -24,15 +24,37 @@ import gnu.math.IntNum;
 public class XQuery extends Interpreter
 {
   public static final String XQUERY_FUNCTION_NAMESPACE
-    = "http://www.w3.org/2003/05/xpath-functions";
+    = "http://www.w3.org/2004/10/xpath-functions";
   public static final String KAWA_FUNCTION_NAMESPACE
     = "http://kawa.gnu.org/";
+  public static final String QEXO_FUNCTION_NAMESPACE
+    = "http://qexo.gnu.org/";
+  public static final String LOCAL_NAMESPACE
+    = "http://www.w3.org/2004/10/xquery-local-functions";
+  public static final Namespace xqueryFunctionNamespace
+    = Namespace.getInstance(XQUERY_FUNCTION_NAMESPACE);
+  public static final Namespace kawaFunctionNamespace
+    = Namespace.getInstance(KAWA_FUNCTION_NAMESPACE);
+  public static final Namespace qexoFunctionNamespace
+    = Namespace.getInstance(QEXO_FUNCTION_NAMESPACE);
+  public static final  Namespace[] defaultFunctionNamespacePath
+    = { qexoFunctionNamespace,
+	xqueryFunctionNamespace,
+	Namespace.EmptyNamespace,
+	kawaFunctionNamespace };
   static boolean charIsInt = false;
 
   /** Pseudo-namespace "prefix" for the default element namespace. */
   public static final String DEFAULT_ELEMENT_PREFIX = "elements$";
   /** Pseudo-namespace "prefix" for the default function namespace. */
   public static final String DEFAULT_FUNCTION_PREFIX = "functions$";
+
+  Namespace defaultNamespace;
+
+  public boolean hasSeparateFunctionNamespace()
+  {
+    return true;
+  }
 
   public static gnu.math.Numeric asNumber(Object arg)
   {
@@ -71,14 +93,18 @@ public class XQuery extends Interpreter
   public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
+    XQParser parser = (XQParser) lexer;
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, lexer.getMessages(),
-				     ((XQParser) lexer).lexical);
+    Compilation tr = new Compilation(this, parser.getMessages(),
+				     parser.lexical);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
+    XQResolveNames resolver = new XQResolveNames(tr);
+    resolver.functionNamespacePath = parser.functionNamespacePath;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(lexer.getName());
     tr.push(mexp);
     tr.mustCompileHere();
+    ((XQParser) lexer).resolver = resolver;
     if ((options & PARSE_ONE_LINE) != 0)
       {
 	Expression sexp = ((XQParser) lexer).parse(tr);
@@ -132,29 +158,34 @@ public class XQuery extends Interpreter
 	dout.flush();
       }
 
-    new XQResolveNames(tr).resolveModule(mexp);
+    resolver.resolveModule(mexp);
     return tr;
   }
 
   public int getNamespaceOf(Declaration decl)
   {
     return decl.isProcedureDecl() ? FUNCTION_NAMESPACE
-      : decl.isNamespaceDecl() ? NAMESPACE_PREFIX_NAMESPACE
+      //: decl.isNamespaceDecl() ? NAMESPACE_PREFIX_NAMESPACE
       : VALUE_NAMESPACE;
   }
 
-  public void define(String sym, Object p)
+  public Symbol getSymbol (String name)
   {
-    if (p instanceof Procedure)
-      Environment.defineFunction(environ, sym, p);
-    else
-      environ.define (sym, p);
+    return Symbol.make(defaultNamespace, name);
+  }
+
+  public void define(String name, Object value)
+  {
+    Symbol sym = Symbol.make(defaultNamespace, name);
+    Object prop = value instanceof Procedure ? EnvironmentKey.FUNCTION : null;
+    environ.define(sym, prop, value);
   }
 
   protected void define_method(String name, String cname, String mname)
   {
-    Environment.defineFunction(environ, name,
-			       ClassMethods.apply(cname, mname));
+    environ.define(Symbol.make(defaultNamespace, name),
+		   EnvironmentKey.FUNCTION,
+		   ClassMethodProc.make(ClassType.make(cname), mname));
   }
 
   public String getName()
@@ -442,8 +473,9 @@ public class XQuery extends Interpreter
   {
     Environment scmEnv = Scheme.builtin();
 
-    environ = Environment.getInstance(XQUERY_FUNCTION_NAMESPACE);
-    environ.setPrevious(extensionsEnvEnv);
+    environ = Environment.make(XQUERY_FUNCTION_NAMESPACE);
+    defaultNamespace = xqueryFunctionNamespace;
+    //environ.setPrevious(extensionsEnvEnv);
 
     ModuleBody.setMainPrintValues(true);
 
@@ -451,6 +483,7 @@ public class XQuery extends Interpreter
       instance = this;
 
     Environment saveEnv = Environment.getCurrent();
+    /*
     try
       {
 	Environment.setCurrent(scmEnv);
@@ -462,7 +495,6 @@ public class XQuery extends Interpreter
 	    if (val instanceof Procedure)
 	      extensionsEnvEnv.getSymbol(b.getName()).setFunctionValue(val);
 	  }
-
 	// Force it to be loaded now, so we can over-ride let* length etc.
 	loadClass("kawa.lib.std_syntax");
 	loadClass("kawa.lib.lists");
@@ -481,28 +513,29 @@ public class XQuery extends Interpreter
       {
 	Environment.setCurrent(saveEnv);
       }
+    */
 
-    define("document", gnu.kawa.xml.Document.document);
-    define("doc", gnu.kawa.xml.Document.document);  // kludge
-    define("unescaped-data", gnu.kawa.xml.MakeUnescapedData.unescapedData);
-    define("item-at", gnu.xquery.util.ItemAt.itemAt);
-    define("count", gnu.kawa.functions.CountValues.countValues);
-    define("min", gnu.xquery.util.MinMax.min);
-    define("max", gnu.xquery.util.MinMax.max);
-    define("sum", gnu.xquery.util.Reduce.sum);
-    define("avg", gnu.xquery.util.Average.avg);
-    define("index-of", gnu.xquery.util.IndexOf.indexOf);
-    define("last-index-of", gnu.xquery.util.LastIndexOf.lastIndexOf);
-    define("sublist", gnu.xquery.util.SubList.subList);
-    define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
-    define("false", new ConstantFunction0("false", Boolean.FALSE));
-    define("true", new ConstantFunction0("true", Boolean.TRUE));
-    define("number", gnu.xquery.util.NumberValue.numberValue);
-    define("string-value", gnu.xquery.util.StringValue.stringValue);
-    define("string", gnu.xquery.util.StringValue.string);
+    defProcStFld("document", "gnu.kawa.xml.Document","document");
+    defProcStFld("doc", "gnu.kawa.xml.Document", "document");  // kludge
+    defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData", "unescapedData");
+    defProcStFld("item-at", "gnu.xquery.util.ItemAt", "itemAt");
+    defProcStFld("count", "gnu.kawa.functions.CountValues", "countValues");
+    defProcStFld("min", "gnu.xquery.util.MinMax", "min");
+    defProcStFld("max", "gnu.xquery.util.MinMax", "max");
+    defProcStFld("sum", "gnu.xquery.util.Reduce", "sum");
+    defProcStFld("avg", "gnu.xquery.util.Average", "avg");
+    defProcStFld("index-of", "gnu.xquery.util.IndexOf", "indexOf");
+    defProcStFld("last-index-of", "gnu.xquery.util.LastIndexOf", "lastIndexOf");
+    defProcStFld("sublist", "gnu.xquery.util.SubList", "subList");
+    defProcStFld("empty", "gnu.xquery.util.IsEmptySequence", "isEmptySequence");
+    defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
+    defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
+    defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");
+    defProcStFld("string-value", "gnu.xquery.util.StringValue", "stringValue");
+    defProcStFld("string", "gnu.xquery.util.StringValue", "string");
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
-    define("write-to", gnu.kawa.xml.WriteTo.writeTo);
+    defProcStFld("write-to", "gnu.kawa.xml.WriteTo", "writeTo");
     defProcStFld("iterator-items",
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     defProcStFld("list-items", "gnu.kawa.xml.ListItems", "listItems");
@@ -533,7 +566,11 @@ public class XQuery extends Interpreter
     define_method("namespace-uri-for-prefix", "gnu.xquery.util.QNameUtils",
 		  "namespaceURIForPrefix");
 
-    define("distinct-nodes", gnu.kawa.xml.SortNodes.sortNodes);
+    defProcStFld("distinct-nodes", "gnu.kawa.xml.SortNodes", "sortNodes");
+
+    // FIXME - should be imported?
+    defProcStFld("children", "gnu.xquery.util.Children", "children");
+    defProcStFld("not", "kawa.standard.Scheme");
   }
 
   public static XQuery getInstance()
@@ -550,6 +587,11 @@ public class XQuery extends Interpreter
     Interpreter.defaultInterpreter = interp;
     Environment.setGlobal(interp.getEnvironment());
   }
+
+  public static final ConstantFunction0 falseFunction
+    = new ConstantFunction0("false", Boolean.FALSE);
+  public static final ConstantFunction0 trueFunction
+    = new ConstantFunction0("true", Boolean.TRUE);
 
   public static final XMLFormat writeFormat = new XMLFormat();
 

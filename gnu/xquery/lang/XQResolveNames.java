@@ -1,22 +1,60 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
 import gnu.expr.*;
 import gnu.kawa.xml.*;
 import gnu.xml.NamespaceBinding;
-import gnu.mapping.Symbol;
+import gnu.mapping.*;
+import gnu.bytecode.ClassType;
+import gnu.kawa.reflect.*;
 
 public class XQResolveNames extends ResolveNames
 {
+  /** Value of <code>getCode()</code> for <code>lastDecl</code>. */
+  public static final int LAST_BUILTIN = -1;
+
+  /** Value of <code>getCode()</code> for <code>positionDecl</code>. */
+  public static final int POSITION_BUILTIN = -2;
+
+  /** Declaration for the <code>fn:last()</code> function. */
+  public static final Declaration lastDecl
+    = makeBuiltin("last", LAST_BUILTIN);
+
+  /** Declaration for the <code>fn:position()</code> function. */
+  public static final Declaration positionDecl
+    = makeBuiltin("position", POSITION_BUILTIN);
+
+  /** Create a <code>Declaration</code> for a builtin function. */
+  public static Declaration makeBuiltin (String name, int code)
+  {
+    return makeBuiltin (Symbol.make(XQuery.XQUERY_FUNCTION_NAMESPACE, name),
+			code);
+  }
+
+  /** Create a <code>Declaration</code> for a builtin function. */
+  public static Declaration makeBuiltin (Symbol name, int code)
+  {
+    Declaration decl = new Declaration(name);
+    decl.setProcedureDecl(true);
+    decl.setCode(code);
+    return decl;
+  }
+
   public XQResolveNames ()
   {
+    this(null);
   }
 
   public XQResolveNames (Compilation comp)
   {
     super(comp);
+    lookup.push(lastDecl);
+    lookup.push(positionDecl);
   }
+
+  public Namespace[] functionNamespacePath
+    = XQuery.defaultFunctionNamespacePath;
 
   protected Symbol namespaceResolve (String name, boolean function)
   {
@@ -32,12 +70,21 @@ public class XQResolveNames extends ResolveNames
 
     if (! (uri instanceof String))
       {
-	if (colon >= 0)
+	if (colon < 0)
+	  uri = "";
+	else
 	  {
-	    error('e', "unknown namespace prefix '" + prefix + "'");
-	    return null;
+	    try
+	      {
+		Class cl = Class.forName(prefix);
+		uri = "class:" + prefix;
+	      }
+	    catch (Exception ex)
+	      {
+		error('e', "unknown namespace prefix '" + prefix + "'");
+		return null;
+	      }
 	  }
-	uri = "";
       }
     String local = colon < 0 ? name : name.substring(colon+1);
     return Symbol.make(uri, local);
@@ -81,7 +128,7 @@ public class XQResolveNames extends ResolveNames
 	Declaration old = lookup.lookup(name, function);
 	if (old != null
 	    && (! (name instanceof Symbol)
-		|| ((Symbol) name).getEnvironment() != null))
+		|| ((Symbol) name).getNamespace() != null))
 	  comp.error('w', decl, "declaration ",
 		     " hides previous declaration");
 	lookup.push(decl);
@@ -95,17 +142,64 @@ public class XQResolveNames extends ResolveNames
       return decl;
     if (symbol instanceof String)
       {
-	Symbol sym = namespaceResolve ((String) symbol, function);
-	if (sym == null)
-	  return null;
-	decl = lookup.lookup(sym, function);
+	String name = (String) symbol;
+	if (function && name.indexOf(':') < 0)
+	  {
+	    Environment builtins = XQuery.getInstance().getEnvironment();
+	    for (int i = 0;  i < functionNamespacePath.length;  i++)
+	      {
+		Symbol sym = functionNamespacePath[i].lookup(name);
+		if (sym != null)
+		  {
+		    decl = lookup.lookup(sym, function);
+		    if (decl != null)
+		      return decl;
+		    if (! function)
+		      continue;
+		    gnu.mapping.Location loc
+		      = builtins.lookup(sym, EnvironmentKey.FUNCTION);
+		    if (loc == null)
+		      continue;
+		    loc = loc.getBase();
+		    if (loc instanceof StaticFieldLocation)
+		      {
+			decl = ((StaticFieldLocation) loc).getDeclaration();
+			if (decl != null)
+			  return decl;
+		      }
+		    Object val = loc.get(null);
+		    if (val != null)
+		      return procToDecl	(symbol, val);
+		  }
+		
+	      }
+	  }
+	else
+	  {
+	    Symbol sym = namespaceResolve(name, function);
+	    if (sym == null)
+	      return null;
+	    decl = lookup.lookup(sym, function);
+	    if (function && decl == null)
+	      {
+		String uri = sym.getNamespaceURI();
+		if (uri != null && uri.length() > 6 &&
+		    uri.startsWith("class:"))
+		  {
+		    ClassType ctype = ClassType.make(uri.substring(6));
+		    return procToDecl(sym,
+				      ClassMethodProc.make(ctype, sym.getName()));
+		  }
+	      }
+	  }
       }
-    if (decl == null
-	&& (! (exp instanceof ReferenceExp)
-	    // Allow unbound procedures - for now.
-	    || ! ((ReferenceExp) exp).isProcedureName()))
+    if (decl == null)
       {
-	error('e', "unknown variable $"+symbol);
+	if (function)
+	  {
+	  }
+	error('e',
+	      (function ? "unknown function " : "unknown variable $")+symbol+" for "+exp);
       }
     return decl;
   }
@@ -143,9 +237,44 @@ public class XQResolveNames extends ResolveNames
     return exp;
   }
 
+  protected Expression walkSetExp (SetExp exp)
+  {
+    Expression result = super.walkSetExp(exp);
+    Declaration decl = exp.binding;
+    Object name;
+    if (decl != null && ! getCompilation().immediate
+	&& (name = decl.getSymbol()) instanceof Symbol
+	&& XQuery.LOCAL_NAMESPACE.equals(((Symbol) name).getNamespaceURI()))
+      {
+	decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+	decl.setPrivate(true);
+      }
+    return result;
+  }
+
   protected Expression walkApplyExp (ApplyExp exp)
   {
     super.walkApplyExp(exp);
+    Expression func = exp.getFunction();
+    if (func instanceof ReferenceExp)
+      {
+	Declaration decl = ((ReferenceExp) func).getBinding();
+	int code;
+	if (decl != null && (code = decl.getCode()) < 0)
+	  {
+	    switch (code)
+	      {
+	      case POSITION_BUILTIN:
+	      case LAST_BUILTIN:
+		Symbol sym = code == LAST_BUILTIN ? XQParser.LAST_VARNAME
+		  : XQParser.POSITION_VARNAME;
+		decl = lookup.lookup(sym, -1);
+		if (decl == null)
+		  error('e', "undefined context for " + sym.getName());
+		return new ReferenceExp(sym, decl);
+	      }
+	  }
+      }
     Object proc = exp.getFunctionValue();
     if (proc instanceof AttributeConstructor)
       {
@@ -200,4 +329,13 @@ public class XQResolveNames extends ResolveNames
     return NamespaceBinding.maybeAdd(prefix, uri == "" ? null : uri, bindings);
   }
 
+  /** Wrap a (known) procedure value as a Declaration. */
+  static Declaration procToDecl (Object symbol, Object val)
+  {
+    Declaration decl = new Declaration(symbol);
+    decl.setProcedureDecl(true);
+    decl.noteValue(new QuoteExp(val));
+    decl.setFlag(Declaration.IS_CONSTANT);
+    return decl;
+  }
 }

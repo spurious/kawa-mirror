@@ -1,3 +1,24 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	Update for new Symbol/Namespace handling.
+	* XQParser.java (lookupNamespace, resolveQName): Removed methods.
+	(parseName): Renamed to parseQName and noted as deprecated.
+	(parseNameTest): Change return type.
+	(parseNodeTest): Rewrite to use parseNameTest.
+	* XQResolveNames.java (LASTBUILTIN, POSITION_BUILTIN): New constants.
+	(lastDecl, positionDecl, functionNamespacePath): New static fields.
+	(makeBuiltin, walkSetExp, procToDecl): New methods.
+	(<init>): Push lastDecl and positionDecl.
+	(namespaceResolve): Map classname prefix to a "class:" namespace.
+	(push): Search NCName  in functionNamespacePath.
+	(walkSetExp): New method.
+	(walkApplyExp): Special handling of lastDecl and positionDecl.
+	* XQuery.java (parse): Stash resolver in XQParser.
+	(getSymbol): New method.
+	(define, define_method): Update.
+	(<init>): Update.  Use defProcStFld.
+	For now, don't import most Kawa functions.
+
 2004-11-16  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (XQuery): Use defProcStFld instead of define_field.

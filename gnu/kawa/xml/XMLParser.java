@@ -14,15 +14,15 @@ public class XMLParser extends XMLParserChar
   public XMLParser(LineBufferedReader reader, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    this(reader, new NamespaceResolver(out), messages, out);
+    this(reader, new ParsedXMLToConsumer(out), messages, out);
     
   }
 
-  private XMLParser(LineBufferedReader reader, NamespaceResolver resolver,
+  private XMLParser(LineBufferedReader reader, ParsedXMLToConsumer resolver,
 		    SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    super(null, 0, 0, new ParsedXMLToConsumer(resolver));
+    super(null, 0, 0, resolver);
     in = reader;
     this.messages = messages;
     resolver.setParser(this);
@@ -36,29 +36,23 @@ public class XMLParser extends XMLParserChar
     this.messages = messages;
   }
 
+  private XMLParser(URL url, Consumer out, SourceMessages messages,
+		    ParsedXMLToConsumer resolver,
+		    LineBufferedReader lreader)
+    throws java.io.IOException
+  {
+    super(null, 0, 0, resolver);
+    in = lreader;
+    resolver.setParser(this);
+    lreader.setName(url.toString());
+    this.messages = messages;
+  }
+
   public XMLParser(URL url, SourceMessages messages, Consumer out)
     throws java.io.IOException
   {
-    this(url, new NamespaceResolver(out), messages, out);
-  }
-
-  private XMLParser(URL url, NamespaceResolver resolver,
-		    SourceMessages messages, Consumer out)
-    throws java.io.IOException
-  {
-    this(url, resolver, messages);
-    resolver.setParser(this);
-  }
-
-  public XMLParser(URL url, Consumer out, SourceMessages messages)
-    throws java.io.IOException
-  {
-    super(null, 0, 0, new ParsedXMLToConsumer(out));
-    LineBufferedReader lreader
-      = new LineBufferedReader(url.openConnection().getInputStream());
-    in = lreader;
-    lreader.setName(url.toString());
-    this.messages = messages;
+    this(url, out, messages, new ParsedXMLToConsumer(out),
+	 new LineBufferedReader(url.openConnection().getInputStream()));
   }
 
   public int fill(char[] buffer,  int start, int pos)

@@ -1,3 +1,12 @@
+2003-06-27  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java:  Removed - functionality merged with
+	ParsedXMLToConsumer.java.
+	* Makefile.am (java_sources):  Update accordingly.
+	* ParsedXMLToConsumer.java:  Merge in NamespaceResolver functionality,
+	but hopefully more efficient.  This is a major re-write.
+	(class MappingInfo):  New helper class.
+
 2003-05-30  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (toString):  New utility function.

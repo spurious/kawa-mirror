@@ -1,5 +1,8 @@
 2003-06-27  Per Bothner  <per@bothner.com>
 
+	* XMLParser.java (<init>):  Re-do to deal with NamespaceResolver
+	being merged into ParsedXMLToConsumer.
+
 	* NodeType.java (isObject(Object)):  New method.
 	* ElementType.java (isInstancePos):  If kind is OBJECT_VALUE, try
 	isInstance(Object).  Fixes bug 6/17 by reported vizawalou@wanadoo.fr.

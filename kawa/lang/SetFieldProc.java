@@ -42,6 +42,8 @@ public class SetFieldProc extends Procedure2 implements Inlineable
       }
     try
       {
+	if (field != null)
+	  arg2 = field.getType().coerceFromObject(arg2);
 	reflectField.set(arg1, arg2);
 	return Interpreter.voidObject;
       }

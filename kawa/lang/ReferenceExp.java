@@ -14,6 +14,9 @@ public class ReferenceExp extends Expression
   Declaration binding;
   public String string_name () { return symbol; }
 
+  public final String getName() { return symbol; }
+  public final Declaration getBinding() { return binding; }
+
   public ReferenceExp (String symbol)
   {
     this.symbol = symbol;

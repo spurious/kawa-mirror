@@ -14,7 +14,7 @@ public class PrimArraySet extends Procedure3 implements Inlineable
   {
     java.lang.reflect.Array.set(array,
 				((Number) index).intValue(),
-				value);
+				element_type.coerceFromObject(value));
     return Interpreter.voidObject;
   }
   public void compile (ApplyExp exp, Compilation comp, int flags)

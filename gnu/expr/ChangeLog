@@ -1,5 +1,8 @@
 2005-02-15  Per Bothner  <per@bothner.com>
 
+	* ModuleInfo.java: New class.
+	* Makefile.am: Update accordingly.
+
 	* Expression.java (match0): New method.
 	(eval(CallContext)): Use match0.
 	* BeginExp.java (apply): Use match0 to setup tail-call.

@@ -41,6 +41,7 @@ java_sources = \
   Literal.java \
   LitTable.java \
   ModuleBody.java \
+  ModuleInfo.java \
   ModuleMethod.java \
   ModuleWithContext.java \
   ModuleExp.java \

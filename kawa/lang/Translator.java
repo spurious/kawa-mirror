@@ -26,6 +26,27 @@ public class Translator extends Object
 
   public ScopeExp currentScope() { return current_scope; }
 
+  /** Return true if decl is lexical and not fluid. */
+  public boolean isLexical (Declaration decl)
+  {
+    if (decl == null)
+      return false;
+    if (! decl.isFluid())
+      return true;
+    ScopeExp scope = currentScope();
+    ScopeExp context = decl.getContext();
+    for (;; scope = scope.outer)
+      {
+	if (scope == null)
+	  return false;
+	if (scope == context)
+	  return true;
+	if (scope instanceof LambdaExp
+	    && ! ((LambdaExp) scope).getInlineOnly())
+	  return false;
+      }
+  }
+
   private Syntax current_syntax;
   private Object current_syntax_args;
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
@@ -143,6 +164,9 @@ public class Translator extends Object
 	    // to the original symbol.  Here, use the original symbol.
 	    if (obj instanceof String)
 	      binding = env.lookup((String) obj);
+	    else if (obj instanceof Declaration
+		     && ! isLexical((Declaration) obj))
+	      obj = null;
 	  }
 	else
 	  binding = env.lookup(sym);
@@ -296,7 +320,10 @@ public class Translator extends Object
 	// to the original symbol.  Here, use the original symbol.
 	if (binding != null && binding instanceof String)
 	  return new ReferenceExp ((String) binding);
-	return new ReferenceExp (name, (Declaration) binding);
+	Declaration decl = (Declaration) binding;
+	if (! isLexical(decl))
+	  decl = null;
+	return new ReferenceExp (name, decl);
       }
     else if (exp instanceof Expression)
       return (Expression) exp;

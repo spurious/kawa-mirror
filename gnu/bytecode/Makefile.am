@@ -67,4 +67,4 @@ dump$(exext):  dump-main.o gnu-bytecode.o
 	$(GCC) -o dump dump-main.o gnu-bytecode.o \
 	  ../../../libjava/libjava.a
 
-EXTRA_DIST = overview.html
+EXTRA_DIST = package.html

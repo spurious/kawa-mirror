@@ -23,6 +23,8 @@ SCMSOURCES = SymbolOps.scm NumberOps.scm
 
 CLEANFILES = *.class *.stamp
 
+EXTRA_DIST = $(SCMSOURCES) package.html
+
 scmclasses.stamp: $(SCMSOURCES)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
 	echo timestamp > scmclasses.stamp

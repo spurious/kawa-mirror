@@ -88,7 +88,7 @@ java_JAVA =  Access.java Attribute.java AttrContainer.java ObjectType.java Array
 JC1FLAGS = -g
 GCC = ../../../gcc/xgcc -B../../../gcc/
 
-EXTRA_DIST = overview.html
+EXTRA_DIST = package.html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH

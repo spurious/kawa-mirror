@@ -88,6 +88,8 @@ KAWAFLAGS = -P gnu.jemacs.lang. -C
 SCMSOURCES = SymbolOps.scm NumberOps.scm
 
 CLEANFILES = *.class *.stamp
+
+EXTRA_DIST = $(SCMSOURCES) package.html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 JAVACFLAGS = 

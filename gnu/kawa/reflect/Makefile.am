@@ -19,6 +19,8 @@ java_JAVA=\
   StaticGet.java \
   StaticSet.java
 
+EXTRA_DIST = package.html
+
 KAWA = $(JAVA) kawa.repl
 
 all: Makefile classjava.stamp

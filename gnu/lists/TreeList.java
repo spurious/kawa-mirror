@@ -115,7 +115,7 @@ implements Consumer, PositionConsumer, Consumable
   /** Followed by 2 chars that provide an index into objects. */
   static final char POSITION_REF_FOLLOWS = 0xF10E;
 
-  /** A position triple referenceing som eother "nodes".
+  /** A position triple referenceing some other "nodes".
    * Followed by index of squence (2 chars), ipos (2 chars), and
    * index of xpos or -1 if xpos==null (2 chars). */
   static final char POSITION_TRIPLE_FOLLOWS = 0xF10F;

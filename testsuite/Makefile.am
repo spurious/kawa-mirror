@@ -9,10 +9,13 @@ KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 if ENABLE_SERVLET
 SERVLET_TESTS = check-HelloCgiS check-HelloCgiK check-HelloCgiX
 endif
-
+if WITH_SAX2
+SAX2_TESTS = check-MySAXApp
+endif
 all:
 
-check: check2-no-full-tailcalls check1 check2-full-tailcalls $(SERVLET_TESTS)
+check: check2-no-full-tailcalls check1 check2-full-tailcalls \
+  $(SERVLET_TESTS) $(SAX2_TESTS)
 
 check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
@@ -20,7 +23,7 @@ check2-no-full-tailcalls:
 check2-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--full-tailcalls
 
-check1:  check-num check-format check-ppfile scribble.class
+check1:  check-num check-arr check-format check-ppfile scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
@@ -35,6 +38,9 @@ check-scm: testing.zip
 
 check-num: testing.zip
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
+
+check-arr: testing.zip
+	$(KAWATEST) -f "$(srcdir)/arr-test.scm" -e '(test-report)'
 
 check-misc: testing.zip
 	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
@@ -118,6 +124,16 @@ check-HelloCgiX: HelloCgiX.class HelloCgiX
 	  then echo '# HelloCgiX test passes'; \
 	  else echo FAIL HelloCgiX test; fi
 
+MySAXApp.class: $(srcdir)/MySAXApp.java
+	CLASSPATH=..:. $(JAVAC) -g $(srcdir)/MySAXApp.java -d .
+
+check-MySAXApp: MySAXApp.class
+	CLASSPATH=..:. $(JAVA) -Dorg.xml.sax.driver=gnu.kawa.sax.KawaXMLReader\
+	  MySAXApp ../gnu/xquery/testsuite/reviews.xml > tmp.out
+	@if diff -b $(srcdir)/MySAXApp.expected tmp.out; \
+	  then echo '# MySAXApp test passes'; \
+	  else echo FAIL MySAXApp test; fi
+
 MyFunc.class MyModule.class: $(srcdir)/MyFunc.java $(srcdir)/MyModule.java
 	CLASSPATH=..:. $(JAVAC) -g -d . $?
 
@@ -129,9 +145,10 @@ check-scribble: scribble.class
 
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
 EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  classes1.scm classes2.scm SimpleB.java obj-test.scm \
+  classes1.scm classes2.scm SimpleB.java obj-test.scm arr-test.scm \
   MyFunc.java MyModule.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm \
   module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
   ppfile.out scribble.html.in \
+  MySAXApp.java MySAXApp.expected \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected

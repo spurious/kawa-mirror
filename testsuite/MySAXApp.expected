@@ -1,0 +1,54 @@
+Start document
+Start element: reviews
+Characters:    "\n"
+Start element: entry
+Characters:    "\n"
+Start element: title
+Characters:    "Data on the Web"
+End element: title
+Characters:    "\n"
+Start element: price
+Characters:    "34.95"
+End element: price
+Characters:    "\n"
+Start element: review
+Characters:    "\nA very good discussion of semi-structured database\n               systems and XML.\n        "
+End element: review
+Characters:    "\n"
+End element: entry
+Characters:    "\n"
+Start element: entry
+Characters:    "\n"
+Start element: title
+Characters:    "Advanced Programming in the Unix environment"
+End element: title
+Characters:    "\n"
+Start element: price
+Characters:    "65.95"
+End element: price
+Characters:    "\n"
+Start element: review
+Characters:    "\nA clear and detailed discussion of UNIX programming.\n        "
+End element: review
+Characters:    "\n"
+End element: entry
+Characters:    "\n"
+Start element: entry
+Characters:    "\n"
+Start element: title
+Characters:    "TCP/IP Illustrated"
+End element: title
+Characters:    "\n"
+Start element: price
+Characters:    "65.95"
+End element: price
+Characters:    "\n"
+Start element: review
+Characters:    "\nOne of the best books on TCP/IP.\n        "
+End element: review
+Characters:    "\n"
+End element: entry
+Characters:    "\n"
+End element: reviews
+Characters:    "\n"
+End document

@@ -1,3 +1,11 @@
+2002-06-11  Per Bothner  <per@bothner.com>
+
+	* MySAXApp.java:  New SAX2 example proram, taken from SAX web site.
+	* MySAXApp.expected:  Expected output from MySAXApp.java.
+	* arr-test.scm:  New test-suite for SRFI-25, originally written by
+	Jussi Piitulainen <jpiitula@ling.helsinki.fi>.
+	* Makefile.am:  Add rules for new tests.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  New regression test.

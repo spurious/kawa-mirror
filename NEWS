@@ -1,3 +1,14 @@
+New section in manual / web page for projects using Kawa.
+
+The record feasture (make-record-type etc) how handles "funny" type
+and fields names that need to be "mangled" to Java names.
+
+Re-did implementation of define-alias.  For example, you can
+define type-aliases: (define-alias <marker> <gnu.jemacs.buffer.Marker>)
+and then use <marker> instead of <gnu.jemacs.buffer.Marker>.
+
+(field ARRAY 'length) now works.
+
 Changes from Kawa 1.6.64 to 1.6.66
 ==================================
 Added documentation to the manual for Homogeneous numeric vector datatypes

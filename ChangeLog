@@ -1,3 +1,44 @@
+2000-04-17  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Record.java (getFieldFields):  Removed two methods.
+	(equals):  Re-write to not use getFieldFields.
+
+	* kawa/standard/Scheme.java (getNamedType):  Add <abstract-string>.
+
+2000-04-12  Per Bothner  <per@bothner.com>
+
+	* kawa/Telnet.java:  Merge contents of TelnetConnection.java.
+	Implement Runnable instead of extending Thread.
+	Make some constants (such as ECHO, DONT, etc) public.
+	* kawa/TelnetConnection.java:  Removed.
+	* kawa/TelnetInputStream.java:  Update accordingly.
+	* kawa/TelnetOutputStream.java:  Likewise.
+	* kawa/repl.java:  Likewise.
+	* kawa/Makefile.am (java_JAVA):  Remove TelnetConnection.java.
+	
+	* kawa/lang/GetFieldProc.java:  Use gnu.bytecode.Field (now with
+	sourceName and reflection cache) instead of java.lang.reflect.Field.
+	* kawa/lang/SetFieldProc.java:  Likewise.
+	* kawa/lang/RecordConstructor.java:  Likewise.
+	* kawa/lang/Record.java (toString):  Likewise use extended Field.
+	(makeRecordType):  Handle names that need to be mangled.
+
+	* kawa/standard/location.java (rewrite):  If ReferenceExp, return it.
+	* kawa/standard/define_alias.java (scanForDefinitions):  Put
+	Declaration in pushed form.  Call Declarations's setAlias.
+	(rewrite):  Don't create IndirectConstraint.
+
+	* kawa/standard/Scheme.java (Scheme):  Initialize
+	Interpreter.defaultInterpreter to this Scheme.
+
+	* kawa/standard/number2string.java (apply, apply):  Create FString.
+
+	* kawa/standard/Scheme.java (demangleName):  New static method.
+
+	* kawa/standard/Scheme.java (getTypeValue):  Follow aliases.
+	(getNamedType):  Remove emacs type aliases.  (Now in emacs.scm.)
+	* kawa/standard/prim_method.java (exp2Type):  Use Scheme.getTypeValue.
+
 2000-03-22  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.64.

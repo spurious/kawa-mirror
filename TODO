@@ -1,12 +1,15 @@
 JEmacs:
 * clean up function-binding hacks
 * lambda bindings need to be made fluid.
+* vertical-motion
 
 compile-file should generate .jar, not .zip.
 Should perhaps take multiple file names.
 Update manual to removing .zip references.
 
 Binding for imported unknown names should not be static!
+
+(this) needs to be more general/robust.  What about 'super' ?
 
 Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).

@@ -75,7 +75,7 @@ public class FVector extends Sequence implements Printable, Compilable
   {
     if (scmVectorType == null)
       {
-	scmVectorType = ClassType.make("kawa.lang.Vector");
+	scmVectorType = ClassType.make("gnu.kawa.util.FVector");
 	initVectorMethod
 	  = scmVectorType.addMethod ("<init>", comp.applyNargs,
 				      Type.void_type, Access.PUBLIC);

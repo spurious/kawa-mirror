@@ -1,3 +1,7 @@
+2000-02-19  Per Bothner  <per@bothner.com>
+
+	* FVector.java (makeLiteral):  Update unqualified package name.
+
 2000-01-24  Per Bothner  <per@bothner.com>
 
 	* FVector.java (setAll):  New method.

@@ -305,16 +305,6 @@ public class Compilation
       : typeApplyMethodProc;
   }
 
-  public final ClassType getModuleSuperType(ModuleExp module)
-  {
-    ClassType sup = module.getSuperType();
-    return (sup != null ? sup
-	    : usingCPStyle() ? typeCallFrame
-	    : generateApplet ? typeApplet
-	    : generateServlet ? typeServlet
-	    : typeModuleBody);
-  }
-
   /** Emit code to "evaluate" a compile-time constant.
    * This is the normal external interface.
    * @param value the value to be compiled
@@ -936,19 +926,28 @@ public class Compilation
     new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
 
-  ClassType allocClass (ModuleExp module)
-  {
-    String name = module.getJavaName();
-    name = generateClassName(name);
-    return addClass(module, new ClassType(name));
-  }
-
   ClassType addClass (ModuleExp module, ClassType type)
   {
     ClassType[] interfaces = module.getInterfaces();
     if (interfaces != null)
       type.setInterfaces(interfaces);
-    type.setSuper(getModuleSuperType(module));
+    ClassType sup = module.getSuperType();
+    if (sup == null)
+      {
+	if (usingCPStyle())
+	  sup = typeCallFrame;
+	else if (generateApplet)
+	  sup = typeApplet;
+	else if (generateServlet)
+	  sup = typeServlet;
+	else
+	  {
+	    sup = typeModuleBody;
+	    if (! module.isStatic() && ! generateMain && ! immediate)
+	      type.addInterface(typeRunnable);
+	  }
+      }
+    type.setSuper(sup);
 
     module.type = type;
     addClass(type);
@@ -1412,8 +1411,12 @@ public class Compilation
     String name;
     ClassType new_class = module.type;
     if (new_class == typeProcedure)
-      new_class = allocClass(module);
+      {
+	name = generateClassName(module.getJavaName());
+	new_class = addClass(module, new ClassType(name));
+      }
     curClass = new_class;
+
 
     String filename = module.getFile();
     module.type = new_class;
@@ -1519,6 +1522,15 @@ public class Compilation
       }
     */
 
+    staticModule = module.isStatic();
+
+    if (curClass == mainClass && staticModule)
+      {
+	generateConstructor (module);
+	instanceField = curClass.addField("$instance", curClass,
+					  Access.STATIC|Access.FINAL);
+      }
+
     module.allocParameters(this);
     module.enterFunction(this);
     if (usingCPStyle())
@@ -1554,7 +1566,6 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    staticModule = module.isStatic();
     if (curClass == mainClass
 	&& (staticModule || clinitChain != null
 	    || litTable.literalsChain != null
@@ -1562,12 +1573,6 @@ public class Compilation
       {
 	Method save_method = method;
 
-	if (module.isStatic())
-	  {
-	    generateConstructor (module);
-	    instanceField = curClass.addField("$instance", curClass,
-					      Access.STATIC|Access.FINAL);
-	  }
 	startClassInit();
 	code = getCode();
 	if (staticModule)

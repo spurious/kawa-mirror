@@ -1,3 +1,11 @@
+2003-10-09  Per Bothner  <per@bothner.com>
+
+	* ModuleBody.java:  No longer implement Runnable.
+	* Compilation.java (getModuleSuperType):  Inline into addClass.
+	(addClass):  Add Runnable as implemented interface if non-static.
+	(allocClass):  Inline into addClass.
+	(addClass):  Set instanceField earlier since used by ProcInitializer.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* Declaration (makeField):  If name is a Symbol for an indirect

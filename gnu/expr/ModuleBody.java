@@ -11,7 +11,7 @@ import gnu.kawa.reflect.ClassMemberConstraint;
  * faster virtual method calls instead of slower interface calls).
  */
 
-public abstract class ModuleBody extends CpsProcedure implements Runnable
+public abstract class ModuleBody extends CpsProcedure
 {
   public void apply (CallContext stack)
   {

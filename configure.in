@@ -16,6 +16,9 @@ if test $enable_kawa_frontend = yes ; then
   kawa_bin=kawa
 fi
 
+AC_ARG_WITH(swing,
+  [  --with-swing  Assume Swing (Java Foundation Classes) is available])
+
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
@@ -27,6 +30,12 @@ AC_SUBST(kawa_bin)
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
 
+case ${with_swing} in
+  yes) extra_java='$(java_SWING)' ;;
+  *) extra_java='' ;;
+esac
+  
+AC_SUBST(extra_java)
 AC_SUBST(TOP_BUILDDIR)
 AC_SUBST(CC)
 AC_SUBST(CFLAGS)
@@ -35,6 +44,6 @@ AC_SUBST(VERSION)
 AC_SUBST(SHELL)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile gnu/elisp/Makefile
+  gnu/ecmascript/Makefile gnu/elisp/Makefile gnu/emacs/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile)

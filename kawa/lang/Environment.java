@@ -35,7 +35,6 @@ public class Environment // extends [almost] java.util.Dictionary
 
   public static Environment user ()
   {
-    // transitional hack FIXME
     return kawa.standard.Scheme.curEnvironment ();
   }
 
@@ -54,18 +53,27 @@ public class Environment // extends [almost] java.util.Dictionary
     user().define (name, new_value);
   }
 
-
-  static Environment cur;
-
-  public static Environment current ()
+  /**
+    * @deprecated
+    */
+  public static Environment current () { return getCurrent(); }
+  public static Environment getCurrent ()
   {
-    // FIXME - this should look at the current thread - somethink like:
-    /*
-      Thread thread = Thread.currentThread ();
-      if (thread instanceof Future)
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
       return ((Future)thread).environment;
-     */
-    return cur == null ? user () : cur;
+    return user();
+  }
+
+  public static void setCurrent (Environment env)
+  {
+    Thread thread = Thread.currentThread ();
+    if (thread instanceof Future)
+      {
+	((Future)thread).environment = env;
+      }
+    else
+      kawa.standard.Scheme.setEnvironment (env);
   }
 
   public Environment ()

@@ -269,18 +269,10 @@ public class LambdaExp extends ScopeExp
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
       }
-    Variable thisVar = firstVar();
-    if (thisVar.getName() == "this")
-      thisVar.setType(new_class);
-    else
-       throw new Error("internal error - 'this' is not first arg");
     code.emitNew(new_class);
     code.emitDup(new_class);
     if (staticLink != null)
-      {
-	Declaration frame = outerLambda().heapFrame;
-	comp.method.compile_push_value (frame);
-      }
+      code.emitLoad(outerLambda().heapFrame);
     comp.method.compile_invoke_special (new_class.constructor);
   }
 
@@ -294,7 +286,7 @@ public class LambdaExp extends ScopeExp
 				   Type.void_type, Access.PUBLIC);
     setLiterals_method.init_param_slots ();
     CodeAttr code = setLiterals_method.getCode();
-    setLiterals_method.compile_push_value(code.getArg(1));
+    code.emitLoad(code.getArg(1));
     code.emitPutStatic(comp.literalsField);
     code.emitReturn();
   }
@@ -320,11 +312,21 @@ public class LambdaExp extends ScopeExp
 	  }
 
 	/* DEBUGGING:
-	ZipArchive zar = new ZipArchive ("Foo.zip", "rw");
+	java.io.FileOutputStream zfout = new java.io.FileOutputStream("Foo.zip");
+	java.util.zip.ZipOutputStream zout = new java.util.zip.ZipOutputStream(zfout);
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-	  zar.append (classNames[iClass].replace ('.', '/') + ".class",
-	              classes[iClass]);
-	zar.close ();
+	  {
+	    String clname = classNames[iClass].replace ('.', '/') + ".class";
+	    java.util.zip.ZipEntry zent = new java.util.zip.ZipEntry (clname);
+	    zent.setSize(classes[iClass].length);
+	    java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+	    crc.update(classes[iClass]);
+	    zent.setCrc(crc.getValue());
+	    zent.setMethod(java.util.zip.ZipEntry.STORED);
+	    zout.putNextEntry(zent);
+	    zout.write(classes[iClass]);
+	  }
+	zout.close ();
 	*/
 	/* DEBUGGING:
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
@@ -357,7 +359,8 @@ public class LambdaExp extends ScopeExp
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError ("I/O error in lambda eval");
+    ex.printStackTrace(OutPort.errDefault());
+	throw new GenericError ("I/O error in lambda eval: "+ex);
       }
     catch (ClassNotFoundException ex)
       {

@@ -428,7 +428,7 @@ public class Compilation
       {
 	constructor_method.compile_push_this ();
 	Variable staticLinkArg = code.getArg(1);
-	constructor_method.compile_push_value (staticLinkArg);
+	code.emitLoad(staticLinkArg);
 	code.emitPutField(lexp.staticLinkField);
       }
 
@@ -462,7 +462,14 @@ public class Compilation
     int i = 0;
     method.initCode();
     code = getCode();
-    for (Variable var = lexp.firstVar ();  var != null;  var = var.nextVar ())
+
+    Variable var = lexp.firstVar();
+    if (var.getName() == "this")
+      var.setType(new_class);
+    else
+       throw new Error("internal error - 'this' is not first arg");
+
+    for ( ;  var != null;  var = var.nextVar ())
       {
 	if (! (var instanceof Declaration) || ! var.isParameter ())
 	  continue;
@@ -528,7 +535,7 @@ public class Compilation
     int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
     int opt_args = lexp.defaultArgs == null ? 0
       : lexp.defaultArgs.length - key_args;
-    for (Variable var = lexp.firstVar ();  var != null; var = var.nextVar ())
+    for (var = lexp.firstVar ();  var != null; var = var.nextVar ())
       {
 	if (var.isParameter () && ! var.isArtificial ())
 	  {
@@ -549,21 +556,21 @@ public class Compilation
 		if (argsArray == null)
 		  {
 		    // Simple case:  Incoming register is in incomingMap[i]:
-		    method.compile_push_value (incomingMap[i]);
+		    code.emitLoad(incomingMap[i]);
 		  }
 		else if (i < lexp.min_args)
 		  { // This is a required parameter, in argsArray[i].
-		    method.compile_push_value (argsArray);
+		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
 		    method.compile_array_load (scmObjectType);
 		  }
 		else if (i < lexp.min_args + opt_args)
 		  { // An optional parameter
 		    code.emitPushInt(i);
-		    method.compile_push_value(argsArray);
+		    code.emitLoad(argsArray);
 		    code.emitArrayLength();
 		    method.compile_ifi_lt();
-		    method.compile_push_value(argsArray);
+		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
                     method.compile_array_load(scmObjectType);
 		    code.emitElse();
@@ -574,7 +581,7 @@ public class Compilation
 		  {
 		    // This is the "rest" parameter (i.e. following a "."):
 		    // Convert argsArray[i .. ] to a list.
-		    method.compile_push_value(argsArray);
+		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
 		    method.compile_invoke_static(makeListMethod);
 		  }
@@ -591,7 +598,7 @@ public class Compilation
 						      argts, scmObjectType,
 						      Access.PUBLIC|Access.STATIC);
 		      }
-		    method.compile_push_value(argsArray);
+		    code.emitLoad(argsArray);
 		    code.emitPushInt(lexp.min_args + opt_args);
 		    compileConstant(lexp.keywords[key_i++]);
 		    method.compile_invoke_static(searchForKeywordMethod);

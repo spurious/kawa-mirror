@@ -336,7 +336,7 @@ public class Translator extends Compilation
                 || (separate && decl.isProcedureDecl()))
               decl = null;
           }
-        else if (! immediate && value instanceof Named)
+        else if (value instanceof Named)
           {
             if (value instanceof AutoloadProcedure)
               {

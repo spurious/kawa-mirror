@@ -1,3 +1,8 @@
+2003-11-10  Per Bothner  <per@bothner.com>
+
+	* testing.scm (report-fail):  Only use string-append if
+	fail-expected is a string.
+
 2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* misc-test.scm:  Added string-append/shared tests

@@ -24,7 +24,7 @@
 ;;
 ;; test-report:  Called at end to print a summary.
 ;;
-;; fail-unexpected:  If non-null, if means the following test is
+;; fail-expected:  If non-false, if means the following test is
 ;; expected to fail.  The actual value should be string explaining
 ;; the failure.  For example:
 ;; (set! fail-expected "sqrt of negative number not supported")
@@ -96,8 +96,11 @@
   (newline port))
 
 (define (report-fail port fun args res expect)
-  (display (if fail-expected (string-append "XFAIL (" fail-expected "): ")
-	       "FAIL: ") port)
+  (display (cond ((string? fail-expected)
+		  (string-append "XFAIL (" fail-expected "): "))
+		 (fail-expected "XFAIL: ")
+		 (else "FAIL: "))
+	   port)
   (write (cons fun args) port)
   (display "  ==> " port)
   (write res port)

@@ -1,3 +1,7 @@
+1999-04-22  Per Bothner  <bothner@cygnus.com>
+
+	* obj-test.scm:  Add two more for tests for object - with fields.
+
 1999-04-11  Per Bothner  <bothner@cygnus.com>
 
 	* obj-test.scm:  A test for object form needing static link.

@@ -34,7 +34,7 @@ public class CompileFile
   public static final Compilation read (InPort port, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    return Interpreter.getInterpreter().parse(port, messages, 0);
+    return Language.getDefaultLanguage().parse(port, messages, 0);
   }
 
   /** Compile a Scheme source file to one or more .class file.

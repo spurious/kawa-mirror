@@ -5,6 +5,7 @@
 	* kawa/GuiConsole.java: Likewise.
 	* kawa/TelnetRepl.java: Likewise.
 	* kawa/lang/Lambda.java: Likewise.
+	* kawa/lang/CompileFile.java: Likewise.
 	* kawa/standard/Scheme.java: Likewise.
 	* kawa/standard/define_autoload.java: Likewise.
 	* kawa/standard/define_syntax.java: Likewise.

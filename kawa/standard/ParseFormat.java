@@ -90,7 +90,6 @@ public class ParseFormat extends Procedure1
 	  }
 
 	int width = -1;
-System.err.println("Handle magic");
 	digit = Character.digit((char) ch, 10);
 	if (digit >= 0)
 	  {
@@ -161,7 +160,6 @@ System.err.println("Handle magic");
       }
     // System.err.println("format: "+fbuf.toString());
     int fcount = formats.size();
-System.err.println("fcount:"+fcount);
     if (fcount == 1)
       {
 	Object f = formats.elementAt(0);

@@ -533,8 +533,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Class procClass;
     if (pproc instanceof ModuleMethod)
       procClass = ((ModuleMethod) pproc).module.getClass();
-    else if (pproc instanceof ApplyMethodProc)
-      procClass = ((ApplyMethodProc) pproc).module.getClass();
     else if (pproc instanceof CpsMethodProc)
       procClass = ((CpsMethodProc) pproc).module.getClass();
     else

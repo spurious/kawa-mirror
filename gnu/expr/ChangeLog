@@ -1,5 +1,19 @@
 2004-08-03  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (moduleClass):  New field.
+	(typeApplyMethodProc, typeApplyMethodContainer):  Remove fields.
+	(getMethodProcType):  Never return typeApplyMethodProc.
+	(compile):  If mainClass doesn't extend ModuleBody,
+	allocate helper class moduleClass.
+	Implement Runnable independent of super class.
+	(generateApplyMethods):  We never generate ApplyMethodContainer,
+	but we may add methoods to moduleClass instead.
+	(addClass):  $instance variable is now generated in ProcInitializer.
+	If we do have a helper moduleClass, we do have to generate "run".
+	* ProcInitializer.java (emitLoadModuleMethod):  Allocate moduleClass
+	here.  May need to add a $main field to reference mainClass.
+	* PrimProcedure.java:  Don't need to handle ApplyMethodProc.
+
 	* ModuleExp.java (evalModule):  Don't default module to static.
 
 	* ModuleBody.java (run()):  Use existing VoidConsumer instance.

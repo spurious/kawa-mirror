@@ -19,6 +19,8 @@ public class Compilation
 
   public ClassType curClass;
   public ClassType mainClass;
+  /** Generated class that extends ModuleBody.  Normally same as mainClass. */
+  public ClassType moduleClass;
 
   public LambdaExp curLambda;
   public ModuleExp mainLambda;
@@ -26,6 +28,7 @@ public class Compilation
 
   /** Contains "$instance" if the module is static; otherwise null. */
   Variable moduleInstanceVar;
+  Field moduleInstanceMainField;
 
   /** If true, minimize the number of classes generated.
    * Do this even if it makes things a little slower. */
@@ -255,10 +258,6 @@ public class Compilation
 
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod", typeProcedureN);
-  public static ClassType typeApplyMethodProc
-  = ClassType.make("gnu.mapping.ApplyMethodProc", typeProcedureN);
-  public static ClassType typeApplyMethodContainer
-  = ClassType.make("gnu.mapping.ApplyMethodContainer");
 
   /* Classes, fields, and methods used wgen usingCPStyle". */
   public static ClassType typeCallContext
@@ -322,8 +321,7 @@ public class Compilation
   {
     return defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
       ? typeCpsMethodProc
-      : modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
-      : typeApplyMethodProc;
+      : typeModuleMethod;
   }
 
   /** Emit code to "evaluate" a compile-time constant.
@@ -893,6 +891,15 @@ public class Compilation
       }
 
     mainClass = addClass(lexp, mainClass);
+    if (mainClass.getSuperclass().isSubtype(typeModuleBody))
+      moduleClass = mainClass;
+    else
+      {
+	moduleClass = new ClassType(generateClassName("frame"));
+	moduleClass.setSuper(Compilation.typeModuleBody);
+	addClass(moduleClass);
+	generateConstructor(moduleClass, lexp);
+      }
     litTable = new LitTable(this);
     try
       {
@@ -1043,12 +1050,10 @@ public class Compilation
 	else if (generateServlet)
 	  sup = typeServlet;
 	else
-	  {
-	    sup = typeModuleBody;
-	    if (! module.isStatic() && ! generateMain && ! immediate)
-	      type.addInterface(typeRunnable);
-	  }
+	  sup = typeModuleBody;
       }
+    if (! module.isStatic() && ! generateMain && ! immediate)
+      type.addInterface(typeRunnable);
     type.setSuper(sup);
 
     module.type = type;
@@ -1198,13 +1203,11 @@ public class Compilation
       return;
     ClassType save_class = curClass;
     curClass = lexp.getHeapFrameType();
-    boolean generateApplyMethodContainer
-      = ! (curClass.getSuperclass().isSubtype(typeProcedure));
     ClassType procType = getMethodProcType(curClass);
     if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
       curClass.addInterface(typeCpsMethodContainer);
-    else if (generateApplyMethodContainer)
-      curClass.addInterface(typeApplyMethodContainer);
+    else if (! (curClass.getSuperclass().isSubtype(typeModuleBody)))
+      curClass = moduleClass;
     Method save_method = method;
     CodeAttr code = null;
     for (int i = defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
@@ -1249,7 +1252,7 @@ public class Compilation
 		  skipThisProc = true;
 		methodIndex = numMethods-1;
 	      }
-	    if (skipThisProc && ! generateApplyMethodContainer)
+	    if (skipThisProc)
 	      continue;
 	    if (! needThisApply)
 	      {
@@ -1285,8 +1288,6 @@ public class Compilation
 
 		needThisApply = true;
 	      }
-	    if (skipThisProc && generateApplyMethodContainer)
-	      continue;
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
@@ -1327,7 +1328,11 @@ public class Compilation
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
 	    if (needsThis > 0)
-	      code.emitPushThis();
+	      {
+		code.emitPushThis();
+		if (curClass == moduleClass && mainClass != moduleClass)
+		  code.emitGetField(moduleInstanceMainField);
+	      }
 
 	    Declaration var = source.firstDecl();
 	    for (int k = 0; k < singleArgs;  k++)
@@ -1472,20 +1477,9 @@ public class Compilation
 	      {
 		int nargs = i > 4 ? 2 : i + 1;
 		nargs++;
-		for (int k = generateApplyMethodContainer ? 1 : 0;
-		     k < nargs;  k++)
+		for (int k = 0; k < nargs;  k++)
 		  code.emitLoad(code.getArg(k));
-		if (generateApplyMethodContainer)
-		  {
-		    mname = mname + "Default";
-		    Method defMethod
-		      = typeApplyMethodProc.getDeclaredMethod(mname, applyArgs);
-		    code.emitInvokeStatic(defMethod);
-		  }
-		else
-		  {
-		    code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
-		  }
+		code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
 	      }
 	    code.emitReturn();
 	    aswitch.finish(code);
@@ -1676,28 +1670,53 @@ public class Compilation
 	    afterLiterals = new Label(code);
 	    code.fixupChain(afterLiterals, startLiterals);
 	  }
-	Scope initScope = null;
-	if (staticModule)
-	  {
-	    initScope = code.pushScope();
-	    moduleInstanceVar = initScope.addVariable(code,
-						      curClass, "$instance");
-	    code.emitNew(curClass);
-	    code.emitDup(curClass);
-	    code.emitInvokeSpecial(curClass.constructor);
-	    code.emitStore(moduleInstanceVar);
-	  }
+	  
 	dumpInitializers(clinitChain);
 
-	if (staticModule && ! generateMain && ! immediate)
+	if (moduleInstanceVar != null)
 	  {
 	    code.emitLoad(moduleInstanceVar);
 	    code.emitInvokeStatic(getCallContextInstanceMethod);
 	    code.emitInvokeVirtual(apply_method);
 	  }
-	if (initScope != null)
-	  code.popScope();
 	code.emitReturn();
+
+	if (moduleClass != mainClass
+	    && ! staticModule && ! generateMain && ! immediate)
+	  {
+	    method = curClass.addMethod("run", Access.PUBLIC,
+					Type.typeArray0, Type.void_type);
+	    code = method.startCode();
+	    Variable ctxVar = code.addLocal(typeCallContext);
+	    Variable saveVar = code.addLocal(typeConsumer);
+	    code.emitInvokeStatic(getCallContextInstanceMethod);
+	    code.emitStore(ctxVar);
+	    Field consumerFld = typeCallContext.getDeclaredField("consumer");
+	    code.emitLoad(ctxVar);
+	    code.emitGetField(consumerFld);
+	    code.emitStore(saveVar);
+	    code.emitTryStart(true, Type.void_type);
+	    // ctx.consumer = VoidConsumer.instance:
+	    code.emitLoad(ctxVar);
+	    code.emitGetStatic(ClassType.make("gnu.lists.VoidConsumer")
+			       .getDeclaredField("instance"));
+	    code.emitPutField(consumerFld);
+	    // this.apply(ctx):
+	    code.emitPushThis();
+	    code.emitLoad(ctxVar);
+	    code.emitInvokeVirtual(save_method);
+	    code.emitLoad(ctxVar);
+	    code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("run", 0));
+	    code.emitTryEnd();
+	    code.emitFinallyStart();
+	    code.emitLoad(ctxVar);
+	    code.emitLoad(saveVar);
+	    code.emitPutField(consumerFld);
+	    code.emitFinallyEnd();
+	    code.emitTryCatchEnd();
+	    code.emitReturn();
+	  }
+
 	method = save_method;
       }
 

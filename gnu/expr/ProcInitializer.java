@@ -30,10 +30,34 @@ public class ProcInitializer extends Initializer
     code.emitNew(procClass);
     code.emitDup(1);
 
-    if (comp.method.getStaticFlag())
-      code.emitLoad(comp.moduleInstanceVar);
-    else
+    if (! (proc.getOwningLambda() instanceof ModuleExp)
+	|| (comp.moduleClass == comp.mainClass
+	    && ! comp.method.getStaticFlag()))
       code.emitPushThis();
+    else
+      {
+	if (comp.moduleInstanceVar == null)
+	  {
+	    comp.moduleInstanceVar
+	      = code.locals.current_scope.addVariable(code,
+						      comp.moduleClass,
+						      "$instance");
+	    code.emitNew(comp.moduleClass);
+	    code.emitDup(comp.moduleClass);
+	    code.emitInvokeSpecial(comp.moduleClass.constructor);
+	    if (comp.moduleClass != comp.mainClass
+		&& ! comp.mainLambda.isStatic())
+	      {
+		comp.moduleInstanceMainField = 
+		  comp.moduleClass.addField("$main", comp.mainClass, 0);
+		code.emitDup(comp.moduleClass);
+		code.emitPushThis();
+		code.emitPutField(comp.moduleInstanceMainField);
+	      }
+	    code.emitStore(comp.moduleInstanceVar);
+	  }
+	code.emitLoad(comp.moduleInstanceVar);
+      }
     code.emitPushInt(proc.getSelectorValue(comp));
     comp.compileConstant(proc.nameDecl != null ? proc.nameDecl.getSymbol()
 			 : proc.getName(),

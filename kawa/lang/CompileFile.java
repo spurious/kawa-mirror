@@ -114,10 +114,10 @@ public class CompileFile extends Procedure2
 	  topname = prefix + short_name;
       }
     Translator tr = new Translator (Environment.user());
-    LambdaExp lexp = read (inname, tr);
+    ModuleExp mexp = read (inname, tr);
     if (tr.errors > 0)
       return true;
-    Compilation comp = new Compilation (lexp, topname, prefix);
+    Compilation comp = new Compilation (mexp, topname, prefix);
     if (directory == null || directory.length () == 0)
       directory = "";
     else if (directory.charAt (directory.length () - 1) != '/')

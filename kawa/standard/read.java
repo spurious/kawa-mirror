@@ -22,7 +22,7 @@ public class read extends Procedure0or1 {
       {
 	ScmRead lexer = new ScmRead((InPort)arg1);
 	Object result = lexer.readObject((InPort)arg1);
-	SourceError errors = lexer.getErrors();
+	gnu.text.SourceError errors = lexer.getErrors();
 	if (errors != null)
 	  {
 	    lexer.checkErrors(null, 0);
@@ -30,7 +30,7 @@ public class read extends Procedure0or1 {
 	  }
 	return result;
       }
-    catch (SyntaxException e)
+    catch (gnu.text.SyntaxException e)
       {
 	throw new GenericError ("syntax error in read: " + e.toString ());
       }

@@ -206,12 +206,12 @@ let.java \
 letrec.java \
 begin.java \
 ifp.java \
-values_v.java \
-call_with_values.java \
+values_v.java call_with_values.java \
 make_quantity.java quantity2number.java quantity2unit.java \
 make_future.java sleep.java \
 try_catch.java try_finally.java \
 convert.java instance.java \
+ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java \
 Scheme.java \
 null_env.java \

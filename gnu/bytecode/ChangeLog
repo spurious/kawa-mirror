@@ -1,3 +1,12 @@
+1999-11-18  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getModifiers):  Update access_flags after calling
+	reflectClass.getModifiers().
+	* ConstantPool.java (addMethodRef):  Use getModifiers() to check
+	if class is interface.  (This calls getReflectClass if needed.)
+	* ObjectType.java (getReflectClass):  If Class.forName fails, and
+	EXISTING_CLASS flag is set, throw an exception.
+
 1999-11-15  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (flags):  New variable.

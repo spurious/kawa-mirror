@@ -273,7 +273,7 @@ public class ConstantPool
   {
     CpoolClass clas = addClass(method.classfile.this_name);
     int tag;
-    if ((method.getDeclaringClass().access_flags & Access.INTERFACE) == 0)
+    if ((method.getDeclaringClass().getModifiers() & Access.INTERFACE) == 0)
       tag = 10; // CONSTANT_Methodref
     else
       tag = 11; // CONSTANT_InterfaceMethodref

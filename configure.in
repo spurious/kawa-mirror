@@ -4,7 +4,7 @@ AC_INIT(kawa.java)
 jm_MAINTAINER_MODE
 
 PACKAGE=kawa
-VERSION=0.2
+VERSION=0.35
 AC_CONFIG_AUX_DIR(.)
 AC_ARG_PROGRAM
 AC_PROG_INSTALL
@@ -18,4 +18,4 @@ dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], cl
 
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
-AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile)
+AC_OUTPUT(Makefile codegen/Makefile kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile)

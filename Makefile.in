@@ -42,11 +42,13 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = codegen kawa
 
+SUFFIXES = .java .class
+
 JAVAC=javac -classpath .:$$CLASSPATH -d @TOP_BUILDDIR@
 
 javadir=$(prefix)/java
 
-OBJ = kawa.class
+OBJ = kawa.class kawac.class
 
 java_DATA=$(OBJ)
 
@@ -270,13 +272,16 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-.SUFFIXES : .java .class
+.java.class:
+	cd $(srcdir); $(JAVAC) $(<F)
 
-%.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+# This redundant rule is needed for some versions of make, but not GNU make.
+kawac.class:  $(srcdir)/kawac.java
+	cd $(srcdir); $(JAVAC) kawac.java
 
-all: $(OBJ)
+all-recursive:  kawac.class
 .SUFFIXES:
+.SUFFIXES: $(SUFFIXES)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -4,22 +4,23 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = codegen kawa
 
-.SUFFIXES : .java .class
+SUFFIXES = .java .class
 
 JAVAC=javac -classpath .:$$CLASSPATH -d @TOP_BUILDDIR@
 
-%.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+.java.class:
+	cd $(srcdir); $(JAVAC) $(<F)
+
+# This redundant rule is needed for some versions of make, but not GNU make.
+kawac.class:  $(srcdir)/kawac.java
+	cd $(srcdir); $(JAVAC) kawac.java
 
 javadir=$(prefix)/java
 
-OBJ = kawa.class
+OBJ = kawa.class kawac.class
 
 java_DATA=$(OBJ)
 
 CLEANFILES=$(OBJ)
 
-all: $(OBJ)
-
-
-
+all-recursive:  kawac.class

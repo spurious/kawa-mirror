@@ -23,7 +23,8 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     int child = tlist.gotoChildrenStart(index);
     if (child < 0)
       return;
-    SeqPosition pos = SeqPosition.make(tlist, child << 1, null);
+    TreePosition pos = Focus.getCurrent();
+    pos.push(tlist, child << 1, null);
     for (;;)
       {
 	if (! getNamedChild(pos, type))
@@ -39,6 +40,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	  tlist.consumeRange(ichild, next, consumer);
 	pos.ipos = next << 1;
       }
+    pos.pop();
   }
 
   static final Class[] noClasses = {};

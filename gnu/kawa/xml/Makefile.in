@@ -168,15 +168,22 @@ java_sources = \
   WriteTo.java
 
 
+java_BUILT = \
+  Focus.java
+
+
 PACKAGE_FNAME = gnu-kawa-xml
 GCJ_INPUTS = $(java_Java)
+BUILT_SOURCES = $(java_BUILT)
+EXTRA_DIST = Focus.java.in
 subdir = gnu/kawa/xml
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 DIST_COMMON = ChangeLog Makefile.am Makefile.in
 SOURCES = $(java_sources) $(java_SCM)
 
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .java .class .scm .el .lisp
@@ -253,6 +260,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -331,6 +339,10 @@ elisp-classes.stamp: $(java_ELISP)
 	  $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
+
+Focus.java:  $(srcdir)/Focus.java.in
+	sed $(DONT_EDIT_SUBS) $(SED_REFERENCES_SUBS) \
+	  <$(srcdir)/Focus.java.in >Focus.java
 
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

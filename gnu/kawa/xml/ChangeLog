@@ -1,3 +1,10 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* Focus.java.in:  New class, moved from gnu/xquery/util.
+	* Makefile.am (Focus.java):  New rule.
+
+	* NamedChildren.java (namedChildren):  Use TreePosition push/pop.
+
 2002-04-07  Per Bothner  <per@bothner.com>
 
 	* NamedAttributes.java:  Take single QName argument.

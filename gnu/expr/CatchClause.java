@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.OutPort;
 
 /** A "catch" clause of a "try-catch" form.
   */
@@ -33,9 +34,9 @@ public class CatchClause extends ScopeExp
     code.popScope ();
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort ps)
   {
-    ps.print("(%catch ? ");
+    ps.print("(Catch ? ");
     body.print(ps);
     ps.print(")");
   }

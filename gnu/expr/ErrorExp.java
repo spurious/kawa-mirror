@@ -20,11 +20,12 @@ public class ErrorExp extends Expression
     throw new RuntimeException ("evaluated erroneous expression: " + message);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print ("(%error ");
-    ps.print (message);
-    ps.print (")");
+    out.startLogicalBlock("(Error", false, ")");
+    out.writeSpaceLinear();
+    out.print(message);
+    out.endLogicalBlock(")");
   }
 
   public void compile (Compilation comp, Target target)

@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -270,12 +270,13 @@ public class SetExp extends Expression
     new_value = (Expression) new_value.walk(walker);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print(isDefining () ? "(#%define " : "(#%set! ");
-    SFormat.print (name, ps);
-    ps.print(" ");
-    new_value.print (ps);
-    ps.print(")");
+    out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);
+    out.writeSpaceFill();
+    SFormat.print(name, out); // FIXME
+    out.writeSpaceLinear();
+    new_value.print(out);
+    out.endLogicalBlock(")");
   }
 }

@@ -59,9 +59,9 @@ public class SynchronizedExp extends Expression
       body = body.walk(walker);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort ps)
   {
-    ps.print("(#%synchronized ");
+    ps.print("(Synchronized ");
     object.print(ps);
     ps.print(" ");
     body.print(ps);

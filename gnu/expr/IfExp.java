@@ -1,3 +1,6 @@
+// Copyright (c) 2001  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -135,18 +138,18 @@ public class IfExp extends Expression
      else_clause = else_clause.walk(walker);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print("(#%if ");
-    test.print (ps);
-    ps.print(" ");
-    then_clause.print (ps);
+    out.startLogicalBlock("(If ", false, ")");
+    out.setIndentation(-2, false);
+    test.print(out);
+    out.writeSpaceLinear();
+    then_clause.print (out);
     if (else_clause != null)
       {
-	ps.print(" ");
-	else_clause.print (ps);
+	out.writeSpaceLinear();
+	else_clause.print (out);
       }
-    ps.print(")");
+    out.endLogicalBlock(")");
   }
-
 }

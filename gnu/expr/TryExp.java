@@ -94,9 +94,9 @@ public class TryExp extends Expression
       finally_clause = finally_clause.walk(walker);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort ps)
   {
-    ps.print("(%try ");
+    ps.print("(Try ");
     try_clause.print(ps);
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())

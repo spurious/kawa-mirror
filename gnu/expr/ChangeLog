@@ -1,3 +1,29 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (debugPrintFinalExpr):  New static field.
+	(<init>):  If debugPrintFinalExpr, print expression.
+	* ModuleExp.java (debugPrintExpr):  New static field.
+	(evalModule, compileToFiles):  If debugPrintExpr, print expression.
+
+	* Keyword.java:  Inherit from CpsProcedure.  A keyword FOO: sends a
+	beginGroup of "FOO" to a Consumer, like xml <FOO>...</FOO>.
+	
+	* ApplyExp.java (eval(Environment,CallContext)):  For proper tailcalls
+	don't call apply; leave that for the CallContext run method.
+
+	* Expression.java (print(OutPort)):  New abstract method.
+	(print(PrintWriter)):  Make final, and call new method.
+	* ApplyExp.java, BeginExp.java, BlockExp.java, CatchClause.java,
+	ErrorExp.java, ExitExp.java, IfExp.java, LambdaExp.java, LetExp.java,
+	ModuleExp.java, ObjectExp.java, QuoteExp.java, ReferenceExp.java,
+	SetExp.java, SynchronizedExp.java, TryExp.java (print):
+	Changed to take OutPort parameter, and to do pretty-printing.
+
+	* Interpreter.java (getFormat):  New abstract method.
+	(print):  Add default implementation using getFormat.
+
+	* ModuleBody.java (runAsMain):  Make sure OutPort.runCleanups is run.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (eval(Environment,CallContext)):  New method.

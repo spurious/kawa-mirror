@@ -90,16 +90,16 @@ public class BeginExp extends Expression
     exps = walker.walkExps(exps, length);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print("(#%begin");
+    out.startLogicalBlock("(Begin", ")", 2);
     int n = length;
     for (int i = 0; i < n; i++)
       { 
-	ps.print('\n');
-	exps[i].print (ps);
+	out.writeSpaceLinear();
+	exps[i].print(out);
       }
-    ps.print(")");
+    out.endLogicalBlock(")");
   }
 
   public gnu.bytecode.Type getType()

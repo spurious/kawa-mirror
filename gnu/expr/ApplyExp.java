@@ -53,7 +53,7 @@ public class ApplyExp extends Expression
     for (int i = 0; i < n; i++)
       vals[i] = args[i].eval (env);
     ctx.setArgsN(vals);
-    proc.apply(ctx);
+    ctx.proc = proc;
   }
 
   public static void compileToArray(Expression[] args, Compilation comp)
@@ -403,18 +403,19 @@ public class ApplyExp extends Expression
       args = walker.walkExps(args);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print("(#%apply ");
+    out.startLogicalBlock("(Apply", ")", 2);
     if (tailCall)
-      ps.print ("[tailcall] ");
-    func.print (ps);
+      out.print (" [tailcall]");
+    out.writeSpaceFill();
+    func.print(out);
     for (int i = 0; i < args.length; ++i)
       {
-	ps.print(" ");
-	args[i].print (ps);
+	out.writeSpaceLinear();
+	args[i].print(out);
       }
-    ps.print(")");
+    out.endLogicalBlock(")");
   }
 
   private static void popParams (CodeAttr code, LambdaExp lexp,

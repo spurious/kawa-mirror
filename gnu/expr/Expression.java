@@ -22,7 +22,18 @@ public abstract class Expression implements Printable
     ctx.writeValue(val);
   }
 
-  abstract public void print (java.io.PrintWriter ps);
+  public final void print (java.io.PrintWriter ps)
+  {
+    if (ps instanceof OutPort)
+      print((OutPort) ps);
+    else
+      {
+	OutPort out = new OutPort(ps);
+	print(out);
+	out.flush();
+      }
+  }
+  public abstract void print (OutPort ps);
 
   public abstract void compile (Compilation comp, Target target);
 

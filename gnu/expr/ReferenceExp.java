@@ -127,9 +127,9 @@ public class ReferenceExp extends Expression
     return walker.walkReferenceExp(this);
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort ps)
   {
-    ps.print("(#%ref/");
+    ps.print("(Ref/");
     ps.print(id);
     ps.print("/ ");
     SFormat.print (symbol, ps);

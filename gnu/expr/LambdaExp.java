@@ -1432,16 +1432,16 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  public void print (java.io.PrintWriter ps)
+  public void print (OutPort out)
   {
-    ps.print("(#%lambda/");
+    out.startLogicalBlock("(Lambda/", ")", 2);
     if (name != null)
       {
-	ps.print(name);
-	ps.print('/');
+	out.print(name);
+	out.print('/');
       }
-    ps.print(id);
-    ps.print("/ (");
+    out.print(id);
+    out.print("/ (");
     Special prevMode = null;
     int i = 0;
     int opt_i = 0;
@@ -1460,33 +1460,34 @@ public class LambdaExp extends ScopeExp
 	else
 	  mode = Special.key;
 	if (i > 0)
-	  ps.print(' ');
+	  out.print(' ');
 	if (mode != prevMode)
 	  {
-	    ps.print(mode);
-	    ps.print(' ');
+	    out.print(mode);
+	    out.print(' ');
 	  }
 	Expression defaultArg = null;
 	if (mode == Special.optional || mode == Special.key)
 	  defaultArg = defaultArgs[opt_i++];
 	if (defaultArg != null)
-	  ps.print('(');
-	ps.print(decl.getName());
+	  out.print('(');
+	out.print(decl.getName());
 	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
 	  {
-	    ps.print(' ');
-	    defaultArg.print(ps);
-	    ps.print(')');
+	    out.print(' ');
+	    defaultArg.print(out);
+	    out.print(')');
 	  }
 	i++;
 	prevMode = mode;
       }
-    ps.print(") ");
+    out.print(')');
+    out.writeSpaceLinear();
     if (body == null)
-      ps.print("<null body>");
+      out.print("<null body>");
     else
-      body.print (ps);
-    ps.print(")");
+      body.print(out);
+    out.endLogicalBlock(")");
   }
 
   public String toString()

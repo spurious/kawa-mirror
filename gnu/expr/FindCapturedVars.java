@@ -113,27 +113,37 @@ public class FindCapturedVars extends ExpWalker
 	// If init[i] is the magic QuoteExp.nullExp, and the real value
 	// is a LambdaExp or a QuoteExp, we're not going to get weird
 	// order-dependencies, and it is safe to transform it to a regular let.
+	// It's also necessary in the case of a LambdaExp if it shares
+	// a field with the declaration (see LambdaExp.allocFieldField),
+	// since assigning the nullExp can clobber the field after it has
+	// been initialized with a ModuleMethod.
 	Expression[] inits = exp.inits;
 	int len = inits.length;
-        BeginExp bexp = (BeginExp) exp.body;
-	Expression[] exps = bexp.exps;
-	if (bexp.length > len)
+	Expression[] exps = ((BeginExp) exp.body).exps;
+	int init_index = 0;
+	Declaration decl = exp.firstDecl();
+	for (int begin_index = 0;
+	     begin_index < exps.length && init_index < len;
+	     begin_index++)
 	  {
-	    int i = 0;
-	    Declaration decl = exp.firstDecl();
-	    for (; i < len; decl = decl.nextDecl(), i++)
+	    Expression st = exps[begin_index];
+	    if (st instanceof SetExp)
 	      {
-		if (inits[i] == QuoteExp.nullExp
-		    && exps[i] instanceof SetExp)
+		SetExp set = (SetExp) st;
+		if (set.binding == decl
+		    && inits[init_index] == QuoteExp.nullExp
+		    && set.isDefining())
 		  {
-		    SetExp set = (SetExp) exps[i];
-		    if ((set.new_value instanceof LambdaExp
-			 || set.new_value instanceof QuoteExp)
-			&& set.binding == decl)
+		    Expression new_value = set.new_value;
+		    if ((new_value instanceof QuoteExp
+			 || new_value instanceof LambdaExp)
+			&& decl.getValue() == new_value)
 		      {
-			inits[i] = set.new_value;
-			exps[i] = QuoteExp.voidExp;
+			inits[init_index] = new_value;
+			exps[begin_index] = QuoteExp.voidExp;
 		      }
+		    init_index++;
+		    decl = decl.nextDecl();
 		  }
 	      }
 	  }

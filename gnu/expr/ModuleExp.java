@@ -4,7 +4,7 @@ import gnu.bytecode.*;
 import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.text.*;
 import java.io.*;
-import gnu.kawa.reflect.ClassMemberLocation;
+import gnu.kawa.reflect.FieldLocation;
 
 /**
  * Class used to implement Scheme top-level environments.
@@ -214,15 +214,15 @@ public class ModuleExp extends LambdaExp
 		      continue;
 		    Field fld = decl.field;
 		    Location loc
-		      = new ClassMemberLocation(inst, fld.getDeclaringClass(),
-						fld.getName());
+                      = new FieldLocation(inst, fld.getDeclaringClass(),
+					  fld.getName());
 		    Symbol sym = dname instanceof Symbol ? (Symbol) dname
 		      : Symbol.make("", dname.toString().intern());
 		    Object property = comp.getInterpreter()
 		      .getEnvPropertyFor(decl);
 		    // Would it be better to check if fld is FINAL?
-		    // If it is, gets its value; other wise create
-		    // a ClassMemberLocation to access it?  FIXME.
+                    // If it is, gets its value; other wisecreate
+                    // a FieldLocation to access it?  FIXME.
 		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
 		      {
 			Expression dvalue = decl.getValue();
@@ -316,7 +316,7 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-	    if (! decl.getFlag(Declaration.IS_CONSTANT)
+            if ((! decl.getFlag(Declaration.IS_CONSTANT) && ! decl.isAlias())
 		|| value == QuoteExp.undefined_exp)
 	      value = null;
 	    decl.makeField(comp, value);

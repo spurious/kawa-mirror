@@ -153,12 +153,8 @@ public class require extends Syntax
     dofind.setLine(tr);
     ModuleExp mod = new ModuleExp();
     // Should skip if immediate.  FIXME
-    ClassType typeClassMemberLocation
-      = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
-    Method makeClassMemberLocation2
-      = typeClassMemberLocation.getDeclaredMethod("make", 2);
-    Method makeClassMemberLocation3
-      = typeClassMemberLocation.getDeclaredMethod("make", 3);
+    ClassType typeFieldLocation
+      = ClassType.make("gnu.kawa.reflect.FieldLocation");
     for (;;)
       {
 	Class rclass = t.getReflectClass();
@@ -204,7 +200,7 @@ public class require extends Syntax
 	      }
 	    catch (Exception ex)
 	      {
-		throw new WrappedException(ex);
+		throw WrappedException.wrapIfNeeded(ex);
 	      }
 	    Type ftype = fld.getType();
 	    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
@@ -263,29 +259,39 @@ public class require extends Syntax
 		adecl.setAlias(true);
 		adecl.setIndirectBinding(true);
 		Expression fexp;
+                ReferenceExp fref;
+                adecl.setType(typeFieldLocation);
 		if (immediate)
 		  {
-		    if (! isAlias)
-		      fvalue = new ClassMemberLocation(instance, t, fname);
-		    fexp = new QuoteExp(fvalue);
-		    adecl.setCanRead(true);
+                    if (isFinal && isStatic)
+                      {
+                        // An optimization.
+                        adecl.setType(fdecl.getType());
+                        adecl.setAlias(false);
+                        adecl.setIndirectBinding(isAlias);
+                      }
+                    else
+                      fvalue = new FieldLocation(instance, t, fname);
+                    fexp = new QuoteExp(fvalue);
+                    adecl.setCanRead(true);
+                    fref = null;
 		  }
 		else
 		  {
-		    ReferenceExp fref = new ReferenceExp(fdecl);
+		    fref = new ReferenceExp(fdecl);
+		    fref.context = decl;
 		    fref.setDontDereference(true);
 		    fexp = fref;
 		    adecl.setPrivate(true);
 		  }
+		if ((rfield.getModifiers() & Access.FINAL) != 0 && ! isAlias)
+		  {
+		    adecl.setFlag(Declaration.IS_CONSTANT);
+		  }
 		if (fdecl.isProcedureDecl())
 		  adecl.setProcedureDecl(true);
 		if (isStatic)
-		  {
-		    fdecl.setFlag(Declaration.STATIC_SPECIFIED);
-		    adecl.setFlag(Declaration.STATIC_SPECIFIED);
-		  }
-		else
-		  fdecl.base = decl;
+		  adecl.setFlag(Declaration.STATIC_SPECIFIED);
 		/*
 		if (fvalue instanceof gnu.mapping.Location)
 		  {
@@ -321,13 +327,10 @@ public class require extends Syntax
 		    SetExp sexp = new SetExp(adecl, fexp);
 		    sexp.setDefining(true);
 		    forms.addElement(sexp);
+                    if (! isStatic && fref != null)
+                      fref.setFlag(ReferenceExp.DEFER_DECL_BASE);
 		  }
 		adecl.noteValue(fexp);
-		adecl.setType(Compilation.typeLocation);
-		if ((rfield.getModifiers() & Access.FINAL) != 0)
-		  {
-		    adecl.setFlag(Declaration.IS_CONSTANT);
-		  }
 		adecl.setFlag(Declaration.IS_IMPORTED);
 		adecl.setSimple(false);
 		tr.push(adecl);  // Add to translation env.
@@ -398,49 +401,41 @@ public class require extends Syntax
     Type ftype = fld.getType();
     boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
     Type dtype = interp.getTypeFor(ftype.getReflectClass());
+    boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     Object fdname;
-    // FIXME if fvalue is ClassMemberLocation, and field is final,
+    // FIXME if fvalue is FieldLocation, and field is final,
     // get name from value of field.
     if (fvalue instanceof Named) // && ! isAlias
       fdname = ((Named) fvalue).getSymbol();
     else
       {
-	// FIXME move this demangleName
+	// FIXME move this to demangleName
 	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
 	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
 	fdname = Compilation.demangleName(fname, true).intern();
       }
     Declaration fdecl = new Declaration(fdname, dtype);
+    boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if (isAlias)
       fdecl.setIndirectBinding(true);
-    else if (ftype.isSubtype(Compilation.typeProcedure))
+    else if (isFinal && ftype.isSubtype(Compilation.typeProcedure))
       fdecl.setProcedureDecl(true);
-    if (isAlias)
-      fdecl.setAlias(true);
-    if ((fld.getModifiers() & Access.FINAL) != 0
-	&& ! (fvalue instanceof gnu.mapping.Location))
+    if (isStatic)
+      fdecl.setFlag(Declaration.STATIC_SPECIFIED);
+    if (isFinal && ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
-    else if ((fld.getModifiers() & Access.FINAL) != 0
-	&& (fvalue instanceof gnu.kawa.reflect.StaticFieldLocation))
-      {
-	Declaration rdecl
-	  = ((gnu.kawa.reflect.StaticFieldLocation) fvalue).getDeclaration();
-	fdecl.noteValue(new ReferenceExp(rdecl));
-      }
     else
       fdecl.noteValue(null);
     fdecl.setSimple(false);
     fdecl.field = fld;
     //if ((fld.getModifiers() & Access.FINAL) != 0)
     //  fdecl.setFlag(Declaration.IS_CONSTANT);
-    if (fvalue instanceof Macro)
-      fdecl.setSyntax();
     mod.addDeclaration(fdecl);
     if (fvalue instanceof Macro)
       {
+	fdecl.setSyntax();
 	Macro mac = (Macro) fvalue;
 	mac.setCapturedScope(mod);
-	//mac.instance = instance;
       }
     return fdecl;
   }

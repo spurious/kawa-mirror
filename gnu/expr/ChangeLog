@@ -1,3 +1,22 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp.java (context): New field.
+	(DEFER_DECL_BASE): New constant.	
+	(eval): "Optimize" if constant - needed for odule imports.
+	(compile): Replace body by call to Declaration's load method.
+	* Declaration.java (load): Generalize, take extra parameters.
+	Merge in functionality from ReferenceExp.compile.
+	(needsContext): New method.
+	(followAliases): Some simplification.  Now used much less.
+	(makeField): Simplify due to some clarifications.
+	* FindCapturedVars.java (capture(Declaration, Declaration)): New
+	method.  We need to be a little smarter about aliases.
+	(walkSetExp): Ignore if ignorable.
+	* FluidLetExp.java: Update for new load method from Declaration.
+	* ModuleExp.java (evalModule): Use new FieldLocation class.
+	(allocFields): Do pass value to makeField if isAlias().
+	* SetExp.java (compile):  If needed, emit setInstance call.
+
 2005-03-02  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): Field.setConstantValue now handles

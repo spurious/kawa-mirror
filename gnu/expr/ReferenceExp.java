@@ -16,9 +16,17 @@ public class ReferenceExp extends AccessExp
   /** Unique id number, to ease print-outs and debugging. */
   int id = ++counter;
 
-  private static int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
-  private static int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
-  public static int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
+  /** If binding has a non-static field and no base, use this instead of base.
+   *  This is used for aliases of imported module declarations. */
+  public Declaration context;
+
+  public static final int DONT_DEREFERENCE = NEXT_AVAIL_FLAG;
+  public static final int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
+  public static final int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
+  /** Used for a non-static FieldDeclaration used for import aliases.
+   * We want to allocate the FieldLocation at init time, but defer the
+   * instance pointer until the module body (run). */
+  public static final int DEFER_DECL_BASE = NEXT_AVAIL_FLAG << 3;
 
   /* If true, must have binding.isIndirectBinding().  Don't dereference it. */
   public final boolean getDontDereference()
@@ -54,7 +62,7 @@ public class ReferenceExp extends AccessExp
     this.binding = binding;
   }
 
-  public ReferenceExp (Declaration binding)
+  public ReferenceExp (Declaration binding) 
   {
     this.binding = binding;
     this.symbol = binding.getSymbol();
@@ -64,17 +72,30 @@ public class ReferenceExp extends AccessExp
   {
     if (binding != null)
       {
-        if (binding.field != null && binding.field.getStaticFlag())
+        // This isn't just an optimization; it's needed for module imports.
+        if (binding.value instanceof QuoteExp
+            && binding.value != QuoteExp.undefined_exp
+            && (! getDontDereference() || binding.isIndirectBinding()))
+          {
+            Object value = binding.getConstantValue();
+            if (binding.isIndirectBinding())
+              return ((gnu.mapping.Location) value).get();
+            return value;
+          }
+
+        if (binding.field != null && binding.field.getStaticFlag()
+            && (! getDontDereference() || binding.isIndirectBinding()))
           {
             try
               {
                 Object value = binding.field.getReflectField().get(null);
-                if (! (value instanceof Symbol))
-                  return value;
-                // otherwise not implemented!
+                if (binding.isIndirectBinding())
+                  return ((gnu.mapping.Location) value).get();
+                return value;
               }
             catch (Exception ex)
               {
+                throw WrappedException.wrapIfNeeded(ex);
               }
           }
         if ( ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
@@ -96,52 +117,7 @@ public class ReferenceExp extends AccessExp
 
   public void compile (Compilation comp, Target target)
   {
-    if (target instanceof IgnoreTarget)
-      return;
-    Type rtype = getType();
-    CodeAttr code = comp.getCode();
-    Declaration decl = Declaration.followAliases(binding);
-    if (! decl.isIndirectBinding() && getDontDereference())
-      {
-	if (decl.field == null)
-	  throw new Error("internal error: cannot take location of "+decl);
-	Method meth;
-	if (decl.field.getStaticFlag())
-	  {
-	    ClassType typeStaticFieldLocation
-	      = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
-	    meth = typeStaticFieldLocation.getDeclaredMethod("make", 2);
-	  }
-	else
-	  {
-	    ClassType typeClassMemberLocation
-	      = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
-	    meth = typeClassMemberLocation.getDeclaredMethod("make", 3);
-	    decl.base.load(comp);
-	  }
-	comp.compileConstant(decl.field.getDeclaringClass().getName());
-	comp.compileConstant(decl.field.getName());
-	code.emitInvokeStatic(meth);
-      }
-    else
-      {
-	decl.load(comp);
-	if (decl.isIndirectBinding() && ! getDontDereference())
-	  {
-	    code.emitInvokeVirtual(Compilation.getLocationMethod);
-	    rtype = Type.pointer_type;
-	  }
-	/*
-	else if (decl.isFluid() && decl.field == null)
-	  code.emitGetField(FluidLetExp.valueField);
-	*/
-      }
-    if (target instanceof SeriesTarget
-	&& decl.getFlag(Declaration.IS_SINGLE_VALUE))
-      // A kludge until we get a better type system.
-      ((SeriesTarget) target).compileFromStackSimple(comp, rtype);
-    else
-      target.compileFromStack(comp, rtype);
+    binding.load(context, flags, comp, target);
   }
 
   protected Expression walk (ExpWalker walker)

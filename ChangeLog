@@ -1,3 +1,12 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Change to use
+	FieldLocation.  Better handling of non-static modules and re-export.
+	Don't set 'base' of fdecl (since it might be shared); instead create
+	a ReferenceExp alias with a 'context'.
+	(makeDeclInModule): Various tweaks.
+	* kawa/lang/Translator.java (rewrite): Use FieldLocation.
+
 2005-03-03  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (kawaEnvironment): More precise type.

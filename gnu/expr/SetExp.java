@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2001, 2004  Per M.A. Bothner.
+// Copyright (c) 1999, 2001, 2004, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -141,13 +141,29 @@ public class SetExp extends AccessExp
       }
     else if (decl.context instanceof ModuleExp
 	     && (new_value instanceof QuoteExp
-		 || decl.getFlag(Declaration.IS_CONSTANT))
-	     && isDefining()
-	     && declValue != null)
+                 || (decl.getFlag(Declaration.IS_CONSTANT) || decl.isAlias()))
+             && isDefining()
+             && declValue != null)
       { // This is handled in ModuleExp's allocFields method.  But:
-	if (needValue)
-	  {
-	    decl.load(comp);
+        if (new_value instanceof ReferenceExp
+            && ((ReferenceExp) new_value).getFlag(ReferenceExp.DEFER_DECL_BASE)
+            && isDefining() && ! decl.ignorable())
+          {
+            Declaration context = ((ReferenceExp) new_value).context;
+            ClassType typeClassMemberLocation
+              = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
+            Method setInstance
+              = (typeClassMemberLocation
+                 .getDeclaredMethod("setInstance", 1));
+            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+                      comp, Target.pushObject);
+            context.load(null, 0, comp, Target.pushObject);
+            code.emitInvokeVirtual(setInstance);
+          }
+        // MAYBE do: setInstance here; FIXME
+        if (needValue)
+          {
+            decl.load(null, 0, comp, Target.pushObject);
 	    valuePushed = true;
 	  }
       }
@@ -159,7 +175,8 @@ public class SetExp extends AccessExp
 	  new_value.compile (comp, Target.Ignore);
 	else if (decl.isAlias() && isDefining())
 	  {
-	    decl.load(comp);
+            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+                      comp, Target.pushObject);
 	    ClassType locType
 	      = ClassType.make("gnu.mapping.IndirectableLocation");
 	    code.emitCheckcast(locType);
@@ -170,7 +187,8 @@ public class SetExp extends AccessExp
 	else if (decl.isIndirectBinding()
 		 && (isSetIfUnbound() || ! isDefining() || decl.isPublic()))
 	  {
-	    decl.load(comp);
+            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+                      comp, Target.pushObject);
 	    if (isSetIfUnbound())
 	      {
 		if (needValue)
@@ -204,7 +222,8 @@ public class SetExp extends AccessExp
 	  }
 	else if (decl.isFluid())
 	  {
-	    decl.load(comp);
+            decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+                      comp, Target.pushObject);
 	    new_value.compile(comp, Type.pointer_type);
 	    code.emitInvokeVirtual(Compilation.typeLocation
 				   .getDeclaredMethod("set", 1));

@@ -362,8 +362,27 @@ public class FindCapturedVars extends ExpWalker
 	      comp.error('w', "no declaration seen for "+exp.getName());
 	  }
       }
-    capture(Declaration.followAliases(decl));
+    capture(exp.context, decl);
     return exp;
+  }
+
+  void capture (Declaration containing, Declaration decl)
+  {
+    if (decl.isAlias() && decl.value instanceof ReferenceExp)
+      {
+	ReferenceExp rexp = (ReferenceExp) decl.value;
+	Declaration orig = rexp.binding;
+	if (orig != null
+	    && (containing == null || ! orig.needsContext()))
+	  {
+	    capture(rexp.context, orig);
+	    return;
+	  }
+      }
+    if (containing != null && decl.needsContext())
+      capture(containing);
+    else
+      capture(decl);
   }
 
   protected Expression walkThisExp (ThisExp exp)
@@ -381,7 +400,12 @@ public class FindCapturedVars extends ExpWalker
 	decl = allocUnboundDecl(exp.getSymbol(), exp.isFuncDef());
 	exp.binding = decl;
       }
-    capture(Declaration.followAliases(decl));
+    if (! decl.ignorable())
+      {
+	if (! exp.isDefining())
+	  decl = Declaration.followAliases(decl);
+	capture(decl);
+      }
     return super.walkSetExp(exp);
   }
 

@@ -39,7 +39,8 @@ public class FluidLetExp extends LetExp
     
     for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
-	decl.load(comp);
+	decl.load(null, ReferenceExp.DONT_DEREFERENCE,
+		  comp, Target.pushObject);
 	code.emitLoad(save[i]);
 	code.emitInvokeVirtual(Compilation.typeLocation
 			       .getDeclaredMethod("setRestore", 1));
@@ -59,7 +60,8 @@ public class FluidLetExp extends LetExp
     CodeAttr code = comp.getCode();
     save[i] = code.addLocal(Type.pointer_type);
     decl.allocateVariable(code);
-    decl.base.load(comp);
+    decl.base.load(null, ReferenceExp.DONT_DEREFERENCE,
+		   comp, Target.pushObject);
     code.emitDup();
     code.emitStore(decl.getVariable());
     inits[i].compile(comp, Target.pushObject);

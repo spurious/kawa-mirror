@@ -119,63 +119,127 @@ public class Declaration
   public void loadOwningObject (Compilation comp)
   {
     if (base != null)
-      base.load(comp);
+      base.load(null, 0, comp, Target.pushObject);
     else
       getContext().currentLambda().loadHeapFrame(comp);
   }
 
-  public void load (Compilation comp)
+  public void load (Declaration owner, int flags,
+                    Compilation comp, Target target)
   {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    Object val;
-    if (field != null)
+    if (target instanceof IgnoreTarget)
+      return;
+    if (isAlias() && (flags & ReferenceExp.DONT_DEREFERENCE) == 0
+	&& value instanceof ReferenceExp)
       {
-        if (! field.getStaticFlag())
+        ReferenceExp rexp = (ReferenceExp) value;
+        Declaration orig = rexp.binding;
+        if (orig != null
+            && (owner == null || ! orig.needsContext()))
           {
-            loadOwningObject(comp);
-            code.emitGetField(field);
+            orig.load(rexp.context, flags, comp, target);
+            return;
+          }
+      }
+    CodeAttr code = comp.getCode();
+    Type rtype = getType();
+    if (! isIndirectBinding() && (flags & ReferenceExp.DONT_DEREFERENCE) != 0)
+      {
+        if (field == null)
+          throw new Error("internal error: cannot take location of "+this);
+        Method meth;
+        if (field.getStaticFlag())
+          {
+            ClassType typeStaticFieldLocation
+              = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
+            meth = typeStaticFieldLocation.getDeclaredMethod("make", 2);
           }
         else
-          code.emitGetStatic(field);
-      }
-    else if (isIndirectBinding() && comp.immediate && getVariable() == null)
-      {
-	// This is a bit of a kludge.  See comment in ModuleExp.evalModule.
-	Environment env = comp.getEnvironment();
-	Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
-	  : env.getSymbol(symbol.toString());
-	Object property = null;
-	if (isProcedureDecl()
-	    && comp.getInterpreter().hasSeparateFunctionNamespace())
-	  property = EnvironmentKey.FUNCTION;
-	gnu.mapping.Location loc = env.getLocation(sym, property);
-	comp.compileConstant(loc, Target.pushValue(Compilation.typeLocation));
-      }
-    else if (comp.immediate && (val = getConstantValue()) != null)
-      {
-	comp.compileConstant(val);
+          {
+            ClassType typeFieldLocation
+              = ClassType.make("gnu.kawa.reflect.FieldLocation");
+            meth = typeFieldLocation.getDeclaredMethod("make", 3);
+
+            if ((flags & ReferenceExp.DEFER_DECL_BASE) != 0)
+              code.emitPushNull();
+            else
+              {
+                if (owner != null)
+                  owner.load(null, 0, comp, Target.pushObject);
+                else
+                  loadOwningObject(comp);
+              }
+          }
+        comp.compileConstant(field.getDeclaringClass().getName());
+        comp.compileConstant(field.getName());
+        code.emitInvokeStatic(meth);
       }
     else
       {
-	Variable var = getVariable();
-	if (context instanceof ClassExp && var == null && ! getFlag(PROCEDURE))
-	  {
-	    ClassExp cl = (ClassExp) context;
-	    if (cl.isMakingClassPair())
-	      {
-		String getName = ClassExp.slotToMethodName("get", getName());
-		Method getter = cl.type.getDeclaredMethod(getName, 0);
-		cl.loadHeapFrame(comp);
-		code.emitInvoke(getter);
-		return;
-	      }
-	  }
-	if (var == null)
-	  {
-	    var = allocateVariable(code);
-	  }
-	code.emitLoad(var);
+        Object val;
+        if (field != null)
+          {
+            if (! field.getStaticFlag())
+              {
+                if (owner != null)
+                  owner.load(null, 0, comp, Target.pushObject);
+                else
+                  loadOwningObject(comp);
+                code.emitGetField(field);
+              }
+            else
+              code.emitGetStatic(field);
+          }
+        else if (isIndirectBinding() && comp.immediate && getVariable() == null)
+          {
+            // This is a bit of a kludge.  See comment in ModuleExp.evalModule.
+            Environment env = comp.getEnvironment();
+            Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+              : env.getSymbol(symbol.toString());
+            Object property = null;
+            if (isProcedureDecl()
+                && comp.getLanguage().hasSeparateFunctionNamespace())
+              property = EnvironmentKey.FUNCTION;
+            gnu.mapping.Location loc = env.getLocation(sym, property);
+            comp.compileConstant(loc, Target.pushValue(Compilation.typeLocation));
+          }
+        else if (comp.immediate && (val = getConstantValue()) != null)
+          {
+            comp.compileConstant(val);
+          }
+        else
+          {
+            Variable var = getVariable();
+            ClassExp cl;
+            if (context instanceof ClassExp && var == null
+                && ! getFlag(PROCEDURE)
+                && (cl = (ClassExp) context).isMakingClassPair())
+              {
+                String getName = ClassExp.slotToMethodName("get", getName());
+                Method getter = cl.type.getDeclaredMethod(getName, 0);
+                cl.loadHeapFrame(comp);
+                code.emitInvoke(getter);
+              }
+            else
+              {
+                if (var == null)
+                  var = allocateVariable(code);
+                code.emitLoad(var);
+              }
+          }
+        if (isIndirectBinding()
+            && (flags & ReferenceExp.DONT_DEREFERENCE) == 0)
+          {
+            code.emitInvokeVirtual(Compilation.getLocationMethod);
+            rtype = Type.pointer_type;
+          }
       }
+    if (target instanceof SeriesTarget
+	&& getFlag(Declaration.IS_SINGLE_VALUE))
+      // A kludge until we get a better type system.
+      ((SeriesTarget) target).compileFromStackSimple(comp, rtype);
+    else
+      target.compileFromStack(comp, rtype);
   }
 
   /* Compile code to store a value (which must already be on the
@@ -277,6 +341,12 @@ public class Declaration
   public final boolean needsExternalAccess ()
   {
     return (flags & EXTERNAL_ACCESS+PRIVATE) == EXTERNAL_ACCESS+PRIVATE;
+  }
+
+  /** If we need a 'context' supplied from a ReferenceExp or 'this. */
+  public final boolean needsContext ()
+  {
+    return base == null && field != null && ! field.getStaticFlag();
   }
 
   /** True if this is a field or method in a class definition. */
@@ -623,23 +693,16 @@ public class Declaration
     */
   }
 
-
   public static Declaration followAliases (Declaration decl)
   {
     while (decl != null && decl.isAlias())
       {
-	if (decl.getFlag(IS_IMPORTED)
-	    && (decl.flags & (EXPORT_SPECIFIED|EXTERNAL_ACCESS)) != 0)
-	  break;
 	Expression declValue = decl.getValue();
 	if (! (declValue instanceof ReferenceExp))
 	  break;
 	ReferenceExp rexp = (ReferenceExp) declValue;
 	Declaration orig = rexp.binding;
 	if (orig == null)
-	  break;
-	if (orig.field != null && ! orig.field.getStaticFlag()
-	    && orig.base == null)
 	  break;
 	decl = orig;
       }
@@ -671,19 +734,9 @@ public class Declaration
     if ((isIndirectBinding() || isConstant)
 	&& ! comp.immediate)
       fflags |= Access.FINAL;
-    Type ftype;
-    if (isAlias())
-      {
-	Declaration adecl = followAliases(this);
-	if (adecl != null && adecl.getFlag(IS_CONSTANT))
-	  ftype = adecl.getType();
-	else
-	  ftype = Compilation.typeLocation;
-      }
-    else
-      ftype = (isIndirectBinding() ? Compilation.typeLocation
-	       : getType().getImplementationType());
-
+    Type ftype = getType().getImplementationType();
+    if (isIndirectBinding() && ! ftype.isSubtype(Compilation.typeLocation))
+      ftype = Compilation.typeLocation;
     String fname = getName();
     fname = Compilation.mangleNameIfNeeded(fname);
     if (getFlag(IS_UNKNOWN))

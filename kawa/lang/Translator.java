@@ -707,9 +707,9 @@ public class Translator extends Compilation
 			   : null);
 	    if (loc != null)
 	      loc = loc.getBase();
-            if (loc instanceof StaticFieldLocation)
+            if (loc instanceof FieldLocation)
               {
-                decl = ((StaticFieldLocation) loc).getDeclaration();
+                decl = ((FieldLocation) loc).getDeclaration();
               }
 	    /*
             else if (Compilation.inlineOk && function)

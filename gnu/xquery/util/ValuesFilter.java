@@ -151,6 +151,7 @@ public class ValuesFilter extends MethodProc implements CanInline
 			   init,
 			   new QuoteExp(IntNum.one())});
 	posDecl = parser.letVariable("pos", Type.int_type, init);
+	parser.letEnter();
       }
 
     Expression applyPredicate = new ApplyExp(lexp2,

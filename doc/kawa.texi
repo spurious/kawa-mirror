@@ -104,7 +104,6 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Low-level functions::  The Scheme-Java interface
 * XML tools::            Tools for working with XML and HTML
 * Mailing lists::        Where to report bugs, discuss changes, etc
-* Support::              Support
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
 * License::

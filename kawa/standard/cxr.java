@@ -17,24 +17,27 @@ public class cxr extends Procedure1 implements HasSetter
   /** Set count and mask from a function name of the form "c[ad]*r". */
   public void program (String name)
   {
-    count = 0;
-    mask = 0;
+    int c = 0;
+    int m = 0;
     int len = name.length ();
     for (int i = 0;  i < len;  i++)
       {
 	char ch = name.charAt (i);
 	if (ch == 'a' || ch == 'A')
 	  {
-	    mask <<= 1;
-	    count++;
+	    m <<= 1;
+	    c++;
 	  }
 	else if (ch == 'd' || ch == 'D')
 	  {
-	    mask <<= 1;
-	    mask |= 1;
-	    count++;
+	    m <<= 1;
+	    m |= 1;
+	    c++;
 	  }
       }
+    mask = m;
+    // Note we have to set count last, to avoid a race condition.
+    count = c;
   }
 
   public Object apply1 (Object arg1)

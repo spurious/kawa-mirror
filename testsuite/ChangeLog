@@ -1,3 +1,7 @@
+Sat Aug 29 20:57:48 1998  Per Bothner  <bothner@cygnus.com>
+
+	* test.scm:  Re-assigning + is now expected to fail.
+
 Sat Aug 29 11:27:43 1998  Per Bothner  <bothner@cygnus.com>
 
 	* testing.scm (total-expected-count):  New variable.

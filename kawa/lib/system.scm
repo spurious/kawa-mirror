@@ -73,6 +73,11 @@
     ((primitive-array-set <String>) arr 2 string)
     arr))
 
+(define command-parse :: <function>
+  (if (equal? (java.lang.System:getProperty '|file.separator|) '|/|)
+      tokenize-string-using-shell
+      tokenize-string-to-string-array))
+
 (define (compile-file (source :: <string>)
 		      (output :: <String>))
   :: <void>

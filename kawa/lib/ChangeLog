@@ -1,3 +1,16 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SCM_COMPILE_FLAGS): Add--warn-undefined-variable.
+	* misc.scm: Add some <boolean> return type specifers.
+	(procedure?): Simplify since Location no longer extends Procedure.
+
+	* system.scm (command-parse): New function variable.
+
+	* std_syntax.scm: Add a module-export declaration, making other
+	declarations implicitly private.
+
+	* std_syntax.scm (case): Use internal %let rather than public let.
+
 2004-12-02  Per Bothner  <per@bothner.com>
 
 	* misc.scm (force): Converted to Scheme from kawa.standard.force.

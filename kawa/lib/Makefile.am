@@ -41,3 +41,4 @@ PACKAGE_FNAME = kawa-lib
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 EXTRA_GCJ_COMPILED = ../../bin/kawa1$(exeext) scm-classes.stamp
 EXTRA_GCJ_INPUTS = *.class
+SCM_COMPILE_FLAGS = --warn-undefined-variable

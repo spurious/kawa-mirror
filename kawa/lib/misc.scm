@@ -1,15 +1,15 @@
 #|
-(define (equal? x y)
+(define (equal? x y) :: <boolean>
   (or (eq? x y)
       (and (not (eq? x #!null))
 	   ((primitive-virtual-method <object> "equals" <boolean> (<object>))
 	    x y))))
 |#
 
-(define (boolean? x)
+(define (boolean? x) :: <boolean>
   (or (eq? x #t) (eq? x #f)))
 
-(define (symbol? x)
+(define (symbol? x) :: <boolean>
   (instance? x <java.lang.String>))
 
 (define (symbol->string (s <symbol>))
@@ -18,8 +18,8 @@
 (define (string->symbol (str <string>))
   (invoke (invoke str 'toString) 'intern))
 
-(define (procedure? x)
-  (and (instance? x <function>) (not (instance? x <gnu.mapping.Location>))))
+(define (procedure? x) :: <boolean>
+  (instance? x <function>))
 
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))

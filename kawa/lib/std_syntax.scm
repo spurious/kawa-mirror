@@ -1,5 +1,9 @@
 ;;; Definitions for some standard syntax.
 
+(module-export cond case and or let let* letrec do delay %make-promise)
+
+(module-export cond case and let let* do delay)
+
 ;;; COND
 
 (define-syntax cond
@@ -39,7 +43,7 @@
 
 (define-syntax case (syntax-rules ()
 				  ((case key clauses ...)
-				   (let ((tmp key))
+				   (%let ((tmp key))
 				     (%case tmp clauses ...)))))
 
 (define-syntax %case (syntax-rules (else)

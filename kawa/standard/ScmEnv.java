@@ -1,5 +1,7 @@
 package kawa.standard;
 import gnu.mapping.*;
+import gnu.expr.Compilation;
+import gnu.bytecode.ClassType;
 import gnu.math.Unit;
 import gnu.kawa.reflect.ClassMethods;
 
@@ -38,7 +40,12 @@ public class ScmEnv extends InheritingEnvironment
 	Object val = null;
 	String uri = name.getNamespaceURI();
 	if (uri != null && uri.startsWith("class:"))
-	  val = ClassMethods.apply(uri.substring(6), nam);
+	  {
+	    String mname = nam.equals("new") ? "<init>"
+	      : Compilation.mangleName(nam);
+	    ClassType methodClass = ClassType.make(uri.substring(6));
+	    val = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
+	  }
 	else if (nam.endsWith("$unit"))
 	  val = Unit.lookup(nam.substring(0, nam.length()-5));
 	else 

@@ -431,9 +431,13 @@ Kawa normally keeps running as long as there is an active
 read-eval-print loop still awaiting input or there is an unfinished
 other computation (such as requested by a @samp{-e} of @samp{-f} option).
 
-To close a read-eval-print-loop, you type an end-of-file character
-(normally ctrl/D until Unix).  (If the read-eval-print-loop
-is in a new window, you can select @samp{Close} from the @samp{File} menu.)
+To close a read-eval-print-loop, you can type the special
+literal @code{#!eof} at top level.  This is recognized as end-of-file.
+Unfortunately, due to thread-related complications, just typing
+an end-of-file character (normally ctrl/D until Unix), will not work.
+
+If the read-eval-print-loop
+is in a new window, you can select @samp{Close} from the @samp{File} menu.
 
 To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
@@ -523,6 +527,11 @@ before keyword parameters.
 
 @defvr Constant #!eof
 The end-of-file object.
+
+Note that if the Scheme reader sees this literal at top-level,
+it is returned literally.  This is indistinguishable from
+coming to the end of the input file.  If you do not want to end reading,
+but want the actual value of @code{#!eof}, you should quote it.
 @end defvr
 
 @defvr Constant #!void

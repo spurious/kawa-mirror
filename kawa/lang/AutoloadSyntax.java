@@ -44,20 +44,27 @@ public class AutoloadSyntax extends Syntax implements Externalizable
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<syntax ");
+    ps.print(toString());
+  }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer(100);
+    sbuf.append("#<syntax ");
     if (getName() != null)
       {
-	ps.print(getName());
-	ps.print(' ');
+	sbuf.append(getName());
+	sbuf.append(' ');
       }
     if (loaded != null)
-      ps.print ("autoloaded>");
+      sbuf.append("autoloaded>");
     else
       {
-	ps.print ("autoload ");
-	ps.print (className);
-	ps.print (">");
+	sbuf.append("autoload ");
+	sbuf.append(className);
+	sbuf.append(">");
       }
+    return sbuf.toString();
   }
 
   private void throw_error (String prefix)

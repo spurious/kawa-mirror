@@ -1,5 +1,8 @@
 2003-04-18  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/AutoloadSyntax.java (toString):  New method.
+	(print):  Use toString.
+
 	* kawa/lang/Translator.java (environ):  Remove field.
 	(lexical):  Replacement field.
 	(<init>):  Allocate lexical instead of environ.

@@ -43,3 +43,7 @@ Make #!null more robust.  Allow (global) variables to be bound to #!null
 without being considered to be undefined.
 
 Optionally issue a warning if a symbol is rebound.
+
+Provide a way to write a "main" method in Scheme.
+
+Make kawa.repl -f FILE (or something) work for compiled FILEs.

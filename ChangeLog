@@ -1,3 +1,14 @@
+Thu Nov 27 21:42:08 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/*.java:  Update for gnu.bytecode changes.
+	(Mostly change Method.compile_xxx to CodeAttr.emitXxx.)
+	* kawa/repl.java (checkInitFile):  Fix thinko (sense of test).
+	On non-Unix-like system, read kawarc.scm instead of .kawarc.scm.
+
+Wed Nov 12 22:25:56 1997  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/ApplyExp.java (compile):  Fix typo.
+
 Sat Nov  1 23:30:16 1997  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Change version to 1.5.91.

@@ -6,10 +6,22 @@
                      (syntax-case __arg ()
                                   ((__name . pattern) (begin form ...))))))))
 
+;; Helper routines for define-procedure.
+(define (add-procedure-properties
+	 (proc :: <gnu.expr.GenericProc>)
+	 #!rest (args :: <object[]>)) :: <void>
+  (invoke proc 'setProperties args))
+
 (define-syntax define-procedure
-  (syntax-rules ()
-		((define-procedure name . args)
-		 (define-constant name (make-procedure name: 'name . args)))))
+  (syntax-rules (:: <gnu.expr.GenericProc>)
+		((define-procedure name args ...)
+		 (begin
+		   ;; The GenericProc has to be allocated at init time, for
+		   ;; the sake of require, while the actual properties may
+		   ;; need to be evaluated at module-run-time.
+		   (define-constant name :: <gnu.expr.GenericProc>
+		     (make <gnu.expr.GenericProc> 'name))
+		   (add-procedure-properties name args ...)))))
 
 (define (%defmacro form rule)
   (rule (car (form 'form))))

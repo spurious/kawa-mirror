@@ -1,3 +1,9 @@
+2002-08-14  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (add-procedure-properties):  New helper procedure.
+	(define-procedure):  Split into two parts: define-constant, evaluated
+	st init-time, and add-procedure-properties and module-run-time.
+
 2002-08-04  Per Bothner  <per@bothner.com>
 
 	* strings.scm (string-ci=?, string<?, string>?, string<=?, string>=?,

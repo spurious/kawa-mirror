@@ -125,15 +125,41 @@ public class lambda extends Syntax implements Printable
 	    mode = pair.car;
 	    continue;
 	  }
+	String name;
+	Object defaultValue = ELisp.nilExpr;
         Pair p;
-	if (! (pair.car instanceof String))
+	if (pair.car instanceof String)
 	  {
-	    tr.syntaxError ("parameter is not a symbol");
+	    name = (String) pair.car;
+          }
+	else if (pair.car instanceof Pair
+		 && (p = (Pair) pair.car).car instanceof String
+		 && p.cdr instanceof Pair)
+          {
+	    name = (String) p.car;
+            p = (Pair) p.cdr;
+            if (p != null && mode != null)
+              {
+                defaultValue = p.car;
+                if (p.cdr instanceof Pair)
+                  p = (Pair) p.cdr;
+                else if (p.cdr == LList.Empty)
+                  p = null;
+                else
+                  {
+                    tr.syntaxError("improper list in specifier for parameter `"
+                                   + name + "')");
+                    return;
+                  }
+              }
+	  }
+	else
+	  {
+	    tr.syntaxError ("parameter is neither name nor (name default)");
 	    return;
 	  }
-	String name = (String) pair.car;
 	if (mode == optionalKeyword)
-	  lexp.defaultArgs[opt_args++] = ELisp.nilExpr;
+	  lexp.defaultArgs[opt_args++] = tr.rewrite(defaultValue);
 	Declaration decl = lexp.addDeclaration (name);
         if (bindings instanceof PairWithPosition)
           {
@@ -159,11 +185,19 @@ public class lambda extends Syntax implements Printable
 	// Process documentation string.  FIXME.
 	body = pair.cdr;
       }
+    Object interactive = null;
     if (body instanceof Pair
 	&& (pair = (Pair) body).car instanceof Pair
 	&& ((Pair) pair.car).car == "interactive")
       {
-	// System.err.println("ignore interactive for "+lexp);  // FIXME
+	interactive = ((Pair) pair.car).cdr;
+	if (interactive != LList.Empty
+            && ! (interactive instanceof Pair
+                  && ((Pair) interactive).cdr == LList.Empty))
+          {
+            tr.syntaxError ("missing 'interactive' specification");
+            interactive = null;
+          }
 	body = pair.cdr;
       }
     if (body instanceof PairWithPosition)
@@ -192,6 +226,26 @@ public class lambda extends Syntax implements Printable
     else
       lexp.body = tr.rewrite_body (body);
     tr.pop(lexp);
+
+    if (interactive != null)
+      {
+        if (interactive == LList.Empty)
+          interactive = QuoteExp.nullExp;
+        else
+          {
+            Object arg = ((Pair) interactive).car;
+            if (arg instanceof FString)
+              interactive = new QuoteExp(arg.toString());
+            else
+              {
+                LambdaExp ilexp = new LambdaExp();
+                rewrite(ilexp, LList.Empty, interactive, tr);
+                ilexp.setCanRead(true);
+                interactive = ilexp;
+              }
+          }
+        lexp.setProperty("emacs-interactive", interactive);
+      }
   }
 
 

@@ -77,8 +77,8 @@ public class ELisp extends Interpreter
   {
     if (arg instanceof Char)
       return gnu.math.IntNum.make(((Char) arg).intValue());
-    if (arg instanceof Position)
-      return gnu.math.IntNum.make(1 + ((Position) arg).getOffset());
+    if (arg instanceof javax.swing.text.Position)
+      return gnu.math.IntNum.make(1 + ((javax.swing.text.Position) arg).getOffset());
     return (gnu.math.Numeric) arg;
   }
 
@@ -187,13 +187,12 @@ public class ELisp extends Interpreter
 	loadClass("gnu.jemacs.lang.StringOps", environ);
 	loadClass("gnu.jemacs.lang.ListOps", environ);
 	loadClass("gnu.jemacs.lang.MiscOps", environ);
-
-	loadClass("gnu.jemacs.lisp.autoloads", environ);
       }
     catch (java.lang.ClassNotFoundException ex)
       {
 	// Ignore - happens while building this directory.
       }
+
     define("t", "t");
     define("nil", "nil");
     defun(AddOp.$Pl); // "+"
@@ -205,20 +204,44 @@ public class ELisp extends Interpreter
     defun(NumberCompare.makeGrt(">"));
     defun(NumberCompare.makeGEq(">="));
     defun("lambda", new gnu.jemacs.lang.lambda());
+    defun("defgroup", new defgroup());
+    defun("defcustom", new defcustom());
     defun("defvar", new defvar(false));
     defun("defconst", new defvar(true));
     defun("defun", new gnu.jemacs.lang.defun());
+    defun("defsubst", new gnu.jemacs.lang.defun());
     defun("setq", new gnu.jemacs.lang.setq());
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
+    defun("and", new kawa.standard.and_or(true, this));
     defun("while", new gnu.jemacs.lang.While());
+    defun("unwind-protect", new gnu.jemacs.lang.UnwindProtect());
     defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));
     defun("save-current-buffer", new gnu.jemacs.lang.SaveExcursion(true));
     defun("let", new kawa.standard.fluid_let(false, nilExpr));
     defun("let*", new kawa.standard.fluid_let(true, nilExpr));
     defun("concat", new kawa.standard.string_append());
+    Procedure not = new kawa.standard.not(this);
+    defun("not", not);
+    defun("null", not);
+    defun("eq", new kawa.standard.eq_p(this));
     defun("equal", new kawa.standard.equal_p(this));
+    defun("typep", new gnu.kawa.reflect.InstanceOf(this));
+    try
+      {
+	loadClass("gnu.jemacs.lisp.primitives", environ);
+	loadClass("gnu.jemacs.buffer.emacs", environ);
+	loadClass("gnu.jemacs.lisp.simple", environ);
+	loadClass("gnu.jemacs.lisp.autoloads", environ);
+	loadClass("gnu.jemacs.lisp.keymap", environ);
+	loadClass("gnu.jemacs.lisp.editfns", environ);
+	loadClass("gnu.jemacs.lisp.keydefs", environ);
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+	// Ignore - happens while building this directory.
+      }
   }
 
   public static ELisp getInstance()
@@ -272,6 +295,14 @@ public class ELisp extends Interpreter
 
   public Type getTypeFor(String name)
   {
+    if (name == "t")
+      name = "java.lang.Object";
+    else if (name == "marker")
+      name = "gnu.jemacs.buffer.Marker";
+    else if (name == "buffer")
+      name = "gnu.jemacs.buffer.Bufffer";
+    else if (name == "window")
+      name = "gnu.jemacs.buffer.Window";
     return Scheme.string2Type(name);
   }
 
@@ -336,5 +367,45 @@ public class ELisp extends Interpreter
 	    */
 	  }
       }
+  }
+
+  public static void readableChar(char ch, StringBuffer buf, boolean quote)
+  {
+    if (quote && (ch == '\\' || ch == '\'' || ch == '\"'))
+      {
+        buf.append('\\');
+        buf.append(ch);
+      }
+    else if (ch > 127)
+      {
+        buf.append("\\u");
+        String hex = Integer.toHexString(ch);
+        for (int i = hex.length();  i < 4;  i++)  buf.append('0');
+        buf.append(hex);
+      }
+    else if (ch >= ' ')
+      buf.append(ch);
+    else if (ch == '\t')  buf.append("\\t");
+    else if (ch == '\r')  buf.append("\\r");
+    else if (ch == '\n')  buf.append("\\n");
+    else
+      {
+        buf.append("\\0");
+        buf.append((ch >> 3) & 7);
+        buf.append(ch & 7);
+      }
+  }
+
+  /**
+   * Call toString, quoting characters that are not ascii graphic chars.
+   * This method will probably be moved somewhere more appropriate.
+   */
+  public static String readableString(Object obj)
+  {
+    String str = obj.toString();
+    StringBuffer buf = new StringBuffer(200);
+    for (int i = 0;  i < str.length();  i++)
+      readableChar(str.charAt(i), buf, false);
+    return buf.toString();
   }
 }

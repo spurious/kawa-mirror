@@ -1,3 +1,53 @@
+2000-06-18  Per Bothner  <per@bothner.com>
+
+	* AddOp.java ($Mn):  New static method, implements unary minus.
+	(applyN):  Call $Mn if unary minus.
+
+	* MiscOps.scm (purecopy, minibuffer-depth):  New dummy definitions.
+	(call-interactively, push):  New procedures.
+	(car, cdr):  New procedures - handle nil as input.
+	(format):  New procedure.
+	(apply):  New procedure - handle symbol as function.
+	(prog1):  New syntax.
+	(quit-char):  New variable.
+	
+	* StringOps.scm (substring, char-to-string):  New procedures.
+
+	* NumberOps.scm (1-, 1+, %):  Hardwire invoke-static calls.
+	* NumberCompare.java (apply2):  Call ELisp.asNumber on operands.
+	* ELisp.java (asNumber):  Handle javax.swing.text.Position.
+
+	* ELisp.java (<init>):  Do some autoloads first, and then some
+	after we have initialized variables symbols.
+	Add definitions for new procedures and syntax.
+	(getTypeFor):  New procedure.
+	
+	* ELisp.java (readableChar, readableString):  New helper functions.
+	
+	* UnwindProtect.java:  New class, extends Syntax.
+	* defcustom.java:  New class, extends Syntax.
+	* defgroup.java:  New class, extends Syntax.
+	* Makefile.am:  Update accordingly.
+	* lambda.java (rewrite):  Implement support for default arguments.
+	Implement support for (interactive ...).
+
+	* Symbol.java:(properties):  New static Environment.
+	(getPropertyList, setPropertyList, plistGet, plistPut, plistRemove):
+	New static methods to handle property lists.
+	* SymbolOps.scm (symbol-plist, setplist, plist-remprop, plist-member,
+	plist-get, plist-put, get, put):  New procedures for property lists.
+
+	* Symbol.java (makeBufferLocal):  New static method.
+	* SymbolOps.scm(symbol-value, set):  New procedures.
+	(make-local-variable, make-variable-buffer-local):  New procedures.
+	
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java (readString):  Fix so line number get updated
+	correctly on line-continuation escape.
+
+	* ELispReader.java (readObject):  Handle #' syntax.
+	
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Load new gnu.jemacs.lisp.autoloads.

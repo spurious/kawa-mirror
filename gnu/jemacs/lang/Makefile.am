@@ -15,8 +15,10 @@ java_WITH_SWING =\
   Symbol.java \
   NumberCompare.java \
   SaveExcursion.java \
+  UnwindProtect.java \
   defun.java \
   defvar.java \
+  defcustom.java defgroup.java \
   lambda.java \
   setq.java
 

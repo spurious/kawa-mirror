@@ -223,6 +223,11 @@ public class ELispReader extends LispReader
 	    continue;
 	  case '\\':
 	    c = readEscape();
+            if (c == -2)
+	      {
+		c = '\n'; // So prev gets set ...
+		continue;
+	      }
 	    /* ... fall through ... */
 	  default:
 	    if (c < 0)
@@ -340,6 +345,8 @@ public class ELispReader extends LispReader
 	      case 'd':  return readInteger(10);
 	      case 'o':  return readInteger(8);
 	      case 'b':  return readInteger(2);
+	      case '\'':
+		return readQuote("function");
 	      case '|':
 		saveReadState = ((InPort) port).readState;
 		((InPort) port).readState = '|';

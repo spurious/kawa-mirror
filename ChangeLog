@@ -1,3 +1,12 @@
+2004-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite_car):  Make public.
+	(rewrite_pair):  Use LispInterpreter's makeApply (overridden by q2).
+	(rewrite):  Rewrrite value of LangExp.
+
+	* kawa/lang/Translator.java (exp2Type):  If unknown type return
+	pointer_type rather than null.
+
 2004-02-13  Per Bothner  <per@bothner.com>
 
 	* gnu/kawa/Makefile.am (SUBDIRS):  Add q2.

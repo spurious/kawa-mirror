@@ -66,7 +66,7 @@ public class Translator extends Compilation
     return rewrite(input);
   }
 
-  final Expression rewrite_car (Pair pair, boolean function)
+  public final Expression rewrite_car (Pair pair, boolean function)
   {
     Object car = pair.car;
     if (pair instanceof PairWithPosition)
@@ -314,7 +314,7 @@ public class Translator extends Compilation
 	cdr = cdr_pair.cdr;
       }
 
-    return new ApplyExp (func, args);
+    return ((LispInterpreter) getInterpreter()).makeApply(func, args);
   }
 
   /**
@@ -451,6 +451,8 @@ public class Translator extends Compilation
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;
       }
+    else if (exp instanceof LangExp)
+      return rewrite(((LangExp) exp).getLangValue(), function);
     else if (exp instanceof Expression)
       return (Expression) exp;
     else
@@ -542,6 +544,7 @@ public class Translator extends Compilation
 	     else
 	       error('e',
 		 "invalid type spec (must be \"type\" or 'type or <type>)");
+	     return Type.pointer_type;
 	   }
 	 return type;
       }

@@ -1,3 +1,12 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* ElementType.java:  New class, extends NodeType, implements TypeValue.
+	* ItemAt.java:  New class, extends Proecdure2.
+	* SubList.java:  New class, extends CpsProcedure.
+	* Makefile.am (java_sources):  Add new classes.
+
+	* Document.java (document):  Reverse incorrect isLetter test.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* MakeElement.java (beginGroup, endGroup):  Switch argument order.

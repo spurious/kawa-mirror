@@ -104,13 +104,16 @@ java_sources = \
   Children.java \
   Compare.java \
   Document.java \
+  ElementType.java \
   IntegerRange.java \
   IsEmptySequence.java \
+  ItemAt.java \
   MakeAttribute.java \
   MakeElement.java \
   NamedChildren.java \
   NodeType.java \
   StringValue.java \
+  SubList.java \
   ValuesFilter.java \
   XMLFormat.java
 

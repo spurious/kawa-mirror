@@ -24,12 +24,12 @@ public class Document extends Procedure1
 	    seenProto = true;
 	    break;
 	  }
-	if (Character.isLetter(ch))
+	if (! Character.isLetter(ch))
 	  break;
       }
     if (! seenProto)
       fileName = "file:" + fileName;
-    
+
     java.net.URL url = new java.net.URL(fileName);
     TreeList doc = new TreeList();
     doc.beginDocument();

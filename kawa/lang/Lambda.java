@@ -164,6 +164,11 @@ public class Lambda extends Syntax implements Printable
 	Object defaultValue = defaultDefault;
 	Pair typeSpecPair = null;
         Pair p;
+	if (pair.car == "::")
+	  {
+	    tr.syntaxError("'::' must follow parameter name");
+	    return;
+	  }
 	if (pair.car instanceof String || pair.car instanceof Binding)
           {
             name = pair.car.toString();

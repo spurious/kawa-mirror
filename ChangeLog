@@ -1,3 +1,7 @@
+2002-03-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewrite):  Check for mis-placed '::'.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add gnu/jemacs/swing/Makefile.

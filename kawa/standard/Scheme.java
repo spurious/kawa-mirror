@@ -62,6 +62,15 @@ public class Scheme extends Interpreter
   public static SpecialType voidType
     = new SpecialType("void", "V", 0, java.lang.Void.TYPE);
 
+  static Scheme instance;
+
+  public static Scheme getInstance()
+  {
+    if (kawa_environment == null)
+      new Scheme ();
+    return instance;
+  }
+
   public static synchronized Environment builtin ()
   {
     if (kawa_environment == null)
@@ -375,6 +384,7 @@ public class Scheme extends Interpreter
       define_proc ("values", "kawa.standard.values_v");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_proc ("eval", "kawa.lang.Eval");
+      define_proc ("repl", new kawa.repl(this));
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
       define_proc ("null-environment", "kawa.standard.null_env");
       define_proc ("interaction-environment", "kawa.standard.user_env");
@@ -500,7 +510,7 @@ public class Scheme extends Interpreter
       define_proc ("format", "kawa.standard.format");
       define_proc ("parse-format", parseFormat);
       //define_proc("emacs:parse-format", new kawa.standard.ParseFormat(true));
-      define_proc("emacs:read", "gnu.elisp.streams");
+      define_proc("emacs:read", "kawa.lib.emacs");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
@@ -518,6 +528,8 @@ public class Scheme extends Interpreter
       initScheme();
     environ = new ScmEnv (kawa_environment);
     environ.setName ("interaction-environment."+(++scheme_counter));
+    if (instance == null)
+      instance = this;
   }
 
   public Scheme (Environment environ)
@@ -573,6 +585,11 @@ public class Scheme extends Interpreter
     throws java.io.IOException, gnu.text.SyntaxException
   {
     return ScmRead.readObject(in);
+  }
+
+  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
+  {
+    return new ScmRead(inp, messages);
   }
 
   public void print (Object value, OutPort out)

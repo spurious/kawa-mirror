@@ -35,8 +35,7 @@ public class convert extends Procedure2 implements Inlineable
     Type type = Scheme.getTypeValue(args[0]);
     if (type != null)
       {
-	args[1].compile(comp, Target.pushObject);
-	type.emitCoerceFromObject(comp.getCode());
+        args[1].compile(comp, Target.pushValue(type));
 	target.compileFromStack(comp, type);
       }
     else

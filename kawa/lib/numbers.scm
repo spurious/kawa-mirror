@@ -14,12 +14,13 @@
   (and (instance? x <number>) (not (invoke (as <number> x) 'isExact))))
 
 (define (zero? (x :: <number>)) :: <boolean> 
-  ((primitive-virtual-method <number> "isZero" <boolean> ())
-   x))
+  (invoke x 'isZero))
+
+(define (positive? (x :: <real>)) :: <boolean>
+  (> (invoke x 'sign) 0))
 
 (define (negative? (x :: <real>)) :: <boolean> 
-  ((primitive-virtual-method <real> "isNegative" <boolean> ())
-   x))
+  (invoke x 'isNegative))
 
 (define (odd? (x :: <integer>)) :: <boolean> 
   ((primitive-virtual-method <integer> "isOdd" <boolean> ())
@@ -31,11 +32,24 @@
 (define (abs (x :: <number>)) :: <number>
   (invoke x 'abs))
 
-(define (quotient (x :: <integer>) (y :: <integer>)) :: <integer>
-  (invoke-static <integer> 'quotient x y))
+(define (quotient (x :: <real>) (y :: <real>)) :: <real>
+  (if (and (instance? x <integer>) (instance? y <integer>))
+      (invoke-static <integer> 'quotient x y)
+      (invoke (/ x y) 'toInt (static-field <number> 'TRUNCATE))))
 
-(define (remainder (x :: <integer>) (y :: <integer>)) :: <integer>
-  (invoke-static <integer> 'remainder x y))
+(define (remainder (x :: <real>) (y :: <real>)) :: <real> 
+  (if (and (instance? x <integer>) (instance? y <integer>))
+      (invoke-static <integer> 'remainder x y)
+      (if (zero? y)
+	  (if (exact? y) x (exact->inexact x))
+	  (- x (/ x y) 'toInt (static-field <number> 'TRUNCATE)))))
+
+(define (modulo (x :: <real>) (y :: <real>)) :: <real>
+  (if (and (instance? x <integer>) (instance? y <integer>))
+      (invoke-static <integer> 'modulo x y)
+      (if (zero? y)
+	  (if (exact? y) x (exact->inexact x))
+	  (- x (/ x y) 'toInt (static-field <number> 'FLOOR)))))
 
 (define (numerator (x :: <rational>)) :: <integer>
   (invoke x 'numerator))

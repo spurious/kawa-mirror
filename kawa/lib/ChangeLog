@@ -1,3 +1,10 @@
+2003-08-20  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (positive?, modulo):  New functions.
+	(quotient, remainder):  Generalize to <real> operands.
+	Fixes Savannah bug #4867.
+	(zero?, negative?):  Replace primitive-virtual-method by invoke.
+
 2003-05-30  Per Bothner  <per@bothner.com>
 
 	* lists.scm (car, cdr)  Use syntactic trick to give name to getter

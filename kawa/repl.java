@@ -15,22 +15,22 @@ public class repl extends Procedure0or1
   public static String compilationTopname = null;
   public static String compilationPrefix = null;
 
-  Interpreter interp;
+  Language language;
 
-  public repl(Interpreter interp)
+  public repl(Language language)
   {
-    this.interp = interp;
+    this.language = language;
   }
 
   public Object apply0 ()
   {
-    Shell.run(interp, Environment.getCurrent());
+    Shell.run(language, Environment.getCurrent());
     return Values.empty;
   }
 
   public Object apply1(Object env)
   {
-    Shell.run(interp, (Environment) env);
+    Shell.run(language, (Environment) env);
     return Values.empty;
   }
 
@@ -76,7 +76,7 @@ public class repl extends Procedure0or1
     printOption(out, "-C <filename> ...", "Compile named files to Java class files");
     printOption(out, "--output-format <format>", "Use <format> when printing top-level output");
     printOption(out,"--<language>", "Select source language, one of:");
-    String[][] languages = Interpreter.getLanguages();
+    String[][] languages = Language.getLanguages();
     for (int i = 0; i < languages.length; i++)
       {
 	out.print("   ");
@@ -234,8 +234,8 @@ public class repl extends Procedure0or1
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
-	    Interpreter interp = Interpreter.defaultInterpreter;
-	    Shell.runString(args[iArg], interp, interp.getEnvironment());
+	    Language language = Language.getDefaultLanguage();
+	    Shell.runString(args[iArg], language, language.getEnvironment());
 	    something_done = true;
 	  }
 	else if (arg.equals ("-f"))
@@ -348,7 +348,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(Interpreter.defaultInterpreter, Environment.getCurrent());
+	    Shell.run(Language.getDefaultLanguage(), Environment.getCurrent());
 	    return -1;
 	  }
 	else if (arg.equals ("-w"))
@@ -502,7 +502,7 @@ public class repl extends Procedure0or1
 		    System.err.println("got connection from "
 				       +client.getInetAddress()
 				       +" port:"+client.getPort());
-		    TelnetRepl.serve(Interpreter.defaultInterpreter, client);
+		    TelnetRepl.serve(Language.getDefaultLanguage(), client);
 		  }
 	      }
 	    catch (java.io.IOException ex)
@@ -666,7 +666,7 @@ public class repl extends Procedure0or1
 	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
-	    Shell.run(Interpreter.defaultInterpreter);
+	    Shell.run(Language.getDefaultLanguage());
 	  }
       }
     finally

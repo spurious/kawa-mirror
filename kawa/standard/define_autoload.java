@@ -63,12 +63,12 @@ public class define_autoload extends Syntax
       file = new File(new File(tr.getFile()).getParent(), filespec);
     String filename = file.getPath();
     int dot = filename.lastIndexOf('.');
-    Interpreter interp;
+    Language language;
     if (dot >= 0)
       {
 	String extension = filename.substring(dot);
-	interp = Interpreter.getInstance(extension);
-	if (interp == null)
+	language = Language.getInstance(extension);
+	if (language == null)
 	  {
 	    tr.syntaxError("unknown extension for "+filename);
 	    return true;
@@ -115,7 +115,7 @@ public class define_autoload extends Syntax
 	try
 	  {
 	    InPort port = InPort.openFile(filename);
-	    lexer = interp.getLexer(port, tr.getMessages());
+	    lexer = language.getLexer(port, tr.getMessages());
 	    findAutoloadComments((LispReader) lexer, classname, defs, tr);
 	  }
 	catch (Exception ex)
@@ -182,7 +182,7 @@ public class define_autoload extends Syntax
 		      {
 			name = ((Pair)pair.cdr).car.toString();
 			value = new AutoloadProcedure(name, filename,
-						      tr.getInterpreter());
+						      tr.getLanguage());
 		      }
 		    else
 		      tr.error('w', "unsupported ;;;###autoload followed by: "
@@ -267,7 +267,7 @@ public class define_autoload extends Syntax
 	    && fn.charAt(0) == '<' && fn.charAt(len-1) == '>')
 	  filename = fn.substring(1, len-1);
 	Object value = new AutoloadProcedure(name, filename.toString(),
-					     tr.getInterpreter());
+					     tr.getLanguage());
 	Expression ex = new QuoteExp(value);
 	decl.setFlag(Declaration.IS_CONSTANT);
 	decl.noteValue(ex);

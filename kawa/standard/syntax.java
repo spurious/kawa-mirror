@@ -88,7 +88,7 @@ public class syntax extends Syntax
       }
     else if (form instanceof String || form instanceof Symbol)
       {
-	Declaration d = tr.lexical.lookup(form, Interpreter.VALUE_NAMESPACE);
+	Declaration d = tr.lexical.lookup(form, Language.VALUE_NAMESPACE);
 	if (d != null)
 	  x = new ReferenceExp(d);
       }

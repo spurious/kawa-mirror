@@ -387,8 +387,7 @@ public class Lambda extends Syntax implements Printable
 	if (attrName == null)
 	  {
 	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
-	    gnu.bytecode.Type rtype
-	      = tr.getInterpreter().getTypeFor(attrExpr);
+	    gnu.bytecode.Type rtype = tr.getLanguage().getTypeFor(attrExpr);
 	    if (rtype != null)
 	      lexp.setReturnType(rtype);
 	  }
@@ -560,7 +559,7 @@ public class Lambda extends Syntax implements Printable
 		System.arraycopy(exps, 1, new_body, 0, len);
 		lexp.body = new BeginExp(new_body);
 	      }
-	    Convert.setCoercedReturnValue(lexp, rexp, tr.getInterpreter());
+	    Convert.setCoercedReturnValue(lexp, rexp, tr.getLanguage());
 	  }
       }
     else if (lexp.returnType != null && lexp.returnType != Type.pointer_type)

@@ -144,7 +144,7 @@ public class load extends Procedure1 {
     throws SyntaxException, Throwable
   {
     boolean print = ModuleBody.getMainPrintValues();
-    Interpreter interp = Interpreter.getInterpreter();
+    Language language = Language.getDefaultLanguage();
     Consumer out = (print ? kawa.Shell.getOutputConsumer(OutPort.outDefault())
 		    : new VoidConsumer());
     // Reading the entire file and evaluting it as a unit is more
@@ -153,7 +153,7 @@ public class load extends Procedure1 {
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run(interp, env, port, out, OutPort.errDefault());
+	kawa.Shell.run(language, env, port, out, OutPort.errDefault());
       }
     else
       {

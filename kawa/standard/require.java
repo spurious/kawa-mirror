@@ -139,7 +139,7 @@ public class require extends Syntax
   public static boolean importDefinitions (Type type, String uri, Vector forms,
 					   ScopeExp defs, Compilation tr)
   {
-    Interpreter interp = tr.getInterpreter();
+    Language language = tr.getLanguage();
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
     String tname = type.getName();
     Object instance = null;
@@ -204,7 +204,7 @@ public class require extends Syntax
 	      }
 	    Type ftype = fld.getType();
 	    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-	    Declaration fdecl = makeDeclInModule(mod, fvalue, fld, interp);
+	    Declaration fdecl = makeDeclInModule(mod, fvalue, fld, language);
 	    Object fdname = fdecl.getSymbol();
 	    if (fname.startsWith(Declaration.PRIVATE_PREFIX))
 	      continue;
@@ -226,7 +226,7 @@ public class require extends Syntax
                     Object property = null;
                     if (isFinal
                         && (fdecl.isProcedureDecl() || fvalue instanceof Macro)
-                        && (tr.getInterpreter()
+                        && (tr.getLanguage()
                             .hasSeparateFunctionNamespace()))
                       property = EnvironmentKey.FUNCTION;
                     env.addLocation(sym, property,
@@ -374,7 +374,7 @@ public class require extends Syntax
 				 Object instance)
   {
     Compilation comp = Compilation.getCurrent();
-    Interpreter interp = comp.getInterpreter();
+    Language language = comp.getLanguage();
     Class rclass = type.getReflectClass();
     for (Field fld = type.getFields();  fld != null;  fld = fld.getNext())
       {
@@ -385,7 +385,7 @@ public class require extends Syntax
 	  {
 	    makeDeclInModule(mod,
 			     rclass.getField(fld.getName()).get(instance),
-			     fld, interp);
+			     fld, language);
 	  }
 	catch (Exception ex)
 	  {
@@ -395,12 +395,12 @@ public class require extends Syntax
   }
 
   private static Declaration makeDeclInModule (ModuleExp mod, Object fvalue,
-					       Field fld, Interpreter interp)
+					       Field fld, Language language)
   {
     String fname = fld.getName();
     Type ftype = fld.getType();
     boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-    Type dtype = interp.getTypeFor(ftype.getReflectClass());
+    Type dtype = language.getTypeFor(ftype.getReflectClass());
     boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     Object fdname;
     // FIXME if fvalue is FieldLocation, and field is final,

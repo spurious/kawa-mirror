@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import gnu.mapping.*;
 
-import gnu.expr.Interpreter;
+import gnu.expr.Language;
 import kawa.standard.Scheme;
 
 /** A Frame containing a Kawa read-eval-print loop.
@@ -21,7 +21,7 @@ public class GuiConsole extends Frame implements ActionListener {
 
   static int window_number = 0;
 
-  Interpreter interp;
+  Language language;
   Environment environment;
   Future thread;
 
@@ -31,18 +31,18 @@ public class GuiConsole extends Frame implements ActionListener {
   MessageArea message = null;
 
   public static void main(String[] args) {
-    Interpreter interp = new Scheme();
-    new GuiConsole(interp, interp.getNewEnvironment());
+    Language language = new Scheme();
+    new GuiConsole(language, language.getNewEnvironment());
   }
 
   public GuiConsole()
   {
-    this(Interpreter.defaultInterpreter, Environment.getCurrent());
+    this(Language.getDefaultLanguage(), Environment.getCurrent());
   }
 
-  public GuiConsole(Interpreter interp, Environment environment) {
+  public GuiConsole(Language language, Environment environment) {
     super("Kawa");
-    this.interp = interp;
+    this.language = language;
     this.environment = environment;
 
     in_r = new gnu.text.QueueReader ();
@@ -64,7 +64,7 @@ public class GuiConsole extends Frame implements ActionListener {
     setSize(700,500);
     setVisible(true);
 
-    thread = new Future (new kawa.repl(interp),
+    thread = new Future (new kawa.repl(language),
 			 environment, in_p, out_p, err_p);
     thread.start();
   }
@@ -132,9 +132,9 @@ public class GuiConsole extends Frame implements ActionListener {
     String cmd = e.getActionCommand();
 
     if (cmd.equals(NEW))
-      new GuiConsole(interp, interp.getNewEnvironment());
+      new GuiConsole(language, language.getNewEnvironment());
     else if (cmd.equals(NEW_SHARED))
-      new GuiConsole(interp, environment);
+      new GuiConsole(language, environment);
     else if (cmd.equals(EXIT))
       System.exit(0);
     else if (cmd.equals(CLOSE))

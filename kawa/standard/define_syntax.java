@@ -98,7 +98,7 @@ public class define_syntax extends Syntax
       {
 	SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
-	if (tr.getInterpreter().hasSeparateFunctionNamespace())
+	if (tr.getLanguage().hasSeparateFunctionNamespace())
 	  result.setFuncDef(true);
 
 	tr.formStack.addElement(result);

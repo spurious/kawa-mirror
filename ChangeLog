@@ -1,5 +1,18 @@
 2005-03-04  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java: Update Interpreter->Lanuguage various places.
+	* kawa/Shell.java: Likewise.
+	* kawa/GuiConsole.java: Likewise.
+	* kawa/TelnetRepl.java: Likewise.
+	* kawa/lang/Lambda.java: Likewise.
+	* kawa/standard/Scheme.java: Likewise.
+	* kawa/standard/define_autoload.java: Likewise.
+	* kawa/standard/define_syntax.java: Likewise.
+	* kawa/standard/load.java: Likewise.
+	* kawa/standard/not.java: Likewise.
+	* kawa/standard/require.java: Likewise.
+	* kawa/standard/syntax.java: Likewise.
+
 	* kawa/standard/require.java (importDefinitions): Change to use
 	FieldLocation.  Better handling of non-static modules and re-export.
 	Don't set 'base' of fdecl (since it might be shared); instead create

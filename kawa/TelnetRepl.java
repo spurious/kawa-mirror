@@ -7,11 +7,11 @@ public class TelnetRepl extends Procedure0
   // close when finished.
   java.net.Socket socket;
 
-  Interpreter interp;
+  Language language;
 
-  public TelnetRepl(Interpreter interp, java.net.Socket socket)
+  public TelnetRepl(Language language, java.net.Socket socket)
   {
-    this.interp = interp;
+    this.language = language;
     this.socket = socket;
   }
 
@@ -19,7 +19,7 @@ public class TelnetRepl extends Procedure0
   {
     try
       {
-	Shell.run(interp, Environment.getCurrent());
+	Shell.run(language, Environment.getCurrent());
 	return Values.empty;
       }
     finally
@@ -39,7 +39,7 @@ public class TelnetRepl extends Procedure0
       @param client A client that has connected to us,
       and that wants to use the telnet protocol to talk to a
       Scheme read-eval-print-loop. */
-  public static void serve (Interpreter interp, java.net.Socket client)
+  public static void serve (Language language, java.net.Socket client)
     throws java.io.IOException
   {
     Telnet conn = new Telnet(client, true);
@@ -54,8 +54,8 @@ public class TelnetRepl extends Procedure0
     conn.request(Telnet.DO, Telnet.LINEMODE);
     */
 
-    Thread thread = new Future(new TelnetRepl(interp, client),
-			       interp.getEnvironment(),
+    Thread thread = new Future(new TelnetRepl(language, client),
+			       language.getEnvironment(),
 			       in, out, out);
     thread.start();
   }

@@ -122,7 +122,7 @@ public class Shell
     if (out == null)
       return VoidConsumer.getInstance();
     else if (info == null)
-      return Interpreter.getInterpreter().getOutputConsumer(out);
+      return Language.getDefaultLanguage().getOutputConsumer(out);
     try
       {
 	Object args[] = new Object[info.length - 4];
@@ -146,25 +146,25 @@ public class Shell
       }
   }
 
-  public static void run (Interpreter interp)
+  public static void run (Language language)
   {
-    run(interp, interp.getEnvironment());
+    run(language, language.getEnvironment());
   }
 
-  public static void run (Interpreter interp, Environment env)
+  public static void run (Language language, Environment env)
   {
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Procedure prompter = interp.getPrompter();
+	Procedure prompter = language.getPrompter();
 	if (prompter != null)
 	  ((TtyInPort)inp).setPrompter(prompter);
       }
 
-    run(interp, env, inp, OutPort.outDefault(), OutPort.errDefault());
+    run(language, env, inp, OutPort.outDefault(), OutPort.errDefault());
   }
 
-  public static void run (Interpreter interp,  Environment env,
+  public static void run (Language language,  Environment env,
 			  InPort inp, OutPort pout, OutPort perr)
   {
     Consumer out;
@@ -174,7 +174,7 @@ public class Shell
     out = getOutputConsumer(pout);
     try
       {
-	run(interp, env, inp, out, perr);
+	run(language, env, inp, out, perr);
       }
     finally
       {
@@ -183,11 +183,11 @@ public class Shell
       }
   }
 
-  public static void run (Interpreter interp,  Environment env,
+  public static void run (Language language,  Environment env,
 			  InPort inp, Consumer out, OutPort perr)
   {
     SourceMessages messages = new SourceMessages();
-    Lexer lexer = interp.getLexer(inp, messages);
+    Lexer lexer = language.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
     boolean interactive = inp instanceof TtyInPort;
     lexer.setInteractive(interactive);
@@ -202,10 +202,10 @@ public class Shell
       {
 	for (;;)
 	  {
-	    int opts = Interpreter.PARSE_IMMEDIATE|Interpreter.PARSE_ONE_LINE;
+	    int opts = Language.PARSE_IMMEDIATE|Language.PARSE_ONE_LINE;
 	    try
 	      {
-		Compilation comp = interp.parse(lexer, opts);
+		Compilation comp = language.parse(lexer, opts);
 		boolean sawError = messages.checkErrors(perr, 20);
 		if (comp == null) // ??? end-of-file
 		  break;
@@ -281,9 +281,9 @@ public class Shell
       }
   }
 
-  public static void runString (String str, Interpreter interp, Environment env)
+  public static void runString (String str, Language language, Environment env)
   {
-    run(interp, env, new CharArrayInPort(str),
+    run(language, env, new CharArrayInPort(str),
 	ModuleBody.getMainPrintValues() ? OutPort.outDefault() : null,
 	OutPort.errDefault());
   }

@@ -8,26 +8,26 @@ import gnu.expr.*;
 
 public class not extends Procedure1 implements Inlineable
 {
-  Interpreter interpreter;
+  Language language;
   public QuoteExp trueExp;
   public QuoteExp falseExp;
 
-  public not(Interpreter interpreter)
+  public not(Language language)
   {
-    this.interpreter = interpreter;
-    trueExp = new QuoteExp(interpreter.booleanObject(true));
-    falseExp = new QuoteExp(interpreter.booleanObject(false));
+    this.language = language;
+    trueExp = new QuoteExp(language.booleanObject(true));
+    falseExp = new QuoteExp(language.booleanObject(false));
   }
 
-  public not(Interpreter interpreter, String name)
+  public not(Language language, String name)
   {
-    this(interpreter);
+    this(language);
     setName(name);
   }
 
   public Object apply1 (Object arg1)
    {
-     return interpreter.booleanObject(! interpreter.isTrue(arg1));
+     return language.booleanObject(! language.isTrue(arg1));
    }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -37,7 +37,7 @@ public class not extends Procedure1 implements Inlineable
       {
 	ConditionalTarget ctarget = (ConditionalTarget) target;
 	ConditionalTarget sub_target
-	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue, interpreter);
+	  = new ConditionalTarget(ctarget.ifFalse, ctarget.ifTrue, language);
 	sub_target.trueBranchComesFirst = ! ctarget.trueBranchComesFirst;
 	arg.compile(comp, sub_target);
 	return;
@@ -57,6 +57,6 @@ public class not extends Procedure1 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return interpreter.getTypeFor(Boolean.TYPE);
+    return language.getTypeFor(Boolean.TYPE);
   }
 }

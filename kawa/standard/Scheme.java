@@ -691,8 +691,8 @@ public class Scheme extends LispLanguage
 
   public Scheme ()
   {
-    if (Interpreter.defaultInterpreter == null)
-      Interpreter.defaultInterpreter = this;
+    if (Language.getDefaultLanguage() == null)
+      Language.setDefaultLanguage(this);
     environ = getNewEnvironment();
     if (instance == null)
       {
@@ -728,7 +728,7 @@ public class Scheme extends LispLanguage
   /** Evalutate Scheme expressions from string.
    * @param string the string constaining Scheme expressions
    * @param env the Environment to evaluate the string in
-   * @return result of last expression, or Interpreter.voidObject if none. */
+   * @return result of last expression, or Language.voidObject if none. */
   public static Object eval (String string, Environment env)
   {
     return eval (new CharArrayInPort(string), env);
@@ -737,14 +737,14 @@ public class Scheme extends LispLanguage
   /** Evalutate Scheme expressions from stream.
    * @param port the port to read Scheme expressions from
    * @param env the Environment to evaluate the string in
-   * @return result of last expression, or Interpreter.voidObject if none. */
+   * @return result of last expression, or Language.voidObject if none. */
   public static Object eval (InPort port, Environment env)
   {
     SourceMessages messages = new SourceMessages();
     try
       {
 	LispReader lexer = (LispReader)
-	  Interpreter.getInterpreter().getLexer(port, messages);
+	  Language.getDefaultLanguage().getLexer(port, messages);
 	Object body = ReaderParens.readList(lexer, 0, 1, -1);
         if (messages.seenErrors())
           throw new gnu.text.SyntaxException(messages);
@@ -901,7 +901,7 @@ public class Scheme extends LispLanguage
 	int colon = name.indexOf(':');
 	Class clas = getNamedType(name.substring(colon+1)).getReflectClass();
 	String lang = name.substring(0,colon);
-	Interpreter interp = Interpreter.getInstance(lang);
+	Language interp = Language.getInstance(lang);
 	if (interp == null)
 	    throw new RuntimeException("unknown type '" + name
 				       + "' - unknown language '"
@@ -936,7 +936,7 @@ public class Scheme extends LispLanguage
       t = getNamedType (name);
     if (t != null)
       return t;
-    t = Interpreter.string2Type(name);
+    t = Language.string2Type(name);
     if (t != null)
       types.put (name, t);
     return t;

@@ -46,15 +46,16 @@ install-html:
 		<kawa_toc.html >$(HTML_HOME)/kawa.html
 
 XSLT = xsltproc
+DOCBOOK_XSL = $$HOME/XML/docbook-xsl/html/docbook.xsl
 
 internals.html: $(srcdir)/internals.xml
-	$(XSLT) /opt/docbook-xsl/html/docbook.xsl $< > $@
+	$(XSLT) $(DOCBOOK_XSL) $< > $@
 
 internals/index.html: $(srcdir)/internals.xml
 	$(XSLT) --stringparam base.dir internals/ \
 	  --stringparam generate.section.toc.level 1 \
 	  --stringparam use.id.as.filename 1 \
-	  /opt/docbook-xsl/html/docbook.xsl $<
+	  $(DOCBOOK_XSL) $<
 
 TransformToLatex.class:
 	ln -s /home/bothner/public_html/papers/Freenix00/TransformToLatex.class .

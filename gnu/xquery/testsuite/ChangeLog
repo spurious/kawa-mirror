@@ -1,3 +1,7 @@
+2002-01-07  Per Bothner  <per@bothner.com>
+
+	* tab.xml.in:  Add some CDATA and a comment to verify they work.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Change 3.4 and 4.4.to 3.5 and 4.5 to avoid

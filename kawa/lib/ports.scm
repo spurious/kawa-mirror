@@ -5,13 +5,12 @@
   (invoke-static <output-port> 'openFile pathname))
 
 (define (call-with-input-file (pathname :: <String>) (proc :: <procedure>))
-	  :: <void>
  (let ((port :: <input-port> (open-input-file pathname)))
     (try-finally
      (proc port)
      (close-input-port port))))
 
-(define (call-with-output-file pathname proc) :: <void>
+(define (call-with-output-file pathname proc)
   (let ((port :: <output-port> (open-output-file pathname)))
     (try-finally
      (proc port)

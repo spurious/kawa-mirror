@@ -89,7 +89,7 @@ and distributed with it, but may be independently useful.
 * Getting Kawa::
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
-* Restrictions::         Features of R4RS not implemented
+* Restrictions::         Features of R5RS not implemented
 * Extensions::           Kawa features not in standard Scheme
 * Compiling::            Compiling Scheme code to byte-codes
 * Low-level functions::  The Scheme-Java interface
@@ -101,9 +101,7 @@ and distributed with it, but may be independently useful.
 @chapter Features
 
 Kawa is a full Scheme implementation.  It implements almost
-all of R4RS (for exceptions @pxref{Restrictions}), plus some extensions.
-It provides @code{define-syntax} from the R4RS appendix,
-and (from the draft R5RS) eval and multiple values.
+all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
 By default, symbols are case sensitive.
 
 It is completely written in Java.  Scheme functions and files
@@ -152,6 +150,10 @@ A snapshot of the development tree is in
 @ifclear html
 @url{ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz}.
 @end ifclear
+
+These are all in the @uref{ftp://ftp.cygnus.com/pub/bothner,Kawa ftp site},
+which includes other versions and files, including a @code{.deb}
+Debian package file of Kawa.
 
 @node Installation, Running, Getting Kawa, Top
 @chapter Building and installing Kawa
@@ -443,16 +445,16 @@ To exit the entire Kawa session, call the
 @code{exit} procedure (with 0 or 1 integer arguments).
 
 @node Restrictions, Extensions, Running, Top
-@chapter Features of R4RS not implemented
+@chapter Features of R5RS not implemented
 
-Kawa implements all the required and optional features of R4RS,
+Kawa implements all the required and optional features of R5RS,
 with the following exceptions.
 
 The entire "numeric tower" is implemented.
 However, some transcendental function only work on reals.
 Integral function do not necessarily work on
 inexact (floating-point) integers.
-(The whole idea of "inexact integer" in R4RS seems rather pointless ...)
+(The whole idea of "inexact integer" in R5RS seems rather pointless ...)
 
 Also, call-with-current-continuation is only "upwards" (?).
 I.e. once a continuation has been exited, it cannot be invoked.

@@ -1,3 +1,9 @@
+Wed Mar 11 13:09:07 1998  Per Bothner  <bothner@cygnus.com>
+
+	* texinfo.tex:  Update to current version.
+	* kawa.texi:  Replace R4RS by R5RS where appropriate.
+	Mention ftp site and Debian package.
+
 Tue Mar 10 22:25:38 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Makefile.am (install-html):  New rule to install html.

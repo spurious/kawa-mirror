@@ -1,3 +1,8 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* Method.java (toString):  Use getName of declaring class to avoid
+	prefixing by "Class Type ".  Fixes bug reported by Daniel Bonniot.
+
 2001-11-23  Per Bothner  <per@bothner.com>
 
 	* ClassType.java  (isSubclass):  Handle other class an interface,

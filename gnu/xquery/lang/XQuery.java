@@ -189,6 +189,7 @@ public class XQuery extends Interpreter
     define("false", new ConstantFunction0("false", Boolean.FALSE));
     define("true", new ConstantFunction0("true", Boolean.TRUE));
     define("string-value", gnu.xquery.util.StringValue.stringValue);
+    define("string", gnu.xquery.util.StringValue.string);
   }
 
   public static XQuery getInstance()

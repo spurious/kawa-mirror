@@ -13,7 +13,7 @@ package gnu.lists;
  */
 
 public class TreeList extends AbstractSequence
-implements Consumer, Consumable
+implements Consumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
   // for the sake of NamespaceResolver.  FIXME.  Perhaps an abstract class
@@ -30,6 +30,23 @@ implements Consumer, Consumable
     resizeObjects();
     gapEnd = 200;
     data = new char[gapEnd];
+  }
+
+  /**
+   * Make a copy of a sub-range of a TreeList.
+   * @param list the TreeList to copy
+   * @param startPosition start of range, as a raw index in data
+   * @param endPosition end of range, as a raw index in data
+   */
+  public TreeList(TreeList list, int startPosition, int endPosition)
+  {
+    this();
+    list.consumeRange(startPosition, endPosition, this);
+  }
+
+  public TreeList(TreeList list)
+  {
+    this(list, 0, list.data.length);
   }
 
   public void clear()
@@ -62,10 +79,12 @@ implements Consumer, Consumable
   // 0xF107: CHAR_PAIR_FOLLOWS
   // 0xF108: BEGIN_GROUP_LONG
   // 0xF109: BEGIN_ATTRIBUTE_LONG
-  // 0xF10A: END_ATTRIBUTES
+  // 0xF10A: END_ATTRIBUTE
   // 0xF10B: END_GROUP_SHORT
   // 0xF10C: END_GROUP_LONG
   // 0xF10D A B: OBJECT_REF_FOLLOWS:  The object in objects[(A,B)].
+  // 0xF10E A B: POSITION_REF_FOLLOWS:  The TreePosition in objects[(A,B)].
+  // 0xF10F A B C D E F: POSITION_TRIPLE_FOLLOWS
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -87,6 +106,14 @@ implements Consumer, Consumable
 
   /** Followed by 2 chars that provide an index into objects. */
   static final char OBJECT_REF_FOLLOWS = 0xF10D;
+
+  /** Followed by 2 chars that provide an index into objects. */
+  static final char POSITION_REF_FOLLOWS = 0xF10E;
+
+  /** A position triple referenceing som eother "nodes".
+   * Followed by index of squence (2 chars), ipos (1 chars), and
+   * index of xpos or -1 if xpos==null (2 chars). */
+  static final char POSITION_TRIPLE_FOLLOWS = 0xF10F;
 
   /** Encoding prefix that indicates a byte value. */
   static final int BYTE_PREFIX = 0xF000;
@@ -136,18 +163,16 @@ implements Consumer, Consumable
    * [index], 2 shorts, where objects[index] is the attribute type name
    *   and objects[index+1] is the attribute type object.
    * [end_offset], 2 shorts, giving the location of the following
-   *   BEGIN_ATTRIBUTE_LONG or END_ATTRIBUTES.  If the attribute straddles
-   *   the gap, then end_offset is a negative offset relative to data.length.
-   *   (Therefore allocating more space for the gap does not require adjusting
-   *   end_offset.)  Otherwise, the end_offset is relative to the
-   *   BEGIN_ATTRIBUTE_LONG word.
+   *   END_ATTRIBUTE.  If the attribute straddles the gap, then
+   *   end_offset is a negative offset relative to data.length.
+   *   (Therefore allocating more space for the gap does not require
+   *   adjusting end_offset.)  Otherwise, the end_offset is relative
+   *   to the BEGIN_ATTRIBUTE_LONG word.
    */
   static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
 
-  /** The end of all the attributes of a node.
-   * Marks start of children (if any) and must be there even if there
-   * are no attributes. */
-  static final int END_ATTRIBUTES = 0xF10A;
+  /** The end of an attributes of a node. */
+  static final int END_ATTRIBUTE = 0xF10A;
 
   /** Beginning of a group, compact form.
    *
@@ -219,9 +244,6 @@ implements Consumer, Consumable
   static final int END_GROUP_LONG = 0xF10C;
 
   int currentBeginGroup = 0;
-
-  // If we're consuming an attribute value, index of attribute node's start.
-  int attributeStart;
 
   public void ensureSpace(int needed)
   {
@@ -342,6 +364,30 @@ implements Consumer, Consumable
     data[index+1] = (char) i;
   }
 
+  public boolean consume(TreePosition position)
+  {
+    ensureSpace(3);
+    // FIXME - no need for find to search in this case!
+    int index = find(new TreePosition(position));
+    data[gapStart++] = POSITION_REF_FOLLOWS;
+    setIntN(gapStart, index);
+    gapStart += 2;
+    return true;
+  }
+
+  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)
+  {
+    ensureSpace(7);
+    data[gapStart] = POSITION_TRIPLE_FOLLOWS;
+    int seq_index = find(seq);
+    int xpos_index = xpos == null ? -1 : find(xpos);
+    setIntN(gapStart+1, seq_index);
+    setIntN(gapStart+3, ipos);
+    setIntN(gapStart+5, xpos_index);
+    gapStart += 7;
+    return true;
+  }
+
   public void writeObject(Object v)
   {
     ensureSpace(3);
@@ -363,7 +409,7 @@ implements Consumer, Consumable
 
   public void beginGroup(int index)
   {
-    ensureSpace(3 + 1 + 7);
+    ensureSpace(3 + 7);
     gapEnd -= 7;
     data[gapStart++] = BEGIN_GROUP_LONG;
     setIntN(gapStart, gapEnd - data.length); // end_offset
@@ -373,13 +419,12 @@ implements Consumer, Consumable
     setIntN(gapEnd + 3, gapStart - 3);  // begin_offset
     setIntN(gapEnd + 5, currentBeginGroup);  // parent_offset
     currentBeginGroup = gapStart - 3;
-    data[--gapEnd] = END_ATTRIBUTES;
   }
 
   public void endGroup(String typeName)
   {
     if (data[gapEnd] != END_GROUP_LONG)
-      throw new Error("unexpected endGroup");
+      throw new Error("unexpected endGroup "+typeName);
     int index = getIntN(gapEnd + 1);
     int begin = getIntN(gapEnd + 3);
     int parent = getIntN(gapEnd + 5);
@@ -418,27 +463,22 @@ implements Consumer, Consumable
 
   public void beginAttribute(int index)
   {
-    if (data[gapEnd] != END_ATTRIBUTES)
-      throw new Error("unexpected beginAttribute");
-    if (attributeStart > 0)
-      setIntN(attributeStart + 3, gapStart - attributeStart);
-    attributeStart = gapStart;
-    ensureSpace(6);
+    ensureSpace(5 + 1);
+    gapEnd--;
     data[gapStart++] = BEGIN_ATTRIBUTE_LONG;
     setIntN(gapStart, index);
     setIntN(gapStart + 2, gapEnd - data.length);
     gapStart += 4;
+    data[gapEnd] = END_ATTRIBUTE;
   }
 
-  public void endAttributes()
+  public void endAttribute()
   {
-    if (attributeStart > 0)
-      setIntN(attributeStart + 3, gapStart - attributeStart);
-    if (data[gapEnd] != END_ATTRIBUTES)
-      throw new Error("unexpected endAttributes");
+    if (data[gapEnd] != END_ATTRIBUTE)
+      throw new Error("unexpected endAttribute");
+    // Move the END_ATTRIBUTES to before the gap.
     gapEnd++;
-    data[gapStart++] = END_ATTRIBUTES;
-    attributeStart = 0;
+    data[gapStart++] = END_ATTRIBUTE;
   }
 
   public void writeChar(int i)
@@ -542,6 +582,13 @@ implements Consumer, Consumable
       }
   }
 
+  public boolean isEmpty()
+  {
+    // FIXME does not work if we allow comment() entries!
+    int pos = gapStart == 0 ? gapEnd : 0;
+    return pos == data.length;
+  }
+
   public int size()
   {
     int size = 0;
@@ -554,6 +601,7 @@ implements Consumer, Consumable
 	  pos = gapEnd;
 	if (pos == end)
 	  return size;
+	// FIXME does not work if we allow comment() entries!
 	pos = consumeRange(pos, end, 1, ignore);
 	size++;
       }
@@ -598,7 +646,7 @@ implements Consumer, Consumable
 	    int end = getIntN(index+3);
 	    index = end + (end < 0 ? data.length : index);
 	  }
-	else if (datum == END_ATTRIBUTES)
+	else if (datum == END_ATTRIBUTE)
 	  index++;
 	else
 	  break;
@@ -641,8 +689,12 @@ implements Consumer, Consumable
 	      break;
 	  }
 
-	if (maxSteps >= 0 && --maxSteps == 0)
-	  break;
+	if (maxSteps >= 0)
+	  {
+	    if (maxSteps == 0)
+	      break;
+	    maxSteps--;
+	  }
 	char datum = data[pos++];
 
 	if (datum <= MAX_CHAR_SHORT)
@@ -706,6 +758,30 @@ implements Consumer, Consumable
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
 	    pos += 2;
 	    continue;
+	  case POSITION_TRIPLE_FOLLOWS:
+	    {
+	      AbstractSequence seq = (AbstractSequence) objects[getIntN(pos)];
+	      int ipos = getIntN(pos+2);
+	      int xpos_index = getIntN(pos+4);
+	      Object xpos = xpos_index < 0 ? null : objects[xpos_index];
+	      if (out instanceof PositionConsumer)
+		((PositionConsumer) out).writePosition(seq, ipos, xpos);
+	      else
+		{
+		  TreePosition tpos = new TreePosition();
+		  tpos.push(seq, ipos, xpos);
+		  out.writeObject(tpos);
+		}
+	    }
+	    continue;
+	  case POSITION_REF_FOLLOWS:
+	    if (out instanceof PositionConsumer)
+	      {
+		((PositionConsumer) out).consume((TreePosition) objects[getIntN(pos)]);
+		pos += 2;
+		continue;
+	      }
+	    // ... else fall through ...
 	  case OBJECT_REF_FOLLOWS:
 	    out.writeObject(objects[getIntN(pos)]);
 	    pos += 2;
@@ -732,8 +808,8 @@ implements Consumer, Consumable
 	    out.beginAttribute(objects[index].toString(), objects[index+1]);
 	    pos += 4;
 	    continue;
-	  case END_ATTRIBUTES:
-	    out.endAttributes();
+	  case END_ATTRIBUTE:
+	    out.endAttribute();
 	    continue;
 	  case INT_FOLLOWS:
 	    writeInt(getIntN(pos));
@@ -766,7 +842,7 @@ implements Consumer, Consumable
     if (index == data.length)
       return false;
     char ch = data[index];
-    return ch != END_ATTRIBUTES && ch != END_GROUP_SHORT
+    return ch != END_ATTRIBUTE && ch != END_GROUP_SHORT
       && ch != END_GROUP_LONG;
   }
 
@@ -811,9 +887,11 @@ implements Consumer, Consumable
 	return Sequence.GROUP_VALUE;
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
-      case END_ATTRIBUTES:
+      case END_ATTRIBUTE:
 	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG: // FIXME	
+      case POSITION_REF_FOLLOWS:
+      case POSITION_TRIPLE_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
       default:
 	return Sequence.OBJECT_VALUE;
@@ -862,10 +940,10 @@ implements Consumer, Consumable
     if (datum >= OBJECT_REF_SHORT
 	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
       return objects[datum-OBJECT_REF_SHORT];
-    /*
     if (datum >= BEGIN_GROUP_SHORT
 	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-      return Sequence.GROUP_VALUE;
+      return new TreeList(this, index, index + data[index+1] + 2);
+    /*
     if ((datum & 0xFF00) == BYTE_PREFIX)
       return Sequence.TEXT_BYTE_VALUE;
     */
@@ -890,16 +968,22 @@ implements Consumer, Consumable
 	/*
       case CHAR_PAIR_FOLLOWS:
 	return Sequence.CHAR_VALUE;
-      case BEGIN_GROUP_LONG:
-	return Sequence.GROUP_VALUE;
-      case END_GROUP_SHORT:
-      case END_GROUP_LONG:
-      case END_ATTRIBUTES:
-	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG: // FIXME
 	*/
+      case BEGIN_GROUP_LONG:
+	{
+	  int end_offset = getIntN(index+1);
+	  end_offset += end_offset < 0 ? data.length : index;
+	  return new TreeList(this, index, end_offset+7);
+	}
+      case END_GROUP_SHORT:
+      case END_GROUP_LONG:
+      case END_ATTRIBUTE:
+	return Sequence.eofValue;
+      case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
 	return objects[getIntN(index+1)];
+      case POSITION_TRIPLE_FOLLOWS: //FIXME
       default:
 	throw unsupported("getNext, code="+Integer.toHexString(datum));
       }
@@ -946,13 +1030,16 @@ implements Consumer, Consumable
 	return pos;
       case CHAR_FOLLOWS:
 	return pos + 1;
+      case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
       case CHAR_PAIR_FOLLOWS:
       case INT_FOLLOWS:
 	return pos + 2;
+      case POSITION_TRIPLE_FOLLOWS:
+	return pos + 6;
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
-      case END_ATTRIBUTES:
+      case END_ATTRIBUTE:
 	return -1;
       case BEGIN_GROUP_LONG:
 	j = getIntN(pos);
@@ -1064,7 +1151,11 @@ implements Consumer, Consumable
 			out.print("=CHAR_FOLLOWS"); toskip = 1;  break;
 		      case CHAR_PAIR_FOLLOWS:
 			out.print("=CHAR_PAIR_FOLLOWS"); toskip = 2;  break;
-		      case OBJECT_REF_FOLLOWS:  toskip = 2;  break;
+		      case POSITION_TRIPLE_FOLLOWS:
+			toskip = 6;  break;
+		      case POSITION_REF_FOLLOWS:
+		      case OBJECT_REF_FOLLOWS:
+			toskip = 2;  break;
 		      case END_GROUP_SHORT:
 			out.print("=END_GROUP_SHORT begin:");
 			j = i - data[i+1];
@@ -1100,7 +1191,7 @@ implements Consumer, Consumable
 			out.print(" end:"+j);
 			toskip = 4;
 			break;
-		      case END_ATTRIBUTES: out.print("=END_ATTRIBUTES"); break;
+		      case END_ATTRIBUTE: out.print("=END_ATTRIBUTE"); break;
 		      }
 		  }
 	      }

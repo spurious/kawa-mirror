@@ -59,9 +59,9 @@ public class FilterConsumer implements Consumer
     base.beginAttribute(attrName, attrType);
   }
 
-  public void endAttributes()
+  public void endAttribute()
   {
-    base.endAttributes();
+    base.endAttribute();
   }
 
   public void writeObject(Object v)

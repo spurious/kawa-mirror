@@ -24,7 +24,7 @@ public class VoidConsumer implements Consumer
 
   public void beginAttribute(String attrName, Object attrType) { }
 
-  public void endAttributes() { }
+  public void endAttribute() { }
 
   public void writeObject(Object v) { }
 

@@ -82,6 +82,34 @@ implements Sequence, PositionConsumer, PositionContainer
       }
   }
 
+  void expand(int needed)
+  {
+    int s = 2 * xposes.length;
+    if (used + needed > s)
+      s = used + needed;
+    AbstractSequence[] stmp = new AbstractSequence[s];
+    int[] itmp = new int[s];
+    Object[] xtmp = new Object[s];
+    System.arraycopy(sposes, 0, stmp, 0, used);
+    System.arraycopy(iposes, 0, itmp, 0, used);
+    System.arraycopy(xposes, 0, xtmp, 0, used);
+    sposes = stmp;
+    iposes = itmp;
+    xposes = xtmp;
+  }
+
+  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)
+  {
+    if (used + 1 >= xposes.length)
+      expand(1);
+    sposes[used] = seq;
+    iposes[used] = ipos;
+    xposes[used] = xpos;
+    used++;
+    added();
+    return true;
+  }
+
   /**
    * Append a new position to the sequence.
    */
@@ -89,20 +117,7 @@ implements Sequence, PositionConsumer, PositionContainer
   {
     int depth = position.getDepth();
     if (used + depth >= xposes.length)
-      {
-	int s = 2 * xposes.length;
-	if (used + depth > s)
-	  s = used + depth;
-	AbstractSequence[] stmp = new AbstractSequence[s];
-	int[] itmp = new int[s];
-	Object[] xtmp = new Object[s];
-	System.arraycopy(sposes, 0, stmp, 0, used);
-	System.arraycopy(iposes, 0, itmp, 0, used);
-	System.arraycopy(xposes, 0, xtmp, 0, used);
-	sposes = stmp;
-	iposes = itmp;
-	xposes = xtmp;
-      }
+      expand(depth);
     AbstractSequence seq;
     for (int i = 0;  i < depth-1;  i++)
       {
@@ -117,6 +132,12 @@ implements Sequence, PositionConsumer, PositionContainer
       seq.copyPosition(position.ipos, position.xpos, this, used);
     used++;
 
+    added();
+    return true;
+  }
+
+  void added()
+  {
     size++;
     if (size >= offsets.length)
       {
@@ -125,7 +146,6 @@ implements Sequence, PositionConsumer, PositionContainer
 	offsets = otmp;
       }
     offsets[size] = used;
-    return true;
   }
 
   /** See java.util.List. */

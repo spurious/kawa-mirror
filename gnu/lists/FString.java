@@ -196,6 +196,9 @@ implements CharSequence, Externalizable, Consumable
   {
     return new String (data, start, end - start);
   }
+  // If JDK1.4 compatible:
+  // public java.lang.CharSequence subSequence(int start, int end)
+  // { return substring(start, end); }
 
   public void setCharAt (int index, char ch)
   {

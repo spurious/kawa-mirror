@@ -3,7 +3,10 @@
 
 package gnu.lists;
 
-/** A sequence where each element is a character. */
+/** A sequence where each element is a character.
+ * Note:  It appears that JDK 1.4 will have a new interface
+ * java.lang.CharSequence, with charAt length, subSequence, and toString.
+ */
 
 public interface CharSequence extends Sequence
 {
@@ -36,4 +39,8 @@ public interface CharSequence extends Sequence
   public void writeTo(java.io.Writer str) throws java.io.IOException;
 
   public void consume(int start, int count, Consumer out);
+
+  // JDK 1.4 has these:
+  // public CharSequence subSequence (int start, int end;
+  // public String toString();
 }

@@ -1,4 +1,42 @@
-2001-06-17  Per Bothner  <per@bothner.com>
+2001-07-15  Per Bothner  <per@bothner.com>
+
+	* Consumer.java:  Replace endAttributes by endAttribute.
+	* VoidConsumer.java:  Likewise.
+	* FilterConsumer.java:  Likewise.
+	* TreeList.java (END_ATTRIBUTES):  Removed constant.
+	(END_ATTRIBUTE):  New constant.
+	(beginGroup):  No longer emit END_ATTRIBUTES word.
+	(beginAttribute):  Write END_ATTRIBUTE word.
+	(endAttributes):  Removed.
+	(endAttribute):  New method.
+	(consumeRange, gotoChildrenStart, hasNext, getNextKind, getNext,
+	nextDataIndex, dump):  Update accordingly.
+	* FVector.java:  Remove endAttributes call.
+
+	* PositionConsumer.java (writePosition):  New method.
+	* TreeList.java: Implement PositionConsumer.
+	(consume, writePosition):  New methods.
+	(POSITION_REF_FOLLOWS, POSITION_TRIPLE_FOLLOWS):  New constants.
+	(consumeRange, getNextKind, getNext, nextDataIndex, dump):
+	Support new constants.
+
+	* TreeList.java (<init>):  New constructors.
+	(isEmpty):  New method.
+	(consumeRange):  Fix logic checking maxSteps.
+	(getNext):  Handle BEGIN_GROUP_SHORT/_LONG using copy constructor.
+	* TreePositionList.java (added):  New helper method,.
+	(consume):  Replace old logic by new 'added' method..
+	(writePosition):  New method.
+	(expand):  New helper method.
+
+	* AbstractSequence.java.in (toArray):  Change 0-argument version
+	to use correct implementation rather than using 1-argument version.
+	* AbstractSequence.java.in (consume)  Likewise.
+	* LList.java (consume):  Likewise.
+
+	* FormatToConsumer.java (beginGroup, endGroup):  New methods.
+
+2001-06-17  Per Bothner  <per@bothner.com>	
 
 	Various improvements to documentation comments.
 	* package.html:  Additional text.

@@ -10,7 +10,7 @@ package gnu.lists;
  * then data "written" to the sequence will be inserted in the sequence.
  * <p>
  * <em>Note:</em> This interface is not quite final.  For example it is
- * possible we should need to add endAttribute after each attribute.
+ * probable we will add methods for comments, processing instructions, etc.
  */
 
 public interface Consumer
@@ -30,8 +30,7 @@ public interface Consumer
 	 * This is only allowed immediately after a beginGroup. */
 	public void beginAttribute(String attrName, Object attrType);
 
-	/** No more attributes in this group. */
-	public void endAttributes();
+	public void endAttribute();
 
 	public void writeObject(Object v);
 

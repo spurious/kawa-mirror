@@ -143,7 +143,6 @@ implements Externalizable, Consumable
     String typeName = "#vector"; 
     String type = typeName;
     out.beginGroup(typeName, type);
-    out.endAttributes();
     int len = size;
     for (int i = 0;  i < len;  i++)
       out.writeObject(data[i]);

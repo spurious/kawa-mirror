@@ -31,6 +31,18 @@ public class print
 	ps.print("#f");
     else if (obj == null)
       ps.print("#<null>");
+    else if (obj instanceof Object[])
+      {
+	Object[] arr = (Object[]) obj;
+	ps.print ('[');
+	for (int i = 0;  i < arr.length;  i++)
+	  {
+	    if (i > 0)
+	      ps.print (' ');
+	    print (arr[i], ps);
+	  }
+	ps.print (']');
+      }
     else
       ps.print(obj.toString ());
   }

@@ -1,3 +1,7 @@
+2002-05-19  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (setup):  Fix name/this.name confusion.
+
 2002-02-12  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  If value is Named,

@@ -54,8 +54,8 @@ public class ClassMemberConstraint extends Constraint
 	  }
 	catch (RuntimeException ex)
 	  {
-	    String name = binding.getName();
-	    throw new UnboundSymbol(name, "Unbound symbol " + name
+	    String bname = binding.getName();
+	    throw new UnboundSymbol(bname, "Unbound symbol " + bname
 				    + " - " + ex.toString());
 	  }
         try
@@ -64,8 +64,8 @@ public class ClassMemberConstraint extends Constraint
           }
         catch (java.lang.NoSuchFieldException ex)
           {
-	    String name = binding.getName();
-	    throw new UnboundSymbol(name, "Unbound symbol " + name
+	    String bname = binding.getName();
+	    throw new UnboundSymbol(bname, "Unbound symbol " + bname
 				    + " - no field " + name
 				    + " in " + type.getName());
           }

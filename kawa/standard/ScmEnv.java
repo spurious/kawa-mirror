@@ -60,7 +60,6 @@ public class ScmEnv extends Environment
 	      }
 	    catch (UnboundSymbol ex2)
 	      {
-		ex2.printStackTrace();
 	      }
 	  }
 	throw ex;

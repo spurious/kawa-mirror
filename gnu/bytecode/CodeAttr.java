@@ -1455,7 +1455,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	prev = cur;
       }
-    if (oldest != labels)
+    if (oldest != labels && oldest != null)
       {
 	oldest_prev.next = oldest.next;
 	oldest.next = labels;
@@ -1705,10 +1705,10 @@ public class CodeAttr extends Attribute implements AttrContainer
 		      {
 			dst.print("tableswitch");
 			int low = readInt(i);  i += 4;
-			int high = readInt(i+4);  i += 4;
+			int high = readInt(i);  i += 4;
 			dst.print(" low: "); dst.print(low);
 			dst.print(" high: "); dst.print(high);
-			dst.print(" default: "); dst.print(code_offset);
+			dst.print(" default: "); dst.print(oldpc+code_offset);
 			for (;  low <= high;  low++)
 			  {
 			    code_offset = readInt(i);  i += 4;
@@ -1722,7 +1722,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 			dst.print("lookupswitch");
 			int npairs = readInt(i);  i += 4;
 			dst.print(" npairs: "); dst.print(npairs);
-			dst.print(" default: "); dst.print(code_offset);
+			dst.print(" default: "); dst.print(oldpc+code_offset);
 			while (--npairs >= 0)
 			  {
 			    int match = readInt(i);  i += 4;

@@ -124,13 +124,14 @@ public class SwitchState
 	if (value == values[copyBefore])
 	  return false;
       }
-    int copyAfter = numCases = copyBefore;
+    int copyAfter = numCases - copyBefore;
     System.arraycopy(old_values, copyBefore, values, copyBefore+1, copyAfter);
     System.arraycopy(old_values, 0, values, 0, copyBefore);
     values[copyBefore] = value;
     System.arraycopy(old_labels, copyBefore, labels, copyBefore+1, copyAfter);
     System.arraycopy(old_labels, 0, labels, 0, copyBefore);
     labels[copyBefore] = label;
+    numCases++;
     return true;
   }
 
@@ -138,7 +139,22 @@ public class SwitchState
    * Assume the case value is on the stack; go to the matching case label. */
   public void finish (CodeAttr code)
   {
+    if (defaultLabel == null)
+      {
+	defaultLabel = new Label(code);
+	defaultLabel.define(code);
+	code.emitPushString("bad case value!");
+	ClassType ex = ClassType.make("java.lang.RuntimeException");
+	code.emitNew(ex);
+	code.emitDup(ex);
+	Type[] args = { Type.string_type };
+	Method con = ex.addMethod("<init>", Access.PUBLIC,
+				  args, Type.void_type);
+	code.emitInvokeSpecial(con);
+	code.emitThrow();
+      }
     switch_label.define(code);
+    code.pushType(Type.int_type);
     if (numCases <= 1)
       {
 	if (numCases == 1)
@@ -167,7 +183,7 @@ public class SwitchState
 	for (int i = minValue;  i <= maxValue;  i++)
 	  {
 	    Label lab = values[index] == i ? labels[index++] : defaultLabel;
-	    defaultLabel.emit_wide(code, start);
+	    lab.emit_wide(code, start);
 	  }
       }
     else

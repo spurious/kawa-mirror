@@ -38,17 +38,19 @@ public class LocalVarsAttr extends Attribute
   public void enterScope (Scope scope) {
     scope.linkChild (current_scope);
     current_scope = scope;
+    CodeAttr code = method.getCode();
     for (Variable var = scope.firstVar ();  var != null;  var = var.nextVar ())
       {
 	if (var.isSimple ())
 	  {
 	    if (! var.isAssigned ())
-	      method.allocate_local (var);
+	      var.allocateLocal(code);
 	    else if (used[var.offset] == null)
 	      used[var.offset] = var;
 	    else if (used[var.offset] != var)
 	      throw new Error ("inconsistent local variable assignments for "
 +var.getName()+" at "+var.offset+" != "+used[var.offset]);
+	    var.start_pc = code.PC;
 	  }
       }
   }

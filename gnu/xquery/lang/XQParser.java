@@ -831,8 +831,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL))
       {
 	QName qname = parseNameTest(defaultNamespace);
-	Expression[] args = { dot, new QuoteExp(qname.getNamespaceURI()),
-			      new QuoteExp(qname.getLocalName()) };
+	Expression[] args = { dot, new QuoteExp(new ElementType(qname)) };
 	Expression func
 	  = axis == AXIS_DESCENDANT ? funcNamedDescendants : funcNamedChildren;
 	exp = new ApplyExp(func, args);
@@ -887,7 +886,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    ApplyExp aexp = (ApplyExp) lexp.body;
 	    Expression func = aexp.getFunction();
 	    Expression[] args = aexp.getArgs();
-	    if (func == funcNamedChildren && args.length==3
+	    if (func == funcNamedChildren && args.length==2
 		&& args[0] instanceof ReferenceExp
 		&& ((ReferenceExp) args[0]).getBinding() == decl)
 	      {
@@ -897,16 +896,27 @@ public class XQParser extends LispReader // should be extends Lexer
 		exp = new ApplyExp (func, args);
 		handled = true;
 	      }
+	    else if (func == funcValuesFilter && args.length==2
+		     && args[0] instanceof ApplyExp
+		     && descendants)
+	      {
+		ApplyExp xapp = (ApplyExp) args[0];
+		Expression[] xargs = xapp.getArgs();
+		if (xapp.getFunction() == funcNamedChildren
+		    && xargs.length == 2
+		    && ((ReferenceExp) xargs[0]).getBinding() == decl)
+		  {
+		    xapp.setFunction(funcNamedDescendants);
+		  }
+	      }
 	  }
 
 	if (! handled)
 	  {
-	    if (descendants)
-	      return syntaxError("// not implemented except as //NAME");
-	    Expression[] args = { lexp, exp };
-	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
-					       "valuesMap"),
-			       args);
+	    Expression[] args = new Expression[] { lexp, exp };
+	    Expression func = makeFunctionExp("gnu.kawa.functions.ValuesMap",
+				   "valuesMap");
+	    exp = new ApplyExp(func, args);
 	  }
       }
     return exp;
@@ -950,9 +960,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      return syntaxError("missing ']'");
 	    getRawToken();
 	    Expression[] args = { exp, lexp };
-	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.ValuesFilter",
-					       "valuesFilter"),
-			       args);
+	    exp = new ApplyExp(funcValuesFilter, args);
 	  }
 	/*
 	else if (curToken == ARROW_TOKEN)
@@ -1883,6 +1891,8 @@ public class XQParser extends LispReader // should be extends Lexer
     = makeFunctionExp("gnu.kawa.xml.NamedChildren", "namedChildren");
   static final Expression funcNamedDescendants
     = makeFunctionExp("gnu.kawa.xml.NamedDescendants", "namedDescendants");
+  static final Expression funcValuesFilter
+    = makeFunctionExp("gnu.xquery.util.ValuesFilter", "valuesFilter");
 
   public void error(String message)
   {

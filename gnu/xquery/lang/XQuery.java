@@ -156,6 +156,9 @@ public class XQuery extends Interpreter
     define("unescaped-data", gnu.kawa.xml.MakeUnescapedData.unescapedData);
     define("item-at", gnu.xquery.util.ItemAt.itemAt);
     define("count", gnu.kawa.functions.CountValues.countValues);
+    define("min", gnu.xquery.util.MinMax.min);
+    define("max", gnu.xquery.util.MinMax.max);
+    define("position", gnu.xquery.util.Position.position);
     define("sublist", gnu.xquery.util.SubList.subList);
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);
     define("false", new ConstantFunction0("false", Boolean.FALSE));

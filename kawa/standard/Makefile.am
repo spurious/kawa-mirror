@@ -83,8 +83,8 @@ acos.class \
 atan.class \
 sqrt.class \
 expt.class \
-make_rectangular.class \
-real_part.class imag_part.class \
+make_rectangular.class make_polar.class \
+real_part.class imag_part.class angle.class \
 exact2inexact.class \
 inexact2exact.class \
 number2string.class \

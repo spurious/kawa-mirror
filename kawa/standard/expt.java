@@ -10,7 +10,6 @@ public class expt extends Procedure2
   {
     if (arg2 instanceof IntNum)
       return ((Numeric) arg1).power((IntNum) arg2);
-    return new DFloNum (Math.pow (((RealNum)arg1).doubleValue (),
-				  ((RealNum)arg2).doubleValue ()));
+    return Complex.power ((Complex) arg1, (Complex) arg2);
   }
 }

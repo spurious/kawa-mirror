@@ -8,6 +8,6 @@ public class exp extends Procedure1
 {
   public Object apply1 (Object arg1) throws WrongType
   {
-    return new DFloNum (Math.exp (((RealNum)arg1).doubleValue ()));
+    return ((Complex) arg1).exp();
   }
 }

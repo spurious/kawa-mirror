@@ -232,8 +232,11 @@ public class Scheme extends Interpreter
       define_proc ("sqrt", "kawa.standard.sqrt");
       define_proc ("expt", "kawa.standard.expt");
       define_proc ("make-rectangular", "kawa.standard.make_rectangular");
+      define_proc ("make-polar", "kawa.standard.make_polar");
       define_proc ("real-part", "kawa.standard.real_part");
       define_proc ("imag-part", "kawa.standard.imag_part");
+      define_proc ("magnitude", "kawa.standard.abs");
+      define_proc ("angle", "kawa.standard.angle");
       define_proc ("exact->inexact", "kawa.standard.exact2inexact");
       define_proc ("inexact->exact", "kawa.standard.inexact2exact");
       define_proc ("number->string", "kawa.standard.number2string");

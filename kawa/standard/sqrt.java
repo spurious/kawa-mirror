@@ -8,6 +8,11 @@ public class sqrt extends Procedure1
 {
   public Object apply1 (Object arg1)
   {
-    return new DFloNum (Math.sqrt (((RealNum)arg1).doubleValue ()));
+    Quantity q = (Quantity) arg1;
+    Complex z = q.number().sqrt();
+    Unit u = q.unit();
+    if (u == Unit.Empty)
+      return z;
+    return Complex.make (z, u.sqrt());
   }
 }

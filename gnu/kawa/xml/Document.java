@@ -7,6 +7,7 @@ import gnu.lists.*;
 import gnu.xml.*;
 import java.net.URL;
 import gnu.text.*;
+import gnu.kawa.functions.BaseUri;
 
 /** Implement the XQuery function 'document'. */
 
@@ -14,32 +15,39 @@ public class Document extends Procedure1
 {
   public static final Document document = new Document();
 
-  /** If there is no protocol specified, pre-pend "file:" and return a URL. */
-
-  public static URL makeURL(String fileName)
+  /** Resolve relative URI, and return an URL instance. */
+  public static URL makeURL(Object url, Object base)
     throws java.net.MalformedURLException
   {
-    int len = fileName.length();
-    boolean seenProto = false;
-    for (int i = 0;  i < len;  i++)
+    if (url instanceof URL)
+      return (URL) url;
+    String name = url.toString();
+    if (! BaseUri.hasScheme(name))
       {
-	char ch = fileName.charAt(i);
-	if (ch == ':')
+	if (base != null)
 	  {
-	    seenProto = true;
-	    break;
+	    Object b = BaseUri.baseUri(base);
+	    name = BaseUri.resolve(name,
+			   b == Values.empty ?  base.toString()
+			   : b.toString());
 	  }
-	if (! Character.isLetter(ch))
-	  break;
+	if (! BaseUri.hasScheme(name))
+	  {
+	    name = BaseUri.resolve(name, BaseUri.baseUri().toString());
+	  }
       }
-    if (! seenProto)
-      fileName = "file:" + fileName;
-    return new URL(fileName);
+    return new URL(name);
+  }
+
+  public static URL makeURL(Object url)
+    throws java.net.MalformedURLException
+  {
+    return makeURL(url, null);
   }
 
   public static void parse (Object name, Consumer out) throws Throwable
   {
-    URL url = name instanceof URL ? (URL) name : makeURL(name.toString());
+    URL url = makeURL(name, null);
     SourceMessages messages = new SourceMessages();
     XMLParser parser
       = new XMLParser(url,
@@ -68,7 +76,24 @@ public class Document extends Procedure1
 
   public void apply (CallContext ctx) throws Throwable
   {
-    String fileName = ctx.getNextArg().toString();
-    parse(makeURL(fileName), ctx.consumer);
+    Object url = ctx.getNextArg();
+    Object base = ctx.getNextArg(null);
+    if (url instanceof Values)
+      {
+	int iter = 0;
+	Values vals = (Values) url;
+	for (;;)
+	  {
+	    iter = vals.nextPos(iter);
+	    if (iter == 0)
+	      break;
+	    Object val = vals.getPosPrevious(iter);	
+	    parse(makeURL(url, base), ctx.consumer);
+	  }
+      }
+    else
+      {
+	parse(makeURL(url, base), ctx.consumer);
+      }
   }
 }

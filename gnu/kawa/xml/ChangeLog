@@ -1,3 +1,11 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* Document.java (makeUrl):  The 'url' argument can be a URL as well as
+	a string, and now also takes a 'base' parameter.
+	(parse, apply):  Use new new makeURL.
+	(apply):  Implement specification in allowing a sequence of URLs,
+	and an optional 'base' second parameter.
+
 2003-02-13  Per Bothner  <per@bothner.com>
 
 	* Document.java (parse):  Call writeBaseUri if a TreeList.

@@ -1,3 +1,17 @@
+Sat Mar  8 11:00:24 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/LambdaExp.java (hasNestedScopes):  Removed.  Replaced by:
+	* kawa/lang/ModuleExp.java (mustCompile):  New field.
+	(eval_module):  Test mustCompile instead of hasNestedScopes.
+	* kawa/lang/Translator.java (mustCompileHere):  New method.
+	(rewrite_pair):  If we create a PrimApplyExp, call mustCompileHere.
+	* kawa/lang/ScopeExp.java (push):  Re-implement - use mustCompileHere.
+	* kawa/standard/Scheme.java:  Add define-unit.
+
+Mon Mar  3 13:24:01 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/SetExp.java:  Add extra casts for multiple static links.
+
 Tue Feb 11 20:06:49 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.2.

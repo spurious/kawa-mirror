@@ -100,7 +100,6 @@ libgcj_basedir = @libgcj_basedir@
 AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
-  AppendValues.java \
   Children.java \
   Compare.java \
   ElementType.java \

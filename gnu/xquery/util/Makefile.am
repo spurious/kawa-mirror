@@ -5,7 +5,6 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_sources = \
-  AppendValues.java \
   Children.java \
   Compare.java \
   ElementType.java \

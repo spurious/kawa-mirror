@@ -92,19 +92,23 @@ public class Record extends NameMap
     Class thisClass = getClass();
     if (obj == null || obj.getClass() != thisClass)
       return false;
-    Field[] fields = getFieldFields(thisClass);
-    for (int i = 0;  i < fields.length;  i++)
+    ClassType ctype = (ClassType) Type.make(thisClass);
+    for (gnu.bytecode.Field fld = ctype.getFields();
+	 fld != null;  fld = fld.getNext())
       {
-	Field field = fields[i];
+	if ((fld.getModifiers() & (Modifier.STATIC|Modifier.PUBLIC))
+	    != Modifier.PUBLIC)
+	  continue;
 	Object value1, value2;
 	try
 	  {
+	    Field field = fld.getReflectField();
 	    value1 = field.get(this);
 	    value2 = field.get(obj);
 	  }
-	catch (IllegalAccessException ex)
+	catch (Exception ex)
 	  {
-	    continue;
+	    throw new WrappedException(ex);
 	  }
 	if (! (value1.equals(value2)))
 	  return false;
@@ -112,93 +116,11 @@ public class Record extends NameMap
     return true;
   }
 
-  public static Field[] getFieldFields(Class clas)
-  {
-    String names;
-    try
-    {
-      Field fld = clas.getDeclaredField("$FieldNames$");
-      names = (String) fld.get(null);
-    }
-    catch (Exception ex)
-    {
-      return clas.getDeclaredFields();
-    }
-    int nfields = 0;
-    int nlen = names.length();
-    for (int i = nlen;  --i >= 0; )
-    {
-      if (names.charAt(i) == '\n')
-	nfields++;
-    }
-    Field[] fields = new Field[nfields];
-    int start = 0;
-    int ifield;
-    for (int i = 0;  i < nfields;  i++)
-    {
-      int end = names.indexOf('\n', start);
-      String fname = names.substring(start, end);
-      fname = gnu.expr.Compilation.mangleName(fname);
-      try
-	{
-	  fields[i] = clas.getDeclaredField(fname);
-	}
-      catch (Exception ex)
-	{
-	  throw new WrappedException("record missing field "+fname, ex);
-	}
-      start = end + 1;
-    }
-    return fields;
-  }
-
-  public Field[] getFieldFields()
-  {
-    return getFieldFields(getClass());
-  }
-
   public String toString()
   {
     StringBuffer buf = new StringBuffer(200);
     buf.append("#<");
     buf.append(getTypeName());
-    /*
-    try
-      {
-	Field fld = clas.getDeclaredField("$FieldNames$");
-	String names = (String) fld.get(null);
-	int nfields = 0;
-	int nlen = names.length();
-	int start = 0;
-	int ifield;
-	for (int i = 0;  ;  i++)
-	  {
-	    int end = names.indexOf('\n', start);
-	    if (end < 0)
-	      break;
-	    String fname = names.substring(start, end);
-	    String mname = gnu.expr.Compilation.mangleName(fname);
-	    try
-	      {
-		this.fields[i] = clas.getDeclaredField(mname);
-		Object value = field.get(this);
-		start = end + 1;
-		buf.append(' ');
-		buf.append(fname);
-		buf.append(": ");
-		buf.append(value);
-	      }
-	    catch (Exception ex)
-	      {
-		throw new WrappedException("record missing field "+fname, ex);
-	      }
-	  }
-      }
-    catch (ClassCastException ex)
-      {
-        Field[] fields = clas.getFields();
-      }
-    */
     ClassType ctype = (ClassType) Type.make(getClass());
     for (gnu.bytecode.Field fld = ctype.getFields();
 	 fld != null;  fld = fld.getNext())

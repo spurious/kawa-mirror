@@ -41,9 +41,7 @@ public class XSLT extends XQuery
   {
     try
       {
-	//ModuleExp mexp
-	// = super.parseFile(, messages);
-	gnu.expr.Parser tr = new gnu.expr.Parser(messages);
+	Compilation tr = new Compilation(messages);
 	XQParser lexer
 	  = (XQParser) super.getLexer(new CharArrayInPort(string), messages);
 	//lexer.nesting = 1;
@@ -82,13 +80,13 @@ public class XSLT extends XQuery
   */
   }
 
-  public ModuleExp parse(Environment env, Lexer lexer)
+  public Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     lexer.clearErrors();
     Compilation.usingTailCalls = true;
     gnu.text.SourceMessages messages = lexer.getMessages();
-    gnu.expr.Parser tr = new gnu.expr.Parser(messages);
+    Compilation tr = new Compilation(messages);
     tr.immediate = true;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(lexer.getName());
@@ -103,14 +101,14 @@ public class XSLT extends XQuery
     // FIXME - need check for eof.
     xtr.endDocument();
     tr.pop(mexp);
-    return mexp;
+    return tr;
   }
 
-  public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
-    gnu.expr.Parser tr = new gnu.expr.Parser(messages);
+    Compilation tr = new Compilation(messages);
     tr.mustCompileHere();
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
@@ -122,7 +120,7 @@ public class XSLT extends XQuery
     parser.parse();
     xtr.endDocument();
     tr.pop(mexp);
-    return mexp;
+    return tr;
   }
 
   /** The compiler insert calls to this method for applications and applets. */

@@ -1,3 +1,8 @@
+2002-07-24  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (parseXPath, parse, parseFile):  Update for changes
+	in Interpreter and Compilation.
+
 2002-06-24  Per Bothner  <per@bothner.com>
 
 	* XSLT.java:  Update for moved/changed XMLParser class.

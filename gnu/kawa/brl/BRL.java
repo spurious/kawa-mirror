@@ -68,7 +68,7 @@ public class BRL extends Scheme
     return new XMLPrinter(out, false);
   }
 
-  public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
@@ -96,7 +96,7 @@ public class BRL extends Scheme
     if (port.readState != ']')
       lexer.fatal("An unmatched '[' was read.");
     tr.finishModule(mexp, forms);
-    return mexp;
+    return tr;
   }
 
   /** The compiler insert calls to this method for applications and applets. */

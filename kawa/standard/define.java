@@ -10,10 +10,17 @@ import gnu.expr.*;
 
 public class define extends Syntax implements Printable
 {
+  boolean makePrivate;
+  public define(boolean makePrivate)
+  {
+    this.makePrivate = makePrivate;
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     String name = null;
     Expression value = null;
+    Declaration decl = null;
 
     if (obj instanceof Pair)
       {
@@ -27,12 +34,30 @@ public class define extends Syntax implements Printable
 		value = tr.rewrite (p2.car);
 	      }
 	  }
+	else if (p1.car instanceof Declaration && p1.cdr instanceof Pair)
+	  {
+	    Pair p2 = (Pair) p1.cdr;
+	    if (p2.cdr == List.Empty)
+	      {
+		decl = (Declaration) p1.car;
+                name = decl.symbol();
+		value = tr.rewrite (p2.car);
+	      }
+	  }
 	else if (p1.car instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.car;
 	    if (p2.car instanceof String)
 	      {
 		name = (String) p2.car;
+              }
+            else if (p2.car instanceof Declaration)
+              {
+                decl = (Declaration) p2.car;
+                name = decl.symbol();
+              }
+            if (name != null)
+              {
 		LambdaExp lexp = new LambdaExp();
 		Lambda.rewrite(lexp, p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
@@ -47,11 +72,28 @@ public class define extends Syntax implements Printable
 	  }
       }
     if (name == null)
-      return tr.syntaxError ("invalid syntax for define");
+      return tr.syntaxError ("invalid syntax for "+getName());
     SetExp sexp = new SetExp (name, value);
     sexp.setDefining (true);
+    if (makePrivate)
+      decl.setPrivate(true);
+    if (decl != null)
+      {
+	sexp.binding = decl;
+	decl.noteValue (value);
+      }
     if (! (tr.currentScope() instanceof ModuleExp))
       {
+        if (makePrivate)
+          {
+            tr.error('w', "define-private not at top level "
+                     +tr.currentScope());
+            return sexp;
+          }
+
+        /*
+        // FIXME:  Remove following once define is handled like define-private.
+
 	Object binding = tr.current_decls.get (name);
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.
@@ -59,6 +101,7 @@ public class define extends Syntax implements Printable
 	  return tr.syntaxError ("invalid use of define");
 	sexp.binding = (Declaration) binding;
 	sexp.binding.noteValue (value);
+        */
       }
     return sexp;
   }

@@ -48,6 +48,7 @@ public class Scheme extends Interpreter
 
   public static Syntax beginSyntax;
   public static Syntax defineSyntax;
+  public static Syntax defineSyntaxPrivate;
   public static Syntax defineAliasSyntax;
   public static Syntax defineSyntaxSyntax;
 
@@ -103,7 +104,9 @@ public class Scheme extends Interpreter
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new Quote ());
-      define ("define", defineSyntax = new kawa.standard.define());
+      define ("define", defineSyntax = new kawa.standard.define(false));
+      define ("define-private",
+              defineSyntaxPrivate = new kawa.standard.define(true));
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
@@ -364,6 +367,7 @@ public class Scheme extends Interpreter
       define_proc ("close-input-port", "kawa.standard.close_input_port");
       define_proc ("close-output-port", "kawa.lib.ports");
       define_proc ("read", "kawa.standard.read");
+      define_proc ("read-line", "kawa.standard.read_line");
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
       define_proc ("eof-object?", "kawa.lib.ports");
@@ -591,8 +595,10 @@ public class Scheme extends Interpreter
     try
       {
 	SourceMessages messages = new SourceMessages();
-	return Eval.evalBody(CompileFile.readBody(port, messages),
-			     env, messages);
+        Object body = CompileFile.readBody(port, messages);
+        if (messages.seenErrors())
+          throw new gnu.text.SyntaxException(messages);
+	return Eval.evalBody(body, env, messages);
       }
     catch (gnu.text.SyntaxException e)
       {
@@ -674,7 +680,11 @@ public class Scheme extends Interpreter
   public static ModuleExp makeModuleExp(Object body, Translator tr)
   {
     ModuleExp mexp = new ModuleExp();
-    Lambda.rewrite(mexp, List.Empty, body, tr);
+    java.util.Vector forms = new java.util.Vector(20);
+    SourceMessages messages = tr.getMessages();
+    tr.push(mexp);
+    tr.scan_body(body, forms, mexp);
+    tr.finishModule(mexp, forms);
     return mexp;
   }
 
@@ -698,7 +708,6 @@ public class Scheme extends Interpreter
 	types.put ("Object", Type.pointer_type);
 	types.put ("java.lang.Object", Type.pointer_type);
 	types.put ("String", Type.string_type);
-	types.put ("java.lang.String", Type.string_type);
 
 	types.put ("object", Type.pointer_type);
 	types.put ("number", ClassType.make("gnu.math.Numeric"));

@@ -96,6 +96,7 @@ with_input_from_file.java \
 with_output_to_file.java \
 read.java \
 readchar.java \
+read_line.java \
 char_ready_p.java \
 write.java \
 writechar.java \

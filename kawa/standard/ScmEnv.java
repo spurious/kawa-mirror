@@ -1,8 +1,14 @@
 package kawa.standard;
 import gnu.mapping.*;
+import gnu.math.Unit;
 
 /** An Environment that does special handling for names of the form "<TYPE>".
  * I.e. if an identifier of the form is unbound, then get a matching Type.
+ *
+ * Also, handles U$unit by doing Unit.lookup("U").  (The Scheme reader
+ * translates a quantity like 2in to (* 2 in$unit).  The advantage is
+ * is that we can have clean scoping rules for unit names;  the downside
+ * is that 2in is no longer a literal.)
  */
 
 public class ScmEnv extends Environment
@@ -32,6 +38,12 @@ public class ScmEnv extends Environment
       }
     catch (UnboundSymbol ex)
       {
+        if (name.endsWith("$unit"))
+          {
+            Unit unit = Unit.lookup(name.substring(0, name.length()-5));
+            if (unit != null)
+              return unit;
+          }
 	gnu.bytecode.Type type = getType(name);
 	if (type != null)
 	  return type;
@@ -51,6 +63,12 @@ class ScmEnvConstraint extends UnboundConstraint
   public Object get (Binding binding)
   {
     String name = binding.getName();
+    if (name.endsWith("$unit"))
+      {
+        Unit unit = Unit.lookup(name.substring(0, name.length()-5));
+        if (unit != null)
+          return unit;
+      }
     gnu.bytecode.Type type = ScmEnv.getType(name);
     if (type == null)
       throw new UnboundSymbol(name);

@@ -20,6 +20,7 @@ public class with_compile_options extends Syntax
 	return;
       }
     rest = tr.scanBody(rest, defs, true);
+    rest = new Pair(stack, rest);
     tr.currentOptions.popOptionValues(stack);
     tr.formStack.add(Translator.makePair(form, form.car, rest));
   }

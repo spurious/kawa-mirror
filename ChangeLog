@@ -1,3 +1,8 @@
+2005-01-26  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/with_compile_options.java (scanForm):  Put back a
+	statement that should not have been deleted in 01-22 change.
+
 2005-01-25  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java: Update Interpreter -> Language.
@@ -13,7 +18,7 @@
 	create a list, and return a scanned for for later rewrite.
 	Alternative fix to problem fixed by 01-12 change.
 	* kawa/lang/Eval.java (evalBody): Update scanForm call.
-	*: kawa/standard/with_compile_options.java (scanForm): Update calls to
+	* kawa/standard/with_compile_options.java (scanForm): Update calls to
 	tr.scanForm. Let Translator create list rather than doing it here.
 
 	* kawa/standard/Scheme.java (scheme_counter): Remove static field.

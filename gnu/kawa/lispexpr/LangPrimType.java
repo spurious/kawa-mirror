@@ -121,9 +121,8 @@ public class LangPrimType extends gnu.bytecode.PrimType
   public void emitCoerceToObject (CodeAttr code)
   {
     char sig1 = getSignature().charAt(0);
-    ClassType clas;
-    Method method;
-    Type[] args;
+    Type argType = null;
+    String cname = null;
     switch (sig1)
       {
       case 'Z':
@@ -139,31 +138,28 @@ public class LangPrimType extends gnu.bytecode.PrimType
 	code.emitInvokeStatic(makeCharMethod);
 	break;
       case 'B':  case 'S':  case 'I':
-	clas = ClassType.make("gnu.math.IntNum");
-	args = new Type[1];
-	args[0] = Type.int_type;
-	method = clas.getDeclaredMethod("make", args);
-	code.emitInvokeStatic(method);
+	cname = "gnu.math.IntNum";
+	argType = Type.int_type;
 	break;
       case 'J':
-	clas = ClassType.make("gnu.math.IntNum");
-	args = new Type[1];
-	args[0] = Type.long_type;
-	method = clas.getDeclaredMethod("make", args);
-	code.emitInvokeStatic(method);
+	cname = "gnu.math.IntNum";
+	argType = Type.long_type;
 	break;
       case 'F':
 	code.emitConvert(Type.float_type, Type.double_type);
 	// ... fall through ...
       case 'D':
-	clas = ClassType.make("gnu.math.DFloNum");
-	args = new Type[1];
-	args[0] = Type.double_type;
-	method = clas.getDeclaredMethod("make", args);
-	code.emitInvokeStatic(method);
+	cname = "gnu.math.DFloNum";
+	argType = Type.double_type;
 	break;
       default:
 	super.emitCoerceToObject(code);
+      }
+    if (cname != null)
+      {
+	ClassType clas = ClassType.make(cname);
+	Type[] args = { argType };
+	code.emitInvokeStatic(clas.getDeclaredMethod("make", args));
       }
   }
 

@@ -1,3 +1,8 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* ValuesEvery.java:  New class, extends CpsProcedure.
+	* Makefile.am:  Update accordingly.
+
 2003-10-07  Per Bothner  <per@bothner.com>
 
 	* BooleanValue.java (booleanValue):  Change to match spec better.

@@ -21,6 +21,7 @@ java_sources = \
   RelativeStep.java \
   StringValue.java \
   SubList.java \
+  ValuesEvery.java \
   ValuesFilter.java \
   XMLFormat.java
 

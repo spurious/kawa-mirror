@@ -191,8 +191,9 @@ public class Shell
   {
     SourceMessages messages = new SourceMessages();
     Lexer lexer = interp.getLexer(inp, messages);
-    if (inp instanceof TtyInPort)  // Wrong for the case of '-f' '-'.
-      lexer.setInteractive(true);
+    // Wrong for the case of '-f' '-':
+    boolean interactive = inp instanceof TtyInPort;
+    lexer.setInteractive(interactive);
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
     if (out != null)
@@ -251,9 +252,21 @@ public class Shell
 		e.printAll(perr, 20);
 		e.clear();
 	      }
+	    catch (java.io.IOException e)
+	      {
+		messages.printAll(perr, 20);
+		String msg = new SourceError(inp, 'e', "").toString();
+		msg = msg.substring(0, msg.length() - 2);
+		perr.println(msg + " (or later): caught IOException");
+		e.printStackTrace(perr);
+		if (! interactive)
+		  return;
+	      }
 	    catch (Throwable e)
 	      {
 		e.printStackTrace(perr);
+		if (! interactive)
+		  return;
 	      }
 	  }
       }

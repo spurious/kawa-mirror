@@ -1,3 +1,8 @@
+2002-10-22  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run):  Print file and line on IOException.
+	If !interactive and caught unresumable exception, return.
+
 2002-10-21  Per Bothner  <per@bothner.com>
 
 	* kawa/MessageArea.java (doFocus):  Remove field - always true.

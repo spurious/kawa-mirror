@@ -1,3 +1,9 @@
+2003-11-02  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (PARSE_IMMEDIATE, PARSE_ONE_LINE):  New constants.
+	(parse, parseFile):  Combine two abstract methods into new method.
+	(parse(InPort,SourcesMessages,int)):  New abstract method.
+
 2003-10-30  Per Bothner  <per@bothner.com>
 
 	* StackTarget.java (emitCoerceFromObject):  New static helper method.

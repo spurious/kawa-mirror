@@ -347,11 +347,24 @@ public abstract class Interpreter
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
-  public abstract Compilation parse(Environment env, Lexer lexer)
-    throws java.io.IOException, gnu.text.SyntaxException;
+  /** Flag to tell parse that expression will be evaluated immediately.
+   * I.e. we're not creating class files for future execution. */
+  public static final int PARSE_IMMEDIATE = 1;
+  /** Flag to tell parse to only read a single line if possible.
+   * Multiple lines may be read if syntactically required. */
+  public static final int PARSE_ONE_LINE = 2;
 
-  public abstract Compilation parseFile (InPort port, boolean immediate,
-					 SourceMessages messages)
+  /** Parse one or more expressions.
+   * @param port the InPort to read the expressions from.
+   * @param messages where to send error messages and warnings
+   * @param options various flags, includding PARSE_IMMEDIATE 
+   *   and PARSE_ONE_LINE
+   * @return a new Compilation.
+   *   May return null if PARSE_ONE_LINE on end-of-file.
+   */
+  public abstract Compilation parse(InPort port,
+				    gnu.text.SourceMessages messages,
+				    int options)
     throws java.io.IOException, gnu.text.SyntaxException;
 
   public abstract Type getTypeFor(Class clas);
@@ -591,7 +604,7 @@ public abstract class Interpreter
     Interpreter.defaultInterpreter = this;
     try
       {
-	Compilation comp = parseFile(port, true, messages);
+	Compilation comp = parse(port, messages, PARSE_IMMEDIATE);
 	ModuleExp.evalModule(environ, ctx, comp);
       }
     finally

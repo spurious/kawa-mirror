@@ -57,7 +57,6 @@ public class LambdaExp extends ScopeExp
       throw new WrongArguments ("lambda", 2,
 				"(lambda formals body) [invalid formals]");
 
-    Declaration array_args = null;
     Variable var;
     var = add_decl (Symbol.make ("this"));
     var.setParameter (true);  var.setArtificial (true);
@@ -66,10 +65,10 @@ public class LambdaExp extends ScopeExp
       {
 	// compilefunc.compile depends on the "argsArray" variable
 	// being the second one created for this scope.
-	array_args = add_decl (Symbol.make ("argsArray"),
+	argsArray = add_decl (Symbol.make ("argsArray"),
 			       Compilation.objArrayType);
-	array_args.setParameter (true);
-	array_args.setArtificial (true);
+	argsArray.setParameter (true);
+	argsArray.setArtificial (true);
       }
     bindings = formals;
     int i = 0;
@@ -78,11 +77,14 @@ public class LambdaExp extends ScopeExp
 	Pair bind_pair = (Pair) bindings;
 	Declaration decl = add_decl ((Symbol) bind_pair.car);
 	decl.setParameter (true);
+	decl.noteValue (null);  // Does not have a known value.
 	bindings = bind_pair.cdr;
       }
     if (bindings instanceof Symbol)
       {
-	add_decl ((Symbol) bindings).setParameter (true);
+	Declaration decl = add_decl ((Symbol) bindings);
+	decl.setParameter (true);
+	decl.noteValue (null);  // Does not have a known value.
       }
     push (interp);
     this.body = interp.rewrite_body (body);
@@ -98,11 +100,33 @@ public class LambdaExp extends ScopeExp
    * enclosing function's heapFrame. */
   Declaration staticLink;
 
+  /** Declaration used if varargs or too many args. */
+  Declaration argsArray;
+
+  /** Start of actual body (after copying args etc into home locationss). */
+  Label start_label;
+
   public static boolean doCompile = true;
 
-  public void compile (Compilation comp, boolean ignore_result)
+  /** Get the i'the formal parameter. */
+  Declaration getArg (int i)
   {
-    if (ignore_result)
+    for (Variable var = firstVar ();  ; var = var.nextVar ())
+      {
+	if (var == null)
+	  throw new Error ("internal eror - getArg");
+	if (var.isParameter () && !var.isArtificial ())
+	  {
+	    if (i == 0)
+	      return (Declaration) var;
+	    --i;
+	  }
+      }
+  }
+
+  public void compile (Compilation comp, int flags)
+  {
+    if ((flags & IGNORED) != 0)
       return;
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;

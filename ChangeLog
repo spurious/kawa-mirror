@@ -1,5 +1,16 @@
 2001-03-22  Per Bothner  <per@bothner.com>
 
+	* Make-rules:  Various tweaks.
+	If compiling .class to native, no longer need to make classes.jar.
+	(install-java-classes):  New rule.
+	* Makefile.am (SUBDIRS):  Added new bin directory.
+	(KAWA1_OFILES, kawa1$(exeext)):  Moved to bin/Makefile.am.
+	* configure.in:  (AC_OUTPUT):  Add bin/Makefile.
+	If --enable-gcj-compiled, default JAVA and JAVAC to gij and gcj.
+	* bin:  New sub-directory.
+	* kawa/kawa.c:  Moved to new bin directory.
+	* kawa/Makefile.am:  Moved stuff to bin/Makefile.am.
+ 	
 	* repl.java (checkInitFile):  Set home-directory variable *before*
 	running init file.
 

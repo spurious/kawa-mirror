@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = cygnus
 JAVATOP =
-SUBDIRS = doc testsuite gnu kawa
+SUBDIRS = doc testsuite gnu kawa bin
 javadir=$(datadir)/java
 
 JAR = jar
@@ -98,22 +98,5 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo 'cd ..\..\..\gnu\jemacs\buffer' >>tmp
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
-
-KAWA1_OFILES = \
-  gnu-bytecode.o \
-  gnu-expr.o \
-  gnu-kawa-functions.o \
-  gnu-kawa-lispexpr.o \
-  gnu-kawa-reflect.o \
-  gnu-kawa-util.o \
-  gnu-mapping.o \
-  gnu-math.o \
-  gnu-text.o \
-  kawa-lang.o \
-  kawa-repl.o \
-  kawa-standard.o
-
-kawa1$(exeext): $(KAWA1_OFILES)
-	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl
 
 distall:  distcheck kawa.jar jemacs.jar

@@ -34,22 +34,29 @@ AC_ARG_WITH(awt,
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
-JAVA=${JAVA-java}
-JAVAC=${JAVAC-javac}
-AC_SUBST(JAVA)
-AC_SUBST(JAVAC)
-AC_SUBST(kawa_bin)
 dnl We must have the absolute path to the build directory.
 TOP_BUILDDIR=`pwd`
 
 case ${enable_gcj_compiled} in
   yes)
     GCJ_COMPILED_SELECTED=ENABLE_GCJ_COMPILED
+    JAVA=${JAVA-gij}
+    JAVAC=${JAVAC-"gcj -C"}
     ;;
   *)
     GCJ_COMPILED_SELECTED=DISABLE_GCJ_COMPILED
+    JAVA=${JAVA-java}
+    JAVAC=${JAVAC-javac}
     ;;
 esac
+
+if test $enable_kawa_frontend = yes ; then
+  if test "$enable_gcj_compiled" = yes ; then
+    kawa_bin="kawa-bin kawa"
+  else
+    kawa_bin=kawa
+  fi
+fi
 
 case ${with_java_collections} in
   yes)
@@ -83,6 +90,9 @@ esac
   
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 
+AC_SUBST(JAVA)
+AC_SUBST(JAVAC)
+AC_SUBST(kawa_bin)
 AC_SUBST(XML_SELECTED)
 AC_SUBST(JAVA_COLLECTIONS_SELECTED)
 AC_SUBST(AWT_SELECTED)
@@ -107,4 +117,4 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
-  doc/Makefile testsuite/Makefile)
+  doc/Makefile testsuite/Makefile bin/Makefile)

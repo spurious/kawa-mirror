@@ -1,3 +1,12 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-ppfile):  New test, for slib/ppfile.scm.
+	* ppfile.out:  New file - expected output from ppfile.
+
+	* misc-test.scm (test-alias-5):  New testcase.
+
+	* num-test.scm:  Added two gcd regression tests.
+
 2000-04-14  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm: Added 4 tests for record with names that need mangling.

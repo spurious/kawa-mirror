@@ -1,4 +1,4 @@
-(test-init "numbers" 1641)
+(test-init "numbers" 1643)
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -54,6 +54,10 @@
 (test 2 logcount -13)
 (test 4 logcount 30)
 (test 4 logcount -30)
+
+(section "gcd")
+(test 3 gcd 4294967295 3)
+(test 3 gcd 4294967298 3)
 
 (section "logop")
 

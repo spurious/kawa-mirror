@@ -1,3 +1,9 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* CharArrayInPort.java:  Moved to gnu.mapping.
+	* LispReader.java:  Moved to new package gnu.kawa.lispexpr.
+	* Makefile.am (java_JAVA):  Updated accordingly.
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readEscape):  Split into two overloaded methods.

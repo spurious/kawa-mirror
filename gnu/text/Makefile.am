@@ -8,8 +8,7 @@ javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
   LineBufferedReader.java SourceError.java Lexer.java SyntaxException.java \
-  QueueReader.java SourceMessages.java \
-  LispReader.java NullReader.java CharArrayInPort.java \
+  QueueReader.java SourceMessages.java NullReader.java \
   ReportFormat.java LiteralFormat.java PadFormat.java CompoundFormat.java \
   RomanIntegerFormat.java EnglishIntegerFormat.java \
   CaseConvertFormat.java FlushFormat.java

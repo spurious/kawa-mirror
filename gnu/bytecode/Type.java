@@ -425,18 +425,16 @@ public abstract class Type {
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
 
-  /* The String type. but coercion is handled by toString. */
-  //static public ClassType string_type = new ClassType("java.lang.String");
-  //  static { string_type.flags |= ClassType.EXISTING_CLASS; }
   static public ClassType string_type = ClassType.make("java.lang.String");
+  /* The String type. but coercion is handled by toString. */
+  static public ClassType tostring_type = new ClassType("java.lang.String");
 
   static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
   static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
   static public Type[] typeArray0 = new Type[0];
   static public Method toString_method
-  = pointer_type.addMethod ("toString", typeArray0,
-			     string_type, Access.PUBLIC);
+  = pointer_type.getDeclaredMethod("toString", 0);
   static public ClassType number_type = ClassType.make("java.lang.Number");
   static public Method intValue_method
   = number_type.addMethod ("intValue", typeArray0,

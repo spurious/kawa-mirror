@@ -356,7 +356,7 @@ public abstract class KNode extends SeqPosition
     return null;
   }
 
-  /* BEGIN JAXP 1.3+ */
+  /* #ifdef JAXP-1.3 */
   // public Object setUserData (String key, Object data, UserDataHandler handler)
   // {
     // throw new UnsupportedOperationException("setUserData not implemented yet");
@@ -366,5 +366,5 @@ public abstract class KNode extends SeqPosition
   // {
     // return null;
   // }
-  /* END JAXP 1.3+ */
+  /* #endif JAXP-1.3 */
 }

@@ -153,10 +153,10 @@ public class KElement extends KNode
     return getAttributeNS(namespaceURI, localName) != null;
   }
 
-  /* BEGIN JAXP 1.3+ */
+  /* #ifdef JAXP-1.3 */
   // public TypeInfo getSchemaTypeInfo ()
   // {
     // return null;
   // }
-  /* END JAXP 1.3+ */
+  /* #endif JAXP-1.3 */
 }

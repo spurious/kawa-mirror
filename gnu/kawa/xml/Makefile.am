@@ -7,7 +7,6 @@ java_sources = \
   AncestorOrSelfAxis.java \
   AttributeAxis.java \
   Attributes.java \
-  AttributeConstructor.java \
   AttributeType.java \
   ChildAxis.java \
   CoerceNodes.java \
@@ -17,7 +16,6 @@ java_sources = \
   DescendantOrSelfAxis.java \
   Document.java \
   DocumentConstructor.java \
-  ElementConstructor.java \
   ElementType.java \
   Focus.java \
   FollowingAxis.java \
@@ -35,7 +33,9 @@ java_sources = \
   KProcessingInstruction.java \
   KText.java \
   ListItems.java \
+  MakeAttribute.java \
   MakeCDATA.java \
+  MakeElement.java \
   MakeProcInst.java \
   MakeResponseHeader.java \
   MakeText.java \

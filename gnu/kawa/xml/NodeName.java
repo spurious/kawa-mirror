@@ -23,9 +23,7 @@ public class NodeName extends Procedure1
 	SeqPosition pos = (SeqPosition) node;
 	nodeName = pos.sequence.getNextTypeObject(pos.ipos);
       }
-    return nodeName == null ? Values.empty
-      : nodeName instanceof XName ? ((XName) nodeName).getQName()
-      : nodeName;
+    return nodeName == null ? Values.empty : nodeName;
     }
 
   public Object apply1 (Object node)

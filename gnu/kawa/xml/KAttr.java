@@ -53,7 +53,7 @@ public class KAttr extends KNode
     return true;
   }
 
-  /* BEGIN JAXP 1.3+ */
+  /* #ifdef JAXP-1.3 */
   // public TypeInfo getSchemaTypeInfo ()
   // {
     // return null;
@@ -63,6 +63,5 @@ public class KAttr extends KNode
   // {
     // return false;
   // }
-  /* END JAXP 1.3+ */
-
+  /* #endif JAXP-1.3 */
 }

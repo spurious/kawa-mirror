@@ -203,11 +203,12 @@ public class KDocument extends KNode
   {
   }
 
-  /* BEGIN JAXP 1.3+ */
+  /* #ifdef JAXP-1.3 */
   // public DOMConfiguration getDomConfig ()
   // {
     // throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
 			   // "getDomConfig not implemented");
   // }
-  /* END JAXP 1.3+ */
+  /* #endif JAXP-1.3 */
 }
+

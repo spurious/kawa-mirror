@@ -71,12 +71,23 @@ implements TypeValue, Externalizable, AttributePredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
-    if (attrType instanceof XName)
+    /* #ifdef JAXP-1.3 */
+    // if (attrType instanceof javax.xml.namespace.QName)
+    // {
+    // javax.xml.namespace.QName qtype
+    // = (javax.xml.namespace.QName) attrType;
+    // curNamespaceURI = qtype.getNamespaceURI();
+    // curLocalName = qtype.getLocalPart();
+    // }
+    /* #endif */
+    /* #ifndef JAXP-1.3 */
+    if (attrType instanceof SName)
       {
-	XName qtype = (XName) attrType;
+	SName qtype = (SName) attrType;
 	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalName();
+	curLocalName = qtype.getLocalPart();
       }
+    /* #endif */
     else if (attrType instanceof Symbol)
       {
 	Symbol qname = (Symbol) attrType;
@@ -107,12 +118,23 @@ implements TypeValue, Externalizable, AttributePredicate
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
-    if (curName instanceof XName)
+    /* #ifdef JAXP-1.3 */
+    // if (curName instanceof javax.xml.namespace.QName)
+    // {
+    // javax.xml.namespace.QName qtype
+    // = (javax.xml.namespace.QName) curName;
+    // curNamespaceURI = qtype.getNamespaceURI();
+    // curLocalName = qtype.getLocalPart();
+    // }
+    /* #endif */
+    /* #ifndef JAXP-1.3 */
+    if (curName instanceof SName)
       {
-	XName qtype = (XName) curName;
+	SName qtype = (SName) curName;
 	curNamespaceURI = qtype.getNamespaceURI();
-	curLocalName = qtype.getLocalName();
+	curLocalName = qtype.getLocalPart();
       }
+    /* #endif */
     else if (curName instanceof Symbol)
       {
 	Symbol qname = (Symbol) curName;

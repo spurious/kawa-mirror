@@ -1,3 +1,25 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* AttributeConstructor.java: Removed - we now use MakeAttribute.
+	* ElementConstructor.java: Removed - we now use MakeElement.
+	* MakeElement.java: Moved from gnu.xquery.util.
+	No longer implement CanInline - which re-wrote to ElementConstructor.
+	Merg in namespaceNodes functionality from ElementConstructor.
+	(getTagName): New static helper method.
+	* MakeAttribute.java: Moved from gnu.xquery.util.
+	(makeAttributeExp): New static field.
+	(beginAttribute): Simplify.
+	* Makefile.am: Update accordingly.
+
+	* KAttr.java: Update to new "conditional configuration" syntax.
+	* KDocument.java: Likewise.
+	* KElement.java: Likewise.
+	* KNode.java: Likewise.
+	* AttributeType.java: Handle SName, and QName if using JAXP 1.3.
+	* ElementType.java: Likewise.
+
+	* NodeName.java: Simplify now that XName is qn SName/QName.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	* AttributeConstructor.java: Update Symbol->Location.

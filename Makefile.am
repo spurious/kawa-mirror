@@ -93,7 +93,7 @@ kawa-src.zip: kawa-@VERSION@-src.zip
 jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
-  config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
+  config.guess config.sub install-sh ./mkinstalldirs \
   libtool.m4 ltmain.sh patch-source-list selected-java-source \
   build.xml build.properties \
   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
@@ -112,8 +112,9 @@ JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 # NOTE:  To update javadoc do:
 # make install-javadoc-html
-# cd $JAVADOC_DIR
-# cvs import -m "Javadoc generated." software/kawa/api javadoc kawa_X_Y_ZZ
+# cd ~/Kawa/api
+# export CVSROOT=bothner@subversions.gnu.org:/webcvs/
+# cvs -z 7 import -m "Javadoc generated." software/kawa/api javadoc kawa_X_Y_ZZ
 # cvs checkout -jjavadoc:yesterday -jjavadoc software/kawa/api
 # cd software/kawa/api/
 # cvs ci -m 'Updated.' .

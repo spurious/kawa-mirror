@@ -213,11 +213,18 @@ public class require extends Syntax
 		decl.setPrivate(true);
 		defs.addDeclaration(decl);
 		decl.setCanRead(true);
-		decl.noteValue(dofind);
-		SetExp sexp = new SetExp(decl, dofind);
-		sexp.setLine(tr);
-		sexp.setDefining(true);
-		forms.addElement(sexp);
+		if (immediate)
+		  {
+		    decl.noteValue(new QuoteExp(instance));
+		  }
+		else
+		  {
+		    decl.noteValue(dofind);
+		    SetExp sexp = new SetExp(decl, dofind);
+		    sexp.setLine(tr);
+		    sexp.setDefining(true);
+		    forms.addElement(sexp);
+		  }
               }
 	    java.lang.reflect.Field rfield;
 	    Object fvalue;
@@ -373,12 +380,23 @@ public class require extends Syntax
           break;
       }
 
-    if ((instance == null /*|| immediate*/)
-	&& isRunnable) // Need to make sure 'run' is invoked.
+    if (isRunnable)
       {
-	dofind = Convert.makeCoercion(dofind, Type.void_type);
-	dofind.setLine(tr);
-	forms.addElement(dofind);
+	if (immediate)
+	  {
+	    if (instance == null)
+	      instance = find((ClassType) type, Environment.getCurrent());
+	    forms.addElement(new ApplyExp(Compilation.typeRunnable
+					  .getDeclaredMethod("run", 0),
+					  new Expression[] {
+					    new QuoteExp(instance)}));
+	  }
+	else if (instance == null) // Need to make sure 'run' is invoked.
+	  {
+	    dofind = Convert.makeCoercion(dofind, Type.void_type);
+	    dofind.setLine(tr);
+	    forms.addElement(dofind);
+	  }
       }
     tr.mustCompileHere();
     return true;

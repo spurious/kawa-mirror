@@ -81,11 +81,6 @@ public class Macro extends Syntax implements Printable, Externalizable
   public final boolean isHygienic() { return hygienic; }
   public final void setHygienic (boolean hygienic) {this.hygienic = hygienic;}
 
-  public void setExpander (Procedure expander)
-  {
-    this.expander = new QuoteExp(expander);
-  }
-
   public Macro ()
   {
   }

@@ -2,7 +2,6 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.bytecode.ClassType;
-import gnu.bytecode.Method;
 import gnu.mapping.*;
 import gnu.lists.*;
 
@@ -20,11 +19,10 @@ public class define_syntax extends Syntax
   }
 
   static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
-  static Method makeMethod = typeMacro.getDeclaredMethod("make", 3);
-  static Method makeNonHygienicMethod
-    = typeMacro.getDeclaredMethod("makeNonHygienic", 3);
-  static Method setExpanderMethod
-    = typeMacro.getDeclaredMethod("setExpander", 1);
+  static PrimProcedure makeHygienic
+    = new PrimProcedure(typeMacro.getDeclaredMethod("make", 3));
+  static PrimProcedure makeNonHygienic
+    = new PrimProcedure(typeMacro.getDeclaredMethod("makeNonHygienic", 3));
 
   boolean hygienic;
 
@@ -90,8 +88,9 @@ public class define_syntax extends Syntax
     if (tr.immediate || tr.isStatic())
       args[2] = new QuoteExp(defs);
     else
-      args[2] = new ThisExp(defs);
-    rule = new ApplyExp(new PrimProcedure(hygienic ? makeMethod : makeNonHygienicMethod), args);
+      args[2] = ThisExp.makeGivingContext(defs);
+    rule = new ApplyExp(hygienic ? makeHygienic : makeNonHygienic,
+			args);
     decl.noteValue(rule);
     decl.setProcedureDecl(true);
   

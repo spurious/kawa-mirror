@@ -1,3 +1,19 @@
+2005-01-08  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Macro.java (setExpander): Remove unused field.
+	* kawa/standard/define_syntax.java (setExpanderMethod): Likewise.
+
+	* kawa/standard/define_syntax.java (makeHygienic, makeNonHygienic):
+	New Procedure fields replace makeMethod, makeNonHygienicMethod.
+	(scanForm): New new fields.
+
+	* kawa/standard/define_syntax.java (scanForm): Use new ThisExp
+	factory method makeGivingContext so we can eval this ApplyExp
+	in the current Compilation.  This fixes Savannah bug #11508.
+
+	* kawa/standard/require.java (importDefinitions): If immediate
+	note the instance value as a constant.  Don't compile a dofind call.
+
 2005-01-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (patch-source-list): Filter with sed out initial "./".

@@ -2,9 +2,7 @@
 
 ;;; Parse an XML file (specified by a URL or url string), giving a <document>.
 (define (parse-xml-from-url url) :: <document>
-  (if (not (instance? url <java.net.URL>))
-      (set! url (make <java.net.URL> (invoke url 'toString))))
-  (invoke-static <gnu.xml.ParsedXMLToConsumer> 'parse url))
+  (invoke-static <gnu.xquery.util.Document> 'document url))
 
 #|
 (define (parse-nsxml-from-url url) :: <document>

@@ -80,7 +80,7 @@ public class PadFormat extends ReportFormat
 	start++;
       }
     int len = tbuf.length();
-    int pad = padNeeded(tbuf.length(), minWidth, colInc, minPad);
+    int pad = padNeeded(len, minWidth, colInc, minPad);
     int prefix = 0;
     String text = tbuf.toString();
     if (pad > 0)

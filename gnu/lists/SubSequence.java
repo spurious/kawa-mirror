@@ -4,7 +4,7 @@
 package gnu.lists;
 
 /** A sequence consisting of a sub-range of the elements of a base sequence.
- * The start and end positions are positions triples (on teh same sequence).
+ * The start and end positions are positions triples (on the same sequence).
  */
 
 public class SubSequence

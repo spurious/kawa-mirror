@@ -292,6 +292,7 @@ public class @XMLParser@
             state = EXPECT_NAME_MODIFIER + BEGIN_ELEMENT_STATE;
             continue mainLoop;
           case BEGIN_ELEMENT_STATE:
+            this.pos = pos;
             out.emitBeginElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
 	    start = limit;
@@ -473,6 +474,7 @@ public class @XMLParser@
             continue mainLoop;
 
           case END_ELEMENT_STATE:  // Seen '</' Name.
+            this.pos = pos;
             out.emitEndElement(buffer, start, length);
 	    start = limit;
             // Skip spaces then goto EXPECT_RIGHT_STATE.

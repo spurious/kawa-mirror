@@ -153,7 +153,32 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
   }
 
+  public PrimProcedure(java.lang.reflect.Method method,
+		       Class thisClass, Class[] parameterClasses,
+		       Interpreter interpreter)
+  {
+    Type[] parameterTypes = new Type[parameterClasses.length];
+    for (int i = parameterClasses.length;  --i >= 0; )
+      parameterTypes[i] = interpreter.getTypeFor(parameterClasses[i]);
+    Type returnType = interpreter.getTypeFor(method.getReturnType());
+    ClassType thisType = (ClassType) interpreter.getTypeFor(thisClass);
+    init(thisType.addMethod(method.getName(), method.getModifiers(),
+			    parameterTypes, returnType));
+  }
+
+  public PrimProcedure(java.lang.reflect.Method method,
+		       Interpreter interpreter)
+  {
+    this(method, method.getDeclaringClass(),
+	 method.getParameterTypes(), interpreter);
+  }
+
   public PrimProcedure(Method method)
+  {
+    init(method);
+  }
+
+  private void init(Method method)
   {
     this.method = method;
     this.argTypes = method.getParameterTypes();
@@ -323,13 +348,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
   {
-    return getMethodFor(pproc, null, args);
+    return getMethodFor(pproc, null, args, Interpreter.getInterpreter());
   }
 
   /** Search for a matching static method in a procedure's class.
    * @return a PrimProcedure that is suitable, or null. */
   public static PrimProcedure getMethodFor (Procedure pproc, Declaration decl,
-					    Expression[] args)
+					    Expression[] args,
+					    Interpreter interpreter)
   {
     Class procClass;
     if (pproc instanceof gnu.expr.ModuleMethod)
@@ -380,16 +406,9 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           }
         if (best != null)
           {
-            ClassType procType = ClassType.make(procClass.getName());
-            Type[] argTypes = new Type[bestTypes.length];
-            for (int i = argTypes.length;  --i >= 0; )
-              argTypes[i] = Type.make(bestTypes[i]);
-            gnu.bytecode.Method method
-              = procType.addMethod(best.getName(), best.getModifiers(),
-                                   argTypes,
-                                   Type.make(best.getReturnType()));
-            PrimProcedure prproc = new PrimProcedure(method);
-            prproc.setName(name);
+            PrimProcedure prproc = new PrimProcedure(best, procClass,
+						     bestTypes, interpreter); 
+	    prproc.setName(name);
             return prproc;
           }
       }

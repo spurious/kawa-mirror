@@ -1,3 +1,11 @@
+2000-04-22  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (init):  New private helper method.
+	New constructors take java.lang.reflect.Method and Interpreter.
+	(getMethodFor):  New method overloads use new constructor/
+	* ApplyExp.java (compile):  Pass interpreter to
+	PrimProcedure.getMethodFor.
+
 2000-04-21  Per Bothner  <per@bothner.com>
 
 	* Parser.java:  A new class, an abstract super-class for Translator.

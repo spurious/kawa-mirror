@@ -140,7 +140,8 @@ public class ApplyExp extends Expression
 		else
 		  {
 		    PrimProcedure pproc
-		      = PrimProcedure.getMethodFor(proc, func_decl, exp.args);
+		      = PrimProcedure.getMethodFor(proc, func_decl, exp.args,
+						   comp.getInterpreter());
 		    if (pproc != null)
 		      {
 			if (! pproc.getStaticFlag())

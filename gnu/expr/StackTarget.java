@@ -21,7 +21,7 @@ public class StackTarget extends Target
       }
     else if (stackType instanceof PrimType && type instanceof PrimType)
       {
-	code.emitConvert(type);
+	code.emitConvert(stackType, type);
 	return;
       }
     if (stackType instanceof ClassType && type instanceof ClassType)

@@ -1,0 +1,41 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	New package gnu.xml, moved/renamed from ../gnu/kawa/xml.
+	* ParsedXMLHandler.java.in:  Moved from gnu.kawa.xml.
+	* XMLParser.java.in:  Moved from gnu.kawa.xml.
+	* XMLPrinter.java:  Moved from gnu.kawa.xml.
+	* ParsedXMLToConsumer.java:  Moved from gnu.kawa.xml.
+	* ElementContext.java:  New class.
+	* ElementType.java:  New class.
+	* NamespaceResolver.java:  New class, extends gnu.util.FilterConsumer.
+	* VariableProvider.java:  New interface.
+	* XPath.java:  New class.
+	* XPathConstants.java:  New interface.
+	* XPathContext.java:  New class.
+	* XPathFunction.java:  New class.
+	* XPathParser.java:  New class.
+	* XPathVariable.java:  New abstract class.
+	* Makefile.am:  Moved from ../gnu/kawa/xml.  Added new classes.
+	Renamed some macros.
+	* COPYING:  New file.
+
+2001-03-23  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  The automake Java support does not handle "built"
+	Java sources, so roll our own.
+
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java:  Import gnu.lists instead of gnu.kawa.util.
+	* XMLPrinter.java:  Likewise.
+	(writeObject):  If Consumable, consume it.
+	(write):  Fixes - forgotten what.
+
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	New package.
+	* ParsedXMLHandler.java.in:  New to-be-preprocess-Java file.
+	* gnu/kawa/xml/XMLParser.java.in:  Likewise.
+	* gnu/kawa/xml/ParsedXMLToConsumer.java:  New class.
+	* XMLPrinter.java:  New class.  Implements Consumer.
+

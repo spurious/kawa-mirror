@@ -146,8 +146,8 @@ public class Pair extends List implements Printable, Compilable
     else
       {
 	literal.flags |= Literal.ALLOCATING;
-	comp.findLiteral (car).emit (comp, false);
-	comp.findLiteral (cdr).emit (comp, false);
+	comp.emitLiteral (car);
+	comp.emitLiteral (cdr);
 	if ((literal.flags & Literal.ALLOCATED) != 0)
 	  {
 	    // It's already been allocated, because either the car or cdr

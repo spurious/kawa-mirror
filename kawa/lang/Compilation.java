@@ -29,7 +29,10 @@ public class Compilation
   static public ClassType scmListType = new ClassType ("kawa.lang.List");
   static public ClassType scmPairType = new ClassType ("kawa.lang.Pair");
   static public ClassType scmUndefinedType = new ClassType ("kawa.lang.Undefined");
+  static public ClassType scmPatternType = new ClassType ("kawa.lang.Pattern");
   static ArrayType objArrayType = new ArrayType (scmObjectType);
+  static ArrayType symbolArrayType = new ArrayType (scmSymbolType);
+  static public ClassType scmNamedType = new ClassType ("kawa.lang.Named");
   static public ClassType scmProcedureType
     = new ClassType ("kawa.lang.Procedure");
   static public ClassType scmInterpreterType
@@ -56,6 +59,8 @@ public class Compilation
   static final Field eofConstant
   = scmInterpreterType.new_field ("eofObject", scmSymbolType,
 				    Access.PUBLIC|Access.STATIC);
+  static final Field nameField
+  = scmNamedType.new_field ("name", javaStringType, Access.PUBLIC);
   static Method makeSymbolMethod;
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
@@ -109,10 +114,10 @@ public class Compilation
   public static Method apply3method;
   public static Method apply4method;
   public static Method applyNmethod;
+  static Type[] apply1args = { scmObjectType };
 
   static
   {
-    Type[] apply1args = { scmObjectType };
     apply1method = scmProcedureType.new_method ("apply1", apply1args,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
@@ -194,12 +199,36 @@ public class Compilation
 	  }
 	else if (value instanceof Compilable)
 	  literal = ((Compilable) value).makeLiteral (this);
+	else if (value instanceof Object[])
+	  {
+	    Object[] array = (Object[]) value;
+	    int len = array.length;
+	    literal = new Literal (value, objArrayType, this);
+	    for (int i = array.length;  --i >= 0; )
+	      findLiteral (array[i]);
+	  }
 	else
 	  literal = new Literal (value, scmObjectType, this);
       }
     return literal;
   }
 
+  /** Emit code to push a value.
+   * Only used when compiling to a file, and for internal use.
+   * Must previously have called findLiteral (to detect cycles).
+   */
+  void emitLiteral (Object value)
+  {
+    Literal literal = (Literal) literalTable.get (value);
+    if (literal == null)
+      throw new Error ("emitLiteral called without previous findLiteral");
+    literal.emit (this, false);
+  }
+
+  /** Emit code to "evaluate" a compile-time constant.
+   * This is the normal external interface.
+   * @param value the value to be compiled
+   */
   public void compileConstant (Object value)
   {
     Literal literal = findLiteral (value);
@@ -217,6 +246,52 @@ public class Compilation
 	if ((literal.flags & Literal.INITIALIZED) == 0)
 	  literal.emit (this, true);
       }
+  }
+
+  /** Search this Compilation for a ClassType with a given name.
+   * @param name the name of the class desired
+   * @return the matching ClassType, or null if none is found */
+  public ClassType findNamedClass (String name)
+  {
+    for (int i = 0;  i < numClasses; i++)
+      {
+	if (name.equals (classes[i].getClassName ()))
+	  return classes[i];
+      }
+    return null;
+  }
+
+  /** If non-null: a prefix for generateClassNam to prepend to names. */
+  public String classPrefix;
+
+  /** Generate an unused class name.
+   * @param hint the requested name (or prefix)
+   * @return a unique class name.
+   */
+  public String generateClassName (String hint)
+  {
+    hint = hint.replace ('.', '_').replace ('/', '_');
+    if (classPrefix != null)
+      hint = classPrefix + hint;
+    if (findNamedClass (hint) == null)
+      return hint;
+    for (int i = 0;  ; i++)
+      {
+	String new_hint = hint + i;
+	if (findNamedClass (new_hint) == null)
+	  return new_hint;
+      }
+  }
+
+  public Compilation (LambdaExp lexp, String classname, String prefix)
+  {
+    classPrefix = prefix;
+    ClassType classfile = new ClassType (classname);
+    addClass (classfile);
+    this.curClass = classfile;
+    this.mainClass = classfile;
+    literalTable = new Hashtable (100);
+    compilefunc.compile (this, lexp);
   }
 
   public Compilation (LambdaExp lexp, String classname, boolean immediate)

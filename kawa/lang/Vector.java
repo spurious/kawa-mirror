@@ -66,13 +66,13 @@ public class Vector extends Sequence implements Printable, Compilable
 				      Type.void_type, Access.PUBLIC);
       }
     Literal literal = new Literal (this, scmVectorType, comp);
-    for (int i = 0;  i < value.length;  i++)
-      comp.findLiteral (value[i]);
+    comp.findLiteral (value);
     return literal;
   }
 
   public void emit (Literal literal, Compilation comp)
   {
+    // FIXME - should just comp.findLiteral (value) - but handle circularity!
     int len = value.length;
     // Allocate the Vector object
     comp.method.compile_new (scmVectorType);
@@ -90,7 +90,7 @@ public class Vector extends Sequence implements Printable, Compilable
       {
 	comp.method.compile_dup (scmVectorType);
 	comp.method.compile_push_int (i);
-	comp.findLiteral (value[i]).emit (comp, false);
+	comp.emitLiteral (value[i]);
 	// Stack contents:  ..., Vector, array, array, i, value[i]
 	comp.method.compile_array_store (comp.scmObjectType);
 	// Stack contents:  ..., Vector, array

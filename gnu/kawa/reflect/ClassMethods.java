@@ -77,12 +77,11 @@ public class ClassMethods extends Procedure2
                                            int modifiers, int modmask,
                                            Interpreter interpreter)
   {
-    MethodFilter filter = new MethodFilter(mname, modifiers, modmask);
-    Vector methods = new Vector();
-    dtype.getMethods(filter, "<init>".equals(mname) ? 0 : 2,
-		     methods,
-		     "-"); // Should be more specific - FIXME
+    return getMethods(dtype,mname,modifiers,modmask,false,interpreter);
+  }
 
+  private static int removeRedundantMethods(Vector methods)
+  {
     // Remove over-ridden methods.
     int mlength = methods.size();
   loopi:
@@ -115,6 +114,26 @@ public class ClassMethods extends Procedure2
 	}
       i++;
     }
+    return mlength;
+  }
+    
+  /** Return the methods of a class with the specified name and flag.
+   * @return an array containing the methods.
+   */
+  public static PrimProcedure[] getMethods(ClassType dtype, String mname,
+                                           int modifiers, int modmask,
+                                           boolean is_special,
+                                           Interpreter interpreter)
+  {
+    MethodFilter filter = new MethodFilter(mname, modifiers, modmask);
+    boolean named_class_only = is_special || "<init>".equals(mname);
+    Vector methods = new Vector();
+    dtype.getMethods(filter, named_class_only ? 0 : 2,
+		     methods,
+		     "-"); // Should be more specific - FIXME
+
+    int mlength = (named_class_only ? methods.size()
+		   : removeRedundantMethods(methods));
 
     PrimProcedure[] result = new PrimProcedure[mlength];
     int count = 0;
@@ -123,7 +142,7 @@ public class ClassMethods extends Procedure2
       Method method = (Method) methods.elementAt(i);
       if ((method.getModifiers() & modmask) != modifiers)
 	continue;
-      PrimProcedure pproc = new PrimProcedure(method, interpreter);
+      PrimProcedure pproc = new PrimProcedure(method, is_special, interpreter);
       result[count++] = pproc;
     }
     return result;

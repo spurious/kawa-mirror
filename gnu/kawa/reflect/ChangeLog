@@ -1,3 +1,11 @@
+2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* ClassMethods.java (removeRedundantMethods):  New helper method.
+	(getMethods):  Handle extra is_special flag, for invoke-special.
+	* Invoke.java (invokeSpecial):  New static field.
+	(applyN):  Check for and dis-allow invoke-special.
+	(getMethods):  Handle invoke-special.
+	
 2003-07-12  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* ArrayGet.java (Externalizable): Implement writeExternal, 

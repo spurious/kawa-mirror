@@ -14,6 +14,7 @@ public class Invoke extends ProcedureN implements CanInline
 
   public static final Invoke invoke = new Invoke("invoke", 'V');
   public static final Invoke invokeStatic = new Invoke("invoke-static", 'S');
+  public static final Invoke invokeSpecial = new Invoke("invoke-special", 'P');
   public static final Invoke make = new Invoke("make", 'N');
 
   public Invoke(String name, char kind)
@@ -53,10 +54,14 @@ public class Invoke extends ProcedureN implements CanInline
   protected static Object applyN (Invoke thisProc, Object[] args)
     throws Throwable
   {
+    int kind = thisProc.kind;
+    if (kind == 'P')
+      throw new RuntimeException(thisProc.getName() 
+                                 + ": invoke-special not allowed at run time");
+    
     int nargs = args.length;
     Procedure.checkArgCount(thisProc, nargs);
     Object arg0 = args[0];
-    int kind = thisProc.kind;
     ClassType dtype;
     String mname;
     if (kind == 'V')
@@ -163,23 +168,29 @@ public class Invoke extends ProcedureN implements CanInline
   private int cachePossiblyApplicableMethodCount;
 
   protected PrimProcedure[] getMethods(ClassType ctype, String mname,
-                                       Expression[] args, int argsToSkip)
+                                       Expression[] args, int margsLength, 
+                                       int argsStartIndex, int objIndex)
   {
     if (args == cacheArgs)
       return cacheMethods;
-    int nargs = args.length;
-    Type[] atypes = new Type[nargs - argsToSkip];
-    int i = 0;
-    if (kind == 'V')
-      atypes[i++] = ctype;
-    for ( ; i < atypes.length;  i++)
-      atypes[i] = args[i+argsToSkip].getType();
-    PrimProcedure[] methods
-    = ClassMethods.getMethods(ctype, mname,
-                              kind == 's' ? Access.STATIC : 0,
-			      kind=='S' ? 0 : Access.STATIC,
-                              interpreter);
 
+    Type[] atypes = new Type[margsLength];
+
+    int dst = 0;
+    if (objIndex >= 0)
+      atypes[dst++] = ctype;
+    for (int src = argsStartIndex; 
+         src < args.length && dst < atypes.length; 
+         src++, dst++)
+      atypes[dst] = args[src].getType();
+
+    PrimProcedure[] methods
+      = ClassMethods.getMethods(ctype, mname,
+                                kind == 's' ? Access.STATIC : 0,
+                                kind == 'S' ? 0 : Access.STATIC,
+                                kind == 'P',
+                                interpreter);
+    
     long num = ClassMethods.selectApplicable(methods, atypes);
     cacheArgs = args;
     cacheDefinitelyApplicableMethodCount = (int) (num >> 32);
@@ -253,6 +264,35 @@ public class Invoke extends ProcedureN implements CanInline
     int nargs = args.length;
     ClassType type = getClassType(args);
     String name = getMethodName(args);
+
+    int margsLength, argsStartIndex, objIndex;
+    if (kind == 'V')                     // Invoke virtual
+      {
+        margsLength = nargs - 1;
+        argsStartIndex = 2;
+        objIndex = 0;
+      }
+    else if (kind == 'N')                // make new
+      {
+        margsLength = nargs - 1;
+        argsStartIndex = 1;
+        objIndex = -1;
+      }
+    else if (kind == 'S' || kind == 's') // Invoke static
+      {
+        margsLength = nargs - 2;
+        argsStartIndex = 2;
+        objIndex = -1;
+      }
+    else if (kind == 'P')                // Invoke special
+      {
+        margsLength = nargs - 2;
+        argsStartIndex = 3;
+        objIndex = 1;
+      }
+    else
+      return walker.noteError("unknown invoke kind: " + kind);
+                
     if (type != null && name != null
 	// We can't generate <init> until we know whether it needs
 	// a lexical link, which we don't know until FindCapturedVars is run.
@@ -265,8 +305,8 @@ public class Invoke extends ProcedureN implements CanInline
           {
             try
               {
-                methods = getMethods(type, name, args,
-				     kind == 'S' || kind == 's' ? 2 : 1);
+                methods = getMethods(type, name, args, 
+                                     margsLength, argsStartIndex, objIndex);
               }
             catch (Exception ex)
               {
@@ -383,14 +423,14 @@ public class Invoke extends ProcedureN implements CanInline
 	      }
             if (index >= 0)
               {
-                Expression[] margs
-                  = new Expression[nargs-(kind == 'S' || kind == 's' ? 2 : 1)];
-                int i = 0;
-                if (kind == 'V')
-		  margs[i++] = args[0];
-                System.arraycopy(args, kind == 'N' ? 1 : 2,
-                                 margs, i,
-                                 nargs - (kind == 'N' ? 1 : 2));
+                Expression[] margs = new Expression[margsLength];
+                int dst = 0;
+                if (objIndex >= 0)
+                  margs[dst++] = args[objIndex];
+                for (int src = argsStartIndex; 
+                     src < args.length && dst < margs.length; 
+                     src++, dst++)
+                  margs[dst] = args[src];
                 PrimProcedure method = methods[index];
                 return new ApplyExp(method, margs).setLine(exp);
               }
@@ -418,8 +458,9 @@ public class Invoke extends ProcedureN implements CanInline
   {
     if (kind == 'N')
       return "<init>";
-    if (args.length >= 2)
-      return ClassMethods.checkName(args[1], false);
+    int nameIndex = (kind == 'P' ? 2 : 1);
+    if (args.length >= nameIndex + 1)
+      return ClassMethods.checkName(args[nameIndex], false);
     return null;
   }
 
@@ -442,7 +483,8 @@ public class Invoke extends ProcedureN implements CanInline
   public static synchronized PrimProcedure
   getStaticMethod(ClassType type, String name, Expression[] args)
   {
-    PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 0);
+    PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 
+                                                      args.length, 0, -1);
     int okCount = invokeStatic.cacheDefinitelyApplicableMethodCount;
     int maybeCount = invokeStatic.cachePossiblyApplicableMethodCount;
     int index;

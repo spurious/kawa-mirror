@@ -23,6 +23,9 @@ public class Future extends Thread
   public Future (Procedure0 action)
   {
     this.action = action;
+    in = InPort.inDefault();
+    out = OutPort.outDefault();
+    err = OutPort.errDefault();
     Thread parent_thread = Thread.currentThread();
     Environment parent_env;
     if (parent_thread instanceof Future)
@@ -49,7 +52,6 @@ public class Future extends Thread
   }
 
   public Object waitForResult ()
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
@@ -61,14 +63,8 @@ public class Future extends Thread
       }
     if (exception != null)
       {
-	if (exception instanceof GenericError)
-	  throw (GenericError)exception;
-	if (exception instanceof UnboundSymbol)
-	  throw (UnboundSymbol)exception;
-	if (exception instanceof WrongType)
-	  throw (WrongType)exception;
-	if (exception instanceof WrongArguments)
-	  throw (WrongArguments)exception;
+	if (exception instanceof RuntimeException)
+	  throw (RuntimeException) exception;
 	throw new GenericError (exception.toString());
       }
     return result;

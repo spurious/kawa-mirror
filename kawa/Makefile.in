@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -104,10 +104,13 @@ SUBDIRS = lang standard lib
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 #CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 
-java_WITH_AWT =    GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
+java_WITH_AWT = \
+  GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
 
 
-java_sources = Shell.java repl.java Version.java   TelnetInputStream.java TelnetOutputStream.java Telnet.java   $(java_@AWT_SELECTED@)
+java_sources = Shell.java repl.java Version.java \
+  TelnetInputStream.java TelnetOutputStream.java Telnet.java\
+  $(java_@AWT_SELECTED@)
 
 
 EXTRA_DIST = Version.java.in $(java_WITH_AWT)
@@ -169,7 +172,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \

@@ -38,64 +38,62 @@ public class syntax_case extends Syntax
           }
         return new ApplyExp(call_error, args);
       }
+    Object savePos = tr.pushPositionOf(clauses);
     Object clause;
-    if (! (clauses instanceof Pair)
-        || ! ((clause = ((Pair) clauses).car) instanceof Pair))
-     return tr.syntaxError("syntax-case:  bad clause list");
-    Pair pair = (Pair) clause;
-    StringBuffer pattern_nesting_buffer = new StringBuffer(60);
-    //pattern_nesting_buffer.setLength(0);
-    java.util.Vector pattern_names = new java.util.Vector(50);
-    Pattern pattern
-      = SyntaxRules.translate_pattern(pair.car,
-                                      work.literal_identifiers,
-                                      pattern_names,
-                                      pattern_nesting_buffer,
-                                      0, tr);
-    int varCount = pattern.varCount();
-    if (varCount > work.maxVars)
-      work.maxVars = varCount;
-    String pattern_nesting = pattern_nesting_buffer.toString();
-
-    BlockExp block = new BlockExp();
-    Expression[] args = new Expression[4];
-    args[0] = new QuoteExp(pattern);
-    args[1] = new ReferenceExp(work.inputExpression);
-    args[2] = new ReferenceExp(work.matchArray);
-    args[3] = new QuoteExp(IntNum.zero());
-    Expression tryMatch = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod), args);
-
-    Expression[] inits = new Expression[varCount];
-    LetExp clauseScope = new LetExp(inits);
-    for (int i = 0;  i < varCount;  i++)
+    try
       {
-        args = new Expression[2];
-        args[0] = new ReferenceExp(work.matchArray);
-        args[1] = new QuoteExp(IntNum.make(i));
-        inits[i] = new ApplyExp(work.primArrayGet, args);
-        Object name = pattern_names.elementAt(i);
-        Declaration decl = clauseScope.addDeclaration(name);
-        decl.noteValue(inits[i]);
-      }
-    tr.push(clauseScope);
+	if (! (clauses instanceof Pair)
+	    || ! ((clause = ((Pair) clauses).car) instanceof Pair))
+	  return tr.syntaxError("syntax-case:  bad clause list");
+	Pair pair = (Pair) clause;
+	PatternScope clauseScope = PatternScope.push(tr);
+	clauseScope.matchArray = work.matchArray;
+	tr.push(clauseScope);
 
-    Expression output;
-    pair = (Pair) pair.cdr;
-    if (pair.cdr == LList.Empty)
-      output = tr.rewrite(pair.car);
-    else
-      {
-        Expression fender = tr.rewrite(pair.car);
-        if (! (pair.cdr instanceof Pair
-               && (pair = (Pair) pair.cdr).cdr == LList.Empty))
-          return tr.syntaxError("syntax-case:  bad clause");
-        output = new IfExp(fender, tr.rewrite(pair.car), new ExitExp(block));
+	SyntaxPattern pattern
+	  = new SyntaxPattern(pair.car, work.literal_identifiers, tr);
+	int varCount = pattern.varCount();
+	if (varCount > work.maxVars)
+	  work.maxVars = varCount;
+	String pattern_nesting = clauseScope.pattern_nesting.toString();
+
+	BlockExp block = new BlockExp();
+	Expression[] args = new Expression[4];
+	args[0] = new QuoteExp(pattern);
+	args[1] = new ReferenceExp(work.inputExpression);
+	args[2] = new ReferenceExp(work.matchArray);
+	args[3] = new QuoteExp(IntNum.zero());
+	Expression tryMatch
+	  = new ApplyExp(new PrimProcedure(Pattern.matchPatternMethod), args);
+
+	Expression[] inits = new Expression[varCount];
+	for (int i = 0;  i < varCount;  i++)
+	  inits[i] = QuoteExp.undefined_exp;
+	clauseScope.inits = inits;
+
+	Expression output;
+	pair = (Pair) pair.cdr;
+	if (pair.cdr == LList.Empty)
+	  output = tr.rewrite(pair.car);
+	else
+	  {
+	    Expression fender = tr.rewrite(pair.car);
+	    if (! (pair.cdr instanceof Pair
+		   && (pair = (Pair) pair.cdr).cdr == LList.Empty))
+	      return tr.syntaxError("syntax-case:  bad clause");
+	    output = new IfExp(fender, tr.rewrite(pair.car), new ExitExp(block));
+	  }
+	clauseScope.setBody(output);
+	tr.pop(clauseScope);
+	PatternScope.pop(tr);
+	block.setBody(new IfExp(tryMatch, clauseScope, new ExitExp(block)),
+		      rewriteClauses(((Pair) clauses).cdr, work, tr));
+	return block;
       }
-    clauseScope.setBody(output);
-    tr.pop(clauseScope);
-    block.setBody(new IfExp(tryMatch, clauseScope, new ExitExp(block)),
-                  rewriteClauses(((Pair) clauses).cdr, work, tr));
-    return block;
+    finally
+      {
+	tr.popPositionOf(savePos);
+      }
   }
 
   public Expression rewriteForm (Pair form, Translator tr)
@@ -118,8 +116,16 @@ public class syntax_case extends Syntax
             for (int i = 0;  i < num_literals;  i++)
               {
                 Pair lit_pair = (Pair) obj;
-                if (! (lit_pair.car instanceof String))
-                  return tr.syntaxError ("syntax-case: non-symbol in literals list");
+		Object savePos = tr.pushPositionOf(obj);
+		try
+		  {
+		    if (! (lit_pair.car instanceof String))
+		      return tr.syntaxError ("syntax-case: non-symbol in literals list");
+		  }
+		finally
+		  {
+		    tr.popPositionOf(savePos);
+		  }
                 work.literal_identifiers[i+1] = lit_pair.car;
                 obj = lit_pair.cdr;
               }
@@ -152,15 +158,13 @@ public class syntax_case extends Syntax
   /** Called (at run-time) if syntax-case has no match. */
   public static Object error(String kind, Object arg)
   {
-    if (arg instanceof SyntaxForm)
-      {
-        SyntaxForm sform = (SyntaxForm) arg;
-        Translator tr = sform.getTranslator();
-        Syntax syntax = tr.getCurrentSyntax();
-        String name = syntax == null ? "some syntax" : syntax.getName();
-        return tr.syntaxError("no matching case while expanding " + name);
-      }
-    throw new RuntimeException("no matching case for "+kind);
+    Translator tr = (Translator) Compilation.getCurrent();
+    if (tr == null)
+      throw new RuntimeException("no match in syntax-case");
+    Syntax syntax = tr.getCurrentSyntax();
+    String name = syntax == null ? "some syntax" : syntax.getName();
+    String msg = "no matching case while expanding " + name;
+    return tr.syntaxError(msg);
   }
 }
 

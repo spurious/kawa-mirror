@@ -27,6 +27,15 @@
 	* kawa/lang/AutoloadSyntax.java: Update to define scanForm.
 	* kawa/lang/Lambda.java: Handle incoming SyntaxForms.
 
+	* kawa/standard/require.java: Create a new ModuleExp for imported
+	fields.  Set Macro's capturedScope to it, rather than each Declaration.
+	* kawa/standard/set_b.java:  Simplify by just calling rwrite on LHS.
+	* kawa/standard/syntax.java: New class.
+	* kawa/standard/syntax_case.java: Rewrite.
+	* kawa/standard/syntax_error.java (error): New static method.
+	* kawa/standard/let.java: Re-write.
+	* kawa/standard/let_syntax.java: Likewise.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* Make-rules: New automake doesn't seem to set DIST_SOURCES from

@@ -182,10 +182,10 @@ public class require extends Syntax
     ClassType t = (ClassType) type;
     boolean isRunnable = t.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
-    Vector macros = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
     Expression[] args = { new QuoteExp(tname) };
     ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
+    ModuleExp mod = new ModuleExp();
     for (;;)
       {
 	Class rclass = t.getReflectClass();
@@ -245,13 +245,16 @@ public class require extends Syntax
 		    // But if the binding is re-exported (or EXTERNAL_ACCESS
 		    // gets set), then we need a separate declaration.
 		    // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
+		    boolean hidden
+		      = fname.startsWith(Declaration.PRIVATE_PREFIX);
 		    Object aname;
 		    if (uri == null)
 		      aname = fdname;
 		    else
 		      aname = Symbol.make(uri, fdname);
-		    Declaration adecl = defs.getDefine(aname, 'w', tr);
-		    Declaration fdecl = new Declaration(fdname, dtype);
+		    Declaration adecl = hidden ? new Declaration(aname)
+		      : defs.getDefine(aname, 'w', tr);
+		    Declaration fdecl = mod.addDeclaration(fdname, dtype);
 		    ReferenceExp fref = new ReferenceExp(fdecl);
 		    SetExp sexp = new SetExp(adecl, fref);
 		    sexp.setDefining(true);
@@ -272,14 +275,13 @@ public class require extends Syntax
 		    ftable.put(fname, adecl);
 		    if (fvalue instanceof Macro)
 		      {
-			// Copy the Macro, as we will be modifying it later.
+			// Copy the Macro, so we can modify it.
+			// (This is a shallow copy, not a deep copy.)
 			Macro mac = new Macro((Macro) fvalue);
+			mac.capturedScope = mod;
 			fvalue = mac;
 			fdecl.setSyntax();
 			fdecl.noteValue(new QuoteExp(mac));
-			if (macros == null)
-			  macros = new Vector();
-			macros.addElement(fvalue);
 		      }
 		    else
 		      fdecl.noteValue(new QuoteExp(fvalue));
@@ -299,7 +301,8 @@ public class require extends Syntax
 		    fdecl.setSimple(false);
 		    adecl.setFlag(Declaration.IS_IMPORTED);
 		    adecl.setSimple(false);
-		    tr.push(adecl);  // Add to translation env.
+		    if (! hidden)
+		      tr.push(adecl);  // Add to translation env.
 		    forms.addElement(sexp);
 		  }
 		catch (Exception ex)
@@ -311,14 +314,6 @@ public class require extends Syntax
         t = t.getSuperclass();
         if (t == null)
           break;
-      }
-
-    if (macros != null)
-      {
-	for (int i = macros.size();  --i >= 0; )
-	  {
-	    ((Macro) macros.elementAt(i)).captureDecls(ftable);
-	  }
       }
 
     if ((instance == null || immediate)

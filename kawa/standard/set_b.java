@@ -20,50 +20,50 @@ public class set_b extends Syntax implements Printable
 
   static private Pattern pattern = new ListPat (2, 2);
 
-  public Expression rewrite (Object obj, Translator tr)
+  public Expression rewriteForm (Pair form, Translator tr)
   {
-    Object [] match = pattern.match (obj);
-    if (match == null)
-      return tr.syntaxError ("missing or extra arguments to set!");
-
-    if (match[0] instanceof Pair)
+    Object o1 = form.cdr;
+    SyntaxForm syntax = null;
+    while (o1 instanceof SyntaxForm)
       {
-	// FIXME use location.rewrite_arg.
-	// rewrite (set! (proc . args) rhs) => ((setter proc) args ... rhs)
-	Pair pair = (Pair) match[0];
-	Object proc = pair.car;
-	Object args = pair.cdr;
+	syntax = (SyntaxForm) o1;
+	o1 = syntax.form;
+      }
+    if (! (o1 instanceof Pair))
+      return tr.syntaxError ("missing name");
+    Pair p1 = (Pair) o1;
+    Expression name = tr.rewrite_car(p1, syntax);
+    Object o2 = p1.cdr;
+    while (o2 instanceof SyntaxForm)
+      {
+	syntax = (SyntaxForm) o2;
+	o2 = syntax.form;
+      }
+    Pair p2;
+    if (! (o2 instanceof Pair)
+	|| (p2 = (Pair) o2).cdr != LList.Empty)
+      return tr.syntaxError ("missing or extra arguments to set!");
+    Expression value = tr.rewrite_car(p2, syntax);
 
-	int nargs = LList.length(args);
+    if (name instanceof ApplyExp)
+      {
+	// rewrite (set! (proc . args) rhs) => ((setter proc) args ... rhs)
+
+	ApplyExp aexp = (ApplyExp) name;
+	int nargs = aexp.getArgCount();
 	Expression[] xargs = new Expression[nargs+1];
-	for (int i = 0; i < nargs; i++)
-	  {
-	    pair = (Pair) args;
-	    xargs[i] = tr.rewrite(pair.car);
-	    args = pair.cdr;
-	  }
-	xargs[nargs] = tr.rewrite(match[1]);
-        Expression[] setterArgs = { tr.rewrite(proc) };
+	System.arraycopy(aexp.getArgs(), 0, xargs, 0, nargs);
+	xargs[nargs] = value;
+        Expression[] setterArgs = { aexp.getFunction() };
 	return new ApplyExp(new ApplyExp(new ReferenceExp(setterDecl),
                                          setterArgs), xargs);
       }
+    else if (! (name instanceof ReferenceExp))
+      return tr.syntaxError ("first set! argument is not a variable name");    
 
-    Object sym = match[0];
-    if (! (sym instanceof String)  && ! (sym instanceof Symbol))
-      return tr.syntaxError ("first set! argument is not a variable name");
-    Expression value = tr.rewrite (match[1]);
-    Declaration decl = tr.lexical.lookup(sym, Interpreter.VALUE_NAMESPACE);
-    // Hygenic macro expansion may bind a renamed (uninterned) symbol
-    // to the original symbol.  Here, use the original symbol.
-    if (decl != null  && decl.isAlias()
-	&& decl.getValue() instanceof ReferenceExp)
-      {
-	ReferenceExp rexp = (ReferenceExp) decl.getValue();
-	decl = rexp.getBinding();
-	if (decl == null)
-	  return new SetExp(rexp.getSymbol(), value);
-      }
-    SetExp sexp = new SetExp (sym, value);
+    ReferenceExp ref = (ReferenceExp) name;
+    Declaration decl = ref.getBinding();
+    SetExp sexp = new SetExp (ref.getSymbol(), value);
     if (decl != null)
       {
 	sexp.binding = decl;

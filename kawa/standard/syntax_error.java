@@ -31,4 +31,29 @@ public class syntax_error extends Syntax
       }
     return tr.syntaxError (buffer.toString ());
   }
+
+  public static Expression error (Object form, Object[] message)
+  {
+    StringBuffer buffer = new StringBuffer();
+    int len = message.length;
+    if (message == null || len == 0)
+      buffer.append("invalid syntax");
+    else
+      {
+	for (int i = 0;  i < len;  i++)
+	  buffer.append(message[i]);
+      }
+    Translator tr = (Translator) Compilation.getCurrent();
+    if (tr == null)
+      throw new RuntimeException(buffer.toString());
+    Object savePos = tr.pushPositionOf(form);
+    try
+      {
+	return tr.syntaxError(buffer.toString());
+      }
+    finally
+      {
+	tr.popPositionOf(savePos);
+      }
+  }
 }

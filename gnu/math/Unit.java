@@ -13,6 +13,9 @@ public class Unit extends Quantity
   Dimensions dims;
   double factor;
   MulUnit products;
+
+  /** A Unit equivalent to this unit, divided by factor.
+      Same as the value of the dimensions() only. */
   Unit base;
 
   public final Dimensions dimensions() { return dims; }

@@ -61,6 +61,10 @@ version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 The @uref{http://www.cygnus.com/~bothner/kawa.html, old Kawa home page}
 should also work.
 
+JEmacs is included in the Kawa distribution.  It is a project to
+re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
+It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
+
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
 has various useful information on Scheme.
@@ -105,7 +109,7 @@ For a technical overview of Kawa, see these
 * Compiling::            Compiling Scheme code to byte-codes
 * Extensions::           Kawa features not in standard Scheme
 * Types::
-* Objects and Classes::  Object-oriented features
+* Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
 * Reporting Bugs::       The Kawa Mailing List
 * License::
@@ -820,6 +824,7 @@ Sorry, Java is needed.</applet>
 * Quantities::
 * Logical Number Operations::
 * Strings::
+* Uniform vectors::
 * Files:: File System Interface
 * Ports::
 * Format:: Formatted Output (Common-Lisp-style)
@@ -1121,7 +1126,7 @@ starting at @var{start} and ending just before @var{end}.
 Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (- start))}.
 @end defun
 
-@node Strings, Files, Logical Number Operations, Extensions
+@node Strings, Uniform vectors, Logical Number Operations, Extensions
 @section Strings
 
 @defun string-upcase str
@@ -1156,7 +1161,180 @@ are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
 @end defun
 
-@node Files, Ports, Strings, Extensions
+@node Uniform vectors, Files, Strings, Extensions
+@section Uniform vectors
+
+Uniform vectors are vectors whose elements are of the same numeric type.
+The are defined by @uref{http://srfi.schemers.org/srfi-4/srfi-4.html,SRFI-4}.
+However, the type names (such as @code{<s8vector>}) are a Kawa extension.
+
+@defvar <s8vector>
+The type of uniform vectors where each element can contain
+a signed 8-bit integer.  Represented using an array of @code{<byte>}.
+@end defvar
+
+@defvar <u8vector>
+The type of uniform vectors where each element can contain
+an unsigned 8-bit integer.  Represented using an array of @code{<byte>},
+but each element is treated as if unsigned.
+@end defvar
+
+@defvar <s16vector>
+The type of uniform vectors where each element can contain
+a signed 16-bit integer.  Represented using an array of @code{<short>}.
+@end defvar
+
+@defvar <u16vector>
+The type of uniform vectors where each element can contain
+an unsigned 16-bit integer.  Represented using an array of @code{<short>},
+but each element is treated as if unsigned.
+@end defvar
+
+@defvar <s32vector>
+The type of uniform vectors where each element can contain
+a signed 32-bit integer.  Represented using an array of @code{<int>}.
+@end defvar
+
+@defvar <u32vector>
+The type of uniform vectors where each element can contain
+an unsigned 32-bit integer.  Represented using an array of @code{<int>},
+but each element is treated as if unsigned.
+@end defvar
+
+@defvar <s64vector>
+The type of uniform vectors where each element can contain
+a signed 64-bit integer.  Represented using an array of @code{<long>}.
+@end defvar
+
+@defvar <u64vector>
+The type of uniform vectors where each element can contain
+an unsigned 64-bit integer.  Represented using an array of @code{<long>},
+but each element is treated as if unsigned.
+@end defvar
+
+@defvar <f32vector>
+The type of uniform vectors where each element can contain
+a 32-bit floating-point real.  Represented using an array of @code{<float>}.
+@end defvar
+
+@defvar <f64vector>
+The type of uniform vectors where each element can contain
+a 64-bit floating-point real.  Represented using an array of @code{<double>}.
+@end defvar
+
+@defun s8vector? value
+@defunx u8vector? value
+@defunx s16vector? value
+@defunx u16vector? value
+@defunx s32vector? value
+@defunx u32vector? value
+@defunx s64vector? value
+@defunx u64vector? value
+@defunx f32vector? value
+@defunx f64vector? value
+Return true iff @var{value} is a uniform vector of the specified type.
+@end defun
+
+@defun make-s8vector n [value]
+@defunx make-u8vector n [value]
+@defunx make-s16vector n [value]
+@defunx make-u16vector n [value]
+@defunx make-s32vector n [value]
+@defunx make-u32vector n [value]
+@defunx make-s64vector n [value]
+@defunx make-u64vector n [value]
+@defunx make-f32vector n [value]
+@defunx make-f64vector n [value]
+Create a new uniform vector of the specified type,
+having room for @var{n} elements.
+Initialize each element to @var{value} if it is specified; zero otherwise.
+@end defun
+
+@defun s8vector value ...
+@defunx u8vector value ...
+@defunx s16vector value ..
+@defunx u16vector value ...
+@defunx s32vector value ...
+@defunx u32vector value ...
+@defunx s64vector value ...
+@defunx u64vector value ...
+@defunx f32vector value ...
+@defunx f64vector value ...
+Create a new uniform vector of the specified type,
+whose length is the number of @var{value}s specified,
+and initialize it using those @var{value}s.
+@end defun
+
+@defun s8vector-length v
+@defunx u8vector-length v
+@defunx s16vector-length v
+@defunx u16vector-length v
+@defunx s32vector-length v
+@defunx u32vector-length v
+@defunx s64vector-length v
+@defunx u64vector-length v
+@defunx f32vector-length v
+@defunx f64vector-length v
+Return the length (in number of elements) of the uniform vector @var{v}.
+@end defun
+
+@defun s8vector-ref v i
+@defunx u8vector-ref v i
+@defunx s16vector-ref v i
+@defunx u16vector-ref v i
+@defunx s32vector-ref v i
+@defunx u32vector-ref v i
+@defunx s64vector-ref v i
+@defunx u64vector-ref v i
+@defunx f32vector-ref v i
+@defunx f64vector-ref v i
+Return the element at index @var{i} of the uniform vector @var{v}.
+@end defun
+
+@defun s8vector-set! v i x
+@defunx u8vector-set! v i x
+@defunx s16vector-set! v i x
+@defunx u16vector-set! v i x
+@defunx s32vector-set! v i x
+@defunx u32vector-set! v i x
+@defunx s64vector-set! v i x
+@defunx u64vector-set! v i x
+@defunx f32vector-set! v i x
+@defunx f64vector-set! v i x
+Set the element at index @var{i} of uniform vector @var{v}
+to the value @var{x}, which must be a number coercible
+to the appropriate type.
+@end defun
+
+@defun s8vector->list v
+@defunx u8vector->list v
+@defunx s16vector->list v
+@defunx u16vector->list v
+@defunx s32vector->list v
+@defunx u32vector->list v
+@defunx s64vector->list v
+@defunx u64vector->list v
+@defunx f32vector->list v
+@defunx f64vector->list v
+Convert the uniform vetor @var{v} to a list containing the elments of @var{v}.
+@end defun
+
+@defun list->s8vector l
+@defunx list->u8vector l
+@defunx list->s16vector l
+@defunx list->u16vector l
+@defunx list->s32vector l
+@defunx list->u32vector l
+@defunx list->s64vector l
+@defunx list->u64vector l
+@defunx list->f32vector l
+@defunx list->f64vector l
+Create a uniform vector of the appropriate type, initializing it
+with the elements of the list @var{l}.  The elements of @var{l}
+must be numbers coercible the new vector's element type.
+@end defun
+
+@node Files, Ports, Uniform vectors, Extensions
 @section File System Interface
 
 @defun file-exists? filename
@@ -2141,7 +2319,7 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@node Types, Objects and Classes, Extensions, Top
+@node Types, Objects Classes and Modules, Extensions, Top
 @chapter Types
 
 A @dfn{type} is a set of values, plus an associated set of operations
@@ -2321,11 +2499,13 @@ If @var{type} is not specified, it defaults to @code{<object>}.
 @end deffn
 
 
-@node Objects and Classes, Low-level functions, Types, Top
-@chapter Object-oriented features
+@node Objects Classes and Modules, Low-level functions, Types, Top
+@chapter Object, Classes and Modules
 
 Kawa provides various ways to define, create, and access Java objects.
 Here are the currently supported features.
+
+The Kawa module system is based on the features of the Java class system.
 
 @menu
 * Records::
@@ -2334,6 +2514,7 @@ Here are the currently supported features.
 * Field operations::      Accessing fields of Java objects
 * Method operations::     Calling Java methods from Scheme
 * Anonymous classes::
+* Module classes::        Modules and how they are compiled to classes
 @end menu
 
 @deffn Syntax this
@@ -2346,7 +2527,7 @@ allow an optional class specifier (needed for nested clases).
 @end deffn
 
 
-@node Records, Mangling, Objects and Classes, Objects and Classes
+@node Records, Mangling, Objects Classes and Modules, Objects Classes and Modules
 @section Records
 
 The Record package provides a facility for users to define their own
@@ -2458,7 +2639,7 @@ field-names argument given in the call to @code{make-record-type} that
 created the type represented by @var{rtd}.@refill
 @end defun
 
-@node Mangling, Allocating objects, Records, Objects and Classes
+@node Mangling, Allocating objects, Records, Objects Classes and Modules
 @section Mapping Scheme names to Java names
 
 Programs use "names" to refer to various values and procedures.
@@ -2500,8 +2681,14 @@ The pair @samp{->} is translated to @samp{To}, and if followed
 by a letter, that is is converted to titlecase.
 For example @samp{list->string} is translated to @samp{listToString}.
 
-Other special characters are translated in uglier ways,
-using a mapping scheme that is likely to change in future versions.
+Some symbols are mapped to a mnemonic sequence, starting with a dollar-sign,
+followed by a two-character abbreviation.  For example, the less-than
+symbol @samp{<} is mangled as @samp{$Ls}.
+See the source code to the @code{mangleName} method in the
+@code{gnu.expr.Compilation} class for the full list.
+Characters that do not have a mnemonic abbreviation are
+mangled as @samp{$} followed by a four-hex-digit unicode value.
+For example @samp{Tamil vowel sign ai} is mangled as @samp{$0bc8}.
 
 Note that this mapping may map different Scheme names to the
 same Java name.  For example @samp{string?}, @samp{String?},
@@ -2517,7 +2704,7 @@ naturally, so we urge you to @emph{not} write code that
 and @samp{openFile} to name two different objects.
 
 
-@node Allocating objects, Method operations, Mangling, Objects and Classes
+@node Allocating objects, Method operations, Mangling, Objects Classes and Modules
 @section  Allocating objects
 
 @defun make type args ...
@@ -2546,7 +2733,7 @@ For example, the following are all equivalent:
 
 @end defun
 
-@node Method operations, Field operations, Allocating objects, Objects and Classes
+@node Method operations, Field operations, Allocating objects, Objects Classes and Modules
 @section Calling Java methods from Scheme
 
 Kawa has both a low-level and a high-level 
@@ -2629,7 +2816,7 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@node Field operations, Anonymous classes, Method operations, Objects and Classes
+@node Field operations, Anonymous classes, Method operations, Objects Classes and Modules
 @section Accessing fields of Java objects
 
 Kawa has both a high-level interface and a low-level interface for accessing
@@ -2673,7 +2860,7 @@ A synonym for @code{(field @var{object} @var{fieldname})}.
 A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
 @end defun
 
-@node Anonymous classes,  , Field operations, Objects and Classes
+@node Anonymous classes, Module classes, Field operations, Objects Classes and Modules
 @section Anonymous classes
 
 @deffn Syntax object (supers ...) field-or-method-decl ...
@@ -2713,7 +2900,180 @@ of the object.  It does include the surrounding lexical scope.
 It sort-of also includes the declared methods, but this is not working yet.
 @end deffn
 
-@node Low-level functions, Reporting Bugs, Objects and Classes, Top
+@node Module classes, , Anonymous classes, Objects Classes and Modules
+@section Modules and how they are compiled to classes
+
+(The Kawa module system is under construction.  There are undoubtedly bugs,
+not all of the planned features are implemented yet, and the design
+may change as we get more experience with it.)
+
+A @dfn{module} is a set of definitions that the module @dfn{exports},
+as well as some @dfn{actions} (expressions evaluated for their side effect).
+The top-level forms in a Scheme source file compile a module;
+the source file is the @dfn{module source}.
+When Kawa compiles the module source, the result is the
+@dfn{module class}.  Each exported definition is translated to
+a public field in the module class.
+
+There are two kinds of module class:
+A @dfn{static module} is a class (or gets compiled to a class)
+all of whose public fields a static, and that does not have a
+public constructor.  A JVM can only have a single global instance of
+a static module.  (Static modules are not yet implemented.)
+An @dfn{instance module} has a public default constructor,
+and usually has at least one non-static public field.
+There can be multiple instances
+of an instance module; each instance is called a @dfn{module instance}.
+However, only a single instance of a module can be @dfn{registered}
+in an environment, so in most cases there is only a single
+instance of instance modules.  Registering an instance in an environment
+means creating a binding mapping a magic name (derived from the class name)
+to the instance.
+
+In fact, any Java class class that has the properties of either
+an instance module or a static module, is a module, and can be
+loaded or imported as such;  the class need not have written
+using Scheme.
+
+@subsection How a module becomes a class
+
+If you want to just use a Scheme module as a module (i.e. @code{load}
+or @code{require} it), you don't care how it gets translated
+into a module class.  However, Kawa gives you some control over how this
+is done, and you can use a Scheme module to define a class which
+you can use with other Java classes.  This style of class definition
+is an alternative to @code{define-class} [not yet implemented]
+which lets you define classes and instances fairly conveniently.
+
+The default name of the module class is the main part of the
+filename of the Scheme source file (with directories and extensions
+sripped off).  That can be overridden by the @code{-T} Kawa
+command-line flag.  The package-prefix specified by the @code{-P}
+flag is prepended to give the fully-qualified class name.
+
+@deffn module-name <name>
+Sets the name of the generated class, overriding the default.
+If there is no @samp{.} in the @var{name}, the package-prefix
+(specified by the @code{-P} Kawa command-line flag) is prepended.
+@end deffn
+
+The base class of the generated module class is unspecified;
+you cannot count on it being more specific than @code{Object}.
+However, you can override it with @code{module-extends}.
+
+@deffn module-extends <class>
+Specifies that the class generated from the immediately surrounding
+module should extend (be a sub-class of) the class @code{<@var{class}>}.
+@end deffn
+
+@deffn module-implements <interface> ...
+Specifies that the class generated from the immediately surrounding
+module should implement the interfaces listed.
+@end deffn
+
+Note that the compiler does @emph{not} currently check that all the
+abstract methods requires by the base class or implemented interfaces
+are actually provided, and have the correct signatures.  This will
+hopefully be fixed, but for now, if you are forgot a method, you will
+probably get a verifier error
+
+For each top-level non-private definition the compiler creates a
+corresponding public field with a similar (mangled) name.
+By default, there is some indirection:  The value of the Scheme variable
+is not that of the field itself.  Instead, the field is a
+@code{gnu.mapping.Binding} object, and the value Scheme variable is
+defined to be the value stored in the @code{Binding}.
+
+If the Scheme definition defines a procedure (which is not re-assigned
+in the module), then the compiler assumes the variable as bound as a
+constant procedure.  The compiler generates one or more methods
+corresponding to the body of the Scheme procedure. It also generates
+a public field with the same name; the value of the field is an
+instance of a subclass of @code{<gnu.mapping.Procedure>} which when
+applied will execute the correct method (depending on the actual arguments).
+The field is used when the procedure used as a value (such as being passed
+as an argument to @code{map}), but when the compiler is able to do so,
+it will generate code to call the correct method directly.
+
+You can control the signature of the generated method by declaring
+the parameter types and the return type of the method.  See the
+applet (@pxref{Applet compilation}) example for how this can be done.
+If the procedures has optional parameters, then the compiler will
+generate multiple methods, one for each argument list length.
+(In rare cases the default expression may be such that this is
+not possible, in which case an "variable argument list" method
+is generated instead.  This only happens when there is a nested
+scope @emph{inside} the default expression, which is very contrived.)
+If there are @code{#!keyword} or @code{#!rest} arguments, the compiler
+generate a "variable argument list" method.  This is a method whose
+last parameter is either an array or a @code{<list>}, and whose
+name has @code{$V} appended to indicate the last parameter is a list.
+
+A method will be static iff it doesn't need to reference non-static
+fields or methods of the module instance.  In that case, the corresponding
+field will also be static.   A future extension will support for
+precise control over which components are static, and will support
+creation of static modules (all of whose public fields are static).
+For now, you can only generate instance methods.
+
+Top-leval macros (defined using either @code{define-syntax}
+or @code{defmacro}) create a field whose type is currently a sub-class of
+@code{kawa.lang.Syntax};  this allows importing modules to detect
+that the field is a macro and apply the macro at compile time.
+
+Unfortuntely, the Java class verifier does not allow fields to have
+arbitrary names.  Therefore, the name of a field that represents a
+Scheme variable is "mangled" (@pxref{Mangling}) into an acceptable Java name.
+The implementation can recover the original name of a field @code{X}
+as @code{((gnu.mapping.Named) X).getName()} because all the standard
+compiler-generate field types implemented the @code{Named} interface.
+
+The top-level actions of a module will get compiled to a @code{run}
+method.  If there is an explicit @code{method-extends}, then the
+module class will also automatically implement @code{java.lang.Runnable}.
+(Otherwise, the class does not implement @code{Runnable}, since in that
+case the @code{run} method return an @code{Object} rather than @code{void}.
+This will likely change.)
+
+@subsection Requiring (importing) a module
+
+You can import a module into the current namespace with @code{require}.
+
+@deffn Syntax require modulespec
+The @var{modulespec} can be either a @code{<@var{classname}>}
+or a @code{'@var{featurename}}.  In either case the names
+exported by the specified module (class) are added to the current
+set of visible names.
+
+If @var{modulespec} is @code{<@var{classname}>} where @var{classname}
+is an instance module (it has a public default constructor),
+and if no module instance for that class
+has been registered in the current environment, then a new instance
+is created and registered (using a "magic" identifier).
+If the module class either inherits from @code{gnu.expr.ModuleBody}
+or implements @code{java.lang.Runnable} then the corresponding @code{run}
+method is executed.  (This is done @emph{after} the instance is
+registered so that cycles can be handled.)  These actions (creating,
+registering, and running the module instance) are done both at compile
+time and at run time, if necessary.
+
+All the public fields of the module class are then incorporated
+in the current set of local visible names in the current module.
+This is done at compile time - no new bindings are created at run-time
+(except for the magic binding used to register the module instance),
+and the imported bindings are private to the current module.
+References to the imported bindings will be compiled as field
+references, using the module instance (except for static fields).
+
+If the @var{modulespec} is @code{'@var{featurename}} then the
+@var{featurename} is looked up (at compile time) in the "feature table"
+which yields the implementing @code{<@var{classname}>}.
+@end deffn
+
+For some examples, you may want to look in the @code{gnu/kawa/slib}
+directory.
+
+@node Low-level functions, Reporting Bugs, Objects Classes and Modules, Top
 @chapter The Scheme-Java interface
 
 Kawa has extensive features so you can work with Java objects

@@ -338,7 +338,7 @@ implements gnu.mapping.Named
 	  {
 	    Object car = pair.car;
 	    if (car instanceof Symbol)
-	      car = car.toString();
+	      car = ((Symbol) car).getName();
 	    if (car == "control")
 	      m |= CTRL_MASK;
 	    if (car == "meta")
@@ -360,7 +360,8 @@ implements gnu.mapping.Named
       }
     if (key instanceof String || key instanceof Symbol)
       {
-	String name = key.toString();
+	String name = key instanceof String ? (String) key
+	  : ((Symbol) key).getName();
 	if (name.length() == 1)
 	  {
 	    char ch = name.charAt(0);

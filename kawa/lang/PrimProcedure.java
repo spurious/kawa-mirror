@@ -37,6 +37,8 @@ public class PrimProcedure extends ProcedureN
 		       Type retType, Type[] argTypes)
   {
     this.op_code = op_code;
+    if (op_code == 185) // invokeinterface
+      classtype.access_flags |= Access.INTERFACE;
     method = classtype.new_method (name, argTypes, retType,
 				   op_code == 184 ? Access.STATIC : 0);
     this.retType = retType;

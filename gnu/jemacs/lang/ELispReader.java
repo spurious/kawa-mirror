@@ -1,9 +1,9 @@
 package gnu.jemacs.lang;
-import kawa.lang.*;
+import kawa.lang.ScmRead;
 import gnu.mapping.*;
 import gnu.text.*;
 import gnu.math.*;
-import gnu.expr.Keyword;
+import gnu.expr.*;
 import gnu.kawa.util.*;
 
 /** A class to read Emacs Lisp forms (S-expressions). */
@@ -20,6 +20,13 @@ public class ELispReader extends gnu.text.LispReader
     super(port, messages);
   }
   
+  protected boolean isDelimiter (char ch)
+  {
+    return (Character.isWhitespace (ch)
+	    || ch == ')' || ch == '(' || ch == '"' || ch == ';'
+	    || ch == '[' || ch == ']');
+  }
+
   Object readSymbol ()
        throws java.io.IOException
   {
@@ -572,7 +579,7 @@ public class ELispReader extends gnu.text.LispReader
     throws java.io.IOException, SyntaxException
   {
     char saveReadState = ((InPort) port).readState;
-    ((InPort) port).readState = '(';
+    ((InPort) port).readState = '[';
      try
        {
 	 java.util.Vector vec = new java.util.Vector();
@@ -581,7 +588,7 @@ public class ELispReader extends gnu.text.LispReader
 	     int c = skipWhitespaceAndComments();
 	     if (c < 0)
 	       eofError("unexpected EOF in vector");
-	     if (c == ')')
+	     if (c == ']')
 	       break;
 	     vec.addElement(readObject(c));
 	   }
@@ -661,22 +668,16 @@ public class ELispReader extends gnu.text.LispReader
 	      return readNumber(c, 10);
 	    else
 	      return readSymbol(c, getReadCase());
+	  case '[':
+	    return readVector();
 	  case '#':
 	    next = read();
 	    switch (next)
 	      {
-	      case '(':
-		return readVector();
-	      case 't':
-		return Interpreter.trueObject;
-	      case 'f':
-		return Interpreter.falseObject;
 	      case 'x':
 	      case 'd':
 	      case 'o':
 	      case 'b':
-	      case 'i':
-	      case 'e':
 		unread (next);
 		return readNumber ('#', 10);
 	      case '|':

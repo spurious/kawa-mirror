@@ -546,7 +546,7 @@ public class XQuery extends Interpreter
   {
     XQuery interp = new XQuery();
     Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Environment.setGlobal(interp.getEnvironment());
   }
 
   public static final XMLFormat writeFormat = new XMLFormat();

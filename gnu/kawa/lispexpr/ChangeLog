@@ -1,3 +1,8 @@
+2001-06-05  Per Bothner  <per@bothner.com>
+
+	* ReaderParens.java (readList):  After seeing '.' that starts a token,
+	set ch to '.'.  Fixes bug report of Thomas Kirk <tk@research.att.com>.
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* ReaderDispatch.java (read):  Better error message.

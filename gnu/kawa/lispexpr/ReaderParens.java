@@ -100,6 +100,7 @@ public class ReaderParens extends ReadTableEntry
 		else
 		  {
 		    // Treat '.' as start of token.
+		    ch = '.';
 		    entry = ReadTableEntry.getConstituentInstance();
 		  }
 	      }

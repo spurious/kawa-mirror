@@ -37,7 +37,7 @@ java_JAVA=\
   $(java_@SWING_SELECTED@) \
   Signal.java
 
-EXTRA_DIST = emacs.scm package.html
+EXTRA_DIST = emacs.scm $(EXTRA_JAVA) package.html
 
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.buffer. -C

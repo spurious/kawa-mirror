@@ -1,3 +1,7 @@
+2000-11-21    <per@bothner.com>
+
+	* Makefile.am, Makefile.in (EXTRA_DIST):  Include $(EXTRA_JAVA).
+
 2000-10-15  Per Bothner  <per@bothner.com>
 
 	* SymbolOps.scm (emacs:read, boundp):  Moved from kawa/lib/emacs.scm.

@@ -1,3 +1,7 @@
+2000-11-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am, Makefile.in (EXTRA_DIST):  Include $(EXTRA_JAVA).
+
 2000-10-15  Per Bothner  <per@bothner.com>
 
 	* emacs.scm:  Tweaking of return types, default handling.

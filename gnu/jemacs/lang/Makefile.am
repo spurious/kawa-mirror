@@ -38,7 +38,7 @@ ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
 CLEANFILES = *.class *.stamp
 
-EXTRA_DIST = $(ALL_SCMSOURCES) package.html
+EXTRA_DIST = $(ALL_SCMSOURCES) $(EXTRA_JAVA) package.html
 
 scmclasses.stamp: $(SCMSOURCES)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?

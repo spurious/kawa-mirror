@@ -98,7 +98,7 @@ ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
 CLEANFILES = *.class *.stamp
 
-EXTRA_DIST = $(ALL_SCMSOURCES) package.html
+EXTRA_DIST = $(ALL_SCMSOURCES) $(EXTRA_JAVA) package.html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 JAVACFLAGS = 

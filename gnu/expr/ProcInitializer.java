@@ -10,8 +10,16 @@ public class ProcInitializer extends Initializer
     field = lexp.allocFieldFor(comp);
     proc = lexp;
     LambdaExp heapLambda = lexp.getOwningLambda();
-    next = heapLambda.initChain;
-    heapLambda.initChain = this;
+    if (heapLambda instanceof ModuleExp && comp.isStatic())
+      {
+	next = comp.clinitChain;
+	comp.clinitChain = this;
+      }
+    else
+      {
+	next = heapLambda.initChain;
+	heapLambda.initChain = this;
+      }
   }
 
   /** Create and load a ModuleMethod for the given procedure. */

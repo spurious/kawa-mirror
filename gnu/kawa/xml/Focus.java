@@ -1,5 +1,4 @@
-// -*-Java-*-
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (C) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -10,17 +9,16 @@ import gnu.math.IntNum;
 
 public final class Focus extends TreePosition
 {
-  
-@if WITH REFERENCES@
-static ThreadLocal current = new ThreadLocal();
-@endif WITH REFERENCES@
-@if WITHOUT REFERENCES@
-static Focus current = new Focus();
-@endif WITHOUT REFERENCES@
+  /* BEGIN JAVA2 */
+  static ThreadLocal current = new ThreadLocal();
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
+  // static Focus current = new Focus();
+  /* END JAVA1 */
 
   public static Focus getCurrent()
   {
-@if WITH REFERENCES@
+    /* BEGIN JAVA2 */
     Object obj = current.get();
     if (obj == null)
       {
@@ -28,10 +26,10 @@ static Focus current = new Focus();
 	current.set(obj);
       }
     return (Focus) obj;
-@endif WITH REFERENCES@
-@if WITHOUT REFERENCES@
-    return current;
-@endif WITHOUT REFERENCES@
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
+    // return current;
+    /* END JAVA1 */
   }
 
   public long position;

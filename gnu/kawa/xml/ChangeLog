@@ -1,3 +1,9 @@
+2003-05-03  Per Bothner  <per@bothner.com>
+
+	* Focus.java.in:  Renemed to ..
+	* Focus.java:   and changed to use new JAVA1/JAVA2 switching.
+	* Makefile.am:  Update accordingly.
+
 2003-05-02  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java (<init>):  New constructors automatically

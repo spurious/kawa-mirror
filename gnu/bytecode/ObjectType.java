@@ -57,7 +57,8 @@ public class ObjectType extends Type
       {
 	if (reflectClass == null)
 	  {
-	    /* BEGIN JAVA2 - uses optional 'initialize' argument */
+	    /* BEGIN JAVA2 */
+	    /* Specifies optional 'initialize' argument. */
 	    reflectClass = Class.forName(getInternalName().replace('/', '.'),
 					 false, getClass().getClassLoader());
 	    /* END JAVA2 */

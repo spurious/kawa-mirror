@@ -1,3 +1,8 @@
+2003-04-29  Jim White  <jim@pagesmiths.com>
+
+	* ObjectType.java (getReflectClass):  Move comment to separate line.
+	Lined for Ant support.
+
 2003-04-25  Per Bothner  <per@bothner.com>
 
 	* ObjectType.java (getReflectClass):  Pass false to initialize argument

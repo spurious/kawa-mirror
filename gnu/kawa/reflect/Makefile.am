@@ -13,6 +13,7 @@ java_JAVA=\
   ArraySet.java \
   ClassMemberConstraint.java \
   ClassMethods.java \
+  InstanceOf.java \
   Invoke.java \
   SlotGet.java \
   SlotSet.java \

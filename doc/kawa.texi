@@ -55,7 +55,7 @@ R. Alexander Milowski @w{<alex@@copsol.com>}.
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 The @uref{http://www.cygnus.com/~bothner/kawa.html, old Kawa home page}
-shold also work.
+should also work.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}

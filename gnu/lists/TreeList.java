@@ -25,6 +25,9 @@ implements Consumer, PositionConsumer, Consumable
   public int gapStart;
   public int gapEnd;
 
+  /** If non-zero, gap is in an attribute starting (1 less than) here. */
+  public int attrStart;
+
   public TreeList()
   {
     resizeObjects();
@@ -53,6 +56,7 @@ implements Consumer, PositionConsumer, Consumable
   {
     gapStart = 0;
     gapEnd = data.length;
+    attrStart = 0;
     if (gapEnd > 1500)
       {
 	gapEnd = 200;
@@ -172,7 +176,7 @@ implements Consumer, PositionConsumer, Consumable
    */
   static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
 
-  /** The end of an attributes of a node. */
+  /** The end of an attribute of a node. */
   static final int END_ATTRIBUTE = 0xF10A;
 
   /** Beginning of a document.
@@ -482,6 +486,9 @@ implements Consumer, PositionConsumer, Consumable
     ensureSpace(5 + 1);
     gapEnd--;
     data[gapStart++] = BEGIN_ATTRIBUTE_LONG;
+    if (attrStart != 0)
+      throw new Error("nested attribute");
+    attrStart = gapStart;
     setIntN(gapStart, index);
     setIntN(gapStart + 2, gapEnd - data.length);
     gapStart += 4;
@@ -490,10 +497,12 @@ implements Consumer, PositionConsumer, Consumable
 
   public void endAttribute()
   {
-    if (data[gapEnd] != END_ATTRIBUTE)
+    if (data[gapEnd] != END_ATTRIBUTE || attrStart <= 0)
       throw new Error("unexpected endAttribute");
     // Move the END_ATTRIBUTES to before the gap.
     gapEnd++;
+    setIntN(attrStart+2, gapStart - attrStart + 1);
+    attrStart = 0;
     data[gapStart++] = END_ATTRIBUTE;
   }
 
@@ -673,6 +682,30 @@ implements Consumer, PositionConsumer, Consumable
 	  break;
       }
     return index;
+  }
+
+  public boolean gotoAttributesStart(TreePosition pos)
+  {
+    int index = gotoAttributesStart(pos.ipos >> 1);
+    if (index < 0)
+      return false;
+    pos.push(this, index << 1, null);
+    return true;
+  }
+
+  public int gotoAttributesStart(int index)
+  {
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return -1;
+    char datum = data[index];
+    if ((datum >= BEGIN_GROUP_SHORT
+	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	|| datum == BEGIN_GROUP_LONG)
+      return index + 3;
+    else
+      return -1;
   }
 
   public Object get (int index)
@@ -905,8 +938,9 @@ implements Consumer, PositionConsumer, Consumable
       case END_GROUP_LONG:
       case END_ATTRIBUTE:
 	return Sequence.EOF_VALUE;
-      case BEGIN_ATTRIBUTE_LONG: // FIXME	
-      case POSITION_REF_FOLLOWS:
+      case BEGIN_ATTRIBUTE_LONG:
+	return Sequence.ATTRIBUTE_VALUE;
+      case POSITION_REF_FOLLOWS: // FIXME	
       case POSITION_TRIPLE_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
       default:
@@ -986,8 +1020,13 @@ implements Consumer, PositionConsumer, Consumable
 	/*
       case CHAR_PAIR_FOLLOWS:
 	return Sequence.CHAR_VALUE;
-      case BEGIN_ATTRIBUTE_LONG: // FIXME
 	*/
+      case BEGIN_ATTRIBUTE_LONG:
+	{
+	  int end_offset = getIntN(index+3);
+	  end_offset += end_offset < 0 ? data.length : index;
+	  return new TreeList(this, index, end_offset+1);
+	}
       case BEGIN_GROUP_LONG:
 	{
 	  int end_offset = getIntN(index+1);
@@ -1170,7 +1209,7 @@ implements Consumer, PositionConsumer, Consumable
       case BEGIN_ATTRIBUTE_LONG:
 	j = getIntN(pos+2);
 	j += j < 0 ? data.length : pos-1;
-	return j;
+	return j + 1;
       case LONG_FOLLOWS:
       case DOUBLE_FOLLOWS:
 	return pos + 4;

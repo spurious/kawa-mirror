@@ -1,3 +1,12 @@
+2001-10-17  Per Bothner  <per@bothner.com>
+
+	* Sequence.java.in (ATTRIBUTE_VALUE):  New constant.
+	* TreeList.java (getNextKind, getNext):  Handle BEGIN_ATTRIBUTE_LONG.
+	(attrStart):  New field.
+	(beginAttribute, endAttribute):  Use it to correctly set end pointer.
+	(gotoAttributesStart, gotoAttributesStart):  New methods.
+	(nextDataIndex):  Return index *after* END_ATTRIBUTE.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* CharSequence.java:  Renamed to CharSeq.java to avoid conflict with

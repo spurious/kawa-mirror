@@ -89,10 +89,10 @@ public class CommonLisp extends Lisp2
     while (e.hasMoreElements())
       {
 	Symbol b = e.nextSymbol();
-	if (b.isBound())
+	Object val = b.get(null);
+	if (val != null)
 	  {
 	    String name = b.getName();
-	    Object val = b.get();
 	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
 	      defun(name, val);
 	    else

@@ -1,3 +1,7 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (<init>):  Minor simplification/optimization.
+
 2003-04-18  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java (getNamespaceOf):  New method.

@@ -1,3 +1,9 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Minor simplification/optimization.
+
+	* ELisp.java (getTypeFor):  Fix typo.
+
 2003-05-17  Per Bothner  <per@bothner.com>
 
 	* lambda.java (rewriteBody):  Use getName to test for 'interactive.

@@ -45,6 +45,8 @@ public class FindCapturedVars extends ExpFullWalker
 
   public void capture(Declaration decl)
   {
+    if (decl.isStatic())
+      return;
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
     while (curLambda != declLambda && curLambda.getInlineOnly())

@@ -1,5 +1,13 @@
 1999-09-05  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (PRIVATE, isPrivate, setPrivate):  New flag.
+	(isStatic, isLexical):  New methods.
+	(load, compileStore):  Don't loadOwningObject if field is static.
+	* SetExp.java (eval, compile):  Handle binding to static Declaration.
+	* ReferenceExp.java (eval.compile):  Likewise.
+	* FindTailCalls.java (walkSetExp):  Likewise.
+	* FindCapturedVars.java (capture):  Do nothing if decl.isStatic().
+
 	* ModuleMethod.java:  New class, which extends ProcedureN.
 	* ModuleBody.java:  New apply methods that take a ModuleMethod.
 	* Makefile.am, Makefile.in (java_JAVA):  Add ModuleMethod.java.

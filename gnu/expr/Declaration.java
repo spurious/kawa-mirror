@@ -42,7 +42,7 @@ public class Declaration extends Variable
 {
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
-  int id = ++counter;
+  protected int id = ++counter;
 
   /** The (interned) name of the new variable.
    * This is the source-level (non-mangled) name. */
@@ -79,7 +79,8 @@ public class Declaration extends Variable
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (field != null)
       {
-	loadOwningObject(comp);
+        if (! field.getStaticFlag())
+          loadOwningObject(comp);
 	code.emitGetField(field);
       }
     else
@@ -95,8 +96,11 @@ public class Declaration extends Variable
       code.emitStore(this);
     else
       {
-	loadOwningObject(comp);
-	code.emitSwap();
+        if (! field.getStaticFlag())
+          {
+            loadOwningObject(comp);
+            code.emitSwap();
+          }
 	code.emitPutField(field);
       }
   }
@@ -115,12 +119,20 @@ public class Declaration extends Variable
   static final int CAN_CALL = 4;
   static final int CAN_WRITE = 8;
   static final int IS_FLUID = 16;
+  static final int PRIVATE = 32;
   int flags;
 
   public final void setFlag (boolean setting, int flag)
   {
     if (setting) flags |= flag;
     else flags &= ~flag;
+  }
+
+  public final boolean isPrivate() { return (flags & PRIVATE) != 0; }
+
+  public final void setPrivate(boolean isPrivate)
+  {
+    setFlag(isPrivate, PRIVATE);
   }
 
   /** True if this is a fluid binding (in a FluidLetExp). */
@@ -164,6 +176,16 @@ public class Declaration extends Variable
       return false;
     LambdaExp lexp = (LambdaExp) value;
     return ! lexp.isHandlingTailCalls() || lexp.getInlineOnly();
+  }
+
+  public boolean isStatic()
+  {
+    return context instanceof ModuleExp;
+  }
+
+  public final boolean isLexical()
+  {
+    return ! isFluid() && ! isStatic();
   }
 
   /** List of ApplyExp where this declaration is the function called.

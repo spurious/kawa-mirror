@@ -55,7 +55,8 @@ public class SetExp extends Expression
   {
     Object new_val = new_value.eval (env);
 
-    if (binding != null)
+    if (binding != null
+        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       throw new Error ("internal error - SetExp.eval with lexical binding");
     if (isDefining ())
       env.define (name, new_val);
@@ -79,7 +80,8 @@ public class SetExp extends Expression
 	&& ((LambdaExp) new_value).getInlineOnly())
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
-    if (binding != null)
+    if (binding != null
+        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       {
 	if (binding.ignorable())
 	  new_value.compile (comp, Target.Ignore);
@@ -109,16 +111,27 @@ public class SetExp extends Expression
 	  }
 	else
 	  {
-	    binding.loadOwningObject(comp);
 	    Field field = binding.field;
+            if (! field.getStaticFlag())
+              binding.loadOwningObject(comp);
 	    new_value.compile (comp, field.getType());
 	    code.emitPutField(field);
+            /*
+            if (binding.context instanceof ModuleExp && ! binding.isPrivate())
+              {
+                comp.compileConstant (name);
+                //comp.method.maybe_compile_checkcast (comp.scmSymbolType);
+                new_value.compile (comp, Target.pushObject);
+                code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
+                                      : comp.putGlobalMethod);
+              }
+            */
 	  }
       }
     else
       {
 	comp.compileConstant (name);
-	comp.method.maybe_compile_checkcast (comp.scmSymbolType);
+	//comp.method.maybe_compile_checkcast (comp.scmSymbolType);
 	new_value.compile (comp, Target.pushObject);
 	code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
 			      : comp.putGlobalMethod);

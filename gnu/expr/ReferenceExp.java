@@ -49,7 +49,8 @@ public class ReferenceExp extends Expression
 
   public Object eval (Environment env)
   {
-    if (binding != null)
+    if (binding != null
+        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       throw new Error("internal error: ReferenceExp.eval on lexical binding");
     return env.getChecked(symbol);
   }
@@ -63,7 +64,8 @@ public class ReferenceExp extends Expression
     if (target instanceof IgnoreTarget)
       return;
     CodeAttr code = comp.getCode();
-    if (binding != null)
+    if (binding != null
+        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
       {
 	binding.load(comp);
 	if (binding.isIndirectBinding() && ! getDontDereference())

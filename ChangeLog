@@ -1,5 +1,11 @@
 2003-08-20  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (initScheme):  Change definitions
+	of positive? and modulo.
+	* kawa/standard/modulo.java:  Remove - implemented in kawa.lib.numbers.
+	* kawa/standard/positive_p.java:  Likewise.
+	* kawa/standard/Makefile.am (java_sources):  Update accordingly.
+
 	* kawa/standard/string2number.java (parse):  Pass new exactness
 	parameter.
 

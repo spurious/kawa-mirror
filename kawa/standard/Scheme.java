@@ -217,7 +217,7 @@ public class Scheme extends LispInterpreter
       define_field("<=", "gnu.kawa.functions.NumberCompare", "$Ls$Eq");
       define_field(">=", "gnu.kawa.functions.NumberCompare", "$Gr$Eq");
       define_proc ("zero?", "kawa.lib.numbers");
-      define_proc ("positive?", "kawa.standard.positive_p");
+      define_proc ("positive?", "kawa.lib.numbers");
       define_proc ("negative?", "kawa.lib.numbers");
       define_proc ("odd?", "kawa.lib.numbers");
       define_proc ("even?", "kawa.lib.numbers");
@@ -230,7 +230,7 @@ public class Scheme extends LispInterpreter
       define_proc ("abs", "kawa.lib.numbers");
       define_proc ("quotient", "kawa.lib.numbers");
       define_proc ("remainder", "kawa.lib.numbers");
-      define_proc ("modulo", "kawa.standard.modulo");
+      define_proc ("modulo", "kawa.lib.numbers");
       define_proc ("gcd", "kawa.standard.gcd");
       define_proc ("lcm", "kawa.standard.lcm");
       define_proc ("numerator", "kawa.lib.numbers");

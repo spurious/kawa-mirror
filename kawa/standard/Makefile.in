@@ -207,10 +207,8 @@ and_or.java \
 cxr.java \
 append.java \
 integer_p.java \
-positive_p.java \
 max.java \
 min.java \
-modulo.java \
 gcd.java \
 lcm.java \
 fluid_let.java \

@@ -2,59 +2,49 @@
   (instance? x <string>))
 
 (define (string=? x y)
-  ((primitive-virtual-method <object> "equals" <boolean> (<object>))
-   ((primitive-virtual-method <object> "toString" <String> ()) x)
-   ((primitive-virtual-method <object> "toString" <String> ()) y)))
+  (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
 
 (define (make-string (n :: <int>) #!optional (ch #\Space))
   (make <string> n ch))
 
-(define (string-length (str <string>))
-  ((primitive-virtual-method <string> "length" <int> ())
-   str))
+(define (string-length (str :: <abstract-string>))
+  (invoke str 'length))
 
-(define (string-ref (string <string>) (k <int>))
-  ((primitive-virtual-method <string> "charAt" <char> (<int>))
-   string k))
+(define (string-ref (string :: <abstract-string>) (k :: <int>))
+  (invoke string 'charAt k))
 
-(define (string-set! (string <string>) (k <int>) (char <char>))
-  ((primitive-virtual-method <string> "setCharAt" <void> (<int> <char>))
-   string k char))
+(define (string-set! (string :: <abstract-string>) (k <int>) (char <char>))
+  (invoke string 'setCharAt k char))
 
 (define (substring (str <string>) (start <int>) (end <int>))
   ((primitive-virtual-method <string> "copy" <string> (<int> <int>))
    str start end))
 
-(define (string-copy (str <string>))
-  ((primitive-virtual-method <string> "copy" <string> ())
-   str))
+(define (string-copy (str <abstract-string>))
+  (invoke str 'copy))
 
-(define (string-fill! (str <string>) (ch <char>))
-  ((primitive-virtual-method <string> "fill" <void> (<char>))
-   str ch))
+(define (string-fill! (str <abstract-string>) (ch <char>))
+  (invoke str 'fill ch))
 
-(define (string-upcase! (str <string>))
-  ((primitive-virtual-method <string> "makeUpperCase" <void> ())
-   str)
+(define (string-upcase! (str :: <abstract-string>))
+  (invoke str 'makeUpperCase)
   str)
 
-(define (string-downcase! (str <string>))
-  ((primitive-virtual-method <string> "makeLowerCase" <void> ())
-   str)
+(define (string-downcase! (str :: <abstract-string>))
+  (invoke str 'makeLowerCase)
   str)
 
-(define (string-capitalize! (str <string>))
-  ((primitive-virtual-method <string> "makeCapitalize" <void> ())
-   str)
+(define (string-capitalize! (str :: <abstract-string>))
+  (invoke str 'makeCapitalize)
   str)
 
-(define (string-upcase (str <string>))
+(define (string-upcase (str :: <abstract-string>))
   (string-upcase! (string-copy str)))
 
-(define (string-downcase (str <string>))
+(define (string-downcase (str :: <abstract-string>))
   (string-downcase! (string-copy str)))
 
-(define (string-capitalize (str <string>))
+(define (string-capitalize (str :: <abstract-string>))
   (string-capitalize! (string-copy str)))
 
 #|

@@ -57,7 +57,16 @@ public class Keyword extends Object implements Printable, Compilable
     ps.print(':');
   }
 
-  /** Search vals[0:offset-1] for keyword;  return following value. */
+  /**
+   * Search vals[0:offset-1] for a keyword.
+   * Each key at vals[i] is followed by a value at keys[i+1].
+   * (This is used to search for a keyword parameter in an argument list.)
+   * @param vals the list to search in
+   * @param offset the index in vals to start the search at
+   * @param keyword the keyword to search for
+   * @return vals[i+1] such that vals[i]==keyword (and (i-offset) is even
+   * and non-negative);  if there is no such i, return Special.dfault.
+   */
   public static Object searchForKeyword (Object[] vals,
 					 int offset, Object keyword)
   {
@@ -67,6 +76,29 @@ public class Keyword extends Object implements Printable, Compilable
 	  return vals[i+1];
       }
     return Special.dfault;
+  }
+
+  /**
+   * Search vals[0:offset-1] for a keyword.
+   * Each key at vals[i] is followed by a value at keys[i+1].
+   * (This is used to search for a keyword parameter in an argument list.)
+   * @param vals the list to search in
+   * @param offset the index in vals to start the search at
+   * @param keyword the keyword to search for
+   * @param dfault the value to return if there is no match
+   * @return vals[i+1] such that vals[i]==keyword (and (i-offset) is even
+   * and non-negative);  if there is no such i, return dfault.
+   */
+  public static Object searchForKeyword (Object[] vals,
+					 int offset, Object keyword,
+					 Object dfault)
+  {
+    for (int i = offset;  i < vals.length;  i += 2)
+      {
+	if (vals[i] == keyword)
+	  return vals[i+1];
+      }
+    return dfault;
   }
 
   public final String getName() { return name; }

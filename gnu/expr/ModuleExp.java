@@ -31,12 +31,37 @@ public class ModuleExp extends LambdaExp
 	  Environment.setCurrent(env);
 	if (! mustCompile) // optimization - don't generate unneeded Class.
 	  return body.eval (env);
-	return ((ModuleBody) eval (env)).run();
+	ModuleBody mod = (ModuleBody) eval (env);
+	gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
+	return mod.run();
       }
     finally
       {
 	if (env != orig_env)
 	  Environment.setCurrent(orig_env);
+      }
+  }
+
+  void allocFields (Compilation comp)
+  {
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+	if (decl.isPrivate())
+	  continue;
+	Expression value = decl.getValue();
+	if (value instanceof LambdaExp)
+	  {
+	    ((LambdaExp) value).allocFieldFor(comp);
+	  }
+	else if (value instanceof QuoteExp && ! comp.immediate)
+	  {
+	  }
+	else
+	  {
+	    new BindingInitializer(decl, comp);
+	    decl.setIndirectBinding(true);
+	  }
       }
   }
 
@@ -91,4 +116,27 @@ public class ModuleExp extends LambdaExp
     zout.close ();
   }
 
+  public void print (java.io.PrintWriter ps)
+  {
+    ps.print("(#%module/");
+    if (name != null)
+      {
+	ps.print(name);
+	ps.print('/');
+      }
+    ps.print(id);
+    ps.println("/ (");
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      {
+	ps.print("  ");
+	ps.println(decl);
+      }
+    ps.print(") ");
+    if (body == null)
+      ps.print("<null body>");
+    else
+      body.print (ps);
+    ps.print(")");
+  }
 }

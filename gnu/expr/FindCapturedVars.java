@@ -7,6 +7,39 @@ public class FindCapturedVars extends ExpFullWalker
     exp.walk(new FindCapturedVars());
   }
 
+  public Object walkApplyExp (ApplyExp exp)
+  {
+    boolean skipFunc = false;
+    // If the func is bound to a module-level known function, and it
+    // doesn't need a closure yet (i.e. could be compiled to a static
+    // method), don't walk the function, since that might force it to
+    // unnecessarily get "captured" which might force the current
+    // function to require a closure.  That would be wasteful if the
+    // alternative is to just call func using invokestatic.  (It is
+    // possible that we later find out that func needs a static link,
+    // in which case the current function does as well;  this is taken
+    // care of by calling setCallersNeedStaticLink in LambdaExp.)
+    if (exp.func instanceof ReferenceExp)
+      {
+	Declaration decl = ((ReferenceExp) exp.func).binding;
+	if (decl != null && decl.context instanceof ModuleExp)
+	  {
+	    Expression value = decl.getValue();
+	    if (value instanceof LambdaExp)
+	      {
+		LambdaExp lexp = (LambdaExp) value;
+		if (! lexp.getNeedsClosureEnv())
+		  skipFunc = true;
+	      }
+	  }
+      }
+    if (! skipFunc)
+      exp.func = (Expression) exp.func.walk(this);
+    if (exitValue == null)
+      exp.args = walkExps(exp.args);
+    return exp;
+  }
+
   public Object walkLetExp (LetExp exp)
   {
     if (exp.body instanceof BeginExp && ! (exp instanceof FluidLetExp))
@@ -44,7 +77,7 @@ public class FindCapturedVars extends ExpFullWalker
 
   public void capture(Declaration decl)
   {
-    if (decl.isStatic() || ! (decl.getCanRead() || decl.getCanCall()))
+    if (! (decl.getCanRead() || decl.getCanCall()))
       return;
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
@@ -88,12 +121,13 @@ public class FindCapturedVars extends ExpFullWalker
       return;
 
     // The logic here is similar to that of decl.ignorable():
+    Expression value = decl.getValue();
     LambdaExp declValue;
-    if (decl.value == null || ! (decl.value instanceof LambdaExp))
+    if (value == null || ! (value instanceof LambdaExp))
       declValue = null;
     else
       {
-        declValue = (LambdaExp) decl.value;
+        declValue = (LambdaExp) value;
         if (declValue.getInlineOnly())
           return;
         if (declValue.isHandlingTailCalls())
@@ -143,8 +177,11 @@ public class FindCapturedVars extends ExpFullWalker
 		declLambda.heapFrame.setArtificial(true);
 	      }
 	    decl.setSimple(false);
-	    decl.nextCapturedVar = declLambda.capturedVars;
-	    declLambda.capturedVars = decl;
+	    if (! decl.isPublic())
+	      {
+		decl.nextCapturedVar = declLambda.capturedVars;
+		declLambda.capturedVars = decl;
+	      }
 	  }
       }
   }

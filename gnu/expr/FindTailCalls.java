@@ -34,8 +34,9 @@ public class FindTailCalls extends ExpFullWalker
 		exp.nextCall = binding.firstCall;
 		binding.firstCall = exp;
 		binding.setCanCall(true);
-		if (binding.value instanceof LambdaExp)
-		  lexp = (LambdaExp) binding.value;
+		Expression value = binding.getValue();
+		if (value instanceof LambdaExp)
+		  lexp = (LambdaExp) value;
 	      }
 	  }
 	else if (exp.func instanceof LambdaExp)
@@ -117,9 +118,10 @@ public class FindTailCalls extends ExpFullWalker
     decl = exp.firstDecl();
     for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
       {
-	if (decl.value != null && decl.value instanceof LambdaExp)
+	Expression value = decl.getValue();
+	if (value != null && value instanceof LambdaExp)
 	  {
-	    LambdaExp lexp = (LambdaExp) decl.value;
+	    LambdaExp lexp = (LambdaExp) value;
 	    if (decl.getCanRead())
 	      lexp.setCanRead(true);
 	    if (decl.getCanCall())
@@ -264,7 +266,7 @@ public class FindTailCalls extends ExpFullWalker
   {
     if (decl != null)
       decl.setCanWrite(true);
-    if (decl != null && decl.value == value && value instanceof LambdaExp
+    if (decl != null && decl.getValue() == value && value instanceof LambdaExp
 	&& ! (value instanceof ObjectExp)
         && ! (decl.context instanceof ModuleExp))
       {

@@ -306,8 +306,6 @@ public class FindTailCalls extends ExpWalker
 
   final Expression walkSetExp (Declaration decl, Expression value)
   {
-    if (decl != null)
-      decl.setCanWrite();
     if (decl != null && decl.getValue() == value
 	&& value instanceof LambdaExp && ! (value instanceof ClassExp)
         && ! decl.isPublic())
@@ -336,8 +334,9 @@ public class FindTailCalls extends ExpWalker
 		return exp;
 	      }
 	    decl = Declaration.followAliases(decl);
-
 	  }
+	if (decl != null)
+	  decl.setCanWrite();
 	Expression value = walkSetExp(decl, exp.new_value);
 	if (decl != null && decl.context instanceof LetExp
 	    && value == decl.getValue()

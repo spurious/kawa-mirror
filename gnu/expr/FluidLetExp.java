@@ -17,7 +17,6 @@ public class FluidLetExp extends LetExp
   public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
-    code.pushScope();
     Type result_type = target instanceof IgnoreTarget ? null
 	: getType();
     Target ttarg;
@@ -47,8 +46,7 @@ public class FluidLetExp extends LetExp
 	
       }
     code.emitTryCatchEnd();
-    code.popScope();
-    code.popScope();
+    popScope(code);
     if (result_type != null)
       target.compileFromStack(comp, result_type);
   }

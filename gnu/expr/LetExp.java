@@ -136,7 +136,7 @@ public class LetExp extends ScopeExp
     store_rest (comp, 0, firstDecl());
 
     body.compileWithPosition(comp, target);
-    code.popScope ();
+    popScope(code);
   }
 
   public final gnu.bytecode.Type getType()

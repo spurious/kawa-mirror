@@ -1,5 +1,17 @@
 2005-02-24  Per Bothner  <per@bothner.com>
 
+	* ScopeExp.java (popScope): New method.
+	* ApplyExp.java (compile): Use new popScope method.
+	* FluidLetExp.java (compile): Likewise.
+	* LambdaExp.java (compileEnd): Likewise.
+	* LetExp.java (compile): Likewise.
+	* FluidLetExp.java (compile): Remove redundant pushScope/popScope pair.
+
+	* FindTailCalls.java (walkSetExp): Move setCanWrite so it is only
+	called for SetExp, not LetExp.
+
+	* LambdaExp.java (loadHeapFrame): Use getCaller method.
+
 	* Compilation.java (getLanguage): Change return type to Language.
 	* IfExp.java (getInterpreter): Change to getLanguage.
 	* ClassExp.java: Update Interpreter -> Language etc.

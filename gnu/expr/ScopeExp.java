@@ -23,6 +23,18 @@ public abstract class ScopeExp extends Expression
     return sc;
   }
 
+  /** Clear bytecode resources for the ScopeExp.
+   * This potentially allows Kawa to generate code for the same (inlined,
+   * shared) ScopeExp multiple times - though we're not making use of that yet.
+   */
+  public void popScope (CodeAttr code)
+  {
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
+      decl.var = null;
+    code.popScope();
+    scope = null;
+  }
+
   public void add (Declaration decl)
   {
     if (last == null)

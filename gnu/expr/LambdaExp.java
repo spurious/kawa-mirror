@@ -102,6 +102,7 @@ public class LambdaExp extends ScopeExp
   static final int CLASS_METHOD = 64;
   static final int METHODS_COMPILED = 128;
   public static final int NO_FIELD = 256;
+  /** True if any parameter default expression captures a parameter. */
   static final int DEFAULT_CAPTURES_ARG = 512;
   public static final int SEQUENCE_RESULT = 1024;
   protected static final int NEXT_AVAIL_FLAG = 2048;
@@ -445,7 +446,7 @@ public class LambdaExp extends ScopeExp
   {
     LambdaExp curLambda = comp.curLambda;
     while (curLambda != this && curLambda.getInlineOnly())
-      curLambda = curLambda.returnContinuation.context;
+      curLambda = curLambda.getCaller();
 
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (curLambda.heapFrame != null && this == curLambda)
@@ -489,7 +490,7 @@ public class LambdaExp extends ScopeExp
 	    && (Compilation.defaultCallConvention < Compilation.CALL_WITH_TAILCALLS
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
-	code.popScope();        // Undoes enterScope in allocParameters
+	popScope(code);        // Undoes enterScope in allocParameters
 	if (! Compilation.fewerClasses) // FIXME
 	  code.popScope(); // Undoes pushScope in method.initCode.
       }

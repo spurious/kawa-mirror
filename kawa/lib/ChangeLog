@@ -1,3 +1,9 @@
+2005-01-28  Per Bothner  <per@bothner.com>
+
+	* characters.scm:  Comparisons (such as char-=?, char-ci<?) are
+	implemented much more efficiently, compiles without warnings on Java5,
+	and if using Java5 use the int versions in java.lang.Character.
+
 2005-01-27  Per Bothner  <per@bothner.com>
 
 	* misc.scm (symbol?): Also true for gnu.mapping.Symbol.

@@ -28,34 +28,32 @@
 (define (char-downcase (char <char>))
   (invoke-static <java.lang.Character> "toLowerCase" char))
 
-(define (char=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Eq c1 c2))
+(define (char=? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (= (invoke c1 'intValue) (invoke c2 'intValue)))
 (define (char<? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Ls c1 c2))
+  (< (invoke c1 'intValue) (invoke c2 'intValue)))
 (define (char>? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Gr c1 c2))
+  (> (invoke c1 'intValue) (invoke c2 'intValue)))
 (define (char<=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Ls$Eq c1 c2))
+  (<= (invoke c1 'intValue) (invoke c2 'intValue)))
 (define (char>=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Gr$Eq c1 c2))
+  (>= (invoke c1 'intValue) (invoke c2 'intValue)))
 
-(define (char-ci=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Eq
-                 (invoke-static <java.lang.Character> 'toUpperCase c1)
-                 (invoke-static <java.lang.Character> 'toUpperCase c2)))
-(define (char-ci<? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Ls
-                 (invoke-static <java.lang.Character> 'toUpperCase c1)
-                 (invoke-static <java.lang.Character> 'toUpperCase c2)))
-(define (char-ci>? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Gr
-                 (invoke-static <java.lang.Character> 'toUpperCase c1)
-                 (invoke-static <java.lang.Character> 'toUpperCase c2)))
-(define (char-ci<=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Ls$Eq
-                 (invoke-static <java.lang.Character> 'toUpperCase c1)
-                 (invoke-static <java.lang.Character> 'toUpperCase c2)))
-(define (char-ci>=? (c1 :: <character>) (c2 :: <character>))
-  (invoke-static <character> '$Gr$Eq
-                 (invoke-static <java.lang.Character> 'toUpperCase c1)
-                 (invoke-static <java.lang.Character> 'toUpperCase c2)))
+;; The following functions are written so they will work and generate
+;; good code for both Java5 (which has Character.toUppercase(int))
+;; and older Java versions (which only have Character.toUppercase(char)).
+(define (char-ci=? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (= (as <int> (java.lang.Character:toUpperCase (invoke c1 'intValue)))
+     (as <int> (java.lang.Character:toUpperCase (invoke c2 'intValue)))))
+(define (char-ci<? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (< (as <int> (java.lang.Character:toUpperCase (invoke c1 'intValue)))
+     (as <int> (java.lang.Character:toUpperCase (invoke c2 'intValue)))))
+(define (char-ci>? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (> (as <int> (java.lang.Character:toUpperCase (invoke c1 'intValue)))
+     (as <int> (java.lang.Character:toUpperCase (invoke c2 'intValue)))))
+(define (char-ci<=? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (<= (as <int> (java.lang.Character:toUpperCase (invoke c1 'intValue)))
+     (as <int> (java.lang.Character:toUpperCase (invoke c2 'intValue)))))
+(define (char-ci>=? (c1 :: <character>) (c2 :: <character>)) :: <boolean>
+  (>= (as <int> (java.lang.Character:toUpperCase (invoke c1 'intValue)))
+     (as <int> (java.lang.Character:toUpperCase (invoke c2 'intValue)))))

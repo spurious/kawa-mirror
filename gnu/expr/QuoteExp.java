@@ -13,7 +13,11 @@ public class QuoteExp extends Expression
   public final Object getValue() { return value; }
 
   public final gnu.bytecode.Type getType()
-  { return gnu.bytecode.Type.make(value.getClass()); }
+  {
+    if (value == Values.empty)
+      return gnu.bytecode.Type.void_type;
+    return gnu.bytecode.Type.make(value.getClass());
+  }
 
   static public QuoteExp undefined_exp
   = new QuoteExp (Undefined.getInstance());

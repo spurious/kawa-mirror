@@ -33,10 +33,7 @@ public class Environment // extends [almost] java.util.Dictionary
     this.name = name;
   }
 
-  public static Environment user ()
-  {
-    return kawa.standard.Scheme.curEnvironment ();
-  }
+  public static Environment user () { return current(); }
 
   public static Object lookup_global (String name)
        throws UnboundSymbol
@@ -62,7 +59,7 @@ public class Environment // extends [almost] java.util.Dictionary
     Thread thread = Thread.currentThread ();
     if (thread instanceof Future)
       return ((Future)thread).environment;
-    return user();
+    return kawa.standard.Scheme.curEnvironment ();
   }
 
   public static void setCurrent (Environment env)

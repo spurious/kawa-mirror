@@ -62,10 +62,37 @@ public class InPort extends LineBufferedReader implements Printable
   Object readSymbol ()
        throws java.io.IOException, ReadError
   {
-    return readSymbol (read ());
+    return readSymbol (read (), getReadCase());
   }
 
-  Object readSymbol (int c)
+  /** Get specification of how symbols should be case-folded.
+    * @return Either 'P' (means preserve case), 'U' (upcase),
+    * 'D' (downcase, or 'I' (invert case).
+    */
+  public static char getReadCase()
+  {
+    char read_case;
+    try
+      {
+	String read_case_string
+	  = Environment.lookup_global("symbol-read-case").toString();
+	read_case = read_case_string.charAt(0);
+	if (read_case == 'P') ;
+	else if (read_case == 'u')
+	  read_case = 'U';
+	else if (read_case == 'd' || read_case == 'l' || read_case == 'L')
+	  read_case = 'D';
+	else if (read_case == 'i')
+	  read_case = 'I';
+      }
+    catch (Exception ex)
+      {
+	read_case = 'P';
+      }
+    return read_case;
+  }
+
+  Object readSymbol (int c, char read_case)
        throws java.io.IOException, ReadError
   {
     StringBuffer str = new StringBuffer (30);
@@ -90,10 +117,14 @@ public class InPort extends LineBufferedReader implements Printable
 	    lastChar = ' ';
 	  }
 	else
-
 	  {
 	    lastChar = ch;
-	    ch = Character.toLowerCase (ch);
+	    if (read_case == 'U'
+		|| (read_case == 'I' && Character.isLowerCase(ch)))
+	      ch = Character.toUpperCase(ch);
+	    else if (read_case == 'D'
+		     || (read_case == 'I' && Character.isUpperCase(ch)))
+	      ch = Character.toLowerCase (ch);
 	  }
 	str.append (ch);
 	c = read ();
@@ -119,7 +150,7 @@ public class InPort extends LineBufferedReader implements Printable
     int origc = c;
     if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
       {
-	String name = readSymbol(c).toString();
+	String name = readSymbol(c, 'D').toString();
         int i = Char.charNames.length; 
         for ( ; ; ) {
            if (--i < 0) {
@@ -148,7 +179,7 @@ public class InPort extends LineBufferedReader implements Printable
     int c = read ();
     if (c < 0)
       throw new EofReadError (this, "unexpected EOF after #!");
-    String name = readSymbol(c).toString();
+    String name = readSymbol(c, 'D').toString();
     if (name.equals("optional"))
       return Special.optional;
     if (name.equals("rest"))
@@ -641,7 +672,7 @@ public class InPort extends LineBufferedReader implements Printable
 		 || (c != '.' && next == '.'))
 	      return readSchemeNumber(c, 0, ' ');
 	    else
-	      return readSymbol(c);
+	      return readSymbol(c, getReadCase());
 	  case '#':
 	    next = read();
 	    switch (next)
@@ -694,7 +725,7 @@ public class InPort extends LineBufferedReader implements Printable
 	    if (Character.isDigit((char)c))
 	      return readSchemeNumber(c, 0, ' ');
 	    else
-	      return readSymbol(c);
+	      return readSymbol(c, getReadCase());
 	  }
 	c = read ();
       }

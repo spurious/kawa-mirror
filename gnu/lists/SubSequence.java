@@ -110,14 +110,21 @@ extends AbstractSequence implements Sequence, PositionContainer
 
   protected Object getNext(int ipos, Object xpos)
   {
-    if (base.compare(ipos, xpos, ipos1, xpos) >= 0)
+    if (base.compare(ipos, xpos, ipos1, xpos1) >= 0)
       return eofValue;
     return base.getNext(ipos, xpos);
   }
 
+  protected int getNextKind(int ipos, Object xpos)
+  {
+    if (base.compare(ipos, xpos, ipos1, xpos1) >= 0)
+      return EOF_VALUE;
+    return base.getNextKind(ipos, xpos);
+  }
+
   protected Object getPrevious(int ipos, Object xpos)
   {
-    if (base.compare(ipos, xpos, ipos1, xpos) <= 0)
+    if (base.compare(ipos, xpos, ipos0, xpos0) <= 0)
       return eofValue;
     return base.getPrevious(ipos, xpos);
   }

@@ -157,7 +157,7 @@ implements Consumer, Consumable
    *   to the corresponding END_GROUP_SHORT.
    * [parent_offset], the (unsigned absolute value of the) offset
    *   to the outer BEGIN_GROUP_SHORT/BEGIN_GROUP_LONG.  (If this is the
-   *   outermost group, then parent_position==0.)
+   *   outermost group, then parent_offset==0.)
    *
    * This should is used when index < BEGIN_GROUP_SHORT_INDEX_MAX,
    * both end_offset and parent_offset fit in 16 bits,
@@ -391,7 +391,7 @@ implements Consumer, Consumable
       {
 	data[begin] = (char) (BEGIN_GROUP_SHORT | index);
 	data[begin + 1] = (char) offset;  // end_offset
-	data[begin + 1] = (char) parentOffset;
+	data[begin + 2] = (char) parentOffset;
 	data[gapStart] = END_GROUP_SHORT;
 	data[gapStart + 1] = (char) offset; // begin_offset
 	gapStart += 2;
@@ -563,7 +563,48 @@ implements Consumer, Consumable
   makePosition(int index, boolean isAfter,
 	       PositionContainer posSet, int posNumber)
   {
-    throw unsupported("makePosition");
+    int i = 0;
+    while (--index >= 0)
+      {
+	i = nextDataIndex(i);
+	if (i < 0)
+	  throw new IndexOutOfBoundsException();
+      }
+    posSet.setPosition(posNumber, (i << 1) | (isAfter ? 1 : 0), null);
+    posSet.setSequence(posNumber, this);
+  }
+
+  public boolean gotoChildrenStart(TreePosition pos)
+  {
+    int index = pos.ipos >> 1;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return false;
+    char datum = data[index];
+    if ((datum >= BEGIN_GROUP_SHORT
+	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	|| datum == BEGIN_GROUP_LONG)
+      index += 3;
+    else
+      return false;
+    for (;;)
+      {
+	if (index >= gapStart)
+	  index += gapEnd - gapStart;
+	datum = data[index];
+	if (datum == BEGIN_ATTRIBUTE_LONG)
+	  {
+	    int end = getIntN(index+3);
+	    index = end + (end < 0 ? data.length : index);
+	  }
+	else if (datum == END_ATTRIBUTES)
+	  index++;
+	else
+	  break;
+      }
+    pos.push(this, index << 1, null);
+    return true;
   }
 
   public Object get (int index)
@@ -655,8 +696,12 @@ implements Consumer, Consumable
 	    out.writeBoolean(datum != BOOL_FALSE);
 	    continue;
 	  case CHAR_FOLLOWS:
+	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
+	    pos++;
+	    continue;
 	  case CHAR_PAIR_FOLLOWS:
 	    out.write(data, pos, 1 + datum - CHAR_FOLLOWS);
+	    pos += 2;
 	    continue;
 	  case OBJECT_REF_FOLLOWS:
 	    out.writeObject(objects[getIntN(pos)]);
@@ -722,6 +767,150 @@ implements Consumer, Consumable
       && ch != END_GROUP_LONG;
   }
 
+  protected int getNextKind(int ipos, Object xpos)
+  {
+    int index = ipos >>> 1;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return Sequence.EOF_VALUE;
+    char datum = data[index];
+    if (datum <= MAX_CHAR_SHORT)
+      return Sequence.CHAR_VALUE;
+    if (datum >= OBJECT_REF_SHORT
+	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+      return Sequence.OBJECT_VALUE;
+    if (datum >= BEGIN_GROUP_SHORT
+	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      return Sequence.GROUP_VALUE;
+    if ((datum & 0xFF00) == BYTE_PREFIX)
+      return Sequence.TEXT_BYTE_VALUE;
+    if (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+	&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT)
+      return Sequence.INT_S32_VALUE;
+    switch (datum)
+      {
+      case BOOL_FALSE:
+      case BOOL_TRUE:
+	return Sequence.BOOLEAN_VALUE;
+      case INT_FOLLOWS:
+	return Sequence.INT_S32_VALUE;
+      case LONG_FOLLOWS:
+	return Sequence.INT_S64_VALUE;
+      case FLOAT_FOLLOWS:
+	return Sequence.FLOAT_VALUE;
+      case DOUBLE_FOLLOWS:
+	return Sequence.DOUBLE_VALUE;
+      case CHAR_FOLLOWS:
+      case CHAR_PAIR_FOLLOWS:
+	return Sequence.CHAR_VALUE;
+      case BEGIN_GROUP_LONG:
+	return Sequence.GROUP_VALUE;
+      case END_GROUP_SHORT:
+      case END_GROUP_LONG:
+      case END_ATTRIBUTES:
+	return Sequence.EOF_VALUE;
+      case BEGIN_ATTRIBUTE_LONG: // FIXME	
+      case OBJECT_REF_FOLLOWS:
+      default:
+	return Sequence.OBJECT_VALUE;
+      }
+
+  }
+
+  protected int getNextTypeIndex(int ipos, Object xpos)
+  {
+    int index = ipos >>> 1;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return Sequence.EOF_VALUE;
+    char datum = data[index];
+    if (datum >= BEGIN_GROUP_SHORT
+	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      return datum-BEGIN_GROUP_SHORT;
+    else if (datum == BEGIN_GROUP_LONG || datum == BEGIN_ATTRIBUTE_LONG)
+      return getIntN(index + 1);
+    return -1;
+  }
+
+  protected String getNextTypeName(int ipos, Object xpos)
+  {
+    int index = getNextTypeIndex(ipos, xpos);
+    return index < 0 ? null : (String) objects[index];
+  }
+
+  protected Object getNextTypeObject(int ipos, Object xpos)
+  {
+    int index = getNextTypeIndex(ipos, xpos);
+    return index < 0 ? null : objects[index+1];
+  }
+
+  protected void makeRelativePosition(int istart, Object xstart,
+				      int offset, boolean isAfter,
+				      PositionContainer posSet,
+				      int posNumber)
+  {
+    if (offset < 0)
+      throw unsupported("backwards makeRelativePostion");
+    int pos = istart >>> 1;
+    while (--offset >= 0)
+      {
+	pos = nextDataIndex(pos);
+	if (pos < 0)
+	  throw new IndexOutOfBoundsException();
+      }
+    posSet.setPosition(posNumber, (pos << 1) | (isAfter ? 1 : 0), null);
+  }
+
+  public int nextDataIndex(int pos)
+  {
+    if (pos == gapStart)
+      pos = gapEnd;
+    if (pos == data.length)
+      return -1;
+    int j;
+    char datum = data[pos++];
+    if (datum <= MAX_CHAR_SHORT
+	|| (datum >= OBJECT_REF_SHORT
+	    && datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+	|| (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+	    && datum <= INT_SHORT_ZERO + MAX_INT_SHORT))
+      return pos;
+    if (datum >= BEGIN_GROUP_SHORT
+	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      return data[pos] + pos + 2;
+    switch (datum)
+      {
+      case BOOL_FALSE:
+      case BOOL_TRUE:
+	return pos;
+      case CHAR_FOLLOWS:
+	return pos + 1;
+      case OBJECT_REF_FOLLOWS:
+      case CHAR_PAIR_FOLLOWS:
+      case INT_FOLLOWS:
+	return pos + 2;
+      case END_GROUP_SHORT:
+      case END_GROUP_LONG:
+      case END_ATTRIBUTES:
+	return -1;
+      case BEGIN_GROUP_LONG:
+	j = getIntN(pos);
+	j += j < 0 ? data.length : pos-1;
+	return  j + 7;
+      case BEGIN_ATTRIBUTE_LONG:
+	j = getIntN(pos+2);
+	j += j < 0 ? data.length : pos-1;
+	return j;
+      case LONG_FOLLOWS:
+      case DOUBLE_FOLLOWS:
+	return pos + 4;
+      default:
+	throw new Error("unknown code:"+(int) datum);
+      }
+  }
+
   public void consumeRange(int startPosition, int endPosition, Consumer out)
   {
     consumeRange(startPosition, endPosition, -1, out);
@@ -735,7 +924,7 @@ implements Consumer, Consumable
   // /* DEBUGGING
   public void dump()
   {
-    gnu.mapping.OutPort out = gnu.mapping.OutPort.outDefault();
+    java.io.PrintWriter out = new java.io.PrintWriter(System.out);
     dump(out);
     out.flush();
   }

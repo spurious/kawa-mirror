@@ -1440,6 +1440,26 @@ Note this @emph{only} changes the name property used for printing:
 (PLUS 3 4) => ERROR
 @end example
 
+As a matter of style, it is cleaner to use the @code{define-procedure}
+form, as it is a more declarative interface.
+
+@deffn Syntax define-procedure name [propname: propvalue] ... method ...
+Defines @var{name} as a compound procedure consisting of the
+specified @var{method}s, with the associated properties.
+Applying @var{name} select the "best" @var{method}, and applies that.
+(However, the current implementation of selecting the "best" method
+is not reliable if there is more than one @var{method} )
+
+For example, the standard @code{vector-ref} procedure specifies
+one method, as well as the @code{setter} property:
+@example
+(define-procedure vector-ref
+  setter: vector-set!
+  (lambda ((vector :: <vector>) (k :: <int>))
+    (invoke vector 'get k)))
+@end example
+@end deffn
+
 @subsection Generic (dynamically overloaded) procedures
 
 A @dfn{generic procedure} is a collection of @dfn{method procedures}.
@@ -2178,8 +2198,30 @@ For example:
 @end example
 is equivalent to:
 @example
+((setter car) x 10)
+@end example
+which is equivalent to:
+@example
 (set-car! x 10)
 @end example
+
+@defun setter procedure
+Gets the "setter procedure" associated with a "getter procedure".
+Equivalent to @code{(procedure-property @var{procedure} 'setter)}.
+By convention, a setter procedure takes the same parameters as
+the "getter" procedure, plus an extra parameter that is the
+new value to be stored in the location specified by the parameters.
+The expectation is that following
+@code{((setter @var{proc}) @var{args} ... @var{value})} then
+the value of @code{(@var{proc} @var{args} ...)} will be @var{value}.
+
+The @code{setter} of @code{setter} can be used to set the
+@code{setter} property.
+For example the Scheme prologue effectively does the following:
+@example
+(set! (setter vector-set) vector-set!)
+@end example
+@end defun
 
 Kawa also gives you access to locations as first-class values:
 
@@ -3610,10 +3652,63 @@ For example, the following are all equivalent:
 @node Method operations, Field operations, Allocating objects, Objects Classes and Modules
 @section Calling Java methods from Scheme
 
-Kawa has both a low-level and a high-level 
-"Foreign Function Interface",
-which allows you to call any (virtual or static) Java method
-as if it were a Scheme procedure.
+You can call a Java method as if it were a Scheme procedure
+using various mechanisms.
+The most convenient way to do it is to
+use @code{define-namespace} to define an alias for a Java class:
+@example
+(define-namespace Int32 "class:java.lang.Integer")
+@end example
+In this example the name @code{Int32} is a @dfn{namespace alias}
+for the namespace whose full name is @code{"class:java.lang.Integer"}.
+The full name should be the 6 characters @code{"class:"} followed
+by the fully-qualified name of a Java class.
+You can name a method using a @dfn{qualified name} containing a colon.
+The part of the name before the colon is a namespace alias (in
+this case @code{Int32}), and the part of the name after the colon is the
+method name.  For example:
+@example
+(Int32:toHexString 255) => ff
+@end example
+This invokes the static method @code{toHexString} in the
+Java class @code{java.lang.Integer}, passing it the argument @code{255},
+and returning the Java String @code{"ff"}.  (Note this is not the
+same as a Scheme string!)
+
+You can use the method name @code{new} to construct new objects:
+@example
+(Int32:new '|255|)
+@end example
+This is equivalent to the Java expression @code{new Integer("255")}.
+You can also write:
+@example
+(Int32:new "255")
+@end example
+Kawa is smart enough to convert the Kawa string to a Java String.
+
+You can invoke non-static methods the same way.  In that case the first
+argument is the receiver or @code{this} argument.
+@example
+(Int32:toString (Int32:new "00255"))
+@end example
+This evaluates to the Java String @code{"255"}.
+
+As a shorthand, you can use the name of a Java class instead of a
+namespace alias:
+@example
+(java.lang.Integer:toHexString 255)
+(java.lang.Object:toString some-value)
+@end example
+If Kawa sees a qualified name with a prefix that is not defined @emph{and}
+that matches the name of an existing class, then Kawa will automaticaly
+treat the prefix
+as a nickname for namespace uri like @code{class:java.lang.Integer}.
+Both conditions should be true at both compile-time and run-time.
+However, using an explicit @code{define-namespace} is recommended.
+
+If you prefer, you can instead use the following functions.
+(There is also an older deprecated lower-level interface
+(@pxref{Low-level Method invocation}.)
 
 @defun invoke-static class name args ...
 The @var{class} can be a @code{<java.lang.Class>}, a
@@ -3997,6 +4092,31 @@ If the definition is at module level, then the compiler
 will create a @code{final} field with the given name and type.
 The @var{value} is evaluated as normal; however, if it is a
 compile-time constant, it defaults to being static.
+@end deffn
+
+@deffn Syntax define-namespace name namespace-uri
+Defines @var{name} as @dfn{namespace alias} - a lexically scoped
+"nickname" for the namespace (or package)
+whose full name is @var{namespace-uri}, which should be a string literal.
+Any symbols in the scope of this definitions that contain a colon, and
+where the part before the colon matches the @var{name} will be
+treated as being in the package/namespace whose global unique name
+is the @var{namespace-uri}.
+
+The features is currently used for XML (to be documented).
+In XML terminolofy, a name containing a colon is a @dfn{qualified name}.
+The part of the name before the colon is a @dfn{namespace prefix},
+which is an aliases for a locally-visible @dfn{namespace uri}.
+The latter is an arbitrary string, but for uniqueness it is
+recommended that it be a uri belonging to the organization
+that defines the namespace.  (It need to correspond to an
+actual browsable location, even though it looks like one.)
+The part of a name following the colon is the @var{local part} of the name.
+
+If the namespace starts with the strings @code{"class:"}, then the
+@var{name} can be used for invoking Java methods
+- @pxref{Method operations}.
+
 @end deffn
 
 @subsection How a module becomes a class

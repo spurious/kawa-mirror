@@ -1,3 +1,12 @@
+2002-11-25  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Procedures):  Document define-procedure.
+	(Locations):  Document setter.
+
+	* kawa.texi (Module classes):  Document define-namespace.
+	* kawa.texi (Method operations):  Document new define-namespace-based
+	method invocation syntax.
+
 2002-11-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Features):  List implemented SRFIs.

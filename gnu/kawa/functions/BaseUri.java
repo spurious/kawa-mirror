@@ -33,7 +33,7 @@ public class BaseUri extends Procedure0or1
   }
 
   /** Tests if a URL has a scheme.
-   * For convenience, we treat a 1-character "scheme" is an
+   * For convenience, we treat a 1-character "scheme" as an
    * MS-DOS-style "drive letter" - i.e. not a scheme.. */
   public static boolean hasScheme (String name)
   {
@@ -60,34 +60,47 @@ public class BaseUri extends Procedure0or1
     return -1;
   }
 
-  /** Resolve a relative URI against a base URI.
-   * This does not collapse redundant '..' and '.', but it should. */
+  /** Resolve a URI against a base URI.
+   * This does not collapse redundant '..' and '.'; perhaps it should. */
   public static String resolve (String uri, String base)
   {
+    if (hasScheme(uri) || base == null)
+      return uri;
+    char fileSep = System.getProperty ("file.separator").charAt(0);
     int lastSl = base.lastIndexOf('/');
+    if (fileSep != '/')
+      {
+	int lastSep = base.lastIndexOf(fileSep);
+	if (lastSep > lastSl)
+	  lastSl = lastSep;
+      }
     StringBuffer sbuf = new StringBuffer(base);
     if (lastSl >= 0)
       sbuf.setLength(lastSl+1);
     else
       sbuf.append('/');
-    if (uri.length() > 0 && uri.charAt(0) == '/')
+    if (uri.length() > 0
+	&& (uri.charAt(0) == '/'
+	    || (fileSep != '/'
+		&& (uri.charAt(0) == fileSep || uri.charAt(1) == ':'))))
       {
+	// Uri is an abolste file name, but doesn't have a uri scheme.
 	int baseLen = base.length();
 	int pathStart = BaseUri.uriSchemeLength(base);
-	if (pathStart >= 0)
+	if (pathStart <= 1)
+	  return uri;
+	pathStart++;
+	// Add the "authority" - usually a host-name.
+	if (pathStart + 1 < baseLen
+	    && base.charAt(pathStart) == '/'
+	    && base.charAt(pathStart+1) == '/')
 	  {
-	    pathStart++;
-	    if (pathStart + 1 < baseLen
-		&& base.charAt(pathStart) == '/'
-		&& base.charAt(pathStart+1) == '/')
-	      {
-		int p2 = base.indexOf('/', pathStart+2);
-		if (p2 < 0)
-		  p2 = baseLen; // ? append '/'? FIXME
-		pathStart = p2;
-	      }
-	    sbuf.setLength(pathStart);
+	    int p2 = base.indexOf('/', pathStart+2);
+	    if (p2 < 0)
+	      p2 = baseLen; // ? append '/'? FIXME
+	    pathStart = p2;
 	  }
+	sbuf.setLength(pathStart);
 	sbuf.append(uri);
       }
     else

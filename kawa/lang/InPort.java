@@ -294,7 +294,7 @@ public class InPort extends LineBufferedReader implements Printable
    * For excessively large exponents, return Integer.MIN_VALUE
    * or Integer.MAX_VALUE.
    */
-  int readOptionalExponent()
+  public int readOptionalExponent()
        throws java.io.IOException, ReadError
   {
     int sign = read();

@@ -6,7 +6,7 @@ package kawa.lang;
 
 public class EofReadError extends ReadError
 {
-  EofReadError (InPort inport, String message)
+  public EofReadError (InPort inport, String message)
   {
     super (inport, message);
   }

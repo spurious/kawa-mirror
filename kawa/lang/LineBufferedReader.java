@@ -26,13 +26,13 @@ public class LineBufferedReader extends FilterReader
   final static int BUFFER_SIZE = 1024;
 
   /** The input buffer, containing the current line etc. */
-  char[] buffer;
+  public char[] buffer;
 
   /** The current read position, as an index into buffer. */
-  int pos;
+  public int pos;
 
   /** The length of the valid (data-containing) part of the buffer. */
-  int limit;
+  public int limit;
 
   /** The high-water mark for pos, at a reset or line start. */
   int highestPos;

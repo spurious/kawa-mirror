@@ -1,5 +1,8 @@
 2005-02-07  Per Bothner  <per@bothner.com>
 
+	* build.xml: Also compile srfi37.scm.  Compile DefineRecordType.scm
+	before srfi37.scm, which makes use of define-record-type.
+
 	* kawa/lang/Translator.java (namespaceResolve): If Uri is bound to
 	a constant ClassType create a ClassMethodProc.
 	Fixes the second test-case for Savannah bug #11822.

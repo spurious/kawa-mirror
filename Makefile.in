@@ -766,7 +766,7 @@ $(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/
 all-recursive:  $(JAVATOP)kawa/Version.java selected-java-source
 all: kawa-@VERSION@.jar
 
-selected-java-source:
+selected-java-source: Makefile
 	@java_source=`cat $(srcdir)/selected-java-source 2>/dev/null || echo none`; \
 	if test "$$java_source" = "@JAVA_SOURCE@"; \
 	then echo current java-source is ok; \

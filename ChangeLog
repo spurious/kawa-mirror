@@ -1,5 +1,7 @@
 2004-11-10  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (selected-java-source): Depend on Makefile.
+
 	* kawa/standard/and_or.java: Removed.
 	* kawa/standard/Makefile.am (java_sources): Remove and_or.java.
 	* kawa/standard/Scheme.java: Use definition of 'or' with macro

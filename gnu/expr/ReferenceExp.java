@@ -75,7 +75,7 @@ public class ReferenceExp extends Expression
 		typeLocation = ClassType.make("gnu.mapping.Location");
 		getMethod = typeLocation.addMethod("get",
 						   Type.typeArray0,
-						   Compilation.scmObjectType,
+						   Compilation.typeObject,
 						   Access.PUBLIC|Access.FINAL);
 	      }
 	    code.emitInvokeVirtual (getMethod);

@@ -46,14 +46,14 @@ public class SetApplyExp extends ApplyExp
     else
       {
 	code.emitPushInt(args_length+1);
-	code.emitNewArray(comp.scmObjectType);
+	code.emitNewArray(comp.typeObject);
 	for (int i = 0; i <= args_length; ++i)
 	  {
 	    code.emitDup(comp.objArrayType);
 	    int index = i == args_length ? 0 : i + 1;
 	    code.emitPushInt(index);
 	    exp.args[index].compile (comp, Target.pushObject);
-	    code.emitArrayStore(comp.scmObjectType);
+	    code.emitArrayStore(comp.typeObject);
 	  }
       }
     code.emitInvokeVirtual(getSetMethod(args_length));

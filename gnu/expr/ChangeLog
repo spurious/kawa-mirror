@@ -1,3 +1,24 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	No longer create new class for top-level procedures;
+	instead allocate a ModuleMethod for each procedure.
+	* LambdaExp.java (isClassGenerated):  Update for new behavior.
+	(selectorValue, getSelectorValue):  New field and method.
+	(compile):  Generate static methods, plus allocate ModuleMethod.
+	(addMethodFor):  Better way of selectiing method names.
+	* ModuleMethod.java (apply4):  Add "missing" method.
+	* ModuleBody.java (apply4):  Likewise.
+	(applyN):  Try calling apply0 .. apply4, if appropriate.
+	* Compilation.java:  Allocate static types and methods needed.
+	(addClass):  Generate the ModuleBody applyX methods.
+
+	* Declaration.java:  New fields and methods for line number info.
+
+	* Compilation.java (typeObject):  Renamed from scmObjectType.
+	(typeString, typePair):  New preferred field names.
+	* Literal.java, ReferenceExp.java, SetApplyExp.java:  Update
+ 	references accordingly.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (PRIVATE, isPrivate, setPrivate):  New flag.

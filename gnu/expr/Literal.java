@@ -95,7 +95,7 @@ public class Literal
 	code.emitPushInt(i);
 	comp.emitLiteral (value);
 	// Stack contents:  ..., array, array, i, array[i]
-	code.emitArrayStore(comp.scmObjectType);
+	code.emitArrayStore(comp.typeObject);
 	// Stack contents:  ..., array
       }
   }
@@ -127,9 +127,9 @@ public class Literal
 	code.emitInvokeSpecial(comp.initIntegerMethod);
       }
     else if (value instanceof String[])
-      emitArray (comp, comp.javaStringType);
+      emitArray (comp, comp.typeString);
     else if (value instanceof Object[])
-      emitArray (comp, comp.scmObjectType);
+      emitArray (comp, comp.typeObject);
     else
       {
 	System.err.print ("Unimplemented compileConstant for ");

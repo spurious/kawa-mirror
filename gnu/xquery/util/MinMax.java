@@ -3,7 +3,6 @@
 
 package gnu.xquery.util;
 import gnu.mapping.*;
-import gnu.lists.*;
 
 public class MinMax extends Reduce
 {

@@ -1,3 +1,10 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* IntegerRange.java:  Remove unused import statements
+	* MinMax.java:  Likewise.
+	* RelativeStep.java:  Likewise.
+	* XMLFormat.java:  Likewise.
+
 2004-01-04  Per Bothner  <per@bothner.com>
 
 	* StringValue.java (stringValue):  Require KNode, not SeqPosition.

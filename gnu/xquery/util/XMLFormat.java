@@ -1,6 +1,5 @@
 package gnu.xquery.util;
 import gnu.lists.*;
-import java.io.PrintWriter;
 import gnu.text.Char;
 import gnu.kawa.util.AbstractFormat;
 

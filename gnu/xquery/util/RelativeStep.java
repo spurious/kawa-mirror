@@ -9,7 +9,6 @@ import gnu.expr.*;
 import gnu.kawa.xml.*;
 import gnu.math.IntNum;
 import gnu.kawa.functions.*;
-import gnu.xquery.lang.XQParser;
 
 /** Implements XPath path expression.
  * The XPath expression E1/E2 is compiled into:

@@ -5,8 +5,6 @@ package gnu.xquery.util;
 import gnu.lists.*;
 import gnu.math.IntNum;
 import gnu.mapping.*;
-import gnu.bytecode.*;
-import gnu.expr.*;
 
 public class IntegerRange extends CpsProcedure // implements Inlineable
 {

@@ -6,6 +6,9 @@
 (define-syntax %case (syntax-rules (else)
 				   ((%case key (else expression ...))
 				    (begin expression ...))
+				   ((%case key (else expression ...) . junk)
+				    (%syntax-error
+				     "junk following else (in case)"))
 				   ((%case key
 					   ((datum ...) expression ...))
 				    (if (%case-match key datum ...)

@@ -281,13 +281,16 @@ public class IntNum extends RatNum implements Compilable
   /** Destructively set the value of this to a long. */
   public final void set (long y)
   {
-    ival = (int) y;
-    if ((long) ival == y)
-      words = null;
+    int i = (int) y;
+    if ((long) i == y)
+      {
+	ival = i;
+	words = null;
+      }
     else
       {
 	realloc (2);
-	words[0] = ival;
+	words[0] = i;
 	words[1] = (int) (y >> 32);
 	ival = 2;
       }
@@ -1097,6 +1100,8 @@ public class IntNum extends RatNum implements Compilable
 	  }
       }
     result.ival = MPN.set_str (result.words, bytes, byte_len, radix);
+    if (result.ival == 0 || result.words[result.ival-1] < 0)
+      result.words[result.ival++] = 0;
     if (negative)
       result.setNegative ();
     return result.canonicalize ();

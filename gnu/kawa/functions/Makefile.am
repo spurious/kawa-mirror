@@ -8,6 +8,7 @@ java_sources=\
   AddOp.java \
   Apply.java \
   Assoc.java \
+  ConstantFunction0.java \
   DisplayFormat.java \
   DivideOp.java \
   IsEq.java IsEqual.java IsEqv.java \

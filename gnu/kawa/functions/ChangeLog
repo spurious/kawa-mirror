@@ -1,3 +1,13 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* ConstantFunction0.java:  New class, extends Procedure0.
+	* Makefile.am (java_sources);  Added ConstantFunction0.java.
+
+	* ValuesMap.java (compile):  Don't pushScope/popScope if target is
+	a SeriesTarget, as that causes register clashes due to use of jsr.
+	Call allocChildClasses to handle non-inlined inner lambda.
+	If need be, wrap target using ConsumerTarget.compileUsingConsumer.
+
 2001-10-25  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java:  Now implements CanInline, Inlineable.

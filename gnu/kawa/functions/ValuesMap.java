@@ -63,11 +63,16 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     Expression[] args = exp.getArgs();
-    if (args.length != 2
-	|| ! (target instanceof IgnoreTarget
-	      || target instanceof ConsumerTarget))
+    if (args.length != 2)
       {
 	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    if (! (target instanceof IgnoreTarget
+	   || target instanceof ConsumerTarget
+	   || target instanceof SeriesTarget))
+      {
+	ConsumerTarget.compileUsingConsumer(exp, comp, target);
 	return;
       }
     Expression vals = args[1];
@@ -76,7 +81,7 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
       lambda = (LambdaExp) args[0];
     else
       {
-	// FIXME in InlineCalls phase could wrap epr in LambdaExp
+	// FIXME in InlineCalls phase could wrap expr in LambdaExp
 	ApplyExp.compile(exp, comp, target);
 	return;
       }
@@ -87,7 +92,8 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 	return;
       }
     CodeAttr code = comp.getCode();
-    code.pushScope();
+    if (! (target instanceof SeriesTarget))
+      code.pushScope();
     SeriesTarget starget = new SeriesTarget();
     starget.function = new Label(code);
     starget.done = new Label(code);
@@ -101,9 +107,11 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     starget.function.define(code);
     code.pushType(retAddrType);
     code.emitStore(retAddr);
-    lambda.body.compile(comp, target);
+    lambda.allocChildClasses(comp);
+    lambda.body.compileWithPosition(comp, target);
     code.emitRet(retAddr);
-    code.popScope();
+    if (! (target instanceof SeriesTarget))
+      code.popScope();
     starget.done.define(code);
   }
 

@@ -1,3 +1,7 @@
+Sat Oct 17 14:34:03 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi: Document new synchronized syntax.
+
 Tue Jul 28 08:33:26 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Document that :KEYWORD is now the same as KEYWORD:.

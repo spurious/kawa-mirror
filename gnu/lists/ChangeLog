@@ -1,3 +1,8 @@
+2004-01-12  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (parentPos):  The begin-offset is just one word.
+	Fixes bug reported 2003-11-29 by sascha_opletal@web.de.
+
 2004-01-04  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (getIteratorAtPos):  New method.

@@ -770,7 +770,7 @@ implements Consumer, PositionConsumer, Consumable
 	switch (datum)
 	  {
 	  case END_GROUP_SHORT:
-	    return (index - getIntN(index+1)) << 1;
+	    return (index - data[index+1]) << 1;
 	  case END_GROUP_LONG:
 	    int begin_offset = getIntN(index+3);
 	    if (begin_offset < 0)

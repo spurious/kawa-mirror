@@ -3,22 +3,13 @@
 
 package gnu.mapping;
 
-/** The value field of a AliasConstraint points to another Binding. */
+/** The value field of a AliasConstraint points to another Location. */
 
 public class AliasConstraint extends Constraint
 {
   public Object get (Binding binding, Object defaultValue)
   {
-    if (binding.value instanceof Binding)
-      return ((Binding) binding.value).get(defaultValue);
-    try
-      {
-	return ((Location) binding.value).get();
-      }
-    catch (UnboundSymbol ex)
-      {
-	return defaultValue;
-      }
+    return ((Location) binding.value).get(defaultValue);
   }
 
   public void set (Binding binding, Object value)

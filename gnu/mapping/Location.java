@@ -7,6 +7,18 @@ package gnu.mapping;
 
 public abstract class Location extends Procedure0 implements HasSetter
 {
+  public Object get (Object defaultValue)
+  {
+    try
+      {
+	return get();
+      }
+    catch (UnboundSymbol ex)
+      {
+	return defaultValue;
+      }
+  }
+
   /** Get the current value of this location.
    * @exception UnboundSymbol the location does not have a value. */
   public abstract Object get ();

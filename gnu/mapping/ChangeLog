@@ -1,3 +1,8 @@
+2002-09-26  Per Bothner  <per@bothner.com>
+
+	* Location.java (get(Object)):  New method.
+	* AliasConstraint (get):  Can now simplify to use Location.get.
+
 2002-09-21  Per Bothner  <per@bothner.com>
 
 	* AliasConstraint.java (followAliases):  New static helper method.

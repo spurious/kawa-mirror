@@ -1,3 +1,9 @@
+2004-07-27  Per Bothner  <per@bothner.com>
+
+	* internals.xml (Procedures):  Major re-working - still unfinished.
+	(Compiling functions to methods):  New section.
+	(First-class functions):  New section.
+
 2004-07-19  Per Bothner  <per@bothner.com>
 
 	* internals.xml:  Many small updates/fixes.

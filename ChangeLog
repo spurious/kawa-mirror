@@ -1,3 +1,7 @@
+Sun May 24 13:13:52 1998  Per Bothner  <bothner@cygnus.com>
+
+	* configure.in:  Set version to 1.6.52.
+
 Thu May 21 21:38:24 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/lang/Lexer.java:  New class (extends Reader).

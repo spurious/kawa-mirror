@@ -1,15 +1,17 @@
 package gnu.kawa.functions;
 import gnu.math.*;
 import gnu.mapping.*;
+import gnu.expr.*;
+import gnu.bytecode.*;
 
 /**
  * Implement the Scheme standard function "/".
  * @author Per Bothner
  */
 
-public class DivideOp extends ProcedureN
+public class DivideOp extends ProcedureN implements CanInline
 {
-  public static final DivideOp $Sl = new DivideOp("*");
+  public static final DivideOp $Sl = new DivideOp("/");
 
   public DivideOp(String name)
   {
@@ -28,4 +30,37 @@ public class DivideOp extends ProcedureN
       result = result.div (args[i]);
     return result;
    }
+
+  public Expression inline (ApplyExp exp, ExpWalker walker)
+  {
+    Expression folded = exp.inlineIfConstant(this, walker);
+    if (folded != exp)
+      return folded;
+    Expression[] args = exp.getArgs();
+    if (args.length > 2)
+      return AddOp.pairwise(this, exp.getFunction(), args, walker);
+    if (args.length == 2)
+      {
+	Type type0 = args[0].getType();
+	Type type1 = args[1].getType();
+	int kind0 = AddOp.classify(type0);
+	int kind1 = AddOp.classify(type1);
+	if ((kind0 == 4 || type0.isSubtype(typeRatNum))
+	    && (kind1 == 4 || type1.isSubtype(typeRatNum)))
+	  return new ApplyExp(typeRatNum.getDeclaredMethod("divide", 2),
+			      args);
+	if (kind0 >= 3 && kind1 >= 3)
+	  {
+	    Expression opt = AddOp.primInline(108, exp);
+	    if (opt != exp)
+	      return opt;
+	  }
+	if (kind0 >= 2 &&  kind1 >= 2)
+	  return new ApplyExp(AddOp.typeRealNum.getDeclaredMethod("divide", 2),
+			      args);
+      }
+    return exp;
+  }
+
+  static ClassType typeRatNum = ClassType.make("gnu.math.RatNum");
 }

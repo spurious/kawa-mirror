@@ -11,7 +11,7 @@ import gnu.expr.*;
 // 184: (primitive-static-method "class" "method" "rettype" ("argtype" ...))
 // 185: (primitive-interface-method "class" "method" "rettype" ("argtype" ...))
 
-class prim_method extends Syntax
+public class prim_method extends Syntax
 {
   static private Pattern pattern2 = new ListPat (2);
   static private Pattern pattern3 = new ListPat (3);
@@ -30,11 +30,11 @@ class prim_method extends Syntax
   {
   }
 
-  static Type exp2Type (Object obj, Translator tr)
+  public static Type exp2Type (Object obj, Translator tr)
   {
     String str = obj.toString();
     if (obj instanceof kawa.lang.FString)
-      return PrimProcedure.string2Type(str);
+      return Scheme.string2Type(str);
     else if (obj instanceof String)
       {
 	int len = str.length();
@@ -43,7 +43,7 @@ class prim_method extends Syntax
 	    && str.charAt(len-1) == '>')
 	  {
 	    String tstr = str.substring(1, len-1);
-	    Type type = PrimProcedure.string2Type(tstr);
+	    Type type = Scheme.string2Type(tstr);
 	    if (type != null)
 	      return type;
 	  }

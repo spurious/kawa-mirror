@@ -1,8 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.Type;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.util.Hashtable;
 
 public class Scheme extends Interpreter
 {
@@ -126,8 +129,8 @@ public class Scheme extends Interpreter
       define_proc("cons", kawa.standard.cons.consProcedure);
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
-      define_proc ("set-car!", "kawa.standard.setcar_b");
-      define_proc ("set-cdr!", "kawa.standard.setcdr_b");
+      define_proc ("set-car!", "kawa.lib.lists");
+      define_proc ("set-cdr!", "kawa.lib.lists");
 
       define_proc ("caar", "kawa.standard.cxr");
       define_proc ("cadr", "kawa.standard.cxr");
@@ -271,8 +274,8 @@ public class Scheme extends Interpreter
       define_proc ("make-string", "kawa.lib.strings");
       define_proc ("string", "kawa.standard.string_v");
       define_proc ("string-length", "kawa.lib.strings");
-      define_proc ("string-ref", "kawa.standard.string_ref");
-      define_proc ("string-set!", "kawa.standard.string_set_b");
+      define_proc ("string-ref", "kawa.lib.strings");
+      define_proc ("string-set!", "kawa.lib.strings");
 
       define_proc ("string=?", "kawa.lib.strings");
       define_proc ("string-ci=?", "kawa.standard.string_ci_equal_p");
@@ -590,7 +593,7 @@ public class Scheme extends Interpreter
 	    String name = rexp.getName();
 	    int len = name.length(); 
 	    if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
-	      return PrimProcedure.string2Type(name.substring(1, len-1));
+	      return Scheme.string2Type(name.substring(1, len-1));
 	  }
       }
     return null;
@@ -609,5 +612,71 @@ public class Scheme extends Interpreter
     mexp.lookup(env_formal).setType(Compilation.scmEnvironmentType);
     return mexp;
   }
+
+  static Hashtable types;
+
+  public static Type getNamedType (String name)
+  {
+    if (types == null)
+      {
+	types = new Hashtable ();
+	types.put ("void", Type.void_type);
+	types.put ("int", Scheme.intType);
+	types.put ("char", Scheme.charType);
+	types.put ("boolean", Scheme.booleanType);
+	types.put ("byte", Scheme.byteType);
+	types.put ("short", Scheme.shortType);
+	types.put ("long", Scheme.longType);
+	types.put ("float", Scheme.floatType);
+	types.put ("double", Scheme.doubleType);
+
+	types.put ("Object", Type.pointer_type);
+	types.put ("java.lang.Object", Type.pointer_type);
+	types.put ("String", Type.string_type);
+	types.put ("java.lang.String", Type.string_type);
+
+	types.put ("object", Type.pointer_type);
+	types.put ("number", ClassType.make("gnu.math.Numeric"));
+	types.put ("quantity", ClassType.make("gnu.math.Quantity"));
+	types.put ("complex", ClassType.make("gnu.math.Complex"));
+	types.put ("real", ClassType.make("gnu.math.RealNum"));
+	types.put ("rational", ClassType.make("gnu.math.RatNum"));
+	types.put ("integer", ClassType.make("gnu.math.IntNum"));
+	types.put ("symbol", ClassType.make("java.lang.String"));
+	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
+	types.put ("list", ClassType.make("kawa.lang.List"));
+	types.put ("pair", ClassType.make("kawa.lang.Pair"));
+	types.put ("string", ClassType.make("kawa.lang.FString"));
+	types.put ("vector", ClassType.make("kawa.lang.Vector"));
+	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
+	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
+	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
+	types.put ("record", ClassType.make("kawa.lang.Record"));
+	types.put ("type", ClassType.make("gnu.bytecode.Type"));
+	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
+      }
+    return (Type) types.get(name);
+  }
+
+  public static Type string2Type (String name)
+  {
+    Type t = getNamedType (name);
+    if (t != null)
+      return t;
+    if (name.endsWith("[]"))
+      {
+	t = string2Type(name.substring(0, name.length()-2));
+	if (t == null)
+	  return null;
+	t = new ArrayType(t);
+      }
+    else if (gnu.bytecode.Type.isValidJavaTypeName(name))
+      t = new ClassType (name);
+    else
+      return null;
+    types.put (name, t);
+    return t;
+  }
+
 
 }

@@ -1,3 +1,9 @@
+2002-05-28  Per Bothner  <per@bothner.com>
+
+	* LetExp.java (print):  Print Declaration, not just its name.
+	* ReferenceExp.java (print):  Print Declaration if known.
+	* SetExp.java (print):  Likewise.
+
 2002-05-19  Per Bothner  <per@bothner.com>
 
 	* BlockExp.java (oldTryState):  New field.

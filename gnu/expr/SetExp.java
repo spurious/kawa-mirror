@@ -289,7 +289,16 @@ public class SetExp extends Expression
     out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);
     out.writeSpaceFill();
     printLineColumn(out);
-    SFormat.print(name, out); // FIXME
+    if (binding == null || name.toString() != binding.getName())
+      {
+	out.print('/');
+	SFormat.print (name, out);
+      }
+    if (binding != null)
+      {
+	out.print('/');
+	out.print(binding);
+      }
     out.writeSpaceLinear();
     new_value.print(out);
     out.endLogicalBlock(")");

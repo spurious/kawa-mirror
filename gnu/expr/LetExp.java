@@ -105,7 +105,7 @@ public class LetExp extends ScopeExp
 	if (i > 0)
 	  out.writeSpaceLinear();
 	out.print('(');
-	out.print(decl.getName());
+	out.print(decl);
 	out.writeSpaceFill();
 	//if (decl.isArtificial ())
         //out.print ("<artificial>");

@@ -380,7 +380,7 @@ If @var{filename} is @samp{-}, standard input is read (with no prompting).
 @itemx --
 The global variable @samp{command-line-arguments} is set to the remaining
 arguments (if any), and an interactive read-eval-print loop is started.
-This uses the same "console" as whwre you started up Kawa;
+This uses the same "console" as where you started up Kawa;
 use @samp{-w} to get a new window.
 @item -w
 Creates a new top-level window, and runs an interactive read-eval-print

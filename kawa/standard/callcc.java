@@ -45,7 +45,7 @@ public class callcc extends Procedure1
   }
 
   /*
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
     kawa.lang.Continuation cont = new Continuation ();
     cont.frame = stack.proc;
@@ -61,7 +61,7 @@ class Continuation extends CpsProcedure
   Procedure frame;
   int pc;
 
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
     Object result = Values.make(stack.args);
     stack.pc = pc;

@@ -67,7 +67,7 @@ public class apply extends ProcedureN
     return ((Procedure) args[0]).applyN(getArguments(args, 1));
   }
 
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
     Object[] args = stack.args;
     stack.proc = (Procedure) args[0];

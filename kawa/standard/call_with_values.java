@@ -18,7 +18,7 @@ public class call_with_values extends Procedure2
     return callWithValues((Procedure) producer, (Procedure) consumer);
   }
 
-  public void apply (CallStack stack)
+  public void apply (CallContext stack)
   {
     Procedure.checkArgCount(this, 2);
     Object[] args = stack.args;

@@ -183,9 +183,10 @@ public class XQuery extends Interpreter
 
   protected void define_method(String name, String cname, String mname)
   {
-    environ.define(Symbol.make(defaultNamespace, name),
-		   EnvironmentKey.FUNCTION,
-		   ClassMethodProc.make(ClassType.make(cname), mname));
+    Symbol sym = Symbol.make(defaultNamespace, name);
+    Procedure proc = ClassMethodProc.make(ClassType.make(cname), mname);
+    proc.setSymbol(sym);
+    environ.define(sym, EnvironmentKey.FUNCTION, proc);
   }
 
   public String getName()

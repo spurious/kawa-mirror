@@ -135,6 +135,24 @@ public class XQResolveNames extends ResolveNames
       }
   }
 
+  Declaration flookup (Symbol sym, Environment env)
+  {
+    gnu.mapping.Location loc = env.lookup(sym, EnvironmentKey.FUNCTION);
+    if (loc == null)
+      return null;
+    loc = loc.getBase();
+    if (loc instanceof StaticFieldLocation)
+      {
+	Declaration decl = ((StaticFieldLocation) loc).getDeclaration();
+	if (decl != null)
+	  return decl;
+      }
+    Object val = loc.get(null);
+    if (val != null)
+      return procToDecl(sym, val);
+    return null;
+  }
+
   public Declaration lookup (Expression exp, Object symbol, boolean function)
   {
     Declaration decl = lookup.lookup(symbol, function);
@@ -156,22 +174,10 @@ public class XQResolveNames extends ResolveNames
 		      return decl;
 		    if (! function)
 		      continue;
-		    gnu.mapping.Location loc
-		      = builtins.lookup(sym, EnvironmentKey.FUNCTION);
-		    if (loc == null)
-		      continue;
-		    loc = loc.getBase();
-		    if (loc instanceof StaticFieldLocation)
-		      {
-			decl = ((StaticFieldLocation) loc).getDeclaration();
-			if (decl != null)
-			  return decl;
-		      }
-		    Object val = loc.get(null);
-		    if (val != null)
-		      return procToDecl	(symbol, val);
+		    decl = flookup(sym, builtins);
+		    if (decl != null)
+		      return decl;
 		  }
-		
 	      }
 	  }
 	else
@@ -190,6 +196,10 @@ public class XQResolveNames extends ResolveNames
 		    return procToDecl(sym,
 				      ClassMethodProc.make(ctype, sym.getName()));
 		  }
+		Environment builtins = XQuery.getInstance().getEnvironment();
+		decl = flookup(sym, builtins);
+		if (decl != null)
+		  return decl;
 	      }
 	  }
       }
@@ -199,7 +209,7 @@ public class XQResolveNames extends ResolveNames
 	  {
 	  }
 	error('e',
-	      (function ? "unknown function " : "unknown variable $")+symbol+" for "+exp);
+	      (function ? "unknown function " : "unknown variable $")+symbol);
       }
     return decl;
   }

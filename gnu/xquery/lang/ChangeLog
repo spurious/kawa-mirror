@@ -1,3 +1,11 @@
+2004-12-21  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (define_method): Set name of Procedure, for better
+	error messages.
+
+	* XQResolveNames (flookup): New helper method.
+	(lookup): Use it.  Fix bug where 'fn:true()' wasn't found.
+
 2004-12-12  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Implement line/column and error handling.

@@ -1,10 +1,16 @@
 package gnu.expr;
+import gnu.text.SourceMessages;
 
 /** A very abstract "parser".
  * Converts some input representation to Expression trees. */
 
 public abstract class Parser
 {
+  public Parser(SourceMessages messages)
+  {
+    this.messages = messages;
+  }
+
   public abstract Expression parse (Object input);
 
   public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
@@ -80,6 +86,52 @@ public abstract class Parser
     current_scope = scope.outer;
   }
 
+  public SourceMessages getMessages() { return messages; }
+  public void setMessages (SourceMessages messages)
+  { this.messages = messages; }
+ 
+  public void error(char severity, String message)
+  {
+    messages.error(severity, current_filename, current_line, current_column,
+		   message);
+  }
+
+  public void error(char severity, Declaration decl, String msg1, String msg2)
+  {
+    String filename = current_filename;
+    int line = current_line;
+    int column = current_column;
+    int decl_line = decl.getLine();
+    if (decl_line > 0)
+      {
+	filename = decl.getFile();
+	line = decl_line;
+	column = decl.getColumn();
+      }
+    messages.error(severity, filename, line, column,
+		   msg1 + decl.getName() + msg2);
+  }
+
+  public final String getFile() { return current_filename; }
+  public final int getLine() { return current_line; }
+  public final int getColumn() { return current_column; }
+
+  public void setFile(String filename) { current_filename = filename; }
+  public void setLine(int line) { current_line = line; }
+  public void setColumn(int column) { current_column = column; }
+
+  public void setLine(String filename, int line, int column)
+  {
+    current_filename = filename;
+    current_line = line;
+    current_column = column;
+  }
+
   ScopeExp current_scope;
 
+  protected String current_filename;
+  protected int current_line;
+  protected int current_column;
+
+  protected SourceMessages messages;
 }

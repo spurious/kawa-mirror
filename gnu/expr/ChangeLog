@@ -1,7 +1,22 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
-	* Interpeter.java (languages):  New static table.
+	* Parser.java (current_filename, current_line, current_column,
+	messages):  Move fields here from Translator.
+	(<init>):  New constructor.
+	(error(char,Declaration,String,String)):  New method.
+	(getMessages, setMessages, error):  Methods moved from Translator.
+	(getFile, getLine, getColumn, setFile, setLine, setColumn
+
+	* Interpreter.java (languages):  New static table.
 	(getInstance):  New overloaded static methods.
+
+2000-05-07  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  If calling a name bound to a constant
+	that is not a procedure, emit a warning (instead of an exception).
+	Based on a patch from Daniel Bonniot <bonniot@cma.ensmp.fr>.
+
+	* Expression.java (makeWhile):  Remove old unsafe overloaded variant.
 
 2000-04-22  Per Bothner  <per@bothner.com>
 

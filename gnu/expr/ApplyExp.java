@@ -126,17 +126,26 @@ public class ApplyExp extends Expression
         if (func_decl != null)
 	  {
 	    Expression value = func_decl.getValue();
+	    func_name = func_decl.getName();
 	    if (value != null && value instanceof LambdaExp) 
-	      {
-		func_lambda = (LambdaExp) value;
-		func_name = func_decl.getName();
-	      }
+	      func_lambda = (LambdaExp) value;
 	    if (value != null && value instanceof QuoteExp) 
 	      {
-		Procedure proc = (Procedure) ((QuoteExp) value).getValue();
-		String arg_error = WrongArguments.checkArgCount(proc, args_length);
-		if (arg_error != null)
-		  comp.error('e', arg_error);
+		Object quotedValue = ((QuoteExp) value).getValue();
+		Procedure proc;
+		String msg = null;
+		if (! (quotedValue instanceof Procedure))
+		  {
+		    proc = null;
+		    msg = "calling " + func_name + " which is not a procedure";
+		  }
+		else
+		  {
+		    proc = (Procedure) quotedValue;
+		    msg = WrongArguments.checkArgCount(proc, args_length);
+		  }
+		if (msg != null)
+		  comp.error('w', msg);
 		else
 		  {
 		    PrimProcedure pproc

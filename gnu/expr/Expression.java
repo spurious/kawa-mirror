@@ -62,25 +62,6 @@ public abstract class Expression implements Printable
   public static final Expression[] noExpressions = new Expression[0];
 
   /** Helper method to create a `while' statement. */
-  public static Expression makeWhile(Expression cond, Expression body)
-  {
-    Expression[] inits = new Expression[1];
-    LetExp let = new LetExp(inits);
-    String fname = "%do%loop";
-    Declaration fdecl = let.addDeclaration(fname);
-    Expression recurse = new ApplyExp(new ReferenceExp(fdecl), noExpressions);
-    IfExp lbody = new IfExp(cond,
-			    new BeginExp(body, recurse),
-			    QuoteExp.voidExp);
-    LambdaExp lexp = new LambdaExp(lbody);
-    lexp.setName(fname);
-    inits[0] = lexp;
-    fdecl.noteValue(lexp);
-    let.setBody(new ApplyExp(new ReferenceExp(fdecl), noExpressions));
-    return let;
-  }
-
-  /** Helper method to create a `while' statement. */
   public static Expression makeWhile(Object cond, Object body, Parser parser)
   {
     Expression[] inits = new Expression[1];

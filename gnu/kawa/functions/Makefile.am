@@ -12,6 +12,7 @@ java_JAVA=\
   Assoc.java \
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
+  MakeProcedure.java \
   Member.java \
   Setter.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 

@@ -1,5 +1,12 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* MakeProcedure.java:  New class.
+	* Makefile.am:  Update accordingly.
+
+	* AddOp.java:  Implement gnu.expr.CanInline.
+	(inline):  New method.
+	(pairwise):  New static help method.
+
 	* AddOp.java:  New class, replaces kawa.standard.plus_oper
 	and kawa.standard.minus_oper.
 	* Makefile.am:  Update accordingly.

@@ -280,8 +280,7 @@ public class TestMisc
 	     + "<fld2"+tabNsNodes+" align=\"right\"><!--ignore-this-comment-->12</fld2>");
 
     evalTest("for $n in doc('tab.xml')/result/* return node-name($n)",
-	     // Should perhaps be: "row row h:row" FIXME
-	     "row row {H}row");
+	     "row row h:row");
 
     evalTest("for $n in doc('tab.xml')/result/row/* "
 	     + "return local-name-from-QName(node-name($n))",

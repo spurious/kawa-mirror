@@ -1,3 +1,8 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* use-cases.xml
+	* TestMisc.java
+
 2004-12-12  Per Bothner  <per@bothner.com>
 
 	* bad-1.xql: New bad-syntax test.

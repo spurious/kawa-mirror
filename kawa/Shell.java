@@ -15,14 +15,8 @@ public class Shell
 
   public Shell (Interpreter interp, boolean pflag, boolean dflag)
   {
-    if (interp.out.raw() instanceof java.io.PrintStream)
-      pout = (java.io.PrintStream)interp.out.raw();
-    else
-      pout = new java.io.PrintStream(interp.out.raw());
-    if (interp.err.raw() instanceof java.io.PrintStream)
-      perr = (java.io.PrintStream)interp.err.raw();
-    else
-      perr = new java.io.PrintStream(interp.err.raw());
+    pout = interp.out;
+    perr = interp.err;
     interpreter = interp;
     prompt = pflag;
     display = dflag;
@@ -45,8 +39,9 @@ public class Shell
             try
 	      {
 		obj = interpreter.read();
-		if (obj!=null)
+		if (obj!=Interpreter.eofObject)
 		  {
+		    interpreter.errors = 0;
 		    Expression exp = interpreter.rewrite (obj);
 		    /*
 		      pout.print ("[Re-written expression: ");
@@ -55,21 +50,26 @@ public class Shell
 		      pout.println();
 		      pout.flush();
 		      */
-		    obj = exp.eval (env);
-		    if (obj == null)
-		      pout.println ("[null returned]\n");
-		    else
+		    if (interpreter.errors == 0)
 		      {
-			if (obj instanceof kawa.lang.Exit)
-			  obj = null;
-			else if (display)
+			obj = exp.eval (env);
+			if (obj == null)
+			  pout.println ("[null returned]\n");
+			else
 			  {
-			    kawa.lang.print.print (obj, pout);
-			    pout.println();
-			    pout.flush();
+			    if (obj instanceof kawa.lang.Exit)
+			      obj = null;
+			    else if (display && obj != Interpreter.voidObject)
+			      {
+				kawa.lang.print.print (obj, pout);
+				pout.println();
+				pout.flush();
+			      }
 			  }
 		      }
 		  }
+		else if (prompt)
+		  pout.println ();
 	      }
 	    catch (kawa.lang.WrongArguments e)
 	      {
@@ -96,73 +96,11 @@ public class Shell
 		e.printStackTrace(perr);
 	      }
 	  }
-	catch (kawa.lang.EOFInComment e)
+	catch (kawa.lang.SyntaxError e)
 	  {
             perr.println();
-            perr.println("An <EOF> occurred in a #| comment.");
-            noFatalExceptions = false;
+            perr.println(e);
 	  }
-	catch (kawa.lang.UnexpectedCloseParen e)
-	  {
-            perr.println();
-            perr.println("An unexpected close paren was read.");
-            /*try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-	    } */
-	  }
-	catch (kawa.lang.InvalidPoundConstruct e)
-	  {
-            perr.println();
-            perr.println("An invalid pound construct was read.");
-            /*try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-            } */
-	  }
-	catch (kawa.lang.EOFInString e)
-	  {
-            perr.println();
-            perr.println("An <EOF> occurred in a string.");
-            noFatalExceptions = false;
-	  }
-	catch (kawa.lang.NumberTooLong e)
-	  {
-            perr.println();
-            perr.println("The number was too long for the interpreter to read.");
-            /*try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-            } */
-         }
-	catch (kawa.lang.InvalidCharacterName e)
-	  {
-            perr.println();
-            perr.println("Invalid character name.");
-            /*try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-            } */
-         }
-	catch (kawa.lang.MalformedList e)
-	  {
-            perr.println();
-            perr.println("Malformed list.");
-            /*try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-            }  */
-         }
 	catch (kawa.lang.UnboundSymbol e)
 	  {
             perr.println();
@@ -174,18 +112,6 @@ public class Shell
                noFatalExceptions = false;
             }  */
          }
-	catch (kawa.lang.NotImplemented e)
-	  {
-            perr.println();
-            perr.println("Not Implemented.");
-            /*
-            try {
-               System.in.skip(System.in.available());
-            } catch (java.io.IOException e2) {
-               perr.println("A fatal IO exception occurred on a read.");
-               noFatalExceptions = false;
-            } */
-	  }
 	catch (java.io.IOException e)
 	  {
             perr.println();
@@ -193,7 +119,7 @@ public class Shell
             noFatalExceptions = false;
 	  } 
       }
-    while (obj!=null && noFatalExceptions);
+    while (obj != Interpreter.eofObject && noFatalExceptions);
     return 0;
   }
 }

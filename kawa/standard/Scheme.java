@@ -211,11 +211,11 @@ public class Scheme extends LispInterpreter
       define_proc ("integer?", "kawa.standard.integer_p");
       define_field("exact?", "kawa.lib.numbers");
       define_field("inexact?", "kawa.lib.numbers");
-      define_field("=", "gnu.kawa.functions.NumberCompare");
-      define_field("<", "gnu.kawa.functions.NumberCompare");
-      define_field(">", "gnu.kawa.functions.NumberCompare");
-      define_field("<=", "gnu.kawa.functions.NumberCompare");
-      define_field(">=", "gnu.kawa.functions.NumberCompare");
+      define_field("=", "gnu.kawa.functions.NumberCompare", "$Eq");
+      define_field("<", "gnu.kawa.functions.NumberCompare", "$Ls");
+      define_field(">", "gnu.kawa.functions.NumberCompare", "$Gr");
+      define_field("<=", "gnu.kawa.functions.NumberCompare", "$Ls$Eq");
+      define_field(">=", "gnu.kawa.functions.NumberCompare", "$Gr$Eq");
       define_proc ("zero?", "kawa.lib.numbers");
       define_proc ("positive?", "kawa.standard.positive_p");
       define_proc ("negative?", "kawa.lib.numbers");
@@ -223,10 +223,10 @@ public class Scheme extends LispInterpreter
       define_proc ("even?", "kawa.lib.numbers");
       define_proc ("max", "kawa.standard.max");
       define_proc ("min", "kawa.standard.min");
-      define_field("+", "gnu.kawa.functions.AddOp");
-      define_field("-", "gnu.kawa.functions.AddOp");
-      define_field("*", "gnu.kawa.functions.MultiplyOp");
-      define_field("/", "gnu.kawa.functions.DivideOp");
+      define_field("+", "gnu.kawa.functions.AddOp", "$Pl");
+      define_field("-", "gnu.kawa.functions.AddOp", "$Mn");
+      define_field("*", "gnu.kawa.functions.MultiplyOp", "$St");
+      define_field("/", "gnu.kawa.functions.DivideOp", "$Sl");
       define_proc ("abs", "kawa.lib.numbers");
       define_proc ("quotient", "kawa.lib.numbers");
       define_proc ("remainder", "kawa.lib.numbers");
@@ -406,8 +406,8 @@ public class Scheme extends LispInterpreter
 
       define_proc ("exit", "kawa.lib.thread");
 
-      define_field("arithmetic-shift", "kawa.lib.numbers", "arithmeticShift");
-      define_field("ash", "kawa.lib.numbers", "arithmeticShift");
+      define_field("arithmetic-shift", "kawa.lib.numbers");
+      define_field("ash", "kawa.lib.numbers");
       define_proc ("logand", "kawa.standard.logand");
       define_proc ("logior", "kawa.standard.logior");
       define_proc ("logxor", "kawa.standard.logxor");
@@ -465,7 +465,8 @@ public class Scheme extends LispInterpreter
       define_field("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
       define_field("field", "gnu.kawa.reflect.SlotGet");
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
-      define_field("static-field", "gnu.kawa.reflect.SlotGet");
+      define_field("static-field", "gnu.kawa.reflect.SlotGet",
+		   "staticField");
       define_proc("invoke", gnu.kawa.reflect.Invoke.invoke);
       define_field("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
 

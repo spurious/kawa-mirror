@@ -1,3 +1,8 @@
+2003-01-01  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Use 3-operand form of
+	define_field if and only if field is in class written in Java.
+
 2002-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define_syntax.java (scanForDefinitions, rewriteForm):

@@ -1,11 +1,15 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
+import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
 import gnu.kawa.util.*;
 
 public class define_syntax extends Syntax
 {
+  static ClassType typeMacro = ClassType.make("kawa.lang.Macro");
+  static Method makeMethod = typeMacro.getDeclaredMethod("make", 2);
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Pair pair;
@@ -41,13 +45,12 @@ public class define_syntax extends Syntax
 
         // Add rule to execution environment.
 	if (! (rule instanceof QuoteExp)
-	    || ! (((QuoteExp) rule).getValue() instanceof Compilable))
+	    || ! (((QuoteExp) rule).getValue() instanceof java.io.Externalizable))
 	  {
 	    Expression args[] = new Expression[2];
 	    args[0] = new QuoteExp(name);
 	    args[1] = rule;
-	    Method makeMacro = Macro.getMakeMethod();
-	    rule = new ApplyExp(new PrimProcedure(makeMacro), args);
+	    rule = new ApplyExp(new PrimProcedure(makeMethod), args);
 	  }
 	else
 	  rule = new QuoteExp(macro);

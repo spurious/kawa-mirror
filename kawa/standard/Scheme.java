@@ -632,14 +632,14 @@ public class Scheme extends Interpreter
 
   public Scheme ()
   {
+    if (Interpreter.defaultInterpreter == null)
+      Interpreter.defaultInterpreter = this;
     if (kawaEnvironment == null)
       initScheme();
     environ = new ScmEnv (kawaEnvironment);
     environ.setName ("interaction-environment."+(++scheme_counter));
     if (instance == null)
       instance = this;
-    if (Interpreter.defaultInterpreter == null)
-      Interpreter.defaultInterpreter = this;
   }
 
   public Scheme (Environment environ)
@@ -819,6 +819,7 @@ public class Scheme extends Interpreter
 	types.put ("character", ClassType.make("gnu.kawa.util.Char"));
 	types.put ("vector", ClassType.make("gnu.kawa.util.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
+	types.put ("procedure", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
 	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
 	types.put ("string-output-port",
@@ -857,22 +858,26 @@ public class Scheme extends Interpreter
 
   public static Type string2Type (String name)
   {
-    Type t = getNamedType (name);
-    if (t != null)
-      return t;
+    Type t;
     if (name.endsWith("[]"))
       {
 	t = string2Type(name.substring(0, name.length()-2));
-	if (t == null)
-	  return null;
-	t = new ArrayType(t);
+	if (t != null)
+	  t = gnu.bytecode.ArrayType.make(t);
       }
-    else if (gnu.bytecode.Type.isValidJavaTypeName(name))
-      t = ClassType.make(name);
     else
-      return null;
-    types.put (name, t);
+      t = getNamedType (name);
+    if (t != null)
+      return t;
+    t = Interpreter.string2Type(name);
+    if (t != null)
+      types.put (name, t);
     return t;
+  }
+
+  public Type getTypeFor(String name)
+  {
+    return string2Type(name);
   }
 
   /** Convert expression to a Type.
@@ -880,27 +885,7 @@ public class Scheme extends Interpreter
    */
   public static Type exp2Type (Expression exp)
   {
-    if (exp instanceof QuoteExp)
-      {
-        Object cname = ((QuoteExp) exp).getValue();
-        if (cname instanceof Type)
-          return (Type) cname;
-        if (cname instanceof FString || cname instanceof String)
-          return ClassType.make(cname.toString());
-      }
-    else if (exp instanceof ReferenceExp)
-      {
-        ReferenceExp rexp = (ReferenceExp) exp;
-        Declaration decl = rexp.getBinding();
-        if (decl != null)
-          return exp2Type(decl.getValue());
-        String name = rexp.getName();
-        int len = name.length();
-        if (len > 2 && name.charAt(0) == '<'
-            && name.charAt(len-1) == '>')
-          return Scheme.string2Type(name.substring(1, len-1));
-      }
-    return null;
+    return getInstance().getTypeFor(exp);
   }
 
   /** The compiler insert calls to this method for applications and applets. */

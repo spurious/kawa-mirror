@@ -1,3 +1,10 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* kawa/xml:  Sub-directory moved/renamed to ...
+	* xml:  ... new sub-direvtyory/package.
+	* Makefile.am (SUBDIRS):  Add xml, though only if --enable-xml.
+	* kawa/Makefile.am (SUBDIRS):  Removed xml entry.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SUBDIRS):  Only select commonlisp if Swing is used.

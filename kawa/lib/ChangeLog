@@ -1,3 +1,8 @@
+1998-08-28  Per Bothner  <bothner@cygnus.com>
+
+	* std_syntax.scm (do):  Use "magic" identifier.
+	* syntax.scm (location):  Removed - now in ../standard.
+
 Tue Jul 28 08:31:51 1998  Per Bothner  <bothner@cygnus.com>
 
 	* syntax.scm (location):  New partial implementation.

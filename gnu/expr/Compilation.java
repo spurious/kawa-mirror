@@ -55,8 +55,6 @@ public class Compilation
   SwitchState fswitch;
 
   Field fswitchIndex;
-  /** The actual parameter of the current CallFrame.step(CallContext) method. */
-  Variable callStackContext;
 
   // Various standard classes
   static public ClassType typeObject = Type.pointer_type;
@@ -1259,7 +1257,7 @@ public class Compilation
 
     if (module.isHandlingTailCalls() || usingCPStyle())
       {
-	callStackContext = new Variable ("$ctx", typeCallContext);
+	Variable callStackContext = new Variable ("$ctx", typeCallContext);
 	Scope scope = module.scope;
 	scope.addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
@@ -1289,8 +1287,7 @@ public class Compilation
     module.enterFunction(this);
     if (usingCPStyle())
       {
-	//code.emitLoad(code.getArg(1));
-	code.emitLoad(callStackContext);
+	loadCallContext();
         code.emitGetField(pcCallContextField);
         fswitch = new SwitchState(code);
 	Label l = new Label(code);
@@ -1410,9 +1407,15 @@ public class Compilation
   {
     CodeAttr code = getCode();
     if (curLambda.isHandlingTailCalls())
-      code.emitLoad(callStackContext);
-    else
-      code.emitInvokeStatic(getCallContextInstanceMethod);
+      {
+	Variable var = curLambda.scope.lookup("$ctx");
+	if (var != null && var.getType() == typeCallContext)
+	  {
+	    code.emitLoad(var);
+	    return;
+	  }
+      }
+    code.emitInvokeStatic(getCallContextInstanceMethod);
   }
 
   public void freeLocalField (Field field)

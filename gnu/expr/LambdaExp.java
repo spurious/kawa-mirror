@@ -939,18 +939,18 @@ public class LambdaExp extends ScopeExp
 
     if (isHandlingTailCalls() && ! isModuleBody() && ! comp.usingCPStyle())
       {
-	comp.callStackContext = new Variable ("$ctx", comp.typeCallContext);
-	// Variable thisVar = isStaic? = null : declareThis(comp.curClass);
-	scope.addVariableAfter(thisVariable, comp.callStackContext);
-	comp.callStackContext.setParameter(true);
-	comp.callStackContext.setArtificial(true);
+	Variable callStackContext = new Variable ("$ctx", comp.typeCallContext);
+	// Variable thisVar = isStatic? = null : declareThis(comp.curClass);
+	scope.addVariableAfter(thisVariable, callStackContext);
+	callStackContext.setParameter(true);
+	callStackContext.setArtificial(true);
       }
 
     code.locals.enterScope (scope);
 
     if (argsArray != null && isHandlingTailCalls())
       {
-        code.emitLoad(comp.callStackContext);
+        comp.loadCallContext();
 	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("getArgs", 0));
         code.emitStore(argsArray);
       }
@@ -1216,7 +1216,6 @@ public class LambdaExp extends ScopeExp
     flags |= METHODS_COMPILED;
     Method save_method = comp.method;
     LambdaExp save_lambda = comp.curLambda;
-    Variable saveStackContext = comp.callStackContext;
     comp.curLambda = this;
 
     Method method = primMethods[0];
@@ -1313,7 +1312,6 @@ public class LambdaExp extends ScopeExp
     compileChildMethods(comp);
     comp.method = save_method;
     comp.curLambda = save_lambda;
-    comp.callStackContext = saveStackContext;
   }
 
   public void compileBody (Compilation comp)
@@ -1322,8 +1320,7 @@ public class LambdaExp extends ScopeExp
     if (isHandlingTailCalls())
       {
 	CodeAttr code = comp.getCode();
-	Variable ctxVar = comp.callStackContext;
-	code.emitLoad(ctxVar);
+	comp.loadCallContext();
 	code.emitGetField(comp.typeCallContext.getDeclaredField("consumer"));
 	Scope scope = code.getCurrentScope();
 	Variable result

@@ -340,6 +340,12 @@ public class Declaration
   {
   }
 
+  public Declaration (Variable var)
+  {
+    this(var.getName(), var.getType());
+    this.var = var;
+  }
+
   public Declaration (String name)
   {
     this(name, Type.pointer_type);

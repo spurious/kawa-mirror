@@ -22,6 +22,7 @@ public class ApplyExp extends Expression
   public final Expression getFunction() { return func; }
   public final Expression[] getArgs() { return args; }
   public final int getArgCount() { return args.length; }
+  public void setFunction(Expression func) { this.func = func; }
   public void setArgs(Expression[] args) { this.args = args; }
   public final boolean isTailCall() { return tailCall; }
   public final void setTailCall(boolean tailCall) { this.tailCall = tailCall; }
@@ -249,10 +250,10 @@ public class ApplyExp extends Expression
 	    int pc = fswitch.getMaxValue() + 1;
 	    fswitch.addCase(pc, l, code);
             exp_func.compile (comp, new StackTarget(comp.typeProcedure));
-	    code.emitLoad(comp.callStackContext);
+	    comp.loadCallContext();
 
 	    // Emit: context->pc = pc.
-	    code.emitLoad(comp.callStackContext);
+	    comp.loadCallContext();
 	    code.emitPushInt(pc);
 	    code.emitPutField(Compilation.pcCallContextField);
 	    code.emitInvokeVirtual(comp.applyCpsMethod);
@@ -289,7 +290,7 @@ public class ApplyExp extends Expression
 
 	    /* FIXME
 	    // Load result from stack.value to target.
-	    code.emitLoad(comp.callStackContext);
+	    comp.loadCallContext();
 	    code.emitGetField(comp.valueCallContextField);
 	    target.compileFromStack(comp, Type.pointer_type);
 	    */
@@ -330,7 +331,7 @@ public class ApplyExp extends Expression
       {
 	ClassType typeContext = comp.typeCallContext;
 	exp_func.compile(comp, new StackTarget(comp.typeProcedure));
-	code.emitLoad(comp.callStackContext);
+	comp.loadCallContext();
 	code.emitDupX();
 	// Stack:  context, proc, context
 	if (! exp.isTailCall())

@@ -75,6 +75,11 @@ public class FString extends AbstractString implements Printable, Externalizable
     return new String (value);
   }
 
+  public String substring(int start, int end)
+  {
+    return new String (value, start, end - start);
+  }
+
   public char charAt (int index)
   {
     return value[index];

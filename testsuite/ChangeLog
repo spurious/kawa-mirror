@@ -1,3 +1,8 @@
+2004-08-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Adjust classpath for CGI tests, so we get
+	servlet jar.
+
 2004-08-07  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Overload resolution test is now expected to pass.

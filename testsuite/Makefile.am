@@ -93,15 +93,18 @@ SimpleB.class: $(srcdir)/SimpleB.java classes1.class
 	CLASSPATH=..:. $(JAVAC) -g $(srcdir)/SimpleB.java -d .
 
 classes2.class: $(srcdir)/classes2.scm SimpleB.class
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	$(KAWA) -C $(srcdir)/classes2.scm
 
 HelloCgiK.class: $(srcdir)/HelloCgiK.krl
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	$(KAWA) --servlet --krl -C $(srcdir)/HelloCgiK.krl
 
 HelloCgiK:
 	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
 check-HelloCgiK: HelloCgiK.class HelloCgiK
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiK SERVER_NAME=localhost \
 	  KAWALIB=$(KAWALIB) ./HelloCgiK >tmp.out
 	@if diff -b $(srcdir)/HelloCgiK.expected tmp.out; \
@@ -109,12 +112,14 @@ check-HelloCgiK: HelloCgiK.class HelloCgiK
 	  else echo FAIL HelloCgiK test; fi
 
 HelloCgiS.class: $(srcdir)/HelloCgiS.scm
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	$(KAWA) --servlet --output-format xml -C $(srcdir)/HelloCgiS.scm
 
 HelloCgiS:
 	$(LN_S) ../bin/cgi-servlet HelloCgiS
 
 check-HelloCgiS: HelloCgiS.class HelloCgiS
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiS SERVER_NAME=localhost \
 	  KAWALIB=$(KAWALIB) ./HelloCgiS >tmp.out
 	@if diff -b $(srcdir)/HelloCgiS.expected tmp.out; \
@@ -122,12 +127,14 @@ check-HelloCgiS: HelloCgiS.class HelloCgiS
 	  else echo FAIL HelloCgiS test; fi
 
 HelloCgiX.class: $(srcdir)/HelloCgiX.xql
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	$(KAWA) --servlet -C $(srcdir)/HelloCgiX.xql
 
 HelloCgiX:
 	$(LN_S) ../bin/cgi-servlet HelloCgiX
 
 check-HelloCgiX: HelloCgiX.class HelloCgiX
+	CLASSPATH=@conf_classpath@$$CLASSPATH \
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiX SERVER_NAME=localhost \
 	  PATH_TRANSLATED=./HelloCgiX KAWALIB=$(KAWALIB) ./HelloCgiX >tmp.out
 	@if diff -b $(srcdir)/HelloCgiX.expected tmp.out; \

@@ -20,7 +20,7 @@ public class Compilation
   public ClassType mainClass;
 
   public LambdaExp curLambda;
-  public Declaration thisDecl;
+  public Variable thisDecl;
 
   /** If true, minimize the number of classes generated.
    * Do this even if it makes things a little slower. */
@@ -276,7 +276,12 @@ public class Compilation
 
   Hashtable literalTable;
   int literalsCount;
-  Literal literalsChain;
+
+  /** Rembembers stuff to do in <init> of main class. */
+  Initializer initChain;
+
+  /** Rembembers stuff to do in <clinit> of main class. */
+  Initializer clinitChain;
 
   public static boolean generateMainDefault = false;
   /** True if we should generate a main(String[]) method. */
@@ -437,14 +442,10 @@ public class Compilation
                             : Type.make(value.getClass()));
   }
 
-  private void dumpLiterals ()
+  private void dumpInitializers (Initializer inits)
   {
-    for (Literal literal = literalsChain;  literal != null;
-	 literal = literal.next)
-      {
-	if ((literal.flags & Literal.INITIALIZED) == 0)
-	  literal.emit (this, true);
-      }
+    for (Initializer init = inits;  init != null;  init = init.next)
+      init.emit(this);
   }
 
   /** Search this Compilation for a ClassType with a given name.
@@ -528,7 +529,8 @@ public class Compilation
 	    mangled.append (Character.forDigit ((ch      ) & 15, 16));
 	  }
       }
-    return mangled.toString ();
+    String mname = mangled.toString ();
+    return mname.equals(name) ? name : mname;
   }
 
   /** Generate an unused class name.
@@ -640,6 +642,9 @@ public class Compilation
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
 
+    if (curClass == mainClass)
+      dumpInitializers(initChain);
+
     // If immediate, we cannot set the function name in the constructor,
     // since setLiterals has not been called yet (ecept for nested functions).
     if (lexp != null && lexp.name != null && !immediate)
@@ -711,54 +716,7 @@ public class Compilation
       }
 
     Expression body = lexp.body;
-    Declaration heapFrame = lexp.heapFrame;
-
-    // Is this worth keeping around any more?   FIXME
-    if (lexp.min_args == lexp.max_args && ! lexp.isModuleBody ()
-	&& ! lexp.getImportsLexVars() && ! lexp.getNeedsStaticLink()
-	&& ! lexp.isHandlingTailCalls()
-        && ! (lexp instanceof ClassExp))
-      {
-	Expression[] args = new Expression[lexp.max_args];
-
-	String methodJavaName = lexp.getJavaName();
-	if (methodJavaName.equals(curClass.getName()))
-	  methodJavaName = "apply";
-	Method method = lexp.addMethodFor(curClass, methodJavaName, null);
-	this.method = method;
-	method.initCode();
-	code = getCode();
-	lexp.allocParameters(this, null);
-	lexp.enterFunction(this, null);
-	Type rtype = method.getReturnType();
-	body.compileWithPosition(this, Target.returnValue(rtype));
-	lexp.compileEnd(this);
-
-	// Set up for compiling regular virtual applyX method.
-	// It just calls the static method we just finished with.
-	Variable var = lexp.firstVar ();
-	lexp.scope = new Scope();
-	int itype = 0;
-	for ( ;  var != null; var = var.nextVar ())
-	  {
-	    if (! var.isParameter() || var.isArtificial())
-	      continue;
-	    String vname = var.getName();
-	    Declaration decl = lexp.addDeclaration(vname);
-	    decl.setParameter(true);
-	    if (var.isArtificial())
-	      decl.setArtificial(true);
-	    else
-	      args[itype++] = new ReferenceExp(vname, decl);
-	    if (! var.isSimple())
-	      var = var.nextVar();  // Skip xxIncoming fake fields.
-	  }
-        PrimProcedure pproc = new PrimProcedure(method, lexp);
-        applyMethods.addElement(pproc);
-        applyMethodsCount[lexp.min_args <= 4 ? lexp.min_args : 5]++;
-	body = new ApplyExp(pproc, args);
-	lexp.heapFrame = null;
-      }
+    Variable heapFrame = lexp.heapFrame;
 
     Method apply_method;
     if (lexp.isModuleBody())
@@ -790,12 +748,11 @@ public class Compilation
 
     if (lexp.isHandlingTailCalls())
       {
-	Declaration decl = new Declaration ("stack", typeCallStack);
+	callStackContext = new Variable ("stack", typeCallStack);
 	Scope scope = lexp.scope;
-	scope.addVariableAfter(thisDecl, decl);
-	decl.setParameter(true);
-	decl.setArtificial(true);
-	callStackContext = decl;
+	scope.addVariableAfter(thisDecl, callStackContext);
+	callStackContext.setParameter(true);
+	callStackContext.setArtificial(true);
       }
 
     Variable argsArray;
@@ -845,9 +802,18 @@ public class Compilation
     lexp.allocParameters(this, argsArray);
     lexp.enterFunction(this, argsArray);
 
-    body.compileWithPosition(this,
-			     lexp.isModuleBody () ? Target.pushObject
-			     : Target.returnObject);
+    try
+      {
+        body.compileWithPosition(this,
+                                 lexp.isModuleBody () ? Target.pushObject
+                                 : Target.returnObject);
+      }
+    catch (Exception ex)
+      {
+        error('f', "internal error while compiling - caught: "+ex);
+        ex.printStackTrace(System.err);
+        System.exit(-1);
+      }
     lexp.compileEnd(this);
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.
@@ -901,31 +867,28 @@ public class Compilation
                   }
                 else if (! varArgs)
                   {
-                    Variable pvar = source.firstVar();
+                    Declaration pvar = source.firstDecl();
                     int k = 0;
-                    for (; k < source.min_args;  pvar = pvar.nextVar())
-                      {
-                        if (pvar.isParameter () && ! pvar.isArtificial ())
-                          {
-                            sourceLine = ((Declaration) pvar).getLine();
-                            if (sourceLine > 0)
-                              code.putLineNumber(sourceLine);
-                            if (i > 4) // more than 4 args
-                              {
-                                // Load Object[]args value:
-                                code.emitLoad(code.getArg(2));
-                                code.emitPushInt(k);
-                                code.emitArrayLoad(Type.pointer_type);
-                              }
-                            else
-                              code.emitLoad(code.getArg(k + 2));
-                            Type ptype = primMethod.getParameterTypes()[k];
-                            if (ptype != Type.pointer_type)
-                              CheckedTarget.emitCheckedCoerce(this, source,
-                                                              k, ptype);
-                            k++;
-                          }
-                      }
+		    for (; k < source.min_args;  pvar = pvar.nextDecl())
+		      {
+			sourceLine = ((Declaration) pvar).getLine();
+			if (sourceLine > 0)
+			  code.putLineNumber(sourceLine);
+			if (i > 4) // more than 4 args
+			  {
+			    // Load Object[]args value:
+			    code.emitLoad(code.getArg(2));
+			    code.emitPushInt(k);
+			    code.emitArrayLoad(Type.pointer_type);
+			  }
+			else
+			  code.emitLoad(code.getArg(k + 2));
+			Type ptype = primMethod.getParameterTypes()[k];
+			if (ptype != Type.pointer_type)
+			  CheckedTarget.emitCheckedCoerce(this, source,
+							  k, ptype);
+			k++;
+                     }
                   }
                 code.emitInvokeMethod(apply.method, apply.op_code); 
                 Target.pushObject.compileFromStack(this, apply.getReturnType());
@@ -945,15 +908,16 @@ public class Compilation
       }
 
     if (curClass == mainClass
-	&& ((! immediate && literalsChain != null)
+	&& ((! immediate && clinitChain != null)
 	    || bindingFields.size() > 0))
       {
 	Method save_method = method;
 	method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
 				     Access.PUBLIC|Access.STATIC);
 	method.init_param_slots ();
-	if (! immediate)
-	  dumpLiterals ();
+
+	dumpInitializers(clinitChain);
+
 	code = getCode();
 	int numGlobals = bindingFields.size();
 	if (numGlobals > 0)

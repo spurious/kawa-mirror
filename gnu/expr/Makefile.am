@@ -29,6 +29,7 @@ java_JAVA=\
   GenericProc.java \
   IfExp.java \
   IgnoreTarget.java \
+  Initializer.java \
   Inlineable.java \
   Keyword.java \
   LambdaExp.java \
@@ -41,6 +42,7 @@ java_JAVA=\
   ObjectExp.java \
   QuoteExp.java \
   PrimProcedure.java \
+  ProcInitializer.java \
   PushApply.java \
   ReferenceExp.java \
   ScopeExp.java \

@@ -3,7 +3,7 @@ import gnu.bytecode.*;
 
 /** A Literal contains compile-time information about a constant. */
 
-public class Literal
+public class Literal extends Initializer
 {
   Object value;
 
@@ -12,7 +12,6 @@ public class Literal
    * the static Field named Lit10. */
   int index;
 
-  Literal next;
   public Type type;
   
   public int flags;
@@ -33,9 +32,6 @@ public class Literal
    * value of the literal to the Field. */
   public static final int ASSIGNED = 8;
 
-  /** The static final field that contains the value of the literal. */
-  public Field field;
-
   public final Object getValue() { return value; }
 
   /** Assign a static Field to hold the value of this Literal.
@@ -43,10 +39,10 @@ public class Literal
   void assign (Compilation comp)
   {
     index = comp.literalsCount++;
-    next = comp.literalsChain;
-    comp.literalsChain = this;
+    next = comp.clinitChain;
+    comp.clinitChain = this;
     int flags = comp.immediate ? Access.STATIC|Access.PUBLIC
-      : Access.STATIC|Access.FINAL;
+      : Access.STATIC|Access.FINAL |Access.PUBLIC/*FIXME*/;
     field = comp.mainClass.addField ("Lit"+index, type, flags);
   }
 
@@ -98,6 +94,12 @@ public class Literal
 	code.emitArrayStore(comp.typeObject);
 	// Stack contents:  ..., array
       }
+  }
+
+  public void emit(Compilation comp)
+  {
+    if (! comp.immediate && (flags & Literal.INITIALIZED) == 0)
+      emit (comp, true);
   }
 
   void emit (Compilation comp, boolean ignore)

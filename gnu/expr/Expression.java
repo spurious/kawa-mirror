@@ -38,17 +38,14 @@ public abstract class Expression implements Printable
   {
     String saveFilename = comp.filename;
     int savePosition = comp.position;
-    try
-      {
-        comp.filename = filename;
-        comp.position = position;
-        compile(comp, target);
-      }
-    finally
-      {
-        comp.filename = saveFilename;
-        comp.position = savePosition;
-      }
+    comp.filename = filename;
+    comp.position = position;
+    compile(comp, target);
+    // This might logically belong in a `finally' clause.
+    // It is intentionally not so, so if there is an internal error causing
+    // an exception, we get the line number where the exception was thrown.
+    comp.filename = saveFilename;
+    comp.position = savePosition;
   }
 
   public final void compile (Compilation comp, Type type)

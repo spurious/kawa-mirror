@@ -1,5 +1,7 @@
 2000-05-28  Per Bothner  <per@bothner.com>
 
+	* SlotGet.java (apply2): Use Values.noArgs instead of Procedure.noArgs.
+
 	* ClassMemberConstraint.java (define):  Trivial optimization.
 
 2000-05-22  Per Bothner  <per@bothner.com>

@@ -87,7 +87,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
             && (getmethod.getModifiers() & java.lang.reflect.Modifier.STATIC) == 0)
           throw new RuntimeException("cannot call non-static getter method `"
                                      + mname + "' using `" + getName() + '\'');
-        Object result = getmethod.invoke(obj, Procedure.noArgs);
+        Object result = getmethod.invoke(obj, Values.noArgs);
         result = interpreter.coerceToObject(getmethod.getReturnType(), result);
         return result;
       }

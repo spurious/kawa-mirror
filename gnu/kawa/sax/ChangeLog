@@ -1,3 +1,7 @@
+2003-10-29  Per Bothner  <per@bothner.com>
+
+	* ContentConsumer.java (beginGroup):  Handle XName.
+
 2003-06-27  Per Bothner  <per@bothner.com>
 
 	* ContentConsumer.java (endGroup):  Add flushStrBuffer call.

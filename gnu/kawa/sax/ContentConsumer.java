@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.sax;
@@ -133,8 +133,24 @@ public class ContentConsumer implements Consumer, Attributes
 	System.arraycopy(names, 0, tmp, 0, i);
 	names = tmp;
       }
-    String namespaceURI = ((Symbol) type).getNamespaceURI();
-    String localName = ((Symbol) type).getLocalName();
+    String namespaceURI, localName;
+    if (type instanceof Symbol)
+      {
+	Symbol sym = (Symbol) type;
+	namespaceURI = sym.getNamespaceURI();
+	localName = sym.getLocalName();
+      }
+    else if (type instanceof XName)
+      {
+	XName sym = (XName) type;
+	namespaceURI = sym.getNamespaceURI();
+	localName = sym.getLocalName();
+      }
+    else
+      {
+	namespaceURI = "";
+	localName = type.toString();
+      }
     names[i] = namespaceURI;
     names[i+1] = localName;
     names[i+2] = typeName;

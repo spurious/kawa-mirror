@@ -120,7 +120,8 @@ public class ModuleMethod extends MethodProc
       }
     for (int i = 0;  i < args.length;  i++)
       {
-	if (! getParameterType(i).isInstance(args[i]))
+	Object argi = args[i];
+	if (argi != null && ! getParameterType(i).isInstance(argi))
 	  return NO_MATCH_BAD_TYPE|i;
       }
     ctx.value1 = args;

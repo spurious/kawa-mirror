@@ -21,7 +21,7 @@
     str)))
 
 (define (procedure? x)
-  (instance? x <function>))
+  (and (instance? x <function>) (not (instance? x <gnu.mapping.Location>))))
 
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))

@@ -1,3 +1,7 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* misc.scm (procedure?):  Return #f if a Binding (CLisp symbol).
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* thread.scm (exit): Call OutPort.runCleanups.

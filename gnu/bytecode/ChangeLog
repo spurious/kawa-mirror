@@ -1,3 +1,20 @@
+1999-02-28  Geoff Berry  <gcb@duke.edu>
+
+	* CodeAttr.java (emitArrayLength): Add type check for incoming
+	array.
+	(emitNewArray(Type,int)): New method to support the
+	`multianewarray' instruction.
+	(emitInc): New method to support the `iinc' instruction.
+	(emitGotoIfEq): Fix double case to use `dcmpl'.
+	(emitGotoIfLt, emitGotoIfGe, emitGotoIfGt, emitGotoIfLe,
+	emitGotoIfCompare2): New methods.
+	(emitIfCompare1): Add type check for incoming int.
+	(emitIfRefCompare1, emitIfNotNull, emitIfNull): New methods.
+	(emitIfLt, emitIfGe, emitIfGt, emitIfLe): New methods.
+	(disAssemble): Fix invokeinterface handling.	
+	* ConstantPool.java (addClass): Change parameter type from
+	ClassType to ObjectType to allow ArrayTypes to be added.
+
 Mon Feb 22 23:17:08 1999  Per Bothner  <bothner@cygnus.com>
 
 	* ObjectType.java (getReflectClass):  Replace '/' by '.' in

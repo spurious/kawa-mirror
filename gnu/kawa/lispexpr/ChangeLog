@@ -1,3 +1,7 @@
+2003-08-23  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Fix bug reported by Aubrey Jaffer.
+
 2003-08-20  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber):  Unit.mul has been renamed to times.

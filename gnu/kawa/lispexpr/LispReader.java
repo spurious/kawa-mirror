@@ -327,7 +327,7 @@ public class LispReader extends Lexer
     if (pos >= end)
       return "no digits";
     char ch = buffer[pos++];
-    for (; ch == '#';  ch = buffer[pos++])
+    while (ch == '#')
       {
 	if (pos >= end)
 	  return "no digits";
@@ -388,6 +388,9 @@ public class LispReader extends Lexer
 	      }
 	    return "unknown modifier '#" + ch + '\'';
 	  }
+	if (pos >= end)
+	  return "no digits";
+	ch = buffer[pos++];
       }
     if (exactness == '\0')
       exactness = ' ';

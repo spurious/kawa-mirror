@@ -1,3 +1,5 @@
+(require 'gui)
+
 (frame title: "Kawa GUI Test"
        contents: (button label: "Yes"
 			 oncommand: (lambda ()

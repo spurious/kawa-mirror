@@ -44,8 +44,8 @@ public class Shell
 
 	    /* DEBUGGING:
 	    perr.print ("[Re-written expression: ");
-	    exp.print (perr);
-	    perr.print ("\nbefore eval<"+exp.getClass().getName()+">");
+	    mod.print (perr);
+	    perr.print ("\nbefore eval<"+mod.getClass().getName()+">");
 	    perr.println();
 	    perr.flush();
 	    */

@@ -33,8 +33,6 @@ public class and_or extends Syntax implements Printable
     inits[0] = interp.rewrite (pair.car);
     temp_decl.noteValue (inits[0]);
     let.push (interp);
-    if (interp.currentLambda () == null)
-      temp_decl.setSimple (false);
     Expression temp_exp = new ReferenceExp (temp_name, temp_decl);
     Expression rest = rewrite (pair.cdr, interp); // self-recurse
     Expression then_clause, else_clause;

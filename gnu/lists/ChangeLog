@@ -1,3 +1,7 @@
+2004-08-04  Christian Surlykke <christian@surlykke.dk>
+
+	* GapVector.java: (GapVector) Initialization of gapStart and gapEnd.
+
 2004-08-19  Per Bothner  <per@bothner.com>
 
 	* GapVector.java (gapReserve):  Use setSize to change base.size,

@@ -18,6 +18,8 @@ public class GapVector extends AbstractSequence implements Sequence
   public GapVector(SimpleVector base)
   {
     this.base = base;
+    this.gapStart = 0;
+    this.gapEnd = base.size;
   }
 
   public int size()

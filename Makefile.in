@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -104,18 +104,49 @@ javadir = $(datadir)/java
 
 JAR = jar
 
-@WITH_SWING_TRUE@JAR_DEPS_SWING =   ./gnu/jemacs/buffer/java-classes.stamp   ./gnu/jemacs/buffer/scm-classes.stamp   ./gnu/jemacs/lang/java-classes.stamp   ./gnu/jemacs/lang/scm-classes.stamp   ./gnu/jemacs/lisp/elisp-classes.stamp
-@ENABLE_XML_TRUE@JAR_DEPS_XML = ./gnu/xml/java-classes.stamp   ./gnu/xquery/lang/java-classes.stamp
+@WITH_SWING_TRUE@JAR_DEPS_SWING = @WITH_SWING_TRUE@\
+@WITH_SWING_TRUE@  ./gnu/jemacs/buffer/java-classes.stamp \
+@WITH_SWING_TRUE@  ./gnu/jemacs/buffer/scm-classes.stamp \
+@WITH_SWING_TRUE@  ./gnu/jemacs/lang/java-classes.stamp \
+@WITH_SWING_TRUE@  ./gnu/jemacs/lang/scm-classes.stamp \
+@WITH_SWING_TRUE@  ./gnu/jemacs/lisp/elisp-classes.stamp
+@ENABLE_XML_TRUE@JAR_DEPS_XML = @ENABLE_XML_TRUE@./gnu/xml/java-classes.stamp \
+@ENABLE_XML_TRUE@  ./gnu/xquery/lang/java-classes.stamp
 
-JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML)   ./gnu/bytecode/java-classes.stamp   ./gnu/math/java-classes.stamp   ./gnu/lists/java-classes.stamp   ./gnu/text/java-classes.stamp   ./gnu/mapping/java-classes.stamp   ./gnu/expr/java-classes.stamp   ./gnu/kawa/util/java-classes.stamp   ./gnu/kawa/reflect/java-classes.stamp   ./gnu/kawa/functions/java-classes.stamp   ./gnu/kawa/lispexpr/java-classes.stamp   ./gnu/kawa/slib/scm-classes.stamp   ./gnu/ecmascript/java-classes.stamp   ./gnu/commonlisp/lang/java-classes.stamp   ./kawa/lang/java-classes.stamp   ./kawa/standard/java-classes.stamp   ./kawa/lib/scm-classes.stamp   ./kawa/java-classes.stamp
+JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) \
+  ./gnu/bytecode/java-classes.stamp \
+  ./gnu/math/java-classes.stamp \
+  ./gnu/lists/java-classes.stamp \
+  ./gnu/text/java-classes.stamp \
+  ./gnu/mapping/java-classes.stamp \
+  ./gnu/expr/java-classes.stamp \
+  ./gnu/kawa/util/java-classes.stamp \
+  ./gnu/kawa/reflect/java-classes.stamp \
+  ./gnu/kawa/functions/java-classes.stamp \
+  ./gnu/kawa/lispexpr/java-classes.stamp \
+  ./gnu/kawa/slib/scm-classes.stamp \
+  ./gnu/ecmascript/java-classes.stamp \
+  ./gnu/commonlisp/lang/java-classes.stamp \
+  ./kawa/lang/java-classes.stamp \
+  ./kawa/standard/java-classes.stamp \
+  ./kawa/lib/scm-classes.stamp \
+  ./kawa/java-classes.stamp
 
 
-EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat   libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
+  config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
+  libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh \
+  build.xml build.properties \
+  $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
-JAVADOC_PACKAGES =    gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions   kawa kawa.lang kawa.standard   gnu.jemacs.lang gnu.jemacs.buffer
+JAVADOC_PACKAGES = \
+  gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists\
+  gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
+  kawa kawa.lang kawa.standard \
+  gnu.jemacs.lang gnu.jemacs.buffer
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
@@ -128,7 +159,8 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README COPYING ChangeLog Makefile.am Makefile.in NEWS \
 TODO acinclude.m4 aclocal.m4 config.guess config.sub configure \
-configure.in install-sh ltconfig ltmain.sh missing mkinstalldirs
+configure.in install-sh ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig \
+ltmain.sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -188,7 +220,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \

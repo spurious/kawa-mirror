@@ -1,0 +1,538 @@
+<?xml version="1.0"?>
+<!-- A build file for use by Ant to build Kawa. -->
+<project name="Kawa" default="all" basedir=".">
+  <!-- Give the user a chance to override the defaults. -->
+  <property file="build.properties"/>
+  
+  <property name="version" value="1.6.97"/>
+
+  <property name="debug"        value="true" />
+  <property name="deprecation"  value="false" />
+  <property name="optimize"     value="true" />
+  
+  <property name="src.dir"      value="${basedir}"/>
+  <!--<property name="build.dir"    value="${basedir}"/>-->
+  <property name="build.dir"    value="${user.dir}"/>
+  <property name="dist.dir"     value="${basedir}"/>
+  
+  <property name="build.tools" value="${build.dir}/tools"/>
+  <property name="build.preprocessed" value="${build.dir}"/>
+  <property name="build.classes" value="${build.dir}"/>
+  
+  <property name="dist.kawa.jar" value="${dist.dir}/kawa-${version}.jar"/>
+  
+  <!-- 
+     Set preprocess.overwrite true to force preprocessing.
+     Eventually this will be dependency checked.
+     For now use "ant clean" if anything changes.
+  -->
+  <property name="preprocess.overwrite" value="false"/>
+
+  <target name="all" depends="classes, jar"/>
+
+  <!-- 
+     These are the files that are Kawa.    
+     They go in the classpath, jar, and are deleted by clean.
+     If additional files (resources like properties and the
+     like) are added, something will need to be done so that
+     clean will still work when build.classes=src.dir.
+  -->
+  <fileset id="build.classes" dir="${build.classes}">
+     <include name="gnu/**/*.class"/>
+     <include name="kawa/**/*.class"/>
+  </fileset>
+  
+  <!-- 
+     These are the files that are preprocessed before compiling.    
+     In order to allow them to be mixed with the original source,
+     we must list them each here.
+  -->
+  <fileset id="build.preprocessed" dir="${build.preprocessed}">
+     <include name="gnu/lists/AbstractSequence.java"/>
+     <include name="gnu/lists/Convert.java"/>
+     <include name="gnu/lists/SeqPosition.java"/>
+     <include name="gnu/lists/Sequence.java"/>
+     <include name="gnu/lists/SimpleVector.java"/>
+     <include name="gnu/xml/ParsedXMLHandler.java"/>
+     <include name="gnu/xml/ParsedXMLHandlerByte.java"/>
+     <include name="gnu/xml/QName.java"/>
+     <include name="gnu/xml/XMLParser.java"/>
+     <include name="gnu/xml/XMLParserByte.java"/>
+     <include name="kawa/Version.java"/>
+  </fileset>
+  
+  <patternset id="with-awt-true">
+  </patternset>
+  
+  <patternset id="with-awt-false">
+    <exclude name="kawa/GuiConsole.java"/>
+    <exclude name="kawa/MessageArea.java"/>
+    <exclude name="kawa/TextAreaWriter.java"/>
+    <exclude name="kawa/GuiInPort.java"/>
+  </patternset>
+  
+  <patternset id="with-swing-true">
+    <include name="gnu/jemacs/buffer/*"/>
+    <include name="gnu/jemacs/lang/*"/>
+  </patternset>
+  
+  <patternset id="with-swing-false">
+  </patternset>
+  
+  <!-- The following is part of an "if" trick.  Don't change it. -->
+  <property name="with-swing-true" value="do not change me"/>
+
+  <target name="classes" 
+          depends="java-classes, lib-scm-classes, slib-scm-classes
+          , slib-scm-classes, commonlisp-scm-classes
+          , jemacs-el-classes" />
+  
+  <target name="run" depends="classes">
+     <java classname="kawa.repl" classpath="${build.classes}" />
+  </target>
+  
+  <target name="build-tools">
+    <mkdir dir="${build.tools}"/>
+    <!-- 
+      This didn't work in NetBeans for some reason. 
+      (Even the includejavaruntime/includeantruntime attributes do no good.
+      The really weird thing is that NetBeans has access to the classes
+      for autocomplete and the scripting window.  Oh well.)
+      The workaround is to link to ant.jar.
+    -->
+    <javac srcdir="${src.dir}"
+           destdir="${build.tools}"
+           classpath="lib/ext/ant.jar"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}">
+      <include name="gnu/kawa/ant/*"/>
+    </javac>
+
+    <taskdef name="xcopy"
+             classname="gnu.kawa.ant.XCopy"
+             classpath="${build.tools}"/>
+
+    <!-- 
+       This doesn't really help us because user data 
+       definitions don't seem to be possible.
+    <typedef name="linestripperset" 
+             classname="gnu.kawa.ant.LineStripperSet"
+             classpath="${build.tools}"/>
+    -->
+
+  </target>
+  
+  <target name="build-settings" depends="build-tools">
+    <!-- 
+       If java.util.List is in the classpath, then we'll compile with
+       Java Collections, unless you override the setting of with-collections.
+    -->
+    <available property="with-collections" classname="java.util.List"/>
+    
+    <!-- 
+       If java.lang.ref.WeakReference is in the classpath, then we'll compile with
+       Java References, unless you override the setting of with-references.
+    -->
+    <available property="with-references" classname="java.lang.ref.WeakReference"/>
+    
+    <!-- 
+       If java.awt.Component is in the classpath, then we'll compile the
+       AWT UI, unless you override the setting of with-awt.
+    -->
+    <available property="with-awt" classname="java.awt.Component"/>
+    
+    <!-- 
+       If java.awt.Component is in the classpath, then we'll compile the
+       JEmacs Swing UI, unless you override the setting of with-swing.
+    -->
+    <available property="with-swing" classname="javax.swing.JComponent"/>
+
+    <!-- 
+       This dummy copy is just so we can reference the sets by id.
+       This is needed because we are not able to put linestrippersets
+       in a task or project the way we can with filtersets.
+       Ant gives "Overriding previous definition of reference to..."
+       warnings.  Can't seem to avoid that.
+    -->
+
+    <xcopy dataOnly="true">
+      <linestripperset id="strip-with-collections-true">
+        <linestripper first="if WITHOUT COLLECTIONS" last="endif WITHOUT COLLECTIONS" />
+      </linestripperset>
+
+      <linestripperset id="strip-with-collections-false">
+        <linestripper first="if WITH COLLECTIONS" last="endif WITH COLLECTIONS" />
+      </linestripperset>
+
+      <linestripperset id="strip-byte-subs">
+        <linestripper first="if CHAR is char" last="endif CHAR is char" />
+      </linestripperset>
+
+      <linestripperset id="strip-char-subs">
+        <linestripper first="if CHAR is byte" last="endif CHAR is byte" />
+      </linestripperset>
+
+      <linestripperset id="strip-with-references-true">
+        <linestripper first="if WITHOUT REFERENCES" last="endif WITHOUT REFERENCES" />
+        <linestripper first="if WITHOUT REFERENCES" last="endif WITHOUT REFERENCES" />
+      </linestripperset>
+
+      <linestripperset id="strip-with-references-false">
+        <linestripper first="if WITH REFERENCES" last="endif WITH REFERENCES" />
+      </linestripperset>
+    </xcopy>
+  </target>
+  
+  <!-- 
+     This preprocessing jazz is rather involved and verbose,
+     but it is entirely compatible with the makefile code 
+     and actually _isn't_ as complicated as I could have made 
+     it (as there are still unrolled patterns here that could 
+     have been wrapped up but demurred in consideration of 
+     those who may try and grok it).
+  -->
+
+      <filterset id="filter-do-not-edit" begintoken="-*-" endtoken="-*-">
+        <filter token="Java" 
+          value="Automatically generated file - DO NOT EDIT!.  -*- buffer-read-only: t -*-" />
+      </filterset>
+      
+      <filterset id="filter-with-collections-true">
+        <filter token="if WITH COLLECTIONS" value="" />
+        <filter token="endif WITH COLLECTIONS" value="" />
+      </filterset>
+
+      <filterset id="filter-with-collections-false">
+        <filter token="if WITHOUT COLLECTIONS" value="" />
+        <filter token="endif WITHOUT COLLECTIONS" value="" />
+      </filterset>
+
+      <filterset id="filter-byte-subs">
+        <filter token="CHAR" value="byte" />
+        <filter token="XMLParser" value="XMLParserByte" />
+        <filter token="ParsedXMLHandler" value="ParsedXMLHandlerByte" />
+        <filter token="if CHAR is byte" value="" />
+        <filter token="endif CHAR is byte" value="" />
+      </filterset>
+
+      <filterset id="filter-char-subs">
+        <filter token="CHAR" value="char" />
+        <filter token="XMLParser" value="XMLParser" />
+        <filter token="ParsedXMLHandler" value="ParsedXMLHandler" />
+        <filter token="if CHAR is char" value="" />
+        <filter token="endif CHAR is char" value="" />
+      </filterset>
+
+      <filterset id="filter-with-references-true">
+        <filter token="QTableElement" value="WeakReference" />
+        <filter token="if WITH REFERENCES" value="" />
+        <filter token="endif WITH REFERENCES" value="" />
+      </filterset>
+
+      <filterset id="filter-with-references-false">
+        <filter token="QTableElement" value="QName" />
+        <filter token="if WITHOUT REFERENCES" value="" />
+        <filter token="endif WITHOUT REFERENCES" value="" />
+      </filterset>
+
+  <target name="preprocess" depends="build-tools, build-settings">
+    <mkdir dir="${build.preprocessed}"/>
+
+    <xcopy todir="${build.preprocessed}/kawa" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/kawa" includes="*.java.in"/>
+      <mapper type="glob" from="*Version.java.in" to="*Version.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset begintoken="&quot;" endtoken="&quot;">
+        <filter token="VERSION" value="&quot;${version}&quot;" />
+      </filterset>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/lists" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/lists" includes="*.java.in"/>
+      <mapper type="glob" from="*.java.in" to="*.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-with-collections-${with-collections}"/>
+      <linestripperset refid="strip-with-collections-${with-collections}"/>
+    </xcopy>
+    
+    <xcopy todir="${build.preprocessed}/gnu/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/xml" />
+      <mapper type="glob" from="*XMLParser.java.in" to="*XMLParser.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-char-subs"/>
+      <linestripperset refid="strip-char-subs"/>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/xml" />
+      <mapper type="glob" from="*ParsedXMLHandler.java.in" to="*ParsedXMLHandler.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-char-subs"/>
+      <linestripperset refid="strip-char-subs"/>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/xml" />
+      <mapper type="glob" from="*XMLParser.java.in" to="*XMLParserByte.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-byte-subs"/>
+      <linestripperset refid="strip-byte-subs"/>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/xml" />
+      <mapper type="glob" from="*ParsedXMLHandler.java.in" to="*ParsedXMLHandlerByte.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-byte-subs"/>
+      <linestripperset refid="strip-byte-subs"/>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/xml" />
+      <mapper type="glob" from="*QName.java.in" to="*QName.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-with-references-${with-references}"/>
+      <linestripperset refid="strip-with-references-${with-references}"/>
+    </xcopy>
+  </target>
+  
+  <target name="java-classes" depends="preprocess">
+    <mkdir dir="${build.classes}"/>
+    <!-- 
+       Javac doesn't "shadow" directories, so there may not be duplicates.
+       That means that if you're building other than in the source directory,
+       then the source directory must be clean.
+    -->
+    <javac srcdir="${src.dir};${build.preprocessed}"
+           destdir="${build.classes}"
+           debug="${debug}"
+           deprecation="${deprecation}"
+           optimize="${optimize}" >
+      <include name="gnu/bytecode/"/>
+      <include name="gnu/commonlisp/lang/"/>
+      <include name="gnu/expr/"/>
+      <include name="gnu/kawa/functions/"/>
+      <include name="gnu/kawa/lispexpr/"/>
+      <include name="gnu/kawa/reflect/"/>
+      <include name="gnu/lists/"/>
+      <include name="gnu/mapping/"/>
+      <include name="gnu/math/"/>
+      <include name="gnu/text/"/>
+      <include name="gnu/xml/"/>
+      <include name="gnu/kawa/xml/"/>
+      <include name="gnu/xquery/lang"/>
+      <include name="gnu/xquery/util"/>
+      <include name="kawa/lang/"/>
+      <include name="kawa/standard/"/>
+      <include name="kawa/"/>
+      <patternset refid="with-awt-${with-awt}"/>
+      <patternset refid="with-swing-${with-swing}"/>
+    </javac>
+  </target>
+   
+  <!-- 
+    Can't use apply's dependency checking because
+    Kawa can't handle a "-C" with no files listed.
+    Also that is probably the wrong thing because
+    Kawa needs all the files listed for its scanning.
+  -->
+
+  <!--
+    These files are in two filesets so that the first
+    set is listed before the second in the command 
+    line (otherwise they just go in directory order
+    and the compile fails).
+  -->
+      <fileset id="lib-scm-1st" dir="${src.dir}/kawa/lib"> 
+        <include name="std_syntax.scm"/>
+        <include name="syntax.scm"/>
+        <include name="reflection.scm"/>
+      </fileset>
+      <fileset id="lib-scm-2nd" dir="${src.dir}/kawa/lib">
+        <include name="lists.scm"/>
+        <include name="thread.scm"/>
+        <include name="characters.scm"/>
+        <include name="files.scm"/>
+        <include name="keywords.scm"/>
+        <include name="ports.scm"/>
+        <include name="misc.scm"/>
+        <include name="numbers.scm"/>
+        <include name="strings.scm"/>
+        <include name="vectors.scm"/>
+        <include name="uniform.scm"/>
+        <include name="system.scm"/>
+        <include name="trace.scm"/>
+        <include name="windows.scm"/>
+      </fileset>
+
+  <target name="check-lib-scm-classes">
+    <uptodate property="lib-scm-classes-uptodate">
+      <mapper type="glob" from="*.scm" to="*.class"/>
+      <srcfiles refid="lib-scm-1st"/> 
+      <srcfiles refid="lib-scm-2nd"/>
+    </uptodate>
+  </target>
+
+  <target name="lib-scm-classes" 
+          depends="check-lib-scm-classes" 
+          unless="lib-scm-classes-uptodate">
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P kawa.lib. --module-static -C"/>
+      <fileset refid="lib-scm-1st"/>
+      <fileset refid="lib-scm-2nd"/>
+    </apply>
+  </target>
+  
+      <fileset id="commonlisp-scm" dir="${src.dir}/gnu/commonlisp/lisp"> 
+        <include name="PrimOps.scm"/>
+      </fileset>
+
+  <target name="check-commonlisp-scm-classes">
+    <uptodate property="commonlisp-scm-classes-uptodate">
+      <mapper type="glob" from="*.scm" to="*.class"/>
+      <srcfiles refid="commonlisp-scm"/>
+    </uptodate>
+  </target>
+
+  <target name="commonlisp-scm-classes"
+          depends="check-commonlisp-scm-classes" 
+          unless="commonlisp-scm-classes-uptodate">
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.commonlisp.lisp. --module-static -C"/>
+      <fileset refid="commonlisp-scm"/>
+    </apply>
+  </target>
+
+      <fileset id="slib-scm" dir="${src.dir}/gnu/kawa/slib"> 
+        <include name="genwrite.scm"/>
+        <include name="pp.scm"/>
+        <include name="ppfile.scm"/>
+        <include name="printf.scm"/>
+        <include name="readtable.scm"/>
+      </fileset>
+
+  <target name="check-slib-scm-classes">
+    <uptodate property="slib-scm-classes-uptodate">
+      <mapper type="glob" from="*.scm" to="*.class"/>
+      <srcfiles refid="slib-scm"/>
+    </uptodate>
+  </target>
+
+  <target name="slib-scm-classes"
+          depends="check-slib-scm-classes" 
+          unless="slib-scm-classes-uptodate">
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg line="-classpath"/> <arg path="${build.classes}"/>
+      <arg line="kawa.repl"/>
+      <arg line="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <fileset refid="slib-scm"/>
+    </apply>
+  </target>
+  
+      <fileset id="jemacs-scm" dir="${src.dir}/gnu/jemacs/buffer"> 
+        <include name="emacs.scm"/>
+      </fileset>
+      <fileset id="jemacs-el" dir="${src.dir}/gnu/jemacs/lisp"> 
+        <include name="primitives.el"/>
+        <include name="alist.el"/>
+        <include name="simple.el"/>
+        <include name="alist.el"/>
+        <include name="keymap.el"/>
+        <include name="keydefs.el"/>
+        <include name="hanoi.el"/>
+        <include name="rect.el"/>
+        <include name="editfns.el"/>
+        <include name="subr.el"/>
+        <include name="autoloads.el"/>
+      </fileset>
+
+  <target name="check-jemacs-el-classes">
+    <condition property="jemacs-el-classes-uptodate"> 
+      <and>
+        <uptodate>
+          <mapper type="glob" from="*.scm" to="*.class"/>
+          <srcfiles refid="jemacs-scm"/>
+        </uptodate>
+        <uptodate>
+          <mapper type="glob" from="*.el" to="*.class"/>
+          <srcfiles refid="jemacs-el"/>
+        </uptodate>
+      </and>
+    </condition>
+  </target>
+
+  <target name="jemacs-el-classes" 
+          depends="build-settings, check-jemacs-el-classes" 
+          if="with-swing-${with-swing}" 
+          unless="jemacs-el-classes-uptodate">
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg line="-classpath"/> <arg path="${build.classes}"/>
+      <arg line="kawa.repl"/>
+      <arg line="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
+      <fileset refid="jemacs-scm"/>
+    </apply>
+
+    <!-- Don't know why, but "elisp" can't "getInstance" if this is present: -->
+    <delete file="${build.classes}/gnu/jemacs/lisp/primitives.class"/>
+
+    <apply taskname="elisp" executable="java" 
+           failonerror="true" parallel="true">
+      <arg line="-classpath"/> <arg path="${build.classes}"/>
+      <arg line="kawa.repl"/>
+      <arg line="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.jemacs.lisp. --elisp -C"/>
+      <fileset refid="jemacs-el"/>
+    </apply>
+  </target>
+  
+  <target name="jar">
+    <jar jarfile="${dist.kawa.jar}"
+         manifest="${src.dir}/jar-manifest">
+       <fileset refid="build.classes"/>
+    </jar>
+  </target>
+
+  <!--
+    These clean targets are split up because I can't (yet)
+    get build-tools to work in NetBeans.
+    For this to work, build.tools must be a different
+    directory than build.classes uses.
+  -->
+  <target name="clean-build">
+    <delete>
+       <fileset refid="build.classes"/>
+       <fileset refid="build.preprocessed"/>
+    </delete>
+  </target>
+
+  <target name="clean-tools">
+    <delete dir="${build.tools}"/>
+  </target>
+
+  <target name="clean-dist">
+    <delete file="${dist.kawa.jar}"/>
+  </target>
+
+  <target name="clean" depends="clean-build, clean-tools, clean-dist"/>
+
+</project>

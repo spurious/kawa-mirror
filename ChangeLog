@@ -1,5 +1,14 @@
 2001-11-18  Per Bothner  <per@bothner.com>
 
+	Add support building Kawa using Ant, contributed by Jim White
+	with some hacking by yours truly.
+	* build.xml:  New file, with build rules for Ant,
+	* build.properties:  New file, with comment-out settable properties.
+	* Makefile.am (EXTRA_DIST):  Add build.xml and build.properties.
+	* configure.in (AC_OUTPUT):  Also make gnu/kawa/ant/Makefile.
+
+2001-11-18  Per Bothner  <per@bothner.com>
+
 	* kawa/standard/define_namespace.java:  Moved to gnu/kawa/xml and
 	renamed to DefineNamespace.java.
 	* kawa/standard/Makefile,am, kawa/standard/Scheme.java: Update.

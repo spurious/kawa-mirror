@@ -47,7 +47,7 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 	throw new RuntimeException("illegal access for field "
 				   + field.getSourceName());
       }
-    return Interpreter.voidObject;
+    return Values.empty;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -63,7 +63,7 @@ public class SetFieldProc extends Procedure2 implements Inlineable
     args[1].compile(comp, field.getType());
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPutField(field);
-    comp.compileConstant(Interpreter.voidObject, target);
+    comp.compileConstant(Values.empty, target);
   }
 
   public gnu.bytecode.Type getReturnType (Expression[] args)

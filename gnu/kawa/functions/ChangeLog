@@ -1,3 +1,8 @@
+2003-12-14  Chris Dean <ctdean@sokitomi.com>
+
+	* DisplayFormat.java (AbstractFormat): Allow obj.toString() to
+	return null.
+
 2003-11-10  Per Bothner  <per@bothner.com>
 
 	* ParseFormat.java (parseFormat):  Allow '*' for precision.

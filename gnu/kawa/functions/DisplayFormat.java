@@ -156,10 +156,14 @@ public class DisplayFormat extends AbstractFormat
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable && out instanceof PrintWriter)
       ((Printable) obj).print((PrintWriter) out);
-    else if (obj == null)
-      write("#!null", out);
     else
-      write (obj.toString(), out);
+      {
+	String asString = obj != null ? obj.toString() : null;
+	if (asString == null)
+	  write("#!null", out);
+	else
+	  write(asString, out);
+      }
   }
 
   /** Recursive helper method for writing out Array (sub-) objects.

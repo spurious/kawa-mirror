@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.lists.*;
 import java.io.*;
 import gnu.expr.*;
+import gnu.xml.*;
 
 /** A SeqPosition used to represent a node in (usually) a TreeList.
  * This is special in that the represented node is the current position
@@ -45,21 +46,14 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
 
   public Type getImplementationType()
   {
-    return typeSeqPosition;
+    return typeKNode;
   }
 
   public boolean isInstance (Object obj)
   { 
-    if (obj instanceof AbstractSequence)
+    if (obj instanceof KNode)
       {
-	AbstractSequence seq = (AbstractSequence) obj;
-	int start = seq.startPos();
-	return isInstancePos(seq, start)
-	  && ! seq.hasNext(seq.nextPos(start));
-      }
-    else if (obj instanceof SeqPosition)
-      {
-	SeqPosition pos = (SeqPosition) obj;
+	KNode pos = (KNode) obj;
 	return isInstancePos(pos.sequence, pos.getPos());
       }
     return false;
@@ -107,21 +101,21 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
     return true;
   }
 
-  public static SeqPosition coerceForce(Object obj, int kinds)
+  public static KNode coerceForce(Object obj, int kinds)
   {
-    SeqPosition pos = coerceOrNull(obj, kinds);
+    KNode pos = coerceOrNull(obj, kinds);
     if (pos == null)
       throw new ClassCastException("coerce from "+obj.getClass());
     return pos;
   }
 
-  public static SeqPosition coerceOrNull(Object obj, int kinds)
+  public static KNode coerceOrNull(Object obj, int kinds)
   {
-    SeqPosition pos;
-    if (obj instanceof AbstractSequence)
-      pos = new SeqPosition((AbstractSequence) obj, 0, false);
-    else if (obj instanceof SeqPosition)
-      pos = (SeqPosition) obj;
+    KNode pos;
+    if (obj instanceof NodeTree)
+      pos = KNode.make((NodeTree) obj);
+    else if (obj instanceof KNode)
+      pos = (KNode) obj;
     else
       return null;
     return isInstance(pos.sequence, pos.ipos, kinds) ? pos : null;
@@ -167,9 +161,9 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
       gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
   }
 
-  public static final ClassType typeSeqPosition = ClassType.make("gnu.lists.SeqPosition");
+  public static final ClassType typeKNode = ClassType.make("gnu.kawa.xml.KNode");
   public static final ClassType typeNodeType = ClassType.make("gnu.kawa.xml.NodeType");
-  public static final NodeType nodeType = new NodeType("gnu.lists.SeqPosition");
+  public static final NodeType nodeType = new NodeType("gnu.kawa.xml.KNode");
   static final Method coerceMethod
     = typeNodeType.getDeclaredMethod("coerceForce", 2);
   static final Method coerceOrNullMethod

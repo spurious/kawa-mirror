@@ -7,6 +7,22 @@
 	* KElement.java:  New class, extends KNode, implements Element.
 	* Makefile.am (java_sources):  Add new files.
 
+	* ElementType.java (coerceOrNull, coerce):  Return a KElement.
+	* NodeType.java (typeSeqPosition):  Replace by typeKNode.
+	(nodeType):  Is now a KNode rather than a SeqPosition.
+	(getImplementationType):  Return typeKNode instead of typeSeqPosition.
+	(isInstance):  Instance must now be a KNode.
+	(coerceForce, coerceOrNull):  Now check for KNode.
+	* NodeConstructor.java (typeKNode):  New static field.
+	(compileUsingNodeTree):  At end convert NodeTree to KNode.
+	* Nodes.java:  Now implements org.w3c.dom.NodeList.
+	(getLength, item):  New methods
+	(get):  Use KNode.make to return a KNode rather than a SeqPosition.
+	(getPosNext):  New optimized implementation.
+	(root(AbstractSequence,int)):  Take a NodeTree and return a KNode.
+	(root(Object)):  Require a KNode.
+	* TreeScanner.java (apply):  Argument must be a KNode.
+
 2003-12-24  Per Bothner  <per@bothner.com>
 
 	* AttributeConstructor.java (setQName):  New method.

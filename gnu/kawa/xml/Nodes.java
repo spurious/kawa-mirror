@@ -5,10 +5,12 @@ package gnu.kawa.xml;
 import gnu.mapping.Values;
 import gnu.lists.*;
 import gnu.xml.*;
+import org.w3c.dom.*;
 
 /** Manages a sequence of node references. */
 
 public class Nodes extends Values
+implements org.w3c.dom.NodeList
 {
   /** Number of data elements for a POSITION_PAIR_FOLLOWS node reference. */
   static final int POS_SIZE = 5;
@@ -203,6 +205,11 @@ public class Nodes extends Values
     return count;
   }
 
+  public int getLength()
+  {
+    return count;
+  }
+
   public Object get (int index)
   {
     int i = POS_SIZE * index;
@@ -213,8 +220,25 @@ public class Nodes extends Values
     // Inline of: return getPosNext(i << 1)
     if (data[i] != POSITION_PAIR_FOLLOWS)
       throw new RuntimeException("internal error - unexpected data");
-    return SeqPosition.make((AbstractSequence) objects[getIntN(i+1)],
-			    getIntN(i+3));
+    return KNode.make((NodeTree) objects[getIntN(i+1)], getIntN(i+3));
+  }
+
+  public Node item(int index)
+  {
+    if (index >= count)
+      return null;
+    else
+      return (Node) item(index);
+  }
+
+  public Object getPosNext(int ipos)
+  {
+    int index = posToDataIndex(ipos);
+    if (index == data.length)
+      return Sequence.eofValue;
+    if (data[index] != POSITION_PAIR_FOLLOWS)
+      throw new RuntimeException("internal error - unexpected data");
+    return KNode.make((NodeTree) objects[getIntN(index+1)], getIntN(index+3));
   }
 
   /** Optimization of ((SeqPosition) get(index)).sequence.
@@ -245,14 +269,14 @@ public class Nodes extends Values
     return getIntN(i+3);
   }
 
-  private static SeqPosition root (AbstractSequence seq, int ipos)
+  private static KNode root (NodeTree seq, int ipos)
   {
     int end = seq.endPos();
     for (;;)
       {
 	int parent = seq.parentPos(ipos);
 	if (parent == end)
-	  return SeqPosition.make(seq, ipos);
+	  return KNode.make(seq, ipos);
 	ipos = parent;
       }
   }
@@ -260,15 +284,7 @@ public class Nodes extends Values
   /** Return the root node of the argument. */
   public static SeqPosition root (Object node)
   {
-    if (node instanceof AbstractSequence)
-      {
-	AbstractSequence seq = (AbstractSequence) node;
-	return root(seq, seq.startPos());
-      }
-    else
-      {
-	SeqPosition spos = (SeqPosition) node;
-	return root(spos.sequence, spos.getPos());
-      }
+    KNode spos = (KNode) node;
+    return root((NodeTree) spos.sequence, spos.getPos());
   }
 }

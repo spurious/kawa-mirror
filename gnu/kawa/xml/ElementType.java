@@ -94,10 +94,10 @@ implements TypeValue, Externalizable, GroupPredicate
       != null;
   }
 
-  public static SeqPosition coerceOrNull (Object obj,
-				    String namespaceURI, String localName)
+  public static KElement coerceOrNull (Object obj,
+				       String namespaceURI, String localName)
   {
-    SeqPosition pos = NodeType.coerceOrNull(obj, GROUP_OK);
+    KElement pos = (KElement) NodeType.coerceOrNull(obj, GROUP_OK);
     if (pos == null)
       return null;
     Object curName = pos.getNextTypeObject();
@@ -126,10 +126,10 @@ implements TypeValue, Externalizable, GroupPredicate
     return null;
   }
 
-  public static SeqPosition coerce (Object obj,
-				    String namespaceURI, String localName)
+  public static KElement coerce (Object obj,
+				 String namespaceURI, String localName)
   {
-    SeqPosition pos = coerceOrNull(obj, namespaceURI, localName);
+    KElement pos = coerceOrNull(obj, namespaceURI, localName);
     if (pos == null)
       throw new ClassCastException();
     return pos;

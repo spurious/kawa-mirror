@@ -78,7 +78,9 @@ implements Inlineable
 					  Compilation comp, Target target)
   {
     Method makeMethod = typeNodeTree.getDeclaredMethod("make", 0);
-    ConsumerTarget.compileUsingConsumer(exp, comp, target, makeMethod, null);
+    Method makeKNodeMethod = typeKNode.getDeclaredMethod("make", 1);
+    ConsumerTarget.compileUsingConsumer(exp, comp, target,
+					makeMethod, makeKNodeMethod);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -147,6 +149,8 @@ implements Inlineable
 
   static final ClassType typeNodeTree
     = ClassType.make("gnu.xml.NodeTree");
+  static final ClassType typeKNode
+    = ClassType.make("gnu.kawa.xml.KNode");
   static final ClassType typeNodeConstructor
     = ClassType.make("gnu.kawa.xml.NodeConstructor");
   static final Method pushNodeContextMethod

@@ -29,16 +29,8 @@ public abstract class TreeScanner extends CpsProcedure
     PositionConsumer out = (PositionConsumer) ctx.consumer;
     Object node = ctx.getNextArg();
     ctx.lastArg();
-    if (node instanceof AbstractSequence)
-      {
-	AbstractSequence seq = (AbstractSequence) node;
-	scan(seq, seq.startPos(), out);
-      }
-    else
-      {
-	SeqPosition spos = (SeqPosition) node;
-	scan(spos.sequence, spos.getPos(), out);
-      }
+    KNode spos = (KNode) node;
+    scan(spos.sequence, spos.getPos(), out);
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

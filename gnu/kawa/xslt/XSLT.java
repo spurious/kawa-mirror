@@ -71,31 +71,19 @@ public class XSLT extends XQuery
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new XslTranslator(inp, messages, this);
-    // return null;
-  /*
-    XslTranslator xtr = new XslTranslator(mexp, messages, this);
-    XMLParser parser = new XMLParser(inp, xtr);
-    return xtr;
-    return null; // FIXME
-  */
   }
 
-  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
-			   int options)
+  public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, messages);
+    Compilation tr = new Compilation(this, lexer.getMessages());
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
-    mexp.setFile(port.getName());
+    mexp.setFile(lexer.getName());
     tr.push(mexp);
     tr.mustCompileHere();
-    XslTranslator xtr = new XslTranslator(mexp, messages, this);
-    xtr.beginDocument();
-    XMLParser parser = new XMLParser(port, messages, xtr);
-    parser.parse();
-    xtr.endDocument();
+    ((XslTranslator) lexer).parse(mexp);
     tr.pop(mexp);
     return tr;
   }

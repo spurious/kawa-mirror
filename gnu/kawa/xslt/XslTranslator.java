@@ -38,18 +38,7 @@ public class XslTranslator extends Lexer implements Consumer
   {
     super(inp, messages);
     this.interpreter = interpreter;
-    /* FIXME
-    parser = new XMLParser(inp, this);
-    */
-  }
-
-  public XslTranslator(ModuleExp mexp,
-		       SourceMessages messages, XSLT interpreter)
-  {
-    super(null, messages);  // FIXME
-    this.mexp = mexp;
-    //this.messages = messages;
-    this.interpreter = interpreter;
+    parser = new XMLParser(inp, messages, this);
   }
 
   static final String XSL_TRANSFORM_URI
@@ -410,6 +399,13 @@ public class XslTranslator extends Lexer implements Consumer
       return QuoteExp.nullExp;
     else
       return new QuoteExp(Symbol.make(null, name)); // FIXME
+  }
+
+  public void parse (ModuleExp mexp)
+  {
+    beginDocument(mexp);
+    parser.parse();
+    endDocument();
   }
 
   static final ClassType typeXSLT

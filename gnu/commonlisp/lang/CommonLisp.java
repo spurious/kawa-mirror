@@ -2,7 +2,7 @@ package gnu.commonlisp.lang;
 import gnu.mapping.*;
 import gnu.jemacs.lang.*;
 import gnu.jemacs.lang.Symbol;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
@@ -80,8 +80,6 @@ public class CommonLisp extends Interpreter
   {
     if (arg instanceof Char)
       return gnu.math.IntNum.make(((Char) arg).intValue());
-    if (arg instanceof javax.swing.text.Position)
-      return gnu.math.IntNum.make(1 + ((javax.swing.text.Position) arg).getOffset());
     return (gnu.math.Numeric) arg;
   }
 
@@ -92,8 +90,6 @@ public class CommonLisp extends Interpreter
     int i;
     if (x instanceof gnu.math.Numeric)
       i = ((gnu.math.Numeric) x).intValue();
-    else if (x instanceof Position)
-      i = ((Position) x).getOffset() + 1;
     else
       i = -1;
     if (i < 0 || i > 0xffff)
@@ -108,7 +104,7 @@ public class CommonLisp extends Interpreter
 
   public String getName()
   {
-    return "Emacs-Lisp";
+    return "CommonLisp";
   }
 
   static CommonLisp instance;

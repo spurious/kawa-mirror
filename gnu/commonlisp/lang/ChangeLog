@@ -1,3 +1,11 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java:  Update for new gnu.lists.
+	
+	(asNumber):  Don't allow Position.
+	(getName):  Return "CommonLisp" (not "Emacs-Lisp"!).
+	
+
 2000-10-14  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (getInstance): Restore current Environment when done.

@@ -13,6 +13,9 @@ import gnu.expr.*;
 
 public class let extends Syntax implements Printable
 {
+  public static final let let = new let();
+  static { let.setName("let"); }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))

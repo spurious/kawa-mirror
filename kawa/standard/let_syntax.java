@@ -25,7 +25,8 @@ public class let_syntax extends Syntax implements Printable
     Object body = pair.cdr;
     int decl_count = LList.length (bindings);
     Expression[] inits = new Expression[decl_count];
-    Macro[] decls = new Macro[decl_count];
+    Declaration[] decls = new Declaration[decl_count];
+    Macro[] macros = new Macro[decl_count];
     Object[] transformers = new Object[decl_count];
     LetExp let = new LetExp (inits);
     for (int i = 0; i < decl_count; i++)
@@ -42,7 +43,9 @@ public class let_syntax extends Syntax implements Printable
 	binding = (Pair) binding.cdr;
 	if (binding.cdr != LList.Empty)
 	  return tr.syntaxError("let binding for `"+name+"' is improper list");
-        decls[i] = new Macro(name);
+        macros[i] = new Macro(name);
+        decls[i] = new Declaration(name);
+        macros[i].bind(decls[i]);
 	transformers[i] = binding.car;
         let.addDeclaration(decls[i]);
 	inits[i] = QuoteExp.nullExp;
@@ -53,8 +56,7 @@ public class let_syntax extends Syntax implements Printable
     for (int i = 0; i < decl_count; i++)   
       {
         inits[i] = tr.rewrite(transformers[i]);
-	decls[i].expander = inits[i];
-        decls[i].noteValue(inits[i]);
+	macros[i].expander = inits[i];
       }
     if (! recursive)
       tr.push(let);

@@ -15,35 +15,31 @@ public class define_syntax extends Syntax
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Pair pair;
-    if (! (form.cdr instanceof Pair)
-        || ! ((pair = (Pair) form.cdr).car instanceof String
-              || pair.car instanceof Declaration))
-      return tr.syntaxError("Missing macro name for "+form.car);
-    String name;
-    Macro macro;
-    if (pair.car instanceof String)
+    Declaration decl;
+    try
       {
-        name = (String) pair.car;
-        macro = null;
+        pair = (Pair) form.cdr;
+        decl = (Declaration) pair.car;
       }
-    else
+    catch (Exception ex)
       {
-        macro = (Macro) pair.car;
-        name = macro.getName();
+        return tr.syntaxError(getName()+" not in a statement list");
       }
+    String name = decl.getName();
+    Macro macro = (Macro) decl.getConstantValue();
     if (! (pair.cdr instanceof Pair))
       return tr.syntaxError("Missing transformation for "+form.car);
     pair = (Pair) pair.cdr;
     Expression rule = tr.rewrite(pair.car);
     macro.expander = rule;
-    if (! (macro.context instanceof ModuleExp))
+    if (! (decl.context instanceof ModuleExp))
       {
 	return QuoteExp.voidExp;
       }
     else
       {
         // Add rule to translation environment.
-        tr.addGlobal(name, macro);
+        tr.addGlobal(name, decl);
 
         // Add rule to execution environment.
 	if (tr.immediate)
@@ -67,10 +63,8 @@ public class define_syntax extends Syntax
 	  }
 	else
 	  rule = new QuoteExp(macro);
-        SetExp result = new SetExp (macro, rule);
-                        
+        SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
-	macro.noteValue(rule);
         return result;
       }
   }
@@ -78,21 +72,25 @@ public class define_syntax extends Syntax
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
+    Pair p;
     if (! (st.cdr instanceof Pair)
-        || ! (((Pair) st.cdr).car instanceof String))
-      return super.scanForDefinitions(st, forms, defs, tr);
-    Pair p = (Pair) st.cdr;
-    Object name = p.car;
-    if (! (p.car instanceof String)
-        || ! (p.cdr instanceof Pair)
-        || (p = (Pair) p.cdr).cdr != LList.Empty)
+        || ! ((p = (Pair) st.cdr).car instanceof String))
+      {
+        forms.addElement(tr.syntaxError("Missing macro name for "+st.car));
+        return false;
+      }
+    String name = (String) p.car;
+    if (! (p.cdr instanceof Pair) || (p = (Pair) p.cdr).cdr != LList.Empty)
       {
         forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));
         return false;
       }
-    Macro macro = new Macro((String) name);
-    defs.addDeclaration(macro);
-    p = tr.makePair(st, this, new Pair(macro, p));
+
+    Declaration decl = defs.getDefine(name, 'w', tr);
+    Macro macro = new Macro(name);
+    macro.bind(decl);
+
+    p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
     return true;
   }

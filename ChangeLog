@@ -1,9 +1,13 @@
+2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* kawa/standard/Scheme.java (initScheme): Add invoke-static.
+
 2003-07-13  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Do followAliases
 	when checking for a namespace-using name.
 
-2003-07-12  Chris Dean  <Chris.Dean@sokitomi.com>
+2003-07-10  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* kawa/standard/syntax_rules.java (rewriteForm):  Allow Keywords among
 	the literals

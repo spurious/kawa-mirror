@@ -470,7 +470,9 @@ public class Scheme extends LispInterpreter
       define_field("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
       define_proc("invoke", gnu.kawa.reflect.Invoke.invoke);
+
       define_field("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
+      define_field("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");

@@ -45,7 +45,7 @@ of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
 
 The author of Kawa is
 @ifhtml
-<a href="http://home.pacbell.net/bothner/">Per Bothner</a>
+<a href="http://www.bothner.com/~per/">Per Bothner</a>
 <tt>&lt;<a href="mailto:per@bothner.com">per@bothner.com</a>&gt;</tt>.
 It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
 <tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>.
@@ -60,10 +60,6 @@ The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.
 The @uref{http://www.cygnus.com/~bothner/kawa.html, old Kawa home page}
 should also work.
-
-JEmacs is included in the Kawa distribution.  It is a project to
-re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
-It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
@@ -112,6 +108,7 @@ For a technical overview of Kawa, see these
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
 * Reporting Bugs::       The Kawa Mailing List
+* Projects::             Projects using Kawa
 * License::
 * Index::
 @end menu
@@ -2677,9 +2674,8 @@ letter converted to titlecase.  Thus @samp{number?} is
 converted to @samp{isNumber} (which fits with Java conventions),
 and @samp{file-exists?} is converted to @samp{isFileExists}
 (which doesn't really).
-The pair @samp{->} is translated to @samp{To}, and if followed
-by a letter, that is is converted to titlecase.
-For example @samp{list->string} is translated to @samp{listToString}.
+The pair @samp{->} is translated to @samp{$To$}.
+For example @samp{list->string} is translated to @samp{list$To$string}.
 
 Some symbols are mapped to a mnemonic sequence, starting with a dollar-sign,
 followed by a two-character abbreviation.  For example, the less-than
@@ -2836,6 +2832,8 @@ The field name is "mangled" (@pxref{Mangling}) into a valid Java name.
 If there is no accessible field whose name is @code{"@var{fieldname}"},
 we look for a no-argument method whose name is @code{"get@var{Fieldname}"}.
 
+If @var{object} is a primitive Java array, then @var{fieldname} can only
+be @code{'length}, and the result is the number of elements of the array.
 @end defun
 
 @defun static-field class fieldname
@@ -3158,11 +3156,12 @@ the resulting procedure must be an array whose elements have type
 Applying the procedure returns the element at the specified index.
 @end deffn
 
-@deffn Syntax primitive-array-new element-type
+@deffn Syntax primitive-array-length element-type
 Evaluates to a one-argument procedure.  The argument of
 the resulting procedure must be an array whose elements have type
 @var{element-type}.
 Applying the procedure returns the length of the array.
+(Alternatively, you can use @code{(field @var{array} 'length)}.)
 @end deffn
 
 @node Low-level Method invocation, Low-level Field operations, Array operations, Low-level functions
@@ -3344,7 +3343,7 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node Reporting Bugs, License, Low-level functions, Top
+@node Reporting Bugs, Projects, Low-level functions, Top
 @chapter Reporting Bugs and the Kawa Mailing List
 
 If you have a problem installing or using Kawa,
@@ -3361,7 +3360,54 @@ send mail to the address following @code{mailto:} in the
 Messages to the mailing list are now
 @uref{http://sourceware.cygnus.com/ml/kawa/, archived}.
 
-@node License, Index, Reporting Bugs, Top
+@node Projects, License, Reporting Bugs, Top
+@chapter Projects using Kawa
+
+JEmacs is included in the Kawa distribution.  It is a project to
+re-implement Emacs, allowing a mix of Java. Scheme, and Emacs Lisp.
+It has its own @uref{http://jemacs.sourceforge.net/,home-page}.
+
+BRL ("the Beautiful Report Language") is a database-oriented language
+to embed in HTML and other markup.
+@uref{http://brl.sourceforge.net/, BRL} allows you to embed Scheme in
+a an HTML file on a web server.
+
+The Health Media Research Laboratory, part of the Comprehensive Cancer
+Center at the University of Michigan, is using Kawa as an integral part of
+its core tailoring technologies. Java programs using Kawa libraries are used
+to administer customized web-based surveys, generate tailored feedback,
+validate data, and "characterize," or transform, data. Kawa code is embedded
+directly in XML-formatted surveys and data dictionaries. Performance and
+ease of implementation has far exceeded expectations. For more information
+contact Paul R. Potts, Technical Director, Health Media Research Lab,
+@code{<potts@@umich.edu>}.
+
+Mike Dillon (@code{mdillon@@gjt.org})
+did the preliminary work of creating a
+Kawa plugin for jEdit. It is called SchemeShell and provides a REPL inside
+of the jEdit console for executing expressions in Kawa (much as the BeanShell
+plugin does with the BeanShell scripting language).
+It is currently available only via CVS from:
+@example
+CVSROOT=:pserver:anonymous@@cvs.jedit.sourceforge.net:/cvsroot/jedit
+MODULE=plugins/SchemeShell
+@end example
+
+STMicroelectronics (@code{marco.vezzoli@@st.com})
+uses Kawa in a prototypal
+intranet 3tier information retrival system as a communication protocol
+between server and clients and to do server agents programming.
+
+Bossa is a research programming language that has a Java-like syntax,
+and features multiple dispatch
+methods, quantified parametric types, higher-order functions, and the new
+concept of "abstract interfaces".
+The Bossa compiler uses Kawa's @code{gnu.expr} and @code{gnu.bytecode}
+packages to generate Java bytecode.
+A GPLed release is planned. For more information feel free to contact
+Daniel Bonniot (@w{@code{d.bonniot@@mail.dotcom.fr}}).
+
+@node License, Index, Projects, Top
 @chapter License
 
 @section License for the Kawa software

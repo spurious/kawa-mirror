@@ -1,3 +1,11 @@
+2000-04-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Projects):  New section on projects using Kawa.
+	(Top):  Updated link to my home page.
+	(Mangling):  Updated mangling for '->'.
+	(Field operations):  Note that '(field array 'length)' works.
+	(Array operation):  Fix typo.
+
 2000-03-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Top):  Add link to JEmacs home page.

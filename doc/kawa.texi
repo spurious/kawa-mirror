@@ -495,8 +495,17 @@ Telnet client program to a remote "Kawa server".
 Set the default language to Scheme.
 (This is the default unless you select another language.)
 @item --elisp
+@itemx --emacs
+@itemx --emacs-lisp
 Set the default language to Emacs Lisp.
 (The implementation is quite incomplete.)
+@item --lisp
+@itemx --clisp
+@itemx --clisp
+@itemx --commonlisp
+@itemx --common-lisp
+Set the default language to CommonLisp.
+(The implementation is @em{very} incomplete.)
 @end table
 
 The following options control which calling conventions are used:

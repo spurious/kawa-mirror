@@ -1,3 +1,11 @@
+2004-10-07  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass):  Move staticModule variable earlier.
+	Make the apply_method ("run") static in a staticModule.
+	Call the apply_method from "<cinit>" if staticModule, regardless
+	of whether we have a moduleInstanceVar.
+	Fixes Savannah bug #10600 "top level vars not always initialized".
+
 2004-09-05  Per Bothner  <per@bothner.com>
 
 	* IfExp.java (walkChildren):  Allow else_clause to be null.

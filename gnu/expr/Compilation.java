@@ -1821,13 +1821,14 @@ public class Compilation
     CodeAttr code;
     Expression body = module.body;
     Variable heapFrame = module.heapFrame;
-
+    boolean staticModule = module.isStatic();
     Method apply_method;
-    boolean staticModule = false;
     
+    int apply_flags = Access.PUBLIC|Access.FINAL;
+    if (staticModule)
+      apply_flags |= Access.STATIC;
     apply_method
-      = curClass.addMethod ("run", arg_types, Type.void_type,
-			    Access.PUBLIC|Access.FINAL);
+      = curClass.addMethod ("run", arg_types, Type.void_type, apply_flags);
     method = apply_method;
     // For each parameter, assign it to its proper slot.
     // If a parameter !isSimple(), we cannot assign it to a local slot,
@@ -1854,8 +1855,6 @@ public class Compilation
     int line = module.getLine();
     if (line > 0)
       code.putLineNumber(line);
-
-    staticModule = module.isStatic();
 
     if (curClass == mainClass && staticModule)
       {
@@ -1903,11 +1902,10 @@ public class Compilation
 	  
 	dumpInitializers(clinitChain);
 
-	if (moduleInstanceVar != null)
+	if (staticModule)
 	  {
-	    code.emitLoad(moduleInstanceVar);
 	    code.emitInvokeStatic(getCallContextInstanceMethod);
-	    code.emitInvokeVirtual(apply_method);
+	    code.emitInvokeStatic(apply_method);
 	  }
 	code.emitReturn();
 

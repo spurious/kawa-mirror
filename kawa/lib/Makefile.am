@@ -27,6 +27,7 @@ java_SCM=\
   strings.scm \
   syntax.scm \
   vectors.scm \
-  system.scm
+  system.scm \
+  emacs.scm
 
 SOURCES = $(java_JAVA)

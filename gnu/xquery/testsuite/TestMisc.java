@@ -167,55 +167,55 @@ public class TestMisc
 	     "[<a at1=\"val1\"><b /><c /></a>][ at1=\"val1\"][<b />][<c />]");
 
     // Boundary whitsapce (xmlspace) tests:
-    evalTest("declare xmlspace = preserve\n"
+    evalTest("declare xmlspace preserve;\n"
 	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
 	     " ;<b/>;  x  ;");
-    evalTest("declare xmlspace = skip\n"
+    evalTest("declare xmlspace skip;\n"
 	     + "for $n in (<a> <b/> {' x '} </a>)/node() return ($n,';')",
 	     "<b/>; x ;");
-    evalTest("declare xmlspace = skip\n"
+    evalTest("declare xmlspace skip;\n"
 	     + "for $n in (<a> x <b/> y<c/>&#x20;</a>)/node() return ($n,';')",
 	     " x ;<b/>; y;<c/>; ;");
     evalTest("for $n in (<a> <b/> </a>)/node() return ($n,';')",
 	     "<b/>;");
 
     // Simple namespace tests.
-    evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='XXX'\n"
+    evalTest("declare namespace xx='XXX';\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='XXX';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
 	     "X1X2");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
 	     "X2");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*)",
 	     "X1X2");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:*)",
 	     "X1X2");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x1:*)",
 	     "X1");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:ab)",
 	     "X1X2");
-    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX';\n declare namespace x2='YYY';\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:cd>X2</x2:cd></top>)/*:cd)",
 	     "X2");
-    evalTest("declare namespace h='H'\n"
+    evalTest("declare namespace h='H';\n"
 	     + "string(document(\"tab.xml\")/result/h:row)",
 	     "\nc1\n33\n44\nc2\n");
-    evalTest("declare namespace xx='H'\n"
+    evalTest("declare namespace xx='H';\n"
 	     + "string(document(\"tab.xml\")/result/xx:row)",
 	     "\nc1\n33\n44\nc2\n");
     evalTest("string(document(\"tab.xml\")/result/*:row)",
 	     "\na1\n12\n\nb1\n22\n\nc1\n33\n44\nc2\n");
     evalTest("string(document(\"tab.xml\")/result/*:row/*:fld1)",
 	     "a1b1c1c2");
-    evalTest("declare namespace k='J'\n"
+    evalTest("declare namespace k='J';\n"
 	     + "string(document(\"tab.xml\")/result/*:row/k:fld1)",
 	     "c1c2");
-    evalTest("declare namespace k='J'\n"
+    evalTest("declare namespace k='J';\n"
 	     + "string(document(\"tab.xml\")/result/*:row[k:fld1])",
 	     "\nc1\n33\n44\nc2\n");
 
@@ -238,10 +238,10 @@ public class TestMisc
     evalTest("element r {let $y := <b x='1'/>"
 	     + " let $x:=<a>{$y}</a> return $x/b/@x}",
 	     "<r x=\"1\" />");
-    evalTest("declare function x(){<a><b x='1'/><b x='2'/></a>}"
+    evalTest("declare function x(){<a><b x='1'/><b x='2'/></a>};"
 	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
-    evalTest("declare function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>}"
+    evalTest("declare function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>};"
 	     + " let $st := s()/a return ("
 	     + " '[',$st/@x ,'] [',$st ,']')",
 	     "[ x=\"2\"] [<a x=\"2\" />]");
@@ -279,11 +279,11 @@ public class TestMisc
     evalTest("('2','3') instanceof string+", "true");
     evalTest("('2','3') instanceof string*", "true");
 
-    evalTest("declare namespace Int='class:java.lang.Integer'\n"
+    evalTest("declare namespace Int='class:java.lang.Integer';\n"
 	     + "Int:toHexString(266)", "10a");
-    evalTest("declare namespace File='class:java.io.File'\n"
-	     + "declare function make-file ($x as string) {File:new($x)}\n"
-	     + "declare function parent ($x) {java.io.File:getParent($x)}\n"
+    evalTest("declare namespace File='class:java.io.File';\n"
+	     + "declare function make-file ($x as string) {File:new($x)};\n"
+	     + "declare function parent ($x) {java.io.File:getParent($x)};\n"
 	     + "parent(make-file('dir/mine.txt'))", "dir");
     evalTest("java.lang.Integer:toHexString(255)", "ff");
 

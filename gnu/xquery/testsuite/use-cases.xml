@@ -219,7 +219,7 @@ additional authors.</description>
 <ident>Use Case "XMP" (Experiences and Exemplars) Q9</ident>
 <description>In the document "books.xml", find all section or chapter titles
 that contain the word "XML", regardless of the level of nesting.</description>
-<NOTE>books.xml has been inlines to the $books variable.</NOTE>
+<NOTE>books.xml has been inlined to the $books variable.</NOTE>
 <query>
 let $books :=
 document {
@@ -262,6 +262,7 @@ return
 <description>In the document "prices.xml", find the minimum price for
 each book, in the form of a "minprice" element with the book title as
 its title attribute.</description>
+<NOTE>needs distinct-values</NOTE>
 <query>
 <results>
   {
@@ -360,20 +361,21 @@ with the book title and the editor's affiliation.</description>
 <description><![CDATA[Prepare a (nested) table of contents for Book1, listing
 all the sections and their titles. Preserve the original attributes of
 each <section> element, if any.]]></description>
+<NOTE>return type in recursive call causes stack underflow.</NOTE>
 <query>
-(:define function toc($book-or-section as element()) as element()*:)
-define function toc($book-or-section as element())
+(:declare function toc($book-or-section as element()) as element()*:)
+declare function local:toc($book-or-section as element())
 {
     for $section in $book-or-section/section
     return
         <section>
-                { $section/@* , $section/title , toc($section) }            
+                { $section/@* , $section/title , local:toc($section) }            
         </section>
-}
+};
 
 <toc>
    {
-     for $s in doc("book1.xml")/book return toc($s)
+     for $s in doc("book1.xml")/book return local:toc($s)
    }
 </toc>
 </query>
@@ -477,7 +479,7 @@ immediately contained in the section.</description>
 <query><![CDATA[
 <section_list>
 {
-    for $s in document("book1.xml")//section
+    for $s in doc("book1.xml")//section
     let $f := $s/figure 
     return
         <section title="{ $s/title/text() }" figcount="{ count($f) }"/>
@@ -506,23 +508,50 @@ includes the number of figures immediately contained in the section.
 </description>
 <NOTE>removed newline between 'section' and attribute constructor</NOTE>
 <NOTE>removed 'element' in parameter spec and 'returns element'</NOTE>
+<NOTE>quite different in current use-case</NOTE>
+<!-- This version causes a bus error on mac!
 <query><![CDATA[
-define function section_summary($s)
+declare function local:section-summary($book-or-section)
+{
+  for $section in $book-or-section
+  return
+    <section>
+       { $section/@* }
+       { $section/title }
+       <figcount>
+         { count($section/figure) }
+       </figcount>
+       { local:section-summary($section) }
+    </section>
+};
+
+<toc>
+  {
+    for $s in doc("book1.xml")/book/section
+    return local:section-summary($s)
+  }
+</toc> ]]>
+</query>
+-->
+<query><![CDATA[
+declare function section_summary($s)
 {
     <section>
         { $s/@* }
         { $s/title }
-        <figcount>{ count($s/figure) }</figcount>
+       <figcount>
+         { count($s/figure) }
+       </figcount>
 {
             for $ss in $s/section
             return section_summary($ss)
         }
     </section>
-}
+};
 
 <toc>
 {
-    for $s in document("book1.xml")//section
+    for $s in doc("book1.xml")//section
     return section_summary($s)
 }
 </toc> ]]>
@@ -609,15 +638,16 @@ return ($s//instrument)[position()<=2]
 </expect>
 </test>
 
-<!--
-FAILS - don't know why
 <test>
 <ident>Use case "SEQ" (Queries based on Sequence) Q3</ident>
 <description>In Report1, what Instruments were used in the first
 two Actions after the second Incision?</description>
+<NOTE>two calls to doc pulled out to use same variable.
+Need to fix doc to cache previous NodeTree instances.</NOTE>
 <query><![CDATA[
-let $i2 := (doc("report1.xml")//incision)[2]
-for $a in (doc("report1.xml")//action)[. >> $i2][position()<=2]
+let $report1 := doc("report1.xml")
+let $i2 := ($report1//incision)[2]
+for $a in ($report1//action)[. >> $i2][position()<=2]
 return $a//instrument
 ]]></query>
 <expect>
@@ -625,7 +655,7 @@ return $a//instrument
 <instrument>trocar</instrument>
 </expect>
 </test>
--->
+<!--Q4 uses 'some ... satisfies' -->
 
 <test>
 <ident>Use Case "R" Q3 - Find cases where a user with a rating worse
@@ -783,7 +813,7 @@ return
 inline</NOTE>
 <query><![CDATA[
 
-define function one_level ($p as element(), $parts-data) as element()
+declare function one_level ($p as element(), $parts-data) as element()
 {
     <part partid="{ $p/@partid }"
           name="{ $p/@name }" >
@@ -793,7 +823,7 @@ define function one_level ($p as element(), $parts-data) as element()
             return one_level($s, $parts-data)
         }
     </part>
-}
+};
 
 let $parts-list :=
 <partlist>

@@ -1,3 +1,16 @@
+Fri Sep 13 08:21:33 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/call_with_input_string.javaL  New class.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}}:  Update.
+	* kawac.java, kawa/Shell.java:  Don't use old GenericError.message.
+
+	* kawa.java:  Re-write to do options processing.
+	* kawa/Shell.java:  Remove constructor.  Make run method static.
+	(runString, runFile):  New static methods.
+	* kawa.texi:  New documentation file.
+	* texinfo.tex:  New support file, needed for kawa.texi.
+	* Makefile.{am,in}:  Update for kawa.texi.
+
 Thu Sep 12 16:22:47 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Literal.java:  Make flags public.

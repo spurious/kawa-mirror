@@ -1,0 +1,266 @@
+\input texinfo.tex      @c -*-texinfo-*-
+@c %**start of header
+@setfilename kawa.info
+@settitle Kawa, the Java-based Scheme system
+@setchapternewpage off
+@c version: %W% %G%
+@c %**end of header
+
+@iftex
+@finalout
+@end iftex
+@titlepage
+@title Kawa, the Java-based Scheme system
+@subtitle September, 1996
+@sp 1
+@author Per Bothner
+@page
+@end titlepage
+
+@ifinfo
+@node Top, Features, (dir), (dir)
+@top
+@unnumbered The Kawa Scheme system, by Per Bothner
+@end ifinfo
+
+Kawa is a Scheme environment, written in java,
+and that compiles Scheme code into Java byte-codes.
+
+@menu
+* Features::
+* Installation::   Building and installing Kawa
+* Running::       How to start up and run Kawa
+* Restrictions::  Features of R4RS not implemented
+* Extensions::
+* Compilation::
+@end menu
+
+@node Features
+@section Features
+
+@node Installation
+@section Building and installing Kawa
+
+@subsection Setting up to use Java
+
+You will need a working Java system.
+The program 'java' is the Java interpreter.
+The program 'javac' is the Java compiler,
+and is needed if you want to compile the source release yourself.
+Both programs must both be in your @code{PATH}.
+
+You also need to set @code{CLASSPATH} so it includes both the
+current directory, and the standard Java library.
+
+If you have the Java Developer's Kit in directory @code{$JDK},
+and your are using a Bourne-shell compatible shell
+(/bin/sh, ksh, bash, or other) you can set both variables thus:
+@example
+export PATH=$JDK/bin:$PATH
+export CLASSPATH=.:$JDK/lib/classes.zip
+@end example
+
+@subsection Installing the binary release
+
+The binary release includes only the binary compiled (.class)
+versions of the same .java source files in the source release.
+It does not include any documentation, so you probably want the
+source release in addition to the binary release.  The prupose
+of the binary release is just to save you time and trouble
+compiling the sources.
+
+The binary release comes as a gzip-compress tar file:
+kawa-0.3-compiled.tar.gz.
+
+You need to decide where you want to put the kawa .class files.
+Assuming it is /usr/local/java, you can do:
+@example
+gunzip -c <kawa-0.3-compiled.tar.gz|(cd /usr/local/java; tar xf -)
+@end example
+
+Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
+so it includes the Kawa files.  For example:
+@example
+	export CLASSPATH=.:/usr/local/java:$JDK/lib/classes.zip
+@end example
+
+Then to run Kawa do:
+@example
+java kawa
+@end example
+
+@section Unpacking and Installation the source release
+The Kawa release normally comes as a gzip-compressed tar file.
+
+In your build directory do:
+@example
+tar xzf kawa-0.3.tar.gz
+cd kawa-0.3
+@end example
+
+Then you must configure the sources.  This you can do
+the same way you configure most other GNU software.  Normally
+you can just run the configure script with no arguments:
+
+@example
+./configure
+@end example
+
+This will specify that a later 'make install' will install the
+compiled .class files into /usr/local/java.  If you want them
+to be installed someplace else, such as $PREFIX/java, then
+specify that when you run configure:
+
+@example
+./configure -- prefix $PREFIX
+@end example
+
+Thus you need to compile all the .java source files.
+Just run make:
+@example
+make
+@end example
+
+You can now test the system by running Kawa in place:
+@example
+java kawa
+@end example
+
+or you can install the compiled files:
+@example
+make install
+@end example
+
+This will install your classes into $PREFIX/java (and its
+sub-directories).  Here $PREFIX is the directory you specified
+to configure with the --prefix option, or /usr/local if you
+did not specify a --prefix option.
+
+To use the installed files, you need to set CLASSPATH so
+that $PREFIX/java is on the path:
+@example
+export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
+@end example
+
+@node Running
+@section How to start up and run Kawa
+
+To running Kawa, you must start a Java interpreter.
+This depends on the Java interpreter.
+For JavaSoft's JDK, you do:
+@example
+java kawa
+@end example
+
+You can pass various flags to Kawa, for example:
+@example
+java kawa -e '(display (+ 12 4))(newline)'
+@end example
+This causes Kawa to print @samp{16}, and then exit.
+
+@table @samp
+@item -c @var{expr}
+Kawa evalutes @var{expr}, which contains one or more Scheme expressions.
+@item -e @var{expr}
+Same as @samp{-c @var{expr}}.
+@item -f @var{filename}
+Kawa reads and evaluates expressions from the file named by @var{filename}.
+If @var{filename} is @samp{-}, standard input is read (with no prompting).
+@item -s
+@itemx --
+The global variable @samp{command-line-arguments} is set to the remaining
+arguments (if any), and an interactive read-eval-print loop is started.
+@end table
+
+If there are further command-line arguments after the options
+have been processed, then the first remaining argument names a
+file that is read and evaluated.  If there is no such argument,
+then Kawa enters an interactive read-eval-print loop,
+but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
+or @samp{--} options were specified.
+
+@defvar command-line-arguments
+The remaining arguments (following any switches processed by Kawa itself)
+are assinged to the global variable @samp{command-line-arguments},
+which is a vector of strings.
+@end defvar
+
+@node Restrictions
+@section Features of R4RS not implemented
+
+The file Compliance.html specifies which functions and syntax
+have been implemented so far.
+
+The only numeric datatypes are fix-width (32-bit) integers, and
+double-precision floats.  Many of the numeric and math functions
+have not been implemented yet.
+
+Also, call-with-current-continuation is only "upwards" (?).
+I.e. once a continuation has been exited, it cannot be invoked.
+These restricted continuations can be used to implement catch/throw
+(such as the examples in R4RS), but not co-routines or backtracking.
+
+@subsection Tail-call elimination
+Kawa does not do general tail-call elimination.  However, if the
+compiler can prove that the procedure being called is the current
+function, then the tail call will be replaced by a jump.
+This means the procedure must be defined using a letrec, not a
+define (because the compiler does not know if someone might
+re-define a global definition), and there must be no assignments
+(using set!) to the procedure binding.
+
+@node Extensions
+@section Extensions
+
+@defun exit [code]
+Exits the Kawa interpreter, and ends the Java session.
+The integer value @var{code} is returned to the operating
+system.  If @var{code} is not specified, zero is returned,
+indicating normal (non-error) termination.
+@end defun
+
+@defmac when condition form...
+If @var{condition} is true, evaluate each @var{form} in order,
+returning the value of the last one.
+@end defmac
+
+@defmac unless condition form...
+If @var{condition} is false, evaluate each @var{form} in order,
+returning the value of the last one.
+@end defmac
+
+@defun vector-append arg...
+Creates a new vector, containing the elements from all the @var{arg}s
+appended together.   Each @var{arg} may be a vector or a list.
+@end defun
+
+@node Compilation
+@section Compilation
+To byte-compile a file @samp{foo.scm} do:
+@example
+(compile-file "foo.scm" "foo")
+@end example
+
+This will create @samp{foo.zip}, which contains bytecompiled "j-code"
+that implements @samp{foo.scm}.
+
+You can later do:
+@example
+(load "foo")
+@end example
+
+This will load @samp{foo.zip}, which should have the same effect as
+loading @samp{foo.scm}, except you will get the byte-compiled versions.
+
+Actually, note that if you type a lambda expression to the
+read-eval-print loop, or there is one in a @samp{.scm} file you load,
+those procedures will actually be compiled into bytecodes too.
+The evaluator (in the traditional sense) is only used for top-level
+expressions @emph{outside} a lambda.  (It would have been more elegant
+to also byte-compile top-level expressions by surrounding them
+by a dummy lambda.  However, this would create a new Class object
+in the Java VM for every top-level expression.  This is undesirable
+unless you hava a VM that can garbage collect Class objects.
+I believe Sun's VM currently does not, but that is planned for JDK 1.1.)
+
+@bye

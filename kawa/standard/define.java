@@ -19,7 +19,12 @@ public class define extends Syntax implements Printable
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    if (p2.cdr == List.Empty)
-	      return new SetExp ((Symbol)p1.car, interp.rewrite (p2.car));
+	      {
+		SetExp result = new SetExp ((Symbol)p1.car,
+					    interp.rewrite (p2.car));
+		result.setDefining (true);
+		return result;
+	      }
 	  }
 	else if (p1.car instanceof Pair)
 	  {
@@ -29,7 +34,9 @@ public class define extends Syntax implements Printable
 		Symbol name = (Symbol) p2.car;
 		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, interp);
 		lexp.setName (name.toString ());
-		return new SetExp (name, lexp);
+		SetExp result = new SetExp (name, lexp);
+		result.setDefining (true);
+		return result;
 	      }
 	  }
       }

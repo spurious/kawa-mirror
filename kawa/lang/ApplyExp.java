@@ -1,4 +1,5 @@
 package kawa.lang;
+import codegen.*;
 
 /** This class is used to represent "combination" or "application".
  * A function and arguments are evaluated, and then the function applied.
@@ -31,6 +32,35 @@ public class ApplyExp extends Expression
     for (int i = 0; i < n; i++)
       vals[i] = args[i].eval (env);
     return ((kawa.lang.Procedure)rator).applyN (vals);
+  }
+
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    Method applymethod;
+    func.compile (comp, false);
+    comp.method.compile_checkcast (comp.scmProcedureType);
+    if (args.length <= 4)
+      {
+	for (int i = 0; i < args.length; ++i)
+	  args[i].compile (comp, false);
+	applymethod = comp.applymethods[args.length];
+      }
+    else
+      {
+	comp.method.compile_push_int (args.length);
+	comp.method.compile_new_array (comp.scmObjectType);
+	for (int i = 0; i < args.length; ++i)
+	  {
+	    comp.method.compile_dup (comp.scmObjectType);
+	    comp.method.compile_push_int (i);
+	    args[i].compile (comp, false);
+	    comp.method.compile_array_store (comp.scmObjectType);
+	  }
+	applymethod = comp.applyNmethod;
+      }
+    comp.method.compile_invoke_virtual (applymethod);
+    if (ignore_result)
+      comp.method.compile_pop (1);
   }
 
   public void print (java.io.PrintStream ps)

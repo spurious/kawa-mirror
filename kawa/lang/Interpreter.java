@@ -43,6 +43,8 @@ public class Interpreter extends Object
   public java.util.Hashtable current_decls;
   ScopeExp current_scope;
 
+  public LambdaExp currentLambda () { return current_scope.currentLambda (); }
+
   protected QuasiQuote      quasiquote;
   protected Unquote         unquote;
   protected UnquoteSplicing unquotesplicing;
@@ -77,10 +79,13 @@ public class Interpreter extends Object
       define(quasiquote.name,quasiquote);
       define(unquote.name,unquote);
       define(unquotesplicing.name,unquotesplicing);
+      define("compile-func", new compilefunc ());
+      define("load-compiled", new loadcompiled ());
+      //      define("foo-compiled", new Foo ());
 
    }
 
-  public void define(java.lang.String name,Object p)
+  public void define(String name, Object p)
   {
     globals.put(name,p);
   }
@@ -88,6 +93,16 @@ public class Interpreter extends Object
   public void define(Symbol sym, Object p)
   {
     globals.put(sym.toString (),p);
+  }
+
+  public static Object lookup_global (String name)
+  {
+    return curInterpreter.lookup (name);
+  }
+
+  public static void define_global (String name, Object new_value)
+  {
+    curInterpreter.define (name, new_value);
   }
 
   public Object lookup(java.lang.String name)
@@ -234,6 +249,35 @@ public class Interpreter extends Object
     return new ErrorExp (message);
   }
 
+  /** Resolve a symbol to a Declaration.
+   * May cause the Declaration to be "captured" in a closure ("heapFrame").
+   * @param sym the symbol whose Declaration we want
+   * @return the Declaration, or null if there no lexical Declaration */
+  public Declaration resolve (Symbol sym)
+  {
+    Declaration decl = (Declaration) current_decls.get (sym);
+    if (decl != null)
+      {
+	LambdaExp curLambda = currentLambda ();
+	LambdaExp declLambda = decl.context.currentLambda ();
+	if (curLambda != declLambda)
+	  {
+	    decl.setSimple (false);
+	    LambdaExp lambda = curLambda;
+	    for (; lambda != declLambda; lambda = lambda.outerLambda ())
+	      {
+		if (lambda.staticLink == null)
+		  lambda.staticLink
+		    = lambda.add_decl (Symbol.make ("staticLink"),
+				       Compilation.objArrayType);
+		if (lambda != curLambda)
+		  lambda.staticLink.setSimple (false);
+	      }
+	  }
+      }
+    return decl;
+  }
+
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */
@@ -268,11 +312,8 @@ public class Interpreter extends Object
       }
     else if (exp instanceof Symbol)
       {
-	ReferenceExp rexp = new ReferenceExp ((Symbol)exp);
-	Declaration decl = (Declaration) current_decls.get (rexp.symbol);
-	if (decl != null)
-	  rexp.binding = decl;
-	return rexp;
+	Symbol sym = (Symbol) exp;
+	return new ReferenceExp (sym, resolve (sym));
       }
     else if (exp instanceof Expression)
       return (Expression) exp;

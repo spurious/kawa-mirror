@@ -13,5 +13,12 @@ public abstract class Expression implements Printable
 
   abstract public void print (java.io.PrintStream ps);
 
-  // abstract public void compile (Method method);
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    System.err.print ("Unimplemented Expression.compile method for ");
+    System.err.println (getClass ());
+    if (!ignore_result)
+      comp.method.compile_push_null ();
+  }
+
 }

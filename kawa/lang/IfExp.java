@@ -1,4 +1,5 @@
 package kawa.lang;
+import codegen.*;
 
 /**
  * This class represents a conditional.
@@ -35,6 +36,31 @@ public class IfExp extends Expression
       return else_clause.eval (env);
     else
       return Interpreter.undefinedObject;
+  }
+
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    test.compile (comp, false);
+    comp.compileConstant (Interpreter.falseObject);
+    Label else_label = new Label (comp.method);
+    comp.method.compile_goto_ifeq (else_label);
+    then_clause.compile (comp, ignore_result);
+    Label end_label;
+    if (else_clause == null && ignore_result)
+      end_label = null;
+    else
+      {
+	end_label = new Label (comp.method);
+	comp.method.compile_goto (end_label);
+      }
+
+    else_label.define (comp.method);
+    if (else_clause != null)
+      else_clause.compile (comp, ignore_result);
+    else if (! ignore_result)
+      comp.compileConstant (Interpreter.undefinedObject);
+    if (end_label != null)
+      end_label.define (comp.method);
   }
 
   public void print (java.io.PrintStream ps)

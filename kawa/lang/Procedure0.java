@@ -7,13 +7,18 @@ package kawa.lang;
 
 public abstract class Procedure0 extends Procedure
 {
+  public Procedure0 ()
+  {
+    super();
+  }
 
-   public Procedure0(java.lang.String n) {
-      super(n);
-   }
+  public Procedure0 (java.lang.String n)
+  {
+    super(n);
+  }
 
-   public abstract Object apply0 ()
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol;
+  public abstract Object apply0 ()
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol;
 
   public Object apply1 (Object arg1)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol

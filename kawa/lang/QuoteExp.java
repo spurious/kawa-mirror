@@ -16,6 +16,12 @@ public class QuoteExp extends Expression
     return value;
   }
 
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    if (!ignore_result)
+      comp.compileConstant (value);
+  }
+
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%quote ");

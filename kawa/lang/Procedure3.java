@@ -7,6 +7,10 @@ package kawa.lang;
 
 public abstract class Procedure3 extends Procedure
 {
+  public Procedure3 ()
+  {
+    super();
+  }
 
   public Procedure3(java.lang.String n)
   {

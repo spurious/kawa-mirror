@@ -27,15 +27,13 @@ public class letstar extends Syntax implements Printable
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
     Pair bind_pair = (Pair) bindings;
     Expression[] inits = new Expression[1];
-    Declaration[] decls = new Declaration [1];
     Object[] bind_match = pattern2.match (bind_pair.car);
     if (bind_match == null)
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
     if (! (bind_match[0] instanceof Symbol))
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body) [var is not an identifier]");
-    LetExp let = new LetExp (decls, inits);
+    LetExp let = new LetExp (inits);
     let.add_decl ((Symbol) bind_match[0]);
-    decls[0].index = 0;
     inits[0] = interp.rewrite (bind_match[1]);
     let.push (interp);
     let.body = rewrite (bind_pair.cdr, body, interp); // self-recurse

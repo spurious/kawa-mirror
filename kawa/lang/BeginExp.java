@@ -23,6 +23,14 @@ public class BeginExp extends Expression
     return exps[i].eval (env);
   }
 
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    int n = exps.length, i;
+    for (i = 0; i < n - 1; i++)
+      exps[i].compile (comp, true);
+    exps[i].compile (comp, ignore_result);
+  }
+
   public void print (java.io.PrintStream ps)
   {
     ps.print("(#%begin");

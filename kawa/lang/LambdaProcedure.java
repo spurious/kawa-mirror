@@ -25,6 +25,11 @@ public class LambdaProcedure extends ProcedureN
 	|| (lexpr.max_args >= 0 && args.length > lexpr.max_args))
       throw new WrongArguments(this.name,lexpr.min_args,"(?)");
     Object[] frame = new Object[lexpr.space_needed];
+    Environment new_env = new Environment (frame, lexpr, environment);
+    if (lexpr.heapFrame != null)
+      frame[lexpr.heapFrame.offset] = new Object[lexpr.heapSize];
+    if (lexpr.staticLink != null)
+      lexpr.staticLink.setValue (new_env, environment.values);
     System.arraycopy (args, 0, frame, 0, lexpr.min_args);
     if (lexpr.max_args < 0) // Variable-arity procedure
       {
@@ -34,6 +39,6 @@ public class LambdaProcedure extends ProcedureN
 	  list = new Pair (args[i], list);
 	frame[lexpr.min_args] = list;
       }
-    return lexpr.body.eval (new Environment (frame, lexpr, environment));
+    return lexpr.body.eval (new_env);
   }
 }

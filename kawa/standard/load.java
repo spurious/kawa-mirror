@@ -27,13 +27,17 @@ public class load extends Procedure1 {
     Interpreter interpreter = Interpreter.current ();
     Environment env = new Environment (interpreter);
     Object last = Interpreter.voidObject;
-    int i = 0;
-    for (;; i++)
+    for (;;)
       {
 	Object obj;
 	try
 	  {
 	    obj = port.readSchemeObject ();
+	    if (obj == Interpreter.eofObject)
+	      {
+		port.close ();
+		break;
+	      }
 	  }
 	catch (SyntaxError e)
 	  {
@@ -43,8 +47,6 @@ public class load extends Procedure1 {
 	  {
 	    throw new GenericError ("I/O exception in load: " + e.toString ());
 	  }
-	if (obj == Interpreter.eofObject)
-	  break;
 	int save_errors = interpreter.errors;
 	Expression exp;
 	try

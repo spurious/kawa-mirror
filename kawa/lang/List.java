@@ -72,4 +72,21 @@ public class List extends Sequence implements Printable
 	n += 2;
       }
   }
+
+  public static List makeList (Object[] vals, int offset, int length)
+  {
+    List result = Interpreter.nullObject;
+    for (int i = length;  --i >= 0; )
+      result = new Pair (vals[offset+i], result);
+    return result;
+  }
+
+  public static List makeList (Object[] vals, int offset)
+  {
+    List result = Interpreter.nullObject;
+    for (int i = vals.length - offset;  --i >= 0; )
+      result = new Pair (vals[offset+i], result);
+    return result;
+  }
 }
+

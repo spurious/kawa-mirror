@@ -7,6 +7,11 @@ package kawa.lang;
 
 public abstract class Procedure extends Named implements Executable, Printable
 {
+  public Procedure()
+  {
+    super("<unknown>");
+  }
+
   public Procedure(java.lang.String n)
   {
     super(n);
@@ -73,7 +78,8 @@ public abstract class Procedure extends Named implements Executable, Printable
   public void print(java.io.PrintStream ps)
   {
     ps.print ("#<procedure ");
-    ps.print (name ());
+    String n = name ();
+    ps.print (n == null ? "<null>" : n);
     ps.print ('>');
   }
 }

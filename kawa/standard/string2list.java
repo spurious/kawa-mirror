@@ -15,13 +15,13 @@ public class string2list extends Procedure1
   public Object apply1 (Object arg1)
        throws WrongType
   {
-     java.lang.StringBuffer str = (java.lang.StringBuffer)arg1;
+    StringBuffer str = (StringBuffer) arg1;
 
-     int len = str.length();
+    int len = str.length();
 
-     List result = Interpreter.nullObject;
-     for (int i=len; --i >= 0; )
-       result = new Pair(new Char (str.charAt(t)), result);
-     return result;
+    List result = Interpreter.nullObject;
+    for (int i=len; --i >= 0; )
+      result = new Pair(Char.make (str.charAt(i)), result);
+    return result;
   }
 }

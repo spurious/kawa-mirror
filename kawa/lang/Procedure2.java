@@ -13,6 +13,10 @@ public abstract class Procedure2 extends Procedure
   {
     super(n);
   }
+  public Procedure2()
+  {
+    super();
+  }
 
   public Object apply0 ()
       throws WrongArguments, WrongType, GenericError, UnboundSymbol

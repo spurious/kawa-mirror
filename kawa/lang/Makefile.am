@@ -73,6 +73,12 @@ Procedure0or1.class \
 Procedure1or2.class \
 ProcedureN.class \
 Syntax.class \
+Literal.class \
+Compilation.class \
+compilefunc.class \
+loadcompiled.class \
+SchemeLoader.class \
+CompiledProc.class \
 $(EXCEPTIONS)
 
 java_DATA=$(OBJ) $(EXCEPTIONS)

@@ -50,7 +50,7 @@ public class Environment
       {
 	Declaration decl = env.scope.lookup (sym);
 	if (decl != null)
-	  return env.values[decl.index];
+	  return env.values[decl.offset];
       }
     return interp.globals.get (sym.toString ());
   }

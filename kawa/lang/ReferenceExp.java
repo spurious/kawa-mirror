@@ -11,24 +11,71 @@ public class ReferenceExp extends Expression
   Declaration binding;
   public String string_name () { return symbol.toString (); }
 
-  public ReferenceExp (Symbol symbol) { this.symbol = symbol; }
+  public ReferenceExp (Symbol symbol)
+  {
+    this.symbol = symbol;
+  }
+
+  public ReferenceExp (Symbol symbol, Declaration binding)
+  {
+    this.symbol = symbol;
+    this.binding = binding;
+  }
 
   public Object eval (Environment env)
        throws kawa.lang.UnboundSymbol
   {
+    Object val;
     if (binding != null)
+      return binding.getValue (env);
+    else
       {
-	ScopeExp scope = binding.context;
-	while (scope.shared)
-	  scope = scope.outer;
-	while (env.scope != scope)
-	  env = env.outer;
-	return env.values[binding.index];
+	val = env.interp.lookup (symbol);
+	if (val == null)
+	  throw 
+	    new UnboundSymbol(symbol.toString ());
       }
-    Object val = env.interp.lookup (symbol);
-    if (val == null)
-      throw new UnboundSymbol(symbol.toString ());
     return val;
+  }
+
+  static public void compile_load (Declaration decl, Compilation comp)
+  {
+    if (decl.baseVariable != null)
+      {
+	compile_load (decl.baseVariable, comp);  // recursive!
+	comp.method.compile_push_int (decl.offset);
+	comp.method.compile_array_load (Compilation.scmObjectType);
+      }
+    else
+      {
+	LambdaExp curLambda = comp.curLambda;
+	LambdaExp declLambda = decl.context.currentLambda ();
+	if (curLambda != declLambda)
+	  {
+	    comp.method.compile_push_value (curLambda.staticLink);
+	    LambdaExp lambda = curLambda.outerLambda ();
+	    for ( ; lambda != declLambda;  lambda = lambda.outerLambda ())
+	      {
+		comp.method.compile_push_int (lambda.heapFrame.offset);
+		comp.method.compile_array_load (Compilation.scmObjectType);
+	      }
+	  }
+	else
+	  comp.method.compile_push_value (decl);
+      }
+  }
+
+  public void compile (Compilation comp, boolean ignore_result)
+  {
+    if (ignore_result)
+      return;
+    if (binding != null)
+      compile_load (binding, comp);
+    else
+      {
+	comp.method.compile_push_string (symbol.toString ());
+	comp.method.compile_invoke_static (comp.lookupGlobalMethod);
+      }
   }
 
   public void print (java.io.PrintStream ps)

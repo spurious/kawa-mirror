@@ -8,21 +8,19 @@ import kawa.lang.*;
 
 public class let extends Syntax implements Printable
 {
-  static private Pattern pattern = new VarListPat (1);
   static private Pattern pattern2 = new ListPat (2);
 
   public Expression rewrite (Object obj, Interpreter interp)
        throws kawa.lang.WrongArguments
   {
-    Object [] match = pattern.match (obj);
-    if (match == null)
-      throw new kawa.lang.WrongArguments("let",2,"(let bindings body)");
-    Object bindings = match[0];
-    Object body = match[1];
+    if (! (obj instanceof Pair))
+      return interp.syntaxError ("missing let arguments");
+    Pair pair = (Pair) obj;
+    Object bindings = pair.car;
+    Object body = pair.cdr;
     int decl_count = kawa.standard.length.length (bindings);
     Expression[] inits = new Expression[decl_count];
-    Declaration[] decls = new Declaration [decl_count];
-    LetExp let = new LetExp (decls, inits);
+    LetExp let = new LetExp (inits);
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;

@@ -282,8 +282,7 @@ public class StandardInterpreter extends Interpreter
       //-- (let* ((n obj)...) e1 ... )
       define("let*", new kawa.standard.letstar());
       //-- (letrec ((n obj)...) e1 ... )
-      syn = new kawa.standard.letrec();
-      define(syn.name,syn);
+      define("letrec", new letrec());
       //-- (define sym obj)
       define("define", new kawa.standard.define());
       //-- (apply sym obj)

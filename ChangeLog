@@ -1,3 +1,22 @@
+2001-02-28  Per Bothner  <per@bothner.com>
+
+	Support for compiling Kawa using Gcj.
+	* Make-rules:  New file, to be include by each Makefile.am.
+	* Makefile.am (JAVADOC_PACKAGES):  Add "recent" packages.
+	(kawa1$(exeext)):  Make, using gcj, Kawa executable (Java-only part).
+	M aclocal.m4
+	* configure.in:  Add support for --enable-gjc-compiled flag.
+	* .../Makefile.am:  Include Make-rules; handle --enable-gjc-compiled.
+
+	* kawa/lang/Record.java:  Use fully-qualified java.lang.reflect.Field
+	instead of import, as latter confuses Gcj.
+	* kawa/standard/Scheme.java:  Use define_field for display.
+	* kawa/standard/map.java:  Fix typo in comment.
+	* kawa/standard/require.java (featureMap, SLIB_PREFIX): Static fields
+	moved from gnu.kawa.slib.SLib.
+	(map, mapFeature):  Methods moved from gnu.kawa.slib.SLib.
+	(scanForDefinitions):  Uddate to use local mapFeature.
+
 2001-02-27  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (main):  Field dumpZipPrefix moved to ModuleExp.

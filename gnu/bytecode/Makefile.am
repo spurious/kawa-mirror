@@ -2,13 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-JAVAC = @JAVAC@
-JAVACFLAGS = -g
-SOURCES = $(java_JAVA)
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
 Access.java \
@@ -47,25 +41,16 @@ ClassTypeWriter.java \
 ExceptionsAttr.java \
 dump.java
 
-JC1FLAGS = -g
-GCC = ../../../gcc/xgcc -B../../../gcc/
+PACKAGE_FNAME = gnu-bytecode
 
-gnu-bytecode.zip: classjava.stamp
-	cd ../..; \
-	  zip -q -r -n .class gnu/bytecode/gnu-bytecode.zip \
-	  gnu/bytecode -i '*.class' -x gnu/bytecode/ZipLoader.class
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o dump$(exext)
 
-gnu-bytecode.o:  gnu-bytecode.zip
-	CLASSPATH=`pwd`/../../../libjava \
-	  $(GCC) -c -fassume-compiled $(JC1FLAGS) \
-	  -x java gnu-bytecode.zip -o gnu-bytecode.o
+all: $(@GCJ_COMPILED_SELECTED@)
 
-dump-main.o:  dump-main.cc
-	$(GCC) -g -I$(srcdir)/../../../libjava/include -c \
-	  $(srcdir)/dump-main.cc -o dump-main.o	
+dump$(exext):  $(OFILES_DIR)/gnu-bytecode.o
+	$(GCJ) -o dump --main=gnu.bytecode.dump $(OFILES_DIR)/gnu-bytecode.o
 
-dump$(exext):  dump-main.o gnu-bytecode.o
-	$(GCC) -o dump dump-main.o gnu-bytecode.o \
-	  ../../../libjava/libjava.a
+CLEANFILES = *.class *.o *.stamp dump$(exext)
 
 EXTRA_DIST = package.html
+

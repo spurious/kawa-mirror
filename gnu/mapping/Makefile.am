@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   AliasConstraint.java \
@@ -54,3 +52,7 @@ java_JAVA=\
   WrongType.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-mapping
+
+all: $(@GCJ_COMPILED_SELECTED@)

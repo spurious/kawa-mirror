@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
 set_b.java \
@@ -92,3 +90,8 @@ ScmEnv.java Scheme.java \
 object.java define_class.java \
 TracedProcedure.java \
 scheme_env.java
+
+PACKAGE_FNAME = kawa-standard
+CLEANFILES = *.class *.o *.stamp
+
+all: $(@GCJ_COMPILED_SELECTED@)

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   ArrayGet.java \
@@ -24,5 +22,6 @@ EXTRA_DIST = package.html
 
 KAWA = $(JAVA) kawa.repl
 
-all: Makefile classjava.stamp
+PACKAGE_FNAME = gnu-kawa-reflect
 
+all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)

@@ -68,6 +68,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
+GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JEMACS_VERSION = @JEMACS_VERSION@
@@ -84,11 +85,26 @@ install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 
 
+
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
+SUFFIXES = .java .class .scm .el .lisp
 
 javadir = $(datadir)/java/$(subdir)
+
+GCJ = gcj
+JAR = fastjar
+GCJFLAGS = -gdwarf-2
+OFILES_DIR = $(TO_TOPDIR)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+TO_TOPDIR = $(top_builddir)
+GCJ_DEPS = $(java_JAVA)
+
+DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
+ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
+# Compiler to use for compiling builtin .scm/.el/.cl files.
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_JAVA = \
   AliasConstraint.java \
@@ -99,7 +115,6 @@ java_JAVA = \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   IndirectConstraint.java \
   CallFrame.java CallContext.java CpsProcedure.java \
-  CpsMethodContainer.java CpsMethodProc.java \
   Environment.java \
   FluidBinding.java \
   FluidConstraint.java \
@@ -139,6 +154,8 @@ java_JAVA = \
 
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-mapping
 subdir = gnu/mapping
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -155,8 +172,8 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .java .class
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .java .class .scm .el .lisp
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/Make-rules
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/mapping/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -282,6 +299,34 @@ mostlyclean-am: mostlyclean-generic mostlyclean-javaJAVA
 	mostlyclean-generic mostlyclean-javaJAVA uninstall uninstall-am \
 	uninstall-javaJAVA
 
+
+# Make sure $(KAWA1) is available, if --enable-gcj-compiled.
+$(TO_TOPDIR)/kawa1$(exeext):
+	cd $(TO_TOPDIR) && $(MAKE) kawa1$(exeext)
+
+$(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
+
+$(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
+	$(JAR) cf classes.jar *.class
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	  classes.jar -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+	rm classes.jar
+
+scm-classes.stamp: $(java_SCM)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --module-static -C $?
+	echo timestamp > scm-classes.stamp
+
+elisp-classes.stamp: $(java_ELISP)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
+	echo timestamp > elisp-classes.stamp
+
+all: $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_WITH_SWING = \
   Buffer.java \
@@ -37,21 +35,16 @@ java_JAVA=\
   $(java_@SWING_SELECTED@) \
   Signal.java
 
+java_SCM = emacs.scm
+
 EXTRA_DIST = emacs.scm $(EXTRA_JAVA) package.html
 
-KAWA = $(JAVA) kawa.repl
-KAWAFLAGS = -P gnu.jemacs.buffer. -C
+GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
+GCJ_DEPS = $(java_WITH_SWING) scm-classes.stamp
+PACKAGE_CFNAME = gnu-jemacs-buffer
+CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
 
-SCMSOURCES = emacs.scm
-
-CLEANFILES = *.class *.stamp
-
-scmclasses.stamp: $(SCMSOURCES)
-	cd ../../../kawa; $(MAKE) 
-	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
-	echo timestamp > scmclasses.stamp
-
-WITH_SWING: classjava.stamp scmclasses.stamp
+WITH_SWING: classjava.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 WITHOUT_SWING:
 

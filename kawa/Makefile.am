@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang standard lib
+include $(top_srcdir)/Make-rules
 
-SUFFIXES = .java .class
+SUBDIRS = lang standard lib
 
 bin_PROGRAMS = @kawa_bin@
 EXTRA_PROGRAMS = kawa
@@ -38,6 +38,8 @@ kawa.sh:
 	chmod +x tmp
 	mv tmp kawa.sh
 
+PACKAGE_FNAME = kawa-repl
+
 READLINE_INCLUDE_PATH =
 READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
@@ -47,7 +49,7 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 # Force repl.class to be built before sub-dirs.
 # Specifically, lib needs repl to compile scm files.
-all-recursive:  classjava.stamp
+all-recursive:  classjava.stamp $(@GCJ_COMPILED_SELECTED@)
 
 EXTRA_DIST = Version.java.in Version.java
 

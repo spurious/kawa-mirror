@@ -1,3 +1,9 @@
+2001-02-27  Per Bothner  <per@bothner.com>
+
+	* CpsMethodContainer.java:  New interface.
+	* CpsMethodProc.java:    New class, extends CpsProcedure.
+	* Makefile.am:  Update accordingly.
+
 2000-12-09  Per Bothner  <per@bothner.com>
 
 	* Binding.java (UNBOUND):  New static field - a special value.

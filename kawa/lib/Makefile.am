@@ -2,15 +2,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .scm .class
+include $(top_srcdir)/Make-rules
 
-KAWA = $(JAVA) kawa.repl
-JAVAC = $(KAWA)
-JAVACFLAGS = -P kawa.lib. --module-static -C
-
-javadir=$(datadir)/java/$(subdir)
-
-java_JAVA = $(java_SCM)
+PACKAGE_CFNAME = kawa-lib
+ENABLE_GCJ_COMPILED = ../../kawa1$(exeext) scm-classes.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
 
 java_SCM=\
   std_syntax.scm \
@@ -32,6 +27,10 @@ java_SCM=\
 
 SOURCES = $(java_JAVA)
 
+CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+
 # Used to generate makekawa.bat in ../.. .
 list-sources:
 	echo $(SOURCES)
+
+all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)

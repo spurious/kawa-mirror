@@ -46,14 +46,16 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/htdocs/api
-JAVADOC_PACKAGES = kawa kawa.lang kawa.standard \
+JAVADOC_PACKAGES = \
   gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text \
-  gnu.kawa.reflect gnu.jemacs.lang gnu.jemacs.buffer
+  gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
+  kawa kawa.lang kawa.standard \
+  gnu.jemacs.lang gnu.jemacs.buffer
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 
 MAINTAINERCLEANFILES = makekawa.bat
-MOSTLYCLEANFILES = tmp
+MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 
 install-javadoc-html:
 	rm -rf $(JAVADOC_DIR)
@@ -96,5 +98,22 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo 'cd ..\..\..\gnu\jemacs\buffer' >>tmp
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
+
+KAWA1_OFILES = \
+  gnu-bytecode.o \
+  gnu-expr.o \
+  gnu-kawa-functions.o \
+  gnu-kawa-lispexpr.o \
+  gnu-kawa-reflect.o \
+  gnu-kawa-util.o \
+  gnu-mapping.o \
+  gnu-math.o \
+  gnu-text.o \
+  kawa-lang.o \
+  kawa-repl.o \
+  kawa-standard.o
+
+kawa1$(exeext): $(KAWA1_OFILES)
+	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl
 
 distall:  distcheck kawa.jar jemacs.jar

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_WITH_SWING =\
   ELisp.java \
@@ -28,23 +26,16 @@ java_JAVA=\
 
 EXTRA_JAVA = $(java_WITH_SWING)
 
-KAWA = $(JAVA) kawa.repl
-KAWAFLAGS = -P gnu.jemacs.lang. -C
-
 SCM_WITH_SWING = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \
   MiscOps.scm
-SCMSOURCES = ListOps.scm $(SCM_@SWING_SELECTED@)
+java_SCM = ListOps.scm $(SCM_@SWING_SELECTED@)
+PACKAGE_CFNAME = gnu-jemacs-lang
 ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
-CLEANFILES = *.class *.stamp
-
 EXTRA_DIST = $(ALL_SCMSOURCES) $(EXTRA_JAVA) package.html
+CLEANFILES = *.class *.stamp *.jar
 
-scmclasses.stamp: $(SCMSOURCES)
-	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
-	echo timestamp > scmclasses.stamp
-
-all: Makefile classjava.stamp scmclasses.stamp
+all: Makefile classjava.stamp scm-classes.stamp
 
 # Used to generate makekawa.bat in ../../.. .
 list-sources:

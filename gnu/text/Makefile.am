@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   Char.java \
@@ -15,3 +13,7 @@ java_JAVA=\
   CaseConvertFormat.java FlushFormat.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-text
+
+all: $(@GCJ_COMPILED_SELECTED@)

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   ApplyExp.java \
@@ -62,3 +60,7 @@ java_JAVA=\
   Undefined.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-expr
+
+all: $(@GCJ_COMPILED_SELECTED@)

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   LispReader.java \
@@ -12,5 +10,6 @@ java_JAVA=\
 
 KAWA = $(JAVA) kawa.repl
 
-all: Makefile classjava.stamp
+PACKAGE_FNAME = gnu-kawa-lispexpr
 
+all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)

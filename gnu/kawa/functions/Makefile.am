@@ -2,6 +2,8 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+include $(top_srcdir)/Make-rules
+
 SUFFIXES = .java .class
 
 javadir=$(datadir)/java/$(subdir)
@@ -17,5 +19,6 @@ java_JAVA=\
   Setter.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
-all: Makefile classjava.stamp
+PACKAGE_FNAME = gnu-kawa-functions
 
+all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)

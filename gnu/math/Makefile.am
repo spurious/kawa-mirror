@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   Numeric.java \
@@ -21,3 +19,9 @@ java_JAVA=\
   ExponentialFormat.java
 
 EXTRA_DIST = package.html
+
+PACKAGE_FNAME = gnu-math
+
+CLEANFILES = *.class *.o *.stamp
+
+all: $(@GCJ_COMPILED_SELECTED@)

@@ -2,9 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .java
-
-javadir=$(datadir)/java/$(subdir)
+include $(top_srcdir)/Make-rules
 
 EXCEPTIONS=\
 GenericError.java\
@@ -37,3 +35,8 @@ SyntaxForm.java \
 Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)
+
+PACKAGE_FNAME = kawa-lang
+CLEANFILES = *.class *.o *.stamp
+
+all: $(@GCJ_COMPILED_SELECTED@)

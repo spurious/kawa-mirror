@@ -2,30 +2,19 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class .el
+include $(top_srcdir)/Make-rules
 
-javadir=$(datadir)/java/$(subdir)
-
-JAVA = @JAVA@
-CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
-JAVAROOT = $(top_builddir)
-
-KAWA = $(JAVA) kawa.repl
-KAWAFLAGS = -P gnu.jemacs.lisp. -C
-
-ELISPSOURCES = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
+java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
 
-SOURCES = $(ELISPSOURCES)
+GCJ_DEPS = elisp-classes.stamp
+PACKAGE_CFNAME = gnu-jemacs-lisp
+CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_FNAME).o
+
+SOURCES = $(java_ELISP)
 
 CLEANFILES = *.class *.stamp
 
-all: Makefile el_@SWING_SELECTED@.stamp
+all: Makefile $(@SWING_SELECTED@)
 
-el_WITH_SWING.stamp: $(ELISPSOURCES)
-	cd ../../../kawa; $(MAKE)
-	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) --elisp $(KAWAFLAGS) $?
-	echo timestamp > el_WITH_SWING.stamp
-
-el_WITHOUT_SWING.stamp:
-	echo timestamp > el_WITHOUT_SWING.stamp
+WITH_SWING = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)

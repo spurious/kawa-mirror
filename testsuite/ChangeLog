@@ -1,3 +1,9 @@
+Thu Mar 11 11:09:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* misc-test.scm:  Add another test.
+	* Makefile.am:  Set up to test different options, for now
+	both --no-full-tailcalls and --full-tailcalls for most tests.
+
 Mon Feb  8 22:42:58 1999  Per Bothner  <bothner@cygnus.com>
 
 	* misc-test.scm:  New regression test.

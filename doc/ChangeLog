@@ -1,3 +1,8 @@
+Tue Apr 28 21:55:07 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi (port-column, port-line, set-port-line!):  New.
+	Deprecated RScheme-style functions they subsume.
+
 Wed Mar 11 13:09:07 1998  Per Bothner  <bothner@cygnus.com>
 
 	* texinfo.tex:  Update to current version.

@@ -923,20 +923,40 @@ by @code{(input-port-read-state @var{port})}.
 The prompt has the form of a comment to make it easier to cut-and-paste.
 @end defun
 
+@defun port-column input-port
+@deffnx Function port-line input-port
+Return the current column number or line number of @var{input-port},
+using the current input port if none is specified.
+If the number is unknown, the result is @code{#f}.  Otherwise,
+the result is a 0-origin integer - i.e. the first character
+of the first line is line 0, column 0.  (However, when you
+display a file position, for example in an error message,
+we recommend you add 1 to get 1-origin integers.  This is
+because lines and column numbers traditionally start with
+1, and that is what non-programmers will find most natural.)
+@end defun
+
+@defun set-port-line! port line
+Set (0-origin) line number of the current line of @var{port} to @var{num}.
+@end defun
+
 @defun input-port-line-number port
 Get the line number of the current line of @var{port},
 which must be a (non-binary) input port.
 The initial line is line 1.
+Deprecated; replaced by @code{(+ 1 (port-line @var{port}))}.
 @end defun
 
 @defun set-input-port-line-number! port num
 Set line number of the current line of @var{port} to @var{num}.
+Deprecated;  replaced by @code{(set-port-line @var{port} (- @var{num} 1))}.
 @end defun
 
 @defun input-port-column-number port 
 Get the column number of the current line of @var{port}, 
 which must be a (non-binary) input port.
 The initial column is column 1.
+Deprecated; replaced by @code{(+ 1 (port-column @var{port}))}.
 @end defun
 
 @defun input-port-read-state port

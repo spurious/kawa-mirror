@@ -1,3 +1,7 @@
+2000-06-05  Per Bothner  <per@bothner.com>
+
+	* MethodProc.java (mostSpecific):  Fix type comparisons.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (mangleName):  Readable mangling of initial digit.

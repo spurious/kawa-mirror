@@ -229,6 +229,10 @@ public abstract class AbstractString extends UniformVector implements Printable
   /** Make a shared sub-string, using position values.
    * (In contrast, substring makes a copy, and takes raw offsets.)
    * (Does not necessarily do any error checking.)
+   * @param fromPosition an abstract position value in this string
+   * @param toPosition an abstract position value in this string
+   * Ownership of fromPosition and toPosition is transfered to the result,
+   * so caller cannot safely use them after the subString call.
    */
   public AbstractString subString(int fromPosition, int toPosition)
   {

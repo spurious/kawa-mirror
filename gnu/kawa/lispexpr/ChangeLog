@@ -1,5 +1,8 @@
 2001-05-16  Per Bothner  <per@bothner.com>
 
+	* LangPrimType.java (compare):  New method, handles <boolean>.
+	Fixes bug reported 05-11 by Allan Erskine <a.erskine@cs.ucl.ac.uk>.
+
 	* LangPrimType.java:  New class, renamed from kawa.lang.SpecialType.
 	* Makefile.am (java_sources):  Update accordingly.
 

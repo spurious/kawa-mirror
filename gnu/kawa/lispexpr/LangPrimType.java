@@ -158,4 +158,20 @@ public class LangPrimType extends gnu.bytecode.PrimType
       }
   }
 
+  public int compare(Type other)
+  {
+    // Anything (except void) can be converted to boolean.
+    char sig1 = getSignature().charAt(0);
+    if (other instanceof PrimType)
+      {
+	char sig2 = getSignature().charAt(0);
+	if (sig1 == sig2)
+	  return 0;
+	if (sig2 == 'V' || (sig2 == 'Z' && sig1 != 'V'))
+	  return -1;
+      }
+    if (sig1 == 'Z')
+      return 1;
+    return super.compare(other);
+  }
 }

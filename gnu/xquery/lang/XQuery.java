@@ -69,11 +69,13 @@ public class XQuery extends Interpreter
     return tr;
   }
 
-  public Compilation parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, boolean immediate,
+				gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
     Compilation tr = new Compilation(messages);
+    tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     tr.push(mexp);

@@ -46,10 +46,12 @@ public abstract class LispInterpreter extends Interpreter
     return tr;
   }
 
-  public Compilation parseFile (InPort port, SourceMessages messages)
+  public Compilation parseFile (InPort port, boolean immediate,
+				SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    kawa.lang.Translator tr = new  kawa.lang.Translator (environ, messages);
+    kawa.lang.Translator tr = new kawa.lang.Translator (environ, messages);
+        tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     if (Compilation.generateAppletDefault)
       mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);

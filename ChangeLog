@@ -1,3 +1,8 @@
+2002-11-05  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (read):  Call parseFile with new
+	'immediate' argument set to false.
+
 2002-10-28  Per Bothner  <bothner@bothner.com>
 
 	Rename the Binding and BindingEnumerator classes in gnu.mapping

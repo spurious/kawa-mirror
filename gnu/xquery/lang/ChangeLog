@@ -1,3 +1,7 @@
+2002-11-05  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (parseFile): Take and use new 'immediate' parameter.
+
 2002-10-22  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (DEFINE_TOKEN):  Remove constant.

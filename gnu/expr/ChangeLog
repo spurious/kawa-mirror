@@ -1,3 +1,9 @@
+2002-11-05  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (parseFile):  Take extra 'immediate' argument.
+	(eval):  Set/restore current Envronment and Interpreter.
+	Call parseFile with 'immediate' argument as true.
+
 2002-10-28  Per Bothner  <per@bothner.com>
 
 	* Symbol.java:  Renamed to Symbol.java.

@@ -330,7 +330,8 @@ public abstract class Interpreter
   public abstract Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException;
 
-  public abstract Compilation parseFile (InPort port, SourceMessages messages)
+  public abstract Compilation parseFile (InPort port, boolean immediate,
+					 SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException;
 
   public abstract Type getTypeFor(Class clas);
@@ -549,8 +550,22 @@ public abstract class Interpreter
   public void eval (InPort port, CallContext ctx) throws Throwable
   {
     SourceMessages messages = new SourceMessages();
-    Compilation comp = parseFile(port, messages);
-    ModuleExp.evalModule(environ, ctx, comp);
+    Environment saveEnviron = Environment.getCurrent();
+    if (saveEnviron != environ)
+      Environment.setCurrent(environ);
+    Interpreter saveInterp = defaultInterpreter;
+    Interpreter.defaultInterpreter = this;
+    try
+      {
+	Compilation comp = parseFile(port, true, messages);
+	ModuleExp.evalModule(environ, ctx, comp);
+      }
+    finally
+      {
+	if (saveEnviron != environ && saveEnviron != null)
+	  Environment.setCurrent(saveEnviron);
+	Interpreter.defaultInterpreter = saveInterp;
+      }
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"
 				 + messages.toString(20));

@@ -68,12 +68,14 @@ public class BRL extends Scheme
     return new XMLPrinter(out, false);
   }
 
-  public Compilation parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, boolean immediate,
+				gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
     kawa.lang.Translator tr
       = new  kawa.lang.Translator (Environment.user(), messages);
+    tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);

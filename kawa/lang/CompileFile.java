@@ -42,7 +42,7 @@ public class CompileFile extends Procedure2
   public static final Compilation read (InPort port, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    return Interpreter.getInterpreter().parseFile(port, messages);
+    return Interpreter.getInterpreter().parseFile(port, false, messages);
   }
 
   public final Object apply2 (Object arg1, Object arg2)

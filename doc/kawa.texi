@@ -536,6 +536,8 @@ Creates a new top-level window, and runs an interactive read-eval-print
 in the new window.  See @ref{New-Window}.
 Same as @code{-e (scheme-window #t)}.
 You can specify multiple @samp{-w} options, and also use @samp{-s}.
+@item --help
+Prints out some help.
 @item --version
 Prints out the Kawa version number, and then exits.
 @item --server @var{portnum}

@@ -740,9 +740,6 @@ public class Compilation
     else
       argsArray = null;
 
-    //if (! usingCPStyle)
-    //      lexp.declareClosureEnv();
-
     if (usingCPStyle() || (fewerClasses && curClass == mainClass))
       {
 	code = getCode();

@@ -96,11 +96,14 @@ XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
+@WITH_GCJ_TRUE@bin_PROGRAMS = @kawa_bin@ kawa-bin
+@WITH_GCJ_FALSE@bin_PROGRAMS = @kawa_bin@
+@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa
 
-bin_PROGRAMS = @kawa_bin@
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c
+kawa_bin_SOURCES = 
 CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 
 READLINE_INCLUDE_PATH = 
@@ -131,9 +134,6 @@ WITHOUT_GCJ_LIBS =
 libkawa_la_SOURCES = 
 libkawa_la_LIBADD =    $(KAWA1_OFILES)   gnu-ecmascript.lo   $(LIBADD_XML)   gnu-kawa-slib.lo   gnu-commonlisp-lisp.lo   kawa-lib.lo
 
-
-WITH_GCJ_COMPILED = kawa-bin$(EXEEXT) gckawa
-WITHOUT_GCJ_COMPILED = kawa.sh
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 LTLIBRARIES =  $(lib_LTLIBRARIES)
@@ -158,13 +158,17 @@ libkawa_la_LDFLAGS =
 @ENABLE_XML_TRUE@gnu-xquery-lang.lo gnu-kawa-slib.lo \
 @ENABLE_XML_TRUE@gnu-commonlisp-lisp.lo kawa-lib.lo
 libkawa_la_OBJECTS = 
-bin_PROGRAMS =  @kawa_bin@
+@WITH_GCJ_FALSE@bin_PROGRAMS =  @kawa_bin@
 PROGRAMS =  $(bin_PROGRAMS)
 
 kawa_OBJECTS =  kawa.$(OBJEXT)
 kawa_DEPENDENCIES = 
 kawa_LDFLAGS = 
-SCRIPTS =  $(noinst_SCRIPTS)
+kawa_bin_OBJECTS = 
+kawa_bin_LDADD = $(LDADD)
+kawa_bin_DEPENDENCIES = 
+kawa_bin_LDFLAGS = 
+SCRIPTS =  $(bin_SCRIPTS) $(noinst_SCRIPTS)
 
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -177,8 +181,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(libkawa_la_SOURCES) $(kawa_SOURCES)
-OBJECTS = $(libkawa_la_OBJECTS) $(kawa_OBJECTS)
+SOURCES = $(libkawa_la_SOURCES) $(kawa_SOURCES) $(kawa_bin_SOURCES)
+OBJECTS = $(libkawa_la_OBJECTS) $(kawa_OBJECTS) $(kawa_bin_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
@@ -292,6 +296,25 @@ kawa$(EXEEXT): $(kawa_OBJECTS) $(kawa_DEPENDENCIES)
 	@rm -f kawa$(EXEEXT)
 	$(LINK) $(kawa_LDFLAGS) $(kawa_OBJECTS) $(kawa_LDADD) $(LIBS)
 
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`"; \
+	    $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`"; \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	done
+
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
@@ -347,7 +370,7 @@ installcheck: installcheck-am
 install-info-am: 
 install-info: install-info-am
 install-exec-am: install-libLTLIBRARIES install-binPROGRAMS \
-		install-exec-local
+		install-binSCRIPTS install-exec-local
 install-exec: install-exec-am
 
 install-data-am:
@@ -356,14 +379,16 @@ install-data: install-data-am
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-libLTLIBRARIES uninstall-binPROGRAMS
+uninstall-am: uninstall-libLTLIBRARIES uninstall-binPROGRAMS \
+		uninstall-binSCRIPTS
 uninstall: uninstall-am
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
+	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) \
+		$(DESTDIR)$(bindir)
 
 
 mostlyclean-generic:
@@ -411,14 +436,14 @@ distclean-compile clean-compile maintainer-clean-compile \
 mostlyclean-libtool distclean-libtool clean-libtool \
 maintainer-clean-libtool mostlyclean-binPROGRAMS distclean-binPROGRAMS \
 clean-binPROGRAMS maintainer-clean-binPROGRAMS uninstall-binPROGRAMS \
-install-binPROGRAMS tags mostlyclean-tags distclean-tags clean-tags \
-maintainer-clean-tags distdir info-am info dvi-am dvi check check-am \
-installcheck-am installcheck install-info-am install-info \
-install-exec-local install-exec-am install-exec install-data-am \
-install-data install-am install uninstall-am uninstall all-redirect \
-all-am all installdirs mostlyclean-generic distclean-generic \
-clean-generic maintainer-clean-generic clean mostlyclean distclean \
-maintainer-clean
+install-binPROGRAMS uninstall-binSCRIPTS install-binSCRIPTS tags \
+mostlyclean-tags distclean-tags clean-tags maintainer-clean-tags \
+distdir info-am info dvi-am dvi check check-am installcheck-am \
+installcheck install-info-am install-info install-exec-local \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 kawa.sh:
@@ -456,8 +481,6 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 
 kawa-bin$(EXEEXT): libkawa.la
 	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  libkawa.la --main=kawa.repl
-
-all: $(@GCJ_SELECTED@)
 
 install-exec-local: install-exec-bindir
 

@@ -1,7 +1,14 @@
-bin_PROGRAMS = @kawa_bin@
+if WITH_GCJ
+bin_PROGRAMS =  @kawa_bin@ kawa-bin
+bin_SCRIPTS = gckawa
+else
+bin_PROGRAMS =  @kawa_bin@
+endif
+
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
 kawa_SOURCES = kawa.c
+kawa_bin_SOURCES =
 CLEANFILES = kawa.sh kawa$(EXEEXT) kawa1$(EXEEXT) kawa-bin$(EXEEXT) tmp *.stamp
 
 READLINE_INCLUDE_PATH =
@@ -92,11 +99,6 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 
 kawa-bin$(EXEEXT): libkawa.la
 	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  libkawa.la --main=kawa.repl
-
-WITH_GCJ_COMPILED = kawa-bin$(EXEEXT) gckawa
-WITHOUT_GCJ_COMPILED = kawa.sh
-
-all: $(@GCJ_SELECTED@)
 
 install-exec-local: install-exec-bindir
 

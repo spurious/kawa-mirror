@@ -1,3 +1,8 @@
+2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* kawa/standard/Scheme.java (LispInterpreter): Definition for
+	string-append/shared; redefine string-append.
+
 2003-11-08  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Use new Interpreter.parse convention.

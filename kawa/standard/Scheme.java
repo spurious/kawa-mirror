@@ -303,7 +303,8 @@ public class Scheme extends LispInterpreter
       define_field ("string-ci>=?", "kawa.lib.strings");
 
       define_proc ("substring", "kawa.lib.strings");
-      define_proc ("string-append", "kawa.standard.string_append");
+      define_proc ("string-append", "kawa.lib.strings");
+      define_proc ("string-append/shared", "kawa.lib.strings");
       define_field("string->list", "kawa.lib.strings");
       define_field("list->string", "kawa.lib.strings");
       define_proc ("string-copy", "kawa.lib.strings");

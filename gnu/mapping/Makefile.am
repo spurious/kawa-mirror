@@ -15,6 +15,7 @@ java_JAVA=\
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   IndirectConstraint.java \
   CallFrame.java CallContext.java CpsProcedure.java \
+  CpsMethodContainer.java CpsMethodProc.java \
   Environment.java \
   FluidBinding.java \
   FluidConstraint.java \

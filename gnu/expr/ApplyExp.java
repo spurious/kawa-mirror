@@ -190,8 +190,10 @@ public class ApplyExp extends Expression
 	      {
 		if (is_static)
 		  extraArg = 1;
-		if (comp.curLambda == func_lambda)
-		  code.emitLoad(func_lambda.closureEnv);  // Recursive call.
+		if (comp.curLambda == func_lambda)  // Recursive call.
+		  code.emitLoad(func_lambda.closureEnv != null
+				? func_lambda.closureEnv
+				: func_lambda.thisVariable);
 		else
 		  func_lambda.getOwningLambda().loadHeapFrame(comp);
 	      }

@@ -44,12 +44,12 @@ of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
 The author of Kawa is
 @ifhtml
 <a href="http://home.pacbell.net/bothner/">Per Bothner</a>
-<tt>&lt;<a href="mailto:bothner@cygnus.com">bothner@cygnus.com</a>&gt;</tt>.
+<tt>&lt;<a href="mailto:per@bothner.com">per@bothner.com</a>&gt;</tt>.
 It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
 <tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>.
 @end ifhtml
 @ifclear html
-Per Bothner @w{<bothner@@cygnus.com>}.
+Per Bothner @w{<per@@bothner.com>}.
 It is a re-write of Kawa 0.2, which was written by
 R. Alexander Milowski @w{<alex@@copsol.com>}.
 @end ifclear
@@ -248,7 +248,7 @@ export CLASSPATH
 On Windows95/WindowsNT, you need to set @code{classpath} in a DOS console.
 For example:
 @example
-set classpath=\kawa\kawa-compiled.zip
+set classpath=\kawa\kawa-@value{VERSION}-compiled.zip
 @end example
 
 Then to run Kawa do:
@@ -256,10 +256,19 @@ Then to run Kawa do:
 java kawa.repl
 @end example
 
+To run Kawa in a fresh window, you can do:
+@example
+java kawa.repl -w
+@end example
+On Windows, you probably do want to use the @code{-w} flag,
+because if you run Kawa under the MS-DOS prompt, you won't see
+commands echoed until you hit Enter.  (If anyone knows a way
+to fix this problem, please let me know.)
+
 @node Source distribution,  , Binary distribution, Installation
 @section Installing and using the source distribution
 The Kawa release normally comes as a gzip-compressed tar file named
-@samp{kawa-@value{VERSION}.tar.gz}.
+@samp{kawa-@value{VERSION}.tar.gz} .
 
 In your build directory do:
 @example
@@ -339,18 +348,38 @@ This is done automatically if you use the @samp{kawa} script.
 
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
 environment.  If you want to build Kawa from source under Windows
-(95, 98, or NT), one option you might consider is using Cygwin,
-a free Unix-like environment available from
-@url{http://sourceware.cygnus.com/cygwin/}.  The standard
-build instructions then apply.
+(95, 98, or NT), you could use a Unix empulation package, such
+as the free @uref{http://sourceware.cygnus.com/cygwin/,Cygwin}.
+However, there are some problems with filenames that make this
+more complicated than it should be.
 
-It is possible to build Kawa from source on Windows95, without
-CygWin32 or some other Unix-emulation package, but in that case
-you will probably be unable to use the @code{configure} scripts
-and @code{Makefile}s.  However, importing all the Java source
-files into your Java development environment, and having it
-compile them, will handle most of the needed work.  You then
-need to compile the builtin Scheme procedures:
+The Kawa source distribution now includes a simple batch file for building
+Kawa under Windows.  You can do the following:
+
+@enumerate
+@item
+Download the Kawa source distribution @code{kawa-@value{VERSION}.tar.gz}.
+@item
+Extract the files using an appropriate tool.
+(I did @code{tar xzf kawa-@value{VERSION}.tar.gz}, using the @code{tar}
+that is part of @uref{http://sourceware.cygnus.com/cygwin/, Cygwin}.
+If there are alternative commonly-available tools, please let me
+know about them.)
+@item
+In an MS-DOS window, @code{cd kawa-@value{VERSION}}.
+@item
+Edit @code{makekawa.bat} if need be to specify the location of your Java tools.
+@item
+Execute @code{makekawa.bat}.
+@item
+If this succeeded, you should have a working kawa.
+For example you can do @code{java kawa.repl -w}, assuming
+@code{java} is in your @code{PATH}.
+@end enumerate
+
+If you use an integrated Java development environment, you should be
+able to import all the Java source files, and have it compile all of them.
+You then need to compile the builtin Scheme procedures:
 @example
 cd kawa\lib
 %KAWA% -d ..\.. -P kawa.lib. -C *.scm

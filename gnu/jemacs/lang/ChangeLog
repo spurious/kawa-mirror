@@ -1,3 +1,8 @@
+2004-09-12  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>): ELisp 'if' syntax allows multiple-statement
+	else part.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* ELisp.java:  Use static syntax to access static fields/methods.

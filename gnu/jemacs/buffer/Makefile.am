@@ -30,6 +30,8 @@ java_JAVA=\
   @extra_java@ \
   Emacs.java
 
+EXTRA_DIST = emacs.scm overview.html
+
 KAWA = $(JAVA) kawa.repl
 
 all: Makefile classjava.stamp

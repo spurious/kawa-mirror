@@ -77,7 +77,6 @@ public class XQuery extends Interpreter
 	    Expression sexp = lexer.parse(tr);
 	    if (sexp == null)
 	      break;
-	    System.err.println("PARSE:"+sexp);
 	    if (mexp.body != null)
 	      throw new RuntimeException ("not implemented - multiple actions");
 	    mexp.body = sexp;

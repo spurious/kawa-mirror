@@ -1,3 +1,18 @@
+2000-06-25  Per Bothner  <per@bothner.com>
+
+	Moved some functions around, for the same of CommonLisp support.
+	* ListOps.scm (car, cdr):  New functions; moved from MiscOps.scm.
+	* SymbolOps.scm	(apply, prog1):  New functions; moved from MiscOps.scm.
+	* MiscOps.scm (car, cdr, apply, prog1):  Removed.
+
+	* lambda.java:  Nor inherits from kawa.lang.Lambda.
+	(rewrite(Object,Translator)):  No longer needed.
+	(rewrite(LambdaExp,Object,Object,Translator)):  Replaced by non-static
+	rewriteBody method.
+	* defun.java (lambdaSyntax):  New field.
+	(rewriteFrom):  Use lambdaSyntax, instead of static lambda call.
+	* ELisp.java:  Update appropriately.
+
 2000-06-19  Per Bothner  <per@bothner.com>
 
 	* AddOp.java:   Remove unneeded imports.

@@ -204,13 +204,18 @@ public class ELisp extends Interpreter
     defun(NumberCompare.makeLEq("<="));
     defun(NumberCompare.makeGrt(">"));
     defun(NumberCompare.makeGEq(">="));
-    defun("lambda", new gnu.jemacs.lang.lambda());
+
+    lambda lambda = new gnu.jemacs.lang.lambda();
+    lambda.setKeywords("&optional", "&rest", "&key");
+    lambda.defaultDefault = nilExpr;
+    defun("lambda", lambda);
+    defun("defun", new gnu.jemacs.lang.defun(lambda));
+
     defun("defgroup", new defgroup());
     defun("defcustom", new defcustom());
     defun("defvar", new defvar(false));
     defun("defconst", new defvar(true));
-    defun("defun", new gnu.jemacs.lang.defun());
-    defun("defsubst", new gnu.jemacs.lang.defun());
+    defun("defsubst", new gnu.jemacs.lang.defun(lambda));
     defun("setq", new gnu.jemacs.lang.setq());
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());

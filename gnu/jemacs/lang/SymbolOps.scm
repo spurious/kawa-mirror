@@ -90,3 +90,17 @@
 (define (make-variable-buffer-local symbol)
   (invoke-static <gnu.jemacs.lang.Symbol> 'makeBufferLocal symbol #t)
   symbol)
+
+(define (apply func #!rest (args :: <Object[]>))
+  (invoke-static 'kawa.standard.apply 'applyN
+		 (if (symbol? func) (symbol-function func) func)
+		 args))
+
+(define-syntax prog1
+  (syntax-rules ()
+		((prog1 first)
+		 first)
+		((prog1 first rest ...)
+		 (let ((%prog1-save% first)) ;; Should be lexical-let? FIXME
+		   (begin rest ...)
+		   %prog1-save%))))

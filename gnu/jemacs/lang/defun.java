@@ -11,6 +11,13 @@ import kawa.lang.*;
 
 public class defun extends Syntax implements Printable
 {
+  kawa.lang.Lambda lambdaSyntax;
+
+  public defun (kawa.lang.Lambda lambdaSyntax)
+  {
+    this.lambdaSyntax = lambdaSyntax;
+  }
+
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                      ScopeExp defs, Translator tr)
   {
@@ -60,7 +67,7 @@ public class defun extends Syntax implements Printable
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    LambdaExp lexp = new LambdaExp();
-	    lambda.rewrite(lexp, p2.car, p2.cdr, tr);
+	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr);
 	    lexp.setName (name);
 	    if (p2 instanceof PairWithPosition)
 	      {

@@ -9,176 +9,15 @@ import kawa.lang.*;
  * @author	Per Bothner
  */
 
-public class lambda extends Syntax implements Printable
+public class lambda extends Lambda
 {
-  public static final String optionalKeyword = "&optional";
-  public static final String restKeyword = "&rest";
-
   /** True if parameters should be bound fluidly. */
-  static boolean fluidBindings = true;
+  boolean fluidBindings = true;
 
-  public Expression rewrite (Object obj, Translator tr)
+  public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
-    if (! (obj instanceof Pair))
-      return tr.syntaxError ("missing formals in lambda");
-    int old_errors = tr.getMessages().getErrorCount();
-    LambdaExp lexp = new LambdaExp();
-    Pair pair = (Pair) obj;
-    rewrite(lexp, pair.car, pair.cdr, tr);
-    if (tr.getMessages().getErrorCount() > old_errors)
-      return new ErrorExp("bad lambda expression");
-    return lexp;
-  }
-
-  /**
-   * Higher-level constructor, that does the re-writing.
-   * @param formals the formal parameter list (or symbol)
-   * @param body the body of the procedure
-   * @param tr the (Scheme) Translator
-   */
-  // FIXME make method of Translator
-  public static void rewrite(LambdaExp lexp, Object formals, Object body, Translator tr)
-  {
-    /* Count formals, while checking that the syntax is OK. */
-    Object bindings = formals;
-    int opt_args = -1;
-    int rest_args = -1;
     Pair pair;
-    for (; bindings instanceof Pair;  bindings = pair.cdr)
-      {
-	pair = (Pair) bindings;
-        // An initial pass to count the parameters.
-	if (pair.car == optionalKeyword)
-	  {
-	    if (opt_args >= 0)
-	      {
-		tr.syntaxError ("multiple &optional in parameter list");
-		return;
-	      }
-	    else if (rest_args >= 0)
-	      {
-		tr.syntaxError ("&optional after &rest");
-		return;
-	      }
-	    opt_args = 0;
-	  }
-	else if (pair.car == restKeyword)
-	  {
-	    if (rest_args >= 0)
-	      {
-		tr.syntaxError ("multiple &rest in parameter list");
-		return;
-	      }
-	    rest_args = 0;
-	  }
-        else if (pair.car == "::" // && "::" is unbound FIXME
-                 && pair.cdr instanceof Pair)
-          pair = (Pair) pair.cdr;
-	else if (rest_args >= 0)
-	  rest_args++;
-	else if (opt_args >= 0)
-	  opt_args++;
-	else
-	  lexp.min_args++;
-	bindings = pair.cdr;
-      }
-    if (bindings instanceof String)
-      {
-	if (opt_args >= 0 || rest_args >= 0)
-	  {
-	    tr.syntaxError ("dotted rest-arg after &optional or &rest");
-	    return;
-	  }
-	rest_args = 1;
-      }
-    else if (bindings != LList.Empty)
-      {
-	tr.syntaxError ("misformed formals in lambda");
-	return;
-      }
-    if (rest_args > 1)
-      {
-	tr.syntaxError ("multiple #!rest parameters");
-        return;
-      }
-    if (opt_args < 0)
-      opt_args = 0;
-    if (rest_args < 0)
-      rest_args = 0;
-    if (rest_args > 0)
-      lexp.max_args = -1;
-    else   // Is this useful?
-      lexp.max_args = lexp.min_args + opt_args;
-    if (opt_args > 0)
-      lexp.defaultArgs = new Expression[opt_args];
-
-    tr.push(lexp);
-    bindings = formals;
     int i = 0;
-    opt_args = 0;
-    Object mode = null;
-    for (; bindings instanceof Pair;  bindings = pair.cdr)
-      {
-	pair = (Pair) bindings;
-	if (pair.car == optionalKeyword || pair.car == restKeyword)
-	  {
-	    mode = pair.car;
-	    continue;
-	  }
-	String name;
-	Object defaultValue = ELisp.nilExpr;
-        Pair p;
-	if (pair.car instanceof String)
-	  {
-	    name = (String) pair.car;
-          }
-	else if (pair.car instanceof Pair
-		 && (p = (Pair) pair.car).car instanceof String
-		 && p.cdr instanceof Pair)
-          {
-	    name = (String) p.car;
-            p = (Pair) p.cdr;
-            if (p != null && mode != null)
-              {
-                defaultValue = p.car;
-                if (p.cdr instanceof Pair)
-                  p = (Pair) p.cdr;
-                else if (p.cdr == LList.Empty)
-                  p = null;
-                else
-                  {
-                    tr.syntaxError("improper list in specifier for parameter `"
-                                   + name + "')");
-                    return;
-                  }
-              }
-	  }
-	else
-	  {
-	    tr.syntaxError ("parameter is neither name nor (name default)");
-	    return;
-	  }
-	if (mode == optionalKeyword)
-	  lexp.defaultArgs[opt_args++] = tr.rewrite(defaultValue);
-	Declaration decl = lexp.addDeclaration (name);
-        if (bindings instanceof PairWithPosition)
-          {
-            PairWithPosition declPos = (PairWithPosition) bindings;
-            decl.setFile(declPos.getFile());
-            decl.setLine(declPos.getLine(), declPos.getColumn());
-          }
-	if (mode == restKeyword)
-	  decl.setType(Compilation.scmListType);
-	decl.noteValue(null);  // Does not have a known value.
-	tr.push(decl);
-      }
-    if (bindings instanceof String)
-      {
-	Declaration decl = lexp.addDeclaration ((String) bindings);
-	decl.setType(Compilation.scmListType);
-	decl.noteValue (null);  // Does not have a known value.
-	tr.push(decl);
-      }
     if (body instanceof Pair
 	&& (pair = (Pair) body).car instanceof FString)
       {
@@ -203,9 +42,15 @@ public class lambda extends Syntax implements Printable
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
     FluidLetExp let = null;
-    if (fluidBindings)
+
+    int decl_count = lexp.min_args;
+    if (lexp.defaultArgs != null)
+      decl_count += lexp.defaultArgs.length;
+    if (lexp.max_args < 0)
+      decl_count++;
+
+    if (fluidBindings && decl_count > 0)
       {
-	int decl_count = lexp.min_args + opt_args + rest_args;
 	Expression[] inits = new Expression[decl_count];
 	let = new FluidLetExp (inits);
 	i = 0;
@@ -246,11 +91,5 @@ public class lambda extends Syntax implements Printable
           }
         lexp.setProperty("emacs-interactive", interactive);
       }
-  }
-
-
-  public void print(java.io.PrintWriter ps)
-  {
-    ps.print("#<builtin lambda>");
   }
 }

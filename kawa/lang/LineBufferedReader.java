@@ -80,7 +80,7 @@ public class LineBufferedReader extends FilterReader
       lineStart();
     if (pos >= limit)
       {
-	// Converting CRLF to LF is made more complicated is because
+	// Converting CRLF to LF is made more complicated because
 	// we want to be able to return ready()
 	boolean seenCR = false;
 	if (buffer == null)

@@ -54,7 +54,6 @@ Symbol.class \
 Vector.class \
 Executable.class \
 Syntaxable.class \
-Exit.class \
 Undefined.class \
 Lambda.class \
 LambdaProcedure.class \

@@ -42,9 +42,4 @@ public class define extends Syntax implements Printable
       }
     return interp.syntaxError ("invalid syntax for define");
   }
-
-  public void print(java.io.PrintStream ps)
-  {
-    ps.print("#<builtin define>");
-  }
 }

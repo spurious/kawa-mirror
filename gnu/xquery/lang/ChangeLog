@@ -1,3 +1,12 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Handle namespaces better.
+	(NCNAME_COLON_TOKEN):  New token kind - NCNAME followed by ':'.
+	(getrawtoken):  Improve parsing - can return NCNAME_COLON_TOKEN.
+	(peekOperand):  Handle NCNAME_COLON_TOKEN.
+	(parseNameTest):  New method.
+	(parse):  Handle namespace declarations.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (interactive):  New flag.

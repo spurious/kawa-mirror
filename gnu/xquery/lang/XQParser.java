@@ -44,34 +44,7 @@ public class XQParser extends LispReader // should be extends Lexer
 
   NameLookup lexical;
 
-  int nesting;
-
   boolean preserveBoundarySpace;
-
-  /** Enter a nested expression.
-   * This is used in interactive mode to control whether to continue
-   * past end of line, depending on whether the expression is incomplete.
-   * @parm promptChar Used in prompt string to indicate type of nesting.
-   * @return The previous value of promptChar, to be passed to popNesting.
-   */
-  protected char pushNesting (char promptChar)
-  {
-    nesting++;
-    InPort port = (InPort) getPort();
-    char save = port.readState;
-    port.readState = promptChar;
-    return save;
-  }
-
-  /** Exit a nested expression, reversing pushNesting
-   * @param save Saved values return by prior pushNEsting
-   */
-  protected void popNesting (char save)
-  {
-    InPort port = (InPort) getPort();
-    port.readState = save;
-    nesting--;
-  }
 
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,

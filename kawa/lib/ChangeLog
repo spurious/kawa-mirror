@@ -1,3 +1,10 @@
+2004-08-24  Per Bothner  <per@bothner.com>
+
+	* files.scm (%file-separator):  "inline" symbol->string to reduce
+	circular dependencies - which currently precents automatic inlining.
+	* reflection.scm (record-type-name):  Likewise.
+	* syntax.scm (%defmacro):  Remove unused and wrong macro.
+
 2004-08-06  Per Bothner  <per@bothner.com>
 
 	* system.scm (compile-file):  New function, converted from Java.

@@ -48,7 +48,7 @@
     filename))
   
 (define (%file-separator)
-  (symbol->string
+  (make <string>
    (invoke-static <java.lang.System> 'getProperty 'file.separator)))
 
 (define (system-tmpdir)

@@ -23,10 +23,6 @@
                      (syntax-case __arg ()
                                   ((__name . pattern) (begin form ...))))))))
 
-(define (%defmacro form rule)
-  (let ((formform :: <pair> (form 'form)))
-    (rule (field form_form 'car))))
-
 (define (gentemp) :: <symbol>
   (invoke-static <gnu.expr.Symbols> 'gentemp))
 

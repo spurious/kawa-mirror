@@ -29,7 +29,7 @@
     object)))
 
 (define (record-type-name (rtd :: <class-type>))
-  (symbol->string
+  (make <string>
    (invoke-static <gnu.expr.Compilation> 'demangleName
 		  (invoke rtd 'getName) #t)))
 

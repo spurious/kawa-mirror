@@ -18,8 +18,6 @@ equal_p.java \
 cons.java \
 car.java \
 cdr.java \
-setcar_b.java \
-setcdr_b.java \
 cxr.java \
 list_p.java \
 list_v.java \
@@ -78,8 +76,6 @@ char_ci_less_equal_p.java \
 char_ci_greater_p.java \
 char_ci_greater_equal_p.java \
 string_v.java \
-string_ref.java \
-string_set_b.java \
 string2list.java \
 list2string.java \
 string_ci_equal_p.java \

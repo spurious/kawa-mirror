@@ -1,5 +1,10 @@
 2002-01-23  Per Bothner  <per@bothner.com>
 
+	* kawa/Shell.java (run):  Call Lexer's setInteractive if TtyInPort.
+
+	* kawa/standard/Scheme.java (initScheme):  Define values-append.
+	Fix definition of unescaped-data.
+
 	* kawa/lang/Translator.java (makeBody):  New method.
 	(rewrite_body, finishModule):  Use makeBody.
 

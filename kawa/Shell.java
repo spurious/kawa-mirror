@@ -191,6 +191,8 @@ public class Shell
   {
     SourceMessages messages = new SourceMessages();
     Lexer lexer = interp.getLexer(inp, messages);
+    if (inp instanceof TtyInPort)  // Wrong for the case of '-f' '-'.
+      lexer.setInteractive(true);
     CallContext ctx = new CallContext();
     Consumer saveConsumer = null;
     if (out != null)

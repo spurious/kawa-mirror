@@ -170,6 +170,9 @@ public class FindCapturedVars extends ExpWalker
       return; // FIXME - for now, as long as unknows are static
     if (decl.field != null && decl.field.getStaticFlag())
       return;
+    if (decl.getFlag(Declaration.IS_CONSTANT)
+	&& decl.getValue() instanceof QuoteExp)
+      return;
 
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();

@@ -1,3 +1,7 @@
+2002-11-20  Per Bothner  <bothner@bothner.com>
+
+	* NamespaceEnv.java (get):  Handle "class:" namespaces.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* NamespaceEnv.java (NAMESPACE_PREFIX):  Moved to Interpreter.

@@ -1,9 +1,10 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.expr.Interpreter;
+import gnu.kawa.reflect.ClassMethods;
 
 /** Helper Environment used by Scheme to resolve "NAMESPACE:NAME". */ 
 
@@ -29,11 +30,25 @@ public class NamespaceEnv extends Environment
 	String prefix = name.substring(0, i);
 	Object nsValue
 	  = mainEnv.get((Interpreter.NAMESPACE_PREFIX+prefix).intern(), null);
+	String localName = name.substring(i+1);
 	if (nsValue != null)
 	  {
-	    String localName = name.substring(i+1);
-	    return ElementConstructor.make(name, nsValue.toString().intern(),
+	    String namespace = nsValue.toString();
+	    if (namespace.startsWith("class:"))
+	      return ClassMethods.apply(namespace.substring(6),	localName);
+	    return ElementConstructor.make(name, namespace.intern(),
 					   localName);
+	  }
+	else
+	  {
+	    try
+	      {
+		Class.forName(prefix);
+		return ClassMethods.apply(prefix, localName);
+	      }
+	    catch (Throwable ex)
+	      {
+	      }
 	  }
       }
     return defaultValue;

@@ -322,8 +322,6 @@ public class require extends Syntax
 		    sexp.setDefining(true);
 		    forms.addElement(sexp);
 		  }
-		adecl.setAlias(true);
-		adecl.setIndirectBinding(true);
 		adecl.noteValue(fexp);
 		adecl.setType(Compilation.typeLocation);
 		if ((rfield.getModifiers() & Access.FINAL) != 0)

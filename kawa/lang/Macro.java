@@ -157,14 +157,13 @@ public class Macro extends Syntax implements Printable, Externalizable
 	Object result;
 	if (! hygienic)
 	  {
+	    form = Quote.quote(form, tr);
 	    int nargs = Translator.listLength(form);
 	    if (nargs <= 0)
 	      return tr.syntaxError("invalid macro argument list to "+this);
 	    Object[] args = new Object[nargs-1];
 	    for (int i = 0;  i < nargs;  i++)
 	      {
-		if (form instanceof SyntaxForm)
-		  form = ((SyntaxForm) form).form;
 		Pair pair = (Pair) form;
 		if (i > 0)
 		  args[i-1] = pair.car;

@@ -25,12 +25,18 @@ public class Quote extends Syntax implements Printable
     this.isQuasi = isQuasi;
   }
 
-  public static final int QUOTE_DEPTH = -1;
+  /** An initial value for 'depth' for plain (non-quasi) quote,
+   * with namespace resolution. */
+  static final int QUOTE_DEPTH = -1;
+
+  /** An initial value for 'depth' for plain (non-quasi) quote,
+   * without namespace resolution. */
+  static final int DATUM_DEPTH = -2;
 
   /** True for quasiquote; false for plain quote. */
   boolean isQuasi;
 
-  public static Object expand (Object template, boolean quasi, Translator tr)
+  static Object expand (Object template, int depth, Translator tr)
   {
     /* #ifndef JAVA2 */
     // Object seen = null;
@@ -38,12 +44,21 @@ public class Quote extends Syntax implements Printable
     /* #ifdef JAVA2 */
     IdentityHashMap seen = new IdentityHashMap();
     /* #endif */
-    return expand(template, quasi ? 1 : QUOTE_DEPTH, null, seen, tr);
+    return expand(template, depth, null, seen, tr);
   }
 
+  /** Quote an object (without namespace-expansion).
+   * Basically just recursively removes SyntaxForm wrappers. */
   public static Object quote (Object obj, Translator tr)
   {
-    return expand(obj, false, tr);
+    return expand(obj, DATUM_DEPTH, tr);
+  }
+
+  /** Quote an object (without namespace-expansion).
+   * Basically just recursively removes SyntaxForm wrappers. */
+  public static Object quote (Object obj)
+  {
+    return expand(obj, DATUM_DEPTH, (Translator) Compilation.getCurrent());
   }
 
   static Expression coerceExpression (Object val)
@@ -54,7 +69,7 @@ public class Quote extends Syntax implements Printable
   static Object expand_pair (Pair pair, int depth, SyntaxForm syntax,
 			     Object seen, Translator tr)
   {
-    if (depth == QUOTE_DEPTH)
+    if (depth <= QUOTE_DEPTH)
       ;
     else if (tr.matches(pair.car, LispLanguage.quasiquote_sym))
       depth++;
@@ -69,12 +84,11 @@ public class Quote extends Syntax implements Printable
 	if (depth == 0)
 	  return tr.rewrite_car(pair_cdr, syntax);
       }
-    else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym)
-	     && depth >= 0)
+    else if (tr.matches(pair.car, LispLanguage.unquotesplicing_sym))
       return tr.syntaxError ("invalid used of " + pair.car +
 				 " in quasiquote template");
     Object expanded_cdr = expand (pair.cdr, depth, syntax, seen, tr);
-    if (pair.car instanceof Pair && depth != QUOTE_DEPTH)
+    if (pair.car instanceof Pair && depth > QUOTE_DEPTH)
       {
 	Pair pair_car = (Pair)pair.car;
 	if (tr.matches(pair_car.car, LispLanguage.unquotesplicing_sym)
@@ -119,6 +133,7 @@ public class Quote extends Syntax implements Printable
   static Object expand (Object template, int depth,
 			SyntaxForm syntax, Object seen, Translator tr)
   {
+    boolean resolveNamespaces = depth > DATUM_DEPTH;
     /* #ifdef JAVA2 */
     IdentityHashMap map = (IdentityHashMap) seen;
     Object old = map.get(template);
@@ -159,7 +174,7 @@ public class Quote extends Syntax implements Printable
 	    Object element = vector.get(i);
 	    int element_depth = depth;
 	    Pair pair;
-	    if (element instanceof Pair && depth != QUOTE_DEPTH
+	    if (element instanceof Pair && depth > QUOTE_DEPTH
 		&& tr.matches((pair = (Pair)element).car,
 			      LispLanguage.unquotesplicing_sym)
 		&& --element_depth == 0)
@@ -217,7 +232,7 @@ public class Quote extends Syntax implements Printable
 	      result = Invoke.makeInvokeStatic(vectorAppendType, "apply", args);
 	  }
       }
-    else if (template instanceof String)
+    else if (resolveNamespaces && template instanceof String)
       result = tr.namespaceResolve((String) template);
     else
       result = template;
@@ -235,7 +250,7 @@ public class Quote extends Syntax implements Printable
     if (! (obj instanceof Pair)
 	|| (pair = (Pair) obj).cdr != LList.Empty)
       return tr.syntaxError ("wrong number of arguments to quasiquote");
-    return coerceExpression(expand(pair.car, isQuasi, tr));
+    return coerceExpression(expand(pair.car, isQuasi ? 1 : QUOTE_DEPTH, tr));
   }
 
   static final ClassType appendType = ClassType.make("kawa.standard.append");

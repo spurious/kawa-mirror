@@ -221,10 +221,7 @@
 				    (%make-promise (lambda () expression)))))
 
 (define (syntax-object->datum obj)
-  (let loop ((x obj))
-    (if (instance? x <kawa.lang.SyntaxForm>)
-	(loop (field (as <kawa.lang.SyntaxForm> x) 'form))
-	x)))
+  (kawa.lang.Quote:quote obj))
 
 (define (datum->syntax-object template-identifier obj)
   (kawa.lang.SyntaxForm:makeWithTemplate template-identifier obj))

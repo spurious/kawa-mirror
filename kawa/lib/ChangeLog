@@ -1,3 +1,7 @@
+2005-02-23  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (syntax-object->datum): Use new Quote.quote method.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* parameters.scm: New file, implements SRFI-39.

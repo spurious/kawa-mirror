@@ -1,3 +1,11 @@
+2003-05-16  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (checkName):  Take new 'reversible' parameter.
+	* Invoke.java (getMethodName):  Pass false to checkName.
+	* SlotGet.java (compile, getReturnType):  Pass true to checkName.
+	* SlotSet.java (compile):  Likewise.
+	Fixes bug reported 05-13 by Chris Dean <Chris.Dean@sokitomi.com>.
+
 2003-05-13  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java:  New class, extends Type.

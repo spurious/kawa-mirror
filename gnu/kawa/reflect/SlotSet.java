@@ -214,7 +214,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     if (type instanceof ClassType)
       {
         ClassType ctype = (ClassType) type;
-	String name = ClassMethods.checkName(arg1);
+	String name = ClassMethods.checkName(arg1, true);
 	if (name != null)
 	  {
 	    part = getField(ctype, name);

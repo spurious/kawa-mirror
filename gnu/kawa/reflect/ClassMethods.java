@@ -217,7 +217,7 @@ public class ClassMethods extends Procedure2
     return pproc;
   }
 
-  static String checkName(Expression exp)
+  static String checkName(Expression exp, boolean reversible)
   {
     if (exp instanceof QuoteExp)
       {
@@ -229,7 +229,9 @@ public class ClassMethods extends Procedure2
 	  nam = ((Symbol) name).getName();
 	else
 	  return null;
-	return Compilation.mangleName(nam);
+	if (Compilation.isValidJavaName(nam))
+	  return nam;
+	return Compilation.mangleName(nam, reversible);
       }
     return null;
   }

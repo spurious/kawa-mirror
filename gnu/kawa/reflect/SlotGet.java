@@ -188,7 +188,7 @@ public class SlotGet extends Procedure2
     Expression arg1 = args[1];
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
-    String name = ClassMethods.checkName(arg1);
+    String name = ClassMethods.checkName(arg1, true);
     CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {
@@ -294,7 +294,7 @@ public class SlotGet extends Procedure2
         Expression arg1 = args[1];
         Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
           : arg0.getType();
-        String name = ClassMethods.checkName(arg1);
+        String name = ClassMethods.checkName(arg1, true);
         if (type instanceof ClassType && name != null)
           {
             ClassType ctype = (ClassType) type;

@@ -404,7 +404,7 @@ public class Invoke extends ProcedureN implements CanInline
     if (kind == 'N')
       return "<init>";
     if (args.length >= 2)
-      return ClassMethods.checkName(args[1]);
+      return ClassMethods.checkName(args[1], false);
     return null;
   }
 

@@ -103,7 +103,7 @@ public class LetExp extends ScopeExp
 
   public void print (OutPort out, String startTag, String endTag)
   {
-    out.startLogicalBlock(startTag, endTag, 2);
+    out.startLogicalBlock(startTag+"#"+id+" outer:"+outer.id, endTag, 2);
     out.writeSpaceFill();
     printLineColumn(out);
     out.startLogicalBlock("(", false, ")");
@@ -116,18 +116,23 @@ public class LetExp extends ScopeExp
 	  out.writeSpaceFill();
 	out.startLogicalBlock("(", false, ")");
 	decl.printInfo(out);
-	out.writeSpaceFill();
-	out.print('=');
-	out.writeSpaceFill();
-	//if (decl.isArtificial ())
-        //out.print ("<artificial>");
-	//else
+	if (inits != null)
 	  {
-	    if (inits[i] == null)
-	      out.print("<null>");
-	    else
-	      inits[i].print(out);
-	    i++;
+	    out.writeSpaceFill();
+	    out.print('=');
+	    out.writeSpaceFill();
+	    //if (decl.isArtificial ())
+	    //out.print ("<artificial>");
+	    //else
+	    {
+	      if (i >= inits.length)
+		out.print("<missing init>");
+	      else if (inits[i] == null)
+		out.print("<null>");
+	      else
+		inits[i].print(out);
+	      i++;
+	    }
 	  }
 	out.endLogicalBlock(")");
       }

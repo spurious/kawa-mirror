@@ -1,3 +1,10 @@
+2004-11-05  Per Bothner  <per@bothner.com>
+
+	* CatchClause.java (<init>): New constructor.
+	(print): Do pretty-printing.
+	* TryExp.java (print): Do pretty-printing.
+	* LetExp.java (print): Print more info, more robustly.
+
 2004-10-27  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (mustCompile): Move field from here ...

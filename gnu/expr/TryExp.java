@@ -96,7 +96,7 @@ public class TryExp extends Expression
 
   public void print (OutPort ps)
   {
-    ps.print("(Try ");
+    ps.startLogicalBlock("(Try ", ")", 2);
     try_clause.print(ps);
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())
@@ -105,9 +105,10 @@ public class TryExp extends Expression
       }
     if (finally_clause != null)
       {
+	ps.writeSpaceLinear();
 	ps.print(" finally: ");
 	finally_clause.print(ps);
       }
-    ps.print(")");
+    ps.endLogicalBlock(")");
   }
 }

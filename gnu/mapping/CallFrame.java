@@ -3,7 +3,7 @@ package gnu.mapping;
 /** A procedure activation frame (when compiled with explicit stacks).
  * Not yet working/useful. */
 
-public abstract class CallFrame extends CpsProcedure
+public abstract class CallFrame extends MethodProc
 implements Cloneable, CpsMethodContainer
 {
   public Object[] args;

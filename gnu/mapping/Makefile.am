@@ -8,7 +8,6 @@ java_sources=\
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \
   IndirectConstraint.java \
-  CallFrame.java CpsProcedure.java \
   CpsMethodContainer.java CpsMethodProc.java \
   Environment.java \
   FluidBinding.java \

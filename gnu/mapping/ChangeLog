@@ -1,5 +1,10 @@
 2004-08-03  Per Bothner  <per@bothner.com>
 
+	* CpsMethodProc.java:  Remove no-longer-used class.
+	* Makefile.am (java_sources): Remove CpsProcedure.java, CallFrame.java.
+	* CpsMethodProc.java:  Extend MethodProc instead of CpsProcedure.
+	* CallFrame.java:  Likewise.
+
 	* MethodProc.java:  Merge functionality from CpsProcedure.
 	* CpsProcedure.java:  Now just a stub, soon to be removed.
 

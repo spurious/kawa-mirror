@@ -3,7 +3,7 @@
 
 package gnu.mapping;
 
-public class CpsMethodProc extends CpsProcedure
+public class CpsMethodProc extends MethodProc
 {
   public CpsMethodContainer module;
   public final int selector;

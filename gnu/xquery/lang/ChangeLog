@@ -1,3 +1,10 @@
+2003-09-14  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNodeTest):  Support other axes.
+
+	* XQParser.java (funcNamedChildren, funcNamedDescendants,
+	funcNamedDescendantsOrSelf):  Remove no-longer-used static fields.
+
 2003-09-11  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (skipSpaceOrComment):  Rename to skipSpace, taking

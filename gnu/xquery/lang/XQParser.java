@@ -1268,13 +1268,22 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     
     Expression exp;
-    if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT
-	 || axis == AXIS_DESCENDANT_OR_SELF
-	 || axis == AXIS_SELF || axis == AXIS_PARENT)
-	&&
-	(curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
-	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
-	 || curToken == OP_NODE || curToken == OP_TEXT))
+    if (axis == AXIS_ATTRIBUTE)
+      {
+	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN
+	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
+	  {
+	    Symbol qname = parseNameTest("");
+	    Expression[] args = { dot };
+	    TreeScanner op = AttributeAxis.make(new AttributeType(qname));
+	    exp = new ApplyExp(op, args);
+	  }
+	else
+	  return syntaxError("missing name or '*' after '@' or attribute::");
+      }
+    else if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
+	     || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
+	     || curToken == OP_NODE || curToken == OP_TEXT)
       {
 	NodePredicate predicate;
 	if (curToken == OP_NODE || curToken == OP_TEXT)
@@ -1297,30 +1306,43 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	Expression[] args = { dot };
 	TreeScanner op;
-	if (axis == AXIS_DESCENDANT)
-	  op = DescendantAxis.make(predicate);
-	else if (axis == AXIS_DESCENDANT_OR_SELF)
-	  op = DescendantOrSelfAxis.make(predicate);
-	else if (axis == AXIS_SELF)
-	  op = SelfAxis.make(predicate);
-	else if (axis == AXIS_PARENT)
-	  op = ParentAxis.make(predicate);
-	else
-	  op = ChildAxis.make(predicate);
-	exp = new ApplyExp(op, args);
-      }
-    else if (axis == AXIS_ATTRIBUTE)
-      {
-	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN
-	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
+	switch (axis)
 	  {
-	    Symbol qname = parseNameTest("");
-	    Expression[] args = { dot };
-	    TreeScanner op = AttributeAxis.make(new AttributeType(qname));
-	    exp = new ApplyExp(op, args);
+	  default:  // case AXIS_CHILD: case -1:
+	    op = ChildAxis.make(predicate);
+	    break;
+	  case AXIS_DESCENDANT:
+	    op = DescendantAxis.make(predicate);
+	    break;
+	  case AXIS_DESCENDANT_OR_SELF:
+	    op = DescendantOrSelfAxis.make(predicate);
+	    break;
+	  case AXIS_SELF:
+	    op = SelfAxis.make(predicate);
+	    break;
+	  case AXIS_PARENT:
+	    op = ParentAxis.make(predicate);
+	    break;
+	  case AXIS_ANCESTOR:
+	    op = AncestorAxis.make(predicate);
+	    break;
+	  case AXIS_ANCESTOR_OR_SELF:
+	    op = AncestorOrSelfAxis.make(predicate);
+	    break;
+	  case AXIS_FOLLOWING:
+	    op = FollowingAxis.make(predicate);
+	    break;
+	  case AXIS_FOLLOWING_SIBLING:
+	    op = FollowingSiblingAxis.make(predicate);
+	    break;
+	  case AXIS_PRECEDING:
+	    op = PrecedingAxis.make(predicate);
+	    break;
+	  case AXIS_PRECEDING_SIBLING:
+	    op = PrecedingSiblingAxis.make(predicate);
+	    break;
 	  }
-	else
-	  return syntaxError("missing name or '*' after '@' or attribute::");
+	exp = new ApplyExp(op, args);
       }
     else if (axis >= 0)
       return syntaxError("unsupported axis '"+axisNames[axis]+"::'");
@@ -2796,13 +2818,6 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
-  static final Expression funcNamedChildren
-    = makeFunctionExp("gnu.kawa.xml.NamedChildren", "namedChildren");
-  static final Expression funcNamedDescendants
-    = makeFunctionExp("gnu.kawa.xml.NamedDescendants", "namedDescendants");
-  static final Expression funcNamedDescendantsOrSelf
-    = makeFunctionExp("gnu.kawa.xml.NamedDescendants", 
-		      "namedDescendantsOrSelf");
   static final Expression funcForwardFilter
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "forwardFilter");
   static final Expression funcReverseFilter

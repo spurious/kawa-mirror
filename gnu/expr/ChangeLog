@@ -1,3 +1,10 @@
+2004-10-14  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (usedClass):  Generalize parmater to Type, so we
+	can also handle ArrayTypes.  Check immediate here, instead of callers.
+	* PrimProcedure.java (compile):  Can thus simplify here.
+	* StackTarget.java (emitCoerceFromObject):  Call usedClass.
+
 2004-10-07  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (addClass):  Move staticModule variable earlier.

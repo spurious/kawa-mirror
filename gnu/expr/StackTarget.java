@@ -76,6 +76,7 @@ public class StackTarget extends Target
       }
     else
       {
+	comp.usedClass(type);
 	type.emitCoerceFromObject(code);
       }
   }

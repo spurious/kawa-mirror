@@ -2131,8 +2131,13 @@ public class Compilation
    * It is used to ensure that we can inherit from classes defines when in
    * immediate mode (in Scheme using define-class or similar).
    */
-  public void usedClass (ClassType clas)
+  public void usedClass (Type type)
   {
+    while (type instanceof ArrayType)
+      type = ((ArrayType) type).getComponentType();
+    if (! immediate || ! (type instanceof ClassType))
+      return;
+    ClassType clas = (ClassType) type;
     if (loader != null && clas.isExisting())
       {
 	loader.addClass(clas.getReflectClass());

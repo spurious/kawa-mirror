@@ -398,8 +398,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    : is_static ? argTypes[i + skipArg]
             : i==0 ? thisType
             : argTypes[i-1];
-	if (comp.immediate && arg_type instanceof ClassType)
-	  comp.usedClass((ClassType) arg_type);
+	comp.usedClass(arg_type);
 	Target target =
 	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
 	  : CheckedTarget.getInstance(arg_type, source, i);
@@ -420,13 +419,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     else
       {
 	mclass = method.getDeclaringClass();
-	if (comp.immediate)
-	  {
-	    comp.usedClass(mclass);
-	    Type rtype = method.getReturnType();
-	    if (rtype instanceof ClassType)
-	      comp.usedClass((ClassType) rtype);
-	  }
+	comp.usedClass(mclass);
+	comp.usedClass(method.getReturnType());
       }
 
     // invokespecial == primitive-constructor

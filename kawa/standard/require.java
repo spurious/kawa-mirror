@@ -26,7 +26,7 @@ public class require extends Syntax
     map("printf", SLIB_PREFIX + "printf");
     map("xml", SLIB_PREFIX + "XML");
     map("readtable", SLIB_PREFIX + "readtable");
-    map("http", "gnu.kawa.servlet.HTTP");
+    map("http", SLIB_PREFIX + "HTTP");
   }
 
   public static String mapFeature(String featureName)

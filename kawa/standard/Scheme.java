@@ -734,11 +734,6 @@ public class Scheme extends LispInterpreter
     return eval (new CharArrayInPort(string), env);
   }
 
-  public Object eval (String string)
-  {
-    return eval(string, environ);
-  }
-
   /** Evalutate Scheme expressions from stream.
    * @param port the port to read Scheme expressions from
    * @param env the Environment to evaluate the string in

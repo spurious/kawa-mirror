@@ -1,3 +1,8 @@
+2003-10-09  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/read.java (apply1):  Use Procedure's getName
+	method rather than the deprecated name.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (scanForDefinitions):  Split most into

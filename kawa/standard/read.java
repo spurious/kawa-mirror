@@ -15,7 +15,7 @@ public class read extends Procedure0or1
     throws Throwable
   {
     if (! (arg1 instanceof InPort))
-      throw new WrongType (this.name(), 0, "input port");
+      throw new WrongType (this.getName(), 0, "input port");
     ScmRead lexer = new ScmRead((InPort)arg1);
     try
       {

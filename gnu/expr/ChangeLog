@@ -1,3 +1,8 @@
+2001-05-01  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getNamespaceof):  New method.
+	(VALUE_NAMESPACE, FUNCTION_NAMESPACE): New constants.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compileArgs):  Use compileNotePosition.

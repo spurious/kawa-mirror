@@ -218,6 +218,17 @@ public abstract class Interpreter
     return null;
   }
 
+  public static final int VALUE_NAMESPACE = 1<<0;
+  public static final int FUNCTION_NAMESPACE = 1<<1;
+
+  /** Return the namespace (e.g value or function) of a Declaration.
+   * Return a bitmask of all the namespces "covered" by the Declaration.
+   */
+  public int getNamespaceOf(Declaration decl)
+  {
+    return VALUE_NAMESPACE;
+  }
+
   public void emitPushBoolean(boolean value, CodeAttr code)
   {
     code.emitGetStatic(value ? Compilation.trueConstant

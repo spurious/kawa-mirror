@@ -5,7 +5,7 @@ import gnu.mapping.Procedure;
 
 /** Implements Kawa extension function "setter", as in SRFI-17. */
 
-public class Setter extends Procedure1 implements CanInline
+public class Setter extends Procedure1 implements CanInline, HasSetter
 {
   public static final Setter setter = new Setter();
   static { setter.setName("setter"); }
@@ -51,5 +51,10 @@ public class Setter extends Procedure1 implements CanInline
           }
       }
     return exp;
+  }
+
+  public void set1(Object arg1, Object value) throws Throwable
+  {
+    ((Procedure) arg1).setSetter((Procedure) value);
   }
 }

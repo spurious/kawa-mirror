@@ -1,3 +1,8 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* Setter.java:  Implement HasSetter.
+	(set1):  New method.
+
 2002-08-04  Per Bothner  <per@bothner.com>
 
 	* NumberCompare.java (compile):  More complete optimization.

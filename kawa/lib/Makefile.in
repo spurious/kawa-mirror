@@ -80,6 +80,7 @@ java_JAVA = $(java_SCM)
 java_SCM=\
   std_syntax.scm \
   reflection.scm \
+  lists.scm \
   thread.scm \
   characters.scm \
   files.scm \

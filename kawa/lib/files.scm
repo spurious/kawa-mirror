@@ -27,6 +27,17 @@
 			     ("java.io.File"))
    (->pathname oldname) (->pathname newname)))
 
+
+(define (copy-file from to)
+  (let ((in (open-input-file from))
+	(out (open-output-file to)))
+    (do ((ch (read-char in) (read-char in)))
+	((eof-object? ch)
+	 (close-output-port out)
+	 (close-input-port in)
+	 #!void)
+      (write-char ch out))))
+
 (define (create-directory dirname)
   ((primitive-virtual-method "java.io.File" "mkdir" "boolean" ())
    (->pathname dirname)))

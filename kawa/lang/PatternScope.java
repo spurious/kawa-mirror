@@ -15,10 +15,13 @@ public class PatternScope extends LetExp
 
   /** Nesting of currently visible macro pattern names.
    * For the <code>i</code>'th pattern variable,
-   * <code>(int) pattern_nesting.charAt(i)</code> is the nesting (in terms of
-   * number of ellipsis that indicate the variable is repeated). */
-  public StringBuffer pattern_nesting;
+   * <code>(int) patternNesting.charAt(i)/2</code> is the nesting (in terms of
+   * number of ellipsis that indicate the variable is repeated).
+   * The low-order bit indicates that if matched value is the <code>car</code>
+   * of the value saved in the <code>vars</code> array. */
+  public StringBuffer patternNesting;
 
+  // FIXME - move to Translator?
   public Declaration matchArray;
 
   public PatternScope ()
@@ -35,13 +38,13 @@ public class PatternScope extends LetExp
     if (oldScope == null)
       {
 	newScope.pattern_names = new Vector();
-	newScope.pattern_nesting = new StringBuffer();
+	newScope.patternNesting = new StringBuffer();
       }
     else
       {
 	newScope.pattern_names = (Vector) oldScope.pattern_names.clone();
-	newScope.pattern_nesting
-	  = new StringBuffer(oldScope.pattern_nesting.toString());
+	newScope.patternNesting
+	  = new StringBuffer(oldScope.patternNesting.toString());
       }
     return newScope;
   }

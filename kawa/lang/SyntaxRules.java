@@ -121,7 +121,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     // Calculate maxVars:
     for (int i = this.rules.length;  --i >= 0; )
       {
-	int size = this.rules[i].pattern_nesting.length();
+	int size = this.rules[i].patternNesting.length();
 	if (size > maxVars)
 	  maxVars = size;
       }

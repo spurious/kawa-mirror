@@ -1,3 +1,19 @@
+2004-11-15  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxTemplate.java: Change "opcode" of template_program
+	from 2 bits to 3 bits.  Rearrange them some.
+	(BUILD_VAR_CAR): New opcode.
+	(pattern_nesting): Rename to patternNesting. Low-order bit encodes
+	if match is car of saved Pair.
+	(get_var, execute_car): New helper methods.
+	* kawa/lang/PatternScope.java (pattern_nesting): Renamed likewise.
+	* kawa/lang/SyntaxPattern.java (MATCH_ANY_CAR): New opcode.
+	(translate): Take a "context" parameter so we can tell when to
+	emit MATCH_ANY_CAR.
+	(match_car): New function.
+	(disassemble, match): Handle MATCH_ANY_CAR.
+	* kawa/lang/SyntaxRules.java: Updated for renamed pattern_nesting.
+
 2004-11-14  Per Bothner  <per@bothner.com>
 	
 	* kawa/standard/char_ready_p.java: No longer extend Procedure0or1.

@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.*;
 
-/** The transated form of a <code>(syntax <var>template</var>)</code>. */
+/** The translated form of a <code>(syntax <var>template</var>)</code>. */
 
 public class SyntaxTemplate implements Externalizable
 {
@@ -18,15 +18,18 @@ public class SyntaxTemplate implements Externalizable
    * in the range 1..127, which makes the <code>CONSTANT_Utf8</code> encoding
    * used in <code>.class</code> files compact.
    * The folowing <code>BUILD_XXX</code> are the "opcode" of the encoding,
-   * stored in the low-order 2 bits of a <code>char</code>.
+   * stored in the low-order 3 bits of a <code>char</code>.
    */
   String template_program;
 
+  /** Template instructions that don't have an operand value. */
+  static final int BUILD_MISC = 0;
+
   /** Make following operand into a 1-element list. */
-  static final int BUILD_LIST1 = (1<<2)+3;
+  static final int BUILD_LIST1 = (1<<3)+BUILD_MISC;
 
   /** Wrap following sub-expression in a SyntaxForm. */
-  static final int BUILD_SYNTAX = (2<<2)+3;
+  static final int BUILD_SYNTAX = (2<<3)+BUILD_MISC;
 
   /** A sub-template that gets repeated depending on a matched pattern.
    * Followed by a variable index of a pattern variable of at least
@@ -35,7 +38,7 @@ public class SyntaxTemplate implements Externalizable
    * pair for each match of the pattern variable.  If the length is > 0,
    * it is the length of the repeated sub-template, which is followed by
    * another subtemplate to be spliced (appended) to the repetition. */
-  static final int BUILD_REPEAT = (3<<2)+3;
+  static final int BUILD_REPEAT = (3<<3)+BUILD_MISC;
 
   /** Build a vector (an <code>FVector</code>) from following sub-expressions.
    * Followed by a length N, then 1+VAR_NO, then for each I, where 0<=I<N:
@@ -43,34 +46,45 @@ public class SyntaxTemplate implements Externalizable
    * the expression for element I itself.  If the pattern has elipsis,
    * then VAR_NO is a variable from which to get the repeat count; otherwise
    * VAR_NO is -1. */
-  static final int BUILD_VECTOR = (5<<2)+3;
+  static final int BUILD_VECTOR = (5<<3)+BUILD_MISC;
 
   /* A sub-expression to be repeated a pattern-determined number of times.
    * Each value is inserted into the curent vector.
    * Corresponds to '...' (except BUILD_VEC_REPEAT is a prefix operator,
    * not suffix) in a vector template. */
-  static final int BUILD_VEC_REPEAT = (6<<2)+3;
+  static final int BUILD_VEC_REPEAT = (6<<3)+BUILD_MISC;
 
   /** Instruction to creat a <code>Pair</code> from sub-expressions.
    * Instruction <code>BUILD_CONS+4*delta</code> is followed by a
    * sub-expression for the <code>car</code>
    * (whose length is <code<delta</code> chars),
    * followed by the expression for the <code>cdr</code>. */
-  static final int BUILD_CONS = 0;
+  static final int BUILD_CONS = 1;
 
-  /** Instruction BUILD_VARS+8*i pushes vars[i].
+  /** Instruction BUILD_VAR+8*i pushes vars[i].
    * This array contains the values of pattern variables. */
-  final static int BUILD_VAR = 1;
+  final static int BUILD_VAR = 2; // Must be an even number.
+
+  /** Instruction BUILD_VAR_CAR+8*i pushes car(vars[i]).
+   * It assumes that vars[i] is actually a pair whose car was the
+   * matched pattern variable.  (This is done so we can preserve
+   * <code>PairWithPosition</code> source positions). */
+  final static int BUILD_VAR_CAR = BUILD_VAR+1;
 
   /** Instruction BUILD_LITERAL+8*i pushes literal_values[i]. */
-  final static int BUILD_LITERAL = 2;
+  final static int BUILD_LITERAL = 4;
+
+  /** Unfinished support for "operand" values that need more tahn 13 bits. */
+  final static int BUILD_WIDE = 7;
 
   /** Map variable to ellipsis nesting depth.
    * The nesting depth of the <code>i</code>'th pattern variable
-   * is <code>(int) pattern_nesting.charAt(i)</code>.
+   * is <code>(int) patternNesting.charAt(i)/2</code>.
+   * The low-order bit indicates that if matched value is the <code>car</code>
+   * of the value saved in the <code>vars</code> array.
    * (We use a <code>String</code> because it is compact both at runtime
    * and in <code>.class</code> files. */
-  String pattern_nesting;
+  String patternNesting;
 
   int max_nesting;
 
@@ -126,11 +140,11 @@ public class SyntaxTemplate implements Externalizable
 		j++;
 	      }
 	  }
-	else if ((ch & 3) == BUILD_CONS)
+	else if ((ch & 7) == BUILD_CONS)
 	  ps.println (" - CONS "+(ch >> 3));
-	else if ((ch & 3) == BUILD_LITERAL)
+	else if ((ch & 7) == BUILD_LITERAL)
 	  {
-	    int lit_num = ch >> 2;
+	    int lit_num = ch >> 3;
 	    ps.print (" - literal[" + lit_num + "]: ");
 	    if (literal_values == null || literal_values.length <= lit_num
 		|| lit_num < 0)
@@ -139,10 +153,11 @@ public class SyntaxTemplate implements Externalizable
 	      kawa.standard.Scheme.writeFormat.writeObject(literal_values [lit_num], (Consumer) ps);
 	    ps.println();
 	  }
-	else if ((ch & 3) == BUILD_VAR)
+	else if ((ch & 6) == BUILD_VAR) // Also catches BUILD_VAR_CAR.
 	  {
-	    int var_num = ch >> 2;
-	    ps.print(" - VAR[" + var_num + "]");
+	    int var_num = ch >> 3;
+	    ps.print(((ch & 7) == BUILD_VAR ? " - VAR[" : " - VAR_CAR[")
+	             + var_num + "]");
 	    if (patternNames != null
 		&& var_num >= 0 && var_num < patternNames.size())
 	      ps.print(": " + patternNames.elementAt(var_num));
@@ -159,10 +174,10 @@ public class SyntaxTemplate implements Externalizable
   {
   }
 
-  public SyntaxTemplate (String pattern_nesting, String template_program,
+  public SyntaxTemplate (String patternNesting, String template_program,
 			 Object[] literal_values, int max_nesting)
   {
-    this.pattern_nesting = pattern_nesting;
+    this.patternNesting = patternNesting;
     this.template_program = template_program;
     this.literal_values = literal_values;
     this.max_nesting = max_nesting;
@@ -171,8 +186,8 @@ public class SyntaxTemplate implements Externalizable
   public SyntaxTemplate (Object template, Translator tr)
   {
     this.currentScope = tr.currentScope();
-    this.pattern_nesting = tr == null || tr.patternScope == null ? ""
-      : tr.patternScope.pattern_nesting.toString();
+    this.patternNesting = tr == null || tr.patternScope == null ? ""
+      : tr.patternScope.patternNesting.toString();
     StringBuffer program = new StringBuffer ();
     java.util.Vector literals_vector = new java.util.Vector ();
     /* BEGIN JAVA1 */
@@ -329,13 +344,15 @@ public class SyntaxTemplate implements Externalizable
 	int pattern_var_num = indexOf(tr.patternScope.pattern_names, form);
 	if (pattern_var_num >= 0)
 	  {
+	    int var_nesting = patternNesting.charAt(pattern_var_num);
+	    int op = (var_nesting & 1) != 0 ? BUILD_VAR_CAR : BUILD_VAR;
+	    var_nesting >>= 1;
 	    // R4RS requires that the nesting be equal.
 	    // We allow an extension here, since it allows potentially-useful
 	    // rules like (x (y ...) ...)  => (((x y) ...) ...)
-	    int var_nesting = pattern_nesting.charAt(pattern_var_num);
 	    if (var_nesting > nesting)
 	      tr.syntaxError ("inconsistent ... nesting of " + form);
-	    template_program.append((char) (BUILD_VAR + 4 * pattern_var_num));
+	    template_program.append((char) (op + 8 * pattern_var_num));
 	    return var_nesting == nesting ? pattern_var_num : -1;
 	  }
 	// else treated quoted symbol as literal:
@@ -348,9 +365,9 @@ public class SyntaxTemplate implements Externalizable
       }
     if (form instanceof String || form instanceof Symbol)
       tr.noteAccess(form, tr.currentScope());
-    if (true) // FIXME
+    if (! (form instanceof SyntaxForm))
       template_program.append((char) (BUILD_SYNTAX));
-    template_program.append((char) (BUILD_LITERAL + 4 * literals_index));
+    template_program.append((char) (BUILD_LITERAL + 8 * literals_index));
     return -2;
   }
 
@@ -406,6 +423,31 @@ public class SyntaxTemplate implements Externalizable
     return execute(0, vars, 0, new int[max_nesting], tr, templateScope);
   }
 
+  Object get_var (int var_num, Object[] vars, int[] indexes)
+  {
+    Object var = vars [var_num];
+    if (var_num < patternNesting.length())
+      {
+	int var_nesting = (int) patternNesting.charAt(var_num) >> 1;
+	for (int level = 0;  level < var_nesting;  level++)
+	  var = ((Object[]) var) [indexes[level]];
+      }
+    return var;    
+  }
+
+  Pair execute_car (int pc, Object[] vars, int nesting, int[] indexes,
+		    Translator tr, ScopeExp templateScope)
+  {
+    int ch = template_program.charAt(pc);
+    if ((ch & 7) == BUILD_VAR_CAR)
+      {
+	Pair p = (Pair) get_var(ch >> 3, vars, indexes);
+	return Translator.makePair(p, p.car, LList.Empty);
+      }
+    Object v = execute(pc, vars, nesting, indexes, tr, templateScope);
+    return new Pair(v, LList.Empty);
+  }
+
   /**
    * @param nesting  number of levels of ... we are nested inside
    * @param indexes element i (where i in [0 .. nesting-1] specifies
@@ -414,7 +456,7 @@ public class SyntaxTemplate implements Externalizable
   Object execute (int pc, Object[] vars, int nesting, int[] indexes,
 		  Translator tr, ScopeExp templateScope)
   {
-    char ch = template_program.charAt(pc);
+    int ch = template_program.charAt(pc);
     /* DEBUGGING:
     System.err.print ("{execute template pc:"+pc
 		      + " ch:"+(int)ch+" nesting:[");
@@ -422,10 +464,11 @@ public class SyntaxTemplate implements Externalizable
       System.err.print ((level > 0 ? " " : "") + indexes[level]);
     System.err.println("]}");
     */
+    while ((ch & 7) == BUILD_WIDE)
+      ch = ((ch - BUILD_WIDE) << 13) |	template_program.charAt(++pc);
     if (ch == BUILD_LIST1)
       {
-	Object v = execute(pc+1, vars, nesting, indexes, tr, templateScope);
-	return new Pair(v, LList.Empty);
+	return execute_car(pc+1, vars, nesting, indexes, tr, templateScope);
       }
     else if (ch == BUILD_SYNTAX)
       {
@@ -438,17 +481,16 @@ public class SyntaxTemplate implements Externalizable
 	Object result = null;
 	for (;;)
 	  {
-	    Pair q = new Pair();
+	    pc++;
+	    Pair q = execute_car(pc, vars, nesting, indexes, tr, templateScope);
 	    if (p == null)
 	      result = q;
 	    else
 	      p.cdr = q;
-	    pc++;
-	    q.car = execute(pc, vars, nesting, indexes, tr, templateScope);
 	    p = q;
 	    pc += ch >> 3;
 	    ch = template_program.charAt(pc);
-	    if ((ch & 3) != BUILD_CONS)
+	    if ((ch & 7) != BUILD_CONS)
 	      break;
 	  }
 	p.cdr = execute(pc, vars, nesting, indexes, tr, templateScope);
@@ -466,8 +508,7 @@ public class SyntaxTemplate implements Externalizable
 	for (int j = 0;  j < count; j++)
 	  {
 	    indexes[nesting] = j;
-	    Object element = execute(pc, vars, nesting + 1, indexes, tr, templateScope);
-	    Pair pair = new Pair (element, LList.Empty);
+	    Pair pair = execute_car(pc, vars, nesting + 1, indexes, tr, templateScope);
 	    if (last == null)
 	      result = pair;
 	    else
@@ -530,28 +571,20 @@ public class SyntaxTemplate implements Externalizable
 	  }
 	return vec;
       }
-    else if ((ch & 3) == BUILD_LITERAL)
+    else if ((ch & 7) == BUILD_LITERAL)
       {
-	int lit_no = ch >> 2;
+	int lit_no = ch >> 3;
 	/* DEBUGGING:
 	System.err.println("-- insert literal#"+lit_no
 			   +": "+literal_values[lit_no]);
 	*/
 	return literal_values[lit_no];
       }
-    else if ((ch & 3) == BUILD_VAR)
+    else if ((ch & 6) == BUILD_VAR) // Also handles BUILD_VAR_CAR.
       {
-	int var_num = ch >> 2;
-	Object var = vars [var_num];
-	if (var_num < pattern_nesting.length ())
-	  {
-	    int var_nesting = (int) pattern_nesting.charAt (var_num);
-	    for (int level = 0;  level < var_nesting;  level++)
-	      var = ((Object[]) var) [indexes[level]];
-	  }
-	/* DEBUGGING:
-	System.err.println("-- insert pattern var: "+var);
-	*/
+	Object var = get_var(ch >> 3, vars, indexes);
+	if ((ch & 7) == BUILD_VAR_CAR)
+	  var = ((Pair) var).car;
 	return var;
       }
     else
@@ -563,7 +596,7 @@ public class SyntaxTemplate implements Externalizable
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    out.writeObject(pattern_nesting);
+    out.writeObject(patternNesting);
     out.writeObject(template_program);
     out.writeObject(literal_values);
     out.writeInt(max_nesting);
@@ -572,7 +605,7 @@ public class SyntaxTemplate implements Externalizable
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    pattern_nesting = (String) in.readObject();
+    patternNesting = (String) in.readObject();
     template_program = (String) in.readObject();
     literal_values = (Object[]) in.readObject();
     max_nesting = in.readInt();

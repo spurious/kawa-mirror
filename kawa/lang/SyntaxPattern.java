@@ -39,6 +39,8 @@ public class SyntaxPattern extends Pattern implements Externalizable
   /** The instruction <code>8*i+MATCH_EQUALS</code> matches the literal values literals[i]. */
   static final int MATCH_EQUALS = 2;
 
+  /** The instruction <code>8*i+MATCH_ANY</code> matches any form,
+   * It sets <code>vars[i]</code> to the matched form. */
   static final int MATCH_ANY = 3;
 
   /** The instruction <code>8*i+MATCH_PAIR</code> matches a Pair.
@@ -62,6 +64,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
    * It is followed by a pattern which must also match. */
   static final int MATCH_LENGTH = 6;
 
+  /** The instruction <code>8*i+MATCH_CAR</code> matches the car of a Pair,
+   * It sets <code>vars[i]</code> to the Pair itself. */
+  static final int MATCH_ANY_CAR = 7;
+
   Object[] literals;
   int varCount;
 
@@ -84,16 +90,6 @@ public class SyntaxPattern extends Pattern implements Externalizable
   {
     this(new StringBuffer(), pattern,
 	 null, literal_identifiers, tr);
-    /*
-    StringBuffer programbuf = new StringBuffer();
-    this
-    translate(pattern, programbuf,
-	      literal_identifiers, 0, literalsbuf, null, tr);
-    program = programbuf.toString();
-    literals = new Object[literalsbuf.size()];
-    literalsbuf.copyInto(literals);
-    varCount = tr.patternScope.pattern_names.size();
-    */
   }
 
   SyntaxPattern (StringBuffer programbuf, Object pattern,
@@ -102,11 +98,34 @@ public class SyntaxPattern extends Pattern implements Externalizable
   {
     Vector literalsbuf = new Vector();
     translate(pattern, programbuf,
-	      literal_identifiers, 0, literalsbuf, null, tr);
+	      literal_identifiers, 0, literalsbuf, null, '\0', tr);
     program = programbuf.toString();
     literals = new Object[literalsbuf.size()];
     literalsbuf.copyInto(literals);
     varCount = tr.patternScope.pattern_names.size();
+    /* DEBUGGING:
+    System.err.print("{translated pattern");
+    Macro macro = tr.currentMacroDefinition;
+    if (macro != null)
+      {
+	System.err.print(" for ");
+	System.err.print(macro);
+      }
+    String file = tr.getFile();
+    if (file != null)
+      {
+	System.err.print(" file ");
+	System.err.print(file);
+      }
+    int line = tr.getLine();
+    if (line != 0)
+      {
+	System.err.print(" line ");
+	System.err.print(line);
+      }
+    System.err.println(':');
+    disassemble();
+    */
   }
 
   public void disassemble ()
@@ -145,7 +164,9 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    ps.println();
 	    break;
 	  case MATCH_ANY:
-	    ps.print(" - ANY["+value+"]");
+	  case MATCH_ANY_CAR:
+	    ps.print((opcode == MATCH_ANY ? " - ANY[" : " - ANY_CAR[")
+		     +value+"]");
 	    if (pattern_names != null
 		&& value >= 0 && value < pattern_names.size())
 	      ps.print(pattern_names.elementAt(value));
@@ -192,9 +213,13 @@ public class SyntaxPattern extends Pattern implements Externalizable
 
 
 
+  /**
+   * @param context 'V' : vector elements; 'P' : car of Pair; '\0' : other.
+   */
   void translate (Object pattern, StringBuffer program,
 		  Object[] literal_identifiers, int nesting,
 		  Vector literals, SyntaxForm syntax,
+		  char context,
 		  Translator tr)
   {
     PatternScope patternScope = tr.patternScope;
@@ -235,9 +260,12 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		  }
 
 		int subvar0 = patternNames.size();
+		if (context == 'P')
+		  context = '\0';
 		translate(pair.car, program, literal_identifiers,
 			  repeat ? nesting + 1 : nesting,
-			  literals, syntax, tr);
+			  literals, syntax,
+			  context == 'V' ? '\0' : 'P', tr);
 		int subvarN = patternNames.size() - subvar0;
 		int width = ((program.length() - start_pc - 1) << 3)
 		  | (repeat ? MATCH_LREPEAT : MATCH_PAIR);
@@ -302,9 +330,11 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	      tr.syntaxError("duplicated pattern variable " + pattern);
 	    int i = patternNames.size();
 	    patternNames.addElement(pattern);
-	    patternScope.pattern_nesting.append((char) nesting);
+	    boolean matchCar = context == 'P';
+	    int n = (nesting << 1) + (matchCar ? 1 : 0);
+	    patternScope.patternNesting.append((char) n);
 	    tr.push(patternScope.addDeclaration(pattern));
-	    addInt(program, (i << 3) | MATCH_ANY);
+	    addInt(program, (i << 3) | (matchCar ? MATCH_ANY_CAR : MATCH_ANY));
 	    return;
 	  }
 	else if (pattern == LList.Empty)
@@ -316,6 +346,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	  {
 	    program.append((char) MATCH_VECTOR);
 	    pattern = LList.makeList((FVector) pattern);
+	    context = 'V';
 	    continue;
 	  }
 	else
@@ -345,6 +376,28 @@ public class SyntaxPattern extends Pattern implements Externalizable
       offset += insertInt(offset, sbuf, (val << 13) + MATCH_WIDE);
     sbuf.insert(offset, (char) (val));
     return offset+1;
+  }
+
+  /** Match the <code>car</code> of a <code>Pair</code>.
+   * This special case (instead of of just matching the <code>car</code>
+   * directly), is so we can copy <code>PairWithPosition</code> line number
+   * info into the output of a template. */
+  boolean match_car (Pair p, Object[] vars, int start_vars,
+		     int pc, SyntaxForm syntax)
+  {
+    int pc_start = pc;
+    char ch;
+    int value = (ch = program.charAt(pc++)) >> 3;
+    while ((ch & 7) == MATCH_WIDE)
+      value = (value << 13) | ((ch = program.charAt(pc++)) >> 3);
+    if ((ch & 7) == MATCH_ANY_CAR)
+      {
+	if (syntax != null && ! (p.car instanceof SyntaxForm))
+	  p = Translator.makePair(p, syntax.fromDatum(p.car), p.cdr);
+	vars[start_vars + value] = p;
+	return true;
+      }
+    return match (p.car, vars, start_vars, pc_start, syntax);
   }
 
   public boolean match (Object obj, Object[] vars, int start_vars,
@@ -406,7 +459,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	    if (! (obj instanceof Pair))
 	      return false;
 	    p = (Pair) obj;
-	    if (! match(p.car, vars, start_vars, pc, syntax))
+	    if (! match_car(p, vars, start_vars, pc, syntax))
 	      return false;
 	    pc += value;
 	    value = 0;
@@ -464,7 +517,7 @@ public class SyntaxPattern extends Pattern implements Externalizable
 		    obj = syntax.form;
 		  }
 		p = (Pair) obj;
-		if (! match (p.car, vars, start_vars, repeat_pc, syntax))
+		if (! match_car (p, vars, start_vars, repeat_pc, syntax))
 		  return false;
 		obj = p.cdr;
 		for (int j = 0;  j < subvarN;  j++)
@@ -488,8 +541,10 @@ public class SyntaxPattern extends Pattern implements Externalizable
 	      obj = syntax.fromDatum(obj);
 	    vars[start_vars + value] = obj;
 	    return true;
+	  case MATCH_ANY_CAR: // Disallowed here.
 	  default:
-	    throw new Error("unrecognized pattern opcode");
+	    disassemble();
+	    throw new Error("unrecognized pattern opcode @pc:"+pc);
 	  }
       }
   }

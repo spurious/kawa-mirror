@@ -1,3 +1,6 @@
+// Copyright (c) 1996-2000  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.mapping;
 
 /** A Binding is a Location in an Environment object. */
@@ -229,12 +232,13 @@ public class Binding extends Location
 
   public final Object getFunctionValue()
   {
-    // Kludge  FIXME
-    Constraint constraint = Constraint.getConstraint(this);
-    if (constraint instanceof gnu.jemacs.lang.SymbolConstraint)
-      return ((gnu.jemacs.lang.SymbolConstraint) constraint).getFunctionBinding(this);
-    else if (isBound())
-      return get();
+    Binding binding = this;
+    while (binding.constraint instanceof AliasConstraint)
+      binding = (Binding) binding.value;
+    if (binding instanceof Binding2)
+      return ((Binding2) binding).functionValue;
+    else if (binding.isBound())
+      return binding.get();
     else
       return null;
   }

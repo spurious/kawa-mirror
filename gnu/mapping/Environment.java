@@ -1,3 +1,6 @@
+// Copyright (c) 1996-2000  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.mapping;
 
 /**
@@ -35,6 +38,18 @@ public class Environment extends NameMap
   public static void define_global (String name, Object new_value)
   {
     user().define (name, new_value);
+  }
+
+  public static void defineFunction (String name, Object new_value)
+  {
+    defineFunction(user(), name, new_value);
+  }
+
+  public static void defineFunction (Environment env,
+				     String name, Object new_value)
+  {
+    Binding2 binding = Binding2.getBinding2(env, name);
+    binding.functionValue = new_value;
   }
 
   /** Define name (interned) to have a given value. */

@@ -7,7 +7,10 @@ SUFFIXES = .java .class
 javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
+  AliasConstraint.java \
+  ApplyMethodContainer.java ApplyMethodProc.java \
   Binding.java \
+  Binding2.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   IndirectConstraint.java \
   CallFrame.java CallStack.java CpsProcedure.java \

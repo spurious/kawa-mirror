@@ -21,7 +21,7 @@ public class PrimArraySet extends Procedure3 implements Inlineable
   {
     exp.args[0].compile(comp, 0, new ArrayType(element_type));
     exp.args[1].compile(comp, 0, Type.int_type);
-    exp.args[2].compile(comp, 0);
+    exp.args[2].compile(comp, 0, element_type);
     comp.getCode().emitArrayStore(element_type);
     if ((flags & Expression.IGNORED) == 0)
       comp.compileConstant (Interpreter.voidObject);

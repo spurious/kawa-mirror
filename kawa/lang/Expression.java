@@ -9,8 +9,12 @@ import gnu.bytecode.Type;
 
 public abstract class Expression implements Printable
 {
-  abstract public Object eval (Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError;
+  public Object eval (Environment env)
+       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  {
+    throw new GenericError ("internal error - "
+			    + getClass() + ".eval called");
+  }
 
   abstract public void print (java.io.PrintWriter ps);
 

@@ -1,5 +1,10 @@
 Mon Sep 16 11:09:40 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* CpoolDouble.java:  New class, for CONSTANT_Double.
+	* Makefile.{am,in}:  Add CpoolDouble.class.
+	* Method.java (compile_push_double):  New method.
+	* ZipArchive.java:  Fix usage string.
+	
 	* Makefile.{am,in}: (javadir):  Use $(subdir)
 	{DEP_,}DISTFILES):  Do not include DATA (i.e. *.class).
 	Replace generated EXTRA_DIST with ditto SOURCES.

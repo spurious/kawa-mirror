@@ -282,17 +282,16 @@ public class Method {
   final void push_stack_type (Type type) {
     if (type == Type.void_type)
       throw new Error ("pushing void type onto stack");
-    if (type.size == 8)
-      push_stack_type (Type.void_type);
     if (stack_types == null)
       stack_types = new Type[20];
-    else if (SP >= stack_types.length) {
+    else if (SP + 1 >= stack_types.length) {
       Type[] new_array = new Type[2 * stack_types.length];
       System.arraycopy (stack_types, 0, new_array, 0, SP);
       stack_types = new_array;
     }
-    stack_types[SP] = type;
-    SP++;
+    if (type.size == 8)
+      stack_types[SP++] = Type.void_type;
+    stack_types[SP++] = type;
     if (SP > max_stack)
       max_stack = SP;
   }
@@ -339,6 +338,38 @@ public class Method {
       {
 	instruction_start_hook (3);
 	int j = CpoolLong.get_const (classfile, i).index;
+      	put1 (20); // ldc2w
+	put2 (j);
+      }
+    push_stack_type (Type.double_type);
+  }
+
+  public void compile_push_double (double x)
+  {
+    if (x == 0.0)
+      {
+	instruction_start_hook (1);
+	put1 (14);  // dconst_0
+      }
+    else if (x == 1.0)
+      {
+	instruction_start_hook (1);
+	put1 (15);  // dconst_1
+      }
+    else if (x >= -128.0 && x < 128.0
+	     && (double)(int)x == x)
+      {
+	// Saves space in the constant pool
+	// Probably faster, at least on modern CPUs.
+	compile_push_int ((int) x);
+	instruction_start_hook (1);
+	pop_stack_type ();
+	put1 (135); // i2d
+      }
+    else
+      {
+	instruction_start_hook (3);
+	int j = CpoolDouble.get_const (classfile, x).index;
       	put1 (20); // ldc2w
 	put2 (j);
       }

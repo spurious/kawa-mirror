@@ -245,7 +245,7 @@ public class ZipArchive
 
   private static void usage ()
   {
-    System.err.println ("zipfile [pt] archive [file ...]");
+    System.err.println ("zipfile [ptxq] archive [file ...]");
     System.exit (-1);
   }
 
@@ -290,7 +290,7 @@ public class ZipArchive
    *
    * ZipArchive p archive file ...
    *   Print the named members from the archive on standard output.
-   *   Prints just the raw contents, with no headerss or conversion.
+   *   Prints just the raw contents, with no headers or conversion.
    *
    * ZipArchive [ptx] archive
    *   With no arguments, does each command for every member in the archive.

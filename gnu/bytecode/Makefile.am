@@ -19,6 +19,7 @@ CpoolClass.class \
 CpoolEntry.class \
 CpoolInt.class \
 CpoolLong.class \
+CpoolDouble.class \
 CpoolNameAndType.class \
 CpoolRef.class \
 CpoolString.class \

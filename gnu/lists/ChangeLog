@@ -1,3 +1,7 @@
+2003-11-09  Per Bothner  <per@bothner.com>
+
+	* SeqPosition.java (toString):  Rename to toInfo, and add new toString.
+
 2003-11-03  Per Bothner  <per@bothner.com>
 
 	* UnescapedData.java:  New longer implement Consumable.

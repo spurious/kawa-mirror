@@ -335,6 +335,16 @@ implements
 
   public String toString()
   {
+    if (sequence == null)
+      return toInfo();
+    Object item = sequence.getPosNext(ipos);
+    if (item == null)
+      return toInfo();
+    return item.toString();
+  }
+
+  public String toInfo()
+  {
     StringBuffer sbuf = new StringBuffer(60);
     sbuf.append('{');
     if (sequence == null)

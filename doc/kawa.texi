@@ -812,6 +812,11 @@ Delete the file named @var{filename}.
 Renames the file named @var{oldname} to @var{newname}.
 @end defun
 
+@defun copy-file oldname newname-from path-to
+Copy the file named @var{oldname} to @var{newname}.
+The return value is unspecified.
+@end defun
+
 @defun create-directory dirname
 Create a new directory named @var{dirname}.
 Unspecified what happens on error (such as exiting file with the same name).
@@ -855,9 +860,12 @@ and returning a string.
 @end defun
 
 @defun default-prompter port
-The default prompt procedure.  It returns @code{"#|kawa:@var{L}#| "}, where
-@var{L} is the number of the current line of @var{port}.  The prompt has
-the form of a comment to make it easier to cut-and-paste.
+The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
+@var{L} is the number of the current line of @var{port}.
+When reading a continuation line, the result
+is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
+by @code{(input-port-read-state @var{port})}.
+The prompt has the form of a comment to make it easier to cut-and-paste.
 @end defun
 
 @defun input-port-line-number port
@@ -876,6 +884,15 @@ which must be a (non-binary) input port.
 The initial column is column 1.
 @end defun
 
+@defun input-port-read-state port
+Returns a character indicating the current @code{read} state of the @var{port}.
+Returns @code{#\Return} if not current doing a @var{read},
+@code{#\"} if reading a string;  @code{#\|} if reading a comment;  @code{#\(}
+if inside a list; and @code{#\Space} when otherwise in a @code{read}.
+The result is intended for use by prompt prcedures, and is not necessarily
+correct except when reading a new-line.
+@end defun
+
 @defvar symbol-read-case
 A symbol that controls how @code{read} handles letters when reading a symbol.
 (Letter following a @samp{\} are unchanged in all cases.)
@@ -885,6 +902,20 @@ in symbols are down-cased.
 If the first letter is @samp{I}, then the case of letters in symbols
 is inverted.
 Otherwise (the default), the letter is not changed.
+@end defvar
+
+@defvar port-char-encoding
+Controls how bytes in external files are converted to/from internal
+Unicode characters.  Can be either a symbol or a boolean.
+If @code{port-char-encoding} is @code{#f}, the file is assumed
+to be a binary files and no conversion is done.
+Otherwise, the file is a text file.  The default is @code{#t}, which
+uses a locale-dependent conversion.  If @code{port-char-encoding}
+is a symbol, it must be the name of a character encoding known to Java.
+For all text files (that is if @code{port-char-encoding} is not @code{#f}),
+on input a @code{#\Return} character or
+a @code{#\Return} followed by @code{#\Newline}
+are converted into plain @code{#\Newline}.
 @end defvar
 
 @node Exceptions, Eval and Environments, Ports, Extensions

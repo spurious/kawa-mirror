@@ -16,9 +16,6 @@ integer_p.java \
 positive_p.java \
 max.java \
 min.java \
-NumberCompare.java \
-multiply_oper.java \
-divide_oper.java \
 modulo.java \
 gcd.java \
 lcm.java \

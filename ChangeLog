@@ -1,3 +1,11 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/NumberCompare.java:  Moved to gnu.kawa.functions.
+	* kawa/standard/divide_oper.java:  Ditto; renamed to DivideOp.
+	* kawa/standard/multiply_oper.java:  Ditto; renamed to MultiplyOp.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/Scheme.java:  Likewise.
+
 2001-09-21  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/AutoloadProcedure.java (load):  If getFunction

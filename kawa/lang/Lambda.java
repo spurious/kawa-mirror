@@ -285,7 +285,7 @@ public class Lambda extends Syntax implements Printable
     if (body instanceof Pair && ((Pair) body).car == "<sequence>")
       {
         System.err.println("make sequence");
-        ClassType type = ClassType.make("gnu.kawa.util.Consumer");
+        ClassType type = ClassType.make("gnu.lists.Consumer");
         Declaration rdecl = new Declaration("$result$", type);
         lexp.add(null, rdecl);
         tr.push(rdecl);

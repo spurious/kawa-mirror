@@ -19,12 +19,12 @@ public class CompileFile extends Procedure2
     super ("compile-file");
   }
 
-  public static final ModuleExp read (String name, Translator tr)
+  public static final ModuleExp read (String name, SourceMessages messages)
   {
     try
       {
 	InPort fstream = InPort.openFile(name);
-	ModuleExp result = read(fstream, tr);
+	ModuleExp result = read(fstream, messages);
 	fstream.close();
 	return result;
       }
@@ -38,52 +38,20 @@ public class CompileFile extends Procedure2
       }
   }
 
-  public static final ModuleExp read (InPort port, Translator tr)
+  public static final ModuleExp read (InPort port, SourceMessages messages)
   {
-    ModuleExp mexp = new ModuleExp();
-    mexp.setFile(port.getName());
-    java.util.Vector forms = new java.util.Vector(20);
-    SourceMessages messages = tr.getMessages();
-    tr.push(mexp);
-    try
-      {
-	LispReader lexer = (LispReader) Interpreter.getInterpreter().getLexer(port, messages);
-        for (;;)
-          {
-	    Object sexp = lexer.readObject(); // FIXME
-	    if (sexp == Sequence.eofValue)
-	      break;
-            if (! tr.scan_form (sexp, forms, mexp))
-              break;
-          }
-	if (port.peek() == ')')
-	  lexer.fatal("An unexpected close paren was read.");
-      }
-    catch (gnu.text.SyntaxException ex)
-      {
-        // Got a fatal error.
-        if (ex.getMessages() != messages)
-          throw new GenericError ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-      }
-    catch (java.io.IOException e)
-      {
-	throw new GenericError ("I/O exception reading file: " + e.toString ());
-      }
-    tr.finishModule(mexp, forms);
-    return mexp;
+    return Interpreter.getInterpreter().parseFile(port, messages);
   }
 
   public final Object apply2 (Object arg1, Object arg2)
   {
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
-    Translator tr = new Translator ();
+    SourceMessages messages = new SourceMessages();
     ModuleExp lexp;
     try
       {
-	lexp = read (arg1.toString (), tr);
-        SourceMessages messages = tr.getMessages();
+	lexp = read (arg1.toString (), messages);
         if (messages.seenErrors())
           throw new gnu.text.SyntaxException(messages);
       }
@@ -127,8 +95,7 @@ public class CompileFile extends Procedure2
 	if (prefix != null)
 	  topname = prefix + short_name;
       }
-    Translator tr = new Translator (Environment.user(), messages);
-    ModuleExp mexp = read (inname, tr);
+    ModuleExp mexp = read (inname, messages);
     if (messages.seenErrors())
       return;
 

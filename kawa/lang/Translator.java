@@ -25,9 +25,6 @@ public class Translator extends Parser
   // Map name to Declaration.
   public Environment environ;
 
-  /** If doing immediate evaluation. */
-  public boolean immediate;
-
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
   {
@@ -444,7 +441,7 @@ public class Translator extends Parser
     return result;
   }
 
-  boolean scan_form (Object st, java.util.Vector forms, ScopeExp defs)
+  public boolean scan_form (Object st, java.util.Vector forms, ScopeExp defs)
   {
     // Process st.
     if (! (st instanceof Pair))
@@ -632,6 +629,59 @@ public class Translator extends Parser
    * For each binding, we push <old binding>, <name>.
    * For each new scope, we push <null>. */
   java.util.Stack shadowStack = new java.util.Stack();
+
+ /**
+   * Insert decl into environ.
+   * (Used at rewrite time, not eval time.)
+   */
+  public void push (Declaration decl)
+  {
+    String sym = decl.getName();
+    if (sym == null)
+      return;
+    pushBinding(sym, decl);
+  }
+
+  /** Remove this from Translator.environ.
+   * (Used at rewrite time, not eval time.)
+   */
+  private void pop (Declaration decl)
+  {
+    String sym = decl.getName();
+    if (sym == null)
+      return;
+    popBinding();
+  }
+
+  public final void pushDecls (ScopeExp scope)
+  {
+    // shadowStack.push(null);
+    for (Declaration decl = scope.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      push(decl);
+  }
+
+  private final void popDecls (ScopeExp scope)
+  {
+    for (Declaration decl = scope.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      pop(decl);
+  }
+
+  public void push (ScopeExp scope)
+  {
+    scope.outer = current_scope;
+    if (! (scope instanceof ModuleExp))
+      mustCompileHere();
+    current_scope = scope;
+    pushDecls(scope);
+  }
+
+  public void pop (ScopeExp scope)
+  {
+    popDecls(scope);
+    current_scope = scope.outer;
+  }
 
   /** Note a new binding, remembering old binding in the shadowStack. */
   public void pushBinding(String name, Object value)

@@ -78,7 +78,7 @@ public class SyntaxRule implements Externalizable
 
   // A syntax-rule template is translated into a "template program."
   // The template program is a simple bytecode stored in a string.
-  // The encoding is designed is that instructions are normally
+  // The encoding is designed so that instructions are normally
   // in the range 1..127, which makes the CONSTANT_Utf8 encoding used
   // in .class files compact.
 
@@ -116,7 +116,7 @@ public class SyntaxRule implements Externalizable
 	  {
 	    int lit_num = (ch - FIRST_LITERALS) >> 1;
 	    ps.print (" - literal[" + lit_num + "]: ");
-	    SFormat.print (literal_values [lit_num], ps);
+	    kawa.standard.Scheme.writeFormat.writeObject(literal_values [lit_num], (Consumer) ps);
 	    ps.println ();
 	  }
 	else
@@ -370,6 +370,7 @@ public class SyntaxRule implements Externalizable
 		  last.cdr = pair;
 		last = pair;
 	      }
+
 	    if (last == null)
 	      result = following;
 	    else

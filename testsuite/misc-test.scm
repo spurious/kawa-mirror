@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 62)
+(test-init "Miscellaneous" 65)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -225,6 +225,33 @@
 (set! (car p2) 49)
 (test '(49 . 50) 'test-alias-2 p2)
 (test '(49 . 50) 'test-alias-3 ((location p1)))
+
+(define test-nesting-1
+  (lambda ()
+    ((lambda (bar)
+       (letrec
+	   ((foo 
+	     (lambda (bar1) (foo bar))))
+	 33))
+   100)))
+(test 33 test-nesting-1)
+
+(define (test-nesting-2)
+  ((lambda (bar1)
+     (lambda ()
+       (lambda ()
+         bar1)))
+   #t)
+  (let ((bar2 34))
+    (lambda () (lambda () bar2))))
+(test 34 ((test-nesting-2)))
+
+(define (test-duplicate-names)
+  (let ((bar #t)) (lambda () (lambda () bar)))
+  (let ((bar #t)) (lambda () (lambda () bar)))
+  (let ((bar #t)) (lambda () (lambda () bar)))
+  97)
+(test 97 test-duplicate-names)
 
 (define (test-location-local x)
   (let* ((xl (location x))  ;; test location of formal parameter x

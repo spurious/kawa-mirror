@@ -136,6 +136,7 @@ case ${enable_xml} in
 esac
   
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
+BYTECODE_VERSION="$VERSION"
 
 pathsep=':'
 filesep='/'
@@ -168,6 +169,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(JEMACS_VERSION)
+AC_SUBST(BYTECODE_VERSION)
 AC_SUBST(SHELL)
 Make_rules="$srcdir/Make-rules"
 AC_SUBST_FILE(Make_rules)

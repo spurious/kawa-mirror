@@ -1,3 +1,10 @@
+2005-01-18  C. Brian Jones  <cbj@gnu.org>
+
+	* configure.in: Added BYTECODE_VERSION.
+	[Per: changed to be the same as VERSION]
+	* Makefile.am: Added targets for bytecode.jar, install-bytecode-jar.
+	* gnu/bytecode/jar-manifest: New file.
+
 2005-01-16  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (makeDeclInModule): Clear the value

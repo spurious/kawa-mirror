@@ -1,3 +1,12 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* ArrayOps.scm, ELisp.java, ELispReader.java, ObArray.java,
+	SaveExcursion.java, Symbol.java, UnwindProtect.java, While.java,
+	defcustom.java, defgroup.java, defun.java, defvar.java, lambda.java,
+	setq.java:  Update gnu.kawa.util->gnu.lists, elementAt->get,
+	length->size, UniformVector->SimpleVector,  setAll->fill,
+	marker-kind to isAfter boolean.
+
 2000-12-09  Per Bothner  <per@bothner.com>
 
 	* ObArray.java (getBinding):  New method.

@@ -77,6 +77,11 @@ public abstract class Interpreter
     return null;
   }
 
+  protected Interpreter ()
+  {
+    gnu.lists.Convert.setInstance(KawaConvert.getInstance());
+  }
+
   public static Interpreter getInstance (String langName, Class langClass)
   {
     try
@@ -179,7 +184,7 @@ public abstract class Interpreter
           return getTypeFor((Class) spec);
         if (spec instanceof String)
           return getTypeFor((String) spec);
-        if (spec instanceof gnu.kawa.util.AbstractString)
+        if (spec instanceof gnu.lists.CharSequence)
           return gnu.bytecode.ClassType.make(spec.toString());
       }
     return (Type) spec;

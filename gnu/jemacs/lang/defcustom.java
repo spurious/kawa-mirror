@@ -1,6 +1,6 @@
 package gnu.jemacs.lang;
 import kawa.lang.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.expr.*;
 
 public class defcustom extends Syntax

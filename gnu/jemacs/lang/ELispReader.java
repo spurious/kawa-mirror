@@ -4,7 +4,7 @@ import gnu.mapping.*;
 import gnu.text.*;
 import gnu.math.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** A class to read Emacs Lisp forms (S-expressions). */
 

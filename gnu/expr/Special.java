@@ -11,7 +11,7 @@ public class Special extends Object implements Printable, Externalizable
   public static Special optional = new Special("optional");
   public static Special rest = new Special("rest");
   public static Special key = new Special("key");
-  public static Special eof = new Special("eof");
+  public static Object eof = gnu.lists.Sequence.eofValue;
   public static Special dfault = new Special("default");
   // Also:
   // #!void is the same as Values.Empty.
@@ -26,7 +26,7 @@ public class Special extends Object implements Printable, Externalizable
     name = new String(n);
   }
 
-  public static Special make (String name)
+  public static Object make (String name)
   {
     if (name == "optional") return optional;
     if (name == "rest") return rest;

@@ -32,6 +32,7 @@ java_JAVA=\
   Inlineable.java \
   InlineCalls.java \
   Interpreter.java \
+  KawaConvert.java \
   Keyword.java \
   LambdaExp.java \
   LetExp.java \

@@ -1,20 +1,20 @@
-(define (length (x :: <gnu.kawa.util.Sequence>))
-  (invoke x 'length))
+(define (length (x :: <gnu.lists.Sequence>))
+  (invoke x 'size))
 
 (define (arrayp x) <elisp:boolean>
-  (instance? x <gnu.kawa.util.UniformVector>))
+  (instance? x <gnu.lists.SimpleVector>))
 
 (define (aref
-         (array <gnu.kawa.util.UniformVector>)
+         (array <gnu.lists.SimpleVector>)
          (k <int>))
-  (invoke array 'elementAt k))
+  (invoke array 'get k))
 
-(define (aset (array <gnu.kawa.util.UniformVector>)
+(define (aset (array <gnu.lists.SimpleVector>)
 	      (k <int>)
 	      obj)
-  (invoke array 'setElementAt obj k)
+  (invoke array 'set k obj)
   obj)
 
-(define (fillarray (array <gnu.kawa.util.UniformVector>) obj)
-  (invoke array 'setAll obj)
+(define (fillarray (array <gnu.lists.SimpleVector>) obj)
+  (invoke array 'fill obj)
   obj)

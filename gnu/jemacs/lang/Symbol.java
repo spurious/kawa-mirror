@@ -1,6 +1,6 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.jemacs.buffer.BufferLocalConstraint;
 
 /** Support for ELisp Symbols.
@@ -8,7 +8,7 @@ import gnu.jemacs.buffer.BufferLocalConstraint;
  * Instead, at the ELisp level, the progrmmer uses java.lang.String objects.
  * This is for compatibility with Scheme, better integration with Java,
  * and because Strings are less "heighy-weight".  The special symbol `nil'
- * is actually the value gnu.kawa.util.LList.Empty.
+ * is actually the value gnu.lists.LList.Empty.
  * We use an Environment (ObArray) to map from from String to Binding2
  * objects (perhaps in the future we will use Symbol instances instead of
  * Binding2 instances).  The mapping from identifies to Binding2 objects

@@ -1,6 +1,6 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class ObArray extends Environment
 {
@@ -48,7 +48,7 @@ public class ObArray extends Environment
         env = vec.get(0);
         if (! (env instanceof Environment))
           {
-            env = new ObArray(vec.length());
+            env = new ObArray(vec.size());
             vec.set(0, env);
           }
         

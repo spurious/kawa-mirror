@@ -74,7 +74,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	Type restType = argTypes[arg_count-1];
 	if (restType == Compilation.scmListType)
 	  { // FIXME
-	    rargs[rargs.length-1] = gnu.kawa.util.LList.makeList(args, fixArgs);
+	    rargs[rargs.length-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
 	  }
 	else
@@ -363,7 +363,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       code.emitPrimop (opcode(), args.length, retType);
     else
       code.emitInvokeMethod(method, opcode());
-
     target.compileFromStack(comp, retType);
   }
 

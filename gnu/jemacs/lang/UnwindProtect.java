@@ -2,7 +2,7 @@ package gnu.jemacs.lang;
 import kawa.lang.*;
 import gnu.expr.Expression;
 import gnu.expr.TryExp;
-import gnu.kawa.util.Pair;
+import gnu.lists.Pair;
 
 public class UnwindProtect extends Syntax
 {

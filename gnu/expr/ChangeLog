@@ -1,3 +1,20 @@
+2001-03-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java	(compile):  When calling an inlined function,
+	use parameter's type as target when evaluating arguments.
+
+	* LambdaExp.java (compileAlloc, allocChildClasses):  Use old
+	closure handling code when Compilation.usingTailCalls.
+
+	* ModuleExp.java:  Add debugging code.
+
+	* LitTable.java (writeObject):  Update FString package name.
+	* Compilation.java:  Update classnames for new gnu.list changes.
+	* Interpreter.java (<init>):  Constructor sets Convert.instance.
+	* KawaConvert.java:  New class, extends gnu.lists.Convert.
+	* Makefile.am:  Add KawaConvert.java.
+	* Special.java (eof):  Now use gnu.lists.Sequence.eofValue.
+
 2001-02-28  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (enterFunction):  If getInlineOnly(), set closureEnv

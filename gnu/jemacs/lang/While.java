@@ -1,7 +1,7 @@
 package gnu.jemacs.lang;
 import gnu.expr.*;
 import kawa.lang.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.mapping.*;
 
 /** Implement the ELisp `while' syntax form. */

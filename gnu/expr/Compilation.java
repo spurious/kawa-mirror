@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -61,10 +61,10 @@ public class Compilation
   static public ClassType javaStringType = typeString;
   static public ClassType scmSymbolType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
-  static public ClassType scmSequenceType = ClassType.make("gnu.kawa.util.Sequence");
+  static public ClassType scmSequenceType = ClassType.make("gnu.lists.Sequence");
   static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
-  static public ClassType scmListType = ClassType.make("gnu.kawa.util.LList");
-  static public ClassType typePair = ClassType.make("gnu.kawa.util.Pair");
+  static public ClassType scmListType = ClassType.make("gnu.lists.LList");
+  static public ClassType typePair = ClassType.make("gnu.lists.Pair");
   static public ClassType scmPairType = typePair;
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
@@ -108,6 +108,9 @@ public class Compilation
   static final Field emptyConstant
     = scmListType.addField ("Empty", scmListType,
 			    Access.PUBLIC|Access.STATIC);
+  static final Field eofConstant
+    = scmSequenceType.addField ("eofValue", typeObject,
+				Access.PUBLIC|Access.STATIC);
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
   static Method initIntegerMethod;
@@ -315,8 +318,10 @@ public class Compilation
 	  }
 	else if (value == Values.empty)
 	  literal = new Literal (value, voidConstant, this);
-	else if (value == gnu.kawa.util.LList.Empty)
+	else if (value == gnu.lists.LList.Empty)
 	  literal = new Literal (value, emptyConstant, this);
+	else if (value == gnu.lists.Sequence.eofValue)
+	  literal = new Literal (value, eofConstant, this);
 	else if (value instanceof Undefined)
 	  literal = new Literal (value, undefinedConstant, this);
 	else if (immediate)
@@ -921,7 +926,7 @@ public class Compilation
 			code.popScope();	
 		      }
 		  }
-		else if ("gnu.kawa.util.LList".equals
+		else if ("gnu.lists.LList".equals
 			 (lastArgType.getName()))
 		  {	
 		    code.emitLoad(code.getArg(2)); // load args array.

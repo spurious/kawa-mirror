@@ -166,8 +166,8 @@ public class LitTable implements ObjectOutput
       {
 	lit.flags |= Literal.WRITING;
 	int oldStack = stackPointer;
-	if (obj instanceof gnu.kawa.util.FString
-	    && ((gnu.kawa.util.FString) obj).length() < 65535)
+	if (obj instanceof gnu.lists.FString
+	    && ((gnu.lists.FString) obj).size() < 65535)
 	  { // Optimization.
 	    push(obj.toString(), Type.string_type);
 	  }

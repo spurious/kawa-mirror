@@ -1,7 +1,7 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import kawa.lang.*;
 import java.util.Vector;
 

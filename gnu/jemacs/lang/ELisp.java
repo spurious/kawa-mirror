@@ -1,6 +1,6 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
@@ -90,8 +90,8 @@ public class ELisp extends Interpreter
     int i;
     if (x instanceof gnu.math.Numeric)
       i = ((gnu.math.Numeric) x).intValue();
-    else if (x instanceof Position)
-      i = ((Position) x).getOffset() + 1;
+    else if (x instanceof javax.swing.text.Position)
+      i = ((javax.swing.text.Position) x).getOffset() + 1;
     else
       i = -1;
     if (i < 0 || i > 0xffff)

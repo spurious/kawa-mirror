@@ -603,7 +603,7 @@ public class repl extends Procedure0or1
 	      }
 	    else
 	      {
-		// See it arg is a valid Compation option, and it so set it.
+		// See if arg is a valid Compilation option, and if so set it.
 		int eq = name.indexOf("=");
 		String opt_value;
 		if (eq < 0)

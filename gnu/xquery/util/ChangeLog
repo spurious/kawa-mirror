@@ -1,3 +1,10 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* Document.java (document, apply1): Specific that it throws Throwable,
+	thus we no longer have to wrap exceptions.
+
+	* AppendValues.java (compile):  Use compileWithPosition.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* Document.java (document):  Filter through NamespaceResolver.

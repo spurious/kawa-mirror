@@ -33,7 +33,7 @@ public class AppendValues extends CpsProcedure implements Inlineable
     if (target instanceof ConsumerTarget || target instanceof IgnoreTarget)
       {
 	for (int i = 0;  i < nargs;  i++)
-	  args[i].compile(comp, target);
+	  args[i].compileWithPosition(comp, target);
       }
     else if (target instanceof SeriesTarget)
       {
@@ -48,7 +48,7 @@ public class AppendValues extends CpsProcedure implements Inlineable
 	    else
 	      next = done;
 	    serTarget.done = next;
-	    args[i].compile(comp, serTarget);
+	    args[i].compileWithPosition(comp, serTarget);
 	    if (i + 1 < nargs)
 	      next.define(code);
 	  }

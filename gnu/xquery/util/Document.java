@@ -12,7 +12,7 @@ public class Document extends Procedure1
 {
   public static final Document document = new Document();
 
-  public static TreeList document (String fileName)
+  public static TreeList document (String fileName) throws Throwable
   {
     int len = fileName.length();
     boolean seenProto = false;
@@ -30,25 +30,18 @@ public class Document extends Procedure1
     if (! seenProto)
       fileName = "file:" + fileName;
     
-    try
-      {
-	java.net.URL url = new java.net.URL(fileName);
-	TreeList doc = new TreeList();
-	doc.beginDocument();
-	XMLParser parser
-	  = new XMLParser(url,
-			  new ParsedXMLToConsumer(new NamespaceResolver(doc)));
-	parser.parse();
-	doc.endDocument();
-	return doc;
-      }
-    catch (Exception ex)
-      {
-	throw new WrappedException(ex);
-      }
+    java.net.URL url = new java.net.URL(fileName);
+    TreeList doc = new TreeList();
+    doc.beginDocument();
+    XMLParser parser
+      = new XMLParser(url,
+		      new ParsedXMLToConsumer(new NamespaceResolver(doc)));
+    parser.parse();
+    doc.endDocument();
+    return doc;
   }
 
-  public Object apply1 (Object arg1)
+  public Object apply1 (Object arg1) throws Throwable
   {
     return document(arg1.toString());
   }

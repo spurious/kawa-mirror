@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 127)
+(test-init "Miscellaneous" 128)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -566,3 +566,8 @@
 		  (chifun
 		   (lambda () (list topfun))))
 	   "Test."))))
+
+(require 'list-lib)
+
+(test '(1 3) 'filter!-test (filter! odd? (iota 5)))
+

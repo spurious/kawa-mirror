@@ -1,3 +1,22 @@
+2001-05-08  Per Bothner  <per@bothner.com>
+
+	Change full-tailcalls calling convention so result is Consumer.
+	ModuleBody uses full-tailcalls calling convention.
+	* ApplyExp.java (compile):  Comment out usingCPStyle code for now.
+	* Compilation.java (valueCallContextField):  Removed field.
+	(addClass):  If non-static module-exp generate CpsProcedure apply.
+	* Expression.java (eval(Environment,CallContext)):  New method.
+	* IfExp.java (eval(Environment,CallContext)):  New method.
+	* LambdaExp.java (isHandlingTailCalls):  A non-static module body
+	now implements the CprProcedure calling convention.
+	* ModuleBody.java:  Now extends CpsProcedure instead of Procedure0.
+	Also implements Runnable.
+	(run):  Return type is now void, with result ignored.
+	(apply0):  New method, returns result value,
+	* ModuleExp.java (evalModule(Environment,CallContext)):  New method.
+	Call eval(Environment,CallContext) if not compiling.
+	* TailTarget.java (compileFromStack):  Call StackContext's writeValue.
+
 2001-05-01  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getNamespaceof):  New method.

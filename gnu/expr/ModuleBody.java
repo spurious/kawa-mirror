@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.lists.VoidConsumer;
 
 /**
  * Abstract class for the dummy top-level function of a module.
@@ -9,18 +10,27 @@ import gnu.mapping.*;
  * faster virtual method calls instead of slower interface calls).
  */
 
-public abstract class ModuleBody extends Procedure0
+public abstract class ModuleBody extends CpsProcedure implements Runnable
 {
-  public Object apply0 ()
+  public void apply (CallContext stack)
   {
-    return run();
   }
 
-  // Should return void.  FIXME
-  // The problem is eval needs to return a result.
-  public Object run ()
+  public void run ()
   {
-    return Values.empty;
+    CallContext ctx = new CallContext();
+    ctx.consumer = new VoidConsumer();
+    ctx.values = Values.noArgs;
+    ctx.proc = this;
+    ctx.run();
+  }
+
+  public Object apply0 ()
+  {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    ctx.proc = this;
+    return applyV(ctx);
   }
 
   /** This is invoked by main when ModuleBody is compiled with --main. */

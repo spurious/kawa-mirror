@@ -148,16 +148,28 @@ public class ModuleExp extends ClassExp
 
   public final Object evalModule (Environment env)
   {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    evalModule(env, ctx);
+    return Values.make((gnu.lists.TreeList) ctx.vstack);
+  }
+
+  public final void evalModule (Environment env, CallContext ctx)
+  {
     Environment orig_env = Environment.getCurrent();
     try
       {
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 	if (! mustCompile) // optimization - don't generate unneeded Class.
-	  return body.eval (env);
-	ModuleBody mod = (ModuleBody) eval (env);
-	gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
-	return mod.run();
+	  body.eval (env, ctx);
+	else
+	  {
+	    ModuleBody mod = (ModuleBody) eval (env);
+	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
+	    ctx.proc = mod;
+	    ctx.run();
+	  }
       }
     finally
       {

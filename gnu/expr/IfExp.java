@@ -34,6 +34,15 @@ public class IfExp extends Expression
       return interpreter.noValue();
   }
 
+  public void eval (Environment env, CallContext ctx)
+  {
+    Interpreter interpreter = getInterpreter();
+    if (interpreter.isTrue((test.eval (env))))
+      then_clause.eval (env, ctx);
+    else if (else_clause != null)
+      else_clause.eval(env, ctx);
+  }
+
   public void compile (Compilation comp, Target target)
   {
     compile(test, then_clause,

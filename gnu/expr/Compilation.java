@@ -235,8 +235,6 @@ public class Compilation
   public static Field noArgsField
     = typeValues.addField("noArgs", objArrayType,
 				Access.PUBLIC|Access.STATIC);
-  public static Field valueCallContextField
-    = typeCallContext.addField("value", Type.pointer_type, Access.PUBLIC);
   public static Field pcCallContextField
     = typeCallContext.addField("pc", Type.int_type, Access.PROTECTED);
   public static ClassType typeCpsProcedure
@@ -1065,43 +1063,30 @@ public class Compilation
           = curClass.addMethod ("step", arg_types, Type.void_type, 
                                 Access.PUBLIC|Access.FINAL);
       }
+    else if (lexp.isHandlingTailCalls())
+      {
+	apply_method
+	  = curClass.addMethod ("apply", arg_types, Type.void_type,
+				Access.PUBLIC|Access.FINAL);
+      }
     else if (lexp.isModuleBody())
       {
-	if (((ModuleExp) lexp).isStatic())
-	  {
-	    staticModule = true;
-	    generateConstructor (lexp);
-	    instanceField = curClass.addField("$instance", curClass,
-					     Access.STATIC|Access.FINAL);
-	    apply_method = startClassInit();
-	    code = getCode();
-	    code.emitNew(curClass);
-	    code.emitDup(curClass);
-	    code.emitInvokeSpecial(curClass.constructor);
-	    code.emitPutStatic(instanceField);
+	staticModule = true;
+	generateConstructor (lexp);
+	instanceField = curClass.addField("$instance", curClass,
+					  Access.STATIC|Access.FINAL);
+	apply_method = startClassInit();
+	code = getCode();
+	code.emitNew(curClass);
+	code.emitDup(curClass);
+	code.emitInvokeSpecial(curClass.constructor);
+	code.emitPutStatic(instanceField);
 
-	    classInitLabel = new Label(code);
-	    classBodyLabel = new Label(code);
-	    code.emitGoto(classInitLabel);
-	    classBodyLabel.define(code);
-	  }
-	else
-	  {
-	    Type rtype = Type.pointer_type;
-	    if (curClass.getSuperclass() != typeModuleBody)
-	      {
-		curClass.addInterface(typeRunnable);
-		rtype = Type.void_type;
-	      }
-	    apply_method
-	      = curClass.addMethod ("run", arg_types, rtype, 
-				    Access.PUBLIC|Access.FINAL);
-	  }
+	classInitLabel = new Label(code);
+	classBodyLabel = new Label(code);
+	code.emitGoto(classInitLabel);
+	classBodyLabel.define(code);
       }
-    else if (lexp.isHandlingTailCalls())
-      apply_method
-	= curClass.addMethod ("apply", arg_types, Type.void_type,
-			      Access.PUBLIC|Access.FINAL);
     else
       {
 	String apply_name = "apply"+arg_letter;
@@ -1166,11 +1151,7 @@ public class Compilation
 
     try
       {
-        body.compileWithPosition(this,
-                                 ! lexp.isModuleBody () ? Target.returnObject
-                                 : curClass.getSuperclass() != typeModuleBody
-                                 ? Target.Ignore
-                                 : Target.pushObject);
+        body.compileWithPosition(this, Target.returnObject);
       }
     catch (Exception ex)
       {

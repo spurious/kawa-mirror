@@ -241,6 +241,7 @@ public class ApplyExp extends Expression
           }
       }
 
+    /*
     if (comp.usingCPStyle())
       {
 	  {
@@ -294,6 +295,7 @@ public class ApplyExp extends Expression
 	  }
 	return;
       }
+    */
 
     // Check for tail-recursion.
     boolean tail_recurse

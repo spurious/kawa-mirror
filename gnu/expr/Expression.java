@@ -16,6 +16,12 @@ public abstract class Expression implements Printable
 			        + getClass() + ".eval called");
   }
 
+  public void eval (Environment env, CallContext ctx)
+  {
+    Object val = eval(env);
+    ctx.writeValue(val);
+  }
+
   abstract public void print (java.io.PrintWriter ps);
 
   public abstract void compile (Compilation comp, Target target);

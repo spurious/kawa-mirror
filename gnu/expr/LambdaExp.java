@@ -220,8 +220,8 @@ public class LambdaExp extends ScopeExp
 
   public final boolean isHandlingTailCalls ()
   {
-    return Compilation.usingTailCalls && ! isModuleBody()
-      && ! isClassMethod();
+    return (isModuleBody() && ! ((ModuleExp) this).isStatic())
+      || (Compilation.usingTailCalls && ! isModuleBody() && ! isClassMethod());
   }
 
   public final boolean variable_args () { return max_args < 0; }

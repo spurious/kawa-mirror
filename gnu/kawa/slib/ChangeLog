@@ -1,3 +1,8 @@
+2005-04-02  Per Bothner  <per@bothner.com>
+
+	* testing.scm: New file - srfi-64 (draft) reference implementation.
+	* Makefile.am (java_SCM): Update accordingly.
+
 2005-02-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (java_SCM): Re-order so DefineRecordType.scm is

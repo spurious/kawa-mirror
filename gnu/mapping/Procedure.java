@@ -234,4 +234,23 @@ public abstract class Procedure implements Named, Printable
     props[avail+1] = value;
     return properties;
   }
+
+  public Object removeProperty(Object key)
+  {
+    Object[] props = properties;
+    if (props == null)
+      return null;
+    for (int i = props.length;  (i -= 2) >= 0; )
+      {
+	Object k = props[i];
+	if (k == key)
+	  {
+	    Object old = props[i + 1];
+	    props[i] = null;
+	    props[i + 1] = null;
+	    return old;
+	  }
+      }
+    return null;
+  }
 }

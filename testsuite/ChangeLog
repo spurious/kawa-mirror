@@ -1,3 +1,8 @@
+Tue Mar 18 14:17:29 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* misc-test.scm:  New tests.
+	* Makefile.am, Makefile.in:  Update.
+
 Mon Mar 17 22:05:01 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* obj-test.scm:  New test.  Test record feature (if JDK 1.1).

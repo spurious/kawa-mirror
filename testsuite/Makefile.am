@@ -11,7 +11,7 @@ MISC_1_1 = check-obj
 
 all:
 
-check:  check-scm check-num check-mac @EXTRA_MISC@
+check:  check-scm check-num check-mac check-misc @EXTRA_MISC@
 
 check-scm:
 	rm -rf tmp?
@@ -20,6 +20,9 @@ check-scm:
 
 check-num:
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
+
+check-misc:
+	$(KAWATEST) -f "$(srcdir)/misc-test.scm" -e '(test-report)'
 
 check-mac:
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \

@@ -193,9 +193,16 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_sources = \
   Button.java \
+  DrawImage.java \
+  DrawShape.java \
+  FillShape.java \
   MenuItem.java \
+  Paintable.java \
   ViewContainer.java \
-  Viewable.java
+  Viewable.java \
+  WithComposite.java \
+  WithPaint.java \
+  WithTransform.java
 
 
 PACKAGE_FNAME = gnu-kawa-models

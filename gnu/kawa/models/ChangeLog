@@ -1,3 +1,14 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	* Paintable.java:  New interface,
+	* DrawImage.java:  New class, implements Paintable.
+	* DrawShape.java:  New class, implements Paintable.
+	* FillShape.java:  New class, implements Paintable.
+	* WithComposite.java:  New class, implements Paintable.
+	* WithPaint.java:  New class, implements Paintable.
+	* WithTransform.java:  New class, implements Paintable.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2003-07-21  Per Bothner  <per@bothner.com>
 
 	New package.

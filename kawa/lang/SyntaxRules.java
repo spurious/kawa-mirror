@@ -42,7 +42,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
     Macro macro = tr.currentMacroDefinition;
-    //    java.util.Vector capturedIdentifiers = macro.capturedIdentifiers;
     for (int i = 0;  i < rules_count;  i++, srules = rules_pair.cdr)
       {
 	rules_pair = (Pair) srules;

@@ -7,7 +7,7 @@ import gnu.lists.*;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
-public class CallContext implements Runnable
+public class CallContext // implements Runnable
     // extends ValueStack ??? FIXME
 {
   /* BEGIN JAVA2 */
@@ -68,12 +68,13 @@ public class CallContext implements Runnable
 
   public Procedure proc;
 
+  /** The program location in the current procedure.
+   * This a selector that only has meaning to the proc's Procedure.*/
+  public int pc;
+
   /* CPS: ??
   CallFrame frame;
   */
-
-  /** The program location in the current procedure. */
-  public int pc;
 
   /** Default place for function results.
    * In the future, function arguments will also use vstack. */
@@ -102,14 +103,14 @@ public class CallContext implements Runnable
    * Each argument uses 4 bits.
    * Arguments beyond 8 are implicitly ARG_IN_VALUES_ARRAY.
    */
-  int where;
-  final static int ARG_IN_VALUES_ARRAY = 0;
-  final static int ARG_IN_VALUE1 = 1;
-  final static int ARG_IN_VALUE2 = 2;
-  final static int ARG_IN_VALUE3 = 3;
-  final static int ARG_IN_VALUE4 = 4;
-  final static int ARG_IN_IVALUE1 = 5;
-  final static int ARG_IN_IVALUE2 = 6;
+  public int where;
+  public final static int ARG_IN_VALUES_ARRAY = 0;
+  public final static int ARG_IN_VALUE1 = 1;
+  public final static int ARG_IN_VALUE2 = 2;
+  public final static int ARG_IN_VALUE3 = 3;
+  public final static int ARG_IN_VALUE4 = 4;
+  public final static int ARG_IN_IVALUE1 = 5;
+  public final static int ARG_IN_IVALUE2 = 6;
 
   Object getArgAsObject(int i)
   {
@@ -130,18 +131,21 @@ public class CallContext implements Runnable
 
   /** Get the next incoming argument.
    * Throw WrongArguments if there are no more arguments.
+   * FIXME: This and following methods don't really fit until the
+   * current match/apply-based API, at least as currently implemented.
+   * We probably need to pass in (or make this a method of) the Procedure.
    */
   public Object getNextArg()
   {
     if (next >= count)
-      throw new WrongArguments(proc, count);
+      throw new WrongArguments(null, count);
     return getArgAsObject(next++);
   }
 
   public int getNextIntArg()
   {
     if (next >= count)
-      throw new WrongArguments(proc, count);
+      throw new WrongArguments(null, count);
     Object arg = getArgAsObject(next++);
     return ((Number) arg).intValue();
   }
@@ -164,7 +168,7 @@ public class CallContext implements Runnable
   }
 
   /** Get remaining arguments as an array. */
-  public final Object[] getRestArgsArray ()
+  public final Object[] getRestArgsArray (int next)
   {
     Object[] args = new Object[count - next];
     int i = 0;
@@ -177,7 +181,7 @@ public class CallContext implements Runnable
 
   /** Get remaining arguments as a list.
    * Used for Scheme and Lisp rest args. */
-  public final LList getRestArgsList ()
+  public final LList getRestArgsList (int next)
   {
     LList nil = LList.Empty;
     LList list = nil;
@@ -200,61 +204,8 @@ public class CallContext implements Runnable
   public void lastArg()
   {
     if (next < count)
-      throw new WrongArguments(proc, count);
+      throw new WrongArguments(null, count);
     values = null;
-  }
-
-  public void setArgs()
-  {
-    count = 0;
-    where = 0;
-    next = 0;
-  }
-
-  public void setArgs(Object arg1)
-  {
-    value1 = arg1;
-    count = 1;
-    where = ARG_IN_VALUE1;
-    next = 0;
-  }
-
-  public void setArgs(Object arg1, Object arg2)
-  {
-    value1 = arg1;
-    value2 = arg2;
-    count = 2;
-    where = ARG_IN_VALUE1|(ARG_IN_VALUE2<<4);
-    next = 0;
-  }
-  public void setArgs(Object arg1, Object arg2, Object arg3)
-  {
-    value1 = arg1;
-    value2 = arg2;
-    value3 = arg3;
-    count = 3;
-    where = ARG_IN_VALUE1|(ARG_IN_VALUE2<<4)|(ARG_IN_VALUE3<<8);
-    next = 0;
-  }
-
-  public void setArgs(Object arg1, Object arg2, Object arg3, Object arg4)
-  {
-    value1 = arg1;
-    value2 = arg2;
-    value3 = arg3;
-    value4 = arg4;
-    count = 4;
-    where = (ARG_IN_VALUE1|(ARG_IN_VALUE2<<4)
-      |(ARG_IN_VALUE3<<8|ARG_IN_VALUE4<<12));
-    next = 0;
-  }
-
-  public void setArgsN(Object[] args)
-  {
-    values = args;
-    count = args.length;
-    where = 0;
-    next = 0;
   }
 
   public Object[] getArgs()
@@ -264,6 +215,7 @@ public class CallContext implements Runnable
     else
       {
 	int n = count;
+	next = 0;
 	Object[] args = new Object[n];
 	for (int i = 0;  i < n;  i++)
 	  args[i] = getNextArg();
@@ -372,26 +324,6 @@ public class CallContext implements Runnable
     finally
       {
 	consumer = consumerSave;
-      }
-  }
-
-  public void run()
-  {
-    try
-      {
-	runUntilDone();
-      }
-    catch (RuntimeException ex)
-      {
-	throw ex;
-      }
-    catch (Error ex)
-      {
-	throw ex;
-      }
-    catch (Throwable ex)
-      {
-	throw new WrappedException(ex);
       }
   }
 

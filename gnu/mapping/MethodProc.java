@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -66,50 +66,6 @@ public abstract class MethodProc extends ProcedureN
     return atypes[index];
   }
 
-  /*
-  public abstract int applyIfMatches (CallContext ctx) throws Throwable
-  {
-    int code = match(ctx, args);
-    if (code == 0)
-      method.applyV(ctx);
-    return code;
-  }
-
-  public void apply (CallContext stack) throws Throwable
-  {
-    int code = applyIfMatches(ctx);
-    if (code < 0)
-      throw new WrongType(this, code, null);
-  }
-*/
-
-  /** Match the incoming arguments.
-   * @param ctx where to save the matched result on success
-   * @param args the incoming argument list
-   * @return non-negative if the match succeeded, else negative
-   */
-  // FIXME - only checks argument length.
-  public int match (CallContext ctx, Object[] args)
-  {
-    int argCount = args.length;
-    int num = numArgs();
-    int min = num & 0xFFF;
-    if (argCount < min)
-      return NO_MATCH_TOO_FEW_ARGS|min;
-    if (num >= 0)
-      {
-        int max = num >> 12;
-        if (argCount > max)
-          return NO_MATCH_TOO_MANY_ARGS|max;
-      }
-    ctx.setArgsN(args);
-    ctx.proc = this;
-    return 0;
-  }
-  // FUTURE:
-  // On success, vars has been initialized so vars.run() will work.
-  // public abstract int match(CallContext vars);
-
   /** Return code from match:  Unspecified failure. */
   public static final int NO_MATCH = -1;
 
@@ -125,15 +81,12 @@ public abstract class MethodProc extends ProcedureN
   public static final int NO_MATCH_AMBIGUOUS = 0xfff30000;
 
   /** Return code from match: Invalid argument type.
-   * In that case the lower half is the 0-origin index of the first
+   * In that case the lower half is the 1-origin index of the first
    * argument that does not match. */
   public static final int NO_MATCH_BAD_TYPE = 0xfff40000;
 
-  public Object applyV(CallContext ctx) throws Throwable
-  {
-    return ctx.runUntilValue();
-  }
-
+  /** Helper method to throw an exception if a <code>matchX</code>
+   * method fails. */
   public static RuntimeException
   matchFailAsException(int code, Procedure proc, Object[] args)
   {
@@ -143,17 +96,15 @@ public abstract class MethodProc extends ProcedureN
       return new WrongArguments(proc, args.length);
     if (code != NO_MATCH_BAD_TYPE)
       arg = WrongType.ARG_UNKNOWN;
-    throw new WrongType(proc, arg, null);
+    return new WrongType(proc, arg, args[arg-1]);
   }
 
   public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
     CallContext ctx = CallContext.getInstance();
-    int err = match(ctx, args);
-    if (err != 0)
-      throw matchFailAsException(err, this, args);
-    return applyV(ctx);
+    checkN(args, ctx);
+    return ctx.runUntilValue();
   }
 
   /** Return the more specific of the arguments.

@@ -1,5 +1,21 @@
 2004-08-06  Per Bothner  <per@bothner.com>
 
+	* Procedure.java:  New API, especially for --full-tailcalls.
+	(apply):  New static method.  Old apply calls new static.
+	(match0, match1, match2, match3, match4, matchN):  New methods.
+	(check0, check1, check2, check3, check4, checkN):  New methods.
+	* MethodProc.java (match, applyV):  Remove methods.
+	(apply(CallContext)):  Remove method - use the inherited method.
+	(applyN):  Update to use checkN instead of removed match+applyV.
+	* CallContext.java:  No longer implement Runnable.
+	(run):  Remove method.
+	(pc):  New field.
+	(getRestArgsArray, getRestArgsList):  Take start parameter.
+	(setArgs[5 methods], setArgsN):  Remove methods.
+	(getArgs):  Reset next to 0.
+
+2004-08-06  Per Bothner  <per@bothner.com>
+
 	* WrappedException.java (<init>):  Add default constructor.
 	* WrongType.java (number):  Change to 1-origin.
 	(typeExpected):  Renamed to expectedType and chaned to Object,

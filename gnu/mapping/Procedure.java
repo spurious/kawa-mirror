@@ -1,3 +1,6 @@
+// Copyright (c) 2004  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.mapping;
 
 /**
@@ -105,41 +108,277 @@ public abstract class Procedure implements Named
 
   /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
-   * the result is (by default) left in stack.value. */
+   * the result is written to ctx.consumer. */
 
   public void apply (CallContext ctx) throws Throwable
+  {
+    apply(this, ctx);
+  }
+
+  public static void apply (Procedure proc, CallContext ctx) throws Throwable
   {
     Object result;
     int count = ctx.count;
     if (ctx.where == 0 && count != 0)
-      result = applyN(ctx.values);
+      result = proc.applyN(ctx.values);
     else
       {
 	switch (count)
 	  {
 	  case 0:
-	    result = apply0();
+	    result = proc.apply0();
 	    break;
 	  case 1:
-	    result = apply1(ctx.getNextArg());
+	    Object a = ctx.getNextArg();
+	    result = proc.apply1(a);
 	    break;
 	  case 2:
-	    result = apply2(ctx.getNextArg(), ctx.getNextArg());
+	    result = proc.apply2(ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  case 3:
-	    result = apply3(ctx.getNextArg(), ctx.getNextArg(),
-			    ctx.getNextArg());
+	    result = proc.apply3(ctx.getNextArg(), ctx.getNextArg(),
+				 ctx.getNextArg());
 	    break;
 	  case 4:
-	    result = apply4(ctx.getNextArg(), ctx.getNextArg(),
-			    ctx.getNextArg(), ctx.getNextArg());
+	    result = proc.apply4(ctx.getNextArg(), ctx.getNextArg(),
+				 ctx.getNextArg(), ctx.getNextArg());
 	    break;
 	  default:
-	    result = applyN(ctx.getArgs());
+	    result = proc.applyN(ctx.getArgs());
 	    break;
 	  }
       }
     ctx.writeValue(result);
+  }
+
+  /** Pass zero arguments.
+   * @return non-negative if the match succeeded, else negative.
+   */
+  public int match0 (CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (min > 0)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num < 0)
+      return matchN(ProcedureN.noArgs, ctx);
+    ctx.count = 0;
+    ctx.where = 0;
+    ctx.next = 0;
+    ctx.proc = this;
+    return 0;
+  }
+
+  /** Pass one argument.
+   * @return non-negative if the match succeeded, else negative.
+   */
+  public int match1 (Object arg1, CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (min > 1)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 1)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.count = 1;
+	ctx.where = CallContext.ARG_IN_VALUE1;
+	ctx.next = 0;
+	ctx.proc = this;
+	return 0;
+      }
+    Object[] args = { arg1 };
+    return matchN(args, ctx);
+  }
+
+  /** Pass two arguments.
+   * @return non-negative if the match succeeded, else negative.
+   */
+  public int match2 (Object arg1, Object arg2, CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (min > 2)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 2)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.count = 2;
+	ctx.where = CallContext.ARG_IN_VALUE1
+	  |(CallContext.ARG_IN_VALUE2<<4);
+	ctx.next = 0;
+	ctx.proc = this;
+	return 0;
+      }
+    Object[] args = { arg1, arg2 };
+    return matchN(args, ctx);
+  }
+
+  /** Pass three arguments.
+   * @return non-negative if the match succeeded, else negative.
+   */
+  public int match3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (min > 3)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 3)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.value3 = arg3;
+	ctx.count = 3;
+	ctx.where = CallContext.ARG_IN_VALUE1
+	  |(CallContext.ARG_IN_VALUE2<<4)
+	  |(CallContext.ARG_IN_VALUE3<<8);
+	ctx.next = 0;
+	ctx.proc = this;
+	return 0;
+      }
+    Object[] args = { arg1, arg2, arg3 };
+    return matchN(args, ctx);
+  }
+
+  /** Pass four arguments.
+   * @return non-negative if the match succeeded, else negative.
+   */
+  public int match4 (Object arg1, Object arg2, Object arg3, Object arg4,
+		     CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (min > 4)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 4)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.value3 = arg3;
+	ctx.value4 = arg4;
+	ctx.count = 4;
+	ctx.where = (CallContext.ARG_IN_VALUE1
+		     |(CallContext.ARG_IN_VALUE2<<4)
+		     |(CallContext.ARG_IN_VALUE3<<8)
+		     |(CallContext.ARG_IN_VALUE4<<12));
+	ctx.next = 0;
+	ctx.proc = this;
+	return 0;
+      }
+    Object[] args = { arg1, arg2, arg3, arg4 };
+    return matchN(args, ctx);
+  }
+
+  public int matchN (Object[] args, CallContext ctx)
+  {
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (args.length < min)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+	switch (args.length)
+	  {
+	  case 0:
+	    return match0(ctx);
+	  case 1:
+	    return match1(args[0], ctx);
+	  case 2:
+	    return match2(args[0], args[1], ctx);
+	  case 3:
+	    return match3(args[0], args[1], args[2], ctx);
+	  case 4:
+	    return match4(args[0], args[1], args[2], args[3], ctx);
+	  default:
+	    int max = num >> 12;
+	    if (args.length > max)
+	      return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	  }
+      }
+    ctx.values = args;
+    ctx.count = args.length;
+    ctx.where = 0;
+    ctx.next = 0;
+    ctx.proc = this;
+    return 0;
+  }
+
+  /** Does match0, plus throws exception on argument mismatch. */
+  public void check0 (CallContext ctx)
+  {
+    int code = match0(ctx);
+    if (code != 0)
+      {
+	throw MethodProc.matchFailAsException(code, this, ProcedureN.noArgs);
+      }
+  }
+
+  /** Does match1, plus throws exception on argument mismatch. */
+  public void check1 (Object arg1, CallContext ctx)
+  {
+    int code = match1(arg1, ctx);
+    if (code != 0)
+      {
+	Object[] args = { arg1 };
+	throw MethodProc.matchFailAsException(code, this, args);
+      }
+  }
+
+  /** Does match, plus throws exception on argument mismatch. */
+  public void check2 (Object arg1, Object arg2, CallContext ctx)
+  {
+    int code = match2(arg1, arg2, ctx);
+    if (code != 0)
+      {
+	Object[] args = { arg1, arg2 };
+	throw MethodProc.matchFailAsException(code, this, args);
+      }
+  }
+ 
+  /** Does match3, plus throws exception on argument mismatch. */
+  public void check3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
+  {
+    int code = match3(arg1, arg2, arg3, ctx);
+    if (code != 0)
+      {
+	Object[] args = { arg1, arg2, arg3 };
+	throw MethodProc.matchFailAsException(code, this, args);
+      }
+  }
+
+  /** Does match4, plus throws exception on argument mismatch. */
+  public void check4 (Object arg1, Object arg2, Object arg3, Object arg4,
+		      CallContext ctx)
+  {
+    int code = match4(arg1, arg2, arg3, arg4, ctx);
+    if (code != 0)
+      {
+	Object[] args = { arg1, arg2, arg3, arg4 };
+	throw MethodProc.matchFailAsException(code, this, args);
+      }
+  }
+
+  /** Does matchN, plus throws exception on argument mismatch. */
+  public void checkN (Object[] args, CallContext ctx)
+  {
+    int code = matchN(args, ctx);
+    if (code != 0)
+      {
+	throw MethodProc.matchFailAsException(code, this, args);
+      }
   }
 
   public Procedure getSetter()

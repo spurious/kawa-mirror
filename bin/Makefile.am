@@ -1,8 +1,10 @@
+if ENABLE_KAWA_FRONTEND
 if WITH_GCJ
-KAWAPROGS =  @kawa_bin@ kawa-bin
+KAWAPROGS =  kawa-bin kawa
 bin_SCRIPTS = gckawa
 else
-KAWAPROGS =  @kawa_bin@
+KAWAPROGS = kawa
+endif
 endif
 bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
@@ -28,6 +30,11 @@ KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
   gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o
 LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
   gnu-brl.lo gnu-kawa-brl.lo
+endif
+if ENABLE_SERVLET
+KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
+LIBADD_SERVLET = gnu-kawa-servlet.lo
+EXTRA_LIB_SERVLET = -l-javax-servlet
 endif
 
 kawa.sh:
@@ -75,7 +82,8 @@ kawa-standard.lo:
 kawa-repl.lo:
 	cd ../kawa && $(MAKE) ../bin/kawa-repl.lo
 
-KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES) \
+KAWA2_OFILES = $(KAWA1_OFILES) \
+  $(KAWA2_XML_OFILES) $(KAWA2_SERVLET_OFILES) \
   kawa-lib.o \
   gnu-commonlisp-lisp.o \
   gnu-kawa-slib.o
@@ -93,6 +101,7 @@ libkawa_la_LIBADD = \
   $(KAWA1_OFILES) \
   gnu-ecmascript.lo \
   $(LIBADD_XML) \
+  $(LIBADD_SERVLET) \
   gnu-kawa-slib.lo \
   gnu-commonlisp-lisp.lo \
   kawa-lib.lo
@@ -102,15 +111,21 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 	  -o kawa1$(EXEEXT) $(KAWA1_OFILES) --main=kawa.repl
 
 kawa-bin$(EXEEXT): libkawa.la
-	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  libkawa.la --main=kawa.repl
+	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET)
 
 install-exec-local: install-exec-bindir
 
 install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
-	if test "@kawa_bin@" = "" ; then \
-	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
-	fi
+if ENABLE_KAWA_FRONTEND
+else
+	$(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa
+endif
 if WITH_GCJ
 	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa
 endif
+
+uninstall-local: uninstall-exec-bindir
+
+uninstall-exec-bindir:
+	rm -f $(DESTDIR)$(bindir)/kawa $(DESTDIR)$(bindir)/gckawa

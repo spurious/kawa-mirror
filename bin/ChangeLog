@@ -1,3 +1,7 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Various tweaks due to new automake.
+
 2002-02-11  Per Bothner  <per@bothner.com>
 
 	* kawa.c (get_classpath):  Add extern declaration to kill warning.

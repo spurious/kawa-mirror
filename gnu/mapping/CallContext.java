@@ -79,6 +79,14 @@ public class CallContext implements Runnable
     return getArgAsObject(next++);
   }
 
+  public int getNextIntArg()
+  {
+    if (next >= count)
+      throw new WrongArguments(proc, count);
+    Object arg = getArgAsObject(next++);
+    return ((Number) arg).intValue();
+  }
+
   /** Get the next incoming argument.
    * Return defaultValue if there are no more arguments.
    */
@@ -87,6 +95,13 @@ public class CallContext implements Runnable
     if (next >= count)
       return defaultValue;
     return getArgAsObject(next++);
+  }
+
+  public int getNextIntArg(int defaultValue)
+  {
+    if (next >= count)
+      return defaultValue;
+    return ((Number) getArgAsObject(next++)).intValue();
   }
 
   /** Note that we are done with the input arguments.

@@ -78,7 +78,7 @@ public class Values extends TreeList implements Printable, Externalizable
 	|| (next = list.nextDataIndex(startPosition)) <= 0)
       return empty;
     if (next == endPosition || list.nextDataIndex(next) < 0)
-      return list.getNext(startPosition, null); // Singleton value
+      return list.getNext(startPosition << 1, null); // Singleton value
     Values vals = new Values();
     list.consumeRange(startPosition, endPosition, vals);
     return vals;

@@ -1,3 +1,9 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* Values.java (make):  Fix call to getNext.
+
+	* CallContext.java (getNextIntArg):  Two new methods.
+
 2001-11-23  Per Bothner  <per@bothner.com>
 
 	* WrongArguments.java:  Use 'name' not `name' in error messages.

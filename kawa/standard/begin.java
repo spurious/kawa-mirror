@@ -14,4 +14,10 @@ public class begin extends Syntax implements Printable
   {
     return tr.rewrite_body (obj);
   }
+
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                    ScopeExp defs, Translator tr)
+  {
+    return tr.scan_body(st.cdr, forms, defs);
+  }
 }

@@ -46,12 +46,6 @@ public class Scheme extends Interpreter
   static Environment r5_environment;
   protected static Environment kawa_environment;
 
-  public static Syntax beginSyntax;
-  public static Syntax defineSyntax;
-  public static Syntax defineSyntaxPrivate;
-  public static Syntax defineAliasSyntax;
-  public static Syntax defineSyntaxSyntax;
-
   public static SpecialType byteType
     = new SpecialType ("byte", "B", 1, java.lang.Byte.TYPE);
   public static SpecialType shortType
@@ -104,9 +98,8 @@ public class Scheme extends Interpreter
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new Quote ());
-      define_syntax("define", defineSyntax = new kawa.standard.define(false));
-      define_syntax("define-private",
-                    defineSyntaxPrivate = new kawa.standard.define(true));
+      define_syntax("define", new kawa.standard.define(false));
+      define_syntax("define-private", new kawa.standard.define(true));
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
@@ -122,7 +115,7 @@ public class Scheme extends Interpreter
       define_syntax ("let*", "kawa.lib.std_syntax");
       define_syntax ("letrec", "kawa.standard.letrec");
 
-      define ("begin", beginSyntax = new kawa.standard.begin());
+      define ("begin", new kawa.standard.begin());
       define_syntax ("do", "kawa.lib.std_syntax");
       define_syntax ("delay", "kawa.lib.std_syntax");
       define_proc ("%make-promise", "kawa.lib.std_syntax");
@@ -132,8 +125,7 @@ public class Scheme extends Interpreter
       define_syntax ("lambda", "kawa.lang.Lambda");
 
       // Appendix (and R5RS)
-      defineSyntaxSyntax = new kawa.standard.define_syntax ();
-      define ("define-syntax", defineSyntaxSyntax);
+      define ("define-syntax", new kawa.standard.define_syntax ());
       define ("syntax-rules", new kawa.standard.syntax_rules ());
       define ("syntax-case", new kawa.standard.syntax_case ());
       define ("let-syntax", new kawa.standard.let_syntax (false));
@@ -221,7 +213,7 @@ public class Scheme extends Interpreter
 
       //-- Section 6.5
       define_proc ("number?", "kawa.lib.numbers");
-      define_proc ("quantity?", "kawa.lib.number");
+      define_proc ("quantity?", "kawa.lib.numbers");
       define_proc ("complex?", "kawa.lib.numbers");
       define_proc ("real?", "kawa.lib.numbers");
       define_proc ("rational?", "kawa.lib.numbers");
@@ -380,6 +372,7 @@ public class Scheme extends Interpreter
       define_proc ("transcript-off", "kawa.lib.ports");
       define_proc ("transcript-on", "kawa.lib.ports");
       define_proc ("call-with-input-string", "kawa.lib.ports");  // Extension
+      define_proc ("open-input-string", "kawa.lib.ports");  // SRFI-6
       define_proc ("call-with-output-string",  // Extension
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
@@ -465,12 +458,14 @@ public class Scheme extends Interpreter
       define_proc("instance?", new kawa.standard.instance());
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
-      define_proc("make", "gnu.kawa.reflect.MakeInstance");
+      define_syntax("define-class", "kawa.standard.define_class");
+      define_proc("make", gnu.kawa.reflect.MakeInstance.make);
       define_proc("slot-ref", "gnu.kawa.reflect.SlotGet");
       define_proc("slot-set!", "gnu.kawa.reflect.SlotSet");
       define_proc("field", "gnu.kawa.reflect.SlotGet");
       define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
       define_proc("static-field", "kawa.standard.static_field");
+      define_proc("invoke", "gnu.kawa.reflect.Invoke");
       define_proc("invoke-static", "gnu.kawa.reflect.InvokeStatic");
 
       define_proc("file-exists?", "kawa.lib.files");
@@ -544,8 +539,7 @@ public class Scheme extends Interpreter
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_proc ("%makeProcLocation", "kawa.standard.makeProcLocation");
       define_syntax ("location", "kawa.standard.location");
-      defineAliasSyntax = new kawa.standard.define_alias();
-      define ("define-alias", defineAliasSyntax);
+      define ("define-alias", new kawa.standard.define_alias());
   }
 
   static int scheme_counter = 0;
@@ -668,7 +662,8 @@ public class Scheme extends Interpreter
     else if (exp instanceof ReferenceExp)
       {
 	ReferenceExp rexp = (ReferenceExp) exp;
-	if (rexp.getBinding() == null)
+        Declaration binding = rexp.getBinding();
+	if (binding == null)
 	  {
 	    String name = rexp.getName();
 	    int len = name.length(); 

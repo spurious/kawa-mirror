@@ -16,6 +16,56 @@ public class define extends Syntax implements Printable
     this.makePrivate = makePrivate;
   }
 
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                     ScopeExp defs, Translator tr)
+  {
+    if (! (st.cdr instanceof Pair))
+      return super.scanForDefinitions(st, forms, defs, tr);
+    Pair p = (Pair) st.cdr;
+    Object name = p.car;
+    Declaration decl = null;
+    Pair declForm = null;
+    if (name instanceof String)
+      {
+        decl = new Declaration((String) name);
+        declForm = tr.makePair(p, decl, p.cdr);
+        st = tr.makePair(st, this, declForm);
+      }
+    else if (name instanceof Pair)
+      {
+        Pair name_pair = (Pair) name;
+        if (name_pair.car instanceof String)
+          {
+            decl = new Declaration((String) name_pair.car);
+            declForm = tr.makePair(name_pair, decl, name_pair.cdr);
+            p = tr.makePair(p, declForm, p.cdr);
+            st = tr.makePair(st, this, p);
+          }
+      }
+    if (decl != null)
+      {
+        if (defs instanceof ModuleExp)
+          {
+            tr.mustCompileHere();
+            tr.push(decl);
+            if (! makePrivate)
+              {
+                decl.setCanRead(true);
+                // decl.setCanWrite(true);
+              }
+          }
+        if (declForm instanceof PairWithPosition)
+          {
+            PairWithPosition declPos = (PairWithPosition) declForm;
+            decl.setFile(declPos.getFile());
+            decl.setLine(declPos.getLine(), declPos.getColumn());
+          }
+        defs.addDeclaration(decl);
+      }
+    forms.addElement (st);
+    return true;
+  }
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object obj = form.cdr;

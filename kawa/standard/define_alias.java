@@ -53,4 +53,19 @@ public class define_alias extends Syntax implements Printable
       }
     return tr.syntaxError ("invalid syntax for define-alias");
   }
+
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                     ScopeExp defs, Translator tr)
+  {
+    if (! (st.cdr instanceof Pair)
+        || (tr.currentScope() instanceof ModuleExp)
+        || ! (((Pair) st.cdr).car instanceof String))
+      return super.scanForDefinitions(st, forms, defs, tr);
+    Object name = ((Pair) st.cdr).car;
+    Type typeLocation = ClassType.make("gnu.mapping.Location");
+    Declaration decl = defs.addDeclaration((String) name, typeLocation);
+    decl.setIndirectBinding(true);
+    forms.addElement(st);
+    return true;
+  }
 }

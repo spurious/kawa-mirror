@@ -53,4 +53,27 @@ public class define_syntax extends Syntax
         return result;
       }
   }
+
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                     ScopeExp defs, Translator tr)
+  {
+    if (! (st.cdr instanceof Pair)
+        || (tr.currentScope() instanceof ModuleExp)
+        || ! (((Pair) st.cdr).car instanceof String))
+      return super.scanForDefinitions(st, forms, defs, tr);
+    Pair p = (Pair) st.cdr;
+    Object name = p.car;
+    if (! (p.car instanceof String)
+        || ! (p.cdr instanceof Pair)
+        || (p = (Pair) p.cdr).cdr != List.Empty)
+      {
+        forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));
+        return false;
+      }
+    Macro macro = new Macro((String) name, p.car);
+    defs.addDeclaration(macro);
+    p = tr.makePair(st, this, new Pair(macro, p));
+    forms.addElement (p);
+    return true;
+  }
 }

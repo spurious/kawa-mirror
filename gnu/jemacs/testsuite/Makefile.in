@@ -78,6 +78,8 @@ KAWALIB = ../../..
 KAWA = KAWALIB=$(KAWALIB) $(KAWALIB)/kawa/kawa.sh
 DOTEST = $(KAWA) --elisp  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
+
+SOURCES = lang-test.el
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in

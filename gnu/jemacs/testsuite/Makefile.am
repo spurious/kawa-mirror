@@ -3,6 +3,8 @@ KAWA = KAWALIB=$(KAWALIB) $(KAWALIB)/kawa/kawa.sh
 DOTEST = $(KAWA) --elisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
+SOURCES = lang-test.el
+
 all:
 
 check_WITH_SWING:

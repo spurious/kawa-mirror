@@ -40,15 +40,10 @@ VarEnumerator.java \
 ZipArchive.java \
 ZipMember.java \
 ZipLoader.java \
+ArrayClassLoader.java \
 ClassFileInput.java \
 ClassTypeWriter.java \
 dump.java
-
-install-html:
-	-mkdir $(HTML_HOME)/gnu.bytecode
-	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.bytecode/index.html
-	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.bytecode/COPYING
-	chmod a+r $(HTML_HOME)/gnu.bytecode/*
 
 JC1FLAGS = -g
 GCC = ../../../gcc/xgcc -B../../../gcc/
@@ -70,3 +65,5 @@ dump-main.o:  dump-main.cc
 dump$(exext):  dump-main.o gnu-bytecode.o
 	$(GCC) -o dump dump-main.o gnu-bytecode.o \
 	  ../../../libjava/libjava.a
+
+EXTRA_DIST = overview.html

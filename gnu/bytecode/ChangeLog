@@ -1,3 +1,18 @@
+Wed Jul 22 22:18:24 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ZipLoader.java (loadClass):  Fix variable clash.
+	(Reported by Lynn Quam <quam@ai.sri.com>.)
+
+	* CodeAttr.java (emitMaybeWide):  New function.
+	(emitLoad, emitStore):  Fix bug using emitMaybeWide.
+	(disAssemble):  Fix a few buglets.
+
+	* LineNumbersAttr.java (write):  Minor optimization.
+
+	* ArrayClassLoader.java:  Moved from ../../kawa/lang/SchemeLoader.java.
+	* Makefile.am:  Update.
+	(install-html):  Subsumed by install-subdir-html in ../Makefile.am.
+
 Mon Jun 29 18:56:04 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Method.java (compile_tailcall):  Replaced by ...

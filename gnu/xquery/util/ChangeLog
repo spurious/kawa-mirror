@@ -1,3 +1,7 @@
+2003-11-14  Per Bothner  <per@bothner.com>
+
+	* StringValue.java (concat$V):  New method.
+
 2003-10-19  Per Bothner  <per@bothner.com>
 
 	* ValuesEvery.java:  New class, extends CpsProcedure.

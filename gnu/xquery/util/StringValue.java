@@ -255,4 +255,14 @@ public class StringValue extends Procedure1
     return s.toString();
   }
 
+  public static String concat$V (Object[] args)
+  {
+    int count = args.length;
+    java.lang.StringBuffer result = new java.lang.StringBuffer();
+
+    for (int i = 0; i < count; i++)
+      result.append(stringValue(args[i]));
+    return result.toString();
+  }
+
 }

@@ -280,6 +280,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void endGroup(String typeName)
   {
+    closeStartTag();
     nesting--;
     namespaceStackLength = namespaceLengthStack[nesting];
     base.endGroup(typeName);
@@ -287,6 +288,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeChar(int v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append((char) v);
@@ -298,6 +300,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeBoolean(boolean v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(v);
@@ -309,6 +312,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeFloat(float v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(v);

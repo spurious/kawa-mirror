@@ -1,3 +1,8 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java (endGroup, writeChar, writeBoolean,
+	writeFloat):  Add missing calls to closeStartTag.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (writeObject):  Handle null argument.

@@ -215,7 +215,6 @@ exact2inexact.java \
 inexact2exact.java \
 string2number.java \
 string_v.java \
-string_append.java \
 vector_append.java \
 force.java \
 call_with_input_file.java \

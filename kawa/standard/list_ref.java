@@ -3,7 +3,7 @@ import kawa.lang.*;
 
 public class list_ref extends Procedure2
 {
-  public list_ref (Procedure2 proc)
+  public list_ref ()
   {
     super("list-ref");
   }

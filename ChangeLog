@@ -1,3 +1,7 @@
+2003-03-29  Jim White  <jim@pagesmiths.com>
+
+	* build.xml:  Various fixes.
+
 2003-03-24  Chris Dean  <ctdean@mercedsystems.com>
 
 	* kawa/standard/load.java (loadRlative):  Fix typo to loadRelative.

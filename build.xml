@@ -528,6 +528,8 @@
         <include name="printf.scm"/>
         <include name="srfi1.scm"/>
         <include name="readtable.scm"/>
+        <include name="DefineRecordType.scm"/>
+        <include name="cut.scm"/>
       </fileset>
 
   <target name="check-slib-scm-classes">
@@ -630,6 +632,9 @@
       <fileset id="jemacs-buffer-scm" dir="${src.dir}/gnu/jemacs/buffer"> 
         <include name="emacs.scm"/>
       </fileset>
+      <fileset id="jemacs-slib-scm" dir="${src.dir}/gnu/kawa/slib"> 
+        <include name="gui.scm"/>
+      </fileset>
       <fileset id="jemacs-el" dir="${src.dir}/gnu/jemacs/lisp"> 
         <include name="primitives.el"/>
         <include name="alist.el"/>
@@ -654,6 +659,10 @@
         <uptodate>
           <mapper type="glob" from="*.scm" to="*.class"/>
           <srcfiles refid="jemacs-buffer-scm"/>
+        </uptodate>
+        <uptodate>
+          <mapper type="glob" from="*.scm" to="*.class"/>
+          <srcfiles refid="jemacs-slib-scm"/>
         </uptodate>
         <uptodate>
           <mapper type="glob" from="*.el" to="*.class"/>
@@ -698,6 +707,15 @@
       <arg value="-d"/> <arg path="${build.classes}"/>
       <arg line="-P gnu.jemacs.buffer. --module-static -C"/>
       <fileset refid="jemacs-buffer-scm"/>
+    </apply>
+
+    <apply taskname="kawa" executable="java" 
+           failonerror="true" parallel="true">
+      <arg value="-classpath"/> <arg path="${build.classes}"/>
+      <arg value="kawa.repl"/>
+      <arg value="-d"/> <arg path="${build.classes}"/>
+      <arg line="-P gnu.kawa.slib. --module-static -C"/>
+      <fileset refid="jemacs-slib-scm"/>
     </apply>
 
     <apply taskname="elisp" executable="java" 

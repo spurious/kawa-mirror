@@ -1,3 +1,8 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	* gnu/kawa/Makefile.am (SUBDIRS):  Add q2.
+	* configure.in:  Add gnu/q2/Makefile gnu/q2/lang/Makefile.
+
 2004-01-09  Per Bothner  <bothner@bothner.com>
 
 	* kawa/repl.java:  Use new Environment setGlobal method.

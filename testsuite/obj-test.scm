@@ -1,4 +1,4 @@
-(test-init "Objects" 80)
+(test-init "Objects" 81)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -250,6 +250,11 @@
         )))
 (define main-frame (create-main-frame))
 (test (format #f "this: ~a\n" main-frame) field main-frame 'myField)
+
+(define simple-date (make <SimpleDateTest>))
+(define-namespace date "class:java.util.Date")
+(test (+ 1900 (date:get-year (date:new)))
+      invoke simple-date 'get-year)
 
 ;; Test for Savannah bug #4289
 (define pa-data (pa-new 10))

@@ -1,5 +1,10 @@
 2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
 
+	* classes1.scm (<SimpleDateTest>): Add for invoke-special test.
+	* obj-test.scm: Test invoke-special with <SimpleDateTest> class.
+
+2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
+
 	* arr-test.scm: Test for Savannah [bug #4310] share-array edge case
 
 2003-07-14  Joerg Hoehle  <Joerg-Cyril.Hoehle@t-systems.com>

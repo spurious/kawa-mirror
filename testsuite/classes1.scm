@@ -22,3 +22,8 @@
   (syntax-rules ()
 		((define-class-using-syntax-rules name super parts ...)
 		 (define-simple-class name (super) parts ...))))
+
+(define-simple-class <SimpleDateTest> (<java.util.Date>)
+  ((get-year) :: <int>
+   (+ (invoke-special <java.util.Date> (this) 'get-year) 1900)))
+

@@ -183,7 +183,8 @@ public class LitTable implements ObjectOutput
 		writeObject(arr[i]);
 	      }
 	  }
-	else if (obj instanceof String || lit.type instanceof ArrayType)
+	else if (obj == null
+                 || obj instanceof String || lit.type instanceof ArrayType)
 	  {
 	    // nothing to do
 	  }

@@ -1,5 +1,8 @@
 2000-08-06  Per Bothner  <per@bothner.com>
 
+	* LitTable.java (writeObject):  Handle null argument.
+	(Fixes bug reported by Martin Atzmueller <ygrats@gmx.net>.)
+
 	* ApplyExp.java (compile):  If direct method call needs closure,
 	just call loadHeapFrame on parent.  This is a simplification
 	which allows Dorai Sitaram pregexp package to work.

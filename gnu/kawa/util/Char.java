@@ -222,7 +222,7 @@ public class Char implements Printable, Externalizable
       }
   }
 
-  public Char readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return make(value);
   }

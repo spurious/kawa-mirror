@@ -147,7 +147,7 @@ public class LList extends Sequence implements Printable, Externalizable
   {
   }
 
-  public LList readResolve() throws ObjectStreamException
+  public Object readResolve() throws ObjectStreamException
   {
     return Empty;
   }

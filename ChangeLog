@@ -1,3 +1,8 @@
+2000-10-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (scanForDefinitions):  If imported field
+	is a Binding, do setIndirectBinding(true).
+
 2000-08-16  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (main):  The --cps flag also sets usingTailCalls.

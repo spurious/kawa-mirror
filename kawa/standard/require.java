@@ -147,7 +147,10 @@ public class require extends Syntax
 		    String fdname
 		      = (fvalue instanceof Named ? ((Named) fvalue).getName()
 			 : fname.intern());
-		    Declaration fdecl = new Declaration(fdname, fld.getType());
+                    Type ftype = fld.getType();
+		    Declaration fdecl = new Declaration(fdname, ftype);
+                    if (ftype.isSubtype(Compilation.typeBinding))
+                      fdecl.setIndirectBinding(true);
 		    if (! isStatic)
 		      fdecl.base = decl;
 		    fdecl.field = fld;

@@ -1,3 +1,8 @@
+2001-10-25  Per Bothner  <per@bothner.com>
+
+	* ValuesMap.java:  Now implements CanInline, Inlineable.
+	(inline, compile, getReturnType):  New methods.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* Apply.java, Assoc.java, Member.java (apply* methods):

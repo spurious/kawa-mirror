@@ -4,12 +4,14 @@
 package gnu.kawa.functions;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.bytecode.*;
+import gnu.expr.*;
 
 /** Map a unary function over a value sequence, yielding a new sequence.
  * Used to implement XQuery's 'for' form.
  */
 
-public class ValuesMap extends CpsProcedure
+public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 {
   public static final ValuesMap valuesMap = new ValuesMap();
 
@@ -47,5 +49,66 @@ public class ValuesMap extends CpsProcedure
 	ctx.proc = proc;
 	ctx.runUntilDone();
       }
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 2
+	&& args[0] instanceof LambdaExp)
+      ((LambdaExp) args[0]).setInlineOnly(true);
+    return exp;
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length != 2
+	|| ! (target instanceof IgnoreTarget
+	      || target instanceof ConsumerTarget))
+      {
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    Expression vals = args[1];
+    LambdaExp lambda;
+    if (args[0] instanceof LambdaExp)
+      lambda = (LambdaExp) args[0];
+    else
+      {
+	// FIXME in InlineCalls phase could wrap epr in LambdaExp
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    Declaration param = lambda.firstDecl();
+    if (param == null || param.nextDecl() != null)
+      {
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    CodeAttr code = comp.getCode();
+    code.pushScope();
+    SeriesTarget starget = new SeriesTarget();
+    starget.function = new Label(code);
+    starget.done = new Label(code);
+    starget.value = param.allocateVariable(code);
+    Type retAddrType = Type.pointer_type;
+    Variable retAddr = code.addLocal(retAddrType);
+    vals.compile(comp, starget);
+
+    if (code.reachableHere())
+      code.emitGoto(starget.done);
+    starget.function.define(code);
+    code.pushType(retAddrType);
+    code.emitStore(retAddr);
+    lambda.body.compile(comp, target);
+    code.emitRet(retAddr);
+    code.popScope();
+    starget.done.define(code);
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Type.pointer_type;
   }
 }

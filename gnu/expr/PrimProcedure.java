@@ -333,6 +333,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    : is_static ? argTypes[i + skipArg]
             : i==0 ? thisType
             : argTypes[i-1];
+	if (comp.immediate && arg_type instanceof ClassType)
+	  comp.usedClass((ClassType) arg_type);
 	Target target =
 	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
 	  : CheckedTarget.getInstance(arg_type, source, i);
@@ -347,12 +349,25 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
+    ClassType mclass;
+    if (method == null)
+      mclass = null;
+    else
+      {
+	mclass = method.getDeclaringClass();
+	if (comp.immediate)
+	  {
+	    comp.usedClass(mclass);
+	    Type rtype = method.getReturnType();
+	    if (rtype instanceof ClassType)
+	      comp.usedClass((ClassType) rtype);
+	  }
+      }
 
     if (opcode() == 183) // invokespecial == primitive-constructor
       {
-	ClassType type = method.getDeclaringClass();
-	code.emitNew(type);
-	code.emitDup(type);
+	code.emitNew(mclass);
+	code.emitDup(mclass);
       }
 
     Expression[] args = exp.getArgs();
@@ -360,7 +375,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (arg_error != null)
       comp.error('e', arg_error);
 
-    compile(getStaticFlag() ? null : method.getDeclaringClass(), args, comp, target);
+    compile(getStaticFlag() ? null : mclass, args, comp, target);
   }
 
   public void compile (Type thisType, Expression[] args, Compilation comp, Target target)

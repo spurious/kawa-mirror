@@ -1,3 +1,8 @@
+2003-04-21  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (compileArgs, compile):  Call usedClass on
+	classes declaring method and parameter and return types.
+
 2003-04-19  Per Bothner  <per@bothner.com>
 
 	* ResolveNames.java:  New class, extends ExpWalker.

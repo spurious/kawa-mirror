@@ -129,6 +129,7 @@ convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java makeProcLocation.java location.java \
 ScmEnv.java Scheme.java \
+object.java field.java static_field.java \
 null_env.java \
 user_env.java \
 scheme_env.java

@@ -1,32 +1,49 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
+import gnu.bytecode.Type;
+
+/** Exception thrown when a procedure parameter has the wrong type. */
 
 public class WrongType extends WrappedException
 {
-  //-- number of the argument, 0-origin
-  // ARG_UNKNOWN mean unknown argument number
-  // ARG_VARNAME means not a call, procname is a variable name.
-  // ARG_DESCRIPTION means not a call, procname describes the target.
+  /** Number of the argument, 1-origin.
+   * <br>
+   * Can be an integer >= 1, or one of the values <code>ARG_UNKNOWN</code>,
+   * <code>ARG_VARNAME</code>, or <code>ARG_DESCRIPTION</code>.
+   */
   public int number;
 
+  /** <code>number==ARG_UNKNOWN</code> means unknown argument number. */
   public static final int ARG_UNKNOWN = -1;
+
+  /** <code>number==ARG_VARNAME</code> means not a call,
+   * <code>procname</code> is a variable name. (deprecated/unused) */
   public static final int ARG_VARNAME = -2;
+
+  /** <code>number==ARG_VARNAME</code> means not a call,
+   * <code>procname</code> describes the target. (deprecated/unused) */
   public static final int ARG_DESCRIPTION = -3;
 
-  //-- type of the argument
-  public String typeExpected;
-  //-- Procedure name that threw the exception
+  /** Name of <code>Procedure</code> that threw the exception (if non-null). */
   public String procname;
+
+  /** The <code>Procedure</code> that threw the exception (if non-null). */
   public Procedure proc;
+
+  /** The actual argument that was bad. */
+  public Object argValue;
+
+  /** The expected parameter type (a Type or TypeValue), or a string name/description. */
+  public Object expectedType;
 
   public WrongType(String name, int n, String u)
   {
     super(null, null);
     procname = name;
-    number = n - 1;
-    typeExpected = u;
+    number = n;
+    expectedType = u;
   }
 
   public WrongType(Procedure proc, int n, ClassCastException ex)
@@ -35,6 +52,32 @@ public class WrongType extends WrappedException
     this.proc = proc;
     this.procname = proc.getName();
     this.number = n;
+  }
+
+  public WrongType(Procedure proc, int n, Object argValue)
+  {
+    this.proc = proc;
+    this.procname = proc.getName();
+    this.number = n;
+    this.argValue = argValue;
+  }
+
+  public WrongType(Procedure proc, int n, Object argValue, Type expectedType)
+  {
+    this.proc = proc;
+    this.procname = proc.getName();
+    this.number = n;
+    this.argValue = argValue;
+    this.expectedType = expectedType;
+  }
+
+  public WrongType(Procedure proc, int n, Object argValue, String expectedType)
+  {
+    this.proc = proc;
+    this.procname = proc.getName();
+    this.number = n;
+    this.argValue = argValue;
+    this.expectedType = expectedType;
   }
 
   public WrongType(String procname, int n, ClassCastException ex)
@@ -73,14 +116,46 @@ public class WrongType extends WrappedException
     else
       {
         sbuf.append("Argument ");
-        if (number >= 0)
+        if (number > 0)
           {
             sbuf.append('#');
             sbuf.append(number);
           }
+	if (argValue != null)
+	  {
+	    sbuf.append(" (");
+	    String argString = argValue.toString();
+	    if (argString.length() > 50)
+	      {
+		sbuf.append(argString.substring(0, 47));
+		sbuf.append("...");
+	      }
+	    else
+	      sbuf.append(argString);
+	    sbuf.append(")");
+	  }
         sbuf.append(" to '");
         sbuf.append(procname);
         sbuf.append("' has wrong type");
+	if (argValue != null)
+	  {
+	    sbuf.append(" (");
+	    sbuf.append(argValue.getClass().getName());
+	    sbuf.append(")");
+	  }
+	Object expectType = expectedType;
+	if (expectType == null && number > 0 && proc instanceof MethodProc)
+	  expectType = ((MethodProc) proc).getParameterType(number);
+	if (expectType == null && expectType != Type.pointer_type)
+	  {
+	    sbuf.append(" (expected: ");
+	    if (expectType instanceof Type)
+	      expectType = ((Type) expectType).getName();
+	    else if (expectType instanceof Class)
+	      expectType = ((Class) expectType).getName();
+	    sbuf.append(expectType);
+	    sbuf.append(")");
+	  }
       }
     Throwable ex = getCause();
     if (ex != null)

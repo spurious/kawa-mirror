@@ -11,6 +11,13 @@ public class WrappedException extends RuntimeException
 {
   /**
    * Create a new WrappedException.
+   */
+  public WrappedException ()
+  {
+  }
+
+  /**
+   * Create a new WrappedException.
    *
    * @param message The error or warning message.
    */

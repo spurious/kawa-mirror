@@ -40,7 +40,8 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
     if (type != null)
       {
         args[1].compile(comp, Target.pushValue(type));
-	target.compileFromStack(comp, type);
+	if (code.reachableHere())
+	  target.compileFromStack(comp, type);
       }
     else
       {

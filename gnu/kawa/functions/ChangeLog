@@ -1,3 +1,8 @@
+2003-04-08  Per Bothner  <per@bothner.com>
+
+	* Convert.java (compile):  Only compileFromStack if reachable.
+	Fixes bug reported 04-07 by Vladimir Tsichevski.
+
 2003-04-06  Per Bothner  <per@bothner.com>
 
 	* ObjectFormat.java (print):  New static help method.

@@ -1,3 +1,8 @@
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (define):	Just use the new version of
+	the Environment define method.
+
 2000-04-12  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (apply2, compile, getReturnType):  Handle 'length

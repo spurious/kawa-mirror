@@ -128,12 +128,6 @@ public class ClassMemberConstraint extends Constraint
 	  name = name.intern();
 	if (object instanceof Binding)
 	  env.addBinding((Binding) object);
-	else if (gnu.expr.Interpreter.getInterpreter().hasSeparateFunctionNamespace()
-		 && (object instanceof Procedure
-		     || object instanceof kawa.lang.Syntax))
-	  { // Major kludge!  FIXME!
-	    gnu.jemacs.lang.Symbol.setFunctionBinding(env, name, object);
-	  }
 	else
 	  env.define(name, object);
       }

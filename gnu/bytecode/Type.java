@@ -41,7 +41,7 @@ public abstract class Type {
     else if (reflectClass.isPrimitive())
       throw new Error("internal error - primitive type not found");
     else
-      type = new ClassType(reflectClass.getName());
+      type = ClassType.make(reflectClass.getName());
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
     return type;
@@ -256,14 +256,14 @@ public abstract class Type {
   static public Type void_type = new PrimType ("void", "V", 0,
 					       java.lang.Void.TYPE);
 
-  static public ClassType pointer_type = new ClassType ("java.lang.Object");
-  static public ClassType string_type = new ClassType ("java.lang.String");
-  static public ClassType boolean_ctype = new ClassType ("java.lang.Boolean");
+  static public ClassType pointer_type = ClassType.make("java.lang.Object");
+  static public ClassType string_type = ClassType.make("java.lang.String");
+  static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
   static public Type[] typeArray0 = new Type[0];
   static public Method toString_method
   = pointer_type.addMethod ("toString", typeArray0,
 			     string_type, Access.PUBLIC);
-  static public ClassType number_type = new ClassType ("java.lang.Number");
+  static public ClassType number_type = ClassType.make("java.lang.Number");
   static public Method intValue_method
   = number_type.addMethod ("intValue", typeArray0,
 			    int_type, Access.PUBLIC);

@@ -1,3 +1,13 @@
+Sat Aug 29 20:24:39 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Method.java (getModifiers):  New method.
+
+	* Type.java (make):  Do (many) ClassType.make instead of new ClassType.
+
+	* Variable.java (allocateLocal):  If assigned, return immediately.
+
+	* ZipLoader.java (loadClass):  Fix small logic error.
+
 Sat Aug 29 09:14:00 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Method.java (assign_local):  Removed.

@@ -19,6 +19,8 @@ public class AutoloadProcedure extends Procedure implements Externalizable
    * and that is expected to define the Procedure in the global environment. */
   String className;
 
+  Environment env;
+
   /** The loaded procedure, or null if it has not yet been loaded. */
   Procedure loaded;
 
@@ -30,6 +32,13 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   {
     super(name);
     this.className = className;
+  }
+
+  public AutoloadProcedure (String name, String className, Environment env)
+  {
+    super(name);
+    this.className = className;
+    this.env = env;
   }
 
   public void print(java.io.PrintWriter ps)
@@ -63,13 +72,13 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   /** Load the class named in className. */
   void load ()
   {
+    Environment env = this.env != null ? this.env : Environment.getCurrent();
     String name = this.name();
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
 	if (loaded == this)
 	  throw_error("circularity detected");
-	Environment env = Environment.getCurrent();
 	if (loaded instanceof ModuleBody)
 	  {
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);

@@ -1,3 +1,15 @@
+2000-12-09  Per Bothner  <per@bothner.com>
+
+	Patch from Matthias Radestock <matthias@lshift.net>:
+	* kawa/lang/AutoloadProcedure.java (env):  New field.
+	(<init>):  Extra Environment argument.
+	(load):  Use env field instead of current Environment.
+	* kawa/lang/AutoloadSyntax.java:  Likewise.
+	* kawa/standard/define_autoload.java:  Pass Translator's global
+	environment to AutoloadProcedure and AutoloadSyntax constructors.
+	* kawa/standard/Scheme.java (define_proc, define_syntax):  Pass
+	current environ to AutoloadProcedure and AutoloadSyntax constructors.
+
 2000-12-02  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java (getExpander):  New method.

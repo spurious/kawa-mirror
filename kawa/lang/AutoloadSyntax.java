@@ -20,6 +20,8 @@ public class AutoloadSyntax extends Syntax implements Externalizable
    * global environment. */
   String className;
 
+  Environment env;
+
   /** The loaded syntax, or null if it has not yet been loaded. */
   Syntax loaded;
 
@@ -31,6 +33,13 @@ public class AutoloadSyntax extends Syntax implements Externalizable
   {
     super(name);
     this.className = className;
+  }
+
+  public AutoloadSyntax (String name, String className, Environment env)
+  {
+    super(name);
+    this.className = className;
+    this.env = env;
   }
 
   public void print(java.io.PrintWriter ps)
@@ -61,13 +70,13 @@ public class AutoloadSyntax extends Syntax implements Externalizable
   /** Load the class named in className. */
   void load ()
   {
+    Environment env = this.env != null ? this.env : Environment.getCurrent();
     String name = this.getName();
     try
       {
 	Object value = Class.forName (className).newInstance ();
 	if (value instanceof ModuleBody)
 	  {
-	    Environment env = Environment.current ();
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(value, env);
 	    ((ModuleBody) value).run();
 	    try

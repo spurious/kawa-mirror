@@ -185,7 +185,8 @@ public class define_autoload extends Syntax
 		    if (pair.car == "defun")
 		      {
 			name = (String) ((Pair)pair.cdr).car;
-			value = new AutoloadProcedure(name, filename);
+			value = new AutoloadProcedure(name, filename,
+						      tr.getGlobalEnvironment());
 		      }
 		    else
 		      tr.error('w', "unsupported ;;;###autoload followed by: "
@@ -269,10 +270,12 @@ public class define_autoload extends Syntax
 	    && fn.charAt(0) == '<' && fn.charAt(len-1) == '>')
 	  filename = fn.substring(1, len-1);
 	if (type == "<syntax>" || type == "<macro>")
-	  value = new AutoloadSyntax(name, filename.toString());
+	  value = new AutoloadSyntax(name, filename.toString(),
+				     tr.getGlobalEnvironment());
 	else if (type == "<procedure>" || type == "<interactive>"
 		 || type == null)
-	  value = new AutoloadProcedure(name, filename.toString());
+	  value = new AutoloadProcedure(name, filename.toString(),
+					tr.getGlobalEnvironment());
 	else
 	  {
 	    tr.syntaxError("unknown autoload type: " + type);

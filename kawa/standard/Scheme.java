@@ -29,7 +29,7 @@ public class Scheme extends Interpreter
   /** Define a procedure to be autoloaded. */
   protected void define_proc (String name, String className)
   {
-    define (name, new AutoloadProcedure (name, className));
+    define (name, new AutoloadProcedure (name, className, environ));
   }
 
   protected void define_syntax (String name, Syntax proc)
@@ -52,7 +52,7 @@ public class Scheme extends Interpreter
   /* Define a Syntax to be autoloaded. */
   protected void define_syntax (String name, String className)
   {
-    define (name, new AutoloadSyntax (name, className));
+    define (name, new AutoloadSyntax (name, className, environ));
   }
 
   public static Environment nullEnvironment;

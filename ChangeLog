@@ -1,3 +1,17 @@
+1999-12-06  Per Bothner  <per@bothner.com>
+
+	* Makefile.am, Makefile.in (JAVADOC_PACKAGES):  Add new packages.
+	(JAVADOC_FLAGS):  Add flags to give javadoc enough memory.
+
+	* kawa/lang/Lambda.java (rewrite):  Support NAME :: TYPE syntax.
+
+	* kawa/standard/let.java (rewrite):  Trivial optimization.
+
+	* kawa/standard/define_member_alias.java:  New Syntax class.
+	* kawa/standard/Makefile.am (java_JAVA):  Add define_member_alias.java.
+	* kawa/standard/Scheme.java (initScheme):  Define define-member-alias.
+	 (getNamedType):  Define buffer and window.
+
 1999-12-05  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.63.

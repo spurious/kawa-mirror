@@ -19,15 +19,18 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/htdocs/api
 JAVADOC_PACKAGES = kawa kawa.lang kawa.standard \
-  gnu.bytecode gnu.mapping gnu.expr gnu.math gnu.text gnu.ecmascript
+  gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text \
+  gnu.kawa.reflect gnu.jemacs.lang gnu.jemacs.buffer
 JAVADOC = javadoc
+JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
+
 MAINTAINERCLEANFILES = makekawa.bat
 MOSTLYCLEANFILES = tmp
 
 install-javadoc-html:
 	rm -rf $(JAVADOC_DIR)
 	-mkdir $(JAVADOC_DIR)
-	cd $(top_srcdir) && $(JAVADOC) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
+	cd $(top_srcdir) && $(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	echo "Now also copy over the COPYING files!"
 
 install-html: install-javadoc-html

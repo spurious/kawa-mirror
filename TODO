@@ -11,6 +11,8 @@ Calls to setter (as in (set! (...)) should be inlined.
 
 Fix scheme-window in misc.scm.
 
+Lexer should implement mark/reset.
+
 Module compilation:
 * Procedures that have #!optional args should be compiled to
 multiple methods.
@@ -63,6 +65,8 @@ should be resolved statically (inlined or direct methods calls).
 Combine primitive field with record facility and define-class.
 
 Support persistence and serialization of Scheme values.
+
+Provide getopt-long (Guile, check scsh).
 
 Implement SwitchExp;  use it for Scheme case.
 

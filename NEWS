@@ -1,3 +1,11 @@
+You can now use the syntax NAME :: TYPE to specify the type of a parameter.
+For example: (define (vector-length x :: <vector>) (invoke x 'length)).
+The following also works: (define (vector-length (x :: <vector>)) ...).
+
+(define-member-alias NAME OBJECT [FNAME]) is new syntactic sugar
+for (define-alias NAME (field OBJECT FNAME)), where the default for
+FNAME is the mangling of NAME.
+
 Changes from Kawa 1.6.60 to 1.6.62
 ==================================
 The new function `invoke' allows you to call a Java method.

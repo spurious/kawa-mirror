@@ -62,7 +62,8 @@ public class AutoloadSyntax extends Syntax
 	Object value = Class.forName (className).newInstance ();
 	if (value instanceof ModuleBody)
 	  {
-            Environment env = Environment.current ();
+	    Environment env = Environment.current ();
+	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(value, env);
 	    ((ModuleBody) value).run();
 	    value = env.get (name);
 	    if (value == null || value == this

@@ -67,6 +67,7 @@ public class AutoloadProcedure extends Procedure
 	if (loaded instanceof ModuleBody)
 	  {
 	    Environment env = Environment.getCurrent();
+	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);
 	    ((ModuleBody)loaded).run();
 	    Object value = env.get (name);
 	    if (value == null

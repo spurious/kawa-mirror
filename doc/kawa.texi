@@ -587,10 +587,6 @@ define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
-The @code{define-syntax} primitive is provided, but has some bugs
-making it not properly hygienic.  Neither @code{let-syntax}
-nor @code{letrec-syntax} are implemented.
-
 @node Extensions, Compiling, Restrictions, Top
 @chapter Extensions
 
@@ -2318,11 +2314,54 @@ which must be provided by any class that extends @code{Procedure2}.
 @node Method operations, Field operations, Scheme types in Java, Low-level functions
 @section Calling Java methods from Scheme
 
-Kawa provides a simple yet powerful "Foreign Function Interface",
+Kawa has both a low-level and a high-level 
+"Foreign Function Interface",
 which allows you to call any (virtual or static) Java method
 as if it were a Scheme procedure.
+The high-level one is incomplete, so I will stick to what
+is implemented so far.
 
-These primitives require you to specify the parameter and return types.
+@defun invoke-static class name args ...
+The @var{class} can be a @code{<java.lang.Class>}, a
+@code{<gnu.bytecode.ClassType>}, or a @code{<symbol>} or @code{<string>}
+that names a Java class.  The @var{name} can be @code{<symbol>} or
+@code{<string>} that names one or more methods in the Java class.
+
+If @var{name} is not a valid Java name, it is "mangled" into a Java name:
+For example, @code{"open-file"} is mangled to @code{"openFile"},
+and @code{"char?"} is mangled to @code{"isChar"}.
+
+Any public methods (static or instance) in the specified @var{class} (or its
+super-classes) that match "@var{name}" or "@var{name}$V" collectively form a
+generic procedure.  When the procedure is applied to the argument list,
+the most specific applicable method is chosen depending on the
+argument list;  that method is then
+called with the given arguments.  Iff the method is an instance method,
+the first actual argument is used as the @code{this} argument.  If there are
+no applicable methods (or no methods at all!), or there is no "best"
+method, @code{WrongType} is thrown.
+
+("@var{name}$V" will be used for procedures with @code{#!rest} or keyword args;
+the last argument must be an array type;  all the "extra" arguments
+must be compatible with the type of the array elements.)
+
+An example (derived from the Skij FAQ):
+@example
+(invoke-static <java.lang.Thread> 'sleep 100)
+@end example
+@end defun
+
+@defun class-methods class name
+Return a generic function containing those methods of @var{class}
+that match the name @var{name}, in the sense of @code{invoke-static}.
+Same as:
+@example
+(lambda args (apply invoke-static (cons class (cons name args))))
+@end example
+@end defun
+
+The following lower-level primitives require you to specify
+the parameter and return types.
 Type specifications are currently required to be string literals
 or one of the standard types (@pxref{Standard Types}).
 A type specifier can be a fully-qualified Java class name

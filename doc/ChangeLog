@@ -1,3 +1,8 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Describe invoke-static and class-methods.
+	Remove no-longer valid disclaimer about let-syntax and letrec-syntax.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Document read-line.
@@ -14,7 +19,7 @@
 1999-07-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Update my email address.
-	Better Windows build instructions, using amkekawa.bat.
+	Better Windows build instructions, using makekawa.bat.
 
 1999-07-19  Per Bothner  <per@bothner.com>
 

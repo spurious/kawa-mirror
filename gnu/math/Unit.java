@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
-import java.io.*;
 
 /* A unit of measurement, either primitive (meter) or derived (kilogram).
  * @author	Per Bothner

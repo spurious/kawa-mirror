@@ -52,16 +52,17 @@ public class Shell
 		    */
 		    if (interpreter.errors == 0)
 		      {
-			obj = exp.eval (env);
-			if (obj == null)
+			Object result = exp.eval (env);
+			if (result == null)
 			  pout.println ("[null returned]\n");
 			else
 			  {
-			    if (obj instanceof kawa.lang.Exit)
-			      obj = null;
-			    else if (display && obj != Interpreter.voidObject)
+			    if (result instanceof kawa.lang.Exit)
+			      result = null;
+			    else if (display
+				     && result != Interpreter.voidObject)
 			      {
-				kawa.lang.print.print (obj, pout);
+				kawa.lang.print.print (result, pout);
 				pout.println();
 				pout.flush();
 			      }

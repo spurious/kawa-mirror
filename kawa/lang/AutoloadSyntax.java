@@ -62,7 +62,7 @@ public class AutoloadSyntax extends Syntax
 	if (value instanceof ModuleBody)
 	  {
             Environment env = Environment.current ();
-	    ((ModuleBody) value).run (env);
+	    ((ModuleBody) value).run();
 	    value = env.get (name);
 	    if (value == null || value == this
 		|| !(value instanceof Syntax))

@@ -1,5 +1,6 @@
 package kawa.lang;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 
@@ -194,7 +195,11 @@ public class Record extends NameMap
     List list = List.Empty;
     Field[] fields = clas.getFields();
     for (int i = fields.length;  --i >= 0; )
-      list = new Pair (fields[i].getName().intern(), list);
+      {
+	Field field = fields[i];
+	if ((field.getModifiers() & Modifier.STATIC) == 0)
+	  list = new Pair(field.getName().intern(), list);
+      }
     return list;
   }
 

@@ -7,13 +7,13 @@ import gnu.mapping.*;
 
 public class Promise implements Printable
 {
-  Procedure0 thunk;
+  Procedure thunk;
 
   /** The result - or null if it is not ready. */
   Object result;
 
-  /** Create a new Promise that will evaluata think when forced. */
-  public Promise (Procedure0 thunk)
+  /** Create a new Promise that will evaluate thunk when forced. */
+  public Promise (Procedure thunk)
   {
     this.thunk = thunk;
   }

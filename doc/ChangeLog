@@ -1,3 +1,7 @@
+2004-07-27  Chris Dean  <ctdean@sokitomi.com>
+
+	* kawa.texi (Compilation options):  Add --warn-as-error.
+
 2004-07-27  Per Bothner  <per@bothner.com>
 
 	* internals.xml (Procedures):  Major re-working - still unfinished.

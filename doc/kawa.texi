@@ -1040,6 +1040,8 @@ lexical scope nor in the compile-time dynamic (global) environment.
 This is useful for catching typos.
 (A @code{define-variable} form can be used to silence warnings.
 It declares to the compiler that a variable is to be resolved dynamically.)
+@item --warn-as-error
+Treat a compilation warning as if it were an error and halt compilation.
 @end table
 
 An option can be followed by a value, as

@@ -1,5 +1,10 @@
 2002-11-23  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (define_field):  Moved to Interpreter.
+	* kawa/standard/StaticFieldConstraint.java:  Moved to gnu.kawa.reflect.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/lang/Translator.java:  Explicitly import StaticFieldConstraint.
+
 	* configure.in:  Make --with-collections the default.
 
 002-11-20  Per Bothner  <bothner@bothner.com>

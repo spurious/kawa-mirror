@@ -1,10 +1,10 @@
 package kawa.lang;
 import kawa.standard.Scheme;
-import kawa.standard.StaticFieldConstraint;
 import gnu.bytecode.Method;
 import gnu.bytecode.Variable;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.reflect.StaticFieldConstraint;
 import java.lang.reflect.Modifier;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;

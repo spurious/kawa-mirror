@@ -61,7 +61,6 @@ try_catch.java try_finally.java synchronizd.java \
 make.java location.java \
 define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \
-StaticFieldConstraint.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java thisRef.java \
 TracedProcedure.java \

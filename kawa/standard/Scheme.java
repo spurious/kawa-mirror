@@ -41,16 +41,6 @@ public class Scheme extends LispInterpreter
     define(name, proc);
   }
 
-  protected void define_field (String name, String cname, String fname)
-  {
-    StaticFieldConstraint.define(environ, name, cname, fname);
-  }
-
-  protected void define_field (String name, String cname)
-  {
-    StaticFieldConstraint.define(environ, name, cname, Compilation.mangleName(name));
-  }
-
   /* Define a Syntax to be autoloaded. */
   protected void define_syntax (String name, String className)
   {

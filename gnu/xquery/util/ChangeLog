@@ -1,3 +1,7 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* NamedCollator.java: Change "select" (preprocessor) syntax.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* MakeAttribute.java: Moved to gnu.kawa.xml.

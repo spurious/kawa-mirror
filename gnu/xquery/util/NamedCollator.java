@@ -2,14 +2,14 @@ package gnu.xquery.util;
 import java.io.*;
 
 public class NamedCollator
-/* BEGIN JAVA2 */
+/* #ifdef JAVA2 */
 extends java.text.Collator
-/* END JAVA2 */
+/* #endif */
 implements Externalizable
 {
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   java.text.Collator collator;
-  /* END JAVA2 */
+  /* #endif */
 
   String name;
 
@@ -37,26 +37,26 @@ implements Externalizable
 
   public int compare (String str1, String str2)
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (collator != null)
       return collator.compare(str1, str2);
-    /* END JAVA2 */
+    /* #endif */
     return str1.compareTo(str2);
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public java.text.CollationKey getCollationKey (String source)
   {
     return collator.getCollationKey(source);
   }
-  /* END JAVA2 */
+  /* #endif */
 
   public int hashCode ()
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     if (collator != null)
       return collator.hashCode();
-    /* END JAVA2 */
+    /* #endif */
     return 0;
   }
 

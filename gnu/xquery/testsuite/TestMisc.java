@@ -279,6 +279,21 @@ public class TestMisc
 	     + "<fld1"+tabNsNodes+">a1</fld1>"
 	     + "<fld2"+tabNsNodes+" align=\"right\"><!--ignore-this-comment-->12</fld2>");
 
+    evalTest("for $n in doc('tab.xml')/result/* return node-name($n)",
+	     // Should perhaps be: "row row h:row" FIXME
+	     "row row {H}row");
+
+    evalTest("for $n in doc('tab.xml')/result/row/* "
+	     + "return local-name-from-QName(node-name($n))",
+	     "fld1 fld2 fld1 fld2");
+    evalTest("for $n in doc('tab.xml')/result/*:row/*:fld1 "
+	     + "return <n>{namespace-uri-from-QName(node-name($n))}</n>",
+	     "<n></n><n></n><n>J</n><n>J</n>");
+    evalTest("for $n in doc('tab.xml')/result/*:row/*:fld1 return "
+	     + "('[', for $p in ('', 'k', 'h') return"
+	     + " (namespace-uri-for-prefix($p,$n),';'), ']')",
+	     "[;J;H;][;J;H;][;J;H;][;J;H;]");
+
     // Based on bugs reported by Francois Leygues <vizawalou@wanadoo.fr>:
     evalTest("let $bx := <b x='xx'></b> return"
 	     + " let $x := <a>{for $y in $bx return $y}</a>"

@@ -1,3 +1,8 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main): Add tests for node-name, local-name-from-QName,
+	namespace-uri-from-QName, namespace-uri-for-prefix.
+
 2004-05-29  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Some extra tests for ingnorable space,

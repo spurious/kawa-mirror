@@ -1,6 +1,10 @@
+1999-12-05  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.63.
+
 1999-11-16  Per Bothner  <per@bothner.com>
 
-	* configure.in:  Set version to 1.6.62.
+	* configure.in:  Set version to 1.6.62, and made release.
 	* COPYING:  New file.  Replaces removed doc/license.terms.
 	* kawa/repl.java (main):  --version prints (short) copyright notice.
 

@@ -11,6 +11,7 @@ public abstract class Procedure implements Named, Printable
   private Object[] properties;
 
   private static final String nameKey = "name";
+  private static final String setterKey = "setter";
 
   public String getName()
   {
@@ -88,19 +89,55 @@ public abstract class Procedure implements Named, Printable
     context.pc = rpc;
   }
   */
+
   /** Call this Procedure using the explicit-CallContext-convention.
    * The input arguments are (by default) in stack.args;
    * the result is (by default) left in stack.value. */
 
-  public void apply (CallContext stack)
+  public void apply (CallContext ctx)
   {
-    stack.value = applyN(stack.args);
+    Object result;
+    int count = ctx.count;
+    if (ctx.where == 0)
+      result = applyN(ctx.values);
+    else
+      {
+	switch (count)
+	  {
+	  case 0:
+	    result = apply0();
+	    break;
+	  case 1:
+	    result = apply1(ctx.getArgAsObject(0));
+	    break;
+	  case 2:
+	    result = apply2(ctx.getArgAsObject(0), ctx.getArgAsObject(1));
+	    break;
+	  case 3:
+	    result = apply3(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
+			    ctx.getArgAsObject(2));
+	    break;
+	  case 4:
+	    result = apply4(ctx.getArgAsObject(0), ctx.getArgAsObject(1),
+			    ctx.getArgAsObject(2), ctx.getArgAsObject(3));
+	    break;
+	  default:
+	    result = applyN(ctx.getArgs());
+	    break;
+	  }
+      }
+    ctx.value = result;
   }
 
   public Procedure getSetter()
   {
     if (! (this instanceof HasSetter))
-      throw new RuntimeException("procedure '"+getName()+ "' has no setter");
+      {
+	Object setter = getProperty(setterKey, null);
+	if (setter instanceof Procedure)
+	  return (Procedure) setter;
+	throw new RuntimeException("procedure '"+getName()+ "' has no setter");
+      }
     int num_args = numArgs();
     if (num_args == 0x0000)
       return new Setter0(this);
@@ -115,9 +152,9 @@ public abstract class Procedure implements Named, Printable
     getSetter().apply1(result);
   }
 
-  public void set1(Object result, Object arg1)
+  public void set1(Object arg1, Object value)
   {
-    getSetter().apply2(result, arg1);
+    getSetter().apply2(arg1, value);
   }
 
   public void setN (Object[] args)

@@ -1,3 +1,23 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (args):  Removed field - use valueX instead.
+	(getArgs):  New method.
+	* CallFrame.java (apply):  Use values field of CallContext, not args.
+	* CpsProcedure.java (match, applyN):  Likewise.
+
+	Various fixes for SRFI-17 compatibility (which has rhs value as
+	last value, not first value to setter procedure).
+	* HasSetter.java:  Update comments to match new conventions.
+	* Procedure.java (setterKey):  New static field.
+	(getSetter):  Look for "setter" property.
+	(set1):  Rename args to match new convention.
+	* Setter1.java (apply2):  Likewise.
+	* NameMap.java (set1):  Switch args to match new convention.
+	* ProcLocation.java (set):  Switch to match new setter convention.
+
+	* Procedure.java (apply(CallContext)):  Optimize - avoid applyN.
+
+
 2000-08-17  Per Bothner  <per@bothner.com>
 
 	* CallStack.java:  Renamed to ...

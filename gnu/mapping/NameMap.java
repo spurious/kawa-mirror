@@ -31,7 +31,7 @@ public abstract class NameMap extends Procedure1 implements HasSetter
     return get ((String) arg);
   }
 
-  public void set1 (Object value, Object arg)
+  public void set1 (Object arg, Object value)
   {
     put ((String) arg, value);
   }

@@ -8,8 +8,8 @@ public class Setter1 extends Setter
 
   public int numArgs() { return 0x2002; }
 
-  public Object apply2(Object result, Object arg)
-  { getter.set1(result, arg);  return Values.empty; }
+  public Object apply2(Object arg, Object value)
+  { getter.set1(arg, value);  return Values.empty; }
 
   public Object applyN(Object[] args)
   {

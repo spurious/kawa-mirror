@@ -16,7 +16,7 @@ public interface HasSetter
 (define-syntax set!
  (syntax-rules ()
   ((set! (func arg ...) rhs)
-   ((setter func) rhs arg ...))
+   ((setter func) arg ... rhs))
   ((set! var rhs)
    (%set! var rhs))))
 
@@ -26,14 +26,15 @@ Better code generation:
 => f.set(rhs args ...)
 E.g.
 (set (f) rhs) =>  [compile f].set0([compile rhs])
-(set (f x) rhs) =>  [compile f].set1([compile rhs], [compile x])
-(set (f x1 .. xn) rhs) => [compile f].setN([compile rhs], .. [compile xn])
+(set (f x) rhs) =>  [compile f].set1([compile x], [compile rhs])
+(set (f x1 .. xn) rhs)
+    => [compile f].setN([[compile x1], .. [compile xn], [compile rhs]])
 
 Examples:
-(setter car) == (lambda (rhs pair) (set-car! pair rhs))
-(setter cdr) == (lambda (rhs pair) (set-cdr! pair rhs))
-(setter caXXXr) == (lambda (rhs pair) (set-car! (cXXXr pair) rhs))
-(setter cdXXXr) == (lambda (rhs pair) (set-cdr! (cXXXr pair) rhs))
+(setter car) == set-car!
+(setter cdr) == set-cdr!
+(setter caXXXr) == (lambda (rhs pair) (set-car! (cXXXr pair) rhs)) ???
+(setter cdXXXr) == (lambda (rhs pair) (set-cdr! (cXXXr pair) rhs)) ???
 (setter list-ref) ...
 
 (ENV 'NAME) => value of NAME in ENV

@@ -20,9 +20,10 @@ public class ProcLocation extends Location
 
   public void set (Object value)
   {
-    Object[] xargs = new Object[args.length + 1];
-    xargs[0] = value;
-    System.arraycopy(args, 0, xargs, 1, args.length);
+    int len = args.length;
+    Object[] xargs = new Object[len + 1];
+    xargs[len] = value;
+    System.arraycopy(args, 0, xargs, 0, len);
     proc.setN(xargs);
   }
 }

@@ -84,14 +84,14 @@ public class IntNum extends RatNum implements Compilable
     return result;
   }
 
-  /** Make an IntNum from an array of words.
-   * The array may be reused (i.e. not copied). */
+  /** Make a canonicalized IntNum from an array of words.
+   * The array may be reused (without copying). */
   public static IntNum make (int[] words, int len)
   {
     if (words == null)
       return make (len);
     len = IntNum.wordsNeeded (words, len);
-    if (len <= 0)
+    if (len <= 1)
       return len == 0 ? zero () : make (words[0]);
     IntNum num = new IntNum ();
     num.words = words;
@@ -212,7 +212,7 @@ public class IntNum extends RatNum implements Compilable
 
   /** Calculate how many words are significant in words[0:len-1].
    * Returns the least value x such that x>0 && words[0:x-1]==words[0:len-1],
-   * when words is views as a 2's complement integer.
+   * when words is viewed as a 2's complement integer.
    */
   public static int wordsNeeded (int[] words, int len)
   {
@@ -1137,24 +1137,17 @@ public class IntNum extends RatNum implements Compilable
 	    bytes[byte_len++] = (byte) digit;
 	  }
       }
-    int chars_per_word = MPN.chars_per_word(radix);
-    IntNum result = IntNum.alloc((byte_len + 1) / chars_per_word + 1);
-    result.ival = MPN.set_str(result.words, bytes, byte_len, radix);
-    if (result.ival == 0 || result.words[result.ival-1] < 0)
-      result.words[result.ival++] = 0;
-    if (negative)
-      result.setNegative ();
-    return result.canonicalize ();
+    return valueOf (bytes, byte_len, negative, radix);
   }
 
   public static IntNum valueOf (String s, int radix)
        throws NumberFormatException
   {
-    int chars_per_word = MPN.chars_per_word (radix);
-    if (s.length () <= chars_per_word)
-      return IntNum.make (Long.parseLong (s, radix));
     int len = s.length ();
-    IntNum result = IntNum.alloc ((len + 1) / chars_per_word + 1);
+    // Testing (len < MPN.chars_per_word(radix)) would be more accurate,
+    // but slightly more expensive, for little practical gain.
+    if (len <= 15 && radix <= 16)
+      return IntNum.make (Long.parseLong (s, radix));
     
     int byte_len = 0;
     byte[] bytes = new byte[len];
@@ -1174,12 +1167,22 @@ public class IntNum extends RatNum implements Compilable
 	    bytes[byte_len++] = (byte) digit;
 	  }
       }
-    result.ival = MPN.set_str (result.words, bytes, byte_len, radix);
-    if (result.ival == 0 || result.words[result.ival-1] < 0)
-      result.words[result.ival++] = 0;
+    return valueOf (bytes, byte_len, negative, radix);
+  }
+
+  public static IntNum valueOf (byte[] digits, int byte_len,
+				boolean negative, int radix)
+  {
+    int chars_per_word = MPN.chars_per_word(radix);
+    int[] words = new int[byte_len / chars_per_word + 1];
+    int size = MPN.set_str(words, digits, byte_len, radix);
+    if (size == 0)
+      return zero();
+    if (words[size-1] < 0)
+      words[size++] = 0;
     if (negative)
-      result.setNegative ();
-    return result.canonicalize ();
+      negate (words, words, size);
+    return make (words, size);
   }
 
   public static IntNum valueOf (String s)

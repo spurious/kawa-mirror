@@ -1,3 +1,9 @@
+2003-04-19  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Update to use NameLookup.
+	(parseStepQualifiers):  Defer NameLookup's push after addDeclaration.
+	(parseFunctionDefinition):  Explicitly push declarations.
+
 2003-04-18  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (mark, reset):  New methods.

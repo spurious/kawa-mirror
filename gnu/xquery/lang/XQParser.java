@@ -1181,8 +1181,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    LambdaExp lexp = new LambdaExp(1);
 	    lexp.setFile(getName());
 	    lexp.setLine(startLine, startColumn);
-	    parser.push(lexp);
 	    Declaration dot = lexp.addDeclaration("dot");
+	    parser.push(lexp);
 	    dot.noteValue(null);
 	    Expression cond = parseExpr();
 	    cond.setFile(getName());
@@ -2089,6 +2089,7 @@ public class XQParser extends LispReader // should be extends Lexer
     lexp.setLine(declLine, declColumn);
     lexp.setName(name);
     Declaration decl = parser.currentScope().addDeclaration(name);
+    parser.push(decl);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
     decl.setFile(getName());
@@ -2107,6 +2108,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		String pname
 		  = new String(tokenBuffer, 0, tokenBufferLength).intern();
 		Declaration param = lexp.addDeclaration(pname);
+		parser.push(param);
 		getRawToken();
 		lexp.min_args++;
 		lexp.max_args++;

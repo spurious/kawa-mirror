@@ -1286,7 +1286,7 @@ is equivalent to:
 
 Kawa also gives you access to locations as first-class values:
 
-@deffn Syntax (location lvalue)
+@deffn Syntax location lvalue
 Returns a location object for the given @var{lvalue}.
 You can get its value (by applying it, as if it were a procedure),
 and you can set its value (by using @code{set!} on the application).
@@ -1303,7 +1303,7 @@ call using a procedure that has a @code{setter}.
 @end example
 @end deffn
 
-@deffn Syntax (define-alias variable lvalue)
+@deffn Syntax define-alias variable lvalue
 Define @var{variable} as an alias for @var{lvalue}.
 In other words, makes it so that @code{(location @var{variable})}
 is equivalent to @code{(location @var{lvalue})}.
@@ -1544,7 +1544,7 @@ an array of references to @code{java.lang.StringBuffer} objects.
 @node Declaring Types of Variables, Processes, Standard Types, Extensions
 @section Declaring Types of Variables
 
-@deffn Syntax let ((name [:: type] init) ...) body)
+@deffn Syntax let ((name [:: type] init) ...) body
 Declare new locals variables with the given @var{name}, initial value
 @var{init}, and optional type specification @var{type}.
 If @var{type} is specified, then the expression @var{init} is evaluated,
@@ -1552,10 +1552,10 @@ the result coerced to @var{type}, and then assigned to the variable.
 If @var{type} is not specified, it defaults to @code{<object>}.
 @end deffn
 
-@deffn Syntax let* ((name [:: type] init) ...) body)
+@deffn Syntax let* ((name [:: type] init) ...) body
 @end deffn
 
-@deffn Syntax letrec ((name [:: type] init) ...) body)
+@deffn Syntax letrec ((name [:: type] init) ...) body
 @end deffn
 
 @node Processes, Miscellaneous, Declaring Types of Variables, Extensions

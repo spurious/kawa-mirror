@@ -20,7 +20,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   public Marker pointMarker;
   public Marker markMarker;
 
-  /** List of modes active for this buffer, mahor mode first. */
+  /** List of modes active for this buffer, major mode first. */
   Mode modes;
 
   /** Map buffer names to buffers. */

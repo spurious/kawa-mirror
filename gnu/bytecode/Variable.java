@@ -132,7 +132,4 @@ public class Variable extends Location implements java.util.Enumeration {
     while (--size >= 0)
       code.locals.used [offset + size] = null;
   }
-
-
-  
 }

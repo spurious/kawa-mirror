@@ -205,27 +205,30 @@ ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
-  AliasConstraint.java \
   CallContext.java \
-  Constraint.java UnboundConstraint.java TrivialConstraint.java \
-  ConstantConstraint.java \
-  IndirectConstraint.java \
+  ConstantLocation.java \
   Environment.java \
-  FluidBinding.java \
-  FluidConstraint.java \
+  EnvironmentKey.java \
   Future.java \
   HasSetter.java \
+  IndirectableLocation.java \
+  InheritingEnvironment.java \
   InPort.java \
+  KeyPair.java \
   Location.java \
+  LocationEnumeration.java \
   LogWriter.java \
   MethodProc.java \
   NameMap.java \
   Named.java \
+  NamedLocation.java \
+  Namespace.java \
   OutPort.java \
   CharArrayInPort.java \
   CharArrayOutPort.java \
+  SharedLocation.java \
+  PlainLocation.java \
   Printable.java \
-  ProcLocation.java \
   Procedure.java \
   Procedure0.java \
   Procedure0or1.java \
@@ -235,13 +238,16 @@ java_sources = \
   Procedure3.java \
   Procedure4.java \
   ProcedureN.java \
+  ProcLocation.java \
+  PropertyLocation.java \
   Setter.java \
   Setter0.java \
   Setter1.java \
+  SimpleEnvironment.java \
   Symbol.java \
-  SymbolEnumeration.java \
   TtyInPort.java \
-  UnboundSymbol.java \
+  UnboundLocation.java \
+  UnboundLocationException.java \
   Values.java \
   ValueStack.java \
   WrappedException.java \

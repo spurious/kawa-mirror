@@ -3,27 +3,29 @@
 include $(top_srcdir)/Make-rules
 
 java_sources=\
-  AliasConstraint.java \
   CallContext.java \
-  Constraint.java UnboundConstraint.java TrivialConstraint.java \
-  ConstantConstraint.java \
-  IndirectConstraint.java \
+  ConstantLocation.java \
   Environment.java \
-  FluidBinding.java \
-  FluidConstraint.java \
+  EnvironmentKey.java \
   Future.java \
   HasSetter.java \
+  IndirectableLocation.java \
+  InheritingEnvironment.java \
   InPort.java \
+  KeyPair.java \
   Location.java \
+  LocationEnumeration.java \
   LogWriter.java \
   MethodProc.java \
   NameMap.java \
   Named.java \
+  NamedLocation.java \
+  Namespace.java \
   OutPort.java \
   CharArrayInPort.java \
   CharArrayOutPort.java \
+  PlainLocation.java \
   Printable.java \
-  ProcLocation.java \
   Procedure.java \
   Procedure0.java \
   Procedure0or1.java \
@@ -33,13 +35,17 @@ java_sources=\
   Procedure3.java \
   Procedure4.java \
   ProcedureN.java \
+  ProcLocation.java \
+  PropertyLocation.java \
   Setter.java \
   Setter0.java \
   Setter1.java \
+  SharedLocation.java \
+  SimpleEnvironment.java \
   Symbol.java \
-  SymbolEnumeration.java \
   TtyInPort.java \
-  UnboundSymbol.java \
+  UnboundLocation.java \
+  UnboundLocationException.java \
   Values.java \
   ValueStack.java \
   WrappedException.java \

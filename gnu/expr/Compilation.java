@@ -244,7 +244,7 @@ public class Compilation
   public static Field numArgsCallFrameField
     = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
   public static Field argsCallContextField
-    = typeCallContext.addField("args", objArrayType, Access.PROTECTED);
+    = typeCallContext.addField("values", objArrayType, Access.PROTECTED);
   public static Field procCallContextField
     = typeCallContext.addField("proc", typeProcedure, Access.PROTECTED);
   public static Field callerCallFrameField
@@ -426,7 +426,8 @@ public class Compilation
 
   private void dumpInitializers (Initializer inits)
   {
-    for (Initializer init = inits;  init != null;  init = init.next)
+    for (Initializer init = Initializer.reverse(inits);
+         init != null;  init = init.next)
       init.emit(this);
   }
 
@@ -608,12 +609,12 @@ public class Compilation
     mainClass = new ClassType(classname);
 
     // Do various code re-writes and optimization.
+
     ChainLambdas.chainLambdas(lexp, this);
     PushApply.pushApply(lexp);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
-    if (! usingCPStyle)
-      FindCapturedVars.findCapturedVars(lexp);
+    FindCapturedVars.findCapturedVars(lexp);
     InlineCalls.inlineCalls(lexp);
 
     mainClass = addClass(lexp, mainClass);
@@ -692,6 +693,7 @@ public class Compilation
     if (curClass == mainClass)
       {
 	Initializer init;
+        initChain = Initializer.reverse(initChain);
 	while ((init = initChain) != null)
 	  {
 	    initChain = init.next;
@@ -1023,7 +1025,7 @@ public class Compilation
     LambdaExp saveLambda = curLambda;
     curLambda = lexp;
     Type[] arg_types;
-    if (lexp.isHandlingTailCalls())
+    if (lexp.isHandlingTailCalls() || usingCPStyle())
       {
 	arg_count = 1;
 	arg_letter = '?';

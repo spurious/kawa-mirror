@@ -526,7 +526,11 @@ public class LambdaExp extends ScopeExp
 	  fflags |= Access.PUBLIC;
       }
     else
-      fname = fname + "$Fn" + ++comp.localFieldIndex;
+      {
+	fname = fname + "$Fn" + ++comp.localFieldIndex;
+	if (! getNeedsClosureEnv())
+	  fflags |= Access.STATIC;
+      }
     Type rtype = Compilation.getMethodProcType(comp.mainClass);
     Field field = comp.mainClass.addField (fname, rtype, fflags);
     if (nameDecl != null)
@@ -592,8 +596,10 @@ public class LambdaExp extends ScopeExp
 	ClassType ctype = comp.curClass;
 	rtype = ctype;
 	code.emitNew(ctype);
+	/*
 	code.emitDup(ctype);
 	code.emitInvokeSpecial(ctype.constructor);
+	*/
 	code.emitDup(ctype);
 	code.emitPushInt(pc);
 	code.emitPutField(comp.saved_pcCallFrameField);
@@ -842,7 +848,7 @@ public class LambdaExp extends ScopeExp
 		ClassType heapFrameType = heapFrameLambda.getCompiledClassType(comp);
 		closureEnvField = comp.curClass.addField ("closureEnv", heapFrameType);
 	      }
-	    else if (parent.getNeedsStaticLink())
+	    else if (parent.getNeedsStaticLink() && ! Compilation.usingCPStyle())
 	      {
 		closureEnvField = comp.curClass.addField ("closureEnv", parent.closureEnv.getType());
 	      }
@@ -951,7 +957,7 @@ public class LambdaExp extends ScopeExp
     scope.setStartPC(code.getPC());
 
     if (closureEnv != null && ! closureEnv.isParameter()
-	&& ! getInlineOnly())
+	&& ! getInlineOnly() && ! comp.usingCPStyle())
       {
 	code.emitPushThis();
 	Field field = closureEnvField;

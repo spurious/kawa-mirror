@@ -1,5 +1,36 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* SetApplyExp.java:  Removed, as part of "setter" re-implementation.
+	* Makefile.am (java_JAVA):  Update accordingly.
+	* ExpWalker.java (walkSetApplyExp):  Removed field.
+
+	* ApplyExp.java (compile):  Add overloading.
+	New checkInlineable parameter.
+	
+	* Compilation.java (argsCallContextField):  Use "values" field,
+	instead of removed "args" field.
+	(dumpInitializers):  Reverse the order (to make it normal).
+
+	* Compilation.java, FindCapturedVars.java, LambdaExp.java:
+	Various fixes that apply when usingCPStyle().
+
+	* LambdaExp.java (allocFieldFor):  If anonymous lambda, make
+	field static if it doesn't need a closure.
+	* FindCapturedVars.java (capture):  Return if decl has a static field.
+	* ReferenceExp.java (eval):  If decl has ststic field, get its value.
+
+	* Declaration.java (getConstantValue):  New helper method.
+	* Declaration.java (IS_SYNTAX):  New flag constant.
+	* SetExp.java (compile):  Update for Macro not extendeding Declaration.
+	* ModuleExp.java (allocField):  Likewise.
+
+	* PrimProcedure.java (takesVarArgs):  Return false if not a method.
+	* ProcInitializer.java (emit):  Handle property value being
+	an Expression, as opposed to a constant value.
+	* ReferenceExp.java (setBinding):  New method.
+
+2000-10-12  Per Bothner  <per@bothner.com>
+
 	* CanInline.java:  New interface.
 	* InlineCalls.java:  New class, extends ExpFullWalker.
 	* Makefile.am (java_JAVA):  Add new classes.

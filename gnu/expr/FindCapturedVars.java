@@ -105,6 +105,10 @@ public class FindCapturedVars extends ExpFullWalker
   {
     if (! (decl.getCanRead() || decl.getCanCall()))
       return;
+
+    if (decl.field != null && decl.field.getStaticFlag())
+      return;
+
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
 
@@ -143,8 +147,14 @@ public class FindCapturedVars extends ExpFullWalker
         curLambda = curReturn.context;
         chain = chain.nextSibling;
       }
-    if (curLambda == declLambda)
-      return;
+    if (Compilation.usingCPStyle())
+      {
+	if (curLambda instanceof ModuleExp)
+	  return;
+      }
+    else
+      if (curLambda == declLambda)
+	return;
 
     // The logic here is similar to that of decl.ignorable():
     Expression value = decl.getValue();
@@ -168,7 +178,7 @@ public class FindCapturedVars extends ExpFullWalker
 	LambdaExp heapLambda = curLambda;
 	heapLambda.setImportsLexVars();
 	LambdaExp parent = heapLambda.outerLambda();
-	for (LambdaExp outer = parent;  outer != declLambda; )
+	for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
 	  {
 	    heapLambda = outer;
 	    if (! decl.getCanRead() && declValue == outer)

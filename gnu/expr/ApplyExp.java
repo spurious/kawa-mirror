@@ -38,20 +38,6 @@ public class ApplyExp extends Expression
     return proc.applyN (vals);
   }
 
-  public void compile (Compilation comp, Target target)
-  {
-    if (func instanceof QuoteExp)
-      {
-	Object proc = ((QuoteExp) func).getValue();
-	if (proc instanceof Inlineable)
-	  {
-	    ((Inlineable) proc).compile(this, comp, target);
-	    return;
-	  }
-      }
-    compile(this, comp, target);
-  }
-
   public static void compileToArray(Expression[] args, Compilation comp)
   {
     CodeAttr code = comp.getCode();
@@ -106,12 +92,21 @@ public class ApplyExp extends Expression
       }
   }
 
+  public void compile (Compilation comp, Target target)
+  {
+    compile(this, comp, target, true);
+  }
+
   public static void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    compile(exp, comp, target, false);
+  }
+
+  static void compile (ApplyExp exp, Compilation comp, Target target,
+                              boolean checkInlineable)
+  {
     int args_length = exp.args.length;
-    Method method;
     Expression exp_func = exp.func;
-    gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
     String func_name = null;
     if (exp_func instanceof LambdaExp)
@@ -140,6 +135,11 @@ public class ApplyExp extends Expression
 		    proc = null;
 		    msg = "calling " + func_name + " which is not a procedure";
 		  }
+                else if (checkInlineable && quotedValue instanceof Inlineable)
+                  {
+                    ((Inlineable) quotedValue).compile(exp, comp, target);
+                    return;
+                  }
 		else
 		  {
 		    proc = (Procedure) quotedValue;
@@ -166,10 +166,15 @@ public class ApplyExp extends Expression
     else if (exp_func instanceof QuoteExp)
       {
         Object proc = ((QuoteExp) exp_func).getValue();
+	if (proc instanceof Inlineable)
+	  {
+            if (checkInlineable)
+              {
+                ((Inlineable) proc).compile(exp, comp, target);
+                return;
+              }
 
-        // If it wasn't inlineable, we already checked for this in Translator.
-        if (proc instanceof Inlineable)
-          {
+            // If it wasn't inlineable, we already checked for this in Translator.
             PrimProcedure pproc
               = PrimProcedure.getMethodFor((Procedure) proc, exp.args);
             if (pproc != null)
@@ -180,6 +185,9 @@ public class ApplyExp extends Expression
               }
           }
       }
+
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    Method method;
 
     if (func_lambda != null)
       {
@@ -238,7 +246,7 @@ public class ApplyExp extends Expression
 	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	    int pc = fswitch.getMaxValue() + 1;
 	    fswitch.addCase(pc, l, code);
-            exp_func.compile (comp, new StackTarget(comp.typeCpsProcedure));
+            exp_func.compile (comp, new StackTarget(comp.typeProcedure));
 	    code.emitLoad(comp.callStackContext);
 
 	    // Emit: context->pc = pc.
@@ -401,7 +409,7 @@ public class ApplyExp extends Expression
       {
 	Object proc = ((QuoteExp) func).getValue();
 	if (proc instanceof Inlineable)
-	  return ((Inlineable) proc).getReturnType(args);
+          return ((Inlineable) proc).getReturnType(args);
       }
     return super.getType();
   }

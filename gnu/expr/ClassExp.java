@@ -32,6 +32,7 @@ public class ClassExp extends LambdaExp
   public Expression[] supers;
 
   public LambdaExp initMethod;
+  public LambdaExp clinitMethod;
 
   public ClassExp ()
   {
@@ -63,20 +64,16 @@ public class ClassExp extends LambdaExp
     String className = new_class.getName();
     // Type.make(Class.forname)
 
-    ClassType typeClass = ClassType.make("java.lang.Class");
-    Method forNameClassMethod
-      = typeClass.addMethod("forName", comp.string1Arg,
-                            typeClass, Access.STATIC|Access.PUBLIC);
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitPushString(className);
-    code.emitInvokeStatic(forNameClassMethod);
+    code.emitInvokeStatic(comp.getForNameHelper());
     ClassType typeType;
     int nargs;
     boolean needsLink = getNeedsClosureEnv();
     if (isMakingClassPair() || needsLink)
       {
 	code.emitPushString(instanceType.getName());
-	code.emitInvokeStatic(forNameClassMethod);
+	code.emitInvokeStatic(comp.getForNameHelper());
 	typeType = ClassType.make("gnu.expr.PairClassType");
 	nargs = needsLink ? 3 : 2;
       }
@@ -91,6 +88,7 @@ public class ClassExp extends LambdaExp
 	comp.curLambda.loadHeapFrame(comp);
 	argsClass[--nargs] = Type.pointer_type;
       }
+    ClassType typeClass = ClassType.make("java.lang.Class");
     while (--nargs >= 0) argsClass[nargs] = typeClass;
     Method makeMethod
       = typeType.addMethod("make", argsClass,
@@ -109,7 +107,8 @@ public class ClassExp extends LambdaExp
   {
     if (! partsDeclared)
       {
-	getType();
+	if (type == null)
+	  setTypes(comp);
 	declareParts();
       }
     if (type.getName() == null)
@@ -159,7 +158,7 @@ public class ClassExp extends LambdaExp
     return type;
   }
 
-  void setTypes()
+  void setTypes(Compilation comp)
   {
     int len = supers == null ? 0 : supers.length;
     ClassType[] superTypes = new ClassType[len];
@@ -169,12 +168,24 @@ public class ClassExp extends LambdaExp
       {
 	Type st = Interpreter.getInterpreter().getTypeFor(supers[i]);
 	if (st == null || ! (st instanceof ClassType))
-	  throw new Error("invalid super type");
+	  {
+	    String msg = "invalid super type";
+	    if (comp == null)
+	      throw new Error(msg);
+	    else
+	      comp.error('e', msg);
+	  }
 	ClassType t = (ClassType) st;
 	if ((t.getModifiers() & Access.INTERFACE) == 0)
 	  {
 	    if (j < i)
-	      throw new Error("duplicate superclass");
+	      {
+		String msg = "duplicate superclass for "+this;
+		if (comp == null)
+		  throw new Error(msg);
+		else
+		  comp.error('e', msg);
+	      }
 	    superType = t;
 	  }
 	else
@@ -220,7 +231,7 @@ public class ClassExp extends LambdaExp
   public Type getType()
   {
     if (type == null)
-      setTypes();
+      setTypes(null);
     return type;
   }
 
@@ -264,7 +275,8 @@ public class ClassExp extends LambdaExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
-	if (child != initMethod || ! isMakingClassPair())
+	if ((child != initMethod && child != clinitMethod)
+	    || ! isMakingClassPair())
 	  child.addMethodFor(type, null, null);
 	if (isMakingClassPair())
 	  child.addMethodFor(instanceType, null, type);

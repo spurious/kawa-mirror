@@ -712,7 +712,8 @@ public class LambdaExp extends ScopeExp
     primMethods = new Method[numStubs + 1];
 
     boolean isStatic;
-    boolean isInitMethod = false;
+    // 'I' if initMethod ($finit$); 'C' if clinitMethod (<clinit>).
+    char isInitMethod = '\0';
     if (isClassMethod())
       {
 	if (outer instanceof ClassExp)
@@ -720,7 +721,12 @@ public class LambdaExp extends ScopeExp
 	    ClassExp cl = (ClassExp) outer;
 	    isStatic = cl.isMakingClassPair() && closureEnvType != null;
 	    if (this == cl.initMethod)
-	      isInitMethod = true;
+	      isInitMethod = 'I';
+	    else if (this == cl.clinitMethod)
+	      {
+		isInitMethod = 'C';
+		isStatic = true;
+	      }
 	  }
 	else
 	  isStatic = false;
@@ -748,16 +754,18 @@ public class LambdaExp extends ScopeExp
 	nameBuf.append("lambda");
 	nameBuf.append(+(++comp.method_counter));
       }
-    if (name != null)
+    if (isInitMethod == 'C')
+      nameBuf.append("<clinit>");
+    else if (name != null)
       nameBuf.append(Compilation.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
     boolean withContext
       = (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
-	 && ! isInitMethod);
+	 && isInitMethod == '\0');
    int mflags = (isStatic ? Access.STATIC : 0)
       + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
-    if (isInitMethod)
+    if (isInitMethod != '\0')
       {
 	if (isStatic)
 	  { // if cl.isMakingClassPair() - i.e. defining a non-simple class:
@@ -786,7 +794,7 @@ public class LambdaExp extends ScopeExp
 
     int ctxArg = 0;
     if (getCallConvention () >= Compilation.CALL_WITH_CONSUMER
-	&& ! isInitMethod)
+	&& isInitMethod == '\0')
       ctxArg = 1;
 
     int nameBaseLength = nameBuf.length();

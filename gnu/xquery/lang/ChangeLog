@@ -1,5 +1,10 @@
 2003-10-08  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (peekOperator):  Handle ValueComp operators 'eq' ...
+	by mapping them to GeneralComp operators '=' ... .
+
+	* XQParser.java (parseUnaryExpr):  Provide implementation.
+
 	* XQParser.java:  Initial support for modules.
 	(IMPORT_MODULE_TOKEN, MODULE_NAMESPACE_TOKEN):  New constant.
 	(peekOperand):  Recognize new compound tokens.

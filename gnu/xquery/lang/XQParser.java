@@ -573,12 +573,31 @@ public class XQParser extends LispReader // should be extends Lexer
 	    char c1 = tokenBuffer[0];
 	    if (len == 2)
 	      {
-		if (c1 == 'o' && tokenBuffer[1] == 'r')
+		char c2 = tokenBuffer[1];
+		if (c1 == 'o' && c2 == 'r')
 		  curToken = OP_OR;
-		else if (c1 == 't' && tokenBuffer[1] == 'o')
+		else if (c1 == 't' && c2 == 'o')
 		  curToken = OP_RANGE_TO;
-		else if (c1 == 'i' && tokenBuffer[1] == 's')
+		else if (c1 == 'i' && c2 == 's')
 		  curToken = OP_IS;
+
+		// The ValueComp operators 'eq' ... are mapped to the
+		// corresponding GeneralComp operators '=' ...
+		// So we fail to catch certain errors.  FIXME.
+		else if (c1 == 'e' && c2 == 'q')
+		  curToken = OP_EQU;
+		else if (c1 == 'n' && c2 == 'e')
+		  curToken = OP_NEQ;
+		else if (c1 == 'g')
+		  {
+		    if (c2 == 'e')  curToken = OP_GEQ;
+		    else if (c2 == 't')  curToken = OP_GRT;
+		  }
+		else if (c1 == 'l')
+		  {
+		    if (c2 == 'e')  curToken = OP_LEQ;
+		    else if (c2 == 't')  curToken = OP_LSS;
+		  }
 	      }
 	    else
 	      {
@@ -1145,9 +1164,10 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     Expression exp;
     if (curToken == OP_SUB || curToken == OP_ADD) {
+      int op = curToken;
       getRawToken();
       exp = parseUnionExpr();
-      exp = syntaxError("non-trivial UnaryExpr not implemented");
+      exp = makeBinary(op, new QuoteExp(gnu.math.IntNum.zero()), exp);
     }
     else
       exp = parseUnionExpr();

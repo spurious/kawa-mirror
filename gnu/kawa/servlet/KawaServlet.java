@@ -11,7 +11,7 @@ import java.io.IOException;
 public abstract class KawaServlet
 extends HttpServlet
 {
-  public abstract void run(CallContext ctx);
+  public abstract void run(CallContext ctx) throws Throwable;
 
    public void doPost (HttpServletRequest request,
 		       HttpServletResponse response)
@@ -79,7 +79,5 @@ extends HttpServlet
       }
     ctx.consumer.endDocument();
   }
-
-  public abstract void apply(CallContext context)  throws Throwable;
 }
 

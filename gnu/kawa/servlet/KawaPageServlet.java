@@ -37,7 +37,7 @@ public class KawaPageServlet extends KawaServlet
     context = config.getServletContext();
   }
 
-  public void apply(CallContext ccontext) throws Throwable
+  public void run(CallContext ccontext) throws Throwable
   {
     ServletCallContext ctx = (ServletCallContext) ccontext;
     HttpServletRequest request = ctx.request;

@@ -1,3 +1,9 @@
+2004-08-11  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java (run): New abstract method, replaces ...
+	(apply):   Removed abstract method.
+	* KawaPageServlet.java (apply):  Rename to run.
+
 2004-08-10  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getProcedure): Rename to getModule and

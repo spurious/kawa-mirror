@@ -2515,7 +2515,7 @@ primitive Java @code{char} type.
 The type of Scheme vectors.
 @end defvar
 
-@defvar <function>
+@defvar <procedure>
 The type of Scheme procedures.
 @end defvar
 

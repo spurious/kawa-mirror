@@ -1,3 +1,7 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Standard Types):  Use <procedure> instead of <function>.
+
 2000-06-18  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Reporting Bugs):  Node renamed to Mailing lists.

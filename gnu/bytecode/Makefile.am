@@ -2,12 +2,12 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-.SUFFIXES: .java .class
+SUFFIXES = .java .class
 
 JAVAC=javac -classpath ..:$$CLASSPATH -d @TOP_BUILDDIR@
 
-%.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+.java.class:
+	cd $(srcdir); $(JAVAC) $(<F)
 
 javadir=$(prefix)/java/codegen
 
@@ -29,11 +29,12 @@ Scope.class \
 Type.class \
 Variable.class \
 VarEnumerator.class \
-ZipArchive.class
+ZipArchive.class \
+ZipMember.class \
+ZipLoader.class
 
 java_DATA=$(OBJ)
 
-CLEANFILES=$(OBJ) ZipMember.class
+CLEANFILES=$(OBJ)
 
 all: $(OBJ)
-

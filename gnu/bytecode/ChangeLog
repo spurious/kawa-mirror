@@ -1,5 +1,11 @@
 Tue Sep  3 19:44:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* ZipArchive.java:  Move ZipMember to ...
+	* ZipMember.java:  ... new file (and make it public).
+	* ZipLoader.java:  New class (derived from kawa.lang.SchemeLoader).
+	* Makefile.{am,in}:  Add new classes.
+	Fix broken suffix handling.
+
 	* ClassType.java (getClassName):  New method.
 	* Method.java (compile_linenumber):  New method.
 	(LineNumberTable_name_index):  New field.

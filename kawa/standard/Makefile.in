@@ -182,13 +182,10 @@ readchar.class \
 char_ready_p.class \
 write.class \
 writechar.class \
-input_port_p.class \
-output_port_p.class \
 open_input_file.class \
 open_output_file.class \
 close_input_port.class \
 close_output_port.class \
-call_with_input_string.class \
 call_with_output_string.class \
 load.class \
 procedure_p.class \

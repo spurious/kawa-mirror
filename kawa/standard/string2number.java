@@ -9,7 +9,7 @@ public class string2number extends Procedure1or2
   {
     try
       {
-	InPort iport = call_with_input_string.open_input_string (str);
+	InPort iport = new CharArrayInPort(str);
 	return iport.readSchemeNumber (radix);
       }
     catch (ReadError ex)

@@ -311,13 +311,13 @@ public class Scheme extends Interpreter
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
 
-      //-- Section 6.10 [complete except for transcript-on/off]
+      //-- Section 6.10  -- complete
       define_proc ("call-with-input-file",
 		   "kawa.standard.call_with_input_file");
       define_proc ("call-with-output-file",
 		   "kawa.standard.call_with_output_file");
-      define_proc ("input-port?", "kawa.standard.input_port_p");
-      define_proc ("output-port?", "kawa.standard.output_port_p");
+      define_proc ("input-port?", "kawa.lib.ports");
+      define_proc ("output-port?", "kawa.lib.ports");
       define_proc ("current-input-port", "kawa.standard.current_input_port");
       define_proc ("current-output-port", "kawa.standard.current_output_port");
       define_proc ("with-input-from-file",
@@ -338,8 +338,9 @@ public class Scheme extends Interpreter
       define_proc ("write-char", "kawa.standard.writechar");
       define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");
-      define_proc ("call-with-input-string",  // Extension
-		   "kawa.standard.call_with_input_string");
+      define_proc ("transcript-off", "kawa.lib.ports");
+      define_proc ("transcript-on", "kawa.lib.ports");
+      define_proc ("call-with-input-string", "kawa.lib.ports");  // Extension
       define_proc ("call-with-output-string",  // Extension
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
@@ -351,8 +352,6 @@ public class Scheme extends Interpreter
       define_proc ("default-prompter", "kawa.lib.ports");
       define_proc ("input-port-prompter", "kawa.lib.ports");
       define_proc ("set-input-port-prompter!", "kawa.lib.ports");
-      define_proc ("transcript-off", "kawa.lib.ports");
-      define_proc ("transcript-on", "kawa.lib.ports");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
@@ -476,7 +475,7 @@ public class Scheme extends Interpreter
   public static Object eval (String string, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    return eval (call_with_input_string.open_input_string (string), env);
+    return eval (new CharArrayInPort(string), env);
   }
 
   public Object eval (String string)

@@ -40,6 +40,7 @@
   <property name="dist.dir"     value="${build.dir}"/>
   
   <property name="build.tools"        value="${build.dir}/tools"/>
+  <property name="build.tmp"          value="${build.dir}/tmp"/>
   <property name="build.preprocessed" value="${build.dir}"/>
   <property name="build.classes"      value="${build.dir}"/>
   
@@ -92,6 +93,12 @@
      <include name="kawa/Version.java"/>
   </fileset>
   
+  <patternset id="build.selectjava">
+     <include name="gnu/bytecode/ObjectType.java"/>
+     <include name="gnu/mapping/CallContext.java"/>
+     <include name="gnu/kawa/xml/Focus.java"/>
+  </patternset>
+
   <target name="run" depends="classes">
      <java taskname="kawa" classname="kawa.repl" classpath="${build.classes}" />
   </target>
@@ -128,13 +135,6 @@
     -->
     <available property="with-collections" classname="java.util.List"/>
     <property name="with-collections" value="false"/>
-    
-    <!-- 
-       If java.lang.ref.WeakReference is in the classpath, then we'll compile with
-       Java References, unless you override the setting of with-references.
-    -->
-    <available property="with-references" classname="java.lang.ref.WeakReference"/>
-    <property name="with-references" value="false"/>
     
     <!-- 
        If java.awt.Component is in the classpath, then we'll compile the
@@ -176,7 +176,6 @@
         dist.kawa.jar=${dist.kawa.jar}
         build.dir=${build.dir}
         with-collections=${with-collections}
-        with-references=${with-references}
         with-awt=${with-awt}
         with-swing=${with-swing}
         with-sax2=${with-sax2}
@@ -210,14 +209,6 @@
         <linestripper first="if CHAR is byte" last="endif CHAR is byte" />
       </linestripperset>
 
-      <linestripperset id="strip-with-references-true">
-        <linestripper first="if WITHOUT REFERENCES" last="endif WITHOUT REFERENCES" />
-        <linestripper first="if WITHOUT REFERENCES" last="endif WITHOUT REFERENCES" />
-      </linestripperset>
-
-      <linestripperset id="strip-with-references-false">
-        <linestripper first="if WITH REFERENCES" last="endif WITH REFERENCES" />
-      </linestripperset>
     </xcopy>
   </target>
   
@@ -252,6 +243,68 @@
     -->
 
   </target>
+  
+  <target name="select-java1" depends="build-tools">
+    <mkdir dir="${build.tmp}"/>
+    <xcopy todir="${build.tmp}" overwrite="true">
+ 	   <fileset dir="${src.dir}">
+       	 <patternset refid="build.selectjava"/>
+		 <!--
+			 <or>
+				 <contains text="BEGIN JAVA1"/>
+				 <contains text="BEGIN JAVA2"/>
+			 </or>
+	     -->
+      </fileset>
+      <linecommenterset begintoken="/* " endtoken=" */" >
+        <linecommenter first="BEGIN JAVA2" last="END JAVA2" comment="true"/>
+        <linecommenter first="BEGIN JAVA1" last="END JAVA1" comment="false"/>
+      </linecommenterset>
+    </xcopy>
+    <copy todir="${build.preprocessed}">
+       <fileset dir="${build.tmp}">
+       	 <patternset refid="build.selectjava"/>
+       </fileset>          
+    </copy>
+  </target>
+  
+  <target name="select-java2" depends="build-tools">
+    <mkdir dir="${build.tmp}"/>
+    <xcopy todir="${build.tmp}" overwrite="true">
+ 	   <fileset dir="${src.dir}">
+       	 <patternset refid="build.selectjava"/>
+		 <!--
+			 <or>
+				 <contains text="BEGIN JAVA1"/>
+				 <contains text="BEGIN JAVA2"/>
+			 </or>
+	     -->
+      </fileset>
+      <linecommenterset begintoken="/* " endtoken=" */" >
+        <linecommenter first="BEGIN JAVA2" last="END JAVA2" comment="false"/>
+        <linecommenter first="BEGIN JAVA1" last="END JAVA1" comment="true"/>
+      </linecommenterset>
+    </xcopy>
+    <copy todir="${build.preprocessed}">
+       <fileset dir="${build.tmp}">
+       	 <patternset refid="build.selectjava"/>
+       </fileset>          
+    </copy>
+  </target>
+    
+  <target name="check-for-java2">
+     <available property="has-java2" classname="java.lang.ThreadLocal"/>
+  </target>
+  
+  <target name="select-java1-auto" depends="check-for-java2" unless="has-java2">
+     <antcall target="select-java1"/>
+  </target>
+  
+  <target name="select-java2-auto" depends="check-for-java2" if="has-java2">
+     <antcall target="select-java2"/>
+  </target>
+  
+  <target name="select-java-auto" depends="select-java1-auto, select-java2-auto"/>
   
   <!-- 
      This preprocessing jazz is rather involved and verbose,
@@ -293,18 +346,6 @@
         <filter token="endif CHAR is char" value="" />
       </filterset>
 
-      <filterset id="filter-with-references-true">
-        <filter token="QTableElement" value="WeakReference" />
-        <filter token="if WITH REFERENCES" value="" />
-        <filter token="endif WITH REFERENCES" value="" />
-      </filterset>
-
-      <filterset id="filter-with-references-false">
-        <filter token="QTableElement" value="QName" />
-        <filter token="if WITHOUT REFERENCES" value="" />
-        <filter token="endif WITHOUT REFERENCES" value="" />
-      </filterset>
-
   <target name="preprocess" depends="build-tools, build-settings">
     <mkdir dir="${build.preprocessed}"/>
 
@@ -327,24 +368,6 @@
       <linestripperset refid="strip-with-collections-${with-collections}"/>
     </xcopy>
     
-    <xcopy todir="${build.preprocessed}/gnu/mapping" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/mapping" />
-      <mapper type="glob" from="*CallContext.java.in" to="*CallContext.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-with-references-${with-references}"/>
-      <linestripperset refid="strip-with-references-${with-references}"/>
-    </xcopy>
-
-    <xcopy todir="${build.preprocessed}/gnu/kawa/xml" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/kawa/xml" />
-      <mapper type="glob" from="*Focus.java.in" to="*Focus.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-with-references-${with-references}"/>
-      <linestripperset refid="strip-with-references-${with-references}"/>
-    </xcopy>
-
     <xcopy todir="${build.preprocessed}/gnu/xml" 
            overwrite="${preprocess.overwrite}">
       <fileset dir="${src.dir}/gnu/xml" />
@@ -381,14 +404,6 @@
       <linestripperset refid="strip-byte-subs"/>
     </xcopy>
 
-    <xcopy todir="${build.preprocessed}/gnu/xml" 
-           overwrite="${preprocess.overwrite}">
-      <fileset dir="${src.dir}/gnu/xml" />
-      <mapper type="glob" from="*QName.java.in" to="*QName.java"/>
-      <filterset refid="filter-do-not-edit"/>
-      <filterset refid="filter-with-references-${with-references}"/>
-      <linestripperset refid="strip-with-references-${with-references}"/>
-    </xcopy>
   </target>
   
   <patternset id="with-sax2-false">
@@ -414,7 +429,7 @@
        That means that if you're building other than in the source directory,
        then the source directory must be clean.
     -->
-    <javac srcdir="${src.dir};${build.preprocessed}"
+    <javac srcdir="${build.preprocessed}:${src.dir}"
            destdir="${build.classes}"
            debug="${debug}"
            deprecation="${deprecation}"
@@ -746,6 +761,9 @@
     <delete>
        <fileset refid="build.classes"/>
        <fileset refid="build.preprocessed"/>
+       <fileset dir="${build.tmp}">
+          <patternset refid="build.selectjava"/>
+       </fileset>
     </delete>
   </target>
 

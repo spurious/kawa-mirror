@@ -1,3 +1,16 @@
+2003-05-03  Per Bothner  <per@bothner.com>
+
+	* build.xml:  Remove no-longer needed support for "references".
+	* build.properties:  Likewise.
+	* Make-rules:  Remove WITH_JAVA_REFERENCES conditionals.
+	* configure.in:  Drop --without-java-references argument.
+
+2003-04-29  Jim White  <jim@pagesmiths.com>
+
+	* build.xml:  Support for JAVA1 <-> JAVA2 source conversion.
+	(select-java1, select-java2, check-for-java2, select-java1-auto,
+	select-java2-auto, select-java-auto):  New targets.
+
 2003-04-30  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite):  Intern name before lookup.

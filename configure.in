@@ -32,10 +32,6 @@ AC_ARG_WITH(java-collections,
   [  --without-java-collections Don't use Java collections (java.util.List)],
   with_java_collections=$withval, with_java_collections=yes)
 
-AC_ARG_WITH(java-references,
-  [  --without-java-references  Don't use java.lang.ref],
-  with_java_references=$withval, with_java_references=yes)
-
 AC_ARG_WITH(swing,
   [  --with-swing            Assume Swing (Java Foundation Classes) is available])
 
@@ -102,7 +98,6 @@ esac
 AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET, test "$enable_servlet" = "yes")
-AM_CONDITIONAL(WITH_JAVA_REFERENCES, test "$with_java_references" = "yes")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")

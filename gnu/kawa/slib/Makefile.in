@@ -77,12 +77,15 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class .scm
 
+javadir = $(datadir)/java/$(subdir)
+
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.kawa.slib. -C
 
 java_JAVA = SLib.java
 
 SCMSOURCES = genwrite.scm pp.scm ppfile.scm printf.scm
+EXTRA_DIST = $(SCMSOURCES)
 
 CLEANFILES = *.class *.stamp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

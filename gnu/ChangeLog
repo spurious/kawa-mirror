@@ -1,3 +1,8 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* kawa/Makefile.am:  Make $(SERVLET_SUBDIRS) before slib, since
+	we moved HTTP.scm from gnu.kawa.servlet to slib.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* blr/progfun.scm:  Move to gnu.kawa.brl.

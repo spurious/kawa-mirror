@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = util reflect functions lispexpr $(XML_SUBDIR) \
-  slib $(SERVLET_SUBDIRS) ant
+  $(SERVLET_SUBDIRS) slib ant
 if ENABLE_SERVLET
 SERVLET_SUBDIRS = servlet
 endif

@@ -46,10 +46,10 @@ public class Compilation
     = scmPairType.addField ("car", scmObjectType, Access.PUBLIC);
   static final Field cdrField
     = scmPairType.addField ("cdr", scmObjectType, Access.PUBLIC);
-  static final Field trueConstant
+  static public final Field trueConstant
     = scmInterpreterType.addField ("trueObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC); 
-  static final Field falseConstant
+  static public final Field falseConstant
     = scmInterpreterType.addField ("falseObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nullConstant
@@ -241,6 +241,13 @@ public class Compilation
   {
     if (target instanceof IgnoreTarget)
       return;
+    if (target instanceof ConditionalTarget)
+      {
+	ConditionalTarget ctarg = (ConditionalTarget) target;
+	getCode().emitGoto(IfExp.is_true(value) ? ctarg.ifTrue
+			   : ctarg.ifFalse);
+	return;
+      }
     compileConstant(value);
     target.compileFromStack(this, Type.pointer_type);
   }
@@ -645,7 +652,7 @@ public class Compilation
 		    compileConstant(lexp.keywords[key_i++]);
 		    code.emitInvokeStatic(searchForKeywordMethod);
 		    code.emitDup(1);
-		    code.emitGotoIf(199); // ifnonnull
+		    code.emitIfCompare1(199); // ifnonnull
 		    code.emitPop(1);
 		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
 		    code.emitFi();
@@ -662,7 +669,7 @@ public class Compilation
       }
 
     lexp.start_label = new Label (method);
-    lexp.start_label.define (method);
+    lexp.start_label.define(code);
 
     lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())

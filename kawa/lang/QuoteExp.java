@@ -13,7 +13,8 @@ public class QuoteExp extends Expression
 
   static public QuoteExp undefined_exp
   = new QuoteExp (Interpreter.undefinedObject);
-
+  static public QuoteExp voidExp = new QuoteExp (Interpreter.voidObject);
+  static public QuoteExp trueExp = new QuoteExp(Interpreter.trueObject);
   static public QuoteExp falseExp = new QuoteExp(Interpreter.falseObject);
 
   public QuoteExp (Object val) { value = val; }

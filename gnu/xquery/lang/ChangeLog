@@ -1,3 +1,7 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* XQuery.java:  Update for move of WriteTo class.
+
 2002-01-13  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parse):  Skip initial Unix script header #!/PROGRAM.

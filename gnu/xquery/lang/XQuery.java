@@ -198,7 +198,7 @@ public class XQuery extends Interpreter
     define("string", gnu.xquery.util.StringValue.string);
     define("concat", new kawa.standard.string_append());
 
-    define("write-to", gnu.kawa.functions.WriteTo.writeTo);
+    define("write-to", gnu.kawa.xml.WriteTo.writeTo);
   }
 
   public static XQuery getInstance()

@@ -165,6 +165,8 @@ or from a @uref{http://www.gnu.org/order/ftp.html,mirror site}.
 
 The latest release of the Kawa source code is
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.tar.gz}.
+The same sources are available as a zip file
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}-src.zip}.
 
 A ready-to-run @code{.jar} archive of the pre-compiled classes is in
 @uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.
@@ -265,7 +267,9 @@ java kawa.repl -w
 @node Source distribution,  , Binary distribution, Installation
 @section Installing and using the source distribution
 The Kawa release normally comes as a gzip-compressed tar file named
-@samp{kawa-@value{VERSION}.tar.gz} .
+@samp{kawa-@value{VERSION}.tar.gz}.
+The same sources are available as a zip file
+@samp{kawa-@value{VERSION}-src.zip}.
 Two methods are supporting for compiling the Kawa sources;
 choose whichever is most convenient for you.
 

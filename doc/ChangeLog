@@ -1,3 +1,7 @@
+2001-11-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Mentioned new kawa-VERSION-src.zip.
+
 2001-11-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Binary distribution):  Remove note about windows console.

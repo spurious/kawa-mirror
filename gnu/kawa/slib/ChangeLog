@@ -1,3 +1,7 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* XML.scm:  Update gnu.kawa.xml -> gnu.xml.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES):  Removed redundant macro.

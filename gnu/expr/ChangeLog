@@ -1,3 +1,12 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add "krl".
+	(getInstanceFromFilenameExtension):  New static.
+	(getInstance):  Also look for "get"+LANGNAME+"Instance" method.
+
+	* Interpreter.java (defineAll, loadClass);  Moved from
+	gnu.xquery.lang.XQuery and made non-static.
+
  2002-01-29  Daniel Bonniot  <bonniot@users.sourceforge.net>
  
  	* LambdaExp.java (addMethodFor): Rename conflicting methods in the same

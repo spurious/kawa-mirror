@@ -1,3 +1,6 @@
+// Copyright (c) 2002  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
@@ -41,6 +44,7 @@ public abstract class Interpreter
   static String[][] languages =
   {
     { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
+    { "krl", ".krl", "gnu.kawa.brl.BRL" },
     { "brl", ".brl", "gnu.kawa.brl.BRL" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
     { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
@@ -71,6 +75,18 @@ public abstract class Interpreter
     languages = newLangs;
   }
 
+  public static Interpreter getInstanceFromFilenameExtension(String filename)
+  {
+    int dot = filename.lastIndexOf('.');
+    if (dot > 0)
+      {
+	Interpreter interp = Interpreter.getInstance(filename.substring(dot));
+	if (interp != null)
+	  return interp;
+      }
+    return null;
+  }
+
   /** Look for an interpreter for a language with the given name or extension.
    * If name is null, look for the first language available. */
   public static Interpreter getInstance (String name)
@@ -96,7 +112,7 @@ public abstract class Interpreter
 		    // so don't give up yet.
 		    break;
 		  }
-		return getInstance(name, langClass);
+		return getInstance(names[0], langClass);
 	      }
 	  }
       }
@@ -112,14 +128,27 @@ public abstract class Interpreter
   {
     try
       {
-	java.lang.reflect.Method method
-	  = langClass.getDeclaredMethod("getInstance", new Class[0]);
+	java.lang.reflect.Method method;
+	Class[] args = { };
+	try
+	  {
+	    String capitalizedName
+	      = (Character.toTitleCase(langName.charAt(0))
+		 + langName.substring(1).toLowerCase());
+	    String methodName = "get" + capitalizedName + "Instance";
+	    method = langClass.getDeclaredMethod(methodName, args);
+	  }
+	catch (Exception ex)
+	  {
+	    method
+	      = langClass.getDeclaredMethod("getInstance", args);
+	  }
 	return (Interpreter) method.invoke(null, Values.noArgs);
       }
     catch (Exception ex)
       {
-	if (langName == null)
-	  langName = langClass.getName();
+	langName = langClass.getName();
+	ex.printStackTrace();
 	throw new WrappedException("getInstance for '" + langName + "' failed",
 				   ex);
       }
@@ -157,6 +186,63 @@ public abstract class Interpreter
   public void define(String sym, Object p)
   {
     environ.define (sym, p);
+  }
+
+  /** Import all the public fields of an object. */
+  public static void defineAll(Object object, Environment env)
+  {
+    Class clas = object.getClass();
+    java.lang.reflect.Field[] fields = clas.getFields();
+    for (int i = fields.length;  --i >= 0; )
+      {
+	java.lang.reflect.Field field = fields[i];
+	String name = field.getName();
+	if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
+	  {
+	    try
+	      {
+		Object part = field.get(object);
+		if (part instanceof Named)
+		  name = ((Named) part).getName();
+		else
+		  name = name.intern();
+		if (part instanceof Binding)
+		  env.addBinding((Binding) part);
+		else
+		  env.define(name, part);
+	      }
+	    catch (Exception ex)
+	      {
+		throw new WrappedException("error accessing field "+field, ex);
+	      }
+	  }
+	else
+	  {
+	    System.err.println("INTERNAL ERROR in defineAll for "
+			       + name + " in " + clas);
+	  }
+      }
+  }
+
+  public void loadClass(String name)
+    throws java.lang.ClassNotFoundException
+  {
+    try
+      {
+	Class clas = Class.forName(name);
+	Object inst = clas.newInstance ();
+	defineAll(inst, environ);
+	if (inst instanceof ModuleBody)
+	  ((ModuleBody)inst).run();
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+	throw ex;
+      }
+    catch (Exception ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public Object lookup(String name)

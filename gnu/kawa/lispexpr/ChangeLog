@@ -1,5 +1,17 @@
 2001-04-23  Per Bothner  <per@bothner.com>
 
+	* LispReader.java (parseNumber):  Set decimal_point correct.
+	If no digits before decimal_point adjust digits_start to include point.
+
+	* LispReader.java (makeSymbol):  New method.
+	(returnSymbol):  Call makeSymbol.
+
+	* LispReader.java (makeNil, makePair, setCdr):  Add implementations.
+	* ScmRead.java (makeNil, makePair, setCdr):  Remove implementations.
+
+	* LispReader.java (isDelimiter):  Remove - not used.
+	* ScmRead.java (numError):  Likewise.
+
 	* ReaderDispatch.java (kind):  New field.
 	(getKind):  Return kind instead of hardwired value.
 	Change constructors to set kind.

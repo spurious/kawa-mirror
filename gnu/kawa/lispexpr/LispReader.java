@@ -34,12 +34,6 @@ public abstract class LispReader extends Lexer
       }
   }
 
-  protected boolean isDelimiter (char ch)
-  {
-    return (Character.isWhitespace (ch)
-	    || ch == ')' || ch == '(' || ch == '"' || ch == ';');
-  }
-
   /** Read a #|...|#-style comment (which may contain other nested comments).
     * Assumes the initial "#|" has already been read.
     */
@@ -444,7 +438,7 @@ public abstract class LispReader extends Lexer
 		  return "duplicate '.' in number";
 		if (radix != 10)
 		  return "'.' in non-decimal number";
-		decimal_point = pos;
+		decimal_point = pos - 1;
 		break;
 	      case 'e': case 's': case 'f': case 'd': case 'l':
 	      case 'E': case 'S': case 'F': case 'D': case 'L':
@@ -519,6 +513,8 @@ public abstract class LispReader extends Lexer
     RealNum number = null;
     if (exp_seen != '\000' || decimal_point >= 0)
       {
+	if (digits_start > decimal_point && decimal_point >= 0)
+	  digits_start = decimal_point;
 	if (numerator != null)
 	  return "floating-point number after fraction symbol '/'";
 	String str = new String(buffer, digits_start, pos - digits_start);
@@ -768,7 +764,7 @@ public abstract class LispReader extends Lexer
 	String str = new String(tokenBuffer, startPos, len - 1);
 	return Keyword.make(str.intern());
       }
-    return new String(tokenBuffer, startPos, len).intern();
+    return makeSymbol(new String(tokenBuffer, startPos, len));
   }
 
   /*
@@ -948,8 +944,23 @@ public abstract class LispReader extends Lexer
     return readObject();
   }
 
-  protected abstract Object makeNil ();
-  protected abstract Object makePair (Object car, int line, int column);
+  protected Object makeSymbol (String name)
+  {
+    return name.intern();
+  }
+
+  protected Object makeNil ()
+  {
+    return LList.Empty;
+  }
+
+  protected Object makePair (Object car, int line, int column)
+  {
+    PairWithPosition pair = new PairWithPosition (port, car, LList.Empty);
+    pair.setLine(line + 1, column + 1);
+    pair.setFile (port.getName());
+    return pair;
+  }
 
   public Object makePair (Object car, Object cdr)
   {
@@ -958,7 +969,10 @@ public abstract class LispReader extends Lexer
     return pair;
   }
 
-  protected abstract void setCdr (Object pair, Object cdr);
+  protected void setCdr (Object pair, Object cdr)
+  {
+    ((Pair) pair).cdr = cdr;
+  }
 
   /** Read a number from a LispReader
    * @param previous number of characters already pushed on tokenBuffer

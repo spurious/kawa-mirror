@@ -13,7 +13,7 @@ public class setcar_b extends Procedure2
     if (arg1 instanceof Pair)
       {
 	((Pair)arg1).car = arg2;
-	return Interpreter.undefinedObject;
+	return Interpreter.voidObject;
       }
     else
       throw new WrongType(this.name,1,"pair");

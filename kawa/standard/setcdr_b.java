@@ -13,7 +13,7 @@ public class setcdr_b extends Procedure2
     if (arg1 instanceof Pair)
       {
 	((Pair)arg1).cdr = arg2;
-	return Interpreter.undefinedObject;
+	return Interpreter.voidObject;
       }
     else
       throw new kawa.lang.WrongType(this.name,1,"pair");

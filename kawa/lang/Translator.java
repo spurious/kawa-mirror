@@ -130,13 +130,13 @@ public class Translator extends Parser
    */
   Object getBinding (Object obj, boolean function)
   {
-    if (obj instanceof String)
+    if (obj instanceof String || obj instanceof Binding)
       {
-	String name = (String) obj;
+	String name = obj.toString();
 	// Same logic as in rewrite(Object,boolean)..
 	Binding binding = environ.lookup(name);
 	if (binding == null)
-	  binding = env.lookup(name);
+	  binding = obj instanceof Binding ? (Binding) obj : env.lookup(name);
 	else if (binding.isBound())
 	  {
 	    Object val1 = binding.getValue();
@@ -149,8 +149,8 @@ public class Translator extends Parser
 	  }
 	if (binding == null)
 	  obj = null;
-	else if (function)
-	  obj = binding.getFunctionValue();
+	else if (function && getInterpreter().hasSeparateFunctionNamespace())
+	  obj = binding.getFunctionValue(null);
         else if (binding.isBound())
           obj = binding.getValue();
         else
@@ -209,7 +209,10 @@ public class Translator extends Parser
             String name = ref.getName();
             Binding binding = env.lookup(name);
 	    if (binding != null)
-	      proc = binding.getFunctionValue();
+	      if (getInterpreter().hasSeparateFunctionNamespace())
+		proc = binding.getFunctionValue(null);
+	      else
+		proc = binding.getValue();
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)
@@ -305,14 +308,14 @@ public class Translator extends Parser
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair ((Pair) exp);
-    else if (exp instanceof String)
+    else if (exp instanceof String || exp instanceof Binding)
       {
-	String name = (String) exp;
+	String name = exp.toString();
 	// Same logic as in getBinding.  The duplication is difficult to avoid,
 	// because there are two results: Binding and name may is changed.
 	Binding binding = environ.lookup(name);
         if (binding == null)
-	  binding = env.lookup(name);
+	  binding = exp instanceof Binding ? (Binding) exp : env.lookup(name);
         else if (binding.isBound())
           {
             // Check for hygiene re-naming - see SyntaxRule.execute_template.
@@ -326,8 +329,8 @@ public class Translator extends Parser
         Object value;
 	if (binding == null)
 	  value = null;
-	else if (function)
-	  value = binding.getFunctionValue();
+	else if (function && getInterpreter().hasSeparateFunctionNamespace())
+	  value = binding.getFunctionValue(null);
         else if (binding.isBound())
           value = binding.getValue();
         else

@@ -109,7 +109,7 @@ public class Lambda extends Syntax implements Printable
 	  lexp.min_args++;
 	bindings = pair.cdr;
       }
-    if (bindings instanceof String)
+    if (bindings instanceof String || bindings instanceof Binding)
       {
 	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
 	  {
@@ -163,9 +163,9 @@ public class Lambda extends Syntax implements Printable
 	Object defaultValue = defaultDefault;
 	Object typeSpec = null;
         Pair p;
-	if (pair.car instanceof String)
+	if (pair.car instanceof String || pair.car instanceof Binding)
           {
-            name = (String) pair.car;
+            name = pair.car.toString();
             if (pair.cdr instanceof Pair
                 && (p = (Pair) pair.cdr).car == "::")
               {
@@ -181,10 +181,11 @@ public class Lambda extends Syntax implements Printable
               }
           }
 	else if (pair.car instanceof Pair
-		 && (p = (Pair) pair.car).car instanceof String
+		 && ((p = (Pair) pair.car).car instanceof String
+		     || p.car instanceof Binding)
 		 && p.cdr instanceof Pair)
           {
-	    name = (String) p.car;
+	    name = p.car.toString();
             p = (Pair) p.cdr;
             if (p.car == "::")
               {
@@ -264,9 +265,9 @@ public class Lambda extends Syntax implements Printable
 	decl.noteValue(null);  // Does not have a known value.
 	tr.push(decl);
       }
-    if (bindings instanceof String)
+    if (bindings instanceof String || bindings instanceof Binding)
       {
-	Declaration decl = lexp.addDeclaration ((String) bindings);
+	Declaration decl = lexp.addDeclaration (bindings.toString());
 	decl.setType(Compilation.scmListType);
 	decl.noteValue (null);  // Does not have a known value.
 	tr.push(decl);

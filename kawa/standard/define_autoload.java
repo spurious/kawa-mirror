@@ -182,9 +182,13 @@ public class define_autoload extends Syntax
 		    Pair pair = (Pair) form;
 		    Object value = null;
 		    String name = null;
-		    if (pair.car == "defun")
+		    String command = ((pair.car instanceof String
+				       || pair.car instanceof Binding)
+				      ? pair.car.toString()
+				      : null);
+		    if (command == "defun")
 		      {
-			name = (String) ((Pair)pair.cdr).car;
+			name = ((Pair)pair.cdr).car.toString();
 			value = new AutoloadProcedure(name, filename,
 						      tr.getGlobalEnvironment());
 		      }

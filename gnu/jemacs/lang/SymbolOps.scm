@@ -28,9 +28,6 @@
 
 ;; setq
 
-(define (set symbol value)
-  (invoke-static <gnu.jemacs.lang.Symbol> 'isSymbol x))
-
 ;(define (make-symbol NAME)  ...)
 
 ; (define (intern name #!optional obarray)  ...)
@@ -48,8 +45,8 @@
 ;;A `void-variable' error is signaled if SYMBOL has neither a local
 ;;     binding nor a global value.
 
-(define (symbol-value sym)
-  ...)
+;(define (symbol-value sym)
+;  ...)
 
 ;; setq
 
@@ -69,7 +66,7 @@
 ;; symbol's function cell is void, a `void-function' error is signaled.
 
 (define (symbol-function symbol)
-  (invoke-static <gnu.jemacs.lang.SymbolConstraint> 'getFunctionBinding
+  (invoke-static <gnu.jemacs.lang.Symbol> 'getFunctionBinding
 		 symbol))
 
 ;(define (fboundp x) ..)
@@ -77,6 +74,6 @@
 ;(fmakunboud symbol)
 
 (define (fset symbol object)
-  (invoke-static <gnu.jemacs.lang.SymbolConstraint> 'setFunctionBinding
+  (invoke-static <gnu.jemacs.lang.Symbol> 'setFunctionBinding
 		 (invoke-static <gnu.mapping.Environment> 'getCurrent)
 		 symbol object))

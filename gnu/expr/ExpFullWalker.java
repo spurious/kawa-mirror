@@ -92,4 +92,12 @@ public class ExpFullWalker extends ExpWalker
       }
   }
 
+  public Object walkSynchronizedExp (SynchronizedExp exp)
+  {
+    exp.object = (Expression) exp.object.walk(this);
+    if (exitValue == null)
+      exp.body = (Expression) exp.body.walk(this);
+    return exp;
+  }
+
 }

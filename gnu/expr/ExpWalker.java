@@ -16,5 +16,7 @@ public class ExpWalker
   public Object walkBeginExp (BeginExp exp) { return walkExpression(exp); }
   public Object walkQuoteExp (QuoteExp exp) { return walkExpression(exp); }
   public Object walkReferenceExp (ReferenceExp exp)
-   { return walkExpression(exp); }
+  { return walkExpression(exp); }
+  public Object walkSynchronizedExp (SynchronizedExp exp)
+    { return walkExpression(exp); }
 }

@@ -1,3 +1,37 @@
+Thu Jul 11 15:10:14 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Major re-write.  All functions are now byte-compiled,
+	using the codegen package.
+
+	* kawa/lang/{Compilation,CompiledProc,Literal,SchemeLoader,
+	compilefunc,loadcompiled}.java:  New classes - compilation-related.
+	* Makefile.{am,in} (OBJ):  Add new classes.
+
+	* kawa/lang/{Expression,ApplyExp,BeginExp,IfExp,LambdaExp,LetExp,
+	QuoteExp,ReferenceExp,SetExp}.java: Add compile method.
+	* kawa/lang/Declaration.java (getFrame, getValue, setValue):  New.
+	* kawa/lang/Interpreter.java(lookup_global,define_global,resolve): New.
+	* kawa/lang/LambdaExp/(staticLink, heapFrame):  New variables.
+	(eval):  Actually compile to get new bytecode.
+	* kawa/lang/List.java:  New makeList methods.
+	* kawa/lang/Procedure{,0,2,3,4}.java:  Add default initializer.
+	* kawa/lang/ReferenceExp.java (compile_load):  New method.
+	* kawa/lang/ScopeExp.java:  A ScopeExp now contains Scope, which
+	includes all the Variables/Declarations as a linked list.
+	(num_decls, decls)  Removed.
+ 	(firstVar, currentLambda):  New methods.
+	* kawa/lang/SetExp.java (isDefining, setDefining, compile_store):  New.
+
+	* kawa/standard/Makefile.{am,in}: Fix typos (bogus 'eq' in string ops).
+	* kawa/standard/let.java:  Remove pointless pattern.match.
+	* kawa/standard/{let,letstar}.java:  Don't allocate array of
+	Declarations (since we now use links).
+	* kawa/standard/define.java:  Set DEFINING_FLAG on result.
+	* kawa/standard/letrec.java:  Re-wriiten to use extend Syntax.
+	* kawa/standard/StandardInterpreter.java: Upadet for new letrec.
+	* kawa/standard/load.java:  Close on port on eof.
+	* kawa/standard/string2list.java:  Use Char.make rather than new Char.
+
 Tue Jul  2 11:34:24 1996  Anthony Green  <green@csk3.cygnus.com>
 
 	* Makefile.am, Makefile.in, configure.in: Added the codegen

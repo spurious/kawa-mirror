@@ -325,7 +325,7 @@ public class Compilation
 	      }
 	  }
 	else
-	  literal = new Literal (value, typeObject, this);
+	  literal = new Literal (value, Type.make(value.getClass()), this);
       }
     return literal;
   }

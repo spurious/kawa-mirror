@@ -5,10 +5,14 @@ Various XQuery changes, based on the May '02 specification.
 - Implemented 'define variable', except the 'external' support.
 - Implemented the trace function.
 - Implemented the new comment syntax.
+- Supports the new element(NAME, *) type-specifier syntax.
 - Expanded string literal syntax, with references and doubled quotes.
 - Allow doc as synonym for document function.
 - Implemented the full 2-operand document function (now-deprecated, sigh).
 - Implemented base-uri support.
+
+KawaPageServlet allows automatic loading and on-the-fly compilation in a
+servlet engine.  See http://www.gnu.org/software/qexo/simple-xquery-webapp.html
 
 The default source-base requires various Java 2 features, such as collection.
 However, 'make-select1' will comment out Java2 dependencies, allowing you

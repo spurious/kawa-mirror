@@ -1,5 +1,9 @@
 2005-03-07  Per Bothner  <per@bothner.com>
 
+	* Language.java: Merge in remaining methods from Interpreter.
+	* Interpreter.java: Removed class.
+	* Makefile.am: Update accordingly.
+
 	* Compilation.java: Update Interpreter -> Language.
 	* ConditionalTarget.java: Likewise.
 	* NameLookup.java: Likewise.

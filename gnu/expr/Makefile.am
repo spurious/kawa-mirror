@@ -31,7 +31,6 @@ java_sources = \
   Initializer.java \
   Inlineable.java \
   InlineCalls.java \
-  Interpreter.java \
   KawaConvert.java \
   Keyword.java \
   LambdaExp.java \

@@ -52,6 +52,25 @@ public class ProcInitializer extends Initializer
 
     emitLoadModuleMethod(proc, comp);
 
+    if (proc.properties != null)
+      {
+	int len = proc.properties.length;
+	for (int i = 0;  i < len;  i += 2)
+	  {
+	    Object key = proc.properties[i];
+	    if (key != null)
+	      {
+		Object val = proc.properties[i+1];
+		code.emitDup(1);
+		comp.compileConstant(key);
+		((Expression) val).compile(comp, Target.pushObject);
+		Method m = comp.typeProcedure.getDeclaredMethod("setProperty",
+								2);
+		code.emitInvokeVirtual(m);
+	      }
+	  }
+      }
+
     if (field.getStaticFlag())
       code.emitPutStatic(field);
     else

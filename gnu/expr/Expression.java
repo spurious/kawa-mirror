@@ -143,6 +143,4 @@ public abstract class Expression implements Printable
   {
     return (flags & flag) != 0;
   }
-
-
 }

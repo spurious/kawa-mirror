@@ -37,7 +37,6 @@ java_JAVA=\
   LetExp.java \
   Literal.java \
   LitTable.java \
-  MethodProc.java \
   ModuleBody.java \
   ModuleMethod.java \
   ModuleExp.java \

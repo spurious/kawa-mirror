@@ -1,3 +1,21 @@
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* ConditionalTarget.java (<init>(Label,Label)):  Remove constructor.
+
+	* LambdaExp.java (properties):  New field.
+	(getProperty, setProperty):  New methods.
+	* ExpFullWalker.java (walkLambdaExp):  Also walk properties.
+	* ProcInitializer.java (emit):  Also handle properties list.
+
+	* Compilation.java (addClass):  Generate numArgs if --full-tailcalls.
+
+	* GenericProc.java (make$V):  Renamed to plain make.
+
+	* Interpreter.java (asType):  New method.
+
+	* MethodProc.java:  Moved to gnu.mapping.
+	* Makefile.am:  Update accordingly.
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* QuoteExp.java (getType):  If value is null, type is Type.nullType.

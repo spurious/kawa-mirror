@@ -1458,4 +1458,26 @@ public class LambdaExp extends ScopeExp
 
     return str;
   }
+
+  /** If non-null, a sequence of (key, value)-pairs.
+   * These will be used to call setProperty at run-time. */
+  Object[] properties;
+
+  public Object getProperty(Object key, Object defaultValue)
+  {
+    if (properties != null)
+      {
+	for (int i = properties.length;  (i -= 2) >= 0; )
+	  {
+	    if (properties[i] == key)
+	      return properties[i + 1];
+	  }
+      }
+    return defaultValue;
+  }
+
+  public synchronized void setProperty(Object key, Object value)
+  {
+    properties = Procedure.setProperty(properties, key, value);
+  }
 }

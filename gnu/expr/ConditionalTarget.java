@@ -13,13 +13,8 @@ public class ConditionalTarget extends Target
   /**
     * @param ifTrue label to jump to if this evaluates to true
     * @param ifFalse label to jump to if true
+    * @pram interpreter specifies what values are true
     */
-
-  public ConditionalTarget (Label ifTrue, Label ifFalse)
-  {
-    this.ifTrue = ifTrue;
-    this.ifFalse = ifFalse;
-  }
 
   public ConditionalTarget (Label ifTrue, Label ifFalse,
 			    Interpreter interpreter)

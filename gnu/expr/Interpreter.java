@@ -3,8 +3,6 @@ import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
 
-// WARNING many of the fields/method will be to Scheme instead.
-
 /**
  * Contains various language-dependent methods.
  * Also contains "global" state about the executation environment,
@@ -169,15 +167,33 @@ public abstract class Interpreter
     return  string2Type(name);
   }
 
+  /** "Coerce" a language-specific "type specifier" object to a Type. */
+  public Type asType(Object spec)
+  {
+    if (! (spec instanceof Type))
+      {
+        if (spec instanceof Class)
+          return getTypeFor((Class) spec);
+        if (spec instanceof String)
+          return getTypeFor((String) spec);
+        if (spec instanceof gnu.kawa.util.AbstractString)
+          return gnu.bytecode.ClassType.make(spec.toString());
+      }
+    return (Type) spec;
+  }
+
   public Type getTypeFor(Expression exp)
   {
     if (exp instanceof QuoteExp)
       {
-        Object cname = ((QuoteExp) exp).getValue();
-        if (cname instanceof Type)
-          return (Type) cname;
-        if (cname instanceof gnu.kawa.util.FString || cname instanceof String)
-          return gnu.bytecode.ClassType.make(cname.toString());
+        try
+          {
+            return asType(((QuoteExp) exp).getValue());
+          }
+        catch (Exception ex)
+          {
+            return null;
+          }
       }
     else if (exp instanceof ReferenceExp)
       {

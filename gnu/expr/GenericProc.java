@@ -116,7 +116,7 @@ public class GenericProc extends MethodProc
   }
 
   /** Create a GenericProc from one or more methods, plus properties. */
-  public static GenericProc make$V (Object[] args)
+  public static GenericProc make (Object[] args)
   {
     int alen = args.length;
     int mlen = 0;

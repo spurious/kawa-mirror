@@ -103,6 +103,19 @@ public class ExpFullWalker extends ExpWalker
 	walkDefaultArgs(exp);
 	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
+        Object[] properties = exp.properties;
+        if (properties != null)
+          {
+            int len = properties.length;
+            for (int i = 1;  i < len;  i += 2)
+              {
+                Object val = properties[i];
+                if (val instanceof Expression)
+                  {
+                    properties[i] = ((Expression) properties[i]).walk(this);
+                  }
+              }
+          }
 	return exp;
       }
     finally

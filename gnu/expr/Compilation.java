@@ -1052,7 +1052,7 @@ public class Compilation
       }
 
     CodeAttr code;
-    if (arg_letter == 'N')
+    if (arg_letter == 'N' || arg_letter == '?')
       {
 	method = curClass.addMethod("numArgs", apply0args, Type.int_type,
 				    Access.PUBLIC);

@@ -58,6 +58,7 @@ PairWithPosition.class \
 FString.class \
 SFormat.class \
 Symbol.class \
+Keyword.class Special.class \
 Vector.class \
 Undefined.class \
 Lambda.class \
@@ -93,7 +94,14 @@ PrimProcedure.class PrimApplyExp.class \
 Values.class \
 Promise.class \
 Future.class \
+@EXTRA_OBJ@ \
 $(EXCEPTIONS)
+
+OBJ_1_0=
+OBJ_1_1=Record.class \
+  GetFieldProc.class SetFieldProc.class RecordConstructor.class
+
+EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 
 java_DATA=$(OBJ)
 

@@ -149,15 +149,18 @@ public class FString extends Sequence implements Printable, Compilable
       && ((OutPort)ps).printReadable;
     int len = length();
     if (readable)
-      ps.print ('\"');
-    for (int i = 0;  i < len; i++)
       {
-	char ch = value[i];
-	if (readable && (ch == '\\' || ch == '\"'))
-	  ps.print ('\\');
-	ps.print (ch);
+	ps.print ('\"');
+	for (int i = 0;  i < len; i++)
+	  {
+	    char ch = value[i];
+	    if ((ch == '\\' || ch == '\"'))
+	      ps.print ('\\');
+	    ps.print (ch);
+	  }
+	ps.print ('\"');
       }
-    if (readable)
-      ps.print ('\"');
+    else
+      ps.print(value);
   }
 }

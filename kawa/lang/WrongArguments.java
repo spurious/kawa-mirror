@@ -4,18 +4,18 @@ public class WrongArguments extends Exception {
    //-- negative indicates that the right number of arguments was used
    public int number;
    //-- usage description for procedure
-   public java.lang.String usage;
+   public String usage;
    //-- Procedure name that threw the exception
-   public java.lang.String procname;
+   public String procname;
 
    public WrongArguments(java.lang.String name,int n,java.lang.String u) {
-      procname = new java.lang.String(name);
+      procname = name;
       number = n;
-      usage = new java.lang.String(u);
+      usage = u;
    }
 
   public WrongArguments(Symbol name, int n, String u)
   {
-    this (name.toString (), n, u);
+    this (name == null ? null : name.toString (), n, u);
   }
 }

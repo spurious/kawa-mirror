@@ -75,7 +75,7 @@ public class List extends Sequence implements Printable
 
   public static List makeList (Object[] vals, int offset, int length)
   {
-    List result = Interpreter.nullObject;
+    List result = List.Empty;
     for (int i = length;  --i >= 0; )
       result = new Pair (vals[offset+i], result);
     return result;
@@ -83,7 +83,7 @@ public class List extends Sequence implements Printable
 
   public static List makeList (Object[] vals, int offset)
   {
-    List result = Interpreter.nullObject;
+    List result = List.Empty;
     for (int i = vals.length - offset;  --i >= 0; )
       result = new Pair (vals[offset+i], result);
     return result;

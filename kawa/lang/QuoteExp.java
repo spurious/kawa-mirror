@@ -12,6 +12,8 @@ public class QuoteExp extends Expression
   static public QuoteExp undefined_exp
   = new QuoteExp (Interpreter.undefinedObject);
 
+  static public QuoteExp falseExp = new QuoteExp(Interpreter.falseObject);
+
   public QuoteExp (Object val) { value = val; }
   
   public Object eval (Environment env)

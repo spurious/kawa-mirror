@@ -13,7 +13,7 @@ package gnu.lists;
  */
 
 public class TreeList extends AbstractSequence
-implements Consumer, PositionConsumer, Consumable
+implements XConsumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
   // for the sake of ParsedXMLToConsumer.  FIXME.  Perhaps an abstract class
@@ -94,6 +94,8 @@ implements Consumer, PositionConsumer, Consumable
   // 0xF110 BEGIN_DOCUMENT
   // 0xF111 END_DOCUMENT
   // 0xF112 BASE_URI: Not a node, but a property of the previous node (start).
+  // 0xF113 COMMENT
+  // 0xF114 PROCESSING_INSTRUCTION
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -165,6 +167,21 @@ implements Consumer, PositionConsumer, Consumable
 
   /** A surrogate pair follows.  (not implemented). */
   static final int CHAR_PAIR_FOLLOWS = CHAR_FOLLOWS + 1;
+
+  /** A comment node follows.
+   * [COMMENT]
+   * [length] 2 shorts
+   * [comment text], (length) number of characters.
+   */
+  static final int COMMENT = 0xF113;
+
+  /** A processing-instruction node follows.
+   * [PROCESSING_INSTRUCTION]
+   * [target] 2 shorts, where objects[target] is the target as a String.
+   * [length] 2 shorts.
+   * [comment text], (length) number of characters.
+   */
+  static final int PROCESSING_INSTRUCTION = 0xF114;
 
   /** The beginning of an attribute.
    * [BEGIN_ATTRIBUTE_LONG]
@@ -406,8 +423,8 @@ implements Consumer, PositionConsumer, Consumable
   }
 
   /** Write/set the base-uri property of the current element or document.
-   * Only allowed immediately following beginDocument or beginGroup.
-   */
+   * Only allowed immediately following beginDocument, beginGroup,
+   * or writeProcessingInstruction.   */
   public void writeBaseUri (Object uri)
   {
     ensureSpace(3);
@@ -415,6 +432,31 @@ implements Consumer, PositionConsumer, Consumable
     data[gapStart++] = BASE_URI;
     setIntN(gapStart, index);
     gapStart += 2;
+  }
+
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    ensureSpace(3+length);
+    int i = gapStart;
+    data[i++] = COMMENT;
+    setIntN(i, length);
+    i += 2;
+    System.arraycopy(chars, offset, data, i, length);
+    gapStart = i + length;
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    ensureSpace(5+length);
+    int i = gapStart;
+    data[i++] = PROCESSING_INSTRUCTION;
+    int index = find(target);
+    setIntN(i, index);
+    setIntN(i+2, length);
+    i += 4;
+    System.arraycopy(content, offset, data, i, length);
+    gapStart = i + length;
   }
 
   public void beginGroup(String typeName, Object type)
@@ -926,9 +968,29 @@ implements Consumer, PositionConsumer, Consumable
 	    out.endDocument();
 	    continue;
 	  case BASE_URI:
-	    if (out instanceof TreeList)
-	      ((TreeList) out).writeBaseUri(objects[getIntN(pos)]);
+	    if (out instanceof XConsumer)
+	      ((XConsumer) out).writeBaseUri(objects[getIntN(pos)]);
 	    pos += 2;
+	    continue;
+	  case COMMENT:
+	    {
+	      int length = getIntN(pos);
+	      pos += 2;
+	      if (out instanceof XConsumer)
+		((XConsumer) out).writeComment(data, pos, length);
+	      pos += length;
+	    }
+	    continue;
+	  case PROCESSING_INSTRUCTION:
+	    {
+	      String target = (String) objects[getIntN(pos)];
+	      int length = getIntN(pos+2);
+	      pos += 4;
+	      if (out instanceof XConsumer)
+		((XConsumer) out).writeProcessingInstruction(target, data,
+							     pos, length);
+	      pos += length;
+	    }
 	    continue;
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
@@ -1093,6 +1155,31 @@ implements Consumer, PositionConsumer, Consumable
 	  case BEGIN_DOCUMENT:
 	  case BASE_URI:
 	    pos += 2;
+	    continue;
+	  case COMMENT:
+	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
+	    index = getIntN(pos); // comment length
+	    pos += 2;
+	    sbuf.append("<!--");
+	    sbuf.append(data, pos, index);
+	    sbuf.append("-->");
+	    pos += index;
+	    continue;
+	  case PROCESSING_INSTRUCTION:
+	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
+	    sbuf.append("<?");
+	    index = getIntN(pos); // target
+	    pos += 2;
+	    sbuf.append(objects[index]);
+	    index = getIntN(pos); // comment length
+	    pos += 2;
+	    if (index > 0)
+	      {
+		sbuf.append(' ');
+		sbuf.append(data, pos, index);
+		pos += index;
+	      }
+	    sbuf.append("?>");
 	    continue;
 	  case END_DOCUMENT:
 	    continue;
@@ -1267,6 +1354,10 @@ implements Consumer, PositionConsumer, Consumable
 	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG:
 	return Sequence.ATTRIBUTE_VALUE;
+      case COMMENT:
+	return Sequence.COMMENT_VALUE;
+      case PROCESSING_INSTRUCTION:
+	return Sequence.PROCESSING_INSTRUCTION_VALUE;
       case BASE_URI:  // FIXME
       case POSITION_REF_FOLLOWS: // FIXME	
       case POSITION_PAIR_FOLLOWS:
@@ -1476,6 +1567,17 @@ implements Consumer, PositionConsumer, Consumable
 	  {
 	  case BASE_URI:
 	    return index + 2;
+	  case PROCESSING_INSTRUCTION:
+	    index += 2;
+	    /* ... fall through ... */
+	  case COMMENT:
+	    {
+	      int length = getIntN(index);
+	      index += 2;
+	      if (! inGroup)
+		sbuf.append(data, index, length);
+	      return index + length;
+	    }
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
 	    sbuf.append(datum != BOOL_FALSE);
@@ -1603,6 +1705,8 @@ implements Consumer, PositionConsumer, Consumable
 	  case BASE_URI:
 	    pos += 3;
 	    break;
+	  case PROCESSING_INSTRUCTION:
+	  case COMMENT:
 	  case BEGIN_DOCUMENT:
 	  case BEGIN_GROUP_LONG:
 	  case BEGIN_ATTRIBUTE_LONG:
@@ -1735,7 +1839,15 @@ implements Consumer, PositionConsumer, Consumable
 	  case DOUBLE_FOLLOWS:
 	    next = pos + 5;
 	    if (checkText) break;
-	    continue;
+	    continue;	
+	  case PROCESSING_INSTRUCTION:
+	    next = pos + 5 + getIntN(pos+3);
+	    if (checkNode) break;
+	    continue;	
+	  case COMMENT:
+	    next = pos + 3 + getIntN(pos+1);
+	    if (checkNode) break;
+	    continue;	
 	  case BEGIN_GROUP_LONG:
 	    if (descend)
 	      next = pos + 3;
@@ -1831,6 +1943,11 @@ implements Consumer, PositionConsumer, Consumable
       case LONG_FOLLOWS:
       case DOUBLE_FOLLOWS:
 	return pos + 4;
+      case PROCESSING_INSTRUCTION:
+	pos++;
+	// ... fall through ...
+      case COMMENT:
+	return pos + 2 + getIntN(pos);
       default:
 	throw new Error("unknown code:"+Integer.toHexString((int) datum));
       }
@@ -1846,10 +1963,13 @@ implements Consumer, PositionConsumer, Consumable
 	char datum = data[index];
 	if ((datum >= BEGIN_GROUP_SHORT
 	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	    || datum == PROCESSING_INSTRUCTION
 	    || datum == BEGIN_GROUP_LONG
 	    || datum == BEGIN_DOCUMENT)
 	  {
 	    int next = index + 3;
+	    if (datum == PROCESSING_INSTRUCTION)
+	      next = index + 2 + getIntN(index);
 	    if (next == gapStart)
 	      next = gapEnd;
 	    if (next < data.length && data[next] == BASE_URI)
@@ -1909,6 +2029,7 @@ implements Consumer, PositionConsumer, Consumable
   public void dump ()
   {
     java.io.PrintWriter out = new java.io.PrintWriter(System.out);
+
     dump(out);
     out.flush();
   }
@@ -1975,7 +2096,7 @@ implements Consumer, PositionConsumer, Consumable
 			break;
 		      case FLOAT_FOLLOWS:
 			j = getIntN(i+1);
-			out.print("=FLOAT_FOLLOWS value:"
+			out.write("=FLOAT_FOLLOWS value:"
 				  +Float.intBitsToFloat(j));
 			toskip = 2;
 			break;
@@ -1997,6 +2118,23 @@ implements Consumer, PositionConsumer, Consumable
 			j = getIntN(i+1);
 			out.print(objects[j]);
 			toskip = 2;
+			break;
+		      case COMMENT:
+			out.print("=COMMENT: '");
+			j = getIntN(i+1);
+			out.write(data, i+3, j);
+			out.print('\'');
+			toskip = 2+j;
+			break;
+		      case PROCESSING_INSTRUCTION:
+			out.print("=PROCESSING_INSTRUCTION: ");
+			j = getIntN(i+1);
+			out.print(objects[j]);
+			out.print(" '");
+			j = getIntN(i+3);
+			out.write(data, i+3, j);
+			out.print('\'');
+			toskip = 4+j;
 			break;
 		      case END_DOCUMENT:
 			out.print("=END_DOCUMENT");

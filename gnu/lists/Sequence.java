@@ -70,10 +70,10 @@ extends
   public static final int GROUP_VALUE = 33;
   public static final int DOCUMENT_VALUE = 34;
   public static final int ATTRIBUTE_VALUE = 35;
+  public static final int COMMENT_VALUE = 36;
+  public static final int PROCESSING_INSTRUCTION_VALUE = 37;
   /*
   public static final int NAMESPACE_ATTRIBUTE_VALUE = 16;
-  public static final int COMMENT_VALUE = 16;
-  public static final int PROCESSING_INSTRUCTION_VALUE = 16;
   public static final int ENTITY_REFERENCE_VALUE = 16;
   */
 }

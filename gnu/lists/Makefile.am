@@ -52,7 +52,8 @@ java_sources = \
   U32Vector.java \
   U64Vector.java \
   UnescapedData.java \
-  VoidConsumer.java
+  VoidConsumer.java \
+  XConsumer.java
 
 PACKAGE_FNAME = gnu-lists
 GCJ_INPUTS =  $(java_Java)

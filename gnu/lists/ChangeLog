@@ -1,3 +1,15 @@
+2004-04-18  Per Bothner  <per@bothner.com>
+
+	* XConsumer.java (XConsumer):  New interface, extends Consumer.
+	* Makefile.am:  Update accordingly.
+	* Sequence.java (COMMENT_VALUE, PROCESSING_INSTRUCTION_VALUE):  New
+	constants.
+	* TreeList.java:  Implement XConsumer.
+	(COMMENT, PROCESSING_INSTRUCTION):  New contants.
+	(writeComment,  writeProcessingInstruction):  New methods.
+	(consumeIRange, toString, getNextKind, stringValue, nextNodeIndex,
+	nextMatching, nextDataIndex, dump):  Handle new node kinds.
+
 2004-01-27  Rafael Jesus Alcantara Perez <rafa@dedaloingenieros.com>
 
 	* Pair.java (lastPair):  Fix thinko.

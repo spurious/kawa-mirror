@@ -1,3 +1,31 @@
+2002-07-24  Per Bothner  <per@bothner.com>
+
+	* Compilation.java:  Merge in functionality of Parser.java.
+	(current_scope, messages):  New fields.
+	(filename, position):  Remove fields - uses messages instead.
+	(error):  Chaneg to use messages.
+	(currentLambda, getModule, setModule, currentModule, currentScope,
+	musCompileHerem push, pop, lookupm getMessages, setMessages,
+	getFile, getLine, getColumn, setFile, setLine, setColumn): New methods.
+	(immediate):  Make public.
+	(getIntepreter):  Call Interpreter's static getInterpreter.
+	(<init>):  New simple constructors.
+	(compile):  New method, contains bulk of old constructor.
+	Add two tests to return if seenErrors.
+	(compileToFiles, compileToArchive):  Moved from ModuleExp.java.
+	* Parser.java:  Remove file.
+	* Makefile.am (java_sources):  Remove Parser.java.
+	* ModuleExp.java (eval):  Remove method - inlined in evalModule.
+	(evalToCall, evalModule):  Make static - pass in Compilation.
+	(compileToFiles, compileToArchive):  Moved to COmpilation.java.
+	* CheckedTarget.java (emitCheckedCoerce):  Use comp's getLine method.
+	* Expression.java (compileNotePosition):  Use line-related methods.
+	(makeWhile):  Update Parser->Compilation.
+	* ScopeExp.java (getDefine):  Likewise.
+	* Interpreter.java (parse):  Return Compilation, not ModuleExp.
+	(parseFile):  Likewise.
+	(eval):  Update accordingly.
+
 2002-07-23  Per Bothner  <per@bothner.com>
 
 	* ChainLambdas.java.(chainLambdas):  Use new walk method.

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -7,6 +7,9 @@ import gnu.mapping.*;
 import java.util.*;
 import java.io.*;
 import kawa.Shell;
+import gnu.text.*;
+import java.util.zip.*;
+// import java.util.jar.*; // Java2
 
 public class Compilation
 {
@@ -41,7 +44,7 @@ public class Compilation
   int numClasses;
 
   /** True if the compiled result will be immediately loaded. */ 
-  boolean immediate;
+  public boolean immediate;
 
   /** The current method. */
   public Method method;
@@ -296,11 +299,6 @@ public class Compilation
 	    : generateApplet ? typeApplet
 	    : generateServlet ? typeServlet
 	    : typeModuleBody);
-  }
-
-  public Interpreter getInterpreter()
-  {
-    return Interpreter.defaultInterpreter;  // For now.  FIXME.
   }
 
   /** Emit code to "evaluate" a compile-time constant.
@@ -701,20 +699,33 @@ public class Compilation
 
   String source_filename;
 
+  public Compilation (boolean immediate, SourceMessages messages)
+  {
+    this.immediate = immediate;
+    this.messages = messages;
+  }
+
+  public Compilation (SourceMessages messages)
+  {
+    this.messages = messages;
+  }
+
   /** Create a new Compilation environment.
    * @param lexp top-level function
    * @param classname name of top-level class to generate
    * @param prefix prefix to pre-pend to the names of other (non-top) classes
    * @param immediate true if the classes will be immediately loaded
    */
-  public Compilation (ModuleExp lexp, String classname, String prefix,
-		      boolean immediate)
+  public void compile (ModuleExp lexp, String classname, String prefix)
   {
     source_filename = lexp.filename;
     classPrefix = prefix;
-    this.immediate = immediate;
-    mainClass = new ClassType(classname);
     mainLambda = lexp;
+
+    if (messages.seenErrors())
+      return;
+
+    mainClass = new ClassType(classname);
 
     // Do various code re-writes and optimization.
     PushApply.pushApply(lexp);
@@ -723,6 +734,9 @@ public class Compilation
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp);
+
+    if (messages.seenErrors())
+      return;
 
     if (debugPrintFinalExpr)
       {
@@ -745,6 +759,105 @@ public class Compilation
 	error('f', "Internal compiler exception: "+ex);
 	throw ex;
       }
+  }
+
+  public void compileToFiles (ModuleExp mexp, String topname, String directory, String prefix)
+    throws java.io.IOException
+  {
+    if (directory == null || directory.length() == 0)
+      directory = "";
+    else if (directory.charAt(directory.length() - 1) != File.separatorChar)
+      directory = directory + File.separatorChar;
+    String name = mexp.getName();
+    if (name != null)
+      {
+	topname = name;
+	if (prefix == null)
+	  {
+	    int index = name.lastIndexOf('.');
+	    if (index >= 0)
+	      prefix = name.substring(0, index+1);
+	  }
+      }
+
+    if (mexp.debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + mexp.getName()
+		      + " top:" + topname + " prefix=" + prefix + " :");
+	mexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
+    /* DEBUGGING:
+    OutPort perr = OutPort.errDefault();
+    perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
+    this.print (perr);
+    perr.println();
+    perr.flush();
+    */
+
+    compile(mexp, topname, prefix);
+    for (int iClass = 0;  iClass < numClasses;  iClass++)
+      {
+	ClassType clas = classes[iClass];
+	String out_name
+	  = (directory + clas.getName().replace('.', File.separatorChar)
+	     + ".class");
+	String parent = new File(out_name).getParent();
+	if (parent != null)
+	  new File(parent).mkdirs();
+	clas.writeToFile(out_name);
+      }
+  }
+
+  public void compileToArchive (ModuleExp mexp, String fname)
+    throws java.io.IOException
+  {
+    boolean makeJar = false;
+    if (fname.endsWith(".zip"))
+      makeJar = false;
+    else if (fname.endsWith(".jar"))
+      makeJar = true;
+    else
+      {
+	fname = fname + ".zip";
+	makeJar = false;
+      }
+    compile(mexp, LambdaExp.fileFunctionName, null);
+    File zar_file = new File (fname);
+    if (zar_file.exists ())
+      zar_file.delete ();
+    ZipOutputStream zout;
+    /* Java2:
+    if (makeJar)
+      zout = new JarOutputStream (new FileOutputStream (zar_file));
+    else
+    */
+      {
+	zout = new ZipOutputStream (new FileOutputStream (zar_file));
+	zout.setMethod(zout.STORED); // no compression
+      }
+
+    byte[][] classBytes = new byte[numClasses][];
+    CRC32 zcrc = new CRC32();
+    for (int iClass = 0;  iClass < numClasses;  iClass++)
+      {
+	ClassType clas = classes[iClass];
+	classBytes[iClass] = clas.writeToArray ();
+	ZipEntry zent = new ZipEntry(clas.getName ().replace ('.', '/')
+				     + ".class");
+
+	zent.setSize(classBytes[iClass].length);
+	zcrc.reset();
+	zcrc.update(classBytes[iClass], 0, classBytes[iClass].length);
+	zent.setCrc(zcrc.getValue());
+
+	zout.putNextEntry (zent);
+	zout.write (classBytes[iClass]);
+      }
+    zout.close ();
   }
 
   public void addClass (ClassType new_class)
@@ -1418,14 +1531,6 @@ public class Compilation
     // FIXME
   }
 
-  String filename;
-  int position;
-
-  public void error(char severity, String message)
-  {
-    error(severity, filename, position >> 12, position & ((1 << 12) - 1), message);
-  }
-
   public void error(char severity, String filename, int line, int column, String message)
   {
     error(new gnu.text.SourceError(severity, filename, line, column, message));
@@ -1436,4 +1541,120 @@ public class Compilation
     // FIXME - use SourceMessages framework!
     System.err.println(err);
   }
+
+  /** This may not make sense, except for Lisp-like languages.
+   * For those, 'input' an s-expression  from the reader. */
+  public Expression parse (Object input)
+  {
+    throw new Error("unimeplemented parse");
+  }
+
+  public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
+
+  public LambdaExp currentLambda () { return current_scope.currentLambda (); }
+
+  public final ModuleExp getModule() { return mainLambda; }
+  public void setModule(ModuleExp mexp) { mainLambda = mexp; }
+
+  /** The same as getModule, until we allow nested modules. */
+  public ModuleExp currentModule() { return current_scope.currentModule(); }
+
+  /** Note that we have seen a construct that must be compiled, not evaluated.
+   * If we are not inside a lambda (which is always compiled), but
+   * only inside the outer-most ModuleExp, note that it must be compiled.
+   */
+  public void mustCompileHere ()
+  {
+    ScopeExp exp = current_scope;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return;
+	if (exp instanceof ModuleExp)
+	  {
+	    ((ModuleExp) exp).mustCompile = true;
+	    return;
+	  }
+      }
+  }
+
+  public ScopeExp currentScope() { return current_scope; }
+
+  public void push (ScopeExp scope)
+  {
+    if (scope instanceof ModuleExp)
+      {
+	if (mainLambda == null)
+	  mainLambda = (ModuleExp) scope;
+      }
+    else
+      mustCompileHere();
+    scope.outer = current_scope;
+    current_scope = scope;
+  }
+
+  public void pop (ScopeExp scope)
+  {
+    current_scope = scope.outer;
+  }
+
+  public final void pop ()
+  {
+    pop(current_scope);
+  }
+
+  public Declaration lookup(String name, int namespace)
+  {
+    Interpreter interp = getInterpreter();
+    for (ScopeExp scope = current_scope;  scope != null;  scope = scope.outer)
+      {
+	Declaration decl = scope.lookup(name, interp, namespace);
+	if (decl != null)
+	  return decl;
+      }
+    return null;
+  }
+
+  public SourceMessages getMessages() { return messages; }
+  public void setMessages (SourceMessages messages)
+  { this.messages = messages; }
+ 
+  public void error(char severity, String message)
+  {
+    messages.error(severity, getFile(), getLine(), getColumn(),
+		   message);
+  }
+
+  public void error(char severity, Declaration decl, String msg1, String msg2)
+  {
+    String filename = getFile();
+    int line = getLine();
+    int column = getColumn();
+    int decl_line = decl.getLine();
+    if (decl_line > 0)
+      {
+	filename = decl.getFile();
+	line = decl_line;
+	column = decl.getColumn();
+      }
+    messages.error(severity, filename, line, column,
+		   msg1 + decl.getName() + msg2);
+  }
+
+  public final String getFile() { return messages.getFile(); }
+  public final int getLine() { return messages.getLine(); }
+  public final int getColumn() { return messages.getColumn(); }
+
+  public void setFile(String filename) { messages.setFile(filename); }
+  public void setLine(int line) { messages.setLine(line); }
+  public void setColumn(int column) { messages.setColumn(column); }
+
+  public void setLine(String filename, int line, int column)
+  {
+    messages.setLine(filename, line, column);
+  }
+
+  protected ScopeExp current_scope;
+
+  protected SourceMessages messages;
 }

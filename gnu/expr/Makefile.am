@@ -43,7 +43,6 @@ java_sources = \
   PairClassType.java \
   ObjectExp.java \
   QuoteExp.java \
-  Parser.java \
   PrimProcedure.java \
   ProcInitializer.java \
   PushApply.java \

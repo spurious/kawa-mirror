@@ -327,10 +327,10 @@ public abstract class Interpreter
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
-  public abstract ModuleExp parse(Environment env, Lexer lexer)
+  public abstract Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException;
 
-  public abstract ModuleExp parseFile (InPort port, SourceMessages messages)
+  public abstract Compilation parseFile (InPort port, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException;
 
   public abstract Type getTypeFor(Class clas);
@@ -530,11 +530,11 @@ public abstract class Interpreter
   public void eval (InPort port, CallContext ctx) throws Throwable
   {
     SourceMessages messages = new SourceMessages();
-    ModuleExp mod = parseFile(port, messages);
+    Compilation comp = parseFile(port, messages);
+    ModuleExp.evalModule(environ, ctx, comp);
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"
 				 + messages.toString(20));
-    mod.evalModule(environ, ctx);
   }
 
   // The compiler finds registerEnvironment by using reflection.

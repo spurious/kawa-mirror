@@ -1,9 +1,8 @@
 package gnu.expr;
 import java.io.*;
-import java.util.zip.*;
-// import java.util.jar.*; // Java2
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.text.*;
 
 /**
  * Class used to implement Scheme top-level environments.
@@ -34,31 +33,6 @@ public class ModuleExp extends LambdaExp
   {
   }
 
-  public Object eval (Environment env) throws Throwable
-  {
-    //if (thisValue != null)
-    /// return thisValue;
-    try
-      {
-        Class clas = evalToClass();
-	Object inst = clas.newInstance ();
-
-	Procedure proc = (Procedure) inst;
-	if (proc.getName() == null)
-	  proc.setName (this.name);
-        //thisValue = proc;
-	return inst;
-      }
-    catch (InstantiationException ex)
-      {
-	throw new RuntimeException("class not instantiable: in lambda eval");
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new RuntimeException("class illegal access: in lambda eval");
-      }
-  }
-
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
   public static int dumpZipCounter;
@@ -66,13 +40,17 @@ public class ModuleExp extends LambdaExp
   ///** A cache if this has already been evaluated. */
   //Procedure thisValue;
 
-  public Class evalToClass ()
+  public static Class evalToClass (Compilation comp)
   {
+    ModuleExp mexp = comp.getModule();
+    SourceMessages messages = comp.getMessages();
     try
       {
-	String class_name = getJavaName ();
-
-	Compilation comp = new Compilation (this, class_name, null, true);
+	String class_name = mexp.getJavaName ();
+	comp.immediate = true;
+	comp.compile(mexp, class_name, null);
+	if (messages.seenErrors())
+	  return null;
 
 	byte[][] classes = new byte[comp.numClasses][];
 	String[] classNames = new String[comp.numClasses];
@@ -153,16 +131,9 @@ public class ModuleExp extends LambdaExp
       }
   }
 
-  public final Object evalModule (Environment env) throws Throwable
+  public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
   {
-    CallContext ctx = CallContext.getInstance();
-    ctx.values = Values.noArgs;
-    evalModule(env, ctx);
-    return Values.make((gnu.lists.TreeList) ctx.vstack);
-  }
-
-  public final void evalModule (Environment env, CallContext ctx) throws Throwable
-  {
+    ModuleExp mexp = comp.getModule();
     Environment orig_env = Environment.getCurrent();
     try
       {
@@ -172,17 +143,38 @@ public class ModuleExp extends LambdaExp
 	if (debugPrintExpr)
 	  {
 	    OutPort dout = OutPort.outDefault();
-	    dout.println ("[Evaluating module \""+getName()+"\" mustCompile="+mustCompile+':');
-	    this.print(dout);
+	    dout.println ("[Evaluating module \""+mexp.getName()+"\" mustCompile="+mexp.mustCompile+':');
+	    mexp.print(dout);
 	    dout.println(']');
 	    dout.flush();
 	  }
 
-	if (! mustCompile) // optimization - don't generate unneeded Class.
-	  body.eval (env, ctx);
+	if (! mexp.mustCompile) // optimization - don't generate unneeded Class.
+	  mexp.body.eval (env, ctx);
 	else
 	  {
-	    ModuleBody mod = (ModuleBody) eval (env);
+	    ModuleBody mod;
+	    try
+	      {
+		Class clas = evalToClass(comp);
+		if (clas == null)
+		  return;
+		Object inst = clas.newInstance ();
+		
+		Procedure proc = (Procedure) inst;
+		if (proc.getName() == null)
+		  proc.setName (mexp.name);
+		//thisValue = proc;
+		mod = (ModuleBody) inst;
+	      }
+	    catch (InstantiationException ex)
+	      {
+		throw new RuntimeException("class not instantiable: in lambda eval");
+	      }
+	    catch (IllegalAccessException ex)
+	      {
+		throw new RuntimeException("class illegal access: in lambda eval");
+	      }
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
 	    ctx.proc = mod;
 	  }
@@ -235,106 +227,6 @@ public class ModuleExp extends LambdaExp
 	    decl.makeField(comp, value);
 	  }
       }
-  }
-
-  public void compileToFiles (String topname, String directory, String prefix)
-    throws java.io.IOException
-  {
-    if (directory == null || directory.length() == 0)
-      directory = "";
-    else if (directory.charAt(directory.length() - 1) != File.separatorChar)
-      directory = directory + File.separatorChar;
-    String name = getName();
-    if (name != null)
-      {
-	topname = name;
-	if (prefix == null)
-	  {
-	    int index = name.lastIndexOf('.');
-	    if (index >= 0)
-	      prefix = name.substring(0, index+1);
-	  }
-      }
-
-    if (debugPrintExpr)
-      {
-	OutPort dout = OutPort.outDefault();
-	dout.println("[Compiling module-name:" + getName()
-		      + " top:" + topname + " prefix=" + prefix + " :");
-	this.print(dout);
-	dout.println(']');
-	dout.flush();
-      }
-
-    /* DEBUGGING:
-    OutPort perr = OutPort.errDefault();
-    perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
-    this.print (perr);
-    perr.println();
-    perr.flush();
-    */
-
-    Compilation comp = new Compilation(this, topname, prefix, false);
-    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      {
-	ClassType clas = comp.classes[iClass];
-	String out_name
-	  = (directory + clas.getName().replace('.', File.separatorChar)
-	     + ".class");
-	String parent = new File(out_name).getParent();
-	if (parent != null)
-	  new File(parent).mkdirs();
-	clas.writeToFile(out_name);
-      }
-  }
-
-  public void compileToArchive (String fname)
-    throws java.io.IOException
-  {
-    boolean makeJar = false;
-    if (fname.endsWith(".zip"))
-      makeJar = false;
-    else if (fname.endsWith(".jar"))
-      makeJar = true;
-    else
-      {
-	fname = fname + ".zip";
-	makeJar = false;
-      }
-    Compilation comp = new Compilation(this, LambdaExp.fileFunctionName,
-				       null, false);
-    File zar_file = new File (fname);
-    if (zar_file.exists ())
-      zar_file.delete ();
-    ZipOutputStream zout;
-    /* Java2:
-    if (makeJar)
-      zout = new JarOutputStream (new FileOutputStream (zar_file));
-    else
-    */
-      {
-	zout = new ZipOutputStream (new FileOutputStream (zar_file));
-	zout.setMethod(zout.STORED); // no compression
-      }
-
-    byte[][] classes = new byte[comp.numClasses][];
-    CRC32 zcrc = new CRC32();
-    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      {
-	ClassType clas = comp.classes[iClass];
-	classes[iClass] = clas.writeToArray ();
-	ZipEntry zent = new ZipEntry(clas.getName ().replace ('.', '/')
-				     + ".class");
-
-	zent.setSize(classes[iClass].length);
-	zcrc.reset();
-	zcrc.update(classes[iClass], 0, classes[iClass].length);
-	zent.setCrc(zcrc.getValue());
-
-	zout.putNextEntry (zent);
-	zout.write (classes[iClass]);
-      }
-    zout.close ();
   }
 
   protected Expression walk (ExpWalker walker)

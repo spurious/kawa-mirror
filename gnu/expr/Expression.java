@@ -75,16 +75,15 @@ public abstract class Expression implements Printable
   /** Compile, but take note of line number. */
   public final void compileNotePosition(Compilation comp, Target target)
   {
-    String saveFilename = comp.filename;
-    int savePosition = comp.position;
-    comp.filename = filename;
-    comp.position = position;
+    String saveFilename = comp.getFile();
+    int saveLine = comp.getLine();
+    int saveColumn = comp.getColumn();
+    comp.setLine(filename, getLine(), getColumn());
     compile(comp, target);
     // This might logically belong in a `finally' clause.
     // It is intentionally not so, so if there is an internal error causing
     // an exception, we get the line number where the exception was thrown.
-    comp.filename = saveFilename;
-    comp.position = savePosition;
+    comp.setLine(saveFilename, saveLine, saveColumn);
   }
 
   public final void compile (Compilation comp, Type type)
@@ -106,7 +105,7 @@ public abstract class Expression implements Printable
   public static final Expression[] noExpressions = new Expression[0];
 
   /** Helper method to create a `while' statement. */
-  public static Expression makeWhile(Object cond, Object body, Parser parser)
+  public static Expression makeWhile(Object cond, Object body, Compilation parser)
   {
     Expression[] inits = new Expression[1];
     LetExp let = new LetExp(inits);

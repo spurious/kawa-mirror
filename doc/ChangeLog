@@ -1,3 +1,7 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* Kawa.texi:  Document using Ant.  Remove makekawa.bat documentation.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Document let-values, let*-values, and current-error-port.

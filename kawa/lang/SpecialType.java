@@ -77,6 +77,8 @@ public class SpecialType extends gnu.bytecode.PrimType
 	return IntNum.make(((Number) obj).longValue());
       case 'D':  case 'F':
 	return DFloNum.make(((Number) obj).doubleValue());
+      case 'V':
+	return gnu.mapping.Values.empty;
       }
     return super.coerceToObject(obj);
   }

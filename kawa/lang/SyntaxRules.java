@@ -7,7 +7,7 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class SyntaxRules extends Syntax implements Printable, Compilable
+public class SyntaxRules extends Macro implements Printable, Compilable
 {
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
@@ -191,7 +191,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       return new EqualPat (pattern);
   }
 
-  public Object rewrite1 (Object obj, Translator tr)
+  public Object expand (Object obj, Translator tr)
   {
     Object[] vars = new Object[maxVars];
     for (int i = 0;  i < rules.length;  i++)
@@ -215,11 +215,6 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       }
     return tr.syntaxError ("no matching syntax-rule for "
 				+ literal_identifiers[0]);
-  }
-
-  public Expression rewrite (Object obj, Translator tr)
-  {
-    return tr.rewrite (rewrite1 (obj, tr));
   }
 
   public void print(java.io.PrintWriter ps)

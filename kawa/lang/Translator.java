@@ -136,15 +136,19 @@ public class Translator extends Object
       {
 	String sym = (String) obj;
 	obj = current_decls.get (sym);
+	Binding binding = null;
         if (obj != null)
 	  {
 	    // Hygenic macro expansion may bind a renamed (uninterned) symbol
 	    // to the original symbol.  Here, use the original symbol.
 	    if (obj instanceof String)
-	      obj = env.get ((String) obj);
+	      binding = env.lookup((String) obj);
 	  }
 	else
-	  obj = env.get (sym);
+	  binding = env.lookup(sym);
+	if (binding != null && binding.isBound())
+	  return binding.get();
+	return null;
       }
      return obj;
   }
@@ -359,9 +363,9 @@ public class Translator extends Object
 	      Pair st_pair = (Pair) st;
 	      Object op = st_pair.car;
 	      Syntax syntax = check_if_Syntax (op);
-	      if (syntax != null && syntax instanceof SyntaxRules)
+	      if (syntax != null && syntax instanceof Macro)
 		{
-		  st = ((SyntaxRules) syntax).rewrite1 (st_pair.cdr, this);
+		  st = ((Macro) syntax).expand (st_pair.cdr, this);
 		  continue;
 		}
 	      else if (syntax == Scheme.beginSyntax)

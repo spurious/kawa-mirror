@@ -35,7 +35,7 @@ public class Record extends NameMap
     return hash;
   }
 
-  public Object get (String fname)
+  public Object getChecked (String fname)
   {
     Class clas = getClass();
     java.lang.reflect.Field fld;

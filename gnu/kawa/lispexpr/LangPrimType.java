@@ -7,7 +7,7 @@ import gnu.text.Char;
 
 /** Use to implement some special types that convert differently. */
 
-public class LangPrimType extends gnu.bytecode.PrimType
+public class LangPrimType extends PrimType implements TypeValue
 {
   Interpreter interpreter;
   PrimType implementationType;
@@ -80,6 +80,24 @@ public class LangPrimType extends gnu.bytecode.PrimType
     if (value instanceof Character)
       return ((Character) value).charValue();
     return  ((Char) value).charValue();
+  }
+
+  public void emitIsInstance (CodeAttr code)
+  {
+    char sig1 = getSignature().charAt(0);
+    switch (sig1)
+      {
+      case 'Z':
+	code.emitPop(1);
+	code.emitPushInt(1);
+	break;
+      case 'C':
+	ClassType scmCharType = ClassType.make("gnu.text.Char");
+	code.emitInstanceof(scmCharType);
+	break;
+      default:
+	super.emitIsInstance(code);
+      }
   }
 
   public void emitCoerceFromObject (CodeAttr code)
@@ -188,5 +206,32 @@ public class LangPrimType extends gnu.bytecode.PrimType
     if (sig1 == 'V' || sig1 == 'Z')
       return 1;
     return super.compare(other);
+  }
+
+  public void emitTestIf(Variable incoming, Declaration decl, Compilation comp)
+  {
+    char sig1 = getSignature().charAt(0);
+    /*
+    switch (sig1)
+      {
+      case 'Z':
+      }
+    */
+    CodeAttr code = comp.getCode();
+    if (incoming != null)
+      code.emitLoad(incoming);
+    if (decl != null)
+      {
+	code.emitDup();
+	decl.compileStore(comp);
+      }
+    emitIsInstance(code);
+    code.emitIfIntNotZero();
+  }
+
+  public void emitIsInstance(Variable incoming,
+			     Compilation comp, Target target)
+  {
+    gnu.kawa.reflect.InstanceOf.emitIsInstance(this, incoming, comp, target);
   }
 }

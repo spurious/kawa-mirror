@@ -1,3 +1,8 @@
+2001-08-24  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes):  New node.
+	(Anonymous classes):  Update.
+
 2001-08-17  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (XML tools):  New chapter.

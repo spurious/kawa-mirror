@@ -2710,6 +2710,7 @@ The Kawa module system is based on the features of the Java class system.
 * Allocating objects::
 * Field operations::      Accessing fields of Java objects
 * Method operations::     Calling Java methods from Scheme
+* Defining new classes::
 * Anonymous classes::
 * Module classes::        Modules and how they are compiled to classes
 @end menu
@@ -3021,7 +3022,7 @@ Some examples using these functions are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@node Field operations, Anonymous classes, Method operations, Objects Classes and Modules
+@node Field operations, Defining new classes, Method operations, Objects Classes and Modules
 @section Accessing fields of Java objects
 
 Kawa has both a high-level interface and a low-level interface for accessing
@@ -3067,29 +3068,83 @@ A synonym for @code{(field @var{object} @var{fieldname})}.
 A synonym for @code{(set! (field @var{object} @var{fieldname}) @var{value})}.
 @end defun
 
-@node Anonymous classes, Module classes, Field operations, Objects Classes and Modules
-@section Anonymous classes
+@node Defining new classes, Anonymous classes, Field operations, Objects Classes and Modules
+@section Defining new classes
 
-@deffn Syntax object (supers ...) field-or-method-decl ...
-Returns a new instance of an anonymous (inner) class.
+Kawa provides various mechanisms for defining new classes.
+The @code{define-class} and @code{define-simple-class} forms
+will usually be the preferred mechanisms.  They have basically
+the same syntax, but have a couple of differences.
+@code{define-class} allows multiple inheritance as well as true nested
+(first-class) class objects.  However, the implementation
+is more complex: code using it is slightly slower, and the mapping to
+Java classes is a little less obvious.   (Each Scheme class is implemented
+as a pair of an interface and an implementation class.)
+A class defined by @code{define-simple-class} is slightly more
+efficient, and it is easier to access it from Java code.
+
+The syntax of @code{define-class} are mostly compatible with that
+in the Guile and Stk dialects of Scheme.
+
+@deffn Syntax define-class name (supers ...) field-or-method-decl ...
+@deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
 @display
 @var{field-or-method} = @var{field-decl} | @var{method-decl}
-@var{field-decl} = (@var{field-name} [[@var{field-type}] @var{field-init}])
-@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
+@var{field-decl} = (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
+@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [:: @var{rtype}] @var{body})
 @end display
+Defines a new class named @var{name}.  If @code{define-simple-class} is
+used, creates a normal Java class named @var{name} in the current package.
+(If @var{name} has the form @code{<xyx>} the Java implementation
+type is named @code{xyz}.)  If @code{define-class} the implementation is
+unspecified.  In most cases, the compiler creates a class pair,
+consisting of a Java interface and a Java implementation class.
 
-Returns a new instance of a unique (anonymous) class.
-The class inherits from the list of @var{supers}, where at most one of the
-elements should be the base class being extended from, and the rest
-are interfaces.
+The class inherits from the classes and interfaces listed in @var{supers}.
+This is a list of names of classes that are in scope (perhaps imported
+using @code{require}), or names for existing classes or interfaces
+surrounded by @code{<>}, such as @code{<gnu.lists.Sequence>}.
+If @code{define-simple-class} is used, at most one of these may be
+the name of a normal Java class or classes defined using
+@code{define-simple-class}; the rest must be interfaces or classes
+defined using @code{define-class}.
+If @code{define-class} is used, @emph{all} of the classes listed
+in @var{supers} should be interfaces or classes defined using
+@code{define-class}.
 
-Each @var{field-decl} declares a public instance field.
-If @var{field-type} is given, it specifies the type of the field.
-If @var{field-init} is given, it is an expression whose value
-becomes the initial value of the field.
-The @var{field-init} is evaluated at the same time as the @code{object}
-expression is evaluated,
-in a scope where all the @var{field-name}s are visible.
+Each @var{field-decl} declares a public instance "slot" (field)
+with the given @var{fname}.  If @var{ftype} is specified it is the
+type of the slot.  The following @var{option-keyword}s are implemented:
+@table @asis
+@item @code{type:} @var{ftype}
+Specifies that @var{ftype} is the type of (the values of) the field.
+Equivalent to @samp{:: @var{ftype}}.
+@item @code{allocation:} @code{class:}
+Specifies that there should be a single slot shared between all
+instances of the class (and its sub-classes).
+Not yet implemented for @code{define-class},
+only for @code{define-simple-class}.
+In Java terms this is a @code{static} field.
+@item @code{allocation:} @code{instance:}
+Specifies that each instance has a separate value "slot", and they
+are not shared. In Java terms, this is a non-@code{static} field.
+This is the default.
+@item @code{init-form:} @var{expr}
+An expression used to initialize the slot.
+The lexical environment of the @var{expr} is that of the @code{define-class}
+or @code{define-simple-class}.  (This is not quite true in the current
+implementation, as the names of fields and methods of this class are visible.)
+@item @code{init-value:} @var{value}
+A value expression used to initialize the slot.
+For now this is synonymous with @var{init-form:}, but that may change
+(depending on what other implementation do), so to be safe only use
+@code{init-value:} with a literal.
+@item @code{init-keyword:} @code{@var{name}:}
+A keyword that that can be used to initialize instance in @code{make} calls.
+For now, this is ignored, and @var{name} should be the same as the
+field's @var{fname}.
+@code{static} field.
+@end table
 
 Each @var{method-decl} declares a public non-static method,
 whose name is @var{method-name}.  (If @var{method-name} is not a valid
@@ -3105,6 +3160,71 @@ implemented using multiple overloaded methods.)
 The scope of the @var{body} of a method includes the @var{field-decl}s
 of the object.  It does include the surrounding lexical scope.
 It sort-of also includes the declared methods, but this is not working yet.
+@end deffn
+
+A simple example:
+@example
+(define-simple-class <2d-vector> ()
+  (x type: <double> init-value: 0.0 init-keyword: x:)
+  (y type: <double> init-value: 0.0 init-keyword: y:)
+  ((add (other :: <2d-vector>)) :: <2d-vector>
+   ;; Kawa compiles this using primitive Java types!
+   (make <2d-vector>
+     x: (+ x (slot-ref other 'x))
+     y: (+ y (slot-ref other 'y))))
+  ((scale (factor :: <double>)) :: <2d-vector>
+   ;; Unfortunately, multiply is not yet optimized as addition is.
+   (make <2d-vector> x: (* factor x) y: (* factor y))))
+
+(define-simple-class <3d-vector> (<2d-vector>)
+  (z type: <double> init-value: 0.0 init-keyword: z:)
+  ((scale (factor :: <double>)) :: <2d-vector>
+   ;; Note we cannot override the return type to <3d-vector>
+   ;; because Java does not allow that.  Should hide that. .
+   (make <3d-vector>
+     ;; Unfortunately, slot names of inherited classes are not visible.
+     ;; Until this is fixed, use slot-ref.
+     x: (* factor (slot-ref (this) 'x))
+     y: (* factor (slot-ref (this) 'y))
+     z: (* factor z))))
+@end example
+
+@node Anonymous classes, Module classes, Defining new classes, Objects Classes and Modules
+@section Anonymous classes
+
+@deffn Syntax object (supers ...) field-or-method-decl ...
+Returns a new instance of an anonymous (inner) class.
+The syntax is similar to @code{define-class}.
+@display
+@var{field-or-method} = @var{field-decl} | @var{method-decl}
+@var{field-decl} = (@var{fname} [[[::] @var{ftype}] @var{finit}])
+    | (@var{fname} [:: @var{ftype}] [@var{option-keyword} @var{option-value}]*)
+@var{method-decl} = ((@var{method-name} @var{formal-arguments}) [[::] @var{rtype}] @var{body})
+@end display
+
+Returns a new instance of a unique (anonymous) class.
+The class inherits from the list of @var{supers}, where at most one of the
+elements should be the base class being extended from, and the rest
+are interfaces.
+
+This is roughly equivalent to:
+@example
+(begin
+  (define-name @var{hname} (@var{supers} ...) @var{field-or-method-decl} ...)
+  (make @var{hname}))
+@end example
+
+A @var{field-decl} is as for @code{define-class}, except
+that we also allow an abbreviated syntax.
+Each @var{field-decl} declares a public instance field.
+If @var{ftype} is given, it specifies the type of the field.
+If @var{finit} is given, it is an expression whose value
+becomes the initial value of the field.
+The @var{finit} is evaluated at the same time as the @code{object}
+expression is evaluated,
+in a scope where all the @var{fname}s are visible.
+
+A @var{method-decl} is as for @code{define-class}.
 @end deffn
 
 @node Module classes, , Anonymous classes, Objects Classes and Modules
@@ -3192,7 +3312,7 @@ The value is readonly, and you cannot assign to it.
 (This is not fully enforced.)
 If the definition is at module level, then the compiler
 will create a @code{final} field with the given name and type.
-If @var{value} is evaluated as normal; however, if it is a
+The @var{value} is evaluated as normal; however, if it is a
 compile-time constant, it defaults to being static.
 @end deffn
 

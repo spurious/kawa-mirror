@@ -3,9 +3,14 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  AttributeAxis.java \
   Attributes.java \
   AttributeConstructor.java \
+  AttributeType.java \
+  ChildAxis.java \
   DefineNamespace.java \
+  DescendantAxis.java \
+  DescendantOrSelfAxis.java \
   Document.java \
   DocumentConstructor.java \
   ElementConstructor.java \
@@ -24,9 +29,12 @@ java_sources = \
   NodeName.java \
   NodeType.java \
   OutputAsXML.java \
+  ParentAxis.java \
+  SelfAxis.java \
   SortNodes.java \
   SortedNodes.java \
   TextConstructor.java \
+  TreeScanner.java \
   UnionNodes.java \
   WriteTo.java \
   XMLParser.java

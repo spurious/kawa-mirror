@@ -1,3 +1,15 @@
+2003-08-03  Per Bothner  <per@bothner.com>
+
+	* TreeScanner.java:  New class, extends CpsProcedure.
+	* AttributeAxis.java:  New class, extends TreeScanner.
+	* ChildAxis.java:  New class, extends TreeScanner.
+	* DescendantAxis.java:  New class, extends TreeScanner.
+	* DescendantOrSelfAxis.java:  New class, extends TreeScanner.
+	* ParentAxis.java:  New class, extends TreeScanner.
+	* SelfAxis.java:  New class, extends TreeScanner.
+	* AttributeType.java:  New class, extends NodeType.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2003-08-02  Per Bothner  <per@bothner.com>
 
 	* ElementType.java (getImplementationType):  New method.

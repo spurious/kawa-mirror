@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -6,14 +6,23 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.math.IntNum;
 
-/** Map a unary function over a value sequence, yielding a new sequence.
+/** Map a function over a value sequence, yielding a new sequence.
+ * Normally, the function takes one argument, the item in the sequence.
+ * If startCounter is non-negative, a position index is also passed.
  * Used to implement XQuery's 'for' form.
  */
 
 public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 {
   public static final ValuesMap valuesMap = new ValuesMap();
+  public static final ValuesMap valuesMapWithPos = new ValuesMap();
+  static { valuesMapWithPos.startCounter = 1; }
+
+  /** If non-negative also define a counter variable.
+   * Used for XQuery's 'at' clause in a FLWOR expression. */
+  public int startCounter = -1;
 
   public int numArgs() { return 0x2002; }
 
@@ -26,30 +35,51 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     if (val instanceof Values)
       {
 	int ipos = 0;
+	int count = startCounter;
 	Values values = (Values) val;
 	while ((ipos = values.nextPos(ipos)) != 0)
 	  {
 	    Object v = values.getPosPrevious(ipos);
-	    ctx.setArgs(v);
+	    if (startCounter >= 0)
+	      ctx.setArgs(v, IntNum.make(count++));
+	    else
+	      ctx.setArgs(v);
 	    ctx.proc = proc;
 	    ctx.runUntilDone();
 	  }
       }
     else
       {
-	ctx.setArgs(val);
+	if (startCounter >= 0)
+	  ctx.setArgs(val, IntNum.make(startCounter));
+	else
+	  ctx.setArgs(val);
 	ctx.proc = proc;
 	ctx.runUntilDone();
       }
   }
 
-  public Expression inline (ApplyExp exp, ExpWalker walker)
+  /** If we can inline, return LambdaExp for first arg; otherwise null. */
+  private LambdaExp canInline (ApplyExp exp)
   {
     Expression[] args = exp.getArgs();
-    if (args.length == 2
-	&& args[0] instanceof LambdaExp)
+    Expression arg0;
+    // FIXME Could if needed wrap expr in LambdaExp:
+    if (args.length == 2 && (arg0 = args[0]) instanceof LambdaExp)
       {
-	LambdaExp lexp = (LambdaExp) args[0];
+	LambdaExp lexp = (LambdaExp) arg0;
+	if (lexp.min_args == lexp.max_args
+	    && 	lexp.min_args == (startCounter >= 0 ? 2 : 1))
+	  return lexp;
+      }
+    return null;
+  }
+
+  public Expression inline (ApplyExp exp, ExpWalker walker)
+  {
+    LambdaExp lexp = canInline(exp);
+    if (lexp != null)
+      {
 	lexp.setInlineOnly(true);
 	lexp.returnContinuation = exp;
       }
@@ -58,12 +88,13 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    Expression[] args = exp.getArgs();
-    if (args.length != 2)
+    LambdaExp lambda = canInline(exp);
+    if (lambda == null)
       {
 	ApplyExp.compile(exp, comp, target);
 	return;
       }
+    Expression[] args = exp.getArgs();
     if (! (target instanceof IgnoreTarget
 	   || target instanceof ConsumerTarget
 	   || target instanceof SeriesTarget))
@@ -72,24 +103,19 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 	return;
       }
     Expression vals = args[1];
-    LambdaExp lambda;
-    if (args[0] instanceof LambdaExp)
-      lambda = (LambdaExp) args[0];
-    else
-      {
-	// FIXME in InlineCalls phase could wrap expr in LambdaExp
-	ApplyExp.compile(exp, comp, target);
-	return;
-      }
     Declaration param = lambda.firstDecl();
-    if (param == null || param.nextDecl() != null)
-      {
-	ApplyExp.compile(exp, comp, target);
-	return;
-      }
     CodeAttr code = comp.getCode();
     SeriesTarget starget = new SeriesTarget();
     starget.scope = code.pushScope();
+    Variable counter;
+    if (startCounter >= 0)
+      {
+	counter = starget.scope.addVariable(code, Type.int_type, "position");
+	code.emitPushInt(startCounter);
+	code.emitStore(counter);
+      }
+    else
+      counter = null;
     starget.function = new Label(code);
     starget.done = new Label(code);
     // If the param Declaration is captured, then it gets messy initializing
@@ -108,8 +134,18 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     starget.function.define(code);
     code.pushType(retAddrType);
     code.emitStore(retAddr);
-    args = new Expression[] { new ReferenceExp(param) };
+    if (startCounter >= 0)
+      {
+	args = new Expression[] { new ReferenceExp(param),
+	new ReferenceExp(new Declaration(counter))};
+      }
+    else
+      args = new Expression[] { new ReferenceExp(param) };
     new ApplyExp(lambda, args).compile(comp, target);
+    if (startCounter >= 0)
+      {
+	code.emitInc(counter, (short) 1);
+      }
     code.emitRet(retAddr);
     code.popScope();
     starget.done.define(code);

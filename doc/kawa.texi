@@ -915,6 +915,7 @@ You can also compile your Scheme program to native code using GCJ.
 @menu
 * Archive compilation::         Compiling Scheme to an archive file
 * Files compilation::           Compiling Scheme to a set of .class files
+* Compilation options::
 * Application compilation::     Compiling Scheme to a standalone application
 * Applet compilation::          Compiling Scheme to an applet
 * Compiling to executable::     Compiling Scheme to a native executable
@@ -941,7 +942,7 @@ This should have the same effect as
 loading @samp{foo.scm}, except you will get the faster byte-compiled versions.
 @end defun
 
-@node Files compilation, Application compilation, Archive compilation, Compiling
+@node Files compilation
 @section Compiling Scheme to a set of .class files
 
 Invoking @samp{kawa} (or @samp{java kawa.repl}) with
@@ -982,9 +983,6 @@ and can be used as an applet.  @xref{Applet compilation}.
 @item --servlet
 The resulting class implements @code{javax.servlet.http.HttpServlet},
 and can be used as an servlet in a servlet container like Tomcat.
-@item --module-static
-If no @code{module-static} is specified, generate a static module
-(as if @code{(module-static #t)} were specified. @xref{Module classes}.
 @end table
 
 When you actually want to load the classes, the @var{outdirectory}
@@ -1013,7 +1011,70 @@ One way to do that is with the @samp{-f}:
 kawa -f macs.scm -C foosrc.scm
 @end example
 
-@node Application compilation,  Applet compilation, Files compilation, Compiling
+@node Compilation options
+@section Compilation options
+
+Various named option control how Kawa compiles certain forms.
+
+@table @samp
+@item --module-static
+If no @code{module-static} is specified, generate a static module
+(as if @code{(module-static #t)} were specified). @xref{Module classes}.
+@item --warn-invoke-unknown-method
+Emit a warning if the @code{invoke} function calls a named method
+for which there is no matching method in the compile-time type of the receiver.
+This (currently) defaults to on;
+to turn it off use the @code{--no-warn-invoke-unknown-method} flag.
+@item --warn-undefined-variable
+Emit a warning if the code references a variable which is neither in
+lexical scope nor in the compile-time dynamic (global) environment.
+This is useful for catching typos.
+@end table
+
+An option can be followed by a value, as
+in @code{--warn-invoke-unknown-method=no}.
+For boolean options, the values @code{yes}, @code{true}, @code{on}, or @code{1}
+enable the option, while @code{no}, @code{false}, @code{off},
+or @code{0} disable it.
+You can also negate an option by prefixing it with @code{no-}:
+The option @code{--no-warn-invoke-unknown-method}
+is the same as @code{--warn-invoke-unknown-method=no}.
+
+You can set the same options (except, for now, @code{module-static})
+within your Scheme source file.  (In that case they override the
+options on the command line.)
+
+@deffn Syntax module-compile-options [key: value] ...
+This sets the value of the @code{key} option to @code{value}
+for the current module (source file).  It takes effect as
+soon it is seen during the first macro-expansion pass,
+and is active thereafter (unless overridden by @code{with-compile-options}).
+
+The @var{key} is one of the above option names.
+(The following colon make it a Kawa keyword.)
+The @var{value} must be a literal value: either a boolean
+(@code{#t} or @code{#f}), a number, or a string,
+depending on the @var{key}.
+(All the options so far are boolean options.)
+
+@example
+(module-compile-options warn-undefined-variable: #t)
+;; This causes a warning message that y is unknown.
+(define (func x) (list x y))
+@end example
+@end deffn
+
+@deffn Syntax with-compile-options [key: value] ... body
+Similar to @code{module-compile-options}, but the option
+is only active within @var{body}.
+@example
+(define (func x)
+  (with-compile-options warn-invoke-unknown-method: #f
+    (invoke x 'size)))
+@end example
+@end deffn
+
+@node Application compilation
 @section Compiling Scheme to a standalone application
 
 A Java application is a Java class with a special method
@@ -2178,6 +2239,37 @@ Create a uniform vector of the appropriate type, initializing it
 with the elements of the list @var{l}.  The elements of @var{l}
 must be numbers coercible the new vector's element type.
 @end defun
+
+@subsection Relationship with Java arrays
+
+Each uniform array type is implemented as an @dfn{underlying Java array},
+and a length field.
+The underlying type is
+@code{byte[]} for @code{<u8vector>} or @code{<s8vector>};
+@code{short[]} for @code{<u16vector>} or @code{<u16vector>};
+@code{int[]} for @code{<u32vector>} or @code{<s32vector>};
+@code{long[]} for @code{<u64vector>} or @code{<s64vector>};
+@code{<float[]} for @code{<f32vector>}; and
+@code{<double[]} for @code{<f32vector>}.
+The length field allows a uniform array to only use the
+initial part of the underlying array.  (This can be used
+to support Common Lisp's fill pointer feature.)
+This also allows resizing a uniform vector.  There is no
+Scheme function for this, but you can use the @code{setSize} method:
+@example
+(invoke some-vector 'setSize 200)
+@end example
+
+If you have a Java array, you can create a uniform vector
+sharing with the Java array:
+@example
+(define arr :: <byte[]> ((primitive-array-new <byte>) 10))
+(define vec :: <u8vector> (make <u8vector> arr))
+@end example
+At this point @code{vec} uses @code{arr} for its underlying storage,
+so changes to one affect the other.
+It @code{vec} is re-sized so it needs a larger underlying array,
+then it will no longer use @code{arr}.
 
 @node Exceptions, Locations, Uniform vectors, Extensions
 @section Signalling and recovering from exceptions

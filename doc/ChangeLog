@@ -1,3 +1,10 @@
+2003-10-21  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Compilation options):  New node.
+
+	* kawa.texi (Uniform vectors):  New subsection: Relationship with
+	Java arrays.
+
 2003-09-05  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (version.texi):  Add dependency so make info works even

@@ -1,6 +1,7 @@
 package kawa.standard;
+import kawa.lang.*;
 
-public class vector extends kawa.lang.ProcedureN
+public class vector extends ProcedureN
 {
   public vector()
   {
@@ -9,10 +10,6 @@ public class vector extends kawa.lang.ProcedureN
 
   public Object applyN (Object[] args)
   {
-    int count = args.length;
-    java.util.Vector v = new java.util.Vector();
-    for (int i = 0;  i < count; i++)
-      v.addElement (args[i]);
-    return new kawa.lang.vector(v);
+    return new Vector (args);
   }
 }

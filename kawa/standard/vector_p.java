@@ -1,19 +1,18 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure1;
+public class vector_p extends Procedure1
+{
+  public vector_p()
+  {
+    super("vector?");
+  }
 
-public class vector_p extends kawa.lang.Procedure1 {
-   public kawa.standard.vector_p() {
-      super("vector?");
-   }
-
-   public Object apply1 (Object arg1)
-   {
-      if (arg1 instanceof kawa.lang.vector) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
-   }
-
+  public Object apply1 (Object arg1)
+  {
+    if (arg1 instanceof Vector)
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
+  }
 }

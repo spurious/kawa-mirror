@@ -76,8 +76,5 @@ public abstract class EToolkit
     // Default is to ignore.
   }
 
-  /**
-   * @return
-   */
   public abstract Object getIgnoreAction();
 }

@@ -50,7 +50,7 @@ public class SwingToolkit extends EToolkit
   }
 
   /**
-   * @see gnu.jemacs.buffer.EToolkit#getMenu(java.lang.Object)
+   * @see gnu.jemacs.buffer.EToolkit#getMenu(gnu.lists.LList)
    */
   public EMenu getMenu(LList menubar)
   {

@@ -31,7 +31,6 @@ public class with_compile_options extends Syntax
 				      Syntax syntax, Translator tr)
   {
     boolean seenKey = false;
-    System.err.println("getProp start form:"+form);
     gnu.text.Options options = tr.currentOptions;
     while (form instanceof Pair)
       {
@@ -40,7 +39,6 @@ public class with_compile_options extends Syntax
 	  break;
 	String key = ((Keyword) pair.car).getName();
 	seenKey = true;
-	System.err.println("key:"+key);
 	Object savePos = tr.pushPositionOf(pair);
 	try
 	  {

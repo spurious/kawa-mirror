@@ -922,6 +922,49 @@ are converted into plain @code{#\Newline}.
 @node Exceptions, Eval and Environments, Ports, Extensions
 @subsection Signalling and recovering from exceptions
 
+@defun catch key thunk handler
+Invoke @var{thunk} in the dynamic context of @var{handler} for
+exceptions matching @var{key}.  If thunk throws to the symbol @var{key},
+then @var{handler} is invoked this way:
+
+@example
+(handler key args ...)
+@end example
+
+@var{key} may be a symbol.  The @var{thunk} takes no
+arguments.  If @var{thunk} returns normally, that is the return value of
+@code{catch}.
+
+Handler is invoked outside the scope of its own @code{catch}.  If
+@var{handler} again throws to the same key, a new handler from further
+up the call chain is invoked.
+
+If the key is @code{#t}, then a throw to @emph{any} symbol will match
+this call to @code{catch}.
+@end defun
+
+@defun throw key &rest args ...
+Invoke the catch form matching @var{key}, passing @var{args} to the
+@var{handler}.  
+
+If the key is a symbol it will match catches of the same
+symbol or of #t.
+
+If there is no handler at all, an error is signaled.
+@end defun
+
+@deffn procedure error message args ...
+Raise an error with key @code{misc-error} and a message constructed by
+displaying @var{msg} and writing @var{args}.
+This normally prints a stack trace, and brings you back to
+the top level, or exits kawa if you are not running interactively.
+@end deffn
+
+@defun primitive-throw exception
+Throws the @var{exception}, which must be an instance of a sub-class
+of @code{<java.lang.Throwable>}.
+@end defun
+
 @deffn Syntax try-finally body handler
 Evaluate @var{body}, and return its result.
 However, before it returns, evaluate @var{handler}.
@@ -929,6 +972,29 @@ Even if @var{body} returns abnormally (by throwing an exception),
 @var{handler} is evaluated.
 
 (This is implemented just like Java's @code{try}-@code{finally}.)
+@end deffn
+
+@deffn Syntax try-catch body handler ...
+Evaluate @var{body}, in the conect of the given @var{handler-spec}s.
+Eavh @var{handler} has the form:
+@example
+@var{var} @var{type} @var{exp} ...
+@end example
+If an exception is thrown in @var{body}, the first @var{handle-spec}
+is selected such that the thrown exception is an instance of
+the @var{handler}'s @var{type}. If no @var{handler} is selected,
+the exception is propagated through the dynamic execution context
+until a matching @var{handler} is found.  (If no matching @var{handler}
+is found, then an error message is printed, and the computation terminated.)
+
+Once a @var{handler} is selected,
+the @var{var} is bound to the thrown exception, and the @var{exp} in
+the @var{handler} are executed.  The result of the @code{try-catch}
+is the result of @var{body} if no exception is thrown, or the
+value of the last @var{exp} in the selected @var{handler} if an
+exception is thrown.
+
+(This is implemented just like Java's @code{try}-@code{catch}.)
 @end deffn
 
 @defun dynamic-wind in-guard thunk out-guard
@@ -1154,13 +1220,6 @@ Exits the Kawa interpreter, and ends the Java session.
 The integer value @var{code} is returned to the operating
 system.  If @var{code} is not specified, zero is returned,
 indicating normal (non-error) termination.
-@end defun
-
-@defun error string
-Signals an error with the given @var{string} as an error message.
-It does this by throwing a @code{GenericError} (but that may change).
-This normally prints a stack trace, and brings you back to
-the top level, or exits kawa if you are not running interactively.
 @end defun
 
 @defun apply proc [arg1 ...] args

@@ -1,3 +1,9 @@
+2003-03-24  Per Bothner  <per@bothner.com>
+
+	New testcase based on bug report from Chris Dean 2003-03-23.
+	* classes1.scm (define-class-using-syntax-rules):  New macro.
+	* classes2.scm (<SimpleC>):  Use new macro.
+
 2003-03-13  Per Bothner  <per@bothner.com>
 
 	* arr-test.scm:  Test for rebug reported by Chris Dean

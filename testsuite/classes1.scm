@@ -13,3 +13,8 @@
 (define-class <ClsC> (<ClsB>)
   (c :: <int> init-form: 22)
   ((f (y :: <int>)) :: <int> (+ xx c y)))
+
+(define-syntax define-class-using-syntax-rules
+  (syntax-rules ()
+		((define-class-using-syntax-rules name super parts ...)
+		 (define-simple-class name (super) parts ...))))

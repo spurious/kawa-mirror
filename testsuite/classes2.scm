@@ -8,7 +8,7 @@
   (e :: <int> init-form: 39)
   ((f (y :: <int>)) :: <int> (+ 100 xx  e y)))
 
-(define-simple-class <SimpleC> (<SimpleB>)
+(define-class-using-syntax-rules <SimpleC> <SimpleB>
   (d :: <int> init-form: 23 init-keyword: d:)
   (e :: <int> init-form: 24))
 

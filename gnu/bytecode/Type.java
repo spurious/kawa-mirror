@@ -213,6 +213,25 @@ public abstract class Type {
     return getReflectClass().isInstance(obj);
   }
 
+  /** Return true if this is a "subtype" of other. */
+  public boolean isSubtype (Type other)
+  {
+    return other.getReflectClass().isAssignableFrom(getReflectClass());
+  }
+
+  /** Return true iff t1[i].isSubtype(t2[i]) for all i. */
+  public static boolean isMoreSpecific (Type[] t1, Type[] t2)
+  {
+    if (t1.length != t2.length)
+      return false;
+    for (int i = t1.length; --i >= 0; )
+      {
+	if (! t1[i].isSubtype(t2[i]))
+	  return false;
+      }
+    return true;
+  }
+
   public void emitIsInstance (CodeAttr code)
   {
     code.emitInstanceof(this);

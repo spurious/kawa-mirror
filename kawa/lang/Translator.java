@@ -21,7 +21,7 @@ import gnu.kawa.util.*;
 public class Translator extends Object
 {
   // Map name to Declaration.
-  public Environment current_decls;
+  public Environment environ;
   ScopeExp current_scope;
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
@@ -60,14 +60,14 @@ public class Translator extends Object
   public Translator (Environment env, SourceMessages messages)
   {
     this.env = env;
-    current_decls = new Environment();
+    environ = new Environment();
     this.messages = messages;
   }
 
   public Translator (Environment env)
   {
     this.env = env;
-    current_decls = new Environment();
+    environ = new Environment();
     messages = new SourceMessages();
   }
 
@@ -161,7 +161,7 @@ public class Translator extends Object
     if (obj instanceof String)
       {
 	String sym = (String) obj;
-	obj = current_decls.get (sym);
+	obj = environ.get (sym);
 
         if (obj instanceof Syntax)
           return obj;
@@ -301,14 +301,18 @@ public class Translator extends Object
     else if (exp instanceof String)
       {
 	String name = (String) exp;
-	Object binding = current_decls.get (name);
+	Object binding = environ.get (name);
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.  Here, use the original symbol.
 	if (binding != null && binding instanceof String)
 	  return new ReferenceExp ((String) binding);
-	Declaration decl = (Declaration) binding;
-	if (! isLexical(decl))
-	  decl = null;
+	Declaration decl = null;
+        if (binding instanceof Declaration) // ?? FIXME
+          {
+            decl = (Declaration) binding;
+            if (! isLexical(decl))
+              decl = null;
+          }
 	return new ReferenceExp (name, decl);
       }
     else if (exp instanceof Expression)
@@ -443,8 +447,11 @@ public class Translator extends Object
     return defs;
   }
 
+  public ModuleExp module;
+
   public void finishModule(ModuleExp mexp, java.util.Vector forms)
   {
+    module = mexp;
     int nforms = forms.size();
     int ndecls = mexp.countDecls();
     pushDecls(mexp);
@@ -470,52 +477,74 @@ public class Translator extends Object
     */
   }
 
+  /** Used to remember shadowed bindings in environ.
+   * For each binding, we push <old binding>, <name>.
+   * For each new scope, we push <null>. */
+  java.util.Stack shadowStack = new java.util.Stack();
+
+  /** Note a new binding, remembering old binding in the shadowStack. */
+  public void pushBinding(String name, Object value)
+  {
+    Object old = environ.put(name, value);
+    shadowStack.push(old);
+    shadowStack.push(name);
+  }
+
+  public boolean popBinding()
+  {
+    Object name = shadowStack.pop();
+    if (name == null)
+        return false;
+    Object old = shadowStack.pop();
+    if (old == null)
+      environ.remove(name);
+    else
+      environ.put(name, old);
+    return true;
+  }
+
   /**
-   * Insert decl into current_decls.
+   * Insert decl into environ.
    * (Used at rewrite time, not eval time.)
    */
   public void push (Declaration decl)
   {
-    String sym = decl.symbol();
+    String sym = decl.getName();
     if (sym == null)
       return;
-    Object old_decl = current_decls.get (sym);
+    Object old_decl = environ.get (sym);
     if (old_decl != null)
       decl.shadowed = old_decl;
-    current_decls.put (sym, decl);
+    environ.put (sym, decl);
   }
 
-  /** Remove this from Translator.current_decls.
+  /** Remove this from Translator.environ.
    * (Used at rewrite time, not eval time.)
    */
   void pop (Declaration decl)
   {
-    String sym = decl.symbol();
+    String sym = decl.getName();
     if (sym == null)
       return;
     if (decl.shadowed == null)
-      current_decls.remove (sym);
+      environ.remove (sym);
     else
-      current_decls.put (sym, decl.shadowed);
+      environ.put (sym, decl.shadowed);
   }
 
   public final void pushDecls (ScopeExp scope)
   {
-    for (Variable var = scope.firstVar();  var != null;  var = var.nextVar())
-      {
-	// Don't make artificial variables visible.
-	if (! var.isArtificial())
-	  push((Declaration)var);
-      }
+    shadowStack.push(null);
+    for (Declaration decl = scope.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      push(decl);
   }
 
   public final void popDecls (ScopeExp scope)
   {
-    for (Variable var = scope.firstVar();  var != null;  var = var.nextVar())
-      {
-	if (! var.isArtificial ())
-	  pop((Declaration)var);
-      }
+    for (Declaration decl = scope.firstDecl();
+         decl != null;  decl = decl.nextDecl())
+      pop(decl);
   }
 
   public void push (ScopeExp scope)

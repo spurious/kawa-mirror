@@ -13,14 +13,12 @@ abstract public class Syntax extends Declaration implements Printable
 {
   public Syntax ()
   {
-    super ();
     setSimple(false);
   }
 
   public Syntax (String name)
   {
     setName(name);
-    sym = name;
     setSimple(false);
   }
 

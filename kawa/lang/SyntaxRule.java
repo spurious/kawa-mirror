@@ -71,7 +71,7 @@ public class SyntaxRule implements Compilable
     template_identifiers.copyInto (this.template_identifiers);
     this.captured_decls = new Object[num_identifiers];
     for (int i = num_identifiers;  --i >= 0; )
-      captured_decls[i] = tr.current_decls.get(this.template_identifiers[i]);
+      captured_decls[i] = tr.environ.get(this.template_identifiers[i]);
   }
 
   static final String dots3 = "...";
@@ -266,8 +266,7 @@ public class SyntaxRule implements Compilable
 	String renamed_symbol = Symbol.makeUninterned (name);
 	vars[num_variables + i] = renamed_symbol;
         Object captured = captured_decls == null ? null : captured_decls[i];
-	tr.current_decls.put (renamed_symbol,
-                              captured == null ? name : captured);
+	tr.environ.put(renamed_symbol, captured == null ? name : captured);
       }
     return execute_template (0, vars, 0, indexes, tr, form);
   }

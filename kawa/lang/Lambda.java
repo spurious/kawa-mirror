@@ -239,7 +239,6 @@ public class Lambda extends Syntax implements Printable
             decl.setFile(declPos.getFile());
             decl.setLine(declPos.getLine(), declPos.getColumn());
           }
-	decl.setParameter(true);
 	if (typeSpec != null)
 	  decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
 	decl.noteValue(null);  // Does not have a known value.
@@ -248,7 +247,6 @@ public class Lambda extends Syntax implements Printable
     if (bindings instanceof String)
       {
 	Declaration decl = lexp.addDeclaration ((String) bindings);
-	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
 	tr.push(decl);
       }

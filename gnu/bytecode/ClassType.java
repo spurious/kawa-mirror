@@ -114,9 +114,28 @@ public class ClassType extends ObjectType
     setSignature("L"+name+";");
   }
 
+  SourceDebugExtAttr sourceDbgExt;
+
+  /** Create a <code>SourceDebugExtAttr</code>, if needed, and
+   * set the "stratum".  The stratum is typically a programming language
+   * such as "JSP", "Scheme", or "Java" (the default). */
+  public void setStratum (String stratum)
+  {
+    if (sourceDbgExt == null)
+      sourceDbgExt = new SourceDebugExtAttr(this);
+    sourceDbgExt.addStratum(stratum);
+  }
+
   /** Set the name of the SourceFile associated with this class. */
   public void setSourceFile (String name)
   {
+    if (sourceDbgExt != null)
+      {
+	sourceDbgExt.addFile(name);
+	if (sourceDbgExt.fileCount > 0)
+	  return;
+      }
+    name = SourceFileAttr.fixSourceFile(name);
     SourceFileAttr.setSourceFile(this, name);
   }
 

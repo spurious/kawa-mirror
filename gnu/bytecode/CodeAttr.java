@@ -27,6 +27,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   LineNumbersAttr lines;
   public LocalVarsAttr locals;
 
+  SourceDebugExtAttr sourceDbgExt;
+
   // In hindsight, maintaining stack_types is more hassle than it is worth.
   // Instead, better to just keep track of SP, which should catch most
   // stack errors, while being more general and less hassle.  FIXME.
@@ -70,10 +72,10 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** The offsets points to 3 bytes that should be deleted. */
   static final int FIXUP_DELETE3 = 8;
   /** The following instructions are moved to later in the code stream.
-   * Instead the instructions starting at the fixup label are patching here.
+   * Instead the instructions starting at the fixup label are patched here.
    * (If the fixup label is null, we're done.)
    * This allows re-arranging code to avoid unneeded gotos.
-   * The following intstruction is the target of a later FIXUP_MOVE,
+   * The following instruction is the target of a later FIXUP_MOVE,
    * and we'll insert then when we get to it. */
   static final int FIXUP_MOVE = 9;
   /** The following instructions are moved to the end of the code stream.
@@ -267,8 +269,16 @@ public class CodeAttr extends Attribute implements AttrContainer
     put2(cnst.index);
   }
 
+  public final void putLineNumber (String filename, int linenumber)
+  {
+    getMethod().classfile.setSourceFile(filename);
+    putLineNumber(linenumber);
+  }
+
   public final void putLineNumber (int linenumber)
   {
+    if (sourceDbgExt != null)
+      linenumber = sourceDbgExt.fixLine(linenumber);
     fixupAdd(FIXUP_LINE_PC, null);
     fixupAdd(FIXUP_LINE_NUMBER, linenumber, null);
   }

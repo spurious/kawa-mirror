@@ -122,6 +122,7 @@ public class Method implements AttrContainer {
     if (classfile.constants == null)
       classfile.constants = new ConstantPool();
     prepareCode(0);
+    code.sourceDbgExt = classfile.sourceDbgExt;
     code.pushScope();
   }
 

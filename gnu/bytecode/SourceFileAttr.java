@@ -21,6 +21,18 @@ public class SourceFileAttr extends Attribute
     filename_index = 0;
   }
 
+  public static String fixSourceFile (String fname)
+  {
+    String fsep = System.getProperty("file.separator", "/");
+    if (fsep != null && fsep.length() == 1)
+      {
+	char fsep0 = fsep.charAt(0);
+	if (fsep0 != '/')
+	  fname = fname.replace(fsep0, '/');
+      }
+    return fname;
+  }
+
   public static void setSourceFile (ClassType cl, String filename)
   {
     Attribute attr = Attribute.get (cl, "SourceFile");

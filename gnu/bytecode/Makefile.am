@@ -24,6 +24,7 @@ LineNumbersAttr.java LocalVarsAttr.java InnerClassesAttr.java \
 MiscAttr.java \
 PrimType.java \
 Scope.java \
+SourceDebugExtAttr.java \
 SourceFileAttr.java \
 Type.java \
 Variable.java \

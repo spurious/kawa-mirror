@@ -204,10 +204,13 @@ public class ClassFileInput extends DataInputStream
       }
     else if (name == "LocalVariableTable" && container instanceof CodeAttr)
       {
-	LocalVarsAttr attr = new LocalVarsAttr((CodeAttr) container);
+	CodeAttr code = (CodeAttr) container;
+	LocalVarsAttr attr = new LocalVarsAttr(code);
 	Method method = attr.getMethod();
 	if (attr.parameter_scope == null)
 	  attr.parameter_scope = method.pushScope();
+	if (attr.parameter_scope.end == null)
+	  attr.parameter_scope.end = new Label(code.PC);
 	Scope scope = attr.parameter_scope;
 	ConstantPool constants = method.getConstants();
         int count = readUnsignedShort();
@@ -254,6 +257,16 @@ public class ClassFileInput extends DataInputStream
 	  exn_indices[i] = readShort();
         meth.setExceptions(exn_indices);
 	return meth.getExceptionAttr();
+      }
+    else if (name == "SourceDebugExtension" && container instanceof ClassType)
+      {
+	SourceDebugExtAttr attr
+	  = new SourceDebugExtAttr((ClassType) container);
+	byte[] data = new byte[length];
+	readFully(data, 0, length);
+	attr.data = data;
+	attr.dlength = length;
+	return attr;
       }
     else
       {

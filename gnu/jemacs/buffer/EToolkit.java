@@ -8,7 +8,9 @@ import java.awt.Color;
 
 public abstract class EToolkit
 {
-  public static String defaultToolkit = "gnu.jemacs.swing.SwingToolkit";
+  public static final String swingToolkit = "gnu.jemacs.swing.SwingToolkit";
+  public static final String swtToolkit = "gnu.jemacs.swt.SwtToolkit";
+  public static String defaultToolkit = swingToolkit;
   static EToolkit instance;
   static Class toolkitClass;
 
@@ -17,7 +19,14 @@ public abstract class EToolkit
     EToolkit inst = instance;
     if (inst != null)
       return inst;
-    return getInstance(defaultToolkit);
+    String name = System.getProperty("gnu.jemacs.toolkit");
+    if (name == null)
+      name = defaultToolkit;
+    else if (name.equals("swing"))
+      name = swingToolkit;
+    else if (name.equals("swt"))
+      name = swtToolkit;
+    return getInstance(name);
   }
 
   public static synchronized EToolkit getInstance (String toolkitClassname)

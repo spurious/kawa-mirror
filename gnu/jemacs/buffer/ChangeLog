@@ -1,3 +1,8 @@
+2004-08-23  Per Bothner  <per@bothner.com>
+
+	* EToolkit.java	(swingToolkit, swtToolkit):  New constants.
+	(getInstance):  Get gnu.jemacs.toolkit property to select toolkit.
+
 2004-08-04  Christian Surlykke <christian@surlykke.dk>
 
 	* Buffer.java (invoke): New abstract method 

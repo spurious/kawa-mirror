@@ -204,7 +204,9 @@ apply.class \
 map.class \
 callcc.class \
 exit.class \
-ashift.class \
+logand.class logior.class logxor.class lognot.class logop.class \
+logbit_p.class logtest.class logcount.class \
+ashift.class bit_extract.class int_length.class \
 define.class \
 define_syntax.class \
 syntax_error.class \
@@ -214,7 +216,6 @@ begin.class \
 ifp.class \
 values_v.class \
 call_with_values.class \
-int_length.class \
 Scheme.class \
 null_env.class \
 user_env.class \

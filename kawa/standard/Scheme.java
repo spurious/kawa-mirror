@@ -319,14 +319,59 @@ public class Scheme extends Interpreter
       user_environment.setName ("interaction-environment");
       env = user_environment;
       define_proc ("exit", "kawa.standard.exit");
-      define_proc ("arithmetic-shift", "kawa.standard.ashift");
+
+      Symbol sym = Symbol.make ("arithmetic-shift");
+      proc = new AutoloadProcedure (sym, "kawa.standard.ashift");
+      define (sym, proc);
+      define ("ash", proc);
+      define_proc ("logand", "kawa.standard.logand");
+      define_proc ("logior", "kawa.standard.logior");
+      define_proc ("logxor", "kawa.standard.logxor");
+      define_proc ("lognot", "kawa.standard.lognot");
+      define_proc ("logop", "kawa.standard.logop");
+      define_proc ("logbit?", "kawa.standard.logbit_p");
+      define_proc ("logtest", "kawa.standard.logtest");
+      define_proc ("logcount", "kawa.standard.logcount");
+      define_proc ("bit-extract", "kawa.standard.bit_extract");
+      define_proc ("integer-length", "kawa.standard.int_length");
+
       //-- (when cond exp ...)
       define_syntax ("when", "kawa.lib.when_unless");
       //-- (unless cond exp ...)
       define_syntax ("unless", "kawa.lib.when_unless");
-      define_proc ("integer-length", "kawa.standard.int_length");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
    }
+
+  /** Evalutate Scheme expressions from string.
+   * @param string the string constaining Scheme expressions
+   * @param env the Environment to evaluate the string in
+   * @return result of last expression, or Interpreter.voidObject if none. */
+  public static Object eval (String string, Environment env)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    return eval (call_with_input_string.open_input_string (string), env);
+  }
+
+  /** Evalutate Scheme expressions from stream.
+   * @param port the port to read Scheme expressions from
+   * @param env the Environment to evaluate the string in
+   * @return result of last expression, or Interpreter.voidObject if none. */
+  public static Object eval (InPort port, Environment env)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    return Eval.eval (CompileFile.read (port, env), env);
+  }
+
+  /** Evalutate Scheme expressions from an "S expression."
+   * @param sexpr the S expression to evaluate
+   * @param env the Environment to evaluate the string in
+   * @return result of the expression. */
+  public static Object eval (Object sexpr, Environment env)
+       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  {
+    return Eval.eval (sexpr, env);
+  }
+
 }

@@ -52,7 +52,7 @@ class kawa
 	    if (iArg == args.length)
 	      bad_option (arg);
 	    setArgs (args, iArg+1);
-	    Shell.runFile (args[iArg], interpreter, false);
+	    Shell.runFile (args[iArg]);
 	    something_done = true;
 	  }
 	else if (arg.equals ("-s") || arg.equals ("--"))
@@ -73,7 +73,7 @@ class kawa
     if (iArg < args.length)
       {
 	setArgs (args, iArg+1);
-	Shell.runFile (args[iArg], interpreter, false);
+	Shell.runFile (args[iArg]);
       }
     else
       {

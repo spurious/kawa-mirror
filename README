@@ -12,6 +12,9 @@ The file NEWS summarizes recent changes.
 
 The file Compliance.html summarizes divergence from the R4RS.
 
+A slightly out-of-date design document discussing how to compile
+Scheme into Java is in http://www.cygnus.com/~bothner/scm2java.html.
+
 Authors
 =======
 R. Alexander Milowski <alex@copsol.com> wrote and released

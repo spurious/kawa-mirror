@@ -1,3 +1,43 @@
+Mon Oct 21 12:58:17 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/Shell.java (runFile):  Re-write to call load.loadSource.
+	This forces compilation, which has better line number support.
+	Also rmeoved unused formal parameters.
+	* kawa.java:  Update for new Shell.runFile calling convention.
+
+	* kawa/standard/Scheme.java:  Update string -> string_v.
+
+	* kawa/lang/FString.java:  New file.  Replaces uses of StringBuffer.
+	* kawa/lang/Makefile.{am,in}:  Add FString.class.
+	* kawa/lang/InPort.java (readString):  Return FString not StringBuffer.
+	* kawa/lang/Literal.java (emit):  Remove StringBuffer support.
+	* kawa/lang/Compilation.java:  Likewise.
+
+	* kawa/lang/Sequence.java (eofValue):  New static.
+	* kawa/lang/Interpreter.java (eofObject):  Removed.
+	* kawa/lang/Compilation.java (scmSequenceType):  Added.
+
+	* kawa/lang/Compilation.java (mangleClassName): Handle general Unicode.
+	
+	* kawa/Shell.java, kawa/lang/{CompileFile,InPort}.java,
+	kawa/standard/{eof_object_p,load,readchar}.java:
+	Update Interpreter.eofObject -> Sequence.eofValue.
+
+	* kawa/standard/{string_ci_equal_p,string_ci_greaterequal_p,
+	string_ci_greaterthan_p,string_ci_lessequal_p,string_ci_lessthan_p,
+	string_copy,string_equal_p,string_greaterequal_p,string_greaterthan_p,
+	string_lessequal_p,string_lessthan_p,with_input_from_file,
+	with_output_to_file}.java:  Remove StringBuffer coercion.
+ 	This makes the code more general, efficient, and handles FString.
+
+	* kawa/standard/{call_with_input_file,call_with_output_file,
+	call_with_output_string,list2string,make_string,number2string,
+	open_input_file,open_output_file,string2list,string2symbol,
+	string_append,string_fill_b,string_length,string_p,string_ref,
+	string_set_b,string_v,substring,symbol2string}.java:
+	Update from StringBuffer to FString for Scheme string values.
+	* kawa/lang/CompileFile.java:  Likewise.
+
 Fri Oct 18 14:06:40 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Environment.java:  Rewrite.

@@ -919,12 +919,7 @@ public class ClassType extends ObjectType
    */
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    String name = getName();
-    Type found = lookupType(name);
-    if (found != this)
-      throw new IOException("serializing "+this+" not in class table not implemented");
-    else
-      out.writeUTF(name);
+    out.writeUTF(getName());
   }
 
   public void readExternal(ObjectInput in)

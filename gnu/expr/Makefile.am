@@ -9,6 +9,7 @@ javadir=$(datadir)/java/$(subdir)
 java_JAVA=\
   ApplyExp.java \
   BeginExp.java \
+  BindingInitializer.java \
   BlockExp.java \
   CatchClause.java \
   ChainLambdas.java \

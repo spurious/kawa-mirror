@@ -1,3 +1,7 @@
+2001-04-23  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (setArgs):  New method.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* ApplyExpr.java (compile):  After too many/few-arguments message,

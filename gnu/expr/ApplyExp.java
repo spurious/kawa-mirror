@@ -21,6 +21,7 @@ public class ApplyExp extends Expression
 
   public final Expression getFunction() { return func; }
   public final Expression[] getArgs() { return args; }
+  public void setArgs(Expression[] args) { this.args = args; }
   public final boolean isTailCall() { return tailCall; }
   public final void setTailCall(boolean tailCall) { this.tailCall = tailCall; }
 

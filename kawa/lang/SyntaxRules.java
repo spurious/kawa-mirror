@@ -34,7 +34,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
     this.literal_identifiers = literal_identifiers;
     int rules_count = LList.listLength(srules, false);
-    if (rules_count <= 0)
+    if (rules_count < 0)
       {
 	rules_count = 0;
 	tr.syntaxError ("missing or invalid syntax-rules");

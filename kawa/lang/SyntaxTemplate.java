@@ -40,19 +40,9 @@ public class SyntaxTemplate implements Externalizable
    * another subtemplate to be spliced (appended) to the repetition. */
   static final int BUILD_REPEAT = (3<<3)+BUILD_MISC;
 
-  /** Build a vector (an <code>FVector</code>) from following sub-expressions.
-   * Followed by a length N, then 1+VAR_NO, then for each I, where 0<=I<N:
-   * a length of the sub-expression for element I, followed by
-   * the expression for element I itself.  If the pattern has elipsis,
-   * then VAR_NO is a variable from which to get the repeat count; otherwise
-   * VAR_NO is -1. */
+  /** Build a vector (an <code>FVector</code>) from following sub-expression.
+   * The latter must evaluate to a list. */
   static final int BUILD_VECTOR = (5<<3)+BUILD_MISC;
-
-  /* A sub-expression to be repeated a pattern-determined number of times.
-   * Each value is inserted into the curent vector.
-   * Corresponds to '...' (except BUILD_VEC_REPEAT is a prefix operator,
-   * not suffix) in a vector template. */
-  static final int BUILD_VEC_REPEAT = (6<<3)+BUILD_MISC;
 
   /** Instruction to creat a <code>Pair</code> from sub-expressions.
    * Instruction <code>BUILD_CONS+4*delta</code> is followed by a
@@ -116,8 +106,6 @@ public class SyntaxTemplate implements Externalizable
 	  ps.println (" - LIST1");
 	else if (ch == BUILD_SYNTAX)
 	  ps.println (" - SYNTAX");
-	else if (ch == BUILD_VEC_REPEAT)
-	  ps.println (" - VEC_REPEAT");
 	else if (ch == BUILD_REPEAT)
 	  {
 	    int var_num = template_program.charAt(++i);
@@ -125,21 +113,7 @@ public class SyntaxTemplate implements Externalizable
 	    ps.println (" - BUILD_REPEAT var:"+var_num+" width:"+width);
 	  }
 	else if (ch == BUILD_VECTOR)
-	  {
-	    int count = template_program.charAt(++i);
-	    int var_num = (short) template_program.charAt(++i);
-	    ps.println (" - BUILD_VECTOR count:"+count+" var:"+(var_num-1));
-	    int j = 0;
-	    i++;
-	    while (j < count)
-	      {
- 		int width = template_program.charAt(i);
-		ps.println("  " + i + ": width of element "+j+": "+width);
-		print_template_program(patternNames, ps,
-				       ++i, i += width);
-		j++;
-	      }
-	  }
+	  ps.println (" - VECTOR");
 	else if ((ch & 7) == BUILD_CONS)
 	  ps.println (" - CONS "+(ch >> 3));
 	else if ((ch & 7) == BUILD_LITERAL)
@@ -293,50 +267,10 @@ public class SyntaxTemplate implements Externalizable
       }
     else if (form instanceof FVector)
       {
-	int save_pc = template_program.length();
-	int save_literals = literals_vector.size();
-	int ret = -2;
-	FVector vec = (FVector) form;
-	int len = vec.size();
-	int var_num = -1;
 	template_program.append((char) BUILD_VECTOR);
-	template_program.append((char) len);
-	template_program.append('\0'); /* var_num if ellipsis, to be patched */
-	int element_start = save_pc + 3;
-	for (int i = 0;  i < len;  i++)
-	  {
-	    template_program.append((char) 0);
-	    boolean repeat = i + 1 < len && vec.get(i+1) == dots3;
-	    if (repeat)
-	      template_program.append((char) BUILD_VEC_REPEAT);
-	    int ret2 = convert_template (vec.get(i), template_program,
-					 repeat ? (nesting + 1) : nesting,
-					 literals_vector, seen, tr);
-	    if (repeat)
-	      {
-		if (nesting >= max_nesting)
-		  max_nesting = nesting + 1;
-		if (var_num >= 0)
-		  tr.syntaxError("more than one '...' in vector template");
-		if (ret2 <= -1)	
-		  tr.syntaxError ("... follows template with no suitably-nested pattern variable");
-		else
-		  var_num = ret2;
-		template_program.setCharAt(save_pc + 1, (char) (len - 2));
-		template_program.setCharAt(save_pc + 2, (char) (ret2 + 1));
-		i++;
-	      }
-	    if (ret2 > ret)
-	      ret = ret2;
-	    int element_end = template_program.length();
-	    template_program.setCharAt(element_start,
-				       (char) (element_end - element_start - 1));
-	    element_start = element_end;
-	  }
-	if (ret >= -1)
-	  return ret;
-	literals_vector.setSize(save_literals);
-	template_program.setLength(save_pc);
+	return convert_template(LList.makeList((FVector) form),
+				template_program, nesting,
+				literals_vector, seen, tr);
       }
     else if (form instanceof String
 	     && tr != null && tr.patternScope != null)
@@ -528,48 +462,8 @@ public class SyntaxTemplate implements Externalizable
       }
     else if (ch == BUILD_VECTOR)
       {
-	int count = (int) template_program.charAt(++pc);
-	int var_num = (short) template_program.charAt(++pc) - 1;
-	int var_count;
-	int size;
-	if (var_num < 0)
-	  {
-	    size = count;
-	    var_count = 0;
-	  }
-	else
-	  {
-	    var_count = get_count(vars[var_num], nesting, indexes);
-	  }
-	size = count + var_count;
-	FVector vec = new FVector(size);
-	int i = 0;
-	pc++;
-	while (i < size)
-	  {
-	    int width = (int) template_program.charAt(pc++);
-	    if (template_program.charAt(pc) == BUILD_VEC_REPEAT)
-	      {
-		for (int j = 0;  j < var_count;  j++)
-		  {
-		    indexes[nesting] = j;
-		    Object el = execute (pc + 1, vars, nesting + 1,
-					 indexes, tr, templateScope);
-		    if (el instanceof SyntaxForm)
-		      el = ((SyntaxForm) el).form;
-		    vec.set(i++, el);
-		  }
-	      }
-	    else
-	      {
-		Object el = execute(pc, vars, nesting, indexes, tr, templateScope);
-		if (el instanceof SyntaxForm)
-		  el = ((SyntaxForm) el).form;
-		vec.set(i++, el);
-	      }
-	    pc += width;
-	  }
-	return vec;
+	Object el = execute(pc+1, vars, nesting, indexes, tr, templateScope);
+	return new FVector((LList) el);
       }
     else if ((ch & 7) == BUILD_LITERAL)
       {

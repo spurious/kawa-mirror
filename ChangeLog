@@ -1,3 +1,13 @@
+2004-12-18  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/SyntaxRules.java (<init>):  Allow an empty list in
+	syntax-rules, since R%RS does.
+
+	* kawa/lang/SyntaxTemplate.java (BUILD_VECTOR): Simplify implemenation.
+	(BUILD_VEC_REPEAT): Remove non-longer-used constant.
+	(print_template_program): Update accordingly.
+	(convert_template, execute): Vector handling is now trivial.
+
 2004-12-08  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java: Update for new Environment handling.

@@ -34,6 +34,14 @@ public abstract class AbstractString extends UniformVector implements Printable
       dst[dstBegin++] = charAt(i);
   }
 
+  public InPort open ()
+  {
+    int len = length();
+    char[] buffer = new char[len];
+    getChars(0, len, buffer, 0);
+    return new CharArrayInPort(buffer, len);
+  }
+
   /**
    * Write out (part of) this string.
    * @param start index of initial character to write
@@ -237,6 +245,14 @@ public abstract class AbstractString extends UniformVector implements Printable
   public AbstractString subString(int fromPosition, int toPosition)
   {
     return new SubString(this, fromPosition, toPosition);
+  }
+
+  /** Delete a sub-range of the string.
+   */
+  public void deleteRange(int fromPosition, int toPosition)
+  {
+    throw new RuntimeException("delete not implemented for "
+			       + getClass().getName());
   }
 
   public int getStartPosition()

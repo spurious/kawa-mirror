@@ -147,6 +147,13 @@ public class CharBuffer extends AbstractString
     string.getChars(0, count, array, where);
   }
 
+  public void deleteRange(int fromPosition, int toPosition)
+  {
+    int fromOffset = getPositionOffset(fromPosition);
+    int toOffset = getPositionOffset(toPosition);
+    delete(fromOffset, toOffset - fromOffset);
+  }
+
   public void delete(int where, int count)
   {
     // Adjust the positions.

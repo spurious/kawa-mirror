@@ -18,6 +18,7 @@ public class location extends Syntax implements Printable
   /** Assuming obj is in an lvalue context, re-write it. */
   public static Expression rewriteArg (Object obj, Translator tr)
   {
+    // FIXME! Do we need this?  Why not just call tr.rewrite(obj) ?
     while (obj instanceof Pair)
       {
 	Pair pair = (Pair) obj;
@@ -66,21 +67,8 @@ public class location extends Syntax implements Printable
 	rexp.setDontDereference(true);
 	Declaration binding = rexp.getBinding();
 	if (binding != null && binding.isLexical())
-	  {
-	    binding.setIndirectBinding(true);
-	    return rexp;
-	  }
-	else
-	  {
-	    gnu.bytecode.Method meth = Compilation.typeEnvironment
-	      .addMethod("getCurrentBinding", Compilation.string1Arg,
-			 Compilation.typeBinding,
-			 Access.PUBLIC|Access.STATIC);
-	    Expression proc = new QuoteExp(new PrimProcedure(meth));
-	    Expression[] args = new Expression[1];
-	    args[0] = new QuoteExp(rexp.getName());
-	    return new ApplyExp(proc, args);
-	  }
+	  binding.setIndirectBinding(true);
+	return rexp;
       }
     if (arg instanceof ApplyExp)
       {

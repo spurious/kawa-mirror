@@ -37,9 +37,10 @@ class MPN
     long carry = 0;
     for (int i = 0; i < len;  i++)
       {
-	carry = (long) x[i] + (long) y[i] + carry;
+	carry += ((long) x[i] & 0xffffffffL) 
+	  + ((long) y[i] & 0xffffffffL);
 	dest[i] = (int) carry;
-	carry = (carry >> 32) & 1;
+	carry >>>= 32;
       }
     return (int) carry;
   }
@@ -58,9 +59,8 @@ class MPN
 	int y = Y[i];
 	int x = X[i];
 	y += cy;	/* add previous carry to subtrahend */
-	// Invert the high-order bit, because:
-	// (unsigned) X > (unsigned) y iff
-	// (int) (x^0x80000000) > (int) (y^0x80000000).
+	// Invert the high-order bit, because: (unsigned) X > (unsigned) Y
+	// iff: (int) (X^0x80000000) > (int) (Y^0x80000000).
 	cy = (y^0x80000000) < (cy^0x80000000) ? 1 : 0;
 	y = x - y;
 	cy += (y^0x80000000) > (x ^ 0x80000000) ? 1 : 0;
@@ -112,8 +112,9 @@ class MPN
 	long carry = 0;
 	for (int j = 0;  j < xlen; j++)
 	  {
-	    carry += ((long) x[j] & 0xffffffffL) * yword;
-	    dest[i+j] += (int) carry;
+	    carry += ((long) x[j] & 0xffffffffL) * yword
+	      + ((long) dest[i+j] & 0xffffffffL);
+	    dest[i+j] = (int) carry;
 	    carry >>>= 32;
 	  }
 	dest[i+xlen] = (int) carry;
@@ -173,13 +174,12 @@ class MPN
 	    r = 2 * r + (a0 & 1);
 	    if ((D & 1) != 0)
 	      {
-		r -= q;
 		int k = (r >= q) ? 0 : (q - r <= D) ? 1: 2;
 		r = r - q + k * D;
-		q += k;
+		q -= k;
 	      }
 	  }
-	else				/* Implies c1 = b1 WRONG!! FIXME! */
+	else				/* Implies c1 = b1 */
 	  {				/* Hence a1 = d - 1 = 2*b1 - 1 */
 	    r = a0 + D;
 	    if (a0 >= ((long)(-D) & 0xffffffffL))
@@ -200,7 +200,7 @@ class MPN
      * OK for quotient==dividend.
      */
 
-    public static int divmod_1 (int[] quotient, int[] dividend,
+  public static int divmod_1 (int[] quotient, int[] dividend,
 			      int len, int divisor)
   {
     int i = len - 1;
@@ -223,6 +223,36 @@ class MPN
     return (int)(r >> 32);
   }
 
+  /* Subtract x[0:len-1]*y from dest[offset:offset+len-1].
+   * All values are treated as if unsigned.
+   * @return the most significant word of
+   * the product, minus borrow-out from the subtraction.
+   */
+  public static int submul_1 (int[] dest, int offset, int[] x, int len, int y)
+  {
+    long yl = (long) y & 0xffffffffL;
+    int carry = 0;
+    int j = 0;
+    do
+      {
+	long prod = ((long) x[j] & 0xffffffffL) * yl;
+	int prod_low = (int) prod;
+	int prod_high = (int) (prod >> 32);
+	prod_low += carry;
+	// Invert the high-order bit, because: (unsigned) X > (unsigned) Y
+	// iff: (int) (X^0x80000000) > (int) (Y^0x80000000).
+	carry = ((prod_low ^ 0x80000000) < (carry ^ 0x80000000) ? 1 : 0)
+	  + prod_high;
+	int x_j = dest[offset+j];
+	prod_low = x_j - prod_low;
+	if ((prod_low ^ 0x80000000) > (x_j ^ 0x80000000))
+	  carry++;
+	dest[offset+j] = prod_low;
+      }
+    while (++j < len);
+    return carry;
+  }
+
   /** Divide zds[0:nx] by y[0:ny-1].
    * The remainder ends up in zds[0:ny-1].
    * The quotient ends up in zds[ny:nx].
@@ -235,12 +265,21 @@ class MPN
     // This is basically Knuth's formulation of the classical algorithm,
     // but translated from in scm_divbigbig in Jaffar's SCM implementation.
 
-    // Could be re-implemented using gmp's mpn_devrem:
+    // Correspondance with Knuth's notation:
+    // Knuth's u[0:m+n] == zds[nx:0].
+    // Knuth's v[1:n] == y[ny-1:0]
+    // Knuth's n == ny.
+    // Knuth's m == nx-ny.
+    // Our nx == Knuth's m+n.
+
+    // Could be re-implemented using gmp's mpn_divrem:
     // zds[nx] = mpn_divrem (&zds[ny], 0, zds, nx, y, ny).
 
     int j = nx; 
     do
       {                          // loop over digits of quotient
+	// Knuth's j == our nx-j.
+	// Knuth's u[j:j+n] == our zds[j:j-ny].
 	int qhat;  // treated as unsigned
 	if (zds[j]==y[ny-1])
 	  qhat = -1;  // 0xffffffff
@@ -249,38 +288,25 @@ class MPN
 	    long w = (((long)(zds[j])) << 32) + ((long)zds[j-1] & 0xffffffffL);
 	    qhat = (int) udiv_qrnnd (w, y[ny-1]);
 	  }
-	if (qhat == 0) continue;
-	int i = 0;
-	long num = 0;
-	long t2 = 0;   // treated as unsigned
-	do
-	  {                        // multiply and subtract
-	    t2 += ((long) y[i] & 0xffffffffL) * ((long) qhat & 0xffffffffL);
-	    num += ((long)zds[j - ny + i] &0xffffffffL) - (t2 & 0xffffffffL);
-	    long num_adjust = num;
-	    if (num < 0)
+	if (qhat != 0)
+	  {
+	    int borrow = submul_1 (zds, j - ny, y, ny, qhat);
+	    int save = zds[j];
+	    long num = ((long)save&0xffffffffL) - ((long)borrow&0xffffffffL);
+            while (num != 0)
 	      {
-		num_adjust += 0x100000000L;
-		num = -1;
+		qhat--;
+		long carry = 0;
+		for (int i = 0;  i < ny; i++)
+		  {
+		    carry += ((long) zds[j-ny+i] & 0xffffffffL)
+		      + ((long) y[i] & 0xffffffffL);
+		    zds[j-ny+i] = (int) carry;
+		    carry >>>= 32;
+		  }
+		zds[j] += carry;
+		num = carry - 1;
 	      }
-	    else
-	      num = 0;
-	    zds[j - ny + i] = (int) num_adjust;
-	    t2 = t2 >>> 32;
-	  } while (++i < ny);
-	//borrow from high digit; don't update
-	num += ((long)zds[j - ny + i] & 0xffffffffL) - (t2 & 0xffffffffL);
-	while (num != 0)
-	  {	// "add back" required
-	    i = 0; num = 0; qhat--;
-	    do
-	      {
-		num += 
-		  ((long) zds[j - ny + i] + (long) y[i]) & 0x1ffffffffL;
-		zds[j - ny + i] = (int) num;
-		num >>= 32;
-	      } while (++i < ny);
-	    num--;
 	  }
 	zds[j] = qhat;
       } while (--j >= ny);
@@ -325,36 +351,6 @@ class MPN
       return 1;
   }
 
-  /** radix**chars_per_word, i.e. the biggest number that fits a word,
-   * built by factors of base.  Exception: For 2, 4, 8, etc,
-   * big_base is log2(base), i.e. the number of bits used to represent
-   * each digit in the base.
-   * Same as gmp's __mp_bases[radix].big_base.
-   */
-  static public int big_base (int radix)
-  {
-    if (radix == 10)
-      return 0x3b9aca00;
-    else if (radix == 16)
-      return 4;
-    else if ((radix & (radix - 1)) == 0)
-      {
-	for (int i = 0; ; i++)
-	  {
-	    radix >>= 1;
-	    if (radix == 0)
-	      return i;
-	  }
-      }
-    else
-      {
-	int power = 1;
-	for (int i = radix;  --i >= 0; )
-	  power *= radix;
-	return power;
-      }
-  }
-
   /** Count the number of leading zero bits in an int. */
   public static int count_leading_zeros (int i)
   {
@@ -373,7 +369,6 @@ class MPN
 
   public static int set_str (int dest[], byte[] str, int str_len, int base)
   {
-    int big_base = MPN.big_base (base);
     int size = 0;
     if ((base & (base - 1)) == 0)
       {
@@ -381,7 +376,8 @@ class MPN
 	// least to most significant character/digit.  */
  
 	int next_bitpos = 0;
-	int bits_per_indigit = big_base;
+	int bits_per_indigit = 0;
+	for (int i = base; (i >>= 1) != 0; ) bits_per_indigit++;
 	int res_digit = 0;
  
 	for (int i = str_len;  --i >= 0; )
@@ -404,59 +400,34 @@ class MPN
       {
 	// General case.  The base is not a power of 2.
 	int indigits_per_limb = MPN.chars_per_word (base);
-	int j;
-	int cy_limb;
 	int str_pos = 0;
-	int res_digit;
-	int i;
  
-	for (i = indigits_per_limb ; i < str_len; i += indigits_per_limb)
+	while (str_pos < str_len)
 	  {
-	    res_digit = str[str_pos++];
-	    for (j = 1; j < indigits_per_limb; j++)
-	      res_digit = res_digit * base + str[str_pos++];
- 
-	    if (size == 0)
+	    int chunk = str_len - str_pos;
+	    if (chunk > indigits_per_limb)
+	      chunk = indigits_per_limb;
+	    int res_digit = str[str_pos++];
+	    int big_base = base;
+
+	    while (--chunk > 0)
 	      {
-		if (res_digit != 0)
-		  {
-		    dest[0] = res_digit;
-		    size = 1;
-		  }
+		res_digit = res_digit * base + str[str_pos++];
+		big_base *= base;
 	      }
+ 
+	    int cy_limb;
+	    if (size == 0)
+	      cy_limb = res_digit;
 	    else
 	      {
 		cy_limb = MPN.mul_1 (dest, dest, size, big_base);
 		cy_limb += MPN.add_1 (dest, dest, size, res_digit);
-		if (cy_limb != 0)
-		  dest[size++] = cy_limb;
 	      }
-	  }
- 
-        big_base = base;
-	res_digit = str[str_pos++];
-	for (j = 1; j < str_len - (i - indigits_per_limb); j++)
-	  {
-	    res_digit = res_digit * base + str[str_pos++];
-	    big_base *= base;
-	  }
-      
-	if (size == 0)
-	  {
-	    if (res_digit != 0)
-	      {
-		dest[0] = res_digit;
-		size = 1;
-	      }
-	  }
-	else
-	  {
-	    cy_limb = MPN.mul_1 (dest, dest, size, big_base);
-	    cy_limb += MPN.add_1 (dest, dest, size, res_digit);
 	    if (cy_limb != 0)
 	      dest[size++] = cy_limb;
 	  }
-      }
+       }
     return size;
   }
 
@@ -512,6 +483,30 @@ class MPN
       }
     dest[i-1] = low_word >>> count;
     return retval;
+  }
+
+  /** Return the long-truncated value of right shifting.
+  * @param x a two's-complement "bignum"
+  * @param len the number of significant words in x
+  * @param count the shift count
+  * @return (long)(x[0..len-1] >> count).
+  */
+  public static long rshift_long (int[] x, int len, int count)
+  {
+    int wordno = count >> 5;
+    count &= 31;
+    int sign = x[len-1] < 0 ? -1 : 0;
+    int w0 = wordno >= len ? sign : x[wordno];
+    wordno++;
+    int w1 = wordno >= len ? sign : x[wordno];
+    if (count != 0)
+      {
+	wordno++;
+	int w2 = wordno >= len ? sign : x[wordno];
+	w0 = (w0 >>> count) | (w1 << (32-count));
+	w1 = (w1 >>> count) | (w2 << (32-count));
+      }
+    return ((long)w1 << 32) | ((long)w0 & 0xffffffffL);
   }
 
   /* Shift x[0:len-1]count bits to the "right" (i.e. divide by 2**count).
@@ -689,4 +684,27 @@ class MPN
     len--;
     return intLength (words[len]) + 32 * len;
   }
+
+  /* DEBUGGING:
+  public static void dprint (IntNum x)
+  {
+    if (x.words == null)
+      System.err.print(Long.toString((long) x.ival & 0xffffffffL, 16));
+    else
+      dprint (System.err, x.words, x.ival);
+  }
+  public static void dprint (int[] x) { dprint (System.err, x, x.length); }
+  public static void dprint (int[] x, int len) { dprint (System.err, x, len); }
+  public static void dprint (java.io.PrintStream ps, int[] x, int len)
+  {
+    ps.print('(');
+    for (int i = 0;  i < len; i++)
+      {
+	if (i > 0)
+	  ps.print (' ');
+	ps.print ("#x" + Long.toString ((long) x[i] & 0xffffffffL, 16));
+      }
+    ps.print(')');
+  }
+  */
 }

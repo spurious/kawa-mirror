@@ -60,6 +60,12 @@ public class IntNum extends RatNum implements Compilable
     return smallFixNums[1 - minFixNum];
   }
 
+  /** Return the IntNum for -1. */
+  public static IntNum minusOne ()
+  {
+    return smallFixNums[-1 - minFixNum];
+  }
+
   /** Return a (possibly-shared) IntNum with a given long value. */
   public static IntNum make (long value)
   {
@@ -73,6 +79,21 @@ public class IntNum extends RatNum implements Compilable
     result.words[0] = i;
     result.words[1] = (int) (value >> 32);
     return result;
+  }
+
+  /** Make an IntNum from an array of words.
+   * The array may be reused (i.e. not copied). */
+  public static IntNum make (int[] words, int len)
+  {
+    if (words == null)
+      return make (len);
+    len = IntNum.wordsNeeded (words, len);
+    if (len <= 0)
+      return len == 0 ? zero () : make (words[0]);
+    IntNum num = new IntNum ();
+    num.words = words;
+    num.ival = len;
+    return num;
   }
 
   /** Allocate a new non-shared IntNum.
@@ -165,20 +186,25 @@ public class IntNum extends RatNum implements Compilable
     return ((RealNum)obj).compare_reversed (this);
   }
 
-  public boolean isOdd ()
+  public final boolean isOdd ()
   {
     int low = words == null ? ival : words[0];
     return (low & 1) != 0;
   }
 
-  public boolean isZero ()
+  public final boolean isZero ()
   {
     return words == null && ival == 0;
   }
 
-  public boolean isOne ()
+  public final boolean isOne ()
   {
     return words == null && ival == 1;
+  }
+
+  public final boolean isMinusOne ()
+  {
+    return words == null && ival == -1;
   }
 
   /** Calculate how many words are significant in words[0:len-1].
@@ -188,20 +214,20 @@ public class IntNum extends RatNum implements Compilable
   public static int wordsNeeded (int[] words, int len)
   {
     int i = len;
-    int word = words[--i];
-    if (word == -1)
+    if (i > 0)
       {
-	while (i > 0 && (word = words[i-1]) < 0)
+	int word = words[--i];
+	if (word == -1)
 	  {
-	    i--;
-	    if (word != -1) break;
+	    while (i > 0 && (word = words[i-1]) < 0)
+	      {
+		i--;
+		if (word != -1) break;
+	      }
 	  }
-      }
-    else
-      {
-	while (word == 0 && i > 0 && (word = words[i-1]) >= 0)
+	else
 	  {
-	    i--;
+	    while (word == 0 && i > 0 && (word = words[i-1]) >= 0)  i--;
 	  }
       }
     return i+1;
@@ -422,25 +448,16 @@ public class IntNum extends RatNum implements Compilable
     IntNum result = alloc (x.ival + 1);
     int i = y.ival;
     long carry = MPN.add_n (result.words, x.words, y.words, i);
-    /*
-    long carry = 0;
-    for (i = 0; i < y.ival;  i++)
-      {
-	carry = ((long) x.words[i] & (long) 0xffffffffL) +
-	  ((long) y.words[i] & (long) 0xffffffffL) + carry;
-	result.words[i] = (int) carry;
-	carry >>= 32;
-      }
-      */
+    long y_ext = y.words[i-1] < 0 ? 0xffffffffL : 0;
     for (; i < x.ival;  i++)
       {
-	carry += (long) x.words[i] & (long) 0xffffffffL;
+	carry += ((long) x.words[i] & 0xffffffffL) + y_ext;;
 	result.words[i] = (int) carry;
-	carry >>= 32;
+	carry >>>= 32;
       }
     if (x.words[i - 1] < 0)
-      carry--;
-    result.words[i] = (int) carry;
+      y_ext--;
+    result.words[i] = (int) (carry + y_ext);
     result.ival = i+1;
     return result.canonicalize ();
   }
@@ -650,7 +667,6 @@ public class IntNum extends RatNum implements Compilable
 	// numerator the same number of steps (to keep the quotient the same!).
 
 	int nshift = MPN.count_leading_zeros (ywords[ylen-1]);
-	
 	if (nshift != 0)
 	  {
 	    // Shift up the denominator setting the most significant bit of
@@ -669,8 +685,10 @@ public class IntNum extends RatNum implements Compilable
 	rlen = ylen;
 	if (remainder != null || rounding_mode != TRUNCATE)
 	  {
-	    // Optimize nshift == FIXME
-	    MPN.rshift (ywords, xwords, 0, rlen, nshift);
+	    if (nshift == 0)
+	      System.arraycopy (xwords, 0, ywords, 0, rlen);
+	    else
+	      MPN.rshift (ywords, xwords, 0, rlen, nshift);
 	  }
 
 	qlen = xlen+1-ylen;
@@ -756,50 +774,59 @@ public class IntNum extends RatNum implements Compilable
     return rem.canonicalize ();
   }
 
-  /*
+  /** Calculate the integral power of an IntNum.
+   * @param x the value (base) to exponentiate
+   * @param y the exponent (must be non-negative)
+   */
   public static IntNum power (IntNum x, int y)
   {
-  }
-  */
-
-  /*
-  public void setTimes (IntNum x, int y)
-  {
-    if (x.words == null)
+    if (y <= 0)
       {
-	set ((long) x.val * (long) y);
-	return;
+	if (y == 0)
+	  return one ();
+	else
+	  throw new Error ("negative exponent");
       }
-    ...;
-  }
-  */
-
-  /** Destructively multiply this by an int. */
-  /*
-  public void setTimes (int y)
-  {
-    if (words == null)
+    if (x.isZero ())
+      return x;
+    int plen = x.words == null ? 1 : x.ival;  // Length of pow2.
+    int blen = ((x.intLength () * y) >> 5) + 2 * plen;
+    boolean negative = x.isNegative () && (y & 1) != 0;
+    int[] pow2 = new int [blen];
+    int[] rwords = new int [blen];
+    int[] work = new int [blen];
+    x.getAbsolute (pow2);	// pow2 = abs(x);
+    int rlen = 1;
+    rwords[0] = 1; // rwords = 1;
+    for (;;)  // for (i = 0;  ; i++)
       {
-	set ((long) ival * (long) y);
+	// pow2 == x**(2**i)
+	// prod = x**(sum(j=0..i-1, (y>>j)&1))
+	if ((y & 1) != 0)
+	  { // r *= pow2
+	    MPN.mul (work, pow2, plen, rwords, rlen);
+	    int[] temp = work;  work = rwords;  rwords = temp;
+	    rlen += plen;
+	    while (rwords[rlen-1] == 0)  rlen--;
+	  }
+	y >>= 1;
+	if (y == 0)
+	  break;
+	// pow2 *= pow2;
+	MPN.mul (work, pow2, plen, pow2, plen);
+	int[] temp = work;  work = pow2;  pow2 = temp;  // swap to avoid a copy
+	plen *= 2;
+	while (pow2[plen-1] == 0)  plen--;
       }
-    else
-      {
-	boolean neg = isNegative ();
-	...;
-      }
+    if (negative)
+      negate (rwords, rwords, rlen);
+    return IntNum.make (rwords, rlen);
   }
-  */
 
   private static final long __umulsidi (int x, int y)
   {
     return ((long)x & 0xffffffffL) * ((long)y & 0xffffffffL);
   }
-
-  /*
-  public static mul_1u (IntNum result, IntNum x, int y)
-  {
-  }
-  */
 
   /** Add an unsigned int to this.
    * @param i add (long)i & 0xFFFFFFF to this.
@@ -1198,7 +1225,38 @@ public class IntNum extends RatNum implements Compilable
       return (double) ival;
     if (ival < 2)
       return (double) longValue ();
-    throw new Error ("not implemented - IntNum.doubleValue for bignum");
+
+    int il = MPN.intLength (words, ival) + 1;
+    long l = MPN.rshift_long (words, ival, il - 64);
+    boolean neg = l < 0;
+    if (neg)
+      l = -l;
+    // l is now properly viewed as unsigned, since the -l might have
+    // overflowed.  For correct rounding, check the bit that we will shift out.
+    if ((l & (1l << 10)) != 0)
+      l += (1l << 11);
+    // Check for overflow into the sign bit.
+    // This could be because either the negation or addition overflowed.
+    // (However, it is not possible both overflowed.)
+    if (l < 0)
+      {
+	l >>>= 1;
+	il += 1;
+      }
+    // At this point the sign bit is zero, but the next-highest bit is one.
+    // That bit becomes the "hidden" bit.
+    l = (l >> 10) & 0xfffffffffffffL;
+    double d;
+    if (il >= 1025)
+      d = Double.POSITIVE_INFINITY;
+    else
+      {
+	l += (long)(il + 1021) << 52;
+	d = Double.longBitsToDouble (l);
+      }
+    if (neg)
+      d = -d;
+    return d;
   }
 
   public Numeric add (Object y)
@@ -1230,10 +1288,15 @@ public class IntNum extends RatNum implements Compilable
 
   public Numeric div (Object y)
   {
-    if (y instanceof RealNum)
-      return new DFloNum (doubleValue () / ((RealNum)y).doubleValue ());
-    else
+    if (y instanceof RatNum)
+      {
+	RatNum r = (RatNum) y;
+	return RatNum.make (IntNum.times (this, r.denominator()),
+			    r.numerator());
+      }
+    if (! (y instanceof Numeric))
       throw new IllegalArgumentException ();
+    return ((Numeric)y).div_reversed (this);
   }
 
   /** Copy the abolute value of this into an array of words.

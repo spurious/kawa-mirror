@@ -19,7 +19,8 @@ OBJ=\
   RatNum.class \
   IntFraction.class \
   MPN.class \
-  IntNum.class
+  IntNum.class \
+  BitOps.class
 
 java_DATA=$(OBJ)
 

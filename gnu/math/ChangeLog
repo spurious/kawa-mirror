@@ -1,3 +1,23 @@
+Fri Dec 13 15:10:38 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* BitOps.java:  New class, implementing "bit-wise integer functions".
+	* Makefile.am, Makefile.in (OBJ):  Add BitOps.class.
+	* IntNum.java (minusOne, make, isMinusOne, power):  New methods.
+	(isOdd, isZero, isOne):  Make final.
+	(wordsNeeded):  Handle the case that len==0.
+	(plus):  Fix various bugs.
+	(doubleValue):  Implement for bignums.
+	(div):  Return an exact rational, rather than an inexact DFloNum.
+	* MPN.java (add_n):  Remove bogus optimization.
+	(mul):  Fix thinko - carry did not add old value of dest.
+	(submul_1):  New function.
+	(divide):  Partial re-write.  Works better now.
+	(set_str):  Merge code for loop and final words.
+	(rshift_long):  New function.
+	(dprint):  Added debugging methods.
+	* RatNum.java (isZero, power):  New methods.
+	(Infinity, NegInfinity):  New static fields.
+
 Wed Nov 20 17:50:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* DFloNum.java:  Make arithmetic generic:  We now have

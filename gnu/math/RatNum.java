@@ -26,6 +26,18 @@ public abstract class RatNum extends RealNum
     return true;
   }
 
+  public boolean isZero ()
+  {
+    return numerator().isZero();
+  }
+
+  /** Positive exact "rational" infinity. */
+  public static RatNum Infinity
+  = new IntFraction (IntNum.one (), IntNum.zero ());
+  /** Negative exact "rational" infinity. */
+  public static RatNum NegInfinity
+  = new IntFraction (IntNum.make (-1), IntNum.zero ());
+
   public static int compare (RatNum x, RatNum y)
   {
     return IntNum.compare (IntNum.times (x.numerator (), y.denominator ()),
@@ -68,6 +80,39 @@ public abstract class RatNum extends RealNum
   {
     return RatNum.make (IntNum.times (x.numerator(), y.denominator()),
 			IntNum.times (x.denominator(), y.numerator()));
+  }
+
+  public static RatNum power (RatNum x, IntNum y)
+  {
+    if (y.isZero ())
+      return IntNum.one ();
+    if (x.isZero ())
+      return y.isNegative () ? RatNum.Infinity : (RatNum) x;
+    
+    int i = y.ival;
+    if (y.words != null || i > 1000000 || i < -1000000)
+      {
+	IntNum xi;
+	if (x instanceof IntNum && (xi = (IntNum) x).words == null)
+	  {
+	    i = xi.ival;
+	    if (i == 1)
+	      return xi;
+	    if (i == -1)
+	      return y.isOdd () ? xi : IntNum.one ();
+	  }
+	throw new ArithmeticException ("exponent too big");
+      }
+    if (i < 0)
+      {
+	i = -i;
+	return RatNum.make (IntNum.power (x.denominator (), i),
+			    IntNum.power (x.numerator (), i));
+      }
+    if (x instanceof IntNum)
+      return IntNum.power ((IntNum) x, i);
+    return RatNum.make (IntNum.power (x.numerator (), i),
+			IntNum.power (x.denominator (), i));
   }
 
   public String toString ()

@@ -75,6 +75,13 @@
   (set! current-menubar menubar)
   (set-menubar-dirty-flag))
 
+;;; MODES
+
+(define (redraw-modeline)  ;;XEmacs has optional "all" parameter!
+  (invoke (as <buffer> (current-buffer)) 'redrawModeline))
+
+(define force-mode-line-update redraw-modeline)
+
 ;;; FILES
 
 (define (find-file #!optional (filename (read-from-minibuffer "Find file: ")))
@@ -245,17 +252,34 @@
 (define (switch-to-buffer-other-frame (buffer :: <buffer>))
   (pop-to-buffer buffer #f (make-frame buffer)))
 
-(define (set-window-buffer window buffer)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "setBuffer"
-			    <void> (<buffer>))
-   window (get-buffer buffer)))
+(define (set-window-buffer (window :: <window>) (buffer :: <buffer>))
+  (invoke window 'setBuffer (get-buffer buffer)))
 
-(define (window-point window)
-  ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getPoint" <int> ())
-   window))
+(define (window-point (window :: <window>))
+  (invoke window 'getPoint))
 
 (define (set-window-point (window :: <window>) position)
   (invoke window 'setDot (invoke (invoke window 'getBuffer) 'positionToOffset position)))
+
+(define (window-height #!optional (window :: <window> (selected-window)))
+  (invoke window 'getHeightInLines))
+
+(define (window-width #!optional (window :: <window> (selected-window)))
+  (invoke window 'getWidthInColumns))
+
+(define (window-pixel-height #!optional (window :: <window> (selected-window)))
+  (invoke (invoke window 'getPanel) 'getHeight))
+
+(define (window-pixel-width #!optional (window :: <window> (selected-window)))
+  (invoke (invoke window 'getPanel) 'getWidth))
+
+(define (window-text-area-pixel-height
+	 #!optional (window :: <window> (selected-window)))
+  (invoke window 'getHeight))
+
+(define (window-text-area-pixel-width
+	 #!optional (window :: <window> (selected-window)))
+  (invoke window 'getWidth))
 
 ;;; FRAMES
 
@@ -436,15 +460,13 @@
 
 ;;; TEXT
 
-(define (insert-char ch #!optional (count 1) (buffer (current-buffer)))
-  ((primitive-virtual-method <buffer> "insert" <void>
-			     (<char> <int> <javax.swing.text.Style>))
-   buffer ch count #!null))
+(define (insert-char ch #!optional (count :: <int> 1)
+		     (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'insert ch count #!null))
 
-(define (insert str
-		#!optional (buffer :: <buffer> (current-buffer)))
-  ;; FIXME char of str is a character
-  (invoke buffer 'insert (invoke str 'toString) #!null))
+(define (insert #!rest (args :: <Object[]>))
+  (let ((buffer :: <buffer> (current-buffer)))
+    (invoke buffer 'insertAll args #!null)))
 
 (define (erase-buffer #!optional (buffer :: <buffer> (current-buffer)))
   (invoke buffer 'removeAll))

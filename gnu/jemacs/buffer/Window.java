@@ -373,6 +373,16 @@ public class Window extends javax.swing.JTextPane
   {
   }
 
+  public int getHeightInLines()
+  {
+    return getHeight() / buffer.charHeight;
+  }
+
+  public int getWidthInColumns()
+  {
+    return getWidth() / buffer.charWidth;
+  }
+
   public String toString()
   {
     StringBuffer sbuf = new StringBuffer(100);

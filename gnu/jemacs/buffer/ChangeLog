@@ -1,3 +1,18 @@
+2000-03-21  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (charHeight, charWidth):  New fields.
+	(<init>):  Set charHeight, charWidth.
+	* Window.java (getHeightInLines, getWidthInColumns):  New method.
+	* emacs.scm (window-height, window-width, window-pixel-height,
+	window-pixel-width, window-text-area-pixel-height,
+	window-text-area-pixel-width):  New procedures.
+	
+	* Buffer.java (insert):  Rename to insertString.
+	(insert):  New method generalizes old insert.
+	(insertAll):  New method.
+	* emacs.scm (redraw-modeline, force-mode-line-update):  New.
+	(insert):  Genealize to inserting character and varargs.
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (encoding):  New field.

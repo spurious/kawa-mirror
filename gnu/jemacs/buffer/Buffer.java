@@ -21,7 +21,7 @@ public class Buffer
   static Style blueStyle = styles.addStyle("blue", null);
   static
   {
-    StyleConstants.setFontFamily(defaultStyle, "Lucida Sans Typewriter");
+    StyleConstants.setFontFamily(defaultStyle, "Lucida Sans TypeWriter");
     StyleConstants.setFontSize(defaultStyle, 14);
     StyleConstants.setForeground(redStyle, Color.red);
     StyleConstants.setForeground(blueStyle, Color.blue);
@@ -30,6 +30,12 @@ public class Buffer
   Marker pointMarker;
 
   Caret curPosition = null;
+
+  /** Nominal height in pixels of a character. */
+  int charHeight;
+
+  /** Nominal width in pixels of a character. */
+  int charWidth;
 
   BufferContent content;
   DefaultStyledDocument document;
@@ -156,6 +162,12 @@ public class Buffer
 
     document = new javax.swing.text.DefaultStyledDocument(content, styles);
 
+    java.awt.Font defaultFont = document.getFont(defaultStyle);
+    java.awt.FontMetrics fm
+      = java.awt.Toolkit.getDefaultToolkit().getFontMetrics(defaultFont);
+    charHeight = fm.getHeight();
+    charWidth = fm.charWidth('m');
+
     modelineDocument
       = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
     // Needed for proper bidi (bi-directional text) handling.
@@ -238,9 +250,30 @@ public class Buffer
     return "#<buffer \"" + name + "\">";
   }
 
-  public void insert (String string, Style style)
+  public void insertString (String string, Style style)
   {
     pointMarker.insert(string, style);
+  }
+
+  public void insertAll (Object[] values, Style style)
+  {
+    int len = values.length;
+    for (int i = 0;  i < len;  i++)
+      {
+	Object value = values[i];
+	if (value instanceof gnu.kawa.util.Char)
+	  insert(((gnu.kawa.util.Char) value).charValue(), 1, style);
+	else
+	  pointMarker.insert(value.toString(), style);
+      }
+  }
+
+  public void insert (Object value, Style style)
+  {
+    if (value instanceof gnu.kawa.util.Char)
+      insert(((gnu.kawa.util.Char) value).charValue(), 1, style);
+    else
+      pointMarker.insert(value.toString(), style);
   }
 
   /** Insert count copies of ch at point. */

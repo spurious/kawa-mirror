@@ -34,10 +34,8 @@ public class StackTarget extends Target
 	return true;
       }
 
-    if (stackType.isSubtype(type))
-      return true;
     stackType.emitCoerceToObject(code);
-    return false;
+    return stackType.isSubtype(type);
   }
 
   public void compileFromStack(Compilation comp, Type stackType)

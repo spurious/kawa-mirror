@@ -1,3 +1,12 @@
+2000-10-23  Per Bothner  <per@bothner.com>
+
+	* StackTarget.java (compileFromStack0):  Always call emitCoerceToObject
+	even when stackType.isSubtype(type).  Fixes bug in Stalin's
+	destruct.sc benchmark, reported by Brian D. Carlstrom <bdc@ai.mit.edu>.
+
+	* Interpreter.java (languages):  Recognize ".sc" as a Scheme
+	extension (used in Stalin).
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* SetApplyExp.java:  Removed, as part of "setter" re-implementation.

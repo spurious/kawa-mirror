@@ -38,7 +38,7 @@ public abstract class Interpreter
 
   static String[][] languages =
   {
-    { "scheme", ".scm", "kawa.standard.Scheme" },
+    { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
     { "commonlisp", "common-lisp", "clisp", "lisp",
       ".lisp", ".lsp", ".cl",

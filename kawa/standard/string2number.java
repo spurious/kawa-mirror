@@ -14,7 +14,7 @@ public class string2number extends Procedure1or2
 	FString fstr = (FString) str;
 	int len = fstr.length();
 	char[] data = fstr.data;
-	Object result = LispReader.parseNumber(data, 0, len,
+	Object result = LispReader.parseNumber(data, 0, len, '\0',
 					       radix, LispReader.SCM_NUMBERS);
 	if (! (result instanceof Numeric))
 	  return Scheme.falseObject;

@@ -1,3 +1,8 @@
+2003-08-20  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/string2number.java (parse):  Pass new exactness
+	parameter.
+
 2003-08-06  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/TracedProcedure.java (indentation):  Initialize using

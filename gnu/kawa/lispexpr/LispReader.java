@@ -273,48 +273,64 @@ public class LispReader extends Lexer
       }
   }
 
-  /** If tokenBuffer.substring(startPos,endPos) is a number, return it.
-   * If it is a symbol, return null.
-   * Otherwise, (i.e. if it is a "potential number") throw an Exception.
-   * or return a String - for an error message
-   */
-  protected Object checkNumber(int startPos, int endPos)
+  private boolean isPotentialNumber (char[] buffer, int start, int end)
   {
-    return parseNumber(tokenBuffer, startPos, endPos - startPos, 0, SCM_NUMBERS);
-    /*
     int sawDigits = 0;
-    int sawDots = 0;
-    for (int i = startPos;  i < endPos;  i++)
+    for (int i = start;  i < end;  i++)
       {
-	char ch = tokenBuffer[i];
+	char ch = buffer[i];
 	if (Character.isDigit(ch))
 	  sawDigits++;
+	else if (ch == '-' || ch == '+')
+	  {
+	    if (i + 1 == end)
+	      return false;
+	  }
+	else if (ch == '#')
+	  return true;
+	else if (Character.isLetter(ch) || ch == '/')
+ 	  {
+	    if (i == start)
+	      return false;
+	  }
+	else if (ch != '.' && ch != '_' && ch != '^')
+	  return false;
       }
-    if (sawDigits == endPos - startPos)
-      gnu.math.IntNum.valueOf (tokenBuffer, startPos, endPos - startPos, 10, false);
-    return null;
-    */
+    return sawDigits > 0;
   }
 
   static final int SCM_COMPLEX = 1;
   public static final int SCM_NUMBERS = SCM_COMPLEX;
 
   /** Parse a number.
-   * If not a number returns a String (error message) or null.
+   * @param buffer contains the characters of the number
+   * @param start startinging index of the number in the buffer
+   * @param count number of characters in buffer to use
+   * @param exactness either 'i' or 'I' force an inexact result,
+   *   either 'e' or 'E' force an exact result,
+   *   '\0' yields an inact or inexact depending on the form of the literal,
+   *   while ' ' is like '\0' but does not allow more exactness specifiers.
    * @param radix the number base to use or 0 if unspecified
+   * @return the number if a valid number; null or a String-valued error
+   *   message if if there was some error parsing the number.
    */
-  public static Object parseNumber(char[] buffer, int start, int count, int radix, int flags)
+  public static Object parseNumber(char[] buffer, int start, int count,
+				   char exactness, int radix, int flags)
   {
-    char exactness = ' ';
+    /*
+    System.err.println("parseNumber '"+new String(buffer,start, count)
+		       +"' exact:"+(exactness=='\0'?"\\0":(""+exactness))
+		       +" radix:"+radix+" fl:"+flags);
+    */
     int end = start + count;
     int pos = start;
     if (pos >= end)
-      return null;
+      return "no digits";
     char ch = buffer[pos++];
     for (; ch == '#';  ch = buffer[pos++])
       {
 	if (pos >= end)
-	  return null;
+	  return "no digits";
 	ch = buffer[pos++];
 	switch (ch)
 	  {
@@ -340,8 +356,13 @@ public class LispReader extends Lexer
 	    break;
 	  case 'e':  case 'E':
 	  case 'i':  case 'I':
-	    if (exactness != ' ')
-	      return "duplicate exactness specifier";
+	    if (exactness != '\0')
+	      {
+		if (exactness == ' ')
+		  return "non-prefix exactness specifier";
+		else
+		  return "duplicate exactness specifier";
+	      }
 	    exactness = ch;
 	    break;
 	  default:
@@ -353,7 +374,7 @@ public class LispReader extends Lexer
 		  break;
 		value = 10 * value + dig;
 		if (pos >= end)
-		  return null;
+		  return "missing letter after '#'";
 		ch = buffer[pos++];
 	      }
 	    if (ch == 'R' || ch == 'r')
@@ -368,6 +389,8 @@ public class LispReader extends Lexer
 	    return "unknown modifier '#" + ch + '\'';
 	  }
       }
+    if (exactness == '\0')
+      exactness = ' ';
     if (radix == 0)
       {
 	for (int i = count;  ; )
@@ -388,10 +411,11 @@ public class LispReader extends Lexer
       }
 
     boolean negative = ch == '-';
+    boolean numeratorNegative = negative;
     if (ch == '-' || ch == '+')
       {
 	if (pos >= end)
-	  return null;
+	  return "no digits following sign";
 	ch = buffer[pos++];
       }
 
@@ -401,7 +425,7 @@ public class LispReader extends Lexer
       {
 	char sign = buffer[start];
 	if (sign != '+' && sign != '-')
-	  return null;
+	  return "no digits";
 	if (exactness == 'i' || exactness == 'I')
 	  return new DComplex(0, negative ? -1 : 1);
 	return negative ? Complex.imMinusOne() : Complex.imOne();
@@ -511,7 +535,7 @@ public class LispReader extends Lexer
       }
 
     if (digits_start < 0)
-      return "not a number - no digits";
+      return "no digits";
 
     if (hash_seen || underscore_seen)
       {
@@ -546,7 +570,7 @@ public class LispReader extends Lexer
 		boolean numeratorZero = numerator.isZero();
 		if (inexact)
 		  number =  new DFloNum ((numeratorZero ? Double.NaN
-					  : negative ? Double.NEGATIVE_INFINITY
+					  : numeratorNegative ? Double.NEGATIVE_INFINITY
 					  : Double.POSITIVE_INFINITY));
 		else if (numeratorZero)
 		  return "0/0 is undefined";
@@ -560,7 +584,7 @@ public class LispReader extends Lexer
 	  }
 	if (inexact && number.isExact())
 	  // We want #i-0 or #i-0/1 to be -0.0, not 0.0.
-	  number = new DFloNum(negative && number.isZero() ? -0.0
+	  number = new DFloNum(numeratorNegative && number.isZero() ? -0.0
 			       : number.doubleValue());
       }
 
@@ -573,7 +597,8 @@ public class LispReader extends Lexer
 
 	if (ch == '@')
 	  { /* polar notation */
-	    Object angle = parseNumber(buffer, pos, end - pos, 10, flags);
+	    Object angle = parseNumber(buffer, pos, end - pos,
+				       exactness, 10, flags);
 	    if (angle instanceof String)
 	      return angle;
 	    if (! (angle instanceof RealNum))
@@ -590,11 +615,12 @@ public class LispReader extends Lexer
 	if (ch == '-' || ch == '+')
 	  {
 	    pos--;
-	    Object imag = parseNumber(buffer, pos, end - pos, 10, flags);
+	    Object imag = parseNumber(buffer, pos, end - pos,
+				      exactness, 10, flags);
 	    if (imag instanceof String)
 	      return imag;
 	    if (! (imag instanceof Complex))
-	      return "invalid numeric constant";
+	      return "invalid numeric constant ("+imag+")";
 	    Complex cimag = (Complex) imag;
 	    RealNum re = cimag.re();
 	    if (! re.isZero())
@@ -700,7 +726,7 @@ public class LispReader extends Lexer
 	      }
 
 	    if (unit == null)
-	      return null; // ??
+	      return "expected unit";
 	    else if (unit instanceof Unit)
 	      return Quantity.make(number, (Unit) unit);
 	    else
@@ -790,29 +816,19 @@ public class LispReader extends Lexer
     return makeSymbol(new String(tokenBuffer, startPos, len));
   }
 
-  /*
-  public boolean isPotentialNumber(int startPos, int endPos)
-  {
-    int len = endPos - startPos;
-    if (len <= 0)
-      return false;
-    int prevLetter = 0, curLetter;
-    int seenDigit = 0;
-    int seenDot = 0;
-    if ((string[0] < '0' || string[0] > '9')
-        && string[0] != '+' && string[0] != '-'
-        && string[0] != '.' && string[0] != '^' && string[0] != '_')
-        return 0;
-    if (string[len-1] == '+' || string[len-1] == '-') return 0;
-  }
-  */
-
   /** Classify and return a token in tokenBuffer from startPos to endPos. */
   public Object handleToken(int startPos, int endPos)
   {
-    Object value = checkNumber(startPos, endPos);
+    Object value = parseNumber(tokenBuffer, startPos, endPos - startPos,
+			       '\0', 0, SCM_NUMBERS);
     if (value != null && ! (value instanceof String))
       return value;
+    if (isPotentialNumber(tokenBuffer, startPos, endPos))
+      {
+	error(value == null ? "not a valid number"
+	      : "not a valid number: " + value);
+	return IntNum.zero();
+      }
     return returnSymbol(startPos, endPos);
   }
 
@@ -1012,7 +1028,7 @@ public class LispReader extends Lexer
 	return IntNum.zero();
       }
     Object result = LispReader.parseNumber(reader.tokenBuffer, startPos,
-					   endPos - startPos, radix, 0);
+					   endPos - startPos, '\0', radix, 0);
     if (result instanceof String)
       {
 	reader.error((String) result);

@@ -1,3 +1,14 @@
+Mon Feb  3 17:16:17 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* ClassType.java (getClassName):  Removed.
+	(compileCoerceFromObject):  New methods.
+	(this_name):  Moved to Type.
+	* Type.java (getName):  New method.
+	(compileCoerceFromObject):  New methods.
+	* Method.java (set_static):  Renamed to setStaticFlag.
+	(compile_convert, compile_goto_if, compile_primop,
+	getDeclaringClass, getReturnType, getParameterTypes, getName): New
+
 Fri Jan  3 18:52:20 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Access:  Make class public.

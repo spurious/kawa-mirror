@@ -35,12 +35,17 @@ public class Method {
     parameter_scope = push_scope ();
   }
 
-  public void set_static (boolean is_static) {
+  public final void setStaticFlag (boolean is_static) {
     if (is_static)
       access_flags |= Access.STATIC;
     else
       access_flags ^= ~Access.STATIC;
   }
+
+  public final boolean getStaticFlag () {
+    return (access_flags & Access.STATIC) != 0;
+  }
+    
 
   private Type[] stack_types;
   private int SP;  // Current stack size (in "words")
@@ -736,9 +741,75 @@ public class Method {
   /**
    * Convert the element on top of the stack to requested type
    */
-  final void compile_convert (Type type) {
+  public final void compile_convert (Type type) {
+    Type from = pop_stack_type();
+    push_stack_type(from);
+    compile_convert (from, type);
+  }
+
+  public final void compile_convert (Type from, Type to)
+  {
+    byte[] to_sig = to.signature;
+    byte[] from_sig = from.signature;
+    int op = -1;
+    if (to_sig.length == 1 || from_sig.length == 1)
+      {
+	byte to_sig0 = to_sig[0];
+	byte from_sig0 = to_sig[0];
+	if (from.size < 4)
+	  from_sig0 = 'I';
+	if (to.size < 4)
+	  {
+	    compile_convert (from, Type.int_type);
+	    from_sig0 = 'I';
+	  }
+	if (from_sig0 == to_sig0)
+	  return;
+	switch (from_sig0)
+	  {
+	  case 'I':
+	    switch (to_sig0)
+	      {
+	        case 'B':  op = 145;  break;  // i2b
+	        case 'C':  op = 146;  break;  // i2c
+	        case 'S':  op = 147;  break;  // i2s
+		case 'J':  op = 133;  break;  // i2l
+		case 'F':  op = 134;  break;  // i2f
+		case 'D':  op = 135;  break;  // i2d
+	      }
+	    break;
+	  case 'J':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 136;  break;  // l2i
+		case 'F':  op = 137;  break;  // l2f
+		case 'D':  op = 138;  break;  // l2d
+	      }
+	    break;
+	  case 'F':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 139;  break;  // f2i
+		case 'J':  op = 140;  break;  // f2l
+		case 'D':  op = 141;  break;  // f2d
+	      }
+	    break;
+	  case 'D':
+	    switch (to_sig0)
+	      {
+		case 'I':  op = 142;  break;  // d2i
+		case 'J':  op = 143;  break;  // d2l
+		case 'F':  op = 144;  break;  // d2f
+	      }
+	    break;
+	  }
+      }
+    if (op < 0)
+      throw new Error ("unsupported Method.compile_convert");
     instruction_start_hook (1);
-    System.err.print("Warning - Method.convert not implemented\n");
+    pop_stack_type();
+    put1 (op);
+    push_stack_type(to);
   }
 
   final void compile_transfer (Label label, int opcode)
@@ -792,6 +863,23 @@ public class Method {
 
   /** The stack of currently active conditionals. */
   IfState if_stack;
+
+  /** Compile start of a conditional:  if (!(x OPCODE 0)) ...
+   * The value of x must already have been pushed. */
+  public final void compile_goto_if (int opcode)
+  {
+    IfState new_if = new IfState (this);
+    Type type1 = pop_stack_type ().promote ();
+    instruction_start_hook (3);
+    compile_transfer (new_if.end_label, opcode);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of conditional:  if (x != 0) */
+  public final void compile_if_neq_0 ()
+  {
+    compile_goto_if (153); // ifeq
+  }
 
   /** Compile start of a conditional:  if (x != y) ...
    * The values of x and y must already have been pushed. */
@@ -931,6 +1019,7 @@ public class Method {
   public final void compile_mul () { compile_binop (104); }
   public final void compile_div () { compile_binop (108); }
   public final void compile_rem () { compile_binop (112); }
+
   private final void compile_binop (int base_code) {
     instruction_start_hook (1);
     Type type2 = pop_stack_type ().promote ();
@@ -949,6 +1038,15 @@ public class Method {
     else
       throw new Error ("bad type in binary operation");
     push_stack_type (type1_raw);
+  }
+
+  public void compile_primop (int opcode, int arg_count, Type retType)
+  {
+    instruction_start_hook (1);
+    while (-- arg_count >= 0)
+      pop_stack_type ();
+    put1 (opcode);
+    push_stack_type (retType);
   }
 
   public void compile_invoke_method (Method method, int opcode)
@@ -1234,5 +1332,17 @@ public class Method {
 
     if (signature_index == 0)
       signature_index = classfile.get_utf8_const (getSignature ());
+  }
+
+  public ClassType getDeclaringClass() { return classfile; }
+
+  public Type getReturnType() { return return_type; }
+
+  public Type[] getParameterTypes() { return arg_types; }
+
+  public String getName ()
+  {
+    // FIXME - only works for ASCII names!
+    return name == null ? null : new String (name, 0);
   }
 };

@@ -5,7 +5,6 @@ public class ClassType extends Type {
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
-  String this_name;
   int this_class;
   int super_class; // constant pool index of super class, or -1 if unknown
   int[] interfacesImplemented;
@@ -71,11 +70,6 @@ public class ClassType extends Type {
   {
     this_name = name;
     return set_class_name (to_utf8 (name.replace ('.', '/')));
-  }
-
-  public final String getClassName ()
-  {
-    return this_name;
   }
 
   CpoolClass set_class_name (byte[] name)
@@ -338,5 +332,14 @@ public class ClassType extends Type {
       }
     }
     return buffer;
+  }
+
+  /** Compile (in given method) cast from Object to this Type. */
+  public void compileCoerceFromObject (Method method)
+  {
+    if (this == Type.string_type)
+      method.compile_invoke_virtual (Type.toString_method);
+    else if (this != Type.pointer_type)
+      method.compile_checkcast (this);
   }
 }

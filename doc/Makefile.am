@@ -33,6 +33,7 @@ HTML_HOME = $$HOME/public_html
 install-html:
 	-mkdir $(HTML_HOME)/kawa
 	cp $(KAWA_HTML_PARTS) $(HTML_HOME)/kawa/
+	cp kawa_toc.html $(HTML_HOME)/kawa/kawa_toc.html
 	cp kawa_toc.html $(HTML_HOME)/kawa/index.html
 	sed -e 's|HREF="kawa_|HREF="kawa/kawa_|g' -e 's|HREF="../|HREF="|g' \
 		<kawa_toc.html >$(HTML_HOME)/kawa.html

@@ -1,3 +1,7 @@
+2003-09-24  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (copyToList):  Revert use of gnu.xml.NodeTree.
+
 2003-09-23  Per Bothner  <per@bothner.com>
 
 	* LList.java (makeList):  Generalize parameter to java.util.List,

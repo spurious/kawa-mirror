@@ -1319,11 +1319,7 @@ implements Consumer, PositionConsumer, Consumable
 
   private Object copyToList(int startPosition, int endPosition)
   {
-    //    return new TreeList(this, start, end);
-    // FIXME:  dependency on gnu.xml!
-    gnu.xml.NodeTree nodes = new gnu.xml.NodeTree();
-    consumeIRange(startPosition, endPosition, nodes);
-    return nodes;
+    return new TreeList(this, startPosition, endPosition);
   }
 
   public Object getPosNext(int ipos)

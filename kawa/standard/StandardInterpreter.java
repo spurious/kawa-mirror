@@ -247,6 +247,8 @@ public class StandardInterpreter extends Interpreter
       define ("and", new kawa.standard.and_or (true));
       
       define_proc ("exit", "kawa.standard.exit");
+      define_proc ("values", "kawa.standard.values");
+      define_proc ("call-with-values", "kawa.standard.call_with_values");
 
       define_proc ("compile-func", "kawa.lang.compilefune");
       define_proc ("compile-file", "kawa.lang.CompileFile");

@@ -200,6 +200,8 @@ begin.class \
 ifp.class \
 when.class \
 unless.class \
+values.class \
+call_with_values.class \
 StandardInterpreter.class 
 
 java_DATA=$(OBJ)

@@ -1,3 +1,10 @@
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	* configure.in:  New --enable-xml flag.
+	(XML_SELECTED):  New substitution macro.
+	* gnu/kawa/Makefile.am (SUBDIR):  Add optional xml directory.
+	* kawa/standard/Scheme.java (getNamedType):  Add <document>.
+
 2000-12-13  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/map.java (inline):  Inline map as well as for-each.

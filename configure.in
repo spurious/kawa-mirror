@@ -16,6 +16,9 @@ if test $enable_kawa_frontend = yes ; then
   kawa_bin=kawa
 fi
 
+AC_ARG_ENABLE(xml,
+  [  --enable-xml             Build support for XML processing])
+
 AC_ARG_WITH(swing,
   [  --with-swing  Assume Swing (Java Foundation Classes) is available])
 
@@ -48,9 +51,15 @@ case ${with_awt} in
   no) AWT_SELECTED=WITHOUT_AWT ;;
   *)  AWT_SELECTED=WITH_AWT ;;
 esac
+
+case ${enable_xml} in
+  yes)  XML_SELECTED=XML_ENABLED ;;
+  *)  XML_SELECTED=XML_DISABLED ;;
+esac
   
 JEMACS_VERSION=`echo $VERSION | sed  -e 's/^1/0/'`
 
+AC_SUBST(XML_SELECTED)
 AC_SUBST(AWT_SELECTED)
 AC_SUBST(SWING_SELECTED)
 AC_SUBST(extra_java)
@@ -65,7 +74,7 @@ AC_SUBST(SHELL)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
-  gnu/kawa/functions/Makefile
+  gnu/kawa/functions/Makefile gnu/kawa/xml/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
   gnu/commonlisp/testsuite/Makefile

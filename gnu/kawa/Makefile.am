@@ -1,4 +1,5 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = util reflect functions lispexpr slib
+XML_ENABLED = xml
+SUBDIRS = util reflect functions lispexpr $(@XML_SELECTED@) slib

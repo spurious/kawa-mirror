@@ -10,11 +10,10 @@ public class NamedDescendants extends CpsProcedure
  public static final NamedDescendants namedDescendants
    = new NamedDescendants();
 
-  public static void namedDescendants(String namespaceURI, String localName,
+  public static void namedDescendants(GroupPredicate predicate,
 				      TreeList list, int pos,
 				      Consumer consumer)
   {
-    GroupPredicate predicate = new ElementType(namespaceURI, localName);
     int limit = list.nextDataIndex(pos);
     for (;;)
       {
@@ -31,18 +30,19 @@ public class NamedDescendants extends CpsProcedure
       }
   }
 
-  public static void namedDescendants (String namespaceURI, String localName, Object node, Consumer consumer)
+  public static void namedDescendants (GroupPredicate predicate,
+				       Object node, Consumer consumer)
     throws Throwable
   {
     if (node instanceof TreeList)
       {
-	namedDescendants(namespaceURI, localName, (TreeList) node, 0, consumer);
+	namedDescendants(predicate, (TreeList) node, 0, consumer);
       }
     else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedDescendants(namespaceURI, localName, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  namedDescendants(predicate, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
       }
   }
 
@@ -50,8 +50,7 @@ public class NamedDescendants extends CpsProcedure
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    String namespaceURI = (String) ctx.getNextArg();
-    String localName = (String) ctx.getNextArg();
+    GroupPredicate predicate = (GroupPredicate) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {
@@ -63,14 +62,14 @@ public class NamedDescendants extends CpsProcedure
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedDescendants(namespaceURI, localName, tlist.getNext(index << 1, null), consumer);
+	      namedDescendants(predicate, tlist.getNext(index << 1, null), consumer);
 	    else
-	      namedDescendants(namespaceURI, localName, tlist, index, consumer);
+	      namedDescendants(predicate, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);
 	  }
       }
     else
-      namedDescendants(namespaceURI, localName, node, consumer);
+      namedDescendants(predicate, node, consumer);
   }
 }
 

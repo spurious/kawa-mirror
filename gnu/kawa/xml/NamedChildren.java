@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -13,9 +13,9 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 {
   public static final NamedChildren namedChildren = new NamedChildren();
   
-  public int numArgs() { return 0x3003; }
+  public int numArgs() { return 0x2002; }
 
-  public static void namedChildren (String namespaceURI, String localName,
+  public static void namedChildren (GroupPredicate type,
 				    TreeList tlist, int index,
 				    Consumer consumer)
     throws Throwable
@@ -26,7 +26,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     SeqPosition pos = SeqPosition.make(tlist, child << 1, null);
     for (;;)
       {
-	if (! getNamedChild(pos, namespaceURI, localName))
+	if (! getNamedChild(pos, type))
 	  break;
 	if (consumer instanceof PositionConsumer)
 	  ((PositionConsumer) consumer).writePosition(tlist,
@@ -44,21 +44,23 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 
   static final Class[] noClasses = {};
 
-  public static void namedChildren (String namespaceURI, String localName, Object node, Consumer consumer)
+  public static void namedChildren (GroupPredicate type, Object node, Consumer consumer)
     throws Throwable
   {
     if (node instanceof TreeList)
       {
-	namedChildren(namespaceURI, localName, (TreeList) node, 0, consumer);
+	namedChildren(type, (TreeList) node, 0, consumer);
       }
     else if (node instanceof SeqPosition && ! (node instanceof TreePosition))
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedChildren(namespaceURI, localName, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  namedChildren(type, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
       }
-    else if (namespaceURI == "")
-      Values.writeValues(getNamedProperty(node, localName), consumer);
+    else if (type instanceof ElementType
+	     && ((ElementType) type).getNamespaceURI() == "")
+      Values.writeValues(getNamedProperty(node,((ElementType) type).getLocalName()),
+			 consumer);
   }
 
   public static String getPropertyName(String name)
@@ -110,8 +112,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    String namespaceURI = (String) ctx.getNextArg();
-    String localName = (String) ctx.getNextArg();
+    GroupPredicate predicate = (GroupPredicate) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {
@@ -123,29 +124,31 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedChildren(namespaceURI, localName, tlist.getNext(index << 1, null), consumer);
+	      namedChildren(predicate, tlist.getNext(index << 1, null), consumer);
 	    else
-	      namedChildren(namespaceURI, localName, tlist, index, consumer);
+	      namedChildren(predicate, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);
 	  }
       }
     else
-      namedChildren(namespaceURI, localName, node, consumer);
+      namedChildren(predicate, node, consumer);
   }
 
-  public static boolean getNamedChild(SeqPosition position,
-				      String namespaceURI, String localName)
+  public static boolean getNamedChild(SeqPosition position, GroupPredicate type)
     throws Throwable
   {
     AbstractSequence seq = position.sequence;
 
     if (seq == null)
       {
-	if (namespaceURI == "")
+	if (type instanceof ElementType
+	    && ((ElementType) type).getNamespaceURI() == "")
 	  {
 	    if (position.ipos > 1)
 	      return false;
-	    position.xpos = getNamedProperty(position.xpos, localName);
+	    position.xpos
+	      = getNamedProperty(position.xpos,
+				 ((ElementType) type).getLocalName());
 	    return position.xpos != Values.empty;
 	  }
 	return false;
@@ -160,21 +163,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	if (kind == Sequence.GROUP_VALUE)
 	  {
 	    Object curName = seq.getNextTypeObject(ipos, xpos);
-	    String curNamespaceURI;
-	    String curLocalName;
-	    if (curName instanceof QName)
-	      {
-		QName qname = (QName) curName;
-		curNamespaceURI = qname.getNamespaceURI();
-		curLocalName = qname.getLocalName();
-	      }
-	    else
-	      {
-		curNamespaceURI = "";
-		curLocalName = curName.toString().intern();  // FIXME
-	      }
-	    if ((localName == curLocalName || localName == null)
-		&& (namespaceURI == curNamespaceURI || namespaceURI == null))
+	    if (type.isInstance(seq, ipos, xpos, curName))
 	      return true;
 	  }
 	seq.gotoNext(position, 0);
@@ -216,15 +205,18 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     CodeAttr code = comp.getCode();
+    Object type;
 
-
-    if (nargs == 3 && target instanceof ConsumerTarget
-	&& ! (args[0] instanceof ReferenceExp))
+    if (nargs == 2 && target instanceof ConsumerTarget
+	&& ! (args[0] instanceof ReferenceExp)
+	&& args[1] instanceof QuoteExp
+	&& (type = ((QuoteExp) args[1]).getValue()) instanceof ElementType)
       {
 	code.pushScope();
 	Variable newConsumer = code.addLocal(typeNamedChildrenFilter);
-	args[1].compile(comp, comp.typeString);  // Push namespaceURI.
-	args[2].compile(comp, comp.typeString);  // Push localName.
+	ElementType etype = (ElementType) type;
+	comp.compileConstant(etype.getNamespaceURI());
+	comp.compileConstant(etype.getLocalName());
 	code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
 	code.emitInvokeStatic(makeNamedChildrenFilterMethod);
 	code.emitStore(newConsumer);
@@ -233,38 +225,30 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	return;
       }
 
-    if (nargs == 3
+    if (nargs == 2
 	&& (target instanceof SeriesTarget
-	    	    || target instanceof ConsumerTarget
-))
+	    || target instanceof ConsumerTarget))
       {
 	Variable child = target instanceof SeriesTarget ? code.addLocal(typeSeqPosition) : null;
 	Type retAddrType = Type.pointer_type;
+	SeriesTarget pathTarget = new SeriesTarget();
+	pathTarget.scope = code.pushScope();
 	Variable retAddr = code.addLocal(retAddrType);
-	Variable namespaceURIVar, localNameVar;
+	Variable predicateVar;
 	if (args[1] instanceof QuoteExp)
-	  namespaceURIVar = null;
+	  predicateVar = null;
 	else
 	  {
-	    namespaceURIVar = code.addLocal(comp.typeString);
-	    args[1].compile(comp, comp.typeString);
-	    code.emitStore(namespaceURIVar);
-	  }
-	if (args[2] instanceof QuoteExp)
-	  localNameVar = null;
-	else
-	  {
-	    localNameVar = code.addLocal(comp.typeString);
-	    args[2].compile(comp, comp.typeString);
-	    code.emitStore(localNameVar);
+	    predicateVar = code.addLocal(typeGroupPredicate);
+	    args[1].compile(comp, typeGroupPredicate);
+	    code.emitStore(predicateVar);
 	  }
 
-	SeriesTarget pathTarget = new SeriesTarget();
 	pathTarget.function = new Label(code);
 	pathTarget.done = new Label(code);
-	pathTarget.value
-	  = code.addLocal(target instanceof SeriesTarget ? typeSeqPosition
-			  : Type.pointer_type);
+	Type pathType = target instanceof SeriesTarget ? typeSeqPosition
+	  : Type.pointer_type;
+	pathTarget.param = new Declaration(code.addLocal(pathType));
 	args[0].compile(comp, pathTarget);
 
 	if (code.reachableHere())
@@ -275,24 +259,20 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	Label nextChildLoopTop = null;
 	if (target instanceof SeriesTarget)
 	  {
-	    code.emitLoad(pathTarget.value);
+	    pathTarget.param.load(comp);
 	    code.emitInvokeStatic(gotoFirstChildMethod);
 	    code.emitStore(child);
 	    nextChildLoopTop = new Label(code);
 	    nextChildLoopTop.define(code);
 	    code.emitLoad(child);
 	  }
-	if (namespaceURIVar == null)
-	  args[1].compile(comp, comp.typeString);
+	if (predicateVar == null)
+	  args[1].compile(comp, typeGroupPredicate);
 	else
-	  code.emitLoad(namespaceURIVar);
-	if (localNameVar == null)
-	  args[2].compile(comp, comp.typeString);
-	else
-	  code.emitLoad(localNameVar);
+	  code.emitLoad(predicateVar);
 	if (target instanceof ConsumerTarget)
 	  {
-	    code.emitLoad(pathTarget.value);
+	    pathTarget.param.load(comp);
 	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
 	    code.emitInvokeStatic(namedChildrenMethod);
 	    code.emitRet(retAddr);
@@ -311,6 +291,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	    code.emitInvokeStatic(gotoNextMethod);
 	    code.emitGoto(nextChildLoopTop);
 	  }
+	code.popScope();
 	pathTarget.done.define(code);
 	return;
       }
@@ -328,11 +309,13 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   = typeNamedChildrenFilter.getDeclaredMethod("make", 3);
   static final ClassType typeNamedChildren
     = ClassType.make("gnu.kawa.xml.NamedChildren");
+  static final ClassType typeGroupPredicate
+    = ClassType.make("gnu.lists.GroupPredicate");
   static final ClassType typeSeqPosition = NodeType.nodeType;
   static final Method getNamedChildMethod
-    = typeNamedChildren.getDeclaredMethod("getNamedChild", 3);
+    = typeNamedChildren.getDeclaredMethod("getNamedChild", 2);
   static final Method namedChildrenMethod
-    = typeNamedChildren.getDeclaredMethod("namedChildren", 4);
+    = typeNamedChildren.getDeclaredMethod("namedChildren", 3);
   static final Method gotoFirstChildMethod
     = typeNamedChildren.getDeclaredMethod("gotoFirstChild", 1);
   static final Method gotoNextMethod

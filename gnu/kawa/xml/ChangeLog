@@ -1,3 +1,18 @@
+2002-03-07  Per Bothner  <per@bothner.com>
+
+	* ElementType.java:  New constructor.
+	(getNamespaceURI, getLocalName):  New accessor methods.
+	(isInstance):  Check that argument triple is actually a group.
+	(coerceOrNull):  Likewise.
+
+	* NamedDescendants.java (apply, namedDescendants):  Take a single
+	GroupPredicate argument instead of a namespaceURL+localName pair.
+	* NamedChildren.java (namedChildren, apply, getNamedChild):  Likewise.
+	(getNamedChild):  Use predicate's isInstance method.
+	(numArgs):  Takes 2 instead of 3 arguments.
+	(compile):  Update accordingly.  Update for new SeriesTarget semantics.
+	Can now safely pushScope/popScope.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java (beginData):  Write out and clear sbuf buffer.

@@ -20,9 +20,18 @@ implements TypeValue, Externalizable, GroupPredicate
 
   public ElementType(QName qname)
   {
-    super("ELEMENT "+qname+" (*)");
+    this(null, qname);
+  }
+
+  public ElementType(String name, QName qname)
+  {
+    super(name != null && name.length() > 0 ? name
+	    : "ELEMENT "+qname+" (*)");
     this.qname = qname;
   }
+
+  public final String getNamespaceURI () { return qname.getNamespaceURI(); }
+  public final String getLocalName () { return qname.getLocalName(); }
 
   public void emitCoerceFromObject (CodeAttr code)
   {
@@ -38,7 +47,8 @@ implements TypeValue, Externalizable, GroupPredicate
 
   public boolean isInstance(AbstractSequence seq, int ipos, Object xpos)
   {
-    return isInstance(seq, ipos, xpos, seq.getNextTypeObject(ipos, xpos));
+    return seq.getNextKind(ipos, xpos) == Sequence.GROUP_VALUE
+      && isInstance(seq, ipos, xpos, seq.getNextTypeObject(ipos, xpos));
   }
 
   public boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
@@ -76,6 +86,8 @@ implements TypeValue, Externalizable, GroupPredicate
     if (pos.sequence == null)
       return null;
     Object curName = pos.getNextTypeObject();
+    if (pos.sequence.getNextKind(pos.ipos, pos.xpos) != Sequence.GROUP_VALUE)
+      return null;
     String curNamespaceURI;
     String curLocalName;
     if (curName instanceof QName)

@@ -42,6 +42,7 @@ public class Lambda extends Syntax implements Printable
     for (; bindings instanceof Pair;  bindings = pair.cdr)
       {
 	pair = (Pair) bindings;
+        // An initial pass to count the parameters.
 	if (pair.car == Special.optional)
 	  {
 	    if (opt_args >= 0)
@@ -79,6 +80,9 @@ public class Lambda extends Syntax implements Printable
 	      }
 	    key_args = 0;
 	  }
+        else if (pair.car == "::" // && "::" is unbound FIXME
+                 && pair.cdr instanceof Pair)
+          pair = (Pair) pair.cdr;
 	else if (key_args >= 0)
 	  key_args++;
 	else if (rest_args >= 0)
@@ -141,28 +145,82 @@ public class Lambda extends Syntax implements Printable
 	String name;
 	Object defaultValue = QuoteExp.falseExp;
 	Object typeSpec = null;
+        Pair p;
 	if (pair.car instanceof String)
-	  name = (String) pair.car;
+          {
+            name = (String) pair.car;
+            if (pair.cdr instanceof Pair
+                && (p = (Pair) pair.cdr).car == "::")
+              {
+                if (! (pair.cdr instanceof Pair))
+                  {
+                    tr.syntaxError("`::' not followed by a type specifier"
+                                   + " (for parameter `" + name + "')");
+                    return;
+                  }
+                p = (Pair) p.cdr;
+                typeSpec = p.car;
+                pair = p;
+              }
+          }
 	else if (pair.car instanceof Pair
-		 && ((Pair) pair.car).car instanceof String
-		 && ((Pair) pair.car).cdr instanceof Pair)
-	  {
-	    Pair pair_car = (Pair) pair.car;
-	    name = (String) pair_car.car;
-	    if (mode == null)
-	      typeSpec = ((Pair) pair_car.cdr).car;
-	    else if (mode != Special.rest)
-	      {
-		Pair defaultPair = (Pair) pair_car.cdr;
-		defaultValue = defaultPair.car;
-		if (defaultPair.cdr instanceof Pair)
-		  typeSpec = ((Pair) defaultPair.cdr).car;
-	      }
-	    else
-	      {
-		tr.syntaxError ("default value for #!rest parameter");
-		return;
-	      }
+                 && mode != Special.rest
+		 && (p = (Pair) pair.car).car instanceof String
+		 && p.cdr instanceof Pair)
+          {
+	    name = (String) p.car;
+            p = (Pair) p.cdr;
+            if (p.car == "::")
+              {
+                if (! (p.cdr instanceof Pair))
+                  {
+                    tr.syntaxError("`::' not followed by a type specifier"
+                                   + " (for parameter `" + name + "')");
+                    return;
+                  }
+                p = (Pair) p.cdr;
+                typeSpec = p.car;
+                if (p.cdr instanceof Pair)
+                  p = (Pair) p.cdr;
+                else if (p.cdr == List.Empty)
+                  p = null;
+                else
+                  {
+                    tr.syntaxError("improper list in specifier for parameter `"
+                                   + name + "')");
+                    return;
+                  }
+              }
+            if (p != null && mode != null)
+              {
+                defaultValue = p.car;
+                if (p.cdr instanceof Pair)
+                  p = (Pair) p.cdr;
+                else if (p.cdr == List.Empty)
+                  p = null;
+                else
+                  {
+                    tr.syntaxError("improper list in specifier for parameter `"
+                                   + name + "')");
+                    return;
+                  }
+              }
+            if (p != null)
+              {
+                if (typeSpec != null)
+                  {
+                    tr.syntaxError("duplicate type specifier for parameter `"
+                                   + name + '\'');
+                    return;
+                  }
+                typeSpec = p.car;
+                if (p.cdr != List.Empty)
+                  {
+                    tr.syntaxError("junk at end of specifier for parameter `"
+                                   + name + '\'');
+                    return;
+                  }
+              }
 	  }
 	else
 	  {
@@ -174,9 +232,9 @@ public class Lambda extends Syntax implements Printable
 	if (mode == Special.key)
 	  lexp.keywords[key_args++] = Keyword.make(name.toString());
 	Declaration decl = lexp.addDeclaration (name);
-        if (pair instanceof PairWithPosition)
+        if (bindings instanceof PairWithPosition)
           {
-            PairWithPosition declPos = (PairWithPosition) pair;
+            PairWithPosition declPos = (PairWithPosition) bindings;
             decl.setFile(declPos.getFile());
             decl.setLine(declPos.getLine(), declPos.getColumn());
           }

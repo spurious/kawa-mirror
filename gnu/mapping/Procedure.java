@@ -99,7 +99,7 @@ public abstract class Procedure implements Named, Printable
   public Procedure getSetter()
   {
     if (! (this instanceof HasSetter))
-      throw new RuntimeException("procedure "+getName()+ "has no setter");
+      throw new RuntimeException("procedure '"+getName()+ "' has no setter");
     int num_args = numArgs();
     if (num_args == 0x0000)
       return new Setter0(this);

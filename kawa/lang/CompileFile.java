@@ -91,6 +91,7 @@ public class CompileFile extends Procedure2
         int dotIndex = short_name.lastIndexOf('.');
         if (dotIndex > 0)
           short_name = short_name.substring (0, dotIndex);
+	short_name = Compilation.mangleNameIfNeeded(short_name);
 	topname = short_name;
 	if (prefix != null)
 	  topname = prefix + short_name;

@@ -1,3 +1,14 @@
+2002-09-26  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (IS_ALIAS):  Make public.
+	(isLexical):  Static can be lexical.
+	(makeField):  If decl is alias, make field a Location, not a Binding.
+	* FindTailCalls.java (walkSetExp):  Walk value even if defining alias.
+	* SetExp.java (compile):  Don't initialize simple public alias
+	using an AliasConstraint - Location is set by BindingInitializer.
+	* ModuleExp.java (allocFields):  Don't clear value if an alias.
+	* Interpreter.java (getTypeFor):  Handle imported aliases.
+
 2002-09-24  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (inlineOk):  New static field.

@@ -177,7 +177,7 @@ public class Declaration
   static final int PRIVATE = 0x20;
   static final int IS_SIMPLE = 0x40;
   static final int PROCEDURE = 0x80;
-  static final int IS_ALIAS = 0x100;
+  public static final int IS_ALIAS = 0x100;
   /** Set if this is just a declaration, not a definition. */
   public static final int NOT_DEFINING = 0x200;
   public static final int EXPORT_SPECIFIED = 0x400;
@@ -324,7 +324,7 @@ public class Declaration
 
   public final boolean isLexical()
   {
-    return ! isFluid() && ! isStatic();
+    return ! isFluid() && ! getFlag(IS_UNKNOWN);
   }
 
   /** List of ApplyExp where this declaration is the function called.
@@ -517,7 +517,8 @@ public class Declaration
     if (getFlag(STATIC_SPECIFIED)
 	|| (isConstant && value instanceof QuoteExp))
       fflags |= Access.STATIC;
-    Type ftype = (isIndirectBinding() ? Compilation.typeBinding
+    Type ftype = (isAlias() ? Compilation.typeLocation
+		  : isIndirectBinding() ? Compilation.typeBinding
 		  : getType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)

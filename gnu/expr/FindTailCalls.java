@@ -295,7 +295,10 @@ public class FindTailCalls extends ExpWalker
 	if (decl != null && decl.isAlias())
 	  {
 	    if (exp.isDefining())
-	      return exp;
+	      {
+		exp.new_value = (Expression) exp.new_value.walk(this);
+		return exp;
+	      }
 	    decl = Declaration.followAliases(decl);
 
 	  }

@@ -244,7 +244,7 @@ public class ModuleExp extends LambdaExp
 	  }
 	else
 	  {
-	    if (! decl.getFlag(Declaration.IS_CONSTANT)
+	    if (! decl.getFlag(Declaration.IS_CONSTANT|Declaration.IS_ALIAS)
 		|| value == QuoteExp.undefined_exp)
 	      value = null;
 	    decl.makeField(comp, value);

@@ -177,8 +177,7 @@ public class SetExp extends Expression
 	  new_value.compile (comp, Target.Ignore);
 	else if (decl.isAlias() && isDefining())
 	  {
-	    if (decl.isPublic()
-		|| !( decl.getValue() instanceof ReferenceExp))
+	    if (!( decl.getValue() instanceof ReferenceExp))
 	      {
 		decl.load(comp);
 		new_value.compile (comp, Target.pushObject);

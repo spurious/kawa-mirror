@@ -388,10 +388,29 @@ public abstract class Interpreter
     else if (exp instanceof ReferenceExp)
       {
         ReferenceExp rexp = (ReferenceExp) exp;
-        Declaration decl = rexp.getBinding();
-        if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
-          return getTypeFor(decl.getValue());
+        Declaration decl = Declaration.followAliases(rexp.getBinding());
         String name = rexp.getName();
+        if (decl != null)
+	  {
+	    name = decl.getName();
+	    exp = decl.getValue();
+	    if (decl.isAlias()
+		&& exp instanceof QuoteExp)
+	      {
+		Object val = ((QuoteExp) exp).getValue();
+		if (val instanceof Location)
+		  {
+		    Location loc = (Location) val;
+		    if (loc.isBound())
+		      return asType(loc.get());
+		    if (! (loc instanceof Named))
+		      return null;
+		    name = ((Named) loc).getName();
+		  }
+	      }
+	    else if (! decl.getFlag(Declaration.IS_UNKNOWN))
+	      return getTypeFor(exp);
+	  }
 	Object val = Environment.getCurrent().get(name);
 	if (val instanceof Type)
 	  return (Type) val;

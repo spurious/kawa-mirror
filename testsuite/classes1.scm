@@ -4,6 +4,10 @@
   (a :: <int> init-value: 4)
   (b :: <int> init-form: 6 allocation: class:)
   (hyphenated-field? init-value: "yes")
+  ((lambda-method1)
+   (lambda (x) (make-vector 1 x))) ; This lambda doesn't "capture" anything.
+  ((lambda-method2 n)
+   (lambda (x) (make-vector (+ a n) x))) ; This lambda does.
   ((f (y :: <int>)) :: <int>
    (if (equal? hyphenated-field? "yes") (+ xx a b y) 999)))
 

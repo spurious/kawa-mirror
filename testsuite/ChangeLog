@@ -1,3 +1,8 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* classes1.scm (<SimpleA>):  Add two methods that return lambdas.
+	* obj-test.scm:  Check that those work.
+
 2003-04-01  Vladimir Tsichevski <wowa@jet.msk.su>
 
 	* mac-test.scm:  Check set! in macro code.

@@ -1,3 +1,10 @@
+2004-11-10  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (%lang-boolean):  New helper macro.
+	(and): Rewrite to use syntax-case and %lang-boolean, so we
+	can use the same macro for Common Lisp and ELisp as well as Scheme.
+	(or): New syntax, patterned on 'and'.
+
 2004-11-08  Per Bothner  <per@bothner.com>
 
 	* prim_syntax.scm: New file.

@@ -66,14 +66,32 @@
 					  (or (eqv? key 'datum)
 					      (%case-match key more ...)))))
 
+(define-syntax %lang-boolean
+  (syntax-rules ()
+    ((%lang-boolean value)
+     (make <gnu.expr.QuoteExp>
+       (invoke
+	(invoke-static <gnu.expr.Interpreter> 'getInterpreter)
+	'booleanObject value)))))
+
 ;;; AND
 
-(define-syntax and
-  (syntax-rules ()
-		((and) #t)
-		((and test) test)
-		((and test1 test2 test3 ...)
-		 (and (if test1 test2 #f) test3 ...))))
+(define-syntax (and f)
+  (syntax-case f ()
+	       ((and) (%lang-boolean #t))
+	       ((and test) (syntax test))
+	       ((and test1 test2 ...)
+		(syntax (%let ((x test1))
+			  (if x (and test2 ...) x))))))
+;;; OR
+
+(define-syntax (or f)
+  (syntax-case f ()
+	       ((or) (%lang-boolean #f))
+	       ((or test) (syntax test))
+	       ((or test1 test2 ...)
+		(syntax (%let ((x test1))
+			  (if x x (or test2 ...)))))))
 
 ;;; LET (including named let)
 

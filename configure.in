@@ -106,6 +106,8 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(JEMACS_VERSION)
 AC_SUBST(SHELL)
+Make_rules="$srcdir/Make-rules"
+AC_SUBST_FILE(Make_rules)
 
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile

@@ -11,14 +11,16 @@ GCJFLAGS = -g
 OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
-GCJ_DEPS = $(java_JAVA)
-
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o
+java_Java= $(java_BUILT) $(java_sources)
+GCJ_DEPS = $(java_Java)
+SOURCES = $(java_sources)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o $(EXTRA_CLEAN)
+clean:
+	rm -f $(CLEANFILES)
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
-KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 # Make sure $(KAWA1) is available, if --enable-gcj-compiled.
@@ -27,11 +29,7 @@ $(TO_TOPDIR)/kawa1$(exeext):
 
 $(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
 	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
-	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
-
-$(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
-	  *.class -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+	  $(GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
@@ -40,13 +38,13 @@ java-classes.stamp: $(java_Java)
 scm-classes.stamp: $(java_SCM)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
 	  $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --module-static -C $?
+	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --module-static -C $?
 	echo timestamp > scm-classes.stamp
 
 elisp-classes.stamp: $(java_ELISP)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
 	  $(KAWA1) -d $(top_builddir) \
-	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
+	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
 # Almost the same as automake's install-javaJAVA, but the standard

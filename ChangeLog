@@ -1,3 +1,12 @@
+2001-04-26  Per Bothner  <per@bothner.com>
+
+	Change most Makefile.am back to worked with released automake.
+	This means include of Make-rules must be handled by automake, which
+	is less ideal, but automake snapshots are too buggy.
+	* Make-rules:  Bunch of little changes.
+	* Makefile.am (EXTRA_DIST): Add Make-rules.
+	* configure.in:  Add AC_SUBST_FILE for Make-rules.
+
 2001-04-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (getNamedType):  Add <readtable>.

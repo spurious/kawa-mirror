@@ -1,3 +1,9 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* Children.java: Moved to gnu.kawa.xml, because it is also
+	used for Scheme.
+	* Makefile.am: Update accordingly.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* NamedCollator.java: Change "select" (preprocessor) syntax.

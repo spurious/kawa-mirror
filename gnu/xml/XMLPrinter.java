@@ -70,6 +70,15 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
     return xout;
   }
 
+  /** Convert argument to string in XML syntax. */
+
+  public static String toString (Object value)
+  {
+    StringWriter stringWriter = new StringWriter();
+    new XMLPrinter(stringWriter).writeObject(value);
+    return stringWriter.toString();
+  }
+
   public void setStyle (Object style)
   {
     this.style = style;

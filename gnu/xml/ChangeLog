@@ -1,3 +1,7 @@
+2003-05-30  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (toString):  New utility function.
+
 2003-05-02  Per Bothner  <per@bothner.com>
 
 	* NamespaceResolver.java (parser, mismatchReported):  New field.

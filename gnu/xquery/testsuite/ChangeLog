@@ -1,0 +1,6 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	New directory.
+	* test1.xql:  New simple test case for XQuery language.
+	* expected1.xml:  Expected output from test1.xql.
+

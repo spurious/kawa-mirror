@@ -15,7 +15,7 @@ public class repl
 
   static void bad_option (String str)
   {
-    System.err.println ("bad option " + str);
+    System.err.println ("kawa: bad option '" + str + "'");
     System.exit (-1);
   }
 
@@ -153,6 +153,10 @@ public class repl
 	else if (arg.equals("--main"))
 	  {
 	    Compilation.generateMainDefault = true;
+	  }
+	else if (arg.equals("--debug-dump-zip"))
+	  {
+	    gnu.expr.LambdaExp.dumpZipPrefix = "kawa-zip-dump-";
 	  }
 	else if (arg.equals("--version"))
 	  {

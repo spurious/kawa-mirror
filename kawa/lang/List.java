@@ -89,4 +89,3 @@ public class List extends Sequence implements Printable
     return result;
   }
 }
-

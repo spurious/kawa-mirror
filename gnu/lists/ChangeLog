@@ -1,3 +1,11 @@
+2004-01-04  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java (getIteratorAtPos):  New method.
+	* TreeList.java (getPosNext):  Use getIteratorAtPos method, which
+	is overridden by NodeTree to return a KNode.
+	* TreeList.java (BEGIN_ATTRIBUTE_LONG, BEGIN_DOCUMENT, END_DOCUMENT,
+	END_GROUP_SHORT, END_GROUP_LONG):  Make protected.
+
 2003-11-16  Per Bothner  <per@bothner.com>
 
 	* Pair.java (readResolve):  New method.

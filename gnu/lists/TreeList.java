@@ -179,7 +179,7 @@ implements Consumer, PositionConsumer, Consumable
    * Kludge warning:  ParsedXMLToConsumer.endAttributes has hard-wired in the
    * size of BEGIN_ATTRIBUTE_LONG and END_ATTRIBUTE.
    */
-  static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
+  protected static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
 
   /** The end of an attribute of a node. */
   static final int END_ATTRIBUTE = 0xF10A;
@@ -193,10 +193,10 @@ implements Consumer, PositionConsumer, Consumable
    *   to the BEGIN_DOCUMENT word.
    * Used to distinguish a document from its element node.
    */
-  static final int BEGIN_DOCUMENT = 0xF110;
+  protected static final int BEGIN_DOCUMENT = 0xF110;
 
   /** End of a document. */
-  static final int END_DOCUMENT = 0xF111;
+  protected static final int END_DOCUMENT = 0xF111;
 
   /** The base-uri property of a node.
    * This is not an actual value, but it is a property of the previous
@@ -230,7 +230,7 @@ implements Consumer, PositionConsumer, Consumable
    *   matching BEGIN.  (This is the same as the matching end_offset.)
    *
    */
-  static final int END_GROUP_SHORT = 0xF10B;
+  protected static final int END_GROUP_SHORT = 0xF10B;
 
   /** Begin of a group, non-compact form.
    *
@@ -273,7 +273,7 @@ implements Consumer, PositionConsumer, Consumable
    *   actual index of the parent group.  Otherwise, then parent_offset is a
    *   negative offset relative to the END_GROUP_LONG word.
    */
-  static final int END_GROUP_LONG = 0xF10C;
+  protected static final int END_GROUP_LONG = 0xF10C;
 
   int currentParent = 0;
 
@@ -1414,7 +1414,7 @@ implements Consumer, PositionConsumer, Consumable
       case POSITION_PAIR_FOLLOWS: //FIXME
 	AbstractSequence seq = (AbstractSequence) objects[getIntN(index+1)];
 	ipos = getIntN(index+3);
-	return SeqPosition.make(seq, ipos);
+	return seq.getIteratorAtPos(ipos);
       default:
 	throw unsupported("getPosNext, code="+Integer.toHexString(datum));
       }

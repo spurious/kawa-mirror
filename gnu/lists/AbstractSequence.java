@@ -195,6 +195,11 @@ public abstract class AbstractSequence
     return new SeqPosition(this, startPos());
   }
 
+  public SeqPosition getIteratorAtPos(int ipos)
+  {
+    return new SeqPosition(this, ipos);
+  }
+
   /* BEGIN JAVA2 */
   public final Iterator iterator()
   {

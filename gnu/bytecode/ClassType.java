@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001, 2002  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2002, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -231,7 +231,7 @@ public class ClassType extends ObjectType
   int LineNumberTable_name_index;
 
   /** Get the fields of this class. */
-  public final Field getFields()
+  public final synchronized Field getFields()
   {
     if ((flags & (ADD_FIELDS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
       addFields();
@@ -248,10 +248,7 @@ public class ClassType extends ObjectType
    */
   public Field getDeclaredField(String name)
   {
-    if ((flags & (ADD_FIELDS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
-      addFields();
-    Field field;
-    for (field = fields;   field != null;  field = field.next)
+    for (Field field = getFields();   field != null;  field = field.next)
       {
 	if (name.equals(field.name))
 	  return field;
@@ -307,7 +304,8 @@ public class ClassType extends ObjectType
 
   /** Use reflection to add all the declared fields of this class.
    * Does not add private or package-private fields.
-   * Does not check for duplicate (already-known) fields. */
+   * Does not check for duplicate (already-known) fields.
+   * Is not thread-safe if another thread may access this ClassType. */
   public void addFields()
   {
     Class clas = getReflectClass();
@@ -398,7 +396,7 @@ public class ClassType extends ObjectType
     return meth;
   }
 
-  public Method getDeclaredMethods()
+  public final synchronized Method getDeclaredMethods()
   {
     if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
       addMethods(getReflectClass());
@@ -527,10 +525,8 @@ public class ClassType extends ObjectType
 
   public Method getDeclaredMethod(String name, Type[] arg_types)
   {
-    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
-      addMethods(getReflectClass());
-    Method method;
-    for (method = methods;  method != null;  method = method.next)
+    for (Method method = getDeclaredMethods();
+	 method != null;  method = method.next)
       {
 	if (! name.equals(method.getName()))
 	  continue;
@@ -554,10 +550,9 @@ public class ClassType extends ObjectType
   /** Get a method with matching name and number of arguments. */
   public Method getDeclaredMethod(String name, int argCount)
   {
-    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
-      addMethods(getReflectClass());
     Method result = null;
-    for (Method method = methods;  method != null;  method = method.next)
+    for (Method method = getDeclaredMethods();
+	 method != null;  method = method.next)
       {
 	if (name.equals(method.getName())
 	    && argCount == method.getParameterTypes().length)

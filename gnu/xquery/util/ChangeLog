@@ -4,6 +4,17 @@
 	
 	* NamedChildren.java (namedChildren):  Use getNamedChild method.
 
+	* MakeElement.java:  Also implement CanInline.
+	(inline):  New method.
+
+	* MakeElement.am (beginGroup, endGroup):  New helper methods.
+	(apply):  Use new methods.
+	(compile):  Call new methods.	
+	* MakeAttribute.java (beginAttribute):  New helper method.
+	(numArgs):  Now takes any number of arguments.
+	(apply):  Use new helper method; handle any number of arguments.
+	(compile):  Similarly.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* StringValue.java:  Various fixes to actually make it work.

@@ -6,25 +6,53 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
+import gnu.kawa.xml.*;
+import gnu.xml.QName;
 
 public class MakeAttribute extends CpsProcedure implements Inlineable
 {
   public static final MakeAttribute makeAttribute = new MakeAttribute();
 
-  public int numArgs() { return 0x2002; }
+  public int numArgs() { return 0xFFFFF001; }
+
+  public static void beginAttribute(Object type, Consumer out)
+  {
+    String name;
+    if (type instanceof AttributeConstructor)
+      {
+	AttributeConstructor cons = (AttributeConstructor) type;
+	name = cons.getXmlName();
+	type = cons.getQName();
+      }
+    else if (type instanceof ElementConstructor)
+      {
+	ElementConstructor cons = (ElementConstructor) type;
+	name = cons.getXmlName();
+	type = cons.getQName();
+      }
+    else if (type instanceof QName)
+      name = ((QName) type).getLocalName();
+    else
+      name = type.toString();
+    out.beginAttribute(name, type);
+  }
 
   public void apply (CallContext ctx)
   {
     Object type = ctx.getNextArg();
-    String name = type.toString();
     Consumer out = ctx.consumer;
-    out.beginAttribute(name, type);
+    beginAttribute(type, out);
     Object arg = ctx.getNextArg();
-    if (arg instanceof Consumable)
-      ((Consumable) arg).consume(out);
-    else
-      ctx.writeValue(arg);
-    ctx.lastArg();
+    Object endMarker = Special.dfault;
+    for (;;)
+      {
+	if (arg == endMarker)
+	  break;
+	if (arg instanceof Consumable)
+	  ((Consumable) arg).consume(out);
+	else
+	  ctx.writeValue(arg);
+      }
     out.endAttribute();
   }
 
@@ -40,10 +68,8 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
 	code.emitLoad(consumer);
 	code.emitDup();
 	args[0].compile(comp, Target.pushObject);
-	code.emitDup();
-	code.emitInvokeVirtual(Type.pointer_type.getDeclaredMethod("toString", 0));
-	code.emitSwap();
-	code.emitInvokeInterface(beginAttributeMethod);
+	// Stack:  consumer, consumer, tagtype
+	code.emitInvokeStatic(beginAttributeMethod);
 	for (int i = 1;  i < nargs;  i++)
 	  args[i].compile(comp, target);
 	code.emitInvokeInterface(endAttributeMethod);
@@ -54,8 +80,10 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
       ConsumerTarget.compileUsingConsumer(exp, comp, target);
   }
 
+  static final ClassType typeMakeAttribute
+    = ClassType.make("gnu.xquery.util.MakeAttribute");
   static final Method beginAttributeMethod
-    = Compilation.typeConsumer.getDeclaredMethod("beginAttribute", 2);
+    = typeMakeAttribute.getDeclaredMethod("beginAttribute", 2);
   static final Method endAttributeMethod
     = Compilation.typeConsumer.getDeclaredMethod("endAttribute", 0);
 

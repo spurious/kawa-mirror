@@ -6,19 +6,51 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.xml.ElementConstructor;
+import gnu.xml.QName;
 
-public class MakeElement extends CpsProcedure implements Inlineable
+public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 {
   public static final MakeElement makeElement = new MakeElement();
 
   public int numArgs() { return 0xFFFFF001; }
 
+  public static void beginGroup(Object type, Consumer out)
+  {
+    String name;
+    if (type instanceof ElementConstructor)
+      {
+	ElementConstructor cons = (ElementConstructor) type;
+	name = cons.getXmlName();
+	type = cons.getQName();
+      }
+    else if (type instanceof QName)
+      name = ((QName) type).getLocalName();
+    else
+      name = type.toString();
+    out.beginGroup(name, type);
+  }
+
+  public static void endGroup(Object type, Consumer out)
+  {
+    String name;
+    if (type instanceof ElementConstructor)
+      {
+	ElementConstructor cons = (ElementConstructor) type;
+	name = cons.getXmlName();
+      }
+    else if (type instanceof QName)
+      name = ((QName) type).getLocalName();
+    else
+      name = type.toString();
+    out.endGroup(name);
+  }
+
   public void apply (CallContext ctx)
   {
     Object type = ctx.getNextArg();
-    String name = type.toString();
     Consumer out = ctx.consumer;
-    out.beginGroup(name, type);
+    beginGroup(type, out);
     Object endMarker = Special.dfault;
     for (;;)
       {
@@ -30,7 +62,25 @@ public class MakeElement extends CpsProcedure implements Inlineable
 	else
 	  ctx.writeValue(arg);
       }
-    out.endGroup(name);
+    endGroup(type, out);
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+    if (nargs > 1 && args[0] instanceof QuoteExp)
+      {
+	Object tag = ((QuoteExp) args[0]).getValue();
+	if (tag instanceof ElementConstructor)
+	  {
+	    nargs--;
+	    Expression[] xargs = new Expression[nargs];
+	    System.arraycopy(args, 1, xargs, 0, nargs);
+	    return new ApplyExp(args[0], xargs);
+	  }
+      }
+    return exp;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -45,18 +95,13 @@ public class MakeElement extends CpsProcedure implements Inlineable
 	code.emitLoad(consumer);
 	code.emitDup();
 	args[0].compile(comp, Target.pushObject);
-	// Stack:  consumer, consumer, type
-	code.emitDup();
-	code.emitInvokeVirtual(comp.typeObject.getDeclaredMethod("toString", 0));
-	// Stack:  consumer, consumer, type, name
-	code.emitDup(1, 2); // dup_x2
-	// Stack:  consumer, name, consumer, type, name
-	code.emitSwap();
-	code.emitInvokeInterface(beginGroupMethod);
+	code.emitDup(1, 1); // dup_x1
+	// Stack:  consumer, tagtype, consumer, tagtype
+	code.emitInvokeStatic(beginGroupMethod);
 	// Stack:  consumer, name
 	for (int i = 1;  i < nargs;  i++)
 	  args[i].compile(comp, target);
-	code.emitInvokeInterface(endGroupMethod);
+	code.emitInvokeStatic(endGroupMethod);
       }
     else if (target instanceof IgnoreTarget)
       ApplyExp.compile(exp, comp, target);
@@ -69,8 +114,10 @@ public class MakeElement extends CpsProcedure implements Inlineable
     return Compilation.typeObject;
   }
 
+  static final ClassType typeMakeElement
+    = ClassType.make("gnu.xquery.util.MakeElement");
   static final Method beginGroupMethod
-    = Compilation.typeConsumer.getDeclaredMethod("beginGroup", 2);
+    = typeMakeElement.getDeclaredMethod("beginGroup", 2);
   static final Method endGroupMethod
-    = Compilation.typeConsumer.getDeclaredMethod("endGroup", 1);
+    = typeMakeElement.getDeclaredMethod("endGroup", 2);
 }

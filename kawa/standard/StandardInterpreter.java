@@ -36,10 +36,14 @@ public class StandardInterpreter extends Interpreter
       //-- Section 4.1
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
-      define_syntax ("do", "kawa.lib.do");
 
       // Section 4.2
       define_syntax ("cond", "kawa.standard.cond");
+      define ("or", new kawa.standard.and_or (false));
+      define ("and", new kawa.standard.and_or (true));
+      define_syntax ("begin", "kawa.standard.begin");
+      define_syntax ("do", "kawa.lib.do");
+      define_syntax ("quasiquote", "kawa.standard.quasiquote");
 
       //-- Section 6.1
       define_proc ("not", "kawa.standard.not");
@@ -55,7 +59,7 @@ public class StandardInterpreter extends Interpreter
 
       //-- Section 6.3  -- complete
       define_proc ("pair?", "kawa.standard.pair_p");
-      define_proc ("cons", "kawa.standard.cons");
+      define ("cons", kawa.standard.cons.consProcedure);
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
       define_proc ("set-car!", "kawa.standard.setcar_b");
@@ -93,7 +97,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("list?", "kawa.standard.list_p");
       define_proc ("list", "kawa.standard.list");
       define_proc ("length", "kawa.standard.length");
-      define_proc ("append", "kawa.standard.append");
+      define ("append", kawa.standard.append.appendProcedure);
       define_proc ("reverse", "kawa.standard.reverse");
       define_proc ("list-tail", "kawa.standard.list_tail");
       define_proc ("list-ref", "kawa.standard.list_ref");
@@ -190,13 +194,15 @@ public class StandardInterpreter extends Interpreter
       //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.standard.vector_p");
       define_proc ("make-vector", "kawa.standard.make_vector");
-      define_proc ("vector", "kawa.standard.vector");
+      define ("vector", kawa.standard.vector.vectorProcedure);
       define_proc ("vector-length", "kawa.standard.vector_length");
       define_proc ("vector-ref", "kawa.standard.vector_ref");
       define_proc ("vector-set!", "kawa.standard.vector_set_b");
       define_proc ("list->vector", "kawa.standard.list2vector");
       define_proc ("vector->list", "kawa.standard.vector2list");
       define_proc ("vector-fill!", "kawa.standard.vector_fill_b");
+      // Extension:
+      define ("vector-append", kawa.standard.vector_append.vappendProcedure);
 
       //-- Section 6.9
       define_proc ("procedure?", "kawa.standard.procedure_p");
@@ -240,13 +246,6 @@ public class StandardInterpreter extends Interpreter
       define_syntax ("letrec", "kawa.standard.letrec");
       //-- (define sym obj)
       define_syntax ("define", "kawa.standard.define");
-      //-- (apply sym obj)
-      //-- (begin obj ...)
-      define_syntax ("begin", "kawa.standard.begin");
-      //-- (if cond then-exp else-exp)
-
-      define ("or", new kawa.standard.and_or (false));
-      define ("and", new kawa.standard.and_or (true));
       
       define_proc ("exit", "kawa.standard.exit");
       define_proc ("values", "kawa.standard.values");
@@ -258,7 +257,6 @@ public class StandardInterpreter extends Interpreter
       //-- (unless cond exp ...)
       define_syntax ("unless", "kawa.lib.when_unless");
 
-      define_proc ("compile-func", "kawa.lang.compilefune");
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
    }

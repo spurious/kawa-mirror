@@ -1,13 +1,18 @@
 package kawa.standard;
 import kawa.lang.*;
+import codegen.Field;
+import codegen.Access;
+import codegen.ClassType;
 
 /**
  * Implement the Scheme standard function "append".
  * @author Per Bothner
  */
 
-public class append extends ProcedureN
+public class append extends ProcedureN implements Compilable
 {
+  public static append appendProcedure = new append ();
+
   public append()
   {
     super("append");
@@ -45,5 +50,23 @@ public class append extends ProcedureN
 	  }
       }
     return result;
+  }
+
+  static Field appendConstant;
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    if (appendConstant == null)
+      {
+	ClassType thisType = new ClassType ("kawa.standard.append");
+	appendConstant = thisType.new_field ("appendProcedure", thisType,
+					     Access.PUBLIC|Access.STATIC);
+      }
+    return new Literal (this, appendConstant, comp);
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    throw new Error ("internal error - append.emit called");
   }
 }

@@ -13,6 +13,7 @@ javadir=$(prefix)/java/kawa/standard
 
 OBJ=\
 set_b.class \
+quasiquote.class \
 not.class \
 boolean_p.class \
 cond.class \
@@ -107,6 +108,7 @@ vector_set_b.class \
 vector2list.class \
 list2vector.class \
 vector_fill_b.class \
+vector_append.class \
 call_with_input_file.class \
 call_with_output_file.class \
 current_input_port.class \

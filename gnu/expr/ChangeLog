@@ -1,3 +1,17 @@
+Mon Nov 23 16:04:42 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Inlineable.java (getReturnType):  New method.
+	* PrimProcedure.java (getReturnType):  New method.
+	* ApplyExp.java (getType):  Generalize with Inlineable.getReturnType;
+
+	* ObjectExp.java:  New Expression class.
+	* BeginExp.java (getExpressions):  New method.
+	* Compilation.java (addClass):  Remove unused local 'main'.
+	* FindTailCalls.java (walkLambdaExp):  Allow null body.
+	* ExpFullWalker.java (walkLambdaExp):  Allow null body.
+	* LambdaExp.java (firstChild, nextSibling):  Make public.
+	* Makefile.am, Makefile.in (java_JAVA):  Add ObjectExp.java.
+
 Sun Nov 15 21:31:59 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ReferenceExp.java (lookup):  Remove magic for Scheme <TYPE>

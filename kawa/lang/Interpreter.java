@@ -37,6 +37,6 @@ public abstract class Interpreter
   }
 
   public abstract Object read (InPort in)
-    throws java.io.IOException, kawa.lang.ReadError;
+    throws java.io.IOException, SyntaxException;
   public abstract void print (Object obj, OutPort out);
 }

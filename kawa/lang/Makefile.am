@@ -12,13 +12,12 @@ WrongArguments.java \
 WrongType.java \
 GenericError.java\
 NamedException.java \
-ReadError.java \
-EofReadError.java
+SyntaxException.java
 
 java_JAVA=\
 Char.java \
 LineBufferedReader.java QueueReader.java \
-InPort.java \
+InPort.java SourceError.java Lexer.java ScmRead.java \
 OutPort.java \
 TtyInPort.java SysInPort.java \
 LogWriter.java NullReader.java CharArrayInPort.java \

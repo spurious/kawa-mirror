@@ -1,3 +1,13 @@
+2003-01-05  Per Bothner  <per@bothner.com>
+
+	* XPath.java:  Removed - superceded more-or-less by XQuery.
+	* XPathConstants.java:  Likewise.
+	* XPathContext.java:  Likewise.
+	* XPathFunction.java:  Likewise.
+	* XPathParser.java:  Likewise.
+	* XPathVariable.java:  Likewise.
+	* Makefile.am:  Update acordingly.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* QName.java.in:  Removed - now uses gnu.mapping.Symbol.

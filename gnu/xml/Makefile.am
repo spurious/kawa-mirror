@@ -3,9 +3,6 @@
 include $(top_srcdir)/Make-rules
 
 java_FUTURE = \
-  ArrayDocument.java \
-  ArrayDocumentConstants.java \
-  ArrayDocumentHandler.java \
   ParsedXMLPrinter.java \
   MakeTreeNode.java \
   TreeNode.java \
@@ -15,14 +12,7 @@ java_FUTURE = \
 java_sources = \
   NamedChildrenFilter.java \
   NamespaceResolver.java \
-  XPath.java \
-  XPathConstants.java \
-  XPathContext.java \
-  XPathFunction.java \
-  XPathParser.java \
-  XPathVariable.java \
   XMLPrinter.java \
-  VariableProvider.java \
   ParsedXMLToConsumer.java
 
 java_BUILT = \

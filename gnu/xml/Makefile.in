@@ -154,9 +154,6 @@ DONT_EDIT_SUBS = -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-' \
 
 
 java_FUTURE = \
-  ArrayDocument.java \
-  ArrayDocumentConstants.java \
-  ArrayDocumentHandler.java \
   ParsedXMLPrinter.java \
   MakeTreeNode.java \
   TreeNode.java \
@@ -167,14 +164,7 @@ java_FUTURE = \
 java_sources = \
   NamedChildrenFilter.java \
   NamespaceResolver.java \
-  XPath.java \
-  XPathConstants.java \
-  XPathContext.java \
-  XPathFunction.java \
-  XPathParser.java \
-  XPathVariable.java \
   XMLPrinter.java \
-  VariableProvider.java \
   ParsedXMLToConsumer.java
 
 

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.2e from Makefile.am
+# Makefile.in generated automatically by automake 1.2g from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -11,7 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
-SHELL = @SHELL@
+SHELL = /bin/sh
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -57,6 +57,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 EXEEXT = @EXEEXT@
 JAVA = @JAVA@
+JAVAC = @JAVAC@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
@@ -65,165 +66,162 @@ VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUFFIXES = .java .class
-
-# Use an environment variable for CLASSPATH so we pick up standard classes:
-CLASSPATH_ENV = CLASSPATH=../..:$(srcdir)/../..:$$CLASSPATH
-JAVAC = javac
-JCFLAGS = -g
+SUFFIXES = .java .java
 
 javadir=$(datadir)/java/$(subdir)
 
 EXCEPTIONS=\
-UnboundSymbol.class \
-WrongArguments.class \
-WrongType.class \
-GenericError.class\
-NamedException.class \
-ReadError.class \
-EofReadError.class
+UnboundSymbol.java \
+WrongArguments.java \
+WrongType.java \
+GenericError.java\
+NamedException.java \
+ReadError.java \
+EofReadError.java
 
-OBJ=\
-Char.class \
-LineBufferedReader.class QueueReader.class \
-InPort.class \
-OutPort.class \
-TtyInPort.class SysInPort.class \
-LogWriter.class NullReader.class CharArrayInPort.class \
-Target.class StackTarget.class IgnoreTarget.class TailTarget.class \
-Expression.class \
-ApplyExp.class \
-BeginExp.class \
-ErrorExp.class \
-IfExp.class \
-LambdaExp.class \
-LetExp.class \
-QuoteExp.class \
-ReferenceExp.class \
-ScopeExp.class \
-SetExp.class SetApplyExp.class \
-ModuleExp.class \
-TryExp.class CatchClause.class \
+java_JAVA=\
+Char.java \
+LineBufferedReader.java QueueReader.java \
+InPort.java \
+OutPort.java \
+TtyInPort.java SysInPort.java \
+LogWriter.java NullReader.java CharArrayInPort.java \
+Target.java StackTarget.java IgnoreTarget.java TailTarget.java \
+ConditionalTarget.java \
+Expression.java \
+ApplyExp.java \
+BeginExp.java \
+ErrorExp.java \
+IfExp.java \
+LambdaExp.java \
+LetExp.java \
+QuoteExp.java \
+ReferenceExp.java \
+ScopeExp.java \
+SetExp.java SetApplyExp.java \
+ModuleExp.java \
+TryExp.java CatchClause.java \
 \
-Declaration.class \
-Location.class \
-Binding.class \
-Environment.class \
+Declaration.java \
+Location.java \
+Binding.java \
+Environment.java \
 \
-Pattern.class \
-AnyPat.class \
-EqualPat.class \
-ListPat.class \
-ListRepeatPat.class \
-PairPat.class \
-VarListPat.class \
+Pattern.java \
+AnyPat.java \
+EqualPat.java \
+ListPat.java \
+ListRepeatPat.java \
+PairPat.java \
+VarListPat.java \
 \
-Printable.class \
-Named.class Inlineable.class \
-Sequence.class \
-List.class \
-Pair.class \
-PairWithPosition.class \
-FString.class \
-SFormat.class \
-Symbol.class \
-Keyword.class Special.class \
-Vector.class \
-Undefined.class \
-Lambda.class \
-Quote.class \
-Translator.class \
-Interpreter.class \
-Eval.class \
-Procedure.class \
-Procedure0.class \
-Procedure1.class \
-Procedure2.class \
-Procedure3.class \
-Procedure4.class \
-Procedure0or1.class \
-Procedure1or2.class \
-ProcedureN.class \
-AutoloadProcedure.class \
-HasSetter.class Setter.class Setter0.class Setter1.class \
-ModuleBody.class \
-Continuation.class \
-CalledContinuation.class \
-Syntax.class \
-SyntaxRule.class \
-SyntaxRules.class \
-DefMacro.class \
-AutoloadSyntax.class \
-Literal.class \
-Compilation.class \
-Compilable.class \
-CompileFile.class \
-loadcompiled.class \
-SchemeLoader.class \
-CompiledProc.class \
-SpecialType.class PrimProcedure.class \
-PrimGetStatic.class PrimSetStatic.class \
-PrimArrayNew.class PrimArrayLength.class PrimArraySet.class PrimArrayGet.class\
-Values.class \
-Promise.class \
-Future.class \
-Record.class GetFieldProc.class SetFieldProc.class RecordConstructor.class \
+Printable.java \
+Named.java Inlineable.java \
+Sequence.java \
+List.java \
+Pair.java \
+PairWithPosition.java \
+FString.java \
+SFormat.java \
+Symbol.java \
+Keyword.java Special.java \
+Vector.java \
+Undefined.java \
+Lambda.java \
+Quote.java \
+Translator.java \
+Interpreter.java \
+Eval.java \
+Procedure.java \
+Procedure0.java \
+Procedure1.java \
+Procedure2.java \
+Procedure3.java \
+Procedure4.java \
+Procedure0or1.java \
+Procedure1or2.java \
+ProcedureN.java \
+AutoloadProcedure.java \
+HasSetter.java Setter.java Setter0.java Setter1.java \
+ModuleBody.java \
+Continuation.java \
+CalledContinuation.java \
+Syntax.java \
+SyntaxRule.java \
+SyntaxRules.java \
+DefMacro.java \
+AutoloadSyntax.java \
+Literal.java \
+Compilation.java \
+Compilable.java \
+CompileFile.java \
+loadcompiled.java \
+SchemeLoader.java \
+CompiledProc.java \
+SpecialType.java PrimProcedure.java \
+PrimGetStatic.java PrimSetStatic.java \
+PrimArrayNew.java PrimArrayLength.java PrimArraySet.java PrimArrayGet.java\
+Values.java \
+Promise.java \
+Future.java \
+Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)
-
-java_DATA=$(OBJ)
-
-# Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.java)
-
-CLEANFILES = *.class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-DATA =  $(java_DATA)
-
-DIST_COMMON =  Makefile.am Makefile.in
+JAVACFLAGS = 
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
+DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-default: all
+all: Makefile classjava.stamp
 
 .SUFFIXES:
-.SUFFIXES: .class .java
-$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/lang/Makefile
+.SUFFIXES: .java
+$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus ./kawa/lang/Makefile
 
-Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-install-javaDATA: $(java_DATA)
+mostlyclean-javaJAVA:
+
+clean-javaJAVA:
+	-rm *.class classjava.stamp
+
+distclean-javaJAVA:
+
+maintainer-clean-javaJAVA:
+
+install-javaJAVA: classjava.stamp
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	@list='$(java_DATA)'; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
-	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(javadir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(javadir)/$$p; \
-	  fi; fi; \
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(javadir)/$$p; \
 	done
 
-uninstall-javaDATA:
-	$(NORMAL_UNINSTALL)
-	list='$(java_DATA)'; for p in $$list; do \
+uninstall-javaJAVA:
+	@$(NORMAL_UNINSTALL)
+	for p in *.class; do \
 	  rm -f $(javadir)/$$p; \
 	done
+classjava.stamp: $(java_JAVA)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > classjava.stamp
 tags: TAGS
 TAGS:
 
 
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
-subdir = kawa/lang
+subdir = ./kawa/lang
 
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
@@ -241,15 +239,13 @@ install-info:
 install-exec: 
 	@$(NORMAL_INSTALL)
 
-install-data: install-javaDATA
+install-data: install-javaJAVA
 	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
 
-uninstall: uninstall-javaDATA
-
-all: Makefile $(DATA)
+uninstall: uninstall-javaJAVA
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
@@ -271,28 +267,25 @@ distclean-generic:
 maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-mostlyclean:  mostlyclean-generic
+mostlyclean:  mostlyclean-javaJAVA mostlyclean-generic
 
-clean:  clean-generic mostlyclean
+clean:  clean-javaJAVA clean-generic mostlyclean
 
-distclean:  distclean-generic clean
+distclean:  distclean-javaJAVA distclean-generic clean
 	-rm -f config.status
 
-maintainer-clean:  maintainer-clean-generic distclean
+maintainer-clean:  maintainer-clean-javaJAVA maintainer-clean-generic \
+		distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-.PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi installcheck install-info install-exec install-data install \
-uninstall all installdirs mostlyclean-generic distclean-generic \
+.PHONY: mostlyclean-javaJAVA distclean-javaJAVA clean-javaJAVA \
+maintainer-clean-javaJAVA uninstall-javaJAVA install-javaJAVA tags \
+distdir info dvi installcheck install-info install-exec install-data \
+install uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
-
-.java.class:
-	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
-
-all: $(OBJ)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

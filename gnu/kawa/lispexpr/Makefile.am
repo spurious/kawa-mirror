@@ -6,6 +6,16 @@ include $(top_srcdir)/Make-rules
 
 java_JAVA=\
   LispReader.java \
+  ReaderDispatch.java \
+  ReaderDispatchMisc.java \
+  ReaderIgnoreRestOfLine.java \
+  ReaderMisc.java \
+  ReaderParens.java \
+  ReaderQuote.java \
+  ReaderString.java \
+  ReaderVector.java \
+  ReadTable.java \
+  ReadTableEntry.java \
   ScmRead.java
 
 KAWA = $(JAVA) kawa.repl

@@ -1,3 +1,21 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* LispReader.java:  Complete re-write, having the reader be
+	table-driven in the manner of Common Lisp readtables.
+	* ScmRead.java:  Likewise.
+	* ReadTable.java:  New class, extends gnu.kawa.util.RangeTable.
+	* ReadTableEntry.java:  New class.
+	* ReaderDispatch.java:  New class, extends ReadTableEntry.
+	* ReaderDispatchMisc.java:  New class, extends ReadTableEntry.
+	* ReaderIgnoreRestOfLine.java:  New class, extends ReadTableEntry.
+	* ReaderMisc.java:  New class, extends ReadTableEntry.
+	* ReaderParens.java:  New class, extends ReadTableEntry.
+	* ReaderQuote.java:  New class, extends ReadTableEntry.
+	* ReaderString.java:  New class, extends ReadTableEntry.
+	* ReaderVector.java:  New class, extends ReadTableEntry.
+	* Makefile.am:  Update for new classes.
+	* COPYING:  New file.
+
 2001-03-08  Per Bothner  <per@bothner.com>
 
 	* ScmRead.java:  Various fixes to use new gnu.lists package,

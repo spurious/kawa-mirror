@@ -157,7 +157,6 @@ public class FieldLocation extends ClassMemberLocation
   {
     try
       {
-	//System.err.println("getfval "+rfield+" inst:"+instance);
 	return rfield.get(instance);
       }
     catch (Throwable ex)

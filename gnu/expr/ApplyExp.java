@@ -450,11 +450,13 @@ public class ApplyExp extends Expression
     return super.getType();
   }
 
-  public static Expression inlineIfConstant(Procedure proc, ApplyExp exp)
-  {
-    return exp.inlineIfConstant(proc, (ExpWalker) null);
-  }
-
+  /** Inline this ApplyExp if parameters are constant.
+   * @param proc the procedure bound to this.func.
+   * @param walker the inline contact - an InlineCalls instance, actually.
+   * @return the constant result (as a QuoteExp) if inlining was possible;
+   *   otherwise this ApplyExp.
+   * If applying proc throws an exception, print a warning on walker.messages.
+   */
   public final Expression inlineIfConstant(Procedure proc, ExpWalker walker)
   {
     int len = args.length;

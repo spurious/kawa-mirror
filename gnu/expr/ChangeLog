@@ -2,6 +2,7 @@
 
 	* ApplyExp.java (inlineIfConstant):  New overload - pass ExpWalker.
 	Print warning and return argument if folding throws exception.
+	(inlineIfConstant):  Remove old no-longer-needed method.
 
 2003-07-14  Per Bothner  <per@bothner.com>
 

@@ -18,4 +18,15 @@ public class ArrayType extends ObjectType
 
   public String getNameOrSignature() { return getSignature(); }
 
+  public int compare(Type other)
+  {
+    // This is rather coarse .. FIXME
+    if (other instanceof ArrayType)
+      return -2;
+    else if (other.getName().equals("java.lang.Object"))
+      return -1;
+    else
+      return -3;
+  }
+
 }

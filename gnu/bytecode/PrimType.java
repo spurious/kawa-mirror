@@ -71,4 +71,81 @@ public class PrimType extends Type {
 	  super.emitCoerceFromObject(code);
       }
   }
+
+  public static int compare(PrimType type1, PrimType type2)
+  {
+    char sig1 = type1.signature.charAt(0);
+    char sig2 = type2.signature.charAt(0);
+
+    if (sig1 == sig2)
+      return 0;
+
+    // Anything can be converted to void, but not vice versa.
+    if (sig1 == 'V')
+      return 1;
+    if (sig2 == 'V')
+      return -1;
+
+    // In Java, no other type can be converted to/from boolean.
+    // Other languages, including C and Scheme are different:
+    // "everything" can be converted to a boolean.
+    if (sig1 == 'Z' || sig2 == 'Z')
+      return -3;
+
+    // On the other hand, in Java this is not correct,
+    // but it is correct for Scheme.  FIXME.
+    if (sig1 == 'C' || sig2 == 'C')
+      return -3;
+
+    if (sig1 == 'D')
+      return 1;
+    if (sig2 == 'D')
+      return -1;
+    if (sig1 == 'F')
+      return 1;
+    if (sig2 == 'F')
+      return -1;
+    if (sig1 == 'J')
+      return 1;
+    if (sig2 == 'J')
+      return -1;
+    if (sig1 == 'I')
+      return 1;
+    if (sig2 == 'I')
+      return -1;
+    if (sig1 == 'S')
+      return 1;
+    if (sig2 == 'S')
+      return -1;
+    // Can we get here?
+    return -3;
+  }
+
+  public int compare(Type other)
+  {
+    if (other instanceof PrimType)
+      return compare(this, (PrimType) other);
+    if (! (other instanceof ClassType))
+      return -3;
+    char sig1 = signature.charAt(0);
+    String otherName = other.getName();
+    // This is very incomplete!  FIXME.
+    switch (sig1)
+      {
+      case 'V':
+        return 1;
+      case 'D':
+        if (otherName.equals("java.lang.Double")
+            || otherName.equals("gnu.math.DFloat"))
+          return 0; // Or maybe 1?
+        break;
+      case 'I':
+        if (otherName.equals("java.lang.Integer"))
+          return 0; // Or maybe 1?
+        if (otherName.equals("gnu.math.IntNum"))
+          return -1;
+        break;
+      }
+    return -2;
+  }
 }

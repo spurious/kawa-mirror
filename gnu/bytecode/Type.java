@@ -226,17 +226,39 @@ public abstract class Type {
     if (this instanceof ClassType && other instanceof ClassType)
       {
 	// If stackType inherits from target type, no coercion is needed.
-	ClassType baseClass = (ClassType) this;
-	while (baseClass != null)
-	  {
-	    if (baseClass == other)
-	      return true;
-	    baseClass = baseClass.getSuperclass();
-	  }
+        return ((ClassType) this).isSubclass((ClassType) other);
       }
     // FIXME - also need to check for implemented interfaces!
 
     return false;
+  }
+
+  /** Return a numeric code showing "subtype" relationship:
+   *  1: if other is a pure subtype of this;
+   *  0: if has the same members;
+   * -1: if this is a pure subtype of other;
+   * -2: if both a member in common but neither is a subtype of the other;
+   * -3: if the types have no values in common.
+   * "Same member" is rather loose;  by "A is a subtype of B"
+   * we mean that all instance of A can be "widened" to B.
+   * More formally, A.compare(B) returns:
+   *  1: all B values can be converted to A without a coercion failure
+   *     (i.e. a ClassCastException), but not vice versa.
+   *  0: all A values can be converted to B without a coercion failure
+   *     and vice versa;
+   * -1: all A values can be converted to B without a coercion failure
+   *     not not vice versa;
+   * -2: there are (potentially) some A values that can be converted to B,
+   *     and some B values can be converted to A;
+   * -3: there are no A values that can be converted to B, and neither
+   *     are there any B values that can be converted to A.
+   */
+  public abstract int compare(Type other);
+
+  /** Change result from compare to compensate for argument swapping. */
+  protected static int swappedCompareResult(int code)
+  {
+    return code == 1 ? -1 : code == -1 ? 1 : code;
   }
 
   /** Return true iff t1[i].isSubtype(t2[i]) for all i. */

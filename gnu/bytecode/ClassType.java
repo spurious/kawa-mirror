@@ -127,6 +127,9 @@ public class ClassType extends ObjectType implements AttrContainer {
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
 
+  public final boolean isInterface()
+  { return (access_flags & Access.INTERFACE) != 0; }
+
   public ClassType () { }
 
   public ClassType (String class_name)
@@ -488,6 +491,41 @@ public class ClassType extends ObjectType implements AttrContainer {
     }
     return buffer;
   }
+
+  public final boolean isSubclass(ClassType other)
+  {
+    ClassType baseClass = this;
+    while (baseClass != null)
+      {
+        if (baseClass == other)
+          return true;
+        baseClass = baseClass.getSuperclass();
+      }
+    return false;
+  }
+
+  public int compare(Type other)
+  {
+    if (other instanceof PrimType)
+      return swappedCompareResult(((PrimType) other).compare(this));
+    if (other instanceof ArrayType)
+      return swappedCompareResult(((ArrayType) other).compare(this));
+    if (! (other instanceof ClassType))
+      return -3;
+    String name = getName();
+    if (name != null && name.equals(other.getName()))
+      return 0;
+    ClassType cother = (ClassType) other;
+    if (this.isInterface() || cother.isInterface())
+      return -2;
+    if (isSubclass(cother))
+      return -1;
+    if (cother.isSubclass(this))
+      return 1;
+    return -3;
+  }
+
+  
 
   public String toString()
   {

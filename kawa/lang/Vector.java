@@ -93,7 +93,7 @@ public class Vector extends Sequence implements Printable, Compilable
 	code.emitPushInt(i);
 	comp.emitLiteral (value[i]);
 	// Stack contents:  ..., Vector, array, array, i, value[i]
-	comp.method.compile_array_store (comp.scmObjectType);
+	code.emitArrayStore(comp.scmObjectType);
 	// Stack contents:  ..., Vector, array
       }
     // Remove no-longer-needed array from stack:

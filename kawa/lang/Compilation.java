@@ -149,6 +149,10 @@ public class Compilation
    * Only used if immdiate. */
   Field literalsField;
 
+  public static boolean generateMainDefault = false;
+  /** True if we should generate a main(String[]) method. */
+  public boolean generateMain = generateMainDefault;
+
   Literal findLiteral (Object value)
   {
     Literal literal = (Literal) literalTable.get (value);
@@ -227,7 +231,7 @@ public class Compilation
 	if (literal.field == literalsField)
 	  {
 	    code.emitPushInt(literal.index);
-	    method.compile_array_load (scmObjectType);
+	    code.emitArrayLoad(scmObjectType);
 	    method.maybe_compile_checkcast (literal.type);
 	  }
       }
@@ -399,7 +403,7 @@ public class Compilation
       }
 
     ClassType superType
-      = new ClassType (lexp.isModuleBody () ? "kawa.lang.ModuleBody"
+      = ClassType.make(lexp.isModuleBody () ? "kawa.lang.ModuleBody"
 		       : "kawa.lang.Procedure" + arg_letter);
     curClass.setSuper (superType);
 
@@ -438,7 +442,7 @@ public class Compilation
       }
 
     // If immediate, we cannot set the function name in the constructor,
-    // since setLiterals has not been called yet (ecept for nested fnctions).
+    // since setLiterals has not been called yet (ecept for nested functions).
     if (lexp.name != null && !immediate)
       {
 	constructor_method.compile_push_this ();
@@ -592,7 +596,7 @@ public class Compilation
 		  { // This is a required parameter, in argsArray[i].
 		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
-		    method.compile_array_load (scmObjectType);
+		    code.emitArrayLoad(scmObjectType);
 		  }
 		else if (i < lexp.min_args + opt_args)
 		  { // An optional parameter
@@ -602,7 +606,7 @@ public class Compilation
 		    code.emitIfIntLt();
 		    code.emitLoad(argsArray);
 		    code.emitPushInt(i);
-                    method.compile_array_load(scmObjectType);
+                    code.emitArrayLoad(scmObjectType);
 		    code.emitElse();
 		    lexp.defaultArgs[opt_i++].compile(this, 0);
 		    code.emitFi();
@@ -643,7 +647,7 @@ public class Compilation
 		if (param.isSimple ())
 		  code.emitStore(param);
 		else
-		  method.compile_array_store (Compilation.scmObjectType);
+		  code.emitArrayStore(Compilation.scmObjectType);
 	      }
 	    i++;
 	  }
@@ -669,6 +673,25 @@ public class Compilation
 
     method.popScope();
     curLambda = saveLambda;
+
+    if (generateMain && lexp.isModuleBody () && curClass == mainClass)
+      {
+	Type[] args = { new ArrayType(javaStringType) };
+	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,
+				    args, Type.void_type);
+				    
+	method.init_param_slots ();
+	code = getCode();
+	code.emitNew(curClass);
+	code.emitDup(curClass);
+	code.emitInvokeSpecial(constructor_method);
+	code.emitLoad(code.getArg(0));
+	Method moduleMain
+	  = superType.addMethod("runAsMain", Access.PUBLIC,
+				args, Type.void_type);
+	code.emitInvokeVirtual(moduleMain);
+	code.emitReturn();
+      }
 
     return new_class;
   }

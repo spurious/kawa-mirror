@@ -95,7 +95,7 @@ public class Literal
 	code.emitPushInt(i);
 	comp.emitLiteral (array[i]);
 	// Stack contents:  ..., array, array, i, array[i]
-	comp.method.compile_array_store (comp.scmObjectType);
+	code.emitArrayStore(comp.scmObjectType);
 	// Stack contents:  ..., array
       }
   }

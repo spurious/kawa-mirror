@@ -74,7 +74,7 @@ public class SetExp extends Expression
 	code.emitSwap();
 	code.emitPushInt(decl.offset);
 	code.emitSwap();
-	comp.method.compile_array_store (Compilation.scmObjectType);
+	code.emitArrayStore(Compilation.scmObjectType);
       }
   }
 
@@ -94,7 +94,7 @@ public class SetExp extends Expression
 	    comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	    code.emitPushInt(binding.offset);
 	    new_value.compile (comp, 0);
-	    comp.method.compile_array_store (Compilation.scmObjectType);
+	    code.emitArrayStore(Compilation.scmObjectType);
 	  }
       }
     else

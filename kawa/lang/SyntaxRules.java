@@ -267,7 +267,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	code.emitPushInt(i);
 	comp.emitLiteral (rules[i]);
 	// Stack contents:  ..., this,this,literals, array, array, i, rules[i]
-	comp.method.compile_array_store (SyntaxRule.thisType);
+	code.emitArrayStore(SyntaxRule.thisType);
 	// Stack contents:  ..., this, this, literals, array
       }
 

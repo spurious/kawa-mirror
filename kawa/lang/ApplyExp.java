@@ -110,7 +110,7 @@ public class ApplyExp extends Expression
 	    code.emitDup(comp.objArrayType);
 	    code.emitPushInt(i);
 	    exp.args[i].compile (comp, 0);
-	    comp.method.compile_array_store (comp.scmObjectType);
+	    code.emitArrayStore(comp.scmObjectType);
 	  }
 	applymethod = comp.applyNmethod;
       }

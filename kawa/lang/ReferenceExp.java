@@ -65,7 +65,7 @@ public class ReferenceExp extends Expression
 	compile_load (decl.baseVariable, comp);  // recursive!
 	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	code.emitPushInt(decl.offset);
-	comp.method.compile_array_load (Compilation.scmObjectType);
+	code.emitArrayLoad(Compilation.scmObjectType);
       }
     else
       {
@@ -79,7 +79,7 @@ public class ReferenceExp extends Expression
 	      {
 		comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 		code.emitPushInt(lambda.staticLink.offset);
-		comp.method.compile_array_load (Compilation.scmObjectType);
+		code.emitArrayLoad(Compilation.scmObjectType);
 		// Invariant:  The stack top contains lambda.staticLink.
 	      }
 	    // Now the stack top is the declLambda heapFrame.

@@ -53,7 +53,7 @@ public class SetApplyExp extends ApplyExp
 	    int index = i == args_length ? 0 : i + 1;
 	    code.emitPushInt(index);
 	    exp.args[index].compile (comp, 0);
-	    comp.method.compile_array_store (comp.scmObjectType);
+	    code.emitArrayStore(comp.scmObjectType);
 	  }
       }
 

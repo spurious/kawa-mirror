@@ -1,3 +1,7 @@
+Wed Jul 29 09:47:09 1998  PARMELAN Edouard <parmee@postecss.ncrfran.france.ncr.com>
+
+	* ClassTypeWritter,java (printSignature):  Add missing commas.
+
 Wed Jul 22 22:18:24 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ZipLoader.java (loadClass):  Fix variable clash.

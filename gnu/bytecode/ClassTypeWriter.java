@@ -282,7 +282,7 @@ public class ClassTypeWriter extends PrintWriter
 	    print(c);
 	    break;
 	  }
-	if (nargs > 0)
+	if (nargs++ > 0)
 	  print(',');
 	pos = printSignature(sig, pos);
       }

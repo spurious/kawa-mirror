@@ -8,7 +8,7 @@ package gnu.mapping;
 public class FluidConstraint extends Constraint
 {
   /** The original Constraint from the Binding.
-   * Use this to get the default value if tere is no fluid binding
+   * Use this to get the default value if there is no fluid binding
    * in the current thread. */
   Constraint savedConstraint;
 

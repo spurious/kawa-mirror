@@ -1,4 +1,11 @@
 XQuery:
+* Much improved namespace support.  Namespace attributes in a source
+  xml document are remembered, and correctly serialized (printed).
+  There is support for namespace undeclarations (as in the XML Namespaces
+  1.1 Candicate Recommendation).  Copying element nodes (as needed when
+  creating new element nodes with element constructors) should correctly
+  copy the namespace declarations.
+  Still missing is support for namespace attributes in element constructors.
 * Support compiled library modules:  'module' and 'import module'
   statements.  Efficient cross-module calling.  (Needs documentation.)
 * Proper QName handling of variable and function names.
@@ -30,7 +37,14 @@ XQuery:
 Various fixes and better error messages in number parsing.
 Some optimizations for the divide function.
 
+New framework for controlling compiler warnings and other features,
+supporting command-line flags, and the Scheme forms with-compile-options
+and module-compile-options.  The flag --warn-undefined-variable is
+useful for catching typos.  Implementation funded by Merced Systems.
+
 New invoke-special syntax form (implemented by Chris Dean).
+
+New define-variable form (similar to Common Lisp's defvar).
 
 Changes from Kawa 1.6.99 to 1.7.
 ================================

@@ -1,3 +1,9 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* IntegerFormat.java:  Remove useless import statements.
+	* LiteralFormat.java (toString):  Adding a String and a char[]
+	doesn't behave as expected.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (pushNesting, popNesting):  Moved from XQParser.

@@ -3,7 +3,6 @@
 
 package gnu.text;
 import java.text.FieldPosition;
-import java.text.Format;
 import java.io.Writer;
 
 /** Handle formatting of integers.

@@ -36,5 +36,10 @@ public class LiteralFormat extends ReportFormat
   }
 
   public String toString()
-  { return "LiteralFormat[\"" + text + "\"]"; }
+  {
+    StringBuffer sbuf = new StringBuffer("LiteralFormat[\"");
+    sbuf.append(text);
+    sbuf.append("\"]");
+    return sbuf.toString();
+  }
 }

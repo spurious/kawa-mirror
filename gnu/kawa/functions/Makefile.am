@@ -14,6 +14,7 @@ java_sources=\
   MakeProcedure.java \
   Member.java \
   Setter.java \
+  ValuesMap.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
 PACKAGE_FNAME = gnu-kawa-functions

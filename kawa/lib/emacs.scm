@@ -9,3 +9,7 @@
     ((primitive-virtual-method <gnu.elisp.ELispReader> "readObject"
 			       <object> ())
      lexer)))
+
+(define (emacs:symbol-name (symbol <gnu.mapping.Binding>))
+  ((primitive-static-method <gnu.elisp.ELisp> "getString" <object> (<gnu.mapping.Binding>))
+   symbol))

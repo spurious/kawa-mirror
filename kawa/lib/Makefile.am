@@ -28,6 +28,7 @@ java_SCM=\
   syntax.scm \
   vectors.scm \
   system.scm \
+  trace.scm \
   emacs.scm
 
 SOURCES = $(java_JAVA)

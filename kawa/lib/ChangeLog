@@ -1,3 +1,9 @@
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* trace.scm:  New file.
+	* files.scm (system-tmpdir, make-temporary-file):  New procedures.
+	* Makefile.am, Makefile.in (java_SCM):  Add trace.scm.
+
 1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* reflection.scm (subtype?):  New procedure.

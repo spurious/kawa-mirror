@@ -47,5 +47,35 @@
   ((primitive-constructor "java.io.File" ("String"))
     filename))
   
+(define (%file-separator)
+  (symbol->string
+   ((primitive-static-method <java.lang.System> "getProperty"
+			     <String> (<String>))
+    'file.separator)))
+
+(define (system-tmpdir)
+  (let ((name
+	 ((primitive-static-method <java.lang.System> "getProperty"
+				   <String> (<String>))
+	  'java.io.tmpdir))) ; Java2 only
+    (if (not (eq? name #!null))
+	(symbol->string name)
+	(let ((sep (%file-separator)))
+	  (if (equal? sep "\\") "C:\\temp" "/tmp")))))
+
 ; From scsh
 ;(define (directory-files [dir [dotfiles?]]) ...)
+
+(define *temp-file-number* 1)
+; From MzLib.  Scsh has (crate-temp-file [prefix]).
+; This is not safe from race conditions!
+; Fix this using new Java2 File.createTempFile.  FIXME.
+; Should not be using /tmp.  FIXME.
+(define (make-temporary-file #!optional (fmt "kawa~d.tmp"))
+  (let loop ()
+    (let ((fname (string-append (system-tmpdir) (%file-separator)
+				(format #f fmt *temp-file-number*))))
+      (set! *temp-file-number* (+ *temp-file-number* 1))
+      (if (file-exists? fname)
+	  (loop)
+	  fname))))

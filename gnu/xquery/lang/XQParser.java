@@ -29,7 +29,7 @@ public class XQParser extends LispReader // should be extends Lexer
 
   public static boolean warnOldVersion;
 
-  /** The inetrnal name of the variable containing '.', teh context node. */
+  /** The internal name of the variable containing '.', the context node. */
   static final String DOT_VARNAME = "$dot$";
 
   /** The pseduo-function position() is mapped to a reference. */
@@ -208,9 +208,11 @@ public class XQParser extends LispReader // should be extends Lexer
   /* FuncName including following '('). */
   static final int FNAME_TOKEN = 'F';
 
-  static final int DECLARE_NAMESPACE_TOKEN = 'M'; // <"declare" "namespace">
+  static final int IMPORT_MODULE_TOKEN = 'I'; // <"import" "module">
+  static final int MODULE_NAMESPACE_TOKEN = 'M'; // <"module" "namespace">
+  static final int DECLARE_NAMESPACE_TOKEN = 'N'; // <"declare" "namespace">
   static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
-  static final int DEFAULT_ELEMENT_TOKEN = 'N'; // <"default" "element">
+  static final int DEFAULT_ELEMENT_TOKEN = 'E'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
   static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
   static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
@@ -340,7 +342,7 @@ public class XQParser extends LispReader // should be extends Lexer
     switch (ch)
       {
       case ')':  case '[':  case ']':  case '}':
-      case '$':  case '@':  case ',':  case '?':
+      case '$':  case '@':  case ',':  case '?':  case ';':
 	break;
       case ':':
 	if (checkNext('='))
@@ -712,9 +714,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (lookingAt("default", /*"f"+*/ "unction"))
 	      return curToken = DEFAULT_FUNCTION_TOKEN;
 	    break;
+	  case 'm':
+	    if (lookingAt("import", /*"m"+*/ "odule"))
+	      return curToken = IMPORT_MODULE_TOKEN;
+	    break;
 	  case 'n':
 	    if (lookingAt("declare", /*"n"+*/ "amespace"))
 	      return curToken = DECLARE_NAMESPACE_TOKEN;
+	    if (lookingAt("module", /*"n"+*/ "amespace"))
+	      return curToken = MODULE_NAMESPACE_TOKEN;
 	    break;
 	  case 'v':
 	    if (lookingAt("declare", /*"v"+*/ "ariable"))
@@ -772,7 +780,9 @@ public class XQParser extends LispReader // should be extends Lexer
     namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
     namespaces.put("xs", "http://www.w3.org/2001/XMLSchema");
     namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-    namespaces.put("fn", "http://www.w3.org/2002/11/xquery-functions");
+    namespaces.put("fn", XQuery.XQUERY_FUNCTION_NAMESPACE);
+    namespaces.put("kawa", XQuery.KAWA_FUNCTION_NAMESPACE);
+    namespaces.put("qexo", XQuery.KAWA_FUNCTION_NAMESPACE);
     namespaces.put("local", "http://www.w3.org/2003/08/xquery-local-functions");
   }
 
@@ -2095,14 +2105,13 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	int colon = tokenBufferLength;
 	while (--colon >= 0 && tokenBuffer[colon] != ':') ;
-	Object name;
+	String local, uri;
 	if (colon >= 0)
 	  {
 	    String prefix = new String(tokenBuffer, 0, colon);
 	    colon++;
-	    String local
-	      = new String(tokenBuffer, colon, tokenBufferLength - colon);
-	    String uri = (String) namespaces.get(prefix);
+	    local = new String(tokenBuffer, colon, tokenBufferLength - colon);
+	    uri = (String) namespaces.get(prefix);
 	    if (uri == null)
 	      {
 		try
@@ -2113,21 +2122,18 @@ public class XQParser extends LispReader // should be extends Lexer
 		catch (Exception ex)
 		  {
 		    syntaxError("unknown namespace '" + prefix + "'");
-		    name = new Symbol(local.intern());
+		    uri = defaultFunctionNamespace;
 		  }
 	      }
-	    name = Symbol.make(uri, local);
 	  }
 	else
 	  {
-	    String str = new String(tokenBuffer, 0, tokenBufferLength);
-	    if (str.equals("typeswitch"))
+	    local = new String(tokenBuffer, 0, tokenBufferLength);
+	    if (local.equals("typeswitch"))
 	      return parseTypeSwitch();
-	    if (defaultFunctionNamespace == "")
-	      name = str.intern(); // kludge
-	    else
-	      name = Symbol.make(defaultFunctionNamespace, str);
+	    uri = defaultFunctionNamespace;
 	  }
+	Object name = Symbol.make(uri, local);
 	startColumn -= tokenBufferLength;
 	char save = pushNesting('(');
 	getRawToken();
@@ -2481,30 +2487,28 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
-    Object name;
+    boolean isLocal = false;
+    String local, uri;
     if (curToken == QNAME_TOKEN)
       {
 	int colon = tokenBufferLength;
 	while (tokenBuffer[--colon] != ':') ;
 	String prefix = new String(tokenBuffer, 0, colon);
+	isLocal = prefix.equals("local");
 	colon++;
-	String local = new String(tokenBuffer, colon,
-				  tokenBufferLength - colon);
-	String uri = (String) namespaces.get(prefix);
+	local = new String(tokenBuffer, colon, tokenBufferLength - colon);
+	uri = (String) namespaces.get(prefix);
 	if (uri == null)
 	  syntaxError("unknown namespace '" + prefix + "'");
-	name = Symbol.make(uri, local);
       }
     else if (curToken == NCNAME_TOKEN)
       {
-	String str = new String(tokenBuffer, 0, tokenBufferLength);
-	if (defaultFunctionNamespace == "")
-	  name = str.intern(); // kludge
-	else
-	  name = Symbol.make(defaultFunctionNamespace, str);
+	local = new String(tokenBuffer, 0, tokenBufferLength);
+	uri = defaultFunctionNamespace;
       }
     else
       return syntaxError("missing function name");
+    Object name = Symbol.make(uri, local);
     getRawToken();
     if (curToken != '(')
       return syntaxError("missing parameter list:"+curToken);
@@ -2514,6 +2518,12 @@ public class XQParser extends LispReader // should be extends Lexer
     lexp.setLine(declLine, declColumn);
     lexp.setName(name);
     Declaration decl = parser.currentScope().addDeclaration(name);
+    if (isLocal && ! parser.immediate)
+      {
+	decl.setFlag(Declaration.PRIVATE_SPECIFIED);
+	decl.setPrivate(true);
+      }
+    decl.setFlag(Declaration.STATIC_SPECIFIED);
     parser.push(decl);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
@@ -2693,8 +2703,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  error('w', "use 'declare namespace' instead of 'namespace'");
 	curToken = DECLARE_NAMESPACE_TOKEN;
       }
-    if (curToken == DECLARE_NAMESPACE_TOKEN)
+    if (curToken == DECLARE_NAMESPACE_TOKEN
+	|| curToken == MODULE_NAMESPACE_TOKEN)
       {
+	int command = curToken;
 	int next = skipSpace(nesting != 0);
 	if (next >= 0)
 	  {
@@ -2703,20 +2715,61 @@ public class XQParser extends LispReader // should be extends Lexer
 	      {
 		getRawToken();
 		if (curToken != NCNAME_TOKEN)
-		  return syntaxError("confused after seeing 'declare namespace'");
+		  return syntaxError("missing namespace prefix");
 		String prefix = new String(tokenBuffer, 0, tokenBufferLength);
 		getRawToken();
 		if (curToken != OP_EQU)
 		  return syntaxError("missing '=' in namespace declaration");
 		getRawToken();
 		if (curToken != STRING_TOKEN)
-		  return syntaxError("missing uri namespace declaration");
+		  return syntaxError("missing uri in namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
 		namespaces.put(prefix, uri);
 		parseSeparator();
+		if (command == MODULE_NAMESPACE_TOKEN)
+		  parser.getModule().setName(uri);
 		return QuoteExp.voidExp;
 	      }
 	  }
+      }
+    if (curToken == IMPORT_MODULE_TOKEN)
+      {
+	getRawToken();
+	String prefix = null;
+	if (match("namespace"))
+	  {
+	    getRawToken();
+	    if (curToken != NCNAME_TOKEN)
+	      return syntaxError("missing namespace prefix");
+	    prefix = new String(tokenBuffer, 0, tokenBufferLength);
+	    getRawToken();
+	    if (curToken != OP_EQU)
+	      return syntaxError("missing '=' in namespace declaration");
+	    getRawToken();
+	  }
+	if (curToken != STRING_TOKEN)
+	  return syntaxError("missing uri in namespace declaration");
+	String uri = new String(tokenBuffer, 0, tokenBufferLength);
+	if (prefix != null)
+	  namespaces.put(prefix, uri);
+	getRawToken();
+	if (match("at"))
+	  {
+	    getRawToken();
+	    if (curToken != STRING_TOKEN)
+	      return syntaxError("missing module location");
+	    String at = new String(tokenBuffer, 0, tokenBufferLength);
+	    parseSeparator();
+	  }
+	else if (curToken != ';')
+	  parseSeparator();
+	ModuleExp module = parser.getModule();
+	Vector forms = new Vector();
+	Type type = gnu.expr.Interpreter.string2Type(uri);
+	kawa.standard.require.importDefinitions(type, uri, forms, module, parser);
+	Expression[] inits = new Expression[forms.size()];
+	forms.toArray(inits);
+	return BeginExp.canonicalize(new BeginExp(inits));
       }
     if (curToken == DEFAULT_ELEMENT_TOKEN
 	|| curToken == DEFAULT_FUNCTION_TOKEN
@@ -2745,12 +2798,9 @@ public class XQParser extends LispReader // should be extends Lexer
 		  return syntaxError("missing uri namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
 		if (forFunctions)
-		  {
-		    error('w', "'declare function namespace' not implemented - ignored");
-		  defaultFunctionNamespace = uri.toString();
-		  }
+		  defaultFunctionNamespace = uri;
 		else
-		  defaultElementNamespace = uri.toString();
+		  defaultElementNamespace = uri;
 		return QuoteExp.voidExp;
 	      }
 	  }

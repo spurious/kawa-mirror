@@ -11,6 +11,7 @@ import gnu.bytecode.Type;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.xquery.util.*;
 import gnu.xml.*;
+import gnu.kawa.reflect.ClassMethods;
 import gnu.text.Lexer;
 import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
@@ -19,6 +20,8 @@ public class XQuery extends Interpreter
 {
   public static final String XQUERY_FUNCTION_NAMESPACE
     = "http://www.w3.org/2003/05/xpath-functions";
+  public static final String KAWA_FUNCTION_NAMESPACE
+    = "http://kawa.gnu.org/";
   static boolean charIsInt = false;
 
   public static gnu.math.Numeric asNumber(Object arg)
@@ -61,6 +64,7 @@ public class XQuery extends Interpreter
     gnu.text.SourceMessages messages = lexer.getMessages();
     Compilation tr = new Compilation(messages);
     ModuleExp mexp = new ModuleExp();
+    mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
     tr.push(mexp);
     tr.mustCompileHere();
     tr.immediate = true;
@@ -82,6 +86,7 @@ public class XQuery extends Interpreter
     Compilation tr = new Compilation(messages);
     tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
+    mexp.setFlag(ModuleExp.STATIC_SPECIFIED);
     mexp.setFile(port.getName());
     tr.push(mexp);
     XQParser lexer = (XQParser) getLexer(port, messages);
@@ -115,6 +120,20 @@ public class XQuery extends Interpreter
     return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
   }
 
+  public void define(String sym, Object p)
+  {
+    if (p instanceof Procedure)
+      Environment.defineFunction(environ, sym, p);
+    else
+      environ.define (sym, p);
+  }
+
+  protected void define_method(String name, String cname, String mname)
+  {
+    Environment.defineFunction(environ, name,
+			       ClassMethods.apply(cname, mname));
+  }
+
   public String getName()
   {
     return "XQuery";
@@ -124,34 +143,35 @@ public class XQuery extends Interpreter
 
   static int envCounter = 0;
 
+  /** Environment of pre-defined non-standard Qexo/Kawa functions. */
+  public static Environment extensionsEnvEnv
+    = Environment.getInstance(KAWA_FUNCTION_NAMESPACE);
+
   public XQuery()
   {
     Environment scmEnv = Scheme.builtin();
-    environ = new Environment(scmEnv);
-    environ.setName ("interaction-environment."+(++envCounter));
-    ModuleBody.setMainPrintValues(true);
 
-    /*
-    BindingEnumeration e = scmEnv.enumerateAllBindings();
-    while (e.hasMoreElements())
-      {
-	Binding b = e.nextBinding();
-	if (b.isBound())
-	  {
-	    String name = b.getName();
-	    Object val = b.get();
-	    define(name, val);
-	  }
-      }
-    */
+    environ = Environment.getInstance(XQUERY_FUNCTION_NAMESPACE);
+    environ.setPrevious(extensionsEnvEnv);
+
+    ModuleBody.setMainPrintValues(true);
 
     if (instance == null)
       instance = this;
 
     Environment saveEnv = Environment.getCurrent();
-    Environment.setCurrent(environ);
     try
       {
+	Environment.setCurrent(scmEnv);
+	SymbolEnumeration e = scmEnv.enumerateAllSymbols();
+	while (e.hasMoreElements())
+	  {
+	    Symbol b = e.nextSymbol();
+	    Object val = b.get(null);
+	    if (val instanceof Procedure)
+	      extensionsEnvEnv.getSymbol(b.getName()).setFunctionValue(val);
+	  }
+
 	// Force it to be loaded now, so we can over-ride let* length etc.
 	loadClass("kawa.lib.std_syntax");
 	loadClass("kawa.lib.lists");
@@ -171,7 +191,6 @@ public class XQuery extends Interpreter
 	Environment.setCurrent(saveEnv);
       }
 
-    define("define", new kawa.standard.set_b());
     define("document", gnu.kawa.xml.Document.document);
     define("doc", gnu.kawa.xml.Document.document);  // kludge
     define("unescaped-data", gnu.kawa.xml.MakeUnescapedData.unescapedData);
@@ -198,7 +217,7 @@ public class XQuery extends Interpreter
 		 "gnu.kawa.xml.IteratorItems", "iteratorItems");
     define_field("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_field("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
-    define_field("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("node-name", "gnu.kawa.xml.NodeName", "nodeName");
     define_method("root", "gnu.kawa.xml.Nodes", "root");
     define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");

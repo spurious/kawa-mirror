@@ -1,3 +1,21 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Initial support for modules.
+	(IMPORT_MODULE_TOKEN, MODULE_NAMESPACE_TOKEN):  New constant.
+	(peekOperand):  Recognize new compound tokens.
+	(pushStandardNamespaces):  Define kawa and qexo prefixes.
+	(parseMaybePrimaryExpr):  Better handling of function names.
+	(parseFunctionDefinition):  Likewise.  Make functions static.
+	'local' prefix sets private flag.
+	(parse):  Recognize module declaration and module import.
+	'declare function namespace' is now supported.
+	(getRawToken):  Recognize ';'.
+	* XQuery.java (KAWA_FUNCTION_NAMESPACE):  New constant.
+	(parse):  XQuery modules are now static.
+	(define, define_method):  New method overrides.
+	(<init>):  Initialize qexo namespace.
+	Don't define 'define'.
+
 2003-09-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (getRawToken):  Add missing tokenBufferAppend.

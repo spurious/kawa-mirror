@@ -242,7 +242,8 @@ public class SetExp extends Expression
 
   public final gnu.bytecode.Type getType()
   {
-    return Type.void_type;
+    return ! getHasValue() ? Type.void_type
+      : binding == null ? Type.pointer_type : binding.getType();
   }
 
   Object walk (ExpWalker walker) { return walker.walkSetExp(this); }

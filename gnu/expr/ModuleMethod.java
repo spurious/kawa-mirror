@@ -14,8 +14,7 @@ import gnu.mapping.*;
  * uses the possibly much slower interface method calls.
  */
 
-public class ModuleMethod extends ProcedureN
-// future:  extends MethodProc
+public class ModuleMethod extends MethodProc
 {
   ModuleBody module;
   public final int selector;
@@ -60,5 +59,27 @@ public class ModuleMethod extends ProcedureN
   public Object applyN(Object[] args)
   {
     return module.applyN(this, args);
+  }
+
+  public Object getVarBuffer()
+  {
+    return new Object[1];
+  }
+
+  // FIXME - only checks argument length.
+  public RuntimeException match (Object vars, Object[] args)
+  {
+    int argCount = args.length;
+    int num = numArgs();
+    if (argCount < (num & 0xFFF)
+	|| (num >= 0 && argCount > (num >> 12)))
+      return new WrongArguments(this, argCount);
+    ((Object[]) vars)[0] = args;
+    return null;
+  }
+
+  public Object applyV(Object vars)
+  {
+    return applyN((Object[]) ((Object[]) vars)[0]);
   }
 }

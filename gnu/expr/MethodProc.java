@@ -38,7 +38,7 @@ public abstract class MethodProc extends ProcedureN
     return result;
   }
 
-  /** Return number of paramaters, including optional and rest arguments. */
+  /** Return number of parameters, including optional and rest arguments. */
   public int numParameters()
   {
     int num = numArgs();

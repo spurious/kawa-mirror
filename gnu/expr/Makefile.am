@@ -43,6 +43,7 @@ java_JAVA=\
   ModuleExp.java \
   ObjectExp.java \
   QuoteExp.java \
+  Parser.java \
   PrimProcedure.java \
   ProcInitializer.java \
   PushApply.java \

@@ -668,7 +668,7 @@ public class LambdaExp extends ScopeExp
     primMethods = new Method[numStubs + 1];
     int mflags = (isClassMethod() || thisVariable != null) ? Access.PUBLIC
       : closureEnvType == null ? Access.PUBLIC|Access.STATIC
-      : closureEnvType == ctype ? Access.PUBLIC|Access.FINAL
+      : closureEnvType == ctype ? Access.PUBLIC
       : Access.STATIC;
     Type rtype = body.getType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;

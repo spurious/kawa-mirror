@@ -1,3 +1,19 @@
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* Parser.java:  A new class, an abstract super-class for Translator.
+	* Expression.java (makeWhile):  New overload, uses Parser.
+	* Makefile.am (java_JAVA):  Add parser.java.
+
+	* LambdaExp.java (addMethodFor):  Don't make method FINAL
+	(the user may want to inherit from this module).
+
+	* ModuleMethod.java:  Change to extend MethodProc.
+	(getVarBuffer, match, applyV):  New methods.
+
+	* SetExp.java (getType):  Handle the HAS_VALUE case.
+
+	* Interpreter.java (emitPushBoolean, emitCoerceToBoolean): New methods.
+
 2000-04-13  Per Bothner  <per@bothner.com>
 
 	* SetExp (eval, compile):  If define-alias, create an AliasConstraint.

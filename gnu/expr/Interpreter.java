@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.CodeAttr;
 
 // WARNING many of the fields/method will be to Scheme instead.
 
@@ -82,6 +83,25 @@ public abstract class Interpreter
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
 
   public abstract gnu.bytecode.Type getTypeFor(Class clas);
+
+  public void emitPushBoolean(boolean value, CodeAttr code)
+  {
+    code.emitGetStatic(value ? Compilation.trueConstant
+		       : Compilation.falseConstant);
+  }
+
+  /** Generate code to test if an object is considered true.
+   * Assume the object has been pushed on the JVM stack.
+   * Generate code to push true or false as appropriate. */
+  public void emitCoerceToBoolean(CodeAttr code)
+  {
+    emitPushBoolean(false, code);
+    code.emitIfNEq();
+    code.emitPushInt(1);
+    code.emitElse();
+    code.emitPushInt(0);
+    code.emitFi();
+  }
 
   public Object coerceFromObject(Class clas, Object obj)
   {

@@ -3562,7 +3562,7 @@ These procedures use the Java 1.1 reflection facility.
 Programs use "names" to refer to various values and procedures.
 The definition of what is a "name" is different in different
 programming languages.  A name in Scheme (and other Lisp-like
-languages) can be principle contain any character (if using a
+languages) can in principle contain any character (if using a
 suitable quoting convention), but typically names consist of
 "words" (one or more letters) separated by hyphens, such
 as @samp{make-temporary-file}.  Digits
@@ -3619,6 +3619,13 @@ naturally, so we urge you to @emph{not} write code that
 "mixes" naming conventions by using (say) the names @samp{open-file}
 and @samp{openFile} to name two different objects.
 
+The above mangling is used to generate Java method names.
+Each top-level definition is also mapped to a Java field.
+The name of this field is also mangled, but using a mostly
+reversible mapping:  The Scheme function @samp{file-exists?}
+is mapped to the method name @samp{file$Mnexists$Qu}.
+Because @samp{$} is used to encode special characters, you
+should avoid using it in names in your source file.
 
 @node Allocating objects, Method operations, Mangling, Objects Classes and Modules
 @section  Allocating objects

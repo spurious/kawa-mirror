@@ -1,3 +1,6 @@
+The way top-level definitions (including Scheme procedures) are mapping
+into Java fields is changed to use a mostly reversible mapping.
+
 define-alias of types can now be exported from a module.
 
 New --no-inline --inline=none option.

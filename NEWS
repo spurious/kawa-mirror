@@ -6,6 +6,18 @@ used to implement the standard "do" form.
 
 The R5RS multiple value functions values and call-with-values are implemented.
 
+Macros (and primitive syntax) can now be autoloaded as well as procedures.
+
+New kawac application compiles to one or more .class files.
+
+Compile time errors include line numbers.
+Uncaught exceptions so a stack trace that includes line numbers.
+This makes it more practical to debug Kawa with a Java debugger.
+
+Quasiquotation is implemented.
+
+Various minor bug fixes and optimizations.
+
 Changes since 0.2:
 ==================
 The biggest single change is that Scheme procedures are now compiled

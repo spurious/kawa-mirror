@@ -1,3 +1,38 @@
+Sat Sep  7 12:11:18 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Mostly fixes to improve stack traces.
+	* kawa/lang/Compilation.java (source_filename):  New field.
+	(constructors):  Set source_filename from LambdaExp filename.
+	(addClass):  Set ClassType sourcefile from source_filename.
+	* kawa/lang/CompileFile.java (read):  Set filename of LambdaExp.
+	* kawa/lang/{Expression,PairWithPosition}.java:  Make methods public.
+	* kawa/lang/Expression.java (compile_with_linenumber):  New method.
+	* kawa/lang/{BeginExp,IfExp,LetExp,compilefunc}.java (compile):
+	Use compile_with_linenumber to emit line numbers where appropriate.
+	* kawa/lang/LambdaExp.java (eval):  Set classname from function name.
+	Set function name using named.setName.
+	* kawa/lang/Literal.java (constructor):  Set default type to Object.
+	(compile):  Do a cast if needed.
+	* kawa/lang/compilefunc.java (compile):  Do not set name
+	(apply2):  Remove.  No longer extend Procedure2.
+	* kawa/standard/define.java (rewrite):  Set line number info.
+	* kawa/Shell.java (run):  Do printStackTrace on exception.
+	
+	* kawa/lang/LambdaExp:  Always compile.  Remove doCompile field.
+	* kawa/lang/LambdaProcedure.java:  Remove.  Never used.
+	* kawa/lang/Makefile.{am,in}:  Remove LambdaProcedure.class.
+
+	Implement quasi-quoatation (backquote):
+	* kawa/standard/vector_append.java:  New ProcedureN.
+	* kawa/standard/{append,cons,vector}.java:  Allocate a new Procedure
+	of this type.  This is so quasiquote can access these standard
+	functions by value (not name).  Also implement Compilable.
+	* kawa/standard/quasiquote.java:  New primitive syntax.
+	* kawa/standard/StandardInterpreter.java:  Add quasiquote,
+	vector-append.  Change cons, append, vector to use static procs.
+	Remove non-working compile-func.
+	* kawa/standard/Makefile.{am,in}:  Add quasiquote, vector_append.
+
 Thu Sep  5 00:00:13 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/{abs,append,apply,char_ci_greater_equal_p,

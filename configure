@@ -696,7 +696,7 @@ fi
 
 PACKAGE=kawa
 
-VERSION=1.6.55
+VERSION=1.6.56
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -797,9 +797,9 @@ fi
   fi
   
 
-echo $ac_n "checking for Cygwin32 environment""... $ac_c" 1>&6
-echo "configure:802: checking for Cygwin32 environment" >&5
-if eval "test \"`echo '$''{'am_cv_cygwin32'+set}'`\" = set"; then
+echo $ac_n "checking for Cygwin environment""... $ac_c" 1>&6
+echo "configure:802: checking for Cygwin environment" >&5
+if eval "test \"`echo '$''{'am_cv_cygwin'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
@@ -812,20 +812,20 @@ return __CYGWIN32__;
 EOF
 if { (eval echo configure:814: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  am_cv_cygwin32=yes
+  am_cv_cygwin=yes
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
-  am_cv_cygwin32=no
+  am_cv_cygwin=no
 fi
 rm -f conftest*
 rm -f conftest*
 fi
 
-echo "$ac_t""$am_cv_cygwin32" 1>&6
-CYGWIN32=
-test "$am_cv_cygwin32" = yes && CYGWIN32=yes
+echo "$ac_t""$am_cv_cygwin" 1>&6
+CYGWIN=
+test "$am_cv_cygwin" = yes && CYGWIN=yes
 echo $ac_n "checking for Mingw32 environment""... $ac_c" 1>&6
 echo "configure:831: checking for Mingw32 environment" >&5
 if eval "test \"`echo '$''{'am_cv_mingw32'+set}'`\" = set"; then
@@ -862,7 +862,7 @@ echo "configure:862: checking for executable suffix" >&5
 if eval "test \"`echo '$''{'am_cv_exeext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  if test "$CYGWIN32" = yes || test "$MINGW32" = yes; then
+  if test "$CYGWIN" = yes || test "$MINGW32" = yes; then
 am_cv_exeext=.exe
 else
 cat > am_c_test.c << 'EOF'

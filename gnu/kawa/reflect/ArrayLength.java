@@ -3,8 +3,11 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.lispexpr.LangPrimType;
+import java.io.*;
 
-public class ArrayLength extends Procedure1 implements Inlineable
+public class ArrayLength 
+  extends Procedure1
+  implements Inlineable, Externalizable
 {
   Type element_type;
 
@@ -29,5 +32,16 @@ public class ArrayLength extends Procedure1 implements Inlineable
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
     return gnu.kawa.lispexpr.LangPrimType.intType;
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(element_type);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    element_type = (Type) in.readObject();
   }
 }

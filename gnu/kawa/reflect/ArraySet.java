@@ -2,8 +2,9 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
-public class ArraySet extends Procedure3 implements Inlineable
+public class ArraySet extends Procedure3 implements Inlineable, Externalizable
 {
   Type element_type;
 
@@ -32,5 +33,16 @@ public class ArraySet extends Procedure3 implements Inlineable
   public gnu.bytecode.Type getReturnType (Expression[] args)
   {
     return Type.void_type;
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(element_type);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    element_type = (Type) in.readObject();
   }
 }

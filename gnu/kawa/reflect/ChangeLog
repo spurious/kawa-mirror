@@ -1,3 +1,11 @@
+2003-07-12  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* ArrayGet.java (Externalizable): Implement writeExternal, 
+	readExternal.  Fixes Savannah bug #4289
+	* ArraySet.java (Externalizable): Likewise
+	* ArrayNew.java (Externalizable): Likewise
+	* ArrayLength.java (Externalizable): Likewise
+    
 2003-06-06  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inlineClassName, inline): Call ApplyExp.setLine.

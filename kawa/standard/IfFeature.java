@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.lists.*;
 
 public class IfFeature extends Syntax implements Printable
 {
@@ -37,11 +38,24 @@ public class IfFeature extends Syntax implements Printable
     return false;
   }
 
+  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
+                                    ScopeExp defs, Translator tr)
+  {
+    Object [] match = ListPat.match(3, 3, null, st.cdr);
+    if (match == null || ! (match[0] instanceof String))
+      {
+	forms.addElement(tr.syntaxError("invalid syntax for cond-expand"));
+	return false;
+      }
+    return tr.scan_body(match[hasFeature((String) match[0]) ? 1 : 2],
+			forms, defs);
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     Object [] match = ListPat.match(3, 3, null, obj);
     if (match == null || ! (match[0] instanceof String))
-      return tr.syntaxError ("invalid syntax for if");
+      return tr.syntaxError ("invalid syntax for cond-expand");
     return tr.rewrite(match[hasFeature((String) match[0]) ? 1 : 2]);
   }
 }

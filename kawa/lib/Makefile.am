@@ -5,6 +5,10 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_SCM=\
+  $(java_SCM_ALWAYS) \
+  $(scm_@AWT_SELECTED@)
+
+java_SCM_ALWAYS =\
   std_syntax.scm \
   reflection.scm \
   syntax.scm \
@@ -22,7 +26,9 @@ java_SCM=\
   system.scm \
   trace.scm
 
-EXTRA_DIST = $(java_SCM)
+scm_WITH_AWT = windows.scm
+
+EXTRA_DIST = $(java_SCM_ALWAYS) $(scm_WITH_AWT)
 
 # Used to generate makekawa.bat in ../.. .
 list-sources:

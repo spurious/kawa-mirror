@@ -6,10 +6,10 @@ SUBDIRS = lang standard lib
 
 .SUFFIXES : .java .class
 
-JAVAC=javac -classpath ..:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
 %.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+	cd $(srcdir); $(JAVAC) $(<F)
 
 javadir=$(prefix)/java/kawa
 

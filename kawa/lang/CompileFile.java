@@ -34,27 +34,38 @@ public class CompileFile extends Procedure2
       }
   }
 
-  public static final ModuleExp read (InPort port, Translator tr)
-       throws GenericError
+  public static final Object readBody (InPort port)
   {
     Object body;
     try
       {
-	body = port.readListBody ();
+	ScmRead lexer = new ScmRead(port);
+	body = lexer.readListBody ();
+	if (lexer.firstError != null)
+	  {
+	    String msg = lexer.firstError.toString();
+	    lexer.checkErrors(null, 0);
+	    throw new GenericError("read errors seen reading file: "+msg);
+	  }
 	if (port.peek() == ')')
-	  throw new ReadError (port, "An unexpected close paren was read.");
+	  lexer.fatal("An unexpected close paren was read.");
       }
-    catch (ReadError e)
+    catch (SyntaxException e)
       {
-	// The '\n' is because a ReadError includes a line number,
-	// and it is better if that starts the line.
+	// The '\n' is because a SyntaxException includes a line number,
+	// and it is better if that starts the line.  FIXME OBSOLETE
 	throw new GenericError ("read error reading file:\n" + e.toString ());
       }
     catch (java.io.IOException e)
       {
 	throw new GenericError ("I/O exception reading file: " + e.toString ());
       }
-    return new ModuleExp (body, tr, port.getName ());
+    return body;
+  }
+
+  public static final ModuleExp read (InPort port, Translator tr)
+  {
+    return new ModuleExp (readBody(port), tr);
   }
 
   public final Object apply2 (Object arg1, Object arg2)

@@ -18,27 +18,27 @@ public class ModuleExp extends LambdaExp
    * This can be a let scope, or primitive procedure. */
   public boolean mustCompile;
 
-  public ModuleExp (Object body, Translator tr, String filename)
+  public ModuleExp (Object body, Translator tr)
   {
     super (formals, body, tr);
     lookup(env_formal).setType(Compilation.scmEnvironmentType);
-    setFile (filename);
   }
 
-  public final Object eval_module (Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  public final Object evalModule (Environment env)
   {
-    if (! mustCompile) // optimization - don't generate unneeded Class.
-      return body.eval (env);
     Environment orig_env = Environment.getCurrent();
     try
       {
-	Environment.setCurrent(env);
+	if (env != orig_env)
+	  Environment.setCurrent(env);
+	if (! mustCompile) // optimization - don't generate unneeded Class.
+	  return body.eval (env);
 	return ((ModuleBody) eval (env)).run (env);
       }
     finally
       {
-	Environment.setCurrent(orig_env);
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
       }
   }
 }

@@ -6,22 +6,32 @@ public class Eval extends Procedure1or2
 {
   final static String evalFunctionName = "atEvalLevel";
 
-  public static Object eval (ModuleExp mod, Translator tr,
-			      Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  public static Object eval (Object sexpr, Environment env)
   {
-    mod.setName (evalFunctionName);
-    if (tr.errors > 0)
-      throw new GenericError ("syntax errors during eval");
-    return mod.eval_module (env);
+    PairWithPosition body = new PairWithPosition(sexpr, List.Empty);
+    body.setFile("<eval>");
+    return evalBody(body, env);
   }
 
-  public static Object eval (Object sexpr, Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
+  public static Object evalBody (Object body, Environment env)
   {
-    Translator tr = new Translator (env);
-    ModuleExp mod = new ModuleExp (new Pair (sexpr, List.Empty), tr, "<eval>");
-    return eval (mod, tr, env);
+    Environment orig_env = Environment.getCurrent();
+    try
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(env);
+	Translator tr = new Translator (env);
+	ModuleExp mod = new ModuleExp (body, tr);
+	mod.setName (evalFunctionName);
+	if (tr.errors > 0)
+	    throw new GenericError ("syntax errors during eval");
+	return mod.evalModule (env);
+      }
+    finally
+      {
+	if (env != orig_env)
+	  Environment.setCurrent(orig_env);
+      }
   }
 
   public Object apply1 (Object arg1)

@@ -1,4 +1,4 @@
-<result>
+<result xmlns:h="H" xmlns:j="J" xmlns:k="J">
 <row>
 <fld1>a1</fld1>
 <fld2 align="right">12</fld2>
@@ -7,4 +7,10 @@
 <fld1 align="left">b1</fld1>
 <fld2 align="right">22</fld2>
 </row>
+<h:row>
+<j:fld1>c1</j:fld1>
+<h:fld2>33</h:fld2>
+<j:fld3>44</j:fld3>
+<k:fld1>c2</k:fld1>
+</h:row>
 </result>

@@ -1,3 +1,13 @@
+2002-10-22  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (DEFINE_TOKEN):  Remove constant.
+	(DECLARE_NAMESPACE_TOKEN, DEFAULT_ELEMENT_TOKEN,
+	DEFAULT_FUNCTION_TOKEN, DEFINE_FUNCTION_TOKEN):  New constants.
+	(lookingAt):  New helper method to handle double-lexeme tokens.
+	(peekOperand):  Use lookingAt.
+	(parse):  Handle new tokens - and updated syntax.
+	Warn about old syntax.
+
 2002-07-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseDataType):  Handle 'text' and 'node'.

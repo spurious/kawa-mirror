@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -139,7 +139,10 @@ public class XQParser extends LispReader // should be extends Lexer
   /* FuncName including following '('). */
   static final int FNAME_TOKEN = 'F';
 
-  static final int DEFINE_TOKEN = 'N';
+  static final int DECLARE_NAMESPACE_TOKEN = 'M'; // <"declare" "namespace">
+  static final int DEFAULT_ELEMENT_TOKEN = 'N'; // <"default" "element">
+  static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
+  static final int DEFINE_FUNCTION_TOKEN = 'P'; // <"define" "function">
 
   /* 'Q': QName (intern'ed name is curValue)
    * 'R': NCName ':' '*'
@@ -505,6 +508,40 @@ public class XQParser extends LispReader // should be extends Lexer
     return curToken;
   }
 
+  /**
+   * Internal method to match against double-lexeme tokens.
+   * @param word0 expected previous word
+   * @param word1 expected next word
+   */
+  private boolean lookingAt (String word0, String word1)
+      throws java.io.IOException, SyntaxException
+  {
+    if (! word0.equals(curValue))
+      return false;
+    int i = 0;
+    int len = word1.length();
+    for (;; )
+      {
+	int ch = read();
+	if (i == len)
+	  {
+	    if (ch < 0)
+	      return true;
+	    if ( ! isNamePart((char) ch))
+	      {
+		unread();
+		return true;
+	      }
+	    i++;
+	    break;
+	  }
+	if (ch < 0 || ch != word1.charAt(i++))
+	  break;
+      }
+    port.skip(-i);
+    return false;
+  }
+
   /** Process token, assuming we are in operand context.
    */
 
@@ -539,10 +576,22 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	curValue = name;
-	if ((next == 'f' || next == 'F') && "define".equals(name))
+	switch (next)
 	  {
-	    unread();
-	    return curToken = DEFINE_TOKEN;
+	  case 'e':
+	    if (lookingAt("default", /*"e"+*/ "lement"))
+	      return curToken = DEFAULT_ELEMENT_TOKEN;
+	    break;
+	  case 'f':
+	    if (lookingAt("define", /*"f"+*/ "unction"))
+	      return curToken = DEFINE_FUNCTION_TOKEN;
+	    if (lookingAt("default", /*"f"+*/ "unction"))
+	      return curToken = DEFAULT_FUNCTION_TOKEN;
+	    break;
+	  case 'n':
+	    if (lookingAt("declare", /*"n"+*/ "amespace"))
+	      return curToken = DECLARE_NAMESPACE_TOKEN;
+	    break;
 	  }
 	if (next >= 0)
 	  unread();
@@ -1888,16 +1937,12 @@ public class XQParser extends LispReader // should be extends Lexer
     if (getRawToken() == EOF_TOKEN)
       return null;
     peekOperand();
-    if (curToken == DEFINE_TOKEN)
+    if (curToken == DEFINE_FUNCTION_TOKEN)
       {
-	getRawToken();
-	peekNonSpace("unexpected end-of-file after 'define'");
 	int declLine = getLineNumber() + 1;
 	int declColumn = getColumnNumber() + 1;
-	if (match("function"))
-	  getRawToken();
-	else
-	  error("'define' is not followed by 'function'");
+	getRawToken();
+	peekNonSpace("unexpected end-of-file after 'define function'");
 	Expression exp = parseFunctionDefinition(declLine, declColumn);
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
@@ -1905,6 +1950,11 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     if (curToken == NCNAME_TOKEN
 	&& "namespace".equals((String) curValue))
+      {
+	error('w', "use 'declare namespace' instead of 'namespace'");
+	curToken = DECLARE_NAMESPACE_TOKEN;
+      }
+    if (curToken == DECLARE_NAMESPACE_TOKEN)
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
 	if (next >= 0)
@@ -1914,7 +1964,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      {
 		getRawToken();
 		if (curToken != NCNAME_TOKEN)
-		  return syntaxError("confused after seeing 'namespace'");
+		  return syntaxError("confused after seeing 'declare namespace'");
 		String prefix = new String(tokenBuffer, 0, tokenBufferLength);
 		getRawToken();
 		if (curToken != OP_EQU)
@@ -1928,8 +1978,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
       }
-    if (curToken == NCNAME_TOKEN
-	&& "default".equals((String) curValue))
+    if (curToken == DEFAULT_ELEMENT_TOKEN
+	|| curToken == DEFAULT_FUNCTION_TOKEN
+	|| (curToken == NCNAME_TOKEN
+	    && "default".equals((String) curValue)))
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
 	if (next >= 0)
@@ -1937,6 +1989,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	    unread();
 	    if (isNameStart((char) next))
 	      {
+		boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
+		if (curToken == NCNAME_TOKEN)
+		  error('w', "use 'default element namespace' instead of 'default namespace'");
 		getRawToken();
 		curValue = new String(tokenBuffer, 0, tokenBufferLength);
 		if (curToken != NCNAME_TOKEN ||
@@ -1949,7 +2004,12 @@ public class XQParser extends LispReader // should be extends Lexer
 		if (curToken != STRING_TOKEN)
 		  return syntaxError("missing uri namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
-		defaultNamespace = uri.toString();
+		if (forFunctions)
+		  {
+		    error('w', "'declare function namespace' not implemented - ignored");
+		  }
+		else
+		  defaultNamespace = uri.toString();
 		return QuoteExp.voidExp;
 	      }
 	  }

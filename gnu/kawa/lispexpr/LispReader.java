@@ -518,7 +518,7 @@ public abstract class LispReader extends Lexer
 	if (numerator != null)
 	  return "floating-point number after fraction symbol '/'";
 	String str = new String(buffer, digits_start, pos - digits_start);
-	double d = Double.valueOf(str).doubleValue(); // wasteful FIXME
+	double d = Convert.parseDouble(str);
 	number = new DFloNum(negative ? - d : d);
       }
     else

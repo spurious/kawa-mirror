@@ -1,3 +1,7 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Use new Convert.parseDouble.
+
 2001-04-23  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber):  Set decimal_point correct.

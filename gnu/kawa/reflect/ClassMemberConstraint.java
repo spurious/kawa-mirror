@@ -163,8 +163,7 @@ public class ClassMemberConstraint extends Constraint
 	    throw new WrappedException("error accessing field "+field, ex);
 	  }
       }
-    name = name.intern();
-    Symbol symbol = new Symbol(name);
+    Symbol symbol = new Symbol(Compilation.demangleName(name, true).intern());
     setValue(symbol, object);
     setConstraint(symbol, new ClassMemberConstraint(field));
     env.addSymbol(symbol);

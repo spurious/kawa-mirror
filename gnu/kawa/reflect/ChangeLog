@@ -1,3 +1,8 @@
+2003-08-09  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (define):  Demangle field name
+	when field is non-final.
+
 2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* ClassMethods.java (removeRedundantMethods):  New helper method.

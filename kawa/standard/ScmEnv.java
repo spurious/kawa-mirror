@@ -56,11 +56,19 @@ public class ScmEnv extends Environment
 
   public Object get (String name, Object defaultValue)
   {
-    Object value = super.get(name, defaultValue);
+    Binding binding = lookup(name);
+    Object value = binding == null ? defaultValue : binding.get(defaultValue);
     if (value != defaultValue
 	|| (defaultValue != Binding.UNBOUND
 	    && super.get(name, Binding.UNBOUND) != Binding.UNBOUND))
       return value;
+
+    if (binding != null)
+      {
+	binding = AliasConstraint.followAliases(binding);
+	if (binding != null)
+	  name = binding.getName();
+      }
 
     if (name.endsWith("$unit"))
       {

@@ -1,5 +1,9 @@
 2002-09-26  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/ScmEnv.java (get):  Follow aliases.
+	* kawa/standard/require.java (scanForDefinitions):  Recognize aliases,
+	as indicated by the type gnu.mapping.Location.
+
 	* kawa/standard/map.java (applyN):  Handle for-each properly
 	when arity is 1.
 

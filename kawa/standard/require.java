@@ -24,7 +24,7 @@ public class require extends Syntax
      until we've done scanning B, returned to A, and finished scanning
      A.  At that point we can add to B the definitions exported from
      A.  Thus the (require <A>) in B.has to *lazily* imports A's
-     definitions, using somekind of placeholder.
+     definitions, using some kind of placeholder.
 
      One complication is knowing whether a (require <B>) refers to a
      source file to be compiled.  It is not enough to check if a class
@@ -32,11 +32,13 @@ public class require extends Syntax
      source B.scm, not an older B.class.  This is complicated by the
      (module-name B) declaration: We don't know whether source file
      B.scm provides the B class until we've parsed B.scm.  A solution
-     to this problem is that we first parse all the source files,
+     to this problem is that we first parse all the source files (as
+     listed on the command line),
      yielding their S-expression form.  We then check for module-name
      forms.  However, the possibility of macros does complicate this:
      There could be a macro that re-defines module-name, and there
-     could be a macro that expands to module-name.  Arguably worrying
+     could be a macro that expands to module-name.  Also, we could
+     have commands that change the reader or read-table.  Arguably worrying
      about these possibilities may be overkill.  However, it can be
      handled thus: Parse each source file to S-expressions.  Scan each
      source file's S-expression until the first require (if any).
@@ -213,15 +215,19 @@ public class require extends Syntax
 		try
 		  {
 		    Object fvalue = rfield.get(instance);
-		    String fdname
-		      = (fvalue instanceof Named ? ((Named) fvalue).getName()
-			 : Compilation.demangleName(fname, true).intern());
                     Type ftype = fld.getType();
+		    boolean isAlias = ftype == Compilation.typeLocation;
+		    String fdname
+		      = (fvalue instanceof Named && ! isAlias
+			 ? ((Named) fvalue).getName()
+			 : Compilation.demangleName(fname, true).intern());
 		    Type dtype = interp.getTypeFor(ftype.getReflectClass());
 		    Declaration fdecl = defs.getDefine(fdname, 'w', tr);
 		    fdecl.setType(dtype);
-                    if (ftype.isSubtype(Compilation.typeBinding))
+                    if (isAlias || ftype.isSubtype(Compilation.typeBinding))
                       fdecl.setIndirectBinding(true);
+		    if (isAlias)
+		      fdecl.setAlias(true);
 		    if (! isStatic || fvalue instanceof Macro)
 		      fdecl.base = decl;
 		    fdecl.field = fld;

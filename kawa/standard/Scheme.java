@@ -648,6 +648,8 @@ public class Scheme extends Interpreter
     environ.setName ("interaction-environment."+(++scheme_counter));
     if (instance == null)
       instance = this;
+    if (Interpreter.defaultInterpreter == null)
+      Interpreter.defaultInterpreter = this;
   }
 
   public Scheme (Environment environ)
@@ -771,6 +773,8 @@ public class Scheme extends Interpreter
 	    if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
 	      return Scheme.string2Type(name.substring(1, len-1));
 	  }
+	else if (binding.isAlias())
+	  return getTypeValue(binding.getValue());
       }
     return null;
   }
@@ -840,11 +844,6 @@ public class Scheme extends Interpreter
         types.put ("u64vector", ClassType.make("gnu.kawa.util.U64Vector"));
         types.put ("f32vector", ClassType.make("gnu.kawa.util.F32Vector"));
         types.put ("f64vector", ClassType.make("gnu.kawa.util.F64Vector"));
-
-        // Only if JEmacs is available.  FIXME.
-	types.put ("buffer", ClassType.make("gnu.jemacs.buffer.Buffer"));
-	types.put ("frame", ClassType.make("gnu.jemacs.buffer.Frame"));
-	types.put ("window", ClassType.make("gnu.jemacs.buffer.Window"));
       }
     return (Type) types.get(name);
   }
@@ -910,6 +909,66 @@ public class Scheme extends Interpreter
     Scheme interp = new Scheme();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
+  }
+
+  public static String demangleName(String name)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    int len = name.length();
+    boolean mangled = false;
+    boolean predicate = false;
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = name.charAt(i);
+	char d;
+	if (ch == 'i' && i == 0 && len > 2 && name.charAt(i+1) == 's'
+	    && ! Character.isLowerCase(d = name.charAt(i+2)))
+	  {
+	    mangled = true;
+	    predicate = true;
+	    i++;
+	    if (Character.isUpperCase(d) || Character.isTitleCase(d))
+	      {
+		sbuf.append(Character.toLowerCase(d));
+		i++;
+		continue;
+	      }
+	    continue;
+	  }
+	else if (ch == '$' && i + 2 < len)
+	  {
+	    char c1 = name.charAt(i+1);
+	    char c2 = name.charAt(i+2);
+	    d = Compilation.demangle2(c1, c2);
+	    if (d != (char)(-1))
+	      {
+		sbuf.append(d);
+		i += 2;
+		mangled = true;
+		continue;
+	      }
+	    else if (c1 == 'T' && c2 == 'o' && i + 3 < len
+		     && name.charAt(i+3) == '$')
+	      {
+		sbuf.append("->");
+		i += 3;
+		mangled = true;
+		continue;
+	      }
+	  }
+	else if (i > 1
+		 && (Character.isUpperCase(ch) || Character.isTitleCase(ch))
+		 && (Character.isLowerCase(name.charAt(i-1))))
+	  {
+	    sbuf.append('-');
+	    mangled = true;
+	    ch = Character.toLowerCase(ch);
+	  }
+	sbuf.append(ch);
+      }
+    if (predicate)
+      sbuf.append('?');
+    return mangled ? sbuf.toString() : name;
   }
 
 }

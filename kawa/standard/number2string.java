@@ -5,23 +5,23 @@ import gnu.kawa.util.*;
 
 public class number2string extends Procedure1or2
 {
-  public static String apply (Object arg, int radix)
+  public static FString apply (Object arg, int radix)
   {
-    return ((Numeric)arg).toString (radix);
+    return new FString(((Numeric)arg).toString (radix));
   }
 
-  public static String apply (Object arg)
+  public static FString apply (Object arg)
   {
-    return ((Numeric)arg).toString(10);
+    return new FString(((Numeric)arg).toString(10));
   }
 
   public final Object apply1 (Object arg1)
   {
-    return new FString(apply(arg1));
+    return apply(arg1);
   }
 
   public final Object apply2 (Object arg1, Object arg2)
   {
-    return new FString(apply(arg1, ((IntNum) arg2).intValue()));
+    return apply(arg1, ((IntNum) arg2).intValue());
   }
 }

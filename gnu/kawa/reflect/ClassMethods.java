@@ -8,6 +8,16 @@ import java.util.Vector;
 
 public class ClassMethods extends Procedure2
 {
+  public static final ClassMethods classMethods = new ClassMethods();
+  static { classMethods.setName("class-methods"); }
+
+  /** Create a method or generic of the matching methods.
+   * @param arg0 a Class, ClassType, or a String, FString or Symbol
+   *  that names a class.
+   * @param arg1 a method name (a String, FString, or Symbol)
+   * Loosely the same as ClassMethodProc.make(arg0, arg1),
+   * but with some extar conversions and checks.
+   */
   public Object apply2 (Object arg0, Object arg1)
   {
     return apply(this, arg0, arg1, null, null, 0, 0);

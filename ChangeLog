@@ -1,5 +1,7 @@
 2005-02-07  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: Change class-methods to use defProcStFld.
+
 	* kawa/standard/require.java (makeDeclInModule): Set value to
 	reference to appropriate Declaration if StaticFieldLocation.
 	Fixes Savannah bug #11822 - but only for macros in static modules.

@@ -14,9 +14,13 @@ implements TypeValue, Externalizable, GroupPredicate
 {
   Symbol qname;
 
-  public ElementType(String namespaceURI, String localName)
+  /** An element type for match by name.
+   * @param localName if null matches any local name; otherwise must
+   *  be intered, and matches by identity.
+   * @param namespaceURI full name of namespace, or null for any namespace. */
+  public static ElementType make (String namespaceURI, String localName)
   {
-    this(Symbol.make(namespaceURI, localName));
+    return new ElementType(Symbol.make(namespaceURI, localName));
   }
 
   public ElementType(Symbol qname)

@@ -18,9 +18,9 @@ implements TypeValue, Externalizable, AttributePredicate
 {
   Symbol qname;
 
-  public AttributeType(String namespaceURI, String localName)
+  public static AttributeType make (String namespaceURI, String localName)
   {
-    this(Symbol.make(namespaceURI, localName));
+    return new AttributeType(Symbol.make(namespaceURI, localName));
   }
 
   public AttributeType(Symbol qname)

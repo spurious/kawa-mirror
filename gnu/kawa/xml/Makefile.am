@@ -40,7 +40,6 @@ java_sources = \
   MakeResponseHeader.java \
   MakeText.java \
   MakeUnescapedData.java \
-  NamespaceEnv.java \
   NodeCompare.java \
   NodeConstructor.java \
   NodeName.java \

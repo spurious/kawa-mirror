@@ -19,8 +19,6 @@ public class DefineNamespace extends Syntax
       }
     String name = (Interpreter.NAMESPACE_PREFIX + p1.car).intern();
     Declaration decl = defs.getDefine(name, 'w', tr);
-    // This gives us a ConstantValue attribute when compiled.
-    decl.setType(gnu.bytecode.Type.tostring_type);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT);
     if (defs instanceof ModuleExp)

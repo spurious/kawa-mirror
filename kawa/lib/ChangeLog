@@ -1,0 +1,5 @@
+Tue Sep  3 22:11:58 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* do.scm:  New file - implement do macro.
+	* when_unless.scm:  Implement (non-standard) when and unless.
+	* Makefile.{am,in}:  New file.

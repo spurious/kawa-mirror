@@ -70,6 +70,7 @@ public class Declaration
   Declaration next;
 
   public final Declaration nextDecl() { return next; }
+  public final void setNext(Declaration next) {  this.next = next; }
 
   Variable var;
   public Variable getVariable() { return var; }

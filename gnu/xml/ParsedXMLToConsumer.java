@@ -81,6 +81,37 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     out.endGroup(name);
   }
 
+  /** Handles the predefined entities, such as "&lt;" and "&quot;". */
+  public void emitEntityReference(char[] name, int start, int length)
+  {
+    char c0 = name[start];
+    char ch = '?';
+    if (length == 2 && name[start+1] == 't')
+      {
+	
+	if (c0 == 'l')
+	  ch = '<';
+	else if (c0 == 'g')
+	  ch = '>';
+      }
+    else if (length == 3)
+      {
+	if (c0 == 'a' && name[start+1] == 'm' && name[start+2] == 'p')
+	  ch = '&';
+      }
+    else if (length == 4)
+      {
+	char c1 = name[start+1];
+	char c2 = name[start+2];
+	char c3 = name[start+3];
+	if (c0 == 'q' && c1 == 'u' && c2 == 'o' && c3 == 't')
+	  ch = '"';
+	else if (c0 == 'a' && c1 == 'p' && c2 == 'o' && c3 == 's')
+	  ch = '\'';
+      }
+    out.writeChar(ch);
+  }
+
   public void emitCharacterReference(int value, char[] name, int start, int length)
   {
     out.writeChar(value);

@@ -1,5 +1,10 @@
 2002-02-13  Per Bothner  <per@bothner.com>
 
+	* ParsedXMLToConsumer.java (emitEntityReference):  New method.
+
+	* XMLPrinter.java (writeChar): Fix output of character references.
+	(write):  If a char is >= 127, pass it to writeChar.
+
 	* Makefile.am (java_sources):  Remove QName.java - it is in java_BUILT.
 
 	* Makefile.am (DONT_EDIT_SUBS):  Moved to ../../Make-rules.

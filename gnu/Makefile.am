@@ -8,7 +8,7 @@ HTML_HOME = $$HOME/public_html
 
 install-subdir-html:
 	-mkdir $(HTML_HOME)/gnu.$(DIR)
-	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.$(DIR)/index.html
+	cp $(srcdir)/package.html $(HTML_HOME)/gnu.$(DIR)/index.html
 	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.$(DIR)/COPYING
 	chmod a+r $(HTML_HOME)/gnu.$(DIR)/*
 

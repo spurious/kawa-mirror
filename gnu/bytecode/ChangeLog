@@ -1,5 +1,9 @@
 2001-12-24  Per Bothner  <per@bothner.com>
 
+	* CodeAttr.java (emitPushString):  Tolerate null String argument.
+
+	* CodeAttr.java (emitThen):  New method.
+
 	* package.html:  Remove "http:" from relative URLs.
 
 	* Method.java (toString):  Use getName of declaring class to avoid

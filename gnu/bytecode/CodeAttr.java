@@ -598,7 +598,10 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitPushString (String str)
   {
-    emitPushConstant(getConstants().addString(str));
+    if (str == null)
+      emitPushNull();
+    else
+      emitPushConstant(getConstants().addString(str));
     pushType(Type.string_type);
   }
 
@@ -1329,6 +1332,11 @@ public class CodeAttr extends Attribute implements AttrContainer
 	put1(169);  // ret
 	put2(offset);
       }
+  }
+
+  public final void emitThen()
+  {
+    if_stack.start_stack_size = SP;
   }
 
   public final void emitIfThen ()

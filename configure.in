@@ -137,6 +137,7 @@ AC_LINK_FILES(gnu/xquery/testsuite/tab.xml.in, gnu/xquery/testsuite/tab.xml)
 AC_LINK_FILES(gnu/xquery/testsuite/bib.xml.in, gnu/xquery/testsuite/bib.xml)
 AC_LINK_FILES(gnu/xquery/testsuite/book1.xml.in, gnu/xquery/testsuite/book1.xml)
 AC_LINK_FILES(gnu/xquery/testsuite/reviews.xml.in, gnu/xquery/testsuite/reviews.xml)
+AC_LINK_FILES(testsuite/scribble.html.in, testsuite/scribble.html)
 
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile

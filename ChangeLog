@@ -1,3 +1,7 @@
+2002-02-11  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Link testsuite/scribble.html.in to scribble.html.
+
 2002-02-05  Per Bothner  <per@bothner.com>
 
 	* configure.in: Add links to two more xml data-sets for xml tests.

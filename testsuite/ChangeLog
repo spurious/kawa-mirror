@@ -1,3 +1,10 @@
+2002-02-11  Per Bothner  <per@bothner.com>
+
+	* scribble.html:  Remnamed to ...
+	* scribble.html.in:  New file.
+	* Makefile.am (check-scribble):  Use check-scrible link in this
+	directory, since appletview looks for class file in dir of html file.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  symbol->string no longer coerces to <String>.

@@ -1,3 +1,7 @@
+2005-02-20  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm: Various tests for parameters and fluids. 
+
 2005-02-11  Dean Ferreyra  <dferreyra@igc.org>
 
 	* misc-test.scm: New testcase for Savannah bug #11801.

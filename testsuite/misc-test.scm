@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 129)
+(test-init "Miscellaneous" 135)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -592,3 +592,28 @@
     (list (force t1) (force t2))))
 
 (test '(1 2) fluid-let-and-threads)
+
+(define param1 (make-parameter 10 number->string))
+(test "10" 'param-test1 (param1))
+(define-alias param1v (param1))
+(set! (param1) 11)
+(test "11" 'param-test2 param1v)
+(param1 12)
+(test "12" 'param-test3 (param1))
+(set! param1v 13)
+(test "13" 'param-test4 (param1))
+(test '("15" "15" "16" "16" "13" "13") 'param-test5
+      (let ((r0
+	     (fluid-let ((param1v (+ (string->number param1v) 2)))
+	       (let ((r1 (list (param1) param1v)))
+		 (set! param1v 16)
+		 (append r1 (list (param1) param1v))))))
+	(append r0 (list (param1) param1v))))
+(param1 20)
+(test '("22" "22" "17" "17" "20" "20") 'param-test5
+      (let ((r0
+	     (parameterize ((param1 (+ (string->number (param1)) 2)))
+	       (let ((r1 (list (param1) param1v)))
+		 (set! param1v 17)
+		 (append r1 (list (param1) param1v))))))
+	(append r0 (list (param1) param1v))))

@@ -80,7 +80,7 @@ public class Vector extends Sequence implements Printable, Compilable
     // Allocate the Vector object
     code.emitNew(scmVectorType);
     code.emitPushInt(len);
-    code.emitNewArray(comp.scmObjectType);
+    code.emitNewArray(comp.typeObject);
     // Stack contents:  ..., Vector, array
     code.emitDup(2, 0);  // dup2
     // Stack contents:  ..., Vector, array, Vector, array
@@ -95,7 +95,7 @@ public class Vector extends Sequence implements Printable, Compilable
 	code.emitPushInt(i);
 	comp.emitLiteral (value[i]);
 	// Stack contents:  ..., Vector, array, array, i, value[i]
-	code.emitArrayStore(comp.scmObjectType);
+	code.emitArrayStore(comp.typeObject);
 	// Stack contents:  ..., Vector, array
       }
     // Remove no-longer-needed array from stack:

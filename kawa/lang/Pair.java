@@ -153,10 +153,10 @@ public class Pair extends List implements Printable, Compilable
       {
 	if (carField == null)
 	  {
-	    carField = Compilation.scmPairType.addField
-	      ("car", Compilation.scmObjectType, Access.PUBLIC);
-	    cdrField = Compilation.scmPairType.addField
-	      ("cdr", Compilation.scmObjectType, Access.PUBLIC);
+	    carField = Compilation.typePair.addField
+	      ("car", Compilation.typeObject, Access.PUBLIC);
+	    cdrField = Compilation.typePair.addField
+	      ("cdr", Compilation.typeObject, Access.PUBLIC);
 	  }
 	literal.flags |= Literal.ALLOCATING;
 	comp.emitLiteral (car);

@@ -1,3 +1,8 @@
+2003-03-13  Per Bothner  <per@bothner.com>
+
+	* Arrays.java (make):  Fix thinko - addition should be multiply.
+	Fixes bug reported 03-12 by Chris Dean <ctdean@mercedsystems.com>.
+
 2003-03-07  Ivelin Ivanov <ivelin@apache.org>
 
 	* BaseUri.java (resolve):  Remove redundant semicolon.

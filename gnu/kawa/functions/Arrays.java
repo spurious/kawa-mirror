@@ -41,7 +41,7 @@ public class Arrays
 	      lowBounds = new int[rank];
 	    lowBounds[i] = lo;
 	  }
-	total += size;
+	total *= size;
       }
     return GeneralArray.makeSimple(lowBounds, dimensions, new FVector(total, value));
   }

@@ -12,7 +12,6 @@ public class XMLParser extends XMLParserChar
   SourceMessages messages;
 
   public XMLParser(LineBufferedReader reader, SourceMessages messages, Consumer out)
-    throws java.io.IOException
   {
     this(reader, new ParsedXMLToConsumer(out), messages, out);
     
@@ -20,7 +19,6 @@ public class XMLParser extends XMLParserChar
 
   private XMLParser(LineBufferedReader reader, ParsedXMLToConsumer resolver,
 		    SourceMessages messages, Consumer out)
-    throws java.io.IOException
   {
     super(null, 0, 0, resolver);
     in = reader;
@@ -29,7 +27,6 @@ public class XMLParser extends XMLParserChar
   }
 
   public XMLParser(LineBufferedReader reader, Consumer out, SourceMessages messages)
-    throws java.io.IOException
   {
     super(null, 0, 0, new ParsedXMLToConsumer(out));
     in = reader;

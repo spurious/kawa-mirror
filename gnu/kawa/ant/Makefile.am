@@ -6,5 +6,7 @@ AUTOMAKE_OPTIONS = foreign
 # when using Ant - but they still should go into the distribution tar file.
 SOURCES = LineStripperSet.java  XCopy.java
 EXTRA_DIST = Makefile.am
+CLEANFILES = $(top_builddir)/tools/$(subdir)/*.class
 
 all:
+

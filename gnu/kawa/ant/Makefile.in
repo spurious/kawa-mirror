@@ -103,6 +103,7 @@ AUTOMAKE_OPTIONS = foreign
 # when using Ant - but they still should go into the distribution tar file.
 SOURCES = LineStripperSet.java  XCopy.java
 EXTRA_DIST = Makefile.am
+CLEANFILES = $(top_builddir)/tools/$(subdir)/*.class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in
@@ -171,6 +172,7 @@ installdirs:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)

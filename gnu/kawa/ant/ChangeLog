@@ -1,3 +1,7 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CLEANFILES):  New macro.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  New file.

@@ -1,3 +1,7 @@
+2003-04-12  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (FIELD_OR_METHOD):  New flag.
+
 2003-04-12  Vladimir Tsichevski <wowa1@online.ru>
 
 	* ObjectExp.java (compile): If closureEnv is null, push this instead.

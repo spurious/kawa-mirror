@@ -208,6 +208,9 @@ public class Declaration
    * Used for an exported macro that references a non-exported name. */
   public static final int EXTERNAL_ACCESS = 0x80000;
 
+  /** True if this is a field or method in a class definition. */
+  public static final int FIELD_OR_METHOD = 0x100000;
+
   protected int flags = IS_SIMPLE;
 
   public final boolean getFlag (int flag)

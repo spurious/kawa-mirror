@@ -85,6 +85,18 @@ public abstract class ScopeExp extends Expression
       }
   }
 
+  public ModuleExp currentModule ()
+  {
+    ScopeExp exp = this;
+    for (;; exp = exp.outer)
+      {
+	if (exp == null)
+	  return null;
+	if (exp instanceof ModuleExp)
+	  return (ModuleExp) exp;
+      }
+  }
+
   /**
    * Find a Declaration by name.
    * @param sym the (interned) name of the Declaration sought

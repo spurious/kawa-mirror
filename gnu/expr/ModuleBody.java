@@ -38,6 +38,20 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
     return applyV(ctx);
   }
 
+  private static boolean mainPrintValues;
+
+  /** True if runAsMain should print values (in top-level expressions). */
+  public static boolean getMainPrintValues()
+  {
+    return mainPrintValues;
+  }
+
+  public static void setMainPrintValues(boolean value)
+  {
+    mainPrintValues = value;
+  }
+
+
   /** This is invoked by main when ModuleBody is compiled with --main. */
   public final void runAsMain (String[] args)
   {
@@ -45,7 +59,21 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
     gnu.text.WriterManager.instance.registerShutdownHook();
     try
       {
-	apply0();
+	CallContext ctx = new CallContext();
+	ctx.values = Values.noArgs;
+	ctx.proc = this;
+	if (getMainPrintValues())
+	  {
+	    OutPort out = OutPort.outDefault();
+	    ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(out);
+	    ctx.run();
+	    out.freshLine();
+	  }
+	else
+	  {
+	    ctx.consumer = new VoidConsumer();
+	    ctx.run();
+	  }
       }
     finally
       {

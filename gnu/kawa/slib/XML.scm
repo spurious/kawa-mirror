@@ -26,8 +26,3 @@
 			  (make <gnu.xml.XMLPrinter> out))))))
     (invoke parser 'parse)))
 |#
-
-;;; Print a Consumable (such as a <document>) to a port, in XML syntax.
-(define (print-as-xml (data :: <gnu.lists.Consumable>)
-		      #!optional (out (current-output-port)))
-  (invoke data 'consume (make <gnu.xml.XMLPrinter> out)))

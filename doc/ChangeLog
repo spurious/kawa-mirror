@@ -1,3 +1,7 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Compiling to executable):  Simplify, use gckawa script.
+
 2001-06-18  Daniel Bonniot <d.bonniot@@mail.dotcom.fr>
 
 	* kawa.texi (Projects):  "Bossa" renamed to "Nice"; update.

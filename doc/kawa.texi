@@ -908,21 +908,14 @@ see @ref{Files compilation}.
 kawa --main -C myprog.scm
 @end example
 
-Now assuming that @code{$PREFIX} is where both GCJ and Kawa are installed
-(the name of the @code{--prefix} argument you used when configuring both),
-you may need to set these environment variables:
-@example
-CLASSPATH=$PREFIX/share/java/kawa.jar:$CLASSPATH
-PATH=$PREFIX/bin:$PATH
-LD_LIBRARY_PATH=$PREFIX/lib
-export LD_LIBRARY_PATH CLASSPATH
-@end example
-
 Then to create an executable @code{myprog} do:
 @example
-gcj --main=myprog myprog*.class -o myprog -L$PREFIX/bin -lkawa
+gckawa --main=myprog myprog*.class -o myprog
 @end example
 
+The @code{gckawa} is a simple shell script that calls @code{gcj}.
+The reason for the wildcard in @code{myprog*.class} is that sometimes
+Kawa will generate some helper classes in addition to @code{myprog.class}.
 The @code{--main} option tell @code{gcj} which class contains
 the @code{main} method it should use.  The @code{-o} option names
 the resuling executable program.  The @code{-lkawa} option tells

@@ -46,8 +46,8 @@ public class define extends Syntax implements Printable
 	  }
 	else
 	  tr.error('w', "duplicate declaration for `"+sym+"'");
-	Object declForm = name_pair == null ? decl
-	  : declForm = tr.makePair(name_pair, decl, name_pair.cdr);
+	Object declForm = name_pair == null ? (Object) decl
+	  : (Object) tr.makePair(name_pair, decl, name_pair.cdr);
 	p = tr.makePair(p, declForm, p.cdr);
 	st = tr.makePair(st, this, p);
         if (defs instanceof ModuleExp)

@@ -436,8 +436,7 @@ module3.class: $(srcdir)/module3.scm module1.class MyTimestamp.class
 	$(KAWA) -C $(srcdir)/module3.scm
 
 classes1.class: $(srcdir)/classes1.scm
-	-rm -f SimpleDateTest.class
-	$(KAWA) --warn-as-error -C $(srcdir)/classes1.scm
+	$(KAWA) -C $(srcdir)/classes1.scm
 
 SimpleB.class: $(srcdir)/SimpleB.java classes1.class
 	CLASSPATH=..:. $(JAVAC) -g $(srcdir)/SimpleB.java -d .

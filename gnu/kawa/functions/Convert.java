@@ -88,6 +88,20 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
     return new ApplyExp(c, exps);
   }
 
+  /** Modify LambdaExp so result is coerced to given type. */
+  public static void setCoercedReturnValue (LambdaExp lexp, Expression type,
+					    Interpreter interp)
+  {
+    gnu.bytecode.Type rtype = interp.getTypeFor(type);
+    if (rtype != null)
+      {
+	Expression value = lexp.body;
+	lexp.body = Convert.makeCoercion(value, type);
+	lexp.body.setLine(value);
+	lexp.setReturnType(rtype);
+      }
+  }
+
   /**
    * Convenience method to make an Expression that coerces a value.
    * @param value to be coerced

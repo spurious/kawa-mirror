@@ -1,3 +1,7 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* Convert.java (setCoercedReturnValue):  New static helper method.
+
 2003-07-16  Per Bothner  <per@bothner.com>
 
 	* Arrays.java (effectiveIndex):  Minor optimization - I hope.

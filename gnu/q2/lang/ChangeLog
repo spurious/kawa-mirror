@@ -1,3 +1,7 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java: Update import for moved MakeAttribute.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* Q2Apply.java:  Extend MethodProc instead of CpsProcedure.

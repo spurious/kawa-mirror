@@ -5,7 +5,7 @@ import gnu.text.*;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.expr.Keyword;
-import gnu.xquery.util.MakeAttribute;
+import gnu.kawa.xml.MakeAttribute;
 
 /** A class to read Scheme forms (S-expressions). */
 

@@ -157,6 +157,9 @@ MyFunc.class MyModule.class: $(srcdir)/MyFunc.java $(srcdir)/MyModule.java
 MyDate.class MyTimestamp.class: $(srcdir)/MyDate.java $(srcdir)/MyTimestamp.java
 	CLASSPATH=..:. $(JAVAC) -g -d . $?
 
+check-pitfalls:
+	$(KAWA) -f $(srcdir)/r5rs_pitfall.scm
+
 APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
@@ -171,5 +174,5 @@ EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   module1.scm module1a.scm module2.scm module3.scm included-1.scm \
   HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
   ppfile.out scribble.html.in \
-  MySAXApp.java MySAXApp.expected \
+  MySAXApp.java MySAXApp.expected r5rs_pitfall.scm \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected

@@ -1,13 +1,16 @@
 (define-syntax should-be
   (syntax-rules ()
     ((_ test-id value expression)
+(try-catch
      (let ((return-value expression))
          (if (not (equal? return-value value))
            (for-each (lambda (v) (display v))
                      `("Failure: " test-id ", expected '"
                      value "', got '" ,return-value "'." #\newline))
            (for-each (lambda (v) (display v))
-                     '("Passed: " test-id #\newline)))))))
+                     '("Passed: " test-id #\newline))))
+(ex <java.lang.Throwable>
+  (format #t "Failure: ~s - caught exception.~%~!" test-id))))))
 
 (define call/cc call-with-current-continuation)
 
@@ -23,7 +26,7 @@
             (y (call-with-current-continuation (lambda (c) (set! cont c) 0))))
      (if cont
          (let ((c cont))
-           (set! cont #f)
+           (set! cont #f)2
            (set! x 1)
            (set! y 1)
            (c 0))
@@ -261,9 +264,12 @@
   (let ((ls (list 1 2 3 4)))
     (append ls ls '(5))))
 
+
 ;;Not really an error to fail this (Matthias Radestock)
 ;;If this returns (0 1 0), your map isn't call/cc safe, but is probably
 ;;tail-recursive.  If its (0 0 0), the opposite is true.
+;(display "Map - failed") (newline)
+(should-be 'map #t
 (let ((result 
        (let ()
          (define executed-k #f)
@@ -283,5 +289,6 @@
   (if (equal? result '(0 0 0))
       (display "Map is call/cc safe, but probably not tail recursive or inefficient.")
       (display "Map is not call/cc safe, but probably tail recursive and efficient."))
-  (newline))
+  (newline)
+  #t))
 

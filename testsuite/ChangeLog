@@ -1,3 +1,9 @@
+2005-02-10  Per Bothner  <per@bothner.com>
+
+	* r5rs_pitfall.scm: New testsuite, slightly modified fro Kawa.
+	See http://sisc.sourceforge.net/r5rs_pitfall.php .
+	* Makefile.am (check-pitfalls): Run r5rs_pitfall.scm.
+
 2005-01-25  Per Bothner  <per@bothner.com>
 
 	* HelloCgiX.xql: Add qexo prefix to request-query-string, to test

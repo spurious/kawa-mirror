@@ -1,3 +1,8 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* UnionNodes.java:  New class, extends Procedure2.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2003-07-26  Per Bothner  <per@bothner.com>
 
 	* SortedNodes.java:  New class, extends Values.

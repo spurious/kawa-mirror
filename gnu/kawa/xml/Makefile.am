@@ -27,6 +27,7 @@ java_sources = \
   SortNodes.java \
   SortedNodes.java \
   TextConstructor.java \
+  UnionNodes.java \
   WriteTo.java \
   XMLParser.java
 

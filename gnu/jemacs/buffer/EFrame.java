@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.buffer;
+import gnu.lists.LList;
 
 public abstract class EFrame
 {
@@ -31,8 +32,6 @@ public abstract class EFrame
     win.prevWindow = win;
     EWindow.setSelected(win);
   }
-
-  public abstract void setMenuBar (Menu menu);
 
   public void validate ()
   {
@@ -78,6 +77,8 @@ public abstract class EFrame
     return selectedWindow.getNextWindowInFrame(count);
   }
 
+  public abstract void setMenu(LList menu); 
+  
   public abstract String ask(String prompt);
 
   public String toString()

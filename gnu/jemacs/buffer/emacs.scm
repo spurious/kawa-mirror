@@ -91,8 +91,8 @@
 (define current-menubar #!null)
 
 (define (set-menubar-dirty-flag #!optional (frame :: <frame> (selected-frame)))
-  (invoke frame 'setMenuBar
-	  (make <gnu.jemacs.buffer.Menu> current-menubar)))
+  (invoke frame 'setMenu current-menubar))
+
 
 (define (set-menubar menubar)
   (set! current-menubar menubar)
@@ -547,7 +547,7 @@
 	 "------"
 	 #("Save" save-buffer active: (buffer-modified-p)))
    (list "Tools"
-	 (vector "Scheme interaction" scheme-swing-window))
+	 (vector "Scheme interaction" scheme-window))
    #!null
    (list "Help"
 	 #( "About JEmacs..." about-jemacs ) )))
@@ -573,7 +573,7 @@
     (switch-to-buffer buffer)
     buffer))    
 
-(define (scheme-swing-window)
+(define (scheme-window)
   (let ((buffer (get-buffer-create "Scheme interaction")))
     (invoke-static <gnu.jemacs.buffer.ReplMode> 'make buffer 'scheme)
     (use-local-map (static-field <process> 'modeMap) buffer)

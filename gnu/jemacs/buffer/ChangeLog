@@ -1,3 +1,30 @@
+2004-08-04  Christian Surlykke <christian@surlykke.dk>
+
+	* Buffer.java (invoke): New abstract method 
+	* EFrame.java (setMenuBar): Removed. Use setMenu instead
+	(setMenu): New abstract method
+	* EToolkit.java (getIgnoreAction): New abstract method. 
+	(getMenu): New abstract method.
+	(getIgnoreAction): New abstract method.
+	
+	* emacs.scm (set-menubar-dirty-flag): changed to use EFrame.setMenu
+	rather than EFrame.setMenuBar
+	(scheme-swing-window): Renamed to (scheme-window)
+	* EMenu.java: New abstract class
+	* EWindow.java (setSelected): Changed to concrete, moved some
+	non-swing-specific code from SwingWindow.setSelected to here.
+	(tooLong): New abstract method.
+	(lookupKey): Uses that rather than explicitly creating TooLongAction.
+	(modeline):  Moved field to gnu.jemacs.swing.SwingWindow.java
+	* IgnoreAction.java: Class moved to gnu.jemacs.swing package.
+	* InputStreamHandler.java (run): calls ProcessMode.invoke rather than
+	SwingUtilities.invokeAndWait.
+	* Menu.java: Moved to gnu.jemacs.swing and renamed to SwingMenu.java
+	* Modeline.java: Moved to gnu.jemacs.swing 
+	* ProcessMode.java (invoke): New method.
+	* TooLongAction.java: Moved to gnu.jemacs.swing package.
+	* Makefile.am:  Updated accordingly.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* Buffer.java:  Remove unused import statements.

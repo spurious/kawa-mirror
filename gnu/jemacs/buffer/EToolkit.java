@@ -2,6 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.jemacs.buffer;
+import gnu.lists.LList;
 import gnu.mapping.WrappedException;
 import java.awt.Color;
 
@@ -40,6 +41,8 @@ public abstract class EToolkit
   public abstract Buffer newBuffer (String name);
 
   public abstract EFrame newFrame(Buffer buffer);
+  
+  public abstract EMenu getMenu(LList menubar);
 
   /** Get a face with the given name. */
   public abstract Object getFace(String name, boolean create);
@@ -63,4 +66,9 @@ public abstract class EToolkit
   {
     // Default is to ignore.
   }
+
+  /**
+   * @return
+   */
+  public abstract Object getIgnoreAction();
 }

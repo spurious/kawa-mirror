@@ -7,7 +7,6 @@ import gnu.mapping.*;
 
 public abstract class EWindow
 {
-  public Modeline modeline;
   public EFrame frame;
   public Buffer buffer;
 
@@ -39,8 +38,21 @@ public abstract class EWindow
       : EFrame.selectedFrame.selectedWindow;
   }
 
-  public abstract void setSelected();
+  public void setSelected()
+  {
+    EWindow selected = getSelected();
+    if (selected != null && selected.buffer != buffer)
+      selected.unselect();
 
+    if (frame != null)
+      frame.selectedWindow = this;
+    EFrame.selectedFrame = frame;
+    Buffer.setCurrent(buffer);
+
+  }
+
+  public abstract void unselect();
+  
   public static void setSelected(EWindow window)
   {
     window.setSelected();
@@ -246,9 +258,11 @@ public abstract class EWindow
         if (action != null)
 	  return action;
       }
-    return EKeymap.ignorable(key) ? null : new TooLongAction(pendingLength);
+    return EKeymap.ignorable(key) ? null : tooLong(pendingLength); 
   }
 
+  public abstract Object tooLong(int pendingLength);
+  
   public void handleKey (int code)
   {
     Object command = lookupKey(code);

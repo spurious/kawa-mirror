@@ -199,20 +199,17 @@ java_WITH_SWING = \
   Command.java \
   EKeymap.java \
   EFrame.java \
+  EMenu.java \
   EToolkit.java \
   EWindow.java \
-  IgnoreAction.java \
   InfProcessMode.java \
   InputStreamHandler.java \
   Marker.java \
-  Menu.java \
   Mode.java \
-  Modeline.java \
   ProcessMode.java \
   ReplMode.java \
   SelfInsertCommand.java \
-  TelnetMode.java \
-  TooLongAction.java
+  TelnetMode.java
 
 
 java_sources = \

@@ -503,6 +503,16 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   public abstract InPort openReader (int start, int count);
 
   public abstract long savePointMark ();
-
+  
   public abstract void restorePointMark (long pointMark);
+
+  /**
+   * This is intended for Runnable's that may affect the state of the buffer. 
+   * The implementation should make shure that the GUI is properly updated before
+   * control returns
+   * 
+   *  @param doRun
+   */
+  public abstract void invoke(Runnable doRun);
+
 }

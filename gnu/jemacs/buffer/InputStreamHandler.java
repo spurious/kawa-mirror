@@ -33,7 +33,7 @@ class InputStreamHandler extends Thread
 	      break;
 	    wr.buffer = buffer;
 	    wr.count = avail;
-	    javax.swing.SwingUtilities.invokeAndWait(wr);
+	    mode.invoke(wr);
 	    //wr.write(buffer, 0, avail);
 	    //wr.flush();
 	  }

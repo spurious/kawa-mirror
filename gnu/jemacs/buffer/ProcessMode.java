@@ -104,6 +104,15 @@ public class ProcessMode extends Mode
     else
       buffer.insert(ch, count);
   }
+
+  /**
+   * 
+   * @param doRun
+   */
+  public void invoke(Runnable doRun) 
+  {
+    buffer.invoke(doRun);
+  }
 }
 
 class ProcessInsertCommand extends Procedure0

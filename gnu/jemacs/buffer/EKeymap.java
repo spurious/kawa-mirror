@@ -534,7 +534,9 @@ implements gnu.mapping.Named
         if (command == null)
           {
             if (ignorable(key))
-              return IgnoreAction.getInstance();
+            {
+              return EToolkit.getInstance().getIgnoreAction();
+            }
             else
 	      return keymap.getDefaultBinding();
           }

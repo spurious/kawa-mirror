@@ -348,7 +348,7 @@ check-maketab1:  maketab1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
 	@if diff -b $(srcdir)/tab.html tmp2; then echo '# maketab1 test passes'; else echo FAIL maketab1 test; fi
 
-# FIXME - this doe snot do the correct thing
+# FIXME - this does not do the correct thing
 check-desc:
 	$(KAWA) --xquery -e 'document("gnu/xquery/testsuite/bib.xml")//*[1]'
 

@@ -21,7 +21,7 @@ public abstract class ObjectType extends Type
     try
       {
 	if (reflectClass == null)
-	  reflectClass = Class.forName(getNameOrSignature());
+	  reflectClass = Class.forName(getNameOrSignature().replace('/', '.'));
       }
     catch (java.lang.ClassNotFoundException ex)
       {

@@ -1,7 +1,7 @@
 1999-11-16  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  Minor fix for tail-recursion with many
-	arguments.  (Bug reported by Walter C. Pelissero <wcp@demon.db.de>.)
+	arguments. (Bug reported by Walter C. Pelissero <wcp@lpds.sublink.org>)
 
 1999-11-15  Per Bothner  <per@bothner.com>
 

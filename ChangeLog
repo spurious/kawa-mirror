@@ -1,3 +1,9 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Support new flag --without-awt.
+
+	* Makefile.am:  Add rules for kawa-compiled.jar.
+
 2000-02-26  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (getNamedType):  Add "frame".

@@ -19,6 +19,9 @@ fi
 AC_ARG_WITH(swing,
   [  --with-swing  Assume Swing (Java Foundation Classes) is available])
 
+AC_ARG_WITH(awt,
+  [  --with-awt  Assume AWT is available (default on)])
+
 #AM_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
@@ -41,6 +44,12 @@ case ${with_swing} in
     ;;
 esac
   
+case ${with_awt} in
+  no) AWT_SELECTED=WITHOUT_AWT ;;
+  *)  AWT_SELECTED=WITH_AWT ;;
+esac
+  
+AC_SUBST(AWT_SELECTED)
 AC_SUBST(SWING_SELECTED)
 AC_SUBST(extra_java)
 AC_SUBST(TOP_BUILDDIR)

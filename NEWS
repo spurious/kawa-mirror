@@ -1,3 +1,5 @@
+Changes from Kawa 1.6.59 to 1.6.60
+==================================
 The procedures slot-ref and slot-set! are now available.
 They are equivalent to the existing `field', but reading
 a field `x' will look for `getX' method if there is no public
@@ -10,6 +12,8 @@ There is now a teaser screen snapshot of "JEmacs"
 at http://www.bothner.com/~per/papers/jemacs.png.
 
 The html version of the manual now has a primitive index.
+The manual has been slightly re-organized, with a new
+"Classes and Objects" chapter.
 
 The new functions invoke-static and class-methods allow you
 to call an arbitary Java method.  They both take a class

@@ -1,7 +1,7 @@
 2004-12-22  Per Bothner  <per@bothner.com>
 
-	* use-cases.xml
-	* TestMisc.java
+	* use-cases.xml: Update syntax for enclosed expression in atrtribute.
+	* TestMisc.java: Update serialization for QName.
 
 2004-12-12  Per Bothner  <per@bothner.com>
 

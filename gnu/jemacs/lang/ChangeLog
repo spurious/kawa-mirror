@@ -1,3 +1,7 @@
+2004-11-16  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (ELisp): Add defun for '%let'.  Use defProcStFld.
+
 2004-11-10  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (ELisp): Remove definitions of 'and' and 'or'.

@@ -154,8 +154,9 @@ public class ELisp extends Lisp2
     defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));
     defun("save-current-buffer", new gnu.jemacs.lang.SaveExcursion(true));
     defun("let", new kawa.standard.fluid_let(false, nilExpr));
+    defun("%let", kawa.standard.let.let);
     defun("let*", new kawa.standard.fluid_let(true, nilExpr));
-    define_field ("concat", "kawa.lib.strings", "string$Mnappend");
+    defProcStFld("concat", "kawa.lib.strings", "string$Mnappend");
     Procedure not = new kawa.standard.not(this);
     defun("not", not);
     defun("null", not);

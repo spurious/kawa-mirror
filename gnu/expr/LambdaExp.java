@@ -24,12 +24,27 @@ public class LambdaExp extends ScopeExp
   /** A list of Declarations, chained using Declaration's nextCapturedVar.
     * All the Declarations are allocated in the current heapFrame. */
   Declaration capturedVars;
-  /* If any variables local to this LambdaExp are captured by some inner
-     non-lined Lambda, then all such variables are allocated in a heapFrame.
-     If (! usingCPStyle), then the heapFrame is an instance of the Procedure
-     compiled from one of our child lambdas, and
-     heapFrameLambda points to the child
-     If (! usingCPStyle), then heapFrameLambda is this LambdaExp.  */
+
+  /** A local variable that points to the heap-allocated part of the frame.
+   * This is an instance of heapFrameLambda (which is one of our children);
+   * each captured variable is a field in the heapFrame.  A procedure has
+   * a heapFrame iff if has a parameter or local variable that is
+   * referenced ("captured") by a non-inline inferior procedure.
+   * (I.e there is a least one non-inline procedure that encloses the
+   * reference but not the definition.)  Note that an inline procedure may
+   * have a heapFrame if it encloses a non-inline procedure.  This is
+   * necessary because we represent loops as tail-recursive inline procedures.
+   */
+  Declaration heapFrame;
+
+  /** If any variables local to this LambdaExp are captured by some inner
+   * non-lined Lambda, then all such variables are allocated in a heapFrame.
+   * If (! usingCPStyle), then the heapFrame is an instance of the Procedure
+   * compiled from one of our child lambdas, and heapFrameLambda points to
+   * the child, a non-inline function.  (If all the children are inline
+   * functions, but a Declaration is captured by a non-inline descendent,
+   * then we create a dummy "frame" class.)
+   * If (usingCPStyle), then heapFrameLambda is this LambdaExp. (?) */
   LambdaExp heapFrameLambda;
 
   public LambdaExp firstChild;
@@ -58,13 +73,9 @@ public class LambdaExp extends ScopeExp
   public Field closureEnvField;
 
   /** Field in heapFrame.getType() that contains the static link.
-   * Its value is this function's heapFrame value. */
+   * It is used by child functions to get to outer environments.
+   * Its value is this function's closureEnv value. */
   public Field staticLinkField;
-
-  /** A variable that points to the heap-allocated part of the frame.
-   * This is an instance of heapFrameLambda (which is one of our children);
-   * each captured variable is a field in the heapFrame. */
-  Declaration heapFrame;
 
   /** A variable that points to the closure environment passed in.
    * It can be any one of:
@@ -72,7 +83,7 @@ public class LambdaExp extends ScopeExp
    * this, if this function is its parent's heapFrame;
    * a local variable initialized from this.closureEnv;
    * a parameter (only if !getCanRead()); or
-   * a copy of our parent's closureEnv or heapFrame (only if getInlineOnly()).
+   * a copy of our caller's closureEnv or heapFrame (only if getInlineOnly()).
    * See declareClosureEnv and closureEnvField. */
   Declaration closureEnv;
 
@@ -246,6 +257,15 @@ public class LambdaExp extends ScopeExp
     return null;
   }
 
+  /** For an INLINE_ONLY function, return the function it gets inlined in. */
+  public LambdaExp getCaller ()
+  {
+    LambdaExp caller = this;
+    while (caller.getInlineOnly())
+      caller = caller.returnContinuation.context;
+    return caller;
+  }
+
   Declaration thisVariable;
 
   public Declaration declareThis(ClassType clas)
@@ -269,17 +289,13 @@ public class LambdaExp extends ScopeExp
 	  parent = parent.outerLambda();
 	Declaration parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
-	if (getInlineOnly())
-	  {
-	    closureEnv = parentFrame;
-	  }
-	else if (parent.heapFrameLambda == this || isClassMethod())
+	if (parent.heapFrameLambda == this || isClassMethod())
 	  closureEnv = thisVariable;
-	else if (! isClassGenerated())
+	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink())
+	  closureEnv = null;
+	else if (! isClassGenerated() && ! getInlineOnly())
 	  {
-	    if (parent.heapFrame == null)
-	      closureEnv = null;
-	    else if (! primMethod.getStaticFlag())
+	    if (! primMethod.getStaticFlag())
 	      closureEnv = declareThis(primMethod.getDeclaringClass());
 	    else
 	      {
@@ -290,14 +306,20 @@ public class LambdaExp extends ScopeExp
 		closureEnv.setParameter(true);
 	      }
 	  }
-	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink())
-	  closureEnv = null;
 	else
 	  {
-	    closureEnv = new Declaration("closureEnv",
-					 parentFrame.getType());
-	    scope.addVariable(closureEnv);
-	    closureEnv.setArtificial(true);
+	    LambdaExp caller = getInlineOnly() ? getCaller() : null;
+	    if (parent == caller)
+	      closureEnv = parentFrame;
+	    else if (caller != null && parent == caller.outerLambdaNotInline())
+	      closureEnv = caller.closureEnv;
+	    else
+	      {
+		closureEnv = new Declaration("closureEnv",
+					     parentFrame.getType());
+		scope.addVariable(closureEnv);
+		closureEnv.setArtificial(true);
+	      }
 	  }
       }
     return closureEnv;
@@ -443,7 +465,7 @@ public class LambdaExp extends ScopeExp
       code.emitReturn();
     code.popScope();        // Undoes enterScope in enterFuntion.
     if (! Compilation.fewerClasses) // FIXME
-      comp.method.popScope(); // Undoes pushScope in method.initCode.
+      code.popScope(); // Undoes pushScope in method.initCode.
   }
 
   public void compile (Compilation comp, Target target)
@@ -573,6 +595,7 @@ public class LambdaExp extends ScopeExp
   // Can we merge this with allocParameters?
   public void allocChildClasses (Compilation comp)
   {
+    declareClosureEnv();
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       { 
@@ -595,11 +618,14 @@ public class LambdaExp extends ScopeExp
 	  {
 	    boolean method_static;
 	    ObjectType closureEnvType;
-	    if (heapFrame == null
-		|| ! (child.getImportsLexVars() || child.getNeedsStaticLink()))
+	    if (! (child.getImportsLexVars() || child.getNeedsStaticLink()))
 	      closureEnvType = null;
-	    else
+	    else if (heapFrame != null)
 	      closureEnvType = (ClassType) heapFrame.getType();
+	    else if (closureEnv != null)
+	      closureEnvType = (ClassType) closureEnv.getType();
+	    else
+	      closureEnvType = null;
 	    // generate_unique_name (new_class, child.getName());
 	    String child_name = child.getName();
 	    String method_name = "lambda"+(++comp.method_counter);

@@ -1,3 +1,10 @@
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (compile):  When doing a direct method call,
+	pass the correct closure environment.
+	* LambdaExp.java (getCaller):  New method.
+	(declareClosureEnv):  Fix problems with inline functions.
+
 1999-07-15  Per Bothner  <per@bothner.com>
 
 	* Target.java (pushValue, returnValue):  New static methods.

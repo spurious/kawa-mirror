@@ -8,6 +8,8 @@ public class ceiling extends Procedure1
 {
    public Object apply1 (Object arg1)
    {
+     if (arg1 instanceof IntNum)
+       return arg1;
      RealNum num = (RealNum) arg1;
      return new DFloNum (Math.ceil (num.doubleValue ()));
    }

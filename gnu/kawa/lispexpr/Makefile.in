@@ -99,7 +99,7 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_sources =    LangPrimType.java   LispReader.java   ReaderDispatch.java   ReaderDispatchMacro.java   ReaderDispatchMisc.java   ReaderIgnoreRestOfLine.java   ReaderMacro.java   ReaderMisc.java   ReaderParens.java   ReaderQuote.java   ReaderString.java   ReaderVector.java   ReadTable.java   ReadTableEntry.java   ScmRead.java
+java_sources =    LangPrimType.java   LispInterpreter.java   LispReader.java   ReaderDispatch.java   ReaderDispatchMacro.java   ReaderDispatchMisc.java   ReaderIgnoreRestOfLine.java   ReaderMacro.java   ReaderMisc.java   ReaderParens.java   ReaderQuote.java   ReaderString.java   ReaderVector.java   ReadTable.java   ReadTableEntry.java   ScmRead.java
 
 
 KAWA = $(JAVA) kawa.repl

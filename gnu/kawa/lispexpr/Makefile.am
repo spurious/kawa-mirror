@@ -6,6 +6,7 @@ AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
   LangPrimType.java \
+  LispInterpreter.java \
   LispReader.java \
   ReaderDispatch.java \
   ReaderDispatchMacro.java \

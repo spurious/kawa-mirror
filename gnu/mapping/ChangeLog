@@ -1,3 +1,7 @@
+Thu Nov 26 12:38:53 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Makefile.am (java_JAVA), Makefile.in:  Add NameMap.java.
+
 Sun Nov 15 21:26:14 1998  Per Bothner  <bothner@cygnus.com>
 
 	* NameMap.java:  New Procedure1 sub-class.

@@ -29,6 +29,24 @@ public abstract class RealNum extends Numeric
     return compare (x) >= 0;
   }
 
+  public RealNum max (RealNum x)
+  {
+    boolean exact = isExact () && x.isExact ();
+    RealNum result = grt (x) ? this : x;
+    if (!exact && result.isExact ())
+      result = new DFloNum (result.doubleValue ());
+    return result;
+  }
+
+  public RealNum min (RealNum x)
+  {
+    boolean exact = isExact () && x.isExact ();
+    RealNum result = grt (x) ? x : this;
+    if (!exact && result.isExact ())
+      result = new DFloNum (result.doubleValue ());
+    return result;
+  }
+
   public Numeric abs ()
   {
     return isNegative () ? neg () : this;

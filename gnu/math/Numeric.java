@@ -25,6 +25,12 @@ public abstract class Numeric
     return sub (obj).isZero ();
   }
 
+  /* Rounding modes: */
+  public static final int FLOOR = 1;
+  public static final int CEILING = 2;
+  public static final int TRUNCATE = 3;
+  public static final int ROUND = 4;
+
   /*
   public abstract Object add_reversed (Numeric obj);
 

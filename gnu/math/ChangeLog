@@ -1,3 +1,15 @@
+Mon Sep 16 10:55:39 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Numeric.java (FLOOR, CEILING, TRUNCATE, ROUND):  New constants.
+	* RealNum.java (max, min):  New methods.
+	* IntNum.java (isOdd):  Check low-order word, not high-order word!
+	(setPlus, set):  New overload variants.
+	(setNeg):  Renamed to setNegative.
+	(divide, quotient, remiander, modulo, lcm):  New methods.
+	* Makefile.{am,in}: (javadir):  Use $(subdir)
+	{DEP_,}DISTFILES):  Do not include DATA (i.e. *.class).
+	Replace generated EXTRA_DIST with ditto SOURCES.
+
 Thu Sep 12 15:40:30 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Numeric.class, RealNum.class, DFloNum.class, RatNum.class,

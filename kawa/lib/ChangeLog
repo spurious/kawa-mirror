@@ -1,3 +1,7 @@
+Tue Jul 28 08:31:51 1998  Per Bothner  <bothner@cygnus.com>
+
+	* syntax.scm (location):  New partial implementation.
+
 Wed Jul 22 18:05:23 1998  Per Bothner  <bothner@cygnus.com>
 
 	* characters.scm (char-alphabetic?):  New function.

@@ -17,7 +17,7 @@
   (= x 0))
 
 (defun boundp (x)
-  (invoke-static 'gnu.jemacs.lang.Symbol 'isBound x))
+  (invoke-static 'gnu.commonlisp.lang.Symbol 'isBound x))
 
 (defun define-function (symbol object) (fset symbol object))
 

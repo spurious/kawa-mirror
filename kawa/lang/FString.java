@@ -111,6 +111,18 @@ public class FString extends Sequence implements Printable, Compilable
       System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
   }
 
+  public int hashCode ()
+  {
+    /* Matches String.hashCode specification, as updated specification in
+       http://www.javasoft.com/docs/books/jls/clarify.html. */
+    char[] val = value;
+    int len = val.length;
+    int hash = 0;
+    for (int i = 0;  i < len;  i++)
+      hash = 32 * hash + val[i];
+    return hash;
+  }
+
   public boolean equals (Object obj)
   {
     if (obj == null || !(obj instanceof FString))

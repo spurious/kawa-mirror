@@ -1,5 +1,8 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
+	* Environment.java (defineValue, getFunction, putFunction):  New.
+	(define_global):  Use defineValue rather than define.
+
 	* Values.java:  Make implement java.io.Externalizable.
 
 2000-04-21  Per Bothner  <per@bothner.com>

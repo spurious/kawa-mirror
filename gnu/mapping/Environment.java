@@ -37,7 +37,7 @@ public class Environment extends NameMap
   /** Define name (interned) to have a given value. */
   public static void define_global (String name, Object new_value)
   {
-    user().define (name, new_value);
+    user().defineValue (name, new_value);
   }
 
   public static void defineFunction (String name, Object new_value)
@@ -139,11 +139,22 @@ public class Environment extends NameMap
     return null;
   }
 
-  public Binding define (String name, Object value)
+  /**
+   * Define the value binding for a symbol.
+   */
+  public Binding defineValue (String name, Object value)
   {
     Binding binding = getBinding(name);
     binding.set(value);
     return binding;
+  }
+
+  /**
+   * Define the value or function binding for a symbol, as appropriate
+   */
+  public Binding define (String name, Object value)
+  {
+    return defineValue(name, value);
   }
 
   public void addBinding(Binding binding)
@@ -212,6 +223,16 @@ public class Environment extends NameMap
     return binding.get ();
   }
 
+  /** Get the function binding for a symbol.
+   * If this Environment is a single-namespace language (such as Scheme).
+   * this is equivalent to getChecked.
+   * @exception gnu.mapping.UnboundSymbol the name has no function binding
+   */
+  public Object getFunction(String name)
+  {
+    return getChecked(name);
+  }
+
   public Object put (/* interned */ String name, Object value)
   {
     Binding binding = lookup (name);
@@ -236,6 +257,15 @@ public class Environment extends NameMap
   public Object put (Object name, Object value)
   {
     return put ((String) name, value);
+  }
+
+  /** Set the function binding for a symbol.
+   * If this Environment is a single-namespace language (such as Scheme).
+   * this is equivalent to put.
+   */
+  public void putFunction(String name, Object value)
+  {
+    put(name, value);
   }
 
   /** Does not enumerate inherited Bindings. */

@@ -2,7 +2,8 @@ package kawa;
 
 import kawa.lang.*;
 import kawa.standard.*;
-
+import gnu.mapping.*;
+import gnu.expr.*;
 import java.io.*;
 
 public class Shell extends Procedure0
@@ -85,7 +86,7 @@ public class Shell extends Procedure0
 	    if (lexer.checkErrors(perr, 20))
 	      continue;
 	    tr.errors = 0;
-	    ModuleExp mod = new ModuleExp (body, tr);
+	    ModuleExp mod = Scheme.makeModuleExp(body, tr);
 	    mod.setName("atInteractiveLevel");  // FIXME
 
 	    /* DEBUGGING:
@@ -103,13 +104,13 @@ public class Shell extends Procedure0
 		  interp.print(result, pout);
 	      }
 	  }
-	catch (kawa.lang.WrongArguments e)
+	catch (WrongArguments e)
 	  {
 	    if (e.usage != null)
 	      perr.println("usage: "+e.usage);
 	    e.printStackTrace(perr);
 	  }
-	catch (kawa.lang.WrongType e)
+	catch (WrongType e)
 	  {
 	    perr.println("Argument "+e.number+" to "+e.procname
 			 +" must be of type "+e.typeExpected);

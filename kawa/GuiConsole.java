@@ -3,14 +3,10 @@ package kawa;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import gnu.mapping.*;
 
-import kawa.lang.InPort;
-import kawa.lang.TtyInPort;
-import kawa.lang.OutPort;
 import kawa.standard.Scheme;
 import kawa.lang.Interpreter;
-import kawa.lang.Future;
-import kawa.lang.Environment;
 
 /** A Frame containing a Kwa read-eval-print loop.
   * @author Albert Ting <alt@artisan.com> (original base)

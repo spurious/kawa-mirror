@@ -2,6 +2,7 @@ package kawa;
 
 import kawa.lang.*;
 import java.io.Reader;
+import gnu.mapping.*;
 
 /** A TtyInPort that reads from a MessageArea.
   */

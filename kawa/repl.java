@@ -2,6 +2,8 @@ package kawa;
 import kawa.lang.*;
 import kawa.standard.*;
 import java.io.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 

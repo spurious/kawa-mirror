@@ -12,6 +12,7 @@ Wed Jul 22 18:05:23 1998  Per Bothner  <bothner@cygnus.com>
 	* strings.scm (string=?):  New function.
 	* syntax.scm, others:  Update for classes moved from kawa.lang to gnu.
 	* reflection.scm:  Fix inconsistent macro names.
+	Reported by William J. Edney (bedney@firstsoft.com).
 
 Mon Jun 29 11:27:16 1998  Per Bothner  <bothner@cygnus.com>
 

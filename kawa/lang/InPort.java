@@ -74,16 +74,17 @@ public class InPort extends LineBufferedReader implements Printable
       setConvertCR(true);
   }
 
-  // For now, this is static.  It should probably be thread-local.
-  private static InPort inp = new TtyInPort (System.in, "<stdin>",
-					     OutPort.outDefault());
+  private static InPort systemInPort = new SysInPort (System.in, "<stdin>",
+						      OutPort.outDefault());
+  private static InPort defaultInPort = systemInPort;
 
   static public InPort inDefault ()
   {
     Thread thread = Thread.currentThread ();
     if (thread instanceof Future)
       return ((Future) thread).in;
-    return inp;
+    else
+      return defaultInPort;
   }
 
   static public void setInDefault (InPort in)
@@ -92,7 +93,7 @@ public class InPort extends LineBufferedReader implements Printable
     if (thread instanceof Future)
       ((Future) thread).in = in;
     else
-      inp = in;
+      defaultInPort = in;
   }
 
   public static InPort openFile(String fname)

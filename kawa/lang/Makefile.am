@@ -28,7 +28,8 @@ Char.class \
 LineBufferedReader.class QueueReader.class \
 InPort.class \
 OutPort.class \
-TtyInPort.class LogWriter.class NullReader.class CharArrayInPort.class \
+TtyInPort.class SysInPort.class \
+LogWriter.class NullReader.class CharArrayInPort.class \
 Expression.class \
 ApplyExp.class \
 BeginExp.class \

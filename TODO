@@ -29,3 +29,5 @@ When done, if errors or warnings, throw SyntaxErrors.
 Printing SyntaxError prints error log.
 
 Replace use of ZipArchive by jar files (once JDK 1.1 is out).
+
+Perhaps add #|...|# comments.  (Supposedly SCM and others have them.)

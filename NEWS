@@ -1,3 +1,13 @@
+Changes since 1.0:
+==================
+Eval is available, as specified for R5RS.
+Also implemented are scheme-report-environment, null-environment, and
+interaction-environment.
+
+Lexical bindings are now always handled by the compiler.
+The evaluator no longer understand lexical scopes (such as a "let");
+a top-level "let" (just like a "lambda") now forces compilation.
+
 Changes since 0.4:
 ==================
 
@@ -34,7 +44,7 @@ Macros (and primitive syntax) can now be autoloaded as well as procedures.
 New kawac application compiles to one or more .class files.
 
 Compile time errors include line numbers.
-Uncaught exceptions so a stack trace that includes line numbers.
+Uncaught exceptions cause a stack trace that includes .scm line numbers.
 This makes it more practical to debug Kawa with a Java debugger.
 
 Quasiquotation is implemented.

@@ -1,3 +1,66 @@
+Fri Oct 18 14:06:40 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Environment.java:  Rewrite.
+	Remove stuff for lexical scopes.
+	Make into first-class object like Dictionary, but with "inheritance."
+	* kawa/lang/{Binding,Location}.java:  New classes.
+
+	* kawa/lang/Declaration.java (getvalue, getframe, setvalue):
+	Remove - eval no longer deal with lexical scoping.
+	* kawa/lang/LambdaExp.java (hasNestedScopes):  New field.
+	(compile_setLiterals):  No longer needs to worry about a static
+	link in outer-most lambda from evaluated LetExp.
+	* kawa/lang/LetExp.java (eval):  Just throw exception.
+	* kawa/lang/SetExp.java (eval):  Now only handle top-level names.
+	* kawa/lang/ScopeExp.java (eval):  Likewise.
+	* kawa/lang/ReferenceExp.java (eval):  Likewise.
+	(compile_load):  Use recursive compile_load for staticLink.
+
+	* kawa/lang/ModuleBody.java:  New abstract interface, using run.
+	* kawa/lang/LambdaExp.java (<init>):  Support ModuleBody interface.
+	(eval_module):  New interface (pass Environment).
+	* kawa/lang/CompileFile.java (read):  New interface to set modulebody.
+	* kawa/lang/compilefunc.java:  ModuleBody now takes Environment.
+	* kawa/lang/{AutoloadProcedure,AutoloadSyntax}.java:  Update likewise.
+	* kawa/standard/load.java, kawa/Shell.java:  Likewise.
+
+	* kawa/lang/{Lambda,LambdaExp,Quote}.java, kawa/standard/{and_or,
+	begin,define,define_syntax,ifp,let,letstar,letrec,quasiquote,set_b,
+	syntax_error}.java:
+	Replace throw new WrongArguments by return interp.syntaxError.
+	* kawa/standard/letstar.java: Remove a pointless use of VarListPat(1).
+	* kawa/lang/Syntax.java (rewrite):  No longer throws WrongArguments.
+	* kawa/lang/Interpreter (rewrite*):  Likewise.
+	* kawa/lang/AutoloadSyntax (load etc):  Likewise.
+
+	* kawa/lang/SyntaxRule.java (2-arg execute_template):  Do rewrite here,
+	and thus return an expression instead of an Object.
+	* kawa/lang/SyntaxRules.java (rewrite):  Therefore do not rewrite here.
+	
+	* kawa/standard/StandardInterpreter.java:  Renamed to Scheme.java.
+	* kawa/standard/ashift.java:  New function (arithmetic-shift).
+	* kawa/standard/not.java:  Fix broken semantics (required Boolean).
+	* kawa/standard/{string,vector}.java:  Renamed to string_v.java and
+	vector_v.java to avoid confusion on case-insensitive filesystems.
+	* kawa/standard/quasiquote.java:  Update accordingly.
+	* {kawa,kawac}.java:  Update StandardInterpreter->Scheme.
+	
+	* kawa/lang/Interpreter.java (curEnvironment):  New [temporary] method.
+	(rewrite_pair):  Deal with hygiene Symbol in current_decls.
+	* kawa/lang/Eval.java:  New class, for "eval" function.
+	* kawa/lang/Makefile.{am,in}:  New files Location, Binding, Eval.
+
+	* kawa/standard/{scheme_env,null_env,user_env}.java:  New classes.
+	* kawa/standard/Makefile.{am,in}:  Update accordingly.
+
+	* kawa/lang/InPort.java (readSchemeNumber):  Make more robust.
+	* kawa/standard/string2number.java:  On ReadError, return #f.
+	* kawa/lang/Pair.java (pair):  Remove redundant call to super.
+
+	* kawa/lang/Compilation (findLiteral):  Never allocate a field
+	for a String - more efficient to just use a CONSTANT_String.
+	* kawa/lang/Literal.java (emit):  String is never ALLOCATED now.
+
 Mon Sep 16 11:04:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.0.  (Yeah!)

@@ -1,3 +1,12 @@
+2003-03-29  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (main):  Add parameter type specification, since
+	otherwise 'new File(x)' is ambiguous in JDK 1.4.
+
+	* TestMisc.java (main):  Add two tests for substring.
+
+	* TestMisc.java (evalTest):  Guard against null base exception.
+
 2003-03-04  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Add a test for computed constructors.

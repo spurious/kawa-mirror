@@ -105,26 +105,35 @@ public class XQResolveNames extends ResolveNames
 
   protected Expression walkReferenceExp (ReferenceExp exp)
   {
-    if (exp.getBinding() == null && exp.getSymbol() instanceof Symbol)
+    if (exp.getBinding() == null)
       {
-	Symbol sym = (Symbol) exp.getSymbol();
-	if ("".equals(sym.getNamespaceURI()))
+	Object symbol = exp.getSymbol();
+	Declaration decl = lookup.lookup(symbol, exp.isProcedureName());
+	if (decl != null)
+	  exp.setBinding(decl);
+	else
 	  {
-	    String name = sym.getLocalName();
-	    Expression f;
-	    if ("request".equals(name))
-	      f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetRequest", 
-					   "getRequest");
-	    else if ("response".equals(name))
-	      f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetResponse",
-					   "getResponse");
-	    else
-	      f = null;
-	    if (f != null)
-	      return new ApplyExp(f, Expression.noExpressions);
+	    Symbol sym;
+	    if (symbol instanceof Symbol
+		&& "".equals((sym = (Symbol) symbol).getNamespaceURI()))
+	      {
+		String name = sym.getLocalName();
+		Expression f;
+		if ("request".equals(name))
+		  f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetRequest", 
+					       "getRequest");
+		else if ("response".equals(name))
+		  f = XQParser.makeFunctionExp("gnu.kawa.servlet.GetResponse",
+					       "getResponse");
+		else
+		  f = null;
+		if (f != null)
+		  return new ApplyExp(f, Expression.noExpressions);
+	      }
+	    super.walkReferenceExp(exp);
 	  }
       }
-    return super.walkReferenceExp(exp);
+    return exp;
   }
 
   protected Expression walkApplyExp (ApplyExp exp)
@@ -141,7 +150,15 @@ public class XQResolveNames extends ResolveNames
       {
 	ElementConstructor cons = (ElementConstructor) proc;
 	if (cons.getQName() == null)
-	  cons.setQName(namespaceResolve(cons.getXmlName(), false));
+	  {
+	    Compilation comp = getCompilation();
+	    int saveColumn = comp.getColumn();
+	    // Add 1 for the '<' to get the actual element name.
+	    if (saveColumn > 0)
+	      comp.setColumn(saveColumn+1);
+	    cons.setQName(namespaceResolve(cons.getXmlName(), false));
+	    comp.setColumn(saveColumn);
+	  }
 
 	// Add namespaces nodes that might be needed.
 	NamespaceBinding nsBindings = cons.getNamespaceNodes();
@@ -168,6 +185,8 @@ public class XQResolveNames extends ResolveNames
   static NamespaceBinding maybeAddNamespace(String sname, Symbol qname,
 					    NamespaceBinding bindings)
   {
+    if (qname == null) // Happens if prevously-reported unknown prefix.
+      return bindings;
     int colon = sname.indexOf(':');
     String prefix = colon < 0 ? null : sname.substring(0, colon).intern();
     String uri = qname.getNamespaceURI();

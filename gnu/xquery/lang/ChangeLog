@@ -1,3 +1,13 @@
+2003-12-26  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseElementConstructor):  Set line/column for
+	attribute.
+	* XQResolveNames.java (maybeAddNamespace):  Avoid NullPointerException.
+	(walkApplyExp):  Adjust column number if ElementConstructor.
+
+	* XQResolveNames.java (walkReferenceExp):  Fix $request/$response
+	handling.
+
 2003-12-25  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseRelativePathExpr, parseFLWRExpression):  last(),

@@ -1902,6 +1902,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
 	  break;
 	String attrName = new String(tokenBuffer, 0, tokenBufferLength);
+	int startLine = getLineNumber() + 1;
+	int startColumn = getColumnNumber() + 1 - tokenBufferLength;
 	String defininingNamespace = null;
 	Symbol attrQName = null;
 	if (curToken == NCNAME_TOKEN)
@@ -1955,7 +1957,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	    for (int i = n;  --i >= 0; )
 	      args[i] = (Expression) vec.elementAt(vecSize + i);
 	    vec.setSize(vecSize);
-	    vec.addElement(new ApplyExp(makeAttr, args));
+	    ApplyExp aexp = new ApplyExp(makeAttr, args);
+	    aexp.setFile(getName());
+	    aexp.setLine(startLine, startColumn);
+	    vec.addElement(aexp);
 	  }
       }
     boolean empty = false;

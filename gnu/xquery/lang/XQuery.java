@@ -40,6 +40,11 @@ public class XQuery extends Interpreter
     return (char) i;
   }
 
+  public boolean isTrue(Object value)
+  {
+    return gnu.xquery.util.BooleanValue.booleanValue(value);
+  }
+
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new XQParser(inp, messages);

@@ -715,9 +715,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    Expression exp2 = parseBinaryExpr(tokPriority+1);
 	    if (token == OP_AND)
-	      exp = new IfExp(exp, exp2, QuoteExp.falseExp);
+	      exp = new IfExp(booleanValue(exp), exp2, QuoteExp.falseExp);
 	    else if (token == OP_OR)
-	      exp = new IfExp(exp, QuoteExp.trueExp, exp2);
+	      exp = new IfExp(booleanValue(exp), QuoteExp.trueExp, exp2);
 	    else
 	      exp = makeBinary(token, exp, exp2);
 	  }
@@ -1189,6 +1189,15 @@ public class XQParser extends LispReader // should be extends Lexer
     return new ApplyExp(string, args);
   }
 
+  /** Coerce the value of an expresison to a boolean value. */
+  Expression booleanValue(Expression exp)
+  {
+    Expression[] args = { exp };
+    Expression string
+      = makeFunctionExp("gnu.xquery.util.BooleanValue", "booleanValue");
+    return new ApplyExp(string, args);
+  }
+
   Expression parseNameSpec(String defaultNamespaceUri, boolean attribute)
       throws java.io.IOException, SyntaxException
   {
@@ -1595,7 +1604,7 @@ public class XQParser extends LispReader // should be extends Lexer
     getRawToken();
     nesting--;
     Expression elsePart = parseExpr();
-    return new IfExp(cond, thenPart, elsePart);
+    return new IfExp(booleanValue(cond), thenPart, elsePart);
   }
 
   public boolean match(String word)
@@ -1671,7 +1680,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	body = parseExpr();
 	if (cond != null)
 	  {
-	    body = new IfExp(cond, body, QuoteExp.voidExp);
+	    body = new IfExp(booleanValue(cond), body, QuoteExp.voidExp);
 	  }
 	body.setFile(getName());
 	body.setLine(bodyLine, bodyColumn);

@@ -1,3 +1,11 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (booleanValue):  New method.
+	(parseBinaryExpr, parseIfExpr, parseFLWRExpression):
+	Call booleanValue.
+
+	* XQuery.java (isTrue):  New method.
+
 2002-04-08  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (OP_NODE, OP_TEXT):  New constants.

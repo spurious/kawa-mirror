@@ -1,3 +1,8 @@
+1999-07-11  Per Bothner  <per@bothner.com>
+
+	* formatst.scm:  Set fail-expected 4 places.  Some other fixes.
+	* Makefile.am, Makefile.in (check1):  Add check-format.
+
 1999-06-30  Per Bothner  <per@bothner.com>
 
 	* formatst.scm:  New testsuite, derived from one in Slib.

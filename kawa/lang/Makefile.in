@@ -77,13 +77,12 @@ UnboundSymbol.java \
 WrongArguments.java \
 WrongType.java \
 GenericError.java\
-NamedException.java \
-SyntaxException.java
+NamedException.java
 
 java_JAVA=\
 Char.java \
-LineBufferedReader.java QueueReader.java \
-InPort.java SourceError.java Lexer.java ScmRead.java \
+QueueReader.java \
+InPort.java ScmRead.java \
 OutPort.java \
 TtyInPort.java SysInPort.java \
 LogWriter.java NullReader.java CharArrayInPort.java \

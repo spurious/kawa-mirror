@@ -1,10 +1,11 @@
 package kawa.lang;
 import gnu.math.*;
 import java.io.*;
+import gnu.text.SyntaxException;
 
 /** A class to read Scheme forms (S-expressions). */
 
-public class ScmRead extends Lexer
+public class ScmRead extends gnu.text.Lexer
 {
   public ScmRead(InPort port)
   {
@@ -131,6 +132,24 @@ public class ScmRead extends Lexer
            }
         }
       }
+    else if ((origc = Character.digit((char) c, 8)) >= 0)
+      {
+	int next = peek();
+	next = Character.digit((char) next, 8);
+	if (next >= 0)
+	  {
+	    c = 8 * origc + next;
+	    for (;;)
+	      {
+		skip();
+		next = peek();
+		next = Character.digit((char) next, 8);
+		if (next < 0)
+		  break;
+		c = 8 * c + next;
+	      }
+	  }
+      }
     else if (origc == '\r')
       {
 	c = '\n';
@@ -161,6 +180,8 @@ public class ScmRead extends Lexer
       return Special.eof;
     if (name.equals("void"))
       return Values.empty;
+    if (name.equals("default"))
+      return Special.dfault;
     if (name.equals("null"))
       return null;
     error("unknown named constant #!"+name);
@@ -788,8 +809,9 @@ public class ScmRead extends Lexer
   protected Object readList ()
     throws java.io.IOException, SyntaxException
   {
-    char saveReadState = port.readState;
-    port.readState = '(';
+    // FIXME  These casts are not a good idea!
+    char saveReadState = ((InPort) port).readState;
+    ((InPort) port).readState = '(';
     int line = port.getLineNumber ();
     int column = port.getColumnNumber ();
     try
@@ -803,15 +825,15 @@ public class ScmRead extends Lexer
       }
     finally
       {
-	port.readState = saveReadState;
+	((InPort) port).readState = saveReadState;
       }
   }
 
   protected Vector readVector ()
     throws java.io.IOException, SyntaxException
   {
-    char saveReadState = port.readState;
-    port.readState = '(';
+    char saveReadState = ((InPort) port).readState;
+    ((InPort) port).readState = '(';
      try
        {
 	 java.util.Vector vec = new java.util.Vector();
@@ -830,7 +852,7 @@ public class ScmRead extends Lexer
        }
      finally
        {
-	port.readState = saveReadState;
+	((InPort) port).readState = saveReadState;
        }
   }
  
@@ -844,15 +866,15 @@ public class ScmRead extends Lexer
   public Object readObject ()
       throws java.io.IOException, SyntaxException
   {
-    char saveReadState = port.readState;
-    port.readState = ' ';
+    char saveReadState = ((InPort) port).readState;
+    ((InPort) port).readState = ' ';
     try
       {
 	return readObject (read ());
       }
     finally
       {
-	port.readState = saveReadState;
+	((InPort) port).readState = saveReadState;
       }
   }
 
@@ -880,15 +902,15 @@ public class ScmRead extends Lexer
 	  case '(':
 	    return readList();
 	  case '"':
-	    saveReadState = port.readState;
-	    port.readState = '\"';
+	    saveReadState = ((InPort) port).readState;
+	    ((InPort) port).readState = '\"';
 	    try
 	      {
 		return readString();
 	      }
 	    finally
 	      {
-		port.readState = saveReadState;
+		((InPort) port).readState = saveReadState;
 	      }
 	  case '\'':
 	    return readQuote(Interpreter.quote_sym);
@@ -936,15 +958,15 @@ public class ScmRead extends Lexer
 		unread (next);
 		return readNumber ('#', 10);
 	      case '|':
-		saveReadState = port.readState;
-		port.readState = '|';
+		saveReadState = ((InPort) port).readState;
+		((InPort) port).readState = '|';
 		try
 		  {
 		    readNestedComment();
 		  }
 		finally
 		  {
-		    port.readState = saveReadState;
+		    ((InPort) port).readState = saveReadState;
 		  }
 		break;
 	      default:

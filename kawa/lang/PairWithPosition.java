@@ -41,7 +41,8 @@ public class PairWithPosition extends Pair
 
   /** Get the line number of (the start of) this pair.
     * The "first" line is line 1. */
-  public PairWithPosition (InPort port, Object car, Object cdr)
+  public PairWithPosition (gnu.text.LineBufferedReader port,
+			   Object car, Object cdr)
   {
     super (car, cdr);
     filename = port.getName ();

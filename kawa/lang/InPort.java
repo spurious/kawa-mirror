@@ -2,20 +2,8 @@ package kawa.lang;
 import gnu.math.*;
 import java.io.*;
 
-public class InPort extends LineBufferedReader implements Printable
+public class InPort extends gnu.text.LineBufferedReader implements Printable
 {
-  String name;
-
-  public String getName ()
-  {
-    return name;
-  }
-
-  public void setName (String name)
-  {
-    this.name = name;
-  }
-
   public InPort (Reader in)
   {
     super (in);
@@ -24,7 +12,7 @@ public class InPort extends LineBufferedReader implements Printable
   public InPort (Reader in, String name)
   {
     this (in);
-    this.name = name;
+    setName(name);
   }
 
   public InPort (InputStream in)
@@ -35,7 +23,7 @@ public class InPort extends LineBufferedReader implements Printable
   public InPort (InputStream in, String name)
   {
     this (in);
-    this.name = name;
+    setName(name);
   }
 
   public static Reader convertToReader (InputStream in, Object conv)
@@ -111,6 +99,8 @@ public class InPort extends LineBufferedReader implements Printable
 		      Environment.user().get("port-char-encoding"));
   }
 
+  // FIXME - Having this be in InPort while ScmRead takes a LineBufferedReader
+  // is flakey.  Maybe this should be some kind of "attribute".
   char readState = '\n';
   /** Return a character that indicates what we are currently reading.
     * Returns '\n' if we are not inside read; '\"' if reading a string;
@@ -121,6 +111,7 @@ public class InPort extends LineBufferedReader implements Printable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<input-port");
+    String name = getName();
     if (name != null)
       {
 	ps.print (' ');

@@ -41,16 +41,17 @@ public class CompileFile extends Procedure2
       {
 	ScmRead lexer = new ScmRead(port);
 	body = lexer.readListBody ();
-	if (lexer.firstError != null)
+	gnu.text.SourceError errors = lexer.getErrors();
+	if (errors != null)
 	  {
-	    String msg = lexer.firstError.toString();
+	    String msg = errors.toString();
 	    lexer.checkErrors(null, 0);
 	    throw new GenericError("read errors seen reading file: "+msg);
 	  }
 	if (port.peek() == ')')
 	  lexer.fatal("An unexpected close paren was read.");
       }
-    catch (SyntaxException e)
+    catch (gnu.text.SyntaxException e)
       {
 	// The '\n' is because a SyntaxException includes a line number,
 	// and it is better if that starts the line.  FIXME OBSOLETE

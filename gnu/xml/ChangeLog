@@ -1,3 +1,7 @@
+2003-11-02  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java.in (<init>):  Remove unneeded throws specifications.
+
 2003-10-30  Per Bothner  <per@bothner.com>
 
 	* NamespaceBinding.java (toString):  New method.

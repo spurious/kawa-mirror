@@ -563,7 +563,6 @@ public class @XMLParser@
 
 @if CHAR is byte@
   public @XMLParser@(InputStream in, @ParsedXMLHandler@ out)
-    throws IOException
   {
     this.in = in; 
     buffer = new byte[1024];
@@ -576,7 +575,6 @@ public class @XMLParser@
 
 @if CHAR is char@
   public @XMLParser@(Reader in, @ParsedXMLHandler@ out)
-    throws IOException
   {
     this.in = in;
     buffer = new char[1024];

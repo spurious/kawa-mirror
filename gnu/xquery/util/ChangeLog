@@ -1,6 +1,6 @@
 2004-07-20  Per Bothner  <per@bothner.com>
 
-	* IntegerRange.java:  Remove unused import statements
+	* IntegerRange.java:  Remove unused import statements.
 	* MinMax.java:  Likewise.
 	* RelativeStep.java:  Likewise.
 	* XMLFormat.java:  Likewise.

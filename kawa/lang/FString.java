@@ -28,6 +28,8 @@ public class FString extends Sequence implements Printable, Compilable
       value[i] = ch;
   }
 
+  /** Create an FString from a char[].
+   * Note that this contructor does *not* copy the argument. */
   public FString (char[] values)
   {
     value = values;
@@ -40,10 +42,20 @@ public class FString extends Sequence implements Printable, Compilable
 
   public FString (StringBuffer buffer)
   {
-    int length = buffer.length ();
+    this(buffer, 0, buffer.length());
+  }
+
+  public FString (StringBuffer buffer, int offset, int length)
+  {
     value = new char[length];
     if (length > 0)
-      buffer.getChars (0, length, value, 0);
+      buffer.getChars (offset, offset+length, value, 0);
+  }
+
+  public FString (char[] buffer, int offset, int length)
+  {
+    value = new char[length];
+    System.arraycopy(buffer, offset, value, 0, length);
   }
 
   public FString copy (int start, int end)

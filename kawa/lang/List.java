@@ -126,6 +126,21 @@ public class List extends Sequence implements Printable, Compilable
   {
     return new ListEnumeration(this);
   }
+
+  public static Pair list1(Object arg1)
+  {
+    return new Pair(arg1, List.Empty);
+  }
+
+  public static Pair list2(Object arg1, Object arg2)
+  {
+    return new Pair(arg1, new Pair(arg2, List.Empty));
+  }
+
+  public static Pair list3(Object arg1, Object arg2, Object arg3)
+  {
+    return new Pair(arg1, new Pair(arg2, new Pair(arg3, List.Empty)));
+  }
 }
 
 /** A Enumerations for linked Lists.

@@ -28,10 +28,12 @@ public abstract class Sequence
       Class componentType = arr.getClass().getComponentType();
       arr = (Object[]) java.lang.reflect.Array.newInstance(componentType, len);
       alen = len; 
-    } 
-    for (int i = 0;  i < len;  i++) 
-    { 
-      arr[i] = elementAt(i); 
+    }
+    
+    java.util.Enumeration e = elements();
+    for (int i = 0;  e.hasMoreElements(); i++)
+    {
+      arr[i] = e.nextElement();
     } 
     if (len < alen) 
       arr[len] = null; 

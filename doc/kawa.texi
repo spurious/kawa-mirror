@@ -923,7 +923,7 @@ by @code{(input-port-read-state @var{port})}.
 The prompt has the form of a comment to make it easier to cut-and-paste.
 @end defun
 
-@defun port-column input-port
+@deffn Function port-column input-port
 @deffnx Function port-line input-port
 Return the current column number or line number of @var{input-port},
 using the current input port if none is specified.
@@ -934,7 +934,7 @@ display a file position, for example in an error message,
 we recommend you add 1 to get 1-origin integers.  This is
 because lines and column numbers traditionally start with
 1, and that is what non-programmers will find most natural.)
-@end defun
+@end deffn
 
 @defun set-port-line! port line
 Set (0-origin) line number of the current line of @var{port} to @var{num}.

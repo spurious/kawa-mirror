@@ -1,3 +1,7 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* ReplMode.java: Update Interpreter->Lanuguage various places.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* emacs.scm (global-map, esc-map): Define using define-variable.

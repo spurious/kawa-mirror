@@ -1,6 +1,6 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
-import gnu.expr.Interpreter;
+import gnu.expr.Language;
 import java.io.*;
 
 public class ReplMode extends ProcessMode
@@ -11,7 +11,7 @@ public class ReplMode extends ProcessMode
   OutPort err;
   Future thread;
 
-  public ReplMode (Buffer buffer, Interpreter interp, Environment environment)
+  public ReplMode (Buffer buffer, Language language, Environment environment)
     throws java.io.IOException
   {
     lineMode = true;
@@ -23,7 +23,7 @@ public class ReplMode extends ProcessMode
     PipedReader preader = new PipedReader();
     toInferior = new PipedWriter(preader);
     in = new TtyInPort(preader, "<stdin>", out);
-    thread = new Future (new kawa.repl(interp),
+    thread = new Future (new kawa.repl(language),
 			 environment, in, out, err);
     thread.setPriority(Thread.currentThread().getPriority() + 1);
     thread.start();
@@ -32,15 +32,15 @@ public class ReplMode extends ProcessMode
   public static void make (Buffer buffer, String language)
     throws java.io.IOException
   {
-    make(buffer, Interpreter.getInstance(language));
+    make(buffer, Language.getInstance(language));
   }
 
-  public static void make (Buffer buffer, Interpreter interpreter)
+  public static void make (Buffer buffer, Language language)
     throws java.io.IOException
   {
     
     buffer.modes = new ReplMode (buffer,
-				 interpreter, Environment.getCurrent());
+				 language, Environment.getCurrent());
   }
 
 

@@ -147,6 +147,11 @@ public class ReaderParens extends ReadTableEntry
 	      }
 	    else
 	      {
+		if (last == null)
+		  {
+		    line = startLine;
+		    column = startColumn-1;
+		  }
 		value = lexer.makePair(value, line, column);
 	      }
 	    if (last == null)

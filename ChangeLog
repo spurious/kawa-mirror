@@ -1,3 +1,11 @@
+2004-11-16  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/throw_name.java (throwName): New static field.
+	* kawa/standard/call_with_values.java (callWithvalues): Likewise.
+	* kawa/standard/Scheme.java (initScheme): Replace most define_field
+	calls by defprocStFld, and the rest by define_syntax, Also replace
+	many define_proc by defProcStFld.
+
 2004-11-15  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxTemplate.java: Change "opcode" of template_program

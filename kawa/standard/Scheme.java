@@ -102,7 +102,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("case", "kawa.lib.std_syntax");
       define_syntax ("and", "kawa.lib.std_syntax");
       define_syntax ("or", "kawa.lib.std_syntax");
-      define_field("%let", "kawa.standard.let", "let");
+      define_syntax ("%let", kawa.standard.let.let);
       define_syntax ("let", "kawa.lib.std_syntax");
       define_syntax ("%let-decl", "kawa.lib.std_syntax");
       define_syntax ("%let-init", "kawa.lib.std_syntax");
@@ -130,21 +130,21 @@ public class Scheme extends LispInterpreter
       environ = r4Environment;
 
       //-- Section 6.1  -- complete
-      define_field("not", "kawa.standard.Scheme");
-      define_proc ("boolean?", "kawa.lib.misc");
+      defProcStFld("not", "kawa.standard.Scheme");
+      defProcStFld("boolean?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
-      define_field("eq?", "kawa.standard.Scheme", "isEq");
-      define_field("eqv?", "kawa.standard.Scheme", "isEqv");
-      define_field("equal?", "kawa.standard.Scheme", "isEqual");
+      defProcStFld("eq?", "kawa.standard.Scheme", "isEq");
+      defProcStFld("eqv?", "kawa.standard.Scheme", "isEqv");
+      defProcStFld("equal?", "kawa.standard.Scheme", "isEqual");
 
       //-- Section 6.3  -- complete
-      define_proc("pair?", "kawa.lib.lists");
-      define_field("cons", "kawa.lib.lists");
-      define_field("car", "kawa.lib.lists");
-      define_field("cdr", "kawa.lib.lists");
-      define_proc ("set-car!", "kawa.lib.lists");
-      define_proc ("set-cdr!", "kawa.lib.lists");
+      defProcStFld("pair?", "kawa.lib.lists");
+      defProcStFld("cons", "kawa.lib.lists");
+      defProcStFld("car", "kawa.lib.lists");
+      defProcStFld("cdr", "kawa.lib.lists");
+      defProcStFld("set-car!", "kawa.lib.lists");
+      defProcStFld("set-cdr!", "kawa.lib.lists");
 
       define_proc ("caar", "kawa.standard.cxr");
       define_proc ("cadr", "kawa.standard.cxr");
@@ -174,86 +174,86 @@ public class Scheme extends LispInterpreter
       define_proc ("cddadr", "kawa.standard.cxr");
       define_proc ("cdddar", "kawa.standard.cxr");
       define_proc ("cddddr", "kawa.standard.cxr");
-      define_proc ("null?", "kawa.lib.lists");
-      define_field("list?", "kawa.lib.lists");
-      define_field("list", "gnu.kawa.functions.MakeList");
-      define_proc ("length", "kawa.lib.lists");
-      define_field("append", "kawa.standard.append", "append");
-      define_proc ("reverse", "kawa.lib.lists");
-      define_proc ("reverse!", "kawa.lib.lists");  // Not R5RS.
-      define_field("list-tail", "kawa.lib.lists");
-      define_field("list-ref", "kawa.lib.lists");
+      defProcStFld("null?", "kawa.lib.lists");
+      defProcStFld("list?", "kawa.lib.lists");
+      defProcStFld("list", "gnu.kawa.functions.MakeList");
+      defProcStFld("length", "kawa.lib.lists");
+      defProcStFld("append", "kawa.standard.append", "append");
+      defProcStFld("reverse", "kawa.lib.lists");
+      defProcStFld("reverse!", "kawa.lib.lists");  // Not R5RS.
+      defProcStFld("list-tail", "kawa.lib.lists");
+      defProcStFld("list-ref", "kawa.lib.lists");
 
-      define_field("memq", "kawa.lib.lists");
-      define_field("memv", "kawa.lib.lists");
-      define_field("member", "kawa.lib.lists");
-      define_field("assq", "kawa.lib.lists");
-      define_field("assv", "kawa.lib.lists");
-      define_field("assoc", "kawa.lib.lists");
+      defProcStFld("memq", "kawa.lib.lists");
+      defProcStFld("memv", "kawa.lib.lists");
+      defProcStFld("member", "kawa.lib.lists");
+      defProcStFld("assq", "kawa.lib.lists");
+      defProcStFld("assv", "kawa.lib.lists");
+      defProcStFld("assoc", "kawa.lib.lists");
 
       //-- Section 6.4  -- complete, including slashified read/write
       
-      define_proc ("symbol?", "kawa.lib.misc");
-      define_proc ("symbol->string", "kawa.lib.misc");
-      define_proc ("string->symbol", "kawa.lib.misc");
+      defProcStFld("symbol?", "kawa.lib.misc");
+      defProcStFld("symbol->string", "kawa.lib.misc");
+      defProcStFld("string->symbol", "kawa.lib.misc");
 
       //-- Section 6.5
-      define_proc ("number?", "kawa.lib.numbers");
-      define_proc ("quantity?", "kawa.lib.numbers");
-      define_proc ("complex?", "kawa.lib.numbers");
-      define_proc ("real?", "kawa.lib.numbers");
-      define_proc ("rational?", "kawa.lib.numbers");
+      defProcStFld("number?", "kawa.lib.numbers");
+      defProcStFld("quantity?", "kawa.lib.numbers");
+      defProcStFld("complex?", "kawa.lib.numbers");
+      defProcStFld("real?", "kawa.lib.numbers");
+      defProcStFld("rational?", "kawa.lib.numbers");
       define_proc ("integer?", "kawa.standard.integer_p");
-      define_field("exact?", "kawa.lib.numbers");
-      define_field("inexact?", "kawa.lib.numbers");
-      define_field("=", "gnu.kawa.functions.NumberCompare", "$Eq");
-      define_field("<", "gnu.kawa.functions.NumberCompare", "$Ls");
-      define_field(">", "gnu.kawa.functions.NumberCompare", "$Gr");
-      define_field("<=", "gnu.kawa.functions.NumberCompare", "$Ls$Eq");
-      define_field(">=", "gnu.kawa.functions.NumberCompare", "$Gr$Eq");
-      define_proc ("zero?", "kawa.lib.numbers");
-      define_proc ("positive?", "kawa.lib.numbers");
-      define_proc ("negative?", "kawa.lib.numbers");
-      define_proc ("odd?", "kawa.lib.numbers");
-      define_proc ("even?", "kawa.lib.numbers");
+      defProcStFld("exact?", "kawa.lib.numbers");
+      defProcStFld("inexact?", "kawa.lib.numbers");
+      defProcStFld("=", "gnu.kawa.functions.NumberCompare", "$Eq");
+      defProcStFld("<", "gnu.kawa.functions.NumberCompare", "$Ls");
+      defProcStFld(">", "gnu.kawa.functions.NumberCompare", "$Gr");
+      defProcStFld("<=", "gnu.kawa.functions.NumberCompare", "$Ls$Eq");
+      defProcStFld(">=", "gnu.kawa.functions.NumberCompare", "$Gr$Eq");
+      defProcStFld("zero?", "kawa.lib.numbers");
+      defProcStFld("positive?", "kawa.lib.numbers");
+      defProcStFld("negative?", "kawa.lib.numbers");
+      defProcStFld("odd?", "kawa.lib.numbers");
+      defProcStFld("even?", "kawa.lib.numbers");
       define_proc ("max", "kawa.standard.max");
       define_proc ("min", "kawa.standard.min");
-      define_field("+", "gnu.kawa.functions.AddOp", "$Pl");
-      define_field("-", "gnu.kawa.functions.AddOp", "$Mn");
-      define_field("*", "gnu.kawa.functions.MultiplyOp", "$St");
-      define_field("/", "gnu.kawa.functions.DivideOp", "$Sl");
-      define_proc ("abs", "kawa.lib.numbers");
-      define_proc ("quotient", "kawa.lib.numbers");
-      define_proc ("remainder", "kawa.lib.numbers");
-      define_proc ("modulo", "kawa.lib.numbers");
+      defProcStFld("+", "gnu.kawa.functions.AddOp", "$Pl");
+      defProcStFld("-", "gnu.kawa.functions.AddOp", "$Mn");
+      defProcStFld("*", "gnu.kawa.functions.MultiplyOp", "$St");
+      defProcStFld("/", "gnu.kawa.functions.DivideOp", "$Sl");
+      defProcStFld("abs", "kawa.lib.numbers");
+      defProcStFld("quotient", "kawa.lib.numbers");
+      defProcStFld("remainder", "kawa.lib.numbers");
+      defProcStFld("modulo", "kawa.lib.numbers");
       define_proc ("gcd", "kawa.standard.gcd");
       define_proc ("lcm", "kawa.standard.lcm");
-      define_proc ("numerator", "kawa.lib.numbers");
-      define_proc ("denominator", "kawa.lib.numbers");
-      define_proc ("floor", "kawa.lib.numbers");
-      define_proc ("ceiling", "kawa.lib.numbers");
-      define_proc ("truncate", "kawa.lib.numbers");
-      define_proc ("round", "kawa.lib.numbers");
-      define_proc ("rationalize", "kawa.lib.numbers");
-      define_proc ("exp", "kawa.lib.numbers");
-      define_proc ("log", "kawa.lib.numbers");
-      define_proc ("sin", "kawa.lib.numbers");
-      define_proc ("cos", "kawa.lib.numbers");
-      define_proc ("tan", "kawa.lib.numbers");
-      define_proc ("asin", "kawa.lib.numbers");
-      define_proc ("acos", "kawa.lib.numbers");
+      defProcStFld("numerator", "kawa.lib.numbers");
+      defProcStFld("denominator", "kawa.lib.numbers");
+      defProcStFld("floor", "kawa.lib.numbers");
+      defProcStFld("ceiling", "kawa.lib.numbers");
+      defProcStFld("truncate", "kawa.lib.numbers");
+      defProcStFld("round", "kawa.lib.numbers");
+      defProcStFld("rationalize", "kawa.lib.numbers");
+      defProcStFld("exp", "kawa.lib.numbers");
+      defProcStFld("log", "kawa.lib.numbers");
+      defProcStFld("sin", "kawa.lib.numbers");
+      defProcStFld("cos", "kawa.lib.numbers");
+      defProcStFld("tan", "kawa.lib.numbers");
+      defProcStFld("asin", "kawa.lib.numbers");
+      defProcStFld("acos", "kawa.lib.numbers");
       define_proc ("atan", "kawa.standard.atan");
-      define_proc ("sqrt", "kawa.lib.numbers");
-      define_field ("expt", "kawa.standard.expt");
-      define_proc ("make-rectangular", "kawa.lib.numbers");
-      define_proc ("make-polar", "kawa.lib.numbers");
-      define_proc ("real-part", "kawa.lib.numbers");
-      define_proc ("imag-part", "kawa.lib.numbers");
-      define_proc ("magnitude", "kawa.lib.numbers");
-      define_proc ("angle", "kawa.lib.numbers");
-      define_proc ("exact->inexact", "kawa.lib.numbers");
-      define_proc ("inexact->exact", "kawa.lib.numbers");
-      define_proc ("number->string", "kawa.lib.numbers");
+      defProcStFld("sqrt", "kawa.lib.numbers");
+      defProcStFld("expt", "kawa.standard.expt");
+      defProcStFld("make-rectangular", "kawa.lib.numbers");
+      defProcStFld("make-polar", "kawa.lib.numbers");
+      defProcStFld("real-part", "kawa.lib.numbers");
+      defProcStFld("imag-part", "kawa.lib.numbers");
+      defProcStFld("magnitude", "kawa.lib.numbers");
+      defProcStFld("angle", "kawa.lib.numbers");
+      defProcStFld("exact->inexact", "kawa.lib.numbers");
+      defProcStFld("inexact->exact", "kawa.lib.numbers");
+      defProcStFld("number->string", "kawa.lib.numbers");
       define_proc ("string->number", "kawa.standard.string2number");
 
       //-- Section 6.6  -- complete
@@ -307,25 +307,25 @@ public class Scheme extends LispInterpreter
       defProcStFld("string-fill!", "kawa.lib.strings");
 
       //-- Section 6.8  -- complete
-      define_proc ("vector?", "kawa.lib.vectors");
-      define_proc ("make-vector", "kawa.lib.vectors");
-      define_proc ("vector", "kawa.lib.vectors");
-      define_proc ("vector-length", "kawa.lib.vectors");
-      define_field("vector-ref", "kawa.lib.vectors");
-      define_proc ("vector-set!", "kawa.lib.vectors");
-      define_proc ("list->vector", "kawa.lib.vectors");
-      define_field("vector->list", "kawa.lib.vectors");
-      define_proc ("vector-fill!", "kawa.lib.vectors");
+      defProcStFld("vector?", "kawa.lib.vectors");
+      defProcStFld("make-vector", "kawa.lib.vectors");
+      defProcStFld("vector", "kawa.lib.vectors");
+      defProcStFld("vector-length", "kawa.lib.vectors");
+      defProcStFld("vector-ref", "kawa.lib.vectors");
+      defProcStFld("vector-set!", "kawa.lib.vectors");
+      defProcStFld("list->vector", "kawa.lib.vectors");
+      defProcStFld("vector->list", "kawa.lib.vectors");
+      defProcStFld("vector-fill!", "kawa.lib.vectors");
       // Extension:
-      define_field("vector-append", "kawa.standard.vector_append", "vectorAppend");
-      define_field("values-append", "gnu.kawa.functions.AppendValues",
+      defProcStFld("vector-append", "kawa.standard.vector_append", "vectorAppend");
+      defProcStFld("values-append", "gnu.kawa.functions.AppendValues",
 		   "appendValues");
 
       //-- Section 6.9  -- complete [except restricted call/cc]
-      define_proc ("procedure?", "kawa.lib.misc");
-      define_field("apply", "gnu.kawa.functions.Apply", "apply");
-      define_field("map", "kawa.standard.Scheme", "map");
-      define_field("for-each", "kawa.standard.Scheme", "forEach");
+      defProcStFld("procedure?", "kawa.lib.misc");
+      defProcStFld("apply", "gnu.kawa.functions.Apply", "apply");
+      defProcStFld("map", "kawa.standard.Scheme", "map");
+      defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("call/cc", "kawa.standard.callcc");
       define_proc ("force", "kawa.standard.force");
@@ -385,11 +385,12 @@ public class Scheme extends LispInterpreter
       r5Environment = new Environment (r4Environment);
       r5Environment.setName ("r5rs-environment");
       environ = r5Environment;
-      define_proc ("values", "kawa.lib.misc");
-      define_proc ("call-with-values", "kawa.standard.call_with_values");
-      define_field("let-values", "kawa.lib.syntax");
-      define_field("let*-values", "kawa.lib.syntax");
-      define_field("receive", "kawa.lib.syntax");
+      defProcStFld("values", "kawa.lib.misc");
+      defProcStFld("call-with-values", "kawa.standard.call_with_values",
+		   "callWithValues");
+      define_syntax("let-values", "kawa.lib.syntax");
+      define_syntax("let*-values", "kawa.lib.syntax");
+      define_syntax("receive", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
@@ -406,28 +407,28 @@ public class Scheme extends LispInterpreter
       define_syntax("define-autoload", new define_autoload(false));
       define_syntax("define-autoloads-from-file", new define_autoload(true));
 
-      define_proc ("exit", "kawa.lib.thread");
+      defProcStFld("exit", "kawa.lib.thread");
 
-      define_field("arithmetic-shift", "kawa.lib.numbers");
-      define_field("ash", "kawa.lib.numbers", "arithmetic$Mnshift");
+      defProcStFld("arithmetic-shift", "kawa.lib.numbers");
+      defProcStFld("ash", "kawa.lib.numbers", "arithmetic$Mnshift");
       define_proc ("logand", "kawa.standard.logand");
       define_proc ("logior", "kawa.standard.logior");
       define_proc ("logxor", "kawa.standard.logxor");
-      define_proc ("lognot", "kawa.lib.numbers");
-      define_proc ("logop", "kawa.lib.numbers");
-      define_proc ("logbit?", "kawa.lib.numbers");
-      define_proc ("logtest", "kawa.lib.numbers");
-      define_proc ("logcount", "kawa.lib.numbers");
-      define_proc ("bit-extract", "kawa.lib.numbers");
-      define_proc ("integer-length", "kawa.lib.numbers");
+      defProcStFld("lognot", "kawa.lib.numbers");
+      defProcStFld("logop", "kawa.lib.numbers");
+      defProcStFld("logbit?", "kawa.lib.numbers");
+      defProcStFld("logtest", "kawa.lib.numbers");
+      defProcStFld("logcount", "kawa.lib.numbers");
+      defProcStFld("bit-extract", "kawa.lib.numbers");
+      defProcStFld("integer-length", "kawa.lib.numbers");
 
       // These are from SLIB.
-      define_proc("string-upcase!", "kawa.lib.strings");
-      define_proc("string-downcase!", "kawa.lib.strings");
-      define_proc("string-capitalize!", "kawa.lib.strings");
-      define_proc("string-upcase", "kawa.lib.strings");
-      define_proc("string-downcase", "kawa.lib.strings");
-      define_proc("string-capitalize", "kawa.lib.strings");
+      defProcStFld("string-upcase!", "kawa.lib.strings");
+      defProcStFld("string-downcase!", "kawa.lib.strings");
+      defProcStFld("string-capitalize!", "kawa.lib.strings");
+      defProcStFld("string-upcase", "kawa.lib.strings");
+      defProcStFld("string-downcase", "kawa.lib.strings");
+      defProcStFld("string-capitalize", "kawa.lib.strings");
       define_syntax("primitive-virtual-method",
                     new kawa.standard.prim_method(182));
       define_syntax("primitive-static-method",
@@ -445,15 +446,15 @@ public class Scheme extends LispInterpreter
       define_syntax("primitive-array-get", "kawa.lib.reflection");
       define_syntax("primitive-array-set", "kawa.lib.reflection");
       define_syntax("primitive-array-length", "kawa.lib.reflection");
-      define_proc("subtype?", "kawa.lib.reflection");
-      define_field("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
+      defProcStFld("subtype?", "kawa.lib.reflection");
+      defProcStFld("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
       define_syntax("try-finally", "kawa.lib.syntax");
       define_syntax("try-catch", "kawa.lib.prim_syntax");
       define_proc("throw", "kawa.standard.throw_name");
-      define_proc("catch", "kawa.lib.syntax");
-      define_proc("error", "kawa.lib.misc");
+      defProcStFld("catch", "kawa.lib.syntax");
+      defProcStFld("error", "kawa.lib.misc");
       define_proc("as", gnu.kawa.functions.Convert.as);
-      define_field("instance?", "kawa.standard.Scheme", "instanceOf");
+      defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
       define_syntax("synchronized", "kawa.lib.syntax");
       object objectSyntax = new kawa.standard.object(lambda);
       define_syntax("object", objectSyntax);
@@ -462,39 +463,39 @@ public class Scheme extends LispInterpreter
       define_syntax("define-simple-class",
                     new kawa.standard.define_class(objectSyntax, true));
       define_syntax("this", "kawa.standard.thisRef");
-      define_field("make", "gnu.kawa.reflect.Invoke", "make");
-      define_field("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
-      define_field("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
-      define_field("field", "gnu.kawa.reflect.SlotGet");
-      define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
-      define_field("static-field", "gnu.kawa.reflect.SlotGet",
+      defProcStFld("make", "gnu.kawa.reflect.Invoke", "make");
+      defProcStFld("slot-ref", "gnu.kawa.reflect.SlotGet", "field");
+      defProcStFld("slot-set!", "gnu.kawa.reflect.SlotSet", "setField$Ex");
+      defProcStFld("field", "gnu.kawa.reflect.SlotGet");
+      defProcStFld("class-methods", "gnu.kawa.reflect.ClassMethods");
+      defProcStFld("static-field", "gnu.kawa.reflect.SlotGet",
 		   "staticField");
-      define_field("invoke", "gnu.kawa.reflect.Invoke", "invoke");
+      defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
 
-      define_field("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
-      define_field("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
+      defProcStFld("invoke-static", "gnu.kawa.reflect.Invoke", "invokeStatic");
+      defProcStFld("invoke-special", "gnu.kawa.reflect.Invoke", "invokeSpecial");
 
       define ("define-macro", "kawa.lib.syntax");
       define ("%define-macro",
 	      new kawa.standard.define_syntax("define-macro", false));
       define ("syntax-case", new kawa.standard.syntax_case ());
 
-      define_proc("file-exists?", "kawa.lib.files");
-      define_proc("file-directory?", "kawa.lib.files");
-      define_proc("file-readable?", "kawa.lib.files");
-      define_proc("file-writable?", "kawa.lib.files");
-      define_proc("delete-file", "kawa.lib.files");
-      define_proc("system-tmpdir", "kawa.lib.files");
-      define_proc("make-temporary-file", "kawa.lib.files");
-      define_proc("rename-file", "kawa.lib.files");
-      define_proc("copy-file", "kawa.lib.files");
-      define_proc("create-directory", "kawa.lib.files");
-      define_proc("->pathname", "kawa.lib.files");
+      defProcStFld("file-exists?", "kawa.lib.files");
+      defProcStFld("file-directory?", "kawa.lib.files");
+      defProcStFld("file-readable?", "kawa.lib.files");
+      defProcStFld("file-writable?", "kawa.lib.files");
+      defProcStFld("delete-file", "kawa.lib.files");
+      defProcStFld("system-tmpdir", "kawa.lib.files");
+      defProcStFld("make-temporary-file", "kawa.lib.files");
+      defProcStFld("rename-file", "kawa.lib.files");
+      defProcStFld("copy-file", "kawa.lib.files");
+      defProcStFld("create-directory", "kawa.lib.files");
+      defProcStFld("->pathname", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
       define("symbol-read-case", "P");
 
-      define_proc("system", "kawa.lib.system");
-      define_proc("make-process", "kawa.lib.system");
+      defProcStFld("system", "kawa.lib.system");
+      defProcStFld("make-process", "kawa.lib.system");
       define_proc("tokenize-string-to-string-array", "kawa.lib.system");
       define_proc("tokenize-string-using-shell", "kawa.lib.system");
       if ("/".equals(System.getProperty("file.separator")))
@@ -502,15 +503,15 @@ public class Scheme extends LispInterpreter
       else
 	define ("command-parse", lookup("tokenize-string-to-string-array"));
       
-      define_proc ("record-accessor", "kawa.lib.reflection");
-      define_proc ("record-modifier", "kawa.lib.reflection");
-      define_proc ("record-predicate", "kawa.lib.reflection");
-      define_proc ("record-constructor", "kawa.lib.reflection");
-      define_proc ("make-record-type", "kawa.lib.reflection");
-      define_proc ("record-type-descriptor", "kawa.lib.reflection");
-      define_proc ("record-type-name", "kawa.lib.reflection");
-      define_proc ("record-type-field-names", "kawa.lib.reflection");
-      define_proc ("record?", "kawa.lib.reflection");
+      defProcStFld("record-accessor", "kawa.lib.reflection");
+      defProcStFld("record-modifier", "kawa.lib.reflection");
+      defProcStFld("record-predicate", "kawa.lib.reflection");
+      defProcStFld("record-constructor", "kawa.lib.reflection");
+      defProcStFld("make-record-type", "kawa.lib.reflection");
+      defProcStFld("record-type-descriptor", "kawa.lib.reflection");
+      defProcStFld("record-type-name", "kawa.lib.reflection");
+      defProcStFld("record-type-field-names", "kawa.lib.reflection");
+      defProcStFld("record?", "kawa.lib.reflection");
       define_syntax("define-record-type", "gnu.kawa.slib.DefineRecordType");
 
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
@@ -518,16 +519,16 @@ public class Scheme extends LispInterpreter
       define_syntax ("fluid-let", "kawa.standard.fluid_let");
       define_syntax("constant-fold", "kawa.standard.constant_fold");
 
-      define_proc ("compile-file", "kawa.lib.system");
+      defProcStFld("compile-file", "kawa.lib.system");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
-      define_proc ("environment-bound?", "kawa.lib.misc");
-      define_proc ("scheme-implementation-version", "kawa.lib.misc");
-      define_proc ("scheme-window", "kawa.lib.windows");
+      defProcStFld("environment-bound?", "kawa.lib.misc");
+      defProcStFld("scheme-implementation-version", "kawa.lib.misc");
+      defProcStFld("scheme-window", "kawa.lib.windows");
       define_syntax ("define-procedure", "kawa.lib.syntax");
-      define_field("make-procedure",
+      defProcStFld("make-procedure",
                    "gnu.kawa.functions.MakeProcedure", "makeProcedure");
-      define_field("procedure-property", "kawa.lib.misc");
-      define_proc ("set-procedure-property!", "kawa.lib.misc");
+      defProcStFld("procedure-property", "kawa.lib.misc");
+      defProcStFld("set-procedure-property!", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
@@ -536,9 +537,9 @@ public class Scheme extends LispInterpreter
       define_syntax ("define-namespace", "gnu.kawa.xml.DefineNamespace");
       define_syntax ("define-base-unit", new kawa.standard.define_unit(true));
 
-      define_proc ("gentemp", "kawa.lib.syntax");
+      defProcStFld("gentemp", "kawa.lib.syntax");
       define_syntax ("defmacro", "kawa.lib.syntax");
-      define_field("setter", "gnu.kawa.functions.Setter", "setter");
+      defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");
@@ -547,19 +548,19 @@ public class Scheme extends LispInterpreter
       define_syntax ("trace", "kawa.lib.trace");
       define_syntax ("untrace", "kawa.lib.trace");
 
-      define_field("format", "gnu.kawa.functions.Format");
-      define_field("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
+      defProcStFld("format", "gnu.kawa.functions.Format");
+      defProcStFld("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
 
-      define_field("make-element", "gnu.xquery.util.MakeElement", "makeElement");
-      define_field("make-attribute", "gnu.xquery.util.MakeAttribute", "makeAttribute");
-      define_field("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
-      define_field("children", "gnu.xquery.util.Children", "children");
-      define_field("attributes", "gnu.kawa.xml.Attributes");
-      define_field("unescaped-data", "gnu.kawa.xml.MakeUnescapedData",
+      defProcStFld("make-element", "gnu.xquery.util.MakeElement", "makeElement");
+      defProcStFld("make-attribute", "gnu.xquery.util.MakeAttribute", "makeAttribute");
+      defProcStFld("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
+      defProcStFld("children", "gnu.xquery.util.Children", "children");
+      defProcStFld("attributes", "gnu.kawa.xml.Attributes");
+      defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData",
 		   "unescapedData");
-      define_proc ("keyword?", "kawa.lib.keywords");
-      define_proc ("keyword->string", "kawa.lib.keywords");
-      define_proc ("string->keyword", "kawa.lib.keywords");
+      defProcStFld("keyword?", "kawa.lib.keywords");
+      defProcStFld("keyword->string", "kawa.lib.keywords");
+      defProcStFld("string->keyword", "kawa.lib.keywords");
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
       define_syntax("define-variable", "kawa.standard.define_variable");
@@ -575,101 +576,101 @@ public class Scheme extends LispInterpreter
       define_syntax ("with-compile-options",
 		     "kawa.standard.with_compile_options");
 
-      define_field("array?", "kawa.lib.arrays");
-      define_field("array-rank", "kawa.lib.arrays");
-      define_field("make-array", "kawa.lib.arrays");
-      define_field("array", "kawa.lib.arrays");
-      define_field("array-start", "kawa.lib.arrays");
-      define_field("array-end", "kawa.lib.arrays");
-      define_field("shape", "kawa.lib.arrays");
-      define_field("array-ref", "gnu.kawa.functions.ArrayRef", "arrayRef");
-      define_field("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
-      define_field("share-array", "kawa.lib.arrays");
+      defProcStFld("array?", "kawa.lib.arrays");
+      defProcStFld("array-rank", "kawa.lib.arrays");
+      defProcStFld("make-array", "kawa.lib.arrays");
+      defProcStFld("array", "kawa.lib.arrays");
+      defProcStFld("array-start", "kawa.lib.arrays");
+      defProcStFld("array-end", "kawa.lib.arrays");
+      defProcStFld("shape", "kawa.lib.arrays");
+      defProcStFld("array-ref", "gnu.kawa.functions.ArrayRef", "arrayRef");
+      defProcStFld("array-set!", "gnu.kawa.functions.ArraySet", "arraySet");
+      defProcStFld("share-array", "kawa.lib.arrays");
 
-      define_proc ("s8vector?", "kawa.lib.uniform");
-      define_proc ("make-s8vector", "kawa.lib.uniform");
-      define_proc ("s8vector", "kawa.lib.uniform");
-      define_proc ("s8vector-length", "kawa.lib.uniform");
-      define_proc ("s8vector-ref", "kawa.lib.uniform");
-      define_proc ("s8vector-set!", "kawa.lib.uniform");
-      define_proc ("s8vector->list", "kawa.lib.uniform");
-      define_proc ("list->s8vector", "kawa.lib.uniform");
-      define_proc ("u8vector?", "kawa.lib.uniform");
-      define_proc ("make-u8vector", "kawa.lib.uniform");
-      define_proc ("u8vector", "kawa.lib.uniform");
-      define_proc ("u8vector-length", "kawa.lib.uniform");
-      define_proc ("u8vector-ref", "kawa.lib.uniform");
-      define_proc ("u8vector-set!", "kawa.lib.uniform");
-      define_proc ("u8vector->list", "kawa.lib.uniform");
-      define_proc ("list->u8vector", "kawa.lib.uniform");
+      defProcStFld("s8vector?", "kawa.lib.uniform");
+      defProcStFld("make-s8vector", "kawa.lib.uniform");
+      defProcStFld("s8vector", "kawa.lib.uniform");
+      defProcStFld("s8vector-length", "kawa.lib.uniform");
+      defProcStFld("s8vector-ref", "kawa.lib.uniform");
+      defProcStFld("s8vector-set!", "kawa.lib.uniform");
+      defProcStFld("s8vector->list", "kawa.lib.uniform");
+      defProcStFld("list->s8vector", "kawa.lib.uniform");
+      defProcStFld("u8vector?", "kawa.lib.uniform");
+      defProcStFld("make-u8vector", "kawa.lib.uniform");
+      defProcStFld("u8vector", "kawa.lib.uniform");
+      defProcStFld("u8vector-length", "kawa.lib.uniform");
+      defProcStFld("u8vector-ref", "kawa.lib.uniform");
+      defProcStFld("u8vector-set!", "kawa.lib.uniform");
+      defProcStFld("u8vector->list", "kawa.lib.uniform");
+      defProcStFld("list->u8vector", "kawa.lib.uniform");
 
-      define_proc ("s16vector?", "kawa.lib.uniform");
-      define_proc ("make-s16vector", "kawa.lib.uniform");
-      define_proc ("s16vector", "kawa.lib.uniform");
-      define_proc ("s16vector-length", "kawa.lib.uniform");
-      define_proc ("s16vector-ref", "kawa.lib.uniform");
-      define_proc ("s16vector-set!", "kawa.lib.uniform");
-      define_proc ("s16vector->list", "kawa.lib.uniform");
-      define_proc ("list->s16vector", "kawa.lib.uniform");
-      define_proc ("u16vector?", "kawa.lib.uniform");
-      define_proc ("make-u16vector", "kawa.lib.uniform");
-      define_proc ("u16vector", "kawa.lib.uniform");
-      define_proc ("u16vector-length", "kawa.lib.uniform");
-      define_proc ("u16vector-ref", "kawa.lib.uniform");
-      define_proc ("u16vector-set!", "kawa.lib.uniform");
-      define_proc ("u16vector->list", "kawa.lib.uniform");
-      define_proc ("list->u16vector", "kawa.lib.uniform");
+      defProcStFld("s16vector?", "kawa.lib.uniform");
+      defProcStFld("make-s16vector", "kawa.lib.uniform");
+      defProcStFld("s16vector", "kawa.lib.uniform");
+      defProcStFld("s16vector-length", "kawa.lib.uniform");
+      defProcStFld("s16vector-ref", "kawa.lib.uniform");
+      defProcStFld("s16vector-set!", "kawa.lib.uniform");
+      defProcStFld("s16vector->list", "kawa.lib.uniform");
+      defProcStFld("list->s16vector", "kawa.lib.uniform");
+      defProcStFld("u16vector?", "kawa.lib.uniform");
+      defProcStFld("make-u16vector", "kawa.lib.uniform");
+      defProcStFld("u16vector", "kawa.lib.uniform");
+      defProcStFld("u16vector-length", "kawa.lib.uniform");
+      defProcStFld("u16vector-ref", "kawa.lib.uniform");
+      defProcStFld("u16vector-set!", "kawa.lib.uniform");
+      defProcStFld("u16vector->list", "kawa.lib.uniform");
+      defProcStFld("list->u16vector", "kawa.lib.uniform");
 
-      define_proc ("s32vector?", "kawa.lib.uniform");
-      define_proc ("make-s32vector", "kawa.lib.uniform");
-      define_proc ("s32vector", "kawa.lib.uniform");
-      define_proc ("s32vector-length", "kawa.lib.uniform");
-      define_proc ("s32vector-ref", "kawa.lib.uniform");
-      define_proc ("s32vector-set!", "kawa.lib.uniform");
-      define_proc ("s32vector->list", "kawa.lib.uniform");
-      define_proc ("list->s32vector", "kawa.lib.uniform");
-      define_proc ("u32vector?", "kawa.lib.uniform");
-      define_proc ("make-u32vector", "kawa.lib.uniform");
-      define_proc ("u32vector", "kawa.lib.uniform");
-      define_proc ("u32vector-length", "kawa.lib.uniform");
-      define_proc ("u32vector-ref", "kawa.lib.uniform");
-      define_proc ("u32vector-set!", "kawa.lib.uniform");
-      define_proc ("u32vector->list", "kawa.lib.uniform");
-      define_proc ("list->u32vector", "kawa.lib.uniform");
+      defProcStFld("s32vector?", "kawa.lib.uniform");
+      defProcStFld("make-s32vector", "kawa.lib.uniform");
+      defProcStFld("s32vector", "kawa.lib.uniform");
+      defProcStFld("s32vector-length", "kawa.lib.uniform");
+      defProcStFld("s32vector-ref", "kawa.lib.uniform");
+      defProcStFld("s32vector-set!", "kawa.lib.uniform");
+      defProcStFld("s32vector->list", "kawa.lib.uniform");
+      defProcStFld("list->s32vector", "kawa.lib.uniform");
+      defProcStFld("u32vector?", "kawa.lib.uniform");
+      defProcStFld("make-u32vector", "kawa.lib.uniform");
+      defProcStFld("u32vector", "kawa.lib.uniform");
+      defProcStFld("u32vector-length", "kawa.lib.uniform");
+      defProcStFld("u32vector-ref", "kawa.lib.uniform");
+      defProcStFld("u32vector-set!", "kawa.lib.uniform");
+      defProcStFld("u32vector->list", "kawa.lib.uniform");
+      defProcStFld("list->u32vector", "kawa.lib.uniform");
 
-      define_proc ("s64vector?", "kawa.lib.uniform");
-      define_proc ("make-s64vector", "kawa.lib.uniform");
-      define_proc ("s64vector", "kawa.lib.uniform");
-      define_proc ("s64vector-length", "kawa.lib.uniform");
-      define_proc ("s64vector-ref", "kawa.lib.uniform");
-      define_proc ("s64vector-set!", "kawa.lib.uniform");
-      define_proc ("s64vector->list", "kawa.lib.uniform");
-      define_proc ("list->s64vector", "kawa.lib.uniform");
-      define_proc ("u64vector?", "kawa.lib.uniform");
-      define_proc ("make-u64vector", "kawa.lib.uniform");
-      define_proc ("u64vector", "kawa.lib.uniform");
-      define_proc ("u64vector-length", "kawa.lib.uniform");
-      define_proc ("u64vector-ref", "kawa.lib.uniform");
-      define_proc ("u64vector-set!", "kawa.lib.uniform");
-      define_proc ("u64vector->list", "kawa.lib.uniform");
-      define_proc ("list->u64vector", "kawa.lib.uniform");
+      defProcStFld("s64vector?", "kawa.lib.uniform");
+      defProcStFld("make-s64vector", "kawa.lib.uniform");
+      defProcStFld("s64vector", "kawa.lib.uniform");
+      defProcStFld("s64vector-length", "kawa.lib.uniform");
+      defProcStFld("s64vector-ref", "kawa.lib.uniform");
+      defProcStFld("s64vector-set!", "kawa.lib.uniform");
+      defProcStFld("s64vector->list", "kawa.lib.uniform");
+      defProcStFld("list->s64vector", "kawa.lib.uniform");
+      defProcStFld("u64vector?", "kawa.lib.uniform");
+      defProcStFld("make-u64vector", "kawa.lib.uniform");
+      defProcStFld("u64vector", "kawa.lib.uniform");
+      defProcStFld("u64vector-length", "kawa.lib.uniform");
+      defProcStFld("u64vector-ref", "kawa.lib.uniform");
+      defProcStFld("u64vector-set!", "kawa.lib.uniform");
+      defProcStFld("u64vector->list", "kawa.lib.uniform");
+      defProcStFld("list->u64vector", "kawa.lib.uniform");
 
-      define_proc ("f32vector?", "kawa.lib.uniform");
-      define_proc ("make-f32vector", "kawa.lib.uniform");
-      define_proc ("f32vector", "kawa.lib.uniform");
-      define_proc ("f32vector-length", "kawa.lib.uniform");
-      define_proc ("f32vector-ref", "kawa.lib.uniform");
-      define_proc ("f32vector-set!", "kawa.lib.uniform");
-      define_proc ("f32vector->list", "kawa.lib.uniform");
-      define_proc ("list->f32vector", "kawa.lib.uniform");
-      define_proc ("f64vector?", "kawa.lib.uniform");
-      define_proc ("make-f64vector", "kawa.lib.uniform");
-      define_proc ("f64vector", "kawa.lib.uniform");
-      define_proc ("f64vector-length", "kawa.lib.uniform");
-      define_proc ("f64vector-ref", "kawa.lib.uniform");
-      define_proc ("f64vector-set!", "kawa.lib.uniform");
-      define_proc ("f64vector->list", "kawa.lib.uniform");
-      define_proc ("list->f64vector", "kawa.lib.uniform");
+      defProcStFld("f32vector?", "kawa.lib.uniform");
+      defProcStFld("make-f32vector", "kawa.lib.uniform");
+      defProcStFld("f32vector", "kawa.lib.uniform");
+      defProcStFld("f32vector-length", "kawa.lib.uniform");
+      defProcStFld("f32vector-ref", "kawa.lib.uniform");
+      defProcStFld("f32vector-set!", "kawa.lib.uniform");
+      defProcStFld("f32vector->list", "kawa.lib.uniform");
+      defProcStFld("list->f32vector", "kawa.lib.uniform");
+      defProcStFld("f64vector?", "kawa.lib.uniform");
+      defProcStFld("make-f64vector", "kawa.lib.uniform");
+      defProcStFld("f64vector", "kawa.lib.uniform");
+      defProcStFld("f64vector-length", "kawa.lib.uniform");
+      defProcStFld("f64vector-ref", "kawa.lib.uniform");
+      defProcStFld("f64vector-set!", "kawa.lib.uniform");
+      defProcStFld("f64vector->list", "kawa.lib.uniform");
+      defProcStFld("list->f64vector", "kawa.lib.uniform");
 
       define_syntax("cut", "gnu.kawa.slib.cut");
       define_syntax("cute", "gnu.kawa.slib.cut");

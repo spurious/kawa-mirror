@@ -4,6 +4,8 @@ import gnu.mapping.*;
 
 public class throw_name extends ProcedureN
 {
+  public static final throw_name throwName = new throw_name();
+
   public Object applyN (Object[] args)
     throws Throwable
   {

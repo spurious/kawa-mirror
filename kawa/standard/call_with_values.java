@@ -3,6 +3,9 @@ import gnu.mapping.*;
 
 public class call_with_values extends Procedure2
 {
+  public static final call_with_values callWithValues = new call_with_values();
+  static { callWithValues.setName("call-with-values"); }
+
   public static Object callWithValues (Procedure producer, Procedure consumer)
      throws Throwable
   {

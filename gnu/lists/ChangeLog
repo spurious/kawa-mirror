@@ -1,3 +1,9 @@
+2003-07-26  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (POSITION_PAIR_FOLLOWS):  Make protected.
+
+	* TreeList.java (dump):  Also print identityHashCode.
+
 2003-07-23  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (stableCompare):  New method.

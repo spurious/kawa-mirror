@@ -121,7 +121,7 @@ implements Consumer, PositionConsumer, Consumable
 
   /** A position triple referenceing some other "nodes".
    * Followed by index of sequence (2 chars), and ipos (2 chars). */
-  static final char POSITION_PAIR_FOLLOWS = 0xF10F;
+  protected static final char POSITION_PAIR_FOLLOWS = 0xF10F;
 
   /** Encoding prefix that indicates a byte value. */
   static final int BYTE_PREFIX = 0xF000;
@@ -1926,7 +1926,8 @@ implements Consumer, PositionConsumer, Consumable
 		    ch = ch - OBJECT_REF_SHORT;
 		    Object obj = objects[ch];
 		    out.print("=Object#"+((int)ch)+'='
-			      +obj+':'+obj.getClass().getName());
+			      +obj+':'+obj.getClass().getName()
+			      +'@'+System.identityHashCode(obj));
 		  }
 		else if (ch >= BEGIN_GROUP_SHORT
 			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)

@@ -26,6 +26,31 @@ public class XQParser extends LispReader // should be extends Lexer
 
   int nesting;
 
+  /** Enter a nested expression.
+   * This is used in interactive mode to control whether to continue
+   * past end of line, depending on whether the expression is incomplete.
+   * @parm promptChar Used in prompt string to indicate type of nesting.
+   * @return The previous value of promptChar, to be passed to popNesting.
+   */
+  protected char pushNesting (char promptChar)
+  {
+    nesting++;
+    InPort port = (InPort) getPort();
+    char save = port.readState;
+    port.readState = promptChar;
+    return save;
+  }
+
+  /** Exit a nested expression, reversing pushNesting
+   * @param save Saved values return by prior pushNEsting
+   */
+  protected void popNesting (char save)
+  {
+    InPort port = (InPort) getPort();
+    port.readState = save;
+    nesting--;
+  }
+
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
    * and returns that.  If there are no more non-space characters,
@@ -311,6 +336,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	break;
       case '\'':  case '\"':
+	char saveReadState = pushNesting ((char) next);
 	for (;;)
 	  {
 	    next = read();
@@ -320,6 +346,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      break;
 	    tokenBufferAppend((char) next);
 	  }
+	popNesting(saveReadState);
 	ch = STRING_TOKEN;
 	break;
       default:
@@ -417,9 +444,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
 	else if (ch >= ' ' && ch < 127)
-	  error("invalid character '"+ch+'\'');
+	  syntaxError("invalid character '"+ch+'\'', 1);
 	else
-	  error("invalid character '\\u"+Integer.toHexString(ch)+'\'');
+	  syntaxError("invalid character '\\u"+Integer.toHexString(ch)+'\'',
+		      1);
       }
     curToken = ch;
     return ch;
@@ -803,7 +831,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	int tokPriority = priority(token);
 	if (tokPriority < prio || tokPriority > (OP_MOD >> 2))
 	  return exp;
+	char saveReadState = pushNesting('%');
 	getRawToken();
+	popNesting(saveReadState);
 	if (token == OP_INSTANCEOF)
 	  {
 	    Expression[] args = { exp, parseDataType() };
@@ -1176,7 +1206,7 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     Expression exp = parseMaybePrimaryExpr();
     if (exp == null)
-      return syntaxError("missing PrimaryExpr");
+      return syntaxError("missing expression");
     return exp;
   }
 
@@ -1295,13 +1325,12 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseEnclosedExpr()
       throws java.io.IOException, SyntaxException
   {
+    char saveReadState = pushNesting('{');
     peekNonSpace("unexpected end-of-file after '{'");
     int startLine = getLineNumber() + 1;
     int startColumn = getColumnNumber() + 1;
     getRawToken();
-    nesting++;
     Expression exp = parseExpr();
-    nesting--;
     //do { getRawToken(); } while (curToken == EOL_TOKEN);
     while (curToken == ',')
       {
@@ -1310,6 +1339,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     exp.setFile(getName());
     exp.setLine(startLine, startColumn);
+    popNesting(saveReadState);
     if (curToken != '}')
       return syntaxError("missing '}'");
     return exp;
@@ -1361,7 +1391,6 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseElementConstructor()
       throws java.io.IOException, SyntaxException
   {
-    nesting++;
     Vector vec = new Vector();
     Expression element = parseNameSpec(defaultElementNamespace, false);
     vec.addElement(element);
@@ -1438,22 +1467,21 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     args = new Expression[vec.size()];
     vec.copyInto(args);
-    nesting--;
     return new ApplyExp(makeFunctionExp("gnu.xquery.util.MakeElement", "makeElement"),
 			args);
   }
 
-  Expression parseExprSequence()
+  Expression parseExprSequence(int rightToken)
       throws java.io.IOException, SyntaxException
   {
-    if (curToken == ')' || curToken == EOF_TOKEN)
+    if (curToken == rightToken || curToken == EOF_TOKEN)
       return QuoteExp.voidExp;
     Expression exp = null;
     for (;;)
       {
 	Expression exp1 = parseExpr();
 	exp = exp == null ? exp1 : makeExprSequence(exp, exp1);
-	if (curToken == ')' || curToken == EOF_TOKEN)
+	if (curToken == rightToken || curToken == EOF_TOKEN)
 	  break;
 	if (nesting == 0 && curToken == EOL_TOKEN)
 	  return exp;
@@ -1467,6 +1495,7 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseTypeSwitch()
     throws java.io.IOException, SyntaxException
   {
+    char save = pushNesting('t');
     getRawToken();
     Expression selector = parseExpr();
     if (curToken != ')')
@@ -1492,8 +1521,10 @@ public class XQParser extends LispReader // should be extends Lexer
     String argName = varName == null ? "$arg$" : varName.toString();
     while (match("case"))
       {
+	pushNesting('c');
 	getRawToken();
 	Expression caseType = parseDataType();
+	popNesting('t');
 	LambdaExp lexp = new LambdaExp(1);
 	Declaration decl = lexp.addDeclaration(argName,  // FIXME cast
 					       (Type) ((QuoteExp) caseType).getValue());
@@ -1503,8 +1534,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	else
 	  error("missing 'return' after 'case'");
 	parser.push(lexp);
+	pushNesting('r');
 	Expression caseExpr = parseExpr();
 	lexp.body = caseExpr;
+	popNesting('t');
 	parser.pop(lexp);
 	vec.addElement(lexp);
       }
@@ -1527,6 +1560,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	error('w', "no 'default' clause in 'typeswitch'");
       }
     vec.addElement(lexp);
+    popNesting(save);
     Expression[] args = new Expression[vec.size()];
     vec.copyInto(args);
     return new ApplyExp(makeFunctionExp("gnu.kawa.reflect.TypeSwitch",
@@ -1549,9 +1583,9 @@ public class XQParser extends LispReader // should be extends Lexer
     if (token == '(')
       {
 	getRawToken();
-	nesting++;
-	exp = parseExprSequence();
-	nesting--;
+	char saveReadState = pushNesting('(');
+	exp = parseExprSequence(')');
+	popNesting(saveReadState);
 	if (curToken == EOF_TOKEN)
 	  eofError("missing ')' - unexpected end-of-file");
       }
@@ -1573,19 +1607,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	      getRawToken();
 	    return exp;
 	  }
-	InPort port = (InPort) getPort();
-	char saveReadState = port.readState;
-	try
-	  {
-	    port.readState = '<';
-	    exp = parseElementConstructor();
-	    exp.setFile(getName());
-	    exp.setLine(startLine, startColumn);
-	  }
-	finally
-	  {
-	    port.readState = saveReadState;
-	  }
+	char saveReadState = pushNesting('<');
+	exp = parseElementConstructor();
+	exp.setFile(getName());
+	exp.setLine(startLine, startColumn);
+	popNesting(saveReadState);
       }
     else if (token == STRING_TOKEN)
       {
@@ -1675,7 +1701,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      name = Symbol.make(defaultFunctionNamespace, str);
 	  }
 	startColumn -= tokenBufferLength;
-	nesting++;
+	char save = pushNesting('(');
 	getRawToken();
 	Vector vec = new Vector(10);
 	if (curToken != ')')
@@ -1699,10 +1725,14 @@ public class XQParser extends LispReader // should be extends Lexer
 	else
 	  exp = null;
 	if (exp == null)
-	  exp = new ApplyExp(new ReferenceExp(name, decl), args);
+	  {
+	    ReferenceExp rexp = new ReferenceExp(name, decl);
+	    rexp.setProcedureName(true);
+	    exp = new ApplyExp(rexp, args);
+	  }
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
-	nesting--;
+	popNesting(save);
       }
     else if (token == NCNAME_TOKEN || token == QNAME_TOKEN)
       {
@@ -1767,7 +1797,7 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     getRawToken();
-    nesting++;
+    char save = pushNesting('i');
     Expression cond = parseExpr();
     if (curToken != ')')
       return syntaxError("missing ')' after 'if (EXPR'");
@@ -1783,7 +1813,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("else"))
       return syntaxError("missing 'else'");
     getRawToken();
-    nesting--;
+    popNesting(save);
     Expression elsePart = parseExpr();
     return new IfExp(booleanValue(cond), thenPart, elsePart);
   }
@@ -1839,7 +1869,7 @@ public class XQParser extends LispReader // should be extends Lexer
     else
       {
 	Expression cond;
-	nesting++;
+	char save = pushNesting('w');
 	if (curToken == OP_WHERE)
 	  {
 	    getRawToken();
@@ -1851,7 +1881,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  cond = null;
-	nesting--;
+	popNesting(save);
 	boolean sawReturn = match("return");
 	if (! sawReturn && ! match("let") && ! match("for"))
 	  return syntaxError("missing 'return' clause");
@@ -1888,6 +1918,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseFLWRExpression (boolean isFor)
       throws java.io.IOException, SyntaxException
   {
+    char save = pushNesting(isFor ? 'f' : 'l');
     getRawToken();
     String name;
     if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN
@@ -1910,12 +1941,11 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	if (curToken != ':'
 	    || getRawToken() != OP_EQU)
-	  return syntaxError("missing ':=' in 'let' clause - "+curToken);
+	  return syntaxError("missing ':=' in 'let' clause");
       }
     getRawToken();
-    nesting++;
     Expression value = parseBinaryExpr(priority(OP_OR));
-    nesting--;
+    popNesting(save);
     return parseFLWRExpression(isFor, name, value);
   }
 
@@ -2047,7 +2077,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	int declColumn = getColumnNumber() + 1;
 	getRawToken();
 	peekNonSpace("unexpected end-of-file after 'define function'");
+	char save = pushNesting('d');
 	Expression exp = parseFunctionDefinition(declLine, declColumn);
+	popNesting(save);
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	return exp;
@@ -2120,7 +2152,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
       }
 
-    Expression exp = parseExprSequence();
+    Expression exp = parseExprSequence(EOF_TOKEN);
     if (curToken == EOL_TOKEN)
       unread('\n');
     exp.setFile(getName());
@@ -2194,20 +2226,48 @@ public class XQParser extends LispReader // should be extends Lexer
     super.error(message);
   }
 
-  /**
-   * Handle syntax errors (at rewrite time).
-   * @param message an error message to print out
-   * @return an ErrorExp
-   */
   public Expression syntaxError (String message)
     throws java.io.IOException, SyntaxException
   {
-    error(message);
+    return syntaxError(message, tokenWidth());
+  }
+
+  private int tokenWidth()
+  {
+    switch (curToken)
+      {
+      case EOF_TOKEN:
+	return 0;
+      case QNAME_TOKEN:
+      case NCNAME_TOKEN:
+      case INTEGER_TOKEN:
+      case FLOAT_TOKEN:
+	return tokenBufferLength;
+      default:
+	return 1;
+      }
+  }
+
+  /**
+   * Handle syntax errors (at rewrite time).
+   * @param message an error message to print out
+   * @param columnAdjust number of columns to subtract from current position.
+   * @return an ErrorExp
+   */
+  public Expression syntaxError (String message, int columnAdjust)
+    throws java.io.IOException, SyntaxException
+  {
+    int line = port.getLineNumber();
+    int column = port.getColumnNumber();
+    error('e', port.getName(), line + 1,
+	  column < 0 ? 0 : column + 1 - columnAdjust,
+	  message);
     if (interactive)
       {
 	curToken = 0;
 	curValue = null;
 	nesting = 0;
+	((InPort) getPort()).readState = '\n';
 	for (;;)
 	  {
 	    int ch = read();

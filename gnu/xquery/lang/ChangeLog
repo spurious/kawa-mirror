@@ -1,5 +1,28 @@
 2003-01-12  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (Prompter.apply1): Always emit readState character.
+	* XQParser.java (pushNesting, popNesting):  New methods.
+	(getRawRoken):  Push/pop nesting around string literal.
+	(parseBinaryExpr):  Push/pop nesting around binary operator.
+	(parseEnclosedExpr, parseTypeSwitch, parseMaybePrimaryExpr,
+	parseIfExpr, parseFLWRExpression, parse):  Call pushNesting/popNesting.
+	(parseElementConstructor):  Remove increment/decrement of nesting here.
+	(syntaxError):  Read port's readState.
+
+	* XQParser.java (syntaxError):  New overload takes paramter indicating
+	number of columns to subtract from current position.
+	(tokenWidth):  Return number of chars taken by curToken,
+	(syntaxError):  Call tokenWidth.
+
+	* XQParser.java (getRawRoken): Use syntaxError rather than error
+	on seeing unrecognized character.
+
+	* XQParser.java (parseMaybePrimaryExpr):  Do setProcedureName
+	on function name in call.
+
+	* XQParser,java (parseExprSequence):  Take new rightToken parameter
+	so we can emit error on un-matched ')'.
+
 	* XQParser.java (pushStandardNamespaces):  New method.
 	(<init>(InPort)):  Call <init>(InPort,SourceMessages).
 	(<init>(InPort,SourceMessage):  Call pushStandardNamespaces.

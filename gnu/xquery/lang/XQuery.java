@@ -267,9 +267,11 @@ class Prompter extends Procedure1
     InPort port = (InPort) arg;
     int line = port.getLineNumber() + 1;
     char state = port.readState;
+    if (state == '\n')
+      state = ' ';
     if (state == '<')
       return "<!--" + line + "-->";
     else
-      return "{--" + line + "--} ";
+      return "{--" + state + line + "--} ";
   }
 }

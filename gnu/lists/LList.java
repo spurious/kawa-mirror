@@ -231,7 +231,7 @@ public class LList extends ExtSequence
         last = pair;
       }
     return result;
-  } 
+  }
   /* END JAVA2 */
   /* BEGIN JAVA1 */
   // public static LList makeList (Sequence vals)
@@ -249,7 +249,7 @@ public class LList extends ExtSequence
         // last = pair;
       // }
     // return result;
-  // } 
+  // }
   /* END JAVA1 */
 
   public static LList makeList (Object[] vals, int offset, int length)

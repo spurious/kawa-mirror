@@ -212,11 +212,9 @@ public class Pair extends LList implements Externalizable
 	  return ((Comparable) x1).compareTo((Comparable) x2);
 	pair1 = (Pair) x1;
 	pair2 = (Pair) x2;
-      
       }
   }
 
-  
   public int compareTo(Object obj)
   {
     if (obj == Empty)

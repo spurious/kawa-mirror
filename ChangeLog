@@ -1,5 +1,8 @@
 2004-03-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_syntax.java (rewriteForm): Do setProcedureDecl
+	and setFuncDef, for the sake of 'defmacro' used in Common Lisp.
+
 	* kawa/standard/define_class.java (rewrite):  Move setSimple call ...
 	(scanForDefinitions):  ... to here.
 	

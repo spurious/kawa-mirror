@@ -13,6 +13,7 @@ java_JAVA=\
   CatchClause.java \
   ChainLambdas.java \
   CheckedTarget.java \
+  ClassExp.java \
   Compilable.java \
   Compilation.java \
   ConditionalTarget.java \

@@ -456,7 +456,7 @@ public class LambdaExp extends ScopeExp
 	code.emitPutField(closureEnvField);
       }
 
-    if (name != null)
+    if (name != null && ! (this instanceof ObjectExp))
       {
 	// Call setName(name) on the result.
 	if (setNameMethod == null)
@@ -1007,10 +1007,8 @@ public class LambdaExp extends ScopeExp
   /** A cache if this has already been evaluated. */
   Procedure thisValue;
 
-  public Object eval (Environment env)
+  public Class evalToClass ()
   {
-    if (thisValue != null)
-      return thisValue;
     try
       {
 	String class_name = getJavaName ();
@@ -1060,8 +1058,6 @@ public class LambdaExp extends ScopeExp
 
 	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
 	Class clas = loader.loadClass (class_name, true);
-	Object inst = clas.newInstance ();
-
 	/* Pass literal values to the compiled code. */
 	for (Literal literal = comp.literalsChain;  literal != null;
 	     literal = literal.next)
@@ -1082,11 +1078,7 @@ public class LambdaExp extends ScopeExp
 		throw new Error("internal error - "+ex);
 	      }
 	  }
-	Procedure proc = (Procedure) inst;
-	if (proc.name () == null)
-	  proc.setName (this.name);
-        thisValue = proc;
-	return inst;
+        return clas;
       }
     catch (java.io.IOException ex)
       {
@@ -1096,6 +1088,27 @@ public class LambdaExp extends ScopeExp
     catch (ClassNotFoundException ex)
       {
 	throw new RuntimeException("class not found in lambda eval");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new RuntimeException("class illegal access: in lambda eval");
+      }
+  }
+
+  public Object eval (Environment env)
+  {
+    if (thisValue != null)
+      return thisValue;
+    try
+      {
+        Class clas = evalToClass();
+	Object inst = clas.newInstance ();
+
+	Procedure proc = (Procedure) inst;
+	if (proc.name () == null)
+	  proc.setName (this.name);
+        thisValue = proc;
+	return inst;
       }
     catch (InstantiationException ex)
       {

@@ -704,7 +704,8 @@ public class Compilation
     // Is this worth keeping around any more?   FIXME
     if (lexp.min_args == lexp.max_args && ! lexp.isModuleBody ()
 	&& ! lexp.getImportsLexVars() && ! lexp.getNeedsStaticLink()
-	&& ! lexp.isHandlingTailCalls())
+	&& ! lexp.isHandlingTailCalls()
+        && ! (lexp instanceof ClassExp))
       {
 	Expression[] args = new Expression[lexp.max_args];
 

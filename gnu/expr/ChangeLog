@@ -1,3 +1,15 @@
+1999-10-25  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (popParams):  Take extra argument.
+	(compile):  Handle tail-recursion for varargs functions.
+
+	* ClassExp.java:  New class; extends ObjectExp.
+	* Makefile.am, Makefile.in (java_JAVA):  Added ClassExp.java.
+	* Compilation.java (addClass):  ClassExp cannot have "apply" method.
+	* LambdaExp.java (evalToClass):  New method.
+
+	* PrimProcedure.java (compile):  Handle takesVarArgs() methods.
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java:  New inherits from MethodProc.

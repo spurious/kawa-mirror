@@ -14,12 +14,9 @@ public class CompileFile extends Procedure2
     super ("compile-file");
   }
 
-  public final Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  public static final LambdaExp read (String name, Interpreter interpreter)
+       throws GenericError
   {
-    if (! (arg1 instanceof StringBuffer))
-      throw new WrongType (this.name, 1, "file name");
-    String name = arg1.toString ();
     FileInputStream fstream;
     try
       {
@@ -27,11 +24,10 @@ public class CompileFile extends Procedure2
       }
     catch (java.io.FileNotFoundException e)
       {
-	throw new GenericError ("load: file not found: " + name);
+	throw new GenericError ("compile-file: file not found: " + name);
       }
 
-    InPort port = new InPort (fstream);
-    Interpreter interpreter = Interpreter.current ();
+    InPort port = new InPort (fstream, name);
     Environment env = new Environment (interpreter);
 
     List body = List.Empty;
@@ -49,13 +45,19 @@ public class CompileFile extends Procedure2
 		break;
 	      }
 	  }
+	catch (ReadError e)
+	  {
+	    // The '\n' is because a ReadError includes a line number,
+	    // and it is better if that starts the line.
+	    throw new GenericError ("read error in compile-file:\n" + e.toString ());
+	  }
 	catch (SyntaxError e)
 	  {
-	    throw new GenericError ("syntax error in load: " + e.toString ());
+	    throw new GenericError ("syntax error in compile-file: " + e.toString ());
 	  }
 	catch (java.io.IOException e)
 	  {
-	    throw new GenericError ("I/O exception in load: " + e.toString ());
+	    throw new GenericError ("I/O exception in compile-file: " + e.toString ());
 	  }
 	Pair cur = new Pair (obj, List.Empty);
 	if (last == null)
@@ -66,8 +68,26 @@ public class CompileFile extends Procedure2
 
       }
 
-    LambdaExp lexp = new LambdaExp (List.Empty, body, interpreter);
-    Compilation comp = new Compilation (lexp, "lambda0", false);
+    try
+      {
+	LambdaExp lexp = new LambdaExp (List.Empty, body, interpreter);
+	lexp.setModuleBody (true);
+	return lexp;
+      }
+    catch (WrongArguments ex)
+      {
+	throw new IllegalArgumentException (ex.toString ());
+      }
+  }
+
+  public final Object apply2 (Object arg1, Object arg2)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    if (! (arg1 instanceof StringBuffer))
+      throw new WrongType (this.name (), 1, "file name");
+    Interpreter interpreter = Interpreter.current ();
+    LambdaExp lexp = read (arg1.toString (), interpreter);
+    Compilation comp = new Compilation (lexp, "Top", false);
 
     try
       {
@@ -82,9 +102,11 @@ public class CompileFile extends Procedure2
 	byte[][] classes = new byte[comp.numClasses][];
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
-	    classes[iClass] = comp.classes[iClass].emit_to_array ();
+	    ClassType clas = comp.classes[iClass];
+	    classes[iClass] = clas.emit_to_array ();
 
-	    zar.append ("lambda" + iClass + ".class", classes[iClass]);
+	    zar.append (clas.getClassName ().replace ('.', '/') + ".class",
+			classes[iClass]);
 	  }
 	zar.close ();
       }
@@ -94,5 +116,55 @@ public class CompileFile extends Procedure2
       }
 
     return Interpreter.voidObject;
+  }
+
+  /** Compile a Scheme source file to one or more .class file.
+   * @param inname name of the Scheme source file
+   * @param directory where to place the .class files
+   * @param topname name for the class of the .class for the top-level code.
+   *  If null, topname is derived from prefix and inname.
+   * @param prefix to prepend classnames for functions
+   */
+  public static void compile_to_files (String inname, String directory,
+				String prefix, String topname)
+       throws GenericError
+  {
+    if (topname == null)
+      {
+	File infile = new File (inname);
+	String short_name = infile.getName ();
+	if (short_name.endsWith (".scm"))
+	  short_name
+	    = short_name.substring (0, short_name.length () - 4);
+	topname = short_name;
+	if (prefix != null)
+	  topname = prefix + short_name;
+      }
+    Interpreter interpreter = Interpreter.current ();
+    int save_errors = interpreter.errors;
+    LambdaExp lexp = read (inname, interpreter);
+    if (interpreter.errors > save_errors)
+      return;
+    Compilation comp = new Compilation (lexp, topname, prefix);
+    if (directory == null || directory.length () == 0)
+      directory = "";
+    else if (directory.charAt (directory.length () - 1) != '/')
+      directory = directory + '/';
+
+    try
+      {
+        for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+          {
+            ClassType clas = comp.classes[iClass];
+	    String out_name
+	      = directory +
+	      clas.getClassName ().replace ('.', '/') + ".class";
+	    clas.emit_to_file (out_name);
+          }
+      }
+    catch (IOException ex)
+      {
+        throw new GenericError (ex.toString ());
+      }
   }
 }

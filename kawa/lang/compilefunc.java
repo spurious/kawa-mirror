@@ -40,7 +40,9 @@ public class compilefunc extends Procedure2
 	argsArray = null;
       }
 
-    ClassType superType = new ClassType ("kawa.lang.Procedure" + arg_letter);
+    ClassType superType
+      = new ClassType (lexp.isModuleBody () ? "kawa.lang.ModuleBody"
+		       : "kawa.lang.Procedure" + arg_letter);
     comp.curClass.set_super (superType);
 
     Type[] constructor_args = comp.apply0args;
@@ -77,6 +79,14 @@ public class compilefunc extends Procedure2
 	constructor_method.compile_putfield (lexp.staticLinkField);
       }
 
+    comp.method = constructor_method;
+    if (lexp.name != null)
+      {
+	constructor_method.compile_push_this ();
+	comp.compileConstant (lexp.name);
+	constructor_method.compile_putfield (comp.nameField);
+      }
+
     Method apply_method = comp.curClass.new_method ("apply"+arg_letter,
 					 arg_types,
 					 comp.scmObjectType,
@@ -86,7 +96,7 @@ public class compilefunc extends Procedure2
 
     // If imcomingMap[i] is non-null, it means that the user's i'th
     // formal parameter (numbering the left-most one as 0) is captured
-    // by an inferior lambda, so it needs to be saved in the heapFram.
+    // by an inferior lambda, so it needs to be saved in the heapFrame.
     // The incoming variable is incomingMap[i], which is in register (i+1)
     // (since the unnamed "this" parameter is in register 0).
     Declaration incomingMap[] = new Declaration[lexp.min_args];
@@ -233,7 +243,7 @@ public class compilefunc extends Procedure2
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (! (arg1 instanceof LambdaProcedure))
-      throw new WrongType (this.name, 1, "lambda procedure");
+      throw new WrongType (this.name().toString (), 1, "lambda procedure");
     LambdaProcedure proc = (LambdaProcedure) arg1;
     try
       {

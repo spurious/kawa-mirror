@@ -6,7 +6,6 @@ java_sources=\
   AddOp.java \
   AppendValues.java \
   Apply.java \
-  Assoc.java \
   ConstantFunction0.java \
   Convert.java \
   CountValues.java \
@@ -18,7 +17,6 @@ java_sources=\
   MakeProcedure.java \
   MultiplyOp.java \
   NumberCompare.java \
-  Member.java \
   Setter.java \
   ValuesMap.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 

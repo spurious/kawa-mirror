@@ -1,3 +1,9 @@
+2002-03-21  Per Bothner  <per@bothner.com>
+
+	* Assoc.java:  Remove class - subsumed by kawa.lib.lists.
+	* Member.java:  Remove class - subsumed by kawa.lib.lists.
+ 	* Makefile.am:  Update accordingly.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java (compile):  Can now safely always pushScope/popScope.

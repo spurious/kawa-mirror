@@ -153,6 +153,33 @@ public class Type {
     return this_name;
   }
 
+  public static boolean isValidJavaTypeName (String name)
+  {
+    boolean in_name = false;
+    int i;
+    int len = name.length();
+    while (len > 2 && name.charAt(len-1) == ']'
+	   && name.charAt(len-2) == '[')
+      len -= 2;
+    for (i = 0;  i < len; i++)
+      {
+	char ch = name.charAt(i);
+	if (ch == '.')
+	  {
+	    if (in_name)
+	      in_name = false;
+	    else
+	      return false;
+	  }
+	else if (in_name ? Character.isJavaIdentifierPart(ch)
+		 : Character.isJavaIdentifierStart(ch))
+	  in_name = true;
+	else
+	  return false;
+      }
+    return i == len;
+  }
+
   /** Compile code to coerce/convert from Objevt to this type. */
   public void compileCoerceFromObject (Method method)
   {

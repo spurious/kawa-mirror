@@ -1,16 +1,16 @@
 package gnu.kawa.functions;
-import gnu.expr.Interpreter;
+import gnu.expr.Language;
 
 /** Implement the standard Scheme procedure <tt>equal?</tt>
  * and the Lisp <tt>equal</tt>. */
 
 public class IsEqual extends gnu.mapping.Procedure2
 {
-  Interpreter interpreter;
+  Language language;
 
-  public IsEqual(Interpreter interpreter, String name)
+  public IsEqual(Language language, String name)
   {
-    this.interpreter = interpreter;
+    this.language = language;
     setName(name);
   }
 
@@ -21,7 +21,7 @@ public class IsEqual extends gnu.mapping.Procedure2
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    return interpreter.booleanObject(apply(arg1, arg2));
+    return language.booleanObject(apply(arg1, arg2));
   }
 
 }

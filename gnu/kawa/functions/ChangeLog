@@ -1,3 +1,10 @@
+2005-03-04  Per Bothner  <per@bothner.com>
+
+	* Convert.java: Update Interpreter->Language various places.
+	* IsEq.java: Likewise.
+	* IsEqual.java: Likewise.
+	* IsEqv.java: Likewise.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* LispFormat.java <Init>: Handle ~W (Write) and ~Y (pretty-printing,

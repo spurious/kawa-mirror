@@ -101,9 +101,9 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
 
   /** Modify LambdaExp so result is coerced to given type. */
   public static void setCoercedReturnValue (LambdaExp lexp, Expression type,
-					    Interpreter interp)
+					    Language language)
   {
-    gnu.bytecode.Type rtype = interp.getTypeFor(type);
+    gnu.bytecode.Type rtype = language.getTypeFor(type);
     if (rtype != null)
       {
 	Expression value = lexp.body;

@@ -8,12 +8,12 @@ import gnu.expr.*;
 
 public class IsEqv extends Procedure2 implements CanInline
 {
-  Interpreter interpreter;
+  Language language;
   IsEq isEq;
 
-  public IsEqv(Interpreter interpreter, String name, IsEq isEq)
+  public IsEqv(Language language, String name, IsEq isEq)
   {
-    this.interpreter = interpreter;
+    this.language = language;
     this.isEq = isEq;
     setName(name);
   }
@@ -29,7 +29,7 @@ public class IsEqv extends Procedure2 implements CanInline
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    return interpreter.booleanObject(apply(arg1, arg2));
+    return language.booleanObject(apply(arg1, arg2));
    }
 
   private static boolean nonNumeric(Expression exp)

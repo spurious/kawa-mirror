@@ -8,11 +8,11 @@ import gnu.expr.*;
 
 public class IsEq extends Procedure2 implements Inlineable
 {
-  Interpreter interpreter;
+  Language language;
 
-  public IsEq(Interpreter interpreter, String name)
+  public IsEq(Language language, String name)
   {
-    this.interpreter = interpreter;
+    this.language = language;
     setName(name);
   }
 
@@ -23,16 +23,16 @@ public class IsEq extends Procedure2 implements Inlineable
 
   public Object apply2(Object arg1, Object arg2) 
   {
-    return interpreter.booleanObject(arg1==arg2);
+    return language.booleanObject(arg1==arg2);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    compile(exp.getArgs(), comp, target, interpreter);
+    compile(exp.getArgs(), comp, target, language);
   }
 
   public static void compile (Expression[] args, Compilation comp,
-			      Target target, Interpreter interpreter)
+			      Target target, Language language)
   {
     CodeAttr code = comp.getCode();
     args[0].compile(comp, Target.pushObject);
@@ -52,8 +52,8 @@ public class IsEq extends Procedure2 implements Inlineable
 	code.emitIfEq();
 	if (target.getType() instanceof ClassType)
 	  {
-	    Object trueValue = interpreter.booleanObject(true);
-	    Object falseValue = interpreter.booleanObject(false);
+	    Object trueValue = language.booleanObject(true);
+	    Object falseValue = language.booleanObject(false);
 	    comp.compileConstant(trueValue, Target.pushObject);
 	    code.emitElse();
 	    comp.compileConstant(falseValue, Target.pushObject);
@@ -67,7 +67,7 @@ public class IsEq extends Procedure2 implements Inlineable
 	    code.emitPushInt(1);
 	    code.emitElse();
 	    code.emitPushInt(0);
-	    type = interpreter.getTypeFor(Boolean.TYPE);
+	    type = language.getTypeFor(Boolean.TYPE);
 	  }
 	code.emitFi();
 	target.compileFromStack(comp, type);
@@ -76,6 +76,6 @@ public class IsEq extends Procedure2 implements Inlineable
 
   public Type getReturnType (Expression[] args)
   {
-    return interpreter.getTypeFor(Boolean.TYPE);
+    return language.getTypeFor(Boolean.TYPE);
   }
 }

@@ -1,3 +1,8 @@
+2004-07-19  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (rationalize, sqrt, exact->inexact, inexact->exact):
+	New functions, transcribed from Java code in kawa.standard.
+
 2003-11-21  Per Bothner  <per@bothner.com>
 
 	* ports.scm (call-with-input-file):  New functiom.

@@ -71,6 +71,11 @@
 (define (round (x :: <real>)) :: <real>
   (invoke x 'toInt (static-field <number> 'ROUND)))
 
+(define (rationalize (x :: <real>) (y :: <real>)) :: <real>
+  (gnu.math.RatNum:rationalize
+   (as <real> (invoke x 'sub y))
+   (as <real> (invoke x 'add y))))
+
 (define (exp (x :: <complex>)) :: <complex>
   (invoke x 'exp))
 
@@ -93,6 +98,11 @@
 (define (acos (x :: <double>)) :: <double>
   (invoke-static <java.lang.Math> 'acos x))
 
+(define (sqrt (num :: <quantity>)) :: <quantity>
+  (gnu.math.Quantity:make
+   (invoke (invoke num 'number) 'sqrt)
+   (invoke (invoke num 'unit) 'sqrt)))
+
 (define (make-rectangular (x :: <real>) (y :: <real>)) :: <complex>
   (invoke-static <complex> 'make x y))
 
@@ -110,6 +120,16 @@
 
 (define (angle (x :: <complex>)) :: <real>
   (invoke (invoke x 'number) 'angle))
+
+(define (exact->inexact (num :: <number>)) :: <number>
+  (if (invoke num 'isExact)
+      (make <gnu.math.DFloNum> (invoke (as <real> num) 'doubleValue))
+      num))
+
+(define (inexact->exact (num :: <number>)) :: <number>
+  (if (instance? num <real>)
+      (invoke (as <real> num) 'toExact)
+      num))
 
 (define (arithmetic-shift (value :: <integer>) (amount :: <int>)) :: <integer>
   (invoke-static <integer> 'shift value amount))

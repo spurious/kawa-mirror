@@ -4,7 +4,7 @@
 package gnu.xml;
 import gnu.lists.*;
 
-/** Use to represent a Document of Document Fragment, in the XML DOM sense.
+/** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
  */
 
@@ -28,6 +28,18 @@ public class NodeTree extends TreeList
       ((TreeList) v).consume(this);
     else
       super.writeObject(v);
+  }
+
+  public int nextPos (int position)
+  {
+    boolean isAfter = (position & 1) != 0;
+    int index = posToDataIndex(position);
+    int next = nextNodeIndex(index, -1 >>> 1);
+    if (next != index)
+      return next << 1;
+    if (index == data.length)
+      return 0;
+    return (index << 1) + 3;
   }
 
   public static NodeTree make ()

@@ -62,7 +62,7 @@ public class Declaration extends Variable
 
   ScopeExp context;
 
-  /* SEMI-OBOSLETE (misleading):
+  /* SEMI-OBSOLETE (misleading):
    * A frame is a set of local variables.  In interpreted code, the frame
    * is mapped into a single Object array, indexed by Variable.offset.
    * In compiled code, the frame is mapped into the local variable slots

@@ -457,10 +457,10 @@ int
 main(int argc, char** argv)
 {
   char *path, *classpath;
+  int in_from_tty_fd;
 #if SUPPORT_TELNET
   char *hostname = "127.0.0.1";  /* localhost */
   int port = 5555;
-  int in_from_tty_fd;
   struct in_addr inaddr;
   struct hostent *host;
   int sock;

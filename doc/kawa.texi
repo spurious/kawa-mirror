@@ -984,6 +984,15 @@ This normally prints a stack trace, and brings you back to
 the top level, or exits kawa if you are not running interactively.
 @end defun
 
+@defun apply proc [arg1 ...] args
+@var{Args} must be a sequence (list, vector, or string) or a
+primitive Java array.
+(This is an extension over standard Scheme, which requires that
+@var{args} be a list.)
+Calls the @var{proc} (which must be a procedure), using as arguments
+the @var{arg1}... values plus all the elements of @var{args}.
+@end defun
+
 @defmac when condition form...
 If @var{condition} is true, evaluate each @var{form} in order,
 returning the value of the last one.

@@ -1,3 +1,11 @@
+2003-04-19  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (lexical):  Now in Compilation.
+	(<init>):  Update accordingly.
+	(push(ScopeExp), pop(ScopeExp), push(Declaration)):  Subsumed
+	by version in Compilation.
+	(pop(Declaration)):  Removed - never used.
+	
 2003-04-18  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/AutoloadSyntax.java (toString):  New method.

@@ -24,9 +24,6 @@ import java.util.Hashtable;
 
 public class Translator extends Compilation
 {
-  /** Current lexical scope - map name to Declaration. */
-  public final NameLookup lexical;
-
   // Global environment used to look for syntax/macros.
   private Environment env;
 
@@ -60,14 +57,12 @@ public class Translator extends Compilation
   {
     super(messages);
     this.env = env;
-    lexical = new NameLookup(getInterpreter());
   }
 
   public Translator (Environment env)
   {
     super(new SourceMessages());
     this.env = env;
-    lexical = new NameLookup(getInterpreter());
   }
 
   public Translator ()
@@ -759,40 +754,5 @@ public class Translator extends Compilation
     err.println();
     err.flush();
     */
-  }
-
- /**
-   * Insert decl into environ.
-   * (Used at rewrite time, not eval time.)
-   */
-  public void push (Declaration decl)
-  {
-    Object name = decl.getSymbol();
-    if (name == null)
-      return;
-    lexical.push(decl);
-  }
-
-  private void pop (Declaration decl)
-  {
-    String sym = decl.getName();
-    if (sym == null)
-      return;
-    lexical.pop(decl);
-  }
-
-  public void push (ScopeExp scope)
-  {
-    scope.outer = current_scope;
-    if (! (scope instanceof ModuleExp))
-      mustCompileHere();
-    current_scope = scope;
-    lexical.push(scope);
-  }
-
-  public void pop (ScopeExp scope)
-  {
-    lexical.pop(scope);
-    current_scope = scope.outer;
   }
 }

@@ -183,6 +183,8 @@ SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
 @item
 SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
 @item
+SRFI 26: Notation for Specializing Parameters without Currying - @pxref{Procedures}. 
+@item
 SRFI 28: Basic Format Strings - @pxref{Format}.
 @item
 SRFI 30: Nested Multi-line Comments.
@@ -1565,6 +1567,59 @@ identifier of the form @code{<TYPE>} (that is the first character
 is @samp{<} and the last is @samp{>}), then tha specifies the
 functions return type.  It is syntactic sugar for
 @code{(as <TYPE> (begin BODY))}.
+
+@deffn Syntax cut slot-or-expr slot-or-expr* [@code{<...>}]
+where each @var{slot-or-expr} is either an @var{expression} or
+the literal symbol @code{<>}.
+
+It is frequently necessary to specialize some of the parameters of a
+multi-parameter procedure. For example, from the binary operation @code{cons}
+one might want to obtain the unary operation
+@code{(lambda (x) (cons 1 x))}.
+This specialization of parameters is also known
+as @dfn{partial application}, @dfn{operator section}, or @dfn{projection}.
+The macro @code{cut} specializes some of the parameters of its first
+argument. The parameters that are to show up as formal variables of the
+result are indicated by the symbol @code{<>}, pronouced as "slot".
+In addition, the symbol @code{<...>}, pronounced as "rest-slot", matches all
+residual arguments of a variable argument procedure.
+
+A @code{cut}-expression is transformed into
+a @var{lambda expression} with as many formal variables as there are
+slots in the list @var{slot-or-expr}*.
+The body of the resulting @var{lambda expression} calls
+the first @var{slot-or-expr} with arguments from the @var{slot-or-expr}* list
+in the order they appear. In case there is a rest-slot symbol, the resulting
+procedure is also of variable arity, and the body calls the first
+@var{slot-or-expr} with remaining arguments provided to the actual call of the
+specialized procedure.
+
+Here are some examples:@*
+@code{(cut cons (+ a 1) <>)} is the same as @w{@code{(lambda (x2) (cons (+ a 1) x2))}}@*
+@code{(cut list 1 <> 3 <> 5)} is the same as @w{@code{(lambda (x2 x4) (list 1 x2 3 x4 5))}}@*
+@code{(cut list)} is the same as @w{@code{(lambda () (list))}}@*
+@code{(cut list 1 <> 3 <...>)} is the same as @w{@code{(lambda (x2 . xs) (apply list 1 x2 3 xs))}}
+
+The first argument can also be a slot, as one should expect in Scheme:@*
+@code{(cut <> a b)} is the same as @w{@code{(lambda (f) (f a b))}}
+@end deffn
+
+@deffn Syntax cute slot-or-expr slot-or-expr* [@code{<...>}]
+The macro @code{cute} (a mnemonic for "cut with evaluated non-slots") is
+similar to @code{cut}, but it evaluates the non-slot expressions at the
+time the procedure is specialized, not at the time the specialized
+procedure is called.
+
+For example:@*
+@code{(cute cons (+ a 1) <>)} is the same as
+@w{@code{(let ((a1 (+ a 1))) (lambda (x2) (cons a1 x2)))}}
+
+As you see from comparing this example with the first example above, the
+@code{cute}-variant will evaluate @code{(+ a 1)} once,
+while the @code{cut}-variant will
+evaluate it during every invocation of the resulting procedure.
+
+@end deffn
 
 @node Quantities, Logical Number Operations, Procedures, Extensions
 @section Quantities
@@ -5251,8 +5306,12 @@ which is Copyright (C) Lars T. Hansen (1999). All Rights Reserved.
 This manual has quoted from SRFI-25 (Multi-dimensional Array Primitives),
 which is Copyright (C) Jussi Piitulainen (2001). All Rights Reserved.
 
-The following notice applies to SRFI-6, SRFI-8, SRFI-9, SRFI-11, and
-SRFI-25, which are quoted in this manual, but it does not apply to the
+This manual has quoted from SRFI-26 (Notation for Specializing
+Parameters without Currying),
+which is Copyright (C) Sebastian Egner (2002). All Rights Reserved.
+
+The following notice applies to SRFI-6, SRFI-8, SRFI-9, SRFI-11, SRFI-25,
+and SRFI-26, which are quoted in this manual, but it does not apply to the
 manual as a whole:
 
 @quotation

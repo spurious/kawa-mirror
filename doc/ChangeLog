@@ -1,3 +1,7 @@
+2003-01-25  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Procedures):  Document cut and cute from SRFI-26.
+
 2002-11-25  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Procedures):  Document define-procedure.

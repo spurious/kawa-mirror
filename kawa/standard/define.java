@@ -147,10 +147,8 @@ public class define extends Syntax implements Printable
 			&& decl.getCanWrite())
 		       ? null : value);
       }
-    SetExp sexp = new SetExp (name, value);
+    SetExp sexp = new SetExp(decl, value);
     sexp.setDefining (true);
-    sexp.binding = decl;
-    sexp.binding = decl;
     if (makePrivate && ! (tr.currentScope() instanceof ModuleExp))
       tr.error('w', "define-private not at top level "
 	       +tr.currentScope());

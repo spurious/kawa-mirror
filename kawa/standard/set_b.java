@@ -66,7 +66,7 @@ public class set_b extends Syntax implements Printable
     SetExp sexp = new SetExp (ref.getSymbol(), value);
     if (decl != null)
       {
-	sexp.binding = decl;
+	sexp.setBinding(decl);
 	decl = Declaration.followAliases(decl);
 	if (decl != null)
 	  decl.noteValue (value);

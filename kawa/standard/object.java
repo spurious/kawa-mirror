@@ -424,9 +424,8 @@ public class object extends Syntax
 		      {
 			Declaration decl = (Declaration) d;
 			isStatic = decl.getFlag(Declaration.STATIC_SPECIFIED);
-			SetExp sexp = new SetExp (decl.getName(), initValue);
+			SetExp sexp = new SetExp(decl, initValue);
 			tr.setLineOf(sexp);
-			sexp.binding = decl;
 			decl.noteValue(null);
 			initValue = sexp;
 		      }

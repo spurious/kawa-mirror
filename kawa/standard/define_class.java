@@ -98,8 +98,7 @@ public class define_class extends Syntax
 	 : name);
     oexp.setName(cname);
     objectSyntax.rewriteClassDef((Object[]) form.cdr, tr);
-    SetExp sexp = new SetExp (symbol, oexp);
-    sexp.binding = decl;
+    SetExp sexp = new SetExp(decl, oexp);
     sexp.setDefining (true);
     return sexp;
   }

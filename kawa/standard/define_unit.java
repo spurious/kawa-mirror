@@ -106,9 +106,8 @@ public class define_unit extends Syntax
 							     args);
 	  }
       }
-    SetExp sexp = new SetExp (name, value);
+    SetExp sexp = new SetExp(decl, value);
     sexp.setDefining (true);
-    sexp.binding = decl;
     decl.noteValue(value);
     return sexp;
   }

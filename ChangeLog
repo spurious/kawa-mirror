@@ -1,3 +1,13 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define.java: Use different SetExp constructor,
+	to avoid setting the 'binding' field, which will become private.
+	* kawa/standard/define_class.java: Likewise.
+	* kawa/standard/define_unit.java:  Likewise.
+	* kawa/standard/object.java: Likewise.
+	* kawa/standard/define_variable.java: Use SetExp's setBinding method.
+	* kawa/standard/set_b.java: Likewise.
+
 2005-02-07  Per Bothner  <per@bothner.com>
 
 	* build.xml: Also compile srfi37.scm.  Compile DefineRecordType.scm

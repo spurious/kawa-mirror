@@ -73,7 +73,7 @@ public class define_variable extends Syntax implements Printable
     
     if (decl != null)
       {
-	sexp.binding = decl;
+	sexp.setBinding(decl);
 	if (decl.context instanceof ModuleExp
 	    && decl.getCanWrite())
 	  value = null;

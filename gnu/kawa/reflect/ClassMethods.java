@@ -14,10 +14,10 @@ public class ClassMethods extends ProcedureN
     return apply(this, args[0], args[1], null, null, 0, 0);
   }
 
-  public static Procedure apply(Procedure thisProc,
-                                Object arg0, Object arg1,
-                                Type rtype, Type[] atypes,
-                                int modifiers, int modmask)
+  public static MethodProc apply(Procedure thisProc,
+                                 Object arg0, Object arg1,
+                                 Type rtype, Type[] atypes,
+                                 int modifiers, int modmask)
   {
     ClassType dtype;
     String mname;
@@ -33,8 +33,9 @@ public class ClassMethods extends ProcedureN
       mname = arg1.toString();
     else
       throw new WrongType(thisProc, 1, null);
-    mname = Compilation.mangleName(mname);
-    return apply(dtype, mname, null, null, 0, 0);
+    if (! ("<init>".equals(mname)))
+      mname = Compilation.mangleName(mname);
+    return apply(dtype, mname, rtype, atypes, modifiers, modmask);
   }
 
   public static MethodProc apply(ClassType dtype, String mname,
@@ -147,6 +148,8 @@ public class ClassMethods extends ProcedureN
   {
     java.lang.reflect.Constructor[] methods = clas.getConstructors();
     int nmethods = selectMethods(methods, null, modifiers, modmask);
+    if (nmethods == methods.length)
+      return methods;
     java.lang.reflect.Constructor[] matching
     = new java.lang.reflect.Constructor[nmethods];
     System.arraycopy(methods, 0, matching, 0, nmethods);

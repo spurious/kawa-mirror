@@ -1,3 +1,11 @@
+1999-10-25  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (apply):  Return MethodProc, not Procedure.
+	* MakeInstance.java:  Make it implement Inlineable.
+	Handle "<init>" specially.
+	* Invoke.java:  New class; extends ProcedureN.
+	* Makefile.am, Makefile.in (java_JAVA):  Add Invoke.java.
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	New package.

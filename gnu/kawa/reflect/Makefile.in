@@ -77,7 +77,7 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_JAVA =    ClassMethods.java   InvokeStatic.java   MakeInstance.java   SlotGet.java   SlotSet.java
+java_JAVA =    ClassMethods.java   Invoke.java   InvokeStatic.java   MakeInstance.java   SlotGet.java   SlotSet.java
 
 
 KAWA = $(JAVA) kawa.repl
@@ -86,7 +86,7 @@ CONFIG_CLEAN_FILES =
 JAVACFLAGS = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
 JAVAROOT = $(top_builddir)
-DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
+DIST_COMMON =  $(java_JAVA) ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)

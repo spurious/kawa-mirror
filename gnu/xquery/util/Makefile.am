@@ -7,14 +7,11 @@ AUTOMAKE_OPTIONS = foreign
 java_sources = \
   Children.java \
   Compare.java \
-  ElementType.java \
   IntegerRange.java \
   IsEmptySequence.java \
   ItemAt.java \
   MakeAttribute.java \
   MakeElement.java \
-  NamedChildren.java \
-  NodeType.java \
   NumberValue.java \
   StringValue.java \
   SubList.java \

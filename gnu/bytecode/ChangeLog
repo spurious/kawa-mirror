@@ -1,3 +1,10 @@
+2004-12-30  Per Bothner  <per@bothner.com>
+
+	* ClassFileInput.java (readAttribute): Link in scopes read from
+	LocalVariableTable table into Scope tree structure.
+
+	* Variable.java (shouldEmit): Trivial performance fix
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* Type.java (setReflectClass): New method.

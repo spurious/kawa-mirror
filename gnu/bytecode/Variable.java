@@ -151,7 +151,7 @@ public class Variable extends Location implements java.util.Enumeration
     return (isSimple () && name != null && sc != null
 	    && (start = sc.start) != null
 	    && (pos = start.position) >= 0
-	    && (end = scope.end) != null
+	    && (end = sc.end) != null
 	    && end.position > pos);
   }
 

@@ -221,9 +221,16 @@ public class ClassFileInput extends DataInputStream
 	    Variable var = new Variable();
 	    int start_pc = readUnsignedShort();
 	    int end_pc = start_pc + readUnsignedShort();
+
 	    if (start_pc != prev_start || end_pc != prev_end)
 	      {
+		while (scope.parent != null
+		       && (start_pc < scope.start.position
+			   || end_pc > scope.end.position))
+		  scope = scope.parent;
+		Scope parent = scope;
 		scope = new Scope(new Label(start_pc), new Label(end_pc));
+		scope.linkChild(parent);
 		prev_start = start_pc;
 		prev_end = end_pc;
 	      }

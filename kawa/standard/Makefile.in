@@ -197,12 +197,12 @@ make_future.java sleep.java \
 try_catch.java try_finally.java \
 convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
-setter.java make.java makeProcLocation.java \
+setter.java make.java makeProcLocation.java location.java \
 Scheme.java \
 null_env.java \
 user_env.java \
 scheme_env.java
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_CLEAN_FILES = 
 JAVACFLAGS = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH

@@ -1,3 +1,15 @@
+1999-06-30  Per Bothner  <per@bothner.com>
+
+	* **/Makefile.in:  Re-generated.
+	* **/Makefile.nt, **/Makefile.unix:  Remove - not used in years.
+	* kawa/standard/ObjectFormat.java (format):  Optimize if no length
+ 	truncation is needed, especially if dst is CharArrayWriter.
+	* kawa/standard/LispFormat.java (LispRealFormat):  New class.
+	(LispFreshlineFormat):  New non-public ReportFormat class.
+	(LispTabulateFormat.padChar):  New field.
+	(LispTabulateFormat.format):  Re-write - now works.
+	(LispFormat.<init>):  Working support for ~F, ~E, ~G, ~$, ~T, ~&.
+
 1999-06-20  Per Bothner  <bothner@pacbell.net>
 
 	* configure.in:  Add new --with-swing option.

@@ -1,3 +1,10 @@
+The `format' function now  provides fairly complete functionality
+for CommonLisp-style formatting.  (See the Comon Lisp hyperspec at
+http://www.harlequin.com/education/books/HyperSpec/Body/sec_22-3.html.)
+The floating point formatters (~F, ~E, ~G, ~$) now pass the formatst.scm
+test (from Slib, but with some "fixes"; in the testsuite directory).  Also,
+output ports now track column numbers, so ~T and ~& also work correctly.
+
 A new package gnu.emacs provides various building blocks
 for building an Emacs-like text editor.  These classes
 are only compiled when Kawa is configured with the

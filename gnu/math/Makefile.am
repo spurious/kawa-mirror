@@ -4,38 +4,19 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-CLASSPATH = ../..:$(srcdir)/../..:$$CLASSPATH
-# Use an environment variable for CLASSPATH so we pick up standard classes:
-CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
-JAVAC = javac
-JCFLAGS = -g
-
-.java.class:
-	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
-
 javadir=$(datadir)/java/$(subdir)
 
-
-OBJ=\
-  Numeric.class \
-  Quantity.class DQuantity.class CQuantity.class \
-  Complex.class CComplex.class DComplex.class \
-  BaseUnit.class Unit.class MulUnit.class Dimensions.class \
-  RealNum.class DFloNum.class \
-  RatNum.class \
-  IntFraction.class \
-  MPN.class \
-  IntNum.class \
-  BitOps.class
-
-java_DATA=$(OBJ)
-
-# Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.java)
-
-CLEANFILES = *.class
-
-all: $(OBJ)
+java_JAVA=\
+  Numeric.java \
+  Quantity.java DQuantity.java CQuantity.java \
+  Complex.java CComplex.java DComplex.java \
+  BaseUnit.java Unit.java MulUnit.java Dimensions.java \
+  RealNum.java DFloNum.java \
+  RatNum.java \
+  IntFraction.java \
+  MPN.java \
+  IntNum.java \
+  BitOps.java
 
 HTML_HOME = $$HOME/public_html
 

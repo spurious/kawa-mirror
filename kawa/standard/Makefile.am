@@ -16,12 +16,8 @@ min.java \
 gcd.java \
 lcm.java \
 fluid_let.java \
-rationalize.java \
 atan.java \
-sqrt.java \
 expt.java \
-exact2inexact.java \
-inexact2exact.java \
 string2number.java \
 string_v.java \
 vector_append.java \

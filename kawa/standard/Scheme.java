@@ -238,7 +238,7 @@ public class Scheme extends LispInterpreter
       define_proc ("ceiling", "kawa.lib.numbers");
       define_proc ("truncate", "kawa.lib.numbers");
       define_proc ("round", "kawa.lib.numbers");
-      define_proc ("rationalize", "kawa.standard.rationalize");
+      define_proc ("rationalize", "kawa.lib.numbers");
       define_proc ("exp", "kawa.lib.numbers");
       define_proc ("log", "kawa.lib.numbers");
       define_proc ("sin", "kawa.lib.numbers");
@@ -247,7 +247,7 @@ public class Scheme extends LispInterpreter
       define_proc ("asin", "kawa.lib.numbers");
       define_proc ("acos", "kawa.lib.numbers");
       define_proc ("atan", "kawa.standard.atan");
-      define_proc ("sqrt", "kawa.standard.sqrt");
+      define_proc ("sqrt", "kawa.lib.numbers");
       define_field ("expt", "kawa.standard.expt");
       define_proc ("make-rectangular", "kawa.lib.numbers");
       define_proc ("make-polar", "kawa.lib.numbers");
@@ -255,8 +255,8 @@ public class Scheme extends LispInterpreter
       define_proc ("imag-part", "kawa.lib.numbers");
       define_proc ("magnitude", "kawa.lib.numbers");
       define_proc ("angle", "kawa.lib.numbers");
-      define_proc ("exact->inexact", "kawa.standard.exact2inexact");
-      define_proc ("inexact->exact", "kawa.standard.inexact2exact");
+      define_proc ("exact->inexact", "kawa.lib.numbers");
+      define_proc ("inexact->exact", "kawa.lib.numbers");
       define_proc ("number->string", "kawa.lib.numbers");
       define_proc ("string->number", "kawa.standard.string2number");
 

@@ -1,3 +1,13 @@
+2004-07-19  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme (initScheme):  The functions rationalize,
+	sqrt, exact->inexact and inexact->exact are now in kawa.lib.numbers.
+	* kawa/standard/exact2inexact.java:  Removed class.
+	* kawa/standard/inexact2exact.java:  Likewise.
+	* kawa/standard/rationalize.java:  Likewise.
+	* kawa/standard/sqrt.java:  Likewise.
+	* Makefile.am:  Update accordingly.
+
 2004-06-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/object.java (throwsKeyword):  New constant.

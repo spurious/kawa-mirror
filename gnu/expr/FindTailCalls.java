@@ -20,6 +20,7 @@ public class FindTailCalls extends ExpFullWalker
   {
     if (inTailContext)
       exp.setTailCall(true);
+    exp.context = currentLambda;
     boolean save = inTailContext;
     try
       {
@@ -30,6 +31,8 @@ public class FindTailCalls extends ExpFullWalker
 	    Declaration binding = func.binding;
 	    if (binding != null)
 	      {
+		exp.nextCall = binding.firstCall;
+		binding.firstCall = exp;
 		binding.setCanCall(true);
 	      }
 	  }

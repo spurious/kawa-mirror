@@ -13,6 +13,12 @@ public class ApplyExp extends Expression
   Expression[] args;
   boolean tailCall;
 
+  /** Containing LambdaExp. */
+  LambdaExp context;
+
+  /** The next ApplyExp in ((ReferenceExp)func).binding.firstCall list. */
+  public ApplyExp nextCall;
+
   public final Expression getFunction() { return func; }
   public final Expression[] getArgs() { return args; }
   public final boolean isTailCall() { return tailCall; }

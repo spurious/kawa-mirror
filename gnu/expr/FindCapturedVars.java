@@ -18,7 +18,7 @@ public class FindCapturedVars extends ExpFullWalker
 	LambdaExp heapLambda = curLambda;
 	for (;;)
 	  {
-	    heapLambda.setImportsLexVars(true);
+	    heapLambda.setImportsLexVars();
 	    LambdaExp outer = heapLambda.outerLambda();
 	    if (outer == declLambda)
 	      break;

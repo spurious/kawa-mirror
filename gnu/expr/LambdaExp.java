@@ -33,6 +33,9 @@ public class LambdaExp extends ScopeExp
   LambdaExp firstChild;
   LambdaExp nextSibling;
 
+  /** If non-null, a Declaration whose value is (only) this LambdaExp. */
+  Declaration nameDecl;
+
   static final int INLINE_ONLY = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -55,6 +58,25 @@ public class LambdaExp extends ScopeExp
   {
     if (importsLexVars) flags |= IMPORTS_LEX_VARS;
     else flags &= ~IMPORTS_LEX_VARS;
+  }
+
+  public final void setImportsLexVars()
+  {
+    int old = flags;
+    flags |= IMPORTS_LEX_VARS;
+
+    // If this needs an environment (close), the its callers do too.
+    if ((old & IMPORTS_LEX_VARS) == 0 && nameDecl != null)
+      {
+	LambdaExp outer = outerLambda();
+	for (ApplyExp app = nameDecl.firstCall;
+	     app != null;  app = app.nextCall)
+	  {
+	    LambdaExp caller = app.context;
+	    for (; caller != outer; caller = caller.outerLambda())
+	      caller.setImportsLexVars();
+	  }
+      }
   }
 
   public final boolean getCanRead()

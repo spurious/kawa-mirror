@@ -147,13 +147,25 @@ public class Declaration extends Variable
       && (! getCanCall() || (value != null && value instanceof LambdaExp));
   }
 
+  /** List of ApplyExp where this declaration is the function called.
+   * The applications are chained using their nextcall fields. */
+  public ApplyExp firstCall;
+
   public void noteValue (Expression value)
   {
     // We allow assigning a real value after undefined ...
     if (this.value == QuoteExp.undefined_exp)
-      this.value = value;
+      {
+	if (value instanceof LambdaExp)
+	  ((LambdaExp) value).nameDecl = this;
+	this.value = value;
+      }
     else
-      this.value = null;
+      {
+	if (this.value instanceof LambdaExp) 
+          ((LambdaExp) this.value).nameDecl = null; 
+	this.value = null;
+      }
   }
 
   public Declaration (String name)

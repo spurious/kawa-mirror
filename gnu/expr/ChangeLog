@@ -1,3 +1,13 @@
+Sun Sep 13 13:00:01 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (context, nextCall):  New fields.
+	* FindTailCalls.java (walkApplyExp):  Set context and nextCall.
+	* Declaration.java (nextCall):  New field.
+	(noteValue):  Update LambdaExp.nameDecl.
+	* FindCapturedVars.java:  Call new setImportsLexVars variant.
+	* LambdaExp.java (nameDecl):  New field. 
+	(setImportsLexVars):  New method - also chases down callers.
+
 Fri Sep 11 20:20:12 1998  Per Bothner  <bothner@cygnus.com>
 
 	More efficient procedure representation:  Inlining, directly

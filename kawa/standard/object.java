@@ -8,6 +8,14 @@ import java.util.Vector;
 public class object extends Syntax
 {
   Lambda lambda;
+  static final Keyword typeKeyword = Keyword.make("type");
+  static final Keyword allocationKeyword = Keyword.make("allocation");
+  static final Keyword instanceKeyword = Keyword.make("instance");
+  static final Keyword classKeyword = Keyword.make("class");
+  static final Keyword initformKeyword = Keyword.make("initform");
+  static final Keyword init_formKeyword = Keyword.make("init-form");
+  static final Keyword init_valueKeyword = Keyword.make("init-value");
+  static final Keyword init_keywordKeyword = Keyword.make("init-keyword");
 
   public object(Lambda lambda)
   {
@@ -52,6 +60,7 @@ public class object extends Syntax
     LambdaExp method_list = null;
     LambdaExp last_method = null;
     // First pass (get Declarations).
+    // Should be done at scan time.  FIXME.
     Vector inits = null;
     for (Object obj = components;  obj != LList.Empty;  )
       {
@@ -63,18 +72,78 @@ public class object extends Syntax
 	if (pair.car instanceof String)
 	  { // Field declaration.
 	    Object type = null;
-	    Declaration decl = oexp.addDeclaration((String) pair.car);
+	    String sname = (String) pair.car;
+	    Declaration decl = oexp.addDeclaration(sname);
 	    decl.setSimple(false);
-	    if (pair.cdr instanceof Pair)
+	    int nKeywords = 0;
+	    Object args = pair.cdr;
+	    Object init = null;
+	    while (args instanceof Pair)
 	      {
-		pair = (Pair) pair.cdr;
-		Object init = pair.car;
-		if (pair.cdr instanceof Pair)
+		pair = (Pair) args;
+		Object key = pair.car;
+		args = pair.cdr;
+		if ((key == "::" || key instanceof Keyword)
+		    && args instanceof Pair)
 		  {
-		    type = init;
-		    pair = (Pair) pair.cdr;
-		    init = pair.car;
+		    nKeywords++;
+		    pair = (Pair) args;
+		    Object value = pair.car;
+		    args = pair.cdr;
+		    if (key == "::" || key == typeKeyword)
+		      type = value;
+		    else if (key == allocationKeyword)
+		      {
+			if (value == classKeyword)
+			  decl.setFlag(Declaration.STATIC_SPECIFIED);
+			else if (value == instanceKeyword)
+			  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
+			else
+			  tr.error('e', "unknown allocation kind '"+value+"'");
+		      }
+		    else if (key == initformKeyword
+			     || key == init_formKeyword
+			     || key == init_valueKeyword)
+		      {
+			init = value;
+		      }
+		    else if (key == init_keywordKeyword)
+		      {
+			if (! (value instanceof Keyword))
+			  tr.error('e', "invalid 'init-keyword' - not a keyword");
+			else if (((Keyword) value).getName() != sname)
+			  tr.error('w', "init-keyword option ignored");
+		      }
+		    else
+		      {
+			tr.error('w', "unknown slot keyword '"+key+"'");
+		      }
 		  }
+		else if (args == LList.Empty && init == null)
+		  {
+		    // CLtL:2 explicitly prohibits this as an extension.
+		    init = key;
+		  }
+		else if (args instanceof Pair
+			 && nKeywords == 0 && init == null && type == null
+			 && (pair = (Pair) args).cdr == LList.Empty)
+		  {
+		    // Backward compatibility.
+		    type = key;
+		    init = pair.car;
+		    args = pair.cdr;
+		  }
+		else
+		  {
+		    args = null;  // Trigger error message
+		    break;
+		  }
+	      }
+	    if (args != LList.Empty)
+	      return tr.syntaxError("invalid argument list for slot '"
+				    + sname + '\''+" args:"+(args==null?"null":args.getClass().getName()));
+	    if (init != null)
+	      {
 		if (inits == null)
 		  inits = new Vector (20);
 		inits.addElement(decl);
@@ -119,16 +188,56 @@ public class object extends Syntax
 	if (pair.car instanceof String)
 	  { // Field declaration.
 	    Object type = null;
-	    if (pair.cdr instanceof Pair)
+	    int nKeywords = 0;
+	    Object args = pair.cdr;
+	    Object init = null;
+	    while (args instanceof Pair)
 	      {
-		pair = (Pair) pair.cdr;
-		Object init = pair.car;
-		if (pair.cdr instanceof Pair)
+		pair = (Pair) args;
+		Object key = pair.car;
+		args = pair.cdr;
+		if ((key == "::" || key instanceof Keyword)
+		    && args instanceof Pair)
 		  {
-		    type = init;
-		    pair = (Pair) pair.cdr;
-		    init = pair.car;
+		    nKeywords++;
+		    pair = (Pair) args;
+		    Object value = pair.car;
+		    args = pair.cdr;
+		    if (key == "::" || key == typeKeyword)
+		      type = value;
+		    else if (key == initformKeyword
+			     || key == init_formKeyword
+			     || key == init_valueKeyword)
+		      {
+			init = value;
+		      }
+		    else
+		      {
+			// handled in first pass.
+		      }
 		  }
+		else if (args == LList.Empty && init == null)
+		  {
+		    // CLtL:2 explicitly prohibits this as an extension.
+		    init = key;
+		  }
+		else if (args instanceof Pair
+			 && nKeywords == 0 && init == null && type == null
+			 && (pair = (Pair) args).cdr == LList.Empty)
+		  {
+		    // Backward compatibility.
+		    type = key;
+		    init = pair.car;
+		    args = pair.cdr;
+		  }
+		else
+		  {
+		    args = null;  // Trigger error message
+		    break;
+		  }
+	      }
+	    if (init != null)
+	      {
 		Declaration decl = (Declaration) inits.elementAt(init_index);
 		Expression initValue = tr.rewrite(init);
 		SetExp sexp = new SetExp (decl.getName(), initValue);

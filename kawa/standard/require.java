@@ -80,6 +80,7 @@ public class require extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
+    Interpreter interp = tr.getInterpreter();
     Object name = ((Pair) st.cdr).car;
     // Type type = Scheme.expType(tr.rewrite(name));
     Type type = null;
@@ -171,9 +172,10 @@ public class require extends Syntax
 		    Object fvalue = rfield.get(instance);
 		    String fdname
 		      = (fvalue instanceof Named ? ((Named) fvalue).getName()
-			 : fname.intern());
+			 : Compilation.demangleName(fname, true).intern());
                     Type ftype = fld.getType();
-		    Declaration fdecl = new Declaration(fdname, ftype);
+		    Type dtype = interp.getTypeFor(ftype.getReflectClass());
+		    Declaration fdecl = new Declaration(fdname, dtype);
                     if (ftype.isSubtype(Compilation.typeBinding))
                       fdecl.setIndirectBinding(true);
 		    if (! isStatic)

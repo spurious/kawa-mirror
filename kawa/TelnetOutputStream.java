@@ -16,7 +16,7 @@ public class TelnetOutputStream extends FilterOutputStream
 
   public void write (int value) throws IOException
   {
-    if (value == TelnetConnection.IAC)
+    if (value == Telnet.IAC)
       out.write(value);
     out.write(value);
   }
@@ -32,7 +32,7 @@ public class TelnetOutputStream extends FilterOutputStream
     int limit = off + len;
     for (i = off;  i < limit;  i++)
     {
-      if (b[i] == (byte) TelnetConnection.IAC)
+      if (b[i] == (byte) Telnet.IAC)
 	{
 	  // Write from b[off] upto and including b[i].
 	  out.write(b, off, i+1-off);
@@ -47,42 +47,42 @@ public class TelnetOutputStream extends FilterOutputStream
 
   public void writeCommand (int code) throws IOException
   {
-    out.write(TelnetConnection.IAC);
+    out.write(Telnet.IAC);
     out.write(code);
   }
 
   public final void writeCommand (int code, int option) throws IOException
   {
-    out.write(TelnetConnection.IAC);
+    out.write(Telnet.IAC);
     out.write(code);
     out.write(option);
   }
 
   public final void writeDo (int option) throws IOException
   {
-    writeCommand(TelnetConnection.DO, option);
+    writeCommand(Telnet.DO, option);
   }
 
   public final void writeDont (int option) throws IOException
   {
-    writeCommand(TelnetConnection.DONT, option);
+    writeCommand(Telnet.DONT, option);
   }
 
   public final void writeWill (int option) throws IOException
   {
-    writeCommand(TelnetConnection.WILL, option);
+    writeCommand(Telnet.WILL, option);
   }
 
   public final void writeWont (int option) throws IOException
   {
-    writeCommand(TelnetConnection.WONT, option);
+    writeCommand(Telnet.WONT, option);
   }
 
   public final void writeSubCommand (int option, byte[] command)
      throws IOException
   {
-    writeCommand(TelnetConnection.SB, option);
+    writeCommand(Telnet.SB, option);
     write(command);
-    writeCommand(TelnetConnection.SE);
+    writeCommand(Telnet.SE);
   }
 }

@@ -9,9 +9,9 @@ import java.io.*;
 
 public class TelnetInputStream extends FilterInputStream
 {
-  TelnetConnection connection;
+  Telnet connection;
 
-  public TelnetInputStream (InputStream in, TelnetConnection conn)
+  public TelnetInputStream (InputStream in, Telnet conn)
     throws IOException
   {
     super(in);
@@ -53,32 +53,32 @@ public class TelnetInputStream extends FilterInputStream
 	int ch = buf[pos++] & 0xff;
 	if (state == 0)
 	  {
-	    if (ch != TelnetConnection.IAC)
+	    if (ch != Telnet.IAC)
 	      return ch;
-	    state = TelnetConnection.IAC;
+	    state = Telnet.IAC;
 	    continue;
 	  }
-	else if (state == TelnetConnection.IAC)
+	else if (state == Telnet.IAC)
 	  {
-	    if (ch == TelnetConnection.IAC)
+	    if (ch == Telnet.IAC)
 	      {
 		state = 0;
-		return TelnetConnection.IAC;
+		return Telnet.IAC;
 	      }
-	    else if (ch == TelnetConnection.WILL
-		     || ch == TelnetConnection.WONT
-		     || ch == TelnetConnection.DO
-		     || ch == TelnetConnection.DONT
-		     || ch == TelnetConnection.SB)
+	    else if (ch == Telnet.WILL
+		     || ch == Telnet.WONT
+		     || ch == Telnet.DO
+		     || ch == Telnet.DONT
+		     || ch == Telnet.SB)
 	      {
 		state = ch;
 	      }
-	    else if (ch == TelnetConnection.IP)
+	    else if (ch == Telnet.IP)
 	      {
 		System.err.println("Interrupt Process");
 		state = 0;
 	      }
-	    else if (ch == TelnetConnection.EOF)
+	    else if (ch == Telnet.EOF)
 	      {
 		return -1;
 	      }
@@ -87,27 +87,27 @@ public class TelnetInputStream extends FilterInputStream
 		state = 0; // ???
 	      }
 	  }
-	else if (state == TelnetConnection.WILL || state == TelnetConnection.WONT
-		 || state == TelnetConnection.DO || state == TelnetConnection.DONT)
+	else if (state == Telnet.WILL || state == Telnet.WONT
+		 || state == Telnet.DO || state == Telnet.DONT)
 	  {
 	    connection.handle (state, ch);
 	    state = 0;
 	  }
-	else if (state == TelnetConnection.SB)
+	else if (state == Telnet.SB)
 	  {
-	    if (ch == TelnetConnection.IAC)
+	    if (ch == Telnet.IAC)
 	      state = SB_IAC;
 	    else
 	      buf[subCommandLength++] = (byte) ch;
 	  }
 	else if (state == SB_IAC)
 	  {
-	    if (ch == TelnetConnection.IAC)
+	    if (ch == Telnet.IAC)
 	      {
 		buf[subCommandLength++] = (byte) ch;
-		state = TelnetConnection.SB;
+		state = Telnet.SB;
 	      }
-	    else if (ch == TelnetConnection.SE)
+	    else if (ch == Telnet.SE)
 	      {
 		connection.subCommand(buf, 0, subCommandLength);
 		state = 0;
@@ -142,7 +142,7 @@ public class TelnetInputStream extends FilterInputStream
 	while (pos < count && done < length)
 	  {
 	    byte ch = buf[pos];
-	    if (ch == (byte) TelnetConnection.IAC)
+	    if (ch == (byte) Telnet.IAC)
 	      break;
 	    b[offset++] = ch;
 	    done++;

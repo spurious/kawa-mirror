@@ -239,7 +239,7 @@ public class repl extends Procedure0or1
 	    try
 	      {
 		java.net.Socket socket = new java.net.Socket("localhost",port);
-		TelnetConnection conn = new TelnetConnection(socket, true);
+		Telnet conn = new Telnet(socket, true);
 		java.io.InputStream sin = conn.getInputStream();
 		java.io.OutputStream sout = conn.getOutputStream();
 		java.io.PrintStream pout = new PrintStream (sout, true);
@@ -363,25 +363,22 @@ public class repl extends Procedure0or1
   static void serveTelnet (Interpreter interp, java.net.Socket client)
     throws java.io.IOException
   {
-    TelnetConnection conn = new TelnetConnection(client, true);
+    Telnet conn = new Telnet(client, true);
     java.io.OutputStream sout = conn.getOutputStream();
     java.io.InputStream sin = conn.getInputStream();
     OutPort out = new OutPort(sout);
     TtyInPort in = new TtyInPort(sin, "<stdin>", out);
     /*
-    conn.request(TelnetConnection.DO, TelnetConnection.EOF);
-    conn.request(TelnetConnection.DO, TelnetConnection.NAWS);
-    conn.request(TelnetConnection.DO, TelnetConnection.TTYPE);
-    conn.request(TelnetConnection.DO, TelnetConnection.LINEMODE);
+    conn.request(Telnet.DO, Telnet.EOF);
+    conn.request(Telnet.DO, Telnet.NAWS);
+    conn.request(Telnet.DO, Telnet.TTYPE);
+    conn.request(Telnet.DO, Telnet.LINEMODE);
     */
 
-    System.err.println("create new Future");
     Thread thread = new Future(new SocketRepl(interp, client),
 			       interp.getEnvironment(),
 			       in, out, out);
-    System.err.println("start new Future");
     thread.start();
-    System.err.println("Future started");
   }
 }
 

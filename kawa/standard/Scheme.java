@@ -425,6 +425,7 @@ public class Scheme extends Interpreter
       define_proc("rename-file", "kawa.lib.files");
       define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
+      define_proc("->pathname", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
       define("symbol-read-case", "P");
 
@@ -514,10 +515,8 @@ public class Scheme extends Interpreter
    * @param env the Environment to evaluate the string in
    * @return result of last expression, or Interpreter.voidObject if none. */
   public static Object eval (InPort port, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Translator tr = new Translator (env);
-    return Eval.eval (CompileFile.read (port, tr), tr, env);
+    return Eval.evalBody(CompileFile.readBody(port), env);
   }
 
   /** Evalutate Scheme expressions from an "S expression."
@@ -525,15 +524,14 @@ public class Scheme extends Interpreter
    * @param env the Environment to evaluate the string in
    * @return result of the expression. */
   public static Object eval (Object sexpr, Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
     return Eval.eval (sexpr, env);
   }
 
   public Object read (InPort in)
-    throws java.io.IOException, kawa.lang.ReadError
+    throws java.io.IOException, kawa.lang.SyntaxException
   {
-    return in.readSchemeObject();
+    return ScmRead.readObject(in);
   }
 
   public void print (Object value, OutPort out)

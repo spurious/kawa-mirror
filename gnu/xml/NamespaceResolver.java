@@ -120,6 +120,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void beginAttribute(String name, Object attrType)
   {
+    attrCount++;
     if (attrCount >= startIndexes.length)
       {
 	String[] tmp = new String[2 * nameStack.length];
@@ -137,7 +138,6 @@ public class NamespaceResolver extends FilterConsumer
       }
     name = name.intern();
     int colon = name.indexOf(':');
-    attrCount++;
     nameStack[3 * attrCount] = name;
     startIndexes[attrCount] = tlist.gapStart;
     if (colon > 0)

@@ -1,3 +1,8 @@
+2003-01-24  Per Bothner  <per@bothner.com>
+
+	* NamespaceResolver.java (beginAttribute):  Fix off-by-one error
+	reported 1/22 by Robert Yokota <ryokota@modeln.com>.
+
 2003-01-09  Per Bothner  <per@bothner.com>
 
 	* NamedChildrenFilter.java:  Update for gnu.lists changes.

@@ -275,7 +275,7 @@ public class ClassExp extends LambdaExp
       {
 	int count = vec.size();
 	if (count == 0 || ! vec.elementAt(count-1).equals(implMethod))
-	  vec.add(implMethod);
+	  vec.addElement(implMethod);
       }
     else
       {

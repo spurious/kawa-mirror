@@ -71,7 +71,7 @@ public class FindTailCalls extends ExpFullWalker
     boolean save = inTailContext;
     try
       {
-	int n = exp.exps.length - 1;
+	int n = exp.length - 1;
 	for (int i = 0;  i <= n;  i++)
 	  {
 	    inTailContext = (i == n) && save;

@@ -13,7 +13,11 @@ public class ExpFullWalker extends ExpWalker
 
   public Expression[] walkExps (Expression[] exps)
   {
-    int n = exps.length;
+    return walkExps(exps, exps.length);
+  }
+
+  public Expression[] walkExps (Expression[] exps, int n)
+  {
     for (int i = 0;  i < n && exitValue == null;  i++)
       exps[i] = (Expression) exps[i].walk(this);
     return exps;
@@ -31,7 +35,7 @@ public class ExpFullWalker extends ExpWalker
 
   public Object walkBeginExp (BeginExp exp)
   {
-    exp.exps = walkExps(exp.exps);
+    exp.exps = walkExps(exp.exps, exp.length);
     return exp;
   }
 

@@ -75,8 +75,9 @@ public class FindCapturedVars extends ExpFullWalker
 	// order-dependencies, and it is safe to transform it to a regular let.
 	Expression[] inits = exp.inits;
 	int len = inits.length;
-	Expression[] exps = ((BeginExp) exp.body).exps;
-	if (exps.length > len)
+        BeginExp bexp = (BeginExp) exp.body;
+	Expression[] exps = bexp.exps;
+	if (bexp.length > len)
 	  {
 	    int i = 0;
 	    Declaration decl = exp.firstDecl();

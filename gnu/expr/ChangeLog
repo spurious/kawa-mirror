@@ -1,3 +1,13 @@
+2000-08-17  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (length):  New field.
+	Allow variable number of sub-Expressions.
+	(canonicalize, add):  New methods.
+	* FindCapturedVars.java (walkLetExp):  Use BeginExp's new length field.
+	* FindTailCalls.java (walkBeginExp):  Use BeginExp's new length field.
+	* ExpFullWalker.java (walkExps):  New overload takes explicit length.
+	(walkBeginExp):  Pass BeginExp's new length field to walkExps.
+
 2000-08-06  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (writeObject):  Handle null argument.

@@ -8,6 +8,13 @@ bounds checking), and avoids a separate environment object.
 
 Preliminary support for inlining, concentrating on do loops.
 
+If the compiler sees a function call whose (non-lexically-bound) name
+matches an existing (globally-defined) procedure, and that procedure
+instance has a static method named either "apply" or the mangled
+procedure name, them the compiler emits a direct call to that method.
+This can make a very noticable speed difference, though it may
+violate strict Scheme sementics, and some code may break.
+
 Partial support for first-class "location" variables.
 
 Changes from Kawa 1.6.53 to 1.6.54

@@ -1,3 +1,12 @@
+Sat Aug 29 20:50:05 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/standard/{plus_oper,minus_oper,multiply_oper,greater_oper}.java:
+	Add static apply methods, to allow compiling direct calls.
+	* kawa/lang/*.java:  Do ClassType.make instead of new ClassType.
+	* kawa/lang/AutoloadProcedure.java (getLoaded, numArgs):  New methods.
+	* kawa/lang/PrimProcedure.java (<init>):  Set right opcode from method.
+	* kawa/lang/Translator.java (rewrite_pair): Directly call static apply.
+
 Sat Aug 29 09:12:55 1998  Per Bothner  <bothner@cygnus.com>
 
 	* **/Makefile.in, configure, aclocal.m4:  Re-generated.

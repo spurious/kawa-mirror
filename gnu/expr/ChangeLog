@@ -1,3 +1,17 @@
+2005-01-09  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (compilePushClass): Use new loadClassRef method.
+	* Compilation.java (loadClassRef): New helper method.
+	(getForNameHelper): Handle Java1, which doesn't have 3-operand forName.
+
+	* ModuleExp.java (make(ClassType)): New constructor.
+	(writeExternal): If a non-existing class, write ClassType, not String.
+	(readExternal): Handling reading either a ClassType or a String.
+	* LitTable.java (store): New private helper method.
+	(emit): Use store.
+	(emit): Special handling of not-existing ClassType literals.
+	This fixes Savannah bug #11491.
+
 2005-01-08  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load): If immediate and constant, load latter.

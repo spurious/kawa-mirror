@@ -39,6 +39,15 @@ public class ModuleExp extends LambdaExp
     return mexp;
   }
 
+  public static ModuleExp make (ClassType type)
+  {
+    ModuleExp mexp = new ModuleExp();
+    mexp.type = type;
+    mexp.setName(type.getName());
+    mexp.flags |= LAZY_DECLARATIONS;
+    return mexp;
+  }
+
   /** Used to control which .zip file dumps are generated. */
   public static String dumpZipPrefix;
 
@@ -352,7 +361,8 @@ public class ModuleExp extends LambdaExp
       {
 	if (getFlag(LAZY_DECLARATIONS))
 	  {
-	    type = ClassType.make(getName());
+	    if (type == null)
+	      type = ClassType.make(getName());
 	    kawa.standard.require.makeModule(this, type, null);
 	    flags &= ~LAZY_DECLARATIONS;
 	  }
@@ -363,19 +373,33 @@ public class ModuleExp extends LambdaExp
   public void writeExternal(ObjectOutput out) throws IOException
   {
     String name = null;
-    if (type != null && type != Compilation.typeProcedure)
-      name = type.getName();
-    if (name == null)
-      name = getName();
-    if (name == null)
-      name = getFile();
-    out.writeObject(name);
+    if (type != null && type != Compilation.typeProcedure
+	&& ! type.isExisting())
+      // The class is (presumably) one we're currently generating.
+      // At run-time it may be loaded by a non-system ClassLoader.
+      // Thus compiling the class literal needs to use loadClassRef.
+      out.writeObject(type);
+    else
+      {
+	if (name == null)
+	  name = getName();
+	if (name == null)
+	  name = getFile();
+	out.writeObject(name);
+      }
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    setName((String) in.readObject());
+    Object name = in.readObject();
+    if (name instanceof ClassType)
+      {
+	type = (ClassType) name;
+	setName(type.getName());
+      }
+    else
+      setName((String) name);
     flags |= LAZY_DECLARATIONS;
   }
 }

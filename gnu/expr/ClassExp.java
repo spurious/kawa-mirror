@@ -61,19 +61,16 @@ public class ClassExp extends LambdaExp
   public void compilePushClass (Compilation comp, Target target)
   {
     ClassType new_class = type;
-    String className = new_class.getName();
     // Type.make(Class.forname)
 
     gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPushString(className);
-    code.emitInvokeStatic(comp.getForNameHelper());
+    comp.loadClassRef(new_class.getName());
     ClassType typeType;
     int nargs;
     boolean needsLink = getNeedsClosureEnv();
     if (isMakingClassPair() || needsLink)
       {
-	code.emitPushString(instanceType.getName());
-	code.emitInvokeStatic(comp.getForNameHelper());
+	comp.loadClassRef(instanceType.getName());
 	typeType = ClassType.make("gnu.expr.PairClassType");
 	nargs = needsLink ? 3 : 2;
       }

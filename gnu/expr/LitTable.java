@@ -40,7 +40,7 @@ public class LitTable implements ObjectOutput
     // The second pass actually emits code.
     // The reason for using two passes is so we can detect cycles
     // and sharing using the first pass.  This generates better code:
-    // If an object is only used once, and as not a top-level literal,
+    // If an object is only used once, and is not a top-level literal,
     // they we don't need to allocate a Field for it.  And if an object
     // does not cyclically depend on itself, we can allocate *and*
     // initialize using a single call, which generates better code.
@@ -486,6 +486,17 @@ public class LitTable implements ObjectOutput
       }
   }
 
+  private void store (Literal literal, boolean ignore, CodeAttr code)
+  {
+    if (literal.field != null)
+      {
+	if (! ignore)
+	  code.emitDup(literal.type);
+	code.emitPutStatic(literal.field);
+      }
+    literal.flags |= Literal.EMITTED;
+  }
+
   void emit(Literal literal, boolean ignore)
   {
     CodeAttr code = comp.getCode();
@@ -510,13 +521,7 @@ public class LitTable implements ObjectOutput
 	Type elementType = ((ArrayType) literal.type).getComponentType();
 	code.emitPushInt(len);
 	code.emitNewArray(elementType);
-	if (literal.field != null)
-	  {
-	    if (! ignore)
-	      code.emitDup(literal.type);
-	    code.emitPutStatic(literal.field);
-	  }
-	literal.flags |= Literal.EMITTED;
+	store(literal, ignore, code);
 	for (int i = 0;  i < len;  i++)
 	  {
 	    Literal el = (Literal) literal.argValues[i];
@@ -531,13 +536,18 @@ public class LitTable implements ObjectOutput
     else if (literal.type instanceof ArrayType)
       {
 	code.emitPushPrimArray(literal.value, (ArrayType) literal.type);
-	if (literal.field != null)
-	  {
-	    if (! ignore)
-	      code.emitDup(literal.type);
-	    code.emitPutStatic(literal.field);
-	  }
-	literal.flags |= Literal.EMITTED;
+	store(literal, ignore, code);
+      }
+    else if (literal.value instanceof ClassType
+	     && ! ((ClassType) literal.value).isExisting())
+      {
+	// We need to special case ClassTypes that are (currently)
+	// non-existing, because the corresponding reflective Class
+	// needs to be loaded using the correct ClassLoader.
+	comp.loadClassRef(((ClassType) literal.value).getName());
+	code.emitInvokeStatic(Compilation.typeType.getDeclaredMethod("make", 1));
+	code.emitCheckcast(Compilation.typeClassType);
+	store(literal, ignore, code);
       }
     else
       {
@@ -590,13 +600,7 @@ public class LitTable implements ObjectOutput
 	    code.emitInvokeVirtual(resolveMethod);
 	    type.emitCoerceFromObject(code);
 	  }
-	if (literal.field != null)
-	  {
-	    if (! ignore || (useDefaultInit && method != null))
-	      code.emitDup(type);
-	    code.emitPutStatic(literal.field);
-	  }
-	literal.flags |= Literal.EMITTED;
+	store(literal, ignore && ! (useDefaultInit && method != null), code);
 	if (useDefaultInit && method != null)
 	  {
 	    if (! ignore)

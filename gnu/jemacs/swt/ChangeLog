@@ -1,0 +1,20 @@
+2004-08-04  Christian Surlykke <christian@surlykke.dk>
+
+	New preliminary GUI implementation, using SWT instead of Swing.
+	* BufferContent.java: New file, holds actual content of a Buffer.
+	   Extends SwtCharBuffer to implement 
+	   org.eclipse.swt.custom.StyledTextContent.
+	* BufferContentReader.java: New file, extends java.io.Reader.
+	* CommandDialog.java: New file, for entering command input.
+	   Extends org.eclipse.swt.widgets.Dialog.
+	* LineOffsets.java: New file. Maintains line offsets for a 
+	   SwtCharBuffer. 
+	* Makefile.am: New file. Copied from gnu/jemacs/swing and adapted.
+	* Makefile.in: New file. Copied from gnu/jemacs/swing and adapted.
+	* SwtBuffer.java: New file. Extends gnu.jemacs.buffer.Buffer.
+	* SwtCharBuffer.java: New file. Extends GapVector. Models 'text with
+	   line offsets' with the aid of the LineOffsets class.
+	* SwtFrame.java: New file. Extends EFrame.
+	* SwtMenu.java: New file. Extends EMenu.
+	* SwtToolkit.java: New file. Extends EToolkit.
+	* SwtWindow.java: New file. Extends EWindow.

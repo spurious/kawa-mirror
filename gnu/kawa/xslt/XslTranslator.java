@@ -20,9 +20,9 @@ public class XslTranslator extends Lexer implements Consumer
 {
   boolean inTemplate;
   Declaration consumerDecl;
-  Stack elements = new Stack();
   StringBuffer nesting = new StringBuffer(100);
   ModuleExp mexp;
+  Compilation comp;
 
   /** We seen a beginAttribute but the closing endAttribute. */
   boolean inAttribute;
@@ -52,10 +52,10 @@ public class XslTranslator extends Lexer implements Consumer
 
   public String popMatchingAttribute(String ns, String name, int start)
   {
-    int size = elements.size();
+    int size = comp.exprStack.size();
     for (int i = start; i < size;  i++)
       {
-	Object el = elements.elementAt(start);
+	Object el = comp.exprStack.elementAt(start);
 	if (! (el instanceof ApplyExp))
 	  return null;
 	ApplyExp aexp = (ApplyExp) el;
@@ -74,7 +74,7 @@ public class XslTranslator extends Lexer implements Consumer
 	SName stag = (SName) tag;
 	if (stag.getLocalPart() == name && stag.getNamespaceURI() == ns)
 	  {
-	    elements.removeElementAt(i);
+	    comp.exprStack.removeElementAt(i);
 	    return (String) ((QuoteExp) args[1]).getValue();
 	  }
       }
@@ -84,11 +84,11 @@ public class XslTranslator extends Lexer implements Consumer
   Expression popTemplateBody(int start)
   {
     // should strip off attributes?
-    int i = elements.size() - start;
+    int i = comp.exprStack.size() - start;
     Expression exp;
     Expression[] args = new Expression[i];
     while (--i >= 0)
-      args[i] = (Expression) elements.pop();
+      args[i] = (Expression) comp.exprStack.pop();
     return new ApplyExp(AppendValues.appendValues, args);
   }
 
@@ -129,7 +129,7 @@ public class XslTranslator extends Lexer implements Consumer
 	XName xn = (XName) type;
 	type = new SName(xn.getSymbol(), xn.getPrefix());
       }
-    nesting.append((char) elements.size());
+    nesting.append((char) comp.exprStack.size());
     push(type);
   }
 
@@ -140,7 +140,7 @@ public class XslTranslator extends Lexer implements Consumer
     attributeName = attrName;
     attributeType = attrType;
     attributeValue.setLength(0);
-    nesting.append((char) elements.size());
+    nesting.append((char) comp.exprStack.size());
     inAttribute = true;
   }
 
@@ -159,7 +159,7 @@ public class XslTranslator extends Lexer implements Consumer
     int nlen = nesting.length()-1;
     int start = nesting.charAt(nlen);
     nesting.setLength(nlen);
-    Expression startTag = (Expression) elements.elementAt(start);
+    Expression startTag = (Expression) comp.exprStack.elementAt(start);
     String xslTag = isXslTag(startTag);
     if (xslTag == "value-of")
       {
@@ -168,7 +168,7 @@ public class XslTranslator extends Lexer implements Consumer
 	  {
 	    Expression exp = interpreter.parseXPath(select, getMessages());
 	    exp = XQParser.stringValue(exp);
-	    elements.pop();
+	    comp.exprStack.pop();
 	    push(exp);
 	    return;
 	  }
@@ -179,7 +179,7 @@ public class XslTranslator extends Lexer implements Consumer
 	String mode = popMatchingAttribute("", "mode", start + 1);
 	Expression[] args
 	  = { new QuoteExp(select), resolveQNameExpression(mode) };
-	elements.pop();
+	comp.exprStack.pop();
 	push(new ApplyExp(new QuoteExp(applyTemplatesProc), args));
       }
     else if (xslTag == "if")
@@ -188,7 +188,7 @@ public class XslTranslator extends Lexer implements Consumer
 	Expression test = interpreter.parseXPath(select, getMessages());
 	test = XQParser.booleanValue(test);
 	Expression clause = popTemplateBody(start+1);
-	elements.pop();
+	comp.exprStack.pop();
 	push(new IfExp(test, clause, QuoteExp.voidExp));
       }
     else if (xslTag == "stylesheet" || xslTag == "transform")
@@ -206,7 +206,7 @@ public class XslTranslator extends Lexer implements Consumer
 	String priority = popMatchingAttribute("", "priority", start + 1);
 	String mode = popMatchingAttribute("", "mode", start + 1);
 	templateLambda.body = popTemplateBody(start+1);
-	elements.pop();
+	comp.exprStack.pop();
 	Expression[] args = new Expression[5];
 	double prio = 0.0; // FIXME
 	args[0] = resolveQNameExpression(name);
@@ -219,9 +219,9 @@ public class XslTranslator extends Lexer implements Consumer
       }
     else
       {
-	Expression[] args = new Expression[elements.size() - start];
+	Expression[] args = new Expression[comp.exprStack.size() - start];
 	for (int i = args.length;  --i >= 0; )
-	  args[i] = (Expression) elements.pop();
+	  args[i] = (Expression) comp.exprStack.pop();
 	// FIXME does not preserve namespace attributes.
 	Expression exp = new ApplyExp(MakeElement.makeElement, args);
 	push(exp);
@@ -239,7 +239,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   void push(Expression exp)
   {
-    elements.push(exp);
+    comp.exprStack.push(exp);
   }
 
   void push(Object value)
@@ -333,7 +333,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public Expression getExpression()
   {
-    return (Expression) elements.pop();
+    return (Expression) comp.exprStack.pop();
   }
 
   public void error (char kind, String message)
@@ -357,11 +357,19 @@ public class XslTranslator extends Lexer implements Consumer
       return new QuoteExp(Symbol.make(null, name)); // FIXME
   }
 
-  public void parse (ModuleExp mexp)
+  public void parse (Compilation comp)
   {
+    this.comp = comp;
+    if (comp.exprStack == null)
+      comp.exprStack = new Stack();
+    ModuleExp mexp = new ModuleExp();
+    mexp.setFile(getName());
+    comp.push(mexp);
+    comp.mustCompileHere();
     beginDocument(mexp);
     parser.parse();
     endDocument();
+    comp.pop(mexp);
   }
 
   static final ClassType typeXSLT

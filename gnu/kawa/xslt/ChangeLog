@@ -1,3 +1,11 @@
+2005-01-27  Per Bothner  <per@bothner.com>
+
+	* XSLT.java (<init>): Move some functionality to XslTranslator.parse.
+	(parseXPath): Rename lexer variable to parser, since it is one.
+	* XlsTranslator.kava (comp): New field.
+	(elements): Remove field - use comp.exprStack instead.
+	(parse): Take Compilation rather than ModuleExp.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* XslTranslator.java: Update for removing of ElementConstructor and

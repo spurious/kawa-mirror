@@ -39,13 +39,13 @@ public class XSLT extends XQuery
     try
       {
 	Compilation tr = new Compilation(this, messages);
-	XQParser lexer
+	XQParser parser
 	  = (XQParser) super.getLexer(new CharArrayInPort(string), messages);
-	//lexer.nesting = 1;
+	//parser.nesting = 1;
 	java.util.Vector exps = new java.util.Vector(20);
 	for (;;)
 	  {
-	    Expression sexp = lexer.parse(tr);
+	    Expression sexp = parser.parse(tr);
 	    if (sexp == null)
 	      break;
 	    exps.addElement(sexp);
@@ -74,15 +74,10 @@ public class XSLT extends XQuery
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, lexer.getMessages());
-    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
-    ModuleExp mexp = new ModuleExp();
-    mexp.setFile(lexer.getName());
-    tr.push(mexp);
-    tr.mustCompileHere();
-    ((XslTranslator) lexer).parse(mexp);
-    tr.pop(mexp);
-    return tr;
+    Compilation comp = new Compilation(this, lexer.getMessages());
+    comp.immediate = (options & PARSE_IMMEDIATE) != 0;
+    ((XslTranslator) lexer).parse(comp);
+    return comp;
   }
 
   /** The compiler insert calls to this method for applications and applets. */

@@ -1,3 +1,9 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* BRL.java (parseFile):  Now throws IOException and SyntaxException.
+
+	* BRL.java (<init>):  HTTP module moved to slib package.
+
 2002-02-14  Per Bothner  <per@bothner.com>
 
 	* BRL.java (<init>):  Update path to progfun in loadClass argument.

@@ -20,7 +20,7 @@ public class BRL extends Scheme
       {
 	loadClass("gnu.brl.stringfun");
 	loadClass("gnu.kawa.brl.progfun");
-	loadClass("gnu.kawa.servlet.HTTP");
+	loadClass("gnu.kawa.slib.HTTP");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
@@ -69,6 +69,7 @@ public class BRL extends Scheme
   }
 
   public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
     kawa.lang.Translator tr
@@ -77,37 +78,23 @@ public class BRL extends Scheme
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
-    try
+    BRLRead lexer = new BRLRead(port, messages);
+    lexer.setBrlCompatible(isBrlCompatible());
+    boolean inString = true;
+    Object sexp = lexer.brlReader.read(lexer, ']', 0);
+    for (;;)
       {
-	BRLRead lexer = new BRLRead(port, messages);
-	lexer.setBrlCompatible(isBrlCompatible());
-	boolean inString = true;
-	Object sexp = lexer.brlReader.read(lexer, ']', 0);
-        for (;;)
+	if (sexp == Sequence.eofValue)
+	  break;
+	if (sexp.toString().length() > 0)
 	  {
-	    if (sexp == Sequence.eofValue)
+	    if (! tr.scan_form (sexp, forms, mexp))
 	      break;
-	    if (sexp.toString().length() > 0)
-	      {
-		if (! tr.scan_form (sexp, forms, mexp))
-		  break;
-	      }
-	    sexp = lexer.readObject(); // FIXME
-          }
-	if (port.readState != ']')
-	  lexer.fatal("An unmatched '[' was read.");
+	  }
+	sexp = lexer.readObject(); // FIXME
       }
-    catch (gnu.text.SyntaxException ex)
-      {
-        // Got a fatal error.
-        if (ex.getMessages() != messages)
-          throw new RuntimeException ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-      }
-    catch (java.io.IOException e)
-      {
-	throw new RuntimeException ("I/O exception reading file: " + e.toString ());
-      }
+    if (port.readState != ']')
+      lexer.fatal("An unmatched '[' was read.");
     tr.finishModule(mexp, forms);
     return mexp;
   }

@@ -212,8 +212,9 @@ let.class \
 letrec.class \
 begin.class \
 ifp.class \
-values.class \
+values_v.class \
 call_with_values.class \
+int_length.class \
 Scheme.class \
 null_env.class \
 user_env.class \

@@ -19,7 +19,7 @@ public class let extends Syntax implements Printable
     Pair pair = (Pair) obj;
     Object bindings = pair.car;
     Object body = pair.cdr;
-    int decl_count = kawa.standard.length.length (bindings);
+    int decl_count = List.length (bindings);
     Expression[] inits = new Expression[decl_count];
     LetExp let = new LetExp (inits);
     for (int i = 0; i < decl_count; i++)

@@ -15,7 +15,7 @@ public class apply extends ProcedureN
       throw new WrongType(this.name(),1,"procedure");
     Procedure proc = (Procedure) args[0];
     Object last = args[count-1];
-    int last_count = kawa.standard.length.length (last);
+    int last_count = List.length (last);
     Object[] proc_args = new Object[last_count + (count - 2)];
     int i;
     for (i = 0; i < count - 2; i++)

@@ -308,7 +308,7 @@ public class Scheme extends Interpreter
       r5_environment = new Environment (r4_environment);
       r5_environment.setName ("r5rs-environment");
       env = r5_environment;
-      define_proc ("values", "kawa.standard.values");
+      define_proc ("values", "kawa.standard.values_v");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
@@ -324,6 +324,7 @@ public class Scheme extends Interpreter
       define_syntax ("when", "kawa.lib.when_unless");
       //-- (unless cond exp ...)
       define_syntax ("unless", "kawa.lib.when_unless");
+      define_proc ("integer-length", "kawa.standard.int_length");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");

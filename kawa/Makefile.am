@@ -16,7 +16,7 @@ java_sources = Shell.java repl.java Version.java \
   TelnetInputStream.java TelnetOutputStream.java Telnet.java\
   $(java_@AWT_SELECTED@)
 
-EXTRA_DIST = Version.java.in
+EXTRA_DIST = Version.java.in $(java_WITH_AWT)
 
 PACKAGE_FNAME = kawa-repl
 GCJ_INPUTS =  $(java_Java)

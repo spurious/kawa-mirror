@@ -1,3 +1,7 @@
+2000-01-22  Per Bothner  <per@bothner.com>
+
+	* testing.scm (setion):  Return implied #!void rather than #t.
+
 1999-12-11  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  New test for fluid-let, from bug reported by

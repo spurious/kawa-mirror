@@ -84,8 +84,8 @@
 (define (section . args)
   (set! cur-section args)
   (display-section (or *log-file* (current-output-port)))
-  (set! last-section #f)
-  #t)
+  (set! last-section #f))
+
 (define record-error (lambda (e) (set! errs (cons (list cur-section e) errs))))
 
 (define (report-pass port fun args res)

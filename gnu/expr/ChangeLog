@@ -1,3 +1,8 @@
+2001-02-28  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (enterFunction):  If getInlineOnly(), set closureEnv
+	from using loadHeapFrame of outerLambda.  (Fixes new test-case.)
+
 2001-02-26  Per Bothner  <per@bothner.com>
 
 	Use ModuleMethod to implement nested procedures too.

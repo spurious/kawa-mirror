@@ -1061,13 +1061,18 @@ public class LambdaExp extends ScopeExp
     scope.setStartPC(code.getPC());
 
     if (closureEnv != null && ! closureEnv.isParameter()
-	&& ! getInlineOnly() && ! comp.usingCPStyle())
+	&& ! comp.usingCPStyle())
       {
-	code.emitPushThis();
-	Field field = closureEnvField;
-	if (field == null)
-	  field = outerLambda().closureEnvField;
-	code.emitGetField(field);
+	if (getInlineOnly())
+	  outerLambda().loadHeapFrame(comp);
+	else
+	  {
+	    code.emitPushThis();
+	    Field field = closureEnvField;
+	    if (field == null)
+	      field = outerLambda().closureEnvField;
+	    code.emitGetField(field);
+	  }
 	code.emitStore(closureEnv);
       }
     if (heapFrame != null && ! comp.usingCPStyle())

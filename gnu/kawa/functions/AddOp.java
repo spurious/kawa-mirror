@@ -153,7 +153,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
             if (type != null)
               {
                 PrimProcedure prim
-                  = PrimProcedure.makeBuiltinBinary(opcode, type);
+                  = PrimProcedure.makeBuiltinUnary(opcode, type);
                 return new ApplyExp(prim, args);
               }
           }

@@ -27,7 +27,7 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method instanceMethod;
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     return Invoke.inlineClassName(exp, 1, interpreter);
   }

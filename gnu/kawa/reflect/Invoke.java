@@ -207,7 +207,7 @@ public class Invoke extends ProcedureN implements CanInline, Inlineable
     return fields;
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     return kind == 'V' ? exp : inlineClassName(exp, 0, interpreter);
   }

@@ -46,7 +46,7 @@ public class TypeSwitch extends CpsProcedure implements CanInline, Inlineable
     defaultProc.apply(ctx);
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
     for (int i = 1;  i < args.length;  i++)

@@ -1,3 +1,8 @@
+2002-07-21  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java, Invoke.java, SlotGet.java, SlotSet.java,
+	TypeSwitch.java (inline):  Update to take extra ExpWalker parameter.
+
 2002-06-18  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (getField):  Call Compilation.mangleNameIfNeeded.

@@ -3,6 +3,8 @@ TO BE DONE FOR 2.0:
 Let LineBufferedReader pos, limit, buffer be private,
 but provide methods to get/set them.
 
+exact->inexact only implemented for RealNums, not other Complex.
+
 Fix scheme-window so #!eof closes window.
 
 Implement source-filename source-line source-column macros.
@@ -23,8 +25,7 @@ Use type declarations and (local) type inference.
 Replace use of ZipArchive by jar files.
 
 Implement full call-cc and tail-calls by re-writing as in RScheme.
-(Sombody may be working on this.)  This would be slower, so should
-be optional, probably not the default.
+This would be slower, so should be optional, probably not the default.
 
 Compile a module with top-level function definitions to a single class
 with methods.  More efficient when functions can be statically resolved.
@@ -45,8 +46,8 @@ Possibly re-write macro syntax to use syntactic closures.
 Implement system open-input-pipe open-output-pipe close-pipe.
 Implement read-line; other Guile port operations.
 
-Implement infrastructure for other languages,
-and at least one other language.
+Add a way to specify a load-path (or maybe just use CLASSPATH?).
+First seach for loaded files in directory where current file was found.
 
 OTHER:
 
@@ -58,12 +59,6 @@ Update to match kawa-tour:
   SyntaxRule.match should use Pattern.
 
 Should SyntaxRule inherit from Pattern?
-
-We depend on some hacks to automake:
-- info files make in builddir, not $(srcdir)
-- DATA is added to DIST_DEPFILES
-- distdir also searches current dir
-Try to get automake maintainers to accept these.
 
 Move readSchemeObject readSchemeNumber etc from InPort
 to new class(es) Parser:

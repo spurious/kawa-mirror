@@ -596,12 +596,88 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.double_type);
   }
 
+  /** Calculate how many CONSTANT_String constants we need for a string.
+   * Each CONSTANT_String can be at most 0xFFFF bytes (as a UTF8 string).
+   * Returns a String, where each char, coerced to an int, is the length
+   * of a substring of the input that is at most 0xFFFF bytes.
+   */
+  public final String calculateSplit (String str)
+  {
+    int strLength = str.length();
+    StringBuffer sbuf = new StringBuffer(20);
+    // Where the current segments starts, as an index in 'str':
+    int segmentStart = 0;
+    int byteLength = 0; // Length in bytes of current segment so far.
+    for (int i = 0;  i < strLength; i++)
+      {
+	char ch = str.charAt(i);
+	int bytes = ch >= 0x0800 ? 3 : ch >= 0x0080 || ch == 0 ? 2 : 1;
+	if (byteLength + bytes > 0xFFFF)
+	  {
+	    sbuf.append((char) (i - segmentStart));
+	    segmentStart = i;
+	    byteLength = 0;
+	  }
+	byteLength += bytes;
+      }
+    sbuf.append((char) (strLength - segmentStart));
+    return sbuf.toString();
+  }
+
+  /** Emit code to push the value of a constant String.
+   * Uses CONSTANT_String and CONSTANT_Utf8 constant pool entries as needed.
+   * Can handle Strings whose UTF8 length is greates than 0xFFFF bytes
+   * (the limit of a CONSTANT_Utf8) by generating String concatenation.
+   */
   public final void emitPushString (String str)
   {
     if (str == null)
       emitPushNull();
     else
-      emitPushConstant(getConstants().addString(str));
+      {
+	int length = str.length();
+	String segments = calculateSplit(str);
+	int numSegments = segments.length();
+	if (numSegments <= 1)
+	  emitPushConstant(getConstants().addString(str));
+	else
+	  {
+	    if (numSegments == 2)
+	      {
+		int firstSegment = (int) segments.charAt(0);
+		emitPushString(str.substring(0, firstSegment));
+		emitPushString(str.substring(firstSegment));
+		Method concatMethod
+		  = Type.string_type.getDeclaredMethod("concat", 1);
+		emitInvokeVirtual(concatMethod);
+	      }
+	    else
+	      {
+		ClassType sbufType = ClassType.make("java.lang.StringBuffer");
+		emitNew(sbufType);
+		emitDup(sbufType);
+		emitPushInt(length);
+		Type[] args1 = { Type.int_type };
+		emitInvokeSpecial(sbufType.getDeclaredMethod("<init>", args1));
+		Type[] args2 = { Type.string_type };
+		Method appendMethod
+		  = sbufType.getDeclaredMethod("append", args2);
+		int segStart = 0;
+		for (int seg = 0;  seg < numSegments;  seg++)
+		  {
+		    emitDup(sbufType);
+		    int segEnd = segStart + (int) segments.charAt(seg);
+		    emitPushString(str.substring(segStart, segEnd));
+		    emitInvokeVirtual(appendMethod);
+		    segStart = segEnd;
+		  }
+		emitInvokeVirtual(Type.toString_method);
+	      }
+	    if (str == str.intern())
+	      emitInvokeVirtual(Type.string_type.getDeclaredMethod("intern", 0));
+	    return;
+	  }
+      }
     pushType(Type.string_type);
   }
 

@@ -1700,7 +1700,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	decl.noteValue (null);  // Does not have a known value.
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
-    parser.push(sc); // FIXME where is matching pop?
+    parser.push(sc);
     Expression body;
     if (curToken == ',')
       {
@@ -1741,6 +1741,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	body.setFile(getName());
 	body.setLine(bodyLine, bodyColumn);
       }
+    parser.pop(sc);
     if (isFor)
       {
 	((LambdaExp) sc).body = body;

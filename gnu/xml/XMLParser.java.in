@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xml;
@@ -37,16 +37,17 @@ public class @XMLParser@
   private static final int MAYBE_ATTRIBUTE_STATE = 10;
   private static final int ATTRIBUTE_SEEN_EQ_STATE = 11;
   private static final int DOCTYPE_SEEN_STATE = 13;
-  private static final int EXPECT_RIGHT_STATE = 15;
-  private static final int SAW_LEFT_STATE = 18;
+  private static final int DOCTYPE_NAME_SEEN_STATE = 16;
+  private static final int SAW_LEFT_STATE = 14;
   private static final int SAW_LEFT_SLASH_STATE = 19; // Seen '</'
   private static final int SAW_LEFT_EXCL_STATE = 20;
   private static final int SAW_LEFT_QUEST_STATE = 21; // Seen '<?'
   private static final int SAW_LEFT_EXCL_MINUS_STATE = 22;
   private static final int SAW_AMP_STATE = 25;  // Saw '&'.  
   private static final int SAW_AMP_SHARP_STATE = 26;  // Saw '&#'.  
-  private static final int SAW_ERROR = 27;
-  private static final int SAW_EOF_ERROR = 28;  // Unexpected end-of-file.
+  private static final int EXPECT_RIGHT_STATE = 27;
+  private static final int SAW_ERROR = 28;
+  private static final int SAW_EOF_ERROR = 30;  // Unexpected end-of-file.
 
   public void parse()
   {
@@ -79,13 +80,13 @@ public class @XMLParser@
     int continue_state = SAW_LEFT_STATE;
     @CHAR@ ch = (@CHAR@) ' '; // ???
     int length = 0;
+    int dstart = -1;
     String message = null;
 
-    int start = pos;
+    int start = buffer.length;
   mainLoop: //
     for (;;)
       {
-        //System.err.println("state:"+state+" ch:"+(char)ch);
         handleChar:  // When done get next character.
         switch (state)
           {
@@ -117,39 +118,40 @@ public class @XMLParser@
             // This state handle text not inside tags (in which case
             // terminator=='<').  It also handles attribute values (in
             // which case terminator is '\'' or '"').
-            length = 0;
             start = pos - 1;
+            length = pos;
             for (;;)
               {
                 if (ch == terminator)
                   {
                     state = continue_state;
-                    length = -1;
                     break;
                   }
                 if (ch == '&')
                   {
                     state = SAW_AMP_STATE;
-                    length = -1;
                     break;
                   }
                 if (pos == limit)
                   {
+                    length--;
                     break;
                   }
                 ch = buffer[pos++];
               }
-            length = pos - start + length;
+            length = pos - length;
             if (length > 0)
               out.emitCharacters(buffer, start, length);
+	    start = buffer.length;
             break handleChar;
 
           case SKIP_SPACES_MODIFIER + EXPECT_RIGHT_STATE:
           case SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE:
           case SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE:
-          case SKIP_SPACES_MODIFIER + EXPECT_NAME_MODIFIER + DOCTYPE_SEEN_STATE:
+          case SKIP_SPACES_MODIFIER + DOCTYPE_SEEN_STATE:
             // "Subroutine" for skipping whitespace.
-            if (ch == ' ' || ch == '\t'|| ch == '\n' || ch == '\r')
+            if (ch == ' ' || ch == '\t'|| ch == '\n' || ch == '\r'
+		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
             // Not a space, so "return" to next state.
             state -= SKIP_SPACES_MODIFIER;
@@ -159,85 +161,77 @@ public class @XMLParser@
           case EXPECT_NAME_MODIFIER + END_ELEMENT_STATE:
           case EXPECT_NAME_MODIFIER + ATTRIBUTE_SEEN_NAME_STATE:
           case EXPECT_NAME_MODIFIER + SAW_ENTITY_REF:
-          case EXPECT_NAME_MODIFIER + DOCTYPE_SEEN_STATE:
+          case EXPECT_NAME_MODIFIER + DOCTYPE_NAME_SEEN_STATE:
           case EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE:
             // "Subroutine" for reading a Name.
-            if (! (ch >= 'a' && ch <= 'z') && ! (ch >= 'A' && ch <= 'Z')
-                && ch != '_' && ch != ':'
-                && ch >= 0)
-              {
-                message = "missing name";
-                state = SAW_ERROR;
-                continue mainLoop;
-              }
-            length = 1;
-            start = pos - 1;
             for (;;)
               {
-                if (pos >= limit)
-                  {
-                    pos = start;
-                    state = SAW_EOF_ERROR;
-                    continue mainLoop;
-                  }
-                ch = buffer[pos++];
+		// Update for XML 2nd ed.   FIXME
                 if ((ch >= 'a' && ch <= 'z')
                     || (ch >= 'A' && ch <= 'Z')
-                    || (ch >= '0' && ch <= '9')
-                    || ch == '.' || ch == '-' || ch == '_' || ch == ':'
-                    || ch < 0)
+		    || ch == '_' || ch == ':'
+                    || (pos > start
+			&& (ch >= '0' && ch <= '9')
+			|| ch == '.' || ch == '-'))
                   {
-                    length++;
                   }
                 else
                   {
-                    state -= EXPECT_NAME_MODIFIER;
+		    state -= EXPECT_NAME_MODIFIER;
+		    length = pos - 1 - start;
+		    if (length == 0)
+		      {
+			message = "missing name";
+			state = SAW_ERROR;
+		      }
                     continue mainLoop;
                   }
+                if (pos < limit)
+		  ch = buffer[pos++];
+		else
+		  break handleChar;
               }
           case SAW_AMP_SHARP_STATE:
-            int value = 0;
-            int base;
-            if (ch == 'x' && pos < limit)
-              {
-                ch = buffer[pos++];
-                base = 16;
-              }
-            else
-              base = 10;
-            length = 0;
-            for (;;)
-              {
-                if (ch == ';')
-                  break;
-                int digit = Character.digit((char) ch, base);
-                if (digit < 0 || pos == limit)
-                  {
-                    length = 0;
-                    break;
-                  }
-                value = base * value + digit;
-                length++;
-                ch = buffer[pos++];
-              }
-            if (length == 0)
-              {
-                message = "Invalid character reference";
-                state = SAW_ERROR;
-                continue mainLoop;
-              }
-            if (base == 16)
-              length++;
-            out.emitCharacterReference(value, buffer, pos - 1 - length, length);
-            state = TEXT_STATE;
-            break handleChar;
+	    for (;;)
+	      {
+		if (ch == ';')
+		  {
+		    out.emitCharacterReference(length,
+					       buffer, start, pos-1-start);
+		    state = TEXT_STATE;
+		    break handleChar;
+		  }
+		if (ch == 'x' && dstart == 0)
+		  dstart = 16;
+		else if (length >= 0x8000000)
+		  break; // Overflow likely.
+		else
+		  {
+		    int base = dstart == 0 ? 10 : dstart;
+		    int digit = Character.digit((char) ch, base);
+		    if (digit < 0)
+		      break;
+		    length = length * base + digit;
+		  }
+                if (pos < limit)
+		  ch = buffer[pos++];
+		else
+		  break handleChar;
+	      }
+	    message = "Invalid character reference";
+	    state = SAW_ERROR;
+	    continue mainLoop;
 
           case SAW_AMP_STATE:
             if (ch == '#')
               {
                 state = SAW_AMP_SHARP_STATE;
+		start = pos;
+		length = 0;  // accumulated value; -1 means error, -2 overflow
+		dstart = 0;  // base - 0 means not seen yet
                 break handleChar;
               }
+	    start = pos - 1;
             state = EXPECT_NAME_MODIFIER + SAW_ENTITY_REF;
             continue mainLoop;
 
@@ -248,6 +242,7 @@ public class @XMLParser@
                 error("missing ';'");
               }
             out.emitEntityReference(buffer, start, length);
+	    start = limit;
             state = TEXT_STATE;
             break handleChar;
 
@@ -259,134 +254,125 @@ public class @XMLParser@
               }
             if (ch == '?')
               {
+		start = pos;
                 state = EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + SAW_LEFT_QUEST_STATE;
                 break handleChar;
               }
             if (ch == '!')
               {
                 state = SAW_LEFT_EXCL_STATE;
+		start = pos;
                 break handleChar;
               }
             // Read Name then goto BEGIN_ELEMENT_STATE.
+	    start = pos - 1;
             state = EXPECT_NAME_MODIFIER + BEGIN_ELEMENT_STATE;
             continue mainLoop;
           case BEGIN_ELEMENT_STATE:
             out.emitBeginElement(buffer, start, length);
             state = SKIP_SPACES_MODIFIER + MAYBE_ATTRIBUTE_STATE;
+	    start = limit;
             continue mainLoop;
 
-          case SAW_LEFT_QUEST_STATE: // Seen '<?' Name.
-            for (int dstart = pos - 1;;)
+          case SAW_LEFT_QUEST_STATE: // Seen '<?' Name Spaces
+	    if (dstart < 0)
+	      dstart = pos - 1;
+            for (;;)
               {
-                if (pos + 2 >= limit)
-                  {
-                    pos = dstart;
-                    state = SAW_EOF_ERROR;
-                    continue mainLoop;
-                  }
-                ch = buffer[pos++];
-                if (ch != '?')
-                  continue;
-                ch = buffer[pos++];
-                if (ch != '>')
-                  continue;
-                out.emitProcessingInstruction(buffer, start, length,
-                                              dstart, pos - 2 - dstart);
-                state = TEXT_STATE;
-                break handleChar;
+		int end;
+		if (ch == '>'
+		    && buffer[end = pos - 2] == '?'
+		    && end >= dstart)
+		  {
+		    out.emitProcessingInstruction(buffer, start, length,
+						  dstart, end - dstart);
+		    start = limit;
+		    dstart = -1;
+		    state = TEXT_STATE;
+		    break handleChar;
+		  }
+                if (pos < limit)
+		  ch = buffer[pos++];
+		else
+		  break handleChar;
               }
 
           case SAW_LEFT_EXCL_STATE: // Seen '<!'
-            if (ch == '-' && pos < limit && buffer[pos++] == '-')
-              {
-                // Handle comment.
-                start = pos - 4;
-                for (;;)
-                  {
-                    if (pos + 3 >= limit)
-                      {
-                        pos = start;
-                        state = SAW_EOF_ERROR;
-                        continue mainLoop;
-                      }
-                    ch = buffer[pos++];
-                    if (ch != '-')
-                      continue;
-                    ch = buffer[pos++];
-                    if (ch != '-')
-                      continue;
-		    do
-		      ch = buffer[pos++];
-		    while (ch == '-' && pos < limit);
-                    if (ch != '>')
-                      continue;
-                    out.emitComment(buffer, start, pos-start);
-                    state = TEXT_STATE;
-                    break handleChar;
-                  }
-              }
+	  exclLoop:
+	    for (;;)
+	      {
+		if (ch == '>')
+		  {
+		    length = pos - 1 - start;
+		    if (length >= 4
+			&& buffer[start] == '-'
+			&& buffer[start+1] == '-')
+		      {
+			if (buffer[pos-2] == '-'
+			    && buffer[pos-3] == '-')
+			  {
+			    out.emitComment(buffer, start + 2, length - 4);
+			    break exclLoop;
+			  }
+		      }
+		    else if (length >= 6
+			     && buffer[start] == '['
+			     && buffer[start+1] == 'C'
+			     && buffer[start+2] == 'D'
+			     && buffer[start+3] == 'A'
+			     && buffer[start+4] == 'T'
+			     && buffer[start+5] == 'A'
+			     && buffer[start+6] == '[')
+		      {
+			if (buffer[pos-2] == ']'
+			    && buffer[pos-3] == ']')
+			  {
+			    out.emitCharacters(buffer, start + 7, pos - 10 - start);
+			    break exclLoop;
+			  }
+		      }
+		    else
+		      {
+			// FIXME ignoreing <!ELEMENT ... > etc.
+			break exclLoop;
+		      }
+		  }
+		else if (pos == start+7
+			 &&  buffer[start] == 'D'
+			 &&  buffer[start+1] == 'O'
+			 &&  buffer[start+2] == 'C'
+			 &&  buffer[start+3] == 'T'	
+			 &&  buffer[start+4] == 'Y'
+			 &&  buffer[start+5] == 'P'
+			 &&  ch == 'E')
+		  {
+		    start = limit;
+		    state = SKIP_SPACES_MODIFIER + DOCTYPE_SEEN_STATE;
+		    break handleChar;
+		  }
+                if (pos < limit)
+		  ch = buffer[pos++];
+		else
+		  break handleChar;
+	      }
+	    start = limit;
+	    state = TEXT_STATE;
+	    break handleChar;
 
-            if (ch == '[' && pos + 5 < limit
-                && buffer[pos] == 'C'
-                && buffer[pos+1] == 'D'
-                && buffer[pos+2] == 'A'
-                && buffer[pos+3] == 'T'
-                && buffer[pos+4] == 'A'
-                && buffer[pos+5] == '[')
-              {
-                pos += 6;
-                start = pos;
-                for (;;)
-                  {
-                    if (pos + 3 >= limit)
-                      {
-                        pos = start;
-                        state = SAW_EOF_ERROR;
-                        continue mainLoop;
-                      }
-                    ch = buffer[pos++];
-                    if (ch != ']')
-                      continue;
-                    ch = buffer[pos++];
-                    if (ch != ']')
-                      continue;
-                    ch = buffer[pos++];
-                    if (ch != '>')
-                      continue;
-                    out.emitCharacters(buffer, start, pos - 3 - start);
-                    state = TEXT_STATE;
-                    break handleChar;
-                  }
-              }
-            if (pos + 8 < limit
-                && ch == 'D'
-                && buffer[pos] == 'O'
-                && buffer[pos+1] == 'C'
-                && buffer[pos+2] == 'T'
-                && buffer[pos+3] == 'Y'
-                && buffer[pos+4] == 'P'
-                && buffer[pos+5] == 'E')
-              {
-                pos = pos + 6;
-                state = EXPECT_NAME_MODIFIER + SKIP_SPACES_MODIFIER + DOCTYPE_SEEN_STATE;
-                break handleChar;
-              }
-            message = "unexpected or unimplemented text after '<!'";
-            state = SAW_ERROR;
-            continue mainLoop;
+          case DOCTYPE_SEEN_STATE:  /* Seen '<!DOCTYPE' S* */
+	    state = EXPECT_NAME_MODIFIER + DOCTYPE_NAME_SEEN_STATE;
+	    start = pos - 1;
+	    continue mainLoop;
 
-          case DOCTYPE_SEEN_STATE:
-            terminator = 0;
-            for (int dstart = pos - 1;;)
+          case DOCTYPE_NAME_SEEN_STATE:  /* Seen '<!DOCTYPE' S* Name */
+	    if (dstart < 0)
+	      {
+		dstart = pos - 1;
+		terminator = 0;
+	      }
+            for (;;)
               {
-                if (pos >= limit)
-                  {
-                    pos = dstart;
-                    state = SAW_EOF_ERROR;
-                    continue mainLoop;
-                  }
-                ch = buffer[pos++];
-                if (ch == '\'' || ch == '\"')
+		if (ch == '\'' || ch == '\"')
                   {
                     if (terminator == 0)
                       terminator = ch;
@@ -398,9 +384,15 @@ public class @XMLParser@
                     out.emitDoctypeDecl(buffer, start, length,
                                         dstart, pos - 1 - dstart);
                     terminator = (@CHAR@) '<';
+		    start = limit;
+		    dstart = -1;
                     state = TEXT_STATE;
                     break handleChar;
                   }
+                if (pos < limit)
+		  ch = buffer[pos++];
+		else
+		  break handleChar;
               }
 
           case MAYBE_ATTRIBUTE_STATE:
@@ -419,17 +411,20 @@ public class @XMLParser@
                 state = TEXT_STATE;
                 break handleChar;
               }
+	    start = pos - 1;
             state = EXPECT_NAME_MODIFIER + ATTRIBUTE_SEEN_NAME_STATE;
             continue mainLoop;
           case ATTRIBUTE_SEEN_NAME_STATE:
             out.emitBeginAttribute(buffer, start, length);
+	    start = limit;
             if (ch == '=')
               {
                 state = ATTRIBUTE_SEEN_EQ_STATE;
                 break handleChar;
               }
-            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
-              break handleChar;
+            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
+		|| ch == '\u0085' || ch == '\u2028')
+              break handleChar; // FIXME - re-calls emitBeginAttribute
             message = "missing or misplaced '=' after attribute name";
             state = SAW_ERROR;
             continue mainLoop;
@@ -441,7 +436,8 @@ public class @XMLParser@
                 state = TEXT_STATE;
                 break handleChar;
               }
-            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
+            if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
+		|| ch == '\u0085' || ch == '\u2028')
               break handleChar;
             message = "missing or unquoted attribute value";
             state = SAW_ERROR;
@@ -449,11 +445,13 @@ public class @XMLParser@
 
           case SAW_LEFT_SLASH_STATE: // Seen '</'.
             // Do "Name" subroutine, then goto END_ELEMENT_STATE.
+	    start = pos - 1;
             state = EXPECT_NAME_MODIFIER + END_ELEMENT_STATE;
             continue mainLoop;
 
           case END_ELEMENT_STATE:  // Seen '</' Name.
             out.emitEndElement(buffer, start, length);
+	    start = limit;
             // Skip spaces then goto EXPECT_RIGHT_STATE.
             state = SKIP_SPACES_MODIFIER + EXPECT_RIGHT_STATE;
             continue mainLoop;
@@ -474,49 +472,85 @@ public class @XMLParser@
           ch = buffer[pos++];
         else
           {
-            if (state == TEXT_STATE)
-              return;
-            state = SAW_EOF_ERROR;
+	    int saved = pos - start;
+	    if (saved > 0)
+	      {
+		if (saved >= buffer.length)
+		  {
+		    @CHAR@[] tmp = new @CHAR@[saved+100];
+		    System.arraycopy(buffer, start, tmp, 0, saved);
+		    buffer = tmp;
+		  }
+		else if (start > 0)
+		  System.arraycopy(buffer, start, buffer, 0, saved);
+		pos = saved;
+		start = 0;
+	      }
+	    else
+	      {
+		pos = 0;
+	      }
+	    int count = fill(buffer, pos, buffer.length - pos);
+	    if (count > 0)
+	      {
+		limit = pos + count;
+		ch = buffer[pos++];
+		start = saved >= 0 ? 0 : limit;
+	      }
+	    else
+	      {
+		if (state == TEXT_STATE)
+		  return;
+		state = SAW_EOF_ERROR;
+	      }
           }
       }
+  }
+
+@if CHAR is byte@
+  InputStream in;
+@endif CHAR is byte@
+@if CHAR is char@
+  Reader in;
+@endif CHAR is char@
+
+  public int fill(@CHAR@[] buffer, int start, int length)
+  {
+    if (in == null)
+      return -1;
+    try
+      {
+	return in.read(buffer, start, length);
+      }
+    catch (java.io.IOException ex)
+      {
+	throw new RuntimeException(ex.getMessage());
+      }
+  }
+
+  public @XMLParser@(@CHAR@[] buffer, int pos, int limit,
+		     @ParsedXMLHandler@ out)
+  {
+    this.buffer = buffer;
+    this.pos = pos;
+    this.limit = limit;
+    this.out = out;
   }
 
   public @XMLParser@(URL url, @ParsedXMLHandler@ out)  throws IOException
   {
     URLConnection conn = url.openConnection();
-    int length = conn.getContentLength();
     InputStream in = conn.getInputStream();
 @if CHAR is byte@
-    if (length < 0)
-      throw new IOException("-1 length - not found?");
-    buffer = new byte[length];
-    for (int done = 0;  done < length; )
-      done += in.read(buffer, done, length - done);
-    in.close();
+    this.in = in; 
+    buffer = new byte[1024];
 @endif CHAR is byte@
 @if CHAR is char@
-    InputStreamReader reader = new InputStreamReader(in);
-    int size = length + 1024;
-    buffer = new char[size];
-    length = 0;
-    for (;;)
-      {
-	int avail = buffer.length - length;
-	if (avail == 0)
-	  {
-	    char[] tmp = new char[2 * length];
-	    System.arraycopy(buffer, 0, tmp, 0, length);
-	    buffer = tmp;
-	  }
-	int count = reader.read(buffer, length, avail);
-	if (count <= 0)
-	  break;
-	length += count;
-      }
-    reader.close();
+    this.in = new InputStreamReader(in);
+    buffer = new char[1024];
 @endif CHAR is char@
     pos = 0;
-    limit = length;
+    limit = 0;
 
     this.out = out;
   }

@@ -54,8 +54,8 @@ public class @ParsedXMLHandler@
   }
 
   /** Process a comment.
-   * The data (starting at start for length @CHAR@s) include both delimiters.
-   * (I.e. both "<!--" and "-->" are included). */
+   * The data (starting at start for length @CHAR@s).
+   * Does not include the delimiters (i.e. "<!--" and "-->" are excluded). */
   public void emitComment(@CHAR@[] data, int start, int length)
   {
   }

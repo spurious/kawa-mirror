@@ -361,10 +361,8 @@ with the book title and the editor's affiliation.</description>
 <description><![CDATA[Prepare a (nested) table of contents for Book1, listing
 all the sections and their titles. Preserve the original attributes of
 each <section> element, if any.]]></description>
-<NOTE>return type in recursive call causes stack underflow.</NOTE>
 <query>
-(:declare function toc($book-or-section as element()) as element()*:)
-declare function local:toc($book-or-section as element())
+declare function toc($book-or-section as element()) as element()*
 {
     for $section in $book-or-section/section
     return
@@ -655,7 +653,116 @@ return $a//instrument
 <instrument>trocar</instrument>
 </expect>
 </test>
-<!--Q4 uses 'some ... satisfies' -->
+
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q4</ident>
+<description>In Report1, find "Procedure" sections where no Anesthesia
+element occurs before the first Incision</description>
+<query><![CDATA[
+for $p in doc("report1.xml")//section[section.title = "Procedure"]
+where not(some $a in $p//anesthesia satisfies
+        $a << ($p//incision)[1] )
+return $p
+]]></query>
+<expect>
+</expect>
+</test>
+
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q5a</ident>
+<description>In Report1, what happened between the first Incision
+and the second Incision? (1st solution)</description>
+<query><![CDATA[
+declare function local:precedes($a as node(), $b as node()) as xs:boolean 
+{
+    $a << $b
+      and
+    empty($a//node() intersect $b)
+};
+
+
+declare function local:follows($a as node(), $b as node()) as xs:boolean 
+{
+    $a >> $b
+      and
+    empty($b//node() intersect $a)
+};
+
+<critical_sequence>
+ {
+  let $proc := doc("report1.xml")//section[section.title="Procedure"][1]
+  for $n in $proc//node()
+  where local:follows($n, ($proc//incision)[1])
+    and local:precedes($n, ($proc//incision)[2])
+  return $n
+ }
+</critical_sequence>
+]]></query>
+<expect>
+<critical_sequence>
+      The fascia was identified and
+      <action>#2 0 Maxon stay sutures were placed on each side of the midline.
+      </action>#2 0 Maxon stay sutures were placed on each side of the midline.
+</critical_sequence>
+</expect>
+</test>
+
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q5b</ident>
+<description>In Report1, what happened between the first Incision
+and the second Incision? (2nd solution)</description>
+<query><![CDATA[
+<critical_sequence>
+ {  let $proc := doc("report1.xml")//section[section.title="Procedure"][1],
+      $i1 :=  ($proc//incision)[1],
+      $i2 :=  ($proc//incision)[2]
+  for $n in $proc//node() except $i1//node()
+  where $n >> $i1 and $n << $i2
+  return $n 
+ }
+</critical_sequence>
+]]></query>
+<expect>
+<critical_sequence>
+      The fascia was identified and
+      <action>#2 0 Maxon stay sutures were placed on each side of the midline.
+      </action>#2 0 Maxon stay sutures were placed on each side of the midline.
+</critical_sequence>
+</expect>
+</test>
+
+<test>
+<ident>Use case "SEQ" (Queries based on Sequence) Q5c</ident>
+<description>In Report1, what happened between the first Incision
+and the second Incision? (3rd solution)</description>
+<query><![CDATA[
+declare function local:between($seq as node()*, $start as node(), $end as node())
+ as item()*
+{
+  let $nodes :=
+    for $n in $seq except $start//node()
+    where $n >> $start and $n << $end
+    return $n
+  return $nodes except $nodes//node()
+};
+
+<critical_sequence>
+ {
+  let $proc := doc("report1.xml")//section[section.title="Procedure"][1],
+      $first :=  ($proc//incision)[1],
+      $second:=  ($proc//incision)[2]
+  return local:between($proc//node(), $first, $second)
+ }
+</critical_sequence>
+]]></query>
+<expect>
+<critical_sequence>
+      The fascia was identified and
+      <action>#2 0 Maxon stay sutures were placed on each side of the midline.
+      </action>
+</critical_sequence>
+</expect>
+</test>
 
 <test>
 <ident>Use Case "R" Q3 - Find cases where a user with a rating worse
@@ -805,6 +912,50 @@ return
     </expensive_item>
   </result>
 </expect>
+</test>
+
+<test>
+<ident>Use Case "NS" - Queries Using Namespaces:  Q2</ident>
+<description>Select the title of each record that is for sale.</description>
+<query>
+declare namespace music = "http://www.example.org/music/records";
+
+<Q2>
+  {
+    doc("auction.xml")//music:title
+  }
+</Q2>
+</query>
+<NOTE>
+The use-case document shows: <![CDATA[
+<Q2>
+  <music
+    xmlns="http://www.example.org/music/records">In a Silent Way</music>
+  <music
+     xmlns="http://www.example.org/music/records">Think of One ...</music>
+</Q2>
+]]> but I don't think that is correct.
+</NOTE>
+<expect><![CDATA[
+<Q2>
+  <title
+     xmlns="http://www.example.org/music/records"
+     xmlns:ma="http://www.example.com/AuctionWatch"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:anyzone="http://www.example.com/auctioneers#anyzone"
+     xmlns:eachbay="http://www.example.com/auctioneers#eachbay"
+     xmlns:yabadoo="http://www.example.com/auctioneers#yabadoo"
+  >In a Silent Way</title>
+  <title
+    xmlns="http://www.example.org/music/records"
+    xmlns:ma="http://www.example.com/AuctionWatch"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:anyzone="http://www.example.com/auctioneers#anyzone"
+    xmlns:eachbay="http://www.example.com/auctioneers#eachbay"
+    xmlns:yabadoo="http://www.example.com/auctioneers#yabadoo"
+  >Think of One ...</title>
+</Q2>
+]]></expect>
 </test>
 
 <test>

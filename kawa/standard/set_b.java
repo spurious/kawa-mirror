@@ -3,6 +3,8 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import gnu.bytecode.*;
+import gnu.kawa.functions.Setter;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.
@@ -11,6 +13,10 @@ import gnu.kawa.util.*;
 
 public class set_b extends Syntax implements Printable
 {
+  static final ClassType setterType = ClassType.make("gnu.kawa.functions.Setter");
+  static final Field setterField = setterType.getDeclaredField("setter");
+  static final Declaration setterDecl = new Declaration("setter", setterField);
+  static { setterDecl.noteValue(new QuoteExp(Setter.setter)); }
 
   static private Pattern pattern = new ListPat (2, 2);
 
@@ -23,27 +29,23 @@ public class set_b extends Syntax implements Printable
     if (match[0] instanceof Pair)
       {
 	// FIXME use location.rewrite_arg.
-	// rewrite (set! (proc . args) rhs) => ((setter proc) rhs . args)
-	// NOTE: this does not preserve evaluation order!
+	// rewrite (set! (proc . args) rhs) => ((setter proc) args ... rhs)
 	Pair pair = (Pair) match[0];
 	Object proc = pair.car;
 	Object args = pair.cdr;
-	/*
-	args = new Pair(match[1], args);
-	proc = new Pair("setter", new Pair(proc, LList.Empty));
-	return tr.rewrite(new Pair(proc, args));
-	*/
 
 	int nargs = LList.length(args);
 	Expression[] xargs = new Expression[nargs+1];
-	for (int i = 1; i <= nargs; i++)
+	for (int i = 0; i < nargs; i++)
 	  {
 	    pair = (Pair) args;
 	    xargs[i] = tr.rewrite(pair.car);
 	    args = pair.cdr;
 	  }
-	xargs[0] = tr.rewrite(match[1]);
-	return new SetApplyExp(tr.rewrite(proc), xargs);
+	xargs[nargs] = tr.rewrite(match[1]);
+        Expression[] setterArgs = { tr.rewrite(proc) };
+	return new ApplyExp(new ApplyExp(new ReferenceExp(setterDecl),
+                                         setterArgs), xargs);
       }
 
     if (! (match[0] instanceof String))

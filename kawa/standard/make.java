@@ -35,7 +35,7 @@ public class make extends ProcedureN
       {
 	Keyword key = (Keyword) args[i++];
 	Object arg = args[i++];
-	Record.set1(result, arg, key.getName());
+	Record.set1(arg, key.getName(), result);
       }
     return result;
   }

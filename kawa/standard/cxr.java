@@ -52,7 +52,7 @@ public class cxr extends Procedure1 implements HasSetter
     return arg1;
   }
 
-  public void set1 (Object value, Object list)
+  public void set1 (Object list, Object value)
   {
     if (count == 0)
       program (name().toString ());

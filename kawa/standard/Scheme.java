@@ -86,15 +86,8 @@ public class Scheme extends Interpreter
 
   public static Scheme getInstance()
   {
-    try
-      {
     if (kawaEnvironment == null)
       new Scheme ();
-      }
-    catch (Throwable ex)
-      {
-        ex.printStackTrace(System.err);
-      }
     return instance;
   }
 
@@ -136,7 +129,7 @@ public class Scheme extends Interpreter
       define_syntax ("case", "kawa.lib.std_syntax");
       define_syntax ("and", "kawa.lib.std_syntax");
       define ("or", new kawa.standard.and_or (false, this));
-      define_syntax ("%let", "kawa.standard.let");
+      define_field("%let", "kawa.standard.let", "let");
       define_syntax ("let", "kawa.lib.std_syntax");
       define_syntax ("%let-decl", "kawa.lib.std_syntax");
       define_syntax ("%let-init", "kawa.lib.std_syntax");
@@ -174,8 +167,8 @@ public class Scheme extends Interpreter
       //-- Section 6.3  -- complete
       define_proc("pair?", "kawa.lib.lists");
       define_proc("cons", "kawa.lib.lists");
-      define_proc ("car", "kawa.standard.car");
-      define_proc ("cdr", "kawa.standard.cdr");
+      define_proc ("car", "kawa.lib.lists");
+      define_proc ("cdr", "kawa.lib.lists");
       define_proc ("set-car!", "kawa.lib.lists");
       define_proc ("set-cdr!", "kawa.lib.lists");
 
@@ -533,7 +526,8 @@ public class Scheme extends Interpreter
       define_proc ("scheme-implementation-version", "kawa.lib.misc");
       define_proc ("scheme-window", "kawa.lib.misc");
       define_syntax ("define-procedure", "kawa.lib.syntax");
-      define_proc ("make-procedure", "kawa.lib.misc");
+      define_field("make-procedure",
+                   "gnu.kawa.functions.MakeProcedure", "makeProcedure");
       define_proc ("procedure-property", "kawa.lib.misc");
       define_proc ("set-procedure-property!", "kawa.lib.misc");
 
@@ -556,7 +550,6 @@ public class Scheme extends Interpreter
 
       define_field("format", "gnu.kawa.functions.Format");
       define_field("parse-format", "gnu.kawa.functions.ParseFormat", "parseFormat");
-      define_proc("emacs:read", "kawa.lib.emacs"); //
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");

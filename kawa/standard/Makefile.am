@@ -12,8 +12,6 @@ quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
 not.java \
 and_or.java \
-car.java \
-cdr.java \
 cxr.java \
 list_p.java \
 append.java \

@@ -228,7 +228,7 @@ public class ParseFormat extends Procedure1
 	    if (arg instanceof FString)
 	      {
 		FString str = (FString) arg;
-		iport = new CharArrayInPort(arg.data, arg.size);
+		iport = new CharArrayInPort(str.data, str.size);
 	      }
 	    else 
 	      iport = new CharArrayInPort(arg.toString()); 

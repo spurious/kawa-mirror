@@ -1,3 +1,7 @@
+2004-08-05  Chris Dean  <ctdean@sokitomi.com>
+
+	* kawa.texi (Field operations):  Document "isName" fields.
+
 2004-07-27  Chris Dean  <ctdean@sokitomi.com>
 
 	* kawa.texi (Compilation options):  Add --warn-as-error.

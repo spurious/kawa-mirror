@@ -28,3 +28,8 @@
 (define (iarr-set (array :: <int[]>) (index :: <int>) (value :: <int>))
   (let ((setter (primitive-array-set <int>)))
     (setter array index value)))
+
+(define-variable dvar1 11)
+(define-variable dvar2)
+(define-variable dvar3 13)
+(define dvar-test-1 (list dvar1 dvar2 dvar3))

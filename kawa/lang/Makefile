@@ -1,0 +1,114 @@
+ 
+.SUFFIXES : .java .class
+
+#=========================================================================
+# Unix version 
+#=========================================================================
+JAVAC=javac -classpath ../..:$$CLASSPATH
+CLASSES=../../../classes
+CLASSESDIR=$(CLASSES)/kawa/lang/
+
+$(CLASSESDIR)%.class: %.java
+	$(JAVAC) -d $(CLASSES) $<
+
+#=========================================================================
+# WIN32 version (NMAKE)
+#=========================================================================
+#JAVAC=javac -classpath ..\..;%CLASSPATH%
+#CLASSES=..\..\..\classes
+#CLASSESDIR=..\..\..\classes\kawa\lang\
+#.java{\}.class:
+#	$(JAVAC) -d $(CLASSES) $(*F).java
+
+EXCEPTIONS=\
+$(CLASSESDIR)EOFInComment.class \
+$(CLASSESDIR)UnexpectedCloseParen.class \
+$(CLASSESDIR)InvalidPoundConstruct.class \
+$(CLASSESDIR)EOFInString.class \
+$(CLASSESDIR)NumberTooLong.class \
+$(CLASSESDIR)InvalidCharacterName.class \
+$(CLASSESDIR)MalformedList.class \
+$(CLASSESDIR)UnboundSymbol.class \
+$(CLASSESDIR)WrongArguments.class \
+$(CLASSESDIR)WrongType.class \
+$(CLASSESDIR)GenericError.class \
+$(CLASSESDIR)NotImplemented.class
+
+OBJ=\
+$(CLASSESDIR)Interpreter.class \
+$(CLASSESDIR)Executable.class \
+$(CLASSESDIR)Syntaxable.class \
+$(CLASSESDIR)Printable.class \
+$(CLASSESDIR)Named.class \
+$(CLASSESDIR)snull.class \
+$(CLASSESDIR)pair.class \
+$(CLASSESDIR)iport.class \
+$(CLASSESDIR)oport.class \
+$(CLASSESDIR)symbol.class \
+$(CLASSESDIR)vector.class \
+$(CLASSESDIR)Exit.class \
+$(CLASSESDIR)Undefined.class \
+$(CLASSESDIR)Lambda.class \
+$(CLASSESDIR)LambdaProcedure.class \
+$(CLASSESDIR)Quote.class \
+$(CLASSESDIR)QuasiQuote.class \
+$(CLASSESDIR)Unquote.class \
+$(CLASSESDIR)UnquoteSplicing.class \
+$(CLASSESDIR)Procedure0.class \
+$(CLASSESDIR)Procedure1.class \
+$(CLASSESDIR)Procedure2.class \
+$(CLASSESDIR)Procedure3.class \
+$(CLASSESDIR)Procedure4.class \
+$(CLASSESDIR)Syntax0.class \
+$(CLASSESDIR)Syntax1.class \
+$(CLASSESDIR)Syntax2.class \
+$(CLASSESDIR)Syntax3.class \
+$(CLASSESDIR)Syntax4.class \
+$(EXCEPTIONS)
+
+all: $(OBJ)
+
+# Exceptions
+$(CLASSESDIR)EOFInComment.class: EOFInComment.java
+$(CLASSESDIR)$(CLASSESDIR)UnexpectedCloseParen.class: UnexpectedCloseParen.java
+$(CLASSESDIR)InvalidPoundConstruct.class: InvalidPoundConstruct.java
+$(CLASSESDIR)EOFInString.class: EOFInString.java
+$(CLASSESDIR)NotImplemented.class: NotImplemented.java
+$(CLASSESDIR)NumberTooLong.class: NumberTooLong.java
+$(CLASSESDIR)InvalidCharacterName.class: InvalidCharacterName.java
+$(CLASSESDIR)MalformedList.class: MalformedList.java
+$(CLASSESDIR)UnboundSymbol.class: UnboundSymbol.java
+$(CLASSESDIR)WrongArguments.class: WrongArguments.java
+$(CLASSESDIR)WrongType.class: WrongType.java
+$(CLASSESDIR)GenericError.class: GenericError.java
+# code
+$(CLASSESDIR)Printable.class: Printable.java
+$(CLASSESDIR)Named.class: Named.java
+$(CLASSESDIR)snull.class: snull.java
+$(CLASSESDIR)EOF.class: EOF.java
+$(CLASSESDIR)pair.class: pair.java
+$(CLASSESDIR)iport.class: iport.java
+$(CLASSESDIR)oport.class: oport.java
+$(CLASSESDIR)symbol.class: symbol.java
+$(CLASSESDIR)vector.class: vector.java
+$(CLASSESDIR)Executable.class: Executable.java
+$(CLASSESDIR)Syntaxable.class: Syntaxable.java
+$(CLASSESDIR)Exit.class: Exit.java
+$(CLASSESDIR)Undefined.class: Undefined.java
+$(CLASSESDIR)Lambda.class: Lambda.java
+$(CLASSESDIR)LambdaProcedure.class: LambdaProcedure.java
+$(CLASSESDIR)Quote.class: Quote.java
+$(CLASSESDIR)QuasiQuote.class: QuasiQuote.java
+$(CLASSESDIR)Unquote.class: Unquote.java
+$(CLASSESDIR)UnquoteSplicing.class: UnquoteSplicing.java
+$(CLASSESDIR)Interpreter.class: Interpreter.java
+$(CLASSESDIR)Procedure0.class: Procedure0.java
+$(CLASSESDIR)Procedure1.class: Procedure1.java
+$(CLASSESDIR)Procedure2.class: Procedure2.java
+$(CLASSESDIR)Procedure3.class: Procedure3.java
+$(CLASSESDIR)Procedure4.class: Procedure4.java
+$(CLASSESDIR)Syntax0.class: Syntax0.java
+$(CLASSESDIR)Syntax1.class: Syntax1.java
+$(CLASSESDIR)Syntax2.class: Syntax2.java
+$(CLASSESDIR)Syntax3.class: Syntax3.java
+$(CLASSESDIR)Syntax4.class: Syntax4.java

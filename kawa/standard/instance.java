@@ -26,7 +26,7 @@ public class instance extends Procedure2 implements Inlineable
 	    ((Type) arg1).emitIsInstance(code);
 	  }
 	else
-	  throw new Error ("1st arg is not a Type");
+	  throw new Error ("2nd arg is not a Type");
       }
     else
       {

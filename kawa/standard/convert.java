@@ -31,7 +31,7 @@ public class convert extends Procedure2 implements Inlineable
 
 	  }
 	else
-	  throw new Error ("2nd arg is not a Type");
+	  throw new Error ("1st arg is not a Type");
       }
     else
       {

@@ -161,6 +161,19 @@ public class InlineCalls extends ExpWalker
         if (exp.new_value instanceof LambdaExp)
           ((LambdaExp) exp.new_value).nameDecl = decl;
       }
+    /*
+    if (decl != null && ! decl.getFlag(Declaration.TYPE_SPECIFIED))
+      {
+	// This is a kludge to handle the a #!rest parameter that
+	// is implicitly declared to be a Scheme <list>, but may be
+	// assinged some other value, which is a legal Scheme idiom.
+	// We could set implicitly set the parameter type to <list>,
+	// but doing so improves type inference in the common case.
+	Type declType = decl.getType();
+	if (declType != null && ! exp.new_value.getType().isSubtype(declType))
+	  decl.setType(Type.pointer_type);
+      }
+    */
     return exp;
   }
 

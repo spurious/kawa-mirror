@@ -22,7 +22,8 @@ public class FindCapturedVars extends ExpWalker
     // possible that we later find out that func needs a static link,
     // in which case the current function does as well;  this is taken
     // care of by calling setCallersNeedStaticLink in LambdaExp.)
-    if (exp.func instanceof ReferenceExp && ! Compilation.usingTailCalls)
+    if (exp.func instanceof ReferenceExp
+	&& Compilation.defaultCallConvention <= Compilation.CALL_WITH_RETURN)
       {
 	Declaration decl
 	  = Declaration.followAliases(((ReferenceExp) exp.func).binding);

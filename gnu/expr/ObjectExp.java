@@ -27,7 +27,7 @@ public class ObjectExp extends ClassExp
       {
 	LambdaExp caller = outerLambda();
 	Variable closureEnv =
-	  ! Compilation.usingTailCalls ? getOwningLambda().heapFrame
+	  Compilation.defaultCallConvention < Compilation.CALL_WITH_CONSUMER ? getOwningLambda().heapFrame
 	  : caller.heapFrame != null ? caller.heapFrame	: caller.closureEnv;
 	if (closureEnv == null)
 	  code.emitPushThis();

@@ -77,7 +77,8 @@ public class ApplyExp extends Expression
     for (int i = 0; i < args.length; ++i)
       {
 	Expression arg = args[i];
-	if (comp.usingCPStyle
+	if (Compilation.defaultCallConvention
+	     >= Compilation.CALL_WITH_CONTINUATIONS
 	    && ! (arg instanceof QuoteExp) && ! (arg instanceof ReferenceExp))
 	  {
 	    // If the argument involves a CPStyle function call, we will
@@ -177,7 +178,7 @@ public class ApplyExp extends Expression
 	else if (func_lambda.max_args >= 0
 		 && args_length > func_lambda.max_args)
           msg = "too many args "+args_length+" for ";
-	else if (! func_lambda.isHandlingTailCalls()
+	else if (func_lambda.getCallConvention() < Compilation.CALL_WITH_CONSUMER
 		 && comp.inlineOk(func_lambda)
 		 && (method = func_lambda.getMethod(args_length)) != null)
 	  {

@@ -206,10 +206,28 @@ public class LambdaExp extends ScopeExp
 	    && (isModuleBody() || this instanceof ClassExp));
   }
 
+  /** Specify the calling convention used for this function.
+   * @return One of the CALL_WITH_xxx values in Compilation. */
+  public int getCallConvention ()
+  {
+    if (isModuleBody() && ! ((ModuleExp) this).isStatic())
+      return ((Compilation.defaultCallConvention
+	      >= Compilation.CALL_WITH_CONSUMER)
+	      ? Compilation.defaultCallConvention
+	      : Compilation.CALL_WITH_CONSUMER);
+    if (isClassMethod())
+      return Compilation.CALL_WITH_RETURN;
+    return ((Compilation.defaultCallConvention
+	     != Compilation.CALL_WITH_UNSPECIFIED)
+	    ? Compilation.defaultCallConvention
+	    : Compilation.CALL_WITH_RETURN);
+  }
+
   public final boolean isHandlingTailCalls ()
   {
     return (isModuleBody() && ! ((ModuleExp) this).isStatic())
-      || (Compilation.usingTailCalls && ! isModuleBody() && ! isClassMethod());
+      || (Compilation.defaultCallConvention >= Compilation.CALL_WITH_TAILCALLS
+	  && ! isModuleBody() && ! isClassMethod());
   }
 
   public final boolean variable_args () { return max_args < 0; }
@@ -475,7 +493,7 @@ public class LambdaExp extends ScopeExp
     if (! getInlineOnly())
       {
 	if (comp.method.reachableHere()
-	    && (! Compilation.usingTailCalls
+	    && (Compilation.defaultCallConvention < Compilation.CALL_WITH_TAILCALLS
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
 	code.popScope();        // Undoes enterScope in allocParameters
@@ -691,7 +709,7 @@ public class LambdaExp extends ScopeExp
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     int numStubs =
-      ((flags & DEFAULT_CAPTURES_ARG) != 0) || Compilation.usingTailCalls ? 0
+      ((flags & DEFAULT_CAPTURES_ARG) != 0) || Compilation.defaultCallConvention >= Compilation.CALL_WITH_TAILCALLS ? 0
       : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
@@ -737,7 +755,8 @@ public class LambdaExp extends ScopeExp
       nameBuf.append(Compilation.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
-    if (Compilation.usingTailCalls && ! isInitMethod && ! isClassMethod())
+    if (getCallConvention() >= Compilation.CALL_WITH_TAILCALLS
+	&& ! isInitMethod)
       nameBuf.append("$T");
 
    int mflags = (isStatic ? Access.STATIC : 0)
@@ -764,11 +783,12 @@ public class LambdaExp extends ScopeExp
 
     Type rtype
       = (getFlag(SEQUENCE_RESULT)
-	 || (Compilation.usingTailCalls && ! isClassMethod()))
+	 || getCallConvention () >= Compilation.CALL_WITH_CONSUMER)
       ? Type.void_type
       : getReturnType().getImplementationType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
-    if (Compilation.usingTailCalls && ! isInitMethod && ! isClassMethod())
+    if (getCallConvention () >= Compilation.CALL_WITH_CONSUMER
+	&& ! isInitMethod)
       {
 	Type[] atypes = new Type[1+extraArg];
 	if (extraArg > 0)
@@ -856,10 +876,10 @@ public class LambdaExp extends ScopeExp
 	Method main = getMainMethod();
 	
 	Declaration decl = firstDecl();
-	if (isHandlingTailCalls())
+	if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
 	  {
 	    firstArgsArrayArg = decl;
-	    if (! Compilation.usingTailCalls) // FIXME
+	    if (Compilation.defaultCallConvention <= Compilation.CALL_WITH_RETURN) // FIXME
 	      scope.addVariable(null, comp.typeCallContext, "$ctx");
 	  }
 	for (;;)
@@ -952,7 +972,8 @@ public class LambdaExp extends ScopeExp
 	else
 	  {
 	    frameType = new ClassType(comp.generateClassName("frame"));
-	    if (Compilation.usingTailCalls) // FIXME
+	    if (Compilation.defaultCallConvention
+		>= Compilation.CALL_WITH_CONSUMER)
 	    frameType.setSuper(Type.pointer_type);
 	    else
 	    frameType.setSuper(Compilation.typeModuleBody);
@@ -969,7 +990,8 @@ public class LambdaExp extends ScopeExp
     int i = 0;
     int j = 0;
 
-    if (isHandlingTailCalls() && ! isModuleBody() && ! comp.usingCPStyle())
+    if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
+	&& ! isModuleBody() && ! comp.usingCPStyle())
       {
 	Variable callStackContext = new Variable ("$ctx", comp.typeCallContext);
 	// Variable thisVar = isStatic? = null : declareThis(comp.curClass);
@@ -980,7 +1002,8 @@ public class LambdaExp extends ScopeExp
 
     code.locals.enterScope (scope);
 
-    if (argsArray != null && isHandlingTailCalls())
+    if (argsArray != null
+	&& getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
       {
         comp.loadCallContext();
 	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("getArgs", 0));
@@ -996,7 +1019,8 @@ public class LambdaExp extends ScopeExp
 	// the label that tail-recursion branches back to.
 	// This way, a self-tail-call knows where to leave the argumnents.
 	if (argsArray != null && min_args == max_args
-	    && primMethods == null && ! isHandlingTailCalls())
+	    && primMethods == null
+	    && getCallConvention() < Compilation.CALL_WITH_CONSUMER)
 	  {
 	    code.emitLoad(argsArray);
 	    code.emitPushInt(j);
@@ -1101,7 +1125,8 @@ public class LambdaExp extends ScopeExp
 
     Variable argsArray = this.argsArray;
     if (min_args == max_args && ! comp.fewerClasses
-	&& primMethods == null && ! isHandlingTailCalls())
+	&& primMethods == null
+	&& getCallConvention () < Compilation.CALL_WITH_CONSUMER)
       argsArray = null;
 
     // For each non-artificial parameter, copy it from its incoming
@@ -1124,7 +1149,9 @@ public class LambdaExp extends ScopeExp
       {
 	if (param == firstArgsArrayArg && argsArray != null)
 	  {
-	    if (primMethods != null && ! Compilation.usingTailCalls)
+	    if (primMethods != null
+		&& (Compilation.defaultCallConvention
+		    < Compilation.CALL_WITH_CONSUMER))
 	      {
 		plainArgs = i;
 		defaultStart = plainArgs - min_args;
@@ -1251,7 +1278,7 @@ public class LambdaExp extends ScopeExp
     for (LambdaExp child = firstChild;  child != null; )
       {
 	if (! child.getCanRead() && ! child.getInlineOnly()
-	    && ! child.isHandlingTailCalls())
+	    && child.getCallConvention () < Compilation.CALL_WITH_CONSUMER)
 	  {
 	    child.compileAsMethod(comp);
 	  }
@@ -1366,7 +1393,7 @@ public class LambdaExp extends ScopeExp
   public void compileBody (Compilation comp)
   {
     Target target;
-    if (isHandlingTailCalls())
+    if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
       target = ConsumerTarget.makeContextTarget(comp);
     else
       target = Target.pushValue(getReturnType());

@@ -9,6 +9,7 @@ import java.io.*;
 import kawa.Shell;
 import gnu.text.*;
 import java.util.zip.*;
+import java.util.Stack;
 // import java.util.jar.*; // Java2
 
 public class Compilation
@@ -33,8 +34,23 @@ public class Compilation
   /** If true, print out final expressions after optimizations etc. */
   public static boolean debugPrintFinalExpr;
 
-  public static boolean usingCPStyle;
-  public static boolean usingTailCalls = false;
+  /** The default calling convention.
+   * One of the following CALL_WITHG_xxx values. */
+  public static int defaultCallConvention;
+  public static final int CALL_WITH_UNSPECIFIED = 0;
+  /** Plain calling convention, using regular Java parameters and returns. */
+  public static final int CALL_WITH_RETURN = 1;
+  /** Function results are written to the current CallContext's Consumer. */
+  public static final int CALL_WITH_CONSUMER = 2;
+  /** Like CALL_WITH_CONSUMER, but handle full on-stack-growing tail-calls. */
+  public static final int CALL_WITH_TAILCALLS = 3;
+  /** Support for full continuations.  Not implemented. */
+  public static final int CALL_WITH_CONTINUATIONS = 4;
+
+  public static boolean usingCPStyle()
+  { return defaultCallConvention == CALL_WITH_CONTINUATIONS; }
+  public boolean usingTailCalls()
+  { return defaultCallConvention >= CALL_WITH_TAILCALLS; }
 
   /** If moduleStatic > 0, (module-static #t) is implied by default.
    * If moduleStatic < 0, (module-static #f) is implied by default. */
@@ -294,7 +310,8 @@ public class Compilation
 
   public static final ClassType getMethodProcType(ClassType modClass)
   {
-    return usingTailCalls ? typeCpsMethodProc
+    return defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
+      ? typeCpsMethodProc
       : modClass.getSuperclass().isSubtype(typeProcedure) ? typeModuleMethod
       : typeApplyMethodProc;
   }
@@ -1089,13 +1106,14 @@ public class Compilation
     boolean generateApplyMethodContainer
       = ! (curClass.getSuperclass().isSubtype(typeProcedure));
     ClassType procType = getMethodProcType(curClass);
-    if (Compilation.usingTailCalls)
+    if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
       curClass.addInterface(typeCpsMethodContainer);
     else if (generateApplyMethodContainer)
       curClass.addInterface(typeApplyMethodContainer);
     Method save_method = method;
     CodeAttr code = null;
-    for (int i = Compilation.usingTailCalls ? 5 : 0;  i < 6; i++)
+    for (int i = defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
+	   ? 5 : 0;  i < 6; i++)
       {
 	// If i < 5, generate the method named ("apply"+i);
 	// else generate "applyN".
@@ -1112,7 +1130,7 @@ public class Compilation
 	    Method[] primMethods = source.primMethods;
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
-	      || Compilation.usingTailCalls
+	      || defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
 	      || source.max_args >= source.min_args + numMethods;
 	    int methodIndex;
 	    boolean skipThisProc = false;
@@ -1144,7 +1162,7 @@ public class Compilation
 		    for (int k = i;  k > 0;  k--)
 		      applyArgs[k] = typeObject;
 		  }
-		else if (Compilation.usingTailCalls)
+		else if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
 		  {
 		    mname = "apply";
 		    applyArgs = new Type[2];
@@ -1158,7 +1176,7 @@ public class Compilation
 		  }
 		applyArgs[0] = procType;
 		method = curClass.addMethod (mname, applyArgs,
-					     Compilation.usingTailCalls ? (Type) Type.void_type : (Type) Type.pointer_type,
+					     defaultCallConvention >= Compilation.CALL_WITH_CONSUMER ? (Type) Type.void_type : (Type) Type.pointer_type,
 					     Access.PUBLIC);
 		code = method.startCode();
 
@@ -1298,7 +1316,7 @@ public class Compilation
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
-	    if (! usingTailCalls)
+	    if (defaultCallConvention < Compilation.CALL_WITH_CONSUMER)
 	      Target.pushObject.compileFromStack(this,
 						 source.getReturnType());
 	    code.emitReturn();
@@ -1306,7 +1324,7 @@ public class Compilation
 	if (needThisApply)
 	  {
 	    aswitch.addDefault(code);
-	    if (usingTailCalls)
+	    if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
 	      {
 		code.emitLoad(code.getArg(1));
 		Method errMethod
@@ -1598,9 +1616,6 @@ public class Compilation
     return new_class;
   }
 
-  public static boolean usingCPStyle() { return usingCPStyle; }
-  public boolean usingTailCalls() { return usingTailCalls; }
-
   int localFieldIndex; 
   public Field allocLocalField (Type type, String name)
   {
@@ -1614,7 +1629,7 @@ public class Compilation
   public final void loadCallContext()
   {
     CodeAttr code = getCode();
-    if (curLambda.isHandlingTailCalls())
+    if (curLambda.getCallConvention() >= CALL_WITH_CONSUMER)
       {
 	Variable var = curLambda.scope.lookup("$ctx");
 	if (var != null && var.getType() == typeCallContext)
@@ -1755,6 +1770,135 @@ public class Compilation
   public void setLine(String filename, int line, int column)
   {
     messages.setLine(filename, line, column);
+  }
+
+  /** A help vector for building expressions. */
+  public Stack exprStack;
+
+  public void letStart ()
+  {
+    LetExp let = new LetExp(null);
+    let.outer = current_scope;
+    System.err.println("letStart "+let+" pushed:"+current_scope);
+    current_scope = let;
+  }
+
+  public Declaration letVariable (Object name, Type type, Expression init)
+  {
+    LetExp let = (LetExp) current_scope;
+    Declaration decl = let.addDeclaration(name, type);
+    decl.noteValue(init);
+    return decl;
+  }
+
+  public void letEnter ()
+  {
+    LetExp let = (LetExp) current_scope;
+    int ndecls = let.countDecls();
+    Expression[] inits = new Expression[ndecls];
+    int i = 0;
+    for (Declaration decl = let.firstDecl();
+	 decl != null;
+	 decl = decl.nextDecl())
+      inits[i++] = decl.getValue();
+    let.inits = inits;
+    lexical.push(let);
+  }
+
+  public LetExp letDone (Expression body)
+  {
+    LetExp let = (LetExp) current_scope;
+    let.body = body;
+    pop(let);
+    System.err.println("letDone "+let+" outer:"+current_scope);
+    return let;
+  }
+
+  private void checkLoop()
+  {
+    if (((LambdaExp) current_scope).getName() != "%do%loop")
+      throw new Error("internal error - bad loop state");
+  }
+
+  /** Start a new loop.
+   * (We could make this implied by the first loopVaribale call ???) */
+  public void loopStart()
+  {
+    LambdaExp loopLambda = new LambdaExp();
+    Expression[] inits = { loopLambda };
+    LetExp let = new LetExp(inits);
+    String fname = "%do%loop";
+    Declaration fdecl = let.addDeclaration(fname);
+    fdecl.noteValue(loopLambda);
+    loopLambda.setName(fname);
+    let.outer = current_scope;
+    loopLambda.outer = let;
+    current_scope = loopLambda;
+  }
+
+  public Declaration loopVariable(Object name, Type type, Expression init)
+  {
+    checkLoop();
+    LambdaExp loopLambda = (LambdaExp) current_scope;
+    Declaration decl = loopLambda.addDeclaration(name, type);
+    if (exprStack == null)
+      exprStack = new Stack();
+    exprStack.push(init);
+    loopLambda.min_args++;
+    return decl;
+  }
+
+  /** Done handling loop variables, and pushes them into the lexical scope.
+   * Ready to parse the loop condition. */ 
+  public void loopEnter ()
+  {
+    checkLoop();
+    LambdaExp loopLambda = (LambdaExp) current_scope;
+    int ninits = loopLambda.min_args;
+    loopLambda.max_args = ninits;
+    Expression[] inits = new Expression[ninits];
+    for (int i = ninits;  --i >= 0; )
+      inits[i] = (Expression) exprStack.pop();
+    LetExp let = (LetExp) loopLambda.outer;
+    Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
+    let.setBody(new ApplyExp(new ReferenceExp(fdecl), inits));
+    lexical.push(loopLambda);
+  }
+  public void loopCond(Expression cond)
+  {
+    checkLoop();
+    exprStack.push(cond);
+  }
+  public void loopBody(Expression body)
+  {
+    LambdaExp loopLambda = (LambdaExp) current_scope;
+    loopLambda.body = body;
+  }
+  public Expression loopRepeat(Expression[] exps)
+  {
+    LambdaExp loopLambda = (LambdaExp) current_scope;
+    ScopeExp let = loopLambda.outer;
+    Declaration fdecl = let.firstDecl();  // The decls for loopLambda.
+    Expression[] letInits = { loopLambda };
+    Expression cond = (Expression) exprStack.pop();
+    Expression recurse = new ApplyExp(new ReferenceExp(fdecl), exps);
+    loopLambda.body = new IfExp(cond,
+				new BeginExp(loopLambda.body, recurse),
+				QuoteExp.voidExp);
+    lexical.pop(loopLambda);
+    current_scope = let.outer;
+    return let;
+  }
+
+  public Expression loopRepeat ()
+  {
+    return loopRepeat(Expression.noExpressions);
+  }
+
+  public Expression loopRepeat (Expression exp)
+  {
+    Expression[] args = { exp };
+    return loopRepeat(args);
   }
 
   /** Current lexical scope - map name to Declaration. */

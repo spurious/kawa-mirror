@@ -1,5 +1,19 @@
 2003-09-04  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (defaultCallConvention):  New static field.
+	(CALL_WITH_UNSPECIFIED, CALL_WITH_RETURN, CALL_WITH_CONSUMER,
+	CALL_WITH_TAILCALLS, CALL_WITH_CONTINUATIONS):  New constants.
+	CALL_WITH_CONSUMER is a new API, new default for XQuery and ModuleExps.
+	(usingCPStyle, usingTailCalls):  Remove static fields.
+	* Compilation.java, ApplyExp.java, FindCapturedVars.java,
+	LambdaExp.java, ObjectExp.java:  Update accordingly.
+	* LambdaExp.java (getCallConvention):  New method.
+
+	* Compilation.java (letStart, letVariable, letEnter, letDone):
+	New helper methods for constructing a LetExp.
+	(loopStart, loopVariable, loopEnter, loopCond, loopBody, loopRepeat):
+	New helper methods for constructing a for-style loop.
+
 	* InlineCalls.java (getCompilation):  Move method to base class.
 	* ExpWalker.java (getCompilation):  Moved method.
 

@@ -12,7 +12,7 @@ java_sources=\
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \
   IndirectConstraint.java \
-  CallFrame.java CallContext.java CpsProcedure.java \
+  CallFrame.java CpsProcedure.java \
   CpsMethodContainer.java CpsMethodProc.java \
   Environment.java \
   FluidBinding.java \
@@ -72,7 +72,7 @@ CallContext.java: $(srcdir)/CallContext.java.in
 
 BUILT_SOURCES = $(java_BUILT)
 java_Java= $(java_BUILT) $(java_sources)
-EXTRA_DIST = $(java_sources) package.html
+EXTRA_DIST = package.html $(java_BUILT)
 
 PACKAGE_FNAME = gnu-mapping
 GCJ_INPUTS =  $(java_Java)

@@ -190,8 +190,10 @@ public class Shell
 			  InPort inp, Consumer out, OutPort perr)
   {
     SourceMessages messages = new SourceMessages();
+    Lexer lexer = interp.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
     boolean interactive = inp instanceof TtyInPort;
+    lexer.setInteractive(interactive);
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
     if (out != null)
@@ -206,7 +208,7 @@ public class Shell
 	    int opts = Interpreter.PARSE_IMMEDIATE|Interpreter.PARSE_ONE_LINE;
 	    try
 	      {
-		Compilation comp = interp.parse(inp, messages, opts);
+		Compilation comp = interp.parse(lexer, opts);
 		if (comp == null) // ??? end-of-file
 		  break;
 		comp.getModule().setName("atInteractiveLevel");  // FIXME

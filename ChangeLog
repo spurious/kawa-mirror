@@ -1,3 +1,7 @@
+2003-11-08  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run):  Use new Interpreter.parse convention.
+
 2003-11-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define.java (rewriteForm):  Complain if not in <body>.

@@ -16,7 +16,7 @@
 (define (write-char ch #!optional
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))
-  (invoke port 'writeSchemeObject ch #f))
+  (invoke port 'writeChar (char->integer ch)))
 
 ;; SRFI-6
 (define (open-input-string (str :: <string>)) :: <input-port>

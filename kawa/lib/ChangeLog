@@ -1,3 +1,7 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* ports.scm (write-char):  Don't use writeSchemeObejct method.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* misc.scm (base-uri):  New function.

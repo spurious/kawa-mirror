@@ -13,6 +13,7 @@ import gnu.xquery.util.*;
 import gnu.xml.*;
 import gnu.kawa.reflect.ClassMethods;
 import gnu.text.Lexer;
+import gnu.text.SourceMessages;
 import java.util.Vector;
 import gnu.kawa.functions.ConstantFunction0;
 
@@ -50,31 +51,26 @@ public class XQuery extends Interpreter
     return gnu.xquery.util.BooleanValue.booleanValue(value);
   }
 
-  public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
+  public gnu.text.Lexer getLexer(InPort inp, SourceMessages messages)
   {
     XQParser parser = new XQParser(inp, messages);
     parser.interpreter = this;
     return parser;
   }
 
-  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
-			   int options)
+  public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(this, messages);
+    Compilation tr = new Compilation(this, lexer.getMessages());
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     tr.mustCompileHere();
     ModuleExp mexp = new ModuleExp();
-    mexp.setFile(port.getName());
+    mexp.setFile(lexer.getName());
     tr.push(mexp);
-    XQParser lexer = (XQParser) getLexer(port, messages);
-    lexer.nesting = 1;
     if ((options & PARSE_ONE_LINE) != 0)
       {
-	if (port instanceof TtyInPort)
-	  lexer.setInteractive(true);
-	Expression sexp = lexer.parse(tr);
+	Expression sexp = ((XQParser) lexer).parse(tr);
 	if (sexp == null)
 	  return null;
 	mexp.body = sexp;
@@ -84,7 +80,7 @@ public class XQuery extends Interpreter
 	Vector exps = new Vector(10);
 	for (;;)
 	  {
-	    Expression sexp = lexer.parse(tr);
+	    Expression sexp = ((XQParser) lexer).parse(tr);
 	    if (sexp == null)
 	      break;
 	    exps.addElement(sexp);

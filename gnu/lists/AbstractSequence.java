@@ -141,7 +141,7 @@ public abstract class AbstractSequence
     return -1;
   }
 
-  /** Get next matching child or descendent.
+  /** Get next matching child or descendent (ignoring attributes).
    * @param startPos starting position
    * @param predicate test to apply to selected elements
    * @param endPos stop before endPos

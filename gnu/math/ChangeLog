@@ -1,3 +1,8 @@
+Wed May  7 12:28:35 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* IntNum.java (power):  Handle overflow into sign bit.
+	* IntNum.java (doubleValue):  Fix thinko for 2-word case.
+
 Mon Mar 31 16:29:01 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* LICENSE:  New file - and new license!

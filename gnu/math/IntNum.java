@@ -775,6 +775,8 @@ public class IntNum extends RatNum implements Compilable
 	plen *= 2;
 	while (pow2[plen-1] == 0)  plen--;
       }
+    if (rwords[rlen-1] < 0)
+      rlen++;
     if (negative)
       negate (rwords, rwords, rlen);
     return IntNum.make (rwords, rlen);
@@ -1148,7 +1150,7 @@ public class IntNum extends RatNum implements Compilable
   {
     if (words == null)
       return (double) ival;
-    if (ival < 2)
+    if (ival <= 2)
       return (double) longValue ();
 
     int il = MPN.intLength (words, ival) + 1;

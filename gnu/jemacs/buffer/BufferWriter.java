@@ -25,10 +25,10 @@ public class BufferWriter extends java.io. Writer
   public synchronized void write(int x)
   {
     boolean mustAdjustPoint
-      = adjustPoint && marker.getDot() == marker.buffer.getDot();
+      = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert((char) x, 1, style);
     if (mustAdjustPoint)
-      marker.buffer.setDot(marker.getDot());
+      marker.buffer.setDot(marker.getOffset());
   }
 
   public synchronized void write (char[] data, int off, int len)
@@ -36,10 +36,10 @@ public class BufferWriter extends java.io. Writer
     if (len == 0)
       return;
     boolean mustAdjustPoint
-      = adjustPoint && marker.getDot() == marker.buffer.getDot();
+      = adjustPoint && marker.getOffset() == marker.buffer.getDot();
     marker.insert(new String(data, off, len), style);
     if (mustAdjustPoint)
-      marker.buffer.setDot(marker.getDot());
+      marker.buffer.setDot(marker.getOffset());
   }
 
   public synchronized void flush()

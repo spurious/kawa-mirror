@@ -39,7 +39,7 @@ public class ReplBuffer extends Buffer
   {
     insert('\n', 1, null);
     int pos = getDot();
-    int markPos = processMark.getDot();
+    int markPos = processMark.getOffset();
     Segment segment = new Segment();
     try
       {

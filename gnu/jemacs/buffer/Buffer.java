@@ -43,6 +43,8 @@ public class Buffer
 
   public String getFileName() { return filename; }
 
+  public BufferContent getContent() { return content; }
+
   public void setFileName(String fname)
   {
     if (filename != null && fileBuffers.get(filename) == this)
@@ -178,6 +180,17 @@ public class Buffer
     setDot(i - 1);
   }
 
+  public int minDot()
+  {
+    return 0;
+  }
+
+  public int maxDot()
+  {
+    // Subtract 1 for the content's final "\n".
+    return content.length() - 1;
+  }
+
   public void forwardChar(int i)
   {
     if (curPosition != null)
@@ -212,6 +225,11 @@ public class Buffer
   public void insert (char ch, int count, Style style)
   {
     pointMarker.insert(ch, count, style);
+  }
+
+  public void deleteChar (int count)
+  {
+    pointMarker.deleteChar(count);
   }
 
   Marker pointMarker = makePointMarker();
@@ -288,5 +306,29 @@ public class Buffer
       {
         throw new RuntimeException("error reading file \""+filename+"\": "+ex);
       }
+  }
+
+  /** Search in BUF for COUNT instances of the character TARGET between START and END.
+   * If COUNT is positive, search forwards; END must be >= START.
+   * If COUNT is negative, search backwards for the -COUNTth instance;
+   *   END must be <= START.
+   * If COUNT is zero, do anything you please; run rogue, for all I care.
+   * If END is zero, use beginning or end of (FIXME: accessible part of)
+   * the buffer, as appropriate for the direction indicated by COUNT.
+   *
+   * If we find COUNT instances, SHORTAGE is zero, and return the
+   * position after the COUNTth match.  Note that for reverse motion
+   * this is not the same as the usual convention for Emacs motion commands.
+
+   * If we don't find COUNT instances before reaching END, set SHORTAGE
+   * to the number of TARGETs left unfound, and return (shortage<<32|END).
+   * @return (SHORTAGE<<32|POS)
+  */
+  public final long scan(char target, int start, int end,
+                   int count, boolean allowQuit)
+  {
+    if (end == 0)
+      end = count > 0 ? content.length() - 1 : 0;
+    return content.scan(target, start, end, count, allowQuit);
   }
 }

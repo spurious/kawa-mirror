@@ -1,7 +1,7 @@
 package gnu.jemacs.buffer;
 import javax.swing.text.*;
 
-public final class Marker
+public final class Marker implements Position
 {
   Buffer buffer;
 
@@ -14,6 +14,8 @@ public final class Marker
   {
   }
 
+  static final int EMACS_MARK_KIND = BufferContent.EMACS_MARK_KIND;
+
   public Marker(Marker marker)
   {
     buffer = marker.buffer;
@@ -23,7 +25,7 @@ public final class Marker
         if (marker.index >= 0)
           index = content.allocateFromPosition(content.indexes[marker.index]);
         else
-          index = content.allocatePosition(marker.getDot(), 1);
+          index = content.allocatePosition(marker.getOffset(),EMACS_MARK_KIND);
       }
   }
 
@@ -33,23 +35,18 @@ public final class Marker
       buffer.content.freePosition(index);
   }
 
-  public int getDot()
+  public int getOffset()
   {
     if (buffer == null)
       return -1;
     else if (index == POINT_POSITION_INDEX)
       return buffer.getDot();
-    if (buffer.content == null || buffer.content.positions == null)
-      {
-         new Error("BAD getDot index:"+index).printStackTrace(System.err);
-        System.exit(-1);
-      }
-      return buffer.content.positions[buffer.content.indexes[index]];
+    return buffer.content.positions[buffer.content.indexes[index]];
   }
 
   public int getPoint()
   {
-    return 1 + getDot();
+    return 1 + getOffset();
   }
 
   public Buffer getBuffer()
@@ -97,19 +94,39 @@ public final class Marker
           }
         int newIndex;
         if (buffer == newBuffer)
-          newIndex = buffer.content.allocatePositionIndex(newPosition, 1);
+          newIndex = buffer.content.allocatePositionIndex(newPosition,
+                                                          EMACS_MARK_KIND);
         else
           {
             buffer = newBuffer;
-            newIndex = buffer.content.allocatePosition(newPosition, 1);
+            newIndex = buffer.content.allocatePosition(newPosition,
+                                                       EMACS_MARK_KIND);
           }
         buffer.content.indexes[index] = newIndex;
       }
   }
 
+  public void deleteChar(int count)
+  {
+    int point = getOffset();
+    try
+      {
+        if (count < 0)
+          {
+            point += count;
+            count = - count;
+          }
+        buffer.document.remove(point, count);
+      }
+    catch (javax.swing.text.BadLocationException ex)
+      {
+        throw new Error("bad location: "+ex);
+      }
+  }
+
   public void insert (String string, Style style)
   {
-    int point = getDot();
+    int point = getOffset();
     try
       {
         buffer.document.insertString(point, string, style);
@@ -132,7 +149,7 @@ public final class Marker
     for (int i = todo;  --i >= 0; )
       sbuf.append(ch);
     String str = sbuf.toString();
-    int point = getDot();
+    int point = getOffset();
     for (;;)
       {
 	try
@@ -161,7 +178,7 @@ public final class Marker
   {
     if (buffer == null)
       return 0;
-    return buffer.hashCode() ^ getDot();
+    return buffer.hashCode() ^ getOffset();
   }
 
   public boolean equals (Object other)
@@ -169,7 +186,7 @@ public final class Marker
     if (! (other instanceof Marker))
       return false;
     Marker m2 = (Marker) other;
-    return buffer == m2.buffer && getDot() == m2.getDot();
+    return buffer == m2.buffer && getOffset() == m2.getOffset();
   }
 
   public String toString()

@@ -1,3 +1,30 @@
+1999-12-06  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (getContent, minDot, maxDot, deleteChar, scan):  New.
+	* BufferContent.java:  No longer extends GapContent;  now just
+	implements AbstractDocument.Content.
+	(BEFORE_MARK_KIND, EMACS_MARK_KIND, AFTER_MARK_KIND):  New "enums".
+	(array, gapStart, gapEnd):  New fields for buffer-gap implementation.
+	(<init>):  New constructors.
+	(allocatePositionIndex):  Fix off-by-one-errors.
+	Also, we need to adjust indexes array if a new position was inserted.
+	(shiftGap, length, charAt, getChars, getString, gapReserve,
+	createPosition, dump):  New methods.
+	(indexOf, lastIndexOf):  New static helper methods.
+	(scan):  New method, converted from XEmacs.
+	(GapPosition):  New class.
+	(GapUndoableEdit):  New class.
+	* Emacs.java (checkQuit):  New method.
+	* Marker.java:  Now implements java.swing.text.Position.
+	(getDot):  Renamed to getOffset, for compatibility with Position.
+	(EMACS_MARK_KIND):  New "enum".  Use it various places.
+	(deleteChar):  New method.
+	* BufferWriter.java, ReplBuffer.java:  Update getDot -> getOffset.
+	* emacs.scm:  Use new <buffer> type specifier.
+	(point-min, point-max, buffer-end, buffer-size, point-at-bol,
+ 	point-at-eol, beginning-of-line, end-of-line, forward-line,
+	delete-char):  New procedures.
+
 1999-11-18  Per Bothner  <per@bothner.com>
 
 	* emacs.scm:  In various places, fix <gnu.jemacs.text.Marker>

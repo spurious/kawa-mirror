@@ -8,7 +8,7 @@
 
 ;;; READ AND PRINT
 
-(define (open-output-buffer (buffer <gnu.jemacs.buffer.Buffer>))
+(define (open-output-buffer (buffer <buffer>))
   (make <gnu.jemacs.buffer.BufferWriter> buffer))
 
 (define (open-output-marker (marker <gnu.jemacs.buffer.Marker>))
@@ -40,13 +40,13 @@
   global-map)
 
 (define (current-local-map #!optional (buffer (current-buffer)))
-  (invoke (field (as <gnu.jemacs.buffer.Buffer> buffer) 'keymap)
+  (invoke (field (as <buffer> buffer) 'keymap)
           'getLocalKeymap))
 
 (define (use-local-map keymap #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "setLocalKeymap"
                              <void> (<javax.swing.text.Keymap>))
-   ((primitive-get-field <gnu.jemacs.buffer.Buffer> "keymap"
+   ((primitive-get-field <buffer> "keymap"
                          <gnu.jemacs.buffer.BufferKeymap>)
     buffer)
    keymap))
@@ -71,13 +71,13 @@
 
 (define (find-file-noselect
          #!optional (filename (read-from-minibuffer "Find file: ")))
-  ((primitive-static-method <gnu.jemacs.buffer.Buffer> "findFile"
-                            <gnu.jemacs.buffer.Buffer> (<String>))
+  ((primitive-static-method <buffer> "findFile"
+                            <buffer> (<String>))
    filename))
 
 (define (save-buffer #!optional (buffer (current-buffer)))
   (if (buffer-file-name buffer)
-      ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "save" <void> ())
+      ((primitive-virtual-method <buffer> "save" <void> ())
        (current-buffer))
       (write-file (read-from-minibuffer "File to save in: ") buffer)))
 
@@ -87,39 +87,39 @@
   (save-buffer buffer))
 
 (define (insert-file filename #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "insertFile"
+  ((primitive-virtual-method <buffer> "insertFile"
                              <void> (<String>))
    buffer filename))
 
 ;;; BUFFERS
 
 (define (current-buffer)
-  (invoke-static <gnu.jemacs.buffer.Buffer> 'getCurrent))
+  (invoke-static <buffer> 'getCurrent))
 
 ;; Emacs allows a buffer name as well as a buffer.
 (define (set-buffer buffer)
-  (invoke-static <gnu.jemacs.buffer.Buffer> 'setCurrent buffer))
+  (invoke-static <buffer> 'setCurrent buffer))
 
 ;; Emacs returns an Emacs string, not a Java string. 
 (define (buffer-name #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "getName"
+  ((primitive-virtual-method <buffer> "getName"
 			       <String> ())
    buffer))
 
 
 (define (get-buffer buffer-or-name)
-  ((primitive-static-method  <gnu.jemacs.buffer.Buffer> "coerceBuffer"
-			     <gnu.jemacs.buffer.Buffer> (<object>))
+  ((primitive-static-method  <buffer> "coerceBuffer"
+			     <buffer> (<object>))
    buffer-or-name))
 
 (define (generate-new-buffer-name starting-name)
-  ((primitive-static-method <gnu.jemacs.buffer.Buffer> "generateNewBufferName"
+  ((primitive-static-method <buffer> "generateNewBufferName"
 			    <String> (<String>))
    starting-name))
 
 (define (buffer-file-name #!optional (buffer (current-buffer)))
   (let ((name
-         ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "getFileName"
+         ((primitive-virtual-method <buffer> "getFileName"
                                     <java.lang.String> ())
           buffer)))
     (if (eq? name #!null)
@@ -127,21 +127,21 @@
         (symbol->string name))))
 
 (define (set-visited-file-name filename #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "setFileName" <void>
+  ((primitive-virtual-method <buffer> "setFileName" <void>
                              (<String>))
    buffer filename))
 
 (define (get-buffer-create name)
   (let ((buf
-	 ((primitive-static-method  <gnu.jemacs.buffer.Buffer> "getBuffer"
-				    <gnu.jemacs.buffer.Buffer> (<String>))
+	 ((primitive-static-method  <buffer> "getBuffer"
+				    <buffer> (<String>))
 	  name)))
     (if (eq? buf #!null)
-	((primitive-constructor <gnu.jemacs.buffer.Buffer> (<String>)) name)
+	((primitive-constructor <buffer> (<String>)) name)
 	buf)))
 
 (define (generate-new-buffer name)
-  ((primitive-constructor <gnu.jemacs.buffer.Buffer> (<String>))
+  ((primitive-constructor <buffer> (<String>))
    (generate-new-buffer-name name)))
 
 ;;; WINDOWS
@@ -196,7 +196,7 @@
 
 (define (window-buffer #!optional (window (selected-window)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "getBuffer"
-			    <gnu.jemacs.buffer.Buffer> ())
+			    <buffer> ())
    window))
 
 (define (switch-to-buffer
@@ -209,7 +209,7 @@
 
 (define (set-window-buffer window buffer)
   ((primitive-virtual-method <gnu.jemacs.buffer.Window> "setBuffer"
-			    <void> (<gnu.jemacs.buffer.Buffer>))
+			    <void> (<buffer>))
    window (get-buffer buffer)))
 
 (define (window-point window)
@@ -223,7 +223,7 @@
 ;;; FRAMES
 
 (define (make-frame #!optional (buffer (current-buffer)))
-  ((primitive-constructor <gnu.jemacs.buffer.Frame> (<gnu.jemacs.buffer.Buffer>))
+  ((primitive-constructor <gnu.jemacs.buffer.Frame> (<buffer>))
    buffer))
 
 (define (delete-frame #!optional (frame (selected-frame)))
@@ -251,20 +251,88 @@
 ;;; POSITIONS
 
 (define (point #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "getPoint" <int> ())
+  ((primitive-virtual-method <buffer> "getPoint" <int> ())
    buffer))
 
-(define (goto-char position #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "setPoint" <void> (<int>))
-   buffer position))
+(define (point-min #!optional (buffer :: <buffer> (current-buffer)))
+  (+ (invoke buffer 'minDot) 1))
+
+(define (point-max #!optional (buffer :: <buffer> (current-buffer)))
+  (+ (invoke buffer 'maxDot) 1))
+
+(define (buffer-end flag #!optional (buffer :: <buffer> (current-buffer)))
+  ((if (<= flag 0) point-min point-max) buffer))
+
+(define (buffer-size #!optional (buffer :: <buffer> (current-buffer)))
+  (- (invoke buffer 'maxDot) (invoke buffer 'minDot)))
+
+(define (goto-char position #!optional (buffer :: <buffer> (current-buffer)))
+  (invoke buffer 'setPoint position))
 
 (define (forward-char #!optional (count 1) (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "forwardChar" <void> (<int>))
+  ((primitive-virtual-method <buffer> "forwardChar" <void> (<int>))
    buffer count))
 
 (define (backward-char #!optional (count 1) (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "backwardChar" <void> (<int>))
+  ((primitive-virtual-method <buffer> "backwardChar" <void> (<int>))
    buffer count))
+
+(define (point-at-bol
+         #!optional
+         (n  :: <int> 1)
+         (buffer  :: <buffer> (current-buffer)))
+  <int>
+  (let* ((orig (point buffer))
+         (shortage (forward-line (- n 1) buffer))
+         (end (point buffer)))
+    (invoke buffer 'setPoint orig)
+    end))
+
+(define (point-at-eol #!optional (count  :: <int> 1)
+                      (buffer  :: <buffer> (current-buffer)))
+  <int>
+  (let* ((pos-shortage
+          (invoke buffer 'scan
+                  #\Newline (- (point buffer) 1)
+                  0 (- count (if (> count 0) 0 1)) #t))
+         (shortage (arithmetic-shift pos-shortage -32))
+         (pos (as <int> pos-shortage)))
+    (if (zero? shortage) pos (+ pos 1))))
+
+(define (beginning-of-line
+         #!optional
+         (n  :: <int> 1)
+         (buffer :: <buffer> (current-buffer))) <void>
+  (invoke buffer 'setPoint (point-at-bol n buffer)))
+
+(define (end-of-line #!optional
+                     (n :: <int> 1)
+                     (buffer :: <buffer> (current-buffer)))
+  <void>
+  (invoke buffer 'setPoint (point-at-eol n buffer)))
+
+(define (forward-line #!optional
+                      (count :: <int> 1)
+                      (buffer :: <buffer> (current-buffer)))
+  (let* ((content :: <gnu.jemacs.buffer.BufferContent>
+                  (invoke buffer 'getContent))
+         (negp (<= count 0))
+         (pos2 (invoke buffer 'getDot))
+         (pos-shortage
+          (invoke buffer 'scan
+                  #\Newline pos2 0
+                  (- count (if negp 1 0)) #t))
+         (shortage (arithmetic-shift pos-shortage -32))
+         (pos (as <int> pos-shortage)))
+    (if (and (> shortage 0)
+             (or negp
+                 (and (> (invoke buffer 'maxDot) (invoke buffer 'minDot))
+                      (not (= pos pos2))
+                      (not (char=? #\Newline
+                                   (invoke content 'charAt (- pos 1)))))))
+        (set! shortage (- shortage 1)))
+    (invoke buffer 'setDot pos)
+    (if negp (- shortage) shortage)))
 
 ;;; MARKERS
 
@@ -272,7 +340,7 @@
   (make <gnu.jemacs.buffer.Marker>))
 
 (define (point-marker #!optional (share #f) (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "getPointMarker"
+  ((primitive-virtual-method <buffer> "getPointMarker"
                              <gnu.jemacs.buffer.Marker> (<boolean>))
    buffer share))
 
@@ -290,25 +358,31 @@
 
 (define (marker-buffer (marker <gnu.jemacs.buffer.Marker>))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "getBuffer"
-                             <gnu.jemacs.buffer.Buffer> ())
+                             <buffer> ())
    marker))
 
 (define (set-marker (marker <gnu.jemacs.buffer.Marker>) position
                     #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "set" <void>
-                             (<gnu.jemacs.buffer.Buffer> <int>))
+                             (<buffer> <int>))
    marker buffer (- position 1)))
 
 ;;; TEXT
 
 (define (insert-char ch count #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "insert" <void>
+  ((primitive-virtual-method <buffer> "insert" <void>
 			     (<char> <int> <javax.swing.text.Style>))
    buffer ch count #!null))
 
+(define (delete-char #!optional (count 1) killp (buffer (current-buffer)))
+  (invoke (as <buffer> buffer) 'deleteChar count))
+
 ;;; DEFAULT BINDINGS
 
+(define-key global-map "\C-a" beginning-of-line)
 (define-key global-map "\C-b" backward-char)
+(define-key global-map "\C-d" delete-char)
+(define-key global-map "\C-e" end-of-line)
 (define-key global-map "\C-f" forward-char)
 (define-key global-map "\C-x\C-s" save-buffer)
 (define-key global-map "\C-x\C-w" write-file)
@@ -319,9 +393,9 @@
 (define-key global-map "\C-xb" switch-to-buffer)
 (define-key global-map "\C-xi" insert-file)
 (define-key global-map "\C-x\C-f" find-file)
+(define-key global-map "\C-x50" delete-frame)
 (define-key global-map "\C-x52" make-frame)
 (define-key global-map "\C-xo" other-window)
-(define-key global-map "\C-x50" delete-frame)
 
 (define (emacs)
   (set-buffer (get-buffer-create "*scratch*"))

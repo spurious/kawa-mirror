@@ -467,27 +467,6 @@ public class Compilation
   }
 
 
-  private void emitLiterals(Method emitLiteralsMethod)
-  {
-    method = emitLiteralsMethod;
-    // We need to startCode even if there are no literals,
-    // once we've created the emitLiteralsMethod.
-    CodeAttr code = method.startCode();
-    if (litTable.literalsChain != null)
-      {
-	try
-	  {
-	    litTable.emit();
-	  }
-	catch (Throwable ex)
-	  {
-	    error('e', "Literals: Internal error:" + ex);
-	    ex.printStackTrace(System.err);
-	  }
-      }
-    code.emitReturn();
-  }
-
   private void dumpInitializers (Initializer inits)
   {
     for (Initializer init = Initializer.reverse(inits);
@@ -1683,13 +1662,15 @@ public class Compilation
         ex.printStackTrace(System.err);
         System.exit(-1);
       }
-    Method emitLiteralsMethod = null;
+    Label startLiterals = null;
+    Label afterLiterals = null;
+    Method initMethod = null;
 
     if (curClass == mainClass)
       {
 	Method save_method = method;
 
-	startClassInit();
+	initMethod = startClassInit();
 	code = getCode();
 	if (staticModule)
 	  {
@@ -1700,10 +1681,9 @@ public class Compilation
 	  }
 	if (! immediate)
 	  {
-	    emitLiteralsMethod
-	      = curClass.addMethod("$literals$", Access.PRIVATE|Access.STATIC,
-				   Type.typeArray0, Type.void_type);
-	    code.emitInvokeStatic(emitLiteralsMethod);
+	    startLiterals = new Label(code);
+	    afterLiterals = new Label(code);
+	    code.fixupChain(afterLiterals, startLiterals);
 	  }
 	dumpInitializers(clinitChain);
 
@@ -1732,8 +1712,24 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (emitLiteralsMethod != null)
-      emitLiterals(emitLiteralsMethod);
+    if (startLiterals != null)
+      {
+	method = initMethod;
+	code = getCode();
+
+	Label endLiterals = new Label(code);
+	code.fixupChain(startLiterals, endLiterals);
+
+	try
+	  {
+	    litTable.emit();
+	  }
+	catch (Throwable ex)
+	  {
+	    error('e', "Literals: Internal error:" + ex);
+	  }
+	code.fixupChain(endLiterals, afterLiterals);
+      }
 
     if (generateMain && curClass == mainClass)
       {

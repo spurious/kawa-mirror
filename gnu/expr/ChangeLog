@@ -1,5 +1,9 @@
 2004-07-31  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (emitLiterals):  Inline and remove method.
+	(addClass):  Use new fixupChain methods.
+	This removes need for generating $literals$ method.
+
 	* CheckedTarget.java (emitCheckedCoerce):  Use new Label-based
 	addHandler.  Use new beginFragment/endFragment methods.
 

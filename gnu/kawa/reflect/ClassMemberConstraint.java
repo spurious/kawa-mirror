@@ -33,6 +33,12 @@ public class ClassMemberConstraint extends Constraint
     this.name = field.getName();
   }
 
+  public ClassMemberConstraint(java.lang.reflect.Field field)
+  {
+    this.rfield = field;
+    this.name = field.getName();
+  }
+
   void setup()
   {
     if (rfield == null)
@@ -103,4 +109,46 @@ public class ClassMemberConstraint extends Constraint
       }
   }
 
+  public static void define (String name, Object object,
+                             java.lang.reflect.Field field, Environment env)
+  {
+    if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
+      {
+	try
+	  {
+	    object = field.get(object);
+	  }
+	catch (Exception ex)
+	  {
+	    throw new WrappedException("error accessing field "+field, ex);
+	  }
+	if (object instanceof Named)
+	  name = ((Named) object).getName();
+	else if (object instanceof kawa.lang.Syntax) // FIXME
+	  name = ((kawa.lang.Syntax) object).getName();
+	else
+	  name = name.intern();
+	if (object instanceof Binding)
+	  env.addBinding((Binding) object);
+      }
+    else
+      {
+	Binding binding = new Binding(name);
+	setValue(binding, object);
+	setConstraint(binding, new ClassMemberConstraint(field));
+	env.addBinding(binding);
+      }
+  }
+
+  /** Import all the public fields of an object. */
+  public static void defineAll(Object object, Environment env)
+  {
+    Class clas = object.getClass();
+    java.lang.reflect.Field[] fields = clas.getFields();
+    for (int i = fields.length;  --i >= 0; )
+      {
+	java.lang.reflect.Field field = fields[i];
+	define(field.getName(), object, field, env);
+      }
+  }
 }

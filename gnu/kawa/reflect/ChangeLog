@@ -1,3 +1,8 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (<Init>(Field)):  New constructor.
+	(defineAll, define):  New static methods.
+
 1999-12-27  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (<init>):  New constructor.

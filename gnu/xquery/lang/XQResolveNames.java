@@ -45,6 +45,7 @@ public class XQResolveNames extends ResolveNames
 
   protected void push (ScopeExp exp)
   {
+    Compilation comp = getCompilation();
     for (Declaration decl = exp.firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
@@ -58,11 +59,10 @@ public class XQResolveNames extends ResolveNames
 	if (decl.isNamespaceDecl())
 	  continue;
 	Object name = decl.getSymbol();
+	boolean function = decl.isProcedureDecl();
 	if (name instanceof String)
 	  {
 	    int line = decl.getLine();
-	    Compilation comp = getCompilation();
-	    boolean function = decl.isProcedureDecl();
 	    if (line > 0 && comp != null)
 	      {
 		String saveFilename = comp.getFile();
@@ -77,6 +77,13 @@ public class XQResolveNames extends ResolveNames
 	    if (name != null)
 	      decl.setName(name);
 	  }
+
+	Declaration old = lookup.lookup(name, function);
+	if (old != null
+	    && (! (name instanceof Symbol)
+		|| ((Symbol) name).getEnvironment() != null))
+	  comp.error('w', decl, "declaration ",
+		     " hides previous declaration");
 	lookup.push(decl);
       }
   }

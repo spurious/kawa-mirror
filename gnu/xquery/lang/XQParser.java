@@ -29,13 +29,13 @@ public class XQParser extends LispReader // should be extends Lexer
   public static boolean warnOldVersion;
 
   /** The internal name of the variable containing '.', the context node. */
-  static final String DOT_VARNAME = "$dot$";
+  static final Symbol DOT_VARNAME = Symbol.make(null, "$dot$");
 
   /** The pseduo-function position() is mapped to a reference. */
-  static final String POSITION_VARNAME = "$position$";
+  static final Symbol POSITION_VARNAME = Symbol.make(null, "$position$");
 
   /** The pseduo-function last() is mapped to a reference to this variable. */
-  static final String LAST_VARNAME = "$last$";
+  static final Symbol LAST_VARNAME = Symbol.make(null, "$last$");
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -2424,7 +2424,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	Expression[] args = new Expression[vec.size()];
 
-	String varName = null;
+	Object varName = null;
 	if (name instanceof Symbol)
 	  {
 	    Symbol sym = (Symbol) name;

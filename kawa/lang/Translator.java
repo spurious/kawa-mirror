@@ -22,6 +22,9 @@ public class Translator extends Object
   public Environment current_decls;
   ScopeExp current_scope;
 
+  // This is null in JDK 1.1 and something else in JDK 1.2.
+  private ClassLoader systemClassLoader = getClass().getClassLoader();
+
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
   public ScopeExp currentScope() { return current_scope; }
@@ -250,7 +253,7 @@ public class Translator extends Object
 	      break tryDirectCall;
 	  }
 	Class procClass = proc.getClass();
-	if (procClass.getClassLoader() != null)
+	if (procClass.getClassLoader() != systemClassLoader)
 	  break tryDirectCall;
 	try
 	  {

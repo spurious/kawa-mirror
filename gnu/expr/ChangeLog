@@ -1,3 +1,12 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule):  Don't default module to static.
+
+	* ModuleBody.java (run()):  Use existing VoidConsumer instance.
+
+	* ModuleBody.java (run(Environment)):  Remove obsolete method.
+	(run(Consumer)):  Don't call run(Environment).
+
 2004-08-01  Per Bothner  <per@bothner.com>
 
 	Optimization in <clinit>:  Change $instance from field to variable.

@@ -3,7 +3,7 @@
 	* lists.scm (car, cdr)  Use syntactic trick to give name to getter
 	methods that are passed to define-procedure.
 	* misc.scm (procedure-property):  Likewise.
-	* ports.scm (port-line, input-port-line-number, input-port=promoter):
+	* ports.scm (port-line, input-port-line-number, input-port-prompter):
 	Likewise.
 	* vectors.scm (vector-ref):  Likewise.
 

@@ -1,4 +1,4 @@
-declare xmlspace = preserve
+declare xmlspace preserve;
 let $newline := "
 ",
 $result := (document("tab.xml")/result)

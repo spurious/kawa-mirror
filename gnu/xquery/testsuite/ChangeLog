@@ -1,3 +1,8 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* descend.xql:  Update for revised XQuery syntax.
+	* maketab1.xql:  Likewise.
+
 2003-09-18  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Two tests for absolute path expressions.

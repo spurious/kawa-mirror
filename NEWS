@@ -1,3 +1,16 @@
+Major re-write of the macro-handling and hygiene framework.
+Usable support for syntax-case; in fact some of the primitives (such as
+'if') are now implemented using syntax-case.
+(syntax FORM) (or the short-cut #!FORM) evaluates to a syntax object
+(define-syntax (mac x) tr) same as (define-syntax mac (lambda (x) tr))
+The following non-hygienic forms are equivalent:
+  (define-macro (MACRO-NAME (PARAM ...) TRANSFORMER)
+  (define-macro MACRO-NAME (lambda (PARAM ...) TRANSFORMER))
+  (defmac MACRO-NAME (PARAM ...) TRANSFORMER)
+Allow vectors and more general ellipsis-forms in patterns and templates.
+
+Added .xq and .xquery as XQuery file extensions, to match latest draft.
+
 A new configure switch --with-java-source=VERSION allows you to tweak
 the Kawa sources to match Java compiler and libraries you're using.
 The default (and how the sources are distributed) is "2" (for "Java 2"

@@ -98,7 +98,7 @@ kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = lang testsuite
+SUBDIRS = lang lisp testsuite
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in

@@ -1,3 +1,14 @@
+2001-04-07  Thomas Kirk  <tk@research.att.com>
+
+	* ZipLoader.java (loadAllClasses):  New method to force load
+	of all classes from the zip archive, close archive.
+	(close):  New Method to prevent leaking open ZipFiles when 
+	archive is not completely read.
+	(loadClass):  Reopen the zip file if it has been closed prematurely.
+
+	* ZipLoader.java (zipname):  New field to hold name of zipfile
+	in case it must be reopened.
+
 2001-03-29  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitTryStart):  If the stack needs to be saved,
@@ -17,7 +28,7 @@
 	* CodeAttr.java (assignConstants):  Handle CodeFragments, labels here.
 	* Method.java (assign_constants):  REname to assignConstants.
 
-2000-11-21  Brain R. Lewis <brlewis@users.sourceforge.net>
+2000-11-21  Brian R. Lewis <brlewis@users.sourceforge.net>
 
 	* ArrayClassLoader.java:  Handle custom classloader by using
 	Class.forName() instead of findSystemClass().

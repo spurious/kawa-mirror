@@ -1,3 +1,8 @@
+2002-04-19  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* ClassType.java (addMethods): Prevents addMethods to incorrectly list
+	twice the methods of the class.
+
 2002-04-18  Per Bothner  <per@bothner.com>
 
 	* ArrayClassLoader.java:  New default constructor.

@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
@@ -52,7 +55,7 @@ public class ReferenceExp extends Expression
   }
 
   private static ClassType thisType;
-  static ClassType ctypeBinding = null;
+  static ClassType typeLocation = null;
   static Method getMethod = null;
 
   public void compile (Compilation comp, Target target)
@@ -65,10 +68,10 @@ public class ReferenceExp extends Expression
 	binding.load(comp);
 	if (binding.isIndirectBinding() && ! getDontDereference())
 	  {
-	    if (ctypeBinding == null)
+	    if (typeLocation == null)
 	      {
-		ctypeBinding = ClassType.make("gnu.mapping.Binding");
-		getMethod = ctypeBinding.addMethod("get",
+		typeLocation = ClassType.make("gnu.mapping.Location");
+		getMethod = typeLocation.addMethod("get",
 						   Type.typeArray0,
 						   Compilation.scmObjectType,
 						   Access.PUBLIC|Access.FINAL);

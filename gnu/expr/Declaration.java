@@ -46,7 +46,7 @@ public class Declaration extends Variable
 
   /** The (interned) name of the new variable.
    * This is the source-level (non-mangled) name. */
-  String sym;
+  protected String sym;
 
   public final String symbol () { return sym; }
 
@@ -106,7 +106,7 @@ public class Declaration extends Variable
 
   /** If non-null, the single expression used to set this variable.
    * If the variable can be set more than once, then value is null. */
-  Expression value = QuoteExp.undefined_exp;
+  protected Expression value = QuoteExp.undefined_exp;
 
   public Expression getValue() { return value; }
 
@@ -185,6 +185,10 @@ public class Declaration extends Variable
           ((LambdaExp) this.value).nameDecl = null; 
 	this.value = null;
       }
+  }
+
+  protected Declaration()
+  {
   }
 
   public Declaration (String name)

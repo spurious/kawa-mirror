@@ -1,3 +1,6 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
@@ -66,7 +69,7 @@ public class SetExp extends Expression
     return Values.empty;
   }
 
-  static ClassType ctypeBinding = null;
+  static ClassType ctypeLocation = null;
   static Method setMethod = null;
 
   public void compile (Compilation comp, Target target)
@@ -80,17 +83,16 @@ public class SetExp extends Expression
       {
 	if (binding.ignorable())
 	  new_value.compile (comp, Target.Ignore);
-	else if (binding.isIndirectBinding())
+	else if (binding.isIndirectBinding() && ! isDefining())
 	  {
 	    binding.load(comp);
 	    new_value.compile (comp, Target.pushObject);
-	    if (ctypeBinding == null)
+	    if (ctypeLocation == null)
 	      {
-		ctypeBinding = ClassType.make("gnu.mapping.Binding");
-		setMethod = ctypeBinding.addMethod("set",
-						   Compilation.apply1args,
-						   Type.void_type,
-						   Access.PUBLIC|Access.FINAL);
+		ctypeLocation = ClassType.make("gnu.mapping.Location");
+		setMethod = ctypeLocation.addMethod
+                  ("set", Compilation.apply1args,
+                   Type.void_type, Access.PUBLIC|Access.FINAL);
 	      }
 	    code.emitInvokeVirtual (setMethod);
 	  }

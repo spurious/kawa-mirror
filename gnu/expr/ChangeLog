@@ -1,3 +1,11 @@
+1999-08-26  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (sym, value):  Make fields protected.
+	(<init>):  New protected empty constructor (for kawa.lang.Syntax).
+
+	* ReferenceExp.java (compile):  Indirect bindings are now Locations.
+	* SetExp.java (compile):  Likewise.
+
 1999-08-22  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (error):  New methods, like those in Translator.

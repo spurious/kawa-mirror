@@ -1,3 +1,7 @@
+2003-01-28  Per Bothner  <per@bothner.com>
+
+	* VariableProvider.java:  Removed - superceded more-or-less by XQuery.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* NamespaceResolver.java (beginAttribute):  Fix off-by-one error

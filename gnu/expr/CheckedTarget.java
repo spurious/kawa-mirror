@@ -103,13 +103,20 @@ public class CheckedTarget extends StackTarget
     initWrongType();
     int startPC = code.getPC();
     type.emitCoerceFromObject(code);
+
+    int endPC = code.getPC();
+    // If no cast was needed, no code has been generated.
+    // Thus endPC is equal to startPC and we can stop safely.
+    if (endPC == startPC)
+      return;
+
     Label endLabel = null;
     if (isInTry)
       {
         endLabel = new Label(code);
         code.emitGoto(endLabel);
+	endPC = code.getPC();
       }
-    int endPC = code.getPC();
     code.addHandler(startPC, endPC, isInTry ? endPC : -1,
                     typeClassCastException,
                     code.getConstants());

@@ -121,7 +121,7 @@
              (format #f "{arg1: ~s arg2: ~s}" arg1 arg2)))))
 
 (test "{arg1: 23 arg2: 12}" 'object-with-closure-3
-      (symbol->string ((document-filter 23) 12)))
+      (symbol->string (as <String> ((document-filter 23) 12))))
 
 (define i100 (force-eval make <integer> ival: 100))
 (define i200 (force-compile make <integer> ival: 200))

@@ -1,3 +1,7 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  symbol->string no longer coerces to <String>.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SOURCES):  Add module2.scm.

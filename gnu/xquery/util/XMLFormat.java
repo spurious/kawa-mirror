@@ -74,9 +74,9 @@ public class XMLFormat extends AbstractFormat
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
-    else if (obj instanceof Consumable && out instanceof PrintWriter)
+    else if (obj instanceof Consumable && out instanceof Consumer)
       //((Printable) obj).print((PrintWriter) out);
-      ((Consumable) out).consume(new gnu.xml.XMLPrinter((PrintWriter) out));
+      ((Consumable) out).consume(new gnu.xml.XMLPrinter((Consumer) out));
     else if (obj == null)
       ;
     else

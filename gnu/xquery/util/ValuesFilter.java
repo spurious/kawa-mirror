@@ -20,7 +20,19 @@ public class ValuesFilter extends CpsProcedure
     if (result instanceof SeqPosition)
       return true;
     if (result instanceof Values)
-      return ! ((Values) result).isEmpty();
+      {
+	Values values = (Values) result;
+	int index = 0;
+	for (;;)
+	  {
+	    int next = values.nextDataIndex(index);
+	    if (next < 0)
+	      return false;
+	    if (matches(values.getNext(index << 1, null), count))
+	      return true;
+	    index = next;
+	  }
+      }
     throw new Error("unimplemented condition type"); // FIXME
   }
 
@@ -28,7 +40,7 @@ public class ValuesFilter extends CpsProcedure
   {
     Object values = ctx.getNextArg();
     Procedure proc = (Procedure) ctx.getNextArg();
-    long count = 1;
+    long count = 0;
     int index = 0;
     Consumer out = ctx.consumer;
     for (;;)
@@ -37,9 +49,9 @@ public class ValuesFilter extends CpsProcedure
 	if (next < 0)
 	  break;
 	Object value = Values.nextValue(values, index);
+	count++;
 	if (matches(proc.apply1(value), count))
 	  out.writeObject(value);
-	count++;
 	index = next;
       }
   }

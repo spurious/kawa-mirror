@@ -1,5 +1,13 @@
 2001-11-06  Per Bothner  <per@bothner.com>
 
+	* StringValue.java:  Various fixes to actually make it work.
+	(string):  New static, to match function name "string".
+
+	* ValuesFilter.java (matches):  Handle multiple values better.
+	(apply):  Inceement count *before* calling matches.
+
+	* XMLFormat.java:  Update as XMLPrinter now takes a Consumer.
+
 	* Compare.java:  New class, extends Procedure2.
 	* Makefile.am (java_sources):  Add Compare.java.
 

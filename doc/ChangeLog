@@ -1,6 +1,14 @@
+2001-11-26  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Binary distribution):  Remove note about windows console.
+
+	* kawa.texi:  Merge in Ant instructions from Jim White.
+
+	* kawa.texi (Standard Types):  Update note on <String>.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
-	* Kawa.texi:  Document using Ant.  Remove makekawa.bat documentation.
+	* kawa.texi:  Document using Ant.  Remove makekawa.bat documentation.
 
 2001-11-12  Per Bothner  <per@bothner.com>
 

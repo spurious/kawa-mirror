@@ -1,7 +1,6 @@
 package gnu.text;
 import java.io.*;
 import java.util.Hashtable;
-import gnu.mapping.*;
 
 /**
  * A wrapper for characters.
@@ -20,7 +19,7 @@ import gnu.mapping.*;
  * Finally, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
-public class Char implements Printable, Externalizable
+public class Char implements Externalizable
 {
   // Leave open the possibility for characters beyond Unicode.
   int value;
@@ -154,6 +153,7 @@ public class Char implements Printable, Externalizable
   public String toString ()
   {
     StringBuffer buf = new StringBuffer();
+    new Error("Char.toString called").printStackTrace();
     buf.append("[Char '");
     if (value >= (int) ' ' && value < 127)
       buf.append((char) value);
@@ -190,17 +190,6 @@ public class Char implements Printable, Externalizable
     else
       sbuf.append((char) ch);
     return sbuf.toString();
-  }
-
-  public void print(PrintWriter ps)
-  {
-    boolean readable = (ps instanceof OutPort)
-      && ((OutPort)ps).printReadable;
-    char ch = charValue ();
-    if (readable)
-      ps.print(toScmReadableString(ch));
-    else
-      ps.print (ch);
   }
 
   /**

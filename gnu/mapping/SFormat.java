@@ -1,6 +1,7 @@
 package gnu.mapping;
 import java.io.CharArrayWriter;
 import gnu.lists.*;
+import gnu.text.Char;
 
 /** A Format to print structured objects on streams.
  * After JDK 1.1 comes out, this should be made compatible with
@@ -42,6 +43,14 @@ public class SFormat // extends gnu.text.ReportFormat
       ((Printable)obj).print(ps);
     else if (obj instanceof Boolean)
       ps.print(((Boolean)obj).booleanValue() ? "#t" : "#f");
+    else if (obj instanceof Char)
+      {
+	char ch = ((Char) obj).charValue ();
+	if (printReadable(ps))
+	  ps.print(Char.toScmReadableString(ch));
+	else
+	  ps.print(ch);
+      }
     else if (obj == null)
       ps.print("#!null");
     else if (obj instanceof Object[])

@@ -1,3 +1,8 @@
+2002-02-13  Per Bothner  <per@bothner.com>
+
+	* SFormat.java (print):  Must handle Char explicitly, since Char
+	no longer implements Printable.
+
 2002-02-12  Per Bothner  <per@bothner.com>
 
 	* CallContext.java:  Allow fluid bindings for any thread,

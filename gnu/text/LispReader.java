@@ -10,6 +10,11 @@ public abstract class LispReader extends Lexer
     super(port);
   }
 
+  public LispReader(LineBufferedReader port, SourceMessages messages)
+  {
+    super(port, messages);
+  }
+
   protected boolean isDelimiter (char ch)
   {
     return (Character.isWhitespace (ch)
@@ -84,6 +89,12 @@ public abstract class LispReader extends Lexer
   public Object readListBody ()
        throws java.io.IOException, SyntaxException
   {
+    return readListBody(')');
+  }
+
+  public Object readListBody (char endDelimiter)
+       throws java.io.IOException, SyntaxException
+  {
     Object last = null;
     Object list = makeNil();
 
@@ -93,7 +104,7 @@ public abstract class LispReader extends Lexer
 	if (c < 0)
 	    break;
 	unread(c);
-	if (c == ')')
+	if (c == endDelimiter)
 	  break;
 	int line = port.getLineNumber ();
 	int column = port.getColumnNumber ();
@@ -111,8 +122,8 @@ public abstract class LispReader extends Lexer
 		//-- Read the cdr for the Pair
 		Object cdr = readObject ();
 		c = skipWhitespaceAndComments();
-		if (c != ')')
-		  error(". OBJECT not followed by )");
+		if (c != endDelimiter)
+		  error(". OBJECT not followed by `"+endDelimiter+"'");
 		if (c >= 0)
 		  unread(c);
 		// ( a1 ... an . cdr) creates an n-element list ended by
@@ -141,14 +152,20 @@ public abstract class LispReader extends Lexer
   protected Object readList ()
     throws java.io.IOException, SyntaxException
   {
+    return readList(')');
+  }
+
+  protected Object readList (char endDelimiter)
+    throws java.io.IOException, SyntaxException
+  {
     // FIXME  These casts are not a good idea!
     char saveReadState = ((InPort) port).readState;
-    ((InPort) port).readState = '(';
+    ((InPort) port).readState = endDelimiter;
     int line = port.getLineNumber ();
     int column = port.getColumnNumber ();
     try
       {
-	Object list = readListBody ();
+	Object list = readListBody(endDelimiter);
 	int c = read ();
 	if (c < 0)
 	  error('e', port.getName(), line+1, column+1,

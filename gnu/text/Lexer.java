@@ -1,6 +1,14 @@
+// Copyright (c) 1999  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.text;
 import gnu.math.*;
 import java.io.*;
+
+/**
+ * Framework for implementing lexical scanners.
+ * @author	Per Bothner
+ */
 
 public class Lexer extends Reader
 {
@@ -9,6 +17,12 @@ public class Lexer extends Reader
   public Lexer(LineBufferedReader port)
   {
     this.port = port;
+  }
+
+  public Lexer(LineBufferedReader port, SourceMessages messages)
+  {
+    this.port = port;
+    this.messages = messages;
   }
 
   public void close() throws java.io.IOException
@@ -57,51 +71,34 @@ public class Lexer extends Reader
     port.skip_quick();
   }
 
-  int errors = 0;
+  SourceMessages messages = null;
+
+  public SourceMessages getMessages () { return messages; }
+  public void setMessages (SourceMessages messages)
+  { this.messages = messages; }
 
   /** Returns true if any error were seen.  Prints and clears the errors.
    * @param out where to write the error message to
    * @param max maximum number of messages to print (can be 0) */
   public boolean checkErrors(PrintWriter out, int max)
   {
-    if (firstError != null)
-      {
-	SourceError.printAll(firstError, out, max);
-	firstError = lastError = null;
-	errorCount = 0;
-	return true;
-      }
-    return false;
+    return messages != null && messages.checkErrors(out, max);
   }
 
-  int errorCount;
+  public SourceError getErrors()
+  { return messages == null ? null : messages.getErrors(); }
 
-  public SourceError getErrors() { return firstError; }
+  public boolean seenErrors()
+  { return messages != null && messages.seenErrors(); }
 
-  SourceError firstError;
-  SourceError lastError;
-
-  public boolean seenErrors() { return errorCount > 0; }
-  public void clearErrors() { errorCount = 0; }
+  public void clearErrors() { if (messages != null) messages.errorCount = 0; }
 
   public void error(char severity, String filename, int line, int column,
 		    String message)
   {
-    error(new SourceError(severity, filename, line, column, message));
-  }
-
-  public void error(SourceError error)
-  {
-    if (error.severity == 'f')
-      errorCount = 1000;
-    else if (error.severity != 'w')
-      errorCount++;
-    if (lastError != null)
-      lastError.next = error;
-    else
-      firstError = error;
-    lastError = error;
-    error.next = null;
+    if (messages == null)
+      messages = new SourceMessages();
+    messages.error(severity, filename, line, column, message);
   }
 
   public void error(char severity, String message)
@@ -120,7 +117,7 @@ public class Lexer extends Reader
   public void fatal(String message) throws SyntaxException
   {
     error('f', message);
-    throw new SyntaxException(this);
+    throw new SyntaxException(messages);
   }
 
   public void eofError(String msg) throws SyntaxException

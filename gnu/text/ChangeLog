@@ -1,3 +1,14 @@
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* SourceMessages.java:  New class (collection of SourceError).
+	* Makefile.am, Makefile.in (java_JAVA):  Add SourceMessages.java.
+	* Lexer.java:  Re-written - error handling now using SourceMessages.
+	* LispReader.java (readlistBody, readList):  New overloads that
+	take an explicit end delimiter, not just ')'.
+	* SourceError.java (printAll):  Replaced by SourceMessages.printAll.
+	* SyntaxException.java (lexer):  Lexer field replaced by ...
+	(messages):  ... new SourceMessages field.  Change methods to match.
+
 Thu Mar 11 11:14:49 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* LispReader.java:  New class.

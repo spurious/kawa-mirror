@@ -4,15 +4,17 @@ package gnu.text;
 
 public class SyntaxException extends Exception
 {
-  Lexer lexer;
+  SourceMessages messages;
 
-  public SyntaxException(Lexer lexer)
+  public SyntaxException(SourceMessages messages)
   {
-    this.lexer = lexer;
+    this.messages = messages;
   }
+
+  public SourceMessages getMessages () { return messages; }
 
   public void printAll(java.io.PrintWriter out, int max)
   {
-    SourceError.printAll(lexer.firstError, out, max);
+    messages.printAll(out, max);
   }
 }

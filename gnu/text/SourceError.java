@@ -60,12 +60,4 @@ public class SourceError
   {
     out.print(this);
   }
-
-  static void printAll(SourceError err, java.io.PrintWriter out, int max)
-  {
-    for (; err != null && --max >= 0;  err = err.next)
-      {
-	out.println(err);
-      }
-  }
 }

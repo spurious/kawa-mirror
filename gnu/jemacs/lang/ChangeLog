@@ -1,3 +1,7 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* SaveExcursion.java:  Update for CharSequence -> CharSeq renaming.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* MiscOps.scm (message):  Allow and ignore extra arguments.

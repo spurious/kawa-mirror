@@ -3,7 +3,7 @@ import javax.swing.text.*;
 import java.io.*;
 import java.awt.Color;
 import gnu.mapping.InPort;
-import gnu.lists.CharSequence;
+import gnu.lists.CharSeq;
 import gnu.text.Char;
 import gnu.lists.CharBuffer;
 import gnu.commonlisp.lang.Symbol;
@@ -73,7 +73,7 @@ public class Buffer extends DefaultStyledDocument
     redrawModeline();
   }
 
-  public CharSequence getStringContent ()
+  public CharSeq getStringContent ()
   {
     return content;
   }

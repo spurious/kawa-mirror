@@ -1,3 +1,8 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* Buffer.java:  Update for CharSequence -> CharSeq renaming.
+	* ProcessMode.java:  Likewise.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (PACKAGE_CFNAME):  Rename to PACKAGE_FNAME.

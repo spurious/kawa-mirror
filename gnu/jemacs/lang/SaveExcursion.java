@@ -6,7 +6,6 @@ import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.jemacs.buffer.*;
 import gnu.kawa.reflect.Invoke;
-import gnu.lists.CharSequence;
 
 public class SaveExcursion extends Syntax
 {

@@ -68,7 +68,7 @@ public class ProcessMode extends Mode
       }
   }
 
-  public void writeToInferior(gnu.lists.CharSequence str)
+  public void writeToInferior(gnu.lists.CharSeq str)
     throws java.io.IOException
   {
     str.writeTo(toInferior);

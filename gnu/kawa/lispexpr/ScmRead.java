@@ -117,14 +117,14 @@ public class ScmRead extends LispReader
 	if (len == 2 && str.charAt(0) == ':')
 	  return "::";
 	str.setLength(len-1);
-	return Keyword.make(str.toString());
+	return Keyword.make(str.toString().intern());
       }
     if (firstChar == ':')
       {
 	str.reverse();
 	str.setLength(str.length()-1);
 	str.reverse();
-	return Keyword.make(str.toString());
+	return Keyword.make(str.toString().intern());
       }
     return str.toString().intern();
   }
@@ -377,14 +377,23 @@ public class ScmRead extends LispReader
 	  {
 	    skip();
 	    String word = readAlphaWord (c);
-	    Object u = word+"$unit";
+	    Object u = (word+"$unit").intern();
 	    int power;
 	    try {
+	      if (peek() == '^')
+		{
+		  skip();
+		  c = peek();
+		  if (c != '-' && c != '-'
+		      && Character.digit((char)c, 10) < 0)
+		    error("missing exponent following unit " + word + '^');
+		}
 	      power = readOptionalExponent ();
 	    } catch (ClassCastException e) {
 	      error("unit exponent too large");
 	      power = 1;
 	    }
+	    // "expt" and "*" are too open to name clashes. FIXME.
 	    if (power != 1)
               u = LList.list3("expt", u, IntNum.make(power));
 	    if (unit == null)
@@ -392,6 +401,11 @@ public class ScmRead extends LispReader
 	    else
 	      unit = LList.list3("*", unit, u);
 	    c = peek ();
+	    if (c == '*')
+	      {
+		skip();
+		c = peek();
+	      }
 	  }
       }
 

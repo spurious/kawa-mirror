@@ -429,6 +429,7 @@ public class Scheme extends Interpreter
       define_proc("error", "kawa.lib.syntax");
       define_proc("as", new kawa.standard.convert());
       define_proc("instance?", new kawa.standard.instance());
+      define_syntax("synchronized", "kawa.standard.synchronizd");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");

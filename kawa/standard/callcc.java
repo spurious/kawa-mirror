@@ -13,7 +13,7 @@ public class callcc extends Procedure1
   /** Call a precedure with the current continuation. */
   public static Object apply (Procedure proc)
   {
-    Continuation cont = new Continuation ();
+    kawa.lang.Continuation cont = new kawa.lang.Continuation ();
     try
       {
 	return proc.apply1 (cont);

@@ -22,7 +22,7 @@ public class TailTarget extends StackTarget
 	Target.pushObject.compileFromStack(comp, stackType);
 	code.emitLoad(comp.callStackContext);
 	code.emitSwap();
-	code.emitPutField(comp.valueCallStackField);
+	code.emitPutField(comp.valueCallContextField);
 	code.emitReturn();
       }
   }

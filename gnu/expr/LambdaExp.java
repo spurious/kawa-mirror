@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -107,7 +107,8 @@ public class LambdaExp extends ScopeExp
   static final int METHODS_COMPILED = 128;
   static final int NO_FIELD = 256;
   static final int DEFAULT_CAPTURES_ARG = 512;
-  protected static final int NEXT_AVAIL_FLAG = 1024;
+  public static final int SEQUENCE_RESULT = 1024;
+  protected static final int NEXT_AVAIL_FLAG = 2048;
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
@@ -455,7 +456,7 @@ public class LambdaExp extends ScopeExp
   {
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;
-    Variable saveCallStackContext = comp.callStackContext;
+    Variable saveCallContextContext = comp.callStackContext;
     try
       {
 	return comp.addClass (this);
@@ -464,7 +465,7 @@ public class LambdaExp extends ScopeExp
       {
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
-	comp.callStackContext = saveCallStackContext;
+	comp.callStackContext = saveCallContextContext;
       }
   }
 
@@ -552,7 +553,6 @@ public class LambdaExp extends ScopeExp
     Type rtype;
     CodeAttr code = comp.getCode();
 
-    /*
     if (Compilation.fewerClasses && ! getImportsLexVars())
       {
 	//	Label func_start = new Label(code);
@@ -560,6 +560,7 @@ public class LambdaExp extends ScopeExp
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = this;
 	type = saveLambda.type;
+        /*
 	if (comp.usingCPStyle())
 	  {
 	    heapFrameLambda = this;
@@ -568,15 +569,18 @@ public class LambdaExp extends ScopeExp
 		 var != null; var = var.nextDecl())
 	      var.assignField(comp);
 	  }
+        */
 	gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	int pc = comp.fswitch.getMaxValue() + 1;
 	code.emitGoto(func_end);
 	Type[] stackTypes = code.saveStackTypeState(true);
 
 	fswitch.addCase(pc, code);
+        /*
 	code.emitPushThis();
-	code.emitGetField(comp.argsCallStackField);
+	code.emitGetField(comp.argsCallContextField);
 	code.emitStore(comp.argsArray);
+        */
 	allocParameters(comp);
 	enterFunction(comp);
 
@@ -613,7 +617,6 @@ public class LambdaExp extends ScopeExp
 	  }
       }
     else
-    */
     if (! isClassGenerated())
       {
 	rtype = comp.typeModuleMethod;
@@ -664,6 +667,8 @@ public class LambdaExp extends ScopeExp
       }
     if (name != null)
       nameBuf.append(comp.mangleName(name));
+    if (getFlag(SEQUENCE_RESULT))
+      nameBuf.append("$C");
 
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
@@ -693,7 +698,7 @@ public class LambdaExp extends ScopeExp
     if (! isStatic)
       closureEnv = declareThis(ctype);
 
-    Type rtype = body.getType();
+    Type rtype = getFlag(SEQUENCE_RESULT) ? Type.void_type : body.getType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
     for (int i = 0;  i <= numStubs;  i++)
       {
@@ -906,7 +911,7 @@ public class LambdaExp extends ScopeExp
     if (argsArray != null && isHandlingTailCalls())
       {
         code.emitLoad(comp.callStackContext);
-        code.emitGetField(comp.argsCallStackField);
+        code.emitGetField(comp.argsCallContextField);
         code.emitStore(argsArray);
       }
 
@@ -1172,7 +1177,8 @@ public class LambdaExp extends ScopeExp
     Method method = primMethods[0];
     boolean isStatic = method.getStaticFlag();
     Type rtype = method.getReturnType();
-    Target target = Target.returnValue(rtype);
+    Target target = getFlag(SEQUENCE_RESULT) ? new ConsumerTarget(firstDecl())
+      : Target.returnValue(rtype);
     int numStubs = primMethods.length - 1;
     Type restArgType = restArgType();
 

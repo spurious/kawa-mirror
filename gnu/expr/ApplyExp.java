@@ -68,7 +68,7 @@ public class ApplyExp extends Expression
 	// Re-use caller's argsArray.
 	// code.emitLoad(caller.declareArgsArray());  FIXME
 	code.emitLoad(comp.callStackContext);
-	code.emitGetField(Compilation.argsCallStackField);
+	code.emitGetField(Compilation.argsCallContextField);
       }
     else
       {
@@ -110,19 +110,20 @@ public class ApplyExp extends Expression
   {
     int args_length = exp.args.length;
     Method method;
+    Expression exp_func = exp.func;
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
     String func_name = null;
-    if (exp.func instanceof LambdaExp)
+    if (exp_func instanceof LambdaExp)
       {
-	func_lambda = (LambdaExp) exp.func;
+	func_lambda = (LambdaExp) exp_func;
 	func_name = func_lambda.getName();
 	if (func_name == null)
 	  func_name = "<lambda>";
       }
-    else if (exp.func instanceof ReferenceExp) 
+    else if (exp_func instanceof ReferenceExp) 
       { 
-        Declaration func_decl = ((ReferenceExp)exp.func).binding;
+        Declaration func_decl = ((ReferenceExp) exp_func).binding;
         if (func_decl != null)
 	  {
 	    Expression value = func_decl.getValue();
@@ -162,9 +163,9 @@ public class ApplyExp extends Expression
 	      }
 	  }
       }
-    else if (exp.func instanceof QuoteExp)
+    else if (exp_func instanceof QuoteExp)
       {
-        Object proc = ((QuoteExp) exp.func).getValue();
+        Object proc = ((QuoteExp) exp_func).getValue();
 
         // If it wasn't inlineable, we already checked for this in Translator.
         if (proc instanceof Inlineable)
@@ -185,17 +186,12 @@ public class ApplyExp extends Expression
 	// These error message should really be done earlier,
 	// but we do not have the right information until
 	// the rewrite pass is finished.
+        String msg = null;
 	if (args_length < func_lambda.min_args)
-	  {
-            comp.error('w', "too few args for " + func_name);
-	    func_lambda = null;
-	  }
+          msg = "too few args for ";
 	else if (func_lambda.max_args >= 0
 		 && args_length > func_lambda.max_args)
-	  {
-            comp.error('w', "too many args for " + func_name);
-	    func_lambda = null;
-	  }
+          msg = "too many args "+args_length+" for ";
 	else if (! func_lambda.isHandlingTailCalls()
 		 && (method = func_lambda.getMethod(args_length)) != null)
 	  {
@@ -223,6 +219,16 @@ public class ApplyExp extends Expression
 	    target.compileFromStack(comp, method.getReturnType());
 	    return;
 	  }
+        if (msg != null)
+          {
+            comp.error('w', msg + func_name);
+            if (exp_func instanceof ReferenceExp)
+              {
+                func_lambda = null;
+                exp_func
+                  = new ReferenceExp(((ReferenceExp) exp_func).getName());
+              }
+          }
       }
 
     if (comp.usingCPStyle())
@@ -232,13 +238,13 @@ public class ApplyExp extends Expression
 	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	    int pc = fswitch.getMaxValue() + 1;
 	    fswitch.addCase(pc, l, code);
+            exp_func.compile (comp, new StackTarget(comp.typeCpsProcedure));
 	    code.emitLoad(comp.callStackContext);
 
 	    // Emit: context->pc = pc.
 	    code.emitLoad(comp.callStackContext);
 	    code.emitPushInt(pc);
-	    code.emitPutField(Compilation.pcCallStackField);
-
+	    code.emitPutField(Compilation.pcCallContextField);
 	    code.emitInvokeVirtual(comp.applyCpsMethod);
 
 	    // emit[save java stack, if needed]
@@ -273,7 +279,7 @@ public class ApplyExp extends Expression
 
 	    // Load result from stack.value to target.
 	    code.emitLoad(comp.callStackContext);
-	    code.emitGetField(comp.valueCallStackField);
+	    code.emitGetField(comp.valueCallContextField);
 	    target.compileFromStack(comp, Type.pointer_type);
 	  }
 	return;
@@ -308,18 +314,18 @@ public class ApplyExp extends Expression
       {
 	code.emitLoad(comp.callStackContext);
 	code.emitDup(comp.callStackContext.getType());
-	exp.func.compile(comp, new StackTarget(comp.typeProcedure));
-	code.emitPutField(comp.procCallStackField);
+	exp_func.compile(comp, new StackTarget(comp.typeProcedure));
+	code.emitPutField(comp.procCallContextField);
 	code.emitDup(comp.callStackContext.getType());
 	//  evaluate args to frame-locals vars;  // may recurse! 
 	compileToArray (exp.args, comp);
-	code.emitPutField(comp.argsCallStackField);
+	code.emitPutField(comp.argsCallContextField);
 	code.emitReturn();
 	return;
       }
 
     if (!tail_recurse)
-      exp.func.compile (comp, new StackTarget(comp.typeProcedure));
+      exp_func.compile (comp, new StackTarget(comp.typeProcedure));
 
     boolean toArray
       = (tail_recurse ? func_lambda.min_args != func_lambda.max_args

@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2000  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -52,7 +52,7 @@ public class Compilation
   SwitchState fswitch;
 
   Field fswitchIndex;
-  /** The actual parameter of the current CallFrame.step(CallStack) method. */
+  /** The actual parameter of the current CallFrame.step(CallContext) method. */
   Variable callStackContext;
 
   // Various standard classes
@@ -223,35 +223,35 @@ public class Compilation
   = ClassType.make("gnu.mapping.ApplyMethodContainer");
 
   /* Classes, fields, and methods used wgen usingCPStyle". */
-  public static ClassType typeCallStack
-    = ClassType.make("gnu.mapping.CallStack");
-  public static Method popCallStackMethod
-    = typeCallStack.addMethod("pop", apply0args, Type.void_type,
+  public static ClassType typeCallContext
+    = ClassType.make("gnu.mapping.CallContext");
+  public static Method popCallContextMethod
+    = typeCallContext.addMethod("pop", apply0args, Type.void_type,
 			      Access.PUBLIC);
   public static ClassType typeValues
     = ClassType.make("gnu.mapping.Values");
   public static Field noArgsField
     = typeValues.addField("noArgs", objArrayType,
 				Access.PUBLIC|Access.STATIC);
-  public static Field valueCallStackField
-    = typeCallStack.addField("value", Type.pointer_type, Access.PUBLIC);
-  public static Field pcCallStackField
-    = typeCallStack.addField("pc", Type.int_type, Access.PROTECTED);
+  public static Field valueCallContextField
+    = typeCallContext.addField("value", Type.pointer_type, Access.PUBLIC);
+  public static Field pcCallContextField
+    = typeCallContext.addField("pc", Type.int_type, Access.PROTECTED);
   public static ClassType typeCpsProcedure
     = ClassType.make("gnu.mapping.CpsProcedure");
   public static ClassType typeCallFrame
     = ClassType.make("gnu.mapping.CallFrame");
   public static Field numArgsCallFrameField
     = typeCallFrame.addField("numArgs", Type.int_type, Access.PROTECTED);
-  public static Field argsCallStackField
-    = typeCallStack.addField("args", objArrayType, Access.PROTECTED);
-  public static Field procCallStackField
-    = typeCallStack.addField("proc", typeProcedure, Access.PROTECTED);
+  public static Field argsCallContextField
+    = typeCallContext.addField("args", objArrayType, Access.PROTECTED);
+  public static Field procCallContextField
+    = typeCallContext.addField("proc", typeProcedure, Access.PROTECTED);
   public static Field callerCallFrameField
     = typeCallFrame.addField("caller", typeCallFrame, Access.PROTECTED);
   public static Field saved_pcCallFrameField
     = typeCallFrame.addField("saved_pc", Type.int_type, Access.PROTECTED);
-  private static Type[] applyCpsArgs = { typeCallStack};
+  private static Type[] applyCpsArgs = { typeCallContext};
   public static Method applyCpsMethod
     = typeProcedure.addMethod("apply", applyCpsArgs, Type.void_type,
 				 Access.PUBLIC);
@@ -605,7 +605,8 @@ public class Compilation
     source_filename = lexp.filename;
     classPrefix = prefix;
     this.immediate = immediate;
-    
+    mainClass = new ClassType(classname);
+
     // Do various code re-writes and optimization.
     ChainLambdas.chainLambdas(lexp, this);
     PushApply.pushApply(lexp);
@@ -614,7 +615,7 @@ public class Compilation
     if (! usingCPStyle)
       FindCapturedVars.findCapturedVars(lexp);
 
-    mainClass = allocClass (lexp, classname);
+    mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);
     addClass (lexp);
   }
@@ -639,39 +640,33 @@ public class Compilation
   {
     String name = lexp.getJavaName();
     name = generateClassName(name);
-    return allocClass(lexp, name);
+    if (lexp instanceof ObjectExp)
+      return lexp.getCompiledClassType(this);
+    else
+      return addClass(lexp, new ClassType(name));
   }
 
-  ClassType allocClass (LambdaExp lexp, String name)
+  ClassType addClass (LambdaExp lexp, ClassType type)
   {
-    ClassType type;
-    if (lexp instanceof ObjectExp)
+    ClassType superType;
+    if (lexp.isModuleBody ())
       {
-	type = lexp.getCompiledClassType(this);
+        ModuleExp module = (ModuleExp) lexp;
+        superType = getModuleSuperType(module);
+        ClassType[] interfaces = module.getInterfaces();
+        if (interfaces != null)
+          type.setInterfaces(interfaces);
       }
     else
-      {
-	type = new ClassType(name);
-	ClassType superType;
-	if (lexp.isModuleBody ())
-	  {
-	    ModuleExp module = (ModuleExp) lexp;
-	    superType = getModuleSuperType(module);
-	    ClassType[] interfaces = module.getInterfaces();
-	    if (interfaces != null)
-	      type.setInterfaces(interfaces);
-	  }
-	else
-	  superType = (usingCPStyle ? typeCallFrame
-		       : lexp.isHandlingTailCalls() ? typeCpsProcedure
-		       : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
-		       ? typeProcedureN
-		       : typeProcedureArray[lexp.min_args]);
-	type.setSuper (superType);
+      superType = (usingCPStyle ? typeCallFrame
+                   : lexp.isHandlingTailCalls() ? typeCpsProcedure
+                   : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
+                   ? typeProcedureN
+                   : typeProcedureArray[lexp.min_args]);
+    type.setSuper (superType);
 
-	lexp.type = type;
-	addClass(type);
-      }
+    lexp.type = type;
+    addClass(type);
     return type;
   }
 
@@ -1032,7 +1027,7 @@ public class Compilation
 	arg_count = 1;
 	arg_letter = '?';
 	arg_types = new Type[1];
-	arg_types[0] = typeCallStack;
+	arg_types[0] = typeCallContext;
       }
     else if (lexp.min_args != lexp.max_args || lexp.min_args > 4
 	|| (fewerClasses && curClass == mainClass))
@@ -1069,7 +1064,14 @@ public class Compilation
     boolean staticModule = false;
     Label classInitLabel = null;
     Label classBodyLabel = null;
-    if (lexp.isModuleBody())
+    
+    if (usingCPStyle())
+      {
+        apply_method
+          = curClass.addMethod ("step", arg_types, Type.void_type, 
+                                Access.PUBLIC|Access.FINAL);
+      }
+    else if (lexp.isModuleBody())
       {
 	if (((ModuleExp) lexp).isStatic())
 	  {
@@ -1121,6 +1123,7 @@ public class Compilation
     // Below, we assign the value to the slot.
     method.initCode();
     code = getCode();
+    // if (usingCPStyle())   code.addParamLocals();
 
     thisDecl = method.getStaticFlag() ? null : lexp.declareThis(new_class);
     Variable var = thisDecl;
@@ -1129,9 +1132,9 @@ public class Compilation
     if (! (fewerClasses && curClass == mainClass))
       lexp.allocChildClasses(this);
 
-    if (lexp.isHandlingTailCalls())
+    if (lexp.isHandlingTailCalls() || usingCPStyle())
       {
-	callStackContext = new Variable ("stack", typeCallStack);
+	callStackContext = new Variable ("stack", typeCallContext);
 	Scope scope = lexp.scope;
 	scope.addVariableAfter(thisDecl, callStackContext);
 	callStackContext.setParameter(true);
@@ -1159,12 +1162,21 @@ public class Compilation
 
     lexp.allocParameters(this);
     lexp.enterFunction(this);
+    if (usingCPStyle())
+      {
+	//code.emitLoad(code.getArg(1));
+	code.emitLoad(callStackContext);
+        code.emitGetField(pcCallContextField);
+        fswitch = new SwitchState(code);
+      }
 
     try
       {
         body.compileWithPosition(this,
-                                 lexp.isModuleBody () ? Target.pushObject
-                                 : Target.returnObject);
+                                 ! lexp.isModuleBody () ? Target.returnObject
+                                 : curClass.getSuperclass() != typeModuleBody
+                                 ? Target.Ignore
+                                 : Target.pushObject);
       }
     catch (Exception ex)
       {

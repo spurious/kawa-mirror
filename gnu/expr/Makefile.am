@@ -17,6 +17,7 @@ java_JAVA=\
   ClassExp.java \
   Compilation.java \
   ConditionalTarget.java \
+  ConsumerTarget.java \
   Declaration.java \
   ErrorExp.java \
   ExitExp.java \

@@ -132,7 +132,7 @@ public class SetExp extends Expression
     // to generate fields for module-level definitions;  this is how
     // bindings are exported from modules.
 
-    if (binding != null && ! binding.isPrivate()
+    if (binding != null && ! binding.isPrivate() && ! comp.usingCPStyle()
 	&& binding.context instanceof ModuleExp
 	&& binding.getValue() instanceof LambdaExp
 	&& ((LambdaExp) binding.getValue()).getName() != null // FIXME

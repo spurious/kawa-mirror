@@ -185,8 +185,8 @@ public class Scheme extends Interpreter
       //-- Section 6.4  -- complete, including slashified read/write
       
       define_proc ("symbol?", "kawa.lib.misc");
-      define_proc ("symbol->string", "kawa.standard.symbol2string");
-      define_proc ("string->symbol", "kawa.standard.string2symbol");
+      define_proc ("symbol->string", "kawa.lib.misc");
+      define_proc ("string->symbol", "kawa.lib.misc");
 
       //-- Section 6.5
       define_proc ("number?", "kawa.lib.numbers");
@@ -228,9 +228,9 @@ public class Scheme extends Interpreter
       define_proc ("rationalize", "kawa.standard.rationalize");
       define_proc ("exp", "kawa.lib.numbers");
       define_proc ("log", "kawa.lib.numbers");
-      define_proc ("sin", "kawa.standard.sin");
-      define_proc ("cos", "kawa.standard.cos");
-      define_proc ("tan", "kawa.standard.tan");
+      define_proc ("sin", "kawa.lib.numbers");
+      define_proc ("cos", "kawa.lib.numbers");
+      define_proc ("tan", "kawa.lib.numbers");
       define_proc ("asin", "kawa.standard.asin");
       define_proc ("acos", "kawa.standard.acos");
       define_proc ("atan", "kawa.standard.atan");

@@ -77,7 +77,7 @@ public class CompileFile extends Procedure2
 	    ClassType clas = comp.classes[iClass];
 	    classes[iClass] = clas.emit_to_array ();
 
-	    zar.append (clas.getClassName ().replace ('.', '/') + ".class",
+	    zar.append (clas.getName ().replace ('.', '/') + ".class",
 			classes[iClass]);
 	  }
 	zar.close ();
@@ -129,8 +129,7 @@ public class CompileFile extends Procedure2
           {
             ClassType clas = comp.classes[iClass];
 	    String out_name
-	      = directory +
-	      clas.getClassName ().replace ('.', '/') + ".class";
+	      = directory + clas.getName ().replace ('.', '/') + ".class";
 	    clas.emit_to_file (out_name);
           }
       }

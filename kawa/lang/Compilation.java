@@ -95,7 +95,7 @@ public class Compilation
 				       Access.PUBLIC|Access.STATIC);
   }
 
-  static Type[] apply0args = new Type[0];
+  static Type[] apply0args = Type.typeArray0;
   static Type[] applyNargs = { objArrayType };
 
   static final Method makeNullPairMethod
@@ -239,7 +239,7 @@ public class Compilation
   {
     for (int i = 0;  i < numClasses; i++)
       {
-	if (name.equals (classes[i].getClassName ()))
+	if (name.equals (classes[i].getName ()))
 	  return classes[i];
       }
     return null;

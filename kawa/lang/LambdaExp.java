@@ -124,7 +124,7 @@ public class LambdaExp extends ScopeExp
     for (Variable var = firstVar ();  ; var = var.nextVar ())
       {
 	if (var == null)
-	  throw new Error ("internal eror - getArg");
+	  throw new Error ("internal error - getArg");
 	if (var.isParameter () && !var.isArtificial ())
 	  {
 	    if (i == 0)
@@ -183,6 +183,7 @@ public class LambdaExp extends ScopeExp
       {
 	String class_name = name == null ? "lambda"
 	  : Compilation.mangleClassName (name.toString ());
+
 	Compilation comp = new Compilation (this, class_name, true);
 	compile_setLiterals (comp);
 
@@ -191,7 +192,7 @@ public class LambdaExp extends ScopeExp
 	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
 	  {
 	    ClassType clas = comp.classes[iClass];
-	    classNames[iClass] = clas.getClassName ();
+	    classNames[iClass] = clas.getName ();
 	    classes[iClass] = clas.emit_to_array ();
 	  }
 
@@ -229,7 +230,7 @@ public class LambdaExp extends ScopeExp
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError ("class I/O error in lambda eval");
+	throw new GenericError ("class I/O errorin lambda eval");
       }
     catch (ClassNotFoundException ex)
       {

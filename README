@@ -7,17 +7,12 @@ It is implemented in Java, and compiles Scheme into Java byte-codes.
 Documentation is in the doc directory.
 The file doc/kawa.txt (which was automatically generated from doc/kawa.texi)
 explains how to build, install, and use Kawa.
-The file doc/kawa.html contains the same information in HTML format.
-An overview of how Kawa works is in doc/kawa-tour.ps.
+
+The Kawa home page is: http://www.gnu.org/software/kawa/
 
 The file NEWS summarizes recent changes.
 
-Kawa's copyright is in doc/license.terms.
-(The Kawa distribution includes the packages gnu.bytecode and gnu.math,
-which have different terms - but which impose no restrictions as long as
-you do not modify those two packages).
-
-The file doc/Compliance.html summarizes divergence from the R4RS.
+Kawa's copyright is in the file COPYING.
 
 	--Per Bothner
-Cygnus Support     bothner@cygnus.com
+per@bothner.com

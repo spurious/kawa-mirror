@@ -3,7 +3,11 @@ TO BE DONE FOR 2.0:
 Implement SRFI 0: Feature-based conditional expansion construct 
 Implement SRFI 4: Homogeneous numeric vector datatypes 
 Implement SRFI 6: Basic String Ports
-IMplement SRFI 9: Defining Record Types
+Implement SRFI 9: Defining Record Types
+
+Move more of kawa.lang.* to gnu.kawa.reflect and gnu.kawa.*.
+
+Calls to setter (as in (set! (...)) should be inlined.
 
 Fix scheme-window in misc.scm.
 
@@ -56,10 +60,6 @@ Fix when switching to syntatic closures.
 All function calls in kawa.lib that call standard or library functions
 should be resolved statically (inlined or direct methods calls).
 
-Make all the primitive-XXX macros be procedures, once we have better inlining.
-E.g.: (primitive-virtual-method <TYPE> "NAME" <RTYPE> (<ARG1> ...))
-becomes: (prim-virtual-method <TYPE> 'NAME <RTYPE> <ARG1> ...)
-
 Combine primitive field with record facility and define-class.
 
 Support persistence and serialization of Scheme values.
@@ -82,12 +82,7 @@ Complete R4RS procedures.
 
 Complete R5RS number syntax;  clean up quantity syntax.
 
-Implement let-syntax and letrec-syntax.
-Implement syntax-case.
-Possibly re-write macro syntax to use syntactic closures.
-
 Implement system open-input-pipe open-output-pipe close-pipe.
-Implement read-line; other Guile port operations.
 
 Add a way to specify a load-path (or maybe just use CLASSPATH?).
 First seach for loaded files in directory where current file was found.

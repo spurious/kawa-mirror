@@ -1,4 +1,27 @@
-Added open-input-string from SRFI-6.
+Changes from Kawa 1.6.60 to 1.6.62
+==================================
+The new function `invoke' allows you to call a Java method.
+All of `invoke', `invoke-static' and `make' now select the
+bets method.  They are also inlined at compile time in many
+cases.  Specifically, if there is a method known to be
+definitely applicable, based on compile-time types of the
+argument expressions, the compiler will choose the most
+specific such method.
+
+The functions slot-ref, slot-set!, field, and static-field are
+now inlined by the compiler when it can.
+
+Added open-input-string, open-output-string, get-output-string from SRFI-6.
+See http://srfi.schemers.org/srfi-6/srfi-6.html.
+
+The manual has a new section "Mapping Scheme names to Java names",
+and a new chapter "Types".  The chapters "Extensions", "Objects and
+Classes", and "Low-level functions" have been extensivley re-organized.
+
+The Kawa license has been simplified.  There used to be two licenses:
+One for the packages gnu.*, and one for the packages kawa.*.  There
+latter has been replaced by the former.  The "License" section of the
+manual was also improved.
 
 Changes from Kawa 1.6.59 to 1.6.60
 ==================================

@@ -1,3 +1,9 @@
+1999-11-16  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.62.
+	* COPYING:  New file.  Replaces removed doc/license.terms.
+	* kawa/repl.java (main):  --version prints (short) copyright notice.
+
 1999-11-15  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Pair.java (emit):  Use new ClassType.getDeclaredField.

@@ -1,3 +1,9 @@
+2005-01-28  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (loadClassRef):  Fix JAVA5 case to use
+	emitPushClass, which fixes a popType error.  Then comment the JAVA5
+	case out because it causes a verification error I haven't figured out.
+
 2005-01-25  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (interp): Remplace field by ...

@@ -42,7 +42,7 @@ public class TtyInPort extends InPort
 
   public int fill (char[] buffer, int off, int len) throws java.io.IOException
   {
-    int count = in.read(buffer, pos, len);
+    int count = in.read(buffer, off, len);
     if (tie != null && count > 0)
       tie.echo(buffer, off, len);
     return count;

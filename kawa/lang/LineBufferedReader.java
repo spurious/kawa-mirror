@@ -121,7 +121,7 @@ public class LineBufferedReader extends FilterReader
     * This can be usefully overridden by sub-classes. */
   public int fill (char[] buffer, int off, int len) throws java.io.IOException
   {
-    return in.read(buffer, pos, len);
+    return in.read(buffer, off, len);
   }
 
   private void clearMark ()

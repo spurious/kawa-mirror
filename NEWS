@@ -1,3 +1,16 @@
+Improved Kawa home page with extra links, pointer to Java-generated api docs,
+and homepages for gnu.math and gnu.bytecode.
+
+Implemented system, make-process, and some related procedures.
+
+Added macros for primitive access to object fields, static fields, and
+Java arrays.  Added constant-fold syntax, and used it for the other macros.
+
+The --main flag compiles Scheme code to an application (containing a main
+method), which can be be invoked directly by a Java interpreter.
+
+Implemented --version (following GNU standards) as kawa.repl command-line flag.
+
 Changes since Kawa 1.5.93
 =========================
 Adding make procedure to create new objects/records.

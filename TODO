@@ -1,9 +1,14 @@
 TO BE DONE FOR 2.0:
 
-Make primitive field accesses work in same way.
-Combine with record facility.
+Implement source-filename source-line source-column macros.
+Macro-expansions lose line number information.
+Fix when switching to syntatic closures.
 
-Provide a way to write a "main" method in Scheme.
+Make all the primitive-XXX macros be procedures, once we have better inlining.
+E.g.: (primitive-virtual-method <TYPE> "NAME" <RTYPE> (<ARG1> ...))
+becomes: (prim-virtual-method <TYPE> 'NAME <RTYPE> <ARG1> ...)
+
+Combine primitive field with record facility and define-class.
 
 Support presistence and serialization of Scheme values.
 

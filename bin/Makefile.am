@@ -14,6 +14,11 @@ DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
+if ENABLE_XML
+KAWA2_XML_OFILES = gnu-xml.o
+LIBADD_XML = gnu-xml.lo
+endif
+
 kawa.sh:
 	echo '#!/bin/sh' >tmp
 	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
@@ -39,10 +44,9 @@ KAWA1_OFILES = \
   kawa-repl.lo \
   kawa-standard.lo
 
-KAWA2_OFILES = $(KAWA1_OFILES) \
+KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES) \
   kawa-lib.o \
-  gnu-kawa-slib.o \
-  gnu-xml.o
+  gnu-kawa-slib.o
 
 WITH_GCJ_LIBS =  libkawa.la
 WITHOUT_GCJ_LIBS =
@@ -56,7 +60,7 @@ libkawa_la_SOURCES =
 libkawa_la_LIBADD = \
   $(KAWA1_OFILES) \
   gnu-ecmascript.lo \
-  gnu-xml.lo \
+  $(LIBADD_XML) \
   gnu-kawa-slib.lo \
   kawa-lib.lo
 

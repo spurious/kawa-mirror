@@ -113,10 +113,13 @@ DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
+@ENABLE_XML_TRUE@KAWA2_XML_OFILES = gnu-xml.o
+@ENABLE_XML_TRUE@LIBADD_XML = gnu-xml.lo
+
 KAWA1_OFILES =    gnu-bytecode.lo   gnu-lists.lo   gnu-expr.lo   gnu-kawa-functions.lo   gnu-kawa-lispexpr.lo   gnu-kawa-reflect.lo   gnu-kawa-util.lo   gnu-mapping.lo   gnu-math.lo   gnu-text.lo   kawa-lang.lo   kawa-repl.lo   kawa-standard.lo
 
 
-KAWA2_OFILES = $(KAWA1_OFILES)   kawa-lib.o   gnu-kawa-slib.o   gnu-xml.o
+KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES)   kawa-lib.o   gnu-kawa-slib.o
 
 
 WITH_GCJ_LIBS = libkawa.la
@@ -126,7 +129,7 @@ WITHOUT_GCJ_LIBS =
 @LIBKAWA_TRUE@lib_LTLIBRARIES = libkawa.la
 #libkawa_la_LDFLAGS = -rpath $(libdir)
 libkawa_la_SOURCES = 
-libkawa_la_LIBADD =    $(KAWA1_OFILES)   gnu-ecmascript.lo   gnu-xml.lo   gnu-kawa-slib.lo   kawa-lib.lo
+libkawa_la_LIBADD =    $(KAWA1_OFILES)   gnu-ecmascript.lo   $(LIBADD_XML)   gnu-kawa-slib.lo   kawa-lib.lo
 
 
 WITH_GCJ_COMPILED = kawa-bin$(EXEEXT)
@@ -139,11 +142,19 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libkawa_la_LDFLAGS = 
-libkawa_la_DEPENDENCIES =  gnu-bytecode.lo gnu-lists.lo gnu-expr.lo \
-gnu-kawa-functions.lo gnu-kawa-lispexpr.lo gnu-kawa-reflect.lo \
-gnu-kawa-util.lo gnu-mapping.lo gnu-math.lo gnu-text.lo kawa-lang.lo \
-kawa-repl.lo kawa-standard.lo gnu-ecmascript.lo gnu-xml.lo \
-gnu-kawa-slib.lo kawa-lib.lo
+@ENABLE_XML_FALSE@libkawa_la_DEPENDENCIES =  gnu-bytecode.lo \
+@ENABLE_XML_FALSE@gnu-lists.lo gnu-expr.lo gnu-kawa-functions.lo \
+@ENABLE_XML_FALSE@gnu-kawa-lispexpr.lo gnu-kawa-reflect.lo \
+@ENABLE_XML_FALSE@gnu-kawa-util.lo gnu-mapping.lo gnu-math.lo \
+@ENABLE_XML_FALSE@gnu-text.lo kawa-lang.lo kawa-repl.lo \
+@ENABLE_XML_FALSE@kawa-standard.lo gnu-ecmascript.lo gnu-kawa-slib.lo \
+@ENABLE_XML_FALSE@kawa-lib.lo
+@ENABLE_XML_TRUE@libkawa_la_DEPENDENCIES =  gnu-bytecode.lo gnu-lists.lo \
+@ENABLE_XML_TRUE@gnu-expr.lo gnu-kawa-functions.lo gnu-kawa-lispexpr.lo \
+@ENABLE_XML_TRUE@gnu-kawa-reflect.lo gnu-kawa-util.lo gnu-mapping.lo \
+@ENABLE_XML_TRUE@gnu-math.lo gnu-text.lo kawa-lang.lo kawa-repl.lo \
+@ENABLE_XML_TRUE@kawa-standard.lo gnu-ecmascript.lo gnu-xml.lo \
+@ENABLE_XML_TRUE@gnu-kawa-slib.lo kawa-lib.lo
 libkawa_la_OBJECTS = 
 bin_PROGRAMS =  @kawa_bin@
 PROGRAMS =  $(bin_PROGRAMS)

@@ -2,6 +2,11 @@ XQuery:
 * Implement namespace declaration attributes such as <a xmlns:a="URL">. 
 
 In define-class/define-simple-class:
+* You can specify access: ['private|'protected|'public|'package] to set
+  the Java access permissions of fields and methods.
+* Methods can be static by using the access: 'static specifier.
+* The reflective routines invoke, field, static-field, slot-ref, slot-set!
+  can now access non-public methods/fields when appropriate.
 * Such classes are no longer initialized when the containing module is loaded.
 * The EXPR in 'init-form: EXPR' is now evaluated in the outer scope.
 * A new 'init: EXPR' evalues EXPR in the inner scope.

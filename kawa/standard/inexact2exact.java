@@ -8,9 +8,8 @@ public class inexact2exact extends Procedure1
 {
    public Object apply1 (Object arg1)
    {
-     Numeric num = (Numeric) arg1;
-     if (num.isExact ())
-       return num;
-     return IntNum.make ((long) (((RealNum)num).doubleValue ()));
+     if (arg1 instanceof RealNum)
+       return ((RealNum)arg1).toExact ();
+     return arg1;
    }
 }

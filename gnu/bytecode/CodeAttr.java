@@ -494,6 +494,11 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  {
 	    reserve(1);
 	    put1(11 + xi);  // fconst_0 .. fconst_2
+	    if (xi == 0 && Float.floatToIntBits(x) != 0) // x == -0.0
+	      {
+		reserve(1);
+		put1(118);  // fneg
+	      }
 	  }
 	else
 	  {
@@ -521,6 +526,11 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  {
 	    reserve(1);
 	    put1(14+xi);  // dconst_0 or dconst_1
+	    if (xi == 0 && Double.doubleToLongBits(x) != 0L) // x == -0.0
+	      {
+		reserve(1);
+		put1(119);  // dneg
+	      }
 	  }
 	else
 	  {

@@ -1,3 +1,8 @@
+1999-08-30  Geoff Berry  <gcb@gnu.org>
+
+	* CodeAttr.java (emitPushDouble, emitPushFloat): Handle
+          pushing of -0.0.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* Method.java (write):  Remove unused Variable var.

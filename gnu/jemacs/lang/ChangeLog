@@ -1,3 +1,7 @@
+2004-02-15  Per Bothner  <per@bothner.com>
+
+	* lambda.java (rewriteBody):  Now need to rewrite default args here.
+
 2004-01-09  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (registerEnvironment):  Update setCurrent to setGlobal.

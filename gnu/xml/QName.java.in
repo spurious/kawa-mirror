@@ -1,4 +1,12 @@
+// -*-Java-*-
+// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.xml;
+import java.io.*;
+@if WITH REFERENCES@
+import java.lang.ref.*;
+@endif WITH REFERENCES@
 
 /** An XML "qualified name", after namesapce-resolution.
  * Consists of a local part (the part after the colon in an XML file),
@@ -9,17 +17,17 @@ package gnu.xml;
  * local part and namespace URI, they are the same QName object.
  */
 
-public class QName
+public class QName implements Externalizable
 {
   /** The namespace URI if it exists (as an interned String), else null. */
-  public String getNamespaceURI()
+  public final String getNamespaceURI()
   {
     return namespaceURI;
   }
 
   /** The local name of a qualified name, as an interned String.
    * If namespaceURI is null, this is the fully-qualified name. */
-  public String getLocalName()
+  public final String getLocalName()
   {
     return localName;
   }
@@ -61,16 +69,26 @@ public class QName
    * (such that table[index].getName()==key);
    * if there is no such element, returns an index
    * such that (table[index]==null || tabel[index]==DELETED). */
-  static int hashSearch (QName[] table, int log2Size,
+  static int hashSearch (@QTableElement@[] table, int log2Size,
 			 String namespaceURI, String localName, int hash)
   {
     int mask = (1 << log2Size) - 1;
     int index = hash & mask;
-    QName element = table[index];
-    if (element == null
-	|| (element.namespaceURI == namespaceURI
-	    && element.localName == localName))
+    @QTableElement@ element = table[index];
+    if (element == null)
       return index;
+@if WITH REFERENCES@
+    QName qname = (QName) element.get();
+    if (qname == null
+	|| (qname.namespaceURI == namespaceURI
+	    && qname.localName == localName))
+      return index;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+     if (element.namespaceURI == namespaceURI
+	 && element.localName == localName))
+      return index;
+@endif WITHOUT REFERENCES@
     int avail = -1;
     int step = (((hash >> log2Size) ^ index) << 1) + 1;
     for (;;)
@@ -81,9 +99,18 @@ public class QName
 	element = table[index];
 	if (element == null)
 	  return avail < 0 ? index : avail;
+@if WITH REFERENCES@
+	qname = (QName) element.get();
+	if (qname == null
+	    || (qname.namespaceURI == namespaceURI
+		&& qname.localName == localName))
+	  return index;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
 	if (element.namespaceURI == namespaceURI
 	    && element.localName == localName)
 	  return index;
+@endif WITHOUT REFERENCES@
       }
   }
 
@@ -98,26 +125,45 @@ public class QName
     int hash = localName.hashCode();
     int index = hashSearch(table, log2Size,
 			   namespaceURI, localName, hash);
-    QName element = table[index];
-    if (element == null || element == hashDELETED)
+    @QTableElement@ element = table[index];
+@if WITH REFERENCES@
+    if (element != null)
       {
-	if (namespaceURI != null)
-	  namespaceURI = namespaceURI.intern();
-	element = new QName(namespaceURI, localName.intern());
-	table[index] = element;
-	count++;
-
-	// Rehash if over 2/3 full.
-	if (3 * count >= 2 * table.length)
-	  {
-	    int new_capacity = 2 * table.length;
-	    QName[] new_table = new QName[new_capacity];
-	    hashInsertAll(new_table, log2Size + 1, table, log2Size);
-	    table = new_table;
-	    log2Size++;
-	  }
+	QName qname = (QName) element.get();
+	if (qname != null)
+	  return qname;
       }
-    return element;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+    if (element != null && element != hashDELETED)
+      return element;
+@endif WITHOUT REFERENCES@
+    if (namespaceURI != null)
+      namespaceURI = namespaceURI.intern();
+     QName qnew = new QName(namespaceURI, localName.intern());
+     enter(qnew, index);
+     return qnew;
+  }
+
+  private static void enter(QName element, int index)
+  {
+@if WITH REFERENCES@
+    table[index] = new WeakReference(element);
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+    table[index] = element;
+@endif WITH REFERENCES@
+    count++;
+
+    // Rehash if over 2/3 full.
+    if (3 * count >= 2 * table.length)
+      {
+	int new_capacity = 2 * table.length;
+	@QTableElement@[] new_table = new @QTableElement@[new_capacity];
+	hashInsertAll(new_table, log2Size + 1, table, log2Size);
+	table = new_table;
+	log2Size++;
+      }
   }
 
   /** Find a QName with the given namespaceURI and localName.
@@ -129,16 +175,19 @@ public class QName
     int hash = localName.hashCode();
     int index = hashSearch(table, log2Size,
 			   namespaceURI, localName, hash);
-    QName element = table[index];
+    @QTableElement@ element = table[index];
+@if WITH REFERENCES@
+  return element == null ? null : (QName) element.get();
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
     return element == hashDELETED ? null : element;
+@endif WITHOUT REFERENCES@
   }
 
   static synchronized void remove(QName name, int hash)
   {
     int index = hashSearch(table, log2Size,
 			   name.namespaceURI, name.localName, hash);
-    if (table[index] != name)
-      return; // ERROR
     table[index] = hashDELETED;
     count--;
   }
@@ -148,23 +197,72 @@ public class QName
     remove (this, hashCode());
   }
 
-  static void hashInsertAll (QName[] tableDst, int log2SizeDst,
-				   QName[] tableSrc, int log2SizeSrc)
+  static void hashInsertAll (@QTableElement@[] tableDst, int log2SizeDst,
+			     @QTableElement@[] tableSrc, int log2SizeSrc)
   {
     int sizeSrc = 1 << log2SizeSrc;
     for (int i = sizeSrc;  --i >= 0;)
       {
-	QName element = tableSrc[i];
+	@QTableElement@ element = tableSrc[i];
 	if (element != null && element != hashDELETED)
 	  {
+@if WITH REFERENCES@
+	    QName qname = (QName) element.get();
+	    // Should not possible - finalizer should have rmeoved it. 
+	    if (qname == null)
+	      continue;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+	    QName qname = element;
+@endif WITHOUT REFERENCES@
 	    int index = hashSearch(tableDst, log2SizeDst,
-				   element.namespaceURI, element.localName,
-				   element.hashCode());
-	    QName oldElement = tableDst[index];
+				   qname.namespaceURI, qname.localName,
+				   qname.hashCode());
 	    tableDst[index] = element;
 	  }
       }
   }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(namespaceURI);
+    out.writeObject(localName);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    namespaceURI = ((String) in.readObject());
+    if (namespaceURI != null)
+      namespaceURI = namespaceURI.intern();
+    localName = ((String) in.readObject()).intern();
+  }
+
+  private static synchronized QName readResolve(QName qname, int hash)
+  {
+    int index = hashSearch(table, log2Size,
+			   qname.namespaceURI, qname.localName, hash);
+    @QTableElement@ element = table[index];
+@if WITH REFERENCES@
+    if (element != null)
+      {
+	QName old = (QName) element.get();
+	if (old != null)
+	  return old;
+      }
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+    if (element != null && element != hashDELETED)
+      return element;
+@endif WITHOUT REFERENCES@
+    enter(qname, index);
+    return qname;
+  }
+
+  public Object readResolve() throws ObjectStreamException
+  {
+    return readResolve(this, localName.hashCode());
+  } 
 
   /** The namespace URI if it exists, else null.
    * This String is assumed to be interned. */
@@ -175,14 +273,20 @@ public class QName
    * This string is assumed to be interned. */
   protected String localName;
 
+  /** Must be log2(table.length). */
+  static int log2Size = 8;
   /** A hashtable used to manage QNames and make sure they are unique.
    * The length must be a power of two. */
-  static QName[] table;
-  /** Must be log2(table.length). */
-  static int log2Size;
+  static @QTableElement@[] table = new @QTableElement@[1 << log2Size];
   /** Number of (non-deleted) entries in the table. */
   static int count;
 
   /** Used to mark deleted elements in a hash table. */
-  public static final QName hashDELETED = new QName(null, null);
+  public static final @QTableElement@ hashDELETED;
+@if WITHOUT REFERENCES@
+  static { hashDELETED = new QName(null, null); }
+@endif WITHOUT REFERENCES@
+@if WITH REFERENCES@
+  static { hashDELETED = new WeakReference(null); }
+@endif WITH REFERENCES@
 }

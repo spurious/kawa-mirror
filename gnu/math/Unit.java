@@ -118,7 +118,6 @@ public class Unit extends Quantity
     this.name = name;
     this.factor = factor;
     this.dims = dims;
-    unitTable.put (name, this);
   }
 
   public Unit (String name, DQuantity value)
@@ -135,10 +134,33 @@ public class Unit extends Quantity
   {
     if (value.imValue() != 0.0)
       throw new ArithmeticException("defining "+name+" using complex value");
-    return new Unit (name, value.reValue(), value.unit().dimensions());
+    Unit unit = new Unit (name, value.reValue(), value.unit().dimensions());
+    unitTable.put (name, unit);
+    return unit;
   }
 
-  public Complex number() { return new DFloNum(factor); }
+  public static Unit define (String name, DQuantity value)
+  {
+    Unit unit = new Unit (name, value);
+    unitTable.put (name, unit);
+    return unit;
+  }
+
+  public static Unit define (String name, double factor, Dimensions dims)
+  {
+    Unit unit = new Unit (name, factor, dims);
+    unitTable.put (name, unit);
+    return unit;
+  }
+
+  public static Unit define (String name, double factor, Unit base)
+  {
+    Unit unit = new Unit (name, factor, base);
+    unitTable.put (name, unit);
+    return unit;
+  }
+
+  public Complex number() { return DFloNum.one(); }
   public boolean isExact () { return false; }
   public final boolean isZero () { return false; }
 
@@ -201,19 +223,7 @@ public class Unit extends Quantity
 
   public Unit unit ()
   {
-    if (base == null)
-      {
-	if (dims.bases[0] == Dimensions.endDummy)
-	  base = Unit.Empty;
-	else if (dims.powers[0] == 1 && dims.bases[1] == Dimensions.endDummy)
-	  base = dims.bases[0];
-	else
-	  {
-	    base = new Unit();
-	    base.dims = dims;
-	  }
-      }
-    return base;
+    return this;
   }
 
   public static Unit lookup (String name)
@@ -224,13 +234,13 @@ public class Unit extends Quantity
   public static final BaseUnit meter = new BaseUnit ("m", "Length");
   public static final BaseUnit second = new BaseUnit ("s", "Time");
   public static final BaseUnit gram = new BaseUnit ("g", "Mass");
-  public static final Unit cm = new Unit ("cm", 0.01, meter);
-  public static final Unit mm = new Unit ("mm", 0.1, cm);
-  public static final Unit in = new Unit ("in", 0.0254, meter);
-  public static final Unit pt = new Unit ("pt", 0.0003527778, meter);
-  public static final Unit pica = new Unit ("pica", 0.004233333, meter);
-  public static final Unit radian = new Unit ("rad", 1.0, Unit.Empty);
+  public static final Unit cm = define("cm", 0.01, meter);
+  public static final Unit mm = define("mm", 0.1, cm);
+  public static final Unit in = define("in", 0.0254, meter);
+  public static final Unit pt = define("pt", 0.0003527778, meter);
+  public static final Unit pica = define("pica", 0.004233333, meter);
+  public static final Unit radian = define("rad", 1.0, Unit.Empty);
 
-  public static final Unit minute = new Unit ("min", 60.0, second);
-  public static final Unit hour = new Unit ("hour", 60.0, minute);
+  public static final Unit minute = define("min", 60.0, second);
+  public static final Unit hour = define("hour", 60.0, minute);
 }

@@ -1,3 +1,14 @@
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* Unit.java (<init>):  Constructor do not enter new Unit in unitTable.
+	(define):  New methods, for contructing + entering in unitBale.
+	(pre-defined units):  Use new `define' methods.
+
+	Change so that arithmetic on Units uses this Unit, not the BaseUnit.
+	(unit):  Just returns this.
+	(number)  Returns DFLoNum.one().
+	* DLoNum.java (one):  New static method (and private field).
+
 1999-06-30  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (ten):  New static method.

@@ -99,6 +99,9 @@ public class DFloNum extends RealNum implements Compilable
     throw new IllegalArgumentException ();
   }
 
+  private static final DFloNum one = new DFloNum(1.0);
+  public static final DFloNum one() { return one; }
+
   public Numeric div (Object y)
   {
     if (y instanceof RealNum)

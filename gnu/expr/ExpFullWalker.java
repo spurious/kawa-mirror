@@ -88,14 +88,19 @@ public class ExpFullWalker extends ExpWalker
     return exp;
   }
 
+  public void walkDefaultArgs (LambdaExp exp)
+  {
+    if (exp.defaultArgs != null)
+      exp.defaultArgs = walkExps(exp.defaultArgs);
+  }
+
   public Object walkLambdaExp (LambdaExp exp)
   {
     LambdaExp save = currentLambda;
     currentLambda = exp;
     try
       {
-	if (exp.defaultArgs != null)
-	  exp.defaultArgs = walkExps(exp.defaultArgs);
+	walkDefaultArgs(exp);
 	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
 	return exp;

@@ -1,3 +1,14 @@
+2000-02-25  Per Bothner  <per@bothner.com>
+
+	* ExpFullWalker.java (walkDefaultArgs):  New method.
+	(walkLambdaExp):  Call walkDefaultArgs.
+	* FindCapturedVars.java (walkDefaultArgs):  New method.
+	Check if default expression captures a parameter.
+	* LambdaExp.java (DEFAULT_CAPTURES_ARG):  New flag.
+	(setFlag): New (non-public) method.
+	(addMethodFor):  Generate stubs unless DEFAULT_CAPTURES_ARG is set.
+	(compileAsMethod):  For stubs, make parameter be simple.
+
 2000-02-12  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (typeApplyMethodContainer):  New static field.

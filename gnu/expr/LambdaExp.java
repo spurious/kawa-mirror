@@ -106,17 +106,20 @@ public class LambdaExp extends ScopeExp
   static final int CLASS_METHOD = 64;
   static final int METHODS_COMPILED = 128;
   static final int NO_FIELD = 256;
+  static final int DEFAULT_CAPTURES_ARG = 512;
   protected int flags;
   public int  getFlags() { return flags; }
 
+  final void setFlag (boolean setting, int flag)
+  {
+    if (setting) flags |= flag;
+    else flags &= ~flag;
+  }
 
   /** True iff this lambda is only "called" inline. */
   public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
   public final void setInlineOnly(boolean inlineOnly)
-  {
-    if (inlineOnly) flags |= INLINE_ONLY;
-    else flags &= ~INLINE_ONLY;
-  }
+  { setFlag(inlineOnly, INLINE_ONLY); }
 
   public final boolean getNeedsClosureEnv ()
   { return (flags & (NEEDS_STATIC_LINK|IMPORTS_LEX_VARS)) != 0; }
@@ -676,19 +679,7 @@ public class LambdaExp extends ScopeExp
 
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
-    int numStubs = 0;
-    for ( ;  numStubs < opt_args;  numStubs++)
-      {
-	// For simplicity, we only handle literal default argumenst,
-	// for now.  FIXME.
-	// We should handle any expression, as long as there is no assignment
-	// or taking location of or capture by inferior lambda (in the
-	// default expression) of a previous parameter (since then we get
-	// problems about having to pass a heapFrame between the various
-	// methods.
-	if (! (defaultArgs[numStubs] instanceof QuoteExp))
-	  break;
-      }
+    int numStubs = ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
     int mflags = (isClassMethod() || thisVariable != null) ? Access.PUBLIC
@@ -1141,6 +1132,17 @@ public class LambdaExp extends ScopeExp
     Target target = Target.returnValue(rtype);
     int numStubs = primMethods.length - 1;
     Type restArgType = restArgType();
+
+    int[] saveDeclFlags = null;
+    if (numStubs > 0)
+      {
+	saveDeclFlags = new int[min_args + numStubs];
+	int k = 0;
+	for (Declaration decl = firstDecl();
+	     k < min_args + numStubs; decl = decl.nextDecl())
+	  saveDeclFlags[k++] = decl.flags;
+      }
+
     for (int i = 0;  i <= numStubs;  i++)
       {
 	comp.method = primMethods[i];
@@ -1155,13 +1157,19 @@ public class LambdaExp extends ScopeExp
 	    int thisArg = isStatic ? 0 : 1;
 	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    Declaration decl;
-	    Variable var;
+	    Variable var = code.getArg(0);
 	    if (! isStatic)
-	      code.emitPushThis();
-	    var = code.getArg(isStatic ? 0 : 1);
+	      {
+		code.emitPushThis();
+		if (getNeedsClosureEnv())
+		  closureEnv = var;
+		var = code.getArg(1);
+	      }
 	    decl = firstDecl();
 	    for (int j = 0;  j < min_args + i;  j++, decl = decl.nextDecl())
 	      {
+		decl.flags |= Declaration.IS_SIMPLE;
+		decl.var = var;
 		code.emitLoad(var);
 		var = var.nextVar();
 	      }
@@ -1187,9 +1195,20 @@ public class LambdaExp extends ScopeExp
 	    else
 	      code.emitInvokeVirtual(primMethods[toCall]);
 	    code.emitReturn();
+	    closureEnv = null;
 	  }
 	else
 	  {
+	    if (saveDeclFlags != null)
+	      {
+		int k = 0;
+		for (Declaration decl = firstDecl();
+		     k < min_args + numStubs; decl = decl.nextDecl())
+		  {
+		    decl.flags = saveDeclFlags[k++];
+		    decl.var = null;
+		  }
+	      }
 	    comp.method.initCode();
 	    allocChildClasses(comp);
 	    allocParameters(comp);

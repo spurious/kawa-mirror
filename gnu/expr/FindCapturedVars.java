@@ -40,6 +40,30 @@ public class FindCapturedVars extends ExpFullWalker
     return exp;
   }
 
+  public void walkDefaultArgs (LambdaExp exp)
+  {
+    if (exp.defaultArgs == null)
+      return;
+
+    super.walkDefaultArgs(exp);
+
+    // Check if any default expression "captured" a parameters.
+    // If so, evaluating a default expression cannot be done until the
+    // heapFrame is allocated in the main-method.  But in most cases, a
+    // default expression will not contain a nested scope, hence no
+    // capture, hence we can generate efficient code to handle optional
+    // arguments.
+    for (Declaration param = exp.firstDecl();
+	 param != null; param = param.nextDecl())
+      {
+	if (! param.isSimple())
+	  {
+	    exp.setFlag(true, LambdaExp.DEFAULT_CAPTURES_ARG);
+	    break;
+	  }
+      }
+  }
+
   public Object walkLetExp (LetExp exp)
   {
     if (exp.body instanceof BeginExp && ! (exp instanceof FluidLetExp))

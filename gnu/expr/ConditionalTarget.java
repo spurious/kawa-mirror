@@ -64,14 +64,16 @@ public class ConditionalTarget extends Target
 	break;
       }
     if (trueBranchComesFirst)
-      {
-	code.emitGotoIfEq(ifFalse);
-	code.emitGoto(ifTrue);
-      }
+      code.emitGotoIfEq(ifFalse);
     else
-      {
-	code.emitGotoIfNE(ifTrue);
-	code.emitGoto(ifFalse);
-      }
+      code.emitGotoIfNE(ifTrue);
+    emitGotoFirstBranch(code);  // Usually a no-op.
+  }
+
+  /** Goto whichever of IfTrue or ifFalse is specified by trueBranchComesFirst.
+   * Normally, the goto should get optimized away as a no-op. */
+  public final void emitGotoFirstBranch(CodeAttr code)
+  {
+    code.emitGoto(trueBranchComesFirst ? ifTrue : ifFalse);
   }
 }

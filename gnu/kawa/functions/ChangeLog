@@ -1,5 +1,9 @@
 2001-12-24  Per Bothner  <per@bothner.com>
 
+	* IsEq.java (compile):  Use ConditionalTarget's emitGotoFirstBranch.
+
+2001-12-24  Per Bothner  <per@bothner.com>
+
 	* IntegerFormat.java:  New class, extends gnu.text.IntegerFormat.
 	* Makefile.am (java_sources):  Add IntegerFormat.java.
 

@@ -40,15 +40,10 @@ public class IsEq extends Procedure2 implements Inlineable
       {
 	ConditionalTarget ctarget = (ConditionalTarget) target;
 	if (ctarget.trueBranchComesFirst)
-	  {
-	    code.emitGotoIfNE(ctarget.ifFalse);
-	    code.emitGoto(ctarget.ifTrue);
-	  }
+	  code.emitGotoIfNE(ctarget.ifFalse);
 	else
-	  {
-	    code.emitGotoIfEq(ctarget.ifTrue);
-	    code.emitGoto(ctarget.ifFalse);
-	  }
+	  code.emitGotoIfEq(ctarget.ifTrue);
+	ctarget.emitGotoFirstBranch(code);
       }
     else
       {

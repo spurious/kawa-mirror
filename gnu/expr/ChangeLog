@@ -1,3 +1,11 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* ConditionalTarget.java (emitGotoFirstBranch):  New method.
+	(compileFromStack):  Use emitGotoFirstBranch.
+
+	* TypeValue.java:  New interface.
+	* Makefile.am (java_sources):  Add TypeValue.java.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* Expression.java (makeGetField):  Moved to gnu.kawa.reflect.SlotGet.

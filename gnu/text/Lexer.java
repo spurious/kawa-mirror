@@ -45,7 +45,8 @@ public class Lexer extends Reader
 
   public void unread(int ch) throws java.io.IOException
   {
-    port.unread();
+    if (ch >= 0)
+      port.unread();
   }
 
   public int peek() throws java.io.IOException

@@ -1,3 +1,7 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (unread):  Only unread if character is not eof.
+
 2001-10-02  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (isPrettyPrinting):  Set in constructors only.

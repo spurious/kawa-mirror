@@ -10,6 +10,26 @@ import gnu.mapping.*;
 
 public class callcc extends Procedure1
 {
+  /** Call a precedure with the current continuation. */
+  public static Object apply (Procedure proc)
+  {
+    Continuation cont = new Continuation ();
+    try
+      {
+	return proc.apply1 (cont);
+      }
+    catch (CalledContinuation ex)
+      {
+	if (ex.continuation != cont)
+	  throw ex;
+	return ex.value;
+      }
+    finally
+      {
+	cont.invoked = true;
+      }
+  }
+
   public Object apply1 (Object arg1)
   {
     Procedure proc;
@@ -21,7 +41,7 @@ public class callcc extends Procedure1
       {
 	throw new GenericError ("argument to call/cc is not procedure");
       }
-    return Continuation.callcc (proc);
+    return apply (proc);
   }
 
 }

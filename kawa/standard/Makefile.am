@@ -2,12 +2,12 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-.SUFFIXES : .java .class
+SUFFIXES = .java .class
 
 JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
 
-%.class: %.java
-	(cd $(srcdir); $(JAVAC) $(<F))
+.java.class:
+	cd $(srcdir); $(JAVAC) $(<F)
 
 javadir=$(prefix)/java/kawa/standard
 
@@ -160,13 +160,12 @@ map.class \
 callcc.class \
 exit.class \
 define.class \
+define_syntax.class \
 let.class \
 letrec.class \
 letstar.class \
 begin.class \
 ifp.class \
-when.class \
-unless.class \
 values.class \
 call_with_values.class \
 StandardInterpreter.class 

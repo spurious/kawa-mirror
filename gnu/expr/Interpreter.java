@@ -5,7 +5,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
-import gnu.bytecode.Method;
+//import gnu.bytecode.Method;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
@@ -206,13 +206,10 @@ public abstract class Interpreter
    * @param name the language-level name of the function.
    * @param cname the fully-qualified name of the class containing the method.
    * @param mname the name of the static method.
-   * @param nargs the number of parameter taken by the method.
    */
-  protected void define_method(String name, String cname,
-			       String mname, int nargs)
+  protected void define_method(String name, String cname, String mname)
   {
-    Method meth = ClassType.make(cname).getDeclaredMethod(mname, nargs);
-    environ.define(name, new PrimProcedure(meth));
+    environ.define(name, ClassMethods.apply(cname, mname));
   }
 
   protected void define_field (String name, String cname, String fname)

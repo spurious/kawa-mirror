@@ -63,6 +63,8 @@ public class LambdaExp extends ScopeExp
     else flags &= ~INLINE_ONLY;
   }
 
+  public boolean isSharedSwitchMethod() { return false; }
+
   /** True iff this lambda "captures" (uses) lexical variables from outside. */
   public final boolean getImportsLexVars ()
   { return (flags & IMPORTS_LEX_VARS) != 0; }
@@ -150,6 +152,11 @@ public class LambdaExp extends ScopeExp
 
   public String getName () { return name; }
 
+  public String getJavaName ()
+  {
+    return name == null ? "lambda" : Compilation.mangleName (name);
+  }
+
   public LambdaExp outerLambda ()
   {
     return outer == null ? null : outer.currentLambda ();
@@ -229,9 +236,12 @@ public class LambdaExp extends ScopeExp
 	  }
 	while (parent != this)
 	  {
-	    if (parent.heapFrameLambda != null)
-	      curLambda = parent.heapFrameLambda;
-	    code.emitGetField(curLambda.staticLinkField);
+	    if (! (parent instanceof ObjectExp))
+	      {
+		if (parent.heapFrameLambda != null)
+		  curLambda = parent.heapFrameLambda;
+		code.emitGetField(curLambda.staticLinkField);
+	      }
 	    curLambda = parent;
 	    parent = parent.outerLambda();
 	  }
@@ -273,6 +283,17 @@ public class LambdaExp extends ScopeExp
 
   public ClassType compileAlloc (Compilation comp)
   {
+    /*
+    if (isSharedSwitchMethod())
+      {
+	code = ...;
+	Label l = new Label(code);
+	int pc = comp.fwitch.getMaxValue() + 1;
+	comp.addCase(pc, l, conp);
+	Variable argsArray = declareArgsArray();
+	enterFunction(comp, argsArray);
+      }
+    */
     ClassType new_class = compile (comp);
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitNew(new_class);
@@ -392,7 +413,9 @@ public class LambdaExp extends ScopeExp
       {
 	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
-	if (heapFrameLambda != this && heapFrameLambda != null
+	if (parent instanceof ObjectExp)
+	  ;
+	else if (heapFrameLambda != this && heapFrameLambda != null
 	    && getCanRead())
 	  {
 	    ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
@@ -487,7 +510,7 @@ public class LambdaExp extends ScopeExp
 	    // Check for existing field with name name.  Probably overkill.
 	    for (int i = 0; ; i++)
 	      {
-		Field fld =frameType.getField(mname);
+		Field fld = frameType.getField(mname);
 		if (fld == null)
 		  break;
 		mname = dname + 1;
@@ -629,8 +652,7 @@ public class LambdaExp extends ScopeExp
   {
     try
       {
-	String class_name = name == null ? "lambda"
-	  : Compilation.mangleName (name.toString ());
+	String class_name = getJavaName ();
 
 	Compilation comp = new Compilation (this, class_name, null, true);
 	compile_setLiterals (comp);
@@ -782,7 +804,7 @@ public class LambdaExp extends ScopeExp
     String str = "LambdaExp/"+name+'/'+id+'/';
 
 	int l = getLine();
-	if (l <= 0)
+	if (l <= 0 && body != null)
 	  l = body.getLine();
 	if (l > 0)
 	  str = str + "l:" + l;

@@ -1,3 +1,27 @@
+Tue Dec 15 10:50:53 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ChainLambdas.java:  New ExpFullWalker sub-class.
+	* PushApply.java:  New ExpFullWalker sub-class.
+	* Makefile.am, Makefile.in (java_Java):  Add new source files.
+	* FindTailCalls.java:  Moved some functionality to ChainLambdas
+	and PushApply in order to keep things less convoluted.
+	(walkObjectExp):  New method.
+	* ExpWalker.java (walkObjectExp):  New trivial method.
+	* ExpFullWalker.java (walkObjectExp):  New method.
+	* Compilation.java (<init>): Invoke ChainLambdas and PushApply walkers.
+
+	* Compilation.java (allocClass):  Use getJavaName.
+ 	(allocClass):  Use getCompiledClassType for ObjectExp.
+	* LambdaExp.java (isSharedSwitchMethod): New (currently unused) method.
+	(getJavaName):  New method.
+	(eval):  Use getJavaName,
+	(loadHeapFrame, allocChildClasses):  Test for and handle ObjectExp.
+	(toString):  Tolerate null body (as in ObjectExp).
+	* ObjectExp.java (<init>):  Set type initially to null.
+	(getJavaName, getCompiledClassType, walk, toString):  New methods.
+	* ReferenceExp.java:  Remove Scheme-specific support for <TYPE>.
+	(This functionality has moved to kawa.standard.ScmEnv.)
+
 Mon Nov 23 16:04:42 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Inlineable.java (getReturnType):  New method.

@@ -9,29 +9,29 @@ public class ObjectExp extends LambdaExp
 
   public ObjectExp ()
   {
-    type = Type.pointer_type;
+    type = null;
   }
 
-  public ClassType compile (Compilation comp)
+  public String getJavaName ()
   {
-    ClassType saveClass = comp.curClass;
-    Method saveMethod = comp.method;
-    try
+    return name == null ? "object" : Compilation.mangleName (name);
+  }
+
+  public ClassType getCompiledClassType()
+  {
+    if (type == null)
       {
-	ClassType new_class = type;
 	String name = getName();
-	if (new_class == comp.scmProcedureType)
-	  new_class = new ClassType(name == null? "object" : name);
-	this.type = new_class;
+	type = new ClassType(name == null? "object" : name);
 	if (supers == null || supers.length == 0)
-	  new_class.setSuper(Type.pointer_type);
+	  type.setSuper(Type.pointer_type);
 	else
 	  {
 	    int i = 0;
 	    ClassType type = (ClassType) ((QuoteExp) supers[0]).getValue();
 	    if ((type.getModifiers() & Access.INTERFACE) == 0)
 	      {
-		new_class.setSuper(type);
+		type.setSuper(type);
 		i++;
 	      }
 	    int skip = i;
@@ -42,15 +42,23 @@ public class ObjectExp extends LambdaExp
 		for (;  i < len;  i++)
 		  interfaces[i-skip]
 		    = (ClassType) ((QuoteExp) supers[i]).getValue();
-		new_class.setInterfaces(interfaces);
+		type.setInterfaces(interfaces);
 	      }
 	  }
-	//comp.addClass(new_class);
+      }
+    return type;
+  }
+
+  public ClassType compile (Compilation comp)
+  {
+    ClassType saveClass = comp.curClass;
+    Method saveMethod = comp.method;
+    try
+      {
+	ClassType new_class = getCompiledClassType();
 	comp.curClass = new_class;
-	//allocChildClasses(comp);
 
 	String filename = getFile();
-	type = new_class;
 	if (filename != null)
 	  new_class.setSourceFile (filename);
 
@@ -66,6 +74,7 @@ public class ObjectExp extends LambdaExp
 	    Declaration decl = (Declaration) var;
 	    decl.field = new_class.addField(decl.getName(), decl.getType(),
 					    Access.PUBLIC);
+	    decl.setSimple(false);
 	  }
 
 	for (LambdaExp child = firstChild;  child != null; )
@@ -123,13 +132,18 @@ public class ObjectExp extends LambdaExp
       }
   }
 
-  /*
-  public void compile (Compilation comp, Target target)
+  Object walk (ExpWalker walker) { return walker.walkObjectExp(this); }
+
+  public String toString()
   {
-    if (target instanceof IgnoreTarget)
-      return;
-    Type rtype = compileAlloc (comp);
-    target.compileFromStack(comp, rtype);
+    String str = "ObjectExp/"+name+'/'+id+'/';
+
+	int l = getLine();
+	if (l <= 0 && body != null)
+	  l = body.getLine();
+	if (l > 0)
+	  str = str + "l:" + l;
+
+    return str;
   }
-  */
 }

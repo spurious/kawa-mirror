@@ -89,22 +89,7 @@ public class ReferenceExp extends Expression
 	comp.compileConstant (symbol);
 	if (comp.immediate)
 	  comp.method.compile_checkcast (comp.scmSymbolType);
-	int len = symbol.length();
-	if (len > 2 && symbol.charAt(0) == '<' && symbol.charAt(len-1) == '>')
-	  {
-	    if (thisType == null)
-	      {
-		thisType = ClassType.make("gnu.expr.ReferenceExp");
-		lookupMethod
-		  = thisType.addMethod ("lookup",
-					Compilation.sym1Arg,
-					Compilation.scmObjectType,
-					Access.PUBLIC|Access.STATIC);
-	      }
-	    code.emitInvokeStatic(lookupMethod);
-	  }
-	else
-	  code.emitInvokeStatic(comp.lookupGlobalMethod);
+	code.emitInvokeStatic(comp.lookupGlobalMethod);
       }
     target.compileFromStack(comp, getType());
   }

@@ -68,13 +68,13 @@
 		       "|# "))))
 
 (define (input-port-prompter port)
-  ((primitive-virtual-method <kawa.lang.TtyInPort> "getPrompter"
-			       <kawa.lang.Procedure> ())
+  ((primitive-virtual-method <gnu.mapping.TtyInPort> "getPrompter"
+			       <gnu.mapping.Procedure> ())
    port))
 
 (define (set-input-port-prompter! port prompter)
-  ((primitive-virtual-method <kawa.lang.TtyInPort> "setPrompter"
-			       <void> (<kawa.lang.Procedure>))
+  ((primitive-virtual-method <gnu.mapping.TtyInPort> "setPrompter"
+			       <void> (<gnu.mapping.Procedure>))
    port prompter))
 
 (define (close-output-port port)

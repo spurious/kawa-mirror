@@ -1,7 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.RealNum;
-import gnu.math.Numeric;
 import gnu.mapping.*;
 
 /**

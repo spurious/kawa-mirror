@@ -3,8 +3,6 @@ package kawa;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.*;
-import java.util.*;
 
 /** Simple TextArea that always scrolls to the bottom.  Also creates an
  * out and err PrintWriter so that you can redirect stdout/stderr to

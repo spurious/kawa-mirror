@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.*;
 
 public class call_with_values extends Procedure2

@@ -7,7 +7,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.Hashtable;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
 import gnu.kawa.lispexpr.*;
 import gnu.lists.FormatToConsumer;
 import gnu.kawa.functions.DisplayFormat;

@@ -50,7 +50,7 @@ public class define_class extends Syntax
     Object[] saved = objectSyntax.scanClassDef(p, oexp, tr);
     if (saved == null)
 	return false;
-    st = tr.makePair(st, this, tr.makePair(p, decl, saved));
+    st = Translator.makePair(st, this, Translator.makePair(p, decl, saved));
     forms.addElement (st);
     return true;
   }

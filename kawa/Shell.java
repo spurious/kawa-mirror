@@ -1,8 +1,5 @@
 package kawa;
 
-import kawa.lang.*;
-import gnu.kawa.lispexpr.LispReader;
-import kawa.standard.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;

@@ -48,8 +48,8 @@ public class define_unit extends Syntax
 	      }
 	    if (unit != null)
 	      decl.noteValue(new QuoteExp(unit));
-	    p = tr.makePair(p, decl, p.cdr);
-	    st = tr.makePair(st, this, p);
+	    p = Translator.makePair(p, decl, p.cdr);
+	    st = Translator.makePair(st, this, p);
 	    forms.addElement (st);
 	    return true;
 	  }

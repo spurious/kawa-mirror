@@ -1,7 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
-import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.bytecode.*;
@@ -21,7 +20,7 @@ public class define_member_alias extends Syntax
     Type typeSymbol = ClassType.make("gnu.mapping.Symbol");
     Declaration decl = defs.addDeclaration((String) name, typeSymbol);
     decl.setIndirectBinding(true);
-    st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));
+    st = Translator.makePair(st, this, Translator.makePair(p, decl, p.cdr));
     forms.addElement(st);
     return true;
   }

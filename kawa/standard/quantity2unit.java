@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
 
@@ -9,7 +8,6 @@ public class quantity2unit extends Procedure1
 {
   public Object apply1 (Object arg1)
    {
-     Quantity q = (Quantity) arg1;
-     return q.unit();
+     return ((Quantity) arg1).unit();
    }
 }

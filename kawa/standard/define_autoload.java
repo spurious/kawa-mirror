@@ -7,7 +7,6 @@ import kawa.lang.*;
 import gnu.lists.*;
 import java.io.File;
 import gnu.mapping.*;
-import gnu.text.*;
 import gnu.kawa.lispexpr.*;
 
 public class define_autoload extends Syntax

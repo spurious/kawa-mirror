@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
 

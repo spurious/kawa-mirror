@@ -3,7 +3,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.Type;
-import gnu.bytecode.ClassType;
 import gnu.kawa.functions.Convert;
 
 /**

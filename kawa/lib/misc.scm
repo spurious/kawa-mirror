@@ -7,7 +7,7 @@
 |#
 
 (define (boolean? x)
-  (instance? x <java.lang.Boolean>))
+  (or (eq? x #t) (eq? x #f)))
 
 (define (symbol? x)
   (instance? x <java.lang.String>))
@@ -69,3 +69,11 @@
 		 (invoke-static <gnu.kawa.functions.BaseUri> 'baseUri node))))
     (if (eq? uri #!void) #f uri)))
 
+#|
+(define (identity-function x)
+  x)
+
+(define (make-parameter init #!optional converter :: <procedure> identity-function)
+
+  (make <gnu.kawa.util.Parameter> init converter))
+|#

@@ -1,9 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
-import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
-import gnu.mapping.Symbol;
 import gnu.expr.*;
 import gnu.lists.*;
 

@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.*;
              
 public class with_output_to_file extends Procedure2

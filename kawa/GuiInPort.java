@@ -1,6 +1,5 @@
 package kawa;
 
-import kawa.lang.*;
 import java.io.Reader;
 import gnu.mapping.*;
 

@@ -1,6 +1,4 @@
 package kawa.lang;
-import gnu.mapping.*;
-import gnu.expr.*;
 import gnu.lists.*;
 import java.io.*;
 import gnu.kawa.lispexpr.LispInterpreter;

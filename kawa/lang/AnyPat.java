@@ -1,6 +1,5 @@
 package kawa.lang;
 import gnu.mapping.*;
-import gnu.expr.*;
 import java.io.*;
 
 /**

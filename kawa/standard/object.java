@@ -2,7 +2,6 @@ package kawa.standard;
 import gnu.expr.*;
 import kawa.lang.*;
 import gnu.lists.*;
-import gnu.bytecode.*;
 import java.util.Vector;
 import gnu.mapping.Symbol;
 
@@ -104,7 +103,7 @@ public class object extends Syntax
 		decl = oexp.addDeclaration(sname);
 		decl.setSimple(false);
 		decl.setFlag(Declaration.FIELD_OR_METHOD);
-		tr.setLine(decl, pair);
+		Translator.setLine(decl, pair);
 		args = pair.cdr;
 	      }
 	    int nKeywords = 0;
@@ -266,7 +265,7 @@ public class object extends Syntax
 		return null;
 	      }
 	    Declaration decl = oexp.addDeclaration(mname);
-	    tr.setLine(decl, mpair);
+	    Translator.setLine(decl, mpair);
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.outer = oexp;
 	    lexp.setClassMethod(true);

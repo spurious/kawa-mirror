@@ -89,7 +89,7 @@ public class define_syntax extends Syntax
 
     Declaration decl = defs.getDefine(name, 'w', tr);
     decl.setType(typeMacro);
-    p = tr.makePair(st, this, new Pair(decl, p));
+    p = Translator.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
 
     tr.push(decl);

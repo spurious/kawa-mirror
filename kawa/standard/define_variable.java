@@ -32,8 +32,8 @@ public class define_variable extends Syntax implements Printable
 	decl.setCanRead(true);
 	decl.setCanWrite(true);
 	decl.setIndirectBinding(true);
-	p = tr.makePair(p, decl, p.cdr);
-	st = tr.makePair(st, this, p);
+	p = Translator.makePair(p, decl, p.cdr);
+	st = Translator.makePair(st, this, p);
       }
     forms.addElement (st);
     return true;

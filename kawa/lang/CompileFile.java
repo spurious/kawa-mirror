@@ -1,11 +1,9 @@
 package kawa.lang;
 import java.io.*;
-import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
-import gnu.kawa.lispexpr.LispReader;
 
 /** Procedure to read and compile and entire file.
  * Creates a .zip archive containing the resulting classes.

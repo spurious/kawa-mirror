@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.*;
              
 public class with_input_from_file extends Procedure2

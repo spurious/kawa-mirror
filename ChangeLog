@@ -1,3 +1,52 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* kawa/GuiConsole.java:  Remove unused import statements.
+	* kawa/GuiInPort.java:  Likewise.
+	* kawa/MessageArea.java:  Likewise.
+	* kawa/Shell.java:  Likewise.
+	* kawa/lang/AnyPat.java:  Likewise.
+	* kawa/lang/CompileFile.java:  Likewise.
+	* kawa/lang/EqualPat.java:  Likewise.
+	* kawa/lang/Lambda.java:  Likewise.
+	* kawa/lang/ListRepeatPat.java:  Likewise.
+	* kawa/lang/PairPat.java:  Likewise.
+	* kawa/lang/SyntaxRule.java:  Likewise.
+	* kawa/lang/Translator.java:  Likewise.
+	* kawa/lang/loadcompiled.java:  Likewise.
+	* kawa/standard/Scheme.java:  Likewise.
+	* kawa/standard/atan.java:  Likewise.
+	* kawa/standard/call_with_values.java:  Likewise.
+	* kawa/standard/define_autoload.java:  Likewise.
+	* kawa/standard/define_member_alias.java:  Likewise.
+	* kawa/standard/letrec.java:  Likewise.
+	* kawa/standard/logior.java:  Likewise.
+	* kawa/standard/make_future.java:  Likewise.
+	* kawa/standard/max.java:  Likewise.
+	* kawa/standard/min.java:  Likewise.
+	* kawa/standard/module_extends.java:  Likewise.
+	* kawa/standard/module_implements.java:  Likewise.
+	* kawa/standard/module_name.java:  Likewise.
+	* kawa/standard/object.java:  Likewise.
+	* kawa/standard/open_output_file.java:  Likewise.
+	* kawa/standard/prim_method.java:  Likewise.
+	* kawa/standard/quantity2number.java:  Likewise.
+	* kawa/standard/quantity2unit.java:  Likewise.
+	* kawa/standard/scheme_env.java:  Likewise.
+	* kawa/standard/syntax_error.java:  Likewise.
+	* kawa/standard/throw_name.java:  Likewise.
+	* kawa/standard/try_finally.java:  Likewise.
+	* kawa/standard/vector_append.java:  Likewise.
+	* kawa/standard/with_input_from_file.java:  Likewise.
+	* kawa/standard/with_output_to_file.java:  Likewise.
+	* kawa/standard/define.java:  Use static syntax to access
+	static fields/methods.
+	* kawa/standard/define_class.java:  Likewise.
+	* kawa/standard/define_member_alias.java:  Likewise.
+	* kawa/standard/define_syntax.java:  Likewise.
+	* kawa/standard/define_unit.java:  Likewise.
+	* kawa/standard/define_variable.java:  Likewise.
+	* kawa/standard/object.java:  Likewise.
+
 2004-07-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme (initScheme):  The functions rationalize,

@@ -1,18 +1,13 @@
 package kawa.lang;
-import kawa.standard.Scheme;
-import gnu.bytecode.Method;
-import gnu.bytecode.Variable;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.StaticFieldConstraint;
-import java.lang.reflect.Modifier;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.LispInterpreter;
-import java.util.Hashtable;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is

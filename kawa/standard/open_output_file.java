@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.Procedure1;
 import gnu.mapping.OutPort;
 import gnu.mapping.Environment;

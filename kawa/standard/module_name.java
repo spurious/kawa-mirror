@@ -1,9 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
-import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.bytecode.*;
 
 public class module_name extends Syntax
 {

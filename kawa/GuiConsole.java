@@ -2,7 +2,6 @@ package kawa;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import gnu.mapping.*;
 
 import gnu.expr.Interpreter;

@@ -1,5 +1,4 @@
 package kawa.lang;
-import gnu.bytecode.*;
 import gnu.mapping.*;
 
 public class loadcompiled extends Procedure1

@@ -67,9 +67,10 @@ public class define extends Syntax implements Printable
 	    decl.setProcedureDecl(true);
 	    lexp.nameDecl = decl;
 	    lambda.rewrite(lexp, namePair.cdr, tr);
-	    declForm = tr.makePair(namePair, lexp, namePair.cdr);
-	    declForm = tr.makePair(p1, declForm,
-				   lambda.rewriteAttrs(lexp, p1.cdr, tr));
+	    declForm = Translator.makePair(namePair, lexp, namePair.cdr);
+	    declForm = Translator.makePair(p1, declForm,
+					   lambda.rewriteAttrs(lexp,
+							       p1.cdr, tr));
 	  }
 	else
 	  {
@@ -90,7 +91,7 @@ public class define extends Syntax implements Printable
 	      }
 	    else
 	      value_list = p2.cdr;
-	    declForm = tr.makePair(p1, decl, value_list);
+	    declForm = Translator.makePair(p1, decl, value_list);
 	  }
         if (defs instanceof ModuleExp)
           {
@@ -105,7 +106,7 @@ public class define extends Syntax implements Printable
 		  decl.setCanWrite(true);
               }
           }
-	st = tr.makePair(st, this, declForm);
+	st = Translator.makePair(st, this, declForm);
 	Translator.setLine(decl, namePair);
       }
     forms.addElement (st);

@@ -1,6 +1,5 @@
 package kawa.standard;
 import gnu.lists.*;
-import java.lang.Error;  // To work around case-fold bug in some compilers.
 import gnu.mapping.*;
 
 /**

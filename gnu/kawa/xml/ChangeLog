@@ -1,3 +1,8 @@
+2005-03-06  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java: Moved to gnu.kawa.lispexpr.
+	The reason is so namespaces can work even when --disable-xml.
+
 2005-03-03  Per Bothner  <per@bothner.com>
 
 	* Children.java: Moved from gnu.mapping.xquery, because it is also

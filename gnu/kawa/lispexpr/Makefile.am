@@ -3,6 +3,7 @@
 include $(top_srcdir)/Make-rules
 
 java_sources = \
+  DefineNamespace.java \
   LangPrimType.java \
   LispLanguage.java \
   LispPackage.java \

@@ -218,7 +218,6 @@ java_sources = \
   Children.java \
   CoerceNodes.java \
   CommentConstructor.java \
-  DefineNamespace.java \
   DescendantAxis.java \
   DescendantOrSelfAxis.java \
   Document.java \

@@ -1,5 +1,7 @@
 2005-03-07  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: Update package of DefineNamespace.
+
 	* kawa/standard/read_line.java (apply2): Update WrongType call.
 
 2005-03-06  Per Bothner  <per@bothner.com>

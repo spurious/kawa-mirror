@@ -1,4 +1,4 @@
-package gnu.kawa.xml;
+package gnu.kawa.lispexpr;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;

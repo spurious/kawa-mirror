@@ -5,7 +5,8 @@ KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 DOTEST = $(KAWA) --clisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
-SOURCES = lang-test.lisp
+EXTRA_DIST = lang-test.lisp
+CLEANFILES = *.log
 
 all:
 

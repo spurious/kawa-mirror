@@ -1,8 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
-@Make_rules@
+include $(top_srcdir)/Make-rules
 
 EXCEPTIONS=\
 GenericError.java\

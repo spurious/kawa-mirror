@@ -1,15 +1,12 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
-@Make_rules@
+include $(top_srcdir)/Make-rules
 
 java_sources = \
   random.java
 
 PACKAGE_FNAME = gnu-brl
 GCJ_INPUTS =  $(java_Java)
-SOURCES = $(java_SCM) $(java_sources)
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 java_SCM = stringfun.scm

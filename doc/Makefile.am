@@ -1,3 +1,4 @@
+# Have .info files to be created in builddir, not srcdir.
 AUTOMAKE_OPTIONS = cygnus
 
 SUFFIXES = .pdf

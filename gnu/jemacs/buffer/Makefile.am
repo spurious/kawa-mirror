@@ -1,8 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
-@Make_rules@
+include $(top_srcdir)/Make-rules
 
 java_WITH_SWING = \
   Buffer.java \
@@ -38,7 +36,7 @@ java_SCM = emacs.scm
 
 EXTRA_DIST = emacs.scm $(java_WITH_SWING) package.html
 GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
-GCJ_DEPS = $(java_WITH_SWING) scm-classes.stamp
+EXTRA_GCJ_DEPS = scm-classes.stamp
 PACKAGE_FNAME = gnu-jemacs-buffer
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 

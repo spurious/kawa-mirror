@@ -127,11 +127,11 @@ APPLETVIEWER = appletviewer
 check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. scribble.html
 
-SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
+CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
+EXTRA_DIST = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm \
   MyFunc.java MyModule.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm \
-  module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql
-CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
-EXTRA_DIST = ppfile.out scribble.html.in \
+  module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql \
+  ppfile.out scribble.html.in \
   HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected

@@ -63,6 +63,7 @@ public class Declaration
       : symbol.toString();
   }
   public final Object getSymbol() { return symbol; }
+  public final void setSymbol(Object symbol) { this.symbol = symbol; }
 
   /* Declarations in a ScopeExp are linked together in a linked list. */
   Declaration next;

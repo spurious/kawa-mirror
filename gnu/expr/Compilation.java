@@ -10,7 +10,6 @@ import kawa.Shell;
 import gnu.text.*;
 import java.util.zip.*;
 import java.util.Stack;
-// import java.util.jar.*; // Java2
 
 /** State for a single expression or module.
  * For each top-level thing (expression or file) we compile or evaluate
@@ -1410,7 +1409,6 @@ public class Compilation
 	      code.putLineNumber(line);
 
 	    Method primMethod = primMethods[methodIndex];
-	    //System.err.println("meth#"+i+'/'+numMethods+" "+primMethod);
 	    Type[] primArgTypes = primMethod.getParameterTypes();
 	    int nargs = primArgTypes.length;
 	    int singleArgs = varArgs ? (nargs - 1) : nargs;
@@ -2096,6 +2094,41 @@ public class Compilation
 
   public ScopeExp currentScope() { return current_scope; }
 
+  /** Set <code>currentScope()</code>.
+   * Also update the <code>nesting</code> object.
+   */
+  public void setCurrentScope (ScopeExp scope)
+  {
+    int scope_nesting = ScopeExp.nesting(scope);
+    int current_nesting = ScopeExp.nesting(current_scope);
+    while (current_nesting > scope_nesting)
+      {
+	pop(current_scope);
+	current_nesting--;
+      }
+    ScopeExp sc = scope;
+    while (scope_nesting > current_nesting)
+      {
+	sc = sc.outer;
+	scope_nesting--;
+      }
+    while (sc != current_scope)
+      {
+	pop(current_scope);
+	sc = sc.outer;
+      }
+    pushChain(scope, sc);
+  }
+
+  void pushChain (ScopeExp scope, ScopeExp limit)
+  {
+    if (scope != limit)
+      {
+	pushChain(scope.outer, limit);
+	push(scope);
+      }
+  }
+
   public void push (ScopeExp scope)
   {
     if (scope instanceof ModuleExp)
@@ -2379,4 +2412,16 @@ public class Compilation
   protected ScopeExp current_scope;
 
   protected SourceMessages messages;
+
+  public static Compilation getCurrent ()
+  {
+    Environment env = Environment.getCurrent();
+    return (Compilation) env.get("*current-compilation*", null);
+  }
+
+  public static void setCurrent (Compilation comp)
+  {
+    Environment env = Environment.getCurrent();
+    env.put("*current-compilation*", comp);
+  }
 }

@@ -140,6 +140,9 @@ public class ModuleExp extends LambdaExp
       }
   }
 
+  /** Flag to force compilation, even when not required. */
+  public static boolean alwaysCompile = false;
+
   public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
   {
     ModuleExp mexp = comp.getModule();
@@ -149,17 +152,18 @@ public class ModuleExp extends LambdaExp
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 
-	if (debugPrintExpr && ! comp.mustCompile)
-	  {
-	    OutPort dout = OutPort.outDefault();
-	    dout.println ("[Evaluating module \""+mexp.getName()+"\":");
-	    mexp.print(dout);
-	    dout.println(']');
-	    dout.flush();
+	if (! alwaysCompile && ! comp.mustCompile)
+	  { // optimization - don't generate unneeded Class.
+	    if (debugPrintExpr)
+	      {
+		OutPort dout = OutPort.outDefault();
+		dout.println ("[Evaluating module \""+mexp.getName()+"\":");
+		mexp.print(dout);
+		dout.println(']');
+		dout.flush();
+	      }
+	    mexp.body.eval (env, ctx);
 	  }
-
-	if (! comp.mustCompile) // optimization - don't generate unneeded Class.
-	  mexp.body.eval (env, ctx);
 	else
 	  {
 	    ModuleBody mod;

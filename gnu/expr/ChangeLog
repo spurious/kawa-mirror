@@ -1,5 +1,12 @@
 2004-11-05  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (alwaysCompile): New static flag.
+	(evalModule): Use new flag, and eliminate extra tests.
+
+	* Compilation.java (setCurrentScope): New method.
+	(getCurrent, setCurrent): New static methods.
+	* Declaration.java (setSymbol): New method.
+
 	* Interpreter.java (languages): Add "xq" and "xquery" as extensions
 	for XQuery, to match section H.2.3 of 20041029 XQuery draft.
 

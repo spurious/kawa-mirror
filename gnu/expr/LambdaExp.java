@@ -183,7 +183,7 @@ public class LambdaExp extends ScopeExp
    * We don't need a class if this is only called inline.
    * We also don't need a class if all callers are known, and we can
    * invoke a method for this procedure.
-   * However, the last optimization is not availble when using tail calls.
+   * However, the last optimization is not available when using tail calls.
    */
   public final boolean isClassGenerated ()
   {

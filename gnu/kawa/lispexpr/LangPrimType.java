@@ -10,6 +10,7 @@ import gnu.text.Char;
 public class LangPrimType extends gnu.bytecode.PrimType
 {
   Interpreter interpreter;
+  PrimType implementationType;
 
   public static LangPrimType byteType = new LangPrimType(Type.byte_type);
   public static LangPrimType shortType = new LangPrimType(Type.short_type);
@@ -23,12 +24,14 @@ public class LangPrimType extends gnu.bytecode.PrimType
   public LangPrimType (PrimType type)
   {
     super(type);
+    implementationType = type;
   }
 
   public LangPrimType (PrimType type, Interpreter interpreter)
   {
     super(type);
     this.interpreter = interpreter;
+    implementationType = type;
   }
 
   public LangPrimType (String nam, String sig, int siz, Class reflectClass)
@@ -39,8 +42,14 @@ public class LangPrimType extends gnu.bytecode.PrimType
   public LangPrimType (String nam, String sig, int siz, Class reflectClass,
 		      Interpreter interpreter)
   {
-    super (nam, sig, siz, reflectClass);
+    this(nam, sig, siz, reflectClass);
+    implementationType = Type.signatureToPrimitive(sig.charAt(0));
     this.interpreter = interpreter;
+  }
+
+  public Type getImplementationType()
+  {
+    return implementationType;
   }
 
   public Object coerceFromObject (Object obj)

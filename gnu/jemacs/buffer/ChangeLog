@@ -1,3 +1,13 @@
+2001-11-26  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java (dump):  Minor improvement in positions printing.
+
+	* ReplBuffer.java (<init>): The processMarker is no longer isAfter().
+	(enter):  Move processMark before sending data to QueueReader.
+
+	* BufferKeymap.java (ignorable):  Make more consistent.
+	(asKeyStroke):  Handle some more key names.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* emacs.scm:  Use invoke instead of primitive-virtual-method.

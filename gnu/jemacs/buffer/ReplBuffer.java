@@ -23,7 +23,8 @@ public class ReplBuffer extends Buffer
 
     inputStyle = redStyle;
 
-    processMark = new Marker(pointMarker);
+    processMark = new Marker(this, 0, false);
+    repl = this;
     processWriter = new BufferWriter(processMark, true);
     in_r = new QueueReader ();
     out = new OutPort(processWriter, true, true);
@@ -38,6 +39,7 @@ public class ReplBuffer extends Buffer
 
   public void enter()
   {
+    // FIXME goto end of line.
     insert('\n', 1, null);
     int pos = getDot();
     int markPos = processMark.getOffset();
@@ -50,8 +52,8 @@ public class ReplBuffer extends Buffer
       {
         throw new RuntimeException("internal error: "+ex);
       }
-    in_r.append(segment.array, segment.offset, segment.count);
     processMark.setDot(pos);
+    in_r.append(segment.array, segment.offset, segment.count);
   }
 
   public static ReplBuffer make(String language)

@@ -165,7 +165,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
   /**
    * True for a KeyStroke if the default action should be to ignore it.
    * For example, pressing a shift key should not be an action!
-   * We als have the complication that both KEY-PRESSED and KEY_TYPED
+   * We also have the complication that both KEY-PRESSED and KEY_TYPED
    * events and we typically want to ignore one but not both.
    * (If both are handled, we have problems with default actions, as
    * well as when to abort a prefix sequence.  Swing does not have
@@ -183,28 +183,16 @@ public class BufferKeymap implements javax.swing.text.Keymap
     if (code == 0)
       { // It's a KEY_TYPED (keyChar) event.
         char ch = key.getKeyChar();
-        return (ch < ' ' && ch != '\n' && ch != '\t') || ch > 127;
+        return ch < ' ' || ch >= 127;
       }
     else
       { // It's a KEY_PRESSED (keyCODE) event.
-        /*
-        if ((mods & ~SHIFT_MASK) != 0)
-          return false;
-        if (code >= KeyEvent.VK_A && code <= KeyEvent.VK_Z)
-          return true;
-        if ((mods & SHIFT_MASK) != 0)
-          return false;
-        // FIXME Basically, in the case of KEY_PRESSED events that will
-        // map wihout loss of information into normal KEY_TYPED events,
+        // Basically, in the case of KEY_PRESSED events that will
+        // map without loss of information into normal KEY_TYPED events,
         // we prefer the KEY_TYPED events (as they don't depend on the
         // keyboard layout).
-        // ',', '-', '.', '/', '0' .. '9'', '=', ';'
-        if ((code >= KeyEvent.VK_COMMA && code <= KeyEvent.VK_9)
-            || code == KeyEvent.VK_EQUALS
-            || code == KeyEvent.VK_SEMICOLON)
-          return true;
-        */
-        return true;
+        return (mods & ~SHIFT_MASK) == 0
+	  && code >= KeyEvent.VK_SPACE && code < KeyEvent.VK_DELETE;
       }
   }
 
@@ -268,7 +256,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
             if (ignorable(key))
               return IgnoreAction.getInstance();
             else
-              return keymap.getDefaultAction();
+	      return keymap.getDefaultAction();
           }
         if (i == nKeys)
           return action;
@@ -414,12 +402,21 @@ public class BufferKeymap implements javax.swing.text.Keymap
 		return javax.swing.KeyStroke.getKeyStroke(ch, m);
 	      }
 	  }
-	if (name == "backspace")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, m);
-	if (name == "prior")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, m);
-	if (name == "next")
-	  return javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, m);
+	int code = -1;
+	if (name.charAt(0) == 'k')
+	  {
+	    if (name == "kp-left")       code = KeyEvent.VK_KP_LEFT;
+	    else if (name == "kp-right") code = KeyEvent.VK_KP_RIGHT;
+	    else if (name == "kp-up")    code = KeyEvent.VK_KP_UP;
+	    else if (name == "kp-down")  code = KeyEvent.VK_KP_DOWN;
+	    else if (name == "kp-delete")code = KeyEvent.VK_DELETE;
+	  }
+	else if (name == "delete")       code = KeyEvent.VK_DELETE;
+	else if (name == "backspace")    code = KeyEvent.VK_BACK_SPACE;
+	else if (name == "prior")        code = KeyEvent.VK_PAGE_UP;
+	else if (name == "next")         code = KeyEvent.VK_PAGE_DOWN;
+	if (code >= 0)
+	  return javax.swing.KeyStroke.getKeyStroke(code, m);
         if (name == "return")
           name = "enter";
 	return javax.swing.KeyStroke.getKeyStroke(name.toUpperCase());
@@ -527,6 +524,11 @@ public class BufferKeymap implements javax.swing.text.Keymap
             keySpec = ((Pair) keySpec).cdr;
           }
         KeyStroke key = asKeyStroke(keySpec);
+	if (key == null)
+	  {
+	    System.err.println("unknown key name: "+keySpec);
+	    return;
+	  }
         if ((key.getModifiers() & META_MASK) != 0)
           {
             key = stripMeta(key);

@@ -137,7 +137,7 @@ implements javax.swing.text.AbstractDocument.Content
     for (int i = 0;  i < poslen;  i++)
       {
 	int pos = positions[i];
-	if (pos != 0)
+	if (free == -2 ? pos != FREE_POSITION : pos != 0)
 	  System.err.println("position#"+i+": "+(pos>>1)+" isAfter:"+(pos&1));
       }
   }

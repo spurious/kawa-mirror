@@ -959,8 +959,6 @@ public class Scheme extends LispLanguage
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Scheme interp = new Scheme();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setCurrent(interp.getEnvironment());
+    Language.setDefaults(new Scheme());
   }
 }

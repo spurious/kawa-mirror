@@ -1,5 +1,8 @@
 2005-02-24  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java registerEnvironment):
+	Use new setDefaults method.
+
 	* kawa/repl.java (getInterpreterFromFilenameExtension): Change return
 	type and name to getLanguageFromFilenameExtension.
 	(getInterpreter): Also change return type and rename to getLanguage.

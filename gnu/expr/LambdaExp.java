@@ -1367,16 +1367,7 @@ public class LambdaExp extends ScopeExp
   {
     Target target;
     if (isHandlingTailCalls())
-      {
-	CodeAttr code = comp.getCode();
-	comp.loadCallContext();
-	code.emitGetField(comp.typeCallContext.getDeclaredField("consumer"));
-	Scope scope = code.getCurrentScope();
-	Variable result
-	  = scope.addVariable(code, Compilation.typeConsumer, "$result");
-	code.emitStore(result);
-	target = new ConsumerTarget(result);
-      }
+      target = ConsumerTarget.makeContextTarget(comp);
     else
       target = Target.pushValue(getReturnType());
     body.compileWithPosition(comp, target,

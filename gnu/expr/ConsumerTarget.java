@@ -11,6 +11,7 @@ import gnu.bytecode.*;
 public class ConsumerTarget extends Target
 {
   Variable consumer;
+  boolean isContextTarget;
 
   public ConsumerTarget(Variable consumer)
   {
@@ -18,6 +19,24 @@ public class ConsumerTarget extends Target
   }
 
   public Variable getConsumerVariable() { return consumer; }
+
+  /** True iff this target is the current CallContext's current Consumer. */
+  public final boolean isContextTarget () { return isContextTarget; }
+
+  /** Make a Target that uses the current CallContext's current Consumer. */
+  public static Target makeContextTarget (Compilation comp)
+  {
+    CodeAttr code = comp.getCode();
+    comp.loadCallContext();
+    code.emitGetField(comp.typeCallContext.getDeclaredField("consumer"));
+    Scope scope = code.getCurrentScope();
+    Variable result
+      = scope.addVariable(code, Compilation.typeConsumer, "$result");
+    code.emitStore(result);
+    ConsumerTarget target = new ConsumerTarget(result);
+    target.isContextTarget = true;
+    return target;
+  }
 
   /** Compile an expression using a temporary Consumer, if needed. */
   public static void compileUsingConsumer(Expression exp,

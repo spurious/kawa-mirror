@@ -327,6 +327,10 @@ public class ApplyExp extends Expression
 	  {
 	    code.emitReturn();
 	  }
+	else if (((ConsumerTarget) target).isContextTarget())
+	  {
+	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilDone", 0));
+	  }
 	else
 	  {
 	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());

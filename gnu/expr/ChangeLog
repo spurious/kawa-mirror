@@ -1,3 +1,10 @@
+2003-08-17  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (isContextTarget):  New field.
+	(isContextTarget, makeContextTarget):  New methods.
+	* LambdaExp.java (compileBody):  Use makeContextTarget.
+	* ApplyExp.java (compile):  Minor optimization.
+
 2003-08-09  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (callInitMethods):  Don't call recursively

@@ -77,7 +77,7 @@ public class ObjectExp extends LambdaExp
       {
 	CodeAttr code = comp.getCode();
 	code.emitDup(1);
-	code.emitInvokeVirtual(initMethod.primMethod);
+	code.emitInvokeVirtual(initMethod.getMainMethod());
       }
     target.compileFromStack(comp, getCompiledClassType(comp));
   }
@@ -136,10 +136,7 @@ public class ObjectExp extends LambdaExp
 
 	    // generate_unique_name (method_class, child.getName());
 	    String child_name = child.getName();
-	    String method_name = comp.mangleName(child_name);
-	    child.primMethod
-	      = child.addMethodFor (method_class, method_name, null);
-	    child.primMethod.setModifiers(Access.PUBLIC);
+	    child.addMethodFor(comp, null);
 	    child = child.nextSibling;
 	  }
 
@@ -147,14 +144,14 @@ public class ObjectExp extends LambdaExp
 	  {
 	    Method save_method = comp.method;
 	    LambdaExp save_lambda = comp.curLambda;
-	    comp.method = child.primMethod;
+	    comp.method = child.getMainMethod();
 	    comp.curClass = comp.method.getDeclaringClass();
 	    comp.curLambda = child;
 	    comp.method.initCode();
             child.allocChildClasses(comp);
-	    child.allocParameters(comp, null);
-	    child.enterFunction(comp, null);
-	    Type rtype = child.primMethod.getReturnType();
+	    child.allocParameters(comp);
+	    child.enterFunction(comp);
+	    Type rtype = comp.method.getReturnType();
 	    child.body.compileWithPosition(comp, Target.returnValue(rtype));
 	    child.compileEnd(comp);
 	    child.compileChildMethods(comp);

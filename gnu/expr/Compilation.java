@@ -9,10 +9,8 @@ import java.io.*;
 
 public class Compilation
 {
-  /** Set of PrimProcedures generated for visible top-level procedures. */
+  /** Set of visible top-level LambdaExps that need apply methods. */
   Vector applyMethods = new Vector();
-  /** Number of the different kinds of applyMethods. */
-  int[] applyMethodsCount = new int[6]; // apply0..apply4+applyN
   /** Used by LambdaExp.getSelectorValue if need to allocate new selector. */
   int maxSelectorValue;
 
@@ -47,7 +45,6 @@ public class Compilation
   SwitchState fswitch;
 
   Field fswitchIndex;
-  Variable argsArray;
   /** The actual parameter of the current CallFrame.step(CallStack) method. */
   Variable callStackContext;
 
@@ -71,11 +68,16 @@ public class Compilation
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType scmInterpreterType
     = ClassType.make("kawa.lang.Interpreter");
+  static public ClassType typeMacro
+    = ClassType.make("kawa.lang.Macro");
   static public ClassType typeEnvironment
     = ClassType.make("gnu.mapping.Environment");
-  static public ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
-  static public final Method getBindingMethod
-    = typeBinding.addMethod("get", Type.typeArray0,
+  static public ClassType typeLocation
+    = ClassType.make("gnu.mapping.Location");
+  static public ClassType typeBinding
+    = ClassType.make("gnu.mapping.Binding", typeLocation);
+  static public final Method getLocationMethod
+    = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
   static public final Method getProcedureBindingMethod
     = typeBinding.addMethod("getProcedure", Type.typeArray0,
@@ -321,12 +323,17 @@ public class Compilation
 	  {
 	    Object[] array = (Object[]) value;
 	    int len = array.length;
-	    literal = new Literal (value, objArrayType, this);
-	    for (int i = array.length;  --i >= 0; )
+	    if (len == 0 && ! (value instanceof String[]))
+	      literal = new Literal(value, noArgsProcedureField, this);
+	    else
 	      {
-		Object element = array[i];
-		if (element != null)
-		  findLiteral(element);
+		literal = new Literal (value, objArrayType, this);
+		for (int i = len;  --i >= 0; )
+		  {
+		    Object element = array[i];
+		    if (element != null)
+		      findLiteral(element);
+		  }
 	      }
 	  }
 	else
@@ -503,7 +510,7 @@ public class Compilation
 		next = i + 1 < len ? name.charAt(i+1) : '\0';
 		if (Character.isLowerCase(next))
 		  {
-		    mangled.append("To");
+		    mangled.append(i == 1 ? "to" : "To");
 		    next = Character.toTitleCase(next);
 		    mangled.append(next);
 		    i++;
@@ -643,7 +650,14 @@ public class Compilation
     code.emitInvokeSpecial(superConstructor);
 
     if (curClass == mainClass)
-      dumpInitializers(initChain);
+      {
+	Initializer init;
+	while ((init = initChain) != null)
+	  {
+	    initChain = init.next;
+	    init.emit(this);
+	  }
+      }
 
     // If immediate, we cannot set the function name in the constructor,
     // since setLiterals has not been called yet (ecept for nested functions).
@@ -653,10 +667,226 @@ public class Compilation
 	compileConstant (lexp.name);
 	code.emitPutField(nameField);
       }
+
+    if (curClass == mainClass) // lexp.isModuleBody())
+      {
+	code = getCode();
+	int numGlobals = bindingFields.size();
+	if (numGlobals > 0)
+	  {
+	    code.emitInvokeStatic(getCurrentEnvironmentMethod);
+	    java.util.Enumeration e = bindingFields.keys();
+	    while (e.hasMoreElements())
+	      {
+		String id = (String) e.nextElement();
+		Field fld = (Field) bindingFields.get(id);
+		if (--numGlobals > 0)
+		  code.emitDup(1);
+		code.emitPushString(id);
+		code.emitInvokeVirtual(getBindingEnvironmentMethod);
+		code.emitPutStatic(fld);
+	      }
+	  }
+      }
+
     code.emitReturn();
     method = save_method;
     curClass = save_class;
     return constructor_method;
+  }
+
+  /** Generate ModuleBody's apply0 .. applyN methods.
+   * Use the applyMethods vector, which contains methods that implement
+   * the (public, readable) methods of the current module. */
+  public void generateApplyMethods()
+  {
+    Method save_method = method;
+    CodeAttr code = null;
+    for (int i = 0;  i < 6; i++)
+      {
+	// If i < 5, generate the method named ("apply"+i);
+	// else generate "applyN".
+	boolean needThisApply = false;
+	SwitchState aswitch = null;
+
+	for (int j = applyMethods.size();  --j >= 0; )
+	  {
+	    LambdaExp source = (LambdaExp) applyMethods.elementAt(j);
+	    // Select the subset of source.primMethods[*] that are suitable
+	    // for the current apply method (applyArgsModule[i]).
+	    Method[] primMethods = source.primMethods;
+	    int numMethods = primMethods.length;
+	    boolean varArgs = source.max_args < 0
+	      || source.max_args >= source.min_args + numMethods;
+	    int methodIndex;
+	    if (i < 5) // Handling apply0 .. apply4
+	      {
+		methodIndex = i - source.min_args;
+		if (methodIndex < 0 || methodIndex >= numMethods
+		    || (methodIndex == numMethods - 1 && varArgs))
+		  continue;
+		numMethods = 1;
+		varArgs = false;
+	      }
+	    else // Handling applyN
+	      {
+		methodIndex = 5 - source.min_args;
+		if (methodIndex > 0 && numMethods <= methodIndex && ! varArgs)
+		  continue;
+		methodIndex = numMethods-1;
+	      }
+	    if (! needThisApply)
+	      {
+		// First LambdaExp we seen suitable for this i.
+		String mname = i < 5 ? ("apply"+i) : "applyN";
+		method = curClass.addMethod (mname, applyArgsModule[i],
+					     Type.pointer_type,
+					     Access.PUBLIC);
+		method.init_param_slots();
+		code = getCode();
+
+		code.emitLoad(code.getArg(1)); // method
+		code.emitGetField(selectorOfModuleMethod);
+		aswitch = new SwitchState(code);
+
+		needThisApply = true;
+	      }
+
+	    aswitch.addCase(source.getSelectorValue(this), code);
+
+	    Method primMethod = primMethods[methodIndex];
+	    Type[] primArgTypes = primMethod.getParameterTypes();
+	    int nargs = primArgTypes.length;
+	    int singleArgs = varArgs ? (nargs - 1) : nargs;
+	    Variable counter = null;
+	    int pendingIfEnds = 0;
+
+	    if (i > 4 && numMethods > 1)
+	      {
+		counter = code.addLocal(Type.int_type);
+		code.emitLoad(code.getArg(2));
+		code.emitArrayLength();
+		if (source.min_args != 0)
+		  {
+		    code.emitPushInt(source.min_args);
+		    code.emitSub(Type.int_type);
+		  }
+		code.emitStore(counter);
+	      }
+
+	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
+	    if (needsThis > 0)
+	      code.emitPushThis();
+
+	    for (int k = 0; k < singleArgs;  k++)
+	      {
+		if (counter != null && k >= source.min_args)
+		  {
+		    code.emitLoad(counter);
+		    code.emitIfIntLEqZero();
+		    code.emitInvoke(primMethods[k - source.min_args]);
+		    code.emitElse();
+		    pendingIfEnds++;
+		    code.emitInc(counter, (short) (-1));
+		  }
+
+		if (i > 4) // applyN method
+		  {
+		    // Load Object[]args value:
+		    code.emitLoad(code.getArg(2));
+		    code.emitPushInt(k);
+		    code.emitArrayLoad(Type.pointer_type);
+		  }
+		else // apply'i method
+		  code.emitLoad(code.getArg(k + 2));
+		Type ptype = primArgTypes[k];
+		if (ptype != Type.pointer_type)
+		  CheckedTarget.emitCheckedCoerce(this, source,
+						  k, ptype);
+		    
+	      }
+
+	    if (varArgs)
+	      {
+		Type lastArgType = primArgTypes[singleArgs];
+		if (lastArgType instanceof ArrayType)
+		  {
+		    Type elType
+		      = ((ArrayType) lastArgType).getComponentType();
+		    boolean mustConvert
+		      = ! "java.lang.Object".equals(elType.getName());
+		    if (singleArgs == 0 && ! mustConvert)
+		      code.emitLoad(code.getArg(2)); // load args array.
+		    else
+		      {
+			code.pushScope();
+			if (counter == null)
+			  {
+			    counter = code.addLocal(Type.int_type);
+			    code.emitLoad(code.getArg(2));
+			    code.emitArrayLength();
+			  }
+			code.emitLoad(counter);
+			code.emitNewArray(elType);
+			Label testLabel = new Label(code);
+			code.emitGoto(testLabel);
+			Label loopTopLabel = new Label(code);
+			loopTopLabel.define(code);
+
+			code.emitDup(1); // new array
+			code.emitLoad(counter);
+			code.emitLoad(code.getArg(2));
+			code.emitLoad(counter);
+			if (singleArgs != 0)
+			  {
+			    code.emitPushInt(singleArgs);
+			    code.emitAdd(Type.int_type);
+			  }
+			code.emitArrayLoad(Type.pointer_type);
+			if (mustConvert)
+			  {
+			    CheckedTarget.emitCheckedCoerce
+			      (this, source, source.getName(), -1, elType);
+			  }
+			code.emitArrayStore(elType);
+			testLabel.define(code);
+			code.emitInc(counter, (short) (-1));
+			code.emitLoad(counter);
+			code.emitGotoIfIntGeZero(loopTopLabel);
+			code.popScope();	
+		      }
+		  }
+		else if ("gnu.kawa.util.LList".equals
+			 (lastArgType.getName()))
+		  {	
+		    code.emitLoad(code.getArg(2)); // load args array.
+		    code.emitPushInt(singleArgs);
+		    code.emitInvokeStatic(Compilation.makeListMethod);
+		  }
+		else
+		  throw new RuntimeException("unsupported #!rest type");
+              }
+
+	    code.emitInvoke(primMethod);
+	    Target.pushObject.compileFromStack(this,
+					       primMethod.getReturnType());
+	    while (--pendingIfEnds >= 0)
+	      code.emitFi();
+	    code.emitReturn();
+          }
+	if (needThisApply)
+	  {
+	    aswitch.addDefault(code);
+	    int nargs = i > 4 ? 2 : i + 1;
+	      nargs++;
+	    for (int k = 0;  k < nargs;  k++)
+	      code.emitLoad(code.getArg(k));
+	    code.emitInvokeSpecial(applyModuleMethods[i]);  // call super
+	    code.emitReturn();
+	    aswitch.finish(code);
+	  }
+      }
+    method = save_method;
   }
 
   /** Compiles a function to a class. */
@@ -755,40 +985,14 @@ public class Compilation
 	callStackContext.setArtificial(true);
       }
 
-    Variable argsArray;
-    if (lexp.isHandlingTailCalls() || lexp.min_args != lexp.max_args || lexp.min_args > 4
-	|| (fewerClasses && curClass == mainClass))
-      argsArray = lexp.declareArgsArray();
-    else
-      argsArray = null;
-
-    if (usingCPStyle() || (fewerClasses && curClass == mainClass))
-      {
-	code = getCode();
-	if (lexp.isHandlingTailCalls())
-	  {
-	    fswitchIndex = pcCallStackField;
-	    callStackContext.reserveLocal(1, code);
-	    code.emitLoad(callStackContext);
-	  }
-	else
-	  {
-	    fswitchIndex = curClass.addField("PC", Type.int_type);
-	    code.emitPushThis();
-	  }
-	code.emitGetField(fswitchIndex);
-	fswitch = new SwitchState(code);
-	fswitch.addCase(0, code);
-	this.argsArray = argsArray;
-      }
-
     int line = lexp.getLine();
     if (line > 0)
       code.putLineNumber(line);
 
+    /*
     if (arg_letter == 'N')
       {
-	argsArray.reserveLocal(1, code);
+	argsArray.reserveLocal(1, code); // FIXME
 
 	if (true) // If generating code to check number of arguments
 	  {
@@ -798,9 +1002,10 @@ public class Compilation
 	    code.emitInvokeStatic(checkArgCountMethod);
 	  }
       }
+    */
 
-    lexp.allocParameters(this, argsArray);
-    lexp.enterFunction(this, argsArray);
+    lexp.allocParameters(this);
+    lexp.enterFunction(this);
 
     try
       {
@@ -815,6 +1020,7 @@ public class Compilation
         System.exit(-1);
       }
     lexp.compileEnd(this);
+
     if (Compilation.fewerClasses) // FIXME
       method.popScope(); // Undoes pushScope in method.initCode.
 
@@ -827,89 +1033,9 @@ public class Compilation
       }
 
     if (lexp.isModuleBody ())
-      { // Generate ModuleBody's apply0 .. applyN methods:
-	Method save_method = method;
-        for (int i = 0;  i < 6; i++)
-          {
-            if (applyMethodsCount[i] == 0)
-              continue;
-            String mname = i < 5 ? ("apply"+i) : "applyN";
-            method = curClass.addMethod (mname, applyArgsModule[i],
-                                         Type.pointer_type,
-                                         Access.PUBLIC);
-            method.init_param_slots();
-            code = getCode();
-            int nargs;
-            code.emitLoad(code.getArg(1));
-            code.emitGetField(selectorOfModuleMethod);
-            SwitchState aswitch = new SwitchState(code);
-            for (int j = applyMethods.size();  --j >= 0; )
-              {
-                PrimProcedure apply
-                  = (PrimProcedure) applyMethods.elementAt(j);
-                LambdaExp source = apply.source;
-                boolean varArgs = source.min_args != source.max_args;
-                if (i != ((varArgs || source.min_args >= 5) ? 5
-                          : source.min_args))
-                  continue;
-                aswitch.addCase(source.getSelectorValue(this), code);
-                int sourceLine = source.getLine();
-                if (sourceLine > 0)
-                  code.putLineNumber(sourceLine);
-                Method primMethod = apply.method;
-                nargs = primMethod.getParameterTypes().length;
-                int needsThis = apply.getStaticFlag() ? 0 : 1;
-                if (needsThis > 0)
-                  code.emitPushThis();
-                if (varArgs)
-                  {
-                    code.emitLoad(code.getArg(2));
-                  }
-                else if (! varArgs)
-                  {
-                    Declaration pvar = source.firstDecl();
-                    int k = 0;
-		    for (; k < source.min_args;  pvar = pvar.nextDecl())
-		      {
-			sourceLine = ((Declaration) pvar).getLine();
-			if (sourceLine > 0)
-			  code.putLineNumber(sourceLine);
-			if (i > 4) // more than 4 args
-			  {
-			    // Load Object[]args value:
-			    code.emitLoad(code.getArg(2));
-			    code.emitPushInt(k);
-			    code.emitArrayLoad(Type.pointer_type);
-			  }
-			else
-			  code.emitLoad(code.getArg(k + 2));
-			Type ptype = primMethod.getParameterTypes()[k];
-			if (ptype != Type.pointer_type)
-			  CheckedTarget.emitCheckedCoerce(this, source,
-							  k, ptype);
-			k++;
-                     }
-                  }
-                code.emitInvokeMethod(apply.method, apply.op_code); 
-                Target.pushObject.compileFromStack(this, apply.getReturnType());
-                code.emitReturn();
-              }
-            aswitch.addDefault(code);
-            nargs = method.getParameterTypes().length;
-            if (! method.getStaticFlag())
-              nargs++;
-            for (int k = 0;  k < nargs;  k++)
-              code.emitLoad(code.getArg(k));
-            code.emitInvokeSpecial(applyModuleMethods[i]);  // call super
-            code.emitReturn();
-            aswitch.finish(code);
-          }
-	method = save_method;
-      }
+      generateApplyMethods();
 
-    if (curClass == mainClass
-	&& ((! immediate && clinitChain != null)
-	    || bindingFields.size() > 0))
+    if (curClass == mainClass && ! immediate && clinitChain != null)
       {
 	Method save_method = method;
 	method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
@@ -919,22 +1045,6 @@ public class Compilation
 	dumpInitializers(clinitChain);
 
 	code = getCode();
-	int numGlobals = bindingFields.size();
-	if (numGlobals > 0)
-	  {
-	    code.emitInvokeStatic(getCurrentEnvironmentMethod);
-	    java.util.Enumeration e = bindingFields.keys();
-	    while (e.hasMoreElements())
-	      {
-		String id = (String) e.nextElement();
-		Field fld = (Field) bindingFields.get(id);
-		if (--numGlobals > 0)
-		  code.emitDup(1);
-		code.emitPushString(id);
-		code.emitInvokeVirtual(getBindingEnvironmentMethod);
-		code.emitPutStatic(fld);
-	      }
-	  }
 	code.emitReturn();
 	method = save_method;
       }

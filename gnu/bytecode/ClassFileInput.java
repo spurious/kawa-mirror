@@ -1,5 +1,5 @@
-// Copyright (c) 1997  Cygnus Solutions, Inc.
-// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
 import java.io.InputStream;

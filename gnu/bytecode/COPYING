@@ -10,13 +10,9 @@ These classes are free software.  You can use and re-distribute a class
 without restriction (in source or binary form) as long as you use a
 version has not been modified in any way from a version released
 by Per Bothner, Cygnus Solutions, or the Free Software Foundation.
-
-If you make make any modifications, you must clearly indicate that
-in the first few lines of the source code.  You must also follow the
-more stringent terms of the GNU General Public License; either version 2,
-or (at your option) any later version.  (Version 2 is included below
-for your convenience.)  If these terms would cause you difficulty,
-you may negotiate different licensing terms with Cygnus Solutions.
+You may make and distribute a modified version, provided you follow
+the terms of the GNU General Public License; either version 2,
+or (at your option) any later version.  (Version 2 is included below.)
 
 For questions, contact Per Bothner, Cygnus Solutions,
 1325 Chesapeake Terrace, Sunnyvale CA 94089, USA.

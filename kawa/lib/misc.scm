@@ -54,7 +54,7 @@
 |#
 
 (define (make-procedure #!rest (args :: <Object[]>))
-  (invoke-static <gnu.expr.GenericProc> 'make$V args))
+  (invoke-static <gnu.expr.GenericProc> 'make args))
 
 (define (procedure-property (proc :: <procedure>) key #!optional default)
   (invoke proc 'getProperty key default))

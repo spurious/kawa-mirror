@@ -276,7 +276,7 @@
 
 ;;; IOTA count [start step]	(start start+step ... start+(count-1)*step)
 
-(define (iota count :: <integer> #!optional (start :: <number> 0) (step :: <number> 0))
+(define (iota count :: <integer> #!optional (start :: <number> 0) (step :: <number> 1))
   (if (< count 0) (error "Negative step count" iota count))
     (let ((last-val (+ start (* (- count 1) step))))
       (do ((count count (- count 1))

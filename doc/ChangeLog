@@ -1,6 +1,8 @@
 2002-02-15  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Fix various typos and minor errors.
+	(Loading a ModuleBody):  Renamed to ...
+	(Loading Java functions into Scheme):  Re-written and expanded.
 
 	* Makefile.am (internals.html):  Use xsltproc.
 	(EXTRA_DIST):  DOn't include generated html or postscript.

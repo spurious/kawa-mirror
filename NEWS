@@ -1,0 +1,23 @@
+Changes since 0.3:
+==================
+The hygienic macros described in the appendix to R4RS are now
+impemented (but only the define-syntax for).  They are
+used to implement the standard "do" form.
+
+The R5RS multiple value functions values and call-with-values are implemented.
+
+Changes since 0.2:
+==================
+The biggest single change is that Scheme procedures are now compiled
+to Java bytecodes.  This is mainly for efficiency, but it also allows
+us to do tail-recursion-elimination in some cases.
+
+The "codegen" library is included.  This is a toolkit that handles
+most of the details needed to generate Java bytecode (.class) files.
+
+The internal structure of Kawa has been extensively re-written,
+especially how syntax transforms, eval, and apply are done,
+largely due to the needs for compilation.
+
+Almost all the R4RS procedures are now implemented, except that
+there are stiil large gaps in Section 6.5 "Numbers".

@@ -3,6 +3,8 @@
 This documents how to install and use Kawa, a Scheme system
 implemented in Java, and which compiles into Java bytecodes.
 
+The file NEWS summarizes changes since previous releases.
+
 Setting up to use Java
 ======================
 

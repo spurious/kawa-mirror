@@ -1,55 +1,43 @@
 package gnu.jemacs.buffer;
 import javax.swing.text.*;
+import gnu.lists.*;
 
-public final class Marker implements Position
+public final class Marker extends SeqPosition implements Position
 {
   Buffer buffer;
 
-  /** Either POINT_POSITION_INDEX, or a Content-specific magic cookie. */
-  int position;
-  /** Marker follows Buffer's Caret. */
-  static final int POINT_POSITION_INDEX = -1;
-  //static final int RESERVED_POSITION_COUNT = 1;
+  /** Is this the special point marker? */
+  public final boolean isPoint() { return buffer != null && sequence == null; }
 
   public Marker()
   {
   }
-
-  static final int EMACS_MARK_KIND = BufferContent.EMACS_MARK_KIND;
 
   public Marker(Marker marker)
   {
     buffer = marker.buffer;
     if (buffer != null)
       {
-        BufferContent content = buffer.content;
-	if (marker.position == POINT_POSITION_INDEX)
-	  position = content.createPosition(marker.getOffset(),
-					    BufferContent.AFTER_MARK_KIND);
+	if (marker.isPoint())
+	  init(buffer.content, buffer.curPosition.getDot(), true);
 	else
-	  position = content.copyPosition(marker.position);
+	  init(marker);
       }
   }
 
-  public Marker (Buffer buffer, int offset, int kind)
+  public Marker (Buffer buffer, int offset, boolean isAfter)
   {
+    super(buffer.content, offset, isAfter);
     this.buffer = buffer;
-    this.position = buffer.content.createPosition(offset, kind);
-  }
-
-  public void finalize()
-  {
-    if (buffer != null)
-      buffer.content.releasePosition(position);
   }
 
   public int getOffset()
   {
     if (buffer == null)
       return -1;
-    else if (position == POINT_POSITION_INDEX)
+    else if (isPoint())
       return buffer.curPosition.getDot();
-    return buffer.content.getPositionOffset(position);
+    return nextIndex();
   }
 
   public int getPoint()
@@ -69,7 +57,7 @@ public final class Marker implements Position
 
   public void set(Buffer newBuffer, int newPosition)
   {
-    if (this.position == POINT_POSITION_INDEX)
+    if (isPoint())
       {
         if (newBuffer != buffer)
           {
@@ -84,8 +72,9 @@ public final class Marker implements Position
       }
     else
       {
-        if (buffer != null)
-          buffer.content.releasePosition(position);
+        if (sequence != null)
+          release();
+	sequence = null;
         if (newBuffer == null)
           {
             buffer = null;
@@ -101,8 +90,7 @@ public final class Marker implements Position
               newPosition = newLength;
           }
 	buffer = newBuffer;
-	position = newBuffer.content.createPosition(newPosition,
-						    EMACS_MARK_KIND);
+	init(newBuffer.content, newPosition, false);
       }
   }
 
@@ -174,6 +162,7 @@ public final class Marker implements Position
       {
 	try
 	  {
+	    System.err.println("insertStr '"+ch+"' point:"+point);
 	    buffer.insertString(point, str, style);
 	  }
 	catch (javax.swing.text.BadLocationException ex)

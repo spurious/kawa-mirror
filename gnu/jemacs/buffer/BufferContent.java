@@ -2,7 +2,7 @@ package gnu.jemacs.buffer;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** A Content class that supports Emacs-style Markers.
  * The standard GapContent is close, but unfortunately it only
@@ -26,7 +26,7 @@ implements javax.swing.text.AbstractDocument.Content
     // (A cleaner solution might be to initialize this as empty, but have
     // Buffer insert the initial '\n'.  FIXME.)
     gapEnd = initialSize-1;
-    array[gapEnd] = '\n';
+    getArray()[gapEnd] = '\n';
   }
 
   protected int getChars(int where, int len)
@@ -43,23 +43,33 @@ implements javax.swing.text.AbstractDocument.Content
     //   throw new BadLocationException("bad length", len);
     if (where + len <= gapStart)
       return where;
-    else if (where < gapStart)
-      shiftGap(where);
-    return where + (gapEnd - gapStart);
+    if (where >= gapStart)
+      return where + (gapEnd - gapStart);
+    // Shift the gap depending in which direction needs least copying.
+    if (gapStart - where > (len >> 1))
+      {
+	shiftGap(where + len);
+	return where;
+      }
+    else
+      {
+	shiftGap(where);
+	return where + (gapEnd - gapStart);
+      }
   }
 
   public void getChars(int where, int len, Segment txt)
     throws BadLocationException
   {
     txt.offset = getChars(where, len);
-    txt.array = array;
+    txt.array = getArray();
     txt.count = len;
   }
 
   public String getString(int where, int len)
     throws BadLocationException
   {
-    return new String(array, getChars(where, len), len);
+    return new String(getArray(), getChars(where, len), len);
   }
 
   public UndoableEdit remove(int where, int nitems)
@@ -72,7 +82,7 @@ implements javax.swing.text.AbstractDocument.Content
 
     GapUndoableEdit undo = new GapUndoableEdit(where);
     undo.content = this;
-    undo.data = new String(array, gapEnd - nitems, nitems);
+    undo.data = new String(getArray(), gapEnd - nitems, nitems);
     undo.nitems = nitems;
     undo.isInsertion = false;
     return undo;
@@ -104,29 +114,31 @@ implements javax.swing.text.AbstractDocument.Content
     throws BadLocationException
   {
     // A weird hack, but this seems to be what Swing does ...
-    int kind = offset == 0 ? BEFORE_MARK_KIND : AFTER_MARK_KIND;
+    boolean isAfter = offset != 0;
 
     if (offset < 0 || offset > length())
       throw new BadLocationException("bad offset to createPosition", offset);
-    return new GapPosition(this, offset, kind);
+    GapPosition pos = new GapPosition(this);
+    makePosition(offset, isAfter, pos, 0);
+    return pos;
   }
 
   public void dump()
   {
-    System.err.println("Buffer Content dump.  length:"+length());
+    System.err.println("Buffer Content dump.  size:"+size()+"  buffer:"+getArray().length);
     System.err.print("before gap: \"");
-    System.err.print(new String(array, 0, gapStart));
+    System.err.print(new String(getArray(), 0, gapStart));
     System.err.println("\" (gapStart:"+gapStart+" gapEnd:"+gapEnd+')');
     System.err.print("after gap: \"");
-    System.err.print(new String(array, gapEnd, array.length-gapEnd));
+    System.err.print(new String(getArray(), gapEnd, getArray().length-gapEnd));
     System.err.println("\"");
     int poslen = positions == null ? 0 : positions.length;
-    System.err.println("Positions (size: "+poslen+"):");
+    System.err.println("Positions (size: "+poslen+" free:"+free+"):");
     for (int i = 0;  i < poslen;  i++)
       {
 	int pos = positions[i];
 	if (pos != 0)
-	  System.err.println("position#"+i+": "+(pos>>2)+" kind:"+(pos&3));
+	  System.err.println("position#"+i+": "+(pos>>1)+" isAfter:"+(pos&1));
       }
   }
 
@@ -192,7 +204,7 @@ implements javax.swing.text.AbstractDocument.Content
                   ceil = start + 5000;
                 Signal.checkQuit();
               }
-            int i = indexOf(array, start, ceil, target);
+            int i = indexOf(getArray(), start, ceil, target);
             if (i >= 0)
               {
                 count--;
@@ -222,7 +234,7 @@ implements javax.swing.text.AbstractDocument.Content
                   floor = start - 5000;
                 Signal.checkQuit();
               }
-            int i = lastIndexOf(array, start - 1, floor, target);
+            int i = lastIndexOf(getArray(), start - 1, floor, target);
             if (i >= 0)
               {
                 count++;
@@ -247,17 +259,15 @@ implements javax.swing.text.AbstractDocument.Content
   }
 }
 
-class GapPosition extends gnu.kawa.util.Position
+class GapPosition extends SeqPosition
     implements javax.swing.text.Position
 {
-  public GapPosition()
+  public GapPosition(CharBuffer content)
   {
+    super(content);
   }
 
-  public GapPosition(CharBuffer content, int offset, int kind)
-  {
-    super(content, offset, kind);
-  }
+  public int getOffset() { return nextIndex(); }
 }
 
 class GapUndoableEdit extends AbstractUndoableEdit

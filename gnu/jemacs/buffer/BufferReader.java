@@ -18,7 +18,7 @@ public class BufferReader extends InPort
   {
     super(gnu.text.NullReader.nullReader, name);
     this.content = content;
-    buffer = content.array;
+    buffer = content.getArray();
     rangeStart = start;
     rangeLength = count;
     if (start < content.gapStart)
@@ -32,7 +32,7 @@ public class BufferReader extends InPort
       {
 	int gapSize = content.gapEnd - content.gapStart;
 	pos = start + gapSize;
-	int length = content.array.length;
+	int length = content.getArray().length;
 	limit = pos + count > length ? length : pos + count;
       }
   }
@@ -46,7 +46,7 @@ public class BufferReader extends InPort
 	int gapSize = content.gapEnd - content.gapStart;
 	pos = content.gapEnd;
 	int count = rangeLength - (content.gapStart - rangeStart);
-	int length = content.array.length;
+	int length = content.getArray().length;
 	limit = pos + count > length ? length : pos + count;
 	if (pos < limit)
 	  return buffer[pos++];

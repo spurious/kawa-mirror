@@ -23,13 +23,13 @@ public class MarkerReader extends InPort
     super(gnu.text.NullReader.nullReader, buffer.getName());
     this.marker = marker;
     content = buffer.content;
-    this.buffer = content.array;
+    this.buffer = content.getArray();
   }
 
   public int read()
   {
     int offset = marker.getOffset();
-    buffer = content.array;
+    buffer = content.getArray();
     if (offset >= content.gapStart)
       offset += content.gapEnd - content.gapStart;
     int length = buffer.length;

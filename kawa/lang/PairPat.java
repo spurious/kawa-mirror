@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.*;
 
 public class PairPat extends Pattern implements Printable, Externalizable

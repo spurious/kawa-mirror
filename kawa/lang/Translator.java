@@ -10,7 +10,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -262,7 +262,7 @@ public class Translator extends Parser
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
-    int cdr_length = LList.length (cdr);
+    int cdr_length = LList.listLength(cdr, false);
 
     if (func instanceof QuoteExp)
       {

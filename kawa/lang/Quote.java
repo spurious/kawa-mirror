@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.Printable;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /**
  * The Syntax transformer that re-writes the "quote" Scheme primitive.

@@ -102,9 +102,9 @@ implements java.awt.event.FocusListener,
   {
     // Change buffer's pointMarker so it follows this Window's Caret.
     buffer.curPosition = caret;
-    if (buffer.pointMarker.position >= 0)
-      buffer.content.releasePosition(buffer.pointMarker.position);
-    buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
+    if (! buffer.pointMarker.isPoint())
+      buffer.content.releasePosition(buffer.pointMarker.ipos, null);
+    buffer.pointMarker.sequence = null;
     caret.addChangeListener(this);
   }
 
@@ -131,9 +131,8 @@ implements java.awt.event.FocusListener,
   void unselect()
   {
     int point = buffer.curPosition.getDot();
-    int kind = BufferContent.AFTER_MARK_KIND;
-    int index = buffer.content.createPosition(point, kind);
-    buffer.pointMarker.position = index;
+    int index = buffer.content.createPosition(point, true);
+    buffer.pointMarker.ipos = index;
     buffer.curPosition = null;
     getCaret().removeChangeListener(this);
     // ?? selected = null;

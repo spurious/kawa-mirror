@@ -1,5 +1,5 @@
 package kawa.lang;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /** A Pattern that will match a list of a given minimum length. */
 

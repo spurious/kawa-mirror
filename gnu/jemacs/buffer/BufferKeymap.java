@@ -3,7 +3,7 @@ import gnu.mapping.Procedure;
 import gnu.math.IntNum;
 import javax.swing.*;
 import javax.swing.text.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.text.Char;
 import java.awt.event.KeyEvent;
 
@@ -117,7 +117,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
   public static Object
   lookupKey(Keymap keymap, Sequence keys, boolean acceptDefaults)
   {
-    int nKeys = keys.length();
+    int nKeys = keys.size();
     KeyStroke[] prefixKeys = new KeyStroke[nKeys];
     java.util.Enumeration enumKeys = keys.elements();
     for (int i = 0;  enumKeys.hasMoreElements();  i++)
@@ -264,8 +264,9 @@ public class BufferKeymap implements javax.swing.text.Keymap
         i++;
         if (action == null)
           {
+	    System.err.println("lookupKey no match "+toString(key)+" ignoreable?"+ignorable(key));
             if (ignorable(key))
-              return null;
+              return IgnoreAction.getInstance();
             else
               return keymap.getDefaultAction();
           }
@@ -278,6 +279,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
 	  comm = null;
 	if (comm instanceof String)
 	  comm = Command.resolveSymbol(comm);
+	System.err.println("lookupKey "+toString(key)+" > "+comm);
 	if (comm instanceof Keymap)
 	  keymap = (Keymap) comm;
 	else
@@ -480,7 +482,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
         // Handle key sequence.
 	Sequence value = (Sequence) keySpec;
         boolean hackMeta = keySpec instanceof FString;
-        int len = value.length();
+        int len = value.size();
         //key = null;
         KeyStroke pending = null;
         for (int i = 0;  i < len; )

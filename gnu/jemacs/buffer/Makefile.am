@@ -15,6 +15,7 @@ java_WITH_SWING = \
   Command.java \
   FinalAction.java \
   Frame.java \
+  IgnoreAction.java \
   InfProcessMode.java \
   InputStreamHandler.java \
   InsertAction.java \

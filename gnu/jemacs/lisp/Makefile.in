@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -101,6 +102,8 @@ TO_TOPDIR = $(top_builddir)
 
 GCJ_DEPS = elisp-classes.stamp
 
+CLEANFILES = *.class *.stamp
+
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
@@ -111,8 +114,6 @@ java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
   rect.el editfns.el subr.el autoloads.el
 
 PACKAGE_CFNAME = gnu-jemacs-lisp
-
-CLEANFILES = *.class *.stamp
 
 SOURCES = $(java_ELISP)
 

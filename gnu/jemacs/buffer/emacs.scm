@@ -83,7 +83,7 @@
    keymap))
 
 (define (lookup-key (keymap :: <keymap>)
-		    (keys :: <gnu.kawa.util.Sequence>)
+		    (keys :: <gnu.lists.Sequence>)
 		    #!optional (accept-defaults :: <boolean> #f))
   (let ((binding
          (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'lookupKey

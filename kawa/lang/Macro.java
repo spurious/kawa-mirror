@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.expr.*;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.*;
 
 public class Macro extends Syntax implements Printable, Externalizable

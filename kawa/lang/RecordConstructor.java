@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class RecordConstructor extends ProcedureN
 {
@@ -62,7 +62,7 @@ public class RecordConstructor extends ProcedureN
       init(type);
     else
       {
-	int nfields = LList.length(fieldsList);
+	int nfields = LList.listLength(fieldsList, false);
 	this.fields = new Field[nfields];
 	Field list = type.getFields();
 	for (int i = 0;  i < nfields;  i++)

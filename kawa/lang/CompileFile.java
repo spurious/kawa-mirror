@@ -4,7 +4,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.kawa.lispexpr.LispReader;
 
 /** Procedure to read and compile and entire file.

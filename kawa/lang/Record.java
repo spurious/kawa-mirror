@@ -4,7 +4,7 @@ import java.lang.reflect.Modifier;
 import java.util.Vector;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.expr.Compilation;
 
 public class Record extends NameMap

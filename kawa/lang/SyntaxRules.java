@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.*;
 
 public class SyntaxRules extends Procedure1 implements Printable, Externalizable 
@@ -42,7 +42,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
-    int rules_count = LList.list_length (rules);
+    int rules_count = LList.listLength(rules, false);
     if (rules_count <= 0)
       {
 	rules_count = 0;
@@ -233,7 +233,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	  }
       }
     return tr.syntaxError ("no matching syntax-rule for "
-				+ literal_identifiers[0]);
+			   + literal_identifiers[0]);
   }
 
   public void print(java.io.PrintWriter ps)

@@ -68,7 +68,7 @@ public class ProcessMode extends Mode
       }
   }
 
-  public void writeToInferior(gnu.kawa.util.AbstractString str)
+  public void writeToInferior(gnu.lists.CharSequence str)
     throws java.io.IOException
   {
     str.writeTo(toInferior);

@@ -1,6 +1,6 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.jemacs.lang.ELisp;
 import gnu.math.IntNum;
 import javax.swing.*;

@@ -2,7 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 /* This implements the R5RS "eval" procedure. */
 

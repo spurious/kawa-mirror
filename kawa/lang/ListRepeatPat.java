@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.*;
 
 public class ListRepeatPat extends Pattern implements Printable, Externalizable
@@ -38,7 +38,7 @@ public class ListRepeatPat extends Pattern implements Printable, Externalizable
       SFormat.print (obj, System.err);
       System.err.print (")\n");
       */
-    int length = LList.list_length (obj);
+    int length = LList.listLength(obj, false);
     if (length < 0)
       return false;
 

@@ -3,9 +3,9 @@ import javax.swing.text.*;
 import java.io.*;
 import java.awt.Color;
 import gnu.mapping.InPort;
-import gnu.kawa.util.AbstractString;
+import gnu.lists.CharSequence;
 import gnu.text.Char;
-import gnu.kawa.util.CharBuffer;
+import gnu.lists.CharBuffer;
 
 public class Buffer extends DefaultStyledDocument
 {
@@ -72,7 +72,7 @@ public class Buffer extends DefaultStyledDocument
     redrawModeline();
   }
 
-  public AbstractString getStringContent ()
+  public CharSequence getStringContent ()
   {
     return content;
   }
@@ -169,7 +169,7 @@ public class Buffer extends DefaultStyledDocument
     this.name = name;
     this.content = content;
 
-    pointMarker = new Marker(this, 0, BufferContent.AFTER_MARK_KIND);
+    pointMarker = new Marker(this, 0, true);
     markMarker = new Marker();
 
     modelineDocument
@@ -527,9 +527,8 @@ public class Buffer extends DefaultStyledDocument
   public Element createLeafElement(Element parent, AttributeSet attributes,
                                    int p0, int p1)
   {
-    p0 = content.createPosition(p0,
-                                p0==0?CharBuffer.BEFORE_MARK_KIND:CharBuffer.AFTER_MARK_KIND);
-    p1 = content.createPosition(p1, CharBuffer.AFTER_MARK_KIND);
+    p0 = content.createPosition(p0, p0!=0);
+    p1 = content.createPosition(p1, true);
     return new Leaf(this, parent, attributes, p0, p1);
   }
   */
@@ -568,7 +567,7 @@ class Leaf implements javax.swing.text.Element
 
   public void finalize()
   {
-    gnu.kawa.util.CharBuffer content = buffer.content;
+    gnu.lists.CharBuffer content = buffer.content;
     content.releasePosition(startPosition);
     content.releasePosition(endPosition);
   }

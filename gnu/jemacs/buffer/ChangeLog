@@ -1,3 +1,16 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* Buffer.java, BufferContent.java, BufferKeymap.java,
+	BufferReader.java, Command.java, Marker.java, MarkerReader.java,
+	Menu.java,ProcessMode.java, Window.java,emacs.scm}:
+	Update gnu.kawa.util->gnu.lists, AbstractString->CharSequence,
+	marker-kind to isAfter boolean, array->getArray(), length->size.
+	* Marker.java (isPoint):  New method
+	Inherit from gnu.lists.SeqPosition.
+	* IgnoreAction.java:  New class, extends javax.swing.text.TextAction.
+	* Makefile.am:  Update acordingly.
+	* BufferContent.java (getChars):  Shift gap to minimize copying.
+
 2000-11-21  Per Bothner  <per@bothner.com>
 
 	* Makefile.am, Makefile.in (EXTRA_DIST):  Include $(EXTRA_JAVA).

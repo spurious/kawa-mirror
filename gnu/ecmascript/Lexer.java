@@ -5,7 +5,7 @@ import kawa.lang.*;
   * Reads EcmaScript token from a InPort.
   */
 
-public class Lexer extends kawa.lang.Lexer
+public class Lexer extends gnu.text.Lexer
 {
   private boolean prevWasCR = false;
 
@@ -161,7 +161,7 @@ public class Lexer extends kawa.lang.Lexer
   }
 
   public String getStringLiteral (char quote)
-    throws java.io.IOException, SyntaxException
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     int i = port.pos;
     int start = i;
@@ -285,7 +285,7 @@ public class Lexer extends kawa.lang.Lexer
 
 
   public Object maybeAssignment(Object token)
-    throws java.io.IOException, SyntaxException
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     int ch = read();
     if (ch == '=')
@@ -317,7 +317,7 @@ public class Lexer extends kawa.lang.Lexer
     */
 
   public Object getToken()
-    throws java.io.IOException, SyntaxException
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     int ch = read();
     for (;;)
@@ -451,7 +451,7 @@ public class Lexer extends kawa.lang.Lexer
   }
 
   public static Object getToken(InPort inp)
-    throws java.io.IOException, SyntaxException
+    throws java.io.IOException, gnu.text.SyntaxException
   {
     return new Lexer(inp).getToken();
   }

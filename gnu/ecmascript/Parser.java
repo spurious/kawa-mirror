@@ -1,6 +1,7 @@
 package gnu.ecmascript;
 import kawa.lang.*;
 import java.util.Vector;
+import gnu.text.SyntaxException;
 
 public class Parser
 {

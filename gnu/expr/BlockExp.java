@@ -14,7 +14,7 @@ public class BlockExp extends Expression
   Declaration label;
   Expression body;
 
-  /** If non-null, evaluate this, but on if non-normal exit. */
+  /** If non-null, evaluate this, but only if non-normal exit. */
   Expression exitBody;
 
   public void setBody(Expression body)

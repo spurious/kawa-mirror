@@ -1,3 +1,8 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (EXTRA_DIST):  New variable, for ppfile.out.
+	(SOURCES):  Addes scribble.com.
+
 2000-06-18  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  New tests for make-procedure and properties.

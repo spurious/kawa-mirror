@@ -80,9 +80,10 @@ KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 APPLETVIEWER = appletviewer
 
-SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   obj-test.scm misc-test.scm polytype.scm formatst.scm
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm
 
 CLEANFILES = tmp? *.log testing.zip *.class
+EXTRA_DIST = ppfile.out
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in

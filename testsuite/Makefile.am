@@ -62,5 +62,6 @@ check-scribble: scribble.class
 	CLASSPATH=.:.. $(APPLETVIEWER) $(srcdir)/scribble.html
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm misc-test.scm polytype.scm formatst.scm
+  obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm
 CLEANFILES = tmp? *.log testing.zip *.class
+EXTRA_DIST = ppfile.out

@@ -1,3 +1,7 @@
+1999-06-20  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Add emacs.
+
 Sun Mar 21 11:03:23 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* elisp:  New package gnu.elisp.

@@ -1,3 +1,60 @@
+Mon Jan 19 14:44:09 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/Shell.java:  Extend Procedure0, so it can be passed to Future.
+	Add contsructur, various fields, and make methods non-static.
+	Remove code now in Scheme (read and print methods).
+	(run, runString)  Take Interpreter arguemnts, not Environment.
+	* kawa/repl.java:  Update for new Shell.run interfaces.
+	* kawa/{TextAreaWriter.java,GuiConsole.java,MessageArea.java}:
+	New classes, for making a Frame with a repl.
+	* kawa/Makefile.am:  Add new classes.
+	
+	* kawa/standard/load.java (loadSource):  Update for new Shell.run.
+
+	* kawa/lang/Interpreter.java (read, print):  New abstract methods.
+	* kawa/standard/Scheme.java (read, print):  New methods.
+	(Scheme):  Support multiple instances and environments.
+	(initScheme):  New method, created from Scheme constructor.
+	Add port-char-encoding, copy-file, input-port-read-state.
+
+	* kawa/lang/Expression.java (eval):  Make non-abstract.  Throw error.
+	* kawa/lang/LetExp.java (eval):  Remove.
+
+	* kawa/lang/LineBufferedReader.java (convertCR)  New field.
+	(setConvertCR):  New method.
+	(read):  Only squash CR and CRLF to LF if convertCR.
+	* kawa/standard/{open_input_file.java,open_output_file.java}:
+	Use port-char-encoding to select char conversion and text vs binary.
+
+	* kawa/lang/OutPort.java (outDefault, setOutDefault, errDefault,
+	setErrDefault):  Get/set thread-local port (in current Future).
+	* kawa/lang/InPort.java (inDefault, setInDefault):  Likewise.
+
+	* kawa/lang/QueueReader.java:  New class.
+
+	* kawa/lang/TryExp.java:  Add code to implement try-catch.
+	* kawa/lang/CatchClause.java:  New class, for try-catch catch clause.
+	* kawa/lang/Makefile.am:  Add QueueReader and CatchClause.
+
+	* kawa/lang/PrimProcedure.java (toString):  Added.
+	(member):  New field.
+	(applyN):  Implement (partially) using reflection.
+
+Thu Jan 15 13:03:02 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/InPort.java (readState):  New field.
+	(getReadState):  New method.  (Used by input-port-read-state.)
+	(readList, readSchemeObject):  Set and restore readState.
+
+Sat Jan 10 13:42:48 1998  Alcibiades Petrofsky <albatros@wco.com>
+
+	* kawa/lang/Continuation.java:  Support multi-value continuation.
+
+	Support full R4RS number syntax, including polar, plus infinity/NaN.
+	* kawa/lang/InPort.java (readSchemeComplex):  New method.
+ 	(readSchemeNumber, readSchemeReal):  Re-write.
+	* kawa/standard/string2number.java:  Update.
+
 Sun Dec 14 22:42:44 1997  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.5.92.

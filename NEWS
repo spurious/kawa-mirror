@@ -1,5 +1,13 @@
 Changes since Kawa 1.5
 ======================
+The default prompt now shows continuations lines differently.
+
+The copy-file function was added.
+
+The variable port-char-encoding controls how external files
+are converted to/from internal Unicode characters.  It also
+controls whether CR and CR-LF are converted to LF.
+
 The reader by default no longer down-cases letters in symbols.
 A new variable symbol-read-case control how case is handled:
 'P (the default) preserves case;  'U upper-cases letters;

@@ -1,3 +1,45 @@
+TO BE DONE FOR 1.6:
+
+Implement Environment properly.  Support threads and modules.
+Get GuiConsole working for multiple windows.
+
+Provide a low-level Scheme interface to catch Java exceptions.
+Implement a higher-level Scheme catch/throw interface.
+
+TO BE DONE FOR 2.0:
+
+Provide a way to write a "main" method in Scheme.
+
+Allow the type of an Expression to be other than Object.
+Use type declarations and (local) type inference.
+
+Replace use of ZipArchive by jar files.
+
+Implement full call-cc and tail-calls by re-writing as in RScheme.
+(Sombody may be working on this.)  This would be slower, so should
+be optional, probably not the default.
+
+Compile a module with top-level function definitions to a single class
+with methods.  More efficient when functions can be statically resolved.
+However less efficient otherwise, since need to use reflection interface.
+
+Provide bindings/implementations for the Format concept of java.text.
+Implement Common Lisp-style format.  (SLib version cannot be used,
+as it is not thread-safe.  That could perhaps be fixed.)
+Implement pretty-printer, ideally in a way that works with AWT containers.
+
+Complete R4RS procedures.
+  trig functions for complex numbers
+
+Implement let-syntax and letrec-syntax.
+Implement syntax-case.
+Possibly re-write macro syntax to use syntactic closures.
+
+Implement infrastructure for other languages,
+and at least one other language.
+
+OTHER:
+
 Update to match kawa-tour:
   Vector -> FVector
   Quote -> quote  (also Lambda -> lambda)
@@ -5,24 +47,11 @@ Update to match kawa-tour:
 
 Should SyntaxRule inherit from Pattern?
 
-Complete R4RS procedures.
-  trig functions for complex numbers
-
 We depend on some hacks to automake:
 - info files make in builddir, not $(srcdir)
 - DATA is added to DIST_DEPFILES
 - distdir also searches current dir
 Try to get automake maintainers to accept these.
-
-Implement Environment properly.  Support threads and modules.
-
-Provide a low-level Scheme interface to catch Java exceptions.
-Implement a higher-level Scheme catch/throw interface.
-
-Implement let-syntax and letrec-syntax.
-Implement syntax-case.
-Possibly re-write macro syntax to use syntactic closures.
-(Study forthcoming RScheme release.)
 
 Move readSchemeObject readSchemeNumber etc from InPort
 to new class(es) Parser:
@@ -39,8 +68,6 @@ Printing SyntaxError prints error log.
 Make it easier to plug in other source languages.
 Implement Emacs Lisp reader and primitives.
 
-Replace use of ZipArchive by jar files (once JDK 1.1 is out).
-
 Implement heapFrame, static link etc as references to objects,
 not arrays.  Make consistent with JDK1.1 inner classes extension.
 Better naming convention for inner lambdas. (I.e. fix kawa.lib.lambda.)
@@ -50,12 +77,7 @@ without being considered to be undefined.
 
 Optionally issue a warning if a symbol is rebound.
 
-Provide a way to write a "main" method in Scheme.
-
 Make kawa.repl -f FILE (or something) work for compiled FILEs.
-
-Allow the type of an Expression to be other than Object.
-Use type declarations and (local) type inference.
 
 Use primitive types for expressions when declared/inferred.  Inline arithmetic
 when possible.  Integrate native numeric types into numeric tower.
@@ -68,15 +90,4 @@ infinite-precision integers.
 Inline calls to simple methods, especially builtins.
 Ties in with module specifications (to determine which bindings are builtin).
 
-Implement full call-cc and tail-calls by re-writing as in RScheme.
-(Sombody may be working on this.)  This would be slower, so should
-be optional, probably not the default.
-
-Compile a module with top-level function definitions to a single class
-with methods.  More efficient when functions can be statically resolved.
-However less efficient otherwise, since need to use reflection interface.
-
-Provide bindings/implementations for the Format concept of java.text.
-Implement Common Lisp-style format.  (SLib version cannot be used,
-as it is not thread-safe.  That could perhaps be fixed.)
-Implement pretty-printer, ideally in a way that works with AWT containers.
+Load should take an optional environment argument.

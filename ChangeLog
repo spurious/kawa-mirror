@@ -5,6 +5,9 @@ Sat Nov  1 23:30:16 1997  Per Bothner  <bothner@cygnus.com>
 	* configure.in, */Makefile.am:  Remove --with-jdk11 flag, and stuff
 	that depends on it  Make the reflection stuff non-optional.
 	
+	* kawa/lang/Compilation.java (addClass):  Generate literals in
+	<clinit>, not <init>.
+
 	* kawa/stadard/Scheme.java:  Add environment-bound? and
 	scheme-implementation-version from kawa.lib.misc.
 

@@ -174,20 +174,20 @@ Alternatively, you can install the pre-compiled binary distribution.
 
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) version 1.0.x or 1.1 from JavaSoft (Sun).
+(JDK) version 1.1.x from JavaSoft (Sun).
 (Kawa has also been reported to work with Kaffe, Symantec Cafe, and J++.)
 You can download free copies of
 @ifhtml
-<a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
+<a href="http://java.sun.com/products/jdk/1.1/index.html">
 @end ifhtml
-JDK 1.0.2
+JDK 1.1.x
 @ifhtml
 </a>
-for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS.
+for various platforms.
 @end ifhtml
 @ifclear html
-for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS
-from @url{http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html}.
+for various platforms
+from @url{http://java.sun.com/products/jdk/1.1/index.html/index.html}.
 @end ifclear
 
 The program @code{java} is the Java interpreter.
@@ -263,10 +263,6 @@ specify that when you run configure:
 @example
 ./configure --prefix $PREFIX
 @end example
-
-If you have JDK 1.1 or some other Java 1.1 system with the
-java.lang.reflect.Field class, you add the option @code{--with-jdk1}.
-This will enable the record feature.
 
 Thus you need to compile all the .java source files.
 Just run make:
@@ -659,8 +655,7 @@ Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (-
 The Record package provides a facility for user to define their own
 record data types.  A record type is implemented as Java Class
 object, and records are extensions of the class @code{Record}.
-These procedures are only available if you specified @code{--with-jdk11}
-when you configured Kawa, since they use the Java 1.1 reflection facility.
+These procedures use the Java 1.1 reflection facility.
 
 @defun make-record-type type-name field-names
 Returns a @dfn{record-type descriptor}, a value representing a new data
@@ -879,11 +874,11 @@ The initial column is column 1.
 @node Eval and Environments, Quantities, Ports, Extensions
 @subsection Eval and Environments
 
-@defun eval expression [environment-specifier]
+@defun eval expression [environment]
 @code{eval} evaluates @var{expression} in the environment indicated
-by @var{environment-specifier}.
+by @var{environment}.
 
-The default for @var{environment-specifier} is the result
+The default for @var{environment} is the result
 of @code{(interaction-environment)}.
 @end defun
 
@@ -910,6 +905,11 @@ as @code{car}) is undefined.
 @defun interaction-environment
 This procedure return an environment that contains implementation-defined
 bindings, as well as top-level user bindings.
+@end defun
+
+@defun environment-bound? environment symbol
+Return true @code{#t} if there is a binding for @var{symbol}
+in @var{environment};  otherwise returns @code{#f}.
 @end defun
 
 @node Quantities, Threads, Eval and Environments, Extensions
@@ -1042,6 +1042,11 @@ More will be added later.
 @node Miscellaneous,  , Standard Types, Extensions
 @subsection Miscellaneous
 
+@defun scheme-implementation-version
+Returns the Kawa version number as a string.
+@c (Compatible with slib.)
+@end defun
+
 @defun gentemp
 Returns a new (interned) symbol each time it is called.
 The symbol names are implementation-dependent.
@@ -1109,8 +1114,7 @@ expressions @emph{outside} a lambda.  (It would have been simpler
 to also byte-compile top-level expressions by surrounding them
 by a dummy lambda.  However, this would create a new Class object
 in the Java VM for every top-level expression.  This is undesirable
-unless you have a VM that can garbage collect Class objects.
-Sun's VM currently does not, but that is planned for JDK 1.1.)
+unless you have a VM that can garbage collect Class objects.)
 
 To save speed when loading large Scheme source files, you probably
 want to pre-compile them and save them on your local disk.

@@ -1,5 +1,11 @@
 Changes since Kawa 1.5
 ======================
+The gnu.bytecode package has been extensively changed.
+There are new classes representing the various standard Attributes,
+and data associated with an attribute is now stored there.
+
+Added new procedures environment-bound? and scheme-implementation-version.
+
 Scheme symbols are represented as java.lang.String objects.
 Interned symbols are interned Strings;  uninterned symbols are
 uninterned Strings.  Note that Java strings literals are
@@ -20,7 +26,7 @@ and column number of an input port.
 
 The R4RS prcedures transcript-on and transcript-off are implemented.
 
-Standard types can be referred to using syntax similar to RSCheme.
+Standard types can be referred to using syntax similar to RScheme.
 For example Scheme strings now have the type <string> which is
 preferred to "kawa.lang.FString" (which in addition to being longer,
 is also more suspectible to changes in internal implementation).

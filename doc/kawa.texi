@@ -102,9 +102,8 @@ all of R5RS (for exceptions @pxref{Restrictions}), plus some extensions.
 By default, symbols are case sensitive.
 
 It is completely written in Java.  Scheme functions and files
-are automatically compiled into Java byte-codes, providing
-reasonable speed.  (However, Kawa is not an optimizing compiler,
-and does not perform major transformations on the code.)
+are automatically compiled into Java byte-codes.  Kawa does some
+optimizations, and the compiled code runs at reasonable speed.
 
 Kawa provides the usual read-eval-print loop, as well as batch modes.
 
@@ -124,13 +123,12 @@ Quantities, keyword values, and the expanded @code{lambda} form
 @node Getting Kawa, Installation, Features, Top
 @chapter Getting Kawa
 
-The current sources release is in
-@ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz">here</a>.
-@end ifhtml
-@ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz}.
-@end ifclear
+To get the Kawa sources, you have choice between the
+@uref{ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz,
+current stable version} (possibly quite old), or the newer
+@uref{ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz,
+latest snapshot} (builds and passes the testsuite but not
+extensively tested).
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
@@ -461,7 +459,7 @@ faster (though I have not done any measurements yet).
 It is also closer to the Java call model, so may be better for people
 primarily interested in using Kawa for scripting Java systems.
 
-Both calling convention can co-exist:  Code compiled
+Both calling conventions can co-exist:  Code compiled
 with @code{--full-tailcalls} can call code compiled
 with @code{--no-full-tailcalls} and vice versa.
 
@@ -518,12 +516,22 @@ Integral function do not necessarily work on
 inexact (floating-point) integers.
 (The whole idea of "inexact integer" in R5RS seems rather pointless ...)
 
-Also, call-with-current-continuation is only "upwards" (?).
+Also, @code{call-with-current-continuation} is only "upwards" (?).
 I.e. once a continuation has been exited, it cannot be invoked.
 These restricted continuations can be used to implement catch/throw
 (such as the examples in R4RS), but not co-routines or backtracking.
 
-Kawa does not do general tail-call elimination.  However, if the
+Kawa now does general tail-call elimination, but only if
+you use the flag @code{--full-tail-calls}.  (Currently, the
+@code{eval} function itself is not fully tail-recursive, in violation
+of R5RS.)   The @code{--full-tail-calls} flag is not on by default,
+partly because it is noticably slower (though I have not measured how
+much), and partly I think it is more useful for Kawa to be compilatible
+with standard Java calling conventions and tools.
+Code compiled with @code{--full-tail-calls} can call code
+ compiled without it and vice versa.
+
+Even without @code{--full-tail-calls}, if the
 compiler can prove that the procedure being called is the current
 function, then the tail call will be replaced by a jump.
 This means the procedure must be defined using a letrec, not a
@@ -555,6 +563,7 @@ nor @code{letrec-syntax} are implemented.
 * Quantities::
 * Threads::
 * Standard Types::
+* Declaring Types of Variables::
 * Processes::
 * Miscellaneous::
 @end menu
@@ -1431,7 +1440,7 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
-@node Standard Types, Processes, Threads, Extensions
+@node Standard Types, Declaring Types of Variables, Threads, Extensions
 @section Standard Types
 
 Kawa has first-class types, that you can use in various ways.
@@ -1457,8 +1466,29 @@ An arbitrary Scheme value - and hence an arbitrary Java object.
 The type of Scheme numbers.
 @end defvar
 
+@defvar <quantity>
+The type of quantities optionally with units.
+This is a sub-type of @code{<number>}.
+@end defvar
+
+@defvar <complex>
+The type of complex numbers.
+This is a sub-type of @code{<quantity>}.
+@end defvar
+
+@defvar <real>
+The type of real numbers.
+This is a sub-type of @code{<complex>}.
+@end defvar
+
+@defvar <rational>
+The type of complex numbers.
+This is a sub-type of @code{<real>}.
+@end defvar
+
 @defvar <integer>
 The type of Scheme integers.
+This is a sub-type of @code{<rational>}.
 @end defvar
 
 @defvar <symbol>
@@ -1483,6 +1513,12 @@ This is @emph{not} the same as (non-mutable) Java strings
 (which happen to be the same as @code{<symbol>}).
 @end defvar
 
+@defvar <character>
+The type of Scheme character values.  This is a sub-type of
+@code{<object>}, in contrast to type @code{<char>}, which is the
+primitive Java @code{char} type.
+@end defvar
+
 @defvar <vector>
 The type of Scheme vectors.
 @end defvar
@@ -1505,7 +1541,24 @@ In addition, any Java type can be named using this syntax.
 For example @code{<java.lang.StringBuffer[]>} represents
 an array of references to @code{java.lang.StringBuffer} objects.
 
-@node Processes, Miscellaneous, Standard Types, Extensions
+@node Declaring Types of Variables, Processes, Standard Types, Extensions
+@section Declaring Types of Variables
+
+@deffn Syntax let ((name [:: type] init) ...) body)
+Declare new locals variables with the given @var{name}, initial value
+@var{init}, and optional type specification @var{type}.
+If @var{type} is specified, then the expression @var{init} is evaluated,
+the result coerced to @var{type}, and then assigned to the variable.
+If @var{type} is not specified, it defaults to @code{<object>}.
+@end deffn
+
+@deffn Syntax let* ((name [:: type] init) ...) body)
+@end deffn
+
+@deffn Syntax letrec ((name [:: type] init) ...) body)
+@end deffn
+
+@node Processes, Miscellaneous, Declaring Types of Variables, Extensions
 @section Processes
 
 @defun make-process command envp

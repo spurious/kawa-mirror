@@ -1,5 +1,7 @@
 Tue Jul 16 23:18:20 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
+	* ZipArchive.java:  New class, for handling .zip archives.
+
 	* Field.java (strName):  New method.
 	* Method.java (assign_local):  Fix type lossage.
 	(compile_checkcast, maybe_compile_checkcast):  New methods for arrays.

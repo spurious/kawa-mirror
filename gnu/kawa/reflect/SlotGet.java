@@ -37,6 +37,11 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
     String fname = gnu.expr.Compilation.mangleName(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
+    if (clas.isArray() && "length".equals(fname))
+      {
+	int length = java.lang.reflect.Array.getLength(obj);
+	return interpreter.coerceToObject(length);
+      }
     boolean illegalAccess = false;
     java.lang.reflect.Field field;
     try
@@ -168,11 +173,11 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     Type type = isStatic ? kawa.standard.Scheme.exp2Type(arg0)
       : arg0.getType();
     String name = ClassMethods.checkName(arg1);
+    CodeAttr code = comp.getCode();
     if (type instanceof ClassType && name != null)
       {
         ClassType ctype = (ClassType) type;
         Object part = getField(ctype, name);
-        CodeAttr code = comp.getCode();
         if (part instanceof gnu.bytecode.Field)
           {
             gnu.bytecode.Field field = (gnu.bytecode.Field) part;
@@ -187,6 +192,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
               code.emitGetStatic(field); 
             else
               code.emitGetField(field);
+	    target.compileFromStack(comp, field.getType());
             return;
           }
         if (part instanceof gnu.bytecode.Method)
@@ -205,10 +211,18 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
               code.emitInvokeInterface(method);
             else
               code.emitInvokeVirtual(method);
+	    target.compileFromStack(comp, method.getReturnType());
             return;
           }
         if (type != Type.pointer_type)
           comp.error('e', "no slot `"+name+"' in "+ctype.getName());
+      }
+    else if (type instanceof ArrayType && "length".equals(name) && ! isStatic)
+      {
+	args[0].compile(comp, Target.pushValue(type));
+	code.emitArrayLength();
+	target.compileFromStack(comp, kawa.standard.Scheme.intType);  // FIXME
+	return;
       }
     ApplyExp.compile(exp, comp, target);
   }
@@ -232,6 +246,9 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
             if (part instanceof gnu.bytecode.Method)
               return ((gnu.bytecode.Method) part).getReturnType();
           }
+	else if (type instanceof ArrayType && "length".equals(name)
+		 && ! isStatic)
+	  return kawa.standard.Scheme.intType;  // FIXME
       }
     return Type.pointer_type;
   }

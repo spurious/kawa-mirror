@@ -1,3 +1,8 @@
+2000-04-12  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (apply2, compile, getReturnType):  Handle 'length
+	of an array as a special case.
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  Sigh.  Put in some kludge

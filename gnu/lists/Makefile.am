@@ -20,6 +20,7 @@ java_sources = \
   FVector.java \
   GapVector.java \
   GeneralArray.java \
+  GeneralArray1.java \
   GroupPredicate.java \
   LList.java \
   NodePredicate.java \

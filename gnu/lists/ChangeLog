@@ -1,5 +1,18 @@
 2002-06-10  Per Bothner  <per@bothner.com>
 
+	* Array.java (isEmpty, getRowMajor, getLowBound, getSize, transpose):
+	New methods.
+	* GeneralArray.java:  Extend AbstractSequence.
+	Generalize to arbitrary lower bound.
+	(makeSimple, get, getRowMajor, getLowBound, getSize, transpose):
+	New methods.
+	* Sequence.java.in:  Don't implement Array.
+	* SimpleVector.java.in:  Do implement Array.
+	(getRowMajor, transpose):  New methods.
+	* AbstractSequence.java.in (getLowBound(int), getSize(int)):  New.
+	* GeneralArray1.java:  New class, extends GeneralArray and Sequence.
+	* Makefile.am: (java_sources):  Update accordingly. 
+
 	* FVector.java (<init>):  Don't set initial value if it is null.
 
 2002-05-06  Per Bothner  <per@bothner.com>

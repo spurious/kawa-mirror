@@ -25,7 +25,7 @@ extends
 @if WITH COLLECTIONS@
     java.util.List,
 @endif WITH COLLECTIONS@
-    Array, Consumable
+    Consumable
 {
   /** Special magic end-of-file marker. */
   public static final Object eofValue = new String[] { "(EOF)" };

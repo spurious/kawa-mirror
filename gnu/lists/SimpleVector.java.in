@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -16,7 +16,8 @@ import java.util.*;
  * vectors are also adjustable (by re-allocating the buffer)
  * and have a fill pointer (the size field). */
 
-public abstract class SimpleVector extends AbstractSequence implements Sequence
+public abstract class SimpleVector extends AbstractSequence
+  implements Sequence, Array
 {
   /** The (current) number of elements.
    * Must always have size() >= 0 && size() <= getBufferLength(). */
@@ -119,6 +120,11 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
   public long longAtBuffer(int index)
   {
     return Convert.toLong(getBuffer(index));
+  }
+
+  public Object getRowMajor (int i)
+  {
+    return get(i);
   }
 
   protected abstract Object getBuffer(int index);
@@ -358,5 +364,18 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
   public int getElementKind()
   {
     return OBJECT_VALUE;
+  }
+
+  public Array transpose(int[] lowBounds, int[] dimensions,
+			 int offset0, int[] factors)
+  {
+    GeneralArray array = new GeneralArray();
+    array.strides = factors;
+    array.dimensions = dimensions;
+    array.lowBounds = lowBounds;
+    array.offset = offset0;
+    array.base = this;
+    array.simple = false;
+    return array;
   }
 }

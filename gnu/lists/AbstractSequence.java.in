@@ -59,6 +59,16 @@ public abstract class AbstractSequence
     return set(indexes[0], value);
   }
 
+  public int getLowBound(int dim)
+  {
+    return 0;
+  }
+
+  public int getSize (int dim)
+  {
+    return dim==0 ? size() : 1;
+  }
+
   protected RuntimeException unsupported (String text)
   {
     text = getClass().getName() + " does not implement " + text;

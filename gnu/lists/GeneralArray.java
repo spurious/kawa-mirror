@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -13,47 +13,103 @@ package gnu.lists;
  * transposing an array can be implement as just creating a simple
  * re-mapping of the indexes. */
 
-public class GeneralArray
-// Should extends AbstractSequence?
+public class GeneralArray extends AbstractSequence
 implements Array //, Consumable
 // Should implement Collection?
 // Note this intentionally does not implement Sequence.
 {
   SimpleVector base;
-  int rank;
   int[] dimensions;
-  int[] stride;
+  int[] strides;
+  int[] lowBounds;
+  static final int[] zeros = new int[8];
   int offset;
+  boolean simple = true;
+
+  public static Array makeSimple(int[] lowBounds, int[] dimensions,
+				 SimpleVector base)
+  {
+    int d = dimensions.length;
+    if (lowBounds == null)
+      {
+	lowBounds = zeros;
+	if (d > lowBounds.length)
+	  lowBounds = new int[d];
+      }
+    if (d == 1 && lowBounds[0] == 0)
+      return base;
+    GeneralArray array = new GeneralArray();
+    int[] strides = new int[d];
+    int n = 1;
+    for (int i = d;  --i >= 0; )
+      {
+	strides[i] = n;
+	n *= dimensions[i];
+      }
+    array.strides = strides;
+    array.dimensions = dimensions;
+    array.lowBounds = lowBounds;
+    array.base = base;
+    return array;
+  }
+
+  public GeneralArray()
+  {
+  }
 
   public GeneralArray(int[] dimensions)
   {
     int total = 1;
     int rank = dimensions.length;
-    int[] stride = new int[rank];
+    if (rank <= zeros.length)
+      lowBounds = zeros;
+    else
+      lowBounds = new int[rank]; 
+    int[] strides = new int[rank];
     for (int i = rank;  --i >= 0; )
       {
-	stride[i] = total;
+	strides[i] = total;
 	total *= dimensions[i];
       }
     base = new FVector(total);
     this.dimensions = dimensions;
-    this.rank = rank;
     this.offset = 0;
   }
 
-  public int rank() { return rank; }
+  public int rank() { return dimensions.length; }
 
   public int getEffectiveIndex(int[] indexes)
   {
     int result = offset;
-    for (int i = rank;  --i >= 0; )
+    for (int i = dimensions.length;  --i >= 0; )
       {
 	int index = indexes[i];
-	if (index < 0 || index >= dimensions[i])
+	int low = lowBounds[i];
+	if (index < low || (index -= low) >= dimensions[i])
 	  throw new IndexOutOfBoundsException();
-	result += stride[i] * index;
+	result += strides[i] * index;
       }
     return result;
+  }
+
+  public Object get (int index)
+  {
+    return getRowMajor(index);
+  }
+
+  public Object getRowMajor(int index)
+  {
+    if (simple)
+      return base.get(index);
+    int total = offset;
+    for (int i = dimensions.length;  --i >= 0; )
+      {
+	int dim = dimensions[i];
+	int cur = index % dim;
+	index = index / dim;
+	total = total + strides[i] * cur;
+      }
+    return base.get(total);
   }
 
   public Object get(int[] indexes)
@@ -70,8 +126,33 @@ implements Array //, Consumable
   public int size()
   {
     int total = 1;
-    for (int i = rank;  --i >= 0; )
+    for (int i = dimensions.length;  --i >= 0; )
       total *= dimensions[i];
     return total;
+  }
+
+  public int getLowBound(int dim)
+  {
+    return lowBounds[dim];
+  }
+
+  public int getSize(int dim)
+  {
+    return dimensions[dim];
+  }
+
+  public Array transpose(int[] lowBounds, int[] dimensions,
+			 int offset0, int[] factors)
+  {
+    GeneralArray array =
+      dimensions.length == 1 && lowBounds[0] == 0 ? new GeneralArray1()
+      : new GeneralArray();
+    array.offset = offset0;
+    array.strides = factors;
+    array.dimensions = dimensions;
+    array.lowBounds = lowBounds;
+    array.base = base;
+    array.simple = false;
+    return array;
   }
 }

@@ -1,6 +1,7 @@
 package kawa.lang;
 import codegen.*;
 import java.util.Hashtable;
+import java.io.*;
 
 public class Compilation
 {
@@ -22,59 +23,83 @@ public class Compilation
   static public ClassType scmObjectType = new ClassType ("java.lang.Object");
   static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
   static public ClassType scmSymbolType = new ClassType ("kawa.lang.Symbol");
+  static public ClassType scmStringType = new ClassType ("java.lang.StringBuffer");
   static public ClassType javaStringType = new ClassType ("java.lang.String");
+  static public ClassType javaIntegerType = new ClassType ("java.lang.Integer");
   static public ClassType scmListType = new ClassType ("kawa.lang.List");
+  static public ClassType scmPairType = new ClassType ("kawa.lang.Pair");
   static public ClassType scmUndefinedType = new ClassType ("kawa.lang.Undefined");
-  static Type objArrayType = new ArrayType (scmObjectType);
+  static ArrayType objArrayType = new ArrayType (scmObjectType);
   static public ClassType scmProcedureType
     = new ClassType ("kawa.lang.Procedure");
   static public ClassType scmInterpreterType
     = new ClassType ("kawa.lang.Interpreter");
-  static Field trueConstant
+  static final Field carField
+    = scmPairType.new_field ("car", scmObjectType, Access.PUBLIC);
+  static final Field cdrField
+    = scmPairType.new_field ("cdr", scmObjectType, Access.PUBLIC);
+  static final Field trueConstant
     = scmInterpreterType.new_field ("trueObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC); 
-  static Field falseConstant
+  static final Field falseConstant
     = scmInterpreterType.new_field ("falseObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC);
-  static Field nullConstant
-  = scmInterpreterType.new_field ("nullObject", scmObjectType, // FIXME type
+  static final Field nullConstant
+  = scmInterpreterType.new_field ("nullObject", scmListType,
 				    Access.PUBLIC|Access.STATIC);
-  static Field voidConstant
+  static final Field voidConstant
   = scmInterpreterType.new_field ("voidObject", scmUndefinedType,
 				    Access.PUBLIC|Access.STATIC);
-  static Field undefinedConstant
+  static final Field undefinedConstant
   = scmInterpreterType.new_field ("undefinedObject", scmUndefinedType,
 				    Access.PUBLIC|Access.STATIC);
-  static Field eofConstant
+  static final Field eofConstant
   = scmInterpreterType.new_field ("eofObject", scmSymbolType,
 				    Access.PUBLIC|Access.STATIC);
   static Method makeSymbolMethod;
+  static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
   static Method makeListMethod;
+  static Method initStringBufferMethod;
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
     makeListMethod = scmListType.new_method ("makeList",
 					     makeListArgs, scmListType,
 					     Access.PUBLIC|Access.STATIC);
+    Type[] int1Args = { Type.int_type };
+    initIntegerMethod = javaIntegerType.new_method ("<init>",
+						    int1Args, Type.void_type,
+						    Access.PUBLIC);
+
     Type[] string1Arg = { javaStringType };
     makeSymbolMethod = scmSymbolType.new_method ("make", string1Arg,
 						 scmSymbolType,
 						 Access.PUBLIC|Access.STATIC);
+    initStringBufferMethod = scmStringType.new_method ("<init>", string1Arg,
+						       Type.void_type,
+						       Access.PUBLIC);
+
+    Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
-      = scmInterpreterType.new_method ("lookup_global", string1Arg,
+      = scmInterpreterType.new_method ("lookup_global", sym1Arg,
 				       scmObjectType,
 				       Access.PUBLIC|Access.STATIC);
-    Type[] stringObjArgs = { javaStringType, scmObjectType };
+    Type[] symObjArgs = { scmSymbolType, scmObjectType };
     defineGlobalMethod
-      = scmInterpreterType.new_method ("define_global", stringObjArgs,
+      = scmInterpreterType.new_method ("define_global", symObjArgs,
 				       Type.void_type,
 				       Access.PUBLIC|Access.STATIC);
   }
 
   static Type[] apply0args = new Type[0];
   static Type[] applyNargs = { objArrayType };
+
+  static final Method makeNullPairMethod
+  = scmPairType.new_method ("makePair", apply0args, scmPairType,
+			     Access.PUBLIC|Access.STATIC);
+  static Method makePairMethod;
 
   public static Method apply0method = scmProcedureType.new_method
   ("apply0", apply0args, scmObjectType, Access.PUBLIC|Access.FINAL);
@@ -106,6 +131,9 @@ public class Compilation
     applyNmethod = scmProcedureType.new_method ("applyN", applyNargs,
 						scmObjectType,
 						Access.PUBLIC|Access.FINAL);
+    makePairMethod = scmPairType.new_method ("makePair", apply2args,
+					     scmPairType,
+					     Access.PUBLIC|Access.STATIC);
   }
 
   public static Method[] applymethods = {
@@ -115,6 +143,8 @@ public class Compilation
   Hashtable literalTable;
   int literalsCount;
   Literal literalsChain;
+  /* The static "literals" field, which points to an array of literal values.
+   * Only used if immdiate. */
   Field literalsField;
 
   public void addClass (ClassType new_class)
@@ -131,66 +161,83 @@ public class Compilation
     new_class.access_flags = Access.PUBLIC;
   }
 
-  public Compilation (ClassType classfile)
+  Literal findLiteral (Object value)
   {
-    addClass (classfile);
-    this.curClass = classfile;
-    this.mainClass = classfile;
-
-    literalTable = new Hashtable (100);
-    literalsField = classfile.new_field ("literals",
-					 objArrayType, Access.STATIC);
+    Literal literal = (Literal) literalTable.get (value);
+    if (literal != null)
+      {
+	// This value is used multiple types (perhaps recursively),
+	// so do allocate a LitN Field for it.
+	if (literal.field == null)
+	  literal.assign (this);
+      }
+    else
+      {
+	if (value instanceof Boolean)
+	  {
+	    boolean val = ((Boolean)value).booleanValue ();
+	    literal = new Literal (value,
+				   val ? trueConstant : falseConstant,
+				   this);
+	  }
+	else if (value == Interpreter.voidObject)
+	  literal = new Literal (value, voidConstant, this);
+	else if (value == Interpreter.eofObject)
+	  literal = new Literal (value, eofConstant, this);
+	else if (value == Interpreter.nullObject)
+	  literal = new Literal (value, nullConstant, this);
+	else if (value == Interpreter.undefinedObject)
+	  literal = new Literal (value, undefinedConstant, this);
+	else if (immediate)
+	  {
+	    literal = new Literal (value, this);
+	  }
+	else if (value instanceof Pair)
+	  {
+	    literal = new Literal (value, scmPairType, this);
+	    Pair pair = (Pair) value;
+	    findLiteral (pair.car);
+	    findLiteral (pair.cdr);
+	  }
+	else if (value instanceof Symbol)
+	  literal = new Literal (value, scmSymbolType, this);
+	else
+	  literal = new Literal (value, scmObjectType, this);
+      }
+    return literal;
   }
 
   public void compileConstant (Object value)
   {
-    if (value instanceof Boolean)
-      {
-	boolean val = ((Boolean)value).booleanValue ();
-	method.compile_getstatic (val ? trueConstant : falseConstant);
-	return;
-      }
-    if (value == Interpreter.voidObject)
-      {
-	method.compile_getstatic (voidConstant);
-	return;
-      }
-    if (value == Interpreter.eofObject)
-      {
-	method.compile_getstatic (eofConstant);
-	return;
-      }
-    if (value == Interpreter.nullObject)
-      {
-	method.compile_getstatic (nullConstant);
-	return;
-      }
-    if (value == Interpreter.undefinedObject)
-      {
-	method.compile_getstatic (undefinedConstant);
-	return;
-      }
-    if (immediate)
-      {
-	Literal literal = (Literal) literalTable.get (value);
-	if (literal == null)
-	  literal = new Literal (value, this);
-	literal.compile (this);
-	return;
-      }
-    if (value instanceof Symbol)
-      {
-	method.compile_push_string (((Symbol)value).toString ());
-	method.compile_invoke_static (makeSymbolMethod);
-	return;
-      }
-    System.err.print ("Unimplemented compileConstant for ");
-    System.err.println (getClass ());
-    method.compile_push_null ();
+    Literal literal = findLiteral (value);
+    if (literal.field == null)
+      literal.assign (this);
+    literal.compile (this);
+    return;
   }
 
-  public Compilation (String classname)
+  public void dumpLiterals ()
   {
-    this (new ClassType (classname));
+    for (Literal literal = literalsChain;  literal != null;
+	 literal = literal.next)
+      {
+	if ((literal.flags & Literal.INITIALIZED) == 0)
+	  literal.emit (this, true);
+      }
+  }
+
+  public Compilation (LambdaExp lexp, String classname, boolean immediate)
+  {
+    ClassType classfile = new ClassType (classname);
+    addClass (classfile);
+    this.curClass = classfile;
+    this.mainClass = classfile;
+    this.immediate = immediate;
+
+    literalTable = new Hashtable (100);
+    if (immediate)
+      literalsField = classfile.new_field ("literals",
+                                           objArrayType, Access.STATIC);
+    compilefunc.compile (this, lexp);
   }
 }

@@ -92,6 +92,9 @@ public class Declaration extends Variable
 
   public Object getValue (Object[] frame)
   {
+    //System.err.println ("getvalue: " + sym + " offset:"+offset + " context:"+context + " this:"+this);
+    if (context.heapFrame == this)
+      return frame;
     if (baseVariable != null)
       frame = (Object[]) baseVariable.getValue (frame);
     return frame[offset];
@@ -99,6 +102,7 @@ public class Declaration extends Variable
 
   public Object[] getFrame (Environment env)
   {
+    //System.err.println ("getframe: " + sym + " offset:"+offset);
     Object frame[] = env.values;
     ScopeExp curScope = env.scope;
     ScopeExp declScope = context;
@@ -118,6 +122,9 @@ public class Declaration extends Variable
 
   Object getValue (Environment env)
   {
+    if (context.heapFrame == this)
+      return env.values;
+    //System.err.println ("getvalue: " + sym);
     return getValue (getFrame (env)); 
   }
 

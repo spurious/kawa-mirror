@@ -2,7 +2,7 @@ package kawa.lang;
 
 import java.io.PrintStream;
 
-public class Symbol extends Object implements Printable
+public class Symbol extends Object implements Printable, Compilable
 {
   private java.lang.String name;
 
@@ -60,5 +60,12 @@ public class Symbol extends Object implements Printable
   public void print(java.io.PrintStream ps)
   {
     ps.print(name);
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    comp.method.compile_push_string (((Symbol)literal.value).toString ());
+    comp.method.compile_invoke_static (comp.makeSymbolMethod);
+    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

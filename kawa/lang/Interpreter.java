@@ -79,10 +79,6 @@ public class Interpreter extends Object
       define(quasiquote.name,quasiquote);
       define(unquote.name,unquote);
       define(unquotesplicing.name,unquotesplicing);
-      define("compile-func", new compilefunc ());
-      define("load-compiled", new loadcompiled ());
-      //      define("foo-compiled", new Foo ());
-
    }
 
   public void define(String name, Object p)
@@ -95,12 +91,15 @@ public class Interpreter extends Object
     globals.put(sym.toString (),p);
   }
 
-  public static Object lookup_global (String name)
+  public static Object lookup_global (Symbol name)
   {
-    return curInterpreter.lookup (name);
+    Object result = curInterpreter.lookup (name);
+    if (result == null)
+      new UnboundSymbol(name.toString ());
+    return result;
   }
 
-  public static void define_global (String name, Object new_value)
+  public static void define_global (Symbol name, Object new_value)
   {
     curInterpreter.define (name, new_value);
   }
@@ -260,7 +259,7 @@ public class Interpreter extends Object
       {
 	LambdaExp curLambda = currentLambda ();
 	LambdaExp declLambda = decl.context.currentLambda ();
-	if (curLambda != declLambda)
+	if (curLambda != declLambda || declLambda == null)
 	  {
 	    decl.setSimple (false);
 	    LambdaExp lambda = curLambda;

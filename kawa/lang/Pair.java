@@ -2,7 +2,7 @@ package kawa.lang;
 
 import java.io.PrintStream;
 
-public class Pair extends List implements Printable
+public class Pair extends List implements Printable, Compilable
 {
    public Object car;
    public Object cdr;
@@ -122,5 +122,57 @@ public class Pair extends List implements Printable
 	    break;
 	  }
       }
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    if ((literal.flags & Literal.ALLOCATING) != 0)
+      {
+	// We have detected a circularity.
+	// Resolve it by only allocating the Pair, leaving the car and cdr
+	// as null.  They will be set later by one of our callers.
+	// Emit:  push makePair()  (same as new Pair (null, null)
+	comp.method.compile_invoke_static (Compilation.makeNullPairMethod);
+	literal.flags |= Literal.ALLOCATED;
+      }
+    else
+      {
+	literal.flags |= Literal.ALLOCATING;
+	comp.findLiteral (car).emit (comp, false);
+	comp.findLiteral (cdr).emit (comp, false);
+	if ((literal.flags & Literal.ALLOCATED) != 0)
+	  {
+	    // It's already been allocated, because either the car or cdr
+	    // depended on the value of the Literal (i.e a circularity).
+	    // Just initialize car and cdr.
+	    // Emit:  this.cdr = pop();  this.car = pop();  push this;
+	    comp.method.compile_getstatic (literal.field);
+	    comp.method.compile_dup (1, 1);  // emit dup_x1
+	    comp.method.compile_swap ();
+	    comp.method.compile_putfield (Compilation.cdrField);
+	    comp.method.compile_dup (1, 1);  // emit dup_x1
+	    comp.method.compile_swap ();
+	    comp.method.compile_putfield (Compilation.carField);
+	  }
+	else
+	  {
+	    // The normal case - no circularities detected.
+	    // emit:  push new Pair (pop(), pop())
+	    comp.method.compile_invoke_static  (Compilation.makePairMethod);
+	  }
+	literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
+      }
+  }
+
+  // Convenience function used by emit.
+  public static Pair makePair ()
+  {
+    return new Pair (null, null);
+  }
+
+  // Convenience function used by emit.
+  public static Pair makePair (Object car, Object cdr)
+  {
+    return new Pair (car, cdr);
   }
 };

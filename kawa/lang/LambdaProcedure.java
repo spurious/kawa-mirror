@@ -2,6 +2,7 @@ package kawa.lang;
 
 /**
  * Interpreted Procedure resulting from a lambda expression.
+ * CURRENTLY NOT USED - we always bytecompile lambda expressions!
  * @author	Per Bothner
  */
 
@@ -24,10 +25,10 @@ public class LambdaProcedure extends ProcedureN
     if (args.length < lexpr.min_args
 	|| (lexpr.max_args >= 0 && args.length > lexpr.max_args))
       throw new WrongArguments(this.name,lexpr.min_args,"(?)");
-    Object[] frame = new Object[lexpr.space_needed];
+    Object[] frame = new Object[lexpr.frameSize];
     Environment new_env = new Environment (frame, lexpr, environment);
     if (lexpr.heapFrame != null)
-      frame[lexpr.heapFrame.offset] = new Object[lexpr.heapSize];
+      frame[lexpr.heapFrame.offset] = new Object[lexpr.frameSize];
     if (lexpr.staticLink != null)
       lexpr.staticLink.setValue (new_env, environment.values);
     System.arraycopy (args, 0, frame, 0, lexpr.min_args);

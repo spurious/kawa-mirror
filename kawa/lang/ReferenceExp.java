@@ -43,6 +43,7 @@ public class ReferenceExp extends Expression
     if (decl.baseVariable != null)
       {
 	compile_load (decl.baseVariable, comp);  // recursive!
+	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	comp.method.compile_push_int (decl.offset);
 	comp.method.compile_array_load (Compilation.scmObjectType);
       }
@@ -56,12 +57,17 @@ public class ReferenceExp extends Expression
 	    LambdaExp lambda = curLambda.outerLambda ();
 	    for ( ; lambda != declLambda;  lambda = lambda.outerLambda ())
 	      {
-		comp.method.compile_push_int (lambda.heapFrame.offset);
+		comp.method.maybe_compile_checkcast (Compilation.objArrayType);
+		comp.method.compile_push_int (lambda.staticLink.offset);
 		comp.method.compile_array_load (Compilation.scmObjectType);
+		// Invariant:  The stack top contains lambda.staticLink.
 	      }
+	    // Now the stack top is the declLambda heapFrame.
 	  }
 	else
-	  comp.method.compile_push_value (decl);
+	  {
+	    comp.method.compile_push_value (decl);
+	  }
       }
   }
 
@@ -73,7 +79,9 @@ public class ReferenceExp extends Expression
       compile_load (binding, comp);
     else
       {
-	comp.method.compile_push_string (symbol.toString ());
+	comp.compileConstant (symbol);
+	if (comp.immediate)
+	  comp.method.compile_checkcast (comp.scmSymbolType);
 	comp.method.compile_invoke_static (comp.lookupGlobalMethod);
       }
   }

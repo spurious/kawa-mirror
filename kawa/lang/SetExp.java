@@ -78,9 +78,6 @@ public class SetExp extends Expression
 
   public void compile (Compilation comp, boolean ignore_result)
   {
-    if (binding == null)
-      comp.method.compile_push_string (name.toString ());
-
     if (binding != null)
       {
 	if (binding.isSimple ())
@@ -98,6 +95,7 @@ public class SetExp extends Expression
       }
     else
       {
+	comp.compileConstant (name);
 	new_value.compile (comp, false);
 	comp.method.compile_invoke_static (comp.defineGlobalMethod);
       }

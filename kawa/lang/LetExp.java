@@ -17,11 +17,12 @@ public class LetExp extends ScopeExp
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
-    Object[] values = shared ? env.values : new Object[space_needed];
+    Object[] values = shared ? env.values : new Object[frameSize];
     int i = 0;
     for (Variable var = firstVar ();  var != null; var = var.nextVar ())
       {
-	values[var.offset] = inits[i].eval (env);
+	if (var != heapFrame)
+	  values[var.offset] = inits[i].eval (env);
 	i++;
       }
     return body.eval (shared ? env : new Environment (values, this, env));
@@ -46,8 +47,6 @@ public class LetExp extends ScopeExp
       inits[i].compile (comp, false);
 
     comp.method.enterScope (scope);
-    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
-      comp.method.current_scope.add_var (comp.method, var);
 
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstVar ());

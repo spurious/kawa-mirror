@@ -1,21 +1,15 @@
 package kawa.lang;
 import codegen.*;
 
+/** Compiles a function to a class.
+ * @author Per Bothner
+ */
+
 public class compilefunc extends Procedure2
 {
   public compilefunc ()
   {
     super ("compile-func");
-  }
-
-  static public final Compilation compile (LambdaExp lexp,
-					   String className,
-					   boolean immediate)
-  {
-    Compilation comp = new Compilation (className);
-    comp.immediate = immediate;
-    compile (comp, lexp);
-    return comp;
   }
 
   static public final void compile (Compilation comp,  LambdaExp lexp)
@@ -45,32 +39,23 @@ public class compilefunc extends Procedure2
 	  arg_types[i] = comp.scmObjectType;
 	argsArray = null;
       }
+
     ClassType superType = new ClassType ("kawa.lang.Procedure" + arg_letter);
     comp.curClass.set_super (superType);
 
-    if (comp.curClass == comp.mainClass)
-      {
-	ClassType[] interfaces = { new ClassType ("kawa.lang.CompiledProc") };
-	comp.curClass.setInterfaces (interfaces);
-
-	Method setLiterals_method = comp.curClass.new_method ("setLiterals",
-							      comp.applyNargs,
-							      Type.void_type,
-							      Access.PUBLIC);
-	setLiterals_method.init_param_slots ();
-	setLiterals_method.compile_push_value
-	  (setLiterals_method.find_arg (1));
-	setLiterals_method.compile_putstatic (comp.literalsField);
-	setLiterals_method.compile_return ();
-      }
-
     Type[] constructor_args = comp.apply0args;
-    Field staticLink = null;
+    boolean constructor_takes_staticLink = false;
     if (lexp.staticLink != null)
       {
-	staticLink = comp.curClass.new_field ("staticLink", comp.objArrayType);
-	constructor_args = comp.applyNargs;
+	lexp.staticLinkField = comp.curClass.new_field ("staticLink",
+							comp.objArrayType);
+	if (lexp.outerLambda () != null)
+	  {
+	    constructor_args = comp.applyNargs;
+	    constructor_takes_staticLink = true;
+	  }
       }
+
     Method constructor_method = comp.curClass.new_method ("<init>",
 							  constructor_args,
 							  Type.void_type,
@@ -84,14 +69,13 @@ public class compilefunc extends Procedure2
     constructor_method.init_param_slots ();
     constructor_method.compile_push_this ();
     constructor_method.compile_invoke_nonvirtual (superConstructor);
-    if (lexp.staticLink != null)
+    if (constructor_takes_staticLink)
       {
 	constructor_method.compile_push_this ();
 	Variable staticLinkArg = constructor_method.find_arg (1);
 	constructor_method.compile_push_value (staticLinkArg);
-	constructor_method.compile_putfield (staticLink);
+	constructor_method.compile_putfield (lexp.staticLinkField);
       }
-    constructor_method.compile_return ();
 
     Method apply_method = comp.curClass.new_method ("apply"+arg_letter,
 					 arg_types,
@@ -155,18 +139,18 @@ public class compilefunc extends Procedure2
 
     comp.method.enterScope (lexp.scope);
 
+    if (lexp.heapFrame != null)
+      {
+	comp.method.compile_push_int (lexp.frameSize);
+	comp.method.compile_new_array (comp.scmObjectType);
+	comp.method.compile_store_value (lexp.heapFrame);
+      }
+
     if (lexp.staticLink != null)
       {
 	comp.method.compile_push_this ();
-	comp.method.compile_getfield (staticLink);
-	comp.method.compile_store_value (lexp.staticLink);
-      }
-
-    if (lexp.heapFrame != null)
-      {
-	comp.method.compile_push_int (lexp.heapSize);
-	comp.method.compile_new_array (comp.scmObjectType);
-	comp.method.compile_store_value (lexp.heapFrame);
+	comp.method.compile_getfield (lexp.staticLinkField);
+	SetExp.compile_store (lexp.staticLink, comp);
       }
 
     // For each non-artificial parameter, copy it from its incoming
@@ -229,6 +213,15 @@ public class compilefunc extends Procedure2
     lexp.body.compile (comp, false);
     comp.method.compile_return ();
 
+    if (! comp.immediate && comp.curClass == comp.mainClass)
+      {
+	Method save_method = comp.method;
+	comp.method = constructor_method;
+	comp.dumpLiterals ();
+	comp.method = save_method;
+      }
+    constructor_method.compile_return ();
+
     comp.method.pop_scope ();
     comp.curLambda = saveLambda;
   }
@@ -241,7 +234,8 @@ public class compilefunc extends Procedure2
     LambdaProcedure proc = (LambdaProcedure) arg1;
     try
       {
-	compile (proc.lexpr, arg2.toString (), false).curClass.emit_to_file ();
+	Compilation comp = new Compilation (proc.lexpr, arg2.toString (), false);
+	comp.curClass.emit_to_file ();
       }
     catch (java.io.IOException ex)
       {

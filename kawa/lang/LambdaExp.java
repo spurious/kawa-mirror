@@ -89,15 +89,11 @@ public class LambdaExp extends ScopeExp
     pop (interp);
   }
 
-  /** A variable that points to the heap-allocated part of the frame.
-   * This is an Object array that contains all the variables
-   * captured by an inner Lambda. */
-  Declaration heapFrame;
-
-  /** The size needed for the heapFrame array. */
-  int heapSize;
+  /** If non-null, this is the Field that contains the static link. */
+  Field staticLinkField;
 
   /** If non-null, this contains the static link.
+   * It is copied from the staticLinkField.
    * The static link variable points to the same array as the
    * enclosing function's heapFrame. */
   Declaration staticLink;
@@ -134,6 +130,35 @@ public class LambdaExp extends ScopeExp
     comp.method.compile_invoke_nonvirtual (new_class.constructor);
   }
 
+  void compile_setLiterals (Compilation comp, Object[] values)
+  {
+    ClassType[] interfaces = { new ClassType ("kawa.lang.CompiledProc") };
+    comp.mainClass.setInterfaces (interfaces);
+
+    Method setLiterals_method
+      = comp.mainClass.new_method ("setLiterals", comp.applyNargs,
+				   Type.void_type, Access.PUBLIC);
+    setLiterals_method.init_param_slots ();
+    setLiterals_method.compile_push_value (setLiterals_method.find_arg (1));
+    setLiterals_method.compile_putstatic (comp.literalsField);
+
+    if (staticLinkField != null && outerLambda () == null)
+      {
+	Method saveMethod = comp.method;
+	comp.method = setLiterals_method;
+	// The outer-most lambda needs a staticLink,
+	// because it is surrounded by some other ScopeExp.
+	// This code sets the staticLink from the environment.
+	setLiterals_method.compile_push_this ();
+	comp.compileConstant (values);
+	setLiterals_method.compile_checkcast (Compilation.objArrayType);
+	setLiterals_method.compile_putfield (staticLinkField);
+	comp.method = saveMethod;
+      }
+
+    setLiterals_method.compile_return ();
+  }
+
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
@@ -141,35 +166,40 @@ public class LambdaExp extends ScopeExp
       return new LambdaProcedure (this, env);
     try
       {
-    Compilation comp = compilefunc.compile (this, "lambda0", true);
+	Compilation comp = new Compilation (this, "lambda0", true);
+	compile_setLiterals (comp, env.values);
 
-    byte[][] classes = new byte[comp.numClasses][];
-    for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
-      {
-	classes[iClass] = comp.classes[iClass].emit_to_array ();
+	byte[][] classes = new byte[comp.numClasses][];
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  classes[iClass] = comp.classes[iClass].emit_to_array ();
 
-	// DEBUGGING - FIXME
-	try {comp.classes[iClass].emit_to_file ("lambda" + iClass + ".class");}
-	catch (java.io.IOException ex)
-	  {   System.err.print("Caught I/O exception: ");  }
+	/* DEBUGGING
+	ZipArchive zar = new ZipArchive ("Foo.zip", "rw");
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  zar.append ("lambda" + iClass + ".class", classes[iClass]);
+	zar.close ();
+	*/
 
-      }
+	SchemeLoader loader = new SchemeLoader (classes);
+	Class clas = loader.loadClass ("lambda0", true);
+	Object inst = clas.newInstance ();
 
-    SchemeLoader loader = new SchemeLoader (classes);
-    Class clas = loader.loadClass ("lambda0", true);
-    //Class clas = Class.forName ("lambda0");
-    Object inst = clas.newInstance ();
-    /* Pass literal values to the compiled code. */
-    CompiledProc cproc = (CompiledProc) inst;
-    Object[] literals = new Object[comp.literalsCount];
-    for (Literal literal = comp.literalsChain;  literal != null;
-	 literal = literal.next)
-      {
-	literals[literal.index] = literal.value;
-      }
-    cproc.setLiterals (literals);
+	/* Pass literal values to the compiled code. */
+	CompiledProc cproc = (CompiledProc) inst;
+	Object[] literals = new Object[comp.literalsCount];
+	for (Literal literal = comp.literalsChain;  literal != null;
+	     literal = literal.next)
+	  {
+	    /* DEBUGGING
+	    System.err.print ("literal["+literal.index+"]=");
+	    print.print (literal.value, System.err);
+	    System.err.println();
+	    */
+	    literals[literal.index] = literal.value;
+	  }
+	cproc.setLiterals (literals);
 
-    return inst;
+	return inst;
       }
     catch (java.io.IOException ex)
       {

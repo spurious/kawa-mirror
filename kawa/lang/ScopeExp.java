@@ -17,39 +17,48 @@ public abstract class ScopeExp extends Expression
   /** The statically enclosing binding contour. */
   ScopeExp outer;
 
-  /** Number of frame slots needed by the scope, and shared inner scopes. */
-  // FIXME - this is obsolete, except for eval'd code.
-  int space_needed;
-
   /** True iff this scope should be embedded in the outer scope's frame. */
   boolean shared;
 
+  /** A variable that points to the heap-allocated part of the frame.
+   * This is an Object array that contains all the variables
+   * captured by an inner Lambda.
+   * The size of the array is frameSize.  */
+  Declaration heapFrame;
+
+  /** The number of slots used by the current frame.
+   * This is only used if shared is set.
+   * In a LambdaExp, it is the size needed for the heapFrame array. */
+  int frameSize;
+
   public void assign_space ()
   {
-    LambdaExp lambda = currentLambda ();
-    /* If space_need > 0, we have already allocated space for nested scopes.
-     * Otherwise, make sure incoming arguments are properly allocated. */
-    if (lambda != null && space_needed == 0)
-      space_needed = lambda.incomingArgs ();
+    ScopeExp alloc_scope = this;
+    while (! (alloc_scope instanceof LambdaExp))
+      {
+	ScopeExp alloc_outer = alloc_scope.outer;
+	if (alloc_outer == null)
+	  break;
+	alloc_scope = alloc_outer;
+      }
     for (Variable var = firstVar ();  var != null;  var = var.nextVar ()) 
       {
 	Declaration decl = (Declaration) var;
 	if (decl.offset < 0)
 	  {
-	    if (! decl.isSimple () && lambda != null)
+	    if (! decl.isSimple ())
 	      {
-	      /* A variable captured by an inner Lambda is allocated
-		 in the heap frame. */
-		if (lambda.heapFrame == null)
-		  lambda.heapFrame = add_decl (Symbol.make ("heapFrame"),
-					       Compilation.objArrayType);
-		decl.baseVariable = lambda.heapFrame;
-		decl.offset = lambda.heapSize++;
+		/* A variable captured by an inner Lambda is allocated
+		   in the heap frame. */
+		if (alloc_scope.heapFrame == null)
+		  alloc_scope.heapFrame
+		    = alloc_scope.add_decl (Symbol.make ("heapFrame"),
+					    Compilation.objArrayType);
+		decl.baseVariable = alloc_scope.heapFrame;
+		decl.offset = alloc_scope.frameSize++;
 	      }
 	  }
       }
-    if (shared && space_needed > outer.space_needed)
-      outer.space_needed = space_needed;
   }
 
   public final void push_decls (Interpreter interp)

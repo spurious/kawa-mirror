@@ -72,9 +72,14 @@ Procedure4.class \
 Procedure0or1.class \
 Procedure1or2.class \
 ProcedureN.class \
+AutoloadProcedure.class \
+Continuation.class \
+CalledContinuation.class \
 Syntax.class \
 Literal.class \
 Compilation.class \
+Compilable.class \
+CompileFile.class \
 compilefunc.class \
 loadcompiled.class \
 SchemeLoader.class \

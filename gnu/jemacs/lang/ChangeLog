@@ -1,3 +1,36 @@
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java (isDelimiter):  Add '\'' and '#' as delimiters.
+	(readSymbol):   Removed, replaced by readAtom.
+	(readAtom0, readAtom):  New methods.
+	(getReadCase, readNumber, readComplex, numError, readReal):  Remove.
+	(readInteger):  New method - just call readAtom0.
+	(readObject):  Use readInteger and readAtom as appropriate.
+	Handle `:SYMBOL' syntax for uninterned symbols.
+
+	* NumberCompare.java:  New class, extends ProcedureN.
+	* NumberOps.scm:  New file.
+	* Symbol.java:  Change to inherit from Symbol2.
+	(getBinding):  Return Binding2 rather than plain Binding.
+	(getFunctionBinding, setFunctionBinding):  New static methods.
+	* SymbolOps.scm (set):  Remove duplicate definition.
+	(symbol-function, fset):  Update SymbolConstraint -> Symbol.
+	* lambda.java (rewrite):  Using a Pattern is overkill.
+	* defun.java:  New class;  extends Syntax.
+	* Makefile.am (java_JAVA, SCMSOURCES):  Update for new files.
+
+	* ELisp.java (hasSeparateFunctionNamespace, defineAll, defun,
+	registerEnvironment):  New methods.
+	(<init>):  Define `t', `nil', `<', `<=', `>', `>=', `defun'.
+
+	* FunctionSymbolConstraint.java:  Removed.  No longer needed thanks
+	to "Binding2" support in gnu.mapping and gnu.expr.
+	* GeneralSymbolConstraint.java:  Likewise.
+	* SymbolConstraint.java:  Likewise.
+	* UnboundSymbolConstraint.java:  Likewise.
+	* ValueSymbolConstraint.java:  Likewise.
+	* ObArray.java (valueConstraint, functionConstraint):  Removed fields.
+
 2000-01-31  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (nilExpr):  New constant.

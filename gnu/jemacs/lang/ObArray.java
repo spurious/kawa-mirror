@@ -4,9 +4,6 @@ import gnu.kawa.util.*;
 
 public class ObArray extends Environment
 {
-  ValueSymbolConstraint valueConstraint = new ValueSymbolConstraint(this);
-  FunctionSymbolConstraint functionConstraint = new FunctionSymbolConstraint(this);
-
   public static Environment asEnvironment(Object env)
   {
     if (env instanceof FVector)
@@ -32,12 +29,10 @@ public class ObArray extends Environment
   public ObArray (int initialCapacity)
   {
     super(initialCapacity);
-    this.unboundConstraint = new UnboundSymbolConstraint(this);
   }
 
   public ObArray (Environment previous)
   {
     super(previous);
-    this.unboundConstraint = new UnboundSymbolConstraint(this);
   }
 }

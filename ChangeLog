@@ -1,3 +1,21 @@
+Mon Jan 20 16:23:28 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* kawa/lang/Compilation.java:  Add new addClass overloading,
+	based on the code from compilefunc.compile.
+	* kawa/lang/LambdaExp.java:  Use Compilation.addClass.
+	* kawa/lang/compilefunc.java:  No longer needed.
+
+	* kawa/standard/callcc.java: Remove redundant cast.
+
+	* kawa/lang/Future.java:  New class.
+	* kawa/standard/force.java:  Handle Future as well as Promise.
+	* kawa/standard/{make_future,sleep}.java:  New procedures.
+	* kawa/standard/Scheme,java:  Add future, %make-future. and sleep.
+	* kawa/{lang,standard}/Makefile.{am,in}:  Update as needed.
+
+	* kawa/lang/InPort.java (readSchemeReal):  Only recognize
+	exponent marker as such if followed by '+', '-', or digit.
+
 Sun Jan  5 19:18:27 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Create new Translator class from the rewrite-related methods and data

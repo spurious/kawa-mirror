@@ -57,7 +57,7 @@ class kawac
       }
     catch (GenericError ex)
       {
-	System.err.println(ex.message);
+	System.err.println(ex.getMessage ());
       }
    }
 }

@@ -337,10 +337,14 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
     print(v);
   }
 
+  public void beginDocument() { }
+
+  public void endDocument() { }
+
   public void beginGroup(String typeName, Object type)
   {
     if (objectFormat != null)
-      objectFormat.beginGroup(typeName, type,this);
+      objectFormat.beginGroup(typeName, type, this);
     else
       {
 	print('(');

@@ -80,8 +80,8 @@ see @ref{License}.
 This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
-The two packages @uref{http:../gnu.bytecode/,@code{gnu.bytecode}}
-and @uref{http:../gnu.math/,@code{gnu.math}} are used by Kawa,
+The two packages @uref{../gnu.bytecode/,@code{gnu.bytecode}}
+and @uref{../gnu.math/,@code{gnu.math}} are used by Kawa,
 and distributed with it, but may be independently useful.
 
 @menu

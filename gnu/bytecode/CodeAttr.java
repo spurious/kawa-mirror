@@ -889,7 +889,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack.try_type = type;
     addHandler(try_stack.start_pc, try_stack.end_pc,
 	       PC, type, getConstants());
-    //pushScope();
     if (var != null)
       {
 	pushType(type);
@@ -916,6 +915,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitCatchEnd();
       }
+    try_stack.end_pc = PC;
 
     pushScope();
     Type except_type = Type.pointer_type;

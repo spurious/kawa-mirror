@@ -4,6 +4,7 @@
 package gnu.text;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Enumeration;
 
 /** Mananges a table of named options,
  * Can inherit from another table of "default" options. */
@@ -231,7 +232,43 @@ public class Options
 	reset(key, oldValue);
       }
   }
+
+  /** Return the list of option keys.
+   */
+  public Vector keys ()
+  {
+    return getKeys(new Vector());
 }
+
+  private Vector getKeys(Vector allKeys)
+  {
+    if (infoTable != null)
+      {
+        Enumeration e = infoTable.keys();
+        while (e.hasMoreElements())
+          {
+            Object k = e.nextElement();
+            if (! allKeys.contains(k))
+              allKeys.add(k);
+          }
+      }
+    
+    if (previous != null)
+      previous.getKeys(allKeys);
+    
+    return allKeys;
+  }
+
+  public String getDoc(String key)
+  {
+    OptionInfo info = getInfo(key);
+    if (key == null)
+      return null;
+    return info.documentation;
+  }
+  
+}
+
 final class OptionInfo
 {
   OptionInfo next;

@@ -1,3 +1,7 @@
+2004-07-27  Chris Dean  <ctdean@sokitomi.com>
+
+	* Options.java:  Add keys() function.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* IntegerFormat.java:  Remove useless import statements.

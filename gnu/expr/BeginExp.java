@@ -2,7 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 
 /**
- * This class rerpesents a sequence of Expressions.
+ * This class represents a sequence of Expressions.
  * The expressions are evaluated for their side-effects,
  * and the value of the last Expression is the result.
  * @author	Per Bothner
@@ -30,6 +30,8 @@ public class BeginExp extends Expression
       exps[i].compileWithPosition(comp, Target.Ignore);
     exps[i].compileWithPosition(comp, target);
   }
+
+  Object walk (ExpWalker walker) { return walker.walkBeginExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

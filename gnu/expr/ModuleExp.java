@@ -45,7 +45,7 @@ public class ModuleExp extends LambdaExp
       directory = "";
     else if (directory.charAt(directory.length() - 1) != '/')
       directory = directory + '/';
-    Compilation comp = new Compilation(this, topname, prefix);
+    Compilation comp = new Compilation(this, topname, prefix, false);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       {
 	ClassType clas = comp.classes[iClass];
@@ -60,7 +60,8 @@ public class ModuleExp extends LambdaExp
   {
     if (! fname.endsWith(".zip") && ! fname.endsWith(".jar"))
       fname = fname + ".zip";
-    Compilation comp = new Compilation(this, LambdaExp.fileFunctionName,false);
+    Compilation comp = new Compilation(this, LambdaExp.fileFunctionName,
+				       null, false);
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();

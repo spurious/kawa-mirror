@@ -1,3 +1,22 @@
+1998-08-28  Per Bothner  <bothner@cygnus.com>
+
+	* ExpWalker.java, ExpFullWalker.java, FindTailCalls.java,
+	FindCapturedVars.java:  New tree-walker (visitor) classes.
+	* Expression.java (walk):  New method.
+	* *Exp.java:  Add walk method to Expression sub-classes.
+
+	* ApplyExp.java (tailCall, isTailCall, setTailCall):  New flag, methods.
+	(compile):  Inline function if it has the getInlineOnly() flag.
+
+	Changed a bunch of stuff for new closure implementation.
+	* LambdaExp.java (compileAlloc):  New method.
+	* Declaration.java (loadOwningObject, load, compileStore, initBinding):
+	New methods for new closures.
+	* ReferenceExp.java (compile_load):  Removed.
+	* Compilation.java (<init>):  Merge constructors.  Call walkers.
+
+	* LambdaExp.java, ReferenceExp.java:  Add unique number to ease debugging.
+
 1998-08-25  Per Bothner  <bothner@cygnus.com>
 
 	* Declaration.java (isIndirectBinding, setIndirectBinding):  New.

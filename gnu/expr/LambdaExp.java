@@ -17,6 +17,40 @@ public class LambdaExp extends ScopeExp
   public Keyword[] keywords;
   public Expression[] defaultArgs;
 
+  static int counter;
+  /** Unique id number, to ease print-outs and debugging. */
+  int id = ++counter;
+
+  /** A list of Declarations, chained using Declaration's nextCapturedVar.
+    * All the Declarations are allocated in the current closure. */
+  Declaration capturedVars;
+  /* If any variables local to this LambdaExp are captured by some inner
+     non-lined Lambda, then all such variables are allocated in a heapFrame.
+     The heapFrame is an instance of the Procedure compiled from one
+     of our child lambdas.  heapFrameLambda points to the child.  */
+  LambdaExp heapFrameLambda;
+
+  static final int INLINE_ONLY = 1;
+  static final int IMPORTS_LEX_VARS = 2;
+  int flags;
+
+  /** True iff this lambda is only "called" inline. */
+  public final boolean getInlineOnly() { return (flags & INLINE_ONLY) != 0; }
+  public final void setInlineOnly(boolean inlineOnly)
+  {
+    if (inlineOnly) flags |= INLINE_ONLY;
+    else flags &= ~INLINE_ONLY;
+  }
+
+  /** True iff this lambda "captures" (uses) lexical variables from outside. */
+  public final boolean getImportsLexVars ()
+  { return (flags & IMPORTS_LEX_VARS) != 0; }
+
+  public final void setImportsLexVars(boolean importsLexVars)
+  {
+    if (importsLexVars) flags |= IMPORTS_LEX_VARS;
+    else flags &= ~IMPORTS_LEX_VARS;
+  }
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
 
@@ -25,6 +59,15 @@ public class LambdaExp extends ScopeExp
 
   public final boolean variable_args () { return max_args < 0; }
 
+
+  /** Return the ClassType of the Procedure this is being compiled into. */
+  public ClassType getCompiledClassType()
+  {
+    Variable var = firstVar();
+    if (var == null || var.getName() != "this")
+      throw new Error("internal error: getCompileClassType");
+    return (ClassType) var.getType();
+  }
 
   /** Number of argument variable actually passed by the caller.
    * For functions that accept more than 4 argument, or take a variable number,
@@ -63,17 +106,20 @@ public class LambdaExp extends ScopeExp
     this.body = body;
   }
 
-  /** If non-null, this is the Field that contains the static link. */
+  /** If non-null, this is a Field that is used for implementing lexical closures.
+   * If getName() is "closureEnv", it is our parent's heapFrame,
+   * which is an instance of one of our siblings.
+   * (Otherwise, we use "this" as the implicit "closureEnv" field.)
+   * If getName() is "staticLink", it is used to chain together heap frames. */
   public Field staticLinkField;
-
-  /** If non-null, this contains the static link.
-   * It is copied from the staticLinkField.
-   * The static link variable points to the same array as the
-   * enclosing function's heapFrame. */
-  public Declaration staticLink;
 
   /** Declaration used if varargs or too many args. */
   public Declaration argsArray;
+
+  /** A variable that points to the heap-allocated part of the frame.
+   * This is an instance of heapFrameLambda (which is one of our children);
+   * each captured variable is a field in the heapFrame. */
+  Declaration heapFrame;
 
   /** Get the i'the formal parameter. */
   Declaration getArg (int i)
@@ -91,31 +137,87 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  public void compile (Compilation comp, Target target)
+  public ClassType compile (Compilation comp)
   {
-    if (target instanceof IgnoreTarget)
-      return;
-    gnu.bytecode.CodeAttr code = comp.getCode();
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;
-    ClassType new_class;
     try
       {
-	String new_name
-	  = comp.generateClassName (name == null ? "lambda" : name.toString());
-	new_class = comp.addClass (this, new_name);
+	String new_name = name == null ? "lambda" : name;
+	new_name = comp.generateClassName(new_name);
+	return comp.addClass (this, new_name);
       }
     finally
       {
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
       }
+  }
+
+  static Method setNameMethod = null;
+
+  public ClassType compileAlloc (Compilation comp)
+  {
+    ClassType new_class = compile (comp);
+    gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitNew(new_class);
     code.emitDup(new_class);
-    if (staticLink != null)
-      code.emitLoad(outerLambda().heapFrame);
     code.emitInvokeSpecial(new_class.constructor);
-    target.compileFromStack(comp, new_class);
+    if (staticLinkField != null)
+      {
+	code.emitDup(new_class);
+	LambdaExp caller = outerLambda();
+	if (staticLinkField.getName() == "closureEnv")
+	  code.emitLoad(caller.heapFrame);
+	else // staticLinkField.getName() == "staticLink"
+	  {
+	    code.emitPushThis();
+	    if (caller.staticLinkField != null
+		&& caller.staticLinkField.getName() == "closureEnv")
+	      code.emitGetField(caller.staticLinkField);
+	  }
+	code.emitPutField(staticLinkField);
+      }
+    
+    if (name != null)
+      {
+	// Call setName(name) on the result.
+	if (setNameMethod == null)
+	  {
+	    ClassType typeNamed = ClassType.make("gnu.mapping.Named");
+	    setNameMethod
+	      = typeNamed.addMethod("setName",
+				    Compilation.string1Arg, Type.void_type,
+				    Access.PUBLIC|Access.FINAL);
+	  }
+	code.emitDup(new_class);
+	code.emitPushString(name);
+	code.emitInvokeVirtual(setNameMethod);
+      }
+    return new_class;
+  }
+
+  public void compile (Compilation comp, Target target)
+  {
+    if (target instanceof IgnoreTarget)
+      return;
+    if (getInlineOnly())
+      throw new Error("internal error: compile called for inlineOnly LambdaExp");
+    LambdaExp parent = outerLambda();
+    Type rtype;
+    if (parent != null && parent.heapFrameLambda == this)
+      {
+	// When parent was entered, we allocated an instance of this
+	// Procedure, and assigned it to parent's heapFrame.
+	// So just get the heapFrame.
+	parent.heapFrame.load(comp);
+	rtype = parent.heapFrame.getType();
+      }
+    else
+      {
+	rtype = compileAlloc (comp);
+      }
+    target.compileFromStack(comp, rtype);
   }
 
   void compile_setLiterals (Compilation comp)
@@ -140,7 +242,7 @@ public class LambdaExp extends ScopeExp
 	String class_name = name == null ? "lambda"
 	  : Compilation.mangleName (name.toString ());
 
-	Compilation comp = new Compilation (this, class_name, true);
+	Compilation comp = new Compilation (this, class_name, null, true);
 	compile_setLiterals (comp);
 
 	byte[][] classes = new byte[comp.numClasses][];
@@ -217,9 +319,18 @@ public class LambdaExp extends ScopeExp
       }
   }
 
+  Object walk (ExpWalker walker) { return walker.walkLambdaExp(this); }
+
   public void print (java.io.PrintWriter ps)
   {
-    ps.print("(#%lambda (");
+    ps.print("(#%lambda/");
+    if (name != null)
+      {
+	ps.print(name);
+	ps.print('/');
+      }
+    ps.print(id);
+    ps.print("/ (");
     Special prevMode = null;
     int i = 0;
     int opt_i = 0;
@@ -264,4 +375,6 @@ public class LambdaExp extends ScopeExp
     body.print (ps);
     ps.print(")");
   }
+
+  public String toString() { return "LambdaExp/"+name+'/'+id+'/'; }
 }

@@ -34,6 +34,8 @@ public abstract class Expression implements Printable
     compile (comp, new StackTarget(type));
   }
 
+  abstract Object walk (ExpWalker walker);
+
   String filename;
   int position;
 

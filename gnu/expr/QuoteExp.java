@@ -29,6 +29,8 @@ public class QuoteExp extends Expression
   {
     comp.compileConstant(value, target);
   }
+ 
+  Object walk (ExpWalker walker) { return walker.walkQuoteExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

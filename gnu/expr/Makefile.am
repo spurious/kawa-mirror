@@ -17,6 +17,10 @@ java_JAVA=\
   Declaration.java \
   ErrorExp.java \
   Expression.java \
+  ExpFullWalker.java \
+  ExpWalker.java \
+  FindCapturedVars.java \
+  FindTailCalls.java \
   IfExp.java \
   IgnoreTarget.java \
   Inlineable.java \

@@ -12,22 +12,10 @@ import gnu.bytecode.*;
  * is true, and offset is the number of the local variable slot.
  *
  * If a local variable is captured by an inner lambda, the
- * variable is stored in the heapFrame array variable.
- * The offset field indicates the element in the heapFrame array.
- * The baseVariable field points to the declaration of the headFrame array.
- *
- * If a function needs a heapFrame array, then LambdaExp.heapFrame
- * points to the declaration that points to the heapFrame array.
- * This declaration has isSimple and isArtificial true.
- *
- * The heapFrame array is passed to the constructors of inferior
- * procedures that need a static link.  It is pointed to by the
- * staticLink field of the generated procedure object.  When
- * the procedure is applied, the procedure prologue copies the
- * staticLink field into the local staticLink variable.
- * That staticLink variable has isArtificial set.
- * In the case of multi-level capture, then the staticLink variable
- * may in turn also be captured.
+ * variable is stored in a field of the LambdaExp's heapFrame variable.
+ * (The latter declaration has isSimple and isArtificial true.)
+ * The heapFrame reference is an instance of the LambdaExp's heapFrameLambda;
+ * the Declaration's field specifies the Field used.
  *
  * If a function takes a fixed number of parameters, at most four,
  * then the arguments are passed in Java registers 1..4.
@@ -38,10 +26,8 @@ import gnu.bytecode.*;
  * using two Declarations, named "foo" and "fooIncoming".
  * The "fooIncoming" declaration is the actual parameter as passed
  * by the caller using a Java local variable slot.  It has isParameter(),
- * isSimple(), and isArtificial set.  Its baseVariable field points to
- * the "foo" Declaration.  The "foo" Declaration has isParameter() set.
- * Its baseVariable points to the heapFrame Declaration.
- * The procedure prologue copies "fooIncoming" to "foo", which acts
+ * isSimple(), and isArtificial set.  The "foo" Declaration has isParameter()
+ * set.  The procedure prologue copies "fooIncoming" to "foo", which acts
  * just like a normal captured local variable.
  *
  * If a function takes more than 4 or a variable number of parameters,
@@ -65,22 +51,64 @@ public class Declaration extends Variable
   /** Return the ScopeExp that contains (declares) this Declaration. */
   public final ScopeExp getContext() { return context; }
 
-  /* SEMI-OBSOLETE (misleading):
-   * A frame is a set of local variables.  In interpreted code, the frame
-   * is mapped into a single Object array, indexed by Variable.offset.
-   * In compiled code, the frame is mapped into the local variable slots
-   * of the current method, where Variable.offset is the variable number.
-   *
-   * The value of a simple variable is stored directly in the frame
-   * (array element or local variable slot).  This only works for variables
-   * that are not captured by inner functions.  The index field specified
-   * the array index or local variable slot;  the baseVariable is null.
-   *
-   * A 'frame-indirect' variable is stored in a heap array pointed to
-   * by another variable.  The baseVariable is that other variable,
-   * the index field specifies the array element.
-   */
-  public Declaration baseVariable;
+  /** Used to link Declarations in a LambdaExp's capturedVars list. */
+  Declaration nextCapturedVar;
+
+  Field field;
+
+  /** If this is a field in some object, load a reference to that object. */
+  public void loadOwningObject (Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    LambdaExp curLambda = comp.curLambda;
+    LambdaExp lambda = getContext().currentLambda ();
+    if (lambda == curLambda)
+      code.emitLoad(lambda.heapFrame);
+    else
+      {
+	code.emitPushThis();
+	LambdaExp parent = curLambda.outerLambda();
+	if (parent.heapFrameLambda != curLambda)
+	  {
+	    code.emitGetField(curLambda.staticLinkField);
+	  }
+	while (parent != lambda)
+	  {
+	    if (parent.heapFrameLambda != null)
+	      curLambda = parent.heapFrameLambda;
+	    code.emitGetField(curLambda.staticLinkField);
+	    curLambda = parent;
+	    parent = parent.outerLambda();
+	  }
+      }
+  }
+
+  public void load (Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    if (field != null)
+      {
+	loadOwningObject(comp);
+	code.emitGetField(field);
+      }
+    else
+      code.emitLoad(this);
+  }
+
+  /* Compile code to store a value (which must already be on the
+     stack) into this variable. */
+  public void compileStore (Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    if (isSimple ())
+      code.emitStore(this);
+    else
+      {
+	loadOwningObject(comp);
+	code.emitSwap();
+	code.emitPutField(field);
+      }
+  }
 
   /** If non-null, the Declaration that we "shadow" (hide). */
   public Object shadowed;  /* Either a Declaration or a String. */
@@ -115,5 +143,32 @@ public class Declaration extends Variable
   }
 
   public String string_name () { return sym; }
+
+  Method makeBindingMethod = null;
+
+  /** Generate code to initialize the location for this.
+      Assume the initial value is already pushed on the stack. */
+  public void initBinding (Compilation comp)
+  {
+    if (indirectBinding)
+      {
+	CodeAttr code = comp.getCode();
+	code.emitPushString(symbol());
+	if (makeBindingMethod == null)
+	  {
+	    ClassType typeBinding = ClassType.make("gnu.mapping.binding");
+	    Type[] args = new Type[2];
+	    args[0] = Type.pointer_type;
+	    args[1] = Type.string_type;
+	    makeBindingMethod
+	      = typeBinding.addMethod("make", args, typeBinding,
+				      Access.PUBLIC|Access.STATIC);
+	  }
+	code.emitInvokeStatic(makeBindingMethod);
+	code.emitStore(this);
+      }
+    else
+      compileStore(comp);
+  }
 
 }

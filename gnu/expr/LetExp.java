@@ -13,14 +13,16 @@ public class LetExp extends ScopeExp
 
   public LetExp (Expression[] i) { inits = i; }
 
+  Method makeBindingMethod = null;
+
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
-  private final void store_rest (Compilation comp, Variable vars)
+  static void store_rest (Compilation comp, Variable vars)
   {
     if (vars != null)
       {
 	store_rest (comp, vars.nextVar ());
-	SetExp.compile_store ((Declaration) vars, comp);
+	((Declaration) vars).initBinding(comp);
       }
   }
 
@@ -40,6 +42,8 @@ public class LetExp extends ScopeExp
     body.compileWithPosition(comp, target);
     code.popScope ();
   }
+
+  Object walk (ExpWalker walker) { return walker.walkLetExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

@@ -33,7 +33,7 @@ public class Scope
     parent.lastChild = this;
   }
 
-  Variable addVariable (CodeAttr code, Type type, String name)
+  public Variable addVariable (CodeAttr code, Type type, String name)
   {
     Variable var = new Variable ();
     var.setType(type);

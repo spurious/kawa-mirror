@@ -5,6 +5,12 @@
 	(run): Move allocation of child Environment from here ...
 	(<init>): ... to here.  This avoids a race condition.
 
+	* Environment.java (make(String,Environment)): Move incrementing
+	timestamp from here to ...
+	* InheritingEnvironment.java (<init>): ... here.
+	Also set currentTimestamp, not just baseTimestamp.
+	(getLocation): Maybe set timestamp of new indirect location.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java (makePrivate): New factory method.

@@ -48,7 +48,7 @@ public class Scheme extends LispLanguage
   public static Environment nullEnvironment;
   public static Environment r4Environment;
   public static Environment r5Environment;
-  protected static Environment kawaEnvironment;
+  protected static SimpleEnvironment kawaEnvironment;
 
   public static LangPrimType booleanType;
   static Scheme instance;

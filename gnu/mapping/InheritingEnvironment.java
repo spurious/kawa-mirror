@@ -11,10 +11,13 @@ public class InheritingEnvironment extends SimpleEnvironment
   Object[] propertyMap;
   int baseTimestamp;
 
-  public InheritingEnvironment (String name, Environment env)
+  public InheritingEnvironment (String name, SimpleEnvironment parent)
   {
     super(name);
-    addParent(env);
+    addParent(parent);
+    int timestamp = ++parent.currentTimestamp;
+    baseTimestamp = timestamp;
+    currentTimestamp = timestamp;
   }
 
   public void addParent (Environment env)
@@ -108,6 +111,8 @@ public class InheritingEnvironment extends SimpleEnvironment
 	      xloc.value = IndirectableLocation.DIRECT_ON_SET;
 	    else
 	      xloc.value = null;
+	    if (xloc instanceof SharedLocation)
+	      ((SharedLocation) xloc).timestamp = baseTimestamp;
 	    return xloc;
 	  }
 	else

@@ -342,10 +342,7 @@ public abstract class Environment
 
   public static SimpleEnvironment make (String name, Environment parent)
   {
-    SimpleEnvironment p = (SimpleEnvironment)parent;
-    InheritingEnvironment env = new InheritingEnvironment(name, parent);
-    env.baseTimestamp = ++p.currentTimestamp;
-    return env;
+    return new InheritingEnvironment(name, (SimpleEnvironment) parent);
   }
 
   public String toString ()

@@ -16,7 +16,7 @@ import gnu.kawa.reflect.ClassMethods;
 
 public class ScmEnv extends InheritingEnvironment
 {
-  public ScmEnv (String name, Environment previous)
+  public ScmEnv (String name, SimpleEnvironment previous)
   {
     super(name, previous);
   }

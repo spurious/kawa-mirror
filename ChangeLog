@@ -1,5 +1,9 @@
 2005-03-03  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java (kawaEnvironment): More precise type.
+	* kawa/standard/ScmEnv.java (<init>): Parameter is SimpleEnvironment,
+	to match superclass parameter.
+
 	* kawa/standard/Scheme.java: Remove definition of 'emacs' fnction - it
 	doesn't work for Scheme, and causes order-dependency awkwardness when
 	compiling CommonLisp/ELisp.

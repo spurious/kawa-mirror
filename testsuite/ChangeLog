@@ -1,5 +1,10 @@
 2003-06-03  Per Bothner  <per@bothner.com>
 
+	* mac-test.scm:  New cond-expand test, based on bug reported
+	2003-06-02 by Sven.Hartrumpf@FernUni-Hagen.de.
+
+2003-06-03  Per Bothner  <per@bothner.com>
+
 	* misc-test.scm: New tests.
 
 2003-06-01  Per Bothner  <per@bothner.com>

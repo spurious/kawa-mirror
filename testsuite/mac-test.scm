@@ -1,4 +1,4 @@
-(test-init "macros" 46)
+(test-init "macros" 47)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -183,3 +183,10 @@
 	     (else
 	      (define found-kawa-feature "no")))
 (test "yes" 'found-kawa-feature found-kawa-feature)
+
+;; Based on bug reported 2003-06-02 by Sven.Hartrumpf@FernUni-Hagen.de
+(cond-expand 
+ ((not no-such-srfi)
+  (define third caddr))
+ (else))
+(test 'z third '(x y z))

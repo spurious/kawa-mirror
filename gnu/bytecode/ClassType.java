@@ -149,7 +149,7 @@ public class ClassType extends ObjectType
   public String getPackageName()
   {
     String name = getName();
-    int index = name.indexOf('.');
+    int index = name.lastIndexOf('.');
     return index < 0 ? name : name.substring(0, index);
   }
 

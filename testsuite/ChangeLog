@@ -1,3 +1,7 @@
+Tue Mar 25 19:37:14 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* mac-test.scm:  Add a test for demacro and gentemp.
+
 Tue Mar 18 14:17:29 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* misc-test.scm:  New tests.

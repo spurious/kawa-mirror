@@ -9,3 +9,14 @@
 (test '(1 2) 'something (something 1 2))
 
 (test '(2 3) 'something (something 2 3))
+
+;;; From Common Lisp the Language 2nd ed page 198
+(defmacro arithmetic-if (test neg-form zero-form pos-form)
+  (let ((var (gentemp)))
+    `(let ((,var ,test))
+       (cond ((< , var 0) ,neg-form)
+	     ((= ,var 0) ,zero-form)
+	     (#t ,pos-form)))))
+
+(test "POS" 'arithmetic-if-pos (arithmetic-if 234 "NEG" "ZERO" "POS"))
+(test "NEG" 'arithmetic-if-pos (arithmetic-if -234 "NEG" "ZERO" "POS"))

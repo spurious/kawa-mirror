@@ -1,4 +1,4 @@
-(test-init "numbers" 1653)
+(test-init "numbers" 1656)
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -140,3 +140,13 @@
 (define (quotient-float (a :: <real>))
   (quotient (+ a 25.0) 10))
 (test 97.0 quotient-float 950)
+
+(define v (vector 3 -4/5 9 10 (+ 8 1/2) -100))
+(java.util.Collections:sort v)
+(test #(-100 -4/5 3 17/2 9 10) 'sort-v-1 v)
+(set! v (vector 1.2 -1.2 8.9 100.0 8.9))
+(java.util.Collections:sort v)
+(test #(-1.2 1.2 8.9 8.9 100.0) 'sort-v-2 v)
+(set! v (vector 1 0.5 5/2 8 2.5))
+(java.util.Collections:sort v)
+(test #(0.5 1 5/2 2.5 8) 'sort-v-3 v)

@@ -1,3 +1,8 @@
+2004-02-21  Per Bothner  <per@bothner.com>
+
+	* num-tests.scm:  Add tests of Comparable numbers
+	using java.util.Collections.sort.
+
 2004-02-16  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm:  Add a testcase by Al Petrovsky.

@@ -1,4 +1,28 @@
-define-private
+When a source file is compiled, the top-level definitions (procedures,
+variables, and macros) are compiled to final fields on the resulting class.
+This are not automatically entered into the current environment;  instead
+that is the responsibility of whoever loads the compiled class.  This
+is a major step towards a module system for Kawa.
+
+There is a new form define-private which is like define, except that
+the defined name is not exported from the current module.
+
+A procedure that has optional arguments is now typically compiled into
+multiple methods.  If it's a top-level procedure, these will be methods
+in the modules "ModuleBody" class, with the same (mangled) name.
+The compiler can in many cases call the appropriate method directly.
+Usually, each method takes a fixed number of arguments, which means
+we save the overhead of creating an array for the arguments.
+[FIXME - for now this only done when the default value if constant.]
+
+A top-level procedure declared using the form
+	(define (NAME ARS ...) BODY ..)
+is assumed to be "constant" if it isn't assigned to in the current
+compilation unit.  A call in the same compilation unit will now be
+implemented as a direct method call.  This is not done if the
+prcedure is declared with the form:
+	(define NAME (lambda (ARGS ,,,) BODY ...)
+[FUTURE: This inlining is also not done when --no-inline is specified.]
 
 gnu.expr.Declaration no longer inherits from gnu.bytecode.Variable.
 

@@ -1,3 +1,38 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/ScmRead.java: Add #!undefined->Interpreter.undefinedObject.
+
+	* kawa/lang/PrimArrayGet.java:  Moved to gnu.kawa.reflect.ArrayGet.
+	* kawa/lang/PrimArraySet.java:  Moved to gnu.kawa.reflect.ArraySet.
+	* kawa/lang/PrimArrayNew.java:  Moved to gnu.kawa.reflect.ArrayNew.
+	* kawa/lang/PrimArrayLength.java:Moved to gnu.kawa.reflect.ArrayLength.
+	* kawa/lang/PrimGetStatic.java:  Moved to gnu.kawa.reflect.StaticGet.
+	* kawa/lang/PrimSetStatic.java:  Moved to gnu.kawa.reflect.StaticSet.
+	* kawa/lang/QueueReader.java:  Moved to gnu.text.
+	* kawa/lang/Makefile.am (java_JAVA):  Update accordingly.
+	* kawa/standard/syntax_case.java:  Update for new class names.
+	* kawa/GuiConsole.java:  Update since QueueReader was moved.
+	* kawa/MessageArea.java:  Likewise.
+
+	* kawa/standard/Makefile.am (java_JAVA):  Remove moved files.
+	* kawa/standard/Scheme.java (initScheme):  Various procedures are
+	now defined in kawa/lib/vectors.scm and numbers.scm.
+	* kawa/standard/{acos.java,asin.java,lognot.java,logop.java,
+	logbit_p.java,logtest.java,logcount.java,bit_extract.java,
+ 	int_length.java close_input_port.java,null_env.java,user_env.java,
+	make_vector,.java,vector_fill_b.java,cons.java,vector_v.java}:
+ 	No longer needed.
+
+	* kawa/standard/load.java (apply):  Make static.
+
+	* kawa/standard/quasiquote.java:  Call utility functions using inlined
+	Invoke.makeInvokeStatic, rather than new ApplyExp (new QuoteExp ...).
+	* kawa/standard/append.java (append$V):  New method.
+	No longer implement Compilable.
+	* kawa/standard/vector_append.java (apply$V):  New method.
+	No longer implement Compilable.
+	* kawa/standard/Scheme.java (initScheme):  Don't use removed statics.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/load.java:  Change methods to return void.

@@ -8,8 +8,6 @@ be implemnted by overloading.
 
 BindingInitializer.emit: global Environment should be cached
 
-quasi-quote:  cons etc should be called directly.
-
 idN$NAME - should not be static.
 
 Add --inline and --no-inline flags.

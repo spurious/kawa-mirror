@@ -20,7 +20,7 @@ java_JAVA = Shell.java repl.java Version.java \
 
 EXTRA_JAVA = $(java_WITH_AWT)
 
-SOURCES = $(java_JAVA) Version.java.in
+EXTRA_DIST = Version.java.in
 
 PACKAGE_FNAME = kawa-repl
 

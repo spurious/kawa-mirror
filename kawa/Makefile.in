@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4c from Makefile.am
+# Makefile.in generated automatically by automake 1.4e from Makefile.am.
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -47,7 +47,6 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
 
@@ -60,7 +59,6 @@ POST_UNINSTALL = :
 
 @SET_MAKE@
 AMDEP = @AMDEP@
-AMINCLUDE = @AMINCLUDE@
 AMTAR = @AMTAR@
 AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
@@ -69,6 +67,8 @@ CFLAGS = @CFLAGS@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTALL_STRIP_PROGRAM_ENV = @INSTALL_STRIP_PROGRAM_ENV@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
@@ -76,11 +76,12 @@ JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
-SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
+_am_include = @_am_include@
 extra_java = @extra_java@
 install_sh = @install_sh@
 kawa_bin = @kawa_bin@
@@ -107,7 +108,7 @@ TO_TOPDIR = $(top_builddir)
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 GCJ_DEPS = $(java_JAVA)
 
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
@@ -128,45 +129,28 @@ java_JAVA = Shell.java repl.java Version.java \
 
 EXTRA_JAVA = $(java_WITH_AWT)
 
-SOURCES = $(java_JAVA) Version.java.in
+EXTRA_DIST = Version.java.in Version.java
 
 PACKAGE_FNAME = kawa-repl
-
-EXTRA_DIST = Version.java.in Version.java
+OBJEXT = o
 subdir = kawa
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = 
-DIST_SOURCES = 
+CONFIG_CLEAN_FILES =
+DIST_SOURCES =
 depcomp = 
-DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
+all: all-recursive
 
-
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-
-GZIP_ENV = --best
-DIST_SUBDIRS =  $(SUBDIRS)
-all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .java .class .scm .el .lisp
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/Make-rules
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/Make-rules $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --cygnus  kawa/Makefile
 
-
-mostlyclean-javaJAVA:
-
-
-clean-javaJAVA:
-	-rm *.class classjava.stamp
-
-distclean-javaJAVA:
-
-
-maintainer-clean-javaJAVA:
-
+Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
 
 install-javaJAVA: classjava.stamp
 	@$(NORMAL_INSTALL)
@@ -182,6 +166,9 @@ uninstall-javaJAVA:
 	  echo " rm -f $(DESTDIR)$(javadir)/$$p"; \
 	  rm -f $(DESTDIR)$(javadir)/$$p; \
 	done
+
+clean-javaJAVA:
+	-rm -f *.class classjava.stamp
 classjava.stamp: $(java_JAVA)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
 	echo timestamp > classjava.stamp
@@ -193,7 +180,7 @@ classjava.stamp: $(java_JAVA)
 #     (which will cause the Makefiles to be regenerated when you run `make');
 # (2) otherwise, pass the desired values on the `make' command line.
 all-recursive install-data-recursive install-exec-recursive \
-installdirs-recursive install-recursive uninstall-recursive install-info-recursive \
+installdirs-recursive install-recursive uninstall-recursive \
 check-recursive installcheck-recursive info-recursive dvi-recursive:
 	@set fnord $(MAKEFLAGS); amf=$$2; \
 	dot_seen=no; \
@@ -245,7 +232,6 @@ tags-recursive:
 
 tags: TAGS
 
-
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -280,64 +266,28 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID
-
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-
-
-distdir: $(DISTFILES)
-	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  if test -d $$d/$$file; then \
-	    cp -pR $$d/$$file $(distdir) \
-	    || exit 1; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || cp -p $$d/$$file $(distdir)/$$file \
-	    || exit 1; \
-	  fi; \
-	done
-	for subdir in $(SUBDIRS); do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d $(distdir)/$$subdir \
-	    || mkdir $(distdir)/$$subdir \
-	    || exit 1; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
-	      || exit 1; \
-	  fi; \
-	done
-info-am:
-info: info-recursive
-dvi-am:
-dvi: dvi-recursive
 check-am:
 check: check-recursive
-installcheck-am:
-installcheck: installcheck-recursive
-install-info-am: 
-install-info: install-info-recursive
-install-exec-am:
-install-exec: install-exec-recursive
+all-am: Makefile classjava.stamp
 
-install-data-am: install-javaJAVA
+installdirs: installdirs-recursive
+installdirs-am:
+
+install: install-recursive
+install-exec: install-exec-recursive
 install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-recursive
-uninstall-am: uninstall-javaJAVA
-uninstall: uninstall-recursive
-all-am: Makefile classjava.stamp
-all-redirect: all-recursive
-install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
-installdirs: installdirs-recursive
-installdirs-am:
-	$(mkinstalldirs)  $(DESTDIR)$(javadir)
 
+installcheck: installcheck-recursive
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  INSTALL_PROGRAM_ENV='$(INSTALL_STRIP_PROGRAM_ENV)' install
 
 mostlyclean-generic:
-
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -356,33 +306,49 @@ clean-am: clean-generic clean-javaJAVA mostlyclean-am
 
 distclean: distclean-recursive
 
-distclean-am: clean-am distclean-generic distclean-javaJAVA \
-	distclean-tags
+distclean-am: clean-am distclean-generic distclean-tags
+
+dvi:
+
+dvi-am:
+
+info:
+
+info-am:
+
+install-data-am: install-javaJAVA
+
+install-exec-am:
+
+install-info:
+
+install-man:
+
+installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
 
-maintainer-clean-am: distclean-am maintainer-clean-generic \
-	maintainer-clean-javaJAVA
+maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-javaJAVA
+mostlyclean-am: mostlyclean-generic
 
-.PHONY: all all-am all-recursive all-redirect check check-am \
-	check-recursive clean clean-generic clean-javaJAVA \
-	clean-recursive distclean distclean-generic distclean-javaJAVA \
-	distclean-recursive distclean-tags distdir dvi dvi-am \
+uninstall-am: uninstall-javaJAVA
+
+.PHONY: all all-am all-recursive check check-am check-recursive clean \
+	clean-generic clean-javaJAVA clean-recursive distclean \
+	distclean-generic distclean-recursive distclean-tags dvi dvi-am \
 	dvi-recursive info info-am info-recursive install install-am \
 	install-data install-data-am install-data-recursive \
 	install-exec install-exec-am install-exec-recursive \
-	install-info install-info-am install-info-recursive \
-	install-javaJAVA install-recursive install-strip installcheck \
-	installcheck-am installcheck-recursive installdirs \
-	installdirs-am installdirs-recursive maintainer-clean \
-	maintainer-clean-generic maintainer-clean-javaJAVA \
+	install-info install-javaJAVA install-man install-recursive \
+	install-strip installcheck installcheck-am \
+	installcheck-recursive installdirs installdirs-am \
+	installdirs-recursive maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
-	mostlyclean-javaJAVA mostlyclean-recursive tags tags-recursive \
-	uninstall uninstall-am uninstall-javaJAVA uninstall-recursive
+	mostlyclean-recursive tags tags-recursive uninstall \
+	uninstall-am uninstall-javaJAVA uninstall-recursive
 
 
 # Make sure $(KAWA1) is available, if --enable-gcj-compiled.
@@ -430,4 +396,3 @@ all-recursive:  classjava.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-

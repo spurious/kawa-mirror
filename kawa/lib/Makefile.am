@@ -29,8 +29,6 @@ EXTRA_DIST = $(java_SCM)
 
 java_JAVA =
 
-CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
-
 # Used to generate makekawa.bat in ../.. .
 list-sources:
 	echo $(SOURCES)

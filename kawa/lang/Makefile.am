@@ -37,6 +37,5 @@ Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \
 $(EXCEPTIONS)
 
 PACKAGE_FNAME = kawa-lang
-CLEANFILES = *.class *.o *.stamp
 
 all: $(@GCJ_COMPILED_SELECTED@)

@@ -1,3 +1,14 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (<clinit>):  Also handle require 'xml.
+
+	* Make-rules (CLEANFILE):  Also remove $(OFILES_DIR)/$(PACKAGE_FNAME).o.
+	* configure.in (AC_OUTPUT):  Replace gnu/kawa/xml by gnu/xml.
+	* kawa/Makefile.am (SOURCES):  Removed - recent automake complains.
+	(EXTRA_DIST):  Use this instead.
+	* kawa/lang/Makefile.am (CLEANFILES):  Remove redundant macro.
+	* kawa/lib/Makefile.am (CLEANFILES):  Likewise.
+
 2001-04-07  Thomas Kirk  <tk@research.att.com>
 
 	* kawa/standard/load.java(loadCompiled): Avoid leaking 

@@ -13,7 +13,7 @@ TO_TOPDIR = $(top_builddir)
 ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 GCJ_DEPS = $(java_JAVA)
 
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)

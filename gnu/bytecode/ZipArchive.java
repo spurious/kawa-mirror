@@ -84,12 +84,12 @@ public class ZipArchive
   void writeLocalHeader (ZipMember zmember) throws IOException
   {
     for (int i = 4+LREC_SIZE;  --i >= 0; )
-      buffer[i] = '\000';
-    buffer[0] = 'P';
-    buffer[1] = 'K';
-    buffer[2] = '\003';
-    buffer[3] = '\004';
-    buffer[4] = '\n';                    // 4+L_VERSION_NEEDED_TO_EXTRACT_0
+      buffer[i] = 0;
+    buffer[0] = (byte) 'P';
+    buffer[1] = (byte) 'K';
+    buffer[2] = (byte) '\003';
+    buffer[3] = (byte) '\004';
+    buffer[4] = (byte) '\n';          // 4+L_VERSION_NEEDED_TO_EXTRACT_0
     write2 (zmember.name.length, buffer, 4+22);
     write4 (zmember.compressed_size, buffer, 4+14);
     write4 (zmember.uncompressed_size, buffer, 4+18);
@@ -99,14 +99,14 @@ public class ZipArchive
   void writeCentralHeader (ZipMember zmember) throws IOException
   {
     for (int i = 4+CREC_SIZE;  --i >= 0; )
-      buffer[i] = '\000';
-    buffer[0] = 'P';
-    buffer[1] = 'K';
-    buffer[2] = '\001';
-    buffer[3] = '\002';
-    buffer[4] = '\024';             // 4+C_VERSION_MADE_BY_0
-    buffer[5] = '\003';             // 4+C_VERSION_MADE_BY_1
-    buffer[6] = '\n';               // 4+C_VERSION_NEEDED_TO_EXTRACT_0
+      buffer[i] = 0;
+    buffer[0] = (byte) 'P';
+    buffer[1] = (byte) 'K';
+    buffer[2] = (byte) '\001';
+    buffer[3] = (byte) '\002';
+    buffer[4] = (byte) '\024';             // 4+C_VERSION_MADE_BY_0
+    buffer[5] = (byte) '\003';             // 4+C_VERSION_MADE_BY_1
+    buffer[6] = (byte) '\n';               // 4+C_VERSION_NEEDED_TO_EXTRACT_0
     write4 (zmember.compressed_size, buffer, 4+16);
     write4 (zmember.uncompressed_size, buffer, 4+20);
     write2 (zmember.name.length, buffer, 4+24);
@@ -137,11 +137,11 @@ public class ZipArchive
       throw new Error ("internal error writeEndHeaders");
     int dir_size = (int) file.getFilePointer () - dir_start;
     for (int i = 4+ECREC_SIZE;  --i >= 0; )
-      buffer[i] = '\000';
-    buffer[0] = 'P';
-    buffer[1] = 'K';
-    buffer[2] = '\005';
-    buffer[3] = '\006';
+      buffer[i] = 0;
+    buffer[0] = (byte) 'P';
+    buffer[1] = (byte) 'K';
+    buffer[2] = (byte) '\005';
+    buffer[3] = (byte) '\006';
     write2 (count, buffer, 8);       // NUM_ENTRIES_CENTRL_DIR_THS_DISK
     write2 (count, buffer, 10);      // TOTAL_ENTRIES_CENTRAL_DIR
     write4 (dir_size, buffer, 12);   // SIZE_CENTRAL_DIRECTORY

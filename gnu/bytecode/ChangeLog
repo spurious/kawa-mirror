@@ -1,3 +1,7 @@
+Tue Feb  4 22:13:40 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* ZipArchive.java:  Add char-constant -> byte casts.
+
 Mon Feb  3 17:16:17 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* ClassType.java (getClassName):  Removed.

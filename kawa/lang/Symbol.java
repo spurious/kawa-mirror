@@ -59,7 +59,28 @@ public class Symbol extends Object implements Printable, Compilable
 
   public void print(java.io.PrintStream ps)
   {
-    ps.print(name);
+    boolean readable = (ps instanceof OutPort)
+      && ((OutPort)ps).printReadable;
+    if (readable)
+      {
+	int len = name.length ();
+	for (int i = 0;  i < len;  i++)
+	  {
+	    char ch = name.charAt (i);
+	    if (!(Character.isLowerCase (ch)
+		  || ch == '!' || ch == '$' || ch == '%' || ch == '&'
+		  || ch == '*' || ch == '/' || ch == ':' || ch == '<'
+		  || ch == '=' || ch == '>' || ch == '?' || ch == '~'
+		  || ch == '_' || ch == '^'
+		  || ((ch == '+' || ch == '-') && (i > 0 || len == 1))
+		  || (Character.isDigit (ch) && i > 0)
+		  || (ch == '.' && (i == 0 || name.charAt (i - 1) == '.'))))
+	      ps.print ('\\');
+	    ps.print (ch);
+	  }
+      }
+    else
+      ps.print(name);
   }
 
   public Literal makeLiteral (Compilation comp)

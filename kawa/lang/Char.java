@@ -1,6 +1,9 @@
 package kawa.lang;
 import java.io.*;
 import java.util.Hashtable;
+import codegen.ClassType;
+import codegen.Method;
+import codegen.Access;
 
 /**
  * A wrapper for characters.
@@ -19,7 +22,7 @@ import java.util.Hashtable;
  * Finally, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
-public class Char implements Printable
+public class Char implements Printable, Compilable
 {
   // Leave open the possibility for characters beyond Unicode.
   int value;
@@ -123,5 +126,27 @@ public class Char implements Printable
 	  }
       }
     ps.print (ch);
+  }
+
+  static public ClassType scmCharType;
+  static Method makeCharMethod;
+
+  public Literal makeLiteral (Compilation comp)
+  {
+    if (scmCharType == null)
+      {
+	scmCharType = new ClassType ("kawa.lang.Char");
+	makeCharMethod = scmCharType.new_method ("make",
+						 comp.int1Args, scmCharType,
+						 Access.PUBLIC|Access.STATIC);
+      }
+    return new Literal (this, scmCharType, comp);
+  }
+
+  public void emit (Literal literal, Compilation comp)
+  {
+    comp.method.compile_push_int (((Char)literal.value).intValue ());
+    comp.method.compile_invoke_static (makeCharMethod);
+    literal.flags |= Literal.ALLOCATED|Literal.INITIALIZED;
   }
 }

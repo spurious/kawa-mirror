@@ -5,7 +5,7 @@ import gnu.bytecode.Type;
 import gnu.bytecode.Access;
 import gnu.bytecode.Method;
 
-public class Record
+public class Record extends Procedure1 implements HasSetter
 {
   public String getTypeName()
   {
@@ -36,6 +36,50 @@ public class Record
     return hash;
   }
 
+  public Object apply1 (Object arg)
+  {
+    String fname = (String) arg;
+    Class clas = getClass();
+    java.lang.reflect.Field fld;
+    try
+      {
+	fld = clas.getField (fname);
+	return fld.get(this);
+      }
+    catch (NoSuchFieldException ex)
+      {
+	//throw new UnboundSymbol(fname);
+	throw new GenericError("no such field "+fname+" in "+clas.getName());
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new GenericError("illegal access for field "+fname);
+      }
+  }
+
+  public void set1 (Object value, Object arg)
+  { set1(this, value, (String) arg); }
+
+  public static void set1 (Object record, Object value, String fname)
+  {
+    Class clas = record.getClass();
+    java.lang.reflect.Field fld;
+    try
+      {
+	fld = clas.getField (fname);
+	fld.set(record, value);
+      }
+    catch (NoSuchFieldException ex)
+      {
+	//throw new UnboundSymbol(fname);
+	throw new GenericError("no such field "+fname+" in "+clas.getName());
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new GenericError("illegal access for field "+fname);
+      }
+  }
+
   public boolean equals (Object obj)
   {
     if (this == obj)
@@ -62,6 +106,7 @@ public class Record
       }
     return true;
   }
+
   public String toString()
   {
     StringBuffer buf = new StringBuffer(200);
@@ -87,6 +132,11 @@ public class Record
       }
     buf.append(">");
     return buf.toString();
+  }
+
+  public void print(java.io.PrintWriter ps)
+  {
+    ps.print(toString());
   }
 
   public static Class makeRecordType (String name, List fnames)

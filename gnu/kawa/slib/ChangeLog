@@ -1,3 +1,7 @@
+2003-03-21  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* srfi1.scm (list-tabulate):  Fix thinko.
+
 2003-01-29  Per Bothner  <per@bothner.com>
 
 	* gui.scm: New file.

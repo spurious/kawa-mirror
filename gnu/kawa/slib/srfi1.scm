@@ -249,7 +249,7 @@
 ;;; Make a list of length LEN. Elt i is (PROC i) for 0 <= i < LEN.
 
 (define (list-tabulate len proc :: <procedure>)
-  (if (or (not (integer? len)) (< n 0))
+  (if (or (not (integer? len)) (< len 0))
       (error "list-tabulate arg#1 must be a non-negative integer"))
   (do ((i (- len 1) (- i 1))
        (ans '() (cons (proc i) ans)))

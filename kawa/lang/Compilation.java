@@ -62,13 +62,13 @@ public class Compilation
   static Method defineGlobalMethod;
   static Method makeListMethod;
   static Method initStringBufferMethod;
+  static Type[] int1Args = { Type.int_type };
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
     makeListMethod = scmListType.new_method ("makeList",
 					     makeListArgs, scmListType,
 					     Access.PUBLIC|Access.STATIC);
-    Type[] int1Args = { Type.int_type };
     initIntegerMethod = javaIntegerType.new_method ("<init>",
 						    int1Args, Type.void_type,
 						    Access.PUBLIC);

@@ -621,16 +621,23 @@ public class XQParser extends LispReader // should be extends Lexer
     return curToken;
   }
 
-
- public XQParser (InPort port)
+  private void pushStandardNamespaces ()
   {
-    super(port);
-    nesting = 1;
+    namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
+    namespaces.put("xs", "http://www.w3.org/2001/XMLSchema");
+    namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    namespaces.put("fn", "http://www.w3.org/2002/11/xquery-functions");
+  }
+
+  public XQParser (InPort port)
+  {
+    this(port, null);
   }
 
   public XQParser(InPort port, SourceMessages messages)
   {
     super(port, messages);
+    pushStandardNamespaces();
     nesting = 1;
   }
 
@@ -744,6 +751,16 @@ public class XQParser extends LispReader // should be extends Lexer
     return new QuoteExp(new ElementType(qname));
   }
 
+  /** Parse: ["as" SequenceType] */
+  public Expression parseOptionalTypeDeclaration ()
+      throws java.io.IOException, SyntaxException
+  {
+    if (! match("as"))
+      return null;
+    getRawToken();
+    return parseDataType();
+  }
+
   public Expression parseDataType()
       throws java.io.IOException, SyntaxException
   {
@@ -759,7 +776,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return new QuoteExp(textNodeTest);
 	if ("node".equalsIgnoreCase(tname))
 	  return new QuoteExp(anyNodeTest);
-	Type type = kawa.standard.Scheme.getNamedType(tname);
+	Type type = kawa.standard.Scheme.getNamedType(tname); // FIXME
+	if (type == null)
+	  type = gnu.bytecode.ClassType.make(tname);
 	return new QuoteExp(type);
       }
     else
@@ -1880,7 +1899,7 @@ public class XQParser extends LispReader // should be extends Lexer
       curToken = ':';
     else
       getRawToken();
-    ScopeExp sc;
+    
     if (isFor)
       {
 	char ch;
@@ -1954,11 +1973,17 @@ public class XQParser extends LispReader // should be extends Lexer
 		String pname
 		  = new String(tokenBuffer, 0, tokenBufferLength).intern();
 		Declaration param = lexp.addDeclaration(pname);
-		//parser.push(param);
 		getRawToken();
+		lexp.min_args++;
+		lexp.max_args++;
+		Expression paramType = parseOptionalTypeDeclaration ();
+		if (paramType instanceof QuoteExp)
+		  param.setType((Type) ((QuoteExp) paramType).getValue());
+		else if (paramType != null)
+		  error('w', "parameter type too complex");
 	      }
-	    lexp.min_args++;
-	    lexp.max_args++;
+	    else
+	      error("missing parameter name");
 	    if (curToken == ')')
 	      break;
 	    if (curToken != ',')

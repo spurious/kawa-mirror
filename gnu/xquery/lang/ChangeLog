@@ -1,3 +1,15 @@
+2003-01-12  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (pushStandardNamespaces):  New method.
+	(<init>(InPort)):  Call <init>(InPort,SourceMessages).
+	(<init>(InPort,SourceMessage):  Call pushStandardNamespaces.
+
+	* XQParser.java (parseOptionalTypeDeclaration):  New method.
+	(parseDataType):  Make ClassType if unrecognized type name.
+	(parseFunctionDefinition):  Call parseOptionalTypeDeclaration.
+
+	* XQParser.java (parseFLWRExpression):  Remove unused sc local.
+
 2002-11-23  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  Declare iterator-items and list-items.

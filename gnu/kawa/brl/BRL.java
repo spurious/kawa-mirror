@@ -10,6 +10,7 @@ import gnu.text.*;
 public class BRL extends Scheme
 {
   static BRL instance;
+  static final Object emptyForm = new FString();
 
   public BRL ()
   {
@@ -88,11 +89,9 @@ public class BRL extends Scheme
       {
 	if (sexp == Sequence.eofValue)
 	  break;
-	if (sexp.toString().length() > 0)
-	  {
-	    if (! tr.scan_form (sexp, forms, mexp))
-	      break;
-	  }
+	if (sexp != emptyForm
+	    && ! tr.scan_form (sexp, forms, mexp))
+	  break;
 	sexp = lexer.readObject(); // FIXME
       }
     if (port.readState != ']')

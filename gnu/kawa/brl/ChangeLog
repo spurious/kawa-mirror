@@ -1,3 +1,9 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* BRL.java (emptyForm):  New static.field.
+	(parseFile):  Use emptyForm instead of toString().length().
+	* BRLReaderString.java (read):  If empty, return emptyForm.
+
 2002-11-05  Per Bothner  <per@bothner.com>
 
 	* BRL.java (parseFile): Take and use new 'immediate' parameter.

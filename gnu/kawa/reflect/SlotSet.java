@@ -105,7 +105,8 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
     if (type instanceof ClassType && name != null)
       {
         ClassType clas = (ClassType) type;
-        gnu.bytecode.Field field = clas.getField(name);
+        gnu.bytecode.Field field
+	  = clas.getField(Compilation.mangleNameIfNeeded(name));
         if (field != null)
           return field;
 

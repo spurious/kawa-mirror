@@ -1,3 +1,7 @@
+2002-06-18  Per Bothner  <per@bothner.com>
+
+	* SlotSet.java (getField):  Call Compilation.mangleNameIfNeeded.
+
 2002-06-05  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (compile):  Convert field type to language type.

@@ -68,6 +68,7 @@ PACKAGE = @PACKAGE@
 SHELL = @SHELL@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign

@@ -81,6 +81,19 @@ public class Declaration extends Variable
   /** If non-null, the Declaration that we "shadow" (hide). */
   Declaration shadowed;
 
+  /** If non-null, the single expression used to set this variable.
+   * If the variable can be set more than once, then value is null. */
+  Expression value = QuoteExp.undefined_exp;
+
+  public void noteValue (Expression value)
+  {
+    // We allow assigning a real value after undefined ...
+    if (this.value == QuoteExp.undefined_exp)
+      this.value = value;
+    else
+      this.value = null;
+  }
+
   public Declaration (Symbol s)
   {
     sym = s;

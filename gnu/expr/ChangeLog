@@ -1,5 +1,61 @@
 2001-08-16  Per Bothner  <per@bothner.com>
 
+	* ClassExp.java:  Major re-write, to handle define-class, first-class
+	classes, and true multiple inheritance.
+	(simple, makeClassPair, instanceType):  New fields.
+	(isSimple, setSimple, isMakingClassPair, setMakingClassPair):  New.
+	(declareParts, slotToMethodName):  New methods.
+	(class AbstractMethodFilter):  New class, extends Filter.
+
+	* ClassInitializer.java:  New helper class, extends Initializer.
+	* PairClassType.java:  New class, extends ClassType.
+	* Makefile.am:  Update for new classes.
+
+	* ModuleExp.java:  Now inherits directly from LambdaExp.
+	(allocFields):  Add check for ClassExp.
+	* ClassExp.java:  Now inherts directly from LambdaExp.
+	Lots of code moved over from ObjectExp.
+	* ObjectExp.java:  Now inherits from ClassExp, instead of vice versa.
+	* ExpWalker.java (walkClassExp):  New method.
+	(walkObjectExp):  Default to calling walkClassExp.
+	* FindTailCalls.java (walkObjectExp):  Changed to walkClassExp.
+	* ChainLambda.java:  Update for changed inheritance graph.
+	* FindCapturedVars.java:  Likewise.
+	(capture):  Don't set heapFrameLambda to ClassExp.
+	* LambdaExpr.java:  Update for changed inheritance graph.
+	* LambdaExp.java (compileEnd):  Kludge to handle usingTailCalls.
+	* LambdaExp.java (addMethodFor):  Set isStatic if in ClassType.
+	
+	* ChainLambdas.java (walkClassExp):  If we are making a class-pair,
+	name and addClass for instanceType class,
+
+	* Compilation.java (typeClassType):  New static field.
+
+	* Compilation.java (mangleName):  Take extra 'reversible' parameter
+	to make an inveritble mangling.  Add overload.
+	(demangle2):  Add support for '>', '<', and '('
+	(demangleName):   Methods moved from kawa.stamdard.Scheme.
+	Add extra 'reversible' option.
+
+	* Compilation.java (<init>):  Add catch for error, to try to produce
+	better error message on a compiler crash.
+
+	* Compilation.java (addClass):  'Or' in PUBLIC, instead of assigning,
+	since other code may have set other flags.
+
+	* Compilation.java (getConstructor):  Add overload.
+	(generateConstructor):  Add overload.
+	If class has a staticLinkField, emit code to set it.
+	* LambdaExp.java (enterFunction):  Use new getConstructor method.
+
+	* LambdaExp.java (getExpClassName):  New method.
+	(toString):  Use getExpClassName.
+	
+	* Interpreter.java (getTypeFor):  If a ClassExp, return its type.
+
+	* Declaration.java (load):  If there is no variable and not field,
+	but there is a "get" method, emit code to use that.
+
 	* SynchronizedExp.java (compile):  Check for a ConsumerTarget.
 
 2001-07-16  Per Bothner  <per@bothner.com>

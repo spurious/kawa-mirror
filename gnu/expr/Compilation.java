@@ -74,6 +74,7 @@ public class Compilation
   public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
+  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType");
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeInterpreter
@@ -449,9 +450,14 @@ public class Compilation
   /** If non-null: a prefix for generateClassName to prepend to names. */
   public String classPrefix;
 
-  /** Convert a string to a safe Java identifier.
-   * This mapping is not invertible. */
   public static String mangleName (String name)
+  {
+    return mangleName(name, false);
+  }
+
+  /** Convert a string to a safe Java identifier.
+   * @param reversible if we shoudl use an invertible mapping. */
+  public static String mangleName (String name, boolean reversible)
   {
     int len = name.length ();
     StringBuffer mangled = new StringBuffer (len);
@@ -470,22 +476,29 @@ public class Compilation
 	      mangled.append("$N");
 	    mangled.append(ch);
 	  }
-	else if (Character.isLetter(ch) || ch == '_' || ch == '$')
+	else if (Character.isLetter(ch) || ch == '_')
 	  mangled.append(ch);
+	else if (ch == '$')
+	  mangled.append(reversible ? "$$" : "$");
 	else
 	  {
 	    switch (ch)
 	      {
 	      case '+':  mangled.append("$Pl");  break;
 	      case '-':
-		char next = i + 1 < len ? name.charAt(i+1) : '\0';
-		if (next == '>')
-		  {
-		    mangled.append("$To$");
-		    i++;
-		  }
-		else if (! Character.isLowerCase(next))
+		if (reversible)
 		  mangled.append("$Mn");
+		else
+		  {
+		    char next = i + 1 < len ? name.charAt(i+1) : '\0';
+		    if (next == '>')
+		      {
+			mangled.append("$To$");
+			i++;
+		      }
+		    else if (! Character.isLowerCase(next))
+		      mangled.append("$Mn");
+		  }
 		break;
 	      case '*':  mangled.append("$St");  break;
 	      case '/':  mangled.append("$Sl");  break;
@@ -529,7 +542,8 @@ public class Compilation
 		mangled.append(Character.forDigit ((ch >>  4) & 15, 16));
 		mangled.append(Character.forDigit ((ch      ) & 15, 16));
 	      }
-	    upcaseNext = true;
+	    if (! reversible)
+	      upcaseNext = true;
 	  }
       }
     String mname = mangled.toString ();
@@ -547,6 +561,19 @@ public class Compilation
 	switch (char2)
 	  {
 	  case 'x':  return '!';
+	  }
+	break;
+      case 'G':
+	switch (char2)
+	  {
+	  case 'r':   return '>';
+	  }
+	break;
+      case 'L':
+	switch (char2)
+	  {
+	  case 's':   return '<';
+	  case 'P':   return '(';
 	  }
 	break;
       case 'M':
@@ -571,6 +598,80 @@ public class Compilation
 	break;
       }
     return (char) (-1);
+  }
+
+  public static String demangleName(String name)
+  {
+    return demangleName(name, false);
+  }
+
+  public static String demangleName(String name, boolean reversible)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    int len = name.length();
+    boolean mangled = false;
+    boolean predicate = false;
+    boolean downCaseNext = false;
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = name.charAt(i);
+	if (downCaseNext && ! reversible)
+	  {
+	    ch = Character.toLowerCase(ch);
+	    downCaseNext = false;
+	  }
+	char d;
+	if (!reversible
+	    && ch == 'i' && i == 0 && len > 2 && name.charAt(i+1) == 's'
+	    && ! Character.isLowerCase(d = name.charAt(i+2)))
+	  {
+	    mangled = true;
+	    predicate = true;
+	    i++;
+	    if (Character.isUpperCase(d) || Character.isTitleCase(d))
+	      {
+		sbuf.append(Character.toLowerCase(d));
+		i++;
+		continue;
+	      }
+	    continue;
+	  }
+	else if (ch == '$' && i + 2 < len)
+	  {
+	    char c1 = name.charAt(i+1);
+	    char c2 = name.charAt(i+2);
+	    d = Compilation.demangle2(c1, c2);
+	    if (d != (char)(-1))
+	      {
+		sbuf.append(d);
+		i += 2;
+		mangled = true;
+		downCaseNext = true;
+		continue;
+	      }
+	    else if (c1 == 'T' && c2 == 'o' && i + 3 < len
+		     && name.charAt(i+3) == '$')
+	      {
+		sbuf.append("->");
+		i += 3;
+		mangled = true;
+		downCaseNext = true;
+		continue;
+	      }
+	  }
+	else if (! reversible && i > 1
+		 && (Character.isUpperCase(ch) || Character.isTitleCase(ch))
+		 && (Character.isLowerCase(name.charAt(i-1))))
+	  {
+	    sbuf.append('-');
+	    mangled = true;
+	    ch = Character.toLowerCase(ch);
+	  }
+	sbuf.append(ch);
+      }
+    if (predicate)
+      sbuf.append('?');
+    return mangled ? sbuf.toString() : name;
   }
 
   /** Generate an unused class name.
@@ -630,7 +731,16 @@ public class Compilation
 
     mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);
-    addClass (lexp);
+    try
+      {
+	addClass (lexp);
+      }
+    catch (RuntimeException ex)
+      {
+	// Try to produce a localized error message.
+	error('f', "Internal compiler exception: "+ex);
+	throw ex;
+      }
   }
 
   public void addClass (ClassType new_class)
@@ -646,7 +756,7 @@ public class Compilation
 	classes = new_classes;
       }
     classes[numClasses++] = new_class;
-    new_class.access_flags = Access.PUBLIC;
+    new_class.access_flags |= Access.PUBLIC;
   }
 
   ClassType allocClass (LambdaExp lexp)
@@ -687,7 +797,20 @@ public class Compilation
   {
     ClassType clas = (Compilation.usingTailCalls ? curClass
 		      : lexp.getHeapFrameType());
-    return clas.addMethod("<init>", Access.PUBLIC, apply0args, Type.void_type);
+    return getConstructor(clas, lexp);
+  }
+
+  public static final Method getConstructor (ClassType clas, LambdaExp lexp)
+  {
+    Type[] args;
+    if (lexp instanceof ClassExp && lexp.staticLinkField != null)
+      {
+	args = new Type[1];
+	args[0] = lexp.staticLinkField.getType();
+      }
+    else
+      args = apply0args;
+    return clas.addMethod("<init>", Access.PUBLIC, args, Type.void_type);
   }
 
   public final void generateConstructor (LambdaExp lexp)
@@ -700,7 +823,7 @@ public class Compilation
     Method save_method = method;
     ClassType save_class = curClass;
     curClass = clas;
-    Method constructor_method = getConstructor(lexp);
+    Method constructor_method = getConstructor(clas, lexp);
     clas.constructor = constructor_method;
 
     Method superConstructor
@@ -711,6 +834,13 @@ public class Compilation
     CodeAttr code = getCode();
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
+
+    if (lexp instanceof ClassExp && lexp.staticLinkField != null)
+      {
+	code.emitPushThis();
+	code.emitLoad(code.getCurrentScope().getVariable(1));
+	code.emitPutField(lexp.staticLinkField);
+      }
 
     Initializer init;
     lexp.initChain = Initializer.reverse(lexp.initChain);
@@ -759,7 +889,6 @@ public class Compilation
 	    // Select the subset of source.primMethods[*] that are suitable
 	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
-	    //System.err.println("generatApp "+primMethods[0]+" "+source);
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
 	      || Compilation.usingTailCalls

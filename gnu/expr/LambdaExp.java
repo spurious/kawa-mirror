@@ -189,7 +189,7 @@ public class LambdaExp extends ScopeExp
     else flags &= ~CAN_CALL;
   }
 
-  /** True if this is a method in an ObjectExp. */
+  /** True if this is a method in an ClassExp. */
   public final boolean isClassMethod()
   { return (flags & CLASS_METHOD) != 0; }
 
@@ -215,7 +215,7 @@ public class LambdaExp extends ScopeExp
     return (! getInlineOnly()
 	    && (isHandlingTailCalls()
 		|| isModuleBody ()
-		|| this instanceof ObjectExp));
+		|| this instanceof ClassExp));
   }
 
   public final boolean isHandlingTailCalls ()
@@ -361,7 +361,7 @@ public class LambdaExp extends ScopeExp
     if (closureEnv == null && getNeedsClosureEnv())
       {
 	LambdaExp parent = outerLambda();
-	if (parent instanceof ObjectExp)
+	if (parent instanceof ClassExp)
 	  parent = parent.outerLambda();
 	Variable parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
@@ -497,7 +497,7 @@ public class LambdaExp extends ScopeExp
 	code.emitPutField(closureEnvField);
       }
 
-    if (name != null && ! (this instanceof ObjectExp))
+    if (name != null && ! (this instanceof ClassExp))
       {
 	// Call setName(name) on the result.
 	if (setNameMethod == null)
@@ -534,8 +534,9 @@ public class LambdaExp extends ScopeExp
 	comp.method = save_method;
 	comp.curClass = save_class;
       }
-    if (heapFrame != null && ! Compilation.usingTailCalls)
-      comp.generateConstructor(this);
+    if (heapFrame != null
+	&& (! Compilation.usingTailCalls || heapFrameLambda == null)) // kludge
+      comp.generateConstructor((ClassType) heapFrame.getType(), this);
   }
 
   Field allocFieldFor (Compilation comp)
@@ -706,7 +707,7 @@ public class LambdaExp extends ScopeExp
 
   public ClassType getHeapFrameType()
   {
-    if (this instanceof ModuleExp || this instanceof ObjectExp)
+    if (this instanceof ModuleExp || this instanceof ClassExp)
       return (ClassType) getType();
     else
       return (ClassType) heapFrame.getType();
@@ -720,7 +721,7 @@ public class LambdaExp extends ScopeExp
 	if (exp == null)
 	  return null;
 	if (exp instanceof ModuleExp
-	    || exp instanceof ObjectExp
+	    || exp instanceof ClassExp
 	    || (exp instanceof LambdaExp 
 		&& ((LambdaExp) exp).heapFrame != null))
 	  return (LambdaExp) exp;
@@ -731,18 +732,23 @@ public class LambdaExp extends ScopeExp
   {
     LambdaExp heapLambda = getHeapLambda(outer);
     ClassType ctype = heapLambda.getHeapFrameType();
+    addMethodFor(ctype, comp, closureEnvType);
+  }
+
+  void addMethodFor (ClassType ctype, Compilation comp, ObjectType closureEnvType)
+  {
     // generate_unique_name (new_class, child.getName());
     String name = getName();
     StringBuffer nameBuf = new StringBuffer(60);
     LambdaExp outer = outerLambda();
-    if (! (outer.isModuleBody() || outer instanceof ObjectExp)
+    if (! (outer.isModuleBody() || outer instanceof ClassExp)
 	|| name == null)
       {
 	nameBuf.append("lambda");
 	nameBuf.append(+(++comp.method_counter));
       }
     if (name != null)
-      nameBuf.append(comp.mangleName(name));
+      nameBuf.append(Compilation.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
     /*
@@ -759,7 +765,17 @@ public class LambdaExp extends ScopeExp
     primMethods = new Method[numStubs + 1];
 
     boolean isStatic;
-    if (isClassMethod() || thisVariable != null || closureEnvType == ctype)
+    if (isClassMethod())
+      {
+	if (outer instanceof ClassExp)
+	  {
+	    ClassExp cl = (ClassExp) outer;
+	    isStatic = cl.isMakingClassPair() && closureEnvType != null; 
+	  }
+	else
+	  isStatic = false;
+      }
+    else if (thisVariable != null || closureEnvType == ctype)
       isStatic = false;
     else if (nameDecl == null)
       isStatic = true;
@@ -792,7 +808,7 @@ public class LambdaExp extends ScopeExp
 	Type[] atypes = new Type[1+extraArg];
 	if (extraArg > 0)
 	  atypes[0] = closureEnvType;
-	atypes[extraArg] = comp.typeCallContext;
+	atypes[extraArg] = Compilation.typeCallContext;
 	primMethods[0] = ctype.addMethod(nameBuf.toString(), atypes, rtype, mflags);
 	return;
       }
@@ -819,15 +835,16 @@ public class LambdaExp extends ScopeExp
 		|| ! ("gnu.lists.LList".equals(lastTypeName)
 		      || "java.lang.Object[]".equals(lastTypeName)))
 	      {
-		lastType = comp.objArrayType;
-		argsArray = new Variable("argsArray", comp.objArrayType);
+		lastType = Compilation.objArrayType;
+		argsArray = new Variable("argsArray",
+					 Compilation.objArrayType);
 	      }
 	    firstArgsArrayArg = var;
 	    atypes[atypes.length-1] = lastType;
 	  }
 
 	boolean classSpecified
-	  = (outer instanceof ObjectExp
+	  = (outer instanceof ClassExp
 	     || (outer instanceof ModuleExp
 		 && (((ModuleExp) outer)
 		     .getFlag(ModuleExp.SUPERTYPE_SPECIFIED))));
@@ -937,7 +954,7 @@ public class LambdaExp extends ScopeExp
       {
 	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
-	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
+	if (! (parent instanceof ClassExp) && heapFrameLambda != this)
 	  {
 	    if (heapFrameLambda != null)
 	      {
@@ -969,7 +986,7 @@ public class LambdaExp extends ScopeExp
 	    ObjectType closureEnvType;
 	    if (! child.getNeedsClosureEnv())
 	      closureEnvType = null;
-	    else if (this instanceof ObjectExp)
+	    else if (this instanceof ClassExp)
 	      closureEnvType = getCompiledClassType(comp);
 	    else if ("$finit$".equals(getName()))
 	      closureEnvType = outerLambda().getCompiledClassType(comp);
@@ -990,7 +1007,7 @@ public class LambdaExp extends ScopeExp
     if (heapFrame != null)
       {
 	ClassType frameType;
-	if (this instanceof ModuleExp || this instanceof ObjectExp)
+	if (this instanceof ModuleExp || this instanceof ClassExp)
 	  frameType = getCompiledClassType(comp);
 	else if (Compilation.usingTailCalls && heapFrameLambda != null)
 	  {
@@ -1103,7 +1120,7 @@ public class LambdaExp extends ScopeExp
 	if (closureEnv != null && heapFrame != null)
 	  staticLinkField = frameType.addField("staticLink",
 					       closureEnv.getType());
-        if (! (this instanceof ModuleExp) && ! (this instanceof ObjectExp))
+        if (! (this instanceof ModuleExp) && ! (this instanceof ClassExp))
           {
             if (heapFrameLambda != null)
               heapFrameLambda.compileAlloc(comp);
@@ -1111,7 +1128,7 @@ public class LambdaExp extends ScopeExp
               {
                 code.emitNew(frameType);
                 code.emitDup(frameType);
-                Method constructor = comp.getConstructor(this);
+                Method constructor = comp.getConstructor(frameType, this);
                 code.emitInvokeSpecial(constructor);
               }
             if (staticLinkField != null)
@@ -1506,9 +1523,18 @@ public class LambdaExp extends ScopeExp
     out.endLogicalBlock(")");
   }
 
+  protected final String getExpClassName()
+  {
+    String cname = getClass().getName();
+    int index = cname.lastIndexOf('.');
+    if (index >= 0)
+      cname = cname.substring(index+1);
+    return cname;
+  }
+
   public String toString()
   {
-    String str = "LambdaExp/"+name+'/'+id+'/';
+    String str = getExpClassName()+':'+name+'/'+id+'/';
 
 	int l = getLine();
 	if (l <= 0 && body != null)

@@ -210,7 +210,8 @@
            debug="${debug}"
            deprecation="${deprecation}"
            optimize="${optimize}">
-      <include name="gnu/kawa/ant/*"/>
+      <include name="gnu/kawa/util/PreProcess.java"/>
+      <include name="gnu/kawa/ant/*.java"/>
     </javac>
 
     <taskdef name="xcopy"
@@ -228,60 +229,36 @@
   </target>
   
   <target name="select-java1" depends="build-tools">
-    <delete dir="${build.tmp}/preprocess"/>
-    <mkdir dir="${build.tmp}/preprocess"/>
-    <xcopy todir="${build.tmp}/preprocess" overwrite="true">
-   	  <fileset refid="build.selectjava"/>
-      <linecommenterset begintoken="/* " endtoken=" */" >
-        <linecommenter first="#ifndef JAVA2" last="#endif" comment="false"/>
-        <linecommenter first="#ifdef JAVA2" last="#endif" comment="true"/>
-        <linecommenter first="#ifdef JAVA5" last="#endif" comment="true"/>
-        <linecommenter first="#ifndef JAVA5" last="#endif" comment="false"/>
-        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="true"/>
-        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="false"/>
-      </linecommenterset>
-    </xcopy>
-    <copy todir="${build.preprocessed}">
-       <fileset dir="${build.tmp}/preprocess"/>
-    </copy>
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="-JAVA2 -JAVA5 -JAXP-1.3"/>
+      <arg line="${fileList}"/>
+    </java>
   </target>
-  
+    
   <target name="select-java2" depends="build-tools">
-    <delete dir="${build.tmp}/preprocess"/>
-    <mkdir dir="${build.tmp}/preprocess"/>
-    <xcopy todir="${build.tmp}/preprocess" overwrite="true">
-   	  <fileset refid="build.selectjava"/>
-      <linecommenterset begintoken="/* " endtoken=" */" >
-        <linecommenter first="#ifndef JAVA2" last="#endif" comment="true"/>
-        <linecommenter first="#ifdef JAVA2" last="#endif" comment="false"/>
-        <linecommenter first="#ifndef JAVA5" last="#endif" comment="false"/>
-        <linecommenter first="#ifdef JAVA5" last="#endif" comment="true"/>
-        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="true"/>
-        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="false"/>
-      </linecommenterset>
-    </xcopy>
-    <copy todir="${build.preprocessed}">
-       <fileset dir="${build.tmp}/preprocess"/>
-    </copy>
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="+JAVA2 -JAVA5 -JAXP-1.3"/>
+      <arg line="${fileList}"/>
+    </java>
   </target>
     
   <target name="select-java5" depends="build-tools">
-    <delete dir="${build.tmp}/preprocess"/>
-    <mkdir dir="${build.tmp}/preprocess"/>
-    <xcopy todir="${build.tmp}/preprocess" overwrite="true">
-   	  <fileset refid="build.selectjava"/>
-      <linecommenterset begintoken="/* " endtoken=" */" >
-        <linecommenter first="#ifndef JAVA2" last="#endif" comment="true"/>
-        <linecommenter first="#ifdef JAVA2" last="#endif" comment="false"/>
-        <linecommenter first="#ifndef JAVA5" last="#endif" comment="true"/>
-        <linecommenter first="#ifdef JAVA5" last="#endif" comment="false"/>
-        <linecommenter first="#ifdef JAXP-1.3" last="#endif" comment="false"/>
-        <linecommenter first="#ifndef JAXP-1.3" last="#endif" comment="true"/>
-      </linecommenterset>
-    </xcopy>
-    <copy todir="${build.preprocessed}">
-       <fileset dir="${build.tmp}/preprocess"/>
-    </copy>
+    <pathconvert property="fileList" pathSep=" " dirSep="${file.separator}">
+      <path><fileset refid="build.selectjava"/></path>
+    </pathconvert>
+    <java classname="gnu.kawa.util.PreProcess">
+      <classpath location="${build.tools}"/>
+      <arg line="+JAVA2 +JAVA5 +JAXP-1.3"/>
+      <arg line="${fileList}"/>
+    </java>
   </target>
     
   <target name="check-for-java2">

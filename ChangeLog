@@ -1,5 +1,8 @@
 2005-01-08  Per Bothner  <per@bothner.com>
 
+	* build.xml (build-tools): Also compile gnu/kawa/util/PreProcess.java.
+	(select-java1, select-java2, select-java5): Rewrite to use PreProcess.
+
 	* kawa/lang/Macro.java (setExpander): Remove unused field.
 	* kawa/standard/define_syntax.java (setExpanderMethod): Likewise.
 

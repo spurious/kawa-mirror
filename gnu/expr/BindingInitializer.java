@@ -25,11 +25,12 @@ public class BindingInitializer extends Initializer
     if (value instanceof QuoteExp)
       {
 	Object val = ((QuoteExp) value).getValue();
-	if (val == null || val instanceof String)
-	  return;
-	Literal lit = comp.litTable.findLiteral(val);
-	if (lit.field == this.field)
-	  return;
+	if (val != null && ! (val instanceof String))
+	  {
+	    Literal lit = comp.litTable.findLiteral(val);
+	    if (lit.field == this.field)
+	      return;
+	  }
       }
 
     if (! field.getStaticFlag())

@@ -1,5 +1,8 @@
 2003-03-29  Per Bothner  <per@bothner.com>
 
+	* BindingInitializer.java (emit):  Modify optimization of 200-06-09.
+	Fixes bug reported 03-29 by Vladimir Tsichevski <wowa1@online.ru>.
+
 	* Interpreter.java (define_method):  Remove last parameter.
 	Use ClassMethods.apply.
 

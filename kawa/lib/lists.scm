@@ -1,12 +1,12 @@
 (module-static #t)
 
-(define (pair? x)
+(define (pair? x) :: <boolean>
   (instance? x <pair>))
 
-(define (cons car cdr)
+(define (cons car cdr) :: <pair>
   (make <pair> car cdr))
 
-(define (null? x)
+(define (null? x) :: <boolean>
   (eq? x '()))
 
 (define (set-car! (p <pair>) x)
@@ -29,5 +29,5 @@
     ((primitive-get-field <pair> "cdr" <Object>)
      x)))
 
-(define (length list :: <list>) <int>
+(define (length list :: <list>) :: <int>
   (invoke-static <list> 'length list))

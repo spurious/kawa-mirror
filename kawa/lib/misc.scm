@@ -58,3 +58,13 @@
 
 (define (set-procedure-property! proc :: <procedure> key value)
   (invoke proc 'setProperty key value))
+
+;;; The one-argument case is a standard DSSSL procedure.
+;;; The multi-argument extension matches Guile.
+(define (error msg . args)
+  (set! msg (call-with-output-string (lambda (port) (display msg port))))
+  (set! args (map
+	      (lambda (arg)
+		(call-with-output-string (lambda (port) (write arg port))))
+	      args))
+  (apply throw 'misc-error msg args))

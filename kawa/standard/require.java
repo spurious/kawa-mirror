@@ -70,6 +70,8 @@ public class require extends Syntax
     map("http", SLIB_PREFIX + "HTTP");
     map("srfi-1", SLIB_PREFIX + "srfi1");
     map("list-lib", SLIB_PREFIX + "srfi1");
+    map("srfi-37", SLIB_PREFIX + "srfi37");
+    map("args-fold", SLIB_PREFIX + "srfi37");
     map("gui", SLIB_PREFIX + "gui");
   }
 

@@ -219,8 +219,10 @@ class Break
  * until more general output framework (e.g. pretty-printing).
  */
 
-class BufferedPort extends FilterWriter
+class BufferedPort extends Writer
 {
+  protected Writer out;
+
   char[] buffer;
 
   /** First used (unflushed) position in buffer. */
@@ -234,7 +236,7 @@ class BufferedPort extends FilterWriter
 
   BufferedPort(Writer out, int bufsize)
   {
-    super(out);
+    this.out = out;
     buffer = new char[bufsize];
   }
 

@@ -1,3 +1,9 @@
+1999-12-05  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (class BufferedPort):  Now extends Writer instead of
+	FilterWriter.  (Walter C. Pelissero <wcp@lpds.sublink.org> reported
+	that the old code crashed for some FilterWriter implementations.)
+
 1999-11-03  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (flushLocal):  If out is null, expand buffer.

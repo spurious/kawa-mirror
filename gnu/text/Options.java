@@ -237,25 +237,20 @@ public class Options
    */
   public Vector keys ()
   {
-    return getKeys(new Vector());
-}
-
-  private Vector getKeys(Vector allKeys)
-  {
-    if (infoTable != null)
+    Vector allKeys = new Vector();
+    for (Options options = this;  options != null;  options = options.previous)
       {
-        Enumeration e = infoTable.keys();
-        while (e.hasMoreElements())
-          {
-            Object k = e.nextElement();
-            if (! allKeys.contains(k))
-              allKeys.add(k);
-          }
+	if (options.infoTable != null)
+	  {
+	    Enumeration e = options.infoTable.keys();
+	    while (e.hasMoreElements())
+	      {
+		Object k = e.nextElement();
+		if (! allKeys.contains(k))
+		  allKeys.add(k);
+	      }
+	  }
       }
-    
-    if (previous != null)
-      previous.getKeys(allKeys);
-    
     return allKeys;
   }
 

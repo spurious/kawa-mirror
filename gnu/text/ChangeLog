@@ -1,3 +1,7 @@
+2004-07-28  Per Bothner  <per@bothner.com>
+
+	* Options.java (keys):  Make non-recursive.
+
 2004-07-27  Chris Dean  <ctdean@sokitomi.com>
 
 	* Options.java:  Add keys() function.

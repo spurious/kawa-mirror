@@ -1,3 +1,7 @@
+Tue Jul 28 08:33:26 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Document that :KEYWORD is now the same as KEYWORD:.
+
 Mon Jun 29 21:23:02 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Document string-upcase, string-downcase!, etc.

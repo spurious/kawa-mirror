@@ -116,6 +116,8 @@ public class Variable extends Location implements java.util.Enumeration {
    */
   public void allocateLocal (CodeAttr code)
   {
+    if (offset != UNASSIGNED)
+      return;
     for (int i = 0; ; i++)
       {
 	if (reserveLocal (i, code))

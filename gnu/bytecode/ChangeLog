@@ -1,3 +1,7 @@
+2003-04-21  Per Bothner  <per@bothner.com>
+
+	* ArrayClassLoader.java:  Rewrite to use a Hashtable.
+
 2003-04-04  Per Bothner  <per@bothner.com>
 
 	* Access.java (toString(int,char)):  New overloaded method.

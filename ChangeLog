@@ -4,7 +4,6 @@
 	can take multiple values.
 	* kawa/lang/Continuation.java:  Extend MethodProc, not ProcedureN.
 	(<init>):  Change to take a CallContext.
-	(id, counter):  Remove debugging fields.
 	(apply1, applyN):  Remove methods.
 	(apply):  New method.
 	* kawa/standard/call_with_values.java (apply):  Use checkN.

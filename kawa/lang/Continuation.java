@@ -12,6 +12,7 @@ public class Continuation extends MethodProc
 {
   public boolean invoked;
   static int counter;
+  int id;
 
   public Continuation (CallContext ctx)
   {

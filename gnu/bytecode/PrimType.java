@@ -86,6 +86,22 @@ public class PrimType extends Type {
     code.emitInvokeSpecial(method);
   }
 
+  public void emitIsInstance (CodeAttr code)
+  {
+    char sig1 = (signature == null || signature.length() != 1) ? ' '
+      : signature.charAt(0);
+    if (sig1 == 'Z')  // boolean
+      boolean_ctype.emitIsInstance(code);
+    else if (sig1 == 'V')
+      {
+	code.emitPop(1);
+	code.emitPushInt(1);
+      }
+    // Have left out Character -> char, since not used by Kawa.
+    else
+      number_type.emitIsInstance(code);
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     char sig1 = (signature == null || signature.length() != 1) ? ' '

@@ -1,3 +1,7 @@
+2004-08-05  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (emitIsInstance):  New method.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* Variable.java (shouldEmit):  Require that scope's start and end

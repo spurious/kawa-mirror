@@ -71,7 +71,13 @@ public class ClassType extends ObjectType implements AttrContainer {
   }
 
   /** Return the modifiers (access flags) for this class. */
-  public final int getModifiers() { return access_flags; }
+  public final int getModifiers()
+  {
+    if (access_flags == 0 && getReflectClass() != null)
+      return reflectClass.getModifiers();
+    else
+      return access_flags;
+  }
 
   /** Set the modifiers (access flags) for this class. */
   public final void setModifiers(int flags) { access_flags = flags; }

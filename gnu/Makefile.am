@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode math text mapping expr kawa ecmascript jemacs
+SUBDIRS = bytecode math text mapping expr kawa ecmascript jemacs commonlisp
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html

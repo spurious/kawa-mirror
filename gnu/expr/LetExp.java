@@ -95,6 +95,7 @@ public class LetExp extends ScopeExp
   {
     out.startLogicalBlock("(Let", ")", 2);
     out.writeSpaceFill();
+    printLineColumn(out);
     out.startLogicalBlock("(", false, ")");
     Declaration decl = firstDecl();
     int i = 0;

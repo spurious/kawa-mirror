@@ -1,3 +1,9 @@
+2002-01-13  Per Bothner  <per@bothner.com>
+
+	* HttpPrinter.java:  New class, extends FilterConsumer,
+	* MakeResponseHeader.java:  new class, extends CpsProcedure.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2001-11-24  Jim White <jim@pagesmiths.com>
 
 	* Attributes.java:  Fix/update 'package' declaration.

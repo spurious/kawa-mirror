@@ -9,6 +9,8 @@ java_sources = \
   AttributeConstructor.java \
   DefineNamespace.java \
   ElementConstructor.java \
+  HttpPrinter.java \
+  MakeResponseHeader.java \
   NamedAttributes.java \
   NamespaceEnv.java \
   OutputAsXML.java

@@ -1,3 +1,8 @@
+2003-06-03  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/IfFeature.java (scanForDefinitions):  Call scan_form
+	on single form.  Fixes bug reported by Sven.Hartrumpf@FernUni-Hagen.de.
+
 2003-06-01  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.7.

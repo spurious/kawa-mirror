@@ -47,7 +47,7 @@ public class IfFeature extends Syntax implements Printable
 	forms.addElement(tr.syntaxError("invalid syntax for cond-expand"));
 	return false;
       }
-    return tr.scan_body(match[hasFeature((String) match[0]) ? 1 : 2],
+    return tr.scan_form(match[hasFeature((String) match[0]) ? 1 : 2],
 			forms, defs);
   }
 

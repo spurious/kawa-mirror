@@ -665,5 +665,5 @@ public abstract class Interpreter
   // The compiler finds registerEnvironment by using reflection.
   //
   // public static void registerEnvironment()
-  // { Environment.setCurrent(new ...().getEnvironment()); }
+  // { Environment.setGlobal(new ...().getEnvironment()); }
 }

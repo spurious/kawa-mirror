@@ -1,3 +1,5 @@
+New --help option (contributed by Andreas Schlapbach).
+
 Changed the code generation used when --full-tailcalls.  It now is
 closer to that used by default, in that we don't generate a class for
 each non-inlined procedure.  In both cases calling an unknown

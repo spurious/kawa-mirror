@@ -1,3 +1,10 @@
+2001-09-20  Per Bothner  <per@bothner.com>
+
+	Add support for --help, based on a patch from
+	Andreas Schlapbach  <schlpbch@kde.org>.
+	* kawa/kawa.repl (printOptions):  New method.
+	(main, bad_option):  Use printOptions.
+
 2001-09-13  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Fix typo in help text for --with-gcj.

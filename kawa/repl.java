@@ -36,8 +36,56 @@ public class repl extends Procedure0or1
 
   static void bad_option (String str)
   {
-    System.err.println ("kawa: bad option `" + str + "'");
+    System.err.println ("kawa: bad option '" + str + "'");
+    printOptions(System.err);
     System.exit (-1);
+  }
+
+  public static void printOptions(PrintStream out)
+  {
+    out.println("Usage: [java kawa.repl | kawa] [options ...]");
+    out.println();
+    out.println(" Generic options:");
+    out.println(" --help                    Show help about options");
+    out.println(" --author                  Show author information");
+    out.println(" --version                 Show version information");
+    out.println();
+    out.println(" Options");
+    out.println(" -e <expr>                 Evaluate expression <expr>");
+    out.println(" -c <expr>                 Same as -e, but make sure ~/.kawarc.scm is run first");
+    out.println(" -f <filename>             File to interpret");
+    out.println(" -s | --                   Start reading commands interactively from console");
+    out.println(" -w                        Launch the interpreter in a GUI window");
+    out.println(" --server <port>           Start a server accepting telnet connections on <port>");
+    out.println(" --debug-dump-zip          Compiled interactive expressions to a zip archive");
+    out.println(" --debug-print-expr        Print generated internal expressions");
+    out.println(" --debug-print-final-expr  Print expression after any optimizations");
+    out.println(" --[no-]full-tailcalls     (Don't) use full tail-calls");
+    out.println(" -C <filename> ...         Compile named files to Java class files");
+    out.println(" --<language>              Select source language, one of:");
+    String[][] languages = Interpreter.getLanguages();
+    for (int i = 0; i < languages.length; i++)
+      {
+	out.print("   ");
+	String[] lang = languages[i];
+	// skip last entry, which is class name
+	int nwords = lang.length - 1;
+	for (int j = 0; j < nwords; j++) 
+	  out.print(lang[j] + " ");
+	if (i == 0)
+	  out.print("[default]");
+	out.println();
+      }
+    out.println(" Compilation options, must be specified before -C");
+    out.println(" -d <dirname>              Directory to place .class files in");
+    out.println(" -P <prefix>               Prefix to prepand to class names");
+    out.println(" -T <topname>              name to give ot top-level class");
+    
+    out.println(" --main                    Generate an application, with a main method");
+    out.println(" --applet                  Generate an applet");
+    out.println(" --module-static           Top-leval definitions are by default static");
+    out.println();
+    out.println("For more information go to:  http://www.gnu.org/software/kawa/");
   }
 
   public static FVector commandLineArguments;
@@ -328,6 +376,16 @@ public class repl extends Procedure0or1
 	    else if (arg.equals("--no-full-tailcalls"))
 	      {
 		gnu.expr.Compilation.usingTailCalls = false;
+	      }
+	    else if (arg.equals("--help"))
+	      {
+		printOptions(System.out);
+		System.exit(0);
+	      }
+	    else if (arg.equals("--author"))
+	      {
+		System.out.println("Per Bothner <per@bothner.com>");
+		System.exit(0);
 	      }
 	    else if (arg.equals("--version"))
 	      {

@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
-public class XMLPrinter implements Consumer
+public class XMLPrinter implements Consumer, PositionConsumer
 {
   PrintWriter out;
   boolean inAttribute = false;
@@ -150,6 +150,11 @@ public class XMLPrinter implements Consumer
   {
     if (v instanceof Consumable)
       ((Consumable) v).consume(this);
+    else if (v instanceof SeqPosition)
+      {
+	SeqPosition pos = (SeqPosition) v;
+	pos.sequence.consumeNext(pos.ipos, pos.xpos, this);
+      }
     else
       {
 	startWord();
@@ -211,5 +216,16 @@ public class XMLPrinter implements Consumer
       }
     if (count > 0)
       out.write(buf, limit - count, count);
+  }
+
+  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)
+  {
+    seq.consumeNext(ipos, xpos, this);
+    return true;
+  }
+
+  public boolean consume(TreePosition position)
+  {
+    throw new Error("not implemented consume(TreePosition)");
   }
 }

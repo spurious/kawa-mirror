@@ -1,3 +1,9 @@
+2001-08-16  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java:  Implement positionConsumer.
+	(writePosition):  New methods.
+	(writeObject):  Handle SeqPosition.
+
 2001-07-17  Per Bothner  <per@bothner.com>
 
 	* package.html:  Belated initial check-in.

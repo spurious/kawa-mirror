@@ -1,5 +1,5 @@
-The Java classes (with related files and documentation) in gnu.bytecode,
-gnu.math, and gnu.text are copyright Per Bothner and Cygnus Solutions.
+The Java classes (with related files and documentation) in this package
+are copyright Per Bothner and Cygnus Solutions.
 
 These classes are distributed in the hope that they will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

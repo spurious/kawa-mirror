@@ -2,11 +2,38 @@ package kawa.standard;
 import kawa.lang.*;
 import java.io.*;
 import codegen.ZipArchive;
+import codegen.ZipLoader;
 
 public class load extends Procedure1 {
   public load ()
   {
     super("load");
+  }
+
+  public final static Object loadClassFile (String name)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    try
+      {
+	Class clas = Class.forName (name);
+	Object inst = clas.newInstance ();
+	if (! (inst instanceof Procedure0))
+	  throw new GenericError ("load - class is not an Procedure0");
+	Procedure0 proc = (Procedure0) inst;
+	return proc.apply0 ();
+      }
+    catch (ClassNotFoundException ex)
+      {
+	throw new GenericError ("class not found in load");
+      }
+    catch (InstantiationException ex)
+      {
+	throw new GenericError ("class not instantiable: in load");
+      }
+    catch (IllegalAccessException ex)
+      {
+	throw new GenericError ("class illegal access: in load");
+      }
   }
 
   public final static Object loadCompiled (String name)
@@ -20,8 +47,8 @@ public class load extends Procedure1 {
 	if (!zfile.canRead ())
 	  throw new GenericError ("load: "+name+" - not readable");
 	ZipArchive zar = new ZipArchive (name, "r");
-	SchemeLoader loader = new SchemeLoader (zar);
-	Class clas = loader.loadClass ("lambda0", true);
+	ZipLoader loader = new ZipLoader (zar);
+	Class clas = loader.loadClass ("Top", true);
 	Object inst = clas.newInstance ();
 	Procedure0 proc = (Procedure0) inst;
 	return proc.apply0 ();
@@ -56,7 +83,7 @@ public class load extends Procedure1 {
       {
 	throw new GenericError ("load: file not found: " + name);
       }
-    return loadSource (new InPort (fstream));
+    return loadSource (new InPort (fstream, name));
   }
 
   public final static Object loadSource (InPort port)
@@ -76,6 +103,12 @@ public class load extends Procedure1 {
 		port.close ();
 		break;
 	      }
+	  }
+	catch (ReadError e)
+	  {
+	    // The '\n' is because a ReadError includes a line number,
+	    // and it is better if that starts the line.
+	    throw new GenericError ("read error in load:\n" + e.toString ());
 	  }
 	catch (SyntaxError e)
 	  {
@@ -113,6 +146,11 @@ public class load extends Procedure1 {
       return loadCompiled (name);
     if (name.endsWith (".scm"))
       return loadSource (name);
+    if (name.endsWith (".class"))
+      {
+	name = name.substring (0, name.length () - 6);
+	return loadClassFile (name.replace ('/', '.'));
+      }
     File file = new File (name);
     if (file.exists ())
       {
@@ -161,6 +199,12 @@ public class load extends Procedure1 {
 	file = new File (xname);
 	if (file.exists ())
 	  return loadCompiled (xname);
+
+	xname = name + ".class";
+	file = new File (xname);
+	if (file.exists ())
+	  return loadClassFile (xname);
+
 	xname = name + ".scm";
 	file = new File (xname);
 	if (file.exists ())

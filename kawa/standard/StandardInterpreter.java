@@ -5,7 +5,7 @@ public class StandardInterpreter extends Interpreter
 {
   final void define_proc (Named proc)
   {
-    define (proc.name, proc);
+    define (proc.name (), proc);
   }
 
   /* Define a procedure to be autoloaded. */
@@ -13,6 +13,13 @@ public class StandardInterpreter extends Interpreter
   {
     Symbol symbol = Symbol.make (name);
     define (symbol, new AutoloadProcedure (symbol, className));
+  }
+
+  /* Define a Syntax to be autoloaded. */
+  final void define_syntax (String name, String className)
+  {
+    Symbol symbol = Symbol.make (name);
+    define (symbol, new AutoloadSyntax (symbol, className));
   }
 
   public kawa.standard.StandardInterpreter(InPort i, OutPort o, OutPort e)
@@ -27,11 +34,12 @@ public class StandardInterpreter extends Interpreter
       kawa.lang.Procedure2 equal;
 
       //-- Section 4.1
-      define("if", new kawa.standard.ifp());
-      define("set!", new kawa.standard.set_b());
+      define_syntax ("if", "kawa.standard.ifp");
+      define_syntax ("set!", "kawa.standard.set_b");
+      define_syntax ("do", "kawa.lib.do");
 
       // Section 4.2
-      define("cond",new kawa.standard.cond());
+      define_syntax ("cond", "kawa.standard.cond");
 
       //-- Section 6.1
       define_proc ("not", "kawa.standard.not");
@@ -39,11 +47,11 @@ public class StandardInterpreter extends Interpreter
 
       //-- Section 6.2
       eqv = new kawa.standard.eqv_p();
-      define(eqv.name,eqv);
+      define(eqv.name (), eqv);
       eq = new kawa.standard.eq_p();
-      define(eq.name,eq);
+      define(eq.name (), eq);
       equal = new kawa.standard.equal_p();
-      define(equal.name,equal);
+      define(equal.name (), equal);
 
       //-- Section 6.3  -- complete
       define_proc ("pair?", "kawa.standard.pair_p");
@@ -91,17 +99,17 @@ public class StandardInterpreter extends Interpreter
       define_proc ("list-ref", "kawa.standard.list_ref");
 
       proc = new kawa.standard.mem("memq",eq);
-      define(proc.name,proc);
+      define(proc.name (), proc);
       proc = new kawa.standard.mem("memv",eqv);
-      define(proc.name,proc);
+      define(proc.name (), proc);
       proc = new kawa.standard.mem("member",equal);
-      define(proc.name,proc);
+      define(proc.name (), proc);
       proc = new kawa.standard.ass("assq",eq);
-      define(proc.name,proc);
+      define(proc.name (), proc);
       proc = new kawa.standard.ass("assv",eqv);
-      define(proc.name,proc);
+      define(proc.name (), proc);
       proc = new kawa.standard.ass("assoc",equal);
-      define(proc.name,proc);
+      define(proc.name (), proc);
 
       //-- Section 6.4  -- complete, including slashified read/write
       
@@ -114,7 +122,7 @@ public class StandardInterpreter extends Interpreter
       define_proc ("real?", "kawa.standard.real_p");
       define("inexact?",proc);
       proc = new kawa.standard.integer_p();
-      define(proc.name,proc);
+      define(proc.name (), proc);
       define("exact?",proc);
       define_proc ("zero?", "kawa.standard.zero_p");
       define_proc ("positive?", "kawa.standard.positive_p");
@@ -225,23 +233,17 @@ public class StandardInterpreter extends Interpreter
       define_proc ("load", "kawa.standard.load");
 
       //-- (let ((n obj)...) e1 ... )
-      define("let", new kawa.standard.let());
+      define_syntax ("let", "kawa.standard.let");
       //-- (let* ((n obj)...) e1 ... )
-      define("let*", new kawa.standard.letstar());
+      define_syntax ("let*", "kawa.standard.letstar");
       //-- (letrec ((n obj)...) e1 ... )
-      define("letrec", new letrec());
+      define_syntax ("letrec", "kawa.standard.letrec");
       //-- (define sym obj)
-      define("define", new kawa.standard.define());
+      define_syntax ("define", "kawa.standard.define");
       //-- (apply sym obj)
       //-- (begin obj ...)
-      define("begin", new kawa.standard.begin());
+      define_syntax ("begin", "kawa.standard.begin");
       //-- (if cond then-exp else-exp)
-      //-- (when cond exp ...)
-      syn = new kawa.standard.when();
-      define(syn.name,syn);
-      //-- (unless cond exp ...)
-      syn = new kawa.standard.unless();
-      define(syn.name,syn);
 
       define ("or", new kawa.standard.and_or (false));
       define ("and", new kawa.standard.and_or (true));
@@ -249,6 +251,12 @@ public class StandardInterpreter extends Interpreter
       define_proc ("exit", "kawa.standard.exit");
       define_proc ("values", "kawa.standard.values");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
+
+      define ("define-syntax", new kawa.standard.define_syntax ());
+      //-- (when cond exp ...)
+      define_syntax ("when", "kawa.lib.when_unless");
+      //-- (unless cond exp ...)
+      define_syntax ("unless", "kawa.lib.when_unless");
 
       define_proc ("compile-func", "kawa.lang.compilefune");
       define_proc ("compile-file", "kawa.lang.CompileFile");

@@ -273,12 +273,10 @@ public class Compilation
 				Access.PUBLIC|Access.STATIC);
   public static Field pcCallContextField
     = typeCallContext.addField("pc", Type.int_type, Access.PROTECTED);
-  public static ClassType typeCpsProcedure
-    = ClassType.make("gnu.mapping.CpsProcedure");
   public static ClassType typeCallFrame
     = ClassType.make("gnu.mapping.CallFrame");
   public static ClassType typeCpsMethodProc
-  = ClassType.make("gnu.mapping.CpsMethodProc", typeCpsProcedure);
+  = ClassType.make("gnu.mapping.CpsMethodProc", typeProcedure);
   public static ClassType typeCpsMethodContainer
   = ClassType.make("gnu.mapping.CpsMethodContainer");
   public static Field numArgsCallFrameField

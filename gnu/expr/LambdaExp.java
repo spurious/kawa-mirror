@@ -83,6 +83,7 @@ public class LambdaExp extends ScopeExp
   static final int NEEDS_STATIC_LINK = 16;
   /* Used (future) by FindTailCalls. */
   static final int CANNOT_INLINE = 32;
+  static final int CLASS_METHOD = 64;
   int flags;
 
   /** True iff this lambda is only "called" inline. */
@@ -148,6 +149,16 @@ public class LambdaExp extends ScopeExp
     if (called) flags |= CAN_CALL;
     else flags &= ~CAN_CALL;
   }
+
+  /** True if this is a method in an ObjectExp. */
+  public final boolean isClassMethod()
+  { return (flags & CLASS_METHOD) != 0; }
+
+  public final void setClassMethod(boolean isMethod)
+  {
+    if (isMethod) flags |= CLASS_METHOD;
+    else flags &= ~CLASS_METHOD;
+  }
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
 
@@ -168,7 +179,8 @@ public class LambdaExp extends ScopeExp
 
   public final boolean isHandlingTailCalls ()
   {
-    return Compilation.usingTailCalls && ! isModuleBody();
+    return Compilation.usingTailCalls && ! isModuleBody()
+      && ! isClassMethod();
   }
 
   public final boolean variable_args () { return max_args < 0; }

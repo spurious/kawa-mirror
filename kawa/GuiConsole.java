@@ -10,6 +10,11 @@ import kawa.lang.OutPort;
 import kawa.standard.Scheme;
 import kawa.lang.Interpreter;
 
+/** A Frame containing a Kwa read-eval-print loop.
+  * @author Albert Ting <alt@artisan.com> (original base)
+  * @author Per Bothner (extensive changes).
+  */
+
 public class GuiConsole extends Frame {
   private static String EXIT = "Exit";
   private static String NEW = "New";

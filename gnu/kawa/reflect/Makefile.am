@@ -7,6 +7,7 @@ SUFFIXES = .java .class
 javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
+  ClassMemberConstraint.java \
   ClassMethods.java \
   Invoke.java \
   SlotGet.java \

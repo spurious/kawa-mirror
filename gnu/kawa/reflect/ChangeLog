@@ -1,3 +1,12 @@
+1999-12-06  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java:  New class;  extends Constraint.
+	* Makefile.am, Makefile.in (java_JAVA): Add ClassMemberConstraint.java.
+	* Invoke.java (applyN):  Throw exception if no applicable method found.
+	(getMethods):  Add argsToSkip parameter.
+	(compile, getReturnType):  Fix getMethods call.
+	(makeInvokeStatic):  New method.
+
 1999-11-15  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (selectApplicable, apply):  New static methods.

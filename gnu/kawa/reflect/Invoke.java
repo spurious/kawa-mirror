@@ -75,6 +75,9 @@ public class Invoke extends ProcedureN implements Inlineable
       = ClassMethods.apply(dtype, mname, null, null,
                            thisProc.kind=='S' ? Access.STATIC : 0,
                            Access.STATIC);
+    if (proc == null)
+      throw new RuntimeException(thisProc.getName() + ": no method named `"
+                                 + mname + "' in class " + dtype.getName());
     Object[] margs = new Object[nargs-(kind == 'S' ? 2 : 1)];
     int i = 0;
     if (kind == 'V')
@@ -122,14 +125,13 @@ public class Invoke extends ProcedureN implements Inlineable
   private int cachePossiblyApplicableMethodCount;
 
   protected PrimProcedure[] getMethods(ClassType ctype, String mname,
-                                       Expression[] args)
+                                       Expression[] args, int argsToSkip)
   {
     if (args == cacheArgs)
       return cacheMethods;
     int nargs = args.length;
     cacheArgs = args;
     cacheMethods = null;
-    int argsToSkip = kind == 'S' ? 2 : 1;
     Type[] atypes = new Type[nargs - argsToSkip];
     int i = 0;
     if (kind == 'V')
@@ -182,7 +184,7 @@ public class Invoke extends ProcedureN implements Inlineable
         int okCount, maybeCount;
         synchronized (this)
           {
-            methods = getMethods(type, name, args);
+            methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
             okCount = cacheDefinitelyApplicableMethodCount;
             maybeCount = cachePossiblyApplicableMethodCount;
           }
@@ -317,7 +319,8 @@ public class Invoke extends ProcedureN implements Inlineable
             && (name instanceof FString || name instanceof String))
           {
             PrimProcedure[] methods = getMethods((ClassType) type,
-                                                 name.toString(), args);
+                                                 name.toString(), args,
+                                                 kind == 'S' ? 2 : 1);
             if (methods != null
                 && (cacheDefinitelyApplicableMethodCount == 1
                     || (cacheDefinitelyApplicableMethodCount == 0
@@ -326,5 +329,32 @@ public class Invoke extends ProcedureN implements Inlineable
           }
       }
     return Type.pointer_type;
+  }
+
+  /** Return an ApplyExp that will call a method with given arguments.
+   * @param type the class containing the method we want to call.
+   * @param name the name of the method we want to call
+   * @param args the arguments to the call
+   * @return an ApplyExp representing the call
+   */
+  public static synchronized
+  ApplyExp makeInvokeStatic(ClassType type, String name, Expression[] args)
+  {
+    PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 0);
+    int okCount = invokeStatic.cacheDefinitelyApplicableMethodCount;
+    int maybeCount = invokeStatic.cachePossiblyApplicableMethodCount;
+    int index;
+    if (methods == null)
+      index = -1;
+    else if (okCount > 0)
+      index = MethodProc.mostSpecific(methods, okCount);
+    else if (maybeCount == 1)
+      index = 0;
+    else
+      index = -1;
+    if (index < 0)
+      throw new RuntimeException("missing or ambiguous method `" + name
+                                 + "' in " + type.getName());
+    return new ApplyExp(methods[index], args);
   }
 }

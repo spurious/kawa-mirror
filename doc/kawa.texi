@@ -439,6 +439,7 @@ nor @code{letrec-syntax} are implemented.
 * Eval and Environments::
 * Quantities::
 * Threads::
+* Standard Types::
 * Miscellaneous::
 @end menu
 
@@ -955,7 +956,7 @@ Define @var{unit-name} as a unit (that can be used in literals)
 equal to the quantity @var{expression}.
 @end defmac
 
-@node Threads, Miscellaneous, Quantities, Extensions
+@node Threads, Standard Types, Quantities, Extensions
 @subsection Threads
 
 There is a very preliminary interface to create parallel threads.
@@ -984,7 +985,61 @@ The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
-@node Miscellaneous,  , Threads, Extensions
+@node Standard Types, Miscellaneous, Threads, Extensions
+@subsection Standard Types
+
+Kawa has first-class types, that you can use in various ways.
+Currently, these are mainly useful for interfacing with primitive Java methods
+(such as @code{primitive-virtual-function}, but they will be useful
+for other purposes (such as declarating variables) later.
+
+These types are bound to identifiers having the form @code{<TYPENAME>}.
+(This syntax and most of the names are as in RScheme.)
+
+To find which Java classes these types map into, look in
+@code{kawa/lang/PrimProcedure.java}.
+
+@defvar <object>
+An arbitrary Scheme value - and hence an arbitrary Java object.
+@end defvar
+
+@defvar <integer>
+The type of Scheme integers.
+@end defvar
+
+@defvar <symbol>
+The type of Scheme symbols.
+@end defvar
+
+@defvar <keyword>
+The type of keyword values.  @xref{Keywords}.
+@end defvar
+
+@defvar <list>
+The type of Scheme lists (pure and impure, including the empty list).
+@end defvar
+
+@defvar <pair>
+The type of Scheme pairs.  This is a sub-type of @var{list}.
+@end defvar
+
+@defvar <string>
+The type of (mutable) Scheme strings.
+This is @emph{not} the same as (non-mutable) Java strings
+(which happen to be the same as @code{<symbol>}).
+@end defvar
+
+@defvar <vector>
+The type of Scheme vectors.
+@end defvar
+
+@defvar <function>
+The type of Scheme procedures.
+@end defvar
+
+More will be added later.
+
+@node Miscellaneous,  , Standard Types, Extensions
 @subsection Miscellaneous
 
 @defun gentemp
@@ -1212,7 +1267,8 @@ which allows you to call any (virtual or static) Java method
 as if it were a Scheme procedure.
 
 These primitives require you to specify the parameter and return types.
-Type specifications are currently required to be string literals.
+Type specifications are currently required to be string literals
+or one of the standard types (@pxref{Standard Types}).
 A type specifier can be a fully-qualified Java class name
 (for example @code{"java.lang.StringBuffer"}).  In that case,
 the actual argument is cast at run time to the named class.
@@ -1227,7 +1283,7 @@ corresponding Scheme number classes.  Similarly, @code{"char"}
 can be converted to and from Scheme characters.  The type
 @code{boolean} matches any object, and the result is @code{false}
 if and only if the actual argument is @code{#f}.
-The return type @code{"void"} indicates that no value is returned.
+The return type @code{<void>} indicates that no value is returned.
 
 @defmac primitive-constructor class (argtype ...)
 Returns a new anonymous procedure, which when called will create

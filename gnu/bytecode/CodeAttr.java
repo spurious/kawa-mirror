@@ -393,10 +393,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
     scope.end_pc = PC;  readPC = PC;
-    for (Variable var = scope.vars; var != null; var = var.next) {
-      if (var.isSimple () && ! var.dead ())
-	var.freeLocal(this);
-    }
+    scope.freeLocals(this);
     return scope;
   }
 
@@ -1011,7 +1008,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
   /**
-   * Comple code to push the contents of a local variable onto the statck.
+   * Compile code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
    */
   public final void emitLoad (Variable var)

@@ -61,6 +61,16 @@ public class LocalVarsAttr extends Attribute
       }
   }
 
+  /** Mark scopes upto specified scope as 'preserved'.
+   * This means that the local variable slots are not available for reuse
+   * when the scope exits.  The effected scopes are all ancestor scopes from
+   * the current scope (inclusive) upto the specified scope (exclusive). */
+  public void preserveVariablesUpto(Scope scope)
+  {
+    for (Scope cur = current_scope;  cur != scope;  cur = cur.parent)
+      cur.preserved = true;
+  }
+
   public final boolean isEmpty ()
   {
     VarEnumerator vars = allVars();

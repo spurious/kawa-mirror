@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.kawa.xml.NamespaceEnv;
 
 public class define_namespace extends Syntax
 {
@@ -17,7 +18,7 @@ public class define_namespace extends Syntax
     String sym = null;
     if (name instanceof String)
       {
-	sym = ("xmlns:" + name).intern();
+	sym = (NamespaceEnv.NAMESPACE_PREFIX + name).intern();
 	Declaration decl = defs.getDefine(sym, 'w', tr);
 	tr.pushBinding(sym, decl);
 	decl.setFlag(Declaration.IS_CONSTANT);

@@ -390,6 +390,7 @@ public class Scheme extends LispInterpreter
       define_proc ("port-line", "kawa.lib.ports");
       define_proc ("set-port-line!", "kawa.lib.ports");
       define_proc ("port-column", "kawa.lib.ports");
+      define_proc ("current-error-port", "kawa.lib.ports");
       define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
       define_proc ("set-input-port-line-number!", "kawa.lib.ports");
       define_proc ("input-port-column-number", "kawa.lib.ports");

@@ -1,3 +1,10 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (initScheme):  Define current-error-port.
+
+	* kawa/standard/define_namespace.java (scanForDefinitions):
+	Use NamespaceEnv.NAMESPACE_PREFIX
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (getNamedType):  The type <String>

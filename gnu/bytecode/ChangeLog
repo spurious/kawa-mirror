@@ -1,3 +1,7 @@
+2005-03-02  Per Bothner  <per@bothner.com>
+
+	* Field.java (setConstantValue): Handle boolean and char fields.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (pushScope): Don't do a getLabel - it's redundant,

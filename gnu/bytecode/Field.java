@@ -130,8 +130,16 @@ public class Field extends Location implements AttrContainer {
     CpoolEntry entry;
     switch (sig1)
       {
-      case 'C':
       case 'Z':
+	entry = cpool.addInt(PrimType.booleanValue(value)? 1 : 0);
+	break;
+      case 'C':
+	if (value instanceof Character)
+	  {
+	    entry = cpool.addInt(((Character) value).charValue());
+	    break;
+	  }
+	/// else fall through ...
       case 'B':
       case 'S':
       case 'I':

@@ -705,14 +705,16 @@ public class Declaration
 	    if (literal.field == null)
 	      literal.assign(field, comp.litTable);
 	  }
+	else if (ftype instanceof PrimType
+		 || "java.lang.String".equals(ftype.getName()))
+	  {
+	    if (val instanceof gnu.text.Char)
+	      val = gnu.math.IntNum.make(((gnu.text.Char) val).intValue());
+	    field.setConstantValue(val, comp.mainClass);
+	    return;
+	  }
       }
-    if (value instanceof QuoteExp
-	&& (ftype instanceof PrimType
-	    || "java.lang.String".equals(ftype.getName())))
-      {
-	field.setConstantValue(((QuoteExp) value).getValue(), comp.mainClass);
-      }
-    else if (isIndirectBinding()
+    if (isIndirectBinding()
 	     || (value != null && ! (value instanceof ClassExp)))
       {
 	BindingInitializer init = new BindingInitializer(this, field, value);

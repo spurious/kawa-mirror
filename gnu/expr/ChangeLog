@@ -1,3 +1,8 @@
+2005-03-02  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField): Field.setConstantValue now handles
+	boolean and char fields - but expects java.lang.Character.
+
 2005-02-25  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField): Revert 2005-02-11 change.

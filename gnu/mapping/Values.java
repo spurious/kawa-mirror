@@ -84,6 +84,21 @@ public class Values extends TreeList implements Printable, Externalizable
     return vals;
   }
 
+  /** If a simple value, return that value.
+   * Also, if no values, return empty.
+   */
+  public final Object canonicalize ()
+  {
+    if (gapEnd == data.length)
+      {
+	if (gapStart == 0)
+	  return empty;
+	if (nextDataIndex(0) == gapStart) // Singleton value.
+	  return getNext(0, null);
+      }
+    return this;
+  }
+
   /** Apply a Procedure with these values as the arguments. */
   public Object call_with (Procedure proc) throws Throwable
   {

@@ -14,14 +14,20 @@ public class Children extends CpsProcedure
   public static void children (TreeList tlist, int index, Consumer consumer)
   {
     int child = tlist.gotoChildrenStart(index);
-    while (child >= 0)
+    if (child < 0)
+      return;
+    int limit = tlist.nextDataIndex(index);
+    for (;;)
       {
 	int ipos = child << 1;
-	int kind = tlist.getNextKind(ipos, null);
-	if (kind == Sequence.EOF_VALUE)
+	// If the current child is a char or primitive, skip to next real node.
+	int next = tlist.nextNodeIndex(child, limit);
+	// The child node wasn't primtive, so call nextDataIndex instead.
+	int next0=next;
+	if (next == child)
+	  next = tlist.nextDataIndex(child);
+	if (next < 0)
 	  break;
-	// if kind is CHAR_VALUE return text node.  FIXME
-	int next = tlist.nextDataIndex(child);
 	if (consumer instanceof PositionConsumer)
 	  ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
 	else

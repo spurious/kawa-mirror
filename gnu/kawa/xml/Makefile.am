@@ -8,6 +8,7 @@ java_sources = \
   AttributeConstructor.java \
   AttributeType.java \
   ChildAxis.java \
+  CoerceNodes.java \
   DefineNamespace.java \
   DescendantAxis.java \
   DescendantOrSelfAxis.java \
@@ -27,6 +28,7 @@ java_sources = \
   NamespaceEnv.java \
   NodeCompare.java \
   NodeName.java \
+  Nodes.java \
   NodeType.java \
   OutputAsXML.java \
   ParentAxis.java \

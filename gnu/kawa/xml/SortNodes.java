@@ -18,7 +18,12 @@ public class SortNodes extends Procedure1 implements Inlineable
   {
     SortedNodes nodes = new SortedNodes();
     Values.writeValues(values, nodes);
-    return nodes;
+    if (nodes.count > 1)
+      return nodes;
+    else if (nodes.count == 0)
+      return Values.empty;
+    else
+      return nodes.get(0);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -28,7 +33,8 @@ public class SortNodes extends Procedure1 implements Inlineable
       ApplyExp.compile(exp, comp, target);
     else
       ConsumerTarget.compileUsingConsumer(args[0], comp, target,
-					  makeSortedNodesMethod, null);
+					  makeSortedNodesMethod,
+					  canonicalizeMethod);
   }
 
   public Type getReturnType (Expression[] args)
@@ -40,5 +46,6 @@ public class SortNodes extends Procedure1 implements Inlineable
     = ClassType.make("gnu.kawa.xml.SortedNodes");
   public static final Method makeSortedNodesMethod
     = typeSortedNodes.getDeclaredMethod("<init>", 0);
-
+  public static final Method canonicalizeMethod
+    = Compilation.typeValues.getDeclaredMethod("canonicalize", 0);
 }

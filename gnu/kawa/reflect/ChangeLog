@@ -1,5 +1,7 @@
 2005-02-07  Per Bothner  <per@bothner.com>
 
+	* ClassMethods.java (classMethods): New static field.
+
 	* StaticFieldLocation.java (make): New static factory method.
 	* ClassMemberLocation (make(String,String)): Remove factory method.
 

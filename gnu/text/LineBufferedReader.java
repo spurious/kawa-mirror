@@ -74,7 +74,7 @@ public class LineBufferedReader extends FilterReader
   }
 
   /** The position that marks the start of the current or marked line.
-    * If the readAheadLimit && markPos < pos, then it is the start of the
+    * If the readAheadLimit > 0 && markPos < pos, then it is the start of the
     * line containing the markPos.
     * If we are at the end of a line, and have not started reading the next
     * one (and are therefore allowed by unread back to the old line),
@@ -184,7 +184,7 @@ public class LineBufferedReader extends FilterReader
 	saveStart = pos;
 	if (readAheadLimit > 0 && markPos < pos)
 	  {
-	    if (pos - markPos < readAheadLimit
+	    if (pos - markPos > readAheadLimit
 		|| ((flags & USER_BUFFER) != 0
 		    && reserve - markPos > buffer.length))
 	      clearMark();
@@ -532,13 +532,13 @@ public class LineBufferedReader extends FilterReader
     read();
   }
 
-  static int countLines (char[] buffer, int off, int len)
+  static int countLines (char[] buffer, int start, int limit)
   {
     int count = 0;
     char prev = '\0';
-    for (int i = 0;  i < len;  i++)
+    for (int i = start;  i < limit;  i++)
       {
-	char ch = buffer[i+off];
+	char ch = buffer[i];
 	if ((ch == '\n' && prev != '\r') || ch == '\r')
 	  count++;
 	prev = ch;

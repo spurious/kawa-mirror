@@ -1,3 +1,8 @@
+2002-06-18  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (reserve):  Fix logic error.
+	(countLines):  Change 2nd parameter from length to limit.
+
 2002-06-02  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (outputLine):  Copy prefix to new buffer, not

@@ -1,5 +1,11 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Macro.java (expand): Add extra test since Expression
+	now extends Procedure.
+	* kawa/standard/define.java (scanForm): Use setSymbol since
+	setName(Object) was removed from LambdaExp.
+	* kawa/standard/object.java (scanClassDef): Likewise.
+
 	* kawa/standard/Scheme.java: Declare 'make-parameter' and
 	'parameterize' from SRFI-39.
 

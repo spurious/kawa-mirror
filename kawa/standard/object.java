@@ -291,7 +291,7 @@ public class object extends Syntax
 	    decl.noteValue(lexp);
 	    decl.setFlag(Declaration.FIELD_OR_METHOD);
 	    decl.setProcedureDecl(true);
-	    lexp.setName (mname);
+	    lexp.setSymbol(mname);
 	    if (pair.cdr instanceof PairWithPosition)
 	      lexp.setFile(((PairWithPosition) pair.cdr).getFile());
 	    Object body = lambda.rewriteAttrs(lexp, pair.cdr, tr);

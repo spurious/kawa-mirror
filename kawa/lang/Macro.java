@@ -133,7 +133,7 @@ public class Macro extends Syntax implements Printable, Externalizable
       {
 	Procedure pr;
 	Object exp = expander;
-	if (exp instanceof Procedure)
+	if (exp instanceof Procedure && ! (exp instanceof Expression))
 	  pr = (Procedure) exp;
 	else
 	  {

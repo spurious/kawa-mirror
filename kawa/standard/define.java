@@ -78,7 +78,7 @@ public class define extends Syntax implements Printable
       {
 	LambdaExp lexp = new LambdaExp();
 	decl.setProcedureDecl(true);
-	lexp.setName(name);
+	lexp.setSymbol(name);
 	lexp.nameDecl = decl;
 	Object formals = p4.car;
 	Object body = p4.cdr;

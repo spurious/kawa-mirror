@@ -5,3 +5,4 @@ libtool
 patch-source-list
 selected-java-source
 kawa*.jar
+autom4te.cache

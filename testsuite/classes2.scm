@@ -14,3 +14,4 @@
 
 (define yy :: <int> 56)
 
+(define date-test-instance (make <DateTest>))

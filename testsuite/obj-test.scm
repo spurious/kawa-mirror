@@ -1,4 +1,4 @@
-(test-init "Objects" 95)
+(test-init "Objects" 98)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -286,6 +286,9 @@
 (define non-simple-date (make <DateTest>))
 (test (+ 1900 (date:get-year (date:new)))
       invoke non-simple-date 'get-year)
+(test #t 'date-1 (>= (invoke date-test-instance 'get-year) 2004))
+(test #f 'date-2 (invoke non-simple-date 'before date-test-instance))
+(test #t 'date-3 (>= (make-date-test) 2004))
 
 ;; Test for Savannah bug #4289
 (define pa-data (pa-new 10))

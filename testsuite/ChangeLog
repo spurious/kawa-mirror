@@ -1,3 +1,9 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* classes1.scm: Add test for define-namespace of a class.
+	* classes2.scm: Test creating on non-static class.
+	* obj-test.scm: Test creating of non-simple classes.
+
 2004-12-02  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST): Add MyDate.java and MyTimestamp.java.

@@ -14,7 +14,7 @@ public class PrettyWriter extends java.io.Writer
 {
   protected Writer out;
 
-  public PrettyWriter(java.io.Writer base)
+  public PrettyWriter(java.io.Writer out)
   {
     this.out = out;
     isPrettyPrinting = true;

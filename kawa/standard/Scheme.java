@@ -725,10 +725,12 @@ public class Scheme extends Interpreter
    * @return result of last expression, or Interpreter.voidObject if none. */
   public static Object eval (InPort port, Environment env)
   {
+    SourceMessages messages = new SourceMessages();
     try
       {
-	SourceMessages messages = new SourceMessages();
-        Object body = CompileFile.readBody(port, messages);
+	LispReader lexer = (LispReader)
+	  Interpreter.getInterpreter().getLexer(port, messages);
+	Object body = ReaderParens.readList(lexer, 0, 1, -1);
         if (messages.seenErrors())
           throw new gnu.text.SyntaxException(messages);
 	return Eval.evalBody(body, env, messages);
@@ -739,6 +741,11 @@ public class Scheme extends Interpreter
 	// and it is better if that starts the line.  FIXME OBSOLETE
 	throw new RuntimeException("eval: errors while compiling:\n"
 				   +e.getMessages().toString(20));
+      }
+    catch (java.io.IOException e)
+      {
+	throw new RuntimeException("eval: I/O exception: "
+				   + e.toString ());
       }
   }
 

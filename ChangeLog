@@ -1,3 +1,13 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java (readBody):  Removed method.
+	* kawa/standard/Scheme.java (eval):  Re-write to use new static
+	ReaderParens.readList instead of CompileFile.readBody.
+	* kawa/standard/define_autoload.java (findAutoloadComments):
+	Update call to LispReader's readNestedComment for new argument list.
+	* kawa/standard/string2number.java (parse):  Use new
+	LispReader.parseNumber method.
+
 2001-04-11  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Eval.java (eval):  If argument is PairWithPosition,

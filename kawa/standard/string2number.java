@@ -11,21 +11,19 @@ public class string2number extends Procedure1or2
     try
       {
 	InPort iport;
-	/* FIXME
-	if (str instanceof FString)
-	  iport = ((FString) str).open();
-	  else */
-	  iport = new CharArrayInPort(str.toString());
-	ScmRead lexer = new ScmRead(iport);
-	Object result = lexer.readNumber(radix);
-	if (lexer.checkErrors(null, 0))
+	FString fstr = (FString) str;
+	int len = fstr.length();
+	char[] data = fstr.data;
+	Object result = LispReader.parseNumber(data, 0, len,
+					       radix, LispReader.SCM_NUMBERS);
+	if (! (result instanceof Numeric))
 	  return Scheme.falseObject;
 	return result;
       }
-    catch (java.io.IOException ex)
+    catch (Throwable ex)
       {
-	throw new RuntimeException("internal input error in string->number - "
-				   + ex.getMessage ());
+	ex.printStackTrace();
+	return Scheme.falseObject;
       }
   }
 

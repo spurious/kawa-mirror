@@ -210,7 +210,7 @@ public class define_autoload extends Syntax
 	    if (in.peek() == '|')
 	      {
 		in.skip();
-		in.readNestedComment();
+		in.readNestedComment('#', '|');
 		continue;
 	      }
 	  }

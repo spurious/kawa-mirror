@@ -38,31 +38,6 @@ public class CompileFile extends Procedure2
       }
   }
 
-  public static final Object readBody (InPort port, SourceMessages messages)
-  {
-    Object body = null;
-    try
-      {
-	LispReader lexer = (LispReader)
-	  Interpreter.getInterpreter().getLexer(port, messages);
-	body = lexer.readListBody ();
-	if (port.peek() == ')')
-	  lexer.fatal("An unexpected close paren was read.");
-      }
-    catch (gnu.text.SyntaxException ex)
-      {
-        // Got a fatal error.
-        if (ex.getMessages() != messages)
-          throw new GenericError ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-      }
-    catch (java.io.IOException e)
-      {
-	throw new GenericError ("I/O exception reading file: " + e.toString ());
-      }
-    return body;
-  }
-
   public static final ModuleExp read (InPort port, Translator tr)
   {
     ModuleExp mexp = new ModuleExp();

@@ -1,3 +1,6 @@
+The reader (for Scheme and Lisp) has been re-written to be table-driven,
+based on the design of Common Lisp readtables.
+
 The new gnu.lists package has new implementations of sequence-related
 classes.  It replaces most of gnu.kawa.util.  See the package.html file.
 

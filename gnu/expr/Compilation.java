@@ -1346,7 +1346,8 @@ public class Compilation
       generateConstructor(lexp);
 
     if (curClass == mainClass // && ! immediate
-	&& (staticModule || clinitChain != null || literalsChain != null))
+	&& (staticModule || clinitChain != null || literalsChain != null
+	    || generateMain || generateApplet))
       {
 	Method save_method = method;
 

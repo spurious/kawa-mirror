@@ -1,3 +1,7 @@
+2001-10-02  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass):  Create clinit if --main or --applet.
+
 2001-09-29  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (getImplMethods):  Use Vector's 'addElement' method

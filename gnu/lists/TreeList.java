@@ -930,7 +930,7 @@ implements Consumer, PositionConsumer, Consumable
 	    continue;
 	  case BASE_URI:
 	    if (out instanceof TreeList)
-	      ((TreeList) out).writeObject(objects[getIntN(pos)]);
+	      ((TreeList) out).writeBaseUri(objects[getIntN(pos)]);
 	    pos += 2;
 	    continue;
 	  case BOOL_FALSE:

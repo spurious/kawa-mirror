@@ -271,12 +271,33 @@ public class XQuery extends Interpreter
 
   LangPrimType booleanType;
 
+  static Object[] typeMap =
+    { "string", Type.string_type,
+      "boolean", Type.boolean_type,
+      "integer", "gnu.math.IntNum",
+      "positiveInteger", "gnu.math.IntNum",
+      "nonPositiveInteger", "gnu.math.IntNum",
+      "negativeInteger", "gnu.math.IntNum",
+      "nonNegativeInteger", "gnu.math.IntNum",
+      "decimal", "gnu.math.RealNum"
+    };
+
   public Type getTypeFor(String name)
   {
     if (name == "t")
       name = "java.lang.Object";
-    if (name.equals("string"))
-      return Type.string_type;
+    String core = name.startsWith("xs:") ? name.substring(3) : name;
+    for (int i = typeMap.length;  (i -= 2) >= 0; )
+      {
+	if (typeMap[i].equals(core))
+	  {
+	    Object t = typeMap[i+1];
+	    if (t instanceof String)
+	      return Scheme.string2Type((String) t);
+	    else
+	      return (Type) t;
+	  }
+      }
     return Scheme.string2Type(name);
   }
 

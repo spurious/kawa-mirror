@@ -208,6 +208,7 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
   LangPrimType.java \
   LispInterpreter.java \
+  LispLanguage.java \
   LispPackage.java \
   LispReader.java \
   ReaderDispatch.java \

@@ -1942,7 +1942,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     return try_stack != null;
   }
 
-  /** Compile a tail-call to position 0 of the current procewure.
+  /** Compile a tail-call to position 0 of the current procedure.
    * @param pop_args if true, copy argument registers (except this) from stack.
    * @param scope Scope whose start we jump back to. */
   public void emitTailCall (boolean pop_args, Scope scope)

@@ -1,6 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-JAVATOP =
 SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
   gnu/mapping $(XML_SUBDIRS) gnu/expr \
   gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
@@ -115,7 +114,7 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
   libtool.m4 ltmain.sh patch-source-list selected-java-source \
   build.xml build.properties \
-  $(JAVATOP)kawa/Version.java jar-manifest Make-rules
+  kawa/Version.java jar-manifest Make-rules
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
@@ -138,7 +137,7 @@ JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 # cd software/kawa/api/
 # cvs ci -m 'Updated.' .
 
-MAINTAINERCLEANFILES = makekawa.bat $(JAVATOP)kawa/Version.java
+MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 CLEANFILES = *.jar
 
@@ -167,10 +166,10 @@ uninstall-jar:
 	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
 	  $(DESTDIR)$(javadir)/kawa.jar
 
-$(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/configure.in
-	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/$(JAVATOP)kawa/Version.java.in >$@
+kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
+	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/kawa/Version.java.in >$@
 
-all-recursive:  $(JAVATOP)kawa/Version.java selected-java-source
+all-recursive:  kawa/Version.java selected-java-source
 all: kawa-@VERSION@.jar
 
 selected-java-source: Makefile

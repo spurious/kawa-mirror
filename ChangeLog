@@ -1,5 +1,10 @@
 2005-01-02  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (JAVATOP): Remove unused macro.
+
+	* Makefile.am: Update "select" rules to use new "preprocessor" syntax.
+	* build.xml: Likewise.
+
 	* kawa/lang/Quote.java, kawa/lang/SyntaxTemplate.java,
 	kawa/standard/syntax.java: Change "select" (preprocessor) syntax.
 

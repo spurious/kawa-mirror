@@ -1,3 +1,12 @@
+1999-11-03  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (apply):  Check if method isApplicable.
+
+	* InvokeStatic.java (invokeStatic):  New static field.
+	(apply$V):  New method.
+	(getMethod):  Pass argument types to ClassMethods.apply.
+	* MakeInstance.java (getMethod):  Likewise.
+
 1999-10-25  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (apply):  Return MethodProc, not Procedure.

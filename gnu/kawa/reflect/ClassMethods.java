@@ -57,6 +57,7 @@ public class ClassMethods extends ProcedureN
     for (int i = 0;  i < methods.length;  i++)
       {
         gnu.bytecode.Method method;
+        PrimProcedure cur;
         if (wantConstructor)
           {
             java.lang.reflect.Constructor rmethod
@@ -69,6 +70,8 @@ public class ClassMethods extends ProcedureN
             method
               = dtype.addMethod("<init>", rmethod.getModifiers(), params,
                                 Type.void_type);
+            cur = new PrimProcedure(method);
+            cur.setReturnType(dtype);
           }
         else
           {
@@ -83,13 +86,20 @@ public class ClassMethods extends ProcedureN
               = dtype.addMethod(rmethod.getName(),
                                 rmethod.getModifiers(), params,
                                 interpreter.getTypeFor(rmethod.getReturnType()));
+            cur = new PrimProcedure(method);
+          }
+        if (atypes != null)
+          {
+            int applicable = cur.isApplicable(atypes);
+            if (applicable == -3)
+              continue;
           }
         if (pproc != null && gproc == null)
           {
             gproc = new GenericProc();
             gproc.add(pproc);
           }
-        pproc = new PrimProcedure(method);
+        pproc = cur;
         if (gproc != null)
           gproc.add(pproc);
       }
@@ -100,7 +110,7 @@ public class ClassMethods extends ProcedureN
       }
     if (pproc != null)
       return pproc;
-    throw new RuntimeException("no method named `"+mname+"' in "
+    throw new RuntimeException("no applicable method named `"+mname+"' in "
                                +dtype.getName());
   }
 

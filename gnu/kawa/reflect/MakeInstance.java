@@ -77,12 +77,15 @@ public class MakeInstance extends ProcedureN implements Inlineable
       return cacheProc;
     Expression arg0 = args[0];
     Type type = kawa.standard.Scheme.exp2Type(arg0);
+    Type[] atypes = new Type[nargs];
+    for (int i = nargs;  --i >= 0; )
+      atypes[i] = args[i+1].getType();
     cacheArgs = args;
     if (type instanceof ClassType)
       {
         ClassType ctype = (ClassType) type;
         Procedure proc
-          = ClassMethods.apply(this, type, "<init>", null, null, 0, 0);
+          = ClassMethods.apply(this, type, "<init>", null, atypes, 0, 0);
         if (proc instanceof PrimProcedure)
           return (PrimProcedure) proc;
       }
@@ -99,7 +102,6 @@ public class MakeInstance extends ProcedureN implements Inlineable
     else
       {
         PrimProcedure proc = getMethod(args);
-        System.err.println("INLINE make proc:"+proc);
         if (proc != null)
           {
             Expression[] margs = new Expression[nargs];

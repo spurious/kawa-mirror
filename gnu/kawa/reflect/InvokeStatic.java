@@ -7,12 +7,29 @@ import java.lang.reflect.Modifier;
 
 public class InvokeStatic extends ProcedureN implements Inlineable
 {
+  public static InvokeStatic invokeStatic = new InvokeStatic("invoke-static");
+
+  public InvokeStatic(String name)
+  {
+    super(name);
+  }
+
+  public static Object apply$V(Object[] args)
+  {
+    return applyN(invokeStatic, args);
+  }
+
   public Object applyN (Object[] args)
   {
+    return applyN(this, args);
+  }
+
+  public static Object applyN (Procedure thisProc, Object[] args)
+  {
     int len = args.length;
-    Procedure.checkArgCount(this, len);
+    Procedure.checkArgCount(thisProc, len);
     len -= 2;
-    Procedure proc = ClassMethods.apply(this, args[0], args[1], null, null,
+    Procedure proc = ClassMethods.apply(thisProc, args[0], args[1], null, null,
                                         Modifier.STATIC, Modifier.STATIC);
     Object[] rargs = new Object[len];
     System.arraycopy(args, 2, rargs, 0, len);
@@ -33,6 +50,9 @@ public class InvokeStatic extends ProcedureN implements Inlineable
       return cacheProc;
     Expression arg0 = args[0];
     Expression arg1 = args[1];
+    Type[] atypes = new Type[nargs];
+    for (int i = nargs;  --i >= 0; )
+      atypes[i] = args[i+2].getType();
     Type type = kawa.standard.Scheme.exp2Type(arg0);
     cacheArgs = args;
     if (type instanceof ClassType && arg1 instanceof QuoteExp)
@@ -43,7 +63,7 @@ public class InvokeStatic extends ProcedureN implements Inlineable
           {
             String mname = val.toString();
             Procedure proc
-              = ClassMethods.apply(this, type, val, null, null,
+              = ClassMethods.apply(this, type, val, null, atypes,
                                    Modifier.STATIC, Modifier.STATIC);
             if (proc instanceof PrimProcedure)
               return (PrimProcedure) proc;

@@ -199,6 +199,7 @@ public class XQuery extends Interpreter
     define_field("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_field("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
     define_field("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("root", "gnu.kawa.xml.Nodes", "root");
     define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");
     define_method("substring", "gnu.xquery.util.StringValue", "substring");

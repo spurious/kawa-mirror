@@ -12,6 +12,7 @@ import java.util.Vector;
 import java.util.Hashtable;
 import gnu.kawa.xml.*;
 import gnu.bytecode.Type;
+import gnu.bytecode.ClassType;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
 
@@ -884,7 +885,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "$Sl", "div");
 	break;
       case OP_MOD:
-	func = new QuoteExp(new PrimProcedure(gnu.bytecode.ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
+	func = new QuoteExp(new PrimProcedure(ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
 	break;
       case OP_EQU:
 	func = makeFunctionExp("gnu.xquery.util.Compare", "=");
@@ -1083,7 +1084,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	getRawToken();
 	Type type = interpreter.getTypeFor(tname); 
 	if (type == null)
-	  type = gnu.bytecode.ClassType.make(tname);
+	  type = ClassType.make(tname);
 	return type;
       }
     else
@@ -1173,9 +1174,20 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parsePathExpr()
       throws java.io.IOException, SyntaxException
   {
+    Expression step1;
     if (curToken == '/' || curToken == SLASHSLASH_TOKEN)
-      return syntaxError("unimplemented non-relative PathExpr");
-    return parseRelativePathExpr();
+      {
+	Declaration dotDecl = parser.lookup(DOT_VARNAME, -1);
+	if (dotDecl == null)
+	  error("node test when focus is undefined");
+	Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
+	step1 = new ApplyExp(ClassType.make("gnu.kawa.xml.Nodes")
+			     .getDeclaredMethod("root", 1),
+			     new Expression[] { dot } );
+      }
+    else
+      step1 = parseStepExpr();
+    return parseRelativePathExpr(step1);
   }
 
   Symbol parseNameTest(String defaultNamespaceUri)
@@ -1352,10 +1364,9 @@ public class XQParser extends LispReader // should be extends Lexer
     return exp;
   }
 
-  Expression parseRelativePathExpr()
+  Expression parseRelativePathExpr(Expression exp)
       throws java.io.IOException, SyntaxException
   {
-    Expression exp = parseStepExpr();
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
 	boolean descendants = curToken == SLASHSLASH_TOKEN;
@@ -2805,7 +2816,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	Procedure proc = (Procedure) fld.get(null);
 	//return new QuoteExp(proc);
 
-	gnu.bytecode.ClassType type = gnu.bytecode.ClassType.make(className);
+	ClassType type = ClassType.make(className);
 	gnu.bytecode.Field procField = type.getDeclaredField(fieldName);
 	Declaration decl = new Declaration(name, procField);
 	decl.noteValue(new QuoteExp(proc));

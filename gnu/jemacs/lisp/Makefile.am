@@ -6,15 +6,9 @@ SUFFIXES = .java .class .el
 
 javadir=$(datadir)/java/$(subdir)
 
+JAVA = @JAVA@
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
 JAVAROOT = $(top_builddir)
-
-java_WITH_SWING =
-
-EXTRA_JAVA = $(java_WITH_SWING)
-
-java_JAVA=\
-  $(java_@SWING_SELECTED@)
 
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lisp. -C
@@ -24,13 +18,14 @@ ELISPSOURCES = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
 
 CLEANFILES = *.class *.stamp
 
-WITH_SWING: elclasses.stamp
+all: Makefile elclasses.stamp
 
-WITHOUT_SWING:
-
-all: Makefile @SWING_SELECTED@
-
-elclasses.stamp: $(ELISPSOURCES)
+elclasses.WITH_SWING: $(ELISPSOURCES)
 	cd ../../../kawa; $(MAKE)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) --elisp $(KAWAFLAGS) $?
 	echo timestamp > elclasses.stamp
+
+elclasses.WITHOUT_SWING:
+	echo timestamp > elclasses.stamp
+
+elclasses.stamp: elclasses.@SWING_SELECTED@

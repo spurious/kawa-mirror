@@ -11,8 +11,7 @@ public class ThreadLocation extends Location
   final Symbol name;
   final Object property;
   static int counter;
-  /** Used as a "property" key for an anonymous fluid binding. */
-  static final Object DYNAMIC = new Symbol("(dynamic)", null);
+  boolean unlink;
   private static synchronized int nextCounter() { return ++counter; }
 
   Location global;
@@ -34,7 +33,8 @@ public class ThreadLocation extends Location
   public ThreadLocation (Symbol name)
   {
     this.name = name;
-    this.property = DYNAMIC;
+    this.property = new String("(dynamic)");
+    unlink = true;
   }
 
   public ThreadLocation (Symbol name, Object property, Location global)
@@ -60,28 +60,26 @@ public class ThreadLocation extends Location
   {
     Object entry;
     /* #ifdef JAVA2 */
-    entry = (Location) thLocal.get();
+    entry = thLocal.get();
     /* #else */
     // entry = threadMap.get(Thread.currentThread());
     /* #endif */
     if (entry == null)
       {
 	Environment env = Environment.getCurrent();
-	Location loc = env.getLocation(name, property);
-	if (global != null && loc instanceof IndirectableLocation)
+	NamedLocation loc = env.getLocation(name, property, true);
+	if (global != null)
 	  {
-	    IndirectableLocation iloc = (IndirectableLocation) loc;
-	    synchronized (iloc)
+	    synchronized (loc)
 	      {
-		if (iloc.base == null && iloc.value == Location.UNBOUND)
-		  iloc.setBase(global);
+		if (loc.base == null && loc.value == Location.UNBOUND)
+		  loc.setBase(global);
 	      }
 	  }
 	
-	if (property == DYNAMIC)
+	if (unlink)
 	  {
 	    LocationRef lref = new LocationRef();
-	    lref.sym = name;
 	    lref.env = env;
 	    lref.loc = loc;
 	    entry = lref;
@@ -146,10 +144,9 @@ class LocationRef
 {
   Environment env;
   Location loc;
-  Symbol sym;
 
   public void finalize ()
   {
-    env.remove(sym, ThreadLocation.DYNAMIC);
+    env.remove(loc.getKeySymbol(), loc.getKeyProperty());
   }
 }

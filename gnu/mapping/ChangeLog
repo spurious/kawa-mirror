@@ -1,3 +1,10 @@
+2005-02-20  Per Bothner  <per@bothner.com>
+
+	* ThreadLocation.java (DYNAMIC): Can't use static property for all
+	anonymous ThreadLocations, since it might not be unique.  So remove.
+	(unlink): New field, to control if went should unlink when finalizing.
+	(LocationRef.finalize): Use Locations's symbol and propertyt to unlink.
+
 2005-02-19  Per Bothner  <per@bothner.com>
 
 	* ThreadLocation.java (setGlobal): Allocate Location for global,

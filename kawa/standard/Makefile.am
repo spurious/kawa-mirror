@@ -15,7 +15,6 @@ and_or.java \
 eqv_p.java \
 eq_p.java \
 equal_p.java \
-cons.java \
 car.java \
 cdr.java \
 cxr.java \
@@ -51,8 +50,6 @@ ceiling.java \
 truncate.java \
 round.java \
 rationalize.java \
-asin.java \
-acos.java \
 atan.java \
 sqrt.java \
 expt.java \
@@ -83,10 +80,7 @@ string_ci_lessequal_p.java \
 string_ci_greaterthan_p.java \
 string_ci_greaterequal_p.java \
 string_append.java \
-make_vector.java \
-vector_v.java \
 vector2list.java \
-vector_fill_b.java \
 vector_append.java \
 force.java \
 call_with_input_file.java \
@@ -101,15 +95,12 @@ write.java \
 writechar.java \
 open_input_file.java \
 open_output_file.java \
-close_input_port.java \
 call_with_output_string.java \
 load.java \
 apply.java constant_fold.java \
 map.java \
 callcc.java \
-logand.java logior.java logxor.java lognot.java logop.java \
-logbit_p.java logtest.java logcount.java \
-ashift.java bit_extract.java int_length.java \
+logand.java logior.java logxor.java ashift.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
 require.java \
@@ -130,6 +121,4 @@ define_member_alias.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java \
 TracedProcedure.java \
-null_env.java \
-user_env.java \
 scheme_env.java

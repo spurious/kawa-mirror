@@ -5,6 +5,7 @@ import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.math.IntNum;
 import gnu.bytecode.*;
+import gnu.kawa.reflect.*;
 
 public class syntax_case extends Syntax
 {
@@ -130,14 +131,14 @@ public class syntax_case extends Syntax
             work.inputExpression = let.addDeclaration((String) null);
             work.inputExpression.noteValue(linits[0]);
             work.matchArray = let.addDeclaration((String) null);
-            work.primArrayGet = new PrimArrayGet(Type.pointer_type);
+            work.primArrayGet = new ArrayGet(Type.pointer_type);
             work.matchArray.setType(Compilation.objArrayType);
             work.inputExpression.setCanRead(true);
             work.matchArray.setCanRead(true);
             tr.push(let);
             let.body = rewriteClauses(obj, work, tr);
             tr.pop(let);
-            Procedure arrayNew = new PrimArrayNew(Type.pointer_type);
+            Procedure arrayNew = new ArrayNew(Type.pointer_type);
             Expression[] args = new Expression[1];
             args[0] = new QuoteExp(IntNum.make(work.maxVars));
             linits[1] = new ApplyExp(arrayNew, args);
@@ -177,5 +178,5 @@ class syntax_case_work
   /** The maximum of the varCount() for the patterns seen so far. */
   int maxVars;
 
-  PrimArrayGet primArrayGet;
+  ArrayGet primArrayGet;
 }

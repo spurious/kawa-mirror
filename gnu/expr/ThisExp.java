@@ -49,8 +49,8 @@ public class ThisExp extends ReferenceExp
   {
     if (binding != null)
       return binding.getType();
-    if (context != null && context instanceof ClassExp)
-      return ((ClassExp) context).getType();
+    if (context instanceof ClassExp || context instanceof ModuleExp)
+      return context.getType();
     return Type.pointer_type;
   }
 }

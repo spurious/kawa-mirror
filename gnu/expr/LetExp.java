@@ -19,13 +19,31 @@ public class LetExp extends ScopeExp
 
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
-  static void store_rest (Compilation comp, Declaration decl)
+  void store_rest (Compilation comp, int i, Declaration decl)
   {
     if (decl != null)
       {
-	store_rest (comp, decl.nextDecl());
+	store_rest (comp, i+1, decl.nextDecl());
 	if (decl.needsInit())
-	  decl.initBinding(comp);
+	  {
+	    if (decl.isIndirectBinding())
+	      {
+		CodeAttr code = comp.getCode();
+		if (inits[i] == QuoteExp.undefined_exp)
+		  {
+		    Object name = decl.getSymbol();
+		    comp.compileConstant(name, Target.pushObject);
+		    code.emitInvokeStatic(BindingInitializer.makeLocationMethod(name));
+		  }
+		else
+		  {
+		    decl.pushIndirectBinding(comp);
+		  }
+		code.emitStore(decl.getVariable());
+	      }
+	    else
+	      decl.compileStore(comp);
+	  }
       }
   }
 
@@ -51,7 +69,8 @@ public class LetExp extends ScopeExp
 	Target varTarget;
 	Expression init = inits[i];
         decl.allocateVariable(code);
-	if (! decl.needsInit())
+	if (! decl.needsInit()
+	    || (decl.isIndirectBinding() && inits[i] == QuoteExp.undefined_exp))
 	  varTarget = Target.Ignore;
 	else
 	  {
@@ -72,7 +91,7 @@ public class LetExp extends ScopeExp
     code.enterScope(getVarScope());
 
     /* Assign the initial values to the proper variables, in reverse order. */
-    store_rest (comp, firstDecl());
+    store_rest (comp, 0, firstDecl());
 
     body.compileWithPosition(comp, target);
     code.popScope ();
@@ -103,7 +122,7 @@ public class LetExp extends ScopeExp
 
   public void print (OutPort out, String startTag, String endTag)
   {
-    out.startLogicalBlock(startTag+"#"+id+" outer:"+outer.id, endTag, 2);
+    out.startLogicalBlock(startTag+"#"+id, endTag, 2);
     out.writeSpaceFill();
     printLineColumn(out);
     out.startLogicalBlock("(", false, ")");

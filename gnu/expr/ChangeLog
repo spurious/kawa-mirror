@@ -1,5 +1,42 @@
 2004-12-05  Per Bothner  <per@bothner.com>
 
+	Update for new Symbol/Location changes.
+	* BindingInitializer.java (createNewSymbol): Replace field with
+	new local lookupInEnv in emit.
+	(emit): Looking up Location may need FUNCTION property.
+	(makeLocationMethod): New helper method.
+	* Compilation.java: Various updates.
+	(getEnvironment): New method.
+	* Declaration.java (load): Update kludge for immediate mode.
+	(UNKNOWN_PREFIX): Changed, since it now names Location, not Symbols.
+	(IS_DYNAMIC): New constant.
+	(initBinding): Remove method.
+	(followAliases): Stop if aliased field is non-static.
+	* FindCapturedVars.java (allocUnboundDecl): Handle FUNCTION binding.
+	* FluidLetExp.java (compile, doInits): Rewrite for new fluid handling.
+	* InlineCalls.java: Update.
+	* Interpreter.java (define_method): Remove method.  Replace by
+	(defineFunction): New method.
+	(defineFromFieldValue): Take field instead of name.  Rewrite,
+	(getEnvPropertyFor, getSymbol): New helper methods.
+	(getDefaultSymbolValue, getSymbolValue, getSymbolProcedure): Remove.
+	* ModuleBody.java: Update ClassMemberConstraint -> ClassMemberLocation.
+	* ModuleExp.java (evalModule): Don't do defineAll.
+	* ReferenceExp.java (eval, compile): Update for new Location handling.
+	* SetExp.java (eval, comple): Likewise.
+
+	* LetExp.java: Optimize letrec-like bindings.
+
+	* ModuleExp.java: Implement externalizable.
+	(writeExternal, readExternal): New methods.
+	(LAZY_DECLARATION): New constant.
+	(make): New static method.
+	(firstDecl): New method - get lazy declarations.
+
+	* ThisExp.java (getType): Simplify. Also do getType of ModuleExp.
+
+2004-12-05  Per Bothner  <per@bothner.com>
+
 	* Declaration.java (getCode, setCode): New methods.
  	* Declaration.java (needsExternalAccess): New helper method.
 	(makeField): Use it.
@@ -9,7 +46,7 @@
 
 	* Declaration.java (IS_DYNAMIC): New constant.
 	* Expression.java (setLine): New method.
-	* LambdaExp.java (setType): New type.
+	* LambdaExp.java (setType): New method.
 	* ScopeExp.java (firstDecl): Make non-final, for the sake of ModuleExp.
 
 	* GenericProc.java (methods): Make protected, for new ClassMethodProc.

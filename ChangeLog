@@ -1,3 +1,24 @@
+Sun Mar  7 16:42:02 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/repl.java:  New flags --full-tailscalls and --no-full-tailcalls.
+	* kawa/lang/AutoloadProcedure.java (load):  ModuleBody.run no longer
+	takes any argument.
+	* kawa/lang/AutoloadSyntax.java (load):  Likewise.
+	* kawa/lang/Promise.java:  Change thunk from Procedure0 to Procedure.
+	* kawa/lang/Record.java (typeFieldNames):  Skip static fields.
+	* kawa/standard/Scheme.java (env_formal, moduleFormals):  Removed.
+	* kawa/standard/apply.java:  Handle full tailcall-elimination.
+	* kawa/standard/{let.java,letrec.java}:  Handle type specifiers.
+	* kawa/standard/load.java:  ModuleBody.run no longer takes 
+
+Tue Feb  9 11:39:20 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/{string2symbol,symbol2string}.java:  Replaced
+	by Scheme code in ../lib/misc.scm.
+	* kawa/standard/{sin,cos,tan}.java: Replaced by code in numbers.scm.
+	* kawa/standard/Scheme.java:  Update to get new implementations.
+	* kawa/standard/Makefile.am:  Updated for removed classes.
+
 Mon Feb 22 22:19:00 1999  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.6.57.

@@ -1,0 +1,4 @@
+Mon Mar 31 16:44:57 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* PACKAGES:  New list of "gnu." Java packages.
+	* Makefile.{am, in}:  Contains bytecode and math sub-directories.

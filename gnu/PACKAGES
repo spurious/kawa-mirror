@@ -1,0 +1,23 @@
+This is the master list of Java packages under the "gnu" top-level package.
+If you want your package added, contact Per Bothner <bothner@cygnus.com>.
+Any packages under "gnu" must be freely restributable, though they do not
+have to use the GNU General Public License.  However, we encourage
+people to use the GPL for Java applications;  for re-usable Java
+libraries, a modified GPL (as used by gnu.bytecode and gnu.math)
+may be apporpriate.
+
+gnu,bytecode:  A package to create, read, write, and print .class files.
+  Author:  Per Bothner <bothner@cygnus.com>
+  License:  Modified GPL (no restrictions if code used unchanged).
+  Distributed with Kawa.
+  See:  http:/www.cygnus/com/~/bothner/kawa.html.
+
+gnu.c2j:  A translator to help convert C++ programs to Java.
+  Authors:  ilya tilevich <ilya_tilevich@ibi.com>, Chris Laffra <laffra@ms.com>
+  See: http://pacevm.dac.pace.edu:80/~ny971734/c2j.html
+
+gnu.math:  Complex numbers, rationals, bignums, units, other kinds of numbers.
+  Author:  Per Bothner <bothner@cygnus.com>
+  License:  Modified GPL (no restrictions if code used unchanged).
+  Distributed with Kawa.
+  See:  http:/www.cygnus/com/~/bothner/kawa.html.

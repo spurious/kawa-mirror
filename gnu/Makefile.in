@@ -47,7 +47,7 @@ JAVA_VERSION = @JAVA_VERSION@
 EXTRA_MISC = @EXTRA_MISC@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode
+SUBDIRS = bytecode math
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  Makefile.am Makefile.in

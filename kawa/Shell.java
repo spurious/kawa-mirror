@@ -12,7 +12,7 @@ public class Shell
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Object prompter = env.get (Symbol.make ("default-prompter"));
+	Object prompter = env.get ("default-prompter");
 	if (prompter != null && prompter instanceof Procedure)
 	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
       }
@@ -39,7 +39,7 @@ public class Shell
 	      filename = "<unknown>";
 	    ModuleExp mod = new ModuleExp (new Pair (sexp, List.Empty),
 					   tr, filename);
-	    mod.setName (Symbol.make ("atInteractiveLevel"));  // FIXME
+	    mod.setName("atInteractiveLevel");  // FIXME
 
 	    /* DEBUGGING:
 	    perr.print ("[Re-written expression: ");

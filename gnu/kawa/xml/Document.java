@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -60,9 +60,9 @@ public class Document extends Procedure1
     out.endDocument();
   }
 
-  public static TreeList parse (Object url) throws Throwable
+  public static NodeTree parse (Object url) throws Throwable
   {
-    TreeList doc = new TreeList();
+    NodeTree doc = new NodeTree();
     parse(url, doc);
     return doc;
   }

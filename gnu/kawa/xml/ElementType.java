@@ -31,6 +31,11 @@ implements TypeValue, Externalizable, GroupPredicate
     this.qname = qname;
   }
 
+  public Type getImplementationType()
+  {
+    return Type.pointer_type;
+  }
+
   public final String getNamespaceURI () { return qname.getNamespaceURI(); }
   public final String getLocalName () { return qname.getLocalName(); }
 

@@ -60,7 +60,13 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
+	gnu/mapping gnu/xml gnu/kawa/xml gnu/kawa/xslt gnu/expr \
+	gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions \
+	gnu/kawa/lispexpr gnu/kawa/servlet gnu/kawa/sax gnu/kawa/ant \
+	gnu/kawa/models gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
+	gnu/jemacs gnu/kawa/swingviews gnu/kawa/slib gnu/xquery \
+	gnu/brl gnu/kawa/brl bin
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -211,7 +217,19 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 JAVATOP = 
-SUBDIRS = doc testsuite gnu kawa bin
+SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
+  gnu/mapping $(XML_SUBDIRS) gnu/expr \
+  gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
+  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant gnu/kawa/models \
+  gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
+  $(SWING_SUBDIRS) gnu/kawa/slib $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+
+@ENABLE_XML_TRUE@XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
+@ENABLE_XML_TRUE@BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+@ENABLE_XML_TRUE@XQUERY_SUBDIR = gnu/xquery
+@ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = gnu/kawa/sax
+@ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = gnu/kawa/servlet
+@WITH_SWING_TRUE@SWING_SUBDIRS = gnu/jemacs gnu/kawa/swingviews
 javadir = $(datadir)/java
 JAR = jar
 @WITH_SWING_TRUE@JAR_DEPS_SWING = \
@@ -747,7 +765,6 @@ install-javadoc-html:
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
-	cd gnu;  make install-html HTML_HOME="$(HTML_HOME)"
 
 install-data-am:  install-jar
 install-jar:

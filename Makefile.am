@@ -1,7 +1,26 @@
 ## Process this with automake to create Makefile.in
 
 JAVATOP =
-SUBDIRS = doc testsuite gnu kawa bin
+SUBDIRS = doc testsuite gnu/bytecode gnu/math gnu/lists gnu/text \
+  gnu/mapping $(XML_SUBDIRS) gnu/expr \
+  gnu/kawa/util gnu/kawa/reflect gnu/kawa/functions gnu/kawa/lispexpr \
+  $(SERVLET_SUBDIRS) $(SAX_SUBDIR) gnu/kawa/ant gnu/kawa/models \
+  gnu/commonlisp gnu/q2 gnu/ecmascript kawa \
+  $(SWING_SUBDIRS) gnu/kawa/slib $(XQUERY_SUBDIR) $(BRL_SUBDIRS) bin
+if ENABLE_XML
+XML_SUBDIRS = gnu/xml gnu/kawa/xml gnu/kawa/xslt
+BRL_SUBDIRS = gnu/brl gnu/kawa/brl
+XQUERY_SUBDIR = gnu/xquery
+if WITH_SAX2
+SAX_SUBDIR = gnu/kawa/sax
+endif
+endif
+if ENABLE_SERVLET
+SERVLET_SUBDIRS = gnu/kawa/servlet
+endif
+if WITH_SWING
+SWING_SUBDIRS = gnu/jemacs gnu/kawa/swingviews
+endif
 javadir=$(datadir)/java
 
 JAR = jar
@@ -133,7 +152,6 @@ install-javadoc-html:
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
-	cd gnu;  make install-html HTML_HOME="$(HTML_HOME)"
 
 install-data-am:  install-jar
 install-jar:

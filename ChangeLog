@@ -1,3 +1,9 @@
+2004-12-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS): "Inline" SUBDIRS from gnu and gnu/kawa.
+	(install-html): Don't do into now Makefile-free gnu directory.
+	* configure.in (AC_OUTPUT): Update accordingly.
+
 2004-12-26  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SyntaxPattern.java (literalIdentifierEq,

@@ -1,3 +1,10 @@
+Tue Feb  3 16:41:25 1998  Per Bothner  <bothner@cygnus.com>
+
+	* numbers.scm:  New file with lots of procedures.
+	* characters.scm (char?):  New procedure.
+	* vectors.scm (vector?):  New procedure.
+	* Makefile.am, makefile.in:  Update for new classes.
+
 Tue Jan 27 11:22:08 1998  Per Bothner  <bothner@cygnus.com>
 
 	* port.scm, syntax.scm:  Use <TYPENAME> in place of "TYPENAME".

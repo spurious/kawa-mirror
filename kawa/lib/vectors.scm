@@ -1,3 +1,6 @@
+(define (vector? x)
+  (instance? x <vector>))
+
 (define (vector-length x)
   ((primitive-virtual-method <vector> "length" <int> ())
    x))

@@ -34,6 +34,7 @@ OBJ=\
   keywords.class \
   ports.class \
   misc.class \
+  numbers.class \
   quantities.class \
   strings.class \
   syntax.class \
@@ -46,6 +47,7 @@ OBJ=\
 # into valid Java class names.
 SECONDARY_OBJS=\
   characters$$char_2_integer.class \
+  characters$$char_P.class \
   characters$$char__downcase.class \
   characters$$char__lower__case_P.class \
   characters$$char__numeric_P.class \
@@ -67,6 +69,22 @@ SECONDARY_OBJS=\
   keywords$$string_2_keyword.class \
   misc$$environment__bound_P.class \
   misc$$scheme__implementation__version.class \
+  numbers$$abs.class \
+  numbers$$complex_P.class \
+  numbers$$denominator.class \
+  numbers$$exp.class \
+  numbers$$log.class \
+  numbers$$make__polar.class \
+  numbers$$make__rectangular.class \
+  numbers$$number_P.class \
+  numbers$$numerator.class \
+  numbers$$quantity_P.class \
+  numbers$$quotient.class \
+  numbers$$rational_P.class \
+  numbers$$real_P.class \
+  numbers$$real__part.class \
+  numbers$$remainder.class \
+  numbers$$zero_P.class \
   ports$$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \
@@ -95,6 +113,7 @@ SECONDARY_OBJS=\
   thread$$exit.class \
   vectors$$list_2_vector.class \
   vectors$$vector__length.class \
+  vectors$$vector_P.class \
   vectors$$vector__ref.class \
   vectors$$vector__set_B.class \
   reflection$$lambda.class \

@@ -1,3 +1,8 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* XslTranslator.java: Update for removing of ElementConstructor and
+	AttributeConstructor.  Likewise use of SName.  Other cleanups.
+
 2004-08-08  Per Bothner  <per@bothner.com>
 
 	* XSLT.java (process):  Use new check0 API.

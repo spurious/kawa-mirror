@@ -23,10 +23,16 @@ public class XslTranslator extends Lexer implements Consumer
   Stack elements = new Stack();
   StringBuffer nesting = new StringBuffer(100);
   ModuleExp mexp;
+
+  /** We seen a beginAttribute but the closing endAttribute. */
+  boolean inAttribute;
+  /** The 'attribute name' from the most recent beginAttribute. */
   String attributeName;
+  /** The 'attribute type' from the most recent beginAttribute. */
   Object attributeType;
-  AttributeConstructor attributeConstructor;
+  /** Buffer to acumulate the value of the current attribute. */
   StringBuffer attributeValue = new StringBuffer(100);
+
   XSLT interpreter;
   XMLParser parser;
 
@@ -54,18 +60,22 @@ public class XslTranslator extends Lexer implements Consumer
 	  return null;
 	ApplyExp aexp = (ApplyExp) el;
 	Expression function = aexp.getFunction();
-	if (! (function instanceof QuoteExp))
+	if (aexp.getFunction() != MakeAttribute.makeAttributeExp)
 	  return null;
-	Object fun = ((QuoteExp) function).getValue();
-	if (! (fun instanceof AttributeConstructor))
+	Expression[] args = aexp.getArgs();
+	if (args.length != 2)
 	  return null;
-	AttributeConstructor attrCon = (AttributeConstructor) fun;
-	Symbol qname = attrCon.getQName();
-	if (qname.getLocalName() == name &&
-	    qname.getNamespaceURI() == ns)
+	Expression arg0 = args[0];
+	if (! (arg0 instanceof QuoteExp))
+	  return null;
+	Object tag = ((QuoteExp) arg0).getValue();
+	if (! (tag instanceof SName))
+	  return null;
+	SName stag = (SName) tag;
+	if (stag.getLocalPart() == name && stag.getNamespaceURI() == ns)
 	  {
 	    elements.removeElementAt(i);
-	    return (String) ((QuoteExp) aexp.getArgs()[0]).getValue();
+	    return (String) ((QuoteExp) args[1]).getValue();
 	  }
       }
     return null;
@@ -86,10 +96,8 @@ public class XslTranslator extends Lexer implements Consumer
   {
     if (type instanceof QuoteExp)
       type = ((QuoteExp) type).getValue();
-    if (type instanceof XName)
-      type = ((XName) type).getQName();
-    else if (type instanceof ElementConstructor)
-      type = ((ElementConstructor) type).getQName();
+    if (type instanceof SName)
+      type = ((SName) type).getSymbol();
     if (! (type instanceof Symbol))
       return null;
     Symbol qname = (Symbol) type;
@@ -108,108 +116,51 @@ public class XslTranslator extends Lexer implements Consumer
     String xslTag = isXslTag(type);
     if (xslTag == "template")
       {
-	///if (templateLambda != null)
-	// error();
+	if (templateLambda != null)
+	  error("nested xsl:template");
 	templateLambda = new LambdaExp();
 	//templateLambda.setFile(getName());
 	//templateLambda.setLine(declLine, declColumn);
       }
-    nesting.append((char) elements.size());
-    Symbol qname;
     if (type instanceof XName)
-      qname = ((XName) type).getQName();
-    else
-      qname = (Symbol) type;
-    push(ElementConstructor.make(typeName, qname));
-    /*
-    String xslcommand = ...;
-    Expression[] args;
-    if (inTemplate)
       {
-	if (curXSLcommand == null)
-	  {
-	    args = new Expression[3];
-	    args[0] = new ReferenceExp(consumerDecl);
-	    args[1] = new QuoteExp(typeName);
-	    args[2] = new QuoteExp(type);  // FIXME
-	    append(new ApplyExp(beginGroupMethod, args));
-	  }
-	else
-	  {
-	    elements.add(typeName);
-	    elements.add(type);
-	    // error("unimplemented xsl command "+xslcommand);
-	  }
+	// This gets rid of namespace "nodes".   That's not really right.
+	// We do want to get rid of xmlns:xsl, though, at least.  FIXME.
+	XName xn = (XName) type;
+	type = new SName(xn.getSymbol(), xn.getPrefix());
       }
-    else
-      {
-      }
-    */
+    nesting.append((char) elements.size());
+    push(type);
   }
 
   public void beginAttribute(String attrName, Object attrType)
   {
-    // if (attributeName != null) ERROR();
+    if (inAttribute)
+      error('f', "internal error - attribute inside attribute");
     attributeName = attrName;
     attributeType = attrType;
-    Symbol qname;
-    if (attrType instanceof XName)
-      qname = ((XName) attrType).getQName();
-    else
-      qname = (Symbol) attrType;
-    attributeConstructor = AttributeConstructor.make(attrName, qname);
     attributeValue.setLength(0);
     nesting.append((char) elements.size());
-    /*
-    if (inTemplate)
-      {
-	if (curXSLcommand == null)
-	  {
-	  }
-	else
-	  {
- 	    elements.add(attrName);
-	    elements.add(attrType);
-	  }
-      }
-    */
+    inAttribute = true;
   }
 
   public void endAttribute()
   {
-    Expression[] args = { new QuoteExp(attributeValue.toString()) };
-    push(new ApplyExp(attributeConstructor, args));
+    Expression[] args = new Expression[2];
+    args[0] = new QuoteExp(attributeType);
+    args[1] = new QuoteExp(attributeValue.toString());
+    push(new ApplyExp(MakeAttribute.makeAttributeExp, args));
     nesting.setLength(nesting.length()-1);
-    attributeConstructor = null;
-    attributeType = null;
-    attributeName = null;
+    inAttribute = false;
   }
 
   public void endGroup(String typeName)
   {
-    /*
-    if (inTemplate)
-      {
-	if (curXSLcommand == null)
-	  {
-	    args = new Expression[2];
-	    args[0] = new ReferenceExp(consumerDecl);
-	    args[1] = new QuoteExp(typeName);
-	    append(new ApplyExp(endGroupMethod, args));
-	  }
-	else
-	  {
-	  }
-      }
-    else
-      {
-      }
-    */
     int nlen = nesting.length()-1;
     int start = nesting.charAt(nlen);
     nesting.setLength(nlen);
-    Expression constructor = (Expression) elements.elementAt(start);
-    String xslTag = isXslTag(constructor);
+    Expression startTag = (Expression) elements.elementAt(start);
+    String xslTag = isXslTag(startTag);
     if (xslTag == "value-of")
       {
 	String select = popMatchingAttribute("", "select", start + 1);
@@ -268,11 +219,11 @@ public class XslTranslator extends Lexer implements Consumer
       }
     else
       {
-	Expression[] args = new Expression[elements.size() - start - 1];
+	Expression[] args = new Expression[elements.size() - start];
 	for (int i = args.length;  --i >= 0; )
 	  args[i] = (Expression) elements.pop();
-	elements.pop();
-	Expression exp = new ApplyExp(constructor, args);
+	// FIXME does not preserve namespace attributes.
+	Expression exp = new ApplyExp(MakeElement.makeElement, args);
 	push(exp);
 	mexp.body = exp;
       }
@@ -280,7 +231,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeChar(int v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(String.valueOf((char) v));
@@ -298,7 +249,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeBoolean(boolean v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(v ? QuoteExp.trueExp : QuoteExp.falseExp);
@@ -306,7 +257,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeFloat(float v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(DFloNum.make(v));
@@ -314,7 +265,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeDouble(double v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(DFloNum.make(v));
@@ -322,7 +273,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeInt(int v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(IntNum.make(v));
@@ -330,7 +281,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeLong(long v)
   { 
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(IntNum.make(v));
@@ -353,7 +304,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeObject(Object v)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(v);
     else
       push(v);
@@ -361,7 +312,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void writeChars(String str)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(str);
     else
       push(str);
@@ -369,7 +320,7 @@ public class XslTranslator extends Lexer implements Consumer
 
   public void write(char[] buf, int off, int len)
   {
-    if (attributeType != null)
+    if (inAttribute)
       attributeValue.append(buf, off, len);
     else
       push(new String(buf, off, len));
@@ -385,11 +336,16 @@ public class XslTranslator extends Lexer implements Consumer
     return (Expression) elements.pop();
   }
 
+  public void error (char kind, String message)
+  {
+    getMessages().error(kind, message);
+  }
+
   /*
   public void fatal(String message) throws SyntaxException
   {
-    messages.error('f', message);
-    throw new SyntaxException(messages);
+    getMessages().error('f', message);
+    throw new SyntaxException(getMessages());
   }
   */
 

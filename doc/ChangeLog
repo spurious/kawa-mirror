@@ -1,3 +1,7 @@
+2004-06-27  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes):  Document new throws: specifier.
+
 2004-05-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (DOCBOOK_XSLT):  New macro.

@@ -4246,7 +4246,7 @@ Currently, the @var{formal-arguments} cannot contain optional, rest,
 or keyword parameters.  (The plan is to allow optional parameters,
 implemented using multiple overloaded methods.)
 
-A @var{method-decl} in @code{define-simple-class}
+A @var{method-decl} in a @code{define-simple-class}
 can have the following @var{option-keyword}s:
 @table @asis
 @item @code{access:} @var{kind}
@@ -4255,6 +4255,16 @@ Can be one of @code{'private}, @code{'protected},
 @code{'public}, or @code{'package}.
 @item @code{allocation:} @var{kind}
 If @var{kind} is @code{'class} or @code{'static} creates a static method.
+@item @code{throws:} ( @var{exception-class-name} ... )
+Specifies a list of checked exception that the method may throw.
+Equivalent to a @code{throws} specification in Java code.
+For example:
+@example
+(define-simple-class <T>
+  (prefix)
+  ((lookup name) throws: (<java.io.FileNotFoundException>)
+   (make <java.io.FileReader> (string-append prefix name))))
+@end example
 @end table
 
 The scope of the @var{body} of a method includes the @var{field-decl}s

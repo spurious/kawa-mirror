@@ -174,22 +174,31 @@ public class InPort extends FilterInputStream
     int c = readChar ();
     if (c < 0)
       throw new EofReadError (this, "unexpected EOF in character literal");
+    int origc = c;
     if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
       {
 	unreadChar ();
 	Symbol name = readSymbol ();
-	for (int i = Char.charNames.length; ; )
-	  {
-	    if (--i < 0)
-	      throw new ReadError (this,
-				   "unknown character name: "
-				   + name.toString());
-	    if (Char.charNames[i] == name)
-	      {
-		c = Char.charNameValues[i];
-		break;
-	      }
-	  }
+        int i = Char.charNames.length; 
+        for ( ; ; ) {
+           if (--i < 0) {
+              break;
+           }
+           if (Char.charNames[i] == name) {
+              c = Char.charNameValues[i];
+             break;
+           }
+        }
+        if (i<0) {
+           if (name.toString().length()>1) {
+              throw new ReadError (
+                 this,
+                 "unknown character name: " + name.toString()
+              );
+           } else {
+              c = origc;
+           }
+        }
       }
     return Char.make((char)c);
   }

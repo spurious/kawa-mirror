@@ -1,3 +1,20 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	Support two languages "krl" (experimental) and "brl" (BRL-compatible).
+	* BRL.java (getInstance):  Now take a 'compatible' flag.
+	(getKrlInstance, getBrlInstance):  New static methods.
+	(brlCompatible):  New field.
+	(isBrlCompatible, setBrlCompatible):  New methods.
+	(getLexer, parseFile):  Set lexer's compatible flag according to ours.
+	(getOutputConsumer):  If compatible emit standard Scheme output.
+	(makeBody):  If compatible, return standard BeginExp.
+	* BRLRead.java (brlCompatible):  New field.
+	(isBrlCompatible, setBrlCompatible):  New methods.
+	(readObject):  If compatible, ]string[ is read as a regular <string>.
+	* BRLReaderString.java (read):  Ditto.
+
+	* BRL.java (<init>):  Load stringfun and progfun standard modules.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	New package - an experimental re-implemntation of BRL.

@@ -15,24 +15,56 @@ public class BRL extends Scheme
   {
     instance = this;
     ModuleBody.setMainPrintValues(true);
+    Environment.setCurrent(getEnvironment());
+    try
+      {
+	loadClass("gnu.brl.stringfun");
+	loadClass("gnu.brl.progfun");
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+	  System.err.println("caught "+ex);
+      }
   }
 
-  public static Scheme getInstance()  //sic!
+  public static Interpreter getInstance(boolean brlCompatible)
   {
     if (instance == null)
       new BRL ();
+    instance.setBrlCompatible(brlCompatible);
+    return instance;
+  }
+
+  public static BRL getKrlInstance()
+  {
+    getInstance(false);
     return instance;    
   }
+
+  public static BRL getBrlInstance()
+  {
+    getInstance(true);
+    return instance;    
+  }
+
+  boolean brlCompatible = false;
+
+  public boolean isBrlCompatible() { return brlCompatible; }
+  public void setBrlCompatible(boolean compat) {  brlCompatible = compat; }
 
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     Compilation.usingTailCalls = true;
-    return new BRLRead(inp, messages);
+    BRLRead lexer = new BRLRead(inp, messages);
+    lexer.setBrlCompatible(isBrlCompatible());
+    return lexer;
   }
 
   public Consumer getOutputConsumer(OutPort out)
   {
-    return new XMLPrinter(out);
+    if (isBrlCompatible())
+      return super.getOutputConsumer(out);
+    return new XMLPrinter(out, false);
   }
 
   public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
@@ -47,6 +79,7 @@ public class BRL extends Scheme
     try
       {
 	BRLRead lexer = new BRLRead(port, messages);
+	lexer.setBrlCompatible(isBrlCompatible());
 	boolean inString = true;
 	Object sexp = lexer.brlReader.read(lexer, ']', 0);
         for (;;)
@@ -88,6 +121,8 @@ public class BRL extends Scheme
 
   public Expression makeBody(Expression[] exps)
   {
+    if (isBrlCompatible())
+      return super.makeBody(exps);
     return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues, exps);
   }
 

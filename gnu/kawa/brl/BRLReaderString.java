@@ -7,7 +7,7 @@ package gnu.kawa.brl;
 import gnu.kawa.lispexpr.*;
 import gnu.text.*;
 import gnu.mapping.InPort;
-import gnu.lists.UnescapedData;
+import gnu.lists.*;
 
 public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry
 {
@@ -86,9 +86,14 @@ public class BRLReaderString extends gnu.kawa.lispexpr.ReadTableEntry
 			    }
 		    }
 	
-		String str = new String(in.tokenBuffer, startPos,
-					in.tokenBufferLength - startPos);
-		return new UnescapedData(str);
+		int length = in.tokenBufferLength - startPos;
+		if (((BRLRead) in).isBrlCompatible())
+		  return new FString(in.tokenBuffer, startPos, length);
+		else
+		  {
+		    String str = new String(in.tokenBuffer, startPos, length);
+		    return new UnescapedData(str);
+		  }
 	    }
 	finally
 	    {

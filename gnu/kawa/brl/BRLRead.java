@@ -3,8 +3,7 @@ import gnu.kawa.lispexpr.*;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;
 import gnu.text.SourceMessages;
-import gnu.lists.UnescapedData;
-import gnu.lists.Sequence;
+import gnu.lists.*;
 
 /** A class to read Scheme forms (S-expressions). */
 
@@ -70,8 +69,11 @@ public class BRLRead extends LispReader
 		int length = tokenBufferLength - startPos;
 		if (length > 0)
 		  {
-		    return new UnescapedData(new String(tokenBuffer,
-							startPos, length));
+		    if (isBrlCompatible())
+		      return new FString(tokenBuffer, startPos, length);
+		    else
+		      return new UnescapedData(new String(tokenBuffer,
+							  startPos, length));
 		  }
 		else if (ch < 0)
 		  return Sequence.eofValue; // FIXME;
@@ -117,6 +119,14 @@ public class BRLRead extends LispReader
     brlReadTable.set(c, brlReader);
   }
 
+  boolean brlCompatible = false;
+
+  public boolean isBrlCompatible() { return brlCompatible; }
+  public void setBrlCompatible(boolean compat)
+  {
+    brlCompatible = compat;
+    initialColonIsKeyword = compat;
+  }
 
   public static ReadTable brlReadTable;
   static

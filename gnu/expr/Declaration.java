@@ -111,8 +111,22 @@ public class Declaration
     else
       {
 	Variable var = getVariable();
+	if (context instanceof ClassExp && var == null && ! getFlag(PROCEDURE))
+	  {
+	    ClassExp cl = (ClassExp) context;
+	    if (cl.isMakingClassPair())
+	      {
+		String getName = ClassExp.slotToMethodName("get", getName());
+		Method getter = cl.type.getDeclaredMethod(getName, 0);
+		cl.loadHeapFrame(comp);
+		code.emitInvoke(getter);
+		return;
+	      }
+	  }
 	if (var == null)
-	  var = allocateVariable(code);
+	  {
+	    var = allocateVariable(code);
+	  }
 	code.emitLoad(var);
       }
   }

@@ -349,7 +349,10 @@ public class Symbol extends Location implements Externalizable
 
   public String toString()
   {
-    return getName();
+    String uri = getNamespaceURI();
+    if (uri == null || uri.length() == 0)
+      return getName();
+    return '{'+getNamespaceURI()+"}"+getName();
   }
 
   public void writeExternal(ObjectOutput out) throws IOException

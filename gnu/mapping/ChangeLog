@@ -1,3 +1,7 @@
+2002-12-11  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (toString):  Also display getNamespaceURI() if non-empty.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* Environment.java: Implement Externalizable.

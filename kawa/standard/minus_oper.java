@@ -14,7 +14,22 @@ public class minus_oper extends ProcedureN
     int ival = 0;
     double dval = 0.0;
     boolean isInteger = true;
-    for (int i = 0; i < args.length; i++)
+    int i = 0;
+    if (args.length > 1)
+      {
+	Object arg = args[0];
+	if (arg instanceof Double)
+	  {
+	    isInteger = false;
+            dval = ((Double)arg).doubleValue();
+	  }
+	else if (arg instanceof Integer)
+	  ival = ((Integer)arg).intValue();
+	else
+	  throw new WrongType(this.name, 1,"number");
+	i++;
+      }
+    for (; i < args.length; i++)
       {
 	Object arg = args[i];
 	if (arg instanceof Double)

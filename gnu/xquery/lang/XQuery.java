@@ -155,9 +155,11 @@ public class XQuery extends Interpreter
 	loadClass("gnu.kawa.slib.HTTP");
 	loadClass("gnu.kawa.slib.XStrings");
       }
-    catch (java.lang.ClassNotFoundException ex)
+    catch (Throwable ex)
       {
-	// Ignore - gnu.kawa.slib.HTTP is only built if servlets enabled.
+	// Ignore.  We get a ClassNotFoundException if gnu.kawa.slib.HTTP
+	// was not built.  We get a NoClassDefFoundError if gnu.kawa.slib.HTTP
+	// can't find servlets in the classpath.
       }
 
     define("define", new kawa.standard.set_b());

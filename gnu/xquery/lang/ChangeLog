@@ -1,3 +1,7 @@
+2002-11-20  Per Bothner  <bothner@bothner.com>
+
+	* XQuery.java (<init>):  Recover from missing servlet classes.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseFunctionDefinition):  Parse QName function name.

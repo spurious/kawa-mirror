@@ -14,11 +14,6 @@
 (define (%defmacro form rule)
   (rule (car (form 'form))))
 
-;; A future version may allow (this [<CLASS>])
-(define-syntax this
-  (lambda (__arg)
-    (make <gnu.expr.ThisExp>)))
-
 (define (gentemp)
   ((primitive-static-method <gnu.expr.Symbol> "gentemp"
 			    <symbol> ())))

@@ -76,7 +76,6 @@ public abstract class Procedure implements Named
   /** Check that the number of arguments in a call is valid.
     * @param proc the Procedure being called
     * @param argCount the number of arguments in the call
-    * @return nothing, if the number of arguments is ok
     * @exception WrongArguments there are too many or too
     *     few actual arguments
     */

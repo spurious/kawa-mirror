@@ -81,7 +81,7 @@ public class KawaPageServlet extends KawaServlet
 	    Compilation comp;
 	    try
 	      {
-		comp = interp.parse(port, messages, interp.PARSE_IMMEDIATE);
+		comp = language.parse(port, messages, Language.PARSE_IMMEDIATE);
 		String name = path.substring(path.lastIndexOf('/')+1,
 					     path.indexOf('.'));
 		comp.getModule().setName(name);

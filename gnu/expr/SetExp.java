@@ -102,7 +102,8 @@ public class SetExp extends Expression
 	comp.compileConstant (name);
 	comp.method.maybe_compile_checkcast (comp.scmSymbolType);
 	new_value.compile (comp, Target.pushObject);
-	code.emitInvokeStatic(comp.defineGlobalMethod);
+	code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
+			      : comp.putGlobalMethod);
       }
 
     comp.compileConstant(Values.empty, target);

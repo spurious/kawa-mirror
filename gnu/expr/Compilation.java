@@ -60,6 +60,7 @@ public class Compilation
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
+  static Method putGlobalMethod;
   static Method makeListMethod;
   static Method searchForKeywordMethod;
   
@@ -83,6 +84,10 @@ public class Compilation
     Type[] symObjArgs = { scmSymbolType, scmObjectType };
     defineGlobalMethod
       = scmEnvironmentType.addMethod ("define_global", symObjArgs,
+				       Type.void_type,
+				       Access.PUBLIC|Access.STATIC);
+    putGlobalMethod
+      = scmEnvironmentType.addMethod ("put_global", symObjArgs,
 				       Type.void_type,
 				       Access.PUBLIC|Access.STATIC);
   }

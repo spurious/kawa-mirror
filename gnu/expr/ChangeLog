@@ -1,3 +1,9 @@
+Fri Jul 24 16:11:36 1998  Lynn Quam <quam@ai.sri.com>
+
+	* Compilation.java (putGlobalMethod):  New static field.
+	* SetExp.java (compile):  If !isDefining(), compile
+	putGlobalMethod instead of defineGlobalMethod.
+
 Wed Jul 22 21:42:42 1998  Per Bothner  <bothner@cygnus.com>
 
 	New directory.  Files mostly moved from ../../kawa/lang.

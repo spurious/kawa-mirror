@@ -1,9 +1,6 @@
 (define (string? x) :: <boolean>
   (instance? x <string>))
 
-(define (string=? x y) :: <boolean>
-  (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
-
 (define (make-string (n :: <int>) #!optional (ch #\Space)) :: <string>
   (make <string> n ch))
 
@@ -16,6 +13,48 @@
 (define (string-set! (string :: <abstract-string>) (k <int>) (char <char>))
   :: <void>
   (invoke string 'setCharAt k char))
+
+(define (string=? x y) :: <boolean>
+  (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
+
+(define (string-ci=? x y) :: <boolean>
+  (invoke (invoke x 'toString) 'equalsIgnoreCase (invoke y 'toString)))
+
+(define (string<? x y) :: <boolean>
+  (< (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
+
+(define (string>? x y) :: <boolean>
+  (> (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
+
+(define (string<=? x y) :: <boolean>
+  (<= (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
+
+(define (string>=? x y) :: <boolean>
+  (>= (invoke (invoke x 'toString) 'compareTo (invoke y 'toString)) 0))
+
+(define (string-ci<? x y) :: <boolean>
+  (< (invoke (invoke (invoke x 'toString) 'toLowerCase)
+	     'compareTo
+	     (invoke (invoke y 'toString) 'toLowerCase))
+     0))
+
+(define (string-ci>? x y) :: <boolean>
+  (> (invoke (invoke (invoke x 'toString) 'toLowerCase)
+	     'compareTo
+	     (invoke (invoke y 'toString) 'toLowerCase))
+     0))
+
+(define (string-ci<=? x y) :: <boolean>
+  (<= (invoke (invoke (invoke x 'toString) 'toLowerCase)
+	      'compareTo
+	      (invoke (invoke y 'toString) 'toLowerCase))
+      0))
+
+(define (string-ci>=? x y) :: <boolean>
+  (>= (invoke (invoke (invoke x 'toString) 'toLowerCase)
+	      'compareTo
+	      (invoke (invoke y 'toString) 'toLowerCase))
+      0))
 
 (define (substring (str <abstract-string>) (start <int>) (end <int>))
   :: <string>

@@ -8,6 +8,7 @@ javadir=$(datadir)/java/$(subdir)
 
 java_JAVA=\
   Binding.java \
+  CallFrame.java CallStack.java CpsProcedure.java \
   Environment.java \
   Future.java \
   HasSetter.java \

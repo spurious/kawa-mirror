@@ -1,3 +1,14 @@
+Sun Mar  7 16:45:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+ 	* CallStack.java:  New class.
+	* CpsProcedure.java:  New class (extends ProcedureN).
+	* CallFrame.java:  New class (extends CpsProcedure).
+	* Makefile.am (java_JAVA), Makefile.in:  Add new source files.
+	* Procedure.java (noArgs):  New static field.
+	(apply(CallStack)):  New overloading method.
+	* ProcedureN.java (apply0):  Use Procedure.noArgs.
+	* Values.java (empty):  Change to use Procedure.noArgs.
+
 Thu Nov 26 12:38:53 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* Makefile.am (java_JAVA), Makefile.in:  Add NameMap.java.

@@ -134,7 +134,6 @@ public class CommonLisp extends Lisp2
       }
     catch (java.lang.ClassNotFoundException ex)
       {
-	  System.err.println("caught "+ex);
 	// Ignore - happens while building this directory.
       }
 

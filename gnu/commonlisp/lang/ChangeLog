@@ -1,3 +1,7 @@
+2001-11-15  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (<init>):  Remove unwanted error message.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	* Lisp2.java:  Now extends new LispInterpreter class.

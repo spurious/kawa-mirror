@@ -719,11 +719,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp
-	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
-	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
-	echo 'export CLASSPATH' >>tmp
-	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
-	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+@WITH_GCJ_TRUE@	echo 'exec `echo "$$0" | sed -e '"'"'s|/kawa[^/]*$$|/kawa-bin|'"'"'` "$$@"' >> tmp
+@WITH_GCJ_FALSE@	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
+@WITH_GCJ_FALSE@	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+@WITH_GCJ_FALSE@	echo 'export CLASSPATH' >>tmp
+@WITH_GCJ_FALSE@	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
+@WITH_GCJ_FALSE@	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
 	chmod +x tmp
 	mv tmp kawa.sh
 

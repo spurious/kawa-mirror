@@ -44,11 +44,15 @@ endif
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp
+if WITH_GCJ
+	echo 'exec `echo "$$0" | sed -e '"'"'s|/kawa[^/]*$$|/kawa-bin|'"'"'` "$$@"' >> tmp
+else
 	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \
 	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
+endif
 	chmod +x tmp
 	mv tmp kawa.sh
 

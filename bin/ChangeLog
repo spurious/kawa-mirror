@@ -1,3 +1,7 @@
+2003-05-18  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (kawa.sh):  If --with-gcj, just exec kawa-bin.
+
 2003-05-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Various fixes.  bin_SCRIPTS is set to gckawa

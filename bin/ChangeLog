@@ -1,3 +1,7 @@
+2001-04-10  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWA2_OFILES):  Update gnu-kawa-xml.o -> gnu-xml.o.
+
 2001-03-23  Per Bothner  <per@bothner.com>
 
 	New directory.

@@ -42,7 +42,7 @@ KAWA1_OFILES = \
 KAWA2_OFILES = $(KAWA1_OFILES) \
   kawa-lib.o \
   gnu-kawa-slib.o \
-  gnu-kawa-xml.o
+  gnu-xml.o
 
 kawa1$(exeext): $(KAWA1_OFILES)
 	 gcj -o kawa1$(exeext) $(KAWA1_OFILES) --main=kawa.repl

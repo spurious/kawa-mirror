@@ -121,7 +121,7 @@ KAWA1_OFILES = \
 KAWA2_OFILES = $(KAWA1_OFILES) \
   kawa-lib.o \
   gnu-kawa-slib.o \
-  gnu-kawa-xml.o
+  gnu-xml.o
 
 
 ENABLE_GCJ_COMPILED = kawa-bin$(exeext)

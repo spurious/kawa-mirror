@@ -1,3 +1,10 @@
+2004-03-09  Per Bothner  <per@bothner.com>
+
+	* NodeName.java (nodeName):  If name is XName, extract its QName.
+
+	* NodeType.java (DOCUMENT_OK):  New constant.
+	(isInstance):  If kind is a DOCUMENT_VALUE, check DOCUMENT_OK.
+
 2004-02-15  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (rewrite):  Move handling to scanForDefinitions.

@@ -102,6 +102,7 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Types::
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
+* XML tools::            Tools for working with XML
 * Mailing lists::        Where to report bugs, discuss changes, etc
 * Projects::             Projects using Kawa
 * License::
@@ -3368,7 +3369,7 @@ which yields the implementing @code{<@var{classname}>}.
 For some examples, you may want to look in the @code{gnu/kawa/slib}
 directory.
 
-@node Low-level functions, Mailing lists, Objects Classes and Modules, Top
+@node Low-level functions, XML tools, Objects Classes and Modules, Top
 @chapter The Scheme-Java interface
 
 Kawa has extensive features so you can work with Java objects
@@ -3645,7 +3646,39 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node Mailing lists, Projects, Low-level functions, Top
+@node XML tools, Mailing lists, Low-level functions, Top
+@chapter Tools for working with XML
+
+Kawa has a number of experimental features for working with XML.
+These are built on the concepts of the @code{gnu.lists} package.
+
+@subsection Scheme functions
+
+@defun make-element tag [attribute ...] child ...
+Create a representation of a XML element, corresponding to
+@example
+<@var{tag} @var{attribute}...>@var{child}...</@var{tag}>
+@end example
+The result is a @code{TreeList}, though if the result context is a consumer
+the result is instead "written" to the consumer.
+Thus nested calls to @code{make-element} only result in a
+single @code{TreeList}.
+More generally, whether an @var{attribute} or @var{child} is includded
+by copying or by reference is (for now) undefined.
+The @var{tag} should currently be a symbol, though in the future it should
+be a qualified name.
+An @var{attribute} is typically a call to @code{amke-attribute},
+but it can be any attribute-valued expression.
+@end defun
+
+@defun make-attribute name value...
+Create an "attribute", which is a name-value pair.
+For now, @var{name} should be a symbol
+@end defun
+
+@subsection xquery language
+
+@node Mailing lists, Projects, XML tools, Top
 @chapter Mailing lists
 
 If you have a problem installing or using Kawa,

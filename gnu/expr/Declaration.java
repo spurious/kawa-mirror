@@ -108,6 +108,8 @@ public class Declaration extends Variable
    * If the variable can be set more than once, then value is null. */
   Expression value = QuoteExp.undefined_exp;
 
+  public Expression getValue() { return value; }
+
   static final int INDIRECT_BINDING = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
@@ -193,9 +195,12 @@ public class Declaration extends Variable
   public Declaration (String s, Type type)
   {
     sym = s;
-    name = Compilation.mangleName(s);
-    if (s.equals(name))
-      name = s;
+    if (s != null)
+      {
+        name = Compilation.mangleName(s);
+        if (s.equals(name))
+          name = s;
+      }
     setType(type);
   }
 

@@ -14,14 +14,24 @@ public class ExitExp extends Expression
   BlockExp block;
   Expression result;
 
+  public ExitExp(Expression result, BlockExp block)
+  {
+    this.result = result;
+    this.block = block;
+  }
+
+  public ExitExp(BlockExp block)
+  {
+    this.result = QuoteExp.voidExp;
+    this.block = block;
+  }
+
   public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();
     Expression res = result == null ? QuoteExp.voidExp : result;
     res.compileWithPosition(comp, block.subTarget);
     code.emitGoto(block.exitLabel);
-    // Normally target is an IgnoreTarget, but just in case it isn't:
-    QuoteExp.voidExp.compile(comp, target);
   }
 
   Object walk (ExpWalker walker) { return walker.walkExitExp(this); }
@@ -29,7 +39,7 @@ public class ExitExp extends Expression
   public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%exit ");
-    if (block == null)
+    if (block == null || block.label == null)
       ps.print("<unknown>");
     else
       ps.print(block.label.getName());

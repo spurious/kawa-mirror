@@ -14,6 +14,13 @@ public class BeginExp extends Expression
 
   public BeginExp (Expression[] ex) { exps = ex; }
 
+  public BeginExp(Expression exp0, Expression exp1)
+  {
+    exps = new Expression[2];
+    exps[0] = exp0;
+    exps[1] = exp1;
+  }
+
   public Expression[] getExpressions() { return exps; }
 
   public Object eval (Environment env)

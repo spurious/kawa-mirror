@@ -9,6 +9,19 @@
 
 	* LambdaExp.java:  Provide a cache for evaluated value.
 
+	* BlockExp.java (exitBody):  New field.
+	(setBody):  New overloaded methods.
+	(compile): Handle exitBody.  Set this.exitLabel.
+	* Declaration.java (getValue):  New method.
+	(<init>(String, Type)):  Handle the name being null.
+	* IfExp.java (compile):  Optimize if else part is ExitExp.
+	* ExpFullWalker.java (walkBlockExp, walkExitExp):  New methods.
+	* ExitExp.java (<init>):  New constructors.
+	(compile):  Remove bogus compilation of void.	
+	* BeginExp.java (<init>):  New convenience constructor.
+	* LetExp.java (getBody, setBody):  New methods.
+	* ReferenceExp.java (<init>):  New overloaded constructor.
+
 1999-08-18  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (getName):  Use super.getName() instead of

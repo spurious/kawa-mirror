@@ -14,6 +14,20 @@ public class BlockExp extends Expression
   Declaration label;
   Expression body;
 
+  /** If non-null, evaluate this, but on if non-normal exit. */
+  Expression exitBody;
+
+  public void setBody(Expression body)
+  {
+    this.body = body;
+  }
+
+  public void setBody(Expression body, Expression exitBody)
+  {
+    this.body = body;
+    this.exitBody = exitBody;
+  }
+
   /* Target used to evaluate body. Temporary only used during compilation. */
   Target subTarget;
   /* Label to exit to.  Temporary only used during compilation. */
@@ -21,6 +35,7 @@ public class BlockExp extends Expression
 
   public void compile (Compilation comp, Target target)
   {
+    Target subTarget;
     if (target instanceof IgnoreTarget
 	|| target == Target.pushObject)
       subTarget = target;
@@ -31,9 +46,19 @@ public class BlockExp extends Expression
 	subTarget = new StackTarget(getType());
       }
     gnu.bytecode.CodeAttr code = comp.getCode();
-    Label exitLabel = new Label(code);
+    exitLabel = new Label(code);
+    this.subTarget = exitBody == null ? subTarget : Target.Ignore;
     body.compileWithPosition(comp, subTarget);
-    exitLabel.define(code);
+    if (exitBody != null)
+      {
+        Label doneLabel = new Label(code);
+        code.emitGoto(doneLabel);
+        exitLabel.define(code);
+        exitBody.compileWithPosition(comp, subTarget);
+        doneLabel.define(code);
+      }
+    else
+      exitLabel.define(code);
     if (subTarget != target)
       target.compileFromStack(comp, subTarget.getType());
   }
@@ -43,9 +68,15 @@ public class BlockExp extends Expression
   public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%block ");
-    ps.print(label.getName());
+    if (label != null)
+      ps.print(label.getName());
     ps.print(' ');
     body.print(ps);
+    if (exitBody != null)
+      {
+        ps.print(" else ");
+        exitBody.print(ps);
+      }
     ps.print(')');
   }
 }

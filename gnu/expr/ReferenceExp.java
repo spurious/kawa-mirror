@@ -38,6 +38,12 @@ public class ReferenceExp extends Expression
     this.binding = binding;
   }
 
+  public ReferenceExp (Declaration binding)
+  {
+    this.binding = binding;
+    this.symbol = binding.getName();
+  }
+
   public Object eval (Environment env)
   {
     if (binding != null)

@@ -63,6 +63,13 @@ public class IfExp extends Expression
 	else
 	  falseLabel = ((ConditionalTarget) target).ifFalse;
       }
+    else if (else_clause instanceof ExitExp
+             && ((ExitExp) else_clause).result instanceof QuoteExp
+             && ((ExitExp) else_clause).block.subTarget instanceof IgnoreTarget)
+      {
+        falseInherited = true;
+        falseLabel = ((ExitExp) else_clause).block.exitLabel;
+      }
     else
       {
 	falseInherited = false;
@@ -101,6 +108,8 @@ public class IfExp extends Expression
 	else
 	  else_clause.compileWithPosition(comp, target);
       }
+    else
+      code.setUnreachable();
     code.emitFi();
   }
 

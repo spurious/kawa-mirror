@@ -13,6 +13,9 @@ public class LetExp extends ScopeExp
 
   public LetExp (Expression[] i) { inits = i; }
 
+  public Expression getBody() { return body; }
+  public void setBody(Expression body) { this.body = body; }
+
   Method makeBindingMethod = null;
 
   /* Recursive helper routine, to store the values on the stack

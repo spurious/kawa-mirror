@@ -45,6 +45,20 @@ public class ExpFullWalker extends ExpWalker
     return exp;
   }
 
+  public Object walkBlockExp(BlockExp exp)
+  {
+    exp.body = (Expression) exp.body.walk(this);
+    if (exitValue == null)
+      exp.exitBody = (Expression) exp.exitBody.walk(this);
+    return exp;
+  }
+
+  public Object walkExitExp(ExitExp exp)
+  {
+    exp.result = (Expression) exp.result.walk(this);
+    return exp;
+  }
+
   public Object walkLetExp (LetExp exp)
   {
     exp.inits = walkExps (exp.inits);

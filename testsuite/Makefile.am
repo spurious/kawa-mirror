@@ -64,7 +64,7 @@ APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
 check-scribble: scribble.class
-	CLASSPATH=.:.. $(APPLETVIEWER) $(srcdir)/scribble.html
+	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. file:$(srcdir)/scribble.html
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm

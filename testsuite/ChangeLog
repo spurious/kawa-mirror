@@ -1,3 +1,9 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-scribble):  Handle appletviewer changes in JDK:
+	CLASSPATH environment variable is ignored, so use -J flags.
+	The filename should be a URL, so prepend 'file:'.
+
 2001-06-04  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWALIB):  Change to use .jar file.

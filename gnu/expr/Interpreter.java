@@ -362,9 +362,16 @@ public abstract class Interpreter
    * @return a new Compilation.
    *   May return null if PARSE_ONE_LINE on end-of-file.
    */
-  public abstract Compilation parse(InPort port,
+  public final Compilation parse(InPort port,
 				    gnu.text.SourceMessages messages,
 				    int options)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    Lexer lexer = getLexer(port, messages);
+    return parse(lexer, options);
+  }
+
+  public abstract Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException;
 
   public abstract Type getTypeFor(Class clas);
@@ -542,6 +549,7 @@ public abstract class Interpreter
 	ctx.consumer = ctx.vstack;
 	ctx.values = Values.noArgs;
 	eval(port, ctx);
+	// FIXME maybe use startFromContext/getFromContext?
 	return Values.make((gnu.lists.TreeList) ctx.vstack);
       }
     finally

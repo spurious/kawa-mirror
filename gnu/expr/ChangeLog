@@ -1,3 +1,8 @@
+2003-11-06  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (parse): Change abstract method to take a Lexer.
+	Add final method with older interface.
+
 2003-11-05  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (<init>):  Use setName method.

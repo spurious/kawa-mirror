@@ -1,3 +1,12 @@
+2004-05-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseContent):  Changes to fix space handling.
+	* XQParser.java (parseXMLConstructor):  Use MakeCData for CDATA.
+	Handle direct processing instruction constructor.
+
+	* XQParser.java (parseMaybePrimaryExpr):  Update for TextConstructor
+	being renamed to MakeText.
+
 2004-05-08  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (OP_COMMENT, OP_PI, OP_DOCUMENT):  New token codes.

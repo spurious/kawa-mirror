@@ -1777,7 +1777,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
-  /** Parse ElementContent (delimiter == '<')  or AttributeContext (otherwise).
+  /** Parse ElementContent (delimiter == '<')  or AttributeContent (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
    *   '\"' if parsing AttributeContent depending on the starting quote
    * @param result a buffer to place the resulting Expressions.
@@ -1786,17 +1786,34 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     tokenBufferLength = 0;
-    boolean preserve = preserveBoundarySpace || delimiter != '<';
+    int prevEnclosed = result.size() - 1;
+    boolean skipBoundarySpace = ! preserveBoundarySpace && delimiter == '<';
+    boolean skippable = skipBoundarySpace;
+    Expression makeText = null;
     for (;;)
       {
 	int next = read();
-	if ((next < 0 || next == '{' || next == delimiter)
-	    && tokenBufferLength > 0)
+	if (next == delimiter && delimiter != '<' && checkNext(delimiter))
 	  {
-	    if (preserve)
+	    tokenBufferAppend(delimiter);
+	    continue;
+	  }
+	if (next == delimiter || next < 0 || next == '{')
+	  {
+	    if (tokenBufferLength > 0 && ! skippable)
 	      {
-		String str = new String(tokenBuffer, 0, tokenBufferLength);
-		result.addElement(new QuoteExp(str));
+		Expression str
+		  = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength));
+		result.addElement(str);
+	      }
+	    else if (next == '{' && prevEnclosed == result.size())
+	      {
+		
+		Expression[] args = { new QuoteExp("") };
+		if (makeText == null)
+		  makeText = makeFunctionExp("gnu.kawa.xml.MakeText",
+					     "makeText");
+		result.addElement(new ApplyExp(makeText, args));
 	      }
 	    tokenBufferLength = 0;
 	  }
@@ -1808,16 +1825,18 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (next == '{')
 	      {
 		tokenBufferAppend('{');
-		preserve = true;
+		skippable = false;
 	      }
 	    else
 	      {
 		unread(next);
 		Expression exp = parseEnclosedExpr();
 		if (delimiter != '<')
-		  exp = stringValue(exp);
+		  exp = stringValue(exp); // FIXME
 		result.addElement(exp);
 		tokenBufferLength = 0;
+		prevEnclosed = result.size();
+		skippable = skipBoundarySpace;
 	      }
 	  }
 	else if (next == '}')
@@ -1826,7 +1845,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (next == '}')
 	      {
 		tokenBufferAppend('}');
-		preserve = true;
+		skippable = false;
 	      }
 	    else
 	      {
@@ -1838,10 +1857,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (delimiter != '<')
 	      {
-		if (checkNext(delimiter))
-		  tokenBufferAppend(delimiter);
-		else
-		  break;
+		break;
 	      }
 	    else
 	      {
@@ -1850,17 +1866,18 @@ public class XQParser extends LispReader // should be extends Lexer
 		  break;
 		result.addElement(parseXMLConstructor(next));
 		tokenBufferLength = 0;
+		skippable = skipBoundarySpace;
 	      }
 	  }
 	else if (next == '&')
 	  {
 	    parseEntityOrCharRef();
-	    preserve = true;
+	    skippable = false;
 	  }
 	else
 	  {
-	    if (! preserve)
-	      preserve = ! Character.isWhitespace((char) next);
+	    if (skippable)
+	      skippable = Character.isWhitespace((char) next);
 	    tokenBufferAppend((char) next);
 	  }
       }
@@ -1978,8 +1995,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    getDelimited("]]>");
 	    Expression[] args =
 	      { new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength)) };
-	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.TextConstructor",
-					       "textConstructor"),
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.MakeCDATA",
+					       "makeCDATA"),
 			       args);
 	  }
 	else
@@ -1987,7 +2004,18 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (next == '?')
       {
-	exp = syntaxError("<? (processing instructions) not implemented");
+	next = peek();
+	if (next < 0 || ! isNameStart((char) next)
+	    || getRawToken() != NCNAME_TOKEN)
+	  syntaxError("missing target after '<?'");
+	String target = new String(tokenBuffer, 0, tokenBufferLength);
+	skipSpace();
+	getDelimited("?>");
+	String content = new String(tokenBuffer, 0, tokenBufferLength);
+	Expression[] args = { new QuoteExp(target), new QuoteExp(content) };
+	exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.MakeProcInst",
+					   "makeProcInst"),
+			   args);
       }
     else
       {
@@ -2512,8 +2540,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	      func = makeFunctionExp("gnu.kawa.xml.CommentConstructor",
 				     "commentConstructor");
 	    else /* kind == 't' */
-	      func = makeFunctionExp("gnu.kawa.xml.TextConstructor",
-				     "textConstructor");
+	      func = makeFunctionExp("gnu.kawa.xml.MakeText",
+				     "makeText");
 	    char saveReadState = pushNesting('{');
 	    peekNonSpace("unexpected end-of-file after '{'");
 	    if (curToken != '{')

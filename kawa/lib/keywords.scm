@@ -1,17 +1,9 @@
-(define (keyword? object)
-  ((primitive-static-method <keyword> "isKeyword"
-			    "boolean" (<object>))
-   object))
+(define (keyword? object) :: <boolean>
+  (invoke-static <keyword> 'isKeyword object))
 
-(define (keyword->string keyword)
-  ((primitive-constructor <string> (<String>))
-   ((primitive-virtual-method <keyword> "getName" <String> ())
-    keyword)))
-;  ((primitive-virtual-method <keyword> "toSchemeString"
-;			     <string> ())
-;   keyword))
+(define (keyword->string (keyword :: <keyword>)) :: <string>
+  (make <string>
+    (invoke keyword 'getName)))
 
-(define (string->keyword string)
-  ((primitive-static-method <keyword> "make"
-			    <keyword> ("String"))
-   string))
+(define (string->keyword (string :: <String>)) :: <keyword>
+  (invoke-static <keyword> 'make string))

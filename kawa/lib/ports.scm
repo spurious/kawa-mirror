@@ -102,10 +102,9 @@
 (define (close-output-port (port :: <output-port>))
   (invoke port 'close))
 
-(define (transcript-on filename)
-  ((primitive-static-method <output-port> "setLogFile" <void>
-			    (<String>))
-   filename))
+(define (transcript-on filename) :: <void>
+  (invoke-static <output-port> 'setLogFile (invoke filename 'toString)))
 
 (define (transcript-off)
-  ((primitive-static-method <output-port> "closeLogFile" <void> ())))
+  (invoke-static <output-port> 'closeLogFile))
+

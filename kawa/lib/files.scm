@@ -49,15 +49,11 @@
   
 (define (%file-separator)
   (symbol->string
-   ((primitive-static-method <java.lang.System> "getProperty"
-			     <String> (<String>))
-    'file.separator)))
+   (invoke-static <java.lang.System> 'getProperty 'file.separator)))
 
 (define (system-tmpdir)
-  (let ((name
-	 ((primitive-static-method <java.lang.System> "getProperty"
-				   <String> (<String>))
-	  'java.io.tmpdir))) ; Java2 only
+  (let ((name ; Java2 only
+	 (invoke-static <java.lang.System> 'getProperty 'java.io.tmpdir)))
     (if (not (eq? name #!null))
 	(symbol->string name)
 	(let ((sep (%file-separator)))

@@ -120,7 +120,6 @@
 (define (integer-length (i :: <integer>)) :: <int>
   (invoke i 'intLength))
 
-(define (number->string arg #!optional (radix :: <int> 10))
+(define (number->string (arg :: <number>) #!optional (radix :: <int> 10))
   (make <string>
-    ((primitive-virtual-method <number> 'toString <String> (<int>))
-     arg radix)))
+    (invoke arg 'toString radix)))

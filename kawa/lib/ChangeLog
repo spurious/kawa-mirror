@@ -1,5 +1,12 @@
 2001-11-05  Per Bothner  <per@bothner.com>
 
+	* files.scm, keywords.scm, lists.scm, misc.scm, numbers.scm, ports.scm,
+	reflection.scm:  Various updates to avoid using <String> in conjunction
+	with a primite-xxx-mmethod macro, which can cause some confusion.
+	Mostly use invoke, invoke-static, or make, plus more type declarations.
+
+2001-11-05  Per Bothner  <per@bothner.com>
+
 	* syntax.scm:  Add Lars T Hansen's implementation of let-values
 	and let*values.  [srfi-11]
 

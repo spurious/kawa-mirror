@@ -1,22 +1,18 @@
 ;;; RECORDS
 
-(define (make-record-type name fnames)
-  ((primitive-static-method <record> "makeRecordType"
-			    <class-type> (<String> <list>))
-   name fnames))
+(define (make-record-type (name :: <String>) (fnames :: <list>))
+  (invoke-static <record> 'makeRecordType name fnames))
 
 (define (record-constructor cl #!optional (flds #!null))
   ((primitive-constructor <kawa.lang.RecordConstructor>
 			  (<class-type> <object>))
    cl flds))
 
-(define (record-accessor class fname)
-  ((primitive-constructor "kawa.lang.GetFieldProc" (<class-type> "String"))
-   class fname))
+(define (record-accessor (class :: <class-type>) (fname :: <String>))
+  (make <kawa.lang.GetFieldProc> class fname))
 
-(define (record-modifier class fname)
-  ((primitive-constructor <kawa.lang.SetFieldProc> (<class-type> "String"))
-   class fname))
+(define (record-modifier (class :: <class-type>) (fname :: <String>))
+  (make <kawa.lang.SetFieldProc> class fname))
 
 (define (record? obj)
   (instance? obj <record>))
@@ -92,7 +88,7 @@
 		 (constant-fold
 		  (primitive-constructor
 		   <kawa.lang.GetFieldProc>
-		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 1 #|PUBLIC|#))))
 (define-syntax primitive-set-field
@@ -101,7 +97,7 @@
 		 (constant-fold
 		  (primitive-constructor
 		   <kawa.lang.SetFieldProc>
-		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 1 #|PUBLIC|#))))
 
@@ -111,7 +107,7 @@
 		 (constant-fold
 		  (primitive-constructor
 		   <gnu.kawa.reflect.StaticGet>
-		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 (define-syntax primitive-set-static
@@ -120,7 +116,7 @@
 		 (constant-fold
 		  (primitive-constructor
 		   <gnu.kawa.reflect.StaticSet>
-		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
+		   (<gnu.bytecode.ClassType> <java.lang.String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
 

@@ -16,9 +16,7 @@
   (make <string> s))
 
 (define (string->symbol (str <string>))
-  ((primitive-virtual-method <String> "intern" <symbol> ())
-   ((primitive-virtual-method <object> "toString" <String> ())
-    str)))
+  (invoke (invoke str 'toString) 'intern))
 
 (define (procedure? x)
   (and (instance? x <function>) (not (instance? x <gnu.mapping.Location>))))

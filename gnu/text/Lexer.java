@@ -25,6 +25,8 @@ public class Lexer extends Reader
     this.messages = messages;
   }
 
+  public final LineBufferedReader getPort() { return port; }
+
   public void close() throws java.io.IOException
   {
     port.close();
@@ -204,4 +206,32 @@ public class Lexer extends Reader
     return overflow ? -1 : ival;
   }
 
+  public String getName() { return port.getName(); }
+  public int getLineNumber() { return port.getLineNumber(); }
+  public int getColumnNumber() { return port.getColumnNumber(); }
+
+  /** For building token of various kinds. */
+  public char[] tokenBuffer = new char[100];
+
+  /** The number of chars of tokenBuffer that are used. */
+  public int tokenBufferLength = 0;
+
+  /** Append one character to tokenBuffer, resizing it if need be. */
+  public void tokenBufferAppend(int ch)
+  {
+    if (ch > 0x10000)
+      {
+	// append surrogates - fixme.
+      }
+    int len = tokenBufferLength;
+    char[] buffer = tokenBuffer;
+    if (len == tokenBuffer.length)
+      {
+	tokenBuffer = new char[2 * len];
+	System.arraycopy(buffer, 0, tokenBuffer, 0, len);
+	buffer = tokenBuffer;
+      }
+    buffer[len] = (char) ch;
+    tokenBufferLength = len + 1;
+  }
 }

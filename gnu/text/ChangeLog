@@ -1,3 +1,13 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* Char.java (nameToChar):  Try looking for named char, ignoring case.
+	If we see C-X (for any X), return the corresponding control character.
+
+	* Lexer.java (getName, getLineNumber, getColumnNumber):  New methods.
+
+	* Lexer.java (tokenBuffer, tokenBufferLength):  New public fields.
+	(tokenBufferAppend):  New method.
+
 2000-08-16  Per Bothner  <per@bothner.com>
 
 	* ReportFormat.java (getParam):  If no args passed return defaultValue.

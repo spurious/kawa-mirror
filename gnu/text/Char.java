@@ -112,10 +112,14 @@ public class Char implements Printable, Externalizable
 
   public static int nameToChar(String name)
   {
-    
     for (int i = charNames.length; --i >= 0 ; )
       {
         if (charNames[i].equals(name))
+          return charNameValues[i];
+      }
+    for (int i = charNames.length; --i >= 0 ; )
+      {
+        if (charNames[i].equalsIgnoreCase(name))
           return charNameValues[i];
       }
     int len = name.length();
@@ -132,6 +136,18 @@ public class Char implements Printable, Externalizable
 	    value = (value << 4) + dig;
 	  }
       }
+
+    // Check for Emacs control character syntax.
+    if (len == 3 && name.charAt(1) == '-')
+      {
+	char ch = name.charAt(0);
+	if (ch == 'c' || ch == 'C')
+	  {
+	    ch = name.charAt(2);
+	    return ch & 31;
+	  }
+      }
+
     return -1;
   }
 

@@ -1,3 +1,19 @@
+2000-08-17  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java (open, deleteRange):  New methods.
+	* CharBuffer.java (deleteRange):  New method.
+
+	* FVector.java (length):  New field.  Supports variable-length.
+	(add(Object)):  New method.  (Compatible with java.util.List.)
+	
+	* ConstantString.java:  New class, extends AbstractString.
+
+	* Consumer.java:  New interface.
+	* Consumable.java:  New interface.
+	* Collector.java:  New class.
+	* ConsumeProc.java:  New class.
+	* Makefile.am (java_JAVA):  Update for new classes.
+
 2000-06-24  Per Bothner  <per@bothner.com>
 
 	* AbstractString.java:  Implement gnu.mapping.Printable.

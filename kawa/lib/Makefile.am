@@ -6,7 +6,7 @@ SUFFIXES = .java .scm .class
 
 KAWA = $(JAVA) kawa.repl
 JAVAC = $(KAWA)
-JAVACFLAGS = -P kawa.lib. -C
+JAVACFLAGS = -P kawa.lib. --module-static -C
 
 javadir=$(datadir)/java/$(subdir)
 

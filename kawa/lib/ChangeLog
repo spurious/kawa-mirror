@@ -1,3 +1,10 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (JAVACFLAGS):  Add --module-static flag.
+
+	* trace.scm (%do-trace):  Incorrect primitive-static-method replaced
+	by invoke-static.
+
 2000-04-17  Per Bothner  <per@bothner.com>
 
 	* strings.scm: Use invoke/invoke-static more.

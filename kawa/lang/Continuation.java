@@ -2,7 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 
 /**
- * A Continuation "rerpesents an entire (default) future for the computation.
+ * A Continuation "represents an entire (default) future for the computation.
  * This implemementation is based on Java exceptions, and is restricted
  * to "upward" (?) continuation (i.e. catch/throw-type uses).
  * @author	Per Bothner

@@ -10,18 +10,57 @@ public class WrongArguments extends IllegalArgumentException {
 
   Procedure proc;
 
+  /** Returns an error message if the number of arguments in a call is valid.
+    * @param proc the Procedure being called
+    * @param argCount the number of arguments in the call
+    * @return null, if the number of arguments is ok;
+    *     otherwise a suitable error message
+    */
+  public static String checkArgCount (Procedure proc, int argCount)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xfff;
+    int max = num >> 12;
+    boolean tooMany;
+    if (argCount < min)
+      tooMany = false;
+    else if (max >= 0 && argCount > max)
+      tooMany = true;
+    else
+      return null;
+    StringBuffer buf = new StringBuffer(100);
+    buf.append("call to `");
+    buf.append(proc.getName());
+    buf.append("' has too ");
+    buf.append(tooMany ? "many" : "few");
+    buf.append(" arguments (");
+    buf.append(argCount);
+    if (min == max)
+      {
+	buf.append("; must be ");
+	buf.append(min);
+      }
+    else
+      {
+	buf.append("; min=");
+	buf.append(min);
+	if (max >= 0)
+	  {
+	    buf.append(", max=");
+	    buf.append(max);
+	  }
+      }
+    buf.append(')');
+    return buf.toString();
+  }
+
   public String getMessage()
   {
     if (proc != null)
       {
-	int x = proc.minArgs();
-	if (number < x)
-	  return "too few arguments ("+number+ 
-	    ") to "+proc.name()+" (requires "+x+")";
-	x = proc.maxArgs();
-	if (x >= 0 && number > x)
-	  return "too many argments ("+number+ 
-	    ") to "+proc.name()+" (at most "+x+")";
+	String msg = checkArgCount(proc, number);
+	if (msg != null)
+	  return msg;
       }
     return super.getMessage();
   }

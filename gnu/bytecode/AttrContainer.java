@@ -7,6 +7,9 @@ package gnu.bytecode;
 
 public interface AttrContainer
 {
+  /** Get the (first) Attribute of this container. */
   public Attribute getAttributes ();
+
+  /** Set the (list of) Attributes of this container. */
   public void setAttributes (Attribute attribute);
 }

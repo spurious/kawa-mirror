@@ -4,11 +4,13 @@
 package gnu.bytecode;
 import java.io.*;
 
-/* Represents an Attribute of an AttrContainer.
- * Various sub-classses are used for standard attributes,
- * or you can use MiscAttr for a generic attribute.
- * @author      Per Bothner
- */
+/**
+  * Represents an Attribute of an AttrContainer.
+  * <p>
+  * Various sub-classses are used for standard attributes,
+  * or you can use MiscAttr for a generic attribute.
+  * @author      Per Bothner
+  */
 
 public abstract class Attribute
 {

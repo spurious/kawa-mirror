@@ -1,6 +1,8 @@
 package gnu.bytecode;
 
-/** Abstract class object reference types.
+/**
+  * Abstract class object reference types.
+  * <p>
   * Extended by ClassType and ArrayType. */
 
 public abstract class ObjectType extends Type

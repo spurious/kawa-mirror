@@ -1,3 +1,8 @@
+2004-04-17  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inline):  Suppress most warnings if the flag
+	warn-invoke-unknown-method flag is turned off.
+
 2004-02-11  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (getMethods - two overloads):  New parameter

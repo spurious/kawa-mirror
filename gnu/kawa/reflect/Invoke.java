@@ -406,7 +406,9 @@ public class Invoke extends ProcedureN implements CanInline
 			  }
 		      }
 		  }
-                if (index < 0)
+                if (index < 0
+		    && comp.getBooleanOption("warn-invoke-unknown-method",
+					     true))
 		  {
 		    walker.error('w',
 			       "more than one definitely applicable method `"
@@ -417,15 +419,17 @@ public class Invoke extends ProcedureN implements CanInline
               }
 	    else if (okCount == 0)
 	      {
-		walker.error('w',
-			   "no definitely applicable method `"
-			   +name+"' in "+type.getName());
+		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+		  walker.error('w',
+			       "no definitely applicable method `"
+			       +name+"' in "+type.getName());
 	      }
             else
 	      {
-		walker.error('w',
-			   "more than one possibly applicable method `"
-			   +name+"' in "+type.getName());
+		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+		  walker.error('w',
+			       "more than one possibly applicable method `"
+			       +name+"' in "+type.getName());
 		for (int i = 0;  i < okCount; )
 		  walker.error('w', "candidate: " + methods[i]);
 	      }

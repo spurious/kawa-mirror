@@ -1,3 +1,7 @@
+2003-10-28  Per Bothner  <per@bothner.com>
+
+	* Make-rules (DONT_EDIT_SUBS):  Move to gnu/xml/Makefile.am.
+
 2003-10-21  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.7.90.

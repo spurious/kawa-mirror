@@ -1,3 +1,7 @@
+2003-11-20  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run):  Better error robustness.
+
 2003-11-14  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/string_append.java:  Removed class.

@@ -209,11 +209,12 @@ public class Shell
 	    try
 	      {
 		Compilation comp = interp.parse(lexer, opts);
+		boolean sawError = messages.checkErrors(perr, 20);
 		if (comp == null) // ??? end-of-file
 		  break;
-		comp.getModule().setName("atInteractiveLevel");  // FIXME
-		if (messages.checkErrors(perr, 20))
+		if (sawError)
 		  continue;
+		comp.getModule().setName("atInteractiveLevel");  // FIXME
 
 		// Skip whitespace, in case somebody calls (read-char) or similar.
 		int ch;
@@ -251,6 +252,8 @@ public class Shell
 	      {
 		e.printAll(perr, 20);
 		e.clear();
+		if (! interactive)
+		  return;
 	      }
 	    catch (java.io.IOException e)
 	      {

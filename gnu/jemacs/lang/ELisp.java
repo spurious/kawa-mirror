@@ -185,26 +185,14 @@ public class ELisp extends Lisp2
   public static ELisp getInstance()
   {
     if (instance == null)
-      {
-        Environment saveEnv = Environment.getCurrent();
-        try
-          {
-            instance = new ELisp();
-          }
-        finally
-          {
-            Environment.setCurrent(saveEnv);
-          }
-      }
+      instance = new ELisp();
     return instance;
   }
 
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    ELisp interp = new ELisp();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Language.setDefaults(new ELisp());
   }
 
   public Object read (InPort in)

@@ -134,26 +134,14 @@ public class CommonLisp extends Lisp2
   public static CommonLisp getInstance()
   {
     if (instance == null)
-      {
-        Environment saveEnv = Environment.getCurrent();
-        try
-          {
-            instance = new CommonLisp();
-          }
-        finally
-          {
-            Environment.setCurrent(saveEnv);
-          }
-      }
+      instance = new CommonLisp();
     return instance;
   }
 
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    CommonLisp interp = new CommonLisp();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    Language.setDefaults(new CommonLisp());
   }
 
   public Object read (InPort in)

@@ -1,3 +1,8 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (registerEnvironment): Use new setDefaults method.
+	(<init>): Don't get Environment - might cause NullPointerException.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* defun.java (rewriteForm): Use setSymbol(Object), since

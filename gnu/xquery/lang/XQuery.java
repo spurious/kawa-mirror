@@ -486,8 +486,8 @@ public class XQuery extends Language
     if (instance == null)
       instance = this;
 
-    Environment saveEnv = Environment.getCurrent();
     /*
+    Environment saveEnv = Environment.getCurrent();
     try
       {
 	Environment.setCurrent(scmEnv);
@@ -612,9 +612,7 @@ public class XQuery extends Language
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    XQuery language = new XQuery();
-    Language.setDefaultLanguage(language);
-    Environment.setGlobal(language.getEnvironment());
+    Language.setDefaults(new XQuery());
   }
 
   public static final ConstantFunction0 falseFunction

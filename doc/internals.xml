@@ -2275,6 +2275,50 @@ signature/interfaces.  Perhaps we can use Java interface types.</para>
 -->
 </sect1>
 
+<sect1 id="Module-initialization"><title>Module initialization</title>
+<para>
+A number of things need to happen before we evaluate a module,
+and the order these things are done is important.
+Here we give an overview.</para>
+<itemizedlist>
+<listitem>
+<para>
+Creation of literal values.
+</para>
+<para>
+In immediate mode, we want to use the exact same literal values
+as in the source forms.  ince we cannot embed the values in the bytecode,
+we have to pass them in from the run-time environment.
+As in non-immediate mode, the compiler generates fields for the
+literals, but does not generate code to set the fields.
+Instead, it uses reflection to set the fields.
+This has to be done after the class is initialized,
+which means we cannot place anything that depends on the literals
+in the class initializer.
+(Alternatively, the class initializer could access the literals table
+using a thread-local variable, and use that to initialize the literal fields.)
+</para>
+</listitem>
+<listitem>
+<para>
+Initializing public fields for exported declarations.
+Each expored declarations has an associated public field
+that can be accessed by other modules.
+These are usually <function>final</function> fields.
+</para>
+</listitem>
+<listitem>
+<para>
+Evaluating the top-level forms aka the model-level statements and expressions.
+In a static module, this code is in the class initializer (check this).
+In a non-statric module (including immeediate mode), this is
+placed in <function>run</function> method.
+In a static method, these actions are also done in the class initializer.
+</para>
+</listitem>
+</itemizedlist>
+</sect1>
+
 <sect1 id="Low-level"><title>Low-level Java access</title>
 <para>
 Many implementations of a high-level language provide an interface

@@ -1,3 +1,7 @@
+2005-02-01  Per Bothner  <per@bothner.com>
+
+	* internals.xml (Module initialization): New section.
+
 2004-12-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Projects): Update Nice description and

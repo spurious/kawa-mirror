@@ -169,4 +169,25 @@ public class Values extends TreeList implements Printable, Externalizable
     else
       return values;
   }
+
+  public static void writeValues(Object value, Consumer out)
+  {
+    if (value instanceof Values)
+      {
+	((Values) value).consume(out);
+	/*
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  writeValues(values[i], out);
+	*/
+      }
+    /*
+    else if (value instanceof Consumable)
+      {
+	((Consumable) value).consume(out);
+      }
+    */
+    else
+      out.writeObject(value);
+  }
 }

@@ -207,25 +207,6 @@ public class CallContext implements Runnable
   /** Write values (of function result) to current consumer. */
   public void writeValue(Object value)
   {
-    if (value instanceof Values)
-      {
-	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  writeValue(values[i]);
-      }
-    else
-      /*
-    if (value instanceof Consumable)
-      {
-	/ *
-	Object[] values = ((Values) value).getValues();
-	for (int i = 0;  i < values.length;  i++)
-	  writeValue(values[i]);
-	* /
-	((Consumable) value).consume(consumer);
-      }
-    else
-*/
-      consumer.writeObject(value);
+    Values.writeValues(value, consumer);
   }
 }

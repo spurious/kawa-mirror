@@ -1,3 +1,8 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* Values.java (writeValues):  New static method.
+	* CallContext.java (writeValues):  Use Values' new writeValues method.
+
 2001-10-25  Per Bothner  <per@bothner.com>
 
 	* Values.java (nextIndex, nextValue):  New static helper method

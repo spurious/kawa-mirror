@@ -24,7 +24,7 @@ public class vector_v extends ProcedureN implements Compilable
   {
     if (vectorConstant == null)
       {
-	ClassType thisType = new ClassType ("kawa.standard.vector");
+	ClassType thisType = new ClassType ("kawa.standard.vector_v");
 	vectorConstant = thisType.new_field ("vectorProcedure", thisType,
 					     Access.PUBLIC|Access.STATIC);
       }

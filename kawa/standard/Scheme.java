@@ -259,14 +259,14 @@ public class Scheme extends Interpreter
       define_proc ("char-ci<=?", "kawa.standard.char_ci_less_equal_p");
       define_proc ("char-ci>=?", "kawa.standard.char_ci_greater_equal_p");
       define_proc ("char-alphabetic?", "kawa.standard.char_alphabetic_p");
-      define_proc ("char-numeric?", "kawa.standard.char_numeric_p");
-      define_proc ("char-whitespace?", "kawa.standard.char_whitespace_p");
-      define_proc ("char-upper-case?", "kawa.standard.char_upper_case_p");
-      define_proc ("char-lower-case?", "kawa.standard.char_lower_case_p");
-      define_proc ("char->integer", "kawa.standard.char2integer");
-      define_proc ("integer->char", "kawa.standard.integer2char");
-      define_proc ("char-upcase", "kawa.standard.char_upcase");
-      define_proc ("char-downcase", "kawa.standard.char_downcase");
+      define_proc ("char-numeric?", "kawa.lib.characters");
+      define_proc ("char-whitespace?", "kawa.lib.characters");
+      define_proc ("char-upper-case?", "kawa.lib.characters");
+      define_proc ("char-lower-case?", "kawa.lib.characters");
+      define_proc ("char->integer", "kawa.lib.characters");
+      define_proc ("integer->char", "kawa.lib.characters");
+      define_proc ("char-upcase", "kawa.lib.characters");
+      define_proc ("char-downcase", "kawa.lib.characters");
       
       //-- Section 6.7  -- complete
       define_proc ("string?", "kawa.standard.string_p");
@@ -299,10 +299,10 @@ public class Scheme extends Interpreter
       define_proc ("vector?", "kawa.standard.vector_p");
       define_proc ("make-vector", "kawa.standard.make_vector");
       define ("vector", kawa.standard.vector_v.vectorProcedure);
-      define_proc ("vector-length", "kawa.standard.vector_length");
-      define_proc ("vector-ref", "kawa.standard.vector_ref");
-      define_proc ("vector-set!", "kawa.standard.vector_set_b");
-      define_proc ("list->vector", "kawa.standard.list2vector");
+      define_proc ("vector-length", "kawa.lib.vectors");
+      define_proc ("vector-ref", "kawa.lib.vectors");
+      define_proc ("vector-set!", "kawa.lib.vectors");
+      define_proc ("list->vector", "kawa.lib.vectors");
       define_proc ("vector->list", "kawa.standard.vector2list");
       define_proc ("vector-fill!", "kawa.standard.vector_fill_b");
       // Extension:
@@ -379,6 +379,10 @@ public class Scheme extends Interpreter
       define_proc ("logcount", "kawa.standard.logcount");
       define_proc ("bit-extract", "kawa.standard.bit_extract");
       define_proc ("integer-length", "kawa.standard.int_length");
+
+      define ("primitive-virtual-method",new kawa.standard.prim_method(false));
+      define ("primitive-static-method", new kawa.standard.prim_method(true));
+      define ("primitive-op1", new kawa.standard.prim_method());
 
       //-- (when cond exp ...)
       define_syntax ("when", "kawa.lib.when_unless");

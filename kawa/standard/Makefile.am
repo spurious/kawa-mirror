@@ -14,6 +14,7 @@ javadir=$(prefix)/java/$(subdir)
 OBJ=\
 set_b.class \
 quasiquote.class \
+prim_method.class \
 not.class \
 boolean_p.class \
 and_or.class \
@@ -101,14 +102,6 @@ char_ci_less_equal_p.class \
 char_ci_greater_p.class \
 char_ci_greater_equal_p.class \
 char_alphabetic_p.class \
-char_numeric_p.class \
-char_whitespace_p.class \
-char_upper_case_p.class \
-char_lower_case_p.class \
-char2integer.class \
-integer2char.class \
-char_upcase.class \
-char_downcase.class \
 string_p.class \
 make_string.class \
 string_v.class \
@@ -134,11 +127,7 @@ string_fill_b.class \
 vector_p.class \
 make_vector.class \
 vector_v.class \
-vector_length.class \
-vector_ref.class \
-vector_set_b.class \
 vector2list.class \
-list2vector.class \
 vector_fill_b.class \
 vector_append.class \
 force.class \
@@ -194,7 +183,7 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES=$(OBJ)
+CLEANFILES = *.class
 
 all: $(OBJ)
 

@@ -1,5 +1,13 @@
 2003-09-04  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (compile):  Remove redundant error checks.
+	* LambdaExp.java (isClassGenerated):  Simplify.
+	(restArgType):  Check for CallContext parameter.
+	(addMethodFor):  When CALL_USING_CONSUMER or _TAILCALLS generate stubs
+	and methods with real arguments in addition to CallContext.
+	(allocChildClasses, allocParameters, enterFunction):  Related changes.
+	* Compilation.java (generateApplyMethods):  Likewise.
+
 	* Compilation.java (defaultCallConvention):  New static field.
 	(CALL_WITH_UNSPECIFIED, CALL_WITH_RETURN, CALL_WITH_CONSUMER,
 	CALL_WITH_TAILCALLS, CALL_WITH_CONTINUATIONS):  New constants.

@@ -1113,7 +1113,8 @@ public class Compilation
     Method save_method = method;
     CodeAttr code = null;
     for (int i = defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
-	   ? 5 : 0;  i < 6; i++)
+	   ? 5 : 0;
+	 i < 6; i++)
       {
 	// If i < 5, generate the method named ("apply"+i);
 	// else generate "applyN".
@@ -1130,7 +1131,6 @@ public class Compilation
 	    Method[] primMethods = source.primMethods;
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
-	      || defaultCallConvention >= Compilation.CALL_WITH_CONSUMER
 	      || source.max_args >= source.min_args + numMethods;
 	    int methodIndex;
 	    boolean skipThisProc = false;
@@ -1142,6 +1142,10 @@ public class Compilation
 		  skipThisProc = true;
 		numMethods = 1;
 		varArgs = false;
+	      }
+	    else if (defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
+	      {
+		methodIndex = numMethods-1;
 	      }
 	    else // Handling applyN
 	      {
@@ -1197,12 +1201,23 @@ public class Compilation
 	    int singleArgs = varArgs ? (nargs - 1) : nargs;
 	    Variable counter = null;
 	    int pendingIfEnds = 0;
+	    boolean withContextArg = primMethod.getName().endsWith("$X");
+	    if (withContextArg)
+	      singleArgs--;
 
 	    if (i > 4 && numMethods > 1)
 	      {
 		counter = code.addLocal(Type.int_type);
-		code.emitLoad(code.getArg(2));
-		code.emitArrayLength();
+		if (withContextArg)
+		  {
+		    code.emitLoad(code.getArg(2)); // get $ctx
+		    code.emitGetField(typeCallContext.getDeclaredField("count"));
+		  }
+		else
+		  {
+		    code.emitLoad(code.getArg(2));
+		    code.emitArrayLength();
+		  }
 		if (source.min_args != 0)
 		  {
 		    code.emitPushInt(source.min_args);
@@ -1222,13 +1237,20 @@ public class Compilation
 		  {
 		    code.emitLoad(counter);
 		    code.emitIfIntLEqZero();
+		    if (withContextArg)
+		      code.emitLoad(code.getArg(2)); // get $ctx
 		    code.emitInvoke(primMethods[k - source.min_args]);
 		    code.emitElse();
 		    pendingIfEnds++;
 		    code.emitInc(counter, (short) (-1));
 		  }
 
-		if (i > 4) // applyN method
+		if (withContextArg)
+		  {
+		    code.emitLoad(code.getArg(2)); // get $ctx
+		    code.emitInvoke(typeCallContext.getDeclaredMethod("getNextArg", 0));
+		  }
+		else if (i > 4) // applyN method
 		  {
 		    // Load Object[]args value:
 		    code.emitLoad(code.getArg(2));
@@ -1253,7 +1275,14 @@ public class Compilation
 		      = ((ArrayType) lastArgType).getComponentType();
 		    boolean mustConvert
 		      = ! "java.lang.Object".equals(elType.getName());
-		    if (singleArgs == 0 && ! mustConvert)
+		    if (withContextArg)
+		      {
+			if (mustConvert)
+			  new Error("not implemented mustConvert restarg");
+			code.emitLoad(code.getArg(2)); // get $ctx
+			code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("getRestArgsArray", 0));
+		      }
+		    else if (singleArgs == 0 && ! mustConvert)
 		      code.emitLoad(code.getArg(2)); // load args array.
 		    else
 		      {
@@ -1303,16 +1332,25 @@ public class Compilation
 		else if ("gnu.lists.LList".equals
 			 (lastArgType.getName()))
 		  {	
-		    code.emitLoad(code.getArg(2)); // load args array.
-		    code.emitPushInt(singleArgs);
-		    code.emitInvokeStatic(Compilation.makeListMethod);
+		    if (withContextArg)
+		      {
+			code.emitLoad(code.getArg(2)); // get $ctx
+			code.emitInvokeVirtual(typeCallContext.getDeclaredMethod("getRestArgsList", 0));
+		      }
+		    else
+		      {
+			code.emitLoad(code.getArg(2)); // load args array.
+			code.emitPushInt(singleArgs);
+			code.emitInvokeStatic(Compilation.makeListMethod);
+		      }
 		  }
 		else if (lastArgType == typeCallContext)
 		  code.emitLoad(code.getArg(2));
 		else
 		  throw new RuntimeException("unsupported #!rest type:"+lastArgType);
               }
-
+	    if (withContextArg)
+	      code.emitLoad(code.getArg(2)); // get $ctx
 	    code.emitInvoke(primMethod);
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();

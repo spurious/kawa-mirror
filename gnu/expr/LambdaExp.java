@@ -194,16 +194,10 @@ public class LambdaExp extends ScopeExp
   /** True iff this is the dummy top-level function of a module body. */
   public final boolean isModuleBody () { return this instanceof ModuleExp; }
 
-  /** True if a class is generated for this procedure.
-   * We don't need a class if this is only called inline.
-   * We also don't need a class if all callers are known, and we can
-   * invoke a method for this procedure.
-   * However, the last optimization is not available when using tail calls.
-   */
+  /** True if a class is generated for this procedure.  */
   public final boolean isClassGenerated ()
   {
-    return (! getInlineOnly()
-	    && (isModuleBody() || this instanceof ClassExp));
+    return isModuleBody() || this instanceof ClassExp;
   }
 
   /** Specify the calling convention used for this function.
@@ -304,8 +298,12 @@ public class LambdaExp extends ScopeExp
     Method[] methods = primMethods;
     if (max_args >= 0 && methods.length > max_args - min_args)
       return null;
-    Type[] types = methods[methods.length-1].getParameterTypes();
-    return types[types.length-1];
+    Method method = methods[methods.length-1];
+    Type[] types = method.getParameterTypes();
+    int ilast = types.length-1;
+    if (method.getName().endsWith("$X"))
+      ilast--;
+    return types[ilast];
   }
 
   public void setName (String name)
@@ -709,8 +707,7 @@ public class LambdaExp extends ScopeExp
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
     int numStubs =
-      ((flags & DEFAULT_CAPTURES_ARG) != 0) || Compilation.defaultCallConvention >= Compilation.CALL_WITH_TAILCALLS ? 0
-      : opt_args;
+      ((flags & DEFAULT_CAPTURES_ARG) != 0) ? 0 : opt_args;
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
 
@@ -755,10 +752,9 @@ public class LambdaExp extends ScopeExp
       nameBuf.append(Compilation.mangleName(name));
     if (getFlag(SEQUENCE_RESULT))
       nameBuf.append("$C");
-    if (getCallConvention() >= Compilation.CALL_WITH_TAILCALLS
-	&& ! isInitMethod)
-      nameBuf.append("$T");
-
+    boolean withContext
+      = (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
+	 && ! isInitMethod);
    int mflags = (isStatic ? Access.STATIC : 0)
       + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
     if (isInitMethod)
@@ -787,31 +783,29 @@ public class LambdaExp extends ScopeExp
       ? Type.void_type
       : getReturnType().getImplementationType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
+
+    int ctxArg = 0;
     if (getCallConvention () >= Compilation.CALL_WITH_CONSUMER
 	&& ! isInitMethod)
-      {
-	Type[] atypes = new Type[1+extraArg];
-	if (extraArg > 0)
-	  atypes[0] = closureEnvType;
-	atypes[extraArg] = Compilation.typeCallContext;
-	primMethods[0] = ctype.addMethod(nameBuf.toString(), atypes, rtype, mflags);
-	argsArray = new Variable("argsArray", Compilation.objArrayType);
-	return;
-      }
+      ctxArg = 1;
+    int nameBaseLength = nameBuf.length();
     for (int i = 0;  i <= numStubs;  i++)
       {
+	nameBuf.setLength(nameBaseLength);
 	int plainArgs = min_args + i;
 	int numArgs = plainArgs;
 	if (i == numStubs && varArgs)
 	  numArgs++;
-	Type[] atypes = new Type[extraArg + numArgs];
+	Type[] atypes = new Type[extraArg + numArgs + ctxArg];
 	if (extraArg > 0)
 	  atypes[0] = closureEnvType;
 	Declaration var = firstDecl();
 	for (int itype = 0; itype < plainArgs; var = var.nextDecl())
 	  atypes[extraArg + itype++] = var.getType().getImplementationType();
+	if (ctxArg != 0)
+	  atypes[atypes.length-1] = Compilation.typeCallContext;
 	if (plainArgs < numArgs)
-	  {	
+	  {
 	    nameBuf.append("$V");
 	    name = nameBuf.toString();
 	    Type lastType = var.getType();
@@ -823,10 +817,14 @@ public class LambdaExp extends ScopeExp
 		lastType = Compilation.objArrayType;
 		argsArray = new Variable("argsArray",
 					 Compilation.objArrayType);
+		argsArray.setParameter(true);
+		argsArray.setArtificial(true);
 	      }
 	    firstArgsArrayArg = var;
-	    atypes[atypes.length-1] = lastType;
+	    atypes[atypes.length-(withContext ? 2 : 1)] = lastType;
 	  }
+	if (withContext)
+	  nameBuf.append("$X");
 
 	boolean classSpecified
 	  = (outer instanceof ClassExp
@@ -876,19 +874,21 @@ public class LambdaExp extends ScopeExp
 	Method main = getMainMethod();
 	
 	Declaration decl = firstDecl();
-	if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
-	  {
-	    firstArgsArrayArg = decl;
-	    if (Compilation.defaultCallConvention <= Compilation.CALL_WITH_RETURN) // FIXME
-	      scope.addVariable(null, comp.typeCallContext, "$ctx");
-	  }
 	for (;;)
 	  {
 	    if (decl == firstArgsArrayArg && argsArray != null)
 	      {
 		scope.addVariable(argsArray);
-		argsArray.setParameter(true);
-		argsArray.setArtificial(true);
+	      } 
+	    if (isHandlingTailCalls()
+		&& (firstArgsArrayArg == null ? decl == null
+		    : argsArray != null ? decl == firstArgsArrayArg
+		    : decl == firstArgsArrayArg.nextDecl()))
+	      {
+		Variable var =
+		  scope.addVariable(null, comp.typeCallContext, "$ctx");
+		var.setParameter(true);
+		var.setArtificial(true);
 	      } 
 	    if (decl == null)
 	      break;
@@ -931,16 +931,7 @@ public class LambdaExp extends ScopeExp
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       {
-	if (child.isClassGenerated())
-	  {
-	    if (child.min_args != child.max_args || child.min_args > 4
-		|| child.isHandlingTailCalls())
-	      {
-		child.argsArray = new Variable("argsArray", comp.objArrayType);
-		child.firstArgsArrayArg = child.firstDecl();
-	      }
-	  }
-	else if (! child.getInlineOnly())
+	if (! child.isClassGenerated() && ! child.getInlineOnly())
 	  {
 	    boolean method_static;
 	    ObjectType closureEnvType;
@@ -990,25 +981,7 @@ public class LambdaExp extends ScopeExp
     int i = 0;
     int j = 0;
 
-    if (getCallConvention() >= Compilation.CALL_WITH_CONSUMER
-	&& ! isModuleBody() && ! comp.usingCPStyle())
-      {
-	Variable callStackContext = new Variable ("$ctx", comp.typeCallContext);
-	// Variable thisVar = isStatic? = null : declareThis(comp.curClass);
-	scope.addVariableAfter(thisVariable, callStackContext);
-	callStackContext.setParameter(true);
-	callStackContext.setArtificial(true);
-      }
-
     code.locals.enterScope (scope);
-
-    if (argsArray != null
-	&& getCallConvention() >= Compilation.CALL_WITH_CONSUMER)
-      {
-        comp.loadCallContext();
-	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("getArgs", 0));
-        code.emitStore(argsArray);
-      }
 
     for (Declaration decl = firstDecl();  decl != null;  )
       {
@@ -1149,9 +1122,7 @@ public class LambdaExp extends ScopeExp
       {
 	if (param == firstArgsArrayArg && argsArray != null)
 	  {
-	    if (primMethods != null
-		&& (Compilation.defaultCallConvention
-		    < Compilation.CALL_WITH_CONSUMER))
+	    if (primMethods != null)
 	      {
 		plainArgs = i;
 		defaultStart = plainArgs - min_args;
@@ -1277,8 +1248,7 @@ public class LambdaExp extends ScopeExp
   {
     for (LambdaExp child = firstChild;  child != null; )
       {
-	if (! child.getCanRead() && ! child.getInlineOnly()
-	    && child.getCallConvention () < Compilation.CALL_WITH_CONSUMER)
+	if (! child.getCanRead() && ! child.getInlineOnly())
 	  {
 	    child.compileAsMethod(comp);
 	  }
@@ -1309,6 +1279,8 @@ public class LambdaExp extends ScopeExp
 	     k < min_args + numStubs; decl = decl.nextDecl())
 	  saveDeclFlags[k++] = decl.flags;
       }
+
+    boolean ctxArg = getCallConvention () >= Compilation.CALL_WITH_CONSUMER;
 
     for (int i = 0;  i <= numStubs;  i++)
       {
@@ -1353,9 +1325,11 @@ public class LambdaExp extends ScopeExp
 		else if ("java.lang.Object[]".equals(lastTypeName))
 		  arg = new QuoteExp(Values.noArgs);
 		else // FIXME
-		  throw new Error("unimplemented #!rest type");
+		  throw new Error("unimplemented #!rest type "+lastTypeName);
 		arg.compile(comp, restArgType);
 	      }
+	    if (ctxArg)
+	      code.emitLoad(var);
 	    if (isStatic)
 	      code.emitInvokeStatic(primMethods[toCall]);
 	    else

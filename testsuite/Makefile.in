@@ -75,9 +75,11 @@ KAWALIB = ..
 KAWA = KAWALIB=$(KAWALIB) ../kawa/kawa.sh
 KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
+APPLETVIEWER = appletviewer
+
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   obj-test.scm misc-test.scm polytype.scm formatst.scm
 
-CLEANFILES = tmp? *.log testing.zip
+CLEANFILES = tmp? *.log testing.zip *.class
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in
@@ -85,7 +87,7 @@ DIST_COMMON =  ChangeLog Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
@@ -218,6 +220,13 @@ check-polytype: testing.zip
 check-format: testing.zip
 	$(KAWATEST) \
 	  -f "$(srcdir)/formatst.scm" -e '(test-report)'
+
+scribble.class: $(srcdir)/scribble.scm
+	$(KAWA) --applet -C $(srcdir)/scribble.scm
+
+# Not does with "make check" as it is interactive.
+check-scribble: scribble.class
+	CLASSPATH=.:.. $(APPLETVIEWER) $(srcdir)/scribble.html
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

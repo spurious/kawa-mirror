@@ -1,3 +1,9 @@
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* scribble.scm:  New "applet" testcase.
+	* scribble.html:  Web page that uses scribble applet.
+	* Makefile.am (scribble.class, check-scribble):  New rules.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Added tests for call-with-values and values.

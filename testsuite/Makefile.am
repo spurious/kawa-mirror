@@ -44,6 +44,15 @@ check-format: testing.zip
 	$(KAWATEST) \
 	  -f "$(srcdir)/formatst.scm" -e '(test-report)'
 
+scribble.class: $(srcdir)/scribble.scm
+	$(KAWA) --applet -C $(srcdir)/scribble.scm
+
+APPLETVIEWER = appletviewer
+
+# Not does with "make check" as it is interactive.
+check-scribble: scribble.class
+	CLASSPATH=.:.. $(APPLETVIEWER) $(srcdir)/scribble.html
+
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   obj-test.scm misc-test.scm polytype.scm formatst.scm
-CLEANFILES = tmp? *.log testing.zip
+CLEANFILES = tmp? *.log testing.zip *.class

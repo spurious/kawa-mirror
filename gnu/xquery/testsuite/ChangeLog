@@ -1,3 +1,8 @@
+2004-05-28  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java (toString):  New static method.
+	(main):  Use it.
+
 2004-05-05  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Expected output now includes CDATA.

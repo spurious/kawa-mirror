@@ -389,23 +389,24 @@ public class TestMisc
 	     + "XQuery:eval-with-focus(XQuery:getInstance(),"
 	     + "  '<r pos=\"{position()}\">{.}</r>', <b/>, 3, 4)",
 	     "<r pos=\"3\"><b /></r>");
+
     Object r;
     String e = "<r pos='{position()}' size='{last()}'>{.}</r>";
     try
       {
-	r = interp.evalWithFocus(e, interp.eval("2,3,4"));
+	r = toString(interp.evalWithFocus(e, interp.eval("2,3,4")));
       }
     catch (Throwable ex)
       {
 	r = ex;
       }
     matchTest(e, r,
-	      "<r pos=\"1\" size=\"3\">2</r>, "
-	      + "<r pos=\"2\" size=\"3\">3</r>, "
+	      "<r pos=\"1\" size=\"3\">2</r>"
+	      + "<r pos=\"2\" size=\"3\">3</r>"
 	      + "<r pos=\"3\" size=\"3\">4</r>");
     try
       {
-	r = interp.evalWithFocus(e, interp.eval("<b/>"), 4, 10);
+	r = toString(interp.evalWithFocus(e, interp.eval("<b/>"), 4, 10));
       }
     catch (Throwable ex)
       {
@@ -497,6 +498,14 @@ public class TestMisc
 	result = ex;
       }
     matchTest(expr, result, expected);
+  }
+
+  public static String toString (Object value)
+  {
+    CharArrayOutPort wr = new CharArrayOutPort();
+    gnu.xml.XMLPrinter xp = new gnu.xml.XMLPrinter(wr);
+    xp.writeObject(value);
+    return wr.toString();
   }
 
   public static void matchTest(String expr, Object returned, String expected)

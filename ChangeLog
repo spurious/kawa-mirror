@@ -1,3 +1,18 @@
+2000-03-22  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.64.
+
+2000-03-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (module):  Make non-public.
+	(getModule):  New method.
+
+	* kawa/standard/module_extends.java:  New class, extends Syntax.
+	* kawa/standard/module_name.java:  New class, extends Syntax.
+	* kawa/standard/module_implements.java:  New class, extends Syntax.
+	* kawa/standard/Makefile.am (java_JAVA):  Add new classes.
+	* kawa/standard/Scheme.java (initScheme):  Define new syntax.
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Kludge to work with ELisp.

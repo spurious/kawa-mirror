@@ -1,8 +1,12 @@
+JEmacs:
+* clean up function-binding hacks
+* lambda bindings need to be made fluid.
+
 compile-file should generate .jar, not .zip.
 Should perhaps take multiple file names.
 Update manual to removing .zip references.
 
-Document SRFI 4: Homogeneous numeric vector datatypes 
+Binding for imported unknown names should not be static!
 
 Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).

@@ -1,3 +1,13 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (<init>(String,Field)):  New constructor.
+	(getDeclaration):  Two new static methods.
+
+	* PrimProcedure.java (makeBuiltinBinary):  New static method.
+
+	* SetApplyExp.java (setterProcedure):  Update for moved class
+	kawa.standard.setter -> gnu.kawa.functions.Setter.
+
 2000-10-09  Per Bothner  <per@bothner.com>
 
 	* GenericProc.java (applyN):  If a method matches, don't re-use the

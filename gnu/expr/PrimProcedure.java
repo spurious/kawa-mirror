@@ -245,6 +245,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     this.argTypes= argTypes;
   }
 
+  public static PrimProcedure makeBuiltinBinary(int opcode, Type type)
+  {
+    // FIXME - should cache!
+    Type[] args = new Type[2];
+    args[0] = type;
+    args[1] = type;
+    return new PrimProcedure(opcode, type, args);
+  }
+
   public PrimProcedure(int op_code, ClassType classtype, String name,
 		       Type retType, Type[] argTypes)
   {
@@ -298,7 +307,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             arg_type = argTypes[arg_count-1+skipArg];
 	    if (arg_type == Compilation.scmListType)
 	      {
-		kawa.standard.list_v.compile(args, i, comp);
+		gnu.kawa.functions.MakeList.compile(args, i, comp);
 		break;
 	      }
             code.emitPushInt(args.length - fix_arg_count);
@@ -397,7 +406,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     return getMethodFor(pclass, pproc.getName(), decl, args, interpreter);
   }
 
-  public static Class getProcedureClass (Procedure pproc)
+  public static Class getProcedureClass (Object pproc)
   {
     Class procClass;
     if (pproc instanceof gnu.expr.ModuleMethod)

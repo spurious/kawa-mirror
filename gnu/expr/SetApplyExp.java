@@ -9,7 +9,7 @@ import gnu.bytecode.*;
 public class SetApplyExp extends ApplyExp
 {
   public static QuoteExp setterProcedure
-  = new QuoteExp(kawa.standard.setter.setterProcedure);
+  = new QuoteExp(gnu.kawa.functions.Setter.setter);
 
   public SetApplyExp(Expression proc, Expression[] args)
   {

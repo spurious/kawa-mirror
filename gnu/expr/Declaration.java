@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.Named;
 
 /**
  * The static information associated with a local variable binding.
@@ -305,6 +306,14 @@ public class Declaration
     setType(type);
   }
 
+  public Declaration (String name, Field field)
+  {
+    this.name = name;
+    setType(field.getType());
+    this.field = field;
+    setSimple(false);
+  }
+
   Method makeBindingMethod = null;
 
   /** Create a Binding object, given that isIndirectBinding().
@@ -475,5 +484,37 @@ public class Declaration
 	    comp.initChain = init;
 	  }
       }
+  }
+
+  public static Declaration getDeclaration(Named proc)
+  {
+    return getDeclaration(proc, proc.getName());
+  }
+
+  public static Declaration getDeclaration(Object proc, String name)
+  {
+    if (name != null)
+      {
+        Class procClass = PrimProcedure.getProcedureClass(proc);
+        if (procClass != null)
+          {
+            ClassType procType = (ClassType) Type.make(procClass);
+            String fname = Compilation.mangleName(name);
+            gnu.bytecode.Field procField = procType.getDeclaredField(fname);
+            if (procField != null)
+              {
+                int fflags = procField.getModifiers();
+                if ((fflags & Access.STATIC) != 0)
+                  {
+                    Declaration decl = new Declaration(name, procField);
+                    decl.noteValue(new QuoteExp(proc));
+                    if ((fflags & Access.FINAL) != 0)
+                      decl.setFlag(Declaration.IS_CONSTANT);
+                    return decl;
+                  }
+              }
+          }
+      }
+    return null;
   }
 }

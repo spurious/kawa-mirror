@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(doc/kawa.texi)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.92)
+AM_INIT_AUTOMAKE(kawa, 1.6.94)
 
 AM_MAINTAINER_MODE
 AC_PROG_CC
@@ -57,6 +57,7 @@ esac
 
 AM_CONDITIONAL(LIBKAWA, test "$with_gcj" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
+AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_PROG_LIBTOOL
 
 if test $enable_kawa_frontend = yes ; then
@@ -128,7 +129,7 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/kawa/functions/Makefile gnu/xml/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
-  gnu/commonlisp/testsuite/Makefile
+  gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile

@@ -1,3 +1,26 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java:  Handle symbol as Binding.
+	* kawa/lang/Translator.java:  Handle symbol as Binding.
+	* kawa/standard/define_autoload.java:  Likewise.
+	* kawa/standard/fluid_let.java:  Likewise.
+	* kawa/standard/let.java:  Likewise.
+	* kawa/standard/prim_method.java:  Likewise.
+	* kawa/standard.Scheme.java (getNamedType):  Handle clisp:xxx as
+	well as elisp:xxx, and better error check.
+
+	* configure.in:  Set version to 1.6.94.
+
+	* configure.in (WITH_SWING):  New automake conditional.
+	(AC_OUTPUT):  Add gnu/commonlisp/lisp/Makefile.
+	* Make-rules (clisp-classes.stamp):  New rule.
+	* Makefile.am:  Use automake conditionals.
+	(kawa-@VERSION@-jar):  Depend on */*.stamp files.
+
+	* Makefile.am (JAVADOC_PACKAGES):  Update list.
+	(JAVADOC_DIR):  Change.
+	(install-javadoc-html):  Use -sourcepath to get generated files.
+
 2001-06-09  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.92.

@@ -43,6 +43,12 @@ scm-classes.stamp: $(java_SCM)
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --module-static -C $?
 	echo timestamp > scm-classes.stamp
 
+clisp-classes.stamp: $(java_CLISP)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --clisp -C $?
+	echo timestamp > clisp-classes.stamp
+
 elisp-classes.stamp: $(java_ELISP)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
 	  $(KAWA1) -d $(top_builddir) \

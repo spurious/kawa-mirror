@@ -12,7 +12,38 @@ JAR = jar
 kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
-kawa-@VERSION@.jar:
+if WITH_SWING
+JAR_DEPS_SWING = \
+  ./gnu/jemacs/buffer/java-classes.stamp \
+  ./gnu/jemacs/buffer/scm-classes.stamp \
+  ./gnu/jemacs/lang/java-classes.stamp \
+  ./gnu/jemacs/lang/scm-classes.stamp \
+  ./gnu/jemacs/lisp/elisp-classes.stamp
+endif
+if ENABLE_XML
+JAR_DEPS_XML = ./gnu/xml/java-classes.stamp
+endif
+
+JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) \
+  ./gnu/bytecode/java-classes.stamp \
+  ./gnu/math/java-classes.stamp \
+  ./gnu/lists/java-classes.stamp \
+  ./gnu/text/java-classes.stamp \
+  ./gnu/mapping/java-classes.stamp \
+  ./gnu/expr/java-classes.stamp \
+  ./gnu/kawa/util/java-classes.stamp \
+  ./gnu/kawa/reflect/java-classes.stamp \
+  ./gnu/kawa/functions/java-classes.stamp \
+  ./gnu/kawa/lispexpr/java-classes.stamp \
+  ./gnu/kawa/slib/scm-classes.stamp \
+  ./gnu/ecmascript/java-classes.stamp \
+  ./gnu/commonlisp/lang/java-classes.stamp \
+  ./kawa/lang/java-classes.stamp \
+  ./kawa/standard/java-classes.stamp \
+  ./kawa/lib/scm-classes.stamp \
+  ./kawa/java-classes.stamp
+
+kawa-@VERSION@.jar: $(JAR_DEPS)
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
 	    `find . -name '*.class' -print`
 
@@ -50,10 +81,10 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
 HTML_HOME = $$HOME/public_html
-JAVADOC_DIR = $$HOME/Kawa/htdocs/api
+JAVADOC_DIR = $$HOME/Kawa/api
 JAVADOC_PACKAGES = \
-  gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text \
-  gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
+  gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists\
+  gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
   kawa kawa.lang kawa.standard \
   gnu.jemacs.lang gnu.jemacs.buffer
 JAVADOC = javadoc
@@ -64,9 +95,9 @@ MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 CLEANFILES = *.jar
 
 install-javadoc-html:
-	rm -rf $(JAVADOC_DIR)
+	rm -rf $(JAVADOC_DIR)/*
 	-mkdir $(JAVADOC_DIR)
-	cd $(top_srcdir) && $(JAVADOC) $(JAVADOC_FLAGS) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
+	$(JAVADOC) $(JAVADOC_FLAGS) -sourcepath .:$(top_srcdir) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 
 install-html: install-javadoc-html

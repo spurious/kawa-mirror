@@ -25,4 +25,9 @@ public class PrimArrayGet extends Procedure2 implements Inlineable
     code.emitArrayLoad(element_type);
     target.compileFromStack(comp, element_type);
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return element_type;
+  }
 }

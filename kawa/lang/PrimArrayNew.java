@@ -25,4 +25,9 @@ public class PrimArrayNew extends Procedure1 implements Inlineable
     code.emitNewArray(element_type);
     target.compileFromStack(comp, new ArrayType(element_type));
   }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return new ArrayType(element_type);
+  }
 }

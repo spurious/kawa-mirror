@@ -51,6 +51,25 @@ public class Scope
     last_var = var;
   }
 
+  /* Add a new Variable, linking it in after a given Variable, */
+  public void addVariableAfter (Variable prev, Variable var)
+  {
+    if (prev == null)
+      { // Put first
+	var.next = vars;
+	vars = var;
+      }
+    else
+      {
+	var.next = prev.next;
+	prev.next = var;
+      }
+    if (last_var == prev)
+      last_var = var;
+    if (var.next == var)
+      throw new Error("cycle");
+  }
+
   public void addVariable (CodeAttr code, Variable var)
   {
     var.start_pc = code == null ? 0 : code.PC;

@@ -43,11 +43,20 @@ implements Externalizable, Consumable
     this.data = data;
   }
 
-  public FVector(Sequence seq)
+  /* BEGIN JAVA2 */
+  public FVector(java.util.List seq)
   {
     this.data = new Object[seq.size()];
     addAll(seq);
   }
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
+  // public FVector(Sequence seq)
+  // {
+    // this.data = new Object[seq.size()];
+    // addAll(seq);
+  // }
+  /* END JAVA1 */
 
   /** Get the allocated length of the data buffer. */
   public int getBufferLength()

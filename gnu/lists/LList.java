@@ -205,14 +205,15 @@ public class LList extends ExtSequence implements Sequence, Externalizable
     return count;
   }
 
-  public static LList makeList (Sequence vals)
+  /* BEGIN JAVA2 */
+  public static LList makeList (java.util.List vals)
   {
-    java.util.Enumeration e = ((AbstractSequence) vals).elements();
+    java.util.Iterator e = vals.iterator();
     LList result = LList.Empty;
     Pair last = null;
-    for (int i = 0;  e.hasMoreElements(); i++)
+    while (e.hasNext())
       {
-        Pair pair = new Pair(e.nextElement(), LList.Empty);
+        Pair pair = new Pair(e.next(), LList.Empty);
         if (last == null)
           result = pair;
         else
@@ -221,6 +222,25 @@ public class LList extends ExtSequence implements Sequence, Externalizable
       }
     return result;
   } 
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
+  // public static LList makeList (Sequence vals)
+  // {
+    // java.util.Enumeration e = ((AbstractSequence) vals).elements();
+    // LList result = LList.Empty;
+    // Pair last = null;
+    // while (e.hasMoreElements())
+      // {
+        // Pair pair = new Pair(e.nextElement(), LList.Empty);
+        // if (last == null)
+          // result = pair;
+        // else
+          // last.cdr = pair;
+        // last = pair;
+      // }
+    // return result;
+  // } 
+  /* END JAVA1 */
 
   public static LList makeList (Object[] vals, int offset, int length)
   {

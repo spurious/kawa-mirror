@@ -30,7 +30,7 @@
 ;; (set! fail-expected "sqrt of negative number not supported")
 ;; (test "+2.0i" number->string (sqrt -4))
 ;;
-;; verbose:  If true, all tests are wroitten to standard output,
+;; verbose:  If true, all tests are written to standard output,
 ;; not just to the log file.
 
 (define verbose #f)

@@ -26,7 +26,7 @@ public abstract class ReportFormat extends Format
 
   /** Format an array of arguments, and write out the result.
    * @param dst where to write the result
-   * @param args the objets to be formatted
+   * @param args the objects to be formatted
    * @param start the index (in args) of the argument to start with
    * @return an integer result(resultCode, nextArg), where
    * nextArg is the index following the last argument processed, and

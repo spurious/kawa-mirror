@@ -4,6 +4,7 @@ import gnu.kawa.util.*;
 import gnu.expr.*;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
+import gnu.bytecode.CodeAttr;
 
 public class ELisp extends Interpreter
 {
@@ -19,6 +20,14 @@ public class ELisp extends Interpreter
   public Object booleanObject(boolean b)
   {
     if (b) return TRUE; else return FALSE;
+  }
+
+  public void emitPushBoolean(boolean value, CodeAttr code)
+  {
+    if (value)
+      code.emitPushString("t");
+    else
+      code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
   }
 
   public Object noValue()
@@ -63,6 +72,31 @@ public class ELisp extends Interpreter
       return Char.make((char)c);
   }
 
+  public static gnu.math.Numeric asNumber(Object arg)
+  {
+    if (arg instanceof Char)
+      return gnu.math.IntNum.make(((Char) arg).intValue());
+    if (arg instanceof Position)
+      return gnu.math.IntNum.make(1 + ((Position) arg).getOffset());
+    return (gnu.math.Numeric) arg;
+  }
+
+  public static char asChar(Object x)
+  {
+    if (x instanceof Char)
+      return ((Char) x).charValue();
+    int i;
+    if (x instanceof gnu.math.Numeric)
+      i = ((gnu.math.Numeric) x).intValue();
+    else if (x instanceof Position)
+      i = ((Position) x).getOffset() + 1;
+    else
+      i = -1;
+    if (i < 0 || i > 0xffff)
+      throw new gnu.jemacs.buffer.Signal("error", "not a character value");
+    return (char) i;
+  }
+
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new ELispReader(inp, messages);
@@ -76,6 +110,7 @@ public class ELisp extends Interpreter
   static ELisp instance;
 
   public static void loadClass(String name, Environment env)
+    throws java.lang.ClassNotFoundException
   {
     try
       {
@@ -85,14 +120,17 @@ public class ELisp extends Interpreter
 	if (inst instanceof gnu.expr.ModuleBody)
 	  ((gnu.expr.ModuleBody)inst).run();
       }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+	throw ex;
+      }
     catch (Exception ex)
       {
-	ex.printStackTrace(System.err);
 	throw new WrappedException(ex);
       }
   }
 
-  private void defun(String name, Object value)
+  protected void defun(String name, Object value)
   {
     Symbol.setFunctionBinding(environ, name, value);
     if (value instanceof Named)
@@ -132,31 +170,52 @@ public class ELisp extends Interpreter
 	      define(name, val);
 	  }
       }
-    System.err.println("done");
 
     if (instance == null)
       instance = this;
 
-    loadClass("gnu.jemacs.lang.SymbolOps", environ);
-    loadClass("gnu.jemacs.lang.NumberOps", environ);
-    loadClass("gnu.jemacs.lang.ArrayOps", environ);
-    // Force it to be loaded now, so we can over-ride let* etc.
-    loadClass("kawa.lib.std_syntax", environ);
+    try
+      {
+	// Force it to be loaded now, so we can over-ride let* length etc.
+	loadClass("kawa.lib.std_syntax", environ);
+	loadClass("kawa.lib.lists", environ);
+	loadClass("kawa.lib.strings", environ);
+	loadClass("gnu.jemacs.lang.SymbolOps", environ);
+	loadClass("gnu.jemacs.lang.NumberOps", environ);
+	loadClass("gnu.jemacs.lang.ArrayOps", environ);
+	loadClass("gnu.jemacs.lang.StringOps", environ);
+	loadClass("gnu.jemacs.lang.ListOps", environ);
+	loadClass("gnu.jemacs.lang.MiscOps", environ);
+      }
+    catch (java.lang.ClassNotFoundException ex)
+      {
+	// Ignore - happens while building this directory.
+      }
     define("t", "t");
     define("nil", "nil");
+    defun(AddOp.$Pl); // "+"
+    defun(AddOp.$Mn); // "-"
+    defun(DivideOp.$Sl); // "/"
+    defun(NumberCompare.makeLss("<"));
     defun(NumberCompare.makeLss("<"));
     defun(NumberCompare.makeLEq("<="));
     defun(NumberCompare.makeGrt(">"));
     defun(NumberCompare.makeGEq(">="));
     defun("lambda", new gnu.jemacs.lang.lambda());
+    defun("defvar", new defvar(false));
+    defun("defconst", new defvar(true));
     defun("defun", new gnu.jemacs.lang.defun());
     defun("setq", new gnu.jemacs.lang.setq());
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
     defun("while", new gnu.jemacs.lang.While());
+    defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));
+    defun("save-current-buffer", new gnu.jemacs.lang.SaveExcursion(true));
     defun("let", new kawa.standard.fluid_let(false, nilExpr));
     defun("let*", new kawa.standard.fluid_let(true, nilExpr));
+    defun("concat", new kawa.standard.string_append());
+    defun("equal", new kawa.standard.equal_p(this));
   }
 
   public static ELisp getInstance()
@@ -209,7 +268,12 @@ public class ELisp extends Interpreter
   public Type getTypeFor (Class clas)
   {
     if (clas.isPrimitive())
-      return Scheme.getNamedType(clas.getName());
+      {
+	String name = clas.getName();
+	if (name.equals("boolean"))
+	  name = "elisp:boolean";
+	return Scheme.getNamedType(name);
+      }
     return Type.make(clas);
   }
 
@@ -260,5 +324,3 @@ public class ELisp extends Interpreter
       }
   }
 }
-
-

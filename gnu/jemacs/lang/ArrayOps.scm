@@ -1,5 +1,7 @@
-;; FIXME should return <elisp:boolean>, not <boolean>
-(define (arrayp x)
+(define (length (x :: <gnu.kawa.util.Sequence>))
+  (invoke x 'length))
+
+(define (arrayp x) <elisp:boolean>
   (instance? x <gnu.kawa.util.UniformVector>))
 
 (define (aref

@@ -9,18 +9,23 @@ javadir=$(datadir)/java/$(subdir)
 java_JAVA=\
   ELisp.java \
   ELispReader.java \
+  AddOp.java \
+  DivideOp.java \
   ObArray.java \
   Symbol.java \
   NumberCompare.java \
+  SaveExcursion.java \
   While.java \
   defun.java \
+  defvar.java \
   lambda.java \
   setq.java
 
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lang. -C
 
-SCMSOURCES = SymbolOps.scm NumberOps.scm ArrayOps.scm
+SCMSOURCES = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \
+  ListOps.scm MiscOps.scm
 
 CLEANFILES = *.class *.stamp
 

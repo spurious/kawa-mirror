@@ -1,3 +1,32 @@
+2000-04-22  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (emitPushBoolean):  New method.
+	(asNumber, asChar):  New static methods.
+
+	* AddOp.java:  New class (extends ProcedureN) implements '+' and '-'.
+	* DivideOp.java:  New class (extends ProcedureN) implements '/'.
+	* ArrayOps.scm (length):  New procedure.
+	(arrayp):  Declare to return <elisp:boolean>.
+	* ListOps.scm:  New file, implements setcar and setcdr.
+	* MiscOps.scm:  New file, provides various unimplemented stubs.
+	* StringOps.scm:  New file, implements stringp and make-string.
+	* defvar.java:  New class, extends Syntax.
+	* SaveExcursion.java:  New class, extends Syntax.
+	* Makefile.am (java_JAVA, SCMSOURCES):  Add new files.
+	* ELisp.java (<init>):  Register some new methods and classes.
+	* ELisp.java (getTypeFor):  Handle< elisp:boolean>.
+
+	* ELisp.java (loadClass):  Do not catch ClassNotFoundException.
+	(<init>):  Catch and ignore ClassNotFoundException.
+
+	* lambda.java:  Recognize and ignore documentation string.
+	Recognize and ignore '(interactive ...)' declaration.
+	Make parameter be bound fluidly.
+
+	* NumberOps.scm (%):  New procedure.
+
+	* While.java:  Use new Expression.makeWhile method overload.
+	
 2000-03-21  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Force kawa.lib.std_syntax to be loaded now.

@@ -99,19 +99,16 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_WITH_SWING =    ELisp.java   ELispReader.java   AddOp.java   DivideOp.java   ObArray.java   Print.java   Symbol.java   NumberCompare.java   SaveExcursion.java   defcustom.java defgroup.java   lambda.java
+java_WITH_SWING =    ELisp.java   ELispReader.java   AddOp.java   DivideOp.java   Print.java   NumberCompare.java   SaveExcursion.java   defcustom.java defgroup.java   lambda.java
 
 
 java_sources =    While.java   $(java_@SWING_SELECTED@)
 
 
-SCM_WITH_SWING = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm   MiscOps.scm
-
-java_SCM = ListOps.scm $(SCM_@SWING_SELECTED@)
+java_SCM = MiscOps.scm NumberOps.scm
 PACKAGE_FNAME = gnu-jemacs-lang
-ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
-EXTRA_DIST = $(java_WITH_SWING) $(ALL_SCMSOURCES) package.html
+EXTRA_DIST = $(java_WITH_SWING) $(java_SCM) package.html
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

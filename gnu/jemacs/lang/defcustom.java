@@ -2,6 +2,7 @@ package gnu.jemacs.lang;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
+import gnu.mapping.Binding;
 
 public class defcustom extends Syntax
 {
@@ -12,9 +13,9 @@ public class defcustom extends Syntax
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
     Object name = p.car;
-    if (name instanceof String)
+    if (name instanceof String || name instanceof Binding)
       {
-	String sym = (String) name;
+	String sym = name.toString();
 	Declaration decl = defs.lookup(sym);
 	if (decl == null)
 	  {

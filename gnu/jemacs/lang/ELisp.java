@@ -5,69 +5,12 @@ import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
-import gnu.bytecode.CodeAttr;
 import gnu.kawa.lispexpr.LangPrimType;
-import gnu.commonlisp.lang.CommonLisp;
+import gnu.commonlisp.lang.*;
 import gnu.kawa.functions.DisplayFormat;
 
-// Should perhaps inherit from CommonLisp, but getInstance (different
-// return types) is a problem.  Perhaps have both inherit from "Lisp2"?  FIXME
-
-public class ELisp extends Interpreter
+public class ELisp extends Lisp2
 {
-  public static final LList FALSE = LList.Empty;
-  public static final String TRUE = "t";
-  public static final Expression nilExpr = CommonLisp.nilExpr;
-
-  public boolean isTrue(Object value)
-  {
-    return value != FALSE;
-  }
-
-  public Object booleanObject(boolean b)
-  {
-    if (b) return TRUE; else return FALSE;
-  }
-
-  public void emitPushBoolean(boolean value, CodeAttr code)
-  {
-    if (value)
-      code.emitPushString("t");
-    else
-      code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
-  }
-
-  public Object noValue()
-  {
-    return FALSE;
-  }
-
-  public boolean hasSeparateFunctionNamespace()
-  {
-    return true;
-  }
-
-  /** Get a ELisp symbol for a given (interned) Java string. */
-  public static Object getSymbol (String name)
-  {
-    if (name == "nil")
-      return FALSE;
-    // return Environment.getCurrentBinding(name);
-    return name;
-  }
-
-  /** Get a ELisp string for a given Java string. */
-  public static Object getString (String name)
-  {
-    return new FString(name);
-  }
-
-  /** Get a ELisp string for a given ELisp symbol. */
-  public static Object getString (Binding symbol)
-  {
-    return getString(symbol.getName());
-  }
-
   static boolean charIsInt = false;
 
   /** Get a ELisp character object. */
@@ -139,7 +82,7 @@ public class ELisp extends Interpreter
 
   protected void defun(String name, Object value)
   {
-    Symbol.setFunctionBinding(environ, name, value);
+    gnu.commonlisp.lang.Symbol.setFunctionBinding(environ, name, value);
     if (value instanceof Named)
       {
 	Named n = (Named) value;
@@ -157,8 +100,7 @@ public class ELisp extends Interpreter
 
   public ELisp()
   {
-
-    environ = new ObArray();
+    environ = new SymbolTable();
     environ.setName ("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
 
@@ -187,11 +129,8 @@ public class ELisp extends Interpreter
 	loadClass("kawa.lib.std_syntax", environ);
 	loadClass("kawa.lib.lists", environ);
 	loadClass("kawa.lib.strings", environ);
-	loadClass("gnu.jemacs.lang.SymbolOps", environ);
+	loadClass("gnu.commonlisp.lisp.PrimOps", environ);
 	loadClass("gnu.jemacs.lang.NumberOps", environ);
-	loadClass("gnu.jemacs.lang.ArrayOps", environ);
-	loadClass("gnu.jemacs.lang.StringOps", environ);
-	loadClass("gnu.jemacs.lang.ListOps", environ);
 	loadClass("gnu.jemacs.lang.MiscOps", environ);
       }
     catch (java.lang.ClassNotFoundException ex)
@@ -211,7 +150,9 @@ public class ELisp extends Interpreter
     defun(NumberCompare.$Gr$Eq);
 
     lambda lambda = new gnu.jemacs.lang.lambda();
-    lambda.setKeywords("&optional", "&rest", "&key");
+    lambda.setKeywords(getSymbol("&optional"),
+		       getSymbol("&rest"),
+		       getSymbol("&key"));
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
     defun("defun", new gnu.commonlisp.lang.defun(lambda));
@@ -280,11 +221,6 @@ public class ELisp extends Interpreter
     ELisp interp = new ELisp();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
-  }
-
-  public Environment getNewEnvironment ()
-  {
-    return new ObArray(environ);
   }
 
   public Object read (InPort in)
@@ -356,7 +292,7 @@ public class ELisp extends Interpreter
 		  env.addBinding((Binding) part);
 		else if (part instanceof Procedure
 			 || part instanceof kawa.lang.Syntax)
-		  Symbol.setFunctionBinding(env, name, part);
+		  gnu.commonlisp.lang.Symbol.setFunctionBinding(env, name, part);
 		else
 		  env.define(name, part);
 	      }

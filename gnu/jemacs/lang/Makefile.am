@@ -9,9 +9,7 @@ java_WITH_SWING =\
   ELispReader.java \
   AddOp.java \
   DivideOp.java \
-  ObArray.java \
   Print.java \
-  Symbol.java \
   NumberCompare.java \
   SaveExcursion.java \
   defcustom.java defgroup.java \
@@ -21,13 +19,10 @@ java_sources=\
   While.java \
   $(java_@SWING_SELECTED@)
 
-SCM_WITH_SWING = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \
-  MiscOps.scm
-java_SCM = ListOps.scm $(SCM_@SWING_SELECTED@)
+java_SCM = MiscOps.scm NumberOps.scm
 PACKAGE_FNAME = gnu-jemacs-lang
-ALL_SCMSOURCES = ListOps.scm $(SCM_WITH_SWING)
 
-EXTRA_DIST = $(java_WITH_SWING) $(ALL_SCMSOURCES) package.html
+EXTRA_DIST = $(java_WITH_SWING) $(java_SCM) package.html
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 all: Makefile java-classes.stamp scm-classes.stamp

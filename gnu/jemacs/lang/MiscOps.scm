@@ -31,3 +31,17 @@
 
 (define (quit-char) #\bel)
 
+(define (make-local-variable symbol)
+  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #f)
+  symbol)
+(define (make-variable-buffer-local symbol)
+  (invoke-static <gnu.jemacs.buffer.Buffer> 'makeBufferLocal symbol #t)
+  symbol)
+
+(define (emacs:read #!optional (port (current-input-port)))
+  (let ((lexer
+	 ((primitive-constructor <gnu.jemacs.lang.ELispReader> (<input-port>))
+	  port)))
+    ((primitive-virtual-method <gnu.jemacs.lang.ELispReader> "readObject"
+			       <object> ())
+     lexer)))

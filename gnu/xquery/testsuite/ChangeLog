@@ -1,3 +1,7 @@
+2002-06-24  Per Bothner  <per@bothner.com>
+
+	* TestSuite.java (main):  Document.document method is renamed to parse.
+
 2002-06-12  Per Bothner  <per@bothner.com>
 
 	* exp-format-users.html:  First test for XSLT implementation.

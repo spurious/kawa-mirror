@@ -3,6 +3,7 @@ import java.io.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import java.net.URL;
+import gnu.kawa.xml.Document;
 
 /** Run a suite of XQuery tests, as read from an xml file. */
 
@@ -14,8 +15,7 @@ public class TestSuite extends FilterConsumer
       {
 	try
 	  {
-	    URL url = gnu.kawa.xml.Document.makeURL(args[i]);
-	    ParsedXMLToConsumer.parse(url, new TestSuite());
+	    Document.parse(args[i], new TestSuite());
 	  }
 	catch (Throwable ex)
 	  {

@@ -37,12 +37,12 @@ jemacs-@JEMACS_VERSION@.jar:
 	  && cd .. && rm -rf tmpdir
 
 kawa-compiled.zip: kawa-@VERSION@-compiled.zip
-kawa.jar: kawa-@VERSION@-compiled.jar
+kawa.jar: kawa-@VERSION@.jar
 jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
-  $(JAVATOP)kawa/Version.java
+  $(JAVATOP)kawa/Version.java jar-manifest
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/htdocs/api

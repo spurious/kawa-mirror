@@ -1,5 +1,8 @@
 2000-06-19  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (kawa.jar):  Fix dependency.
+	(EXTRA_DIST): Add jar-manifest.
+
 	* configure.in:  Set version to 1.6.66.
 	(JEMACS_VERSION):  New variable.
 

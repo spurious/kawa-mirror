@@ -315,7 +315,9 @@ public class @XMLParser@
                     ch = buffer[pos++];
                     if (ch != '-')
                       continue;
-                    ch = buffer[pos++];
+		    do
+		      ch = buffer[pos++];
+		    while (ch == '-' && pos < limit);
                     if (ch != '>')
                       continue;
                     out.emitComment(buffer, start, pos-start);

@@ -13,6 +13,7 @@ public class XMLPrinter implements Consumer, PositionConsumer
   boolean inAttribute = false;
   boolean inStartTag = false;
   boolean canonicalize = true;
+  boolean htmlCompat = true;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
@@ -113,11 +114,11 @@ public class XMLPrinter implements Consumer, PositionConsumer
 
   public void endGroup(String typeName)
   {
-    if (canonicalize)
+    if (canonicalize && ! htmlCompat)
       closeTag();
     if (inStartTag)
       {
-	writeRaw("/>");
+	writeRaw(htmlCompat ? " />" : "/>");
 	inStartTag = false;
       }
     else
@@ -158,10 +159,16 @@ public class XMLPrinter implements Consumer, PositionConsumer
 	SeqPosition pos = (SeqPosition) v;
 	pos.sequence.consumeNext(pos.ipos, pos.xpos, this);
       }
+    else if (v instanceof String || v instanceof CharSeq)
+      {
+	writeChars(v.toString());
+      }
     else
       {
 	startWord();
-	out.writeChars(v == null ? "(null)" : v.toString());
+	prev = ' ';
+	writeChars(v == null ? "(null)" : v.toString());
+	prev = WORD;
       }
   }
 

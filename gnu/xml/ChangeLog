@@ -1,5 +1,13 @@
 2001-12-24  Per Bothner  <per@bothner.com>
 
+	* XMLParser.java.in (parse):  Fix comment reading to handle --->.
+
+	* XMLPrinter.java (htmlCompat):  New field.
+	(endGroup):  If htmlCompat, don't call closeTag.
+
+	* XMLPrinter.java (writeObject):  Handle null.
+	Don't startWord if value is String or CharSeq.
+
 	* NamespaceResolver.java (endGroup, writeChar, writeBoolean,
 	writeFloat):  Add missing calls to closeStartTag.
 

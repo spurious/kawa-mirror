@@ -85,7 +85,7 @@ public class Variable extends Location implements java.util.Enumeration {
   }
 
   /** Assign a local variable to a given local variable slot.
-   * @param local the index of  the local variables.
+   * @param local the index of the local variables.
    * @return true iff we succeeded (i.e. the slot was unused) */
   public boolean reserveLocal (int varIndex, CodeAttr code)
   {

@@ -281,6 +281,12 @@ specify that when you run configure:
 ./configure --prefix $PREFIX
 @end example
 
+If you have the GNU @samp{readline} library installed, you might try
+adding the @samp{--enable-kawa-frontend} flag.  This will build the
+@samp{kawa} front-end program, which provides input-line editing
+and an input history.  You can get @samp{readline} from archives
+of GNU programs, including @uref{ftp://www.gnu.org/}.
+
 If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
 conflict with the new ones.
@@ -343,7 +349,7 @@ cd kawa\lib
 @chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa}
-script.  This finds your java interpreter, and sets up @samp{CLASSPATH}
+program.  This finds your java interpreter, and sets up @samp{CLASSPATH}
 correctly.
 If you have installed Kawa such @code{$PREFIX/bin} is in your @code{$PATH},
 just do:
@@ -351,6 +357,8 @@ just do:
 kawa
 @end example
 However, @samp{kawa} only works if you have a Unix-like environment.
+On some platforms, @samp{kawa} is a program that uses the GNU
+@samp{readline} library to provide input line editing.
 
 To run Kawa manually, you must start a Java interpreter.
 How you do this depends on the Java interpreter.
@@ -424,10 +432,17 @@ Same as @code{-e (scheme-window #t)}.
 You can specify multiple @samp{-w} options, and also use @samp{-s}.
 @item --version
 Prints out the Kawa version number, and then exits.
+@item --server @var{portnum}
+Start a server listening from connections on the specified @var{portnum}.
+Each connection using the Telnet protocol causes a new read-eval-print-loop
+to started.  This option allows you to connect using any
+Telnet client program to a remote "Kawa server".
 @end table
 
 The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, and @samp{--main}
 are used to compile a Scheme file; see @ref{Files compilation}.
+The option @samp{--connect @var{portnum}} is only used by
+the @samp{kawa} front-end program.
 
 If there are further command-line arguments after the options
 have been processed, then the first remaining argument names a

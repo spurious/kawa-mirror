@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -50,12 +50,12 @@ public class XQuery extends Interpreter
     return new XQParser(inp, messages);
   }
 
-  public ModuleExp parse(Environment env, Lexer lexer)
+  public Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
     gnu.text.SourceMessages messages = lexer.getMessages();
-    gnu.expr.Parser tr = new gnu.expr.Parser(messages);
+    Compilation tr = new Compilation(messages);
     ModuleExp mexp = new ModuleExp();
     tr.push(mexp);
     tr.mustCompileHere();
@@ -66,14 +66,14 @@ public class XQuery extends Interpreter
       return null;
     mexp.body = sexp;
     tr.pop(mexp);
-    return mexp;
+    return tr;
   }
 
-  public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+  public Compilation parseFile (InPort port, gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.usingTailCalls = true;
-    gnu.expr.Parser tr = new gnu.expr.Parser(messages);
+    Compilation tr = new Compilation(messages);
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());
     tr.push(mexp);
@@ -99,7 +99,7 @@ public class XQuery extends Interpreter
 	mexp.body = new BeginExp(arr);
       }
     tr.pop(mexp);
-    return mexp;
+    return tr;
   }
 
   public int getNamespaceOf(Declaration decl)

@@ -324,10 +324,12 @@ public class TestMisc
 
     for (;;)
       {
-	ModuleExp mod = interp.parse(env, lexer);
-	if (mod == null)
+	Compilation comp = interp.parse(env, lexer);
+	if (comp == null)
 	  break; // return "*** end-of-file ***";
+	ModuleExp mod = comp.getModule();
 	mod.setName("atInteractiveLevel");  // FIXME
+	ModuleExp.evalModule(env, ctx, comp);
 	SourceError firstError = messages.getErrors();
 	if (firstError != null)
 	  return "*** syntax error - " + firstError;
@@ -347,7 +349,6 @@ public class TestMisc
 	  }
 	*/
 
-	mod.evalModule(env, ctx);
 	ctx.runUntilDone();
       }
     /*

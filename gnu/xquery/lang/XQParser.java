@@ -1853,14 +1853,14 @@ public class XQParser extends LispReader // should be extends Lexer
     return parse(null);
   }
 
-  Parser parser;
+  Compilation parser;
 
   String defaultNamespace = "";
   Hashtable namespaces = new Hashtable(50);
 
   /** Parse an expression.
    * Return null on EOF. */
-  public Expression parse(Parser parser)
+  public Expression parse(Compilation parser)
       throws java.io.IOException, SyntaxException
   {
     this.parser = parser;

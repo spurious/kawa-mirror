@@ -179,6 +179,29 @@ public class ClassTypeWriter extends PrintWriter
       entry.print(this, 0);
   }
 
+  /** Print constant pool index for dis-assembler. */
+  final void printConstantOperand(int index)
+  {
+    print(' ');
+    if (printConstants)
+      {
+	print('#');
+	print(index);
+	print('=');
+      }
+    CpoolEntry[] pool = ctype.constants.pool;
+    CpoolEntry entry;
+    if (pool == null || index < 0 || index >= pool.length
+	|| (entry = pool[index]) == null)
+      print("<invalid constant index>");
+    else
+      {
+	print('<');
+	entry.print(this, 1);
+	print('>');
+      }
+  }
+
   public final void printConstantPool ()
   {
     CpoolEntry[] pool = ctype.constants.pool;

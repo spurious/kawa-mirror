@@ -206,7 +206,7 @@ public class ClassFileInput extends DataInputStream
 	    var.end_pc = var.start_pc + readUnsignedShort();
 	    var.setName(readUnsignedShort(), constants);
 	    var.setSignature(readUnsignedShort(), constants);
-	    method.assign_local(var, readUnsignedShort());
+	    var.offset = readUnsignedShort();
 	  }
 	return attr;
       }

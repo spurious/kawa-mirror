@@ -1,3 +1,7 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* TypedValue.java: Fix javadoc.
+
 2005-03-31  Dean Ferreyra <dferreyra@igc.org>
 
 	* ModuleExp.java (STATIC_RUN_SPECIFIED): New flag.

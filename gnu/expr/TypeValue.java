@@ -27,12 +27,14 @@ public interface TypeValue
 			 Compilation comp);
 
   /** Emit code for <tt>incoming instanceof this_type</tt>.
+   * The implementation can use
+   * {@link gnu.kawa.reflect.InstanceOf#emitIsInstance InstanceOf
+   *   .emitIsInstance} which is a conveniece method that calls
+   * {@link #emitTestIf emitTestIf}.
    * @param incoming Contains the value we are testing to see if it has the
    *        the type of 'this'.  If null, use top-of-stack.
    * @param comp The compilation state.
    * @param target Where to leave the result.
-   * @note  Implementation can use gnu.kawa.reflect.InstanceOf.emitIsInstance,
-   *   which is a conveniece method that calls emitTestIf.
    */
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target);

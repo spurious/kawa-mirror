@@ -43,10 +43,11 @@ public class Translator extends Object
 
   final Expression rewrite_car (Pair pair)
   {
+    Object car = pair.car;
     if (pair instanceof PairWithPosition)
-      return rewrite_with_position (pair.car, (PairWithPosition) pair);
+      return rewrite_with_position (car, (PairWithPosition) pair);
     else
-      return rewrite (pair.car);
+      return rewrite (car);
   }
 
   /**
@@ -152,11 +153,7 @@ public class Translator extends Object
       ((ModuleExp)lambda).mustCompile = true;
   }
 
-  /** Check if Object is Syntax, or bound to Syntax.
-   * @param obj the value to check
-   * @return the Syntax bound to obj, or null.
-   */
-  public Syntax check_if_Syntax (Object obj)
+  Object getBinding (Object obj)
   {
     if (obj instanceof String)
       {
@@ -172,6 +169,16 @@ public class Translator extends Object
 	else
 	  obj = env.get (sym);
       }
+     return obj;
+  }
+
+  /** Check if Object is Syntax, or bound to Syntax.
+   * @param obj the value to check
+   * @return the Syntax bound to obj, or null.
+   */
+  public Syntax check_if_Syntax (Object obj)
+  {
+    obj = getBinding(obj);
     if (obj instanceof Syntax)
       return (Syntax) obj;
     return null;
@@ -179,36 +186,31 @@ public class Translator extends Object
 
   public Expression rewrite_pair (Pair p)
   {
-    Object car = p.car;
     Object cdr = p.cdr;
-    Syntax syntax = check_if_Syntax (car);
-    if (syntax != null)
-      return apply_rewrite (syntax, cdr);
-
-    int cdr_length = List.length (cdr);
 
     Expression func = rewrite_car (p);
+
+    if (func instanceof ReferenceExp)
+      {
+	ReferenceExp ref = (ReferenceExp) func;
+	if (ref.binding == null)
+	  {
+	    Object first = getBinding(ref.symbol);
+	    if (first instanceof Syntax)
+	      return apply_rewrite ((Syntax) first, cdr);
+	    if (first instanceof Inlineable)
+	      func = new QuoteExp(first);
+	  }
+      }
+
+    int cdr_length = List.length (cdr);
     Expression[] args = new Expression[cdr_length];
+
     for (int i = 0; i < cdr_length; i++)
       {
 	Pair cdr_pair = (Pair) cdr;
 	args[i] = rewrite_car (cdr_pair);
 	cdr = cdr_pair.cdr;
-      }
-    if (func instanceof QuoteExp)
-      {
-	QuoteExp qfunc = (QuoteExp) func;
-	if (qfunc.value instanceof PrimProcedure)
-	  {
-	    PrimProcedure proc = (PrimProcedure) qfunc.value;
-	    Method method = proc.method;
-	    boolean is_static = proc.getStaticFlag();
-	    if (args.length != proc.getParameterTypes().length + (is_static ? 0 : 1))
-	      return syntaxError ("wrong number of arguments to primitive "
-				   + proc.toString());
-	    mustCompileHere();
-	    return new PrimApplyExp (qfunc, args);
-	  }
       }
     return new ApplyExp (func, args);
   }
@@ -234,9 +236,13 @@ public class Translator extends Object
 	int len = name.length();
 	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
 	  {
-	    gnu.bytecode.Type type = PrimProcedure.getNamedType(name);
-	    if (type != null)
-	      return new QuoteExp(type);
+	    String tname = name.substring(1, len-1);
+	    if (gnu.bytecode.Type.isValidJavaTypeName(tname))
+	      {
+		gnu.bytecode.Type type = PrimProcedure.getNamedType(tname);
+		if (type != null)
+		  return new QuoteExp(type);
+	      }
 	  }
 	return new ReferenceExp (name, resolve (name, (Declaration) binding));
       }

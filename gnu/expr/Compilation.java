@@ -900,11 +900,12 @@ public class Compilation
       {
 	addClass (lexp);
       }
-    catch (RuntimeException ex)
+    catch (Throwable ex)
       {
-	// Try to produce a localized error message.
-	error('f', "Internal compiler exception: "+ex);
-	throw ex;
+	error('f', "internal compile error - caught "+ex);
+	messages.printAll(OutPort.errDefault(), 20);
+	messages.clear();
+	throw WrappedException.wrapIfNeeded(ex);
       }
   }
 
@@ -1878,16 +1879,8 @@ public class Compilation
 	fswitch.addCase(0, l, code);
       }
 
-    try
-      {
-	module.compileBody(this);
-      }
-    catch (Exception ex)
-      {
-        error('f', "internal error while compiling - caught: "+ex);
-        ex.printStackTrace(System.err);
-        System.exit(-1);
-      }
+    module.compileBody(this);
+
     Label startLiterals = null;
     Label afterLiterals = null;
     Method initMethod = null;

@@ -1,3 +1,8 @@
+2005-01-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compile): Wrap Throwable if needed. Print messages.
+	(addClass): Don' catch exceptions and exit here.  Handle later.
+
 2005-01-28  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (loadClassRef):  Fix JAVA5 case to use

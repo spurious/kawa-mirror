@@ -1,3 +1,7 @@
+2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* ELisp.java (<init>):  Use new string-append implementation.
+
 2003-10-12  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Define function, prog1, prog2 syntax forms.

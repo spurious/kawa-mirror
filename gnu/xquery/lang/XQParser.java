@@ -16,6 +16,9 @@ public class XQParser extends LispReader // should be extends Lexer
   int curToken;
   Object curValue;
 
+  public static final gnu.kawa.reflect.InstanceOf instanceOf
+  = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
+
   int nesting;
 
   /** Skip whitspace.
@@ -94,6 +97,8 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int OP_AND       = 200 + 4;      // 'and'
   static final int OP_EQU       = 200 + 8;      // '='
   static final int OP_NEQ       = 200 + 8 + 1;  // '!='
+  static final int OP_INSTANCEOF= 200 + 8 + 2;  // 'instanceof'
+  static final int OP_RANGE_TO  = 200 + 8 + 3;  // 'to'
   static final int OP_LSS       = 200 + 12;     // '<'
   static final int OP_GRT       = 200 + 12 + 1; // '>'
   static final int OP_LEQ       = 200 + 12 + 2; // '<='
@@ -334,7 +339,7 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   /** Return the current token, assuming it is in operator context.
-   * Resolve NCNAME_TOKEN (identifier) to 'and', 'or', 'div', 'mod'.
+   * Resolve NCNAME_TOKEN (identifier) to 'and', 'or', 'div', etc.
    */
   int peekOperator()
       throws java.io.IOException, SyntaxException
@@ -351,6 +356,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	      {
 		if (c1 == 'o' && tokenBuffer[1] == 'r')
 		  curToken = OP_OR;
+		else if (c1 == 't' && tokenBuffer[1] == 'o')
+		  curToken = OP_RANGE_TO;
 	      }
 	    else
 	      {
@@ -362,6 +369,8 @@ public class XQParser extends LispReader // should be extends Lexer
 		      curToken = OP_AND;
 		  }
 		else if (c1 == 'm') {
+		  if (c2 == 'u' && c3 == 'l')
+		    curToken = OP_MUL;
 		  if (c2 == 'o' && c3 == 'd')
 		    curToken = OP_MOD;
 		}
@@ -369,6 +378,19 @@ public class XQParser extends LispReader // should be extends Lexer
 		  if (c2 == 'i' && c3 == 'v')
 		    curToken = OP_DIV;
 		}
+	      }
+	  }
+	else if (len == 10)
+	  {
+	    for (int i = 0; ;   i++)
+	      {
+		if (i == 10)
+		  {
+		    curToken = OP_INSTANCEOF;
+		    break;
+		  }
+		else if (tokenBuffer[i] != "instanceof".charAt(i))
+		  break;
 	      }
 	  }
       }
@@ -387,7 +409,9 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
-	if (next == '(') // FunctionCall or KindTest
+	if (next == '('
+	    && ! name.equalsIgnoreCase("if"))
+	  // FunctionCall or KindTest
 	  return FNAME_TOKEN;
 	//int next = peek();
 	if (next != ':')
@@ -509,13 +533,34 @@ public class XQParser extends LispReader // should be extends Lexer
     switch (op)
       {
       case OP_ADD: 
-	func = makeFunctionExp("gnu.kawa.functions.AddOp", "$Pl");
+	func = makeFunctionExp("gnu.kawa.functions.AddOp", "+");
 	break;
       case OP_SUB:
-	func = makeFunctionExp("gnu.kawa.functions.AddOp", "$Mn");
+	func = makeFunctionExp("gnu.kawa.functions.AddOp", "-");
+	break;
+      case OP_MUL:
+	func = makeFunctionExp("gnu.kawa.functions.MultiplyOp", "$St", "mul");
+	break;
+      case OP_DIV:
+	func = makeFunctionExp("gnu.kawa.functions.DivideOp", "$Sl", "div");
+	break;
+      case OP_MOD:
+	func = new QuoteExp(new PrimProcedure(gnu.bytecode.ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
 	break;
       case OP_LSS:
-	func = makeFunctionExp("kawa.standard.NumberCompare", "$Ls");
+	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", "<");
+	break;
+      case OP_LEQ:
+	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", "<=");
+	break;
+      case OP_GRT:
+	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", ">");
+	break;
+      case OP_GEQ:
+	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", ">=");
+	break;
+      case OP_RANGE_TO:
+	func = makeFunctionExp("gnu.xquery.util.IntegerRange", "integerRange");
 	break;
       default:
 	return new ErrorExp("unimplemented binary op: "+op);
@@ -529,6 +574,23 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression exp = parseBinaryExpr(priority(OP_OR));
     // FIXME check for "sortby".
     return exp;
+  }
+
+  public Expression parseDataType()
+      throws java.io.IOException, SyntaxException
+  {
+    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+      {
+	String tname = new String(tokenBuffer, 0, tokenBufferLength);
+	gnu.bytecode.Type type = kawa.standard.Scheme.getNamedType(tname);
+	getRawToken();
+	return new QuoteExp(type);
+      }
+    else
+      {
+	getRawToken();
+	return syntaxError("bad syntax - expected DataType");
+      }
   }
 
   Expression parseBinaryExpr(int prio)
@@ -547,8 +609,21 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (tokPriority < prio || tokPriority > (OP_MOD >> 2))
 	  return exp;
 	getRawToken();
-	Expression exp2 = parseBinaryExpr(tokPriority+1);
-	exp = makeBinary(token, exp, exp2);
+	if (token == OP_INSTANCEOF)
+	  {
+	    Expression[] args = { exp, parseDataType() };
+	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.lang.XQParser",
+					       "instanceOf"),
+			       args);
+	  }
+	else
+	  {
+	    Expression exp2 = parseBinaryExpr(tokPriority+1);
+	    if (token == OP_AND)
+	      exp = new IfExp(exp, exp2, QuoteExp.falseExp);
+	    else
+	      exp = makeBinary(token, exp, exp2);
+	  }
     }
   }
 
@@ -817,6 +892,7 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     int token = peekOperand();
     Expression exp;
+    int c1, c2, c3;
     if (token == '(')
       {
 	getRawToken();
@@ -934,9 +1010,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (tokenBufferLength == 3)
 	      {
 		// FIXME:  use match(String)?
-		char c1 = tokenBuffer[0];
-		char c2 = tokenBuffer[2];
-		char c3 = tokenBuffer[2];
+		c1 = tokenBuffer[0];
+		c2 = tokenBuffer[2];
+		c3 = tokenBuffer[2];
 		if ((c1 == 'l' || c1 == 'L')
 		    || (c2 == 'e' || c1 == 'E')
 		    || (c3 == 't' || c1 == 'T'))
@@ -949,6 +1025,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (forOrLet < 0)
 	      return syntaxError("invalid syntax - variable following name");
 	    return parseFLWRExpression(forOrLet > 0);
+	  }
+	else if (next == '(' && tokenBufferLength == 2
+		 && ((c1 = tokenBuffer[0]) == 'i' || c1 == 'I')
+		 && ((c2 = tokenBuffer[1]) == 'f' || c2 == 'F'))
+	  {
+	    return parseIfExpr();
 	  }
 	else
 	  {
@@ -971,6 +1053,31 @@ public class XQParser extends LispReader // should be extends Lexer
     */
     getRawToken();
     return exp;
+  }
+
+  public Expression parseIfExpr()
+      throws java.io.IOException, SyntaxException
+  {
+    getRawToken();
+    nesting++;
+    Expression cond = parseExpr();
+    if (curToken != ')')
+      return syntaxError("missing ')' after 'if (EXPR'");
+    getRawToken();
+    if (curToken != NCNAME_TOKEN
+	|| tokenBufferLength != 4
+	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("then"))
+      return syntaxError("missing 'then'");
+    getRawToken();
+    Expression thenPart = parseExpr();
+    if (curToken != NCNAME_TOKEN
+	|| tokenBufferLength != 4
+	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("else"))
+      return syntaxError("missing 'else'");
+    getRawToken();
+    nesting--;
+    Expression elsePart = parseExpr();
+    return new IfExp(cond, thenPart, elsePart);
   }
 
   public boolean match(String word)
@@ -1078,7 +1185,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("missing ':=' in 'let' clause - "+curToken);
       }
     getRawToken();
-    Expression value = parsePrimaryExpr();  // ?? FIXME
+    Expression value = parseExpr();
     return parseFLWRExpression(isFor, name, value);
   }
 
@@ -1122,7 +1229,15 @@ public class XQParser extends LispReader // should be extends Lexer
     axisNames[AXIS_SELF] = "self";
   }
     
-  public static Expression makeFunctionExp(String className, String fieldName)
+  public static Expression makeFunctionExp(String className, String name)
+  {
+    return makeFunctionExp(className,
+			   Compilation.mangleNameIfNeeded(name),
+			   name);
+  }
+
+  public static Expression makeFunctionExp(String className,
+					   String fieldName, String name)
   {
     try
       {
@@ -1133,9 +1248,6 @@ public class XQParser extends LispReader // should be extends Lexer
 
 	gnu.bytecode.ClassType type = gnu.bytecode.ClassType.make(className);
 	gnu.bytecode.Field procField = type.getDeclaredField(fieldName);
-	String name = proc.getName();
-	if (name == null)
-	  name = fieldName;
 	Declaration decl = new Declaration(name, procField);
 	decl.noteValue(new QuoteExp(proc));
 	decl.setFlag(Declaration.IS_CONSTANT);

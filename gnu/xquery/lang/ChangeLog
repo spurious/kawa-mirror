@@ -1,3 +1,18 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (OP_INSTANCEOF, OP_RANGE_TO):  New constants.
+	(instanceOf):  New static field.
+	(peekOperator):  Map 'to', 'mul' and 'instanceof'.
+	(peekOperand):  Special case for 'if' followed by '('.
+	(makeFunctionExp):  Add overloads.
+	(makeBinary):  Add implementations for OP_MUL, OP_DIV, OP_MOD,
+	OP_LSS. OP_LEQ, OP_GRT, OP_GEQ and OP_RANGE_TO.
+	(parseDataType):  New method.
+	(parseBinarOp):  Special case for OP_INSTANCEOF and OP_AND.
+	(parseMaybePrimaryExpr):  Handle 'if' expressions.
+	(parseIfExpr):  New method.
+	(parseFLWRExpression):  Call parseExpr instead of parsePrimaryExpr.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (FNAME_TOKEN):  New constant.

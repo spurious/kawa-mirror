@@ -1,3 +1,8 @@
+2003-04-30  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java (scanForDefinitions):  Set namespace
+	Declaration's type to java.lang.String.
+
 2003-04-14  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java (scanForDefinitions):  Use Translator's

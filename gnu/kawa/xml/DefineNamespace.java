@@ -20,6 +20,8 @@ public class DefineNamespace extends Syntax
       {
 	sym = (Interpreter.NAMESPACE_PREFIX + name).intern();
 	Declaration decl = defs.getDefine(sym, 'w', tr);
+	// This gives us a ConstantValue attribute when compiled.
+	decl.setType(gnu.bytecode.Type.tostring_type);
 	tr.push(decl);
 	decl.setFlag(Declaration.IS_CONSTANT);
 	p = tr.makePair(p, decl, p.cdr);

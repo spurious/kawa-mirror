@@ -489,7 +489,6 @@ public class XQuery extends Interpreter
     define("number", gnu.xquery.util.NumberValue.numberValue);
     define("string-value", gnu.xquery.util.StringValue.stringValue);
     define("string", gnu.xquery.util.StringValue.string);
-    define("concat", new kawa.standard.string_append());
 
     define_method("trace", "gnu.xquery.util.Debug", "trace");
     define("write-to", gnu.kawa.xml.WriteTo.writeTo);
@@ -514,6 +513,7 @@ public class XQuery extends Interpreter
     define_method("starts-with", "gnu.xquery.util.StringValue", "startsWith");
     define_method("ends-with","gnu.xquery.util.StringValue", "endsWith");
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
+    define_method("concat", "gnu.xquery.util.StringValue", "concat");
 
     define("distinct-nodes", gnu.kawa.xml.SortNodes.sortNodes);
   }

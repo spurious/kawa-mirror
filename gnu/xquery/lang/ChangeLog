@@ -1,3 +1,7 @@
+2003-11-14  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>):  New use StringValue.concat$V.
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (PARSE_WITH_FOCUS):  New flag.
@@ -31,7 +35,7 @@
 
 2003-10-19  Per Bothner  <per@bothner.com>
 
-	* XQuery.java (parses, parseFile):  Pass this to Compilation.
+	* XQuery.java (parse, parseFile):  Pass this to Compilation.
 
 2003-10-16  Per Bothner  <per@bothner.com>
 

@@ -1,3 +1,8 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* QNameUtils.java: New class.
+	* Makefile.am: Update accordingly.
+
 2004-08-10  Per Bothner  <per@bothner.com>
 
 	* ValuesFilter.java (inline): Add missing letEnter call.

@@ -17,6 +17,7 @@ java_sources = \
   MakeElement.java \
   MinMax.java \
   NumberValue.java \
+  QNameUtils.java \
   Reduce.java \
   RelativeStep.java \
   StringValue.java \

@@ -261,7 +261,7 @@ public class ApplyExp extends Expression
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
 	func_lambda.allocParameters(comp, null);
-	popParams (code, func_lambda);
+	popParams (code, func_lambda, false);
 	func_lambda.enterFunction(comp, null);
 	func_lambda.body.compileWithPosition(comp, target);
 	code.popScope();
@@ -300,9 +300,10 @@ public class ApplyExp extends Expression
 	  func.compile (comp, new StackTarget(comp.typeProcedure));
       }
 
-    if (args_length <= 4
-	|| (tail_recurse
-	    && func_lambda.min_args == func_lambda.max_args))
+    boolean toArray
+      = (tail_recurse ? func_lambda.min_args != func_lambda.max_args
+         : args_length > 4);
+    if (! toArray)
       {
 	for (int i = 0; i < args_length; ++i)
 	  exp.args[i].compile (comp, Target.pushObject);
@@ -315,7 +316,7 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	popParams(code, func_lambda);
+	popParams(code, func_lambda, toArray);
 	code.emitTailCall(false, func_lambda.scope);
 	return;
       }
@@ -339,13 +340,21 @@ public class ApplyExp extends Expression
     ps.print(")");
   }
 
-  private static void popParams (CodeAttr code, LambdaExp lexp)
+  private static void popParams (CodeAttr code, LambdaExp lexp,
+                                 boolean toArray)
   {
     Variable params = lexp.firstVar();
     if (params != null && params.getName() == "this")
       params = params.nextVar();
     if (params != null && params.getName() == "argsArray")
-      params = params.nextVar();
+      {
+        if (toArray)
+          {
+            popParams (code, params, 1);
+            return;
+          }
+        params = params.nextVar();
+      }
     popParams (code, params, lexp.min_args);
   }
 

@@ -256,7 +256,7 @@ public class SimpleEnvironment extends Environment
     else if (old instanceof UnboundLocation)
       {
 	nloc = ((UnboundLocation) old).getLocation();
-	if (nloc instanceof IndirectableLocation)
+	if (nloc != null && nloc != loc)
 	  ((IndirectableLocation)  nloc).base = loc;
       }
 

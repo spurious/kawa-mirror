@@ -1,3 +1,10 @@
+2004-12-19  Per Bothner  <per@bothner.com>
+
+	* InheritingEnvironment.java (hasMoreElements): Fix logic bug
+	reported (with incomplete patch) by Christian Surlykke.
+
+	* SimpleEnvironment.java (addLocation): Guard againts cycles.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	Rewrite of how symbols and environments are handled.

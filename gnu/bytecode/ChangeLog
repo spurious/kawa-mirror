@@ -1,3 +1,14 @@
+Sat Oct 17 13:04:32 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitNot):  Use explicit parameter instead of topType.
+	(emitConvert):  Remove single-argument form.
+	(emitMonitorEnter, emitMonitorExit):  New methods.
+	(emitTryStart):  Always save result (in local var) if there is one.
+	(disAssembler):  Fix typo moniorenter -> monitorenter.
+
+	* Scope.java (addVariable):  Make public.
+	* Type.java (throwable_type):  New static.
+
 Fri Sep 11 20:05:59 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ClassType.java (make):  New static overload.

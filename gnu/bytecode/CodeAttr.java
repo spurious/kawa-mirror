@@ -689,9 +689,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitIOr () { emitBinop (128); }
   public final void emitXOr () { emitBinop (130); }
 
-  public final void emitNot()
+  public final void emitNot(Type type)
   {
-    Type type = topType();  // Must be int or long.
     emitPushConstant(1, type);
     emitAdd();
     emitPushConstant(1, type);
@@ -1096,15 +1095,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     if_stack = if_stack.previous;
   }
 
-  /**
-   * Convert the element on top of the stack to requested type
-   */
-  public final void emitConvert (Type type) {
-    Type from = popType();
-    pushType(from);
-    emitConvert(from, type);
-  }
-
   public final void emitConvert (Type from, Type to)
   {
     String to_sig = to.getSignature();
@@ -1209,6 +1199,20 @@ public class CodeAttr extends Attribute implements AttrContainer
     unreachable_here = true;
   }
 
+  public final void emitMonitorEnter ()
+  {
+    popType();
+    reserve(1);
+    put1 (194);  // monitorenter
+  }
+
+  public final void emitMonitorExit ()
+  {
+    popType();
+    reserve(1);
+    put1 (195);  // monitorexit
+  }
+
   /**
    * Compile a method return.
    */
@@ -1261,11 +1265,12 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitTryStart(boolean has_finally, Type result_type)
   {
     TryState try_state = new TryState(this);
-    boolean must_save_result = has_finally && result_type != null;
-    if (must_save_result || SP > 0)
+    if (result_type != null && result_type.size == 0) // void
+      result_type = null;
+    if (result_type != null || SP > 0)
       {
 	pushScope();
-	if (must_save_result)
+	if (result_type != null)
 	  try_state.saved_result = addLocal(result_type);
       }
     if (SP > 0)
@@ -1290,10 +1295,12 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (try_stack.saved_result != null)
 	  emitStore(try_stack.saved_result);
 	try_stack.end_label = new Label(this);
-	if (try_stack.finally_subr != null)
-	  emitGoto(try_stack.finally_subr, 168);  // jsr
 	if (reachableHere())
-	  emitGoto(try_stack.end_label);
+	  {
+	    if (try_stack.finally_subr != null)
+	      emitGoto(try_stack.finally_subr, 168);  // jsr
+	    emitGoto(try_stack.end_label);
+	  }
 	readPC = PC;
 	try_stack.end_pc = PC;
       }
@@ -1302,10 +1309,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitCatchStart(Variable var)
   {
     emitTryEnd();
+    SP = 0;
     if (try_stack.try_type != null)
-      {
-	emitCatchEnd();
-      }
+      emitCatchEnd();
     ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
     readPC = PC;
@@ -1316,6 +1322,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	pushType(type);
 	emitStore(var);
       }
+    else
+      pushType(Type.throwable_type);
   }
 
   public void emitCatchEnd()
@@ -1328,7 +1336,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  emitGoto(try_stack.finally_subr, 168); // jsr
 	emitGoto(try_stack.end_label);
       }
-    popScope();
     try_stack.try_type = null;
   }
 
@@ -1336,26 +1343,20 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     emitTryEnd();
     if (try_stack.try_type != null)
-      {
-	emitCatchEnd();
-      }
+      emitCatchEnd();
     readPC = PC;
+    SP = 0;
     try_stack.end_pc = PC;
 
     pushScope();
     Type except_type = Type.pointer_type;
     Variable except = addLocal(except_type);
     emitCatchStart(null);
-    pushType(except_type);
     emitStore(except);
     emitGoto(try_stack.finally_subr, 168); // jsr
     emitLoad(except);
     emitThrow();
     
-    //emitCatchEnd();
-    
-    //if (try_stack.finally_subr == null)
-    // error();
     try_stack.finally_subr.define(this);
     Type ret_addr_type = Type.pointer_type;
     try_stack.finally_ret_addr = addLocal(ret_addr_type);
@@ -1743,7 +1744,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 		  }
 		else if (op < 196)
 		  {
-		    print("186;new;newarray;anewarray;arraylength;athrow;checkcast;instanceof;moniorenter;monitorexit;", op-186, dst);
+		    print("186;new;newarray;anewarray;arraylength;athrow;checkcast;instanceof;monitorenter;monitorexit;", op-186, dst);
 		    if (op == 187 || op == 189 || op == 192 || op == 193)
 		      printConstant = 2;
 		    else if (op == 188)  // newarray

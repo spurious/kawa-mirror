@@ -87,14 +87,28 @@ public class ReaderParens extends ReadTableEntry
 	      {
 		ch = port.peek();
 		entry = lexer.getReadTable().lookup(ch);
-		int kind = entry.getKind();
+		int kind = entry == null ? ReadTable.ILLEGAL : entry.getKind();
 		if (kind == ReadTable.WHITESPACE
-		    || kind == ReadTable.TERMINATING_MACRO)
+		    || kind == ReadTable.TERMINATING_MACRO
+		    || kind == ReadTable.ILLEGAL)
 		  {
 		    port.skip();
 		    column++;
+		    if (ch == close)
+		      {
+			lexer.error("unexpected '"
+				    + ((char) close) + "' after '.'");
+			break;
+		      }
+		    if (ch < 0)
+		      lexer.eofError("unexpected EOF in list");
 		    if (sawDot)
-		      lexer.error("multiple '.' in list");
+		      {
+			lexer.error("multiple '.' in list");
+			sawDotCdr = false;
+			list = lexer.makeNil();
+			last = null;
+		      }
 		    sawDot = true;
 		  }
 		else
@@ -117,13 +131,16 @@ public class ReaderParens extends ReadTableEntry
 	    // interpret this as a 0-element list ended by cdr - i.e.
 	    // just cdr by itself.
 
-	    if (sawDot)
+	    if (sawDotCdr)
 	      {
-		if (sawDotCdr)
-		  {
-		    lexer.error("multiple values after '.'");
-		    sawDotCdr = true;
-		  }
+		lexer.error("multiple values after '.'");
+		last = null;
+		list = lexer.makeNil();
+		sawDotCdr = false;
+		continue;
+	      }
+	    else if (sawDot)
+	      {
 		sawDotCdr = true;
 	      }
 	    else

@@ -58,19 +58,28 @@ PACKAGE = @PACKAGE@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 
-info_TEXINFOS = kawa-tour.texi
+KAWA_HTMLS = kawa_toc.html kawa_1.html kawa_2.html kawa_3.html kawa_4.html \
+	kawa_5.html kawa_6.html kawa_7.html kawa_8.html kawa_9.html \
+	kawa_10.html kawa_11.html
+GENERATED_HTML = $(KAWA_HTMLS)
 
-EXTRA_DIST = kawa.txt kawa_toc.html kawa_[1-9*.html scm2java.html \
+man_MANS = kawa.1
+
+SOURCES = kawa.man
+EXTRA_DIST = kawa.txt $(KAWA_HTMLS) scm2java.html \
   license.terms kawa-tour.tex kawa-tour.ps Compliance.html
-info_TEXINFOS = kawa.texi
-CLEANFILES = kawa.txt *.info kawa_toc.html kawa_[1-9]*.html
+info_TEXINFOS = kawa.texi kawa-tour.texi
+CLEANFILES = kawa.txt *.info kawa_toc.html $(KAWA_HTMLS) kawa1.tmp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_srcdir)/../texinfo/util/texi2dvi; else echo texi2dvi; fi`
 TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
-INFO_DEPS = kawa.info
-DVIS = kawa.dvi
-TEXINFOS = kawa.texi
+INFO_DEPS = kawa.info kawa-tour.info
+DVIS = kawa.dvi kawa-tour.dvi
+TEXINFOS = kawa.texi kawa-tour.texi
+MANS = kawa.1
+
+NROFF = nroff
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in mdate-sh stamp-vti \
 texinfo.tex version.texi
 
@@ -116,6 +125,10 @@ maintainer-clean-vti:
 
 kawa.info: kawa.texi version.texi
 kawa.dvi: kawa.texi version.texi
+
+
+kawa-tour.info: kawa-tour.texi
+kawa-tour.dvi: kawa-tour.texi
 
 
 DVIPS = dvips
@@ -192,7 +205,11 @@ dist-info: $(INFO_DEPS)
 mostlyclean-aminfo:
 	rm -f kawa.aux kawa.cp kawa.cps kawa.dvi kawa.fn kawa.fns kawa.ky \
 	  kawa.log kawa.pg kawa.toc kawa.tp kawa.tps kawa.vr kawa.vrs \
-	  kawa.op kawa.tr kawa.cv
+	  kawa.op kawa.tr kawa.cv kawa-tour.aux kawa-tour.cp \
+	  kawa-tour.cps kawa-tour.dvi kawa-tour.fn kawa-tour.fns \
+	  kawa-tour.ky kawa-tour.log kawa-tour.pg kawa-tour.toc \
+	  kawa-tour.tp kawa-tour.tps kawa-tour.vr kawa-tour.vrs \
+	  kawa-tour.op kawa-tour.tr kawa-tour.cv
 
 clean-aminfo:
 
@@ -201,6 +218,21 @@ distclean-aminfo:
 maintainer-clean-aminfo:
 	for i in $(INFO_DEPS); do rm -f `eval echo $$i*`; done
 clean-info: mostlyclean-aminfo
+install-man: $(MANS)
+	$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(mandir)/man1
+	@sect=1;				\
+	inst=`echo "kawa" | sed '$(transform)'`.1; \
+	if test -f $(srcdir)/kawa.1; then file=$(srcdir)/kawa.1; \
+	else file=kawa.1; fi; \
+	echo " $(INSTALL_DATA) $$file $(mandir)/man$$sect/$$inst"; \
+	$(INSTALL_DATA) $$file $(mandir)/man$$sect/$$inst
+
+uninstall-man:
+	$(NORMAL_UNINSTALL)
+	inst=`echo "kawa" | sed '$(transform)'`.1; \
+	rm -f $(mandir)/man1/$$inst
+
 tags: TAGS
 TAGS:
 
@@ -226,19 +258,20 @@ install-info: install-info-am
 install-exec: 
 	@$(NORMAL_INSTALL)
 
-install-data: 
+install-data: install-man
 	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
 
-uninstall: 
+uninstall: uninstall-man
 
-all: Makefile
+all: Makefile $(MANS)
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
+	$(mkinstalldirs)  $(mandir)/man1
 
 
 mostlyclean-generic:
@@ -269,11 +302,11 @@ maintainer-clean:  maintainer-clean-vti maintainer-clean-aminfo \
 
 .PHONY: default mostlyclean-vti distclean-vti clean-vti \
 maintainer-clean-vti install-info-am uninstall-info mostlyclean-aminfo \
-distclean-aminfo clean-aminfo maintainer-clean-aminfo tags distdir info \
-dvi installcheck install-info install-exec install-data install \
-uninstall all installdirs mostlyclean-generic distclean-generic \
-clean-generic maintainer-clean-generic clean mostlyclean distclean \
-maintainer-clean
+distclean-aminfo clean-aminfo maintainer-clean-aminfo install-man \
+uninstall-man tags distdir info dvi installcheck install-info \
+install-exec install-data install uninstall all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi
@@ -282,11 +315,12 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
           | sed -e '/^Concept Index/,$$d' \
              -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
-
-kawa_toc.html:  $(srcdir)/kawa.texi version.texi
+$(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
 	texi2html -menu -split_chapter $<
-
 kawa.html: kawa_toc.html
+kawa.1: kawa.man
+	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
+	mv kawa1.tmp kawa.1
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

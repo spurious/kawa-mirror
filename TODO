@@ -1,7 +1,14 @@
 JEmacs:
 * clean up function-binding hacks
-* lambda bindings need to be made fluid.
 * vertical-motion
+Scheme sould not reference ELisp statically.
+
+Modules:
+* '(define foo :: <Foo> 10)' should compile to 'public Foo foo = 10;'
+with no extra Binding.  Use reflection when entering in Environment.
+(partially done)
+* Infer parameter and return types when defaulted and otherwise match
+method in explicit module-extends or module-interface.
 
 compile-file should generate .jar, not .zip.
 Should perhaps take multiple file names.
@@ -9,7 +16,9 @@ Update manual to removing .zip references.
 
 Binding for imported unknown names should not be static!
 
-(this) needs to be more general/robust.  What about 'super' ?
+(this) needs to be more general/robust.
+Start by forcing it to make the generated method non-static.
+What about 'super' ?
 
 Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).
@@ -34,8 +43,6 @@ Calls to setter (as in (set! (...)) should be inlined.
 Perhaps:  (object ((<javax.swing.JDialog> myFrame)) ...)
 
 Fix scheme-window in misc.scm.
-
-Implement compileConstant for DComplex and CComplex.
 
 Generate better code for `(and test1 test2 test3)'.
 [See maybe-report-section in testing.scm]

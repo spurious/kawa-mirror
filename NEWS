@@ -1,4 +1,19 @@
+The new declaration (module-export name ...) allows control over the
+names exported from a module.  The new declaration (module-static ...)
+allows control over which definitions are static and which are
+non-static.  This makes it easier to use a module as a Java class.
+
+Procedures names that accidentally clash with inherited method
+names (such as "run") are now re-named.
+
+Simple aliases (define-aliases defining an alias for a variable name)
+are implemented more efficiently.
+
+The package hierarchy is getter cleaner, with fewer cyclic dependencies:
 The gnu.math package no longer has any dependencies on kawa.* or gnu.*.
+Two classes were moved from gnu.text to other classes, avoiding another
+cyclic package dependency between gnu.text and gnu.mapping.  The new
+gnu.kawa.lispexpr is for compile-time handling of Lisp-like languages.
 
 Compliation of literals has been re-done.  A class that can be used
 in a literal no longer needs to be declared as Compilable.  Instead,
@@ -16,6 +31,9 @@ growable buffer, with markers (automatically-adjusted positions).
 Many of the Scheme <string> procedures now work on <abstract-string>.
 The JEmacs BufferContnat class (contains the characters of a buffer)
 now extends CharBuffer.
+
+Some JEmacs changes to support a "mode" concept, as well as
+preliminary support for inferior-process and telnet modes.
 
 New section in manual / web page for projects using Kawa.
 

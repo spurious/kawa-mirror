@@ -1,8 +1,6 @@
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Added gnu/kawa/lispexpr/Makefile.
-	* gnu/Makefile.am (SUBDIRS):  Do text before mapping, now that text
-	no longer depends on mapping (but mapping still depends on text).
 	* kawa/lang/CompileFile.java:  LispReader moved to gnu.kawa.lispexpr.
 	* kawa/lang/ScmRead.java:  Moved to gnu.kawa.lispexpr.
 	* kawa/lang/Makefile.am:  Updated accordingly.

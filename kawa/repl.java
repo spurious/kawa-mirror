@@ -59,7 +59,8 @@ class repl
   public static void main(String args[])
   {
     Interpreter interp = new Scheme();
-    Environment env = Scheme.makeEnvironment ();
+    Environment env = interp.getEnvironment();
+    Environment.setCurrent(env);
     Environment.define_global("symbol-read-case", "P");
 
     int iArg = 0;

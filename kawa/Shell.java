@@ -24,15 +24,17 @@ public class Shell extends Procedure0
     InPort saveIn = InPort.inDefault();
     OutPort saveOut = OutPort.outDefault();
     OutPort saveErr = OutPort.errDefault();
+    Environment saveEnv = Environment.getCurrent();
     try
       {
 	OutPort.setOutDefault(out);
 	OutPort.setErrDefault(err);
 	InPort.setInDefault(in);
+	Environment.setCurrent(interp.getEnvironment());
 
 	if (in instanceof TtyInPort)
 	  {
-	    Object prompter = interp.environ.get ("default-prompter");
+	    Object prompter = interp.lookup("default-prompter");
 	    if (prompter != null && prompter instanceof Procedure)
 	      ((TtyInPort)in).setPrompter((Procedure) prompter);
 	  }
@@ -44,6 +46,7 @@ public class Shell extends Procedure0
 	OutPort.setOutDefault(saveOut);
 	OutPort.setErrDefault(saveErr);
 	InPort.setInDefault(saveIn);
+	Environment.setCurrent(saveEnv);
       }
   }
 
@@ -52,7 +55,7 @@ public class Shell extends Procedure0
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Object prompter = interp.environ.get ("default-prompter");
+	Object prompter = interp.lookup("default-prompter");
 	if (prompter != null && prompter instanceof Procedure)
 	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
       }
@@ -63,7 +66,7 @@ public class Shell extends Procedure0
   public static void run (Interpreter interp,
 			  InPort inp, OutPort pout, OutPort perr)
   {
-    Environment env = interp.environ;
+    Environment env = interp.getEnvironment();
     Translator tr = new Translator (env);
     for (;;)
       {

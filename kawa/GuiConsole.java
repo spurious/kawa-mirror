@@ -10,6 +10,7 @@ import kawa.lang.OutPort;
 import kawa.standard.Scheme;
 import kawa.lang.Interpreter;
 import kawa.lang.Future;
+import kawa.lang.Environment;
 
 /** A Frame containing a Kwa read-eval-print loop.
   * @author Albert Ting <alt@artisan.com> (original base)
@@ -36,7 +37,9 @@ public class GuiConsole extends Frame implements ActionListener {
   MessageArea message = null;
 
   public static void main(String[] args) {
-    new GuiConsole(new Scheme());
+    Interpreter interp = new Scheme();
+    Environment.setCurrent(Scheme.builtin());
+    new GuiConsole(interp);
   }
 
   public GuiConsole(Interpreter interp) {
@@ -61,7 +64,8 @@ public class GuiConsole extends Frame implements ActionListener {
     setSize(700,500);
     setVisible(true);
 
-    thread = new Future (new kawa.Shell(interp, in_p, out_p, err_p));
+    thread = new Future (new kawa.Shell(interp, in_p, out_p, err_p),
+			 interp.getEnvironment());
     thread.start();
   }
 

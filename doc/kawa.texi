@@ -396,6 +396,16 @@ which is a vector of strings.
 A string containing the home directory of the user.
 @end defvar
 
+An alternative interface runs the Java read-eval-print-loop
+inside a new window. This is in some ways nicer.  One reason
+is that it provides better editing.  You can also create
+new windows.  They can either have different top-level
+environments or they can share environments.  To try it, do:
+@example
+java kawa.GuiConsole
+@end example
+Note that @code{GuiConsole} currently ignores all command-line options.
+
 @node Restrictions, Extensions, Running, Top
 @section Features of R4RS not implemented
 

@@ -63,9 +63,9 @@ public class AutoloadSyntax extends Syntax
             Environment env = Environment.current ();
 	    ((ModuleBody) value).run (env);
 	    value = env.get (name);
-	    if (value == null
+	    if (value == null || value == this
 		|| !(value instanceof Syntax))
-	      throw_error ("invalid ModuleBody class");
+	      throw_error("syntax not found in ");
 	    loaded = (Syntax) value;
 	  }
 	else if (value instanceof Syntax)
@@ -80,7 +80,7 @@ public class AutoloadSyntax extends Syntax
 	      }
 	  }
 	else
-	  throw_error ("failed to autoload valid syntax object");
+	  throw_error ("failed to autoload valid syntax object ");
       }
     catch (ClassNotFoundException ex)
       {	throw_error ("failed to find class "); }

@@ -70,10 +70,13 @@ SECONDARY_OBJS=\
   misc$$environment__bound_P.class \
   misc$$scheme__implementation__version.class \
   numbers$$abs.class \
+  numbers$$angle.class \
   numbers$$complex_P.class \
   numbers$$denominator.class \
   numbers$$exp.class \
+  numbers$$imag__part.class \
   numbers$$log.class \
+  numbers$$magnitude.class \
   numbers$$make__polar.class \
   numbers$$make__rectangular.class \
   numbers$$number_P.class \

@@ -38,4 +38,16 @@
    x y))
 (define (real-part x)
   ((primitive-virtual-method <complex> "re" <real> ())  x))
+(define (imag-part x)
+  ((primitive-static-method <quantity> "make" <quantity>
+			    (<complex> <gnu.math.Unit>))
+   ((primitive-virtual-method <quantity> "im" <real> ())  x)
+   ((primitive-virtual-method <quantity> "unit" <gnu.math.Unit> ()) x)))
+(define (magnitude x)
+  ((primitive-virtual-method <number> "abs" <number> ())
+   x))
+(define (angle x)
+  ((primitive-virtual-method <complex> "angle" <real>
+ ())
+   ((primitive-virtual-method <quantity> "number" <complex> ()) x)))
 

@@ -6,6 +6,7 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.Hashtable;
+import gnu.text.SourceMessages;
 
 public class Scheme extends Interpreter
 {
@@ -425,6 +426,7 @@ public class Scheme extends Interpreter
       define_syntax("primitive-array-get", "kawa.lib.reflection");
       define_syntax("primitive-array-set", "kawa.lib.reflection");
       define_syntax("primitive-array-length", "kawa.lib.reflection");
+      define_proc("subtype?", "kawa.lib.reflection");
       define_proc("primitive-throw", new kawa.standard.prim_throw());
       define_syntax("try-finally", "kawa.standard.try_finally");
       define_syntax("try-catch", "kawa.standard.try_catch");
@@ -543,7 +545,19 @@ public class Scheme extends Interpreter
    * @return result of last expression, or Interpreter.voidObject if none. */
   public static Object eval (InPort port, Environment env)
   {
-    return Eval.evalBody(CompileFile.readBody(port), env);
+    try
+      {
+	SourceMessages messages = new SourceMessages();
+	return Eval.evalBody(CompileFile.readBody(port, messages),
+			     env, messages);
+      }
+    catch (gnu.text.SyntaxException e)
+      {
+	// The '\n' is because a SyntaxException includes a line number,
+	// and it is better if that starts the line.  FIXME OBSOLETE
+	throw new RuntimeException("eval: errors while compiling `"+
+				   name+"`:\n"+e.getMessages().toString(20));
+      }
   }
 
   /** Evalutate Scheme expressions from an "S expression."
@@ -650,6 +664,7 @@ public class Scheme extends Interpreter
 	types.put ("list", ClassType.make("kawa.lang.List"));
 	types.put ("pair", ClassType.make("kawa.lang.Pair"));
 	types.put ("string", ClassType.make("kawa.lang.FString"));
+	types.put ("character", ClassType.make("kawa.lang.Char"));
 	types.put ("vector", ClassType.make("kawa.lang.Vector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));

@@ -1,3 +1,15 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* ArrayType.java (getImplementationType):  New method
+
+	* ClassType.java (compare):  Handle case when both are interfaces.
+
+	* Type.java (string_type):  Is now a normal Java class.
+	(tostring_type):  New class;  String that uses toString to convert.
+	* ObjectType.java (coerceFromObject, emitCoerceFromObject):  Check if
+	this is new Type.tostring_type
+	(getImplementationType):  Map tostring_type to string_type.
+
 2001-10-23  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitJsr):  New method.

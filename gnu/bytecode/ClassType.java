@@ -771,6 +771,8 @@ public class ClassType extends ObjectType implements AttrContainer {
       {
 	if (cother.implementsInterface(this))
 	  return 1;
+	if (cother.isInterface() && this.implementsInterface(cother))
+	  return -1;
 	return -2;
       }
     if (cother.isInterface())

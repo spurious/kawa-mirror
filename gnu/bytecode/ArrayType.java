@@ -19,6 +19,12 @@ public class ArrayType extends ObjectType
     this.elements = elements;
   }
 
+  public Type getImplementationType()
+  {
+    Type eltype = elements.getImplementationType();
+    return elements == eltype ? this : make(eltype);
+  }
+
   /** Find or create an ArrayType for the specified element type. */
   public static ArrayType make(Type elements)
   {
@@ -47,5 +53,4 @@ public class ArrayType extends ObjectType
     else
       return -3;
   }
-
 }

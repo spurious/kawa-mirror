@@ -1,11 +1,16 @@
 package gnu.kawa.util;
 import gnu.math.*;
+import java.io.*;
 
 /** Uniform vector of signed 64-bit integers. */
 
-public class S64Vector extends UniformVector
+public class S64Vector extends UniformVector implements Externalizable
 {
   long[] data;
+
+  public S64Vector ()
+  {
+  }
 
   public S64Vector(int num, long val)
   {
@@ -53,5 +58,27 @@ public class S64Vector extends UniformVector
   public final void print(int index, java.io.PrintWriter ps)
   {
     ps.print(longValue(index));
+  }
+
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the elements in order (written using writeLong).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = data.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeLong(data[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    long[] data = new long[len];
+    for (int i = 0;  i < len;  i++)
+      data[i] = in.readLong();
+    this.data = data;
   }
 }

@@ -1,11 +1,16 @@
 package gnu.kawa.util;
 import gnu.math.*;
+import java.io.*;
 
 /** Uniform vector of unsigned 8-bit integers. */
 
-public class U8Vector extends UniformVector
+public class U8Vector extends UniformVector implements Externalizable
 {
   byte[] data;
+
+  public U8Vector ()
+  {
+  }
 
   public U8Vector(int num, byte val)
   {
@@ -55,4 +60,25 @@ public class U8Vector extends UniformVector
     ps.print(intValue(index));
   }
 
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the elements in order (written using writeByte).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = data.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeByte(data[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    byte[] data = new byte[len];
+    for (int i = 0;  i < len;  i++)
+      data[i] = in.readByte();
+    this.data = data;
+  }
 }

@@ -1,6 +1,18 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
-	* FString.java:  Make implement java.io.Externalizable/
+	* F32Vector.java:  Make implement java.io.Externalizable.
+	(writeExternal, readExternal, default constructor):  Added new methods.
+	* F64Vector.java:  Likewise.
+	* S8Vector.java:  Likewise.
+	* S16Vector.java:  Likewise.
+	* S32Vector.java:  Likewise.
+	* S64Vector.java:  Likewise.
+	* U8Vector.java:  Likewise.
+	* U16Vector.java:  Likewise.
+	* U32Vector.java:  Likewise.
+	* U64Vector.java:  Likewise.
+
+	* FString.java:  Make implement java.io.Externalizable.
 	(writeExternal, readExternal, default constructor):  Added new methods.
 	* FVector.java:  Likewise.
 	* Pair.java:  Likewise.

@@ -1,11 +1,16 @@
 package gnu.kawa.util;
 import gnu.math.*;
+import java.io.*;
 
 /** Uniform vector of signed 32-bit integers. */
 
-public class S32Vector extends UniformVector
+public class S32Vector extends UniformVector implements Externalizable
 {
   int[] data;
+
+  public S32Vector ()
+  {
+  }
 
   public S32Vector(int num, int val)
   {
@@ -53,5 +58,27 @@ public class S32Vector extends UniformVector
   public final void print(int index, java.io.PrintWriter ps)
   {
     ps.print(intValue(index));
+  }
+
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the elements in order (written using writeInt).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = data.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeInt(data[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    int[] data = new int[len];
+    for (int i = 0;  i < len;  i++)
+      data[i] = in.readInt();
+    this.data = data;
   }
 }

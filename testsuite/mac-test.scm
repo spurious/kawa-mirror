@@ -1,4 +1,4 @@
-(test-init "macros" 45)
+(test-init "macros" 46)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -176,3 +176,10 @@
       (cond-expand ((not srfi-4)
 		    "no-srfi-4")
 		   (else "has-srfi-4")))
+
+;; Based on bug reported 2003-06-01 by Sven.Hartrumpf@FernUni-Hagen.de
+(cond-expand (kawa
+	      (define found-kawa-feature "yes"))
+	     (else
+	      (define found-kawa-feature "no")))
+(test "yes" 'found-kawa-feature found-kawa-feature)

@@ -1,3 +1,9 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm:  More test, mostly let-syntax and friends.
+	* misc-test.scm:  Add a test for internal define-alias.
+	* test.scm:  Comment our extra (newline).
+
 1999-08-17  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  Another object regression test.

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 65)
+(test-init "Miscellaneous" 66)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -225,6 +225,14 @@
 (set! (car p2) 49)
 (test '(49 . 50) 'test-alias-2 p2)
 (test '(49 . 50) 'test-alias-3 ((location p1)))
+
+(define (test-alias-4 x y)
+  (define-alias xcar (car x))
+  (define-alias yy y)
+  (set! yy (+ yy xcar))
+  (set! xcar yy)
+  (list yy xcar x y))
+(test '(59 59 (59 . 50) 59) test-alias-4 p1 10)
 
 (define test-nesting-1
   (lambda ()

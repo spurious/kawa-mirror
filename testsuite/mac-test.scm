@@ -1,4 +1,4 @@
-(test-init "macros" 7)
+(test-init "macros" 12)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -15,8 +15,8 @@
   (let ((var (gentemp)))
     `(let ((,var ,test))
        (cond ((< , var 0) ,neg-form)
-	     ((= ,var 0) ,zero-form)
-	     (#t ,pos-form)))))
+             ((= ,var 0) ,zero-form)
+             (#t ,pos-form)))))
 
 (test "POS" 'arithmetic-if-pos (arithmetic-if 234 "NEG" "ZERO" "POS"))
 (test "NEG" 'arithmetic-if-pos (arithmetic-if -234 "NEG" "ZERO" "POS"))
@@ -26,3 +26,65 @@
       ((lambda lambda lambda) 'x))
 (test '(1 2 3) 'lambda-begin
       ((lambda (begin) (begin 1 2 3)) (lambda lambda lambda)))
+
+;;; From R5RS:
+(test 'now 'let-syntax-1
+      (let-syntax
+          ((when (syntax-rules ()
+                               ((when test stmt1 stmt2 ...)
+                                (if test
+                                    (begin stmt1 stmt2 ...))))))
+        (let ((if #t))
+          (when if (set! if 'now))
+          if)))
+
+;;; From R5RS:
+(test 'outer 'let-syntax-2
+      (let ((x 'outer))
+        (let-syntax ((m (syntax-rules () ((m) x))))
+          (let ((x 'inner))
+            (m)))))                ;       =>  outer
+
+
+;;; Based on an example Listed as an "error" in R5RS.
+;;; (We don't actually complain about the erroneous version.)
+(test 6 'let-syntax-3
+      (let-syntax
+          ((foo (syntax-rules ()
+                              ((foo (proc args ...) body ...)
+                               (define proc
+                                 (lambda (args ...)
+                                   body ...))))))
+        (let ((x 3))
+          (foo (plus x y) (+ x y))
+          (let () ;; Added this extra let to make it legit.
+            (define foo x)
+            (plus foo x)))))
+
+;;; From R5RS:
+(test 7 'letrec-syntax-1
+      (letrec-syntax
+       ((my-or (syntax-rules ()
+                             ((my-or) #f)
+                             ((my-or e) e)
+                             ((my-or e1 e2 ...)
+                              (let ((temp e1))
+                                (if temp
+                                    temp
+                                    (my-or e2 ...)))))))
+       (let ((x #f)
+             (y 7)
+             (temp 8)
+             (let odd?)
+             (if even?))
+         (my-or x
+                (let temp)
+                (if y)
+                y))))
+
+(define (internal-define-syntax)
+  (let ()
+    (define-syntax ten (syntax-rules () ((ten) 10)))
+    (define x (ten))
+    x))
+(test 10 internal-define-syntax)

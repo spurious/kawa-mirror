@@ -1003,7 +1003,7 @@
 (let ((n (string->number "281474976710655")))
   (if (and n (exact? n))
       (test-bignum)))
-(newline)
+;(newline)
 (test-sc4)
 (test-delay)
 ;(display "To fully test continuations:")

@@ -4,7 +4,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
-/** This implements the numeric comparison relations: <. <=, etc. */
+/** This implements the numeric comparison relations: <, <=, etc. */
 
 public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 {

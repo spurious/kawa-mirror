@@ -1,7 +1,7 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
 
-/** Represents a "mode instance" - i.e. a mode active for a specific Buffer. */
+/** Represents a "mode instance" - a mode active for a specific {@link Buffer}. */
 
 public class Mode implements gnu.mapping.ApplyMethodContainer
 {

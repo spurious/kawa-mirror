@@ -346,7 +346,7 @@ public abstract class AbstractSequence
     removePos(startPos(), endPos());
   }
 
-  /** Does the position pair have the "isAfter" property?
+  /** Tests whether the position has the "isAfter" property.
    * I.e. if something is inserted at the position, will
    * the iterator end up being after the new data? */
   protected boolean isAfterPos (int ipos)

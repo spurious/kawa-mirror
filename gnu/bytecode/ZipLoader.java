@@ -126,7 +126,7 @@ public class ZipLoader extends ClassLoader
     close();
   }
 
-  /** Close the zip archive. loadClass will reopen if necessary. */
+  /** Close the zip archive - loadClass will reopen if necessary. */
   public void close()
     throws java.io.IOException
   {

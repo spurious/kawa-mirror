@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 2000  Per M.A. Bothner.
+// Copyright (c) 1997, 2000, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -417,7 +417,7 @@ public abstract class Type {
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
-  /** The "return type" of an expression that never returns, e.g. a throw. */
+  /** The "return type" of an expression that never returns, such as a throw. */
   public static final PrimType neverReturnsType = new PrimType (void_type);
   static { neverReturnsType.this_name = "(never-returns)"; }
 

@@ -1356,8 +1356,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   { emitGotoIfCompare2(label, 158); }
 
 
-  /** Compile start of a conditional:  if (!(x OPCODE 0)) ...
-   * The value of x must already have been pushed. */
+  /** Compile start of a conditional:
+   *   <tt>if (!(<var>x</var> opcode 0)) ...</tt>.
+   * The value of <var>x</var> must already have been pushed. */
   public final void emitIfCompare1 (int opcode)
   {
     IfState new_if = new IfState(this);
@@ -1368,21 +1369,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     new_if.start_stack_size = SP;
   }
 
-  /** Compile start of conditional:  if (x != 0) ...
+  /** Compile start of conditional:  <tt>if (x != 0) ...</tt>.
    * Also use this if you have pushed a boolean value:  if (b) ... */
   public final void emitIfIntNotZero()
   {
     emitIfCompare1(153); // ifeq
   }
 
-  /** Compile start of conditional:  if (x <= 0) */
+  /** Compile start of conditional:  <tt>if (x <= 0)</tt>. */
   public final void emitIfIntLEqZero()
   {
     emitIfCompare1(157); // ifgt
   }
 
-  /** Compile start of a conditional:  if (!(x OPCODE null)) ...
-   * The value of x must already have been pushed and must be of
+  /** Compile start of a conditional:  <tt>if (!(x opcode null)) ...</tt>.
+   * The value of <tt>x</tt> must already have been pushed and must be of
    * reference type. */
   public final void emitIfRefCompare1 (int opcode)
   {

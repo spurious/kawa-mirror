@@ -1,6 +1,6 @@
 package gnu.text;
 
-/** Used to signal a non-recoverable (i.e. fatal) syntax error. */
+/** Used to signal a non-recoverable (fatal) syntax error. */
 
 public class SyntaxException extends Exception
 {

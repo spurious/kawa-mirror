@@ -1,7 +1,8 @@
 package gnu.kawa.functions;
 import gnu.expr.Interpreter;
 
-/** Implement the standard Scheme procedure "equal?" and the Lisp "equal". */
+/** Implement the standard Scheme procedure <tt>equal?</tt>
+ * and the Lisp <tt>equal</tt>. */
 
 public class IsEqual extends gnu.mapping.Procedure2
 {

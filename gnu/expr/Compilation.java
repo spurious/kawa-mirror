@@ -1075,9 +1075,9 @@ public class Compilation
       }
   }
 
-  /** Generate ModuleBody's apply0 .. applyN methods.
-   * Use the applyMethods vector, which contains methods that implement
-   * the (public, readable) methods of the current module. */
+  /** Generate ModuleBody's <tt>apply0</tt>...<tt>applyN</tt> methods.
+   * Use the <tt>applyMethods</tt> vector, which contains methods that
+   * implement the (public, readable) methods of the current module. */
   public void generateApplyMethods(LambdaExp lexp)
   {
     int numApplyMethods

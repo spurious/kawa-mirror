@@ -116,7 +116,7 @@ public abstract class RealNum extends Complex
     return toExactInt(toInt(value, rounding_mode));
   }
 
-  /** Converts an integral double (e.g. toInt result) to an IntNum. */
+  /** Converts an integral double (such as a toInt result) to an IntNum. */
   public static IntNum toExactInt (double value)
   {
     if (Double.isInfinite (value) || Double.isNaN (value))

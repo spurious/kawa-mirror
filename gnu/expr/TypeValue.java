@@ -13,19 +13,20 @@ public interface TypeValue
   /** The lower-level Type used to represent instances of this type. */
   public Type getImplementationType();
 
-  /** Emit code for 'if (INCOMING instanceof THIS_TYPE) DECL = INCOMING ...'
-   * This method is designed for 'typeswitch' applications, where this
+  /** Emit code for
+   *  <tt>if (incoming instanceof this_type) decl = incoming ...</tt>.
+   * This method is designed for <tt>typeswitch</tt> applications, where this
    * call is the first part of a conditional, so it must be followed
-   * by calls to emitElse and emitFi.
+   * by calls to <tt>emitElse</tt> and <tt>emitFi</tt>.
    * @param incoming Contains the value we are testing to see if it has the
-   *        the type of 'this'.  If null, use top-of-stack.
-   * @param decl If non-null, assign value after coercion to Declaration.
+   *        type of <tt>this</tt>.  If null, use top-of-stack.
+   * @param decl If non-null, assign value after coercion to <tt>Declaration</tt>.
    * @param comp The compilation state.
    */
   public void emitTestIf(Variable incoming, Declaration decl,
 			 Compilation comp);
 
-  /** Emit code for 'INCOMING instanceof THIS_TYPE'.
+  /** Emit code for <tt>incoming instanceof this_type</tt>.
    * @param incoming Contains the value we are testing to see if it has the
    *        the type of 'this'.  If null, use top-of-stack.
    * @param comp The compilation state.

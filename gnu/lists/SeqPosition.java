@@ -146,7 +146,7 @@ implements
   }
 
   /** Move one element forwards, if possible.
-   * @returns if we succeeded in moving forwards (i.e. not at end of sequence).
+   * @return if we succeeded in moving forwards (i.e. not at end of sequence).
    */
   public boolean gotoNext()
   {
@@ -239,7 +239,7 @@ implements
     return sequence.nextIndex(getPos()) - 1;
   }
 
-  /** Does the position pair have the "isAfter" property?
+  /** Tests whether the position pair has the "isAfter" property.
    * I.e. if something is inserted at the position, will
    * the iterator end up being after the new data?
    * A toNext() or next() command should set isAfter() to true;

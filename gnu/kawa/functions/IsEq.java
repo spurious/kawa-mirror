@@ -3,7 +3,8 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-/** Implement the standard Scheme function "eq?" and the Lisp "eq". */
+/** Implement the standard Scheme function <tt>eq?</tt>
+ * and the Lisp <tt>eq</tt>. */
 
 public class IsEq extends Procedure2 implements Inlineable
 {

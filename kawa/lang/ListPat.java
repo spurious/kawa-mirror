@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.lists.*;
 
-/** Match a list whose length in in the range [min_length .. max_length]. */
+/** Match a list whose length in in the range [min_length..max_length]. */
 
 public class ListPat extends Pattern
 {

@@ -3,6 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
+import gnu.mapping.CharArrayOutPort;
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -75,5 +76,14 @@ public class NodeTree extends TreeList
 	comp = id1 < id2 ? -1 : id1 > id2 ? 1 : 0;
       }
     return comp;
+  }
+
+
+  public String toString ()
+  {
+    CharArrayOutPort wr = new CharArrayOutPort();
+    XMLPrinter xp = new XMLPrinter(wr);
+    consume(xp);
+    return wr.toString();
   }
 }

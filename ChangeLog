@@ -1,3 +1,13 @@
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java:  No extends from gnu.expr.Parser.
+	(current_scope):  Moved field to Parser.
+	(parse):  New method, implements method from Parser.
+	(currentLambda, currentScope, getInterpreter, mustCompileHere,
+	push, pop, pushDecls, popDecls):  Moved methods to Parser.
+
+	* kawa/lang/Translator.java (getBinding):  Also check inherited env.
+
 2000-04-18  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.6.67.

@@ -18,20 +18,13 @@ import gnu.kawa.util.*;
  * each top-level form.
  */
 
-public class Translator extends Object
+public class Translator extends Parser
 {
   // Map name to Declaration.
   public Environment environ;
-  ScopeExp current_scope;
 
   /** If doing immediate evaluation. */
   public boolean immediate;
-
-  public LambdaExp currentLambda () { return current_scope.currentLambda (); }
-
-  public ScopeExp currentScope() { return current_scope; }
-
-  public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
 
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
@@ -82,6 +75,11 @@ public class Translator extends Object
   }
 
   public final Environment getGlobalEnvironment() { return env; }
+
+  public Expression parse (Object input)
+  {
+    return rewrite(input);
+  }
 
   final Expression rewrite_car (Pair pair)
   {
@@ -151,22 +149,14 @@ public class Translator extends Object
     env.put (name, value);
   }
 
-  /** Note that we have seen a construct that must be compiled, not evaluated.
-   * If we are not inside a lambda (which is always compiled), but
-   * only inside the outer-most ModuleExp, note that it must be compiled. */
-  public void mustCompileHere ()
-  {
-    LambdaExp lambda = currentLambda ();
-    if (lambda instanceof ModuleExp)
-      ((ModuleExp)lambda).mustCompile = true;
-  }
-
   Object getBinding (Object obj)
   {
     if (obj instanceof String)
       {
 	String sym = (String) obj;
 	Binding binding = environ.lookup (sym);
+	if (binding == null)
+	  binding = env.lookup(sym);
 	if (binding == null)
 	  obj = null;
 	else
@@ -550,58 +540,5 @@ public class Translator extends Object
     else
       environ.put(name, old);
     return true;
-  }
-
-  /**
-   * Insert decl into environ.
-   * (Used at rewrite time, not eval time.)
-   */
-  public void push (Declaration decl)
-  {
-    String sym = decl.getName();
-    if (sym == null)
-      return;
-    pushBinding(sym, decl);
-  }
-
-  /** Remove this from Translator.environ.
-   * (Used at rewrite time, not eval time.)
-   */
-  void pop (Declaration decl)
-  {
-    String sym = decl.getName();
-    if (sym == null)
-      return;
-    popBinding();
-  }
-
-  public final void pushDecls (ScopeExp scope)
-  {
-    //shadowStack.push(null);
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      push(decl);
-  }
-
-  public final void popDecls (ScopeExp scope)
-  {
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      pop(decl);
-  }
-
-  public void push (ScopeExp scope)
-  {
-    scope.outer = current_scope;
-    if (! (scope instanceof ModuleExp))
-      mustCompileHere();
-    current_scope = scope;
-    pushDecls(scope);
-  }
-
-  public void pop (ScopeExp scope)
-  {
-    popDecls(scope);
-    current_scope = scope.outer;
   }
 }

@@ -168,9 +168,6 @@ public class Compilation
   Hashtable literalTable;
   int literalsCount;
   Literal literalsChain;
-  /* The static "literals" field, which points to an array of literal values.
-   * Only used if immdiate. */
-  Field literalsField;
 
   public static boolean generateMainDefault = false;
   /** True if we should generate a main(String[]) method. */
@@ -249,12 +246,6 @@ public class Compilation
 	if (literal.field == null)
 	  literal.assign (this);
 	code.emitGetStatic(literal.field);
-	if (literal.field == literalsField)
-	  {
-	    code.emitPushInt(literal.index);
-	    code.emitArrayLoad(scmObjectType);
-	    method.maybe_compile_checkcast (literal.type);
-	  }
       }
   }
 
@@ -360,19 +351,44 @@ public class Compilation
 	// This function is probably not quite enough ...
 	// (Note the verifier may be picky about class names.)
 	if (Character.isLowerCase (ch) || Character.isUpperCase (ch)
-	    || Character.isDigit (ch) || ch == '_')
+	    || Character.isDigit (ch) || ch == '_' || ch == '$')
 	  mangled.append(ch);
 	else if (ch == '!')
 	  mangled.append("_B");
 	else if (ch == '?')
-	  mangled.append("_P");
+	  {
+	    char first = mangled.length() > 0 ? mangled.charAt(0) : '\0';
+	    if (i + 1 == len && Character.isLowerCase(first))
+	      {
+		mangled.setCharAt(0, Character.toTitleCase(first));
+		mangled.insert(0, "is");
+	      }
+	    else
+	      mangled.append("_P");
+	  }
 	else if (ch == '%')
 	  mangled.append("_C");
 	else if (ch == '-')
 	  {
-	    if (i + 1 < len && name.charAt(i+1) == '>')
+	    char next = i + 1 < len ? name.charAt(i+1) : '\0';
+	    if (next == '>')
 	      {
-		mangled.append("_2_");
+		i++;
+		next = i + 1 < len ? name.charAt(i+1) : '\0';
+		if (Character.isLowerCase(next))
+		  {
+		    mangled.append("To");
+		    next = Character.toTitleCase(next);
+		    mangled.append(next);
+		    i++;
+		  }
+		else
+		  mangled.append("_2_");
+	      }
+	    else if (Character.isLowerCase(next))
+	      {
+		next = Character.toTitleCase(next);
+		mangled.append(next);
 		i++;
 	      }
 	    else
@@ -429,9 +445,6 @@ public class Compilation
 
     mainClass = allocClass (lexp, classname);
     literalTable = new Hashtable (100);
-    if (immediate)
-      literalsField = mainClass.addField ("literals",
-					  objArrayType, Access.STATIC);
     addClass (lexp);
   }
 

@@ -7,9 +7,7 @@ public class Literal
 {
   Object value;
 
-  /* If Compilation is immediate, this is the index into the literalsField
-   * array that contains the value of this Literal.
-   * Otherwise, if field is non-null, it is the number of the Field.
+  /* If field is non-null, it is the number of the Field.
    * I.e. if the index is 10, the value of the Literal is the value of
    * the static Field named Lit10. */
   int index;
@@ -47,12 +45,9 @@ public class Literal
     index = comp.literalsCount++;
     next = comp.literalsChain;
     comp.literalsChain = this;
-    if (! comp.immediate)
-      field = comp.mainClass.addField ("Lit"+index, type,
-					Access.STATIC|Access.FINAL);
-    else
-      // Not actually used, except some places test that field==null.
-      field = comp.literalsField;
+    int flags = comp.immediate ? Access.STATIC|Access.PUBLIC
+      : Access.STATIC|Access.FINAL;
+    field = comp.mainClass.addField ("Lit"+index, type, flags);
   }
 
   /** Create a new Literal, where comp must be in immediate mode. */
@@ -60,8 +55,8 @@ public class Literal
   {
     this.value = value;
     comp.literalTable.put (value, this);
+    this.type = Type.make(value.getClass());
     assign (comp);
-    this.type = comp.scmObjectType;
   }
 
   /** Create a new Literal, for a value available from a static field.

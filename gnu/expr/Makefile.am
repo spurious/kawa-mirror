@@ -13,7 +13,6 @@ java_JAVA=\
   ChainLambdas.java \
   Compilable.java \
   Compilation.java \
-  CompiledProc.java \
   ConditionalTarget.java \
   Declaration.java \
   ErrorExp.java \

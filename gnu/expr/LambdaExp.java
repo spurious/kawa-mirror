@@ -629,21 +629,6 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  void compile_setLiterals (Compilation comp)
-  {
-    ClassType[] interfaces = { new ClassType ("gnu.expr.CompiledProc") };
-    comp.mainClass.setInterfaces (interfaces);
-
-    Method setLiterals_method
-      = comp.mainClass.addMethod ("setLiterals", comp.applyNargs,
-				   Type.void_type, Access.PUBLIC);
-    setLiterals_method.init_param_slots ();
-    CodeAttr code = setLiterals_method.getCode();
-    code.emitLoad(code.getArg(1));
-    code.emitPutStatic(comp.literalsField);
-    code.emitReturn();
-  }
-
   /** Used to control with .zip files dumps are generated. */
   public static String dumpZipPrefix;
   public static int dumpZipCounter;
@@ -655,7 +640,6 @@ public class LambdaExp extends ScopeExp
 	String class_name = getJavaName ();
 
 	Compilation comp = new Compilation (this, class_name, null, true);
-	compile_setLiterals (comp);
 
 	byte[][] classes = new byte[comp.numClasses][];
 	String[] classNames = new String[comp.numClasses];
@@ -703,8 +687,6 @@ public class LambdaExp extends ScopeExp
 	Object inst = clas.newInstance ();
 
 	/* Pass literal values to the compiled code. */
-	CompiledProc cproc = (CompiledProc) inst;
-	Object[] literals = new Object[comp.literalsCount];
 	for (Literal literal = comp.literalsChain;  literal != null;
 	     literal = literal.next)
 	  {
@@ -714,9 +696,16 @@ public class LambdaExp extends ScopeExp
 	    SFormat.print(literal.value, out);
 	    out.println();
 	    */
-	    literals[literal.index] = literal.value;
+	    try
+	      {
+		clas.getDeclaredField(literal.field.getName())
+		  .set(null, literal.value);
+	      }
+	    catch (java.lang.NoSuchFieldException ex)
+	      {
+		throw new Error("internal error - "+ex);
+	      }
 	  }
-	cproc.setLiterals (literals);
 	Named named = (Named) inst;
 	if (named.name () == null)
 	  named.setName (this.name);

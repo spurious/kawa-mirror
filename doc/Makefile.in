@@ -53,7 +53,8 @@ TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_s
 INFO_DEPS = kawa.info
 DVIS = kawa.dvi
 TEXINFOS = kawa.texi
-DIST_COMMON =  Makefile.am Makefile.in mdate-sh texinfo.tex version.texi
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in mdate-sh texinfo.tex \
+version.texi
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \

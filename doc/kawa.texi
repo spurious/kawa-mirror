@@ -36,33 +36,30 @@ and that compiles Scheme code into Java byte-codes.
 
 This documents version @value{VERSION}, updated @value{UPDATED}.
 
+The author of Kawa is
 @ifhtml
-R. Alexander Milowski
-<tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>
-wrote the first Kawa releases.
 <a href="http://www.cygnus.com/~bothner">Per Bothner</a>
-<tt>&lt;<a href="mailto:bothner@cygnus.com">bothner@cygnus.com</a>&gt;</tt>
-extensively re-wrote Kawa, and released version 0.3 and up.
+<tt>&lt;<a href="mailto:bothner@cygnus.com">bothner@cygnus.com</a>&gt;</tt>.
+It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
+<tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>.
 @end ifhtml
 @ifclear html
-R. Alexander Milowski @w{<alex@@copsol.com>} wrote the first Kawa releases.
-Per Bothner @w{<bothner@@cygnus.com>} extensively re-wrote Kawa,
-and released version 0.3 and up.
+Per Bothner @w{<bothner@@cygnus.com>}.
+It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
+R. Alexander Milowski @w{<alex@@copsol.com>}.
 @end ifclear
 
 @ifhtml
 <a href="http://www.cygnus.com/~bothner/kawa.html">This</a>
-is my Kawa home-page.
-<p>
+is the Kawa home-page.
 <a href="http://www.copsol.com/kawa/index.html">
 Copsol's Kawa home-page</a>
 is not maintained by Cygnus and so may not be as current.
 @end ifhtml
 @ifclear html
-My Kawa home page (which is currently just an on-line
+The Kawa home page (which is currently just an on-line
 version of this document) is
 @url{http://www.cygnus.com/~bothner/kawa.html}.
-
 Copsol's Kawa home-page (@url{http://www.copsol.com/kawa/index.html})
 is not maintained by Cygnus and so may not be as current.
 @end ifclear
@@ -135,10 +132,10 @@ The pre-compiled @code{.class} files are in
 
 A snapshot of the development tree is
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.1alpha.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.1alpha.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz}.
 @end ifclear
 
 @node Installation, Running, Getting Kawa, Top
@@ -170,7 +167,7 @@ You can download free copies of
 @end ifhtml
 JDK 1.0.2
 @ifhtml
-</a>.
+</a>
 for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS.
 @end ifhtml
 @ifclear html
@@ -190,7 +187,7 @@ include wherever you installed Kawa.
 
 If you have the JDK in directory @code{$JDK},
 and you are using a Bourne-shell compatible shell
-(/bin/sh, ksh, bash, or other) you can set both variables thus:
+(/bin/sh, ksh, bash, and some others) you can set both variables thus:
 @example
 PATH=$JDK/bin:$PATH
 CLASSPATH=.:$JDK/lib/classes.zip
@@ -259,6 +256,13 @@ Just run make:
 @example
 make
 @end example
+This assume that @samp{java} and @samp{javac} are the java interpreter
+and compiler, respectively.
+If you are using the Kaffe free Java interpreter,
+you need to instead say:
+@example
+make JAVA=kaffe
+@end example
 
 You can now test the system by running Kawa in place:
 @example
@@ -285,15 +289,26 @@ that @code{$PREFIX/java} is on the path:
 @example
 export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
 @end example
+This is done automatically if you use the @samp{kawa} script.
 
 @node Running, Restrictions, Installation, Top
 @section How to start up and run Kawa
 
-To run Kawa, you must start a Java interpreter.
+The easiest way to start up Kawa is to run the @samp{kawa}
+script.  This finds your java interpreter, and sets up @samp{CLASSPATH}
+correctly.
+If you have installed Kawa such @code{$PREFIX/bin} is in your @code{$PATH},
+just do:
+@example
+kawa
+@end example
+However, @samp{kawa} only works on Unix-like systems.
+
+To run Kawa manually, you must start a Java interpreter.
 This depends on the Java interpreter.
 For JavaSoft's JDK, you must have the Java interpreter
 in your @code{PATH}.
-You must also make sure that the @code{kawa.class} file,
+You must also make sure that the @code{kawa/repl.class} file,
 the rest of the Kawa packages, and the standard Java
 packages can be found by searching CLASSPATH.
 @xref{Running Java}.
@@ -301,14 +316,6 @@ packages can be found by searching CLASSPATH.
 Then you do:
 @example
 java kawa.repl
-@end example
-
-If you running Kawa on a Unix-like system, you can
-use the @code{kawa} shell script.  If you have installed
-it in your @code{PATH} (i.e. @code{$PREFIX/bin} is in your @code{$PATH}),
-just do:
-@example
-kawa
 @end example
 
 In either case, you will then get the @samp{kawa>} prompt, which means you are
@@ -321,7 +328,7 @@ or call the @code{exit} procedure (with 0 or 1 integer arguments).
 
 You can pass various flags to Kawa, for example:
 @example
-java kawa.repl -e '(display (+ 12 4))(newline)'
+kawa -e '(display (+ 12 4))(newline)'
 @end example
 This causes Kawa to print @samp{16}, and then exit.
 
@@ -339,12 +346,15 @@ The global variable @samp{command-line-arguments} is set to the remaining
 arguments (if any), and an interactive read-eval-print loop is started.
 @end table
 
+The options @samp{-C}, @samp{-d}, @samp{-T} and @samp{-P}
+are used to compile a Scheme file; see @ref{Files compilation}.
+
 If there are further command-line arguments after the options
 have been processed, then the first remaining argument names a
 file that is read and evaluated.  If there is no such argument,
 then Kawa enters an interactive read-eval-print loop,
 but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
-or @samp{--} options were specified.
+@samp{-C}, or @samp{--} options were specified.
 
 @defvar command-line-arguments
 The remaining arguments (following any switches processed by Kawa itself)
@@ -558,10 +568,10 @@ The interface is similar to the standard @code{delay}/@code{force},
 where a thread is basically the same as a promise, except that
 evaluation may be in parallel.
 
-So far, little or no effort has been made into makeing Kawa
+So far, little or no effort has been made into making Kawa
 thread-safe.  There are no per-thread bindings, and
 the current input and output parts are global.
-That need to change.
+That needs to change.
 
 @defmac future expression
 Creates a new thread that evaluates @var{expression}.
@@ -569,8 +579,8 @@ Creates a new thread that evaluates @var{expression}.
 
 @defun force thread
 The standard @code{force} function has generalized to also work
-on thraeds.  If waits for the threads @var{expression} to finish
-executing, and return the result.
+on threads.  If waits for the thread's @var{expression} to finish
+executing, and returns the result.
 @end defun
 
 @defun sleep time
@@ -634,8 +644,7 @@ Java "verifier" to be run when functions are loaded from it,
 which takes a little extra time.
 
 Alternatively, you can compile a Scheme source file to a
-collection of @samp{.class} files using the stand-alone
-@samp{kawac} application.
+collection of @samp{.class} files.
 You then use the standard Java class loading mechanism to load the code.
 The Java "verifier" does not need to get run, which makes
 loading a little faster.
@@ -669,25 +678,28 @@ loading @samp{foo.scm}, except you will get the byte-compiled versions.
 @node Files compilation,  , Archive compilation, Compiling
 @subsection Compiling Scheme to a set of .class files
 
-The @samp{kawac} application will compile a @samp{.scm} source file into one or
-more @samp{.class} files.
+Invoking @samp{kawa} with the @samp{-C} flag will compile
+a @samp{.scm} source file into one or more @samp{.class} files.
 
 You run it as follows:
 @example
-java kawac @var{infile} [-d @var{outdirectory}] [@var{prefix} [@var{topname}]]
+kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] -C @var{infile}
 @end example
 
+Note the @samp{-C} must come last, because @samp{Kawa} processes the
+arguments and options in order,
+
 Here:
-@table @var
-@item infile
+@table @samp
+@item -C @var{infile}
 The Scheme source file we want to compile.
-@item @samp{-d} outdirectory
+@item -d @var{outdirectory}
 The directory under which the resulting @samp{.class} files will be.
 The default is the current directory.
-@item prefix
+@item -P @var{prefix}
 A string to prepend to the generated class names.
 The default is the empty string.
-@item topname
+@item -T @var{topname}
 The name of the "top" class - i.e. the one that contains the code
 for the top-level expressions and definitions.
 The default is generated from the @var{infile} and @var{prefix}.
@@ -700,7 +712,7 @@ by specifying the top-level class, either as a file name
 (relative to @var{outdirectory}) or a class name.
 E.g. if you did:
 @example
-java kawac foosrc.scm -d /usr/local/java my.lib. foo     
+kawa -d /usr/local/java -P my.lib. -T foo -C foosrc.scm
 @end example
 you can use either:
 @example
@@ -709,6 +721,14 @@ you can use either:
 or:
 @example
 (load "my/lib/foo.class")
+@end example
+
+If you are compiling a Scheme source file (say @samp{foosrc.scm})
+that uses macros defined in some other file (say @samp{macs.scm}),
+you need to make sure the definitions are visible to the compiler.
+One way to do that is with the @samp{-f}:
+@example
+kawa -f macs.scm -C foosrc.scm
 @end example
 
 @node Primitive functions, Reporting Bugs, Compiling, Top
@@ -753,9 +773,59 @@ The @samp{Procedure2} class provides implementations of all
 the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
+@subsection Calling Java methods from Scheme
+
+Kawa provides a simple yet powerful "Foreign Function Interface",
+which allows you to call any (virtual or static) Java method
+as if it were a Scheme procedure.
+
+These primitives require you to specify the parameter and return types.
+Type specifications are currently required to be string literals.
+A type specifier can be a fully-qualified Java class name
+(for example @code{"java.lang.StringBuffer"}).  In that case,
+the actual argument is cast at run time to the named class.
+The specification @code{"String"} is an exception:
+It causes the @code{toString} method of the actual
+arguement to be invoked.
+
+A type specifier can also be one of the primitive Java types.
+The numeric types @code{"long"}, @code{"int"}, @code{"short"},
+@code{"byte"}, @code{"float"}, and @code{"double"} are converted from the
+corresponding Scheme number classes.  Similarly, @code{"char"}
+can be converted to and from Scheme characters.  The type
+@code{boolean} matches any object, and the result is @code{false}
+if and only if the actual argument is @code{#f}.
+The return type @code{"void"} indicates that no value is returned.
+
+@defmac primitive-virtual-method class method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the instance method whose name is the string @var{method}
+in the class whose name is @var{class}.
+@end defmac
+
+@defmac primitive-static-method class method rtype (argtype ...)
+Returns a new anonymous procedure, which when called will
+invoke the static method whose name is the string @var{method}
+in the class whose name is @var{class}.
+@end defmac
+
+The macros return procedure values, just like @code{lambda},
+but the procedures are @emph{not} first-class.  Currently, they can
+only be used directly as the procedure of a procedure call, and
+they cannot be assigned, nor passed as values.  They are only
+supported in compiled code, and therefore cannot be used in
+the interactive top-level.  These restrictions will be
+eased in a future Kawa release (which will use the new
+Java reflective facilities).  Note also that neither macro
+checks that there really is a method that matches the specification.
+
+Some examples using these primitives are are @samp{vectors.scm}
+and @samp{characters.scm} the directory @samp{kawa/lib} in
+the Kawa sources.
+
 @subsection Loading a ModuleBody
 
-The "top" class created by @code{kawac} (@pxref{Files compilation})
+The "top" class created by @code{kawa -C} (@pxref{Files compilation})
 extends the @code{ModuleBody} class.  It is actually fairly
 easy to write a @code{ModuleBody} by hand in Java, and you can
 then use the Scheme @code{load} procedure to cause arbitrary

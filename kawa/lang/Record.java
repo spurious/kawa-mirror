@@ -91,7 +91,7 @@ public class Record extends NameMap
       }
     catch (NoSuchFieldException ex)
       {
-	//throw new UnboundSymbol(fname);
+	//throw new UnboundLocation(fname);
 	throw new GenericError("no such field "+fname+" in "+clas.getName());
       }
     catch (IllegalAccessException ex)

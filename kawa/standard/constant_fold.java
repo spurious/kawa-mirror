@@ -29,6 +29,11 @@ public class constant_fold extends Syntax
     Object func = checkConstant(aexp.getFunction(), tr);
     if (! (func instanceof Procedure))
       return exp;
+
+    // Not quite the same - checkConstant also looks up name in Environment,
+    // which seems a bit too dangerous for inlineIfConstant.  FIXME.
+    // return aexp.inlineIfConstant((Procedure) func, tr.getMessages());
+
     Expression[] args = aexp.getArgs();
     int i = args.length;
     Object[] vals = new Object[i];

@@ -1,4 +1,4 @@
-(test-init "Objects" 76)
+(test-init "Objects" 77)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -242,3 +242,12 @@
 	   (let ((n v) (r (this)))
 	     (list n)))) )
 (test '(3) 'ff (invoke obj-with-let 'meth 3))
+
+(define (create-main-frame)
+  (object ()
+   (myField init-form:
+        (format #f "this: ~a\n" (this))
+        )))
+(define main-frame (create-main-frame))
+(test (format #f "this: ~a\n" main-frame) field main-frame 'myField)
+

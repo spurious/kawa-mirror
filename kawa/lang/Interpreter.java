@@ -121,12 +121,6 @@ public class Interpreter extends Object
       return list;
    }
 
-  public Object read()
-      throws java.io.IOException, SyntaxError
-  {
-    return in.readSchemeObject ();
-  }
-
   /**
    * Re-write a Scheme <body> in S-expression format into internal form.
    * Does not yet handle internal defines.

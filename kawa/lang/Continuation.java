@@ -23,7 +23,7 @@ public class Continuation extends Procedure1
   {
     if (invoked)
       throw new GenericError
-	("implementation restriction: continuation can be invoked once");
+	("implementation restriction: continuation can only be used once");
     throw new CalledContinuation (arg1, this);
   }
 
@@ -38,9 +38,9 @@ public class Continuation extends Procedure1
       }
     catch (CalledContinuation ex)
       {
-	if (ex.continuation == cont)
-	  return ex.value;
-	throw ex;
+	if (ex.continuation != cont)
+	  throw ex;
+	return ex.value;
       }
     finally
       {

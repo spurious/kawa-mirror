@@ -42,7 +42,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 
 javadir=$(prefix)/java/kawa/lang
 
@@ -125,6 +125,8 @@ Promise.class \
 $(EXCEPTIONS)
 
 java_DATA=$(OBJ) $(EXCEPTIONS)
+
+EXTRA_DIST = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ) $(EXCEPTIONS)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
@@ -233,7 +235,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
-	cd $(srcdir); $(JAVAC) $*.java
+	$(JAVAC) -d ../.. $<
 
 all: $(OBJ)
 .SUFFIXES:

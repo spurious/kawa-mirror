@@ -501,8 +501,8 @@ System.err.println("after parseArgs:"+peekToken());
 
   public static void main (String[] args)
   {
-    Interpreter interp = new kawa.standard.Scheme();  // FIXME
-    Environment.setGlobal(interp.getEnvironment());
+    Language language = new kawa.standard.Scheme();  // FIXME
+    Environment.setGlobal(language.getEnvironment());
 
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)

@@ -1,3 +1,7 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java: Update Interpreter -> Language.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java: Update Interpreter -> Language.

@@ -73,9 +73,10 @@ public class KawaPageServlet extends KawaServlet
 	    InputStream resourceStream = url.openStream();
 	    InPort port = new InPort(resourceStream,
 				     path.substring(path.lastIndexOf('/')+1));
-	    Interpreter interp = Interpreter.getInstanceFromFilenameExtension(path);
-	    Interpreter.defaultInterpreter = interp;
-	    Environment.setCurrent(interp.getEnvironment());
+	    Language language
+	      = Language.getInstanceFromFilenameExtension(path);
+	    Language.setDefaultLanguage(language);
+	    Environment.setCurrent(language.getEnvironment());
 	    SourceMessages messages = new SourceMessages();
 	    Compilation comp;
 	    try

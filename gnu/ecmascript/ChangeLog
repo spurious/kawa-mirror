@@ -1,3 +1,7 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* Parser.java: Update Interpreter -> Language.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* Parser.java (parseFunctionDefinition): Use setName method, since

@@ -1,3 +1,11 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java:  New class, implements XQuery 'typeswitch'.
+	* Makefile.am (java_sources):  Update accordingly.
+
+	* InstanceOf.java (emitIsInstance):  New static helper method.
+	(compile):  If type us TypeValue, calls its emitIsInstance method.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (makeGetField):  New method, moved from Expression.

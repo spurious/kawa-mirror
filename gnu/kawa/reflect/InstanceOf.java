@@ -49,7 +49,13 @@ public class InstanceOf extends Procedure2 implements Inlineable
     if (type != null)
       {
 	args[0].compile(comp, Target.pushObject);
-	type.emitIsInstance(code);
+	if (type instanceof TypeValue)
+	  {
+	    ((TypeValue) type).emitIsInstance(null, comp, target);
+	    return;
+	  }
+	else
+	  type.emitIsInstance(code);
       }
     else
       {
@@ -71,5 +77,29 @@ public class InstanceOf extends Procedure2 implements Inlineable
   public Type getReturnType (Expression[] args)
   {
     return interpreter.getTypeFor(Boolean.TYPE);
+  }
+
+  public static void emitIsInstance(TypeValue type, Variable incoming,
+				    Compilation comp, Target target)
+  {
+    CodeAttr code = comp.getCode();
+    type.emitTestIf(null, null, comp);
+    ConditionalTarget cond = null;
+    if (target instanceof ConditionalTarget)
+      {
+	cond = (ConditionalTarget) target;
+	code.emitGoto(cond.ifTrue);
+      }
+    else
+      code.emitPushInt(1);
+    code.emitElse();
+    if (cond != null)
+      code.emitGoto(cond.ifFalse);
+    else
+      code.emitPushInt(0);
+    code.emitFi();
+    if (cond == null)
+      target.compileFromStack(comp,
+			      comp.getInterpreter().getTypeFor(Boolean.TYPE));
   }
 }

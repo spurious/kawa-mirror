@@ -16,7 +16,8 @@ java_sources = \
   SlotGet.java \
   SlotSet.java \
   StaticGet.java \
-  StaticSet.java
+  StaticSet.java \
+  TypeSwitch.java
 
 EXTRA_DIST = package.html
 

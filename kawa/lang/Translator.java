@@ -260,7 +260,8 @@ public class Translator extends Object
       }
 
   tryDirectCall:
-    if (proc != null && proc instanceof Procedure)
+    if (proc != null && proc instanceof Procedure
+        && ! (proc instanceof Inlineable))
       {
 	if (proc instanceof AutoloadProcedure)
 	  {

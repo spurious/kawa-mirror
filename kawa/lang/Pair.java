@@ -153,10 +153,8 @@ public class Pair extends List implements Printable, Compilable
       {
 	if (carField == null)
 	  {
-	    carField = Compilation.typePair.addField
-	      ("car", Compilation.typeObject, Access.PUBLIC);
-	    cdrField = Compilation.typePair.addField
-	      ("cdr", Compilation.typeObject, Access.PUBLIC);
+	    carField = Compilation.typePair.getDeclaredField("car");
+	    cdrField = Compilation.typePair.getDeclaredField("cdr");
 	  }
 	literal.flags |= Literal.ALLOCATING;
 	comp.emitLiteral (car);

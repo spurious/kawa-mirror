@@ -89,10 +89,10 @@ public class WrappedException extends RuntimeException
     return getMessage();
   }
 
-  /* Future: BEGIN JAVA1 */
-  // The initCause/getCause functionality was added in JDK 1.4.
-  // It is available in gcj 3.3, so we could perhaps put it in a JAVA1 block,
-  // but I'm not quite ready for that yet.
+  /* The initCause/getCause functionality was added in JDK 1.4.
+     It is available in gcj 3.3, so we could perhaps put it in a JAVA1 block,
+     but I'm not quite ready for that yet.
+     Future: BEGIN a JAVA1 section */
   public Throwable initCause(Throwable cause)
   {
     exception = cause;
@@ -105,6 +105,6 @@ public class WrappedException extends RuntimeException
   }
 
   private Throwable exception;
-  /* Future:END JAVA1 */
+  /* Future: END a JAVA1 section. */
   private String message;
 }

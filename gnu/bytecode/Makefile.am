@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ..:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
 .java.class:
 	cd $(srcdir); $(JAVAC) $(<F)

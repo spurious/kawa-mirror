@@ -32,6 +32,9 @@ AC_ARG_WITH(servlet,
 AC_ARG_WITH(swing,
   AC_HELP_STRING(--with-swing, [Assume Swing (Java Foundation Classes) is available]))
 
+AC_ARG_WITH(swt,
+  AC_HELP_STRING(--with-swt, [Assume SWT is available]))
+
 AC_ARG_WITH(awt,
   AC_HELP_STRING([--with-awt], [Assume AWT is available (default on)]))
 
@@ -103,6 +106,7 @@ AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET,
   test "$enable_servlet" != "" -a "$enable_servlet" != "no")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
+AM_CONDITIONAL(WITH_SWT, test "$with_swt" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
@@ -189,7 +193,7 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
-  gnu/jemacs/swing/Makefile
+  gnu/jemacs/swing/Makefile gnu/jemacs/swt/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   gnu/q2/Makefile gnu/q2/lang/Makefile
   gnu/xquery/Makefile gnu/xquery/lang/Makefile

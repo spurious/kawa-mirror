@@ -1,3 +1,9 @@
+2004-08-23  Per Bothner  <per@bothner.com>
+
+	* configure.in (--with-swt):  New option.
+	(WITH_SWT):  New conditional.
+	(AC_OUTPUT):  Add gnu/jemacs/swt/Makefile.
+
 2004-08-04  Christian Surlykke <christian@surlykke.dk>
 
 	* build.xml: Added jemacs-swt-classes task.

@@ -339,6 +339,8 @@ public abstract class Environment
 
   public static SimpleEnvironment make (String name, Environment parent)
   {
-    return new InheritingEnvironment(name, parent);
+    InheritingEnvironment env = new InheritingEnvironment(name, parent);
+    env.baseTimestamp = ((SimpleEnvironment)parent).currentTimestamp;
+    return env;
   }
 }

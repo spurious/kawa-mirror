@@ -1,3 +1,12 @@
+2002-01-13  Per Bothner  <per@bothner.com>
+
+	* ServletPrinter.java:  New class, extends HttpPrinter.
+	* Makefile.am (java_sources):  Added ServletPrinter.java.
+	* KawaServlet.java (doGet):  Use new ServletPrinter.
+	Let latter do setContentType, so odn't do it here.
+	Likewise. don't emit <html> and </html>.
+	On the other hand, do emit beginDocument and endDocument.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* GetRequest.java:  Now implements Inlineable.

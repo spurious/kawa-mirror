@@ -14,13 +14,12 @@ extends HttpServlet implements CpsMethodContainer
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
   {
-    response.setContentType("text/html");
     ServletCallContext ctx = new ServletCallContext();
     ctx.request = request;
     ctx.response = response;
     ctx.servlet = this;
     ctx.values = Values.noArgs;
-    OutPort out = new OutPort(response.getOutputStream());
+    ctx.consumer = new ServletPrinter(response);
 
     /* FIXME should use fluid binding!
     gnu.expr.Interpreter interp = gnu.expr.Interpreter.getInterpreter();
@@ -42,11 +41,10 @@ extends HttpServlet implements CpsMethodContainer
       }
     */
 
-    out.println("<html>");
-    ctx.consumer = new XMLPrinter(out);
+    ctx.consumer.beginDocument();
     apply(ctx);
     ctx.run();
-    out.println("</html>");
+    ctx.consumer.endDocument();
   }
 
   public void apply(CpsMethodProc proc, CallContext context)

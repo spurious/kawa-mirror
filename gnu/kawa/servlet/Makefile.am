@@ -8,7 +8,8 @@ java_sources=\
   GetRequest.java \
   GetResponse.java \
   KawaServlet.java \
-  ServletCallContext.java
+  ServletCallContext.java \
+  ServletPrinter.java
 
 PACKAGE_FNAME = gnu-kawa-servlet
 GCJ_INPUTS =  $(java_Java)

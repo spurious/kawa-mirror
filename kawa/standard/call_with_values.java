@@ -21,7 +21,7 @@ public class call_with_values extends Procedure2
     Object values = ((Procedure) args[0]).apply0 ();
     Procedure consumer = (Procedure) args[1];
     if (values instanceof Values)
-      args = ((Values) values).values();
+      args = ((Values) values).getValues();
     else
       {
 	args = new Object[1];

@@ -9,11 +9,16 @@ import gnu.mapping.*;
 
 public class list_v extends ProcedureN
 {
-  public Object applyN (Object[] args)
+  public static Object list$V (Object[] args)
   {
     Object result = List.Empty;
     for (int i = args.length;  --i >= 0; )
       result = new Pair (args[i], result);
     return result;
+  }
+
+  public Object applyN (Object[] args)
+  {
+    return list$V(args);
   }
 }

@@ -104,9 +104,9 @@ public class Scheme extends Interpreter
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new Quote ());
-      define ("define", defineSyntax = new kawa.standard.define(false));
-      define ("define-private",
-              defineSyntaxPrivate = new kawa.standard.define(true));
+      define_syntax("define", defineSyntax = new kawa.standard.define(false));
+      define_syntax("define-private",
+                    defineSyntaxPrivate = new kawa.standard.define(true));
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
@@ -465,10 +465,13 @@ public class Scheme extends Interpreter
       define_proc("instance?", new kawa.standard.instance());
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
-      define_proc("field", "kawa.standard.field");
-      define_proc("class-methods", "kawa.standard.class_methods");
+      define_proc("make", "gnu.kawa.reflect.MakeInstance");
+      define_proc("slot-ref", "gnu.kawa.reflect.SlotGet");
+      define_proc("slot-set!", "gnu.kawa.reflect.SlotSet");
+      define_proc("field", "gnu.kawa.reflect.SlotGet");
+      define_proc("class-methods", "gnu.kawa.reflect.ClassMethods");
       define_proc("static-field", "kawa.standard.static_field");
-      define_proc("invoke-static", "kawa.lang.InvokeStatic");
+      define_proc("invoke-static", "gnu.kawa.reflect.InvokeStatic");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -503,7 +506,6 @@ public class Scheme extends Interpreter
       define_proc ("record-type-name", "kawa.lib.reflection");
       define_proc ("record-type-field-names", "kawa.lib.reflection");
       define_proc ("record?", "kawa.lib.reflection");
-      define_proc("make", "kawa.standard.make");
 
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
@@ -635,7 +637,7 @@ public class Scheme extends Interpreter
       return;
     if (value instanceof Values)
       {
-	Object[] values = ((Values) value).values();
+	Object[] values = ((Values) value).getValues();
 	for (int i = 0;  i < values.length;  i++)
 	  {
 	    SFormat.print (values[i], out);

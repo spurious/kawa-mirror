@@ -5,6 +5,35 @@
 (define (response-content-type type)
   (response-header '|Content-Type| type))
 
+(define (response-status (code :: <int>) #!optional (message :: <String>  #!null))
+  (response-header '|Status|
+		     (format (if (eq? message #!null) "~d" "~d ~a")
+			     code message)))
+
+;; For now the same as response-status
+(define (error-response (code :: <int>) #!optional (message :: <String>  #!null))
+  (response-header '|Status|
+		     (format (if (eq? message #!null) "~d" "~d ~a")
+			     code message)))
+
+(define (current-servlet) :: <javax.servlet.http.HttpServlet>
+  (invoke-static <gnu.kawa.servlet.ServletCallContext> "getServlet"))
+
+(define (current-servlet-context) :: <javax.servlet.ServletContext>
+  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getServletContext))
+
+(define (current-servlet-config) :: <javax.servlet.ServletConfig>
+  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getServletConfig))
+
+(define (servlet-context-realpath #!optional (path :: <String> '||)) :: <String>
+  (let ((context :: <javax.servlet.ServletContext>
+		 (invoke-static <gnu.kawa.servlet.ServletCallContext>
+				'getServletContext)))
+    (invoke context 'getRealPath path)))
+
+(define (get-response) :: <javax.servlet.http.HttpServletResponse>
+  (invoke-static <gnu.kawa.servlet.ServletCallContext> 'getResponse))
+
 (define (get-request) :: <javax.servlet.http.HttpServletRequest>
   ((static-field <gnu.kawa.servlet.GetRequest> 'getRequest)))
 

@@ -29,6 +29,19 @@ public abstract class ObjectType extends Type
     return reflectClass;
   }
 
+  /** Convert an object to a value of this Type.
+   * Throw a ClassCastException when this is not possible. */
+  public Object coerceFromObject (Object obj)
+  {
+    if (this == Type.string_type)
+      return obj.toString();
+    if (getReflectClass().isAssignableFrom(obj.getClass()))
+      return obj;
+    throw new ClassCastException("don't know how to coerce "
+				 + obj.getClass().getName() + " to "
+				 + getName());
+  }
+
   /** Compile (in given method) cast from Object to this Type. */
   public void emitCoerceFromObject (CodeAttr code)
   {

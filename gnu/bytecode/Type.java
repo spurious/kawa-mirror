@@ -4,7 +4,7 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Type {
+public abstract class Type {
   String signature;
   // Fully-qualified name (in external format, i.e. using '.' to separate).
   String this_name;
@@ -197,14 +197,7 @@ public class Type {
 
   /** Convert an object to a value of this Type.
    * Throw a ClassCastException when this is not possible. */
-  public Object coerceFromObject (Object obj)
-  {
-    if (getReflectClass().isAssignableFrom(obj.getClass()))
-      return obj;
-    throw new ClassCastException("don't know how to coerce "
-				 + obj.getClass().getName() + " to "
-				 + getName());
-  }
+  public abstract Object coerceFromObject (Object obj);
 
   public Object coerceToObject (Object obj)
   {

@@ -54,6 +54,8 @@ public class ApplyExp extends Expression
     Object[] vals = new Object[n];
     for (int i = 0; i < n; i++)
       vals[i] = args[i].eval (env);
+    if (proc == null)
+      throw new NullPointerException();
     ctx.setArgsN(vals);
     ctx.proc = proc;
   }

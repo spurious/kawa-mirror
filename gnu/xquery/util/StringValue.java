@@ -67,4 +67,40 @@ public class StringValue extends Procedure1
       stringValue(node, sbuf);
     return sbuf.toString();
   }
+
+  public static Object lowerCase (Object node)
+  {
+    if (node == Values.empty || node == null)
+      return Values.empty;
+    return stringValue(node).toLowerCase();
+  }
+
+  public static Object upperCase (Object node)
+  {
+    if (node == Values.empty)
+      return Values.empty;
+    return stringValue(node).toUpperCase();
+  }
+
+  public static Object substring (Object str, Object start)
+  {
+    if (str == Values.empty || start == Values.empty)
+      return Values.empty;
+    
+    int i = ((Number) NumberValue.numberValue(start)).intValue() - 1;
+     
+    return str.toString().substring(i);
+  }
+
+  public static Object substring (Object str, Object start,Object length)
+  {
+    if (str == Values.empty || start == Values.empty
+	|| length == Values.empty)
+      return Values.empty;
+    
+    int i = ((Number) NumberValue.numberValue(start)).intValue() - 1;
+    int len = ((Number) NumberValue.numberValue(length)).intValue();
+     
+    return str.toString().substring(i, i + len);
+  }
 }

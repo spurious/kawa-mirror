@@ -1,7 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode mapping text expr math ecmascript elisp
+SUBDIRS = bytecode mapping text expr math ecmascript elisp emacs
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html

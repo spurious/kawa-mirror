@@ -893,7 +893,7 @@ public class ClassType extends ObjectType
     String name = getName();
     Type found = lookupType(name);
     if (found != this)
-      throw new IOException("serializing ClassType not in class table not implemented");
+      throw new IOException("serializing "+this+" not in class table not implemented");
     else
       out.writeUTF(name);
   }

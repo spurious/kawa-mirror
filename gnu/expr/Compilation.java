@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import java.util.*;
 import java.io.*;
+import kawa.Shell;
 
 public class Compilation
 {
@@ -1371,6 +1372,14 @@ public class Compilation
 				    
 	method.init_param_slots ();
 	code = getCode();
+
+	if (Shell.defaultFormatName != null)
+	  {
+	    code.emitPushString(Shell.defaultFormatName);
+	    code.emitInvokeStatic(ClassType.make("kawa.Shell")
+				  .getDeclaredMethod("setDefaultFormat", 1));
+	  }
+
 	code.emitNew(curClass);
 	code.emitDup(curClass);
 	code.emitInvokeSpecial(curClass.constructor);

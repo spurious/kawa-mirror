@@ -57,15 +57,17 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
   {
     kawa.repl.setArgs(args, 0);
     gnu.text.WriterManager.instance.registerShutdownHook();
+    Thread thread = Thread.currentThread();
     try
       {
 	CallContext ctx = new CallContext();
+	CallContext.setInstance(thread, ctx);
 	ctx.values = Values.noArgs;
 	ctx.proc = this;
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();
-	    ctx.consumer = Interpreter.getInterpreter().getOutputConsumer(out);
+	    ctx.consumer = kawa.Shell.getOutputConsumer(out);
 	    ctx.runUntilDone();
 	    out.freshLine();
 	  }

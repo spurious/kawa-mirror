@@ -1,3 +1,12 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* Compilation.java:  If generating main, and the --output-format
+	was specified, have compiled main call Shell's setDefaultFormat.
+
+	* ModuleBody.java (runAsMain):  Call new CallContext.setInstance.
+
+	* ModuleBody.java (runAsMain):  Use new Shell.getOutputConsumer.
+
 2002-01-18  Nic Ferrier <nferrier@tf1.tapsellferrier.co.uk>
 
 	* Interpreter.java (registerLanguage):  New static method.

@@ -36,8 +36,9 @@
 (define make-funny-record2 (record-constructor funny-record '(b-c a!)))
 (define lt1 (make-funny-record1 10 12))
 (test 10 'accessor21 ((record-accessor funny-record 'a!) lt1))
-((record-modifier funny-record 'b-c) lt1 14)
-(test (make-funny-record2 14 10) 'funny-record lt1)
+((record-modifier funny-record 'b-c) lt1 (+ 2 (lt1 'b-c))))
+(set! (lt1 'a!) 9)
+(test (make-funny-record2 14 9) 'funny-record lt1)
 
 (test '(10 \10 20 \20) 'object-with-field-1
        (let*

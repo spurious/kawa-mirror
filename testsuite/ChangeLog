@@ -1,3 +1,8 @@
+2003-01-26  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  Extend tests to using record-type as a NameMap,
+	based on bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm:  Add 25 new tests, for cut and cute (from srfi-26).

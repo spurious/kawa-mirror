@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
-import java.io.Reader;
 import gnu.text.Lexer;
 import gnu.text.SyntaxException;
 

@@ -1,3 +1,11 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java:  Remove unused import statements.
+	* ReadTable.java:  Likewise.
+	* ReadTableEntry.java:  Likewise.
+	* ReaderDispatchMisc.java:  Likewise.
+	* ReaderParens.java:  Likewise.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (readValues):  Fatal on invalid char if interactive.

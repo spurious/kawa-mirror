@@ -3,7 +3,6 @@
 
 package gnu.kawa.lispexpr;
 import gnu.text.*;
-import gnu.mapping.InPort;
 import gnu.mapping.Values;
 
 public class ReaderParens extends ReadTableEntry

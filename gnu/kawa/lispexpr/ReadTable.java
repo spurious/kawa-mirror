@@ -3,7 +3,6 @@
 
 package gnu.kawa.lispexpr;
 import gnu.kawa.util.RangeTable;
-import gnu.expr.Interpreter;
 
 public class ReadTable extends RangeTable
 {

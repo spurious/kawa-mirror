@@ -5,9 +5,6 @@ package gnu.kawa.lispexpr;
 import gnu.text.*;
 import gnu.mapping.InPort;
 import gnu.mapping.Values;
-import gnu.expr.Interpreter;
-import gnu.lists.SimpleVector;
-import gnu.math.IntNum;
 
 public class ReaderDispatchMisc extends ReadTableEntry
 {

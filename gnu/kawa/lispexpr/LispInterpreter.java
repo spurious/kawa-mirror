@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
-import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.*;
 import gnu.lists.*;

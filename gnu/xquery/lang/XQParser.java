@@ -25,7 +25,6 @@ public class XQParser extends LispReader // should be extends Lexer
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
 
   int nesting;
-  boolean interactive;
 
   /** Skip whitespace.
    * Sets 'index' to the that of the next non-whitespace character,
@@ -530,15 +529,20 @@ public class XQParser extends LispReader // should be extends Lexer
  public XQParser (InPort port)
   {
     super(port);
-    interactive = port instanceof TtyInPort;
-    nesting = interactive ? 0 : 1;
+    nesting = 1;
   }
 
   public XQParser(InPort port, SourceMessages messages)
   {
     super(port, messages);
-    interactive = port instanceof TtyInPort;
-    nesting = interactive ? 0 : 1;
+    nesting = 1;
+  }
+
+  public void setInteractive(boolean v)
+  {
+    if (interactive != v)
+      if (v) nesting--; else nesting++;
+    interactive = v;
   }
   
   protected ReadTable getReadTable () { return xqlReadTable; }
@@ -577,7 +581,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static Expression makeExprSequence(Expression exp1, Expression exp2)
   {
     return makeBinary(makeFunctionExp
-		      ("gnu.xquery.util.AppendValues", "appendValues"),
+		      ("gnu.kawa.functions.AppendValues", "appendValues"),
 		      exp1, exp2);
   }
 

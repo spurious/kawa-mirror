@@ -4,6 +4,36 @@ import gnu.kawa.util.*;
 
 public class ObArray extends Environment
 {
+  /**
+   * Get the function binding for a symbol.
+   * @exception gnu.mapping.UnboundSymbol the name has no function binding
+   */
+  public Object getFunction(String name)
+  {
+    return Symbol.getFunctionBinding(this, name);
+  }
+
+  /** Set the function binding for a symbol.
+   * this is equivalent to put.
+   */
+  public void putFunction(String name, Object value)
+  {
+    gnu.jemacs.lang.Symbol.setFunctionBinding(this, name, value);
+  }
+
+  /**
+   * Define the value or function binding for a symbol, as appropriate
+   */
+  public Binding define (String name, Object value)
+  {
+    Binding2 binding = Binding2.getBinding2(this, name);
+    if (value instanceof Procedure || value instanceof kawa.lang.Syntax)
+      binding.functionValue = value;
+    else
+      binding.set(value);
+    return binding;
+  }
+
   public static Environment asEnvironment(Object env)
   {
     if (env instanceof FVector)
@@ -24,6 +54,11 @@ public class ObArray extends Environment
         
       }
     return (Environment) env;
+  }
+
+  public ObArray ()
+  {
+    super();
   }
 
   public ObArray (int initialCapacity)

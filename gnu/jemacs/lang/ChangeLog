@@ -1,5 +1,10 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
+	* ELisp.java (<init>):  Create an ObArray rather than an Environment.
+	* Makefile.am:  Only build While.java unless --with-swing configured.
+
+	* ObArray.java (getFunction, putFunction, define):  New methods.
+
 	* ELisp.java (booleanType):  New field.
 	(getTypeFor):  Use booleanType if "boolean" is requested.
 

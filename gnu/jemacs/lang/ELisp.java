@@ -152,7 +152,7 @@ public class ELisp extends Interpreter
   public ELisp()
   {
 
-    environ = new Environment();
+    environ = new ObArray();
     environ.setName ("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
 

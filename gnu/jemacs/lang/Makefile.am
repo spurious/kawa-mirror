@@ -6,7 +6,7 @@ SUFFIXES = .java .class
 
 javadir=$(datadir)/java/$(subdir)
 
-java_JAVA=\
+java_WITH_SWING =\
   ELisp.java \
   ELispReader.java \
   AddOp.java \
@@ -15,11 +15,16 @@ java_JAVA=\
   Symbol.java \
   NumberCompare.java \
   SaveExcursion.java \
-  While.java \
   defun.java \
   defvar.java \
   lambda.java \
   setq.java
+
+java_JAVA=\
+  While.java \
+  $(java_@SWING_SELECTED@)
+
+EXTRA_JAVA = $(java_WITH_SWING)
 
 KAWA = $(JAVA) kawa.repl
 KAWAFLAGS = -P gnu.jemacs.lang. -C

@@ -4,132 +4,71 @@
 package gnu.mapping;
 import java.io.*;
 
-/** A Symbol is a Location in an Environment object. */
+/** A Symbol is a name, usually in a specific Namespace.
+ * A Symbol is stateless:  Comon Lisp-style "value", "function" and
+ * "property list" bindings are not part of the Symbol itself, but
+ * looked up in the current Environment.
+ * A <code>Symbol</code> may be viewed as an <code>EnvironmentKey</code>
+ * with a <code>null</code> property component.
+ */
 
-public class Symbol extends Location
+public class Symbol
   implements
+  EnvironmentKey,
   /* BEGIN JAVA2 */
   Comparable,
-  java.util.Map.Entry,
   /* END JAVA2 */
   Externalizable
 {
-  public final String getNamespaceURI()
+  static int counter;
+  public int id = ++counter;
+
+  String name;
+  Namespace namespace;
+
+  public final Symbol getKeySymbol () { return this; }
+  public final Object getKeyProperty () { return null; }
+  public boolean matches (EnvironmentKey key)
   {
-    Environment env = getEnvironment();
-    return env == null ? null : env.getName();
+    return key.getKeySymbol() == this && key.getKeyProperty() == null;
+  }
+  public boolean matches (Symbol symbol, Object property)
+  {
+    return symbol == this && property == null;
   }
 
-  /** Synonym for getName - the "print name" of the symbol without Environment.
+  public final String getNamespaceURI()
+  {
+    Namespace ns = getNamespace();
+    return ns == null ? null : ns.getName();
+  }
+
+  /** Synonym for getName - the "print name" of the symbol without Namespace.
    * Useful when thinking of a Symbol as an XML QName. */
   public final String getLocalName()
   {
-    return getName();
+    return name;
+  }
+
+  public final String getName()
+  {
+    return name;
   }
 
   /** Find or create a symbol in a specificed environment.
-   * @param environ can be an Environment, or a namespace/environment name
+   * @param namespace can be an Namespace, or a namespace/environment name
    *   (resolved using Environment.getInstance), or null (in which case
    *   an uninterned symbol is created).
    * @param name The "local name" or "print name" of the desired symbol.
    */
-  public static Symbol make (Object environ, String name)
+  public static Symbol make (Object namespace, String name)
   {
-    if (name != null)
-      name = name.intern();
-    if (environ == null)
-      return new Symbol(name);
-    Environment env = environ instanceof String
-      ? Environment.getInstance((String) environ)
-      : (Environment) environ;
-    return env.getSymbol(name);
-  }
-
-  /** The current value of the binding. */
-  Object value;
-
-  Constraint constraint;
-
-  /** Magic value used to indicate there is no property binding. */
-  public static final String UNBOUND = new String("(unbound)");
-
-  /** Magic value used as a key for function bindings. */
-  static final String FUNCTION = new String("(function).");
-
-  public final Object get ()
-  {
-    return constraint.get(this);
-  }
-
-  public final Object get (Object defaultValue)
-  {
-    return constraint.get(this, defaultValue);
-  }
-
-  public Procedure getProcedure ()
-  {
-    try
-      {
-	return constraint.getProcedure(this);
-      }
-    catch (UnboundSymbol ex)
-      {
-	// FIXME!!!
-	Object f = getFunctionValue(UNBOUND);
-	if (f != UNBOUND)
-	  return (Procedure) f;
-	throw ex;
-      }
-  }
-
-  public final void defineValue(Object value)
-  {
-    Environment env = constraint.getEnvironment(this);
-    if (env == null || env.locked)
-      set(value);
-    else
-      {
-	this.constraint = TrivialConstraint.getInstance(this);
-	this.value = value;
-      }
-  }
-
-  public final void defineConstant(Object value)
-  {
-    Environment env = constraint.getEnvironment(this);
-    if (env.locked)
-      set(value);
-    else
-      {
-	this.constraint = ConstantConstraint.getInstance(env);
-	this.value = value;
-      }
-  }
-
-  public final void set (Object value)
-  { 
-    constraint.set(this, value);
-  }
-
-  public final Constraint getConstraint()
-  {
-    return constraint;
-  }
-
-  public final void setConstraint (Constraint constraint)
-  {
-    this.constraint = constraint;
-  }
-
-  public final void setConstraint (Constraint constraint, Object value)
-  {
-    this.constraint = constraint;
-    this.value = value;
-  }
-
-  public boolean isBound ()
-  {
-    return constraint.isBound(this);
+    Namespace ns = namespace instanceof String
+      ? Namespace.getInstance((String) namespace)
+      : (Namespace) namespace;
+    if (ns == null || name == null)
+      return new Symbol(name, ns);
+    return ns.getSymbol(name.intern());
   }
 
   public Symbol ()
@@ -138,58 +77,22 @@ public class Symbol extends Location
 
   public Symbol (String name)
   {
-    setName(name); 
-    constraint = UnboundConstraint.getInstance((Environment) null);
+    this.name = name;
   }
 
-  // The compiler emits calls to this method.
-  public static Symbol makeUninterned (Object init, String name)
+  public Symbol (String name, Namespace ns)
   {
-    Symbol binding = new Symbol(name);
-    binding.value = init;
-    binding.constraint = TrivialConstraint.getInstance((Environment) null);
-    return binding;
-  }
-
-  // The compiler emits calls to this method.
-  public static Symbol makeUninterned (String name)
-  {
-    return new Symbol(name);
+    this.name = name;
+    this.namespace = ns;
   }
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<binding ");
+    ps.print ("#<symbol ");
     String name = getName();
     if (name != null)
       ps.print(name);
-    if (isBound())
-      {
-	ps.print(" -> ");
-	ps.print(get());
-      }
-    else
-      ps.print("(unbound)");
     ps.print ('>');
-  }
-
-  // Methods that implement java.util.Map.Entry:
-
-  public final Object getKey ()
-  {
-    return getName();
-  }
-
-  public final Object getValue ()
-  {
-    return constraint.get(this);
-  }
-
-  public final Object setValue (Object value)
-  {
-    Object old = constraint.get(this);
-    constraint.set(this, value);
-    return old;
   }
 
   public int compareTo(Object o)
@@ -209,172 +112,38 @@ public class Symbol extends Location
 
   public int hashCode ()
   {
-    // Note:  The hashCode should not depend on the value.
-    // This is contrary to the Map.Entry specification.
-    return System.identityHashCode(this); // ^ System.identityHashCode(env);
+    return name == null ? 0 : name.hashCode();
   }
 
-  /** Used to mark deleted elements in a hash table. */
-  public final static Symbol hashDELETED
-  = new Symbol(new String("<Deleted>"));
 
-  /** Search a hash table using double hashing and open addressing.
-   * @param table the hash table
-   * @param log2Size log2 of the (used) size of table
-   * @param mask must equal ((1 << log2Size) - 1)
-   * @param key the search key
-   * @param hash the hash of the search key
-   * @return the index of the element in table containing the match
-   * (such that table[index].getName()==key);
-   * if there is no such element, returns an index
-   * such that (table[index]==null || tabel[index]==DELETED). */
-  public static int hashSearch (Symbol[] table, int log2Size, int mask,
-				String key, int hash)
+  public final Namespace getNamespace()
   {
-    int index = hash & mask;
-    Symbol element = table[index];
-    if (element == null || element.getName() == key)
-      return index;
-    int avail = -1;
-    int step = (((hash >> log2Size) ^ index) << 1) + 1;
-    for (;;)
-      {
-	if (element == hashDELETED && avail < 0)
-	  avail = index;
-	index = (index + step) & mask;
-	element = table[index];
-	if (element == null)
-	  return avail < 0 ? index : avail;
-	if (element.getName() == key)
-	  return index;
-      }
+    return namespace;
   }
 
-  public static int hashSearch (Symbol[] table, int log2Size, String key)
+  public final void setNamespace (Namespace ns)
   {
-    return hashSearch(table, log2Size, (1 << log2Size) - 1,
-		      key, System.identityHashCode(key));
+    namespace = ns;
   }
 
-  /** Find an entry in a hash table.
-   * @param table the hash table
-   * @param log2Size log2 of the (used) size of table
-   * @param key the search key
-   * @return null if the was no matching element in the hash table;
-   * otherwise the matching element. */
-  public static Symbol hashGet (Symbol[] table, int log2Size, String key)
-  {
-    int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
-			   key, System.identityHashCode(key));
-    Symbol element = table[index];
-    if (element == null || element == hashDELETED)
-      return null;
-    return element;
-  }
+  /** Conventional value used as a property key for function bindings. */
+  public static final Object FUNCTION = new Symbol("(function)", null);
 
-  /** Set an entry in a hash table.
-   * @param table the hash table
-   * @param log2Size log2 of the (used) size of table
-   * @param value the new entry
-   * @return null if the was no matching element in the hash table;
-   * otherwise the old match. */
-  public static Symbol hashSet (Symbol[] table, int log2Size, Symbol value)
-  {
-    String key = value.getName();
-    int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
-			   key, System.identityHashCode(key));
-    Symbol element = table[index];
-    table[index] = value;
-    return element == hashDELETED ? null : element;
-  }
-
-  /** Delete an entry from a hash table.
-   * @param table the hash table
-   * @param log2Size log2 of the (used) size of table
-   * @param key the search key
-   * @return null if the was no matching element in the hash table;
-   * otherwise the old element. */
-  public static Symbol hashDelete (Symbol[] table, int log2Size, String key)
-  {
-    int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
-			   key, System.identityHashCode(key));
-    Symbol element = table[index];
-    table[index] = hashDELETED;
-    return element == hashDELETED ? null : element;
-  }
-
-  public static int hashInsertAll (Symbol[] tableDst, int log2SizeDst,
-				   Symbol[] tableSrc, int log2SizeSrc)
-  {
-    int countInserted = 0;
-    int sizeSrc = 1 << log2SizeSrc;
-    int sizeDst = 1 << log2SizeDst;
-    int maskDst = (1 << log2SizeDst) - 1;
-    for (int i = sizeSrc;  --i >= 0;)
-      {
-	Symbol element = tableSrc[i];
-	if (element != null && element != hashDELETED)
-	  {
-	    String key = element.getName();
-	    int index = hashSearch(tableDst, log2SizeDst, maskDst,
-				   key, System.identityHashCode(key));
-	    Symbol oldElement = tableDst[index];
-	    if (oldElement != null && oldElement != hashDELETED)
-	      countInserted++;
-	    tableDst[index] = element;
-	  }
-      }
-    return countInserted;
-  }
-
-  /** Get value of "function binding" of a Symbol.
-   * Some languages (including Common Lisp and Emacs Lisp) associate both
-   * a value binding and a function binding with a symbol.
-   * @exception UnboundSymbol if no function binding.
+  /** Conventional value used as a <code>Symbol</code> name to
+   * access an <code>Object</code>'s property list.
+   * A <dfn>property list</dfn> is a list with a even number of
+   * <code>Pair</code>s, containing alternating keys and values.
+   * They are used in Common Lisp and Emacs Lisp.
+   * Kawa (following XEmacs) allows arbitrary objects to have property lists,
+   * thus the PLIST as used as the name and the object as the property.
+   * (In the future we'll do somethingg clever so that get(SYMBOL, KEY)
+   * as the same as getf(get(PLIST, SYMBOL), KEY) - but much faster.)
    */
-  public final Object getFunctionValue()
-  {
-    Object value = constraint.getFunctionValue(this);
-    if (value == UNBOUND)
-      throw new UnboundSymbol(getName());
-    return value;
-  }
-
-  /** Get value of "function binding" of a Symbol.
-   * Some languages (including Common Lisp and Emacs Lisp) associate both
-   * a value binding and a function binding with a symbol.
-   * @param defaultValue value to return if there is no function binding
-   * @return the function value, or defaultValue if no function binding.
-   */
-  public final Object getFunctionValue(Object defaultValue)
-  {
-    Object value = constraint.getFunctionValue(this);
-    return value == UNBOUND ? defaultValue : value;
-  }
-
-  public boolean hasFunctionValue()
-  {
-    Object value = constraint.getFunctionValue(this);
-    return value != UNBOUND;
-  }
-
-  public void setFunctionValue(Object value)
-  {
-    constraint.setFunctionValue(this, value);
-  }
-
-  public void removeFunctionValue()
-  {
-    constraint.setFunctionValue(this, UNBOUND);
-  }
-
-  public final Environment getEnvironment()
-  {
-    return constraint.getEnvironment(this);
-  }
+  public static final Symbol PLIST = new Symbol("(property-list)", null);
 
   public String toString()
   {
+    // String h = "@"+Integer.toHexString(System.identityHashCode(this));
     String uri = getNamespaceURI();
     if (uri == null || uri.length() == 0)
       return getName();
@@ -383,31 +152,29 @@ public class Symbol extends Location
 
   public void writeExternal(ObjectOutput out) throws IOException
   {
-    out.writeObject(getEnvironment());
+    Namespace ns = getNamespace();
+    String name;
+    if (ns != null && (name = ns.getName()) != null
+	&& Namespace.getInstance(name) == ns)
+      out.writeObject(name);
+    else
+      out.writeObject(ns);
     out.writeObject(getName());
   }
 
   public void readExternal(ObjectInput in)
     throws IOException, ClassNotFoundException
   {
-    Environment env = (Environment) in.readObject();
-    if (env == null)
-      constraint = UnboundConstraint.getInstance((Environment) null);
-    else
-      constraint = env.unboundConstraint;
-    String name = (String) in.readObject();
-    if (name != null)
-      setName(name.intern());
+    Object ns = in.readObject();
+    namespace = (ns instanceof String ? Namespace.getInstance((String) ns)
+		 : (Namespace) ns);
+    name = (String) in.readObject();
   }
 
   public Object readResolve() throws ObjectStreamException
   {
-    if (constraint == null)
+    if (namespace == null)
       return this;
-    Environment env = constraint.getEnvironment(this);
-    if (env == null)
-      return this;
-    return make(env, getName());
+    return make(namespace, getName());
   }
-
 }

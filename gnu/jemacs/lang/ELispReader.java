@@ -118,7 +118,7 @@ public class ELispReader extends gnu.text.LispReader
    * Assumes the initial '?' and has already been read.
    */
   protected Object readCharacter()
-       throws java.io.IOException  
+    throws java.io.IOException, SyntaxException
   {
     int c = read();
     if (c < 0)
@@ -132,101 +132,6 @@ public class ELispReader extends gnu.text.LispReader
       return IntNum.make(c);
     else
       return Char.make((char)c);
-  }
-
-  protected int readEscape()
-       throws java.io.IOException  
-  {
-    int c = read();
-    if (c < 0)
-      {
-	error("unexpected EOF in character literal");
-	c = '?';
-      }
-    else
-      {
-	switch ((char) c)
-	  {
-	  case 'a':  c =  7;  break;  // alarm/bell
-	  case 'b':  c =  8;  break;  // backspace
-	  case 't':  c =  9;  break;  // tab
-	  case 'n':  c = 10;  break;  // newline
-	  case 'v':  c = 11;  break;  // vertical tab
-	  case 'f':  c = 12;  break;  // formfeed
-	  case 'r':  c = 13;  break;  // carriage return
-	  case 'e':  c = 27;  break;  // escape
-	  case '\\': c = 92;  break;  // backslash
-	  case 'M':
-	    c = read();
-	    if (c != '-')
-	      {
-		error("Invalid escape character syntax");
-		return '?';
-	      }
-	    c = read();
-	    if (c == '\\')
-	      c = readEscape();
-	    return c | 0200;
-	  case 'C':
-	    c = read();
-	    if (c != '-')
-	      {
-		error("Invalid escape character syntax");
-		return '?';
-	      }
-	    /* ... fall through ... */
-	  case '^':
-	    c = read();
-	    if (c == '\\')
-	      c = readEscape();
-	    if (c == '?')
-	      return 0177;
-	    return c & (0200 | 037);
-	  case '0':
-	  case '1':
-	  case '2':
-	  case '3':
-	  case '4':
-	  case '5':
-	  case '6':
-	  case '7':
-	    /* An octal escape, as in ANSI C.  */
-	    c = c - '0';
-	    for (int count = 0;  ++count < 3; )
-	      {
-		int d = read();
-		int v = Character.digit((char) d, 8);
-		if (v >= 0)
-		  c = (c << 3) + v;
-		else
-		  {
-		    if (d >= 0)
-		      unread(d);
-		    break;
-		  }
-	      }
-	    break;
-	  case 'x':
-	    c = 0;
-	    /* A hex escape, as in ANSI C.  */
-	    for (;;)
-	      {
-		int d = read();
-		int v = Character.digit((char) d, 16);
-		if (v >= 0)
-		  c = (c << 4) + v;
-		else
-		  {
-		    if (d >= 0)
-		      unread(d);
-		    break;
-		  }
-	      }
-	    break;
-	  default:  break;
-	  }
-      }
-    return c;
   }
 
   /** Read a word of alphabetic characters.

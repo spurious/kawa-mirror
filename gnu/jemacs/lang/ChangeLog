@@ -1,3 +1,7 @@
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* ELispReader.java (readEscape):  Moved to SourceMessages.
+
 1999-08-07  Per Bothner  <per@bothner.com>
 
 	Move from gnu.elisp to gnu.jemacs.lang.

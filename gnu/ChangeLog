@@ -1,3 +1,7 @@
+2002-05-14  Per Bothner  <per@bothner.com>
+
+	* PACKAGES:  Remove obsolete file - now use GNU Java site instead.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* kawa/Makefile.am:  Make $(SERVLET_SUBDIRS) before slib, since

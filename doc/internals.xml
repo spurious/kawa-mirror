@@ -1114,6 +1114,28 @@ be implemented as an inlined loop, so implementing that equally
 efficiently will need the planned analysis phase.</para>
 </sect2>
 
+<sect2 id="New-Tail-calls"><title>New tail-call convention</title>
+<para><emphasis>This is describing a work in progress.</emphasis></para>
+<para>
+To handle general tail-calls, and to be able to select betwee overlaoded
+methods, we split a function call into two separate operations:</para>
+<orderedlist>
+<listitem><para>The <literal>match</literal> operation is given the
+actual parameters, and matches them against the formal parameters.
+If the right number and types of arguments were given,
+a non-negative integer return code specifies success;
+otherwise a negative return code specifies a mis-match.
+On success the arguments are saved in the argument save area of
+the <classname>CallContext</classname>.</para></listitem>
+<listitem><para>The <literal>apply</literal> operation
+performs the actual work (function body) of the called function.
+It gets the actual parameters from the <classname>CallContext</classname>,
+where <literal>match</literal> previously saved it.</para>
+</listitem>
+</orderedlist>
+
+</sect2>
+
 <sect2 id="Closures"><title>Closures</title>
 <para>
 Languages that provide first-class nested functions with lexical scoping

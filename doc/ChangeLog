@@ -1,3 +1,7 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* internals.xml: New short section about the new tail-call convention.
+
 2004-10-07  Chris Dean  <ctdean@sokitomi.com>
 
 	* kawa.texi (Multiple values): Add missing "(".

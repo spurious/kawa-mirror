@@ -1,7 +1,7 @@
 (define (vector? x)
   (instance? x <vector>))
 
-(define (vector-length (x <vector>))
+(define (vector-length x :: <vector>)
   (invoke x 'length))
 
 (define (vector-ref

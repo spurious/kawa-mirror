@@ -66,7 +66,8 @@
       ((primitive-array-set <String>) arr i (car p)))))
 
 (define (tokenize-string-using-shell string)
-  (let ((arr ((primitive-array-new <java.lang.String>) 3)))
+  (let ((arr :: <java.lang.String[]>
+             ((primitive-array-new <java.lang.String>) 3)))
     ((primitive-array-set <String>) arr 0 "/bin/sh")
     ((primitive-array-set <String>) arr 1 "-c")
     ((primitive-array-set <String>) arr 2 string)

@@ -809,19 +809,28 @@ public class IntNum extends RatNum implements Compilable
   {
     int xval = x.ival;
     int yval = y.ival;
-    if (x.words == null && y.words == null
-	&& xval != Integer.MIN_VALUE && yval != Integer.MIN_VALUE)
+    if (x.words == null)
       {
-	if (xval < 0)
-	  xval = -xval;
-	if (yval < 0)
-	  yval = -yval;
-	return IntNum.make (IntNum.gcd (xval, yval));
+	if (xval == 0)
+	  return IntNum.abs(y);
+	if (y.words == null
+	    && xval != Integer.MIN_VALUE && yval != Integer.MIN_VALUE)
+	  {
+	    if (xval < 0)
+	      xval = -xval;
+	    if (yval < 0)
+	      yval = -yval;
+	    return IntNum.make (IntNum.gcd (xval, yval));
+	  }
+	xval = 1;
       }
-
-    int xlen = x.words == null ? 1 : xval;
-    int ylen = y.words == null ? 1 : yval;
-    int len = (xlen > ylen ? xlen : ylen) + 1;
+    if (y.words == null)
+      {
+	if (yval == 0)
+	  return IntNum.abs(x);
+	yval = 1;
+      }
+    int len = (xval > yval ? xval : yval) + 1;
     int[] xwords = new int[len];
     int[] ywords = new int[len];
     x.getAbsolute (xwords);

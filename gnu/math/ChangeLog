@@ -1,3 +1,8 @@
+Fri May 23 17:29:47 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* IntNum.java (gcd):  Check that either arg is zero.
+	* Makefile.{am,in}:  Use CPASSPATH env variable, instead of -classpath.
+
 Tue May 20 22:07:14 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Fix class initialization cicularities.

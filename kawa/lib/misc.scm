@@ -24,12 +24,10 @@
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))
 
-(define (environment-bound? env sym)
-  (not (eq? ((primitive-virtual-method "gnu.mapping.Environment" "lookup"
-                                       "gnu.mapping.Binding"
-                                       (<symbol>))
-             env sym)
-       #!null)))
+(define (environment-bound? (env :: <gnu.mapping.Environment>)
+			    (sym :: <String>))
+  :: <boolean>
+  (invoke env 'isBound sym))
 
 ;; The version number is not optiona according to R5RS.
 ;; But since earlier versions of this implementation took 0 arguments,

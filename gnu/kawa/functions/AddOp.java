@@ -3,15 +3,14 @@ import gnu.math.IntNum;
 import gnu.math.Numeric;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.bytecode.Type;
-import gnu.bytecode.PrimType;
+import gnu.bytecode.*;
 
 /**
  * Implement the Scheme standard functions "+" and "-".
  * @author Per Bothner
  */
 
-public class AddOp extends ProcedureN implements CanInline
+public class AddOp extends ProcedureN implements CanInline, Inlineable
 {
   int plusOrMinus = 1;
 
@@ -198,5 +197,164 @@ public class AddOp extends ProcedureN implements CanInline
           }
       }
     return exp;
+  }
+
+  /*
+  static ClassType typeInteger = ClassType.make("java.lang.Integer");
+  static ClassType typeLong = ClassType.make("java.lang.Long");
+  */
+  static ClassType typeIntNum = ClassType.make("gnu.math.IntNum");
+  static ClassType typeDFloNum = ClassType.make("gnu.math.DFloNum");
+  static ClassType typeRealNum = ClassType.make("gnu.math.RealNum");
+  static ClassType typeNumeric = ClassType.make("gnu.math.Numeric");
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    int len = args.length;
+    if (len == 0)
+      {
+	comp.compileConstant(IntNum.zero(), target);
+	return;
+      }
+    Type type = getReturnType(args);
+    Type ttype = target.getType();
+    if (len == 1)
+      {
+	// FIXME
+	ApplyExp.compile(exp, comp, target);
+	return;
+      }
+    PrimType ptype = null;
+    if (ttype instanceof PrimType)
+      {
+	char sig = type.getSignature().charAt(0);
+	if (sig == 'V' || sig == 'Z' || sig == 'C')
+	 ptype = null; // error
+	else if (sig == 'D' || sig == 'F')
+	  {
+	    if (type.isSubtype(typeRealNum))
+	      ptype = Type.double_type;
+	  }
+	else
+	  {
+	    if (type.isSubtype(typeIntNum))
+	      ptype = sig == 'J' ? Type.long_type : Type.int_type;
+	  }
+      }
+    if (ptype != null)
+      {
+	CodeAttr code = comp.getCode();
+	// FIXME would be nice to use iinc when appropriate!
+	// We would need to use a special LocalVariableTarget,
+	// created by SetExp when dest is a local variable.
+	// Then if len==2 && ptype==Type.int_type
+	// && target instanceof LocalVariableTarget
+	// && one arg is QuoteExp && other arg is same local as target
+	// => then emit iinc.
+	args[0].compile(comp, ttype);
+	for (int i = 1;  i < len;  i++)
+	  {
+	    args[i].compile(comp, ptype);
+	    if (plusOrMinus > 0)
+	      code.emitAdd(ptype);
+	    else
+	      code.emitSub(ptype);
+	  }
+	target.compileFromStack(comp, ttype);
+      }
+    else
+      ApplyExp.compile(exp, comp, target);
+    
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    int len = args.length;
+    if (len == 0)
+      return typeIntNum;
+    Type type0 = null;
+    int kind0 = 0;
+    // kind==1:  other number
+    // kind==2:  real number
+    // kind==3:  floating-point
+    // kind==4:  integer
+    for (int i = 0;  i < len;  i++)
+      {
+	Expression arg = args[i];
+	Type type = arg.getType();
+	int kind = 0;
+	if (type instanceof PrimType)
+	  {
+	    char sig = type.getSignature().charAt(0);
+	    if (sig == 'V' || sig == 'Z' || sig == 'C')
+	      {
+		return Type.pointer_type; // error
+	      }
+	    else if (sig == 'D' || sig == 'F')
+	      {
+		kind = 3;
+		type = typeDFloNum;
+	      }
+	    else
+	      {
+		kind = 4;
+		sig = 'I';
+		type = typeIntNum;
+	      }
+	  }
+	else
+	  {
+	    if (type.isSubtype(typeIntNum))
+	      kind = 4;
+	    else if (type.isSubtype(typeDFloNum))
+	      kind = 3;
+	    else if (type.isSubtype(typeRealNum))
+	      kind = 2;
+	    else if (type.isSubtype(typeNumeric))
+	      kind = 1;
+	    else
+	      return Type.pointer_type;
+	  }
+
+	if (i == 0)
+	  {
+	    type0 = type;
+	    kind0 = kind;
+	    continue;
+	  }
+
+	if (type == type0)
+	  continue;
+
+	if (kind0 == 4 && kind == 4)
+	  type = typeIntNum;
+	else if (kind0 >= 3 && kind >= 3)
+	  {
+	    type = typeDFloNum;
+	    kind0 = 3;
+	  }
+	else if (kind0 >= 2 && kind >= 2)
+	  {
+	    if (kind0 >= 3 || kind >= 3)
+	      {
+		type = typeDFloNum;
+		kind0 = 3;
+	      }
+	    else
+	      {
+		type = typeRealNum;
+		kind0 = 2;
+	      }
+	  }
+	else if (kind0 >= 1 && kind >= 1)
+	  {
+	    type = typeNumeric;
+	    kind0 = 1;
+	  }
+	else
+	  return Type.pointer_type;
+      }
+    return type0;
   }
 }

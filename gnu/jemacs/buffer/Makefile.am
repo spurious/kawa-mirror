@@ -18,6 +18,7 @@ java_WITH_SWING = \
   InsertAction.java \
   Marker.java \
   MarkerReader.java \
+  Menu.java \
   Modeline.java \
   PrefixAction.java \
   ProcAction.java \

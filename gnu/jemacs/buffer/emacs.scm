@@ -63,6 +63,40 @@
 			    (<javax.swing.text.Keymap> <object> <object>))
    keymap key binding))
 
+;;; MENUS
+
+(define current-menubar #!null)
+
+(define default-menubar
+  '(
+    ("File"
+     #("Open..." find-file)
+     #("Open in Other Window..." find-file-other-window )
+     #("Open in New Frame..." find-file-other-frame )
+     #("Insert File..." insert-file )
+     #("View File..." view-file )
+     "------"
+     #("New Frame" make-frame)
+     #("Delete Frame" delete-frame)
+     "------"
+     #( "Save" save-buffer :active (buffer-modified-p) ) )
+    ("Tools"
+     #( "Scheme interaction" scheme-swing-window))
+    #!null
+    ("Help"
+     #( "About JEmacs..." about-jemacs ) )))
+
+(define (set-menubar-dirty-flag)
+  ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "setMenuBar"
+			     <void> (<gnu.jemacs.buffer.Menu>))
+   (selected-frame)
+   ((primitive-constructor <gnu.jemacs.buffer.Menu> 
+			   (<object>)) current-menubar)))
+
+(define (set-menubar menubar)
+  (set! current-menubar menubar)
+  (set-menubar-dirty-flag))
+
 ;;; FILES
 
 (define (find-file #!optional (filename (read-from-minibuffer "Find file: ")))
@@ -85,7 +119,8 @@
   (set-visited-file-name filename buffer)
   (save-buffer buffer))
 
-(define (insert-file filename #!optional (buffer (current-buffer)))
+(define (insert-file #!optional (filename (read-from-minibuffer "Insert file: "))
+		     (buffer (current-buffer)))
   ((primitive-virtual-method <buffer> "insertFile"
                              <void> (<String>))
    buffer filename))
@@ -222,7 +257,8 @@
 
 (define (make-frame #!optional (buffer (current-buffer)))
   ((primitive-constructor <gnu.jemacs.buffer.Frame> (<buffer>))
-   buffer))
+   buffer)
+  (set-menubar default-menubar))
 
 (define (delete-frame #!optional (frame (selected-frame)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "delete" <void> ())

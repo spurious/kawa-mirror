@@ -78,7 +78,7 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_WITH_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferReader.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   MarkerReader.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   TooLongAction.java   Window.java
+java_WITH_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferReader.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   MarkerReader.java   Menu.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   TooLongAction.java   Window.java
 
 
 EXTRA_JAVA = $(java_WITH_SWING)

@@ -8,6 +8,8 @@ public class Frame extends javax.swing.JFrame
 
   JPanel contents;
 
+  JMenuBar menuBar;
+    
   static int counter;
   int id = ++counter;
 
@@ -35,6 +37,17 @@ public class Frame extends javax.swing.JFrame
     setVisible(true);
     Window.setSelected(win);
     setTitle("JEmacs");
+    menuBar = new JMenuBar();
+    setJMenuBar(menuBar);
+  }
+
+  public void setMenuBar (Menu menu)
+  {
+    menuBar.removeAll();
+    // a menubar contain a list of menus, stored inside a single menu
+    while (menu.getMenuComponentCount() > 0)
+      menuBar.add(menu.getMenuComponent(0));
+    menuBar.updateUI();
   }
 
   public void delete()

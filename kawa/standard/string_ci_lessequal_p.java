@@ -2,8 +2,8 @@ package kawa.standard;
 
 import kawa.lang.Procedure2;
 
-public class string_ci_lessthanequal_p extends kawa.lang.Procedure2 {
-   public string_ci_lessthanequal_p() {
+public class string_ci_lessequal_p extends Procedure2 {
+   public string_ci_lessequal_p() {
       super("string-ci<=?");
    }
 

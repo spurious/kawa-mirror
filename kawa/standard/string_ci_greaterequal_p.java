@@ -1,9 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class string_ci_greaterthanequal_p extends Procedure2
+public class string_ci_greaterequal_p extends Procedure2
 {
-  public string_ci_greaterthanequal_p() {
+  public string_ci_greaterequal_p() {
     super("string-ci>=?");
   }
 

@@ -113,13 +113,13 @@ list2string.class \
 string_equal_p.class \
 string_ci_equal_p.class \
 string_lessthan_p.class \
-string_lessthanequal_p.class \
+string_lessequal_p.class \
 string_greaterthan_p.class \
-string_greaterthanequal_p.class \
+string_greaterequal_p.class \
 string_ci_lessthan_p.class \
-string_ci_lessthanequal_p.class \
+string_ci_lessequal_p.class \
 string_ci_greaterthan_p.class \
-string_ci_greaterthanequal_p.class \
+string_ci_greaterequal_p.class \
 substring.class \
 string_append.class \
 string_copy.class \

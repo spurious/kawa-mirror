@@ -152,53 +152,34 @@ public class StandardInterpreter extends Interpreter
       define_proc ("char-upcase", "kawa.standard.char_upcase");
       define_proc ("char-downcase", "kawa.standard.char_downcase");
       
-      //-- Section 6.7
-      proc = new kawa.standard.string_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.make_string();
-      define(proc.name,proc);
-      proc = new kawa.standard.string();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_length();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ref();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_set_b();
-      define(proc.name,proc);
-      proc = new kawa.standard.list2string();
-      define(proc.name,proc);
-      proc = new kawa.standard.string2list();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_append();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ci_equal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ci_greaterthan_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ci_greaterthanequal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ci_lessthan_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_ci_lessthanequal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_copy();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_fill_b();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_equal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_greaterthan_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_greaterthanequal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_lessthan_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.string_lessthanequal_p();
-      define(proc.name,proc);
-      proc = new kawa.standard.substring();
-      define(proc.name,proc);
+      //-- Section 6.7  -- complete
+      define_proc ("string?", "kawa.standard.string_p");
+      define_proc ("make-string", "kawa.standard.make_string");
+      define_proc ("string", "kawa.standard.string");
+      define_proc ("string-length", "kawa.standard.string_length");
+      define_proc ("string-ref", "kawa.standard.string_ref");
+      define_proc ("string-set!", "kawa.standard.string_set_b");
 
-      //-- Section 6.8
+      define_proc ("string=?", "kawa.standard.string_equal_p");
+      define_proc ("string-ci=?", "kawa.standard.string_ci_equal_p");
+      define_proc ("string<?", "kawa.standard.string_lessthan_p");
+      define_proc ("string>?", "kawa.standard.string_greaterthan_p");
+      define_proc ("string<=?", "kawa.standard.string_lessequal_p");
+      define_proc ("string>=?", "kawa.standard.string_greaterequal_p");
+
+      define_proc ("string-ci<?", "kawa.standard.string_ci_lessthan_p");
+      define_proc ("string-ci>?", "kawa.standard.string_ci_greaterthan_p");
+      define_proc ("string-ci<=?", "kawa.standard.string_ci_lessequal_p");
+      define_proc ("string-ci>=?", "kawa.standard.string_ci_greaterequal_p");
+
+      define_proc ("substring", "kawa.standard.substring");
+      define_proc ("string-append", "kawa.standard.string_append");
+      define_proc ("string->list", "kawa.standard.string2list");
+      define_proc ("list->string", "kawa.standard.list2string");
+      define_proc ("string-copy", "kawa.standard.string_copy");
+      define_proc ("string-fill!", "kawa.standard.string_fill_b");
+
+      //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.standard.vector_p");
       define_proc ("make-vector", "kawa.standard.make_vector");
       define_proc ("vector", "kawa.standard.vector");

@@ -1,9 +1,8 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure2;
-
-public class string_greaterthanequal_p extends kawa.lang.Procedure2 {
-   public string_greaterthanequal_p() {
+public class string_greaterequal_p extends Procedure2 {
+   public string_greaterequal_p() {
       super("string>=?");
    }
 
@@ -12,9 +11,9 @@ public class string_greaterthanequal_p extends kawa.lang.Procedure2 {
       if (((java.lang.StringBuffer)arg1).toString().compareTo(
              ((java.lang.StringBuffer)arg2).toString()
           )>=0) {
-         return kawa.lang.Interpreter.trueObject;
+         return Interpreter.trueObject;
       } else {
-         return kawa.lang.Interpreter.falseObject;
+         return Interpreter.falseObject;
       }
    }
 

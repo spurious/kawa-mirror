@@ -103,10 +103,11 @@ ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 CLEANFILES = tmp? *.log testing.zip *.class
 
-SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql tab.html
+SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql tab.html   multab.xql expectedmul.xml
+
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES =  tab.xml
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in tab.xml.in
+CONFIG_CLEAN_FILES = 
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -122,8 +123,6 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-tab.xml: $(top_builddir)/config.status tab.xml.in
-	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 tags: TAGS
 TAGS:
 
@@ -220,11 +219,20 @@ check-test1:  test1.class
 maketab1.class:  maketab1.xql
 	$(KAWA) --main --xquery -C $<
 
+# Should not run $(JAVA) when built --with-gcj, as that runs
+# interpreter gij.  Instead, should compile to native.
 check-maketab1:  maketab1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
 	diff -b $(srcdir)/tab.html tmp2
 
-check:  check-test1 check-maketab1
+multab.class:  multab.xql
+	$(KAWA) --main --xquery -C $<
+
+check-multab:  multab.class
+	CLASSPATH=.:$(KAWALIB) $(JAVA) multab >tmp3
+	@if diff -b $(srcdir)/expectedmul.xml tmp3; then echo '# multab test passes'; else echo FAIL multab test; fi
+
+check:  check-test1 check-maketab1 check-multab
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

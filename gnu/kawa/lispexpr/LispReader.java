@@ -1051,6 +1051,16 @@ public abstract class LispReader extends Lexer
     int ch = reader.read();
     if (ch < 0)
       reader.eofError("unexpected EOF in #! special form");
+
+    /* Handle Unix #!PROGRAM line at start of file. */
+    if (ch == '/'
+	&& reader.getLineNumber() == 0
+	&& reader.getColumnNumber() == 3)
+      {
+	ReaderIgnoreRestOfLine.getInstance().read(reader, '#', 1);
+	return Values.empty;
+      }
+
     int startPos = reader.tokenBufferLength;
     reader.tokenBufferAppend(ch);
     reader.readToken(reader.read(), false, 'D');

@@ -1,3 +1,7 @@
+2002-01-13  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readSpecial):  Skip Unix script header #!/PROGRAM.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* ReadTable.java (setBracketMode):  New methods.

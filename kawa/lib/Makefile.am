@@ -8,6 +8,7 @@ java_SCM=\
 
 # NOTE if you update this list, also update build.xml.
 java_SCM_ALWAYS =\
+  prim_syntax.scm \
   std_syntax.scm \
   reflection.scm \
   syntax.scm \

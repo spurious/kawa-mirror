@@ -17,11 +17,15 @@
 
 (define-syntax defmacro
   (syntax-rules ()
-		((defmacro name pattern form ...)
-                 (define-syntax name
-                   (lambda (__arg)
-                     (syntax-case __arg ()
-                                  ((__name . pattern) (begin form ...))))))))
+		((defmacro name pattern . forms)
+		 (%define-macro name (lambda pattern . forms)))))
+
+(define-syntax define-macro
+  (syntax-rules ()
+    ((define-macro (name . pattern) . forms)
+     (%define-macro name (lambda pattern . forms)))
+    ((define-macro name function)
+     (%define-macro name function))))
 
 (define (gentemp) :: <symbol>
   (invoke-static <gnu.expr.Symbols> 'gentemp))
@@ -44,6 +48,27 @@
   (try-catch (thunk)
 	     (ex <kawa.lang.NamedException>
 		 (invoke ex 'applyHandler key handler))))
+
+(define-syntax (try-finally x)
+  (syntax-case x ()
+	       ((_ try-part finally-part)
+		(make <gnu.expr.TryExp>
+		  (syntax->expression (syntax try-part))
+		  (syntax->expression (syntax finally-part))))))
+
+(define-syntax (synchronized x)
+  (syntax-case x ()
+	       ((_ object . body)
+		(make <gnu.expr.SynchronizedExp>
+		  (syntax->expression (syntax object))
+		  (syntax-body->expression (syntax body))))))
+
+(define (identifier? form) :: <boolean>
+  (and (instance? form <kawa.lang.SyntaxForm>)
+       (kawa.lang.SyntaxForm:isIdentifier form)))
+
+(define (free-identifier=? id1 id2) :: <boolean>
+  (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
 
 ;; SRFI-11  Copyright (C) Lars T Hansen (1999). All Rights Reserved.
 
@@ -159,11 +184,17 @@
        (req
          (cond-expand more-clauses ...))
        (else body ...)))
-    ((cond-expand (feature-id body ...) more-clauses ...)
-     (%if-feature feature-id
-		  (begin body ...)
-		  (cond-expand more-clauses ...)))))
+    ((cond-expand (feature-id . body) . more-clauses)
+     (%cond-expand (feature-id . body) . more-clauses))))
 
+(define-syntax %cond-expand
+  (lambda (x)
+    (syntax-case x ()
+		 ((_ (test . then) . more-clauses)
+		  (if (invoke-static <kawa.standard.IfFeature> 'testFeature
+				     (syntax test))
+		      (syntax (begin . then))
+		      (syntax (cond-expand . more-clauses)))))))
 
 ;; RECEIVE implementation from http://srfi.schemers.org/srfi-8/srfi-8.html
 ;; Copyright (C) John David Stone (1999). All Rights Reserved.

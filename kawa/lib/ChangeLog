@@ -1,3 +1,14 @@
+2004-11-08  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm: New file.
+	* Makefile.am: Add new file.
+	* std_syntax.scm: Use %let instead of let a few places.
+	* syntax.scm (defmacro): Rewrite using %define-macro.
+	(try-finally, synchronized): Write in Scheme using syntax-case.
+	(identifer?, free-identifier=?, define-macro): New.
+	(cond-expand): Change to not use %if-feature primitive syntax,
+	* system.scm (compile-file): Add missing check for errors.
+
 2004-10-23  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (letrec): New syntax definition.

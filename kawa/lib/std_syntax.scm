@@ -12,11 +12,11 @@
 		 (%syntax-error "else clause must be last clause of cond"))
 
 		((cond (test => result))
-		 (let ((temp test))
+		 (%let ((temp test))
 		   (if temp (result temp))))
 
 		((cond (test => result) clause1 clause2 ...)
-		 (let ((temp test))
+		 (%let ((temp test))
 		   (if temp
 		       (result temp)
 		       (cond clause1 clause2 ...))))
@@ -112,33 +112,34 @@
 
 (define-syntax let
   (syntax-rules ()
-		((let (binding ...) . body)
-		 (%let (binding ...) . body))
-		; Alternative definition would be simpler, but makes more
-		; work for compiler to optimize it - and still doesn't
-		; do quite as well.
-		;((%let-lambda1 (binding ...) () body)
-		;(%let-init binding) ...))
-		((let name (binding ...) . body)
-		 ((letrec ((name (%let-lambda1 (binding ...) () body)))
-		    name)
-		  (%let-init binding) ...))))
+    ((let (binding ...) . body)
+     ;; We destructure the bindings to simplify %let's job.
+     (%let (binding ...) . body))
+    ;; Alternative definition would be simpler, but makes more work for
+    ;; the compiler to optimize it - and still doesn't do quite as well.
+    ;;((%let-lambda1 (binding ...) () body)
+    ;;(%let-init binding) ...))
+    ((let name (binding ...) . body)
+     ((letrec ((name (%let-lambda1 (binding ...) () body)))
+	name)
+      (%let-init binding) ...))))
 
 ;;; LET*
 
-(define-syntax let* (syntax-rules ()
-				 ((let* () . body) (%let () . body))
-				 ((let* (var-init) . body)
-				  (%let (var-init) . body))
-				 ((let* (var-init . bindings) . body)
-				  (%let (var-init)
-				    (let* bindings . body)))
-				 ((let* bindings . body)
-				  (%syntax-error
-				   "invalid bindings list in let*"))
-				 ((let* . body)
-				  (%syntax-error
-				   "missing bindings list in let*"))))
+(define-syntax let*
+  (syntax-rules ()
+    ((let* () . body) (%let () . body))
+    ((let* (var-init) . body)
+     (%let (var-init) . body))
+    ((let* (var-init . bindings) . body)
+     (%let (var-init)
+	   (let* bindings . body)))
+    ((let* bindings . body)
+     (%syntax-error
+      "invalid bindings list in let*"))
+    ((let* . body)
+     (%syntax-error
+      "missing bindings list in let*"))))
 
 ;;; LETREC
 

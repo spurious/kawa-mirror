@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 94)
+(test-init "Miscellaneous" 95)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -420,3 +420,6 @@
 (test "#<procedure Plus10>" 'plus10-name1 (format "~s" plus10))
 (set-procedure-property! plus10 'name 'PlusTen)
 (test "#<procedure PlusTen>" 'plus10-name2 (format "~s" plus10))
+
+(define (return-null) #!null)
+(test #!null return-null)

@@ -1,3 +1,7 @@
+2001-09-15  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  New test, for bug reported by Jocelyn Paine.
+
 2001-08-30  Per Bothner  <per@bothner.com>
 
 	* classes1.scm (hyphenated-field?):  New field to test mangling.

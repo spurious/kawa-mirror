@@ -1,0 +1,5 @@
+Thu Sep 12 15:40:30 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Numeric.class, RealNum.class, DFloNum.class, RatNum.class,
+	MPN.class, IntNum.class:  New class for re-vamped numerics.
+	* Makefile.{am,in}:  New files.

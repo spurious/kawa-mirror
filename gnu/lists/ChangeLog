@@ -1,3 +1,7 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (dump):  Print group and attribute type objects.
+
 2001-11-06  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (stringValue):  Make attributes and long groups work.

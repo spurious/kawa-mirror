@@ -1276,7 +1276,7 @@ implements Consumer, PositionConsumer, Consumable
 			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
 		  {
 		    ch = ch - BEGIN_GROUP_SHORT;
-		    out.print("=BEGIN_GROUP_SHORT index#"+((int)ch)+"=<"+objects[ch]+'>');
+		    out.print("=BEGIN_GROUP_SHORT index#"+((int)ch)+"=<"+objects[ch]+"::"+objects[ch+1]+'>');
 		    toskip = 2;
 		  }
 		else if (ch >= INT_SHORT_ZERO + MIN_INT_SHORT
@@ -1334,7 +1334,7 @@ implements Consumer, PositionConsumer, Consumable
 			j += j < 0 ? data.length : i;
 			out.print("=BEGIN_GROUP_LONG end:"+j);
 			j = getIntN(j + 1);
-			out.print(" -> #"+j+"=<"+objects[j]+'>');
+			out.print(" -> #"+j+"=<"+objects[j]+"::"+objects[j+1]+'>');
 			toskip = 2;
 			break;
 		      case END_GROUP_LONG:

@@ -21,6 +21,7 @@ java_SCM_ALWAYS =\
   strings.scm \
   vectors.scm \
   uniform.scm \
+  arrays.scm \
   system.scm \
   trace.scm
 

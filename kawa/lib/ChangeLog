@@ -1,3 +1,7 @@
+2002-06-10  Per Bothner  <per@bothner.com>
+
+	* arrays.scm:  New file, with procedures for SRFI-25.
+
 2002-05-17  Per Bothner  <per@bothner.com>
 
 	* misc.scm (null-environment):  Should take a versio number, according

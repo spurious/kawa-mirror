@@ -401,11 +401,11 @@ public class XQuery extends Interpreter
    * Similar to <code>evalWithFocus(String, Object, Consumer)</code>.
    * The "$X" in the method name tells the Kawa compiler that the CallContext
    * argument is implicit, so it can be invoked from XQuery code thus:
-   * <code>XQuery:evalWithFocus($xquery, "expr", $sequence)</code>
+   * <code>XQuery:eval-with-focus($xquery, "expr", $sequence)</code>
    */
-  public void evalWithFocus$X (String expr,
-			       Object values,
-			       CallContext ctx)
+  public void eval_with_focus$X (String expr,
+				 Object values,
+				 CallContext ctx)
     throws Throwable
   {
     applyWithFocus$X(evalToFocusProc(expr), values, ctx);
@@ -415,9 +415,9 @@ public class XQuery extends Interpreter
    * Similar to <code>evalWithFocus(String, Object, int, int, Consumer)</code>.
    * The "$X" in the method name tells the Kawa compiler that the CallContext
    * argument is implicit, so it can be invoked from XQuery code thus:
-   * <code>XQuery:evalWithFocus($xquery, "expr", $item, $pos, $size)</code>
+   * <code>XQuery:eval-with-focus($xquery, "expr", $item, $pos, $size)</code>
    */
-  public void evalWithFocus$X (String expr,
+  public void eval_with_focus$X (String expr,
 			       Object item, int position, int size,
 			       CallContext ctx)
     throws Throwable

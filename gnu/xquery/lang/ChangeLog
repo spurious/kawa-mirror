@@ -3,7 +3,7 @@
 	* XQuery.java (PARSE_WITH_FOCUS):  New flag.
 	(parse):  Check for PARSE_WITH_FOCUS.
 	(applyWithFocus, applyWithFocus$X, evalToFocusProc, evalWithFocus,
-	evalWithFocus$X):  New methods.
+	eval_with_focus$X):  New methods.
 
 2003-11-08  Per Bothner  <per@bothner.com>
 

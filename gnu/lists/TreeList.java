@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -519,6 +519,26 @@ implements Consumer, PositionConsumer, Consumable
 
   public void beginAttribute(int index)
   {
+    /* This needs to be tested.  FIXME.  Anyway only solves limited problem.
+    // If there is whitespace and nothing else between the BEGIN_GROUP_LONG
+    // and the current position, get rid of the spaces.
+    int i = currentBeginGroup;
+    if (i > 0 && (i += 3) < gapStart)
+      {
+	for (int j = i;  ; j++)
+	  {
+	    if (j == gapStart)
+	      {
+		gapStart = i;
+		break;
+	      }
+	    char c = data[j];
+	    if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
+	      break;
+	  }
+      }
+    */
+
     ensureSpace(5 + 1);
     gapEnd--;
     data[gapStart++] = BEGIN_ATTRIBUTE_LONG;
@@ -772,6 +792,7 @@ implements Consumer, PositionConsumer, Consumable
     int pos = startPosition;
     int limit = startPosition <= gapStart && endPosition > gapStart ? gapStart
       : endPosition;
+    //System.err.println("consumeRange from "+pos+" to "+limit);
     int index;
     for (;;)
       {
@@ -1009,7 +1030,13 @@ implements Consumer, PositionConsumer, Consumable
     if (datum >= BEGIN_GROUP_SHORT
 	&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
       return datum-BEGIN_GROUP_SHORT;
-    else if (datum == BEGIN_GROUP_LONG || datum == BEGIN_ATTRIBUTE_LONG)
+    else if (datum == BEGIN_GROUP_LONG)
+      {
+	int j = getIntN(index+1);
+	j += j < 0 ? data.length : index;
+	return getIntN(j + 1);
+      }
+    else if (datum == BEGIN_ATTRIBUTE_LONG)
       return getIntN(index + 1);
     return -1;
   }
@@ -1242,6 +1269,87 @@ implements Consumer, PositionConsumer, Consumable
 	  throw new IndexOutOfBoundsException();
       }
     posSet.setPosition(posNumber, (pos << 1) | (isAfter ? 1 : 0), null);
+  }
+
+  /** Get matching matching child or descendent.
+   * This does a depth-first traversal.
+   * @param pos starting index
+   * @param predicate test to apply to groups
+   * @param limit stop if pos reaches here
+   * @return index of next match or -1 if none found
+   */
+  public final int nextMatchingChild(int pos, GroupPredicate predicate, int limit)
+  {
+    int start = pos;
+    if (limit == -1)
+      limit = data.length;
+    for (;;)
+      {
+	if (pos == gapStart)
+	  pos = gapEnd;
+	if (pos >= limit)
+	  return -1;
+	int j;
+	char datum = data[pos++];
+	if (datum <= MAX_CHAR_SHORT
+	    || (datum >= OBJECT_REF_SHORT
+		&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+	    || (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+		&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT))
+	  continue;
+	switch (datum)
+	  {
+	  case BEGIN_DOCUMENT:
+	  case BOOL_FALSE:
+	  case BOOL_TRUE:
+	    continue;
+	  case POSITION_REF_FOLLOWS:
+	  case OBJECT_REF_FOLLOWS:
+	  case CHAR_PAIR_FOLLOWS:
+	  case INT_FOLLOWS:
+	    pos += 2;
+	    continue;
+	  case CHAR_FOLLOWS:
+	  case END_GROUP_SHORT:
+	    pos++;
+	    continue;
+	  case POSITION_TRIPLE_FOLLOWS:
+	  case END_GROUP_LONG:
+	    pos += 6;
+	    continue;
+	  case END_ATTRIBUTE:
+	  case END_DOCUMENT:
+	    continue;
+	  case BEGIN_ATTRIBUTE_LONG:
+	    j = getIntN(pos+2);
+	    pos = j + j < 0 ? data.length + 1 : pos;
+	    continue;
+	  case LONG_FOLLOWS:
+	  case DOUBLE_FOLLOWS:
+	    pos += 4;
+	    continue;
+	  default:
+	    if (datum >= BEGIN_GROUP_SHORT
+		&& datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	      j = datum - BEGIN_GROUP_SHORT;
+	    else if (datum == BEGIN_GROUP_LONG)
+	      {
+		j = getIntN(pos);
+		j = getIntN(j + j < 0 ? data.length + 1: pos);
+	      }
+	    else
+	      throw new Error("unknown code:"+(int) datum);
+	    if (pos == start + 1)
+	      {
+		pos += 2;
+		continue;
+	      }
+	    if (predicate.isInstance(this, (pos - 1) << 1, null))
+	      return pos - 1;
+	    pos += 2;
+	    continue;
+	  }
+      }
   }
 
   public int nextDataIndex(int pos)

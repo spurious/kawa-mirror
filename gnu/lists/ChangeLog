@@ -1,3 +1,13 @@
+2002-02-05  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (getNextTypeIndex):  Fix bad BEGIN_GROUP_LONG handling.
+
+	* TreeList.java (nextMatchingChild):  New method.
+
+	* ElementPredicate.java:  New interface.
+	* GroupPredicate.java:  New interface, extends ElementPredicate.java.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2002-02-01  Per Bothner  <per@bothner.com>
 
 	* PrintConsumer.java (writeInt):  Add missing startNumber call.

@@ -12,6 +12,7 @@ java_sources = \
   Consumer.java \
   ConsumerWriter.java \
   Consumable.java \
+  ElementPredicate.java \
   F32Vector.java \
   F64Vector.java \
   FilterConsumer.java \
@@ -20,6 +21,7 @@ java_sources = \
   FVector.java \
   GapVector.java \
   GeneralArray.java \
+  GroupPredicate.java \
   LList.java \
   Pair.java \
   PairWithPosition.java \

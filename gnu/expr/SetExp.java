@@ -77,7 +77,9 @@ public class SetExp extends Expression
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (binding != null)
       {
-	if (binding.isIndirectBinding())
+	if (binding.ignorable())
+	  new_value.compile (comp, Target.Ignore);
+	else if (binding.isIndirectBinding())
 	  {
 	    binding.load(comp);
 	    new_value.compile (comp, Target.pushObject);

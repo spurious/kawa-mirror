@@ -24,6 +24,17 @@ public class StackTarget extends Target
 	code.emitConvert(type);
 	return;
       }
+    if (stackType instanceof ClassType && type instanceof ClassType)
+      {
+	// If stackType inherits from target type, no coercion is needed.
+	ClassType baseClass = (ClassType) stackType;
+	while (baseClass != null)
+	  {
+	    if (baseClass == type)
+	      return;
+	    baseClass = baseClass.getSuperclass();
+	  }
+      }
     stackType.emitCoerceToObject(code);
     type.emitCoerceFromObject(code);
   }

@@ -1,3 +1,25 @@
+Sat Jan 24 14:31:52 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/MessageArea.java (endMakr, length, out_stream):  New fields.
+	(enter):  Don't pass KeyEvent, or do consume here.
+	Better handling of various edits, including multi-line paste.
+	(write):  New method, body taken from TextAreaWriter.
+	(deleteOldText):  New method.
+	(textValueChanged):  New listener method.
+	* kawa/GuiConsole.java (constructor):  Create GuiInPort, not TtyInPort.
+ 	(actionPerformed):  Use MessageArea.deleteOldText.
+	* kawa/GuiInPort.java:  New class.
+	* kawa/TextAreaWriter.java (write(String)):  Call MessageArea.write.
+	(write):  Add cast from int to char. (Patch from Albert Ting.)
+	* kawa/Makefile.am, kawa/Makefile.in (OBJ):  Add GuiInPort.class.
+
+Tue Jan 20 10:28:24 1998  Alternator Petrofsky  <albatros@wco.com>
+
+	* kawa/lang/InPort.java (readState):  Changed to StringBuffer.
+	isDelimiter, readNestedComment, readVector): New functions
+	(skipWhitespaceAndComments): Handle nested comments.
+	(readListBody): Update.  Use isDelimiter after dot.
+
 Wed Jan 21 12:37:10 1998  Per Bothner  <bothner@cygnus.com>
 
 	General cleanup of how Environments work, especially how they

@@ -40,6 +40,7 @@ java_sources = \
   ModuleBody.java \
   ModuleMethod.java \
   ModuleExp.java \
+  NameLookup.java \
   PairClassType.java \
   ObjectExp.java \
   QuoteExp.java \

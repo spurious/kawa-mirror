@@ -1,3 +1,8 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* NameLookup.java:  New class.
+	* Makefile.am (java_sources0:  Update.
+
 2003-04-14  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (compileStore):  Use emitPutStatic if static field.

@@ -141,6 +141,7 @@ public class Declaration extends Variable
   }
 
   /** True if we never need to access this declaration. */
+  // rename to isAccessed?
   public boolean ignorable()
   {
     return ! getCanRead()

@@ -156,7 +156,7 @@ public class ApplyExp extends Expression
 	    int pc = fswitch.getMaxValue() + 1;
 	    fswitch.addCase(pc, l, comp);
 	    emit[proc.apply(args, context, THIS_frame, pc)];
-	    emit[save java stack, if needed];
+	    code.saveStack(class?);
 	    code.emitReturn();
 	    l.define(code);
 	    emit[restore java stack, if needed];

@@ -87,12 +87,12 @@ public class IfExp extends Expression
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);
     code.emitIfThen();
-    if (! trueInherited)
+    if (! trueInherited /* && trueLabel.hasFixups()*/)
       {
 	trueLabel.define(code);
 	then_clause.compileWithPosition(comp, target);
       }
-    if (! falseInherited)
+    if (! falseInherited /* && falseLabel.hasFixups()*/)
       {
 	code.emitElse();
 	falseLabel.define(code);
@@ -103,6 +103,8 @@ public class IfExp extends Expression
       }
     code.emitFi();
   }
+
+  Object walk (ExpWalker walker) { return walker.walkIfExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

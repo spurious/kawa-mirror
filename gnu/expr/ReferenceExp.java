@@ -1,8 +1,5 @@
 package gnu.expr;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Method;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
+import gnu.bytecode.*;
 import gnu.mapping.*;
 import kawa.lang.PrimProcedure;  // FIXME
 
@@ -19,6 +16,16 @@ public class ReferenceExp extends Expression
 
   public final String getName() { return symbol; }
   public final Declaration getBinding() { return binding; }
+
+  static int counter;
+  /** Unique id number, to ease print-outs and debugging. */
+  int id = ++counter;
+
+  boolean dontDereference;
+  /* If true, must have binding.isBinding().  Don't dereference Binding. */
+  public final boolean getDontDereference() { return  dontDereference; }
+  public final void setDontDereference(boolean dontDereference)
+  { this.dontDereference = dontDereference; }
 
   public ReferenceExp (String symbol)
   {
@@ -62,49 +69,32 @@ public class ReferenceExp extends Expression
     return lookup(env, symbol);
   }
 
-  static public void compile_load (Declaration decl, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    if (decl.baseVariable != null)
-      {
-	compile_load (decl.baseVariable, comp);  // recursive!
-	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	code.emitPushInt(decl.offset);
-	code.emitArrayLoad(Compilation.scmObjectType);
-      }
-    else
-      {
-	LambdaExp curLambda = comp.curLambda;
-	LambdaExp declLambda = decl.context.currentLambda ();
-	if (curLambda != declLambda)
-	  {
-	    compile_load (curLambda.staticLink, comp);
-	    LambdaExp lambda = curLambda.outerLambda ();
-	    for ( ; lambda != declLambda;  lambda = lambda.outerLambda ())
-	      {
-		comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-		code.emitPushInt(lambda.staticLink.offset);
-		code.emitArrayLoad(Compilation.scmObjectType);
-		// Invariant:  The stack top contains lambda.staticLink.
-	      }
-	    // Now the stack top is the declLambda heapFrame.
-	  }
-	else
-	  {
-	    comp.method.compile_push_value (decl);
-	  }
-      }
-  }
-
   private static ClassType thisType;
   private static Method lookupMethod;
+  static ClassType ctypeBinding = null;
+  static Method getMethod = null;
 
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
       return;
+    CodeAttr code = comp.getCode();
     if (binding != null)
-      compile_load (binding, comp);
+      {
+	binding.load(comp);
+	if (binding.isIndirectBinding() && ! getDontDereference())
+	  {
+	    if (ctypeBinding == null)
+	      {
+		ctypeBinding = ClassType.make("gnu.mapping.Binding");
+		getMethod = ctypeBinding.addMethod("get",
+						   Type.typeArray0,
+						   Compilation.scmObjectType,
+						   Access.PUBLIC|Access.FINAL);
+	      }
+	    code.emitInvokeVirtual (getMethod);
+	  }
+      }
     else
       {
 	comp.compileConstant (symbol);
@@ -115,25 +105,34 @@ public class ReferenceExp extends Expression
 	  {
 	    if (thisType == null)
 	      {
-		thisType = new ClassType("gnu.expr.ReferenceExp");
+		thisType = ClassType.make("gnu.expr.ReferenceExp");
 		lookupMethod
 		  = thisType.addMethod ("lookup",
 					Compilation.sym1Arg,
 					Compilation.scmObjectType,
 					Access.PUBLIC|Access.STATIC);
 	      }
-	    comp.getCode().emitInvokeStatic(lookupMethod);
+	    code.emitInvokeStatic(lookupMethod);
 	  }
 	else
-	  comp.getCode().emitInvokeStatic(comp.lookupGlobalMethod);
+	  code.emitInvokeStatic(comp.lookupGlobalMethod);
       }
     target.compileFromStack(comp, Type.pointer_type);
   }
 
+  Object walk (ExpWalker walker) { return walker.walkReferenceExp(this); }
+
   public void print (java.io.PrintWriter ps)
   {
-    ps.print("(#%ref ");
+    ps.print("(#%ref/");
+    ps.print(id);
+    ps.print("/ ");
     SFormat.print (symbol, ps);
     ps.print(")");
+  }
+
+  public String toString()
+  {
+    return "RefExp/"+symbol+'/'+id+'/';
   }
 }

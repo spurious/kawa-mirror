@@ -1,3 +1,7 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (define):  Trivial optimization.
+
 2000-05-22  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (class MethodFilter):  New non-public class.

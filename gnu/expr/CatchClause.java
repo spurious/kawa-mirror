@@ -16,13 +16,13 @@ public class CatchClause extends ScopeExp
     addDeclaration (name, type);
   }
 
-  /** "Convert" a <code>LetExp</code> to a <code>CatchClause</code>. */
-  public CatchClause (LetExp let)
+  /** "Convert" a <code>LambdaExp</code> to a <code>CatchClause</code>. */
+  public CatchClause (LambdaExp lexp)
   {
-    Declaration decl = let.firstDecl();
-    let.remove(null, decl);
+    Declaration decl = lexp.firstDecl();
+    lexp.remove(null, decl);
     add(decl);
-    body = let.body;
+    body = lexp.body;
   }
 
   public final CatchClause getNext() { return next; }
@@ -51,7 +51,8 @@ public class CatchClause extends ScopeExp
   public void print (OutPort out)
   {
     out.writeSpaceLinear();
-    out.startLogicalBlock("(Catch ", ")", 2);
+    out.startLogicalBlock("(Catch", ")", 2);
+    out.writeSpaceFill();
     decls.printInfo(out);
     out.writeSpaceLinear();
     body.print(out);

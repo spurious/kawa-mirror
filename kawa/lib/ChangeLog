@@ -1,3 +1,9 @@
+2005-03-18  Per Bothner  <per@bothner.com>
+
+	* prim_syntax.scm (try-catch): Don't translate catch-clause to a let,
+	with a bogus initial value.  Instead we generate a temporary LambdaExp.
+	Fixes Savannah bug #11540.
+
 2005-03-17  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): Revert yesterday's change -

@@ -75,6 +75,9 @@ public class Scheme extends LispLanguage
     return kawaEnvironment;
   }
 
+  public static Lambda lambda = new kawa.lang.Lambda();
+  static { lambda.setKeywords(Special.optional, Special.rest, Special.key); }
+
   public void initScheme ()
   {
       Named proc;
@@ -85,8 +88,6 @@ public class Scheme extends LispLanguage
 
       environ = nullEnvironment;
 
-      Lambda lambda = new kawa.lang.Lambda();
-      lambda.setKeywords(Special.optional, Special.rest, Special.key);
       define_syntax ("lambda", lambda);
 
       //-- Section 4.1  -- complete

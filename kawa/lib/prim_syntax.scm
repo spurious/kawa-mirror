@@ -74,6 +74,5 @@
 		  (invoke-static <kawa.standard.try_catch> 'rewrite
 				 (syntax try-part)
 				 (syntax
-				  #((%let ((var :: type 0))
-					 . catch-body) ...)))))))
+				  #((((var :: type)) . catch-body) ...)))))))
 

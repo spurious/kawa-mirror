@@ -96,7 +96,8 @@ public class TryExp extends Expression
 
   public void print (OutPort ps)
   {
-    ps.startLogicalBlock("(Try ", ")", 2);
+    ps.startLogicalBlock("(Try", ")", 2);
+    ps.writeSpaceFill();
     try_clause.print(ps);
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())

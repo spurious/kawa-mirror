@@ -1,3 +1,10 @@
+2005-03-18  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (lambda): New static field.
+	* kawa/standard/try_catch.java (rewrite): Rewritw catch-clause first
+	to LambdaExp, rather than LetExp, before converting to CatchClause.
+	Fixes Savannah bug #11540.
+
 2005-03-17  Per Bothner  <per@bothner.com>
 
 	* ltmain.sh: New version of cvs libtool (2.1a).

@@ -1,3 +1,11 @@
+Sat Apr  4 21:10:56 1998  Per Bothner  <bothner@cygnus.com>
+
+	* misc.scm (scheme-implementation-version):  Re-implement to use
+	kawa.Version.getVersion, instead of Makefile magic.
+	* port.scm (port-line, port-column, set-port-line!):  New.
+	* std_syntax.scm (and):  New syntax (taken from R5RS).
+	* Makefile.am:  Re-write to compile all out-of-date *.java at once.
+
 Tue Mar 10 22:05:31 1998  Per Bothner  <bothner@cygnus.com>
 
 	* reflection:  Use constant-fold.  Use <String> instead of <symbol>.

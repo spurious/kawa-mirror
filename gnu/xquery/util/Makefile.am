@@ -8,7 +8,6 @@ java_sources = \
   AppendValues.java \
   Children.java \
   Compare.java \
-  Document.java \
   ElementType.java \
   IntegerRange.java \
   IsEmptySequence.java \

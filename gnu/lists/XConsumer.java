@@ -19,7 +19,5 @@ public interface XConsumer extends Consumer
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length);
 
-  /*
   public void writeCDATA(char[] chars, int offset, int length);
-  */
 }

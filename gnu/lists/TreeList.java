@@ -96,6 +96,7 @@ implements XConsumer, PositionConsumer, Consumable
   // 0xF112 BASE_URI: Not a node, but a property of the previous node (start).
   // 0xF113 COMMENT
   // 0xF114 PROCESSING_INSTRUCTION
+  // 0xF115 CDATA_SECTION
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -182,6 +183,13 @@ implements XConsumer, PositionConsumer, Consumable
    * [comment text], (length) number of characters.
    */
   static final int PROCESSING_INSTRUCTION = 0xF114;
+
+  /** A CDATA node follows.
+   * [CDATA_SECTION]
+   * [length] 2 shorts
+   * [comment text], (length) number of characters.
+   */
+  static final int CDATA_SECTION = 0xF115;
 
   /** The beginning of an attribute.
    * [BEGIN_ATTRIBUTE_LONG]
@@ -690,6 +698,17 @@ implements XConsumer, PositionConsumer, Consumable
       }
   }
 
+  public void writeCDATA (char[] chars, int offset, int length)
+  {
+    ensureSpace(3+length);
+    int i = gapStart;
+    data[i++] = CDATA_SECTION;
+    setIntN(i, length);
+    i += 2;
+    System.arraycopy(chars, offset, data, i, length);
+    gapStart = i + length;
+  }
+
   public boolean isEmpty()
   {
     // FIXME does not work if we allow comment() entries!
@@ -981,6 +1000,15 @@ implements XConsumer, PositionConsumer, Consumable
 	      pos += length;
 	    }
 	    continue;
+	  case CDATA_SECTION:
+	    {
+	      int length = getIntN(pos);
+	      pos += 2;
+	      if (out instanceof XConsumer)
+		((XConsumer) out).writeCDATA(data, pos, length);
+	      pos += length;
+	    }
+	    continue;
 	  case PROCESSING_INSTRUCTION:
 	    {
 	      String target = (String) objects[getIntN(pos)];
@@ -1163,6 +1191,15 @@ implements XConsumer, PositionConsumer, Consumable
 	    sbuf.append("<!--");
 	    sbuf.append(data, pos, index);
 	    sbuf.append("-->");
+	    pos += index;
+	    continue;
+	  case CDATA_SECTION:
+	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
+	    index = getIntN(pos); // comment length
+	    pos += 2;
+	    sbuf.append("<![CDATA[");
+	    sbuf.append(data, pos, index);
+	    sbuf.append("]]>");
 	    pos += index;
 	    continue;
 	  case PROCESSING_INSTRUCTION:
@@ -1354,6 +1391,8 @@ implements XConsumer, PositionConsumer, Consumable
 	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG:
 	return Sequence.ATTRIBUTE_VALUE;
+      case CDATA_SECTION:
+	return Sequence.CHAR_VALUE;
       case COMMENT:
 	return Sequence.COMMENT_VALUE;
       case PROCESSING_INSTRUCTION:
@@ -1570,11 +1609,12 @@ implements XConsumer, PositionConsumer, Consumable
 	  case PROCESSING_INSTRUCTION:
 	    index += 2;
 	    /* ... fall through ... */
+	  case CDATA_SECTION:
 	  case COMMENT:
 	    {
 	      int length = getIntN(index);
 	      index += 2;
-	      if (! inGroup)
+	      if (! inGroup || datum == CDATA_SECTION)
 		sbuf.append(data, index, length);
 	      return index + length;
 	    }
@@ -1716,6 +1756,7 @@ implements XConsumer, PositionConsumer, Consumable
 	  case END_ATTRIBUTE:
 	  case END_DOCUMENT:
 	    return pos;
+	  case CDATA_SECTION:
 	  default:
 	    pos = nextDataIndex(pos);
 	    continue;
@@ -1848,6 +1889,10 @@ implements XConsumer, PositionConsumer, Consumable
 	    next = pos + 3 + getIntN(pos+1);
 	    if (checkNode) break;
 	    continue;	
+	  case CDATA_SECTION:
+	    next = pos + 3 + getIntN(pos+1);
+	    if (checkText) break;
+	    continue;	
 	  case BEGIN_GROUP_LONG:
 	    if (descend)
 	      next = pos + 3;
@@ -1946,6 +1991,7 @@ implements XConsumer, PositionConsumer, Consumable
       case PROCESSING_INSTRUCTION:
 	pos++;
 	// ... fall through ...
+      case CDATA_SECTION:
       case COMMENT:
 	return pos + 2 + getIntN(pos);
       default:
@@ -2121,6 +2167,13 @@ implements XConsumer, PositionConsumer, Consumable
 			break;
 		      case COMMENT:
 			out.print("=COMMENT: '");
+			j = getIntN(i+1);
+			out.write(data, i+3, j);
+			out.print('\'');
+			toskip = 2+j;
+			break;
+		      case CDATA_SECTION:
+			out.print("=CDATA: '");
 			j = getIntN(i+1);
 			out.write(data, i+3, j);
 			out.print('\'');

@@ -17,18 +17,11 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class SwtMenu extends Menu implements EMenu
 {
-
-  /**
-   * @param parent
-   */
   public SwtMenu(EFrame frame)
   {
     super(((SwtFrame) frame).getShell());
   }
 
-  /**
-   * @see gnu.jemacs.buffer.EMenu#setMenu(java.lang.Object)
-   */
   public void setMenu(LList menu)
   {
   }

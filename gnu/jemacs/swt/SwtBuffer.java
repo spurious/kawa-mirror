@@ -242,9 +242,6 @@ public class SwtBuffer extends Buffer
     return 0;
   }
 
-  /**
-   * @return
-   */
   public StyledTextContent getBufferContent()
   {
     return bufferContent;

@@ -51,10 +51,6 @@ public class SwtHelper
 
   /**
    * Creates a new menu bar for a shelln
-   * 
-   * @param shell
-   * @param bar
-   * @return
    */
   public static Menu newMenu(final Shell shell, final int bar)
   {
@@ -72,9 +68,6 @@ public class SwtHelper
 
   /**
    * Creates a new Menu inside a MenuItem.
-   * 
-   * @param menuItem
-   * @return
    */
   public static Menu newMenu(final MenuItem menuItem)
   {
@@ -92,11 +85,6 @@ public class SwtHelper
 
   /**
    * Creates a new MenuItem.
-   * 
-   * @param parent
-   * @param style
-   * @param text
-   * @return
    */
   public static MenuItem newMenuItem(final Menu parent, final int style, final String text, final SelectionListener selectionListener)
   {
@@ -124,9 +112,6 @@ public class SwtHelper
   /**
    * Sets a menu bar for a shell. The menu must have been created 
    * with the shell as parent
-   * 
-   * @param shell
-   * @param menubar
    */
   public static void setMenuBar(final Shell shell, final Menu menubar)
   {
@@ -140,10 +125,6 @@ public class SwtHelper
     }
   }
 
-  /**
-   * @param menuItem
-   * @param subMenu
-   */
   public static void setMenu(final MenuItem menuItem, final Menu subMenu)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -156,11 +137,6 @@ public class SwtHelper
     }
   }
 
-  /**
-   * @param display
-   * @param layout
-   * @return
-   */
   public static Shell newShell(final Display display, final FillLayout layout)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -182,15 +158,9 @@ public class SwtHelper
   }
 
   /**
-   * Creates a StyledText instance with a given content, and an SwtWindow which will be installed as
+   * Creates a StyledText instance with a given content, and an SwtWindow
+   * which will be installed as
    * VerifyKeylistener, FocusListener, KeyListener and Mouselistener
-   * @param parent
-   * @param style
-   * @param firstVisibleLine
-   * @param swtBuffer
-   * @param window
-   * 
-   * @return
    */
   public static StyledText newStyledText(final Composite parent, 
                                          final int style, 
@@ -216,9 +186,6 @@ public class SwtHelper
     }
   }
 
-  /**
-   * @see StyledText.getTopIndex
-   */
   public static int getTopIndex(final StyledText styledText)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -233,10 +200,6 @@ public class SwtHelper
     }
   }
  
-  /**
-   * @param styledText
-   * @return
-   */
   public static int getCaretOffset(final StyledText styledText)
   {
     if (Thread.currentThread() != getDisplay().getThread()) 
@@ -339,9 +302,6 @@ public class SwtHelper
 
   }
 
-  /**
-   * @param styledText
-   */
   public static void redraw(final Control control)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -356,11 +316,6 @@ public class SwtHelper
 
   }
 
-  /**
-   * @param parent
-   * @param i
-   * @return
-   */
   public static SashForm newSashForm(final Composite parent, final int style)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -375,10 +330,6 @@ public class SwtHelper
     }
   }
   
-  /**
-   * @param styledText
-   * @param sashForm
-   */
   public static void setParent(final Control control, final Composite parent)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -447,10 +398,6 @@ public class SwtHelper
 
   }
 
-
-  /**
-   * @param parent
-   */
   public static void layout(final Composite composite)
   {
     if (Thread.currentThread() != getDisplay().getThread())
@@ -522,6 +469,4 @@ public class SwtHelper
   {
     public Object result;
   }
-
-
 }

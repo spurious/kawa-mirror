@@ -70,9 +70,6 @@ public class SwtFrame extends EFrame
     return result;
   }
 
-  /**
-   * @return
-   */
   public Shell getShell()
   {
     return this.shell;

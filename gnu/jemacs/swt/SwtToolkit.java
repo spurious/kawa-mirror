@@ -32,9 +32,6 @@ public class SwtToolkit extends EToolkit
     return new SwtFrame(buffer);
   }
 
-  /**
-   * @see gnu.jemacs.buffer.EToolkit#getMenu(java.lang.Object)
-   */
   public EMenu getMenu(LList menubar)
   {
     return new SwtMenu(null);

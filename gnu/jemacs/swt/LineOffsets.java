@@ -133,10 +133,6 @@ public class LineOffsets extends GapVector
     return intervalStart;
   }
 
-  /**
-   * @param where
-   * @param count
-   */
   public void deleteLines(int firstLine, int numberOfLines)
   {
     if (numberOfLines > 0)
@@ -147,10 +143,6 @@ public class LineOffsets extends GapVector
     }
   }
 
-  /**
-   * @param start
-   * @param newLineOffsets
-   */
   public void insertLines(int index, int[] offsets)
   {
     if (offsets != null && offsets.length > 0)
@@ -208,12 +200,6 @@ public class LineOffsets extends GapVector
     
   }
 
-  
-
-  /**
-   * @param newText
-   * @return
-   */
   public int countLines(String newText)
   {
     Matcher m = newLinePattern.matcher(newText);
@@ -225,11 +211,6 @@ public class LineOffsets extends GapVector
     return i;
   }
 
-  /**
-   * @param start
-   * @param length
-   * @return
-   */
   public int linesInRange(int startOffset, int endOffset)
   {
     int indexOfStart = offset2index(startOffset);
@@ -237,12 +218,6 @@ public class LineOffsets extends GapVector
     return indexOfEnd - indexOfStart;
   }
 
-
-  /**
-   * @param i
-   * @param j
-   * @param k
-   */
   public void textRegionMoved(int regionStart, int regionEnd, int displacement)
   {
     int firstIndexToUpdate = offset2index(regionStart) + 1;
@@ -253,10 +228,6 @@ public class LineOffsets extends GapVector
     }
   }
 
-  /**
-   * @param where
-   * @param i
-   */
   public void textInserted(int startOffset, CharSequence seq)
   {
     int index = offset2index(startOffset);
@@ -266,10 +237,6 @@ public class LineOffsets extends GapVector
     }
   }
 
-  /**
-   * @param where
-   * @param count
-   */
   public void textDeleted(int startOffset, int endOffset)
   {
     int index = offset2index(startOffset);
@@ -280,10 +247,6 @@ public class LineOffsets extends GapVector
     }
   }
 
-  /**
-   * @param c
-   * @return
-   */
   public boolean isLineDelimiter(char c)
   {
     // TODO Auto-generated method stub

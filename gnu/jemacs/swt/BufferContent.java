@@ -25,9 +25,6 @@ import org.eclipse.swt.custom.TextChangingEvent;
 public class BufferContent extends SwtCharBuffer
   implements StyledTextContent, CharSeq
 {
-  /**
-   * @param str
-   */
   public BufferContent()
   {
     this(1000);
@@ -230,10 +227,6 @@ public class BufferContent extends SwtCharBuffer
   {
   }
 
-  /**
-   * @param offset
-   * @return
-   */
   public int lineStartPos(int pos)
   {
     int offset = pos2offset(pos);

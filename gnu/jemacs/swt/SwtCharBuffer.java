@@ -15,10 +15,6 @@ public class SwtCharBuffer extends GapVector implements CharSequence
   protected FString chars;
   protected LineOffsets lineOffsets;
   
-  /**
-   * @param initialSize
-   * @param lineOffsets
-   */
   public SwtCharBuffer(int initialSize)
   { 
     super(new FString(new char[initialSize]));
@@ -71,19 +67,11 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     
   }
 
-  /**
-   * @param start
-   * @return
-   */
   public int pos2offset(int pos)
   {
     return pos < gapStart ? pos : pos + gapEnd - gapStart; 
   }
   
-  /**
-   * @param offset
-   * @return
-   */
   public int offset2pos(int offset)
   {
     return offset <= gapStart ? offset : offset - gapEnd + gapStart;
@@ -156,12 +144,7 @@ public class SwtCharBuffer extends GapVector implements CharSequence
     gapStart -= count;
     lineOffsets.textDeleted(where, where + count);
   }
-  /**
-   * @param start
-   * @param end
-   * @param dest
-   * @param 
-   */
+
   public void getChars(int start, int end, char[] dest, int destStart)
   {
     int startOffset = pos2offset(start);

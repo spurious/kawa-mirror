@@ -1,3 +1,14 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java: Remove useful or incorrect javadoc comments.
+	* LineOffsets.java: Likewise.
+	* SwtBuffer.java: Likewise.
+	* SwtCharBuffer.java: Likewise.
+	* SwtFrame.java: Likewise.
+	* SwtHelper.java: Likewise.
+	* SwtMenu.java: Likewise.
+	* SwtToolkit.java: Likewise.
+
 2005-01-07  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java: Implement CharSeq.

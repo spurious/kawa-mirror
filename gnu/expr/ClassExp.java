@@ -54,6 +54,12 @@ public class ClassExp extends LambdaExp
     if (target instanceof IgnoreTarget)
       return;
     ClassType new_class = compile (comp);
+    compilePushClass(comp, target);
+  }
+
+  public void compilePushClass (Compilation comp, Target target)
+  {
+    ClassType new_class = type;
     String className = new_class.getName();
     // Type.make(Class.forname)
 

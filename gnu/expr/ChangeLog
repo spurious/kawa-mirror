@@ -1,3 +1,20 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (getOwningLambda):  New methods, replaces
+	static getHeapLambda.
+	Don't stop at ClassExp unless getNeedsCloseEnv.
+	(allocFieldFor, compileSetField, addMethodFor):  Use getOwningLambda.
+	* ApplyExp.java (compile):  Use getOwningLambda.
+	* ObjectExp.java (compile):  Likewise.
+	* ProcInitializer.java (<init>):  Likewise.
+	* ClassInitializer.java (<init>):  Likewise.
+	
+	* ClassExp.java (compilePushClass):  New method.
+	(compile):  Use compilePushClass.
+	* ClassInitializer.java (<init>):  Call ClassExp.compile here instead
+	of indirectly in emit.  The latter may be too late if compile
+	generates extra initializers, such as if there is a lambda.
+
 2003-04-04  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walklambdaExp):  Set CANNOT_INLINE for

@@ -13,6 +13,7 @@ public class ClassInitializer extends Initializer
   public ClassInitializer(ClassExp cexp, Compilation comp)
   {
     field = cexp.allocFieldFor(comp);
+    cexp.compile (comp);
     this.cexp = cexp;
     if (field.getStaticFlag())
       {
@@ -21,7 +22,7 @@ public class ClassInitializer extends Initializer
       }
     else
       {
-	LambdaExp heapLambda = LambdaExp.getHeapLambda(cexp.outer);
+	LambdaExp heapLambda = cexp.getOwningLambda();
 	next = heapLambda.initChain;
 	heapLambda.initChain = this;
       }
@@ -32,7 +33,7 @@ public class ClassInitializer extends Initializer
     CodeAttr code = comp.getCode();
     if (! field.getStaticFlag())
       code.emitPushThis();
-    cexp.compile(comp, Target.pushValue(Compilation.typeClassType));
+    cexp.compilePushClass(comp, Target.pushValue(Compilation.typeClassType));
     if (field.getStaticFlag())
       code.emitPutStatic(field);
     else

@@ -503,7 +503,7 @@ public class LambdaExp extends ScopeExp
 	if (! getNeedsClosureEnv())
 	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
-    ClassType frameType = getHeapLambda(outer).getHeapFrameType();
+    ClassType frameType = getOwningLambda().getHeapFrameType();
     Type rtype = Compilation.getMethodProcType(frameType);
     Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)
@@ -525,7 +525,7 @@ public class LambdaExp extends ScopeExp
     else
       {
 	compileAsMethod(comp);
-	getHeapLambda(outer).addApplyMethod(this);
+	getOwningLambda().addApplyMethod(this);
       }
 
     return (new ProcInitializer(this, comp)).field;
@@ -642,15 +642,16 @@ public class LambdaExp extends ScopeExp
       return (ClassType) heapFrame.getType();
   }
 
-  public static LambdaExp getHeapLambda(ScopeExp scope)
+
+  public LambdaExp getOwningLambda()
   {
-    ScopeExp exp = scope;
+    ScopeExp exp = outer;
     for (;; exp = exp.outer)
       {
 	if (exp == null)
 	  return null;
 	if (exp instanceof ModuleExp
-	    || exp instanceof ClassExp
+	    || (exp instanceof ClassExp && getNeedsClosureEnv())
 	    || (exp instanceof LambdaExp 
 		&& ((LambdaExp) exp).heapFrame != null))
 	  return (LambdaExp) exp;
@@ -659,7 +660,7 @@ public class LambdaExp extends ScopeExp
 
   void addMethodFor (Compilation comp, ObjectType closureEnvType)
   {
-    LambdaExp heapLambda = getHeapLambda(outer);
+    LambdaExp heapLambda = getOwningLambda();
     ClassType ctype = heapLambda.getHeapFrameType();
     addMethodFor(ctype, comp, closureEnvType);
   }

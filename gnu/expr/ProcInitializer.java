@@ -9,7 +9,7 @@ public class ProcInitializer extends Initializer
   {
     field = lexp.allocFieldFor(comp);
     proc = lexp;
-    LambdaExp heapLambda = LambdaExp.getHeapLambda(lexp.outer);
+    LambdaExp heapLambda = lexp.getOwningLambda();
     if (heapLambda instanceof ModuleExp && comp.instanceField != null)
       {
 	next = comp.clinitChain;

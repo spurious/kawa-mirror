@@ -21,6 +21,87 @@ public class Pair extends List implements Printable
     ps.print(")");
   }
 
+  static public boolean equals (Pair pair1, Pair pair2)
+  {
+    while (pair1.car.equals (pair2.car))
+      {
+	if (! (pair1.cdr instanceof Pair) || !(pair2.cdr instanceof Pair))
+	  return pair1.cdr.equals (pair2.cdr);
+	pair1 = (Pair) pair1.cdr;
+	pair2 = (Pair) pair2.cdr;
+      
+      }
+    return false;
+  }
+
+  public Object elementAt (int index)
+  {
+    Pair pair = this;
+    int i = index;
+    while (i > 0)
+      {
+	i--;
+	if (pair.cdr instanceof Pair)
+	  pair = (Pair)pair.cdr;
+	else if (pair.cdr instanceof Sequence)
+	  return ((Sequence)pair.cdr).elementAt (i);
+	else
+	  break;
+      }
+    if (i == 0)
+      return pair.car;
+    else
+      throw new IndexOutOfBoundsException ();
+  }
+
+  // A generalization of List.list_length
+  public int length ()
+  {
+    // Based on list-length implementation in
+    // Guy L Steele jr: "Common Lisp:  The Language", 2nd edition, page 414
+    int n = 0;
+    Object slow = this;
+    Object fast = this;
+    for (;;)
+      {
+	if (fast == Empty)
+	  return n;
+	if (! (fast instanceof Pair))
+	  {
+	    if (fast instanceof Sequence)
+	      {
+		int j = ((Sequence) fast).length ();
+		return j >= 0 ? n + j : j;
+	      }
+	    return -2;
+	  }
+	Pair fast_pair = (Pair) fast;
+	if (fast_pair.cdr == Empty)
+	  return n+1;
+	if (fast == slow && n > 0)
+	  return -1;
+	if (! (fast_pair.cdr instanceof Pair))
+	  {
+	    n++;
+	    fast = fast_pair.cdr;
+	    continue;
+	  }
+	if (!(slow instanceof Pair))
+	  return -2;
+	slow = ((Pair)slow).cdr;
+	fast = ((Pair)fast_pair.cdr).cdr;
+	n += 2;
+      }
+  }
+
+  public boolean equals (Object obj)
+  {
+    if ((obj != null) && (obj instanceof Pair))
+      return equals (this, (Pair) obj);
+    else
+      return false;
+  }
+
   static public final void printNoParen (Pair p, java.io.PrintStream ps)
   {
     for (;;)

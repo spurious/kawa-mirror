@@ -7,7 +7,7 @@ import java.io.PrintStream;
  * @author	Per Bothner
  */
 
-public class List extends Object implements Printable
+public class List extends Sequence implements Printable
 {
   protected List () { }
 
@@ -17,6 +17,16 @@ public class List extends Object implements Printable
   {
     // Gets overridden for Pair.
     ps.print("()");
+  }
+
+  public int length ()
+  {
+    return 0;
+  }
+
+  public Object elementAt (int index)
+  {
+    throw new ArrayIndexOutOfBoundsException (index);
   }
   
   /** Count the length of a list.

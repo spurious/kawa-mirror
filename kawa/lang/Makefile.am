@@ -47,13 +47,14 @@ VarListPat.class \
 \
 Printable.class \
 Named.class \
+Sequence.class \
 List.class \
 Pair.class \
 print.class \
 iport.class \
 oport.class \
 Symbol.class \
-vector.class \
+Vector.class \
 Executable.class \
 Syntaxable.class \
 Exit.class \

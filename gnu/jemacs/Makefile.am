@@ -3,6 +3,6 @@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = lang $(SWING_SUBDIRS)
 if WITH_SWING
-SWING_SUBDIRS = buffer lisp testsuite
+SWING_SUBDIRS = buffer lisp testsuite swing
 endif
 EXTRA_DIST = jar-manifest status.html

@@ -17,7 +17,7 @@
 ;;; The section when we last emitted a message.
 (define last-section #f)
 
-(define (TEST-INIT name)
+(define (test-init name)
   (set! test-name name)
   (set! *log-file* (open-output-file (string-append name ".log")))
   (display (string-append "%%%% Starting test " name) *log-file*)
@@ -43,7 +43,7 @@
        (begin (display-section (current-output-port))
 	      (set! last-section cur-section))))
 
-(define (SECTION . args)
+(define (section . args)
   (set! cur-section args)
   (display-section (or *log-file* (current-output-port)))
   (set! last-section #f)

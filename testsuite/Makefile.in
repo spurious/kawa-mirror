@@ -164,6 +164,7 @@ testing.zip: $(srcdir)/testing.scm
 check-scm: testing.zip
 	rm -rf tmp?
 	$(KAWATEST) -e '(define this-file-name "$(srcdir)/test.scm")' \
+	  -e "(set! symbol-read-case 'D)" \
 	  -f $(srcdir)/test.scm -e '(test-report)'
 
 check-num: testing.zip

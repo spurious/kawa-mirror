@@ -1,4 +1,4 @@
-(TEST-INIT "Miscellaneous")
+(test-init "Miscellaneous")
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)

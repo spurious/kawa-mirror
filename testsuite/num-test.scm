@@ -1,4 +1,4 @@
-(TEST-INIT "numbers")
+(test-init "numbers")
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -26,30 +26,30 @@
 (test -1250120440709706990357803482218496
   - 17280012451545786657095548928 1250137720722158536144460577767424)
 
-(SECTION "expt")
+(section "expt")
 (test 9223372036854775808 expt 2 63)
 
-(SECTION "convert")
+(section "convert")
 (test 10000000000 inexact->exact (exact->inexact 10000000000))
 (test 0 inexact->exact 0.0)
-(Test 123451/10 rationalize (inexact->exact 12345.1) (inexact->exact 0.00001))
+(test 123451/10 rationalize (inexact->exact 12345.1) (inexact->exact 0.00001))
 
-(SECTION "magnitude")
+(section "magnitude")
 (test 4.0 magnitude 4.)
 (test 4e3 magnitude -4000.)
 (test 5.0 magnitude 3-4i)
 (test 3/2 magnitude (/ 6 -4))
 
-(SECTION "shift")
+(section "shift")
 (test 12676506002282294014967032053760 arithmetic-shift 10 100)
 
-(SECTION "logcount")
+(section "logcount")
 (test 3 logcount 13)
 (test 2 logcount -13)
 (test 4 logcount 30)
 (test 4 logcount -30)
 
-(SECTION "logop")
+(section "logop")
 
 ;; A Boolean 1-bit version of logop.
 (define (logop-bits op x y)
@@ -80,7 +80,7 @@
     ((= i 16) #t)
   (logop-test i))
 
-(SECTION "integer-length")
+(section "integer-length")
 
 (test 0 integer-length 0)
 (test 1 integer-length 1)

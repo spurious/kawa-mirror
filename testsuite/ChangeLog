@@ -1,5 +1,7 @@
 Sun Dec 14 17:02:02 1997  Per Bothner  <bothner@cygnus.com>
 
+	* Update for symbol-read-case, defaulting to 'P.
+
 	* num-test.scm:  Added two tests from Norman Hardy <norm@netcom.com>.
 	* misc-test.scm:  Add a repression test that used to cause bad warning.
 	* Makefile.am (CLEANFILES):  Also remove testing.zip and *.log.

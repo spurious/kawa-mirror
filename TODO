@@ -41,3 +41,5 @@ Better naming convention for inner lambdas. (I.e. fix kawa.lib.lambda.)
 
 Make #!null more robust.  Allow (global) variables to be bound to #!null
 without being considered to be undefined.
+
+Optionally issue a warning if a symbol is rebound.

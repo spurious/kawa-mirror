@@ -53,20 +53,23 @@ public class ClassMethods extends ProcedureN
                                            Interpreter interpreter)
   {
     MethodFilter filter = new MethodFilter(mname, modifiers, modmask);
-    gnu.bytecode.Method[] methods
-      = dtype.getMethods(filter, ! "<init>".equals(mname));
+    Vector methods = new Vector();
+    dtype.getMethods(filter, "<init>".equals(mname) ? 0 : 2,
+		     methods,
+		     Type.pointer_type);  // FIXME
 
     // Remove over-ridden methods.
-    int mlength = methods.length;
+    int mlength = methods.size();
+  loopi:
     for (int i = 1;  i < mlength; )
     {
-      gnu.bytecode.Method method1 = methods[i];
+      Method method1 = (Method) methods.elementAt(i);
       ClassType class1 = method1.getDeclaringClass();
       Type[] types1 = method1.getParameterTypes();
       int tlen = types1.length;
       for (int j = 0;  j < i;  j++)
 	{
-	  gnu.bytecode.Method method2 = methods[j];
+	  Method method2 = (Method) methods.elementAt(j);
 	  Type[] types2 = method2.getParameterTypes();
 	  if (tlen != types2.length)
 	    continue;
@@ -79,11 +82,11 @@ public class ClassMethods extends ProcedureN
 	  if (k >= 0)
 	    continue;
 	  if (class1.isSubtype(method2.getDeclaringClass()))
-	    methods[j] = method1;
-	  methods[i] = methods[mlength - 1];
+	    methods.setElementAt(method1, j);
+	  methods.setElementAt(methods.elementAt(mlength - 1), i);
 	  mlength--;
 	  // Re-do current i, since methods[i] replaced.
-	  break;
+	  continue loopi;
 	}
       i++;
     }
@@ -92,7 +95,7 @@ public class ClassMethods extends ProcedureN
     int count = 0;
     for (int i = mlength;  --i >= 0; )
     {
-      gnu.bytecode.Method method = methods[i];
+      Method method = (Method) methods.elementAt(i);
       if ((method.getModifiers() & modmask) != modifiers)
 	continue;
       PrimProcedure pproc = new PrimProcedure(method, interpreter);
@@ -222,6 +225,6 @@ class MethodFilter implements gnu.bytecode.Filter
     gnu.bytecode.Method method = (gnu.bytecode.Method) value;
     String mname = method.getName();
     return ((method.getModifiers() & modmask) == modifiers)
-      && (mname.equals(name) || mname.equals(nameV));      
+      && (mname.equals(name) || mname.equals(nameV));
   }
 }

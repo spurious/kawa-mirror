@@ -1,3 +1,8 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (insert):  Remove xpos parameters.
+	* Marker.java:  Update for gnu.lists changes.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* EKeyMap.java: Print-name of Symbol may require getName, not toString.

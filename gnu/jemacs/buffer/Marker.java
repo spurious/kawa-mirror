@@ -19,9 +19,9 @@ public final class Marker extends SeqPosition
     if (buffer != null)
       {
 	if (marker.isPoint())
-	  init(buffer, buffer.getDot(), true);
+	  set(buffer, buffer.getDot(), true);
 	else
-	  init(marker);
+	  set(marker);
       }
   }
 
@@ -89,7 +89,7 @@ public final class Marker extends SeqPosition
             if (newPosition > newLength)
               newPosition = newLength;
           }
-	init(newBuffer, newPosition, false);
+	set(newBuffer, newPosition, false);
       }
   }
 
@@ -98,13 +98,13 @@ public final class Marker extends SeqPosition
     if (isPoint())
       buffer.removeChar(count);
     else
-      buffer.remove(ipos, xpos, count);
+      buffer.removePos(ipos, count);
   }
 
   public void insert (char[] data, int off, int len, Object style)
   {
     int point = getOffset();
-    buffer.insert(data, off, len, style, ipos, xpos);
+    buffer.insert(data, off, len, style, ipos);
     point += len;
     setDot(point);
   }
@@ -115,7 +115,7 @@ public final class Marker extends SeqPosition
     if (isPoint())
       buffer.insert(string, style);
     else
-      buffer.insert(string, style, ipos, xpos);
+      buffer.insert(string, style, ipos);
     point += string.length();
     setDot(point);
   }

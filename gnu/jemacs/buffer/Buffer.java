@@ -201,22 +201,21 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
     return "#<buffer \"" + name + "\">";
   }
 
-  /** Insert count copies of ch at position of (ipos, xpos). */
+  /** Insert count copies of ch at Pos ipos. */
   /*
-  public void insert (char ch, int count, Object style, int ipos, Object xpos)
+  public void insert (char ch, int count, Object style, int ipos)
   {
   }
   */
 
   /** Insert string with given style at position pair. */
-  public abstract void insert (String string, Object style,
-			       int ipos, Object xpos);
+  public abstract void insert (String string, Object style, int ipos);
 
   /** Insert character with given style at position pair. */
   public void insert (char[] chars, int offset, int count, Object style,
-		      int ipos, Object xpos)
+		      int ipos)
   {
-    insert(new String(chars, offset, count), style, ipos, xpos);
+    insert(new String(chars, offset, count), style, ipos);
   }
 
   public void insertAll (Object[] values, Object style)

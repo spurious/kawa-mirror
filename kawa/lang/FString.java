@@ -119,7 +119,7 @@ public class FString extends Sequence implements Printable, Compilable
     int len = val.length;
     int hash = 0;
     for (int i = 0;  i < len;  i++)
-      hash = 32 * hash + val[i];
+      hash = 31 * hash + val[i];
     return hash;
   }
 

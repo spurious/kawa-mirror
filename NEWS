@@ -1,3 +1,9 @@
+Full-tail-call-elimination when using flag --full-tail-calls.
+
+The keywords let (including named let), let*, and letrec support type
+specifiers for the declared variables  For example:
+	(let ((lst <list> (foo x))) (reverse lst))
+
 Changes from Kawa 1.6.55 to 1.6.57
 ==================================
 A new command-line flag --server PORT specifies that Kawa should run

@@ -21,9 +21,6 @@ Combine primitive field with record facility and define-class.
 
 Support persistence and serialization of Scheme values.
 
-Allow the type of an Expression to be other than Object.
-Use type declarations and (local) type inference.
-
 Replace use of ZipArchive by jar files.
 
 Implement full call-cc and tail-calls by re-writing as in RScheme.

@@ -245,6 +245,11 @@ public class Environment extends NameMap
 	define (name, value);
 	return null;
       }
+    else if (! binding.isBound())
+      {
+	binding.set (value);
+        return null;
+      }
     else
       {
 	Object old_value = binding.get ();

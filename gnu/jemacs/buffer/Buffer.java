@@ -8,17 +8,21 @@ public class Buffer
 {
   String name;
   String filename;
+  String encoding;
   //boolean modified;
 
   static Buffer current;
 
   static javax.swing.text.StyleContext styles
   = new javax.swing.text.StyleContext();
+  static Style defaultStyle = styles.addStyle("default",null);
   Style inputStyle = styles.addStyle("input", null);
   static Style redStyle = styles.addStyle("red", null);
   static Style blueStyle = styles.addStyle("blue", null);
   static
   {
+    StyleConstants.setFontFamily(defaultStyle, "Lucida Sans Typewriter");
+    StyleConstants.setFontSize(defaultStyle, 14);
     StyleConstants.setForeground(redStyle, Color.red);
     StyleConstants.setForeground(blueStyle, Color.blue);
   }
@@ -66,9 +70,11 @@ public class Buffer
       {
         buffer = new Buffer(null);
         buffer.setFileName(fname);
+	buffer.encoding = System.getProperty("file.encoding", "UTF8");
         try
           {
-            Reader in = new FileReader(fname);
+	    Reader in = new InputStreamReader(new FileInputStream(fname),
+					      buffer.encoding);
             buffer.insertFile(in);
             in.close();
           }
@@ -152,6 +158,10 @@ public class Buffer
 
     modelineDocument
       = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
+    // Needed for proper bidi (bi-directional text) handling.
+    // Does cause extra overhead, so should perhaps not be default.
+    // Instead only set it if we insert Hebrew/Arabic text?  FIXME.
+    document.putProperty("i18n", Boolean.TRUE);
     redrawModeline();
   }
 
@@ -309,7 +319,10 @@ public class Buffer
   {
     try
       {
-        Writer out = new FileWriter(filename);
+	if (encoding == null)
+	  encoding = System.getProperty("file.encoding", "UTF8");
+	Writer out = new OutputStreamWriter(new FileOutputStream(filename),
+					    encoding);
         save(out);
         out.close();
       }
@@ -338,7 +351,10 @@ public class Buffer
   {
     try
       {
-        Reader in = new FileReader(filename);
+	if (encoding == null)
+	  encoding = System.getProperty("file.encoding", "UTF8");
+        Reader in = new InputStreamReader(new FileInputStream(filename),
+					  encoding);
         insertFile(in);
         in.close();
       }

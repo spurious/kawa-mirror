@@ -142,6 +142,8 @@ public final class Marker implements Position
 
   public void insert (String string, Style style)
   {
+    if (style == null)
+      style = Buffer.defaultStyle;
     int point = getOffset();
     try
       {
@@ -160,6 +162,8 @@ public final class Marker implements Position
   {
     if (count < 0)
       return;
+    if (style == null)
+      style = Buffer.defaultStyle;
     int todo = count > 500 ? 500 : count;
     StringBuffer sbuf = new StringBuffer(todo);
     for (int i = todo;  --i >= 0; )

@@ -1,3 +1,11 @@
+2000-03-17  Per Bothner  <per@bothner.com>
+
+	* Buffer.java (encoding):  New field.
+	(defaultStyle):  New static field.  Use Lucida Sans Typewriter.
+	(findFile, save, inserFile):  Set and/or use encoding.
+	(<init>):  Set "18n" property to true, for correct bidi handling.
+	* Marker.java (insert):  If null style, use Buffer.defaultStyle.
+
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	Various tweaks for better javadoc processing.

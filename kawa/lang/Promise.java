@@ -31,12 +31,12 @@ public class Promise implements Printable
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<promise ");
     if (result == null)
-      ps.print (" - not forced yet>");
+      ps.print("#<promise - not forced yet>");
     else
       {
-	SFormat.print (result, ps);
+	ps.print("#<promise - forced to a ");
+	ps.print(result.getClass().getName());
 	ps.print ('>');
       }
   }

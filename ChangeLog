@@ -1,5 +1,8 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Promise.java (print):  Don't try to print forced value,
+	as this could cause a loop.
+
 	* kawa/lang/Lambda.java (rewrite):  Parameter name can be Symbol.
 	* kawa/lang/SyntaxRules.java (literal_identifiers):  Can now be Symbol.
 	(<init>, translate_pattern, readExternal):  Update accordingly.
@@ -2831,7 +2834,7 @@ Mon Jan 26 16:38:14 1998  Per Bothner  <bothner@cygnus.com>
 
 Sat Jan 24 14:31:52 1998  Per Bothner  <bothner@cygnus.com>
 
-	* kawa/MessageArea.java (endMakr, length, out_stream):  New fields.
+	* kawa/MessageArea.java (endMark, length, out_stream):  New fields.
 	(enter):  Don't pass KeyEvent, or do consume here.
 	Better handling of various edits, including multi-line paste.
 	(write):  New method, body taken from TextAreaWriter.

@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.2e from Makefile.am
+# Makefile.in generated automatically by automake 1.2g from Makefile.am
 
 # Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -11,7 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
-SHELL = @SHELL@
+SHELL = /bin/sh
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -56,6 +56,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 EXEEXT = @EXEEXT@
+JAVA = @JAVA@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
@@ -66,173 +67,79 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .scm .class
 
-JAVA = java
-CLASSPATH = ../..:$(srcdir)/../..:$$CLASSPATH
-# Use an environment variable for CLASSPATH so we pick up standard classes:
-CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
-
-JAVAC = javac
-JCFLAGS = -g
 KAWA = $(JAVA) kawa.repl
+JAVAC = $(KAWA)
+JAVACFLAGS = -P kawa.lib. -C
 
 javadir=$(datadir)/java/$(subdir)
 
-OBJ=\
-  std_syntax.class \
-  reflection.class \
-  thread.class \
-  characters.class \
-  files.class \
-  keywords.class \
-  ports.class \
-  misc.class \
-  numbers.class \
-  quantities.class \
-  strings.class \
-  syntax.class \
-  vectors.class \
-  system.class
+java_JAVA = $(java_SCM)
 
-# These are generated automatically when the $(OBJ) files are built,
-# but they also need to be installed.
-# The funny names are because the Scheme functions names get "mangled"
-# into valid Java class names.
-SECONDARY_OBJS=\
-  characters$$char_2_integer.class \
-  characters$$char_P.class \
-  characters$$char__downcase.class \
-  characters$$char__lower__case_P.class \
-  characters$$char__numeric_P.class \
-  characters$$char__upcase.class \
-  characters$$char__upper__case_P.class \
-  characters$$char__whitespace_P.class \
-  characters$$integer_2_char.class \
-  files$$file__exists_P.class \
-  files$$file__readable_P.class \
-  files$$create__directory.class \
-  files$$copy__file.class \
-  files$$delete__file.class \
-  files$$file__directory_P.class \
-  files$$file__writable_P.class \
-  files$$rename__file.class \
-  files$$_2_pathname.class \
-  keywords$$keyword_2_string.class \
-  keywords$$keyword_P.class \
-  keywords$$string_2_keyword.class \
-  misc$$environment__bound_P.class \
-  misc$$scheme__implementation__version.class \
-  misc$$scheme__window.class \
-  numbers$$abs.class \
-  numbers$$angle.class \
-  numbers$$complex_P.class \
-  numbers$$denominator.class \
-  numbers$$exp.class \
-  numbers$$imag__part.class \
-  numbers$$log.class \
-  numbers$$magnitude.class \
-  numbers$$make__polar.class \
-  numbers$$make__rectangular.class \
-  numbers$$number_P.class \
-  numbers$$numerator.class \
-  numbers$$quantity_P.class \
-  numbers$$quotient.class \
-  numbers$$rational_P.class \
-  numbers$$real_P.class \
-  numbers$$real__part.class \
-  numbers$$remainder.class \
-  numbers$$zero_P.class \
-  ports$$call__with__input__string.class \
-  ports$$default__prompter.class \
-  ports$$eof__object_P.class \
-  ports$$force__output.class \
-  ports$$input__port_P.class \
-  ports$$input__port__column__number.class \
-  ports$$input__port__line__number.class \
-  ports$$input__port__prompter.class \
-  ports$$input__port__read__state.class \
-  ports$$output__port_P.class \
-  ports$$newline.class \
-  ports$$set__input__port__line__number_B.class \
-  ports$$set__input__port__prompter_B.class \
-  ports$$transcript__off.class \
-  ports$$transcript__on.class \
-  strings$$make__string.class \
-  strings$$string__copy_B.class \
-  strings$$string__fill_B.class \
-  strings$$string__length.class \
-  strings$$substring.class \
-  syntax$$_Cdefmacro.class \
-  syntax$$catch.class \
-  syntax$$dynamic__wind.class \
-  syntax$$error.class \
-  syntax$$gentemp.class \
-  syntax$$lambda.class \
-  syntax$$lambda0.class \
-  syntax$$lambda1.class \
-  thread$$exit.class \
-  vectors$$list_2_vector.class \
-  vectors$$vector__length.class \
-  vectors$$vector_P.class \
-  vectors$$vector__ref.class \
-  vectors$$vector__set_B.class \
-  reflection$$lambda.class \
-  reflection$$make__record__type.class \
-  reflection$$record_P.class \
-  reflection$$record__accessor.class \
-  reflection$$record__constructor.class \
-  reflection$$record__modifier.class \
-  reflection$$record__predicate.class \
-  reflection$$record__type__descriptor.class \
-  reflection$$record__type__field__names.class \
-  reflection$$record__type__name.class
+java_SCM=\
+  std_syntax.scm \
+  reflection.scm \
+  thread.scm \
+  characters.scm \
+  files.scm \
+  keywords.scm \
+  ports.scm \
+  misc.scm \
+  numbers.scm \
+  quantities.scm \
+  strings.scm \
+  syntax.scm \
+  vectors.scm \
+  system.scm
 
-java_DATA=$(OBJ) $(SECONDARY_OBJS)
-
-# Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.scm)
-
-CLEANFILES = *.class
+SOURCES = $(java_JAVA)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-DATA =  $(java_DATA)
-
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
+DIST_COMMON =  $(java_JAVA) ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-default: all
+all: Makefile classjava.stamp
 
 .SUFFIXES:
 .SUFFIXES: .class .java .scm
-$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/lib/Makefile
 
-Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 
-install-javaDATA: $(java_DATA)
+mostlyclean-javaJAVA:
+
+clean-javaJAVA:
+	-rm *.class classjava.stamp
+
+distclean-javaJAVA:
+
+maintainer-clean-javaJAVA:
+
+install-javaJAVA: classjava.stamp
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	@list='$(java_DATA)'; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-	    echo " $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
-	  else if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(javadir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(javadir)/$$p; \
-	  fi; fi; \
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(javadir)/$$p; \
 	done
 
-uninstall-javaDATA:
-	$(NORMAL_UNINSTALL)
-	list='$(java_DATA)'; for p in $$list; do \
+uninstall-javaJAVA:
+	@$(NORMAL_UNINSTALL)
+	for p in *.class; do \
 	  rm -f $(javadir)/$$p; \
 	done
+classjava.stamp: $(java_JAVA)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > classjava.stamp
 tags: TAGS
 TAGS:
 
@@ -257,15 +164,13 @@ install-info:
 install-exec: 
 	@$(NORMAL_INSTALL)
 
-install-data: install-javaDATA
+install-data: install-javaJAVA
 	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
 
-uninstall: uninstall-javaDATA
-
-all: Makefile $(DATA)
+uninstall: uninstall-javaJAVA
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
@@ -287,36 +192,25 @@ distclean-generic:
 maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-mostlyclean:  mostlyclean-generic
+mostlyclean:  mostlyclean-javaJAVA mostlyclean-generic
 
-clean:  clean-generic mostlyclean
+clean:  clean-javaJAVA clean-generic mostlyclean
 
-distclean:  distclean-generic clean
+distclean:  distclean-javaJAVA distclean-generic clean
 	-rm -f config.status
 
-maintainer-clean:  maintainer-clean-generic distclean
+maintainer-clean:  maintainer-clean-javaJAVA maintainer-clean-generic \
+		distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-.PHONY: default uninstall-javaDATA install-javaDATA tags distdir info \
-dvi installcheck install-info install-exec install-data install \
-uninstall all installdirs mostlyclean-generic distclean-generic \
+.PHONY: mostlyclean-javaJAVA distclean-javaJAVA clean-javaJAVA \
+maintainer-clean-javaJAVA uninstall-javaJAVA install-javaJAVA tags \
+distdir info dvi installcheck install-info install-exec install-data \
+install uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
-
-.java.class:
-	$(CLASSPATH_ENV) $(JAVAC) $(JFLAGS) -d ../.. $<
-
-.scm.class:
-	$(CLASSPATH_ENV) $(KAWA) -d ../.. -P $(subdir). -C $< 
-
-misc.class: $(srcdir)/misc.scm
-	$(CLASSPATH_ENV) $(KAWA) \
-	  -e '(define-syntax %V (syntax-rules () ((%V) "@VERSION@")))' \
-	  -d ../.. -P $(subdir). -C $(srcdir)/misc.scm
-
-all: $(OBJ)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

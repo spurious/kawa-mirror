@@ -1,0 +1,8 @@
+2001-02-16  Per Bothner  <per@bothner.com>
+
+	New package.
+	* ParsedXMLHandler.java.in:  New to-be-preprocess-Java file.
+	* gnu/kawa/xml/XMLParser.java.in:  Likewise.
+	* gnu/kawa/xml/ParsedXMLToConsumer.java:  New class.
+	* XMLPrinter.java:  New class.  Implements Consumer.
+

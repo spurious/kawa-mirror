@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.math.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.xml.Focus;
 
 public class Position extends Procedure0 implements Inlineable
 {

@@ -1,3 +1,12 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* Compare.java:  Implement CanInline.
+
+	* Focus.java.in:  Move to gnu.kawa.xml.
+	* Makefile.am:  Update accordingly.
+	* Position.java:  Now need to import Focus.
+	* ValuesFilter.java:  Likewise.
+
 2002-04-19  Per Bothner  <per@bothner.com>
 
 	* Average.java:  New class, extends Procedure1.

@@ -6,6 +6,7 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.xml.Focus;
 
 public class ValuesFilter extends CpsProcedure
 {

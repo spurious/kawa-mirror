@@ -113,8 +113,6 @@ install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 pathsep = @pathsep@
-
-AUTOMAKE_OPTIONS = foreign
 SUFFIXES = .java .class .scm .el .lisp
 
 javadir = $(datadir)/java/$(subdir)
@@ -171,22 +169,14 @@ java_sources = \
   XMLFormat.java
 
 
-java_BUILT = \
-  Focus.java
-
-
 PACKAGE_FNAME = gnu-xquery-util
-
-BUILT_SOURCES = $(java_BUILT)
-EXTRA_DIST = Focus.java.in
 subdir = gnu/xquery/util
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 DIST_COMMON = ChangeLog Makefile.am Makefile.in
 SOURCES = $(java_sources) $(java_SCM)
 
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .java .class .scm .el .lisp
@@ -201,7 +191,7 @@ distclean-libtool:
 	-rm -f libtool
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/Make-rules $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  gnu/xquery/util/Makefile
+	  $(AUTOMAKE) --gnu  gnu/xquery/util/Makefile
 Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
 uninstall-info-am:
@@ -263,7 +253,6 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -342,11 +331,6 @@ elisp-classes.stamp: $(java_ELISP)
 	  $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
-
-Focus.java:  $(srcdir)/Focus.java.in
-	sed $(DONT_EDIT_SUBS) $(SED_REFERENCES_SUBS) \
-	  <$(srcdir)/Focus.java.in >Focus.java
-
 all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

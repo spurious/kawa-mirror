@@ -5,10 +5,11 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.kawa.functions.NumberCompare;
 import gnu.math.*;
+import gnu.expr.*;
 
 /** Compares two values (or sequences) according to XPath semantics. */
 
-public class Compare extends Procedure2
+public class Compare extends Procedure2 implements CanInline
 {
   static final int RESULT_GRT = 1;
   static final int RESULT_EQU = 0;
@@ -105,4 +106,12 @@ public class Compare extends Procedure2
   public static final Compare $Gr$Eq= make(">=",TRUE_IF_GRT|TRUE_IF_EQU);
   public static final Compare $Ls   = make("<",TRUE_IF_LSS);
   public static final Compare $Ls$Eq= make("<=",TRUE_IF_LSS|TRUE_IF_EQU);
+
+  public Expression inline (ApplyExp exp /*, SourceMessages messages*/)
+  {
+    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    if (folded != exp)
+      return folded;
+    return exp;
+  }
 }

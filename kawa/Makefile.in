@@ -111,7 +111,7 @@ uninstall-binSCRIPTS:
 install-javaDATA: $(java_DATA)
 	$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
 	  else if test -f $$p; then \
@@ -120,7 +120,7 @@ install-javaDATA: $(java_DATA)
 	done
 
 uninstall-javaDATA:
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  rm -f $(javadir)/$$p; \
 	done
 

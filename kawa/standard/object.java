@@ -34,11 +34,13 @@ public class object extends Syntax
 	supers[i] = new QuoteExp(type);
 	superlist = superpair.cdr;
       }
-    obj = pair.cdr;
+    Object components = pair.cdr;
     ObjectExp oexp = new ObjectExp();
+    if (clname != null)
+      oexp.setName(clname);
     LambdaExp method_list = null;
     LambdaExp last_method = null;
-    while (obj != List.Empty)
+    for (obj = components;  obj != List.Empty;  )
       {
 	if (! (obj instanceof Pair)
 	    || ! ((pair = (Pair) obj).car instanceof Pair))
@@ -47,8 +49,22 @@ public class object extends Syntax
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String)
 	  {
-	    oexp.addDeclaration((String) pair.car);
-	    //return tr.syntaxError("field object member not implemented"); //FIXME
+	    Object type = null;
+	    Declaration decl = oexp.addDeclaration((String) pair.car);
+	    decl.setSimple(false);
+	    if (pair.cdr instanceof Pair)
+	      {
+		pair = (Pair) pair.cdr;
+		Object init = pair.car;
+		if (pair.cdr instanceof Pair)
+		  {
+		    type = init;
+		    pair = (Pair) pair.cdr;
+		    init = pair.car;
+		  }
+	      }
+	    if (type != null)
+	      decl.setType(prim_method.exp2Type(type, tr));
 	  }
 	else if (pair.car instanceof Pair)
 	  {
@@ -56,8 +72,9 @@ public class object extends Syntax
 	    if (! (mpair.car instanceof String))
 	      return tr.syntaxError("missing method name");
 	    String mname = (String) mpair.car;
+	    Declaration decl = oexp.addDeclaration(mname);
 	    LambdaExp lexp = new LambdaExp();
-	    Lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+	    decl.noteValue(lexp);
 	    lexp.setName (mname);
 	    if (last_method == null)
 	      method_list = lexp;
@@ -70,8 +87,27 @@ public class object extends Syntax
       }
     oexp.firstChild = method_list;
     oexp.supers = supers;
-    if (clname != null)
-      oexp.setName(clname);
+    tr.push(oexp);
+    LambdaExp meth = method_list;
+    for (obj = components;  obj != List.Empty;  )
+      {
+	pair = (Pair) obj;
+	obj = pair.cdr; // Next member.
+	pair = (Pair) pair.car;
+	if (pair.car instanceof String)
+	  {
+	  }
+	else if (pair.car instanceof Pair)
+	  {
+	    Pair mpair = (Pair) pair.car;
+	    LambdaExp lexp = meth;
+	    meth = meth.nextSibling;
+	    Lambda.rewrite(lexp, mpair.cdr, pair.cdr, tr);
+	  }
+	else
+	  return tr.syntaxError("invalid field/method definition");
+      }
+    tr.pop(oexp);
     return oexp;
   }
 }

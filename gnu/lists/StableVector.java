@@ -10,7 +10,7 @@ package gnu.lists;
 public class StableVector extends GapVector
 {
   /** This array maps from the exported ipos values (indexes in the positions
-   * array to the ipos of the underlying SimpleVector base.
+   * array) to the ipos of the underlying SimpleVector base.
    * The first two elements are reserved for START_POSITION and END_POSITION.
    * Unused elements in positions are chained together in a free list
    * headed by the 'free' variable.  */

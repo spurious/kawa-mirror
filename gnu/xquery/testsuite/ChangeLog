@@ -1,3 +1,7 @@
+2003-07-23  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Add 3 more tests.
+
 2003-07-10  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  New tests based on bugs reported by Francois Leygues

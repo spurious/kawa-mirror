@@ -146,8 +146,16 @@ public class TestMisc
 	     "  return <b atr1='11' atr2=\"{$x}\">{($y,99,$y)}</b>",
 	     "<b atr1=\"11\" atr2=\"12\"><a>24</a>99<a>24</a></b>");
 
-    evalTest("document{element elm {attribute at{\"abc\"}, \"data\"}}/elm",
+    evalTest("let $el := 'elm' return "
+	     + "document{element {$el} {attribute at{\"abc\"}, \"data\"}}/elm",
 	     "<elm at=\"abc\">data</elm>");
+
+    evalTest("let $a := <a at1='val1'><b/><c/></a>,"
+	     + "  $b0 := <b/>,"
+	     + "  $b := $a/b return"
+	     + " ($a is $a, $a << $b, $b >> $b,"
+	     + "  $a isnot $b, $b, $b0, $b is $b0)",
+	     "true true false true <b /> <b /> false");
 
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
@@ -212,6 +220,11 @@ public class TestMisc
     evalTest("define function x(){<a><b x='1'/><b x='2'/></a>}"
 	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
+    failureExpectedNext = "";
+    evalTest("define function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>}"
+	     + " let $st := s()/a return ("
+	     + " '[',$st/@x ,'] [',$st ,']')",
+	     "[ x=\"2\"] [<a x=\"2\" />]");
 
     // Testcase from <Seshukumar_Adiraju@infosys.com>:
     evalTest("let $books := "

@@ -34,7 +34,7 @@
 
 (defvar selective-display nil)
 
-(defun barf-if-buffer-read-only ($optional buffer start end)
+(defun barf-if-buffer-read-only (&optional buffer start end)
   nil) ;; FIXME
 
 (defun execute-extended-command (prefix-arg)

@@ -1,3 +1,10 @@
+2004-09-23  Christian Surlykke <christian@surlykke.dk>
+
+	* editfns.el (barf-if-buffer-read-only): Changed '$optional' to 
+	'&optional' in parameter list.
+	* primitives.el (add-hook): Added two optional parameters so it
+	conforms with what subr.el expects (and how FSF defines it).
+  
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	* simple.el (newline):  New more restricted implementation.

@@ -26,4 +26,4 @@
 
 (defvar help-char ?\C-g)
 
-(defun add-hook (hook value) nil)  ;; Ignore for now.  FIXME.
+(defun add-hook (hook value &optional append local) nil)  ;; Ignore for now.  FIXME.

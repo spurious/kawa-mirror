@@ -1,5 +1,5 @@
 dnl Process this with autoconf to create configure
-AC_INIT(kawac.java)
+AC_INIT(kawa/repl.java)
 
 AM_INIT_AUTOMAKE(kawa, 1.2beta)
 

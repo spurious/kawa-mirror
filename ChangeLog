@@ -1,3 +1,11 @@
+Tue Feb  4 22:16:51 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Expression.java (Compile with Type):  Cast to
+	boolean_type such that result is false iff arg is #f.
+	* kawa/lang/PrimProcedure.java (getStaticFlag, getParameterTypes): New.
+	* kawa/lang/Translator.java (rewrite_pair):  Use new methods
+	(and don't crash on primitive-op1).	
+
 Mon Feb  3 17:05:29 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.2 beta.

@@ -1,3 +1,7 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* ports.scm (current-input-port):  New procedure.
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* files.scm, keywords.scm, lists.scm, misc.scm, numbers.scm, ports.scm,

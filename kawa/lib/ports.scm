@@ -10,6 +10,9 @@
 (define (current-output-port)
   ((primitive-static-method <output-port> "outDefault" <output-port> ())))
 
+(define (current-error-port)
+  ((primitive-static-method <output-port> "errDefault" <output-port> ())))
+
 (define (write-char ch #!optional
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))

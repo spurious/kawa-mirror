@@ -21,7 +21,7 @@ public class LineStripperSet extends FilterSet
      * Individual filter component of filterset
      *
      * @author    Jim White
-     * @created   2001-11-14
+     * Created   2001-11-14.
      */
     public static class LineStripper // extends FilterSet.Filter
     {
@@ -149,7 +149,7 @@ public class LineStripperSet extends FilterSet
     /**
      * Create a new filter
      *
-     * @param  the filter to be added
+     * @param stripper the filter to be added
      */
     public void addLineStripper(LineStripper stripper)
     {

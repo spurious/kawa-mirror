@@ -1,3 +1,9 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* Kawa.java: Remove empty javadoc @version tag.
+	* LineCommenterSet.java: Fix javadoc problems.
+	* LineStripperSet.java: Likewise.
+
 2003-05-03  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST):  Add LineCommenterSet.java.

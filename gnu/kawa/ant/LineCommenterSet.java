@@ -22,7 +22,7 @@ public class LineCommenterSet extends FilterSet
      * Individual filter component of filterset
      *
      * @author    Jim White
-     * @created   2001-11-14
+     * Created   2001-11-14.
      */
     public static class LineCommenter // extends FilterSet.Filter
     {
@@ -175,7 +175,7 @@ public class LineCommenterSet extends FilterSet
     /**
      * Create a new filter
      *
-     * @param  the filter to be added
+     * @param commenter the filter to be added
      */
     public void addLineCommenter(LineCommenter commenter)
     {

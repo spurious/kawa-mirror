@@ -11,7 +11,6 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
 /**
  *
  * @author  jim
- * @version 
  */
 public class Kawa extends MatchingTask
 {

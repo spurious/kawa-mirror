@@ -434,12 +434,20 @@ public class ApplyExp extends Expression
       }
   }
 
+  /** Cache for getType(). */
+  protected Type type;
+
   public final gnu.bytecode.Type getType()
   {
+    if (type != null)
+      return type;
     Expression afunc = func;
+    // In case of cycles.
+    type = Type.pointer_type;
     if (afunc instanceof ReferenceExp)
       {
 	Declaration func_decl = ((ReferenceExp) afunc).binding;
+	func_decl = Declaration.followAliases(func_decl);
 	if (func_decl != null && ! func_decl.getFlag(Declaration.IS_UNKNOWN))
 	  afunc = func_decl.getValue();
       }
@@ -447,13 +455,13 @@ public class ApplyExp extends Expression
       {
 	Object proc = ((QuoteExp) afunc).getValue();
 	if (proc instanceof Inlineable)
-	  return ((Inlineable) proc).getReturnType(args);
+	  type = ((Inlineable) proc).getReturnType(args);
       }
-    if (afunc instanceof LambdaExp)
+    else if (afunc instanceof LambdaExp)
       {
-	return ((LambdaExp) afunc).getReturnType();
+	type = ((LambdaExp) afunc).getReturnType();
       }
-    return super.getType();
+    return type;
   }
 
   /** Inline this ApplyExp if parameters are constant.
@@ -488,4 +496,5 @@ public class ApplyExp extends Expression
 	return this;
       }
   }
+
 }

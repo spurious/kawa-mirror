@@ -140,7 +140,10 @@ public class XSLT extends XQuery
 	    Procedure proc = TemplateTable.nullModeTable.find(pos.getNextTypeName());
 	    String name = pos.getNextTypeName();
 	    if (proc != null)
-	      proc.apply(ctx);
+	      {
+		proc.check0(ctx);
+		ctx.runUntilDone();
+	      }
 	    else
 	      {
 		out.beginGroup(name, type);

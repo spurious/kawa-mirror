@@ -74,14 +74,14 @@ public class Eval extends Procedure1or2
 	if (env != orig_env)
 	  Environment.setCurrent(env);
 	Translator tr = new Translator (env, messages);
-	ModuleExp mod = kawa.standard.Scheme.makeModuleExp(body, tr);
+	ModuleExp mod = gnu.kawa.lispexpr.LispInterpreter.makeModuleExp(body, tr);
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());
 	mod.setName (evalFunctionName);
+	ModuleExp.evalModule(env, ctx, tr);
 	if (messages.seenErrors())
 	  throw new RuntimeException("invalid syntax in eval form:\n"
 				     + messages.toString(20));
-	mod.evalModule(env, ctx);
       }
     finally
       {

@@ -827,17 +827,6 @@ public class Scheme extends LispInterpreter
     return getInstance().getTypeFor(exp);
   }
 
-  public static ModuleExp makeModuleExp(Object body, Translator tr)
-  {
-    ModuleExp mexp = new ModuleExp();
-    java.util.Vector forms = new java.util.Vector(20);
-    SourceMessages messages = tr.getMessages();
-    tr.push(mexp);
-    tr.scan_body(body, forms, mexp);
-    tr.finishModule(mexp, forms);
-    return mexp;
-  }
-
   static Hashtable types;
 
   public static Type getNamedType (String name)

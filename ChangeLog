@@ -1,5 +1,16 @@
 2002-07-24  Per Bothner  <per@bothner.com>
 
+	* kawa/Shell.java (run):  Update for gnu.expr changes.
+	* kawa/standard/load.java (loadSource):  Likewise.
+	* kawa/lang/CompileFile.java:  Likewise.
+	(read):  Return Compilation instead of ModuleExp.
+	(compile_to_file):  Catch compile-time exceptions.
+	* kawa/lang/Eval.java (evalBody):  Updates.
+	* kawa/lang/Translator.java:  Update Parser -> Compilation.
+	Replace current_line etc by Compilation's getLine etc methods.
+	(module, getModule):  Now in Compilation.
+	* kawa/standard/Scheme.java (makeModuleExp):  Moved to LispInterpreter.
+
 	* kawa/lang/Translator.java (matches):  New method.
 	* kawa/standard/define.java (rewriteForm):  Use new matches method.
 	* kawa/standard/let.java (write):  Likewise.

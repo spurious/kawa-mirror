@@ -21,7 +21,7 @@ import gnu.kawa.lispexpr.LispInterpreter;
  * each top-level form.
  */
 
-public class Translator extends Parser
+public class Translator extends Compilation
 {
   // Current lexical scope - map name to Declaration.
   public Environment environ;
@@ -449,13 +449,12 @@ public class Translator extends Parser
     PairWithPosition ppair = (PairWithPosition) pair;
     Object saved = positionPair;
     if (positionPair == null
-	|| positionPair.getFile() != current_filename
-	|| positionPair.getLine() != current_line
-	|| positionPair.getColumn() != current_column)
+	|| positionPair.getFile() != getFile()
+	|| positionPair.getLine() != getLine()
+	|| positionPair.getColumn() != getColumn())
       {
 	saved = PairWithPosition.make(Special.eof, positionPair,
-				      current_filename,
-				      current_line, current_column);
+				      getFile(), getLine(), getColumn());
       }
     setLine(pair);
     positionPair = ppair;
@@ -524,9 +523,9 @@ public class Translator extends Parser
 	else
 	  result = rewrite (exp, function);
 	if (result.getFile () == null)
-	  result.setFile(current_filename);
+	  result.setFile(getFile());
 	if (result.getLine () == 0)
-	  result.setLine (current_line, current_column);
+	  result.setLine (getLine(), getColumn());
       }
     finally
       {
@@ -549,9 +548,9 @@ public class Translator extends Parser
 	  forms.addElement(st);
 	else
 	  {
-	    String save_filename = current_filename;
-	    int save_line = current_line;
-	    int save_column = current_column;
+	    String save_filename = getFile();
+	    int save_line = getLine();
+	    int save_column = getColumn();
 	    try
 	      {
 		setLine(st_pair);
@@ -560,9 +559,7 @@ public class Translator extends Parser
 	      }
 	    finally
 	      {
-		current_filename = save_filename;
-		current_line = save_line;
-		current_column = save_column;
+		setLine(save_filename, save_line, save_column);
 	      }
 	  }
       }
@@ -657,10 +654,6 @@ public class Translator extends Parser
       }
   }
 
-  ModuleExp module;
-
-  public final ModuleExp getModule() { return module; }
-
   public void finishModule(ModuleExp mexp, java.util.Vector forms)
   {
     boolean moduleStatic = mexp.isStatic();
@@ -705,7 +698,7 @@ public class Translator extends Parser
     if (! moduleStatic)
       mexp.declareThis(null);
 
-    module = mexp;
+    setModule(mexp);
     int nforms = forms.size();
     int ndecls = mexp.countDecls();
     mexp.body = makeBody(forms, mexp);

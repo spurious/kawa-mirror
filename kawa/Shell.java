@@ -206,10 +206,10 @@ public class Shell
 	  {
 	    try
 	      {
-		ModuleExp mod = interp.parse(env, lexer);
-		if (mod == null) // end-of-file
+		Compilation comp = interp.parse(env, lexer);
+		if (comp == null) // end-of-file
 		  break;
-		mod.setName("atInteractiveLevel");  // FIXME
+		comp.getModule().setName("atInteractiveLevel");  // FIXME
 		if (lexer.checkErrors(perr, 20))
 		  continue;
 
@@ -228,7 +228,9 @@ public class Shell
 		  }
 
 
-		mod.evalModule(env, ctx);
+		ModuleExp.evalModule(env, ctx, comp);
+		if (messages.checkErrors(perr, 20))
+		  continue;
 		ctx.runUntilDone();
 		if (ch < 0)
 		  break;

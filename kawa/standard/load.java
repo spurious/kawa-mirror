@@ -136,17 +136,18 @@ public class load extends Procedure1 {
     else
       {
 	SourceMessages messages = new SourceMessages();
-	ModuleExp mexp = CompileFile.read(port, messages);
+	Compilation comp = CompileFile.read(port, messages);
+	ModuleExp mexp = comp.getModule();
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
-	if (messages.seenErrors())
-	  throw new SyntaxException(messages);
 	CallContext ctx = CallContext.getInstance();
 	Consumer save = ctx.consumer;
 	try
 	  {
 	    ctx.consumer = out;
 	    ctx.values = Values.noArgs;
-	    mexp.evalModule(env, ctx);
+	    ModuleExp.evalModule(env, ctx, comp);
+	    if (messages.seenErrors())
+	      throw new SyntaxException(messages);
 	  }
 	finally
 	  {

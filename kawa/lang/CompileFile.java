@@ -19,13 +19,13 @@ public class CompileFile extends Procedure2
     super ("compile-file");
   }
 
-  public static final ModuleExp read (String name, SourceMessages messages)
+  public static final Compilation read (String name, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     try
       {
 	InPort fstream = InPort.openFile(name);
-	ModuleExp result = read(fstream, messages);
+	Compilation result = read(fstream, messages);
 	fstream.close();
 	return result;
       }
@@ -39,7 +39,7 @@ public class CompileFile extends Procedure2
       }
   }
 
-  public static final ModuleExp read (InPort port, SourceMessages messages)
+  public static final Compilation read (InPort port, SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     return Interpreter.getInterpreter().parseFile(port, messages);
@@ -51,10 +51,10 @@ public class CompileFile extends Procedure2
     if (! (arg1 instanceof FString))
       throw new WrongType (this.name (), 1, "file name");
     SourceMessages messages = new SourceMessages();
-    ModuleExp lexp = read (arg1.toString (), messages);
+    Compilation comp = read (arg1.toString (), messages);
+    comp.compileToArchive(comp.getModule(), arg2.toString());
     if (messages.seenErrors())
       throw new gnu.text.SyntaxException(messages);
-    lexp.compileToArchive(arg2.toString());
     return Interpreter.voidObject;
   }
 
@@ -84,11 +84,30 @@ public class CompileFile extends Procedure2
       }
     try
       {
-	ModuleExp mexp = read (inname, messages);
+	Compilation comp = read (inname, messages);
 	if (messages.seenErrors())
 	  return;
-
-	mexp.compileToFiles (topname, directory, prefix);
+	try
+	  {
+	    comp.compileToFiles(comp.getModule(), topname, directory, prefix);
+	  }
+	catch (Throwable ex)
+	  {
+	    StringBuffer sbuf = new StringBuffer();
+	    sbuf.append("Internal error while compiling ");
+	    sbuf.append(inname);
+	    int line = comp.getLine();
+	    if (line > 0)
+	      {
+		sbuf.append(':');
+		sbuf.append(line);
+	      }
+	    System.err.println(sbuf);
+	    ex.printStackTrace(System.err);
+	    System.exit(-1);
+	  }
+	if (messages.seenErrors())
+	  return;
       }
     catch (gnu.text.SyntaxException ex)
       {

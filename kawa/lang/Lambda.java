@@ -287,8 +287,12 @@ public class Lambda extends Syntax implements Printable
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
     // Syntatic sugar:  <TYPE> BODY (or :: <TYPE> BODY) --> (as <TYPE> BODY)
+    boolean sawColons = false;
     if (body instanceof Pair && tr.matches(((Pair) body).car, "::"))
-      body = ((Pair) body).cdr;
+      {
+	body = ((Pair) body).cdr;
+	sawColons = true;
+      }
     if (body instanceof Pair && ((Pair) body).car == "<sequence>")
       {
         ClassType type = ClassType.make("gnu.lists.Consumer");
@@ -307,7 +311,8 @@ public class Lambda extends Syntax implements Printable
 	BeginExp bexp = (BeginExp) lexp.body;
 	Expression[] exps = bexp.getExpressions();
 	int len = exps.length;
-	if (len > 1)
+	// We allow ':: "TYPENAME" BODY' but not '"TYPENAME" BODY'
+	if (len > 1 && (sawColons || exps[0] instanceof ReferenceExp))
 	  {
 	    Expression rexp = exps[0];
 	    gnu.bytecode.Type rtype = tr.getInterpreter().getTypeFor(rexp);
@@ -324,6 +329,7 @@ public class Lambda extends Syntax implements Printable
                     value = new BeginExp(new_body);
                   }
                 lexp.body = Convert.makeCoercion(value, rexp);
+		lexp.body.setLine(bexp);
 		lexp.setReturnType(rtype);
 	      }
 	  }

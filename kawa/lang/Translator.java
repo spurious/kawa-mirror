@@ -537,6 +537,16 @@ public class Translator extends Compilation
       }
   }
 
+  /** Set the line position of the argument to the current position. */
+
+  public void setLineOf (Expression exp)
+  {
+    if (exp.getFile () == null)
+      exp.setFile(getFile());
+    if (exp.getLine () == 0)
+      exp.setLine (getLine(), getColumn());
+  }
+
   /** Extract a type from the car fo a pair. */
   public Type exp2Type(Pair typeSpecPair)
   {
@@ -575,10 +585,7 @@ public class Translator extends Compilation
 	  result = rewrite_pair (pair);  // To avoid a cycle
 	else
 	  result = rewrite (exp, function);
-	if (result.getFile () == null)
-	  result.setFile(getFile());
-	if (result.getLine () == 0)
-	  result.setLine (getLine(), getColumn());
+	setLineOf(result);
       }
     finally
       {
@@ -657,6 +664,7 @@ public class Translator extends Compilation
 
   public Expression rewrite_body (Object exp)
   {
+    Object saved = pushPositionOf(exp);
     java.util.Vector forms = new java.util.Vector(20);
     LetExp defs = new LetExp(null);
     defs.outer = current_scope;
@@ -677,15 +685,18 @@ public class Translator extends Compilation
 	    defs.inits = inits;
 	  }
 	Expression body = makeBody(forms, null);
+	setLineOf(body);
 	if (ndecls == 0)
 	  return body;
 	mustCompileHere();
 	defs.body = body;
+	setLineOf(defs);
 	return defs;
       }
     finally
       {
 	pop(defs);
+	popPositionOf(saved);
       }
   }
 

@@ -1,3 +1,13 @@
+2003-05-17  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (setLineOf):  New method.
+	(rewrite_with_position):  Use setLineOf.
+	(rewrite_body):  Call pushPositionOf, popPositionOf.
+	Call setLineOf on result.
+	* kawa/kawa/Lambda.java (rewriteBody):  Don't allow a return type
+	to be specified with just a string literal.
+	If converting result, set line position of modified body.
+
 2003-05-09  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Remove --with-java-collections arg and related crud.

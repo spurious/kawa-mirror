@@ -1,3 +1,9 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* XML.scm (as-xml):  New definition.
+
+	* readtable.scm:  Some more incomplete kludging.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* printf.scm:  Merge new version from Slib.

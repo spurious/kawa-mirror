@@ -1,10 +1,21 @@
+;; Common Lisp has *readtable* variaable, which is settable.
 (define (current-readtable) :: <readtable>
   (invoke-static <readtable> 'getCurrent))
+;; (define (set-current-readtable! (readtable :: <readtable>)) ...)
 
+;; Common Lisp has readtablep
 (define (readtable? obj) :: <boolean>
   (instance? obj <readtable>))
 
 #|
+(define (steam->lexer (stream :: <input-port>))
+  :: <gnu.text.Lexer>
+  ;; Associate a property table with an InPort?
+  ...)
+
+(define (copy-readtable #!optional from-readtable to-readtable)
+  ...)
+
 (define (set-syntax-from-char
 	 (from-char :: <char>) (to-char :: <char>)
 	 #!optional
@@ -25,10 +36,23 @@
 	 (char :: <char>)
 	 #!optional
 	 (readtable :: <readtable> (current-readtable)))
-  (let ((entry :: <gnu.kawa.lispexpr.ReaderMacro>
+  (let ((entry :: <gnu.kawa.lispexpr.ReadTableEntry>
 	       (invoke readtable 'lookup char)))
-    (values (invoke entry 'getProcedure)
-	    (invoke entry 'isNonTerminating))))
+    (if (instance? entry <gnu.kawa.lispexpr.ReaderMacro>)
+	(let ((macro :: <gnu.kawa.lispexpr.ReaderMacro>
+		     entry))
+	  (values (invoke entry 'getProcedure)
+		  (invoke entry 'isNonTerminating)))
+	(let* ((kind :: <int> (invoke entry 'getKind))
+	       (non-terminating :: <boolean>
+				(= kind (static-field <readtable> 'NON_TERMINATING_MACRO))))
+	  (if (or non-terminating
+		  (= kind (static-field <readtable> 'TERMINATING_MACRO)))
+	      (values
+	       (lambda ((stream :: <input-port>) (char :: <char>))
+		 (invoke entry 'read (stream->lexer stream) char 1))
+	       non-terminating)
+	      (values #f))))))
 
 (define (make-dispatch-macro-character
 	 (char :: <char>)

@@ -1,3 +1,5 @@
+(define as-xml (make <gnu.kawa.xml.OutputAsXML>))
+
 ;;; Parse an XML file (specified by a URL or url string), giving a <document>.
 (define (parse-xml-from-url url) :: <document>
   (if (not (instance? url <java.net.URL>))

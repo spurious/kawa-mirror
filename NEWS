@@ -1,6 +1,13 @@
-New command-line option \ ("meta-arg").
+Changes from Kawa 1.6.97 to 1.6.98.
+==================================
+Generated HTML and Postscrpt documents are no longer included in the
+source distribution.  Get kawa-doc-VERSION.tar.gz instead.
 
-Handling of Unix script header #!/PROGRAM.
+(format #t ...) and (format PORT ...) noe...
+
+Support fluid bindings (fluid-let) for any thread, not just Future and main.
+
+A Unix script  header #!/PROGRAM is ignored.
 
 You can now take the same Kawa "web" program (written in Scheme, KRL/BRL,
 or XQuery) and run it as either a servlet or a CGI script.

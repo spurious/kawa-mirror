@@ -1,15 +1,11 @@
-Fix Type.string_type.
-
-Make all apply, eval, etc method do 'throws Exception'.
-
-Perhaps CallFrame should extend ModuleBody.
-
 BEFORE KAWA 1.7?
-* Fluid variables should work for non-Future threads.
+* Make sure build.xml works (fix various HTTP.scm, brl, etc)
+* Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
+* Interpreter.getInterpreter should get current thread's.
+* define-class should work for repl - need shared ArrayClassLoader
 * define-namespace should work lexically
 * CL reader interface
 * More define-class functionality?
-* define-class should work for repl - need shared ArrayClassLoader
 * Finish modules: define-module?  constructor arguments?
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
@@ -17,6 +13,8 @@ BEFORE KAWA 1.7?
 * document define-procedure
 * Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
+
+Perhaps CallFrame should extend ModuleBody.
 
 Should inline when accessing a final static field (using static-field),
 for int (or shorter) types - but only for "compile-time constants".

@@ -24,6 +24,7 @@ public class require extends Syntax
     map("pretty-print", SLIB_PREFIX + "pp");
     map("pprint-file", SLIB_PREFIX + "ppfile");
     map("printf", SLIB_PREFIX + "printf");
+    map("xml", SLIB_PREFIX + "XML");
   }
 
   public static String mapFeature(String featureName)

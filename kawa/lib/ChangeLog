@@ -1,3 +1,9 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* thread.scm (exit): Call OutPort.runCleanups.
+
+	* ports.scm (write, display):  No longer written in Scheme - boo-hoo.
+
 2001-03-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Tweaks to work around missing automake support.

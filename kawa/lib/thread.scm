@@ -1,7 +1,6 @@
-(define (exit #!optional (status 0))
-  ((primitive-static-method <java.lang.System> "exit"
-			    <void> (<int>))
-   status))  
+(define (exit #!optional (status :: <int> 0))
+  (invoke-static <output-port> 'runCleanups)
+  (invoke-static <java.lang.System> 'exit statuc))
 
 ;; FUTURE
 

@@ -1,3 +1,8 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (capture):  If decl has a base field, just
+	capture that, but don't do anything else.
+
 2003-02-23  Per Bothner  <per@bothner.com>
 
 	* InlineCalls.java (walkIfExp):  New method - fold if constant test.

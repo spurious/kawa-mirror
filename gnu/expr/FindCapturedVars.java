@@ -232,6 +232,11 @@ public class FindCapturedVars extends ExpWalker
       }
     if (decl.getFlag(Declaration.STATIC_SPECIFIED))
       decl.setSimple(false);
+    else if (decl.base != null)
+      {
+	decl.base.setCanRead(true);
+	capture(decl.base);
+      }
     else if (decl.getCanRead() || declValue == null)
       {
 	LambdaExp heapLambda = curLambda;
@@ -244,11 +249,6 @@ public class FindCapturedVars extends ExpWalker
 	      break;
 	    heapLambda.setNeedsStaticLink();
 	    outer = heapLambda.outerLambda();
-	  }
-	if (decl.base != null)
-	  {
-	    decl.base.setCanRead(true);
-	    capture(decl.base);
 	  }
 	if (decl.isSimple())
 	  {	

@@ -2349,6 +2349,13 @@ An example (derived from the Skij FAQ):
 @example
 (invoke-static <java.lang.Thread> 'sleep 100)
 @end example
+
+The behavior of interpreted code and compiled code is not
+indentical, though you should get the same result either way
+unless you have designed the classes rather strangely.  The
+details will be nailed down later, but the basic idea is that
+the compiler will "inline" the @code{invoke-static} call
+if it can pick a single "best" matching method.
 @end defun
 
 @defun class-methods class name

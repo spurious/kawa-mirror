@@ -1,3 +1,8 @@
+1999-12-11  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  New test for fluid-let, from bug reported by
+	Walter C. Pelissero <wcp@lpds.sublink.org> 1999-12-10.
+
 1999-11-28  Per Bothner  <per@bothner.com>
 
 	* misc-test.scm:  Various tests for variable lookup, inlining,

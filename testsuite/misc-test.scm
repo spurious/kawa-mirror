@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 79)
+(test-init "Miscellaneous" 80)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -159,7 +159,9 @@
 		 (+ 100 *xx*)))
     *xx*))
 (define (twice-*xx*) (* 2 *xx*))
-(test '(220 . 3) 'fluid-test (let ((res (fluid-test 10))) (cons res *xx*)))
+(test '(220 . 3) 'fluid-let-1 (let ((res (fluid-test 10))) (cons res *xx*)))
+
+(test 'bar 'fluid-let-2 (fluid-let ((flt (lambda () 'bar))) (flt)))
 
 (section "closures")
 

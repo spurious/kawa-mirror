@@ -17,8 +17,11 @@
 ;;; The section when we last emitted a message.
 (define last-section #f)
 
-(define (test-init name)
+(define total-expected-count #f)
+
+(define (test-init name #!optional total-count)
   (set! test-name name)
+  (set! total-expected-count total-count)
   (set! *log-file* (open-output-file (string-append name ".log")))
   (display (string-append "%%%% Starting test " name) *log-file*)
   (newline *log-file*)
@@ -103,19 +106,35 @@
      (set! fail-expected #f))
    (if (procedure? fun) (apply fun args) (car args))))
 
+(define (report-display value)
+  (display value)
+  (and *log-file* (display value *log-file*)))
+
+(define (report-newline)
+  (newline)
+  (and *log-file* (newline *log-file*)))
+
 (define (report1 value string)
   (cond ((> value 0)
-	 (display string)	 (display value)	 (newline)
-	 (cond (*log-file*
-		(display string *log-file*)
-		(display value *log-file*)
-		(newline *log-file*))))))
+	 (report-display string)
+	 (report-display value)
+	 (report-newline))))
 
 (define (test-report)
   (report1 pass-count  "# of expected passes      ")
   (report1 xfail-count "# of expected failures    ")
   (report1 xpass-count  "# of unexpected successes ")
   (report1 fail-count  "# of unexpected failures  ")
+  (if (and total-expected-count
+	   (not (= total-expected-count
+		   (+ pass-count xfail-count xpass-count fail-count))))
+      (begin
+	(report-display "*** Total number of tests should be: ")
+	(report-display total-expected-count)
+	(report-display ". ***")
+	(report-newline)
+	(report-display "*** Discrepency indicates testsuite error or exceptions. ***")
+	(report-newline)))
   (cond (*log-file*
 	 (close-output-port *log-file*)
 	 (set! *log-file* #f))))

@@ -1,5 +1,5 @@
 package gnu.ecmascript;
-import kawa.lang.*;
+import gnu.mapping.*;
 
 class Prompter extends Procedure1
 {

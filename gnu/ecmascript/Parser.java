@@ -1,7 +1,10 @@
 package gnu.ecmascript;
-import kawa.lang.*;
 import java.util.Vector;
 import gnu.text.SyntaxException;
+import gnu.mapping.*;
+import gnu.expr.*;
+import kawa.lang.Sequence;
+import kawa.lang.Interpreter;  // FIXME
 
 public class Parser
 {
@@ -346,7 +349,7 @@ System.err.println("after parseArgs:"+peekToken());
       }
   }
 
-  static Expression emptyStatement = new QuoteExp(Interpreter.voidObject);
+  static Expression emptyStatement = new QuoteExp(Values.empty);
 
   public Expression parseIfStatement()
     throws java.io.IOException, SyntaxException

@@ -1,5 +1,7 @@
 package gnu.ecmascript;
-import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
+import kawa.lang.Sequence;
 
 /**
   * Reads EcmaScript token from a InPort.

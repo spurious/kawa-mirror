@@ -42,7 +42,7 @@ public class ApplyExp extends Expression
   {
     if (func instanceof QuoteExp)
       {
-	Object proc = ((QuoteExp) func).value;
+	Object proc = ((QuoteExp) func).getValue();
 	if (proc instanceof Inlineable)
 	  {
 	    ((Inlineable) proc).compile(this, comp, target);
@@ -122,11 +122,14 @@ public class ApplyExp extends Expression
     else if (exp.func instanceof ReferenceExp) 
       { 
         Declaration func_decl = ((ReferenceExp)exp.func).binding; 
-        if (func_decl != null && func_decl.value != null 
-            && func_decl.value instanceof LambdaExp) 
+        if (func_decl != null)
 	  {
-	    func_lambda = (LambdaExp) func_decl.value;
-	    func_name = func_decl.getName();
+	    Expression value = func_decl.getValue();
+	    if (value != null && value instanceof LambdaExp) 
+	      {
+		func_lambda = (LambdaExp) value;
+		func_name = func_decl.getName();
+	      }
 	  }
       }
     else if (exp.func instanceof QuoteExp)
@@ -161,15 +164,14 @@ public class ApplyExp extends Expression
             comp.error('w', "too many args for " + func_name);
 	    func_lambda = null;
 	  }
-	else if (! func_lambda.getCanRead() && ! func_lambda.getInlineOnly()
-		 && ! func_lambda.isHandlingTailCalls())
+	else if (! func_lambda.isHandlingTailCalls()
+		 && (method = func_lambda.getMethod(exp.args.length)) != null)
 	  {
-	    method = func_lambda.primMethod;
 	    boolean is_static = method.getStaticFlag();
 	    Expression[] args = exp.getArgs();
 	    int extraArg = 0;
 	    Type[] argTypes = method.getParameterTypes();
-	    // ?? Procedure.checkArgCount(this, args.length);
+	    // ?? Procedure.checkArgCount(this, args.length); // FIXME
 	    LambdaExp parent = func_lambda.outerLambda();
 	    if (! is_static || func_lambda.declareClosureEnv() != null)
 	      {
@@ -182,26 +184,13 @@ public class ApplyExp extends Expression
 		else
 		  code.emitLoad(parent.closureEnv);
 	      }
-	    if (func_lambda.max_args != func_lambda.min_args)
-	      {
-		compileToArray (exp.args, comp);
-	      }
-	    else
-	      {
-		for (int i = 0; i < args.length; ++i)
-		  {
-		    if (argTypes[extraArg+i] == null)
-		      {
-			throw new Error("bad argtypes["+i+"] len:"+argTypes.length
-+" func:"+func_lambda+" meth:"+method);
-		      }
-		    args[i].compile(comp, argTypes[extraArg+i]);
-		  }
-	      }
-	    if (is_static)
-	      code.emitInvokeStatic(method);
-	    else
-	      code.emitInvokeVirtual(method);
+
+	    boolean varArgs = func_lambda.restArgType() != null;
+	    PrimProcedure.compileArgs(args,
+				      extraArg > 0 ? Type.void_type : null,
+				      argTypes, varArgs,
+				      func_name, func_lambda, comp);
+	    code.emitInvoke(method);
 	    target.compileFromStack(comp, method.getReturnType());
 	    return;
 	  }
@@ -276,9 +265,9 @@ public class ApplyExp extends Expression
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
-	func_lambda.allocParameters(comp, null);
+	func_lambda.allocParameters(comp);
 	popParams (code, func_lambda, false);
-	func_lambda.enterFunction(comp, null);
+	func_lambda.enterFunction(comp);
 	func_lambda.body.compileWithPosition(comp, target);
 	code.popScope();
 	// comp.method.popScope();

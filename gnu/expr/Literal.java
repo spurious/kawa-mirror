@@ -34,25 +34,41 @@ public class Literal extends Initializer
 
   public final Object getValue() { return value; }
 
-  /** Assign a static Field to hold the value of this Literal.
-   * This supports the same value being used multiple times or cyclically. */
   void assign (Compilation comp)
   {
-    index = comp.literalsCount++;
+    assign(null, comp);
+  }
+
+  /** Assign a static Field to hold the value of this Literal.
+   * This supports the same value being used multiple times or cyclically. */
+  void assign (String name, Compilation comp)
+  {
     next = comp.clinitChain;
     comp.clinitChain = this;
     int flags = comp.immediate ? Access.STATIC|Access.PUBLIC
-      : Access.STATIC|Access.FINAL |Access.PUBLIC/*FIXME*/;
-    field = comp.mainClass.addField ("Lit"+index, type, flags);
+      : Access.STATIC|Access.FINAL;
+    if (name == null)
+      {
+	index = comp.literalsCount++;
+	name = "Lit" + index;
+      }
+    else
+      flags |= Access.PUBLIC;
+    field = comp.mainClass.addField (name, type, flags);
   }
 
   /** Create a new Literal, where comp must be in immediate mode. */
   public Literal (Object value, Compilation comp)
   {
+    this (value, (String) null, comp);
+  }
+
+  public Literal (Object value, String name, Compilation comp)
+  {
     this.value = value;
     comp.literalTable.put (value, this);
     this.type = Type.make(value.getClass());
-    assign (comp);
+    assign(name, comp);
   }
 
   /** Create a new Literal, for a value available from a static field.
@@ -134,8 +150,8 @@ public class Literal extends Initializer
       emitArray (comp, comp.typeObject);
     else
       {
-	System.err.print ("Unimplemented compileConstant for ");
-	System.err.println (value.getClass ());
+	comp.error('e', "unimplemented support for compiling "
+		   + value.getClass().getName() + " literals");
 	code.emitGetStatic(Compilation.undefinedConstant);
       }
     flags |= ALLOCATED|INITIALIZED;

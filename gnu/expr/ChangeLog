@@ -1,3 +1,62 @@
+2000-01-22  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java:  New class, inherits from Initializer.
+	* Makefile.am, Makefile.in (java_JAVA):  Add BindingInitializer.java.
+
+	* Compilation.java (argsArray):  Removed field.
+	(typemacro, typeLocation, getLocationMethod):  New static fields.
+	(findLiteral):  If empty Object[], use noArgsProcedureField.
+	Handle Object[] where some elements are null.
+	(mangleName):  If name starts with "->" mangle to "to", not "To".
+	(generateConstructor):  More robust loop for processing initChain.
+	Generate code to initialize bindingFields fields (not in "run").
+	(generateApplyMethods):  New method.  Code moved from addClass,
+	and generalized to handle LambdaExps with multiple primMethods.
+	* LambdaExp.java (argArray, firstArgsArrayArg):  New fields.
+	(flags):  Make protected.
+	(METHODS_COMPILED, NO_FIELD):  New flag enums.
+	(isClassgenerated):  Needing closure no longer forces class generation.
+	(primMethod):  Rmeoved field; replaced by ...
+	(primMethods):  New field.
+	(getMethod, getmainmethod, restTypeArgs):  New methods.
+	(declareArgsArray):  Removed method.
+	(allocFieldFor, compileSetField):  New methods.
+	(compile):  Use new methods.
+	(addMethodFor):  New interface - can generate multiple Methods.
+	(allocParameters, enterFunction):  New longer takes argsArray argument.
+	(enterFunction):  Handle both fix args plus final var args array/list.
+	Generate better coed for keywordw when default is constant.
+	(compileAsMethod):  Handle multiple methods;  generate stubs.
+	* ObjectExp.java (compile):  Use LambdaExp's getMainMethod.
+	* ApplyExp.java (compile):  Use LambdaExp's getMethod.
+	Call that method using PrimProcedure.compileArgs.
+
+	* FindTailCalls.java: Use Declaration's getValue method.
+	* FindCapturedVars.java (walkApplyExp):  New method.
+	(capture):  No longer return immediately if decl.isStatic().
+	No need to chain decl on owner's capturedVars if decl is public.
+	* Keyword.java (searchForKeyword):  New static method.
+	* ModuleExp.java (evalModule):  Call ClassMemberConstraint.defineAll.
+	(allocFields, print):   New methods.
+	
+	* SetExp.java (compile):  Various hacks mostly so that top-level
+	definitions get exported as fields.
+	* Literal.java (assign):  New overloaded method.
+	(emit):  Better error message if Compilable not implemented.
+
+	* PrimProcedure.java (match):  Optimize if rest arg is LList.
+	(compileArgs):  New static helper method.
+	(compile):  Use it.
+	* ProcInitializer.java (emitLoadModuleMethod):  New static method.
+	(emit):  Use emitLoadModuleMethod.
+	(<init>):  New constructor.
+	* ReferenceExp.java (compile):  Use Compilation.getLocationMethod.
+	Handle non-static Binding method.
+	
+	* Declaration.java (shadowed):  Removed fields.
+	(getValue):  Make final.
+	(isPublic):  New method.
+
 1999-12-24  Per Bothner  <per@bothner.com>
 
 	* Initializer.java:  New abstract class.

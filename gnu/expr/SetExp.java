@@ -70,7 +70,6 @@ public class SetExp extends Expression
     return Values.empty;
   }
 
-  static ClassType ctypeLocation = null;
   static Method setMethod = null;
 
   public void compile (Compilation comp, Target target)
@@ -80,22 +79,60 @@ public class SetExp extends Expression
 	&& ((LambdaExp) new_value).getInlineOnly())
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
-    if (binding != null
-        && ! (binding.isStatic() && ! binding.isPrivate()))
+
+    // This code is kind of kludgy, because it handles a number of
+    // different cases:  assignments and definitions to both local and
+    // globals variables.  Some of the complication is because we want
+    // to generate fields for module-level definitions;  this is how
+    // bindings are exported from modules.
+
+    if (binding != null && ! binding.isPrivate()
+	&& binding.context instanceof ModuleExp
+	&& binding.getValue() instanceof LambdaExp
+	&& ((LambdaExp) binding.getValue()).getName() != null // FIXME
+	&& binding.getValue() == new_value)
+      {
+	((LambdaExp) new_value).compileSetField(comp);
+      }
+    else if (binding != null
+	     && binding.context instanceof ModuleExp
+	     && (new_value instanceof QuoteExp)
+	     && ! binding.isPrivate() && ! comp.immediate
+	     && binding.getValue() != null)
+      { // This handles macros a la syntax-rules - and other constants.
+	Object value = ((QuoteExp) new_value).getValue();
+	String fname = Compilation.mangleName(name);
+	Literal literal = comp.findLiteral(value);
+	if (literal.field == null)
+	  literal.assign(fname, comp);
+      }
+    else if (binding instanceof kawa.lang.Macro
+	     && binding.context instanceof ModuleExp
+	     && ((kawa.lang.Macro) binding).expander instanceof LambdaExp
+	     && ! binding.isPrivate())
+      {
+	LambdaExp expander = (LambdaExp) ((kawa.lang.Macro) binding).expander;
+	if (! expander.isHandlingTailCalls())
+	  {
+	    expander.flags |= LambdaExp.NO_FIELD;
+	    expander.compileAsMethod(comp);
+	    comp.applyMethods.addElement(expander);
+	  }
+	new BindingInitializer(binding, comp, new_value);
+      }
+    else if (binding != null)
       {
 	if (binding.ignorable())
 	  new_value.compile (comp, Target.Ignore);
-	else if (binding.isIndirectBinding() && ! isDefining())
+	else if (binding.isIndirectBinding()
+		 && (! isDefining() || binding.isPublic()))
 	  {
 	    binding.load(comp);
 	    new_value.compile (comp, Target.pushObject);
-	    if (ctypeLocation == null)
-	      {
-		ctypeLocation = ClassType.make("gnu.mapping.Location");
-		setMethod = ctypeLocation.addMethod
-                  ("set", Compilation.apply1args,
-                   Type.void_type, Access.PUBLIC|Access.FINAL);
-	      }
+	    if (setMethod == null)
+	      setMethod = comp.typeLocation.addMethod
+		("set", Compilation.apply1args,
+		 Type.void_type, Access.PUBLIC|Access.FINAL);
 	    code.emitInvokeVirtual (setMethod);
 	  }
 	else if (binding.isFluid())
@@ -119,22 +156,11 @@ public class SetExp extends Expression
               code.emitPutStatic(field);
             else
               code.emitPutField(field);
-            /*
-            if (binding.context instanceof ModuleExp && ! binding.isPrivate())
-              {
-                comp.compileConstant (name);
-                //comp.method.maybe_compile_checkcast (comp.scmSymbolType);
-                new_value.compile (comp, Target.pushObject);
-                code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
-                                      : comp.putGlobalMethod);
-              }
-            */
 	  }
       }
     else
       {
 	comp.compileConstant (name);
-	//comp.method.maybe_compile_checkcast (comp.scmSymbolType);
 	new_value.compile (comp, Target.pushObject);
 	code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
 			      : comp.putGlobalMethod);

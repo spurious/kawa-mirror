@@ -4,6 +4,18 @@
 package gnu.bytecode;
 import java.io.*;
 
+/**
+  * Represents a method in a <code>ClassType</code>.
+  * <p>
+  * A <code>Method</code> contain a <code>CodeAttr</code> object;
+  * the interface for generating bytecode instructions is primarily
+  * in <code>CodeAttr</code>.
+  * <p>
+  * All the methods whose name start with <code>compile_</code> are
+  * deprecated, and should not be used;  use the methods
+  * in <code>CodeAttr</code>instead.
+  */
+
 public class Method implements AttrContainer {
   private String name;
   Type[] arg_types;
@@ -170,45 +182,6 @@ public class Method implements AttrContainer {
   public void push_long_const (long i);
 
   */
-
-  // public final void compile_int_add () { code.put1(96); pop_stack_type ();}
-  // public final void compile_long_add () { code.put1(97); pop_stack_type ();}
-  // public final void compile_float_add () { code.put1(98); pop_stack_type ();}
-  // public final void compile_double_add () { code.put1(99); pop_stack_type ();}
-  public final void compile_add () { compile_binop (96); }
-  public final void compile_sub () { compile_binop (100); }
-  public final void compile_mul () { compile_binop (104); }
-  public final void compile_div () { compile_binop (108); }
-  public final void compile_rem () { compile_binop (112); }
-
-  private final void compile_binop (int base_code) {
-    prepareCode(1);
-    Type type2 = pop_stack_type ().promote ();
-    Type type1_raw = pop_stack_type ();
-    Type type1 = type1_raw.promote ();
-    if (type1 != type2)
-      throw new Error ("non-matching types in binary operation");
-    if (type1 == Type.int_type)
-      code.put1(base_code);
-    else if (type1 == Type.long_type)
-      code.put1(base_code+1);
-    else if (type1 == Type.float_type)
-      code.put1(base_code+2);
-    else if (type1 == Type.double_type)
-      code.put1(base_code+3);
-    else
-      throw new Error ("bad type in binary operation");
-    push_stack_type (type1_raw);
-  }
-
-  public void compile_primop (int opcode, int arg_count, Type retType)
-  {
-    prepareCode(1);
-    while (-- arg_count >= 0)
-      pop_stack_type ();
-    code.put1(opcode);
-    push_stack_type (retType);
-  }
 
   /** Compile a tail-call to position 0 of the current procewure.
    * If pop_args is true, copy argument registers (except this) from stack. */

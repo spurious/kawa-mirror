@@ -4,9 +4,19 @@
 package gnu.bytecode;
 import java.io.*;
 
-/* Represents the contents of a standard "Code" attribute.
- * @author      Per Bothner
- */
+/**
+  * Represents the contents of a standard "Code" attribute.
+  * <p>
+  * Most of the actual methods that generate bytecode operation
+  * are in this class (typically with names starting with <code>emit</code>),
+  * though there are also some in <code>Method</code>.
+  * <p>
+  * Note that a <code>CodeAttr</code> is an <code>Attribute</code>
+  * of a <code>Method</code>, and can in turn contain other
+  * <code>Attribute</code>s, such as a <code>LineNumbersAttr</code>.
+  *
+  * @author      Per Bothner
+  */
 
 public class CodeAttr extends Attribute implements AttrContainer
 {
@@ -512,21 +522,26 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.int_type);
   }
 
+  private int adjustTypedOp  (Type type)
+  {
+    switch (type.getSignature().charAt(0))
+      {
+      case 'I':  return 0;  // int
+      case 'J':  return 1;  // long
+      case 'F':  return 2;  // float
+      case 'D':  return 3;  // double
+      default:   return 4;  // object
+      case 'B':
+      case 'Z':  return 5;  // byte or boolean
+      case 'C':  return 6;  // char
+      case 'S':  return 7;  // short
+      }
+  }
+
   private void emitTypedOp (int op, Type type)
   {
     reserve(1);
-    switch (type.getSignature().charAt(0))
-      {
-      case 'I':/*op = op;*/  break;
-      case 'J':  op += 1;  break;  // long
-      case 'F':  op += 2;  break;  // float
-      case 'D':  op += 3;  break;  // double
-      default:   op += 4;  break;  // object
-      case 'B': case 'Z':  op += 5;  break;  // byte or boolean
-      case 'C':  op += 6;  break;  // char
-      case 'S':  op += 7;  break;  // short
-      }
-    put1(op);
+    put1(op + adjustTypedOp(type));
   }
 
   /** Store into an element of an array.
@@ -601,6 +616,37 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.pointer_type);
   }
 
+  private void emitBinop (int base_code)
+  {
+    Type type2 = popType().promote();
+    Type type1_raw = popType();
+    Type type1 = type1_raw.promote();
+    if (type1 != type2 || ! (type1 instanceof PrimType))
+      throw new Error ("non-matching or bad types in binary operation");
+    emitTypedOp(base_code, type1);
+    pushType(type1_raw);
+  }
+
+  // public final void emitIntAdd () { put1(96); popType();}
+  // public final void emitLongAdd () { put1(97); popType();}
+  // public final void emitFloatAdd () { put1(98); popType();}
+  // public final void emitDoubleAdd () { put1(99); popType();}
+
+  public final void emitAdd () { emitBinop (96); }
+  public final void emitSub () { emitBinop (100); }
+  public final void emitMul () { emitBinop (104); }
+  public final void emitDiv () { emitBinop (108); }
+  public final void emitRem () { emitBinop (112); }
+
+  public void emitPrimop (int opcode, int arg_count, Type retType)
+  {
+    reserve(1);
+    while (-- arg_count >= 0)
+      popType();
+    put1(opcode);
+    pushType(retType);
+  }
+
   /**
    * Comple code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
@@ -614,18 +660,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       throw new Error ("attempting to load from unassigned variable "+var
 		       +" simple:"+var.isSimple()+", offset: "+offset);
     Type type = var.getType().promote();
-    int kind;
     reserve(4);
-    if (type == Type.int_type)
-      kind = 0; // iload??
-    else if (type == Type.long_type)
-      kind = 1; // lload??
-    else if (type == Type.float_type)
-      kind = 2; // float??
-    else if (type == Type.double_type)
-      kind = 3; // dload??
-    else
-      kind = 4; // aload??
+    int kind = adjustTypedOp(type);
     if (offset <= 3)
       put1(26 + 4 * kind + offset);  // [ilfda]load_[0123]
     else
@@ -649,19 +685,9 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (offset < 0 || !var.isSimple ())
       throw new Error ("attempting to store in unassigned variable");
     Type type = var.getType().promote ();
-    int kind;
     reserve(4);
     popType();
-    if (type == Type.int_type)
-      kind = 0; // istore??
-    else if (type == Type.long_type)
-      kind = 1; // lstore??
-    else if (type == Type.float_type)
-      kind = 2; // float??
-    else if (type == Type.double_type)
-      kind = 3; // dstore??
-    else
-      kind = 4; // astore??
+    int kind = adjustTypedOp(type);
     if (offset <= 3)
       put1(59 + 4 * kind + offset);  // [ilfda]store_[0123]
     else
@@ -1089,29 +1115,13 @@ public class CodeAttr extends Attribute implements AttrContainer
    */
   public final void emitReturn ()
   {
-    reserve(1);
     if (getMethod().getReturnType() == Type.void_type)
       {
+	reserve(1);
 	put1(177); // return
-	return;
       }
-    Type type = popType();
-    if (type == Type.int_type
-	|| type == Type.short_type
-	|| type == Type.byte_type
-	|| type == Type.boolean_type
-	|| type == Type.char_type)
-      put1(172); // ireturn
-    else if (type == Type.long_type)
-      put1(173); // lreturn
-    else if (type == Type.float_type)
-      put1(174); // freturn
-    else if (type == Type.double_type)
-      put1(175); // dreturn
-    else if (type == Type.void_type)
-      throw new Error ("returning void type");
     else
-      put1(176); // arreturn
+      emitTypedOp (172, popType().promote());
   }
 
   /** Add an exception handler. */

@@ -131,6 +131,6 @@ public class BRLRead extends LispReader
   public static ReadTable brlReadTable;
   static
   {
-    brlReadTable = ReadTable.getInitial();
+    brlReadTable = ScmRead.makeSchemeReadTable();
   }
 }

@@ -1,3 +1,15 @@
+2004-02-11  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (getMethods - two overloads):  New parameter
+	'caller'; pass it to MethodFilter.  Remove redundant modifiers test.
+	(class MethodFilter):  Add caller field.
+	(select):  Check if method is accessible.
+	* Invoke.java (getMethods):  New parameter 'caller'.
+	(inline):  Get our calling class and pass it to getMethods.
+	(getMethods(5 params)):  Inline in getStaticMethod.
+	* SlotGet.java (compile):  Check if field/method is accessible.
+	* SlotSet.java (compile):  Check if field/method is accessible.
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (class MethodFilter):  Enhance so it also matches

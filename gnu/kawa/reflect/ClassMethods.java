@@ -71,13 +71,15 @@ public class ClassMethods extends Procedure2
   }
 
   /** Return the methods of a class with the specified name and flag.
+   * @param caller if non-null, check that methods are accessible in it.
    * @return an array containing the methods.
    */
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
                                            int modifiers, int modmask,
+                                           ClassType caller,
                                            Interpreter interpreter)
   {
-    return getMethods(dtype,mname,modifiers,modmask,false,interpreter);
+    return getMethods(dtype,mname,modifiers,modmask,false, caller, interpreter);
   }
 
   private static int removeRedundantMethods(Vector methods)
@@ -123,9 +125,10 @@ public class ClassMethods extends Procedure2
   public static PrimProcedure[] getMethods(ClassType dtype, String mname,
                                            int modifiers, int modmask,
                                            boolean is_special,
+                                           ClassType caller,
                                            Interpreter interpreter)
   {
-    MethodFilter filter = new MethodFilter(mname, modifiers, modmask);
+    MethodFilter filter = new MethodFilter(mname, modifiers, modmask, caller);
     boolean named_class_only = is_special || "<init>".equals(mname);
     Vector methods = new Vector();
     dtype.getMethods(filter, named_class_only ? 0 : 2,
@@ -140,8 +143,6 @@ public class ClassMethods extends Procedure2
     for (int i = mlength;  --i >= 0; )
     {
       Method method = (Method) methods.elementAt(i);
-      if ((method.getModifiers() & modmask) != modifiers)
-	continue;
       PrimProcedure pproc = new PrimProcedure(method, is_special, interpreter);
       result[count++] = pproc;
     }
@@ -196,8 +197,8 @@ public class ClassMethods extends Procedure2
                                  int modifiers, int modmask)
   {
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
-    PrimProcedure[] methods = getMethods(dtype, mname,
-                                         modifiers, modmask, interpreter);
+    PrimProcedure[] methods = getMethods(dtype, mname, modifiers, modmask,
+					 null, interpreter);
     GenericProc gproc = null;
     PrimProcedure pproc = null;
     for (int i = 0;  i < methods.length;  i++)
@@ -262,32 +263,36 @@ class MethodFilter implements gnu.bytecode.Filter
   int nlen;
   int modifiers;
   int modmask;
+  ClassType caller;
 
-  public MethodFilter(String name, int modifiers, int modmask)
+  public MethodFilter(String name, int modifiers, int modmask,
+		      ClassType caller)
   {
     this.name = name;
     this.nlen = name.length();
     this.modifiers = modifiers;
     this.modmask = modmask;
+    this.caller = caller;
   }
 
   public boolean select(Object value)
   {
     gnu.bytecode.Method method = (gnu.bytecode.Method) value;
     String mname = method.getName();
-    if ((method.getModifiers() & modmask) == modifiers
-	&& mname.startsWith(name))
-      {
-	int mlen = mname.length();
-	char c;
-	if (mlen == nlen
-	    || (mlen == nlen + 2
-		&& mname.charAt(nlen) == '$'
-		&& ((c = mname.charAt(nlen+1)) == 'V' || c == 'X'))
-	    || (mlen == nlen + 4
-		&& mname.endsWith("$V$X")))
-	  return true;
-      }
-    return false;
+    int mmods = method.getModifiers();
+    if ((mmods & modmask) != modifiers
+	|| ! mname.startsWith(name))
+      return false;
+    int mlen = mname.length();
+    char c;
+    if (mlen != nlen
+	&& (mlen != nlen + 2
+	    || mname.charAt(nlen) != '$'
+	    || ((c = mname.charAt(nlen+1)) != 'V' && c != 'X'))
+	&& (mlen != nlen + 4
+	    || ! mname.endsWith("$V$X")))
+      return false;
+    return caller == null
+      || caller.isAccessible(method.getDeclaringClass(), mmods);
   }
 }

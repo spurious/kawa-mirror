@@ -193,6 +193,8 @@ public class SlotGet extends Procedure2
     if (type instanceof ClassType && name != null)
       {
 	ClassType ctype = (ClassType) type;
+	ClassType caller = comp.curClass != null ? comp.curClass
+	  : comp.mainClass;
         Object part = getField(ctype, name);
         if (part instanceof gnu.bytecode.Field)
           {
@@ -202,6 +204,9 @@ public class SlotGet extends Procedure2
             if (isStatic && ! isStaticField)
               comp.error('e', ("cannot access non-static field `" + name
                                + "' using `" + getName() + '\''));
+	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
+	      comp.error('e', "field "+ctype.getName()+'.'+name
+			 +" is not accessible here");
             args[0].compile(comp,
                             isStaticField ? Target.Ignore
                             : Target.pushValue(ctype));
@@ -256,10 +261,13 @@ public class SlotGet extends Procedure2
         if (part instanceof gnu.bytecode.Method)
           {
             gnu.bytecode.Method method = (gnu.bytecode.Method) part;
+	    int modifiers = method.getModifiers();
             boolean isStaticMethod = method.getStaticFlag();
             if (isStatic && ! isStaticMethod)
               comp.error('e', "cannot call non-static getter method `"
                          + name + "' using `" + getName() + '\'');
+	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
+	      comp.error('e', "method "+method +" is not accessible here");
             args[0].compile(comp,
                             isStaticMethod ? Target.Ignore
                             : Target.pushValue(ctype));

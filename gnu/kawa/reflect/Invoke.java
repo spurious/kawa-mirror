@@ -169,7 +169,8 @@ public class Invoke extends ProcedureN implements CanInline
 
   protected PrimProcedure[] getMethods(ClassType ctype, String mname,
                                        Expression[] args, int margsLength, 
-                                       int argsStartIndex, int objIndex)
+                                       int argsStartIndex, int objIndex,
+				       ClassType caller)
   {
     if (args == cacheArgs)
       return cacheMethods;
@@ -189,7 +190,7 @@ public class Invoke extends ProcedureN implements CanInline
                                 kind == 's' ? Access.STATIC : 0,
                                 kind == 'S' ? 0 : Access.STATIC,
                                 kind == 'P',
-                                interpreter);
+                                caller, interpreter);
     
     long num = ClassMethods.selectApplicable(methods, atypes);
     cacheArgs = args;
@@ -301,12 +302,16 @@ public class Invoke extends ProcedureN implements CanInline
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;
+	Compilation comp = walker.getCompilation();
         synchronized (this)
           {
             try
               {
                 methods = getMethods(type, name, args, 
-                                     margsLength, argsStartIndex, objIndex);
+                                     margsLength, argsStartIndex, objIndex,
+				     comp == null ? null
+				     : comp.curClass != null ? comp.curClass
+				     : comp.mainClass);
               }
             catch (Exception ex)
               {
@@ -321,9 +326,8 @@ public class Invoke extends ProcedureN implements CanInline
             int index = -1;
             if (methods.length == 0)
 	      {
-		if (walker.getCompilation()
-		    .getBooleanOption("warn-invoke-unknown-method", true))
-		  walker.error('w', "no method `"+name+"' in "+type.getName());
+		if (comp.getBooleanOption("warn-invoke-unknown-method", true))
+		  walker.error('w', "no accessible method `"+name+"' in "+type.getName());
 	      }
             else if (okCount + maybeCount == 0)
               {
@@ -488,32 +492,9 @@ public class Invoke extends ProcedureN implements CanInline
   getStaticMethod(ClassType type, String name, Expression[] args)
   {
     PrimProcedure[] methods = invokeStatic.getMethods(type, name, args, 
-                                                      args.length, 0, -1);
+                                                      args.length, 0, -1, null);
     int okCount = invokeStatic.cacheDefinitelyApplicableMethodCount;
     int maybeCount = invokeStatic.cachePossiblyApplicableMethodCount;
-    int index;
-    if (methods == null)
-      index = -1;
-    else if (okCount > 0)
-      index = MethodProc.mostSpecific(methods, okCount);
-    else if (maybeCount == 1)
-      index = 0;
-    else
-      index = -1;
-    return index < 0 ? null : methods[index];
-  }
-
-  public static synchronized PrimProcedure
-  getMethod(ClassType type, String name, boolean isStatic,
-	    Type[] argTypes, Interpreter interpreter)
-  {
-    PrimProcedure[] methods
-      = ClassMethods.getMethods(type, name,
-				isStatic ? Access.STATIC : 0, Access.STATIC,
-				interpreter);
-    long num = ClassMethods.selectApplicable(methods, argTypes);
-    int okCount = (int) (num >> 32);
-    int maybeCount = (int) num;
     int index;
     if (methods == null)
       index = -1;

@@ -234,10 +234,16 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
 
 	if (part != null)
 	  {
-	    boolean isStaticField = 
+	    int modifiers =
 	      (part instanceof gnu.bytecode.Field)
-	      ? ((gnu.bytecode.Field) part).getStaticFlag()
-	      : ((gnu.bytecode.Method) part).getStaticFlag();
+	      ? ((gnu.bytecode.Field) part).getModifiers()
+	      : ((gnu.bytecode.Method) part).getModifiers();
+	    boolean isStaticField = (modifiers & Access.STATIC) != 0;
+	    ClassType caller = comp.curClass != null ? comp.curClass
+	      : comp.mainClass;
+	    if (caller != null && ! caller.isAccessible(ctype, modifiers))
+	      comp.error('e', "slot "+name +" in "+ctype.getName()
+			 +" not accessible here");
 	    args[0].compile(comp,
 			    isStaticField ? Target.Ignore
 			    : Target.pushValue(ctype));

@@ -1,3 +1,13 @@
+2001-10-31  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (getArgCount):  New method.
+
+	* FindTailCalls.java (walkLambdaExp):  Check if marked as inlined.
+	Fixes problem where ValuesMap.inline terms tail-call to non-tailcall.
+
+	* SeriesTarget.java (compile):  Don't pushScope/popScope, since that
+	causes register conflicts due to our unusual jsr-based control flow.
+
 2001-10-25  Per Bothner  <per@bothner.com>
 
 	* SeriesTarget.java:  New class, extends Target.

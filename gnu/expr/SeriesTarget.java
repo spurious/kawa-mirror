@@ -49,7 +49,6 @@ public class SeriesTarget extends Target
 	 index = value;
        }
     */
-    code.pushScope();
     Variable indexVar = code.addLocal(Type.int_type);
     Variable valuesVar = code.addLocal(Type.pointer_type);
     Variable nextVar = code.addLocal(Type.int_type); 
@@ -73,8 +72,6 @@ public class SeriesTarget extends Target
     code.emitLoad(nextVar);
     code.emitStore(indexVar);
     code.emitGoto(top);
-    code.pushScope();
-    
 
     /*
     if (stackType is singleton type)

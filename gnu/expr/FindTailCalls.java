@@ -172,7 +172,7 @@ public class FindTailCalls extends ExpWalker
 	inTailContext = false;
 	if (exp.defaultArgs != null)
 	  exp.defaultArgs = walkExps(exp.defaultArgs);
-	inTailContext = true;
+	inTailContext = exp.getInlineOnly() ? save : true;
 	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
       }

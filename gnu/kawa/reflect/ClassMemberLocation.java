@@ -192,7 +192,10 @@ public class ClassMemberLocation extends Location
     java.lang.reflect.Field[] fields = clas.getFields();
     for (int i = fields.length;  --i >= 0; )
       {
-	define(instance, fields[i], uri, interp, env);
+	java.lang.reflect.Field field = fields[i];
+	if (field.getName().startsWith(Declaration.PRIVATE_PREFIX))
+	      continue;
+	define(instance, field, uri, interp, env);
       }
   }
 

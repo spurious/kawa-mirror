@@ -1,3 +1,8 @@
+2004-12-27  Per Bothner  <per@bothner.com>
+
+	* ClassMemberLocation.java (defineAll): Ignore fields whose names
+	start with PRIVATE_PREFIX.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java: Update to use Location in place of Symbol.

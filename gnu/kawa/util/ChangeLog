@@ -1,3 +1,7 @@
+2000-02-26  Per Bothner  <per@bothner.com>
+
+	* Pair.java (equals(Pair,Pair)):  Generalize to handle null.
+
 2000-02-19  Per Bothner  <per@bothner.com>
 
 	* FVector.java (makeLiteral):  Update unqualified package name.

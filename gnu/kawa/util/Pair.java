@@ -25,15 +25,28 @@ public class Pair extends LList implements Printable, Compilable
 
   static public boolean equals (Pair pair1, Pair pair2)
   {
-    while (pair1.car.equals (pair2.car))
+    if (pair1 == pair2)
+      return true;
+    if (pair1 == null || pair2 == null)
+      return false;
+    for (;;)
       {
-	if (! (pair1.cdr instanceof Pair) || !(pair2.cdr instanceof Pair))
-	  return pair1.cdr.equals (pair2.cdr);
-	pair1 = (Pair) pair1.cdr;
-	pair2 = (Pair) pair2.cdr;
+	Object x1 = pair1.car;
+	Object x2 = pair2.car;
+	if (x1 != x2 && (x1 == null || ! x1.equals(x2)))
+	  return false;
+	x1 = pair1.cdr;
+	x2 = pair2.cdr;
+	if (x1 == x2)
+	  return true;
+	if (x1 == null || x2 == null)
+	  return false;
+	if (! (x1 instanceof Pair) || !(x2 instanceof Pair))
+	  return x1.equals(x2);
+	pair1 = (Pair) x1;
+	pair2 = (Pair) x2;
       
       }
-    return false;
   }
 
   public Object get (int index)

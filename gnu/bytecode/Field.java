@@ -56,5 +56,9 @@ public class Field extends Location implements AttrContainer {
 	= constants.addUtf8("ConstantValue").index;
   }
 
+  public final Field getNext()
+  {
+    return next;
+  }
 
 }

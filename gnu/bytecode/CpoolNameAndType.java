@@ -23,6 +23,16 @@ public class CpoolNameAndType extends CpoolEntry
 
   public int getTag() { return ConstantPool.NAME_AND_TYPE; }
 
+  public final CpoolUtf8 getName()
+  {
+    return name;
+  }
+
+  public final CpoolUtf8 getType()
+  {
+    return type;
+  }
+ 
   final static int hashCode (CpoolUtf8 name, CpoolUtf8 type)
   {
     return name.hash ^ type.hash;

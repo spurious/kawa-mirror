@@ -29,6 +29,20 @@ public class ConstantPool
    * the initial dummy element (with index 0). */
   int count;
 
+  public final int getCount()
+  {
+    return count;
+  }
+
+  /**
+   * Get the index'th entry in pool.
+   * Will throw ArrayIndexOutOfBoundsException on an invalid index
+   */
+  public final CpoolEntry getPoolEntry(int index)
+  {
+    return pool[index];
+  }
+
   boolean locked;
 
   CpoolEntry[] hashTab;

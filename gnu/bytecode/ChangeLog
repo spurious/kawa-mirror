@@ -1,3 +1,11 @@
+Mon Apr 27 13:18:01 1998  Jeff Haynes  <jhaynes@dascom.com>
+
+        * ClassType.java, ConstantPool.java, CpoolClass.java, CpoolUtf8.java,
+	CpoolNameAndType.java, CpoolRef.java, CpoolString.java,
+	CpoolValue1.java, CpoolValue2.java, Field.java, Method.java:
+	Add public access methods for class members so that I can
+	interogate a class from outside this java package.
+
 Fri May 15 21:33:19 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Type.java (registerTypeForClass):  New static method.

@@ -130,6 +130,17 @@ public class ClassType extends ObjectType implements AttrContainer {
   /** Constant pool index of "LineNumberTable". */
   int LineNumberTable_name_index;
 
+  /** Get the fields of this class. */
+  public final Field getFields()
+  {
+    return fields;
+  }
+
+  public final int getFieldCount()
+  {
+    return fields_count;
+  }
+
   /** Find a field with the given name,or null. */
   public Field getField(String name)
   {
@@ -177,6 +188,16 @@ public class ClassType extends ObjectType implements AttrContainer {
   Method last_method;
   public Method constructor;
 
+  /** Get the methods of this class. */
+  public final Method getMethods()
+  {
+    return methods;
+  }
+ 
+  public final int getMethodCount() {
+    return methods_count;
+  }
+ 
   Method addMethod () {
     return new Method (this, 0);
   }

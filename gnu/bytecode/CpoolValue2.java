@@ -23,6 +23,11 @@ public class CpoolValue2 extends CpoolEntry
 
   public int getTag() { return tag; }
 
+  public final long getValue()
+  {
+    return value;
+  }
+
   final static int hashCode (long val) { return (int) val; }
 
   void write (DataOutputStream dstr) throws java.io.IOException {

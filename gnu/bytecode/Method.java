@@ -320,4 +320,9 @@ public class Method implements AttrContainer {
       }
     this.name_index = name_index;
   }
+
+  public final Method getNext()
+  {
+    return next;
+  }
 };

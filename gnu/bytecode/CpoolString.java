@@ -20,6 +20,11 @@ public class CpoolString extends CpoolEntry
 
   public int getTag() { return ConstantPool.STRING; }
 
+  public final CpoolUtf8 getString()
+  {
+    return str;
+  }
+
   final static int hashCode (CpoolUtf8 str) { return str.hash ^ 0xF30F; }
 
   void write (DataOutputStream dstr) throws java.io.IOException

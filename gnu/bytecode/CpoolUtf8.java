@@ -20,6 +20,11 @@ public class CpoolUtf8 extends CpoolEntry
 
   public int getTag() { return 1; } // CONSTANT_CUtf8
 
+  public final String getString()
+  {
+    return string;
+  }
+
   void write (DataOutputStream dstr) throws java.io.IOException
   {
 	dstr.writeByte (1);  // CONSTANT_Utf8

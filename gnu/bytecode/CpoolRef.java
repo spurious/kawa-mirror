@@ -20,6 +20,16 @@ CpoolRef extends CpoolEntry
   int tag;
   public int getTag() { return tag; }
 
+  public final CpoolClass getCpoolClass()
+  {
+    return clas;
+  }
+
+  public final CpoolNameAndType getNameAndType()
+  {
+    return nameAndType;
+  }
+
   CpoolRef (int tag) { this.tag = tag; }
 
   CpoolRef (ConstantPool cpool, int hash, int tag,

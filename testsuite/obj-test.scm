@@ -1,4 +1,4 @@
-(test-init "Objects" 38)
+(test-init "Objects" 41)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -161,3 +161,7 @@
 (test 4 list-length-1 '(a b c d))
 (test 2 list-length-3 '(a b))
 (test 0 length (classify))
+
+(test 3 length-diff1 'abcdef 'abc)
+(test 3 length-diff2 'abcdef 'abc)
+(test 3 length-diff3 'abcdef 'abc)

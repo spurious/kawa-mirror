@@ -1,3 +1,11 @@
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	New tests Based on a bug report from Walter C. Pelissero
+	<walter@pelissero.org>.  Needs to be in compiled module to trigger bug.
+	* module1.scm (length-diff1, length-diff2, length-diff3):
+	Define and export new procedures, using primitive subtraction.
+	* obj-test.scm:  Test new procedures.
+
 2001-03-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am: Support for using gcj-compiled Kawa.

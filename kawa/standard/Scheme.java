@@ -1,7 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class StandardInterpreter extends Interpreter
+public class Scheme extends Interpreter
 {
   final void define_proc (Named proc)
   {
@@ -22,7 +22,12 @@ public class StandardInterpreter extends Interpreter
     define (symbol, new AutoloadSyntax (symbol, className));
   }
 
-  public kawa.standard.StandardInterpreter(InPort i, OutPort o, OutPort e)
+  static Environment null_environment;
+  static Environment r4_environment;
+  static Environment r5_environment;
+  static Environment user_environment;
+
+  public Scheme (InPort i, OutPort o, OutPort e)
   {
       super(i,o,e);
 
@@ -32,6 +37,11 @@ public class StandardInterpreter extends Interpreter
       kawa.lang.Procedure2 eqv;
       kawa.lang.Procedure2 eq;
       kawa.lang.Procedure2 equal;
+
+      // (null-environment)
+      null_environment = new Environment (this);
+      null_environment.setName ("null-environment");
+      env = null_environment;
 
       //-- Section 4.1  -- complete
       define (Interpreter.quote_sym, new kawa.lang.Quote ());
@@ -56,6 +66,13 @@ public class StandardInterpreter extends Interpreter
 
       //-- Section 5  -- complete [except for internal definitions]
       define_syntax ("lambda", "kawa.lang.Lambda");
+
+      // Appendix (and R5RS)
+      define ("define-syntax", new kawa.standard.define_syntax ());
+
+      r4_environment = new Environment (null_environment);
+      r4_environment.setName ("r4rs-environment");
+      env = r4_environment;
 
       //-- Section 6.1  -- complete
       define_proc ("not", "kawa.standard.not");
@@ -236,7 +253,7 @@ public class StandardInterpreter extends Interpreter
       //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.standard.vector_p");
       define_proc ("make-vector", "kawa.standard.make_vector");
-      define ("vector", kawa.standard.vector.vectorProcedure);
+      define ("vector", kawa.standard.vector_v.vectorProcedure);
       define_proc ("vector-length", "kawa.standard.vector_length");
       define_proc ("vector-ref", "kawa.standard.vector_ref");
       define_proc ("vector-set!", "kawa.standard.vector_set_b");
@@ -259,8 +276,8 @@ public class StandardInterpreter extends Interpreter
 		   "kawa.standard.call_with_input_file");
       define_proc ("call-with-output-file",
 		   "kawa.standard.call_with_output_file");
-      define_proc ("input-port?", "kawa.standard.input_port_p.java");
-      define_proc ("output-port?", "kawa.standard.output_port_p.java");
+      define_proc ("input-port?", "kawa.standard.input_port_p");
+      define_proc ("output-port?", "kawa.standard.output_port_p");
       define_proc ("current-input-port", "kawa.standard.current_input_port");
       define_proc ("current-output-port", "kawa.standard.current_output_port");
       define_proc ("with-input-from-file",
@@ -288,11 +305,21 @@ public class StandardInterpreter extends Interpreter
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
-      define_proc ("exit", "kawa.standard.exit");
+      r5_environment = new Environment (r4_environment);
+      r5_environment.setName ("r5rs-environment");
+      env = r5_environment;
       define_proc ("values", "kawa.standard.values");
       define_proc ("call-with-values", "kawa.standard.call_with_values");
+      define_proc ("eval", "kawa.lang.Eval");
+      define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
+      define_proc ("null-environment", "kawa.standard.null_env");
+      define_proc ("interaction-environment", "kawa.standard.user_env");
 
-      define ("define-syntax", new kawa.standard.define_syntax ());
+      user_environment = new Environment (r5_environment);
+      user_environment.setName ("interaction-environment");
+      env = user_environment;
+      define_proc ("exit", "kawa.standard.exit");
+      define_proc ("arithmetic-shift", "kawa.standard.ashift");
       //-- (when cond exp ...)
       define_syntax ("when", "kawa.lib.when_unless");
       //-- (unless cond exp ...)

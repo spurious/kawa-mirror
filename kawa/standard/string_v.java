@@ -1,9 +1,9 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class string extends ProcedureN
+public class string_v extends ProcedureN
 {
-  public kawa.standard.string()
+  public string_v()
   {
     super("string");
   }

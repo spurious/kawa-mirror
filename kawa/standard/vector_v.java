@@ -4,11 +4,11 @@ import codegen.Field;
 import codegen.Access;
 import codegen.ClassType;
 
-public class vector extends ProcedureN implements Compilable
+public class vector_v extends ProcedureN implements Compilable
 {
-  public static vector vectorProcedure = new vector ();
+  public static vector_v vectorProcedure = new vector_v ();
 
-  public vector()
+  public vector_v()
   {
     super("vector");
   }

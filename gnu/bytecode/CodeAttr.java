@@ -1079,6 +1079,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     setUnreachable();
   }
 
+  public final void emitJsr (Label label)
+  {
+    emitGoto(label, 168);
+  }
+
   public final void emitGotoIfEq (Label label, boolean invert)
   {
     Type type2 = popType().promote();

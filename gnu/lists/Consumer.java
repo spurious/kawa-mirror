@@ -23,6 +23,9 @@ public interface Consumer
 	public void writeInt(int v);
 	public void writeLong(long v);
 
+	public void beginDocument();
+	public void endDocument();
+
 	public void beginGroup(String typeName, Object type);
 	public void endGroup(String typeName);
 

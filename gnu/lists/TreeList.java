@@ -20,13 +20,15 @@ implements Consumer, PositionConsumer, Consumable
   // in gnu.lists that NamespaceResolver could extend?
 
   public Object[] objects;
-  static final Object availObject = new String("(AVAIL");
+  static final Object availObject = new String("(AVAIL)");
   public char[] data;
   public int gapStart;
   public int gapEnd;
 
   /** If non-zero, gap is in an attribute starting (1 less than) here. */
   public int attrStart;
+  /** If non-zero, gap is in an document starting (1 less than) here. */
+  public int docStart;
 
   public TreeList()
   {
@@ -90,6 +92,7 @@ implements Consumer, PositionConsumer, Consumable
   // 0xF10E A B: POSITION_REF_FOLLOWS:  The TreePosition in objects[(A,B)].
   // 0xF10F A B C D E F: POSITION_TRIPLE_FOLLOWS
   // 0xF110 BEGIN_DOCUMENT
+  // 0xF111 END_DOCUMENT
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -173,16 +176,27 @@ implements Consumer, PositionConsumer, Consumable
    *   (Therefore allocating more space for the gap does not require
    *   adjusting end_offset.)  Otherwise, the end_offset is relative
    *   to the BEGIN_ATTRIBUTE_LONG word.
+   * Kludge warning:  NamespaceResolver.endAttributes has hard-wired in the
+   * size of BEGIN_ATTRIBUTE_LONG and END_ATTRIBUTE.
    */
   static final int BEGIN_ATTRIBUTE_LONG = 0xF109;
 
   /** The end of an attribute of a node. */
   static final int END_ATTRIBUTE = 0xF10A;
 
-  /** Beginning of a document.
-   * No parameters.  Used to distinguish a document from its element node.
+  /** Beginning of a document (or top-level value).
+   * [end_offset], 2 shorts, giving the location of the following
+   *   END_DOCUMENT.  If the attribute straddles the gap, then
+   *   end_offset is a negative offset relative to data.length.
+   *   (Therefore allocating more space for the gap does not require
+   *   adjusting end_offset.)  Otherwise, the end_offset is relative
+   *   to the BEGIN_DOCUMENT word.
+   * Used to distinguish a document from its element node.
    */
   static final int BEGIN_DOCUMENT = 0xF110;
+
+  /** End of a document. */
+  static final int END_DOCUMENT = 0xF111;
 
   /** Beginning of a group, compact form.
    *
@@ -427,12 +441,26 @@ implements Consumer, PositionConsumer, Consumable
 
   public void beginDocument()
   {
-    ensureSpace(1);
+    ensureSpace(3+1);
+    gapEnd--;
     data[gapStart++] = BEGIN_DOCUMENT;
+    if (docStart != 0)
+      throw new Error("nested document");
+    docStart = gapStart;
+    setIntN(gapStart, gapEnd - data.length);
+    gapStart += 2;
+    data[gapEnd] = END_DOCUMENT;
   }
 
   public void endDocument()
   {
+    if (data[gapEnd] != END_DOCUMENT || docStart <= 0)
+      throw new Error("unexpected endDocument");
+    // Move the END_DOCUMENT to before the gap.
+    gapEnd++;
+    setIntN(docStart, gapStart - docStart + 1);
+    docStart = 0;
+    data[gapStart++] = END_DOCUMENT;
   }
 
   public void beginGroup(int index)
@@ -671,7 +699,7 @@ implements Consumer, PositionConsumer, Consumable
 	|| datum == BEGIN_GROUP_LONG)
       index += 3;
     else if (datum == BEGIN_DOCUMENT)
-      return index + 1;
+      return index + 3;
     else
       return -1;
     for (;;)
@@ -809,6 +837,11 @@ implements Consumer, PositionConsumer, Consumable
 	switch (datum)
 	  {
 	  case BEGIN_DOCUMENT:
+	    out.beginDocument();
+	    pos += 2;
+	    continue;
+	  case END_DOCUMENT:
+	    out.endDocument();
 	    continue;
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
@@ -952,6 +985,7 @@ implements Consumer, PositionConsumer, Consumable
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
       case END_ATTRIBUTE:
+      case END_DOCUMENT:
 	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG:
 	return Sequence.ATTRIBUTE_VALUE;
@@ -1018,7 +1052,18 @@ implements Consumer, PositionConsumer, Consumable
     switch (datum)
       {
       case BEGIN_DOCUMENT:
-	return this;  // ???
+	{
+	  int end_offset = getIntN(index+1);
+	  end_offset += end_offset < 0 ? data.length : index;
+	  end_offset++;
+	  /* Need to be careful about this.
+	  if (index == 0
+	      && (end_offset == data.length
+		  || (end_offset == gapStart && gapEnd == data.length)))
+	    return this;
+	  */
+	  return new TreeList(this, index, end_offset);
+	}
       case BOOL_FALSE:
       case BOOL_TRUE:
 	return Convert.toObject(datum != BOOL_FALSE);
@@ -1051,6 +1096,7 @@ implements Consumer, PositionConsumer, Consumable
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
       case END_ATTRIBUTE:
+      case END_DOCUMENT:
 	return Sequence.eofValue;
       case POSITION_REF_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
@@ -1074,7 +1120,7 @@ implements Consumer, PositionConsumer, Consumable
   public int stringValue(boolean inGroup, int index, StringBuffer sbuf)
   {
     Object value = null;
-    int doChildren = 0;
+    int doChildren = 0, j;
     if (index >= gapStart)
       index += gapEnd - gapStart;
     if (index == data.length)
@@ -1132,24 +1178,26 @@ implements Consumer, PositionConsumer, Consumable
 	    sbuf.append(data[index]);
 	    return index + 1;
 	  case BEGIN_DOCUMENT:
-	    doChildren = 1;
-	    index = data.length;
+	    doChildren = index + 2;
+	    j = getIntN(index);
+	    index = j + (j < 0 ? data.length + 1 : index);
 	    break;
 	  case BEGIN_GROUP_LONG:	
 	    doChildren = index + 2;
-	    int j = getIntN(index);
+	    j = getIntN(index);
 	    j += j < 0 ? data.length : index-1;
 	    index = j + 7;
 	    break;
 	  case END_GROUP_SHORT:
 	  case END_GROUP_LONG:
 	  case END_ATTRIBUTE:
+	  case END_DOCUMENT:
 	    return -1;
 	  case BEGIN_ATTRIBUTE_LONG:
 	    if (! inGroup)
 	      doChildren = index + 4;
 	    int end = getIntN(index+2);
-	    index = end + (end < 0 ? data.length + 1 : index);
+	    index = end + (end < 0 ? data.length + 1: index);
 	    break;
 	  case POSITION_TRIPLE_FOLLOWS:
 	    {
@@ -1216,7 +1264,9 @@ implements Consumer, PositionConsumer, Consumable
     switch (datum)
       {
       case BEGIN_DOCUMENT:
-	return data.length;
+	j = getIntN(pos);
+	j += j < 0 ? data.length : pos-1;
+	return  j + 1;
       case BOOL_FALSE:
       case BOOL_TRUE:
 	return pos;
@@ -1232,6 +1282,7 @@ implements Consumer, PositionConsumer, Consumable
       case END_GROUP_SHORT:
       case END_GROUP_LONG:
       case END_ATTRIBUTE:
+      case END_DOCUMENT:
 	return -1;
       case BEGIN_GROUP_LONG:
 	j = getIntN(pos);
@@ -1298,7 +1349,8 @@ implements Consumer, PositionConsumer, Consumable
 			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
 		  {
 		    ch = ch - BEGIN_GROUP_SHORT;
-		    out.print("=BEGIN_GROUP_SHORT index#"+((int)ch)+"=<"+objects[ch]+"::"+objects[ch+1]+'>');
+		    j = data[i+1] + i;
+		    out.print("=BEGIN_GROUP_SHORT end:"+j+" index#"+((int)ch)+"=<"+objects[ch]+"::"+objects[ch+1]+'>');
 		    toskip = 2;
 		  }
 		else if (ch >= INT_SHORT_ZERO + MIN_INT_SHORT
@@ -1333,7 +1385,14 @@ implements Consumer, PositionConsumer, Consumable
 			toskip = 4;
 			break;
 		      case BEGIN_DOCUMENT:
-			out.print("=BEGIN_DOCUMENT");
+			j = getIntN(i+1);
+			j += j < 0 ? data.length : i;
+			out.print("=BEGIN_DOCUMENT end:");
+			out.print(j);
+			toskip = 2;
+			break;
+		      case END_DOCUMENT:
+			out.print("=END_DOCUMENT");
 			break;
 		      case BOOL_FALSE: out.print("= false");  break;
 		      case BOOL_TRUE:  out.print("= true");  break;
@@ -1349,12 +1408,17 @@ implements Consumer, PositionConsumer, Consumable
 			j = i - data[i+1];
 			out.print(j);
 			j = data[j] - BEGIN_GROUP_SHORT;
-			out.print(" -> #"+j+"=<"+objects[j]+'>');
+			out.print(" -> #");
+			out.print(j);
+			out.print("=<");
+			out.print(objects[j]);
+			out.print('>');
 			toskip = 1;  break;
 		      case BEGIN_GROUP_LONG:
 			j = getIntN(i+1);
 			j += j < 0 ? data.length : i;
-			out.print("=BEGIN_GROUP_LONG end:"+j);
+			out.print("=BEGIN_GROUP_LONG end:");
+			out.print(j);
 			j = getIntN(j + 1);
 			out.print(" -> #"+j+"=<"+objects[j]+"::"+objects[j+1]+'>');
 			toskip = 2;

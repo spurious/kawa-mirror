@@ -5,28 +5,17 @@ package gnu.lists;
 
 /** A Consumer that does nothing. */
 
-public class VoidConsumer implements Consumer
+public class VoidConsumer extends FilterConsumer
 {
   public static VoidConsumer instance = new VoidConsumer();
 
   public static VoidConsumer getInstance() { return instance; }
 
-  public void writeChar(int v) { }
-  public void writeBoolean(boolean v) { }
-
-  public void writeFloat(float v) { }
-  public void writeDouble(double v) { }
-  public void writeInt(int v) { }
-  public void writeLong(long v) { }
-
-  public void beginGroup(String typeName, Object type) { }
-  public void endGroup(String typeName) { }
-
-  public void beginAttribute(String attrName, Object attrType) { }
-
-  public void endAttribute() { }
-
-  public void writeObject(Object v) { }
+  public VoidConsumer()
+  {
+    super(null);
+    skipping = true;
+  }
 
   /** True if consumer is ignoring rest of group.
    * The producer can use this information to skip ahead. */
@@ -34,7 +23,4 @@ public class VoidConsumer implements Consumer
   {
     return true;
   }
-
-  public void writeChars(String str) { }
-  public void write(char[] buf, int off, int len) { }
 }

@@ -8,6 +8,7 @@ package gnu.lists;
 public class FilterConsumer implements Consumer
 {
   protected Consumer base;
+  protected boolean skipping;
 
   public FilterConsumer (Consumer base)
   {
@@ -16,57 +17,80 @@ public class FilterConsumer implements Consumer
 
   public void writeChar(int v)
   {
-    base.writeChar(v);
+    if (! skipping)
+      base.writeChar(v);
   }
 
   public void writeBoolean(boolean v)
   {
-    base.writeBoolean(v);
+    if (! skipping)
+      base.writeBoolean(v);
   }
 
   public void writeFloat(float v)
   {
-    base.writeFloat(v);
+    if (! skipping)
+      base.writeFloat(v);
   }
 
   public void writeDouble(double v)
   {
-    base.writeDouble(v);
+    if (! skipping)
+      base.writeDouble(v);
   }
 
   public void writeInt(int v)
   {
-    base.writeInt(v);
+    if (! skipping)
+      base.writeInt(v);
   }
 
   public void writeLong(long v)
   {
-    base.writeLong(v);
+    if (! skipping)
+      base.writeLong(v);
+  }
+
+  public void beginDocument()
+  {
+    if (! skipping)
+      base.beginDocument();
+  }
+
+  public void endDocument()
+  {
+    if (! skipping)
+      base.endDocument();
   }
 
   public void beginGroup(String typeName, Object type)
   {
-    base.beginGroup(typeName, type);
+    if (! skipping)
+      base.beginGroup(typeName, type);
   }
 
   public void endGroup(String typeName)
   {
-    base.endGroup(typeName);
+    if (! skipping)
+      base.endGroup(typeName);
   }
 
   public void beginAttribute(String attrName, Object attrType)
   {
-    base.beginAttribute(attrName, attrType);
+    if (! skipping)
+      base.beginAttribute(attrName, attrType);
   }
 
   public void endAttribute()
   {
-    base.endAttribute();
+    if (! skipping)
+      base.endAttribute();
   }
 
   public void writeObject(Object v)
   {
-    base.writeObject(v);
+    if (! skipping)
+      base.writeObject(v);
   }
 
   public boolean ignoring()
@@ -76,11 +100,13 @@ public class FilterConsumer implements Consumer
 
   public void writeChars(String str)
   {
-    base.writeChars(str);
+    if (! skipping)
+      base.writeChars(str);
   }
 
   public void write(char[] buf, int off, int len)
   {
-    base.write(buf, off, len);
+    if (! skipping)
+      base.write(buf, off, len);
   }
 }

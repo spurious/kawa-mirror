@@ -1,3 +1,16 @@
+2002-01-07  Per Bothner  <per@bothner.com>
+
+	* Consumer.java (beginDocument, endDocument):  New methods.
+	* FilterConsumer.java (beginDocument, endDocument):  New methods.
+	* TreeList.java (END_DOCUMENT):  New code.
+	(BEGIN_DOCUMENT):  Now followed by pointer to END_DOCUMENT.
+	(various methods):  update as appropriate.
+
+	* FilterConsumer.java (skipping):  New boolean field.
+	(Consumer methods):  Do nothing if skipping is true.
+	* VoidConsumer.java:  New extends FilterConsumer.
+	(Consumer methods):  Remove - use inherited versions.
+
 2001-12-29  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (consumeRange):  Fix indexing bug for BEGIN_GROUP_LONG.

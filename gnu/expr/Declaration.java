@@ -40,6 +40,10 @@ import gnu.bytecode.*;
 
 public class Declaration extends Variable
 {
+  static int counter;
+  /** Unique id number, to ease print-outs and debugging. */
+  int id = ++counter;
+
   /** The (interned) name of the new variable.
    * This is the source-level (non-mangled) name. */
   String sym;
@@ -169,6 +173,11 @@ public class Declaration extends Variable
       }
     else
       compileStore(comp);
+  }
+
+  public String toString()
+  {
+    return "Declaration["+getName()+'/'+id+']';
   }
 
 }

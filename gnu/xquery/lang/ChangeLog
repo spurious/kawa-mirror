@@ -1,3 +1,11 @@
+2003-03-15  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseElementConstructor):  The default namespace
+	for an attribute is "", not null.
+
+	* XQParser.java (parseNameSpec):  Don't bother passing the
+	defaultNamespaceUri to parseNameTest as it isn't used.
+
 2003-03-04  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (<init>):  New function node-name.

@@ -1371,7 +1371,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	Symbol qname = curToken == NCNAME_TOKEN
 	  ? Symbol.make(defaultNamespaceUri, name)
-	  : parseNameTest(defaultNamespaceUri);
+	  : parseNameTest(null);
 	return new QuoteExp(attribute
 			    ? (Object) AttributeConstructor.make(name, qname)
 			    : (Object) ElementConstructor.make(name, qname));
@@ -1406,7 +1406,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	unread(ch);
 	getRawToken();
 	int vecSize = vec.size();
-	Expression makeAttr = parseNameSpec(null, true);
+	Expression makeAttr = parseNameSpec("", true);
 	if (makeAttr == null)
 	  break;
 	if (! (makeAttr instanceof QuoteExp)

@@ -1,3 +1,8 @@
+Sat Jul 20 17:40:46 1996  Anthony Green  <green@csk3.cygnus.com>
+
+	* */Makefile.am, */Makefile.in: srcdir is no longer 
+	forced to be at the same level as build dir.
+
 Fri Jul 19 14:55:52 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/standard/{call_with_input_file,call_with_output_file,

@@ -7,7 +7,7 @@ AUTOMAKE_OPTIONS = foreign
 JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
 
 %.class: %.java
-	(cd $(srcdir); $(JAVAC) $<)
+	(cd $(srcdir); $(JAVAC) $(<F))
 
 javadir=$(prefix)/java/kawa/standard
 

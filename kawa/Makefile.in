@@ -235,7 +235,7 @@ mostlyclean distclean maintainer-clean
 .SUFFIXES : .java .class
 
 %.class: %.java
-	(cd $(srcdir); $(JAVAC) $<)
+	(cd $(srcdir); $(JAVAC) $(<F))
 
 all: $(OBJ)
 .SUFFIXES:

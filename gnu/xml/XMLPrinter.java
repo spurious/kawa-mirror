@@ -82,6 +82,7 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   public void setStyle (Object style)
   {
     this.style = style;
+    htmlCompat = false;
     if ("html".equals(style))
       {
 	isHtml = true;

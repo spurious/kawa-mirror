@@ -1,3 +1,7 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* XMLPrinter.java (setStyle):  Default htmlCompat to false.
+
 2003-07-23  Per Bothner  <per@bothner.com>
 
 	* NodeTree.java (stableCompare): New method.

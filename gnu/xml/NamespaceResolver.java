@@ -3,6 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
+import gnu.mapping.Symbol;
 
 /** Process namespace attributes as received from an XML parser. */
 
@@ -215,7 +216,7 @@ public class NamespaceResolver extends FilterConsumer
 	String local = nameStack[3 * i + 2];
 	boolean isNsNode = name == "xmlns" || prefix == "xmlns";
 	String uri = isNsNode ? "(namespace-node)" : resolve(prefix);
-	Object type = QName.make(uri, local);
+	Object type = Symbol.make(uri, local);
 	if (cons == tlist)
 	  {
 	    int index = getIndex(name, type);

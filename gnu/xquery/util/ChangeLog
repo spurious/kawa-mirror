@@ -1,3 +1,8 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* MakeAttribute.java, MakeElement.java:  Use gnu.mapping.Symbol
+	instead of gnu.xml.QName.
+
 2002-08-18  Per Bothner  <per@bothner.com>
 
 	* MakeAttribute.java (beginAttribute):  Swap argument order, for

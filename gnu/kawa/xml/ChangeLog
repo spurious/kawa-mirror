@@ -1,3 +1,8 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* AttributeConstructor.java, ElementConstructor.java, ElementType.java,
+	NamedAttributes.java:  Use gnu.mapping.Symbol instead of gnu.xml.QName.
+
 2002-07-28  Per Bothner  <per@bothner.com>
 
 	* NodeType.java:  Also implement TypeValue.

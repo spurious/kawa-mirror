@@ -14,7 +14,7 @@ public class NamedAttributes extends CpsProcedure
   
   public int numArgs() { return 0x2002; }
 
-  public static void namedAttributes (QName qname,
+  public static void namedAttributes (Symbol qname,
 				      TreeList tlist, int index,
 				      Consumer consumer)
   {
@@ -32,9 +32,9 @@ public class NamedAttributes extends CpsProcedure
 	Object curName = tlist.getNextTypeObject(ipos, null);
 	String curNamespaceURI;
 	String curLocalName;
-	if (curName instanceof QName)
+	if (curName instanceof Symbol)
 	  {
-	    QName cname = (QName) curName;
+	    Symbol cname = (Symbol) curName;
 	    curNamespaceURI = cname.getNamespaceURI();
 	    curLocalName = cname.getLocalName();
 	  }
@@ -55,7 +55,7 @@ public class NamedAttributes extends CpsProcedure
       }
   }
 
-  public static void namedAttributes (QName qname, Object node, Consumer consumer)
+  public static void namedAttributes (Symbol qname, Object node, Consumer consumer)
   {
     if (node instanceof TreeList)
       {
@@ -73,7 +73,7 @@ public class NamedAttributes extends CpsProcedure
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
-    QName qname = (QName) ctx.getNextArg();
+    Symbol qname = (Symbol) ctx.getNextArg();
     ctx.lastArg();
     if (node instanceof Values)
       {

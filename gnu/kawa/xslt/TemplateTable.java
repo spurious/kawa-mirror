@@ -1,22 +1,23 @@
 package gnu.kawa.xslt;
 import gnu.xml.*;
 import gnu.mapping.Procedure;
+import gnu.mapping.Symbol;
 
 /** Manages the set of xslt templates that have the same 'mode'. */
 
 public class TemplateTable
 {
   /** The "mode" parameter of xsl:template. */
-  QName name;
+  Symbol name;
 
   static final TemplateTable nullModeTable = new TemplateTable(XSLT.nullMode);
 
-  public TemplateTable(QName mode)
+  public TemplateTable(Symbol mode)
   {
     this.name = mode;
   }
 
-  static TemplateTable getTemplateTable(QName name)
+  static TemplateTable getTemplateTable(Symbol name)
   {
     if (name == XSLT.nullMode)
       return nullModeTable;

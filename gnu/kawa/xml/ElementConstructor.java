@@ -15,12 +15,12 @@ implements Inlineable, Externalizable
   /** XML source name - e.g. "PREFIX:LOCAL". */
   String sname;
 
-  QName qname;
+  Symbol qname;
 
   /** Get name is XML source syntax - i.e. "PREFIX:LOCAL". */
   public String getXmlName() { return sname; }
 
-  public QName getQName() { return qname; }
+  public Symbol getQName() { return qname; }
 
   public final String getNamespaceURI() { return qname.getNamespaceURI(); }
 
@@ -33,7 +33,7 @@ implements Inlineable, Externalizable
     return sname.substring(0, colon);
   }
 
-  public static ElementConstructor make(String sname, QName qname)
+  public static ElementConstructor make(String sname, Symbol qname)
   {
     ElementConstructor result = new ElementConstructor();
     result.sname = sname.intern();
@@ -45,7 +45,7 @@ implements Inlineable, Externalizable
   {
     ElementConstructor result = new ElementConstructor();
     result.sname = sname.intern();
-    result.qname = QName.make(namespaceURI, localName);
+    result.qname = Symbol.make(namespaceURI, localName);
     return result;
   }
 
@@ -116,7 +116,7 @@ implements Inlineable, Externalizable
     throws IOException, ClassNotFoundException
   {
     sname = ((String) in.readObject()).intern();
-    qname = (QName) in.readObject();
+    qname = (Symbol) in.readObject();
   }
 
 }

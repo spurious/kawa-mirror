@@ -1,3 +1,9 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* QName.java.in:  Removed - now uses gnu.mapping.Symbol.
+	* Makefile.am, NamedChildrenFilter.java, NamespaceResolver.java:
+	Update accordingly.
+
 2002-07-25  Per Bothner  <per@bothner.com>
 
 	* NamedChildrenFilter.java (writeObject):  Check if val is Consumable.

@@ -7,23 +7,24 @@ import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
 import java.io.*;
+import gnu.mapping.Symbol;
 
 public class ElementType extends NodeType
 implements TypeValue, Externalizable, GroupPredicate
 {
-  QName qname;
+  Symbol qname;
 
   public ElementType(String namespaceURI, String localName)
   {
-    this(QName.make(namespaceURI, localName));
+    this(Symbol.make(namespaceURI, localName));
   }
 
-  public ElementType(QName qname)
+  public ElementType(Symbol qname)
   {
     this(null, qname);
   }
 
-  public ElementType(String name, QName qname)
+  public ElementType(String name, Symbol qname)
   {
     super(name != null && name.length() > 0 ? name
 	    : "ELEMENT "+qname+" (*)");
@@ -58,9 +59,9 @@ implements TypeValue, Externalizable, GroupPredicate
     String localName = qname.getLocalName();
     String curNamespaceURI;
     String curLocalName;
-    if (groupType instanceof QName)
+    if (groupType instanceof Symbol)
       {
-	QName qname = (QName) groupType;
+	Symbol qname = (Symbol) groupType;
 	curNamespaceURI = qname.getNamespaceURI();
 	curLocalName = qname.getLocalName();
       }
@@ -88,9 +89,9 @@ implements TypeValue, Externalizable, GroupPredicate
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;
     String curLocalName;
-    if (curName instanceof QName)
+    if (curName instanceof Symbol)
       {
-	QName qname = (QName) curName;
+	Symbol qname = (Symbol) curName;
 	curNamespaceURI = qname.getNamespaceURI();
 	curLocalName = qname.getLocalName();
       }
@@ -144,7 +145,7 @@ implements TypeValue, Externalizable, GroupPredicate
     String name = in.readUTF();
     if (name.length() > 0)
       setName(name);
-    qname = (QName) in.readObject();
+    qname = (Symbol) in.readObject();
   }
 
   public String toString ()

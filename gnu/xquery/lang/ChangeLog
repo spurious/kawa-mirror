@@ -1,5 +1,8 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* XQParser.java, XQuery.java:  Use gnu.mapping.Symbol instead of
+	gnu.xml.QName.
+
 	* XQuery.java (XQUERY_FUNCTION_NAMESPACE):  New constant.
 	* XQParser.java (defaultFunctionNamespace):  New field.
 	(defaultNamespace):  Rename field to defaultElementNamespace.

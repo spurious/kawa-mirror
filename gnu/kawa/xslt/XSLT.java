@@ -133,17 +133,17 @@ public class XSLT extends XQuery
     Environment.setCurrent(interp.getEnvironment());
   }
 
-  public static void defineCallTemplate(QName name,
+  public static void defineCallTemplate(Symbol name,
 					double priority,
 					Procedure template)
   {
   }
 
-  public static QName nullMode = QName.make(null, "");
+  public static Symbol nullMode = Symbol.make(null, "");
 
   public static void defineApplyTemplate(String pattern,
 					 double priority,
-					 QName mode,
+					 Symbol mode,
 					 Procedure template)
   {
     if (mode == null)
@@ -152,8 +152,8 @@ public class XSLT extends XQuery
     table.enter(pattern, priority, template);
   }
 
-  public static void defineTemplate(QName name, String pattern,
-				    double priority, QName mode,
+  public static void defineTemplate(Symbol name, String pattern,
+				    double priority, Symbol mode,
 				    Procedure template)
   {
     if (name != null)
@@ -233,7 +233,7 @@ public class XSLT extends XQuery
       }
   }
 
-  public static void applyTemplates(String select, QName mode)
+  public static void applyTemplates(String select, Symbol mode)
     throws Throwable
   {
     if (mode == null)

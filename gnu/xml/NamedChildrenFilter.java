@@ -3,6 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.*;
+import gnu.mapping.Symbol;
 
 /** A FilterConsumer that only passes through matching children.
  */
@@ -51,9 +52,9 @@ public class NamedChildrenFilter extends FilterConsumer
       {
 	String curNamespaceURI;
 	String curLocalName;
-	if (type instanceof QName)
+	if (type instanceof Symbol)
 	  {
-	    QName qname = (QName) type;
+	    Symbol qname = (Symbol) type;
 	    curNamespaceURI = qname.getNamespaceURI();
 	    curLocalName = qname.getLocalName();
 	  }

@@ -5,6 +5,7 @@ package gnu.kawa.sax;
 import gnu.lists.*;
 import gnu.xml.*;
 import org.xml.sax.*;
+import gnu.mapping.Symbol;
 
 /** Forward SAX1 or SAX2 events to a Consumer.
  */
@@ -37,12 +38,12 @@ public class ConsumeSAXHandler implements DocumentHandler, ContentHandler
 			    String qName, Attributes atts)
         throws SAXException
   {
-    out.beginGroup(qName, QName.make(namespaceURI, localName));
+    out.beginGroup(qName, Symbol.make(namespaceURI, localName));
     int numAttributes = atts.getLength();
     for (int i = 0;  i < numAttributes;  i++)
       {
 	out.beginAttribute(atts.getQName(i),
-			   QName.make(atts.getURI(i), atts.getLocalName(i)));
+			   Symbol.make(atts.getURI(i), atts.getLocalName(i)));
 	out.writeChars(atts.getValue(i));
 	out.endAttribute();
       }

@@ -7,7 +7,6 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.kawa.xml.*;
-import gnu.xml.QName;
 
 public class MakeAttribute extends CpsProcedure implements Inlineable
 {
@@ -30,8 +29,8 @@ public class MakeAttribute extends CpsProcedure implements Inlineable
 	name = cons.getXmlName();
 	type = cons.getQName();
       }
-    else if (type instanceof QName)
-      name = ((QName) type).getLocalName();
+    else if (type instanceof Symbol)
+      name = ((Symbol) type).getLocalName();
     else
       name = type.toString();
     out.beginAttribute(name, type);

@@ -5,6 +5,7 @@ package gnu.kawa.sax;
 import gnu.lists.*;
 import gnu.xml.*;
 import org.xml.sax.*;
+import gnu.mapping.Symbol;
 
 /** Forward Consumer events to a SAX2 ContentHandler.
  */
@@ -134,8 +135,8 @@ public class ContentConsumer implements Consumer, Attributes
 	System.arraycopy(names, 0, tmp, 0, i);
 	names = tmp;
       }
-    String namespaceURI = ((QName) type).getNamespaceURI();
-    String localName = ((QName) type).getLocalName();
+    String namespaceURI = ((Symbol) type).getNamespaceURI();
+    String localName = ((Symbol) type).getLocalName();
     names[i] = namespaceURI;
     names[i+1] = localName;
     names[i+2] = typeName;

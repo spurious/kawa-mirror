@@ -71,7 +71,7 @@ public class XslTranslator extends Lexer implements Consumer
 	if (! (fun instanceof AttributeConstructor))
 	  return null;
 	AttributeConstructor attrCon = (AttributeConstructor) fun;
-	QName qname = attrCon.getQName();
+	Symbol qname = attrCon.getQName();
 	if (qname.getLocalName() == name &&
 	    qname.getNamespaceURI() == ns)
 	  {
@@ -99,9 +99,9 @@ public class XslTranslator extends Lexer implements Consumer
       type = ((QuoteExp) type).getValue();
     if (type instanceof ElementConstructor)
       type = ((ElementConstructor) type).getQName();
-    if (! (type instanceof QName))
+    if (! (type instanceof Symbol))
       return null;
-    QName qname = (QName) type;
+    Symbol qname = (Symbol) type;
     if (qname.getNamespaceURI() != XSL_TRANSFORM_URI)
       return null;
     return qname.getLocalName();
@@ -124,7 +124,7 @@ public class XslTranslator extends Lexer implements Consumer
 	//templateLambda.setLine(declLine, declColumn);
       }
     nesting.append((char) elements.size());
-    push(ElementConstructor.make(typeName, (QName) type));
+    push(ElementConstructor.make(typeName, (Symbol) type));
     /*
     String xslcommand = ...;
     Expression[] args;
@@ -156,7 +156,7 @@ public class XslTranslator extends Lexer implements Consumer
     // if (attributeName != null) ERROR();
     attributeName = attrName;
     attributeType = attrType;
-    attributeConstructor = AttributeConstructor.make(attrName, (QName) attrType);
+    attributeConstructor = AttributeConstructor.make(attrName, (Symbol) attrType);
     attributeValue.setLength(0);
     nesting.append((char) elements.size());
     /*
@@ -397,7 +397,7 @@ public class XslTranslator extends Lexer implements Consumer
     if (name == null)
       return QuoteExp.nullExp;
     else
-      return new QuoteExp(QName.make(null, name)); // FIXME
+      return new QuoteExp(Symbol.make(null, name)); // FIXME
   }
 
   static final ClassType typeXSLT

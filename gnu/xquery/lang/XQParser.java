@@ -11,7 +11,6 @@ import gnu.expr.*;
 import java.util.Vector;
 import java.util.Hashtable;
 import gnu.kawa.xml.*;
-import gnu.xml.QName;
 import gnu.bytecode.Type;
 
 /** A class to read xquery forms. */
@@ -740,7 +739,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseElementType()
       throws java.io.IOException, SyntaxException
   {
-    QName qname = parseNameTest(defaultElementNamespace);
+    Symbol qname = parseNameTest(defaultElementNamespace);
     getRawToken();
     return new QuoteExp(new ElementType(qname));
   }
@@ -856,7 +855,7 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseRelativePathExpr();
   }
 
-  QName parseNameTest(String defaultNamespaceUri)
+  Symbol parseNameTest(String defaultNamespaceUri)
       throws java.io.IOException, SyntaxException
   {
     String local = null, uri = null;
@@ -907,14 +906,16 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (next != '*')
 	  {
 	    syntaxError("invalid characters after 'NCName:'");
-	    return QName.make(defaultNamespaceUri, prefix);
+	    return Symbol.make(defaultNamespaceUri, prefix);
 	  }
 	uri = (String) namespaces.get(prefix);
 	if (uri == null)
 	  syntaxError("unknown namespace '" + prefix + "'");
 	local = null;
       }
-    return QName.make(uri, local);
+    if (uri == null)
+      return new Symbol (local == null ? null : local.intern());
+    return Symbol.make(uri, local);
   }
 
   Expression parseCheckNodeTest(int axis)
@@ -936,7 +937,7 @@ public class XQParser extends LispReader // should be extends Lexer
     if (token == NCNAME_TOKEN || token == QNAME_TOKEN 
 	|| token == NCNAME_COLON_TOKEN || token == OP_MUL)
       {
-	QName qname = parseNameTest(defaultElementNamespace; // FIXME null if attribute
+        Symbol qname = parseNameTest(defaultNamespace; // FIXME null if attribute
       }
     else
     */
@@ -974,7 +975,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else
 	  {
-	    QName qname = parseNameTest(defaultElementNamespace);
+	    Symbol qname = parseNameTest(defaultElementNamespace);
 	    predicate = new ElementType(qname);
 	  }
 	Expression[] args = { dot, new QuoteExp(predicate) };
@@ -989,7 +990,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN
 	    || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL)
 	  {
-	    QName qname = parseNameTest(null);
+	    Symbol qname = parseNameTest("");
 	    Expression[] args = { dot, new QuoteExp(qname), };
 	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.xml.NamedAttributes", "namedAttributes"),
 			       args);
@@ -1319,8 +1320,8 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
-	QName qname = curToken == NCNAME_TOKEN
-	  ? QName.make(defaultNamespaceUri, name)
+	Symbol qname = curToken == NCNAME_TOKEN
+	  ? Symbol.make(defaultNamespaceUri, name)
 	  : parseNameTest(defaultNamespaceUri);
 	return new QuoteExp(attribute
 			    ? (Object) AttributeConstructor.make(name, qname)

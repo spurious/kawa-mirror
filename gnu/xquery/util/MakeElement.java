@@ -7,7 +7,6 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.xml.ElementConstructor;
-import gnu.xml.QName;
 
 public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 {
@@ -24,8 +23,8 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 	name = cons.getXmlName();
 	type = cons.getQName();
       }
-    else if (type instanceof QName)
-      name = ((QName) type).getLocalName();
+    else if (type instanceof Symbol)
+      name = ((Symbol) type).getLocalName();
     else
       name = type.toString();
     out.beginGroup(name, type);
@@ -39,8 +38,8 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 	ElementConstructor cons = (ElementConstructor) type;
 	name = cons.getXmlName();
       }
-    else if (type instanceof QName)
-      name = ((QName) type).getLocalName();
+    else if (type instanceof Symbol)
+      name = ((Symbol) type).getLocalName();
     else
       name = type.toString();
     out.endGroup(name);

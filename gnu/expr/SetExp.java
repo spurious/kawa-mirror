@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.*;
 
 /** An Expression to set (bind) or define a new value to a named variable.
  * @author	Per Bothner
@@ -40,6 +41,14 @@ public class SetExp extends Expression
     this.binding = decl;
     name = decl.sym;
     new_value = val;
+    /*
+    if ("%do%loop".equals(decl.symbol())
+	&& val instanceof LambdaExp)
+      {
+	((LambdaExp) val).setInlineOnly(true);
+System.err.println("recognized do loop");
+      }
+    */
   }
 
   public Object eval (Environment env)
@@ -60,41 +69,42 @@ public class SetExp extends Expression
     return Values.empty;
   }
 
-  /* Compile code to store a value (which must already be on the
-     stack) into the variable decl. */
-  static public void compile_store (Declaration decl, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    if (decl.isSimple ())
-      code.emitStore(decl);
-    else
-      {
-	ReferenceExp.compile_load (decl.baseVariable, comp);
-	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	code.emitSwap();
-	code.emitPushInt(decl.offset);
-	code.emitSwap();
-	code.emitArrayStore(Compilation.scmObjectType);
-      }
-  }
+  static ClassType ctypeBinding = null;
+  static Method setMethod = null;
 
   public void compile (Compilation comp, Target target)
   {
+    if (new_value instanceof LambdaExp
+	&& target instanceof IgnoreTarget
+	&& ((LambdaExp) new_value).getInlineOnly())
+      return;
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (binding != null)
       {
-	if (binding.isSimple ())
+	if (binding.isIndirectBinding())
+	  {
+	    binding.load(comp);
+	    new_value.compile (comp, Target.pushObject);
+	    if (ctypeBinding == null)
+	      {
+		ctypeBinding = ClassType.make("gnu.mapping.Binding");
+		setMethod = ctypeBinding.addMethod("set",
+						   Compilation.apply1args,
+						   Type.void_type,
+						   Access.PUBLIC|Access.FINAL);
+	      }
+	    code.emitInvokeVirtual (setMethod);
+	  }
+	else if (binding.isSimple ())
 	  {
 	    new_value.compile (comp, Target.pushObject);
 	    code.emitStore(binding);
 	  }
 	else
 	  {
-	    ReferenceExp.compile_load (binding.baseVariable, comp);
-	    comp.method.maybe_compile_checkcast (Compilation.objArrayType);
-	    code.emitPushInt(binding.offset);
+	    binding.loadOwningObject(comp);
 	    new_value.compile (comp, Target.pushObject);
-	    code.emitArrayStore(Compilation.scmObjectType);
+	    code.emitPutField(binding.field);
 	  }
       }
     else
@@ -108,6 +118,8 @@ public class SetExp extends Expression
 
     comp.compileConstant(Values.empty, target);
   }
+
+  Object walk (ExpWalker walker) { return walker.walkSetExp(this); }
 
   public void print (java.io.PrintWriter ps)
   {

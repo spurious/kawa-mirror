@@ -46,13 +46,14 @@ SUFFIXES = .java .class
 
 JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 
-javadir=$(prefix)/java/kawa
+javadir=$(prefix)/java/$(subdir)
 
 OBJ = Shell.class
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
@@ -65,9 +66,9 @@ PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST)
 DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST)
 
 TAR = tar
 default: all

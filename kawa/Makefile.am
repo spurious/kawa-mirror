@@ -11,13 +11,14 @@ JAVAC=javac -classpath ..:$(srcdir)/..:$$CLASSPATH
 .java.class:
 	$(JAVAC) -d .. $<
 
-javadir=$(prefix)/java/kawa
+javadir=$(prefix)/java/$(subdir)
 
 OBJ = Shell.class
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java)
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 

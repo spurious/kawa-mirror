@@ -61,7 +61,6 @@ public class Shell
 	  }
 	catch (kawa.lang.WrongArguments e)
 	  {
-	    perr.println();
 	    perr.println("Wrong arguments to procedure "+e.procname
 			 +",expected "+e.number+".");
 	    perr.println("usage: "+e.usage);
@@ -69,39 +68,21 @@ public class Shell
 	  }
 	catch (kawa.lang.WrongType e)
 	  {
-	    perr.println();
 	    perr.println("Argument "+e.number+" to "+e.procname
 			 +" must be of type "+e.typeExpected);
 	    e.printStackTrace(perr);
 	  }
-	catch (kawa.lang.GenericError e)
-	  {
-	    perr.println();
-	    perr.println(e.getMessage ());
-	    e.printStackTrace(perr);
-	  }
 	catch (java.lang.ClassCastException e)
 	  {
-	    perr.println();
 	    perr.println("Invalid parameter, should be: "+ e.getMessage());
 	    e.printStackTrace(perr);
 	  }
-	catch (kawa.lang.SyntaxError e)
+	catch (kawa.lang.ReadError e)
 	  {
-	    perr.println();
-	    perr.println(e);
-	    e.printStackTrace(perr);
+	    perr.println (e);
 	  }
-	catch (kawa.lang.UnboundSymbol e)
+	catch (Exception e)
 	  {
-	    perr.println();
-	    perr.println("Unbound symbol "+e.symbol+" in execution.");
-	    e.printStackTrace(perr);
-	  }
-	catch (java.io.IOException e)
-	  {
-	    perr.println();
-	    perr.println("A fatal IO exception occurred on a read.");
 	    e.printStackTrace(perr);
 	  }
       }

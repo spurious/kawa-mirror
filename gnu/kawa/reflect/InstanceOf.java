@@ -61,6 +61,7 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 	  }
 	else
 	  type.emitIsInstance(code);
+	comp.usedClass(type);
       }
     else
       {

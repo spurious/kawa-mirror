@@ -1,3 +1,8 @@
+2004-10-14  Per Bothner  <per@bothner.com>
+
+	* InstanceOf.java (compile):  Call usedClass.
+	Fixes bug reported today by Dominique Boucher.
+
 2004-08-05  Chris Dean  <ctdean@sokitomi.com>
 
 	* SlotGet.java (Inlineable):  Check for "isFname" methods.

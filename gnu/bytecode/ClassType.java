@@ -66,7 +66,8 @@ public class ClassType extends ObjectType
   /** Return the modifiers (access flags) for this class. */
   public final int getModifiers()
   {
-    if (access_flags == 0 && getReflectClass() != null)
+    if (access_flags == 0
+	&& (flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
       access_flags = reflectClass.getModifiers();
     return access_flags;
   }
@@ -129,7 +130,8 @@ public class ClassType extends ObjectType
    */
   public ClassType[] getInterfaces()
   {
-    if (interfaces == null && getReflectClass() != null)
+    if (interfaces == null
+	&& (flags & EXISTING_CLASS) != 0 && getReflectClass() != null)
       {
 	Class[] reflectInterfaces = reflectClass.getInterfaces();
 	int numInterfaces = reflectInterfaces.length;

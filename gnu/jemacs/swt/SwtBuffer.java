@@ -10,6 +10,7 @@ import org.eclipse.swt.custom.StyledTextContent;
 import gnu.jemacs.buffer.Buffer;
 import gnu.jemacs.buffer.Marker;
 import gnu.lists.Consumer;
+import gnu.lists.CharSeq;
 import gnu.mapping.InPort;
 
 /**

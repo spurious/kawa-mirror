@@ -270,6 +270,12 @@ public class BufferContent extends SwtCharBuffer
     } 
   }
 
+  public void setCharAt (int index, char value)
+  {
+    char[] arr = { value };
+    replaceTextRange(index, index+1, new String(arr));
+  }
+
   public void fill(char value)
   {
     fill(0, size(), value);
@@ -277,9 +283,42 @@ public class BufferContent extends SwtCharBuffer
 
   public void fill(int fromIndex, int toIndex, char value)
   {
-    for (int i = fromIndex;  i < toIndex;  i)
-      setCharAt(value);
+    for (int i = fromIndex;  i < toIndex;  i++)
+      setCharAt(i, value);
   }
+
+  /* #ifdef JAVA5 */
+  // public CharSeq subSequence(int start, int end)
+  // {
+  //   throw new UnsupportedOperationException("subSequence not implemented");
+  // }
+
+  // public void writeTo(int start, int count, Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   dest.append(this, start, start+count);
+  // }
+
+  // public void writeTo(Appendable dest)
+  //   throws java.io.IOException
+  // {
+  //   dest.append(this, 0, size());
+  // }
+  /* #endif */
+  /* #ifndef JAVA5 */
+  public void writeTo(int start, int count, java.io.Writer dest)
+    throws java.io.IOException
+  {
+    while (--count >= 0)
+      dest.write(charAt(start++));
+  }
+
+  public void writeTo(java.io.Writer dest)
+    throws java.io.IOException
+  {
+    writeTo(0, size(), dest);
+  }
+  /* #endif */
 
   /**
    * @param out

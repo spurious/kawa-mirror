@@ -6,7 +6,7 @@ import gnu.lists.FString;
 import gnu.lists.GapVector;
 
 /**
- * TODO Forklare hvad dether går ud på 
+ * TODO Explain that this is all about.
  * @author Christian Surlykke
  *         18-07-2004
  */

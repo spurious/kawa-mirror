@@ -510,10 +510,14 @@ make
 make install
 @end example
 
-@subsection Building Kawa under Windows
+@subsection Building Kawa under MS-Windows
 
-Using the @code{ant} method is recommended for bulding
+Using the @code{ant} method is recommended for building
 Kawa under Microsoft Windows.
+You may get an error message "@code{Out of environment space}."
+See @uref{http://support.microsoft.com/support/kb/articles/Q230/2/05.ASP}
+for a solution.  Alternatively you can run
+the class @code{org.apache.tools.ant.Main} directly from the Ant jar.
 
 The Kawa @code{configure} and @code{make} process assumes a Unix-like
 environment.  If you want to build Kawa from source under Windows

@@ -1,5 +1,8 @@
 2001-11-27  Per Bothner  <per@bothner.com>
 
+	* kawa.texi:  Note environment problem and fix from Jim White
+	when running Ant under MS-Windows.
+
 	* kawa.texi:  Mentioned new kawa-VERSION-src.zip.
 
 2001-11-26  Per Bothner  <per@bothner.com>

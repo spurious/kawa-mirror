@@ -1,8 +1,6 @@
 package gnu.kawa.util;
 import java.io.PrintWriter;
-import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.expr.*;
 import java.io.*;
 
 /**
@@ -11,7 +9,7 @@ import java.io.*;
  * @author	Per Bothner
  */
 
-public class LList extends Sequence implements Printable, Compilable, Externalizable
+public class LList extends Sequence implements Printable, Externalizable
 {
   /** Do not use - only public for serialization! */
   public LList () { }
@@ -152,19 +150,6 @@ public class LList extends Sequence implements Printable, Compilable, Externaliz
   public LList readResolve() throws ObjectStreamException
   {
     return Empty;
-  }
-
-  static private Field nullConstant = null;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (nullConstant == null)
-      nullConstant = Compilation.scmListType.getDeclaredField("Empty");
-    return new Literal (this, nullConstant, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
   }
 
   public java.util.Enumeration elements()

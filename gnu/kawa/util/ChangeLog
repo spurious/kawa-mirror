@@ -1,5 +1,14 @@
 2000-05-22  Per Bothner  <per@bothner.com>
 
+	* Char.java:  No longer implements Compilable.
+	* FString.java:  No longer implements Compilable.
+	* FVector.java:  No longer implements Compilable.
+	* LList.java:  No longer implements Compilable.
+	* Pair.java:  No longer implements Compilable.
+	(make):  Renamed from makePair.
+	* PairWithPosition.java:  Change encoding of position.
+	Implement Externalizable.
+
 	* F32Vector.java (<init>(float[])):  New contructor.
 	* F64Vector.java (<init>(double[])):  New contructor.
 	* S8Vector.java (<init>(byte[])):  New contructor.

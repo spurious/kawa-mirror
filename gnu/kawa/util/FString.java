@@ -1,21 +1,15 @@
 package gnu.kawa.util;
 import java.io.*;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.text.CharArrayInPort;
-import gnu.expr.*;
 
 /** Representation of fixed-length mutable character strings.
  * Used for the Scheme string type.
  * @author Per Bothner
  */
 
-public class FString extends AbstractString implements Printable, Compilable, Externalizable
+public class FString extends AbstractString implements Printable, Externalizable
 {
-
   char[] value;
 
   public FString ()
@@ -166,32 +160,6 @@ public class FString extends AbstractString implements Printable, Compilable, Ex
 	  return false;
       }
     return true;
-  }
-
-  static public ClassType scmStringType;
-  static public Method initFStringMethod;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (scmStringType == null)
-      {
-	scmStringType = ClassType.make("gnu.kawa.util.FString");
-	initFStringMethod
-	  = scmStringType.addMethod ("<init>", comp.string1Arg,
-				      Type.void_type, Access.PUBLIC);
-      }
-    Literal literal = new Literal (this, scmStringType, comp);
-    comp.findLiteral (value);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitNew(scmStringType);
-    code.emitDup(scmStringType);
-    code.emitPushString(toString ());
-    code.emitInvokeSpecial(initFStringMethod);
   }
 
   public void print (java.io.PrintWriter ps)

@@ -1,13 +1,7 @@
 package gnu.kawa.util;
 import java.io.*;
 import java.util.Hashtable;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Method;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
-import kawa.standard.Scheme;
 import gnu.mapping.*;
-import gnu.expr.*;
 
 /**
  * A wrapper for characters.
@@ -26,7 +20,7 @@ import gnu.expr.*;
  * Finally, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
-public class Char implements Printable, Compilable, Externalizable
+public class Char implements Printable, Externalizable
 {
   // Leave open the possibility for characters beyond Unicode.
   int value;
@@ -231,38 +225,5 @@ public class Char implements Printable, Compilable, Externalizable
   public Char readResolve() throws ObjectStreamException
   {
     return make(value);
-  }
-
-  static public ClassType scmCharType;
-  public static Method makeCharMethod;
-  public static Method charValueMethod;
-
-  public static void initMakeMethods()
-  {
-    if (scmCharType == null)
-      {
-	scmCharType = ClassType.make("gnu.kawa.util.Char");
-	makeCharMethod = scmCharType.addMethod ("make",
-						 Compilation.int1Args,
-						 scmCharType,
-						 Access.PUBLIC|Access.STATIC);
-	charValueMethod = scmCharType.addMethod ("charValue",
-						  Type.typeArray0,
-                                                  Type.char_type,
-						  Access.PUBLIC);
-      }
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    initMakeMethods();
-    return new Literal (this, scmCharType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    code.emitPushInt(((Char) literal.getValue()).intValue ());
-    code.emitInvokeStatic(makeCharMethod);
   }
 }

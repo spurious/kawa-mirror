@@ -1,13 +1,8 @@
 package gnu.kawa.util;
 import java.io.*;
-import gnu.bytecode.Method;
-import gnu.bytecode.ClassType;
-import gnu.bytecode.Access;
-import gnu.bytecode.Type;
 import gnu.mapping.*;
-import gnu.expr.*;
 
-public class FVector extends UniformVector implements Printable, Compilable, Externalizable
+public class FVector extends UniformVector implements Printable, Externalizable
 {
   public String getTag() { return ""; }
 
@@ -65,53 +60,6 @@ public class FVector extends UniformVector implements Printable, Compilable, Ext
   {
      for (int index = value.length; --index >= 0; )
        value[index] = new_value;
-  }
-
-  static public ClassType scmVectorType;
-  static public Method initVectorMethod;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    if (scmVectorType == null)
-      {
-	scmVectorType = ClassType.make("gnu.kawa.util.FVector");
-	initVectorMethod
-	  = scmVectorType.addMethod ("<init>", comp.applyNargs,
-				      Type.void_type, Access.PUBLIC);
-      }
-    Literal literal = new Literal (this, scmVectorType, comp);
-    comp.findLiteral (value);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    // FIXME - should just comp.findLiteral (value) - but handle circularity!
-    int len = value.length;
-    // Allocate the FVector object
-    code.emitNew(scmVectorType);
-    code.emitPushInt(len);
-    code.emitNewArray(comp.typeObject);
-    // Stack contents:  ..., FVector, array
-    code.emitDup(2, 0);  // dup2
-    // Stack contents:  ..., FVector, array, FVector, array
-    code.emitInvokeSpecial(initVectorMethod);
-    literal.flags |= Literal.ALLOCATED;
-
-    // Stack contents:  ..., FVector, array
-    // Initialize the FVector elements.
-    for (int i = 0;  i < len;  i++)
-      {
-	code.emitDup(scmVectorType);
-	code.emitPushInt(i);
-	comp.emitLiteral (value[i]);
-	// Stack contents:  ..., FVector, array, array, i, value[i]
-	code.emitArrayStore(comp.typeObject);
-	// Stack contents:  ..., FVector, array
-      }
-    // Remove no-longer-needed array from stack:
-    code.emitPop(1);
   }
 
   public void print(java.io.PrintWriter ps)

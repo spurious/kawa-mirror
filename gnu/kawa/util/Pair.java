@@ -1,12 +1,10 @@
 package gnu.kawa.util;
-import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.expr.*;
 import java.io.*;
 
 import java.io.PrintWriter;
 
-public class Pair extends LList implements Printable, Compilable, Externalizable
+public class Pair extends LList implements Printable, Externalizable
 {
    public Object car;
    public Object cdr;
@@ -144,70 +142,7 @@ public class Pair extends LList implements Printable, Compilable, Externalizable
       }
   }
 
-  static Field carField = null;
-  static Field cdrField = null;
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    Literal literal = new Literal (this, comp.scmPairType, comp);
-    comp.findLiteral (car);
-    comp.findLiteral (cdr);
-    return literal;
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    gnu.bytecode.CodeAttr code = comp.getCode();
-    if ((literal.flags & Literal.ALLOCATING) != 0)
-      {
-	// We have detected a circularity.
-	// Resolve it by only allocating the Pair, leaving the car and cdr
-	// as null.  They will be set later by one of our callers.
-	// Emit:  push makePair()  (same as new Pair (null, null)
-	code.emitInvokeStatic(Compilation.makeNullPairMethod);
-	literal.flags |= Literal.ALLOCATED;
-      }
-    else
-      {
-	if (carField == null)
-	  {
-	    carField = Compilation.typePair.getDeclaredField("car");
-	    cdrField = Compilation.typePair.getDeclaredField("cdr");
-	  }
-	literal.flags |= Literal.ALLOCATING;
-	comp.emitLiteral (car);
-	comp.emitLiteral (cdr);
-	if ((literal.flags & Literal.ALLOCATED) != 0)
-	  {
-	    // It's already been allocated, because either the car or cdr
-	    // depended on the value of the Literal (i.e a circularity).
-	    // Just initialize car and cdr.
-	    // Emit:  this.cdr = pop();  this.car = pop();  push this;
-	    code.emitGetStatic(literal.field);
-	    code.emitDup(1, 1);  // emit dup_x1
-	    code.emitSwap();
-	    code.emitPutField(cdrField);
-	    code.emitDup(1, 1);  // emit dup_x1
-	    code.emitSwap();
-	    code.emitPutField(carField);
-	  }
-	else
-	  {
-	    // The normal case - no circularities detected.
-	    // emit:  push new Pair (pop(), pop())
-	    code.emitInvokeStatic(Compilation.makePairMethod);
-	  }
-      }
-  }
-
-  // Convenience function used by emit.
-  public static Pair makePair ()
-  {
-    return new Pair (null, null);
-  }
-
-  // Convenience function used by emit.
-  public static Pair makePair (Object car, Object cdr)
+  public static Pair make (Object car, Object cdr)
   {
     return new Pair (car, cdr);
   }

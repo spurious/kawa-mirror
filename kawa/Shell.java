@@ -120,7 +120,7 @@ public class Shell extends Procedure0
 	    perr.println("Invalid parameter, should be: "+ e.getMessage());
 	    e.printStackTrace(perr);
 	  }
-	catch (kawa.lang.SyntaxException e)
+	catch (gnu.text.SyntaxException e)
 	  {
 	    e.printAll(perr, 20);
 	  }

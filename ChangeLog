@@ -1,5 +1,7 @@
 2004-12-27  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_syntax.java (scanForm): Use new isStatic().
+
 	* Makefile.am (SUBDIRS): "Inline" SUBDIRS from gnu and gnu/kawa.
 	(install-html): Don't do into now Makefile-free gnu directory.
 	* configure.in (AC_OUTPUT): Update accordingly.

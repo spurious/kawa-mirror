@@ -42,6 +42,8 @@ implements ViewContainer
       }
     else if (contents instanceof Viewable)
       ((Viewable) contents).makeView(this);
+    else if (contents instanceof Paintable)
+      getContentPane().add(new SwingPaintable((Paintable) contents));
     else
       getContentPane().add((Component) contents);
   }

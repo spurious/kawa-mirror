@@ -1,3 +1,8 @@
+2004-02-13  Per Bothner  <per@bothner.com>
+
+	* SwingPaintable.java:  New class, extemds JPanel.
+	* SwingFrame.java (add):  Wrap a Paintable in a JPanel.
+
 2003-07-21  Per Bothner  <per@bothner.com>
 
 	New package.

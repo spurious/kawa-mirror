@@ -1,3 +1,8 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Update Interpreter -> Language:
+	* XQResolveNames.java: Likewise.
+
 2005-03-03  Per Bothner  <per@bothner.com>
 
 	* XQuery.java: Function 'children' has been moved.

@@ -1462,7 +1462,7 @@ public class XQParser extends LispReader // should be extends Lexer
       name[0] = QuoteExp.nullExp;
     else
       name[0]
-	= new ReferenceExp((Interpreter.NAMESPACE_PREFIX + prefix).intern());
+	= new ReferenceExp((Language.NAMESPACE_PREFIX + prefix).intern());
     name[1] = new QuoteExp(local == null ? null : local.intern());
     return name;
   }
@@ -1997,7 +1997,7 @@ public class XQParser extends LispReader // should be extends Lexer
 
   Declaration makeNamespaceDecl (String prefix, String uri)
   {
-    String sym = (Interpreter.NAMESPACE_PREFIX + prefix).intern();
+    String sym = (Language.NAMESPACE_PREFIX + prefix).intern();
     Declaration decl = new Declaration(sym);
     decl.setType(gnu.bytecode.Type.tostring_type);
     decl.setFlag(Declaration.IS_CONSTANT|Declaration.IS_NAMESPACE_PREFIX);

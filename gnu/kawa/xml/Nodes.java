@@ -177,6 +177,21 @@ implements org.w3c.dom.NodeList
     curFragment.writeBaseUri(uri);
   }
 
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    maybeStartNonTextNode();
+    curFragment.writeComment(chars, offset, length);
+    maybeEndNonTextNode();
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    maybeStartNonTextNode();
+    curFragment.writeProcessingInstruction(target, content, offset, length);
+    maybeEndNonTextNode();
+  }
+
   public void beginDocument()
   {
     maybeStartNonTextNode();

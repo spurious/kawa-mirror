@@ -21,6 +21,8 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
   public static final int GROUP_OK = 2;
   public static final int ATTRIBUTE_OK = 4;
   public static final int DOCUMENT_OK = 8;
+  public static final int COMMENT_OK = 16;
+  public static final int PROCESSING_INSTRUCTION_OK = 32;
   int kinds = -1;
 
   public NodeType(String name, int kinds)
@@ -97,6 +99,10 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
 	    return (kinds & ATTRIBUTE_OK) != 0;
 	  case Sequence.DOCUMENT_VALUE:
 	    return (kinds & DOCUMENT_OK) != 0;
+	  case Sequence.COMMENT_VALUE:
+	    return (kinds & COMMENT_OK) != 0;
+	  case Sequence.PROCESSING_INSTRUCTION_VALUE:
+	    return (kinds & PROCESSING_INSTRUCTION_OK) != 0;
 	  }
       }
     return true;

@@ -1,3 +1,9 @@
+2004-04-18  Per Bothner  <per@bothner.com>
+
+	* NodeType.java (COMMENT_OK, PROCESSING_INSTRUCTION_OK): New constants.
+	(isInstance):  Handle new macros.
+	* Nodes.java (writeComment, writeProcessingInstruction):  New methods.
+
 2004-03-09  Per Bothner  <per@bothner.com>
 
 	* NodeName.java (nodeName):  If name is XName, extract its QName.

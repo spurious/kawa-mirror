@@ -59,11 +59,11 @@ public class Type {
   static public Type float_type = new Type ("float", "F", 4);
   static public Type double_type = new Type ("double", "D", 8);
 
-  static public Type boolean_type = new Type ("boolean", "Z",1 );
+  static public Type boolean_type = new Type ("boolean", "Z", 1);
   static public Type char_type = new Type ("char", "C", 2);
 
   static public Type void_type = new Type ("void", "V", 0);
 
-  static public Type pointer_type = new ClassType ("java.lang.Object");
-  static public Type string_type = new ClassType ("java.lang.String");
+  static public ClassType pointer_type = new ClassType ("java.lang.Object");
+  static public ClassType string_type = new ClassType ("java.lang.String");
 }

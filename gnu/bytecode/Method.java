@@ -503,7 +503,7 @@ public class Method {
     else if (element_type == Type.long_type)    put1 (80);  // lastore
     else if (element_type == Type.float_type)   put1 (81);  // fastore
     else if (element_type == Type.double_type)  put1 (82);  // dastore
-    else if (element_type == Type.boolean_type) put1 (79);  // iastore ???
+    else if (element_type == Type.boolean_type) put1 (84);  // bastore
     else if (element_type == Type.char_type)    put1 (85);  // castore
     else                                        put1 (83);  // aastore
   }
@@ -522,7 +522,7 @@ public class Method {
     else if (element_type == Type.long_type)    put1 (47);  // laload
     else if (element_type == Type.float_type)   put1 (48);  // faload
     else if (element_type == Type.double_type)  put1 (49);  // daload
-    else if (element_type == Type.boolean_type) put1 (46);  // iaload
+    else if (element_type == Type.boolean_type) put1 (51);  // baload
     else if (element_type == Type.char_type)    put1 (52);  // caload
     else                                        put1 (50);  // aaload
     push_stack_type (element_type);

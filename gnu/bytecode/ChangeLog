@@ -1,3 +1,12 @@
+Fri Jan  3 18:52:20 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Access:  Make class public.
+	(VALATILE -> VOLATILE):  Fix typo.
+	* ArrayType.java (elements):  Make public.
+	* Method.java (compile_array_store, compile_array_load):
+	Boolean arrays use baload/bastore (byte load/store) op.
+	* Type.java (pointer_type, string_type):  Make types specific.
+
 Sat Nov 16 14:52:45 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* IfState.java:  New class.

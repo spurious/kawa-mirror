@@ -2,7 +2,7 @@ package codegen;
 
 public class ArrayType extends Type
 {
-  Type elements;
+  public Type elements;
 
   static private byte[] array_signature (byte[] element_signature)
   {

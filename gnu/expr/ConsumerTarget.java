@@ -62,7 +62,15 @@ public class ConsumerTarget extends Target
       }
     else
       {
-	methodName = "writeObject";
+	if (SeriesTarget.isSingletonType(stackType))
+	  methodName = "writeObject";
+	else
+	  {
+	    method = comp.typeValues.getDeclaredMethod("writeValues", 2);
+	    code.emitLoad(consumer);
+	    code.emitInvokeStatic(method);
+	    return;
+	  }
       }
     code.emitLoad(consumer);
     code.emitSwap();

@@ -60,3 +60,10 @@
 		(call-with-output-string (lambda (port) (write arg port))))
 	      args))
   (apply throw 'misc-error msg args))
+
+(define (base-uri #!optional (node #!null))
+  (let ((uri (if (eq? node #!null)
+		 (invoke-static <gnu.kawa.functions.BaseUri> 'baseUri)
+		 (invoke-static <gnu.kawa.functions.BaseUri> 'baseUri node))))
+    (if (eq? uri #!void) #f uri)))
+

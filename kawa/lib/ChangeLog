@@ -1,3 +1,7 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* misc.scm (base-uri):  New function.
+
 2003-02-11  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (defmacro):  Move next to %defmacro.

@@ -8,28 +8,21 @@ import gnu.mapping.*;
  * @author	Per Bothner
  */
 
-public class Continuation extends ProcedureN
+public class Continuation extends MethodProc
 {
   public boolean invoked;
   static int counter;
-  int id;
 
-  public Continuation ()
+  public Continuation (CallContext ctx)
   {
-    id = ++counter;
   }
 
-  public Object apply1 (Object arg1)
+  public void apply (CallContext ctx)
   {
     if (invoked)
       throw new GenericError
 	("implementation restriction: continuation can only be used once");
-    throw new CalledContinuation (arg1, this);
-  }
-
-  public Object applyN (Object[] args)
-  {
-    return apply1 (Values.make (args));
+    throw new CalledContinuation (ctx.values, this);
   }
 
   public final String toString()

@@ -1,5 +1,15 @@
 2004-08-08  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/CalledContinuation.java (values):  A continuation
+	can take multiple values.
+	* kawa/lang/Continuation.java:  Extend MethodProc, not ProcedureN.
+	(<init>):  Change to take a CallContext.
+	(id, counter):  Remove debugging fields.
+	(apply1, applyN):  Remove methods.
+	(apply):  New method.
+
+2004-08-08  Per Bothner  <per@bothner.com>
+
 	* kawa/lang/AutoloadProcedure.java (load):
 	ModuleBody is not always Runnable.
 

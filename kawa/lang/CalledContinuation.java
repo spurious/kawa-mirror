@@ -2,13 +2,13 @@ package kawa.lang;
 
 public class CalledContinuation extends RuntimeException
 {
-  public Object value;
+  public Object[] values;
   public Continuation continuation;
 
-  CalledContinuation (Object value, Continuation continuation)
+  CalledContinuation (Object[] values, Continuation continuation)
   {
     super ("call/cc called");
-    this.value = value;
+    this.values = values;
     this.continuation = continuation;
   }
 }

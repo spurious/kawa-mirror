@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -99,11 +99,12 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr 	kawa commonlisp ecmascript $(XQUERY_SUBDIR) $(SWING_SUBDIRS)
+SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
+	kawa commonlisp ecmascript $(XQUERY_SUBDIR) $(SWING_SUBDIRS)
 
-@ENABLE_XML_TRUE@XML_SUBDIR = xml
-@ENABLE_XML_TRUE@XQUERY_SUBDIR = xquery
-@WITH_SWING_TRUE@SWING_SUBDIRS = jemacs
+@ENABLE_XML_TRUE@XML_SUBDIR = @ENABLE_XML_TRUE@xml
+@ENABLE_XML_TRUE@XQUERY_SUBDIR = @ENABLE_XML_TRUE@xquery
+@WITH_SWING_TRUE@SWING_SUBDIRS = @WITH_SWING_TRUE@jemacs
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html
@@ -164,7 +165,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -96,9 +96,9 @@ XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
-@WITH_GCJ_TRUE@bin_PROGRAMS = @kawa_bin@ kawa-bin
-@WITH_GCJ_FALSE@bin_PROGRAMS = @kawa_bin@
-@WITH_GCJ_TRUE@bin_SCRIPTS = gckawa
+@WITH_GCJ_TRUE@bin_PROGRAMS = @WITH_GCJ_TRUE@@kawa_bin@ kawa-bin
+@WITH_GCJ_FALSE@bin_PROGRAMS = @WITH_GCJ_FALSE@@kawa_bin@
+@WITH_GCJ_TRUE@bin_SCRIPTS = @WITH_GCJ_TRUE@gckawa
 
 EXTRA_PROGRAMS = kawa
 noinst_SCRIPTS = kawa.sh
@@ -116,23 +116,46 @@ DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
-@ENABLE_XML_TRUE@KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o gnu-xquery-lang.o
-@ENABLE_XML_TRUE@LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
+@ENABLE_XML_TRUE@KAWA2_XML_OFILES = @ENABLE_XML_TRUE@gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o gnu-xquery-lang.o
+@ENABLE_XML_TRUE@LIBADD_XML = @ENABLE_XML_TRUE@gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
 
-KAWA1_OFILES =    gnu-bytecode.lo   gnu-lists.lo   gnu-expr.lo   gnu-kawa-functions.lo   gnu-kawa-lispexpr.lo   gnu-kawa-reflect.lo   gnu-kawa-util.lo   gnu-mapping.lo   gnu-math.lo   gnu-text.lo   gnu-commonlisp-lang.lo   kawa-lang.lo   kawa-repl.lo   kawa-standard.lo
+KAWA1_OFILES = \
+  gnu-bytecode.lo \
+  gnu-lists.lo \
+  gnu-expr.lo \
+  gnu-kawa-functions.lo \
+  gnu-kawa-lispexpr.lo \
+  gnu-kawa-reflect.lo \
+  gnu-kawa-util.lo \
+  gnu-mapping.lo \
+  gnu-math.lo \
+  gnu-text.lo \
+  gnu-commonlisp-lang.lo \
+  kawa-lang.lo \
+  kawa-repl.lo \
+  kawa-standard.lo
 
 
-KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES)   kawa-lib.o   gnu-commonlisp-lisp.o   gnu-kawa-slib.o
+KAWA2_OFILES = $(KAWA1_OFILES) $(KAWA2_XML_OFILES) \
+  kawa-lib.o \
+  gnu-commonlisp-lisp.o \
+  gnu-kawa-slib.o
 
 
 WITH_GCJ_LIBS = libkawa.la
 WITHOUT_GCJ_LIBS = 
 #lib_LTLIBRARIES = $(@GCJ_SELECTED@_LIBS)
 #EXTRA_LTLIBRARIES = libkawa.la
-@WITH_GCJ_TRUE@lib_LTLIBRARIES = libkawa.la
+@WITH_GCJ_TRUE@lib_LTLIBRARIES = @WITH_GCJ_TRUE@libkawa.la
 #libkawa_la_LDFLAGS = -rpath $(libdir)
 libkawa_la_SOURCES = 
-libkawa_la_LIBADD =    $(KAWA1_OFILES)   gnu-ecmascript.lo   $(LIBADD_XML)   gnu-kawa-slib.lo   gnu-commonlisp-lisp.lo   kawa-lib.lo
+libkawa_la_LIBADD = \
+  $(KAWA1_OFILES) \
+  gnu-ecmascript.lo \
+  $(LIBADD_XML) \
+  gnu-kawa-slib.lo \
+  gnu-commonlisp-lisp.lo \
+  kawa-lib.lo
 
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

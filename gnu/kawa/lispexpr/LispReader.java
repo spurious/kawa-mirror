@@ -139,6 +139,7 @@ public abstract class LispReader extends Lexer
 	// Step 6:
 	inEscapes = true;
 	seenEscapes = true;
+	ch = read();
 	break;
       default:  // case ReadTable.CONSTITUENT:
 	break;

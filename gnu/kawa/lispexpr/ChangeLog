@@ -1,3 +1,7 @@
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readValues):  Add missing read().
+
 2001-04-26  Per Bothner  <per@bothner.com>
 
 	* ReaderParens.java (readList):  Re-order tests so that the case

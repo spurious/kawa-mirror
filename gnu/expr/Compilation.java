@@ -143,7 +143,7 @@ public class Compilation
   static public ClassType typeLocation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeSymbol
-    = ClassType.make("gnu.mapping.Symbol", typeLocation);
+    = ClassType.make("gnu.mapping.Symbol");
   static public final Method getSymbolValueMethod
     = typeInterpreter.getDeclaredMethod("getSymbolValue", 1);
   static public final Method getSymbolProcedureMethod
@@ -174,9 +174,15 @@ public class Compilation
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
 
-  static public final Method getSymbolEnvironmentMethod
-    = typeEnvironment.addMethod("getSymbol", string1Arg,
-				typeSymbol, Access.PUBLIC);
+  static public final Method getLocation1EnvironmentMethod
+  = typeEnvironment.getDeclaredMethod("getLocation", 1);
+  static public final Method getLocation2EnvironmentMethod;
+  static {
+    Type[] args = { typeSymbol, Type.pointer_type };
+    getLocation2EnvironmentMethod
+      = typeEnvironment.addMethod("getLocation", args,
+				  typeLocation, Access.PUBLIC|Access.FINAL);
+  }
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -2074,6 +2080,7 @@ public class Compilation
 
   protected Interpreter interp;
   public Interpreter getInterpreter() { return interp; }
+  public Environment getEnvironment() { return interp.getEnvironment(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
@@ -2392,18 +2399,17 @@ public class Compilation
 
   public Object resolve(Object name, boolean function)
   {
+    Environment env = getEnvironment();
     Symbol symbol;
     if (name instanceof String)
-      symbol = interp.getEnvironment().lookup((String) name);
+      symbol = env.defaultNamespace().lookup((String) name);
     else
       symbol = (Symbol) name;
     if (symbol == null)
       return null;
     if (function && getInterpreter().hasSeparateFunctionNamespace())
-      return symbol.getFunctionValue(null);
-    if (symbol.isBound())
-      return symbol.getValue();
-    return null;
+      return env.getFunction(symbol, null);
+    return env.get(symbol, null);
   }
 
   /** Current lexical scope - map name to Declaration. */

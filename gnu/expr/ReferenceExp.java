@@ -35,7 +35,7 @@ public class ReferenceExp extends Expression
   private static int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
   public static int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
 
-  /* If true, must have binding.isSymbol().  Don't dereference Symbol. */
+  /* If true, must have binding.isIndirectBinding().  Don't dereference it. */
   public final boolean getDontDereference()
   {
     return (flags & DONT_DEREFERENCE) != 0;
@@ -95,17 +95,18 @@ public class ReferenceExp extends Expression
         if ( ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
           throw new Error("internal error: ReferenceExp.eval on lexical binding");
       }
+    Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+      : env.getSymbol(symbol.toString());
+    Object property = getFlag(PREFER_BINDING2) && isProcedureName()
+      ? EnvironmentKey.FUNCTION
+      : null;
     if (getDontDereference())
-      return symbol instanceof Symbol ? symbol : env.getSymbol(symbol.toString());
-    else if (getFlag(PREFER_BINDING2) || symbol instanceof Symbol)
-      {
-	Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
-	  : env.getSymbol(symbol.toString());
-	return isProcedureName() ? Interpreter.getSymbolProcedure(sym)
-	  : Interpreter.getSymbolValue(sym);
-      }
-    else
-      return env.getChecked(symbol.toString());
+      return env.getLocation(sym, property);
+    Object unb = gnu.mapping.Location.UNBOUND;
+    Object val = env.get(sym, property, unb);
+    if (val == unb)
+      throw new UnboundLocationException(sym);
+    return val;
   }
 
   public void compile (Compilation comp, Target target)
@@ -115,25 +116,37 @@ public class ReferenceExp extends Expression
     Type rtype = getType();
     CodeAttr code = comp.getCode();
     Declaration decl = Declaration.followAliases(binding);
-    decl.load(comp);
-    if (decl.isIndirectBinding() && ! getDontDereference())
+    if (! decl.isIndirectBinding() && getDontDereference())
       {
-	if (! isProcedureName())
-	  {
-	    code.emitInvokeStatic(Compilation.getSymbolValueMethod);
-	    rtype = Compilation.typeLocation;
-	  }
-	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
-	//   code.emitGetField(Compilation.functionValueBinding2Field);
+	if (decl.field == null)
+	  throw new Error("internal error: cannot take location of "+decl);
+	ClassType typeClassMemberLocation
+	  = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
+	Method meth;
+	if (decl.field.getStaticFlag())
+	  meth = typeClassMemberLocation.getDeclaredMethod("make", 2);
 	else
 	  {
-	    //code.emitInvokeVirtual(Compilation.getProcedureBindingMethod);
-	    code.emitInvokeStatic(Compilation.getSymbolProcedureMethod);
-	    rtype = Compilation.typeProcedure;
+	    meth = typeClassMemberLocation.getDeclaredMethod("make", 3);
+	    decl.base.load(comp);
 	  }
+	comp.compileConstant(decl.field.getDeclaringClass().getName());
+	comp.compileConstant(decl.field.getName());
+	code.emitInvokeStatic(meth);
       }
-    else if (decl.isFluid() && decl.field == null)
-      code.emitGetField(FluidLetExp.valueField);
+    else
+      {
+	decl.load(comp);
+	if (decl.isIndirectBinding() && ! getDontDereference())
+	  {
+	    code.emitInvokeVirtual(Compilation.getLocationMethod);
+	    rtype = Type.pointer_type;
+	  }
+	/*
+	else if (decl.isFluid() && decl.field == null)
+	  code.emitGetField(FluidLetExp.valueField);
+	*/
+      }
     if (target instanceof SeriesTarget
 	&& decl.getFlag(Declaration.IS_SINGLE_VALUE))
       // A kludge until we get a better type system.
@@ -169,7 +182,7 @@ public class ReferenceExp extends Expression
   {
     return (binding == null || binding.isFluid()) ? Type.pointer_type
       : getDontDereference() ? Compilation.typeLocation
-      : binding.getType();
+      : Declaration.followAliases(binding).getType();
   }
 
   public String toString()

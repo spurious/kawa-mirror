@@ -2,6 +2,8 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.text.*;
+import java.io.*;
+import gnu.kawa.reflect.ClassMemberLocation;
 
 /**
  * Class used to implement Scheme top-level environments.
@@ -9,6 +11,7 @@ import gnu.text.*;
  */
 
 public class ModuleExp extends LambdaExp
+		       implements Externalizable
 {
   public static boolean debugPrintExpr = false;
 
@@ -16,6 +19,7 @@ public class ModuleExp extends LambdaExp
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
+  public static final int LAZY_DECLARATIONS = SUPERTYPE_SPECIFIED << 11;
 
   public String getJavaName ()
   {
@@ -24,6 +28,14 @@ public class ModuleExp extends LambdaExp
 
   public ModuleExp ()
   {
+  }
+
+  public static ModuleExp make (String name)
+  {
+    ModuleExp mexp = new ModuleExp();
+    mexp.setName(name);
+    mexp.flags |= LAZY_DECLARATIONS;
+    return mexp;
   }
 
   /** Used to control which .zip file dumps are generated. */
@@ -53,6 +65,7 @@ public class ModuleExp extends LambdaExp
 	comp.loader = loader;
 
 	comp.compile(mexp, class_name, null);
+	// FIXME - doesn't emit warnings.
 	if (messages.seenErrors())
 	  return null;
 
@@ -188,7 +201,12 @@ public class ModuleExp extends LambdaExp
 	      {
 		throw new RuntimeException("class illegal access: in lambda eval");
 	      }
-	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
+	    // Doing defineAll is tricky, because we need to be careful to
+	    // not "import" LitXx fields.  Instead, we force declarations to
+	    // indirect, and allocate the Location at compile-time in
+	    // Declaration.load.  A cleaner solution would be to do a selective
+	    // defineAll, to only import real declarations.  FIXME.
+	    //ClassMemberLocation.defineAll(mod, null,  comp.getInterpreter(), env);
 	    mod.run(ctx);
 	  }
 	ctx.runUntilDone();
@@ -245,6 +263,7 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (comp.immediate)
 	  {
+	    // This is a bit of a kludge.  See Declaration.load.
 	    decl.setIndirectBinding(true);
 	    decl.setSimple(false);
 	  }
@@ -296,5 +315,38 @@ public class ModuleExp extends LambdaExp
     else
       body.print (out);
     out.endLogicalBlock(")");
+  }
+
+  public Declaration firstDecl ()
+  {
+    synchronized (this)
+      {
+	if (getFlag(LAZY_DECLARATIONS))
+	  {
+	    type = ClassType.make(getName());
+	    kawa.standard.require.makeModule(this, type, null);
+	    flags &= ~LAZY_DECLARATIONS;
+	  }
+      }
+    return decls;
+  }
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    String name = null;
+    if (type != null && type != Compilation.typeProcedure)
+      name = type.getName();
+    if (name == null)
+      name = getName();
+    if (name == null)
+      name = getFile();
+    out.writeObject(name);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName((String) in.readObject());
+    flags |= LAZY_DECLARATIONS;
   }
 }

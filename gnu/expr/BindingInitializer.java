@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
+import gnu.mapping.*;
 
 public class BindingInitializer extends Initializer
 {
@@ -7,7 +8,7 @@ public class BindingInitializer extends Initializer
   Expression value;
 
   static final Method makeSymbolMethod
-  = Compilation.typeSymbol.getDeclaredMethod("make", Compilation.string1Arg);
+  = Compilation.typeSymbol.getDeclaredMethod("makeUninterned", 1);
 
   public BindingInitializer(Declaration decl, Field field, Expression value)
   {
@@ -15,8 +16,6 @@ public class BindingInitializer extends Initializer
     this.value = value;
     this.field = field;
   }
-
-  boolean createNewSymbol = false;
 
   public void emit(Compilation comp)
   {
@@ -38,19 +37,29 @@ public class BindingInitializer extends Initializer
 
     if (value == null)
       {
-	// FIXME - this should be cached in a local Variable:
-	if (! createNewSymbol)
+	boolean lookupInEnv
+	  = decl.getFlag(Declaration.IS_UNKNOWN|Declaration.IS_DYNAMIC|Declaration.IS_FLUID);
+	if (lookupInEnv)
+	  // FIXME - this should be cached in a local Variable:
 	  code.emitInvokeStatic(Compilation.getCurrentEnvironmentMethod);
 
-	String name = decl.getName();
-	if (name == null)
-	  code.emitPushNull();
+	boolean func = comp.getInterpreter().hasSeparateFunctionNamespace();
+	Object property
+	  = func && decl.isProcedureDecl() ? EnvironmentKey.FUNCTION : null;
+
+	Object name = decl.getSymbol();
+	if (name instanceof String && lookupInEnv)
+	  name = Namespace.EmptyNamespace.getSymbol((String) name);
+	comp.compileConstant(name, Target.pushObject);
+	if (! lookupInEnv)
+	  code.emitInvokeStatic(makeLocationMethod(name));
+	else if (property == null)
+	  code.emitInvokeVirtual(Compilation.getLocation1EnvironmentMethod);
 	else
-	  code.emitPushString(name);
-	if (createNewSymbol)
-	  code.emitInvokeStatic(makeSymbolMethod);
-	else
-	  code.emitInvokeVirtual(Compilation.getSymbolEnvironmentMethod);
+	  {
+	    comp.compileConstant(property, Target.pushObject);
+	    code.emitInvokeVirtual(Compilation.getLocation2EnvironmentMethod);
+	  }
       }
     else
       {
@@ -61,5 +70,15 @@ public class BindingInitializer extends Initializer
       code.emitPutStatic(field);
     else
       code.emitPutField(field);
+  }
+
+  public static Method makeLocationMethod (Object name)
+  {
+    Type[] atypes = new Type[1];
+    if (name instanceof Symbol)
+      atypes[0] = Compilation.typeSymbol;
+    else
+      atypes[0] = Type.string_type;
+    return Compilation.typeLocation.getDeclaredMethod("make", atypes);
   }
 }

@@ -1,7 +1,7 @@
 package gnu.expr;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.kawa.reflect.ClassMemberConstraint;
+import gnu.kawa.reflect.ClassMemberLocation;
 
 /**
  * Class for the dummy top-level function of a module.
@@ -96,7 +96,9 @@ public abstract class ModuleBody extends Procedure0
     try
       {
 	CallContext ctx = CallContext.getInstance();
-	ClassMemberConstraint.defineAll(this, ctx.getEnvironment());
+	ClassMemberLocation.defineAll(this,  null,
+				      Interpreter.getInterpreter(),
+				      ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();

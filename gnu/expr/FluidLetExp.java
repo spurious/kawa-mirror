@@ -27,42 +27,48 @@ public class FluidLetExp extends LetExp
       ttarg = Target.pushObject;
     else
       ttarg = new StackTarget(result_type);
-    Variable context = code.addLocal(typeCallContext);
-    if (comp.curLambda.isHandlingTailCalls())
-      comp.loadCallContext();
-    else
-      code.emitInvokeStatic(getContextMethod);
-    code.emitDup(1);
-    code.emitStore(context);
-    code.emitDup(1);
-    code.emitGetField(fluidBindingsField);
-    Variable old_bindings = code.addLocal(typeFluidBinding);
-    code.emitDup(1);
-    code.emitStore(old_bindings);
     code.enterScope(getVarScope());
+    Variable[] save = new Variable[inits.length];
+    
     Declaration decl = firstDecl();
-    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
-      {
-        decl.allocateVariable(code);
-	inits[i].compile(comp, Target.pushObject);
-	decl.base.load(comp);
-	code.emitInvokeStatic(makeFluidBindingMethod);
-	code.emitDup(1);
-	code.emitStore(decl.getVariable());
-      }
-    code.emitInvokeVirtual(setFluidsMethod);
+    doInits(decl, 0, save, comp);
     code.emitTryStart(true, result_type);
     body.compileWithPosition(comp, ttarg);
     code.emitTryEnd();
     code.emitFinallyStart();
-    code.emitLoad(context);
-    code.emitLoad(old_bindings);
-    code.emitInvokeVirtual(resetFluidsMethod);
+
+    
+    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
+      {
+	decl.load(comp);
+	code.emitLoad(save[i]);
+	code.emitInvokeVirtual(comp.typeLocation
+			       .getDeclaredMethod("setRestore", 1));
+	
+      }
     code.emitTryCatchEnd();
     code.popScope();
     code.popScope();
     if (result_type != null)
       target.compileFromStack(comp, result_type);
+  }
+
+  private void doInits (Declaration decl, int i, Variable[] save,
+			Compilation comp)
+  {
+    if (i >= inits.length)
+      return;
+    CodeAttr code = comp.getCode();
+    save[i] = code.addLocal(Type.pointer_type);
+    decl.allocateVariable(code);
+    decl.base.load(comp);
+    code.emitDup();
+    code.emitStore(decl.getVariable());
+    inits[i].compile(comp, Target.pushObject);
+    doInits(decl.nextDecl(), i+1, save, comp);
+    code.emitInvokeVirtual(Compilation.typeLocation
+			   .getDeclaredMethod("setWithSave", 1));
+    code.emitStore(save[i]);
   }
 
   protected Expression walk (ExpWalker walker)
@@ -74,34 +80,4 @@ public class FluidLetExp extends LetExp
   {
     print(out, "(FluidLet", ")");
   }
-
-  static ClassType typeCallContext = ClassType.make("gnu.mapping.CallContext");
-  static Method getContextMethod
-    = typeCallContext.addMethod("getInstance",
-				Type.typeArray0, typeCallContext,
-				Access.STATIC|Access.PUBLIC);
-  public static ClassType typeFluidBinding
-    = ClassType.make("gnu.mapping.FluidBinding");
-  static Field fluidBindingsField
-    = typeCallContext.addField("fluidBindings", typeFluidBinding,
-			  Access.STATIC|Access.PUBLIC);
-  public static Field valueField
-    = typeFluidBinding.addField("value", Type.pointer_type, Access.PUBLIC);
-  static Method setFluidsMethod;
-  static Method resetFluidsMethod;
-  static Method makeFluidBindingMethod;
-  static
-    {
-      Type[] args = { typeFluidBinding };
-      setFluidsMethod = typeCallContext.addMethod
-	("setFluids", args, Type.void_type, Access.PUBLIC);
-      resetFluidsMethod = typeCallContext.addMethod
-	("resetFluids", args, Type.void_type, Access.PUBLIC);
-      args = new Type[3];
-      args[0] = typeFluidBinding;
-      args[1] = Type.pointer_type;
-      args[2] = ClassType.make("gnu.mapping.Symbol");
-      makeFluidBindingMethod = typeFluidBinding.addMethod
-	("make", args, typeFluidBinding, Access.PUBLIC|Access.STATIC);
-    }
 }

@@ -78,13 +78,13 @@ public class InlineCalls extends ExpWalker
 	    Expression inv = rewriteToInvocation(symbol, exp);
 	    if (inv != null)
 	      return inv;
-	    Object fval = symbol.getFunctionValue(null);
+	    Object fval = comp.getEnvironment().getFunction(symbol, null);
 	    if (fval instanceof Procedure)
 	      func = new QuoteExp(fval);
 	    decl = null;
 	  }
       }
-    if (func instanceof QuoteExp)
+    if (func instanceof QuoteExp && func != QuoteExp.undefined_exp)
       {
 	Object fval = ((QuoteExp) func).getValue();
 	if (! (fval instanceof Procedure))

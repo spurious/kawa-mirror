@@ -5,6 +5,7 @@ package gnu.expr;
 import java.util.Hashtable;
 import java.io.Externalizable;
 import gnu.bytecode.Type;
+import gnu.mapping.*;
 
 public class FindCapturedVars extends ExpWalker
 {
@@ -106,7 +107,7 @@ public class FindCapturedVars extends ExpWalker
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
-	Declaration bind = allocUnboundDecl(decl.getSymbol());
+	Declaration bind = allocUnboundDecl(decl.getSymbol(), false);
 	capture(bind);
 	decl.base = bind;
       }
@@ -303,27 +304,37 @@ public class FindCapturedVars extends ExpWalker
   Hashtable unknownDecls = null;
   ModuleExp currentModule = null;
 
-  Declaration allocUnboundDecl(Object name)
+  Declaration allocUnboundDecl(Object name, boolean function)
   {
     Declaration decl;
+    Object key = name;
+    if (function && name instanceof Symbol)
+      {
+	if (! getCompilation().getInterpreter().hasSeparateFunctionNamespace())
+	  function = false;
+	else // FIXME maybe just use gnu.lists.Pair and remove KeyPair class?
+	  key = new KeyPair((Symbol) name, EnvironmentKey.FUNCTION);
+      }
     if (unknownDecls == null)
       {
 	unknownDecls = new Hashtable(100);
 	decl = null;
       }
     else
-      decl = (Declaration) unknownDecls.get(name);
+      decl = (Declaration) unknownDecls.get(key);
     if (decl == null)
       {
 	decl = currentModule.addDeclaration(name);
 	decl.setSimple(false);
 	decl.setPrivate(true);
+	if (function)
+	  decl.setProcedureDecl(true);
 	if (currentModule.isStatic())
 	  decl.setFlag(Declaration.STATIC_SPECIFIED);
 	decl.setCanRead(true);
 	decl.setFlag(Declaration.IS_UNKNOWN);
 	decl.setIndirectBinding(true);
-	unknownDecls.put(name, decl);
+	unknownDecls.put(key, decl);
       }
     return decl;
   }
@@ -333,7 +344,8 @@ public class FindCapturedVars extends ExpWalker
     Declaration decl = exp.getBinding();
     if (decl == null)
       {
-	decl = allocUnboundDecl(exp.getSymbol());
+	decl = allocUnboundDecl(exp.getSymbol(),
+				exp.isProcedureName());
 	exp.setBinding(decl);
       }
     if (decl.getFlag(Declaration.IS_UNKNOWN))
@@ -366,7 +378,7 @@ public class FindCapturedVars extends ExpWalker
     Declaration decl = exp.binding;
     if (decl == null)
       {
-	decl = allocUnboundDecl(exp.getSymbol());
+	decl = allocUnboundDecl(exp.getSymbol(), exp.isFuncDef());
 	exp.binding = decl;
       }
     capture(Declaration.followAliases(decl));

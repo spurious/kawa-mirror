@@ -186,18 +186,8 @@ public abstract class Interpreter
   /** Enter a value into the current environment. */
   public void define(String sym, Object p)
   {
-    environ.define (sym, p);
-  }
-
-  /** Enter a function into the current environment.
-   * The function is implemented using a static method.
-   * @param name the language-level name of the function.
-   * @param cname the fully-qualified name of the class containing the method.
-   * @param mname the name of the static method.
-   */
-  protected void define_method(String name, String cname, String mname)
-  {
-    environ.define(name, ClassMethods.apply(cname, mname));
+    Symbol s = getSymbol(sym);
+    environ.define(s, null, p);
   }
 
   /** Declare in the current Environment a procedure bound to a static field.
@@ -208,13 +198,17 @@ public abstract class Interpreter
    */
   protected void defProcStFld(String name, String cname, String fname)
   {
-    StaticFieldConstraint.define(environ, name, cname, fname);
+    Object property = (hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION
+		       : null);
+    Symbol sym = getSymbol(name);
+    StaticFieldLocation.define(environ, sym, property,
+			       cname, fname);
   }
 
   /** Declare in the current Environment a procedure bound to a static field.
    * @param name the procedure's source-level name.
    * @param cname the name of the class containing the field.
-   * The name of the field is the manling of <code>name</code>.
+   * The name of the field is the mangling of <code>name</code>.
    */
   protected void defProcStFld(String name, String cname)
   {
@@ -224,7 +218,12 @@ public abstract class Interpreter
   /** Enter a named function into the current environment. */
   public final void defineFunction(Named proc)
   {
-    defineFunction(proc.getName(), proc);
+    Object name = proc.getSymbol();
+    Symbol sym = (name instanceof Symbol ? (Symbol) name
+		  : getSymbol(name.toString()));
+    Object property = (hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION
+		       : null);
+    environ.define(sym, property, proc);
   }
 
   /** Enter a function into the current environment.
@@ -232,7 +231,9 @@ public abstract class Interpreter
    **/
   public void defineFunction(String name, Object proc)
   {
-    environ.define(name, proc);
+    Object property = (hasSeparateFunctionNamespace() ? EnvironmentKey.FUNCTION
+		       : null);
+    environ.define(getSymbol(name), property, proc);
   }
 
   /** Import all the public fields of an object. */
@@ -248,7 +249,7 @@ public abstract class Interpreter
 	  {
 	    try
 	      {
-		defineFromFieldValue(name, field.get(object));
+		defineFromFieldValue(field, field.get(object));
 	      }
 	    catch (Throwable ex)
 	      {
@@ -263,17 +264,35 @@ public abstract class Interpreter
       }
   }
 
-  public void defineFromFieldValue(String name, Object part)
+  public void defineFromFieldValue(java.lang.reflect.Field fld, Object value)
     throws Throwable
   {
-    if (part instanceof Named)
-      name = ((Named) part).getName();
+    if (value instanceof NamedLocation)
+      environ.addLocation((NamedLocation) value);
     else
-      name = name.intern();
-    if (part instanceof Symbol)
-      environ.addSymbol((Symbol) part);
-    else
-      environ.define(name, part);
+      {
+	Object vname;
+	if (value instanceof Named)
+	  vname = ((Named) value).getSymbol();
+	else
+	  vname = null;
+	if (vname == null)
+	  vname = Compilation.demangleName(fld.getName(), true).intern();
+	Symbol symbol = vname instanceof Symbol ? (Symbol) vname
+	  : environ.getSymbol(vname.toString());
+	Object prop = getEnvPropertyFor(fld, value);
+	environ.define(symbol, prop, value);
+      }
+  }
+
+  public Object getEnvPropertyFor (java.lang.reflect.Field fld, Object value)
+  {
+    if (! hasSeparateFunctionNamespace())
+      return null;
+    if (Compilation.typeProcedure.getReflectClass()
+	.isAssignableFrom(fld.getType()))
+      return EnvironmentKey.FUNCTION;
+    return null;
   }
 
   public void loadClass(String name)
@@ -295,6 +314,11 @@ public abstract class Interpreter
       {
 	throw new WrappedException("cannot load "+name, ex);
       }
+  }
+
+  public Symbol getSymbol (String name)
+  {
+    return environ.getSymbol(name);
   }
 
   public Object lookup(String name)
@@ -342,7 +366,7 @@ public abstract class Interpreter
 
   public Environment getNewEnvironment ()
   {
-    return new Environment(environ);
+    return Environment.make(null, environ);
   }
 
   public abstract String getName();
@@ -524,8 +548,11 @@ public abstract class Interpreter
 
   public Procedure getPrompter()
   {
-    Symbol pr = Environment.getCurrentSymbol("default-prompter");
-    return pr == null ? null : pr.getProcedure();
+    Object property = null;
+    if (hasSeparateFunctionNamespace())
+      property = EnvironmentKey.FUNCTION;
+    return (Procedure) Environment.getCurrent()
+      .get(getSymbol("default-prompter"), property, null);
   }
 
   /** Return the result of evaluating a string as a source expression. */
@@ -624,54 +651,6 @@ public abstract class Interpreter
     if (messages.seenErrors())
       throw new RuntimeException("invalid syntax in eval form:\n"
 				 + messages.toString(20));
-  }
-
-  public Object getDefaultSymbolValue (Symbol sym, boolean function)
-  {
-    String uri = sym.getNamespaceURI();
-    String name = sym.getName();
-    if (function || ! hasSeparateFunctionNamespace())
-      {
-	if (uri != null && uri.startsWith("class:"))
-	  return ClassMethods.apply(uri.substring(6), name);
-      }
-    // Last restort - check for unresolved namespace prefix.
-    int colon = name.indexOf(':');
-    Environment env = sym.getEnvironment();
-    if (colon >= 0 & env != null)
-      {
-	String prefix = (NAMESPACE_PREFIX+name.substring(0, colon)).intern();
-	Object uri_val = env.get(prefix, null);
-	if (uri_val == null && colon == 0)
-	  uri_val = "";
-	if (uri_val != null)
-	  {
-	    sym = Symbol.make(uri_val, name.substring(colon+1));
-	    return function ? getSymbolProcedure(sym)
-	      : getSymbolValue(sym);
-	  }
-      }
-    throw new UnboundSymbol(name);
-  }
-
-  public static Object getSymbolValue (Symbol sym)
-  {
-    Object val = sym.get(Symbol.UNBOUND);
-    if (val == Symbol.UNBOUND)
-      return getInterpreter().getDefaultSymbolValue(sym, false);
-    return val;
-  }
-
-  public static Procedure getSymbolProcedure (Symbol sym)
-  {
-    Object val = sym.getFunctionValue(Symbol.UNBOUND);
-    if (val == Symbol.UNBOUND)
-      {
-	val = sym.get(Symbol.UNBOUND);
-	if (val == Symbol.UNBOUND)
-	  val = getInterpreter().getDefaultSymbolValue(sym, true);
-      }
-    return (Procedure) val;
   }
 
   // The compiler finds registerEnvironment by using reflection.

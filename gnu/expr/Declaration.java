@@ -134,9 +134,16 @@ public class Declaration
       }
     else if (isIndirectBinding() && comp.immediate && getVariable() == null)
       {
+	// This is a bit of a kludge.  See comment in ModuleExp.evalModule.
+	Environment env = comp.getEnvironment();
 	Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
-	  : Environment.getCurrent().getSymbol(symbol.toString());
-	comp.compileConstant(sym, Target.pushValue(Compilation.typeLocation));
+	  : env.getSymbol(symbol.toString());
+	Object property = null;
+	if (isProcedureDecl()
+	    && comp.getInterpreter().hasSeparateFunctionNamespace())
+	  property = EnvironmentKey.FUNCTION;
+	gnu.mapping.Location loc = env.getLocation(sym, property);
+	comp.compileConstant(loc, Target.pushValue(Compilation.typeLocation));
       }
     else
       {
@@ -196,7 +203,7 @@ public class Declaration
   }
 
   /** This prefix is prepended to field names for unknown names. */
-  static final String UNKNOWN_PREFIX = "id$";
+  static final String UNKNOWN_PREFIX = "loc$";
 
   /** This prefix is used in field names for a declaration that has
    * both EXTERNAL_ACCESS and IS_PRIVATE set. */
@@ -311,7 +318,7 @@ public class Declaration
     return (flags & IS_NAMESPACE_PREFIX) != 0;
   }   
 
-  /** True if the value of the variable is the contents of a Symbol. */
+  /** True if the value of the variable is the contents of a Location. */
   public final boolean isIndirectBinding()
   { return (flags & INDIRECT_BINDING) != 0; }
   public final void setIndirectBinding(boolean indirectBinding)
@@ -454,26 +461,26 @@ public class Declaration
     setSimple(false);
   }
 
-  Method makeSymbolMethod = null;
+  Method makeLocationMethod = null;
 
-  /** Create a Symbol object, given that isIndirectBinding().
+  /** Create a Location object, given that isIndirectBinding().
       Assume the initial value is already pushed on the stack;
-      leaves initialized Symbol object on stack.  */
+      leaves initialized Location object on stack.  */
   public void pushIndirectBinding (Compilation comp)
   {
     CodeAttr code = comp.getCode();
     code.emitPushString(getName());
-    if (makeSymbolMethod == null)
+    if (makeLocationMethod == null)
       {
 	Type[] args = new Type[2];
 	args[0] = Type.pointer_type;
 	args[1] = Type.string_type;
-	makeSymbolMethod
-	  = Compilation.typeSymbol.addMethod("makeUninterned", args,
-					      Compilation.typeSymbol,
+	makeLocationMethod
+	  = Compilation.typeLocation.addMethod("make", args,
+					      Compilation.typeLocation,
 					      Access.PUBLIC|Access.STATIC);
       }
-    code.emitInvokeStatic(makeSymbolMethod);
+    code.emitInvokeStatic(makeLocationMethod);
   }
 
   public final Variable allocateVariable(CodeAttr code)
@@ -498,20 +505,6 @@ public class Declaration
 	  }
       }
     return var;
-  }
-
-  /** Generate code to initialize the location for this.
-      Assume the initial value is already pushed on the stack. */
-  public void initBinding (Compilation comp)
-  {
-    if (isIndirectBinding())
-      {
-	pushIndirectBinding(comp);
-	CodeAttr code = comp.getCode();
-	code.emitStore(getVariable());
-      }
-    else
-      compileStore(comp);
   }
 
   String filename;
@@ -610,9 +603,13 @@ public class Declaration
 	if (! (declValue instanceof ReferenceExp))
 	  break;
 	ReferenceExp rexp = (ReferenceExp) declValue;
-	if (rexp.binding == null)
+	Declaration orig = rexp.binding;
+	if (orig == null)
 	  break;
-	decl = rexp.binding;
+	if (orig.field != null && ! orig.field.getStaticFlag()
+	    && orig.base == null)
+	  break;
+	decl = orig;
       }
     return decl;
   }
@@ -645,7 +642,7 @@ public class Declaration
 	  ftype = Compilation.typeLocation;
       }
     else
-      ftype = (isIndirectBinding() ? Compilation.typeSymbol
+      ftype = (isIndirectBinding() ? Compilation.typeLocation
 	       : getType().getImplementationType());
 
     String fname = getName();

@@ -1,8 +1,9 @@
-// Copyright (c) 1999, 2001  Per M.A. Bothner.
+// Copyright (c) 1999, 2001, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Location
 import gnu.bytecode.*;
 
 /** An Expression to set (bind) or define a new value to a named variable.
@@ -81,38 +82,41 @@ public class SetExp extends Expression
   {
     Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
       : env.getSymbol(symbol.toString());
+    Object property = null;
+    Interpreter interp = Interpreter.getInterpreter();
+    if (isFuncDef()
+	&& interp.hasSeparateFunctionNamespace())
+      property = EnvironmentKey.FUNCTION;
+    if (binding != null
+        && ! (binding.context instanceof ModuleExp))
+      throw new Error ("internal error - SetExp.eval with lexical binding");
+
     if (isSetIfUnbound())
       {
-	if (! sym.isBound())
-	  sym.set(new_value.eval (env));
+	Location loc = env.getLocation(sym, property);
+	if (! loc.isBound())
+	  loc.set(new_value.eval (env));
 	if (getHasValue())
-	  return sym;
+	  return loc;
 	else
 	  return Interpreter.getInterpreter().noValue();
       }
 
     Object new_val = new_value.eval (env);
-
-    if (binding != null
-        && ! (binding.context instanceof ModuleExp))
-      throw new Error ("internal error - SetExp.eval with lexical binding");
     if (isDefining ())
       {
+	/*
 	if (binding != null && binding.isAlias())
-	  AliasConstraint.define(sym,
-				 (gnu.mapping.Location) new_val);
+	  env.addLocation(sym, null, (gnu.mapping.Location) new_val);
 	else
-	  sym.defineValue(new_val);
+	*/
+	env.define(sym, property, new_val);
       }
     else
       {
-	if (sym != null)
-	  sym.set(new_val);
-	else
-	  sym.defineValue(new_val);
-	//	  throw new UnboundSymbol (name);
+	env.put(sym, property, new_val);
       }
-    return getHasValue() ? new_val : Interpreter.getInterpreter().noValue();
+    return getHasValue() ? new_val : interp.noValue();
   }
 
   public void compile (Compilation comp, Target target)
@@ -170,14 +174,13 @@ public class SetExp extends Expression
 	  new_value.compile (comp, Target.Ignore);
 	else if (decl.isAlias() && isDefining())
 	  {
-	    if (!( decl.getValue() instanceof ReferenceExp))
-	      {
-		decl.load(comp);
-		new_value.compile (comp, Target.pushObject);
-		Method meth = ClassType.make("gnu.mapping.AliasConstraint")
-		  .getDeclaredMethod("define", 2);
-		code.emitInvokeStatic(meth);
-	      }
+	    decl.load(comp);
+	    ClassType locType
+	      = ClassType.make("gnu.mapping.IndirectableLocation");
+	    code.emitCheckcast(locType);
+	    new_value.compile(comp, Target.pushObject);
+	    Method meth = locType.getDeclaredMethod("setBase", 1);
+	    code.emitInvokeVirtual(meth);
 	  }
 	else if (decl.isIndirectBinding()
 		 && (isSetIfUnbound() || ! isDefining() || decl.isPublic()))
@@ -192,12 +195,12 @@ public class SetExp extends Expression
 		  }
 		code.pushScope();
 		code.emitDup();
-		Variable symVar = code.addLocal(Compilation.typeSymbol);
-		code.emitStore(symVar);
-		code.emitInvokeVirtual(Compilation.typeSymbol
+		Variable symLoc = code.addLocal(Compilation.typeLocation);
+		code.emitStore(symLoc);
+		code.emitInvokeVirtual(Compilation.typeLocation
 				       .getDeclaredMethod("isBound", 0));
 		code.emitIfIntEqZero();
-		code.emitLoad(symVar);
+		code.emitLoad(symLoc);
 	      }
 	    new_value.compile (comp, Target.pushObject);
 	    if (needValue && ! isSetIfUnbound())
@@ -205,8 +208,8 @@ public class SetExp extends Expression
 		code.emitDupX();
 		valuePushed = true;
 	      }
-	    String setterName = isFuncDef() ? "setFunctionValue" : "set";
-	    code.emitInvokeVirtual(Compilation.typeSymbol
+	    String setterName = "set";
+	    code.emitInvokeVirtual(Compilation.typeLocation
 				   .getDeclaredMethod(setterName, 1));
 	    if (isSetIfUnbound())
 	      {
@@ -218,7 +221,8 @@ public class SetExp extends Expression
 	  {
 	    decl.load(comp);
 	    new_value.compile(comp, Type.pointer_type);
-	    code.emitPutField(FluidLetExp.valueField);
+	    code.emitInvokeVirtual(Compilation.typeLocation
+				   .getDeclaredMethod("set", 1));
 	  }
 	else if (decl.isSimple ())
 	  {

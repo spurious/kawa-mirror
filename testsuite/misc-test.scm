@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 96)
+(test-init "Miscellaneous" 97)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -428,3 +428,9 @@
 (define (fie-1) (fie-2) (fie-3))
 (define (fie-4) (fie-3) (fie-3)) 
 (test #t 'names (and (procedure? fie-1) (procedure? fie-4)))
+
+;; Test from Jim White <jim@pagesmiths.com> - fails if --full-tailscalls.
+(define (systime) (invoke-static <java.lang.System> 'currentTimeMillis))
+(define systime-1 (systime))
+(define systime-2 (systime))
+(test #t >= systime-2 systime-1)

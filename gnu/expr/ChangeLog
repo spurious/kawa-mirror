@@ -1,3 +1,41 @@
+Sun Mar  7 17:28:59 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ApplyExp.java (compileToArray, compile):  Handle full tailcalls.
+	* Compilation.java:  Various new static fields.
+	(fwitchIndex, callStackContext):  New fields.
+	(findLiteral):  Check for null array elements.
+	(allocClass):  Set superType differently if handling tailscalls.
+	(addClass):  Some things are different if handling tailcalls.
+	* Declaration.java (assignField):  New field.
+	(ignorable):  Different rules for full tailcalls.
+	* FindTailCalls.java (walkBeginExp, walfIfExp):  Last expr is in
+	tail context only if whole expr is.
+	(walkLambdaExp):  Do setInlineOnly here, not  in FindCapturedVars.
+	* FindCapturedVars.java (walkLetExp):  Optimize letrec-style forms.
+	(walkLambdaExp):  Removed;  functionality handled by FindTailCalls.
+	(capture):  Handle full tail calls;  various bug fixes.
+	* LambdaExp.java (closureEnvField, closureEnv):  New fields.
+	(NEEDS_STATIC_LINK, CANNOT_INLINE):  New flags.
+	(getNeedsStaticLink, setNeedsStaticLink):  New methods.
+	(isClassGenerated, isHandlingTailCalls):  New methods.
+	(outerLambdaNotInline, declareClosureEnv, compileEnv):  New methods.
+	(thisVariable): New field.
+	(declareThis):  Set/use thisVariable.
+	(compile(Compilation)):  Save/restore comp.callStackContext.
+	(compileAlloc):  Simplify by using new closureEnvField.
+	(compile(Compilation,Target)):   Redo.  Preliminary cps support.
+	(addMethodFor):  Change call interface.  Various changes.
+	(loadHeapFrame, allocChildClasses):  Extensive changes.
+	(allocParameters, enterFunction):  Still more changes.
+	* ModuleBody.java (run):  No longer takes environment arguemnt.
+	* ModuleExp.java (evalModule):  ModuleBody.run no longer takes env.
+	* ObjectExp.java (compile):  Use compileEnd.
+	Update for new LambdaExp.addMethodFor.
+	* PrimProcedure.java (applyN):  Catch InvocationTargetException.
+	* TailTarget.java (compileFromStack):  New method, for full tailcalls.
+	* TryExp.java (compile):  Fix to handle more general Targets.
+	* Literal.java (emitArray):  Nothing to do if value is null.
+
 Fri Jan 15 20:30:58 1999  Per Bothner  <bothner@cygnus.com>
 
 	* ApplyExp.java (compile):  Even if a function is inlined, we

@@ -197,46 +197,17 @@ public class Method implements AttrContainer {
   /**
    * Comple code to push the contents of a local variable onto the statck.
    * @param var The variable whose contents we want to push.
+   * @deprecated
    */
-  public void push_var (Variable var) { compile_push_value (var); }
-  public void compile_push_value (Variable var) {
-    if (var.dead ())
-      throw new Error ("attempting to push dead variable");
-    int offset = var.offset;
-    if (offset < 0 || !var.isSimple ())
-      throw new Error ("attempting to load from unassigned variable "+var
-+" simple:"+var.isSimple ()+", offset: "+offset);
-    Type type = var.getType().promote ();
-    int kind;
-    prepareCode(4);
-    if (type == Type.int_type)
-      kind = 0; // iload??
-    else if (type == Type.long_type)
-      kind = 1; // lload??
-    else if (type == Type.float_type)
-      kind = 2; // float??
-    else if (type == Type.double_type)
-      kind = 3; // dload??
-    else
-      kind = 4; // aload??
-    if (offset <= 3)
-      code.put1(26 + 4 * kind + offset);  // [ilfda]load_[0123]
-    else
-      {
-	if (offset >= 256)
-	  {
-	    code.put1(196); // wide
-	    code.put1(offset >> 8);
-	  }
-	code.put1(21 + kind);  // [ilfda]load
-	code.put1(offset);
-      }
-    push_stack_type (var.getType());
-  }
-
+  public void push_var (Variable var) { code.emitLoad (var); }
   /**
+   * @deprecated
+   */
+  public void compile_push_value (Variable var) { code.emitLoad(var); }
+
+  /** 
     * @deprecated
-    */
+   */
   public void compile_store_value (Variable var)
   {
     code.emitStore(var);

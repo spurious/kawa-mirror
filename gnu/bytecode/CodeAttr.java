@@ -552,6 +552,46 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(Type.pointer_type);
   }
 
+  /**
+   * Comple code to push the contents of a local variable onto the statck.
+   * @param var The variable whose contents we want to push.
+   */
+  public final void emitLoad (Variable var)
+  {
+    if (var.dead())
+      throw new Error("attempting to push dead variable");
+    int offset = var.offset;
+    if (offset < 0 || !var.isSimple())
+      throw new Error ("attempting to load from unassigned variable "+var
+		       +" simple:"+var.isSimple()+", offset: "+offset);
+    Type type = var.getType().promote();
+    int kind;
+    reserve(4);
+    if (type == Type.int_type)
+      kind = 0; // iload??
+    else if (type == Type.long_type)
+      kind = 1; // lload??
+    else if (type == Type.float_type)
+      kind = 2; // float??
+    else if (type == Type.double_type)
+      kind = 3; // dload??
+    else
+      kind = 4; // aload??
+    if (offset <= 3)
+      put1(26 + 4 * kind + offset);  // [ilfda]load_[0123]
+    else
+      {
+	if (offset >= 256)
+	  {
+	    put1(196); // wide
+	    put1(offset >> 8);
+	  }
+	put1(21 + kind);  // [ilfda]load
+	put1(offset);
+      }
+    pushType(var.getType());
+  }
+
   public void emitStore (Variable var)
   {
    if (var.dead ())
@@ -662,7 +702,6 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       emitTransfer (label, opcode); // goto label or jsr label
-    unreachable_here = true;
   }
 
   /** Compile an unconditional branch (goto).
@@ -671,6 +710,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitGoto (Label label)
   {
     emitGoto(label, 167);
+    unreachable_here = true;
   }
 
   public void emitRet (Variable var)
@@ -743,6 +783,14 @@ public class CodeAttr extends Attribute implements AttrContainer
       unreachable_here = true;
     // Pop the if_stack.
     if_stack = if_stack.previous;
+  }
+
+  public final void emitThrow ()
+  {
+    popType();
+    reserve(1);
+    put1 (191);  // athrow
+    unreachable_here = true;
   }
 
   /**
@@ -837,7 +885,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitCatchEnd();
       }
-    ClassType type = (ClassType) var.getType();
+    ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
     addHandler(try_stack.start_pc, try_stack.end_pc,
 	       PC, type, getConstants());
@@ -851,10 +899,12 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void emitCatchEnd()
   {
-    if (try_stack.finally_subr != null)
-      emitGoto(try_stack.finally_subr, 168); // jsr
     if (reachableHere())
-      emitGoto(try_stack.end_label);
+      {
+	if (try_stack.finally_subr != null)
+	  emitGoto(try_stack.finally_subr, 168); // jsr
+	emitGoto(try_stack.end_label);
+      }
     popScope();
     try_stack.try_type = null;
   }
@@ -867,13 +917,21 @@ public class CodeAttr extends Attribute implements AttrContainer
 	emitCatchEnd();
       }
 
+    pushScope();
+    Type except_type = Type.pointer_type;
+    Variable except = addLocal(except_type);
     emitCatchStart(null);
+    pushType(except_type);
+    emitStore(except);
+    emitGoto(try_stack.finally_subr, 168); // jsr
+    emitLoad(except);
+    emitThrow();
+    
     //emitCatchEnd();
     
     //if (try_stack.finally_subr == null)
     // error();
     try_stack.finally_subr.define(this);
-    pushScope();
     Type ret_addr_type = Type.pointer_type;
     try_stack.finally_ret_addr = addLocal(ret_addr_type);
     pushType(ret_addr_type);
@@ -943,7 +1001,6 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final int getLength()
   {
-    int exception_table_length = 0;
     return 12 + getCodeLength() + 8 * exception_table_length
       + Attribute.getLengthAll(this);
   }
@@ -954,8 +1011,16 @@ public class CodeAttr extends Attribute implements AttrContainer
     dstr.writeShort (max_locals);
     dstr.writeInt (PC);
     dstr.write (code, 0, PC);
-    int exception_table_length = 0;  /* FIXME */
+
     dstr.writeShort (exception_table_length);
+    int count = exception_table_length;
+    for (int i = 0;  --count >= 0;  i += 4)
+      {
+	dstr.writeShort(exception_table[i]);
+	dstr.writeShort(exception_table[i+1]);
+	dstr.writeShort(exception_table[i+2]);
+	dstr.writeShort(exception_table[i+3]);
+      }
 
     Attribute.writeAll(this, dstr);
   }

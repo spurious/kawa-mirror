@@ -35,6 +35,17 @@ public class ClassFileInput extends DataInputStream
     readMethods();
     readAttributes(ctype);
   }
+ 
+  /** Read a class (in .class format) from an InputStream.
+    * @return A new ClassType object representing the class that was read.
+    */
+  public static ClassType readClassType (InputStream str)
+       throws IOException, ClassFormatError
+  {
+    ClassType ctype = new ClassType();
+    ClassFileInput reader = new ClassFileInput(ctype, str);
+    return ctype;
+  }
 
   public boolean readHeader () throws IOException
   {
@@ -76,15 +87,19 @@ public class ClassFileInput extends DataInputStream
       }
 
     int nInterfaces = readUnsignedShort();
-    ctype.interfaces = new ClassType[nInterfaces];
-    ctype.interfaceIndexes = new int[nInterfaces];
-    for (int i = 0;  i < nInterfaces;  i++)
+    if (nInterfaces > 0)
       {
-	ctype.interfaceIndexes[i] = readUnsignedShort();
-	clas = (CpoolClass) ctype.constants.getForced(ctype.superClassIndex,
-						      ConstantPool.CLASS);
-	name = clas.name.string;
-	ctype.interfaces[i] = ClassType.make(name.replace('/', '.'));
+	ctype.interfaces = new ClassType[nInterfaces];
+	ctype.interfaceIndexes = new int[nInterfaces];
+	for (int i = 0;  i < nInterfaces;  i++)
+	  {
+	    int index = readUnsignedShort();
+	    ctype.interfaceIndexes[i] = index;
+	    clas = (CpoolClass) ctype.constants.getForced(index,
+							  ConstantPool.CLASS);
+	    name = clas.name.string.replace('/', '.');
+	    ctype.interfaces[i] = ClassType.make(name);
+	  }
       }
   }
 

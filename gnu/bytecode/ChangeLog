@@ -1,3 +1,16 @@
+Sun Dec 14 15:55:22 1997  Per Bothner  <bothner@cygnus.com>
+
+	* ClassFileInput.java (readClassType):
+	(readClassInfo):  Read interface indexes correctly.
+
+	* CodeAttr.java (emitLoad, emitThrow):  New methods.
+	Fix various problems with exception table support.
+	* Method.java (compile_push_value):  Replaced by CodeAttr.emitLoad.
+
+	* ZipMember.java (getData):  New method, based on ZipArchive.contents.
+	* ZipArchive.java (contents):  Move to ZipMember.  Update callers.
+	* ZipLoader.java:  Re-write to use java.util.zip.ZipFile.
+
 Thu Nov 27 21:22:16 1997  Per Bothner  <bothner@cygnus.com>
 
 	* TryState.java:  New class, for exception handling.

@@ -453,9 +453,10 @@ popular alternate setting."
 
 ;; Trash me, baby.
 (defsubst delete-forward-p ()
-  (and delete-key-deletes-forward
-       (or (not (eq (device-type) 'x))
-	   (x-keysym-on-keyboard-sans-modifiers-p 'backspace))))
+;  (and delete-key-deletes-forward
+;       (or (not (eq (device-type) 'x))
+;	   (x-keysym-on-keyboard-sans-modifiers-p 'backspace))))
+  delete-key-deletes-forward)
 
 (defun backward-or-forward-delete-char (arg)
   "Delete either one character backwards or one character forwards.

@@ -1,3 +1,8 @@
+2001-11-26  Per Bothner  <per@bothner.com>
+
+	* simple.el (delete-forward-p):  Simplify so it works for us.
+	* lisp/keydefs.el:  Add kp-left, kp-right, kp-up, kp-down, and delete.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* primitives.el (boundp):  Update fully-qualified-name of Symbol.

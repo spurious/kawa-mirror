@@ -508,12 +508,12 @@ Keymap for characters following C-c.")
 (define-key global-map 'right		'forward-char-command)
 (define-key global-map 'up		'previous-line)
 (define-key global-map 'down		'next-line)
-#|
+
 (define-key global-map 'kp-left		'backward-char-command)
 (define-key global-map 'kp-right	'forward-char-command)
 (define-key global-map 'kp-up		'previous-line)
 (define-key global-map 'kp-down		'next-line)
-
+#|
 ;; movement by pages
 (define-key global-map 'prior		'scroll-down-command)
 (define-key global-map 'next		'scroll-up-command)
@@ -585,9 +585,10 @@ Keymap for characters following C-c.")
 (define-key global-map '(meta kp-prior)	'scroll-other-window-down)
 (define-key global-map '(meta kp-home)	'beginning-of-buffer-other-window)
 (define-key global-map '(meta kp-end)	'end-of-buffer-other-window)
-
+|#
 ;; the infamous delete key
 (define-key global-map 'delete	        'backward-or-forward-delete-char)
+#|
 (define-key global-map '(meta delete)	'backward-or-forward-kill-word)
 (define-key global-map [(control x) (delete)]
 				        'backward-or-forward-kill-sentence)

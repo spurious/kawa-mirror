@@ -92,21 +92,43 @@ public class GenericProc extends MethodProc
 
   public int match (CallContext ctx, Object[] args)
   {
-    int code = 0;
-    CallContext mvars = new CallContext();
+    if (count == 1)
+      return methods[0].match(ctx, args);
+    MethodProc best = null;
+    CallContext vars = null;
+    CallContext bestVars = null;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
-        code = method.match(mvars, args);
-        if (code == 0)
+	if (vars == null)
+          vars = new CallContext();
+	int code = method.match(vars, args);
+	if (code == 0)
           {
-            ctx.value1 = method;
-            ctx.value2 = mvars;
-            return 0;
+            if (best == null)
+              {
+                best = method;
+                bestVars = vars;
+                vars = null;
+              }
+            else
+              {
+                best = MethodProc.mostSpecific(best, method);
+                if (best == method)
+                  {
+                    bestVars = vars;
+                    vars = null;
+                  }
+              }
+            
           }
       }
-    if (count == 1)
-      return code;
+    if (best != null)
+      {
+	ctx.value1 = best;
+	ctx.value2 = bestVars;
+	return 0;
+      }
     return NO_MATCH;
   }
 

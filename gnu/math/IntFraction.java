@@ -34,15 +34,11 @@ public class IntFraction extends RatNum implements Externalizable
   {
     if (obj instanceof RatNum)
       return RatNum.compare (this, (RatNum) obj);
-    if (! (obj instanceof RealNum))
-      throw new IllegalArgumentException ();
     return ((RealNum)obj).compareReversed(this);
   }
 
   public int compareReversed (Numeric x)
   {
-    if (!(x instanceof RatNum))
-      throw new IllegalArgumentException ();
     return RatNum.compare ((RatNum) x, this);
   }
 

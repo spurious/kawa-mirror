@@ -4,6 +4,9 @@
 package gnu.math;
 
 public abstract class RealNum extends Complex
+  /* BEGIN JAVA2 */
+  implements Comparable
+  /* END JAVA2 */
 {
   public final RealNum re() { return this; }
   public final RealNum im() { return IntNum.zero(); }
@@ -207,4 +210,13 @@ public abstract class RealNum extends Complex
     return Long.toString((long) f);
   }
   */
+
+  /** Implements the Comparable interface.
+   * This ordering isn't fully consistent with equals, since say
+   * it returns 0 when comparing 1.5 and 3/2, though they are not equals.
+   */
+  public int compareTo(Object o)
+  {
+    return compare(o);
+  }
 }

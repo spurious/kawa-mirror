@@ -241,8 +241,6 @@ public class IntNum extends RatNum implements Externalizable
   {
     if (obj instanceof IntNum)
       return compare (this, (IntNum) obj);
-    if (! (obj instanceof RealNum))
-      throw new IllegalArgumentException ();
     return ((RealNum)obj).compareReversed (this);
   }
 

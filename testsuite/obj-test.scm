@@ -1,4 +1,4 @@
-(test-init "Objects" 81)
+(test-init "Objects" 82)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -176,6 +176,8 @@
 
 (require <module3>)
 (test 0 list-length-4 '())
+
+(test 24 'factorial-4 factorial-4)
 
 (require <classes1>)
 (require <classes2>)

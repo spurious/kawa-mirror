@@ -2,6 +2,8 @@
 
 (require <module1>)
 
+(define factorial-4 (my-factorial 4))
+
 (define (list-length-4 arg)
   (list-length-2 arg))
 

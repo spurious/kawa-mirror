@@ -1,3 +1,9 @@
+2003-07-16  Per Bothner  <per@bothner.com>
+
+	* module1.scm (my-factorial):  New test case, base of bug reported
+	2003-03-19 by Chris.Dean@sokitomi.com.
+	* module3.scm, obj-test.scm:  Call my-factorial.
+
 2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* classes1.scm (<SimpleDateTest>): Add for invoke-special test.

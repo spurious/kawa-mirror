@@ -11,6 +11,7 @@ import gnu.lists.*;
 
 public class Shell
 {
+  static private int counter;
   private static Class[] noClasses = { };
   private static  Class[] boolClasses = { Boolean.TYPE };
   private static  Class[] xmlPrinterClasses
@@ -211,7 +212,11 @@ public class Shell
 		  break;
 		if (sawError)
 		  continue;
-		comp.getModule().setName("atInteractiveLevel");  // FIXME
+		// We increment and append counter purely to ease debugging.
+		// Since each module gets its own ClassLoader, they don't
+		// need to be named differently.  (And it doesn't matter
+		// if there is a race condition on counter.)
+		comp.getModule().setName("atInteractiveLevel$"+(++counter));
 
 		// Skip whitespace, in case somebody calls (read-char) or similar.
 		int ch;

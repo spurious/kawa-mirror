@@ -1,3 +1,8 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (counter):  New field.
+	(run):  Increment and append counter to generated class name.
+
 2004-07-31  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java:  Update copyright year printed by --version.

@@ -34,15 +34,11 @@ public class TypeSwitch extends MethodProc implements CanInline, Inlineable
       {
 	MethodProc caseProc = (MethodProc) ctx.getNextArg();
 	// FIXME this does not work.
-	if (caseProc.match(ctx, args) >= 0)
-	  {
-	    caseProc.apply(ctx);
-	    return;
-	  }
+	if (caseProc.matchN(args, ctx) >= 0)
+	  return;
       }
     Procedure defaultProc = (Procedure) ctx.getNextArg();
-    ctx.setArgs();
-    defaultProc.apply(ctx);
+    defaultProc.check0(ctx);
   }
 
   public Expression inline (ApplyExp exp, ExpWalker walker)

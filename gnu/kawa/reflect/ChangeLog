@@ -1,3 +1,8 @@
+2004-08-08  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (applyN):  Use new matchN method.  Don't use applyV.
+	* TypeSwitch.java (apply):  Use new matchN/check0 methods.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* TypeSwitch.java:  Extend MethodProc instead of CpsProcedure.

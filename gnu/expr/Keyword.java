@@ -55,7 +55,7 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
 
   public void print(java.io.PrintWriter ps)
   {
-    Symbol.print(name, ps);
+    Symbols.print(name, ps);
     ps.print(':');
   }
 

@@ -249,7 +249,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    for (int j = 0;  j < num_identifiers;  j++)
 	      {
 		String name = macro.templateIdentifiers[j];
-		String renamed_symbol = Symbol.makeUninterned (name);
+		String renamed_symbol = new String(name);
 		vars[rule.num_variables + j] = renamed_symbol;
 		Object captured = macro.capturedDeclarations == null ? null
 		  : macro.capturedDeclarations[j];

@@ -1,3 +1,8 @@
+2002-10-28  Per Bothner  <per@bothner.com>
+
+	The classes gnu.expr.Symbol and gnu.commonlisp.lang.Symbol were
+	renamed to gnu.expr.Symbols and gnu.commonlisp.lang.Symbols.
+
 2002-10-22  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Print file and line on IOException.

@@ -7,7 +7,7 @@ import java.awt.Color;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.text.Char;
-import gnu.commonlisp.lang.Symbol; // FIXME
+import gnu.commonlisp.lang.Symbols; // FIXME
 import javax.swing.text.*; // FIXME
 
 public abstract class Buffer extends AbstractSequence implements CharSeq
@@ -478,7 +478,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
    */
   public static void makeBufferLocal(Object symbol, boolean all)
   {
-    BufferLocalConstraint.make(Symbol.getBinding(symbol), all);
+    BufferLocalConstraint.make(Symbols.getBinding(symbol), all);
   }
 
   public abstract char charAt(int index);

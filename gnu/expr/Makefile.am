@@ -52,7 +52,7 @@ java_sources = \
   SetExp.java \
   Special.java \
   StackTarget.java \
-  Symbol.java \
+  Symbols.java \
   SynchronizedExp.java \
   Target.java \
   ThisExp.java \

@@ -26,9 +26,8 @@
 (define (%defmacro form rule)
   (rule (car (form 'form))))
 
-(define (gentemp)
-  ((primitive-static-method <gnu.expr.Symbol> "gentemp"
-			    <symbol> ())))
+(define (gentemp) :: <symbol>
+  (invoke-static <gnu.expr.Symbols> 'gentemp))
 
 (define-syntax when (syntax-rules ()
 				  ((when cond exp ...)

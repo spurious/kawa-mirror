@@ -61,7 +61,7 @@ public class ELisp extends Lisp2
 
   protected void defun(String name, Object value)
   {
-    gnu.commonlisp.lang.Symbol.setFunctionBinding(environ, name, value);
+    gnu.commonlisp.lang.Symbols.setFunctionBinding(environ, name, value);
     if (value instanceof Named)
       {
 	Named n = (Named) value;
@@ -261,7 +261,7 @@ public class ELisp extends Lisp2
       environ.addBinding((Binding) part);
     else if (part instanceof Procedure
 	     || part instanceof kawa.lang.Syntax)
-      gnu.commonlisp.lang.Symbol.setFunctionBinding(environ, name, part);
+      gnu.commonlisp.lang.Symbols.setFunctionBinding(environ, name, part);
     else
       environ.define(name, part);
   }

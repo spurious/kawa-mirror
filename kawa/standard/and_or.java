@@ -32,7 +32,7 @@ public class and_or extends Syntax implements Printable
       return tr.rewrite (pair.car);
     Expression[] inits = new Expression[1];
     LetExp let = new LetExp (inits);
-    String temp_name = Symbol.generate ();
+    String temp_name = Symbols.generate();
     Declaration temp_decl = let.addDeclaration (temp_name);
     inits[0] = tr.rewrite (pair.car);
     temp_decl.noteValue (inits[0]);

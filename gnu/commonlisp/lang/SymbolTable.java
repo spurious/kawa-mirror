@@ -62,7 +62,7 @@ public class SymbolTable extends Environment implements Externalizable
    */
   public Object getFunction(String name)
   {
-    return Symbol.getFunctionBinding(this, name);
+    return Symbols.getFunctionBinding(this, name);
   }
 
   /** Set the function binding for a symbol.
@@ -70,7 +70,7 @@ public class SymbolTable extends Environment implements Externalizable
    */
   public void putFunction(String name, Object value)
   {
-    Symbol.setFunctionBinding(this, name, value);
+    Symbols.setFunctionBinding(this, name, value);
   }
 
   /**

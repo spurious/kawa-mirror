@@ -153,7 +153,7 @@ java_sources = \
   CLispReader.java \
   Lisp2.java \
   defun.java setq.java defvar.java \
-  Symbol.java \
+  Symbols.java \
   SymbolTable.java \
   UnwindProtect.java \
   CommonLisp.java

@@ -7,10 +7,10 @@ import java.io.PrintWriter;
   * Note Scheme symbols are represented using java.lang.String objects,
   * and there are no Symbol objects. */
 
-public class Symbol
+public class Symbols
 {
   /** There are no instances of this class. */
-  private Symbol ()
+  private Symbols ()
   {
   }
 
@@ -74,7 +74,7 @@ public class Symbol
    */
   public static final String gentemp ()
   {
-    return Symbol.make("GS." + Integer.toString(++gensym_counter));
+    return Symbols.make("GS." + Integer.toString(++gensym_counter));
   }
 
   /**

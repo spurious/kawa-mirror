@@ -138,7 +138,7 @@ public class load extends Procedure1 {
 	SourceMessages messages = new SourceMessages();
 	Compilation comp = CompileFile.read(port, messages);
 	ModuleExp mexp = comp.getModule();
-	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
+	mexp.setName(Symbols.make(LambdaExp.fileFunctionName));
 	CallContext ctx = CallContext.getInstance();
 	Consumer save = ctx.consumer;
 	try

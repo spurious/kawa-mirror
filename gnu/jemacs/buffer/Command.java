@@ -12,7 +12,7 @@ public class Command
     for (;;)
       {
 	if (command instanceof String)
-	  command = gnu.commonlisp.lang.Symbol.getBinding(command);
+	  command = gnu.commonlisp.lang.Symbols.getBinding(command);
 	if (command instanceof Binding)
 	  {
 	    Binding bind = (Binding) command;

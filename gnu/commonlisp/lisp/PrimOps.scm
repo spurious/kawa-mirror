@@ -17,15 +17,15 @@
 ;; SYMBOLS
 
 (define (boundp symbol) :: <clisp:boolean>
-  ((primitive-static-method <gnu.commonlisp.lang.Symbol> "isBound"
+  ((primitive-static-method <gnu.commonlisp.lang.Symbols> "isBound"
                             <boolean> (<object>))
    symbol))
 
 (define (symbolp x) :: <clisp:boolean>
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'isSymbol x))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'isSymbol x))
 
 (define (symbol-name symbol)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'getPrintName symbol))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'getPrintName symbol))
 
 ;(define (make-symbol NAME) ...)
 
@@ -38,24 +38,24 @@
 ;; unintern
 
 ;;(define (symbol-plist symbol)
-;;  (invoke-static <gnu.commonlisp.lang.Symbol> 'getPropertyList symbol))
+;;  (invoke-static <gnu.commonlisp.lang.Symbols> 'getPropertyList symbol))
 
 ;;(define (setplist symbol plist)
-;;  (invoke-static <gnu.commonlisp.lang.Symbol> 'setPropertyList symbol plist)
+;;  (invoke-static <gnu.commonlisp.lang.Symbols> 'setPropertyList symbol plist)
 ;;  plist)
 
 (define (plist-get plist prop #!optional default)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'plistGet plist prop default))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistGet plist prop default))
 
 (define (plist-put plist prop value)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'plistPut plist prop value))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistPut plist prop value))
 
 (define (plist-remprop plist prop)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'plistRemove plist prop))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'plistRemove plist prop))
 
 (define (plist-member plist prop)
   (if (eq?
-       (invoke-static <gnu.commonlisp.lang.Symbol> 'plistGet plist prop #!void)
+       (invoke-static <gnu.commonlisp.lang.Symbols> 'plistGet plist prop #!void)
        #!void)
       '() 't))
 
@@ -71,14 +71,14 @@
 ;;     binding nor a global value.
 
 (define (symbol-value sym)
-  (invoke (invoke-static <gnu.commonlisp.lang.Symbol> 'getBinding sym) 'get))
+  (invoke (invoke-static <gnu.commonlisp.lang.Symbols> 'getBinding sym) 'get))
 
 ;; setq
 
 ;(define (make-symbol NAME)  ...)
 
 (define (set symbol value)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'setValueBinding symbol value))
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'setValueBinding symbol value))
 
 #|
 (define (add-to-list symbol value)
@@ -93,7 +93,7 @@
 ;; symbol's function cell is void, a `void-function' error is signaled.
 
 (define (symbol-function symbol)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'getFunctionBinding
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'getFunctionBinding
 		 symbol))
 
 ;(define (fboundp x) ..)
@@ -101,7 +101,7 @@
 ;(fmakunboud symbol)
 
 (define (fset symbol object)
-  (invoke-static <gnu.commonlisp.lang.Symbol> 'setFunctionBinding
+  (invoke-static <gnu.commonlisp.lang.Symbols> 'setFunctionBinding
 		 (invoke-static <gnu.mapping.Environment> 'getCurrent)
 		 symbol object))
 

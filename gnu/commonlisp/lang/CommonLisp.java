@@ -59,7 +59,7 @@ public class CommonLisp extends Lisp2
 
   protected void defun(String name, Object value)
   {
-    Symbol.setFunctionBinding(environ, name, value);
+    Symbols.setFunctionBinding(environ, name, value);
     if (value instanceof Named)
       {
 	Named n = (Named) value;
@@ -219,7 +219,7 @@ public class CommonLisp extends Lisp2
       environ.addBinding((Binding) part);
     else if (part instanceof Procedure
 	     || part instanceof kawa.lang.Syntax)
-      Symbol.setFunctionBinding(environ, name, part);
+      Symbols.setFunctionBinding(environ, name, part);
     else
       environ.define(name, part);
   }

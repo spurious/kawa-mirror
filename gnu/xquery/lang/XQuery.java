@@ -62,7 +62,7 @@ public class XQuery extends Interpreter
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     gnu.text.SourceMessages messages = lexer.getMessages();
-    Compilation tr = new Compilation(messages);
+    Compilation tr = new Compilation(this, messages);
     ModuleExp mexp = new ModuleExp();
     tr.push(mexp);
     tr.mustCompileHere();
@@ -82,7 +82,7 @@ public class XQuery extends Interpreter
     throws java.io.IOException, gnu.text.SyntaxException
   {
     Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Compilation tr = new Compilation(messages);
+    Compilation tr = new Compilation(this, messages);
     tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());

@@ -1,3 +1,11 @@
+2003-04-19  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (lexical):  New field, moved from Translation.
+	(<init>):  Initialize lexical field.
+	(pus, pop):  Also call corresponding operations on lexical.
+	(push(Declaration)):  New method.
+	(lookup):  Just call lexical.lookup.
+
 2003-04-18  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (compile):  Do nothing if target is IgnoreTarget,

@@ -737,13 +737,14 @@ public class Compilation
 
   public Compilation (boolean immediate, SourceMessages messages)
   {
+    this(messages);
     this.immediate = immediate;
-    this.messages = messages;
   }
 
   public Compilation (SourceMessages messages)
   {
     this.messages = messages;
+    lexical = new NameLookup(getInterpreter());
   }
 
   /** Create a new Compilation environment.
@@ -1669,10 +1670,12 @@ public class Compilation
       mustCompileHere();
     scope.outer = current_scope;
     current_scope = scope;
+    lexical.push(scope);
   }
 
   public void pop (ScopeExp scope)
   {
+    lexical.pop(scope);
     current_scope = scope.outer;
   }
 
@@ -1681,16 +1684,14 @@ public class Compilation
     pop(current_scope);
   }
 
+  public void push (Declaration decl)
+  {
+    lexical.push(decl);
+  }
+
   public Declaration lookup(Object name, int namespace)
   {
-    Interpreter interp = getInterpreter();
-    for (ScopeExp scope = current_scope;  scope != null;  scope = scope.outer)
-      {
-	Declaration decl = scope.lookup(name, interp, namespace);
-	if (decl != null)
-	  return decl;
-      }
-    return null;
+    return lexical.lookup(name, namespace);
   }
 
   /** Called for classes referenced in bytecode.
@@ -1745,6 +1746,9 @@ public class Compilation
   {
     messages.setLine(filename, line, column);
   }
+
+  /** Current lexical scope - map name to Declaration. */
+  public final NameLookup lexical;
 
   protected ScopeExp current_scope;
 

@@ -1,3 +1,7 @@
+Wed Feb 18 22:14:57 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm (input-port-column-number):  Fix parenthesis error.
+
 Mon Feb 16 17:15:21 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ports.scm (input-port?, output-port?, call-with-input-string):

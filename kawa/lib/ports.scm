@@ -40,10 +40,10 @@
    port (- num 1)))
 
 (define (input-port-column-number port)
-  ((+ 1
-      ((primitive-virtual-method <kawa.lang.LineBufferedReader>
-				 "getColumnNumber" <int> ())
-       port))))
+  (+ 1
+     ((primitive-virtual-method <kawa.lang.LineBufferedReader>
+				"getColumnNumber" <int> ())
+      port)))
 
 (define (default-prompter port)
   (let ((state (input-port-read-state port)))

@@ -16,6 +16,8 @@ java_JAVA=\
   IntFraction.java \
   MPN.java \
   IntNum.java \
-  BitOps.java
+  BitOps.java \
+  FixedRealFormat.java \
+  ExponentialFormat.java
 
 EXTRA_DIST = overview.html

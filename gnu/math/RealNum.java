@@ -163,4 +163,48 @@ public abstract class RealNum extends Complex
     else
       return DComplex.sqrt(d, 0);
   }
+
+  /** Convert double to (rounded) integer, after multiplying by 10**k. */
+  public static IntNum toScaledInt (double f, int k)
+  {
+    return toScaledInt(DFloNum.toExact(f), k);
+  }
+
+  /** Convert rational to (rounded) integer, after multiplying by 10**k. */
+  public static IntNum toScaledInt (RatNum r, int k)
+  {
+    if (k != 0)
+      {
+	IntNum power = IntNum.power(IntNum.ten(), k < 0 ? -k : k);
+	IntNum num = r.numerator();
+	IntNum den = r.denominator();
+	if (k >= 0)
+	  num = IntNum.times(num, power);
+	else
+	  den = IntNum.times(den, power);
+	r = RatNum.make(num, den);
+      }
+    return r.toExactInt(ROUND);
+  }
+
+  /** Convert this to (rounded) integer, after multiplying by 10**k. */
+  public IntNum toScaledInt (int k)
+  {
+    return toScaledInt(toExact(), k);
+  }
+
+  /*
+  public static String toScaledIntString (double f, int k)
+  {
+    switch (k)
+      {
+      case 0:  break;
+      case 1:  f = f * 10;  break;
+      case 2:  f = f * 100;  break;
+      case 3:  f = f * 1000;  break;
+      default: return toScaledInt(f, k).toString();
+      }
+    return Long.toString((long) f);
+  }
+  */
 }

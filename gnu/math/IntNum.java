@@ -63,6 +63,11 @@ public class IntNum extends RatNum implements Compilable
     return smallFixNums[1 - minFixNum];
   }
 
+  public static final IntNum ten ()
+  {
+    return smallFixNums[10 - minFixNum];
+  }
+
   /** Return the IntNum for -1. */
   public static IntNum minusOne ()
   {
@@ -1001,65 +1006,78 @@ public class IntNum extends RatNum implements Compilable
     return result.canonicalize ();
   }
 
+  public void format (int radix, StringBuffer buffer)
+  {
+    if (words == null)
+      buffer.append(Integer.toString (ival, radix));
+    else if (ival <= 2)
+      buffer.append(Long.toString (longValue (), radix));
+    else
+      {
+	boolean neg = isNegative ();
+	int[] work;
+	if (neg || radix != 16)
+	  {
+	    work = new int[ival];
+	    getAbsolute (work);
+	  }
+	else
+	  work = words;
+	int len = ival;
+
+	int buf_size = len * (MPN.chars_per_word (radix) + 1);
+	if (radix == 16)
+	  {
+	    if (neg)
+	      buffer.append ('-');
+	    int buf_start = buffer.length ();
+	    for (int i = len;  --i >= 0; )
+	      {
+		int word = work[i];
+		for (int j = 8;  --j >= 0; )
+		  {
+		    int hex_digit = (word >> (4 * j)) & 0xF;
+		    // Suppress leading zeros:
+		    if (hex_digit > 0 || buffer.length () > buf_start)
+		      buffer.append (Character.forDigit (hex_digit, 16));
+		  }
+	      }
+	  }
+	else
+	  {
+	    int i = buffer.length();
+	    for (;;)
+	      {
+		int digit = MPN.divmod_1 (work, work, len, radix);
+		buffer.append (Character.forDigit (digit, radix));
+		while (len > 0 && work[len-1] == 0) len--;
+		if (len == 0)
+		  break;
+	      }
+	    if (neg)
+	      buffer.append ('-');
+	    /* Reverse buffer. */
+	    int j = buffer.length () - 1;
+	    while (i < j)
+	      {
+		char tmp = buffer.charAt (i);
+		buffer.setCharAt (i, buffer.charAt (j));
+		buffer.setCharAt (j, tmp);
+		i++;  j--;
+	      }
+	  }
+      }
+  }
+
   public String toString (int radix)
   {
     if (words == null)
       return Integer.toString (ival, radix);
     else if (ival <= 2)
       return Long.toString (longValue (), radix);
-    boolean neg = isNegative ();
-    int[] work;
-    if (neg || radix != 16)
-      {
-	work = new int[ival];
-	getAbsolute (work);
-      }
-    else
-      work = words;
-    int len = ival;
-
-    int buf_size = len * (MPN.chars_per_word (radix) + 1);
+    int buf_size = ival * (MPN.chars_per_word (radix) + 1);
     StringBuffer buffer = new StringBuffer (buf_size);
-    if (radix == 16)
-      {
-	if (neg)
-	  buffer.append ('-');
-	int buf_start = buffer.length ();
-	for (int i = len;  --i >= 0; )
-	  {
-	    int word = work[i];
-	    for (int j = 8;  --j >= 0; )
-	      {
-		int hex_digit = (word >> (4 * j)) & 0xF;
-		// Suppress leading zeros:
-		if (hex_digit > 0 || buffer.length () > buf_start)
-		  buffer.append (Character.forDigit (hex_digit, 16));
-	      }
-	  }
-      }
-    else
-      {
-	for (;;)
-	  {
-	    int digit = MPN.divmod_1 (work, work, len, radix);
-	    buffer.append (Character.forDigit (digit, radix));
-	    while (len > 0 && work[len-1] == 0) len--;
-	    if (len == 0)
-	      break;
-	  }
-	if (neg)
-	  buffer.append ('-');
-	/* Reverse buffer. */
-	int i = 0;
-	int j = buffer.length () - 1;
-	while (i < j)
-	  {
-	    char tmp = buffer.charAt (i);
-	    buffer.setCharAt (i, buffer.charAt (j));
-	    buffer.setCharAt (j, tmp);
-	    i++;  j--;
-	  }
-      }
+    format(radix, buffer);
     return buffer.toString ();
   }
 

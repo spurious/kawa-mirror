@@ -1,3 +1,13 @@
+1999-06-30  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (ten):  New static method.
+	(format(int,StringBuffer)):  New method.
+	(toString):  Uses new format method.
+	* RealNum.java (toScaledInt):  New methods.
+	* ExponentialFormat.java:  New Format class.
+	* FixedRealFormat.java:  New format class.
+	* Makefile.am, Makefile.in (java_JAVA):  Update for new classes.
+
 Tue Feb  2 15:12:38 1999  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (add):  Re-order operands in expression to work-around

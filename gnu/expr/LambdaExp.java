@@ -925,8 +925,6 @@ public class LambdaExp extends ScopeExp
 	    comp.addClass(frameType);
 	  }
 	heapFrame.setType(frameType);
-	if (! Compilation.usingTailCalls) // FIXME
-	this.type = frameType;
       }
   }
 

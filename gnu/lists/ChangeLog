@@ -1,3 +1,9 @@
+2004-05-04  Per Bothner  <per@bothner.com>
+
+	* LList.java:  Implement Comparable, if JAVA2.
+	(compareTo):  New method.
+	* Pair.java (compareTo):  Two new methods.
+
 2004-04-22  Per Bothner  <per@bothner.com>
 
 	* FString.java:  Implement Comparable, if JAVA2.

@@ -184,6 +184,48 @@ public class Pair extends LList implements Externalizable
       }
   }
 
+  /* BEGIN JAVA2 */
+  static public int compareTo (Pair pair1, Pair pair2)
+  {
+    if (pair1 == pair2)
+      return 0;
+    if (pair1 == null )
+      return -1;
+    if (pair2 == null)
+      return 1;
+    for (;;)
+      {
+	Object x1 = pair1.car;
+	Object x2 = pair2.car;
+	int d = ((Comparable) x1).compareTo((Comparable) x2);
+	if (d != 0)
+	  return d;
+	x1 = pair1.cdr;
+	x2 = pair2.cdr;
+	if (x1 == x2)
+	  return 0;
+	if (x1 == null)
+	  return -1;
+	if (x2 == null)
+	  return 1;
+	if (! (x1 instanceof Pair) || !(x2 instanceof Pair))
+	  return ((Comparable) x1).compareTo((Comparable) x2);
+	pair1 = (Pair) x1;
+	pair2 = (Pair) x2;
+      
+      }
+  }
+
+  
+  public int compareTo(Object obj)
+  {
+    if (obj == Empty)
+      return 1;
+    else
+      return compareTo(this, (Pair) obj);
+  }
+  /* END JAVA2 */
+
   public Object get (int index)
   {
     Pair pair = this;

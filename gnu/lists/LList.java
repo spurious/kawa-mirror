@@ -17,7 +17,11 @@ import java.io.*;
  * @author	Per Bothner
  */
 
-public class LList extends ExtSequence implements Sequence, Externalizable
+public class LList extends ExtSequence
+  implements Sequence, Externalizable
+  /* BEGIN JAVA2 */
+  , Comparable
+  /* END JAVA2 */
 {
   /** Do not use - only public for serialization! */
   public LList () { }
@@ -74,6 +78,14 @@ public class LList extends ExtSequence implements Sequence, Externalizable
     // Over-ridden in Pair!
     return this == obj;
   }
+
+  /* BEGIN JAVA2 */
+  public int compareTo(Object obj)
+  {
+    // Over-ridden in Pair!
+    return obj == Empty ? 0 : -1;
+  }
+  /* END JAVA2 */
 
   public int size()
   {

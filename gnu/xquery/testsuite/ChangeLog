@@ -1,3 +1,8 @@
+2003-07-10  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  New tests based on bugs reported by Francois Leygues
+	<vizawalou@wanadoo.fr> 6/17 and 7/5.
+
 2003-06-27  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  New test based on report from vizawalou@wanadoo.fr.

@@ -201,10 +201,17 @@ public class TestMisc
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
 
+    // Based on bugs reported by Francois Leygues <vizawalou@wanadoo.fr>:
     evalTest("let $bx := <b x='xx'></b> return"
 	     + " let $x := <a>{for $y in $bx return $y}</a>"
 	     + "  return $x/b",
 	     "<b x=\"xx\" />");
+    evalTest("element r {let $y := <b x='1'/>"
+	     + " let $x:=<a>{$y}</a> return $x/b/@x}",
+	     "<r x=\"1\" />");
+    evalTest("let $y := <b x='1'/>"
+	     + " let $x:=<a>{$y}</a> return $x/b/@x",
+	     " x=\"1\"");
 
     // Testcase from <Seshukumar_Adiraju@infosys.com>:
     evalTest("let $books := "

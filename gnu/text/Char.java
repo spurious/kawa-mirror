@@ -21,9 +21,9 @@ import java.util.Hashtable;
 
 public class Char
   implements
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   Comparable,
-  /* END JAVA2 */
+  /* #endif */
   Externalizable
 {
   // Leave open the possibility for characters beyond Unicode.

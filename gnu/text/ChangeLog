@@ -1,3 +1,7 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* Char.java: Change "select" (preprocessor) syntax.
+
 2005-01-01  Per Bothner  <per@bothner.com>
 
 	* LiteralFormat.java (content): New method.

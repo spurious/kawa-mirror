@@ -28,7 +28,7 @@ public class Shell
 	      }
 
 	    Object sexp = inp.readSchemeObject ();
-	    if (sexp==Interpreter.eofObject)
+	    if (sexp == Sequence.eofValue)
 	      {
 		if (prompt)
 		  pout.println ();
@@ -102,22 +102,25 @@ public class Shell
     run (str_port, interp, false, dflag);
   }
 
-  public static void runFile (String fname, Interpreter interp,
-			      boolean dflag)
+  public static void runFile (String fname)
   {
     try
       {
-	
 	InPort iport;
 	if (fname.equals ("-"))
 	  iport = InPort.inDefault ();
 	else
 	  iport = new InPort (new FileInputStream(fname), fname);
-	run (iport, interp, false, dflag);
+	kawa.standard.load.loadSource (iport, Environment.user ());
       }
     catch (FileNotFoundException e)
       {
-	System.out.println("Cannot open file "+fname);
+	System.err.println("Cannot open file "+fname);
+	System.exit(1);
+      }
+    catch (Exception e)
+      {
+	e.printStackTrace(System.err);
 	System.exit(1);
       }
   }

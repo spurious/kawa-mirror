@@ -1,3 +1,7 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* srfi1.scm (map-in-order):  Define as an alias for map.
+
 2003-09-04  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm (response-status, error-response):  HTTP requires a space

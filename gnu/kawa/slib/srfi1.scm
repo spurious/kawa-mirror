@@ -1,6 +1,5 @@
 ;; FIXME - optimize or remove call-cc uses
 ;; FIXME - map for-each are also defined here
-;; FIXME - map-in-order?
 
 ;;; SRFI-1 list-processing library 			-*- Scheme -*-
 ;;; Reference implementation
@@ -980,10 +979,7 @@
 ; 		  (x (f (car lis))))		; Do head first,
 ; 	      (cons x (recur tail)))))))	; then tail.
 
-
-; ;;; We extend MAP to handle arguments of unequal length.
-; (define map map-in-order)	
-; COMMENTED OUT BY MARCO VEZZOLI FOR KAWA
+(define map-in-order map)
 
 ;;; filter, remove, partition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

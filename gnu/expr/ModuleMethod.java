@@ -22,13 +22,13 @@ public class ModuleMethod extends MethodProc
   private int numArgs;
 
   public ModuleMethod(ModuleBody module, int selector,
-                      String name, int numArgs)
+                      Object name, int numArgs)
   {
     this.module = module;
     this.selector = selector;
     this.numArgs = numArgs;
     if (name != null)
-      setName(name);
+      setSymbol(name);
   }
 
   /** Figure out parameter types.

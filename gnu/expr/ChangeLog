@@ -1,5 +1,14 @@
 2003-10-08  Per Bothner  <per@bothner.com>
 
+	* Declaration (makeField):  If name is a Symbol for an indirect
+	binding (e.g. a top-level XQuery variable), compile name to field.
+	* FindCapturedVars.java (walkFluidLetExp, walkReferenceExp,
+	walkSetExp):  Pass name as Object, not String, to allocUnboundDecl.
+	(allocUnboundDecl):  Variable name may be Symbol. not just String.
+	* ProcInitializer.java (emitLoadModuleMethod):  If Procedure has a
+	nameDecl, use its symbol, which in XQuery or CLisp may be a Symbol.
+	* ModuleMethod.java (<init>):  Name can be a Symbol or a String.
+
 	* FindTailCalls.java (walkApplyExp):  If function is append-values,
 	then last operand may be a tail-call.
 

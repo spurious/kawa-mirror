@@ -568,6 +568,11 @@ public class Declaration
     else
       ftype = (isIndirectBinding() ? Compilation.typeSymbol
 	       : getType().getImplementationType());
+    if (isIndirectBinding() && symbol instanceof Symbol)
+      {
+	field = comp.compileConstantToField(symbol);
+	return;
+      }
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {

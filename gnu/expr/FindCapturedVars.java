@@ -104,7 +104,7 @@ public class FindCapturedVars extends ExpWalker
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
-	Declaration bind = allocUnboundDecl(decl.getName());
+	Declaration bind = allocUnboundDecl(decl.getSymbol());
 	capture(bind);
 	decl.base = bind;
       }
@@ -161,7 +161,6 @@ public class FindCapturedVars extends ExpWalker
   {
     if (! (decl.getCanRead() || decl.getCanCall()))
       return;
-
     if (decl.field != null && decl.field.getStaticFlag())
       return;
     if (decl.getFlag(Declaration.IS_CONSTANT)
@@ -302,7 +301,7 @@ public class FindCapturedVars extends ExpWalker
   Hashtable unknownDecls = null;
   ModuleExp currentModule = null;
 
-  Declaration allocUnboundDecl(String name)
+  Declaration allocUnboundDecl(Object name)
   {
     Declaration decl;
     if (unknownDecls == null)
@@ -332,7 +331,7 @@ public class FindCapturedVars extends ExpWalker
     Declaration decl = exp.getBinding();
     if (decl == null)
       {
-	decl = allocUnboundDecl(exp.getName());
+	decl = allocUnboundDecl(exp.getSymbol());
 	exp.setBinding(decl);
       }
     capture(Declaration.followAliases(decl));
@@ -351,7 +350,7 @@ public class FindCapturedVars extends ExpWalker
     Declaration decl = exp.binding;
     if (decl == null)
       {
-	decl = allocUnboundDecl(exp.getName());
+	decl = allocUnboundDecl(exp.getSymbol());
 	exp.binding = decl;
       }
     capture(Declaration.followAliases(decl));

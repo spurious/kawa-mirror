@@ -35,11 +35,9 @@ public class ProcInitializer extends Initializer
     else
       code.emitPushThis();
     code.emitPushInt(proc.getSelectorValue(comp));
-    String name = proc.getName();
-    if (name == null)
-      code.emitPushNull();
-    else
-      code.emitPushString(name);
+    comp.compileConstant(proc.nameDecl != null ? proc.nameDecl.getSymbol()
+			 : proc.getName(),
+			 Target.pushObject);
     code.emitPushInt(proc.min_args | (proc.max_args << 12));
     Method initModuleMethod = procClass.getDeclaredMethod("<init>", 4);
     code.emitInvokeSpecial(initModuleMethod);

@@ -21,7 +21,8 @@
 (require 'generic-write)
 
 ;; Determine the case of digits > 9.  We assume this to be constant.
-(define-constant stdio:hex-upper-case? (string=? "-F" (number->string -15 16)))
+(define-constant stdio:hex-upper-case? :: <boolean>
+  (string=? "-F" (number->string -15 16)))
 
 ;; Parse the output of NUMBER->STRING and pass the results to PROC.
 ;; PROC takes (SIGN-CHARACTER DIGIT-STRING EXPONENT-INTEGER . IMAGPART)

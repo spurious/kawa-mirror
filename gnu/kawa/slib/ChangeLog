@@ -1,3 +1,7 @@
+2002-07-24  Per Bothner  <per@bothner.com>
+
+	* printf.scm (stdio:hex-upper-case?):  Add type specification.
+
 2002-07-23  Per Bothner  <per@bothner.com>
 
 	* XML.scm (parse-xml-from-url):  Indate to invoke correct method.

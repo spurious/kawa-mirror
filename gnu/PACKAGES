@@ -1,14 +1,19 @@
 This is the master list of Java packages under the "gnu" top-level package.
-If you want your package added, contact Per Bothner <bothner@cygnus.com>.
-Any packages under "gnu" must be freely restributable, though they do not
-have to use the GNU General Public License.  However, we encourage
-people to use the GPL for Java applications;  for re-usable Java
-libraries, a modified GPL (as used by gnu.bytecode and gnu.math)
-may be apporpriate.
+
+If you want your package added, contact gnu-java@prep.ai.mit.edu.
+Any packages under "gnu" must be free software.  For the precise
+definition of this, see http://www.gnu.ai.mit.edu/philosophy/free-sw.html.
+There are various ways of making a program free; we recommend
+copyleft, and specifically the GNU General Public License.
+See http://www.gnu.ai.mit.edu/philosophy/categories.html for
+an explanation of these categories.
+If you would like our advice in choosing a way of making a program
+free that meets your goals, please contact gnu@prep.ai.mit.edu.
 
 gnu.bytecode:  A package to create, read, write, and print .class files.
   Author:  Per Bothner <bothner@cygnus.com>
-  License:  Modified GPL (no restrictions if code used unchanged).
+  Copying conditions:  GPL plus special extra permissions
+    (no restrictions if code used unchanged).
   Distributed with Kawa.
   See:  http:/www.cygnus/com/~/bothner/kawa.html.
 
@@ -18,6 +23,7 @@ gnu.c2j:  A translator to help convert C++ programs to Java.
 
 gnu.math:  Complex numbers, rationals, bignums, units, other kinds of numbers.
   Author:  Per Bothner <bothner@cygnus.com>
-  License:  Modified GPL (no restrictions if code used unchanged).
+  Copying conditions:  GPL plus special extra permissions
+    (no restrictions if code used unchanged).
   Distributed with Kawa.
   See:  http:/www.cygnus/com/~/bothner/kawa.html.

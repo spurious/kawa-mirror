@@ -1,3 +1,7 @@
+2002-03-19  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Add two tests of position().
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* bids.xml.in, items.xml.in, users.xml.in:  New test data files.

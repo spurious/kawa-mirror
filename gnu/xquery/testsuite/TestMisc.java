@@ -82,6 +82,10 @@ public class TestMisc
 	     "<fld2 align=\"right\">12</fld2>");
     evalTest("(document(\"tab.xml\")/result/row/*)[2 to 3]",
 	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1>");
+    evalTest("(document(\"tab.xml\")/result/row/*)[position()>1]",
+	     "<fld2 align=\"right\">12</fld2><fld1 align=\"left\">b1</fld1><fld2 align=\"right\">22</fld2>");
+    evalTest("(document(\"tab.xml\")/result/row/*)[position()>1][2]",
+	     "<fld1 align=\"left\">b1</fld1>");
 
     evalTest("document(\"tab.xml\")/result/row/(fld2,fld1)",
 	     "<fld2 align=\"right\">12</fld2><fld1>a1</fld1><fld2 align=\"right\">22</fld2><fld1 align=\"left\">b1</fld1>");

@@ -1,3 +1,8 @@
+2003-02-19  Per Bothner  <per@bothner.com>
+
+	* ValueStack.java (oindex, find):  Field and methods moved to
+	TreeList.  Not much left in this class ...
+
 2003-01-09  Per Bothner  <per@bothner.com>
 
 	* Values.java:  Update for new gnu.lists APIs.

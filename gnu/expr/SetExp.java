@@ -305,7 +305,7 @@ public class SetExp extends Expression
     if (binding == null || symbol.toString() != binding.getName())
       {
 	out.print('/');
-	SFormat.print (symbol, out);
+	out.print(symbol);
       }
     if (binding != null)
       {

@@ -108,7 +108,7 @@ public class ModuleExp extends LambdaExp
 	    /* DEBUGGING:
 	    OutPort out = OutPort.errDefault();
 	    out.print("init["+init.index+"]=");
-	    SFormat.print(init.value, out);
+	    out.print(init.value);
 	    out.println();
 	    */
 	    try

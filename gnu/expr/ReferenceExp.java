@@ -152,7 +152,7 @@ public class ReferenceExp extends Expression
 	&& (binding == null || symbol.toString() != binding.getName()))
       {
 	ps.print('/');
-	SFormat.print (symbol, ps);
+	ps.print(symbol);
       }
     if (binding != null)
       {

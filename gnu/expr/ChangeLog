@@ -1,3 +1,8 @@
+2003-06-06  Per Bothner  <per@bothner.com>
+
+	* InlineCalls.java (rewriteToInvocation, walkApplyExp):  Call setLine
+	to copy line number info on newly allocated ApplyExp.
+
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (inlinedIn):  New helper method.

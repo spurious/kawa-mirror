@@ -20,8 +20,9 @@ public class InlineCalls extends ExpWalker
   }
 
   /** Possibly convert a Symbol method call to invokeStatic or make. */
-  Expression rewriteToInvocation(Symbol sym, Expression[] args)
+  Expression rewriteToInvocation(Symbol sym, ApplyExp aexp)
   {
+    Expression[] args = aexp.args;
     String uri = sym.getNamespaceURI();
     if (uri == null || ! uri.startsWith("class:"))
       return null;
@@ -51,7 +52,9 @@ public class InlineCalls extends ExpWalker
     if (! isNew)
       xargs[1] = new QuoteExp(methodName);
     args = xargs;
-    return invProc.inline(new ApplyExp(new ReferenceExp(invDecl), args), this);
+    ApplyExp nexp = new ApplyExp(new ReferenceExp(invDecl), args);
+    nexp.setLine(aexp);
+    return invProc.inline(nexp, this);
   }
 
   protected Expression walkApplyExp(ApplyExp exp)
@@ -76,7 +79,7 @@ public class InlineCalls extends ExpWalker
 	else if (rexp.getSymbol() instanceof Symbol)
 	  {
 	    Expression inv
-	      = rewriteToInvocation((Symbol) rexp.getSymbol(), exp.args);
+	      = rewriteToInvocation((Symbol) rexp.getSymbol(), exp);
 	    if (inv != null)
 	      return inv;
 	  }
@@ -102,12 +105,17 @@ public class InlineCalls extends ExpWalker
 					   comp.getInterpreter());
 	    if (mproc != null)
 	      {
+		ApplyExp nexp;
 		if (mproc.getStaticFlag())
-		  return new ApplyExp(mproc, exp.args);
-		Expression[] margs = new Expression[1 + nargs];
-		System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
-		margs[0] = new ReferenceExp(decl.base);
-		return new ApplyExp(mproc, margs);
+		  nexp = new ApplyExp(mproc, exp.args);
+		else
+		  {
+		    Expression[] margs = new Expression[1 + nargs];
+		    System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+		    margs[0] = new ReferenceExp(decl.base);
+		    nexp = new ApplyExp(mproc, margs);
+		  }
+		return nexp.setLine(exp);
 	      }
 	  }
       }

@@ -7,6 +7,8 @@ import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
 import gnu.lists.*;
 import gnu.text.Lexer;
+import gnu.text.SourceMessages;
+import java.io.*;
 
 /**
  * Contains various language-dependent methods.
@@ -316,12 +318,13 @@ public abstract class Interpreter
 
   public abstract String getName();
 
-  public abstract Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+  public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
   public abstract ModuleExp parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException;
 
-  public abstract ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages);
+  public abstract ModuleExp parseFile (InPort port, SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException;
 
   public abstract Type getTypeFor(Class clas);
 
@@ -446,6 +449,85 @@ public abstract class Interpreter
   {
     Binding pr = Environment.getCurrentBinding("default-prompter");
     return pr == null ? null : pr.getProcedure();
+  }
+
+  /** Return the result of evaluating a string as a source expression. */
+  public final Object eval (String string) throws Throwable
+  {
+    return eval(new CharArrayInPort(string));
+  }
+
+  /** Evaluate expression(s) read from a Reader.
+   * This just calls eval(InPort).
+   */
+  public final Object eval (Reader in) throws Throwable
+  {
+    return eval(in instanceof InPort ? (InPort) in : new InPort(in));
+  }
+
+  /** Evaluate expression(s) read from an InPort. */
+  public final Object eval (InPort port) throws Throwable
+  {
+    CallContext ctx = CallContext.getInstance();
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = ctx.vstack;
+	ctx.values = Values.noArgs;
+	eval(port, ctx);
+	return Values.make((gnu.lists.TreeList) ctx.vstack);
+      }
+    finally
+      {
+	ctx.vstack.clear();
+	ctx.consumer = save;
+      }
+  }
+
+  /** Evaluate a string and write the result value(s) on a Writer. */
+  public final void eval (String string, Writer out) throws Throwable
+  {
+    eval(string, out instanceof Consumer ? (Consumer) out : new OutPort(out));
+  }
+  
+
+  /** Evaluate a string and write the result value(s) to a Consumer. */
+  public final void eval (String string, Consumer out) throws Throwable
+  {
+    eval(new CharArrayInPort(string), out);
+  }
+
+  /** Read expressions from a Reader and write the result to a Writer. */
+  public final void eval (Reader in, Writer out) throws Throwable
+  {
+    eval(in, out instanceof Consumer ? (Consumer) out : new OutPort(out));
+  }
+
+  /** Read expressions from a Reader and write the result to a Consumer. */
+  public void eval (Reader in, Consumer out) throws Throwable
+  {
+    InPort port = in instanceof Reader ? (InPort) in : new InPort(in);
+    CallContext ctx = CallContext.getInstance();
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = out;
+	eval(port, ctx);
+      }
+    finally
+      {
+	ctx.consumer = save;
+      }
+  }
+
+  public void eval (InPort port, CallContext ctx) throws Throwable
+  {
+    SourceMessages messages = new SourceMessages();
+    ModuleExp mod = parseFile(port, messages);
+    if (messages.seenErrors())
+      throw new RuntimeException("invalid syntax in eval form:\n"
+				 + messages.toString(20));
+    mod.evalModule(environ, ctx);
   }
 
   // The compiler finds registerEnvironment by using reflection.

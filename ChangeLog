@@ -1,5 +1,7 @@
 2001-10-11  Per Bothner  <per@bothner.com>
 
+	* config.guess:  Import new version.
+
 	* configure.in:  Set version to 1.6.96.
 
 	* confgure.in:  New --enable-servlet flag.

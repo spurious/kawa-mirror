@@ -12,42 +12,76 @@
     <TD><STRONG>Implemented/Version</STRONG></TD>
     <TD><STRONG>Notes</STRONG></TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 4.1</STRONG>
+<TR><TD><STRONG>Section 4.1</STRONG>
+    <TD COLSPAN=2><STRONG>Primitive expressions types</STRONG>
+<TR><TD><STRONG>Section 4.1.1</STRONG>
+    <TD COLSPAN=2><STRONG>Variable Expressions</STRONG>
+<TR><TD><STRONG>Section 4.1.2</STRONG>
+    <TD COLSPAN=2><STRONG>Literal Expressions</STRONG>
 <TR><TD>quote<TD>yes/0.1<TD>
+<TR><TD><STRONG>Section 4.1.3</STRONG>
+    <TD COLSPAN=2><STRONG>Procedure calls</STRONG>
+<TR><TD><STRONG>Section 4.1.4</STRONG>
+    <TD COLSPAN=2><STRONG>Lambda Expressions</STRONG>
 <TR><TD>lambda<TD>yes/0.1<TD>
-<TR><TD>set!<TD>yes/0.1<TD>
-<TR><TD>set-car!<TD>yes/0.2<TD>
-<TR><TD>set-cdr!<TD>yes/0.2<TD>
+<TR><TD><STRONG>Section 4.1.5</STRONG>
+    <TD COLSPAN=2><STRONG>Conditionals</STRONG>
 <TR><TD>if<TD>yes/0.1<TD>
+<TR><TD><STRONG>Section 4.1.6</STRONG>
+    <TD COLSPAN=2><STRONG>Assignments</STRONG>
+<TR><TD>set!<TD>yes/0.1<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 4.2</STRONG>
-<TR><TD>cond<TD>no<TD>
+<TR><TD><STRONG>Section 4.2</STRONG>
+    <TD COLSPAN=2><STRONG>Derived expressions types</STRONG>
+<TR><TD><STRONG>Section 4.2.1</STRONG>
+    <TD COLSPAN=2><STRONG>Conditionals</STRONG>
+<TR><TD>cond<TD>yes/0.3<TD>
 <TR><TD>case<TD>no<TD>
 <TR><TD>and<TD>yes/0.1<TD>
 <TR><TD>or<TD>yes/0.1<TD>
+<TR><TD><STRONG>Section 4.2.2</STRONG>
+    <TD COLSPAN=2><STRONG>Binding constructs</STRONG>
 <TR><TD>let<TD>yes/0.1<TD>
-<TR><TD>let*<TD>no<TD>
+<TR><TD>let*<TD>yes/0.3<TD>
 <TR><TD>letrec<TD>no<TD>
+<TR><TD><STRONG>Section 4.2.3</STRONG>
+    <TD COLSPAN=2><STRONG>Sequencing</STRONG>
 <TR><TD>begin<TD>yes/0.1<TD>
+<TR><TD><STRONG>Section 4.2.4</STRONG>
+    <TD COLSPAN=2><STRONG>Iteration</STRONG>
 <TR><TD>do<TD>no<TD>
+<TR><TD><STRONG>Section 4.2.5</STRONG>
+    <TD COLSPAN=2><STRONG>Sequencing</STRONG>
 <TR><TD>delay<TD>no<TD>
+<TR><TD><STRONG>Section 4.2.6</STRONG>
+    <TD COLSPAN=2><STRONG>Quasiquotation</STRONG>
 <TR><TD>quasiquote<TD>no<TD>
 <TR><TD>unquote<TD>no<TD>
 <TR><TD>unquote-splicing<TD>no<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 5.1</STRONG>
+<TR><TD><STRONG>Section 5</STRONG>
+    <TD COLSPAN=2><STRONG>Program Structure</STRONG>
+<TR><TD><STRONG>Section 5.1</STRONG>
+    <TD COLSPAN=2><STRONG>Programs</STRONG>
+<TR><TD><STRONG>Section 5.2</STRONG>
+    <TD COLSPAN=2><STRONG>Definitions</STRONG>
 <TR><TD>define<TD>yes/0.1<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.1</STRONG>
+<TR><TD><STRONG>Section 6</STRONG>
+    <TD COLSPAN=2><STRONG>Standard procedures</STRONG>
+<TR><TD><STRONG>Section 6.1</STRONG>
+    <TD COLSPAN=2><STRONG>Booleans</STRONG>
 <TR><TD>not<TD>yes/0.1<TD>
 <TR><TD>boolean?<TD>yes/0.1<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.2</STRONG>
+<TR><TD><STRONG>Section 6.2</STRONG>
+    <TD COLSPAN=2><STRONG>Equivalence predicates</STRONG>
 <TR><TD>eqv?<TD>yes/0.1<TD>
 <TR><TD>eq?<TD>yes/0.1<TD>
 <TR><TD>equal?<TD>yes/0.1<TD>vectors and lists aren't recursively checked yet...
 
-<TR><TD COLSPAN=3><STRONG>Section 6.3</STRONG>
+<TR><TD><STRONG>Section 6.3</STRONG>
+    <TD COLSPAN=2><STRONG>Pairs and lists</STRONG>
 <TR><TD>pair?<TD>yes/0.1<TD>
 <TR><TD>cons<TD>yes/0.1<TD>
 <TR><TD>car<TD>yes/0.1<TD>
@@ -96,12 +130,14 @@
 <TR><TD>assv<TD>yes/0.1<TD>
 <TR><TD>assoc<TD>yes/0.1<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.4</STRONG>
+<TR><TD><STRONG>Section 6.4</STRONG>
+    <TD COLSPAN=2><STRONG>Symbols</STRONG>
 <TR><TD>symbol?<TD>yes/0.1<TD>
 <TR><TD>symbol->string<TD>yes/0.1<TD>
 <TR><TD>string->symbol<TD>yes/0.1<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.5</STRONG>
+<TR><TD><STRONG>Section 6.5</STRONG>
+    <TD COLSPAN=2><STRONG>Numbers</STRONG>
 <TR><TD>number?<TD>yes/0.1<TD>
 <TR><TD>complex?<TD>no<TD>Complex numbers are not supported yet.
 <TR><TD>real?<TD>yes/0.1<TD>
@@ -156,7 +192,8 @@
 <TR><TD>number->string<TD>no<TD>
 <TR><TD>string->number<TD>no<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.6</STRONG>
+<TR><TD><STRONG>Section 6.6</STRONG>
+    <TD COLSPAN=2><STRONG>Characters</STRONG>
 <TR><TD>char?<TD>yes/0.1<TD>
 <TR><TD>char=?<TD>yes/0.1<TD>
 <TR><TD>char<?<TD>yes/0.1<TD>
@@ -176,41 +213,44 @@
 <TR><TD>char->integer<TD>no<TD>
 <TR><TD>integer->char<TD>no<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.7</STRONG>
+<TR><TD><STRONG>Section 6.7</STRONG>
+    <TD COLSPAN=2><STRONG>Strings</STRONG>
 <TR><TD>string?<TD>yes/0.1<TD>
 <TR><TD>make-string<TD>yes/0.1<TD>
 <TR><TD>string<TD>yes/0.1<TD>
 <TR><TD>string-length<TD>yes/0.1<TD>
 <TR><TD>string-ref<TD>yes/0.1<TD>
 <TR><TD>string-set!<TD>yes/0.1<TD>
-<TR><TD>string=?<TD>no<TD>
-<TR><TD>string<?<TD>no<TD>
-<TR><TD>string>?<TD>no<TD>
-<TR><TD>string<=?<TD>no<TD>
-<TR><TD>string>=?<TD>no<TD>
-<TR><TD>string-ci=?<TD>no<TD>
-<TR><TD>string-ci<?<TD>no<TD>
-<TR><TD>string-ci>?<TD>no<TD>
-<TR><TD>string-ci<=?<TD>no<TD>
-<TR><TD>string-ci>=?<TD>no<TD>
-<TR><TD>substring<TD>no<TD>
-<TR><TD>string->list<TD>no<TD>
-<TR><TD>list->string<TD>no<TD>
-<TR><TD>string-copy<TD>no<TD>
-<TR><TD>string-fill!<TD>no<TD>
+<TR><TD>string=?<TD>yes/0.3<TD>
+<TR><TD>string<?<TD>yes/0.3<TD>
+<TR><TD>string>?<TD>yes/0.3<TD>
+<TR><TD>string<=?<TD>yes/0.3<TD>
+<TR><TD>string>=?<TD>yes/0.3<TD>
+<TR><TD>string-ci=?<TD>yes/0.3<TD>
+<TR><TD>string-ci<?<TD>yes/0.3<TD>
+<TR><TD>string-ci>?<TD>yes/0.3<TD>
+<TR><TD>string-ci<=?<TD>yes/0.3<TD>
+<TR><TD>string-ci>=?<TD>yes/0.3<TD>
+<TR><TD>substring<TD>yes/0.3<TD>
+<TR><TD>string->list<TD>yes/0.3<TD>
+<TR><TD>list->string<TD>yes/0.3<TD>
+<TR><TD>string-copy<TD>yes/0.3<TD>
+<TR><TD>string-fill!<TD>yes/0.3<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.8</STRONG>
+<TR><TD><STRONG>Section 6.8</STRONG>
+    <TD COLSPAN=2><STRONG>Vectors</STRONG>
 <TR><TD>vector?<TD>yes/0.1<TD>
 <TR><TD>make-vector<TD>yes/0.1<TD>
 <TR><TD>vector<TD>yes/0.1<TD>
 <TR><TD>vector-length<TD>yes/0.1<TD>
 <TR><TD>vector-ref<TD>yes/0.1<TD>
 <TR><TD>vector-set!<TD>yes/0.1<TD>
-<TR><TD>vector->list<TD>no<TD>
-<TR><TD>list->vector<TD>no<TD>
-<TR><TD>vector-fill!<TD>no<TD>
+<TR><TD>vector->list<TD>yes/0.3<TD>
+<TR><TD>list->vector<TD>yes/0.3<TD>
+<TR><TD>vector-fill!<TD>yes/0.3<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.9</STRONG>
+<TR><TD><STRONG>Section 6.9</STRONG>
+    <TD COLSPAN=2><STRONG>Control features</STRONG>
 <TR><TD>procedure?<TD>yes/0.1<TD>
 <TR><TD>apply<TD>yes/0.1<TD>
 <TR><TD>map<TD>no<TD>
@@ -218,7 +258,8 @@
 <TR><TD>force<TD>no<TD>
 <TR><TD>call-with-current-continuation<TD>no<TD>
 
-<TR><TD COLSPAN=3><STRONG>Section 6.10</STRONG>
+<TR><TD><STRONG>Section 6.10</STRONG>
+    <TD COLSPAN=2><STRONG>Input and output</STRONG>
 <TR><TD>call-with-input-port<TD>no<TD>
 <TR><TD>input-port?<TD>no<TD>
 <TR><TD>output-port?<TD>no<TD>

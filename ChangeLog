@@ -1,3 +1,19 @@
+Fri Jun 28 17:47:12 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/standard/cond.java:  Re-write to use recursion.
+
+Fri Jun 28 15:02:21 1996  R. Alexander Milowski <sgml@winternet.com>
+
+	* kawa/standard/{list2string,list2vector,string2list,string_append,
+	string_ci_equal_p,string_ci_greaterthan_p,string_ci_greaterthanequal_p,
+	string_ci_lessthan_p,string_ci_lessthanequal_p,string_copy,
+	string_equal_p,string_fill_b,string_greaterthan_p,
+	string_greaterthanequal_p,string_lessthan_p,string_lessthanequal_p,
+	substring,vector2list,vector_fill_b}.java:  New classes.
+	* kawa/standard/cond.java:  Implement cond syntax.
+	* kawa/standard/StandardInterpreter.java:  Update accordingly.
+	* kawa/standard/Makefile{am,in}:  Add new files.
+
 Tue Jun 25 20:40:57 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/Char.java:  New class, for representing Scheme characters,

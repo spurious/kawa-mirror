@@ -139,32 +139,7 @@ public class ELisp extends Lisp2
     LocationEnumeration e = Scheme.builtin().enumerateAllLocations();
     while (e.hasMoreElements())
       {
-	Location loc = e.nextLocation();
-	Symbol name = ((NamedLocation) loc).getKeySymbol();
-
-	if (environ.isBound(name, EnvironmentKey.FUNCTION))
-	  continue;
-	Object val = loc.get(null);
-	/*
-	if (val instanceof Procedure)
-	  {
-            Constraint constraint = b.getConstraint();
-	    if (constraint instanceof StaticFieldConstraint)
-              {
-                StaticFieldConstraint fconstraint
-                  = (StaticFieldConstraint) constraint;
-                String fname = fconstraint.getName();
-                ClassType t = fconstraint.getDeclaringClass();
-	      }
-	  }
-	*/
-	if (val != null)
-	  {
-	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
-	      defun(name, val);
-	    else
-	      define(name.getName(), val);
-	  }
+        importLocation(e.nextLocation());
       }
     try
       {

@@ -8,6 +8,7 @@ import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
 import gnu.kawa.lispexpr.LispLanguage;
+import gnu.kawa.reflect.FieldLocation;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
 
@@ -122,5 +123,31 @@ public abstract class Lisp2 extends LispLanguage
   private void defun(Procedure proc)
   {
     defun(proc.getName(), proc);
+  }
+
+  protected void importLocation (Location loc)
+  {
+    Symbol name = ((NamedLocation) loc).getKeySymbol();
+    if (environ.isBound(name, EnvironmentKey.FUNCTION))
+      return;
+    Object val;
+    loc = loc.getBase();
+    if (loc instanceof FieldLocation
+        && ((FieldLocation) loc).isProcedureOrSyntax())
+      {
+        environ.addLocation(name, EnvironmentKey.FUNCTION, loc);
+      }
+    else if ((val = loc.get(null)) != null)
+      {
+        try {
+        if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
+          defun(name, val);
+        else
+          define(name.getName(), val);
+	} catch (Exception ex)
+	  {
+	    System.err.println("(Cannot import "+loc+"::"+loc.getClass().getName()+" from Scheme)");
+	  }
+      }
   }
 }

@@ -74,16 +74,7 @@ public class CommonLisp extends Lisp2
     LocationEnumeration e = scmEnv.enumerateAllLocations();
     while (e.hasMoreElements())
       {
-	Location loc = e.nextLocation();
-	Object val = loc.get(null);
-	if (val != null)
-	  {
-	    Symbol name = ((NamedLocation) loc).getKeySymbol();
-	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
-	      defun(name, val);
-	    else
-	      define(name.getName(), val);
-	  }
+        importLocation(e.nextLocation());
       }
 
     if (instance == null)

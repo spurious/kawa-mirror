@@ -1,5 +1,7 @@
 2005-03-17  Per Bothner  <per@bothner.com>
 
+	* ELisp.java (<init>): Use importLocation.
+
 	* ELisp.java (createReadTable): New method.
 	* ELispReader.java (getReadTable): Remove method.
 	(createReadTable): New static method.

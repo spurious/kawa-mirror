@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2002  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -24,6 +24,21 @@ public class DisplayFormat extends AbstractFormat
     this.language = language;
   }
 
+  public static DisplayFormat getEmacsLispFormat(boolean readable)
+  {
+    return new DisplayFormat(readable, 'E');
+  }
+
+  public static DisplayFormat getCommonLispFormat(boolean readable)
+  {
+    return new DisplayFormat(readable, 'C');
+  }
+
+  public static DisplayFormat getSchemeFormat(boolean readable)
+  {
+    return new DisplayFormat(readable, 'S');
+  }
+
   boolean readable;
 
   /** 'S' is Scheme-style; 'C' is CommonLisp-style;  'E' is Emacs-style.
@@ -42,7 +57,17 @@ public class DisplayFormat extends AbstractFormat
     if (! getReadableOutput ())
       out.writeChar(v);
     else
-      write(Char.toScmReadableString(v), out);
+      {
+	if (language == 'E'
+	    && v > ' ')
+	  {
+	    out.writeChar('?');
+	    out.writeChar(v);
+	  }
+	// else if (language == 'E') ...
+	else
+	  write(Char.toScmReadableString(v), out);
+      }
   }
 
   public void writeList(LList value, OutPort out)

@@ -6,6 +6,7 @@ import gnu.kawa.lispexpr.*;
 import gnu.lists.*;
 import gnu.xml.*;
 import gnu.expr.*;
+import gnu.text.Lexer;
 
 public class BRL extends Scheme
 {
@@ -69,23 +70,18 @@ public class BRL extends Scheme
     return new XMLPrinter(out, false);
   }
 
-  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
-			   int options)
+  public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
-    Translator tr = new Translator (this, messages);
+    InPort port = (InPort) lexer.getPort();
+    Translator tr = new Translator (this, lexer.getMessages());
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
-    mexp.setFile(port.getName());
+    mexp.setFile(lexer.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
-    BRLRead lexer = new BRLRead(port, messages);
-    lexer.setBrlCompatible(isBrlCompatible());
-    if ((options & PARSE_ONE_LINE) != 0 && port instanceof TtyInPort)
-      lexer.setInteractive(true);
     boolean inString = true;
-    Object sexp = lexer.brlReader.read(lexer, ']', 0);
+    Object sexp = ((BRLRead) lexer).brlReader.read(lexer, ']', 0);
     for (;;)
       {
 	if (sexp == Sequence.eofValue)
@@ -93,9 +89,9 @@ public class BRL extends Scheme
 	if (sexp != emptyForm
 	    && ! tr.scan_form (sexp, forms, mexp))
 	  break;
-	sexp = lexer.readObject(); // FIXME
+	sexp = ((BRLRead) lexer).readObject(); // FIXME
       }
-    if (port.readState != ']')
+    if (port.getReadState() != ']')
       lexer.fatal("An unmatched '[' was read.");
     tr.finishModule(mexp, forms);
     return tr;

@@ -12,23 +12,23 @@ import kawa.lang.Translator; // FIXME
 
 public abstract class LispInterpreter extends Interpreter
 {
-  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
-			   int options)
+  public Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
+    SourceMessages messages = lexer.getMessages();
     kawa.lang.Translator tr = new Translator (this, messages);
     tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
     if (Compilation.generateAppletDefault)
       mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
-    String fname = port.getName();
+    String fname = lexer.getName();
     mexp.setFile(fname);
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
-    LispReader lexer = (LispReader) getLexer(port, messages);
+    LispReader reader = (LispReader) lexer;
     for (;;)
       {
-	Object sexp = lexer.readObject(); // FIXME
+	Object sexp = reader.readObject(); // FIXME
 	if (sexp == Sequence.eofValue)
 	  {
 	    if ((options & PARSE_ONE_LINE) != 0)
@@ -39,7 +39,7 @@ public abstract class LispInterpreter extends Interpreter
 	    || (options & PARSE_ONE_LINE) != 0)
 	  break;
       }
-    if (port.peek() == ')')
+    if (lexer.peek() == ')')
       lexer.fatal("An unexpected close paren was read.");
     tr.finishModule(mexp, forms);
     return tr;

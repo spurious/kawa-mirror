@@ -1,3 +1,8 @@
+2003-11-08  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (parse):  Update to take a Lexer rather than
+	an InPort.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (parse, parseFile):  Combined to single

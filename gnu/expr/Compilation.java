@@ -266,14 +266,8 @@ public class Compilation
     typeProcedure0, typeProcedure1, typeProcedure2, typeProcedure3,
     typeProcedure4 };
 
-  Hashtable literalTable;
-  int literalsCount;
-
   /** Rembembers stuff to do in <clinit> of main class. */
   Initializer clinitChain;
-
-  /** Rembembers literals to initialize (in <clinit>). */
-  Literal literalsChain;
 
   public static boolean generateMainDefault = false;
   /** True if we should generate a main(String[]) method. */
@@ -311,38 +305,6 @@ public class Compilation
     return Interpreter.defaultInterpreter;  // For now.  FIXME.
   }
 
-  public Literal findLiteral (Object value)
-  {
-    if (value == null)
-      return Literal.nullLiteral;
-    Literal literal = (Literal) literalTable.get (value);
-    if (literal == null)
-      {
-	if (value instanceof Boolean)
-	  {
-	    boolean val = ((Boolean)value).booleanValue ();
-	    literal = new Literal (value,
-				   val ? trueConstant : falseConstant,
-				   this);
-	  }
-	else if (value == Values.empty)
-	  literal = new Literal (value, voidConstant, this);
-	else if (value == gnu.lists.LList.Empty)
-	  literal = new Literal (value, emptyConstant, this);
-	else if (value == gnu.lists.Sequence.eofValue)
-	  literal = new Literal (value, eofConstant, this);
-	else if (value instanceof Undefined)
-	  literal = new Literal (value, undefinedConstant, this);
-	else if (immediate)
-	  {
-	    literal = new Literal (value, this);
-	  }
-	else
-	  literal = new Literal (value, Type.make(value.getClass()), this);
-      }
-    return literal;
-  }
-
   /** Emit code to "evaluate" a compile-time constant.
    * This is the normal external interface.
    * @param value the value to be compiled
@@ -356,9 +318,9 @@ public class Compilation
       code.emitPushString((String) value);
     else
       {
-	Literal literal = findLiteral (value);
+	Literal literal = litTable.findLiteral(value);
 	if (literal.field == null)
-	  literal.assign (this);
+	  literal.assign(litTable);
 	code.emitGetStatic(literal.field);
       }
   }
@@ -442,6 +404,23 @@ public class Compilation
     target.compileFromStack(this,
                             value == null ? target.getType()
                             : Type.make(value.getClass()));
+  }
+
+
+  private void emitLiterals()
+  {
+    if (! immediate && litTable.literalsChain != null)
+      {
+	try
+	  {
+	    litTable.emit();
+	  }
+	catch (Throwable ex)
+	  {
+	    error('e', "Literals: Internal error:" + ex);
+	    ex.printStackTrace(System.err);
+	  }
+      }
   }
 
   private void dumpInitializers (Initializer inits)
@@ -757,7 +736,7 @@ public class Compilation
       }
 
     mainClass = addClass(lexp, mainClass);
-    literalTable = new Hashtable (100);
+    litTable = new LitTable(this);
     try
       {
 	addClass (lexp);
@@ -1342,11 +1321,9 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (Compilation.usingTailCalls && ! staticModule)
-      generateConstructor(module);
-
     if (curClass == mainClass // && ! immediate
-	&& (staticModule || clinitChain != null || literalsChain != null
+	&& (staticModule || clinitChain != null
+	    || litTable.literalsChain != null
 	    || generateMain || generateApplet || generateServlet))
       {
 	Method save_method = method;
@@ -1370,12 +1347,12 @@ public class Compilation
 	    dumpInitializers(clinitChain);
 	    code.emitGoto(lab2);
 	    lab1.define(code);
-	    Literal.emit(this);
+	    emitLiterals();
 	    code.emitGoto(lab0);
 	    lab2.define(code);
 	  }
 	else
-	  Literal.emit(this);
+	  emitLiterals();
 
 	if (staticModule)
 	  code.emitGoto(classBodyLabel);

@@ -2,6 +2,7 @@ package gnu.expr;
 import java.io.*;
 import gnu.bytecode.*;
 import java.lang.reflect.Array;
+import java.util.Hashtable;
 
 /** Manages the literals of a Compilation.
  * Implements ObjectOutput, because we use externalization to determine
@@ -10,10 +11,19 @@ import java.lang.reflect.Array;
 public class LitTable implements ObjectOutput
 {
   Compilation comp;
+  ClassType mainClass;
+
+  Hashtable literalTable = new Hashtable (100);
+
+  int literalsCount;
+
+  /** Rembembers literals to initialize (in <clinit>). */
+  Literal literalsChain;
 
   public LitTable(Compilation comp)
   {
     this.comp = comp;
+    this.mainClass = comp.mainClass;
   }
 
   public void emit() throws IOException
@@ -29,22 +39,22 @@ public class LitTable implements ObjectOutput
     // initialize using a single call, which generates better code.
 
     // Here is the first pass.
-    for (Literal init = comp.literalsChain;  init != null;
+    for (Literal init = literalsChain;  init != null;
 	 init = init.next)
       {
 	writeObject(init.value);
       }
 
     // Here is the second pass.
-    for (Literal init = comp.literalsChain;  init != null;
+    for (Literal init = literalsChain;  init != null;
 	 init = init.next)
       {
 	emit(init, true);
       }
 
     // For speedier garbage collection.
-    comp.literalTable = null;
-    comp.literalsCount = 0;
+    literalTable = null;
+    literalsCount = 0;
   }
 
   Object[] valueStack = new Object[20];
@@ -152,14 +162,14 @@ public class LitTable implements ObjectOutput
 
   public void writeObject(Object obj) throws IOException
   {
-    Literal lit = comp.findLiteral(obj);
+    Literal lit = findLiteral(obj);
     if ((lit.flags & (Literal.WRITTEN|Literal.WRITING)) != 0)
       {
 	// It is referenced more than once, so we we need a Field
 	// to save the value.
 	if (lit.field == null
 	    && obj != null && ! (obj instanceof String))
-	  lit.assign (comp);
+	  lit.assign(this);
 	if ((lit.flags & Literal.WRITTEN) == 0)
 	  lit.flags |= Literal.CYCLIC;
       }
@@ -222,6 +232,38 @@ public class LitTable implements ObjectOutput
 	lit.flags |= Literal.WRITTEN;
       }
     push(lit, lit.type);
+  }
+
+  public Literal findLiteral (Object value)
+  {
+    if (value == null)
+      return Literal.nullLiteral;
+    Literal literal = (Literal) literalTable.get(value);
+    if (literal == null)
+      {
+	if (value instanceof Boolean)
+	  {
+	    boolean val = ((Boolean)value).booleanValue ();
+	    literal = new Literal (value,
+				   val ? comp.trueConstant : comp.falseConstant,
+				   this);
+	  }
+	else if (value == gnu.mapping.Values.empty)
+	  literal = new Literal (value, Compilation.voidConstant, this);
+	else if (value == gnu.lists.LList.Empty)
+	  literal = new Literal (value, Compilation.emptyConstant, this);
+	else if (value == gnu.lists.Sequence.eofValue)
+	  literal = new Literal (value, Compilation.eofConstant, this);
+	else if (value instanceof Undefined)
+	  literal = new Literal (value, Compilation.undefinedConstant, this);
+	else if (comp.immediate)
+	  {
+	    literal = new Literal (value, this);
+	  }
+	else
+	  literal = new Literal (value, Type.make(value.getClass()), this);
+      }
+    return literal;
   }
 
   Method getMethod (ClassType type, String name,
@@ -395,85 +437,6 @@ public class LitTable implements ObjectOutput
       }
   }
 
-  // FIXME - move this to CodeAttr?
-  void emitPrimArray(Object value, ArrayType arrayType, CodeAttr code)
-  {
-    Type elementType = arrayType.getComponentType();
-    int len = java.lang.reflect.Array.getLength(value);
-    code.emitPushInt(len);
-    code.emitNewArray(elementType);
-    char sig = elementType.getSignature().charAt(0);
-    for (int i = 0;  i < len;  i++)
-      {
-	long ival = 0;  float fval = 0;  double dval = 0;
-	switch (sig)
-	  {
-	  case 'J':
-	    ival = ((long[]) value)[i];
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'I':
-	    ival = ((int[]) value)[i];
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'S':
-	    ival = ((short[]) value)[i];
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'C':
-	    ival = ((char[]) value)[i];
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'B':
-	    ival = ((byte[]) value)[i];
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'Z':
-	    ival = ((boolean[]) value)[i] ? 1 : 0;
-	    if (ival == 0)
-	      continue;
-	    break;
-	  case 'F':
-	    fval = ((float[]) value)[i];
-	    if (fval == 0.0)
-	      continue;
-	    break;
-	  case 'D':
-	    dval = ((double[]) value)[i];
-	    if (dval == 0.0)
-	      continue;
-	    break;
-	  }
-	code.emitDup(arrayType);
-	code.emitPushInt(i);
-	switch (sig)
-	  {
-	  case 'Z':
-	  case 'C':
-	  case 'B':
-	  case 'S':
-	  case 'I':
-	    code.emitPushInt((int) ival);
-	    break;
-	  case 'J':
-	    code.emitPushLong(ival);
-	    break;
-	  case 'F':
-	    code.emitPushFloat(fval);
-	    break;
-	  case 'D':
-	    code.emitPushDouble(dval);
-	    break;
-	  }
-	code.emitArrayStore(elementType);
-      }
-  }
-
   void emit(Literal literal, boolean ignore)
   {
     CodeAttr code = comp.getCode();
@@ -518,7 +481,7 @@ public class LitTable implements ObjectOutput
       }
     else if (literal.type instanceof ArrayType)
       {
-	emitPrimArray(literal.value, (ArrayType) literal.type, code);
+	code.emitPushPrimArray(literal.value, (ArrayType) literal.type);
 	if (literal.field != null)
 	  {
 	    if (! ignore)
@@ -529,7 +492,6 @@ public class LitTable implements ObjectOutput
       }
     else
       {
-	Interpreter interpreter = comp.getInterpreter();
 	ClassType type = (ClassType) literal.type;
 	boolean useDefaultInit = (literal.flags & Literal.CYCLIC) != 0;
 	Method method = null;

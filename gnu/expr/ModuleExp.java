@@ -117,7 +117,7 @@ public class ModuleExp extends LambdaExp
 	ArrayClassLoader loader = new ArrayClassLoader (classNames, classes);
 	Class clas = loader.loadClass (class_name, true);
 	/* Pass literal values to the compiled code. */
-	for (Literal init = comp.literalsChain;  init != null;
+	for (Literal init = comp.litTable.literalsChain;  init != null;
 	     init = init.next)
 	  {
 	    /* DEBUGGING:

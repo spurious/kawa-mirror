@@ -41,63 +41,63 @@ public class Literal
 
   public final Object getValue() { return value; }
 
-  void assign (Compilation comp)
+  void assign (LitTable litTable)
   {
-    assign((String) null, comp);
+    assign((String) null, litTable);
   }
 
   /** Assign a static Field to hold the value of this Literal.
    * This supports the same value being used multiple times or cyclically. */
-  void assign (String name, Compilation comp)
+  void assign (String name, LitTable litTable)
   {
-    int flags = comp.immediate ? Access.STATIC|Access.PUBLIC
+    int flags = litTable.comp.immediate ? Access.STATIC|Access.PUBLIC
       : Access.STATIC|Access.FINAL;
     if (name == null)
       {
-	index = comp.literalsCount++;
+	index = litTable.literalsCount++;
 	name = "Lit" + index;
       }
     else
       flags |= Access.PUBLIC;
-    assign(comp.mainClass.addField (name, type, flags), comp);
+    assign(litTable.mainClass.addField (name, type, flags), litTable);
   }
 
-  void assign (Field field, Compilation comp)
+  void assign (Field field, LitTable litTable)
   {
-    next = comp.literalsChain;
-    comp.literalsChain = this;
+    next = litTable.literalsChain;
+    litTable.literalsChain = this;
     this.field = field;
   }
 
   /** Create a new Literal, where comp must be in immediate mode. */
-  public Literal (Object value, Compilation comp)
+  public Literal (Object value, LitTable litTable)
   {
-    this (value, (String) null, comp);
+    this (value, (String) null, litTable);
   }
 
-  public Literal (Object value, String name, Compilation comp)
+  public Literal (Object value, String name, LitTable litTable)
   {
     this.value = value;
-    comp.literalTable.put (value, this);
+    litTable.literalTable.put (value, this);
     this.type = Type.make(value.getClass());
-    assign(name, comp);
+    assign(name, litTable);
   }
 
   /** Create a new Literal, for a value available from a static field.
   * The field must be static and already exist. */
-  public Literal (Object value, Field field, Compilation comp)
+  public Literal (Object value, Field field, LitTable litTable)
   {
     this.value = value;
-    comp.literalTable.put (value, this);
+    litTable.literalTable.put(value, this);
     this.field = field;
     this.type = field.getType();
     flags = WRITTEN|EMITTED;
   }
 
-  public Literal (Object value, Type type, Compilation comp)
+  public Literal (Object value, Type type, LitTable litTable)
   {
     this.value = value;
-    comp.literalTable.put (value, this);
+    litTable.literalTable.put (value, this);
     this.type = type;
   }
 
@@ -105,24 +105,6 @@ public class Literal
   {
     this.value = value;
     this.type = type;
-  }
-
-  public static void emit(Compilation comp)
-  {
-    if (! comp.immediate && comp.literalsChain != null
-	&& comp.litTable == null)
-      {
-	comp.litTable = new LitTable(comp);
-	try
-	  {
-	    comp.litTable.emit();
-	  }
-	catch (Throwable ex)
-	  {
-	    comp.error('e', "Literals: Internal error:" + ex);
-	    ex.printStackTrace(System.err);
-	  }
-      }
   }
 }
 

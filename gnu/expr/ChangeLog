@@ -1,3 +1,18 @@
+2002-01-07  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (literalTable, literalsCount, literalsChain,
+	findLiteral):  Moved to LitTable.java.
+	(emitLiterals):  New method; replaces Literal.emit.
+	* LitTable.java (literalTable, literalsCount, literalsChain,
+	findLiteral):  Moved from Compilation.java.
+	(emitPrimArray): Removed; replaced by CodeAttr.emitPushPrimArray.
+	* BindingInitializer.java, Declaration.java, ModuleExp.java:  Update.
+	* Literal.java:  Methods that took Compilation now take LitTable.
+	(emit):  Remove; replaced by Compilation.emitLiterals.
+
+	* Compilation.java (addClass):  Remove generateConstructor call.
+	This generated a duplicate call to initialize ModuleBody.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* ConditionalTarget.java (emitGotoFirstBranch):  New method.

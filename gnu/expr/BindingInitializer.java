@@ -27,7 +27,7 @@ public class BindingInitializer extends Initializer
 	Object val = ((QuoteExp) value).getValue();
 	if (val == null || val instanceof String)
 	  return;
-	Literal lit = comp.findLiteral(val);
+	Literal lit = comp.litTable.findLiteral(val);
 	if (lit.field == this.field)
 	  return;
       }

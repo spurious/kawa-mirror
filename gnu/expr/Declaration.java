@@ -514,9 +514,9 @@ public class Declaration
 	Object val = ((QuoteExp) value).getValue();
 	if (val.getClass().getName().equals(ftype.getName()))
 	  {
-	    Literal literal = comp.findLiteral(val);
+	    Literal literal = comp.litTable.findLiteral(val);
 	    if (literal.field == null)
-	      literal.assign(field, comp);
+	      literal.assign(field, comp.litTable);
 	  }
       }
     if (value instanceof QuoteExp

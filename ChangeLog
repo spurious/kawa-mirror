@@ -1,5 +1,7 @@
 2002-01-23  Per Bothner  <per@bothner.com>
 
+	* configure.in (AC_OUTPUT):  Also make gnu/kawa/brl/Makefile.
+
 	* kawa/Shell.java (run):  Call Lexer's setInteractive if TtyInPort.
 
 	* kawa/standard/Scheme.java (initScheme):  Define values-append.

@@ -1,3 +1,8 @@
+2002-01-23  Per Bothner  <per@bothner.com>
+
+	* kawa/brl:  New directory.
+	* kawa/Makefile.am (XML_SUBDIR):  Add 'brl'.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* kawa/ant:  New directory.

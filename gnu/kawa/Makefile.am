@@ -7,6 +7,6 @@ if ENABLE_SERVLET
 SERVLET_SUBDIRS = servlet
 endif
 if ENABLE_XML
-XML_SUBDIR = xml
+XML_SUBDIR = xml brl
 endif
 

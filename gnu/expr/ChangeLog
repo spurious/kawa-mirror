@@ -1,3 +1,7 @@
+2002-01-23  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (languages):  Add "brl".
+
 2002-01-19  Per Bothner  <per@bothner.com>
 
 	* Compilation.java:  If generating main, and the --output-format

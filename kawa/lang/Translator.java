@@ -1237,8 +1237,20 @@ public class Translator extends Compilation
   {
     if (templateScope == null)
       return decl; // ???
-    Declaration alias = makeAlias(decl.getSymbol(), templateScope);
-    alias.noteValue(new ReferenceExp(decl));
+    return makeRenamedAlias(decl.getSymbol(), decl, templateScope);
+  }
+
+  public Declaration makeRenamedAlias (Object name,
+				       Declaration decl,
+				       ScopeExp templateScope)
+  {
+    Declaration alias = new Declaration(name);
+    alias.setAlias(true);
+    alias.setPrivate(true);
+    alias.context = templateScope;
+    ReferenceExp ref = new ReferenceExp(decl);
+    ref.setDontDereference(true);
+    alias.noteValue(ref);
     return alias;
   }
 
@@ -1287,29 +1299,16 @@ public class Translator extends Compilation
       }
   }
 
-  Declaration makeAlias (Object name, ScopeExp templateScope)
-  {
-    Declaration alias = new Declaration(name);
-    alias.setAlias(true);
-    alias.setPrivate(true);
-    alias.context = templateScope;
-    return alias;
-  }
-
   public Declaration define (Object name, SyntaxForm nameSyntax, ScopeExp defs)
   {
-    Declaration alias;
-    if (nameSyntax != null && nameSyntax.scope != currentScope())
+    boolean aliasNeeded = nameSyntax != null && nameSyntax.scope != currentScope();
+    Object declName = aliasNeeded ? new String(name.toString()) : name;
+    Declaration decl = defs.getDefine(declName, 'w', this);
+    if (aliasNeeded)
       {
-	alias = makeAlias(name, nameSyntax.scope);
+	Declaration alias = makeRenamedAlias(name, decl, nameSyntax.scope);
 	nameSyntax.scope.addDeclaration(alias);
-	name = new String(name.toString());
       }
-    else
-      alias = null;
-    Declaration decl = defs.getDefine(name, 'w', this);
-    if (alias != null)
-      alias.noteValue(new ReferenceExp(decl));
     push(decl);
     return decl;
   }

@@ -1,3 +1,9 @@
+2002-05-19  Per Bothner  <per@bothner.com>
+
+	* BlockExp.java (oldTryState):  New field.
+	(compile):  Set/clear oldTryState,
+	* ExitExpr.java  (compile):  Call doPendingFinalizers.
+
 2002-05-18  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (makeField):  Always mangle, but not reversible.

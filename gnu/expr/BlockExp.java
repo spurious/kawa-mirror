@@ -33,6 +33,8 @@ public class BlockExp extends Expression
   Target subTarget;
   /* Label to exit to.  Temporary only used during compilation. */
   Label exitLabel;
+  /* Current TryState when we start compiling the.  Temporary. */
+  TryState oldTryState;
 
   public void compile (Compilation comp, Target target)
   {
@@ -47,6 +49,7 @@ public class BlockExp extends Expression
 	subTarget = new StackTarget(getType());
       }
     gnu.bytecode.CodeAttr code = comp.getCode();
+    oldTryState = code.getCurrentTry();
     exitLabel = new Label(code);
     this.subTarget = exitBody == null ? subTarget : Target.Ignore;
     body.compileWithPosition(comp, subTarget);
@@ -62,6 +65,7 @@ public class BlockExp extends Expression
       exitLabel.define(code);
     if (subTarget != target)
       target.compileFromStack(comp, subTarget.getType());
+    oldTryState = null;
   }
 
   protected Expression walk (ExpWalker walker)

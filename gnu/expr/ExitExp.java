@@ -32,6 +32,7 @@ public class ExitExp extends Expression
     CodeAttr code = comp.getCode();
     Expression res = result == null ? QuoteExp.voidExp : result;
     res.compileWithPosition(comp, block.subTarget);
+    code.doPendingFinalizers(block.oldTryState);
     code.emitGoto(block.exitLabel);
   }
 

@@ -1,3 +1,8 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SCM_COMPILE_FLAGS): Revert yesterday's change -
+	--module-static-run is now set in ../../Make-rules.
+
 2005-03-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): Add new --module-static-run flag.

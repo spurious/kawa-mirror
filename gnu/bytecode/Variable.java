@@ -49,8 +49,7 @@ public class Variable extends Location implements java.util.Enumeration
    * Only relevant if isSimple (). */
   public final boolean isAssigned () { return offset != UNASSIGNED; }
 
-  int start_pc;
-  int end_pc;
+  Scope scope;
 
   final boolean dead () { return (flags & LIVE_FLAG) == 0; }
 
@@ -139,10 +138,16 @@ public class Variable extends Location implements java.util.Enumeration
   public void freeLocal (CodeAttr code)
   {
     flags &= ~LIVE_FLAG;
-    end_pc = code.PC;
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)
       code.locals.used [offset + size] = null;
+  }
+
+  boolean shouldEmit ()
+  {
+    return (isSimple () && name != null && scope != null
+	    && scope.start.position >= 0
+	    && scope.end.position > scope.start.position);
   }
 
   public String toString()

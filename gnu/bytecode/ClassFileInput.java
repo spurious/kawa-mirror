@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -211,12 +211,20 @@ public class ClassFileInput extends DataInputStream
 	Scope scope = attr.parameter_scope;
 	ConstantPool constants = method.getConstants();
         int count = readUnsignedShort();
+	int prev_start = scope.start.position;
+	int prev_end = scope.end.position;
 	for (int i = 0;  i < count;  i++)
 	  {
 	    Variable var = new Variable();
+	    int start_pc = readUnsignedShort();
+	    int end_pc = start_pc + readUnsignedShort();
+	    if (start_pc != prev_start || end_pc != prev_end)
+	      {
+		scope = new Scope(new Label(start_pc), new Label(end_pc));
+		prev_start = start_pc;
+		prev_end = end_pc;
+	      }
 	    scope.addVariable(var);
-	    var.start_pc = readUnsignedShort();
-	    var.end_pc = var.start_pc + readUnsignedShort();
 	    var.setName(readUnsignedShort(), constants);
 	    var.setSignature(readUnsignedShort(), constants);
 	    var.offset = readUnsignedShort();

@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -13,10 +13,21 @@ public class Scope
   /** If true, don't call freeLocal on our variables (yet). */
   boolean preserved;
 
-  int start_pc;
-  int end_pc;
+  Label start;
+  Label end;
   Variable vars;
   Variable last_var;
+
+  public Scope()
+  {
+  }
+
+  public Scope (Label start, Label end)
+  {
+    this.start = start;
+    this.end = end;
+  }
+
   //  Variable lookup (String name);
   public final Variable firstVar () { return vars; }
 
@@ -49,6 +60,7 @@ public class Scope
     else
       last_var.next = var;
     last_var = var;
+    var.scope = this;
   }
 
   /* Add a new Variable, linking it in after a given Variable, */
@@ -68,11 +80,11 @@ public class Scope
       last_var = var;
     if (var.next == var)
       throw new Error("cycle");
+    var.scope = this;
   }
 
   public void addVariable (CodeAttr code, Variable var)
   {
-    var.start_pc = code == null ? 0 : code.PC;
     addVariable (var);
     if (var.isSimple() && code != null)
       var.allocateLocal(code);
@@ -100,11 +112,9 @@ public class Scope
     return true;
   }
 
-  public void setStartPC(int PC)
+  public void setStartPC(CodeAttr code)
   {
-    start_pc = PC;
-    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
-      var.start_pc = PC;
+    start = code.getLabel();
   }
 
   /**

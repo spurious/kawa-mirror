@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -95,6 +95,11 @@ public class Label {
       }
     else
       code.labels = this;
+  }
+
+  public Label (int position)
+  {
+    this.position = position;
   }
 
   /* Make all narrow fixups for this label point (relatively) to target. */

@@ -244,6 +244,18 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
+  /** Get a new Label for the current location.
+   * Unlike Label.define, Does not change reachableHere().
+   */
+  public Label getLabel ()
+  {
+    boolean  unreachable = unreachable_here;
+    Label label = new Label(this);
+    label.define(this);
+    unreachable_here = unreachable;
+    return label;
+  }
+
   public void emitSwap ()
   {
     reserve(1);
@@ -381,14 +393,13 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void enterScope (Scope scope)
   {
-    scope.setStartPC(PC);
+    scope.setStartPC(this);
     locals.enterScope(scope);
   }
 
   public Scope pushScope () {
     Scope scope = new Scope ();
-    scope.start_pc = PC;
-    readPC = PC;
+    scope.start = getLabel();
     if (locals == null)
       locals = new LocalVarsAttr(getMethod());
     locals.enterScope(scope);
@@ -405,8 +416,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
-    scope.end_pc = PC;  readPC = PC;
     scope.freeLocals(this);
+    scope.end = getLabel();
     return scope;
   }
 
@@ -2004,20 +2015,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	    emitStore(locals.used [arg_slots]);
 	  }
       }
-    reserve(5);
-    int start_pc = scope.start_pc;
-    int delta = start_pc - PC;
-    if (delta < -32768)
-      {
-	put1(200);  // goto_w
-	put4(delta);
-      }
-    else
-      {
-	put1(167); // goto
-	put2(delta);
-      }
-    setUnreachable();
+    emitGoto(scope.start);
   }
 
   /* Make sure the label with oldest fixup is first in labels. */

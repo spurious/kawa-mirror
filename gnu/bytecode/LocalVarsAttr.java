@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -90,7 +90,7 @@ public class LocalVarsAttr extends Attribute
     Variable var;
     while ((var = vars.nextVar ()) != null)
       {
-	if (shouldEmit(var))
+	if (var.shouldEmit())
 	  local_variable_count++;
       }
     return local_variable_count;
@@ -120,12 +120,6 @@ public class LocalVarsAttr extends Attribute
       }
   }
 
-  private boolean shouldEmit (Variable var)
-  {
-    return (var.isSimple () && var.name != null
-	    && var.start_pc >= 0 && var.end_pc > var.start_pc);
-  }
-
   public void write (DataOutputStream dstr) throws java.io.IOException
   {
     VarEnumerator vars = allVars ();
@@ -134,13 +128,16 @@ public class LocalVarsAttr extends Attribute
 	    
     for (vars.reset (); (var = vars.nextVar ()) != null; )
       {
-	if (shouldEmit(var))
+	if (var.shouldEmit())
 	  {
-	    dstr.writeShort (var.start_pc);
-	    dstr.writeShort (var.end_pc - var.start_pc);
-	    dstr.writeShort (var.name_index);
-	    dstr.writeShort (var.signature_index);
-	    dstr.writeShort (var.offset);
+	    Scope scope = var.scope;
+	    int start_pc = scope.start.position;
+	    int end_pc = scope.end.position;
+	    dstr.writeShort(start_pc);
+	    dstr.writeShort(end_pc - start_pc);
+	    dstr.writeShort(var.name_index);
+	    dstr.writeShort(var.signature_index);
+	    dstr.writeShort(var.offset);
 	  }
       }
   }
@@ -169,9 +166,18 @@ public class LocalVarsAttr extends Attribute
 	    dst.printOptionalIndex(var.signature_index);
 	    dst.printSignature(var.getType());
 	    dst.print(" (pc: ");
-	    dst.print (var.start_pc);
-	    dst.print(" length: ");
-	    dst.print (var.end_pc - var.start_pc);
+	    Scope scope = var.scope;
+	    int start_pc, end_pc;
+	    if (scope == null || scope.start == null || scope.end == null
+		|| (start_pc = scope.start.position) < 0
+		|| (end_pc = scope.end.position) < 0)
+	      dst.print("unknown");
+	    else
+	      {
+		dst.print(start_pc);
+		dst.print(" length: ");
+		dst.print(end_pc - start_pc);
+	      }
 	    dst.println(')');
 	  }
       }

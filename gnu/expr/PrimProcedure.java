@@ -4,8 +4,6 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import java.util.Hashtable;
-import gnu.math.IntNum;
-import gnu.math.DFloNum;
 import gnu.mapping.*;
 
 /** A primitive Procedure implemented by a plain Java method. */
@@ -63,12 +61,21 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Object[] restArray = null;
     if (takesVarArgs)
       {
-        ArrayType restArrayType = (ArrayType) argTypes[arg_count-1];
-        elementType = restArrayType.getComponentType();
-        Class elementClass = elementType.getReflectClass();
-        restArray = (Object[])
-          java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
-        rargs[rargs.length-1] = restArray;
+	Type restType = argTypes[arg_count-1];
+	if (restType == Compilation.scmListType)
+	  {
+	    rargs[rargs.length-1] = gnu.kawa.util.LList.makeList(args, fixArgs);
+	    nargs = fixArgs;
+	  }
+	else
+	  {
+	    ArrayType restArrayType = (ArrayType) restType;
+	    elementType = restArrayType.getComponentType();
+	    Class elementClass = elementType.getReflectClass();
+	    restArray = (Object[])
+	      java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
+	    rargs[rargs.length-1] = restArray;
+	  }
       }
     int this_count = getStaticFlag() ? 0 : 1;
     if (this_count != 0)
@@ -205,10 +212,63 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public final Type[] getParameterTypes() { return argTypes; }
 
+  /** Compile arguments and push unto stack.
+   * @param args arguments to evaluate and push.
+   * @param thisType If we care calling a non-static function,
+   *   then args[0] is the receiver and thisType is its expected class.
+   *   If thisType==Type.void_type, ignore argType[0].
+   *   If this_type==null, no special handling of args[0] or argTypes[0].
+   */
+  public static void compileArgs(Expression[] args,
+				 Type thisType, Type[] argTypes,
+				 boolean variable,
+				 String name, LambdaExp source,
+				 Compilation comp)
+ {
+    Type arg_type = null;
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    int skipArg = thisType == Type.void_type ? 1 : 0;
+    int arg_count = argTypes.length - skipArg;
+    boolean is_static = thisType == null || skipArg != 0;
+    int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
+      : args.length;
+    for (int i = 0; ; ++i)
+      {
+        if (variable && i == fix_arg_count)
+          {
+            arg_type = argTypes[arg_count-1+skipArg];
+	    if (arg_type == Compilation.scmListType)
+	      {
+		kawa.standard.list_v.compile(args, i, comp);
+		break;
+	      }
+            code.emitPushInt(args.length - fix_arg_count);
+            arg_type = ((ArrayType) arg_type).getComponentType();
+            code.emitNewArray(arg_type);
+          }
+        if (i >= args.length)
+          break;
+        if (i >= fix_arg_count)
+          {
+            code.emitDup(1); // dup array.
+            code.emitPushInt(i - fix_arg_count);
+          }
+        else
+          arg_type = is_static ? argTypes[i + skipArg]
+            : i==0 ? thisType
+            : argTypes[i-1];
+	args[i].compile(comp,
+                        source == null
+                        ? CheckedTarget.getInstance(arg_type, name, i)
+                        : CheckedTarget.getInstance(arg_type, source, i));
+        if (i >= fix_arg_count)
+          code.emitArrayStore(arg_type);
+      }
+  }
+
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
-    int arg_count = argTypes.length;
     boolean is_static = getStaticFlag();
     Expression[] args = exp.getArgs();
 
@@ -222,46 +282,15 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	code.emitNew(type);
 	code.emitDup(type);
       }
-    boolean variable = takesVarArgs();
-    int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
-      : args.length;
-    Type arg_type = null;
-    for (int i = 0; ; ++i)
-      {
-        if (variable && i == fix_arg_count)
-          {
-            code.emitPushInt(args.length - fix_arg_count);
-            arg_type = ((ArrayType) argTypes[arg_count-1]).getComponentType();
-            code.emitNewArray(arg_type);
-          }
-        if (i >= args.length)
-          break;
-        if (i >= fix_arg_count)
-          {
-            code.emitDup(1); // dup array.
-            code.emitPushInt(i - fix_arg_count);
-          }
-        else
-          arg_type = is_static ? argTypes[i]
-            : i==0 ? method.getDeclaringClass()
-            : argTypes[i-1];
-	args[i].compile(comp,
-                        source == null
-                        ? CheckedTarget.getInstance(arg_type, getName(), i)
-                        : CheckedTarget.getInstance(arg_type, source, i));
-        if (i >= fix_arg_count)
-          code.emitArrayStore(arg_type);
-      }
+    compileArgs(args, is_static ? null : method.getDeclaringClass(), argTypes,
+		takesVarArgs(), getName(), source, comp);
     
     if (method == null)
       code.emitPrimop (opcode(), args.length, retType);
     else
       code.emitInvokeMethod(method, opcode());
 
-    if (retType.isVoid())
-      comp.compileConstant(Values.empty, target);
-    else
-      target.compileFromStack(comp, retType);
+    target.compileFromStack(comp, retType);
   }
 
   public Type getParameterType(int index)

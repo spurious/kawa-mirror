@@ -55,38 +55,35 @@ public class ReferenceExp extends Expression
     return env.getChecked(symbol);
   }
 
-  private static ClassType thisType;
-  static ClassType typeLocation = null;
-  static Method getMethod = null;
-
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
       return;
     CodeAttr code = comp.getCode();
-    if (binding != null
-        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
+    if (binding != null)
       {
 	binding.load(comp);
 	if (binding.isIndirectBinding() && ! getDontDereference())
 	  {
-	    if (typeLocation == null)
-	      {
-		typeLocation = ClassType.make("gnu.mapping.Location");
-		getMethod = typeLocation.addMethod("get",
-						   Type.typeArray0,
-						   Compilation.typeObject,
-						   Access.PUBLIC|Access.FINAL);
-	      }
-	    code.emitInvokeVirtual (getMethod);
+	    code.emitInvokeVirtual (Compilation.getLocationMethod);
 	  }
 	else if (binding.isFluid())
 	  code.emitGetField(FluidLetExp.valueField);
       }
     else
       {
-	code.emitGetStatic(comp.getBindingField(symbol));
-	code.emitInvokeVirtual(Compilation.getBindingMethod);
+	Field field = comp.getBindingField(symbol);
+	if (field.getStaticFlag())
+	  code.emitGetStatic(field);
+	else
+	  {
+	    LambdaExp lexp = comp.curLambda;
+	    while (! (lexp instanceof ModuleExp))
+	      lexp = lexp.outerLambda();
+	    lexp.loadHeapFrame(comp);
+	    code.emitGetField(field);
+	  }
+	code.emitInvokeVirtual(Compilation.getLocationMethod);
       }
     target.compileFromStack(comp, getType());
   }

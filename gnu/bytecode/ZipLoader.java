@@ -55,7 +55,7 @@ public class ZipLoader extends ClassLoader
 		int member_size = (int) member.getSize();
 		java.io.InputStream strm = zar.getInputStream(member);
 		byte[] bytes = new byte[member_size];
-		strm.read(bytes);
+		new java.io.DataInputStream(strm).readFully(bytes);
 		clas = defineClass (name, bytes, 0, member_size);
 		loadedClasses.addElement(name);
 		loadedClasses.addElement(clas);
@@ -68,8 +68,9 @@ public class ZipLoader extends ClassLoader
 	    catch (java.io.IOException ex)
 	      {
 		throw new
-		  Error ("IOException while loading from ziparchive \""
-			 + name + "\": " + ex.toString ());
+		  ClassNotFoundException ("IOException while loading "
+					  + member_name + " from ziparchive \""
+					  + name + "\": " + ex.toString ());
 	      }
 	  }
       }

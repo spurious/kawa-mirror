@@ -1,3 +1,9 @@
+2000-03-05  Per Bothner  <per@bothner.com>
+
+	* ZipLoader.java (loadClass):  Use DataInputStream.readFully to force
+	all of a class member ot be read.  Fixes VerifyError under JDK1.2.
+	Throw ClassNotFoundException rather than Error.
+
 2000-03-02  Per Bothner  <per@bothner.com>
 
 	* Type.java (neverReturnsType):  New static final Type.

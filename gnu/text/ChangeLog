@@ -1,3 +1,7 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (mark, reset):  New methods.
+
 2002-12-11  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (QUEUED_OP_DUMMY_TYPE):

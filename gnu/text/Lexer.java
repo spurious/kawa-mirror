@@ -245,4 +245,27 @@ public class Lexer extends Reader
     buffer[len] = (char) ch;
     tokenBufferLength = len + 1;
   }
+
+
+  private int saveTokenBufferLength = -1;
+
+  /** Start tentative parsing.  Must be followed by a reset. */
+  public void mark ()
+    throws java.io.IOException
+  {
+    if (saveTokenBufferLength >= 0)
+      throw new Error("internal error: recursive call to mark not allowed");
+    port.mark(Integer.MAX_VALUE);
+    saveTokenBufferLength = tokenBufferLength;
+  }
+
+  /** Stop tentative parsing.  Return to position where we called mark. */
+  public void reset ()
+    throws java.io.IOException
+  {
+    if (saveTokenBufferLength < 0)
+      throw new Error("internal error: reset called without prior mark");
+    port.reset();
+    saveTokenBufferLength = -1;
+  }
 }

@@ -9,6 +9,7 @@ public class ExpWalker
   public Object walkScopeExp (ScopeExp exp) { return walkExpression(exp); }
   public Object walkLetExp (LetExp exp) { return walkScopeExp(exp); }
   public Object walkLambdaExp (LambdaExp exp) { return walkScopeExp(exp); }
+  public Object walkObjectExp (ObjectExp exp) { return walkLambdaExp(exp); }
   //public Object walkModuleExp (ModuleExp exp) { return walkLambdaExp(exp); }
   public Object walkSetExp (SetExp exp) { return walkExpression(exp); }
   //public Object walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }

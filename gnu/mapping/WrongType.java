@@ -85,9 +85,13 @@ public class WrongType extends WrappedException
     Throwable ex = getCause();
     if (ex != null)
       {
-        sbuf.append(" (");
-        sbuf.append(ex.getMessage());
-        sbuf.append(')');
+	String msg = ex.getMessage();
+	if (msg != null)
+	  {
+	    sbuf.append(" (");
+	    sbuf.append(msg);
+	    sbuf.append(')');
+	  }
       }
     return sbuf.toString();
   }

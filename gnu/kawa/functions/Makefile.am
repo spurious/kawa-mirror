@@ -6,6 +6,7 @@ java_sources=\
   AddOp.java \
   AppendValues.java \
   Apply.java \
+  Arithmetic.java \
   Arrays.java \
   ArrayRef.java \
   ArraySet.java \

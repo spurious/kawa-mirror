@@ -1,9 +1,9 @@
-// Copyright (c) 2000, 2001, 2003  Per M.A. Bothner.
+// Copyright (c) 2000, 2001, 2003, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
-import gnu.math.IntNum;
-import gnu.math.Numeric;
+import gnu.math.*;
+import java.math.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
@@ -29,9 +29,54 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
   public static Object apply2(int plusOrMinus, Object arg1, Object arg2)
   {
-    Numeric num1 = (Numeric) arg1;
-    Numeric num2 = (Numeric) arg2;
-    return num1.add(num2, plusOrMinus);
+    int code1 = Arithmetic.classifyValue(arg1);
+    int code2 = Arithmetic.classifyValue(arg2);
+    /*
+    if (code1 < 0 || code2 < 0)
+    throw new ClasscastException(); // FIXME
+    */
+    int code = code1 < code2 ? code2 : code1;
+    switch (code)
+      {
+      case Arithmetic.INT_CODE:
+	int i1 = Arithmetic.asInt(arg1);
+	int i2 = Arithmetic.asInt(arg2);
+	return new Integer(plusOrMinus > 0 ? i1 + i2 : i1 - i2);
+      case Arithmetic.LONG_CODE:
+	long l1 = Arithmetic.asLong(arg1);
+	long l2 = Arithmetic.asLong(arg2);
+	return new Long(plusOrMinus > 0 ? l1 + l2 : l1 - l2);
+      case Arithmetic.BIGINTEGER_CODE:
+	BigInteger bi1 = Arithmetic.asBigInteger(arg1);
+	BigInteger bi2 = Arithmetic.asBigInteger(arg2);
+	return plusOrMinus > 0 ? bi1.add(bi2) : bi1.subtract(bi2);
+      case Arithmetic.INTNUM_CODE:
+	return IntNum.add(Arithmetic.asIntNum(arg1), Arithmetic.asIntNum(arg2),
+			  plusOrMinus);
+      case Arithmetic.BIGDECIMAL_CODE:
+	BigDecimal bd1 = Arithmetic.asBigDecimal(arg1);
+	BigDecimal bd2 = Arithmetic.asBigDecimal(arg2);
+	return plusOrMinus > 0 ? bd1.add(bd2) : bd1.subtract(bd2);
+      case Arithmetic.RATNUM_CODE:
+	return RatNum.add(Arithmetic.asRatNum(arg1), Arithmetic.asRatNum(arg2),
+			  plusOrMinus);
+      case Arithmetic.FLOAT_CODE:
+	float f1 = Arithmetic.asFloat(arg1);
+	float f2 = Arithmetic.asFloat(arg2);
+	return new Float(plusOrMinus > 0 ? f1 + f2 : f1 - f2);
+      case Arithmetic.DOUBLE_CODE:
+	double d1 = Arithmetic.asDouble(arg1);
+	double d2 = Arithmetic.asDouble(arg2);
+	return new Double(plusOrMinus > 0 ? d1 + d2 : d1 - d2);
+      case Arithmetic.FLONUM_CODE:
+	d1 = Arithmetic.asDouble(arg1);
+	d2 = Arithmetic.asDouble(arg2);
+	return new DFloNum(plusOrMinus > 0 ? d1 + d2 : d1 - d2);
+      default:
+	Numeric num1 = Arithmetic.asNumeric(arg1);
+	Numeric num2 = Arithmetic.asNumeric(arg2);
+	return num1.add(num2, plusOrMinus);
+      }
   }
 
   public static Object $Pl(Object arg1, Object arg2)

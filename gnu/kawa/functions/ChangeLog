@@ -1,5 +1,11 @@
 2005-03-04  Per Bothner  <per@bothner.com>
 
+	* Arithmetic.java: New utility class.
+	* Makefile.am: Upadte accordingly.
+	* AddOp.java (apply2): Handle operands that are of a java.Number class
+	or gnu.math.BigInteger/BigDecimal.
+	* MultiplyOp.java (applyN): Likewise.
+
 	* Convert.java: Update Interpreter->Language various places.
 	* IsEq.java: Likewise.
 	* IsEqual.java: Likewise.

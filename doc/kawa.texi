@@ -160,19 +160,15 @@ Quantities, keyword values, and the expanded @code{lambda} form
 @node Getting Kawa, Installation, Features, Top
 @chapter Getting Kawa
 
-To get the Kawa sources, you have choice between the
-@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable.tar.gz,
-current stable version} (possibly quite old), or the newer
-@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-newest.tar.gz,
-latest snapshot of the development tree} (builds and passes
-the testsuite but less extensively tested).
+You can get Kawa sources and binaries from the Kawa ftp site
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/},
+or from a @uref{http://www.gnu.org/order/ftp.html,mirror site}.
 
-A ready-to-run @code{.zip} archive of the pre-compiled classes is in
-@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip}.
+The latest release of the Kawa source code is
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.tar.gz}.
 
-These are all in the @uref{ftp://ftp.gnu.org/pub/gnu/kawa/,Kawa ftp site},
-which includes other versions and files, including a @code{.deb}
-Debian package file of Kawa.
+A ready-to-run @code{.jar} archive of the pre-compiled classes is in
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-@value{VERSION}.jar}.
 
 You can also check out the very latest version via anonymous cvs.
 @example

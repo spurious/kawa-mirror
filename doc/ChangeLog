@@ -1,3 +1,7 @@
+2001-10-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Getting Kawa):  Mention mirrors, and other changes.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Use @email where appropriate.

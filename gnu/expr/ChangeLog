@@ -1,5 +1,8 @@
 2001-11-23  Per Bothner  <per@bothner.com>
 
+	* PrimProcedure.java:  Remove unneeded variable.
+	* ConsumerTarget.java:  Use Compilation.typeConsumer.
+
 	* Declaration.java (IS_SINGLE_VALUE):  New constant.
 	* ReferenceExp.java (compilation):  Optimize if SeriesTarget
 	and IS_SINGLE_VALUE is set.

@@ -145,8 +145,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {
-	Throwable th = ex.getTargetException();
-	throw th;
+	throw ex.getTargetException();
       }
   }
 

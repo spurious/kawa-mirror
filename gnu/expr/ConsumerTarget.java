@@ -75,8 +75,7 @@ public class ConsumerTarget extends Target
     code.emitLoad(consumer);
     code.emitSwap();
     if (method == null && methodName != null)
-      method = ClassType.make("gnu.lists.Consumer")
-	.getDeclaredMethod(methodName, 1);
+      method = Compilation.typeConsumer.getDeclaredMethod(methodName, 1);
     if (method != null)
       code.emitInvokeInterface(method);
   }

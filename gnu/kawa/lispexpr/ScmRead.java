@@ -1,13 +1,7 @@
 package gnu.kawa.lispexpr;
-import gnu.math.*;
-import java.io.*;
-import gnu.text.Char;
 import gnu.text.SyntaxException;
 import gnu.mapping.*;
-import gnu.expr.*;
 import gnu.text.SourceMessages;
-import gnu.lists.*;
-import java.util.Vector;
 
 /** A class to read Scheme forms (S-expressions). */
 

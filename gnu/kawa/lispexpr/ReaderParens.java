@@ -81,7 +81,8 @@ public class ReaderParens extends ReadTableEntry
 	    if (ch == close)
 	      break;
 	    if (ch < 0)
-	       lexer.eofError("unexpected EOF in list");
+	       lexer.eofError("unexpected EOF in list starting here",
+			      startLine + 1, startColumn);
 	    ReadTableEntry entry;
 	    if (ch == '.')
 	      {
@@ -101,7 +102,8 @@ public class ReaderParens extends ReadTableEntry
 			break;
 		      }
 		    if (ch < 0)
-		      lexer.eofError("unexpected EOF in list");
+		      lexer.eofError("unexpected EOF in list starting here",
+				     startLine + 1, startColumn);
 		    if (sawDot)
 		      {
 			lexer.error("multiple '.' in list");

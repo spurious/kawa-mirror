@@ -1,3 +1,7 @@
+2001-10-02  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (isPrettyPrinting):  Set in constructors only.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* PrettyWriter.java (setIndentation):  Fix handling of 'prefix' local

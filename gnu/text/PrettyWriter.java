@@ -17,6 +17,7 @@ public class PrettyWriter extends java.io.Writer
   public PrettyWriter(java.io.Writer base)
   {
     this.out = out;
+    isPrettyPrinting = true;
   }
 
   public PrettyWriter(java.io.Writer out, int lineLength)
@@ -35,7 +36,7 @@ public class PrettyWriter extends java.io.Writer
   /** Line length we should format to. */
   int lineLength = 80;
 
-  public boolean isPrettyPrinting = true;
+  public boolean isPrettyPrinting;
 
   public static int initialBufferSize = 126;
 

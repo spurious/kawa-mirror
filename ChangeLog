@@ -1,5 +1,9 @@
 2005-02-07  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/require.java (makeDeclInModule): Set value to
+	reference to appropriate Declaration if StaticFieldLocation.
+	Fixes Savannah bug #11822 - but only for macros in static modules.
+
 	* kawa/standard/require.java (find(String)):  Move 'run' call to ...
 	(find(Class, Environment)): ... here to also do run at compile-time.
 

@@ -120,13 +120,17 @@ public class ReferenceExp extends Expression
       {
 	if (decl.field == null)
 	  throw new Error("internal error: cannot take location of "+decl);
-	ClassType typeClassMemberLocation
-	  = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
 	Method meth;
 	if (decl.field.getStaticFlag())
-	  meth = typeClassMemberLocation.getDeclaredMethod("make", 2);
+	  {
+	    ClassType typeStaticFieldLocation
+	      = ClassType.make("gnu.kawa.reflect.StaticFieldLocation");
+	    meth = typeStaticFieldLocation.getDeclaredMethod("make", 2);
+	  }
 	else
 	  {
+	    ClassType typeClassMemberLocation
+	      = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
 	    meth = typeClassMemberLocation.getDeclaredMethod("make", 3);
 	    decl.base.load(comp);
 	  }

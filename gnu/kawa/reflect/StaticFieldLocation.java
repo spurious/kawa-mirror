@@ -78,4 +78,9 @@ public class StaticFieldLocation extends ClassMemberLocation
     environ.addLocation(sym, property,
 			new StaticFieldLocation(cname, fname));
   }
+
+  public static StaticFieldLocation make (/*Object name,*/ String cname, String fldName)
+  { 
+    return new StaticFieldLocation(cname, fldName);
+  }
 }

@@ -84,9 +84,7 @@ public class require extends Syntax
   {
     try
       {
-	Object value =
-	  find(Class.forName(typeName), Environment.getCurrent());
-	return value;
+	return find(Class.forName(typeName), Environment.getCurrent());
       }
     catch (java.lang.ClassNotFoundException ex)
       {
@@ -462,6 +460,13 @@ public class require extends Syntax
     if ((fld.getModifiers() & Access.FINAL) != 0
 	&& ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
+    else if ((fld.getModifiers() & Access.FINAL) != 0
+	&& (fvalue instanceof gnu.kawa.reflect.StaticFieldLocation))
+      {
+	Declaration rdecl
+	  = ((gnu.kawa.reflect.StaticFieldLocation) fvalue).getDeclaration();
+	fdecl.noteValue(new ReferenceExp(rdecl));
+      }
     else
       fdecl.noteValue(null);
     fdecl.setSimple(false);

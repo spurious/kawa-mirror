@@ -198,11 +198,6 @@ public class ClassMemberLocation extends Location
       }
   }
 
-  public static ClassMemberLocation make (/*Object name,*/ String cname, String fldName)
-  {
-    return make(/*name,*/ null, cname, fldName);
-  }
-
   public static ClassMemberLocation make (/*Object name,*/ Object instance, String cname, String fldName)
   {
     return new ClassMemberLocation(/*name,*/ instance, ClassType.make(cname), fldName);

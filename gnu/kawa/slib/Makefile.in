@@ -155,6 +155,7 @@ EXTRA_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)
 
 @ENABLE_XML_TRUE@XML_SCM = XML.scm XStrings.scm
 @ENABLE_SERVLET_TRUE@SERVLET_SCM = HTTP.scm
+# NOTE if this list is changed, also update build,xml.
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm srfi1.scm readtable.scm \
   $(XML_SCM) $(SERVLET_SCM)
 

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -105,7 +105,10 @@ KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 APPLETVIEWER = appletviewer
 
-SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   classes1.scm classes2.scm SimpleB.java obj-test.scm   misc-test.scm polytype.scm formatst.scm scribble.scm   module1.scm module2.scm
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
+  classes1.scm classes2.scm SimpleB.java obj-test.scm \
+  misc-test.scm polytype.scm formatst.scm scribble.scm \
+  module1.scm module2.scm
 
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = $(SOURCES) ppfile.out

@@ -40,7 +40,7 @@ $(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/
 
 all-recursive:  $(JAVATOP)kawa/Version.java
 
-makekawa.bat:
+makekawa.bat:  $(srcdir)/configure.in
 	echo "rem Build Kawa under Windows" >tmp
 	echo "rem You may need to change the following definitions:" >>tmp
 	echo "set javahome=c:\jdk1.2.1" >>tmp

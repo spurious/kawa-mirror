@@ -1,3 +1,9 @@
+2005-03-16  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Now extends Lexer rather than LispReader.
+	(getReadTable): Remove unused method.
+	(xqlReadTable): Remove unused field.
+
 2005-03-07  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Update Interpreter -> Language:

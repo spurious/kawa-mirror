@@ -17,7 +17,7 @@ import gnu.xquery.util.NamedCollator;
 
 /** A class to read xquery forms. */
 
-public class XQParser extends LispReader // should be extends Lexer
+public class XQParser extends Lexer
 {
   int curToken;
   Object curValue;
@@ -954,14 +954,6 @@ public class XQParser extends LispReader // should be extends Lexer
     interactive = v;
   }
   
-  protected ReadTable getReadTable () { return xqlReadTable; }
-
-  public static ReadTable xqlReadTable;
-  static
-  {
-    xqlReadTable = ReadTable.getInitial();
-  }
-
   private static final int priority(int opcode)
   {
     /* FIXME:  Future!

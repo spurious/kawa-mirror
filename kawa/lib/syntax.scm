@@ -40,26 +40,3 @@
 		(call-with-output-string (lambda (port) (write arg port))))
 	      args))
   (apply throw 'misc-error msg args))
-
-(define-syntax fluid-let
-  (syntax-rules ()
-		((fluid-let ((variable init) ...) . exprs)
-		 (let* ((old-env ((primitive-static-method
-				   "gnu.mapping.Environment" "getCurrent"
-				   "gnu.mapping.Environment" ())))
-			(new-env ((primitive-constructor
-				   "gnu.mapping.Environment"
-				   ("gnu.mapping.Environment")) old-env)))
-		   (begin
-		     ((primitive-virtual-method "gnu.mapping.Environment"
-						"define" "gnu.mapping.Binding"
-						("String" <object>))
-		      new-env 'variable init) ...)
-		   ((primitive-static-method
-		     "gnu.mapping.Environment" "setCurrent"
-		     "void" ("gnu.mapping.Environment")) new-env)
-		   (try-finally
-		    (begin . exprs)
-		    ((primitive-static-method
-		      "gnu.mapping.Environment" "setCurrent"
-		      "void" ("gnu.mapping.Environment")) old-env))))))

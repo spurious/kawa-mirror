@@ -1,3 +1,8 @@
+2002-09-27  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (check-no-inline):  New rule.
+	(check):  Also do check-no-inline.
+
 2002-09-21  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  Add some new tests for srfi-9 (define-record-type).

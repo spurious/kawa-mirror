@@ -14,7 +14,7 @@ SAX2_TESTS = check-MySAXApp
 endif
 all:
 
-check: check2-no-full-tailcalls check1 check2-full-tailcalls \
+check: check2-no-full-tailcalls check1 check2-full-tailcalls check-no-inline \
   $(SERVLET_TESTS) $(SAX2_TESTS)
 
 check2-no-full-tailcalls:
@@ -22,6 +22,9 @@ check2-no-full-tailcalls:
 
 check2-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--full-tailcalls
+
+check-no-inline:
+	$(MAKE) check2 OPTIONS=--no-inline
 
 check1:  check-num check-arr check-format check-ppfile scribble.class
 check2:  check-scm check-misc check-mac check-obj check-polytype

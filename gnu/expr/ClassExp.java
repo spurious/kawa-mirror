@@ -392,7 +392,6 @@ public class ClassExp extends LambdaExp
 			 var != null;  var = var.nextVar())
 		      code.emitLoad(var);
 		    Method imethod = (Method) vec.elementAt(0);
-		    System.err.println("make impl "+impl+" calls "+imethod);
 		    code.emitInvokeStatic(imethod);
 		    code.emitReturn();
 		  }

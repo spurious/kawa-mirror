@@ -30,6 +30,16 @@ public class CpoolClass extends CpoolEntry {
     return name.string;
   }
 
+  /** Get corresponding ObjectType (ClassType or ArrayType). */
+  public final ObjectType getClassType ()
+  {
+    String name = this.name.string;
+    if (name.charAt (0) == '[')
+      return (ObjectType)Type.signatureToType (name);
+    else
+      return ClassType.make (name.replace ('/', '.'));
+  }
+  
   final static int hashCode (CpoolUtf8 name)
   {
     return name.hashCode() ^ 0xF0F;

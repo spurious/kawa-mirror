@@ -234,6 +234,16 @@ public class ClassFileInput extends DataInputStream
 	  }
 	return new InnerClassesAttr(data, (ClassType) container);
      }
+    else if (name == "Exceptions" && container instanceof Method)
+      {
+	Method meth = (Method)container;
+	int count = readUnsignedShort();
+        short[] exn_indices = new short[count];
+	for (int i = 0; i < count; ++i)
+	  exn_indices[i] = readShort();
+        meth.setExceptions(exn_indices);
+	return meth.getExceptionAttr();
+      }
     else
       {
 	byte[] data = new byte[length];

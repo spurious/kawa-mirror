@@ -31,6 +31,24 @@ public class Method implements AttrContainer {
   public final Attribute getAttributes () { return attributes; }
   public final void setAttributes (Attribute attributes)
   { this.attributes = attributes; }
+
+  ExceptionsAttr exceptions;
+  public final ExceptionsAttr getExceptionAttr () { return exceptions; }
+
+  public void setExceptions (short[] exn_indices)
+  {
+    if (exceptions == null)
+      exceptions = new ExceptionsAttr (this);
+    exceptions.setExceptions (exn_indices, classfile);
+  }
+
+  public void setExceptions (ClassType[] exn_types)
+  {
+    if (exceptions == null)
+      exceptions = new ExceptionsAttr(this);
+    exceptions.setExceptions(exn_types);
+  }
+
   CodeAttr code;
   public final CodeAttr getCode () { return code; }
 
@@ -258,6 +276,12 @@ public class Method implements AttrContainer {
   public final Type getReturnType() { return return_type; }
 
   public final Type[] getParameterTypes() { return arg_types; }
+
+  public final ClassType[] getExceptions()
+  {
+    if (exceptions == null) return null;
+    return exceptions.getExceptions();
+  }
 
   public final String getName ()
   {

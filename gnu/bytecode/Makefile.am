@@ -43,6 +43,7 @@ ZipLoader.java \
 ArrayClassLoader.java \
 ClassFileInput.java \
 ClassTypeWriter.java \
+ExceptionsAttr.java \
 dump.java
 
 JC1FLAGS = -g

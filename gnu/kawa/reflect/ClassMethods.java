@@ -13,33 +13,6 @@ public class ClassMethods extends Procedure2
     return apply(this, arg0, arg1, null, null, 0, 0);
   }
 
-  public static MethodProc apply (String className, String methodName)
-  {
-    String mname = methodName.equals("new") ? "<init>"
-      : Compilation.mangleName(methodName);
-    ClassType methodClass = ClassType.make(className);
-    MethodProc proc
-      = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
-    if (proc == null)
-      {
-	StringBuffer sbuf = new StringBuffer();
-	if (! methodClass.isExisting())
-	  {
-	    sbuf.append("no class named ");
-	    sbuf.append(className);
-	  }
-	else
-	  {
-	    sbuf.append("no method named `");
-	    sbuf.append(mname);
-	    sbuf.append("' in class ");
-	    sbuf.append(className);
-	  }
-	throw new RuntimeException(sbuf.toString());
-      }
-    return proc;
-  }
-
   public static MethodProc apply(Procedure thisProc,
                                  Object arg0, Object arg1,
                                  Type rtype, Type[] atypes,

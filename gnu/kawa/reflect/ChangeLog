@@ -1,3 +1,7 @@
+2000-12-13  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (compile):  Comment out Oct 12 change - it isn't safe.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (field):  Remove field;  don't use

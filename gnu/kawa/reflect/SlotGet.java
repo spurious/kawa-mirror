@@ -192,6 +192,12 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
             if (isStaticField)
               {
                 boolean inlined = false;
+                /*
+                FIXME This isn't quite safe.  We should only "inline"
+                the value if the field whose initializer is a constant
+                expression (JLS 2nd ed 15.28).  We cannot determine this
+                using reflection instead we have to parse the .class file.
+
                 Type ftype = field.getType();
                 if ((modifiers & Access.FINAL) != 0
                     && ftype instanceof PrimType)
@@ -214,6 +220,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
                           }
                       }
                   }
+                */
                 if (! inlined)
                   code.emitGetStatic(field); 
               }

@@ -1,3 +1,8 @@
+2004-11-10  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (CommonLisp): Remove definitions of 'and' and 'or'.
+	Instead used definitions in kawa.lib.std_syntax.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (<init>): Also load prim_syntax.

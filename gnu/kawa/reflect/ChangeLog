@@ -1,3 +1,9 @@
+2001-08-30  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (checkName):  Use mangleNameIfNeeded.
+	* SlotGet.java (apply2):  Likewise.
+	* SlotSet.java (apply):  Likewise.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* Invoke.java:  Update for PairClassType field rename.

@@ -32,7 +32,7 @@ public class SlotSet extends Procedure3 implements Inlineable
   {
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
     boolean illegalAccess = false;
-    name = gnu.expr.Compilation.mangleName(name);
+    name = gnu.expr.Compilation.mangleNameIfNeeded(name);
     Class clas = isStatic ? SlotGet.coerceToClass(obj) : obj.getClass();
     try
       {

@@ -45,7 +45,7 @@ public class SlotGet extends Procedure2 implements HasSetter, Inlineable
     if (! (name instanceof String) && ! (name instanceof FString))
       throw WrongType.make(null, this, 1);
     Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
-    String fname = gnu.expr.Compilation.mangleName(name.toString());
+    String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
     if (clas.isArray() && "length".equals(fname))
       {

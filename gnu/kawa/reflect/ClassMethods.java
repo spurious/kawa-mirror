@@ -196,7 +196,7 @@ public class ClassMethods extends ProcedureN
         Object name = ((QuoteExp) exp).getValue();
         if (name instanceof FString || name instanceof String
 	    || name instanceof Binding)
-          return Compilation.mangleName(name.toString());
+          return Compilation.mangleNameIfNeeded(name.toString());
       }
     return null;
   }

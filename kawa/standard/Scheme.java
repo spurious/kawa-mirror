@@ -465,7 +465,7 @@ public class Scheme extends Interpreter
       define_syntax("try-catch", "kawa.standard.try_catch");
       define_proc("throw", "kawa.standard.throw_name");
       define_proc("catch", "kawa.lib.syntax");
-      define_proc("error", "kawa.lib.syntax");
+      define_proc("error", "kawa.lib.misc");
       define_proc("as", kawa.standard.convert.as);
       define_field("instance?", "kawa.standard.Scheme", "instanceOf");
       define_syntax("synchronized", "kawa.standard.synchronizd");

@@ -1,3 +1,8 @@
+2000-12-13  Emmanuel Castro <castro@lirmm.fr>
+
+	* kawa/standard/Scheme.java (initScheme):  'error' is now in
+	kawa.lib.misc, not kawa.lib.syntax.
+
 2000-12-13  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/map.java (inline):  Swap order of then-clause and

@@ -1483,8 +1483,24 @@ public class LambdaExp extends ScopeExp
     properties = Procedure.setProperty(properties, key, value);
   }
 
+  /** If non-null, the type of values returned by this function.
+   * If null, the return type has not been set or calculated yet. */
+  protected Type returnType;
+
+  /** The return type of this function, i.e the type of its returned values. */
   public final Type getReturnType()
   {
-    return body.getType();
+    if (returnType == null)
+      {
+	returnType = Type.pointer_type;  // To guards against cycles.
+	returnType = body.getType();
+      }
+    return returnType;
+  }
+
+  /* Set teh return type of this function. */
+  public final void setReturnType (Type returnType)
+  {
+    this.returnType = returnType;
   }
 }

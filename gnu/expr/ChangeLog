@@ -1,3 +1,10 @@
+2001-11-23  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (returnType):  New field.
+	(getReturnType):  Guard against cycles.
+	(setReturnType):  New method.
+	* ApplyExp.java (getType):  Use LambdaExp's getReturnType.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  If isHandlingTailCalls use CallContext

@@ -1,3 +1,8 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* BaseUri.java:  Moved gnu.kawa.functions.
+	* Makefile.am (java_sources):  Remove BaseUri.java.
+
 2003-02-13  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java:  New class, extends Procedure1.

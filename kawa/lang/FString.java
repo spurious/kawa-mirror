@@ -164,6 +164,16 @@ public class FString extends Sequence implements Printable, Compilable
 	    char ch = value[i];
 	    if ((ch == '\\' || ch == '\"'))
 	      ps.print ('\\');
+	    /*
+	    // These escapes are not standard Scheme,
+	    // so should probably not be enabled by default.
+	    else if (ch == '\n')
+	      { ps.print("\\n"); continue; }
+	    else if (ch == '\r')
+	      { ps.print("\\r"); continue; }
+	    else if (ch == '\t')
+	      { ps.print("\\t"); continue; }
+	    */
 	    ps.print (ch);
 	  }
 	ps.print ('\"');

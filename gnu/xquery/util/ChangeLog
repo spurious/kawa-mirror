@@ -1,3 +1,14 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* MakeElement.java (beginGroup, endGroup):  Switch argument order.
+	(inline):  Use Expressions's setLine to set line number info.
+
+	* NamedChildren.java (compile):  Also optimize ConsumerTarget.
+	(getPropertyName, getNamedProperty):  New methods.
+	(namedChildren, getNamaedChild, gotoNext, gotoFirstChild):  Add
+	support for getting named properties from beans e.g. $request/method.
+	* NodeType.java (coerce):  Handle arbitrary value.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* Document.java (document, apply1): Specific that it throws Throwable,

@@ -15,7 +15,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 
   public int numArgs() { return 0xFFFFF001; }
 
-  public static void beginGroup(Object type, Consumer out)
+  public static void beginGroup(Consumer out, Object type)
   {
     String name;
     if (type instanceof ElementConstructor)
@@ -31,7 +31,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
     out.beginGroup(name, type);
   }
 
-  public static void endGroup(Object type, Consumer out)
+  public static void endGroup(Consumer out, Object type)
   {
     String name;
     if (type instanceof ElementConstructor)
@@ -50,7 +50,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
   {
     Object type = ctx.getNextArg();
     Consumer out = ctx.consumer;
-    beginGroup(type, out);
+    beginGroup(out, type);
     Object endMarker = Special.dfault;
     for (;;)
       {
@@ -62,7 +62,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 	else
 	  ctx.writeValue(arg);
       }
-    endGroup(type, out);
+    endGroup(out, type);
   }
 
   public Expression inline (ApplyExp exp)
@@ -77,7 +77,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
 	    nargs--;
 	    Expression[] xargs = new Expression[nargs];
 	    System.arraycopy(args, 1, xargs, 0, nargs);
-	    return new ApplyExp(args[0], xargs);
+	    return new ApplyExp(args[0], xargs).setLine(exp);
 	  }
       }
     return exp;

@@ -7,6 +7,7 @@ import gnu.lists.*;
 import gnu.xml.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
+import gnu.kawa.reflect.ClassMethods;
 
 public class NamedChildren extends CpsProcedure implements Inlineable
 {
@@ -17,6 +18,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   public static void namedChildren (String namespaceURI, String localName,
 				    TreeList tlist, int index,
 				    Consumer consumer)
+    throws Throwable
   {
     int child = tlist.gotoChildrenStart(index);
     if (child < 0)
@@ -40,7 +42,10 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       }
   }
 
+  static final Class[] noClasses = {};
+
   public static void namedChildren (String namespaceURI, String localName, Object node, Consumer consumer)
+    throws Throwable
   {
     if (node instanceof TreeList)
       {
@@ -52,9 +57,56 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	if (pos.sequence instanceof TreeList)
 	  namedChildren(namespaceURI, localName, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
       }
+    else if (namespaceURI == "")
+      Values.writeValues(getNamedProperty(node, localName), consumer);
   }
 
-  public void apply (CallContext ctx)
+  public static String getPropertyName(String name)
+  {
+    StringBuffer methodName = new StringBuffer(100);
+    methodName.append("get");
+    int nameLength = name.length();
+    boolean upcase = true;
+    for (int i = 0;  i < nameLength;  i++)
+      {
+	char ch = name.charAt(i);
+	if (ch == '-')
+	  upcase = true;
+	else
+	  {
+	    if (upcase)
+	      {
+		ch = Character.toTitleCase(ch);
+		upcase = false;
+	      }
+	    methodName.append(ch);
+	  }
+      }
+    return methodName.toString();
+  }
+
+  public static Object getNamedProperty (Object node, String name)
+    throws Throwable
+  {
+    // Look for a property with a matching name.
+    String methodName = getPropertyName(name)
+      .intern();
+
+    ClassType nodeType = (ClassType) Type.make(node.getClass());
+    PrimProcedure[] methods
+      = ClassMethods.getMethods(nodeType, methodName, 0, 0,
+				Interpreter.getInterpreter());
+    Type[] atypes = { nodeType };
+    long count = ClassMethods.selectApplicable(methods, atypes);
+    if (count == (1L << 32L))
+      return methods[0].apply1(node);
+    else if (count != 0)
+      throw new IllegalArgumentException("no property named "+name+" in "+nodeType);
+    else
+      return Values.empty;
+  }
+
+  public void apply (CallContext ctx)  throws Throwable
   {
     Consumer consumer = ctx.consumer;
     Object node = ctx.getNextArg();
@@ -83,8 +135,21 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 
   public static boolean getNamedChild(SeqPosition position,
 				      String namespaceURI, String localName)
+    throws Throwable
   {
     AbstractSequence seq = position.sequence;
+
+    if (seq == null)
+      {
+	if (namespaceURI == "")
+	  {
+	    if (position.ipos > 1)
+	      return false;
+	    position.xpos = getNamedProperty(position.xpos, localName);
+	    return position.xpos != Values.empty;
+	  }
+	return false;
+      }
     for (;;)
       {
 	int ipos = position.ipos;
@@ -116,9 +181,13 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       }
   }
 
+
   public static void gotoNext(SeqPosition pos)
   {
-    pos.sequence.gotoNext(pos, 0);
+    if (pos.sequence == null)
+      pos.ipos++;
+    else
+      pos.sequence.gotoNext(pos, 0);
   }
 
   static final SeqPosition nullPosition
@@ -127,6 +196,15 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   public static SeqPosition gotoFirstChild(SeqPosition pos)
   {
     TreeList seq = (TreeList) pos.sequence;
+    if (seq == null)
+      {
+	if (pos.ipos == 0)
+	  {
+	    pos.ipos = 1;
+	    return pos;
+	  }
+	return nullPosition;
+      }
     int child = seq.gotoChildrenStart(pos.ipos >> 1);
     if (child < 0)
       return nullPosition;
@@ -140,11 +218,12 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 
     if (nargs == 3
 	&& (target instanceof SeriesTarget
-	    /* || target instanceof ConsumerTarget */))
+	    	    || target instanceof ConsumerTarget
+))
       {
 	CodeAttr code = comp.getCode();
 
-	Variable child = code.addLocal(typeSeqPosition);
+	Variable child = target instanceof SeriesTarget ? code.addLocal(typeSeqPosition) : null;
 	Type retAddrType = Type.pointer_type;
 	Variable retAddr = code.addLocal(retAddrType);
 	Variable namespaceURIVar, localNameVar;
@@ -168,8 +247,9 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	SeriesTarget pathTarget = new SeriesTarget();
 	pathTarget.function = new Label(code);
 	pathTarget.done = new Label(code);
-	pathTarget.value = code.addLocal(typeSeqPosition);
-
+	pathTarget.value
+	  = code.addLocal(target instanceof SeriesTarget ? typeSeqPosition
+			  : Type.pointer_type);
 	args[0].compile(comp, pathTarget);
 
 	if (code.reachableHere())
@@ -177,12 +257,16 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	pathTarget.function.define(code);
 	code.pushType(retAddrType);
 	code.emitStore(retAddr);
-	code.emitLoad(pathTarget.value);
-	code.emitInvokeStatic(gotoFirstChildMethod);
-	code.emitStore(child);
-	Label nextChildLoopTop = new Label(code);
-	nextChildLoopTop.define(code);
-	code.emitLoad(child);
+	Label nextChildLoopTop = null;
+	if (target instanceof SeriesTarget)
+	  {
+	    code.emitLoad(pathTarget.value);
+	    code.emitInvokeStatic(gotoFirstChildMethod);
+	    code.emitStore(child);
+	    nextChildLoopTop = new Label(code);
+	    nextChildLoopTop.define(code);
+	    code.emitLoad(child);
+	  }
 	if (namespaceURIVar == null)
 	  args[1].compile(comp, comp.typeString);
 	else
@@ -191,17 +275,27 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	  args[2].compile(comp, comp.typeString);
 	else
 	  code.emitLoad(localNameVar);
-	code.emitInvokeStatic(getNamedChildMethod);
-	Label ok = new Label(code);
-	code.emitGotoIfIntNeZero(ok);
-	code.emitRet(retAddr);
-	ok.define(code);
-	SeriesTarget starget = (SeriesTarget) target;
-	code.emitLoad(child);
-	starget.compileFromStackSimple(comp, typeSeqPosition);
-	code.emitLoad(child);
-	code.emitInvokeStatic(gotoNextMethod);
-	code.emitGoto(nextChildLoopTop);
+	if (target instanceof ConsumerTarget)
+	  {
+	    code.emitLoad(pathTarget.value);
+	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
+	    code.emitInvokeStatic(namedChildrenMethod);
+	    code.emitRet(retAddr);
+	  }
+	else
+	  {
+	    code.emitInvokeStatic(getNamedChildMethod);
+	    Label ok = new Label(code);
+	    code.emitGotoIfIntNeZero(ok);
+	    code.emitRet(retAddr);
+	    ok.define(code);
+	    code.emitLoad(child);
+	    SeriesTarget starget = (SeriesTarget) target;
+	    starget.compileFromStackSimple(comp, typeSeqPosition);
+	    code.emitLoad(child);
+	    code.emitInvokeStatic(gotoNextMethod);
+	    code.emitGoto(nextChildLoopTop);
+	  }
 	pathTarget.done.define(code);
 	return;
       }
@@ -218,6 +312,8 @@ public class NamedChildren extends CpsProcedure implements Inlineable
   static final ClassType typeSeqPosition = NodeType.nodeType;
   static final Method getNamedChildMethod
     = typeNamedChildren.getDeclaredMethod("getNamedChild", 3);
+  static final Method namedChildrenMethod
+    = typeNamedChildren.getDeclaredMethod("namedChildren", 4);
   static final Method gotoFirstChildMethod
     = typeNamedChildren.getDeclaredMethod("gotoFirstChild", 1);
   static final Method gotoNextMethod

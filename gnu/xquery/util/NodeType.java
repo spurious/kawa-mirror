@@ -38,8 +38,10 @@ public class NodeType extends ClassType
   {
     if (obj instanceof AbstractSequence)
       return new SeqPosition((AbstractSequence) obj, 0, false);
-    else
+    else if (obj instanceof SeqPosition)
       return (SeqPosition) obj;
+    else
+      return new SeqPosition(null, 0, obj);
   }
 
   public static final ClassType typeSeqPosition = ClassType.make("gnu.lists.SeqPosition");

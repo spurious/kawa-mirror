@@ -1,3 +1,13 @@
+Wed Jan 21 12:37:10 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/{Makefile.am,Makefile.in} (SECONDARY_OBJS):
+	Remove GuiConsole$$_MenuAction.class.
+	* kawa/TextAreaWriter.java (write(String)):  New method.
+	Insert at outputMark if writing to a MessageArea.
+	* kawa/MessageArea.java (append):  Remove.
+	(enter):  Nicer behavior.
+	* kawa/GuiConsole.java:  More menu actions.  Various improvements.
+	
 Mon Jan 19 14:44:09 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version to 1.5.93.

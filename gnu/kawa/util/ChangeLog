@@ -1,3 +1,9 @@
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java (insert):  Use RuntimeException instead of
+	UnsupportedOperationException (which is in Java 2 but not JDK 1.1).
+	* LList.java (makeLiteral):  Slight simplification.
+
 2000-04-18  Per Bothner  <per@bothner.com>
 
 	* Position.java:  Fix missing comment terminator.

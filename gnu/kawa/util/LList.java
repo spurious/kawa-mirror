@@ -139,9 +139,7 @@ public class LList extends Sequence implements Printable, Compilable
   public Literal makeLiteral (Compilation comp)
   {
     if (nullConstant == null)
-      nullConstant =
-	Compilation.scmListType.addField ("Empty", Compilation.scmListType,
-					  Access.PUBLIC|Access.STATIC);
+      nullConstant = Compilation.scmListType.getDeclaredField("Empty");
     return new Literal (this, nullConstant, comp);
   }
 

@@ -94,7 +94,8 @@ public abstract class AbstractString extends UniformVector
 
   protected void insert(int where, int count, boolean beforeMarkers)
   {
-    throw new UnsupportedOperationException("insert not supported");
+    // throw new UnsupportedOperationException("insert not supported"); Java 2!
+    throw new RuntimeException("insert not supported");
   }
 
   public void insert(int where, AbstractString str, boolean beforeMarkers)

@@ -257,7 +257,6 @@ public class CharBuffer extends AbstractString
 	System.arraycopy(positions, 0, newpos, 0, poslen);
 	positions = newpos;
       }
-    System.err.println("offst:"+offset+" kind:"+kind+" position:"+position+" pos.len:"+poslen);
     positions[position] = (offset << 2) + kind;
     return position;
   }

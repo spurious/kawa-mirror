@@ -664,7 +664,7 @@ public class LambdaExp extends ScopeExp
     StringBuffer nameBuf = new StringBuffer(60);
     LambdaExp outer = outerLambda();
     if (comp.generateApplet && outer instanceof ModuleExp)
-      declareThis(ctype);
+      closureEnv = declareThis(ctype);
     if (! (outer.isModuleBody() || outer instanceof ObjectExp)
 	|| name == null)
       {
@@ -691,8 +691,7 @@ public class LambdaExp extends ScopeExp
       }
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
-    // FIXME generateApplet test is wrong
-    int mflags = (isClassMethod() || comp.generateApplet) ? Access.PUBLIC
+    int mflags = (isClassMethod() || thisVariable != null) ? Access.PUBLIC
       : closureEnvType == null ? Access.PUBLIC|Access.STATIC
       : closureEnvType == ctype ? Access.PUBLIC|Access.FINAL
       : Access.STATIC;

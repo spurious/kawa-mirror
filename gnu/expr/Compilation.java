@@ -215,6 +215,8 @@ public class Compilation
   = ClassType.make("gnu.expr.ModuleMethod", typeProcedureN);
   public static ClassType typeApplyMethodProc
   = ClassType.make("gnu.mapping.ApplyMethodProc", typeProcedureN);
+  public static ClassType typeApplyMethodContainer
+  = ClassType.make("gnu.mapping.ApplyMethodContainer");
 
   /* Classes, fields, and methods used wgen usingCPStyle". */
   public static ClassType typeCallStack
@@ -703,6 +705,9 @@ public class Compilation
     int numApplyMethods = applyMethods.size();
     if (numApplyMethods == 0)
       return;
+    boolean generateApplyMethodContainer = generateApplet;
+    if (generateApplyMethodContainer)
+      curClass.addInterface(typeApplyMethodContainer);
     Method save_method = method;
     CodeAttr code = null;
     for (int i = 0;  i < 6; i++)
@@ -741,7 +746,7 @@ public class Compilation
 		  skipThisProc = true;
 		methodIndex = numMethods-1;
 	      }
-	    if (skipThisProc && ! generateApplet)
+	    if (skipThisProc && ! generateApplyMethodContainer)
 	      continue;
 	    if (! needThisApply)
 	      {
@@ -773,7 +778,7 @@ public class Compilation
 
 		needThisApply = true;
 	      }
-	    if (skipThisProc && generateApplet)
+	    if (skipThisProc && generateApplyMethodContainer)
 	      continue;
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
@@ -908,9 +913,10 @@ public class Compilation
 	    aswitch.addDefault(code);
 	    int nargs = i > 4 ? 2 : i + 1;
 	      nargs++;
-	    for (int k = generateApplet ? 1 : 0;  k < nargs;  k++)
+	    for (int k = generateApplyMethodContainer ? 1 : 0;
+		 k < nargs;  k++)
 	      code.emitLoad(code.getArg(k));
-	    if (generateApplet)
+	    if (generateApplyMethodContainer)
 	      {
 		Method defMethod = typeApplyMethodProc.getDeclaredMethod(mname+"Default", applyArgs);
 		code.emitInvokeStatic(defMethod);

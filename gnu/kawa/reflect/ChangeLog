@@ -1,3 +1,12 @@
+2002-11-20  Per Bothner  <bothner@bothner.com>
+
+	* ClassMethods.java:  Convert from ProcedureN to Procedure2.
+	(apply2):  New method, replaces applyN.
+	(apply(String,String)):  New method.
+
+	* InvokeNamed.java:  Remove - don't need it after all.
+	* Makefile.am:  Update accordingly.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* InvokeNamed.java:  New class, extends ProcedureN.

@@ -6,13 +6,38 @@ import gnu.expr.*;
 import gnu.lists.FString;
 import java.util.Vector;
 
-public class ClassMethods extends ProcedureN
+public class ClassMethods extends Procedure2
 {
-  public int numArgs() { return 2 | (2 << 12); } // For now.
-
-  public Object applyN (Object[] args)
+  public Object apply2 (Object arg0, Object arg1)
   {
-    return apply(this, args[0], args[1], null, null, 0, 0);
+    return apply(this, arg0, arg1, null, null, 0, 0);
+  }
+
+  public static MethodProc apply (String className, String methodName)
+  {
+    String mname = methodName.equals("new") ? "<init>"
+      : Compilation.mangleNameIfNeeded(methodName);
+    ClassType methodClass = ClassType.make(className);
+    MethodProc proc
+      = ClassMethods.apply(methodClass, mname, null, null, 0, 0);
+    if (proc == null)
+      {
+	StringBuffer sbuf = new StringBuffer();
+	if (! methodClass.isExisting())
+	  {
+	    sbuf.append("no class named ");
+	    sbuf.append(className);
+	  }
+	else
+	  {
+	    sbuf.append("no method named `");
+	    sbuf.append(mname);
+	    sbuf.append("' in class ");
+	    sbuf.append(className);
+	  }
+	throw new RuntimeException(sbuf.toString());
+      }
+    return proc;
   }
 
   public static MethodProc apply(Procedure thisProc,

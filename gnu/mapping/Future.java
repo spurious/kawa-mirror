@@ -3,7 +3,6 @@ package gnu.mapping;
 public class Future extends Thread
 {
   Object result;
-  Future parent;
   CallContext context;
 
   Environment environment;
@@ -12,43 +11,30 @@ public class Future extends Thread
   OutPort err;
   Throwable exception;
 
+  FluidBinding initBindings;
+
   Procedure action;
 
   public Future (Procedure action, Environment environment)
   {
-    this.action = action;
-    Thread parent_thread = Thread.currentThread();
-    this.environment = environment;
+    this(action, environment,
+	 InPort.inDefault(), OutPort.outDefault(), OutPort.errDefault());
   }
 
   public Future (Procedure action, Environment environment,
 		 InPort in, OutPort out, OutPort err)
   {
     this.action = action;
-    Thread parent_thread = Thread.currentThread();
     this.environment = environment;
     this.in = in;
     this.out = out;
     this.err = err;
+    initBindings = getFluids();
   }
 
   public Future (Procedure action)
   {
-    this.action = action;
-    in = InPort.inDefault();
-    out = OutPort.outDefault();
-    err = OutPort.errDefault();
-    Thread parent_thread = Thread.currentThread();
-    Environment parent_env;
-    if (parent_thread instanceof Future)
-      {
-	parent = (Future)parent_thread;
-	parent_env = parent.environment;
-      }
-    else
-      parent_env = Environment.user();
-      
-    environment = parent_env;
+    this(action, Environment.getCurrent());
   }
 
   /** Get the CallContext we use for this Thread. */
@@ -58,6 +44,8 @@ public class Future extends Thread
   {
     try
       {
+	context = CallContext.getInstance();
+	context.fluidBindings = initBindings;
 	result = action.apply0 ();
       }
     catch (Throwable ex)

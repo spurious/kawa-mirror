@@ -1,3 +1,12 @@
+2003-07-12  Per Bothner  <per@bothner.com>
+
+	* Future.java (parent):  Remove unused field.
+	(iniBindings):  New field.
+	(<init>):  Combine construcors.
+	Set initBindings using getFields().
+	(run):  Set context's fluidBindings using initBindings.
+	Fixes bug reported 7/11 by Chris.Dean@sokitomi.com.
+
 2003-07-10  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (getArgAsObject):  Make non-public.

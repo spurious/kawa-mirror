@@ -1,3 +1,9 @@
+2003-04-06  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalToClass):  Don't use SFormat for debug output.
+	* ReferenceExp.java (print):  Don't use SFormat.
+	* SetExp.java (print):  Likewise.
+
 2003-04-05  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (getOwningLambda):  New methods, replaces

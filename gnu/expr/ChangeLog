@@ -6,8 +6,8 @@
 
 	* Interpreter.java (defineAll, loadClass);  Moved from
 	gnu.xquery.lang.XQuery and made non-static.
-
- 2002-01-29  Daniel Bonniot  <bonniot@users.sourceforge.net>
+	
+2002-01-29  Daniel Bonniot  <bonniot@users.sourceforge.net>
  
  	* LambdaExp.java (addMethodFor): Rename conflicting methods in the same
  	class.

@@ -12,6 +12,16 @@ public class ThisExp extends ReferenceExp
     super("$this$");
   }
 
+  public ThisExp (Declaration binding)
+  {
+    super("$this", binding);
+  }
+
+  public ThisExp (ClassType type)
+  {
+    this(new Declaration("this", type));
+  }
+
   public void compile (Compilation comp, Target target)
   {
     CodeAttr code = comp.getCode();

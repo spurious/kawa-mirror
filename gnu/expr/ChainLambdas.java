@@ -2,6 +2,7 @@ package gnu.expr;
 
 /** Sets up the firstChild/nextSibling links of each LambdaExp.
  * Also generates a class name for each ObjectExp and registers each class.
+ * Also, if lambda is bound to a unique declaration, make that its name.
  */
 
 public class ChainLambdas extends ExpFullWalker
@@ -37,6 +38,9 @@ public class ChainLambdas extends ExpFullWalker
 	child = next;
       }
     exp.firstChild = prev;
+
+    if (exp.getName() == null && exp.nameDecl != null)
+      exp.setName(exp.nameDecl.getName());
     return exp;
   }
 

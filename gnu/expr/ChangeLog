@@ -8,6 +8,15 @@
 	* ExpFullWalker.java (walkExps):  New overload takes explicit length.
 	(walkBeginExp):  Pass BeginExp's new length field to walkExps.
 
+	* Expression.java (makeCoercion):  New static methods.
+
+	* ChainLambdas.java (walkLambdaExp):  If lambda is bound to a
+	unique declaration, make that its name.
+
+	* ScopeExp.java (add):  New method.
+
+	* ThisExp.java (<init>):  New constructors take/create Declaration.
+
 2000-08-06  Per Bothner  <per@bothner.com>
 
 	* LitTable.java (writeObject):  Handle null argument.

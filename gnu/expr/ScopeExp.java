@@ -22,6 +22,26 @@ public abstract class ScopeExp extends Expression
     else
       last.next = decl;
     last = decl;
+    decl.context = this;
+  }
+
+  /** Add a Declaration at a specified position.
+   */
+  public void add (Declaration prev, Declaration decl)
+  {
+    if (prev == null)
+      { // Put first
+        decl.next = decls;
+        decls = decl;
+      }
+    else
+      {
+        decl.next = prev.next;
+        prev.next = decl;
+      }
+    if (last == prev)
+      last = decl;
+    decl.context = this;
   }
 
   public ScopeExp () { scope = new Scope (); }
@@ -140,8 +160,7 @@ public abstract class ScopeExp extends Expression
    */
   public final void addDeclaration (Declaration decl)
   {
-    add(decl);
-    decl.context = this;
+    add(decl);  // FIXME just use add
   }
 
   public int countDecls ()

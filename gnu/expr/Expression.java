@@ -82,6 +82,20 @@ public abstract class Expression implements Printable
     return let;
   }
 
+  public static Expression makeCoercion(Expression value, Expression type)
+  {
+    Expression[] exps = new Expression[2];
+    exps[0] = type;
+    exps[1] = value;
+    QuoteExp c = new QuoteExp(kawa.standard.convert.getInstance());
+    return new ApplyExp(c, exps);
+  }
+
+  public static Expression makeCoercion(Expression value, Type type)
+  {
+    return makeCoercion(value, new QuoteExp(type));
+  }
+
   public final void setFile (String filename)
   {
     this.filename = filename;

@@ -12,7 +12,7 @@ public class Member extends Procedure2
     compare = comp;
   }
 
-  public Object apply2 (Object arg1, Object arg2)
+  public Object apply2 (Object arg1, Object arg2) throws Throwable
   {
     while (arg2 instanceof Pair)
       {

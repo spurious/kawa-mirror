@@ -60,17 +60,17 @@ public class Apply extends ProcedureN
     return proc_args;
   }
 
-  public static Object applyN(Procedure proc, Object[] args)
+  public static Object applyN(Procedure proc, Object[] args) throws Throwable
   {
     return proc.applyN(getArguments(args, 0));
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     return ((Procedure) args[0]).applyN(getArguments(args, 1));
   }
 
-  public void apply (CallContext ctx)
+  public void apply (CallContext ctx) throws Throwable
   {
     Object[] args = ctx.getArgs();
     ctx.proc = (Procedure) args[0];

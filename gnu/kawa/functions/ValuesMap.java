@@ -15,7 +15,7 @@ public class ValuesMap extends CpsProcedure
 
   public int numArgs() { return 0x2002; }
 
-  public void apply (CallContext ctx)
+  public void apply (CallContext ctx) throws Throwable
   {
     Procedure proc = (Procedure) ctx.getNextArg();
     Consumer out = ctx.consumer;
@@ -32,7 +32,7 @@ public class ValuesMap extends CpsProcedure
 	      break;
 	    ctx.setArgs(v);
 	    ctx.proc = proc;
-	    ctx.run();
+	    ctx.runUntilDone();
 	    ipos = values.nextDataIndex(ipos >> 1);
 	    /*
 	    if (ipos < 0)
@@ -45,7 +45,7 @@ public class ValuesMap extends CpsProcedure
       {
 	ctx.setArgs(val);
 	ctx.proc = proc;
-	ctx.run();
+	ctx.runUntilDone();
       }
   }
 }

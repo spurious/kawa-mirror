@@ -1,3 +1,9 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* Apply.java, Assoc.java, Member.java (apply* methods):
+	Now throws Throwable.
+	* ValuesMap.java (apply):  Use CallContext's new runUntilDone method.
+	
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java:  Update for CharSequence -> CharSeq renaming.

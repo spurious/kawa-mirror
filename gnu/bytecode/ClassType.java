@@ -75,6 +75,35 @@ public class ClassType extends ObjectType
   /** Set the modifiers (access flags) for this class. */
   public final void setModifiers(int flags) { access_flags = flags; }
 
+  /** Check if a component is accessible from this class.
+   * @param declaring the class containing the component (a field, method,
+   *   or inner class)
+   * @param modifiers the access flags of the component
+   * @return true if the specified component can be accessed from this class.
+   */
+  public boolean isAccessible (ClassType declaring, int modifiers)
+  {
+    int cmods = declaring.getModifiers();
+    if ((modifiers & Access.PUBLIC) != 0 && (cmods & Access.PUBLIC) != 0)
+      return true;
+    String callerName = getName();
+    String className = declaring.getName();
+    if (callerName.equals(className))
+      return true;
+    if ((modifiers & Access.PRIVATE) != 0)
+      return false;
+    int dot = callerName.lastIndexOf('.');
+    String callerPackage = dot >= 0 ? callerName.substring(0, dot) : "";
+    dot = className.lastIndexOf('.');
+    String classPackage = dot >= 0 ? className.substring(0, dot) : "";
+    if (callerPackage.equals(classPackage))
+      return true;
+    if ((modifiers & Access.PROTECTED) != 0
+	&& declaring.isSubclass(this))
+      return true;
+    return false;
+  }
+
   /** Sets the name of the class being defined in this classfile.
    * @param name the name to give to the class
    */

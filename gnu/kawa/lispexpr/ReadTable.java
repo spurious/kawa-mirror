@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner
+// Copyright (c) 2001, 2003  Per M.A. Bothner
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.lispexpr;
@@ -122,35 +122,16 @@ public class ReadTable extends RangeTable
     if (entry == null && ch >= 0 && ch < 0x10000)
       {
 	if (Character.isDigit((char) ch))
-	  {
-	    entry = (ReadTableEntry) lookup('0', null);
-	    if (entry == null)
-	      {
-		entry = ReadTableEntry.getDigitInstance();
-		set(ch, ch, entry);
-	      }
-	    return entry;
-	  }
-	if (Character.isLowerCase((char) ch))
-	  {
-	    entry = (ReadTableEntry) lookup('a', null);
-	    if (entry == null)
-	      {
-		entry = ReadTableEntry.getConstituentInstance();
-		set(ch, ch, entry);
-	      }
-	    return entry;
-	  }
-	if (Character.isLetter((char) ch))
-	  {
-	    entry = (ReadTableEntry) lookup('A', null);
-	    if (entry == null)
-	      {
-		entry = ReadTableEntry.getConstituentInstance();
-		set(ch, ch, entry);
-	      }
-	    return entry;
-	  }
+	  entry = (ReadTableEntry) lookup('0', null);
+	else if (Character.isLowerCase((char) ch))
+	  entry = (ReadTableEntry) lookup('a', null);
+	else if (Character.isLetter((char) ch))
+	  entry = (ReadTableEntry) lookup('A', null);
+	else if (Character.isWhitespace((char) ch))
+	  entry = (ReadTableEntry) lookup(' ', null);
+	// Current code assumes lookup(')') returns null.
+	if (entry == null && ch >= 128)
+	  entry = ReadTableEntry.getConstituentInstance();
       }
     return entry;
   }

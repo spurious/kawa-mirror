@@ -17,8 +17,8 @@ java_sources = \
   MakeElement.java \
   MinMax.java \
   NumberValue.java \
-  Position.java \
   Reduce.java \
+  RelativeStep.java \
   StringValue.java \
   SubList.java \
   ValuesFilter.java \

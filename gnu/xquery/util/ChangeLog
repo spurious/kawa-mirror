@@ -1,5 +1,10 @@
 2003-08-03  Per Bothner  <per@bothner.com>
 
+	* RelativeStep.java:  New class, extends CpsProcedure.
+	* ValuesFilter.java:  Re-write to correctly implement spec.
+	* Position.java:  Remove - no longer used.
+	* Makefile.in (java_sources):  Update accordingly.
+
 	* StringValue.java (contains, startsWith, endsWith):  Use stringValue
 	rather than toString to convert arguments.
 

@@ -1504,7 +1504,7 @@ public class IntNum extends RatNum implements Externalizable
     return IntNum.neg (this);
   }
 
-  /** Calculates <code>ceiling(log2(this &lt; 0 ? -this : this+1))</code>.
+  /** Calculates {@code ceiling(log2(this < 0 ? -this : this+1))}.
    * See Common Lisp: the Language, 2nd ed, p. 361.
    */
   public int intLength ()

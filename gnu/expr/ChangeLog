@@ -1,3 +1,9 @@
+2003-04-08  Per Bothner  <per@bothner.com>
+
+	* Special.java (make):  Return Special instead of Object.
+	Since eof instead a Special, don't handle eof here.
+	Fixes bug reported 04-05 by Vladimir Tsichevski.
+
 2003-04-06  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalToClass):  Don't use SFormat for debug output.

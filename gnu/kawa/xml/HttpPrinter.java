@@ -79,8 +79,8 @@ public class HttpPrinter extends FilterConsumer
   {
     if (label.equalsIgnoreCase("Content-type"))
       sawContentType = value;
-    headers.add(label);
-    headers.add(value);
+    headers.addElement(label);
+    headers.addElement(value);
   }
 
   public void beginAttribute(String attrName, Object attrType)

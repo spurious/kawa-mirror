@@ -764,11 +764,11 @@ public class Method {
 	byte to_sig0 = to_sig[0];
 	byte from_sig0 = to_sig[0];
 	if (from.size < 4)
-	  from_sig0 = 'I';
+	  from_sig0 = (byte) 'I';
 	if (to.size < 4)
 	  {
 	    compile_convert (from, Type.int_type);
-	    from_sig0 = 'I';
+	    from_sig0 = (byte) 'I';
 	  }
 	if (from_sig0 == to_sig0)
 	  return;

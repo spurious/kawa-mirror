@@ -1,3 +1,7 @@
+2003-05-09  Per Bothner  <per@bothner.com>
+
+	* build.xml (build.selectjava):  Add new gnu/lists classes.
+
 2003-05-04  Per Bothner  <per@bothner.com>
 
 	* build.xml (build.selectjava):  Add ListItems.java and

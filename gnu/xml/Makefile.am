@@ -11,7 +11,6 @@ java_FUTURE = \
   ArrayDocumentConstants.java \
   ArrayDocumentHandler.java \
   ConsumeSAXHandler.java \
-  ElementType.java \
   ParsedXMLPrinter.java \
   MakeTreeNode.java \
   TreeNode.java \
@@ -19,9 +18,8 @@ java_FUTURE = \
   XMLConsumer.java
 
 java_sources = \
-  ElementContext.java \
-  ElementType.java \
   NamespaceResolver.java \
+  QName.java \
   XPath.java \
   XPathConstants.java \
   XPathContext.java \

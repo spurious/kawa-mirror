@@ -101,10 +101,10 @@ AUTOMAKE_OPTIONS = foreign
 
 #  CompileTemplates.java
 
-java_FUTURE =    ArrayDocument.java   ArrayDocumentConstants.java   ArrayDocumentHandler.java   ConsumeSAXHandler.java   ElementType.java   ParsedXMLPrinter.java   MakeTreeNode.java   TreeNode.java   SimpleFilter.java   XMLConsumer.java
+java_FUTURE =    ArrayDocument.java   ArrayDocumentConstants.java   ArrayDocumentHandler.java   ConsumeSAXHandler.java   ParsedXMLPrinter.java   MakeTreeNode.java   TreeNode.java   SimpleFilter.java   XMLConsumer.java
 
 
-java_sources =    ElementContext.java   ElementType.java   NamespaceResolver.java   XPath.java   XPathConstants.java   XPathContext.java   XPathFunction.java   XPathParser.java   XPathVariable.java   XMLPrinter.java   VariableProvider.java   ParsedXMLToConsumer.java
+java_sources =    NamespaceResolver.java   QName.java   XPath.java   XPathConstants.java   XPathContext.java   XPathFunction.java   XPathParser.java   XPathVariable.java   XMLPrinter.java   VariableProvider.java   ParsedXMLToConsumer.java
 
 
 java_BUILT =    ParsedXMLHandler.java   ParsedXMLHandlerByte.java   XMLParser.java   XMLParserByte.java

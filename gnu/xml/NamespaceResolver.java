@@ -28,8 +28,6 @@ public class NamespaceResolver extends FilterConsumer
   // It may be the final output if cons instancedof TreeList.
   TreeList tlist;
 
-  ElementContext context;
-
   // The specified target Consumer that accepts the output.
   // In contrast, super.base may be either ==cons or ==tlist.
   Consumer cons;
@@ -58,11 +56,6 @@ public class NamespaceResolver extends FilterConsumer
 
   public NamespaceResolver(Consumer cons)
   {
-    this(cons, new ElementContext());
-  }
-
-  public NamespaceResolver(Consumer cons, ElementContext context)
-  {
     super(cons);
     this.cons = cons;
     if (cons instanceof TreeList)
@@ -74,8 +67,6 @@ public class NamespaceResolver extends FilterConsumer
     namespaceStack[0] = "xml";
     namespaceStack[1] = "http://www.w3.org/XML/1998/namespace";
     namespaceStackLength = 2;
-
-    this.context = context;
   }
 
   public void beginGroup(String name, Object type)
@@ -254,7 +245,7 @@ public class NamespaceResolver extends FilterConsumer
 	String local = nameStack[3 * i + 2];
 	boolean isNsNode = name == "xmlns" || prefix == "xmlns";
 	String uri = isNsNode ? "(namespace-node)" : resolve(prefix);
-	Object type = context.lookup(local, uri);
+	Object type = QName.make(uri, local);
 	if (cons == tlist)
 	  {
 	    int index = getIndex(name, type);

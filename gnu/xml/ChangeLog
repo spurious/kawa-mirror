@@ -1,3 +1,11 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* QName.java:  New class.
+	* ElementContext.java:  Removed; subsumed by QName.
+	* ElementType.java:  Removed; subsumed by QName.
+	* Makefile.am (java_sources):  Update accordingly.
+	* NamespaceResolver.java:  Use QName instead of ElementContext.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java:  Implement positionConsumer.

@@ -3,7 +3,8 @@
 
 package gnu.xml;
 import gnu.lists.*;
-import gnu.mapping.CharArrayOutPort;
+import gnu.mapping.*;
+import gnu.kawa.xml.KNode;
 
 /** Use to represent a Document or Document Fragment, in the XML DOM sense.
  * More compact than traditional DOM, since it uses many fewer objects.
@@ -78,6 +79,59 @@ public class NodeTree extends TreeList
     return comp;
   }
 
+  public SeqPosition getIteratorAtPos(int ipos)
+  {
+    return KNode.make(this, ipos);
+  }
+
+  public String posNamespaceURI (int ipos)
+  {
+    Object type = getNextTypeObject(ipos);
+    if (type instanceof XName)
+      return ((XName) type).getNamespaceURI();
+    if (type instanceof Symbol)
+      return ((Symbol) type).getNamespaceURI();
+    return null;
+  }
+
+  public String posPrefix (int ipos)
+  {
+    String name = getNextTypeName(ipos);
+    if (name == null)
+      return null;
+    int colon = name.indexOf(':');
+    return colon < 0 ? null : name.substring(0, colon);
+  }
+
+  public String posLocalName (int ipos)
+  {
+    Object type = getNextTypeObject(ipos);
+    if (type instanceof XName)
+      return ((XName) type).getLocalName();
+    if (type instanceof Symbol)
+      return ((Symbol) type).getLocalName();
+    return null;
+  }
+
+  public int posFirstChild(int ipos)
+  {
+    int index = gotoChildrenStart(posToDataIndex(ipos));
+    if (index < 0)
+      return -1;
+    char datum = data[index];
+    if (datum == END_GROUP_SHORT || datum == END_GROUP_LONG
+	|| datum == END_DOCUMENT)
+      return -1;
+    return index << 1;
+  }
+
+  public boolean posHasAttributes (int ipos)
+  {
+    int index = gotoAttributesStart(posToDataIndex(ipos));
+    if (index < 0)
+      return false;
+    return index >= 0 && data[index] == BEGIN_ATTRIBUTE_LONG;
+  }
 
   public String toString ()
   {

@@ -1,3 +1,9 @@
+2004-01-04  Per Bothner  <per@bothner.com>
+
+	* NodeTree (getIteratorAtPos):  New method.
+	(posNamespaceURI, posPrefix, posLocalName, posFirstChild,
+	posHasAttributes):  New DOM-like methods.
+
 2003-12-24  Per Bothner  <per@bothner.com>
 
 	* XName.java:  Implement Externalizable.

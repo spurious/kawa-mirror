@@ -400,6 +400,14 @@ implements Consumer, PositionConsumer, Consumable
 
   public void writeObject(Object v)
   {
+    if (v instanceof SeqPosition)
+      {
+	// A SeqPosition is used as a temporary cursor (see NodeType),
+	// so we need to save the current position.
+	SeqPosition pos = (SeqPosition) v;
+        writePosition(pos.sequence, pos.ipos, pos.xpos);
+	return;
+      }
     ensureSpace(3);
     int index = find(v);
     if (index < 0x1000)

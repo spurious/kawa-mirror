@@ -62,6 +62,13 @@ implements
     seq.makePosition(offset, isAfter, this, 0);
   }
 
+  public SeqPosition(AbstractSequence seq, int ipos, Object xpos)
+  {
+    this.sequence = seq;
+    this.ipos = ipos;
+    this.xpos = xpos;
+  }
+
   /** Creates a new SeqPosition, from a position triple.
    * The position triple is copied (using copyPosition).
    */
@@ -71,7 +78,7 @@ implements
     seq.copyPosition(ipos, xpos, pos, 0);
     return pos;
   }
-
+ 
   public final void gotoStart(AbstractSequence seq)
   {
     if (sequence != null)
@@ -272,9 +279,22 @@ implements
 
   public String toString()
   {
-    return "{" + sequence.getClass().getName()
-      + "@" + System.identityHashCode(sequence)
-      + " ipos: " + ipos + " xpos: " + xpos + "}";
+    StringBuffer sbuf = new StringBuffer(60);
+    sbuf.append('{');
+    if (sequence == null)
+      sbuf.append("null sequence");
+    else
+      {
+	sbuf.append(sequence.getClass().getName());
+	sbuf.append('@');
+	sbuf.append(System.identityHashCode(sequence));
+      }
+    sbuf.append(" ipos: ");
+    sbuf.append(ipos);
+    sbuf.append(" xpos: ");
+    sbuf.append(xpos);
+    sbuf.append('}');
+    return sbuf.toString();
   }
 }
 // This is for people using the Emacs editor:

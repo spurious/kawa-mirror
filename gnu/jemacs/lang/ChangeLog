@@ -1,3 +1,10 @@
+2005-03-20  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>): Declare 'emacs' function.
+	(main): Don't count on registerEnvironment, since that doesn't set
+	kawa.repl's previousLanguage.  Instead pass "--elisp" to kawa.repl's
+	processArgs to initialize ELisp more convolutedly.
+
 2005-03-17  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>): Use importLocation.

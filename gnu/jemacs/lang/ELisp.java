@@ -80,6 +80,8 @@ public class ELisp extends Lisp2
 	loadClass("gnu.commonlisp.lisp.PrimOps");
 	loadClass("gnu.jemacs.lang.NumberOps");
 	loadClass("gnu.jemacs.lang.MiscOps");
+
+        defProcStFld("emacs", "gnu.jemacs.buffer.emacs");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
@@ -262,14 +264,9 @@ public class ELisp extends Lisp2
 
   public static void main(String[] args)
   {
-    registerEnvironment();
+    kawa.repl.processArgs(new String[] { "--elisp" }, 0, 1);
     if (args.length == 0)
-      {
-        args = new String[3];
-        args[0] = "-e";
-        args[1] = "(emacs)";
-        args[2] = "--";
-      }
+      args = new String[] { "-e", "(emacs)", "--" };
     kawa.repl.main(args);
   }
 }

@@ -1,10 +1,12 @@
 package gnu.kawa.functions;
 import gnu.math.*;
 import gnu.mapping.*;
+import gnu.bytecode.*;
+import gnu.expr.*;
 
 /** This implements the numeric comparison relations: <. <=, etc. */
 
-public class NumberCompare extends ProcedureN
+public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 {
   // Return codes from Numeric.compare:
   static final int RESULT_GRT = 1;
@@ -140,5 +142,152 @@ public class NumberCompare extends ProcedureN
     //  if (args.length < 2)
     //  throw new WrongArguments(this.name(),2,"(< x1 x2 ...)");
     return applyN(flags, args) ? Boolean.TRUE : Boolean.FALSE;
+  }
+
+  public Expression inline (ApplyExp exp)
+  {
+    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    if (folded != exp)
+      return folded;
+    return exp;
+  }
+
+  /*
+  public void compareIntegers(Expression arg0, Expression arg1,
+			      Compilation comp, Target target)
+  {
+    compile [[ new ApplyExp(this, { new ApplyExp(<IntNum.compare>, { arg0, arg1 }), QuoteExp.zeroExp }) ]];
+  }
+  */
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    if (args.length == 2)
+      {
+	Expression arg0 = args[0];
+	Expression arg1 = args[1];
+	int kind0 = classify(arg0);
+	int kind1 = classify(arg1);
+	CodeAttr code = comp.getCode();
+	if (kind0 >= int_KIND && kind1 >= int_KIND)
+	  {
+	    if (! (target instanceof ConditionalTarget))
+	      {
+		IfExp.compile(exp, QuoteExp.trueExp, QuoteExp.falseExp,
+			      comp, target);
+		return;
+	      }
+	    StackTarget intTarget = new StackTarget(Type.int_type);
+	    ConditionalTarget ctarget = (ConditionalTarget) target;
+	    
+	    int opcode;
+	    int mask = flags;
+	    if (mask == TRUE_IF_NEQ)
+	      mask = TRUE_IF_GRT|TRUE_IF_LSS;
+	    if (arg0 instanceof QuoteExp && ! (arg1 instanceof QuoteExp))
+	      {
+		Expression tmp = arg1; arg1 = arg0; arg0 = tmp;
+		mask ^= TRUE_IF_GRT|TRUE_IF_LSS;
+	      }
+	    Label label1 = ctarget.trueBranchComesFirst ? ctarget.ifFalse : ctarget.ifTrue;
+	    if (ctarget.trueBranchComesFirst)
+	      mask ^= TRUE_IF_GRT|TRUE_IF_LSS|TRUE_IF_EQU;
+	    switch (mask)
+	      {
+	      case TRUE_IF_GRT:  opcode = 157 /*ifgt*/;  break;
+	      case TRUE_IF_EQU:  opcode = 153 /*ifeq*/;  break;
+	      case TRUE_IF_LSS:  opcode = 155 /*iflt*/;  break;
+	      case TRUE_IF_GRT|TRUE_IF_LSS:  opcode = 154 /*ifne*/;  break;
+	      case TRUE_IF_GRT|TRUE_IF_EQU:  opcode = 156 /*ifge*/;  break;
+	      case TRUE_IF_LSS|TRUE_IF_EQU:  opcode = 158 /*ifle*/;  break;
+	      default:
+		opcode = 0;
+	      }
+	    arg0.compile(comp, intTarget);
+	    Object value;
+	    if (arg1 instanceof QuoteExp
+		&& (value = ((QuoteExp) arg1).getValue()) instanceof IntNum
+		&& ((IntNum) value).isZero())
+	      {
+		code.emitGotoIfCompare1(label1, opcode);
+	      }
+	    else
+	      {
+		arg1.compile(comp, intTarget);
+		code.emitGotoIfCompare2(label1, opcode);
+	      }
+	    ctarget.emitGotoFirstBranch(code);
+	    return;
+	  }
+	if (kind0 >= IntNum_KIND && kind1 >= IntNum_KIND)
+	  {
+	    /*
+	    compareIntegers(arg0, arg1, comp, target);
+	    return;
+	    */
+	  }
+      }
+    ApplyExp.compile(exp, comp, target);
+  }
+
+  private static final int IntNum_KIND = 5;
+  private static final int long_KIND = 6;
+  private static final int int_KIND = 7;
+
+  /** Return a code indicate type of number:
+   * 0: unknown or invalid type
+   * 1: java.lang.Number - ignored for now
+   * 2: gnu.math.Numeric
+   * 3: gnu.math.RealNum
+   * 4  floating primitive type
+   * 5: gnu.math.IntNum
+   * 6: long (including literal in long range??)
+   * 7: int
+   */
+  static int classify (Expression exp)
+  {
+    Type type = exp.getType();
+    int kind = classify(type);
+    Object value;
+    if (kind == IntNum_KIND && exp instanceof QuoteExp
+	&& (value = ((QuoteExp) exp).getValue()) instanceof IntNum)
+      {
+	int ilength = ((IntNum) value).intLength();
+	if (ilength < 32)
+	  return int_KIND;
+	if (ilength < 64)
+	  return long_KIND;
+      }
+    return kind;
+  }
+
+  static int classify (Type type)
+  {
+    if (type instanceof PrimType)
+      {
+	char sig = type.getSignature().charAt(0);
+	if (sig == 'V' || sig == 'Z' || sig == 'C')
+	  return 0;
+	if (sig == 'D' || sig == 'F')
+	  return 4;
+	if (sig == 'J')
+	  return long_KIND;
+	return int_KIND;
+      }
+     if (type.isSubtype(AddOp.typeIntNum))
+       return IntNum_KIND;
+     if (type.isSubtype(AddOp.typeDFloNum))
+       return 4;
+     if (type.isSubtype(AddOp.typeRealNum))
+       return 3;
+     if (type.isSubtype(AddOp.typeNumeric))
+       return 2;
+    return 0;
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Compilation.scmBooleanType;
   }
 }

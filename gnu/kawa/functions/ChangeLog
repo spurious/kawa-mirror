@@ -1,3 +1,10 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	Optimize calls like (< x 10) or (> x y) if x and y are <int>.
+	* NumberCompare.java:  Implement CanInline and Inlineable.
+	(inline, compile, getReturnType):  New methods.
+	(classify):   New static helper methods.
+
 2002-02-16  Per Bothner  <per@bothner.com>
 
 	* Format.java (format$V):  Return #!void instead of #t.

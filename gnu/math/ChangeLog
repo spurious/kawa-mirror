@@ -1,3 +1,7 @@
+Tue Mar 10 22:14:40 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (install-html):  New rule.
+
 Mon Feb 16 15:54:54 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (valueOf):  New overloaded method.

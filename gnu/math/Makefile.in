@@ -93,6 +93,8 @@ java_DATA=$(OBJ)
 SOURCES = $(OBJ:.class=.java)
 
 CLEANFILES = *.class
+
+HTML_HOME = $$HOME/public_html
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DATA =  $(java_DATA)
@@ -210,6 +212,11 @@ maintainer-clean
 	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
 
 all: $(OBJ)
+
+install-html:
+	-mkdir $(HTML_HOME)/gnu.byte
+	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.math/index.html
+	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.math/COPYING
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

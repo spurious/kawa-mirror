@@ -232,7 +232,7 @@
 ;;; Make a list of length LEN.
 
 (define (make-list len . maybe-elt)
-  (if (or (not (integer? len)) (< n 0))
+  (if (or (not (integer? len)) (< len 0))
       (error "make-list arg#1 must be a non-negative integer"))
   (let ((elt (cond ((null? maybe-elt) #f) ; Default value
 		   ((null? (cdr maybe-elt)) (car maybe-elt))

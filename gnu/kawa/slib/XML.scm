@@ -2,7 +2,7 @@
 
 ;;; Parse an XML file (specified by a URL or url string), giving a <document>.
 (define (parse-xml-from-url url) :: <document>
-  (invoke-static <gnu.kawa.xml.Document> 'document url))
+  (invoke-static <gnu.kawa.xml.Document> 'parse url))
 
 #|
 (define (parse-nsxml-from-url url) :: <document>

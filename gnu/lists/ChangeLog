@@ -1,3 +1,7 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (dump):  Better output for POSITION_TRIPLE_FOLLOWS.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (dump):  Print group and attribute type objects.

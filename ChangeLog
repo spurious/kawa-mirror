@@ -1,3 +1,11 @@
+Tue Jan 21 18:12:53 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Pattern.java (match):  Change return type to boolean.
+	* kawa/lang/{AnyPat,EqualPat,ListPat,ListRepeatPat,PairPat,
+	VarListPat}.java (match):  Update return type and value.
+	* kawa/lang/PairPat.java (car_count, cdr_count):  New fields.
+	* kawa/lang/SyntaxRules.java (rewrite):  Change call to match.
+	
 Mon Jan 20 16:23:28 1997  Per Bothner  <bothner@kalessin.cygnus.com>
 
 	* kawa/lang/Compilation.java:  Add new addClass overloading,

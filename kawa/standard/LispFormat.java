@@ -1,10 +1,9 @@
 package kawa.standard;
 import gnu.text.*;
 import gnu.kawa.util.*;
-import java.text.FieldPosition;
 import java.text.Format;
+import java.text.FieldPosition;
 import java.text.ParseException;
-import java.text.NumberFormat;
 import java.io.Writer;
 import gnu.math.*;
 import gnu.mapping.OutPort;
@@ -13,12 +12,6 @@ import gnu.mapping.OutPort;
 
 public class LispFormat extends CompoundFormat
 {
-  public static final int SEEN_COLON = 0x4000000;
-  public static final int SEEN_AT = 0x2000000;
-
-  public static final int PARAM_FROM_LIST = 0x8003000;
-  public static final int PARAM_FROM_COUNT = 0x8001000;
-  public static final int PARAM_UNSPECIFIED = 0x8004000;
   public static final String paramFromList = "<from list>";
   public static final String paramFromCount = "<from count>";
   public static final String paramUnspecified = "<unspecified>";
@@ -98,20 +91,19 @@ public class LispFormat extends CompoundFormat
 	      break;
 	    ch = format[i++];
 	  }
-	int flags = 0;
+	boolean seenColon = false;
+	boolean seenAt = false;
 	for (;;)
 	  {
 	    if (ch == ':')
-	      flags |= SEEN_COLON;
+	      seenColon = true;
 	    else if (ch == '@')
-	      flags |= SEEN_AT;
+	      seenAt = true;
 	    else
 	      break;
 	    ch = format[i++];
 	  }
 	ch = Character.toUpperCase(ch);
-	boolean seenColon = (flags & SEEN_COLON) != 0;
-	boolean seenAt = (flags & SEEN_AT) != 0;
 	int numParams = stack.size() - speci;
 	Format fmt;
 	int minWidth, padChar, charVal, param1, param2, param3;
@@ -123,16 +115,19 @@ public class LispFormat extends CompoundFormat
 	    if (ch == 'R')  base = getParam(stack, argstart++);
 	    else if (ch == 'D')  base = 10;
 	    else if (ch == 'O')  base = 8;
-	    else if (ch == 'X')  base = 16;
+	    else if (ch == 'X')  base = 16; 
 	    else base = 2;
 	    minWidth = getParam(stack, argstart);
 	    padChar = getParam(stack, argstart+1);
 	    int commaChar = getParam(stack, argstart+2);
 	    int commaInterval = getParam(stack, argstart+3);
-	    fmt = LispIntegerFormat.getInstance(base, minWidth,
-						padChar, commaChar,
-						commaInterval,
-						seenColon, seenAt);
+            int flags = 0;
+            if (seenColon)
+              flags |= IntegerFormat.SHOW_GROUPS;
+            if (seenAt)
+              flags |= IntegerFormat.SHOW_PLUS;
+	    fmt = IntegerFormat.getInstance(base, minWidth, padChar,
+                                            commaChar, commaInterval, flags);
 	    break;
 	  case 'P':
 	    fmt = LispPluralFormat.getInstance(seenColon, seenAt);
@@ -433,18 +428,6 @@ public class LispFormat extends CompoundFormat
     this(format, 0, format.length);
   }
 
-  public static int getParam(Object arg, int defaultValue)
-  {
-    if (arg instanceof Number)
-      return ((Number) arg).intValue();
-    if (arg instanceof Character)
-      return ((Character) arg).charValue();
-    if (arg instanceof Char)
-      return ((Char) arg).charValue();
-    //if (arg == null || arg == Boolean.FALSE || arg == Special.dfault)
-    return defaultValue;
-  }
-
   public static int getParam(java.util.Vector vec, int index)
   {
     if (index >= vec.size())
@@ -457,59 +440,6 @@ public class LispFormat extends CompoundFormat
     if (arg == paramUnspecified)
       return PARAM_UNSPECIFIED;
     return getParam(arg, PARAM_UNSPECIFIED);
-  }
-
-  static int getParam(int param, int defaultValue, Object[] args, int start)
-  {
-    if (param == PARAM_FROM_COUNT)
-      return args.length - start;
-    if (param == PARAM_FROM_LIST)
-      return getParam(args[start], defaultValue);
-    if (param == PARAM_UNSPECIFIED)
-      return defaultValue;
-    // Need to mask off flags etc?
-    return param;
-  }
-
-  static char getParam(int param, char defaultValue, Object[] args, int start)
-  {
-    return (char) getParam (param, (int) defaultValue, args, start);
-  }
-
-  /** Get the index'th parameter for the conversion specification specs[speci].
-   * Note that parameters are numbered from 1 to numParams(speci).
-   * The list of arguments to be converted is args, with the current index
-   * (as of the start of this conversion, i.e. not taking into account
-   * earlier PARAM_FROM_LIST paramaters for this conversion) in start.
-   * The default value (used if PARAM_UNSPECIFIED) is defaultValue.
-   */
-  /*
-  int getParam(int speci, int index, int defaultValue, Object[] args, int start)
-  {
-    int num_params = numParams(speci);
-    int param = index <= num_params ? specs[speci+index] : PARAM_UNSPECIFIED;
-    if (param == PARAM_FROM_LIST || param == PARAM_FROM_COUNT)
-      start += adjustArgsStart(speci, index);
-    return getParam(param, defaultValue, args, start);
-  }
-  */
-
-  static IntNum asInteger(Object arg)
-  {
-    try
-      {
-	if (arg instanceof RealNum)
-	  return ((RealNum) arg).toExactInt(Numeric.ROUND);
-	if (arg instanceof Long)
-	  return IntNum.make(((Long) arg).longValue());
-	if (arg instanceof Number)
-	  return RealNum.toExactInt(((Number) arg).doubleValue(),
-				    Numeric.ROUND);
-      }
-    catch (Exception ex)
-      {
-      }
-    return null;
   }
 
   /** Convert sequence (or Object[]) to Object[].
@@ -574,127 +504,6 @@ class LispPluralFormat extends ReportFormat
   }
 }
 
-/** Handle formatting of integers.
- * Used to implement the Common Lisp ~D (Decimal), ~X (Hexadecimal),
- * ~O (Octal), ~B (Binary), and ~R (Radix) Common Lisp formats operators. */
-
-class LispIntegerFormat extends ReportFormat
-{
-  int base;
-  int minWidth;
-  int padChar;
-  int commaChar;
-  int commaInterval;
-  boolean printCommas;
-  boolean printPlus;
-
-  private static LispIntegerFormat plainDecimalFormat;
-
-  public static LispIntegerFormat getInstance()
-  {
-    if (plainDecimalFormat == null)
-      plainDecimalFormat = new LispIntegerFormat();
-    return plainDecimalFormat;
-  }
-
-  public LispIntegerFormat ()
-  {
-    base = 10;
-    minWidth = 1;
-    padChar = (int) ' ';
-    commaChar = (int) ',';
-    commaInterval = 3;
-    printCommas = false;
-    printPlus = false;
-  }
-
-  public static Format
-  getInstance (int base, int minWidth, int padChar,
-	       int commaChar, int commaInterval,
-	       boolean printCommas, boolean printPlus)
-  {
-    if (base == LispFormat.PARAM_UNSPECIFIED)
-      {
-	if (padChar == LispFormat.PARAM_UNSPECIFIED
-	    && padChar == LispFormat.PARAM_UNSPECIFIED
-	    && commaChar == LispFormat.PARAM_UNSPECIFIED
-	    && commaInterval == LispFormat.PARAM_UNSPECIFIED)
-	  {
-	    if (printPlus)
-	      return gnu.text.RomanIntegerFormat.getInstance(printCommas);
-	    else
-	      return gnu.text.EnglishIntegerFormat.getInstance(printCommas);
-	  }
-	base = 10;
-      }
-    if (minWidth == LispFormat.PARAM_UNSPECIFIED)  minWidth = 1;
-    if (padChar == LispFormat.PARAM_UNSPECIFIED)  padChar = ' ';
-    if (commaChar == LispFormat.PARAM_UNSPECIFIED)  commaChar = ',';
-    if (commaInterval == LispFormat.PARAM_UNSPECIFIED)  commaInterval = 3;
-    if (base == 10 && minWidth == 1 && padChar == ' '
-	&& commaChar == ',' && commaInterval == 3
-	&& ! printCommas && ! printPlus)
-      return getInstance();
-    LispIntegerFormat fmt = new LispIntegerFormat();
-    fmt.base = base;
-    fmt.minWidth = minWidth;
-    fmt.padChar = padChar;
-    fmt.commaChar = commaChar;
-    fmt.commaInterval = commaInterval;
-    fmt.printCommas = printCommas;
-    fmt.printPlus = printPlus;
-    return fmt;
-  }
-
-  public int format(Object[] args, int start, 
-		    Writer dst, FieldPosition fpos) 
-    throws java.io.IOException
-  {
-    int minWidth =  LispFormat.getParam(this.minWidth, 1, args, start);
-    if (this.minWidth == LispFormat.PARAM_FROM_LIST)  start++;
-    char padChar = LispFormat.getParam(this.padChar, ' ', args, start);
-    if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++;
-    char commaChar = LispFormat.getParam(this.commaChar, ',', args, start);
-    if (this.commaChar == LispFormat.PARAM_FROM_LIST)  start++;
-    int commaInterval = LispFormat.getParam(this.commaInterval, 3, args,start);
-    if (this.commaInterval == LispFormat.PARAM_FROM_LIST)  start++;
-    Object arg = args[start];
-    IntNum iarg = LispFormat.asInteger(arg);
-    if (iarg != null)
-      {
-	String sarg = iarg.toString(base);
-	boolean neg = sarg.charAt(0) == '-';
-	int slen = sarg.length();
-	int ndigits = neg ? slen - 1 : slen;
-	int numCommas = printCommas ? (ndigits-1)/commaInterval : 0;
-	int unpadded_len = ndigits + numCommas;
-	if (neg || printPlus)
-	  unpadded_len++;
-	for (; minWidth > unpadded_len;  --minWidth)
-	  dst.write(padChar);
-	int i = 0;
-	if (neg)
-	  {
-	    dst.write('-');
-	    i++;
-	    slen--;
-	  }
-	else if (printPlus)
-	  dst.write('+');
-	for (;;)
-	  {
-	    dst.write(sarg.charAt(i++));
-	    if (--slen == 0)
-	      break;
-	    if (printCommas && (slen % commaInterval) == 0)
-	      dst.write(commaChar);
-	  }
-      }
-    else
-      print(dst, arg.toString());
-    return start + 1;
-  }
-}
 
 /** Handle formatting of characters.
  * Used to implement the Common List ~C (Character) and ~~ (Tilde)
@@ -722,9 +531,9 @@ class LispCharacterFormat extends ReportFormat
 		    Writer dst, FieldPosition fpos) 
     throws java.io.IOException
   {
-    int count = LispFormat.getParam(this.count, 1, args, start);
+    int count = getParam(this.count, 1, args, start);
     if (this.count == LispFormat.PARAM_FROM_LIST)  start++;
-    int charVal = LispFormat.getParam(this.charVal, '?', args, start);
+    int charVal = getParam(this.charVal, '?', args, start);
     if (this.charVal == LispFormat.PARAM_FROM_LIST)  start++;
     while (--count >= 0)
       printChar (charVal, seenAt, seenColon, dst);
@@ -791,13 +600,13 @@ class LispObjectFormat extends ReportFormat
 		    Writer dst, FieldPosition fpos) 
     throws java.io.IOException
   {
-    int minWidth = LispFormat.getParam(this.minWidth, 0, args, start);
+    int minWidth = getParam(this.minWidth, 0, args, start);
     if (this.minWidth == LispFormat.PARAM_FROM_LIST)  start++;
-    int colInc = LispFormat.getParam(this.colInc, 1, args, start);
+    int colInc = getParam(this.colInc, 1, args, start);
     if (this.colInc == LispFormat.PARAM_FROM_LIST)  start++;
-    int minPad = LispFormat.getParam(this.minPad, 0, args, start);
+    int minPad = getParam(this.minPad, 0, args, start);
     if (this.minPad == LispFormat.PARAM_FROM_LIST)  start++;
-    char padChar = LispFormat.getParam(this.padChar, ' ', args, start);
+    char padChar = getParam(this.padChar, ' ', args, start);
     if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++;
     return gnu.text.PadFormat.format(base, args, start, dst,
 				     padChar, minWidth, colInc, minPad,
@@ -950,7 +759,7 @@ class LispIterationFormat extends ReportFormat
                     Writer dst, FieldPosition fpos)  
     throws java.io.IOException
   {
-    int maxIterations = LispFormat.getParam(this.maxIterations, -1,
+    int maxIterations = getParam(this.maxIterations, -1,
 					    args, start);
     if (this.maxIterations == LispFormat.PARAM_FROM_LIST)  start++;
 
@@ -1059,7 +868,7 @@ class LispChoiceFormat extends ReportFormat
       }
     else if (! skipIfFalse)
       {
-	int index = LispFormat.getParam(this.param, LispFormat.PARAM_FROM_LIST,
+	int index = getParam(this.param, LispFormat.PARAM_FROM_LIST,
 					args, start);
 	if (param == LispFormat.PARAM_FROM_LIST)  start++;
 	if (index < 0 || index >= choices.length)
@@ -1097,7 +906,7 @@ class LispRepositionFormat extends ReportFormat
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)  
     throws java.io.IOException 
   {
-    int count = LispFormat.getParam(this.count, absolute ? 0 : 1,
+    int count = getParam(this.count, absolute ? 0 : 1,
 				    args, start);
     if (!absolute)
       {
@@ -1121,7 +930,7 @@ class LispFreshlineFormat  extends ReportFormat
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)  
     throws java.io.IOException 
   {
-    int count = LispFormat.getParam(this.count, 1, args, start);
+    int count = getParam(this.count, 1, args, start);
     if (this.count == LispFormat.PARAM_FROM_LIST)  start++;
     int column = -1;
     if (dst instanceof OutPort)
@@ -1153,12 +962,12 @@ class LispTabulateFormat extends ReportFormat
   public int format(Object[] args, int start, Writer dst, FieldPosition fpos)  
     throws java.io.IOException 
   {
-    int colnum = LispFormat.getParam(this.colnum, 1, args, start);
+    int colnum = getParam(this.colnum, 1, args, start);
     if (this.colnum == LispFormat.PARAM_FROM_LIST)  start++;
-    int colinc = LispFormat.getParam(this.colinc, 1, args, start);
+    int colinc = getParam(this.colinc, 1, args, start);
     if (this.colinc == LispFormat.PARAM_FROM_LIST)  start++;
     // Extension from SLIB:
-    char padChar = LispFormat.getParam(this.padChar, ' ', args, start); 
+    char padChar = getParam(this.padChar, ' ', args, start); 
     if (this.padChar == LispFormat.PARAM_FROM_LIST)  start++; 
     int column = -1;
     if (dst instanceof OutPort)
@@ -1230,13 +1039,13 @@ class LispRealFormat extends ReportFormat
     if (op == '$')
       {
 	FixedRealFormat mfmt = new FixedRealFormat();
-	int decimals = LispFormat.getParam(this.arg1, 2, args, start);
+	int decimals = getParam(this.arg1, 2, args, start);
 	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	int digits = LispFormat.getParam(this.arg2, 1, args, start);
+	int digits = getParam(this.arg2, 1, args, start);
 	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	int width = LispFormat.getParam(this.arg3, 0, args, start);
+	int width = getParam(this.arg3, 0, args, start);
 	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	char padChar = LispFormat.getParam(this.arg4, ' ', args, start);
+	char padChar = getParam(this.arg4, ' ', args, start);
 	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
 
 	mfmt.setMaximumFractionDigits(decimals);
@@ -1250,15 +1059,15 @@ class LispRealFormat extends ReportFormat
     else if (op == 'F')
       {
 	FixedRealFormat mfmt = new FixedRealFormat();
-	int width = LispFormat.getParam(this.arg1, 0, args, start);
+	int width = getParam(this.arg1, 0, args, start);
 	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	int decimals = LispFormat.getParam(this.arg2, -1, args, start);
+	int decimals = getParam(this.arg2, -1, args, start);
 	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	int scale = LispFormat.getParam(this.arg3, 0, args, start);
+	int scale = getParam(this.arg3, 0, args, start);
 	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	mfmt.overflowChar = LispFormat.getParam(this.arg4, '\0', args, start);
+	mfmt.overflowChar = getParam(this.arg4, '\0', args, start);
 	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
-	char padChar = LispFormat.getParam(this.arg5, ' ', args, start);
+	char padChar = getParam(this.arg5, ' ', args, start);
 	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
 	mfmt.setMaximumFractionDigits(decimals);
 	mfmt.setMinimumIntegerDigits(0);
@@ -1272,19 +1081,19 @@ class LispRealFormat extends ReportFormat
     else // if (op == 'E' || op == 'G')
       {
 	ExponentialFormat efmt = new ExponentialFormat();
-	efmt.width = LispFormat.getParam(this.arg1, 0, args, start);
+	efmt.width = getParam(this.arg1, 0, args, start);
 	if (this.arg1 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.fracDigits = LispFormat.getParam(this.arg2, -1, args, start);
+	efmt.fracDigits = getParam(this.arg2, -1, args, start);
 	if (this.arg2 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.expDigits = LispFormat.getParam(this.arg3, 0, args, start);
+	efmt.expDigits = getParam(this.arg3, 0, args, start);
 	if (this.arg3 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.intDigits = LispFormat.getParam(this.arg4, 1, args, start);
+	efmt.intDigits = getParam(this.arg4, 1, args, start);
 	if (this.arg4 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.overflowChar = LispFormat.getParam(this.arg5, '\0', args, start);
+	efmt.overflowChar = getParam(this.arg5, '\0', args, start);
 	if (this.arg5 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.padChar = LispFormat.getParam(this.arg6, ' ', args, start);
+	efmt.padChar = getParam(this.arg6, ' ', args, start);
 	if (this.arg6 == LispFormat.PARAM_FROM_LIST)  start++;
-	efmt.exponentChar = LispFormat.getParam(this.arg7, 'E', args, start);
+	efmt.exponentChar = getParam(this.arg7, 'E', args, start);
 	if (this.arg7 == LispFormat.PARAM_FROM_LIST)  start++;
 	efmt.general = op == 'G';
 	efmt.showPlus = showPlus;

@@ -1,5 +1,6 @@
 package kawa.standard;
-import gnu.kawa.util.*;
+import gnu.kawa.util.FString;
+import gnu.text.Char;
 import gnu.mapping.*;
 
 public class string_v extends ProcedureN

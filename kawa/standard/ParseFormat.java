@@ -4,11 +4,13 @@ import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;
 import gnu.mapping.*;
-import gnu.kawa.util.FString;
+import gnu.kawa.util.*;
 
 public class ParseFormat extends Procedure1
 {
   boolean emacsStyle = true;
+  public static final int PARAM_UNSPECIFIED = LispFormat.PARAM_UNSPECIFIED;
+  public static final int PARAM_FROM_LIST = LispFormat.PARAM_FROM_LIST;
 
   public ParseFormat (boolean emacsStyle)
   {
@@ -95,7 +97,7 @@ public class ParseFormat extends Procedure1
 	    break;
 	  }
 
-	int width = -1;
+	int width = PARAM_UNSPECIFIED;
 	digit = Character.digit((char) ch, 10);
 	if (digit >= 0)
 	  {
@@ -109,6 +111,8 @@ public class ParseFormat extends Procedure1
 		width = 10 * width + digit;
 	      }
 	  }
+        else if (ch == '*')
+          width = PARAM_FROM_LIST;
 
 	int precision = -1;
 	if (ch == '.')
@@ -136,7 +140,33 @@ public class ParseFormat extends Procedure1
 	  case 'i':
 	  case 'd':
 	  case 'o':
-
+	    int base;
+            int fflags = 0;
+	    if (ch == 'd' || ch == 'i')
+              base = 10;
+	    else if (ch == 'o')
+              base = 8;
+	    else
+              { /* if (ch == 'x' || ch == 'X') */
+                base = 16;
+                if (ch == 'X') fflags = IntegerFormat.UPPERCASE;
+              }
+            boolean seenColon = false;
+            boolean seenAt = false;
+            char padChar
+              = (flags & (SEEN_ZERO+SEEN_MINUS)) == SEEN_ZERO ? '0' : ' ';
+            if ((flags & SEEN_HASH) != 0)
+              fflags |= IntegerFormat.SHOW_BASE;
+            if ((flags & SEEN_PLUS) != 0)
+              fflags |= IntegerFormat.SHOW_PLUS;
+            if ((flags & SEEN_MINUS) != 0)
+              fflags |= IntegerFormat.PAD_RIGHT;
+            if ((flags & SEEN_SPACE) != 0)
+              fflags |= IntegerFormat.SHOW_SPACE;
+	    format = IntegerFormat.getInstance(base, width,
+                                               padChar, PARAM_UNSPECIFIED,
+                                               PARAM_UNSPECIFIED, fflags);
+            break;
 	  case 'e':
 	  case 'f':
 	  case 'g':

@@ -1,4 +1,5 @@
 package kawa.standard;
+import gnu.text.Char;
 import gnu.kawa.util.*;
 import java.io.Reader;
 import java.io.InputStream;

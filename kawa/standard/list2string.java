@@ -1,6 +1,7 @@
 package kawa.standard;
 import gnu.kawa.util.*;
 import gnu.mapping.Procedure1;
+import gnu.text.Char;
 
 /**
  * Implement the Scheme standard function "list->string".

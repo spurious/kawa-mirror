@@ -1,3 +1,7 @@
+2000-04-21  Per Bothner  <per@bothner.com>
+
+	* UnboundConstraint.java (get):  Check parent environment.
+
 2000-04-17  Per Bothner  <per@bothner.com>
 
 	* Procedure.java (getSetter):  Tweak exception message.

@@ -13,6 +13,13 @@ public class UnboundConstraint extends Constraint
 
   public Object get (Binding binding)
   {
+    // Before reporting an error, check parent environment.
+    Object value = binding.value;
+    if (value == null && environment != null
+	&& environment.previous != null)
+      binding.value = value = environment.previous.lookup(binding.getName());
+    if (value != null)
+      return ((Binding) value).get();
     throw new UnboundSymbol(binding.getName());
   }
 

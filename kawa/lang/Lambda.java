@@ -14,7 +14,11 @@ public class Lambda extends Syntax implements Printable
     Object [] match = pattern.match (obj);
     if (match == null)
       return tr.syntaxError ("missing formals in lambda");
-    return new LambdaExp (match[0], match[1], tr);
+    int old_errors = tr.errors;
+    Expression result = new LambdaExp (match[0], match[1], tr);
+    if (tr.errors > old_errors)
+      return new ErrorExp("bad lambda expression");
+    return result;
   }
 
   public void print(java.io.PrintStream ps)

@@ -82,6 +82,7 @@ CalledContinuation.class \
 Syntax.class \
 SyntaxRule.class \
 SyntaxRules.class \
+DefMacro.class \
 AutoloadSyntax.class \
 Literal.class \
 Compilation.class \

@@ -14,7 +14,7 @@ public class Scheme extends Interpreter
 {
   protected void define_proc (Named proc)
   {
-    define (proc.name (), proc);
+    define (proc.getName (), proc);
   }
 
   protected void define_proc (String name, Named proc)
@@ -195,17 +195,17 @@ public class Scheme extends Interpreter
       define_proc ("list-ref", "kawa.standard.list_ref");
 
       proc = new kawa.standard.mem("memq",eq);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
       proc = new kawa.standard.mem("memv",eqv);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
       proc = new kawa.standard.mem("member",equal);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
       proc = new kawa.standard.ass("assq",eq);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
       proc = new kawa.standard.ass("assv",eqv);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
       proc = new kawa.standard.ass("assoc",equal);
-      define(proc.name (), proc);
+      define(proc.getName (), proc);
 
       //-- Section 6.4  -- complete, including slashified read/write
       

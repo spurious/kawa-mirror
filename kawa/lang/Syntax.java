@@ -9,7 +9,7 @@ import gnu.kawa.util.*;
  * @author	Per Bothner
  */
 
-abstract public class Syntax extends Declaration implements Printable
+abstract public class Syntax extends Declaration implements Printable, Named
 {
   public Syntax ()
   {

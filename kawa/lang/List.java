@@ -88,4 +88,19 @@ public class List extends Sequence implements Printable
       result = new Pair (vals[offset+i], result);
     return result;
   }
+
+  public kawa.lang.Vector toVector ()
+  {
+    int len = length();
+
+    Object[] values = new Object[len];
+    Object list = this;
+    for (int i=0; i < len; i++)
+      {
+	Pair pair = (Pair) list;
+	values[i] = pair.car;
+	list = pair.cdr;
+      }
+    return new kawa.lang.Vector (values);
+  }
 }

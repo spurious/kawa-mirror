@@ -313,8 +313,8 @@ public class BitOps
 	  }
 	w[i++] = ni;
 	break;
-      case 1:  for (w[i++] = ni; i < xlen; i++)  w[i] = x.words[i];  break;
-      case 2:  for (w[i++] = ni; i < xlen; i++)  w[i] = ~x.words[i];  break;
+      case 1:  w[i] = ni;  while (++i < xlen)  w[i] = x.words[i];  break;
+      case 2:  w[i] = ni;  while (++i < xlen)  w[i] = ~x.words[i];  break;
       }
     result.ival = i;
   }

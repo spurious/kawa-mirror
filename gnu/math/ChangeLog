@@ -1,3 +1,8 @@
+Mon Mar 17 17:31:11 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* BitOps.java (setBitOp):  Rewrite to work around Microsoft bug.
+	* Unit.java (radian):  New static field, recommended by DSSSL.
+
 Sat Mar  8 08:29:33 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Unit.java (define):  New static method.

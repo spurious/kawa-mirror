@@ -1,3 +1,8 @@
+2004-06-12  Per Bothner  <per@bothner.com>
+
+	* InPort.java (readState, getReadState):
+	Moved to gnu.text.LineBufferedReader.
+
 2004-05-20  Per Bothner  <per@bothner.com>
 
 	* OutPort.java (writeChars):  Remove redundant method.

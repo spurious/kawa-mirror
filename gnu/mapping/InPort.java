@@ -98,15 +98,6 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 		      Environment.user().get("port-char-encoding"));
   }
 
-  // FIXME - Having this be in InPort while ScmRead takes a LineBufferedReader
-  // is flakey.  Maybe this should be some kind of "attribute".
-  public char readState = '\n';
-  /** Return a character that indicates what we are currently reading.
-    * Returns '\n' if we are not inside read; '\"' if reading a string;
-    * '|' if inside a comment; '(' if inside a list; and
-    * ' ' if otherwise inside a read. */
-  public char getReadState () { return readState; }
-
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<input-port");

@@ -6,10 +6,11 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import java.io.PrintWriter;
 import gnu.text.Char;
+import gnu.kawa.util.AbstractFormat;
 
 /** Handle formatted output for Lisp-like languages. */
 
-public class DisplayFormat extends Procedure1or2 implements FormatToConsumer
+public class DisplayFormat extends AbstractFormat
 {
   /** Create a new instance.
    * @param readable if output should be formatted so it could be read
@@ -30,14 +31,6 @@ public class DisplayFormat extends Procedure1or2 implements FormatToConsumer
   char language;
 
   public boolean getReadableOutput () { return readable; }
-
-  protected void write(String str, Consumer out)
-  {
-    if (out instanceof OutPort)
-      ((OutPort) out).write(str);
-    else
-      out.writeChars(str);
-  }
 
   public void writeBoolean(boolean v, Consumer out)
   {
@@ -139,37 +132,5 @@ public class DisplayFormat extends Procedure1or2 implements FormatToConsumer
       write("#!null", out);
     else
       write (obj.toString(), out);
-  }
-
-  public Object apply1 (Object arg1)
-  {
-    format (arg1, OutPort.outDefault());
-    return Values.empty;
-  }
-
-  public Object apply2 (Object arg1,Object arg2)
-  {
-    format (arg1, (Consumer) arg2); 
-    return Values.empty;
-  }
-
-  public void format (Object value, Consumer out)
-  {
-    if (out instanceof OutPort)
-      {
-	OutPort pout = (OutPort) out;
-	FormatToConsumer saveFormat = pout.objectFormat;
-	try
-	  {
-	    pout.objectFormat = this;
-	    out.writeObject(value);
-	  }
-	finally
-	  {
-	    pout.objectFormat = saveFormat;
-	  }
-      }
-    else
-      out.writeObject(value);
   }
 }

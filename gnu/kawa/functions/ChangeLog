@@ -1,3 +1,10 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* Setter.java:  New implements CanInLine.
+	(inline):  Uncomment.
+
+	* DisplayFormat.java:  Now extends gnu.kawa.util.AbstractFormat.
+
 2001-06-17  Per Bothner  <per@bothner.com>
 
 	* DisplayFormat.java (writeObject):  Handle Binding (as symbol).

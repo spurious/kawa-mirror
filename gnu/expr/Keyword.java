@@ -130,29 +130,16 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
     Consumer out = ctx.consumer;
     String tag = getName();
     int nargs = ctx.count;
-    out.beginGroup(tag, this);
+    out.beginAttribute(tag, this);
     for (int i = 0;  i < nargs;  i++)
       {
 	Object arg = ctx.getArgAsObject(i);
-	if (arg instanceof Keyword && i + 1 < nargs)
-	  {
-	    Keyword attr = (Keyword) arg;
-	    arg = ctx.getArgAsObject(++i);
-	    out.beginAttribute(attr.getName(), attr);
-	    out.writeObject(arg);
-	    out.endAttribute();
-	  }
+	if (arg instanceof Consumable)
+	  ((Consumable) arg).consume(out);
 	else
-	  {
-	    /*
-	    if (arg instanceof Consumable)
-	      ((Consumable) arg).consume(out);
-	    else
-	    */
-	      out.writeObject(arg);
-	  }
+	  out.writeObject(arg);
       }
-    out.endGroup(tag);
+    out.endAttribute();
   }
 
 }

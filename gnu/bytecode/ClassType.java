@@ -136,6 +136,28 @@ public class ClassType extends ObjectType implements AttrContainer {
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
 
+  /** Add an interface to the list of implemented interfaces. */
+  public void addInterface (ClassType newInterface)
+  {
+    int oldCount;
+    if (interfaces == null || interfaces.length == 0)
+      {
+	oldCount = 0;
+	interfaces = new ClassType[1];
+      }
+    else
+      {
+	oldCount = interfaces.length;
+	for (int i = oldCount;  --i >= 0; )
+	  if (interfaces[i] == newInterface)
+	    return;
+	ClassType[] newInterfaces = new ClassType[oldCount+1];
+	System.arraycopy(interfaces, 0, newInterfaces, 0, oldCount);
+	interfaces = newInterfaces;
+      }
+    interfaces[oldCount] = newInterface;
+  }
+
   public final boolean isInterface()
   { return (getModifiers() & Access.INTERFACE) != 0; }
 

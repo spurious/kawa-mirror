@@ -76,7 +76,7 @@ JCFLAGS = -g
 javadir=$(prefix)/java/$(subdir)
 
 OBJ = Shell.class repl.class \
-  GuiConsole.class MessageArea.class TextAreaWriter.class
+  GuiConsole.class MessageArea.class TextAreaWriter.class GuiInPort.class
 
 # These are generated automatically when the $(OBJ) files are built,
 # but they also need to be installed.

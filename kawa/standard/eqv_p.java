@@ -9,7 +9,7 @@ import gnu.kawa.util.*;
 
 public class eqv_p extends Procedure2 implements Inlineable
 {
-  public boolean apply (Object arg1, Object arg2) 
+  public static boolean apply (Object arg1, Object arg2) 
   {
     if (arg1==arg2)
       return true;

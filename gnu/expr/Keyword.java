@@ -2,10 +2,11 @@ package gnu.expr;
 import gnu.mapping.*;
 import java.io.*;
 
-public class Keyword implements Printable, Externalizable
+public class Keyword extends Symbol
+  implements Printable, Externalizable
 {
-  // Does not include final ':'.
-  private String name;
+  public static final Namespace keywordNamespace = new Namespace();
+  static { keywordNamespace.setName("(keywords)"); }
 
   public Keyword()
   {
@@ -13,12 +14,8 @@ public class Keyword implements Printable, Externalizable
 
   private Keyword (String name)
   {
-    this.name = name;
+    super(name);
   }
-
-  private static java.util.Hashtable keywordTable = new java.util.Hashtable ();
-
-  public int hashCode () { return name.hashCode (); }
 
   /**
    * Create or find a Keyword with a given name (without final ':').
@@ -27,10 +24,12 @@ public class Keyword implements Printable, Externalizable
    */
   static public Keyword make (String name)
   {
-    Keyword keyword = (Keyword) keywordTable.get (name);
-    if (keyword == null) {
-      keyword = new Keyword (name);
-      keywordTable.put (name, keyword);
+    int hash = name.hashCode();
+    Keyword keyword = (Keyword) keywordNamespace.lookup(name, hash, false);
+    if (keyword == null)
+      {
+	keyword = new Keyword(name);
+	keywordNamespace.add(keyword, hash);
     }
     return keyword;
   }
@@ -102,8 +101,6 @@ public class Keyword implements Printable, Externalizable
     return dfault;
   }
 
-  public final String getName() { return name; }
-  
   /**
    * @serialData Write the keyword name (without colons) using writeUTF.
    */
@@ -121,6 +118,11 @@ public class Keyword implements Printable, Externalizable
 
   public Object readResolve() throws ObjectStreamException
   {
-    return make(name);
+    int hash = name.hashCode();
+    Keyword keyword = (Keyword) keywordNamespace.lookup(name, hash, false);
+    if (keyword != null)
+      return keyword;
+    keywordNamespace.add(this, hash);
+    return this;
   }
 }

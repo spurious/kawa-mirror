@@ -1,3 +1,13 @@
+Sat Oct 17 13:23:50 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* SynchronizedExp.java:  New class.
+	* Makefile.am (java_JAVA), Makefile.in:  Add SynchronizedExp.java.
+	* ExpWalker.java (walkSynchronizedExp):  New method.
+	* ExpFullWalker.java (walkSynchronizedExp):  New method.
+	* FindTailCalls.java (walkSynchronizedExp):  New method.
+
+	* StackTarget.java (compileFromStack):  Use two-argument emitConvert.
+
 Thu Sep 24 19:35:14 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ExpFullWalker.java:  New conventions to support replacement.

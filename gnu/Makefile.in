@@ -71,7 +71,7 @@ SUBDIRS = bytecode mapping text expr math ecmascript
 EXTRA_DIST = PACKAGES
 
 HTML_HOME = $$HOME/public_html
-mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in
 

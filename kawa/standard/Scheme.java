@@ -379,7 +379,7 @@ public class Scheme extends Interpreter
       define_proc ("eof-object?", "kawa.lib.ports");
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
       define_proc ("write", "kawa.lib.ports");
-      define_proc ("display", "kawa.lib.ports");
+      define_field ("display", "kawa.lib.ports", "display");
       define_proc ("write-char", "kawa.lib.ports");
       define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");

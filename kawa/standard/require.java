@@ -9,6 +9,28 @@ import gnu.kawa.reflect.Invoke;
 
 public class require extends Syntax
 {
+  static java.util.Hashtable featureMap = new java.util.Hashtable();
+
+  static void map(String featureName, String className)
+  {
+    featureMap.put(featureName, className);
+  }
+
+  private static final String SLIB_PREFIX = "gnu.kawa.slib.";
+
+  static
+  {
+    map("generic-write", SLIB_PREFIX + "genwrite");
+    map("pretty-print", SLIB_PREFIX + "pp");
+    map("pprint-file", SLIB_PREFIX + "ppfile");
+    map("printf", SLIB_PREFIX + "printf");
+  }
+
+  public static String mapFeature(String featureName)
+  {
+    return (String) featureMap.get(featureName);
+  }
+
   public static Object find(String typeName)
   {
     try
@@ -70,7 +92,7 @@ public class require extends Syntax
 	    tr.error('e', "invalid quoted symbol for `require'");
 	    return false;
 	  }
-	name = gnu.kawa.slib.SLib.mapFeature((String) p.car);
+	name = mapFeature((String) p.car);
 	if (name == null)
 	  {
 	    tr.error('e', "unknown feature name `"+p.car+"' for `require'");

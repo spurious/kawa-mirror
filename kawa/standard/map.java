@@ -124,7 +124,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Declaration loopDecl = let2.addDeclaration("%loop");
     loopDecl.noteValue(lexp);
 
-    // Finally in anner L3=(let ((parg1 (as <pair> arg1)) ...) ...)
+    // Finally an inner L3=(let ((parg1 (as <pair> arg1)) ...) ...)
     Expression[] inits3 = new Expression[nargs];
     LetExp let3 = new LetExp(inits3);
 

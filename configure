@@ -609,22 +609,37 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
 
 PACKAGE=kawa
 
+VERSION=1.5
+
+if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
+  { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
+fi
 cat >> confdefs.h <<EOF
 #define PACKAGE "$PACKAGE"
 EOF
-
-VERSION=1.5
 
 cat >> confdefs.h <<EOF
 #define VERSION "$VERSION"
 EOF
 
 echo $ac_n "checking whether build environment is sane""... $ac_c" 1>&6
-echo "configure:624: checking whether build environment is sane" >&5
+echo "configure:627: checking whether build environment is sane" >&5
+# Just in case
+sleep 1
 echo timestamp > conftestfile
-# Do this in a subshell so we don't clobber the current shell's
-# arguments.  FIXME: maybe try `-L' hack like GETLOADAVG test?
-if (set X `ls -t $srcdir/configure conftestfile`; test "$2" = conftestfile)
+# Do `set' in a subshell so we don't clobber the current shell's
+# arguments.  Must try -L first in case configure is actually a
+# symlink; some systems play weird games with the mod time of symlinks
+# (eg FreeBSD returns the mod time of the symlink's containing
+# directory).
+if (
+   set X `ls -Lt $srcdir/configure conftestfile 2> /dev/null`
+   if test "" = "X"; then
+      # -L didn't work.
+      set X `ls -t $srcdir/configure conftestfile`
+   fi
+   test "$2" = conftestfile
+   )
 then
    # Ok.
    :
@@ -653,8 +668,74 @@ test "$program_suffix" != NONE &&
 # sed with no file args requires a program.
 test "$program_transform_name" = "" && program_transform_name="s,x,x,"
 
+missing_dir=`cd $ac_aux_dir && pwd`
+echo $ac_n "checking for working aclocal""... $ac_c" 1>&6
+echo "configure:674: checking for working aclocal" >&5
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+# Redirect stdin to placate older versions of autoconf.  Sigh.
+if (aclocal --version) < /dev/null > /dev/null 2>&1; then
+   ACLOCAL=aclocal
+   echo "$ac_t""found" 1>&6
+else
+   ACLOCAL="$missing_dir/missing aclocal"
+   echo "$ac_t""missing" 1>&6
+fi
+
+echo $ac_n "checking for working autoconf""... $ac_c" 1>&6
+echo "configure:687: checking for working autoconf" >&5
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+# Redirect stdin to placate older versions of autoconf.  Sigh.
+if (autoconf --version) < /dev/null > /dev/null 2>&1; then
+   AUTOCONF=autoconf
+   echo "$ac_t""found" 1>&6
+else
+   AUTOCONF="$missing_dir/missing autoconf"
+   echo "$ac_t""missing" 1>&6
+fi
+
+echo $ac_n "checking for working automake""... $ac_c" 1>&6
+echo "configure:700: checking for working automake" >&5
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+# Redirect stdin to placate older versions of autoconf.  Sigh.
+if (automake --version) < /dev/null > /dev/null 2>&1; then
+   AUTOMAKE=automake
+   echo "$ac_t""found" 1>&6
+else
+   AUTOMAKE="$missing_dir/missing automake"
+   echo "$ac_t""missing" 1>&6
+fi
+
+echo $ac_n "checking for working autoheader""... $ac_c" 1>&6
+echo "configure:713: checking for working autoheader" >&5
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+# Redirect stdin to placate older versions of autoconf.  Sigh.
+if (autoheader --version) < /dev/null > /dev/null 2>&1; then
+   AUTOHEADER=autoheader
+   echo "$ac_t""found" 1>&6
+else
+   AUTOHEADER="$missing_dir/missing autoheader"
+   echo "$ac_t""missing" 1>&6
+fi
+
+echo $ac_n "checking for working makeinfo""... $ac_c" 1>&6
+echo "configure:726: checking for working makeinfo" >&5
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+# Redirect stdin to placate older versions of autoconf.  Sigh.
+if (makeinfo --version) < /dev/null > /dev/null 2>&1; then
+   MAKEINFO=makeinfo
+   echo "$ac_t""found" 1>&6
+else
+   MAKEINFO="$missing_dir/missing makeinfo"
+   echo "$ac_t""missing" 1>&6
+fi
+
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:658: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:739: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -682,7 +763,7 @@ fi
 
 
 echo $ac_n "checking whether to enable maintainer-specific portions of Makefiles""... $ac_c" 1>&6
-echo "configure:686: checking whether to enable maintainer-specific portions of Makefiles" >&5
+echo "configure:767: checking whether to enable maintainer-specific portions of Makefiles" >&5
     # Check whether --enable-maintainer-mode or --disable-maintainer-mode was given.
 if test "${enable_maintainer_mode+set}" = set; then
   enableval="$enable_maintainer_mode"
@@ -698,6 +779,60 @@ fi
     MAINT='#M#'
   fi
   
+
+echo $ac_n "checking for Cygwin32 environment""... $ac_c" 1>&6
+echo "configure:785: checking for Cygwin32 environment" >&5
+if eval "test \"`echo '$''{'am_cv_cygwin32'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 790 "configure"
+#include "confdefs.h"
+
+int main() {
+int main () { return __CYGWIN32__; }
+; return 0; }
+EOF
+if { (eval echo configure:797: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  rm -rf conftest*
+  am_cv_cygwin32=yes
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  am_cv_cygwin32=no
+fi
+rm -f conftest*
+rm -f conftest*
+fi
+
+echo "$ac_t""$am_cv_cygwin32" 1>&6
+CYGWIN32=
+test "$am_cv_cygwin32" = yes && CYGWIN32=yes
+
+echo $ac_n "checking for executable suffix""... $ac_c" 1>&6
+echo "configure:815: checking for executable suffix" >&5
+if eval "test \"`echo '$''{'am_cv_exeext'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  if test "$CYGWIN32" = yes; then
+am_cv_exeext=.exe
+else
+cat > am_c_test.c << 'EOF'
+int main() {
+/* Nothing needed here */
+}
+EOF
+${CC-cc} -o am_c_test $CFLAGS $CPPFLAGS $LDFLAGS am_c_test.c $LIBS 1>&5
+am_cv_exeext=`echo am_c_test.* | grep -v am_c_test.c | sed -e s/am_c_test//`
+rm -f am_c_test*
+fi
+
+test x"${am_cv_exeext}" = x && am_cv_exeext=no
+fi
+EXEEXT=""
+test x"${am_cv_exeext}" != xno && EXEEXT=${am_cv_exeext}
+echo "$ac_t""${am_cv_exeext}" 1>&6
 
 
 #PACKAGE=kawa
@@ -916,8 +1051,14 @@ s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@PACKAGE@%$PACKAGE%g
 s%@VERSION@%$VERSION%g
+s%@ACLOCAL@%$ACLOCAL%g
+s%@AUTOCONF@%$AUTOCONF%g
+s%@AUTOMAKE@%$AUTOMAKE%g
+s%@AUTOHEADER@%$AUTOHEADER%g
+s%@MAKEINFO@%$MAKEINFO%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@MAINT@%$MAINT%g
+s%@EXEEXT@%$EXEEXT%g
 s%@JAVA@%$JAVA%g
 s%@JAVAC@%$JAVAC%g
 s%@TOP_BUILDDIR@%$TOP_BUILDDIR%g

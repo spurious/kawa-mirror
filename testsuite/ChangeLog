@@ -1,3 +1,7 @@
+2002-08-06  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  No longer any expected failure - it now works.
+
 2002-06-11  Per Bothner  <per@bothner.com>
 
 	* MySAXApp.java:  New SAX2 example proram, taken from SAX web site.

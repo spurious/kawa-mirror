@@ -195,7 +195,6 @@
 (test 24 slot-ref obj3 'e)
 
 (define obj4 (make <ClsC>))
-(set! fail-expected "not calling parent initiaizer methods")
 (test 14 'obj4-b (slot-ref obj4 'b))
 (test 22 'obj4-c (slot-ref obj4 'c))
 (test 44 'obj4-f (invoke obj4 'f 2))

@@ -1,3 +1,8 @@
+2003-09-11  Per Bothner  <per@bothner.com>
+
+	* ValuesFilter.java:  Implement CanInline.
+	(inline):  New method.
+
 2003-09-09  Per Bothner  <per@bothner.com>
 
 	* RelativeStep.java:  Now implements CanInline.

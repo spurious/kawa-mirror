@@ -8,8 +8,10 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.xml.*;
 import gnu.math.IntNum;
+import gnu.kawa.functions.AddOp;
+import gnu.kawa.functions.ValuesMap;
 
-public class ValuesFilter extends CpsProcedure
+public class ValuesFilter extends CpsProcedure implements CanInline
 {
   /** 'F' if following a ForwardStep; 'R' if following a ReverseStep;
    * 'R' if following a PrimaryExpr. */
@@ -96,64 +98,89 @@ public class ValuesFilter extends CpsProcedure
 	  out.writeObject(dot);
       }
     return;
-
-    /*
-    int index = 0;
-    Focus focus = Focus.getCurrent();
-    long savePosition = focus.position;
-    long position = 0;
-    int count = values instanceof Values ? ((Values) values).size() : 1;
-    IntNum countObj = IntNum.make(count);
-    for (;;)
-      {
-	int next = Values.nextIndex(values, index);
-	if (next < 0)
-	  break;
-	Object value = Values.nextValue(values, index);
-	focus.position = kind == 'R' ? (count - position) : (position + 1);
-	position++;
-	IntNum posObj = IntNum.make(position);
-	if (matches(proc.apply3(value, posObj, countObj), position))
-	  out.writeObject(value);
-	index = next;
-      }
-    focus.position = savePosition;
-    */
   }
 
-  /*
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    Expression pred = exp.args[0];
-    if (kind != 'P')
+    Expression[] args = exp.getArgs();
+    Expression exp2 = args[1];
+    LambdaExp lexp2;
+    if (! (exp2 instanceof LambdaExp)
+	|| (lexp2 = (LambdaExp) exp2).min_args != 3
+	|| lexp2.max_args != 3)
+      return exp;
+
+    if (kind == 'P') // FIXME
+      return exp;
+
+    Compilation parser = walker.getCompilation();
+
+    parser.letStart();
+    ClassType typeSortedNodes = SortNodes.typeSortedNodes;
+    Declaration sequence
+      = parser.letVariable("sequence", typeSortedNodes,
+			   new ApplyExp(SortNodes.sortNodes,
+					new Expression [] {args[0]}));
+    parser.letEnter();
+    parser.letStart();
+    Method sizeMethod = CoerceNodes.typeNodes.getDeclaredMethod("size", 0);
+    Declaration lastDecl
+      = parser.letVariable("last", Type.int_type,
+			   new ApplyExp(sizeMethod,
+					new Expression[] {
+					  new ReferenceExp(sequence)}));
+    parser.letEnter();
+
+    LambdaExp mapLambda = new LambdaExp(2);
+    Declaration dotDecl = mapLambda.addDeclaration("dot");
+    Declaration atDecl = mapLambda.addDeclaration("position", Type.int_type);
+
+    Declaration posDecl = atDecl;
+
+    if (kind == 'R')
       {
-	CodeAttr code = comp.getCode();
-	Scope scope = code.pushScope();
-	Type ntype = SortNodes.typeSortedNodes;
-	code.emitNew(ntype);
-	code.emitDup(ntype);
-	code.emitInvoke(SortNodes.makeSortedNodesMethod);
-	Variable nodes = scope.addVariable(code, ntype, "nodes");
-	ConsumerTarget ctarget = new ConsumerTarget(nodes);
-	code.emitStore(nodes);
-	pred.compile(comp, ctarget);
-
-	// emit: int count = nodes.size();
-	code.emitLoad(nodes);
-	code.emitInvoke("size");
-	Variable count = scope.addVariable(code, ntype, "last");
-	code.emitStore(count);
-
-	// FIXME:  compile actual loop.
-
-	code.popScope();
+	parser.letStart();
+	Expression init
+	  = new ApplyExp(AddOp.$Mn,
+			 new Expression[] {
+			   new ReferenceExp(lastDecl),
+			   new ReferenceExp(posDecl)});
+	init
+	  = new ApplyExp(AddOp.$Pl,
+			 new Expression[] {
+			   init,
+			   new QuoteExp(IntNum.one())});
+	posDecl = parser.letVariable("pos", Type.int_type, init);
       }
-    else
-      ApplyExp.compile(exp, comp, target);
+
+    Expression applyPredicate = new ApplyExp(lexp2,
+					     new Expression[] { 
+					       new ReferenceExp(dotDecl),
+					       new ReferenceExp(posDecl),
+					       new ReferenceExp(lastDecl)});
+    Expression body = new IfExp(new ApplyExp(matchesMethod,
+					    new Expression[] {
+					      applyPredicate,
+					      new ReferenceExp(posDecl) }),
+				new ReferenceExp(dotDecl),
+				QuoteExp.voidExp);
+    if (kind == 'R')
+      body = parser.letDone(body);
+    mapLambda.body = body;
+
+    ApplyExp doMap
+      = new ApplyExp(ValuesMap.valuesMapWithPos,
+		     new Expression[] { mapLambda,
+					new ReferenceExp(sequence) });
+    body = ValuesMap.valuesMapWithPos.inline(doMap, walker);
+    return parser.letDone(parser.letDone(body));
   }
-  */
 
   public static final ValuesFilter forwardFilter = new ValuesFilter('F');
   public static final ValuesFilter reverseFilter = new ValuesFilter('R');
   public static final ValuesFilter exprFilter = new ValuesFilter('P');
+  public static final ClassType typeValuesFilter
+    = ClassType.make("gnu.xquery.util.ValuesFilter");
+  public static final Method matchesMethod
+    = typeValuesFilter.getDeclaredMethod("matches", 2);
 }

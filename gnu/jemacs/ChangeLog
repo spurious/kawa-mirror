@@ -1,0 +1,5 @@
+1999-08-08  Per Bothner  <per@bothner.com>
+
+	New package.
+	Move gnu.elisp to gnu.jemacs.text.
+	Move gnu.emacs to gnu.jemacs.buffer.

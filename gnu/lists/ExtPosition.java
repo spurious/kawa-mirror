@@ -3,7 +3,7 @@
 
 package gnu.lists;
 
-/** A SeqPosition for sequences that need for a Pos int for a position.
+/** A SeqPosition for sequences that need more than a Pos int for a position.
  * For such sequences, a Pos int is an index into a PositionManager,
  * which manages a table of ExtPositions, which may contain more state
  * than a regular SeqPosition does.

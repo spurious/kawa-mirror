@@ -3,7 +3,7 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
-import gnu.mapping.Procedure;
+import gnu.mapping.*;
 import gnu.lists.*;
 
 public class define_syntax extends Syntax
@@ -26,7 +26,7 @@ public class define_syntax extends Syntax
       {
         return tr.syntaxError(getName()+" not in a statement list");
       }
-    String name = decl.getName();
+    Object name = decl.getSymbol();
     Macro macro = (Macro) decl.getConstantValue();
     if (! (pair.cdr instanceof Pair))
       return tr.syntaxError("Missing transformation for "+form.car);
@@ -71,13 +71,14 @@ public class define_syntax extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     Pair p;
+    Object name;
     if (! (st.cdr instanceof Pair)
-        || ! ((p = (Pair) st.cdr).car instanceof String))
+        || ! ((name = (p = (Pair) st.cdr).car) instanceof String
+	      || name instanceof Symbol))
       {
         forms.addElement(tr.syntaxError("Missing macro name for "+st.car));
         return false;
       }
-    String name = (String) p.car;
     if (! (p.cdr instanceof Pair) || (p = (Pair) p.cdr).cdr != LList.Empty)
       {
         forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));

@@ -11,17 +11,24 @@ import gnu.lists.*;
 
 abstract public class Syntax implements Printable, Named
 {
-  String name;
+  Object name;
 
-  public String getName() { return name; }
+  public final String getName()
+  {
+    return name == null ? null
+      : name instanceof Symbol ? ((Symbol) name).getName()
+      : name.toString();
+  }
+  public Object getSymbol() { return name; }
 
+  public void setName (Object name) { this.name = name; }
   public void setName (String name) { this.name = name; }
 
   public Syntax ()
   {
   }
 
-  public Syntax (String name)
+  public Syntax (Object name)
   {
     setName(name);
   }

@@ -23,19 +23,19 @@ public class Macro extends Syntax implements Printable, Externalizable
 
   public static Macro make (Declaration decl)
   {
-    Macro mac = new Macro(decl.getName());
+    Macro mac = new Macro(decl.getSymbol());
     mac.capturedIdentifiers = new java.util.Vector ();
     mac.bind(decl);
     return mac;
   }
 
-  public static Macro make (String name, Procedure expander)
+  public static Macro make (Object name, Procedure expander)
   {
     Macro mac = new Macro(name, expander);
     return mac;
   }
 
-  public static Macro make (String name, Procedure expander,
+  public static Macro make (Object name, Procedure expander,
 			    String[] templateIdentifiers,
 			    String capturedFields)
   {
@@ -99,20 +99,20 @@ public class Macro extends Syntax implements Printable, Externalizable
     capturedFields = old.capturedFields;
   }
 
-  public Macro(String name, Procedure expander)
+  public Macro(Object name, Procedure expander)
   {
     super(name);
     //setType(thisType);
     this.expander = new QuoteExp(expander);
   }
 
-  public Macro(String name, Expression lexp)
+  public Macro(Object name, Expression lexp)
   {
     super(name);
     this.expander = lexp;
   }
 
-  public Macro(String name)
+  public Macro(Object name)
   {
     super(name);
   }

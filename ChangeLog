@@ -1,3 +1,20 @@
+2002-12-11  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_syntax.java (scanForDefinitions, rewriteForm):
+	Handle Symbols as macro names - needed for Common Lisp.
+	* kawa/standard/syntax_case.java (rewriteClauses):  Allow
+	pattern names to be Objects - i.e. Symbols as well as Strings.
+	(rewriteForm):  Lkewise allow literal identifiers to be Symbols.
+	(class syntax_case_work):  Likewise - change field type to Object[].
+	* kawa/lang/Syntax.java (name):  Change field from String to Object.
+	(getName):  Change to handle either Symbol or String in name.
+	(getSymbol, setname):  New methods.
+	(<init>):  Change paramater type to Object, to allow Symbol.
+	* kawa/lang/Macro.java (make):  Allow name to be Symbol or String.
+	(<init>):  Likewise.
+	* kawa/lang/SyntaxRules.java (translate_pattern):  Don't convert
+	Symbol to String - instead use as is.  Needed for Common Lisp.
+
 2002-11-23  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (define_field):  Moved to Interpreter.

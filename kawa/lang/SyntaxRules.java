@@ -195,8 +195,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    if (literal_identifiers[i] == pattern)
 	      return new EqualPat (pattern);
 	  }
-	if (pattern instanceof Symbol) // FIXME
-	  pattern = ((Symbol) pattern).getName();
 	if (pattern_names.contains (pattern))
 	  tr.syntaxError ("duplicated pattern variable " + pattern);
 	pattern_names.addElement (pattern);

@@ -73,7 +73,7 @@ public class syntax_case extends Syntax
         args[0] = new ReferenceExp(work.matchArray);
         args[1] = new QuoteExp(IntNum.make(i));
         inits[i] = new ApplyExp(work.primArrayGet, args);
-        String name = (String) pattern_names.elementAt(i);
+        Object name = pattern_names.elementAt(i);
         Declaration decl = clauseScope.addDeclaration(name);
         decl.noteValue(inits[i]);
       }
@@ -113,14 +113,14 @@ public class syntax_case extends Syntax
             form = (Pair) obj;
             obj = form.car;
             int num_literals = LList.length(obj);
-            work.literal_identifiers = new String [num_literals + 1];
+            work.literal_identifiers = new Object [num_literals + 1];
             work.literal_identifiers[0] = null; // FIXME
             for (int i = 0;  i < num_literals;  i++)
               {
                 Pair lit_pair = (Pair) obj;
                 if (! (lit_pair.car instanceof String))
                   return tr.syntaxError ("syntax-case: non-symbol in literals list");
-                work.literal_identifiers[i+1] = (String) lit_pair.car;
+                work.literal_identifiers[i+1] = lit_pair.car;
                 obj = lit_pair.cdr;
               }
             obj = form.cdr;
@@ -167,7 +167,7 @@ public class syntax_case extends Syntax
 class syntax_case_work
 {
   LetExp let;
-  String[] literal_identifiers;
+  Object[] literal_identifiers;
 
   /** A temporary to hold the value of the input expression. */
   Declaration inputExpression;

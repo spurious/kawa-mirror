@@ -18,6 +18,53 @@ public abstract class Type {
   // Maps java.lang.Class to corresponding Type.
   static java.util.Hashtable mapClassToType;
 
+  /** Maps Java type name (e.g. "java.lang.String[]") to corresponding Type. */
+  static java.util.Hashtable mapNameToType;
+
+  public static Type lookupType (String name)
+  {
+    if (mapNameToType == null)
+      {
+	mapNameToType = new java.util.Hashtable();
+	mapNameToType.put("byte",    byte_type);
+	mapNameToType.put("short",   short_type);
+	mapNameToType.put("int",     int_type);
+	mapNameToType.put("long",    long_type);
+	mapNameToType.put("float",   float_type);
+	mapNameToType.put("double",  double_type);
+	mapNameToType.put("boolean", boolean_type);
+	mapNameToType.put("char",    char_type);
+	mapNameToType.put("void",    void_type);
+      }
+    return (Type) mapNameToType.get(name);
+  }
+
+  /** Find an Type with the given name, or create a new one.
+   * Use this for "library classes", where you need the field/method types,
+   * but not one where you are about to generate code for.
+   * @param name the name of the class (e..g. "java.lang.String").
+   */
+  public static Type getType (String name)
+  {
+    Type type = lookupType(name);
+    if (type == null)
+      {
+	if (name.endsWith("[]"))
+	  {
+	    type = getType(name.substring(0, name.length()-2));
+	    type = new ArrayType(type, name);
+	  }
+	else
+	  {
+	    ClassType cl = new ClassType(name);
+	    cl.flags |= ClassType.EXISTING_CLASS;
+	    type = cl;
+	  }
+	mapNameToType.put(name, type);
+      }
+    return type;
+  }
+
   /** Register that the Type for class is type. */
   public static void registerTypeForClass(Class clas, Type type)
   {
@@ -37,7 +84,7 @@ public abstract class Type {
 	  return (Type) t;
       }
     if (reflectClass.isArray())
-      type = new ArrayType(Type.make(reflectClass.getComponentType()));
+      type = ArrayType.make(Type.make(reflectClass.getComponentType()));
     else if (reflectClass.isPrimitive())
       throw new Error("internal error - primitive type not found");
     else

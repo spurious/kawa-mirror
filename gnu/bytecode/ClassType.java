@@ -8,8 +8,6 @@ public class ClassType extends ObjectType implements AttrContainer {
   public static final int minor_version = 3;
   public static final int major_version = 45;
 
-  static java.util.Hashtable classTable;
-
   /** Find a ClassType with the given name, or create a new one.
    * Use this for "library classes", where you need the field/method types,
    * but not one where you are about to generate code for.
@@ -17,16 +15,7 @@ public class ClassType extends ObjectType implements AttrContainer {
    */
   public static ClassType make(String name)
   {
-    if (classTable == null)
-      classTable = new java.util.Hashtable();
-    ClassType cl = (ClassType) classTable.get(name);
-    if (cl == null)
-      {
-	cl = new ClassType(name);
-	classTable.put(name, cl);
-        cl.flags |= EXISTING_CLASS;
-      }
-    return cl;
+    return (ClassType) Type.getType(name);
   }
 
   public static ClassType make (String name, ClassType superClass)
@@ -368,6 +357,26 @@ public class ClassType extends ObjectType implements AttrContainer {
     return null;
   }
 
+  /** Get a method with matching name and number of arguments. */
+  public Method getDeclaredMethod(String name, int argCount)
+  {
+    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
+      addMethods(getReflectClass());
+    Method result = null;
+    for (Method method = methods;  method != null;  method = method.next)
+      {
+	if (name.equals(method.getName())
+	    && argCount == method.getParameterTypes().length)
+	  {
+	    if (result != null)
+	      throw new Error("ambiguoys call to getDeclaredMethod(\""
+			      + name + "\", " + argCount);
+	    result = method;
+	  }
+      }
+    return result;
+  }
+
   public Method getMethod(String name, Type[] arg_types)
   {
     ClassType cl = this;
@@ -416,6 +425,36 @@ public class ClassType extends ObjectType implements AttrContainer {
         meth.arg_types = args;
         meth.return_type = Type.make(method.getReturnType());
       }
+
+    java.lang.reflect.Constructor[] cmethods;
+    try
+      {
+        cmethods = clas.getDeclaredConstructors();
+      }
+    catch (SecurityException ex)
+      {
+        cmethods = clas.getConstructors();
+      }
+    count = cmethods.length;
+    for (int i = 0;  i < count;  i++)
+      {
+        java.lang.reflect.Constructor method = cmethods[i];
+        if (! method.getDeclaringClass().equals(clas))
+          continue;
+        int modifiers = method.getModifiers();
+        if ((modifiers & (Access.PUBLIC|Access.PROTECTED)) == 0)
+          continue;
+        Class[] paramTypes = method.getParameterTypes();
+        int j = paramTypes.length;
+        Type[] args = new Type[j];
+        while (--j >= 0)
+          args[j] = Type.make(paramTypes[j]);
+        Method meth = new Method (this, modifiers);
+        meth.setName("<init>");
+        meth.arg_types = args;
+        meth.return_type = Type.void_type;
+      }
+
     flags |= ADD_METHODS_DONE;
   }
 

@@ -9,9 +9,27 @@ public class ArrayType extends ObjectType
 
   public ArrayType (Type elements)
   {
-    this_name = elements.getName() + "[]";
+    this(elements, elements.getName() + "[]");
+  }
+
+  ArrayType (Type elements, String name)
+  {
+    this_name = name;
     setSignature("[" + elements.getSignature());
     this.elements = elements;
+  }
+
+  /** Find or create an ArrayType for the specified element type. */
+  public static ArrayType make(Type elements)
+  {
+    String name = elements.getName() + "[]";
+    ArrayType type = (ArrayType) Type.lookupType(name);
+    if (type == null || type.elements != elements)
+      {
+	type = new ArrayType(elements, name);
+	mapNameToType.put(name, type);
+      }
+    return type;
   }
 
   public Type getComponentType() { return elements; }

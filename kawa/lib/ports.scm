@@ -79,6 +79,9 @@
 (define (eof-object? obj)
   (eq? obj #!eof))
 
+(define (char-ready? #!optional (port (current-input-port)))
+  (invoke-static <kawa.standard.char_ready_p> 'ready port))
+
 (define (input-port-read-state port)
   ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))

@@ -38,12 +38,6 @@
 				  ((when cond exp ...)
 				   (if (not cond) (begin exp ...)))))
 
-(define (dynamic-wind before thunk after)
-  (before)
-  (try-finally
-   (thunk)
-   (after)))
-
 (define (catch key (thunk :: <procedure>) (handler :: <procedure>))
   (try-catch (thunk)
 	     (ex <kawa.lang.NamedException>

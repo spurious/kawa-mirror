@@ -29,11 +29,17 @@
   :: <boolean>
   (invoke env 'isBound sym))
 
-;; The version number is not optiona according to R5RS.
+;; The version number is not optional according to R5RS.
 ;; But since earlier versions of this implementation took 0 arguments,
 ;; we'll make it optional for backwards compatibility, at least for now.
 (define (null-environment #!optional version)
   (static-field <kawa.standard.Scheme> 'nullEnvironment))
+
+(define (scheme-report-environment version)
+  (case version
+    ((4) (static-field <kawa.standard.Scheme> 'r4Environment))
+    ((5) (static-field <kawa.standard.Scheme> 'r5Environment))
+    (else (error "scheme-report-environment version must be 4 or 5"))))
 
 (define (interaction-environment)
   (invoke-static <gnu.mapping.Environment> 'user))
@@ -52,6 +58,12 @@
     (define (procedure-property (proc :: <procedure>) key #!optional default)
       (invoke proc 'getProperty key default))
     procedure-property))
+
+(define (dynamic-wind before thunk after)
+  (before)
+  (try-finally
+   (thunk)
+   (after)))
 
 ;;; The one-argument case is a standard DSSSL procedure.
 ;;; The multi-argument extension matches Guile.

@@ -1,3 +1,12 @@
+2004-11-14  Per Bothner  <per@bothner.com>
+
+	* misc.scm (scheme-report-environment): Function converted from Java.
+
+	* syntax.scm (dynamic-wind): Moved from here ...
+	* misc.scm: ... to here, to ensure it is defined before use.
+
+	* ports.scm (char-read?): New function - wrapper converted from java.
+
 2004-11-10  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (%lang-boolean):  New helper macro.

@@ -42,14 +42,30 @@ public class GenericProc extends MethodProc
   public Object applyN(Object[] args)
   {
     checkArgCount(this, args.length);
+    MethodProc best = null;
+    Object bestVars = null;
     for (int i = count;  --i >= 0; )
       {
         MethodProc method = methods[i];
         Object vars = method.getVarBuffer();
         if (method.match(vars, args) == null)
-          return method.applyV(vars);
+          {
+            if (best == null)
+              {
+                best = method;
+                bestVars = vars;
+              }
+            else
+              {
+                best = MethodProc.mostSpecific(best, method);
+                if (best == method)
+                  bestVars = vars;
+              }
+          }
       }
-    throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
+    if (best == null)
+      throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
+    return best.applyV(bestVars);
   }
 
   public Object getVarBuffer()

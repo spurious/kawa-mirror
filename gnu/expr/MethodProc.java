@@ -24,7 +24,7 @@ public abstract class MethodProc extends ProcedureN
     int num = numArgs();
     if (argCount < (num & 0xFFF)
 	|| (num >= 0 && argCount > (num >> 12)))
-      return -3;
+      return -1;
     int result = 1;
     for (int i = argCount;  --i >= 0; )
       {
@@ -124,5 +124,25 @@ public abstract class MethodProc extends ProcedureN
           }
       }
     return not2 ? proc1 : not1 ? proc2 : null;
+  }
+
+  /** Return the index of the most specific method. */
+  public static int mostSpecific(MethodProc[] procs, int length)
+  {
+    MethodProc best = null;
+    if (length == 0)
+      return -1;
+    int result = 0;
+    best = procs[0];
+    for (int i = 1;  i < length;  i++)
+      {
+        MethodProc method = procs[i];
+        best = mostSpecific(best, method);
+        if (best == null)
+          return -1;
+        else if (best == method)
+          result = i;
+      }
+    return result;
   }
 }

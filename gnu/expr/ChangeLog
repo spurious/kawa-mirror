@@ -1,3 +1,18 @@
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	Suggested by Daniel Bonniot <bonniot@cma.ensmp.fr>:
+	* ExpFullWalker.java (walkBlockExp):  Test if exitBody is null.
+	* Compilation.java (findLiteral):  Use Type.make(value.getClass()).
+
+	* ObjectExp.java (getCompiledClassType):  Use Scheme.exp2Type.
+
+	* MethodProc.java (isApplicable):  Fix incorrect return code.
+	(mostSpecific):  New method.
+	* GenericProc.java (applyN):  Select most specific matching method.
+
+	* PrimProcedure.java (getParameterType):  Adjust for static/non-static.
+	(getMethodFor):  If class is ModuleMethod, get the module's class.
+
 1999-11-03  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  If function is Inlineable but we didn't

@@ -262,6 +262,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 
   public Type getParameterType(int index)
   {
+    if (! getStaticFlag())
+      {
+        if (index == 0)
+          return method.getDeclaringClass();
+        index--;
+      }
     int lenTypes = argTypes.length;
     if (index < lenTypes - 1)
       return argTypes[index];
@@ -280,7 +286,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    * @return a PrimProcedure that is suitable, or null. */
   public static PrimProcedure getMethodFor (Procedure pproc, Expression[] args)
   {
-    Class procClass = pproc.getClass();
+    Class procClass;
+    if (pproc instanceof gnu.expr.ModuleMethod)
+      procClass = ((ModuleMethod) pproc).module.getClass();
+    else
+      procClass = pproc.getClass();
     if (procClass.getClassLoader() != systemClassLoader)
       return null;
     try

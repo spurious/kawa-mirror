@@ -24,7 +24,7 @@ public class Scheme extends Interpreter
     define(name, proc);
   }
 
-  /* Define a procedure to be autoloaded. */
+  /** Define a procedure to be autoloaded. */
   protected void define_proc (String name, String className)
   {
     define (name, new AutoloadProcedure (name, className));
@@ -839,11 +839,11 @@ public class Scheme extends Interpreter
         types.put ("f64vector", ClassType.make("gnu.kawa.util.F64Vector"));
       }
     Type type = (Type) types.get(name);
-    if (type == null && name.equals("elisp:boolean"))
+    if (type == null && name.startsWith("elisp:"))
       {
-	type = new SpecialType(Type.boolean_type,
-			       gnu.jemacs.lang.ELisp.getInstance());
-	types.put("elisp:boolean", type);
+	Class clas = getNamedType(name.substring(6)).getReflectClass();
+	type = Interpreter.getInstance("elisp").getTypeFor(clas);
+	types.put(name, type);
       }
     return type;
   }

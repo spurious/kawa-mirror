@@ -83,25 +83,10 @@ public class repl extends Procedure0or1
   {
     if (Interpreter.defaultInterpreter == null)
       {
-	Interpreter.defaultInterpreter = new Scheme();
+	Interpreter.defaultInterpreter = Interpreter.getInstance(null);
 	Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
       }
     return Interpreter.defaultInterpreter;
-  }
-
-  public static void setInterpreter(String name)
-  {
-    Interpreter previous = Interpreter.defaultInterpreter; 
-    if (name.length() > 2 && name.charAt(0) == '-')
-      name = name.substring(name.charAt(1) == '-' ? 2 :1);
-    if (name.equals("scheme"))
-      Interpreter.defaultInterpreter = Scheme.getInstance();
-    else if (name.equals("elisp") || name.equals("emacs"))
-      Interpreter.defaultInterpreter = gnu.jemacs.lang.ELisp.getInstance();
-    else
-      bad_option(name);
-    if (previous == null)
-      Environment.setCurrent(Interpreter.defaultInterpreter.getEnvironment());
   }
 
   public static void main(String args[])
@@ -295,8 +280,6 @@ public class repl extends Procedure0or1
 		throw new Error(ex.toString());
 	      }
 	  }
-	else if (arg.equals("--elisp") || arg.equals("--scheme") || args.equals("emacs"))
-	  setInterpreter(arg);
 	else if (arg.equals("--main"))
 	  {
 	    Compilation.generateMainDefault = true;
@@ -335,7 +318,21 @@ public class repl extends Procedure0or1
 	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
-	  bad_option (arg);
+	  { // Check if arg is a known language name.
+	    Interpreter previous = Interpreter.defaultInterpreter;
+	    String name = arg;
+	    if (name.length() > 2 && name.charAt(0) == '-')
+	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
+	    Interpreter interpreter = Interpreter.getInstance(name);
+	    if (interpreter == null)
+	      bad_option(arg);
+	    else
+	      {
+		Interpreter.defaultInterpreter = interpreter;
+		if (previous == null)
+		  Environment.setCurrent(interpreter.getEnvironment());
+	      }
+	  }
 	else
 	  break;
       }

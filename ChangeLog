@@ -1,3 +1,13 @@
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (setInterpreter):  Method removed.
+	(getInterpreter):  Don't hard-wire in Scheme.
+	(main):  Don't hard-wire in languages, instead ask Interpreter.
+
+	* kawa/standard/Scheme.java (getNamedType):  Don't hard-wire
+	"elisp:boolean".  Instead, handle "elisp:*".  Also, get an Elisp
+	instance using reflection - in case it isn't available when compiling.
+
 2000-04-22  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/SpecialType.java (interpreter):  New optional field.

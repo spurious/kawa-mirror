@@ -45,13 +45,7 @@ public class ServletCallContext extends CallContext
   public String getBaseUri ()
   {
     if (baseUri == null)
-      {
-	StringBuffer sbuf = request.getRequestURL();
-	int len = sbuf.length();
-	while (len > 0 && sbuf.charAt(--len) != '/') ;
-	sbuf.setLength(len);
-	baseUri = sbuf.toString();
-      }
+      baseUri = request.getRequestURL().toString();
     return baseUri;
   }
 

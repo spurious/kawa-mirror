@@ -1,3 +1,8 @@
+2003-06-05  Per Bothner  <per@bothner.com>
+
+	* ServletCallContext.java (getBaseUri):  Use entire request url,
+	not just scheme+directory prefix.
+
 2003-05-08  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java (doGet):  Unwrap WrappedException.

@@ -563,7 +563,6 @@ public class Compilation
 	    boolean method_static;
 	    int method_flags;
 	    if (! child.getImportsLexVars())
-	      //if (lexp.heapFrame == null)
 	      {
 		method_class = new_class;
 		method_flags = Access.PUBLIC|Access.STATIC;

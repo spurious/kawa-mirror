@@ -81,7 +81,7 @@ implements Inlineable, Externalizable
 	comp.compileConstant(qname, Target.pushObject);
 	code.emitInvokeInterface(beginGroupMethod);
 	for (int i = 0;  i < nargs;  i++)
-	  args[i].compile(comp, target);
+	  args[i].compileWithPosition(comp, target);
 	code.emitLoad(consumer);
 	comp.compileConstant(sname, Target.pushObject);
 	code.emitInvokeInterface(endGroupMethod);

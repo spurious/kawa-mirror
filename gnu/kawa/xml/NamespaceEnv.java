@@ -23,6 +23,11 @@ public class NamespaceEnv extends Environment
     int i = name.indexOf(':');
     if (i >= 0)
       {
+	if (i == 0)
+	  {
+	    name = name.substring(1).intern();
+	    return ElementConstructor.make(name, null, name);
+	  }
 	String prefix = name.substring(0, i);
 	Object nsValue
 	  = mainEnv.get((NAMESPACE_PREFIX+prefix).intern(), null);

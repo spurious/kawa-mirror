@@ -19,7 +19,7 @@ public abstract class ProcedureN extends Procedure
 
   public Object apply0 ()
   {
-    return applyN (new Object[0]);
+    return applyN (Procedure.noArgs);
   }
 
   public Object apply1 (Object arg1)

@@ -24,8 +24,8 @@ import java.util.Hashtable;
 
 public class Translator extends Compilation
 {
-  // Current lexical scope - map name to Declaration.
-  public Hashtable environ;  // Should use HashMap, but requires JDK 1.2.
+  /** Current lexical scope - map name to Declaration. */
+  public final NameLookup lexical;
 
   // Global environment used to look for syntax/macros.
   private Environment env;
@@ -60,14 +60,14 @@ public class Translator extends Compilation
   {
     super(messages);
     this.env = env;
-    environ = new Hashtable();
+    lexical = new NameLookup(getInterpreter());
   }
 
   public Translator (Environment env)
   {
     super(new SourceMessages());
     this.env = env;
-    environ = new Hashtable();
+    lexical = new NameLookup(getInterpreter());
   }
 
   public Translator ()
@@ -135,8 +135,9 @@ public class Translator extends Compilation
     if (form instanceof Symbol)
       {
 	// Check for hygiene re-naming - see SyntaxRule.execute_template.
-	Declaration decl = (Declaration) environ.get(form);
-	if (decl != null && decl.getValue() instanceof ReferenceExp)
+	Declaration decl = lexical.lookup(form, -1);
+	if (decl != null && decl.isAlias()
+	    && decl.getValue() instanceof ReferenceExp)
 	  form = ((ReferenceExp) decl.getValue()).getSymbol();
       }
     return form == literal;
@@ -144,7 +145,7 @@ public class Translator extends Compilation
 
   public Declaration lookup(Object name, int namespace)
   {
-    Declaration decl = (Declaration) environ.get(name);
+    Declaration decl = lexical.lookup(name, namespace);
     if (decl != null
 	&& (getInterpreter().getNamespaceOf(decl) & namespace) != 0)
       return decl;
@@ -188,7 +189,7 @@ public class Translator extends Compilation
   {
     if (obj instanceof String || obj instanceof Symbol)
       {
-	Declaration decl = (Declaration) environ.get(obj);
+	Declaration decl = lexical.lookup(obj, function);
 	if (decl != null)
 	  {
 	    if (decl.isAlias() && decl.getValue() instanceof ReferenceExp)
@@ -352,7 +353,7 @@ public class Translator extends Compilation
       return rewrite_pair ((Pair) exp);
     else if (exp instanceof String || exp instanceof Symbol)
       {
-	Declaration decl = (Declaration) environ.get(exp);
+	Declaration decl = lexical.lookup(exp, function);
 	Symbol symbol = null;
 	if (exp instanceof String && decl == null)
 	  {
@@ -363,7 +364,7 @@ public class Translator extends Compilation
 		String prefix = str.substring(0, colon);
 		String local = str.substring(colon + 1);
 		String xprefix = Interpreter.NAMESPACE_PREFIX+prefix;
-		Object uri_decl = environ.get(xprefix);
+		Object uri_decl = lexical.lookup(xprefix, function);
 		if (uri_decl instanceof Declaration)
 		  {
 		    decl = (Declaration) uri_decl;
@@ -652,31 +653,34 @@ public class Translator extends Compilation
   {
     java.util.Vector forms = new java.util.Vector(20);
     LetExp defs = new LetExp(null);
-    if (! scan_body (exp, forms, defs))
-      return new ErrorExp("error while scanning in body");
-    return rewrite_body(forms, defs);
-  }
-
-  public Expression rewrite_body (java.util.Vector forms, LetExp defs)
-  {
-    int nforms = forms.size();
-    if (nforms == 0)
-      return syntaxError ("body with no expressions");
-    int ndecls = defs.countDecls();
-    if (ndecls != 0)
+    defs.outer = current_scope;
+    current_scope = defs;
+    try
       {
-        Expression[] inits = new Expression[ndecls];
-        for (int i = ndecls;  --i >= 0; )
-          inits[i] = QuoteExp.nullExp;
-        defs.inits = inits;
-	push(defs);
+	if (! scan_body (exp, forms, defs))
+	  return new ErrorExp("error while scanning in body");
+	int nforms = forms.size();
+	if (nforms == 0)
+	  return syntaxError ("body with no expressions");
+	int ndecls = defs.countDecls();
+	if (ndecls != 0)
+	  {
+	    Expression[] inits = new Expression[ndecls];
+	    for (int i = ndecls;  --i >= 0; )
+	      inits[i] = QuoteExp.nullExp;
+	    defs.inits = inits;
+	  }
+	Expression body = makeBody(forms, null);
+	if (ndecls == 0)
+	  return body;
+	mustCompileHere();
+	defs.body = body;
+	return defs;
       }
-    Expression body = makeBody(forms, null);
-    if (ndecls == 0)
-      return body;
-    defs.body = body;
-    pop(defs);
-    return defs;
+    finally
+      {
+	pop(defs);
+      }
   }
 
   /** Combine a list of zero or more expression forms info a "body". */
@@ -746,7 +750,7 @@ public class Translator extends Compilation
 
     setModule(mexp);
     mexp.body = makeBody(forms, mexp);
-    popDecls();
+    lexical.pop(mexp);
     /* DEBUGGING:
     OutPort err = OutPort.errDefault ();
     err.print ("[Re-written expression for load/compile: ");
@@ -757,11 +761,6 @@ public class Translator extends Compilation
     */
   }
 
-  /** Used to remember shadowed bindings in environ.
-   * For each binding, we push <old binding>, <name>.
-   * For each new scope, we push <null>. */
-  java.util.Stack shadowStack = new java.util.Stack();
-
  /**
    * Insert decl into environ.
    * (Used at rewrite time, not eval time.)
@@ -771,43 +770,15 @@ public class Translator extends Compilation
     Object name = decl.getSymbol();
     if (name == null)
       return;
-    Object old = environ.put(name, decl);
-    // It is possible the same Declaration may be pushed twice:  Once
-    // in scanForDefinitions and once by pushDecls.  With some care
-    // this could probably be avoided.  FIXME.
-    if (decl == old)
-      return;
-    shadowStack.push(old);
-    shadowStack.push(name);
+    lexical.push(decl);
   }
 
-  /** Remove this from Translator.environ.
-   * (Used at rewrite time, not eval time.)
-   */
   private void pop (Declaration decl)
   {
     String sym = decl.getName();
     if (sym == null)
       return;
-    popBinding();
-  }
-
-  public final void pushDeclsStart ()
-  {
-    shadowStack.push(null);
-  }
-
-  public final void popDecls()
-  {
-    while (popBinding()) { }
-  }
-
-  public final void pushDecls (ScopeExp scope)
-  {
-    shadowStack.push(null);
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      push(decl);
+    lexical.pop(decl);
   }
 
   public void push (ScopeExp scope)
@@ -816,25 +787,12 @@ public class Translator extends Compilation
     if (! (scope instanceof ModuleExp))
       mustCompileHere();
     current_scope = scope;
-    pushDecls(scope);
+    lexical.push(scope);
   }
 
   public void pop (ScopeExp scope)
   {
-    popDecls();
+    lexical.pop(scope);
     current_scope = scope.outer;
-  }
-
-  private boolean popBinding()
-  {
-    Object name = shadowStack.pop();
-    if (name == null)
-        return false;
-    Object old = shadowStack.pop();
-    if (old == null)
-      environ.remove(name);
-    else
-      environ.put(name, old);
-    return true;
   }
 }

@@ -130,7 +130,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
     for (int j = num_identifiers;  --j >= 0; )
       {
 	String name = macro.templateIdentifiers[j];
-	Declaration decl =  (Declaration) tr.environ.get(name);
+	Declaration decl =  (Declaration) tr.lexical.lookup(name, -1);
 	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
 	    decl.setCanRead(true);

@@ -44,6 +44,16 @@ public abstract class Lisp2 extends LispInterpreter
     return true;
   }
 
+  public int getNamespaceOf(Declaration decl)
+  {
+    // This is a kludge because the hygiene renameing in SyntaxRules
+    // (which is used for some macros that Lisp uses) doesn't distinguish
+    // function and variable position.
+    if (decl.isAlias())
+      return FUNCTION_NAMESPACE+VALUE_NAMESPACE;
+    return decl.isProcedureDecl() ? FUNCTION_NAMESPACE : VALUE_NAMESPACE;
+  }
+
   public void defineFunction(String name, Object proc)
   {
     Environment.defineFunction(environ, name, proc);

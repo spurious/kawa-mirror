@@ -1,3 +1,19 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (environ):  Remove field.
+	(lexical):  Replacement field.
+	(<init>):  Allocate lexical instead of environ.
+	(lookup, getBinding, rewrite):  Update.
+	(matches):  Update for new hygiene handling.
+	(rewrite_body):  Combine overloaded methods into one.
+	Inline the effect of push - but don't push decls twice.
+	(shadowStack):  Remove field.
+	(pushDeclStart, popDecls, pushDecls, popBinding):  Removed methods.
+	(finishModule, push, pop):  Update accordingly.
+	* kawa/standard/Scheme.java (getNamespaceOf):  New method.
+	* kawa/standard/set_b.java (rewrite):  Update to use new NameLookup.
+	* kawa/lang/SyntaxRules.java (expand):  Likewise.
+
 2003-04-14  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Macro.java (capturedDeclarations):  Change type.
@@ -10,6 +26,7 @@
 	(getBinding, rewrite):  Update and  re-organize.
 	(pushBinding):  Remove and inline into push(Declaration).
 	(popBinding):  Make private.
+
 	* kawa/standard/define_alias.java (scanForDefinitions):  Use
 	Translator's push method instead of pushBinding.
 	* kawa/standard/define_syntax.java (scanForDefinitions):   Likewise.

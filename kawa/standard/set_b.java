@@ -52,15 +52,20 @@ public class set_b extends Syntax implements Printable
     if (! (sym instanceof String)  && ! (sym instanceof Symbol))
       return tr.syntaxError ("first set! argument is not a variable name");
     Expression value = tr.rewrite (match[1]);
-    Object binding = tr.environ.get (sym);
+    Declaration decl = tr.lexical.lookup(sym, Interpreter.VALUE_NAMESPACE);
     // Hygenic macro expansion may bind a renamed (uninterned) symbol
     // to the original symbol.  Here, use the original symbol.
-    if (binding != null && binding instanceof String)
-      return new SetExp ((String) binding, value);
-    SetExp sexp = new SetExp (sym, value);
-    if (binding instanceof Declaration)
+    if (decl != null  && decl.isAlias()
+	&& decl.getValue() instanceof ReferenceExp)
       {
-	Declaration decl = (Declaration) binding;
+	ReferenceExp rexp = (ReferenceExp) decl.getValue();
+	decl = rexp.getBinding();
+	if (decl == null)
+	  return new SetExp(rexp.getSymbol(), value);
+      }
+    SetExp sexp = new SetExp (sym, value);
+    if (decl != null)
+      {
 	sexp.binding = decl;
 	decl = Declaration.followAliases(decl);
 	if (decl != null)

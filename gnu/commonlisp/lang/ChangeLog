@@ -1,3 +1,7 @@
+2003-04-18  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java (getNamespaceOf):  New method.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* defun.java (scanForDefinitions):  Use name as is, even if Symbol.

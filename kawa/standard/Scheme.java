@@ -817,6 +817,11 @@ public class Scheme extends LispInterpreter
     return readable ? writeFormat : displayFormat;
   }
 
+  public int getNamespaceOf (Declaration decl)
+  {
+    return FUNCTION_NAMESPACE+VALUE_NAMESPACE;
+  }
+
   /** If exp is a "constant" Type, return that type, otherwise return null. */
   public static Type getTypeValue (Expression exp)
   {

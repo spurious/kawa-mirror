@@ -53,6 +53,26 @@ public class SyntaxForm implements Externalizable
     return sf;
   }
 
+  /** Create a SyntaxForm with specified form, and given syntatic context.
+   * Used to implement datum->syntax-object in the syntax-case API.
+   * @param template If this is a SyntaxForm, use its scope;
+   *   otherwise use the current Compilation's current scope.
+   * @param form The value (S-expression form) to use.
+   */
+  public static SyntaxForm makeWithTemplate (Object template, Object form)
+  {
+    if (form instanceof SyntaxForm)
+      return (SyntaxForm) form;
+    if (template instanceof SyntaxForm)
+      {
+	SyntaxForm sform = (SyntaxForm) template;
+	if (form == sform.form)
+	  return sform;
+	return sform.fromDatum(form);
+      }
+    return make(form, Compilation.getCurrent().currentScope());
+  }
+
   public SyntaxForm fromDatumIfNeeded (Object form)
   {
     if (form == this.form)

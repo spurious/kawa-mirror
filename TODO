@@ -7,7 +7,6 @@ BEFORE KAWA 1.7?
 * Make sure build.xml works (fix various HTTP.scm, brl, etc)
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * Interpreter.getInterpreter should get current thread's.
-* define-class should work for repl - need shared ArrayClassLoader
 * define-namespace should work lexically
 * CL reader interface
 * More define-class functionality?
@@ -15,7 +14,6 @@ BEFORE KAWA 1.7?
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
-* document define-procedure
 * Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
 

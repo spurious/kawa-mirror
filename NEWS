@@ -1,3 +1,5 @@
+base-uri;  document generalized; load takes YRL; load-relative
+
 Imported implementation of cut and cute from SRFI-26
 (Notation for Specializing Parameters without Currying).
 

@@ -1,3 +1,14 @@
+2004-12-05  Per Bothner  <per@bothner.com>
+
+	* BufferLocalConstraint.java: Remove class, replaced by:
+	* BufferLocal.java: New class, extends IndirectableLocation.
+	* Makefile.am: Update accordingly.
+	* Buffer.java (localBindings): New field.
+	(makeBufferLocal): Update to use new BufferLocal class.
+	* Command.java (resolveSymbol): Update for new Environment handling.
+	* EKeymap.java (keySymbol): New access method, required because
+	it was added to the Named interface.
+
 2004-08-23  Per Bothner  <per@bothner.com>
 
 	* EToolkit.java	(swingToolkit, swtToolkit):  New constants.

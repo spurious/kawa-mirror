@@ -4,7 +4,7 @@ include $(top_srcdir)/Make-rules
 
 java_WITH_SWING = \
   Buffer.java \
-  BufferLocalConstraint.java \
+  BufferLocal.java \
   BufferWriter.java \
   CancelledException.java \
   Command.java \

@@ -12,13 +12,14 @@ public class Command
     for (;;)
       {
 	if (command instanceof String)
-	  command = gnu.commonlisp.lang.Symbols.getSymbol(command);
+	  command = Namespace.getDefaultSymbol((String) command);
 	if (command instanceof Symbol)
 	  {
-	    Symbol bind = (Symbol) command;
-	    command = bind.getFunctionValue(null);
+	    Symbol sym = (Symbol) command;
+	    Environment env = Environment.getCurrent();
+	    command = env.getFunction(sym, null);
 	    if (command == null)
-	      command = bind.getValue();
+	      command = env.get(sym, null);
 	  }
 	else
 	  return command;

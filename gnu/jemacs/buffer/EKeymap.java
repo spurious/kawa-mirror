@@ -56,6 +56,11 @@ implements gnu.mapping.Named
     return name;
   }
 
+  public Object getSymbol ()
+  {
+    return name;
+  }
+
   public void setName (String name)
   {
     this.name = name;

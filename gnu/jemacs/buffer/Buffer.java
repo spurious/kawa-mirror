@@ -20,6 +20,13 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
   public Marker pointMarker;
   public Marker markMarker;
 
+  /** Buffer-local variable bindings.
+   * Represented as pairs of (<code>Symbol</code>, value)-pairs:
+   * For an even integer <code>i</code>, if <code>localBindings[i]</code>
+   * is a <code>Symbol</code>, there is a buffer-local binding
+   * whose value is <code>localBindings{i+1]</code>. */
+  Object[] localBindings;
+
   /** List of modes active for this buffer, major mode first. */
   Mode modes;
 
@@ -475,7 +482,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
    */
   public static void makeBufferLocal(Object symbol, boolean all)
   {
-    BufferLocalConstraint.make(Symbols.getSymbol(symbol), all);
+    BufferLocal.make(Symbols.getSymbol(symbol), all);
   }
 
   public abstract char charAt(int index);

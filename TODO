@@ -1,8 +1,13 @@
-Complete R4RS procedures.
-Implement internal define.
-Complete bignum support.
+Update to match kawa-paper:
+  Vector -> FVector
+  Quote -> quote  (also Lambda -> lambda)
+  SyntaxRule.match should use Pattern.
 
-Add fraction and complex support.
+Should SyntaxRule inherit from Pattern?
+
+Complete R4RS procedures.
+  transcript-on transcript-off
+  trig functions for complex numbers
 
 Add nicer way to access native java methods.
 

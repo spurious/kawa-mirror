@@ -4,11 +4,13 @@ KAWA, THE JAVA-BASED SCHEME SYSTEM
 Kawa is an implementation of the Scheme programming language.
 It is implemented in Java, and compiles Scheme into Java byte-codes.
 
-The file kawa.txt (which was automatically generated from kawa.texi)
+The file doc/kawa.txt (which was automatically generated from doc/kawa.texi)
 explains how to build, install, and use Kawa.
-The file kawa.html contains the same information in HTML format.
+The file doc/kawa.html contains the same information in HTML format.
 
 The file NEWS summarizes recent changes.
+
+Kawa's copyright is in doc/license.terms.
 
 The file Compliance.html summarizes divergence from the R4RS.
 

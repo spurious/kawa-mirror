@@ -1,3 +1,16 @@
+Moved kawa to kawa/repl, which means you have to run Kawa
+by saying "java kawa.repl" instead of "java kawa".
+
+Documentation moved to doc directory.
+There is now an internals overview, in doc/kawa-tour.ps.
+
+Internal define is implemented.
+
+Quantities (with units) are implemented (as in DSSSL).
+Complex numbers are implemented (except {,a}{sin,cos,tan}).
+
+A 'kawa' shell-script is now created.
+
 Changes since 1.0:
 ==================
 Now builds "without a snag" using Cafe 1.51 under Win95.

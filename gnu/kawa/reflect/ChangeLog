@@ -1,3 +1,14 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java: Update to use Location in place of Symbol.
+	* SlotSet.java: Likewise.
+
+	* ClassMemberConstraint.java: Removed class, replaced by ...
+	* ClassMemberLocation.java: New class, extends Location.
+	* StaticFieldConstraint.java: Removed class, replaced by ...
+	* StaticFieldLocation.java: New class, extends ClassMemberLocation.
+	* Makefile.am: Update accordingly.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	* Invoke.java (inline): Add overloading.  Support constructing

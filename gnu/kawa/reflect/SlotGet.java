@@ -1,5 +1,6 @@
 package gnu.kawa.reflect;
 import gnu.mapping.*;
+import gnu.mapping.Location;  // As opposed to gnu.bytecode.Location.
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.lists.FString;
@@ -72,10 +73,10 @@ public class SlotGet extends Procedure2
         try
           {
             Object result = field.get(obj);
-	    if (result instanceof Symbol
+	    if (result instanceof Location
 		&& ((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
 		    != 0))
-	      result = ((Symbol) result).get();
+	      result = ((Location) result).get();
 	    else
 	      result = interpreter.coerceToObject(field.getType(), result);
             return result;

@@ -1,6 +1,7 @@
 package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.bytecode.*;
+import gnu.mapping.Location;  // As opposed to gnu.bytecode.Location.
 import gnu.expr.*;
 
 public class SlotSet extends Procedure3 implements CanInline, Inlineable
@@ -45,9 +46,9 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       {
         java.lang.reflect.Field field = clas.getField(name);
 	Class ftype = field.getType();
-	if ("gnu.mapping.Symbol".equals(ftype.getName())
+	if ("gnu.mapping.Location".equals(ftype.getName())
 	    && (field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
-	  ((Symbol) field.get(obj)).set(value);
+	  ((Location) field.get(obj)).set(value);
 	else
 	  field.set(obj, interpreter.coerceFromObject(ftype, value));
         return;

@@ -7,7 +7,7 @@ java_sources = \
   ArrayLength.java \
   ArrayNew.java \
   ArraySet.java \
-  ClassMemberConstraint.java \
+  ClassMemberLocation.java \
   ClassMethodProc.java \
   ClassMethods.java \
   InstanceOf.java \
@@ -15,7 +15,7 @@ java_sources = \
   OccurrenceType.java \
   SlotGet.java \
   SlotSet.java \
-  StaticFieldConstraint.java \
+  StaticFieldLocation.java \
   StaticGet.java \
   StaticSet.java \
   TypeSwitch.java

@@ -105,21 +105,12 @@ public class HttpPrinter extends FilterConsumer
 
   boolean seenXmlHeader;
 
-  public void beginGroup(String typeName, Object type)
+  public void beginData()
   {
     if (base == null)
       {
 	if (sawContentType == null)
-	  {
-	    String mimeType;
-	    if (! seenXmlHeader)
-	      mimeType = "text/html";
-	    else if (typeName.equals("html"))
-	      mimeType = "text/xhtml";
-	    else
-	      mimeType = "text/xml";
-	    addHeader("Content-type", mimeType);
-	  }
+	  addHeader("Content-type", "text/html");
 	if (writer == null)
 	  writer = new OutPort(ostream); // FIXME use encoding.
 	String style = null;
@@ -139,7 +130,29 @@ public class HttpPrinter extends FilterConsumer
 	    throw new RuntimeException(ex.toString());
 	  }
       }
+  }
+
+  public void beginGroup(String typeName, Object type)
+  {
+    if (sawContentType == null)
+      {
+	String mimeType;
+	if (! seenXmlHeader)
+	  mimeType = "text/html";
+	else if (typeName.equals("html"))
+	  mimeType = "text/xhtml";
+	else
+	  mimeType = "text/xml";
+	addHeader("Content-type", mimeType);
+      }
+    beginData();
     base.beginGroup(typeName, type);
+  }
+
+  public void writeObject(Object v)
+  {
+    beginData();
+    super.writeObject(v);
   }
 
   public void writeChars(String str)
@@ -158,7 +171,6 @@ public class HttpPrinter extends FilterConsumer
 
   public void endDocument()
   {
-    System.out.println("HttpPrinter.endDocument called"); System.out.flush();
     if (base != null)
       base.endDocument();
     try

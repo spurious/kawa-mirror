@@ -1,3 +1,9 @@
+2003-07-22  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (compileBody):  Use LambdaExp's language-based
+	return type, not the methods primitive type.
+	Fixes Savannah bug #4423.
+
 2003-07-22  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* ModuleMethod.java (<init>):  Optimization.

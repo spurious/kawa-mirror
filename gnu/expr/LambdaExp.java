@@ -1378,7 +1378,7 @@ public class LambdaExp extends ScopeExp
 	target = new ConsumerTarget(result);
       }
     else
-      target = Target.pushValue(comp.method.getReturnType());
+      target = Target.pushValue(getReturnType());
     body.compileWithPosition(comp, target,
 			     body.getLine() > 0 ? body : this);
   }

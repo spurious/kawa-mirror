@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -115,7 +115,7 @@ public class Compare extends Procedure2 implements CanInline
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
     return exp;

@@ -1,3 +1,7 @@
+2004-08-06  Per Bothner  <per@bothner.com>
+
+	* system.scm (compile-file):  New function, converted from Java.
+
 2004-07-31  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (catch):  Add type declarations.  Simplify using invoke.

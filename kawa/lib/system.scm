@@ -72,3 +72,16 @@
     ((primitive-array-set <String>) arr 1 "-c")
     ((primitive-array-set <String>) arr 2 string)
     arr))
+
+(define (compile-file (source :: <string>)
+		      (output :: <String>))
+  :: <void>
+  (let* ((messages :: <gnu.text.SourceMessages>
+		   (make <gnu.text.SourceMessages>))
+	 (comp :: <gnu.expr.Compilation>
+	       (invoke-static <kawa.lang.CompileFile> 'read source messages)))
+    (invoke comp 'compileToArchive
+	    (invoke comp 'getModule)
+	    output)
+    (if (invoke messages 'seenErrors)
+	(primitive-throw (make <gnu.text.SyntaxException> messages)))))

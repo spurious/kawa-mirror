@@ -1,3 +1,8 @@
+2002-10-27  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Change Österlund -> &Ouml;sterlund to avoid
+	character encoding issues.
+
 2002-10-20  Per Bothner  <per@bothner.com>
 
 	New test based on bug report from Khairul Azhar <kazar1my@yahoo.co.uk>.

@@ -424,7 +424,7 @@
 (define (return-null) #!null)
 (test #!null return-null)
 
-;;; Based on bug report 2002-3-1 from Petter Österlund <petos@fyrplus.se>
+;;; Based on bug report 2002-3-1 from Petter &Ouml;sterlund <petos@fyrplus.se>
 (define (fie-1) (fie-2) (fie-3))
 (define (fie-4) (fie-3) (fie-3)) 
 (test #t 'names (and (procedure? fie-1) (procedure? fie-4)))

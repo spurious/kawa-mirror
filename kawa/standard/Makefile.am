@@ -28,8 +28,6 @@ list_tail.java \
 list_ref.java \
 mem.java \
 ass.java \
-symbol2string.java \
-string2symbol.java \
 integer_p.java \
 exact_p.java \
 inexact_p.java \
@@ -53,9 +51,6 @@ ceiling.java \
 truncate.java \
 round.java \
 rationalize.java \
-sin.java \
-cos.java \
-tan.java \
 asin.java \
 acos.java \
 atan.java \

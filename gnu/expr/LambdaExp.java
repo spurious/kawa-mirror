@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -64,6 +64,14 @@ public class LambdaExp extends ScopeExp
       This is used to see if we can inline the function at its unique
       call site. */
   public ApplyExp returnContinuation;
+
+  /** Expressions that name classes that may be thrown. */
+  ReferenceExp[] throwsSpecification;
+
+  public void setExceptions(ReferenceExp[] exceptions)
+  {
+    throwsSpecification = exceptions;
+  }
 
   /** If non-null, a Declaration whose value is (only) this LambdaExp. */
   public Declaration nameDecl;
@@ -229,7 +237,7 @@ public class LambdaExp extends ScopeExp
   ClassType type = Compilation.typeProcedure;
 
   /** Return the ClassType of the Procedure this is being compiled into. */
-  public ClassType getCompiledClassType(Compilation comp)
+  protected ClassType getCompiledClassType(Compilation comp)
   {
     if (type == Compilation.typeProcedure)
       throw new Error("internal error: getCompiledClassType");
@@ -862,7 +870,42 @@ public class LambdaExp extends ScopeExp
 	      break;
 	    }
 	}
-	primMethods[i] = ctype.addMethod(name, atypes, rtype, mflags);
+	Method method = ctype.addMethod(name, atypes, rtype, mflags);
+	primMethods[i] = method;
+
+	if (throwsSpecification != null && throwsSpecification.length > 0)
+	  {
+	    int n = throwsSpecification.length;
+	    ClassType[] exceptions = new ClassType[n];
+	    for (int j = 0;  j < n;  j++)
+	      {
+		ClassType exception = null;
+		Declaration decl = throwsSpecification[j].getBinding();
+		if (decl != null)
+		  {
+		    Expression declValue = decl.getValue();
+		    if (declValue instanceof ClassExp)
+		      exception
+			= ((ClassExp) declValue).getCompiledClassType(comp);
+		    else
+		      comp.error('e', "throws specification "+decl.getName()
+				 + " has non-class lexical binding");
+		  }
+		if (exception == null)
+		  {
+		    String exName = throwsSpecification[j].getName();
+		    int nlen = exName.length();
+		    if (nlen > 2
+			&& exName.charAt(0) == '<'
+			&& exName.charAt(nlen-1) == '>')
+		      exName = exName.substring(1, nlen-1);
+		    exception = ClassType.make(exName);
+		  }
+		exceptions[j] = exception;
+	      }
+	    ExceptionsAttr attr = new ExceptionsAttr(method);
+	    attr.setExceptions(exceptions);
+	  }
       }
   }
 

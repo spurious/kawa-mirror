@@ -1,3 +1,18 @@
+2004-06-21  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getCompiledClassType):  Method body moved to ...
+	(setParts):  ... new non-public void method.
+	Also, catch exception to warn about unknown class.
+	(getCompiledClassType):  Now just returns type.  Make protected.
+	(walk):  Call setParts instead of getCompiledClassType.
+	* InlineCalls.java (walkClassExp):  Likewise.
+	* LambdaExp.java (getCompiledClassType):  Make protected.
+
+	* LambdaExp.java (throwsSpecification):  New field.
+	(setExceptions):  New method.
+	(addMethodFor):  If throwsSpecification is set, add Exceptions
+	attribute for generated Method.
+
 2004-06-08  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (emitLiterals):  Merge some stuff from caller.

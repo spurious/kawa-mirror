@@ -103,7 +103,12 @@ public class ClassExp extends LambdaExp
     return name == null ? "object" : Compilation.mangleNameIfNeeded (name);
   }
 
-  public ClassType getCompiledClassType(Compilation comp)
+  protected ClassType getCompiledClassType(Compilation comp)
+  {
+    return type;
+  }
+
+  void setParts(ExpWalker walker, Compilation comp)
   {
     if (! partsDeclared)
       {
@@ -155,7 +160,6 @@ public class ClassExp extends LambdaExp
 	  }
 	type.setName(name);
       }
-    return type;
   }
 
   void setTypes(Compilation comp)
@@ -176,7 +180,18 @@ public class ClassExp extends LambdaExp
 	      comp.error('e', msg);
 	  }
 	ClassType t = (ClassType) st;
-	if ((t.getModifiers() & Access.INTERFACE) == 0)
+	int modifiers;
+	try
+	  {
+	    modifiers = t.getModifiers();
+	  }
+	catch (RuntimeException ex)
+	  {
+	    modifiers = 0;
+	    if (comp != null)
+	      comp.error('e', "unknown super-type "+t.getName());
+	  }
+	if ((modifiers & Access.INTERFACE) == 0)
 	  {
 	    if (j < i)
 	      {
@@ -484,7 +499,8 @@ public class ClassExp extends LambdaExp
     ClassType saveClass = comp.curClass;
     try
       {
-	comp.curClass = getCompiledClassType(comp);
+	setParts(walker, comp);
+	comp.curClass = type;
 	return walker.walkClassExp(this);
       }
     finally

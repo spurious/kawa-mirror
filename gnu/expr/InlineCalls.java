@@ -185,7 +185,7 @@ public class InlineCalls extends ExpWalker
   protected Expression walkClassExp (ClassExp exp)
   {
     // Give name to object class.
-    exp.getCompiledClassType(comp);
+    exp.setParts(this, comp);
     comp.addClass(exp.type);
     if (exp.isMakingClassPair())
       {

@@ -1,3 +1,7 @@
+Tue Sep 15 11:00:56 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* IntFraction.java (doubleValue): Fix thinko.
+
 Sat Aug 29 20:48:19 1998  Per Bothner  <bothner@cygnus.com>
 
 	* DFloNum.java,IntNum.java: Do ClassType.make instead of new ClassType.

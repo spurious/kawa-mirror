@@ -1,11 +1,12 @@
 package kawa.lang;
+import kawa.standard.Scheme;
 
 /** Used to translate from source for to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
  * ready for code generation.
  * This is sometimes called a "compilation environment",
  * but we modify it as we go along - there is a single Translator for
- * each top-level environment.
+ * each top-level form.
  */
 
 public class Translator extends Object
@@ -16,6 +17,8 @@ public class Translator extends Object
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
+  public ScopeExp currentScope() { return current_scope; }
+
   private Syntax current_syntax;
   private Object current_syntax_args;
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
@@ -24,7 +27,7 @@ public class Translator extends Object
   int current_column;
 
   // Global environment used to look for syntax/macros.
-  Environment env;
+  private Environment env;
 
   public Translator (Environment env)
   {
@@ -35,32 +38,6 @@ public class Translator extends Object
   public Translator ()
   {
     this (Environment.user());
-  }
-
-  /**
-   * Re-write a Scheme <body> in S-expression format into internal form.
-   * Does not yet handle internal defines.
-   */
-
-  public Expression rewrite_body (Object exp)
-  {
-    int count = List.list_length (exp);
-    if (count == 1)
-      return rewrite (((Pair)exp).car);
-    else if (count <= 0)
-      return syntaxError (count == 0 ? "body with no expressions"
-			   : "body is not a proper list");
-    else
-      {
-	Expression[] exps = new Expression [count];
-	for (int i = 0; i < count; i++)
-	  {
-	    Pair exp_pair = (Pair) exp;
-	    exps[i] = rewrite (exp_pair.car);
-	    exp = exp_pair.cdr;
-	  }
-	return new BeginExp (exps);
-      }
   }
 
   final Expression rewrite_car (Pair pair)
@@ -153,29 +130,48 @@ public class Translator extends Object
     return decl;
   }
 
+  /** Enter a global definition.
+   * This allows macro definitions to be used in the same Translation
+   * as the define-syntax.
+   */
+
+  public void addGlobal (Symbol name, Object value)
+  {
+    env.put (name, value);
+  }
+
+  /** Check if Object is Syntax, or bound to Syntax.
+   * @param obj the value to check
+   * @return the Syntax bound to obj, or null.
+   */
+  public Syntax check_if_Syntax (Object obj)
+  {
+    if (obj instanceof Symbol)
+      {
+	Symbol sym = (Symbol) obj;
+	obj = current_decls.get (sym);
+        if (obj != null)
+	  {
+	    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
+	    // to the original Symbol.  Here, use the original Symbol.
+	    if (obj instanceof Symbol)
+	      obj = env.get ((Symbol) obj);
+	  }
+	else
+	  obj = env.get (sym);
+      }
+    if (obj instanceof Syntax)
+      return (Syntax) obj;
+    return null;
+  }
+
   public Expression rewrite_pair (Pair p)
   {
     Object car = p.car;
     Object cdr = p.cdr;
-    if (car instanceof Syntax)
-      return apply_rewrite ((Syntax)car, cdr);
-
-    if (car instanceof Symbol)
-      {
-	Symbol sym = (Symbol) car;
-	Object binding = current_decls.get (sym);
-        if (binding != null)
-	  {
-	    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
-	    // to the original Symbol.  Here, use the original Symbol.
-	    if (binding instanceof Symbol)
-	      binding = Environment.user().get ((Symbol) binding);
-	  }
-	else
-	  binding = Environment.user().get (sym);
-	if (binding instanceof Syntax)
-	  return apply_rewrite ((Syntax) binding, cdr);
-      }
+    Syntax syntax = check_if_Syntax (car);
+    if (syntax != null)
+      return apply_rewrite (syntax, cdr);
 
     int cdr_length = List.length (cdr);
 
@@ -247,6 +243,108 @@ public class Translator extends Object
 	current_column = save_column;
       }
     return result;
+  }
+
+  /** Recursive helper method for rewrite_body.
+   * Scan body for definitions, placing partially macro-expanded
+   * expressions into forms.
+   * If definitions were seen, return a LetExp containing the definitions.
+   */
+
+  LetExp scan_body (Object body, java.util.Vector forms, LetExp defs)
+  {
+    while (body != List.Empty)
+      {
+	if (! (body instanceof Pair))
+	  {
+	    forms.addElement (syntaxError ("body is not a proper list"));
+	    return defs;
+	  }
+	Pair pair = (Pair) body;
+	Object st = pair.car;
+	for (;;)
+	{
+	  // Process st.
+	  if (! (st instanceof Pair))
+	    forms.addElement (st);
+	  else
+	    {
+	      Pair st_pair = (Pair) st;
+	      Object op = st_pair.car;
+	      Syntax syntax = check_if_Syntax (op);
+	      if (syntax != null && syntax instanceof SyntaxRules)
+		{
+		  st = ((SyntaxRules) syntax).rewrite1 (st_pair.cdr, this);
+		  continue;
+		}
+	      else if (syntax == Scheme.beginSyntax)
+		defs = scan_body (st_pair.cdr, forms, defs);
+	      else if (syntax == Scheme.defineSyntax
+		       && st_pair.cdr instanceof Pair
+		       && ! (current_scope instanceof ModuleExp))
+		{
+		  Object name = ((Pair) st_pair.cdr).car;
+		  if (defs == null)
+		    defs = new LetExp (null);
+		  if (name instanceof Symbol)
+		    defs.add_decl ((Symbol) name);
+		  else if (name instanceof Pair)
+		    {
+		      Pair name_pair = (Pair) name;
+		      if (name_pair.car instanceof Symbol)
+			defs.add_decl ((Symbol) name_pair.car);
+		    }
+		  forms.addElement (st);
+		}
+	      else
+		forms.addElement (st);
+	    }
+	  break;
+	}
+	body = pair.cdr;
+      }
+    return defs;
+  }
+
+  /**
+   * Re-write a Scheme <body> in S-expression format into internal form.
+   * Does not yet handle internal defines.
+   */
+
+  public Expression rewrite_body (Object exp)
+  {
+    java.util.Vector forms = new java.util.Vector(20);
+    LetExp defs = scan_body (exp, forms, null);
+    int nforms = forms.size();
+    if (nforms == 0)
+      return syntaxError ("body with no expressions");
+    int ndecls;
+    if (defs == null)
+      ndecls = 0;
+    else
+      {
+	ndecls = defs.countDecls();
+        Expression[] inits = new Expression[ndecls];
+	for (int i = ndecls;  --i >= 0; )
+	  inits[i] = QuoteExp.undefined_exp;
+	defs.inits = inits;
+	defs.push (this);
+      }
+    Expression body;
+    if (nforms == 1)
+      body = rewrite (forms.elementAt(0));
+    else
+      {
+	Expression[] exps = new Expression [nforms];
+	for (int i = 0; i < nforms; i++)
+	  exps[i] = rewrite (forms.elementAt(i));
+	body = new BeginExp (exps);
+      }
+    if (defs == null)
+      return body;
+    defs.body = body;
+    defs.pop(this);
+    return defs;
   }
 
 }

@@ -231,7 +231,7 @@ public class SyntaxRule implements Compilable
     template_program.append ((char) (FIRST_LITERALS + 2 * literals_index));
   }
 
-  public Expression execute_template (Object[] vars, Translator tr)
+  public Object execute_template (Object[] vars, Translator tr)
   {
     int[] indexes = new int[max_nesting];
     int num_identifiers = template_identifiers.length;
@@ -242,25 +242,13 @@ public class SyntaxRule implements Compilable
 	vars[num_variables + i] = renamed_symbol;
 	tr.current_decls.put (renamed_symbol, name);
       }
-    try
-      {
-	Object expansion = execute_template (0, vars, 0, indexes, tr);
-	/* DEBUGGING:
-	System.err.print ("{Expanded macro: ");
-	SFormat.print (expansion, System.err);
-	System.err.println ('}');
-	*/
-	Expression exp = tr.rewrite (expansion);
-	return exp;
-      }
-    finally
-      {
-	for (int i = 0;  i < num_identifiers;  i++)
-	  {
-	    Symbol renamed_symbol = (Symbol) vars[num_variables + i];
-	    tr.current_decls.remove (renamed_symbol);
-	  }
-      }
+    Object expansion = execute_template (0, vars, 0, indexes, tr);
+    /* DEBUGGING:
+    System.err.print ("{Expanded macro: ");
+    SFormat.print (expansion, System.err);
+    System.err.println ('}');
+    */
+    return expansion;
   }
 
   /**

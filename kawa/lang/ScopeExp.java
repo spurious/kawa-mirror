@@ -170,4 +170,12 @@ public abstract class ScopeExp extends Expression
     scope.add_var (decl);
     decl.context = this;
   }
+
+  public int countDecls ()
+  {
+    int n = 0;
+    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
+      n++;
+    return n;
+  }
 }

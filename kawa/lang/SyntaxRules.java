@@ -189,7 +189,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       return new EqualPat (pattern);
   }
 
-  public Expression rewrite (Object obj, Translator tr)
+  public Object rewrite1 (Object obj, Translator tr)
   {
     Object[] vars = new Object[maxVars];
     for (int i = 0;  i < rules.length;  i++)
@@ -213,6 +213,11 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       }
     return tr.syntaxError ("no matching syntax-rule for "
 				+ literal_identifiers[0]);
+  }
+
+  public Expression rewrite (Object obj, Translator tr)
+  {
+    return tr.rewrite (rewrite1 (obj, tr));
   }
 
   public void print(java.io.PrintStream ps)

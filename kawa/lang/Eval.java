@@ -6,13 +6,14 @@ public class Eval extends Procedure1or2
 {
   final static Symbol evalFunctionName = Symbol.make ("atEvalLevel");
 
-  public static Object eval (ModuleExp mod, Translator tr)
+  private static Object eval (ModuleExp mod, Translator tr,
+			      Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
     mod.setName (evalFunctionName);
     if (tr.errors > 0)
       throw new GenericError ("syntax errors during eval");
-    return mod.eval_module (tr.env);
+    return mod.eval_module (env);
   }
 
   public static Object eval (Object sexpr, Environment env)
@@ -20,7 +21,7 @@ public class Eval extends Procedure1or2
   {
     Translator tr = new Translator (env);
     ModuleExp mod = new ModuleExp (new Pair (sexpr, List.Empty), tr, "<eval>");
-    return eval (mod, tr);
+    return eval (mod, tr, env);
   }
 
   public Object apply1 (Object arg1)

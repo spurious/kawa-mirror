@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -20,6 +20,7 @@ public class XQParser extends LispReader // should be extends Lexer
   int curToken;
   Object curValue;
   boolean focusDefined = true;
+  XQuery interpreter;
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -804,7 +805,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return new QuoteExp(textNodeTest);
 	if ("node".equalsIgnoreCase(tname))
 	  return new QuoteExp(anyNodeTest);
-	Type type = kawa.standard.Scheme.getNamedType(tname); // FIXME
+	Type type = interpreter.getTypeFor(tname); 
 	if (type == null)
 	  type = gnu.bytecode.ClassType.make(tname);
 	return new QuoteExp(type);

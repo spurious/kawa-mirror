@@ -1,3 +1,13 @@
+2003-03-29  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (interpreter):  New field.
+	* XQuery.java (getLexer):  Set XQParser's interpreter field.
+
+	* XQuery.java (<init>):  Define lower-case, upper-case, substring.
+
+	* XQuery.java (getTypeFor):  Handle type "string".
+	* XQParser.java (parseDataType):  Use getTypeFor.
+
 2003-03-15  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseElementConstructor):  The default namespace

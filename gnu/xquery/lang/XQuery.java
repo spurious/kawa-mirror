@@ -49,7 +49,9 @@ public class XQuery extends Interpreter
 
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
-    return new XQParser(inp, messages);
+    XQParser parser = new XQParser(inp, messages);
+    parser.interpreter = this;
+    return parser;
   }
 
   public Compilation parse(Environment env, Lexer lexer)
@@ -194,6 +196,9 @@ public class XQuery extends Interpreter
     define_field("list-items", "gnu.kawa.xml.ListItems", "listItems");
     define_field("base-uri", "gnu.kawa.functions.BaseUri", "baseUri");
     define_field("node-name", "gnu.kawa.xml.NodeName", "nodeName");
+    define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
+    define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");
+    define_method("substring", "gnu.xquery.util.StringValue", "substring");
   }
 
   public static XQuery getInstance()
@@ -235,6 +240,8 @@ public class XQuery extends Interpreter
   {
     if (name == "t")
       name = "java.lang.Object";
+    if (name.equals("string"))
+      return Type.string_type;
     return Scheme.string2Type(name);
   }
 

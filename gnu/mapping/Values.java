@@ -105,16 +105,6 @@ public class Values extends TreeList implements Printable, Externalizable
     return proc.applyN (toArray());
   }
 
-  public boolean equals (Object obj)
-  {
-    if (obj instanceof Values)
-      return super.equals(obj);
-    if (size() != 0)
-      return false;
-    Object x = getPosNext(0);
-    return x != null && x.equals(obj);
-  }
-
   public void print(java.io.PrintWriter ps)
   {
     if (this == empty)

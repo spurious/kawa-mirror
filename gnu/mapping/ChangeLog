@@ -1,3 +1,8 @@
+2003-10-07  Per Bothner  <per@bothner.com>
+
+	* Values.java (equals):  Remove - for now use inherited method,
+	which for a Value just compares identity.
+
 2003-09-30  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (startFromContext, getFromContext,

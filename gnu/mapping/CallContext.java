@@ -21,7 +21,10 @@ public class CallContext // implements Runnable
 
   public final Environment getEnvironment()
   {
-    return curEnvironment != null ? curEnvironment : Environment.global;
+    if (curEnvironment == null)
+      curEnvironment
+	= Environment.make(currentThread.getName(), Environment.global);
+    return curEnvironment;
   }
 
   public static void setInstance(CallContext ctx)

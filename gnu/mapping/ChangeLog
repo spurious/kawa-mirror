@@ -1,3 +1,8 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (getEnvironment): If no Environment, create a new
+	Environment that inherits from global, rather than using it directly.
+
 2005-02-23  Per Bothner  <per@bothner.com>
 
 	* Symbol.java (hasEmptyNamespace): New method.

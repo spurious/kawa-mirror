@@ -15,7 +15,6 @@ public abstract class Environment
 {
   static Environment global;
 
-  // FIXME Deprecated
   public static void setGlobal (Environment env)
   {
     global = env;

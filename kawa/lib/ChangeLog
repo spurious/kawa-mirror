@@ -1,3 +1,9 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* ports.scm (transcript-on):  Use <String> as parameter type,
+	rather than <java.lang.String>, so we get the desired conversion.
+	* vectors.scm:  Extra whitespace for more discrimating line numbers.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* files.scm (*temp-file-number*):  Make private.

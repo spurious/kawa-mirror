@@ -82,7 +82,7 @@
 
 (define (transcript-on filename)
   ((primitive-static-method <output-port> "setLogFile" <void>
-			    (<java.lang.String>))
+			    (<String>))
    filename))
 
 (define (transcript-off)

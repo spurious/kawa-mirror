@@ -50,7 +50,7 @@ public class PrimGetStatic extends Procedure0 implements Inlineable
       }
   }
 
-  public void compile (ApplyExp exp, Compilation comp, Target target)
+  private gnu.bytecode.Field getField ()
   {
     if (field == null)
       {
@@ -59,8 +59,19 @@ public class PrimGetStatic extends Procedure0 implements Inlineable
 	  field = ctype.addField(fname, Type.make(reflectField.getType()),
 				 reflectField.getModifiers());
       }
+    return field;
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    getField();
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitGetStatic(field);
     target.compileFromStack(comp, field.getType());
+  }
+
+  public gnu.bytecode.Type getReturnType (Expression[] args)
+  {
+    return getField().getType();
   }
 }

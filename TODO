@@ -1,12 +1,13 @@
 Report JDK-2 verification bug.
 
+compile-file should generate .jar, not .zip.
+Should perhaps take multiple file names.
+Update manual to removing .zip references.
+
 Document SRFI 4: Homogeneous numeric vector datatypes 
 
 Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).
-
-Optional arguments that are non-constant but "simple" should also
-be implemnted by overloading.
 
 BindingInitializer.emit: global Environment should be cached
 

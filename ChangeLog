@@ -1,5 +1,7 @@
 2000-02-27  Per Bothner  <per@bothner.com>
 
+	* configure.in:  Set version to 1.6.64.
+
 	* configure.in:  Support new flag --without-awt.
 	* kawa/GuiConsole.java:  Addd default constructor.
 	* kawa/repl.java (main):  Load GuiConsole using reflection.

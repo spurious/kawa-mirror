@@ -1,6 +1,11 @@
+Changes from Kawa 1.6.62 to 1.6.64
+==================================
+A lot of improvements to JEmacs (see JEmacs.SourceForge.net).
+
+kawa-compiled-VERSION.zip is replaced by kawa-compiled-VERSION.jar.
+
 You can now use Kawa to generate applets, using the new --applet switch,
 Check the "Applet compilation" section in the manual.
-
 Generating an application using the --main flag should work again.
 Neither --applet nor --main has Scheme hard-wired any more.
 
@@ -33,7 +38,6 @@ compilation unit.  A call in the same compilation unit will now be
 implemented as a direct method call.  This is not done if the
 prcedure is declared with the form:
 	(define NAME (lambda (ARGS ,,,) BODY ...)
-[FUTURE: This inlining is also not done when --no-inline is specified.]
 
 gnu.expr.Declaration no longer inherits from gnu.bytecode.Variable.
 
@@ -41,7 +45,7 @@ A gnu.mapping.Environment now resolves hash index collisions using
 "double hashing" and "open addressing" instead of "chaining" through
 Binding.  This allows a Binding to appear in multiple Environments.
 
-The class Sequence, Pair, PairWithPosition, FString, and Char were
+The classes Sequence, Pair, PairWithPosition, FString, and Char were
 moved from kawa.lang to the new package gnu.kawa.util.  It seems that
 these classes (except perhaps Char) belong together.  The classes List
 and Vector were also moved, and at the same time renamed to LList and

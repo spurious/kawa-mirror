@@ -62,6 +62,12 @@ public class FVector extends Sequence implements Printable, Compilable
     return old;
   }
 
+  public final void setAll (Object new_value)
+  {
+     for (int index = value.length; --index >= 0; )
+       value[index] = new_value;
+  }
+
   static public ClassType scmVectorType;
   static public Method initVectorMethod;
 

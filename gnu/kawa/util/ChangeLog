@@ -1,3 +1,7 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* FVector.java (setAll):  New method.
+
 2000-01-22  Per Bothner  <per@bothner.com>
 
 	* LList.java (list4, chain1, chain4):  New static methods.

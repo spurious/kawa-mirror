@@ -1,3 +1,8 @@
+2003-05-08  Per Bothner  <per@bothner.com>
+
+	* WrappedException.java:  Add so-far-commented-out hooks
+	to use JDK-1.4-style getCause/initCause.
+
 2003-05-03  Per Bothner  <per@bothner.com>
 
 	* CallContext.java.in:  Renamed back to ...

@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -17,7 +17,6 @@ public class WrappedException extends RuntimeException
   public WrappedException (String message)
   {
     this.message = message;
-    this.exception = null;
   }
 
   /**
@@ -33,7 +32,7 @@ public class WrappedException extends RuntimeException
   {
     super();
     this.message = null;
-    this.exception = e;
+    initCause(e);
   }
 
   /**
@@ -49,7 +48,7 @@ public class WrappedException extends RuntimeException
   {
     super();
     this.message = message;
-    this.exception = e;
+    initCause(e);
   }
 
   /**
@@ -63,8 +62,9 @@ public class WrappedException extends RuntimeException
    */
   public String getMessage ()
   {
-    if (message == null && exception != null)
-      return exception.getMessage();
+    Throwable cause;
+    if (message == null && (cause = getCause()) != null)
+      return cause.getMessage();
     else
       return this.message;
   }
@@ -76,7 +76,7 @@ public class WrappedException extends RuntimeException
    */
   public Throwable getException ()
   {
-    return exception;
+    return getCause();
   }
 
   /**
@@ -89,11 +89,22 @@ public class WrappedException extends RuntimeException
     return getMessage();
   }
 
+  /* Future: BEGIN JAVA1 */
+  // The initCause/getCause functionality was added in JDK 1.4.
+  // It is available in gcj 3.3, so we could perhaps put it in a JAVA1 block,
+  // but I'm not quite ready for that yet.
+  public Throwable initCause(Throwable cause)
+  {
+    exception = cause;
+    return this;
+  }
+
   public Throwable getCause()
   {
     return exception;
   }
 
-  private String message;
   private Throwable exception;
+  /* Future:END JAVA1 */
+  private String message;
 }

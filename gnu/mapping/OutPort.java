@@ -163,4 +163,9 @@ public class OutPort extends PrintWriter implements Printable
       }
     ps.print ('>');
   }
+
+  public int getColumnNumber ()
+  {
+    return -1;
+  }
 }

@@ -25,7 +25,7 @@ public class Interpreter extends Object
   static public List nullObject = List.Empty;
   static public Undefined undefinedObject = new kawa.lang.Undefined();
   static public Undefined voidObject = new kawa.lang.Undefined();
-  static public Symbol eofObject = Symbol.makeUninterned ("#EOF");
+  static public Symbol eofObject = Symbol.makeUninterned ("#<eof>");
 
   // Global environment.
   // Currently maps String -> Object;  should probably be Symbol -> Object.

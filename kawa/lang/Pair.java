@@ -124,6 +124,14 @@ public class Pair extends List implements Printable, Compilable
       }
   }
 
+  public Literal makeLiteral (Compilation comp)
+  {
+    Literal literal = new Literal (this, comp.scmPairType, comp);
+    comp.findLiteral (car);
+    comp.findLiteral (cdr);
+    return literal;
+  }
+
   public void emit (Literal literal, Compilation comp)
   {
     if ((literal.flags & Literal.ALLOCATING) != 0)

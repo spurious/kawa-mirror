@@ -192,15 +192,8 @@ public class Compilation
 	  {
 	    literal = new Literal (value, this);
 	  }
-	else if (value instanceof Pair)
-	  {
-	    literal = new Literal (value, scmPairType, this);
-	    Pair pair = (Pair) value;
-	    findLiteral (pair.car);
-	    findLiteral (pair.cdr);
-	  }
-	else if (value instanceof Symbol)
-	  literal = new Literal (value, scmSymbolType, this);
+	else if (value instanceof Compilable)
+	  literal = ((Compilable) value).makeLiteral (this);
 	else
 	  literal = new Literal (value, scmObjectType, this);
       }

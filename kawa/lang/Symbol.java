@@ -62,6 +62,11 @@ public class Symbol extends Object implements Printable, Compilable
     ps.print(name);
   }
 
+  public Literal makeLiteral (Compilation comp)
+  {
+    return new Literal (this, comp.scmSymbolType, comp);
+  }
+
   public void emit (Literal literal, Compilation comp)
   {
     comp.method.compile_push_string (((Symbol)literal.value).toString ());

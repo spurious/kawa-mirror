@@ -4,10 +4,16 @@ package kawa.lang;
 
 public interface Compilable
 {
-  /** Emit code (in comp.method) to initialize a Literal for this value.
-   * If the literal's state on input is UNALLOCATED, makes it INITIALIZED.
-   * If the input state is ALLOCATING, makes it ALLOCATED.
-   * Never called if already ALLOCATED or INITIALIZED.
+  /** Generates a (new) Literal for this for a given Compilation.
+   * If this has sub-objects, calls Compilation.findLiteral on its components.
    */
-    void emit (Literal literal, Compilation comp);
+  Literal makeLiteral (Compilation comp);
+
+  /** Emit code (in comp.method) to initialize a Literal for this value.
+   * Generates code to make the Literal at least ALLOACTED.
+   * Also makes it INITIALIZED, unless ALLOCATING is set (in which
+   * one of our callers will make it INITIALIZED).
+   * Never called if already ALLOCATED.
+   */
+  void emit (Literal literal, Compilation comp);
 }

@@ -3633,10 +3633,6 @@ efficient, and it is easier to access it from Java code.
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
 
-An implementation restriction is that you should only use
-@code{define-class} and @code{define-simple-class} in compiled code.
-The problem involves Java class loaders.
-
 @deffn Syntax define-class name (supers ...) field-or-method-decl ...
 @deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...
 @display

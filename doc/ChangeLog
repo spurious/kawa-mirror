@@ -1,3 +1,7 @@
+2002-08-06  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Defining new classes):  Remove implementation restriction.
+
 2002-07-30  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Servlets, HTTP response):  Document new functions.

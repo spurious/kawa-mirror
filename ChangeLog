@@ -1,3 +1,9 @@
+Wed Mar 19 11:08:04 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/Shell.java (run):  Don't special case #!null result.
+	* kawa/lang/PrimProcedure.java (<init>):  If opcode is invokeinterface,
+	make classtype an interface.
+
 Tue Mar 18 14:03:58 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in, configure:  Change VERSION to 1.3beta.

@@ -365,8 +365,10 @@ public abstract class Interpreter
       {
         if (spec instanceof Class)
           return getTypeFor((Class) spec);
-        if (spec instanceof String || spec instanceof Symbol)
+        if (spec instanceof String)
           return getTypeFor(spec.toString());
+        if (spec instanceof Symbol)
+          return getTypeFor(((Symbol) spec).getName());
         if (spec instanceof CharSeq)
           return gnu.bytecode.ClassType.make(spec.toString());
       }

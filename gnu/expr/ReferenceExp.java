@@ -16,7 +16,11 @@ public class ReferenceExp extends Expression
   Declaration binding;
   public String string_name () { return symbol.toString(); }
 
-  public final String getName() { return symbol.toString(); }
+  public final String getName()
+  {
+    return symbol instanceof Symbol ? ((Symbol) symbol).getName()
+      : symbol.toString();
+  }
   public final Object getSymbol() { return symbol; }
   /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }

@@ -1,3 +1,11 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* ReferenceExp (getName):  If name is a Symbol, use Symbol.getName.
+	* Interpreter.java (asType):  Likewise.
+	* LambdaExp.java (setName):  New method.
+
+	* LambdaExp.java (print):  Print decl itself, rather than its name,
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* CatchClause.java (<init>):  Name parameter need not be a String.

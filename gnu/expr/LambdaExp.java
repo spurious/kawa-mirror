@@ -295,6 +295,12 @@ public class LambdaExp extends ScopeExp
     this.name = name;
   }
 
+  public void setName (Object name)
+  {
+    this.name
+      = name instanceof Symbol ? ((Symbol) name).getName() : name.toString();
+  }
+
   public String getName () { return name; }
 
   public LambdaExp outerLambda ()
@@ -1419,7 +1425,7 @@ public class LambdaExp extends ScopeExp
 	  defaultArg = defaultArgs[opt_i++];
 	if (defaultArg != null)
 	  out.print('(');
-	out.print(decl.getName());
+	out.print(decl);
 	Type type = decl.getType();
 	if (type != null && type != Type.pointer_type)
 	  {

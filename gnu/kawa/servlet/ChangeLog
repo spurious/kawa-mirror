@@ -1,3 +1,8 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* GetRequest.java:  Extend MethodProc instead of CpsProcedure.
+	* GetResponse.java:  Likewise.
+
 2003-11-16  Per Bothner  <per@bothner.com>
 
 	* CGIServletWrapper.java (getLocalPort, getLocalName, getRemotePort):

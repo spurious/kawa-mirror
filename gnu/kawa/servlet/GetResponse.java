@@ -9,7 +9,7 @@ import gnu.expr.*;
 
 /** A 0-argument function that returns the current ServletResponse. */
 
-public class GetResponse extends CpsProcedure implements Inlineable
+public class GetResponse extends MethodProc implements Inlineable
 {
   public static final GetResponse getResponse = new GetResponse();
 

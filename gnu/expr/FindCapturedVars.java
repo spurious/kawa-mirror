@@ -3,9 +3,11 @@ import java.util.Hashtable;
 
 public class FindCapturedVars extends ExpWalker
 {
-  public static void findCapturedVars (Expression exp)
+  public static void findCapturedVars (Expression exp, Compilation comp)
   {
-    exp.walk(new FindCapturedVars());
+    FindCapturedVars walker = new FindCapturedVars();
+    walker.setContext(comp);
+    exp.walk(walker);
   }
 
   protected Expression walkApplyExp (ApplyExp exp)
@@ -257,6 +259,18 @@ public class FindCapturedVars extends ExpWalker
 		heapLambda = outer;
 		if (! decl.getCanRead() && declValue == outer)
 		  break;
+		Declaration heapDecl = heapLambda.nameDecl;
+		if (heapDecl != null
+		    && heapDecl.getFlag(Declaration.STATIC_SPECIFIED))
+		  {
+		    // Unfortunately, SourceMessages sorts the output by line,
+		    // so these might show up in wrong order.
+		    // Hence the slight redundancy.
+		    comp.error('e', decl, "non-static ",
+			       " is referenced by static");
+		    comp.error('e', "static " + heapLambda.getName()
+			       + " references non-static");
+		  }
 		heapLambda.setNeedsStaticLink();
 		outer = heapLambda.outerLambda();
 	      }

@@ -6,16 +6,13 @@ import gnu.kawa.reflect.Invoke;
 
 public class InlineCalls extends ExpWalker
 {
-  Compilation comp;
-
   /** Get the Compilation associated with this walker. */
   public Compilation getCompilation () { return comp; }
 
   public static void inlineCalls (Expression exp, Compilation comp)
   {
     InlineCalls walker = new InlineCalls();
-    walker.comp = comp;
-    walker.messages = comp.getMessages();
+    walker.setContext(comp);
     walker.walk(exp);
   }
 
@@ -72,6 +69,9 @@ public class InlineCalls extends ExpWalker
         decl = rexp.binding;
         if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
+	    decl = Declaration.followAliases(decl);
+	    if (decl.isIndirectBinding())
+	      return exp;
             func = decl.getValue();
 	    if (func instanceof LambdaExp) 
 	      lambda = (LambdaExp) func;

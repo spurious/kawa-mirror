@@ -8,13 +8,12 @@ package gnu.expr;
 
 public class ChainLambdas extends ExpWalker
 {
-  Compilation comp;
   ScopeExp currentScope;
 
   public static void chainLambdas (Expression exp, Compilation comp)
   {
     ChainLambdas walker = new ChainLambdas();
-    walker.comp = comp;
+    walker.setContext(comp);
     walker.walk(exp);
   }
 

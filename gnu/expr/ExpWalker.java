@@ -6,11 +6,18 @@ import gnu.text.SourceMessages;
 public class ExpWalker
 {
   SourceMessages messages;
+  Compilation comp;
 
   protected Expression walkExpression (Expression exp)
   {
     exp.walkChildren(this);
     return exp;
+  }
+
+  public void setContext (Compilation comp)
+  {
+    this.comp = comp;
+    messages = comp.getMessages();
   }
 
   /** Call the walk method of argument Expression.

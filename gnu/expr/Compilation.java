@@ -778,7 +778,7 @@ public class Compilation
     ChainLambdas.chainLambdas(lexp, this);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
-    FindCapturedVars.findCapturedVars(lexp);
+    FindCapturedVars.findCapturedVars(lexp, this);
 
     if (messages.seenErrors())
       return;

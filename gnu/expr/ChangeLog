@@ -1,5 +1,18 @@
 2003-08-06  Per Bothner  <per@bothner.com>
 
+	* ExpWalker.java (comp):  New field.
+	(setContext):  New method.
+	* ChainLambdas.java (comp):  Remove field - use super.comp instead.
+	(chainLambda):  Use setContext methods.
+	* InlineCalls.java (comp):  Remove field - use super.comp instead.
+	(inlineCalls):  Use setContext methods.
+	* FindCapturedVars.java (findCapturedVars):  Take new Compilation
+	parameter, and pass value to ExpWalker's setContext.
+	(capture):  Emit error if static references non-static.
+	* Compilation.java (compile):  Pass this to FindCapturedVars.
+
+	* InlineCalls.java (walkApplyExp):  Do followAliases.
+
 	* PairClassType.java (<init>):  Don't set INTERFACE - it is possible
 	this isn't an actual class pair, but we need the static link.
 

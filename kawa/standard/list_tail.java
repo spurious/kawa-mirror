@@ -8,6 +8,19 @@ public class list_tail extends Procedure2
     super("list-tail");
   }
 
+  static public Object listTail (Object list, int count)
+       throws WrongArguments, WrongType, GenericError
+  {
+    while (--count >= 0)
+      {
+	if (! (list instanceof Pair))
+	  throw new GenericError("List is too short.");
+	Pair pair = (Pair) list;
+	list = pair.cdr;
+      }
+    return list;
+  }
+
   public Object apply2 (Object arg1, Object arg2)
        throws WrongArguments, WrongType, GenericError
   {
@@ -17,14 +30,7 @@ public class list_tail extends Procedure2
 	  {
             Pair list = (Pair)arg1;
             int count = ((java.lang.Integer)arg2).intValue();
-            while (count!=0 && list.cdr instanceof Pair)
-	      {
-		count--;
-		list = (Pair)list.cdr;
-	      }
-            if (count!=0)
-	      throw new GenericError("List is too short.");
-            return list;
+	    return listTail (list, count);
 	  }
 	else
 	  throw new WrongType(this.name,2,"integer");

@@ -425,6 +425,7 @@
       <include name="gnu/kawa/functions/"/>
       <include name="gnu/kawa/lispexpr/"/>
       <include name="gnu/kawa/reflect/"/>
+      <include name="gnu/kawa/util/"/>
       <include name="gnu/lists/"/>
       <include name="gnu/mapping/"/>
       <include name="gnu/math/"/>
@@ -432,6 +433,8 @@
       <include name="kawa/lang/"/>
       <include name="kawa/standard/"/>
       <include name="kawa/"/>
+      <include name="gnu/kawa/xml/"/>
+      <include name="gnu/xml/"/>
       <patternset refid="with-awt-${with-awt}"/>
     </javac>
   </target>
@@ -466,6 +469,7 @@
         <include name="strings.scm"/>
         <include name="vectors.scm"/>
         <include name="uniform.scm"/>
+        <include name="arrays.scm"/>
         <include name="system.scm"/>
         <include name="trace.scm"/>
         <include name="windows.scm"/>
@@ -522,6 +526,7 @@
         <include name="pp.scm"/>
         <include name="ppfile.scm"/>
         <include name="printf.scm"/>
+        <include name="srfi1.scm"/>
         <include name="readtable.scm"/>
       </fileset>
 

@@ -533,7 +533,7 @@ public class LambdaExp extends ScopeExp
       fflags |= Access.PUBLIC;
     else
       fname = fname + "$Fn" + ++comp.localFieldIndex;
-    Type rtype = comp.typeModuleMethod;
+    Type rtype = comp.getMethodProcType();
     Field field = comp.mainClass.addField (fname, rtype, fflags);
     if (nameDecl != null)
       nameDecl.field = field;
@@ -663,6 +663,8 @@ public class LambdaExp extends ScopeExp
     String name = getName();
     StringBuffer nameBuf = new StringBuffer(60);
     LambdaExp outer = outerLambda();
+    if (comp.generateApplet && outer instanceof ModuleExp)
+      declareThis(ctype);
     if (! (outer.isModuleBody() || outer instanceof ObjectExp)
 	|| name == null)
       {
@@ -689,7 +691,8 @@ public class LambdaExp extends ScopeExp
       }
     boolean varArgs = max_args < 0 || min_args + numStubs < max_args;
     primMethods = new Method[numStubs + 1];
-    int mflags = isClassMethod() ? Access.PUBLIC
+    // FIXME generateApplet test is wrong
+    int mflags = (isClassMethod() || comp.generateApplet) ? Access.PUBLIC
       : closureEnvType == null ? Access.PUBLIC|Access.STATIC
       : closureEnvType == ctype ? Access.PUBLIC|Access.FINAL
       : Access.STATIC;
@@ -1151,7 +1154,7 @@ public class LambdaExp extends ScopeExp
 		   && defaultArgs[toCall] instanceof QuoteExp)
 	      toCall++;
 	    int thisArg = isStatic ? 0 : 1;
-	    boolean varArgs = i + 1 == numStubs && restArgType != null;
+	    boolean varArgs = toCall == numStubs && restArgType != null;
 	    Declaration decl;
 	    Variable var;
 	    if (! isStatic)
@@ -1163,9 +1166,10 @@ public class LambdaExp extends ScopeExp
 		code.emitLoad(var);
 		var = var.nextVar();
 	      }
-	    for (int j = i; j < toCall;  j++)
+	    for (int j = i; j < toCall;  j++, decl = decl.nextDecl())
 	      {
-		defaultArgs[j].compile(comp, Target.pushObject);  // FIXME
+		Target paramTarget = StackTarget.getInstance(decl.getType());
+		defaultArgs[j].compile(comp, paramTarget);
 	      }
 	    if (varArgs)
 	      {
@@ -1174,7 +1178,7 @@ public class LambdaExp extends ScopeExp
 		if ("gnu.kawa.util.LList".equals(lastTypeName))
 		  arg = new QuoteExp(gnu.kawa.util.LList.Empty);
 		else if ("java.lang.Object[]".equals(lastTypeName))
-		  arg = new QuoteExp(Procedure.noArgs);
+		  arg = new QuoteExp(Values.noArgs);
 		else // FIXME
 		  throw new Error("unimplemented #!rest type");
 		arg.compile(comp, restArgType);

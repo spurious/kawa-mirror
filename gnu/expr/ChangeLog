@@ -1,3 +1,40 @@
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java:  Create Binding2 instead of Binding
+	if the languge hasSeparateFunctionNamespace().
+	* Declaration.java (isProcedureDecl, setProcedureDecl):  New flags.
+	* Interpreter.java (hasSeparateFunctionNamespace):  New method.
+	* ApplyExp.java (eval, compile):  Remove hacks for checking "function
+	binding" - let ReferenceExp.isProcedureDecl() handle it instead.
+	* ModuleBody.java (runAsMain):  Don't create kawa.standard.Scheme here;
+	instead compiler inserts call to Scheme.registerEnvironment.
+	* ReferenceExp.java (flags):  New int field.
+	(dontereference):  Folded into flags field.
+	(isProcedureName, setProcedureName):  New methods.
+	(eval, compile):  Use function name space, if appropriate.
+	* SetExp.java (getHasValue, setHasValue, isFuncDef, setFunDef,
+	isSetIfBound, setSetIfUnbound):  New methods.
+	(eval, compile):  Update to use new flags.
+
+	* Compilation.java (scmInterpreterType):  Renamed to typeInterpreter.
+	(typeBinding2, functionValueBinding2Field, getBindingEnvironmentMethod,
+	getBinding2Method, defineFunctionMethod, typeApplet, typeValues,
+	noArgsField):  New static fields.
+	(apply*ModuleMethod etc):  Remove many no-longer-needed fields.
+	(generateAppletDefault, generateAppletDefault):  New fields.
+	(getMethodProcType, getModuleSuperType):  New method.
+	(generateApplyMethods):  Fix various small but critical bugs.
+	Handle the main class inheriting from Applet.
+	(addClass):  Generate code to "registerEnvironment" if main or applet.
+	* LambdaExp.java (addMethodFor):  Declare `this' for applet methods.
+	(compileAsMethod):  Fix various small but serious bugs.
+
+	* Compilation.java (mangleName):  Mangle initial digit.
+
+	* ProcInitializer.java (emitLoadModuleMethod):  Get ModuleMethod's
+	<init> method using ClassType.getDeclaredMethod.
+	(constructor_args, initModuleMethod):  No longer needed.
+
 2000-01-31  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (eval):  Use getProcedure to get function value.

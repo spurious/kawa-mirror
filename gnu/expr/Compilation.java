@@ -61,12 +61,12 @@ public class Compilation
   static public ClassType typePair = ClassType.make("gnu.kawa.util.Pair");
   static public ClassType scmPairType = typePair;
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
-  public static final ArrayType objArrayType = new ArrayType (typeObject);
-  public static final ArrayType symbolArrayType = new ArrayType(scmSymbolType);
+  public static final ArrayType objArrayType = ArrayType.make(typeObject);
+  public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
-  static public ClassType scmInterpreterType
+  static public ClassType typeInterpreter
     = ClassType.make("gnu.expr.Interpreter");
   static public ClassType typeMacro
     = ClassType.make("kawa.lang.Macro");
@@ -76,6 +76,10 @@ public class Compilation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeBinding
     = ClassType.make("gnu.mapping.Binding", typeLocation);
+  static public ClassType typeBinding2
+    = ClassType.make("gnu.mapping.Binding2", typeBinding);
+  static final Field functionValueBinding2Field
+    = typeBinding2.addField ("functionValue", Type.pointer_type,Access.PUBLIC);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
@@ -83,22 +87,23 @@ public class Compilation
     = typeBinding.addMethod("getProcedure", Type.typeArray0,
 			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
-    = scmInterpreterType.addField ("trueObject", scmBooleanType,
-				    Access.PUBLIC|Access.STATIC); 
+    = scmBooleanType.addField ("TRUE", scmBooleanType,
+			       Access.PUBLIC|Access.STATIC); 
   static public final Field falseConstant
-    = scmInterpreterType.addField ("falseObject", scmBooleanType,
-				    Access.PUBLIC|Access.STATIC);
+    = scmBooleanType.addField ("FALSE", scmBooleanType,
+			       Access.PUBLIC|Access.STATIC);
   static final Field voidConstant
-  = scmInterpreterType.addField ("voidObject", typeObject,
-				  Access.PUBLIC|Access.STATIC);
+    = typeInterpreter.addField ("voidObject", typeObject,
+				Access.PUBLIC|Access.STATIC);
   static final Field undefinedConstant
-  = scmInterpreterType.addField ("undefinedObject", scmUndefinedType,
-				    Access.PUBLIC|Access.STATIC);
+    = typeInterpreter.addField ("undefinedObject", scmUndefinedType,
+				Access.PUBLIC|Access.STATIC);
   static final Field nameField
   = scmNamedType.addField ("sym_name", scmSymbolType, Access.PUBLIC);
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
+  static Method defineFunctionMethod;
   static Method putGlobalMethod;
   static Method makeListMethod;
   
@@ -109,6 +114,8 @@ public class Compilation
   static public final Method getBindingEnvironmentMethod
     = typeEnvironment.addMethod("getBinding", string1Arg,
 				typeBinding, Access.PUBLIC);
+  public static final Method getBinding2Method
+    = typeBinding2.getDeclaredMethod("getBinding2", 2);
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -126,6 +133,9 @@ public class Compilation
     Type[] symObjArgs = { scmSymbolType, typeObject };
     defineGlobalMethod
       = typeEnvironment.addMethod ("define_global", symObjArgs,
+				   Type.void_type,Access.PUBLIC|Access.STATIC);
+    defineFunctionMethod
+      = typeEnvironment.addMethod ("defineFunction", symObjArgs,
 				   Type.void_type,Access.PUBLIC|Access.STATIC);
     putGlobalMethod
       = typeEnvironment.addMethod ("put_global", symObjArgs,
@@ -199,46 +209,12 @@ public class Compilation
     = ClassType.make("gnu.mapping.ProcedureN", typeProcedure);
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
+  public static ClassType typeApplet = ClassType.make("java.applet.Applet");
 
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod", typeProcedureN);
-  private static Type[] apply0argsModule = { typeModuleMethod };
-  private static Type[] apply1argsModule = { typeModuleMethod, typeObject };
-  private static Type[] apply2argsModule = { typeModuleMethod, typeObject,
-                                             typeObject };
-  private static Type[] apply3argsModule = { typeModuleMethod, typeObject,
-                                             typeObject, typeObject };
-  private static Type[] apply4argsModule
-  = { typeModuleMethod, typeObject, typeObject, typeObject,typeObject };
-  private static Type[] applyNargsModule = { typeModuleMethod, objArrayType };
-  static Type[][] applyArgsModule = { apply0argsModule, apply1argsModule,
-                                      apply2argsModule, apply3argsModule,
-                                      apply4argsModule, applyNargsModule } ;
-  static Method apply0ModuleMethod
-  = typeModuleBody.addMethod ("apply0", apply0argsModule,
-                              typeObject, Access.PUBLIC);
-  static Method apply1ModuleMethod
-  = typeModuleBody.addMethod ("apply1", apply1argsModule,
-                              typeObject, Access.PUBLIC);
-  static Method apply2ModuleMethod
-  = typeModuleBody.addMethod ("apply2", apply2argsModule,
-                              typeObject, Access.PUBLIC);
-  static Method apply3ModuleMethod
-  = typeModuleBody.addMethod ("apply3", apply3argsModule,
-                              typeObject, Access.PUBLIC);
-  static Method apply4ModuleMethod
-  = typeModuleBody.addMethod ("apply4", apply4argsModule,
-                              typeObject, Access.PUBLIC);
-  static Method applyNModuleMethod
-  = typeModuleBody.addMethod ("applyN", applyNargsModule,
-                              typeObject, Access.PUBLIC);
-  public static Method[] applyModuleMethods = {
-    apply0ModuleMethod, apply1ModuleMethod, apply2ModuleMethod,
-    apply3ModuleMethod, apply4ModuleMethod, applyNModuleMethod };
-
-  static public final Field selectorOfModuleMethod
-    = typeModuleMethod.addField ("selector", Type.int_type,
-                                 Access.PUBLIC|Access.FINAL); 
+  public static ClassType typeApplyMethodProc
+  = ClassType.make("gnu.mapping.ApplyMethodProc", typeProcedureN);
 
   /* Classes, fields, and methods used wgen usingCPStyle". */
   public static ClassType typeCallStack
@@ -246,8 +222,10 @@ public class Compilation
   public static Method popCallStackMethod
     = typeCallStack.addMethod("pop", apply0args, Type.void_type,
 			      Access.PUBLIC);
-  public static Field noArgsProcedureField
-    = typeProcedure.addField("noArgs", objArrayType,
+  public static ClassType typeValues
+    = ClassType.make("gnu.mapping.Values");
+  public static Field noArgsField
+    = typeValues.addField("noArgs", objArrayType,
 				Access.PUBLIC|Access.STATIC);
   public static Field valueCallStackField
     = typeCallStack.addField("value", Type.pointer_type, Access.PUBLIC);
@@ -289,6 +267,20 @@ public class Compilation
   /** True if we should generate a main(String[]) method. */
   public boolean generateMain = generateMainDefault;
 
+  public static boolean generateAppletDefault = false;
+  /** True if we should generate an Applet. */
+  public boolean generateApplet = generateAppletDefault;
+
+  public final ClassType getMethodProcType()
+  {
+    return generateApplet ? typeApplyMethodProc : typeModuleMethod;
+  }
+
+  public final ClassType getModuleSuperType()
+  {
+    return generateApplet ? typeApplet : typeModuleBody;
+  }
+
   public Interpreter getInterpreter()
   {
     return Interpreter.defaultInterpreter;  // For now.  FIXME.
@@ -329,7 +321,7 @@ public class Compilation
 	    Object[] array = (Object[]) value;
 	    int len = array.length;
 	    if (len == 0 && ! (value instanceof String[]))
-	      literal = new Literal(value, noArgsProcedureField, this);
+	      literal = new Literal(value, noArgsField, this);
 	    else
 	      {
 		literal = new Literal (value, objArrayType, this);
@@ -489,7 +481,7 @@ public class Compilation
 	// This function is probably not quite enough ...
 	// (Note the verifier may be picky about class names.)
 	if (Character.isLowerCase (ch) || Character.isUpperCase (ch)
-	    || Character.isDigit (ch) || ch == '_' || ch == '$')
+	    || (Character.isDigit (ch) && i > 0) || ch == '_' || ch == '$')
 	  mangled.append(ch);
 	else if (ch == '!')
 	  mangled.append("_B");
@@ -622,7 +614,7 @@ public class Compilation
       {
 	type = new ClassType(name);
 	ClassType superType
-	  = lexp.isModuleBody () ? typeModuleBody
+	  = lexp.isModuleBody () ? getModuleSuperType()
 	  : usingCPStyle ? typeCallFrame
 	  : lexp.isHandlingTailCalls() ? typeCpsProcedure
 	  : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
@@ -688,7 +680,10 @@ public class Compilation
 		if (--numGlobals > 0)
 		  code.emitDup(1);
 		code.emitPushString(id);
-		code.emitInvokeVirtual(getBindingEnvironmentMethod);
+		if (getInterpreter().hasSeparateFunctionNamespace())
+		  code.emitInvokeStatic(getBinding2Method);
+		else
+		  code.emitInvokeVirtual(getBindingEnvironmentMethod);
 		code.emitPutStatic(fld);
 	      }
 	  }
@@ -705,6 +700,9 @@ public class Compilation
    * the (public, readable) methods of the current module. */
   public void generateApplyMethods()
   {
+    int numApplyMethods = applyMethods.size();
+    if (numApplyMethods == 0)
+      return;
     Method save_method = method;
     CodeAttr code = null;
     for (int i = 0;  i < 6; i++)
@@ -713,23 +711,26 @@ public class Compilation
 	// else generate "applyN".
 	boolean needThisApply = false;
 	SwitchState aswitch = null;
+	String mname = null;
+	Type[] applyArgs = null;
 
-	for (int j = applyMethods.size();  --j >= 0; )
+	for (int j = numApplyMethods;  --j >= 0; )
 	  {
 	    LambdaExp source = (LambdaExp) applyMethods.elementAt(j);
 	    // Select the subset of source.primMethods[*] that are suitable
-	    // for the current apply method (applyArgsModule[i]).
+	    // for the current apply method.
 	    Method[] primMethods = source.primMethods;
 	    int numMethods = primMethods.length;
 	    boolean varArgs = source.max_args < 0
 	      || source.max_args >= source.min_args + numMethods;
 	    int methodIndex;
+	    boolean skipThisProc = false;
 	    if (i < 5) // Handling apply0 .. apply4
 	      {
 		methodIndex = i - source.min_args;
 		if (methodIndex < 0 || methodIndex >= numMethods
 		    || (methodIndex == numMethods - 1 && varArgs))
-		  continue;
+		  skipThisProc = true;
 		numMethods = 1;
 		varArgs = false;
 	      }
@@ -737,25 +738,43 @@ public class Compilation
 	      {
 		methodIndex = 5 - source.min_args;
 		if (methodIndex > 0 && numMethods <= methodIndex && ! varArgs)
-		  continue;
+		  skipThisProc = true;
 		methodIndex = numMethods-1;
 	      }
+	    if (skipThisProc && ! generateApplet)
+	      continue;
 	    if (! needThisApply)
 	      {
 		// First LambdaExp we seen suitable for this i.
-		String mname = i < 5 ? ("apply"+i) : "applyN";
-		method = curClass.addMethod (mname, applyArgsModule[i],
+		if (i < 5)
+		  {
+		    mname =  "apply"+i;
+		    applyArgs = new Type[i + 1];
+		    for (int k = i;  k > 0;  k--)
+		      applyArgs[k] = typeObject;
+		  }
+		else
+		  {
+		    mname = "applyN";
+		    applyArgs = new Type[2];
+		    applyArgs[1] = objArrayType;
+		  }
+		ClassType procType = getMethodProcType();
+		applyArgs[0] = procType;
+		method = curClass.addMethod (mname, applyArgs,
 					     Type.pointer_type,
 					     Access.PUBLIC);
 		method.init_param_slots();
 		code = getCode();
 
 		code.emitLoad(code.getArg(1)); // method
-		code.emitGetField(selectorOfModuleMethod);
+		code.emitGetField(procType.getDeclaredField("selector"));
 		aswitch = new SwitchState(code);
 
 		needThisApply = true;
 	      }
+	    if (skipThisProc && generateApplet)
+	      continue;
 
 	    aswitch.addCase(source.getSelectorValue(this), code);
 
@@ -808,7 +827,6 @@ public class Compilation
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,
 						  k, ptype);
-		    
 	      }
 
 	    if (varArgs)
@@ -830,6 +848,12 @@ public class Compilation
 			    counter = code.addLocal(Type.int_type);
 			    code.emitLoad(code.getArg(2));
 			    code.emitArrayLength();
+			    if (singleArgs != 0)
+			      {
+				code.emitPushInt(singleArgs);
+				code.emitSub(Type.int_type);
+			      }
+			    code.emitStore(counter);
 			  }
 			code.emitLoad(counter);
 			code.emitNewArray(elType);
@@ -873,10 +897,10 @@ public class Compilation
               }
 
 	    code.emitInvoke(primMethod);
-	    Target.pushObject.compileFromStack(this,
-					       primMethod.getReturnType());
 	    while (--pendingIfEnds >= 0)
 	      code.emitFi();
+	    Target.pushObject.compileFromStack(this,
+					       primMethod.getReturnType());
 	    code.emitReturn();
           }
 	if (needThisApply)
@@ -884,9 +908,17 @@ public class Compilation
 	    aswitch.addDefault(code);
 	    int nargs = i > 4 ? 2 : i + 1;
 	      nargs++;
-	    for (int k = 0;  k < nargs;  k++)
+	    for (int k = generateApplet ? 1 : 0;  k < nargs;  k++)
 	      code.emitLoad(code.getArg(k));
-	    code.emitInvokeSpecial(applyModuleMethods[i]);  // call super
+	    if (generateApplet)
+	      {
+		Method defMethod = typeApplyMethodProc.getDeclaredMethod(mname+"Default", applyArgs);
+		code.emitInvokeStatic(defMethod);
+	      }
+	    else
+	      {
+		code.emitInvokeSpecial(curClass.getSuperclass().getDeclaredMethod(mname, applyArgs));
+	      }
 	    code.emitReturn();
 	    aswitch.finish(code);
 	  }
@@ -1047,9 +1079,20 @@ public class Compilation
 				     Access.PUBLIC|Access.STATIC);
 	method.init_param_slots ();
 
+	code = getCode();
+
+	if (generateMain || generateApplet)
+	  {
+	    ClassType interpreterType
+	      = (ClassType) Type.make(getInterpreter().getClass());
+	    Method registerMethod
+	      = interpreterType.getDeclaredMethod("registerEnvironment", 0);
+	    if (registerMethod != null)
+	      code.emitInvokeStatic(registerMethod);
+	  }
+
 	dumpInitializers(clinitChain);
 
-	code = getCode();
 	code.emitReturn();
 	method = save_method;
       }
@@ -1106,7 +1149,9 @@ public class Compilation
     if (fld != null)
       return (Field) fld;
     String fieldName = "id"+bindingFields.size()+"$"+mangleName(name);
-    Field field = mainClass.addField(fieldName, typeBinding, Access.STATIC);
+    Type ftype = getInterpreter().hasSeparateFunctionNamespace()
+      ? typeBinding2 : typeBinding;
+    Field field = mainClass.addField(fieldName, ftype, Access.STATIC);
     bindingFields.put(name, field);
     return field;
   }

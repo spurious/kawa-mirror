@@ -1,4 +1,4 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = util reflect slib
+SUBDIRS = util reflect lispexpr slib

@@ -1,3 +1,8 @@
+Tue Apr 28 21:43:52 1998  Per Bothner  <bothner@cygnus.com>
+
+	* misc-test.scm:  Added test for nested try-finally from
+	<Hallvard.Traetteberg@idi.ntnu.no>.
+
 Tue Feb 24 23:08:41 1998  Per Bothner  <bothner@cygnus.com>
 
 	* obj-test.scm:  Add tests for make, (record 'field), and set!.

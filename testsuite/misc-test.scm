@@ -98,3 +98,35 @@
    (test #\X read-char iport)
    (test #\Y read-char iport)
    (test #!eof read-char iport)))
+
+;;; From: Hallvard Traetteberg <Hallvard.Traetteberg@idi.ntnu.no>
+;;; Triggered bug with try-finally nested in an expression.
+
+(define (quote-keyword-values list)
+  (if (null? list)
+  list
+  `(,(car list) ',(car (cdr list))
+  . ,(quote-keyword-values (cdr (cdr list)))))
+  )
+
+(defmacro with-content (object-form . content)
+  (let ((var-symbol (string->symbol (string-append "context-"
+(symbol->string (car object-form)))))
+    (object-form `(,(car object-form)
+         . ,(quote-keyword-values (cdr object-form)))))
+  `(fluid-let ((,var-symbol ,object-form))
+   (let ((content (list . ,content)))
+         (cons ,var-symbol content)))
+  ))
+
+(define (document) (list 'document))
+(define (view #!key type)
+  (list 'view type: type))
+
+(test '((view type: text)) 'with-content
+      (with-content (view type: text)))
+(test '((document) ((view type: diagram)) ((view type: text))) 'with-content
+      (with-content (document) (with-content (view type: diagram))
+		    (with-content (view type: text))))
+
+

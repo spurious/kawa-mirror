@@ -199,7 +199,11 @@ public class Declaration
   static final int IS_FLUID = 0x10;
   static final int PRIVATE = 0x20;
   static final int IS_SIMPLE = 0x40;
+
+  /** True if in the function namespace, for languages that distinguishes them.
+   * I.e. a function definition or macro definition. */
   static final int PROCEDURE = 0x80;
+
   public static final int IS_ALIAS = 0x100;
   /** Set if this is just a declaration, not a definition. */
   public static final int NOT_DEFINING = 0x200;

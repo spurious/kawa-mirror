@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
+import gnu.mapping.Location; // As opposed to gnu.bytecode.Locatio
 import gnu.lists.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
@@ -102,15 +103,16 @@ public class require extends Syntax
   {
     String mangledName = (ctype.getName() + "$instance").intern();
     Symbol symbol = env.getSymbol(mangledName);
+    Location loc = env.getLocation(symbol);
     Object value;
-    synchronized (symbol)
+    synchronized (loc)
       {
-	if (symbol.isBound())
-	  return symbol.get();
+	if (loc.isBound())
+	  return loc.get();
 	try
 	  {
 	    value = ctype.newInstance();
-	    symbol.set(value);
+	    loc.set(value);
 	  }
         catch (Exception ex)
           {
@@ -176,7 +178,6 @@ public class require extends Syntax
   {
     Interpreter interp = tr.getInterpreter();
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
-    Hashtable ftable = null;
     String tname = type.getName();
     Object instance = null;
     ClassType t = (ClassType) type;
@@ -184,8 +185,16 @@ public class require extends Syntax
     Declaration decl = null;
     ClassType thisType = ClassType.make("kawa.standard.require");
     Expression[] args = { new QuoteExp(tname) };
-    ApplyExp dofind = Invoke.makeInvokeStatic(thisType, "find", args);
+    Expression dofind = Invoke.makeInvokeStatic(thisType, "find", args);
+    dofind.setLine(tr);
     ModuleExp mod = new ModuleExp();
+    // Should skip if immediate.  FIXME
+    ClassType typeClassMemberLocation
+      = ClassType.make("gnu.kawa.reflect.ClassMemberLocation");
+    Method makeClassMemberLocation2
+      = typeClassMemberLocation.getDeclaredMethod("make", 2);
+    Method makeClassMemberLocation3
+      = typeClassMemberLocation.getDeclaredMethod("make", 3);
     for (;;)
       {
 	Class rclass = t.getReflectClass();
@@ -194,121 +203,159 @@ public class require extends Syntax
             int flags = fld.getFlags();
             if ((flags & Access.PUBLIC) == 0)
               continue;
+            String fname = fld.getName();
 	    boolean isStatic = (flags & Access.STATIC) != 0;
             if (! isStatic && instance == null)
               {
                 instance = find((ClassType) type, Environment.getCurrent());
-		if (! immediate)
-		  {
-		    String fname = tname.replace('.', '$') + "$instance";
-		    decl = new Declaration(fname, type);
-		    decl.setPrivate(true);
-		    defs.addDeclaration(decl);
-		    decl.setCanRead(true);
-		    decl.noteValue(dofind);
-		    SetExp sexp = new SetExp(decl, dofind);
-		    sexp.setDefining(true);
-		    forms.addElement(sexp);
-		  }
+		String iname = tname.replace('.', '$') + "$instance";
+		decl = new Declaration(iname, type);
+		decl.setPrivate(true);
+		defs.addDeclaration(decl);
+		decl.setCanRead(true);
+		decl.noteValue(dofind);
+		SetExp sexp = new SetExp(decl, dofind);
+		sexp.setLine(tr);
+		sexp.setDefining(true);
+		forms.addElement(sexp);
               }
-            String fname = fld.getName();
 	    java.lang.reflect.Field rfield;
+	    Object fvalue;
+	    boolean isFinal;
 	    try
 	      {
 		rfield = rclass.getField(fname);
+		isFinal = (rfield.getModifiers() & Access.FINAL) != 0;
+		if (isFinal)
+		  fvalue = rfield.get(instance);
+		else
+		  fvalue = Undefined.getInstance();
 	      }
 	    catch (Exception ex)
 	      {
 		throw new WrappedException(ex);
 	      }
-	    if (immediate)
+	    Type ftype = fld.getType();
+	    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
+	    Declaration fdecl = makeDeclInModule(mod, fvalue, fld, interp);
+	    Object fdname = fdecl.getSymbol();
+	    if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+	      continue;
+	    /*
+            if (tr.immediate && defs instanceof ModuleExp)
+              {
+                // FIXME use ClassMemberLocation.define
+                Symbol sym;
+                if (fdname instanceof Symbol)
+                  sym = (Symbol) fdname;
+                else
+                  sym = Symbol.make(uri == null ? "" : uri, fdname.toString());
+                Environment env = Environment.getCurrent();
+
+                if (isAlias && isFinal)
+		  env.addLocation(sym, null, (Location) fvalue);
+                else
+                  {
+                    Object property = null;
+                    if (isFinal
+                        && (fdecl.isProcedureDecl() || fvalue instanceof Macro)
+                        && (tr.getInterpreter()
+                            .hasSeparateFunctionNamespace()))
+                      property = EnvironmentKey.FUNCTION;
+                    env.addLocation(sym, property,
+                                    new ClassMemberLocation(instance, rfield));
+                  }
+              }
+	    */
+
+	    // We create an alias in the current context that points
+	    // a dummy declaration in the exported module.  Normally,
+	    // followAliases will skip the alias, so we use the latter.
+	    // But if the binding is re-exported (or EXTERNAL_ACCESS
+	    // gets set), then we need a separate declaration.
+	    // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
+	    Object aname;
+
+            if (fdname instanceof Symbol)
+              aname = fdname;
+            else
+              {
+                String sname = fdname.toString();
+                if (uri == null)
+                  aname = sname.intern();
+                else
+                  aname = Symbol.make(uri, sname);
+              }
+	    try
 	      {
-		ClassMemberConstraint.define(fname, instance, rfield,
-					     uri == null ? Environment.getCurrent()
-					     : Environment.getInstance(uri));
-	      }
-	    else
-	      {
-		try
+		Declaration adecl = defs.getDefine(aname, 'w', tr);
+		adecl.setAlias(true);
+		adecl.setIndirectBinding(true);
+ 		if (immediate)
+		  adecl.setCanRead(true);
+		ReferenceExp fref = new ReferenceExp(fdecl);
+		fref.setDontDereference(true);
+		if (fdecl.isProcedureDecl())
+		  adecl.setProcedureDecl(true);
+		if (isStatic)
 		  {
-		    Object fvalue = rfield.get(instance);
-                    Type ftype = fld.getType();
-		    boolean isAlias = ftype == Compilation.typeLocation;
-		    String fdname
-		      = (fvalue instanceof Named && ! isAlias
-			 ? ((Named) fvalue).getName()
-			 : Compilation.demangleName(fname, true).intern());
-		    Type dtype = interp.getTypeFor(ftype.getReflectClass());
-		    // We create an alias in the current context that points
-		    // a dummy declaration in the exported module.  Normally,
-		    // followAliases will skip the alias, so we use the latter.
-		    // But if the binding is re-exported (or EXTERNAL_ACCESS
-		    // gets set), then we need a separate declaration.
-		    // (If EXTERNAL_ACCESS, the field gets PRIVATE_PREFIX.)
-		    boolean hidden
-		      = fname.startsWith(Declaration.PRIVATE_PREFIX);
-		    Object aname;
-		    if (uri == null)
-		      aname = fdname;
-		    else
-		      aname = Symbol.make(uri, fdname);
-		    Declaration adecl = hidden ? new Declaration(aname)
-		      : defs.getDefine(aname, 'w', tr);
-		    Declaration fdecl = mod.addDeclaration(fdname, dtype);
-		    ReferenceExp fref = new ReferenceExp(fdecl);
-		    SetExp sexp = new SetExp(adecl, fref);
-		    sexp.setDefining(true);
-                    if (isAlias || ftype.isSubtype(Compilation.typeSymbol))
-                      fdecl.setIndirectBinding(true);
-		    else if (ftype.isSubtype(Compilation.typeProcedure))
-		      {
-			adecl.setProcedureDecl(true);
-			fdecl.setProcedureDecl(true);
-		      }
-		    if (isAlias)
-		      fdecl.setAlias(true);
-		    if (! isStatic || fvalue instanceof Macro)
-		      fdecl.base = decl;
+		    fdecl.setFlag(Declaration.STATIC_SPECIFIED);
+		    adecl.setFlag(Declaration.STATIC_SPECIFIED);
+		  }
+		else
+		  fdecl.base = decl;
+		/*
+		Expression fexp;
+		if (fvalue instanceof gnu.mapping.Location)
+		  {
+		    Declaration fdecl = new Declaration(aname, ftype);
+		    fdecl.base = decl;
 		    fdecl.field = fld;
-		    if (ftable == null)
-		      ftable = new Hashtable(40);
-		    ftable.put(fname, adecl);
-		    if (fvalue instanceof Macro)
+		    ReferenceExp ref = new ReferenceExp(fdecl);
+		    ref.setDontDereference(true);
+		    fexp = ref;
+		  }
+		else
+		  {
+		    int j = 0;
+		    Method m;
+		    if (isStatic)
 		      {
-			// Copy the Macro, so we can modify it.
-			// (This is a shallow copy, not a deep copy.)
-			Macro mac = new Macro((Macro) fvalue);
-			mac.capturedScope = mod;
-			fvalue = mac;
-			fdecl.setSyntax();
-			fdecl.noteValue(new QuoteExp(mac));
+			m = makeClassMemberLocation2;
+			args = new Expression[2];
 		      }
 		    else
-		      fdecl.noteValue(new QuoteExp(fvalue));
-		    // Need to be aliase - so we can follow them!
-		    adecl.setAlias(true);
-		    adecl.setIndirectBinding(true);
-		    adecl.noteValue(fref);
-		    // Kludge, needed by FindCapturedVars.capture:
-		    fdecl.context = defs;
-		    if ((rfield.getModifiers() & Access.FINAL) != 0)
 		      {
-			adecl.setType(dtype);
-			adecl.setFlag(Declaration.IS_CONSTANT);
+			m = makeClassMemberLocation3;
+			args = new Expression[3];
+			args[j++] = new ReferenceExp(decl);
 		      }
-		    fdecl.setPrivate(true);
-		    adecl.setPrivate(true);
-		    fdecl.setSimple(false);
-		    adecl.setFlag(Declaration.IS_IMPORTED);
-		    adecl.setSimple(false);
-		    if (! hidden)
-		      tr.push(adecl);  // Add to translation env.
-		    forms.addElement(sexp);
+		    args[j++] = new QuoteExp(t.getName());
+		    args[j++] = new QuoteExp(fname);
+		    fexp = new ApplyExp(m, args);
 		  }
-		catch (Exception ex)
+		SetExp sexp = new SetExp(adecl, fexp);
+		*/
+		SetExp sexp = new SetExp(adecl, fref);
+		sexp.setDefining(true);
+		forms.addElement(sexp);
+		adecl.setAlias(true);
+		adecl.setIndirectBinding(true);
+		adecl.noteValue(fref);
+		adecl.setType(Compilation.typeLocation);
+		if ((rfield.getModifiers() & Access.FINAL) != 0)
 		  {
-		    throw new WrappedException(ex);
+		    adecl.setFlag(Declaration.IS_CONSTANT);
 		  }
+		
+		adecl.setPrivate(true);
+		adecl.setFlag(Declaration.IS_IMPORTED);
+		adecl.setSimple(false);
+		tr.push(adecl);  // Add to translation env.
+	      }
+	    catch (Exception ex)
+	      {
+		throw new WrappedException(ex);
 	      }
           }
         t = t.getSuperclass();
@@ -316,9 +363,13 @@ public class require extends Syntax
           break;
       }
 
-    if ((instance == null || immediate)
+    if ((instance == null /*|| immediate*/)
 	&& isRunnable) // Need to make sure 'run' is invoked.
-      forms.addElement(Convert.makeCoercion(dofind, Type.void_type));
+      {
+	dofind = Convert.makeCoercion(dofind, Type.void_type);
+	dofind.setLine(tr);
+	forms.addElement(dofind);
+      }
     tr.mustCompileHere();
     return true;
   }
@@ -326,5 +377,75 @@ public class require extends Syntax
   public Expression rewriteForm (Pair form, Translator tr)
   {
     return null;
+  }
+
+  public static void makeModule (ModuleExp mod, ClassType type,
+				 Object instance)
+  {
+    Compilation comp = Compilation.getCurrent();
+    Interpreter interp = comp.getInterpreter();
+    Class rclass = type.getReflectClass();
+    for (Field fld = type.getFields();  fld != null;  fld = fld.getNext())
+      {
+	int flags = fld.getFlags();
+	if ((flags & Access.PUBLIC) == 0)
+	  continue;
+	try
+	  {
+	    makeDeclInModule(mod,
+			     rclass.getField(fld.getName()).get(instance),
+			     fld, interp);
+	  }
+	catch (Exception ex)
+	  {
+	    throw new WrappedException(ex);
+	  }
+      }
+  }
+
+  private static Declaration makeDeclInModule (ModuleExp mod, Object fvalue,
+					       Field fld, Interpreter interp)
+  {
+    String fname = fld.getName();
+    Type ftype = fld.getType();
+    boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
+    Type dtype = interp.getTypeFor(ftype.getReflectClass());
+    Object fdname;
+    // FIXME if fvalue is ClassMemberLocation, and field is final,
+    // get name from value of field.
+    if (fvalue instanceof Named) // && ! isAlias
+      fdname = ((Named) fvalue).getSymbol();
+    else
+      {
+	// FIXME move this demangleName
+	if (fname.startsWith(Declaration.PRIVATE_PREFIX))
+	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
+	fdname = Compilation.demangleName(fname, true).intern();
+      }
+    Declaration fdecl = new Declaration(fdname, dtype);
+    if (isAlias || ftype.isSubtype(Compilation.typeLocation))
+      fdecl.setIndirectBinding(true);
+    else if (ftype.isSubtype(Compilation.typeProcedure))
+      fdecl.setProcedureDecl(true);
+    if (isAlias)
+      fdecl.setAlias(true);
+    if ((fld.getModifiers() & Access.FINAL) != 0
+	&& ! (fvalue instanceof gnu.mapping.Location))
+      fdecl.noteValue(new QuoteExp(fvalue));
+    fdecl.setPrivate(true);
+    fdecl.setSimple(false);
+    fdecl.field = fld;
+    //if ((fld.getModifiers() & Access.FINAL) != 0)
+    //  fdecl.setFlag(Declaration.IS_CONSTANT);
+    if (fvalue instanceof Macro)
+      fdecl.setSyntax();
+    mod.addDeclaration(fdecl);
+    if (fvalue instanceof Macro)
+      {
+	Macro mac = (Macro) fvalue;
+	mac.setCapturedScope(mod);
+	//mac.instance = instance;
+      }
+    return fdecl;
   }
 }

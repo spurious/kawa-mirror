@@ -77,29 +77,11 @@ public class AutoloadSyntax extends Syntax implements Externalizable
   /** Load the class named in className. */
   void load ()
   {
-    Environment env = this.env != null ? this.env : Environment.getCurrent();
     String name = this.getName();
     try
       {
 	Object value = Class.forName (className).newInstance ();
-	if (value instanceof ModuleBody)
-	  {
-	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(value, env);
-	    ((ModuleBody) value).run();
-	    try
-	      {
-		value = env.getFunction(name);
-	      }
-	    catch (Exception ex)
-	      {
-		value = null;
-	      }
-	    if (value == null || value == this
-		|| !(value instanceof Syntax))
-	      throw_error("syntax not found in ");
-	    loaded = (Syntax) value;
-	  }
-	else if (value instanceof Syntax)
+        if (value instanceof Syntax)
 	  {
 	    loaded = (Syntax) value;	
 	    if (name != null && loaded.getName() == null)
@@ -114,7 +96,7 @@ public class AutoloadSyntax extends Syntax implements Externalizable
       { throw_error ("failed to instantiate class "); }
     catch (IllegalAccessException ex)
       { throw_error ("illegal access in class "); }
-    catch (UnboundSymbol e)
+    catch (UnboundLocationException e)
       { throw_error ("missing symbol '" + e.getMessage () + "' "); }
     catch (WrongArguments ex)
       { throw_error ("type error"); }

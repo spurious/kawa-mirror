@@ -164,7 +164,7 @@ public class repl extends Procedure0or1
 	  }
 	else
 	  scmHomeDirectory = Boolean.FALSE;
-	Environment.define_global("home-directory", scmHomeDirectory);
+	Environment.getCurrent().put("home-directory", scmHomeDirectory);
 	if (initFile != null && initFile.exists())
 	  Shell.runFile(initFile.getPath());
       }
@@ -187,8 +187,8 @@ public class repl extends Procedure0or1
       array[i] = new FString (args[i + arg_start]);
     commandLineArguments = new FVector (array);  // FIXME scsh has list
     // FIXME scsh also has command-line proc
-    Environment.define_global ("command-line-arguments",
-			       commandLineArguments);
+    Environment.getCurrent().put("command-line-arguments",
+				 commandLineArguments);
   }
 
   public static Interpreter getInterpreterFromFilenameExtension(String name)
@@ -200,7 +200,7 @@ public class repl extends Procedure0or1
 	if (interp != null)
 	  {
 	    Interpreter.defaultInterpreter = interp;
-	    Environment.setGlobal(interp.getEnvironment());
+	    Environment.setCurrent(interp.getEnvironment());
 	    return interp;
 	  }
       }
@@ -209,12 +209,14 @@ public class repl extends Procedure0or1
 
   public static Interpreter getInterpreter()
   {
-    if (Interpreter.defaultInterpreter == null)
+    Interpreter interpreter = Interpreter.defaultInterpreter;
+    if (interpreter == null)
       {
-	Interpreter.defaultInterpreter = Interpreter.getInstance(null);
-	Environment.setGlobal(Interpreter.defaultInterpreter.getEnvironment());
+	interpreter = Interpreter.getInstance(null);
+	Interpreter.defaultInterpreter = interpreter;
+	Environment.setCurrent(interpreter.getEnvironment());
       }
-    return Interpreter.defaultInterpreter;
+    return interpreter;
   }
 
   static boolean shutdownRegistered
@@ -597,7 +599,7 @@ public class repl extends Procedure0or1
 	      {
 		Interpreter.defaultInterpreter = interpreter;
 		if (previous == null)
-		  Environment.setGlobal(interpreter.getEnvironment());
+		  Environment.setCurrent(interpreter.getEnvironment());
 	      }
 	    else
 	      {

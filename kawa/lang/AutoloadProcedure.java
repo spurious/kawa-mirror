@@ -19,7 +19,7 @@ public class AutoloadProcedure extends Procedure implements Externalizable
    * and that is expected to define the Procedure in the global environment. */
   String className;
 
-  Environment env;
+  Interpreter interp;
 
   /** The loaded procedure, or null if it has not yet been loaded. */
   Procedure loaded;
@@ -34,11 +34,11 @@ public class AutoloadProcedure extends Procedure implements Externalizable
     this.className = className;
   }
 
-  public AutoloadProcedure (String name, String className, Environment env)
+  public AutoloadProcedure (String name, String className, Interpreter interp)
   {
     super(name);
     this.className = className;
-    this.env = env;
+    this.interp = interp;
   }
 
   public void print(java.io.PrintWriter ps)
@@ -74,38 +74,30 @@ public class AutoloadProcedure extends Procedure implements Externalizable
   /** Load the class named in className. */
   void load ()
   {
-    Environment env = this.env != null ? this.env : Environment.getCurrent();
-    String name = this.getName();
+    Object name = this.getSymbol();
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
 	if (loaded == this)
 	  throw_error("circularity detected");
-	if (loaded instanceof ModuleBody)
-	  {
-	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);
-	    if (loaded instanceof Runnable)
-	      ((Runnable)loaded).run();
-	    Object value = env.getSymbol(name).getProcedure();
-	    if (value == null
-		|| !(value instanceof Procedure))
-	      throw_error
-		("invalid ModuleBody class - does not define " + name);
-	    loaded = (Procedure) value;
-	  }
-	else if (name != null)
+	if (name != null)
 	  {
 	    try
 	      {
+		Object property = (interp.hasSeparateFunctionNamespace()
+				   ? EnvironmentKey.FUNCTION
+				   : null);
 		// Should use something like isFunctionBound FIXME
-		if (env.getFunction(name) == this)
-		  env.putFunction(name, loaded);
+		Environment env = interp.getEnvironment();
+		Symbol sym = (name instanceof Symbol ? (Symbol) name
+			      : env.getSymbol(name.toString()));
+		env.put(sym, property, loaded);
 	      }
-	    catch (UnboundSymbol ex)
+	    catch (UnboundLocationException ex)
 	      {
 	      }
-	    if (loaded.getName() == null)
-	      loaded.setName(name);
+	    if (loaded.getSymbol() == null)
+	      loaded.setSymbol(name);
 	  }
       }
     catch (ClassNotFoundException ex)

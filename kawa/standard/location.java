@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.mapping.*;
+import gnu.mapping.Location;  // As opposed to gnu.bytecode.Location.
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.Invoke;
@@ -23,8 +24,8 @@ public class location extends Syntax implements Printable
     if (pair.cdr != LList.Empty)
       return tr.syntaxError ("extra arguments to location");
     //    Expression arg = tr.rewrite(pair.car);
-    Expression arg = tr.rewrite(pair.car);
-    return location.rewrite(arg, tr);
+    Expression[] args = { location.rewrite(tr.rewrite(pair.car), tr) };
+    return Invoke.makeInvokeStatic(thisType, "makeLocationProc", args);
   }
 
   private static ClassType thisType = ClassType.make("kawa.standard.location");
@@ -51,9 +52,27 @@ public class location extends Syntax implements Printable
     return tr.syntaxError("invalid argument to location");
   }
 
-  public static ProcLocation
+  public static Location
   makeProcLocation$V (Procedure proc, Object[] args)
   {
     return new ProcLocation(proc, args);
   }
+
+  public static Procedure
+  makeLocationProc (Location loc)
+  {
+    return new LocationProc(loc);
+  }
+}
+
+class LocationProc extends Procedure0 implements HasSetter
+{
+  public LocationProc (Location loc) { this.loc = loc; }
+
+  Location loc;
+
+  public Object apply0 () { return loc.get(); }
+  public void set0 (Object value) { loc.set(value); }
+
+  public String toString () { return "#<location-proc "+loc+">"; }
 }

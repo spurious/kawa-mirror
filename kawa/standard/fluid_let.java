@@ -71,11 +71,11 @@ public class fluid_let extends Syntax implements Printable
 	  return tr.syntaxError("invalid " + getName() + " syntax");
 	Declaration decl = let.addDeclaration(name);
 	decl.setFluid(true);
-	decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
+	decl.setIndirectBinding(true);
 	if (value == null)
 	  value = new ReferenceExp(name);
 	inits[i] = value;
-	decl.noteValue (value);
+	decl.noteValue(null);
 	bindings = bind_pair.cdr;
       }
     tr.push(let);

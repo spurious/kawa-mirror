@@ -36,7 +36,7 @@ public class load extends Procedure1 {
 	  Environment.setCurrent(env);
 	Class clas = Class.forName (name);
 	Object inst = clas.newInstance ();
-	gnu.kawa.reflect.ClassMemberConstraint.defineAll(inst, env);
+	gnu.kawa.reflect.ClassMemberLocation.defineAll(inst, env);
 	if (inst instanceof Runnable)
 	  ((Runnable)inst).run();
       }
@@ -76,7 +76,7 @@ public class load extends Procedure1 {
 	loader.loadAllClasses();
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	Object proc = clas.newInstance ();
-	gnu.kawa.reflect.ClassMemberConstraint.defineAll(proc, env);
+	gnu.kawa.reflect.ClassMemberLocation.defineAll(proc, env);
 	((ModuleBody) proc).run();
       }
     catch (java.io.IOException ex)

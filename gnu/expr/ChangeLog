@@ -1,3 +1,8 @@
+2004-05-17  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (inlinedIn):  Our caller might be the outer lambda.
+	Fixes Savannah bug #8955 "VerifyError in srfi1.scm".
+
 2004-05-10  Per Bothner  <per@bothner.com>
 
 	* FindTailCalls.java (walkApplyExp):  Don't call walkLambdaExp

@@ -343,12 +343,12 @@ public class LambdaExp extends ScopeExp
   /** True if given LambdaExp is inlined in this function, perhaps indirectly.
    * Is false if this is not inline-only or if getCaller() is not inlined is
    * outer.  Usually the same as (this.outerLambdaNotInline()==outer),
-   * except in the case that other.getInlineOnly(). */
+   * except in the case that outer.getInlineOnly(). */
   boolean inlinedIn (LambdaExp outer)
   {
     if (! getInlineOnly())
       return false;
-    for (ScopeExp exp = getCaller(); (exp = exp.outer) != null; )
+    for (ScopeExp exp = getCaller(); exp != null;  exp = exp.outer)
       {
 	if (exp instanceof LambdaExp)
 	  {

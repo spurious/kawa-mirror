@@ -92,7 +92,16 @@ public class FindTailCalls extends ExpWalker
         decl.setCanRead(true);
         decl.setCanWrite(true);
       }
-    return super.walkFluidLetExp(exp);
+    boolean save = inTailContext;
+    inTailContext = false;
+    try
+      {
+	return super.walkFluidLetExp(exp);
+      }
+    finally
+      {
+	inTailContext = save;
+      }
   }
 
   protected Expression walkLetExp (LetExp exp)

@@ -1,5 +1,9 @@
 2002-11-10  Per Bothner  <per@bothner.com>
 
+	* FindTailCalls.java (walkFluidLetExp): Set inTailContext to false for
+	body, since we need to restore bindings at end.
+	Fixes bug reported by Wen-Chun Ni <wcn@tbcommerce.com>.
+
 	* LetExp.java (print):  New overloaded method.
 	* FluidLetExp.java (print):  New method.
 

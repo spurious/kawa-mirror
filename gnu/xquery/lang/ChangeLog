@@ -1,3 +1,8 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>): Add definitions for local-name-from-QName,
+	namespace-uri-from-QName, namespace-uri-for-prefix.
+
 2004-08-11  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (DOT_VARNAME, POSITION_VARNAME, LAST_VARNAME):

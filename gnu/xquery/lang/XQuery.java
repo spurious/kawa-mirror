@@ -526,6 +526,13 @@ public class XQuery extends Interpreter
     define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
     define_method("concat", "gnu.xquery.util.StringValue", "concat");
 
+    define_method("local-name-from-QName", "gnu.xquery.util.QNameUtils",
+		  "localNameFromQName");
+    define_method("namespace-uri-from-QName", "gnu.xquery.util.QNameUtils",
+		  "namespaceURIFromQName");
+    define_method("namespace-uri-for-prefix", "gnu.xquery.util.QNameUtils",
+		  "namespaceURIForPrefix");
+
     define("distinct-nodes", gnu.kawa.xml.SortNodes.sortNodes);
   }
 

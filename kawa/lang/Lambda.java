@@ -123,16 +123,6 @@ public class Lambda extends Syntax implements Printable
     if (key_args > 0)
       lexp.keywords = new Keyword[key_args];
 
-    lexp.declareThis();
-    
-    if (lexp.min_args != lexp.max_args || lexp.min_args > 4)
-      {
-	// Compilation.compile depends on the "argsArray" variable
-	// being the second one created for this scope.
-	lexp.argsArray = lexp.addDeclaration ("argsArray", Compilation.objArrayType);
-	lexp.argsArray.setParameter (true);
-	lexp.argsArray.setArtificial (true);
-      }
     tr.push(lexp);
     bindings = formals;
     int i = 0;
@@ -149,22 +139,28 @@ public class Lambda extends Syntax implements Printable
 	    continue;
 	  }
 	String name;
-	Object defaultValue;
+	Object defaultValue = QuoteExp.falseExp;
+	Object typeSpec = null;
 	if (pair.car instanceof String)
-	  {
-	    name = (String) pair.car;
-	    defaultValue = QuoteExp.falseExp;
-	  }
+	  name = (String) pair.car;
 	else if (pair.car instanceof Pair
 		 && ((Pair) pair.car).car instanceof String
 		 && ((Pair) pair.car).cdr instanceof Pair)
 	  {
 	    Pair pair_car = (Pair) pair.car;
 	    name = (String) pair_car.car;
-	    defaultValue = ((Pair) pair_car.cdr).car;
-	    if (mode == null || mode == Special.rest)
+	    if (mode == null)
+	      typeSpec = ((Pair) pair_car.cdr).car;
+	    else if (mode != Special.rest)
 	      {
-		tr.syntaxError ("default value for required or #!rest parameter");
+		Pair defaultPair = (Pair) pair_car.cdr;
+		defaultValue = defaultPair.car;
+		if (defaultPair.cdr instanceof Pair)
+		  typeSpec = ((Pair) defaultPair.cdr).car;
+	      }
+	    else
+	      {
+		tr.syntaxError ("default value for #!rest parameter");
 		
 		return;
 	      }
@@ -180,6 +176,8 @@ public class Lambda extends Syntax implements Printable
 	  lexp.keywords[key_args++] = Keyword.make(name.toString());
 	Declaration decl = lexp.addDeclaration (name);
 	decl.setParameter(true);
+	if (typeSpec != null)
+	  decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
 	decl.noteValue(null);  // Does not have a known value.
 	tr.push(decl);
       }

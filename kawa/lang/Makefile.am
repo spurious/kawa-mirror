@@ -45,7 +45,7 @@ DefMacro.java \
 AutoloadSyntax.java \
 CompileFile.java \
 loadcompiled.java \
-SpecialType.java PrimProcedure.java \
+SpecialType.java \
 PrimGetStatic.java PrimSetStatic.java \
 PrimArrayNew.java PrimArrayLength.java PrimArraySet.java PrimArrayGet.java\
 Promise.java \

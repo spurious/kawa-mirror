@@ -28,6 +28,13 @@ public class SpecialType extends gnu.bytecode.PrimType
     return super.coerceFromObject(obj);
   }
 
+  public char charValue (Object value)
+  {
+    if (value instanceof Character)
+      return ((Character) value).charValue();
+    return  ((Char) value).charValue();
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     char sig1 = getSignature().charAt(0);

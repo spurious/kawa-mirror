@@ -222,6 +222,8 @@ public class Translator extends Object
 	      break tryDirectCall;
 	  }
 	Class procClass = proc.getClass();
+	if (procClass.getClassLoader() != null)
+	  break tryDirectCall;
 	try
 	  {
 	    java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
@@ -410,7 +412,7 @@ public class Translator extends Object
 	ndecls = defs.countDecls();
         Expression[] inits = new Expression[ndecls];
 	for (int i = ndecls;  --i >= 0; )
-	  inits[i] = QuoteExp.undefined_exp;
+	  inits[i] = QuoteExp.nullExp;
 	defs.inits = inits;
 	push(defs);
       }

@@ -1495,7 +1495,7 @@ a good way to build a next-generation Emacs.
 @node Conclusion, Biographical Information, Future, Top
 @section Conclusion
 
-Java is a solid implementation of Scheme with many features.
+Kawa is a solid implementation of Scheme with many features.
 It is portable to any environment that can run Java applications.
 It has active use and development.
 I have not bothered running benchmarks, because the state

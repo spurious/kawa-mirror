@@ -65,7 +65,12 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Procedure proc = (Procedure) (args[0]);
     int arity = args.length - 1;
     if (arity == 1)
-      return map1 (proc, args[1]);
+      {
+	if (collect)
+	  return map1 (proc, args[1]);
+	forEach1 (proc, args[1]);
+	return Values.empty;
+      }
     Object result;
     Pair last = null;
     if (collect)

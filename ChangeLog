@@ -1,3 +1,8 @@
+2002-09-26  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (applyN):  Handle for-each properly
+	when arity is 1.
+
 2002-09-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/define.java (scanForDefinitions):  If inlineOk is false,

@@ -1,3 +1,9 @@
+2005-01-19  Dominique Boucher <dominique.boucher@nuecho.com>
+	    Per Bothner  <per@bothner.com>
+
+	* ExponentialFormat.java (addOne): Fix fencepost error - test for
+	reaching the start of the substring *before* decrementing.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* RealNum.java:	Change "select" (preprocessor) syntax.

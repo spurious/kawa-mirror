@@ -38,18 +38,18 @@ public class ExponentialFormat extends java.text.Format
 
   static final double LOG10 = Math.log(10);
 
-  /** Add 1 to the integer in sbuf from didStart to digEnd.
+  /** Add 1 to the integer in sbuf from digStart to digEnd.
    * @return if we overflowed. */
   static boolean addOne(StringBuffer sbuf, int digStart, int digEnd)
   {
     for (int j = digEnd ;  ; )
       {
-	if (--j == digStart)
+	if (j == digStart)
 	  {
 	    sbuf.insert(j, '1');
 	    return true;
 	  }
-	char ch = sbuf.charAt(j);
+	char ch = sbuf.charAt(--j);
 	if (ch != '9')
 	  {
 	    sbuf.setCharAt(j, (char)((int) ch+1));

@@ -19,39 +19,24 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 				    Consumer consumer)
   {
     int child = tlist.gotoChildrenStart(index);
-    while (child >= 0)
+    if (child < 0)
+      return;
+    SeqPosition pos = SeqPosition.make(tlist, child << 1, null);
+    for (;;)
       {
-	int ipos = child << 1;
-	int kind = tlist.getNextKind(ipos, null);
-	if (kind == Sequence.EOF_VALUE)
+	if (! getNamedChild(pos, namespaceURI, localName))
 	  break;
-	int next = tlist.nextDataIndex(child);
-	if (kind == Sequence.GROUP_VALUE || kind == Sequence.DOCUMENT_VALUE)
+	if (consumer instanceof PositionConsumer)
+	  ((PositionConsumer) consumer).writePosition(tlist,
+						      pos.ipos, pos.xpos);
+	else
 	  {
-	    Object curName = tlist.getNextTypeObject(ipos, null);
-	    String curNamespaceURI;
-	    String curLocalName;
-	    if (curName instanceof QName)
-	      {
-		QName qname = (QName) curName;
-		curNamespaceURI = qname.getNamespaceURI();
-		curLocalName = qname.getLocalName();
-	      }
-	    else
-	      {
-		curNamespaceURI = "";
-		curLocalName = curName.toString().intern();  // FIXME
-	      }
-	    if ((localName == curLocalName || localName == null)
-		&& (namespaceURI == curNamespaceURI || namespaceURI == null))
-	      {
-		if (consumer instanceof PositionConsumer)
-		  ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
-		else
-		  tlist.consumeRange(child, next, consumer);
-	      }
+	    int ichild = pos.ipos >>> 1;
+	    int next = tlist.nextDataIndex(ichild);
+	    tlist.consumeRange(ichild, next, consumer);
+	    pos.ipos = next << 1;
 	  }
-	child = next;
+	tlist.gotoNext(pos, 0);
       }
   }
 

@@ -35,7 +35,9 @@ public class Document extends Procedure1
 	java.net.URL url = new java.net.URL(fileName);
 	TreeList doc = new TreeList();
 	doc.beginDocument();
-	XMLParser parser = new XMLParser(url, new ParsedXMLToConsumer(doc));
+	XMLParser parser
+	  = new XMLParser(url,
+			  new ParsedXMLToConsumer(new NamespaceResolver(doc)));
 	parser.parse();
 	doc.endDocument();
 	return doc;

@@ -42,29 +42,11 @@ PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = codegen kawa doc testsuite
-
-SUFFIXES = .java .class
-
-JAVA = java
-JAVAC=javac -classpath .:$(srcdir):$$CLASSPATH
-
 javadir=$(prefix)/java
-
-OBJ = kawac.class
-
-java_DATA=$(OBJ)
-
-# Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.java)
-
-CLEANFILES=$(OBJ)
 ACLOCAL = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-DATA =  $(java_DATA)
-
 DIST_COMMON =  README ChangeLog Makefile.am Makefile.in NEWS README TODO \
 aclocal.m4 configure configure.in install-sh mkinstalldirs
 
@@ -89,22 +71,6 @@ config.status: configure
 	$(SHELL) ./config.status --recheck
 $(srcdir)/configure: @MAINT@configure.in $(ACLOCAL) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && autoconf
-
-install-javaDATA: $(java_DATA)
-	$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(javadir)
-	list="$(java_DATA)"; for p in $$list; do \
-	  if test -f $(srcdir)/$$p; then \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
-	  else if test -f $$p; then \
-	    $(INSTALL_DATA) $$p $(javadir)/$$p; \
-	  fi; fi; \
-	done
-
-uninstall-javaDATA:
-	list="$(java_DATA)"; for p in $$list; do \
-	  rm -f $(javadir)/$$p; \
-	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -209,29 +175,24 @@ check: all-am
 	$(MAKE) check-recursive
 installcheck: installcheck-recursive
 install-info: install-info-recursive
-all-am: $(DATA) Makefile
-
-install-data-am: install-javaDATA
-
-uninstall-am: uninstall-javaDATA
+all-am: Makefile
 
 install-exec: install-exec-recursive
 	$(NORMAL_INSTALL)
 
-install-data: install-data-recursive install-data-am
+install-data: install-data-recursive
 	$(NORMAL_INSTALL)
 
-install: install-recursive install-data-am
+install: install-recursive
 	@:
 
-uninstall: uninstall-recursive uninstall-am
+uninstall: uninstall-recursive
 
 all: all-recursive all-am
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
 installdirs: installdirs-recursive
-	$(mkinstalldirs)  $(javadir)
 
 
 mostlyclean-generic:
@@ -269,29 +230,19 @@ maintainer-clean:  maintainer-clean-am maintainer-clean-recursive
 	@echo "it deletes files that may require special tools to rebuild."
 	rm -f config.status
 
-.PHONY: default uninstall-javaDATA install-javaDATA \
-install-data-recursive uninstall-data-recursive install-exec-recursive \
-uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
-all-recursive check-recursive installcheck-recursive info-recursive \
-dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
+.PHONY: default install-data-recursive uninstall-data-recursive \
+install-exec-recursive uninstall-exec-recursive installdirs-recursive \
+uninstalldirs-recursive all-recursive check-recursive \
+installcheck-recursive info-recursive dvi-recursive \
+mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info dvi check \
-installcheck install-info all-am install-data-am uninstall-am \
-install-exec install-data install uninstall all installdirs \
-mostlyclean-generic distclean-generic clean-generic \
-maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+installcheck install-info all-am install-exec install-data install \
+uninstall all installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
 
-
-.java.class:
-	$(JAVAC) -d . $<
-
-# This redundant rule is needed for some versions of make, but not GNU make.
-kawac.class:  $(srcdir)/kawac.java
-	$(JAVAC) -d . $<
-
-all-recursive:  kawac.class
 .SUFFIXES:
-.SUFFIXES: .java .class
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

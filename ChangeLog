@@ -1,3 +1,32 @@
+Mon Feb  3 17:05:29 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* kawa/repl.java:  Merge in kawac features.
+	* kawac.java:  Remove - no longer needed.
+	* Makefile.am:  Simplify, since we no longer have any .java files here.
+	* kawa/Makefilea.am:  Make all-recursive depend on repl.class.
+
+	* kawa/lang/Future.java (toString):  New.
+
+	* kawa/lang/Translator.java (rewrite_pair):  Look for PrimProcedure.
+	* kawa/lang/PrimApplyExp.java, kawa/lang/PrimProcedure.java,
+	kawa/standard/prim_method.java:  New classes.
+	* kawa/lang/Char.java (makeCharMethod):  Make public.
+	(charValueMethod, initMakeMethods):  New methods.
+	* kawa/lang/Expression.java (compile):  New overload - takes Type.
+
+	* kawa/Shell.java (run):  Make prompt arg be String, not boolean.
+	* kawa/{Shell,repl}.java, kawa/standard/load.java:  Update callers.
+
+	* kawa/standard/{char2integer,char_downcase,char_lower_case_p,
+	char_numeric_p,char_upcase,char_upper_case_p,char_whitespace_p,
+	integer2char}.java:  Removed.  Superceded by ../lib/characters.scm.
+	* kawa/standard/{list2vector,vector_length,vector_ref,
+	vector_set_b,vector_v}.java:  Superceded by ../lib/vectors.scm.
+	* kawa/standard/Scheme.java:  Update for new and moved methods.
+	* kawa/standard/Makefile.am:  Update - mostly removed classes.
+
+	* kawa/standard/negative_p.java:  Use isNegative rather than sign.
+
 Sat Jan 25 12:00:08 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa.java:  Moved to kawa/repl.java.

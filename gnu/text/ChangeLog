@@ -1,3 +1,9 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* Options.java (valueTable, infoTable):  Only allocate when needed.
+	(reset, getLocal, getBoolean(String, boolean), pushOptionValues,
+	popOptionValues):  New methods.
+
 2003-10-16  Per Bothner  <per@bothner.com>
 
 	* Options.java:  New class.

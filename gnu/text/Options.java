@@ -3,6 +3,7 @@
 
 package gnu.text;
 import java.util.Hashtable;
+import java.util.Vector;
 
 /** Mananges a table of named options,
  * Can inherit from another table of "default" options. */
@@ -30,10 +31,10 @@ public class Options
   }
 
   /** Maps property keys to options values. */
-  Hashtable valueTable = new Hashtable();
+  Hashtable valueTable;
 
   /** Maps property keys to OptionInfo. */
-  Hashtable infoTable = new Hashtable();
+  Hashtable infoTable;
 
   /** Create a new option and enters it in this table.
    * A duplicate option throws a RuntimeException.
@@ -42,8 +43,9 @@ public class Options
    * @param documentation a String describing what the option does. */
   public void add(String key, int kind, String documentation)
   {
-    Object old = (OptionInfo) infoTable.get(key);
-    if (old != null)
+    if (infoTable == null)
+      infoTable = new Hashtable();
+    else if (infoTable.get(key) != null)
       throw new RuntimeException("duplicate option key: "+key);
     OptionInfo info = new OptionInfo();
     info.key = key;
@@ -102,7 +104,7 @@ public class Options
       {
 	if (value instanceof String)
 	  value = valueOf(info, (String) value);
-	if (value == null)
+	if (! (value instanceof Boolean))
 	  {
 	    error("value for option "+key
 		  +" must be boolean or yes/no/true/false/1/0",
@@ -112,7 +114,20 @@ public class Options
       }
     else if (value == null)
       value = "";
+    if (valueTable == null)
+      valueTable = new Hashtable();
     valueTable.put(key, value);
+  }
+
+  /** Reset the value of a named option. */
+  public void reset (String key, Object oldValue)
+  {
+    if (valueTable == null)
+      valueTable = new Hashtable();
+    if (oldValue == null)
+      valueTable.remove(key);
+    else
+      valueTable.put(key, oldValue);
   }
 
   public static final String UNKNOWN = "unknown option name";
@@ -131,13 +146,15 @@ public class Options
 	if ((info.kind & BOOLEAN_OPTION) != 0)
 	  return "value of option "+key+" must be yes/no/true/false/1/0";
       }
+    if (valueTable == null)
+      valueTable = new Hashtable();
     valueTable.put(key, value);
     return null;
   }
 
   public OptionInfo getInfo (String key)
   {
-    Object info = infoTable.get(key);
+    Object info = infoTable == null ? null : infoTable.get(key);
     if (info == null && previous != null)
       info = previous.getInfo(key);
     return (OptionInfo) info;
@@ -149,7 +166,7 @@ public class Options
    * hasn't been set. */
   public Object get (String key, Object defaultValue)
   {
-    Object val = valueTable.get(key);
+    Object val = valueTable == null ? null : valueTable.get(key);
     if (val != null)
       return val;
     if (previous != null)
@@ -160,11 +177,58 @@ public class Options
     return defaultValue;
   }
 
+  /** Get current option value.
+   * Only look in local table, in in inherited previous Options.
+   * Return null if there is no binding (even when get would
+   * throw an except on an unknonw option).
+   */
+  public Object getLocal (String key)
+  {
+    return valueTable == null ? null : valueTable.get(key);
+  }
+
   public boolean getBoolean (String key)
   {
     return ((Boolean) get (key, Boolean.FALSE)).booleanValue();
   }
 
+  public boolean getBoolean (String key, boolean defaultValue)
+  {
+    Boolean defaultObject = defaultValue ? Boolean.TRUE : Boolean.FALSE;
+    return ((Boolean) get (key, defaultObject)).booleanValue();
+  }
+
+  /** Set a list of options, remember the old value.
+   * @ param options is vector of triples, echo of which is consisting of:
+   * a String option key;
+   * an entry whose valus is ignores and is used to store the old value; and
+   * a new value for the options.
+   */
+  public void pushOptionValues (Vector options)
+  {
+    int len = options.size();
+    for (int i = 0;  i < len;  )
+      {
+	String key = (String) options.elementAt(i++);
+	Object oldValue = getLocal(key);
+	Object newValue = options.elementAt(i);
+	options.setElementAt(newValue, i++);
+	set(key, options.elementAt(i++));
+      }
+  }
+
+  /** Restore a list of options, as set by pushOptionValues
+   */
+  public void popOptionValues (Vector options)
+  {
+    for (int i = options.size();  (i -= 3) >= 0;  )
+      {
+	String key = (String) options.elementAt(i);
+	Object oldValue = options.elementAt(i+1);
+	options.setElementAt(null, i+1);
+	reset(key, oldValue);
+      }
+  }
 }
 final class OptionInfo
 {

@@ -35,7 +35,7 @@
 (define (record-type-name (rtd :: <class-type>))
   (symbol->string
    (invoke-static <gnu.expr.Compilation> 'demangleName
-		  (invoke rtd 'getName))))
+		  (invoke rtd 'getName) #t)))
 
 (define (record-type-field-names rtd)
   ((primitive-static-method <record> "typeFieldNames"

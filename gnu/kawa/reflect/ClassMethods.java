@@ -56,7 +56,7 @@ public class ClassMethods extends ProcedureN
     Vector methods = new Vector();
     dtype.getMethods(filter, "<init>".equals(mname) ? 0 : 2,
 		     methods,
-		     Type.pointer_type);  // FIXME
+		     "-"); // Should be more specific - FIXME
 
     // Remove over-ridden methods.
     int mlength = methods.size();

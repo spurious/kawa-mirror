@@ -45,6 +45,8 @@ public class ClassType extends ObjectType implements AttrContainer {
   public final void setAttributes (Attribute attributes)
     { this.attributes = attributes; }
 
+  public static final ClassType[] noClasses = { };
+
   String sourcefile;
 
   boolean emitDebugInfo = true;
@@ -127,12 +129,14 @@ public class ClassType extends ObjectType implements AttrContainer {
    */
   public ClassType[] getInterfaces()
   {
-    if (interfaces == null && reflectClass != null)
+    if (interfaces == null && getReflectClass() != null)
       {
 	Class[] reflectInterfaces = reflectClass.getInterfaces();
-	interfaces = new ClassType[reflectInterfaces.length];
+	int numInterfaces = reflectInterfaces.length;
+	interfaces
+	  = numInterfaces == 0 ? noClasses : new ClassType[numInterfaces];
 
-	for (int i = 0; i < reflectInterfaces.length; i++)
+	for (int i = 0; i < numInterfaces; i++)
 	  interfaces[i] = (ClassType) Type.make(reflectInterfaces[i]);
       }
     return interfaces;
@@ -429,17 +433,18 @@ public class ClassType extends ObjectType implements AttrContainer {
 	  }
       if (searchSupers == 0)
 	break;
+
+      if (searchSupers > 1)
+	{
+	  ClassType[] interfaces = ctype.getInterfaces();
+	  if (interfaces != null)
+	    {
+	      for (int i = 0;  i < interfaces.length;  i++)
+		count += interfaces[i].getMethods(filter, searchSupers,
+						  result, offset+count);
+	    }
+	}
     }
-    if (searchSupers > 1)
-      {
-	ClassType[] interfaces = getInterfaces();
-	if (interfaces != null)
-	  {
-	    for (int i = 0;  i < interfaces.length;  i++)
-	      count += interfaces[i].getMethods(filter, searchSupers,
-						result, offset+count);
-	  }
-      }
     return count;
   }
 
@@ -449,11 +454,11 @@ public class ClassType extends ObjectType implements AttrContainer {
    *   1 if superclasses should also be searched,
    *   2 if super-interfaces should also be search
    * @param result Vector to add selected methods in
-   * @param context If non-null, skip if class not visible in context.
+   * @param context If non-null, skip if class not visible in named package.
    * @return number of methods placed in result array
    */
   public int getMethods (Filter filter, int searchSupers, Vector result,
-			 ClassType context)
+			 String context)
   {
     int count = 0;
     for (ClassType ctype = this;  ctype != null;
@@ -461,7 +466,7 @@ public class ClassType extends ObjectType implements AttrContainer {
     {
       if (context == null
 	  || (ctype.getModifiers() & Access.PUBLIC) != 0
-	  || context.getPackageName().equals(ctype.getPackageName()))
+	  || context.equals(ctype.getPackageName()))
 	{
 	  for (Method meth = ctype.getDeclaredMethods();
 	       meth != null;  meth = meth.getNext())
@@ -474,17 +479,18 @@ public class ClassType extends ObjectType implements AttrContainer {
 	}
       if (searchSupers == 0)
 	break;
+
+      if (searchSupers > 1)
+	{
+	  ClassType[] interfaces = ctype.getInterfaces();
+	  if (interfaces != null)
+	    {
+	      for (int i = 0;  i < interfaces.length;  i++)
+		count += interfaces[i].getMethods(filter, searchSupers,
+						  result, context);
+	    }
+	}
     }
-    if (searchSupers > 1)
-      {
-	ClassType[] interfaces = getInterfaces();
-	if (interfaces != null)
-	  {
-	    for (int i = 0;  i < interfaces.length;  i++)
-	      count += interfaces[i].getMethods(filter, searchSupers,
-						result, context);
-	  }
-      }
     return count;
   }
 

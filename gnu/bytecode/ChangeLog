@@ -1,3 +1,16 @@
+2001-11-21  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (noClasses):  New static field.
+	(getInterfaces):  Use getReflectClass().
+	Use noClasses when there are no intefaces.
+	(getMethods):  Search interface also of super-classes.
+	Fixes problem reported by Valtteri Vuorikoski.
+
+	* ClassType.java (getMethods):  Context is now a package name, rather
+	than a ClassType.  Fixes problem reported by Walter Pelissero, where
+	Sun has a private java.lang.UnixProcess which we considered to be in
+	the same package as java.lang.Object, which used to mean "any class",
+
 2001-11-17  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getPackageName):  New method.

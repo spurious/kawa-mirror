@@ -305,6 +305,3 @@ class Prompter extends Procedure1
     return "xquery[" + (((InPort) arg).getLineNumber() + 1) + "]: ";
   }
 }
-
-
-

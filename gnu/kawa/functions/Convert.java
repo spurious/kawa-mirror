@@ -88,6 +88,17 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
     return new ApplyExp(c, exps);
   }
 
+  /**
+   * Convenience method to make an Expression that coerces a value.
+   * @param value to be coerced
+   * @param type to coerce value to
+   * @return expression that coerces value to type
+   */
+  public static Expression makeCoercion(Expression value, Type type)
+  {
+    return makeCoercion(value, new QuoteExp(type));
+  }
+
   /** Modify LambdaExp so result is coerced to given type. */
   public static void setCoercedReturnValue (LambdaExp lexp, Expression type,
 					    Interpreter interp)
@@ -101,16 +112,4 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
 	lexp.setReturnType(rtype);
       }
   }
-
-  /**
-   * Convenience method to make an Expression that coerces a value.
-   * @param value to be coerced
-   * @param type to coerce value to
-   * @return expression that coerces value to type
-   */
-  public static Expression makeCoercion(Expression value, Type type)
-  {
-    return makeCoercion(value, new QuoteExp(type));
-  }
-
 }

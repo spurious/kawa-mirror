@@ -374,7 +374,7 @@ public class Translator extends Compilation
 		Object uri_decl = lexical.lookup(xprefix, function);
 		if (uri_decl instanceof Declaration)
 		  {
-		    decl = (Declaration) uri_decl;
+		    decl = Declaration.followAliases((Declaration) uri_decl);
 		    Expression dval = decl.getValue();
 		    if (dval instanceof QuoteExp)
 		      {

@@ -24,6 +24,15 @@ public class ContentConsumer implements Consumer, Attributes
   /** 1 if in start-tag, 2 if in attribute value, 0 otherwise. */
   int inStartTag;
 
+  public ContentConsumer ()
+  {
+  }
+
+  public ContentConsumer (ContentHandler handler)
+  {
+    out = handler;
+  }
+
   public void error(String method, SAXException ex)
   {
     throw new RuntimeException("caught "+ex+" in "+method);

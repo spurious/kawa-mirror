@@ -1,3 +1,7 @@
+Thu Feb 11 16:14:30 1999  Zvi Har'El  <rl@math.technion.ac.il>
+
+	* InnerClassesAttr.java (print): Fix for anonymous classes.
+
 1999-02-28  Geoff Berry  <gcb@duke.edu>
 
 	* CodeAttr.java (emitArrayLength): Add type check for incoming

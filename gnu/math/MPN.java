@@ -74,9 +74,10 @@ class MPN
 
   /** Multiply x[0:len-1] by y, and write the len least
    * significant words of the product to dest[0:len-1].
-   * Return the most significant words of the product.
+   * Return the most significant word of the product.
    * All values are treated as if they were unsigned
    * (i.e. masked with 0xffffffffL).
+   * OK if dest==x (not sure if this is guaranteed for mpn_mul_1).
    * This function is basically the same as gmp's mpn_mul_1.
    */
 

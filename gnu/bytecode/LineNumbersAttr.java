@@ -58,10 +58,10 @@ public class LineNumbersAttr extends Attribute
   public void write (DataOutputStream dstr) throws java.io.IOException
   {
     dstr.writeShort (linenumber_count);
-    for (int i = 0;  i < linenumber_count;  i++)
+    int count = 2 * linenumber_count;
+    for (int i = 0;  i < count;  i++)
       {
-	dstr.writeShort (linenumber_table[2 * i]);  // start_pc
-	dstr.writeShort (linenumber_table[2 * i + 1]);  // line_number
+	dstr.writeShort(linenumber_table[i]);
       }
   }
 

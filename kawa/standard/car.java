@@ -14,6 +14,6 @@ public class car extends Procedure1
     if (arg1 instanceof Pair)
       return ((Pair)arg1).car;
     else
-      throw new WrongType(this.name,1,"pair");
+      throw new WrongType(this.name (), 1, "pair");
   }
 }

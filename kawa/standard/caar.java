@@ -17,6 +17,6 @@ public class caar extends Procedure1
 	if (arg1 instanceof Pair)
 	  return ((Pair)arg1).car;
       }
-    throw new kawa.lang.WrongType(this.name,1,"list");
+    throw new kawa.lang.WrongType(this.name(),1,"list");
   }
 }

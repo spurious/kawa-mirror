@@ -34,7 +34,7 @@ public class caaadr extends kawa.lang.Procedure1 {
             throw new kawa.lang.GenericError("Result of the cdr not a pair.");
          }
       } else {
-         throw new kawa.lang.WrongType(this.name,1,"list");
+         throw new kawa.lang.WrongType(this.name(),1,"list");
       }
    }
 

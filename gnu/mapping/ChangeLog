@@ -1,3 +1,8 @@
+2002-10-28  Per Bothner  <bothner@bothner.com>
+
+	* Binding.java:  Renamed to Symbol.java.
+	* BindingEnumerator.java:  Renamed to SymbolEnumerator.java.
+
 2002-09-26  Per Bothner  <per@bothner.com>
 
 	* Location.java (get(Object)):  New method.

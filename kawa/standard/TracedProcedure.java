@@ -11,8 +11,8 @@ public class TracedProcedure extends ProcedureN
   public Procedure proc;
   boolean enabled;
 
-  static Binding indentation
-  = Binding.make(gnu.math.IntNum.zero(), "indentation");
+  static Symbol indentation
+  = Symbol.make(gnu.math.IntNum.zero(), "indentation");
   static int indentationStep = 2;
 
   public TracedProcedure (Procedure proc, boolean enable)

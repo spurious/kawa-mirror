@@ -14,37 +14,37 @@ public class Symbols
   public static boolean isSymbol(Object val)
   {
     return val instanceof String || val == Lisp2.FALSE
-      || val instanceof Binding;
+      || val instanceof Symbol;
   }
 
   public static boolean isBound(Object sym)
   {
     if (sym == Lisp2.FALSE)
       return true;
-    Binding binding = sym instanceof Binding ? (Binding) sym
+    Symbol symbol = sym instanceof Symbol ? (Symbol) sym
       :Environment.getCurrent().lookup((String) sym);
-    return binding != null && binding.isBound();
+    return symbol != null && symbol.isBound();
   }
   
-  public static Binding getBinding(Environment env, Object sym)
+  public static Symbol getSymbol(Environment env, Object sym)
   {
     if (sym == Lisp2.FALSE)
       sym = "nil";
-    return sym instanceof Binding ? (Binding) sym
-      : env.getBinding((String) sym);
+    return sym instanceof Symbol ? (Symbol) sym
+      : env.getSymbol((String) sym);
   }
 
-  public static Binding getBinding(Object sym)
+  public static Symbol getSymbol(Object sym)
   {
     if (sym == Lisp2.FALSE)
       sym = "nil";
-    return sym instanceof Binding ? (Binding) sym
-      : Environment.getCurrent().getBinding((String) sym);
+    return sym instanceof Symbol ? (Symbol) sym
+      : Environment.getCurrent().getSymbol((String) sym);
   }
 
   public static void setValueBinding(Object symbol, Object value)
   {
-    getBinding(symbol).set(value);
+    getSymbol(symbol).set(value);
   }
 
   public static Object getPrintName(String sym)
@@ -59,21 +59,18 @@ public class Symbols
 
   public static Object getFunctionBinding (Object symbol)
   {
-    Binding binding = getBinding(symbol);
-    return binding.getFunctionValue();
+    return getSymbol(symbol).getFunctionValue();
   }
 
   public static Object getFunctionBinding (Environment environ, Object symbol)
   {
-    Binding binding = getBinding(environ, symbol);
-    return binding.getFunctionValue();
+    return getSymbol(environ, symbol).getFunctionValue();
   }
 
   public static void setFunctionBinding (Environment environ,
 					 Object symbol, Object value)
   {
-    Binding binding = getBinding(environ, symbol);
-    binding.setFunctionValue(value);
+    getSymbol(environ, symbol).setFunctionValue(value);
   }
 
   /**

@@ -72,10 +72,10 @@ public class SlotGet extends Procedure2
         try
           {
             Object result = field.get(obj);
-	    if (result instanceof Binding
+	    if (result instanceof Symbol
 		&& ((field.getModifiers() & java.lang.reflect.Modifier.FINAL)
 		    != 0))
-	      result = ((Binding) result).get();
+	      result = ((Symbol) result).get();
 	    else
 	      result = interpreter.coerceToObject(field.getType(), result);
             return result;
@@ -243,7 +243,7 @@ public class SlotGet extends Procedure2
             else
               code.emitGetField(field);
 	    Type ftype = field.getType();
-	    if ("gnu.mapping.Binding".equals(ftype.getName())
+	    if ("gnu.mapping.Symbol".equals(ftype.getName())
 		&& (modifiers & Access.FINAL) != 0)
 	      code.emitInvokeVirtual(Compilation.getLocationMethod);
 	    Interpreter interpreter = Interpreter.getInterpreter();

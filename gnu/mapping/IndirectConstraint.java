@@ -2,7 +2,7 @@ package gnu.mapping;
 
 public class IndirectConstraint extends Constraint
 {
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol binding, Object defaultValue)
   {
     try
       {
@@ -22,7 +22,7 @@ public class IndirectConstraint extends Constraint
       }
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol binding, Object value)
   {
     try
       {
@@ -49,7 +49,7 @@ public class IndirectConstraint extends Constraint
 
   public static void define (String name, Procedure location, Environment env)
   {
-    Binding binding = env.getBinding(name);
+    Symbol binding = env.getSymbol(name);
     synchronized (binding)
       {
 	binding.value = location;
@@ -57,7 +57,7 @@ public class IndirectConstraint extends Constraint
       }
   }
 
-  public static void define (Binding binding, Procedure location)
+  public static void define (Symbol binding, Procedure location)
   {
     synchronized (binding)
       {

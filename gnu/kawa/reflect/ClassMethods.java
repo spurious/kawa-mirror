@@ -27,12 +27,12 @@ public class ClassMethods extends ProcedureN
     if (arg0 instanceof ClassType)
       dtype = (ClassType) arg0;
     else if (arg0 instanceof String || arg0 instanceof FString
-	     || arg0 instanceof Binding)
+	     || arg0 instanceof Symbol)
       dtype = ClassType.make(arg0.toString());
     else
       throw new WrongType(thisProc, 0, null);
     if (arg1 instanceof String || arg1 instanceof FString
-	|| arg1 instanceof Binding)
+	|| arg1 instanceof Symbol)
       mname = arg1.toString();
     else
       throw new WrongType(thisProc, 1, null);
@@ -198,7 +198,7 @@ public class ClassMethods extends ProcedureN
       {
         Object name = ((QuoteExp) exp).getValue();
         if (name instanceof FString || name instanceof String
-	    || name instanceof Binding)
+	    || name instanceof Symbol)
           return Compilation.mangleNameIfNeeded(name.toString());
       }
     return null;

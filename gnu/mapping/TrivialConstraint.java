@@ -1,6 +1,6 @@
 package gnu.mapping;
 
-/** This is the default Constraint for a simple variable Binding. */
+/** This is the default Constraint for a simple variable Symbol. */
 
 public class TrivialConstraint extends Constraint
 {
@@ -32,7 +32,7 @@ public class TrivialConstraint extends Constraint
     return result;
   }
 
-  public static TrivialConstraint getInstance(Binding binding)
+  public static TrivialConstraint getInstance(Symbol binding)
   {
     Constraint constraint = binding.constraint;
     if (constraint instanceof TrivialConstraint)
@@ -45,22 +45,22 @@ public class TrivialConstraint extends Constraint
     this.environment = environment;
   }
 
-  public boolean isBound (Binding binding)
+  public boolean isBound (Symbol binding)
   {
     return true;
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol binding, Object defaultValue)
   {
     return binding.value;
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol binding, Object value)
   {
     binding.value = value;
   }
 
-  public Environment getEnvironment (Binding binding)
+  public Environment getEnvironment (Symbol binding)
   {
     return environment;
   }

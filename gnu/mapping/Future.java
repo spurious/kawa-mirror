@@ -117,4 +117,3 @@ public class Future extends Thread
     return CallContext.getInstance().fluidBindings;
   }
 }
-

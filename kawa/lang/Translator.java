@@ -133,32 +133,32 @@ public class Translator extends Compilation
   {
     if (! literal.equals(form))
       return false;
-    Binding binding = environ.lookup(literal);
-    if (binding == null || ! binding.isBound())
+    Symbol symbol = environ.lookup(literal);
+    if (symbol == null || ! symbol.isBound())
       return true;
-    Object val1 = binding.getValue();
+    Object val1 = symbol.getValue();
     // Check for hygiene re-naming - see SyntaxRule.execute_template.
     return val1 == literal;
   }
 
-  Binding lookup(Object obj)
+  Symbol lookup(Object obj)
   {
     String name = obj.toString();
-    Binding binding = environ.lookup(name);
-    if (binding == null)
-      binding = obj instanceof Binding ? (Binding) obj : env.lookup(name);
-    else if (binding.isBound())
+    Symbol symbol = environ.lookup(name);
+    if (symbol == null)
+      symbol = obj instanceof Symbol ? (Symbol) obj : env.lookup(name);
+    else if (symbol.isBound())
       {
-	Object val1 = binding.getValue();
+	Object val1 = symbol.getValue();
 	// Check for hygiene re-naming - see SyntaxRule.execute_template.
 	if (val1 instanceof String)
 	  {
 	    name = (String) val1;
-	    binding = env.lookup(name);
+	    symbol = env.lookup(name);
 	  }
       }
     nameToLookup = name;
-    return binding;
+    return symbol;
   }
 
   public Declaration lookup(String name, int namespace)
@@ -188,14 +188,14 @@ public class Translator extends Compilation
     return decl;
   }
 
-  Object resolve(Binding binding, boolean function)
+  Object resolve(Symbol symbol, boolean function)
   {
-    if (binding == null)
+    if (symbol == null)
       return null;
     if (function && getInterpreter().hasSeparateFunctionNamespace())
-      return binding.getFunctionValue(null);
-    if (binding.isBound())
-      return binding.getValue();
+      return symbol.getFunctionValue(null);
+    if (symbol.isBound())
+      return symbol.getValue();
     return null;
   }
 
@@ -204,10 +204,10 @@ public class Translator extends Compilation
    */
   Object getBinding (Object obj, boolean function)
   {
-    if (obj instanceof String || obj instanceof Binding)
+    if (obj instanceof String || obj instanceof Symbol)
       {
-	Binding binding = lookup(obj);
-	obj = resolve(binding, function);
+	Symbol symbol = lookup(obj);
+	obj = resolve(symbol, function);
         if (obj instanceof Syntax)
           return obj;
 	if (obj instanceof Declaration)
@@ -224,9 +224,9 @@ public class Translator extends Compilation
 	  }
 	else
 	  {
-	    binding = env.lookup(nameToLookup);
-	    if (binding != null && binding.isBound())
-	      return binding.get();
+	    symbol = env.lookup(nameToLookup);
+	    if (symbol != null && symbol.isBound())
+	      return symbol.get();
 	  }
 	return null;
       }
@@ -261,12 +261,12 @@ public class Translator extends Compilation
 	if (decl == null)
 	  {
             String name = ref.getName();
-            Binding binding = env.lookup(name);
-	    if (binding != null)
+            Symbol symbol = env.lookup(name);
+	    if (symbol != null)
 	      if (getInterpreter().hasSeparateFunctionNamespace())
-		proc = binding.getFunctionValue(null);
+		proc = symbol.getFunctionValue(null);
 	      else
-		proc = binding.get(null);
+		proc = symbol.get(null);
 	    if (proc instanceof Syntax)
 	      return apply_rewrite ((Syntax) proc, p);
             if (proc instanceof AutoloadProcedure)
@@ -327,10 +327,10 @@ public class Translator extends Compilation
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair ((Pair) exp);
-    else if (exp instanceof String || exp instanceof Binding)
+    else if (exp instanceof String || exp instanceof Symbol)
       {
-	Binding binding = lookup(exp);
-	Object value = resolve(binding, function);
+	Symbol symbol = lookup(exp);
+	Object value = resolve(symbol, function);
 	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
 	Declaration decl = null;
         if (value instanceof Declaration) // ?? FIXME
@@ -353,7 +353,7 @@ public class Translator extends Compilation
                   }
               }
             Named proc = (Named) value;
-            Constraint constraint = binding.getConstraint();
+            Constraint constraint = symbol.getConstraint();
             if (constraint instanceof StaticFieldConstraint)
               {
                 StaticFieldConstraint fconstraint

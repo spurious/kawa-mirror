@@ -7,12 +7,12 @@ package gnu.mapping;
 
 public class FluidConstraint extends Constraint
 {
-  /** The original Constraint from the Binding.
+  /** The original Constraint from the Symbol.
    * Use this to get the default value if there is no fluid binding
    * in the current thread. */
   Constraint savedConstraint;
 
-  /** Number of active FluidBinding objects for our Binding. */
+  /** Number of active FluidBinding objects for our Symbol. */
   int referenceCount;
 
   public FluidConstraint (Constraint savedConstraint)
@@ -20,18 +20,18 @@ public class FluidConstraint extends Constraint
     this.savedConstraint = savedConstraint;
   }
 
-  FluidBinding find (Binding binding)
+  FluidBinding find (Symbol symbol)
   {
     FluidBinding fl = Future.getFluids();
     for (; fl != null;  fl = fl.previous)
       {
-	if (fl.binding == binding)
+	if (fl.symbol == symbol)
 	  return fl;
       }
     return null;
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol binding, Object defaultValue)
   {
     FluidBinding fl = find(binding);
     if (fl == null)
@@ -40,7 +40,7 @@ public class FluidConstraint extends Constraint
       return fl.value;
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol binding, Object value)
   {
     FluidBinding fl = find(binding);
     if (fl == null)

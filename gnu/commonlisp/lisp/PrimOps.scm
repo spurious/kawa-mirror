@@ -59,10 +59,10 @@
        #!void)
       '() 't))
 
-(define (get (symbol :: <gnu.mapping.Binding>) property #!optional (default '()))
+(define (get (symbol :: <gnu.mapping.Symbol>) property #!optional (default '()))
   (invoke symbol 'getProperty property default))
 
-(define (put (symbol :: <gnu.mapping.Binding>) property value)
+(define (put (symbol :: <gnu.mapping.Symbol>) property value)
   (invoke symbol 'setProperty property value))
 
 ;; VARIABLES
@@ -71,7 +71,7 @@
 ;;     binding nor a global value.
 
 (define (symbol-value sym)
-  (invoke (invoke-static <gnu.commonlisp.lang.Symbols> 'getBinding sym) 'get))
+  (invoke (invoke-static <gnu.commonlisp.lang.Symbols> 'getSymbol sym) 'get))
 
 ;; setq
 

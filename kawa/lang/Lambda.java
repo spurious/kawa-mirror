@@ -109,7 +109,7 @@ public class Lambda extends Syntax implements Printable
 	  lexp.min_args++;
 	bindings = pair.cdr;
       }
-    if (bindings instanceof String || bindings instanceof Binding)
+    if (bindings instanceof String || bindings instanceof Symbol)
       {
 	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
 	  {
@@ -168,7 +168,7 @@ public class Lambda extends Syntax implements Printable
 	    tr.syntaxError("'::' must follow parameter name");
 	    return;
 	  }
-	if (pair.car instanceof String || pair.car instanceof Binding)
+	if (pair.car instanceof String || pair.car instanceof Symbol)
           {
             name = pair.car.toString();
             if (pair.cdr instanceof Pair
@@ -187,7 +187,7 @@ public class Lambda extends Syntax implements Printable
           }
 	else if (pair.car instanceof Pair
 		 && ((p = (Pair) pair.car).car instanceof String
-		     || p.car instanceof Binding)
+		     || p.car instanceof Symbol)
 		 && p.cdr instanceof Pair)
           {
 	    name = p.car.toString();
@@ -270,7 +270,7 @@ public class Lambda extends Syntax implements Printable
 	decl.noteValue(null);  // Does not have a known value.
 	tr.push(decl);
       }
-    if (bindings instanceof String || bindings instanceof Binding)
+    if (bindings instanceof String || bindings instanceof Symbol)
       {
 	Declaration decl = lexp.addDeclaration (bindings.toString());
 	decl.setType(Compilation.scmListType);

@@ -56,18 +56,18 @@ public class ScmEnv extends Environment
 
   public Object get (String name, Object defaultValue)
   {
-    Binding binding = lookup(name);
-    Object value = binding == null ? defaultValue : binding.get(defaultValue);
+    Symbol symbol = lookup(name);
+    Object value = symbol == null ? defaultValue : symbol.get(defaultValue);
     if (value != defaultValue
-	|| (defaultValue != Binding.UNBOUND
-	    && super.get(name, Binding.UNBOUND) != Binding.UNBOUND))
+	|| (defaultValue != Symbol.UNBOUND
+	    && super.get(name, Symbol.UNBOUND) != Symbol.UNBOUND))
       return value;
 
-    if (binding != null)
+    if (symbol != null)
       {
-	binding = AliasConstraint.followAliases(binding);
-	if (binding != null)
-	  name = binding.getName();
+	symbol = AliasConstraint.followAliases(symbol);
+	if (symbol != null)
+	  name = symbol.getName();
       }
 
     if (name.endsWith("$unit"))
@@ -82,8 +82,8 @@ public class ScmEnv extends Environment
 
     for (int i = numExtras;  --i >= 0; )
       {
-	value = extras[i].get(name, Binding.UNBOUND);
-	if (value != Binding.UNBOUND)
+	value = extras[i].get(name, Symbol.UNBOUND);
+	if (value != Symbol.UNBOUND)
 	  return value;
       }
     return defaultValue;
@@ -98,9 +98,9 @@ class ScmEnvConstraint extends UnboundConstraint
     super(environment);
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol symbol, Object defaultValue)
   {
-    String name = binding.getName();
+    String name = symbol.getName();
     if (name.endsWith("$unit"))
       {
         Unit unit = Unit.lookup(name.substring(0, name.length()-5));
@@ -110,7 +110,7 @@ class ScmEnvConstraint extends UnboundConstraint
     gnu.bytecode.Type type = ScmEnv.getType(name);
     if (type == null)
       return defaultValue;
-    set(binding, type);
+    set(symbol, type);
     return type;
   }
 }

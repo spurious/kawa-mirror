@@ -14,8 +14,8 @@ public class StaticFieldConstraint extends ClassMemberConstraint
   public static void define(Environment environ, String name,
                             String cname, String fname)
   {
-    Binding binding = environ.getBinding(name);
-    setConstraint(binding, new StaticFieldConstraint(cname, fname));
-    //    binding.value = null;
+    Symbol symbol = environ.getSymbol(name);
+    setConstraint(symbol, new StaticFieldConstraint(cname, fname));
+    //    symbol.value = null;
   }
 }

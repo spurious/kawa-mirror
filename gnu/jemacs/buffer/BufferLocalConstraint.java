@@ -2,7 +2,7 @@ package gnu.jemacs.buffer;
 import gnu.mapping.*;
 
 /**
- * A Constraint on a Binding that implements buffer-local variable.
+ * A Constraint on a Symbol that implements buffer-local variable.
  */
 
 public class BufferLocalConstraint extends Constraint
@@ -19,9 +19,9 @@ public class BufferLocalConstraint extends Constraint
 
   Object[] bufferBindings;
   
-  public static void make(Binding binding, boolean all)
+  public static void make(Symbol symbol, boolean all)
   {
-    Constraint oldConstraint = getConstraint(binding);
+    Constraint oldConstraint = getConstraint(symbol);
     BufferLocalConstraint newConstraint;
     if (oldConstraint instanceof BufferLocalConstraint)
       newConstraint = (BufferLocalConstraint) oldConstraint;
@@ -31,7 +31,7 @@ public class BufferLocalConstraint extends Constraint
 	newConstraint.all = all;
 	newConstraint.oldConstraint = oldConstraint;
 
-	binding.setConstraint(newConstraint);
+	symbol.setConstraint(newConstraint);
       }
     if (! all)
       {
@@ -71,7 +71,7 @@ public class BufferLocalConstraint extends Constraint
     
   }
 
-  public boolean isBound (Binding binding)
+  public boolean isBound (Symbol symbol)
   {
     Buffer buffer = Buffer.getCurrent();
     if (buffer == lastBuffer)
@@ -96,10 +96,10 @@ public class BufferLocalConstraint extends Constraint
 	  }
 	lastValue = this;
       }
-    return oldConstraint.isBound(binding);
+    return oldConstraint.isBound(symbol);
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol symbol, Object defaultValue)
   {
     Buffer buffer = Buffer.getCurrent();
     if (buffer == lastBuffer)
@@ -123,12 +123,12 @@ public class BufferLocalConstraint extends Constraint
 	      }
 	  }
       }
-    lastValue = oldConstraint.get(binding, defaultValue);
+    lastValue = oldConstraint.get(symbol, defaultValue);
     lastBuffer = buffer;
     return lastValue;
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol symbol, Object value)
   {
     Buffer buffer = Buffer.getCurrent();
     if (buffer != lastBuffer)
@@ -155,11 +155,11 @@ public class BufferLocalConstraint extends Constraint
 	lastValue = value;
 	return;
       }
-    oldConstraint.set(binding, value);
+    oldConstraint.set(symbol, value);
   }
 
-  public Environment getEnvironment (Binding binding)
+  public Environment getEnvironment (Symbol symbol)
   {
-    return oldConstraint.getEnvironment(binding);
+    return oldConstraint.getEnvironment(symbol);
   }
 }

@@ -7,34 +7,34 @@ package gnu.mapping;
 
 public class AliasConstraint extends Constraint
 {
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol binding, Object defaultValue)
   {
     return ((Location) binding.value).get(defaultValue);
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol binding, Object value)
   {
     ((Location) binding.value).set(value);
   }
 
-  public boolean isBound (Binding binding)
+  public boolean isBound (Symbol binding)
   {
     return ((Location) binding.value).isBound();
   }
 
-  public Object getFunctionValue(Binding binding)
+  public Object getFunctionValue(Symbol binding)
   {
-    return ((Binding) binding.value).getFunctionValue();
+    return ((Symbol) binding.value).getFunctionValue();
   }
 
-  public static Binding followAliases(Binding binding)
+  public static Symbol followAliases(Symbol binding)
   {
     while (binding.constraint instanceof AliasConstraint)
-      binding = (Binding) binding.value;
+      binding = (Symbol) binding.value;
     return binding;
   }
 
-  public static void define (Binding binding, Location location)
+  public static void define (Symbol binding, Location location)
   {
     synchronized (binding)
       {

@@ -3,7 +3,7 @@
 
 package gnu.mapping;
 
-/** A constraint for an immutable binding. */
+/** A constraint for an immutable symbol. */
 
 public class ConstantConstraint extends Constraint
 {
@@ -35,12 +35,12 @@ public class ConstantConstraint extends Constraint
     return result;
   }
 
-  public static ConstantConstraint getInstance(Binding binding)
+  public static ConstantConstraint getInstance(Symbol symbol)
   {
-    Constraint constraint = binding.constraint;
+    Constraint constraint = symbol.constraint;
     if (constraint instanceof ConstantConstraint)
-      return (ConstantConstraint) binding.constraint;
-    return getInstance(constraint.getEnvironment(binding));
+      return (ConstantConstraint) symbol.constraint;
+    return getInstance(constraint.getEnvironment(symbol));
   }
 
   public ConstantConstraint (Environment environment)
@@ -48,25 +48,25 @@ public class ConstantConstraint extends Constraint
     this.environment = environment;
   }
 
-  public boolean isBound (Binding binding)
+  public boolean isBound (Symbol symbol)
   {
     return true;
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol symbol, Object defaultValue)
   {
-    return binding.value;
+    return symbol.value;
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol symbol, Object value)
   {
-    if (binding.value == value)
+    if (symbol.value == value)
       return; // No change - ignore
     throw new IllegalStateException("attempt to modify read-only variable: "
-				    + binding.getName());
+				    + symbol.getName());
   }
 
-  public Environment getEnvironment (Binding binding)
+  public Environment getEnvironment (Symbol symbol)
   {
     return environment;
   }

@@ -12,10 +12,10 @@ public class Command
     for (;;)
       {
 	if (command instanceof String)
-	  command = gnu.commonlisp.lang.Symbols.getBinding(command);
-	if (command instanceof Binding)
+	  command = gnu.commonlisp.lang.Symbols.getSymbol(command);
+	if (command instanceof Symbol)
 	  {
-	    Binding bind = (Binding) command;
+	    Symbol bind = (Symbol) command;
 	    command = bind.getFunctionValue(null);
 	    if (command == null)
 	      command = bind.getValue();

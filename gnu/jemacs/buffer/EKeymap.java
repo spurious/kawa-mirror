@@ -337,7 +337,7 @@ implements gnu.mapping.Named
 	else
 	  {
 	    Object car = pair.car;
-	    if (car instanceof Binding)
+	    if (car instanceof Symbol)
 	      car = car.toString();
 	    if (car == "control")
 	      m |= CTRL_MASK;
@@ -358,7 +358,7 @@ implements gnu.mapping.Named
       {
 	return asKeyStroke((char) ((IntNum) key).intValue(), m);
       }
-    if (key instanceof String || key instanceof Binding)
+    if (key instanceof String || key instanceof Symbol)
       {
 	String name = key.toString();
 	if (name.length() == 1)
@@ -540,7 +540,7 @@ implements gnu.mapping.Named
         if (i == nKeys)
           return command;
 	Object comm;
-	if (command instanceof String || command instanceof Binding)
+	if (command instanceof String || command instanceof Symbol)
 	  command = Command.resolveSymbol(command);
 	if (command instanceof EKeymap)
 	  keymap = (EKeymap) command;

@@ -99,7 +99,7 @@ public class DisplayFormat extends AbstractFormat
       writeChar(((Char)obj).charValue(), out);
     else if (obj instanceof Character)
       writeChar(((Character)obj).charValue(), out);
-    else if (obj instanceof Binding)
+    else if (obj instanceof Symbol)
       writeObject(obj.toString(), out);
     else if (obj instanceof CharSeq)
       {

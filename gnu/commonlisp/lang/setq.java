@@ -23,7 +23,7 @@ public class setq extends Syntax implements Printable
 	Pair pair = (Pair) obj;
 	Object sym = pair.car;
 	String name;
-	if (sym instanceof String || sym instanceof Binding)
+	if (sym instanceof String || sym instanceof Symbol)
 	  name = sym.toString();
 	else if (sym == CommonLisp.FALSE)
 	  name = "nil";

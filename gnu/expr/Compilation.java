@@ -92,13 +92,13 @@ public class Compilation
     = ClassType.make("gnu.mapping.Environment");
   static public ClassType typeLocation
     = ClassType.make("gnu.mapping.Location");
-  static public ClassType typeBinding
-    = ClassType.make("gnu.mapping.Binding", typeLocation);
+  static public ClassType typeSymbol
+    = ClassType.make("gnu.mapping.Symbol", typeLocation);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
   static public final Method getProcedureBindingMethod
-    = typeBinding.addMethod("getProcedure", Type.typeArray0,
+    = typeSymbol.addMethod("getProcedure", Type.typeArray0,
 			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
     = scmBooleanType.addField ("TRUE", scmBooleanType,
@@ -131,9 +131,9 @@ public class Compilation
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
 
-  static public final Method getBindingEnvironmentMethod
-    = typeEnvironment.addMethod("getBinding", string1Arg,
-				typeBinding, Access.PUBLIC);
+  static public final Method getSymbolEnvironmentMethod
+    = typeEnvironment.addMethod("getSymbol", string1Arg,
+				typeSymbol, Access.PUBLIC);
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };

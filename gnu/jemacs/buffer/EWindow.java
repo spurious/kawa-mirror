@@ -252,7 +252,7 @@ public abstract class EWindow
 
   public void handleCommand (Object command)
   {
-    if (command instanceof String || command instanceof Binding)
+    if (command instanceof String || command instanceof Symbol)
       {
 	Object resolved = Command.resolveSymbol(command);
 	if (resolved == null)

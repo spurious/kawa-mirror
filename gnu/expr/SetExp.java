@@ -76,7 +76,7 @@ public class SetExp extends Expression
   {
     if (isSetIfUnbound())
       {
-	Binding binding = env.getBinding(name);
+	Symbol binding = env.getSymbol(name);
 	if (! binding.isBound())
 	  binding.set(new_value.eval (env));
 	if (getHasValue())
@@ -93,14 +93,14 @@ public class SetExp extends Expression
     if (isDefining ())
       {
 	if (binding != null && binding.isAlias())
-	  AliasConstraint.define(env.getBinding(name),
+	  AliasConstraint.define(env.getSymbol(name),
 				 (gnu.mapping.Location) new_val);
 	else
 	  env.define (name, new_val);
       }
     else
       {
-	Binding bind = env.lookup (name);
+	Symbol bind = env.lookup (name);
 	if (bind != null)
 	  env.put (name, new_val);
 	else

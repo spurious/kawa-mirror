@@ -67,7 +67,7 @@ public class Invoke extends ProcedureN implements CanInline
         if (arg0 instanceof ClassType)
           dtype = (ClassType) arg0;
         else if (arg0 instanceof String || arg0 instanceof FString
-		 || arg0 instanceof Binding)
+		 || arg0 instanceof Symbol)
           dtype = ClassType.make(arg0.toString());
         else
           throw new WrongType(thisProc, 0, null);
@@ -87,7 +87,7 @@ public class Invoke extends ProcedureN implements CanInline
       {
         Object arg1 = args[1];
         if (arg1 instanceof String || arg1 instanceof FString
-	    || arg1 instanceof Binding)
+	    || arg1 instanceof Symbol)
           mname = arg1.toString();
         else
           throw new WrongType(thisProc, 1, null);

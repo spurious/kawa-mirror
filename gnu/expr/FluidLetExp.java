@@ -94,7 +94,7 @@ public class FluidLetExp extends LetExp
       args = new Type[3];
       args[0] = typeFluidBinding;
       args[1] = Type.pointer_type;
-      args[2] = ClassType.make("gnu.mapping.Binding");
+      args[2] = ClassType.make("gnu.mapping.Symbol");
       makeFluidBindingMethod = typeFluidBinding.addMethod
 	("make", args, typeFluidBinding, Access.PUBLIC|Access.STATIC);
     }

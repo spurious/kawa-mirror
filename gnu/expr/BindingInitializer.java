@@ -6,8 +6,8 @@ public class BindingInitializer extends Initializer
   Declaration decl;
   Expression value;
 
-  static final Method makeBindingMethod
-  = Compilation.typeBinding.getDeclaredMethod("make", Compilation.string1Arg);
+  static final Method makeSymbolMethod
+  = Compilation.typeSymbol.getDeclaredMethod("make", Compilation.string1Arg);
 
   public BindingInitializer(Declaration decl, Field field, Expression value)
   {
@@ -16,7 +16,7 @@ public class BindingInitializer extends Initializer
     this.field = field;
   }
 
-  boolean createNewBinding = false;
+  boolean createNewSymbol = false;
 
   public void emit(Compilation comp)
   {
@@ -38,7 +38,7 @@ public class BindingInitializer extends Initializer
     if (value == null)
       {
 	// FIXME - this should be cached in a local Variable:
-	if (! createNewBinding)
+	if (! createNewSymbol)
 	  code.emitInvokeStatic(comp.getCurrentEnvironmentMethod);
 
 	String name = decl.getName();
@@ -46,10 +46,10 @@ public class BindingInitializer extends Initializer
 	  code.emitPushNull();
 	else
 	  code.emitPushString(name);
-	if (createNewBinding)
-	  code.emitInvokeStatic(makeBindingMethod);
+	if (createNewSymbol)
+	  code.emitInvokeStatic(makeSymbolMethod);
 	else
-	  code.emitInvokeVirtual(comp.getBindingEnvironmentMethod);
+	  code.emitInvokeVirtual(comp.getSymbolEnvironmentMethod);
       }
     else
       {

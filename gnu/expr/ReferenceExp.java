@@ -31,7 +31,7 @@ public class ReferenceExp extends Expression
   private static int PROCEDURE_NAME = NEXT_AVAIL_FLAG << 1;
   public static int PREFER_BINDING2 = NEXT_AVAIL_FLAG << 2;
 
-  /* If true, must have binding.isBinding().  Don't dereference Binding. */
+  /* If true, must have binding.isSymbol().  Don't dereference Symbol. */
   public final boolean getDontDereference()
   {
     return (flags & DONT_DEREFERENCE) != 0;
@@ -80,7 +80,7 @@ public class ReferenceExp extends Expression
             try
               {
                 Object value = binding.field.getReflectField().get(null);
-                if (! (value instanceof Binding))
+                if (! (value instanceof Symbol))
                   return value;
                 // otherwise not implemented!
               }
@@ -92,11 +92,11 @@ public class ReferenceExp extends Expression
           throw new Error("internal error: ReferenceExp.eval on lexical binding");
       }
     if (getDontDereference())
-      return symbol instanceof Binding ? symbol : env.getBinding(symbol.toString());
+      return symbol instanceof Symbol ? symbol : env.getSymbol(symbol.toString());
     else if (getFlag(PREFER_BINDING2))
       {
-	Binding bind = symbol instanceof Binding ? (Binding) symbol
-	  : env.getBinding(symbol.toString());
+	Symbol bind = symbol instanceof Symbol ? (Symbol) symbol
+	  : env.getSymbol(symbol.toString());
 	return isProcedureName() ? bind.getFunctionValue() : bind.get();
       }
     else

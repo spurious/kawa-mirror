@@ -247,8 +247,8 @@ public abstract class Interpreter
       name = ((Named) part).getName();
     else
       name = name.intern();
-    if (part instanceof Binding)
-      environ.addBinding((Binding) part);
+    if (part instanceof Symbol)
+      environ.addSymbol((Symbol) part);
     else
       environ.define(name, part);
   }
@@ -364,7 +364,7 @@ public abstract class Interpreter
       {
         if (spec instanceof Class)
           return getTypeFor((Class) spec);
-        if (spec instanceof String || spec instanceof Binding)
+        if (spec instanceof String || spec instanceof Symbol)
           return getTypeFor(spec.toString());
         if (spec instanceof CharSeq)
           return gnu.bytecode.ClassType.make(spec.toString());
@@ -473,7 +473,7 @@ public abstract class Interpreter
 
   public Procedure getPrompter()
   {
-    Binding pr = Environment.getCurrentBinding("default-prompter");
+    Symbol pr = Environment.getCurrentSymbol("default-prompter");
     return pr == null ? null : pr.getProcedure();
   }
 

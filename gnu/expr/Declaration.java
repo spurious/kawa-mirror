@@ -80,7 +80,7 @@ public class Declaration
   Declaration nextCapturedVar;
 
   /** If non-null, field is relative to base.
-   * If IS_FLUID, base points to IS_UNKNOWN Binding. */
+   * If IS_FLUID, base points to IS_UNKNOWN Symbol. */
   public Declaration base;
 
   public Field field;
@@ -238,7 +238,7 @@ public class Declaration
 
   public final void setProcedureDecl (boolean val) { setFlag(val, PROCEDURE); }
 
-  /** True if the value of the variable is the contents of a Binding. */
+  /** True if the value of the variable is the contents of a Symbol. */
   public final boolean isIndirectBinding()
   { return (flags & INDIRECT_BINDING) != 0; }
   public final void setIndirectBinding(boolean indirectBinding)
@@ -378,26 +378,26 @@ public class Declaration
     setSimple(false);
   }
 
-  Method makeBindingMethod = null;
+  Method makeSymbolMethod = null;
 
-  /** Create a Binding object, given that isIndirectBinding().
+  /** Create a Symbol object, given that isIndirectBinding().
       Assume the initial value is already pushed on the stack;
-      leaves initialized Binding object on stack.  */
+      leaves initialized Symbol object on stack.  */
   public void pushIndirectBinding (Compilation comp)
   {
     CodeAttr code = comp.getCode();
     code.emitPushString(getName());
-    if (makeBindingMethod == null)
+    if (makeSymbolMethod == null)
       {
 	Type[] args = new Type[2];
 	args[0] = Type.pointer_type;
 	args[1] = Type.string_type;
-	makeBindingMethod
-	  = Compilation.typeBinding.addMethod("make", args,
-					      Compilation.typeBinding,
+	makeSymbolMethod
+	  = Compilation.typeSymbol.addMethod("make", args,
+					      Compilation.typeSymbol,
 					      Access.PUBLIC|Access.STATIC);
       }
-    code.emitInvokeStatic(makeBindingMethod);
+    code.emitInvokeStatic(makeSymbolMethod);
   }
 
   public final Variable allocateVariable(CodeAttr code)
@@ -531,7 +531,7 @@ public class Declaration
 	  ftype = Compilation.typeLocation;
       }
     else
-      ftype = (isIndirectBinding() ? Compilation.typeBinding
+      ftype = (isIndirectBinding() ? Compilation.typeSymbol
 	       : getType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)

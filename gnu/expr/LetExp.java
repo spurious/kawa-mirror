@@ -17,8 +17,6 @@ public class LetExp extends ScopeExp
   public Expression getBody() { return body; }
   public void setBody(Expression body) { this.body = body; }
 
-  Method makeBindingMethod = null;
-
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
   static void store_rest (Compilation comp, Declaration decl)

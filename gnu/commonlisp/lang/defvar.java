@@ -2,7 +2,7 @@ package gnu.commonlisp.lang;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
-import gnu.mapping.Binding;
+import gnu.mapping.Symbol;
 
 public class defvar extends Syntax
 {
@@ -21,7 +21,7 @@ public class defvar extends Syntax
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
     Object name = p.car;
-    if (name instanceof String || name instanceof Binding)
+    if (name instanceof String || name instanceof Symbol)
       {
 	String sym = name.toString();
 	Declaration decl = defs.lookup(sym);

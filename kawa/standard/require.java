@@ -100,16 +100,16 @@ public class require extends Syntax
   public static Object find(Class ctype, Environment env)
   {
     String mangledName = (ctype.getName() + "$instance").intern();
-    Binding binding = env.getBinding(mangledName);
+    Symbol symbol = env.getSymbol(mangledName);
     Object value;
-    synchronized (binding)
+    synchronized (symbol)
       {
-	if (binding.isBound())
-	  return binding.get();
+	if (symbol.isBound())
+	  return symbol.get();
 	try
 	  {
 	    value = ctype.newInstance();
-	    binding.set(value);
+	    symbol.set(value);
 	  }
         catch (Exception ex)
           {
@@ -241,7 +241,7 @@ public class require extends Syntax
 		    ReferenceExp fref = new ReferenceExp(fdecl);
 		    SetExp sexp = new SetExp(adecl, fref);
 		    sexp.setDefining(true);
-                    if (isAlias || ftype.isSubtype(Compilation.typeBinding))
+                    if (isAlias || ftype.isSubtype(Compilation.typeSymbol))
                       fdecl.setIndirectBinding(true);
 		    if (isAlias)
 		      fdecl.setAlias(true);

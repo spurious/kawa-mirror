@@ -24,7 +24,7 @@ public class defun extends Syntax implements Printable
     Pair p;
     if (! (st.cdr instanceof Pair)
 	|| ! (((p = (Pair) st.cdr).car instanceof String)
-	      || p.car instanceof Binding))
+	      || p.car instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
     String sym = p.car.toString();
     Declaration decl = defs.lookup(sym);
@@ -55,7 +55,7 @@ public class defun extends Syntax implements Printable
       {
 	Pair p1 = (Pair) obj;
 	
-	if (p1.car instanceof String || p1.car instanceof Binding)
+	if (p1.car instanceof String || p1.car instanceof Symbol)
 	  {
 	    name = p1.car.toString();
 	  }

@@ -13,7 +13,7 @@ import gnu.kawa.lispexpr.LispInterpreter;
 public abstract class Lisp2 extends LispInterpreter
 {
   public static final LList FALSE = LList.Empty;
-  public static Binding TRUE;
+  public static Symbol TRUE;
   public static final Expression nilExpr = new QuoteExp(FALSE);
 
   public boolean isTrue(Object value)
@@ -54,7 +54,7 @@ public abstract class Lisp2 extends LispInterpreter
   {
     if (name == "nil")
       return FALSE;
-    return Environment.getCurrentBinding(name);
+    return Environment.getCurrentSymbol(name);
     //return name;
   }
 
@@ -65,7 +65,7 @@ public abstract class Lisp2 extends LispInterpreter
   }
 
   /** Get a string for a given symbol. */
-  public static Object getString (Binding symbol)
+  public static Object getString (Symbol symbol)
   {
     return getString(symbol.getName());
   }

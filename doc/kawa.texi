@@ -4015,11 +4015,11 @@ For each top-level exported definition the compiler creates a
 corresponding public field with a similar (mangled) name.
 By default, there is some indirection:  The value of the Scheme variable
 is not that of the field itself.  Instead, the field is a
-@code{gnu.mapping.Binding} object, and the value Scheme variable is
-defined to be the value stored in the @code{Binding}.
+@code{gnu.mapping.Symbol} object, and the value Scheme variable is
+defined to be the value stored in the @code{Symbol}.
 Howewer, if you specify an explicit type, then the field will
-have the specified type, instead of being a @code{Binding}.
-The indirection using @code{Binding} is also avoided if you use
+have the specified type, instead of being a @code{Symbol}.
+The indirection using @code{Symbol} is also avoided if you use
 @code{define-constant}.
 
 If the Scheme definition defines a procedure (which is not re-assigned

@@ -212,7 +212,7 @@ public class ModuleExp extends LambdaExp
 
   void allocFields (Compilation comp)
   {
-    // We want the create the id$XXX Binding fields for unknowns first,
+    // We want the create the id$XXX Symbol fields for unknowns first,
     // because it is possible some later Declaration's initializer may depend
     // on it.  Normally this is not an issue, as initializer are usually
     // run as part of the "body" of the module, which is executed later.

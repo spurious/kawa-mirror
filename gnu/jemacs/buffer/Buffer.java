@@ -478,7 +478,7 @@ public abstract class Buffer extends AbstractSequence implements CharSeq
    */
   public static void makeBufferLocal(Object symbol, boolean all)
   {
-    BufferLocalConstraint.make(Symbols.getBinding(symbol), all);
+    BufferLocalConstraint.make(Symbols.getSymbol(symbol), all);
   }
 
   public abstract char charAt(int index);

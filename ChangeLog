@@ -1,3 +1,8 @@
+2002-10-28  Per Bothner  <bothner@bothner.com>
+
+	Rename the Binding and BindingEnumerator classes in gnu.mapping
+	to Symbol and SymbolEnumerator, respectively.
+	
 2002-10-28  Per Bothner  <per@bothner.com>
 
 	The classes gnu.expr.Symbol and gnu.commonlisp.lang.Symbol were

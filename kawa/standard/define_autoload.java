@@ -183,7 +183,7 @@ public class define_autoload extends Syntax
 		    Object value = null;
 		    String name = null;
 		    String command = ((pair.car instanceof String
-				       || pair.car instanceof Binding)
+				       || pair.car instanceof Symbol)
 				      ? pair.car.toString()
 				      : null);
 		    if (command == "defun")

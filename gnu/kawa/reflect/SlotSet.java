@@ -45,9 +45,9 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       {
         java.lang.reflect.Field field = clas.getField(name);
 	Class ftype = field.getType();
-	if ("gnu.mapping.Binding".equals(ftype.getName())
+	if ("gnu.mapping.Symbol".equals(ftype.getName())
 	    && (field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
-	  ((Binding) field.get(obj)).set(value);
+	  ((Symbol) field.get(obj)).set(value);
 	else
 	  field.set(obj, interpreter.coerceFromObject(ftype, value));
         return;
@@ -143,7 +143,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         gnu.bytecode.Field field = (gnu.bytecode.Field) part;
         boolean isStaticField = field.getStaticFlag();
 	Type ftype = field.getType();
-	boolean indirect = ("gnu.mapping.Binding".equals(ftype.getName())
+	boolean indirect = ("gnu.mapping.Symbol".equals(ftype.getName())
 			    && (field.getModifiers() & Access.FINAL) != 0);
         if (isStatic && ! isStaticField)
           comp.error('e', ("cannot access non-static field `" + field.getName()
@@ -158,7 +158,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         valArg.compile(comp,
 		       indirect ? Target.pushObject : Target.pushValue(ftype));
 	if (indirect)
-	  code.emitInvokeVirtual(Compilation.typeBinding.getDeclaredMethod
+	  code.emitInvokeVirtual(Compilation.typeSymbol.getDeclaredMethod
 				 ("set", 1));
         else if (isStaticField)
           code.emitPutStatic(field); 

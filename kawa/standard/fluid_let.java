@@ -49,14 +49,14 @@ public class fluid_let extends Syntax implements Printable
 	Expression value;
 	Pair binding;
 	if (bind_pair.car instanceof String
-	    || bind_pair.car instanceof Binding)
+	    || bind_pair.car instanceof Symbol)
 	  {
 	    name = bind_pair.car.toString();
 	    value = defaultInit;
 	  }
 	else if (bind_pair.car instanceof Pair
 		 && ((binding = (Pair) bind_pair.car).car instanceof String
-		     || binding.car instanceof Binding))
+		     || binding.car instanceof Symbol))
 		 
 	  {
 	    name = binding.car.toString();

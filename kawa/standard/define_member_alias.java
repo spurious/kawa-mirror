@@ -18,8 +18,8 @@ public class define_member_alias extends Syntax
         || ! ((p = (Pair) st.cdr).car instanceof String))
       return super.scanForDefinitions(st, forms, defs, tr);
     Object name = p.car;
-    Type typeBinding = ClassType.make("gnu.mapping.Binding");
-    Declaration decl = defs.addDeclaration((String) name, typeBinding);
+    Type typeSymbol = ClassType.make("gnu.mapping.Symbol");
+    Declaration decl = defs.addDeclaration((String) name, typeSymbol);
     decl.setIndirectBinding(true);
     st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));
     forms.addElement(st);

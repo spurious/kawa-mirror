@@ -1,12 +1,12 @@
-// Copyright (c) 1996-2000  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2002  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
 import java.io.*;
 
-/** A Binding is a Location in an Environment object. */
+/** A Symbol is a Location in an Environment object. */
 
-public class Binding extends Location implements Externalizable
+public class Symbol extends Location implements Externalizable
     // implements java.util.Map.Entry
 {
   /** The current value of the binding. */
@@ -90,31 +90,31 @@ public class Binding extends Location implements Externalizable
     return constraint.isBound(this);
   }
 
-  public Binding ()
+  public Symbol ()
   {
   }
 
-  public Binding (String name)
+  public Symbol (String name)
   {
     setName(name); 
   }
 
   // The compiler emits calls to this method.
-  public static Binding make (Object init, String name)
+  public static Symbol make (Object init, String name)
   {
-    Binding binding = new Binding(name);
+    Symbol binding = new Symbol(name);
     binding.value = init;
     binding.constraint = TrivialConstraint.getInstance((Environment) null);
     return binding;
   }
 
   // gnu.expr.LitTable uses this.
-  public static Binding make (String name, Environment env)
+  public static Symbol make (String name, Environment env)
   {
     if (env == null)
-      return new Binding(name);
+      return new Symbol(name);
     else
-      return env.getBinding(name);
+      return env.getSymbol(name);
   }
 
   public void print(java.io.PrintWriter ps)
@@ -153,7 +153,7 @@ public class Binding extends Location implements Externalizable
   }
 
   /** Just tests for identity.
-   * Otherwise hashTables that have Bindings as keys will break. */
+   * Otherwise hashTables that have Symbols as keys will break. */
   public boolean equals (Object o)
   {
     return this == o;
@@ -167,8 +167,8 @@ public class Binding extends Location implements Externalizable
   }
 
   /** Used to mark deleted elements in a hash table. */
-  public final static Binding hashDELETED
-  = new Binding(new String("<Deleted>"));
+  public final static Symbol hashDELETED
+  = new Symbol(new String("<Deleted>"));
 
   /** Search a hash table using double hashing and open addressing.
    * @param table the hash table
@@ -180,11 +180,11 @@ public class Binding extends Location implements Externalizable
    * (such that table[index].getName()==key);
    * if there is no such element, returns an index
    * such that (table[index]==null || tabel[index]==DELETED). */
-  public static int hashSearch (Binding[] table, int log2Size, int mask,
+  public static int hashSearch (Symbol[] table, int log2Size, int mask,
 				String key, int hash)
   {
     int index = hash & mask;
-    Binding element = table[index];
+    Symbol element = table[index];
     if (element == null || element.getName() == key)
       return index;
     int avail = -1;
@@ -202,7 +202,7 @@ public class Binding extends Location implements Externalizable
       }
   }
 
-  public static int hashSearch (Binding[] table, int log2Size, String key)
+  public static int hashSearch (Symbol[] table, int log2Size, String key)
   {
     return hashSearch(table, log2Size, (1 << log2Size) - 1,
 		      key, System.identityHashCode(key));
@@ -214,11 +214,11 @@ public class Binding extends Location implements Externalizable
    * @param key the search key
    * @return null if the was no matching element in the hash table;
    * otherwise the matching element. */
-  public static Binding hashGet (Binding[] table, int log2Size, String key)
+  public static Symbol hashGet (Symbol[] table, int log2Size, String key)
   {
     int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
 			   key, System.identityHashCode(key));
-    Binding element = table[index];
+    Symbol element = table[index];
     if (element == null || element == hashDELETED)
       return null;
     return element;
@@ -230,12 +230,12 @@ public class Binding extends Location implements Externalizable
    * @param value the new entry
    * @return null if the was no matching element in the hash table;
    * otherwise the old match. */
-  public static Binding hashSet (Binding[] table, int log2Size, Binding value)
+  public static Symbol hashSet (Symbol[] table, int log2Size, Symbol value)
   {
     String key = value.getName();
     int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
 			   key, System.identityHashCode(key));
-    Binding element = table[index];
+    Symbol element = table[index];
     table[index] = value;
     return element == hashDELETED ? null : element;
   }
@@ -246,17 +246,17 @@ public class Binding extends Location implements Externalizable
    * @param key the search key
    * @return null if the was no matching element in the hash table;
    * otherwise the old element. */
-  public static Binding hashDelete (Binding[] table, int log2Size, String key)
+  public static Symbol hashDelete (Symbol[] table, int log2Size, String key)
   {
     int index = hashSearch(table, log2Size, (1 << log2Size) - 1,
 			   key, System.identityHashCode(key));
-    Binding element = table[index];
+    Symbol element = table[index];
     table[index] = hashDELETED;
     return element == hashDELETED ? null : element;
   }
 
-  public static int hashInsertAll (Binding[] tableDst, int log2SizeDst,
-				   Binding[] tableSrc, int log2SizeSrc)
+  public static int hashInsertAll (Symbol[] tableDst, int log2SizeDst,
+				   Symbol[] tableSrc, int log2SizeSrc)
   {
     int countInserted = 0;
     int sizeSrc = 1 << log2SizeSrc;
@@ -264,13 +264,13 @@ public class Binding extends Location implements Externalizable
     int maskDst = (1 << log2SizeDst) - 1;
     for (int i = sizeSrc;  --i >= 0;)
       {
-	Binding element = tableSrc[i];
+	Symbol element = tableSrc[i];
 	if (element != null && element != hashDELETED)
 	  {
 	    String key = element.getName();
 	    int index = hashSearch(tableDst, log2SizeDst, maskDst,
 				   key, System.identityHashCode(key));
-	    Binding oldElement = tableDst[index];
+	    Symbol oldElement = tableDst[index];
 	    if (oldElement != null && oldElement != hashDELETED)
 	      countInserted++;
 	    tableDst[index] = element;
@@ -279,7 +279,7 @@ public class Binding extends Location implements Externalizable
     return countInserted;
   }
 
-  /** Get value of "function binding" of a Binding.
+  /** Get value of "function binding" of a Symbol.
    * Some languages (including Common Lisp and Emacs Lisp) associate both
    * a value binding and a function binding with a symbol.
    * @exception UnboundSymbol if no function binding.
@@ -292,7 +292,7 @@ public class Binding extends Location implements Externalizable
     return value;
   }
 
-  /** Get value of "function binding" of a Binding.
+  /** Get value of "function binding" of a Symbol.
    * Some languages (including Common Lisp and Emacs Lisp) associate both
    * a value binding and a function binding with a symbol.
    * @param defaultValue value to return if there is no function binding

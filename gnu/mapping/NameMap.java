@@ -11,8 +11,8 @@ public abstract class NameMap extends Procedure1 implements HasSetter
    */
   public final Object getChecked(String name)
   {
-    Object value = get(name, Binding.UNBOUND);
-    if (value == Binding.UNBOUND)
+    Object value = get(name, Symbol.UNBOUND);
+    if (value == Symbol.UNBOUND)
       throw new UnboundSymbol(name);
     return value;
   }

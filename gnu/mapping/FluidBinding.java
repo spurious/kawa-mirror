@@ -7,24 +7,25 @@ package gnu.mapping;
 
 public class FluidBinding
 {
-  /** The Binding which this overrides. */
-  Binding binding;
+  /** The Symbol which this overrides. */
+  Symbol symbol;
 
-  /** The current value of the Binding in this thread. */
+  /** The current value of the Symbol in this thread. */
   public Object value;
 
   /** The maininin bindings active in this thread. */
   FluidBinding previous;
 
-  public FluidBinding (FluidBinding previous, Object value, Binding binding)
+  public FluidBinding (FluidBinding previous, Object value, Symbol symbol)
   {
     this.previous = previous;
     this.value = value;
-    this.binding = binding;
+    this.symbol = symbol;
   }
 
-  public static FluidBinding make (FluidBinding prev, Object val, Binding bind)
+  public static FluidBinding make (FluidBinding prev,
+				   Object val, Symbol symbol)
   {
-    return new FluidBinding(prev, val, bind);
+    return new FluidBinding(prev, val, symbol);
   }
 }

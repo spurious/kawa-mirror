@@ -83,15 +83,15 @@ public class ELisp extends Lisp2
     environ = SymbolTable.make("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
 
-    TRUE = environ.getBinding("t");
+    TRUE = environ.getSymbol("t");
     TRUE.set(TRUE);
     define("nil", FALSE);
 
-    BindingEnumeration e
-      = Scheme.getInstance().builtin().enumerateAllBindings();
+    SymbolEnumeration e
+      = Scheme.getInstance().builtin().enumerateAllSymbols();
     while (e.hasMoreElements())
       {
-	Binding b = e.nextBinding();
+	Symbol b = e.nextSymbol();
 	if (b.isBound())
 	  {
 	    String name = b.getName();
@@ -257,8 +257,8 @@ public class ELisp extends Lisp2
       name = ((Named) part).getName();
     else
       name = name.intern();
-    if (part instanceof Binding)
-      environ.addBinding((Binding) part);
+    if (part instanceof Symbol)
+      environ.addSymbol((Symbol) part);
     else if (part instanceof Procedure
 	     || part instanceof kawa.lang.Syntax)
       gnu.commonlisp.lang.Symbols.setFunctionBinding(environ, name, part);

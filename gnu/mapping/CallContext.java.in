@@ -330,12 +330,12 @@ public class CallContext implements Runnable
     FluidBinding fluid = new_fluids;
     for ( ; fluid != old_fluids;  fluid = fluid.previous)
       {
-	Binding binding = fluid.binding;
-	Constraint constraint = binding.constraint;
+	Symbol symbol = fluid.symbol;
+	Constraint constraint = symbol.constraint;
 	if (constraint instanceof FluidConstraint)
 	  ((FluidConstraint) constraint).referenceCount++;
 	else
-	  binding.constraint = new FluidConstraint(constraint);
+	  symbol.constraint = new FluidConstraint(constraint);
       }
     fluidBindings = new_fluids;
   }
@@ -346,10 +346,10 @@ public class CallContext implements Runnable
     FluidBinding fluid = new_fluids;
     for ( ; fluid != old_fluids;  fluid = fluid.previous)
       {
-	Binding binding = fluid.binding;
-	FluidConstraint constraint = (FluidConstraint) binding.constraint;
+	Symbol symbol = fluid.symbol;
+	FluidConstraint constraint = (FluidConstraint) symbol.constraint;
 	if (constraint.referenceCount-- <= 0)
-	  binding.constraint = constraint.savedConstraint;
+	  symbol.constraint = constraint.savedConstraint;
       }
     fluidBindings = old_fluids;
   }

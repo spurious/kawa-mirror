@@ -1,4 +1,4 @@
-// Copyright (c) 1996-2000, 2001  Per M.A. Bothner.
+// Copyright (c) 1996-2000, 2001, 2002  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -11,7 +11,7 @@ package gnu.mapping;
 
 public class Environment extends NameMap
 {
-  Binding[] table;
+  Symbol[] table;
   int log2Size;
   private int mask;
   int num_bindings;
@@ -47,7 +47,7 @@ public class Environment extends NameMap
   public static Object lookup_global (String name)
        throws UnboundSymbol
   {
-    Binding binding = user().lookup(name);
+    Symbol binding = user().lookup(name);
     if (binding == null)
       throw new UnboundSymbol(name);
     return binding.get ();
@@ -67,7 +67,7 @@ public class Environment extends NameMap
   public static void defineFunction (Environment env,
 				     String name, Object new_value)
   {
-    Binding binding = env.getBinding(name);
+    Symbol binding = env.getSymbol(name);
     binding.constraint.setFunctionValue(binding, new_value);
   }
 
@@ -109,7 +109,7 @@ public class Environment extends NameMap
     while (capacity > (1 << log2Size))
       log2Size++;
     capacity = 1 << log2Size;
-    table = new Binding[capacity];
+    table = new Symbol[capacity];
     mask = capacity - 1;
   }
 
@@ -119,32 +119,32 @@ public class Environment extends NameMap
     this.previous = previous;
   }
 
-  public Binding getBinding (String name)
+  public Symbol getSymbol (String name)
   {
-    Binding binding = lookup(name);
+    Symbol binding = lookup(name);
     if (binding != null)
       return binding;
     /* FIXME
     int hash = System.identityHashCode(name);
-    int index = Binding.hashSearch(table, log2Size,mask, name, hash);
-    Binding binding = table[index];
-    if (binding != null && binding != Binding.hashDELETED)
+    int index = Symbol.hashSearch(table, log2Size,mask, name, hash);
+    Symbol binding = table[index];
+    if (binding != null && binding != Symbol.hashDELETED)
       return binding;
     if (locked)
       {
 	if (previous == null)
 	  throw new UnboundSymbol(name);
-	return previous.getBinding(name);
+	return previous.getSymbol(name);
       }
     */
-    binding = addBinding(name, null);
+    binding = addSymbol(name, null);
     binding.constraint = unboundConstraint;
     return binding;
   }
 
-  public static Binding getCurrentBinding (String name)
+  public static Symbol getCurrentSymbol (String name)
   {
-    return getCurrent().getBinding(name);
+    return getCurrent().getSymbol(name);
   }
 
   /**
@@ -153,19 +153,19 @@ public class Environment extends NameMap
    * @return the value of the binding, or null if not found
    */
 
-  public Binding lookup (String name)
+  public Symbol lookup (String name)
   {
     return lookup(name, System.identityHashCode(name));
   }
 
-  private Binding lookup (String name, int hash)
+  private Symbol lookup (String name, int hash)
   {
     for (Environment env = this;  env != null;  env = env.previous)
       {
-	int index = Binding.hashSearch(env.table, env.log2Size, env.mask,
+	int index = Symbol.hashSearch(env.table, env.log2Size, env.mask,
 				       name, hash);
-	Binding element = env.table[index];
-	if (element != null && element != Binding.hashDELETED)
+	Symbol element = env.table[index];
+	if (element != null && element != Symbol.hashDELETED)
 	  return element;
       }
     return null;
@@ -174,9 +174,9 @@ public class Environment extends NameMap
   /**
    * Define the value binding for a symbol.
    */
-  public Binding defineValue (String name, Object value)
+  public Symbol defineValue (String name, Object value)
   {
-    Binding binding = getBinding(name);
+    Symbol binding = getSymbol(name);
     binding.constraint = trivialConstraint;
     binding.value = value;
     return binding;
@@ -185,35 +185,35 @@ public class Environment extends NameMap
   /**
    * Define the value or function binding for a symbol, as appropriate
    */
-  public Binding define (String name, Object value)
+  public Symbol define (String name, Object value)
   {
     return defineValue(name, value);
   }
 
-  public void addBinding(Binding binding)
+  public void addSymbol(Symbol binding)
   {
     // Rehash if over 2/3 full.
     if (3 * num_bindings >= 2 * table.length)
       rehash();
-    if (Binding.hashSet(table, log2Size, binding) == null)
+    if (Symbol.hashSet(table, log2Size, binding) == null)
       num_bindings++;
   }
 
-  public Binding addBinding (String name, Object value)
+  public Symbol addSymbol (String name, Object value)
   {
-    Binding binding = new Binding(name);
+    Symbol binding = new Symbol(name);
     binding.constraint = trivialConstraint;
     binding.value = value;
-    addBinding(binding);
+    addSymbol(binding);
     return binding;
   }
 
   void rehash ()
   {
     int new_capacity = 2 * table.length;
-    Binding[] new_table = new Binding[new_capacity];
+    Symbol[] new_table = new Symbol[new_capacity];
 
-    Binding.hashInsertAll(new_table, log2Size + 1,
+    Symbol.hashInsertAll(new_table, log2Size + 1,
 			  table, log2Size);
     table = new_table;
     log2Size++;
@@ -230,8 +230,8 @@ public class Environment extends NameMap
 	if (locked)
 	  throw new IllegalStateException("attempt to remove variable: "
 					  + name + " locked environment");
-	Binding[] env_tab = env.table;
-	Named old = Binding.hashDelete(env.table, env.log2Size, name);
+	Symbol[] env_tab = env.table;
+	Named old = Symbol.hashDelete(env.table, env.log2Size, name);
 	if (old != null)
 	  return old;
       }
@@ -242,23 +242,23 @@ public class Environment extends NameMap
     return remove((String) name);
   }
 
-  public void remove (Binding binding)
+  public void remove (Symbol binding)
   {
     String name = binding.getName();
     if (locked)
       throw new IllegalStateException("attempt to remove variable: "
 				      + name + " locked environment");
-    Binding.hashDelete(table, log2Size, name);
+    Symbol.hashDelete(table, log2Size, name);
   }
 
   public final boolean isBound(String name)
   {
-    return get(name, Binding.UNBOUND) != Binding.UNBOUND;
+    return get(name, Symbol.UNBOUND) != Symbol.UNBOUND;
   }
 
   public Object get(String name, Object defaultValue)
   {
-    Binding binding = lookup(name);
+    Symbol binding = lookup(name);
     if (binding == null)
       return defaultValue;
     return binding.get(defaultValue);
@@ -276,7 +276,7 @@ public class Environment extends NameMap
 
   public Object put (/* interned */ String name, Object value)
   {
-    Binding binding = lookup (name);
+    Symbol binding = lookup (name);
     if (binding == null)
       {
 	define (name, value);
@@ -309,16 +309,16 @@ public class Environment extends NameMap
     put(name, value);
   }
 
-  /** Does not enumerate inherited Bindings. */
-  public BindingEnumeration enumerateBindings()
+  /** Does not enumerate inherited Symbols. */
+  public SymbolEnumeration enumerateSymbols()
   {
-    return new BindingEnumeration(table, 1 << log2Size);
+    return new SymbolEnumeration(table, 1 << log2Size);
   }
 
-  /** Does enumerate inherited Bindings. */
-  public BindingEnumeration enumerateAllBindings()
+  /** Does enumerate inherited Symbols. */
+  public SymbolEnumeration enumerateAllSymbols()
   {
-    return new BindingEnumeration(this);
+    return new SymbolEnumeration(this);
   }
 
   public String toString ()

@@ -32,7 +32,7 @@ public class UnboundConstraint extends Constraint
     return result;
   }
 
-  public static UnboundConstraint getInstance(Binding binding)
+  public static UnboundConstraint getInstance(Symbol binding)
   {
     Constraint constraint = binding.constraint;
     if (constraint instanceof UnboundConstraint)
@@ -45,7 +45,7 @@ public class UnboundConstraint extends Constraint
     this.environment = environment;
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol binding, Object defaultValue)
   {
     // Before reporting an error, check parent environment.
     Object value = binding.value;
@@ -53,16 +53,16 @@ public class UnboundConstraint extends Constraint
 	&& environment.previous != null)
       binding.value = value = environment.previous.lookup(binding.getName());
     if (value != null)
-      return ((Binding) value).get();
+      return ((Symbol) value).get();
     return defaultValue;
   }
 
-  public boolean isBound (Binding binding)
+  public boolean isBound (Symbol binding)
   {
     return false;
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol binding, Object value)
   {
     Environment env = getEnvironment(binding);
     if (env != null && env.locked)
@@ -77,7 +77,7 @@ public class UnboundConstraint extends Constraint
       }
   }
 
-  public Environment getEnvironment (Binding binding)
+  public Environment getEnvironment (Symbol binding)
   {
     return environment;
   }

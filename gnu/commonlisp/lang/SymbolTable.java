@@ -76,14 +76,14 @@ public class SymbolTable extends Environment implements Externalizable
   /**
    * Define the value or function binding for a symbol, as appropriate
    */
-  public Binding define (String name, Object value)
+  public Symbol define (String name, Object value)
   {
-    Binding binding = getBinding(name);
+    Symbol symbol = getSymbol(name);
     if (value instanceof Procedure || value instanceof kawa.lang.Syntax)
-      binding.setFunctionValue(value);
+      symbol.setFunctionValue(value);
     else
-      binding.set(value);
-    return binding;
+      symbol.set(value);
+    return symbol;
   }
 
   public static Environment asEnvironment(Object env)

@@ -5,8 +5,6 @@ include $(top_srcdir)/Make-rules
 java_sources=\
   AliasConstraint.java \
   ApplyMethodContainer.java ApplyMethodProc.java \
-  Binding.java \
-  BindingEnumeration.java \
   Constraint.java UnboundConstraint.java TrivialConstraint.java \
   ConstantConstraint.java \
   IndirectConstraint.java \
@@ -41,6 +39,8 @@ java_sources=\
   Setter.java \
   Setter0.java \
   Setter1.java \
+  Symbol.java \
+  SymbolEnumeration.java \
   TtyInPort.java \
   UnboundSymbol.java \
   Values.java \

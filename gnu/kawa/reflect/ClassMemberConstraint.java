@@ -5,7 +5,7 @@ import gnu.bytecode.ClassType;
 import gnu.expr.Compilation;
 
 /** A Constraint whose value is that of a named field/method of an object.
- * The object is used as the owning Binding's value.
+ * The object is used as the owning Symbol's value.
  * (For now, only fields are supported.)
  */
 
@@ -43,7 +43,7 @@ public class ClassMemberConstraint extends Constraint
     this.name = field.getName();
   }
 
-  void setup(Binding binding)
+  void setup(Symbol symbol)
   {
     if (rfield == null)
       {
@@ -54,7 +54,7 @@ public class ClassMemberConstraint extends Constraint
 	  }
 	catch (RuntimeException ex)
 	  {
-	    String bname = binding.getName();
+	    String bname = symbol.getName();
 	    throw new UnboundSymbol(bname, "Unbound symbol " + bname
 				    + " - " + ex.toString());
 	  }
@@ -64,7 +64,7 @@ public class ClassMemberConstraint extends Constraint
           }
         catch (java.lang.NoSuchFieldException ex)
           {
-	    String bname = binding.getName();
+	    String bname = symbol.getName();
 	    throw new UnboundSymbol(bname, "Unbound symbol " + bname
 				    + " - no field " + name
 				    + " in " + type.getName());
@@ -72,12 +72,12 @@ public class ClassMemberConstraint extends Constraint
       }
   }
 
-  public Object get (Binding binding, Object defaultValue)
+  public Object get (Symbol symbol, Object defaultValue)
   {
-    setup(binding);
+    setup(symbol);
     try
       {
-        return rfield.get(getValue(binding));
+        return rfield.get(getValue(symbol));
       }
     catch (IllegalAccessException ex)
       {
@@ -85,20 +85,20 @@ public class ClassMemberConstraint extends Constraint
       }
   }
 
-  public void set (Binding binding, Object value)
+  public void set (Symbol symbol, Object value)
   {
-    setup(binding);
+    setup(symbol);
     try
       {
-        rfield.set(getValue(binding), value);
+        rfield.set(getValue(symbol), value);
 	return;
       }
     catch (IllegalAccessException ex)
       {
       }
     // This is a bit of a kludge  FIXME.
-    setConstraint(binding, new TrivialConstraint(getEnvironment(binding)));
-    setValue(binding, value);
+    setConstraint(symbol, new TrivialConstraint(getEnvironment(symbol)));
+    setValue(symbol, value);
   }
 
   public static void define (String name, Object object, String fname)
@@ -109,11 +109,11 @@ public class ClassMemberConstraint extends Constraint
   public static void define (String name, Object object, String fname,
                              Environment env)
   {
-    Binding binding = env.getBinding(name);
-    synchronized (binding)
+    Symbol symbol = env.getSymbol(name);
+    synchronized (symbol)
       {
-	setValue(binding, object);
-	setConstraint(binding,
+	setValue(symbol, object);
+	setConstraint(symbol,
                       new ClassMemberConstraint(object.getClass(), fname));
       }
   }
@@ -129,13 +129,13 @@ public class ClassMemberConstraint extends Constraint
 	    if (field.getType().getName() == "gnu.mapping.Location")
 	      { // Handles exported aliases:
 		name = Compilation.demangleName(name, true).intern();
-		Binding binding = env.getBinding(name);
-		AliasConstraint.define(binding, (Location) value);
+		Symbol symbol = env.getSymbol(name);
+		AliasConstraint.define(symbol, (Location) value);
 		return;
 	      }
-	    if (value instanceof Binding)
+	    if (value instanceof Symbol)
 	      {
-		env.addBinding((Binding) value);
+		env.addSymbol((Symbol) value);
 		return;
 	      }
 	    String vname
@@ -164,10 +164,10 @@ public class ClassMemberConstraint extends Constraint
 	  }
       }
     name = name.intern();
-    Binding binding = new Binding(name);
-    setValue(binding, object);
-    setConstraint(binding, new ClassMemberConstraint(field));
-    env.addBinding(binding);
+    Symbol symbol = new Symbol(name);
+    setValue(symbol, object);
+    setConstraint(symbol, new ClassMemberConstraint(field));
+    env.addSymbol(symbol);
   }
 
   /** Import all the public fields of an object. */

@@ -1,3 +1,8 @@
+2003-09-05  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (version.texi):  Add dependency so make info works even
+	if using CVS version without maintainer mode.
+
 2003-08-20  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Quantities):  Document extended definition of

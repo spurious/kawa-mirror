@@ -31,6 +31,10 @@ EXTRA_DIST = kawa.txt scm2java.html kawa.man \
 info_TEXINFOS = kawa.texi kawa-tour.texi
 CLEANFILES = kawa.txt *.info kawa/*.html internals.html kawa1.tmp kawa.1
 
+# Redundant if configured with  --enable-maintainer-mode.
+# Work around a questionable autoconf feature.
+version.texi: stamp-vti
+
 HTML_HOME = $$HOME/public_html
 
 install-html:

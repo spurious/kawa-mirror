@@ -359,6 +359,71 @@ public class InPort extends FilterInputStream implements Printable
     return Char.make((char)c);
   }
 
+  /** Read a word of alphabetic characters.
+   * @param c the first letter of the word (previously read)
+   * @return the word that was read.
+   */
+
+  public String readAlphaWord (int c)
+       throws java.io.IOException, ReadError
+  {
+    StringBuffer str = new StringBuffer(20);
+    for (;;)
+      {
+	if (c < 0)
+	  break;
+	if (Character.isLowerCase ((char)c) || Character.isUpperCase ((char)c))
+	  str.append ((char) c);
+	else
+	  {
+	    unreadChar();
+	    break;
+	  }
+	c = readChar();
+      }
+    return str.toString();
+  }
+
+  /** Read an optional signed int.
+   * If there is no int in the input stream, return 1.
+   */
+
+  int readOptionalExponent()
+       throws java.io.IOException, ReadError
+  {
+    int sign = readChar();
+    boolean neg = false;
+    int c;
+    if (sign == '+' || sign == '-')
+      c = readChar();
+    else
+      {
+	c = sign;
+	sign = 0;
+      }
+    int value;
+    if (c < 0 || (value = Character.digit ((char)c, 10)) < 0)
+      {
+	if (sign != 0)
+	  throw new ReadError (this, "exponent sign not followed by digit");
+	value = 1;
+      }
+    else
+      {
+	for (;;)
+	  {
+	    c = readChar();
+	    int d = Character.digit ((char)c, 10);
+	    if (d < 0)
+	      break;
+	    value = 10 * value + d;
+	  }
+      }
+    if (c >= 0)
+      unreadChar();
+    return value;
+  }
+
   /** Read a number (with a <prefix> in Scheme syntax from this.
    * @param radix the radix/base specified, or zero if it specified.
    * @param exactness 'i' if #i was seen;  'e' if #i was seen;  else ' '
@@ -402,6 +467,38 @@ public class InPort extends FilterInputStream implements Printable
       }
     if (radix == 0)
       radix = 10;
+    Quantity num = readSchemeReal (c, radix, exactness);
+    c = readChar();
+    if (c == '@')
+      {
+	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	return Quantity.add (num, Quantity.mul (im, Complex.imOne), 1);
+      }
+    else if (c == '+')
+      {
+	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	return Quantity.add (num, im, 1);
+      }
+    else if (c == '-')
+      {
+	Quantity im = readSchemeReal (readChar(), radix, exactness);
+	return Quantity.add (num, im, -1);
+      }
+    else if (Character.isLowerCase ((char)c)
+	     || Character.isUpperCase ((char)c))
+      {
+	throw new ReadError (this,
+			     "unexpected latter '"+((char)c)+"'after number");
+      }
+    else if (c >= 0)
+      unreadChar();
+    return num;
+  }
+
+  /* This actually also handles a real followed by 'i' - for now. */
+  public Quantity readSchemeReal(int c, int radix, char exactness)
+       throws java.io.IOException, ReadError
+  {
     boolean isFloat = false;
     StringBuffer str = new StringBuffer(20);
     if (c=='+')
@@ -415,11 +512,47 @@ public class InPort extends FilterInputStream implements Printable
       }
 
     int digits = 0;
+    Unit unit = null;
+    boolean imaginary = false;
     for (;;)
       {
 	if (Character.digit ((char)c, radix) >= 0)
 	  digits++;
-	else if ((c=='.' || c=='e' || c=='E') && radix == 10)
+	else if (radix == 10
+		 && (Character.isLowerCase ((char)c)
+		     || Character.isUpperCase ((char)c)))
+	  {
+	    String word = readAlphaWord (c);
+	    if (word.length() == 1)
+	      c = Character.toLowerCase ((char)c);
+	    else
+	      c = 0;
+	    if (c == 'e' || c == 's' || c == 'f' || c == 'd' || c == 'l')
+	      {
+		c = 'e';
+		isFloat = true;
+	      }
+	    else if (c == 'i')
+	      {
+		imaginary = true;
+		c = readChar();
+		break;
+	      }
+	    else
+	      {
+		unit = Unit.lookup (word);
+		if (unit == null)
+		  throw new ReadError (this, "unknown unit: " + word);
+		int power = readOptionalExponent();
+		if (power != 1)
+		  unit = Unit.pow (unit, power);
+		c = readChar();
+		if (exactness != 'e')
+		  isFloat = true;
+		break;
+	      }
+	  }
+	else if (c == '.')
 	  isFloat = true;
 	else // catches EOF
 	  break;
@@ -433,7 +566,7 @@ public class InPort extends FilterInputStream implements Printable
 	c = peekChar ();
 	if (Character.digit ((char)c, radix) < 0)
 	  throw new ReadError (this,"\"/\" in rational not followed by digit");
-	Numeric denominator = readSchemeNumber(radix, 'e');
+	Numeric denominator = readSchemeReal(readChar(), radix, 'e');
 	if (isFloat || ! (denominator instanceof IntNum))
 	  throw new ReadError (this, "invalid fraction");
 	return RatNum.make (IntNum.valueOf(str.toString (), radix),
@@ -442,10 +575,17 @@ public class InPort extends FilterInputStream implements Printable
     if (c >= 0)
       unreadChar();
 
-    if (isFloat)
-      return new DFloNum (str.toString ());
+    RealNum rnum;
+    if (!isFloat && exactness != 'i')
+      rnum = IntNum.valueOf(str.toString (), radix);
     else
-      return IntNum.valueOf(str.toString (), radix);
+      {
+	rnum = new DFloNum (str.toString ());
+	if (exactness == 'e')
+	  rnum = rnum.toExact();
+      }
+    Complex cnum = imaginary ? Complex.make (IntNum.zero(),rnum) : rnum;
+    return unit == null ? cnum : Quantity.make (cnum, unit);
   }
 
   /**
@@ -704,7 +844,7 @@ public class InPort extends FilterInputStream implements Printable
 		return readSchemeNumber (8, ' ');
 	      case 'i':
 	      case 'e':
-		return readSchemeNumber (8, (char) next);
+		return readSchemeNumber (0, (char) next);
 	      case '|':
 		boolean notAtEnd = true;
 		do {

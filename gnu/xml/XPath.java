@@ -722,9 +722,6 @@ public class XPath implements XPathConstants
   public boolean evalPath(XPathContext context, int pc, int stop,
 			  PositionConsumer consumer)
     {
-      //		Node node = context.getCurrentNode();
-      //Node save;
-      //NodeList children;
       TreePosition position = context.position;
       int count, savePos;
       for (;;)
@@ -832,11 +829,8 @@ public class XPath implements XPathConstants
 	    case OP_SIMPLE_NAMETEST:
 	      {
 		Object name = values[code[pc]];
-		boolean xx = name.equals(position.getNextTypeName());
-		if (! xx)
-		  {
+		if (! name.equals(position.getNextTypeName()))
 		  return true;
-		  }
 		pc++;
 	      }
 	      continue;
@@ -1061,23 +1055,21 @@ public class XPath implements XPathConstants
     return evalToNumber(context, codeLen-1);
   }
 
-  private boolean matchPath(XPathContext context, int pc, int stop)
+  private boolean matchPath(XPathContext context, int stepNum, int opcodepc)
   {
-    int start = pc;
-    pc = stop;
-    if (pc == start)
+    if (stepNum == 0)
       return true;
-    pc--;
-    int stepLen = code[pc];
-    int stepEnd = pc;
-    pc += stepLen; // Note that stepLen is a negative offset.
+    int numSteps = code[opcodepc-1];
+    int pc = opcodepc + code[opcodepc - numSteps + stepNum - 2];
+    int stop = numSteps == stepNum ? opcodepc - numSteps - 1
+      : opcodepc + code[opcodepc - numSteps + stepNum - 1];
     context.stepPc = pc;
     int axis = code[pc];
     if (axis != OP_AXIS_FIRST+AXIS_DESCENDANT_OR_SELF
-	&& ! matchStep(context, pc, stepEnd))
+	&& ! matchStep(context, pc, stop))
       return false;
-    context.position.gotoParent();
-    return matchPath(context, pc, stop);
+    return context.position.gotoParent()
+      && matchPath(context, stepNum - 1, opcodepc);
   }
 
   private boolean matchStep(XPathContext context, int pc, int stop)
@@ -1097,7 +1089,6 @@ public class XPath implements XPathConstants
   int matchSingleStep(XPathContext context, int pc, int stop)
   {
     int axis = AXIS_CHILD;
-    //Node node = context.getCurrentNode();
     for (;;)
       {
 	if (pc == stop)
@@ -1106,30 +1097,32 @@ public class XPath implements XPathConstants
 	  }
 	short opcode = code[pc];
 	pc++;
-	  /*
-	    if (opcode >= OP_AXIS_FIRST
-	    && opcode < OP_AXIS_FIRST + COUNT_OP_AXIS) {
+	if (opcode >= OP_AXIS_FIRST
+	    && opcode < OP_AXIS_FIRST + COUNT_OP_AXIS)
+	  {
 	    axis = opcode - OP_AXIS_FIRST;
+	    /*
 	    if (axis == AXIS_ATTRIBUTE
-	    && node.getNodeType() != Node.ATTRIBUTE_NODE)
-	    return pc - 1;
+		&& node.getNodeType() != Node.ATTRIBUTE_NODE)
+	      return pc - 1;
+	    */
 	    continue;
-	    }
-	  */
+	  }
 	  int j;
-	  switch (opcode) {
+	  switch (opcode)
+	    {
+	    case OP_SIMPLE_NAMETEST:
+	      {
+		Object name = values[code[pc]];
+		if (! name.equals(context.position.getNextTypeName()))
+		  return -1;
+		pc++;
+	      }
+	      continue;
+	    case OP_NODE:
+	    case OP_ANY_NAMETEST:
+	      continue;
 				/*
-				  case OP_SIMPLE_NAMETEST:
-				  {
-				  Object name = values[code[pc]];
-				  if (! ( node.getNodeName() == name))
-				  return -1;
-				  pc++;
-				  }
-				  continue;
-				  case OP_NODE:
-				  case OP_ANY_NAMETEST:
-				  continue;
 				  case OP_ROOT:
 				  if (node.getNodeType() != Node.DOCUMENT_NODE)
 				  return -1;
@@ -1194,12 +1187,12 @@ public class XPath implements XPathConstants
       case OP_LOCATIONPATH:
 	int opcodepc = pc;
 	int numSteps = code[--pc];
-	pc -= numSteps;
+	//pc -= numSteps;
 	// FIXME - cloning the position is a bit inefficient.
 	TreePosition save = (TreePosition) context.position.clone();
 	try
 	  {
-	    return matchPath(context, code[pc] + opcodepc, pc);
+	    return matchPath(context, numSteps, opcodepc);
 	  }
 	finally
 	  {
@@ -1210,6 +1203,11 @@ public class XPath implements XPathConstants
       }
       return false;
     }
+
+  public boolean match(XPathContext context)
+  {
+    return match(context, codeLen - 1);
+  }
 
   /*
     public boolean match(XPathContext context, Node node)
@@ -1237,11 +1235,22 @@ public class XPath implements XPathConstants
     System.out.println("}");
 
     TreeList doc = new TreeList();
-    //    doc.beginGroup("#document", null);    doc.endAttributes();
     XMLParser xmlparser = new XMLParser(new java.net.URL(args[1]),
 					new ParsedXMLToConsumer(doc));
     xmlparser.parse();
-    //doc.endGroup("#document");
+
+    XPath matcher = null;
+    if (args.length > 2)
+      {
+	matcher = new XPath();
+	XPathParser mparser = new XPathParser(args[2], matcher);
+	mparser.parse();
+	System.out.print("Matcher len: "+matcher.codeLen+" {");
+	for (int j = 0;  j < matcher.codeLen;  j++)
+	  System.out.print(" " + matcher.code[j]);
+	System.out.println("}");
+      }
+
 
     java.io.PrintWriter out = new java.io.PrintWriter(System.out);
     XMLPrinter printer = new XMLPrinter(out);
@@ -1250,7 +1259,7 @@ public class XPath implements XPathConstants
     doc.consume(printer);
     out.flush();
     */
-    doc.dump();
+    // doc.dump();
 
     // TreePosition pos = new TreePosition(doc, 0); // ????
     TreePosition pos = new TreePosition(doc);
@@ -1270,17 +1279,8 @@ public class XPath implements XPathConstants
 	    System.err.println("#"+j+": "+i0+" .. "+i1);
 	    doc.consumeRange(i0, i1, printer);
 	    out.flush();
-	    /*
-	    Node node = output.item(j);
-	    NodeUtil.dump( System.out, node );
 	    if (args.length > 2)
-	      {
-		XPath matcher = new XPath();
-		XPathParser mparser = new XPathParser(args[2], matcher);
-		mparser.parse();
-		System.out.println("matches: "+matcher.match(context, node));
-	      }
-	    */
+	      System.out.println("matches: "+matcher.match(context));
 	  }
       }
     else

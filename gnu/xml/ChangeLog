@@ -1,3 +1,9 @@
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* XPath.java: Numerous small cleanups.
+	(matchPath):  Fix logic.
+	(matchSingleStep):  Convert more of the code for old Node-based.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* Xpath.java:  Use new Convert.parseDouble method.

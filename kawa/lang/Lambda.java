@@ -190,7 +190,35 @@ public class Lambda extends Syntax implements Printable
       }
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
+
+    // Syntatic sugar:  <TYPE> BODY --> (as <TYPE> BODY)
     lexp.body = tr.rewrite_body (body);
+    if (lexp.body instanceof BeginExp)
+      {
+	BeginExp bexp = (BeginExp) lexp.body;
+	Expression[] exps = bexp.getExpressions();
+	int len = exps.length;
+	if (len > 1)
+	  {
+	    Expression rexp = exps[0];
+	    gnu.bytecode.Type rtype
+	      = kawa.standard.Scheme.getTypeValue(rexp);
+	    if (rtype != null)
+	      {
+		if (len > 2)
+		  {
+		    len--;
+		    Expression[] new_body = new Expression[len];
+		    System.arraycopy(exps, 1, new_body, 0, len);
+		    exps = new Expression[2];
+		    exps[0] = rexp;
+		    exps[1] = new BeginExp(new_body);
+		  }
+		QuoteExp c = new QuoteExp(kawa.standard.convert.getInstance());
+		lexp.body = new ApplyExp(c, exps);
+	      }
+	  }
+      }
     tr.pop(lexp);
   }
 

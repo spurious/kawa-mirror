@@ -64,9 +64,9 @@ public class AutoloadProcedure extends Procedure
 	loaded = (Procedure) Class.forName (className).newInstance ();
 	if (loaded == this)
 	  throw_error("circularity detected");
+	Environment env = Environment.getCurrent();
 	if (loaded instanceof ModuleBody)
 	  {
-	    Environment env = Environment.getCurrent();
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);
 	    ((ModuleBody)loaded).run();
 	    Object value = env.getBinding(name).getProcedure();
@@ -78,17 +78,8 @@ public class AutoloadProcedure extends Procedure
 	  }
 	else if (name != null)
 	  {
-	    // FIXME Kludge for ELisp.
-	    if (gnu.expr.Interpreter.getInterpreter().hasSeparateFunctionNamespace())
-	      {
-		gnu.jemacs.lang.Symbol.setFunctionBinding(Environment.user(),
-							  name, loaded);
-	      }
-	    else
-	      {
-		if (Environment.lookup_global (name) == this)
-		  Environment.define_global (name, loaded);
-	      }
+	    if (env.getFunction(name) == this)
+	      env.putFunction(name, loaded);
 	    if (loaded.name () == null)
 	      loaded.setName (name);
 	  }

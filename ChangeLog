@@ -1,5 +1,8 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/AutoloadProcedure.java:  Use new Environment puttFunction.
+	* kawa/lang/AutoloadSyntax.java:  Use new Environment getFunction.
+
 	* kawa/lang/AnyPat.java:  Implement java.io.Externalizable.
 	* kawa/lang/EqualPat.java:  Likewise.
 	* kawa/lang/ListRepeatPat.java:  Likewise.

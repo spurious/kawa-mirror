@@ -65,11 +65,14 @@ public class AutoloadSyntax extends Syntax
 	    Environment env = Environment.current ();
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(value, env);
 	    ((ModuleBody) value).run();
-	    // FIXME Kludge for ELisp.
-	    if (gnu.expr.Interpreter.getInterpreter().hasSeparateFunctionNamespace())
-	      value = gnu.jemacs.lang.Symbol.getFunctionBinding(env, name);
-	    else
-	      value = env.get (name);
+	    try
+	      {
+		value = env.getFunction(name);
+	      }
+	    catch (Exception ex)
+	      {
+		value = null;
+	      }
 	    if (value == null || value == this
 		|| !(value instanceof Syntax))
 	      throw_error("syntax not found in ");

@@ -1,3 +1,41 @@
+Changes from Kawa 1.6.66 to 1.6.68.
+==================================
+JEmacs news:
+- Define emacs-version as Kawa version but with leading 0 instead of 1.
+For example, the current value is "0.6.68 JEmacs".
+- New testsuite directory.
+- Improved autoload framework.  Handle ELisp autoload comments.
+- Handle escape and meta-key.
+- Handle lot more of ELisp.
+- Lots more is now done in ELisp, using .el files imported from XEmacs.
+- Incomplete support for setting mark, including using selection.
+- Basic (but incomplete) implementation of (interactive spec).
+- Common Lisp extensions: typep, default arguments.
+- A new status.html file to note what works and what doesn't.
+
+You can now specify in define and define-private the type of a
+variable.  If the variable is module-level,
+(define name :: <type> value) creates a field named "name"
+having the specified type and initial value.  (If type is not
+specified, the default is not Object, but rather a Binding
+that *contains* the variable's value.)
+
+You can now define the type of a module-level variable:  In
+(define[-private] :: type expression)
+New (define-constant name [:: type] expression) definition form.
+
+A procedure can now have arbitrary properties associated with it.
+Use procedure-property and set-procedure-property! to get and set them.
+
+The new procedure make-procedure creates a generic procedure that
+may contain one or more methods, as well as specified properties.
+
+New declaration form define-base-unit.  Both it and define-unit have been
+re-implemented to be module-safe.  Basically '(define-unit ft 12in)'
+is sugar for '(define-constant ft$unit (... (* 12 in$unit)))', where
+ft$unit and in$unit are standard identifiers managed by the module
+system.  Also, the output syntax for units and quantities is cleaner.
+
 The new declaration (module-export name ...) allows control over the
 names exported from a module.  The new declaration (module-static ...)
 allows control over which definitions are static and which are

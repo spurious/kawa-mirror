@@ -1,3 +1,26 @@
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/AutoloadProcedure.java (getProperty): New method.
+
+	* kawa/lang/AutoloadSyntax.java (load):  Don't re-set in Environment.
+
+	* kawa/standard/Scheme.java (getTypeValue):  Use getTypeFor method
+	of Interpreter.
+
+	* kawa/standard/ParseFormat.java (asFormat):  New static method.
+	* kawa/standard/format.java (formatToString):  New static method.
+	* kawa/standard/instance.java:  Moved and renamed to
+	gnu/kawa/reflect/InstanceOf.java.
+	* kawa/standard/Makefile.am:  Updated accordingly.
+
+	* kawa/standard/apply.java:  Extend for use by ELisp.
+	(getArguments):  Make static, add new skip parameter.
+	(apply, applyN):  Adjust accordingly.
+
+	* kawa/standard/not.java (trueExp, falseExp):  New fields.
+	(compile):  Use them.
+	Also, pass interpreter to ConditionalTarget constructor.
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SUBDIRS):  Move testsuite before gnu, to "force" check

@@ -1,12 +1,21 @@
+BEFORE KAWA 1.7:
+* Finish modules: define-module?  constructor arguments?
+* Handle defmacro definition and use in same source file.
+* load.loadSource if (true) should be if (false).
+* Implement Scheme API for serialization.
+* Create jemacs.jar binary.
+
+Move kawa.standard.convert to gnu.kawa.reflect.Convert.
+Move kawa.lang.Lambda to gnu.kawa.lispexpr.Lambda.  Merge with Elisp version.
+Remove Scheme.getTypeValue.
+
+(define-alias <alias> <class>) doesn't work interactively.
+
 JEmacs:
 * clean up function-binding hacks
 * vertical-motion
-Scheme sould not reference ELisp statically.
 
 Modules:
-* '(define foo :: <Foo> 10)' should compile to 'public Foo foo = 10;'
-with no extra Binding.  Use reflection when entering in Environment.
-(partially done)
 * Infer parameter and return types when defaulted and otherwise match
 method in explicit module-extends or module-interface.
 
@@ -14,7 +23,7 @@ compile-file should generate .jar, not .zip.
 Should perhaps take multiple file names.
 Update manual to removing .zip references.
 
-Binding for imported unknown names should not be static!
+Binding for imported unknown names (idN$NAME) should not be static!
 
 (this) needs to be more general/robust.
 Start by forcing it to make the generated method non-static.
@@ -24,8 +33,6 @@ Re-store code to check argument count when applyN is involved.
 (in Compilation and maybe ApplyExp).
 
 BindingInitializer.emit: global Environment should be cached
-
-idN$NAME - should not be static.
 
 Add --inline and --no-inline flags.
 
@@ -50,18 +57,8 @@ Generate better code for `(and test1 test2 test3)'.
 Lexer should implement mark/reset.
 
 Module compilation:
-* Procedures that have #!optional args should be compiled to
-multiple methods.
 * Allocated selctor indexes "densely" within each applyX method
 of a ModuleBody, so tableswitch gets used, rather than lookupswitch.
-
-Finish define-unit and related cleanups.
-It it a problem that (say) 2in is no longer a literal?
-Perhaps a lazy Unit that is resolved at run-time or rewrite-time?
-How about:  LazyQuantity extends DQuantity, where unit() is
-looked up "as needed" at run time (and may thus fail).  Translator will
-handle it specially, and look it up in the compile-time environment.
-LazyQuantity may be useful for Units that are not fixed (such as money).
 
 define-syntax and friends are not properly hygienic when checking
 literals:  symbols listed among the literals lists are matched as
@@ -81,11 +78,9 @@ Fix scheme-window so #!eof closes window.
 
 Option(s) to control/disable inlining.
 
-Change ModuleMethod to inherit from MethodProc.
-
 Change Declaration so it no longer inherits from Variable.
 (Instead, maybe it should inherit from constraint.)
-Insyead use getVariable() { return (Variable)field; }
+Instead use getVariable() { return (Variable)field; }
 Then we can get rid of the sym field and the symbol method,
 because getName() would be source name, while getVariable.getName()
 is mangled name.  Would also allow us to allocate Variables
@@ -120,7 +115,7 @@ Implement pretty-printer, ideally in a way that works with AWT containers.
 Complete R4RS procedures.
   trig functions for complex numbers
 
-Complete R5RS number syntax;  clean up quantity syntax.
+Complete R5RS number syntax.
 
 Implement system open-input-pipe open-output-pipe close-pipe.
 
@@ -137,7 +132,6 @@ Implement modules.
 
 Update to match kawa-tour:
   Vector -> FVector
-  Quote -> quote  (also Lambda -> lambda)
   SyntaxRule.match should use Pattern.
 
 Should SyntaxRule inherit from Pattern?
@@ -153,9 +147,6 @@ Support warning, error, fatal.
 Parser accumulates list of syntax errors.
 When done, if errors or warnings, throw SyntaxErrors.
 Printing SyntaxError prints error log.
-
-Make it easier to plug in other source languages.
-Implement Emacs Lisp reader and primitives.
 
 Make closure representation consistent with inner classes wrt
 use of Attributes (for possible improved debugging).

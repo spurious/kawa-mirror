@@ -1,3 +1,29 @@
+2001-10-20  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (run):  Use CallContext's runUntilDone, not run.
+	(run, runFile):  Catch Throwable, not Exception.
+	* kawa/lang/AutoloadProcedure.java, kawa/lang/Eval.java,
+	kawa/standard/callcc.java, kawa/standard/TracedProcedure.java,
+	kawa/standard/call_with_values.java, kawa/standard/map.java,
+	kawa/standard/force.java, kawa/standard/call_with_output_string.java,
+	kawa/standard/prim_throw.java, kawa/standard/throw_name.java,
+	(apply* methods, eval* methods):  Now specify throws Throwable.
+	* kawa/lang/Promise.java (force):  Likewise.
+	* kawa/standard/{call_with_input_file.java, call_with_output_file.java,
+	with_input_from_file.java, with_output_to_file.java,load.java):
+	Likewise.  No longer need to catch exceptions.
+	* kawa/standard/prim_throw.java (throw_it):  Specify throws Throwable.
+	No longer need to wrap checked exceptions.
+	* kawa/lang/Macro.java:  Catch Throwable, not Exception.
+	* kawa/standard/constant_fold.java:  Likewise.
+	* kawa/standard/Scheme.java (eval):  Catch and wrap Throwable.
+
+	* kawa/lang/Record.java (get):  Take extra defaultValue parameter.
+	* kawa/standard/ScmEnv.java (likewise):
+	(addExtra):  New hook to add extra Environments to search.
+	* kawa/standard/Scheme.java (<init>):  Use getNewEnvironment.
+	(getNewEnvironment):   Use reflection to add NamespaceEnv.
+
 2001-10-17  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Add gnu/kawa/xml/Makefile.

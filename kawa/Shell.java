@@ -75,7 +75,7 @@ public class Shell
 
 
 		mod.evalModule(env, ctx);
-		ctx.run();
+		ctx.runUntilDone();
 		if (ch < 0)
 		  break;
 	      }
@@ -95,7 +95,7 @@ public class Shell
 		e.printAll(perr, 20);
 		e.clear();
 	      }
-	    catch (Exception e)
+	    catch (Throwable e)
 	      {
 		e.printStackTrace(perr);
 	      }
@@ -134,7 +134,7 @@ public class Shell
 	System.err.println("Cannot open file "+fname);
 	System.exit(1);
       }
-    catch (Exception e)
+    catch (Throwable e)
       {
 	e.printStackTrace(System.err);
 	System.exit(1);

@@ -1,3 +1,8 @@
+All the abstract apply* and eval* methods now specify 'throws Throwable'.
+A bunch of code was changed to match.  The main visible advantage is
+that the throw and primitive-throw procedures work for any Throwable
+without requiring it to be (confusingly) wrapped.
+
 Changes from Kawa 1.6.95 to 1.6.96.
 ==================================
 A new compilation flag --servlet generates a Servlet which can be

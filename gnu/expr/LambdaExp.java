@@ -30,8 +30,8 @@ public class LambdaExp extends ScopeExp
      of our child lambdas.  heapFrameLambda points to the child.  */
   LambdaExp heapFrameLambda;
 
-  LambdaExp firstChild;
-  LambdaExp nextSibling;
+  public LambdaExp firstChild;
+  public LambdaExp nextSibling;
 
   /** A magic value to indicate there is no unique return continuation. */
   final static ApplyExp unknownContinuation = new ApplyExp (null, null);

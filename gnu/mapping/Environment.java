@@ -18,7 +18,7 @@ public class Environment extends NameMap
   protected Constraint unboundConstraint = new UnboundConstraint(this);
 
   static final float threshold = (float) 0.7;
-  static int num_bindings;
+  int num_bindings;
 
   public static Environment user () { return current(); }
 

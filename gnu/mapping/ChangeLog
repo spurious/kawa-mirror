@@ -1,3 +1,8 @@
+1999-08-27  Per Bothner  <per@bothner.com>
+
+	* Environment.java (num_binding):  Make non-static.
+	Reported by Tony White <twhite@texar.com>.
+
 1999-08-26  Per Bothner  <per@bothner.com>
 
 	* WrappedException.java:  New class; inherits from RuntimeException.

@@ -1,3 +1,8 @@
+Thu Jan 15 13:42:16 1998  Alouatte Petrofsky <albatros@wco.com>
+
+	* IntNum.java (negate):  Change return value to boolean (for overflow).
+	(setNegative):  Fix so -2**63 works.
+
 Sat Jan 10 15:08:24 1998  Per Bothner  <bothner@cygnus.com>
 
 	* IntNum.java (getAbsolute):  Fix for negative numbers.

@@ -127,3 +127,11 @@
 	 path)
       (let ((pt ((primitive-array-get <object>) more-points i)))
 	(invoke path 'lineTo (real-part pt) (imag-part pt))))))
+
+(define (scroll contents #!key w h)
+  (if (instance? contents <gnu.kawa.models.Paintable>)
+      (set! contents (gnu.kawa.swingviews.SwingPaintable:new contents)))
+  (let ((scr :: <javax.swing.JScrollPane>
+	     (javax.swing.JScrollPane:new contents)))
+    (invoke scr 'setPreferredSize (make <java.awt.Dimension> w h))
+    scr))

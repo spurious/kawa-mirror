@@ -1,3 +1,7 @@
+2004-03-13  Per Bothner  <per@bothner.com>
+
+	* gui.scm (scroll):  New function.
+
 2004-02-13  Per Bothner  <per@bothner.com>
 
 	* gui.scm (fill, draw, with-paint, with-composite, composite-src-over,

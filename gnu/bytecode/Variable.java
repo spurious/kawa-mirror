@@ -4,8 +4,8 @@
 package gnu.bytecode;
 import java.io.*;
 
-public class Variable extends Location implements java.util.Enumeration {
-
+public class Variable extends Location implements java.util.Enumeration
+{
   /* Variables in a Scope are linked together in a linked list. */
   Variable next;
   public final Variable nextVar () { return next; }

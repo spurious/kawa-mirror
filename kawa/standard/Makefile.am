@@ -53,16 +53,6 @@ exact2inexact.java \
 inexact2exact.java \
 number2string.java \
 string2number.java \
-char_equal_p.java \
-char_less_p.java \
-char_less_equal_p.java \
-char_greater_p.java \
-char_greater_equal_p.java \
-char_ci_equal_p.java \
-char_ci_less_p.java \
-char_ci_less_equal_p.java \
-char_ci_greater_p.java \
-char_ci_greater_equal_p.java \
 string_v.java \
 string2list.java \
 list2string.java \

@@ -267,16 +267,16 @@ public class Scheme extends Interpreter
 
       //-- Section 6.6  -- complete
       define_proc ("char?", "kawa.lib.characters");
-      define_proc ("char=?", "kawa.standard.char_equal_p");
-      define_proc ("char<?", "kawa.standard.char_less_p");
-      define_proc ("char>?", "kawa.standard.char_greater_p");
-      define_proc ("char<=?", "kawa.standard.char_less_equal_p");
-      define_proc ("char>=?", "kawa.standard.char_greater_equal_p");
-      define_proc ("char-ci=?", "kawa.standard.char_ci_equal_p");
-      define_proc ("char-ci<?", "kawa.standard.char_ci_less_p");
-      define_proc ("char-ci>?", "kawa.standard.char_ci_greater_p");
-      define_proc ("char-ci<=?", "kawa.standard.char_ci_less_equal_p");
-      define_proc ("char-ci>=?", "kawa.standard.char_ci_greater_equal_p");
+      define_proc ("char=?", "kawa.lib.characters");
+      define_proc ("char<?", "kawa.lib.characters");
+      define_proc ("char>?", "kawa.lib.characters");
+      define_proc ("char<=?", "kawa.lib.characters");
+      define_proc ("char>=?", "kawa.lib.characters");
+      define_proc ("char-ci=?", "kawa.lib.characters");
+      define_proc ("char-ci<?", "kawa.lib.characters");
+      define_proc ("char-ci>?", "kawa.lib.characters");
+      define_proc ("char-ci<=?", "kawa.lib.characters");
+      define_proc ("char-ci>=?", "kawa.lib.characters");
       define_proc ("char-alphabetic?", "kawa.lib.characters");
       define_proc ("char-numeric?", "kawa.lib.characters");
       define_proc ("char-whitespace?", "kawa.lib.characters");
@@ -804,7 +804,7 @@ public class Scheme extends Interpreter
 	types.put ("pair", ClassType.make("gnu.kawa.util.Pair"));
 	types.put ("string", ClassType.make("gnu.kawa.util.FString"));
 	types.put ("abstract-string", ClassType.make("gnu.kawa.util.AbstractString"));
-	types.put ("character", ClassType.make("gnu.kawa.util.Char"));
+	types.put ("character", ClassType.make("gnu.text.Char"));
 	types.put ("vector", ClassType.make("gnu.kawa.util.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("procedure", ClassType.make("gnu.mapping.Procedure"));

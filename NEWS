@@ -1,5 +1,10 @@
 Changes from Kawa 1.6.58 to 1.6.59
 ==================================
+Optimized eqv? so if one of the arguments is constant and
+not Char or Numeric, inline it the same way eq? is.
+(This helps case when the labels are symbols,
+which help the "lattice" benchmark.) ???
+
 The Emacs-related packages are now grouped under a new gnu.jemacs package.
 
 Improved framework for catching errors.  This means improved error

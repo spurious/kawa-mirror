@@ -1,5 +1,8 @@
 TO BE DONE FOR 2.0:
 
+Remove DefMacro - merge with Macro?
+Fix scheme-window in misc.scm.
+
 Why is start pc==0 in LocalVariableTable?
 
 Let LineBufferedReader pos, limit, buffer be private,
@@ -9,10 +12,7 @@ exact->inexact only implemented for RealNums, not other Complex.
 
 Fix scheme-window so #!eof closes window.
 
-Optimize eqv? so if one of the arguments is constant and
-not Char or Numeric, inline it the same way eq? is.
-(This helps case when the labels are symbols,
-which help the "lattice" benchmark.)
+Option(s) to control/disable inlining.
 
 Implement source-filename source-line source-column macros.
 Macro-expansions lose line number information.
@@ -29,6 +29,8 @@ Combine primitive field with record facility and define-class.
 
 Support persistence and serialization of Scheme values.
 
+Implement SwitchExp;  use it for Scheme case.
+
 Replace use of ZipArchive by jar files.
 
 Implement full call-cc by re-writing.
@@ -38,9 +40,6 @@ Compile a module with top-level function definitions to a single class
 with methods.  More efficient when functions can be statically resolved.
 However less efficient otherwise, since need to use reflection interface.
 
-Provide bindings/implementations for the Format concept of java.text.
-Implement Common Lisp-style format.  (SLib version cannot be used,
-as it is not thread-safe.  That could perhaps be fixed.)
 Implement pretty-printer, ideally in a way that works with AWT containers.
 
 Complete R4RS procedures.
@@ -164,10 +163,10 @@ JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 
 Rewrite (make-temporary-file) to use File.createTempFile.
 
-Replace kawa.lang.Sequence with java.util.List.
+Have kawa.lang.Sequence implement java.util.List.
 gnu.mapping.Binding should implement java.util.Map.Entry.
 
-Possibly replace GuiConsole to use JTextPane (or gnu.emacs.Window).
+Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).
 
 BENCHMARKS
 http://www.ccs.neu.edu/home/will/Twobit/kvwbenchmarks.html

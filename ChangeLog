@@ -1,3 +1,59 @@
+1999-08-22  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Quote (rewrite): Don't use Patterns.
+
+	* kawa/lang/Sequence (toArray):  Allocate correct array type,
+	as specified by Java2 Collections.
+
+	* kawa/lang/PairWithPosition.java (<init>):  New constructor.
+
+	* kawa/MessageArea.java:  Remove redundant import java.lang.*.
+
+	* kawa/lang/AutoloadSyntax.java (rewrite):  Replace by rewriteForm.
+
+	* kawa/lang/SyntaxRule.java (execute_template, both overloadings):
+  	Take the input form as an extra argument.  Use this to copy line
+ 	position of input (if known) to expansion.
+
+	* kawa/lang/Translator.java:  More general macro framework:
+	A macro has an arbitrary expansion precedure (possibly using
+	syntax-case), which is called with a SyntaxForm.
+  	Also, some better line number handling and error message hooks.
+	* kawa/lang/Syntax.java (rewriteForm):  New preferred method to
+	override, instead of (still-available) rewrite.
+	* kawa/lang/Macro.java (rewriteForm):  Method replaces rewrite.
+	(expand):  Takes a complete form, not just the argument list.
+	* kawa/lang/DefMacro.java:  Re-write - expander now takes a single
+	SyntaxForm, rather than an array of forms.  Also, provide hook for
+	not-yet-evaluated expression instead of expander Procedure.
+	* kawa/lang/SyntaxRules.java:  Now inherit from Procedure1.
+	(apply1):  New methods - calls expand.
+ 	(expand):  Update interface to take Pair.
+	* kawa/standard/location.java (rewriteArg):  Update expand call.
+	* kawa/lang/SyntaxForm.java:  New class.
+
+	* kawa/lang/InvokeStatic:  New class.
+	
+	* kawa/lang/EqualPat.java (print):  Tweak the output.
+	* kawa/lang/Pattern.java (typePattern, matchPatternMethod):
+  	New static fields.
+	* kawa/lang/ListRepeatPat.java:  Use Pattern.typePattern.
+	* kawa/lang/PairPat.java:  Likewise.
+	(match):  If input is SyntaxForm, match its contained form.
+
+	* kawa/standard/syntax_case.java:  New Syntax class.
+	* kawa/standard/syntax_rules.java:  New Syntax class.
+	* kawa/standard/let_syntax.java:  New Syntax class.
+	* kawa/standard/Scheme.java:  Define new macros.
+	(exp2Type):  New method.
+	* kawa/standard/define_syntax.java:  No-longer handles
+	the syntax-rules part now that syntax-rules is stand-alone.
+	* kawa/standard/Makefile.am:  Update for new classes.
+
+	* kawa/standard/eq_p.java (compile):  New static method.
+	* kawa/standard/eqv_p.java:  Make Inlineable.
+ 	(isEqv):  Rename to apply.
+
 1999-08-08  Per Bothner  <per@bothner.com>
 
 	* configure.in, configure (AC_OUTPUT):  Update for gnu.jemacs change.

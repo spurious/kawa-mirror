@@ -74,7 +74,8 @@ public abstract class ScopeExp extends Expression
   {
     for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
       {
-	if (! var.isArtificial ())
+	// Don't make artificial variables visible.
+	if (! var.isArtificial())
 	  ((Declaration)var).push (tr);
       }
   }

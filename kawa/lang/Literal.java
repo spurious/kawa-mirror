@@ -127,7 +127,7 @@ public class Literal
 	comp.method.compile_new (comp.javaIntegerType);
 	comp.method.compile_dup (comp.javaIntegerType);
 	comp.method.compile_push_int (((Integer)value).intValue ());
-	comp.method.compile_invoke_nonvirtual (comp.initIntegerMethod);
+	comp.method.compile_invoke_special (comp.initIntegerMethod);
       }
     else if (value instanceof String)
       {

@@ -140,7 +140,7 @@ public class FString extends Sequence implements Printable, Compilable
     comp.method.compile_new (scmStringType);
     comp.method.compile_dup (scmStringType);
     comp.method.compile_push_string (toString ());
-    comp.method.compile_invoke_nonvirtual (initFStringMethod);
+    comp.method.compile_invoke_special (initFStringMethod);
   }
 
   public void print (java.io.PrintStream ps)

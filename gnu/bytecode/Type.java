@@ -460,6 +460,8 @@ public abstract class Type {
   public static final Method booleanValue_method
     = boolean_ctype.addMethod("booleanValue", typeArray0,
 			      boolean_type, Access.PUBLIC);
+  public static final ClassType java_lang_Class_type
+    = ClassType.make("java.lang.Class");
 
   protected Class reflectClass;
 

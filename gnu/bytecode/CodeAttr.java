@@ -589,23 +589,25 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
+  /* Low-level method to pust a ConstantPool entry.
+   * Does not do the appropriatre <code>pushType</code>. */
   public final void emitPushConstant (CpoolEntry cnst)
   {
     reserve(3);
     int index = cnst.index;
     if (cnst instanceof CpoolValue2)
       {
-      	put1 (20); // ldc2w
+      	put1 (20); // ldc2_w
 	put2 (index);
       }
     else if (index < 256)
       {
-	put1(18); // ldc1
+	put1(18); // ldc
 	put1(index);
       }
     else
       {
-	put1(19); // ldc2
+	put1(19); // ldc_w
 	put2(index);
       }
   }
@@ -800,6 +802,14 @@ public class CodeAttr extends Attribute implements AttrContainer
 	  }
 	pushType(Type.string_type);
       }
+  }
+
+  /** Push a class constant pool entry.
+   * This is only supported by JDK 1.5 and later. */
+  public final void emitPushClass (String name)
+  {
+    emitPushConstant(getConstants().addClass(name));
+    pushType(Type.java_lang_Class_type);
   }
 
   public void emitPushNull ()

@@ -72,7 +72,6 @@ public class object extends Syntax
     // First pass (get Declarations).
     // Should be done at scan time.  FIXME.
     Vector inits = new Vector(20);
-    Vector clinits = new Vector(20);
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	if (! (obj instanceof Pair)
@@ -107,7 +106,7 @@ public class object extends Syntax
 	      }
 	    int nKeywords = 0;
 	    Object init = null;
-	    Expression initExp = null;
+	    Object initForm = null;
 	    while (args instanceof Pair)
 	      {
 		pair = (Pair) args;
@@ -145,7 +144,7 @@ public class object extends Syntax
 			// doesn't include this class;
 			// in the case of 'init: EXPR' it does.
 			if (key != initKeyword)
-			  initExp = tr.rewrite(init);
+			  initForm = init;
 		      }
 		    else if (key == init_keywordKeyword)
 		      {
@@ -227,7 +226,7 @@ public class object extends Syntax
 		  = allocationFlag == Declaration.STATIC_SPECIFIED;
 		inits.addElement(decl != null ? (Object) decl
 				 : isStatic ? Boolean.TRUE : Boolean.FALSE);
-		inits.addElement(initExp);
+		inits.addElement(initForm);
 	      }
 	    if (decl == null)
 	      {
@@ -284,7 +283,6 @@ public class object extends Syntax
       oexp,
       components,
       inits,
-      clinits,
       method_list
     };
     return result;
@@ -295,12 +293,23 @@ public class object extends Syntax
     ClassExp oexp = (ClassExp) saved[0];
     Object components = saved[1];
     Vector inits = (Vector) saved[2];
-    Vector clinits = (Vector) saved[3];
-    LambdaExp method_list = (LambdaExp) saved[4];
+    LambdaExp method_list = (LambdaExp) saved[3];
+    Vector clinits = new Vector(20);
     oexp.firstChild = method_list;
+
+    // First a pass over init-form: specifiers, since these are evaluated
+    // in a scope outside the current class.
+    int len = inits.size();
+    for (int i = 1;  i < len;  i += 2)
+      {
+	Object init = inits.elementAt(i);
+	if (init != null)
+	  inits.setElementAt(tr.rewrite(init), i);
+      }
+    
     tr.push(oexp);
 
-    // Second pass (rewrite method/initializer bodies).
+    // Pass to rewrite method/initializer bodies.
     LambdaExp meth = method_list;
     int init_index = 0;  // Input index in inits Vector.
     int finit_index = 0;   // Output index in inits vector.

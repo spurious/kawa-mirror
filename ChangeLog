@@ -1,3 +1,11 @@
+2004-05-10  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/object.java (scanClassDef):  Remove clinits local.
+	(rewriteClassDef):  Remove clinits form returned array.
+	(scanClassDef) Don't rewrite init-form: expression yet.
+	(rewriteClassDef):  Extra pre-pass to rewrite init-form: forms first.
+	Fixes bug #8837.
+
 2004-05-06  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/cxr.java (count):  Replace field by high-order

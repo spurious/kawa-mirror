@@ -97,8 +97,7 @@ public class Lambda extends Syntax implements Printable
 	      }
 	    key_args = 0;
 	  }
-        else if (pair.car == "::" // && "::" is unbound FIXME
-                 && pair.cdr instanceof Pair)
+        else if (tr.matches(pair.car, "::") && pair.cdr instanceof Pair)
           pair = (Pair) pair.cdr;
 	else if (key_args >= 0)
 	  key_args++;
@@ -164,7 +163,7 @@ public class Lambda extends Syntax implements Printable
 	Object defaultValue = defaultDefault;
 	Pair typeSpecPair = null;
         Pair p;
-	if (pair.car == "::")
+	if (tr.matches(pair.car, "::"))
 	  {
 	    tr.syntaxError("'::' must follow parameter name");
 	    return;
@@ -173,7 +172,7 @@ public class Lambda extends Syntax implements Printable
           {
             name = pair.car.toString();
             if (pair.cdr instanceof Pair
-                && (p = (Pair) pair.cdr).car == "::")
+                && tr.matches((p = (Pair) pair.cdr).car, "::"))
               {
                 if (! (pair.cdr instanceof Pair))
                   {
@@ -193,7 +192,7 @@ public class Lambda extends Syntax implements Printable
           {
 	    name = p.car.toString();
             p = (Pair) p.cdr;
-            if (p.car == "::")
+            if (tr.matches(p.car, "::"))
               {
                 if (! (p.cdr instanceof Pair))
                   {
@@ -240,7 +239,7 @@ public class Lambda extends Syntax implements Printable
                 if (p.cdr != LList.Empty)
                   {
                     tr.syntaxError("junk at end of specifier for parameter '"
-                                   + name + '\'');
+                                   + name + '\''+" after type "+p.car);
                     return;
                   }
               }
@@ -286,7 +285,7 @@ public class Lambda extends Syntax implements Printable
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
     // Syntatic sugar:  <TYPE> BODY (or :: <TYPE> BODY) --> (as <TYPE> BODY)
-    if (body instanceof Pair && ((Pair) body).car == "::")
+    if (body instanceof Pair && tr.matches(((Pair) body).car, "::"))
       body = ((Pair) body).cdr;
     if (body instanceof Pair && ((Pair) body).car == "<sequence>")
       {

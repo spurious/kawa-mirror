@@ -275,7 +275,8 @@ public class LambdaExp extends ScopeExp
 	  }
 	else if (parent.heapFrameLambda == this)
 	  closureEnv = thisVariable;
-	else if (! isClassGenerated())
+	else if (isClassMethod() ? ! parent.getNeedsStaticLink()
+		 : ! isClassGenerated())
 	  {
 	    if (parent.heapFrame == null)
 	      closureEnv = null;

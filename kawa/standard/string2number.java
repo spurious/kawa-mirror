@@ -4,7 +4,7 @@ import kawa.math.*;
 
 public class string2number extends Procedure1or2
 {
-  public static Numeric parse (String str, int radix)
+  static Object parse (String str, int radix)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
@@ -14,8 +14,7 @@ public class string2number extends Procedure1or2
       }
     catch (ReadError ex)
       {
-	throw new GenericError ("syntax error in string->number - " +
-				ex.getMessage ());
+	return Scheme.falseObject;
       }
     catch (java.io.IOException ex)
       {

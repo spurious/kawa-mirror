@@ -1,9 +1,10 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Represents a "mode instance" - a mode active for a specific {@link Buffer}. */
 
-public class Mode implements gnu.mapping.ApplyMethodContainer
+public class Mode extends ModuleBody
 {
   public Buffer buffer;
   public Mode next;
@@ -13,19 +14,19 @@ public class Mode implements gnu.mapping.ApplyMethodContainer
     return buffer;
   }
 
-  public Object apply0(ApplyMethodProc proc)
+  public Object apply0(ModuleMethod proc)
   {
     return applyN(proc, Values.noArgs);
   }
 
-  public Object apply1(ApplyMethodProc proc, Object arg1)
+  public Object apply1(ModuleMethod proc, Object arg1)
   {
     Object[] args = new Object[1];
     args[0] = arg1;
     return applyN(proc, args);
   }
 
-  public Object apply2(ApplyMethodProc proc, Object arg1, Object arg2)
+  public Object apply2(ModuleMethod proc, Object arg1, Object arg2)
   {
     Object[] args = new Object[2];
     args[0] = arg1;
@@ -33,7 +34,7 @@ public class Mode implements gnu.mapping.ApplyMethodContainer
     return applyN(proc, args);
   }
 
-  public Object apply3(ApplyMethodProc proc,
+  public Object apply3(ModuleMethod proc,
                        Object arg1, Object arg2, Object arg3)
   {
     Object[] args = new Object[3];
@@ -43,7 +44,7 @@ public class Mode implements gnu.mapping.ApplyMethodContainer
     return applyN(proc, args);
   }
 
-  public Object apply4(ApplyMethodProc proc,
+  public Object apply4(ModuleMethod proc,
                        Object arg1, Object arg2, Object arg3, Object arg4)
   {
     Object[] args = new Object[4];
@@ -54,7 +55,7 @@ public class Mode implements gnu.mapping.ApplyMethodContainer
     return applyN(proc, args);
   }
 
-  public Object applyN(ApplyMethodProc proc, Object[] args)
+  public Object applyN(ModuleMethod proc, Object[] args)
   {
     int count = args.length;
     int num = proc.numArgs();

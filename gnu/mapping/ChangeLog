@@ -1,3 +1,10 @@
+2001-08-15  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (print(String)):  Handle null string.
+
+	* WrongArguments.java (checkArgCount):  If procedures's getName() is
+	null, using procedure's class's name instead.
+
 2001-07-16  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (next):  New field.

@@ -285,7 +285,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void print(String v)
   {
-    write(v);
+    write(v == null ? "(null)" : v);
   }
 
   public void print(Object v)

@@ -30,7 +30,8 @@ public class WrongArguments extends IllegalArgumentException {
       return null;
     StringBuffer buf = new StringBuffer(100);
     buf.append("call to `");
-    buf.append(proc.getName());
+    String pname = proc.getName();
+    buf.append(pname != null ? pname : proc.getClass().getName());
     buf.append("' has too ");
     buf.append(tooMany ? "many" : "few");
     buf.append(" arguments (");

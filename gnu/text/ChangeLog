@@ -1,3 +1,8 @@
+Thu Mar 11 11:14:49 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LispReader.java:  New class.
+	* Makefile.am (java_JAVA), Makefile.in:  Add LispReader.java.
+
 Thu Jun 25 22:36:19 1998  Per Bothner  <bothner@cygnus.com>
 
 	New directory.

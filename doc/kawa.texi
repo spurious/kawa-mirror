@@ -913,7 +913,7 @@ source form that is futher processed (it may be repeatedly macro-expanded).
 If you define a macro with @code{defmacro}, you (currently) cannot use
 the macro in the same compilation as the definition.
 This restrictions does not apply to macros defined by @code{define-syntax}.
-@end defun
+@end defmac
 
 @node Miscellaneous,  , Threads, Extensions
 @subsection Miscellaneous

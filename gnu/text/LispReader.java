@@ -205,131 +205,134 @@ public abstract class LispReader extends Lexer
 	eofError("unexpected EOF in character literal");
 	return -1;
       }
-    else
+    return readEscape(c);
+  }
+
+  protected final int readEscape(int c)
+    throws java.io.IOException, SyntaxException 
+  {
+    switch ((char) c)
       {
-	switch ((char) c)
+      case 'a':  c =  7;  break;  // alarm/bell
+      case 'b':  c =  8;  break;  // backspace
+      case 't':  c =  9;  break;  // tab
+      case 'n':  c = 10;  break;  // newline
+      case 'v':  c = 11;  break;  // vertical tab
+      case 'f':  c = 12;  break;  // formfeed
+      case 'r':  c = 13;  break;  // carriage return
+      case 'e':  c = 27;  break;  // escape
+      case '\"': c = 34;  break;  // quote
+      case '\\': c = 92;  break;  // backslash
+      case ' ': // Skip to end of line, inclusive.
+	for (;;)
 	  {
-	  case 'a':  c =  7;  break;  // alarm/bell
-	  case 'b':  c =  8;  break;  // backspace
-	  case 't':  c =  9;  break;  // tab
-	  case 'n':  c = 10;  break;  // newline
-	  case 'v':  c = 11;  break;  // vertical tab
-	  case 'f':  c = 12;  break;  // formfeed
-	  case 'r':  c = 13;  break;  // carriage return
-	  case 'e':  c = 27;  break;  // escape
-	  case '\"': c = 34;  break;  // quote
-	  case '\\': c = 92;  break;  // backslash
-          case ' ': // Skip to end of line, inclusive.
-            for (;;)
-              {
-                c = read();
-                if (c < 0)
-                  {
-                    eofError("unexpected EOF in character literal");
-                    return -1;
-                  }
-                if (c == '\n')
-                  return -2;
-                if (c == '\r')
-                  {
-                    if (peek() == '\n')
-                      skip();
-                    return -2;
-                  }
-                if (c != ' ' && c != '\t')
-                  {
-                    unread(c);
-                    break;
-                  }
-              }
-          case '\r':
-            if (peek() == '\n')
-              skip();
-            return -2;
-          case '\n':
-            return -2;
-	  case 'M':
 	    c = read();
-	    if (c != '-')
+	    if (c < 0)
 	      {
-		error("Invalid escape character syntax");
-		return '?';
+		eofError("unexpected EOF in character literal");
+		return -1;
 	      }
-	    c = read();
-	    if (c == '\\')
-	      c = readEscape();
-	    return c | 0200;
-	  case 'C':
-	    c = read();
-	    if (c != '-')
+	    if (c == '\n')
+	      return -2;
+	    if (c == '\r')
 	      {
-		error("Invalid escape character syntax");
-		return '?';
+		if (peek() == '\n')
+		  skip();
+		return -2;
 	      }
-	    /* ... fall through ... */
-	  case '^':
-	    c = read();
-	    if (c == '\\')
-	      c = readEscape();
-	    if (c == '?')
-	      return 0177;
-	    return c & (0200 | 037);
-	  case '0':
-	  case '1':
-	  case '2':
-	  case '3':
-	  case '4':
-	  case '5':
-	  case '6':
-	  case '7':
-	    /* An octal escape, as in ANSI C.  */
-	    c = c - '0';
-	    for (int count = 0;  ++count < 3; )
+	    if (c != ' ' && c != '\t')
 	      {
-		int d = read();
-		int v = Character.digit((char) d, 8);
-		if (v >= 0)
-		  c = (c << 3) + v;
-		else
-		  {
-		    if (d >= 0)
-		      unread(d);
-		    break;
-		  }
+		unread(c);
+		break;
 	      }
-	    break;
-          case 'u':
-            c = 0;
-            for (int i = 4;  --i >= 0; )
-              {
-                int d = read ();
-                if (d < 0)
-                  eofError("premature EOF in \\u escape");
-                int v = Character.digit ((char) d, 16);
-                if (v < 0)
-                  error("non-hex character following \\u");
-                c = 16 * c + v;
-              }
-            break;
-	  case 'x':
-	    c = 0;
-	    /* A hex escape, as in ANSI C.  */
-	    for (;;)
-	      {
-		int d = read();
-		int v = Character.digit((char) d, 16);
-		if (v >= 0)
-		  c = (c << 4) + v;
-		else
-		  {
-		    if (d >= 0)
-		      unread(d);
-		    break;
-		  }
-	      }
-	    break;
-	  default:  break;
 	  }
+      case '\r':
+	if (peek() == '\n')
+	  skip();
+	return -2;
+      case '\n':
+	return -2;
+      case 'M':
+	c = read();
+	if (c != '-')
+	  {
+	    error("Invalid escape character syntax");
+	    return '?';
+	  }
+	c = read();
+	if (c == '\\')
+	  c = readEscape();
+	return c | 0200;
+      case 'C':
+	c = read();
+	if (c != '-')
+	  {
+	    error("Invalid escape character syntax");
+	    return '?';
+	  }
+	/* ... fall through ... */
+      case '^':
+	c = read();
+	if (c == '\\')
+	  c = readEscape();
+	if (c == '?')
+	  return 0177;
+	return c & (0200 | 037);
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+	/* An octal escape, as in ANSI C.  */
+	c = c - '0';
+	for (int count = 0;  ++count < 3; )
+	  {
+	    int d = read();
+	    int v = Character.digit((char) d, 8);
+	    if (v >= 0)
+	      c = (c << 3) + v;
+	    else
+	      {
+		if (d >= 0)
+		  unread(d);
+		break;
+	      }
+	  }
+	break;
+      case 'u':
+	c = 0;
+	for (int i = 4;  --i >= 0; )
+	  {
+	    int d = read ();
+	    if (d < 0)
+	      eofError("premature EOF in \\u escape");
+	    int v = Character.digit ((char) d, 16);
+	    if (v < 0)
+	      error("non-hex character following \\u");
+	    c = 16 * c + v;
+	  }
+	break;
+      case 'x':
+	c = 0;
+	/* A hex escape, as in ANSI C.  */
+	for (;;)
+	  {
+	    int d = read();
+	    int v = Character.digit((char) d, 16);
+	    if (v >= 0)
+	      c = (c << 4) + v;
+	    else
+	      {
+		if (d >= 0)
+		  unread(d);
+		break;
+	      }
+	  }
+	break;
+      default:  break;
       }
     return c;
   }

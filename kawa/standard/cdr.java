@@ -14,6 +14,6 @@ public class cdr extends Procedure1
     if (arg1 instanceof Pair)
       return ((Pair)arg1).cdr;
     else
-      throw new WrongType(this.name,1,"list or pair");
+      throw new WrongType(this.name,1,"pair");
   }
 }

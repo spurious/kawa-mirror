@@ -1,5 +1,8 @@
 2002-06-11  Per Bothner  <per@bothner.com>
 
+	* kawa/repl.java (commandLineArgArray):  New variable.
+	(setArgs):  Set commandLineArgArray.
+
 	* build.xml: Generate Focus.java from gnu/kawa/xml/Focus.java.in.
 
 2002-06-10  Per Bothner  <per@bothner.com>

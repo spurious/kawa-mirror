@@ -120,6 +120,7 @@ public class repl extends Procedure0or1
       }
   }
 
+  public static String[] commandLineArgArray;
   public static FVector commandLineArguments;
 
   public static String homeDirectory;
@@ -151,9 +152,19 @@ public class repl extends Procedure0or1
 
   public static void setArgs (String[] args, int arg_start)
   {
-    Object[] array = new Object[args.length - arg_start];
-    for (int i = arg_start;  i < args.length;  i++)
-      array[i - arg_start] = new FString (args[i]);
+    int nargs = args.length - arg_start;
+    Object[] array = new Object[nargs];
+    if (arg_start == 0)
+      commandLineArgArray = args;
+    else
+      {
+	String[] strings = new String[nargs];
+	for (int i = nargs;  --i >= 0; )
+	  strings[i] = args[i+arg_start];
+	commandLineArgArray = strings;
+      }
+    for (int i = nargs;  --i >= 0; )
+      array[i] = new FString (args[i + arg_start]);
     commandLineArguments = new FVector (array);  // FIXME scsh has list
     // FIXME scsh also has command-line proc
     Environment.define_global ("command-line-arguments",

@@ -9,7 +9,7 @@ class kawac
   static void usage ()
   {
     System.err.println
-      ("usage:  kawac infile [-d outdirectory] [prefix [topname]]");
+      ("usage: [java] kawac infile [-d outdirectory] [prefix [topname]]");
     System.exit (-1);
   }
 

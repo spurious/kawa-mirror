@@ -1,5 +1,6 @@
 package gnu.expr;
 import java.io.*;
+import java.util.zip.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 
@@ -65,18 +66,28 @@ public class ModuleExp extends LambdaExp
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();
-    ZipArchive zar = new ZipArchive (zar_file, "rw");
+    ZipOutputStream zout
+	= new ZipOutputStream (new FileOutputStream (zar_file));
+    zout.setMethod(zout.STORED); // no compression
 
     byte[][] classes = new byte[comp.numClasses][];
+    CRC32 zcrc = new CRC32();
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       {
 	ClassType clas = comp.classes[iClass];
 	classes[iClass] = clas.writeToArray ();
+	ZipEntry zent = new ZipEntry(clas.getName ().replace ('.', '/')
+				     + ".class");
 
-	zar.append (clas.getName ().replace ('.', '/') + ".class",
-		    classes[iClass]);
+	zent.setSize(classes[iClass].length);
+	zcrc.reset();
+	zcrc.update(classes[iClass], 0, classes[iClass].length);
+	zent.setCrc(zcrc.getValue());
+
+	zout.putNextEntry (zent);
+	zout.write (classes[iClass]);
       }
-    zar.close ();
+    zout.close ();
   }
 
 }

@@ -1,3 +1,10 @@
+1999-12-06  Per Bothner  <per@bothner.com>
+
+1999-12-06  Bruce R. Lewis  <brlewis@alum.mit.edu>
+
+	* ModuleExp.java (compileToArchive):  Re-write to use java.util.zip.*
+	instead of gnu.bytecode.ZipArchive.
+
 1999-12-05  Daniel Bonniot <bonniot@cma.ensmp.fr>
 
 	* Declaration.java (load):  Call emitPutStatic if appropriate.

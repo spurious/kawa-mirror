@@ -211,7 +211,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int arg_count = argTypes.length;
     boolean is_static = getStaticFlag();
     Expression[] args = exp.getArgs();
-    Procedure.checkArgCount(this, args.length);
+
+    String arg_error = WrongArguments.checkArgCount(this, args.length);
+    if (arg_error != null)
+      comp.error('e', arg_error);
+
     if (opcode() == 183) // invokespecial == primitive-constructor
       {
 	ClassType type = method.getDeclaringClass();

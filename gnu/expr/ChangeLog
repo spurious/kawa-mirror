@@ -1,3 +1,10 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* Expression.java (makeGetField):  Moved to gnu.kawa.reflect.SlotGet.
+	(makeCoercion):  Moved to gnu.kawa.functions.Convert..
+
+	* Expression.java (setLine):  New method.
+
 2001-11-23  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java (emitCheckedCoerce)  If target type is

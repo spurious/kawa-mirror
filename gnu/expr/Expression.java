@@ -126,44 +126,11 @@ public abstract class Expression implements Printable
     return let;
   }
   
-  /**
-   * Convenience method to make an Expression that coerces a value.
-   * @param value to be coerced
-   * @param type to coerce value to
-   * @return expression that coerces value to type
-   */
-  public static Expression makeCoercion(Expression value, Expression type)
+  public final Expression setLine(Expression old)
   {
-    Expression[] exps = new Expression[2];
-    exps[0] = type;
-    exps[1] = value;
-    QuoteExp c = new QuoteExp(kawa.standard.convert.getInstance());
-    return new ApplyExp(c, exps);
-  }
-
-  /**
-   * Convenience method to make an Expression that coerces a value.
-   * @param value to be coerced
-   * @param type to coerce value to
-   * @return expression that coerces value to type
-   */
-  public static Expression makeCoercion(Expression value, Type type)
-  {
-    return makeCoercion(value, new QuoteExp(type));
-  }
-
-  /**
-   * Convenience method to make an Expression that gets the value of a field.
-   * @param value evaluates to object that has the named field
-   * @param fieldName name of field in value
-   * @return expression that get the name field from value
-   */
-  public static Expression makeGetField(Expression value, String fieldName)
-  {
-    Expression[] args = new Expression[2];
-    args[0] = value;
-    args[1] = new QuoteExp(fieldName);
-    return new ApplyExp(gnu.kawa.reflect.SlotGet.field, args);
+    this.filename = old.filename;
+    this.position = old.position;
+    return this;
   }
 
   public final void setFile (String filename)

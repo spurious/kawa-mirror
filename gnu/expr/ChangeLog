@@ -1,3 +1,10 @@
+Tue Mar 30 17:15:14 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LambdaExp.java (CLASS_METHOD):  New flag.
+	(isClassMethod, setClassMethod):  New methods.
+	(isHandlingTailCalls):  Return false if isClassMethod/
+	* ObjectExp (compile):  Call compileExp on actual child method.
+
 Mon Mar 29 23:28:59 1999  Per Bothner  <bothner@cygnus.com>
 
 	* LambdaExp.java (getCompiledClassType):  Add Compilation parameter.

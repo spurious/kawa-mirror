@@ -1,5 +1,6 @@
 2002-11-16  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (XQUERY_FUNCTION_NAMESPACE):  New constant.
 	* XQParser.java (defaultFunctionNamespace):  New field.
 	(defaultNamespace):  Rename field to defaultElementNamespace.
 

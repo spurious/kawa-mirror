@@ -17,6 +17,8 @@ import gnu.kawa.functions.ConstantFunction0;
 
 public class XQuery extends Interpreter
 {
+  public static final String XQUERY_FUNCTION_NAMESPACE
+    = "http://www.w3.org/2002/08/xquery-functions";
   static boolean charIsInt = false;
 
   public static gnu.math.Numeric asNumber(Object arg)

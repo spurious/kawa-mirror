@@ -1,3 +1,7 @@
+2005-02-14  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule): Fix think eval -> apply.
+
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* Expression.java: Change to extens Procedure0.

@@ -187,7 +187,7 @@ public class ModuleExp extends LambdaExp
 		dout.println(']');
 		dout.flush();
 	      }
-	    mexp.body.eval(ctx);
+	    mexp.body.apply(ctx);
 	  }
 	else
 	  {

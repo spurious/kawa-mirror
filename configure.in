@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(doc/kawa.texi)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.96)
+AM_INIT_AUTOMAKE(kawa, 1.6.97)
 
 AM_MAINTAINER_MODE
 AC_PROG_CC
@@ -12,28 +12,32 @@ AC_CANONICAL_HOST
 AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
 AC_ARG_ENABLE(kawa-frontend,
-  [  --enable-kawa-frontend   Build "kawa" front-end program using readline],
+  [  --enable-kawa-frontend  Build "kawa" front-end program using readline],
   enable_kawa_frontend=$enableval, enable_kawa_frontend=no)
 
 AC_ARG_WITH(gcj,
-  [  --with-gjc    Compile Kawa using GCJ (GNU Compiler for Java)])
+  [  --with-gjc              Compile Kawa using GCJ (GNU Compiler for Java)])
 
 AC_ARG_ENABLE(xml,
-  [  --disable-xml            Don't build support for XML processing],
+  [  --disable-xml           Don't build support for XML processing],
   enable_xml=$enableval, enable_xml=yes)
 
 AC_ARG_ENABLE(servlet,
-  [  --enable-servlet         Build support for generating servlets],
+  [  --enable-servlet        Build support for generating servlets],
   enable_servlet=$enableval, enable_servlet=no)
 
 AC_ARG_WITH(java-collections,
-  [  --with-java-collections  Assume Java collections (java.util.List) is available])
+  [  --with-java-collections Assume Java collections (java.util.List) is available])
+
+AC_ARG_WITH(java-references,
+  [  --without-java-references  Don't use java.lang.ref],
+  with_java_references=$withval, with_java_references=yes)
 
 AC_ARG_WITH(swing,
-  [  --with-swing             Assume Swing (Java Foundation Classes) is available])
+  [  --with-swing            Assume Swing (Java Foundation Classes) is available])
 
 AC_ARG_WITH(awt,
-  [  --with-awt               Assume AWT is available (default on)])
+  [  --with-awt              Assume AWT is available (default on)])
 
 AC_PROG_INSTALL
 #AC_PROG_MAKE_SET
@@ -62,6 +66,7 @@ esac
 AM_CONDITIONAL(WITH_GCJ, test "$with_gcj" = "yes")
 AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_CONDITIONAL(ENABLE_SERVLET, test "$enable_servlet" = "yes")
+AM_CONDITIONAL(WITH_JAVA_REFERENCES, test "$with_java_references" = "yes")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
 AM_PROG_LIBTOOL

@@ -1,3 +1,10 @@
+2001-10-16  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.97.
+
+	* configure.in (--without-java-references):  New flag.
+	(WITH_JAVA_REFERENCES)  New automake conditional.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	* config.guess:  Import new version.

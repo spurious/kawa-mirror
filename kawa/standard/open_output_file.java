@@ -6,10 +6,13 @@ import gnu.mapping.Environment;
              
 public class open_output_file extends Procedure1
 {
-  public Object apply1 (Object arg1) 
+  public Object apply1 (Object arg1)
   {
-    String fname = arg1.toString();
+    return openOutputFile(arg1.toString());
+  }
 
+  public static OutPort openOutputFile(String fname)
+  {
     try {
       Object conv = Environment.user().get("port-char-encoding");
       java.io.OutputStream strm = new java.io.FileOutputStream(fname);

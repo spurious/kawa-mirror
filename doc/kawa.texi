@@ -47,7 +47,7 @@ The author of Kawa is
 @uref{http://www.bothner.com/per/,Per Bothner}
 @email{per@@bothner.com}.
 Kawa is a re-write of Kawa 0.2, which was written by
-R. Alexander Milowski @email{alex@@copsol.com}.
+R. Alexander Milowski @email{alex@@milowski.com}.
 
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.

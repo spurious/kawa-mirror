@@ -1,3 +1,10 @@
+2003-08-14  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (sign):  If high-order word is zero, we need to
+	check that remaining words are zero.  Reported by Aubrey Jaffer.
+
+	* IntNum.java (valueOf):  Cheap and more general fits-in-long test.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* IntNum.java (compare(IntNum,int)):  New static method.

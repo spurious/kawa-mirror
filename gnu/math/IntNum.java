@@ -180,8 +180,22 @@ public class IntNum extends RatNum implements Externalizable
 
   public int sign ()
   {
-    int top = words == null ? ival : words[ival-1];
-    return top > 0 ? 1 : top < 0 ? -1 : 0;
+    int n = ival;
+    int[] w = words;
+    if (w == null)
+      return n > 0 ? 1 : n < 0 ? -1 : 0;
+    int i = w[--n];
+    if (i > 0)
+      return 1;
+    if (i < 0)
+      return -1;
+    for (;;)
+      {
+	if (n == 0)
+	  return 0;
+	if (w[--n] != 0)
+	  return 1;
+      }
   }
 
   /** Return -1, 0, or 1, depending on which value is greater. */
@@ -1217,9 +1231,9 @@ public class IntNum extends RatNum implements Externalizable
        throws NumberFormatException
   {
     int len = s.length ();
-    // Testing (len < MPN.chars_per_word(radix)) would be more accurate,
+    // Testing (len < 2 * MPN.chars_per_word(radix)) would be more accurate,
     // but slightly more expensive, for little practical gain.
-    if (len <= 15 && radix <= 16)
+    if (len + radix <= 28)
       return IntNum.make (Long.parseLong (s, radix));
     
     int byte_len = 0;

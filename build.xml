@@ -161,7 +161,10 @@
        If javax.servlet.http.HttpServlet is in the classpath, then we'll
        compile Kawa' servlet interface, unless you override enable-servlet.
     -->
-    <available property="enable-servlet" classname="javax.servlet.http.HttpServlet"/>
+    <!-- The servlet code uses methods from the 2.3 specification now.
+         So test for a class that is new for the 2.3 API.
+    -->
+    <available property="enable-servlet" classname="javax.servlet.Filter"/>
     <property name="enable-servlet" value="false"/>
   
     <echo>
@@ -198,6 +201,7 @@
   
   <target name="build-tools">
     <mkdir dir="${build.tools}"/>
+    <mkdir dir="${build.tmp}"/>
     <!-- 
       This didn't work in NetBeans for some reason. 
       (Even the includejavaruntime/includeantruntime attributes do no good.
@@ -229,7 +233,6 @@
   </target>
   
   <target name="select-java1" depends="build-tools">
-    <mkdir dir="${build.tmp}"/>
     <xcopy todir="${build.tmp}" overwrite="true">
  	   <fileset dir="${src.dir}">
        	 <patternset refid="build.selectjava"/>
@@ -401,6 +404,7 @@
            optimize="${optimize}" >
       <include name="gnu/bytecode/"/>
       <include name="gnu/commonlisp/lang/"/>
+      <include name="gnu/ecmascript/"/>
       <include name="gnu/expr/"/>
       <include name="gnu/kawa/functions/"/>
       <include name="gnu/kawa/lispexpr/"/>
@@ -581,7 +585,7 @@
       <arg line="-P gnu.kawa.slib. --module-static -C"/>
       <fileset dir="${src.dir}/gnu/kawa/slib"> 
         <include name="XML.scm"/>
-        <include name="XString.scm"/>
+        <include name="XStrings.scm"/>
       </fileset>
     </apply>
   </target>
@@ -666,6 +670,7 @@
            optimize="${optimize}" >
       <include name="gnu/jemacs/buffer/"/>
       <include name="gnu/jemacs/lang/"/>
+      <include name="gnu/jemacs/swing/"/>
     </javac>
   </target>
    

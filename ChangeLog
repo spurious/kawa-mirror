@@ -1,7 +1,13 @@
 2003-06-06  Jim White  <jim@pagesmiths.com>
 
-	* build.xml:  Make system.scm get compiled after vectors.scm.
+	* build.xml:  Add gnu/ecmascript.  Add gnu/jemacs/swing.
+	Name change to XStrings.scm.
+	Check for Servlet 2.3 API for enable-servlet (HttpServletResponse
+	.resetBuffer and HttpServletRequest.getRequestURL are only since 2.3).
+	Init of tmp directory moved so that clean will work ok. 
 
+	* build.xml:  Make system.scm get compiled after vectors.scm.
+	
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (distall):  Add more stuff.

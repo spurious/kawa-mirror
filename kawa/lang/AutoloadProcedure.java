@@ -49,7 +49,8 @@ public class AutoloadProcedure extends Procedure
 
   private void throw_error (String prefix)
   {
-    throw new GenericError (prefix + className
+    loaded = null;
+    throw new RuntimeException (prefix + className
 				+ " while autoloading "
 				+ (name () == null ? "" : name().toString ()));
   }
@@ -62,7 +63,7 @@ public class AutoloadProcedure extends Procedure
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();
 	if (loaded == this)
-	  throw new GenericError("circularity in autoload of "+name);
+	  throw_error("circularity detected");
 	if (loaded instanceof ModuleBody)
 	  {
 	    Environment env = Environment.getCurrent();

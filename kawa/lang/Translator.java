@@ -210,7 +210,14 @@ public class Translator extends Object
       {
 	if (proc instanceof AutoloadProcedure)
 	  {
-	    proc = ((AutoloadProcedure) proc).getLoaded();
+	    try
+	      {
+		proc = ((AutoloadProcedure) proc).getLoaded();
+	      }
+	    catch (RuntimeException ex)
+	      {
+		break tryDirectCall;
+	      }
 	    if (proc == null || ! (proc instanceof Procedure))
 	      break tryDirectCall;
 	  }

@@ -447,6 +447,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    if (next == 'e' || next == 'E')
 	      {
+		tokenBufferAppend((char) next);
 		next = read();
 		if (next == '+' || next == '-')
 		  {

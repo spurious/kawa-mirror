@@ -1,3 +1,8 @@
+2003-09-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (getRawToken):  Add missing tokenBufferAppend.
+	Fixes bug reported 09-28 by Weiqi Gao <weiqigao@networkusa.net>.
+
 2003-09-18  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  Add root function.
@@ -56,7 +61,7 @@
 2003-08-03  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseNodeTest):  Handle self:: and parent:: axies.
-	(parseNodeTest):  Handle '.' and '..'.
+	(parseNodeTest):  Handle '.' and '..' abbreviated steps.
 
 	* XQParser.java (focusDefined):  Remove field.  Instead, just check
 	whether DOT_VARNAME is in scope.

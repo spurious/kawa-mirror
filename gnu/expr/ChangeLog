@@ -1,3 +1,10 @@
+2004-05-10  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkApplyExp):  Don't call walkLambdaExp
+	in the case of a ClassExp.
+	(walkSetExp):  Likewise.
+	Fixes bug #8711.
+
 2004-05-09  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (generateApplyMethods):  Emit line numbers.

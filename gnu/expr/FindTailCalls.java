@@ -39,7 +39,8 @@ public class FindTailCalls extends ExpWalker
 		  lexp = (LambdaExp) value;
 	      }
 	  }
-	else if (exp.func instanceof LambdaExp)
+	else if (exp.func instanceof LambdaExp
+		 && ! (exp.func instanceof ClassExp))
 	  {
 	    lexp = (LambdaExp) exp.func;
 	    walkLambdaExp(lexp, false);
@@ -295,8 +296,8 @@ public class FindTailCalls extends ExpWalker
   {
     if (decl != null)
       decl.setCanWrite();
-    if (decl != null && decl.getValue() == value && value instanceof LambdaExp
-	&& ! (value instanceof ObjectExp)
+    if (decl != null && decl.getValue() == value
+	&& value instanceof LambdaExp && ! (value instanceof ClassExp)
         && ! decl.isPublic())
       {
 	LambdaExp lexp = (LambdaExp) value; 

@@ -27,8 +27,8 @@ public class BeginExp extends Expression
   {
     int n = exps.length, i;
     for (i = 0; i < n - 1; i++)
-      exps[i].compile (comp, IGNORED);
-    exps[i].compile (comp, flags);
+      exps[i].compile_with_linenumber (comp, IGNORED);
+    exps[i].compile_with_linenumber (comp, flags);
   }
 
   public void print (java.io.PrintStream ps)

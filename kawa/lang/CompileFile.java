@@ -72,6 +72,7 @@ public class CompileFile extends Procedure2
       {
 	LambdaExp lexp = new LambdaExp (List.Empty, body, interpreter);
 	lexp.setModuleBody (true);
+	lexp.filename = name;
 	return lexp;
       }
     catch (WrongArguments ex)

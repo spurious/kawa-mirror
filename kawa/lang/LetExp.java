@@ -50,7 +50,7 @@ public class LetExp extends ScopeExp
     /* Assign the initial values to the proper variables, in reverse order. */
     store_rest (comp, firstVar ());
 
-    body.compile (comp, flags);
+    body.compile_with_linenumber (comp, flags);
     comp.method.pop_scope ();
   }
 

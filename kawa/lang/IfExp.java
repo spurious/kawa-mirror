@@ -44,7 +44,7 @@ public class IfExp extends Expression
     comp.compileConstant (Interpreter.falseObject);
     Label else_label = new Label (comp.method);
     comp.method.compile_goto_ifeq (else_label);
-    then_clause.compile (comp, flags);
+    then_clause.compile_with_linenumber (comp, flags);
     Label end_label;
     if (else_clause == null && (flags & IGNORED) != 0)
       end_label = null;
@@ -57,7 +57,7 @@ public class IfExp extends Expression
 
     else_label.define (comp.method);
     if (else_clause != null)
-      else_clause.compile (comp, flags);
+      else_clause.compile_with_linenumber (comp, flags);
     else if ((flags & IGNORED) == 0)
       comp.compileConstant (Interpreter.voidObject);
     if (end_label != null)

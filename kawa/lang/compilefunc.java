@@ -5,13 +5,8 @@ import codegen.*;
  * @author Per Bothner
  */
 
-public class compilefunc extends Procedure2
+public class compilefunc
 {
-  public compilefunc ()
-  {
-    super ("compile-func");
-  }
-
   static public final void compile (Compilation comp,  LambdaExp lexp)
   {
     int arg_count;
@@ -80,7 +75,10 @@ public class compilefunc extends Procedure2
       }
 
     comp.method = constructor_method;
-    if (lexp.name != null)
+
+    // If immediate, we cannot set the function name in the constructor,
+    // since setLiterals has not been called yet (ecept for nested fnctions).
+    if (lexp.name != null && !comp.immediate)
       {
 	constructor_method.compile_push_this ();
 	comp.compileConstant (lexp.name);
@@ -223,7 +221,7 @@ public class compilefunc extends Procedure2
     lexp.start_label = new Label (comp.method);
     lexp.start_label.define (comp.method);
 
-    lexp.body.compile (comp, Expression.LAST);
+    lexp.body.compile_with_linenumber (comp, Expression.LAST);
     comp.method.compile_return ();
 
     if (! comp.immediate && comp.curClass == comp.mainClass)
@@ -238,23 +236,4 @@ public class compilefunc extends Procedure2
     comp.method.pop_scope ();
     comp.curLambda = saveLambda;
   }
-
-  public final Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
-  {
-    if (! (arg1 instanceof LambdaProcedure))
-      throw new WrongType (this.name().toString (), 1, "lambda procedure");
-    LambdaProcedure proc = (LambdaProcedure) arg1;
-    try
-      {
-	Compilation comp = new Compilation (proc.lexpr, arg2.toString (), false);
-	comp.curClass.emit_to_file ();
-      }
-    catch (java.io.IOException ex)
-      {
-        System.err.print("Caught I/O exception: ");
-      }
-    return Interpreter.voidObject;
-  }
-
 }

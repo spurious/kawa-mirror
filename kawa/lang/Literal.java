@@ -59,8 +59,11 @@ public class Literal
     this.value = value;
     comp.literalTable.put (value, this);
     assign (comp);
+    this.type = comp.scmObjectType;
   }
 
+  /** Create a new Literal, for a value available from a static field.
+  * The field must be static and already exist. */
   public Literal (Object value, Field field, Compilation comp)
   {
     this.value = value;
@@ -84,6 +87,7 @@ public class Literal
       {
 	comp.method.compile_push_int (index);
 	comp.method.compile_array_load (comp.scmObjectType);
+	comp.method.maybe_compile_checkcast (type);
       }
   }
 

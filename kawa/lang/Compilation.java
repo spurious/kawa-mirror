@@ -154,6 +154,8 @@ public class Compilation
 
   public void addClass (ClassType new_class)
   {
+    if (source_filename != null)
+      new_class.setSourceFile (source_filename);
     if (classes == null)
       classes = new ClassType[20];
     else if (numClasses >= classes.length)
@@ -283,8 +285,11 @@ public class Compilation
       }
   }
 
+  String source_filename;
+
   public Compilation (LambdaExp lexp, String classname, String prefix)
   {
+    source_filename = lexp.filename;
     classPrefix = prefix;
     ClassType classfile = new ClassType (classname);
     addClass (classfile);
@@ -296,6 +301,7 @@ public class Compilation
 
   public Compilation (LambdaExp lexp, String classname, boolean immediate)
   {
+    source_filename = lexp.filename;
     ClassType classfile = new ClassType (classname);
     addClass (classfile);
     this.curClass = classfile;

@@ -6,11 +6,18 @@ ENABLE_GCJ_COMPILED_KAWA = ../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
+if ENABLE_SERVLET
+SERVLET_TESTS = check-HelloCgiS check-HelloCgiK
+endif
+
 all:
 
-check:
+check: check2-no-full-tailcalls check1 check2-full-tailcalls $(SERVLET_TESTS)
+
+check2-no-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--no-full-tailcalls
-	$(MAKE) check1
+
+check2-full-tailcalls:
 	$(MAKE) check2 OPTIONS=--full-tailcalls
 
 check1:  check-num check-format check-ppfile scribble.class
@@ -72,6 +79,28 @@ SimpleB.class: $(srcdir)/SimpleB.java classes1.class
 classes2.class: $(srcdir)/classes2.scm SimpleB.class
 	$(KAWA) -C $(srcdir)/classes2.scm
 
+HelloCgiK.class: $(srcdir)/HelloCgiK.krl
+	$(KAWA) --servlet --krl -C $(srcdir)/HelloCgiK.krl
+
+HelloCgiK:
+	ln -s ../bin/cgi-servlet HelloCgiK
+
+check-HelloCgiK: HelloCgiK.class HelloCgiK
+	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiK SERVER_NAME=localhost \
+	  KAWALIB=$(KAWALIB) ./HelloCgiK >tmp.out
+	@if diff -b $(srcdir)/HelloCgiK.out tmp.out; then echo '# HelloCgiK test passes'; else echo FAIL HelloCgiK test; fi
+
+HelloCgiS.class: $(srcdir)/HelloCgiS.scm
+	$(KAWA) --servlet --output-format xml -C $(srcdir)/HelloCgiS.scm
+
+HelloCgiS:
+	ln -s ../bin/cgi-servlet HelloCgiS
+
+check-HelloCgiS: HelloCgiS.class HelloCgiS
+	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiS SERVER_NAME=localhost \
+	  KAWALIB=$(KAWALIB) ./HelloCgiS >tmp.out
+	@if diff -b $(srcdir)/HelloCgiS.out tmp.out; then echo '# HelloCgiS test passes'; else echo FAIL HelloCgiS test; fi
+
 APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
@@ -81,6 +110,7 @@ check-scribble: scribble.class
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm \
   misc-test.scm polytype.scm formatst.scm scribble.scm \
-  module1.scm module2.scm
-CLEANFILES = tmp? *.log testing.zip *.class
-EXTRA_DIST = $(SOURCES) ppfile.out
+  module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm
+CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
+EXTRA_DIST = $(SOURCES) ppfile.out HelloCgiK.out HelloCgiS.out
+

@@ -1,0 +1,4 @@
+Content-Type: text/html
+
+<?xml version='1.0'?>
+<body><p>The request URI was: HelloCgiS</p><p>There was no query string.</p></body>

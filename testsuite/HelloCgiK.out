@@ -1,0 +1,4 @@
+Content-Type: text/xml
+
+<p>The request URL was: http://localhost/HelloCgiK</p>
+<p>The query string was:  false</p>

@@ -28,7 +28,7 @@ public class sleep extends Procedure1
        {
 	 throw new GenericError("sleep was interrupted");
        }
-     return Scheme.voidObject;
+     return Values.empty;
    }
   
 }

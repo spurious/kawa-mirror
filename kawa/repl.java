@@ -143,7 +143,7 @@ public class repl extends Procedure0or1
 	    initFile = new File(homeDirectory, kawarc_name);
 	  }
 	else
-	  scmHomeDirectory = Interpreter.falseObject;
+	  scmHomeDirectory = Boolean.FALSE;
 	Environment.define_global("home-directory", scmHomeDirectory);
 	if (initFile != null && initFile.exists())
 	  Shell.runFile(initFile.getPath());

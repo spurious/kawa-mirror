@@ -55,7 +55,7 @@ public class CompileFile extends Procedure2
     comp.compileToArchive(comp.getModule(), arg2.toString());
     if (messages.seenErrors())
       throw new gnu.text.SyntaxException(messages);
-    return Interpreter.voidObject;
+    return Values.empty;
   }
 
   /** Compile a Scheme source file to one or more .class file.

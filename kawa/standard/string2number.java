@@ -17,13 +17,13 @@ public class string2number extends Procedure1or2
 	Object result = LispReader.parseNumber(data, 0, len, '\0',
 					       radix, LispReader.SCM_NUMBERS);
 	if (! (result instanceof Numeric))
-	  return Scheme.falseObject;
+	  return Boolean.FALSE;
 	return result;
       }
     catch (Throwable ex)
       {
 	ex.printStackTrace();
-	return Scheme.falseObject;
+	return Boolean.FALSE;
       }
   }
 

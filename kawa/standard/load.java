@@ -199,7 +199,7 @@ public class load extends Procedure1 {
       {
 	Environment env = (Environment) arg2;
 	apply (name, env, relative);
-	return Scheme.voidObject;
+	return Values.empty;
       }
     catch (java.io.FileNotFoundException e)
       {

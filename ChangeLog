@@ -1,3 +1,11 @@
+2003-10-02  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/CompileFile.java, kawa/standard/load.java,
+	kawa/standard/sleep.java:  Use Values.empty directly instead of
+	Interpreter's voidObject field
+	* kawa/repl.java, kawa/standard/string2number.java:  Use Boolean
+	FALSE/TRUE directly instead of via Scheme or Interpreter field.
+
 2003-09-23  Per Bothner  <per@bothner.com>
 
 	* build.xml (build.selectjava):  Add FVector.java and LList.java.

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -92,7 +92,7 @@ public class LambdaExp extends ScopeExp
   /** A variable that points to the closure environment passed in.
    * It can be any one of:
    * null, if no closure environment is needed;
-   * this, if this function is its parent's heapFrame;
+   * this, if this object is its parent's heapFrame;
    * a local variable initialized from this.closureEnv;
    * a parameter (only if !getCanRead()); or
    * a copy of our caller's closureEnv or heapFrame (only if getInlineOnly()).
@@ -490,8 +490,10 @@ public class LambdaExp extends ScopeExp
       {
 	code.emitDup(new_class);
 	LambdaExp caller = outerLambda();
-	code.emitLoad(caller.heapFrame != null ? caller.heapFrame
-		      : caller.closureEnv);		      
+	Variable closureEnv =
+	  ! Compilation.usingTailCalls ? getHeapLambda(caller).heapFrame
+	  : caller.heapFrame != null ? caller.heapFrame	: caller.closureEnv;
+	code.emitLoad(closureEnv);
 	code.emitPutField(closureEnvField);
       }
 
@@ -929,7 +931,7 @@ public class LambdaExp extends ScopeExp
 
     allocFrame(comp);
 
-    if (getNeedsClosureEnv() && isClassGenerated())
+    if (Compilation.usingTailCalls && getNeedsClosureEnv() && isClassGenerated())
       {
 	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
@@ -1349,7 +1351,7 @@ public class LambdaExp extends ScopeExp
 		Expression arg;
 		String lastTypeName = restArgType.getName();
 		if ("gnu.kawa.util.LList".equals(lastTypeName))
-		  arg = new QuoteExp(gnu.kawa.util.LList.Empty);
+		  arg = new QuoteExp(gnu.lists.LList.Empty);
 		else if ("java.lang.Object[]".equals(lastTypeName))
 		  arg = new QuoteExp(Values.noArgs);
 		else // FIXME

@@ -307,8 +307,12 @@ public class ApplyExp extends Expression
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
 	&& func_lambda.min_args == args_length)
       {
+	Declaration param = func_lambda.firstDecl();
 	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, Target.pushObject);
+	  {
+	    exp.args[i].compile(comp, param.getType());
+	    param = param.nextDecl();
+	  }
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
 	func_lambda.allocChildClasses(comp);
@@ -347,16 +351,26 @@ public class ApplyExp extends Expression
     boolean toArray
       = (tail_recurse ? func_lambda.min_args != func_lambda.max_args
          : args_length > 4);
-    if (! toArray)
-      {
-	for (int i = 0; i < args_length; ++i)
-	  exp.args[i].compile (comp, Target.pushObject);
-        method = tail_recurse ? null : comp.applymethods[args_length];
-      }
-    else
+    if (toArray)
       {
 	compileToArray(exp.args, comp);
 	method = comp.applyNmethod;
+      }
+    else if (tail_recurse)
+      {
+	Declaration param = func_lambda.firstDecl();
+	for (int i = 0; i < args_length; ++i)
+	  {
+	    exp.args[i].compile(comp, param.getType());
+	    param = param.nextDecl();
+	  }
+        method = null;
+      }
+    else
+      {
+	for (int i = 0; i < args_length; ++i)
+	  exp.args[i].compile (comp, Target.pushObject);
+        method = comp.applymethods[args_length];
       }
     if (tail_recurse)
       {

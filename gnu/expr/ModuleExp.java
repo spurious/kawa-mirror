@@ -226,6 +226,15 @@ public class ModuleExp extends ClassExp
 	      prefix = name.substring(0, index+1);
 	  }
       }
+
+    /* DEBUGGING:
+    OutPort perr = OutPort.errDefault();
+    perr.println ("[Expression to compile topname:"+topname+" prefix:"+prefix);
+    this.print (perr);
+    perr.println();
+    perr.flush();
+    */
+
     Compilation comp = new Compilation(this, topname, prefix, false);
     for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
       {

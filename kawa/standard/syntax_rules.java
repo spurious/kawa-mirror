@@ -20,9 +20,11 @@ public class syntax_rules extends Syntax
     for (int i = 0;  i < num_literals;  i++)
       {
 	Pair lit_pair = (Pair) literals_list;
-	if (! (lit_pair.car instanceof String))
-	  return tr.syntaxError ("define-syntax: non-symbol in literals list");
-	literal_identifiers[i+1] = (String) lit_pair.car;
+	if (! ((lit_pair.car instanceof String) 
+               || (lit_pair.car instanceof Keyword)) )
+          return tr.syntaxError ("define-syntax: non-symbol '"
+                                 + lit_pair.car + "' in literals list.");
+	literal_identifiers[i+1] = lit_pair.car.toString();
 	literals_list = lit_pair.cdr;
       }
 

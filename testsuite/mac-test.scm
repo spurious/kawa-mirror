@@ -1,4 +1,4 @@
-(test-init "macros" 47)
+(test-init "macros" 48)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -190,3 +190,14 @@
   (define third caddr))
  (else))
 (test 'z third '(x y z))
+
+(define-syntax or-with-keyword-test
+  (syntax-rules (default-value:)
+    ((or-with-keyword-test val default-value: default)
+     (if val
+         val
+         default))
+    ((or-with-keyword-test val)
+     (or-with-keyword-test default-value: #f))))
+
+(test 'ok 'or-with-keyword-test (or-with-keyword-test #f default-value: 'ok))

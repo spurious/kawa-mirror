@@ -1,3 +1,7 @@
+2003-07-10  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* mac-test.scm:  New test for Keyword among syntax-rules literals.
+
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm:  New cond-expand test, based on bug reported

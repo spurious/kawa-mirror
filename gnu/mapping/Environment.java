@@ -413,10 +413,12 @@ public class Environment extends NameMap implements Externalizable
     return new Environment();
   }
 
+  /* Return type conflicts with gnu.commonlisp.lang.SymbolTable.make
   public static Environment make (String name)
   {
     return new Environment(name);
   }
+  */
 
   public static Environment make (String name, Environment parent)
   {

@@ -658,6 +658,9 @@ public class Scheme extends LispInterpreter
       define_proc ("f64vector->list", "kawa.lib.uniform");
       define_proc ("list->f64vector", "kawa.lib.uniform");
 
+      define_syntax("cut", "gnu.kawa.slib.cut");
+      define_syntax("cute", "gnu.kawa.slib.cut");
+
       define_proc ("emacs", "gnu.jemacs.buffer.emacs");
       define_proc ("node", "gnu.kawa.xml.MakeTreeNode");
       define_syntax("%if-feature", "kawa.standard.IfFeature");

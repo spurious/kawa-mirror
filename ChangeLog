@@ -1,5 +1,7 @@
 2003-01-24  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java:  Define cut and cute.
+
 	* kawa/lang/Lambda.java (rewrite):  Don't convert rest parameter
 	to String if it is a Symbol.
 

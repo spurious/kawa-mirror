@@ -1,4 +1,4 @@
-(test-init "Objects" 82)
+(test-init "Objects" 86)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -182,6 +182,11 @@
 (require <classes1>)
 (require <classes2>)
 
+(define IsClass2-value (make <IdClass2>))
+(test 1 slot-ref IsClass2-value 'var1)
+(test 2 slot-ref IsClass2-value 'var2)
+(test 3 get-new-count)
+
 (define obj1 (make <SimpleA>))
 (test 4 slot-ref obj1 'a)
 (test 6 slot-ref obj1 'b)
@@ -257,6 +262,9 @@
 (define-namespace date "class:java.util.Date")
 (test (+ 1900 (date:get-year (date:new)))
       invoke simple-date 'get-year)
+(define non-simple-date (make <DateTest>))
+(test (+ 1900 (date:get-year (date:new)))
+      invoke non-simple-date 'get-year)
 
 ;; Test for Savannah bug #4289
 (define pa-data (pa-new 10))

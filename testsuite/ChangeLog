@@ -1,3 +1,14 @@
+2003-08-09  Per Bothner  <per@bothner.com>
+
+	* classes1.scm (counter, get-new-count, <IdClass1>, <IdClass2>):  New
+	Test for Savannah bug #4540.
+	* obj-test.scm:  New tests.
+
+	* classes1.scm (default-offset, <DateTest>):  New test, for
+	non-simple class with captured context.
+	Based on Savannah (non-)bug #4540.
+	* obj-test.scm:  New test.
+
 2003-08-01  Per Bothner  <per@bothner.com>
 
 	* HelloCgiX.xql:  Add now-needed xmlspace declaration.
@@ -167,7 +178,7 @@
 	New test based on bug report from Khairul Azhar <kazar1my@yahoo.co.uk>.
 	* module1.scm (deldup):  Macro, uses function imported from list-lib.
 	* module2.scm (list1234):  Invoke imported deldup macro.
-	* obj-test.scm:  New test, that list1234 has teh correct value.	
+	* obj-test.scm:  New test, that list1234 has the correct value.	
 
 2002-09-27  Per Bothner  <per@bothner.com>
 

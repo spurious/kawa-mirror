@@ -1,3 +1,5 @@
+(module-static counter get-new-count)
+
 (define-constant xx :: <int> 20)
 
 (define-simple-class <SimpleA> ()
@@ -23,7 +25,27 @@
 		((define-class-using-syntax-rules name super parts ...)
 		 (define-simple-class name (super) parts ...))))
 
+(define *MY-YEAR-OFFSET* 1900)
+(define (default-offset)
+  *MY-YEAR-OFFSET*)
+
+(define-class <DateTest> (<java.util.Date>)
+  (offset init-form:  (default-offset))
+  ((get-year) :: <int>
+   (+ (invoke-special <java.util.Date> (this) 'get-year) offset)))
+
 (define-simple-class <SimpleDateTest> (<java.util.Date>)
   ((get-year) :: <int>
    (+ (invoke-special <java.util.Date> (this) 'get-year) 1900)))
 
+(define-private counter :: <int> 0)
+
+(define (get-new-count)
+  (set! counter (+ counter 1))
+  counter)
+
+(define-simple-class <IdClass1> ()
+  (var1 init-form: (get-new-count)))
+ 
+(define-simple-class <IdClass2> (<IdClass1>)
+  (var2 init-form: (get-new-count)))

@@ -177,7 +177,7 @@ public class BufferKeymap implements javax.swing.text.Keymap
     int mods = key.getModifiers();
     // If there are no modifiers, and it's a normal non-control character,
     // we prefer the KEY_TYPED (keyChar) event.
-    // Otherwise, we prefer to KEY_PRESSED (keyCode) event.
+    // Otherwise, we prefer the KEY_PRESSED (keyCode) event.
     int code = key.getKeyCode();
     if (code == 0)
       { // It's a KEY_TYPED (keyChar) event.
@@ -205,6 +205,35 @@ public class BufferKeymap implements javax.swing.text.Keymap
         */
         return true;
       }
+  }
+
+  public static String toString(KeyStroke key)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append('[');
+    char ch = key.getKeyChar();
+    if (ch != '\0')
+      {
+        sbuf.append("char:'");
+        gnu.jemacs.lang.ELisp.readableChar(ch, sbuf, true);
+        sbuf.append("'");
+      }
+    int code = key.getKeyCode();
+    if (code != 0)
+      {
+        sbuf.append("code:");
+        sbuf.append(code);
+      }
+    int mods = key.getModifiers();
+    if (mods != 0)
+      {
+        sbuf.append(" mods:");
+        sbuf.append(mods);
+      }
+    if (key.isOnKeyRelease())
+      sbuf.append(" release");
+    sbuf.append(']');
+    return sbuf.toString();
   }
 
   public static Action lookupKey(Keymap keymap,

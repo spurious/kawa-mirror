@@ -11,6 +11,7 @@ import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
+import gnu.kawa.lispexpr.LispInterpreter;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -591,21 +592,29 @@ public class Translator extends Parser
         defs.inits = inits;
 	push(defs);
       }
-    Expression body;
-    if (nforms == 1)
-      body = rewrite (forms.elementAt(0));
-    else
-      {
-	Expression[] exps = new Expression [nforms];
-	for (int i = 0; i < nforms; i++)
-	  exps[i] = rewrite (forms.elementAt(i));
-	body = new BeginExp (exps);
-      }
+    Expression body = makeBody(forms);
     if (ndecls == 0)
       return body;
     defs.body = body;
     pop(defs);
     return defs;
+  }
+
+  /** Combine a list of zero or more expression forms info a "body". */
+  public Expression makeBody(java.util.Vector forms)
+  {
+    int nforms = forms.size();
+    if (nforms == 0)
+      return QuoteExp.voidExp; 
+   else if (nforms == 1)
+      return rewrite (forms.elementAt(0));
+    else
+      {
+	Expression[] exps = new Expression [nforms];
+	for (int i = 0; i < nforms; i++)
+	  exps[i] = rewrite (forms.elementAt(i));
+	return ((LispInterpreter) getInterpreter()).makeBody(exps);
+      }
   }
 
   ModuleExp module;
@@ -659,19 +668,7 @@ public class Translator extends Parser
     int nforms = forms.size();
     int ndecls = mexp.countDecls();
     pushDecls(mexp);
-    Expression body;
-    if (nforms == 1)
-      body = rewrite(forms.elementAt(0));
-    else if (nforms == 0)
-      body = QuoteExp.voidExp; 
-    else
-      {
-	Expression[] exps = new Expression [nforms];
-	for (int i = 0; i < nforms; i++)
-	  exps[i] = rewrite(forms.elementAt(i));
-	body = new BeginExp (exps);
-      }
-    mexp.body = body;
+    mexp.body = makeBody(forms);
     pop(mexp);
     /* DEBUGGING:
     OutPort err = OutPort.errDefault ();

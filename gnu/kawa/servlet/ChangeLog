@@ -1,3 +1,7 @@
+2003-10-29  Gerardo Jorvilleur <magoghm@Prodigy.net.mx>
+
+	* KawaServlet.java (doPost):   New method.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* KawaPageServlet.java (getProcedure):  Replace 'parseFile' call

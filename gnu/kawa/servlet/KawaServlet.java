@@ -11,6 +11,13 @@ import java.io.IOException;
 public abstract class KawaServlet
 extends HttpServlet implements CpsMethodContainer
 {
+   public void doPost (HttpServletRequest request,
+		       HttpServletResponse response)
+     throws ServletException, IOException
+  {
+    doGet(request, response);
+  }
+
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
   {

@@ -11,6 +11,6 @@ public class exact2inexact extends Procedure1
      Numeric num = (Numeric) arg1;
      if (! num.isExact ())
        return num;
-     return new DFloNum ((double) (((IntNum)num).longValue ()));
+     return new DFloNum (((RealNum)num).doubleValue ());
    }
 }

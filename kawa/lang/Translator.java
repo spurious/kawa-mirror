@@ -250,12 +250,9 @@ public class Translator extends Object
 	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
 	  {
 	    String tname = name.substring(1, len-1);
-	    if (gnu.bytecode.Type.isValidJavaTypeName(tname))
-	      {
-		gnu.bytecode.Type type = PrimProcedure.string2Type(tname);
-		if (type != null)
-		  return new QuoteExp(type);
-	      }
+	    gnu.bytecode.Type type = PrimProcedure.string2Type(tname);
+	    if (type != null)
+	      return new QuoteExp(type);
 	  }
 	return new ReferenceExp (name, resolve (name, (Declaration) binding));
       }

@@ -148,6 +148,8 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	types.put ("string", new ClassType("kawa.lang.FString"));
 	types.put ("vector", new ClassType("kawa.lang.Vector"));
 	types.put ("function", new ClassType("kawa.lang.Procedure"));
+	types.put ("input-port", new ClassType("kawa.lang.InPort"));
+	types.put ("output-port", new ClassType("kawa.lang.OutPort"));
       }
     return (Type) types.get(name);
   }
@@ -160,10 +162,14 @@ public class PrimProcedure extends ProcedureN implements Inlineable
     if (name.endsWith("[]"))
       {
 	t = string2Type(name.substring(0, name.length()-2));
+	if (t == null)
+	  return null;
 	t = new ArrayType(t);
       }
-    else
+    else if (gnu.bytecode.Type.isValidJavaTypeName(name))
       t = new ClassType (name);
+    else
+      return null;
     types.put (name, t);
     return t;
   }

@@ -195,6 +195,21 @@ public class LList extends Sequence implements Printable, Externalizable
     old.cdr = new Pair(arg1, new Pair(arg2, new Pair(arg3, p4)));
     return p4;
   }
+
+  /** Reverse a list in place, by modifying the cdr fields. */
+  public static LList reverseInPlace(Object list)
+  {
+    // Algorithm takes from reverse function in gcc's tree.c.
+    LList prev = Empty;
+    while (list != Empty)
+      {
+	Pair pair = (Pair) list;
+	list = pair.cdr;
+	pair.cdr = prev;
+	prev = pair;
+      }
+    return prev;
+  }
 }
 
 /** A Enumerations for linked LLists.

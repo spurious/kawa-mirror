@@ -103,6 +103,7 @@ SECONDARY_OBJS=\
   @EXTRA_MISC@
 
 MISC_1_1 = \
+  lambda.class\
   make_002drecord_002dtype.class\
   record_002daccessor.class\
   record_002dconstructor.class\

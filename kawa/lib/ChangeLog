@@ -1,3 +1,7 @@
+Tue Mar 18 14:05:13 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* keywords.scm (keyword->string):  Primitive is virtual, not static.
+
 Mon Mar 17 21:35:10 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* keywords.scm, port.scm, strings.scm:  New files.

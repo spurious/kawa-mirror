@@ -4,8 +4,8 @@
    object))
 
 (define (keyword->string keyword)
-  ((primitive-static-method "kawa.lang.Keyword" "toSchemeString"
-			    "kawa.lang.FString" ("kawa.lang.Keyword"))
+  ((primitive-virtual-method "kawa.lang.Keyword" "toSchemeString"
+			     "kawa.lang.FString" ())
    keyword))
 
 (define (string->keyword string)

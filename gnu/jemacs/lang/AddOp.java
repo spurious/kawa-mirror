@@ -34,6 +34,11 @@ public class AddOp extends ProcedureN
     return apply2(-1, arg1, arg2);
   }
 
+  public static Object $Mn(Object arg1)
+  {
+    return ELisp.asNumber(arg1).neg();
+  }
+
   public static Object $Pl$V (Object arg1, Object arg2,
 			       Object arg3, Object[] rest)
   {
@@ -52,6 +57,8 @@ public class AddOp extends ProcedureN
     if (len == 0)
       return IntNum.zero ();
     Object result = args[0];
+    if (len == 1 && plusOrMinus < 0)
+      return $Mn(result);
     for (int i = 1; i < len; i++)
       result = apply2(plusOrMinus, result, args[i]);
     return result;

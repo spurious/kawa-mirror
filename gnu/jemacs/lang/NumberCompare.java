@@ -56,7 +56,9 @@ public class NumberCompare extends ProcedureN
 
   public static boolean apply2 (int flags, Object arg1, Object arg2)
   {
-    return ((1 << (3 + ((Numeric)arg1).compare(arg2))) & flags) != 0;
+    Numeric num1 = ELisp.asNumber(arg1);
+    Numeric num2 = ELisp.asNumber(arg2);
+    return ((1 << (3 + num1.compare(num2))) & flags) != 0;
   }
 
   public Object applyN (Object[] args)

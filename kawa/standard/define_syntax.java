@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.expr.*;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Method;
+import gnu.mapping.Procedure;
 import gnu.lists.*;
 
 public class define_syntax extends Syntax
@@ -30,27 +31,36 @@ public class define_syntax extends Syntax
     if (! (pair.cdr instanceof Pair))
       return tr.syntaxError("Missing transformation for "+form.car);
     pair = (Pair) pair.cdr;
-    Macro savedMacro = tr.currentMacroDefinition;
-    tr.currentMacroDefinition = macro;
-    Expression rule = tr.rewrite(pair.car);
-    tr.currentMacroDefinition = savedMacro;
-    macro.expander = rule;
+    Object expander = macro.expander;;
+    if (! (expander instanceof Procedure)
+	&& ! (expander instanceof Expression))
+      {
+	Macro savedMacro = tr.currentMacroDefinition;
+	tr.currentMacroDefinition = macro;
+	expander = tr.rewrite(macro.expander);
+	tr.currentMacroDefinition = savedMacro;
+	macro.expander = expander;
+      }
     if (! (decl.context instanceof ModuleExp))
       {
 	return QuoteExp.voidExp;
       }
     else
       {
-	if (! (rule instanceof QuoteExp)
-	    || ! (((QuoteExp) rule).getValue() instanceof java.io.Externalizable))
+	if (expander instanceof QuoteExp)
+	  expander = ((QuoteExp) expander).getValue();
+	Expression rule;
+	if (expander instanceof Procedure
+	    && expander instanceof java.io.Externalizable)
+	  rule = new QuoteExp(macro);
+	else
 	  {
 	    Expression args[] = new Expression[2];
 	    args[0] = new QuoteExp(name);
-	    args[1] = rule;
+	    args[1] = expander instanceof Expression ? (Expression) expander
+	      : new QuoteExp (expander);
 	    rule = new ApplyExp(new PrimProcedure(makeMethod), args);
 	  }
-	else
-	  rule = new QuoteExp(macro);
         SetExp result = new SetExp (decl, rule);
         result.setDefining (true);
         return result;
@@ -76,7 +86,7 @@ public class define_syntax extends Syntax
 
     Declaration decl = defs.getDefine(name, 'w', tr);
     Macro macro = Macro.make(decl);
-
+    macro.expander = p.car;
     p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
 

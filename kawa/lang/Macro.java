@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 public class Macro extends Syntax implements Printable, Externalizable
 {
-  public Expression expander;
+  public Object expander;
 
   java.util.Vector capturedIdentifiers;
 
@@ -20,11 +20,6 @@ public class Macro extends Syntax implements Printable, Externalizable
   /** Declarations captured at macro definition time.
    * The binding (if any) for templateIdentifiers[i] is capturedDeclarations[i]. */
   Object[] capturedDeclarations;
-
-  public Expression getExpander()
-  {
-    return expander;
-  }
 
   public static Macro make (Declaration decl)
   {
@@ -142,8 +137,29 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     try
       {
-        Procedure pr
-	  = (Procedure) getExpander().eval(tr.getGlobalEnvironment());
+	Procedure pr;
+	Object exp = expander;
+	if (exp instanceof Procedure)
+	  pr = (Procedure) exp;
+	else
+	  {
+	    if (! (exp instanceof Expression))
+	      {
+		Macro savedMacro = tr.currentMacroDefinition;
+		tr.currentMacroDefinition = this;
+		try
+		  {
+		    exp = tr.rewrite(exp);
+		    expander = exp;
+		  }
+		finally
+		  {
+		    tr.currentMacroDefinition = savedMacro;
+		  }
+	      }
+	    pr = (Procedure)
+	      ((Expression) exp).eval(tr.getGlobalEnvironment());
+	  }
         SyntaxForm sform = new SyntaxForm();
         sform.form = form;
         sform.tr = tr;

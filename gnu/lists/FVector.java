@@ -56,8 +56,8 @@ public class FVector extends SimpleVector
   /* #ifndef JAVA2 */
   // public FVector(Sequence seq)
   // {
-    // this.data = new Object[seq.size()];
-    // addAll(seq);
+  //   this.data = new Object[seq.size()];
+  //   addAll(seq);
   // }
   /* #endif */
 
@@ -139,11 +139,11 @@ public class FVector extends SimpleVector
     int n = n1 > n2 ? n2 : n1;
     for (int i = 0;  i < n;  i++)
       {
-	Comparable v1 = (Comparable) d1[i];
-	Comparable v2 = (Comparable) d2[i];
-	int d = v1.compareTo(v2);
-	if (d != 0)
-	  return d;
+        Comparable v1 = (Comparable) d1[i];
+        Comparable v2 = (Comparable) d2[i];
+        int d = v1.compareTo(v2);
+        if (d != 0)
+          return d;
       }
     return n1 - n2;
   }

@@ -1,5 +1,7 @@
 package gnu.jemacs.lang;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
+import gnu.jemacs.buffer.BufferLocalConstraint;
 
 /** Support for ELisp Symbols.
  * For now there are actually no "Symbol" objects.
@@ -80,5 +82,96 @@ public class Symbol extends Binding2
   {
     Binding2 binding = getBinding(environ, symbol);
     binding.functionValue = value;
+  }
+
+  /**
+   * The mapping from symbols (Java Strings) to property lists.
+   * The traditional implementation of property lists is that each Symbol
+   * contains a field pointing to the property list.  We prefer to use
+   * Java Strings to implement Symbols, so there is no place for the
+   * property list field.  Instead, we use this global table to map
+   * from a symbol to the symbol's property list.
+   */
+  static Environment propertyLists = new Environment(100);
+
+  /**
+   * Get the property list of a symbol.
+   */
+  public static Object getPropertyList(Object symbol)
+  {
+    String name = symbol == ELisp.FALSE ? "nil" : (String) symbol;
+    Binding binding = propertyLists.lookup(name);
+    if (binding == null)
+      return ELisp.FALSE;
+    return binding.isBound() ? binding.get() : ELisp.FALSE;
+  }
+
+  /**
+   * Set the property list of a symbol.
+   */
+  public static void setPropertyList(Object symbol, Object plist)
+  {
+    String name = symbol == ELisp.FALSE ? "nil" : (String) symbol;
+    propertyLists.defineValue(name, plist);
+  }
+
+  /**
+   * Given a property list and a key, find the corresponing property value.
+   */
+  public static Object plistGet(Object plist, Object prop, Object dfault)
+  {
+    while (plist instanceof Pair)
+      {
+	Pair pair = (Pair) plist;
+	if (pair.car == prop)
+	  return ((Pair) pair.cdr).car;
+      }
+    return dfault;
+  }
+
+  public static Object plistPut(Object plist, Object prop, Object value)
+  {
+    for (Object p = plist; p instanceof Pair; )
+      {
+	Pair pair = (Pair) p;
+	Pair next = (Pair) pair.cdr;
+	if (pair.car == prop)
+	  {
+	    next.car = value;
+	    return plist;
+	  }
+	p = next.cdr;
+      }
+    return new Pair(prop, new Pair(value, plist));
+  }
+
+  public static Object plistRemove(Object plist, Object prop)
+  {
+    Pair prev = null;
+    for (Object p = plist; p instanceof Pair; )
+      {
+	Pair pair = (Pair) p;
+	Pair next = (Pair) pair.cdr;
+	p = next.cdr;
+	if (pair.car == prop)
+	  {
+	    if (prev == null)
+	      return p;
+	    prev.cdr = p;
+	    return plist;
+	  }
+	prev = next;
+      }
+    return plist;
+  }
+
+
+  /**
+   * @param all true if make-variable-buffer-local,
+   *  false if make-local-variable FIXME
+   */
+  public static void makeBufferLocal(Object symbol, boolean all)
+  {
+    BufferLocalConstraint.make(getBinding(symbol), all);
   }
 }

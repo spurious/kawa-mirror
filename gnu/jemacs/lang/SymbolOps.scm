@@ -16,7 +16,33 @@
 ;; mapatoms
 ;; unintern
 
-;;  (symbol-plist)
+(define (symbol-plist symbol)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'getPropertyList symbol))
+
+(define (setplist symbol plist)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'setPropertyList symbol plist)
+  plist)
+
+(define (plist-get plist prop #!optional default)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'plistGet plist prop default))
+
+(define (plist-put plist prop value)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'plistPut plist prop value))
+
+(define (plist-remprop plist prop)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'plistRemove plist prop))
+
+(define (plist-member plist prop)
+  (if (eq
+       (invoke-static <gnu.jemacs.lang.Symbol> 'plistGet plist prop #!void)
+       #!void)
+      '() 't))
+
+(define (get symbol property #!optional (default '()))
+  (plist-get (symbol-plist symbol) property default))
+
+(define (put symbol property value)
+  (setplist symbol (plist-put (symbol-plist symbol) property value)))
 
 ;; VARIABLES
 
@@ -29,26 +55,6 @@
 ;; setq
 
 ;(define (make-symbol NAME)  ...)
-
-; (define (intern name #!optional obarray)  ...)
-
-; (define (intern-soft NAME #!optonal obarray)  ..)
-
-;; obarray
-;; mapatoms
-;; unintern
-
-;;  (symbol-plist)
-
-;; VARIABLES
-
-;;A `void-variable' error is signaled if SYMBOL has neither a local
-;;     binding nor a global value.
-
-;(define (symbol-value sym)
-;  ...)
-
-;; setq
 
 (define (set symbol value)
   (invoke-static <gnu.jemacs.lang.Symbol> 'setValueBinding symbol value))
@@ -77,3 +83,10 @@
   (invoke-static <gnu.jemacs.lang.Symbol> 'setFunctionBinding
 		 (invoke-static <gnu.mapping.Environment> 'getCurrent)
 		 symbol object))
+
+(define (make-local-variable symbol)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'makeBufferLocal symbol #f)
+  symbol)
+(define (make-variable-buffer-local symbol)
+  (invoke-static <gnu.jemacs.lang.Symbol> 'makeBufferLocal symbol #t)
+  symbol)

@@ -1,6 +1,19 @@
+(define (emacs:read #!optional (port (current-input-port)))
+  (let ((lexer
+	 ((primitive-constructor <gnu.jemacs.lang.ELispReader> (<input-port>))
+	  port)))
+    ((primitive-virtual-method <gnu.jemacs.lang.ELispReader> "readObject"
+			       <object> ())
+     lexer)))
+
 ;; SYMBOLS
 
-(define (symbolp x)
+(define (boundp symbol) :: <elisp:boolean>
+  ((primitive-static-method <gnu.jemacs.lang.Symbol> "isBound"
+                            <boolean> (<object>))
+   symbol))
+
+(define (symbolp x) :: <elisp:boolean>
   (invoke-static <gnu.jemacs.lang.Symbol> 'isSymbol x))
 
 (define (symbol-name symbol)
@@ -33,7 +46,7 @@
   (invoke-static <gnu.jemacs.lang.Symbol> 'plistRemove plist prop))
 
 (define (plist-member plist prop)
-  (if (eq
+  (if (eq?
        (invoke-static <gnu.jemacs.lang.Symbol> 'plistGet plist prop #!void)
        #!void)
       '() 't))

@@ -1,3 +1,10 @@
+2000-10-15  Per Bothner  <per@bothner.com>
+
+	* SymbolOps.scm (emacs:read, boundp):  Moved from kawa/lib/emacs.scm.
+	(symbolp):  Add result type specification.
+	(plist-member):  Use eq?, not eq.
+	* ELisp.java (getInstance):  Save and restore current Environment.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Update classes used for eq and equal.

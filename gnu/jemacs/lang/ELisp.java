@@ -253,7 +253,17 @@ public class ELisp extends Interpreter
   public static ELisp getInstance()
   {
     if (instance == null)
-      instance = new ELisp();
+      {
+        Environment saveEnv = Environment.getCurrent();
+        try
+          {
+            instance = new ELisp();
+          }
+        finally
+          {
+            Environment.setCurrent(saveEnv);
+          }
+      }
     return instance;
   }
 

@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 
 /** Implements logical (bit-wise) operations on infinite-precision integers.
  * There are no BitOps object - all the functions here are static.

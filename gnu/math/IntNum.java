@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 import kawa.lang.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
@@ -1107,7 +1110,7 @@ public class IntNum extends RatNum implements Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("kawa.math.IntNum");
+	thisType = new ClassType ("gnu.math.IntNum");
 	Type[] args = new Type[1];
 	args[0] = Type.int_type;
 	makeIntMethod = thisType.addMethod ("make", args, thisType,

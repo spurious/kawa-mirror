@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 
 /** A Dimensions object represents the product or ratio of BaseUnits.
  * The idea is that in order to add two Quantities (such as 3mm + 5cm)

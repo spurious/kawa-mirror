@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 
 /** A Unit which is the product or ratio of two other Units.
  * @author	Per Bothner

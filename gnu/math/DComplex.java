@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 
 /** A complex number using rectangular (Cartesian) plain double values.
  * @author Per Bothner

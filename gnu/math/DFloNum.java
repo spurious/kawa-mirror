@@ -1,4 +1,7 @@
-package kawa.math;
+// Copyright (c) 1997  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./LICENSE.
+
+package gnu.math;
 import kawa.lang.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
@@ -189,7 +192,7 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("kawa.math.DFloNum");
+	thisType = new ClassType ("gnu.math.DFloNum");
 	Type[] args = new Type[1];
 	args[0] = Type.double_type;
 	makeMethod = thisType.addMethod ("make", args, thisType,

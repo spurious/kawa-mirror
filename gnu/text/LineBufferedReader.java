@@ -373,6 +373,7 @@ public class LineBufferedReader extends FilterReader
     this.lineNumber += lineNumber - getLineNumber();
   }
 
+  /** Return the current (zero-based) column number. */
   public int getColumnNumber ()
   {
     if (pos > 0)

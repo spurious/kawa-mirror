@@ -1,3 +1,34 @@
+Wed Dec 23 13:51:35 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	Literals in immediate mode are now allocated to fields (instead
+	of a literals array), just like for non-immediate mode.
+	Use reflection to initialize the fields.
+	* Compilation.java (literalsField):  Removed field.
+	(compileConstant):  Don't generate code to index from literalsField.
+	(<init>):  Don't initialize literalsField.
+	* LambdaExp.java (compile_setLiterals):  Removed method.
+	(eval):  Don't call compile_setLiterals.  Don't create literals array.
+	Don't set lierals[literal.index] to literal.value.  Instead, use
+	reflection to set the static field uses for the literal.
+	* Literal.java (assign):  Create a field, even if immediate.
+	(<init>):  Set type from the value's class.
+	* Makefile.am (java_JAVA), Makefile.in:  Rmeoved Compiledproc.java.
+	* ReferenceExp.java (compile):  No longer need cast if immediate.
+
+	* Compilation.java (mangleName):  More natural mangling.
+	E.g.  "foo-bar?" now becomes "isFooBar".
+
+	* ObjectExp.java (initMethod):  New field.
+	(getCompiledClassType):  Allow extended super-types and implemented
+	interfaces to come in any order.
+	(compile):  New method, to make sure $finit$ is called.
+ 	(compile):  Don't add field for declarations corresponding to methods.
+	
+	* QuoteExp.java (getType):  If value is Values.empty, type is void.
+	* SetExp.java (compile):  Compile rhs to correct type.
+
+	* Expression (compile): Re-use Target.pushObject if possible.
+
 Tue Dec 15 10:50:53 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* ChainLambdas.java:  New ExpFullWalker sub-class.

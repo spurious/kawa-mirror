@@ -85,7 +85,7 @@ GZIP = --best
 all: Makefile
 
 .SUFFIXES:
-$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus testsuite/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status

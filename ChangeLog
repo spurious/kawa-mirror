@@ -1,3 +1,8 @@
+2002-06-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_alias.java (scanForDefinitions):
+	Call Translator's  pushBinding to make alias compiler-visible.
+
 2002-05-29  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (kawa-@VERSION@.jar):  Change rule so we hopefully don't

@@ -44,10 +44,11 @@ public class define_alias extends Syntax implements Printable
         || ! (((Pair) st.cdr).car instanceof String))
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
-    Object name = p.car;
-    Declaration decl = defs.addDeclaration((String) name);
+    String name = (String) p.car;
+    Declaration decl = defs.addDeclaration(name);
     decl.setIndirectBinding(true);
     decl.setAlias(true);
+    tr.pushBinding(name, decl);
     st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));
     forms.addElement(st);
     return true;

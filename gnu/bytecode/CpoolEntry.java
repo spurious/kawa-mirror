@@ -1,6 +1,5 @@
 package codegen;
 import java.io.*;
-import codegen.*;
 
 /**
  * An entry in the constant pool for a ClassType.

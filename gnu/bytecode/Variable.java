@@ -1,6 +1,5 @@
 package codegen;
 import java.io.*;
-import codegen.*;
 
 public class Variable implements java.util.Enumeration {
 

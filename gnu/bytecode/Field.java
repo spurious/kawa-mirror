@@ -1,6 +1,5 @@
 package codegen;
 import java.io.*;
-import codegen.*;
 
 public class Field {
   byte[] name;  /* Utf8 */

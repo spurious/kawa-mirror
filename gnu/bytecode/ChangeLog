@@ -1,3 +1,7 @@
+Sat Oct 26 08:59:10 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* *.java:  Remove redundant 'import codegen.*'. (MS j++ complains.)
+
 Mon Sep 16 11:09:40 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* CpoolDouble.java:  New class, for CONSTANT_Double.

@@ -1,6 +1,5 @@
 package codegen;
 import java.io.*;
-import codegen.*;
 
 /** Access flags. */
 

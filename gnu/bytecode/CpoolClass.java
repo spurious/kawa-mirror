@@ -1,6 +1,5 @@
 package codegen;
 import java.io.*;
-import codegen.*;
 
 /** A CONSTANT_Class entry in the constant pool. */
 

@@ -1,5 +1,8 @@
 2003-03-02  Per Bothner  <per@bothner.com>
 
+	* LambdaExp.java (enterFunction):  No need to allocate a staticLink
+	field if this is a ModuleExp - it's never used.
+
 	* FindCapturedVars.java (capture):  If decl has a base field, just
 	capture that, but don't do anything else.
 

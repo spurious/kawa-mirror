@@ -167,7 +167,7 @@ public class LambdaExp extends ScopeExp
   { return (flags & CAN_READ) != 0; }
   public final void setCanRead(boolean read)
   {
-    if (read) flags |= CAN_READ; 
+    if (read) flags |= CAN_READ;
     else flags &= ~CAN_READ;
   }
 
@@ -411,10 +411,11 @@ public class LambdaExp extends ScopeExp
   /** Generate code to load heapFrame on the JVM stack. */
   public void loadHeapFrame (Compilation comp)
   {
-    gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp curLambda = comp.curLambda;
     while (curLambda != this && curLambda.getInlineOnly())
       curLambda = curLambda.returnContinuation.context;
+
+    gnu.bytecode.CodeAttr code = comp.getCode();
     if (this == curLambda)
       {
 	if (this.heapFrame == null)
@@ -652,7 +653,7 @@ public class LambdaExp extends ScopeExp
 	  return null;
 	if (exp instanceof ModuleExp
 	    || (exp instanceof ClassExp && getNeedsClosureEnv())
-	    || (exp instanceof LambdaExp 
+	    || (exp instanceof LambdaExp
 		&& ((LambdaExp) exp).heapFrame != null))
 	  return (LambdaExp) exp;
       }

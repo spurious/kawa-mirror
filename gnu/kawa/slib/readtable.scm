@@ -27,8 +27,8 @@
 	 (readtable :: <readtable> (current-readtable)))
   (let ((entry :: <gnu.kawa.lispexpr.ReaderMacro>
 	       (invoke readtable 'lookup char)))
-    (value (invoke entry 'getProcedure)
-	   (invoke entry 'isNonTerminating))))
+    (values (invoke entry 'getProcedure)
+	    (invoke entry 'isNonTerminating))))
 
 (define (make-dispatch-macro-character
 	 (char :: <char>)

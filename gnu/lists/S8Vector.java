@@ -117,6 +117,11 @@ public class S8Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_S8_VALUE;
+  }
+
   public String getTag() { return "s8"; }
 
   public void consume(int iposStart, Object xposStart,

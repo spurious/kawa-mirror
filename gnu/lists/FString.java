@@ -268,6 +268,11 @@ implements CharSequence, Externalizable, Consumable
     return true;
   }
 
+  public int getElementKind()
+  {
+    return CHAR_VALUE;
+  }
+
   public void consume(Consumer out)
   {
     String typeName = "#text"; 

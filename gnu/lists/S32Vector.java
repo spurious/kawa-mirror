@@ -112,6 +112,11 @@ public class S32Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_S32_VALUE;
+  }
+
   public String getTag() { return "s32"; }
 
   public void consume(int iposStart, Object xposStart,

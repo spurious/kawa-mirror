@@ -117,6 +117,11 @@ public class F32Vector extends SimpleVector  implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return FLOAT_VALUE;
+  }
+
   public String getTag() { return "f32"; }
 
   public void consume(int iposStart, Object xposStart,

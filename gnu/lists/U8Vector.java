@@ -116,6 +116,11 @@ public class U8Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_U8_VALUE;
+  }
+
   public String getTag() { return "u8"; }
 
   public void consume(int iposStart, Object xposStart,

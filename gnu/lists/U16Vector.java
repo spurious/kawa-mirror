@@ -116,6 +116,11 @@ public class U16Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_U16_VALUE;
+  }
+
   public String getTag() { return "u16"; }
 
   public void consume(int iposStart, Object xposStart,

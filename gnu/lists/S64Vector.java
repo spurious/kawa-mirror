@@ -117,6 +117,11 @@ public class S64Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_S64_VALUE;
+  }
+
   public String getTag() { return "s64"; }
 
   public void consume(int iposStart, Object xposStart,

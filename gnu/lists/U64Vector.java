@@ -116,6 +116,11 @@ public class U64Vector extends SimpleVector implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return INT_U64_VALUE;
+  }
+
   public String getTag() { return "u64"; }
 
   public void consume(int iposStart, Object xposStart,

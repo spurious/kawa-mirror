@@ -124,6 +124,11 @@ public class F64Vector extends SimpleVector  implements Externalizable
       data[start++] = 0;
   }
 
+  public int getElementKind()
+  {
+    return DOUBLE_VALUE;
+  }
+
   public String getTag() { return "f64"; }
 
   public void consume(int iposStart, Object xposStart,

@@ -1,3 +1,7 @@
+2004-06-12  Per Bothner  <per@bothner.com>
+
+	* Q2Read.java (readObject()):   Remove method - use inherited version.
+
 2004-02-13  Per Bothner  <per@bothner.com>
 
 	New package for a new experimental "q2" language.

@@ -37,51 +37,6 @@ public class Q2Read extends LispReader
   
   protected ReadTable getReadTable () { return q2ReadTable; }
 
-  public Object readObject ()
-      throws java.io.IOException, SyntaxException
-  {
-    int startPos = tokenBufferLength;
-    InPort port = (InPort) getPort();
-    int saveNesting = nesting;
-    try
-      {
-	for (;;)
-	  {
-	    int ch = port.read();
-	    if (ch < 0)
-	      {
-		if (port.readState != ']' && ! isInteractive())
-		  error('e', expressionStartFile,
-			expressionStartLine + 1, expressionStartColumn,
-			"an unmatched '[' was read");
-		  return Sequence.eofValue; // FIXME;
-	      }
-	      {
-		if (ch == ']')
-		  port.readState = ']';
-		else
-		  {
-		    nesting++;
-		    Object value = readValues(ch);
-		    if (value != Values.empty)
-		      {
-			if (value == gnu.expr.QuoteExp.voidExp)
-			  value = Values.empty;
-			return value;
-		      }
-		    nesting = saveNesting;
-		  }
-	      }
-	  }
-      }
-    finally
-      {
-	nesting = saveNesting;
-	tokenBufferLength = startPos;
-	//((InPort) port).readState = saveReadState;
-      }
-  }
-
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
   {

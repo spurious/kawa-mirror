@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 112)
+(test-init "Miscellaneous" 113)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -500,3 +500,20 @@
      (fprintf out format value))))
 (test "[ 23]" test-printf "[%3d]" 23)
 (test "[3.50 ]" test-printf "[%-5.2f]" 3.5)
+
+
+(define fluid-stack '())
+(define fluid-let-test-level 'main)
+(define (push-fluid-let-test-level!)
+  (set! fluid-stack (cons fluid-let-test-level fluid-stack)))
+(define (test-fluid-let-levels)
+  (push-fluid-let-test-level!)
+  (force
+   (future
+    (fluid-let ((fluid-let-test-level 'thread))
+      (push-fluid-let-test-level!)
+      (force (future (push-fluid-let-test-level!))))))
+  fluid-stack)
+
+(test '(thread thread main) test-fluid-let-levels)
+

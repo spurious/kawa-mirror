@@ -434,11 +434,22 @@ public class ApplyExp extends Expression
 
   public final gnu.bytecode.Type getType()
   {
-    if (func instanceof QuoteExp)
+    Expression afunc = func;
+    if (afunc instanceof ReferenceExp)
       {
-	Object proc = ((QuoteExp) func).getValue();
+	Declaration func_decl = ((ReferenceExp) afunc).binding;
+	if (func_decl != null && ! func_decl.getFlag(Declaration.IS_UNKNOWN))
+	  afunc = func_decl.getValue();
+      }
+    if (afunc instanceof QuoteExp)
+      {
+	Object proc = ((QuoteExp) afunc).getValue();
 	if (proc instanceof Inlineable)
           return ((Inlineable) proc).getReturnType(args);
+      }
+    if (afunc instanceof LambdaExp)
+      {
+	return ((LambdaExp) afunc).body.getType();
       }
     return super.getType();
   }

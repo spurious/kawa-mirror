@@ -1,5 +1,10 @@
 2001-04-23  Per Bothner  <per@bothner.com>
 
+	* ApplyExp.java (getType):  Handle functions that are ReferenceExp
+	and LambdaExp as well as QuoteExp.  Fixes many warnings in kawa/lib.
+
+2001-04-23  Per Bothner  <per@bothner.com>
+
 	* ApplyExp.java (setArgs):  New method.
 
 2001-04-09  Per Bothner  <per@bothner.com>

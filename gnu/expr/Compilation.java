@@ -906,26 +906,14 @@ public class Compilation
     return addClass(module, new ClassType(name));
   }
 
-  ClassType addClass (LambdaExp lexp, ClassType type)
+  ClassType addClass (ModuleExp module, ClassType type)
   {
-    ClassType superType;
-    if (lexp.isModuleBody ())
-      {
-        ModuleExp module = (ModuleExp) lexp;
-        superType = getModuleSuperType(module);
-        ClassType[] interfaces = module.getInterfaces();
-        if (interfaces != null)
-          type.setInterfaces(interfaces);
-      }
-    else
-      superType = (usingCPStyle ? typeCallFrame
-                   : lexp.isHandlingTailCalls() ? typeCpsProcedure
-                   : (lexp.min_args != lexp.max_args || lexp.min_args > 4)
-                   ? typeProcedureN
-                   : typeProcedureArray[lexp.min_args]);
-    type.setSuper (superType);
+    ClassType[] interfaces = module.getInterfaces();
+    if (interfaces != null)
+      type.setInterfaces(interfaces);
+    type.setSuper(getModuleSuperType(module));
 
-    lexp.type = type;
+    module.type = type;
     addClass(type);
     return type;
   }

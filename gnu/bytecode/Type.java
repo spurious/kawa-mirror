@@ -57,7 +57,14 @@ public abstract class Type {
 	else
 	  {
 	    ClassType cl = new ClassType(name);
-	    cl.flags |= ClassType.EXISTING_CLASS;
+	    try
+	      {
+		cl.reflectClass = Class.forName(name);
+		cl.flags |= ClassType.EXISTING_CLASS;
+	      }
+	    catch (java.lang.ClassNotFoundException ex)
+	      {
+	      }
 	    type = cl;
 	  }
 	mapNameToType.put(name, type);

@@ -170,9 +170,9 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 @WITH_GCJ_TRUE@bin_SCRIPTS = gckawa
-@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin kawa
 @ENABLE_KAWA_FRONTEND_FALSE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin
 @ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_FALSE@KAWAPROGS = kawa
+@ENABLE_KAWA_FRONTEND_TRUE@@WITH_GCJ_TRUE@KAWAPROGS = kawa-bin kawa
 
 bin_PROGRAMS = $(KAWAPROGS) cgi-servlet
 
@@ -198,6 +198,7 @@ kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 @ENABLE_XML_TRUE@LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
 @ENABLE_XML_TRUE@  gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
 
+@ENABLE_XML_TRUE@EXTRA_LIB_XML = -l-org-w3c-dom -l-org-xml-sax
 @ENABLE_SERVLET_TRUE@KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
 @ENABLE_SERVLET_TRUE@LIBADD_SERVLET = gnu-kawa-servlet.lo
 @ENABLE_SERVLET_TRUE@EXTRA_LIB_SERVLET = -l-javax-servlet
@@ -752,7 +753,7 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 	  -o kawa1$(EXEEXT) $(KAWA1_OFILES) --main=kawa.repl
 
 kawa-bin$(EXEEXT): libkawa.la
-	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET)
+	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
 
 install-exec-local: install-exec-bindir
 

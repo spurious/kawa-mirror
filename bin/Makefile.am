@@ -35,6 +35,7 @@ KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o \
   gnu-xquery-lang.o gnu-brl.o gnu-kawa-brl.o gnu-kawa-xslt.o
 LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo \
   gnu-brl.lo gnu-kawa-brl.lo gnu-kawa-xslt.lo
+EXTRA_LIB_XML = -l-org-w3c-dom -l-org-xml-sax
 endif
 if ENABLE_SERVLET
 KAWA2_SERVLET_OFILES = gnu-kawa-servlet.o
@@ -120,7 +121,7 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 	  -o kawa1$(EXEEXT) $(KAWA1_OFILES) --main=kawa.repl
 
 kawa-bin$(EXEEXT): libkawa.la
-	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET)
+	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  --main=kawa.repl libkawa.la $(EXTRA_LIB_SERVLET) $(EXTRA_LIB_XML)
 
 install-exec-local: install-exec-bindir
 

@@ -1,3 +1,9 @@
+2004-01-09  Per Bothner  <per@bothner.com>
+
+	We need extra GCJ libraries now that gnu.kawa.xml uses org.w3c.org.
+	* Makefile.am (EXTRA_LIB_XML):  New macro.
+	(kawa-bin$(EXEEXT)):  Use it.
+
 2003-06-03  Per Bothner  <per@bothner.com>
 
 	* kawa.c (main):  Don't set outgoing argv[0] to incoming argv[0]!

@@ -92,6 +92,23 @@ public class ExpFullWalker extends ExpWalker
       }
   }
 
+  public Object walkObjectExp (ObjectExp exp)
+  {
+    LambdaExp save = currentLambda;
+    currentLambda = exp;
+    try
+      {
+	for (LambdaExp child = exp.firstChild;
+	     child != null && exitValue == null;  child = child.nextSibling)
+	  walkLambdaExp(child);
+	return exp;
+      }
+    finally
+      {
+	currentLambda = save;
+      }
+  }
+
   public Object walkSynchronizedExp (SynchronizedExp exp)
   {
     exp.object = (Expression) exp.object.walk(this);

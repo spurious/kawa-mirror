@@ -1,10 +1,8 @@
 package gnu.expr;
 
 /** Does setTailCall on ApplyExp's that are tail-calls.
-    Also sets up the LambdaExp firstChild/nextSibling links.
     Also setCanRead, setCanCall, setCanWrite on Declarations
-    and setCanRead, setCancall on LambdaExp when appropriate.
-    Also do APPLY-LET and APPLY-BEGIN optimizations (described in the code). */
+    and setCanRead, setCanCall on LambdaExp when appropriate. */
 
 public class FindTailCalls extends ExpFullWalker
 {
@@ -19,27 +17,6 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkApplyExp(ApplyExp exp)
   {
-    if (exp.func instanceof LetExp) // [APPLY-LET]
-      {
-	// Optimize ((let (...) body) . args) to (let (...) (body . args)).
-	// This helps optimize Scheme "named let".
-	LetExp let = (LetExp) exp.func;
-	Expression body = let.body;
-	let.body = exp;
-	exp.func = body;
-	return let.walk(this);
-      }
-    if (exp.func instanceof BeginExp)  // [APPLY-BEGIN]
-      {
-	// Optimize ((begin ... last) . args) to (begin ... (last . args)).
-	// This helps optimize Scheme "named let".
-	BeginExp begin = (BeginExp) exp.func;
-	Expression[] stmts = begin.exps;
-	int last_index = begin.exps.length - 1;
-	exp.func = stmts[last_index];
-	stmts[last_index] = exp;
-	return begin.walk(this);
-      }
     if (inTailContext)
       exp.setTailCall(true);
     exp.context = currentLambda;
@@ -179,34 +156,38 @@ public class FindTailCalls extends ExpFullWalker
       exp.setCanRead(true);
     try
       {
-	if (parent != null)
-	  {
-	    currentLambda.nextSibling = parent.firstChild;
-	    parent.firstChild = currentLambda;
-	  }
 	inTailContext = false;
 	if (exp.defaultArgs != null)
 	  exp.defaultArgs = walkExps(exp.defaultArgs);
 	inTailContext = true;
 	if (exitValue == null && exp.body != null)
 	  exp.body = (Expression) exp.body.walk(this);
-
-	// Put list of children in proper order.
-	LambdaExp prev = null, child = exp.firstChild;
-	while (child != null)
-	  {
-	    LambdaExp next = child.nextSibling;
-	    child.nextSibling = prev;
-	    prev = child;
-	    child = next;
-	  }
-	exp.firstChild = prev;
       }
     finally
       {
 	inTailContext = save;
 	currentLambda = parent;
       }
+  }
+
+  public Object walkObjectExp (ObjectExp exp)
+  {
+    boolean save = inTailContext;
+    LambdaExp parent = currentLambda;
+    currentLambda = exp;
+    exp.setCanRead(true);
+    try
+      {
+	inTailContext = false;
+	super.walkObjectExp(exp);
+      }
+    finally
+      {
+	inTailContext = save;
+	currentLambda = parent;
+      }
+
+    return exp;
   }
 
   public Object walkReferenceExp (ReferenceExp exp)

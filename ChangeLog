@@ -1,3 +1,8 @@
+Sat Aug 29 09:12:55 1998  Per Bothner  <bothner@cygnus.com>
+
+	* **/Makefile.in, configure, aclocal.m4:  Re-generated.
+	* kawa/Makefile.am (Version.java):  Depend on configure.in.
+
 1998-08-28  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in (AC_CONFIG_AUX_DIR):  Removed.

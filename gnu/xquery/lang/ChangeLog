@@ -1,5 +1,18 @@
 2001-11-06  Per Bothner  <per@bothner.com>
 
+	* XQParser.java (interactive):  New flag.
+	(syntaxError):  If interactive, skip to eol and throw SYnatxException
+
+	* XQParser.java (makeBinary):  Redefine comparisons to use
+	gnu.xquery.util.Compare, with new support for '=' and '!='.
+
+	* XQuery.java:  Implement XQuery string using String, not FString.
+
+	* XQPsrser.java (parseElementConstructor):  Better parsing of end tags.
+	Handle end tag immediately followed by '=', not reading it as '>='.
+	Complain if end tag name doesn't match start tag.
+	(parseExprSequence):  Return syntaxError instead of throing Error.
+
 	* XQuery.java (<init>):  Define "string" function.
 
 2001-11-01  Per Bothner  <per@bothner.com>

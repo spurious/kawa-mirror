@@ -20,6 +20,7 @@ public class XQParser extends LispReader // should be extends Lexer
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
 
   int nesting;
+  boolean interactive;
 
   /** Skip whitspace.
    * Sets 'index' to the that of the next non-whitespace character,
@@ -485,13 +486,15 @@ public class XQParser extends LispReader // should be extends Lexer
  public XQParser (InPort port)
   {
     super(port);
-    nesting = port instanceof TtyInPort ? 0 : 1;
+    interactive = port instanceof TtyInPort;
+    nesting = interactive ? 0 : 1;
   }
 
   public XQParser(InPort port, SourceMessages messages)
   {
     super(port, messages);
-    nesting = port instanceof TtyInPort ? 0 : 1;
+    interactive = port instanceof TtyInPort;
+    nesting = interactive ? 0 : 1;
   }
   
   protected ReadTable getReadTable () { return xqlReadTable; }
@@ -554,17 +557,23 @@ public class XQParser extends LispReader // should be extends Lexer
       case OP_MOD:
 	func = new QuoteExp(new PrimProcedure(gnu.bytecode.ClassType.make("gnu.math.IntNum").getDeclaredMethod("remainder", 2)));
 	break;
+      case OP_EQU:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "=");
+	break;
+      case OP_NEQ:
+	func = makeFunctionExp("gnu.xquery.util.Compare", "!=");
+	break;
       case OP_LSS:
-	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", "<");
+	func = makeFunctionExp("gnu.xquery.util.Compare", "<");
 	break;
       case OP_LEQ:
-	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", "<=");
+	func = makeFunctionExp("gnu.xquery.util.Compare", "<=");
 	break;
       case OP_GRT:
-	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", ">");
+	func = makeFunctionExp("gnu.xquery.util.Compare", ">");
 	break;
       case OP_GEQ:
-	func = makeFunctionExp("gnu.kawa.functions.NumberCompare", ">=");
+	func = makeFunctionExp("gnu.xquery.util.Compare", ">=");
 	break;
       case OP_RANGE_TO:
 	func = makeFunctionExp("gnu.xquery.util.IntegerRange", "integerRange");
@@ -835,7 +844,7 @@ public class XQParser extends LispReader // should be extends Lexer
 
   /** Parse ElementContent (delimiter == '<')  or AttributeContext (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
-   *   '\"' if parsing AttributeContent depening on the starting quote
+   *   '\"' if parsing AttributeContent depending on the starting quote
    * @param result a buffer to place the resulting Expressions.
    */
   void parseContent(int delimiter, Vector result)
@@ -848,7 +857,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if ((next < 0 || next == '{' || next == delimiter)
 	    && sbuf.length() > 0)
 	  {
-	    result.addElement(new QuoteExp(new FString(sbuf)));
+	    result.addElement(new QuoteExp(sbuf.toString()));
 	    sbuf.setLength(0);
 	  }
 	if (next < 0)
@@ -956,14 +965,22 @@ public class XQParser extends LispReader // should be extends Lexer
     if (ch != '>')
       return syntaxError("missing '>' after start element");
     parseContent('<', vec);
-    getRawToken();
-    if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
+    ch = skipSpace();
+    if (ch >= 0 && ch != '>')
       {
-	String tag = new String(tokenBuffer, 0, tokenBufferLength);
-	// check that it `matches start tag FIXME
+	unread(ch);
 	getRawToken();
+	if (curToken != NCNAME_TOKEN && curToken != QNAME_TOKEN)
+	  return syntaxError("invalid tag syntax after '</'");
+	if (! (element instanceof QuoteExp))
+	  return syntaxError("'<{'expression'}>' must be closed by '</>'");
+	String tag = new String(tokenBuffer, 0, tokenBufferLength);
+	String startTag = ((QuoteExp) element).getValue().toString(); // FIXME
+	if (! (tag.equals(startTag)))
+	  return syntaxError("'<"+startTag+">' closed by '</"+tag+">'");
+	ch = skipSpace();
       }
-    if (curToken != OP_GRT) // FIXME what about OP_GRE
+    if (ch != '>')
       return syntaxError("missing '>' after end element");
     args = new Expression[vec.size()];
     vec.copyInto(args);
@@ -987,7 +1004,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (nesting == 0 && curToken == EOL_TOKEN)
 	  return exp;
 	if (curToken != ',')
-	  throw new Error("missing ')' - saw "+new String(tokenBuffer, 0, tokenBufferLength)+" @:"+getColumnNumber());
+	  return syntaxError("missing ')' - saw "+new String(tokenBuffer, 0, tokenBufferLength)+" @:"+getColumnNumber());
 	getRawToken();
       }
     return exp;
@@ -1032,9 +1049,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == STRING_TOKEN)
       {
-	//Object val = new String(tokenBuffer, 0, tokenBufferLength);
-	Object val = new FString(tokenBuffer, 0, tokenBufferLength);
-	exp = new QuoteExp(val);
+	exp = new QuoteExp(new String(tokenBuffer, 0, tokenBufferLength));
       }
     else if (token == INTEGER_TOKEN)
       {
@@ -1427,8 +1442,27 @@ public class XQParser extends LispReader // should be extends Lexer
    * @return an ErrorExp
    */
   public Expression syntaxError (String message)
+    throws java.io.IOException, SyntaxException
   {
     error(message);
+    if (interactive)
+      {
+	curToken = 0;
+	curValue = null;
+	nesting = 0;
+	for (;;)
+	  {
+	    int ch = read();
+	    if (ch < 0)
+	      break;
+	    if (ch == '\r' || ch == '\n')
+	      {
+		unread(ch);
+		break;
+	      }
+	  }
+	throw new SyntaxException(getMessages());
+      }
     return new ErrorExp (message);
   }
 

@@ -1,4 +1,4 @@
-(test-init "objects" 11)
+(test-init "objects" 12)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -17,3 +17,19 @@
 (test '(re im) record-type-field-names complex)
 
 (test 20 'set! (begin (set! (z 'im) 15) (+ (z 're) (z 'im))))
+
+(test 2 'object-with-closure
+      (length (let*
+		  ((name 'x)
+		   (obj (object (<java.util.zip.Adler32>))))
+		(letrec ((opt
+			  (lambda (args)
+			    (list obj
+				  (object (<java.lang.Object>
+					   <java.awt.event.ItemListener>)
+					  ((itemStateChanged
+					    (arg <java.awt.event.ItemEvent>))
+					   <void>
+					   (display name) 
+					   (newline)))))))
+		  (opt 3)))))

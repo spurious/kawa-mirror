@@ -61,7 +61,7 @@ public class Shell
 		  pout.println ("[null returned]\n");
 		else if (display && result != Interpreter.voidObject)
 		  {
-		    kawa.lang.print.print (result, pout);
+		    SFormat.print (result, pout);
 		    pout.println();
 		    pout.flush();
 		  }

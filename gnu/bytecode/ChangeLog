@@ -1,3 +1,15 @@
+Sat Jan 16 09:29:34 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* CodeAttr.java (reorder_fixups):  Only reorder if oldest != null.
+	(print):  Fix two small bugs for tableswitch.
+
+	* LocalVarsAttr.java (enterScope):  Set start_pc of local Variables.
+
+	* SwitchState.java (addCase):  Fix typo.  Increment numCases.
+	(finish):  Add defaultLabel, if none was specified.  Fix thinko.
+
+	* ClassTypeWriter.java:  Remove some useless commented-out code.
+
 1998-12-08  Geoff Berry  <gcb@cs.duke.edu>
 
 	* gnu/bytecode/CodeAttr.java (emitShl, emitShr, emitUshr,

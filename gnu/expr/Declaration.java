@@ -434,7 +434,7 @@ public class Declaration
 	else
 	  {
 	    Type type = isIndirectBinding() ? Compilation.typeLocation
-	      : getType();
+	      : getType().getImplementationType();
 	    var = context.scope.addVariable(code, type, vname);
 	  }
       }
@@ -564,7 +564,7 @@ public class Declaration
       }
     else
       ftype = (isIndirectBinding() ? Compilation.typeSymbol
-	       : getType());
+	       : getType().getImplementationType());
     field = comp.mainClass.addField (fname, ftype, fflags);
     if (value instanceof QuoteExp)
       {

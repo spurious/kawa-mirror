@@ -1,3 +1,10 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (makeField):  Use implementation type for field.
+	(allocateVariable):  Use implementation type for bytecode variable.
+	* LambdaExp.java (allocChildClasses):  Likewise for captured variable.
+	(enterFunction):  Likewise for method parameter type.
+
 2003-07-26  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileUsingConsumer): New static helper method.

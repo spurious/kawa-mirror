@@ -890,8 +890,8 @@ public class LambdaExp extends ScopeExp
 		// assign a Variable for the incoming (register) value.
 		String vname
                   = Compilation.mangleName(decl.getName()).intern();
-                var = decl.var
-                  = scope.addVariable(null, decl.getType(), vname);
+		Type vtype = decl.getType().getImplementationType();
+                var = decl.var = scope.addVariable(null, vtype, vname);
 		//scope.addVariableAfter(var, decl);
 		var.setArtificial (true);
 		var.setParameter (true);
@@ -1072,8 +1072,8 @@ public class LambdaExp extends ScopeExp
 		  break;
 		mname = dname + '_' + ++i;
 	      }
-	    Type dtype = decl.getType();
-	    decl.field = frameType.addField (mname, decl.getType(), fflags);
+	    Type ftype = decl.getType().getImplementationType();
+	    decl.field = frameType.addField (mname, ftype, fflags);
 	  }
       }
     if (heapFrame != null && ! comp.usingCPStyle())
@@ -1550,7 +1550,7 @@ public class LambdaExp extends ScopeExp
     return returnType;
   }
 
-  /* Set teh return type of this function. */
+  /* Set the return type of this function. */
   public final void setReturnType (Type returnType)
   {
     this.returnType = returnType;

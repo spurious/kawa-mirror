@@ -280,4 +280,11 @@ public class Pair extends LList implements Externalizable
     car = in.readObject();
     cdr = in.readObject();
   }
+
+  /** Needed to override readResolve in LList. */
+  public Object readResolve() throws ObjectStreamException
+  {
+    return this;
+  }
+
 };

@@ -42,6 +42,11 @@ public class PairWithPosition extends Pair
     return position >>> 20;
   }
 
+  /** Only for serialization. */
+  public PairWithPosition ()
+  {
+  }
+
   public PairWithPosition (PairWithPosition where,
                            Object car, Object cdr)
   {

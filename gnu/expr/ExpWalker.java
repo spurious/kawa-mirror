@@ -8,6 +8,9 @@ public class ExpWalker
   SourceMessages messages;
   Compilation comp;
 
+  /** Get the Compilation associated with this walker. */
+  public Compilation getCompilation () { return comp; }
+
   protected Expression walkExpression (Expression exp)
   {
     exp.walkChildren(this);

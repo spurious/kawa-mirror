@@ -33,12 +33,12 @@ public class Scope
     parent.lastChild = this;
   }
 
-  Variable addVariable (Method method, Type type, String name)
+  Variable addVariable (CodeAttr code, Type type, String name)
   {
     Variable var = new Variable ();
     var.setType(type);
     var.setName(name);
-    addVariable (method, var);
+    addVariable (code, var);
     return var;
    }
 
@@ -51,12 +51,12 @@ public class Scope
     last_var = var;
   }
 
-  public void addVariable (Method method, Variable var)
+  public void addVariable (CodeAttr code, Variable var)
   {
-    var.start_pc = method.code == null ? 0 : method.code.PC;
+    var.start_pc = code == null ? 0 : code.PC;
     addVariable (var);
     if (var.isSimple ())
-      method.allocate_local (var);
+      var.allocateLocal(code);
   }
 
   /**
@@ -82,7 +82,7 @@ public class Scope
   }
 
   /**
-   * Search by name for a Variable.
+   * Search by name for a Variable in this Scope (only).
    * @param name name to search for
    * @return the Variable, or null if not found (in this scope).
    */

@@ -84,4 +84,55 @@ public class Variable extends Location implements java.util.Enumeration {
       flags &= ~ARTIFICIAL_FLAG;
   }
 
+  /** Assign a local variable to a given local variable slot.
+   * @param local the index of  the local variables.
+   * @return true iff we succeeded (i.e. the slot was unused) */
+  public boolean reserveLocal (int varIndex, CodeAttr code)
+  {
+    int size = getType().size > 4 ? 2 : 1;
+    if (code.locals.used == null)
+      code.locals.used = new Variable[20+size];
+    else if (code.getMaxLocals() + size >= code.locals.used.length) {
+      Variable[] new_locals = new Variable [2 * code.locals.used.length + size];
+      System.arraycopy (code.locals.used, 0, new_locals, 0, code.getMaxLocals());
+      code.locals.used = new_locals;
+    }
+    for (int j = 0; j < size; j++)
+      {
+	if (code.locals.used[varIndex+j] != null)
+	  return false;
+      }
+    for (int j = 0; j < size; j++)
+      code.locals.used[varIndex + j] = this;
+    if (varIndex + size > code.getMaxLocals())
+      code.setMaxLocals(varIndex + size);
+    offset = varIndex;
+    return true;
+  }
+
+  /**
+   * Allocate slots for a local variable (or parameter).
+   * @return the index of the (first) slot.
+   */
+  public void allocateLocal (CodeAttr code)
+  {
+    for (int i = 0; ; i++)
+      {
+	if (reserveLocal (i, code))
+	  {
+	    return;
+	  }
+      }
+  }
+
+  public void freeLocal (CodeAttr code)
+  {
+    end_pc = code.PC;
+    int size = getType().size > 4 ? 2 : 1;
+    while (--size >= 0)
+      code.locals.used [offset + size] = null;
+  }
+
+
+  
 }

@@ -171,9 +171,9 @@ public class ClassFileInput extends DataInputStream
 	  {
 	    int start_pc = readUnsignedShort();
 	    int end_pc = readUnsignedShort();
-	    int handle_pc = readUnsignedShort();
+	    int handler_pc = readUnsignedShort();
 	    int catch_type = readUnsignedShort();
-	    /* FIXME */
+	    code.addHandler(start_pc, end_pc, handler_pc, catch_type);
 	  }
 	readAttributes(code);
 	return code;

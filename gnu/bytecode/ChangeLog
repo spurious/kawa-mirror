@@ -1,3 +1,17 @@
+Thu Nov 27 21:22:16 1997  Per Bothner  <bothner@cygnus.com>
+
+	* TryState.java:  New class, for exception handling.
+	* Makefile.am:  Added TryState.class.
+	* Method.java:  Move mone methods to CodeAttr.java.
+	* CodeAttr.java:  Rename compile_xxx to emitXxx.
+	(addhandler, emitTryStart, emitTryEnd. emitCatchStart, emitCatchEnd,
+	emitFinallyStart, emitFinallyEnd, emitTryCatchEnd):  New methods
+	to support exception handling.
+	* ClassFileInput.java:  Create exception table.
+	* Scope.java (various places):  Pass CodeAttr instead of Method.
+	* Variable.java:  Moved functionality here from Method.java.
+	
+
 Mon Nov 10 16:57:28 1997  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (disAssemble):  New method.

@@ -1,3 +1,7 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* KawaServlet.java (doGet):  Use CallContext.setInstance.
+
 2002-01-13  Per Bothner  <per@bothner.com>
 
 	* ServletPrinter.java:  New class, extends HttpPrinter.

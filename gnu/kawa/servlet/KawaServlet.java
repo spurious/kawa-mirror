@@ -20,6 +20,8 @@ extends HttpServlet implements CpsMethodContainer
     ctx.servlet = this;
     ctx.values = Values.noArgs;
     ctx.consumer = new ServletPrinter(response);
+    Thread thread = Thread.currentThread();
+    CallContext.setInstance(thread, ctx);
 
     /* FIXME should use fluid binding!
     gnu.expr.Interpreter interp = gnu.expr.Interpreter.getInterpreter();
@@ -45,6 +47,7 @@ extends HttpServlet implements CpsMethodContainer
     apply(ctx);
     ctx.run();
     ctx.consumer.endDocument();
+    CallContext.setInstance(thread, null);
   }
 
   public void apply(CpsMethodProc proc, CallContext context)

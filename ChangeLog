@@ -1,5 +1,7 @@
 2003-10-16  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/AutoloadSyntax.java (load):  Give Syntax object a name.
+
 	* kawa/repl.java (processArgs):  Try arguments in Compiletion.options.
 
 2003-10-12  Per Bothner  <per@bothner.com>

@@ -100,7 +100,11 @@ public class AutoloadSyntax extends Syntax implements Externalizable
 	    loaded = (Syntax) value;
 	  }
 	else if (value instanceof Syntax)
-          loaded = (Syntax) value;
+	  {
+	    loaded = (Syntax) value;	
+	    if (name != null && loaded.getName() == null)
+	      loaded.setName(name);
+	  }
 	else
 	  throw_error ("failed to autoload valid syntax object ");
       }

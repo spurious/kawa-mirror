@@ -16,14 +16,14 @@ java_WITH_SWING =\
   NumberCompare.java \
   SaveExcursion.java \
   UnwindProtect.java \
-  defun.java \
-  defvar.java \
   defcustom.java defgroup.java \
-  lambda.java \
-  setq.java
+  lambda.java
 
 java_JAVA=\
+  defun.java \
+  defvar.java \
   While.java \
+  setq.java \
   $(java_@SWING_SELECTED@)
 
 EXTRA_JAVA = $(java_WITH_SWING)

@@ -1,3 +1,7 @@
+2000-06-26  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Make some classes unconditionally (even if no swing).
+
 2000-06-25  Per Bothner  <per@bothner.com>
 
 	Moved some functions around, for the same of CommonLisp support.

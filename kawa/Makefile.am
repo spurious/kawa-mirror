@@ -12,36 +12,19 @@ bin_SCRIPTS = kawa
 BAT=
 
 # Use an environment variable for CLASSPATH so we pick up standard classes:
-CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
-JAVAC = javac
-JAVA = java
-JCFLAGS = -g
-
-.java.class:
-	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
-
-# This redundant rule is needed for some versions of make, but not GNU make.
-repl.class:  $(srcdir)/repl.java
-	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d .. $<
+#CLASSPATH_ENV = CLASSPATH=..:$(srcdir)/..:$$CLASSPATH
 
 javadir=$(datadir)/java/$(subdir)
 
-OBJ = Shell.class repl.class \
-  GuiConsole.class MessageArea.class TextAreaWriter.class GuiInPort.class
+java_JAVA = Shell.java repl.java Version.java \
+  GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
 
+CLEANFILES = *.class kawa$(BAT) tmp *.stamp
+BUILT_SOURCES = Version.java
+SOURCES = $(java_JAVA) Version.java.in
 
-# These are generated automatically when the $(OBJ) files are built,
-# but they also need to be installed.
-
-SECONDARY_OBJS=\
-	GuiConsole$$1.class Version.class
-
-java_DATA=$(OBJ) $(SECONDARY_OBJS)
-
-# Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.java) Version.java.in
-
-CLEANFILES = *.class kawa$(BAT) tmp
+Version.java: $(srcdir)/Version.java.in
+	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/Version.java.in >Version.java
 
 kawa$(BAT):
 	echo '#!/bin/sh' >tmp
@@ -53,8 +36,8 @@ kawa$(BAT):
 	chmod +x tmp
 	mv tmp kawa$(BAT)
 
-all: $(OBJ) kawa
-
-# Forve repl.class to be built before sub-dirs.
+# Force repl.class to be built before sub-dirs.
 # Specifically, lib needs repl to compile scm files.
-all-recursive:  repl.class
+all-recursive:  classjava.stamp kawa
+
+EXTRA_DIST = Version.java

@@ -85,12 +85,12 @@ Literal.class \
 Compilation.class \
 Compilable.class \
 CompileFile.class \
-compilefunc.class \
 loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
 Values.class \
 Promise.class \
+Future.class \
 $(EXCEPTIONS)
 
 java_DATA=$(OBJ)

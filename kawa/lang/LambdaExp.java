@@ -75,7 +75,7 @@ public class LambdaExp extends ScopeExp
     
     if (max_args < 0 || max_args > 4)
       {
-	// compilefunc.compile depends on the "argsArray" variable
+	// Compilation.compile depends on the "argsArray" variable
 	// being the second one created for this scope.
 	argsArray = add_decl (Symbol.make ("argsArray"),
 			       Compilation.objArrayType);
@@ -145,10 +145,7 @@ public class LambdaExp extends ScopeExp
       {
 	String new_name
 	  = comp.generateClassName (name == null ? "lambda" : name.toString());
-	new_class = new ClassType (new_name);
-	comp.curClass = new_class;
-	comp.addClass (new_class);
-	compilefunc.compile (comp, this);
+	new_class = comp.addClass (this, new_name);
       }
     finally
       {

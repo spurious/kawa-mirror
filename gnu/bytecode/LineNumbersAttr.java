@@ -24,6 +24,7 @@ public class LineNumbersAttr extends Attribute
     setContainer(code); 
     setNext(code.getAttributes()); 
     code.setAttributes(this);
+    code.lines = this;
   }
 
   public LineNumbersAttr(short[] numbers, CodeAttr code)

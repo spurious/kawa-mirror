@@ -21,10 +21,11 @@ public class LocalVarsAttr extends Attribute
   public LocalVarsAttr(CodeAttr code)
   {
     super("LocalVariableTable");
-    setContainer(code); 
+    setContainer(code);
     setNext(code.getAttributes()); 
     code.setAttributes(this);
     method = (Method) code.getContainer();
+    code.locals = this;
   }
 
   public final Method getMethod() { return method; }

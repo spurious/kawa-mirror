@@ -52,11 +52,13 @@ implements Inlineable, Externalizable
   public void apply (CallContext ctx)
   {
     Consumer out = ctx.consumer;
-    int nargs = ctx.count;
     out.beginAttribute(sname, qname);
-    for (int i = 0;  i < nargs;  i++)
+    Object endMarker = Symbol.UNBOUND;
+    for (;;)
       {
-	Object arg = ctx.getArgAsObject(i);
+	Object arg = ctx.getNextArg(endMarker);
+	if (arg == endMarker)
+	  break;
 	if (arg instanceof Consumable)
 	  ((Consumable) arg).consume(out);
 	else

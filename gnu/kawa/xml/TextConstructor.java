@@ -13,11 +13,13 @@ public class TextConstructor extends CpsProcedure
   public void apply (CallContext ctx)
   {
     Consumer out = ctx.consumer;
-    int nargs = ctx.count;
     StringBuffer sbuf = new StringBuffer();
-    for (int i = 0;  i < nargs;  i++)
+    Object endMarker = Symbol.UNBOUND;
+    for (;;)
       {
-	Object arg = ctx.getArgAsObject(i);
+	Object arg = ctx.getNextArg(endMarker);
+	if (arg == endMarker)
+	  break;
 	StringValue.stringValue(arg, sbuf);
 	out.writeChars(sbuf.toString());
 	sbuf.setLength(0);

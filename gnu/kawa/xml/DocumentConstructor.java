@@ -13,11 +13,13 @@ public class DocumentConstructor extends CpsProcedure
   public void apply (CallContext ctx)
   {
     Consumer out = ctx.consumer;
-    int nargs = ctx.count;
+    Object endMarker = Symbol.UNBOUND;
     out.beginDocument();
-    for (int i = 0;  i < nargs;  i++)
+    for (;;)
       {
-	Object arg = ctx.getArgAsObject(i);
+	Object arg = ctx.getNextArg(endMarker);
+	if (arg == endMarker)
+	  break;
 	if (arg instanceof Consumable)
 	  ((Consumable) arg).consume(out);
 	else

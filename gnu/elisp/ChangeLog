@@ -1,3 +1,8 @@
+1999-06-23  Per Bothner  <per@bothner.com>
+
+	* ELisp.java:  New class.
+	* Makefile.am, Makefile.in (java_JAVA):  Add ELisp.java.
+
 1999-06-20  Per Bothner  <per@bothner.com>
 
 	* ELispReader.java (readSymbol):  Don't recognize keywords.

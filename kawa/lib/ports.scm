@@ -91,8 +91,11 @@
 			       <void> (<gnu.mapping.Procedure>))
    port prompter))
 
-(define (close-output-port port)
-  ((primitive-virtual-method <output-port> "close" <void> ()) port))
+(define (close-input-port (port :: <input-port>))
+  (invoke port 'close))
+
+(define (close-output-port (port :: <output-port>))
+  (invoke port 'close))
 
 (define (transcript-on filename)
   ((primitive-static-method <output-port> "setLogFile" <void>

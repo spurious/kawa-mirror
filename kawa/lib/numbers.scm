@@ -54,6 +54,12 @@
                  ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
                   x)))
 
+(define (asin (x :: <double>))
+  (invoke-static <java.lang.Math> 'asin x))
+
+(define (acos (x :: <double>))
+  (invoke-static <java.lang.Math> 'acos x))
+
 (define (make-rectangular (x <real>) (y <real>))
   ((primitive-static-method <complex> "make" <complex> (<real> <real>))  x y))
 (define (make-polar (x <double>) (y <double>))

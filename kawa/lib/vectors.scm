@@ -1,6 +1,9 @@
 (define (vector? x)
   (instance? x <vector>))
 
+(define (make-vector (k :: <int>) #!optional (fill #!undefined))
+  (make <vector> k fill))
+
 (define (vector-length x :: <vector>)
   (invoke x 'length))
 
@@ -17,3 +20,6 @@
 
 (define (list->vector (x <list>))
   (invoke x 'toVector))
+
+(define (vector-fill! (vec :: <vector>) fill)
+  (invoke vec 'setAll fill))

@@ -1,3 +1,16 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* numbers.scm (asin): New procedure, replaces kawa/standard/asin.java.
+	(acos): New procedure, replaces kawa/standard/acos.java.
+	* ports.scm (close-in-port):  New procedure, replaces
+ 	kawa/standard/close_input_port.java.
+	* vectors.scm (vector-fill!):  New procedure, replaces
+ 	kawa/standard/vector_fill_b.java.
+ 	(make-vector):  New procedure, replaces kawa/standard/make_vector.java.
+
+	* reflection.scm:  Update class names for kawa.lang.Prim* classes
+	moved to gnu.kawa.reflect.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* misc.scm (values):  New procedure.

@@ -44,16 +44,16 @@
 
 #| THESE CAN BE FUNCTIONS WHEN WE HAVE BETTER INLINING:
 (define (primitive-array-new element-type)
-  ((primitive-constructor <kawa.lang.PrimArrayNew> (<gnu.bytecode.Type>))
+  ((primitive-constructor <gnu.kawa.reflect.ArrayNew> (<gnu.bytecode.Type>))
    element-type))
 (define (primitive-array-set element-type)
-  ((primitive-constructor <kawa.lang.PrimArraySet> (<gnu.bytecode.Type>))
+  ((primitive-constructor <gnu.kawa.reflect.ArraySet> (<gnu.bytecode.Type>))
    element-type))
 (define (primitive-array-get element-type)
-  ((primitive-constructor <kawa.lang.PrimArrayGet> (<gnu.bytecode.Type>))
+  ((primitive-constructor <gnu.kawa.reflect.ArrayGet> (<gnu.bytecode.Type>))
    element-type))
 (define (primitive-array-length element-type)
-  ((primitive-constructor <kawa.lang.PrimArrayLength> (<gnu.bytecode.Type>))
+  ((primitive-constructor <gnu.kawa.reflect.ArrayLength> (<gnu.bytecode.Type>))
    element-type))
 ... etc ...
 |#
@@ -62,28 +62,28 @@
 		((primitive-array-new element-type)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimArrayNew> (<gnu.bytecode.Type>))
+		   <gnu.kawa.reflect.ArrayNew> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-set
   (syntax-rules ()
 		((primitive-array-set element-type)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimArraySet> (<gnu.bytecode.Type>))
+		   <gnu.kawa.reflect.ArraySet> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-get
   (syntax-rules ()
 		((primitive-array-get element-type)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimArrayGet> (<gnu.bytecode.Type>))
+		   <gnu.kawa.reflect.ArrayGet> (<gnu.bytecode.Type>))
 		  element-type))))
 (define-syntax primitive-array-length
   (syntax-rules ()
 		((primitive-array-length element-type)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimArrayLength> (<gnu.bytecode.Type>))
+		   <gnu.kawa.reflect.ArrayLength> (<gnu.bytecode.Type>))
 		  element-type))))
 
 (define-syntax primitive-get-field
@@ -110,7 +110,7 @@
 		((primitive-get-static ctype fname ftype)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimGetStatic>
+		   <gnu.kawa.reflect.StaticGet>
 		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
@@ -119,7 +119,7 @@
 		((primitive-set-static ctype fname ftype)
 		 (constant-fold
 		  (primitive-constructor
-		   <kawa.lang.PrimSetStatic>
+		   <gnu.kawa.reflect.StaticSet>
 		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))

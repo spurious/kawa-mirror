@@ -1,3 +1,10 @@
+2001-10-25  Per Bothner  <per@bothner.com>
+
+	* SeriesTarget.java:  New class, extends Target.
+	* Makefile.am (java_sources):  Add SeriesTarget.java.
+	* StackTarget.java (compileFromStack0):  New static helper method.
+	(convert):  New static helper method.  Uses compileFromStack0.
+
 2001-10-20  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* ModuleExp.java (compileToFiles):  Use File.separatorChar.

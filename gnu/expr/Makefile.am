@@ -51,6 +51,7 @@ java_sources = \
   PushApply.java \
   ReferenceExp.java \
   ScopeExp.java \
+  SeriesTarget.java \
   SetExp.java \
   Special.java \
   StackTarget.java \

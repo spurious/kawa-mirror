@@ -20,6 +20,11 @@ public class StackTarget extends Target
 
   protected boolean compileFromStack0(Compilation comp, Type stackType)
   {
+    return compileFromStack0(comp, stackType, type);
+  }
+
+  static boolean compileFromStack0(Compilation comp, Type stackType, Type type)
+  {
     if (type == stackType)
       return true;
     CodeAttr code = comp.getCode();
@@ -36,6 +41,12 @@ public class StackTarget extends Target
 
     stackType.emitCoerceToObject(code);
     return type instanceof ClassType && stackType.isSubtype(type);
+  }
+
+  public static void convert(Compilation comp, Type stackType, Type targetType)
+  {
+    if (! compileFromStack0(comp, stackType, targetType))
+      targetType.emitCoerceFromObject(comp.getCode());
   }
 
   public void compileFromStack(Compilation comp, Type stackType)

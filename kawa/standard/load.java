@@ -14,7 +14,7 @@ public class load extends Procedure1 {
    * is in the CLASSPATH, since it a bit ugly that load of a source file
    * or .zip file reads a file (using a relative or absolute file name),
    * while load of a compiled .class uses the classpath. */
-  public final static Object loadClassFile (String name, Environment env)
+  public final static void loadClassFile (String name, Environment env)
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -25,7 +25,7 @@ public class load extends Procedure1 {
 	Object inst = clas.newInstance ();
 	if (! (inst instanceof Procedure0))
 	  throw new RuntimeException ("load - class is not an Procedure0");
-	return ((ModuleBody)inst).run();
+	((ModuleBody)inst).run();
       }
     catch (ClassNotFoundException ex)
       {
@@ -46,7 +46,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static Object loadCompiled (String name, Environment env)
+  public final static void loadCompiled (String name, Environment env)
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -62,9 +62,12 @@ public class load extends Procedure1 {
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	Object proc = clas.newInstance ();
 	if (proc instanceof ModuleBody)
-	  return ((ModuleBody) proc).run();
+	  {
+	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(proc, env);
+	    ((ModuleBody) proc).run();
+	  }
 	else
-	  return ((CallFrame) proc).apply0();
+	  ((CallFrame) proc).apply0();
       }
     catch (java.io.IOException ex)
       {
@@ -89,15 +92,14 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static Object loadSource (String name, Environment env)
+  public final static void loadSource (String name, Environment env)
     throws SyntaxException
   {
     try
       {
 	InPort fstream = InPort.openFile(name);
-	Object result = loadSource (fstream, env);
+	loadSource (fstream, env);
 	fstream.close();
-	return result;
       }
     catch (java.io.FileNotFoundException e)
       {
@@ -109,7 +111,7 @@ public class load extends Procedure1 {
       }
   }
 
-  public final static Object loadSource (InPort port, Environment env)
+  public final static void loadSource (InPort port, Environment env)
     throws SyntaxException
   {
     // Reading the entire file and evaluting it as a unit is more
@@ -119,7 +121,6 @@ public class load extends Procedure1 {
     if (true)
       {
 	kawa.Shell.run(Scheme.getInstance(), env, port, null, OutPort.errDefault());
-	return Scheme.voidObject;
       }
     else
       {
@@ -129,7 +130,7 @@ public class load extends Procedure1 {
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (messages.seenErrors())
 	  throw new SyntaxException(messages);
-	return mexp.evalModule(env);
+	mexp.evalModule(env);
       }
   }
 
@@ -144,7 +145,8 @@ public class load extends Procedure1 {
     try
       {
 	Environment env = (Environment) arg2;
-	return apply (name, env);
+	apply (name, env);
+	return Scheme.voidObject;
       }
     catch (SyntaxException ex)
       {
@@ -153,21 +155,29 @@ public class load extends Procedure1 {
       }
   }
 
-  public final Object apply (String name, Environment env)
+  public final void apply (String name, Environment env)
     throws SyntaxException
   {
     if (name.endsWith (".zip") || name.endsWith(".jar"))
-      return loadCompiled (name, env);
+      {
+	loadCompiled (name, env);
+	return;
+      }
     if (name.endsWith (".scm"))
-      return loadSource (name, env);
+      {
+	loadSource (name, env);
+	return;
+      }
     char file_separator = System.getProperty ("file.separator").charAt(0);
+
     if (name.endsWith (".class"))
       {
 	name = name.substring (0, name.length () - 6);
 	name = name.replace ('/', '.');
 	if (file_separator != '/')
 	  name = name.replace (file_separator, '.');
-	return loadClassFile (name, env);
+	loadClassFile (name, env);
+	return;
       }
     File file = new File (name);
     if (file.exists ())
@@ -178,7 +188,7 @@ public class load extends Procedure1 {
 	    fs.mark(5);
 	    int char0 = fs.read ();
 	    if (char0 == -1)
-	      return Sequence.eofValue;
+	      return; // Sequence.eofValue;
 	    if (char0 == 'P')
 	      {
 		int char1 = fs.read ();
@@ -191,7 +201,8 @@ public class load extends Procedure1 {
 			if (char3 == '\004')
 			  {
 			    fs.close ();
-			    return loadCompiled (name, env);
+			    loadCompiled (name, env);
+			    return;
 			  }
 		      }
 		  }
@@ -200,9 +211,9 @@ public class load extends Procedure1 {
 	    try
 	      {
 		InPort src = InPort.openFile(fs, name);
-		Object result = loadSource (src, env);
+		loadSource (src, env);
 		src.close();
-		return result;
+		return;
 	      }
 	    catch (java.io.IOException ex)
 	      {
@@ -225,21 +236,30 @@ public class load extends Procedure1 {
 	String xname = fname + ".zip";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadCompiled (xname, env);
+	  {
+	    loadCompiled (xname, env);
+	    return;
+	  }
 	xname = fname + ".jar";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadCompiled (xname, env);
+	  {
+	    loadCompiled (xname, env);
+	    return;
+	  }
 
 	xname = fname + ".class";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadClassFile (name, env);
+	  {
+	    loadClassFile (name, env);
+	    return;
+	  }
 
 	xname = fname + ".scm";
 	file = new File (xname);
 	if (file.exists ())
-	  return loadSource (xname, env);
+	  loadSource (xname, env);
       }
     throw new RuntimeException ("load:  " + name + " - not found");
   }

@@ -29,27 +29,30 @@ public class define_syntax extends Syntax
       return tr.syntaxError("Missing transformation for "+form.car);
     pair = (Pair) pair.cdr;
     Expression rule = tr.rewrite(pair.car);
-    if (macro != null)
+    macro.expander = rule;
+    if (! (macro.context instanceof ModuleExp))
       {
-        macro.noteValue(rule);
-        return QuoteExp.voidExp;
+	return QuoteExp.voidExp;
       }
     else
       {
         // Add rule to translation environment.
-        macro = new Macro(name, rule);
-        //macro.noteValue(rule);
         tr.addGlobal(name, macro);
 
         // Add rule to execution environment.
-        Expression args[] = new Expression[2];
-        args[0] = new QuoteExp(name);
-        args[1] = rule;
-        Method makeMacro = Macro.getMakeMethod();
-        SetExp result
-          = new SetExp (name,
-                        new ApplyExp(new QuoteExp(new PrimProcedure(makeMacro)),
-                                     args));
+	if (! (rule instanceof QuoteExp)
+	    || ! (((QuoteExp) rule).getValue() instanceof Compilable))
+	  {
+	    Expression args[] = new Expression[2];
+	    args[0] = new QuoteExp(name);
+	    args[1] = rule;
+	    Method makeMacro = Macro.getMakeMethod();
+	    rule = new ApplyExp(new PrimProcedure(makeMacro), args);
+	  }
+	else
+	  rule = new QuoteExp(macro);
+        SetExp result = new SetExp (macro, rule);
+                        
         result.setDefining (true);
         return result;
       }
@@ -59,7 +62,6 @@ public class define_syntax extends Syntax
                                      ScopeExp defs, Translator tr)
   {
     if (! (st.cdr instanceof Pair)
-        || (tr.currentScope() instanceof ModuleExp)
         || ! (((Pair) st.cdr).car instanceof String))
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
@@ -71,7 +73,7 @@ public class define_syntax extends Syntax
         forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));
         return false;
       }
-    Macro macro = new Macro((String) name, p.car);
+    Macro macro = new Macro((String) name);
     defs.addDeclaration(macro);
     p = tr.makePair(st, this, new Pair(macro, p));
     forms.addElement (p);

@@ -24,35 +24,41 @@ public class define extends Syntax implements Printable
       return super.scanForDefinitions(st, forms, defs, tr);
     Pair p = (Pair) st.cdr;
     Object name = p.car;
-    Declaration decl = null;
-    Pair declForm = null;
+    Pair name_pair = null;
+    String sym = null;
     if (name instanceof String)
       {
-        decl = new Declaration((String) name);
-        declForm = tr.makePair(p, decl, p.cdr);
-        st = tr.makePair(st, this, declForm);
+	sym = (String) name;
       }
     else if (name instanceof Pair)
       {
-        Pair name_pair = (Pair) name;
+        name_pair = (Pair) name;
         if (name_pair.car instanceof String)
-          {
-            decl = new Declaration((String) name_pair.car);
-            declForm = tr.makePair(name_pair, decl, name_pair.cdr);
-            p = tr.makePair(p, declForm, p.cdr);
-            st = tr.makePair(st, this, p);
-          }
+	  sym = (String) name_pair.car;
       }
-    if (decl != null)
+    if (sym != null)
       {
+	Declaration decl = defs.lookup(sym);
+	if (decl == null)
+	  {
+	    decl = new Declaration(sym);
+	    defs.addDeclaration(decl);
+	  }
+	else
+	  tr.error('w', "duplicate declaration for `"+sym+"'");
+	Object declForm = name_pair == null ? decl
+	  : declForm = tr.makePair(name_pair, decl, name_pair.cdr);
+	p = tr.makePair(p, declForm, p.cdr);
+	st = tr.makePair(st, this, p);
         if (defs instanceof ModuleExp)
           {
-            tr.mustCompileHere();
-            tr.push(decl);
             if (! makePrivate)
               {
                 decl.setCanRead(true);
-                // decl.setCanWrite(true);
+		// (define (f) ...) defaults f to being read-only,
+		// unless f is assigned to in this module.
+		if (name instanceof String || Compilation.usingTailCalls)
+		  decl.setCanWrite(true);
               }
           }
         if (declForm instanceof PairWithPosition)
@@ -61,7 +67,6 @@ public class define extends Syntax implements Printable
             decl.setFile(declPos.getFile());
             decl.setLine(declPos.getLine(), declPos.getColumn());
           }
-        defs.addDeclaration(decl);
       }
     forms.addElement (st);
     return true;
@@ -132,7 +137,10 @@ public class define extends Syntax implements Printable
     if (decl != null)
       {
 	sexp.binding = decl;
-	decl.noteValue (value);
+	if (decl.context instanceof ModuleExp && ! makePrivate
+	    && decl.getCanWrite())
+	  value = null;
+	decl.noteValue(value);
       }
     if (! (tr.currentScope() instanceof ModuleExp))
       {
@@ -142,18 +150,6 @@ public class define extends Syntax implements Printable
                      +tr.currentScope());
             return sexp;
           }
-
-        /*
-        // FIXME:  Remove following once define is handled like define-private.
-
-	Object binding = tr.current_decls.get (name);
-	// Hygenic macro expansion may bind a renamed (uninterned) symbol
-	// to the original symbol.
-	if (binding == null || binding instanceof String)
-	  return tr.syntaxError ("invalid use of define");
-	sexp.binding = (Declaration) binding;
-	sexp.binding.noteValue (value);
-        */
       }
     return sexp;
   }

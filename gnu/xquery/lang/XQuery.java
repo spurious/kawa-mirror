@@ -70,6 +70,7 @@ public class XQuery extends Interpreter
       return null;
     mexp.body = sexp;
     tr.pop(mexp);
+    ResolveNames.resolveNames(mexp, tr.lexical);
     return tr;
   }
 
@@ -105,6 +106,7 @@ public class XQuery extends Interpreter
 	mexp.body = new BeginExp(arr);
       }
     tr.pop(mexp);
+    ResolveNames.resolveNames(mexp, tr.lexical);
     return tr;
   }
 

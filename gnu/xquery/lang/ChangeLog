@@ -1,3 +1,10 @@
+2003-04-21  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (parse, parseFile):  Do ResolveNames.
+	* XQParser.java (parseMaybePrimaryExpr):  Remove now-redundant
+	function-name lookup; the rewriteToInvocation call appears redundant
+	given following Inlinecalls.
+
 2003-04-19  Per Bothner  <per@bothner.com>
 
 	* XQParser.java:  Update to use NameLookup.

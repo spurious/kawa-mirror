@@ -1772,17 +1772,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	Expression[] args = new Expression[vec.size()];
 	vec.copyInto(args);
-	Declaration decl = parser.lookup(name, Interpreter.FUNCTION_NAMESPACE);
-	if (decl == null && name instanceof Symbol)
-	  exp = InlineCalls.rewriteToInvocation((Symbol) name, args);
-	else
-	  exp = null;
-	if (exp == null)
-	  {
-	    ReferenceExp rexp = new ReferenceExp(name, decl);
-	    rexp.setProcedureName(true);
-	    exp = new ApplyExp(rexp, args);
-	  }
+	ReferenceExp rexp = new ReferenceExp(name, null);
+	rexp.setProcedureName(true);
+	exp = new ApplyExp(rexp, args);
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	popNesting(save);

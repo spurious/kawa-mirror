@@ -18,6 +18,7 @@ java_SCM_ALWAYS =\
   keywords.scm \
   numbers.scm \
   strings.scm \
+  parameters.scm \
   ports.scm \
   files.scm \
   misc.scm \

@@ -637,10 +637,9 @@ public class InPort extends LineBufferedReader implements Printable
 	  {
 	    if (exactness == 'i')
 	      {
-		double zero = 0.0; // work-around for a javac bug.
-		return new DFloNum ((numer.isZero () ? 0.0
-				     : negative ? -1.0 : 1.0)
-				    / zero);
+		return new DFloNum ((numer.isZero () ? Double.NaN
+				     : negative ? Double.NEGATIVE_INFINITY
+				     : Double.POSITIVE_INFINITY));
 	      }
 	    else if (numer.isZero())
 	      throw new ReadError (this, "0/0 is undefined");
@@ -1102,7 +1101,7 @@ public class InPort extends LineBufferedReader implements Printable
 	  default:
 	    if (Character.isWhitespace((char)c))
 	      break;
-	    else if (Character.isDigit((char)c))
+	    if (Character.isDigit((char)c))
 	      return readSchemeNumber (c, 10);
 	    else
 	      return readSymbol(c, getReadCase());

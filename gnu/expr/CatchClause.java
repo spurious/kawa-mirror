@@ -10,7 +10,7 @@ public class CatchClause extends ScopeExp
   Expression body;
   CatchClause next;
 
-  public CatchClause (String name, ClassType type)
+  public CatchClause (Object name, ClassType type)
   {
     super ();
     addDeclaration (name, type);

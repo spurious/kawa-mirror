@@ -1,3 +1,7 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* CatchClause.java (<init>):  Name parameter need not be a String.
+
 2002-11-12  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (name):  Removed field, replaced by:

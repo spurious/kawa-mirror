@@ -57,25 +57,45 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+GCJ_SELECTED = @GCJ_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
+LIBGCJ_CFLAGS = @LIBGCJ_CFLAGS@
+LIBGCJ_CXXFLAGS = @LIBGCJ_CXXFLAGS@
+LIBGCJ_JAVAFLAGS = @LIBGCJ_JAVAFLAGS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
 SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
 kawa_bin = @kawa_bin@
+libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = cygnus
 JAVATOP = 
@@ -84,7 +104,7 @@ javadir = $(datadir)/java
 
 JAR = jar
 
-EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat   libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
 
 HTML_HOME = $$HOME/public_html
@@ -100,8 +120,8 @@ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README COPYING ChangeLog Makefile.am Makefile.in NEWS \
-TODO aclocal.m4 config.guess config.sub configure configure.in \
-install-sh missing mkinstalldirs
+TODO acinclude.m4 aclocal.m4 config.guess config.sub configure \
+configure.in install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -117,7 +137,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in 
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  acinclude.m4
 	cd $(srcdir) && $(ACLOCAL)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
@@ -322,6 +342,7 @@ clean-am:  clean-tags clean-generic mostlyclean-am
 clean: clean-recursive
 
 distclean-am:  distclean-tags distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status

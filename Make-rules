@@ -6,15 +6,16 @@ CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
 JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
+LIBTOOL = $(TO_TOPDIR)/libtool
 #GCJFLAGS = -gdwarf-2
-GCJFLAGS = -g
+GCJFLAGS = -g -O
 OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 java_Java= $(java_BUILT) $(java_sources)
 GCJ_DEPS = $(java_Java)
 SOURCES = $(java_sources)
-CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).o $(EXTRA_CLEAN)
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar $(OFILES_DIR)/$(PACKAGE_FNAME).lo $(EXTRA_CLEAN)
 clean:
 	rm -f $(CLEANFILES)
 
@@ -27,9 +28,10 @@ ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 $(TO_TOPDIR)/kawa1$(exeext):
 	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
 
-$(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
-	  $(GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
+$(OFILES_DIR)/$(PACKAGE_FNAME).lo:  $(GCJ_DEPS)
+	$(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(GCJFLAGS) \
+	  --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
+	  $? $(EXTRA_GCJ_INPUTS) -o $(OFILES_DIR)/$(PACKAGE_FNAME).lo
 
 java-classes.stamp: $(java_Java)
 	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
@@ -49,10 +51,12 @@ elisp-classes.stamp: $(java_ELISP)
 
 # Almost the same as automake's install-javaJAVA, but the standard
 # automake support for Java doesn't handle built Java classes.
-install-java-classes: java-classes.stamp
+install-java-classes: all
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(javadir)
 	for p in *.class; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
 	done
+
+install-data-am: install-java-classes

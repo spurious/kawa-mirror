@@ -42,6 +42,7 @@ jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
+  libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh \
   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
 HTML_HOME = $$HOME/public_html

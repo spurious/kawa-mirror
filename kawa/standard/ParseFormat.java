@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;
+import gnu.mapping.*;
 
 public class ParseFormat extends Procedure1
 {
@@ -197,15 +198,15 @@ System.err.println("fcount:"+fcount);
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError("Error parsing format ("+ex+")");
+	throw new RuntimeException("Error parsing format ("+ex+")");
       }
     catch (ParseException ex)
       {
-	throw new GenericError("Invalid format ("+ex+")");
+	throw new RuntimeException("Invalid format ("+ex+")");
       }
     catch (IndexOutOfBoundsException ex)
       {
-	throw new GenericError("End while parsing format");
+	throw new RuntimeException("End while parsing format");
       }
   }
 }

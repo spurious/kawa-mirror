@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Implements the Kawa extension "%syntax-error".
  * Prints out its arguments in an error message.

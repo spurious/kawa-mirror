@@ -1,6 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Implement the standard Scheme function "eq?". */
 

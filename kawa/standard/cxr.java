@@ -1,5 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
+import gnu.mapping.HasSetter;
+import gnu.mapping.WrongType;
 
 /** Implement the standard Scheme procedures "c[ad]*r". */
 
@@ -35,8 +38,6 @@ public class cxr extends Procedure1 implements HasSetter
   }
 
   public Object apply1 (Object arg1)
-       throws kawa.lang.WrongType,
-	 kawa.lang.GenericError
   {
     if (count == 0)
       program (name().toString ());
@@ -44,7 +45,7 @@ public class cxr extends Procedure1 implements HasSetter
     for (int i = count;  --i >= 0;  m >>= 1)
       {
 	if (! (arg1 instanceof Pair) )
-	    throw new kawa.lang.WrongType(this.name (), 1, "list");
+	    throw new WrongType(this.name (), 1, "list");
 	Pair pair = (Pair) arg1;
 	arg1 = (m & 1) != 0 ? pair.cdr : pair.car;
       }
@@ -60,7 +61,7 @@ public class cxr extends Procedure1 implements HasSetter
     for (int i = count;  --i > 0;  m >>= 1)
       {
 	if (! (list instanceof Pair) )
-	    throw new kawa.lang.WrongType(this.name (), 1, "list");
+	    throw new WrongType(this.name (), 1, "list");
 	pair = (Pair) list;
 	list = (m & 1) != 0 ? pair.cdr : pair.car;
       }

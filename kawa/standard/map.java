@@ -1,11 +1,12 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /** Implement the Scheme standard functions "map" and "for-each".
  * @author Per Bothner
  */
 
-public class map  extends ProcedureN
+public class map  extends gnu.mapping.ProcedureN
 {
   /** True if we should collect the result into a list. */
   boolean collect;
@@ -18,7 +19,6 @@ public class map  extends ProcedureN
 
   /** An optimized single-list version of map. */
   static public Object map1 (Procedure proc, Object list)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Object result = List.Empty;
     Pair last = null;
@@ -38,7 +38,6 @@ public class map  extends ProcedureN
 
   /** An optimized single-list version of for-each. */
   static public void forEach1 (Procedure proc, Object list)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     while (list != List.Empty)
       {
@@ -49,7 +48,6 @@ public class map  extends ProcedureN
   }
 
   public Object apply2 (Object arg1, Object arg2)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Procedure proc = (Procedure) arg1;
     if (collect)
@@ -59,7 +57,6 @@ public class map  extends ProcedureN
   }
 
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Procedure proc = (Procedure) (args[0]);
     int arity = args.length - 1;

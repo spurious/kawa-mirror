@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme R5RS function "values".

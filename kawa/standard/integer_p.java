@@ -1,8 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.*;
-
-import kawa.lang.Procedure1;
+import gnu.mapping.*;
 
 public class integer_p extends Procedure1
 {

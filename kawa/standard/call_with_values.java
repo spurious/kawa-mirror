@@ -1,15 +1,10 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 public class call_with_values extends Procedure2
 {
-  public call_with_values ()
-  {
-    super ("call-with-values");
-  }
-
   public Object apply2 (Object producer, Object consumer)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Object values = ((Procedure) producer).apply0 ();
     Procedure cons_proc = (Procedure) consumer;

@@ -1,6 +1,6 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
+import gnu.mapping.*;
 
 /** Implement the standard Scheme procedure "expt". */
 

@@ -2,77 +2,71 @@ package kawa.standard;
 import kawa.lang.*;
 import java.io.*;
 import gnu.bytecode.ZipLoader;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class load extends Procedure1 {
-  public load ()
-  {
-    super("load");
-  }
-
   /** Load using the name of a compile .class file. */
   /* This should probably be re-written to use a ClassLoader, unless '.'
    * is in the CLASSPATH, since it a bit ugly that load of a source file
    * or .zip file reads a file (using a relative or absolute file name),
    * while load of a compiled .class uses the classpath. */
   public final static Object loadClassFile (String name, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
 	Class clas = Class.forName (name);
 	Object inst = clas.newInstance ();
 	if (! (inst instanceof Procedure0))
-	  throw new GenericError ("load - class is not an Procedure0");
+	  throw new RuntimeException ("load - class is not an Procedure0");
 	return ((ModuleBody)inst).run (env);
       }
     catch (ClassNotFoundException ex)
       {
-	throw new GenericError ("class not found in load");
+	throw new RuntimeException ("class not found in load");
       }
     catch (InstantiationException ex)
       {
-	throw new GenericError ("class not instantiable: in load");
+	throw new RuntimeException ("class not instantiable: in load");
       }
     catch (IllegalAccessException ex)
       {
-	throw new GenericError ("class illegal access: in load");
+	throw new RuntimeException ("class illegal access: in load");
       }
   }
 
   public final static Object loadCompiled (String name, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
 	File zfile = new File (name);
 	if (!zfile.exists ())
-	  throw new GenericError ("load: "+name+" - not found");
+	  throw new RuntimeException ("load: "+name+" - not found");
 	if (!zfile.canRead ())
-	  throw new GenericError ("load: "+name+" - not readable");
+	  throw new RuntimeException ("load: "+name+" - not readable");
 	ZipLoader loader = new ZipLoader (name);
 	Class clas = loader.loadClass (LambdaExp.fileFunctionName, true);
 	return ((ModuleBody) clas.newInstance ()).run (env);
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError ("load: "+name+" - "+ex.toString ());
+	throw new RuntimeException ("load: "+name+" - "+ex.toString ());
       }
     catch (ClassNotFoundException ex)
       {
-	throw new GenericError ("class not found in load");
+	throw new RuntimeException ("class not found in load");
       }
     catch (InstantiationException ex)
       {
-	throw new GenericError ("class not instantiable: in load");
+	throw new RuntimeException ("class not instantiable: in load");
       }
     catch (IllegalAccessException ex)
       {
-	throw new GenericError ("class illegal access: in load");
+	throw new RuntimeException ("class illegal access: in load");
       }
   }
 
   public final static Object loadSource (String name, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
@@ -83,16 +77,15 @@ public class load extends Procedure1 {
       }
     catch (java.io.FileNotFoundException e)
       {
-	throw new GenericError ("load: file not found: " + name);
+	throw new RuntimeException ("load: file not found: " + name);
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError("failed to close \""+name+"\" after loading");
+	throw new RuntimeException("failed to close \""+name+"\" after loading");
       }
   }
 
   public final static Object loadSource (InPort port, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more eifficient.
@@ -109,19 +102,17 @@ public class load extends Procedure1 {
 	ModuleExp mexp = CompileFile.read (port, tr);
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
 	if (tr.errors > 0)
-	  throw new GenericError ("syntax errors during load");
+	  throw new RuntimeException ("syntax errors during load");
 	return ((ModuleBody) mexp.eval (env)).run (env);
       }
   }
 
   public final Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return apply2 (arg1, Environment.current ());
   }
 
   public final Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Environment env = (Environment) arg2;
     String name = arg1.toString ();
@@ -175,17 +166,17 @@ public class load extends Procedure1 {
 	      }
 	    catch (java.io.IOException ex)
 	      {
-		throw new GenericError("failed to close \""+name
+		throw new RuntimeException("failed to close \""+name
 				       +"\" after loading");
 	      }
 	  }
 	catch (java.io.FileNotFoundException e)
 	  {
-	    throw new GenericError ("load: file not readable: " + name);
+	    throw new RuntimeException ("load: file not readable: " + name);
 	  }
 	catch (java.io.IOException e)
           {
-            throw new GenericError ("I/O exception in load: "+e.toString ());
+            throw new RuntimeException ("I/O exception in load: "+e.toString ());
           }
       }
     else
@@ -210,6 +201,6 @@ public class load extends Procedure1 {
 	if (file.exists ())
 	  return loadSource (xname, env);
       }
-    throw new GenericError ("load:  " + name + " - not found");
+    throw new RuntimeException ("load:  " + name + " - not found");
   }
 }

@@ -3,6 +3,8 @@ import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.CodeAttr;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class convert extends Procedure2 implements Inlineable
 {

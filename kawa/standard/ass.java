@@ -1,9 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure2;
+import gnu.mapping.WrongType;
 
 public class ass extends Procedure2
 {
-  protected kawa.lang.Procedure2 compare;
+  protected Procedure2 compare;
   protected java.lang.String usage;
   public ass (String name, Procedure2 comp)
   {
@@ -13,14 +15,13 @@ public class ass extends Procedure2
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongType, WrongArguments, GenericError, UnboundSymbol
   {
     while (arg2 instanceof Pair)
       {
 	Pair list = (Pair)arg2;
 
 	if (! (list.car instanceof Pair))
-            throw new GenericError
+            throw new RuntimeException
 	      ("The association list contains non-pair elements.");
 	Pair pair = (Pair) list.car;
 

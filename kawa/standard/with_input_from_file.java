@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
              
 public class with_input_from_file extends Procedure2
 {
@@ -9,7 +10,6 @@ public class with_input_from_file extends Procedure2
   }
 
   public Object apply2 (Object string, Object proc)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     String fname = string.toString();
 

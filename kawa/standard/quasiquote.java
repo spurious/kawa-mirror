@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the "quasiquote" Scheme primitive.

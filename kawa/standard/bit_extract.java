@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.IntNum;
 import gnu.math.BitOps;
+import gnu.mapping.Procedure3;
 
 public class bit_extract extends Procedure3
 {

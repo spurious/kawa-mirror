@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.IntNum;
 import gnu.math.Numeric;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "gcd".
@@ -11,7 +11,6 @@ import gnu.math.Numeric;
 public class gcd extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int len = args.length;
     if (len == 0)

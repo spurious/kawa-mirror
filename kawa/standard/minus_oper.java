@@ -1,6 +1,6 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "-".
@@ -10,7 +10,6 @@ import gnu.math.*;
 public class minus_oper extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Numeric result = (Numeric) args[0];
     if (args.length == 1)

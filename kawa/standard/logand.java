@@ -1,11 +1,10 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
+import gnu.mapping.*;
 
 public class logand extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int len = args.length;
     if (len == 0)

@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.Numeric;
+import gnu.mapping.*;
 
 public class inexact_p extends Procedure1
 {

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "string-append".
@@ -9,7 +10,6 @@ import kawa.lang.*;
 public class string_append extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int count = args.length;
     java.lang.StringBuffer result = new java.lang.StringBuffer();

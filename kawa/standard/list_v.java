@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "list".
@@ -9,7 +10,6 @@ import kawa.lang.*;
 public class list_v extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Object result = List.Empty;
     for (int i = args.length;  --i >= 0; )

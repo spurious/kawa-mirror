@@ -2,6 +2,8 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /** Implement the standard Scheme procedure "not". */
 

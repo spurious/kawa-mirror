@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
 
 /**
  * Implement the Scheme standard function "vector->list".
@@ -7,13 +8,7 @@ import kawa.lang.*;
 
 public class vector2list extends Procedure1
 {
-  public vector2list()
-  {
-    super("vector->list");
-  }
-
   public Object apply1 (Object arg1)
-       throws WrongType
   {
      kawa.lang.Vector v = (kawa.lang.Vector)arg1;
 

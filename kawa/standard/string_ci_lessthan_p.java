@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure2;
 
 /** Implement the standard Scheme procedure "string-ci<?". */
 

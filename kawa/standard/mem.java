@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.WrongType;
+import gnu.mapping.Procedure2;
 
 public class mem extends Procedure2
 {
@@ -13,7 +15,6 @@ public class mem extends Procedure2
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     while (arg2 instanceof Pair)
       {
@@ -28,7 +29,7 @@ public class mem extends Procedure2
       }
 
     if (arg2 == List.Empty)
-      return Interpreter.falseObject;
+      return Boolean.FALSE;
     else
       throw new WrongType(this.name (), 2, "list");
   }

@@ -1,6 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "letrec" primitive.
@@ -37,7 +39,7 @@ public class letrec extends Syntax implements Printable
 	orig_inits[i] = bind_match[1];
 	bindings = bind_pair.cdr;
       }
-    let.push (tr);
+    tr.push(let);
     i = 0;
     for (Variable var = let.firstVar(); var != null; var = var.nextVar(), i++)
       {
@@ -48,7 +50,7 @@ public class letrec extends Syntax implements Printable
       }
     newbody[decl_count] = tr.rewrite_body(body);
     let.body = new BeginExp(newbody);
-    let.pop (tr);
+    tr.pop(let);
     return let;
   }
 }

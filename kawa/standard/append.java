@@ -1,9 +1,11 @@
 package kawa.standard;
+import gnu.mapping.WrongType;
+import gnu.mapping.ProcedureN;
 import kawa.lang.*;
 import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
-import java.lang.Error;  // To work around case-fold bug in some compilers.
+import gnu.expr.*;
 
 /**
  * Implement the Scheme standard function "append".
@@ -20,7 +22,6 @@ public class append extends ProcedureN implements Compilable
   }
 
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int count = args.length;
     if (count == 0)

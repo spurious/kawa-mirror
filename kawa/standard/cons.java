@@ -4,6 +4,8 @@ import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import java.lang.Error;  // To work around case-fold bug in some compilers.
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class cons extends Procedure2 implements Compilable
 {

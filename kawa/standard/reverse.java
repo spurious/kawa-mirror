@@ -1,15 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
+import gnu.mapping.WrongType;
 
 public class reverse extends Procedure1
 {
-   public reverse ()
-  {
-    super("reverse");
-  }
-
   public Object apply1 (Object arg)
-       throws WrongType
   {
     Object result = List.Empty;
     while (arg instanceof Pair)

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 public class char_ready_p extends Procedure0or1 {
   public final Object apply0 ()

@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "and" and "or" primitives.
@@ -31,7 +33,7 @@ public class and_or extends Syntax implements Printable
     Declaration temp_decl = let.addDeclaration (temp_name);
     inits[0] = tr.rewrite (pair.car);
     temp_decl.noteValue (inits[0]);
-    let.push (tr);
+    tr.push(let);
     Expression temp_exp = new ReferenceExp (temp_name, temp_decl);
     Expression rest = rewrite (pair.cdr, tr); // self-recurse
     Expression then_clause, else_clause;
@@ -46,7 +48,7 @@ public class and_or extends Syntax implements Printable
 	else_clause = rest;
       }
     let.body = new IfExp (temp_exp, then_clause, else_clause);
-    let.pop (tr);
+    tr.pop(let);
     return let;
   }
 

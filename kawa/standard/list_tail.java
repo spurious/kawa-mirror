@@ -1,11 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.IntNum;
+import gnu.mapping.*;
 
 public class list_tail extends Procedure2
 {
   static public Object listTail (Object list, int count)
-       throws GenericError
   {
     while (--count >= 0)
       {
@@ -18,7 +18,6 @@ public class list_tail extends Procedure2
   }
 
   public Object apply2 (Object arg1, Object arg2)
-       throws GenericError
   {
     Pair list = (Pair)arg1;
     int count = IntNum.intValue (arg2);

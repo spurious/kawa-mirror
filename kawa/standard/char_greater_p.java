@@ -1,15 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure2;
+import gnu.mapping.WrongType;
 
 public class char_greater_p extends Procedure2
 {
-  public char_greater_p()
-  {
-    super("char>?");
-  }
-
   public Object apply2(Object arg1, Object arg2)
-       throws WrongType
   {
     if (! (arg1 instanceof Char))
       throw new WrongType(this.name(),1,"character");

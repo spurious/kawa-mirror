@@ -1,15 +1,10 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
              
 public class call_with_output_file extends Procedure2
 {
-  public call_with_output_file()
-  {
-    super("call-with-output-file");
-  }
-
   public Object apply2 (Object string, Object proc)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     String fname = string.toString();
 

@@ -1,11 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.*;
+import gnu.mapping.*;
 
 public class make_quantity extends Procedure2
 {
   public Object apply2 (Object arg1, Object arg2)
-       throws GenericError
    {
      Unit unit;
      if (arg2 instanceof Unit)

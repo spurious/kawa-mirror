@@ -1,6 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
 
 public class throw_name extends ProcedureN
 {

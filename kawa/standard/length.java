@@ -1,6 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
+import kawa.lang.List;
 import gnu.math.IntNum;
+import gnu.mapping.Procedure1;
 
 public class length extends Procedure1
 {

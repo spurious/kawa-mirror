@@ -1,14 +1,11 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure2;
+import gnu.mapping.WrongType;
 
 public class setcar_b extends Procedure2
 {
-  public setcar_b()
-  {
-    super("set-car!");
-  }
-
-  public Object apply2 (Object arg1, Object arg2) throws WrongType
+  public Object apply2 (Object arg1, Object arg2)
   {
     if (arg1 instanceof Pair)
       {

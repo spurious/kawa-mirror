@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /** Implements the R5RS procedure "interaction-environment". */
 

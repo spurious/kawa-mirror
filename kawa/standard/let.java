@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "let" primitive.
@@ -35,9 +37,9 @@ public class let extends Syntax implements Printable
 	decl.noteValue (inits[i]);
 	bindings = bind_pair.cdr;
       }
-    let.push (tr);
-    let.body = tr.rewrite_body (body);
-    let.pop (tr);
+    tr.push(let);
+    let.body = tr.rewrite_body(body);
+    tr.pop(let);
     return let;
   }
 }

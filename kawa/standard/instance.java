@@ -1,6 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class instance extends Procedure2 implements Inlineable
 {

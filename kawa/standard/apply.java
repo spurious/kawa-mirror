@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /** Implement the standard Scheme function "apply".
  * This has been generalized so that the last (list argument)
@@ -8,7 +9,6 @@ import kawa.lang.*;
 public class apply extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int count = args.length;
     if (count < 2)

@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.
@@ -10,6 +12,8 @@ public class set_b extends Syntax implements Printable
 {
 
   static private Pattern pattern = new ListPat (2, 2);
+
+
 
   public Expression rewrite (Object obj, Translator tr)
   {
@@ -39,7 +43,7 @@ public class set_b extends Syntax implements Printable
 	    args = pair.cdr;
 	  }
 	xargs[0] = tr.rewrite(match[1]);
-	return new kawa.lang.SetApplyExp(tr.rewrite(proc), xargs);
+	return new SetApplyExp(tr.rewrite(proc), xargs);
       }
 
     if (! (match[0] instanceof String))

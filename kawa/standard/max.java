@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.math.RealNum;
 import gnu.math.Numeric;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "max".
@@ -11,7 +12,6 @@ import gnu.math.Numeric;
 public class max extends ProcedureN
 {
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int len = args.length;
     RealNum result = (RealNum) args[0];

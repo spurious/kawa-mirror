@@ -1,5 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the "define" Scheme primitive.
@@ -31,7 +33,8 @@ public class define extends Syntax implements Printable
 	    if (p2.car instanceof String)
 	      {
 		name = (String) p2.car;
-		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, tr);
+		LambdaExp lexp = new LambdaExp();
+		Lambda.rewrite(lexp, p2.cdr, p1.cdr, tr);
 		lexp.setName (name);
 		if (p2 instanceof PairWithPosition)
 		  {

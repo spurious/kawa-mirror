@@ -3,6 +3,7 @@ import kawa.lang.*;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
+import gnu.expr.*;
 
 // OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
 // 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))

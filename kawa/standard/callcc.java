@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "call-with-current-continuation".
@@ -9,13 +10,7 @@ import kawa.lang.*;
 
 public class callcc extends Procedure1
 {
-  public callcc()
-  {
-    super("call-with-current-continuation");
-  }
-
   public Object apply1 (Object arg1)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     Procedure proc;
     try

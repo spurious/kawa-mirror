@@ -5,6 +5,7 @@ import kawa.lang.*;
 import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.text.ReportFormat;
+import gnu.mapping.*;
 
 public class ObjectFormat extends ReportFormat
 {
@@ -84,6 +85,6 @@ public class ObjectFormat extends ReportFormat
 
   public Object parseObject(String text, java.text.ParsePosition status)
   {
-    throw new GenericError("ObjectFormat.parseObject - not implemented");
+    throw new RuntimeException("ObjectFormat.parseObject - not implemented");
   }
 }

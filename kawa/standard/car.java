@@ -1,5 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
+import gnu.mapping.HasSetter;
+import gnu.mapping.WrongType;
 
 public class car extends Procedure1 implements HasSetter
 {

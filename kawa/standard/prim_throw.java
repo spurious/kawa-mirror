@@ -1,6 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class prim_throw extends Procedure1 implements Inlineable
 {
@@ -10,10 +11,8 @@ public class prim_throw extends Procedure1 implements Inlineable
       throw ((RuntimeException) arg1);
     else if (arg1 instanceof Error)
       throw ((Error) arg1);
-    else if (arg1 instanceof GenericError)
-      throw ((GenericError) arg1);
     else
-      throw (new GenericError(arg1.toString()));
+      throw (new RuntimeException(arg1.toString()));
   }
 
   public Object apply1 (Object arg1)

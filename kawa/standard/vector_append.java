@@ -4,6 +4,8 @@ import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import java.lang.Error;  // To work around case-fold bug in some compilers.
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * Implement the Scheme extended function "vector-append".
@@ -15,7 +17,6 @@ public class vector_append extends ProcedureN implements Compilable
   public static vector_append vappendProcedure = new vector_append ();
 
   public Object applyN (Object[] args)
-      throws WrongType
   {
     int length = 0;
     int args_length = args.length;

@@ -1,11 +1,12 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.IntNum;
+import gnu.mapping.Procedure2;
+import gnu.mapping.WrongType;
 
-public class string_ref extends kawa.lang.Procedure2
+public class string_ref extends Procedure2
 {
   public Object apply2 (Object arg1, Object arg2)
-       throws WrongType, GenericError
   {
     if (! (arg1 instanceof FString))
       throw new WrongType(this.name(),1,"string");

@@ -2,6 +2,9 @@ package kawa.standard;
 import kawa.lang.*;
 import java.io.Reader;
 import java.io.InputStream;
+import gnu.mapping.Procedure0or1;
+import gnu.mapping.WrongType;
+import gnu.mapping.InPort;
 
 public class readchar extends Procedure0or1
 {
@@ -13,7 +16,6 @@ public class readchar extends Procedure0or1
   }
 
   final Object readChar (InPort port)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
@@ -29,7 +31,6 @@ public class readchar extends Procedure0or1
   }
 
   final Object readChar (Reader port)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
@@ -53,7 +54,6 @@ public class readchar extends Procedure0or1
   }
 
   final Object readChar (InputStream port)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     try
       {
@@ -77,13 +77,11 @@ public class readchar extends Procedure0or1
   }
 
   public final Object apply0 ()
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return readChar (InPort.inDefault());
   }
 
   public final Object apply1 (Object arg1)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     if (arg1 instanceof InPort)
       return readChar ((InPort) arg1);

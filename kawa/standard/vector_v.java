@@ -3,6 +3,8 @@ import kawa.lang.*;
 import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 import java.lang.Error;  // To work around case-fold bug in some compilers.
 
 public class vector_v extends ProcedureN implements Compilable

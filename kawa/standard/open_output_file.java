@@ -1,10 +1,12 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
+import gnu.mapping.OutPort;
+import gnu.mapping.Environment;
              
 public class open_output_file extends Procedure1
 {
   public Object apply1 (Object arg1) 
-    throws GenericError
   {
     String fname = arg1.toString();
 
@@ -23,7 +25,7 @@ public class open_output_file extends Procedure1
 	}
       return new OutPort(wr, fname);
     } catch (java.io.IOException e) {
-      throw new GenericError(e.getMessage());
+      throw new RuntimeException(e.getMessage());
     }
   }
 }

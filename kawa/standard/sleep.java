@@ -1,13 +1,13 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.math.*;
+import gnu.mapping.*;
 
 /** Implements the extended procedure "sleep". */
 
 public class sleep extends Procedure1
 {
   public Object apply1 (Object arg1)
-     throws GenericError
    {
      Quantity q = (Quantity) arg1;
      Unit u = q.unit();

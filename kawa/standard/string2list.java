@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
 
 /**
  * Implement the Scheme standard function "string->list".
@@ -8,7 +9,6 @@ import kawa.lang.*;
 public class string2list extends Procedure1
 {
   public Object apply1 (Object arg1)
-       throws WrongType
   {
     FString str = (FString) arg1;
 

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the "define-syntax" Scheme primitive.

@@ -1,6 +1,8 @@
 package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.Type;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 public class Scheme extends Interpreter
 {
@@ -63,12 +65,12 @@ public class Scheme extends Interpreter
 
   public void initScheme ()
   {
-      kawa.lang.Named proc;
-      kawa.lang.Named syn;
+      Named proc;
+      Named syn;
 
-      kawa.lang.Procedure2 eqv;
-      kawa.lang.Procedure2 eq;
-      kawa.lang.Procedure2 equal;
+      Procedure2 eqv;
+      Procedure2 eq;
+      Procedure2 equal;
 
       // (null-environment)
       null_environment = new Environment ();
@@ -76,7 +78,7 @@ public class Scheme extends Interpreter
       environ = null_environment;
 
       //-- Section 4.1  -- complete
-      define (Interpreter.quote_sym, new kawa.lang.Quote ());
+      define (Interpreter.quote_sym, new Quote ());
       define ("define", defineSyntax = new kawa.standard.define());
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
@@ -94,7 +96,7 @@ public class Scheme extends Interpreter
       define ("begin", beginSyntax = new kawa.standard.begin());
       define_syntax ("do", "kawa.lib.std_syntax");
       define_syntax ("delay", "kawa.lib.std_syntax");
-      define_proc ("%make-promise", "kawa.standard.make_promise");
+      define_proc ("%make-promise", "kawa.lib.std_syntax");
       define_syntax ("quasiquote", "kawa.standard.quasiquote");
 
       //-- Section 5  -- complete [except for internal definitions]
@@ -109,7 +111,7 @@ public class Scheme extends Interpreter
 
       //-- Section 6.1  -- complete
       define_proc ("not", new kawa.standard.not());
-      define_proc ("boolean?", "kawa.standard.boolean_p");
+      define_proc ("boolean?", "kawa.lib.misc");
 
       //-- Section 6.2  -- complete
       eqv = new kawa.standard.eqv_p();
@@ -120,7 +122,7 @@ public class Scheme extends Interpreter
       define_proc("equal?", equal);
 
       //-- Section 6.3  -- complete
-      define_proc("pair?", "kawa.standard.pair_p");
+      define_proc("pair?", "kawa.lib.lists");
       define_proc("cons", kawa.standard.cons.consProcedure);
       define_proc ("car", "kawa.standard.car");
       define_proc ("cdr", "kawa.standard.cdr");
@@ -155,7 +157,7 @@ public class Scheme extends Interpreter
       define_proc ("cddadr", "kawa.standard.cxr");
       define_proc ("cdddar", "kawa.standard.cxr");
       define_proc ("cddddr", "kawa.standard.cxr");
-      define_proc ("null?", "kawa.standard.null_p");
+      define_proc ("null?", "kawa.lib.lists");
       define_proc ("list?", "kawa.standard.list_p");
       define_proc ("list", "kawa.standard.list_v");
       define_proc ("length", "kawa.standard.length");
@@ -179,7 +181,7 @@ public class Scheme extends Interpreter
 
       //-- Section 6.4  -- complete, including slashified read/write
       
-      define_proc ("symbol?", "kawa.standard.symbol_p");
+      define_proc ("symbol?", "kawa.lib.misc");
       define_proc ("symbol->string", "kawa.standard.symbol2string");
       define_proc ("string->symbol", "kawa.standard.string2symbol");
 
@@ -199,9 +201,9 @@ public class Scheme extends Interpreter
       define_proc (">=", "kawa.standard.greaterequal_oper");
       define_proc ("zero?", "kawa.lib.numbers");
       define_proc ("positive?", "kawa.standard.positive_p");
-      define_proc ("negative?", "kawa.standard.negative_p");
-      define_proc ("odd?", "kawa.standard.odd_p");
-      define_proc ("even?", "kawa.standard.even_p");
+      define_proc ("negative?", "kawa.lib.numbers");
+      define_proc ("odd?", "kawa.lib.numbers");
+      define_proc ("even?", "kawa.lib.numbers");
       define_proc ("max", "kawa.standard.max");
       define_proc ("min", "kawa.standard.min");
       define_proc ("+", "kawa.standard.plus_oper");
@@ -254,7 +256,7 @@ public class Scheme extends Interpreter
       define_proc ("char-ci>?", "kawa.standard.char_ci_greater_p");
       define_proc ("char-ci<=?", "kawa.standard.char_ci_less_equal_p");
       define_proc ("char-ci>=?", "kawa.standard.char_ci_greater_equal_p");
-      define_proc ("char-alphabetic?", "kawa.standard.char_alphabetic_p");
+      define_proc ("char-alphabetic?", "kawa.lib.characters");
       define_proc ("char-numeric?", "kawa.lib.characters");
       define_proc ("char-whitespace?", "kawa.lib.characters");
       define_proc ("char-upper-case?", "kawa.lib.characters");
@@ -265,14 +267,14 @@ public class Scheme extends Interpreter
       define_proc ("char-downcase", "kawa.lib.characters");
       
       //-- Section 6.7  -- complete
-      define_proc ("string?", "kawa.standard.string_p");
+      define_proc ("string?", "kawa.lib.strings");
       define_proc ("make-string", "kawa.lib.strings");
       define_proc ("string", "kawa.standard.string_v");
       define_proc ("string-length", "kawa.lib.strings");
       define_proc ("string-ref", "kawa.standard.string_ref");
       define_proc ("string-set!", "kawa.standard.string_set_b");
 
-      define_proc ("string=?", "kawa.standard.string_equal_p");
+      define_proc ("string=?", "kawa.lib.strings");
       define_proc ("string-ci=?", "kawa.standard.string_ci_equal_p");
       define_proc ("string<?", "kawa.standard.string_lessthan_p");
       define_proc ("string>?", "kawa.standard.string_greaterthan_p");
@@ -305,7 +307,7 @@ public class Scheme extends Interpreter
       define ("vector-append", kawa.standard.vector_append.vappendProcedure);
 
       //-- Section 6.9  -- complete [except restricted call/cc]
-      define_proc ("procedure?", "kawa.standard.procedure_p");
+      define_proc ("procedure?", "kawa.lib.misc");
       define_proc ("apply", "kawa.standard.apply");
       define_proc (new map (true));        // map
       define_proc (new map (false));       // for-each
@@ -319,8 +321,8 @@ public class Scheme extends Interpreter
 		   "kawa.standard.call_with_output_file");
       define_proc ("input-port?", "kawa.lib.ports");
       define_proc ("output-port?", "kawa.lib.ports");
-      define_proc ("current-input-port", "kawa.standard.current_input_port");
-      define_proc ("current-output-port", "kawa.standard.current_output_port");
+      define_proc ("current-input-port", "kawa.lib.ports");
+      define_proc ("current-output-port", "kawa.lib.ports");
       define_proc ("with-input-from-file",
 		   "kawa.standard.with_input_from_file");
       define_proc ("with-output-to-file",
@@ -328,7 +330,7 @@ public class Scheme extends Interpreter
       define_proc ("open-input-file", "kawa.standard.open_input_file");
       define_proc ("open-output-file", "kawa.standard.open_output_file");
       define_proc ("close-input-port", "kawa.standard.close_input_port");
-      define_proc ("close-output-port", "kawa.standard.close_output_port");
+      define_proc ("close-output-port", "kawa.lib.ports");
       define_proc ("read", "kawa.standard.read");
       define_proc (new readchar (false));  // read-char
       define_proc (new readchar (true));   // peek-char
@@ -511,13 +513,11 @@ public class Scheme extends Interpreter
    * @param env the Environment to evaluate the string in
    * @return result of last expression, or Interpreter.voidObject if none. */
   public static Object eval (String string, Environment env)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return eval (new CharArrayInPort(string), env);
   }
 
   public Object eval (String string)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return eval(string, environ);
   }
@@ -593,4 +593,19 @@ public class Scheme extends Interpreter
       }
     return null;
   }
+
+  /** The name of the formal parameter for the incoming Environment. */
+  static private String env_formal = Symbol.makeUninterned ("theEnvironment");
+
+  /** The formal parameter list of a ModuleBody. */
+  static public Object moduleFormals = new Pair (env_formal, List.Empty);
+
+  public static ModuleExp makeModuleExp(Object body, Translator tr)
+  {
+    ModuleExp mexp = new ModuleExp();
+    Lambda.rewrite(mexp, moduleFormals, body, tr);
+    mexp.lookup(env_formal).setType(Compilation.scmEnvironmentType);
+    return mexp;
+  }
+
 }

@@ -2,6 +2,8 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
+import gnu.mapping.*;
+import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes "try-catch".
@@ -42,9 +44,9 @@ public class try_catch extends Syntax implements Printable
 		if (! (type instanceof ClassType))
 		  return tr.syntaxError("catch clause type not a class type");
 		CatchClause clause = new CatchClause (name, (ClassType) type);
-		clause.push(tr);
+		tr.push(clause);
 		clause.setBody(tr.rewrite_body(try_pair.cdr));
-		clause.pop(tr);
+		tr.pop(clause);
 		if (last == null)
 		  try_exp.setCatchClauses(clause);
 		else

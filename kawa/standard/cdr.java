@@ -1,10 +1,12 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.Procedure1;
+import gnu.mapping.HasSetter;
+import gnu.mapping.WrongType;
 
 public class cdr extends Procedure1 implements HasSetter
 {
   public Object apply1 (Object arg1)
-       throws WrongType
   {
     if (arg1 instanceof Pair)
       return ((Pair)arg1).cdr;

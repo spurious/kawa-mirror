@@ -1,10 +1,10 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.mapping.*;
              
 public class open_input_file extends Procedure1
 {
   public Object apply1 (Object arg1)
-     throws GenericError
   {
     return openInputFile(arg1.toString());
   }

@@ -36,13 +36,13 @@ public class IntegerRange extends CpsProcedure // implements Inlineable
 
   public static void integerRange(IntNum first, IntNum last, Consumer out)
   {
-    if (IntNum.compare(first, last) <= 0)
+    if (IntNum.compare(first, MIN_INT) >= 0
+	&& IntNum.compare(last, MAX_INT) <= 0)
       {
-	if (IntNum.compare(first, MIN_INT) >= 0
-	    && IntNum.compare(last, MAX_INT) <= 0)
+	int fst = first.intValue();
+	int lst = last.intValue();
+	if (fst <= lst)
 	  {
-	    int fst = first.intValue();
-	    int lst = last.intValue();
 	    for (;;)
 	      {
 		out.writeInt(fst);
@@ -51,43 +51,12 @@ public class IntegerRange extends CpsProcedure // implements Inlineable
 		fst++;
 	      }
 	  }
-	else
-	  {
-	    for (;;)
-	      {
-		out.writeObject(first);
-		if (IntNum.compare(first, last) >= 0)
-		  break;
-		first = IntNum.add(first, 1);
-	      }
-
-	  }
+	return;
       }
-    else // first > last:
+    while (IntNum.compare(first, last) <= 0)
       {
-	if (IntNum.compare(first, MAX_INT) <= 0
-	    && IntNum.compare(last, MIN_INT) >= 0)
-	  {
-	    int fst = first.intValue();
-	    int lst = last.intValue();
-	    for (;;)
-	      {
-		out.writeInt(fst);
-		if (fst == lst)
-		  break;
-		fst--;
-	      }
-	  }
-	else
-	  {
-	    for (;;)
-	      {
-		out.writeObject(first);
-		if (IntNum.compare(first, last) <= 0)
-		  break;
-		first = IntNum.add(first, -1);
-	      }
-	  }
+	out.writeObject(first);
+	first = IntNum.add(first, 1);
       }
   }
 

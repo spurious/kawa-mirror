@@ -16,11 +16,7 @@ JAVAC=javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
 javadir=$(prefix)/java/$(subdir)
 
 OBJ=\
-  case.class \
-  cond.class \
-  delay.class \
-  do.class \
-  let.class \
+  std_syntax.class \
   when_unless.class
 
 java_DATA=$(OBJ)

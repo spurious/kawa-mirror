@@ -1,6 +1,8 @@
 1999-11-18  Per Bothner  <per@bothner.com>
 
 	* license.terms:  Remove.  Replaced by by ../COPYING.
+	* Makefile.am (EXTRA_DIST):  Remove license.terms.
+
 	* kawa.texi:  Some minor cleanups for texinfo-4.0.  Now always
 	generate an index.
 	(Ports):  Document new SRFI-6 functions (open-input-string,

@@ -24,7 +24,7 @@ kawa.1: kawa.man
 
 SOURCES = kawa.man
 EXTRA_DIST = kawa.txt $(KAWA_HTMLS) scm2java.html \
-  license.terms kawa-tour.tex kawa-tour.ps Compliance.html mdate-sh
+  kawa-tour.tex kawa-tour.ps Compliance.html mdate-sh
 info_TEXINFOS = kawa.texi kawa-tour.texi
 CLEANFILES = kawa.txt *.info kawa_toc.html $(KAWA_HTMLS) kawa1.tmp kawa.1
 

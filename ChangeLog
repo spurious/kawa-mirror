@@ -1,3 +1,25 @@
+2000-03-06  Per Bothner  <per@bothner.com>
+
+	* configure.in, configure (AC_OUTPUT):  Add gnu/slib/Makefile.
+	* gnu/kawa/Makefile.am (SUBDIRS):  Add slib.
+
+	* jar-manifest:  New file, used to build kawa-@VERSION@-compiled.jar.
+	* Makefile.am (kawa-@VERSION@-compiled.jar):  Add manifest file.
+	(install-javadoc-html):  Copy over COPYING.
+
+	* kawa/lang/Translator.java (immediate):  New field.
+	* kawa/Shell.java (run):  Set Translator's immediate field
+
+	* kawa/lang/Translator.java (rerite_pair):  Call check_if_syntax.
+
+	* kawa/lang/Translator.java (scan):  Save/restore line number info.
+	* kawa/lang/CompileFile.java (compile_to_file):  Return if errors seen.
+
+	* kawa/standard/eqv_p.java (apply):  Make static.
+	
+	* kawa/standard/require.java (allocate):  Rename to find.
+	Add working implementation.
+
 2000-03-02  Per Bothner  <per@bothner.com>
 
 	* jawa/standard/prim_throw.java (getReturnType):

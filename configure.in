@@ -62,7 +62,7 @@ AC_SUBST(SHELL)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
-  gnu/ecmascript/Makefile
+  gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile)

@@ -29,14 +29,14 @@
    port))
 
 (define (port-line port)
-  ((primitive-virtual-method <kawa.lang.LineBufferedReader> "getLineNumber"
+  ((primitive-virtual-method <gnu.text.LineBufferedReader> "getLineNumber"
 			     <int> ())
    port))
 (define (input-port-line-number port)
   (+ 1 (port-line port)))
 
 (define (set-port-line! port line)
-  ((primitive-virtual-method <kawa.lang.LineBufferedReader> "setLineNumber"
+  ((primitive-virtual-method <gnu.text.LineBufferedReader> "setLineNumber"
 			     <void> (<int>))
    port line))
 
@@ -44,7 +44,7 @@
   (set-port-line port (- num 1)))
 
 (define (port-column port)
-  ((primitive-virtual-method <kawa.lang.LineBufferedReader>
+  ((primitive-virtual-method <gnu.text.LineBufferedReader>
 			     "getColumnNumber" <int> ())
    port))
 

@@ -1,3 +1,11 @@
+Mon Jun 29 11:27:16 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm:  Update for LineBufferedReader moved to gnu.text.
+	* strings.scm (string-upcase!, string-downcase!, string-capitalize!,
+	string-upcase, string-downcase, and string-capitalize):  New
+	Slib-compatible functions.
+	(string-copy!):  Fix typo - should be string-copy.
+
 Thu May 21 23:55:14 1998  Per Bothner  <bothner@cygnus.com>
 
 	* characters.scm:  Use <TYPE> rather than "TYPE" specifications.

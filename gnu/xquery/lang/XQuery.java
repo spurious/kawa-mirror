@@ -48,6 +48,7 @@ public class XQuery extends Interpreter
   public ModuleExp parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException
   {
+    Compilation.usingTailCalls = true;
     gnu.text.SourceMessages messages = lexer.getMessages();
     gnu.expr.Parser tr = new gnu.expr.Parser(messages);
     ModuleExp mexp = new ModuleExp();
@@ -65,6 +66,7 @@ public class XQuery extends Interpreter
 
   public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
   {
+    Compilation.usingTailCalls = true;
     gnu.expr.Parser tr = new gnu.expr.Parser(messages);
     ModuleExp mexp = new ModuleExp();
     mexp.setFile(port.getName());

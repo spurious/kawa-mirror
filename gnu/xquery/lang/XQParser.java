@@ -51,6 +51,17 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
+  /** Do skipSpace followed by unread to find next non-space character. */
+  final int peekNonSpace(String message)
+    throws java.io.IOException, SyntaxException
+  {
+    int ch = skipSpace();
+    if (ch < 0)
+      eofError(message);
+    unread(ch);
+    return ch;
+  }
+
   static final int EOF_TOKEN = -1;
   static final int EOL_TOKEN = '\n';
   static final char INTEGER_TOKEN = '0';
@@ -812,7 +823,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    getRawToken();
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.setFile(getName());
-	    lexp.setLine(getLineNumber(), getColumnNumber());
+	    lexp.setLine(getLineNumber() + 1, getColumnNumber() + 1);
 	    lexp.min_args = 1;
 	    lexp.max_args = 1;
 	    parser.push(lexp);
@@ -910,6 +921,9 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseEnclosedExpr()
       throws java.io.IOException, SyntaxException
   {
+    peekNonSpace("unexpected end-of-file after '{'");
+    int startLine = getLineNumber() + 1;
+    int startColumn = getColumnNumber() + 1;
     getRawToken();
     nesting++;
     Expression exp = parseExpr();
@@ -920,6 +934,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	getRawToken();
 	exp = makeExprSequence(exp, parseExpr());
       }
+    exp.setFile(getName());
+    exp.setLine(startLine, startColumn);
     if (curToken != '}')
       return syntaxError("missing '}'");
     return exp;
@@ -1048,6 +1064,8 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseMaybePrimaryExpr()
       throws java.io.IOException, SyntaxException
   {
+    int startLine = getLineNumber() + 1;
+    int startColumn = getColumnNumber()+ 1;
     int token = peekOperand();
     Expression exp;
     int c1, c2, c3;
@@ -1062,6 +1080,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == OP_LSS)
       {
+	startColumn--;  // Subtract 1 for '<'.
 	getRawToken();
 	if (curToken == '/')
 	  {
@@ -1078,6 +1097,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	    return exp;
 	  }
 	exp = parseElementConstructor();
+	exp.setFile(getName());
+	exp.setLine(startLine, startColumn);
       }
     else if (token == STRING_TOKEN)
       {
@@ -1114,11 +1135,25 @@ public class XQParser extends LispReader // should be extends Lexer
 	*/
 	String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
 	Declaration decl = parser.lookup(name, -1);
-	exp = new ReferenceExp(name, decl);
+	exp = null;
+	if (decl == null && Compilation.generateServletDefault)
+	  {
+	    if (name == "request")
+	      exp = makeFunctionExp("gnu.kawa.servlet.GetRequest",
+				    "getRequest");
+	    if (name == "response")
+	      exp = makeFunctionExp("gnu.kawa.servlet.GetResponse",
+				    "getResponse");
+	    if (exp != null)
+	      exp = new ApplyExp(exp, Expression.noExpressions);
+	  }
+	if (exp == null)
+	  exp = new ReferenceExp(name, decl);
       }
     else if (token == FNAME_TOKEN)
       {
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
+	startColumn -= tokenBufferLength;
 	name = name.intern();
 	nesting++;
 	getRawToken();
@@ -1140,6 +1175,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	vec.copyInto(args);
 	Declaration decl = parser.lookup(name, Interpreter.FUNCTION_NAMESPACE);
 	exp = new ApplyExp(new ReferenceExp(name, decl), args);
+	exp.setFile(getName());
+	exp.setLine(startLine, startColumn);
 	nesting--;
       }
     else if (token == NCNAME_TOKEN || token == QNAME_TOKEN)
@@ -1167,7 +1204,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    if (forOrLet < 0)
 	      return syntaxError("invalid syntax - variable following name");
-	    return parseFLWRExpression(forOrLet > 0);
+	    exp = parseFLWRExpression(forOrLet > 0);
+	    exp.setFile(getName());
+	    exp.setLine(startLine, startColumn - 3);
+	    return exp;
 	  }
 	else if (next == '(' && tokenBufferLength == 2
 		 && ((c1 = tokenBuffer[0]) == 'i' || c1 == 'I')
@@ -1284,12 +1324,17 @@ public class XQParser extends LispReader // should be extends Lexer
 	  cond = null;
 	if (! match("return"))
 	  return syntaxError("missing 'return' clause");
+	peekNonSpace("unexpected eof-of-file after 'return'");
+	int bodyLine = getLineNumber() + 1;
+	int bodyColumn = getColumnNumber() + 1;
 	getRawToken();
 	body = parseExpr();
 	if (cond != null)
 	  {
 	    body = new IfExp(cond, body, QuoteExp.voidExp);
 	  }
+	body.setFile(getName());
+	body.setLine(bodyLine, bodyColumn);
       }
     if (isFor)
       {
@@ -1339,7 +1384,7 @@ public class XQParser extends LispReader // should be extends Lexer
     return parseFLWRExpression(isFor, name, value);
   }
 
-  public Expression parseFunctionDefinition()
+  public Expression parseFunctionDefinition(int declLine, int declColumn)
       throws java.io.IOException, SyntaxException
   {
     if (curToken != QNAME_TOKEN && curToken != NCNAME_TOKEN)
@@ -1351,11 +1396,13 @@ public class XQParser extends LispReader // should be extends Lexer
     getRawToken();
     LambdaExp lexp = new LambdaExp();
     lexp.setFile(getName());
-    lexp.setLine(getLineNumber(), getColumnNumber());
+    lexp.setLine(declLine, declColumn);
     lexp.setName(name);
     Declaration decl = parser.currentScope().addDeclaration(name);
     decl.setCanRead(true);
     decl.setProcedureDecl(true);
+    decl.setFile(getName());
+    decl.setLine(declLine, declColumn);
     parser.push(lexp);
     if (curToken != ')')
       {
@@ -1409,17 +1456,29 @@ public class XQParser extends LispReader // should be extends Lexer
       throws java.io.IOException, SyntaxException
   {
     this.parser = parser;
+    int ch = skipSpace();
+    if (ch < 0)
+      return null;
+    unread(ch);
+    int startLine = getLineNumber() + 1;
+    int startColumn = getColumnNumber() + 1;
     if (getRawToken() == EOF_TOKEN)
       return null;
     peekOperand();
     if (curToken == DEFINE_TOKEN)
       {
 	getRawToken();
+	peekNonSpace("unexpected end-of-file after 'define'");
+	int declLine = getLineNumber() + 1;
+	int declColumn = getColumnNumber() + 1;
 	if (match("function"))
 	  getRawToken();
 	else
 	  error("'define' is not followed by 'function'");
-	return parseFunctionDefinition();
+	Expression exp = parseFunctionDefinition(declLine, declColumn);
+	exp.setFile(getName());
+	exp.setLine(startLine, startColumn);
+	return exp;
       }
     if (curToken == NCNAME_TOKEN
 	&& "namespace".equalsIgnoreCase((String) curValue))
@@ -1450,7 +1509,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	&& "default".equalsIgnoreCase((String) curValue))
       {
 	int next = nesting == 0 ? skipHSpace() : skipSpace();
-	System.err.println("saw default then "+next);
 	if (next >= 0)
 	  {
 	    unread();
@@ -1478,6 +1536,8 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression exp = parseExprSequence();
     if (curToken == EOL_TOKEN)
       unread('\n');
+    exp.setFile(getName());
+    exp.setLine(startLine, startColumn);
     return exp;
   }
 

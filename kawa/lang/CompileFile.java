@@ -42,7 +42,8 @@ public class CompileFile extends Procedure2
     Object body = null;
     try
       {
-	ScmRead lexer = new ScmRead(port, messages);
+	gnu.text.LispReader lexer = (gnu.text.LispReader)
+	  Interpreter.getInterpreter().getLexer(port, messages);
 	body = lexer.readListBody ();
 	if (port.peek() == ')')
 	  lexer.fatal("An unexpected close paren was read.");
@@ -70,10 +71,10 @@ public class CompileFile extends Procedure2
     tr.push(mexp);
     try
       {
-	ScmRead lexer = new ScmRead(port, messages);
+	gnu.text.LispReader lexer = (gnu.text.LispReader) Interpreter.getInterpreter().getLexer(port, messages);
         for (;;)
           {
-	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
+	    Object sexp = lexer.readObject(); // FIXME
 	    if (sexp == Sequence.eofValue)
 	      break;
             if (! tr.scan_form (sexp, forms, mexp))
@@ -146,6 +147,9 @@ public class CompileFile extends Procedure2
 	if (short_name.endsWith (".scm"))
 	  short_name
 	    = short_name.substring (0, short_name.length () - 4);
+	else if (short_name.endsWith (".el"))
+	  short_name
+	    = short_name.substring (0, short_name.length () - 3);
 	topname = short_name;
 	if (prefix != null)
 	  topname = prefix + short_name;

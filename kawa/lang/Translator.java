@@ -31,6 +31,8 @@ public class Translator extends Object
 
   public ScopeExp currentScope() { return current_scope; }
 
+  public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
+
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
   {
@@ -301,7 +303,11 @@ public class Translator extends Object
       }
 
     if (func instanceof ReferenceExp)
-      ((ReferenceExp) func).setProcedureName(true);
+      {
+	((ReferenceExp) func).setProcedureName(true);
+	if (getInterpreter().hasSeparateFunctionNamespace())
+	  func.setFlag(ReferenceExp.PREFER_BINDING2);
+      }
     return new ApplyExp (func, args);
   }
 
@@ -318,18 +324,21 @@ public class Translator extends Object
       {
 	String name = (String) exp;
 	Object binding = environ.get (name);
+	Declaration decl = null;
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.  Here, use the original symbol.
 	if (binding != null && binding instanceof String)
-	  return new ReferenceExp ((String) binding);
-	Declaration decl = null;
-        if (binding instanceof Declaration) // ?? FIXME
+	  name = (String) binding;
+        else if (binding instanceof Declaration) // ?? FIXME
           {
             decl = (Declaration) binding;
             if (! isLexical(decl))
               decl = null;
           }
-	return new ReferenceExp (name, decl);
+	ReferenceExp rexp = new ReferenceExp (name, decl);
+	if (getInterpreter().hasSeparateFunctionNamespace())
+	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
+	return rexp;
       }
     else if (exp instanceof Expression)
       return (Expression) exp;

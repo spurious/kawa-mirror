@@ -69,7 +69,7 @@ public class AutoloadProcedure extends Procedure
 	    Environment env = Environment.getCurrent();
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(loaded, env);
 	    ((ModuleBody)loaded).run();
-	    Object value = env.get (name);
+	    Object value = env.getBinding(name).getProcedure();
 	    if (value == null
 		|| !(value instanceof Procedure))
 	      throw_error
@@ -78,8 +78,17 @@ public class AutoloadProcedure extends Procedure
 	  }
 	else if (name != null)
 	  {
-	    if (Environment.lookup_global (name) == this)
-	      Environment.define_global (name, loaded);
+	    // FIXME Kludge for ELisp.
+	    if (gnu.expr.Interpreter.getInterpreter().hasSeparateFunctionNamespace())
+	      {
+		gnu.jemacs.lang.Symbol.setFunctionBinding(Environment.user(),
+							  name, loaded);
+	      }
+	    else
+	      {
+		if (Environment.lookup_global (name) == this)
+		  Environment.define_global (name, loaded);
+	      }
 	    if (loaded.name () == null)
 	      loaded.setName (name);
 	  }

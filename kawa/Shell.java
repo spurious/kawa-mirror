@@ -23,9 +23,12 @@ public class Shell
     InPort inp = InPort.inDefault ();
     if (inp instanceof TtyInPort)
       {
-	Object prompter = env.get("default-prompter");
-	if (prompter != null && prompter instanceof Procedure)
-	  ((TtyInPort)inp).setPrompter((Procedure) prompter);
+	Binding pr = Environment.getCurrentBinding("default-prompter");
+	if (pr != null) // FIXME - is this how we want it to work?
+	  {
+	    Procedure prompter = pr.getProcedure();
+	    ((TtyInPort)inp).setPrompter(prompter);
+	  }
       }
 
     run(interp, env, inp, OutPort.outDefault(), OutPort.errDefault());

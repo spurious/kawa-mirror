@@ -52,19 +52,23 @@ public class PrimType extends Type {
       {
 	code.emitCheckcast(boolean_ctype);
 	code.emitInvokeVirtual(booleanValue_method);
-	return;
       }
-    code.emitCheckcast(number_type);
-    if (sig1 == 'I' || sig1 == 'S' || sig1 == 'B')
-      code.emitInvokeVirtual(intValue_method);
-    else if (sig1 == 'J')
-      code.emitInvokeVirtual(longValue_method);
-    else if (sig1 == 'D')
-      code.emitInvokeVirtual(doubleValue_method);
-    else if (sig1 == 'F')
-      code.emitInvokeVirtual(floatValue_method);
-    // Have left out Character -> char, since not used by Kawa.
+    else if (sig1 == 'V')
+      code.emitPop(1);
     else
-      super.emitCoerceFromObject(code);
+      {
+	code.emitCheckcast(number_type);
+	if (sig1 == 'I' || sig1 == 'S' || sig1 == 'B')
+	  code.emitInvokeVirtual(intValue_method);
+	else if (sig1 == 'J')
+	  code.emitInvokeVirtual(longValue_method);
+	else if (sig1 == 'D')
+	  code.emitInvokeVirtual(doubleValue_method);
+	else if (sig1 == 'F')
+	  code.emitInvokeVirtual(floatValue_method);
+	// Have left out Character -> char, since not used by Kawa.
+	else
+	  super.emitCoerceFromObject(code);
+      }
   }
 }

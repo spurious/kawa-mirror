@@ -1,12 +1,30 @@
 Changes since Kawa 1.5.93
 =========================
+A partial re-write of the implementation of input ports and the Scheme
+reader, to fix some problems, add some features, and improve performance.
+
 Compiled .class files are now installed in $(datadir)/java,
-ather than $(prefix)/java.  By default, that means they are
+rather than $(prefix)/java.  By default, that means they are
 installed in /usr/local/shared/java, rather than /usr/local/java.
 
 There is now internal infrastructure to support inlining of
 procedures, and general procedure-specific optimized code
 generation.
+
+There is better testing that the right number of arguments are
+passed to a procedure, and better error messages when you don't.
+If the procedure is inlined, you get a compile-time error message.
+
+The functions created by primitive-constructor, primitive-virtual-method,
+primitive-static-method, and primitive-interface-method are now
+first-class procedure values.  They use the Java reflection facily,
+except when the compiler can directly inline them (in which case
+it generates the same efficient bytecodes as before).
+
+New functions instance? (tests type membership) and as (converts).
+
+The kawa.html is now split into several files, one per chapter.
+The table of contents is now kawa_toc.html.
 
 The syntactic form try-catch provides low-level exception
 handler support.  It is basically the same as Java's try/catch
@@ -43,9 +61,8 @@ A new variable symbol-read-case control how case is handled:
 'P (the default) preserves case;  'U upper-cases letters;
 'D or -" down-cases letters; and 'I inverts case.
 
-The gnu.bytecode package now supports exception handlers,
-and Kawa has preliminary exception handler support:  The new
-synantic form try-finally supports a cleanup hook that is run
+The gnu.bytecode package now supports exception handlers.
+The new syntactic form try-finally supports a cleanup hook that is run
 after some other code finishes (normally or abnormally).
 Try-finally is used to implement dynamic-wind and fluid-let.
 

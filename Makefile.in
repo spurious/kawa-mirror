@@ -61,6 +61,8 @@ VERSION = @VERSION@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
+
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
@@ -184,6 +186,7 @@ distdir: $(DISTFILES)
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	-chmod 777 $(distdir)
+	$(mkinstalldirs) $(distdir)/debian
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  test -f $(distdir)/$$file \

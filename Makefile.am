@@ -9,3 +9,5 @@ javadir=$(datadir)/java
 
 kawa-@VERSION@-compiled.zip:
 	(cd $(javadir); zip -r -n .class - kawa gnu) > $@
+
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs

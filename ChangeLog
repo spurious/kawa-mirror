@@ -1,3 +1,35 @@
+Mon Feb 16 16:01:37 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Makefile.am (EXTRA_DIST):  Add Debian source package files.
+
+	* kawa/standard/{call_with_input_string.java,input_port_p.java,
+	kawa/standard/output_port_p.java}:  Replaced by functions in kawa/lib.
+	* kawa/standard/{Scheme.java,Makefile.am}:  Update accordingly.
+	
+	* kawa/lang/PrimProcedure.java (string2Type):  Check that name is
+	valid Java class name only for not-yet-defined types.
+	(getNamedType):  Add input-port and output-port.
+	* kawa/lang/Translator.java (rewrite):  Don't call
+	PrimProcedure.string2Type here - now handled by string2Type.
+	* kawa/standard/prim_method.java (exp2Type):  Likewise.
+
+	* kawa/lang/LineBufferedReader.java:  Re-write for increased
+	performance, some extra features, and maybe some bug-fixes.
+	(getConvertCR, setBuffer, skip_quick, unread_quick):  New methods.
+	(fill):  New overrideable method, subsubmes readHook.
+	(readHook):  Removed.
+	* kawa/lang/InPort.java:  Efficiency improvements.
+ 	(readDigits):  New method.
+	* kawa/lang/TtyInPort.java (fill):  New method, replaces readHook.
+	* kawa/lang/{CharArrayInPort.java,NullReader.java}:  New classed.
+	* kawa/lang/{Makefile.am,Makefile.in} (OBJ):  Update for new classes.
+	* kawa/lang/FString.java (open):  New method.
+	* kawa/standard/string2number.java (parse):  Use CharArrayInPort.
+	* kawa/standard/Scheme.java (eval): Likewise.
+	* kawa/Shell.java (runString):  Likewise.
+
+	* kawa/standard/{convert.java,instance.java}:  Fix error messages.
+
 Sun Feb  8 15:01:42 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.6.

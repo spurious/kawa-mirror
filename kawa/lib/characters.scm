@@ -59,4 +59,3 @@
   (invoke-static <character> '$Gr$Eq
                  (invoke-static <java.lang.Character> 'toUpperCase c1)
                  (invoke-static <java.lang.Character> 'toUpperCase c2)))
-

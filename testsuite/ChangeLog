@@ -1,3 +1,8 @@
+2003-04-27  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  New test based on bug reported 04-24 by
+	Vladimir Tsichevski <wowa@jet.msk.su>.
+
 2003-04-21  Vladimir Tsichevski <wowa@jet.msk.su>
 
 	* mac-test.scm:  New test.

@@ -1,4 +1,4 @@
-(test-init "Objects" 75)
+(test-init "Objects" 76)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -235,3 +235,10 @@
       (let ((k (kons 1 2)))
 	(set-kar! k 3)
 	(kar k)))
+
+(define obj-with-let
+  (object ()
+	  ((meth v)
+	   (let ((n v) (r (this)))
+	     (list n)))) )
+(test '(3) 'ff (invoke obj-with-let 'meth 3))

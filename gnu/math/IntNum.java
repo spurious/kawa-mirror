@@ -335,7 +335,11 @@ public class IntNum extends RatNum implements Compilable
     if (y.words == null)
       set (y.ival);
     else if (this != y)
-      set (y.words, y.ival); //COPY
+      {
+	realloc(y.ival);
+	System.arraycopy(y.words, 0, words, 0, y.ival);
+	ival = y.ival;
+      }
   }
 
   /** Add two IntNums, yielding their sum as another IntNum. */
@@ -600,7 +604,7 @@ public class IntNum extends RatNum implements Compilable
     else if (cmpval == 0)  // abs(x) == abs(y)
       {
 	xwords[0] = 1;  qlen = 1;  // quotient = 1
-	ywords[0] = 0;  rlen = 0;  // remainder = 0;
+	ywords[0] = 0;  rlen = 1;  // remainder = 0;
       }
     else if (ylen == 1)
       {
@@ -650,7 +654,7 @@ public class IntNum extends RatNum implements Compilable
     // Now the quotient is in xwords, and the remainder is in ywords.
 
     boolean add_one = false;
-    if (rlen > 0 || ywords[0] != 0)
+    if (rlen > 1 || ywords[0] != 0)
       { // Non-zero remainder i.e. in-exact quotient.
 	switch (rounding_mode)
 	  {
@@ -691,23 +695,35 @@ public class IntNum extends RatNum implements Compilable
     if (remainder != null)
       {
 	// The remainder is by definition: X-Q*Y
+	remainder.set (ywords, rlen);
 	if (add_one)
 	  {
-	    // Subtract the remainder from Y.
-
-	    // In this case, abs(Q*Y) > abs(X).
+	    // Subtract the remainder from Y:
+	    // abs(R) = abs(Y) - abs(orig_rem) = -(abs(orig_rem) - abs(Y)).
+	    IntNum tmp;
+	    if (y.words == null)
+	      {
+		tmp = remainder;
+		tmp.set(yNegative ? ywords[0] + y.ival : ywords[0] - y.ival);
+	      }
+	    else
+	      tmp = IntNum.add(remainder, y, yNegative ? 1 : -1);
+	    // Now tmp <= 0.
+	    // In this case, abs(Q) = 1 + floor(abs(X)/abs(Y)).
+	    // Hence, abs(Q*Y) > abs(X).
 	    // So sign(remainder) = -sign(X).
-	    xNegative = ! xNegative;	
-	    throw new Error ("r_l = y_l - r_l"); // FIXME
+	    if (xNegative)
+	      remainder.setNegative(tmp);
+	    else
+	      remainder.set(tmp);
 	  }
 	else
 	  {
 	    // If !add_one, then: abs(Q*Y) <= abs(X).
 	    // So sign(remainder) = sign(X).
+	    if (xNegative)
+	      remainder.setNegative ();
 	  }
-	remainder.set (ywords, rlen);
-	if (xNegative)
-	  remainder.setNegative ();
       }
   }
 

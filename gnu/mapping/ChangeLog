@@ -1,7 +1,7 @@
 2003-05-03  Per Bothner  <per@bothner.com>
 
 	* CallContext.java.in:  Renamed back to ...
-	* CallContext.java:  and checked to use new JAVA1/JAVA2 switching.
+	* CallContext.java:  and changed to use new JAVA1/JAVA2 switching.
 	* Makefile.am:  Update accordingly.
 
 2003-04-08  Per Bothner  <per@bothner.com>

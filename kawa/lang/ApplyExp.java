@@ -11,6 +11,8 @@ public class ApplyExp extends Expression
   Expression func;
   Expression[] args;
 
+  public Expression[] getArgs() { return args; }
+
   public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
 
   public Object eval (Environment env)
@@ -26,6 +28,16 @@ public class ApplyExp extends Expression
 
   public void compile (Compilation comp, int flags)
   {
+    if (func instanceof QuoteExp)
+      {
+	Object proc = ((QuoteExp) func).value;
+	if (proc instanceof Inlineable)
+	  {
+	    ((Inlineable) proc).compile(this, comp, flags);
+	    return;
+	  }
+      }
+
     Method applymethod;
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;

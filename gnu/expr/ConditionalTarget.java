@@ -8,6 +8,7 @@ import gnu.bytecode.*;
 public class ConditionalTarget extends Target
 {
   public Label ifTrue, ifFalse;
+  Interpreter interpreter;
 
   /**
     * @param ifTrue label to jump to if this evaluates to true
@@ -18,6 +19,14 @@ public class ConditionalTarget extends Target
   {
     this.ifTrue = ifTrue;
     this.ifFalse = ifFalse;
+  }
+
+  public ConditionalTarget (Label ifTrue, Label ifFalse,
+			    Interpreter interpreter)
+  {
+    this.ifTrue = ifTrue;
+    this.ifFalse = ifFalse;
+    this.interpreter = interpreter;
   }
 
   /** True if the ifTrue label comes before the ifFalse label.
@@ -55,7 +64,8 @@ public class ConditionalTarget extends Target
 	  }
 	return;
       case 'L':  case '[':
-	comp.compileConstant(Boolean.FALSE);
+	comp.compileConstant(interpreter == null ? Boolean.FALSE
+			     : interpreter.booleanObject(false));
 	break;
       }
     if (trueBranchComesFirst)

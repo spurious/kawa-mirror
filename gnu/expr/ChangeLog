@@ -1,3 +1,27 @@
+2000-03-12  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleName):  Add manglings for ascii characters.
+
+	* Expression.java (makeWhile):  New static.
+	(noExpressions):  New static field.
+
+	* Expression.java (flags):  New field.
+	(setFlag, getFlag, getFlags):  New methods.
+	* ReferenceExp.java:  Use inherited flags field and conventions.
+	(PREFER_BINDING2):  New flag bit.
+	(eval, compile):  More kludges for ELisp support.
+	* SetExp.java:  Use inherited flags field and conventions.
+	(PREFER_BINDING2):  New flag bit.
+	(eval, compile):  Get "noValue" from Interpreter.
+	(eval, compile):  More kludges for ELisp support.
+	* LambdaExp.java (flags, getFlags, setFlags):  Now inherited.
+
+	* IfExp.java (compile):  Pass interpreter to ConditionalTarget.
+	* Interpreter.java (getInterpreter):  New static method.
+	* ConditionalTarget.java (interpreter):  New field.
+	(<init>):  Take Interpreter argument.
+	(compileFromStack):  Use interpreter's boolean values.
+	
 2000-03-06  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (compile):  Handle identifier bound to declaration

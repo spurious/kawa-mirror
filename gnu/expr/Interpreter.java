@@ -15,6 +15,8 @@ public abstract class Interpreter
 {
   public static Interpreter defaultInterpreter = null;
 
+  public static Interpreter getInterpreter() { return defaultInterpreter; }
+
   // These will be moved from here.  FIXME
   static public final Boolean  trueObject = Boolean.TRUE;
   static public final Boolean  falseObject = Boolean.FALSE;

@@ -45,6 +45,7 @@ public class IfExp extends Expression
 			      Expression else_clause,
 			      Compilation comp, Target target)
   {
+    Interpreter interpreter = comp.getInterpreter();
     gnu.bytecode.CodeAttr code = comp.getCode();
     Label trueLabel, falseLabel;
     boolean trueInherited, falseInherited;
@@ -55,7 +56,7 @@ public class IfExp extends Expression
       {
 	falseInherited = true;
 	Object value = ((QuoteExp) else_clause).getValue();
-	if (comp.getInterpreter().isTrue(value))
+	if (interpreter.isTrue(value))
 	  falseLabel = ((ConditionalTarget) target).ifTrue;
 	else
 	  falseLabel = ((ConditionalTarget) target).ifFalse;
@@ -86,7 +87,8 @@ public class IfExp extends Expression
 	trueInherited = false;
 	trueLabel = new Label(code); 
       }
-    ConditionalTarget ctarget = new ConditionalTarget(trueLabel, falseLabel);
+    ConditionalTarget ctarget
+      = new ConditionalTarget(trueLabel, falseLabel, interpreter);
     if (trueInherited)
       ctarget.trueBranchComesFirst = false;
     test.compile(comp, ctarget);

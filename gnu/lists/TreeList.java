@@ -16,8 +16,8 @@ public class TreeList extends AbstractSequence
 implements Consumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
-  // for the sake of NamespaceResolver.  FIXME.  Perhaps an abstract class
-  // in gnu.lists that NamespaceResolver could extend?
+  // for the sake of ParsedXMLToConsumer.  FIXME.  Perhaps an abstract class
+  // in gnu.lists that ParsedXMLToConsumer extend?
 
   public Object[] objects; 
   public int oindex;
@@ -176,7 +176,7 @@ implements Consumer, PositionConsumer, Consumable
    *   (Therefore allocating more space for the gap does not require
    *   adjusting end_offset.)  Otherwise, the end_offset is relative
    *   to the BEGIN_ATTRIBUTE_LONG word.
-   * Kludge warning:  NamespaceResolver.endAttributes has hard-wired in the
+   * Kludge warning:  ParsedXMLToConsumer.endAttributes has hard-wired in the
    * size of BEGIN_ATTRIBUTE_LONG and END_ATTRIBUTE.
    */
   static final int BEGIN_ATTRIBUTE_LONG = 0xF109;

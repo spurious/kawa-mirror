@@ -32,10 +32,9 @@ public class let extends Syntax implements Printable
 	if (! (bind_pair.car instanceof Pair))
 	  return tr.syntaxError ("let binding is not a pair");
 	Pair binding = (Pair) bind_pair.car;
-	if (! (binding.car instanceof String)
-	    && ! (binding.car instanceof Symbol))
+	Object name = binding.car;
+	if (! (name instanceof String) && ! (name instanceof Symbol))
 	  return tr.syntaxError("variable in let binding is not a symbol");
-	String name = binding.car.toString();
 	if (! (binding.cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for '"+name+"'");
 	Declaration decl = let.addDeclaration(name);

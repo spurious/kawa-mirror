@@ -182,10 +182,11 @@ public class define_autoload extends Syntax
 		    Pair pair = (Pair) form;
 		    Object value = null;
 		    String name = null;
-		    String command = ((pair.car instanceof String
-				       || pair.car instanceof Symbol)
-				      ? pair.car.toString()
-				      : null);
+		    Object car = pair.car;
+		    String command
+		      = car instanceof String ? car.toString()
+		      : car instanceof Symbol ? ((Symbol) car).getName()
+		      : null;
 		    if (command == "defun")
 		      {
 			name = ((Pair)pair.cdr).car.toString();

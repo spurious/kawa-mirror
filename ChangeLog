@@ -1,3 +1,14 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_class.java:  Don't hardwire "define-class" name.
+
+	* kawa/standard/define_autoload.java:  Handle Symbol using getName.
+	* kawa/standard/let.java (rewrite):  Use name as is, without toString.
+	* kawa/standard/try_catch.java (rewrite):  Likewise, allow Symbol.
+	* kawa/standard/fluid_let.java (rewrite):  Likewise.
+	* kawa/standard/letrec.java (rewrite):  Likewise.	
+	Use Translation's matches method.
+
 2002-11-05  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/CompileFile.java (read):  Call parseFile with new

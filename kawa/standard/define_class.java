@@ -65,7 +65,7 @@ public class define_class extends Syntax
           }
       }
     if (name == null)
-      return tr.syntaxError("missing class name in define-class");
+      return tr.syntaxError("missing class name in "+this.getName());
     //LambdaExp lexp = new LambdaExp();
     //lexp.setName(name);
     //    tr.push(lexp);

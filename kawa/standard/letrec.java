@@ -34,15 +34,16 @@ public class letrec extends Syntax implements Printable
 	if (! (bind_pair.car instanceof Pair))
 	  return tr.syntaxError ("letrec binding is not a list");
 	Pair binding = (Pair) bind_pair.car;
-	if (! (binding.car instanceof String))
-	  return tr.syntaxError("letrec variable is not an identifier");
-	String name = (String) binding.car;
+	Object name = binding.car;
+	if (! (name instanceof String)
+	    && ! (name instanceof Symbol))
+	  return tr.syntaxError("variable in letrec binding is not a symbol");
 	if (! (binding.cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for '"+name+"'");
 	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
 	Object init;
-	if ("::".equals(binding.car)) // && "::" is unbound FIXME
+	if (tr.matches(binding.car, "::"))
 	  {
 	    if (! (binding.cdr instanceof Pair)
 		|| (binding = (Pair) binding.cdr).cdr == LList.Empty)

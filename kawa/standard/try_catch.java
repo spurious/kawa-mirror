@@ -34,9 +34,9 @@ public class try_catch extends Syntax implements Printable
 	if (try_obj instanceof Pair)
 	  {
 	    Pair try_pair = (Pair) try_obj;
-	    if (! (try_pair.car instanceof String))
+	    Object name = try_pair.car;
+	    if (! (name instanceof String) && ! (name instanceof Symbol))
 	      return tr.syntaxError("invalid identifier of catch clause");
-	    String name = (String) try_pair.car;
 	    try_obj = try_pair.cdr;
 	    if (try_obj instanceof Pair)
 	      {

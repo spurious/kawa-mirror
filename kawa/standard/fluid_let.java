@@ -45,21 +45,19 @@ public class fluid_let extends Syntax implements Printable
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
-	String name;
 	Expression value;
 	Pair binding;
-	if (bind_pair.car instanceof String
-	    || bind_pair.car instanceof Symbol)
+	Object name = bind_pair.car;
+	if (name instanceof String || name instanceof Symbol)
 	  {
-	    name = bind_pair.car.toString();
 	    value = defaultInit;
 	  }
-	else if (bind_pair.car instanceof Pair
-		 && ((binding = (Pair) bind_pair.car).car instanceof String
+	else if (name instanceof Pair
+		 && ((binding = (Pair) name).car instanceof String
 		     || binding.car instanceof Symbol))
 		 
 	  {
-	    name = binding.car.toString();
+	    name = binding.car;
 	    if (binding.cdr == LList.Empty)
 	      value = defaultInit;
 	    else if (! (binding.cdr instanceof Pair)

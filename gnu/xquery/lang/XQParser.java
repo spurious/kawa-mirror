@@ -211,6 +211,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
   static final int DEFINE_FUNCTION_TOKEN = 'P'; // <"define" "function">
   static final int DEFINE_VARIABLE_TOKEN = 'V'; // <"define" "variable">
+  static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
 
   /* 'Q': QName (intern'ed name is curValue)
    * 'R': NCName ':' '*'
@@ -697,7 +698,14 @@ public class XQParser extends LispReader // should be extends Lexer
 	    break;
 	  }
 	if (next >= 0)
-	  unread();
+	  {
+	    unread();
+	    if (isNameStart((char) next) && curValue.equals("define"))
+	      {
+		getRawToken();
+		curToken = DEFINE_QNAME_TOKEN;
+	      }
+	  }
 	return curToken;
       }
     if (curToken == NCNAME_COLON_TOKEN)
@@ -1701,7 +1709,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (nesting == 0 && curToken == EOL_TOKEN)
 	  return exp;
 	if (curToken != ',')
-	  return syntaxError("missing ')' - saw "+new String(tokenBuffer, 0, tokenBufferLength)+" @:"+getColumnNumber());
+	  return syntaxError (rightToken == ')' ? "expected ')'"
+			       : "confused by syntax error");
 	getRawToken();
       }
     return exp;
@@ -2372,6 +2381,20 @@ public class XQParser extends LispReader // should be extends Lexer
     if (getRawToken() == EOF_TOKEN)
       return null;
     peekOperand();
+    if (curToken == DEFINE_QNAME_TOKEN)
+      {
+	int declLine = getLineNumber() + 1;
+	int declColumn = getColumnNumber() + 1;
+	int next = peekNonSpace("unexpected end-of-file after 'define QName'");
+	if (next == '(')
+	  {
+	    syntaxError("'missing 'function' after 'define'");
+	    curToken = NCNAME_TOKEN;
+	    return parseFunctionDefinition(declLine, declColumn);
+	  }
+	else
+	  return syntaxError("missing keyword after 'define'");
+      }
     if (curToken == DEFINE_FUNCTION_TOKEN)
       {
 	int declLine = getLineNumber() + 1;

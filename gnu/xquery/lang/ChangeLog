@@ -1,3 +1,8 @@
+2003-06-27  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (XQParser):  Error handling improvements:  Better
+	messages, plus special case for 'define QName ('.
+
 2003-06-05  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (Prompter.apply1):  Prettier prompt format.

@@ -1,3 +1,9 @@
+2004-12-18  Per Bothner  <per@bothner.com>
+
+	* syntax.scm (let-values): SRFI-11 implementation is in the public
+	domain, so remove copyright notice.
+	* syntax.scm (case-lambda): Add implementation from SRFI-16.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SCM_COMPILE_FLAGS): Add--warn-undefined-variable.

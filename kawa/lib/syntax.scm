@@ -64,31 +64,10 @@
 (define (free-identifier=? id1 id2) :: <boolean>
   (kawa.lang.SyntaxForm:freeIdentifierEquals id1 id2))
 
-;; SRFI-11  Copyright (C) Lars T Hansen (1999). All Rights Reserved.
+;; LET-VALUES implementation from SRFI-11, by Lars T Hansen.
+;; http://srfi.schemers.org/srfi-11/srfi-11.html
 
-;; This document and translations of it may be copied and furnished to
-;; others, and derivative works that comment on or otherwise explain
-;; it or assist in its implementation may be prepared, copied,
-;; published and distributed, in whole or in part, without restriction
-;; of any kind, provided that the above copyright notice and this
-;; paragraph are included on all such copies and derivative
-;; works. However, this document itself may not be modified in any
-;; way, such as by removing the copyright notice or references to the
-;; Scheme Request For Implementation process or editors, except as
-;; needed for the purpose of developing SRFIs in which case the
-;; procedures for copyrights defined in the SRFI process must be
-;; followed, or as required to translate it into languages other than
-;; English.
-
-;; The limited permissions granted above are perpetual and will not be
-;; revoked by the authors or their successors or assigns.
-
-;; This document and the information contained herein is provided on
-;; an "AS IS" basis and THE AUTHOR AND THE SRFI EDITORS DISCLAIM ALL
-;; WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY
-;; WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT INFRINGE
-;; ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS
-;; FOR A PARTICULAR PURPOSE.
+;; This code is in the public domain.
 
 (define-syntax let-values
   (syntax-rules ()
@@ -123,7 +102,52 @@
 
     ((let*-values (?binding0 ?binding1 ...) ?body0 ?body1 ...)
      (let-values (?binding0)
-       (let*-values (?binding1 ...) ?body0 ?body1 ...)))))
+        (let*-values (?binding1 ...) ?body0 ?body1 ...)))))
+
+;; CASE-LAMBDA implementation from SRFI-16, by Lars T Hansen.
+;; http://srfi.schemers.org/srfi-16/srfi-16.html
+
+;; This code is in the public domain.
+
+(define-syntax case-lambda
+  (syntax-rules ()
+    ((case-lambda 
+      (?a1 ?e1 ...) 
+      ?clause1 ...)
+     (lambda args
+       (let ((l (length args)))
+         (case-lambda "CLAUSE" args l 
+           (?a1 ?e1 ...)
+           ?clause1 ...))))
+    ((case-lambda "CLAUSE" ?args ?l 
+      ((?a1 ...) ?e1 ...) 
+      ?clause1 ...)
+     (if (= ?l (length '(?a1 ...)))
+         (apply (lambda (?a1 ...) ?e1 ...) ?args)
+         (case-lambda "CLAUSE" ?args ?l 
+           ?clause1 ...)))
+    ((case-lambda "CLAUSE" ?args ?l
+      ((?a1 . ?ar) ?e1 ...) 
+      ?clause1 ...)
+     (case-lambda "IMPROPER" ?args ?l 1 (?a1 . ?ar) (?ar ?e1 ...) 
+       ?clause1 ...))
+    ((case-lambda "CLAUSE" ?args ?l 
+      (?a1 ?e1 ...)
+      ?clause1 ...)
+     (let ((?a1 ?args))
+       ?e1 ...))
+    ((case-lambda "CLAUSE" ?args ?l)
+     (error "Wrong number of arguments to CASE-LAMBDA."))
+    ((case-lambda "IMPROPER" ?args ?l ?k ?al ((?a1 . ?ar) ?e1 ...)
+      ?clause1 ...)
+     (case-lambda "IMPROPER" ?args ?l (+ ?k 1) ?al (?ar ?e1 ...) 
+      ?clause1 ...))
+    ((case-lambda "IMPROPER" ?args ?l ?k ?al (?ar ?e1 ...) 
+      ?clause1 ...)
+     (if (>= ?l ?k)
+         (apply (lambda ?al ?e1 ...) ?args)
+         (case-lambda "CLAUSE" ?args ?l 
+           ?clause1 ...)))))
 
 ;; COND-EXPAND implementation from http://srfi.schemers.org/srfi-0/srfi-0.html
 ;; Copyright (C) Marc Feeley (1999). All Rights Reserved.

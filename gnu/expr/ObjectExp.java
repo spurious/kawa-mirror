@@ -7,6 +7,8 @@ public class ObjectExp extends LambdaExp
   /** List of base classes and implemented interfaces. */
   public Expression[] supers;
 
+  public LambdaExp initMethod;
+
   public ObjectExp ()
   {
     type = null;
@@ -27,26 +29,48 @@ public class ObjectExp extends LambdaExp
 	  type.setSuper(Type.pointer_type);
 	else
 	  {
-	    int i = 0;
-	    ClassType type = (ClassType) ((QuoteExp) supers[0]).getValue();
-	    if ((type.getModifiers() & Access.INTERFACE) == 0)
-	      {
-		type.setSuper(type);
-		i++;
-	      }
-	    int skip = i;
 	    int len = supers.length;
-	    if (i < len)
+	    ClassType[] superTypes = new ClassType[len - 1];
+	    int j = 0;
+	    for (int i = 0;  i < len;  i++)
 	      {
-		ClassType[] interfaces = new ClassType[len - i];
-		for (;  i < len;  i++)
-		  interfaces[i-skip]
-		    = (ClassType) ((QuoteExp) supers[i]).getValue();
+		ClassType t = (ClassType) ((QuoteExp) supers[i]).getValue(); 
+		if ((t.getModifiers() & Access.INTERFACE) == 0)
+		  {
+		    if (j < i)
+		      throw new Error("duplicate superclass");
+		    type.setSuper(t);
+		  }
+		else
+		  superTypes[j++] = t;
+	      }
+	    if (j > 0)
+	      {
+		ClassType[] interfaces;
+		if (j == len)
+		  interfaces = superTypes;
+		else
+		  {
+		    interfaces = new ClassType[j];
+		    System.arraycopy(superTypes, 0, interfaces, 0, j);
+		  }
 		type.setInterfaces(interfaces);
 	      }
 	  }
       }
     return type;
+  }
+
+  public void compile (Compilation comp, Target target)
+  {
+    super.compile(comp, Target.pushObject);
+    if (initMethod != null)
+      {
+	CodeAttr code = comp.getCode();
+	code.emitDup(1);
+	code.emitInvokeVirtual(initMethod.primMethod);
+      }
+    target.compileFromStack(comp, getCompiledClassType());
   }
 
   public ClassType compile (Compilation comp)
@@ -72,9 +96,13 @@ public class ObjectExp extends LambdaExp
 	for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
 	  {
 	    Declaration decl = (Declaration) var;
-	    decl.field = new_class.addField(decl.getName(), decl.getType(),
-					    Access.PUBLIC);
-	    decl.setSimple(false);
+	    // If the declaration derives from a method, don't create field.
+	    if (decl.getCanRead())
+	      {
+		decl.field = new_class.addField(decl.getName(), decl.getType(),
+						Access.PUBLIC);
+		decl.setSimple(false);
+	      }
 	  }
 
 	for (LambdaExp child = firstChild;  child != null; )

@@ -116,7 +116,9 @@ public class ELisp extends kawa.standard.Scheme
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    Environment.setCurrent(new ELisp().getEnvironment());
+    ELisp interp = new ELisp();
+    Interpreter.defaultInterpreter = interp;
+    Environment.setCurrent(interp.getEnvironment());
   }
 
   public Environment getNewEnvironment ()

@@ -20,7 +20,7 @@
 	* Makefile.am (java_JAVA, SCMSOURCES):  Update for new files.
 
 	* ELisp.java (hasSeparateFunctionNamespace, defineAll, defun,
-	registerEnvironment):  New methods.
+	(registerEnvironment):  New method.
 	(<init>):  Define `t', `nil', `<', `<=', `>', `>=', `defun'.
 
 	* FunctionSymbolConstraint.java:  Removed.  No longer needed thanks

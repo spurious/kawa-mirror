@@ -1,0 +1,8 @@
+Makefile
+*.class
+java-classes.stamp
+AbstractSequence.java
+Convert.java
+Sequence.java
+SeqPosition.java
+SimpleVector.java

@@ -278,14 +278,18 @@ specify that when you run configure:
 ./configure --prefix $PREFIX
 @end example
 
+If you have installed Kawa before, make sure your @code{CLASSPATH}
+does not include old versions of Kawa, or other classes that may
+conflict with the new ones.
+
 Thus you need to compile all the .java source files.
 Just run make:
 @example
 make
 @end example
-This assume that @samp{java} and @samp{javac} are the java interpreter
+This assumes that @samp{java} and @samp{javac} are the java interpreter
 and compiler, respectively.
-If you are using the Kaffe free Java interpreter,
+For example, if you are using the Kaffe Java interpreter,
 you need to instead say:
 @example
 make JAVA=kaffe
@@ -320,7 +324,17 @@ export CLASSPATH
 This is done automatically if you use the @samp{kawa} script.
 
 I have not yet tried to build Kawa from source on Windows95, though I
-understand others have done so.  (If you know how, let me know!)
+understand others have done so.
+Unless you are using CygWin32 or some other Unix-emulation package,
+you will probably be unable to use the @code{configure} scripts
+and @code{Makefile}s.  However, importing all the Java source
+files into your Java develipment environment, and having it
+compile them, will handle most of the needed work.  You then
+need to compile the builtin Scheme procedures:
+@example
+cd kawa/lib
+%KAWA% -d ../.. -P kawa.lib. -C *.scm
+@end example
 
 @node Running, Restrictions, Installation, Top
 @chapter How to start up and run Kawa
@@ -1838,7 +1852,20 @@ Evaluate it in the @var{env} environment, and return the result.
 @end deftypefn
 
 For the @code{Environment} in most cases you could use
-@samp{Environment.current()}.
+@samp{Environment.current()}.  Before you start, you
+need to initialize the global environment,
+which you can with
+@example
+Environment.setCurrent(new Scheme().getEnvironment());
+@end example
+
+Alternatively, rather than setting the global environment,
+you can use this style:
+@example
+Scheme scm = new Scheme();
+Object x = scm.eval("(+ 3 2)");
+System.out.println(x);
+@end example
 
 @node Reporting Bugs, License, Low-level functions, Top
 @chapter Reporting Bugs and the Kawa Mailing List

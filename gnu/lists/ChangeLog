@@ -1,3 +1,7 @@
+2003-01-05  Per Bothner  <per@bothner.com>
+
+	* LList.java (toString): New method.
+
 2002-09-21  Per Bothner  <per@bothner.com>
 
 	* TreeList.java (getIntN):  Mask with 0xFFFF, in case low word is < 0.

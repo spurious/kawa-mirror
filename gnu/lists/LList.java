@@ -414,4 +414,39 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
       }
     return list;
   }
+
+  public String toString ()
+  {
+    Object rest = this;
+    int i = 0;
+    StringBuffer sbuf = new StringBuffer(100);
+    sbuf.append('(');
+    for (;;)
+      {
+	if (rest == Empty)
+	  break;
+	if (i > 0)
+	  sbuf.append(' ');
+	if (i >= 10)
+	  {
+	    sbuf.append("...");
+	    break;
+	  }
+	if (rest instanceof Pair)
+	  {
+	    Pair pair = (Pair) rest;
+	    sbuf.append(pair.car);
+	    rest = pair.cdr;
+	  }
+	else
+	  {
+	    sbuf.append(". ");
+	    sbuf.append(rest);
+	    break;
+	  }
+	i++;
+      }
+    sbuf.append(')');
+    return sbuf.toString();
+  }
 }

@@ -11,6 +11,7 @@ java_sources = \
   ClassMethods.java \
   InstanceOf.java \
   Invoke.java \
+  OccurrenceType.java \
   SlotGet.java \
   SlotSet.java \
   StaticFieldConstraint.java \

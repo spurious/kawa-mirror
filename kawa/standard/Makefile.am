@@ -135,7 +135,7 @@ close_output_port.class \
 call_with_output_string.class \
 load.class \
 procedure_p.class \
-apply.class \
+apply.class constant_fold.class \
 map.class \
 callcc.class \
 logand.class logior.class logxor.class lognot.class logop.class \
@@ -165,9 +165,10 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-CLEANFILES = *.class
+CLEANFILES = *.class classes.stamp
 
 all: $(OBJ)
 
-all_one: $(SOURCES)
-	$(JAVAC) -d ../.. $?
+classes.stamp: $(SOURCES)
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $?
+	touch classes.stamp

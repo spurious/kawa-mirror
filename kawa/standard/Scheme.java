@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.bytecode.Type;
 
 public class Scheme extends Interpreter
 {
@@ -396,13 +397,14 @@ public class Scheme extends Interpreter
 		  new kawa.standard.prim_method(183));
       define_proc("primitive-op1",
 		  new kawa.standard.prim_method());
-      define_proc("primitive-get-field", "kawa.lib.reflection");
-      define_proc("primitive-set-field", "kawa.lib.reflection");
-      define_proc("primitive-get-static", "kawa.lib.reflection");
-      define_proc("primitive-set-static", "kawa.lib.reflection");
-      define_proc("primitive-array-get", "kawa.lib.reflection");
-      define_proc("primitive-array-set", "kawa.lib.reflection");
-      define_proc("primitive-array-length", "kawa.lib.reflection");
+      define_syntax("primitive-get-field", "kawa.lib.reflection");
+      define_syntax("primitive-set-field", "kawa.lib.reflection");
+      define_syntax("primitive-get-static", "kawa.lib.reflection");
+      define_syntax("primitive-set-static", "kawa.lib.reflection");
+      define_syntax("primitive-array-new", "kawa.lib.reflection");
+      define_syntax("primitive-array-get", "kawa.lib.reflection");
+      define_syntax("primitive-array-set", "kawa.lib.reflection");
+      define_syntax("primitive-array-length", "kawa.lib.reflection");
       define_proc("primitive-throw", new kawa.standard.prim_throw());
       define_syntax("try-finally", "kawa.standard.try_finally");
       define_syntax("try-catch", "kawa.standard.try_catch");
@@ -421,6 +423,7 @@ public class Scheme extends Interpreter
       define_proc("copy-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
       define("port-char-encoding", Boolean.TRUE);
+      define_proc("system", "kawa.lib.system");
       define("symbol-read-case", "P");
       
       // JDK 1.1 only:
@@ -438,6 +441,7 @@ public class Scheme extends Interpreter
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
       define_syntax ("fluid-let", "kawa.lib.syntax");
+      define_syntax("constant-fold", "kawa.standard.constant_fold");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
@@ -542,4 +546,29 @@ public class Scheme extends Interpreter
     out.flush();
   }
 
+
+  /** If exp is a "constant" Type, return that type, otherwise return null. */
+  public static Type getTypeValue (Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+	Object value = ((QuoteExp) exp).getValue();
+	if (value instanceof Type)
+	  return (Type) value;
+	else if (value instanceof Class)
+	  return Type.make((Class) value);
+      }
+    else if (exp instanceof ReferenceExp)
+      {
+	ReferenceExp rexp = (ReferenceExp) exp;
+	if (rexp.getBinding() == null)
+	  {
+	    String name = rexp.getName();
+	    int len = name.length(); 
+	    if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
+	      return PrimProcedure.string2Type(name.substring(1, len-1));
+	  }
+      }
+    return null;
+  }
 }

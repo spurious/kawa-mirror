@@ -17,30 +17,25 @@ public class instance extends Procedure2 implements Inlineable
   {
     Expression[] args = exp.getArgs();
     CodeAttr code = comp.getCode();
-    if (args[1] instanceof QuoteExp)
+    Type type = Scheme.getTypeValue(args[1]);
+    if (type != null)
       {
-	Object arg1 = ((QuoteExp) args[1]).getValue();
-	if (arg1 instanceof Type)
-	  {
-	    args[0].compile(comp, 0);
-	    ((Type) arg1).emitIsInstance(code);
-	  }
-	else
-	  throw new Error ("2nd arg is not a Type");
+	args[0].compile(comp, 0);	
+	type.emitIsInstance(code);
       }
     else
       {
 	if (typeType == null)
 	  {
-	    typeType = new ClassType("gnu.bytecode.Type");
+	    typeType = ClassType.make("gnu.bytecode.Type");
 	    instanceMethod = typeType.addMethod("isInstance",
 						Compilation.apply1args,
 						Scheme.booleanType,
 						gnu.bytecode.Access.PUBLIC);
 	  }
-
-	args[0].compile(comp, 0);
 	args[1].compile(comp, 0, typeType);
+	args[0].compile(comp, 0);
+	code.emitInvokeVirtual(instanceMethod);
       }
     if ((flags & Expression.IGNORED) != 0)
       code.emitPop(1);

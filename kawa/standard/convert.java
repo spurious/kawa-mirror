@@ -21,23 +21,18 @@ public class convert extends Procedure2 implements Inlineable
     if (args.length != 2)
       throw new Error ("wrong number of arguments to "+name());
     CodeAttr code = comp.getCode();
-    if (args[0] instanceof QuoteExp)
+    Type type = Scheme.getTypeValue(args[0]);
+    if (type != null)
       {
-	Object arg0 = ((QuoteExp) args[0]).getValue();
-	if (arg0 instanceof Type)
-	  {
-	    args[1].compile(comp, 0);
-	    ((Type) arg0).emitCoerceFromObject(comp.getCode());
-
-	  }
-	else
-	  throw new Error ("1st arg is not a Type");
+	args[1].compile(comp, 0);
+	type.emitCoerceFromObject(comp.getCode());
+	
       }
     else
       {
 	if (typeType == null)
 	  {
-	    typeType = new ClassType("gnu.bytecode.Type");
+	    typeType = ClassType.make("gnu.bytecode.Type");
 	    coerceMethod = typeType.addMethod("coerceFromObject",
 					      Compilation.apply1args,
 					      Type.pointer_type,

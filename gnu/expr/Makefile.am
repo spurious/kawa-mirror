@@ -31,6 +31,7 @@ java_JAVA=\
   ModuleBody.java \
   ModuleExp.java \
   QuoteExp.java \
+  PrimProcedure.java \
   ReferenceExp.java \
   ScopeExp.java \
   SetApplyExp.java \

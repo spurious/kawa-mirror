@@ -122,7 +122,6 @@ public class Variable extends Location implements java.util.Enumeration
 
   /**
    * Allocate slots for a local variable (or parameter).
-   * @return the index of the (first) slot.
    */
   public void allocateLocal (CodeAttr code)
   {

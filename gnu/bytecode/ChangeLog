@@ -1,3 +1,8 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* Method.java: Remove bogus @return in javadoc comment.
+	* Variable.java: Likewise.
+
 2005-03-22  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitTryStart): Create new TryState *after* we

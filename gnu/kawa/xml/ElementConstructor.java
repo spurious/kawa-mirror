@@ -57,12 +57,10 @@ implements Inlineable, Externalizable
     for (int i = 0;  i < nargs;  i++)
       {
 	Object arg = ctx.getArgAsObject(i);
-	/*
-	  if (arg instanceof Consumable)
+	if (arg instanceof Consumable)
 	  ((Consumable) arg).consume(out);
-	  else
-	*/
-	out.writeObject(arg);
+	else
+	  out.writeObject(arg);
       }
     out.endGroup(sname);
   }

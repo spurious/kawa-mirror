@@ -20,9 +20,9 @@ import java.net.*;
 
 public class @XMLParser@
 {
-  @CHAR@[] buffer;
-  int pos;
-  int limit;
+  protected @CHAR@[] buffer;
+  protected int pos;
+  protected int limit;
 
   @ParsedXMLHandler@ out;
 
@@ -83,8 +83,8 @@ public class @XMLParser@
     int dstart = -1;
     String message = null;
 
-    int start = buffer.length;
-  mainLoop: //
+    int start = limit;
+  mainLoop:
     for (;;)
       {
         handleChar:  // When done get next character.
@@ -96,7 +96,7 @@ public class @XMLParser@
 
           case SAW_ERROR:
             this.pos = pos;
-            error(message);
+            error('e', message);
             for (;;)
               {
                 if (pos >= limit)
@@ -111,7 +111,7 @@ public class @XMLParser@
 
           case SAW_EOF_ERROR:
             this.pos = pos;
-            error("unexpected end-of-file");
+            error('f', "unexpected end-of-file");
             return;
 
           case TEXT_STATE:
@@ -181,7 +181,10 @@ public class @XMLParser@
 		    length = pos - 1 - start;
 		    if (length == 0)
 		      {
-			message = "missing name";
+			if (state == ATTRIBUTE_SEEN_NAME_STATE)
+			  message = "missing attribute name";
+			else
+			  message = "missing name";
 			state = SAW_ERROR;
 		      }
                     continue mainLoop;
@@ -239,7 +242,7 @@ public class @XMLParser@
             if (ch != ';')
               {
                 this.pos = pos;
-                error("missing ';'");
+                error('w', "missing ';'");
               }
             out.emitEntityReference(buffer, start, length);
 	    start = limit;
@@ -473,26 +476,11 @@ public class @XMLParser@
         else
           {
 	    int saved = pos - start;
-	    if (saved > 0)
-	      {
-		if (saved >= buffer.length)
-		  {
-		    @CHAR@[] tmp = new @CHAR@[saved+100];
-		    System.arraycopy(buffer, start, tmp, 0, saved);
-		    buffer = tmp;
-		  }
-		else if (start > 0)
-		  System.arraycopy(buffer, start, buffer, 0, saved);
-		pos = saved;
-		start = 0;
-	      }
-	    else
-	      {
-		pos = 0;
-	      }
-	    int count = fill(buffer, pos, buffer.length - pos);
+	    int count = fill(buffer, start, pos);
 	    if (count > 0)
 	      {
+		pos = this.pos;
+		buffer = this.buffer;
 		limit = pos + count;
 		ch = buffer[pos++];
 		start = saved >= 0 ? 0 : limit;
@@ -508,19 +496,42 @@ public class @XMLParser@
   }
 
 @if CHAR is byte@
-  InputStream in;
+  protected InputStream in;
 @endif CHAR is byte@
 @if CHAR is char@
-  Reader in;
+  protected Reader in;
 @endif CHAR is char@
 
-  public int fill(@CHAR@[] buffer, int start, int length)
+  /** Fill the buffer with more data.
+   * @param start start of current token.
+   * @param pos index of current read position
+   */
+  public int fill(@CHAR@[] buffer, int start, int pos)
   {
     if (in == null)
       return -1;
-    try
+    int saved = pos - start;
+    if (saved > 0)
       {
-	return in.read(buffer, start, length);
+	if (saved >= buffer.length)
+	  {
+	    @CHAR@[] tmp = new @CHAR@[saved+100];
+	    System.arraycopy(buffer, start, tmp, 0, saved);
+	    buffer = tmp;
+	    this.buffer = tmp;
+	  }
+	else if (start > 0)
+	  System.arraycopy(buffer, start, buffer, 0, saved);
+	pos = saved;
+      }
+    else
+      {
+	pos = 0;
+      }
+    try
+      {	
+	this.pos = pos;
+	return in.read(buffer, pos, buffer.length - pos);
       }
     catch (java.io.IOException ex)
       {
@@ -581,7 +592,7 @@ public class @XMLParser@
     this.out = out;
   }
 
-  public void error(String message)
+  public void error(char severity, String message)
   {
     out.error(this, message);
   }

@@ -1,3 +1,13 @@
+2002-06-19  Per Bothner  <per@bothner.com>
+
+	* XMLParser.java.in:  Set up for more useful inheritance.
+	(buffer, pos, limit, in):  Make protected.
+	(parse):  Initiaze start safely even if buffer is null.
+	(error):  Take extra serverity parameter.
+	(parse):  Chaneg calls to error apropriately.
+	(fill):  Handle copying saved data here, rather than in parse.
+	(parse):  More specific error message if expecting attribute name.
+
 2002-05-06  Per Bothner  <per@bothner.com>
 
 	* NamespaceResolver.java (getIndex):  Fix logic error.

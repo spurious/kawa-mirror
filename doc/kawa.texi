@@ -4477,7 +4477,7 @@ or @code{require} it), you don't care how it gets translated
 into a module class.  However, Kawa gives you some control over how this
 is done, and you can use a Scheme module to define a class which
 you can use with other Java classes.  This style of class definition
-is an alternative to @code{define-class} [not yet implemented]
+is an alternative to @code{define-class},
 which lets you define classes and instances fairly conveniently.
 
 The default name of the module class is the main part of the

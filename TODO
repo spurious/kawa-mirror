@@ -3,13 +3,16 @@ BEFORE KAWA 1.7:
 * Handle defmacro definition and use in same source file.
 * load.loadSource if (true) should be if (false).
 * Implement Scheme API for serialization.
-* Create jemacs.jar binary.
 
 Move kawa.standard.convert to gnu.kawa.reflect.Convert.
 Move kawa.lang.Lambda to gnu.kawa.lispexpr.Lambda.  Merge with Elisp version.
 Remove Scheme.getTypeValue.
 
 (define-alias <alias> <class>) doesn't work interactively.
+
+Implement IntRange class.
+Use it to replace Char's hashtable.
+Replace Char by Character.
 
 JEmacs:
 * clean up function-binding hacks

@@ -1,3 +1,7 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* Lexer.java:  Update import as Char has moved.
+
 2000-02-01  Per Bothner  <per@bothner.com>
 
 	* Parser.java:  No longer imports moved kawa.lang.Interpreter.

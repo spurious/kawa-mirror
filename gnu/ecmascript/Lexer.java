@@ -2,7 +2,7 @@ package gnu.ecmascript;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.Sequence;
-import gnu.kawa.util.Char;
+import gnu.text.Char;
 
 /**
   * Reads EcmaScript token from a InPort.

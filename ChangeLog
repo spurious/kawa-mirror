@@ -1,3 +1,30 @@
+2000-06-19  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.66.
+	(JEMACS_VERSION):  New variable.
+
+	* Makefile.am:  Add rules to make jemacs.tar.
+	(kawa-@VERSION@-compiled.jar):  Renamed to kawa-@VERSION@.jar.
+	Do a full configure+make first.
+
+	* gnu/kawa/util/Char.java:  Moved to gnu/text.
+	Various references had to be updated, or import statements added.
+
+	* kawa/repl.java:  Update copyright printed by --version.
+
+	* kawa/standard/LispFormat.java (class LispIntegerFormat):
+	Moved and renamed to gnu/text/IntegerFormat.java.
+	* kawa/standard/ParseFormat.java:  Add mostly-working (except that
+	precision is ignored) for %d %i %o %x and %X.
+
+	* kawa/standard/{char_ci_equal_p.java,char_ci_greater_equal_p.java,
+	char_ci_greater_p.java,char_ci_less_equal_p.java,char_ci_less_p.java,
+	char_equal_p.java,char_greater_equal_p.java,char_greater_p.java,
+	char_less_equal_p.java,char_less_p.java}:  Removed.  Subsumed by
+	new procedures in kawa/lib/characters.scm.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/Scheme.java:  Update accordingly.
+
 2000-06-17  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/AutoloadProcedure.java (getProperty): New method.

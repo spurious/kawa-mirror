@@ -294,7 +294,6 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
     String typeName = "list";
     String type = typeName;
     out.beginGroup(typeName, type);
-    out.endAttributes();
     while (list instanceof Pair)
       {
 	if (list != this)

@@ -11,5 +11,8 @@ public interface FormatToConsumer
   //public void writeChar(int v, Consumer out);
   public void writeBoolean(boolean v, Consumer out);
 
+  public void beginGroup(String typeName, Object type, Consumer out);
+  public void endGroup(String typeName, Consumer out);
+
   public void writeObject(Object v, Consumer out);
 }

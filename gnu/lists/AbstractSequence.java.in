@@ -31,14 +31,6 @@ public abstract class AbstractSequence
   /** See java.util.List. */
   public abstract int size();
 
-  /**
-   * A safe function to count the length of a sequence.
-   * @return the length, or -1 for an infinite list,
-   * or -2 for a malformed sequence.
-   * @deprecated FIXME
-   */
-  //public int length () { return size(); } // FIXME
-
   public boolean isEmpty()
   {
     return size() > 0;
@@ -665,12 +657,27 @@ public abstract class AbstractSequence
 
   public Object[] toArray() 
   { 
-    return toArray(null); 
+    int len = size(); 
+    Object[] arr = new Object[len];
+    
+    java.util.Enumeration e = elements();
+    for (int i = 0;  e.hasMoreElements(); i++)
+      try
+	{
+	  arr[i] = e.nextElement();
+	}
+      catch (java.lang.ArrayIndexOutOfBoundsException ex)
+	{
+	  System.err.println("arry except at i:"+i+" len:"+len);
+	  ((TreeList) this).dump();
+	  throw ex;
+	}
+    return arr;
   } 
 
   public Object[] toArray(Object[] arr) 
   { 
-    int alen = arr == null ? -1 : arr.length; 
+    int alen = arr.length; 
     int len = size(); 
     if (len > alen) 
     { 
@@ -810,7 +817,6 @@ public abstract class AbstractSequence
     String typeName = "#sequence"; 
     String type = typeName;
     out.beginGroup(typeName, type);
-    out.endAttributes();
     java.util.Enumeration e = elements();
     for (int i = 0;  e.hasMoreElements(); i++)
       out.writeObject(e.nextElement());

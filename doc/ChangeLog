@@ -1,3 +1,16 @@
+1999-11-18  Per Bothner  <per@bothner.com>
+
+	* license.terms:  Remove.  Replaced by by ../COPYING.
+	* kawa.texi:  Some minor cleanups for texinfo-4.0.  Now always
+	generate an index.
+	(Ports):  Document new SRFI-6 functions (open-input-string,
+	open-output-string, get-output-string ).
+	(Types):  New chapter.
+	(Standard Types):  Move section to new Types chapter.
+	(Mangling):  New section.
+	(Method operations):  Various changes.  Some text moved around.
+	(License):  Updated and added explication.
+
 1999-09-14  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Objects and Classes):  New chapter.

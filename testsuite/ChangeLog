@@ -1,3 +1,7 @@
+2001-09-24  Per Bothner  <per@bothner.com>
+
+	* obj-test,scm:  Test previous mdoule2.scm change.
+
 2001-09-21  Per Bothner  <per@bothner.com>
 
 	* module1.scm:  Move most of the definitions to module2.scm.

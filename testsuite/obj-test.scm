@@ -1,4 +1,4 @@
-(test-init "Objects" 62)
+(test-init "Objects" 63)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -165,6 +165,9 @@
 (test 3 length-diff1 'abcdef 'abc)
 (test 3 length-diff2 'abcdef 'abc)
 (test 3 length-diff3 'abcdef 'abc)
+
+;; Test bug reported by Jocelyn Paine.
+(test '(boolean #t) make-literal #t)
 
 (require <classes1>)
 (require <classes2>)

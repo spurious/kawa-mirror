@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -105,7 +105,7 @@ public class MakeElement extends CpsProcedure implements CanInline, Inlineable
     else if (target instanceof IgnoreTarget)
       ApplyExp.compile(exp, comp, target);
     else
-      ConsumerTarget.compileUsingConsumer(exp, comp, target);
+      ElementConstructor.compileUsingNodeTree(exp, comp, target);
   }
 
   public Type getReturnType (Expression[] args)

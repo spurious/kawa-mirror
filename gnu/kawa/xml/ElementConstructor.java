@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
@@ -89,7 +89,25 @@ implements Inlineable, Externalizable
     else if (target instanceof IgnoreTarget)
       ApplyExp.compile(exp, comp, target);
     else
-      ConsumerTarget.compileUsingConsumer(exp, comp, target);
+      compileUsingNodeTree(exp, comp, target);
+  }
+
+  /** Compile an expression using a fresh NodeTree.
+   * Compare with ConsumerTarget.compileUsingConsumer, but creates a NodeTree.
+   */
+  public static void compileUsingNodeTree(Expression exp,
+					  Compilation comp, Target target)
+  {
+    CodeAttr code = comp.getCode();
+    Scope scope = code.pushScope();
+    Variable node = scope.addVariable(code, typeNodeTree, null);
+    ConsumerTarget ctarget = new ConsumerTarget(node);
+    code.emitInvokeStatic(typeNodeTree.getDeclaredMethod("make", 0));
+    code.emitStore(node);
+    exp.compile(comp, ctarget);
+    code.emitLoad(node);
+    code.popScope();
+    target.compileFromStack(comp, typeNodeTree);
   }
 
   public Type getReturnType (Expression[] args)
@@ -102,6 +120,9 @@ implements Inlineable, Externalizable
     return "#<ElementConstructor "+sname+" :: "+qname+'>';
   }
 
+
+  static final ClassType typeNodeTree
+    = ClassType.make("gnu.xml.NodeTree");
 
   static final Method beginGroupMethod
     = Compilation.typeConsumer.getDeclaredMethod("beginGroup", 2);

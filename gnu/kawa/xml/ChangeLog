@@ -1,3 +1,9 @@
+2003-07-10  Per Bothner  <per@bothner.com>
+
+	* ElementConstructor.java (compileUsingNodeTree):  New static method.
+	(typeNodeTree):  New static field.
+	(compile):  Use compileUsingNodeTree.
+
 2003-06-27  Per Bothner  <per@bothner.com>
 
 	* XMLParser.java (<init>):  Re-do to deal with NamespaceResolver

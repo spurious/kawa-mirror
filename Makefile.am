@@ -13,6 +13,10 @@ kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
 kawa-@VERSION@.jar:
+	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
+	    `find . -name '*.class' -print`
+
+dist-kawa-@VERSION@.jar:
 	srcdir=`(cd $(srcdir); /bin/pwd)` \
 	  && rm -rf tmpdir \
 	  && mkdir tmpdir \
@@ -57,6 +61,7 @@ JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 
 MAINTAINERCLEANFILES = makekawa.bat
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
+CLEANFILES = *.jar
 
 install-javadoc-html:
 	rm -rf $(JAVADOC_DIR)
@@ -69,10 +74,21 @@ install-html: install-javadoc-html
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
 	cd gnu;  make install-html HTML_HOME="$(HTML_HOME)"
 
+install-data-am:  install-jar
+install-jar:
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	$(INSTALL_DATA) kawa-@VERSION@.jar \
+	  $(DESTDIR)$(javadir)/kawa-@VERSION@.jar
+	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
+	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
+
+
 $(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/configure.in
 	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/$(JAVATOP)kawa/Version.java.in >$@
 
 all-recursive:  $(JAVATOP)kawa/Version.java
+all-redirect: kawa-@VERSION@.jar
 
 makekawa.bat:  $(srcdir)/configure.in
 	echo "rem Build Kawa under Windows" >tmp
@@ -100,4 +116,4 @@ makekawa.bat:  $(srcdir)/configure.in
 	echo '%java% -classpath ..\..\.. kawa.repl -d ..\..\.. -P gnu.jemacs.buffer -C' $$(cd gnu/jemacs/buffer; make -s list-sources) >>tmp
 	sed -e 's/$$/!/' <tmp | tr '!' '\r' >$@
 
-distall:  distcheck kawa.jar jemacs.jar
+distall:  distcheck dist-kawa-@VERSION@.jar jemacs.jar

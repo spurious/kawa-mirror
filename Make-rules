@@ -48,15 +48,3 @@ elisp-classes.stamp: $(java_ELISP)
 	  $(KAWA1) -d $(top_builddir) \
 	    -P `echo $(PACKAGE_FNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
-
-# Almost the same as automake's install-javaJAVA, but the standard
-# automake support for Java doesn't handle built Java classes.
-install-java-classes: all
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(javadir)
-	for p in *.class; do \
-	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
-	done
-
-install-data-am: install-java-classes

@@ -1,3 +1,17 @@
+2001-06-04  Per Bothner  <per@bothner.com>
+
+	No longer install the .class files, but install kawa.jar instead.
+	* Make-rules (install-java-classes, install-data-am):  Removed.
+	* Makefile.am (CLEANFILES):  Add *.jar.
+	(kawa-@VERSION@.jar):  New only makes jar file, without new configure.
+	(dist-kawa-@VERSION@.jar):  Renamed from old kawa-@VERSION@.jar.
+	(install-jar):  New rule.
+	(install-data-am):  New dependency - depend on install-jar.
+	(all-redirect):  New dependency, on kawa-@VERSION@.jar.
+	(distall):  Depend on dist-kawa-@VERSION@.jar, not plain kawa.jar.
+
+	* kawa/Makefile.am (EXTRA_DIST):  Include $(java_WITH_AWT).
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* Make-rules ($(PACKAGE_FNAME).lo):  Link $^ rather than $? to get

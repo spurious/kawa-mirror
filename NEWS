@@ -1,3 +1,9 @@
+Kawa now installs as a .jar file (kawa.jar symlinked to kawa-VERSION.jar),
+rather than a collection of .class files.
+
+The Kawa manual includes instructions for how to build Kawa using GCJ,
+and how to compile Scheme code to a native executable using GCJ.
+
 Kawa now has builtin pretty-printer support, using an algorithm from
 Steel Bank Common Lisp converted from Lisp to Java.  The high-level
 Common Lisp pretty-printing features are mostly not yet implemented,

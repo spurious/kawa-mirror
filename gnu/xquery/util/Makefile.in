@@ -212,16 +212,17 @@ java_sources = \
   Debug.java \
   IndexOf.java \
   IntegerRange.java \
-  IsEmptySequence.java \
   ItemAt.java \
   LastIndexOf.java \
   MakeAttribute.java \
   MakeElement.java \
   MinMax.java \
+  NamedCollator.java \
   NumberValue.java \
   QNameUtils.java \
   Reduce.java \
   RelativeStep.java \
+  SequenceUtils.java \
   StringValue.java \
   SubList.java \
   ValuesEvery.java \

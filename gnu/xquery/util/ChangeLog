@@ -1,3 +1,10 @@
+2004-12-10  Per Bothner  <bothner@Per-Bothners-Computer.local>
+
+	* SequenceUtils.java: New class has sequence functions implementations.
+	* IsEmptySequence.java: Removed class - use SequenceUtils instead.
+	* NamedCollator.java: New class extends Collator.
+	* Makefile.am: Update accordingly.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* QNameUtils.java: New class.

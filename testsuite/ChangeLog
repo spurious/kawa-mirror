@@ -1,3 +1,8 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* num-test.scm:  New test from Sven.Hartrumpf@fernuni-hagen.de
+	(10-17 "airth. expression crashes Kawa") plus 2 derived tests.
+
 2003-10-08  Per Bothner  <per@bothner.com>
 
 	Based on Savannah bug #5651 from Chris Dean <Chris.Dean@sokitomi.com>.

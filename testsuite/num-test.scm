@@ -1,4 +1,4 @@
-(test-init "numbers" 1650)
+(test-init "numbers" 1653)
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -128,3 +128,15 @@
 (test #t number? (string->number "#i1+0/0i"))
 (test #t positive? 2147483648)
 (test #t negative? (string->number "#i-1/0"))
+
+;; From Sven.Hartrumpf@fernuni-hagen.de
+(define quotient-fix-1
+  (lambda (a b x) (quotient (+ (quotient (* a x 10) b) 5) 10)))
+(test 950 quotient-fix-1 95 100 1000)
+;; Variations on Sven's test:
+(define (quotient-fix-2 (a :: <real>))
+  (quotient (+ a 20) 10))
+(test 97 quotient-fix-2 950)
+(define (quotient-float (a :: <real>))
+  (quotient (+ a 25.0) 10))
+(test 97.0 quotient-float 950)

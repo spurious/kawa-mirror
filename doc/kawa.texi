@@ -1426,16 +1426,16 @@ These primitives require you to specify the parameter and return types.
 Type specifications are currently required to be string literals
 or one of the standard types (@pxref{Standard Types}).
 A type specifier can be a fully-qualified Java class name
-(for example @code{"java.lang.StringBuffer"}).  In that case,
+(for example @code{<java.lang.StringBuffer>}).  In that case,
 the actual argument is cast at run time to the named class.
-The specification @code{"String"} is an exception:
+The specification @code{<String>} is an exception:
 It causes the @code{toString} method of the actual
 arguement to be invoked.
 
 A type specifier can also be one of the primitive Java types.
-The numeric types @code{"long"}, @code{"int"}, @code{"short"},
-@code{"byte"}, @code{"float"}, and @code{"double"} are converted from the
-corresponding Scheme number classes.  Similarly, @code{"char"}
+The numeric types @code{<long>}, @code{<int>}, @code{<short>},
+@code{<byte>}, @code{<float>}, and @code{<double>} are converted from the
+corresponding Scheme number classes.  Similarly, @code{<char>}
 can be converted to and from Scheme characters.  The type
 @code{boolean} matches any object, and the result is @code{false}
 if and only if the actual argument is @code{#f}.
@@ -1464,13 +1464,12 @@ Returns a new anonymous procedure, which when called will
 invoke the matching method from the interface whose name is @var{interface}.
 @end deffn
 
-The macros return procedure values, just like @code{lambda},
-but the procedures are @emph{not} first-class.  Currently, they can
-only be used directly as the procedure of a procedure call, and
-they cannot be assigned, nor passed as values.  These restrictions will be
-eased in a future Kawa release (which will use the new
-Java reflective facilities).  Note also that neither macro
-checks that there really is a method that matches the specification.
+The macros return procedure values, just like @code{lambda}.
+If the macros are used directly as the procedure of a procedure call,
+then kawa can inline the correct bytecodes to call the specified methods.
+(Note also that neither macro
+checks that there really is a method that matches the specification.)
+Otherwise, the Java reflection facility is used.
 
 Some examples using these primitives are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in

@@ -1,3 +1,10 @@
+2004-12-05  Per Bothner  <per@bothner.com>
+
+	* ELisp.java: Update for new Symbol/Location handling.
+	(defun): Remove method - use new methods in Lisp2 instead,
+	(defineFormFieldValue): Remove - no longer need to override.
+	* lambda.java (rewriteBody): Do setIndirectBinding.
+
 2004-11-16  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (ELisp): Add defun for '%let'.  Use defProcStFld.

@@ -69,7 +69,7 @@ public class lambda extends Lambda
 	  {
 	    Declaration decl = let.addDeclaration(arg.getSymbol());
 	    decl.setFluid(true);
-	    decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
+	    decl.setIndirectBinding(true);
 	    inits[i] = new ReferenceExp(arg);
 	    decl.noteValue(inits[i]);
 	  }

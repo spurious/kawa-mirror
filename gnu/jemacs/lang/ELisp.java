@@ -59,49 +59,17 @@ public class ELisp extends Lisp2
 
   static ELisp instance;
 
-  protected void defun(String name, Object value)
-  {
-    gnu.commonlisp.lang.Symbols.setFunctionBinding(environ, name, value);
-    if (value instanceof Named)
-      {
-	Named n = (Named) value;
-	if (n.getName() == null)
-	  n.setName(name);
-      }
-  }
-
-  private void defun(Procedure proc)
-  {
-    defun(proc.getName(), proc);
-  }
-
   static int elispCounter = 0;
 
   public ELisp()
   {
     Environment scmEnv = Scheme.builtin();
-    environ = SymbolTable.make("interaction-environment."+(++elispCounter));
+    environ = new SimpleEnvironment("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
 
     TRUE = environ.getSymbol("t");
-    TRUE.set(TRUE);
+    define("t", TRUE);
     define("nil", FALSE);
-
-    SymbolEnumeration e
-      = Scheme.builtin().enumerateAllSymbols();
-    while (e.hasMoreElements())
-      {
-	Symbol b = e.nextSymbol();
-	Object val = b.get(null);
-	if (val != null)
-	  {
-	    String name = b.getName();
-	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
-	      defun(name, val);
-	    else
-	      define(name, val);
-	  }
-      }
 
     if (instance == null)
       instance = this;
@@ -109,9 +77,6 @@ public class ELisp extends Lisp2
     try
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
-	loadClass("kawa.lib.std_syntax");
-	loadClass("kawa.lib.lists");
-	loadClass("kawa.lib.strings");
 	loadClass("gnu.commonlisp.lisp.PrimOps");
 	loadClass("gnu.jemacs.lang.NumberOps");
 	loadClass("gnu.jemacs.lang.MiscOps");
@@ -121,14 +86,18 @@ public class ELisp extends Lisp2
 	// Ignore - happens while building this directory.
       }
 
-    defun(AddOp.$Pl); // "+"
-    defun(AddOp.$Mn); // "-"
-    defun(DivideOp.$Sl); // "/"
-    defun(NumberCompare.$Eq);
-    defun(NumberCompare.$Ls);
-    defun(NumberCompare.$Gr);
-    defun(NumberCompare.$Ls$Eq);
-    defun(NumberCompare.$Gr$Eq);
+    defSntxStFld("if", "gnu.jemacs.lang.MiscOps", "if");
+    defProcStFld("invoke", "gnu.kawa.reflect.Invoke", "invoke");
+
+    defProcStFld("+", "gnu.jemacs.lang.AddOp", "$Pl");
+    defProcStFld("-", "gnu.jemacs.lang.AddOp", "$Mn");
+    defProcStFld("/", "gnu.jemacs.lang.DivideOp", "$Sl");
+    defProcStFld("=", "gnu.jemacs.lang.NumberCompare", "$Eq");
+    defProcStFld("<", "gnu.jemacs.lang.NumberCompare", "$Ls");
+    defProcStFld(">", "gnu.jemacs.lang.NumberCompare", "$Gr");
+    defProcStFld("<=", "gnu.jemacs.lang.NumberCompare", "$Ls$Eq");
+    defProcStFld(">=", "gnu.jemacs.lang.NumberCompare", "$Gr$Eq");
+
     defun("self-insert-command", new gnu.jemacs.buffer.SelfInsertCommand());
 
     lambda lambda = new gnu.jemacs.lang.lambda();
@@ -140,6 +109,7 @@ public class ELisp extends Lisp2
     defun("defun", new gnu.commonlisp.lang.defun(lambda));
     defun("function", new gnu.commonlisp.lang.function(lambda));
 
+    defun(gnu.kawa.lispexpr.LispInterpreter.quote_sym, new kawa.lang.Quote());
     defun("defgroup", new defgroup());
     defun("defcustom", new defcustom());
     defun("defvar", new gnu.commonlisp.lang.defvar(false));
@@ -165,6 +135,36 @@ public class ELisp extends Lisp2
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
     defun("princ", displayFormat);
     defun("prin1", writeFormat);
+    LocationEnumeration e = Scheme.builtin().enumerateAllLocations();
+    while (e.hasMoreElements())
+      {
+	Location loc = e.nextLocation();
+	Symbol name = ((NamedLocation) loc).getKeySymbol();
+
+	if (environ.isBound(name, EnvironmentKey.FUNCTION))
+	  continue;
+	Object val = loc.get(null);
+	/*
+	if (val instanceof Procedure)
+	  {
+            Constraint constraint = b.getConstraint();
+	    if (constraint instanceof StaticFieldConstraint)
+              {
+                StaticFieldConstraint fconstraint
+                  = (StaticFieldConstraint) constraint;
+                String fname = fconstraint.getName();
+                ClassType t = fconstraint.getDeclaringClass();
+	      }
+	  }
+	*/
+	if (val != null)
+	  {
+	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
+	      defun(name, val);
+	    else
+	      define(name.getName(), val);
+	  }
+      }
     try
       {
 	loadClass("gnu.jemacs.lisp.primitives");
@@ -250,28 +250,6 @@ public class ELisp extends Lisp2
       }
     return Type.make(clas);
   }
-
-  public void defineFromFieldValue(String name, Object part)
-    throws Throwable
-  {
-    if (part instanceof Named)
-      name = ((Named) part).getName();
-    else
-      name = name.intern();
-    if (part instanceof Symbol)
-      environ.addSymbol((Symbol) part);
-    else if (part instanceof Procedure
-	     || part instanceof kawa.lang.Syntax)
-      gnu.commonlisp.lang.Symbols.setFunctionBinding(environ, name, part);
-    else
-      environ.define(name, part);
-  }
-  /* If non-final field:  FIXME
-    Binding2 binding = new Binding2(name);
-    setValue(binding, object);
-    setConstraint(binding, new gnu.kawa.reflect.ClassMemberConstraint(field));
-    environ.addBinding(binding);
-  */
 
   public static void readableChar(char ch, StringBuffer buf, boolean quote)
   {

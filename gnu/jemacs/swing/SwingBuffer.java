@@ -283,11 +283,9 @@ public class SwingBuffer extends Buffer
     content.consume(start, count, out);
   }
 
-  public void
-  makePosition(int index, boolean isAfter,
-	       gnu.lists.PositionContainer posSet, int posNumber)
+  public int createPosition(int index, boolean isAfter)
   {
-    content.makePosition(index, isAfter, posSet, posNumber);
+    return content.createPosition(index, isAfter);
   }
 
   public Object get (int index)

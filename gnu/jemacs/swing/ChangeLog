@@ -1,3 +1,10 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* SwingBuffer.java (makePosition):  Remove - use inherited default.
+	(createPosition):  New method.
+	* BufferContent.java (GapPosition.<init>):  New args.
+	(createPosition):  Use new GapPosition constructor.
+
 2002-03-24  Per Bothner  <per@bothner.com>
 
 	* BufferContent.java:  Moved here from gnu.jemacs.buffer.

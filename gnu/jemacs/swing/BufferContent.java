@@ -119,9 +119,7 @@ implements javax.swing.text.AbstractDocument.Content
 
     if (offset < 0 || offset > length())
       throw new BadLocationException("bad offset to createPosition", offset);
-    GapPosition pos = new GapPosition(this);
-    makePosition(offset, isAfter, pos, 0);
-    return pos;
+    return new GapPosition(this, offset, isAfter);
   }
 
   public void dump()
@@ -263,9 +261,9 @@ implements javax.swing.text.AbstractDocument.Content
 class GapPosition extends SeqPosition
     implements javax.swing.text.Position
 {
-  public GapPosition(CharBuffer content)
+  public GapPosition(CharBuffer content, int offset, boolean isAfter)
   {
-    super(content);
+    super(content, offset, isAfter);
   }
 
   public int getOffset() { return nextIndex(); }

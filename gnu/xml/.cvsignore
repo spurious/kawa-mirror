@@ -1,0 +1,7 @@
+Makefile
+*.class
+java-classes.stamp
+ParsedXMLHandler.java
+ParsedXMLHandlerByte.java
+XMLParserByte.java
+XMLParserChar.java

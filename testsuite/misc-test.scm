@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 126)
+(test-init "Miscellaneous" 127)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -555,3 +555,14 @@
   (test "abc" string-append/shared str)
   (test "abc123xy" string-append/shared str "123" "xy")
   (test #t equal? "abc123xy" str))
+
+(test "Test." 'from-psyntax
+      ((lambda ()
+	 (letrec ((topfun
+		   (lambda (marks)
+		     ((lambda ()
+			((lambda ()
+			   (lambda () marks)))))))
+		  (chifun
+		   (lambda () (list topfun))))
+	   "Test."))))

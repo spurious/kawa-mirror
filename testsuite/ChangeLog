@@ -1,3 +1,8 @@
+2004-04-22  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  New testcase, simplified from psynjtax.pp
+	(pre-processed version of portable syntax case implementation).
+
 2004-02-21  Per Bothner  <per@bothner.com>
 
 	* num-tests.scm:  Add tests of Comparable numbers

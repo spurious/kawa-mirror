@@ -64,4 +64,21 @@ public abstract class AbstractFormat extends Procedure1or2 implements FormatToCo
     else
       out.writeObject(value);
   }
+
+  public final void writeObject (Object obj, PrintConsumer out)
+  {
+    writeObject(obj, (Consumer) out);
+  }
+
+  public final void writeObject (Object obj, java.io.Writer out)
+  {
+    if (out instanceof Consumer)
+      writeObject(obj, (Consumer) out);
+    else
+      {
+	OutPort port = new OutPort(out, false, true, "<unknown>");
+	writeObject(obj, (Consumer) out);
+	port.close();
+      }
+  }
 }

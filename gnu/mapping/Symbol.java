@@ -23,7 +23,7 @@ public class Symbol extends Location implements Externalizable
   }
 
   /** Find or create a symbol in a specificed environment.
-   * @param eviron can be an Environment, or a namespace/environment name
+   * @param environ can be an Environment, or a namespace/environment name
    *   (resolved using Environment.getInstance), or null (in which case
    *   an uninterned symbol is created.
    * @param name The "local name" or "print name" of the desired symbol.

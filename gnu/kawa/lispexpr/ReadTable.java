@@ -49,13 +49,10 @@ public class ReadTable extends RangeTable
     tab.set('.',  entry);
     tab.set('/',  entry);
     tab.set(':',  entry);
-    tab.set('<',  entry);
     tab.set('=',  entry);
     tab.set('>',  entry);
     tab.set('?',  entry);
     tab.set('@',  entry);
-    tab.set('[',  entry);
-    tab.set(']',  entry);
     tab.set('^',  entry);
     tab.set('_',  entry);
     tab.set('{',  entry);
@@ -68,17 +65,54 @@ public class ReadTable extends RangeTable
     tab.set(';',  ReaderIgnoreRestOfLine.getInstance());
     tab.set('(',  ReaderParens.getInstance('(', ')'));
 
-    // Scheme, CommonLisp only - Elisp has new ReaderVector(']')
-    // We want '[' to be non-terminating for the sake of say '<char[]>'.
-    tab.set('[',  ReaderParens.getInstance('[', ']',
-					   ReadTable.NON_TERMINATING_MACRO));
-
     tab.set('\'', new ReaderQuote(Interpreter.quote_sym));
     tab.set('`',  new ReaderQuote(Interpreter.quasiquote_sym));
     tab.set(',',  new ReaderQuote(Interpreter.unquote_sym,
 				 '@', Interpreter.unquotesplicing_sym));
+
+    tab.setBracketMode();  // Sets the entries for '[', ']', and '<'.
+
     return tab;
   }
+
+  /** Default value to pass to setBracketMode() unless overridden. */
+  public static int defaultBracketMode = -1;
+
+  /** Specify how '[' and ']' (and '<') are handled.
+   * The value - means that '[' and ']' are plain token constituents.
+   * The value 0 means that '[' and ']' are equivalent to '(' and ')'.
+   * The value 1 means that '[' and ']' are equivalent to '(' and ')', except
+   * within a token starting with '<', in which case they are constituents.
+   * This is so '[' is non-terminating when reading say '<char[]>'
+   */
+  public void setBracketMode(int mode)
+  {
+    if (mode <= 0)
+      {
+	ReadTableEntry token = ReadTableEntry.getConstituentInstance();
+	set('<', token);
+	if (mode < 0)
+	  {
+	    set('[', token);
+	    set(']', token);
+	  }
+      }
+    else
+      set('<', new ReaderTypespec());
+    if (mode >= 0)
+      {
+	set('[', ReaderParens.getInstance('[', ']'));
+	remove(']');
+      }
+  }
+
+  /** Specify how '[' and ']' are handled.
+   * Overless overridden, uses defaultBracketMode. */
+  public void setBracketMode()
+  {
+    setBracketMode(defaultBracketMode);
+  }
+  
 
   public static ReadTable getCurrent() { return current; }
 

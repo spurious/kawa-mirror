@@ -17,6 +17,7 @@ java_sources = \
   ReaderParens.java \
   ReaderQuote.java \
   ReaderString.java \
+  ReaderTypespec.java \
   ReaderVector.java \
   ReadTable.java \
   ReadTableEntry.java \

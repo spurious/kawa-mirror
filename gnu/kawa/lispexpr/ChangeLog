@@ -1,3 +1,13 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* ReaderTypespec.java:  New file from Bruce Lewis.
+	* Makefile.am (java_sources):  Added ReaderTypespec.java.
+	* ReadTable.java (setBracketMode):  New methods.
+	(defaultBracketMode):  New static field
+	(<init>):  Use new method.
+
+	* ScmRead.scm (<init>):  Revert change of 11-19.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* LispReader.scm (initialColonIsKeyword, finalColonIsKeyword):  New.

@@ -1,6 +1,6 @@
 package gnu.kawa.functions;
 import gnu.text.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.text.Format;
 import java.text.FieldPosition;
 import java.text.ParseException;
@@ -450,7 +450,7 @@ public class LispFormat extends CompoundFormat
       return (Object[]) arg;
     if (!(arg instanceof Sequence))
       return null;
-    int count = ((Sequence) arg).length();
+    int count = ((Sequence) arg).size();
     Object[] arr = new Object[count];
     int i = 0;
     while (arg instanceof Pair)
@@ -466,7 +466,7 @@ public class LispFormat extends CompoundFormat
 	int npairs = i;
 	Sequence seq = (Sequence) arg;
 	for (; i < count; i++)
-	  arr[i] = seq.elementAt(npairs + i);
+	  arr[i] = seq.get(npairs + i);
       }
     return arr;
   }

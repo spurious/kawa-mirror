@@ -1,5 +1,5 @@
 package gnu.kawa.functions;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;

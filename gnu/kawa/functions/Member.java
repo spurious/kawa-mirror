@@ -1,7 +1,7 @@
 package gnu.kawa.functions;
 import gnu.mapping.WrongType;
 import gnu.mapping.Procedure2;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class Member extends Procedure2
 {

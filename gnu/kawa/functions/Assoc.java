@@ -1,7 +1,7 @@
 package gnu.kawa.functions;
 import gnu.mapping.Procedure2;
 import gnu.mapping.WrongType;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class Assoc extends Procedure2
 {

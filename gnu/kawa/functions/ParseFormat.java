@@ -4,7 +4,7 @@ import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;
 import gnu.mapping.*;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 
 public class ParseFormat extends Procedure1
 {
@@ -225,8 +225,11 @@ public class ParseFormat extends Procedure1
 	else
 	  {
 	    InPort iport;
-	    if (arg instanceof FString) 
-	      iport = ((FString) arg).open(); 
+	    if (arg instanceof FString)
+	      {
+		FString str = (FString) arg;
+		iport = new CharArrayInPort(arg.data, arg.size);
+	      }
 	    else 
 	      iport = new CharArrayInPort(arg.toString()); 
 	    try

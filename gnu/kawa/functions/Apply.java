@@ -1,5 +1,5 @@
 package gnu.kawa.functions;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import gnu.mapping.*;
 
 /** Implement the standard Scheme function "apply".
@@ -26,7 +26,7 @@ public class Apply extends ProcedureN
 	last_count = last_arr.length;
       }
     else if (last instanceof Sequence)
-      last_count = ((Sequence)last).length();
+      last_count = ((Sequence)last).size();
     else
       last_count = -1;
     if (last_count < 0)
@@ -54,7 +54,7 @@ public class Apply extends ProcedureN
 	  {
 	    Sequence last_seq = (Sequence) last;
 	    for (int j = 0;  j < last_count; j++)
-	      proc_args[i++] = last_seq.elementAt(j);
+	      proc_args[i++] = last_seq.get(j);
 	  }
       }
     return proc_args;

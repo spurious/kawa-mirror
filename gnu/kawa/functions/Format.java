@@ -1,5 +1,5 @@
 package gnu.kawa.functions;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.text.MessageFormat;
 import gnu.text.ReportFormat;
 import gnu.mapping.*;

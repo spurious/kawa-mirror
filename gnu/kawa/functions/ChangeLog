@@ -1,3 +1,14 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* AddOp.java:  Implement Inlineable (in addition to CanInline).
+	If Target is expecting a primitive type(such as <int>) do the operation
+	using primitive arithmetic if safe.
+	(compile, getReturnType):  New methods.
+
+	* Apply.java, Assoc.java, Format.java, LispFormat.java, MakeList.java,
+	Member.java, ParseFormat.java:  Update LList.length->listLength,
+	elementAt->get, length->size, open.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* Apply.java (apply(CallContext)):  Use CallContext's getArgs method.

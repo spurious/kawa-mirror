@@ -21,7 +21,8 @@ JAR_DEPS_SWING = \
   ./gnu/jemacs/lisp/elisp-classes.stamp
 endif
 if ENABLE_XML
-JAR_DEPS_XML = ./gnu/xml/java-classes.stamp
+JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
+  ./gnu/xquery/lang/java-classes.stamp
 endif
 
 JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) \

@@ -1,3 +1,33 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.95.
+
+	* Makefile.am (JAR_DEPS_XML):  Add gnu/xquery/lang/java-classes.stamp.
+	* configure.in:  --with-awt defalts except if --with-gcj.
+	(LIBKAWA):  Automake conditional renamed to WITH_GCJ.
+	(WITH_AWT):  New automake conditional.
+	(AC_OUTPUT):  Add gnu/xquery/*/Makefile.
+
+	* kawa/Shell.java (run):  Use Interpreter's new getPropter method.
+	Use Interpreter's new interp.getOutputConsumer method.
+	Use Interpreter's new parse method.
+
+	* kawa/lang/CompileFile.java (read):  Don't take Translator arg,
+	instead allocate it locally, but take SOurceMessages arg.
+	(apply2):  Update accordingly.
+	* kawa/standard/load.java (loadSource):  Likewise.
+
+	* kawa/standard/Scheme.java:  Extend LispInterpreter.
+	(initScheme):  Add print-as-xml, make-element, make-attribute.
+	Various procedures have been moved or now use define_field.
+	* kawa/lang/Lambda.java (rewriteBody):  Update package of Consumer.
+	* kawa/lang/SyntaxRule.java:  Use Scheme.writeFrmat, instead of
+	semi-deprecated SFormat.print.
+
+	* kawa/lang/Translator.java (immediate):  Field moved up to Parser.
+	(scan_form):  Made public since called by LispInterpreter.
+	(push, pop, pushDecls, popDecls):  Moved from Parser.
+	
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (main):  Don't runCleanups at end if we succeeded

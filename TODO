@@ -128,7 +128,7 @@ Compile a module with top-level function definitions to a single class
 with methods.  More efficient when functions can be statically resolved.
 However less efficient otherwise, since need to use reflection interface.
 
-Implement pretty-printer, ideally in a way that works with AWT containers.
+Implement a pretty-printing AWT container.
 
 Complete R4RS procedures.
   trig functions for complex numbers
@@ -227,7 +227,6 @@ JDK1.2 TASKS - THINGS TO DO ONCE WE REQUIRE JAVA2
 
 Rewrite (make-temporary-file) to use File.createTempFile.
 
-Have kawa.lang.Sequence implement java.util.List.
 gnu.mapping.Binding should implement java.util.Map.Entry.
 
 Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).

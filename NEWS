@@ -1,5 +1,19 @@
 Changes from Kawa 1.6.92 to 1.6.94.
 ==================================
+A new language "xquery" implements a (so far small subset of) XQuery,
+the draft XML Query languaage.
+
+If configured with --with-gcj, Kawa builds and intalls a 'gckawa' script
+to simlify linking with needed libraries.
+
+The 'setter' function is now inlined, and '(set! (field X 'N) V)' and
+'(set! (static-field <T> "N) V)' are now inlined.
+
+If configured --with-gcj, then a gckawa helper script installed,
+to make it easier to link Kawa+gcj-compiled applications.
+
+Changes from Kawa 1.6.92 to 1.6.94.
+==================================
 The JEmacs code now depends on CommonLisp, rather than vice versa, which
 means Commonlisp no longer depends on Swing, and can be built with GCJ.
 CommonLisp and JEmacs symbols are now implemented using Binding, not String.

@@ -105,7 +105,7 @@ javadir = $(datadir)/java
 JAR = jar
 
 @WITH_SWING_TRUE@JAR_DEPS_SWING =   ./gnu/jemacs/buffer/java-classes.stamp   ./gnu/jemacs/buffer/scm-classes.stamp   ./gnu/jemacs/lang/java-classes.stamp   ./gnu/jemacs/lang/scm-classes.stamp   ./gnu/jemacs/lisp/elisp-classes.stamp
-@ENABLE_XML_TRUE@JAR_DEPS_XML = ./gnu/xml/java-classes.stamp
+@ENABLE_XML_TRUE@JAR_DEPS_XML = ./gnu/xml/java-classes.stamp   ./gnu/xquery/lang/java-classes.stamp
 
 JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML)   ./gnu/bytecode/java-classes.stamp   ./gnu/math/java-classes.stamp   ./gnu/lists/java-classes.stamp   ./gnu/text/java-classes.stamp   ./gnu/mapping/java-classes.stamp   ./gnu/expr/java-classes.stamp   ./gnu/kawa/util/java-classes.stamp   ./gnu/kawa/reflect/java-classes.stamp   ./gnu/kawa/functions/java-classes.stamp   ./gnu/kawa/lispexpr/java-classes.stamp   ./gnu/kawa/slib/scm-classes.stamp   ./gnu/ecmascript/java-classes.stamp   ./gnu/commonlisp/lang/java-classes.stamp   ./kawa/lang/java-classes.stamp   ./kawa/standard/java-classes.stamp   ./kawa/lib/scm-classes.stamp   ./kawa/java-classes.stamp
 

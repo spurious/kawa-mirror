@@ -19,7 +19,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --gjc    Compile Kawa using GCJ (GNU Compiler for Java)"
 ac_help="$ac_help
-  --enable-xml             Build support for XML processing"
+  --disable-xml            Don't build support for XML processing"
 ac_help="$ac_help
   --with-java-collections  Assume Java collections (java.util.List) is available"
 ac_help="$ac_help
@@ -719,7 +719,7 @@ fi
 
 PACKAGE=kawa
 
-VERSION=1.6.94
+VERSION=1.6.95
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1235,7 +1235,9 @@ fi
 # Check whether --enable-xml or --disable-xml was given.
 if test "${enable_xml+set}" = set; then
   enableval="$enable_xml"
-  :
+  enable_xml=$enableval
+else
+  enable_xml=yes
 fi
 
 
@@ -1272,7 +1274,7 @@ fi
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:1276: checking for a BSD compatible install" >&5
+echo "configure:1278: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1335,7 +1337,7 @@ case ${with_gcj} in
     JAVA=${JAVA-gij}
     JAVAC=${JAVAC-"gcj -C"}
     echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:1339: checking build system type" >&5
+echo "configure:1341: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -1361,7 +1363,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}gcj", so it can be a program name with args.
 set dummy ${ac_tool_prefix}gcj; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1365: checking for $ac_word" >&5
+echo "configure:1367: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_GCJ'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1393,7 +1395,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "gcj", so it can be a program name with args.
 set dummy gcj; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:1397: checking for $ac_word" >&5
+echo "configure:1399: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_GCJ'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1428,23 +1430,25 @@ fi
   test "x${GCJFLAGS+set}" = xset || GCJFLAGS="-g -O2"
   
 
+    test "${with_awt}" = "" && with_awt=no
     ;;
   *)
     GCJ_COMPILED_SELECTED=DISABLE_GCJ_COMPILED
     GCJ_SELECTED=WITHOUT_GCJ
     JAVA=${JAVA-java}
     JAVAC=${JAVAC-javac}
+    test "${with_awt}" = "" && with_awt=yes
     ;;
 esac
 
 
 
 if test "$with_gcj" = "yes"; then
-  LIBKAWA_TRUE=
-  LIBKAWA_FALSE='#'
+  WITH_GCJ_TRUE=
+  WITH_GCJ_FALSE='#'
 else
-  LIBKAWA_TRUE='#'
-  LIBKAWA_FALSE=
+  WITH_GCJ_TRUE='#'
+  WITH_GCJ_FALSE=
 fi
 
 
@@ -1463,6 +1467,15 @@ if test "$with_swing" = "yes"; then
 else
   WITH_SWING_TRUE='#'
   WITH_SWING_FALSE=
+fi
+
+
+if test "$with_awt" = "yes"; then
+  WITH_AWT_TRUE=
+  WITH_AWT_FALSE='#'
+else
+  WITH_AWT_TRUE='#'
+  WITH_AWT_FALSE=
 fi
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
@@ -1545,7 +1558,7 @@ ac_prog=ld
 if test "$GCC" = yes; then
   # Check if gcc -print-prog-name=ld gives a path.
   echo $ac_n "checking for ld used by GCC""... $ac_c" 1>&6
-echo "configure:1549: checking for ld used by GCC" >&5
+echo "configure:1562: checking for ld used by GCC" >&5
   case $host in
   *-*-mingw*)
     # gcc leaves a trailing carriage return which upsets mingw
@@ -1575,10 +1588,10 @@ echo "configure:1549: checking for ld used by GCC" >&5
   esac
 elif test "$with_gnu_ld" = yes; then
   echo $ac_n "checking for GNU ld""... $ac_c" 1>&6
-echo "configure:1579: checking for GNU ld" >&5
+echo "configure:1592: checking for GNU ld" >&5
 else
   echo $ac_n "checking for non-GNU ld""... $ac_c" 1>&6
-echo "configure:1582: checking for non-GNU ld" >&5
+echo "configure:1595: checking for non-GNU ld" >&5
 fi
 if eval "test \"`echo '$''{'lt_cv_path_LD'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1613,7 +1626,7 @@ else
 fi
 test -z "$LD" && { echo "configure: error: no acceptable ld found in \$PATH" 1>&2; exit 1; }
 echo $ac_n "checking if the linker ($LD) is GNU ld""... $ac_c" 1>&6
-echo "configure:1617: checking if the linker ($LD) is GNU ld" >&5
+echo "configure:1630: checking if the linker ($LD) is GNU ld" >&5
 if eval "test \"`echo '$''{'lt_cv_prog_gnu_ld'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1630,7 +1643,7 @@ with_gnu_ld=$lt_cv_prog_gnu_ld
 
 
 echo $ac_n "checking for $LD option to reload object files""... $ac_c" 1>&6
-echo "configure:1634: checking for $LD option to reload object files" >&5
+echo "configure:1647: checking for $LD option to reload object files" >&5
 if eval "test \"`echo '$''{'lt_cv_ld_reload_flag'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1642,7 +1655,7 @@ reload_flag=$lt_cv_ld_reload_flag
 test -n "$reload_flag" && reload_flag=" $reload_flag"
 
 echo $ac_n "checking for BSD-compatible nm""... $ac_c" 1>&6
-echo "configure:1646: checking for BSD-compatible nm" >&5
+echo "configure:1659: checking for BSD-compatible nm" >&5
 if eval "test \"`echo '$''{'lt_cv_path_NM'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1680,7 +1693,7 @@ NM="$lt_cv_path_NM"
 echo "$ac_t""$NM" 1>&6
 
 echo $ac_n "checking whether ln -s works""... $ac_c" 1>&6
-echo "configure:1684: checking whether ln -s works" >&5
+echo "configure:1697: checking whether ln -s works" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_LN_S'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1701,7 +1714,7 @@ else
 fi
 
 echo $ac_n "checking how to recognise dependant libraries""... $ac_c" 1>&6
-echo "configure:1705: checking how to recognise dependant libraries" >&5
+echo "configure:1718: checking how to recognise dependant libraries" >&5
 if eval "test \"`echo '$''{'lt_cv_deplibs_check_method'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1867,7 +1880,7 @@ case $deplibs_check_method in
 file_magic*)
   if test "$file_magic_cmd" = '$MAGIC_CMD'; then
     echo $ac_n "checking for ${ac_tool_prefix}file""... $ac_c" 1>&6
-echo "configure:1871: checking for ${ac_tool_prefix}file" >&5
+echo "configure:1884: checking for ${ac_tool_prefix}file" >&5
 if eval "test \"`echo '$''{'lt_cv_path_MAGIC_CMD'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1929,7 +1942,7 @@ fi
 if test -z "$lt_cv_path_MAGIC_CMD"; then
   if test -n "$ac_tool_prefix"; then
     echo $ac_n "checking for file""... $ac_c" 1>&6
-echo "configure:1933: checking for file" >&5
+echo "configure:1946: checking for file" >&5
 if eval "test \"`echo '$''{'lt_cv_path_MAGIC_CMD'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2000,7 +2013,7 @@ esac
 # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2004: checking for $ac_word" >&5
+echo "configure:2017: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2032,7 +2045,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "ranlib", so it can be a program name with args.
 set dummy ranlib; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2036: checking for $ac_word" >&5
+echo "configure:2049: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_RANLIB'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2067,7 +2080,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}strip", so it can be a program name with args.
 set dummy ${ac_tool_prefix}strip; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2071: checking for $ac_word" >&5
+echo "configure:2084: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_STRIP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2099,7 +2112,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "strip", so it can be a program name with args.
 set dummy strip; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2103: checking for $ac_word" >&5
+echo "configure:2116: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_STRIP'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2166,8 +2179,8 @@ test x"$pic_mode" = xno && libtool_flags="$libtool_flags --prefer-non-pic"
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 2170 "configure"' > conftest.$ac_ext
-  if { (eval echo configure:2171: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
+  echo '#line 2183 "configure"' > conftest.$ac_ext
+  if { (eval echo configure:2184: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
     case `/usr/bin/file conftest.$ac_objext` in
     *32-bit*)
       LD="${LD-ld} -32"
@@ -2188,7 +2201,7 @@ case $host in
   SAVE_CFLAGS="$CFLAGS"
   CFLAGS="$CFLAGS -belf"
   echo $ac_n "checking whether the C compiler needs -belf""... $ac_c" 1>&6
-echo "configure:2192: checking whether the C compiler needs -belf" >&5
+echo "configure:2205: checking whether the C compiler needs -belf" >&5
 if eval "test \"`echo '$''{'lt_cv_cc_needs_belf'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2201,14 +2214,14 @@ ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$a
 cross_compiling=$ac_cv_prog_cc_cross
 
      cat > conftest.$ac_ext <<EOF
-#line 2205 "configure"
+#line 2218 "configure"
 #include "confdefs.h"
 
 int main() {
 
 ; return 0; }
 EOF
-if { (eval echo configure:2212: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:2225: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   lt_cv_cc_needs_belf=yes
 else
@@ -2530,6 +2543,8 @@ trap 'rm -fr `echo "Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefil
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
+  gnu/xquery/Makefile gnu/xquery/lang/Makefile
+  gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -2591,12 +2606,14 @@ s%@build_vendor@%$build_vendor%g
 s%@build_os@%$build_os%g
 s%@GCJ@%$GCJ%g
 s%@GCJFLAGS@%$GCJFLAGS%g
-s%@LIBKAWA_TRUE@%$LIBKAWA_TRUE%g
-s%@LIBKAWA_FALSE@%$LIBKAWA_FALSE%g
+s%@WITH_GCJ_TRUE@%$WITH_GCJ_TRUE%g
+s%@WITH_GCJ_FALSE@%$WITH_GCJ_FALSE%g
 s%@ENABLE_XML_TRUE@%$ENABLE_XML_TRUE%g
 s%@ENABLE_XML_FALSE@%$ENABLE_XML_FALSE%g
 s%@WITH_SWING_TRUE@%$WITH_SWING_TRUE%g
 s%@WITH_SWING_FALSE@%$WITH_SWING_FALSE%g
+s%@WITH_AWT_TRUE@%$WITH_AWT_TRUE%g
+s%@WITH_AWT_FALSE@%$WITH_AWT_FALSE%g
 s%@LN_S@%$LN_S%g
 s%@RANLIB@%$RANLIB%g
 s%@STRIP@%$STRIP%g
@@ -2666,6 +2683,8 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile gnu/Makefile gnu/bytecode/Makefile gnu/ma
   gnu/jemacs/Makefile gnu/jemacs/lang/Makefile gnu/jemacs/buffer/Makefile
   gnu/jemacs/lisp/Makefile gnu/jemacs/testsuite/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
+  gnu/xquery/Makefile gnu/xquery/lang/Makefile
+  gnu/xquery/util/Makefile gnu/xquery/testsuite/Makefile
   doc/Makefile testsuite/Makefile bin/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

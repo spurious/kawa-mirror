@@ -214,8 +214,6 @@ java_sources = \
   IntegerRange.java \
   ItemAt.java \
   LastIndexOf.java \
-  MakeAttribute.java \
-  MakeElement.java \
   MinMax.java \
   NamedCollator.java \
   NumberValue.java \

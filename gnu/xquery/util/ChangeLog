@@ -1,3 +1,12 @@
+2004-12-22  Per Bothner  <per@bothner.com>
+
+	* MakeAttribute.java: Moved to gnu.kawa.xml.
+	* MakeElement.java: Likewise.
+	* Makefile.am: Update accordingly,
+	* QNameUtils.java (resolveQName): New helper method, used for xs:QName.
+	(makeQName): New implementation, for fn:QName.
+	(localNameFromQName, namespaceURIFromQName): Handle SName.
+
 2004-12-10  Per Bothner  <bothner@Per-Bothners-Computer.local>
 
 	* SequenceUtils.java: New class has sequence functions implementations.

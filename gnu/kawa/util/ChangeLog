@@ -1,3 +1,7 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* RangeTable.java (remove):  New methods.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* RangeTable.java:  New class.

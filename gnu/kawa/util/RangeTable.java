@@ -37,6 +37,26 @@ public class RangeTable implements Cloneable // extends map
     set(key, key, value);
   }
 
+  public void remove(int lo, int hi)
+  {
+    if (lo > hi)
+      return;
+    for (int i = lo;  ; i++)
+      {
+	if ((i & 127) == i)
+	  index[i] = null;
+	else
+	  hash.remove(new Integer(i));
+	if (i == hi)
+	  break;
+      }
+  }
+
+  public void remove(int key)
+  {
+    remove(key, key);
+  }
+
   public RangeTable copy()
   {
     RangeTable copy = new RangeTable();

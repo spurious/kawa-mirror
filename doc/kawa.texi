@@ -156,6 +156,38 @@ From the full expression language, Kawa additionally is missing
 Quantities, keyword values, and the expanded @code{lambda} form
 (with optional and keyword parameters) are supported.
 
+Kawa implements the following semi-standard SRFIs
+(@uref{http://srfi.schemers.org/,Scheme Request for Implementation}):
+@itemize
+@item
+SRFI 0: Feature-based conditional expansion construct,
+using @code{cond-expand} - @pxref{Syntax and conditional compilation}.
+@item
+SRFI 1: @uref{http://srfi.schemers.org/srfi-1/srfi-1.html,List Library}, if @code{(require 'list-lib)}.
+@item
+SRFI 4: Homogeneous numeric vector datatypes - @pxref{Uniform vectors}..
+@item
+SRFI 6: Basic String Ports - @pxref{Ports}.
+@item
+SRFI 8: @code{receive}: Binding to multiple values - @pxref{Multiple values}.
+@item
+SRFI 9: Defining Record Types, using @code{define-record-type}
+- @pxref{Record types}.
+@item
+SRFI 11: Syntax for receiving multiple values,
+using @code{let-values} and @code{let*-value} - @pxref{Multiple values}.
+@item
+SRFI 17: Generalized @code{set!} - @pxref{Locations}.
+@item
+SRFI 23: Error reporting mechanism, using @code{error} - @pxref{Exceptions}.
+@item
+SRFI 25: Multi-dimensional Array Primitives - @pxref{Arrays}.
+@item
+SRFI 28: Basic Format Strings - @pxref{Format}.
+@item
+SRFI 30: Nested Multi-line Comments.
+@end itemize
+
 @node Getting Kawa, Installation, Features, Top
 @chapter Getting Kawa
 
@@ -900,7 +932,7 @@ kawa --main -C myprog.scm
 
 You run it as follows:
 @example
-kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main | --spplet] -C @var{infile} ...
+kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main | --applet | --servlet] -C @var{infile} ...
 @end example
 
 Note the @samp{-C} must come last, because @samp{Kawa} processes the
@@ -1384,7 +1416,7 @@ The system uses certain internal properties:
 @code{'name} refers to the name used when a procedure is printed;
 @code{'emacs-interactive} is used to implement Emacs @code{interactive}
 specification;
-@code{'setter} will be (not yet implemented) used to associate a @code{setter} prcedure.
+@code{'setter} is used to associate a @code{setter} prcedure.
 
 @defun procedure-property proc key [default]
 Get the property value corresponding to the given @var{key}.
@@ -2136,9 +2168,7 @@ calls used in "lvalue context", such as the left operand of @code{set!}.
 
 You can only use procedures that have an associated @dfn{setter}.
 In that case, @code{(set! (f arg ...) value)}
-is equivalent to @code{((setter f) value arg ...)}
-(It is possible the definition will change
-to @code{((setter f) arg ... value)} if Guile goes for that.)
+is equivalent to @code{((setter f) arg ... value)}
 Currently, only a few procedures have associated @code{setter}s,
 and only builtin procedures written in Java can have @code{setter}s.
 

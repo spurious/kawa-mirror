@@ -195,6 +195,7 @@ convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java makeProcLocation.java location.java \
 ScmEnv.java Scheme.java \
+object.java field.java static_field.java \
 null_env.java \
 user_env.java \
 scheme_env.java
@@ -214,7 +215,7 @@ all: Makefile classjava.stamp
 
 .SUFFIXES:
 .SUFFIXES: .class .java
-$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus kawa/standard/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status

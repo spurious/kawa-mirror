@@ -22,12 +22,6 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
 
   static public final LList Empty = new LList ();
 
-  public void print(java.io.PrintWriter ps)
-  {
-    // Gets overridden for Pair.
-    ps.print("()");
-  }
-
   /**
    * A safe function to count the length of a list.
    * @param obj the putative list to measure
@@ -297,24 +291,23 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
   public void consume(Consumer out)
   {
     Object list = this;
-    String typeName = "#list";
+    String typeName = "list";
     String type = typeName;
     out.beginGroup(typeName, type);
     out.endAttributes();
     while (list instanceof Pair)
       {
+	if (list != this)
+	  out.writeChar(' ');
 	Pair pair = (Pair) list;
 	out.writeObject(pair.car);
 	list = pair.cdr;
       }
     if (list != Empty)
       {
-	String cdrName = "#cdr";
-	Object cdrType = cdrName;
-	out.beginGroup(cdrName, cdrType);
-	out.endAttributes();
+	out.writeChar(' ');
+	out.writeChars(". ");
 	out.writeObject(list);
-	out.endGroup(cdrName);
       }
     out.endGroup(typeName);
   }

@@ -5475,16 +5475,16 @@ uses Kawa in a prototypal
 intranet 3tier information retrival system as a communication protocol
 between server and clients and to do server agents programming.
 
-The Nice Programming Language is an open source research language that
-has a Java-like syntax.
-It features multiple dispatch methods, parametric types, higher-order
-functions, tuples, ..., and the new concept of "abstract interfaces". 
+The Nice Programming Language is a new open source language with a
+Java-like syntax. It features multiple dispatch, parametric types,
+higher-order functions, tuples, optional parameters, safe static typing
+of @code{null}, ..., and the new concept of "abstract interfaces".
 The Nice compiler (@code{nicec}) uses Kawa's @code{gnu.expr}
 and @code{gnu.bytecode}
-packages to generate Java bytecode. 
+packages to generate Java bytecode.
 You can find more about Nice at @uref{http://nice.sourceforge.net}.
 For more information feel free to contact
-Daniel Bonniot (@w{@code{d.bonniot@@mail.dotcom.fr}}).
+Daniel Bonniot @email{bonniot@@users.sf.net}).
 
 @node License, Overall Index, Projects, Top
 @chapter License

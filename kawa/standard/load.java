@@ -20,7 +20,7 @@ public class load extends Procedure1 {
   }
 
   public static final load load = new load("load", false);
-  public static final load loadRlative = new load("load-relative", true);
+  public static final load loadRelative = new load("load-relative", true);
 
   /** Load using the name of a compile .class file. */
   /* This should probably be re-written to use a ClassLoader, unless '.'

@@ -166,13 +166,11 @@ public class DFloNum extends RealNum implements Compilable
       bits <<= 1;
     else
       bits |= 0x10000000000000L;
-    IntNum two = IntNum.make(2);
-    RatNum result;
+    IntNum mant = IntNum.make (neg ? -bits : bits);
     if (exp >= 1075)
-      result = IntNum.power (two, exp - 1075);
+      return IntNum.shift (mant, exp - 1075);
     else
-      result = new IntFraction (IntNum.one(), IntNum.power (two, 1075 - exp));
-    return RatNum.times (IntNum.make (neg ? -bits : bits), result);
+      return RatNum.make (mant, IntNum.shift (IntNum.one(), 1075 - exp));
   }
 
   public String toString ()

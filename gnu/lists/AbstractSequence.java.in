@@ -502,6 +502,21 @@ public abstract class AbstractSequence
     return nextIndex(ipos, xpos) != size();
   }
 
+  protected int getNextKind(int ipos, Object xpos)
+  {
+    return hasNext(ipos, xpos) ? Sequence.OBJECT_VALUE : Sequence.EOF_VALUE;
+  }
+
+  protected String getNextTypeName(int ipos, Object xpos)
+  {
+    return null;
+  }
+
+  protected Object getNextTypeObject(int ipos, Object xpos)
+  {
+    return null;
+  }
+
   /** Called by SeqPosition.hasPrevious. */
   protected boolean hasPrevious(int ipos, Object xpos)
   {

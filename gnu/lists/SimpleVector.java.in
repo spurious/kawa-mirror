@@ -332,4 +332,14 @@ public abstract class SimpleVector extends AbstractSequence implements Sequence
     for (;  i < end;  i++)
       out.writeObject(getBuffer(i));
   }
+
+  protected int getNextKind(int ipos, Object xpos)
+  {
+    return hasNext(ipos, xpos) ? getElementKind() : EOF_VALUE;
+  }
+
+  public int getElementKind()
+  {
+    return OBJECT_VALUE;
+  }
 }

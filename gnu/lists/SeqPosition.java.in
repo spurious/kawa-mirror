@@ -131,6 +131,24 @@ implements
     return sequence.hasNext(ipos, xpos);
   }
 
+  /** Return a code (defined in Sequence) for the type of the next element. */
+  public int getNextKind()
+  {
+    return sequence.getNextKind(ipos, xpos);
+  }
+
+  /** Get the "tag name" for the next element, if any. */
+  public String getNextTypeName()
+  {
+    return sequence.getNextTypeName(ipos, xpos);
+  }
+
+  /** Get the "tag object" for the next element, if any. */
+  public Object getNextTypeObject()
+  {
+    return sequence.getNextTypeObject(ipos, xpos);
+  }
+
   /** See java.util.Iterator. */
   public boolean hasPrevious()
   {

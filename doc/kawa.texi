@@ -68,7 +68,7 @@ but it is not very actively updated.
 A new repository has been started at
 @uref{http://www.schemers.org/,www.schemers.org}.
 It includes pointer to an online copy of
-@uref{http://www.schemers.org/Documents/#standards,R5RS}.
+@uref{http://www.schemers.org/Documents/Standards/,R5RS}.
 
 A nice quick introduction to Scheme can be found in
 @uref{http://www.cs.washington.edu/education/courses/341/99su/lectures/scheme/,Greg Badros's lecture notes}.  A more in-depth tutorial which also
@@ -2954,7 +2954,8 @@ People have asked what the Kawa license means in practice.
 Informally, you get to pick between these choices:
 @enumerate
 @item
-Use Kawa as distributed by Per Bothner (or his approved agents),
+Use Kawa as distributed by Per Bothner, Cygnus Solutions, or the
+Free Software Foundation (or their approved agents),
 with no modifications.  In that case, you can use Kawa for any
 purpose you like, and distribute your application with any license
 you like.  (This basically gives you the same rights as
@@ -2977,7 +2978,7 @@ and convince him to include them in future Kawa releases.
 You can negotiate some other (commercial) license with Per Bothner.
 @end enumerate
 
-In general, If the license of Kawa or asociated packages causes
+In general, if the license of Kawa or associated packages causes
 difficulties, let me know.
 
 @section Copyright for this manual

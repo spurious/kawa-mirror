@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS = cygnus
 
+SUFFIXES = .pdf
+
 kawa.txt:  $(srcdir)/kawa.texi version.texi
 	$(MAKEINFO) -I$(srcdir) \
 	    --no-split --no-headers --paragraph-indent=asis $< -o - \
@@ -16,6 +18,12 @@ $(KAWA_HTMLS):  $(srcdir)/kawa.texi version.texi
 	texi2html -menu -split_chapter $<
 kawa.html: kawa_toc.html
 GENERATED_HTML = $(KAWA_HTMLS)
+
+TEXI2PDF = texi2pdf
+
+.texi.pdf:
+	TEXINPUTS=$(top_srcdir)/../texinfo/texinfo.tex:$$TEXINPUTS \
+	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2PDF) $<
 
 man_MANS = kawa.1
 kawa.1: kawa.man

@@ -1,3 +1,8 @@
+2000-01-23  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Some minor fixes.
+	* Makefile.am:  Add rule to generate pdf files using texi2pdf.
+
 1999-12-06  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Scheme types in Java):  Fix kawa.math -> gnu.math.

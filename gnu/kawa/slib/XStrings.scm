@@ -5,7 +5,8 @@
       #!void
       (let* ((s :: <java.lang.String> string)
 	     (slen :: <int> (invoke s 'length))
-	     (index :: <int> start)
+	     (sindex :: <int> start)
+	     (index :: <int> (- sindex 1))
 	     (len :: <int> length)
 	     (avail :: <int> (- slen index))
 	     (rlen :: <int> (if (> len avail) avail len)))

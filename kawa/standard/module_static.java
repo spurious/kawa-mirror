@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.lists.*;
+import gnu.mapping.*;
 
 public class module_static extends Syntax
 {
@@ -25,6 +26,24 @@ public class module_static extends Syntax
 	  ((ModuleExp) defs).setFlag(ModuleExp.NONSTATIC_SPECIFIED);
 	else
 	  ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
+      }
+    else if (list instanceof Pair
+             && (st = (Pair) list).cdr == LList.Empty
+             && st.car instanceof Pair
+             && tr.matches((st = (Pair) st.car).car, Scheme.quote_sym))
+      {
+        if ((st = (Pair)st.cdr) != LList.Empty
+            && st.car == "init-run")
+          {
+            // (module-static 'init-run) implies (module-static #t)
+            ((ModuleExp) defs).setFlag(ModuleExp.STATIC_SPECIFIED);
+            ((ModuleExp) defs).setFlag(ModuleExp.STATIC_RUN_SPECIFIED);
+          }
+          else
+          {
+            tr.error('e', "invalid quoted symbol for '" + getName() + '\'');
+            return false;
+          }
       }
     else
       {

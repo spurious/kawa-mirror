@@ -20,7 +20,8 @@ public class ModuleExp extends LambdaExp
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
   public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
-  public static final int LAZY_DECLARATIONS = SUPERTYPE_SPECIFIED << 11;
+  public static final int STATIC_RUN_SPECIFIED = SUPERTYPE_SPECIFIED << 1;
+  public static final int LAZY_DECLARATIONS = STATIC_RUN_SPECIFIED << 1;
 
   public String getJavaName ()
   {
@@ -299,7 +300,9 @@ public class ModuleExp extends LambdaExp
   /** True if module body (i.e. run) is called by class initializer. */
   public boolean staticInitRun ()
   {
-    return Compilation.moduleStatic == 2 && isStatic();
+    return (isStatic()
+            && (getFlag(STATIC_RUN_SPECIFIED)
+                || Compilation.moduleStatic == 2));
   }
 
   void allocFields (Compilation comp)

@@ -1,3 +1,8 @@
+2005-03-31  Dean Ferreyra <dferreyra@igc.org>
+	    Per Bothner  <per@bothner.com>
+
+	* kawa/standard/module_static.java: Recognize (module-static 'init-run).
+
 2005-03-29  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (scanForm): Don't need set save/set/restore

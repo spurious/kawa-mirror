@@ -8,7 +8,7 @@ public class negative_p extends Procedure1
 {
   public Object apply1 (Object arg1)
    {
-     if (((RealNum)arg1).sign () == -1)
+     if (((RealNum)arg1).isNegative())
        return Interpreter.trueObject;
      else
        return Interpreter.falseObject;

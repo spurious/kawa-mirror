@@ -92,7 +92,7 @@ public class load extends Procedure1 {
     // So instead, we read and evaluate each line individually.
     if (true)
       {
-	kawa.Shell.run (port, env, false, false);
+	kawa.Shell.run (port, env, null, false);
 	return Scheme.voidObject;
       }
     else

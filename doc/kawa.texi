@@ -122,12 +122,12 @@ The current sources release is in
 @url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz}.
 @end ifclear
 
-The pre-compiled @code{.class} files are in
+A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip}.
 @end ifclear
 
 @c A snapshot of the development tree is
@@ -207,19 +207,17 @@ source release in addition to the binary release.  The purpose
 of the binary release is just to save you time and trouble of
 compiling the sources.
 
-The binary release comes as a gzip-compressed tar file named
-@samp{kawa-@value{VERSION}-compiled.tar.gz}.
+The binary release comes as a @code{.zip} archive
+@samp{kawa-@value{VERSION}-compiled.zip}.
 
-You need to decide where you want to put the Kawa @samp{.class} files.
-Assuming it is @samp{/usr/local/java} (the default), you can do:
-@example
-gunzip -c <kawa-@value{VERSION}-compiled.tar.gz|(cd /usr/local/java; tar xf -)
-@end example
+You can unzip the archive, or you can use it as is.
+Assuming the latter, copy the archive to some suitable location,
+such as @code{/usr/local/lib/kawa-compiled.zip}.
 
 Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
-so it includes the Kawa files.  For example:
+so it includes the Kawa archive.  For example:
 @example
-export CLASSPATH=.:/usr/local/java:$JDK/lib/classes.zip
+export CLASSPATH=.:/usr/local/lib/kawa-compiled.zip:$JDK/lib/classes.zip
 @end example
 
 Then to run Kawa do:

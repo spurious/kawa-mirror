@@ -4,7 +4,7 @@ import gnu.lists.*;
 import gnu.expr.*;
 import java.util.Vector;
 
-public class Q2Apply extends CpsProcedure
+public class Q2Apply extends MethodProc
 {
   public static Q2Apply q2Apply = new Q2Apply();
 

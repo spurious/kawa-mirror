@@ -1,3 +1,7 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* obj-test.scm:  Change expected result.
+
 2001-02-28  Per Bothner  <per@bothner.com>
 
 	* module1.scm (classify):  New procedure, used to cause VerifyError.

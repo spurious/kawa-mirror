@@ -160,4 +160,4 @@
 (require <module1>)
 (test 4 list-length-1 '(a b c d))
 (test 2 list-length-3 '(a b))
-(test 1 length (classify))
+(test 0 length (classify))

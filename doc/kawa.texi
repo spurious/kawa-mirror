@@ -162,7 +162,8 @@ Alternatively, you can install the pre-compiled binary distribution.
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) version 1.0.x from JavaSoft (Sun).
-(@emph{Note:} Kawa does run under JDK 1.1 beta3!)
+(@emph{Note:} Kawa is @emph{not} supported on JDK 1.1 beta3,
+due to bugs in the latter!)
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
@@ -203,7 +204,7 @@ The binary release includes only the binary compiled @samp{.class}
 versions of the same @samp{.java} source files in the source release.
 It does not include any documentation, so you probably want the
 source release in addition to the binary release.  The purpose
-of the binary release is just to save you time and trouble
+of the binary release is just to save you time and trouble of
 compiling the sources.
 
 The binary release comes as a gzip-compressed tar file named
@@ -302,7 +303,15 @@ Then you do:
 java kawa.repl
 @end example
 
-You will then get the @samp{kawa>} prompt, which means you are
+If you running Kawa on a Unix-like system, you can
+use the @code{kawa} shell script.  If you have installed
+it in your @code{PATH} (i.e. @code{$PREFIX/bin} is in your @code{$PATH}),
+just do:
+@example
+kawa
+@end example
+
+In either case, you will then get the @samp{kawa>} prompt, which means you are
 in the Kawa read-eval-print-loop.  If you type a Scheme
 expression, Kawa will evaluate it.  Kawa will then print the
 result (if there is a non-"void" result).
@@ -312,7 +321,7 @@ or call the @code{exit} procedure (with 0 or 1 integer arguments).
 
 You can pass various flags to Kawa, for example:
 @example
-java kawa -e '(display (+ 12 4))(newline)'
+java kawa.repl -e '(display (+ 12 4))(newline)'
 @end example
 This causes Kawa to print @samp{16}, and then exit.
 
@@ -349,8 +358,8 @@ which is a vector of strings.
 The file Compliance.html specifies which functions and syntax
 have been implemented so far.
 
-Of the "numeric tower", exact rationals (integers and fractions),
-and double-precision floats are implemented.
+The entire "numeric tower" is implemented.
+However, some transcendental function only work on reals.
 Integral function do not necessarily work on
 inexact (floating-point) integers.
 (The whole idea of "inexact integer" in R4RS seems rather pointless ...)
@@ -367,6 +376,10 @@ This means the procedure must be defined using a letrec, not a
 define (because the compiler does not know if someone might
 re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
+
+The @code{define-syntax} primitive is provided, but has some bugs
+making it not properly hygienic.  Neither @code{let-syntax}
+nor @code{letrec-syntax} are implemented.
 
 @node Extensions, Compiling, Restrictions, Top
 @section Extensions
@@ -500,7 +513,51 @@ This procedure return an environment that contains implementation-defined
 bindings, as well as top-level user bindings.
 @end defun
 
+@subsection Quantities
+
+As a super-class of numbers, Kawa also provides quantities.
+A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
+The number part can be an arbitrary complex number.
+The unit is a product of integer powers of base units,
+such as meter or second.
+
+Kawa quantities are a generalization of the quantities in DSSSL,
+which only has length-derived quantities.
+
+The precise syntax of quantity literals may change,
+but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
+and @code{4cm2} (4 square centimeters).
+
+@defun quantity? object
+True iff @var{object} is a quantity.  Note that all numbers are
+quantities, but not the other way round.
+@end defun
+
+@defun quantity->number q
+Returns the pure number part of the quantity @var{q}, relative to
+primitive (base) units.
+If @var{q} is a number, returns @var{q}.
+If @var{q} is a unit, yields the magitude of @var{q} relative to base units.
+@end defun
+
+@defun quantity->unit q
+Returns the unit of the quantity @var{q}.
+If @var{q} is a number, returns the empty unit.
+@end defun
+
+@defun make-quantity x unit
+Returns the product of @var{x} (a pure number) and @var{unit}.
+You can specify a string instead of @var{unit}, such as @code{"cm"}
+or @var{"s"} (seconds).
+@end defun
+
 @subsection Miscellaneous
+
+@defun sleep time
+Suspends the current thread for the specified time.
+The @var{time} can be either a pure number (in secords),
+or a quantity whose unit is a time unit (such as @code{10s}).
+@end defun
 
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.

@@ -2,10 +2,10 @@ package gnu.jemacs.buffer;
 import gnu.mapping.*;
 
 /**
- * A Constraint on a Symbol that implements a buffer-local variable.
+ * A buffer-local variable (Location).
  */
 
-public class BufferLocal extends IndirectableLocation
+public class BufferLocal extends NamedLocation
 {
   boolean all;
 
@@ -31,12 +31,14 @@ public class BufferLocal extends IndirectableLocation
 	return;
       }
     BufferLocal bloc = new BufferLocal(symbol, all);
+    bloc.base = base;
     env.addLocation(bloc);
   }
 
   public Object get (Object defaultValue)
   {
-    return get(Buffer.getCurrent(), defaultValue);
+    Buffer buffer = Buffer.getCurrent();
+    return buffer == null ? base.get(defaultValue) : get(buffer, defaultValue);
   }
 
   public Object get (Buffer buffer, Object defaultValue)
@@ -69,7 +71,8 @@ public class BufferLocal extends IndirectableLocation
 
   public boolean isBound ()
   {
-    return isBound(Buffer.getCurrent());
+    Buffer buffer = Buffer.getCurrent();
+    return buffer == null ? base.isBound() : isBound(buffer);
   }
 
   public boolean isBound (Buffer buffer)
@@ -102,7 +105,11 @@ public class BufferLocal extends IndirectableLocation
 
   public synchronized final void set (Object newValue)
   {
-    set(Buffer.getCurrent(), newValue);
+    Buffer buffer = Buffer.getCurrent();
+    if (buffer == null)
+      base.set(newValue);
+    else
+      set(buffer, newValue);
   }
 
   public synchronized final void set (Buffer buffer, Object newValue)

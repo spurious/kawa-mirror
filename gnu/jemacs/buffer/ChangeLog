@@ -1,3 +1,8 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* BufferLocal.java (make): Set base field.
+	(isBound, get, set): Make robust in case there is no current Buffer.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	* BufferLocalConstraint.java: Remove class, replaced by:

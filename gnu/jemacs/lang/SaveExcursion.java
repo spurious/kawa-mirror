@@ -6,6 +6,7 @@ import gnu.kawa.util.*;
 import gnu.bytecode.*;
 import gnu.jemacs.buffer.*;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.util.AbstractString;
 
 public class SaveExcursion extends Syntax
 {
@@ -76,7 +77,7 @@ public class SaveExcursion extends Syntax
    * Returns a pair (packed in a long) of buffer posistions. */
   public static long savePointMark(Buffer buffer)
   {
-    BufferContent content = buffer.getContent();
+    AbstractString content = buffer.getStringContent();
     int pointPosition = content.createPosition(buffer.getDot(),
 					       BufferContent.EMACS_MARK_KIND);
     int markPosition = 0;  // FIXME
@@ -86,7 +87,7 @@ public class SaveExcursion extends Syntax
   public static void restoreBufferPointMark(Buffer buffer, long pointMark)
   {
     Buffer.setCurrent(buffer);
-    BufferContent content = buffer.getContent();
+    AbstractString content = buffer.getStringContent();
     int pointPosition = (int) pointMark;
     int markPosition = (int) (pointMark >> 32);
     buffer.setDot(content.getPositionOffset(pointPosition));

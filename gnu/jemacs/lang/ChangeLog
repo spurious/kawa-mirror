@@ -1,5 +1,8 @@
 2000-05-22  Per Bothner  <per@bothner.com>
 
+	* SaveExcursion.java (savePointMark, restoreBufferPointMark):  Use
+	new getStringContent in Buffer.
+
 	* ELisp.java (getTypeFor):  New method.
 
 2000-05-09  Per Bothner  <per@bothner.com>

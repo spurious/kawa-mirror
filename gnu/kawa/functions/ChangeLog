@@ -1,3 +1,12 @@
+2002-06-10  Per Bothner  <per@bothner.com>
+
+	* Arrays.java:  Various methods for implementing SRFI-25 arrays.
+	* ArrayRef.java:  New class, extends ProcedureN.
+	* ArraySet.java:  New class, extends ProcedureN.
+	* Makefile.am:  Update accordingly.
+	* DisplayFormat.java (writeObject):  Handle printing Array objects.
+	(write(Array,int,int,Consumer)):  New recursive helper method.
+
 2002-05-06  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java:  Implement CanInline.

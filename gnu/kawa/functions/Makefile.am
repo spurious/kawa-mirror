@@ -6,6 +6,9 @@ java_sources=\
   AddOp.java \
   AppendValues.java \
   Apply.java \
+  Arrays.java \
+  ArrayRef.java \
+  ArraySet.java \
   ConstantFunction0.java \
   Convert.java \
   CountValues.java \

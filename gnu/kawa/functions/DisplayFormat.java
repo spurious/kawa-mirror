@@ -91,7 +91,6 @@ public class DisplayFormat extends AbstractFormat
     out.endLogicalBlock(")");
   }
 
-
   public void writeObject(Object obj, Consumer out)
   {
     if (obj instanceof Boolean)
@@ -149,6 +148,10 @@ public class DisplayFormat extends AbstractFormat
 	else
 	  write (end, out);
       }
+    else if (obj instanceof Array)
+      {
+	write((Array) obj, 0, 0, out);
+      }
     else if (obj instanceof Consumable)
       ((Consumable) obj).consume(out);
     else if (obj instanceof Printable && out instanceof PrintWriter)
@@ -157,5 +160,49 @@ public class DisplayFormat extends AbstractFormat
       write("#!null", out);
     else
       write (obj.toString(), out);
+  }
+
+  /** Recursive helper method for writing out Array (sub-) objects.
+   * @param array the Array to write out (part of).
+   * @param index the row-major index to start
+   * @param level the recurssion level, from 0 to array.rank()-1.
+   * @param out the destination
+   */
+  int write(Array array, int index, int level, Consumer out)
+  {
+    int rank = array.rank();
+    int count = 0;
+    String start = level > 0 ? "("
+      : rank == 1 ? "#("
+      : "#" + rank + "a(";
+    if (out instanceof OutPort)
+      ((OutPort) out).startLogicalBlock(start, false, ")");
+    else
+      write (start, out);
+    if (rank > 0)
+      {
+	int size = array.getSize(level);
+	level++;
+	for (int i = 0;  i < size;  i++)
+	  {
+	    if (i > 0 && out instanceof OutPort)
+	      ((OutPort) out).writeSpaceFill();
+	    int step;
+	    if (level == rank)
+	      {
+		writeObject(array.getRowMajor(index), out);
+		step = 1;
+	      }
+	    else
+	      step = write(array, index, level, out);
+	    index += step;
+	    count += step;
+	  }
+      }
+    if (out instanceof OutPort)
+      ((OutPort) out).endLogicalBlock(")");
+    else
+      write(")", out);
+    return count;
   }
 }

@@ -1,3 +1,8 @@
+2002-01-02  Per Bothner  <per@bothner.com>
+
+	* NumberValue.java:  New class, extends Procedure1.
+	* Makefile.am (java_sources):  Add NumberValue.java.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* ElementType.java:  New class, extends NodeType, implements TypeValue.

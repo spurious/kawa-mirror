@@ -17,6 +17,7 @@ java_sources = \
   MakeElement.java \
   NamedChildren.java \
   NodeType.java \
+  NumberValue.java \
   StringValue.java \
   SubList.java \
   ValuesFilter.java \

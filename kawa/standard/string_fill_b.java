@@ -21,6 +21,6 @@ public class string_fill_b extends Procedure2
 
     for (int t=0; t<len; t++)
       str.setCharAt(t,c);
-    return str;
+    return Interpreter.voidObject;
   }
 }

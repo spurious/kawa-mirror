@@ -21,6 +21,6 @@ public class vector_fill_b extends Procedure2
      for (int t=0; t<len; t++) {
         v.setElementAt(arg2,t);
      }
-     return v;
+    return Interpreter.voidObject;
   }
 }

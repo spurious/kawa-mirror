@@ -19,6 +19,6 @@ public class vector_set_b extends Procedure3
       {
 	throw new kawa.lang.GenericError("vector index out of bounds.");
       }
-    return Interpreter.undefinedObject;
+    return Interpreter.voidObject;
   }
 }

@@ -5,6 +5,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.kawa.util.*;
+import gnu.kawa.lispexpr.LispReader;
 
 /** Procedure to read and compile and entire file.
  * Creates a .zip archive containing the resulting classes.
@@ -42,7 +43,7 @@ public class CompileFile extends Procedure2
     Object body = null;
     try
       {
-	gnu.text.LispReader lexer = (gnu.text.LispReader)
+	LispReader lexer = (LispReader)
 	  Interpreter.getInterpreter().getLexer(port, messages);
 	body = lexer.readListBody ();
 	if (port.peek() == ')')
@@ -71,7 +72,7 @@ public class CompileFile extends Procedure2
     tr.push(mexp);
     try
       {
-	gnu.text.LispReader lexer = (gnu.text.LispReader) Interpreter.getInterpreter().getLexer(port, messages);
+	LispReader lexer = (LispReader) Interpreter.getInterpreter().getLexer(port, messages);
         for (;;)
           {
 	    Object sexp = lexer.readObject(); // FIXME

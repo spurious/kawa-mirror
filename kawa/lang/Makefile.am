@@ -11,8 +11,6 @@ GenericError.java\
 NamedException.java
 
 java_JAVA=\
-ScmRead.java \
-\
 Pattern.java \
 AnyPat.java \
 EqualPat.java \

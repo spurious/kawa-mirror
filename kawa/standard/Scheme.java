@@ -7,8 +7,8 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.Hashtable;
 import gnu.text.SourceMessages;
-import gnu.text.CharArrayInPort;
 import gnu.kawa.util.*;
+import gnu.kawa.lispexpr.*;
 
 public class Scheme extends Interpreter
 {

@@ -1,6 +1,7 @@
 package kawa;
 
 import kawa.lang.*;
+import gnu.kawa.lispexpr.LispReader;
 import kawa.standard.*;
 import gnu.mapping.*;
 import gnu.expr.*;
@@ -48,7 +49,7 @@ public class Shell
 	    lexer.clearErrors();
 	    PairWithPosition body = new PairWithPosition(inp,
 							 null, LList.Empty);
-	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
+	    Object sexp = ((LispReader) lexer).readObject(); // FIXME
 
             // Skip whitespace, in case somebody calls (read-char) or similar.
             for (;;)

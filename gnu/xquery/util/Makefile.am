@@ -15,6 +15,7 @@ java_sources = \
   NamedChildren.java \
   NodeType.java \
   StringValue.java \
+  ValuesFilter.java \
   XMLFormat.java
 
 PACKAGE_FNAME = gnu-xquery-util

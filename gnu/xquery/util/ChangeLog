@@ -1,3 +1,14 @@
+2001-11-01  Per Bothner  <per@bothner.com>
+
+	* ValuesFilter.java:  New class, extends CpsProcedure.
+	* Makefile.am (java_sources):  Added ValuesFilter.java.
+
+	* NamedChildren.java (compile):  If namespaceURI and localName are
+	constant, don't recompile them to a variable.
+
+	* NamedChildren.java (compile):  Remove pushScope/popScope ad it can
+	cause register clobbering due to use complex jsr-based control flow.
+
 2001-10-25  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java (compile):  Optimize for SeriesTarget.

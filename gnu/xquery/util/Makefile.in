@@ -110,6 +110,7 @@ java_sources = \
   NamedChildren.java \
   NodeType.java \
   StringValue.java \
+  ValuesFilter.java \
   XMLFormat.java
 
 

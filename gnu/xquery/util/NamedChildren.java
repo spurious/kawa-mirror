@@ -159,16 +159,26 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       {
 	CodeAttr code = comp.getCode();
 
-	code.pushScope();
 	Variable child = code.addLocal(typeSeqPosition);
 	Type retAddrType = Type.pointer_type;
 	Variable retAddr = code.addLocal(retAddrType);
-	Variable namespaceURIVar = code.addLocal(comp.typeString);
-	args[1].compile(comp, comp.typeString);
-	code.emitStore(namespaceURIVar);
-	Variable localNameVar = code.addLocal(comp.typeString);
-	args[2].compile(comp, comp.typeString);
-	code.emitStore(localNameVar);
+	Variable namespaceURIVar, localNameVar;
+	if (args[1] instanceof QuoteExp)
+	  namespaceURIVar = null;
+	else
+	  {
+	    namespaceURIVar = code.addLocal(comp.typeString);
+	    args[1].compile(comp, comp.typeString);
+	    code.emitStore(namespaceURIVar);
+	  }
+	if (args[2] instanceof QuoteExp)
+	  localNameVar = null;
+	else
+	  {
+	    localNameVar = code.addLocal(comp.typeString);
+	    args[2].compile(comp, comp.typeString);
+	    code.emitStore(localNameVar);
+	  }
 
 	SeriesTarget pathTarget = new SeriesTarget();
 	pathTarget.function = new Label(code);
@@ -188,8 +198,14 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	Label nextChildLoopTop = new Label(code);
 	nextChildLoopTop.define(code);
 	code.emitLoad(child);
-	code.emitLoad(namespaceURIVar);
-	code.emitLoad(localNameVar);
+	if (namespaceURIVar == null)
+	  args[1].compile(comp, comp.typeString);
+	else
+	  code.emitLoad(namespaceURIVar);
+	if (localNameVar == null)
+	  args[2].compile(comp, comp.typeString);
+	else
+	  code.emitLoad(localNameVar);
 	code.emitInvokeStatic(getNamedChildMethod);
 	Label ok = new Label(code);
 	code.emitGotoIfIntNeZero(ok);
@@ -201,8 +217,6 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	code.emitLoad(child);
 	code.emitInvokeStatic(gotoNextMethod);
 	code.emitGoto(nextChildLoopTop);
-
-	code.popScope();
 	pathTarget.done.define(code);
 	return;
       }

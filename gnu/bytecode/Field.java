@@ -117,4 +117,36 @@ public class Field extends Location implements AttrContainer {
     return next;
   }
 
+  /** Set the ConstantValue attribute for this field.
+   * @param value the value to use for the ConstantValue attribute
+   *   of this field
+   * @param ctype the class that contains this field
+   * This field's type is used to determine the kind of constant.
+   */
+  public final void setConstantValue (Object value, ClassType ctype)
+  {
+    ConstantPool cpool = ctype.getConstants();
+    char sig1 = getType().getSignature().charAt(0);
+    CpoolEntry entry;
+    switch (sig1)
+      {
+      case 'C':
+      case 'Z':
+      case 'B':
+      case 'S':
+      case 'I':
+	entry = cpool.addInt(((Number) value).intValue());  break;
+      case 'J':
+	entry = cpool.addLong(((Number) value).longValue());  break;
+      case 'F':
+	entry = cpool.addFloat(((Number) value).floatValue());  break;
+      case 'D':
+	entry = cpool.addDouble(((Number) value).doubleValue());  break;
+      default:
+	entry = cpool.addString(value.toString());  break;
+      }
+    ConstantValueAttr attr = new ConstantValueAttr(entry.getIndex());
+    attr.addToFrontOf(this);
+  }
+
 }

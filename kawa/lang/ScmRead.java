@@ -56,7 +56,8 @@ public class ScmRead extends gnu.text.Lexer
   Object readSymbol (int c, char read_case)
        throws java.io.IOException
   {
-    if (c < 0 || isDelimiter((char) c))
+    char firstChar = (char) c;
+    if (c < 0 || isDelimiter(firstChar))
       error("no symbol start character");
     StringBuffer str = new StringBuffer (30);
     char lastChar = ' ';
@@ -93,6 +94,13 @@ public class ScmRead extends gnu.text.Lexer
     if (lastChar == ':')
       {
 	str.setLength(str.length()-1);
+	return Keyword.make(str.toString());
+      }
+    if (firstChar == ':')
+      {
+	str.reverse();
+	str.setLength(str.length()-1);
+	str.reverse();
 	return Keyword.make(str.toString());
       }
     return str.toString().intern();

@@ -4,6 +4,12 @@
 	(getOutputConsumer, getPrompter):  New methods.
 	(parse, parseFile):  New abstract methods.
 
+	* Parser.java:  Make non-abstract - used directly by XQuery.
+	(currentModule, lookup):  New methods.
+	(popBinding, pushBinding, push, pop, pushecls, popDecls):
+	Moved to Translator.
+	* ApplyExp.java (compile):  If handling tail calls, use setArgsN.
+
 	* LambdaExp.java (compileBody):  New method.
 	(compile, compileAsMethod):  Use compileBody.
 	* ObjectExp.java (compile):  Likewise.
@@ -12,20 +18,14 @@
 	* Makefile.am (java_sources):  Update accordingly.
 	* Target.java (returnObject, returnValue):  Removed.
 
-	* Parser.java:  Make non-abstract - used directly by XQuery.
-	(currentModule, lookup):  New methods.
-	(popBinding, pushBinding, push, pop, pushecls, popDecls):
-	Moved to Translator.
-	* ApplyExp.java (compile):  If handling tail calls, use setArgsN.
-
 	* Compilation.java (typeConsumer):  New static field.
+
+	* LambdaExp.java:  Overdue update of package containing LList.
 
 	* ConsumerTarget.java:  Re-formatted.
 	(cunsumer):  Fieldtype changed from Declaration to Variable.
 	(compileUsingConsumer):  New static helper method.
 	* Keyword.java (apply):  Update for endAttribute change in Consumer.
-
-	* LambdaExp.java:  Overdue update of package containing LList.
 
 	* ModuleBody.java (runAsMain):  Optionally print values.
 	(getMainPrintValues, setMainPrintValues):  New methods.

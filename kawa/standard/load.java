@@ -4,6 +4,8 @@ import java.io.*;
 import gnu.bytecode.ZipLoader;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.text.SourceMessages;
+import gnu.text.SyntaxException;
 
 public class load extends Procedure1 {
   /** Load using the name of a compile .class file. */
@@ -87,6 +89,7 @@ public class load extends Procedure1 {
   }
 
   public final static Object loadSource (String name, Environment env)
+    throws SyntaxException
   {
     try
       {
@@ -106,6 +109,7 @@ public class load extends Procedure1 {
   }
 
   public final static Object loadSource (InPort port, Environment env)
+    throws SyntaxException
   {
     // Reading the entire file and evaluting it as a unit is more
     // consistent with compiled code, and more efficient.
@@ -118,11 +122,12 @@ public class load extends Procedure1 {
       }
     else
       {
-	Translator tr = new Translator (env);
-	ModuleExp mexp = CompileFile.read (port, tr);
+	SourceMessages messages = new SourceMessages();
+	Translator tr = new Translator(env, messages);
+	ModuleExp mexp = CompileFile.read(port, tr);
 	mexp.setName (Symbol.make (LambdaExp.fileFunctionName));
-	if (tr.errors > 0)
-	  throw new RuntimeException ("syntax errors during load");
+	if (messages.seenErrors())
+	  throw new SyntaxException(messages);
 	return mexp.evalModule(env);
       }
   }
@@ -134,8 +139,22 @@ public class load extends Procedure1 {
 
   public final Object apply2 (Object arg1, Object arg2)
   {
-    Environment env = (Environment) arg2;
-    String name = arg1.toString ();
+    String name = arg1.toString();
+    try
+      {
+	Environment env = (Environment) arg2;
+	return apply (name, env);
+      }
+    catch (SyntaxException ex)
+      {
+	throw new RuntimeException("load: errors while compiling `"+
+				   name+"`:\n"+ex.getMessages().toString(20));
+      }
+  }
+
+  public final Object apply (String name, Environment env)
+    throws SyntaxException
+  {
     if (name.endsWith (".zip") || name.endsWith(".jar"))
       return loadCompiled (name, env);
     if (name.endsWith (".scm"))

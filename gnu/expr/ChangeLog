@@ -1,3 +1,9 @@
+2002-09-20  Per Bothner  <per@bothner.com>
+
+	* ConsumerTarget.java (compileFromStack):  Handle the case where
+	the stack value is long or double, which emitSwap doesn't support.
+	Fixes bug reported by Jim White <jim@pagesmiths.com>.
+
 2002-08-10  Per Bothner  <per@bothner.com>
 
 	* SetExp.java (walkChildren):  Use new ExpWalker walk method.

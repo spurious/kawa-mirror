@@ -46,6 +46,7 @@ public class ConsumerTarget extends Target
     CodeAttr code = comp.getCode();
     String methodName = null;
     Method method = null;
+    boolean islong = false;
     if (stackType instanceof PrimType)
       {
 	char sig = stackType.getSignature().charAt(0);
@@ -53,9 +54,9 @@ public class ConsumerTarget extends Target
 	  {
 	  case 'B': case 'S': case 'I':
 	    methodName = "writeInt";  break;
-	  case 'J':	methodName = "writeLong";  break;
+	  case 'J':	methodName = "writeLong";  islong = true; break;
 	  case 'F':	methodName = "writeFloat";  break;
-	  case 'D':	methodName = "writeDouble";  break;
+	  case 'D':	methodName = "writeDouble"; islong = true; break;
 	  case 'C':	methodName = "writeChar";  break;
 	  case 'Z':	methodName = "writeBoolean";  break;
 	  case 'V':     return;
@@ -73,8 +74,20 @@ public class ConsumerTarget extends Target
 	    return;
 	  }
       }
-    code.emitLoad(consumer);
-    code.emitSwap();
+    if (islong)
+      {
+	code.pushScope();
+	Variable temp = code.addLocal(stackType);
+	code.emitStore(temp);
+	code.emitLoad(consumer);
+	code.emitLoad(temp);
+	code.popScope();
+      }
+    else
+      {
+	code.emitLoad(consumer);
+	code.emitSwap();
+      }
     if (method == null && methodName != null)
       method = Compilation.typeConsumer.getDeclaredMethod(methodName, 1);
     if (method != null)

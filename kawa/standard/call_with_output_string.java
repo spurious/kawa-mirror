@@ -4,7 +4,7 @@ import gnu.mapping.*;
              
 public class call_with_output_string extends Procedure1
 {
-  public Object apply1 (Object proc)
+  public Object apply1 (Object proc) throws Throwable
   {
     CharArrayOutPort port = new CharArrayOutPort();
     ((Procedure)proc).apply1 (port);

@@ -9,31 +9,23 @@ public class with_input_from_file extends Procedure2
     super("with_input_from_file");
   }
 
-  public Object apply2 (Object string, Object proc)
+  public Object apply2 (Object string, Object proc) throws Throwable
   {
     String fname = string.toString();
 
-    try {
-      InPort port = InPort.openFile(fname);
-      Object result;
-      InPort save_port = InPort.inDefault ();
-      try
-	{
-	  InPort.setInDefault (port);
-	  result = ((Procedure)proc).apply0 ();
-	}
-      finally
-	{
-	  InPort.setInDefault (save_port);
-	  port.close ();
-	}
-      return result;
-    } catch (java.io.FileNotFoundException e) {
-       throw new WrappedException("file not found: " + fname, e);
-    }
-    catch (java.io.IOException e)
+    InPort port = InPort.openFile(fname);
+    Object result;
+    InPort save_port = InPort.inDefault ();
+    try
       {
-	throw new WrappedException(e);
+	InPort.setInDefault (port);
+	result = ((Procedure)proc).apply0 ();
       }
+    finally
+      {
+	InPort.setInDefault (save_port);
+	port.close ();
+      }
+    return result;
   }
 }

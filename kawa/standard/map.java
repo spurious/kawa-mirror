@@ -21,7 +21,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
   }
 
   /** An optimized single-list version of map. */
-  static public Object map1 (Procedure proc, Object list)
+  static public Object map1 (Procedure proc, Object list) throws Throwable
   {
     Object result = LList.Empty;
     Pair last = null;
@@ -40,7 +40,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
   }
 
   /** An optimized single-list version of for-each. */
-  static public void forEach1 (Procedure proc, Object list)
+  static public void forEach1 (Procedure proc, Object list) throws Throwable
   {
     while (list != LList.Empty)
       {
@@ -50,7 +50,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       }
   }
 
-  public Object apply2 (Object arg1, Object arg2)
+  public Object apply2 (Object arg1, Object arg2) throws Throwable
   {
     Procedure proc = (Procedure) arg1;
     if (collect)
@@ -59,7 +59,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     return Values.empty;
   }
 
-  public Object applyN (Object[] args)
+  public Object applyN (Object[] args) throws Throwable
   {
     Procedure proc = (Procedure) (args[0]);
     int arity = args.length - 1;

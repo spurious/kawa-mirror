@@ -5,6 +5,7 @@ import gnu.mapping.*;
 public class call_with_values extends Procedure2
 {
   public static Object callWithValues (Procedure producer, Procedure consumer)
+     throws Throwable
   {
     Object values = producer.apply0();
     if (values instanceof Values)
@@ -13,12 +14,12 @@ public class call_with_values extends Procedure2
       return consumer.apply1(values);
   }
 
-  public Object apply2 (Object producer, Object consumer)
+  public Object apply2 (Object producer, Object consumer) throws Throwable
   {
     return callWithValues((Procedure) producer, (Procedure) consumer);
   }
 
-  public void apply (CallContext stack)
+  public void apply (CallContext stack) throws Throwable
   {
     Procedure.checkArgCount(this, 2);
     Object[] args = stack.values;

@@ -10,7 +10,7 @@ import gnu.mapping.*;
 
 public class force extends Procedure1
 {
-  public Object apply1 (Object arg1)
+  public Object apply1 (Object arg1) throws Throwable
   {
     if (arg1 instanceof Promise)
       return ((Promise)arg1).force ();

@@ -45,7 +45,7 @@ public class TracedProcedure extends ProcedureN
       out.print(' ');
   }
 
-  public Object applyN(Object[] args)
+  public Object applyN(Object[] args) throws Throwable
   {
     if (enabled)
       {

@@ -11,7 +11,7 @@ import gnu.mapping.*;
 public class callcc extends Procedure1
 {
   /** Call a precedure with the current continuation. */
-  public static Object apply (Procedure proc)
+  public static Object apply (Procedure proc) throws Throwable
   {
     kawa.lang.Continuation cont = new kawa.lang.Continuation ();
     try
@@ -30,7 +30,7 @@ public class callcc extends Procedure1
       }
   }
 
-  public Object apply1 (Object arg1)
+  public Object apply1 (Object arg1) throws Throwable
   {
     Procedure proc;
     try

@@ -47,6 +47,7 @@ public class load extends Procedure1 {
   }
 
   public final static void loadCompiled (String name, Environment env)
+    throws Throwable
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -110,10 +111,14 @@ public class load extends Procedure1 {
       {
 	throw new RuntimeException("failed to close \""+name+"\" after loading");
       }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public final static void loadSource (InPort port, Environment env)
-    throws SyntaxException
+    throws SyntaxException, Throwable
   {
     boolean print = ModuleBody.getMainPrintValues();
     // Reading the entire file and evaluting it as a unit is more
@@ -144,11 +149,13 @@ public class load extends Procedure1 {
   }
 
   public final Object apply1 (Object arg1)
+    throws Throwable
   {
     return apply2 (arg1, Environment.current ());
   }
 
   public final Object apply2 (Object arg1, Object arg2)
+    throws Throwable
   {
     String name = arg1.toString();
     try
@@ -169,7 +176,7 @@ public class load extends Procedure1 {
   }
 
   public static final void apply (String name, Environment env)
-      throws SyntaxException, java.io.FileNotFoundException
+    throws Throwable
   {
     if (name.endsWith (".zip") || name.endsWith(".jar"))
       {
@@ -195,49 +202,34 @@ public class load extends Procedure1 {
     File file = new File (name);
     if (file.exists ())
       {
-	try
+	InputStream fs = new BufferedInputStream (new FileInputStream (name));
+	fs.mark(5);
+	int char0 = fs.read ();
+	if (char0 == -1)
+	  return; // Sequence.eofValue;
+	if (char0 == 'P')
 	  {
-	    InputStream fs = new BufferedInputStream (new FileInputStream (name));
-	    fs.mark(5);
-	    int char0 = fs.read ();
-	    if (char0 == -1)
-	      return; // Sequence.eofValue;
-	    if (char0 == 'P')
+	    int char1 = fs.read ();
+	    if (char1 == 'K')
 	      {
-		int char1 = fs.read ();
-		if (char1 == 'K')
+		int char2 = fs.read ();
+		if (char2 == '\003')
 		  {
-		    int char2 = fs.read ();
-		    if (char2 == '\003')
+		    int char3 = fs.read ();
+		    if (char3 == '\004')
 		      {
-			int char3 = fs.read ();
-			if (char3 == '\004')
-			  {
-			    fs.close ();
-			    loadCompiled (name, env);
-			    return;
-			  }
+			fs.close ();
+			loadCompiled (name, env);
+			return;
 		      }
 		  }
 	      }
-	    fs.reset();
-	    try
-	      {
-		InPort src = InPort.openFile(fs, name);
-		loadSource (src, env);
-		src.close();
-		return;
-	      }
-	    catch (java.io.IOException ex)
-	      {
-		throw new RuntimeException("failed to close \""+name
-				       +"\" after loading");
-	      }
 	  }
-	catch (java.io.IOException e)
-          {
-            throw new RuntimeException ("I/O exception in load: "+e.toString ());
-          }
+	fs.reset();
+	InPort src = InPort.openFile(fs, name);
+	loadSource (src, env);
+	src.close();
+	return;
       }
     else
       {

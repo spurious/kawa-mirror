@@ -15,7 +15,7 @@ public class constant_fold extends Syntax
       {
 	ReferenceExp rexp = (ReferenceExp) exp;
 	if (rexp.getBinding() == null)
-	  return Environment.user().get(rexp.getName());
+	  return Environment.user().get(rexp.getName(), null);
       }
     return null;
   }
@@ -43,7 +43,7 @@ public class constant_fold extends Syntax
       {
 	return new QuoteExp(((Procedure) func).applyN(vals));
       }
-    catch (Exception ex)
+    catch (Throwable ex)
       {
 	exp = tr.syntaxError("caught exception in constant-fold:");
 	tr.syntaxError(ex.toString());

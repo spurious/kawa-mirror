@@ -665,10 +665,7 @@ public class Scheme extends LispInterpreter
   {
     if (Interpreter.defaultInterpreter == null)
       Interpreter.defaultInterpreter = this;
-    if (kawaEnvironment == null)
-      initScheme();
-    environ = new ScmEnv (kawaEnvironment);
-    environ.setName ("interaction-environment."+(++scheme_counter));
+    environ = getNewEnvironment();
     if (instance == null)
       {
         instance = this;
@@ -702,8 +699,23 @@ public class Scheme extends LispInterpreter
   {
     if (kawaEnvironment == null)
       initScheme();
-    Environment environ = new ScmEnv (kawaEnvironment);
+    ScmEnv environ = new ScmEnv (kawaEnvironment);
     environ.setName ("interaction-environment."+(++scheme_counter));
+
+    // Do: environ.addExtra(new NamespaceEnv(environ))
+    // but without requiring that NamespaceEnv be available at compile-time.
+    try
+      {
+	Class typeNamespaceEnv = Class.forName("gnu.kawa.xml.NamespaceEnv");
+	Class[] argTypes = { Class.forName("gnu.mapping.Environment") };
+	java.lang.reflect.Constructor constr
+	  = typeNamespaceEnv.getDeclaredConstructor(argTypes);
+	Environment[] args = { environ };
+	environ.addExtra((Environment) constr.newInstance(args));
+      }
+    catch (Throwable ex)
+      {
+      }
     return environ;
   }
 
@@ -749,6 +761,18 @@ public class Scheme extends LispInterpreter
 	throw new RuntimeException("eval: I/O exception: "
 				   + e.toString ());
       }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   /** Evalutate Scheme expressions from an "S expression."
@@ -757,7 +781,22 @@ public class Scheme extends LispInterpreter
    * @return result of the expression. */
   public static Object eval (Object sexpr, Environment env)
   {
-    return Eval.eval (sexpr, env);
+    try
+      {
+	return Eval.eval (sexpr, env);
+      }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public Object read (InPort in)

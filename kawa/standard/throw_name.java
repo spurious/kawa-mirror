@@ -6,6 +6,7 @@ import gnu.mapping.*;
 public class throw_name extends ProcedureN
 {
   public Object applyN (Object[] args)
+    throws Throwable
   {
     int len = args.length;
     if (len > 0)

@@ -6,16 +6,13 @@ import gnu.expr.*;
 public class prim_throw extends Procedure1 implements Inlineable
 {
   public static void throw_it (Object arg1)
+    throws Throwable
   {
-    if (arg1 instanceof RuntimeException)
-      throw ((RuntimeException) arg1);
-    else if (arg1 instanceof Error)
-      throw ((Error) arg1);
-    else
-      throw (new RuntimeException(arg1.toString()));
+    throw ((Throwable) arg1);
   }
 
   public Object apply1 (Object arg1)
+    throws Throwable
   {
     throw_it(arg1);
     return Values.empty;

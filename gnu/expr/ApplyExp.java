@@ -291,6 +291,7 @@ public class ApplyExp extends Expression
       }
 
     if (comp.curLambda.isHandlingTailCalls()
+	&& (exp.isTailCall() || target instanceof ConsumerTarget)
 	&& ! comp.curLambda.getInlineOnly())
       {
 	ClassType typeContext = comp.typeCallContext;
@@ -318,15 +319,10 @@ public class ApplyExp extends Expression
 	  {
 	    code.emitReturn();
 	  }
-	else if (target instanceof ConsumerTarget)
+	else
 	  {
 	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
 	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
-	  }
-	else
-	  {
-	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 0));
-	    target.compileFromStack(comp, Type.pointer_type);
 	  }
 	return;
       }
@@ -439,7 +435,7 @@ public class ApplyExp extends Expression
       {
 	Object proc = ((QuoteExp) afunc).getValue();
 	if (proc instanceof Inlineable)
-          return ((Inlineable) proc).getReturnType(args);
+	  return ((Inlineable) proc).getReturnType(args);
       }
     if (afunc instanceof LambdaExp)
       {

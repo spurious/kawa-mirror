@@ -18,24 +18,20 @@ public class IfExp extends Expression
     test = i;  then_clause = t;  else_clause = e;
   }
 
-  /**
-   * Utility function to test if an Object is true in the Scheme sense.
-   * @param object the object to test for truth
-   * @return true iff the object is true is the Scheme sense.
-   */
-  static public final boolean is_true (Object object)
+  protected final Interpreter getInterpreter()
   {
-    return object != Boolean.FALSE;
+    return Interpreter.defaultInterpreter; // FIXME
   }
 
   public Object eval (Environment env)
   {
-    if (is_true (test.eval (env)))
+    Interpreter interpreter = getInterpreter();
+    if (interpreter.isTrue((test.eval (env))))
       return then_clause.eval (env);
     else if (else_clause != null)
       return else_clause.eval (env);
     else
-      return Values.empty;
+      return interpreter.noValue();
   }
 
   public void compile (Compilation comp, Target target)
@@ -58,7 +54,8 @@ public class IfExp extends Expression
 	&& else_clause instanceof QuoteExp)
       {
 	falseInherited = true;
-	if (is_true(((QuoteExp) else_clause).getValue()))
+	Object value = ((QuoteExp) else_clause).getValue();
+	if (comp.getInterpreter().isTrue(value))
 	  falseLabel = ((ConditionalTarget) target).ifTrue;
 	else
 	  falseLabel = ((ConditionalTarget) target).ifFalse;

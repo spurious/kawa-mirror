@@ -32,6 +32,7 @@ java_JAVA=\
   IgnoreTarget.java \
   Initializer.java \
   Inlineable.java \
+  Interpreter.java \
   Keyword.java \
   LambdaExp.java \
   LetExp.java \

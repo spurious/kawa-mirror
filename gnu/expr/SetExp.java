@@ -25,6 +25,7 @@ public class SetExp extends Expression
 
   static private int DEFINING_FLAG = 1;
   static private int GLOBAL_FLAG = 2;
+  static private int HAS_VALUE = 4;
 
   public final boolean isDefining ()
   {
@@ -33,10 +34,18 @@ public class SetExp extends Expression
 
   public final void setDefining (boolean value)
   {
-    if (value)
-      flags |= DEFINING_FLAG;
-    else
-      flags &= ~DEFINING_FLAG;
+    if (value) flags |= DEFINING_FLAG; else flags &= ~DEFINING_FLAG;
+  }
+
+  /** True if evaluating the SetExp yields the value of the RHS. */
+  public final boolean getHasValue()
+  {
+    return (flags & HAS_VALUE) != 0;
+  }
+
+  public final void setHasValue (boolean value)
+  {
+    if (value) flags |= HAS_VALUE; else flags &= ~HAS_VALUE;
   }
 
   public SetExp (Declaration decl, Expression val)
@@ -63,11 +72,13 @@ public class SetExp extends Expression
     else
       {
 	Binding bind = env.lookup (name);
-	if (bind == null)
-	  throw new UnboundSymbol (name);
-	env.put (name, new_val);
+	if (bind != null)
+	  env.put (name, new_val);
+	else
+	  env.define (name, new_val);
+	//	  throw new UnboundSymbol (name);
       }
-    return Values.empty;
+    return getHasValue() ? new_val : Values.empty; // FIXME Interpreter.noValue
   }
 
   static Method setMethod = null;
@@ -79,6 +90,10 @@ public class SetExp extends Expression
 	&& ((LambdaExp) new_value).getInlineOnly())
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
+
+    boolean needValue = getHasValue() && ! (target instanceof IgnoreTarget);
+    if (needValue && binding != null)
+      throw new Error("SetExp.compile: not implemented - return value");
 
     // This code is kind of kludgy, because it handles a number of
     // different cases:  assignments and definitions to both local and
@@ -144,6 +159,8 @@ public class SetExp extends Expression
 	else if (binding.isSimple ())
 	  {
 	    new_value.compile (comp, binding.getType());
+	    if (needValue)
+	      code.emitDup(1, 0);  // dup
 	    code.emitStore(binding.getVariable());
 	  }
 	else
@@ -162,11 +179,14 @@ public class SetExp extends Expression
       {
 	comp.compileConstant (name);
 	new_value.compile (comp, Target.pushObject);
+	if (needValue)
+	  code.emitDup(1, 1);  // dup_x1
 	code.emitInvokeStatic(isDefining () ? comp.defineGlobalMethod
 			      : comp.putGlobalMethod);
       }
 
-    comp.compileConstant(Values.empty, target);
+    if (! needValue)
+      comp.compileConstant(Values.empty, target);
   }
 
   public final gnu.bytecode.Type getType()

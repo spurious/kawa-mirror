@@ -1,3 +1,30 @@
+2000-01-31  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (eval):  Use getProcedure to get function value.
+	* Interpreter.java:  Moved from kawa.lang.
+	(defaultInterpreter):  New static field.
+	(isTrue, booleanObject, noValue):  New methods.
+	(boolObject):  Removed method.
+	(getName):  Made abstract.
+	* Makefile.am, Makefile.in (java_JAVA):  Added Interpreter.java.
+	* Compilation.java (getInterpreter):  New method.
+	(scmInterpreterType):  Interpreter moved from kawa.lang to gnu.expr.
+	(compileConstant):  Use getInterpreter().isTrue method.
+	* IfExp.java (eval, compile):  Likewise.
+	(getInterpreter):  New method.
+	(is_true):  Removed method.
+
+	* SetExp.java (HAS_VALUE):  New flag.
+	(getHasValue, setHasValue):  New methods.
+	(eval):  If getHasValue() return RHS, else return 
+	(compile):  Likewise.
+
+	* QuoteExp.java (getType):  If value is null, type is Object.
+
+2000-01-25  Daniel Bonniot <bonniot@cma.ensmp.fr>
+
+	* QuoteExp.java: (getType):  For null, return Type.pointer_type.
+
 2000-01-24  Per Bothner  <per@bothner.com>
 
 	* BeginExp.java (<init>):  New default constructor.

@@ -30,12 +30,16 @@ public class ApplyExp extends Expression
 
   public Object eval (Environment env)
   {
-    Object rator = func.eval(env);
+    Procedure proc;
+    if (func instanceof ReferenceExp)
+      proc = env.getBinding(((ReferenceExp) func).symbol).getProcedure();
+    else
+      proc = (Procedure) func.eval(env);
     int n = args.length;
     Object[] vals = new Object[n];
     for (int i = 0; i < n; i++)
       vals[i] = args[i].eval (env);
-    return ((Procedure)rator).applyN (vals);
+    return proc.applyN (vals);
   }
 
   public void compile (Compilation comp, Target target)

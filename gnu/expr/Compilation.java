@@ -67,7 +67,7 @@ public class Compilation
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType scmInterpreterType
-    = ClassType.make("kawa.lang.Interpreter");
+    = ClassType.make("gnu.expr.Interpreter");
   static public ClassType typeMacro
     = ClassType.make("kawa.lang.Macro");
   static public ClassType typeEnvironment
@@ -289,6 +289,11 @@ public class Compilation
   /** True if we should generate a main(String[]) method. */
   public boolean generateMain = generateMainDefault;
 
+  public Interpreter getInterpreter()
+  {
+    return Interpreter.defaultInterpreter;  // For now.  FIXME.
+  }
+
   public Literal findLiteral (Object value)
   {
     Literal literal = (Literal) literalTable.get (value);
@@ -381,7 +386,7 @@ public class Compilation
     if (target instanceof ConditionalTarget)
       {
 	ConditionalTarget ctarg = (ConditionalTarget) target;
-	getCode().emitGoto(IfExp.is_true(value) ? ctarg.ifTrue
+	getCode().emitGoto(getInterpreter().isTrue(value) ? ctarg.ifTrue
 			   : ctarg.ifFalse);
 	return;
       }

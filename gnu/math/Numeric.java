@@ -34,6 +34,35 @@ public abstract class Numeric extends java.lang.Number
   public static final int TRUNCATE = 3;
   public static final int ROUND = 4;
 
+  /** Return 1 if this>obj; 0 if this==obj; -1 if this<obj;
+   * -2 if either is NaN; -3 if not comparable (not equal). */
+  public int compare (Object obj)
+  {
+    return -3;
+  }
+
+  public int compare_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
+
+  public boolean equals (Object obj)
+  {
+    if (obj == null || ! (obj instanceof Numeric))
+      return false;
+    return compare (obj) == 0;
+  }
+
+  public boolean grt (Object x)
+  {
+    return compare (x) > 0;
+  }
+
+  public boolean geq (Object x)
+  {
+    return compare (x) >= 0;
+  }
+
   /** Calculate x+k&this. */
   public Numeric add_reversed (Numeric x, int k)
   {

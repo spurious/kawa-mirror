@@ -11,32 +11,6 @@ public abstract class RealNum extends Complex
   /** Return 1 if >0; 0 if ==0; -1 if <0; -2 if NaN. */
   public abstract int sign ();
 
-  /** Return 1 if this>obj; 0 if this==obj; -1 if this<obj;
-   * -2 if either is NaN. */
-  public abstract int compare (Object obj);
-
-  public int compare_reversed (Numeric x)
-  {
-    throw new IllegalArgumentException ();
-  }
-
-  public boolean equals (Object obj)
-  {
-    if (obj == null || ! (obj instanceof RealNum))
-      return false;
-    return compare (obj) == 0;
-  }
-
-  public boolean grt (Object x)
-  {
-    return compare (x) > 0;
-  }
-
-  public boolean geq (Object x)
-  {
-    return compare (x) >= 0;
-  }
-
   public RealNum max (RealNum x)
   {
     boolean exact = isExact () && x.isExact ();

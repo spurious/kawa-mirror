@@ -70,8 +70,7 @@ public abstract class Complex extends Quantity
   public static boolean equals (Complex x, Complex y)
   {
     return x.re().equals(y.re())
-      && x.im().equals(x.im())
-      && x.unit().equals(y.unit());
+      && x.im().equals(x.im());
   }
 
   public boolean equals (Object obj)
@@ -79,6 +78,21 @@ public abstract class Complex extends Quantity
     if (obj == null || ! (obj instanceof Complex))
       return false;
     return Complex.equals (this, (Complex) obj);
+  }
+
+  public static int compare (Complex x, Complex y)
+  {
+    int code = x.im().compare(y.im());
+    if (code != 0)
+      return code;
+    return x.re().compare(y.re());
+  }
+
+  public int compare (Object obj)
+  {
+    if (! (obj instanceof Complex))
+      return ((Numeric) obj).compare_reversed(this);
+    return compare(this, (Complex) obj);
   }
 
   public boolean isZero ()

@@ -1,3 +1,9 @@
+Tue Mar 18 13:59:42 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* RealNum.java (compare, compare_reversed, equals, grt, geq): Moved to
+	* Quantity.java:  ... here
+	* Quantity.java, Complex.java:  Implement compare methods.
+
 Mon Mar 17 17:31:11 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* BitOps.java (setBitOp):  Rewrite to work around Microsoft bug.

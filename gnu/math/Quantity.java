@@ -98,6 +98,22 @@ public abstract class Quantity extends Numeric
   public Numeric neg () { return make ((Complex) number().neg(), unit()); }
   public Numeric abs () { return make ((Complex) number().abs(), unit()); }
 
+  public static int compare (Quantity x, Quantity y)
+  {
+    if (x.unit() == y.unit())
+      return Complex.compare(x.number(), y.number());
+    if (x.dimensions() != y.dimensions() || x.imValue() != y.imValue())
+      return -3;
+    return DFloNum.compare(x.reValue(), y.reValue());
+  }
+
+  public int compare (Object obj)
+  {
+    if (! (obj instanceof Quantity))
+      return ((Numeric) obj).compare_reversed(this);
+    return compare(this, (Quantity) obj);
+  }
+
   public static Quantity add (Quantity x, Quantity y, int k)
   {
     if (x.unit() == y.unit())

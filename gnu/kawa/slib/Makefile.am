@@ -22,3 +22,6 @@ KAWA = $(JAVA) kawa.repl
 
 all: Makefile scmclasses.stamp
 
+# Used to generate makekawa.bat in ../../.. .
+list-sources:
+	echo $(SCMSOURCES)

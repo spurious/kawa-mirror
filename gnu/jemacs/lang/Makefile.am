@@ -30,3 +30,7 @@ scmclasses.stamp: $(SCMSOURCES)
 	echo timestamp > scmclasses.stamp
 
 all: Makefile classjava.stamp scmclasses.stamp
+
+# Used to generate makekawa.bat in ../../.. .
+list-sources:
+	echo $(SCMSOURCES)

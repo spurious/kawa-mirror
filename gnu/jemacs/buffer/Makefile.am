@@ -52,3 +52,6 @@ WITHOUT_SWING:
 
 all: Makefile @SWING_SELECTED@
 
+# Used to generate makekawa.bat in ../../.. .
+list-sources:
+	echo $(SCMSOURCES)

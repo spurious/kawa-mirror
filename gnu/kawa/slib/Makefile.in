@@ -90,7 +90,7 @@ CONFIG_CLEAN_FILES =
 JAVACFLAGS = 
 CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
 JAVAROOT = $(top_builddir)
-DIST_COMMON =  $(java_JAVA) Makefile.am Makefile.in
+DIST_COMMON =  $(java_JAVA) ChangeLog Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -226,6 +226,10 @@ scmclasses.stamp: $(SCMSOURCES)
 	echo timestamp > scmclasses.stamp
 
 all: Makefile scmclasses.stamp
+
+# Used to generate makekawa.bat in ../../.. .
+list-sources:
+	echo $(SCMSOURCES)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

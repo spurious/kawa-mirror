@@ -241,6 +241,10 @@ WITHOUT_SWING:
 
 all: Makefile @SWING_SELECTED@
 
+# Used to generate makekawa.bat in ../../.. .
+list-sources:
+	echo $(SCMSOURCES)
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

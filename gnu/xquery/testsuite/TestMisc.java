@@ -144,6 +144,9 @@ public class TestMisc
 	     "  return <b atr1='11' atr2=\"{$x}\">{($y,99,$y)}</b>",
 	     "<b atr1=\"11\" atr2=\"12\"><a>24</a>99<a>24</a></b>");
 
+    evalTest("document{element elm {attribute at{\"abc\"}, \"data\"}}/elm",
+	     "<elm at=\"abc\">data</elm>");
+
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
     evalTest("declare namespace x1='XXX'\n declare namespace x2='XXX'\n"

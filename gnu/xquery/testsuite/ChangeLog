@@ -1,3 +1,7 @@
+2003-03-04  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Add a test for computed constructors.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  Update expected error message.

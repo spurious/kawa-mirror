@@ -14,9 +14,10 @@ public class string_append extends ProcedureN
     int count = args.length;
     java.lang.StringBuffer result = new java.lang.StringBuffer();
 
-    for (int t=0; t<count; t++) {
-       result.append(args[t].toString());
-    }
+    for (int t=0; t<count; t++)
+      {
+	result.append(args[t]);
+      }
     return new FString (result);
   }
 

@@ -10,6 +10,7 @@ java_JAVA=\
   ApplyExp.java \
   BeginExp.java \
   CatchClause.java \
+  ChainLambdas.java \
   Compilable.java \
   Compilation.java \
   CompiledProc.java \
@@ -33,6 +34,7 @@ java_JAVA=\
   ObjectExp.java \
   QuoteExp.java \
   PrimProcedure.java \
+  PushApply.java \
   ReferenceExp.java \
   ScopeExp.java \
   SetApplyExp.java \

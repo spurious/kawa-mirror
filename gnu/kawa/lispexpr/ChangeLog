@@ -1,3 +1,11 @@
+2003-10-02  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (byteType, shortType, intType, longType, floatType,
+	doubleType, charType, voidType):  Make final.
+	* ReaderDispatchMisc.java:  Use Boolean FALSE/TRUE directly instead
+	of via Interpreter falseObject/trueObject field.
+	* LispReader.java:  Likewise use Undefined.undefined directly.
+
 2003-09-04  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber):  Handle multi-unit products.

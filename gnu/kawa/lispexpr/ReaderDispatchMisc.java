@@ -55,12 +55,12 @@ public class ReaderDispatchMisc extends ReadTableEntry
       case '!':
 	return LispReader.readSpecial(reader);
       case 'T':
-	return Interpreter.trueObject;
+	return Boolean.TRUE;
       case 'F':
 	ch = in.peek();
 	if (Character.isDigit((char) ch))
 	  return LispReader.readSimpleVector(reader, 'F');
-	return Interpreter.falseObject;
+	return Boolean.FALSE;
       case 'S':
       case 'U':
 	return LispReader.readSimpleVector(reader, (char) ch);

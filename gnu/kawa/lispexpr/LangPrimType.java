@@ -12,14 +12,22 @@ public class LangPrimType extends gnu.bytecode.PrimType
   Interpreter interpreter;
   PrimType implementationType;
 
-  public static LangPrimType byteType = new LangPrimType(Type.byte_type);
-  public static LangPrimType shortType = new LangPrimType(Type.short_type);
-  public static LangPrimType intType = new LangPrimType(Type.int_type);
-  public static LangPrimType longType = new LangPrimType(Type.long_type);
-  public static LangPrimType floatType = new LangPrimType(Type.float_type);
-  public static LangPrimType doubleType = new LangPrimType(Type.double_type);
-  public static LangPrimType charType = new LangPrimType(Type.char_type);
-  public static LangPrimType voidType = new LangPrimType(Type.void_type);
+  public static final LangPrimType byteType
+    = new LangPrimType(Type.byte_type);
+  public static final LangPrimType shortType
+    = new LangPrimType(Type.short_type);
+  public static final LangPrimType intType
+    = new LangPrimType(Type.int_type);
+  public static final LangPrimType longType
+    = new LangPrimType(Type.long_type);
+  public static final LangPrimType floatType
+    = new LangPrimType(Type.float_type);
+  public static final LangPrimType doubleType
+    = new LangPrimType(Type.double_type);
+  public static final LangPrimType charType
+    = new LangPrimType(Type.char_type);
+  public static final LangPrimType voidType
+    = new LangPrimType(Type.void_type);
 
   public LangPrimType (PrimType type)
   {

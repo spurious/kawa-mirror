@@ -388,7 +388,8 @@ public class ModuleExp extends LambdaExp
 	  {
 	    if (type == null)
 	      type = ClassType.make(getName());
-	    kawa.standard.require.makeModule(this, type, null);
+            ModuleInfo info = ModuleInfo.find(type.getName());
+	    kawa.standard.require.makeModule(this, type, info.instance);
 	    flags &= ~LAZY_DECLARATIONS;
 	  }
       }

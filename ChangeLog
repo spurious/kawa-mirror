@@ -1,5 +1,14 @@
 2005-03-29  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (scanForm): Don't need set save/set/restore
+	current Compilation, since it's now done in LispLangauge.parse.
+	* kawa/standard/require.java (makeModule): Get current Language
+	directly, rather than via current Compilation.
+	(makeDeclInModule): Handle non-static FieldLocation alias; now
+	works since getDeclaration creates context.  Use vdecl, not fdecl.
+	Only setDontDereference if referenced field is indirect.
+	Set constant flag if appropriate.
+
 	* kawa/standard/Scheme.java (builtin): Remove pointless synchronized.
 
 2005-03-28  Per Bothner  <per@bothner.com>

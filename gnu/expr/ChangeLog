@@ -1,5 +1,9 @@
 2005-03-29  Per Bothner  <per@bothner.com>
 
+	* ModuleExp.java (firstDecl): Get instance using ModuleInfo.
+	* ModuleInfo.java (exp): New field.
+	(getModuleExp): New method.
+
 	* ResolveNames.java (resolveModule): Do Compilation.setCurrent.
 
 	* QuoteExp.java (getType): Type of undefined_exp is Object.

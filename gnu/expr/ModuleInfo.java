@@ -1,5 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
+import gnu.bytecode.ClassType;
 
 public class ModuleInfo
 {
@@ -8,6 +9,22 @@ public class ModuleInfo
   String className;
 
   Object instance;
+
+  ModuleExp exp;
+
+  public synchronized ModuleExp getModuleExp ()
+  {
+    ModuleExp m = exp;
+    if (m == null)
+      {
+        ClassType ctype
+          = (instance == null ? ClassType.make(className)
+             : (ClassType) ClassType.make(instance.getClass()));
+        m = ModuleExp.make(ctype);
+        exp = m;
+      }
+    return m;
+  }
 
   public static ModuleInfo find (String className)
   {

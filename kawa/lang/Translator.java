@@ -727,7 +727,7 @@ public class Translator extends Compilation
 	  return syntaxError("not implemented: variable reference to a method");
 	if (decl != null && decl.getContext() instanceof PatternScope)
 	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
-	  
+
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
 	if (function && separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
@@ -939,17 +939,14 @@ public class Translator extends Compilation
 	    String save_filename = getFile();
 	    int save_line = getLine();
 	    int save_column = getColumn();
-	    Compilation save_comp = Compilation.getCurrent();
 	    try
 	      {
-		Compilation.setCurrent(this);
 		setLine(st_pair);
 		syntax.scanForm(st_pair, defs, this);
 		return;
 	      }
 	    finally
 	      {
-		Compilation.setCurrent(save_comp);
 		setLine(save_filename, save_line, save_column);
 	      }
 	  }

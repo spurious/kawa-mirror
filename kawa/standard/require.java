@@ -399,8 +399,7 @@ public class require extends Syntax
   public static void makeModule (ModuleExp mod, ClassType type,
 				 Object instance)
   {
-    Compilation comp = Compilation.getCurrent();
-    Language language = comp.getLanguage();
+    Language language = Language.getDefaultLanguage();
     Class rclass = type.getReflectClass();
     for (Field fld = type.getFields();  fld != null;  fld = fld.getNext())
       {
@@ -451,13 +450,13 @@ public class require extends Syntax
       fdecl.setFlag(Declaration.STATIC_SPECIFIED);
     if (isFinal && ! (fvalue instanceof gnu.mapping.Location))
       fdecl.noteValue(new QuoteExp(fvalue));
-    else if (isFinal && fvalue instanceof FieldLocation
-             && isStatic) // for now
+    else if (isFinal && fvalue instanceof FieldLocation)
       {
 	FieldLocation floc = (FieldLocation) fvalue;
         Declaration vdecl = floc.getDeclaration();
-        ReferenceExp fref = new ReferenceExp(fdecl);
-        fref.setDontDereference(true);
+        ReferenceExp fref = new ReferenceExp(vdecl);
+        if (floc.isIndirectLocation())
+          fref.setDontDereference(true);
         fdecl.noteValue(fref);
         if (vdecl.isProcedureDecl())
           fdecl.setProcedureDecl(true);
@@ -468,14 +467,17 @@ public class require extends Syntax
       fdecl.noteValue(null);
     fdecl.setSimple(false);
     fdecl.field = fld;
-    //if ((fld.getModifiers() & Access.FINAL) != 0)
-    //  fdecl.setFlag(Declaration.IS_CONSTANT);
+    if (isFinal)
+      fdecl.setFlag(Declaration.IS_CONSTANT);
     mod.addDeclaration(fdecl);
-    if (fvalue instanceof Macro)
+    if (isFinal && fvalue instanceof Syntax) // FIXME - should check type? not value?
       {
 	fdecl.setSyntax();
-	Macro mac = (Macro) fvalue;
-	mac.setCapturedScope(mod);
+        if (fvalue instanceof Macro)
+          {
+            Macro mac = (Macro) fvalue;
+            mac.setCapturedScope(mod);
+          }
       }
     return fdecl;
   }

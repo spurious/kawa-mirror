@@ -14,7 +14,7 @@ public class FieldLocation extends ClassMemberLocation
   static final int SETUP_DONE = 1; // FIXME - do we still need this?
 
   /** Flag that indicates that field value has type Location.
-   * Hence <code>get</code> of this Location requies an extra indirection. */
+   * Hence <code>get</code> of this Location requires an extra indirection. */
   static final int INDIRECT_LOCATION = 2;
   /** The actual value (following any indirection) is constant.
    * I.e. if INDIRECT_LOCATION is set, then that Location has isConstant set,
@@ -35,7 +35,7 @@ public class FieldLocation extends ClassMemberLocation
   public static final int KIND_FLAGS_SET = 64;
   private int flags;
 
-  protected boolean isIndirectLocation ()
+  public boolean isIndirectLocation ()
   { return (flags & INDIRECT_LOCATION) != 0; }
 
   public void setProcedure ()
@@ -151,32 +151,20 @@ public class FieldLocation extends ClassMemberLocation
 	gnu.bytecode.Field procField = t.getDeclaredField(fname);
 	if (procField == null)
 	  return null;
-	Object val;
-	if (value == null)
-	  value = get(null);
-	val = value;
-	if (val == null)
-	  return null;
-	int fflags = procField.getModifiers();
-	Object dname;
-	if (val instanceof Named)
-	  dname = ((Named) val).getSymbol();
-	else
-	  dname = fname;
-	d = new Declaration(dname, procField);
-	d.field = procField;
-	d.noteValue(new QuoteExp(val));
-	if ((fflags & Access.FINAL) != 0)
-	  d.setFlag(Declaration.IS_CONSTANT);
-	if ((flags & PROCEDURE) != 0)
-	  d.setProcedureDecl(true);
-	if ((flags & SYNTAX) != 0)
-	  d.setFlag(Declaration.IS_SYNTAX);
-	if (val instanceof kawa.lang.Macro)
-	  d.setSyntax();
-	if (procField.getType().isSubtype(Compilation.typeLocation))
-	  d.setIndirectBinding(true);
-	decl = d;
+        ModuleInfo info = ModuleInfo.find(t.getName());
+        ModuleExp mexp = info.getModuleExp();
+        Declaration vdecl;
+        for (d = mexp.firstDecl();  d != null; d = d.nextDecl())
+          {
+            if (d.field != null && d.field.getName().equals(fname))
+              break;
+          }
+        if (d != null)
+          {
+            decl = d;
+            return d;
+          }
+        throw new RuntimeException("no field found for "+this);
       }
     return d;
   }

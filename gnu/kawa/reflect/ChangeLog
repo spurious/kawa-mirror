@@ -1,3 +1,8 @@
+2005-03-29  Per Bothner  <per@bothner.com>
+
+	* FieldLocation.java (isIndirectLocation): Make public - for require.
+	(getDeclaration): Get declaration via ModuleInfo.
+
 2005-03-28  Per Bothner  <per@bothner.com>
 
 	* SlotGet.java (field, staticField): Make fields final.

@@ -1,3 +1,7 @@
+2003-10-30  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Add link to gnu/xquery/testsuite/auction.xml.in.
+
 2003-10-28  Per Bothner  <per@bothner.com>
 
 	* Make-rules (DONT_EDIT_SUBS):  Move to gnu/xml/Makefile.am.

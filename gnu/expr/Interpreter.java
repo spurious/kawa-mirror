@@ -543,19 +543,16 @@ public abstract class Interpreter
   public final Object eval (InPort port) throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    Consumer save = ctx.consumer;
+    int oldIndex = ctx.startFromContext();
     try
       {
-	ctx.consumer = ctx.vstack;
-	ctx.values = Values.noArgs;
 	eval(port, ctx);
-	// FIXME maybe use startFromContext/getFromContext?
-	return Values.make((gnu.lists.TreeList) ctx.vstack);
+	return ctx.getFromContext(oldIndex);
       }
-    finally
-      {
-	ctx.vstack.clear();
-	ctx.consumer = save;
+    catch (Throwable ex)
+      { 
+	ctx.cleanupFromContext(oldIndex);
+	throw ex;
       }
   }
 

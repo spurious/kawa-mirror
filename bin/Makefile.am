@@ -22,8 +22,8 @@ INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
-KAWA2_XML_OFILES = gnu-xml.o gnu-xquery-util.o gnu-xquery-lang.o
-LIBADD_XML = gnu-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
+KAWA2_XML_OFILES = gnu-xml.o gnu-kawa-xml.o gnu-xquery-util.o gnu-xquery-lang.o
+LIBADD_XML = gnu-xml.lo gnu-kawa-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
 endif
 
 kawa.sh:

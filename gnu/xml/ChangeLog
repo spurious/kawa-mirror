@@ -1,5 +1,11 @@
 2003-10-28  Per Bothner  <per@bothner.com>
 
+	* NamespaceBinding.java:  New class.
+	* XName.java:  New class.
+	* Makefile.am (java_sources): Update accordingly.
+
+2003-10-28  Per Bothner  <per@bothner.com>
+
 	* Makefile.am (DONE_EDIT_SUBS):  Move from ../../Make-rules.
 	Simplify to not insert extra line.  This matches build.xml and more
 	importantly avoids a GNU sed feature (missing in Mac OSX Panther sed).

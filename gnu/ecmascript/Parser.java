@@ -375,9 +375,37 @@ System.err.println("after parseArgs:"+peekToken());
     return new IfExp(test_part, then_part, else_part);
   }
 
-  public Expression parseFunctionDefinition()
+  public Expression buildLoop (Expression init, Expression test,
+			       Expression incr, Expression body)
+  {
+    if (init != null)
+      {
+	Expression[] pair = new Expression[2];
+	pair[0] = init;
+	pair[1] = buildLoop (null, test, incr, body);
+	return new BeginExp(pair);
+      }
+    throw new Error("not implemented - buildLoop");
+  }
+
+  public Expression parseWhileStatement()
     throws java.io.IOException, SyntaxException
   {
+    skipToken();  // Skip 'while'.
+    Object token = getToken();
+    if (token != Lexer.lparenToken)
+      return syntaxError("expected '(' - got:"+token);
+    Expression test_part = parseExpression();
+    token = getToken();
+    if (token != Lexer.rparenToken)
+      return syntaxError("expected ')' - got:"+token);
+    Expression body = parseStatement();
+    return buildLoop (null, test_part, null, body);
+  }
+
+  public Expression parseFunctionDefinition() 
+    throws java.io.IOException, SyntaxException
+ {
     skipToken();
     String name = getIdentifier();
     Object token = getToken();
@@ -453,6 +481,7 @@ System.err.println("after parseArgs:"+peekToken());
 	switch (((Reserved) token).prio)
 	  {
 	  case Reserved.IF_TOKEN:  return parseIfStatement();
+	  case Reserved.WHILE_TOKEN:  return parseWhileStatement();
 	  case Reserved.FUNCTION_TOKEN:  return parseFunctionDefinition();
 	  }
       }

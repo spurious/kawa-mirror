@@ -1,3 +1,11 @@
+Tue Oct 22 23:14:49 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in (VERSION):  Set to 1.1alpha.
+
+	* kawa/standard/letstar.java:  Removed.
+	* kawa/standard/Scheme.java:  Update syntax class names.
+	* kawa/standard/Makefile.{am,in}:  Update accordingly.
+
 Mon Oct 21 12:58:17 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/Shell.java (runFile):  Re-write to call load.loadSource.

@@ -485,6 +485,88 @@ public class Compilation
   /** If non-null: a prefix for generateClassName to prepend to names. */
   public String classPrefix;
 
+  /** Recusive helper function to reverse order of words in hostname. */
+  private static void putURLWords(String name, StringBuffer sbuf)
+  {
+    int dot = name.indexOf('.');
+    if (dot > 0)
+      {
+	putURLWords(name.substring(dot+1), sbuf);
+	sbuf.append('.');
+	name = name.substring(0, dot);
+      }
+    sbuf.append(name);
+  }
+
+  /** Map a URI to a package/class name.
+   * Similar to the JAXB mangling, and that in the Java language spec.
+   */
+  public static String mangleURI (String name)
+  {
+    boolean hasSlash = name.indexOf('/') >= 0;
+    int len = name.length();
+    if (len > 6 && name.startsWith("class:"))
+      return name.substring(6);
+    // Remove "http:" or "urn:".
+    if (len > 5 && name.charAt(4) == ':'
+	&& name.substring(0, 4).equalsIgnoreCase("http"))
+      {
+	name = name.substring(5);
+	len -= 5;
+	hasSlash = true;
+      }
+    else if (len > 4 && name.charAt(3) == ':'
+	     && name.substring(0, 3).equalsIgnoreCase("uri"))
+      {
+	name = name.substring(4);
+	len -= 4;
+      }
+    int start = 0;
+    StringBuffer sbuf = new StringBuffer();
+    for (;;)
+      {
+	int slash = name.indexOf('/', start);
+	int end = slash < 0 ? len : slash;
+	boolean first = sbuf.length() == 0;
+	if (first && hasSlash)
+	  {
+	    // Remove initial "www.".
+	    String host = name.substring(start, end);
+	    if (end - start > 4 && host.startsWith("www."))
+	      host = host.substring(4);
+	    // Reverse order of words in "host" part.
+	    putURLWords(host, sbuf);
+	  }
+	else if (start != end)
+	  {
+	    if (! first)
+	      sbuf.append('.');
+	    if (end == len)
+	      {
+		int dot = name.lastIndexOf('.', len);
+		if (dot > start + 1 && ! first)
+		  {
+		    // Remove file extension:
+		    int extLen = len - dot;
+		    System.err.println("xtLen:"+extLen);
+		    if (extLen <= 4
+			|| (extLen == 5 && name.endsWith("html")))
+		      {
+			len -= extLen;
+			end = len;
+			name = name.substring(0, len);
+		      }
+		  }
+	      }
+	    sbuf.append(name.substring(start, end));
+	  }
+	if (slash < 0)
+	  break;
+	start = slash + 1;
+      }
+    return sbuf.toString();
+  }
+
   public static String mangleName (String name)
   {
     return mangleName(name, false);

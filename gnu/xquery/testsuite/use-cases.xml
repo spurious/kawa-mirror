@@ -337,6 +337,43 @@ define function section_summary($s)
 </expect>
 </test>
 
+<!--
+<test>
+<ident>Use Case "R" Q11 - List the item number and description of the
+item(s) that received the highest bid ever recorded, and the amount of
+that bid.</ident>
+<query><![CDATA[
+let $highbid := max(document("bids.xml")//bid_tuple/bid)
+return
+    <result>
+      {
+        for $item in document("items.xml")//item_tuple,
+            $b in document("bids.xml")//bid_tuple[itemno = $item/itemno]
+        where $b/bid = $highbid
+        return
+            <expensive_item>
+                { $item/itemno }
+                { $item/description }
+                <high_bid>{ $highbid }</high_bid>
+            </expensive_item>
+        }
+    </result>
+]]>
+</query>
+<expect>
+  <result>
+    <expensive_item>
+      <itemno>1002</itemno>
+      <description>Motorcycle</description>
+      <high_bid>
+        <bid>1200</bid>
+      </high_bid>
+    </expensive_item>
+  </result>
+</expect>
+</test>
+-->
+
 <test>
 <ident>Use Case "PARTS" - Recursive Parts Explosion: Q1 inline data</ident>
 <NOTE>Instead of using an external parts-data.xml file, dine $Parts-line</NOTE>

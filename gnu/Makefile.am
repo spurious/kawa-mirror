@@ -1,7 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
 	kawa commonlisp ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
 	$(SWING_SUBDIRS)

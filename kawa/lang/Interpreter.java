@@ -2,7 +2,7 @@ package kawa.lang;
 
 /** This class is temporary - I plan to move things to Scheme instead. */
 
-public class Interpreter
+public abstract class Interpreter
 {
   static public final Boolean  trueObject = Boolean.TRUE;
   static public final Boolean  falseObject = Boolean.FALSE;
@@ -20,4 +20,10 @@ public class Interpreter
     return b ? Boolean.TRUE : Boolean.FALSE;
   }
 
+
+  public /* FOR NOW */ Environment environ;
+
+  public abstract Object read (InPort in)
+    throws java.io.IOException, kawa.lang.ReadError;
+  public abstract void print (Object obj, OutPort out);
 }

@@ -13,12 +13,6 @@ public class LetExp extends ScopeExp
 
   public LetExp (Expression[] i) { inits = i; }
 
-  public Object eval (Environment env)
-       throws UnboundSymbol, WrongArguments, WrongType, GenericError
-  {
-    throw new GenericError ("internal error - LetExp.eval called");
-  }
-
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
   private final void store_rest (Compilation comp, Variable vars)

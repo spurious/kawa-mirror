@@ -26,8 +26,10 @@ public class LambdaExp extends ScopeExp
   Declaration capturedVars;
   /* If any variables local to this LambdaExp are captured by some inner
      non-lined Lambda, then all such variables are allocated in a heapFrame.
-     The heapFrame is an instance of the Procedure compiled from one
-     of our child lambdas.  heapFrameLambda points to the child.  */
+     If (! usingCPStyle), then the heapFrame is an instance of the Procedure
+     compiled from one of our child lambdas, and
+     heapFrameLambda points to the child
+     If (! usingCPStyle), then heapFrameLambda is this LambdaExp.  */
   LambdaExp heapFrameLambda;
 
   public LambdaExp firstChild;
@@ -49,10 +51,38 @@ public class LambdaExp extends ScopeExp
   /** If non-null, a Declaration whose value is (only) this LambdaExp. */
   Declaration nameDecl;
 
+  /** If non-null, this is a Field that is used for implementing lexical closures.
+   * If getName() is "closureEnv", it is our parent's heapFrame,
+   * which is an instance of one of our siblings.
+   * (Otherwise, we use "this" as the implicit "closureEnv" field.) */
+  public Field closureEnvField;
+
+  /** Field in heapFrame,getType() that contains the static link.
+   * Its value is this function's heapFrame value. */
+  public Field staticLinkField;
+
+  /** A variable that points to the heap-allocated part of the frame.
+   * This is an instance of heapFrameLambda (which is one of our children);
+   * each captured variable is a field in the heapFrame. */
+  Declaration heapFrame;
+
+  /** A variable that points to the closure environment passed in.
+   * It can be any one of:
+   * null, if no closure environment is needed;
+   * this, if this function is its parent's heapFrame;
+   * a local variable initialized from this.closureEnv;
+   * a parameter (only if !getCanRead()); or
+   * a copy of our parent's closureEnv or heapFrame (only if getInlineOnly()).
+   * See declareClosureEnv and closureEnvField. */
+  Declaration closureEnv;
+
   static final int INLINE_ONLY = 1;
   static final int CAN_READ = 2;
   static final int CAN_CALL = 4;
   static final int IMPORTS_LEX_VARS = 8;
+  static final int NEEDS_STATIC_LINK = 16;
+  /* Used (future) by FindTailCalls. */
+  static final int CANNOT_INLINE = 32;
   int flags;
 
   /** True iff this lambda is only "called" inline. */
@@ -63,7 +93,16 @@ public class LambdaExp extends ScopeExp
     else flags &= ~INLINE_ONLY;
   }
 
-  public boolean isSharedSwitchMethod() { return false; }
+  /** True if a child lambda uses lexical variables from outside.
+      Hence, a child heapFrame needs a staticLink to outer frames. */
+  public final boolean getNeedsStaticLink ()
+  { return (flags & NEEDS_STATIC_LINK) != 0; }
+
+  public final void setNeedsStaticLink(boolean needsStaticLink)
+  {
+    if (needsStaticLink) flags |= NEEDS_STATIC_LINK;
+    else flags &= ~NEEDS_STATIC_LINK;
+  }
 
   /** True iff this lambda "captures" (uses) lexical variables from outside. */
   public final boolean getImportsLexVars ()
@@ -80,7 +119,7 @@ public class LambdaExp extends ScopeExp
     int old = flags;
     flags |= IMPORTS_LEX_VARS;
 
-    // If this needs an environment (close), the its callers do too.
+    // If this needs an environment (closure), then its callers do too.
     if ((old & IMPORTS_LEX_VARS) == 0 && nameDecl != null)
       {
 	LambdaExp outer = outerLambda();
@@ -114,6 +153,23 @@ public class LambdaExp extends ScopeExp
 
   /** True iff this is the dummy top-level function of a module body. */
   public final boolean isModuleBody () { return this instanceof ModuleExp; }
+
+  /** True if a class is generated for this procedure.
+   * We don't need a class if this is only called inline.
+   * We also don't need a class if all callers are known, and we can
+   * invoke a method for this procedure.
+   * However, the last optimization is not availble when using tail calls.
+   */
+  public final boolean isClassGenerated ()
+  {
+    return (! getInlineOnly()
+	    && (getCanRead() || Compilation.usingTailCalls()));
+  }
+
+  public final boolean isHandlingTailCalls ()
+  {
+    return Compilation.usingTailCalls && ! isModuleBody();
+  }
 
   public final boolean variable_args () { return max_args < 0; }
 
@@ -162,12 +218,75 @@ public class LambdaExp extends ScopeExp
     return outer == null ? null : outer.currentLambda ();
   }
 
+  /** Return the closest outer non-inlined LambdaExp. */
+
+  public LambdaExp outerLambdaNotInline ()
+  {
+    for (ScopeExp exp = this; (exp = exp.outer) != null; )
+      {
+	if (exp instanceof LambdaExp)
+	  {
+	    LambdaExp result = (LambdaExp) exp;
+	    if (! result.getInlineOnly())
+	      return result;
+	  }
+      }
+    return null;
+  }
+
+  Declaration thisVariable;
+
   public Declaration declareThis(ClassType clas)
   {
-    Declaration var  = new Declaration("this", clas);
-    scope.addVariableAfter(null, var);
-    var.setParameter (true);  var.setArtificial (true);
-    return var;
+    if (thisVariable == null)
+      {
+	Declaration var  = new Declaration("this", clas);
+	scope.addVariableAfter(null, var);
+	var.setParameter (true);  var.setArtificial (true);
+	thisVariable = var;
+      }
+    return thisVariable;;
+  }
+
+  public Declaration declareClosureEnv()
+  {
+    if (closureEnv == null && (getImportsLexVars() || getNeedsStaticLink()))
+      {
+	LambdaExp parent = outerLambda();
+	Declaration parentFrame = parent.heapFrame != null ?  parent.heapFrame
+	  : parent.closureEnv;
+	if (getInlineOnly())
+	  {
+	    closureEnv = parentFrame;
+	  }
+	else if (! isClassGenerated())
+	  {
+	    if (parent.heapFrame == null)
+	      closureEnv = null;
+	    else if (! primMethod.getStaticFlag())
+	      closureEnv = declareThis(primMethod.getDeclaringClass());
+	    else
+	      {
+		Type envType = primMethod.getParameterTypes()[0];
+		closureEnv = new Declaration("closureEnv", envType);
+		scope.addVariableAfter(null, closureEnv);
+		closureEnv.setArtificial(true);
+		closureEnv.setParameter(true);
+	      }
+	  }
+	else if (parent.heapFrameLambda == this)
+	  closureEnv = thisVariable;
+	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink())
+	  closureEnv = null;
+	else
+	  {
+	    closureEnv = new Declaration("closureEnv",
+					 parentFrame.getType());
+	    scope.addVariable(closureEnv);
+	    closureEnv.setArtificial(true);
+	  }
+      }
+    return closureEnv;
   }
 
   public Declaration declareArgsArray()
@@ -188,6 +307,8 @@ public class LambdaExp extends ScopeExp
       }
     Declaration decl = new Declaration ("argsArray", Compilation.objArrayType);
     // The "argsArray" is the second variable allocated (after "this").
+    if (isHandlingTailCalls())
+      prev = prev.nextVar();
     scope.addVariableAfter(prev, decl);
     decl.setParameter(true);
     decl.setArtificial(true);
@@ -203,46 +324,29 @@ public class LambdaExp extends ScopeExp
     this.body = body;
   }
 
-  /** If non-null, this is a Field that is used for implementing lexical closures.
-   * If getName() is "closureEnv", it is our parent's heapFrame,
-   * which is an instance of one of our siblings.
-   * (Otherwise, we use "this" as the implicit "closureEnv" field.)
-   * If getName() is "staticLink", it is used to chain together heap frames. */
-  public Field staticLinkField;
-
-  /** A variable that points to the heap-allocated part of the frame.
-   * This is an instance of heapFrameLambda (which is one of our children);
-   * each captured variable is a field in the heapFrame. */
-  Declaration heapFrame;
-
   /** Generate code to load heapFrame on the JVM stack. */
   public void loadHeapFrame (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp curLambda = comp.curLambda;
     while (curLambda != this && curLambda.getInlineOnly())
-      curLambda = curLambda.outerLambda();
+      curLambda = curLambda.returnContinuation.context;
     if (this == curLambda)
-      code.emitLoad(this.heapFrame);
+      {
+	if (this.heapFrame == null)
+	  code.emitPushThis();
+	else
+	  code.emitLoad(this.heapFrame);
+      }
     else
       {
-	code.emitPushThis();
+	code.emitLoad(curLambda.closureEnv);
 	LambdaExp parent = curLambda.outerLambda();
-	if (parent.heapFrameLambda != curLambda
-	    && parent.heapFrameLambda != null
-	    && curLambda.getCanRead())
-	  {
-	    code.emitGetField(curLambda.staticLinkField);
-	  }
 	while (parent != this)
 	  {
-	    if (! (parent instanceof ObjectExp))
-	      {
-		if (parent.heapFrameLambda != null)
-		  curLambda = parent.heapFrameLambda;
-		code.emitGetField(curLambda.staticLinkField);
-	      }
-	    curLambda = parent;
+	    if (parent.staticLinkField != null)
+	      code.emitGetField(parent.staticLinkField);
+	    //curLambda = parent;
 	    parent = parent.outerLambda();
 	  }
       }
@@ -268,6 +372,7 @@ public class LambdaExp extends ScopeExp
   {
     ClassType saveClass = comp.curClass;
     Method saveMethod = comp.method;
+    Variable saveCallStackContext = comp.callStackContext;
     try
       {
 	return comp.addClass (this);
@@ -276,6 +381,7 @@ public class LambdaExp extends ScopeExp
       {
 	comp.curClass = saveClass;
 	comp.method = saveMethod;
+	comp.callStackContext = saveCallStackContext;
       }
   }
 
@@ -283,36 +389,18 @@ public class LambdaExp extends ScopeExp
 
   public ClassType compileAlloc (Compilation comp)
   {
-    /*
-    if (isSharedSwitchMethod())
-      {
-	code = ...;
-	Label l = new Label(code);
-	int pc = comp.fwitch.getMaxValue() + 1;
-	comp.addCase(pc, l, conp);
-	Variable argsArray = declareArgsArray();
-	enterFunction(comp, argsArray);
-      }
-    */
     ClassType new_class = compile (comp);
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.emitNew(new_class);
     code.emitDup(new_class);
     code.emitInvokeSpecial(new_class.constructor);
-    if (staticLinkField != null)
+    if (closureEnvField != null)
       {
 	code.emitDup(new_class);
 	LambdaExp caller = outerLambda();
-	if (staticLinkField.getName() == "closureEnv")
-	  code.emitLoad(caller.heapFrame);
-	else // staticLinkField.getName() == "staticLink"
-	  {
-	    code.emitPushThis();
-	    if (caller.staticLinkField != null
-		&& caller.staticLinkField.getName() == "closureEnv")
-	      code.emitGetField(caller.staticLinkField);
-	  }
-	code.emitPutField(staticLinkField);
+	code.emitLoad(caller.heapFrame != null ? caller.heapFrame
+		      : caller.closureEnv);		      
+	code.emitPutField(closureEnvField);
       }
 
     if (name != null)
@@ -334,6 +422,16 @@ public class LambdaExp extends ScopeExp
     return new_class;
   }
 
+  public void compileEnd (Compilation comp)
+  {
+    gnu.bytecode.CodeAttr code = comp.getCode();
+    if (comp.method.reachableHere() && ! isHandlingTailCalls())
+      code.emitReturn();
+    code.popScope();        // Undoes enterScope in enterFuntion.
+    if (! Compilation.fewerClasses) // FIXME
+      comp.method.popScope(); // Undoes pushScope in method.initCode.
+  }
+
   public void compile (Compilation comp, Target target)
   {
     if (target instanceof IgnoreTarget)
@@ -342,7 +440,71 @@ public class LambdaExp extends ScopeExp
       throw new Error("internal error: compile called for inlineOnly LambdaExp");
     LambdaExp parent = outerLambda();
     Type rtype;
-    if (parent != null && parent.heapFrameLambda == this)
+    if (Compilation.fewerClasses && ! getImportsLexVars())
+      {
+	CodeAttr code = comp.getCode();
+	//	Label func_start = new Label(code);
+	Label func_end = new Label(code);
+	LambdaExp saveLambda = comp.curLambda;
+	comp.curLambda = this;
+	type = saveLambda.type;
+	if (comp.usingCPStyle())
+	  {
+	    heapFrameLambda = this;
+	    heapFrame = comp.thisDecl;
+	    for (Variable var = firstVar (); var != null; var = var.nextVar ())
+	      {
+		if (! var.isArtificial())
+		  ((Declaration) var).assignField(comp);
+	      }
+	  }
+	gnu.bytecode.SwitchState fswitch = comp.fswitch;
+	int pc = comp.fswitch.getMaxValue() + 1;
+	code.emitGoto(func_end);
+	Type[] stackTypes = code.saveStackTypeState(true);
+
+	fswitch.addCase(pc, code);
+	//	func_start.define(code);
+	//comp.method.initCode();
+	code.emitPushThis();
+	code.emitGetField(comp.argsCallStackField);
+	code.emitStore(comp.argsArray);
+	allocParameters(comp, comp.argsArray);
+	enterFunction(comp, comp.argsArray);
+
+	body.compileWithPosition(comp, Target.returnObject);
+	compileEnd(comp);
+	comp.curLambda = saveLambda;
+	func_end.define(code);
+	code.restoreStackTypeState(stackTypes);
+	ClassType ctype = comp.curClass;
+	rtype = ctype;
+	code.emitNew(ctype);
+	code.emitDup(ctype);
+	code.emitInvokeSpecial(ctype.constructor);
+	code.emitDup(ctype);
+	code.emitPushInt(pc);
+	code.emitPutField(comp.saved_pcCallFrameField);
+	if (isHandlingTailCalls())
+	  {
+	    // Set name field.
+	    if (name != null)
+	      {
+		code.emitDup(ctype);
+		code.emitPushString(name);
+		code.emitPutField(comp.nameField);
+	      }
+	    // Set numArgs field.
+	    code.emitDup(ctype);
+	    code.emitPushInt(min_args | (max_args << 12));
+	    code.emitPutField(comp.numArgsCallFrameField);
+	    // Set static link field to this CallFrame.
+	    code.emitDup(ctype);
+	    code.emitPushThis();
+	    code.emitPutField(comp.callerCallFrameField);
+	  }
+      }
+    else if (parent != null && parent.heapFrameLambda == this)
       {
 	// When parent was entered, we allocated an instance of this
 	// Procedure, and assigned it to parent's heapFrame.
@@ -357,24 +519,40 @@ public class LambdaExp extends ScopeExp
     target.compileFromStack(comp, rtype);
   }
 
-  Method addMethodFor (ClassType ctype, String name, int flags)
+  Method addMethodFor (ClassType ctype, String name, ObjectType closureEnvType)
   {
     Type rtype = body.getType();
     Type[] atypes;
+    int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
     if (min_args != max_args)
-      atypes = Compilation.applyNargs;
+      {
+	if (extraArg == 0)
+	  atypes = Compilation.applyNargs;
+	else
+	  {
+	    atypes = new Type[2];
+	    atypes[0] = closureEnvType;
+	    atypes[1] = Compilation.objArrayType;
+	  }
+      }
     else
       {
-	atypes = new Type[max_args];
+	int itype = 0;
+	atypes = new Type[extraArg + max_args];
+	if (extraArg > 0)
+	  atypes[0] = closureEnvType;
 	Variable var = firstVar ();
 
-	for (int itype = 0;  itype < atypes.length; var = var.nextVar ())
+	for ( ; itype < max_args; var = var.nextVar ())
 	  {
 	    if (! var.isParameter() || var.isArtificial())
 	      continue;
-	    atypes[itype++] = var.getType();
+	    atypes[extraArg + itype++] = var.getType();
 	  }
       }
+    int flags = closureEnvType == null ? Access.PUBLIC|Access.STATIC
+      : closureEnvType == ctype ? Access.FINAL
+      : Access.STATIC;
     return ctype.addMethod(name, atypes, rtype, flags);
   }
 
@@ -383,7 +561,7 @@ public class LambdaExp extends ScopeExp
   {
     for (LambdaExp child = firstChild;  child != null; ) 
       { 
-        if (child.getCanRead() )
+        if (child.isClassGenerated())
 	  //            || heapFrameLambda == child 
 	  //            || child.min_args != child.max_args) 
           { 
@@ -409,23 +587,22 @@ public class LambdaExp extends ScopeExp
 	heapFrame.setType(frameType);
       }
 
-    if (getImportsLexVars())
+    if ((getImportsLexVars() || getNeedsStaticLink())
+	&& isClassGenerated())
       {
 	LambdaExp parent = outerLambda();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
-	if (parent instanceof ObjectExp)
-	  ;
-	else if (heapFrameLambda != this && heapFrameLambda != null
-	    && getCanRead())
+	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
 	  {
-	    ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
-	    staticLinkField = comp.curClass.addField ("closureEnv", heapFrameType);
-	  }
-	// otherwise: closureEnv==this.
-	else if (parent.getImportsLexVars())
-	  {
-	    Type slinkType = parent.outerLambda().heapFrame.getType();
-	    staticLinkField = comp.curClass.addField ("staticLink", slinkType);
+	    if (heapFrameLambda != null)
+	      {
+		ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
+		closureEnvField = comp.curClass.addField ("closureEnv", heapFrameType);
+	      }
+	    else if (parent.getNeedsStaticLink())
+	      {
+		closureEnvField = comp.curClass.addField ("closureEnv", parent.closureEnv.getType());
+	      }
 	  }
       }
 
@@ -435,6 +612,8 @@ public class LambdaExp extends ScopeExp
   {
     CodeAttr code = comp.getCode();
     int i = 0;
+    int j = 0;
+    declareClosureEnv();
     Variable var = firstVar();
     while (var != null)
       {
@@ -458,8 +637,8 @@ public class LambdaExp extends ScopeExp
 	    else
 	      {
 		// This variable was captured by an inner lambda.
-		// It's home location is in the heapFrame.
-		// Later, we copy it from it's incoming register
+		// Its home location is in the heapFrame.
+		// Later, we copy it from its incoming register
 		// to its home location heapFrame.  Here we just create and
 		// assign a Variable for the incoming (register) value.
 		String incoming_name = (var.getName ()+"Incoming").intern();
@@ -476,14 +655,23 @@ public class LambdaExp extends ScopeExp
 	    // the label that tail-recursion branches back to.
 	    // This way, a self-tail-call knows where to leave the argumnents.
 	    if (argsArray != null && min_args == max_args
+		// && ! comp.fewerClasses
 		&& ! var.isArtificial())
 	      {
 		code.emitLoad(argsArray);
-		// The first two slots are "this" and "argsArray".
-		code.emitPushInt(i-2);
+		code.emitPushInt(j);
 		code.emitArrayLoad(Type.pointer_type);
+		decl.getType().emitCoerceFromObject(code);
 		code.emitStore(decl);
 	      }
+	    if (var == argsArray && isHandlingTailCalls())
+	      {
+		code.emitLoad(comp.callStackContext);
+		code.emitGetField(comp.argsCallStackField);
+		code.emitStore(argsArray);
+	      }
+	    if (! var.isArtificial())
+	      j++;
 	    if (var != decl)
 	      var = decl;  // Skip "incomingXxx" before next iteration.
 	    i++;
@@ -497,9 +685,15 @@ public class LambdaExp extends ScopeExp
   void enterFunction (Compilation comp, Variable argsArray)
   {
     CodeAttr code = comp.getCode();
-    // Tail-calls loop back to here! 
+    // Tail-calls loop back to here!
     code.enterScope (scope);
-    if (heapFrame != null)
+    if (closureEnvField != null)
+      {
+	code.emitPushThis();
+	code.emitGetField(closureEnvField);
+	code.emitStore(closureEnv);
+      }
+    if (heapFrame != null && ! comp.usingCPStyle())
       {
 	ClassType frameType = (ClassType) heapFrame.getType();
 	for (Declaration decl = capturedVars; decl != null;
@@ -518,10 +712,11 @@ public class LambdaExp extends ScopeExp
 	    Type dtype = decl.getType();
 	    decl.field = frameType.addField (mname, decl.getType());
 	  }
+	if (closureEnv != null && heapFrame != null) 
+	  staticLinkField = frameType.addField("staticLink",
+					       closureEnv.getType());
 	if (heapFrameLambda != null)
-	  {
-	    heapFrameLambda.compileAlloc(comp);
-	  }
+	  heapFrameLambda.compileAlloc(comp);
 	else
 	  {
 	    code.emitNew(frameType);
@@ -529,10 +724,16 @@ public class LambdaExp extends ScopeExp
 	    Method constructor = comp.generateConstructor(frameType, null);
 	    code.emitInvokeSpecial(constructor);
 	  }
+	if (staticLinkField != null)
+	  {
+	    code.emitDup(heapFrame.getType());
+	    code.emitLoad(closureEnv);
+	    code.emitPutField(staticLinkField);
+	  }
 	code.emitStore(heapFrame);
       }
 
-    if (min_args == max_args)
+    if (min_args == max_args && ! comp.fewerClasses)
       argsArray = null;
 
     // For each non-artificial parameter, copy it from its incoming
@@ -619,6 +820,7 @@ public class LambdaExp extends ScopeExp
 		  }
 		// Now finish copying the incoming argument into its
 		// home location.
+		param.getType().emitCoerceFromObject(code);
 		if (param.isSimple ())
 		  code.emitStore(param);
 		else

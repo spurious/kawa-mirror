@@ -73,7 +73,7 @@ public class FindTailCalls extends ExpFullWalker
 	int n = exp.exps.length - 1;
 	for (int i = 0;  i <= n;  i++)
 	  {
-	    inTailContext = (i == n);
+	    inTailContext = (i == n) && save;
 	    exp.exps[i] = (Expression) exp.exps[i].walk(this);
 	  }
 	return exp;
@@ -86,39 +86,37 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkLetExp (LetExp exp)
   {
+    int n = exp.inits.length; 
     boolean save = inTailContext;
+    gnu.bytecode.Variable var;
     try
       {
 	inTailContext = false;
-	int n = exp.inits.length; 
-
-	gnu.bytecode.Variable var = exp.firstVar();
-	for (int i = 0;  i < n;  i++)
-	  exp.inits[i] = walkSetExp ((Declaration) var, exp.inits[i]);
-
-	inTailContext = true;
-	exp.body = (Expression) exp.body.walk(this);
 
 	var = exp.firstVar();
 	for (int i = 0;  i < n;  i++, var = var.nextVar())
-	  {
-	    Declaration decl = (Declaration) var;
-	    if (decl.value != null && decl.value instanceof LambdaExp)
-	      {
-		LambdaExp lexp = (LambdaExp) decl.value;
-		if (decl.getCanRead())
-		  lexp.setCanRead(true);
-		if (decl.getCanCall())
-		  lexp.setCanCall(true);
-	      }
-	  }
-
-	return exp;
+	  exp.inits[i] = walkSetExp ((Declaration) var, exp.inits[i]);
       }
     finally
       {
 	inTailContext = save;
       }
+    exp.body = (Expression) exp.body.walk(this);
+
+    var = exp.firstVar();
+    for (int i = 0;  i < n;  i++, var = var.nextVar())
+      {
+	Declaration decl = (Declaration) var;
+	if (decl.value != null && decl.value instanceof LambdaExp)
+	  {
+	    LambdaExp lexp = (LambdaExp) decl.value;
+	    if (decl.getCanRead())
+	      lexp.setCanRead(true);
+	    if (decl.getCanCall())
+	      lexp.setCanCall(true);
+	  }
+      }
+    return exp;
   }
 
   public Object walkIfExp (IfExp exp)
@@ -128,17 +126,16 @@ public class FindTailCalls extends ExpFullWalker
       {
 	inTailContext = false;
 	exp.test = (Expression) exp.test.walk(this);
-	inTailContext = true;
-	exp.then_clause = (Expression) exp.then_clause.walk(this);
-	Expression else_clause = exp.else_clause;
-	if (else_clause != null)
-	  exp.else_clause = (Expression) else_clause.walk(this);
-	return exp;
       }
     finally
       {
 	inTailContext = save;
       }
+    exp.then_clause = (Expression) exp.then_clause.walk(this);
+    Expression else_clause = exp.else_clause;
+    if (else_clause != null)
+      exp.else_clause = (Expression) else_clause.walk(this);
+    return exp;
   }
 
   public Object walkLambdaExp (LambdaExp exp)
@@ -168,7 +165,61 @@ public class FindTailCalls extends ExpFullWalker
 	inTailContext = save;
 	currentLambda = parent;
       }
+
+    for (LambdaExp child = exp.firstChild;  child != null;
+	 child = child.nextSibling)
+      {
+	if (child.getCanRead()
+	    || child.min_args != child.max_args)
+	  child.flags |= LambdaExp.CANNOT_INLINE;
+	else
+	  {
+	    ApplyExp caller = child.returnContinuation;
+	    if (caller != null && caller != LambdaExp.unknownContinuation
+		&& ! Compilation.usingCPStyle())
+	      {
+		child.setInlineOnly(true);
+	      }
+	  }
+      }
+
+    for (LambdaExp child = exp.firstChild;  child != null;
+	 child = child.nextSibling)
+      {
+	if ((child.flags & (LambdaExp.CANNOT_INLINE|LambdaExp.INLINE_ONLY))!=0)
+	  continue;
+	// We can inline child if it is a member of a set of functions
+	// which can all be inlined in the same method, and for which
+	// all callers are known and members of the same,
+	// and each function has at most one caller that is not a tail-call.
+	// FIXME  Basic algorithm:
+	/*
+	Vector inlineSet = new Vector();  // empty
+	ApplyExp[] apl = (ApplyExp[]) applications.get(child);
+	Stack queue = new Stack();
+	copy elements of apl to queue;
+	while (!queue.empty())
+	  {
+	    LambdaExp caller = (LambdaExp) queue.pop();
+	    if ((caller.flags & LambdaExp.CANNOT_INLINE) != 0)
+	      {
+		child.flags |= LambdaExp.CANNOT_INLINE;
+		break;
+	      }
+	    if (caller in inlineSet)
+	      continue;
+	    apl = (ApplyExp[]) applications.get(child);
+	    add elements of apl to queue;
+	    add caller to inlineSet;
+	    add caller.returnContinuation.context to inlineSet;
+	  }
+	*/
+      }
   }
+
+  // Map LambdaExp to ApplyExp[], which is the set of non-self tails
+  // calls that call the key.
+  // Hashtable applications = new Hashtable();
 
   public Object walkObjectExp (ObjectExp exp)
   {

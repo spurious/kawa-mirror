@@ -14,6 +14,7 @@ public class ReferenceExp extends Expression
   public String string_name () { return symbol; }
 
   public final String getName() { return symbol; }
+  /** If non-null, the local Declaration this refers to. */
   public final Declaration getBinding() { return binding; }
 
   static int counter;

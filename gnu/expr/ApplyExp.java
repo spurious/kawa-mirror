@@ -53,13 +53,53 @@ public class ApplyExp extends Expression
   public static void compileToArray(Expression[] args, Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    code.emitPushInt(args.length);
-    code.emitNewArray(Type.pointer_type);
+    if (args.length == 0)
+      {
+	code.emitGetStatic(Compilation.noArgsProcedureField);
+	return;
+      }
+    LambdaExp caller = comp.curLambda;
+    if (args.length == caller.min_args
+	&& args.length == caller.max_args
+	&& caller.isHandlingTailCalls())
+      {
+	// Re-use caller's argsArray.
+	// code.emitLoad(caller.declareArgsArray());  FIXME
+	code.emitLoad(comp.callStackContext);
+	code.emitGetField(Compilation.argsCallStackField);
+      }
+    else
+      {
+	code.emitPushInt(args.length);
+	code.emitNewArray(Type.pointer_type);
+      }
     for (int i = 0; i < args.length; ++i)
       {
-	code.emitDup(comp.objArrayType);
-	code.emitPushInt(i);
-	args[i].compile (comp, Target.pushObject);
+	Expression arg = args[i];
+	if (comp.usingCPStyle
+	    && ! (arg instanceof QuoteExp) && ! (arg instanceof ReferenceExp))
+	  {
+	    // If the argument involves a CPStyle function call, we will
+	    // have to save and restore anything on the JVM stack into
+	    // fields in the CallFrame.  This is expensive, so defer
+	    // pushing the duplicated argument array and the index
+	    // until *after* we've calculated the argument.  The downside
+	    // is that we have to do some extra stack operations.
+	    // However, these are cheap (and get compiled away when
+	    // compiling to native code).
+	    arg.compile (comp, Target.pushObject);
+	    code.emitSwap();
+	    code.emitDup(1, 1);
+	    code.emitSwap();
+	    code.emitPushInt(i);
+	    code.emitSwap();
+	  }
+	else
+	  {
+	    code.emitDup(comp.objArrayType);
+	    code.emitPushInt(i);
+	    arg.compile (comp, Target.pushObject);
+	  }
 	code.emitArrayStore(Type.pointer_type);
       }
   }
@@ -70,7 +110,6 @@ public class ApplyExp extends Expression
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp func_lambda = null;
     String func_name = null;
-
     if (exp.func instanceof LambdaExp)
       {
 	func_lambda = (LambdaExp) exp.func;
@@ -106,15 +145,25 @@ public class ApplyExp extends Expression
 	    System.err.println(func_name);
 	    func_lambda = null;
 	  }
-	else if (! func_lambda.getCanRead() && ! func_lambda.getInlineOnly())
+	else if (! func_lambda.getCanRead() && ! func_lambda.getInlineOnly()
+		 && ! func_lambda.isHandlingTailCalls())
 	  {
 	    method = func_lambda.primMethod;
 	    boolean is_static = method.getStaticFlag();
 	    Expression[] args = exp.getArgs();
+	    int extraArg = 0;
 	    Type[] argTypes = method.getParameterTypes();
 	    // ?? Procedure.checkArgCount(this, args.length);
-	    if (! is_static)
-	      func_lambda.outerLambda().loadHeapFrame(comp);
+	    LambdaExp parent = func_lambda.outerLambdaNotInline();
+	    if ((parent.heapFrame != null
+		 && (func_lambda.getImportsLexVars()
+		     || func_lambda.getNeedsStaticLink()))
+		|| ! is_static)
+	      {
+		if (is_static)
+		  extraArg = 1;
+		parent.loadHeapFrame(comp);
+	      }
 	    if (func_lambda.max_args != func_lambda.min_args)
 	      {
 		compileToArray (exp.args, comp);
@@ -123,12 +172,12 @@ public class ApplyExp extends Expression
 	      {
 		for (int i = 0; i < args.length; ++i)
 		  {
-		    if (argTypes[i] == null)
+		    if (argTypes[extraArg+i] == null)
 		      {
 			throw new Error("bad argtypes["+i+"] len:"+argTypes.length
 +" func:"+func_lambda+" meth:"+method);
 		      }
-		    args[i].compile(comp, argTypes[i]);
+		    args[i].compile(comp, argTypes[extraArg+i]);
 		  }
 	      }
 	    if (is_static)
@@ -140,36 +189,65 @@ public class ApplyExp extends Expression
 	  }
       }
 
-    /* CPS:
-    if (comp.usingCPSstyle())
+    if (comp.usingCPStyle())
       {
-	//  evaluate args to frame-locals vars;  // may recurse! 
-	if (isTailCall())
-	  {
-	    emit[proc.apply(args, context, THIS_frame.caller, THIS_frame.saved_pc)];
-	     code.emitReturn();
-	  }
-	else
 	  {
 	    Label l = new Label(code);
 	    gnu.bytecode.SwitchState fswitch = comp.fswitch;
 	    int pc = fswitch.getMaxValue() + 1;
-	    fswitch.addCase(pc, l, comp);
-	    emit[proc.apply(args, context, THIS_frame, pc)];
-	    code.saveStack(class?);
+	    fswitch.addCase(pc, l, code);
+	    code.emitLoad(comp.callStackContext);
+
+	    // Emit: context->pc = pc.
+	    code.emitLoad(comp.callStackContext);
+	    code.emitPushInt(pc);
+	    code.emitPutField(Compilation.pcCallStackField);
+
+	    code.emitInvokeVirtual(comp.applyCpsMethod);
+
+	    // emit[save java stack, if needed]
+	    Type[] stackTypes = code.saveStackTypeState(false);
+	    java.util.Stack stackFields = new java.util.Stack(); 
+	    if (stackTypes != null)
+	      {
+		for (int i = stackTypes.length;  --i >= 0; )
+		  {
+		    Field fld = comp.allocLocalField (stackTypes[i], null);
+		    code.emitPushThis();
+		    code.emitSwap();
+		    code.emitPutField(fld);
+		    stackFields.push(fld);
+		  }
+	      }
+
 	    code.emitReturn();
 	    l.define(code);
-	    emit[restore java stack, if needed];
+
+	    // emit[restore java stack, if needed]
+	    if (stackTypes != null)
+	      {
+		for (int i = stackTypes.length;  --i >= 0; )
+		  {
+		    Field fld = (Field) stackFields.pop();
+		    code.emitPushThis();
+		    code.emitGetField(fld);
+		    comp.freeLocalField(fld);
+		  }
+	      }
+
+	    // Load result from stack.value to target.
+	    code.emitLoad(comp.callStackContext);
+	    code.emitGetField(comp.valueCallStackField);
+	    target.compileFromStack(comp, Type.pointer_type);
 	  }
 	return;
       }
-    */
 
     int args_length = exp.args.length;
 
     // Check for tail-recursion.
     boolean tail_recurse
-      = (target instanceof TailTarget)
+      = exp.tailCall
       && func_lambda != null && func_lambda == comp.curLambda;
 
     if (func_lambda != null && func_lambda.getInlineOnly() && !tail_recurse
@@ -183,10 +261,25 @@ public class ApplyExp extends Expression
 	func_lambda.allocParameters(comp, null);
 	popParams (code, func_lambda);
 	func_lambda.enterFunction(comp, null);
-	func_lambda.body.compileWithPosition(comp, Target.returnObject);
+	func_lambda.body.compileWithPosition(comp, target);
 	code.popScope();
+	// comp.method.popScope();
 	comp.curLambda = saveLambda;
-	target.compileFromStack(comp, Type.pointer_type);
+	return;
+      }
+
+    if (comp.curLambda.isHandlingTailCalls() && exp.isTailCall()
+	&& ! comp.curLambda.getInlineOnly())
+      {
+	code.emitLoad(comp.callStackContext);
+	code.emitDup(comp.callStackContext.getType());
+	exp.func.compile(comp, new StackTarget(comp.scmProcedureType));
+	code.emitPutField(comp.procCallStackField);
+	code.emitDup(comp.callStackContext.getType());
+	//  evaluate args to frame-locals vars;  // may recurse! 
+	compileToArray (exp.args, comp);
+	code.emitPutField(comp.argsCallStackField);
+	code.emitReturn();
 	return;
       }
 

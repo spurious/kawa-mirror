@@ -47,14 +47,21 @@ public class TryExp extends Expression
     boolean has_finally = finally_clause != null;
     Type result_type = target instanceof IgnoreTarget ? null
 	: getType();
+    Target ttarg;
+    if (result_type == null)
+      ttarg = Target.Ignore;
+    else if (result_type == Type.pointer_type)
+      ttarg = Target.pushObject;
+    else
+      ttarg = new StackTarget(result_type);
     code.emitTryStart(has_finally, result_type);
-    try_clause.compileWithPosition(comp, target);
+    try_clause.compileWithPosition(comp, ttarg);
     code.emitTryEnd();
 
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())
       {
-	catch_clause.compile(comp, target);
+	catch_clause.compile(comp, ttarg);
       }
 
     if (finally_clause != null)
@@ -64,6 +71,8 @@ public class TryExp extends Expression
 	code.emitFinallyEnd();
       }
     code.emitTryCatchEnd();
+    if (result_type != null)
+      target.compileFromStack(comp, result_type);
   }
 
   Object walk (ExpWalker walker) { return walker.walkTryExp(this); }

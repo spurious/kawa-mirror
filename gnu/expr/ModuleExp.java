@@ -29,7 +29,7 @@ public class ModuleExp extends LambdaExp
 	  Environment.setCurrent(env);
 	if (! mustCompile) // optimization - don't generate unneeded Class.
 	  return body.eval (env);
-	return ((ModuleBody) eval (env)).run (env);
+	return ((ModuleBody) eval (env)).run();
       }
     finally
       {

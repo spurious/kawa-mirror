@@ -7,16 +7,40 @@ public class FindCapturedVars extends ExpFullWalker
     exp.walk(new FindCapturedVars());
   }
 
-  public Object walkLambdaExp (LambdaExp exp)
+  public Object walkLetExp (LetExp exp)
   {
-    if (! exp.getCanRead())
+    if (exp.body instanceof BeginExp)
       {
-	ApplyExp caller = exp.returnContinuation;
-	if (caller != null && caller != LambdaExp.unknownContinuation
-	    && exp.min_args == exp.max_args)
-	  exp.setInlineOnly(true);
+	// Optimize "letrec"-like forms.
+	// If init[i] is the magic QuoteExp.nullExp, and the real value
+	// is a LambdaExp or a QuoteExp, we're not going to get weird
+	// order-dependencies, and it is safe to transform it to a regular let.
+	Expression[] inits = exp.inits;
+	int len = inits.length;
+	Expression[] exps = ((BeginExp) exp.body).exps;
+	if (exps.length > len)
+	  {
+	    int i = 0;
+	    gnu.bytecode.Variable var = exp.firstVar ();
+	    for (; i < len; var = var.nextVar (), i++)
+	      {
+		Declaration decl = (Declaration) var;
+		if (inits[i] == QuoteExp.nullExp
+		    && exps[i] instanceof SetExp)
+		  {
+		    SetExp set = (SetExp) exps[i];
+		    if ((set.new_value instanceof LambdaExp
+			 || set.new_value instanceof QuoteExp)
+			&& set.binding == decl)
+		      {
+			inits[i] = set.new_value;
+			exps[i] = QuoteExp.voidExp;
+		      }
+		  }
+	      }
+	  }
       }
-    return super.walkLambdaExp (exp);
+    return super.walkLetExp(exp);
   }
 
   public void capture(Declaration decl)
@@ -24,23 +48,39 @@ public class FindCapturedVars extends ExpFullWalker
     LambdaExp curLambda = getCurrentLambda ();
     LambdaExp declLambda = decl.getContext().currentLambda ();
     while (curLambda != declLambda && curLambda.getInlineOnly())
-      curLambda = curLambda.outerLambda();
-    if (curLambda != declLambda && ! decl.ignorable())
+      curLambda = curLambda.returnContinuation.context;
+    if (curLambda == declLambda)
+      return;
+
+    if (decl.getCanRead() || decl.getCanCall())
       {
-	LambdaExp heapLambda = curLambda;
-	for (;;)
+	// The logic here is similar to that of decl.ignorable():
+	LambdaExp declValue;
+	if (decl.value == null || ! (decl.value instanceof LambdaExp))
+	  declValue = null;
+	else
 	  {
-	    heapLambda.setImportsLexVars();
-	    LambdaExp outer = heapLambda.outerLambda();
-	    if (outer == declLambda)
-	      break;
-	    heapLambda = outer;
+	    declValue = (LambdaExp) decl.value;
+	    if (declValue.isHandlingTailCalls() && !declValue.getInlineOnly())
+	      declValue = null;
 	  }
-	if (decl.isSimple())
+
+	LambdaExp heapLambda = curLambda;
+	heapLambda.setImportsLexVars();
+	LambdaExp parent = heapLambda.outerLambda();
+	for (LambdaExp outer = parent;  outer != declLambda; )
+	  {
+	    heapLambda = outer;
+	    if (! decl.getCanRead() && declValue == outer)
+	      break;
+	    heapLambda.setNeedsStaticLink(true);
+	    outer = heapLambda.outerLambda();
+	  }
+	if (decl.isSimple() && (decl.getCanRead() || declValue == null))
 	  {
 	    if (declLambda.capturedVars == null)
 	      {
-		if (! heapLambda.getInlineOnly() && heapLambda.getCanRead())
+		if (heapLambda.isClassGenerated())
 		  declLambda.heapFrameLambda = heapLambda;
 		else
 		  {
@@ -49,7 +89,7 @@ public class FindCapturedVars extends ExpFullWalker
 		      {
 			if (child == null)
 			  break;
-			if (! child.getInlineOnly() && child.getCanRead())
+			if (child.isClassGenerated())
 			  {
 			    declLambda.heapFrameLambda = child;
 			    break;

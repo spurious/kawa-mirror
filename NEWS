@@ -1,3 +1,6 @@
+Srfi-0 (cond-expand) and srfi-8 (receive) are now implemented.  So is
+srfi-1 (lib library), though that requires doing (require 'list-lib).
+
 The JEmacs code is being re-organized, splitting out the Swing-dependent
 code into a separate gnu.jemacs.swing package.  This should make it
 easier to add JEmacs implementation without Swing.

@@ -117,7 +117,7 @@ JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 # cd software/kawa/api/
 # cvs ci -m 'Updated.' .
 
-MAINTAINERCLEANFILES = makekawa.bat
+MAINTAINERCLEANFILES = makekawa.bat $(JAVATOP)kawa/Version.java
 MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 CLEANFILES = *.jar
 

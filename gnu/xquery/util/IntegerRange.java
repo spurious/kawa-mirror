@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
@@ -20,15 +20,29 @@ public class IntegerRange extends CpsProcedure // implements Inlineable
   public static final IntNum MIN_INT = IntNum.make(Integer.MIN_VALUE);
   public static final IntNum MAX_INT = IntNum.make(Integer.MAX_VALUE);
 
-  public void integerRange(IntNum first, IntNum last, Consumer out)
+  /*
+  public static void integerRange(int first, int last, Consumer out)
   {
-    if (IntNum.compare(first, MIN_INT) >= 0
-	&& IntNum.compare(last, MAX_INT) <= 0)
+    int step = first > last ? -1 : 1;
+    for (;;)
       {
-	int fst = first.intValue();
-	int lst = last.intValue();
-	if (fst <= lst)
+	out.writeInt(first);
+	if (first == last)
+	  break;
+	first += step;
+      }
+  }
+  */
+
+  public static void integerRange(IntNum first, IntNum last, Consumer out)
+  {
+    if (IntNum.compare(first, last) <= 0)
+      {
+	if (IntNum.compare(first, MIN_INT) >= 0
+	    && IntNum.compare(last, MAX_INT) <= 0)
 	  {
+	    int fst = first.intValue();
+	    int lst = last.intValue();
 	    for (;;)
 	      {
 		out.writeInt(fst);
@@ -41,27 +55,38 @@ public class IntegerRange extends CpsProcedure // implements Inlineable
 	  {
 	    for (;;)
 	      {
-		out.writeInt(lst);
+		out.writeObject(first);
+		if (IntNum.compare(first, last) >= 0)
+		  break;
+		first = IntNum.add(first, 1);
+	      }
+
+	  }
+      }
+    else // first > last:
+      {
+	if (IntNum.compare(first, MAX_INT) <= 0
+	    && IntNum.compare(last, MIN_INT) >= 0)
+	  {
+	    int fst = first.intValue();
+	    int lst = last.intValue();
+	    for (;;)
+	      {
+		out.writeInt(fst);
 		if (fst == lst)
 		  break;
-		lst--;
+		fst--;
 	      }
 	  }
-      }
-    else if (IntNum.compare(first, last) <= 0)
-      {
-	while (IntNum.compare(first, last) <= 0)
+	else
 	  {
-	    out.writeObject(first);
-	    first = IntNum.add(first, 1);
-	  }
-      }
-    else
-      {
-	while (IntNum.compare(first, last) <= 0)
-	  {
-	    out.writeObject(last);
-	    last = IntNum.add(last, -1);
+	    for (;;)
+	      {
+		out.writeObject(first);
+		if (IntNum.compare(first, last) <= 0)
+		  break;
+		first = IntNum.add(first, -1);
+	      }
 	  }
       }
   }

@@ -1,9 +1,10 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
+import gnu.math.Numeric;
 
 public class BooleanValue extends Procedure1
 {
@@ -13,6 +14,8 @@ public class BooleanValue extends Procedure1
   {
     if (value instanceof Boolean)
       return ((Boolean) value).booleanValue();
+    if (value instanceof Numeric)
+      return ((Numeric) value).isZero();
     if (value instanceof SeqPosition)
       return true;
     if (value instanceof Values)
@@ -21,16 +24,11 @@ public class BooleanValue extends Procedure1
 	value = values.getPosNext(0);
 	if (value == Sequence.eofValue)
 	  return false;
-	if (value instanceof SeqPosition
-	    || value instanceof TreeList)
-	  return true;
 	int next = values.nextDataIndex(0);
-	if (value instanceof Boolean && next < 0)
-	  return ((Boolean) value).booleanValue();
+	if (next < 0)
+	  return booleanValue(value);
       }
-    else if (value instanceof TreeList)
-      return ! ((TreeList) value).isEmpty();
-    throw new Error("invalid boolean value");
+    return true;
   }
 
   public Object apply1(Object arg)

@@ -7,7 +7,6 @@ import gnu.expr.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "letrec" primitive.
- * @author	R. Alexander Milowski
  */
 
 public class letrec extends Syntax implements Printable

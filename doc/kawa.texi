@@ -227,9 +227,16 @@ Assuming the latter, copy the archive to some suitable location,
 such as @code{/usr/local/lib/kawa-compiled.zip}.
 
 Then, before you can actually run Kawa, you need to set @code{CLASSPATH}
-so it includes the Kawa archive.  For example:
+so it includes the Kawa archive.  On Unix, using a Bourne-style shell:
 @example
-export CLASSPATH=.:/usr/local/lib/kawa-compiled.zip:$JDK/lib/classes.zip
+CLASSPATH=/usr/local/lib/kawa-compiled.zip
+export CLASSPATH
+@end example
+
+On Windows95/WindowsNT, you need to set @code{classpath} in a DOS console.
+For example:
+@example
+set classpath=\kawa\kawa-compiled.zip
 @end example
 
 Then to run Kawa do:
@@ -257,8 +264,9 @@ you can just run the configure script with no arguments:
 @end example
 
 This will specify that a later @code{make install} will install the
-compiled @samp{.class} files into @code{/usr/local/java}.  If you want them
-to be installed someplace else, such as @code{$PREFIX/java}, then
+compiled @samp{.class} files into @code{/usr/local/share/java}.
+If you want them
+to be installed someplace else, such as @code{$PREFIX/share/java}, then
 specify that when you run configure:
 @example
 ./configure --prefix $PREFIX
@@ -292,17 +300,21 @@ or you can install the compiled files:
 make install
 @end example
 
-This will install your classes into @code{$PREFIX/java} (and its
+This will install your classes into @code{$PREFIX/share/java} (and its
 sub-directories).  Here @code{$PREFIX} is the directory you specified
 to configure with the @code{--prefix} option, or @code{/usr/local} if you
 did not specify a @code{--prefix} option.
 
 To use the installed files, you need to set @code{CLASSPATH} so
-that @code{$PREFIX/java} is on the path:
+that @code{$PREFIX/share/java} is on the path:
 @example
-export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
+CLASSPATH=$PREFIX/share/java
+export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
+
+I have not yet tried to build Kawa from source on Windows95, though I
+understand others have done so.  (If you know how, let me know!)
 
 @node Running, Restrictions, Installation, Top
 @chapter How to start up and run Kawa
@@ -315,7 +327,7 @@ just do:
 @example
 kawa
 @end example
-However, @samp{kawa} only works if you have a Unix-like shell.
+However, @samp{kawa} only works if you have a Unix-like environment.
 
 To run Kawa manually, you must start a Java interpreter.
 How you do this depends on the Java interpreter.
@@ -1410,7 +1422,7 @@ by specifying the top-level class, either as a file name
 (relative to @var{outdirectory}) or a class name.
 E.g. if you did:
 @example
-kawa -d /usr/local/java -P my.lib. -T foo -C foosrc.scm
+kawa -d /usr/local/share/java -P my.lib. -T foo -C foosrc.scm
 @end example
 you can use either:
 @example
@@ -1620,6 +1632,9 @@ send mail to @code{kawa@@cygnus.com}
 This mailing list is used for reporting bugs, patches, discussing
 changes to Kawa, and announcing snapshots.  If you wish to subscribe
 (or later unsubscribe), send a request to @code{kawa-request@@cygnus.com}.
+
+There are plans to provide an archive of messages to the mailing list;
+there will be a reference here in the Kawa home page when it is available.
 
 @node License,  , Reporting Bugs, Top
 @chapter License

@@ -40,9 +40,9 @@ transform = @program_transform_name@
 
 JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
-KAWATEST = $(JAVA) $(JAVAFLAGS) kawa -f "$(srcdir)/testing.scm"
+KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
 
-SOURCES = testing.scm test.scm num-test.scm
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm
 CLEANFILES = tmp?
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 DIST_COMMON = ChangeLog Makefile.am Makefile.in
@@ -146,7 +146,7 @@ mostlyclean distclean maintainer-clean
 
 all:
 
-check:  check-scm check-num
+check:  check-scm check-num check-mac
 
 check-scm:
 	rm -rf tmp?
@@ -155,6 +155,10 @@ check-scm:
 
 check-num:
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
+
+check-mac:
+	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
+	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 .SUFFIXES:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

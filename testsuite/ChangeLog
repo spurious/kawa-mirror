@@ -1,3 +1,9 @@
+Sat Jan 25 15:45:14 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* test.scm:  Internal define is no longer expected to fail.
+	* mac-test.scm, mac1.scm:  New test.
+	* Makefile.am, Makefile.in:  Appropriate updates.
+
 Sun Jan  5 19:30:22 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* test.scm:  Imaginary literals are now supported.

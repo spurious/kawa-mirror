@@ -2,11 +2,11 @@
 
 JAVA=java
 JAVAFLAGS=-classpath ..:$$CLASSPATH
-KAWATEST = $(JAVA) $(JAVAFLAGS) kawa -f "$(srcdir)/testing.scm"
+KAWATEST = $(JAVA) $(JAVAFLAGS) kawa.repl -f "$(srcdir)/testing.scm"
 
 all:
 
-check:  check-scm check-num
+check:  check-scm check-num check-mac
 
 check-scm:
 	rm -rf tmp?
@@ -16,5 +16,9 @@ check-scm:
 check-num:
 	$(KAWATEST) -f "$(srcdir)/num-test.scm" -e '(test-report)'
 
-SOURCES = testing.scm test.scm num-test.scm
+check-mac:
+	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
+	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
+
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm
 CLEANFILES = tmp?

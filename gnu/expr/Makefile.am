@@ -40,6 +40,7 @@ java_sources = \
   LitTable.java \
   ModuleBody.java \
   ModuleMethod.java \
+  ModuleWithContext.java \
   ModuleExp.java \
   NameLookup.java \
   PairClassType.java \

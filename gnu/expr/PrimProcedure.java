@@ -53,11 +53,39 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     return takesVarArgs() ? (num - 1) + (-1 << 12) : num + (num << 12);
   }
 
-  public int match (CallContext ctx, Object[] args)
+  public int match0 (CallContext ctx)
   {
-    ctx.setArgsN(args);
+    return matchN(ProcedureN.noArgs, ctx);
+  }
 
-    int nargs = ctx.count;
+  public int match1 (Object arg1, CallContext ctx)
+  {
+    Object[] args = { arg1 };
+    return matchN(args, ctx);
+  }
+
+  public int match2 (Object arg1, Object arg2, CallContext ctx)
+  {
+    Object[] args = { arg1, arg2 };
+    return matchN(args, ctx);
+  }
+
+  public int match3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
+  {
+    Object[] args = { arg1, arg2, arg3 };
+    return matchN(args, ctx);
+  }
+
+  public int match4 (Object arg1, Object arg2, Object arg3, Object arg4,
+		     CallContext ctx)
+  {
+    Object[] args = { arg1, arg2, arg3, arg4 };
+    return matchN(args, ctx);
+  }
+
+  public int matchN (Object[] args, CallContext ctx)
+  {
+    int nargs = args.length;
     boolean takesVarArgs = takesVarArgs();
     int mlength = minArgs() + (takesVarArgs ? 1 : 0);
     int fixArgs = takesVarArgs ? mlength - 1 : mlength;
@@ -79,14 +107,18 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Type elementType = null;
     Object[] restArray = null;
     int this_count = getStaticFlag() ? 0 : 1;
-    Object[] rargs = new Object[mlength - this_count];
+    boolean takesContext = takesContext();
+    int rlen = mlength - this_count;
+    Object[] rargs = new Object[rlen + (takesContext ? 1 : 0)];
+    if (takesContext)
+      rargs[rlen] = ctx;
     Object thisValue;
     if (takesVarArgs)
       {
 	Type restType = argTypes[arg_count-1];
 	if (restType == Compilation.scmListType)
 	  { // FIXME
-	    rargs[rargs.length-1] = gnu.lists.LList.makeList(args, fixArgs);
+	    rargs[rlen-1] = gnu.lists.LList.makeList(args, fixArgs);
 	    nargs = fixArgs;
 	  }
 	else
@@ -96,14 +128,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    Class elementClass = elementType.getReflectClass();
 	    restArray = (Object[])
 	      java.lang.reflect.Array.newInstance(elementClass, nargs-fixArgs);
-	    rargs[rargs.length-1] = restArray;
+	    rargs[rlen-1] = restArray;
 	  }
       }
     if (this_count != 0)
       {
 	try
 	  {
-	    thisValue = method.getDeclaringClass().coerceFromObject(ctx.getNextArg());
+	    thisValue = method.getDeclaringClass().coerceFromObject(args[0]);
 	  }
 	catch (ClassCastException ex)
           {
@@ -116,7 +148,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
       {
         try
           {
-            Object arg = ctx.getNextArg();
+            Object arg = args[i];
             Type type = i < fixArgs ? argTypes[i-this_count] : elementType;
             if (type != Type.pointer_type)
               arg = type.coerceFromObject(arg);
@@ -131,11 +163,12 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
           }
       }
     ctx.value1 = thisValue;
-    ctx.value2 = rargs;
+    ctx.values = rargs;
+    ctx.proc = this;
     return 0;
   }
 
-  public Object applyV (CallContext ctx) throws Throwable
+  public void apply (CallContext ctx) throws Throwable
   {
     int arg_count = argTypes.length;
     boolean is_constructor = op_code == 183;
@@ -153,23 +186,14 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	    else
 	      member = clas.getMethod(method.getName(), paramTypes);
 	  }
-        Object[] rargs = (Object[]) ctx.value2;
+	Object result;
 	if (is_constructor)
-	  return ((java.lang.reflect.Constructor) member).newInstance(rargs);
+	  result = (((java.lang.reflect.Constructor) member)
+		    .newInstance(ctx.values));
 	else
-	  {
-	    if (takesContext())
-	      {
-		int nargs = rargs.length;
-		Object[] xargs = new Object[nargs+1];
-		System.arraycopy(rargs, 0, xargs, 0, nargs);
-		xargs[nargs] = ctx;
-		rargs = xargs;
-	      }
-	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
-	    Object result = meth.invoke(ctx.value1, rargs);
-            return retType.coerceToObject(result);
-	  }
+	  result = retType.coerceToObject(((java.lang.reflect.Method) member)
+					  .invoke(ctx.value1, ctx.values));
+	ctx.consumer.writeObject(result);
       }
     catch (java.lang.reflect.InvocationTargetException ex)
       {
@@ -533,8 +557,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     Class procClass;
     if (pproc instanceof ModuleMethod)
       procClass = ((ModuleMethod) pproc).module.getClass();
-    else if (pproc instanceof CpsMethodProc)
-      procClass = ((CpsMethodProc) pproc).module.getClass();
     else
       procClass = pproc.getClass();
     try

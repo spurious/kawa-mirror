@@ -1,5 +1,46 @@
 2004-08-06  Per Bothner  <per@bothner.com>
 
+	Change tailcall function API to use matchX+apply.
+	* ApplyExp.java (eval):  Update to use checkN instead of setArgsN.
+	(compile):  Likewise use checkX instead of setArgsX.
+	Don't set proc field - that's checkX's responsibility now.
+	* Compilation.java (typeModuleWithContext):  New field.
+	(typeCallFrame, typeCpsMethodProc, typeCpsMethodContainer):  Remove.
+	(getMethodProcType):  Remove method - result always typeModuleMethod..
+	(getModuleType, generateMatchMethods):  New methods.
+	(generateApplyMethods):  Replace by two ...
+	(generateApplyMethodsWithContext, generateApplyMethodsWithoutContext):
+	... new methods.
+	(compile):  If module is not a ModuleBody, create frame helper class.
+	(addClass):  Don't emit numArgs.
+	Just generate "run" for module body.
+	* GenericProc.java (applyN):  Update to use matchN+runUntilValue.
+	(match, applyV):  Remove method.
+	(match0, match1, match2, match3, match4, applyN):  New methods.
+	* LambdaExp.java (compileEnd):  Generate match methods, and right kind
+	of apply methods, depending on defailtCallonvention.
+	(getSelectorValue):  Get separate selector value for each method.
+	(allocFieldFor):  All modules are now ModuleBody or a subclass.
+	(allocFrame):  Use Compilation's getModuleType.
+	* ModuleBody.java (apply0):  Update to use match0.
+	(run):  Tweaks, since CallConsumer no longer has "run" method..
+	 (runCleanup):  New helper method used by run and compiled code.
+	(runAsMain):  Calls run method.
+	(match0, match1, match2, match3, match4, matchN):  New methods.
+	* ModuleExp.java (evalModule):  Run module explicitly.
+	* ModuleMethod.java (<init>):  New constructor.
+	(getName, math0, match1, match2, match3, match4, matchN, apply,
+	apply0Default, apply1Default, apply2Default, apply3Default, 
+	apply4Default, applyNDefault, applyError):  New methods.
+	(applyV):  Remove method.
+	* ModuleWithContext.java:  New class, extends ModuleBody.
+	* Makefile.am:  Update accordingly.
+	* PrimProcedure.java (match, applyV):  Remove methods.
+	(match0, match1, match2, match2, match4, matchN, apply):  New methods.
+	(getProcedureClass):  Don't test for removed CpsMethodProc.
+	* ProcInitializer.java (emitLoadModuleMethod):  Don't use removed
+	getMethodProcType.
+
 	* CheckedTarget.java (emitCheckedCoerce):  Argument numbering
 	has been changed to 1-orgin.
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2003  Per M.A. Bothner.
+// Copyright (c) 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -65,8 +65,7 @@ public class ApplyExp extends Expression
       vals[i] = args[i].eval (env);
     if (proc == null)
       throw new NullPointerException();
-    ctx.setArgsN(vals);
-    ctx.proc = proc;
+    proc.checkN(vals, ctx);
   }
 
   public static void compileToArray(Expression[] args, Compilation comp)
@@ -83,8 +82,7 @@ public class ApplyExp extends Expression
     for (int i = 0; i < args.length; ++i)
       {
 	Expression arg = args[i];
-	if (Compilation.defaultCallConvention
-	     >= Compilation.CALL_WITH_CONTINUATIONS
+	if (comp.usingCPStyle()
 	    && ! (arg instanceof QuoteExp) && ! (arg instanceof ReferenceExp))
 	  {
 	    // If the argument involves a CPStyle function call, we will
@@ -300,35 +298,35 @@ public class ApplyExp extends Expression
       {
 	ClassType typeContext = Compilation.typeCallContext;
 	exp_func.compile(comp, new StackTarget(Compilation.typeProcedure));
-	comp.loadCallContext();
-	code.emitDupX();
-	// Stack:  context, proc, context
-	if (! exp.isTailCall())
-	  code.emitDupX();
 	// evaluate args to frame-locals vars;  // may recurse!
 	if (args_length <= 4)
 	  {
 	    for (int i = 0; i < args_length; ++i)
 	      exp.args[i].compile(comp, Target.pushObject);
-	    code.emitInvoke(typeContext.getDeclaredMethod("setArgs",
-							  args_length));
+	    comp.loadCallContext();
+	    code.emitInvoke(Compilation.typeProcedure
+			    .getDeclaredMethod("check"+args_length,
+					       args_length+1));
 	  }
 	else
 	  {
 	    compileToArray (exp.args, comp);
-	    code.emitInvoke(typeContext.getDeclaredMethod("setArgsN", 1));
+	    comp.loadCallContext();
+	    code.emitInvoke(Compilation.typeProcedure
+			    .getDeclaredMethod("checkN", 2));
 	  }
-	code.emitPutField(Compilation.procCallContextField);
 	if (exp.isTailCall())
 	  {
 	    code.emitReturn();
 	  }
 	else if (((ConsumerTarget) target).isContextTarget())
 	  {
+	    comp.loadCallContext();
 	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilDone", 0));
 	  }
 	else
 	  {
+	    comp.loadCallContext();
 	    code.emitLoad(((ConsumerTarget) target).getConsumerVariable());
 	    code.emitInvoke(typeContext.getDeclaredMethod("runUntilValue", 1));
 	  }

@@ -264,9 +264,14 @@ public class LambdaExp extends ScopeExp
 
   int getSelectorValue(Compilation comp)
   {
-    if (selectorValue == 0)
-      selectorValue = ++comp.maxSelectorValue;
-    return selectorValue;
+    int s = selectorValue;
+    if (s == 0)
+      {
+	s = comp.maxSelectorValue;
+	comp.maxSelectorValue = s + primMethods.length;
+	selectorValue = ++s;
+      }
+    return s;
   }
 
   /** Methods used to implement this functions.
@@ -504,7 +509,11 @@ public class LambdaExp extends ScopeExp
 
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);
-    comp.generateApplyMethods(this);
+    comp.generateMatchMethods(this);
+    if (comp.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
+      comp.generateApplyMethodsWithContext(this);
+    else
+      comp.generateApplyMethodsWithoutContext(this);
   }
 
   Field allocFieldFor (Compilation comp)
@@ -538,7 +547,7 @@ public class LambdaExp extends ScopeExp
 	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
     ClassType frameType = getOwningLambda().getHeapFrameType();
-    Type rtype = Compilation.getMethodProcType(frameType);
+    Type rtype = Compilation.typeModuleMethod;
     Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)
       nameDecl.field = field;
@@ -1010,11 +1019,7 @@ public class LambdaExp extends ScopeExp
 	else
 	  {
 	    frameType = new ClassType(comp.generateClassName("frame"));
-	    if (Compilation.defaultCallConvention
-		>= Compilation.CALL_WITH_CONSUMER)
-	    frameType.setSuper(Type.pointer_type);
-	    else
-	    frameType.setSuper(Compilation.typeModuleBody);
+	    frameType.setSuper(comp.getModuleType());
 	    comp.addClass(frameType);
 	  }
 	heapFrame.setType(frameType);

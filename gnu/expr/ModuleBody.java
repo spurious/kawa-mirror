@@ -4,16 +4,18 @@ import gnu.lists.*;
 import gnu.kawa.reflect.ClassMemberConstraint;
 
 /**
- * Abstract class for the dummy top-level function of a module.
- *
- * This provides the functionality of gnu.mapping.ApplyMethodContainer,
- * but it is class rather than an interface (thus ModuleMethod can use
- * faster virtual method calls instead of slower interface calls).
+ * Class for the dummy top-level function of a module.
  */
 
 public abstract class ModuleBody extends Procedure0
 {
-  public void apply (CallContext stack)
+  public void apply (CallContext ctx)  throws Throwable
+  {
+    if (ctx.pc == 0)
+      run(ctx);
+  }
+
+  public void run (CallContext ctx)  throws Throwable
   {
   }
 
@@ -22,28 +24,53 @@ public abstract class ModuleBody extends Procedure0
     run (VoidConsumer.instance);
   }
 
-  public void run(Consumer out)
+  public void run (Consumer out)
   {
+    // This should match the "run" method generated in Compilation.
     CallContext ctx = CallContext.getInstance();
     Consumer save = ctx.consumer;
+    ctx.consumer = out;
+    Throwable th;
     try
       {
-	ctx.consumer = out;
-	ctx.values = Values.noArgs;
-	ctx.proc = this;
-	ctx.run();
+	run(ctx);
+	th = null;
       }
-    finally
+    catch (Throwable ex)
       {
-	ctx.consumer = save;
+	th = ex;
+      }
+    runCleanup(ctx, th, save);
+  }
+
+  public static void runCleanup (CallContext ctx, Throwable th, Consumer save)
+  {
+    if (th == null)
+      {
+	try
+	  {
+	    ctx.runUntilDone();
+	  }
+	catch (Throwable ex)
+	  {
+	    th = ex;
+	  }
+      }
+    ctx.consumer = save;
+    if (th != null)
+      {
+	if (th instanceof RuntimeException)
+	  throw (RuntimeException) th;
+	if (th instanceof Error)
+	  throw (Error) th;
+	throw new WrappedException(th);
       }
   }
 
   public Object apply0 () throws Throwable
   {
     CallContext ctx = CallContext.getInstance();
-    ctx.values = Values.noArgs;
-    ctx.proc = this;
+    match0(ctx);
     return ctx.runUntilValue();
   }
 
@@ -69,19 +96,19 @@ public abstract class ModuleBody extends Procedure0
     try
       {
 	CallContext ctx = CallContext.getInstance();
-	ctx.values = Values.noArgs;
-	ctx.proc = this;
 	ClassMemberConstraint.defineAll(this, ctx.getEnvironment());
 	if (getMainPrintValues())
 	  {
 	    OutPort out = OutPort.outDefault();
 	    ctx.consumer = kawa.Shell.getOutputConsumer(out);
+	    run(ctx);
 	    ctx.runUntilDone();
 	    out.freshLine();
 	  }
 	else
 	  {
 	    ctx.consumer = new VoidConsumer();
+	    run(ctx);
 	    ctx.runUntilDone();
 	  }
 	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
@@ -106,11 +133,13 @@ public abstract class ModuleBody extends Procedure0
    */
 
   public Object apply0(ModuleMethod method)
+    throws Throwable
   {
     return applyN(method, Values.noArgs);
   }
 
   public Object apply1(ModuleMethod method, Object arg1)
+    throws Throwable
   {
     Object[] args = new Object[1];
     args[0] = arg1;
@@ -118,6 +147,7 @@ public abstract class ModuleBody extends Procedure0
   }
 
   public Object apply2(ModuleMethod method, Object arg1, Object arg2)
+    throws Throwable
   {
     Object[] args = new Object[2];
     args[0] = arg1;
@@ -127,6 +157,7 @@ public abstract class ModuleBody extends Procedure0
 
   public Object apply3(ModuleMethod method,
                        Object arg1, Object arg2, Object arg3)
+    throws Throwable
   {
     Object[] args = new Object[3];
     args[0] = arg1;
@@ -137,6 +168,7 @@ public abstract class ModuleBody extends Procedure0
 
   public Object apply4(ModuleMethod method,
                        Object arg1, Object arg2, Object arg3, Object arg4)
+    throws Throwable
   {
     Object[] args = new Object[4];
     args[0] = arg1;
@@ -147,6 +179,7 @@ public abstract class ModuleBody extends Procedure0
   }
 
   public Object applyN(ModuleMethod method, Object[] args)
+    throws Throwable
   {
     int count = args.length;
     int num = method.numArgs();
@@ -170,4 +203,160 @@ public abstract class ModuleBody extends Procedure0
     throw new WrongArguments(method, count);
   }
 
+  public int match0 (ModuleMethod proc, CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (min > 0)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num < 0)
+      return matchN(proc, ProcedureN.noArgs, ctx);
+    ctx.count = 0;
+    ctx.where = 0;
+    ctx.next = 0;
+    ctx.proc = proc;
+    return 0;
+  }
+
+  public int match1 (ModuleMethod proc, Object arg1, CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (min > 1)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 1)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.count = 1;
+	ctx.where = CallContext.ARG_IN_VALUE1;
+	ctx.next = 0;
+	ctx.proc = proc;
+	//ctx.proc = this; 	ctx.pc = proc.selector;
+	return 0;
+      }
+    Object[] args = { arg1 };
+    return matchN(proc, args, ctx);
+  }
+
+  public int match2 (ModuleMethod proc, Object arg1, Object arg2,
+		     CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (min > 2)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 2)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.count = 2;
+	ctx.where = CallContext.ARG_IN_VALUE1
+	  |(CallContext.ARG_IN_VALUE2<<4);
+	ctx.next = 0;
+	ctx.proc = proc;
+	return 0;
+      }
+    Object[] args = { arg1, arg2 };
+    return matchN(proc, args, ctx);
+  }
+
+  public int match3 (ModuleMethod proc, Object arg1, Object arg2, Object arg3,
+		     CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (min > 3)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 3)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.value3 = arg3;
+	ctx.count = 3;
+	ctx.where = CallContext.ARG_IN_VALUE1
+	  |(CallContext.ARG_IN_VALUE2<<4)
+	  |(CallContext.ARG_IN_VALUE3<<8);
+	ctx.next = 0;
+	ctx.proc = proc;
+	// ctx.proc = this; ctx.pc = proc.selector;
+	return 0;
+      }
+    Object[] args = { arg1, arg2, arg3 };
+    return matchN(proc, args, ctx);
+  }
+
+  public int match4 (ModuleMethod proc, Object arg1, Object arg2,
+		     Object arg3, Object arg4, CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (min > 4)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+	if (max < 4)
+          return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	ctx.value1 = arg1;
+	ctx.value2 = arg2;
+	ctx.value3 = arg3;
+	ctx.value4 = arg4;
+	ctx.count = 4;
+	ctx.where = (CallContext.ARG_IN_VALUE1
+		     |(CallContext.ARG_IN_VALUE2<<4)
+		     |(CallContext.ARG_IN_VALUE3<<8)
+		     |(CallContext.ARG_IN_VALUE4<<12));
+	ctx.next = 0;
+	ctx.proc = proc;
+	//ctx.proc = this;	ctx.pc = proc.selector;
+	return 0;
+      }
+    Object[] args = { arg1, arg2, arg3, arg4 };
+    return matchN(proc, args, ctx);
+  }
+
+  public int matchN (ModuleMethod proc, Object[] args, CallContext ctx)
+  {
+    int num = proc.numArgs();
+    int min = num & 0xFFF;
+    if (args.length < min)
+      return MethodProc.NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+	switch (args.length)
+	  {
+	  case 0:
+	    return match0(proc, ctx);
+	  case 1:
+	    return match1(proc, args[0], ctx);
+	  case 2:
+	    return match2(proc, args[0], args[1], ctx);
+	  case 3:
+	    return match3(proc, args[0], args[1], args[2], ctx);
+	  case 4:
+	    return match4(proc, args[0], args[1], args[2], args[3], ctx);
+	  default:
+	    int max = num >> 12;
+	    if (args.length > max)
+	      return MethodProc.NO_MATCH_TOO_MANY_ARGS|max;
+	  }
+      }
+    ctx.values = args;
+    ctx.count = args.length;
+    ctx.where = 0;
+    ctx.next = 0;
+    ctx.proc = proc;
+    // The following doesn't work if this does not pass contexts
+    //ctx.proc = this;    ctx.pc = proc.selector;
+    return 0;
+  }
 }

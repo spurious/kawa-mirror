@@ -1,4 +1,4 @@
-// Copyright (c) 1999  Per M.A. Bothner.
+// Copyright (c) 1999, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -59,31 +59,37 @@ public class GenericProc extends MethodProc
       maxArgs = n;
   }
 
-  /*
-  public int applyIfMatches (CallContext ctx) throws Throwable
+  /* Possibly optimization.  Likewise for apply0, apply2, apply3, apply4.
+  public Object apply1 (Object arg1) throws Throwable
   {
-    int r = NO_MATCH;
+    if (numArgs() != 0x1001)
+      {
+	Object[] args = { arg1 };
+	return applyN(args);
+      }
+    CallContext ctx = CallContext.getInstance();
     for (int i = 0;  i < count;  i++)
       {
         MethodProc method = methods[i];
-	int code = applyIfMatches(ctx);
-	if (code == 0)
-	  return 0;
-	// FIXME: r = combine(r, code);
+        if (method.match1(arg1, ctx) == 0)
+	  return method.applyV(ctx);
       }
-    return r;
+    throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
   }
   */
 
   public Object applyN(Object[] args) throws Throwable
   {
+    if (count == 1)
+      return methods[0].applyN(args);
     checkArgCount(this, args.length);
     CallContext ctx = CallContext.getInstance();
     for (int i = 0;  i < count;  i++)
       {
         MethodProc method = methods[i];
-        if (method.match(ctx, args) == 0)
-	  return method.applyV(ctx);
+	int m = method.matchN(args, ctx);
+        if (m == 0)
+	  return ctx.runUntilValue();
       }
     throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
   }
@@ -103,26 +109,95 @@ public class GenericProc extends MethodProc
     return best;
   }
 
-  public int match (CallContext ctx, Object[] args)
+  public int match0 (CallContext ctx)
   {
     if (count == 1)
-      return methods[0].match(ctx, args);
+      return methods[0].match0(ctx);
     for (int i = 0;  i < count;  i++)
       {
         MethodProc method = methods[i];
-	int code = method.match(ctx, args);
+	int code = method.match0(ctx);
 	if (code == 0)
-	  {
-	    ctx.ivalue1 = i;
-	    return 0;
-	  }
+	  return 0;
       }
+    ctx.proc = null;
     return NO_MATCH;
   }
 
-  public Object applyV(CallContext ctx) throws Throwable
+  public int match1 (Object arg1, CallContext ctx)
   {
-    return methods[ctx.ivalue1].applyV(ctx);
+    if (count == 1)
+      return methods[0].match1(arg1, ctx);
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = method.match1(arg1, ctx);
+	if (code == 0)
+	  return 0;
+      }
+    ctx.proc = null;
+    return NO_MATCH;
+  }
+
+  public int match2 (Object arg1, Object arg2, CallContext ctx)
+  {
+    if (count == 1)
+      return methods[0].match2(arg1, arg2, ctx);
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = method.match2(arg1, arg2, ctx);
+	if (code == 0)
+	  return 0;
+      }
+    ctx.proc = null;
+    return NO_MATCH;
+  }
+
+  public int match3 (Object arg1, Object arg2, Object arg3, CallContext ctx)
+  {
+    if (count == 1)
+      return methods[0].match3(arg1, arg2, arg3, ctx);
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = method.match3(arg1, arg2, arg3, ctx);
+	if (code == 0)
+	  return 0;
+      }
+    ctx.proc = null;
+    return NO_MATCH;
+  }
+
+  public int match4 (Object arg1, Object arg2, Object arg3, Object arg4,
+		     CallContext ctx)
+  {
+    if (count == 1)
+      return methods[0].match4(arg1, arg2, arg3, arg4, ctx);
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = method.match4(arg1, arg2, arg3, arg4, ctx);
+	if (code == 0)
+	  return 0;
+      }
+    ctx.proc = null;
+    return NO_MATCH;
+  }
+
+  public int matchN (Object[] args, CallContext ctx)
+  {
+    if (count == 1)
+      return methods[0].matchN(args, ctx);
+    for (int i = 0;  i < count;  i++)
+      {
+        MethodProc method = methods[i];
+	int code = method.matchN(args, ctx);
+	if (code == 0)
+	  return 0;
+      }
+    ctx.proc = null;
+    return NO_MATCH;
   }
 
   public final void setProperties (Object[] args)

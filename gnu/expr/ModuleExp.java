@@ -182,7 +182,7 @@ public class ModuleExp extends LambdaExp
 		throw new RuntimeException("class illegal access: in lambda eval");
 	      }
 	    gnu.kawa.reflect.ClassMemberConstraint.defineAll(mod, env);
-	    ctx.proc = mod;
+	    mod.run(ctx);
 	  }
 	ctx.runUntilDone();
       }

@@ -362,7 +362,7 @@ with the book title and the editor's affiliation.</description>
 all the sections and their titles. Preserve the original attributes of
 each <section> element, if any.]]></description>
 <query>
-declare function toc($book-or-section as element()) as element()*
+declare function local:toc($book-or-section as element()) as element()*
 {
     for $section in $book-or-section/section
     return
@@ -532,7 +532,7 @@ declare function local:section-summary($book-or-section)
 </query>
 -->
 <query><![CDATA[
-declare function section_summary($s)
+declare function local:section_summary($s)
 {
     <section>
         { $s/@* }
@@ -542,7 +542,7 @@ declare function section_summary($s)
        </figcount>
 {
             for $ss in $s/section
-            return section_summary($ss)
+            return local:section_summary($ss)
         }
     </section>
 };
@@ -550,7 +550,7 @@ declare function section_summary($s)
 <toc>
 {
     for $s in doc("book1.xml")//section
-    return section_summary($s)
+    return local:section_summary($s)
 }
 </toc> ]]>
 </query>
@@ -964,14 +964,14 @@ The use-case document shows: <![CDATA[
 inline</NOTE>
 <query><![CDATA[
 
-declare function one_level ($p as element(), $parts-data) as element()
+declare function local:one_level ($p as element(), $parts-data) as element()
 {
     <part partid="{ $p/@partid }"
           name="{ $p/@name }" >
 {
             for $s in $parts-data//part
             where $s/@partof = $p/@partid
-            return one_level($s, $parts-data)
+            return local:one_level($s, $parts-data)
         }
     </part>
 };
@@ -993,7 +993,7 @@ return
 <parttree>
 {
     for $p in $parts-list//part[empty(@partof)]
-    return one_level($p, $parts-list)
+    return local:one_level($p, $parts-list)
   }
 </parttree>]]>
 </query>

@@ -1,3 +1,10 @@
+2004-12-07  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Add missing "local:" prefixes.
+	* descend.xql: Likewise.
+	* use-cases.xml: Likewise.
+	* tab.html: Fix expected output.
+
 2004-11-08  Per Bothner  <per@bothner.com>
 
 	* maketab1.xql: Use child:: axis, not non-standard children function.

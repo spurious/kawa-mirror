@@ -302,12 +302,12 @@ public class TestMisc
     evalTest("element r {let $y := <b x='1'/>"
 	     + " let $x:=<a>{$y}</a> return $x/b/@x}",
 	     "<r x=\"1\" />");
-    evalTest("declare function x(){<a><b x='1'/><b x='2'/></a>};"
-	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
+    evalTest("declare function local:x(){<a><b x='1'/><b x='2'/></a>};"
+	     + " let $i := <a>{for $a in local:x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
 
-    evalTest("declare function s(){ <a x='10'>{for $n in (<b x='2'/>) return ($n) }</a>};"
-	     + " let $st := s()/b return ("
+    evalTest("declare function local:s(){ <a x='10'>{for $n in (<b x='2'/>) return ($n) }</a>};"
+	     + " let $st := local:s()/b return ("
 	     + " '[',$st/@x ,'] [',$st ,']')",
 	     "[ x=\"2\"] [<b x=\"2\" />]");
 
@@ -347,9 +347,9 @@ public class TestMisc
     evalTest("declare namespace Int='class:java.lang.Integer';\n"
 	     + "Int:toHexString(266)", "10a");
     evalTest("declare namespace File='class:java.io.File';\n"
-	     + "declare function make-file ($x as string) {File:new($x)};\n"
-	     + "declare function parent ($x) {java.io.File:getParent($x)};\n"
-	     + "parent(make-file('dir/mine.txt'))", "dir");
+	     + "declare function local:make-file ($x as string) {File:new($x)};\n"
+	     + "declare function local:parent ($x) {java.io.File:getParent($x)};\n"
+	     + "local:parent(local:make-file('dir/mine.txt'))", "dir");
     evalTest("java.lang.Integer:toHexString(255)", "ff");
 
     // String functions

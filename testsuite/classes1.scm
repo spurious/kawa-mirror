@@ -3,7 +3,9 @@
 (define-simple-class <SimpleA> ()
   (a :: <int> init-value: 4)
   (b :: <int> init-form: 6 allocation: class:)
-  ((f (y :: <int>)) :: <int> (+ xx a b y)))
+  (hyphenated-field? init-value: "yes")
+  ((f (y :: <int>)) :: <int>
+   (if (equal? hyphenated-field? "yes") (+ xx a b y) 999)))
 
 (define-class <ClsB> ()
   (b :: <int> 14))

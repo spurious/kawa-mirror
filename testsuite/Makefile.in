@@ -105,7 +105,7 @@ KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 APPLETVIEWER = appletviewer
 
-SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
+SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm   classes1.scm classes2.scm SimpleB.java obj-test.scm   misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
 
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = $(SOURCES) ppfile.out

@@ -1,3 +1,8 @@
+2001-08-30  Per Bothner  <per@bothner.com>
+
+	* classes1.scm (hyphenated-field?):  New field to test mangling.
+	* obj-test.scm:  Test slot-ref access to new field.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* classes1.scm, classes2.scm, SimpleB.java:  New files for

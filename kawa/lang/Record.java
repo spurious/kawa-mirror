@@ -139,7 +139,7 @@ public class Record extends Procedure1 implements HasSetter
 
   public static ClassType makeRecordType (String name, List fnames)
   {
-    ClassType superClass = new ClassType("kawa.lang.Record");
+    ClassType superClass = ClassType.make("kawa.lang.Record");
     ClassType clas = new ClassType(name);
     clas.setSuper(superClass);
     clas.access_flags = Access.PUBLIC;

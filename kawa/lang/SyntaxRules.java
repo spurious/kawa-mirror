@@ -233,7 +233,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
   public Literal makeLiteral (Compilation comp)
   {
     if (SyntaxRule.thisType == null)
-	SyntaxRule.thisType = new ClassType ("kawa.lang.SyntaxRule");
+	SyntaxRule.thisType = ClassType.make("kawa.lang.SyntaxRule");
     if (thisType == null)
       {
 	thisType = new ClassType ("kawa.lang.SyntaxRules");

@@ -146,7 +146,7 @@ public class FString extends Sequence implements Printable, Compilable
   {
     if (scmStringType == null)
       {
-	scmStringType = new ClassType ("kawa.lang.FString");
+	scmStringType = ClassType.make("kawa.lang.FString");
 	initFStringMethod
 	  = scmStringType.addMethod ("<init>", comp.string1Arg,
 				      Type.void_type, Access.PUBLIC);

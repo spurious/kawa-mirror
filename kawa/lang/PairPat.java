@@ -53,7 +53,7 @@ public class PairPat extends Pattern implements Printable, Compilable
   {
     if (classPairPat == null)
       {
-	classPairPat = new ClassType ("kawa.lang.PairPat");
+	classPairPat = ClassType.make("kawa.lang.PairPat");
 	Type[] apply2args = new Type[2];
 	apply2args[0] = comp.scmPatternType;
 	apply2args[1] = comp.scmPatternType;

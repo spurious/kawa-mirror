@@ -392,7 +392,7 @@ public class SyntaxRule implements Compilable
   public Literal makeLiteral (Compilation comp)
   {
     if (thisType == null)
-      thisType = new ClassType ("kawa.lang.SyntaxRule");
+      thisType = ClassType.make("kawa.lang.SyntaxRule");
     if (initSyntaxRuleMethod == null)
       {
 	Type[] argTypes = new Type[6];

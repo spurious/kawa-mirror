@@ -72,7 +72,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("kawa.lang.ListRepeatPat");
+	thisType = ClassType.make("kawa.lang.ListRepeatPat");
 	Type[] apply1args = new Type[1];
 	apply1args[0] = comp.scmPatternType;
 	makeListRepeatMethod =

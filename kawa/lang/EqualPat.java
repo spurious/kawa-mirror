@@ -39,7 +39,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
   {
     if (EqualPatType == null)
       {
-	EqualPatType = new ClassType ("kawa.lang.EqualPat");
+	EqualPatType = ClassType.make("kawa.lang.EqualPat");
 	makeEqualPatMethod =
 	  EqualPatType.addMethod ("make", comp.apply1args,
 				   EqualPatType, Access.PUBLIC|Access.STATIC);

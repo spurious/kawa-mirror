@@ -175,7 +175,7 @@ public class Char implements Printable, Compilable
   {
     if (scmCharType == null)
       {
-	scmCharType = new ClassType ("kawa.lang.Char");
+	scmCharType = ClassType.make("kawa.lang.Char");
 	makeCharMethod = scmCharType.addMethod ("make",
 						 Compilation.int1Args,
 						 scmCharType,

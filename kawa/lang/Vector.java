@@ -62,7 +62,7 @@ public class Vector extends Sequence implements Printable, Compilable
   {
     if (scmVectorType == null)
       {
-	scmVectorType = new ClassType ("kawa.lang.Vector");
+	scmVectorType = ClassType.make("kawa.lang.Vector");
 	initVectorMethod
 	  = scmVectorType.addMethod ("<init>", comp.applyNargs,
 				      Type.void_type, Access.PUBLIC);

@@ -35,7 +35,7 @@ public class AnyPat extends Pattern implements Printable, Compilable
   {
     if (thisType == null)
       {
-	thisType = new ClassType ("kawa.lang.AnyPat");
+	thisType = ClassType.make("kawa.lang.AnyPat");
 	makeAnyPatMethod =
 	  thisType.addMethod ("make", comp.apply0args,
 			       thisType, Access.PUBLIC|Access.STATIC);

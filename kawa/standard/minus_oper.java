@@ -1,72 +1,50 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class minus_oper extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.minus_oper() {
-      super("-");
-   }
+/**
+ * Implement the Scheme standard function "-".
+ * @author Per Bothner
+ */
 
-   public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object arglist) 
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType,
-             kawa.lang.GenericError
-   {
-      if (arglist instanceof Pair) {
-         Pair top = (Pair)arglist;
-         if (top.cdr instanceof Pair) {
-            if (top.car instanceof java.lang.Number) {
-               boolean isInteger;
-               int ival = 0;
-               double dval = 0.0;
-               if (top.car instanceof java.lang.Integer) {
-                  isInteger = true;
-                  ival = ((java.lang.Integer)top.car).intValue();
-               } else {
-                  isInteger = false;
-                  dval = ((java.lang.Double)top.car).doubleValue();
-               }
-               int count = 2;
-               arglist = top.cdr;
-               while (arglist instanceof Pair) {
-                  top = (Pair)arglist;
-                  if (top.car instanceof java.lang.Integer) {
-                     if (isInteger) {
-                        ival += ((java.lang.Integer)top.car).intValue();
-                     } else {
-                        dval += ((java.lang.Double)top.car).doubleValue();
-                     }
-                  } else if (top.car instanceof java.lang.Double) {
-                     if (isInteger) {
-                        isInteger = false;
-                        dval = ival;
-                     }
-                     dval += ((java.lang.Double)top.car).doubleValue();
-                  } else {
-                     throw new kawa.lang.WrongType(this.name,count,"number");
-                  }
-                  arglist = top.cdr;
-                  count++;
-               }
-               if (isInteger) {
-                  return new java.lang.Integer(ival);
-               } else {
-                  return new java.lang.Double(dval);
-               }
-            } else {
-               throw new kawa.lang.WrongType(this.name,1,"number");
-            }
-         } else {
-            if (top.car instanceof java.lang.Double) {
-               return new java.lang.Double(0-((java.lang.Double)top.car).intValue());
-            } else if (top.car instanceof java.lang.Integer) {
-               return new java.lang.Integer(0-((java.lang.Integer)top.car).intValue());
-            } else {
-               throw new kawa.lang.WrongType(this.name,1,"number");
-            }
-         }
-      } else {
-         throw new kawa.lang.WrongArguments(this.name,-1,"(- n ...)");
+public class minus_oper extends ProcedureN
+{
+  public minus_oper()
+  {
+    super("-");
+  }
+
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    int ival = 0;
+    double dval = 0.0;
+    boolean isInteger = true;
+    for (int i = 0; i < args.length; i++)
+      {
+	Object arg = args[i];
+	if (arg instanceof Double)
+	  {
+            if (isInteger)
+	      {
+		isInteger = false;
+		dval = ival;
+	      }
+            dval -= ((Double)arg).doubleValue();
+	  }
+	else if (arg instanceof Integer)
+	  {
+            if (isInteger)
+	      ival -= ((Integer)arg).intValue();
+	    else
+	      dval -= ((Integer)arg).intValue();
+	  }
+	else
+	  throw new WrongType(this.name,i + 1,"number");
       }
-   }
 
+      if (isInteger)
+	return new Integer(ival);
+      else
+	return new Double(dval);
+   }
 }

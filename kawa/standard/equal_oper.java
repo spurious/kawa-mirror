@@ -1,63 +1,46 @@
 package kawa.standard;
 import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
+/**
+ * Implement the Scheme standard function "=".
+ * @author Per Bothner
+ */
 
-import kawa.lang.Executable;
-import java.io.PrintStream;
+public class equal_oper extends ProcedureN
+{
+  public equal_oper()
+  {
+    super("=");
+  }
 
-public class equal_oper extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.equal_oper() {
-      super("=");
-   }
-
-   public Object execute(
-      kawa.lang.Interpreter i,
-      java.util.Vector frames,
-      Object arglist
-   ) throws kawa.lang.WrongArguments,
-            kawa.lang.WrongType
-   {
-      if (arglist instanceof Pair) {
-         Pair pair = (Pair)arglist;
-
-         if (pair.cdr instanceof Pair) {
-            boolean isequal = true;
-            java.lang.Number first = null;
-            double dval = 0.0;
-            int count = 1;
-            Object o = pair;
-            while (isequal && o instanceof Pair) {
-               pair = (Pair)o;
-               if (first==null) {
-                  if (pair.car instanceof java.lang.Number) {
-                     first = (java.lang.Number)pair.car;
-                     dval = first.doubleValue();
-                  } else {
-                     throw new kawa.lang.WrongType(this.name,count,"number");
-                  }
-               } else if (pair.car instanceof java.lang.Number) {
-                  if (!(dval==((java.lang.Number)pair.car).doubleValue())) {
-                     isequal = false;
-                  }
-               } else {
-                  throw new kawa.lang.WrongType(this.name,count,"number");
-               }
-               o = pair.cdr;
-               count++;
-            }
-            if (isequal) {
-               return kawa.lang.Interpreter.trueObject;
-            } else {
-               return kawa.lang.Interpreter.falseObject;
-            }
-         } else {
-            throw new kawa.lang.WrongArguments(this.name,2,"(= x1 x2 ...)");
-         }
-      } else {
-         throw new kawa.lang.WrongArguments(this.name,2,"(= x1 x2 ...)");
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    if (args.length < 2)
+      throw new kawa.lang.WrongArguments(this.name,2,"(= x1 x2 ...)");
+    for (int i = 0;  i < args.length - 1;  i++)
+      {
+	Object arg1 = args[i];
+	Object arg2 = args[i+1];
+	if (! (arg1 instanceof Number))
+	  throw new kawa.lang.WrongType(name, i, "number");
+	if (! (arg2 instanceof Number))
+	  throw new kawa.lang.WrongType(name, i+1, "number");
+	if (arg1 instanceof Integer && arg2 instanceof Integer)
+	  {
+	    int int1 = ((Integer)arg1).intValue ();
+	    int int2 = ((Integer)arg2).intValue ();
+	    if (! (int1 == int2))
+	      return Interpreter.falseObject;
+	  }
+	else
+	  {
+	    double double1 = ((Number)arg1).doubleValue ();
+	    double double2 = ((Number)arg2).doubleValue ();
+	    if (! (double1 == double2))
+	      return Interpreter.falseObject;
+	  }
       }
-   }
-
+    return Interpreter.trueObject;
+  }
 }

@@ -1,52 +1,46 @@
 package kawa.standard;
 import kawa.lang.*;
 
-public class greater_oper extends kawa.lang.Named implements kawa.lang.Executable {
-   public kawa.standard.greater_oper() {
-      super(">");
-   }
+/**
+ * Implement the Scheme standard function ">".
+ * @author Per Bothner
+ */
 
-   public Object execute(kawa.lang.Interpreter i,java.util.Vector frames,Object arglist) 
-      throws kawa.lang.WrongArguments,
-             kawa.lang.WrongType
-   {
-      if (arglist instanceof Pair) {
-         Pair pair = (Pair)arglist;
+public class greater_oper extends ProcedureN
+{
+  public greater_oper()
+  {
+    super(">");
+  }
 
-         if (pair.cdr instanceof Pair) {
-            boolean retval = true;
-            pair = (Pair)pair.car;
-            java.lang.Number last = null;
-            int count = 1;
-            while (retval && pair.cdr instanceof Pair) {
-               if (last==null) {
-                  if (pair.car instanceof java.lang.Number) {
-                     last = (java.lang.Number)pair.car;
-                  } else {
-                     throw new kawa.lang.WrongType(this.name,count,"number");
-                  }
-               } else if (pair.car instanceof java.lang.Number) {
-                  if (last.doubleValue()<=((java.lang.Number)pair.car).doubleValue()) {
-                     retval = false;
-                  }
-                  last = (java.lang.Number)pair.car;
-               } else {
-                  throw new kawa.lang.WrongType(this.name,count,"number");
-               }
-               pair = (Pair)pair.cdr;
-               count++;
-            }
-            if (retval) {
-               return kawa.lang.Interpreter.trueObject;
-            } else {
-               return kawa.lang.Interpreter.falseObject;
-            }
-         } else {
-            throw new kawa.lang.WrongArguments(this.name,2,"(> x1 x2 ...)");
-         }
-      } else {
-         throw new kawa.lang.WrongArguments(this.name,2,"(> x1 x2 ...)");
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    if (args.length < 2)
+      throw new kawa.lang.WrongArguments(this.name,2,"(> x1 x2 ...)");
+    for (int i = 0;  i < args.length - 1;  i++)
+      {
+	Object arg1 = args[i];
+	Object arg2 = args[i+1];
+	if (! (arg1 instanceof Number))
+	  throw new kawa.lang.WrongType(name, i, "number");
+	if (! (arg2 instanceof Number))
+	  throw new kawa.lang.WrongType(name, i+1, "number");
+	if (arg1 instanceof Integer && arg2 instanceof Integer)
+	  {
+	    int int1 = ((Integer)arg1).intValue ();
+	    int int2 = ((Integer)arg2).intValue ();
+	    if (! (int1 > int2))
+	      return Interpreter.falseObject;
+	  }
+	else
+	  {
+	    double double1 = ((Number)arg1).doubleValue ();
+	    double double2 = ((Number)arg2).doubleValue ();
+	    if (! (double1 > double2))
+	      return Interpreter.falseObject;
+	  }
       }
-   }
-
+    return Interpreter.trueObject;
+  }
 }

@@ -118,7 +118,7 @@ including portable bytecode distribution and web applets,
 though the use of standard Java bytecodes.</para></listitem>
 <listitem><para>
 Full integration between Java and Scheme:  Scheme programs can call
-Java methods, and Java methods can all Scheme procedures.</para></listitem>
+Java methods, and Java methods can call Scheme procedures.</para></listitem>
 <listitem><para>
 Scheme programs benefit from the extensive efforts in improved
 Java implementations, optimizations, environments, and tools.</para></listitem>
@@ -197,7 +197,7 @@ of the original code has by now been re-written.</para>
 Kawa 1.0 was released to our customer and <quote>the Net</quote>
 September 1996. Development has continued since then, at a less intense pace!
 The long-term goal is an object-oriented environment that harmoniously
-integrates Scheme, Java, EcmaScript, and other languages. </para>
+integrates Scheme, Java, ECMAScript, and other languages. </para>
 </sect1>
 
 <sect1 id="Basic"><title>Basic implementation strategy</title>

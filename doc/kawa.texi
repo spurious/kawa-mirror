@@ -916,7 +916,7 @@ collection of @samp{.class} files.
 You then use the standard Java class loading mechanism to load the code.
 The Java "verifier" does not need to get run, which makes
 loading a little faster.
-The compiled class files do have to be installed be installed somewhere
+The compiled class files do have to be installed somewhere
 in the @code{CLASSPATH}.
 
 You can also compile your Scheme program to native code using GCJ.

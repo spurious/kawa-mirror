@@ -268,6 +268,11 @@ public class ELisp extends Interpreter
 
   SpecialType booleanType;
 
+  public Type getTypeFor(String name)
+  {
+    return Scheme.string2Type(name);
+  }
+
   public Type getTypeFor (Class clas)
   {
     if (clas.isPrimitive())

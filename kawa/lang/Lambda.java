@@ -237,7 +237,10 @@ public class Lambda extends Syntax implements Printable
             decl.setLine(declPos.getLine(), declPos.getColumn());
           }
 	if (typeSpec != null)
-	  decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
+	  {
+	    decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));
+	    decl.setFlag(Declaration.TYPE_SPECIFIED);
+	  }
 	else if (mode == Special.rest)
 	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.

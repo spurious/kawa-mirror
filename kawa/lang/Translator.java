@@ -487,6 +487,46 @@ public class Translator extends Parser
 
   public void finishModule(ModuleExp mexp, java.util.Vector forms)
   {
+    boolean moduleStatic = mexp.isStatic();
+    for (Declaration decl = mexp.firstDecl();
+	 decl != null;  decl = decl.nextDecl())
+      {
+	if (decl.getFlag(Declaration.NOT_DEFINING))
+	  {
+	    String msg1 = "'";
+	    String msg2
+	      = (decl.getFlag(Declaration.EXPORT_SPECIFIED)
+		 ? "' exported but never defined"
+		 : decl.getFlag(Declaration.STATIC_SPECIFIED)
+		 ? "' declared static but never defined"
+		 : "' declared but never defined");
+	    error('e', decl, msg1, msg2);
+	  }
+	if (mexp.getFlag(ModuleExp.EXPORT_SPECIFIED))
+	  {
+	    if (decl.getFlag(Declaration.EXPORT_SPECIFIED))
+	      {
+		if (decl.isPrivate())
+		  {
+		    error('e', decl,
+			  "'", "' is declared both private and exported");
+		    decl.setPrivate(false);
+		  }
+	      }
+	    else
+	      decl.setPrivate(true);
+	  }
+	if (moduleStatic)
+	  decl.setFlag(Declaration.STATIC_SPECIFIED);
+	else if ((mexp.getFlag(ModuleExp.NONSTATIC_SPECIFIED)
+		  && ! decl.getFlag(Declaration.STATIC_SPECIFIED))
+		 || (gnu.expr.Compilation.moduleStatic < 0
+		     && ! mexp.getFlag(ModuleExp.STATIC_SPECIFIED)))
+	  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
+      }
+    if (! moduleStatic)
+      mexp.declareThis(null);
+
     module = mexp;
     int nforms = forms.size();
     int ndecls = mexp.countDecls();

@@ -14,12 +14,16 @@ abstract public class Syntax extends Declaration implements Printable, Named
   public Syntax ()
   {
     setSimple(false);
+    // Kludge to prevent BindingInitializer doing setIndirectBinding.
+    setFlag(Declaration.TYPE_SPECIFIED);
+    // Kludge to force BindingInitializer to set field FINAL.
+    setFlag(Declaration.IS_CONSTANT);
   }
 
   public Syntax (String name)
   {
+    this();
     setName(name);
-    setSimple(false);
   }
 
   /**

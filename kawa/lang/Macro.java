@@ -14,6 +14,11 @@ public class Macro extends Syntax implements Printable, Externalizable
     return mac;
   }
 
+  public void setExpander (Procedure expander)
+  {
+    this.expander = new QuoteExp(expander);
+  }
+
   public Macro ()
   {
   }

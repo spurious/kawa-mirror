@@ -1,3 +1,5 @@
+Report JDK-2 verification bug.
+
 Document SRFI 4: Homogeneous numeric vector datatypes 
 
 Re-store code to check argument count when applyN is involved.
@@ -191,6 +193,9 @@ was implied, the corresponding Listener interface is also implied.
 (For example a METHOD-NAME of mousePressed implies an EVENT-TYPE
 of <java.awt.event.MouseEvent>, and hence an interface of
 <java.awt.event.MouseListener>.)
+New syntax:
+(listener [(EXTRA-INTERFACE ...)]
+  ((METHOD-NAME ... EVENT-ARG-NAME [:: EVENT-TYPE]) ...))
 
 IMPROVED ExpWalker INTERFACE
 

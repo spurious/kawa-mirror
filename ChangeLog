@@ -1,3 +1,31 @@
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme (initScheme):  Define "this" macro.
+	(registerEnvironment):  Set Interpreter.defaultInterpreter
+
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (main):  Recognize --applet flag.
+
+	* kawa/standard/load.java (apply):  Now throws FileNotFoundException.
+	(apply2):  Catch FileNotFoundException.
+	(loadClassFile):  Do ClassMemberConstraint.defineAll.
+	* kawa/Shell.java (runFile):  Use load.apply.
+
+	* kawa/lang/Lambda.java (rewrite):  Using a Pattern is overkill.
+
+	* kawa/lang/Translator.java (rewrite_pair):  Maybe setProcedureName.
+
+	* kawa/standard/Scheme.java (registerCurrent):  New static method.
+
+	* kawa/standard/define_variable.java:  New class; extends Syntax.
+	* kawa/standard/Makefile.am (java_JAVA):  Add define_variable.java.
+	* kawa/standard/Scheme.java (initScheme):  Define "define-variable".
+
+2000-02-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define.java (scanForDefinitions):  Fix thinko.
+
 2000-02-01  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (defaultInterpreter):  Static field moved

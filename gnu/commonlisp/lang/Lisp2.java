@@ -6,10 +6,11 @@ import gnu.expr.*;
 import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
+import gnu.kawa.lispexpr.LispInterpreter;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
 
-public abstract class Lisp2 extends Interpreter
+public abstract class Lisp2 extends LispInterpreter
 {
   public static final LList FALSE = LList.Empty;
   public static Binding TRUE;

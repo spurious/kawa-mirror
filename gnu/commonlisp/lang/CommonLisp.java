@@ -74,7 +74,6 @@ public class CommonLisp extends Lisp2
       }
     catch (Exception ex)
       {
-        ex.printStackTrace(System.err);
 	throw new WrappedException(ex);
       }
   }

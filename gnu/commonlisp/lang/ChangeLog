@@ -1,3 +1,9 @@
+2001-07-18  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java:  Now extends new LispInterpreter class.
+
+	* CommonLisp.java (loadClass):  Remove debugging remnant.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* SymbolTable.java (make):  If not registered, create.

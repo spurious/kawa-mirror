@@ -87,7 +87,8 @@ public class IntNum extends RatNum implements Compilable
     return result;
   }
 
-  /** Change words.length to nwords. */
+  /** Change words.length to nwords.
+  * We allow words.length to be upto nwords+2 without reallocating. */
   public void realloc (int nwords)
   {
     if (nwords == 0)
@@ -99,7 +100,9 @@ public class IntNum extends RatNum implements Compilable
 	    words = null;
 	  }
       }
-    else if (words == null || words.length != nwords)
+    else if (words == null
+	     || words.length < nwords
+	     || words.length > nwords + 2)
       {
 	int[] new_words = new int [nwords];
 	if (words == null)
@@ -199,7 +202,6 @@ public class IntNum extends RatNum implements Compilable
 	while (word == 0 && i > 0 && (word = words[i-1]) >= 0)
 	  {
 	    i--;
-	    System.err.println("word:"+word+",i:"+i);
 	  }
       }
     return i+1;
@@ -294,7 +296,7 @@ public class IntNum extends RatNum implements Compilable
   /** Destructively set the value of this to the given words. */
   public final void set (int[] words, int length)
   {
-    if (this.words == null || ival < length)
+    if (this.words == null || this.words.length < length)
       realloc (length + 1);  // Allocate one extra word to grow on.
     for (int i = length;  --i >= 0; )
       this.words[i] = words[i];
@@ -306,7 +308,7 @@ public class IntNum extends RatNum implements Compilable
   {
     if (y.words == null)
       set (y.ival);
-    else
+    else if (this != y)
       set (y.words, y.ival);
   }
 
@@ -491,6 +493,98 @@ public class IntNum extends RatNum implements Compilable
     return result.canonicalize ();
   }
 
+  public static void divide (long x, long y,
+			     IntNum quotient, IntNum remainder,
+			     int rounding_mode)
+  {
+    boolean xNegative, yNegative;
+    if (x < 0)
+      {
+	xNegative = true;
+	if (x == Long.MIN_VALUE)
+	  {
+	    divide (IntNum.make (x), IntNum.make (y),
+		    quotient, remainder, rounding_mode);
+	    return;
+	  }
+	x = -x;
+      }
+    else
+      xNegative = false;
+
+    if (y < 0)
+      {
+	yNegative = true;
+	if (y == Long.MIN_VALUE)
+	  {
+	    if (rounding_mode == TRUNCATE)
+	      { // x != Long.Min_VALUE implies abs(x) < abs(y)
+		if (quotient != null)
+		  quotient.set (0);
+		if (remainder != null)
+		  remainder.set (x);
+	      }
+	    else
+	      divide (IntNum.make (x), IntNum.make (y),
+		      quotient, remainder, rounding_mode);
+	    return;
+	  }
+	y = -y;
+      }
+    else
+      yNegative = false;
+
+    long q = x / y;
+    long r = x % y;
+    boolean qNegative = xNegative ^ yNegative;
+
+    boolean add_one = false;
+    if (r != 0)
+      {
+	switch (rounding_mode)
+	  {
+	  case TRUNCATE:
+	    break;
+	  case CEILING:
+	  case FLOOR:
+	    if (qNegative == (rounding_mode == FLOOR))
+	      add_one = true;
+	    break;
+	  case ROUND:
+	    add_one = r > ((y - (q & 1)) >> 1);
+	    break;
+	  }
+      }
+    if (quotient != null)
+      {
+	if (add_one)
+	  q++;
+	if (qNegative)
+	  q = -q;
+	quotient.set (q);
+      }
+    if (remainder != null)
+      {
+	// The remainder is by definition: X-Q*Y
+	if (add_one)
+	  {
+	    // Subtract the remainder from Y.
+	    r = y - r;
+	    // In this case, abs(Q*Y) > abs(X).
+	    // So sign(remainder) = -sign(X).
+	    xNegative = ! xNegative;
+	  }
+	else
+	  {
+	    // If !add_one, then: abs(Q*Y) <= abs(X).
+	    // So sign(remainder) = sign(X).
+	  }
+	if (xNegative)
+	  r = -r;
+	remainder.set (r);
+      }
+  }
+
   /** Divide two integers, yielding quotient and remainder.
    * @param x the numerator in the division
    * @param t the denominator in the division
@@ -503,46 +597,61 @@ public class IntNum extends RatNum implements Compilable
 			     IntNum quotient, IntNum remainder,
 			     int rounding_mode)
   {
+    if ((x.words == null || x.ival <= 2)
+	&& (y.words == null || y.ival <= 2))
+      {
+	long x_l = x.longValue ();
+	long y_l = y.longValue ();
+	if (x_l != Long.MIN_VALUE && y_l != Long.MIN_VALUE)
+	  {
+	    divide (x_l, y_l, quotient, remainder, rounding_mode);
+	    return;
+	  }
+      }
+
     boolean xNegative = x.isNegative ();
     boolean yNegative = y.isNegative ();
     boolean qNegative = xNegative ^ yNegative;
 
-    IntNum den;
-    if (yNegative || (remainder != null && rounding_mode != TRUNCATE))
+    int xlen = x.words == null ? 1 : x.ival;
+    int ylen = y.words == null ? 1 : y.ival;
+    int[] xwords = new int[xlen];
+    int[] ywords = new int[ylen];
+    x.getAbsolute (xwords);
+    y.getAbsolute (ywords);
+    int[] qwords, rwords;
+    int qlen, rlen;
+
+    if (ylen == 1)
       {
-	den = new IntNum ();
-	den.setAbsolute (y);
+	qwords = xwords;
+	rwords = ywords;
+	qlen = xlen;
+	rlen = 1;
+	rwords[0] = MPN.divmod_1 (qwords, xwords, xlen, ywords[0]);
       }
     else
-      den = y;
-    IntNum num = new IntNum ();
-    num.setAbsolute (x);
-
-    if (x.words != null || y.words != null)
-      throw new Error ("bignum division not implemented");
-
-    long x_l = num.longValue ();
-    long y_l = den.longValue ();
-    long q_l = x_l / y_l;
-    long r_l = x_l % y_l;
+      throw new Error ("general bignum division not implemented");
 
     boolean add_one = false;
-    boolean exact = r_l == 0;
-    switch (rounding_mode)
-      {
-      case TRUNCATE:
-	break;
-      case CEILING:
-      case FLOOR:
-	if (! exact && (qNegative == (rounding_mode == FLOOR)))
-	  add_one = true;
-	break;
-      case ROUND:
-	throw new Error ("ROUND mode not implemented for divide");
+    if (rlen > 0 || rwords[0] != 0)
+      { // Non-zero remainder i.e. in-exact quotient.
+	switch (rounding_mode)
+	  {
+	  case TRUNCATE:
+	    break;
+	  case CEILING:
+	  case FLOOR:
+	    if (qNegative == (rounding_mode == FLOOR))
+	      add_one = true;
+	    break;
+	  case ROUND:
+	    throw new Error ("ROUND mode not implemented for divide");
+	  }
       }
     if (quotient != null)
       {
-	quotient.set (q_l);
+	quotient.set (qwords, qlen);
 	if (qNegative)
 	  {
 	    if (add_one)  // -(quotient + 1) == ~(quotient)
@@ -559,17 +668,18 @@ public class IntNum extends RatNum implements Compilable
 	if (add_one)
 	  {
 	    // Subtract the remainder from Y.
-	    r_l = y_l - r_l;
+
 	    // In this case, abs(Q*Y) > abs(X).
 	    // So sign(remainder) = -sign(X).
-	    xNegative = ! xNegative;
+	    xNegative = ! xNegative;	
+	    throw new Error ("r_l = y_l - r_l");
 	  }
 	else
 	  {
 	    // If !add_one, then: abs(Q*Y) <= abs(X).
 	    // So sign(remainder) = sign(X).
 	  }
-	remainder.set (r_l);
+	remainder.set (rwords, rlen);
 	if (xNegative)
 	  remainder.setNegative ();
       }
@@ -709,7 +819,19 @@ public class IntNum extends RatNum implements Compilable
 	  yval = -yval;
 	return IntNum.make (IntNum.gcd (xval, yval));
       }
-    throw new Error ("unimplemented bignum gcd");
+
+    int xlen = x.words == null ? 1 : xval;
+    int ylen = y.words == null ? 1 : yval;
+    int len = (xlen > ylen ? xlen : ylen) + 1;
+    int[] xwords = new int[len];
+    int[] ywords = new int[len];
+    x.getAbsolute (xwords);
+    y.getAbsolute (ywords);
+    len = MPN.gcd (xwords, ywords, len);
+    IntNum result = new IntNum (0);
+    result.ival = len;
+    result.words = xwords;
+    return result.canonicalize ();
   }
 
   public static IntNum lcm (IntNum x, IntNum y)
@@ -734,42 +856,158 @@ public class IntNum extends RatNum implements Compilable
       }
   }
 
+  void setShiftLeft (IntNum x, int count)
+  {
+    int[] xwords;
+    int xlen;
+    if (x.words == null)
+      {
+	if (count < 32)
+	  {
+	    set ((long) x.ival << count);
+	    return;
+	  }
+	xwords = new int[1];
+	xwords[0] = x.ival;
+	xlen = 1;
+      }
+    else
+      {
+	xwords = x.words;
+	xlen = x.ival;
+      }
+    int word_count = count >> 5;
+    count &= 31;
+    int new_len = xlen + word_count;
+    if (count == 0)
+      {
+	realloc (new_len);
+	for (int i = xlen;  --i >= 0; )
+	  words[i+word_count] = xwords[i];
+      }
+    else
+      {
+	new_len++;
+	realloc (new_len);
+	int shift_out = MPN.lshift (words, word_count, xwords, xlen, count);
+	count = 32 - count;
+	words[new_len-1] = (shift_out << count) >> count;  // sign-extend.
+      }
+    ival = new_len;
+    for (int i = word_count;  --i >= 0; )
+      words[i] = 0;
+  }
+
+  void setShiftRight (IntNum x, int count)
+  {
+    if (x.words == null)
+      set (count < 32 ? x.ival >> count : x.ival < 0 ? -1 : 0);
+    else if (count == 0)
+      set (x);
+    else
+      {
+	boolean neg = x.isNegative ();
+	int word_count = count >> 5;
+	count &= 31;
+	int d_len = x.ival - word_count;
+	if (d_len <= 0)
+	  set (neg ? -1 : 0);
+	else
+	  {
+	    if (words == null || words.length < d_len)
+	      realloc (d_len);
+	    MPN.rshift (words, x.words, word_count, d_len, count);
+	    ival = d_len;
+	    if (neg)
+	      words[ival-1] |= -1 << (32 - count);
+	  }
+      }
+  }
+
+  void setShift (IntNum x, int count)
+  {
+    if (count > 0)
+      setShiftLeft (x, count);
+    else
+      setShiftRight (x, -count);
+  }
+
+  public static IntNum shift (IntNum x, int count)
+  {
+    if (x.words == null)
+      {
+	if (count <= 0)
+	  return make (count > -32 ? x.ival >> (-count) : x.ival < 0 ? -1 : 0);
+	if (count < 32)
+	  return make ((long) x.ival << count);
+      }
+    if (count == 0)
+      return x;
+    IntNum result = new IntNum (0);
+    result.setShift (x, count);
+    return result.canonicalize ();
+  }
+
   public String toString (int radix)
   {
     if (words == null)
       return Integer.toString (ival, radix);
     else if (ival <= 2)
       return Long.toString (longValue (), radix);
-    else if (isNegative ())
+    boolean neg = isNegative ();
+    int[] work;
+    if (neg || radix != 16)
       {
-	return "-" + (IntNum.neg (this).toString (radix));
+	work = new int[ival];
+	getAbsolute (work);
+      }
+    else
+      work = words;
+    int len = ival;
+
+    int buf_size = len * (MPN.chars_per_word (radix) + 1);
+    StringBuffer buffer = new StringBuffer (buf_size);
+    if (radix == 16)
+      {
+	if (neg)
+	  buffer.append ('-');
+	int buf_start = buffer.length ();
+	for (int i = len;  --i >= 0; )
+	  {
+	    int word = work[i];
+	    for (int j = 8;  --j >= 0; )
+	      {
+		int hex_digit = (word >> (4 * j)) & 0xF;
+		// Suppress leading zeros:
+		if (hex_digit > 0 || buffer.length () > buf_start)
+		  buffer.append (Character.forDigit (hex_digit, 16));
+	      }
+	  }
       }
     else
       {
-	int buf_size = ival * (MPN.chars_per_word (radix) + 1);
-	StringBuffer buffer = new StringBuffer (buf_size);
-	if (radix == 16)
+	for (;;)
 	  {
-	    for (int i = ival;  --i >= 0; )
-	      {
-		int word = words[i];
-		for (int j = 8;  --j >= 0; )
-		  {
-		    int hex_digit = (word >> (4 * j)) & 0xF;
-		    // Suppress leading zeros:
-		    if (hex_digit > 0 || buffer.length () > 0)
-		      buffer.append (Character.forDigit (hex_digit, 16));
-		      
-		  }
-	      }
+	    int digit = MPN.divmod_1 (work, work, len, radix);
+	    buffer.append (Character.forDigit (digit, radix));
+	    while (len > 0 && work[len-1] == 0) len--;
+	    if (len == 0)
+	      break;
 	  }
-	else
+	if (neg)
+	  buffer.append ('-');
+	/* Reverse buffer. */
+	int i = 0;
+	int j = buffer.length () - 1;
+	while (i < j)
 	  {
-	    // temporary - until we can implement other radixes.
-	    return "#x"+toString(16);
+	    char tmp = buffer.charAt (i);
+	    buffer.setCharAt (i, buffer.charAt (j));
+	    buffer.setCharAt (j, tmp);
+	    i++;  j--;
 	  }
-	return buffer.toString ();
       }
+    return buffer.toString ();
   }
 
   public String toString ()
@@ -954,6 +1192,44 @@ public class IntNum extends RatNum implements Compilable
       throw new IllegalArgumentException ();
   }
 
+  /** Copy the abolute value of this into an array of words.
+   * Assumes words.length >= (this.words == null ? 1 : this.ival).
+   * Result is zero-extended, but need not be a valid 2's complement number.
+   */
+    
+  public void getAbsolute (int[] words)
+  {
+    int len;
+    if (this.words == null)
+      {
+	len = 1;
+	words[0] = this.ival;
+      }
+    else
+      {
+	len = this.ival;
+	for (int i = len;  --i >= 0; )
+	  words[i] = this.words[i];
+      }
+    for (int i = words.length;  --i > len; )
+      words[i] = 0;
+    if (words[len-1] < 0)
+      negate (words, words, words.length);
+  }
+
+  /** Set dest[0:len-1] to the negation of src[0:len-1]. */
+  public static int negate (int[] dest, int[] src, int len)
+  {
+    long carry = 1;
+    for (int i = 0;  i < len;  i++)
+      {
+        carry += ((long) (~src[i]) & 0xffffffffL);
+        dest[i] = (int) carry;
+        carry >>= 32;
+      }
+    return (int) carry;
+  }
+
   /** Destructively set this to the negative of x.
    * It is OK if x==this.*/
   public void setNegative (IntNum x)
@@ -968,18 +1244,12 @@ public class IntNum extends RatNum implements Compilable
 	return;
       }
     realloc (len + 1);
-    long carry = 1;
     boolean negative = x.isNegative ();
-    for (int i = 0;  i < len;  i++)
-      {
-	carry += ((long) (~x.words[i]) & 0xffffffffL);
-	words[i] = (int) carry;
-	carry >>= 32;
-      }
+    int carry = IntNum.negate (words, x.words, len);
     if (carry > 0 && negative)
       words[len++] = 1;
     ival = len;
-    }
+  }
 
   /** Destructively negate this. */
   public final void setNegative ()

@@ -1,3 +1,16 @@
+Thu Oct 17 22:00:51 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* MPN.java (sub_n, udiv_qrnnd, divmod_1, rshift, lshift,
+	findLowestBit, gcd):  New functions.
+	* IntNum.java (realoc):  Don't reallocate if larger size is close.
+	(set):  Fix wrong comparison.
+	(divide for longs):  New function.
+	(divide general):  Use divide for long, or divmod_1.
+	(gcd):  Implement for bignums.
+	(setShiftLeft, setShiftRight, setShift, shift):  New functions.
+	(toString):  We can print bignums in any radix now.
+	(getAbsolute, negate):  New utility methods.
+
 Mon Sep 16 10:55:39 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* DFloNum.java (makeLiteral, emit):  Implement Compilable.

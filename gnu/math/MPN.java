@@ -45,6 +45,31 @@ class MPN
     return (int) carry;
   }
 
+  /** Subtract Y[0:size-1] from X[0:size-1], and write
+   * the size least significant words of the result to dest[0:size-1].
+   * Return borrow, either 0 or 1.
+   * This is basically the same as gmp's mpn_sub_n function.
+   */
+
+  public static int sub_n (int[] dest, int[] X, int[] Y, int size)
+  {
+    int cy = 0;
+    for (int i = 0;  i < size;  i++)
+      {
+	int y = Y[i];
+	int x = X[i];
+	y += cy;	/* add previous carry to subtrahend */
+	// Invert the high-order bit, because:
+	// (unsigned) X > (unsigned) y iff
+	// (int) (x^0x80000000) > (int) (y^0x80000000).
+	cy = (y^0x80000000) < (cy^0x80000000) ? 1 : 0;
+	y = x - y;
+	cy += (y^0x80000000) > (x ^ 0x80000000) ? 1 : 0;
+	dest[i] = y;
+      }
+    return cy;
+  }
+
   /** Multiply x[0:len-1] by y, and write the len least
    * significant words of the product to dest[0:len-1].
    * Return the most significant words of the product.
@@ -94,6 +119,109 @@ class MPN
 	  }
 	dest[i+xlen] = (int) carry;
       }
+  }
+
+  /* Divide (unsigned long) N by (unsigned int) D.
+   * Returns (remainder << 32)+(unsigned int)(quotient).
+   * Assumes (unsigned int)(N>>32) < (unsigned int)D.
+   * Code transcribed from gmp-2.0's mpn_udiv_w_sdiv function.
+   */
+  public static long udiv_qrnnd (long N, int D)
+  {
+    long q, r;
+    long a1 = N >>> 32;
+    long a0 = N & 0xffffffffL;
+    if (D >= 0)
+      {
+	if (a1 < ((D - a1 - (a0 >>> 31)) & 0xffffffffL))
+	  {
+	    /* dividend, divisor, and quotient are nonnegative */
+	    q = N / D;
+	    r = N % D;
+	  }
+	else
+	  {
+	    /* Compute c1*2^32 + c0 = a1*2^32 + a0 - 2^31*d */
+	    long c = N - ((long) D << 31);
+	    /* Divide (c1*2^32 + c0) by d */
+	    q = c / D;
+	    r = c % D;
+	    /* Add 2^31 to quotient */
+	    q += 1 << 31;
+	  }
+      }
+    else
+      {
+	long b1 = D >>> 1;	/* d/2, between 2^30 and 2^31 - 1 */
+	//long c1 = (a1 >> 1); /* A/2 */
+	//int c0 = (a1 << 31) + (a0 >> 1);
+	long c = N >>> 1;
+	if (a1 < b1 || (a1 >> 1) < b1)
+	  {
+	    if (a1 < b1)
+	      {
+		q = c / b1;
+		r = c % b1;
+	      }
+	    else /* c1 < b1, so 2^31 <= (A/2)/b1 < 2^32 */
+	      {
+		c = ~(c - (b1 << 32));
+		q = c / b1;  /* (A/2) / (d/2) */
+		r = c % b1;
+		q = ~q;    /* (A/2)/b1 */
+		r = (b1 - 1) - r; /* r < b1 => new r >= 0 */
+	      }
+	    r = 2 * r + (a0 & 1);
+	    if ((D & 1) != 0)
+	      {
+		r -= q;
+		int k = (r >= q) ? 0 : (q - r <= D) ? 1: 2;
+		r = r - q + k * D;
+		q += k;
+	      }
+	  }
+	else				/* Implies c1 = b1 */
+	  {				/* Hence a1 = d - 1 = 2*b1 - 1 */
+	    r = a0 + D;
+	    if (a0 >= ((long)(-D) & 0xffffffffL))
+		q = -1;
+	    else
+	      {
+		q = -2;
+		r += D;
+	      }
+	  }
+      }
+    return (r << 32) | (q & 0xFFFFFFFFl);
+  }
+
+    /** Divide divident[0:len-1] by (unsigned int)divisor.
+     * Write result into qutient[0:len-1.
+     * Return the one-word (unsigned) remainder.
+     * OK for quotient==dividend.
+     */
+
+    public static int divmod_1 (int[] quotient, int[] dividend,
+			      int len, int divisor)
+  {
+    int i = len - 1;
+    long r = dividend[i];
+    if ((r & 0xffffffffL) >= ((long)divisor & 0xffffffffL))
+      r = 0;
+    else
+      {
+	quotient[i--] = 0;
+	r <<= 32;
+      }
+
+    for (;  i >= 0;  i--)
+      {
+	int n0 = dividend[i];
+	r = (r & ~0xffffffffL) | (n0 & 0xffffffffL);
+	r = udiv_qrnnd (r, divisor);
+	quotient[i] = (int) r;
+      }
+    return (int)(r >> 32);
   }
 
   /** Number of digits in the conversion base that always fits in a word.
@@ -260,11 +388,6 @@ class MPN
    */
   public static int cmp (int[] x, int[] y, int size)
   {
-System.err.print("MPN.comp(");
-kawa.lang.print.print (x, System.err);
-System.err.print(", ");
-kawa.lang.print.print (y, System.err);
-System.err.print(", "+size+")");
     while (--size >= 0)
       {
 	int x_word = x[size];
@@ -278,5 +401,193 @@ System.err.print(", "+size+")");
 	  }
       }
     return 0;
+  }
+
+  /* Shift x[x_start:x_start+len-1]count bits to the "right"
+   * (i.e. divide by 2**count).
+   * Store the len least significant words of the result at dest.
+   * The bits shifted out to the right are returned.
+   * OK if dest==x.
+   * Assumes: 0 < count < 32
+   */
+
+  public static int rshift (int[] dest, int[] x, int x_start,
+			    int len, int count)
+  {
+    int count_2 = 32 - count;
+    int low_word = x[x_start];
+    int retval = low_word << count_2;
+    int i = 1;
+    for (; i < len;  i++)
+      {
+	int high_word = x[x_start+i];
+	dest[i-1] = (low_word >>> count) | (high_word << count_2);
+	low_word = high_word;
+      }
+    dest[i-1] = low_word >>> count;
+    return retval;
+  }
+
+  /* Shift x[0:len-1]count bits to the "right" (i.e. divide by 2**count).
+   * Store the len least significant words of the result at dest.
+   * OK if dest==x.
+   * OK if count > 32 (but must be >= 0).
+   */
+  public static void rshift (int[] dest, int[] x, int len, int count)
+  {
+    int word_count = count >> 5;
+    count &= 31;
+    rshift (dest, x, word_count, len, count);
+    while (word_count < len)
+      dest[word_count++] = 0;
+  }
+
+  /* Shift x[0:len-1] left by count bits, and store the len least
+   * significant words of the result in dest[d_offset:d_offset+len-1].
+   * Return the bits shifted out from the most significant digit.
+   * Assumes 0 < count < 32.
+   * OK if dest==x.
+   */
+
+  public static int lshift (int[] dest, int d_offset,
+			    int[] x, int len, int count)
+  {
+    int count_2 = 32 - count;
+    int i = len - 1;
+    int high_word = x[i];
+    int retval = high_word >>> count_2;
+    d_offset++;
+    while (--i >= 0)
+      {
+	int low_word = x[i];
+	dest[d_offset+i] = (high_word << count) | (low_word >>> count_2);
+	high_word = low_word;
+      }
+    dest[d_offset+i] = high_word << count;
+    return retval;
+  }
+
+  /** Return least i such that word&(1<<i). Assumes word!=0. */
+  
+  static int findLowestBit (int word)
+  {
+    int i = 0;
+    while ((word & 0xF) == 0)
+      {
+	word >>= 4;
+	i += 4;
+      }
+    if ((word & 3) == 0)
+      {
+	word >>= 2;
+	i += 2;
+      }
+    if ((word & 1) == 0)
+      i += 1;
+    return i;
+  }
+
+  /** Return least i such that words & (1<<i). Assumes there is such an i. */
+
+  static int findLowestBit (int[] words)
+  {
+    for (int i = 0;  ; i++)
+      {
+	if (words[i] != 0)
+	  return 32 * i + findLowestBit (words[i]);
+      }
+  }
+
+  public static int gcd (int[] x, int[] y, int len)
+  {
+    int i, word;
+    // Find sh such that both x and y are divisible by 2**sh.
+    for (i = 0; ; i++)
+      {
+	word = x[i] | y[i];
+	if (word != 0)
+	  {
+	    // Must terminate, since x and y are non-zero.
+	    break;
+	  }
+      }
+    int initShiftWords = i;
+    int initShiftBits = findLowestBit (word);
+    // Logically: sh = initShiftWords * 32 + initShiftBits
+
+    // Temporarily devide both x and y by 2**sh.
+    len -= initShiftWords;
+    MPN.rshift (x, x, initShiftWords, len, initShiftBits);
+    MPN.rshift (y, y, initShiftWords, len, initShiftBits);
+
+    int[] odd_arg; /* One of x or y which is odd. */
+    int[] other_arg; /* The other one can be even or odd. */
+    if ((x[0] & 1) != 0)
+      {
+	odd_arg = x;
+	other_arg = y;
+      }
+    else
+      {
+	odd_arg = y;
+	other_arg = x;
+      }
+
+    for (;;)
+      {
+	// Shift other_arg until it is odd; this doesn't
+	// affect the gcd, since we divide by 2**k, which does not
+	// divide odd_arg.
+	for (i = 0; other_arg[i] == 0; ) i++;
+	if (i > 0)
+	  {
+	    int j;
+	    for (j = 0; j < len-i; j++)
+		other_arg[j] = other_arg[j+i];
+	    for ( ; j < len; j++)
+	      other_arg[j] = 0;
+	  }
+	i = findLowestBit(other_arg[0]);
+	if (i > 0)
+	  MPN.rshift (other_arg, other_arg, 0, len, i);
+	
+	// Now both odd_arg and other_arg are odd.
+
+	// Subtract the smaller from the larger.
+	// This does not change the result, since gcd(a-b,b)==gcd(a,b).
+	i = MPN.cmp(odd_arg, other_arg, len);
+	if (i == 0)
+	    break;
+	if (i > 0)
+	  { // odd_arg > other_arg
+	    MPN.sub_n (odd_arg, odd_arg, other_arg, len);
+	    // Now odd_arg is even, so swap with other_arg;
+	    int[] tmp = odd_arg; odd_arg = other_arg; other_arg = tmp;
+	  }
+	else
+	  { // other_arg > odd_arg
+	    MPN.sub_n (other_arg, other_arg, odd_arg, len);
+	}
+	while (odd_arg[len-1] == 0 && other_arg[len-1] == 0)
+	  len--;
+    }
+    if (initShiftWords + initShiftBits > 0)
+      {
+	if (initShiftBits > 0)
+	  {
+	    int sh_out = MPN.lshift (x, initShiftWords, x, len, initShiftBits);
+	    if (sh_out != 0)
+	      x[(len++)+initShiftWords] = sh_out;
+	  }
+	else
+	  {
+	    for (i = len; --i >= 0;)
+	      x[i+initShiftWords] = x[i];
+	  }
+	for (i = initShiftWords;  --i >= 0; )
+	  x[i] = 0;
+	len += initShiftWords;
+      }
+    return len;
   }
 }

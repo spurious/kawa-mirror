@@ -109,3 +109,17 @@
   (let ((copy :: <string> (string-copy str)))
     (invoke-static <gnu.lists.Strings> 'makeCapitalize copy)
     copy))
+
+(define (string-append #!rest (args :: <Object[]>)) :: <string>
+  (let ((str :: <string> (make <string>)))
+    (invoke str 'addAllStrings args 0)
+    str))
+
+(define (string-append/shared #!rest (args :: <Object[]>)) :: <string>
+  (if (= 0 ((primitive-array-length <Object>) args))
+      (make <string>)
+      (let ((arg1 :: <string> ((primitive-array-get <Object>) args 0)))
+        (invoke arg1 'addAllStrings args 1)
+        arg1)))
+
+

@@ -1,3 +1,7 @@
+2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* strings.scm (string-append, string-append/shared):  New functions.
+
 2003-10-28  Per Bothner  <per@bothner.com>
 
 	* files.scm (system-tmpdir):  Micro-optimization.

@@ -4,7 +4,7 @@ package gnu.mapping;
  * Not yet working/useful. */
 
 public abstract class CallFrame extends MethodProc
-implements Cloneable, CpsMethodContainer
+implements Cloneable
 {
   public Object[] args;
   public Procedure proc;

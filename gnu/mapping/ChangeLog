@@ -13,6 +13,10 @@
 	(getRestArgsArray, getRestArgsList):  Take start parameter.
 	(setArgs[5 methods], setArgsN):  Remove methods.
 	(getArgs):  Reset next to 0.
+	* CpsMethodContainer.java:  Remove interface.
+	* CpsMethodProc.java:  Remove class.
+	* Makefile.am:  Update accordingly.
+	* CallFrame.java:  No longer implement CpsMethodContainer.
 
 2004-08-06  Per Bothner  <per@bothner.com>
 

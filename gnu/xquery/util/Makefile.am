@@ -7,6 +7,7 @@ java_sources = \
   BooleanValue.java \
   Children.java \
   Compare.java \
+  Debug.java \
   IndexOf.java \
   IntegerRange.java \
   IsEmptySequence.java \

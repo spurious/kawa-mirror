@@ -106,7 +106,7 @@ public class LispFormat extends CompoundFormat
 	ch = Character.toUpperCase(ch);
 	int numParams = stack.size() - speci;
 	Format fmt;
-	int minWidth, padChar, charVal, param1, param2, param3;
+	int minWidth, padChar, charVal, param1, param2, param3, count;
 	switch (ch)
 	  {
 	  case 'R':  case 'D':  case 'O':  case 'B':  case 'X':
@@ -308,13 +308,17 @@ public class LispFormat extends CompoundFormat
 	    param1 = getParam(stack, speci);
 	    fmt = new LispFreshlineFormat(param1);
 	    break;
-	  case '_':  // FIXME actually conditional newline
+	  case '_': // conditional newline
 	    param1 = getParam(stack, speci);
 	    if (param1 == PARAM_UNSPECIFIED)
 	      param1 = 1;
 	    charVal = seenColon && seenAt ? '\n' : ' ';
-	    fmt = LispCharacterFormat.getInstance(charVal, param1,
-						  false, false);
+	    int kind;
+	    if (seenAt && seenColon) kind = PrettyWriter.NEWLINE_MANDATORY;
+	    else if (seenAt) kind = PrettyWriter.NEWLINE_MISER;
+	    else if (seenColon) kind = PrettyWriter.NEWLINE_FILL;
+	    else kind = PrettyWriter.NEWLINE_LINEAR;
+	    fmt = LispNewlineFormat.getInstance(param1, kind);
 	    break;
 	  case '~':
 	    if (numParams == 0)
@@ -324,16 +328,22 @@ public class LispFormat extends CompoundFormat
 	      }
 	    /* ... otherwise fall through ... */
 	  case '|':
-	  case '%':
-	    int count = getParam(stack, speci);
+	    count = getParam(stack, speci);
 	    if (count == PARAM_UNSPECIFIED)
 	      count = 1;
 	    // EXTENSION:  Allow repeating other characters than '~'.
 	    charVal = getParam(stack, speci+1);
 	    if (charVal == PARAM_UNSPECIFIED) 
-	      charVal = ch == '|' ? '\f' : ch == '%' ? '\n' : '~';
+	      charVal = ch == '|' ? '\f' : '~';
 	    fmt = LispCharacterFormat.getInstance(charVal, count,
 						  false, false);
+	    break;
+	  case '%':
+	    count = getParam(stack, speci);
+	    if (count == PARAM_UNSPECIFIED)
+	      count = 1;
+	    fmt = LispNewlineFormat.getInstance(count,
+						PrettyWriter.NEWLINE_LITERAL);
 	    break;
           default:
 	    throw new ParseException("unrecognized format specifier ~"+ch, i);
@@ -568,6 +578,58 @@ class LispCharacterFormat extends ReportFormat
 	// if (ch > 0xFFFF) print surrogate chars; else
 	dst.write(ch);
       }
+  }
+}
+
+/** Handle formatting of newline ~% and ~_ format operator.
+ * format operators. */
+
+class LispNewlineFormat extends ReportFormat
+{
+  static final String line_separator
+    = System.getProperty("line.separator", "\n");
+
+  /** One of NEWLINE_LITERAL, NEWLINE_LINEAR, NEWLINE_FILL, NEWLINE_MISER
+   * or NEWLINE_MANDATORY.  These are defined in gnu.text.PrettyWriter. */
+  int kind;
+
+  int count;
+
+  public static LispNewlineFormat
+  getInstance(int count, int kind)
+  {
+    LispNewlineFormat fmt = new LispNewlineFormat();
+    fmt.count = count;
+    fmt.kind = kind;
+    return fmt;
+  }
+
+  public int format(Object[] args, int start, 
+		    Writer dst, FieldPosition fpos) 
+    throws java.io.IOException
+  {
+    int count = getParam(this.count, 1, args, start);
+    if (this.count == LispFormat.PARAM_FROM_LIST)  start++;
+    while (--count >= 0)
+      printNewline (kind, dst);
+    return start;
+  }
+
+  public static void printNewline(int kind, Writer dst)
+    throws java.io.IOException
+  {
+    /*
+    if (dst instanceof OutPort)
+      {
+	((OutPort) dst).writeBreak(kind);
+      }
+    else
+    */
+    if (dst instanceof java.io.PrintWriter)
+      // May make a difference if autoflush.  // FIXME flush if OutPort?
+      ((java.io.PrintWriter) dst).println();
+    else
+      dst.write(line_separator);
   }
 }
 

@@ -77,9 +77,9 @@ public class DisplayFormat extends AbstractFormat
       writeChar(((Character)obj).charValue(), out);
     else if (obj instanceof Binding)
       writeObject(obj.toString(), out);
-    else if (obj instanceof CharSequence)
+    else if (obj instanceof CharSeq)
       {
-	CharSequence str = (CharSequence) obj;
+	CharSeq str = (CharSeq) obj;
 	if (getReadableOutput () && out instanceof PrintWriter)
 	  Strings.printQuoted(str, (PrintWriter) out, 0);
 	else if (obj instanceof FString) // FIXME Do we need this case?

@@ -217,15 +217,35 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	code.emitNew(type);
 	code.emitDup(type);
       }
-    for (int i = 0; i < args.length; ++i)
+    boolean variable = takesVarArgs();
+    int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
+      : args.length;
+    Type arg_type = null;
+    for (int i = 0; ; ++i)
       {
-	Type arg_type = is_static ? argTypes[i]
-	  : i==0 ? method.getDeclaringClass()
-	  : argTypes[i-1];
+        if (variable && i == fix_arg_count)
+          {
+            code.emitPushInt(args.length - fix_arg_count);
+            arg_type = ((ArrayType) argTypes[arg_count-1]).getComponentType();
+            code.emitNewArray(arg_type);
+          }
+        if (i >= args.length)
+          break;
+        if (i >= fix_arg_count)
+          {
+            code.emitDup(1); // dup array.
+            code.emitPushInt(i - fix_arg_count);
+          }
+        else
+          arg_type = is_static ? argTypes[i]
+            : i==0 ? method.getDeclaringClass()
+            : argTypes[i-1];
 	args[i].compile(comp,
                         source == null
                         ? CheckedTarget.getInstance(arg_type, getName(), i)
                         : CheckedTarget.getInstance(arg_type, source, i));
+        if (i >= fix_arg_count)
+          code.emitArrayStore(arg_type);
       }
     
     if (method == null)

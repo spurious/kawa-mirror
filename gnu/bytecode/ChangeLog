@@ -1,3 +1,7 @@
+2000-02-25  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+
+	* ClassType.java (getInterfaces):  Fix thinko.
+
 2000-02-12  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (addInterface):  New method.

@@ -120,7 +120,7 @@ public class ClassType extends ObjectType implements AttrContainer {
    */
   public ClassType[] getInterfaces()
   {
-    if (superClass == null && reflectClass != null)
+    if (interfaces == null && reflectClass != null)
       {
 	Class[] reflectInterfaces = reflectClass.getInterfaces();
 	interfaces = new ClassType[reflectInterfaces.length];

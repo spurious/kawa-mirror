@@ -1,8 +1,6 @@
 package gnu.jemacs.lang;
 import gnu.math.*;
 import gnu.mapping.*;
-import gnu.kawa.util.Char;
-import gnu.kawa.util.Position;
 
 public class AddOp extends ProcedureN
 {

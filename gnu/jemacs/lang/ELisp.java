@@ -2,6 +2,7 @@ package gnu.jemacs.lang;
 import gnu.mapping.*;
 import gnu.kawa.util.*;
 import gnu.expr.*;
+import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
@@ -407,5 +408,18 @@ public class ELisp extends Interpreter
     for (int i = 0;  i < str.length();  i++)
       readableChar(str.charAt(i), buf, false);
     return buf.toString();
+  }
+
+  public static void main(String[] args)
+  {
+    registerEnvironment();
+    if (args.length == 0)
+      {
+        args = new String[3];
+        args[0] = "-e";
+        args[1] = "(emacs)";
+        args[2] = "--";
+      }
+    kawa.repl.main(args);
   }
 }

@@ -1,5 +1,7 @@
 2005-03-16  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (SCM_COMPILE_FLAGS): Add new --module-static-run flag.
+
 	* strings.scm (list->string): Inline car and cdr calls.
 	* files.scm (include-relative): Likewise, aided by type specifier.
 

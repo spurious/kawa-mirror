@@ -1,5 +1,8 @@
 2004-12-24  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/Scheme.java: New syntax "include-relative".
+	The "include" syntax was moved.
+
 	* kawa/lang/SyntaxForm.java (makeWithTemplate): New static function.
 
 	* kawa/lang/SyntaxPattern.java (allocVars): New helper method.

@@ -480,12 +480,13 @@ public class Scheme extends LispInterpreter
       define ("syntax-case", new kawa.standard.syntax_case ());
       define ("%define-syntax", new kawa.standard.define_syntax ());
       define ("syntax-rules", new kawa.standard.syntax_rules ());
-      defSntxStFld("with-syntax", "kawa.lib.std_syntax");
-      defSntxStFld("include", "kawa.lib.std_syntax");
       defProcStFld("syntax-object->datum", "kawa.lib.std_syntax");
       defProcStFld("datum->syntax-object", "kawa.lib.std_syntax");
       defProcStFld("syntax->expression", "kawa.lib.prim_syntax");
       defProcStFld("syntax-body->expression", "kawa.lib.prim_syntax");
+      defSntxStFld("with-syntax", "kawa.lib.std_syntax");
+      defSntxStFld("include", "kawa.lib.files");
+      defSntxStFld("include-relative", "kawa.lib.files");
 
       defProcStFld("file-exists?", "kawa.lib.files");
       defProcStFld("file-directory?", "kawa.lib.files");

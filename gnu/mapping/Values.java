@@ -8,7 +8,7 @@ public class Values implements Printable
 {
   private Object[] vals;
 
-  public static final Values empty = new Values(new Object[0]);
+  public static final Values empty = new Values(Procedure.noArgs);
 
   /** Constructor.
    * @param values the values to encapulate

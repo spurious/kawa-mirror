@@ -548,16 +548,38 @@ If @var{q} is a number, returns the empty unit.
 @defun make-quantity x unit
 Returns the product of @var{x} (a pure number) and @var{unit}.
 You can specify a string instead of @var{unit}, such as @code{"cm"}
-or @var{"s"} (seconds).
+or @code{"s"} (seconds).
 @end defun
 
-@subsection Miscellaneous
+@subsection Threads
+
+There is a very preliminary interface to create parallel threads.
+The interface is similar to the standard @code{delay}/@code{force},
+where a thread is basically the same as a promise, except that
+evaluation may be in parallel.
+
+So far, little or no effort has been made into makeing Kawa
+thread-safe.  There are no per-thread bindings, and
+the current input and output parts are global.
+That need to change.
+
+@defmac future expression
+Creates a new thread that evaluates @var{expression}.
+@end defmac
+
+@defun force thread
+The standard @code{force} function has generalized to also work
+on thraeds.  If waits for the threads @var{expression} to finish
+executing, and return the result.
+@end defun
 
 @defun sleep time
 Suspends the current thread for the specified time.
 The @var{time} can be either a pure number (in secords),
 or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
+
+@subsection Miscellaneous
 
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.
@@ -652,7 +674,7 @@ more @samp{.class} files.
 
 You run it as follows:
 @example
-java kawac @var{infile} [-d @var{outdirectory}] [@var{prefix} [@var{topname}`<]]
+java kawac @var{infile} [-d @var{outdirectory}] [@var{prefix} [@var{topname}]]
 @end example
 
 Here:

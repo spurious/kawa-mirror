@@ -1,3 +1,11 @@
+2002-02-15  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Fix various typos and minor errors.
+
+	* Makefile.am (internals.html):  Use xsltproc.
+	(EXTRA_DIST):  DOn't include generated html or postscript.
+	(../kawa-doc-$(VERSION).tar.gz):  New rules, for latter files.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Update kawa*-compiled.jar to kawa*.jar.

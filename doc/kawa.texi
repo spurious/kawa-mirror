@@ -3934,7 +3934,7 @@ class MyDevFunc extends Procedure2
 public class MyDevice extends ModuleBody
 @{
   public Object run (Environment env)
-    throws WrongArguments, WrongType, GenericError, UnboundSymbol
+    throws WrongArguments, WrongType, UnboundSymbol
   @{
     ... initialize my device here ...;
 
@@ -4078,26 +4078,27 @@ Here is a simple program @code{hello.scm}:
 (make-element 'p
   (let ((query (request-query-string)))
     (if query
-      "There was no query string."
-      (values-append "The query string was: " query))))
+      (values-append "The query string was: " query)
+      "There was no query string.")))
+#\newline ; emit a new-line at the end
 @end example
 
 The same program using KRL is shorter:
 @example
-<p>The request URL was: [(request-url)]</p>
+<p>The request URL was: [(request-url)]</p>,
 <p>[(let ((query (request-query-string)))
     (if query
-      ]There was no query string.[
-      ]The query string was: [query]))</p>
+      (begin ]The query string was: [query)
+      ]There was no query string.[))]</p>
 @end example
 
 You can also use XQuery:
 @example
 <p>The request URL was: @{request-url()@}</p>
 <p>@{let $query := request-query-string() return
-    if (query)
-    then "There was no query string."
-    else "The query string was: ",query@}</p>
+    if ($query)
+    then ("The query string was: ",$query)
+    else "There was no query string."@}</p>
 @end example
 
 Either way, you compile your program to a servlet:
@@ -4130,7 +4131,7 @@ into @code{$CATALINA_HOME/webapps/myutils/WEB-INF/classes/}.
 You also need to copy Kawa somewhere where Tomcat can find it,
 for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
 You can then run the @code{hello} servlet using the URL
-@url{http://localhost::8080/myutils/servlet/hello}.
+@url{http://localhost:8080/myutils/servlet/hello}.
 
 @node CGI scripts, HTTP requests, Servlets, XML tools
 @section Installing Kawa programs as CGI scripts
@@ -4156,7 +4157,7 @@ Next find the @code{cgi-servlet} program that Kawa builds and installs.
 If you installed Kawa in the default place, it will be in
 @code{/usr/local/bin/cgi-servlet}.
 (You'll have this if you installed Kawa from source, but not
-if your just using Kawa @code{.jar} file.)
+if you're just using Kawa @code{.jar} file.)
 Copy this program into the same CGI directory:
 @example
 cp /usr/local/bin/cgi-servlet /var/www/cgi-bin/
@@ -4179,7 +4180,7 @@ chmod a+x /var/www/cgi-bin/hello
 
 Now you should be able to run the Kawa program,
 using the URL @url{http://localhost/cgi-bin/hello}.
-The performance may be pretty bad, mainly because of the
+It may take a few seconds to get the reply, mainly because of the
 start-up time of the Java VM.  That is why servlets are
 preferred.  Using the CGI interface can still be useful
 for testing or when you can't run servlets.  We hope to
@@ -4201,7 +4202,7 @@ before using these functions.
 @example
 (require 'http)
 @end example
-This is not needed for KRL or XQuery.  (FIXME?)
+This is not needed for KRL or XQuery.
 
 @defun request-method
 Returns the method of the HTTP request, usually @code{"GET"}
@@ -4240,8 +4241,8 @@ Corresponds to the CGI variable @code{QUERY_STRING}.
 @defun unescaped-data data
 Creates a special value which causes @code{data} to be printed,
 as is, without normal escaping.  For example, when the output format
-is XML, then printing @code{"<?xml>"} prints as @code{&lt;?xml&gt;},
-but @code{(unescaped-data "<?xml>")} prints as  @code{<?xml>}.
+is XML, then printing @code{"<?xml?>"} prints as @samp{&lt;?xml?&gt;},
+but @code{(unescaped-data "<?xml?>")} prints as  @samp{<?xml?>}.
 @end defun
 
 If using plain Scheme, you need to do the following
@@ -4249,19 +4250,18 @@ before using these functions.
 @example
 (require 'http)
 @end example
-This is not needed for KRL or XQuery.  (FIXME?)
+This is not needed for KRL or XQuery.
 
 @defun response-header key value
 Create the response header @samp{@var{key}: @var{value}} in the HTTP
-response.  It is unspecified whether this works by setting a side-effect,
-or whether it creates a creates a "response header" value (of some
-unspecified type), so you should place this where it can "print"
-its value to the response output stream.
+response.  The result is a "response header value" (of some unspecified
+type).  It does not directly set or print a response header, but only
+does so when you actually "print" its value to the response output stream.
 @end defun
 
 @defun response-content-type type
-Species the content-type of teh result - for example @code{"text/plain"}.
-Convenience functions for @code{(response-header "Content-Type" @var{type})}.
+Species the content-type of the result - for example @code{"text/plain"}.
+Convenience function for @code{(response-header "Content-Type" @var{type})}.
 @end defun
 
 @node KRL, Mailing lists,  XML tools, Top
@@ -4273,7 +4273,7 @@ the KRL language by specifying @code{--krl} on the Kawa command line.
 
 KRL is based on on @uref{http://brl.sourceforge.net/,BRL},
 Bruce Lewis's "Beautiful Report Language", and
-uses some of BRL's code, but there are some experiemntal differences,
+uses some of BRL's code, but there are some experimental differences,
 and the implementation core is different.  You can run KRL in
 BRL-compatility-mode by specifying @code{--brl} instead of @code{--krl}.
 

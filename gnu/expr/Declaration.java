@@ -38,7 +38,7 @@ import gnu.bytecode.*;
  * procedure prologue, so the parameters henceforth act like local variables.
  */
 
-public class Declaration extends Variable
+public class Declaration
 {
   static int counter;
   /** Unique id number, to ease print-outs and debugging. */
@@ -46,11 +46,32 @@ public class Declaration extends Variable
 
   /** The (interned) name of the new variable.
    * This is the source-level (non-mangled) name. */
-  protected String sym;
+  String name;
 
-  public final String symbol () { return sym; }
+  public ScopeExp context;
 
-  ScopeExp context;
+  protected Type type;
+  public final Type getType() { return type; }
+  public final void setType(Type type)
+  { this.type = type;  if (var != null) var.setType(type); }
+  public final String getName() { return name; }
+
+  /* Declarations in a ScopeExp are linked together in a linked list. */
+  Declaration next;
+
+  public final Declaration nextDecl() { return next; }
+
+  Variable var;
+  public Variable getVariable() { return var; }
+
+  public final boolean isSimple()
+  { return (flags & IS_SIMPLE) != 0; }
+
+  public final void setSimple(boolean b)
+  {
+    setFlag(b, IS_SIMPLE);
+    if (var != null) var.setSimple(b);
+  }
 
   /** Return the ScopeExp that contains (declares) this Declaration. */
   public final ScopeExp getContext() { return context; }
@@ -88,7 +109,7 @@ public class Declaration extends Variable
           code.emitGetStatic(field);
       }
     else
-      code.emitLoad(this);
+      code.emitLoad(getVariable());
   }
 
   /* Compile code to store a value (which must already be on the
@@ -97,7 +118,7 @@ public class Declaration extends Variable
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (isSimple ())
-      code.emitStore(this);
+      code.emitStore(getVariable());
     else
       {
         if (! field.getStaticFlag())
@@ -124,7 +145,8 @@ public class Declaration extends Variable
   static final int CAN_WRITE = 8;
   static final int IS_FLUID = 16;
   static final int PRIVATE = 32;
-  int flags;
+  static final int IS_SIMPLE = 64;
+  protected int flags = IS_SIMPLE;
 
   public final void setFlag (boolean setting, int flag)
   {
@@ -168,6 +190,11 @@ public class Declaration extends Variable
     else flags &= ~CAN_WRITE;
   }
 
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
   /** True if we never need to access this declaration. */
   // rename to isAccessed?
   public boolean ignorable()
@@ -183,8 +210,8 @@ public class Declaration extends Variable
   }
 
   public boolean isStatic()
-  {
-    return context instanceof ModuleExp;
+  { // This will soon be wrong.  FIXME.
+    return context instanceof ModuleExp && ! isPrivate();
   }
 
   public final boolean isLexical()
@@ -224,17 +251,9 @@ public class Declaration extends Variable
 
   public Declaration (String s, Type type)
   {
-    sym = s;
-    if (s != null)
-      {
-        name = Compilation.mangleName(s);
-        if (s.equals(name))
-          name = s;
-      }
+    name = s;
     setType(type);
   }
-
-  public String string_name () { return sym; }
 
   Method makeBindingMethod = null;
 
@@ -244,7 +263,7 @@ public class Declaration extends Variable
   public void pushIndirectBinding (Compilation comp)
   {
     CodeAttr code = comp.getCode();
-    code.emitPushString(symbol());
+    code.emitPushString(getName());
     if (makeBindingMethod == null)
       {
 	ClassType typeBinding = ClassType.make("gnu.mapping.Binding");
@@ -258,6 +277,20 @@ public class Declaration extends Variable
     code.emitInvokeStatic(makeBindingMethod);
   }
 
+  public final Variable allocateVariable(CodeAttr code)
+  {
+    if (! isSimple())
+      return null;
+    if (var == null)
+      {
+        String vname = null;
+        if (name != null)
+          vname = Compilation.mangleName(getName());
+        var = context.scope.addVariable(code, getType(), vname);
+      }
+    return var;
+  }
+
   /** Generate code to initialize the location for this.
       Assume the initial value is already pushed on the stack. */
   public void initBinding (Compilation comp)
@@ -266,7 +299,7 @@ public class Declaration extends Variable
       {
 	pushIndirectBinding(comp);
 	CodeAttr code = comp.getCode();
-	code.emitStore(this);
+	code.emitStore(getVariable());
       }
     else
       compileStore(comp);

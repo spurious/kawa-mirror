@@ -126,7 +126,7 @@ public class ApplyExp extends Expression
             && func_decl.value instanceof LambdaExp) 
 	  {
 	    func_lambda = (LambdaExp) func_decl.value;
-	    func_name = func_decl.string_name ();
+	    func_name = func_decl.getName();
 	  }
       }
     else if (exp.func instanceof QuoteExp)
@@ -176,11 +176,11 @@ public class ApplyExp extends Expression
 		if (is_static)
 		  extraArg = 1;
 		if (comp.curLambda == func_lambda)
-		  func_lambda.closureEnv.load(comp);  // Recursive call.
+		  code.emitLoad(func_lambda.closureEnv);  // Recursive call.
 		else if (parent.heapFrame != null || parent.closureEnv == null)
 		  parent.loadHeapFrame(comp);
 		else
-		  parent.closureEnv.load(comp);
+		  code.emitLoad(parent.closureEnv);
 	      }
 	    if (func_lambda.max_args != func_lambda.min_args)
 	      {
@@ -359,7 +359,7 @@ public class ApplyExp extends Expression
   private static void popParams (CodeAttr code, LambdaExp lexp,
                                  boolean toArray)
   {
-    Variable params = lexp.firstVar();
+    Variable params = lexp.scope.firstVar();
     if (params != null && params.getName() == "this")
       params = params.nextVar();
     if (params != null && params.getName() == "argsArray")
@@ -379,9 +379,7 @@ public class ApplyExp extends Expression
   {
     if (count > 0)
       {
-	if (! vars.isSimple())
-	  vars = vars.nextVar();
-	popParams (code, vars.nextVar (), count - 1);
+	popParams (code, vars.nextVar(), count - 1);
 	code.emitStore(vars);
       }
   }

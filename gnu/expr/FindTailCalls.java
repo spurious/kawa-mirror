@@ -86,10 +86,9 @@ public class FindTailCalls extends ExpFullWalker
 
   public Object walkFluidLetExp (FluidLetExp exp)
   {
-    for (gnu.bytecode.Variable var = exp.firstVar ();
-         var != null; var = var.nextVar ())
+    for (Declaration decl = exp.firstDecl();
+         decl != null; decl = decl.nextDecl())
       {
-	Declaration decl = (Declaration) var;
         decl.setCanRead(true);
         decl.setCanWrite(true);
       }
@@ -100,14 +99,14 @@ public class FindTailCalls extends ExpFullWalker
   {
     int n = exp.inits.length; 
     boolean save = inTailContext;
-    gnu.bytecode.Variable var;
+    Declaration decl;
     try
       {
 	inTailContext = false;
 
-	var = exp.firstVar();
-	for (int i = 0;  i < n;  i++, var = var.nextVar())
-	  exp.inits[i] = walkSetExp ((Declaration) var, exp.inits[i]);
+	decl = exp.firstDecl();
+	for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
+	  exp.inits[i] = walkSetExp (decl, exp.inits[i]);
       }
     finally
       {
@@ -115,10 +114,9 @@ public class FindTailCalls extends ExpFullWalker
       }
     exp.body = (Expression) exp.body.walk(this);
 
-    var = exp.firstVar();
-    for (int i = 0;  i < n;  i++, var = var.nextVar())
+    decl = exp.firstDecl();
+    for (int i = 0;  i < n;  i++, decl = decl.nextDecl())
       {
-	Declaration decl = (Declaration) var;
 	if (decl.value != null && decl.value instanceof LambdaExp)
 	  {
 	    LambdaExp lexp = (LambdaExp) decl.value;

@@ -20,12 +20,11 @@ public class LetExp extends ScopeExp
 
   /* Recursive helper routine, to store the values on the stack
    * into the variables in vars, in reverse order. */
-  static void store_rest (Compilation comp, Variable vars)
+  static void store_rest (Compilation comp, Declaration decl)
   {
-    if (vars != null)
+    if (decl != null)
       {
-	Declaration decl = (Declaration) vars;
-	store_rest (comp, vars.nextVar ());
+	store_rest (comp, decl.nextDecl());
 	if (! decl.ignorable())
 	  decl.initBinding(comp);
       }
@@ -35,25 +34,28 @@ public class LetExp extends ScopeExp
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
 
+    /*
     if (comp.usingCPStyle())
       { 
-	for (Variable var = firstVar (); var != null; var = var.nextVar ())
+	for (Declartion decl = firstDecl(); decl != null; decl = decl.nextVar ())
 	  {
-	    ((Declaration) var).assignField(comp);
+	    decl.assignField(comp);
 	  }
      }
+    */
 
     /* Compile all the initializations, leaving the results
        on the stack (in reverse order).  */
-    Variable var = firstVar();
-    for (int i = 0; i < inits.length; i++, var = var.nextVar())
+    Declaration decl = firstDecl();
+    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
 	Target varTarget;
-	if (((Declaration) var).ignorable())
+        decl.allocateVariable(code);
+	if (decl.ignorable())
 	  varTarget = Target.Ignore;
 	else
 	  {
-	    Type varType = var.getType();
+	    Type varType = decl.getType();
 	    if (varType == Type.pointer_type)
 	      varTarget = Target.pushObject;
 	    else
@@ -65,7 +67,7 @@ public class LetExp extends ScopeExp
     code.enterScope (scope);
 
     /* Assign the initial values to the proper variables, in reverse order. */
-    store_rest (comp, firstVar ());
+    store_rest (comp, firstDecl());
 
     body.compileWithPosition(comp, target);
     code.popScope ();
@@ -81,19 +83,19 @@ public class LetExp extends ScopeExp
   public void print (java.io.PrintWriter ps)
   {
     ps.print("(#%let (");
-    Variable var = firstVar ();
+    Declaration decl = firstDecl();
     int i = 0;
     
-    for (; var != null; var = var.nextVar ())
+    for (; decl != null;  decl = decl.nextDecl())
       {
 	if (i > 0)
 	  ps.print(" ");
 	ps.print("(");
-	ps.print(((Declaration) var).string_name());
+	ps.print(decl.getName());
 	ps.print(" ");
-	if (var.isArtificial ())
-	  ps.print ("<artificial>");
-	else
+	//if (decl.isArtificial ())
+        //ps.print ("<artificial>");
+	//else
 	  {
 	    if (inits[i] == null)
 	      ps.print ("<null>");

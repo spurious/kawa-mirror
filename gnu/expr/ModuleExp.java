@@ -19,6 +19,7 @@ public class ModuleExp extends LambdaExp
 
   public ModuleExp ()
   {
+    declareThis(null);
   }
 
   public final Object evalModule (Environment env)

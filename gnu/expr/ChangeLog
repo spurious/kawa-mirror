@@ -1,3 +1,53 @@
+1999-12-24  Per Bothner  <per@bothner.com>
+
+	* Initializer.java:  New abstract class.
+	* ProcInitializer.java:  New class;  extends Initializer.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new classes.
+	* Literal.java:  New inherits from Initializer,
+	(next, field):  Replace by super-class fields.
+	(assign):  Like to comp.comp.clinitChain not comp.comp.literalsChain.
+	(emit):  New method (to satisfy super's abstract method).
+	* Compilation.java (dumpLiterals):  Replaced by dumpInitializers.
+	(literalsChain):  Rename to clinitChain;  change type to Initializer.
+	(initChain):  New field.
+	(generateConstructor):  Do dumpInitializers(initChain).
+
+	* Compilation.java (addClass):  Remove now-unused "apply" generation.
+
+	* Expression.java (compileNotePosition):  Do not use a try-finally
+	to restore linenumber.
+	* Compilation.java (addClass):  If an exception (internal error)
+	is thrown while compiling, catch it and print an error.
+
+	* Declaration.java:  No longer inherit from Variable.
+	(sym):  Field re-named to `name'.
+	(string_name, symbol):  Renmoved methods;  use getName instead.
+	(next, var):  New fields.
+	(IS_SIMPLE):  New flag.
+	(getName, setName, setType, getType, nextDecl, getVariable, isSimple,
+	setSimple):  New methods.
+	(load, compileStore, initBinding):  Pass getVariable() instead of this.
+	(allocateVariable):  New method.
+	* ScopeExp.java (decls, last):  New fields.
+	(firstDecl, add):  New methods.
+	(addDeclaration):  Use new add method.
+	* CatchClause.java (compile):  Change Declaration catchDecl
+ 	to Variable catchVar.
+	* LambdaExp.java (declareThis, declareClosureEnv, declareArgsArray):
+  	Now return Variables.
+	(isClassGenerated):  Always generate class for ObjectExp;  never
+	if outerLambda is a ModuleExp. 
+ 	(heapFrame, closureEnv, thisVariable):	Change from Declaration
+ 	to Variable.
+	* Compilation.java (thisDecl, callStackContext):  Likewise.
+	* ObjectExp.java (compile):  May need staticLink even of caller's
+	closureEnv is null.  Call the Variable "closureEnv", not "staticLink".
+	* FindTailCalls.java:   Update to use Declaration instead of Variable.
+	* ApplyExp.java, FluidLetExp.java, LetExp.java, SerExp.java:  Likewise.
+	* FindCapturedVars.java:  Likewise.
+	(capture):  The heapFrame of a ModuleExp is its thisVariable.
+	* ModuleExp.java (<init>):  Call declareThis.
+
 1999-12-17  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java (emitCheckedCoerce): Use "lambda" as default name.

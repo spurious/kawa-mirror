@@ -42,10 +42,10 @@ public class SetExp extends Expression
   public SetExp (Declaration decl, Expression val)
   {
     this.binding = decl;
-    name = decl.sym;
+    name = decl.getName();
     new_value = val;
 
-    if ("%do%loop".equals(decl.symbol())
+    if ("%do%loop".equals(decl.getName())
 	&& val instanceof LambdaExp
 	&& ! Compilation.usingCPStyle())
       ((LambdaExp) val).setInlineOnly(true);
@@ -56,7 +56,7 @@ public class SetExp extends Expression
     Object new_val = new_value.eval (env);
 
     if (binding != null
-        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
+        && ! (binding.isStatic() && ! binding.isPrivate()))
       throw new Error ("internal error - SetExp.eval with lexical binding");
     if (isDefining ())
       env.define (name, new_val);
@@ -81,7 +81,7 @@ public class SetExp extends Expression
       return;
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (binding != null
-        && ! (binding.context instanceof ModuleExp && ! binding.isPrivate()))
+        && ! (binding.isStatic() && ! binding.isPrivate()))
       {
 	if (binding.ignorable())
 	  new_value.compile (comp, Target.Ignore);
@@ -107,7 +107,7 @@ public class SetExp extends Expression
 	else if (binding.isSimple ())
 	  {
 	    new_value.compile (comp, binding.getType());
-	    code.emitStore(binding);
+	    code.emitStore(binding.getVariable());
 	  }
 	else
 	  {

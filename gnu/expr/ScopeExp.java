@@ -8,9 +8,21 @@ import gnu.bytecode.*;
 
 public abstract class ScopeExp extends Expression
 {
+  Declaration decls;
+  Declaration last;
+
   Scope scope;
 
-  public final Variable firstVar () { return scope.firstVar (); }
+  public final Declaration firstDecl () { return decls; }
+
+  public void add (Declaration decl)
+  {
+    if (last == null)
+      decls = decl;
+    else
+      last.next = decl;
+    last = decl;
+  }
 
   public ScopeExp () { scope = new Scope (); }
 
@@ -36,10 +48,10 @@ public abstract class ScopeExp extends Expression
    */
   public Declaration lookup (String sym)
   {
-    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
+    for (Declaration decl = firstDecl();
+         decl != null;  decl = decl.nextDecl())
       {
-	Declaration decl = (Declaration) var;
-	if (decl.sym == sym)
+	if (decl.name == sym)
 	  return decl;
       }
     return null;
@@ -74,14 +86,14 @@ public abstract class ScopeExp extends Expression
    */
   public final void addDeclaration (Declaration decl)
   {
-    scope.addVariable (decl);
+    add(decl);
     decl.context = this;
   }
 
   public int countDecls ()
   {
     int n = 0;
-    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
+    for (Declaration decl = firstDecl(); decl != null; decl = decl.nextDecl())
       n++;
     return n;
   }

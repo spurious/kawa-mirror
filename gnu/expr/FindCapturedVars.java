@@ -21,10 +21,9 @@ public class FindCapturedVars extends ExpFullWalker
 	if (exps.length > len)
 	  {
 	    int i = 0;
-	    gnu.bytecode.Variable var = exp.firstVar ();
-	    for (; i < len; var = var.nextVar (), i++)
+	    Declaration decl = exp.firstDecl();
+	    for (; i < len; decl = decl.nextDecl(), i++)
 	      {
-		Declaration decl = (Declaration) var;
 		if (inits[i] == QuoteExp.nullExp
 		    && exps[i] instanceof SetExp)
 		  {
@@ -117,7 +116,12 @@ public class FindCapturedVars extends ExpFullWalker
 	  }
 	if (decl.isSimple())
 	  {
-	    if (declLambda.capturedVars == null)
+	    if (declLambda instanceof ModuleExp)
+	      {
+		declLambda.heapFrame = declLambda.thisVariable;
+		declLambda.heapFrameLambda = declLambda;
+	      }
+	    else if (declLambda.capturedVars == null)
 	      {
 		if (heapLambda.isClassGenerated())
 		  declLambda.heapFrameLambda = heapLambda;
@@ -135,8 +139,7 @@ public class FindCapturedVars extends ExpFullWalker
 			  }
 		      }
 		  }
-		declLambda.heapFrame
-		  = declLambda.addDeclaration("heapFrame");
+		declLambda.heapFrame = new gnu.bytecode.Variable("heapFrame");
 		declLambda.heapFrame.setArtificial(true);
 	      }
 	    decl.setSimple(false);

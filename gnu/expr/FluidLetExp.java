@@ -36,14 +36,15 @@ public class FluidLetExp extends LetExp
     code.emitDup(1);
     code.emitStore(old_bindings);
     code.enterScope (scope);
-    Variable var = firstVar();
-    for (int i = 0; i < inits.length; i++, var = var.nextVar())
+    Declaration decl = firstDecl();
+    for (int i = 0; i < inits.length; i++, decl = decl.nextDecl())
       {
+        decl.allocateVariable(code);
 	inits[i].compile(comp, Target.pushObject);
-	code.emitGetStatic(comp.getBindingField(((Declaration)var).string_name()));
+	code.emitGetStatic(comp.getBindingField(decl.getName()));
 	code.emitInvokeStatic(makeFluidBindingMethod);
 	code.emitDup(1);
-	code.emitStore(var);
+	code.emitStore(decl.getVariable());
       }
     code.emitInvokeVirtual(setFluidsMethod);
     code.emitTryStart(true, result_type);

@@ -99,21 +99,22 @@ public class ObjectExp extends LambdaExp
 	comp.curLambda = this;
 
 	allocFrame(comp);
-
-	if (getNeedsStaticLink() && saveLambda.closureEnv != null
-            && saveLambda.heapFrameLambda != this)
+	if (getNeedsStaticLink() && saveLambda.heapFrameLambda != this)
 	  {
-	    staticLinkField
-	      = new_class.addField("staticLink", 
-				   saveLambda.closureEnv.getType());
+            Variable parentFrame = saveLambda.heapFrame != null
+              ? saveLambda.heapFrame
+              : saveLambda.closureEnv;
+            if (parentFrame != null)
+              closureEnvField = staticLinkField
+                = new_class.addField("closureEnv", parentFrame.getType());
 	  }
 	comp.generateConstructor (comp.curClass, this);
 
 	CodeAttr code;
 
-	for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
+	for (Declaration decl = firstDecl();
+             decl != null;  decl = decl.nextDecl())
 	  {
-	    Declaration decl = (Declaration) var;
 	    // If the declaration derives from a method, don't create field.
 	    if (decl.getCanRead())
 	      {
@@ -191,10 +192,8 @@ public class ObjectExp extends LambdaExp
     int opt_i = 0;
     int key_args = keywords == null ? 0 : keywords.length;
     int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
-    for (Variable var = firstVar ();  var != null; var = var.nextVar ())
+    for (Declaration decl = firstDecl();  decl != null; decl = decl.nextDecl())
       {
-	if (! var.isParameter () || var.isArtificial ())
-	  continue;
 	Special mode;
 	if (i < min_args)
 	  mode = null;
@@ -216,7 +215,7 @@ public class ObjectExp extends LambdaExp
 	  defaultArg = defaultArgs[opt_i++];
 	if (defaultArg != null)
 	  ps.print('(');
-	ps.print(((Declaration)var).string_name());
+	ps.print(decl.getName());
 	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
 	  {
 	    ps.print(' ');

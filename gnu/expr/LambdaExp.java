@@ -425,7 +425,10 @@ public class LambdaExp extends ScopeExp
       }
     else
       {
-	code.emitLoad(curLambda.closureEnv);
+	if (curLambda.closureEnv == null)
+	  code.emitPushThis();
+	else
+	  code.emitLoad(curLambda.closureEnv);
 	LambdaExp parent = curLambda.outerLambda();
 	while (parent != this)
 	  {
@@ -1024,9 +1027,20 @@ public class LambdaExp extends ScopeExp
 	  }
 	code.emitStore(closureEnv);
       }
-    if (heapFrame != null && ! comp.usingCPStyle())
+    if (! comp.usingCPStyle())
       {
-	ClassType frameType = (ClassType) heapFrame.getType();
+	int fflags;
+	ClassType frameType;
+	if (heapFrame == null)
+	  {
+	    fflags = Access.STATIC;
+	    frameType = currentModule().getCompiledClassType(comp);
+	  }
+	else
+	  {
+	    fflags = 0;
+	    frameType = (ClassType) heapFrame.getType();
+	  }
 	for (Declaration decl = capturedVars; decl != null;
 	     decl = decl.nextCapturedVar)
 	  {
@@ -1043,8 +1057,12 @@ public class LambdaExp extends ScopeExp
 		mname = dname + '_' + ++i;
 	      }
 	    Type dtype = decl.getType();
-	    decl.field = frameType.addField (mname, decl.getType());
+	    decl.field = frameType.addField (mname, decl.getType(), fflags);
 	  }
+      }
+    if (heapFrame != null && ! comp.usingCPStyle())
+      {
+	ClassType frameType = (ClassType) heapFrame.getType();
 	if (closureEnv != null && ! (this instanceof ModuleExp))
 	  staticLinkField = frameType.addField("staticLink",
 					       closureEnv.getType());

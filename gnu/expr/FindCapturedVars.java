@@ -230,29 +230,31 @@ public class FindCapturedVars extends ExpWalker
 	      }
 	  }
       }
-    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
-      decl.setSimple(false);
-    else if (decl.base != null)
+    if (decl.base != null)
       {
 	decl.base.setCanRead(true);
 	capture(decl.base);
       }
     else if (decl.getCanRead() || declValue == null)
       {
-	LambdaExp heapLambda = curLambda;
-	heapLambda.setImportsLexVars();
-	LambdaExp parent = heapLambda.outerLambda();
-	for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
+	if (! decl.isStatic())
 	  {
-	    heapLambda = outer;
-	    if (! decl.getCanRead() && declValue == outer)
-	      break;
-	    heapLambda.setNeedsStaticLink();
-	    outer = heapLambda.outerLambda();
+	    LambdaExp heapLambda = curLambda;
+	    heapLambda.setImportsLexVars();
+	    LambdaExp parent = heapLambda.outerLambda();
+	    for (LambdaExp outer = parent;  outer != declLambda && outer != null; )
+	      {
+		heapLambda = outer;
+		if (! decl.getCanRead() && declValue == outer)
+		  break;
+		heapLambda.setNeedsStaticLink();
+		outer = heapLambda.outerLambda();
+	      }
 	  }
 	if (decl.isSimple())
 	  {	
 	    if (declLambda.capturedVars == null
+		&& ! decl.isStatic()
 		&& ! (declLambda instanceof ModuleExp
 		      || declLambda instanceof ClassExp))
 	      {

@@ -1,3 +1,17 @@
+2003-04-14  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (compileStore):  Use emitPutStatic if static field.
+	* Declaration.java (isStatic):  If current scope is not a LambdaExp,
+	check the outer LambdaExp for whether it is a static module.
+	* FindCapturedVars.java (capture):  If we capture a simple static
+	variable, we still have to save it in the caturedDecls list.
+	* LambdaExp.java (enterFunction):  Alloocate cpapturedVars as static
+	fields if there is no heapFrame.
+	Fixes bug reported 3/31 by Wen_Chun Ni <wcn@tbcommerce.com>.
+
+	* LambdaExp.java (loadHeapFrame):  If closureEnv is null, push this.
+	Change needed because of 03-02 change.
+
 2003-04-12  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (FIELD_OR_METHOD):  New flag.

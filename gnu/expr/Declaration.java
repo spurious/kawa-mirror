@@ -153,8 +153,10 @@ public class Declaration
           {
             loadOwningObject(comp);
             code.emitSwap();
+	    code.emitPutField(field);
           }
-	code.emitPutField(field);
+	else
+	  code.emitPutStatic(field);
       }
   }
 
@@ -331,9 +333,11 @@ public class Declaration
 
   public boolean isStatic()
   {
-    return (getFlag(STATIC_SPECIFIED)
-	    || (context instanceof ModuleExp
-		&& ((ModuleExp) context).isStatic()));
+    if (getFlag(STATIC_SPECIFIED))
+      return true;
+    LambdaExp lambda = context.currentLambda();
+    return lambda instanceof ModuleExp
+      && ((ModuleExp) lambda).isStatic();
   }
 
   public final boolean isLexical()

@@ -95,7 +95,7 @@ public class BaseUri extends Procedure0or1
 	// Should simplify "segment/../" etc.  FIXME
 	sbuf.append(uri);
       }
-    return sbuf.toString();;
+    return sbuf.toString();
   }
 
   public Object apply0 ()

@@ -1,3 +1,7 @@
+2003-03-07  Ivelin Ivanov <ivelin@apache.org>
+
+	* BaseUri.java (resolve):  Remove redundant semicolon.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* BaseUri.java:  Moved from gnu.kawa.xml - not XML-specific.

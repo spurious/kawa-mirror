@@ -107,14 +107,15 @@
 (define-syntax (include-relative x)
   (syntax-case x ()
 	       ((_ filename)
-		(let ((path-pair (syntax-object->datum (syntax (filename)))))
+		(let ((path-pair :: <pair>
+				 (syntax-object->datum (syntax (filename)))))
 		  (list
 		   (datum->syntax-object (syntax filename) 'include)
 		   (datum->syntax-object
 		    (syntax filename)
 		    (make <string>
 		     (gnu.kawa.functions.BaseUri:resolve
-		      (car path-pair)
+		      (field path-pair 'car)
 		      (gnu.lists.PairWithPosition:getFile path-pair)))))))))
 
 #|

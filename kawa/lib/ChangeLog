@@ -1,6 +1,7 @@
 2005-03-16  Per Bothner  <per@bothner.com>
 
-	* strings.scm ((list->string): Inline car and cdr calls.
+	* strings.scm (list->string): Inline car and cdr calls.
+	* files.scm (include-relative): Likewise, aided by type specifier.
 
 2005-03-04  Per Bothner  <per@bothner.com>
 

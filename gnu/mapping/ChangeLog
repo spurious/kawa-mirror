@@ -1,3 +1,8 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* CallContext.java.in (baseUri):  New protected field.
+	(getBaseUriRaw, getBaseUri, setBaseUri):  New methods.
+
 2003-02-19  Per Bothner  <per@bothner.com>
 
 	* ValueStack.java (oindex, find):  Field and methods moved to

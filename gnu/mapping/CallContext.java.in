@@ -353,4 +353,36 @@ public class CallContext implements Runnable
       }
     fluidBindings = old_fluids;
   }
+
+  protected String baseUri;
+
+  public String getBaseUriRaw ()
+  {
+    return baseUri;
+  }
+
+  /* Get the current "base URI", which defaults to the current directory.
+   * However, it may get reset to the "current document". */
+  public String getBaseUri ()
+  {
+    if (baseUri == null)
+      {
+	String uri = System.getProperty("user.dir");	
+	if (uri == null)
+	  return null;
+	char sep = java.io.File.separatorChar;
+	// Should also encode illegal characters using '%'.  FIXME.
+	if (sep != '/')
+	  uri = uri.replace(sep, '/');
+	baseUri = ((uri.charAt(0) == '/' ? "file://" : "file:///")
+		   + uri + '/');
+      }
+    return baseUri;
+  }
+
+  /** Set the current "base URI". */
+  public void setBaseUri (String baseUri)
+  {
+    this.baseUri = baseUri;
+  }
 }

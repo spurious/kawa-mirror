@@ -1,3 +1,30 @@
+Fri Sep 11 22:29:26 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/repl.java (main):  Handle new --debug-dump-zip option.
+
+	* kawa/lang/CalledContinuation.java:  Make fields public.
+	* kawa/lang/Continuation.java (callcc):  Replaced by callcc.apply.
+	& kawa/standard/callcc.java (apply):  New static method.
+
+	* kawa/lang/Lambda.java:  Don't add argsArray yet.
+	Handle parameter type specification.
+	* kawa/lang/PrimProcedure.java:  Moved to gnu.expr.
+	* kawa/lang/Makefile.in:  Update accordingly.
+	* kawa/lang/SpecialType.java (charValue):  New method.
+
+	* kawa/standard/Scheme.java (getNamedType, string2Type):
+	Moved here from PrimProcedure.
+	* kawa/standard/prim_method.java:  Updated for moved methods.
+
+	* kawa/standard/{car,cdr,cons,make_vector,callcc}.java:
+	Add static apply methods.
+	* kawa/standard/letrec.java (rewrite):  Initial value is now null,
+	because that is compatible with stricter typing scheme.
+	* kawa/lang/Translator.java (rewrite_body):  Ditto for internal define.
+	* kawa/standard/{setcar_b,setcdr_b}.java:  Removed, now in lists.scm.
+	* kawa/standard/{string_ref,string_set_b}.java:  Replaced.
+	* kawa/standard/Makefile.am:  Update accordingly.
+
 Sat Aug 29 20:50:05 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa/standard/{plus_oper,minus_oper,multiply_oper,greater_oper}.java:

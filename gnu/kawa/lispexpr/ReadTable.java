@@ -67,10 +67,10 @@ public class ReadTable extends RangeTable
     tab.set(';',  ReaderIgnoreRestOfLine.getInstance());
     tab.set('(',  ReaderParens.getInstance('(', ')'));
 
-    tab.set('\'', new ReaderQuote(LispInterpreter.quote_sym));
-    tab.set('`',  new ReaderQuote(LispInterpreter.quasiquote_sym));
-    tab.set(',',  new ReaderQuote(LispInterpreter.unquote_sym,
-				 '@', LispInterpreter.unquotesplicing_sym));
+    tab.set('\'', new ReaderQuote(LispLanguage.quote_sym));
+    tab.set('`',  new ReaderQuote(LispLanguage.quasiquote_sym));
+    tab.set(',',  new ReaderQuote(LispLanguage.unquote_sym,
+				 '@', LispLanguage.unquotesplicing_sym));
 
     tab.setBracketMode();  // Sets the entries for '[', ']', and '<'.
 

@@ -4,7 +4,6 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
   LangPrimType.java \
-  LispInterpreter.java \
   LispLanguage.java \
   LispPackage.java \
   LispReader.java \

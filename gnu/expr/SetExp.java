@@ -164,7 +164,7 @@ public class SetExp extends AccessExp
 	      = ClassType.make("gnu.mapping.IndirectableLocation");
 	    code.emitCheckcast(locType);
 	    new_value.compile(comp, Target.pushObject);
-	    Method meth = locType.getDeclaredMethod("setBase", 1);
+	    Method meth = locType.getDeclaredMethod("setAlias", 1);
 	    code.emitInvokeVirtual(meth);
 	  }
 	else if (decl.isIndirectBinding()

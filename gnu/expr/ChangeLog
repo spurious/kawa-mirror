@@ -1,5 +1,7 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
+	* SetExp.java (compile): Call new setAlias method for aliases.
+
 	* AccessExp.java: New class, extends Expression.
 	(binding): Make field private.
 	* Makefile.am: Update accordingly.

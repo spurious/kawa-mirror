@@ -33,7 +33,12 @@ public class Document extends Procedure1
     try
       {
 	java.net.URL url = new java.net.URL(fileName);
-	return gnu.xml.ParsedXMLToConsumer.parse(url);
+	TreeList doc = new TreeList();
+	doc.beginDocument();
+	XMLParser parser = new XMLParser(url, new ParsedXMLToConsumer(doc));
+	parser.parse();
+	doc.endDocument();
+	return doc;
       }
     catch (Exception ex)
       {

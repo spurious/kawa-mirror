@@ -1,14 +1,20 @@
 package gnu.bytecode;
 
 /**
-  * Abstract class object reference types.
+  * Semi-abstract class object reference types.
   * <p>
   * Extended by ClassType and ArrayType. */
 
-public abstract class ObjectType extends Type
+public class ObjectType extends Type
 {
-  public ObjectType ()
+  protected ObjectType ()
   {
+    size = 4;
+  }
+
+  ObjectType (String name)
+  {
+    this_name = name;
     size = 4;
   }
 
@@ -19,7 +25,10 @@ public abstract class ObjectType extends Type
   final static int EXISTING_CLASS = 4;
   int flags;
 
-  public abstract String getNameOrSignature();
+  public String getNameOrSignature()
+  {
+    return getName();
+  }
 
   /** Get the java.lang.Class object for the representation type. */
   public Class getReflectClass()
@@ -36,6 +45,12 @@ public abstract class ObjectType extends Type
           throw new RuntimeException("no such class: "+getName());
       }
     return reflectClass;
+  }
+
+  public int compare(Type other)
+  {
+    // Assume this == nullType.
+    return other == nullType ? 0 : -1;
   }
 
   /** Convert an object to a value of this Type.

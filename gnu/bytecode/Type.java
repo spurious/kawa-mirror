@@ -415,6 +415,9 @@ public abstract class Type {
   public static final PrimType neverReturnsType
     = new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
 
+  /** The magic type of null. */
+  public static final ObjectType nullType = new ObjectType("(type of null)");
+
   static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType string_type = ClassType.make("java.lang.String");
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");

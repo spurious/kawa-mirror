@@ -131,8 +131,6 @@ public class ClassType extends ObjectType implements AttrContainer {
     return interfaces;
   }
 
-  public String getNameOrSignature() { return getName(); }
-
   public void setInterfaces (ClassType[] interfaces)
   { this.interfaces = interfaces; }
 
@@ -701,6 +699,8 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public int compare(Type other)
   {
+    if (other == nullType)
+      return 1;
     if (other instanceof PrimType)
       return swappedCompareResult(((PrimType) other).compare(this));
     if (other instanceof ArrayType)

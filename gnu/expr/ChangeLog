@@ -1,3 +1,14 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* BeginExp.java (compileOptions):  New field.
+	(setCompileOptions, pushOptions, popOptions):  New methods.
+	(compile, walkChildren):  Use pushOptions and popOptons.
+	(print):  Print compileOptions is non-null.
+
+	* Compilation.java (getBooleanOption(Sring,boolean)):  New method.
+
+	* Compilation.java:  New option "warn-invoke-unknown-method".
+
 2003-10-16  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (options):  New static field.

@@ -38,7 +38,15 @@ public class Compilation
   public Options currentOptions = new Options(options);
   static {
     options.add("warn-undefined-variable", Options.BOOLEAN_OPTION,
-		"emit a warning there is no compiler-visible binding for a variable");
+		"warn if no compiler-visible binding for a variable");
+    options.add("warn-invoke-unknown-method", Options.BOOLEAN_OPTION,
+		"warn if invoke calls an unknown method");
+  }
+
+  /** Get a named boolean option. */
+  public final boolean getBooleanOption (String key, boolean defaultValue)
+  {
+    return currentOptions.getBoolean(key, defaultValue);
   }
 
   /** Get a named boolean option. */

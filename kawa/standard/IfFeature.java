@@ -7,6 +7,8 @@ public class IfFeature extends Syntax implements Printable
 {
   public static boolean hasFeature (String name)
   {
+    if (name == "kawa")
+      return true;
     if (name == "srfi-0") // cond-expand
       return true;
     //if (name == "srfi-1") return true; // lists - only if require used.

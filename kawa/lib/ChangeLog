@@ -1,3 +1,7 @@
+Wed Apr  7 23:37:10 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* syntax.scm (fluid-let):  Remove; replaced by kawa.standard.fluid_let.
+
 Sun Mar 21 18:14:09 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* emacs.scm:  New, merged from ../../gnu/elisp/streams.scm.

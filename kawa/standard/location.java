@@ -3,7 +3,8 @@ import kawa.lang.*;
 import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.bytecode.Access;
+import gnu.bytecode.*;
+import gnu.kawa.reflect.Invoke;
 
 /**
  * The Syntax transformer that re-writes the Kawa "location" primitive.
@@ -55,6 +56,8 @@ public class location extends Syntax implements Printable
     return location.rewrite(arg, tr);
   }
 
+  private static ClassType thisType = ClassType.make("kawa.standard.location");
+
   public static Expression rewrite (Expression arg, Translator tr)
   {
     if (arg instanceof ReferenceExp)
@@ -82,12 +85,17 @@ public class location extends Syntax implements Printable
     if (arg instanceof ApplyExp)
       {
 	ApplyExp aexp = (ApplyExp) arg;
-	Expression func = tr.rewrite("%makeProcLocation");
 	Expression[] args = new Expression[aexp.getArgs().length + 1];
 	args[0] = aexp.getFunction();
 	System.arraycopy(aexp.getArgs(), 0, args, 1, args.length-1);
-	return new ApplyExp(func, args);
+	return Invoke.makeInvokeStatic(thisType, "makeProcLocation", args);
       }
     return tr.syntaxError("invalid argument to location");
+  }
+
+  public static ProcLocation
+  makeProcLocation$V (Procedure proc, Object[] args)
+  {
+    return new ProcLocation(proc, args);
   }
 }

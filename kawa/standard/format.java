@@ -6,10 +6,12 @@ import gnu.mapping.*;
 
 public class format extends ProcedureN
 {
+  /*
   char magic = '%';
 
   public boolean ELispStyle() { return true; }
   public boolean CLispStyle() { return false; }
+  */
 
   /*
   public int format(OutPort dst,
@@ -59,7 +61,7 @@ public class format extends ProcedureN
   }
   */
 
-  public void format(OutPort dst, Object[] args, int arg_offset)
+  public static void format(OutPort dst, Object[] args, int arg_offset)
   {
     Object format = args[arg_offset++];
     Object[] vals = new Object[args.length - arg_offset];
@@ -84,7 +86,7 @@ public class format extends ProcedureN
       }
   }
 
-  public FString formatToString (Object[] args, int arg_offset)
+  public static FString formatToString (Object[] args, int arg_offset)
   {
     CharArrayOutPort port = new CharArrayOutPort();
     format(port, args, arg_offset);
@@ -94,6 +96,11 @@ public class format extends ProcedureN
   }
 
   public Object applyN (Object[] args)
+  {
+    return format$V(args);
+  }
+
+  public static Object format$V (Object[] args)
   {
     Object port_arg = args[0];
     if (port_arg == Boolean.TRUE)

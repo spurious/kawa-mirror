@@ -12,9 +12,15 @@ import gnu.kawa.util.*;
 public class define extends Syntax implements Printable
 {
   boolean makePrivate;
+  boolean makeConstant;
   public define(boolean makePrivate)
   {
     this.makePrivate = makePrivate;
+  }
+  public define(boolean makePrivate, boolean makeConstant)
+  {
+    this.makePrivate = makePrivate;
+    this.makeConstant = makeConstant;
   }
 
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
@@ -43,6 +49,8 @@ public class define extends Syntax implements Printable
 	Declaration decl = defs.getDefine(sym, 'w', tr);
 	if (makePrivate)
 	  decl.setPrivate(true);
+	if (makeConstant)
+	  decl.setFlag(Declaration.IS_CONSTANT);
 	Object declForm = (! function) ? (Object) decl
 	  : (Object) tr.makePair(namePair, decl, namePair.cdr);
 	p = tr.makePair(p, declForm, p.cdr);
@@ -54,7 +62,8 @@ public class define extends Syntax implements Printable
                 decl.setCanRead(true);
 		// (define (f) ...) defaults f to being read-only,
 		// unless f is assigned to in this module.
-		if (name instanceof String || Compilation.usingTailCalls)
+		if (! makeConstant
+		    && (name instanceof String || Compilation.usingTailCalls))
 		  decl.setCanWrite(true);
               }
           }

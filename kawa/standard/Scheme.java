@@ -92,6 +92,9 @@ public class Scheme extends Interpreter
       define (Interpreter.quote_sym, new Quote ());
       define_syntax("define", new kawa.standard.define(false));
       define_syntax("define-private", new kawa.standard.define(true));
+      define_syntax("define-constant", new kawa.standard.define(false, true));
+      define_syntax("define-autoload", new define_autoload(false));
+      define_syntax("define-autoloads-from-file", new define_autoload(true));
       define_syntax ("if", "kawa.standard.ifp");
       define_syntax ("set!", "kawa.standard.set_b");
 
@@ -506,11 +509,16 @@ public class Scheme extends Interpreter
       define_proc ("environment-bound?", "kawa.lib.misc");
       define_proc ("scheme-implementation-version", "kawa.lib.misc");
       define_proc ("scheme-window", "kawa.lib.misc");
+      define_syntax ("define-procedure", "kawa.lib.syntax");
+      define_proc ("make-procedure", "kawa.lib.misc");
+      define_proc ("procedure-property", "kawa.lib.misc");
+      define_proc ("set-procedure-property!", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
       define_proc ("make-quantity", "kawa.standard.make_quantity");
-      define_syntax ("define-unit", "kawa.lib.quantities");
+      define_syntax ("define-unit", new kawa.standard.define_unit(false));
+      define_syntax ("define-base-unit", new kawa.standard.define_unit(true));
 
       define_proc ("gentemp", "kawa.lib.syntax");
       define_syntax ("defmacro", "kawa.lib.syntax");

@@ -70,6 +70,7 @@ public class define_syntax extends Syntax
         SetExp result = new SetExp (macro, rule);
                         
         result.setDefining (true);
+	macro.noteValue(rule);
         return result;
       }
   }

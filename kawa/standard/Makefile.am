@@ -1,4 +1,4 @@
-## Process this with automake to create Makefile.in
+# Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -98,7 +98,7 @@ logand.java logior.java logxor.java ashift.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
 require.java module_extends.java module_implements.java module_name.java \
-module_static.java export.java \
+module_static.java export.java define_unit.java \
 syntax_error.java \
 let.java \
 letrec.java \
@@ -111,7 +111,7 @@ try_catch.java try_finally.java synchronizd.java \
 convert.java instance.java \
 ParseFormat.java format.java LispFormat.java ObjectFormat.java \
 setter.java make.java location.java \
-define_alias.java define_variable.java \
+define_alias.java define_variable.java define_autoload.java \
 define_member_alias.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java \

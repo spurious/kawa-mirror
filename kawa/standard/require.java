@@ -126,40 +126,40 @@ public class require extends Syntax
 		  }
               }
             String fname = fld.getName();
-	    Object fvalue;
 	    java.lang.reflect.Field rfield;
 	    try
 	      {
 		rfield = rclass.getField(fname);
-		fvalue = rfield.get(instance);
 	      }
 	    catch (Exception ex)
 	      {
 		throw new WrappedException(ex);
 	      }
-	    String fdname
-	      = (fvalue instanceof Named ? ((Named) fvalue).getName()
-		 : fname.intern());
 	    if (immediate)
 	      {
-		Binding fbind = Environment.getCurrentBinding(fdname);
-		if (fbind != fvalue)
-		  {
-		    if (fvalue instanceof gnu.mapping.Location)
-		      fvalue = ((gnu.mapping.Location) fvalue).get();
-		    fbind.set(fvalue);
-		  }
+		ClassMemberConstraint.define(fname, instance, rfield, Environment.getCurrent());
 	      }
 	    else
 	      {
-		Declaration fdecl = new Declaration(fdname, fld.getType());
-		if (! isStatic)
-		  fdecl.base = decl;
-		fdecl.field = fld;
-		fdecl.noteValue(new QuoteExp(fvalue));
-		fdecl.setPrivate(true);
-		fdecl.setSimple(false);
-		defs.addDeclaration(fdecl);
+		try
+		  {
+		    Object fvalue = rfield.get(instance);
+		    String fdname
+		      = (fvalue instanceof Named ? ((Named) fvalue).getName()
+			 : fname.intern());
+		    Declaration fdecl = new Declaration(fdname, fld.getType());
+		    if (! isStatic)
+		      fdecl.base = decl;
+		    fdecl.field = fld;
+		    fdecl.noteValue(new QuoteExp(fvalue));
+		    fdecl.setPrivate(true);
+		    fdecl.setSimple(false);
+		    defs.addDeclaration(fdecl);
+		  }
+		catch (Exception ex)
+		  {
+		    throw new WrappedException(ex);
+		  }
 	      }
           }
         t = t.getSuperclass();

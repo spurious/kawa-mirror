@@ -63,6 +63,8 @@ public class set_b extends Syntax implements Printable
 	decl = Declaration.followAliases(decl);
 	if (decl != null)
 	  decl.noteValue (value);
+	if (decl.getFlag(Declaration.IS_CONSTANT))
+	  return tr.syntaxError ("constant variable is set!");
       }
     return sexp;
   }

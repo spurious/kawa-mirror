@@ -1,6 +1,7 @@
 package gnu.jemacs.buffer;
 import javax.swing.text.*;
 import java.io.*;
+import java.awt.Color;
 
 public class Buffer
 {
@@ -8,9 +9,18 @@ public class Buffer
   String filename;
   //boolean modified;
 
+  static Buffer current;
+
   static javax.swing.text.StyleContext styles
   = new javax.swing.text.StyleContext();
   Style inputStyle = styles.addStyle("input", null);
+  static Style redStyle = styles.addStyle("red", null);
+  static Style blueStyle = styles.addStyle("blue", null);
+  static
+  {
+    StyleConstants.setForeground(redStyle, Color.red);
+    StyleConstants.setForeground(blueStyle, Color.blue);
+  }
 
   /** Value of point (0-orgin), when curPosition is null. */
   int point;
@@ -18,7 +28,7 @@ public class Buffer
 
   BufferContent content;
   DefaultStyledDocument document;
-  DefaultStyledDocument modelineDocument;
+  StyledDocument modelineDocument;
   public final BufferKeymap keymap = new BufferKeymap(this);
 
   /** Map buffer names to buffer.s */
@@ -110,7 +120,14 @@ public class Buffer
     try
       {
         modelineDocument.remove(0, modelineDocument.getLength());
-        modelineDocument.insertString(0, "---JEmacs: " + getName() + " ---", null);
+        
+        modelineDocument.insertString(0, "-----", redStyle);
+        modelineDocument.insertString(modelineDocument.getLength(),
+                                      "JEmacs: " + getName(),
+                                      blueStyle);
+        modelineDocument.insertString(modelineDocument.getLength(),
+                                      " ---",
+                                      redStyle);
       }
     catch (javax.swing.text.BadLocationException ex)
       {
@@ -123,9 +140,20 @@ public class Buffer
     this.name = name;
     content = new BufferContent();
     document = new javax.swing.text.DefaultStyledDocument(content, styles);
+
     modelineDocument
       = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
     redrawModeline();
+  }
+
+  public static Buffer getCurrent()
+  {
+    return current;
+  }
+
+  public static void setCurrent(Buffer buffer)
+  {
+    current = buffer;
   }
 
   public final int getDot()
@@ -246,7 +274,6 @@ public class Buffer
         document.insertString(offset, new String(buffer, 0, count), null);
         offset += count;
       }
-    setDot(offset);
   }
 
   public void insertFile(String filename)
@@ -262,10 +289,4 @@ public class Buffer
         throw new RuntimeException("error reading file \""+filename+"\": "+ex);
       }
   }
-
-  /*
-  public insertFileContents(String name)
-  {
-  }
-  */
 }

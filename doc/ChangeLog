@@ -1,3 +1,9 @@
+2000-02-12  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Options):  Note -f is like load now.
+	(Applet compilation):  New section.
+	(Objects and Classes):  Docuemnt new `this' macro.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Some minor fixes.

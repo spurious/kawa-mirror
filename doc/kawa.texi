@@ -471,6 +471,7 @@ does cause the @code{~/.kawarc.scm} init file to be run.
 @item -f @var{filename}
 Kawa reads and evaluates expressions from the file named by @var{filename}.
 If @var{filename} is @samp{-}, standard input is read (with no prompting).
+Otherwise, is equivalent to evaluating @samp{(load "@var{filename}")}.
 @item -s
 @itemx --
 The global variable @samp{command-line-arguments} is set to the remaining
@@ -517,8 +518,9 @@ Both calling conventions can co-exist:  Code compiled
 with @code{--full-tailcalls} can call code compiled
 with @code{--no-full-tailcalls} and vice versa.
 
-The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, and @samp{--main}
-are used to compile a Scheme file; see @ref{Files compilation}.
+The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, @samp{--main}
+and @samp{--applet} are used to compile a Scheme file;
+see @ref{Files compilation}.
 The option @samp{--connect @var{portnum}} is only used by
 the @samp{kawa} front-end program.
 
@@ -633,6 +635,7 @@ in the @code{CLASSPATH}.
 * Archive compilation::         Compiling Scheme to an archive file
 * Files compilation::           Compiling Scheme to a set of .class files
 * Application compilation::     Compiling Scheme to a standalone application
+* Applet compilation::          Compiling Scheme to an applet
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
@@ -663,7 +666,7 @@ a @samp{.scm} source file into one or more @samp{.class} files.
 
 You run it as follows:
 @example
-kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main] -C @var{infile} ...
+kawa [-d @var{outdirectory}] [-P @var{prefix}] [-T @var{topname}] [--main | --spplet] -C @var{infile} ...
 @end example
 
 Note the @samp{-C} must come last, because @samp{Kawa} processes the
@@ -686,6 +689,9 @@ The default is generated from the @var{infile} and @var{prefix}.
 @item --main
 Generate a @code{main} method so that the resulting "top" class can
 be used as a stand-alone application. @xref{Application compilation}.
+@item --applet
+The resulting class inherits from @code{java.applet.Applet},
+and can be used as an applet.  @xref{Applet compilation}.
 @end table
 
 When you actually want to load the classes, the @var{outdirectory}
@@ -714,7 +720,7 @@ One way to do that is with the @samp{-f}:
 kawa -f macs.scm -C foosrc.scm
 @end example
 
-@node Application compilation,  , Files compilation, Compiling
+@node Application compilation,  Applet compilation, Files compilation, Compiling
 @section Compiling Scheme to a standalone application
 
 A Java application is a Java class with a special method
@@ -736,6 +742,72 @@ java MyProgram [@var{args}]
 @end example
 Your Scheme program can access the command-line arguments @var{args}
 by using the global variable @samp{command-line-arguments}.
+
+@node Applet compilation, , Application compilation, Compiling
+@section Compiling Scheme to an applet
+An applet is a Java class that inherits from @code{java.applet.Applet}.
+The applet can be downloaded and run in a Java-capable web-browser.
+To generate an applet from a Scheme program, write the Scheme
+program with appropriate definitions of the functions @samp{init},
+@samp{start}, @samp{stop} and @samp{destroy}.  You must declare these
+as zero-argument functions with a @code{<void>} return-type.
+
+Here is an example, based on the scribble applet in Flanagan's
+"Java Examples in a Nutshell" (O'Reilly, 1997):
+@example
+(define-private last-x 0)
+(define-private last-y 0)
+
+(define (init) <void>
+  (let ((applet :: <java.applet.Applet> (this)))
+    (invoke applet 'addMouseListener
+	    (object (<java.awt.event.MouseAdapter>)
+		    ((mousePressed (e :: <java.awt.event.MouseEvent>)) <void>
+		     (set! last-x (invoke e 'getX))
+		     (set! last-y (invoke e 'getY)))))
+    (invoke applet 'addMouseMotionListener
+	    (object (<java.awt.event.MouseMotionAdapter>)
+		    ((mouseDragged (e :: <java.awt.event.MouseEvent>)) <void>
+		     (let ((g :: <java.awt.Graphics>
+			      (invoke applet 'getGraphics))
+			   (x :: <int> (invoke e 'getX))
+			   (y :: <int> (invoke e 'getY)))
+		       (invoke g 'drawLine last-x last-y x y)
+		       (set! last-x x)
+		       (set! last-y y)))))))
+
+(define (start) <void> (format #t "called start.~%~!"))
+(define (stop) <void> (format #t "called stop.~%~!"))
+(define (destroy) <void> (format #t "called destroy.~%~!"))
+@end example
+
+You compile the program with the @samp{--applet} flag in addition to the
+normal @samp{-C} flag:
+@example
+java kawa.repl --applet -C scribble.scm
+@end example
+
+You can then create a @samp{.jar} archive containing your applet.
+You also need to include the Kawa classes in the @samp{.jar},
+or you can include a @code{MANIFEST} file that specifies @code{Class-Path}
+to use a Java 2
+@uref{http://java.sun.com/docs/books/tutorial/ext/basics/download.html,
+download extension}.
+@example
+jar cf scribble.jar scribble*.class @i{other-classes ...}
+@end example
+
+Finally, you create an @samp{.html} page referencing your applet:
+@example
+<html><head><title>Scribble testapp</title></head>
+<body><h1>Scribble testapp</h1>
+You can scribble here:
+<br>
+<applet code="scribble.class" archive="scribble.jar" width=200 height=200>
+Sorry, Java is needed.</applet>
+</body></html>
+@end example
+
 
 @node Extensions, Types, Compiling, Top
 @chapter Extensions
@@ -2263,6 +2335,16 @@ Here are the currently supported features.
 * Method operations::     Calling Java methods from Scheme
 * Anonymous classes::
 @end menu
+
+@deffn Syntax this
+Returns the "this object" - the current instance of the current class.
+The current implementation is incomplete, not robust, and not
+well defined.  However, it will have to do for now.
+Note:  "@code{this}" is a macro, not a variable, so you have to write
+it using parentheses: @samp{(this)}.  A planned extension will
+allow an optional class specifier (needed for nested clases).
+@end deffn
+
 
 @node Records, Mangling, Objects and Classes, Objects and Classes
 @section Records

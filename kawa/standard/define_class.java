@@ -34,6 +34,7 @@ public class define_class extends Syntax
         decl.setLine(declPos.getLine(), declPos.getColumn());
       }
     ClassExp oexp = new ClassExp();
+    oexp.setSimple(isSimple);
     decl.noteValue(oexp);
     if (isSimple)
       decl.setFlag(Declaration.STATIC_SPECIFIED);
@@ -71,11 +72,7 @@ public class define_class extends Syntax
       return tr.syntaxError("missing class name in "+this.getName());
     String name = symbol instanceof Symbol ? ((Symbol) symbol).getName()
       : symbol.toString();
-    //LambdaExp lexp = new LambdaExp();
-    //lexp.setName(name);
-    //    tr.push(lexp);
     ClassExp oexp = (ClassExp) decl.getValue();
-    oexp.setSimple(isSimple);
     int nlen = name.length();
     String cname
       = (nlen > 2 && name.charAt(0) == '<' && name.charAt(nlen-1) == '>'
@@ -83,13 +80,9 @@ public class define_class extends Syntax
 	 : name);
     oexp.setName(cname);
     objectSyntax.rewriteClassDef((Object[]) form.cdr, tr);
-    // lexp.body = oe;
-    // tr.pop(lexp);
     SetExp sexp = new SetExp (symbol, oexp);
     sexp.binding = decl;
     sexp.setDefining (true);
-    // sexp.binding = decl;
-    // decl.noteValue (value);
     return sexp;
   }
 }

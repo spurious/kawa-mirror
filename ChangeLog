@@ -1,5 +1,8 @@
 2004-03-08  Per Bothner  <per@bothner.com>
 
+	* kawa/standard/define_class.java (rewrite):  Move setSimple call ...
+	(scanForDefinitions):  ... to here.
+	
 	* kawa/standard/load.java (loadSource):  Don't call beginDocument
 	or endDocument.
 

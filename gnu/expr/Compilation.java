@@ -1408,8 +1408,8 @@ public class Compilation
   /** Generate code to push the current CallContext on the JVM stack. */
   public final void loadCallContext()
   {
-    CodeAtrr code = getCode();
-    if (comp.curLambda.isHandlingTailCalls())
+    CodeAttr code = getCode();
+    if (curLambda.isHandlingTailCalls())
       code.emitLoad(callStackContext);
     else
       code.emitInvokeStatic(getCallContextInstanceMethod);

@@ -44,4 +44,9 @@ public class BeginExp extends Expression
       }
     ps.print(")");
   }
+
+  public gnu.bytecode.Type getType()
+  {
+    return exps[exps.length - 1].getType();
+  }
 }

@@ -1,7 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.*;
-import kawa.lang.PrimProcedure;  // FIXME
+import kawa.standard.Scheme;  // FIXME
 
 /**
  * This class represents a variable reference (an identifier).
@@ -53,7 +53,7 @@ public class ReferenceExp extends Expression
 	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
 	  {
 	    String tname = name.substring(1, len-1);
-	    gnu.bytecode.Type type = PrimProcedure.string2Type(tname);
+	    gnu.bytecode.Type type = Scheme.string2Type(tname);
 	    if (type != null && type.getReflectClass() != null)
 	      return type;
 	  }
@@ -117,7 +117,7 @@ public class ReferenceExp extends Expression
 	else
 	  code.emitInvokeStatic(comp.lookupGlobalMethod);
       }
-    target.compileFromStack(comp, Type.pointer_type);
+    target.compileFromStack(comp, getType());
   }
 
   Object walk (ExpWalker walker) { return walker.walkReferenceExp(this); }
@@ -129,6 +129,11 @@ public class ReferenceExp extends Expression
     ps.print("/ ");
     SFormat.print (symbol, ps);
     ps.print(")");
+  }
+
+  public final gnu.bytecode.Type getType()
+  {
+    return binding == null ? Type.pointer_type : binding.getType();
   }
 
   public String toString()

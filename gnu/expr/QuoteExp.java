@@ -12,11 +12,15 @@ public class QuoteExp extends Expression
 
   public final Object getValue() { return value; }
 
+  public final gnu.bytecode.Type getType()
+  { return gnu.bytecode.Type.make(value.getClass()); }
+
   static public QuoteExp undefined_exp
   = new QuoteExp (Undefined.getInstance());
   static public QuoteExp voidExp = new QuoteExp (Values.empty);
   static public QuoteExp trueExp = new QuoteExp(Boolean.TRUE);
   static public QuoteExp falseExp = new QuoteExp(Boolean.FALSE);
+  static public QuoteExp nullExp = new QuoteExp(null);
 
   public QuoteExp (Object val) { value = val; }
   

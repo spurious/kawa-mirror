@@ -888,7 +888,8 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     
     Expression exp;
-    if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT)
+    if ((axis < 0 || axis == AXIS_CHILD || axis == AXIS_DESCENDANT
+	 || axis == AXIS_DESCENDANT_OR_SELF)
 	&&
 	(curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN 
 	 || curToken == NCNAME_COLON_TOKEN || curToken == OP_MUL
@@ -915,7 +916,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	Expression[] args = { dot, new QuoteExp(predicate) };
 	Expression func
-	  = axis == AXIS_DESCENDANT ? funcNamedDescendants : funcNamedChildren;
+	  = axis == AXIS_DESCENDANT ? funcNamedDescendants
+	  : axis == AXIS_DESCENDANT_OR_SELF ? funcNamedDescendantsOrSelf
+	  : funcNamedChildren;
 	exp = new ApplyExp(func, args);
       }
     else if (axis == AXIS_ATTRIBUTE)
@@ -945,16 +948,29 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression exp = parseStepExpr();
     while (curToken == '/' || curToken == SLASHSLASH_TOKEN)
       {
-	int op = curToken;
 	boolean descendants = curToken == SLASHSLASH_TOKEN;
-	getRawToken();
 
 	LambdaExp lexp = new LambdaExp(1);
 	Declaration decl = lexp.addDeclaration("dot");
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	decl.noteValue (null);  // Does not have a known value.
 	parser.push(lexp);
-	lexp.body = parseStepExpr();
+	/* FIXME - Enable this when we do proper distinct-doc-order sorting.
+	if (descendants)
+	  {
+	    curToken = '/';
+	    Declaration dotDecl = parser.lookup("dot", -1);
+	    Expression dot = new ReferenceExp("dot", dotDecl);
+	    Expression[] args = { dot, new QuoteExp(new NodeType("node")) };
+	    lexp.body = new ApplyExp(funcNamedDescendantsOrSelf, args);
+	    descendants = false; // FIXME Actually simplify below.
+	  }
+	else
+	*/
+	  {
+	    getRawToken();
+	    lexp.body = parseStepExpr();
+	  }
 	parser.pop(lexp);
 
 	boolean handled = false;
@@ -1994,6 +2010,9 @@ public class XQParser extends LispReader // should be extends Lexer
     = makeFunctionExp("gnu.kawa.xml.NamedChildren", "namedChildren");
   static final Expression funcNamedDescendants
     = makeFunctionExp("gnu.kawa.xml.NamedDescendants", "namedDescendants");
+  static final Expression funcNamedDescendantsOrSelf
+    = makeFunctionExp("gnu.kawa.xml.NamedDescendants", 
+		      "namedDescendantsOrSelf");
   static final Expression funcValuesFilter
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "valuesFilter");
 

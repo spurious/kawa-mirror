@@ -1,3 +1,7 @@
+2002-06-10  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseNodeTest):  Support descdendant-or-self axis.
+
 2002-05-28  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (Prompter.appl1):  State-dependent comment syntax.

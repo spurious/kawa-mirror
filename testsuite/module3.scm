@@ -20,3 +20,6 @@
 (define (pa-new size)
   (let ((newer (primitive-array-new <java.lang.Object>)))
     (newer size)))
+
+(define (namespace-syntax-call)
+  (namespace-syntax-test))

@@ -1,3 +1,10 @@
+2003-09-08  Per Bothner  <per@bothner.com>
+
+	Based on Savannah bug #5113 from Chris Dean <Chris.Dean@sokitomi.com>.
+	* module1.scm (namespace-syntax-test):  New macro.
+	* module3.scm (namespace-syntax-call):  New function.
+	* obj-test.scm:  Test namespace-syntax-call.
+
 2003-08-20  Per Bothner  <per@bothner.com>
 
 	* test.scm:  Merge in new tests from Aubrey Jaffer's latest version

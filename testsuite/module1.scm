@@ -19,3 +19,10 @@
 
 (define (call-to-first x)
   (first x))
+
+(define-namespace date "class:java.util.Date")
+
+(define-syntax namespace-syntax-test
+  (syntax-rules ()
+    ((namespace-syntax-test)
+     (date:parse "6 Sep 2003"))))

@@ -207,7 +207,8 @@ GCJ_INPUTS = $(java_Java)
 subdir = gnu/kawa/swingviews
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-DIST_COMMON = $(top_srcdir)/Make-rules Makefile.am Makefile.in
+DIST_COMMON = $(top_srcdir)/Make-rules ChangeLog Makefile.am \
+	Makefile.in
 SOURCES = $(java_sources) $(java_SCM)
 
 all: all-am

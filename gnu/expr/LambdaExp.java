@@ -614,6 +614,26 @@ public class LambdaExp extends ScopeExp
 
     allocFrame(comp);
 
+    if ((getImportsLexVars() || getNeedsStaticLink())
+	&& isClassGenerated())
+      {
+	LambdaExp parent = outerLambda();
+	LambdaExp heapFrameLambda = parent.heapFrameLambda;
+
+	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
+	  {
+	    if (heapFrameLambda != null)
+	      {
+		ClassType heapFrameType = heapFrameLambda.getCompiledClassType(comp);
+		closureEnvField = comp.curClass.addField ("closureEnv", heapFrameType);
+	      }
+	    else if (parent.getNeedsStaticLink())
+	      {
+		closureEnvField = comp.curClass.addField ("closureEnv", parent.closureEnv.getType());
+	      }
+	  }
+      }
+
     for (LambdaExp child = firstChild;  child != null;
 	 child = child.nextSibling)
       { 
@@ -660,27 +680,6 @@ public class LambdaExp extends ScopeExp
 	  }
 	heapFrame.setType(frameType);
       }
-
-    if ((getImportsLexVars() || getNeedsStaticLink())
-	&& isClassGenerated())
-      {
-	LambdaExp parent = outerLambda();
-	LambdaExp heapFrameLambda = parent.heapFrameLambda;
-
-	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
-	  {
-	    if (heapFrameLambda != null)
-	      {
-		ClassType heapFrameType = heapFrameLambda.getCompiledClassType(comp);
-		closureEnvField = comp.curClass.addField ("closureEnv", heapFrameType);
-	      }
-	    else if (parent.getNeedsStaticLink())
-	      {
-		closureEnvField = comp.curClass.addField ("closureEnv", parent.closureEnv.getType());
-	      }
-	  }
-      }
-
   }
 
   void allocParameters (Compilation comp, Variable argsArray)

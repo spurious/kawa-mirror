@@ -230,7 +230,9 @@ public class FindTailCalls extends ExpFullWalker
     try
       {
 	inTailContext = false;
-	super.walkObjectExp(exp);
+	for (LambdaExp child = exp.firstChild;
+	     child != null && exitValue == null;  child = child.nextSibling)
+	  walkLambdaExp(child, false);
       }
     finally
       {

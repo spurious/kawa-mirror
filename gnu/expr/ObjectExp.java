@@ -96,7 +96,9 @@ public class ObjectExp extends LambdaExp
 	comp.curLambda = this;
 
 	allocFrame(comp);
-	if (getNeedsStaticLink() && saveLambda.closureEnv != null)
+
+	if (getNeedsStaticLink() && saveLambda.closureEnv != null
+            && saveLambda.heapFrameLambda != this)
 	  {
 	    staticLinkField
 	      = new_class.addField("staticLink", 

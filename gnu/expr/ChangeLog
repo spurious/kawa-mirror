@@ -1,3 +1,13 @@
+1999-08-17  Per Bothner  <per@bothner.com>
+
+	* FindTailCalls.java (walkObjectExp):   Don't call super.walkObjectExp,
+	instead call walkLambdaExp on each method so setCanRead is not called.
+	* LambdaExp.java (allocFrame):  Don't create closureEnvField here,
+	since it is not appropriate for ObjectExp.
+	(allocChildClasses):  Create closureEnvField here instead.
+	* ObjectExp.java (compile):  Don't create staticLinkField if this is
+	our parent's heapFrameLambda (since parent has already done it).
+
 1999-08-06  Per Bothner  <per@bothner.com>
 
 	* CheckedTarget.java:  New class, extends StackTarget.

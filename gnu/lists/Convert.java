@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -265,11 +265,11 @@ public class Convert
   {
     // We assume that if collections are available the Double.parseDouble
     // is also available.
-@if WITH COLLECTIONS@
-    return Double.parseDouble(str);
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+    /* BEGIN JAVA2 */
+    // return Double.parseDouble(str);
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
     return Double.valueOf(str).doubleValue();
-@endif WITHOUT COLLECTIONS@
+    /* END JAVA1 */
   }
 }

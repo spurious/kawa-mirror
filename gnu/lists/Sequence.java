@@ -3,9 +3,9 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-@if WITH COLLECTIONS@
-import java.util.*;
-@endif WITH COLLECTIONS@
+/* BEGIN JAVA2 */
+// import java.util.*;
+/* END JAVA2 */
 import java.io.*;
 
 /**
@@ -23,9 +23,9 @@ import java.io.*;
 
 public interface Sequence
 extends
-@if WITH COLLECTIONS@
-    java.util.List,
-@endif WITH COLLECTIONS@
+    /* BEGIN JAVA2 */
+    // java.util.List,
+    /* END JAVA2 */
     Consumable
 {
   /** Special magic end-of-file marker. */

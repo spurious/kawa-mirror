@@ -3,9 +3,9 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
-@if WITH COLLECTIONS@
-import java.util.*;
-@endif WITH COLLECTIONS@
+/* BEGIN JAVA2 */
+// import java.util.*;
+/* END JAVA2 */
 import java.util.Enumeration;
 
 /**
@@ -72,12 +72,12 @@ public abstract class AbstractSequence
   protected RuntimeException unsupported (String text)
   {
     text = getClass().getName() + " does not implement " + text;
-@if WITH COLLECTIONS@
-    return new UnsupportedOperationException(text);
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+    /* BEGIN JAVA2 */
+    // return new UnsupportedOperationException(text);
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
     throw new RuntimeException(text);
-@endif WITHOUT COLLECTIONS@
+    /* END JAVA1 */
   }
 
   public Object set(int index, Object element)
@@ -147,20 +147,20 @@ public abstract class AbstractSequence
     return indexOf(o) >= 0;
   }
 
-@if WITH COLLECTIONS@
+  /* BEGIN JAVA2 */
   /** See java.util.List. */
-  public boolean containsAll(Collection c)
-  {
-    Iterator i = c.iterator();
-    while (i.hasNext())
-      {
-        Object e = i.next();
-        if (! contains(e))
-          return false;
-      }
-    return true;
-  }
-@endif WITH COLLECTIONS@
+  // public boolean containsAll(Collection c)
+  // {
+    // Iterator i = c.iterator();
+    // while (i.hasNext())
+      // {
+        // Object e = i.next();
+        // if (! contains(e))
+          // return false;
+      // }
+    // return true;
+  // }
+  /* END JAVA2 */
 
   public final Enumeration elements()
   {
@@ -172,22 +172,22 @@ public abstract class AbstractSequence
     return new SeqPosition(this, startPos());
   }
 
-@if WITH COLLECTIONS@
-  public final Iterator iterator()
-  {
-    return getIterator();
-  }
+  /* BEGIN JAVA2 */
+  // public final Iterator iterator()
+  // {
+    // return getIterator();
+  // }
 
-  public ListIterator listIterator()
-  {
-    return listIterator(0);
-  }
+  // public ListIterator listIterator()
+  // {
+    // return listIterator(0);
+  // }
 
-  public ListIterator listIterator(int index)
-  {
-    return new SeqPosition(this, index, false);
-  }
-@endif WITH COLLECTIONS@
+  // public ListIterator listIterator(int index)
+  // {
+    // return new SeqPosition(this, index, false);
+  // }
+  /* END JAVA2 */
 
   /** Add a value at a specified Pos.
    * @return the updated Pos, which is after the inserted value..
@@ -212,28 +212,28 @@ public abstract class AbstractSequence
     releasePos(pos);
   }
 
-@if WITH COLLECTIONS@
+  /* BEGIN JAVA2 */
   /** See java.util.Collection. */
-  public boolean addAll(Collection c)
-  {
-    return addAll(size(), c);
-  }
+  // public boolean addAll(Collection c)
+  // {
+    // return addAll(size(), c);
+  // }
 
   /** See java.util.Collection. */
-  public boolean addAll(int index, Collection c)
-  {
-    boolean changed = false;
-    int pos = createPos(index, false);
-    for (Iterator it = c.iterator();  it.hasNext(); )
-      {
-	pos = addPos(pos, it.next());
-	changed = true;
-      }
-    releasePos(pos);
-    return changed;
-  }
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+  // public boolean addAll(int index, Collection c)
+  // {
+    // boolean changed = false;
+    // int pos = createPos(index, false);
+    // for (Iterator it = c.iterator();  it.hasNext(); )
+      // {
+	// pos = addPos(pos, it.next());
+	// changed = true;
+      // }
+    // releasePos(pos);
+    // return changed;
+  // }
+  /* END JAVA2 */
+  /* BEGIN JAVA1 */
   public boolean addAll(Sequence c)
   {
     return addAll(size(), c);
@@ -251,7 +251,7 @@ public abstract class AbstractSequence
     releasePos(pos);
     return changed;
   }
-@endif WITHOUT COLLECTIONS@
+  /* END JAVA1 */
 
   /**
    * Remove one or more elements.
@@ -309,37 +309,37 @@ public abstract class AbstractSequence
     return true;
   }
 
-@if WITH COLLECTIONS@
-  public boolean removeAll(Collection c)
-  {
-    boolean changed = false;
-    for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
-      {
-	Object value = getPosPrevious(iter);
-	if (c.contains(value))
-          {
-	    removePos(iter, -1);
-            changed = true;
-          }
-      }
-    return changed;
-  }
+  /* BEGIN JAVA2 */
+  // public boolean removeAll(Collection c)
+  // {
+    // boolean changed = false;
+    // for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
+      // {
+	// Object value = getPosPrevious(iter);
+	// if (c.contains(value))
+          // {
+	    // removePos(iter, -1);
+            // changed = true;
+          // }
+      // }
+    // return changed;
+  // }
 
-  public boolean retainAll(Collection c)
-  {
-    boolean changed = false;
-    for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
-      {
-	Object value = getPosPrevious(iter);
-        if (! c.contains(value))
-          {
-	    removePos(iter, -1);
-            changed = true;
-          }
-      }
-    return changed;
-  }
-@endif WITH COLLECTIONS@
+  // public boolean retainAll(Collection c)
+  // {
+    // boolean changed = false;
+    // for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
+      // {
+	// Object value = getPosPrevious(iter);
+        // if (! c.contains(value))
+          // {
+	    // removePos(iter, -1);
+            // changed = true;
+          // }
+      // }
+    // return changed;
+  // }
+  /* END JAVA2 */
 
   public void clear()
   {
@@ -649,40 +649,40 @@ public abstract class AbstractSequence
   {
     // Compatible with the Collections specification.
     // FIXME should also depend on class?
-@if WITH COLLECTIONS@
-    if (! (o instanceof java.util.List))
-      return false;
-    Iterator it1 = iterator();
-    Iterator it2 = ((java.util.List) o).iterator();
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+    /* BEGIN JAVA2 */
+    // if (! (o instanceof java.util.List))
+      // return false;
+    // Iterator it1 = iterator();
+    // Iterator it2 = ((java.util.List) o).iterator();
+    /* END JAVA2 */
+    /* BEGIN JAVA1 */
     if (! (o instanceof Sequence))
       return false;
     Enumeration it1 = elements();
     Enumeration it2 = ((Sequence) o).elements();
-@endif WITHOUT COLLECTIONS@
+    /* END JAVA1 */
     for (;;)
       {
-@if WITH COLLECTIONS@
-        boolean more1 = it1.hasNext();
-        boolean more2 = it2.hasNext();
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+	/* BEGIN JAVA2 */
+        // boolean more1 = it1.hasNext();
+        // boolean more2 = it2.hasNext();
+	/* END JAVA2 */
+	/* BEGIN JAVA1 */
         boolean more1 = it1.hasMoreElements();
         boolean more2 = it2.hasMoreElements();
-@endif WITHOUT COLLECTIONS@
+	/* END JAVA1 */
         if (more1 != more2)
           return false;
         if (! more1)
           return true;
-@if WITH COLLECTIONS@
-        Object e1 = it1.next();
-        Object e2 = it2.next();
-@endif WITH COLLECTIONS@
-@if WITHOUT COLLECTIONS@
+	/* BEGIN JAVA2 */
+        // Object e1 = it1.next();
+        // Object e2 = it2.next();
+	/* END JAVA2 */
+	/* BEGIN JAVA1 */
         Object e1 = it1.nextElement();
         Object e2 = it2.nextElement();
-@endif WITHOUT COLLECTIONS@
+	/* END JAVA1 */
         if (e1 == null)
           {
             if (e2 != null)
@@ -703,14 +703,14 @@ public abstract class AbstractSequence
     return new SubSequence(this, ipos0, ipos1);
   }
 
-@if WITH COLLECTIONS@
-  public List subList(int fromIx, int toIx)
-  {
-    return new SubSequence(this,
-			   createPos(fromIx, false),
-			   createPos(toIx, true));
-  }
-@endif WITH COLLECTIONS@
+  /* BEGIN JAVA2 */
+  // public List subList(int fromIx, int toIx)
+  // {
+    // return new SubSequence(this,
+			   // createPos(fromIx, false),
+			   // createPos(toIx, true));
+  // }
+  /* END JAVA2 */
 
   /** Copy an element specified by a position pair to a Consumer.
    * @return if hasNext(ipos). */

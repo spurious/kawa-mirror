@@ -23,9 +23,9 @@ import java.util.NoSuchElementException;
 
 public class SeqPosition
 implements
-@if WITH COLLECTIONS@
-    java.util.ListIterator,
-@endif WITH COLLECTIONS@
+/* BEGIN JAVA2 */
+    // java.util.ListIterator,
+/* END JAVA2 */
     java.util.Enumeration
 {
   /**

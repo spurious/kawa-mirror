@@ -6,6 +6,7 @@
 	(makeField): Check for existing field to guards against duplicates.
 	* LambdaExp.java (allocFieldFor): Use needsExternalAccess.
 	(addMethodFor): Check needsExternalAccess().
+
 	* Declaration.java (IS_DYNAMIC): New constant.
 	* Expression.java (setLine): New method.
 	* LambdaExp.java (setType): New type.

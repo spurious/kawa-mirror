@@ -260,9 +260,11 @@ public class SyntaxRule implements Compilable
       }
     Object expansion = execute_template (0, vars, 0, indexes, tr);
     /* DEBUGGING:
-    System.err.print ("{Expanded macro: ");
-    SFormat.print (expansion, System.err);
-    System.err.println ('}');
+    OutPort err = OutPort.errDefault();
+    err.print("{Expanded macro: ");
+    SFormat.print(expansion, err);
+    err.println('}');
+    err.flush();
     */
     return expansion;
   }

@@ -1,3 +1,10 @@
+2004-12-11  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java: Update 'instanceof' instance of'.
+	* mod1.xql: Update declaration syntax.
+	* mod2.xql: Likewise.
+	* usemod.xql: Likewise.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java: Add missing "local:" prefixes.

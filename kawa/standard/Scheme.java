@@ -425,6 +425,7 @@ public class Scheme extends Interpreter
       define_proc ("record-type-name", "kawa.lib.reflection");
       define_proc ("record-type-field-names", "kawa.lib.reflection");
       define_proc ("record?", "kawa.lib.reflection");
+      define_proc("make", "kawa.standard.make");
 
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
@@ -443,6 +444,7 @@ public class Scheme extends Interpreter
 
       define_proc ("gentemp", "kawa.lib.syntax");
       define_syntax ("defmacro", "kawa.lib.syntax");
+      define_proc("setter", kawa.standard.setter.setterProcedure);
 
       define_syntax ("future", "kawa.lib.thread");
       define_proc ("%make-future", "kawa.standard.make_future");

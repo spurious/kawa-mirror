@@ -154,6 +154,7 @@ make_quantity.class quantity2number.class quantity2unit.class \
 make_future.class sleep.class \
 try_catch.class try_finally.class \
 convert.class instance.class \
+setter.class make.class \
 Scheme.class \
 null_env.class \
 user_env.class \

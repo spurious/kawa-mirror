@@ -111,7 +111,7 @@ public class Literal
 	comp.method.compile_dup (comp.scmStringType);
 	StringBuffer string = (StringBuffer) value;
 	comp.method.compile_push_string (value.toString ());
-	comp.method.compile_invoke_static (comp.initStringBufferMethod);
+	comp.method.compile_invoke_nonvirtual (comp.initStringBufferMethod);
 	flags |= Literal.ALLOCATED|Literal.INITIALIZED;
       }
     else

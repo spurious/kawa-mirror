@@ -101,6 +101,7 @@ AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
   AddOp.java \
+  AppendValues.java \
   Apply.java \
   Assoc.java \
   ConstantFunction0.java \

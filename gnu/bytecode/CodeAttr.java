@@ -959,7 +959,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitGoto (Label label)
   {
     emitGoto(label, 167);
-    unreachable_here = true;
+    setUnreachable();
   }
 
   //public final void compile_goto_ifeq (Label label, boolean invert)
@@ -1259,7 +1259,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
     if_stack.end_label.define (this);
     if (make_unreachable)
-      unreachable_here = true;
+      setUnreachable();
     // Pop the if_stack.
     if_stack = if_stack.previous;
   }
@@ -1366,7 +1366,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     popType();
     reserve(1);
     put1 (191);  // athrow
-    unreachable_here = true;
+    setUnreachable();
   }
 
   public final void emitMonitorEnter ()
@@ -1395,7 +1395,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       emitTypedOp (172, popType().promote());
-    unreachable_here = true;
+    setUnreachable();
   }
 
   /** Add an exception handler. */
@@ -1538,7 +1538,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void emitFinallyEnd()
   {
     emitRet(try_stack.finally_ret_addr);
-    unreachable_here = true;
+    setUnreachable();
     popScope();
     try_stack.finally_subr = null;
   }
@@ -1603,7 +1603,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	put1(167); // goto
 	put2(delta);
       }
-    unreachable_here = true;
+    setUnreachable();
   }
 
   /* Make sure the label with oldest fixup is first in labels. */
@@ -2057,6 +2057,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     frag.next = fragmentStack;
     fragmentStack = frag;
     frag.length = PC;
+    frag.unreachable_save = unreachable_here;
+    unreachable_here = false;
     if (isHandler)
       frag.handlerIndex = exception_table_length - 1;
   }
@@ -2073,5 +2075,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     frag.insns = new byte[frag.length];
     System.arraycopy(code, startPC, frag.insns, 0, frag.length);
     PC = startPC;
+    unreachable_here = frag.unreachable_save;
   }
 }

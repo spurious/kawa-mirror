@@ -12,7 +12,7 @@ import java.io.*;
  * avoiding needless jumps).  Look at gcc/java/jcf-write.c for ideas.
  *
  * CodeFragment extends Label because it can be viewed as a label with
- * some code folloing it.
+ * some code following it.
  */
 
 public class CodeFragment extends Label
@@ -24,6 +24,9 @@ public class CodeFragment extends Label
   /** If handlerIndex >= 0, it is the index in the exception_table
    * for which this fragment is the handler. */
   int handlerIndex;
+
+  /** Used to save value of unreachable_here from the CodeAttr. */
+  boolean unreachable_save;
 
   public CodeFragment(CodeAttr cattr)
   {

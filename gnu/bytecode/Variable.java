@@ -39,6 +39,12 @@ public class Variable extends Location implements java.util.Enumeration {
 
   final boolean dead () { return end_pc > 0; }
 
+  private void setFlag (boolean setting, int flag)
+  {
+    if (setting) flags |= flag;
+    else flags &= ~flag;
+  }
+
   /** Returns true for a "simple" variable.
    * A "simple" Variable can be stack-allocated using standard local
    * variable slots.  It is allocated by the codegen package.
@@ -51,12 +57,7 @@ public class Variable extends Location implements java.util.Enumeration {
   }
   
   public final void setSimple (boolean simple)
-  {
-    if (simple)
-      flags |= SIMPLE_FLAG;
-    else
-      flags &= ~SIMPLE_FLAG;
-  }
+  { setFlag(simple, SIMPLE_FLAG); }
 
   public final boolean isParameter ()
   {
@@ -65,10 +66,7 @@ public class Variable extends Location implements java.util.Enumeration {
   
   public final void setParameter (boolean parameter)
   {
-    if (parameter)
-      flags |= PARAMETER_FLAG;
-    else
-      flags &= ~PARAMETER_FLAG;
+    setFlag(parameter, PARAMETER_FLAG);
   }
 
   public final boolean isArtificial ()
@@ -78,10 +76,7 @@ public class Variable extends Location implements java.util.Enumeration {
   
   public final void setArtificial (boolean artificial)
   {
-    if (artificial)
-      flags |= ARTIFICIAL_FLAG;
-    else
-      flags &= ~ARTIFICIAL_FLAG;
+    setFlag(artificial, ARTIFICIAL_FLAG);
   }
 
   /** Assign a local variable to a given local variable slot.

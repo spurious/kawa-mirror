@@ -1,3 +1,10 @@
+2005-03-11  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java (importDefinitions): Don't set alias's
+	type to typeFieldLocation, since getType should be post-indirection.
+	(makeDeclInModule): Likewise, if field is a Location, decl type
+	is Object. not a Location.
+
 2005-03-07  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java: Update package of DefineNamespace.

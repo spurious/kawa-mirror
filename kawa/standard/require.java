@@ -260,7 +260,6 @@ public class require extends Syntax
 		adecl.setIndirectBinding(true);
 		Expression fexp;
                 ReferenceExp fref;
-                adecl.setType(typeFieldLocation);
 		if (immediate)
 		  {
                     if (isFinal && isStatic)
@@ -400,7 +399,6 @@ public class require extends Syntax
     String fname = fld.getName();
     Type ftype = fld.getType();
     boolean isAlias = ftype.isSubtype(Compilation.typeLocation);
-    Type dtype = language.getTypeFor(ftype.getReflectClass());
     boolean isStatic = (fld.getModifiers() & Access.STATIC) != 0;
     Object fdname;
     // FIXME if fvalue is FieldLocation, and field is final,
@@ -414,6 +412,8 @@ public class require extends Syntax
 	  fname = fname.substring(Declaration.PRIVATE_PREFIX.length());
 	fdname = Compilation.demangleName(fname, true).intern();
       }
+    Type dtype = isAlias ? Type.pointer_type
+      : language.getTypeFor(ftype.getReflectClass());
     Declaration fdecl = new Declaration(fdname, dtype);
     boolean isFinal = (fld.getModifiers() & Access.FINAL) != 0;
     if (isAlias)

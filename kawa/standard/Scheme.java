@@ -840,6 +840,7 @@ public class Scheme extends Interpreter
 
         // Only if JEmacs is available.  FIXME.
 	types.put ("buffer", ClassType.make("gnu.jemacs.buffer.Buffer"));
+	types.put ("frame", ClassType.make("gnu.jemacs.buffer.Frame"));
 	types.put ("window", ClassType.make("gnu.jemacs.buffer.Window"));
       }
     return (Type) types.get(name);

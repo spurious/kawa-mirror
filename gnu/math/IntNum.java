@@ -1233,7 +1233,7 @@ public class IntNum extends RatNum implements Compilable
     // Normal round-to-even rule: round up if the bit dropped is a one, and
     // the bit above it or any of the bits below it is a one.
     if ((m & 1) == 1
-	&& ((m & 2) == 2 || remainder || checkBits (il - (ml + 1))))
+	&& ((m & 2) == 2 || remainder || checkBits (excess_bits)))
       {
 	m += 2;
 	// Check if we overflowed the mantissa
@@ -1317,17 +1317,19 @@ public class IntNum extends RatNum implements Compilable
   }
 
   /** Set dest[0:len-1] to the negation of src[0:len-1].
+   * Return true if overflow (i.e. in src is -2**(32*len-1)).
    * Ok for src==dest. */
-  public static int negate (int[] dest, int[] src, int len)
+  public static boolean negate (int[] dest, int[] src, int len)
   {
     long carry = 1;
+    boolean negative = src[len-1] < 0;
     for (int i = 0;  i < len;  i++)
       {
         carry += ((long) (~src[i]) & 0xffffffffL);
         dest[i] = (int) carry;
         carry >>= 32;
       }
-    return (int) carry;
+    return (negative && dest[len-1] < 0);
   }
 
   /** Destructively set this to the negative of x.
@@ -1344,10 +1346,8 @@ public class IntNum extends RatNum implements Compilable
 	return;
       }
     realloc (len + 1);
-    boolean negative = x.isNegative ();
-    int carry = IntNum.negate (words, x.words, len);
-    if (carry > 0 && negative)
-      words[len++] = 1;
+    if (IntNum.negate (words, x.words, len))
+      words[len++] = 0;
     ival = len;
   }
 

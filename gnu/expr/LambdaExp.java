@@ -765,12 +765,15 @@ public class LambdaExp extends ScopeExp
     primMethods = new Method[numStubs + 1];
 
     boolean isStatic;
+    boolean isInitMethod = false;
     if (isClassMethod())
       {
 	if (outer instanceof ClassExp)
 	  {
 	    ClassExp cl = (ClassExp) outer;
-	    isStatic = cl.isMakingClassPair() && closureEnvType != null; 
+	    isStatic = cl.isMakingClassPair() && closureEnvType != null;
+	    if (this == cl.initMethod)
+	      isInitMethod = true;
 	  }
 	else
 	  isStatic = false;
@@ -792,7 +795,14 @@ public class LambdaExp extends ScopeExp
       isStatic = true;
     int mflags = (isStatic ? Access.STATIC : 0)
       + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
-
+    if (isInitMethod)
+      {
+	// Make it provide to prevent inherited $finit$ from overriding
+	// the current one - and thus preventing its execution.
+	mflags = (mflags & ~(Access.PUBLIC|Access.PROTECTED))+Access.PRIVATE;
+      }
+    if (ctype.isInterface())
+      mflags |= Access.ABSTRACT;
     if (! isStatic)
       closureEnv = declareThis(ctype);
 
@@ -824,7 +834,7 @@ public class LambdaExp extends ScopeExp
 	  atypes[0] = closureEnvType;
 	Declaration var = firstDecl();
 	for (int itype = 0; itype < plainArgs; var = var.nextDecl())
-	  atypes[extraArg + itype++] = var.getType();
+	  atypes[extraArg + itype++] = var.getType().getImplementationType();
 	if (plainArgs < numArgs)
 	  {	
 	    nameBuf.append("$V");

@@ -74,7 +74,8 @@ public class Compilation
   public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
-  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType");
+  static public ClassType typeObjectType = ClassType.make("gnu.bytecode.ObjectType");
+  static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
   static public ClassType typeInterpreter
@@ -680,7 +681,7 @@ public class Compilation
    */
   public String generateClassName (String hint)
   {
-    hint = mangleName (hint);
+    hint = mangleName(hint, true);
     if (mainClass != null)
       hint = mainClass.getName() + '$' + hint;
     else if (classPrefix != null)
@@ -756,7 +757,7 @@ public class Compilation
 	classes = new_classes;
       }
     classes[numClasses++] = new_class;
-    new_class.access_flags |= Access.PUBLIC;
+    new_class.access_flags |= Access.PUBLIC|Access.SUPER;
   }
 
   ClassType allocClass (LambdaExp lexp)
@@ -848,6 +849,17 @@ public class Compilation
       {
 	lexp.initChain = init.next;
 	init.emit(this);
+      }
+
+    if (lexp instanceof ClassExp)
+      {
+	ClassExp cexp = (ClassExp) lexp;
+	LambdaExp initMethod = cexp.initMethod;
+	if (initMethod != null)
+	  {
+	    code.emitPushThis();
+	    code.emitInvoke(initMethod.getMainMethod());
+	  }
       }
 
     code.emitReturn();
@@ -977,6 +989,7 @@ public class Compilation
 	    if (needsThis > 0)
 	      code.emitPushThis();
 
+	    Declaration var = source.firstDecl();
 	    for (int k = 0; k < singleArgs;  k++)
 	      {
 		if (counter != null && k >= source.min_args)
@@ -998,10 +1011,11 @@ public class Compilation
 		  }
 		else // apply'i method
 		  code.emitLoad(code.getArg(k + 2));
-		Type ptype = primArgTypes[k];
+		Type ptype = var.getType();
 		if (ptype != Type.pointer_type)
 		  CheckedTarget.emitCheckedCoerce(this, source,
 						  k, ptype);
+		var = var.nextDecl();
 	      }
 
 	    if (varArgs)

@@ -163,12 +163,21 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 		       Interpreter interpreter)
   {
     Type[] parameterTypes = new Type[parameterClasses.length];
+    Type[] implParameterTypes = new Type[parameterClasses.length];
     for (int i = parameterClasses.length;  --i >= 0; )
-      parameterTypes[i] = interpreter.getTypeFor(parameterClasses[i]);
+      {
+	Type ptype = interpreter.getTypeFor(parameterClasses[i]);
+	parameterTypes[i] = ptype;
+	implParameterTypes[i] = ptype.getImplementationType();
+      }
     Type returnType = interpreter.getTypeFor(method.getReturnType());
+    Type implReturnType = returnType.getImplementationType();
     ClassType thisType = (ClassType) interpreter.getTypeFor(thisClass);
-    init(thisType.addMethod(method.getName(), method.getModifiers(),
-			    parameterTypes, returnType));
+    Method meth = thisType.addMethod(method.getName(), method.getModifiers(),
+				     implParameterTypes, implReturnType);
+    init(meth);
+    argTypes = parameterTypes;
+    retType = op_code == 183 ? meth.getDeclaringClass() : returnType;
   }
 
   public PrimProcedure(java.lang.reflect.Method method,
@@ -284,7 +293,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
    * @param args arguments to evaluate and push.
    * @param thisType If we are calling a non-static function,
    *   then args[0] is the receiver and thisType is its expected class.
-   *   If thisType==Type.void_type, ignore argType[0].
+   *   If thisType==Type.void_type, ignore argTypes[0].  (It is used to to
+   *   pass a link to a closure environment, which was pushed by our caller.)
    *   If this_type==null, no special handling of args[0] or argTypes[0].
    */
   public static void compileArgs(Expression[] args,
@@ -300,6 +310,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     boolean is_static = thisType == null || skipArg != 0;
     int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
       : args.length;
+    Declaration argDecl = source == null ? null : source.firstDecl();
     for (int i = 0; ; ++i)
       {
         if (variable && i == fix_arg_count)
@@ -322,7 +333,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
             code.emitPushInt(i - fix_arg_count);
           }
         else
-          arg_type = is_static ? argTypes[i + skipArg]
+          arg_type = argDecl != null && (is_static || i > 0) ? argDecl.getType()
+	    : is_static ? argTypes[i + skipArg]
             : i==0 ? thisType
             : argTypes[i-1];
 	Target target =
@@ -331,6 +343,8 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	args[i].compileNotePosition(comp, target);
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
+	if (argDecl != null && (is_static || i > 0))
+	  argDecl = argDecl.nextDecl();
       }
   }
 

@@ -33,11 +33,6 @@ public class ObjectExp extends ClassExp
       }
     code.emitInvokeSpecial(init);
 
-    if (initMethod != null)
-      {
-	code.emitDup(1);
-	code.emitInvokeVirtual(initMethod.getMainMethod());
-      }
     target.compileFromStack(comp, getCompiledClassType(comp));
   }
 

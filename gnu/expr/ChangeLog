@@ -1,3 +1,39 @@
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* ClassExp.java (getCompiledClassType):  Map "<TNAME>" to "TNAME" here.
+	(declareParts):  Make static field if specified.
+	If making class pair, get method types from decl.
+	Don't add Method for initMethod to instance method of pair.
+	(getImplMethods):  New method to find implementation methods.
+	(compile):  Use getImplMethods
+	
+	* PairClassType.java (reflectInstanceClass):  Renamed to instanceType.
+	* ClassExp.java (setTypes): Update accordingly.
+
+	* Compilation.java (typeObjectType):  New field.
+	(generateClassName):  Do reversible name mangling.
+	(generateConstructor):  If a ClassExp, call initMethod.
+	* ObjectExp.java (compile):  Don't call initMethod here.
+
+	Be more careful distingusihing source types (such as LispPrimType)
+	and implementation types (such as PrimType) e.g. in conversions.
+	* LambdaExp.java (addMethodFor):  Use implementation type when
+	getting a Method.	
+	* PrimProcedure.java (<init>):  Likewise, but used source types
+	to set this.argTypes and this.retType.
+	(compileArgs):  Use type from source, rather than method's type.
+	* Compilation.java (generateApplyMethods):  Likewise.
+	
+	* LambdaExp.java (addMethodFor):  If a ClassExp's initMethod, then
+	set the PRIVATE flag to prevent bad overrides.
+
+	* Compilation.java (addClass):  Set SUPER flag.
+
+	* FindCapturedVars.java (capture):  If decl IS_CONSTANT, do nothing.
+	
+	* SetExp.java (compile):  If a declaration is a class slot
+	but without an actual field, look for and call a "set" method.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java:  Major re-write, to handle define-class, first-class

@@ -67,7 +67,7 @@ CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
 JAVAC = javac
 JCFLAGS = -g
 
-javadir=$(prefix)/java/$(subdir)
+javadir=$(datadir)/java/$(subdir)
 
 OBJ=\
   Numeric.class \

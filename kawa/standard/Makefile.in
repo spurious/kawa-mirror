@@ -66,7 +66,7 @@ CLASSPATH_ENV = CLASSPATH=../..:$(srcdir)/../..:$$CLASSPATH
 JAVAC = javac
 JCFLAGS = -g
 
-javadir=$(prefix)/java/$(subdir)
+javadir=$(datadir)/java/$(subdir)
 
 OBJ=\
 set_b.class \

@@ -13,7 +13,7 @@ JCFLAGS = -g
 .java.class:
 	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
 
-javadir=$(prefix)/java/$(subdir)
+javadir=$(datadir)/java/$(subdir)
 
 
 OBJ=\

@@ -33,6 +33,8 @@ public class CompoundFormat extends ReportFormat
 	    if (start < 0)
 	      return start;
 	  }
+	else if (start >= args.length)
+	  dst.write("#<missing format argument>");
 	else
 	  {
 	    StringBuffer sbuf = new StringBuffer();

@@ -79,7 +79,14 @@ public class IntegerFormat extends ReportFormat
     boolean padRight = (flags & PAD_RIGHT) != 0;
     boolean padInternal = padChar == '0';
     if (args != null)
-      arg = args[start];
+      {
+	if (start >= args.length)
+	  {
+	    dst.write("#<missing format argument>");
+	    return start;
+	  }
+	arg = args[start];
+      }
     String sarg = convertToIntegerString(arg, base);
     if (sarg != null)
       {

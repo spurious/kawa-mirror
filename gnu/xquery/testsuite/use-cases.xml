@@ -1,16 +1,6 @@
 <testsuite>
 
 <test>
-<query>4+5</query>
-<expect>9</expect>
-</test>
-
-<test>
-<query><![CDATA[<a>{4+5}</a>]]></query>
-<expect><a>9</a></expect>
-</test>
-
-<test>
 <ident>Use Case "XMP": Experiences and Exemplars: Q1</ident>
 
 <description>List books published by Addison-Wesley after 1991,
@@ -84,7 +74,6 @@
 </expect>
 </test>
 
-
 <test>
 <ident>Use Case "XMP": Experiences and Exemplars: Q3</ident>
 <description>For each book in the bibliography, list the title and
@@ -124,6 +113,289 @@
       <title>The Economics of Technology and Content for Digital TV</title>
     </result>
   </results>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "XMP": Experiences and Exemplars: Q5</ident>
+<description>For each book found at both bn.com and amazon.com, list
+the title of the book and its price from each source.</description>
+<NOTE>Q5 kludged text() to use string() FIXME</NOTE>
+<query><![CDATA[
+<books-with-prices>
+{
+    for $b in document("bib.xml")//book,
+        $a in document("reviews.xml")//entry
+    where $b/title = $a/title
+    return
+        <book-with-prices>
+{ $b/title }
+            <price-amazon>{ string($a/price) }</price-amazon>
+<price-bn>{ string($b/price) }</price-bn>
+</book-with-prices>
+}
+</books-with-prices>
+]]>
+</query>
+<expect>
+<books-with-prices>
+<book-with-prices>
+<title>TCP/IP Illustrated</title>
+<price-amazon>65.95</price-amazon>
+<price-bn> 65.95</price-bn>
+</book-with-prices>
+<book-with-prices>
+<title>Advanced Programming in the Unix environment</title>
+<price-amazon>65.95</price-amazon>
+<price-bn>65.95</price-bn>
+</book-with-prices>
+<book-with-prices>
+<title>Data on the Web</title>
+<price-amazon>34.95</price-amazon>
+<price-bn> 39.95</price-bn>
+</book-with-prices>
+</books-with-prices> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q2</ident>
+<description><!CDATA[[Prepare a (flat) figure list for Book1, listing all the
+figures and their titles. Preserve the original attributes of each
+<figure>; element, if any.]]></description>
+<NOTE>had to remove spaces between 'figure' and attribute expressions</NOTE>
+<query>
+let $res :=
+<figlist>
+{
+    for $f in document("book1.xml")//figure
+    return
+        <figure>{ $f/@* }
+            { $f/title }
+        </figure>
+}
+</figlist>
+return $res
+</query>
+<expect>
+<figlist>
+<figure  height="400" width="400">
+<title>Traditional client/server architecture</title>
+</figure>
+<figure  height="200" width="500">
+<title>Graph representations of structures</title>
+</figure>
+<figure  height="250" width ="400">
+<title>Examples of Relations</title>
+</figure>
+</figlist> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q3</ident>
+<description>How many sections are in Book1,
+and how many figures?</description>
+<query>
+<section_count>{ count(document("book1.xml")//section) }</section_count>, 
+<figure_count>{ count(document("book1.xml")//figure) }</figure_count>
+</query>
+<expect>
+<section_count>7</section_count>
+<figure_count>3</figure_count> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q4</ident>
+<description>How many top-level sections are in Book1?</description>
+<query>
+<top_section_count>
+{ 
+   count(document("book1.xml")/book/section) 
+ }
+</top_section_count>
+</query>
+<expect>
+<top_section_count>2</top_section_count> 
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q5</ident>
+<NOTE>replaced text() by string</NOTE>
+<description>
+Make a flat list of the section elements in Book1. In place of its
+original attributes, each section element should have two attributes,
+containing the title of the section and the number of figures
+immediately contained in the section.</description>
+<query><![CDATA[
+<section_list>
+{
+    for $s in document("book1.xml")//section
+    let $f := $s/figure 
+    return
+        <section title={ string($s/title) } figcount={ count($f) }/>
+}
+</section_list> ]]>
+</query>
+<NOTE> the expcted out in the use-cases document is in the wrong order</NOTE>
+<expect>
+<section_list>
+<section title="Introduction" figcount="0"/>
+<section title="Audience" figcount="0"/>
+<section title="Web Data and the Two Cultures" figcount="1"/>
+<section title="A Syntax For Data" figcount="1"/>
+<section title="Base Types" figcount="0"/>
+<section title="Representing Relational Databases" figcount="1"/>
+<section title="Representing Object Databases" figcount="0"/>
+</section_list>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "TREE": Queries that preserve hierarchy: Q6</ident>
+<description>Make a nested list of the section elements in Book1,
+preserving their original attributes and hierarchy. Inside each
+section element, include the title of the section and an element that
+includes the number of figures immediately contained in the section.
+</description>
+<NOTE>removed newline between 'section' and attribute constructor</NOTE>
+<NOTE>removed 'element' in parameter spec and 'returns element'</NOTE>
+<query><![CDATA[
+define function section_summary($s)
+{
+    <section>{ $s/@* }
+        { $s/title }
+        <figcount>{ count($s/figure) }</figcount>
+{
+            for $ss in $s/section
+            return section_summary($ss)
+        }
+    </section>
+}
+
+<toc>
+{
+    for $s in document("book1.xml")//section
+    return section_summary($s)
+}
+</toc> ]]>
+</query>
+<NOTE>the use-cases document is missing the attributes</NOTE>
+<expect>
+  <toc>
+    <section id="intro" difficulty="easy">
+      <title>Introduction</title>
+      <figcount>0</figcount>
+      <section>
+        <title>Audience</title>
+        <figcount>0</figcount>
+      </section>
+      <section>
+        <title>Web Data and the Two Cultures</title>
+        <figcount>1</figcount>
+      </section>
+    </section>
+    <section>
+      <title>Audience</title>
+      <figcount>0</figcount>
+    </section>
+    <section>
+      <title>Web Data and the Two Cultures</title>
+      <figcount>1</figcount>
+    </section>
+    <section id="syntax" difficulty="medium">
+      <title>A Syntax For Data</title>
+      <figcount>1</figcount>
+      <section>
+        <title>Base Types</title>
+        <figcount>0</figcount>
+      </section>
+      <section>
+        <title>Representing Relational Databases</title>
+        <figcount>1</figcount>
+      </section>
+      <section>
+        <title>Representing Object Databases</title>
+        <figcount>0</figcount>
+      </section>
+    </section>
+    <section>
+      <title>Base Types</title>
+      <figcount>0</figcount>
+    </section>
+    <section>
+      <title>Representing Relational Databases</title>
+      <figcount>1</figcount>
+    </section>
+    <section>
+      <title>Representing Object Databases</title>
+      <figcount>0</figcount>
+    </section>
+  </toc>
+</expect>
+</test>
+
+<test>
+<ident>Use Case "PARTS" - Recursive Parts Explosion: Q1 inline data</ident>
+<NOTE>Instead of using an external parts-data.xml file, dine $Parts-line</NOTE>
+<NOTE>use ...//part where COND instead of ...//[COND]</NOTE>
+<NOTE>removed parameter and return type specifie</NOTE>
+<query><![CDATA[
+
+define function one_level ($p, $parts-data)
+{
+    <part partid={ $p/@partid } 
+          name={ $p/@name } >
+{
+            for $s in $parts-data//part
+            where $s/@partof = $p/@partid
+            return one_level($s, $parts-data)
+        }
+    </part>
+}
+
+let $parts-list :=
+<partlist>
+<part partid="0" name="car"/>
+<part partid="1" partof="0" name="engine"/>
+<part partid="2" partof="0" name="door"/>
+<part partid="3" partof="1" name="piston"/>
+<part partid="4" partof="2" name="window"/>
+<part partid="5" partof="2" name="lock"/>
+<part partid="10" name="skateboard"/>
+<part partid="11" partof="10" name="board"/>
+<part partid="12" partof="10" name="wheel"/>
+<part partid="20" name="canoe"/>
+</partlist>
+return
+<parttree>
+{
+    for $p in $parts-list//part where empty($p/@partof)
+    return one_level($p, $parts-list)
+  }
+</parttree>]]>
+</query>
+<NOTE>Need to used CDATA and unabbreviated end tags</NOTE>
+<expect>
+<![CDATA[
+<parttree>
+<part partid="0" name="car">
+<part partid="1" name="engine">
+<part partid="3" name="piston"></part>
+</part>
+<part partid="2" name="door">
+<part partid="4" name="window"></part>
+<part partid="5" name="lock"></part>
+</part>
+</part>
+<part partid="10" name="skateboard">
+<part partid="11" name="board"></part>
+<part partid="12" name="wheel"></part>
+</part>
+<part partid="20" name="canoe"></part>
+</parttree>]]>
 </expect>
 </test>
 

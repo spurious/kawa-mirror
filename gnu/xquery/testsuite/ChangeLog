@@ -1,3 +1,9 @@
+2002-02-05  Per Bothner  <per@bothner.com>
+
+	* book1.xml.in:  New datafile for W3C use-cases.
+	* reviews.xml.in:  New datafile for W3C use-cases.
+	* use-cases.xml:  Add 7 new tests from W3C use-cases.
+
 2002-01-29  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (printSummary):  New method.

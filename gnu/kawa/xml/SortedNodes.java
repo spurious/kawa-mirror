@@ -263,11 +263,11 @@ public class SortedNodes extends Values
   void startFragment ()
   {
     curFragment = new NodeTree();
+    writePosition(curFragment, 0);
   }
 
   void finishFragment ()
   {
-    writePosition(curFragment, 0);
     curFragment = null;
   }
 

@@ -21,19 +21,19 @@ public class cond extends Syntax implements Printable
     if (! (clauses.car instanceof Pair))
       return interp.syntaxError ("mis-formed cond clause");
     Object if_part = ((Pair)clauses.car).car;
-    Object then_part = ((Pair)clauses.car).cdrr;
+    Object then_part = ((Pair)clauses.car).cdr;
 
     if (if_part instanceof Symbol
 	&& ((Symbol)if_part).toString().equalsIgnoreCase("else"))
       {
-	if (else_part != null)
+	if (else_part != Interpreter.nullObject)
 	  return interp.syntaxError ("else clause must be last clause of cond");
 	return interp.rewrite_body (then_part);
       }
 
-    if (then_part == null)
+    if (then_part == Interpreter.nullObject)
       {
-	if (else_part == null)
+	if (else_part == Interpreter.nullObject)
 	  return interp.rewrite (if_part);
 	// later:  use code from the implementation of or.  FIXME
 	// I.e. handle this case as:  (or if_part (cond else_part))
@@ -41,9 +41,10 @@ public class cond extends Syntax implements Printable
       }
 
     // Note we use recursion to handle the remaining clauses.
-    return (interp.rewrite (if_part),
-	    interp.rewrite (then_part),
-	    rewrite (else_part, interp));
+    return new IfExp (interp.rewrite (if_part),
+		      interp.rewrite_body (then_part),
+		      else_part == Interpreter.nullObject ? null
+		      : rewrite (else_part, interp));
   }
 
   public void print(java.io.PrintStream ps)

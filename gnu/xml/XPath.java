@@ -1241,7 +1241,7 @@ public class XPath implements XPathConstants
     System.out.println("}");
 
     TreeList doc = new TreeList();
-    XMLParser xmlparser = new XMLParser(new java.net.URL(args[1]),
+    XMLParser xmlparser = new XMLParserChar(new java.net.URL(args[1]),
 					new ParsedXMLToConsumer(doc));
     xmlparser.parse();
 

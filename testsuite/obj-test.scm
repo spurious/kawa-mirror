@@ -1,4 +1,4 @@
-(test-init "Objects" 63)
+(test-init "Objects" 65)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -207,3 +207,9 @@
 (set! (field obj6 'e) (- (field obj6 'e) 10))
 (test 29 'obj6-e (slot-ref obj6 'e))
 (test 156 'obj6-f (invoke obj6 'f 7))
+
+(require <MyFunc>)
+(test '(1 2 3) my-func-1 2 3)
+(require <MyModule>)
+(test '(#t 5 6) my-func-t 5 6)
+

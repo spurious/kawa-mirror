@@ -1,3 +1,16 @@
+2002-02-15  Per Bothner  <per@bothner.com>
+
+	* HelloCgiK.out:  Renamed to HelloCgiK.expected.  Needed because
+	the suffix .out confuses make when doing make dist.
+	* HelloCgiS.out:  Likewise renamed to HelloCgiS.expected.
+	* MyFunc.java:  New simple function definition test.
+	* MyModule.java:  New simple module test.
+	* obj-test.scm:  Add tests using MyFunc and MyModule.
+	* HelloCgiX.xql, HelloCgiX.expected:  New cgi-servlet/XQuery test.
+	* Makefile.am:  Update as needed.
+
+	* HelloCgiK.krl, HelloCgiK.expected:  Fix inverted logic.
+
 2002-02-14  Per Bothner  <per@bothner.com>
 
 	* HelloCgiK.krl, HelloCgiK.out:  New cgi-servlet/KRL test.

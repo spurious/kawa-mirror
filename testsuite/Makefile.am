@@ -7,7 +7,7 @@ KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 KAWATEST = $(KAWA) -e '(load "testing.zip")' $(OPTIONS)
 
 if ENABLE_SERVLET
-SERVLET_TESTS = check-HelloCgiS check-HelloCgiK
+SERVLET_TESTS = check-HelloCgiS check-HelloCgiK check-HelloCgiX
 endif
 
 all:
@@ -43,7 +43,7 @@ check-mac: testing.zip
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
-check-obj: testing.zip module2.class classes2.class
+check-obj: testing.zip module2.class classes2.class MyFunc.class MyModule.class
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
@@ -83,23 +83,43 @@ HelloCgiK.class: $(srcdir)/HelloCgiK.krl
 	$(KAWA) --servlet --krl -C $(srcdir)/HelloCgiK.krl
 
 HelloCgiK:
-	ln -s ../bin/cgi-servlet HelloCgiK
+	$(LN_S) ../bin/cgi-servlet HelloCgiK
 
 check-HelloCgiK: HelloCgiK.class HelloCgiK
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiK SERVER_NAME=localhost \
 	  KAWALIB=$(KAWALIB) ./HelloCgiK >tmp.out
-	@if diff -b $(srcdir)/HelloCgiK.out tmp.out; then echo '# HelloCgiK test passes'; else echo FAIL HelloCgiK test; fi
+	@if diff -b $(srcdir)/HelloCgiK.expected tmp.out; \
+	  then echo '# HelloCgiK test passes'; \
+	  else echo FAIL HelloCgiK test; fi
 
 HelloCgiS.class: $(srcdir)/HelloCgiS.scm
 	$(KAWA) --servlet --output-format xml -C $(srcdir)/HelloCgiS.scm
 
 HelloCgiS:
-	ln -s ../bin/cgi-servlet HelloCgiS
+	$(LN_S) ../bin/cgi-servlet HelloCgiS
 
 check-HelloCgiS: HelloCgiS.class HelloCgiS
 	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiS SERVER_NAME=localhost \
 	  KAWALIB=$(KAWALIB) ./HelloCgiS >tmp.out
-	@if diff -b $(srcdir)/HelloCgiS.out tmp.out; then echo '# HelloCgiS test passes'; else echo FAIL HelloCgiS test; fi
+	@if diff -b $(srcdir)/HelloCgiS.expected tmp.out; \
+	  then echo '# HelloCgiS test passes'; \
+	  else echo FAIL HelloCgiS test; fi
+
+HelloCgiX.class: $(srcdir)/HelloCgiX.xql
+	$(KAWA) --servlet -C $(srcdir)/HelloCgiX.xql
+
+HelloCgiX:
+	$(LN_S) ../bin/cgi-servlet HelloCgiX
+
+check-HelloCgiX: HelloCgiX.class HelloCgiX
+	REQUEST_METHOD=GET SCRIPT_NAME=HelloCgiX SERVER_NAME=localhost \
+	  PATH_TRANSLATED=./HelloCgiX KAWALIB=$(KAWALIB) ./HelloCgiX >tmp.out
+	@if diff -b $(srcdir)/HelloCgiX.expected tmp.out; \
+	  then echo '# HelloCgiX test passes'; \
+	  else echo FAIL HelloCgiX test; fi
+
+MyFunc.class MyModule.class: $(srcdir)/MyFunc.java $(srcdir)/MyModule.java
+	CLASSPATH=..:. $(JAVAC) -g -d . $?
 
 APPLETVIEWER = appletviewer
 
@@ -109,8 +129,9 @@ check-scribble: scribble.class
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm \
+  MyFunc.java MyModule.java \
   misc-test.scm polytype.scm formatst.scm scribble.scm \
-  module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm
+  module1.scm module2.scm HelloCgiK.krl HelloCgiS.scm HelloCgiX.xql
 CLEANFILES = tmp? *.log testing.zip *.class HelloCgiK HelloCgiS
-EXTRA_DIST = $(SOURCES) ppfile.out HelloCgiK.out HelloCgiS.out
-
+EXTRA_DIST = ppfile.out scribble.html.in \
+  HelloCgiK.expected HelloCgiS.expected HelloCgiX.expected

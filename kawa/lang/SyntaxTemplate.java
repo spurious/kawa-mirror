@@ -197,7 +197,8 @@ public class SyntaxTemplate implements Externalizable
   }
 
   /** Recursively translate a syntax-rule template to a template program.
-   * @param template the template from the syntax-rule
+   * @param form the template from the syntax-rule
+   * @param syntax if non-null, the closest surrounding <code>SyntaxForm</code>
    * @param template_program (output) the translated template
    * @param nesting the depth of ... we are inside
    * @param literals_vector (output) the literal data in the template

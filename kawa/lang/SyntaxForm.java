@@ -42,8 +42,8 @@ public class SyntaxForm implements Externalizable
   }
 
   /** Make a SyntaxForm object with the same contextual information as this.
-   * @param the form used for the new syntax value.
-   * Corresponds to the <code>datum->syntax-object</code> function.
+   * @param form which used for the new syntax value.
+   * Corresponds to the <code>datum-&gt;syntax-object</code> function.
    */
   public SyntaxForm fromDatum (Object form)
   {

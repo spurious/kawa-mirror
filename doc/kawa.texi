@@ -1529,8 +1529,7 @@ form, as it is a more declarative interface.
 Defines @var{name} as a compound procedure consisting of the
 specified @var{method}s, with the associated properties.
 Applying @var{name} select the "best" @var{method}, and applies that.
-(However, the current implementation of selecting the "best" method
-is not reliable if there is more than one @var{method} )
+See the following section on generic procedures.
 
 For example, the standard @code{vector-ref} procedure specifies
 one method, as well as the @code{setter} property:
@@ -1549,7 +1548,16 @@ A @dfn{generic procedure} is a collection of @dfn{method procedures}.
 the terms are related.)
 You can call a generic procedure, which selects the "closest
 match" among the component method procedures:  I.e. the most specific
-method procedure that is applicable give the actual arguments.
+method procedure that is applicable given the actual arguments.
+
+@quotation
+@strong{Note:} The current implementation of selecting the "best" method
+is not reliable if there is more than one method.
+It can select depending on argument count, and it can select between
+primitive Java methods.  However, it cannot yet do what you probably
+hope for: select between different Scheme procedures based on
+parameter types.
+@end quotation
 
 @defun make-procedure [keyword: value]... method...
 Create a generic procedure given the specific methods.
@@ -5287,8 +5295,14 @@ send mail to the address following @code{mailto:} in the
 Messages to the mailing list are now
 @uref{http://sources.redhat.com/ml/kawa/, archived}.
 
-There is a separate mailing list for @uref{http://www.JEmacs.net,JEmacs}.
-See the @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,information page}.
+There are separate mailing lists for
+@uref{http://mail.gnu.org/mailman/listinfo/qexo-general, Qexo}
+and @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,JEmacs}.
+
+Bugs should now preferably be reported using the Bugzilla database
+at @uref{http://savannah.gnu.org/bugs/?group=kawa}.
+Submit a new bug at:
+@uref{http://savannah.gnu.org/bugs/?func=addbug&group=kawa}.
 
 @node Support, Projects, Mailing lists, Top
 @chapter Technical Support for Kawa

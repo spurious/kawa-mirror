@@ -1,3 +1,9 @@
+2003-10-31  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Procedures): Warn about limitations of generic methods.
+	* kawa.texi (Mailing lists}  Note Qexo-general list.
+	Add Bugzilla links.
+
 2003-10-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Compilation options):  New node.

@@ -1,3 +1,8 @@
+2001-08-27  Per Bothner  <per@bothner.com>
+
+	* ModuleExp.java (evalModule):  Call CallContext's run method always.
+	Fixes bug reported by Patrick Barta <patr@welchlink.welch.jhu.edu>
+
 2001-08-24  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (getType0:  Don't call declareParts.

@@ -5,7 +5,8 @@ import javax.swing.text.*;
 import java.awt.*;
 
 public class Window extends javax.swing.JTextPane
-  implements java.awt.event.FocusListener
+implements java.awt.event.FocusListener,
+  javax.swing.event.ChangeListener
 {
   Modeline modeline;
   Frame frame;
@@ -13,6 +14,12 @@ public class Window extends javax.swing.JTextPane
   /** The panel that contains this window and the modeline. */
   JPanel panel;
   JScrollPane scrollPane;
+
+  /** Nominal height in pixels of a character, if non-zero. */
+  int charHeight;
+
+  /** Nominal width in pixels of a character, if non-zero. */
+  int charWidth;
 
   /** Create new Window.
    * @param buffer the Buffer containing the data.
@@ -77,10 +84,28 @@ public class Window extends javax.swing.JTextPane
       }
   }
 
+  public void activateRegion ()
+  {
+    System.err.println("(activateRegions)");
+    Caret caret = getCaret();
+    caret.setDot(buffer.markMarker.getOffset());
+    caret.moveDot(buffer.getDot());
+  }
+
   public static Window getSelected()
   {
     return Frame.selectedFrame == null ? null
       : Frame.selectedFrame.selectedWindow;
+  }
+
+  private void select(Caret caret)
+  {
+    // Change buffer's pointMarker so it follows this Window's Caret.
+    buffer.curPosition = caret;
+    if (buffer.pointMarker.position >= 0)
+      buffer.content.releasePosition(buffer.pointMarker.position);
+    buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
+    caret.addChangeListener(this);
   }
 
   public void setSelected()
@@ -94,11 +119,7 @@ public class Window extends javax.swing.JTextPane
     Frame.selectedFrame = frame;
     Buffer.setCurrent(buffer);
 
-    // Change buffer's pointMarker so it follows this Window's Caret.
-    buffer.curPosition = getCaret();
-    if (buffer.pointMarker.position >= 0)
-      buffer.content.releasePosition(buffer.pointMarker.position);
-    buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
+    select(getCaret());
   }
 
   public static void setSelected(Window window)
@@ -114,7 +135,23 @@ public class Window extends javax.swing.JTextPane
     int index = buffer.content.createPosition(point, kind);
     buffer.pointMarker.position = index;
     buffer.curPosition = null;
+    getCaret().removeChangeListener(this);
     // ?? selected = null;
+  }
+
+  public void stateChanged(javax.swing.event.ChangeEvent e)
+  {
+    Object source = e.getSource();
+    if (source instanceof Caret && buffer != null)
+      {
+	Caret caret = (Caret) source;
+	int mark = caret.getMark();
+	int dot = caret.getDot();
+	if (mark != dot)
+	  {
+	    buffer.markMarker.set(buffer, mark);
+	  }
+      }
   }
 
   public Frame getFrame()
@@ -143,10 +180,7 @@ public class Window extends javax.swing.JTextPane
 	// Change buffer's pointMarker so it follows this Window's Caret.
 	Caret caret = getCaret();
 	caret.setDot(buffer.getDot());
-	buffer.curPosition = caret;
-	if (buffer.pointMarker.position >= 0)
-	  buffer.content.releasePosition(buffer.pointMarker.position);
-	buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
+	select(caret);
       }
     this.buffer = buffer;
   }
@@ -373,14 +407,26 @@ public class Window extends javax.swing.JTextPane
   {
   }
 
+  void getCharSize()
+  {
+    java.awt.Font defaultFont = buffer.getFont(buffer.defaultStyle);
+    java.awt.FontMetrics fm = getGraphics().getFontMetrics(defaultFont);
+    charHeight = fm.getHeight();
+    charWidth = fm.charWidth('m');
+    }
+
   public int getHeightInLines()
   {
-    return getHeight() / buffer.charHeight;
+    if (charHeight == 0)
+      getCharSize();
+    return getHeight() / charHeight;
   }
 
   public int getWidthInColumns()
   {
-    return getWidth() / buffer.charWidth;
+    if (charWidth == 0)
+      getCharSize();
+    return getWidth() / charWidth;
   }
 
   public String toString()

@@ -34,14 +34,9 @@ public class Buffer extends DefaultStyledDocument
   }
 
   Marker pointMarker;
+  Marker markMarker;
 
   Caret curPosition = null;
-
-  /** Nominal height in pixels of a character. */
-  int charHeight;
-
-  /** Nominal width in pixels of a character. */
-  int charWidth;
 
   BufferContent content;
   StyledDocument modelineDocument;
@@ -173,12 +168,7 @@ public class Buffer extends DefaultStyledDocument
     this.content = content;
 
     pointMarker = new Marker(this, 0, BufferContent.AFTER_MARK_KIND);
-
-    java.awt.Font defaultFont = getFont(defaultStyle);
-    java.awt.FontMetrics fm
-      = java.awt.Toolkit.getDefaultToolkit().getFontMetrics(defaultFont);
-    charHeight = fm.getHeight();
-    charWidth = fm.charWidth('m');
+    markMarker = new Marker();
 
     modelineDocument
       = new javax.swing.text.DefaultStyledDocument(new javax.swing.text.StringContent(), styles);
@@ -187,6 +177,11 @@ public class Buffer extends DefaultStyledDocument
     // Instead only set it if we insert Hebrew/Arabic text?  FIXME.
     putProperty("i18n", Boolean.TRUE);
     redrawModeline();
+  }
+
+  public int checkMark()
+  {
+    return markMarker.getOffset();
   }
 
   public static Buffer getCurrent()
@@ -305,6 +300,11 @@ public class Buffer extends DefaultStyledDocument
   public Marker getPointMarker (boolean share)
   {
     return share ? pointMarker : new Marker(pointMarker);
+  }
+
+  public Marker getMarkMarker (boolean force)
+  {
+    return markMarker;
   }
 
   /** Convert an Emacs position (Marker, Position, or 1-origin integer)

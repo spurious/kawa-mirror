@@ -88,6 +88,7 @@
      <include name="gnu/xml/QName.java"/>
      <include name="gnu/xml/XMLParser.java"/>
      <include name="gnu/xml/XMLParserByte.java"/>
+     <include name="gnu/kawa/xml/Focus.java"/>
      <include name="kawa/Version.java"/>
   </fileset>
   
@@ -322,6 +323,15 @@
            overwrite="${preprocess.overwrite}">
       <fileset dir="${src.dir}/gnu/mapping" />
       <mapper type="glob" from="*CallContext.java.in" to="*CallContext.java"/>
+      <filterset refid="filter-do-not-edit"/>
+      <filterset refid="filter-with-references-${with-references}"/>
+      <linestripperset refid="strip-with-references-${with-references}"/>
+    </xcopy>
+
+    <xcopy todir="${build.preprocessed}/gnu/kawa/xml" 
+           overwrite="${preprocess.overwrite}">
+      <fileset dir="${src.dir}/gnu/kawa/xml" />
+      <mapper type="glob" from="*Focus.java.in" to="*Focus.java"/>
       <filterset refid="filter-do-not-edit"/>
       <filterset refid="filter-with-references-${with-references}"/>
       <linestripperset refid="strip-with-references-${with-references}"/>

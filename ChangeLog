@@ -1,3 +1,7 @@
+2002-06-11  Per Bothner  <per@bothner.com>
+
+	* build.xml: Generate Focus.java from gnu/kawa/xml/Focus.java.in.
+
 2002-06-10  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java:  Define srfi-25 array functions.

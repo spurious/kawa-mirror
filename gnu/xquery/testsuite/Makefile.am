@@ -1,6 +1,6 @@
 include $(top_srcdir)/Make-rules
 
-KAWALIB = ../../..
+KAWALIB = $(top_builddir)
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../../../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
@@ -66,7 +66,7 @@ check-format-users:
 ./Mod2.class: mod2.xql
 	$(KAWA) -d ../../.. -C $<
 usemod.class: usemod.xql ./Mod1.class ./Mod2.class
-	$(KAWA) --main -C $<
+	CLASSPATH=$(KAWALIB) $(KAWA) --main -C $<
 check-mod: usemod.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) usemod >tmp-usemod
 	@if diff -b $(srcdir)/usemod.exp tmp-usemod; \

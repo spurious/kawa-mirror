@@ -1,3 +1,8 @@
+2003-12-21  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (usemod.class):  Specify CLASSPATH explicitly.
+	Otherwith we don't find Mod1 when configured --with-gcj.
+
 2003-11-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST):  Add new files.

@@ -28,3 +28,25 @@
 (test '(b) cdr '(a .(b))) 
 (test "foo" cdr '(a ."foo")) 
 (test 'a car '(a #||#)) 
+
+(define (try-vector-ref vec index)
+  (try-catch (vector-ref vec index)
+	     (ex <java.lang.IndexOutOfBoundsException>
+		 "Bad array index")))
+
+(test 3 try-vector-ref #(1 2 3) 2)
+(test "Bad array index" try-vector-ref #(1 2 3) 10)
+
+(define (test-catch)
+  (let* ((x 0)
+	 (y (catch 'key
+		   (lambda ()
+		     (set! x 2)
+		     (throw 'key 10)
+		     (set! x 1000))
+		   (lambda (key arg)
+		     (set! x (* x arg))
+		     (+ x 10)))))
+    (list x y)))
+
+(test '(20 30) test-catch)

@@ -537,7 +537,7 @@ public class Scheme extends LispInterpreter
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
       define_proc ("make-quantity", "kawa.standard.make_quantity");
       define_syntax ("define-unit", new kawa.standard.define_unit(false));
-      define_syntax ("define-namespace", new kawa.standard.define_namespace());
+      define_syntax ("define-namespace", "gnu.kawa.xml.DefineNamespace");
       define_syntax ("define-base-unit", new kawa.standard.define_unit(true));
 
       define_proc ("gentemp", "kawa.lib.syntax");

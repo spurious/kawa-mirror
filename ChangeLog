@@ -1,3 +1,9 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_namespace.java:  Moved to gnu/kawa/xml and
+	renamed to DefineNamespace.java.
+	* kawa/standard/Makefile,am, kawa/standard/Scheme.java: Update.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (initScheme):  Define current-error-port.

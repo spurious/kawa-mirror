@@ -59,7 +59,7 @@ logand.java logior.java logxor.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
 require.java module_extends.java module_implements.java module_name.java \
-module_static.java export.java define_unit.java define_namespace.java \
+module_static.java export.java define_unit.java \
 syntax_error.java \
 let.java \
 letrec.java \

@@ -1,4 +1,5 @@
 XQuery:
+* 'M to N' is now empty if M > N, following the November '03 draft.
 * New Java api for evaluating Java expression with a given context sequence
   (item, position, size).  See www.gnu.org/software/qexo/Running.html
 * Much improved namespace support.  Namespace attributes in a source

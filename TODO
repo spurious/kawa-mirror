@@ -1,11 +1,18 @@
-Optimize away append-values call in HelloCgiS.class.
+BEFORE 1.8
+* implement fn:reverse
+* Compilation: not implemented mustConvert restarg
+* XQuery distinguish qexo: kawa: fn: default function namespaces.
+* Implement/document external functions, variables.
+* Name mangling, document library modules.
+* Finish namespace handling: namespaces in constructed nodes,
+  fn:namespace-for-uri-prefix, get-in-scope-prefixes
+* XML pretty-printing?
+* Output formatting of empty arrays? (make-array (shape 0 0 0 3))
+
 Optimize NumberCompare further.
-For doc: AUTOMAKE_OPTIONS = cygnus
 document eval methods
 
-Static modules should not implement Runnable.  (Change ModuleBody)
-
-BEFORE KAWA 1.7?
+BEFORE KAWA 1.8?
 * SRFI-9 (define-record-type) constructurs should not use reflection.
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * Interpreter.getInterpreter should get current thread's.
@@ -183,6 +190,9 @@ Support warning, error, fatal.
 Parser accumulates list of syntax errors.
 When done, if errors or warnings, throw SyntaxErrors.
 Printing SyntaxError prints error log.
+
+Should print warnings in interactive mode, before evaluation.
+Awkward, because ModuleExp.evalModule is used.
 
 Make closure representation consistent with inner classes wrt
 use of Attributes (for possible improved debugging).

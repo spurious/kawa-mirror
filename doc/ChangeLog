@@ -1,3 +1,9 @@
+2000-08-18  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Update url for Kawa on Mac.
+	Note --with-swing flag.
+	Note invoke warning if unknown method.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Note sponsorship from Brainfood.

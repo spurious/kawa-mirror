@@ -214,7 +214,7 @@ from @url{http://java.sun.com/products/jdk/1.1/index.html/index.html}.
 @end ifclear
 
 If you want to run Kawa on a Macintosh, see
-@uref{http://home.earthlink.net/~athene/2/scheme/mackawa.html}.
+@uref{http://home.earthlink.net/%7Eathene/scheme/mackawa.html}.
 
 The program @code{java} is the Java interpreter.
 The program @code{javac} is the Java compiler,
@@ -312,6 +312,9 @@ adding the @samp{--enable-kawa-frontend} flag.  This will build the
 @samp{kawa} front-end program, which provides input-line editing
 and an input history.  You can get @samp{readline} from archives
 of GNU programs, including @uref{ftp://www.gnu.org/}.
+
+If you have Swing installed, and want to use JEmacs (Emacs in Java),
+also pass the @code{--with-swing} flag to @code{configure}.
 
 If you have installed Kawa before, make sure your @code{CLASSPATH}
 does not include old versions of Kawa, or other classes that may
@@ -2086,12 +2089,12 @@ Even if @var{body} returns abnormally (by throwing an exception),
 @end deffn
 
 @deffn Syntax try-catch body handler ...
-Evaluate @var{body}, in the conect of the given @var{handler-spec}s.
+Evaluate @var{body}, in the context of the given @var{handler} specifications.
 Each @var{handler} has the form:
 @example
 @var{var} @var{type} @var{exp} ...
 @end example
-If an exception is thrown in @var{body}, the first @var{handle-spec}
+If an exception is thrown in @var{body}, the first @var{handler}
 is selected such that the thrown exception is an instance of
 the @var{handler}'s @var{type}. If no @var{handler} is selected,
 the exception is propagated through the dynamic execution context
@@ -2889,6 +2892,15 @@ unless you have designed the classes rather strangely.  The
 details will be nailed down later, but the basic idea is that
 the compiler will "inline" the @code{invoke-static} call
 if it can pick a single "best" matching method.
+
+If the compiler cannot determine the method to call (assuming
+the method name is constant), the compiler has to generate code
+at run-time to find the correct method.  This is much slower,
+so the compiler will print a warning.  To avoid a waning, you can
+use a type declaration, or insert a cast:
+@example
+(invoke (as <java.util.Date> my-date) 'setDate cur-date)
+@end example
 @end defun
 
 @defun class-methods class name

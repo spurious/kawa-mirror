@@ -35,7 +35,7 @@ public class location extends Syntax implements Printable
 	    return new ApplyExp(tr.rewrite(proc), xargs);
 	  }
 	if (syntax instanceof Macro)
-	  obj = ((Macro) syntax).expand(pair.cdr, tr);
+	  obj = ((Macro) syntax).expand(pair, tr);
 	else
 	  return syntax.rewrite(pair.cdr, tr);
       }

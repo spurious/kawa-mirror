@@ -13,3 +13,8 @@
 (define (emacs:symbol-name (symbol <gnu.mapping.Binding>))
   ((primitive-static-method <gnu.elisp.ELisp> "getString" <object> (<gnu.mapping.Binding>))
    symbol))
+
+(define (boundp symbol)
+  ((primitive-static-method <gnu.elisp.Symbol> "isBound"
+                            <boolean> (<object>))
+   symbol))

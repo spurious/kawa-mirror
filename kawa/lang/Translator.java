@@ -51,8 +51,6 @@ public class Translator extends Object
       }
   }
 
-  private Syntax current_syntax;
-  private Object current_syntax_args;
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
   String current_filename;
   int current_line;
@@ -89,27 +87,27 @@ public class Translator extends Object
       return rewrite (car);
   }
 
+  Syntax currentSyntax;
+  public Syntax getCurrentSyntax() { return currentSyntax; }
+
   /**
    * Apply a Syntax object.
    * @param syntax the Syntax object whose rewrite method we call
-   * @param args the syntax arguments (the cdr of the syntax form)
+   * @param form the syntax form (including the macro name)
    * @return the re-written form as an Expression object
    */
-  Expression apply_rewrite (Syntax syntax, Object args)
+  Expression apply_rewrite (Syntax syntax, Pair form)
   {
-    Syntax save_syntax = syntax;
-    Object save_args = args;
-    current_syntax = syntax;
-    current_syntax_args = args;
     Expression exp = errorExp;
+    Syntax saveSyntax = currentSyntax;
+    currentSyntax = syntax;
     try
       {
-	exp = syntax.rewrite (args, this);
+	exp = syntax.rewriteForm(form, this);
       }
     finally
       {
-	current_syntax = save_syntax;
-	current_syntax_args = save_args;
+        currentSyntax = currentSyntax;
       }
     return exp;
   }
@@ -201,11 +199,33 @@ public class Translator extends Object
     if (func instanceof ReferenceExp)
       {
 	ref = (ReferenceExp) func;
-	if (ref.getBinding() == null)
+        Declaration decl = ref.getBinding();
+	if (decl != null)
+          {
+            Expression value = decl.getValue();
+            if (value instanceof QuoteExp)
+              {
+                proc = ((QuoteExp) value).getValue();
+                if (proc instanceof Syntax)
+                  return apply_rewrite ((Syntax) proc, p);
+              }
+          }
+        else
 	  {
 	    proc = getBinding(ref.getName());
 	    if (proc instanceof Syntax)
-	      return apply_rewrite ((Syntax) proc, cdr);
+	      return apply_rewrite ((Syntax) proc, p);
+            if (proc instanceof AutoloadProcedure)
+              {
+                try
+                  {
+                    proc = ((AutoloadProcedure) proc).getLoaded();
+                  }
+                catch (RuntimeException ex)
+                  {
+                    proc = null;
+                  }
+              }
 	    if (proc instanceof Inlineable)
 	      func = new QuoteExp(proc);
 	  }
@@ -319,7 +339,6 @@ public class Translator extends Object
       {
 	String name = (String) exp;
 	Object binding = current_decls.get (name);
-
 	// Hygenic macro expansion may bind a renamed (uninterned) symbol
 	// to the original symbol.  Here, use the original symbol.
 	if (binding != null && binding instanceof String)
@@ -347,7 +366,7 @@ public class Translator extends Object
 	int exp_line = pair.getLine ();
 	int exp_column = pair.getColumn ();
 	current_filename = exp_file;
-	current_line = exp_line;
+        current_line = exp_line;
 	current_column = exp_column;
 	if (exp == pair)
 	  result = rewrite_pair (pair);  // To avoid a cycle
@@ -394,9 +413,32 @@ public class Translator extends Object
 	      Pair st_pair = (Pair) st;
 	      Object op = st_pair.car;
 	      Syntax syntax = check_if_Syntax (op);
+
 	      if (syntax != null && syntax instanceof Macro)
 		{
-		  st = ((Macro) syntax).expand (st_pair.cdr, this);
+                  String save_filename = current_filename;
+                  int save_line = current_line;
+                  int save_column = current_column;
+                  Syntax saveSyntax = currentSyntax;
+                  try
+                    {
+                      if (st_pair instanceof PairWithPosition)
+                        {
+                          PairWithPosition ppair = (PairWithPosition) st_pair;
+                          current_filename = ppair.getFile ();
+                          current_line = ppair.getLine ();
+                          current_column = ppair.getColumn ();
+                        }
+                      currentSyntax = syntax;
+                      st = ((Macro) syntax).expand (st_pair, this);
+                    }
+                  finally
+                    {
+                      current_filename = save_filename;
+                      current_line = save_line;
+                      current_column = save_column;
+                      currentSyntax = saveSyntax;
+                    }
 		  continue;
 		}
 	      else if (syntax == Scheme.beginSyntax)

@@ -42,20 +42,17 @@
 
 ;;; These are only implemented for <real> arguments.
 (define (sin (x <real>))
-  ((primitive-constructor <gnu.math.DFloNum> (<double>))
-   ((primitive-static-method <java.lang.Math> "sin" <double> (<double>))
-    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-     x))))
+  (invoke-static <java.lang.Math> "sin" x))
+;                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+;                  x)))
 (define (cos (x <real>))
-  ((primitive-constructor <gnu.math.DFloNum> (<double>))
-   ((primitive-static-method <java.lang.Math> "cos" <double> (<double>))
-    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-     x))))
+  (invoke-static <java.lang.Math> "cos"
+                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+                  x)))
 (define (tan (x <real>))
-  ((primitive-constructor <gnu.math.DFloNum> (<double>))
-   ((primitive-static-method <java.lang.Math> "tan" <double> (<double>))
-    ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
-     x))))
+  (invoke-static <java.lang.Math> "tan"
+                 ((primitive-virtual-method <java.lang.Number> "doubleValue" <double> ())
+                  x)))
 
 (define (make-rectangular (x <real>) (y <real>))
   ((primitive-static-method <complex> "make" <complex> (<real> <real>))  x y))

@@ -111,7 +111,7 @@ logand.java logior.java logxor.java lognot.java logop.java \
 logbit_p.java logtest.java logcount.java \
 ashift.java bit_extract.java int_length.java \
 define.java \
-define_syntax.java \
+define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
 syntax_error.java \
 let.java \
 letrec.java \

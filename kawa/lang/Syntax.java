@@ -21,12 +21,41 @@ abstract public class Syntax extends Named implements Printable
    * @param tr the Translator that provides context
    * @return the re-written expression
    */
-  abstract public Expression rewrite (Object obj, Translator tr);
+  public Expression rewrite (Object obj, Translator tr)
+  {
+    throw new InternalError("rewrite method not defined");
+  }
+
+  public Expression rewriteForm (Pair form, Translator tr)
+  {
+    return rewrite(form.cdr, tr);
+  }
+
+  /*
+  public Expression apply(SyntaxForm form)
+  {
+    return rewriteForm((Pair) form.form, form.tr);
+  }
+
+  public Object apply1(Object arg)
+  {
+    SyntaxForm form;
+    try
+      {
+        form = (SyntaxForm) arg;
+      }
+    catch (ClassCastException ex)
+      {
+        throw WrongType.make(ex, this, 0);
+      }
+    return apply(form);
+  }
+  */
 
   public void print(java.io.PrintWriter ps)
   {
     ps.print("#<syntax ");
-    String name = this.name ();
+    String name = this.getName();
     if (name == null)
       ps.print ("<unnamed>");
     else

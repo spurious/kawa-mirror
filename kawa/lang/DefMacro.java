@@ -1,16 +1,35 @@
 package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.bytecode.*;
 
 public class DefMacro extends Macro
 {
+  Expression lexp;
   Procedure expander;
+
+  public static ClassType thisType;
+  static public Method makeMethod;
+
+  public static Method getMakeMethod()
+  {
+    if (thisType == null)
+      thisType = ClassType.make("kawa.lang.DefMacro");
+    if (makeMethod == null)
+      {
+        Type[] args = { Compilation.javaStringType, Compilation.typeProcedure };
+        makeMethod = thisType.addMethod("make", args,
+                                        thisType, Access.STATIC|Access.PUBLIC);
+      }
+    return makeMethod;
+  }
 
   public DefMacro (Procedure expander)
   {
     this.expander = expander;
   }
 
+  /*
   public DefMacro (String name, Procedure expander)
   {
     String sym = Symbol.make(name);
@@ -19,29 +38,46 @@ public class DefMacro extends Macro
     this.expander = expander;
     Environment.define_global(sym, this);
   }
+  */
 
-  public Object expand (Object obj, Translator tr)
+  public static DefMacro make (String name, Procedure expander)
   {
-    int count = List.length(obj);
+    DefMacro mac = new DefMacro(expander);
+    mac.setName(name);
+    return mac;
+  }
+
+  public DefMacro (Expression lexp)
+  {
+    this.lexp = lexp;
+  }
+
+  public String toString()
+  {
+    return "#<macro "+getName()+'>';
+  }
+
+  public Object expand (Pair form, Translator tr)
+  {
+    if (expander == null)
+      expander = (Procedure) lexp.eval(Environment.current());
+
     /* DEBUGGING:
-    System.err.print("{Before defmacro expansion: ");
-    SFormat.print (obj, System.err);
-    System.err.println ('}');
+    OutPort err = OutPort.errDefault();
+    err.print("{Before defmacro expansion: ");
+    SFormat.print (form, err);
+    err.println ('}');
     */
-    Object[] args = new Object[count];
-    for (int i = 0; obj instanceof Pair; i++)
-      {
-	Pair pair = (Pair) obj;
-	args[i] = pair.car;
-	obj = pair.cdr;
-      }
     try
       {
-	Object expansion = expander.applyN(args) ;
+        SyntaxForm sform = new SyntaxForm();
+        sform.form = form;
+        sform.tr = tr;
+	Object expansion = expander.apply1(sform) ;
 	/* DEBUGGING:
-	System.err.print("{Expanded macro: ");
-	SFormat.print (expansion, System.err);
-	System.err.println ('}');
+	err.print("{Expanded macro: ");
+	SFormat.print (expansion, err);
+	err.println ('}');
 	*/
 	return expansion;
       }

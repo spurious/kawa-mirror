@@ -1,9 +1,20 @@
 (define-syntax defmacro
   (syntax-rules ()
-		((defmacro name lambda-list form ...)
-		 ((primitive-constructor <kawa.lang.DefMacro> 
-					 (<symbol> <function>)) 
-		  (quote name) (lambda lambda-list form ...)))))
+		((defmacro name pattern form ...)
+                 (define-syntax name
+                   (lambda (__arg)
+                     (syntax-case __arg ()
+                                  ((__name . pattern) form ...)))))))
+;                                  ((__name . __rest)
+;                                   (error "macro not matching" __rest))))))))
+
+;                 (define-syntax name
+;                   (lambda (__name . lambda-list) form ...)))))
+;		 ((primitive-constructor <kawa.lang.DefMacro> 
+;					 (<symbol> <function>)) 
+;		  (quote name) (lambda (__name . lambda-list) form ...)))))
+(define (%defmacro form rule)
+  (rule (car (form 'form))))
 
 (define (gentemp)
   ((primitive-static-method <gnu.expr.Symbol> "gentemp"

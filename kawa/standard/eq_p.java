@@ -18,7 +18,12 @@ public class eq_p extends Procedure2 implements Inlineable {
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
-    Expression[] args = exp.getArgs();
+    compile(exp.getArgs(), comp, target);
+  }
+
+  public static void compile (Expression[] args,
+                              Compilation comp, Target target)
+  {
     CodeAttr code = comp.getCode();
     args[0].compile(comp, Target.pushObject);
     args[1].compile(comp, Target.pushObject);

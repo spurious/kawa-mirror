@@ -27,6 +27,8 @@ public class PairPat extends Pattern implements Printable, Compilable
 
   public boolean match (Object obj, Object[] vars, int start_vars)
   {
+    if (obj instanceof SyntaxForm)
+      obj = ((SyntaxForm) obj).form;
     if (! (obj instanceof Pair))
       return false;
     Pair pair = (Pair) obj;
@@ -55,8 +57,8 @@ public class PairPat extends Pattern implements Printable, Compilable
       {
 	classPairPat = ClassType.make("kawa.lang.PairPat");
 	Type[] apply2args = new Type[2];
-	apply2args[0] = comp.scmPatternType;
-	apply2args[1] = comp.scmPatternType;
+	apply2args[0] = Pattern.typePattern;
+	apply2args[1] = Pattern.typePattern;
 	makePairPatMethod =
 	  classPairPat.addMethod ("make", apply2args,
 				   classPairPat, Access.PUBLIC|Access.STATIC);

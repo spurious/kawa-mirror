@@ -74,7 +74,7 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
       {
 	thisType = ClassType.make("kawa.lang.ListRepeatPat");
 	Type[] apply1args = new Type[1];
-	apply1args[0] = comp.scmPatternType;
+	apply1args[0] = Pattern.typePattern;
 	makeListRepeatMethod =
 	  thisType.addMethod ("make", apply1args,
 			       thisType, Access.PUBLIC|Access.STATIC);

@@ -7,7 +7,7 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class SyntaxRules extends Macro implements Printable, Compilable
+public class SyntaxRules extends Procedure1 implements Printable, Compilable
 {
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
@@ -19,7 +19,7 @@ public class SyntaxRules extends Macro implements Printable, Compilable
   /* The largest (num_variables+template_identifier.length) for any rule. */
   int maxVars = 0;
 
-  static public String syntaxRulesSymbol = "syntax-rules";
+  static public String syntaxRulesSymbol = "syntax-rules"; // OBSOLETE
 
   private void calculate_maxVars ()
   {
@@ -92,7 +92,7 @@ public class SyntaxRules extends Macro implements Printable, Compilable
 
 	    // For the i'th pattern variable, pattern_names.elementAt(i)
 	    // is the name of the variable, and
-	    // (int) patter_nesting.charAt (i) is the nesting (in terms
+	    // (int) pattern_nesting.charAt (i) is the nesting (in terms
 	    // of number of ellipsis that indicate the variable is repeated).
 	    StringBuffer pattern_nesting_buffer = new StringBuffer ();
 	    java.util.Vector pattern_names = new java.util.Vector ();
@@ -102,8 +102,8 @@ public class SyntaxRules extends Macro implements Printable, Compilable
 		tr.syntaxError ("pattern does not start with name");
 		return;
 	      }
+            literal_identifiers[0] = (String) ((Pair)pattern).car;
 	    pattern = ((Pair) pattern).cdr;
-
 
 	    Pattern translated_pattern
 	      = translate_pattern (pattern, literal_identifiers,
@@ -115,9 +115,10 @@ public class SyntaxRules extends Macro implements Printable, Compilable
 	      = new SyntaxRule (translated_pattern, pattern_nesting,
 				pattern_names, template, tr);
 	    /* DEBUGGING:
-	    System.err.println ("{translated template:");
-	    this.rules[i].print_template_program (System.err);
-	    System.err.println ('}');
+	    OutPort err = OutPort.errDefault();
+	    err.println ("{translated template:");
+	    this.rules[i].print_template_program (err);
+	    err.println ('}');
 	    */
 	  }
 	finally
@@ -191,8 +192,25 @@ public class SyntaxRules extends Macro implements Printable, Compilable
       return new EqualPat (pattern);
   }
 
-  public Object expand (Object obj, Translator tr)
+  public Object apply1 (Object arg)
   {
+    SyntaxForm sform;
+    Pair form;
+    try
+      {
+        sform = (SyntaxForm) arg;
+        form = (Pair) sform.form;
+      }
+   catch (ClassCastException ex)
+      {
+        throw WrongType.make(ex, this, 0);
+      }  
+    return expand(form, sform.tr);
+  }
+
+  public Object expand (Pair form, Translator tr)
+  {
+    Object obj = form.cdr;
     Object[] vars = new Object[maxVars];
     for (int i = 0;  i < rules.length;  i++)
       {
@@ -201,18 +219,18 @@ public class SyntaxRules extends Macro implements Printable, Compilable
 	if (rule.pattern.match (obj, vars, 0))
 	  {
 	    /* DEBUGGING:
-	    System.err.print ("{Matched variables: ");
+	    OutPort err = OutPort.errDefault();
+	    err.print ("{Matched variables: ");
 	    for (int j = 0;  j < rule.num_variables;  j++)
 	      {
-		if (j > 0)  System.err.print ("; ");
-		System.err.print (j + ": ");
-		SFormat.print (vars[j], System.err);
+		if (j > 0)  err.print ("; ");
+		err.print (j + ": ");
+		SFormat.print (vars[j], err);
 	      }
-	    System.err.println ('}');
+	    err.println ('}');
 	    */
-	    Object expansion = rule.execute_template (vars, tr);
+	    Object expansion = rule.execute_template (vars, tr, form);
 	    /* DEBUGGING:
-	    OutPort err = OutPort.errDefault();
 	    err.print("{Expansion of ");
 	    err.print(literal_identifiers[0]);
 	    err.print(": ");

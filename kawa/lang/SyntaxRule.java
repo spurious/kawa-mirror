@@ -247,7 +247,7 @@ public class SyntaxRule implements Compilable
 
   static int counter;
 
-  public Object execute_template (Object[] vars, Translator tr)
+  public Object execute_template (Object[] vars, Translator tr, Pair form)
   {
     int[] indexes = new int[max_nesting];
     int num_identifiers = template_identifiers.length;
@@ -258,7 +258,7 @@ public class SyntaxRule implements Compilable
 	vars[num_variables + i] = renamed_symbol;
 	tr.current_decls.put (renamed_symbol, name);
       }
-    return execute_template (0, vars, 0, indexes, tr);
+    return execute_template (0, vars, 0, indexes, tr, form);
   }
 
   /**
@@ -269,11 +269,12 @@ public class SyntaxRule implements Compilable
   private Object execute_template (int start_pc,
 				  Object[] vars,
 				  int nesting, int[] indexes,
-				  Translator tr)
+				  Translator tr, Pair form)
   {
     
     java.util.Stack stack = new java.util.Stack ();
-    for (int i = start_pc;  i < template_program.length ();  i++)
+    int template_length = template_program.length();
+    for (int i = start_pc;  i < template_length;  i++)
       {
 	char ch = template_program.charAt (i);
 	/* DEBUGGING:
@@ -287,7 +288,12 @@ public class SyntaxRule implements Compilable
 	  {
 	    Object car = stack.pop ();
 	    Object cdr = stack.pop ();
-	    stack.push (new Pair (car, cdr));
+            if (i + 1 == template_length
+                && form instanceof PairWithPosition)
+              cdr = new PairWithPosition((PairWithPosition) form, car, cdr);
+            else
+              cdr = new Pair(car, cdr);
+	    stack.push(cdr);
 	  }
 	else if (ch == LIST1)
 	  {
@@ -346,7 +352,7 @@ public class SyntaxRule implements Compilable
 		Object element = execute_template (start_pc,
 						   vars,
 						   nesting + 1, indexes,
-						   tr);
+						   tr, form);
 		Pair pair = new Pair (element, List.Empty);
 		if (last == null)
 		  result = pair;
@@ -390,7 +396,7 @@ public class SyntaxRule implements Compilable
     if (initSyntaxRuleMethod == null)
       {
 	Type[] argTypes = new Type[6];
-	argTypes[0] = comp.scmPatternType;
+	argTypes[0] = Pattern.typePattern;
 	argTypes[1] = comp.javaStringType;
 	argTypes[2] = comp.javaStringType;
 	argTypes[3] = comp.symbolArrayType;

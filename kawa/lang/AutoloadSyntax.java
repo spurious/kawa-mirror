@@ -95,7 +95,7 @@ public class AutoloadSyntax extends Syntax
       { throw_error ("type error"); }
   }
 
-  public Expression rewrite (Object obj, Translator tr)
+  public Expression rewriteForm (Pair form, Translator tr)
   {
     if (loaded == null)
       {
@@ -112,6 +112,6 @@ public class AutoloadSyntax extends Syntax
 	    return tr.syntaxError (e.getMessage ());
 	  }
       }
-    return loaded.rewrite (obj, tr);
+    return loaded.rewriteForm(form, tr);
   }
 }

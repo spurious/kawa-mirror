@@ -1,7 +1,6 @@
 package kawa;
 
 import java.io.*;
-import java.lang.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.*;

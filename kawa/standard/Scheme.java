@@ -121,6 +121,9 @@ public class Scheme extends Interpreter
 
       // Appendix (and R5RS)
       define ("define-syntax", new kawa.standard.define_syntax ());
+      define ("syntax-rules", new kawa.standard.syntax_rules ());
+      define ("syntax-case", new kawa.standard.syntax_case ());
+      define ("let-syntax", new kawa.standard.let_syntax ());
 
       r4_environment = new Environment (null_environment);
       r4_environment.setName ("r4rs-environment");
@@ -450,6 +453,7 @@ public class Scheme extends Interpreter
       define_syntax("object", "kawa.standard.object");
       define_proc("field", "kawa.standard.field");
       define_proc("static-field", "kawa.standard.static_field");
+      define_proc("invoke-static", "kawa.lang.InvokeStatic");
 
       define_proc("file-exists?", "kawa.lib.files");
       define_proc("file-directory?", "kawa.lib.files");
@@ -728,5 +732,32 @@ public class Scheme extends Interpreter
     return t;
   }
 
+  /** Convert expression to a Type.
+   * Allow "TYPE" or 'TYPE or <TYPE>.
+   */
+  public static Type exp2Type (Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        Object cname = ((QuoteExp) exp).getValue();
+        if (cname instanceof Type)
+          return (Type) cname;
+        if (cname instanceof kawa.lang.FString || cname instanceof String)
+          return ClassType.make(cname.toString());
+      }
+    else if (exp instanceof ReferenceExp)
+      {
+        ReferenceExp rexp = (ReferenceExp) exp;
+        Declaration decl = rexp.getBinding();
+        if (decl != null)
+          return exp2Type(decl.getValue());
+        String name = rexp.getName();
+        int len = name.length();
+        if (len > 2 && name.charAt(0) == '<'
+            && name.charAt(len-1) == '>')
+          return Scheme.string2Type(name.substring(1, len-1));
+      }
+    return null;
+  }
 
 }

@@ -27,7 +27,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
 
   public void print(java.io.PrintWriter ps)
   {
-    ps.print ("#<match equal");
+    ps.print ("#<equals: ");
     SFormat.print (value, ps);
     ps.print ('>');
   }
@@ -39,7 +39,8 @@ public class EqualPat extends Pattern implements Printable, Compilable
   {
     if (EqualPatType == null)
       {
-	EqualPatType = ClassType.make("kawa.lang.EqualPat");
+	EqualPatType = ClassType.make("kawa.lang.EqualPat",
+                                      Pattern.typePattern);
 	makeEqualPatMethod =
 	  EqualPatType.addMethod ("make", comp.apply1args,
 				   EqualPatType, Access.PUBLIC|Access.STATIC);

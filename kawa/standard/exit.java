@@ -1,19 +1,18 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure0;
-import kawa.lang.Exit;
+public class exit extends Procedure0or1
+{
+  public Object apply0 ()
+  {
+    System.exit (0);
+    return Interpreter.undefinedObject;  // Never reached
+  }
 
-public class exit extends kawa.lang.Procedure0 {
-   public kawa.standard.exit() {
-      super("exit");
-   }
-
-   public Object apply0 ()
-   {
-      return new kawa.lang.Exit();
-   }
-
-   public void print(java.io.PrintStream ps) {
-      ps.print("#<kawa.standard.exit>");
-   }
+  public Object apply1 (Object arg1)
+  {
+    int status = ((Number)arg1).intValue ();
+    System.exit (status);
+    return Interpreter.undefinedObject;  // Never reached
+  }
 }

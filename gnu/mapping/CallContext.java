@@ -4,7 +4,7 @@ import gnu.lists.*;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
-public final class CallContext implements Runnable
+public class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
   public Procedure proc;

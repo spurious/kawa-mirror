@@ -29,7 +29,7 @@ public class WrappedException extends RuntimeException
    *
    * @param e The exception to be wrapped in a WrappedException.
    */
-  public WrappedException (Exception e)
+  public WrappedException (Throwable e)
   {
     super();
     this.message = null;
@@ -45,7 +45,7 @@ public class WrappedException extends RuntimeException
    * @param message The detail message.
    * @param e The exception to be wrapped in a WrappedException.
    */
-  public WrappedException (String message, Exception e)
+  public WrappedException (String message, Throwable e)
   {
     super();
     this.message = message;
@@ -74,7 +74,7 @@ public class WrappedException extends RuntimeException
    *
    * @return The embedded exception, or null if there is none.
    */
-  public Exception getException ()
+  public Throwable getException ()
   {
     return exception;
   }
@@ -89,6 +89,11 @@ public class WrappedException extends RuntimeException
     return getMessage();
   }
 
+  public Throwable getCause()
+  {
+    return exception;
+  }
+
   private String message;
-  private Exception exception;
+  private Throwable exception;
 }

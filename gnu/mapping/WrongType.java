@@ -82,7 +82,7 @@ public class WrongType extends WrappedException
         sbuf.append(procname);
         sbuf.append("' has wrong type");
       }
-    Exception ex = getException();
+    Throwable ex = getCause();
     if (ex != null)
       {
         sbuf.append(" (");

@@ -1,3 +1,12 @@
+2001-10-11  Per Bothner  <per@bothner.com>
+
+	* CallContext.java:  Remove 'final' attribute.
+
+	* WrappedException.java (exception field):  Change type to Throwable.
+	(<init>, getException):  Change to take/return Throwable.
+	(getCause):  New method, as in JDK1.4.
+	* WrongType.java (getMessage):  Use new getCause, update type.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* SFormat.java:  Update for CharSequence -> CharSeq renaming.

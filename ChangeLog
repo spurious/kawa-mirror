@@ -1,3 +1,62 @@
+Tue Feb  3 12:57:50 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/GuiConsole.java (close):  Make non-private.
+	(Works around javac bug in some JDK versions.)
+	* kawa/Shell.java:  Better handling of WrongArguments.
+	* kawa/repl.java (main):  If compilation throws exception, print stack.
+	
+	* kawa/standard/{abs,complex_p.denominator,exp,log,make_polar,
+	make_rectangular,number_p,numerator,quantity_p,quotient,rational_p,
+	real_p,real_part,remainder,zero_p}.java:  Replaced by functions in lib.
+	* kawa/standard.Scheme.java:  Many functions moved to kawa.lib.numbers.
+	* kawa/standard/Makefile.{am,in}:  Update for removed files.
+	* kawa/lang/PrimProcedure.java (getNamedType):  Add more logical names.
+
+	* kawa/standard/convert.java: New Procedure2 implements "as".
+	* kawa/standard/instance.java: New Procedure2 implements "instance?".
+	* kawa.standard/{char_p,vector_p}.java:  Replaced by Scheme functions.
+	* kawa/standard/Scheme.java:  Update for new or moved procedures.
+	(byteType ... charType): New Scheme-specific SpecialType Types.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	
+	* kawa/lang/{AnyPat,ApplyExp,Char,Compilation,EqualPat,FString,IfExp,
+	Keyword,LambdaExp,Literal,ListRepeatPat,Pair,PairPat,PrimProcedure,
+	Record,ReferenceExp,SetExp,Special,SyntaxRule,SyntaxRules,Vector}.java:
+	Update calls to gnu.bytecode methods (from compile_xxx to emitXxx).
+	* kawa/lang/Char.java:  Use Scheme.charType.
+	* kawa/lang/ApplyExp.java (compile):  Split off to new static function.
+	* kawa/lang/CompileFile.java (read):  Check if unmatched ')' follows.
+	* kawa/lang/InPort.java (readListBody):  Fix line-num off-by-one error.
+	* kawa/lang/ReadError.java (construct_message):  Likewise.
+	
+	* kawa/lang/QuoteExp.java (getValue):  New final method.
+	* kawa/lang/Translator.java (rewrite_pair):  If functions is an
+	Inlineable Procedure, check that the number of args is ok.
+	(rewrite):  Use string2Type instead of getNamedType.
+	* kawa/lang/SpecialType.java:  New class - extends PrimType.
+	* kawa/lang/Makefile.am:  Added SpecialType.class.
+	* kawa/lang/Expression.java (compile(Compilation,int,Type)):  No
+	longer need special handling here for char and boolean primtive types.
+	* kawa/lang/Named.java (getName):  Make non-final.
+	* kawa/lang/PrimProcedure.java (applyN):  Make work.
+	(getNamedType):  Use new Scheme SpecialType objects.
+	(getname):  new overriding method.
+	(compile):  Can simplify, because of new SpecialType objects.
+	
+	* kawa/lang/WrongArguments.java (getMessage, constructor):  New.
+	(checkArgCount):  New static method.
+	Inherit from IllegalArgumentException, not RuntimeException.
+	* kawa/lang/Procedure.java (numArgs):  New virtual method.
+	(minArgs, maxArgs):  New final methods.
+	(checkArgCount):  New static method.
+	* kawa/lang/{Procedure0,Procedure0or1,Procedure1,Procedure1or2,
+	Procedure2,Procedure3,Procedure4}.java
+	(numArgs):  Add overriding method.
+	(applyX):  Remove unneeded throws specifications.
+	(applyX):  Use new WrongArguments constructor.
+	* kawa/lang/Compilation.java:  If compiling to a ProcedureN class,
+	emit numArgs method, and call to cehckArgs.
+
 Tue Jan 27 12:02:33 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in (VERSION):  Set to 1.5.94.

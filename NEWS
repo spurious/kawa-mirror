@@ -1,5 +1,9 @@
-Changes since Kawa 1.5.92
+Changes since Kawa 1.5.93
 =========================
+There is now internal infrastructure to support inlining of
+procedures, and general procedure-specific optimized code
+generation.
+
 The syntactic form try-catch provides low-level exception
 handler support.  It is basically the same as Java's try/catch
 form, but in Scheme syntax.  The new procedure primitive-throw
@@ -9,12 +13,12 @@ The higher-level catch and throw procedures implement
 exception handling where the handler is specified with a "key"
 (a symbol).  These functions were taken from Guile.
 
-The error function has ben generalized to take multiple arguments
+The error function has been generalized to take multiple arguments
 (as in Guile).  It is now a wrapper around (throw 'misc-error ...).
 
-There is now a new Kawa command-line interface.  If you run
-the kawa.GuiConsole application, a new interaction window
-is craeted.  This is uses the AWT TextArea class.  You can
+There is a new "friendly" GUI access to the Kawa command-line.
+If you run the kawa.GuiConsole application, a new interaction
+window is created.  This is uses the AWT TextArea class.  You can
 create multiple "consoles".  They can either share top-level
 enevironments, or have separate environments.  The GuiConsole
 interface has some nice features, including editing.

@@ -1,5 +1,8 @@
 TO BE DONE FOR 2.0:
 
+Make primitive field accesses work in same way.
+Combine with record facility.
+
 Provide a way to write a "main" method in Scheme.
 
 Support presistence and serialization of Scheme values.

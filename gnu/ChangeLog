@@ -1,3 +1,7 @@
+2003-07-21  Per Bothner  <per@bothner.com>
+
+	* kawa/Makefile.am (SUBDIRS):  Add models and swingviews.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SUBDIRS):  Build mapping before xml, since

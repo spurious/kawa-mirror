@@ -172,11 +172,12 @@ target_vendor = @target_vendor@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = util reflect functions lispexpr $(XML_SUBDIR) \
-  $(SAX_SUBDIR) $(SERVLET_SUBDIRS) slib ant
+  $(SAX_SUBDIR) $(SERVLET_SUBDIRS) ant models $(SWING_SUBDIRS) slib
 
 @ENABLE_SERVLET_TRUE@SERVLET_SUBDIRS = servlet
 @ENABLE_XML_TRUE@XML_SUBDIR = xml brl xslt
 @ENABLE_XML_TRUE@@WITH_SAX2_TRUE@SAX_SUBDIR = sax
+@WITH_SWING_TRUE@SWING_SUBDIRS = swingviews
 subdir = gnu/kawa
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
@@ -189,7 +190,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = Makefile.am Makefile.in
 DIST_SUBDIRS = util reflect functions lispexpr xml brl xslt sax servlet \
-	slib ant
+	slib ant models swingviews
 all: all-recursive
 
 .SUFFIXES:

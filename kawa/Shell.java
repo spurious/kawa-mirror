@@ -43,13 +43,13 @@ public class Shell
 		  {
 		    interpreter.errors = 0;
 		    Expression exp = interpreter.rewrite (obj);
-		    /*
+		    /* DEBUGGING:
 		      pout.print ("[Re-written expression: ");
 		      exp.print (pout);
 		      pout.print ("\nbefore eval<"+exp.getClass().getName()+">");
 		      pout.println();
 		      pout.flush();
-		      */
+		    */
 		    if (interpreter.errors == 0)
 		      {
 			obj = exp.eval (env);

@@ -105,8 +105,8 @@ CLEANFILES = tmp? *.log testing.zip *.class
 
 SOURCES = test1.xql expected1.xml
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = 
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+CONFIG_CLEAN_FILES =  tab.xml
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in tab.xml.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -122,6 +122,8 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
+tab.xml: $(top_builddir)/config.status tab.xml.in
+	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 tags: TAGS
 TAGS:
 
@@ -215,7 +217,14 @@ check-test1:  test1.class
 	CLASSPATH=.:$(KAWALIB) $(JAVA) test1 >tmp1
 	diff -b $(srcdir)/expected1.xml tmp1
 
-check:  check-test1
+maketab1.class:  maketab1.xql
+	$(KAWA) --main --xquery -C $<
+
+check-maketab1:  maketab1.class
+	CLASSPATH=.:$(KAWALIB) $(JAVA) maketab1 >tmp2
+	diff -b $(srcdir)/tab.html tmp2
+
+check:  check-test1 check-maketab1
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -6,6 +6,12 @@ Implement SRFI 6: Basic String Ports
 
 Fix scheme-window in misc.scm.
 
+Module compilation:
+* Procedures that have #!optional args should be compiled to
+multiple methods.
+* Allocated selctor indexes "densely" within each applyX method
+of a ModuleBody, so tableswitch gets used, rather than lookupswitch.
+
 Finish define-unit and related cleanups.
 It it a problem that (say) 2in is no longer a literal?
 Perhaps a lazy Unit that is resolved at run-time or rewrite-time?

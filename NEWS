@@ -1,5 +1,38 @@
 class-methods, invoke-static, define-private
 
+The new functions invoke-static and class-methods allow you
+to call an arbitary Java method.  They both take a class
+specification and a method name.  The result of class-methods
+is a generic procedure consisting of those methods whose names
+match.  (Instance methods are also matched;  they are treated
+the asme as class methods with an extra initial argument.)
+The invoke-static function also takes extra arguments, and
+actually calls the "best"-matching method.  An example:
+        (invoke-static <java.lang.Thread> 'sleep 100)
+
+Many fewer classes are now generated when compiling a Scheme file.
+It used to be that each top-level procedure got cmpiled to its
+own class;  that is no longer the case.  The change should
+lead to faster startup and less resource use, but procedure
+application will probably be noticably slower (though not so much
+slower as when reflection is used).  The reason for the slowdown
+is that we in the general case now do an extra method call, plus
+a not-yetoptimized switch statement.  This change is part of the
+new Kawa module system.  That will allow the compiler to
+substitute direct methods calls in more cases, which I hope will
+more than make up for the slowdown.
+
+Many changes to the "Emacs-emulation" library in gnu.jemacs.buffer:
+* Implemented commands to read and save files.
+* We ask for file and buffer names using a dialog pop-up window.
+* Split windows correctly, so that the windows that are not split
+keep their sizes, the windows being split gets split as specified,
+and the frame does not change size.  Now also handles horizonal splits.
+* Fairly good support for  buffer-local keymaps and Emacs-style keymap
+search order.  A new class BufferKeymap manages the active keymaps of
+a buffer.  Multi-key key-sequences are handled.  Pending prefix keys
+are remembered on a per-buffer basis (whereas Emacs does it globally).
+
 There is now some low-level support for generic procedures.
 
 The R5RS primitives let-syntax and letrec-syntax for defining local

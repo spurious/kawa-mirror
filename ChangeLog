@@ -1,3 +1,17 @@
+1999-09-08  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/InvokeStatic.java:  Get rid of lots of crud by
+	using kawa.standard.class_methods.
+	
+	* kawa/lang/CompileFile.java (read):  Set filename of ModuleExp.
+	* kawa/lang/Translator.java (scan_form):  Copy line number info.
+	* kawa/lang/Lambda.java (rewrite):  Set line number info on
+	parameter Declarations.
+
+	* kawa/standard/define.java (rewrite):  Replace by rewriteForm.
+
+	* kawa/lang/{Pair.java,Vector.java}:  Update scmObjectType->typeObject.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (error):  New method.

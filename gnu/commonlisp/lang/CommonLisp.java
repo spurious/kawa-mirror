@@ -106,6 +106,7 @@ public class CommonLisp extends Lisp2
     try
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
+	loadClass("kawa.lib.prim_syntax");
 	loadClass("kawa.lib.std_syntax");
 	loadClass("kawa.lib.lists");
 	loadClass("kawa.lib.strings");
@@ -132,7 +133,6 @@ public class CommonLisp extends Lisp2
     defun("prog1", new prog1("prog1", 1));
     defun("prog2", prog1.prog2);
     defun("progn", new kawa.standard.begin());
-    defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
     defun("and", new kawa.standard.and_or(true, this));
     defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());

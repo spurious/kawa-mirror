@@ -1,3 +1,8 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (<init>): Also load prim_syntax.
+	This defines if, so we don't need removed kawa.standard.ifp.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* CLispReader.java:  Remove unused import statements.

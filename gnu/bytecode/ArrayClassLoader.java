@@ -18,6 +18,10 @@ public class ArrayClassLoader extends ClassLoader
 
   String[] classNames;
 
+  public ArrayClassLoader ()
+  {
+  }
+
   /** Load classes from the given byte arrays.
     By convention, the classes we manage are named "lambda"+<INTEGER>. */
   public ArrayClassLoader (byte[][] classBytes)
@@ -69,12 +73,29 @@ public class ArrayClassLoader extends ClassLoader
       }
   }
 
+  public void addClass(Class clas)
+  {
+    reserve(1);
+    classNames[size] = clas.getName();
+    loadedClasses[size] = clas;
+    size++;
+  }
+
   public void addClass(String name, byte[] bytes)
   {
     reserve(1);
     classNames[size] = name == null ? ("lambda"+size) : name;
     classBytes[size] = bytes;
     size++;
+  }
+
+  public void addClass (ClassType ctype)
+    throws java.io.IOException
+  {
+    if ((ctype.flags & ClassType.EXISTING_CLASS) != 0)
+      addClass(ctype. getReflectClass());
+    else
+      addClass(ctype.getName(), ctype.writeToArray());
   }
 
   public Class loadClass (String name, boolean resolve)

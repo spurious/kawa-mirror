@@ -735,10 +735,16 @@ public class ClassType extends ObjectType
   }
 
   public byte[] writeToArray ()
-    throws java.io.IOException
   {
     ByteArrayOutputStream stream = new ByteArrayOutputStream (500);
-    writeToStream(stream);
+    try
+      {
+	writeToStream(stream);
+      }
+    catch (java.io.IOException ex)
+      {
+	throw new InternalError(ex.toString());
+      }
     return stream.toByteArray ();    
   }
 

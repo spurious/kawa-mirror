@@ -1,5 +1,10 @@
 2002-04-18  Per Bothner  <per@bothner.com>
 
+	* ArrayClassLoader.java:  New default constructor.
+	(addClass(Class), addClass(ClassType)):  New overloaded methods.
+
+	* ClassType.java (writeToArray):  Handle IOException.
+
 	* CodeAttr.java (emitInvoke):  If method name is "<init>",
 	do invokeSpecial.
 

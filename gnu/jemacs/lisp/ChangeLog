@@ -1,3 +1,10 @@
+2000-06-17  Per Bothner  <per@bothner.com>
+
+	* simple.el:  Imported from xemacs-21.2.32.
+	* keydefs.el:  Likewise.
+	* keymap.el:  Likewise.
+	* subr.el:  Likewise.
+
 2000-06-09  Per Bothner  <per@bothner.com>
 
 	* alist.el:  Imported from xemacs-21.2.32.  (Not working yet.)

@@ -100,8 +100,9 @@ JAVADOC_PACKAGES = \
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
   gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard \
   gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
-  gnu.kawa.xslt \
-  gnu.jemacs.lang gnu.jemacs.buffer gnu.commonlisp.lang
+  gnu.kawa.xslt gnu.kawa.sax \
+  gnu.jemacs.lang gnu.jemacs.buffer gnu.jemacs.swing gnu.commonlisp.lang
+
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
 # NOTE:  To update javadoc do:

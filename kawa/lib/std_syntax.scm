@@ -1,8 +1,7 @@
 ;;; Definitions for some standard syntax.
 
-(module-export cond case and or let let* letrec do delay %make-promise)
-
-(module-export cond case and let let* do delay)
+(module-export cond case and or let let* letrec do delay %make-promise
+	       syntax-object->datum datum->syntax-object with-syntax include)
 
 ;;; COND
 
@@ -220,3 +219,55 @@
 (define-syntax delay (syntax-rules ()
 				   ((delay expression)
 				    (%make-promise (lambda () expression)))))
+
+(define (syntax-object->datum obj)
+  (let loop ((x obj))
+    (if (instance? x <kawa.lang.SyntaxForm>)
+	(loop (field (as <kawa.lang.SyntaxForm> x) 'form))
+	x)))
+
+(define (datum->syntax-object template-identifier obj)
+  (if (instance? template-identifier <kawa.lang.SyntaxForm>)
+      (kawa.lang.SyntaxForm:fromDatumIfNeeded template-identifier obj)
+      obj))<
+
+;;; The definitions of with-syntax and include are based on those fromhe
+;;; portable implementation of syntax-case psyntax.ss.
+;;; Copyright (c) 1992-2002 Cadence Research Systems
+;;; Permission to copy this software, in whole or in part, to use this
+;;; software for any lawful purpose, and to redistribute this software
+;;; is granted subject to the restriction that all copies made of this
+;;; software must include this copyright notice in full.  This software
+;;; is provided AS IS, with NO WARRANTY, EITHER EXPRESS OR IMPLIED,
+;;; INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY
+;;; OR FITNESS FOR ANY PARTICULAR PURPOSE.  IN NO EVENT SHALL THE
+;;; AUTHORS BE LIABLE FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES OF ANY
+;;; NATURE WHATSOEVER.
+
+;; Converted to use syntax-rules from the psyntax.ss implementation.
+
+(define-syntax with-syntax
+   (syntax-rules ()
+     ((with-syntax () e1 e2 ...)
+      (begin e1 e2 ...))
+     ((with-syntax ((out in)) e1 e2 ...)
+      (syntax-case in () (out (begin e1 e2 ...))))
+     ((with-syntax ((out in) ...) e1 e2 ...)
+      (syntax-case (list in ...) ()
+		   ((out ...) (begin e1 e2 ...))))))
+
+(define-syntax include
+  (lambda (x)
+    (define read-file
+      (lambda (fn k)
+        (let ((p (open-input-file fn)))
+          (let f ()
+            (let ((x (read p)))
+              (if (eof-object? x)
+                  (begin (close-input-port p) '())
+                  (cons (datum->syntax-object k x) (f))))))))
+    (syntax-case x ()
+      ((k filename)
+       (let ((fn (syntax-object->datum (syntax filename))))
+         (with-syntax (((exp ...) (read-file fn (syntax k))))
+           (syntax (begin exp ...))))))))

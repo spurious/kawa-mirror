@@ -5,6 +5,9 @@
 	here from syntax_case.work.
 	* kawa/standard/syntax_case.java: Fix bugs when nested syntax-cases.
 
+	* kawa/standard/Scheme.java; Define "include", "syntax-object->datum",
+	"datum->syntax-object", "with-syntax".
+
 2004-12-23  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (setLineOf): Do nothing if QuoteExp.

@@ -1,3 +1,8 @@
+2004-12-24  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (syntax-object->datum, datum->syntax-object): New.
+	(with-syntax, include): New functions, imported from psyntax.ss.
+
 2004-12-18  Per Bothner  <per@bothner.com>
 
 	* syntax.scm (let-values): SRFI-11 implementation is in the public

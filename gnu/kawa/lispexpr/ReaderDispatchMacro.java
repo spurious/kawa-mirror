@@ -30,6 +30,22 @@ public class ReaderDispatchMacro extends ReaderMisc
   {
     // java.io.Reader reader = in;
     java.io.Reader reader = in.getPort();
-    return procedure.apply3(reader, Char.make(ch), IntNum.make(count));
+    try
+      {
+	return procedure.apply3(reader, Char.make(ch), IntNum.make(count));
+      }
+    catch (java.io.IOException ex)
+      {
+	throw ex;
+      }
+    catch (gnu.text.SyntaxException ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	in.fatal("reader macro '"+procedure+"' threw: "+ex);
+	return null;  // Never executed.
+      }
   }
 }

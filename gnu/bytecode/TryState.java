@@ -19,6 +19,12 @@ public class TryState {
   /** Used for the return address of the finally subroutine (if any). */
   Variable finally_ret_addr;
 
+  /** Non-null if we need a temporary to save the result. */
+  Variable saved_result;
+
+  /** If the SP > 0 when we entered the try, the stack is saved here. */
+  Variable[] savedStack;
+
   int start_pc;
   int end_pc;
 

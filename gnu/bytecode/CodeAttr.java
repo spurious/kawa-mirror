@@ -32,6 +32,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   private int max_stack;
   private int max_locals;
   int PC;
+  // readPC (which is <= PC) is a bound on locations that have been
+  // saved into labels or otherwise externally seen.
+  // Hence, we cannot re-arrange code upto readPC, but we can
+  // rearrange code between readPC and PC.
+  int readPC;
   byte[] code;
 
   /* The exception handler table, as a vector of quadruples
@@ -82,13 +87,14 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Set the code (instruction bytes) of this method.
     * @param code the code bytes (which are not copied).
     * Implicitly calls setCodeLength(code.length). */
-  public void setCode(byte[] code) { this.code = code; this.PC = code.length; }
+  public void setCode(byte[] code) {
+    this.code = code; this.PC = code.length; readPC = PC; }
   /** Set the length the the code (instruction bytes) of this method.
     * That is the number of current used bytes in getCode().
     * (Any remaing bytes provide for future growth.) */
-  public void setCodeLength(int len) { PC = len; }
+  public void setCodeLength(int len) { PC = len; readPC = len;}
   /** Set the current lengthof the code (instruction bytes) of this method. */
-  public int getCodeLength() { return PC; }
+  public int getCodeLength() { readPC = PC;  return PC; }
 
   public CodeAttr (Method meth)
   {
@@ -162,6 +168,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     if (lines == null)
       lines = new LineNumbersAttr(this);
+    readPC = PC;
     lines.put(linenumber, PC);
   }
 
@@ -329,6 +336,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public Scope pushScope () {
     Scope scope = new Scope ();
     scope.start_pc = PC;
+    readPC = PC;
     if (locals == null)
       locals = new LocalVarsAttr(this);
     locals.enterScope(scope);
@@ -341,7 +349,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public Scope popScope () {
     Scope scope = locals.current_scope;
     locals.current_scope = scope.parent;
-    scope.end_pc = PC;
+    scope.end_pc = PC;  readPC = PC;
     for (Variable var = scope.vars; var != null; var = var.next) {
       if (var.isSimple () && ! var.dead ())
 	var.freeLocal(this);
@@ -389,6 +397,44 @@ public class CodeAttr extends Attribute implements AttrContainer
     return locals.current_scope.addVariable (this, type, name);
   }
 
+  public final void emitPushConstant(int val, Type type)
+  {
+    switch (type.getSignature().charAt(0))
+      {
+      case 'B':  case 'C':  case 'I':  case 'Z':  case 'S':
+	emitPushInt(val);  break;
+      case 'J':
+	emitPushLong((long)val);  break;
+      case 'F':
+	emitPushFloat((float)val);  break;
+      case 'D':
+	emitPushDouble((double)val);  break;
+      default:
+	throw new Error("bad type to emitPushConstant");
+      }
+  }
+
+  public final void emitPushConstant (CpoolEntry cnst)
+  {
+    reserve(3);
+    int index = cnst.index;
+    if (cnst instanceof CpoolValue2)
+      {
+      	put1 (20); // ldc2w
+	put2 (index);
+      }
+    else if (index < 256)
+      {
+	put1(18); // ldc1
+	put1(index);
+      }
+    else
+      {
+	put1(19); // ldc2
+	put2(index);
+      }
+  }
+
   public final void emitPushInt(int i)
   {
     reserve(3);
@@ -406,17 +452,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       {
-	int j = getConstants().addInt(i).index;
-	if (j < 256)
-	  {
-	    put1(18); // ldc1
-	    put1(j);
-	  }
-	else
-	  {
-	    put1(19); // ldc2
-	    put2(j);
-	  }
+	emitPushConstant(getConstants().addInt(i));
       }
     pushType(Type.int_type);
   }
@@ -437,60 +473,68 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       {
-	reserve(3);
-	int j = getConstants().addLong(i).index;
-      	put1 (20); // ldc2w
-	put2 (j);
-      }
-    pushType(Type.double_type);
-  }
-
-  public void emitPushDouble (double x)
-  {
-    if (x == 0.0)
-      {
-	reserve(1);
-	put1 (14);  // dconst_0
-      }
-    else if (x == 1.0)
-      {
-	reserve(1);
-	put1 (15);  // dconst_1
-      }
-    else if (x >= -128.0 && x < 128.0
-	     && (double)(int)x == x)
-      {
-	// Saves space in the constant pool
-	// Probably faster, at least on modern CPUs.
-	emitPushInt ((int) x);
-	reserve(1);
-	popType();
-	put1 (135); // i2d
-      }
-    else
-      {
-	reserve(3);
-	int j = getConstants().addDouble(x).index;
-      	put1(20); // ldc2w
-	put2(j);
+	emitPushConstant(getConstants().addLong(i));
       }
     pushType(Type.long_type);
   }
 
-  public final void emitPushString (String str)
+  public void emitPushFloat (float x)
   {
-    reserve(3);
-    int index = getConstants().addString(str).index;
-    if (index < 256)
+    int xi = (int) x;
+    if ((float) xi == x && xi >= -128 && xi < 128)
       {
-	put1(18); // ldc1
-	put1(index);
+	if (xi >= 0 && xi <= 2)
+	  {
+	    reserve(1);
+	    put1(11 + xi);  // fconst_0 .. fconst_2
+	  }
+	else
+	  {
+	    // Saves space in the constant pool
+	    // Probably faster, at least on modern CPUs.
+	    emitPushInt (xi);
+	    reserve(1);
+	    popType();
+	    put1 (134); // i2f
+	  }
       }
     else
       {
-	put1(19); // ldc2
-	put2(index);
+	emitPushConstant(getConstants().addFloat(x));
       }
+    pushType(Type.float_type);
+  }
+
+  public void emitPushDouble (double x)
+  {
+    int xi = (int) x;
+    if ((double) xi == x && xi >= -128 && xi < 128)
+      {
+	if (xi == 0 || xi == 1)
+	  {
+	    reserve(1);
+	    put1(14+xi);  // dconst_0 or dconst_1
+	  }
+	else
+	  {
+	    // Saves space in the constant pool
+	    // Probably faster, at least on modern CPUs.
+	    emitPushInt (xi);
+	    reserve(1);
+	    popType();
+	    put1 (135); // i2d
+	  }
+      }
+    else
+      {
+	emitPushConstant(getConstants().addDouble(x));
+      }
+    pushType(Type.double_type);
+  }
+
+  public final void emitPushString (String str)
+  {
+    emitPushConstant(getConstants().addString(str));
     pushType(Type.string_type);
   }
 
@@ -637,6 +681,18 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitMul () { emitBinop (104); }
   public final void emitDiv () { emitBinop (108); }
   public final void emitRem () { emitBinop (112); }
+  public final void emitAnd () { emitBinop (126); }
+  public final void emitIOr () { emitBinop (128); }
+  public final void emitXOr () { emitBinop (130); }
+
+  public final void emitNot()
+  {
+    Type type = topType();  // Must be int or long.
+    emitPushConstant(1, type);
+    emitAdd();
+    emitPushConstant(1, type);
+    emitAnd();
+  }
 
   public void emitPrimop (int opcode, int arg_count, Type retType)
   {
@@ -808,6 +864,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     reserve(5);
     if (label.defined ())
       {
+	readPC = PC;
 	int delta = label.position - PC;
 	if (delta < -32768)
 	  {
@@ -881,9 +938,29 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGotoIfEq(label, true);
   }
 
+  public final void emitGotoIfCompare1 (Label label, int opcode)
+  {
+    popType();
+    reserve(3);
+    emitTransfer (label, opcode);
+  }
+
+  public final void emitGotoIfIntEqZero(Label label)
+  { emitGotoIfCompare1(label, 153); }
+  public final void emitGotoIfIntNeZero(Label label)
+  { emitGotoIfCompare1(label, 154); }
+  public final void emitGotoIfIntLtZero(Label label)
+  { emitGotoIfCompare1(label, 155); }
+  public final void emitGotoIfIntGeZero(Label label)
+  { emitGotoIfCompare1(label, 156); }
+  public final void emitGotoIfIntGtZero(Label label)
+  { emitGotoIfCompare1(label, 157); }
+  public final void emitGotoIfIntLeZero(Label label)
+  { emitGotoIfCompare1(label, 158); }
+
   /** Compile start of a conditional:  if (!(x OPCODE 0)) ...
    * The value of x must already have been pushed. */
-  public final void emitGotoIf (int opcode)
+  public final void emitIfCompare1 (int opcode)
   {
     IfState new_if = new IfState(this);
     popType();
@@ -895,7 +972,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   /** Compile start of conditional:  if (x != 0) */
   public final void emitIfIntNotZero()
   {
-    emitGotoIf(153); // ifeq
+    emitIfCompare1(153); // ifeq
   }
 
   /** Compile start of a conditional:  if (!(x OPCODE y)) ...
@@ -925,16 +1002,29 @@ public class CodeAttr extends Attribute implements AttrContainer
     new_if.start_stack_size = SP;
   }
 
+  /** Compile start of a conditional:  if (x == y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfEq ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfNE(new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Emit a 'ret' instruction.
+    * @param var the variable containing the return address */
   public void emitRet (Variable var)
   {
     int offset = var.offset;
     if (offset < 256)
       {
+	reserve(2);
 	put1(169);  // ret
 	put1(offset);
       }
     else
       {
+	reserve(4);
 	put1(196);  // wide
 	put1(169);  // ret
 	put2(offset);
@@ -1159,9 +1249,27 @@ public class CodeAttr extends Attribute implements AttrContainer
   }
 
 
-  public void emitTryStart(boolean has_finally)
+  public void emitTryStart(boolean has_finally, Type result_type)
   {
     TryState try_state = new TryState(this);
+    boolean must_save_result = has_finally && result_type != null;
+    if (must_save_result || SP > 0)
+      {
+	pushScope();
+	if (must_save_result)
+	  try_state.saved_result = addLocal(result_type);
+      }
+    if (SP > 0)
+      {
+	try_state.savedStack = new Variable[SP];
+	int i = 0;
+	while (SP > 0)
+	  {
+	    Variable var = addLocal(topType());
+	    emitStore(var);
+	    try_state.savedStack[i++] = var;
+	  }
+      }
     if (has_finally)
       try_state.finally_subr = new Label(this);
   }
@@ -1170,11 +1278,14 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     if (try_stack.end_label == null)
       {
+	if (try_stack.saved_result != null)
+	  emitStore(try_stack.saved_result);
 	try_stack.end_label = new Label(this);
 	if (try_stack.finally_subr != null)
 	  emitGoto(try_stack.finally_subr, 168);  // jsr
 	if (reachableHere())
 	  emitGoto(try_stack.end_label);
+	readPC = PC;
 	try_stack.end_pc = PC;
       }
   }
@@ -1188,6 +1299,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     ClassType type = var == null ? null : (ClassType) var.getType();
     try_stack.try_type = type;
+    readPC = PC;
     addHandler(try_stack.start_pc, try_stack.end_pc,
 	       PC, type, getConstants());
     if (var != null)
@@ -1201,6 +1313,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     if (reachableHere())
       {
+	if (try_stack.saved_result != null)
+	  emitStore(try_stack.saved_result);
 	if (try_stack.finally_subr != null)
 	  emitGoto(try_stack.finally_subr, 168); // jsr
 	emitGoto(try_stack.end_label);
@@ -1216,6 +1330,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	emitCatchEnd();
       }
+    readPC = PC;
     try_stack.end_pc = PC;
 
     pushScope();
@@ -1252,6 +1367,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     if (try_stack.finally_subr != null)
       emitFinallyEnd();
     try_stack.end_label.define(this);
+    Variable[] vars = try_stack.savedStack;
+    if (vars != null)
+      {
+	for (int i = vars.length;  --i >= 0; )
+	  {
+	    Variable v = vars[i];
+	    if (v != null) {
+	      emitLoad(v);
+	    }
+	  }
+      }
+    if (try_stack.saved_result != null)
+	emitLoad(try_stack.saved_result);
+    if (try_stack.saved_result != null || vars != null)
+	popScope();
     try_stack = try_stack.previous;
   }
 

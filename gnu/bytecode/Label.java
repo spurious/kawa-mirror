@@ -16,7 +16,7 @@ import java.io.*;
  * A few instructions exist in both "narrow" 2-byte and "wide" 4-byte forms.
  *
  * This library uses a very simple data structure to accumulate
- * generated instruction - just a simple byte array of opcodes and
+ * generated instructions - just a simple byte array of opcodes and
  * operands, just as in the final .class file.  When emitting a forward
  * branch, we cannot emit the relative addresss of the still-unknown
  * target.  Instead, we emit the negative of the PC of the instruction,
@@ -66,7 +66,7 @@ public class Label {
   // Array of PC locations that reference this Label.
   // Elements that are -1 provide room to grow.
   // For an element fi in fixups (where fi >= 0), the 2-byte
-  // sequence code[fi]:code[fi+1] will need to be adjusted (relocation) by
+  // sequence code[fi]:code[fi+1] will need to be adjusted (relocated) by
   // the relative position of this Label, or alternatively spring_postion.
   // After relcocation, code[fi]:code[fi+1] will be a reference to 
   // this label (usually a PC-relative reference).
@@ -138,13 +138,6 @@ public class Label {
     }
   }
 
-
-  /**
-   * Define the value of a label as having the current location.
-   * @param method the current method
-   */
-  public void define (Method method) { define (method.code); }
-
   /**
    * Define the value of a label as having the current location.
    * @param code the "Code" attribute of the current method
@@ -154,8 +147,34 @@ public class Label {
     code.unreachable_here = false;
     if (position >= 0)
       throw new Error ("label definition more than once");
+
     position = code.PC;
 
+    /* Remove redundant goto in:  goto L; L:
+       These tend to be generated when compiling IfExp's,
+       so it is worth checking for them.
+    */
+    int goto_pos = position - 3;  // Position of hypothetical goto.
+    if (code.readPC <= goto_pos
+        && fixups != null && wide_fixups == null
+	&& goto_pos > 0 && code.getCode()[goto_pos] == (167-256) /* goto */)
+      {
+	int i;
+	goto_pos++;  // Skip goto opcode.
+	for (i = fixups.length;  -- i >= 0; )
+	  {
+	    if (fixups[i] == goto_pos)
+	      break;
+	  }
+	if (i >= 0)
+	  {
+	    position -= 3;
+	    code.PC = position;
+	    fixups[i] = -1;
+	  }
+      }
+
+    code.readPC = position;
     relocate_fixups (code, position);
 
     if (wide_fixups != null) {
@@ -187,6 +206,7 @@ public class Label {
     code.put1 (200);  // goto_w
     add_wide_fixup (code.PC);
     code.put4 (1);
+    code.readPC = code.PC;
   }
 
   /* Save a fixup so we can later backpatch code[method.PC..method.PC+1]. */
@@ -202,13 +222,14 @@ public class Label {
       }
     else
       {
-	for (i = 0; i < fixups.length && fixups[i] >= 0; ) i++;
-	if (i == fixups.length)
+	int fixups_length = fixups.length;
+	for (i = 0; i < fixups_length && fixups[i] >= 0; ) i++;
+	if (i == fixups_length)
 	  {
 	    int[] new_fixups = new int[2 * fixups.length];
 	    System.arraycopy (fixups, 0, new_fixups, 0, fixups.length);
-	    for (i = fixups.length; ++i < new_fixups.length; )
-	      new_fixups[i] = -1;
+	    i = new_fixups.length;
+	    do { new_fixups[--i] = -1; } while (i > fixups_length);
 	    fixups = new_fixups;
 	  }
 	if (PC < fixups[0])

@@ -1,3 +1,27 @@
+Sat Apr  4 17:36:03 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (readPC):  New instance variable.
+	Set it most places that read the PC.
+	(emitPushConstant, emitPushFloat):  New methods.
+	(emitAnd, andIOR, emitXOr, emitNot):  New methods.
+	(emitGotoIfInt{Eq,New,Lt,Ge,Gt,Le}Zero, emitIfEq):  New methods.
+	(emitRet):  Add missing calls to reserve.
+	* Label.java (define):  Remove version that takes a Method.
+	(define):  If label follows goto of label, try to optimize away goto.
+
+	* CodeAttr.java (emitTryStart):  Extra result_type argument.
+	Generate code to save stack (if non-empty) in new Variables.
+	(emiTryCatchEnd):  Restore stack.
+	Code to save result moved here from TryExp.
+	* TryState.java (savedStack):  Save stack here.
+	(saved_result)  New variable to store final result.
+
+	* Makefile.am:  Re-write to compile all out-of-date *.java at once.
+
+Wed Mar 18 12:06:13 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (emitRet):  Add missing reserve calls.
+
 Sat Mar  7 08:27:38 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Add and fix various comments for javadoc.

@@ -1107,7 +1107,7 @@ public class Compilation
 	      code.emitFi();
 	    if (! usingTailCalls)
 	      Target.pushObject.compileFromStack(this,
-						 primMethod.getReturnType());
+						 source.getReturnType());
 	    code.emitReturn();
           }
 	if (needThisApply)

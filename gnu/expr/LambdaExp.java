@@ -774,7 +774,7 @@ public class LambdaExp extends ScopeExp
       = (getFlag(SEQUENCE_RESULT)
 	 || (Compilation.usingTailCalls && ! isClassMethod()))
       ? Type.void_type
-      : body.getType();
+      : getReturnType().getImplementationType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
     if (Compilation.usingTailCalls && ! isInitMethod && ! isClassMethod())
       {
@@ -1517,5 +1517,10 @@ public class LambdaExp extends ScopeExp
   public synchronized void setProperty(Object key, Object value)
   {
     properties = Procedure.setProperty(properties, key, value);
+  }
+
+  public final Type getReturnType()
+  {
+    return body.getType();
   }
 }

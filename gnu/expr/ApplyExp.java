@@ -242,7 +242,7 @@ public class ApplyExp extends Expression
 				      argTypes, varArgs,
 				      func_name, func_lambda, comp);
 	    code.emitInvoke(method);
-	    target.compileFromStack(comp, method.getReturnType());
+	    target.compileFromStack(comp, func_lambda.getReturnType());
 	    return;
 	  }
         if (msg != null)

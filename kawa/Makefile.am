@@ -22,4 +22,3 @@ GCJ_INPUTS =  $(java_Java)
 # Force repl.class to be built before sub-dirs.
 # Specifically, lib needs repl to compile scm files.
 all-recursive:  Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
-

@@ -15,8 +15,7 @@ public class ChainLambdas extends ExpWalker
   {
     ChainLambdas walker = new ChainLambdas();
     walker.comp = comp;
-    exp.walk(walker);
-    //or:  walter.walkExpression(exp);
+    walker.walk(exp);
   }
 
   protected Expression walkScopeExp (ScopeExp exp)

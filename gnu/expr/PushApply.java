@@ -12,8 +12,7 @@ public class PushApply extends ExpWalker
   public static void pushApply (Expression exp)
   {
     PushApply walker = new PushApply();
-    exp.walk(walker);
-    //or:  walter.walkExpression(exp);
+    walker.walk(exp);
   }
 
   protected Expression walkApplyExp(ApplyExp exp)

@@ -118,7 +118,6 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   {
     int arg_count = argTypes.length;
     boolean is_constructor = op_code == 183;
-    boolean is_static = getStaticFlag();
 
     try
       {
@@ -297,8 +296,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     int skipArg = thisType == Type.void_type ? 1 : 0;
     int arg_count = argTypes.length - skipArg;
     boolean is_static = thisType == null || skipArg != 0;
-    int fix_arg_count = variable ? arg_count - (is_static ? 1 : 2)
-      : args.length;
+    int fix_arg_count = variable ? arg_count - 1 : args.length;
     Declaration argDecl = source == null ? null : source.firstDecl();
     for (int i = 0; ; ++i)
       {

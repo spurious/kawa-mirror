@@ -88,7 +88,7 @@ public class LetExp extends ScopeExp
   {
     inits = walker.walkExps(inits);
     if (walker.exitValue == null)
-      body = (Expression) body.walk(walker);
+      body = (Expression) walker.walk(body);
   }
 
   public void print (OutPort out)

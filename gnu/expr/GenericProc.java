@@ -14,6 +14,15 @@ public class GenericProc extends MethodProc
   int minArgs;
   int maxArgs;
 
+  public GenericProc (String name)
+  {
+    setName(name);
+  }
+
+  public GenericProc ()
+  {
+  }
+
   public int numArgs()
   {
     return minArgs | (maxArgs << 12);
@@ -100,12 +109,10 @@ public class GenericProc extends MethodProc
     return methods[ctx.ivalue1].applyV(ctx);
   }
 
-  /** Create a GenericProc from one or more methods, plus properties. */
-  public static GenericProc make (Object[] args)
+  public final void setProperties (Object[] args)
   {
     int alen = args.length;
     int mlen = 0;
-    GenericProc result = new GenericProc();
     for (int i = 0;  i < alen;  i++)
       {
 	Object arg = args[i];
@@ -114,15 +121,22 @@ public class GenericProc extends MethodProc
 	    String name = ((Keyword) arg).getName();
 	    Object value = args[++i];
 	    if (name == "name")
-	      result.setName(value.toString());
+	      setName(value.toString());
 	    else if (name == "method")
-	      result.add((MethodProc) value);
+	      add((MethodProc) value);
 	    else
-	      result.setProperty(name, value);
+	      setProperty(name, value);
 	  }
 	else
-	  result.add((MethodProc) arg);
+	  add((MethodProc) arg);
       }
+  }
+
+  /** Create a GenericProc from one or more methods, plus properties. */
+  public static GenericProc make (Object[] args)
+  {
+    GenericProc result = new GenericProc();
+    result.setProperties(args);
     return result;
   }
 }

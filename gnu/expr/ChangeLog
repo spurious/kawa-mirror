@@ -1,3 +1,18 @@
+2002-07-23  Per Bothner  <per@bothner.com>
+
+	* ChainLambdas.java.(chainLambdas):  Use new walk method.
+	* FindTailCalls.java (findTailCalls):  Likewise.
+	* PushApply.java (pushApply):  Likewise.
+	* LetExp.java (walkChildren):  Use new ExpWalker.walk method.
+
+	* GenericProc.java (<init>):  New constructors.
+	(setProperties):  New method.
+	(make):  Change to use setProperties.
+
+	* PrimProcedure.java (applyV):  Removed unused is_static variable.
+
+	* PrimProcedure.java (compileArgs):  Fix off-by-one bug.
+
 2002-07-22  Per Bothner  <per@bothner.com>
 
 	* ExpWalker.java (messages):  New field.

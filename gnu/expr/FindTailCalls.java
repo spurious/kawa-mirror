@@ -9,8 +9,7 @@ public class FindTailCalls extends ExpWalker
   public static void findTailCalls (Expression exp)
   {
     FindTailCalls walker = new FindTailCalls();
-    exp.walk(walker);
-    //or:  walter.walkExpression(exp);
+    walker.walk(exp);
   }
 
   boolean inTailContext = true;

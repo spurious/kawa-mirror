@@ -1,3 +1,16 @@
+2004-05-22  Per Bothner  <per@bothner.com>
+
+	* PrettyWriter.java (currentBlock):  -1 now means none.
+	(startLogicalBlock, endLogicalBlock):  Update accordinly.
+	(endLogicalBlock):  Simplify and correct test.
+
+	* PrettyWriter.java
+	(QUEUED_OP_BLOCK_PREFIX): Renamed to QUEUED_OP_BLOCK_START_SUFFIX.
+	Fix value of this and QUEUED_OP_BLOCK_START_SUFFIX to avoid conflict.
+	(QUEUED_OP_BLOCK_START_SIZE):  Adjust accordingly.
+
+	* PrettyWriter.java:  Improved commented-out debugging tools.
+
 2004-03-08  Per Bothner  <per@bothner.com>
 
 	* Text.java:  Implement Comparable, and Map.Entry, if JAVA2.

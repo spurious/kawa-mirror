@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner.
+// Copyright (c) 2001, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.text;
@@ -131,7 +131,8 @@ public class PrettyWriter extends java.io.Writer
   /** Number of elements (in queueInts and queueStrings) in use. */
   int queueSize;
   /** Index (into queueInts) of current unclosed begin-block node. */
-  int currentBlock;
+  int currentBlock = -1;
+  /** Number of startLogicalBlock - number of endLogicalBlock. */
   public int pendingBlocksCount;
 
   static final int QUEUED_OP_TYPE = 0;
@@ -174,15 +175,15 @@ public class PrettyWriter extends java.io.Writer
 
   /** A "block-start" queue item. */
   static final int QUEUED_OP_BLOCK_START_TYPE = 4;
-  static final int QUEUED_OP_BLOCK_START_SIZE = QUEUED_OP_SECTION_START_SIZE + 1;
-  /** If the QUEUED_OP_SECTION_START_SECTION_END < 0, it points to
+  static final int QUEUED_OP_BLOCK_START_SIZE = QUEUED_OP_SECTION_START_SIZE + 3;
+  /** If the QUEUED_OP_SECTION_START_BLOCK_END < 0, it points to
    * the previous (outer) un-closed block-start.
-   * If QUEUED_OP_SECTION_START_SECTION_END > 0, it points to the
+   * If QUEUED_OP_SECTION_START_BLOCK_END > 0, it points to the
    * corresponding block-end node.
    * In both cases the pointers are relative to the current BLOCK_START. */
   static final int QUEUED_OP_BLOCK_START_BLOCK_END = QUEUED_OP_SECTION_START_SIZE;
-  static final int QUEUED_OP_BLOCK_PREFIX = 0;
-  static final int QUEUED_OP_BLOCK_START_SUFFIX = 1;
+  static final int QUEUED_OP_BLOCK_START_PREFIX = QUEUED_OP_SECTION_START_SIZE + 1;
+  static final int QUEUED_OP_BLOCK_START_SUFFIX = QUEUED_OP_SECTION_START_SIZE + 2;
 
   static final int QUEUED_OP_BLOCK_END_TYPE = 5;
   static final int QUEUED_OP_BLOCK_END_SIZE = QUEUED_OP_SIZE;
@@ -227,7 +228,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void write (int ch)
   {
-    //System.err.print("{WRITE-ch: "+((char)ch)+"}");
+    //log("{WRITE-ch: "+((char)ch)+"}");
     if (ch == '\n' && isPrettyPrinting)
       enqueueNewline(NEWLINE_LITERAL);
     else
@@ -246,7 +247,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void write (String str, int start, int count)
   {
-    //System.err.print("{WRITE-str: "+str.substring(start, start+count)+"}");
+    //log("{WRITE-str: "+str.substring(start, start+count)+"}");
     while (count > 0)
       {
 	int cnt = count;
@@ -279,7 +280,7 @@ public class PrettyWriter extends java.io.Writer
 
   public void write (char[] str, int start, int count)
   {
-    //System.err.print("{WRITE: "+new String(str, start, count)+"}");
+    //log("{WRITE: "+new String(str, start, count)+"}");
     int end = start + count;
   retry:
     while (count > 0)
@@ -440,7 +441,7 @@ public class PrettyWriter extends java.io.Writer
 	String[] newStrings = new String[newLength];
 	int queueHead = queueTail + queueSize - oldLength;
 	if (queueHead > 0)
-	  {
+	  { // Wraps around.
 	    System.arraycopy(queueInts, 0, newInts, 0, queueHead);
 	    System.arraycopy(queueStrings, 0, newStrings, 0, queueHead);
 	  }
@@ -465,13 +466,15 @@ public class PrettyWriter extends java.io.Writer
     if (size > 1)
       queueInts[addr + QUEUED_OP_POSN] = indexPosn(bufferFillPointer);
     queueSize += size;
+    //log("enqueue kind:"+kind+" size:"+size+" -> "+queueSize);
     return addr;
   }
 
-  public void enqueueNewline (int kind) // DONE
+  public void enqueueNewline (int kind)
   {
     int depth = pendingBlocksCount;
     int newline = enqueue(QUEUED_OP_NEWLINE_TYPE, QUEUED_OP_NEWLINE_SIZE);
+    //log("enqueueNewline kind:"+((char) kind)+" at:"+newline);
     queueInts[newline + QUEUED_OP_NEWLINE_KIND] = kind;
     queueInts[newline + QUEUED_OP_SECTION_START_DEPTH] = pendingBlocksCount;
     queueInts[newline + QUEUED_OP_SECTION_START_SECTION_END] = 0;
@@ -533,14 +536,21 @@ public class PrettyWriter extends java.io.Writer
     int start = enqueue (QUEUED_OP_BLOCK_START_TYPE,
 			 QUEUED_OP_BLOCK_START_SIZE);
     queueInts[start + QUEUED_OP_SECTION_START_DEPTH] = pendingBlocksCount;
-    queueStrings[start + QUEUED_OP_BLOCK_PREFIX] = perLine ? prefix : null;
+    queueStrings[start + QUEUED_OP_BLOCK_START_PREFIX]
+      = perLine ? prefix : null;
     queueStrings[start + QUEUED_OP_BLOCK_START_SUFFIX] = suffix;
     pendingBlocksCount++;
-    currentBlock -= start;
-    if (currentBlock > 0)
-      currentBlock -= queueInts.length;
+    int outerBlock = currentBlock;
+    if (outerBlock < 0)
+      outerBlock = 0;
+    else
+      {
+	outerBlock -= start;
+	if (outerBlock > 0)
+	  outerBlock -= queueInts.length;
+      }
+    queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END] = outerBlock;
     queueInts[start + QUEUED_OP_SECTION_START_SECTION_END] = 0;
-    queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END] = currentBlock;
     currentBlock = start;
   }
 
@@ -548,7 +558,7 @@ public class PrettyWriter extends java.io.Writer
   {
     int end = enqueue (QUEUED_OP_BLOCK_END_TYPE, QUEUED_OP_BLOCK_END_SIZE);
     pendingBlocksCount--;
-    if (blockDepth >= LOGICAL_BLOCK_LENGTH * (pendingBlocksCount + 2))
+    if (currentBlock < 0)
       {
 	// reallyStartLogicalBlock has been called for the matching
 	// BEGIN_BLOCK, so it is no longer in the queue.  Instead it is in
@@ -560,14 +570,21 @@ public class PrettyWriter extends java.io.Writer
 	  write(this.suffix,
 		this.suffix.length - suffixLength,
 		suffixLength - suffixPreviousLength);
+	currentBlock = -1;
 	return;
       }
     int start = currentBlock;
-    currentBlock = queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END];
-    // Make currentBlock absolute instead of relative.
-    currentBlock += start;
-    if (currentBlock < 0)
-      currentBlock += queueInts.length;
+    int outerBlock = queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END];
+    if (outerBlock == 0)
+      currentBlock = -1;
+    else
+      {
+	// Make currentBlock absolute instead of relative.
+	outerBlock += start;
+	if (outerBlock < 0)
+	  outerBlock += queueInts.length;
+	currentBlock = outerBlock;
+      }
     String suffix = queueStrings[start + QUEUED_OP_BLOCK_START_SUFFIX];
     if (suffix != null)
       write(suffix);
@@ -575,6 +592,7 @@ public class PrettyWriter extends java.io.Writer
     if (endFromStart < 0) // wrap-around.
       endFromStart += queueInts.length;
     queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END] = endFromStart;
+    //log("endLogicalBlock end:"+end+" start:"+start+" rel:"+endFromStart);
   }
 
   public void endLogicalBlock (String suffix)
@@ -645,7 +663,7 @@ public class PrettyWriter extends java.io.Writer
     return column + index;
   }
 
-  void expandTabs (int through) // ODNE except FIXMEs
+  void expandTabs (int through)
   {
     int numInsertions = 0;
     int additional = 0;
@@ -751,8 +769,7 @@ public class PrettyWriter extends java.io.Writer
   boolean maybeOutput(boolean forceNewlines) // DONE
   {
     boolean outputAnything = false;
-    //System.err.print("maybeOutput("+forceNewlines+"):");  System.err.flush();
-    //dumpQueue();
+    //log("maybeOutput("+forceNewlines+"):");  dumpQueue();
   loop:
     while (queueSize > 0)
       {
@@ -827,6 +844,7 @@ public class PrettyWriter extends java.io.Writer
 	    // Convert relative offset to absolute index:
 	    end = end > 0 ? (end + next) % queueInts.length : -1;
 	    int fits = fitsOnLine (end, forceNewlines);
+	    //log("block-start @"+next+" end:"+end+" force:"+forceNewlines+" fits:"+fits);
 	    if (fits > 0)
 	      {
 		// Just nuke the whole logical block and make it look
@@ -837,11 +855,13 @@ public class PrettyWriter extends java.io.Writer
 		expandTabs(next);
 		queueTail = next;
 		queueSize -= endr;
+		//log("remove block -> next:"+next+" endr:"+endr+" qSize:"+queueSize);
 	      }
 	    else if (fits < 0)
 	      {
-		String prefix = queueStrings[next + QUEUED_OP_BLOCK_PREFIX];
+		String prefix = queueStrings[next + QUEUED_OP_BLOCK_START_PREFIX];
 		String suffix = queueStrings[next + QUEUED_OP_BLOCK_START_SUFFIX];
+		//log("reallyStartLogicalBlock: "+blockDepth+" at:"+next);
 		reallyStartLogicalBlock (posnColumn(queueInts[next + QUEUED_OP_POSN]),
 					 prefix, suffix);
 					 
@@ -850,6 +870,7 @@ public class PrettyWriter extends java.io.Writer
 	      break loop;
 	    break;
 	  case QUEUED_OP_BLOCK_END_TYPE:
+	    //log("reallyEndLogicalBlock: "+blockDepth+" at:"+next);
 	    reallyEndLogicalBlock();
 	    break;
 	  case QUEUED_OP_TAB_TYPE:
@@ -858,6 +879,7 @@ public class PrettyWriter extends java.io.Writer
 	  }
 	int size = getQueueSize(queueTail);
 	queueSize -= size;
+	//log("maybeWrite size: "+size+" ->"+queueSize);
 	queueTail = next + size;
       }
     return outputAnything;
@@ -943,6 +965,7 @@ public class PrettyWriter extends java.io.Writer
       }
     out.write(buffer, 0, amountToPrint);
     int lineNumber = this.lineNumber;
+    //log("outputLine#"+lineNumber+": \""+new String(buffer, 0, amountToPrint)+"\" curBlock:"+currentBlock);
     lineNumber++;
     if (! printReadably())
       {
@@ -1009,6 +1032,7 @@ public class PrettyWriter extends java.io.Writer
     try
       {
 	out.write(buffer, 0, count);
+	//log("outputPartial: \""+new String(buffer, 0, count)+'\"');
       }
     catch (IOException ex)
       {
@@ -1087,22 +1111,52 @@ public class PrettyWriter extends java.io.Writer
     pendingBlocksCount = 0;
   }
 
+  /*
+  static PrintWriter log;
+  static {
+    try { log = new PrintWriter(new FileOutputStream("/tmp/pplog")); }
+    catch (Throwable ex) { ex.printStackTrace(); }
+  }
+  void log(String str)
+  {
+    log.println(str);
+    log.flush();
+  }
   void dumpQueue()
   {
-    PrintWriter out = new PrintWriter(System.err);
-    out.println("Queue tail:"+queueTail+" size:"+queueSize);
-    dumpQueue(queueTail, queueSize, out);
-    out.flush();
+    log.println("Queue tail:"+queueTail+" size:"+queueSize
+		+" length:"+queueInts.length+" startCol:"+bufferStartColumn);
+    dumpQueue(queueTail, queueSize, log);
   }
 
   void dumpQueue(int start, int todo, PrintWriter out)
   {
+    int bufIndex = 0;
     while (todo > 0)
       {
 	if (start == queueInts.length)
 	  start = 0;
+	if (start < 0 || start >= queueInts.length)
+	  {
+	    out.print('@');	out.print(start);  out.print(": ");
+	    out.print("out of bounds - queueInts length is ");
+	    out.println(queueInts.length);
+	    break;
+	  }
 	int type = getQueueType(start);
 	int size = getQueueSize(start);
+	if (type != QUEUED_OP_NOP_TYPE)
+	  {
+	    int newIndex = posnIndex(queueInts[start+QUEUED_OP_POSN]);
+	    int count = newIndex - bufIndex;
+	    if (count > 0)
+	      {
+		out.print(count); out.print(" chars: \"");
+		out.write(buffer, bufIndex, count);
+		out.println('\"');
+		bufIndex = newIndex;
+	      }
+	  }
 	out.print('@');	out.print(start);  out.print(": ");
 	out.print("type:");  out.print(type);
 	switch (type)
@@ -1146,8 +1200,7 @@ public class PrettyWriter extends java.io.Writer
 	  {
 	  case QUEUED_OP_BLOCK_START_TYPE:
 	    printQueueWord(start, QUEUED_OP_BLOCK_START_BLOCK_END, "block-end", out);
-	    String prefix = queueStrings[start+QUEUED_OP_BLOCK_PREFIX];
-	    printQueueStringWord(start, QUEUED_OP_BLOCK_PREFIX, "prefix", out);
+	    printQueueStringWord(start, QUEUED_OP_BLOCK_START_PREFIX, "prefix", out);
 	    printQueueStringWord(start, QUEUED_OP_BLOCK_START_SUFFIX, "suffix", out);
 	    break;
 	  case QUEUED_OP_NEWLINE_TYPE:
@@ -1175,6 +1228,13 @@ public class PrettyWriter extends java.io.Writer
 	  }
 	todo -= size;
 	start += size;
+      }
+    int count = bufferFillPointer - bufIndex;
+    if (count > 0)
+      {
+	out.print(count); out.print(" chars: \"");
+	out.write(buffer, bufIndex, count);
+	out.println('\"');
       }
   }
 
@@ -1209,4 +1269,5 @@ public class PrettyWriter extends java.io.Writer
 	out.println(str.length());
       }
   }
+  */
 }

@@ -83,7 +83,7 @@ implements TypeValue, Externalizable, GroupPredicate
 				    String namespaceURI, String localName)
   {
     SeqPosition pos = NodeType.coerceOrNull(obj, GROUP_OK);
-    if (pos.sequence == null)
+    if (pos == null)
       return null;
     Object curName = pos.getNextTypeObject();
     String curNamespaceURI;

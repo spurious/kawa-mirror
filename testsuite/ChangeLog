@@ -1,3 +1,7 @@
+1999-04-11  Per Bothner  <bothner@cygnus.com>
+
+	* obj-test.scm:  A test for object form needing static link.
+
 Thu Apr  8 20:48:23 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* misc-test.scm:  Add new test for fluid-let.

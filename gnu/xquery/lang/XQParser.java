@@ -991,7 +991,25 @@ public class XQParser extends LispReader // should be extends Lexer
 	  eofError("unexpected end-of-file");
 	if (next == '{')
 	  {
-	    result.addElement(parseEnclosedExpr());
+	    next = read();
+	    if (next == '{')
+	      sbuf.append('{');
+	    else
+	      {
+		unread(next);
+		result.addElement(parseEnclosedExpr());
+	      }
+	  }
+	else if (next == '}')
+	  {
+	    next = read();
+	    if (next == '}')
+	      sbuf.append('}');
+	    else
+	      {
+		error("unexpected '}' in element content");
+		unread(next);
+	      }
 	  }
 	else if (next == '<' && delimiter == '<')
 	  {

@@ -1,6 +1,5 @@
 package kawa.lang;
-import gnu.bytecode.Type;
-import gnu.bytecode.ClassType;
+import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
@@ -9,26 +8,22 @@ import gnu.expr.*;
 public class SetFieldProc extends Procedure2 implements Inlineable
 {
   ClassType ctype;
-  String fname;
-  gnu.bytecode.Field field;
-  java.lang.reflect.Field reflectField;
+  Field field;
 
-  SetFieldProc (Class clas, String fname)
+  public SetFieldProc (Class clas, String fname)
   {
-    ctype = (ClassType) gnu.bytecode.Type.make(clas);
-    this.fname = fname;
+    this ((ClassType) Type.make(clas), fname);
   }
 
   public SetFieldProc (ClassType ctype, String fname)
   {
     this.ctype = ctype;
-    this.fname = fname;
+    this.field = Field.searchField(ctype.getFields(), fname);
   }
 
   public SetFieldProc (ClassType ctype, String name, Type ftype, int flags)
   {
     this.ctype = ctype;
-    this.fname = name;
     field = ctype.getField(name);
     if (field == null)
       field = ctype.addField(name, ftype, flags);
@@ -36,29 +31,23 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    if (reflectField == null)
-      {
-	Class clas = ctype.getReflectClass();
-	try
-	  {
-	    reflectField = clas.getField (fname);
-	  }
-	catch (NoSuchFieldException ex)
-	  {
-	    throw new GenericError ("no such field "+fname+" in "+clas.getName());
-	  }
-      }
     try
       {
-	if (field != null)
-	  arg2 = field.getType().coerceFromObject(arg2);
+	java.lang.reflect.Field reflectField = field.getReflectField();
+	arg2 = field.getType().coerceFromObject(arg2);
 	reflectField.set(arg1, arg2);
-	return Interpreter.voidObject;
+      }
+    catch (NoSuchFieldException ex)
+      {
+	throw new RuntimeException ("no such field " + field.getSourceName()
+				    + " in " + ctype.getName());
       }
     catch (IllegalAccessException ex)
       {
-	throw new GenericError("illegal access for field "+fname);
+	throw new RuntimeException("illegal access for field "
+				   + field.getSourceName());
       }
+    return Interpreter.voidObject;
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
@@ -68,13 +57,6 @@ public class SetFieldProc extends Procedure2 implements Inlineable
       {
         ApplyExp.compile(exp, comp, target);
         return;
-      }
-    if (field == null)
-      {
-	field = ctype.getField(fname);
-	if (field == null)
-	  field = ctype.addField(fname, Type.make(reflectField.getType()),
-				 reflectField.getModifiers());
       }
     Expression[] args = exp.getArgs();
     args[0].compile(comp, ctype);

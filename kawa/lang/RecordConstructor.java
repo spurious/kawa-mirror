@@ -1,71 +1,83 @@
 package kawa.lang;
-import java.lang.reflect.Field;
-import gnu.bytecode.ClassType;
+import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.kawa.util.*;
 
 public class RecordConstructor extends ProcedureN
 {
-  Class clas;
+  ClassType type;
   Field[] fields;
+
+  public RecordConstructor (ClassType type, Field[] fields)
+  {
+    this.type = type;
+    this.fields = fields;
+  }
 
   public RecordConstructor (Class clas, Field[] fields)
   {
-    this.clas = clas;
-    this.fields = fields;
+    this((ClassType) Type.make(clas), fields);
   }
 
   public RecordConstructor (Class clas)
   {
-    this.clas = clas;
-    this.fields = clas.getDeclaredFields();
+    init((ClassType) Type.make(clas));
   }
 
-  public RecordConstructor (Class clas, String[] fnames)
+  public RecordConstructor (ClassType type)
   {
-    this.clas = clas;
-    this.fields = new Field[fnames.length];
-    for (int i = 0;  i < fnames.length;  i++)
+    init(type);
+  }
+
+  private void init(ClassType type)
+  {
+    this.type = type;
+    Field list = type.getFields();
+    int count = 0;
+    for (Field fld = list;  fld != null;  fld = fld.getNext())
       {
-	String fname = fnames[i];
-	try
-	  {
-	    this.fields[i] = clas.getField(fname);
-	  }
-	catch (NoSuchFieldException ex)
-	  {
-	    throw new GenericError ("no such field "+fname+" in "+clas.getName());
-	  }
+	if ((fld.getModifiers() & (Access.PUBLIC|Access.STATIC))
+	    == Access.PUBLIC)
+	  count++;
       }
-  }
-
-  public RecordConstructor (ClassType ctype, Object fieldsList)
-  {
-    this(ctype.getReflectClass(), fieldsList);
+    fields = new Field[count];
+    int i = 0;
+    for (Field fld = list;  fld != null;  fld = fld.getNext())
+      {
+	if ((fld.getModifiers() & (Access.PUBLIC|Access.STATIC))
+	    == Access.PUBLIC)
+	  fields[i++] = fld;
+      }
   }
 
   public RecordConstructor (Class clas, Object fieldsList)
   {
-    this.clas = clas;
+    this((ClassType) Type.make(clas), fieldsList);
+  }
+
+  public RecordConstructor (ClassType type, Object fieldsList)
+  {
+    this.type = type;
     if (fieldsList == null)
-      {
-	 this.fields = clas.getDeclaredFields();
-      }
+      init(type);
     else
       {
 	int nfields = LList.length(fieldsList);
 	this.fields = new Field[nfields];
+	Field list = type.getFields();
 	for (int i = 0;  i < nfields;  i++)
 	  {
 	    Pair pair = (Pair) fieldsList;
 	    String fname = pair.car.toString();
-	    try
+	    for (Field fld = list;  ;  fld = fld.getNext())
 	      {
-		this.fields[i] = clas.getField(fname);
-	      }
-	    catch (NoSuchFieldException ex)
-	      {
-		throw new GenericError ("no such field "+fname+" in "+clas.getName());
+		if (fld == null)
+		  throw new RuntimeException ("no such field "+fname+" in "+type.getName());
+		if (fld.getSourceName() == fname)
+		  {
+		    this.fields[i] = fld;
+		    break;
+		  }
 	      }
 	    fieldsList = pair.cdr;
 	  }
@@ -80,7 +92,7 @@ public class RecordConstructor extends ProcedureN
 
   public String getName()
   {
-    return clas.getName()+" constructor";
+    return type.getName()+" constructor";
   }
 
   public Object applyN (Object[] args)
@@ -88,9 +100,8 @@ public class RecordConstructor extends ProcedureN
     Object obj;
     try
       {
-	obj = clas.newInstance();
+	obj = type.getReflectClass().newInstance();
       }
-    
     catch (InstantiationException ex)
       {
 	throw new GenericError (ex.toString());
@@ -106,11 +117,11 @@ public class RecordConstructor extends ProcedureN
 	Field fld = fields[i];
 	try
 	  {
-	    fld.set(obj, args[i]);
+	    fld.getReflectField().set(obj, args[i]);
 	  }
-	catch (IllegalAccessException ex)
+	catch (Exception ex)
 	  {
-	    throw new GenericError("illegal access for field "+fld.getName());
+	    throw new WrappedException("illegal access for field "+fld.getName(), ex);
 	  }
       }
     return obj;

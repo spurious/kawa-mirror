@@ -21,7 +21,7 @@ class GuiInPort extends TtyInPort
     * Needed to handle when a multi-line selection is pasted in.
     * We want the output (and prompt) to be "interpolated" in the right
     * places, so we fake an <Enter> when we're ready to read the
-    * next line.  This sense the next line to the reader.
+    * next line.  This sends the next line to the reader.
     */
   public void lineStart (boolean revisited) throws java.io.IOException
   {

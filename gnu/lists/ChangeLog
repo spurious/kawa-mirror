@@ -1,3 +1,10 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* Convert.java:  Moved to ...
+	* Convert.java.in:  New file.
+	(parseDouble):  New static convenience method.
+	* Makefile.am:  Update to generate Convert.java from Convert.java.in.
+
 2001-04-22  Per Bothner  <per@bothner.com>
 
 	* Convert.java (booleanToObject, objectToBoolean):  New methods.

@@ -1,3 +1,7 @@
+Static modulues are now implemented more similarly to non-staic modules.
+Specifically, the module body is not automatically run by the class
+initializer.  To get the old behavior, use the new --module-static-run flag.
+
 Implement SRFI-39 "Parameter-objects".  These are like anonymous
 fluid values and use the same implementation.
 current-input-port, current-output-port, and current-error-port 

@@ -610,7 +610,7 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL_PROGRAM}'
 
 PACKAGE=kawa
 
-VERSION=1.6
+VERSION=1.6.51
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -836,8 +836,6 @@ test x"${am_cv_exeext}" != xno && EXEEXT=${am_cv_exeext}
 echo "$ac_t""${am_cv_exeext}" 1>&6
 
 
-#PACKAGE=kawa
-#VERSION=2.0alpha
 ac_aux_dir=
 for ac_dir in . $srcdir/.; do
   if test -f $ac_dir/install-sh; then
@@ -1002,8 +1000,9 @@ ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
+  gnu/ecmascript/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
-  doc/Makefile testsuite/Makefile kawa/Version.java" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+  doc/Makefile testsuite/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -1092,8 +1091,9 @@ EOF
 cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
+  gnu/ecmascript/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
-  doc/Makefile testsuite/Makefile kawa/Version.java"}
+  doc/Makefile testsuite/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then

@@ -1,5 +1,7 @@
 Sat Apr  4 17:53:18 1998  Per Bothner  <bothner@cygnus.com>
 
+	* configure.in:  Set version number to 1.6.51.
+	
 	* kawa/lang/Char.java (toString):  New method.
 
 	* kawa/lang/ConditionalTarget.java:  New Target class.
@@ -28,8 +30,9 @@ Sat Apr  4 17:53:18 1998  Per Bothner  <bothner@cygnus.com>
 	* kawa/repl.java (main):  Allow multiple source files after -C flag.
 
 	* kawa/Version.java.in:  Use VERSION instead of @VERSION@ as template.
-	* Makefile.am (Version.java):  New generated at build time.
+	* kawa/Makefile.am (Version.java):  New generated at build time.
 	(EXTRA_DIST):  Also distribute generated Version.java.
+	* configure.in (AC_OUTPUT):  Remove kawa/Version.java.
 	
 Fri Mar 13 22:11:59 1998  Per Bothner  <bothner@cygnus.com>
 

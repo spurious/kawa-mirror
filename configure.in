@@ -1,13 +1,11 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.6)
+AM_INIT_AUTOMAKE(kawa, 1.6.51)
 
 AM_MAINTAINER_MODE
 AM_EXEEXT
 
-#PACKAGE=kawa
-#VERSION=2.0alpha
 AC_CONFIG_AUX_DIR(.)
 AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
@@ -25,5 +23,6 @@ AC_SUBST(TOP_BUILDDIR)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
+  gnu/ecmascript/Makefile
   kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
-  doc/Makefile testsuite/Makefile kawa/Version.java)
+  doc/Makefile testsuite/Makefile)

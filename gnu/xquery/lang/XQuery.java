@@ -613,6 +613,87 @@ public class XQuery extends Interpreter
   {
     return new Prompter();
   }
+
+  /*
+  static boolean isPunctuation (char ch)
+  {
+    return ch == '-' || ch == '.' || ch == ':' || ch == '_'
+      || (ch >= 0xB7 // To short-circuit rare tests
+	  && (ch == '\u00B7' // middle dot
+	      || ch == '\u0387' // greek ano teleia
+	      || ch == '\u06dd' // arabic end of ayah
+	      || ch == '\u06de' // arabic start of rub el hizb
+	      ));
+  }
+
+  static boolean isMark (char ch)
+  {
+    return ! Character.isLetter(ch)
+      && ! Characfter.isDigit(ch)
+      && Character.isJavaIdnteiferiPart(ch);
+  }
+  */
+
+  /** Mangle an XML as specified by JAXB. */
+  static void mangle (String name, int start, int length,
+		      StringBuffer sbuf, char mode)
+  {
+    // One of 'P' for punctuation; 'D' for digit;  'M' for mark;
+    // 'L' for lower-case; 'U' for upper-case; 'O' other (uncased) letter.
+    char prev = 'P';
+    int outStart = sbuf.length();
+    for (int i = 0;  i < length;  )
+      {
+	boolean wordStart;
+	char ch = name.charAt(start + i);
+	i++;
+	if (Character.isUpperCase(ch))
+	  {
+	    wordStart = prev != 'U'
+	      || (i < length
+		  && Character.isLowerCase(name.charAt(start+i)));
+	    prev = 'U';
+	  }
+	else if (Character.isLowerCase(ch))
+	  {
+	    wordStart = prev != 'L' || prev != 'U';
+	    prev = 'L';
+	  }
+	else if (Character.isLetter(ch))
+	  { // uncased letter
+	    wordStart = prev != 'O';
+	    prev = 'O';
+	  }
+	else if (Character.isDigit(ch))
+	  {
+	    wordStart = prev != 'D';
+	    prev = 'D';
+	  }
+	else if (Character.isJavaIdentifierPart(ch))
+	  {
+	    wordStart = prev != 'D' && prev != 'M';
+	    prev = 'M';
+	  }
+	else // if (isPunctuation(ch))
+	  {
+	    prev = 'P';
+	    continue;
+	  }
+	if (wordStart || mode == '_')
+	  {
+	    if (wordStart && mode == '_' && sbuf.length() > outStart)
+	      sbuf.append('_');
+	    ch = Character.toUpperCase(ch);
+	  }
+	sbuf.append(ch);
+      }
+  }
+  public static String mangle (String name)
+  {
+    StringBuffer sbuf = new StringBuffer();
+    mangle(name, 0, name.length(), sbuf, 'U');
+    return sbuf.toString();
+  }
 }
 
 class Prompter extends Procedure1

@@ -113,7 +113,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    /* DEBUGGING:
 	    OutPort err = OutPort.errDefault();
 	    err.println ("{translated template:");
-	    this.rules[i].print_template_program (template_identifiers, err);
+	    this.rules[i].print_template_program (capturedIdentifiers, err);
 	    err.println ('}');
 	    */
 	  }

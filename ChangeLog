@@ -1,3 +1,12 @@
+2003-01-24  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewrite):  Don't convert rest parameter
+	to String if it is a Symbol.
+
+	* kawa/lang/SyntaxRule.java (print_template_program):  Update
+	commented-out debug helper routine.
+	* kawa/lang/SyntaxRules.java (<init>):  Update call in debug code.
+
 2003-01-03  Per Bothner  <per@bothner.com>
 
 	* libtool.m4, ltmain.sh:  Copied from libtool (pre-1.5 CVS) version.

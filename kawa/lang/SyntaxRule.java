@@ -81,7 +81,7 @@ public class SyntaxRule implements Externalizable
   final static int FIRST_LITERALS = 6;
 
   /* DEBUGGING
-  void print_template_program (String[] template_identifiers,
+  void print_template_program (java.util.Vector capturedIdentifiers,
 			       java.io.PrintWriter ps)
   {
     for (int i = 0;  i < template_program.length (); i++)
@@ -110,7 +110,7 @@ public class SyntaxRule implements Externalizable
 	    if (ident_num < 0)
 	      ps.println (" - var[" + var_num + "]");
 	    else
-	      ps.println (" - ident["+template_identifiers[ident_num]+"]");
+	      ps.println (" - ident["+capturedIdentifiers.elementAt(ident_num)+"]");
 	  }
       }
   }

@@ -274,7 +274,7 @@ public class Lambda extends Syntax implements Printable
       }
     if (bindings instanceof String || bindings instanceof Symbol)
       {
-	Declaration decl = lexp.addDeclaration (bindings.toString());
+	Declaration decl = lexp.addDeclaration (bindings);
 	decl.setType(Compilation.scmListType);
 	decl.noteValue (null);  // Does not have a known value.
 	tr.push(decl);

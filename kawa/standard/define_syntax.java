@@ -4,7 +4,6 @@ import kawa.lang.*;
 /**
  * The Syntax transformer that re-writes the "define-syntax" Scheme primitive.
  * Does not handle:
- * - quote in template (symbols get renamed, when they should not)
  * - literals are truly literal (we do not check that the binding at
  *   macro expansion time matches that at definition time)
  * @author	Per Bothner

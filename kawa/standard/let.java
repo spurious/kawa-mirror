@@ -3,6 +3,8 @@ import kawa.lang.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "let" primitive.
+ * This only handles standard "unnamed" let.
+ * The let macro in ../lib/let.scm handles named let as well.
  * @author	Per Bothner
  */
 

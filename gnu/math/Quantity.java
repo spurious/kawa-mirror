@@ -153,10 +153,10 @@ public abstract class Quantity extends Numeric
     throw new IllegalArgumentException ();
   }
 
-  public static Quantity mul (Quantity x, Quantity y)
+  public static Quantity times (Quantity x, Quantity y)
   {
-    Unit unit = Unit.mul (x.unit(), y.unit());
-    // return Quantity.make (Complex.mul (x.number(), y.number()), unit);
+    Unit unit = Unit.times(x.unit(), y.unit());
+    // return Quantity.make (Complex.times(x.number(), y.number()), unit);
     Numeric num = x.number().mul(y.number());
     return Quantity.make ((Complex) num, unit);
   }
@@ -164,20 +164,20 @@ public abstract class Quantity extends Numeric
   public Numeric mul (Object y)
   {
     if (y instanceof Quantity)
-      return mul (this, (Quantity) y);
+      return times(this, (Quantity) y);
     return ((Numeric)y).mulReversed (this);
   }
 
   public Numeric mulReversed (Numeric x)
   {
     if (x instanceof Quantity)
-      return mul ((Quantity)x, this);
+      return times((Quantity) x, this);
     throw new IllegalArgumentException ();
   }
 
-  public static Quantity div (Quantity x, Quantity y)
+  public static Quantity divide (Quantity x, Quantity y)
   {
-    Unit unit = Unit.div (x.unit(), y.unit());
+    Unit unit = Unit.divide (x.unit(), y.unit());
     Numeric num = x.number().div(y.number());
     return Quantity.make ((Complex) num, unit);
   }
@@ -185,14 +185,14 @@ public abstract class Quantity extends Numeric
   public Numeric div (Object y)
   {
     if (y instanceof Quantity)
-      return div (this, (Quantity) y);
+      return divide(this, (Quantity) y);
     return ((Numeric)y).divReversed (this);
   }
 
   public Numeric divReversed (Numeric x)
   {
     if (x instanceof Quantity)
-      return div ((Quantity)x, this);
+      return divide((Quantity)x, this);
     throw new IllegalArgumentException ();
   }
 

@@ -73,7 +73,7 @@ class MulUnit extends Unit implements Externalizable
   public Unit sqrt ()
   {
     if ((power1 & 1) == 0 && (power2 & 1) == 0)
-      return mul (unit1, power1 >> 1, unit2, power2 >> 1);
+      return times(unit1, power1 >> 1, unit2, power2 >> 1);
     return super.sqrt();
   }
 

@@ -30,7 +30,7 @@ public abstract class Unit extends Quantity
 
   public String getName() { return null; }
 
-  static Unit mul (Unit unit1, int power1, Unit unit2, int power2)
+  static Unit times(Unit unit1, int power1, Unit unit2, int power2)
   {
     // First try various simplifications.
     if (unit1 == unit2)
@@ -57,53 +57,53 @@ public abstract class Unit extends Quantity
       {
 	MulUnit munit1 = (MulUnit) unit1;
 	if (munit1.unit1 == unit2)
-	  return mul (unit2, munit1.power1 * power1 + power2,
-		      munit1.unit2, munit1.power2 * power1);
+	  return times(unit2, munit1.power1 * power1 + power2,
+		       munit1.unit2, munit1.power2 * power1);
 	if (munit1.unit2 == unit2)
-	  return mul (munit1.unit1, munit1.power1 * power1,
-		      unit2, munit1.power2 * power1 + power2);
+	  return times(munit1.unit1, munit1.power1 * power1,
+		       unit2, munit1.power2 * power1 + power2);
 	if (unit2 instanceof MulUnit)
 	  {
 	    MulUnit munit2 = (MulUnit) unit2;
 	    if (munit1.unit1 == munit2.unit1 && munit1.unit2 == munit2.unit2)
-	      return mul (munit1.unit1,
-			  munit1.power1 * power1 + munit2.power1 * power2,
-			  munit1.unit2,
-			  munit1.power2 * power1 + munit2.power2 * power2);
+	      return times(munit1.unit1,
+			   munit1.power1 * power1 + munit2.power1 * power2,
+			   munit1.unit2,
+			   munit1.power2 * power1 + munit2.power2 * power2);
 	    if (munit1.unit1 == munit2.unit2 && munit1.unit2 == munit2.unit1)
-	      return mul (munit1.unit1,
-			  munit1.power1 * power1 + munit2.power2 * power2,
-			  munit1.unit2,
-			  munit1.power2 * power1 + munit2.power1 * power2);
+	      return times(munit1.unit1,
+			   munit1.power1 * power1 + munit2.power2 * power2,
+			   munit1.unit2,
+			   munit1.power2 * power1 + munit2.power1 * power2);
 	  }
       }
     if (unit2 instanceof MulUnit)
       {
 	MulUnit munit2 = (MulUnit) unit2;
 	if (munit2.unit1 == unit1)
-	  return mul (unit1, power1 + munit2.power1 * power2,
-		      munit2.unit2, munit2.power2 * power2);
+	  return times(unit1, power1 + munit2.power1 * power2,
+		       munit2.unit2, munit2.power2 * power2);
 	if (munit2.unit2 == unit1)
-	  return mul (munit2.unit1, munit2.power1 * power2,
-		      unit1, power1 + munit2.power2 * power2);
+	  return times(munit2.unit1, munit2.power1 * power2,
+		       unit1, power1 + munit2.power2 * power2);
       }
 
     return MulUnit.make(unit1, power1, unit2, power2);
   }
 
-  public static Unit mul (Unit unit1, Unit unit2)
+  public static Unit times(Unit unit1, Unit unit2)
   {
-    return mul(unit1, 1, unit2, 1);
+    return times(unit1, 1, unit2, 1);
   }
 
-  public static Unit div (Unit unit1, Unit unit2)
+  public static Unit divide (Unit unit1, Unit unit2)
   {
-    return mul(unit1, 1, unit2, -1);
+    return times(unit1, 1, unit2, -1);
   }
 
   public static Unit pow (Unit unit, int power)
   {
-    return mul(unit, power, Unit.Empty, 0);
+    return times(unit, power, Unit.Empty, 0);
   }
 
   Unit ()

@@ -36,12 +36,12 @@ public abstract class RealNum extends Complex
     return (RealNum)(x.add(y, k));
   }
 
-  public static RealNum mul (RealNum x, RealNum y)
+  public static RealNum times(RealNum x, RealNum y)
   {
     return (RealNum)(x.mul(y));
   }
 
-  public static RealNum div (RealNum x, RealNum y)
+  public static RealNum divide (RealNum x, RealNum y)
   {
     return (RealNum)(x.div(y));
   }

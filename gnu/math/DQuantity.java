@@ -36,17 +36,17 @@ public class DQuantity extends Quantity implements Externalizable
     return new DQuantity (x.factor + k * unit_ratio * y.factor, x.unit());
   }
 
-  public static DQuantity mul (DQuantity x, DQuantity y)
+  public static DQuantity times (DQuantity x, DQuantity y)
   {
     double factor = x.factor * y.factor;
-    Unit unit = Unit.mul (x.unit(), y.unit());
+    Unit unit = Unit.times(x.unit(), y.unit());
     return new DQuantity (factor, unit);
   }
 
-  public static DQuantity div (DQuantity x, DQuantity y)
+  public static DQuantity divide (DQuantity x, DQuantity y)
   {
     double factor = x.factor / y.factor; 
-    Unit unit = Unit.div (x.unit(), y.unit());
+    Unit unit = Unit.divide(x.unit(), y.unit());
     return new DQuantity (factor, unit);
   }
 
@@ -71,7 +71,7 @@ public class DQuantity extends Quantity implements Externalizable
   public Numeric mul (Object y)
   {
     if (y instanceof DQuantity)
-      return mul (this, (DQuantity) y);
+      return times(this, (DQuantity) y);
     if (y instanceof RealNum)
       return new DQuantity (factor * ((RealNum)y).doubleValue (), unit());
     if (!(y instanceof Numeric))
@@ -94,7 +94,7 @@ public class DQuantity extends Quantity implements Externalizable
 	if (dimensions() == qy.dimensions())
 	  return new DFloNum ((factor * unit().doubleValue())
 			      / (qy.factor * qy.unit().factor));
-	return div (this, qy);
+	return divide(this, qy);
       }
     if (y instanceof RealNum)
       return new DQuantity (factor / ((RealNum)y).doubleValue (), unit());
@@ -107,7 +107,7 @@ public class DQuantity extends Quantity implements Externalizable
   {
     if (x instanceof RealNum)
       return new DQuantity (((RealNum)x).doubleValue () / factor,
-			   Unit.div (Unit.Empty, unit()));
+			   Unit.divide(Unit.Empty, unit()));
     throw new IllegalArgumentException ();
   }
 

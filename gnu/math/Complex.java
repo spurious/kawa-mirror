@@ -169,33 +169,33 @@ public abstract class Complex extends Quantity
     throw new IllegalArgumentException ();
   }
 
-  public static Complex mul (Complex x, Complex y)
+  public static Complex times (Complex x, Complex y)
   {
     RealNum x_re = x.re();
     RealNum x_im = x.im();
     RealNum y_re = y.re();
     RealNum y_im = y.im();
-    return Complex.make (RealNum.add (RealNum.mul(x_re, y_re),
-				      RealNum.mul(x_im, y_im), -1),
-			 RealNum.add (RealNum.mul(x_re, y_im),
-				      RealNum.mul(x_im, y_re), 1));
+    return Complex.make (RealNum.add (RealNum.times(x_re, y_re),
+				      RealNum.times(x_im, y_im), -1),
+			 RealNum.add (RealNum.times(x_re, y_im),
+				      RealNum.times(x_im, y_re), 1));
   }
 
   public Numeric mul (Object y)
   {
     if (y instanceof Complex)
-      return mul (this, (Complex) y);
+      return times(this, (Complex) y);
     return ((Numeric)y).mulReversed(this);
   }
 
   public Numeric mulReversed (Numeric x)
   {
     if (x instanceof Complex)
-      return mul ((Complex)x, this);
+      return times((Complex)x, this);
     throw new IllegalArgumentException ();
   }
 
-  public static Complex div (Complex x, Complex y)
+  public static Complex divide (Complex x, Complex y)
   {
     if (! x.isExact () || ! y.isExact ())
       return DComplex.div (x.doubleRealValue(), x.doubleImagValue(),
@@ -206,26 +206,26 @@ public abstract class Complex extends Quantity
     RealNum y_re = y.re();
     RealNum y_im = y.im();
 
-    RealNum q = RealNum.add (RealNum.mul(y_re, y_re),
-			     RealNum.mul(y_im, y_im), 1);
-    RealNum n = RealNum.add(RealNum.mul(x_re, y_re),
-			    RealNum.mul(x_im, y_im), 1);
-    RealNum d = RealNum.add(RealNum.mul(x_im, y_re),
-			    RealNum.mul(x_re, y_im), -1);
-    return Complex.make(RealNum.div(n, q), RealNum.div(d, q));
+    RealNum q = RealNum.add (RealNum.times(y_re, y_re),
+			     RealNum.times(y_im, y_im), 1);
+    RealNum n = RealNum.add(RealNum.times(x_re, y_re),
+			    RealNum.times(x_im, y_im), 1);
+    RealNum d = RealNum.add(RealNum.times(x_im, y_re),
+			    RealNum.times(x_re, y_im), -1);
+    return Complex.make(RealNum.divide(n, q), RealNum.divide(d, q));
   }
 
   public Numeric div (Object y)
   {
     if (y instanceof Complex)
-      return div (this, (Complex) y);
+      return divide(this, (Complex) y);
     return ((Numeric)y).divReversed(this);
   }
 
   public Numeric divReversed (Numeric x)
   {
     if (x instanceof Complex)
-      return div ((Complex)x, this);
+      return divide((Complex)x, this);
     throw new IllegalArgumentException ();
   }
 

@@ -1,5 +1,15 @@
 2003-08-20  Per Bothner  <per@bothner.com>
 
+	* Complex.java:  Make more consistengt with IntNum.
+	(mul):  Rename static 2-operand method to times.
+	(div):  Rename static 2-operand method to divide.
+	* DComplex.java:  Likewise.
+	* DQuantity.java:  Likewise.
+	* MulUnit.java:  Likewise.
+	* Quantity.java:  Likewise.
+	* RealNum.java:  Likewise.
+	* Unit.java:  Likewise.
+
 	* IntNum.java (remainder, modulo):  Return x if y is zero.
 
 2003-08-14  Per Bothner  <per@bothner.com>

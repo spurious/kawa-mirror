@@ -126,7 +126,7 @@ public class DComplex extends Complex implements Externalizable
 	    return new DComplex (real * y_re - imag * y_im,
 				 real * y_im + imag * y_re);
 	  }
-	return Complex.mul (this, yc);
+	return Complex.times(this, yc);
       }
     return ((Numeric)y).mulReversed(this);
   }

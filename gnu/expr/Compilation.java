@@ -215,6 +215,7 @@ public class Compilation
   public static ClassType typeModuleBody
     = ClassType.make("gnu.expr.ModuleBody", typeProcedure0);
   public static ClassType typeApplet = ClassType.make("java.applet.Applet");
+  public static ClassType typeServlet = ClassType.make("gnu.kawa.servlet.KawaServlet");
 
   public static ClassType typeModuleMethod
   = ClassType.make("gnu.expr.ModuleMethod", typeProcedureN);
@@ -284,6 +285,10 @@ public class Compilation
   /** True if we should generate an Applet. */
   public boolean generateApplet = generateAppletDefault;
 
+  public static boolean generateServletDefault = false;
+  /** True if we should generate an Servlet. */
+  public boolean generateServlet = generateServletDefault;
+
   public static final ClassType getMethodProcType(ClassType modClass)
   {
     return usingTailCalls ? typeCpsMethodProc
@@ -294,7 +299,10 @@ public class Compilation
   public final ClassType getModuleSuperType(ModuleExp module)
   {
     ClassType sup = module.getSuperType();
-    return sup != null ? sup : generateApplet ? typeApplet : typeModuleBody;
+    return (sup != null ? sup
+	    : generateApplet ? typeApplet
+	    : generateServlet ? typeServlet
+	    : typeModuleBody);
   }
 
   public Interpreter getInterpreter()
@@ -892,9 +900,7 @@ public class Compilation
       return;
     boolean generateApplyMethodContainer
       = ! (curClass.getSuperclass().isSubtype(typeProcedure));
-    ClassType procType
-      = Compilation.usingTailCalls ? typeCpsMethodProc
-      : generateApplyMethodContainer ? typeApplyMethodProc : typeModuleMethod;
+    ClassType procType = getMethodProcType(curClass);
     if (Compilation.usingTailCalls)
       curClass.addInterface(typeCpsMethodContainer);
     else if (generateApplyMethodContainer)
@@ -1154,7 +1160,7 @@ public class Compilation
 
     CodeAttr code = getCode();
 
-    if (generateMain || generateApplet)
+    if (generateMain || generateApplet || generateServlet)
       {
 	ClassType interpreterType
 	  = (ClassType) Type.make(getInterpreter().getClass());
@@ -1347,7 +1353,7 @@ public class Compilation
 
     if (curClass == mainClass // && ! immediate
 	&& (staticModule || clinitChain != null || literalsChain != null
-	    || generateMain || generateApplet))
+	    || generateMain || generateApplet || generateServlet))
       {
 	Method save_method = method;
 

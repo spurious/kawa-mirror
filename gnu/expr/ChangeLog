@@ -1,3 +1,14 @@
+2001-10-11  Per Bothner  <per@bothner.com>
+
+	* Compilation.java:  Added support --servlet.
+	(typeServlet, generateServletDefault, generateServlet):  New fields
+	(getModuleSuperType, startClassInit, addClass): Handle generateServlet.
+	(generateApplyMethods):  Simplify - use getMethodProcType.
+	* LambdaExp.java (allocFieldFor):  Pass correct frameType to
+	Compilation.getMethodProcType.
+
+	* PrimProcedure.java (applyV):  Use WrappedException.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (asType):  CharSequence has been renamed to CharSeq.

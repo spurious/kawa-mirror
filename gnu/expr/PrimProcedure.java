@@ -150,7 +150,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	  throw (RuntimeException) th;
 	if (th instanceof Error)
 	  throw (Error) th;
-	throw new RuntimeException(th.toString());
+	throw new WrappedException(th);
       }
     catch (Exception ex)
       {

@@ -550,8 +550,8 @@ public class LambdaExp extends ScopeExp
 	if (! getNeedsClosureEnv())
 	  fflags = (fflags | Access.STATIC) & ~Access.FINAL;
       }
-    Type rtype = Compilation.getMethodProcType(comp.mainClass);
     ClassType frameType = getHeapLambda(outer).getHeapFrameType();
+    Type rtype = Compilation.getMethodProcType(frameType);
     Field field = frameType.addField (fname, rtype, fflags);
     if (nameDecl != null)
       nameDecl.field = field;

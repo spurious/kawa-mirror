@@ -175,7 +175,6 @@ define_syntax.class \
 syntax_error.class \
 let.class \
 letrec.class \
-letstar.class \
 begin.class \
 ifp.class \
 values.class \

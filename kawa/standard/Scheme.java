@@ -50,17 +50,17 @@ public class Scheme extends Interpreter
       define_syntax ("set!", "kawa.standard.set_b");
 
       // Section 4.2  -- complete
-      define_syntax ("cond", "kawa.lib.cond");
-      define_syntax ("case", "kawa.lib.case");
+      define_syntax ("cond", "kawa.lib.std_syntax");
+      define_syntax ("case", "kawa.lib.std_syntax");
       define ("and", new kawa.standard.and_or (true));
       define ("or", new kawa.standard.and_or (false));
       define_syntax ("%let", "kawa.standard.let");
-      define_syntax ("let", "kawa.lib.let");
-      define_syntax ("let*", "kawa.standard.letstar");
+      define_syntax ("let", "kawa.lib.std_syntax");
+      define_syntax ("let*", "kawa.lib.std_syntax");
       define_syntax ("letrec", "kawa.standard.letrec");
       define_syntax ("begin", "kawa.standard.begin");
-      define_syntax ("do", "kawa.lib.do");
-      define_syntax ("delay", "kawa.lib.delay");
+      define_syntax ("do", "kawa.lib.std_syntax");
+      define_syntax ("delay", "kawa.lib.std_syntax");
       define_proc ("%make-promise", "kawa.standard.make_promise");
       define_syntax ("quasiquote", "kawa.standard.quasiquote");
 

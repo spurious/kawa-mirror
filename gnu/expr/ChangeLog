@@ -1,5 +1,18 @@
 2005-03-16  Per Bothner  <per@bothner.com>
 
+	Change handling of static module to be more similar to non-static. 
+	* Language.java (defineAll): Skip *$instance and PRIVATE_PREFIX fields.
+	* ModuleExp.java (staticInitRun): New method.
+	* Compilation.java (moduleStatic): Change to handle --module-static-run.
+	(addClass): Static modules now implement Runnable.
+	(addClass): Static modules now use "run", instead of "$run$".
+	Call to generateConstructor for static module must now be done after
+	body is emitted, since ProcInitializers are no longer static.
+	Create and initialize $instance field.module.staticInitRun
+	Emit call to run in <clinit> only if 
+	(generateConstructor): Register module.
+	* ProcInitializer.java (<init>): No longer place on clinitChain.
+
 	* ModuleBody.java (runDone): New field.
 	(run): Return immiately if run done earlier.
 	* ModuleInfo.java (register): New static method.

@@ -283,6 +283,12 @@ public class ModuleExp extends LambdaExp
 		&& ! getFlag(NONSTATIC_SPECIFIED)));
   }
 
+  /** True if module body (i.e. run) is called by class initializer. */
+  public boolean staticInitRun ()
+  {
+    return Compilation.moduleStatic == 2 && isStatic();
+  }
+
   void allocFields (Compilation comp)
   {
     // We want the create the id$XXX Symbol fields for unknowns first,

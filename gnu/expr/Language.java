@@ -253,6 +253,9 @@ public abstract class Language
       {
 	java.lang.reflect.Field field = fields[i];
 	String name = field.getName();
+	if (name.startsWith(Declaration.PRIVATE_PREFIX)
+	    || name.endsWith("$instance"))
+	  continue;
 	if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
 	  {
 	    try

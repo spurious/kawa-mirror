@@ -89,6 +89,7 @@ public class Compilation
   { return defaultCallConvention >= CALL_WITH_TAILCALLS; }
 
   /** If moduleStatic > 0, (module-static #t) is implied by default.
+   * If moduleStatic == 2, <clinit> calls run.
    * If moduleStatic < 0, (module-static #f) is implied by default. */
   public static int moduleStatic = 0;
 
@@ -1042,8 +1043,7 @@ public class Compilation
 	else
 	  sup = getModuleType();
       }
-    if (! module.isStatic() && ! generateMain && ! generateServlet
-	&& ! immediate)
+    if (! generateServlet && ! immediate)
       type.addInterface(typeRunnable);
     type.setSuper(sup);
 
@@ -1096,6 +1096,12 @@ public class Compilation
 	code.emitPushThis();
 	code.emitLoad(code.getCurrentScope().getVariable(1));
 	code.emitPutField(lexp.staticLinkField);
+      }
+    if (curClass == mainClass)
+      {
+	code.emitPushThis();
+	code.emitInvokeStatic(ClassType.make("gnu.expr.ModuleInfo")
+                              .getDeclaredMethod("register", 1));
       }
 
     Initializer init;
@@ -1829,12 +1835,8 @@ public class Compilation
     boolean staticModule = module.isStatic();
     Method apply_method;
     
-    apply_method
-      = (staticModule
-	 ? curClass.addMethod ("$run$", arg_types, Type.void_type,
-			       Access.PRIVATE+Access.STATIC)
-	 : curClass.addMethod ("run", arg_types, Type.void_type,
-			       Access.PUBLIC+Access.FINAL));
+    apply_method = curClass.addMethod ("run", arg_types, Type.void_type,
+				       Access.PUBLIC+Access.FINAL);
     method = apply_method;
     // For each parameter, assign it to its proper slot.
     // If a parameter !isSimple(), we cannot assign it to a local slot,
@@ -1860,11 +1862,6 @@ public class Compilation
     int line = module.getLine();
     if (line > 0)
       code.putLineNumber(module.getFile(), line);
-
-    if (curClass == mainClass && staticModule)
-      {
-	generateConstructor (module);
-      }
 
     module.allocParameters(this);
     module.enterFunction(this);
@@ -1897,12 +1894,24 @@ public class Compilation
 	    code.fixupChain(afterLiterals, startLiterals);
 	  }
 	  
-	dumpInitializers(clinitChain);
-
 	if (staticModule)
 	  {
-	    code.emitInvokeStatic(getCallContextInstanceMethod);
-	    code.emitInvokeStatic(apply_method);
+	    generateConstructor (module);
+
+	    code.emitNew(moduleClass);
+	    code.emitDup(moduleClass);
+	    code.emitInvokeSpecial(moduleClass.constructor);
+	    moduleInstanceMainField
+	      = moduleClass.addField("$instance", mainClass,
+				     Access.STATIC|Access.PUBLIC|Access.FINAL);
+	    code.emitPutStatic(moduleInstanceMainField);
+	  }
+	dumpInitializers(clinitChain);
+
+	if (module.staticInitRun())
+	  {
+	    code.emitGetStatic(moduleInstanceMainField);
+	    code.emitInvokeInterface(typeRunnable.getDeclaredMethod("run", 0));
 	  }
 	code.emitReturn();
 
@@ -2003,10 +2012,14 @@ public class Compilation
 	    code.emitInvokeStatic(ClassType.make("kawa.Shell")
 				  .getDeclaredMethod("setDefaultFormat", 1));
 	  }
-
-	code.emitNew(curClass);
-	code.emitDup(curClass);
-	code.emitInvokeSpecial(curClass.constructor);
+	if (moduleInstanceMainField != null)
+	  code.emitGetStatic(moduleInstanceMainField);
+	else
+	  {
+	    code.emitNew(curClass);
+	    code.emitDup(curClass);
+	    code.emitInvokeSpecial(curClass.constructor);
+	  }
 	code.emitLoad(code.getArg(0));
 	Method moduleMain
 	  = typeModuleBody.addMethod("runAsMain", Access.PUBLIC,

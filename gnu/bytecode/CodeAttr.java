@@ -27,7 +27,11 @@ public class CodeAttr extends Attribute implements AttrContainer
   LineNumbersAttr lines;
   public LocalVarsAttr locals;
 
+  // In hindsight, maintaining stack_types is more hassle than it is worth.
+  // Instead, better to just keep track of SP, which should catch most
+  // stack errors, while being more general and less hassle.  FIXME.
   Type[] stack_types;
+
   int SP;  // Current stack size (in "words")
   private int max_stack;
   private int max_locals;
@@ -588,9 +592,9 @@ public class CodeAttr extends Attribute implements AttrContainer
      reference) to 7 (for 'short') which matches the pattern of how JVM
      opcodes typically depend on the operand type. */
 
-  private int adjustTypedOp  (Type type)
+  private int adjustTypedOp  (char sig)
   {
-    switch (type.getSignature().charAt(0))
+    switch (sig)
       {
       case 'I':  return 0;  // int
       case 'J':  return 1;  // long
@@ -604,10 +608,21 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
   }
 
+  private int adjustTypedOp  (Type type)
+  {
+    return adjustTypedOp(type.getSignature().charAt(0));
+  }
+
   private void emitTypedOp (int op, Type type)
   {
     reserve(1);
     put1(op + adjustTypedOp(type));
+  }
+
+  private void emitTypedOp (int op, char sig)
+  {
+    reserve(1);
+    put1(op + adjustTypedOp(sig));
   }
 
   /** Store into an element of an array.
@@ -702,6 +717,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitNewArray (element_type, 1);
   }
 
+  // We may want to deprecate this, because it depends on popType.
   private void emitBinop (int base_code)
   {
     Type type2 = popType().promote();
@@ -713,13 +729,37 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(type1_raw);
   }
 
+  private void emitBinop (int base_code, char sig)
+  {
+    popType();
+    popType();
+    emitTypedOp(base_code, sig);
+    pushType(Type.signatureToPrimitive(sig));
+  }
+
+  private void emitBinop (int base_code, Type type)
+  {
+    popType();
+    popType();
+    emitTypedOp(base_code, type);
+    pushType(type);
+  }
+
   // public final void emitIntAdd () { put1(96); popType();}
   // public final void emitLongAdd () { put1(97); popType();}
   // public final void emitFloatAdd () { put1(98); popType();}
   // public final void emitDoubleAdd () { put1(99); popType();}
 
+  public final void emitAdd(char sig) { emitBinop (96, sig); }
+  public final void emitAdd(PrimType type) { emitBinop (96, type); }
+  /** @deprecated */
   public final void emitAdd () { emitBinop (96); }
+
+  public final void emitSub(char sig) { emitBinop (100, sig); }
+  public final void emitSub(PrimType type) { emitBinop (100, type); }
+  /** @deprecated */
   public final void emitSub () { emitBinop (100); }
+
   public final void emitMul () { emitBinop (104); }
   public final void emitDiv () { emitBinop (108); }
   public final void emitRem () { emitBinop (112); }
@@ -900,6 +940,18 @@ public class CodeAttr extends Attribute implements AttrContainer
       popType();
     if (method.return_type.size != 0)
       pushType(method.return_type);
+  }
+
+  public void emitInvoke (Method method)
+  {
+    int opcode;
+    if ((method.access_flags & Access.STATIC) != 0)
+      opcode = 184;   // invokestatic
+    else if (getMethod().classfile.isInterface())
+      opcode = 185;   // invokeinterface
+    else
+      opcode = 182;   // invokevirtual
+    emitInvokeMethod(method, opcode);
   }
 
   /** Compile a virtual method call.
@@ -1094,6 +1146,12 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(153); // ifeq
   }
 
+  /** Compile start of conditional:  if (x <= 0) */
+  public final void emitIfIntLEqZero()
+  {
+    emitIfCompare1(157); // ifgt
+  }
+
   /** Compile start of a conditional:  if (!(x OPCODE null)) ...
    * The value of x must already have been pushed and must be of
    * reference type. */
@@ -1224,14 +1282,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     if_stack.end_label = end_label;
     if (reachableHere ())
       {
-	int stack_growth = SP-if_stack.start_stack_size;
-	if_stack.then_stacked_types = new Type[stack_growth];
-	System.arraycopy (stack_types, if_stack.start_stack_size,
-			  if_stack.then_stacked_types, 0, stack_growth);
+	int growth = SP-if_stack.start_stack_size;
+	if_stack.stack_growth = growth;
+	if (growth >= 0)
+	  {
+	    if_stack.then_stacked_types = new Type[growth];
+	    System.arraycopy (stack_types, if_stack.start_stack_size,
+			      if_stack.then_stacked_types, 0, growth);
+	  }
+	else
+	  if_stack.then_stacked_types = new Type[0];  // ???
 	emitGoto (end_label);
       }
-    while (SP != if_stack.start_stack_size)
+    while (SP > if_stack.start_stack_size)
       popType();
+    SP = if_stack.start_stack_size;
     else_label.define (this);
     if_stack.doing_else = true;    
   }
@@ -1249,12 +1314,13 @@ public class CodeAttr extends Attribute implements AttrContainer
     else if (if_stack.then_stacked_types != null)
       {
 	int then_clause_stack_size
-	  = if_stack.start_stack_size + if_stack.then_stacked_types.length;
+	  = if_stack.start_stack_size + if_stack.stack_growth;
 	if (! reachableHere ())
 	  {
-	    System.arraycopy (if_stack.then_stacked_types, 0,
-			      stack_types, if_stack.start_stack_size,
-			      if_stack.then_stacked_types.length);
+	    if (if_stack.stack_growth > 0)
+	      System.arraycopy (if_stack.then_stacked_types, 0,
+				stack_types, if_stack.start_stack_size,
+				if_stack.stack_growth);
 	    SP = then_clause_stack_size;
 	  }
 	else if (SP != then_clause_stack_size)

@@ -1,3 +1,21 @@
+2000-01-22  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (addField):  Remove redundant setName, type setting.
+	(getDeclaredMethod):  Minor optimization.
+
+	* CodeAttr.java (emitInvoke):  New method.
+ 	(adjusrTypedOp, emitBinop, emitAdd, emitSub):  New method overloads.
+	(emitIfIntLEqZero):  New method.
+	(emitElse, emitFi):  Add (fragile) support for stack skrinking.
+	* IfState.java (stack_growth):  New field.
+
+	* LocalVarsAttr.java (enterScope):  Tweak error message.
+
+	* Method.java (toString):  Emit types in Java-source form, instead
+	of using getSignature.
+
+	* Type.java (int_type etc):  Change type from Type to Primtype.
+
 1999-12-24  Per Bothner  <per@bothner.com>
 
 	* Variable.java:  New constructors.

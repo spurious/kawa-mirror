@@ -225,11 +225,10 @@ public class ClassType extends ObjectType implements AttrContainer {
     field.setType(type);
     return field;
   }
+
   public final Field addField (String name, Type type, int flags)
   {
     Field field = addField (name, type);
-    field.setName(name);
-    field.type = type;
     field.flags = flags;
     return field;
   }
@@ -338,7 +337,7 @@ public class ClassType extends ObjectType implements AttrContainer {
 	if (! name.equals(method.getName()))
 	  continue;
 	Type[] method_args = method.getParameterTypes();
-	if (arg_types == method_args)
+	if (arg_types == null || arg_types == method_args)
 	  return method;
 	int i = arg_types.length;
 	if (i != method_args.length)

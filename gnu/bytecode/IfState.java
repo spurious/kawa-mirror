@@ -22,6 +22,10 @@ public class IfState {
   /** The stack size before the "then" clause. */
   int start_stack_size;
 
+  /** The change in the stack size caused by the then-clause.
+   * Same as then_stacked_types.length, if stack_growth >= 0. */
+  int stack_growth;
+
   /** The types that were pushed by the then-clause. */
   Type[] then_stacked_types;
 

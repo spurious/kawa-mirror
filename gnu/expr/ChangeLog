@@ -1,3 +1,11 @@
+2004-05-07  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass):  Move call to compileEnd (specifically
+	to generateApplyMethods) after initializers (since they may contain
+	lambdas) but do emitLiterals after them.
+	Move literals initialization to new '$literals' method.
+	Fixes bug #8818.
+
 2004-04-22  Per Bothner  <per@bothner.com>
 
 	* LambdaExp.java (loadHeapFrame):  May need to use closureEnv,

@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -1672,6 +1672,43 @@ public class Compilation
         ex.printStackTrace(System.err);
         System.exit(-1);
       }
+    Method emitLiteralsMethod = null;
+
+    if (curClass == mainClass
+	&& (staticModule || clinitChain != null
+	    || litTable.literalsChain != null || module.applyMethods != null
+	    || generateMain || generateApplet || generateServlet))
+      {
+	emitLiteralsMethod
+	  = curClass.addMethod("$literals$", Access.PRIVATE|Access.STATIC,
+			       Type.typeArray0, Type.void_type);
+
+	Method save_method = method;
+
+	startClassInit();
+	code = getCode();
+	if (staticModule)
+	  {
+	    code.emitNew(curClass);
+	    code.emitDup(curClass);
+	    code.emitInvokeSpecial(curClass.constructor);
+	    code.emitPutStatic(instanceField);
+	  }
+	code.emitInvokeStatic(emitLiteralsMethod);
+	dumpInitializers(clinitChain);
+
+	if (staticModule && ! generateMain && ! immediate)
+	  {
+	    code.emitGetStatic(instanceField);
+	    code.emitInvokeStatic(getCallContextInstanceMethod);
+	    code.emitInvokeVirtual(apply_method);
+	  }
+	code.emitReturn();
+	method = save_method;
+      }
+
+    curLambda = saveLambda;
+
     module.compileEnd(this);
 
     if (Compilation.fewerClasses) // FIXME
@@ -1685,54 +1722,13 @@ public class Compilation
 	fswitch.finish(code);
       }
 
-    if (curClass == mainClass
-	&& (staticModule || clinitChain != null
-	    || litTable.literalsChain != null
-	    || generateMain || generateApplet || generateServlet))
+    if (emitLiteralsMethod != null)
       {
-	Method save_method = method;
-
-	startClassInit();
-	code = getCode();
-	if (staticModule)
-	  {
-	    code.emitNew(curClass);
-	    code.emitDup(curClass);
-	    code.emitInvokeSpecial(curClass.constructor);
-	    code.emitPutStatic(instanceField);
-	  }
-	if (clinitChain != null)
-	  {
-	    Label lab0 = new Label(code);
-	    Label lab1 = new Label(code);
-	    Label lab2 = new Label(code);
-	    // These gotos are losing.  Should instead do a pre-pass (using
-	    // an ExpWalker) before compilation that collects all needed
-	    // constants.  Then we generate code to init the literals *first*,
-	    // before compiling anything else.  FIXME.
-	    code.emitGoto(lab1);
-	    lab0.define(code);
-	    dumpInitializers(clinitChain);
-	    code.emitGoto(lab2);
-	    lab1.define(code);
-	    emitLiterals();
-	    code.emitGoto(lab0);
-	    lab2.define(code);
-	  }
-	else
-	  emitLiterals();
-
-	if (staticModule && ! generateMain && ! immediate)
-	  {
-	    code.emitGetStatic(instanceField);
-	    code.emitInvokeStatic(getCallContextInstanceMethod);
-	    code.emitInvokeVirtual(apply_method);
-	  }
+	method = emitLiteralsMethod;
+	code = method.startCode();
+	emitLiterals();
 	code.emitReturn();
-	method = save_method;
       }
-
-    curLambda = saveLambda;
 
     if (generateMain && curClass == mainClass)
       {

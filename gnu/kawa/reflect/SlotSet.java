@@ -1,7 +1,6 @@
 package gnu.kawa.reflect;
 import gnu.mapping.*;
 import gnu.bytecode.*;
-import gnu.mapping.Location;  // As opposed to gnu.bytecode.Location.
 import gnu.expr.*;
 
 public class SlotSet extends Procedure3 implements CanInline, Inlineable
@@ -46,11 +45,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
       {
         java.lang.reflect.Field field = clas.getField(name);
 	Class ftype = field.getType();
-	if ("gnu.mapping.Location".equals(ftype.getName())
-	    && (field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
-	  ((Location) field.get(obj)).set(value);
-	else
-	  field.set(obj, language.coerceFromObject(ftype, value));
+        field.set(obj, language.coerceFromObject(ftype, value));
         return;
       }
     catch (java.lang.NoSuchFieldException ex)
@@ -156,24 +151,11 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
         gnu.bytecode.Field field = (gnu.bytecode.Field) part;
         boolean isStaticField = field.getStaticFlag();
 	Type ftype = field.getType();
-	boolean indirect = ("gnu.mapping.Symbol".equals(ftype.getName())
-			    && (field.getModifiers() & Access.FINAL) != 0);
         if (isStatic && ! isStaticField)
           comp.error('e', ("cannot access non-static field `" + field.getName()
                            + "' using `" + thisProc.getName() + '\''));
-	if (indirect)
-	  {
-	    if (isStaticField)
-	      code.emitGetStatic(field); 
-	    else
-	      code.emitGetField(field);
-	  }
-        valArg.compile(comp,
-		       indirect ? Target.pushObject : Target.pushValue(ftype));
-	if (indirect)
-	  code.emitInvokeVirtual(Compilation.typeSymbol.getDeclaredMethod
-				 ("set", 1));
-        else if (isStaticField)
+        valArg.compile(comp, Target.pushValue(ftype));
+        if (isStaticField)
           code.emitPutStatic(field); 
         else
           code.emitPutField(field);

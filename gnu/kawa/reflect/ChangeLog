@@ -1,3 +1,11 @@
+2005-03-28  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (field, staticField): Make fields final.
+	* SlotGet.java (compile): Remove ineffective/obsolete test for
+	indirection if Symbol - was never updated to use Location.
+	(apply): Remove extra indirection if Location.
+	* SlotSet.java (apply, compile): Likewise.
+
 2005-03-24  Per Bothner  <per@bothner.com>
 
 	* FieldLocation.java (getField, getFType): New methods.

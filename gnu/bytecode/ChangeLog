@@ -1,3 +1,10 @@
+1999-08-06  Per Bothner  <per@bothner.com>
+
+	* CodeFragment.java:  New class.
+	* ClassType.java (doFixups):  Emit any pending fragments.
+	* CodeAttr.java (getPC, isInTry):  New methods.
+	(beginFragment, endFragment):  New methods.
+
 1999-07-15  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (popType):  Use Type.isVoid method.

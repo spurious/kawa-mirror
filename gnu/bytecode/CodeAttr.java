@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -52,6 +52,8 @@ public class CodeAttr extends Attribute implements AttrContainer
      the lowest element in fixups must be the first one. */
   Label labels;
 
+  CodeFragment fragments;
+
   /** The stack of currently active conditionals. */
   IfState if_stack;
 
@@ -59,6 +61,8 @@ public class CodeAttr extends Attribute implements AttrContainer
   TryState try_stack;
 
   public final Method getMethod() { return (Method) getContainer(); }
+
+  public final int getPC() { return PC; }
 
   public final ConstantPool getConstants ()
   {
@@ -1560,6 +1564,13 @@ public class CodeAttr extends Attribute implements AttrContainer
     try_stack = try_stack.previous;
   }
 
+  public final boolean isInTry()
+  {
+    // This also return true if we're in  a catch clause, but that is
+    // good enough for now.
+    return try_stack != null;
+  }
+
   /** Compile a tail-call to position 0 of the current procewure.
    * @param pop_args if true, copy argument registers (except this) from stack.
    * @param scope Scope whose start we jump back to. */
@@ -2034,5 +2045,31 @@ public class CodeAttr extends Attribute implements AttrContainer
 	SP = save.length;
 	System.arraycopy(save, 0, stack_types, 0, SP);
       }
+  }
+
+  CodeFragment fragmentStack = null;
+
+  public void beginFragment(boolean isHandler)
+  {
+    CodeFragment frag = new CodeFragment(this);
+    frag.next = fragmentStack;
+    fragmentStack = frag;
+    frag.length = PC;
+    if (isHandler)
+      frag.handlerIndex = exception_table_length - 1;
+  }
+
+  public void endFragment()
+  {
+    CodeFragment frag = fragmentStack;
+    fragmentStack = frag.next;
+
+    frag.next = fragments;
+    fragments = frag;
+    int startPC = frag.length;
+    frag.length = PC - startPC;
+    frag.insns = new byte[frag.length];
+    System.arraycopy(code, startPC, frag.insns, 0, frag.length);
+    PC = startPC;
   }
 }

@@ -58,6 +58,8 @@ public class Scheme extends Interpreter
     = new SpecialType("boolean", "Z", 1, java.lang.Boolean.TYPE);
   public static SpecialType charType
     = new SpecialType("char", "C", 2, java.lang.Character.TYPE);
+  public static SpecialType voidType
+    = new SpecialType("void", "V", 0, java.lang.Void.TYPE);
 
   public static synchronized Environment builtin ()
   {
@@ -496,12 +498,14 @@ public class Scheme extends Interpreter
       define_proc ("format", "kawa.standard.format");
       define_proc ("parse-format", parseFormat);
       //define_proc("emacs:parse-format", new kawa.standard.ParseFormat(true));
+      define_proc("emacs:read", "gnu.elisp.streams");
 
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_proc ("%makeProcLocation", "kawa.standard.makeProcLocation");
       define_syntax ("location", "kawa.standard.location");
+      define_syntax ("define-alias", "kawa.standard.define_alias");
   }
 
   static int scheme_counter = 0;
@@ -619,7 +623,7 @@ public class Scheme extends Interpreter
     if (types == null)
       {
 	types = new Hashtable ();
-	types.put ("void", Type.void_type);
+	types.put ("void", Scheme.voidType);
 	types.put ("int", Scheme.intType);
 	types.put ("char", Scheme.charType);
 	types.put ("boolean", Scheme.booleanType);

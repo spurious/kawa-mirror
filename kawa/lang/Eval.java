@@ -78,7 +78,12 @@ public class Eval extends Procedure1or2
 	if (env != saveInterpEnv)
 	  interp.setEnvironment(env);
 	Translator tr = new Translator(interp, messages);
-	ModuleExp mod = gnu.kawa.lispexpr.LispInterpreter.makeModuleExp(body, tr);
+	ModuleExp mod = new ModuleExp();
+	java.util.Vector forms = new java.util.Vector(20);
+	tr.push(mod);
+	tr.scan_body(body, forms, mod);
+	tr.finishModule(mod, forms);
+
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());
 	mod.setName (evalFunctionName);

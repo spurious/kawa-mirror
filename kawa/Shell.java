@@ -190,10 +190,8 @@ public class Shell
 			  InPort inp, Consumer out, OutPort perr)
   {
     SourceMessages messages = new SourceMessages();
-    Lexer lexer = interp.getLexer(inp, messages);
     // Wrong for the case of '-f' '-':
     boolean interactive = inp instanceof TtyInPort;
-    lexer.setInteractive(interactive);
     CallContext ctx = CallContext.getInstance();
     Consumer saveConsumer = null;
     if (out != null)
@@ -205,13 +203,14 @@ public class Shell
       {
 	for (;;)
 	  {
+	    int opts = Interpreter.PARSE_IMMEDIATE|Interpreter.PARSE_ONE_LINE;
 	    try
 	      {
-		Compilation comp = interp.parse(env, lexer);
-		if (comp == null) // end-of-file
+		Compilation comp = interp.parse(inp, messages, opts);
+		if (comp == null) // ??? end-of-file
 		  break;
 		comp.getModule().setName("atInteractiveLevel");  // FIXME
-		if (lexer.checkErrors(perr, 20))
+		if (messages.checkErrors(perr, 20))
 		  continue;
 
 		// Skip whitespace, in case somebody calls (read-char) or similar.
@@ -227,7 +226,6 @@ public class Shell
 			break;
 		      }
 		  }
-
 
 		ModuleExp.evalModule(env, ctx, comp);
 		if (messages.checkErrors(perr, 20))

@@ -104,6 +104,7 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
 * XML tools::            Tools for working with XML and HTML
+* KRL::                  The Kawa Report Language for generating XML/HTML
 * Mailing lists::        Where to report bugs, discuss changes, etc
 * Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
@@ -641,6 +642,10 @@ Set the default language to Emacs Lisp.
 @itemx --common-lisp
 Set the default language to CommonLisp.
 (The implementation is @emph{very} incomplete.)
+@item --krl
+Set the default language to KRL.  See @ref{KRL}.
+@item --brl
+Set the default language to KRL, in BRL-compatibility mode.  See @ref{KRL}.
 @item --xquery
 Set the default language to the draft XML Query language.
 See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery page}
@@ -3999,7 +4004,7 @@ Object x = scm.eval("(+ 3 2)");
 System.out.println(x);
 @end example
 
-@node XML tools, Mailing lists, Low-level functions, Top
+@node XML tools, KRL, Low-level functions, Top
 @chapter Tools for working with XML and HTML
 
 Kawa has a number of experimental features for working with XML.
@@ -4060,7 +4065,57 @@ source language; this also prints output using XML syntax.
 See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery home page}
 for examples and more information.
 
-@node Mailing lists, Support, XML tools, Top
+@node KRL, Mailing lists,  XML tools, Top
+@chapter KRL - The Kawa Report Language for generating XML/HTML
+
+KRL (the "Kawa Report Language") is powerful Kawa dialect for embedding
+Scheme code in text files such as HTML or XML templates.  You select
+the KRL language by specifying @code{--krl} on the Kawa command line.
+
+KRL is based on on @uref{http://brl.sourceforge.net/,BRL},
+Bruce Lewis's "Beautiful Report Language", and
+uses some of BRL's code, but there are some experiemntal differences,
+and the implementation core is different.  You can run KRL in
+BRL-compatility-mode by specifying @code{--brl} instead of @code{--krl}.
+
+@section Differences between KRL and BRL
+
+This section summarizes the known differences between KRL and BRL.
+Unless otherwise specified, KRL in BRL-compatibility mode will
+act as BRL.
+
+@itemize @bullet
+@item
+In BRL a normal Scheme string @code{"mystring"} is the same
+as the inverted quote string @code{]mystring[}, and both are instances
+of the type @code{<string>}.
+In KRL @code{"mystring"} is a normal Scheme string of type @code{<string>},
+but @code{]mystring[} is special type that suppresses output escaping.
+@item
+When BRL writes out a string, it does not do any processing of
+to escape special characters like @code{<}.  However, KRL in its default
+mode does normally ecsape characters and strings.  Thus @code{"<a>"}
+is written as @code{&lt;a&gr;}.
+You can stop it from doing this by overriding the output format, for example
+by specifying @code{--output-format scheme} on the Kawa command line.
+@item
+Various Scheme syntax forms, including @code{lambda},
+take a @code{<body>}, which is a list of one or more declarations and
+expressions.  In normal Scheme and in BRL the value of a @code{<body>})
+is the value of the last expression.  In KRL the value of a @code{<body>})
+is the concatenation of all the values of the expressions,
+as if using @code{values-append}
+@item
+In BRL a word starting with a colon is a keyword.
+In KRL a word starting with a colon is an identifier, which by
+default is bound to the @code{make-element} function specialized
+to take the rest of the word as the tag name (first argument).
+@item
+BRL has an extensive utility library.  This has not yet been ported
+to KRL, even in BRL-compatibility mode.
+@end itemize
+
+@node Mailing lists, Support, KRL, Top
 @chapter Mailing lists
 
 If you have a problem installing or using Kawa,

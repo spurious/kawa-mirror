@@ -1,5 +1,8 @@
 2002-01-29  Per Bothner  <per@bothner.com>
 
+	* kawa.texi (Options):  Document --krl and --brl.
+	(KRL):  New chapter.
+
 	* Makefile.am ($(KAWA_HTMLS)):  Use makeinfo --html, not texi2html.
 
 2002-01-19  Per Bothner  <per@bothner.com>

@@ -1,3 +1,13 @@
+Tue Aug 20 13:59:36 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Values.java:  New class.
+	* kawa/standard/{values,call_with_values}.java:  New functions.
+	* kawa/standard/StandardInterpreter.java:  Define new functions.
+	* kawa/{lang,standard}/Makefile.{am,in}:  Add new classes.
+
+	* kawa/standard/and_or.java:  Do setSimple on temp if top-level.
+
+
 Sat Jul 20 11:25:05 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Make kawa-0.3 release.

@@ -15,13 +15,13 @@ import gnu.mapping.*;
  * must be LambdaExps, and the call must be inlined.
  */
 
-public class TypeSwitch extends CpsProcedure implements CanInline, Inlineable
+public class TypeSwitch extends MethodProc implements CanInline, Inlineable
 {
   public static final TypeSwitch typeSwitch = new TypeSwitch("typeswitch");
 
   public TypeSwitch(String name)
   {
-    super(name);
+    setName(name);
   }
 
   public int numArgs() { return 0xfffff002; }

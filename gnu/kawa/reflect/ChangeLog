@@ -1,3 +1,7 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* TypeSwitch.java:  Extend MethodProc instead of CpsProcedure.
+
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* ArrayLength.java:  Remove unused import statements.

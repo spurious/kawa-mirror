@@ -206,7 +206,7 @@ public class Nodes extends Values
   public Object get (int index)
   {
     int i = POS_SIZE * index;
-    if (i > gapStart)
+    if (i >= gapStart)
       i += gapEnd - gapStart;
     if (i < 0 || i >= data.length)
       throw new IndexOutOfBoundsException();

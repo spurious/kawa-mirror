@@ -1,3 +1,7 @@
+2003-10-08  Per Bothner  <per@bothner.com>
+
+	* Nodes.java (get):  Fix off-by-one bug.
+
 2003-09-24  Per Bothner  <per@bothner.com>
 
 	* NodeConstructor.java:  New abstract class, extends CpsProcedure.

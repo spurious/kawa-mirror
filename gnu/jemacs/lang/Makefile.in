@@ -162,6 +162,7 @@ java_WITH_SWING = \
 
 
 java_sources = \
+  CatchableException.java \
   While.java \
   $(java_@SWING_SELECTED@)
 

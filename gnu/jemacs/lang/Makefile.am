@@ -14,6 +14,7 @@ java_WITH_SWING =\
   lambda.java
 
 java_sources=\
+  CatchableException.java \
   While.java \
   $(java_@SWING_SELECTED@)
 

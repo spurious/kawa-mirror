@@ -1,3 +1,9 @@
+2002-07-28  Per Bothner  <per@bothner.com>
+
+	* CatchableException.java: New class, extends RuntimeException.
+	* Makefile.am (java_sources):  Add CatchableException.java.
+	* MiscOps.scm (catch, throw):  New definitions.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (<init>):  Define self-insert-command.

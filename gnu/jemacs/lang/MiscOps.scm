@@ -20,6 +20,17 @@
 
 (define (minibuffer-depth) 0)  ;; FIXME
 
+(define-syntax catch
+  (syntax-rules ()
+		((catch tag body ...)
+		 (try-catch (begin body ...)
+			    (ex <gnu.jemacs.lang.CatchableException>
+				(invoke ex 'match tag))))))
+
+(define (throw tag value) :: <never-returns>
+  (primitive-throw
+   (make <gnu.jemacs.lang.CatchableException> tag value)))
+
 ;; Should use setf, not setq, and guard against duplicate evaluation.  FIXME.
 (define-syntax push
   (syntax-rules ()

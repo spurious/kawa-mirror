@@ -1,5 +1,8 @@
 2002-01-29  Per Bothner  <per@bothner.com>
 
+	* gnu/brl:  New package - code imported from BRL.
+	* configure.in (AC_OUTPUT):  Also generate gnu/brl/Makefile.
+
 	* kawa/repl.java (getInterpreterFromFilenameExtension):  New static.
 	(processArgs, main):  Use filename extension to select language.
 

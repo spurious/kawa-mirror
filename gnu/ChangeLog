@@ -1,3 +1,8 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* brl:  New directory - modules imported from BRL.
+	* Makefile.am:  Update accordingly.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* kawa/brl:  New directory.

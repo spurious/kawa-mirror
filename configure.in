@@ -139,7 +139,8 @@ AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
   gnu/lists/Makefile gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
   gnu/kawa/Makefile gnu/kawa/util/Makefile gnu/kawa/reflect/Makefile 
   gnu/kawa/functions/Makefile gnu/kawa/servlet/Makefile
-  gnu/xml/Makefile gnu/kawa/xml/Makefile gnu/kawa/brl/Makefile
+  gnu/xml/Makefile gnu/kawa/xml/Makefile
+  gnu/brl/Makefile gnu/kawa/brl/Makefile
   gnu/kawa/lispexpr/Makefile gnu/kawa/slib/Makefile gnu/ecmascript/Makefile
   gnu/commonlisp/Makefile gnu/commonlisp/lang/Makefile
   gnu/commonlisp/lisp/Makefile gnu/commonlisp/testsuite/Makefile

@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(doc/kawa.texi)
 
-AM_INIT_AUTOMAKE(kawa, 1.6.91)
+AM_INIT_AUTOMAKE(kawa, 1.6.92)
 
 AM_MAINTAINER_MODE
 AC_PROG_CC
@@ -56,6 +56,7 @@ case ${with_gcj} in
 esac
 
 AM_CONDITIONAL(LIBKAWA, test "$with_gcj" = "yes")
+AM_CONDITIONAL(ENABLE_XML, test "$enable_xml" = "yes")
 AM_PROG_LIBTOOL
 
 if test $enable_kawa_frontend = yes ; then

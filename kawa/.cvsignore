@@ -1,0 +1,5 @@
+Makefile
+*.class
+Version.java
+java-classes.stamp
+

@@ -48,4 +48,6 @@ public abstract class Interpreter
   }
 
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+
+  public abstract gnu.bytecode.Type getTypeFor(Class clas);
 }

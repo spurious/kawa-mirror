@@ -28,6 +28,13 @@ public class Scheme extends Interpreter
     define (name, new AutoloadProcedure (name, className));
   }
 
+  final void define_syntax (String name, Syntax proc)
+  {
+    if (proc.getName() == null)
+      proc.setName(name);
+    define(name, proc);
+  }
+
   /* Define a Syntax to be autoloaded. */
   final void define_syntax (String name, String className)
   {
@@ -41,6 +48,8 @@ public class Scheme extends Interpreter
 
   public static Syntax beginSyntax;
   public static Syntax defineSyntax;
+  public static Syntax defineAliasSyntax;
+  public static Syntax defineSyntaxSyntax;
 
   public static SpecialType byteType
     = new SpecialType ("byte", "B", 1, java.lang.Byte.TYPE);
@@ -120,10 +129,12 @@ public class Scheme extends Interpreter
       define_syntax ("lambda", "kawa.lang.Lambda");
 
       // Appendix (and R5RS)
-      define ("define-syntax", new kawa.standard.define_syntax ());
+      defineSyntaxSyntax = new kawa.standard.define_syntax ();
+      define ("define-syntax", defineSyntaxSyntax);
       define ("syntax-rules", new kawa.standard.syntax_rules ());
       define ("syntax-case", new kawa.standard.syntax_case ());
-      define ("let-syntax", new kawa.standard.let_syntax ());
+      define ("let-syntax", new kawa.standard.let_syntax (false));
+      define ("letrec-syntax", new kawa.standard.let_syntax (true));
 
       r4_environment = new Environment (null_environment);
       r4_environment.setName ("r4rs-environment");
@@ -422,16 +433,15 @@ public class Scheme extends Interpreter
       define_proc("string-downcase", "kawa.lib.strings");
       define_proc("string-capitalize", "kawa.lib.strings");
 
-      define_proc("primitive-virtual-method",
-		  new kawa.standard.prim_method(182));
-      define_proc("primitive-static-method",
-		  new kawa.standard.prim_method(184));
-      define_proc("primitive-interface-method",
-		  new kawa.standard.prim_method(185));
-      define_proc("primitive-constructor",
-		  new kawa.standard.prim_method(183));
-      define_proc("primitive-op1",
-		  new kawa.standard.prim_method());
+      define_syntax("primitive-virtual-method",
+                    new kawa.standard.prim_method(182));
+      define_syntax("primitive-static-method",
+                    new kawa.standard.prim_method(184));
+      define_syntax("primitive-interface-method",
+                    new kawa.standard.prim_method(185));
+      define_syntax("primitive-constructor",
+                    new kawa.standard.prim_method(183));
+      define_syntax("primitive-op1", new kawa.standard.prim_method());
       define_syntax("primitive-get-field", "kawa.lib.reflection");
       define_syntax("primitive-set-field", "kawa.lib.reflection");
       define_syntax("primitive-get-static", "kawa.lib.reflection");
@@ -452,6 +462,7 @@ public class Scheme extends Interpreter
       define_syntax("synchronized", "kawa.standard.synchronizd");
       define_syntax("object", "kawa.standard.object");
       define_proc("field", "kawa.standard.field");
+      define_proc("class-methods", "kawa.standard.class_methods");
       define_proc("static-field", "kawa.standard.static_field");
       define_proc("invoke-static", "kawa.lang.InvokeStatic");
 
@@ -527,7 +538,8 @@ public class Scheme extends Interpreter
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_proc ("%makeProcLocation", "kawa.standard.makeProcLocation");
       define_syntax ("location", "kawa.standard.location");
-      define_syntax ("define-alias", "kawa.standard.define_alias");
+      defineAliasSyntax = new kawa.standard.define_alias();
+      define ("define-alias", defineAliasSyntax);
   }
 
   static int scheme_counter = 0;
@@ -710,6 +722,13 @@ public class Scheme extends Interpreter
 	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
       }
     return (Type) types.get(name);
+  }
+
+  public Type getTypeFor (Class clas)
+  {
+    if (clas.isPrimitive())
+      return getNamedType(clas.getName());
+    return Type.make(clas);
   }
 
   public static Type string2Type (String name)

@@ -121,6 +121,12 @@ public class Symbol extends Location
     this.constraint = constraint;
   }
 
+  public final void setConstraint (Constraint constraint, Object value)
+  {
+    this.constraint = constraint;
+    this.value = value;
+  }
+
   public boolean isBound ()
   {
     return constraint.isBound(this);
@@ -143,6 +149,12 @@ public class Symbol extends Location
     binding.value = init;
     binding.constraint = TrivialConstraint.getInstance((Environment) null);
     return binding;
+  }
+
+  // The compiler emits calls to this method.
+  public static Symbol makeUninterned (String name)
+  {
+    return new Symbol(name);
   }
 
   public void print(java.io.PrintWriter ps)

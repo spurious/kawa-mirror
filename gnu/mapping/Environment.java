@@ -39,6 +39,11 @@ public class Environment extends NameMap implements Externalizable
     this.locked = locked;
   }
 
+  public void setLocked ()
+  {
+    this.locked = true;
+  }
+
   public Environment getPrevious ()
   {
     return previous;
@@ -401,5 +406,22 @@ public class Environment extends NameMap implements Externalizable
     envTable.put(name, this);
     return this;
    
+  }
+
+  public static Environment make ()
+  {
+    return new Environment();
+  }
+
+  public static Environment make (String name)
+  {
+    return new Environment(name);
+  }
+
+  public static Environment make (String name, Environment parent)
+  {
+    Environment env = new Environment(parent);
+    env.setName(name);
+    return env;
   }
 }

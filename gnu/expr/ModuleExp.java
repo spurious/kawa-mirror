@@ -155,7 +155,7 @@ public class ModuleExp extends LambdaExp
 
   public final Object evalModule (Environment env) throws Throwable
   {
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     ctx.values = Values.noArgs;
     evalModule(env, ctx);
     return Values.make((gnu.lists.TreeList) ctx.vstack);

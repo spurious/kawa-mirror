@@ -1,5 +1,16 @@
 2002-02-12  Per Bothner  <per@bothner.com>
 
+	* Compilation.java (loadCallContext):  Call CallContent.getInstance()
+	unless method isHandlingTailCalls().
+	* FluidLetExp.java (compile):  Get fluids from CallContext, not Future.
+	* ModuleExp.java (evalModule):  Use CallContent.getInstance().
+	* ModuleBody.java (run, apply0):  Likewise.
+	(run) Set/restore CallContext's consumer.
+	(runAsMain):  Use CallContext.setMainContext.
+
+	* ModuleBody.java (run(Environment)):  New method, for compatibility.
+	(run):  Call run(Environment).
+
 	* GenericProc.java (add):  Sort methods by specificity.
 	(applyN, match):  Since methods are sorted, just use first match.
 	(applyV):  Update to match change to match.

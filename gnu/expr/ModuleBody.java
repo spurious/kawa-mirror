@@ -16,6 +16,14 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
   {
   }
 
+  /** For backwards compatibily.
+   * Earlier versions of Kawa used this to initialize a module.
+   * Allows run(Consumer) to call those methods. */
+  public Object run (Environment env)
+  {
+    return Values.empty;
+  }
+
   public void run ()
   {
     run (new VoidConsumer());
@@ -23,16 +31,26 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 
   public void run(Consumer out)
   {
-    CallContext ctx = new CallContext();
-    ctx.consumer = out;
-    ctx.values = Values.noArgs;
-    ctx.proc = this;
-    ctx.run();
+    CallContext ctx = CallContext.getInstance();
+    // For backwards compatibility - see run(Environment).
+    run(ctx.getEnvironment());
+    Consumer save = ctx.consumer;
+    try
+      {
+	ctx.consumer = out;
+	ctx.values = Values.noArgs;
+	ctx.proc = this;
+	ctx.run();
+      }
+    finally
+      {
+	ctx.consumer = save;
+      }
   }
 
   public Object apply0 () throws Throwable
   {
-    CallContext ctx = new CallContext();
+    CallContext ctx = CallContext.getInstance();
     ctx.values = Values.noArgs;
     ctx.proc = this;
     return applyV(ctx);
@@ -57,11 +75,10 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
   {
     kawa.repl.setArgs(args, 0);
     gnu.text.WriterManager.instance.registerShutdownHook();
-    Thread thread = Thread.currentThread();
     try
       {
-	CallContext ctx = new CallContext();
-	CallContext.setInstance(thread, ctx);
+	CallContext ctx = CallContext.setMainContext();
+	//CallContext.setInstance(thread, ctx);
 	ctx.values = Values.noArgs;
 	ctx.proc = this;
 	if (getMainPrintValues())

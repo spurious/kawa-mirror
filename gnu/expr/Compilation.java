@@ -229,10 +229,9 @@ public class Compilation
   public static ClassType typeCallContext
     = ClassType.make("gnu.mapping.CallContext");
   public static final ClassType typeConsumer
-  = ClassType.make("gnu.lists.Consumer");
-  public static Method popCallContextMethod
-    = typeCallContext.addMethod("pop", apply0args, Type.void_type,
-			      Access.PUBLIC);
+    = ClassType.make("gnu.lists.Consumer");
+  public static Method getCallContextInstanceMethod
+    = typeCallContext.getDeclaredMethod("getInstance", 0);
   public static ClassType typeValues
     = ClassType.make("gnu.mapping.Values");
   public static Field noArgsField
@@ -1406,12 +1405,14 @@ public class Compilation
     return field;
   }
 
-  /** Generate code to push the current CallContext on the JVM stack.
-   * Assumes that callStackContext has been set for the current function.
-   * (Later we should call a routine to get it via the current thread.) */
+  /** Generate code to push the current CallContext on the JVM stack. */
   public final void loadCallContext()
   {
-    getCode().emitLoad(callStackContext);
+    CodeAtrr code = getCode();
+    if (comp.curLambda.isHandlingTailCalls())
+      code.emitLoad(callStackContext);
+    else
+      code.emitInvokeStatic(getCallContextInstanceMethod);
   }
 
   public void freeLocalField (Field field)

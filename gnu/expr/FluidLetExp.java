@@ -26,10 +26,13 @@ public class FluidLetExp extends LetExp
       ttarg = Target.pushObject;
     else
       ttarg = new StackTarget(result_type);
-    Variable future = code.addLocal(typeFuture);
-    code.emitInvokeStatic(getContextMethod);
+    Variable context = code.addLocal(typeCallContext);
+    if (comp.curLambda.isHandlingTailCalls())
+      comp.loadCallContext();
+    else
+      code.emitInvokeStatic(getContextMethod);
     code.emitDup(1);
-    code.emitStore(future);
+    code.emitStore(context);
     code.emitDup(1);
     code.emitGetField(fluidBindingsField);
     Variable old_bindings = code.addLocal(typeFluidBinding);
@@ -51,7 +54,7 @@ public class FluidLetExp extends LetExp
     body.compileWithPosition(comp, ttarg);
     code.emitTryEnd();
     code.emitFinallyStart();
-    code.emitLoad(future);
+    code.emitLoad(context);
     code.emitLoad(old_bindings);
     code.emitInvokeVirtual(resetFluidsMethod);
     code.emitTryCatchEnd();
@@ -66,14 +69,15 @@ public class FluidLetExp extends LetExp
     return walker.walkFluidLetExp(this);
   }
 
-  static ClassType typeFuture = ClassType.make("gnu.mapping.Future");
+  static ClassType typeCallContext = ClassType.make("gnu.mapping.CallContext");
   static Method getContextMethod
-    = typeFuture.addMethod("getContext", Type.typeArray0, typeFuture,
-			   Access.STATIC|Access.PUBLIC);
+    = typeCallContext.addMethod("getInstance",
+				Type.typeArray0, typeCallContext,
+				Access.STATIC|Access.PUBLIC);
   public static ClassType typeFluidBinding
     = ClassType.make("gnu.mapping.FluidBinding");
   static Field fluidBindingsField
-    = typeFuture.addField("fluidBindings", typeFluidBinding,
+    = typeCallContext.addField("fluidBindings", typeFluidBinding,
 			  Access.STATIC|Access.PUBLIC);
   public static Field valueField
     = typeFluidBinding.addField("value", Type.pointer_type, Access.PUBLIC);
@@ -83,9 +87,9 @@ public class FluidLetExp extends LetExp
   static
     {
       Type[] args = { typeFluidBinding };
-      setFluidsMethod = typeFuture.addMethod
+      setFluidsMethod = typeCallContext.addMethod
 	("setFluids", args, Type.void_type, Access.PUBLIC);
-      resetFluidsMethod = typeFuture.addMethod
+      resetFluidsMethod = typeCallContext.addMethod
 	("resetFluids", args, Type.void_type, Access.PUBLIC);
       args = new Type[3];
       args[0] = typeFluidBinding;

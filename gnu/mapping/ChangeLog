@@ -1,5 +1,8 @@
 2004-08-03  Per Bothner  <per@bothner.com>
 
+	* MethodProc.java:  Merge functionality from CpsProcedure.
+	* CpsProcedure.java:  Now just a stub, soon to be removed.
+
 	* ApplyMethodContainer.java:  Remove no-longer-used interface.
 	* ApplyMethodProc.java:  Remove no-longer-used class.
 	* Makefile.am:  Update accordingly.

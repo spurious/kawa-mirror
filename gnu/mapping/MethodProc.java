@@ -88,7 +88,24 @@ public abstract class MethodProc extends ProcedureN
    * @param args the incoming argument list
    * @return non-negative if the match succeeded, else negative
    */
-  public abstract int match (CallContext ctx, Object[] args);
+  // FIXME - only checks argument length.
+  public int match (CallContext ctx, Object[] args)
+  {
+    int argCount = args.length;
+    int num = numArgs();
+    int min = num & 0xFFF;
+    if (argCount < min)
+      return NO_MATCH_TOO_FEW_ARGS|min;
+    if (num >= 0)
+      {
+        int max = num >> 12;
+        if (argCount > max)
+          return NO_MATCH_TOO_MANY_ARGS|max;
+      }
+    ctx.setArgsN(args);
+    ctx.proc = this;
+    return 0;
+  }
   // FUTURE:
   // On success, vars has been initialized so vars.run() will work.
   // public abstract int match(CallContext vars);
@@ -112,9 +129,10 @@ public abstract class MethodProc extends ProcedureN
    * argument that does not match. */
   public static final int NO_MATCH_BAD_TYPE = 0xfff40000;
 
-  public abstract Object applyV(CallContext ctx) throws Throwable;
-  // FUTURE:
-  // ctx.runUntilValue();
+  public Object applyV(CallContext ctx) throws Throwable
+  {
+    return ctx.runUntilValue();
+  }
 
   public static RuntimeException
   matchFailAsException(int code, Procedure proc, Object[] args)
@@ -131,14 +149,11 @@ public abstract class MethodProc extends ProcedureN
   public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
-    CallContext vars = CallContext.getInstance();
-    int err = match(vars, args);
+    CallContext ctx = CallContext.getInstance();
+    int err = match(ctx, args);
     if (err != 0)
       throw matchFailAsException(err, this, args);
-    // FUTURE:
-    // vars.setArgs();
-    // vars.runUntilValue();
-    return applyV(vars);
+    return applyV(ctx);
   }
 
   /** Return the more specific of the arguments.

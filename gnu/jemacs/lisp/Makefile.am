@@ -20,14 +20,12 @@ SOURCES = $(ELISPSOURCES)
 
 CLEANFILES = *.class *.stamp
 
-all: Makefile elclasses.stamp
+all: Makefile el_@SWING_SELECTED@.stamp
 
-elclasses.WITH_SWING: $(ELISPSOURCES)
+el_WITH_SWING.stamp: $(ELISPSOURCES)
 	cd ../../../kawa; $(MAKE)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) --elisp $(KAWAFLAGS) $?
-	echo timestamp > elclasses.WITH_SWING
+	echo timestamp > el_WITH_SWING.stamp
 
-elclasses.WITHOUT_SWING:
-	echo timestamp > elclasses.WITHOUT_SWING
-
-elclasses.stamp: elclasses.@SWING_SELECTED@
+el_WITHOUT_SWING.stamp:
+	echo timestamp > el_WITHOUT_SWING.stamp

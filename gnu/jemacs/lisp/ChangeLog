@@ -1,3 +1,7 @@
+2000-06-26  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  Rename targets, to match *.stamp convention.
+
 2000-06-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SOURCES):  New variable.

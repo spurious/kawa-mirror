@@ -51,6 +51,42 @@ public class PrimType extends Type {
     return ! (value instanceof Boolean) || ((Boolean) value).booleanValue();
   }
 
+  public void emitCoerceToObject (CodeAttr code)
+  {
+    char sig1 = getSignature().charAt(0);
+    ClassType clas;
+    Method method;
+    String cname = null;
+    Type[] args;
+    switch (sig1)
+      {
+      case 'Z':
+	clas = ClassType.make("java.lang.Boolean");
+	code.emitIfIntNotZero();
+	code.emitGetStatic(clas.getDeclaredField("TRUE"));
+	code.emitElse();
+	code.emitGetStatic(clas.getDeclaredField("FALSE"));
+	code.emitFi();
+	break;
+      case 'C':  cname = "java.lang.Character"; break;
+      case 'B':  cname = "java.lang.Byte";      break;
+      case 'S':  cname = "java.lang.Short";     break;
+      case 'I':  cname = "java.lang.Integer";   break;
+      case 'J':  cname = "java.lang.Long";      break;
+      case 'F':  cname = "java.lang.Float";     break;
+      case 'D':  cname = "java.lang.Double";    break;
+      default:   cname = null;
+      }
+    clas = ClassType.make(cname);
+    args = new Type[1];
+    args[0] = this;
+    method = clas.getDeclaredMethod("<init>", args);
+    code.emitNew(clas);
+    code.emitDupX();
+    code.emitSwap();
+    code.emitInvokeSpecial(method);
+  }
+
   public void emitCoerceFromObject (CodeAttr code)
   {
     char sig1 = (signature == null || signature.length() != 1) ? ' '

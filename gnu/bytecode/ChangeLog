@@ -1,3 +1,7 @@
+2002-06-05  Per Bothner  <per@bothner.com>
+
+	* PrimType.java (emitCoerceToObject):  New method.
+
 2002-05-19  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (doPendingFinalizers):  New public method.

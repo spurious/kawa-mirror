@@ -117,7 +117,7 @@ public class IntFraction extends RatNum
     if (num_len < den_len + 54)
       {
 	exp = den_len + 54 - num_len;
-	n = IntNum.shift (num, exp);
+	n = IntNum.shift (n, exp);
 	exp = - exp;
       }
 

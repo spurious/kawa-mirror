@@ -1,4 +1,4 @@
-// Copyright (c) 1997, 1998, 1999, 2001  Per M.A. Bothner.
+// Copyright (c) 1997, 1998, 1999, 2001, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
@@ -1791,6 +1791,46 @@ public class CodeAttr extends Attribute implements AttrContainer
     else
       catch_type_index = constants.addClass(catch_type).index;
     addHandler(start_pc, end_pc, handler_pc, catch_type_index);
+  }
+
+  /** Beginning of code that has a cleanup handler.
+   * This is similar to a try-finally, but the cleanup is only
+   * done in the case of an exception.  Alternatively, the try clause
+   * has to manually do the cleanup with code duplication.
+   * Equivalent to: <code>try <var>body</var> catch (Throwable ex) { <var>cleanup</var>; throw ex; }</code>
+   * Call <code>emitWithCleanupStart</code> before the <code><var>body</var></code>.
+   */
+  public void emitWithCleanupStart ()
+  {
+    new TryState(this);
+  }
+
+  /** Called after a <code><var>body</var></code> that has a <code><var>cleanup</var></code> clause.
+   * Followed by the <code><var>cleanup</var></code> code.
+   */
+  public void emitWithCleanupCatch (Variable catchVar)
+  {
+    emitTryEnd();
+    try_stack.saved_result = catchVar;
+    int save_SP = SP;
+    emitCatchStart(catchVar);
+    // Don't trash stack_types, and set things up so the SP has the
+    // right value after emitWithCleanupDone (assuming the handler leaves
+    // the stack empty after the throw).  The + 1 for the incoming exception.
+    SP = save_SP + 1;
+  }
+
+  /** Called after generating a <code><var>cleanup</var></code> handler. */
+
+  public void emitWithCleanupDone ()
+  {
+    Variable catchVar = try_stack.saved_result;
+    try_stack.saved_result = null;
+    if (catchVar != null)
+      emitLoad(catchVar);
+    emitThrow();
+    emitCatchEnd();
+    emitTryCatchEnd();
   }
 
 

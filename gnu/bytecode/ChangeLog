@@ -1,3 +1,8 @@
+2003-09-30  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitWithCleanupStart, emitWithCleanupCatch,
+	emitWithCleanupDone):  New methods.
+
 2003-09-24  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitTryStart):  Clean up internal logic.  Fix bug

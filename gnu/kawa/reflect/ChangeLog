@@ -1,3 +1,8 @@
+2003-10-19  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inline):  Check 'warn-invoke-unknown-method' option
+	before emitting warning.
+
 2003-10-07  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  Check for Procedure

@@ -320,7 +320,11 @@ public class Invoke extends ProcedureN implements CanInline
           {
             int index = -1;
             if (methods.length == 0)
-              walker.error('w', "no method `"+name+"' in "+type.getName());
+	      {
+		if (walker.getCompilation()
+		    .getBooleanOption("warn-invoke-unknown-method", true))
+		  walker.error('w', "no method `"+name+"' in "+type.getName());
+	      }
             else if (okCount + maybeCount == 0)
               {
                 Object[] slots;

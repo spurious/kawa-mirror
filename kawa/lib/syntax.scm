@@ -1,11 +1,3 @@
-(define-syntax defmacro
-  (syntax-rules ()
-		((defmacro name pattern form ...)
-                 (define-syntax name
-                   (lambda (__arg)
-                     (syntax-case __arg ()
-                                  ((__name . pattern) (begin form ...))))))))
-
 ;; Helper routines for define-procedure.
 (define (add-procedure-properties
 	 (proc :: <gnu.expr.GenericProc>)
@@ -22,6 +14,14 @@
 		   (define-constant name :: <gnu.expr.GenericProc>
 		     (make <gnu.expr.GenericProc> 'name))
 		   (add-procedure-properties name args ...)))))
+
+(define-syntax defmacro
+  (syntax-rules ()
+		((defmacro name pattern form ...)
+                 (define-syntax name
+                   (lambda (__arg)
+                     (syntax-case __arg ()
+                                  ((__name . pattern) (begin form ...))))))))
 
 (define (%defmacro form rule)
   (rule (car (form 'form))))

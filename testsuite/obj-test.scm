@@ -1,4 +1,4 @@
-(test-init "objects" 13)
+(test-init "objects" 15)
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -17,6 +17,35 @@
 (test '(re im) record-type-field-names complex)
 
 (test 20 'set! (begin (set! (z 'im) 15) (+ (z 're) (z 'im))))
+
+(test '(10 \10 20 \20) 'object-with-field-1
+       (let*
+	   ((obj (object (<object>)
+			 (fld 10)
+			 ((toString) <String> fld)))
+	    (val1 (field obj 'fld))
+	    (str1 (as <String> obj)))
+	 (begin
+	   (set! (field obj 'fld) 20)
+	   (let*
+	       ((val2 (field obj 'fld))
+		(str2 (as <String> obj)))
+	     (list val1 str1 val2 str2)))))
+
+(test '(100 \100 20 \20) 'object-with-field-2
+       (let*
+	   ((val0 100)
+	    (obj (object (<object>)
+			 (fld val0)
+			 ((toString) <String> fld)))
+	    (val1 (field obj 'fld))
+	    (str1 (as <String> obj)))
+	 (begin
+	   (set! (field obj 'fld) 20)
+	   (let*
+	       ((val2 (field obj 'fld))
+		(str2 (as <String> obj)))
+	     (list val1 str1 val2 str2)))))
 
 (test 2 'object-with-closure-1
       (length (let*

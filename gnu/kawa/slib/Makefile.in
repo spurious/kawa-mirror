@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -101,10 +101,12 @@ AUTOMAKE_OPTIONS = foreign
 
 PACKAGE_FNAME = gnu-kawa-slib
 EXTRA_GCJ_INPUTS = *.class
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext)   $(OFILES_DIR)/$(PACKAGE_FNAME).o
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/kawa1$(exeext) \
+  $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 
-java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm readtable.scm   $(SCMSOURCES_@XML_SELECTED@)
+java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm readtable.scm \
+  $(SCMSOURCES_@XML_SELECTED@)
 
 SOURCES = $(java_SCM)
 SCMSOURCES_XML_ENABLED = XML.scm

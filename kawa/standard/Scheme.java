@@ -818,6 +818,8 @@ public class Scheme extends LispLanguage
 
   public static final DisplayFormat writeFormat = new DisplayFormat(true, 'S');
   public static final DisplayFormat displayFormat = new DisplayFormat(false, 'S');
+  static { writeFormat.setName("write"); }
+  static { displayFormat.setName("display"); }
 
   public FormatToConsumer getFormat(boolean readable)
   {

@@ -184,6 +184,8 @@ public class XQuery extends Interpreter
     define("concat", new kawa.standard.string_append());
 
     define("write-to", gnu.kawa.xml.WriteTo.writeTo);
+    define_field("iterator-items", "gnu.kawa.xml.IteratorItems");
+    define_field("list-items", "gnu.kawa.xml.ListItems");
   }
 
   public static XQuery getInstance()

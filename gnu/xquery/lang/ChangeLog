@@ -1,3 +1,10 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* XQParser.java:  Set line number information various places.
+
+	* XQParser.java (parseStepQualifiers, parseRelativePathExpr,
+	parseFLWRExpression):  Add various optimizations.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* XQParser.java:  Many changes to add line-and-column to expressions.

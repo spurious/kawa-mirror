@@ -750,8 +750,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	QName qname = parseNameTest(defaultNamespace);
 	Expression[] args = { dot, new QuoteExp(qname.getNamespaceURI()),
 			      new QuoteExp(qname.getLocalName()) };
-	exp = new ApplyExp(makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren"),
-			   args);
+	exp = new ApplyExp(funcNamedChildren, args);
       }
     else if (curToken == '@')
       {
@@ -787,16 +786,37 @@ public class XQParser extends LispReader // should be extends Lexer
 	lexp.min_args = 1;
 	lexp.max_args = 1;
 	Declaration decl = lexp.addDeclaration("dot");
+	decl.setFlag(Declaration.IS_SINGLE_VALUE);
 	decl.noteValue (null);  // Does not have a known value.
 	parser.push(lexp);
 	lexp.body = parseStepExpr();
 	parser.pop(lexp);
-	Expression[] args = { lexp, exp };
-	exp = new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
-					   "valuesMap"),
-			   args);
 
-	// exp = makeBinary(op, exp, parseStepExpr());
+	boolean handled = false;
+
+	if (lexp.body instanceof ApplyExp)
+	  {
+	    // Optimize the case of a simple name step.
+	    ApplyExp aexp = (ApplyExp) lexp.body;
+	    Expression func = aexp.getFunction();
+	    Expression[] args = aexp.getArgs();
+	    if (func == funcNamedChildren && args.length==3
+		&& args[0] instanceof ReferenceExp
+		&& ((ReferenceExp) args[0]).getBinding() == decl)
+	      {
+		args[0] = exp;
+		exp = aexp;
+		handled = true;
+	      }
+	  }
+
+	if (! handled)
+	  {
+	    Expression[] args = { lexp, exp };
+	    exp = new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
+					       "valuesMap"),
+			       args);
+	  }
       }
     return exp;
   }
@@ -820,16 +840,20 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	if (curToken == '[')
 	  {
+	    int startLine = getLineNumber() + 1;
+	    int startColumn = getColumnNumber() + 1;
 	    getRawToken();
 	    LambdaExp lexp = new LambdaExp();
 	    lexp.setFile(getName());
-	    lexp.setLine(getLineNumber() + 1, getColumnNumber() + 1);
+	    lexp.setLine(startLine, startColumn);
 	    lexp.min_args = 1;
 	    lexp.max_args = 1;
 	    parser.push(lexp);
 	    Declaration dot = lexp.addDeclaration("dot");
 	    dot.noteValue(null);
 	    Expression cond = parseExpr();
+	    cond.setFile(getName());
+	    cond.setLine(startLine, startColumn);
 	    parser.pop(lexp);
 	    lexp.body = cond;
 	    if (curToken != ']')
@@ -1303,7 +1327,10 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     Declaration decl = sc.addDeclaration(name);
     if (isFor)
-      decl.noteValue (null);  // Does not have a known value.
+      {
+	decl.noteValue (null);  // Does not have a known value.
+	decl.setFlag(Declaration.IS_SINGLE_VALUE);
+      }
     parser.push(sc); // FIXME where is matching pop?
     Expression body;
     if (curToken == ',')
@@ -1588,6 +1615,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	throw new WrappedException(ex);
       }
   }
+
+  static final Expression funcNamedChildren
+    = makeFunctionExp("gnu.xquery.util.NamedChildren", "namedChildren");
 
   public void error(String message)
   {

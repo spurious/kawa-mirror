@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 56)
+(test-init "Miscellaneous" 57)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -148,6 +148,7 @@
 (test 100 'closure-f2-car (car f2-20))
 (test 20 'closure-f2-cdr (cdr f2-20))
 
+;; Here f4 should be optimized away.
 (define (f3 a)
   (define (f4 b)
     (cons a b))
@@ -156,9 +157,19 @@
   (cons a f5))
 (define f3-10 (f3 10))
 (define f4-20 ((cdr f3-10) 20))
-(define f5-33 ((cdr f3-10) 33))
 (test '(10 . 20) 'closure-f4-20 f4-20)
-(test '(10 . 33) 'closure-f5-33 f5-33)
+
+(define (f30 a)
+  (define (f31 b)
+    (cons a b))
+  (define (f32 c)
+    (cons a c))
+  (list a f31 f32))
+(define f30-10 (f30 10))
+(define f31-20 ((cadr f30-10) 20))
+(define f32-33 ((caddr f30-10) 33))
+(test '(10 . 20) 'closure-f31-20 f31-20)
+(test '(10 . 33) 'closure-f32-33 f32-33)
 
 (define (f6 a)
   (define (f7 b)

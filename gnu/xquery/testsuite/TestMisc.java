@@ -204,6 +204,16 @@ public class TestMisc
 	     " x ;<b/>; y;<c/>; ;");
     evalTest("for $n in (<a> <b/> </a>)/node() return ($n,';')",
 	     "<b/>;");
+    evalTest("<a> {3}  {4}  </a>", "<a>34</a>");
+    // This actually succeeds because evalTest ignores spaces.
+    // failureExpectedNext = "fix space handling in constructors";
+    evalTest("<a>{3,4}{5,6}</a>", "<a>3 45 6</a>");
+    failureExpectedNext = "fix space handling in constructors";
+    evalTest("let $x := <a>{3,4}{5,6}</a> return <b>{$x, $x}</b>",
+	     "<ba><a>3 45 6</a><a>3 45 6</a></b>");
+    evalTest("for $n in <a><?xq doit?>abc<!--a comment--></a>/node()"
+	     + " return ($n,';')",
+	     "<?xq doit?>;abc;<!--a comment-->;");
 
     // Simple namespace tests.
     evalTest("declare namespace xx='XXX';\n <xx:a>XX</xx:a>",

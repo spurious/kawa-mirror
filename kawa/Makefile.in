@@ -91,7 +91,6 @@ java_JAVA = Shell.java repl.java Version.java   TelnetInputStream.java TelnetOut
 
 
 CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
-BUILT_SOURCES = Version.java
 SOURCES = $(java_JAVA) Version.java.in kawa.c
 
 READLINE_INCLUDE_PATH = 
@@ -370,7 +369,6 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean-am:  mostlyclean-binPROGRAMS mostlyclean-compile \
 		mostlyclean-javaJAVA mostlyclean-tags \
 		mostlyclean-generic
@@ -416,9 +414,6 @@ all-redirect all-am all installdirs-am installdirs mostlyclean-generic \
 distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
-
-Version.java: $(srcdir)/Version.java.in $(srcdir)/../configure.in
-	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/Version.java.in >Version.java
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp

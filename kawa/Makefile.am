@@ -21,11 +21,7 @@ java_JAVA = Shell.java repl.java Version.java \
   GuiConsole.java MessageArea.java TextAreaWriter.java GuiInPort.java
 
 CLEANFILES = *.class kawa.sh kawa$(EXEEXT) tmp *.stamp
-BUILT_SOURCES = Version.java
 SOURCES = $(java_JAVA) Version.java.in kawa.c
-
-Version.java: $(srcdir)/Version.java.in $(srcdir)/../configure.in
-	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/Version.java.in >Version.java
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp

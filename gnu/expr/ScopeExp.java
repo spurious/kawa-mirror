@@ -154,13 +154,13 @@ public abstract class ScopeExp extends Expression
     return null;
   }
 
-  public Declaration lookup (Object sym, Interpreter interp, int namespace)
+  public Declaration lookup (Object sym, Language language, int namespace)
   {
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
 	if (decl.symbol == sym
-	    && (interp.getNamespaceOf(decl) & namespace) != 0)
+	    && (language.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
       }
     return null;

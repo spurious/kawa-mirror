@@ -1,3 +1,10 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* Compilation.java: Update Interpreter -> Language.
+	* ConditionalTarget.java: Likewise.
+	* NameLookup.java: Likewise.
+	* ScopeExp.java: Likewise.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getPromter): Remove unused method.

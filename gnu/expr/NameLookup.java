@@ -9,11 +9,11 @@ import java.util.*;
 public class NameLookup
 {
   Hashtable map = new Hashtable(100);
-  Interpreter interp;
+  Language language;
 
-  public NameLookup (Interpreter interp)
+  public NameLookup (Language language)
   {
-    this.interp = interp;
+    this.language = language;
   }
 
   public void push (Declaration decl)
@@ -92,7 +92,7 @@ public class NameLookup
       {
 	Declaration decl = (Declaration) r;
 	if (decl.getSymbol() == symbol
-	    && (interp.getNamespaceOf(decl) & namespace) != 0)
+	    && (language.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
 	return null;
       }
@@ -102,7 +102,7 @@ public class NameLookup
       {
 	Declaration decl = (Declaration) v.elementAt(i);
 	if (decl.getSymbol() == symbol
-	    && (interp.getNamespaceOf(decl) & namespace) != 0)
+	    && (language.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
       }
     return null;
@@ -110,7 +110,7 @@ public class NameLookup
 
   public Declaration lookup (Object symbol, boolean function)
   {
-    return lookup(symbol, (function ? Interpreter.FUNCTION_NAMESPACE
-			   : Interpreter.VALUE_NAMESPACE));
+    return lookup(symbol, (function ? Language.FUNCTION_NAMESPACE
+			   : Language.VALUE_NAMESPACE));
   }
 }

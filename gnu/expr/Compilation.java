@@ -137,8 +137,8 @@ public class Compilation
   static public ClassType typeClassType = ClassType.make("gnu.bytecode.ClassType", typeObjectType);
   static public ClassType typeProcedure
     = ClassType.make("gnu.mapping.Procedure");
-  static public ClassType typeInterpreter
-    = ClassType.make("gnu.expr.Interpreter");
+  static public ClassType typeLanguage
+    = ClassType.make("gnu.expr.Language");
   static public ClassType typeEnvironment
     = ClassType.make("gnu.mapping.Environment");
   static public ClassType typeLocation
@@ -146,9 +146,9 @@ public class Compilation
   static public ClassType typeSymbol
     = ClassType.make("gnu.mapping.Symbol");
   static public final Method getSymbolValueMethod
-    = typeInterpreter.getDeclaredMethod("getSymbolValue", 1);
+    = typeLanguage.getDeclaredMethod("getSymbolValue", 1);
   static public final Method getSymbolProcedureMethod
-    = typeInterpreter.getDeclaredMethod("getSymbolProcedure", 1);
+    = typeLanguage.getDeclaredMethod("getSymbolProcedure", 1);
   static public final Method getLocationMethod
     = typeLocation.addMethod("get", Type.typeArray0,
 			    Type.pointer_type, Access.PUBLIC);
@@ -1770,10 +1770,10 @@ public class Compilation
 
     if (generateMain || generateApplet || generateServlet)
       {
-	ClassType interpreterType
+	ClassType languageType
 	  = (ClassType) Type.make(getLanguage().getClass());
 	Method registerMethod
-	  = interpreterType.getDeclaredMethod("registerEnvironment", 0);
+	  = languageType.getDeclaredMethod("registerEnvironment", 0);
 	if (registerMethod != null)
 	  code.emitInvokeStatic(registerMethod);
       }

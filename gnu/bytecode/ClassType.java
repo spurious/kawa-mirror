@@ -150,7 +150,7 @@ public class ClassType extends Type implements AttrContainer {
 
   /**
    * Add a new field to this class, and name the field.
-   * @param name the name of the mew field
+   * @param name the name of the new field
    */
   public Field addField (String name) {
     Field field = new Field (this);

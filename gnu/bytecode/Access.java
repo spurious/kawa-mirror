@@ -49,7 +49,7 @@ public class Access {
     short mask
       = (kind == 'C' ? CLASS_MODIFIERS
 	 : kind == 'F' ? FIELD_MODIFIERS
-	 : kind == 'F' ? METHOD_MODIFIERS
+	 : kind == 'M' ? METHOD_MODIFIERS
 	 : (CLASS_MODIFIERS|FIELD_MODIFIERS|METHOD_MODIFIERS));
     short bad_flags = (short) (flags & ~mask);
     flags &= mask;

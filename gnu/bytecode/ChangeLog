@@ -1,3 +1,9 @@
+2005-01-30  Per Bothner  <per@bothner.com>
+
+	* Access.java (toString): Fix typo.
+
+	* InnerClassesAttr.java (print): Specificy class access flags.
+
 2005-01-28  Per Bothner  <per@bothner.com>
 
 	* Type.java (java_lang_Class_type):  New static field.

@@ -1,4 +1,4 @@
-(test-init "arrays" 164)
+(test-init "arrays" 169)
 
 ;;; array test
 ;;; 2001 Jussi Piitulainen
@@ -385,3 +385,35 @@
 (define a-2-9 (make-array (shape 0 2 0 9)))
 (array-set! a-2-9 1 3 'e)
 (test 'e array-ref a-2-9 1 3)
+
+;; Savannah [bug #4310] share-array edge case.  All these tests should
+;; return ok without an error or IndexOutOfBoundsException
+(define (make-simple-affine ndims hibound)
+  (lambda (i)
+    (if (> i hibound) 
+        (error "index out of bounds" i hibound))
+    (apply values (vector->list (make-vector ndims i)))))
+
+(define four-dee-array (array (shape 0 2 0 2 0 2 0 2)
+			      'a 'b 'c 'd 'e 'f 'g 'h
+			      'i 'j 'k 'l 'm 'n 'o 'p))
+(define four-dee-lil-array (make-array (shape 0 1 0 1 0 1 0 1) 'ok))
+
+(test 'ok array-ref
+      (share-array four-dee-lil-array (shape 0 1) (make-simple-affine 4 0))
+      0)
+(test 'a array-ref
+      (share-array four-dee-array (shape 0 1) (make-simple-affine 4 0))
+      0)
+(test 'a array-ref
+      (share-array four-dee-array (shape 0 2) (make-simple-affine 4 1))
+      0)
+(test '(a p) map
+      (lambda (i)
+	(array-ref
+	 (share-array four-dee-array (shape 0 2) (make-simple-affine 4 1))
+	 i))
+      '(0 1))
+(test 'p array-ref
+      (share-array four-dee-array (shape 1 2) (make-simple-affine 4 1))
+      1)

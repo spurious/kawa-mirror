@@ -1,3 +1,7 @@
+2003-07-15  Chris Dean  <Chris.Dean@sokitomi.com>
+
+	* arr-test.scm: Test for Savannah [bug #4310] share-array edge case
+
 2003-07-14  Joerg Hoehle  <Joerg-Cyril.Hoehle@t-systems.com>
 
 	* misc-test.scm: New test - for bug with makeBuiltinUnary.

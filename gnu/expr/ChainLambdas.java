@@ -1,13 +1,15 @@
 package gnu.expr;
 
 /** Sets up the firstChild/nextSibling links of each LambdaExp.
+ * Setup 'outer' links of ScopeExp and its sub-classes.
  * Also generates a class name for each ObjectExp and registers each class.
  * Also, if lambda is bound to a unique declaration, make that its name.
  */
 
-public class ChainLambdas extends ExpFullWalker
+public class ChainLambdas extends ExpWalker
 {
   Compilation comp;
+  ScopeExp currentScope;
 
   public static void chainLambdas (Expression exp, Compilation comp)
   {
@@ -17,7 +19,23 @@ public class ChainLambdas extends ExpFullWalker
     //or:  walter.walkExpression(exp);
   }
 
-  public Object walkLambdaExp (LambdaExp exp)
+  protected Expression walkScopeExp (ScopeExp exp)
+  {
+    ScopeExp saveScope = currentScope;
+    try
+      {
+	exp.outer = currentScope;
+	currentScope = exp;
+	exp.walkChildren(this);
+	return exp;
+      }
+    finally
+      {
+	currentScope = saveScope;
+      }
+  }
+
+  protected Expression walkLambdaExp (LambdaExp exp)
   {    
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ObjectExp))
@@ -26,7 +44,7 @@ public class ChainLambdas extends ExpFullWalker
 	parent.firstChild = exp;
       }
 
-    super.walkLambdaExp(exp);
+    walkScopeExp(exp);
 
     // Put list of children in proper order.
     LambdaExp prev = null, child = exp.firstChild;
@@ -44,7 +62,7 @@ public class ChainLambdas extends ExpFullWalker
     return exp;
   }
 
-  public Object walkObjectExp (ObjectExp exp)
+  protected Expression walkObjectExp (ObjectExp exp)
   {    
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ObjectExp))
@@ -53,7 +71,7 @@ public class ChainLambdas extends ExpFullWalker
 	parent.firstChild = exp;
       }
 
-    super.walkObjectExp(exp);
+    walkScopeExp(exp);
 
     // Give name to object class.
     exp.getCompiledClassType(comp);

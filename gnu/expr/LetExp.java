@@ -78,7 +78,17 @@ public class LetExp extends ScopeExp
     return body.getType();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkLetExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkLetExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    inits = walker.walkExps(inits);
+    if (walker.exitValue == null)
+      body = (Expression) body.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

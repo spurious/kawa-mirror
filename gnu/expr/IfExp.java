@@ -112,7 +112,19 @@ public class IfExp extends Expression
     code.emitFi();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkIfExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkIfExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    test = test.walk(walker);
+    if (walker.exitValue == null)
+      then_clause = then_clause.walk(walker);
+    if (walker.exitValue == null)
+     else_clause = else_clause.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

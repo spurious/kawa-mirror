@@ -1,3 +1,46 @@
+2000-12-11  Per Bothner  <per@bothner.com>
+
+	* Expression.java (walk):  Make protected and change return type to
+	Expression.  Make non-abstract - just call walkExpression.
+	(walkChildren):  New virtual method.
+	* ApplyExp.java, BeginExp.java, BlockExp.java, ExitExp.java,
+	FluidLetExp.java, IfExp.java, LambdaExp.java, LetExp.java,
+	ModuleExp.java, ObjectExp.java, ScopeExp.java, SetExp.java,
+	SynchronizedExp.java, ThisExp.java, TryExp.java (walk):
+	Make protected and change return type to Expression.
+	* ApplyExp.java, BeginExp.java, BlockExp.java, ExitExp.java,
+	IfExp.java, LambdaExp.java, LetExp.java, ObjectExp.java,
+	ReferenceExp.java, SetExp.java, SynchronizedExp.java,
+	TryExp.java (walkChildren):
+	New method, with logic taken from ExpFullWalker.
+	* ErrorExp.java (walk):  Removed - inherited version now works.
+
+	* ExpWalker.java (walkExpression):  Change to protected and return
+	type as Expression.  Change default to walkChildren and return this.
+	(walkApplyExp etc):  Change to protected and return type to Expression.
+	(currentLambda, exitVlaue):  New fields moved from ExpFullWalker.
+	(getCurrentLambda, walkExps, walkDefaultArgs):  New methods, likewise.
+	* ChainLambdas.java, FindCapturedVars.java, FindTailCalls.java,
+	InlineCalls.java, PushApply.java:  Inherit from ExpWalker.
+	(walkLambdaExp etc):  Change to protected and return Expression.
+	* ExpFullWalker.java:  Removed.  Functionality moved either up to
+	ExpWalker or to walkChildren methods in Expression sub-classes.
+	* Makefile.am (java_JAVA):  Removed ExpFullWalker.java.
+
+	* ChainLambdas.java (walkScopeExp):  Setup 'outer' links of ScopeExp
+	and its sub-classes.  Call new walkChildren to walk children.
+	(walkLambdaExp):  Call walkScopeExp.
+	* Compilation.java (<init>):  Call InlineCalls early, since that may
+	generate new tree.  Call ChainLambdas immediately after.
+	* ExpFullWalker.java (walkScopeExp):  Just call walkChildren.
+	(walkLambdaExp, walkObjectExp):  Removed.
+
+	* LambdaExp.java (<init>(int)):  New constructor.
+
+	* FindCapturedVars.java (allocUnboundDecl):  Use name as is.
+	* Declaration.java (makeField): Handle IS_UNKNOWN declarations,
+	and prepend "id$" here.
+
 2000-12-09  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (IS_UNKNOWN):  New flag.

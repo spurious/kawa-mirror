@@ -265,7 +265,15 @@ public class SetExp extends Expression
       : binding == null ? Type.pointer_type : binding.getType();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkSetExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkSetExp(this);
+  }
+
+  protected void walkChildren (ExpWalker walker)
+  {
+    new_value = (Expression) new_value.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

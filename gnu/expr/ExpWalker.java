@@ -1,27 +1,74 @@
 package gnu.expr;
 
+/** Class for doing a tree-walk over an Expression tree. */
+
 public class ExpWalker
 {
-  public Object walkExpression (Expression exp) { return null; }
-  public Object walkApplyExp (ApplyExp exp) { return walkExpression(exp); }
-  public Object walkIfExp (IfExp exp) { return walkExpression(exp); }
-  public Object walkScopeExp (ScopeExp exp) { return walkExpression(exp); }
-  public Object walkLetExp (LetExp exp) { return walkScopeExp(exp); }
-  public Object walkLambdaExp (LambdaExp exp) { return walkScopeExp(exp); }
-  public Object walkObjectExp (ObjectExp exp) { return walkLambdaExp(exp); }
-  public Object walkModuleExp (ModuleExp exp) { return walkLambdaExp(exp); }
-  public Object walkSetExp (SetExp exp) { return walkExpression(exp); }
-  //public Object walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }
-  public Object walkTryExp (TryExp exp) { return walkExpression(exp); }
-  public Object walkBeginExp (BeginExp exp) { return walkExpression(exp); }
-  public Object walkQuoteExp (QuoteExp exp) { return walkExpression(exp); }
-  public Object walkReferenceExp (ReferenceExp exp)
+  protected Expression walkExpression (Expression exp)
+  {
+    exp.walkChildren(this);
+    return exp;
+  }
+
+  protected Expression walkApplyExp (ApplyExp exp)
+  {
+    return walkExpression(exp);
+  }
+  
+  protected Expression walkIfExp (IfExp exp)
+  {
+    return walkExpression(exp);
+  }
+
+  protected Expression walkScopeExp (ScopeExp exp)
+  {
+    return walkExpression(exp);
+  }
+
+  protected Expression walkLetExp (LetExp exp) { return walkScopeExp(exp); }
+  protected Expression walkLambdaExp (LambdaExp exp) { return walkScopeExp(exp); }
+  protected Expression walkObjectExp (ObjectExp exp) { return walkLambdaExp(exp); }
+  protected Expression walkModuleExp (ModuleExp exp) { return walkLambdaExp(exp); }
+  protected Expression walkSetExp (SetExp exp) { return walkExpression(exp); }
+  //protected Expression walkSwitchExp (SwitchExp exp) { return walkExpression(exp); }
+  protected Expression walkTryExp (TryExp exp) { return walkExpression(exp); }
+  protected Expression walkBeginExp (BeginExp exp) { return walkExpression(exp); }
+  protected Expression walkQuoteExp (QuoteExp exp) { return walkExpression(exp); }
+  protected Expression walkReferenceExp (ReferenceExp exp)
   { return walkExpression(exp); }
-  public Object walkThisExp (ThisExp exp) { return walkReferenceExp(exp); }
-  public Object walkSynchronizedExp (SynchronizedExp exp)
+  protected Expression walkThisExp (ThisExp exp) { return walkReferenceExp(exp); }
+  protected Expression walkSynchronizedExp (SynchronizedExp exp)
     { return walkExpression(exp); }
 
-  public Object walkBlockExp(BlockExp exp) { return walkExpression(exp); }
-  public Object walkExitExp(ExitExp exp) { return walkExpression(exp); }
-  public Object walkFluidLetExp(FluidLetExp exp) { return walkLetExp(exp); }
+  protected Expression walkBlockExp(BlockExp exp) { return walkExpression(exp); }
+  protected Expression walkExitExp(ExitExp exp) { return walkExpression(exp); }
+  protected Expression walkFluidLetExp(FluidLetExp exp)
+  {
+    return walkLetExp(exp);
+  }
+
+  LambdaExp currentLambda = null;
+
+  /** If exitValue is set to non-null, the walk stops. */
+  Object exitValue = null;
+
+  public final LambdaExp getCurrentLambda() { return currentLambda; }
+
+  public Expression[] walkExps (Expression[] exps)
+  {
+    return walkExps(exps, exps.length);
+  }
+
+  public Expression[] walkExps (Expression[] exps, int n)
+  {
+    for (int i = 0;  i < n && exitValue == null;  i++)
+      exps[i] = (Expression) exps[i].walk(this);
+    return exps;
+  }
+
+  public void walkDefaultArgs (LambdaExp exp)
+  {
+    if (exp.defaultArgs != null)
+      exp.defaultArgs = walkExps(exp.defaultArgs);
+  }
 }

@@ -406,6 +406,13 @@ public class LambdaExp extends ScopeExp
   {
   }
 
+  public LambdaExp(int args)
+  {
+    min_args = args;
+    max_args = args;
+  }
+
+
   public LambdaExp (Expression body)
   {
     this.body = body;
@@ -1399,7 +1406,39 @@ public class LambdaExp extends ScopeExp
       }
   }
 
-  Object walk (ExpWalker walker) { return walker.walkLambdaExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkLambdaExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    LambdaExp save = walker.currentLambda;
+    walker.currentLambda = this;
+    try
+      {
+	walker.walkDefaultArgs(this);
+	if (walker.exitValue == null && body != null)
+	  body = body.walk(walker);
+        Object[] properties = this.properties;
+        if (properties != null)
+          {
+            int len = properties.length;
+            for (int i = 1;  i < len;  i += 2)
+              {
+                Object val = properties[i];
+                if (val instanceof Expression)
+                  {
+                    properties[i] = ((Expression) properties[i]).walk(walker);
+                  }
+              }
+          }
+      }
+    finally
+      {
+	walker.currentLambda = save;
+      }
+  }
 
   public void print (java.io.PrintWriter ps)
   {

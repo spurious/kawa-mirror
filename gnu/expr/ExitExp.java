@@ -34,7 +34,15 @@ public class ExitExp extends Expression
     code.emitGoto(block.exitLabel);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkExitExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkExitExp(this);
+  }
+
+  protected void walkChildren (ExpWalker walker)
+  {
+    result = result.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

@@ -1,14 +1,14 @@
 package gnu.expr;
 import java.util.Hashtable;
 
-public class FindCapturedVars extends ExpFullWalker
+public class FindCapturedVars extends ExpWalker
 {
   public static void findCapturedVars (Expression exp)
   {
     exp.walk(new FindCapturedVars());
   }
 
-  public Object walkApplyExp (ApplyExp exp)
+  protected Expression walkApplyExp (ApplyExp exp)
   {
     boolean skipFunc = false;
     // If the func is bound to a module-level known function, and it
@@ -66,7 +66,7 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
-  public Object walkModuleExp (ModuleExp exp)
+  protected Expression walkModuleExp (ModuleExp exp)
   {
     ModuleExp saveModule = currentModule;
     Hashtable saveDecls = unknownDecls;
@@ -114,7 +114,7 @@ public class FindCapturedVars extends ExpFullWalker
       }
   }
 
-  public Object walkFluidLetExp (FluidLetExp exp)
+  protected Expression walkFluidLetExp (FluidLetExp exp)
   {
     for (Declaration decl = exp.firstDecl(); decl != null; decl = decl.nextDecl())
       {
@@ -125,7 +125,7 @@ public class FindCapturedVars extends ExpFullWalker
     return super.walkLetExp(exp);
   }
 
-  public Object walkLetExp (LetExp exp)
+  protected Expression walkLetExp (LetExp exp)
   {
     if (exp.body instanceof BeginExp)
       {
@@ -305,8 +305,7 @@ public class FindCapturedVars extends ExpFullWalker
       decl = (Declaration) unknownDecls.get(name);
     if (decl == null)
       {
-	String fieldName = "id" + unknownDecls.size() + "$" + name;
-	decl = currentModule.addDeclaration(fieldName);
+	decl = currentModule.addDeclaration(name);
 	decl.setSimple(false);
 	decl.setPrivate(true);
 	if (currentModule.isStatic())
@@ -319,7 +318,7 @@ public class FindCapturedVars extends ExpFullWalker
     return decl;
   }
 
-  public Object walkReferenceExp (ReferenceExp exp)
+  protected Expression walkReferenceExp (ReferenceExp exp)
   {
     Declaration decl = exp.getBinding();
     if (decl == null)
@@ -332,14 +331,14 @@ public class FindCapturedVars extends ExpFullWalker
     return exp;
   }
 
-  public Object walkThisExp (ThisExp exp)
+  protected Expression walkThisExp (ThisExp exp)
   {
     // FIXME - not really right, but works in simple cases.
     getCurrentLambda ().setImportsLexVars();
     return exp;
   }
 
-  public Object walkSetExp (SetExp exp)
+  protected Expression walkSetExp (SetExp exp)
   {
     Declaration decl = exp.binding;
     if (decl == null)

@@ -63,7 +63,17 @@ public class BlockExp extends Expression
       target.compileFromStack(comp, subTarget.getType());
   }
 
-  Object walk (ExpWalker walker) { return walker.walkBlockExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkBlockExp(this);
+  }
+
+  protected void walkChildren (ExpWalker walker)
+  {
+    body = body.walk(walker);
+    if (walker.exitValue == null && exitBody != null)
+      exitBody = exitBody.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

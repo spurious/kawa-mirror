@@ -122,7 +122,10 @@ public class ReferenceExp extends Expression
     target.compileFromStack(comp, getType());
   }
 
-  Object walk (ExpWalker walker) { return walker.walkReferenceExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkReferenceExp(this);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

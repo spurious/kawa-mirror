@@ -23,7 +23,6 @@ java_JAVA=\
   ErrorExp.java \
   ExitExp.java \
   Expression.java \
-  ExpFullWalker.java \
   ExpWalker.java \
   FindCapturedVars.java \
   FindTailCalls.java \

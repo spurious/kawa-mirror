@@ -181,7 +181,27 @@ public class ObjectExp extends LambdaExp
       }
   }
 
-  Object walk (ExpWalker walker) { return walker.walkObjectExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkObjectExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    LambdaExp save = walker.currentLambda;
+    walker.currentLambda = this;
+    try
+      {
+	for (LambdaExp child = firstChild;
+	     child != null && walker.exitValue == null;
+	     child = child.nextSibling)
+	  walker.walkLambdaExp(child);
+      }
+    finally
+      {
+	walker.currentLambda = save;
+      }
+  }
 
   public void print (java.io.PrintWriter ps)
   {

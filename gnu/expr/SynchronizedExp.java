@@ -47,7 +47,17 @@ public class SynchronizedExp extends Expression
     code.popScope();
  }
 
-  Object walk (ExpWalker walker) { return walker.walkSynchronizedExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkSynchronizedExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    object = object.walk(walker);
+    if (walker.exitValue == null)
+      body = body.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

@@ -171,5 +171,8 @@ public abstract class ScopeExp extends Expression
     return n;
   }
 
-  Object walk (ExpWalker walker) { return walker.walkScopeExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkScopeExp(this);
+  }
 }

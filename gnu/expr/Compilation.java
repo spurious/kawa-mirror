@@ -610,12 +610,12 @@ public class Compilation
 
     // Do various code re-writes and optimization.
 
-    ChainLambdas.chainLambdas(lexp, this);
     PushApply.pushApply(lexp);
+    InlineCalls.inlineCalls(lexp);
+    ChainLambdas.chainLambdas(lexp, this);
     FindTailCalls.findTailCalls(lexp);
     lexp.setCanRead(true);
     FindCapturedVars.findCapturedVars(lexp);
-    InlineCalls.inlineCalls(lexp);
 
     mainClass = addClass(lexp, mainClass);
     literalTable = new Hashtable (100);

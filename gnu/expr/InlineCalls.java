@@ -1,7 +1,7 @@
 package gnu.expr;
 import gnu.mapping.Procedure;
 
-public class InlineCalls extends ExpFullWalker
+public class InlineCalls extends ExpWalker
 {
   public static void inlineCalls (Expression exp)
   {
@@ -10,7 +10,7 @@ public class InlineCalls extends ExpFullWalker
     //or:  walter.walkExpression(exp);
   }
 
-  public Object walkApplyExp(ApplyExp exp)
+  protected Expression walkApplyExp(ApplyExp exp)
   {
     super.walkApplyExp(exp);
 
@@ -48,7 +48,7 @@ public class InlineCalls extends ExpFullWalker
     return exp;
   }
 
-  public Object walkSetExp (SetExp exp)
+  protected Expression walkSetExp (SetExp exp)
   {
     Declaration decl = exp.binding;
     boolean updateNeeded = false;
@@ -58,13 +58,13 @@ public class InlineCalls extends ExpFullWalker
         if (declValue == exp.new_value)
           updateNeeded = true;
       }
-    Object result = super.walkSetExp(exp);
+    exp.walkChildren(this);
     if (updateNeeded)
       {
         decl.value = exp.new_value;
         if (exp.new_value instanceof LambdaExp)
           ((LambdaExp) exp.new_value).nameDecl = decl;
       }
-    return result;
+    return exp;
   }
 }

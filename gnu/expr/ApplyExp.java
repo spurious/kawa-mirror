@@ -365,7 +365,17 @@ public class ApplyExp extends Expression
     target.compileFromStack(comp, Type.pointer_type);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkApplyExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkApplyExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    func = func.walk(walker);
+    if (walker.exitValue == null)
+      args = walker.walkExps(args);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

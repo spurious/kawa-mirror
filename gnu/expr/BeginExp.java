@@ -80,7 +80,15 @@ public class BeginExp extends Expression
     exps[i].compileWithPosition(comp, target);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkBeginExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkBeginExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    exps = walker.walkExps(exps, length);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

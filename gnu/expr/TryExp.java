@@ -75,7 +75,24 @@ public class TryExp extends Expression
       target.compileFromStack(comp, result_type);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkTryExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkTryExp(this);
+  }
+
+  protected void walkChildren(ExpWalker walker)
+  {
+    try_clause = try_clause.walk(walker);
+    CatchClause catch_clause = catch_clauses;
+    while (walker.exitValue == null && catch_clause != null)
+      {
+	catch_clause.body = catch_clause.body.walk(walker);
+	catch_clause = catch_clause.getNext();
+      }
+
+    if (walker.exitValue == null && finally_clause != null)
+      finally_clause = finally_clause.walk(walker);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

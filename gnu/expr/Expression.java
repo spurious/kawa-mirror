@@ -54,7 +54,12 @@ public abstract class Expression implements Printable
     compile (comp, StackTarget.getInstance(type));
   }
 
-  abstract Object walk (ExpWalker walker);
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkExpression(this);
+  }
+
+  protected void walkChildren (ExpWalker walker) { }
 
   String filename;
   int position;

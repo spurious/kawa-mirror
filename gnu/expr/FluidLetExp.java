@@ -61,7 +61,10 @@ public class FluidLetExp extends LetExp
       target.compileFromStack(comp, result_type);
   }
 
-  Object walk (ExpWalker walker) { return walker.walkFluidLetExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkFluidLetExp(this);
+  }
 
   static ClassType typeFuture = ClassType.make("gnu.mapping.Future");
   static Method getContextMethod

@@ -170,7 +170,10 @@ public class ModuleExp extends LambdaExp
     zout.close ();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkModuleExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkModuleExp(this);
+  }
 
   public void print (java.io.PrintWriter ps)
   {

@@ -450,7 +450,10 @@ public class Declaration
   public void makeField(Compilation comp, Expression value)
   {
     setSimple(false);
-    String fname = Compilation.mangleName(getName());
+    String fname = getName();
+    if (getFlag(IS_UNKNOWN))
+      fname = "id$" + fname;
+    fname = Compilation.mangleName(fname);
     int fflags = 0;
     boolean isConstant = getFlag(IS_CONSTANT);
     boolean typeSpecified = getFlag(TYPE_SPECIFIED);

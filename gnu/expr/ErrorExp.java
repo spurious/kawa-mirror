@@ -31,7 +31,4 @@ public class ErrorExp extends Expression
   {
     // Should never happen!
   }
-
-  Object walk (ExpWalker walker) { return walker.walkExpression(this); }
-
 }

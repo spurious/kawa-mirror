@@ -28,5 +28,8 @@ public class ThisExp extends ReferenceExp
     code.emitPushThis();
   }
 
-  Object walk (ExpWalker walker) { return walker.walkThisExp(this); }
+  protected Expression walk (ExpWalker walker)
+  {
+    return walker.walkThisExp(this);
+  }
 }

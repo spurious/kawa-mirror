@@ -7,7 +7,7 @@ package gnu.expr;
     by making it more likely the application will be to a known procedure.
     This optimization has to be done after Declarations are bound. */
 
-public class PushApply extends ExpFullWalker
+public class PushApply extends ExpWalker
 {
   public static void pushApply (Expression exp)
   {
@@ -16,7 +16,7 @@ public class PushApply extends ExpFullWalker
     //or:  walter.walkExpression(exp);
   }
 
-  public Object walkApplyExp(ApplyExp exp)
+  protected Expression walkApplyExp(ApplyExp exp)
   {
     Expression func = exp.func;
     if (func instanceof LetExp

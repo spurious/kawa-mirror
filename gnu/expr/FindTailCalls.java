@@ -4,7 +4,7 @@ package gnu.expr;
     Also setCanRead, setCanCall, setCanWrite on Declarations
     and setCanRead, setCanCall on LambdaExp when appropriate. */
 
-public class FindTailCalls extends ExpFullWalker
+public class FindTailCalls extends ExpWalker
 {
   public static void findTailCalls (Expression exp)
   {
@@ -15,7 +15,7 @@ public class FindTailCalls extends ExpFullWalker
 
   boolean inTailContext = true;
 
-  public Object walkApplyExp(ApplyExp exp)
+  protected Expression walkApplyExp(ApplyExp exp)
   {
     if (inTailContext)
       exp.setTailCall(true);
@@ -66,7 +66,7 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
-  public Object walkBeginExp(BeginExp exp)
+  protected Expression walkBeginExp(BeginExp exp)
   {
     boolean save = inTailContext;
     try
@@ -85,7 +85,7 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
-  public Object walkFluidLetExp (FluidLetExp exp)
+  protected Expression walkFluidLetExp (FluidLetExp exp)
   {
     for (Declaration decl = exp.firstDecl();
          decl != null; decl = decl.nextDecl())
@@ -96,14 +96,14 @@ public class FindTailCalls extends ExpFullWalker
     return super.walkFluidLetExp(exp);
   }
 
-  public Object walkModuleExp (ModuleExp exp)
+  protected Expression walkModuleExp (ModuleExp exp)
   {
     super.walkLambdaExp(exp);
     walkDecls(exp);
     return exp;
   }
 
-  public Object walkLetExp (LetExp exp)
+  protected Expression walkLetExp (LetExp exp)
   {
     int n = exp.inits.length; 
     boolean save = inTailContext;
@@ -142,7 +142,7 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
-  public Object walkIfExp (IfExp exp)
+  protected Expression walkIfExp (IfExp exp)
   {
     boolean save = inTailContext;
     try
@@ -161,7 +161,7 @@ public class FindTailCalls extends ExpFullWalker
     return exp;
   }
 
-  public Object walkLambdaExp (LambdaExp exp)
+  protected Expression walkLambdaExp (LambdaExp exp)
   {
     walkLambdaExp (exp, true);
     return exp;
@@ -244,7 +244,7 @@ public class FindTailCalls extends ExpFullWalker
   // calls that call the key.
   // Hashtable applications = new Hashtable();
 
-  public Object walkObjectExp (ObjectExp exp)
+  protected Expression walkObjectExp (ObjectExp exp)
   {
     boolean save = inTailContext;
     LambdaExp parent = currentLambda;
@@ -266,7 +266,7 @@ public class FindTailCalls extends ExpFullWalker
     return exp;
   }
 
-  public Object walkReferenceExp (ReferenceExp exp)
+  protected Expression walkReferenceExp (ReferenceExp exp)
   {
     Declaration decl = Declaration.followAliases(exp.binding);
     if (decl != null)
@@ -290,7 +290,7 @@ public class FindTailCalls extends ExpFullWalker
       return (Expression) value.walk(this);
   }
 
-  public Object walkSetExp (SetExp exp)
+  protected Expression walkSetExp (SetExp exp)
   {
     boolean save = inTailContext;
     try
@@ -314,7 +314,7 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
-  public Object walkTryExp (TryExp exp)
+  protected Expression walkTryExp (TryExp exp)
   {
     boolean save = inTailContext;
     try
@@ -328,7 +328,7 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
-  public Object walkSynchronizedExp (SynchronizedExp exp)
+  protected Expression walkSynchronizedExp (SynchronizedExp exp)
   {
     boolean save = inTailContext;
     try

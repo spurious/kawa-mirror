@@ -1,3 +1,10 @@
+2002-03-07  Per Bothner  <per@bothner.com>
+
+	* configure.in (pathset, filesep):  New substitutions.
+	* Make-rules (CLASSPATH_ENV): Use pathsep and filesep.
+
+	* configure.in:  Add links for 3 gnu/xquery/testsuite xml data files.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* .../*/Makefile.am, Makefile.in:  Updated to autmake-1.5d.

@@ -1,3 +1,9 @@
+2003-07-23  Terje Pedersen  <terje@brassforum.com>
+
+	* XQuery.java (<init>):  Define string-length, substring-before,
+	substring-after, translate, string-pad, contains, starts-with,
+	ends-with, string-join):  New standard functions.
+
 2003-07-23  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (OP_IS, OP_ISNOT, OP_GRTGRT, OP_LSSLSS):  New tokens.

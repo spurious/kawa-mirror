@@ -203,6 +203,18 @@ public class XQuery extends Interpreter
     define_method("lower-case", "gnu.xquery.util.StringValue", "lowerCase");
     define_method("upper-case", "gnu.xquery.util.StringValue", "upperCase");
     define_method("substring", "gnu.xquery.util.StringValue", "substring");
+    define_method("string-length",
+		  "gnu.xquery.util.StringValue", "stringLength");
+    define_method("substring-before",
+		  "gnu.xquery.util.StringValue", "substringBefore");
+    define_method("substring-after",
+		  "gnu.xquery.util.StringValue", "substringAfter");
+    define_method("translate", "gnu.xquery.util.StringValue", "translate");
+    define_method("string-pad", "gnu.xquery.util.StringValue", "stringPad");
+    define_method("contains", "gnu.xquery.util.StringValue", "contains");
+    define_method("starts-with", "gnu.xquery.util.StringValue", "startsWith");
+    define_method("ends-with","gnu.xquery.util.StringValue", "endsWith");
+    define_method("string-join", "gnu.xquery.util.StringValue", "stringJoin");
   }
 
   public static XQuery getInstance()

@@ -1,8 +1,12 @@
-Changes from Kawa 1.2 to 1.3
+Changes from Kawa 1.2 to 1.4
 ============================
-Impplement defmacro and gentemp.
-
 The codegen package has been renamed gnu.bytecode.
+The kawa.math package has been moved to gnu.math.
+Both packages have new license:  No restrictions if you use an
+unmodified release, but GNU General Public License.  Let me know
+if that causes problems.  The rest of Kawa still has the old license.
+
+Implement defmacro and gentemp.
 
 Implement make-record-type and related functions to create and use
 new record types.  A record type is implemented as a java.lang.Class

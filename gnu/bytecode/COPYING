@@ -1,5 +1,5 @@
-The Java classes (with related files and documentation) in gnu.bytecode
-and gnu.math are copyright Per Bothner and Cygnus Solutions.
+The Java classes (with related files and documentation) in this package
+are copyright (C) 1996, 1997, 1998, 1999  Per Bothner.
 
 These classes are distributed in the hope that they will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,10 +14,9 @@ You may make and distribute a modified version, provided you follow
 the terms of the GNU General Public License; either version 2,
 or (at your option) any later version.  (Version 2 is included below.)
 
-For questions, contact Per Bothner, Cygnus Solutions,
-1325 Chesapeake Terrace, Sunnyvale CA 94089, USA.
-By email bothner@cygnus.com or info@cygnus.com.
-
+If you have questions, contact Per Bothner,
+18651 Cynthia Avenue, Cupertino CA 95014, USA.
+By email per@bothner.com.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991

@@ -1,5 +1,11 @@
 2001-11-23  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (IS_SINGLE_VALUE):  New constant.
+	* ReferenceExp.java (compilation):  Optimize if SeriesTarget
+	and IS_SINGLE_VALUE is set.
+
+	* Compilation.java (loadCallContext):  New helper function.
+
 	* LambdaExp.java (returnType):  New field.
 	(getReturnType):  Guard against cycles.
 	(setReturnType):  New method.

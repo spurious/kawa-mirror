@@ -1420,6 +1420,14 @@ public class Compilation
     return field;
   }
 
+  /** Generate code to push the current CallContext on the JVM stack.
+   * Assumes that callStackContext has been set for the current function.
+   * (Later we should call a routine to get it via the current thread.) */
+  public final void loadCallContext()
+  {
+    getCode().emitLoad(callStackContext);
+  }
+
   public void freeLocalField (Field field)
   {
     // FIXME

@@ -182,6 +182,9 @@ public class Declaration
   public static final int IS_UNKNOWN = 0x10000;
   public static final int PRIVATE_SPECIFIED = 0x20000;
 
+  // This should be a type property, not a variable property, at some point!
+  public static final int IS_SINGLE_VALUE = 0x40000;
+
   protected int flags = IS_SIMPLE;
 
   public final boolean getFlag (int flag)

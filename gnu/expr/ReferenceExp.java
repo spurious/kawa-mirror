@@ -121,7 +121,12 @@ public class ReferenceExp extends Expression
       }
     else if (decl.isFluid() && decl.field == null)
       code.emitGetField(FluidLetExp.valueField);
-    target.compileFromStack(comp, getType());
+    if (target instanceof SeriesTarget
+	&& decl.getFlag(Declaration.IS_SINGLE_VALUE))
+      // A kludge until we get a better type system.
+      ((SeriesTarget) target).compileFromStackSimple(comp, getType());
+    else
+      target.compileFromStack(comp, getType());
   }
 
   protected Expression walk (ExpWalker walker)

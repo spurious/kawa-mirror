@@ -58,10 +58,3 @@ extends HttpServlet implements CpsMethodContainer
   public abstract void apply(CallContext context);
 }
 
-class ServletCallContext extends CallContext
-{
-  public HttpServletRequest request;
-  public HttpServletResponse response;
-  public HttpServlet servlet;
-}
-

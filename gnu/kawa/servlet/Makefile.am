@@ -7,7 +7,8 @@ AUTOMAKE_OPTIONS = foreign
 java_sources=\
   GetRequest.java \
   GetResponse.java \
-  KawaServlet.java
+  KawaServlet.java \
+  ServletCallContext.java
 
 PACKAGE_FNAME = gnu-kawa-servlet
 GCJ_INPUTS =  $(java_Java)

@@ -1,3 +1,12 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* ServletCallContext.java:  New file, old class moved
+	from KawaServlet.java into its own file.
+
+	* GetRequest.java:  New class, extends CpsProcedure.
+	* GetResponse.java:  New class, extends CpsProcedure.
+	* Makefile.am (java_sources):  Update accordingly.
+
 2001-10-11  Per Bothner  <per@bothner.com>
 
 	New package.

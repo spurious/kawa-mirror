@@ -99,9 +99,9 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = bytecode math lists text mapping expr $(XML_SUBDIRS) 	kawa commonlisp ecmascript $(SWING_SUBDIRS)
+SUBDIRS = bytecode math lists text mapping expr 	kawa commonlisp ecmascript $(XML_SUBDIRS) $(SWING_SUBDIRS)
 
-@ENABLE_XML_TRUE@XML_SUBDIRS = xml
+@ENABLE_XML_TRUE@XML_SUBDIRS = xml xquery
 @WITH_SWING_TRUE@SWING_SUBDIRS = jemacs
 EXTRA_DIST = PACKAGES
 
@@ -115,8 +115,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DIST_SUBDIRS =  bytecode math lists text mapping expr xml kawa \
-commonlisp ecmascript jemacs
+DIST_SUBDIRS =  bytecode math lists text mapping expr kawa commonlisp \
+ecmascript xml xquery jemacs
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 

@@ -6,7 +6,7 @@ KAWATEST = $(KAWA) -e '(load "testing.zip")'
 
 all:
 
-check:  check-scm check-num check-mac check-misc check-obj
+check:  check-scm check-num check-mac check-misc check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
 	$(KAWA) -e '(compile-file "'$(srcdir)/testing.scm'" "testing.zip")'
@@ -30,6 +30,9 @@ check-mac: testing.zip
 
 check-obj: testing.zip
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
+
+check-polytype: testing.zip
+	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   obj-test.scm misc-test.scm

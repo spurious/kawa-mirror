@@ -283,8 +283,8 @@ class Prompter extends Procedure1
     if (state == '<')
       return "<!--" + line + "-->";
     else if (state == ':')
-      return "- (:" + line + ":) ";
+      return "-(:" + line + "c:) ";
     else
-      return "(: " + state + line + ":) ";
+      return "(: " + line + state + ":) ";
   }
 }

@@ -635,10 +635,12 @@ public abstract class Interpreter
     // Last restort - check for unresolved namespace prefix.
     int colon = name.indexOf(':');
     Environment env = sym.getEnvironment();
-    if (colon > 1 & env != null)
+    if (colon >= 0 & env != null)
       {
 	String prefix = (NAMESPACE_PREFIX+name.substring(0, colon)).intern();
 	Object uri_val = env.get(prefix, null);
+	if (uri_val == null && colon == 0)
+	  uri_val = "";
 	if (uri_val != null)
 	  {
 	    sym = Symbol.make(uri_val, name.substring(colon+1));

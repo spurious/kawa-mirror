@@ -1,3 +1,8 @@
+2003-11-22  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getDefaultSymbolValue):  Allow ':local'
+	as well as 'prefix:local'.
+
 2003-11-09  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (applyV):  Handle takesContext().

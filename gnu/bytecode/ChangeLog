@@ -1,3 +1,7 @@
+2003-10-28  Per Bothner  <per@bothner.com>
+
+	* dump-main.cc:  Belatedly remove unused file.
+
 2003-10-09  Per Bothner  <per@bothner.com>
 
 	* ZipArchive.java:  Remove all fields and non-static methods,

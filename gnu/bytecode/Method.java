@@ -325,7 +325,7 @@ public class Method implements AttrContainer {
   {
     StringBuffer sbuf = new StringBuffer(100);
     sbuf.append(getDeclaringClass().getName());
-    sbuf.append(' ');
+    sbuf.append('.');
     sbuf.append(name);
     if (arg_types != null)
       {

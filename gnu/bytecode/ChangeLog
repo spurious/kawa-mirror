@@ -1,3 +1,7 @@
+2002-05-06  Per Bothner  <per@bothner.com>
+
+	* Method.java (toString):  Use '.' before method name.
+
 2002-04-19  Daniel Bonniot  <bonniot@users.sourceforge.net>
 
 	* ClassType.java (addMethods): Prevents addMethods to incorrectly list

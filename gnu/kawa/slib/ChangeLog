@@ -1,3 +1,8 @@
+2002-09-28  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (request-parameter, (request-parameters):  New.
+	Suggested by Marco Vezzoli <marco.vezzoli@st.com>.
+
 2002-09-21  Per Bothner  <per@bothner.com>
 
 	* DefineRecordType.scm:  New macro, implements SRFI-9.

@@ -9,7 +9,9 @@ import gnu.bytecode.*;
 public class TryExp extends Expression
 {
   Expression try_clause;
-  // CatchExp catch_clauses;
+
+  CatchClause catch_clauses;
+
   Expression finally_clause;
   
   public TryExp (Expression try_clause, Expression finally_clause)
@@ -21,11 +23,12 @@ public class TryExp extends Expression
   public Object eval (Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
+    if (catch_clauses != null)
+      throw new GenericError ("internal error - TryExp.eval called");
     try
       {
 	return try_clause.eval(env);
       }
-    /* catch (Exception exp) { } */
     finally
       {
 	finally_clause.eval(env);
@@ -50,15 +53,23 @@ public class TryExp extends Expression
     if (saved_result != null)
       code.emitStore(saved_result);
     code.emitTryEnd();
-    /*
-    CatchExp catch_clause = catch_clauses;
-    for (; catch_clause != null;  catch_clause = catch_clause.next)
+
+    CatchClause catch_clause = catch_clauses;
+    for (; catch_clause != null;  catch_clause = catch_clause.getNext())
       {
-	code.compileCatchStart(catch_var);
-	code.enterScope(catch_clause.scope);
-	catch_clause.body.compile_with_linenumber(comp, flags);
+	code.emitCatchStart(catch_clause.firstVar());
+	catch_clause.compile(comp, flags);
+	code.emitCatchEnd();
+      }
+
+    /*
+    for (int i = 0;  i < catch_count;  i++)
+      {
+	code.emitCatchStart(catch_vars[i]);
+`	code.enterScope(catch_clause.scope); // pushScope ??
+	catch_bodies[i].compile_with_linenumber(comp, flags);
 	code.popScope();
-	code.compileCatchEnd();
+	code.emitCatchEnd();
       }
     */
     if (finally_clause != null)
@@ -79,15 +90,13 @@ public class TryExp extends Expression
   {
     ps.print("(%try ");
     try_clause.print(ps);
+    CatchClause catch_clause = catch_clauses;
+    for (; catch_clause != null;  catch_clause = catch_clause.getNext())
+      {
+	catch_clause.print(ps);
+      }
     ps.print(" finally: ");
     finally_clause.print(ps);
     ps.print(")");
   }
 }
-/*
-public class CatchExp extends ScopeExp
-{
-  CatchExp next;
-  public Expression body;
-}
-*/

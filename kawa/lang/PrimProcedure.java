@@ -11,12 +11,46 @@ public class PrimProcedure extends ProcedureN
   Method method;
   int op_code;
 
+  java.lang.reflect.Member member;
+
   public final int opcode() { return op_code; }
 
   public Object applyN (Object[] args)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    throw new GenericError("apply not implemented for PrimProcedure");
+    try
+      {
+	if (member == null)
+	  {
+	    Class clas = method.getDeclaringClass().getReflectClass();
+	    int i = argTypes.length;
+	    Class[] paramTypes = new Class[i];
+	    while (--i >= 0)
+	      paramTypes[i] = argTypes[i].getReflectClass();
+	    if (op_code == 183)
+	      member = clas.getConstructor(paramTypes);
+	    else
+	      member = clas.getMethod(method.getName(), paramTypes);
+	  }
+	if (member instanceof java.lang.reflect.Constructor)
+	  return ((java.lang.reflect.Constructor) member).newInstance(args);
+	else
+	  {
+	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
+	    if (method.getStaticFlag())
+	      return meth.invoke(null, args);
+	    else
+	      {
+		Object[] rargs = new Object[args.length - 1];
+		System.arraycopy(args, 1, rargs, 0, args.length - 1);
+		return meth.invoke(args[0], rargs);
+	      }
+	  }
+      }
+    catch (Exception ex)
+      {
+	throw new GenericError("apply not implemented for PrimProcedure - " + ex);
+      }
   }
 
   public PrimProcedure(Method method)
@@ -139,5 +173,12 @@ public class PrimProcedure extends ProcedureN
       }
     buf.append(')');
     return buf.toString();
+  }
+
+  public void print(java.io.PrintWriter ps)
+  {
+    ps.print("#<primitive procedure ");
+    ps.print(toString());
+    ps.print ('>');
   }
 }

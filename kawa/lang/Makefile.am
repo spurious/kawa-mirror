@@ -24,7 +24,7 @@ EofReadError.class
 
 OBJ=\
 Char.class \
-LineBufferedReader.class \
+LineBufferedReader.class QueueReader.class \
 InPort.class \
 OutPort.class \
 TtyInPort.class LogWriter.class \
@@ -40,7 +40,7 @@ ReferenceExp.class \
 ScopeExp.class \
 SetExp.class \
 ModuleExp.class \
-TryExp.class \
+TryExp.class CatchClause.class \
 \
 Declaration.class \
 Location.class \

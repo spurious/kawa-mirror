@@ -1,3 +1,7 @@
+2003-01-29  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/require.java:  Recognize 'gui package.
+
 2003-01-26  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Record.java (getField):  New static helper method.

@@ -20,6 +20,8 @@ public class Method {
   /* True if we cannot fall through to bytes[PC] -
      the previous instruction was an uncondition control transfer.  */
   boolean unreachable_here;
+  /** True if control could reach here. */
+  public boolean reachableHere () { return !unreachable_here; }
 
   Method (ClassType clfile, int flags) {
      if (clfile.last_method == null)
@@ -873,6 +875,36 @@ public class Method {
     put2 (CpoolRef.get_const (classfile, method).index);
     if (method.return_type != Type.void_type)
       push_stack_type (method.return_type);
+  }
+
+  /** Compile a tail-call to position 0 of the current procewure.
+   * If pop_args is true, copy argument registers (except this) from stack. */
+  public void compile_tailcall (boolean pop_args)
+  {
+    if (pop_args)
+      {
+	int arg_slots = ((access_flags & Access.STATIC) != 0) ? 0 : 1;
+	for (int i = arg_types.length;  --i >= 0; )
+	  arg_slots += arg_types[i].size > 4 ? 2 : 1;
+	for (int i = arg_types.length;  --i >= 0; )
+	  {
+	    arg_slots -= arg_types[i].size > 4 ? 2 : 1;
+	    compile_store_value (used_locals [arg_slots]);
+	  }
+      }
+    instruction_start_hook (5);
+    int delta = - PC;
+    if (delta < -32768)
+      {
+	put1 (200);  // goto_w
+	put4 (delta);
+      }
+    else
+      {
+	put1 (167); // goto
+	put2 (delta);
+      }
+    unreachable_here = true;
   }
 
   private void compile_fieldop (Field field, int opcode)

@@ -1,3 +1,7 @@
+Sat Jul 20 17:32:28 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Method.java (compile_tailcall, reachableHere):  New methods.
+
 Tue Jul 16 23:18:20 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* ZipArchive.java:  New class, for handling .zip archives.

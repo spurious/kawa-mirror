@@ -1,5 +1,30 @@
 2002-05-28  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Macro.java (capturedIdentifiers, capturedFields
+	templateIdentifiers, capturedDeclarations):  New fields.
+	(make):  New static methods.
+	(captureDecls, getUsedFieldsList):  New methods.
+	* kawa/lang/SyntaxRule.java (template_identifiers, captured_decls):
+	Removed fields.  Instead use capturedIdentifiers and
+	capturedDeclarations from current Macro.
+	(<init>):  Capture decls in SyntaxRules.<init>, not here.
+	(execute)_template):  Removed.  Munging of tr.environ is now
+	done in SyntaxRules.expand.
+	* kawa/lang/SyntaxRules.java (calculate_maxVars, <init>):
+	Take extra length parameter.
+	(<init>):  Get capturedIdentifiers from current Macro, and set them.
+	(expand):  Munge tr's environ to use macro-definition-time decls.
+	* kawa/lang/Translator.java (currentMacroDefinition):  New field.
+	(lookup. lookupGLobal):  New methods.
+	(finishModule):  Only error if NOT_DEFINING and not IS_UNKNOWN.
+	(pushDeclsStart):  New method.
+	(popDecls):  Now takes no arguments.
+	* kawa/standard/define_syntax.java:  Use new Macro.make method.
+	Set/restore tr.currentMacroDefinition
+	* kawa/standard/let_syntax.java:  Likewise.
+	* kawa/standard/require.java (scanForDefinitions):  If the loaded value
+	is a Macro, at end call its captureDecls method.
+
 	* kawa/lang/AutoloadSyntax.java (rewriteForm):  Set currentSyntax.
 
 2002-04-18  Per Bothner  <per@bothner.com>

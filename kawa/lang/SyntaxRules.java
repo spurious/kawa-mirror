@@ -16,12 +16,11 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   /* The largest (num_variables+template_identifier.length) for any rule. */
   int maxVars = 0;
 
-  private void calculate_maxVars ()
+  private void calculate_maxVars (int template_identifiers_length)
   {
     for (int i = rules.length;  --i >= 0; )
       {
-	int size = rules[i].num_variables +
-	  rules[i].template_identifiers.length;
+	int size = rules[i].num_variables + template_identifiers_length;
 	if (size > maxVars)
 	  maxVars = size;
       }
@@ -31,11 +30,12 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
   }
 
-  public SyntaxRules (String[] literal_identifiers, SyntaxRule[] rules)
+  public SyntaxRules (String[] literal_identifiers, SyntaxRule[] rules,
+		      int template_identifiers_length)
   {
     this.literal_identifiers = literal_identifiers;
     this.rules = rules;
-    calculate_maxVars ();    
+    calculate_maxVars(template_identifiers_length);    
   }
 
   public SyntaxRules (String[] literal_identifiers, Object rules,
@@ -50,6 +50,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
       }
     this.rules = new SyntaxRule [rules_count];
     Pair rules_pair;
+    Macro macro = tr.currentMacroDefinition;
+    java.util.Vector capturedIdentifiers = macro.capturedIdentifiers;
     for (int i = 0;  i < rules_count;  i++, rules = rules_pair.cdr)
       {
 	rules_pair = (Pair) rules;
@@ -106,11 +108,12 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 
 	    this.rules[i]
 	      = new SyntaxRule (translated_pattern, pattern_nesting,
-				pattern_names, template, tr);
+				pattern_names, template,
+				capturedIdentifiers, tr);
 	    /* DEBUGGING:
 	    OutPort err = OutPort.errDefault();
 	    err.println ("{translated template:");
-	    this.rules[i].print_template_program (err);
+	    this.rules[i].print_template_program (template_identifiers, err);
 	    err.println ('}');
 	    */
 	  }
@@ -119,7 +122,26 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	    tr.setLine(save_filename, save_line, save_column);
 	  }
       }
-    calculate_maxVars ();    
+    int num_identifiers = capturedIdentifiers.size();
+    calculate_maxVars (num_identifiers);
+    macro.templateIdentifiers = new String[num_identifiers];
+    capturedIdentifiers.copyInto(macro.templateIdentifiers);
+    macro.capturedDeclarations = new Object[num_identifiers];
+    for (int j = num_identifiers;  --j >= 0; )
+      {
+	String name = macro.templateIdentifiers[j];
+	Object binding = tr.environ.get(name);
+	if (binding instanceof Declaration)
+	  {
+	    Declaration decl = (Declaration) binding;
+	    if (! decl.getFlag(Declaration.IS_UNKNOWN))
+              {
+                decl.setCanRead(true);
+                decl.setFlag(Declaration.EXTERNAL_ACCESS);
+	      }
+	  }
+	macro.capturedDeclarations[j] = binding;
+      }
   }
 
   /** Recursively translate a pattern in a syntax-rule to a Pattern object.
@@ -203,6 +225,8 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
     Object obj = form.cdr;
     Object[] vars = new Object[maxVars];
+    Macro macro = (Macro) tr.getCurrentSyntax();
+    int num_identifiers = macro.templateIdentifiers.length;
     for (int i = 0;  i < rules.length;  i++)
       {
 	SyntaxRule rule = rules[i];
@@ -220,7 +244,19 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
 	      }
 	    err.println ('}');
 	    */
-	    Object expansion = rule.execute_template (vars, tr, form);
+
+	    int[] indexes = new int[rule.max_nesting];
+	    for (int j = 0;  j < num_identifiers;  j++)
+	      {
+		String name = macro.templateIdentifiers[j];
+		String renamed_symbol = Symbol.makeUninterned (name);
+		vars[rule.num_variables + j] = renamed_symbol;
+		Object captured = macro.capturedDeclarations == null ? null
+		  : macro.capturedDeclarations[j];
+		tr.environ.put(renamed_symbol, captured == null ? name : captured);
+	      }
+	    Object expansion = rule.execute_template (0, vars, 0, indexes, tr, form);
+
 	    /* DEBUGGING:
 	    err.print("{Expansion of ");
 	    err.print(literal_identifiers[0]);
@@ -249,6 +285,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
     out.writeObject(literal_identifiers);
     out.writeObject(rules);
+    out.writeInt(maxVars);
   }
 
   public void readExternal(ObjectInput in)
@@ -256,6 +293,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Externalizable
   {
     literal_identifiers = (String[]) in.readObject();
     rules = (SyntaxRule[]) in.readObject();
-    calculate_maxVars ();
+    maxVars = in.readInt();
   }
 }

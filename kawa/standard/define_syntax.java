@@ -30,7 +30,10 @@ public class define_syntax extends Syntax
     if (! (pair.cdr instanceof Pair))
       return tr.syntaxError("Missing transformation for "+form.car);
     pair = (Pair) pair.cdr;
+    Macro savedMacro = tr.currentMacroDefinition;
+    tr.currentMacroDefinition = macro;
     Expression rule = tr.rewrite(pair.car);
+    tr.currentMacroDefinition = savedMacro;
     macro.expander = rule;
     if (! (decl.context instanceof ModuleExp))
       {
@@ -72,8 +75,7 @@ public class define_syntax extends Syntax
       }
 
     Declaration decl = defs.getDefine(name, 'w', tr);
-    Macro macro = new Macro(name);
-    macro.bind(decl);
+    Macro macro = Macro.make(decl);
 
     p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);

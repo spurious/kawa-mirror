@@ -22,14 +22,6 @@ public class SyntaxRule implements Externalizable
 
   Object[] literal_values;
 
-  /** The identifiers in the template that are not pattern variable.
-   * These need re-naming to be "hygienic". */
-  String[] template_identifiers;
-
-  /** Declarations captured at macro definition time.
-   * The binding (if any) for template_identifiers[i] is captured_decls[i]. */
-  Object[] captured_decls;
-
   public SyntaxRule ()
   {
   }
@@ -37,14 +29,12 @@ public class SyntaxRule implements Externalizable
   public SyntaxRule (Pattern pattern,
 		     String pattern_nesting,
 		     String template_program,
-		     String[] template_identifiers,
 		     Object[] literal_values,
 		     int max_nesting)
   {
     this.pattern = pattern;
     this.pattern_nesting = pattern_nesting;
     this.template_program = template_program;
-    this.template_identifiers = template_identifiers;
     this.literal_values = literal_values;
     this.max_nesting = max_nesting;
     this.num_variables = pattern_nesting.length ();
@@ -52,26 +42,19 @@ public class SyntaxRule implements Externalizable
 
   public SyntaxRule (Pattern pattern, String pattern_nesting,
 		     java.util.Vector pattern_names,
-		     Object template, Translator tr)
+		     Object template, java.util.Vector template_identifiers,
+		     Translator tr)
   {
     this.pattern = pattern;
     this.pattern_nesting = pattern_nesting;
     this.num_variables = pattern_nesting.length ();
     StringBuffer program = new StringBuffer ();
     java.util.Vector literals_vector = new java.util.Vector ();
-    java.util.Vector template_identifiers = new java.util.Vector ();
     translate_template (template, program, pattern_names,
 			0, literals_vector, template_identifiers, 0, tr);
     this.template_program = program.toString ();
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
-
-    int num_identifiers = template_identifiers.size();
-    this.template_identifiers = new String[num_identifiers];
-    template_identifiers.copyInto (this.template_identifiers);
-    this.captured_decls = new Object[num_identifiers];
-    for (int i = num_identifiers;  --i >= 0; )
-      captured_decls[i] = tr.environ.get(this.template_identifiers[i]);
   }
 
   static final String dots3 = "...";
@@ -98,7 +81,8 @@ public class SyntaxRule implements Externalizable
   final static int FIRST_LITERALS = 6;
 
   /* DEBUGGING
-  void print_template_program (java.io.PrintWriter ps)
+  void print_template_program (String[] template_identifiers,
+			       java.io.PrintWriter ps)
   {
     for (int i = 0;  i < template_program.length (); i++)
       {
@@ -254,29 +238,12 @@ public class SyntaxRule implements Externalizable
     return -1;
   }
 
-  static int counter;
-
-  public Object execute_template (Object[] vars, Translator tr, Pair form)
-  {
-    int[] indexes = new int[max_nesting];
-    int num_identifiers = template_identifiers.length;
-    for (int i = 0;  i < num_identifiers;  i++)
-      {
-	String name = template_identifiers[i];
-	String renamed_symbol = Symbol.makeUninterned (name);
-	vars[num_variables + i] = renamed_symbol;
-        Object captured = captured_decls == null ? null : captured_decls[i];
-	tr.environ.put(renamed_symbol, captured == null ? name : captured);
-      }
-    return execute_template (0, vars, 0, indexes, tr, form);
-  }
-
   /**
    * @param nesting  number of levels of ... we are nested inside
    * @param indexes element i (where i in [0 .. nesting-1] specifies
    * the interation index for the i'level of nesting
    */
-  private Object execute_template (int start_pc,
+  Object execute_template (int start_pc,
 				  Object[] vars,
 				  int nesting, int[] indexes,
 				  Translator tr, Pair form)
@@ -405,7 +372,6 @@ public class SyntaxRule implements Externalizable
     out.writeObject(pattern);
     out.writeObject(pattern_nesting);
     out.writeObject(template_program);
-    out.writeObject(template_identifiers);
     out.writeObject(literal_values);
     out.writeInt(max_nesting);
   }
@@ -416,7 +382,6 @@ public class SyntaxRule implements Externalizable
     pattern = (Pattern) in.readObject();
     pattern_nesting = (String) in.readObject();
     template_program = (String) in.readObject();
-    template_identifiers = (String[]) in.readObject();
     literal_values = (Object[]) in.readObject();
     max_nesting = in.readInt();
   }

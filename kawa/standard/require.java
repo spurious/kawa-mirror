@@ -6,6 +6,7 @@ import gnu.bytecode.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
 import gnu.kawa.reflect.Invoke;
+import java.util.*;
 
 public class require extends Syntax
 {
@@ -88,6 +89,7 @@ public class require extends Syntax
     // Type type = Scheme.expType(tr.rewrite(name));
     Type type = null;
     Pair p;
+    Hashtable ftable = null;
     if (name instanceof Pair && (p = (Pair) name).car == "quote")
       {
 	name = p.cdr;
@@ -134,6 +136,7 @@ public class require extends Syntax
     ClassType t = (ClassType) type;
     boolean isRunnable = t.isSubtype(Compilation.typeRunnable);
     Declaration decl = null;
+    Vector macros = null;
     for (;;)
       {
 	Class rclass = t.getReflectClass();
@@ -183,11 +186,22 @@ public class require extends Syntax
 		    fdecl.setType(dtype);
                     if (ftype.isSubtype(Compilation.typeBinding))
                       fdecl.setIndirectBinding(true);
-		    if (! isStatic)
+		    if (! isStatic || fvalue instanceof Macro)
 		      fdecl.base = decl;
 		    fdecl.field = fld;
+		    if (ftable == null)
+		      ftable = new Hashtable(40);
+		    ftable.put(fname, fdecl);
 		    if (fvalue instanceof Macro)
-		      ((Macro) fvalue).bind(fdecl);
+		      {
+			// Copy the Macro, as we will be modifying it later.
+			Macro mac = new Macro((Macro) fvalue);
+			fvalue = mac;
+			mac.bind(fdecl);
+			if (macros == null)
+			  macros = new Vector();
+			macros.addElement(fvalue);
+		      }
 		    else
 		      fdecl.noteValue(new QuoteExp(fvalue));
 		    fdecl.setPrivate(true);
@@ -203,6 +217,14 @@ public class require extends Syntax
         t = t.getSuperclass();
         if (t == null)
           break;
+      }
+
+    if (macros != null)
+      {
+	for (int i = macros.size();  --i >= 0; )
+	  {
+	    ((Macro) macros.elementAt(i)).captureDecls(ftable);
+	  }
       }
 
     ClassType thisType = ClassType.make("kawa.standard.require");

@@ -43,9 +43,8 @@ public class let_syntax extends Syntax implements Printable
 	binding = (Pair) binding.cdr;
 	if (binding.cdr != LList.Empty)
 	  return tr.syntaxError("let binding for '"+name+"' is improper list");
-        macros[i] = new Macro(name);
         decls[i] = new Declaration(name);
-        macros[i].bind(decls[i]);
+        macros[i] = Macro.make(decls[i]);
 	transformers[i] = binding.car;
         let.addDeclaration(decls[i]);
 	inits[i] = QuoteExp.nullExp;
@@ -53,11 +52,14 @@ public class let_syntax extends Syntax implements Printable
       }
     if (recursive)
       tr.push(let);
+    Macro savedMacro = tr.currentMacroDefinition;
     for (int i = 0; i < decl_count; i++)   
       {
+	tr.currentMacroDefinition = macros[i];
         inits[i] = tr.rewrite(transformers[i]);
 	macros[i].expander = inits[i];
       }
+    tr.currentMacroDefinition = savedMacro;
     if (! recursive)
       tr.push(let);
     Expression result = tr.rewrite_body(body);

@@ -29,6 +29,9 @@ public class Translator extends Parser
   // Global environment used to look for syntax/macros.
   private Environment env;
 
+  /** Set if we're processing a define-syntax or defmacro. */
+  public Macro currentMacroDefinition;
+
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
   {
@@ -143,6 +146,33 @@ public class Translator extends Parser
       }
     nameToLookup = name;
     return binding;
+  }
+
+  public Declaration lookup(String name, int namespace)
+  {
+    Object binding = environ.get(name);
+    Declaration decl = (Declaration) binding;
+    if (decl != null
+	&& (getInterpreter().getNamespaceOf(decl) & namespace) != 0)
+      return decl;
+    return lookupGlobal(name, namespace);
+  }
+
+  public Declaration lookupGlobal(String name)
+  {
+    return lookupGlobal(name, -1);
+  }
+
+  public Declaration lookupGlobal(String name, int namespace)
+  {
+    ModuleExp module = currentModule();
+    Declaration decl = module.lookup(name, getInterpreter(), namespace);
+    if (decl == null)
+      {
+        decl = module.getNoDefine(name);
+        decl.setIndirectBinding(true);
+      }
+    return decl;
   }
 
   Object resolve(Binding binding, boolean function)
@@ -621,7 +651,8 @@ public class Translator extends Parser
     for (Declaration decl = mexp.firstDecl();
 	 decl != null;  decl = decl.nextDecl())
       {
-	if (decl.getFlag(Declaration.NOT_DEFINING))
+	if (decl.getFlag(Declaration.NOT_DEFINING)
+	    && ! decl.getFlag(Declaration.IS_UNKNOWN))
 	  {
 	    String msg1 = "'";
 	    String msg2
@@ -661,9 +692,8 @@ public class Translator extends Parser
     module = mexp;
     int nforms = forms.size();
     int ndecls = mexp.countDecls();
-    pushDecls(mexp);
     mexp.body = makeBody(forms, mexp);
-    pop(mexp);
+    popDecls();
     /* DEBUGGING:
     OutPort err = OutPort.errDefault ();
     err.print ("[Re-written expression for load/compile: ");
@@ -677,7 +707,7 @@ public class Translator extends Parser
   /** Used to remember shadowed bindings in environ.
    * For each binding, we push <old binding>, <name>.
    * For each new scope, we push <null>. */
-  java.util.Stack shadowStack = new java.util.Stack();
+  public /**/ java.util.Stack shadowStack = new java.util.Stack();
 
  /**
    * Insert decl into environ.
@@ -702,19 +732,22 @@ public class Translator extends Parser
     popBinding();
   }
 
+  public final void pushDeclsStart ()
+  {
+    shadowStack.push(null);
+  }
+
+  public final void popDecls()
+  {
+    while (popBinding()) { }
+  }
+
   public final void pushDecls (ScopeExp scope)
   {
-    // shadowStack.push(null);
+    shadowStack.push(null);
     for (Declaration decl = scope.firstDecl();
          decl != null;  decl = decl.nextDecl())
       push(decl);
-  }
-
-  private final void popDecls (ScopeExp scope)
-  {
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      pop(decl);
   }
 
   public void push (ScopeExp scope)
@@ -728,7 +761,7 @@ public class Translator extends Parser
 
   public void pop (ScopeExp scope)
   {
-    popDecls(scope);
+    popDecls();
     current_scope = scope.outer;
   }
 

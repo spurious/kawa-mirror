@@ -1,6 +1,7 @@
 2005-02-12  Per Bothner  <per@bothner.com>
 
 	* AccessExp.java: New class, extends Expression.
+	(binding): Make field private.
 	* Makefile.am: Update accordingly.
 	* ReferenceExp.java (symbol, binding): Move fields to AccessExp.
 	(getName, getSymbol, getBinding, setBinding): Likewise.

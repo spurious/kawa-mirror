@@ -9,7 +9,7 @@ public abstract class AccessExp extends Expression
   /** The name of the variable to set - either a String or a Symbol. */
   Object symbol;
   /** If non-null, the local Declaration this refers to. */
-  public Declaration binding;
+  Declaration binding;
   public String string_name () { return symbol.toString(); }
 
   public final String getName()

@@ -214,7 +214,7 @@ public class TestMisc
     evalTest("java.lang.Integer:toHexString(255)", "ff");
 
     // Check for catching errors:
-    evalTest("+ +", "*** syntax error - <string>:1:4: missing PrimaryExpr");
+    evalTest("+ +", "*** syntax error - <string>:1:3: missing expression");
 
     evalTest("declare namespace x1='XXX",
 	     "*** caught SyntaxException - <string>:1:26: "

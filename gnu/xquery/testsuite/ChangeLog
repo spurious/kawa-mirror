@@ -1,3 +1,7 @@
+2003-01-24  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Update expected error message.
+
 2002-11-20  Per Bothner  <bothner@bothner.com>
 
 	* TestMisc.java:  Add 3 tests for QNames for method invocation.

@@ -188,6 +188,8 @@ public class LineBufferedReader extends FilterReader
     return len;
   }
 
+  /** Get the current line number.
+    * The "first" line is number number 0. */
   public int getLineNumber ()
   {
     return lineNumber + countLines (buffer, 0, pos);

@@ -56,7 +56,7 @@ public class BRL extends Scheme
 
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     BRLRead lexer = new BRLRead(inp, messages);
     lexer.setBrlCompatible(isBrlCompatible());
     return lexer;
@@ -73,7 +73,7 @@ public class BRL extends Scheme
 				gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     kawa.lang.Translator tr
       = new  kawa.lang.Translator (Environment.user(), messages);
     tr.immediate = immediate;

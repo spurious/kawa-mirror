@@ -1,3 +1,10 @@
+Mon Nov 23 14:32:35 1998  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java (make):  Don't alloc words array if len==1.
+	(valOf):  New overload, taking byte[] of digits,
+	Other overloads use this new method.  Fixes problem reported
+ 	by Edouard Parmelan <EP510777@exchange.FRANCE.NCR.com>.
+
 Tue Sep 15 11:00:56 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* IntFraction.java (doubleValue): Fix thinko.

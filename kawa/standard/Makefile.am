@@ -26,15 +26,6 @@ exact2inexact.java \
 inexact2exact.java \
 string2number.java \
 string_v.java \
-string_ci_equal_p.java \
-string_lessthan_p.java \
-string_lessequal_p.java \
-string_greaterthan_p.java \
-string_greaterequal_p.java \
-string_ci_lessthan_p.java \
-string_ci_lessequal_p.java \
-string_ci_greaterthan_p.java \
-string_ci_greaterequal_p.java \
 string_append.java \
 vector_append.java \
 force.java \

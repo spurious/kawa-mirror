@@ -301,17 +301,17 @@ public class Scheme extends LispInterpreter
       define_proc ("string-ref", "kawa.lib.strings");
       define_proc ("string-set!", "kawa.lib.strings");
 
-      define_proc ("string=?", "kawa.lib.strings");
-      define_proc ("string-ci=?", "kawa.standard.string_ci_equal_p");
-      define_proc ("string<?", "kawa.standard.string_lessthan_p");
-      define_proc ("string>?", "kawa.standard.string_greaterthan_p");
-      define_proc ("string<=?", "kawa.standard.string_lessequal_p");
-      define_proc ("string>=?", "kawa.standard.string_greaterequal_p");
+      define_field("string=?", "kawa.lib.strings");
+      define_field("string-ci=?", "kawa.lib.strings");
+      define_field("string<?", "kawa.lib.strings");
+      define_field("string>?", "kawa.lib.strings");
+      define_field("string<=?", "kawa.lib.strings");
+      define_field("string>=?", "kawa.lib.strings");
 
-      define_proc ("string-ci<?", "kawa.standard.string_ci_lessthan_p");
-      define_proc ("string-ci>?", "kawa.standard.string_ci_greaterthan_p");
-      define_proc ("string-ci<=?", "kawa.standard.string_ci_lessequal_p");
-      define_proc ("string-ci>=?", "kawa.standard.string_ci_greaterequal_p");
+      define_field ("string-ci<?", "kawa.lib.strings");
+      define_field ("string-ci>?", "kawa.lib.strings");
+      define_field ("string-ci<=?", "kawa.lib.strings");
+      define_field ("string-ci>=?", "kawa.lib.strings");
 
       define_proc ("substring", "kawa.lib.strings");
       define_proc ("string-append", "kawa.standard.string_append");
@@ -331,7 +331,7 @@ public class Scheme extends LispInterpreter
       define_field("vector->list", "kawa.lib.vectors");
       define_proc ("vector-fill!", "kawa.lib.vectors");
       // Extension:
-      define_proc ("vector-append", "kawa.standard.vector_append");
+      define_field("vector-append", "kawa.standard.vector_append");
       define_proc ("values-append", "gnu.kawa.functions.AppendValues");
 
       //-- Section 6.9  -- complete [except restricted call/cc]

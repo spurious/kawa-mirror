@@ -1,3 +1,15 @@
+2002-08-04  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/{string_ci_equal_p.java, string_ci_greaterequal_p.java,
+	string_ci_greaterthan_p.java, string_ci_lessequal_p.java,
+	string_ci_lessthan_p.java, string_greaterequal_p.java,
+	string_greaterthan_p.java, string_lessequal_p.java,
+	string_lessthan_p.java}:  Removed - noew use kawa.lib.strings.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/vector_append.java (vectorAppend):  New static field.
+	(<init>):  New constructor
+	* kawa/standard/Scheme.java (initScheme):  Update accordingly.
+
 2002-08-02  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/expt.java (expt):  New static methods.

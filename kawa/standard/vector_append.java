@@ -10,6 +10,14 @@ import gnu.mapping.*;
 
 public class vector_append extends ProcedureN
 {
+  public static final vector_append vectorAppend
+    = new vector_append("vector-append");
+
+  public vector_append(String name)
+  {
+    super(name);
+  }
+
   public Object applyN (Object[] args)
   {
     return apply$V(args);

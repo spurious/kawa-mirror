@@ -84,7 +84,13 @@ public class PrimProcedure extends ProcedureN
     Type t = (Type) types.get(name);
     if (t != null)
       return t;
-    t = new ClassType (name);
+    if (name.endsWith("[]"))
+      {
+	t = string2Type(name.substring(0, name.length()-2));
+	t = new ArrayType(t);
+      }
+    else
+      t = new ClassType (name);
     types.put (name, t);
     return t;
   }

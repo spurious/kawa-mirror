@@ -57,6 +57,8 @@ public class PrimApplyExp extends ApplyExp
       comp.method.compile_pop (1);
     else if (retType instanceof ClassType)
       return;
+    else if (retType instanceof ArrayType)
+      return;  // ??? Should we convert to FVector?
     else if (retType == Type.int_type || retType == Type.short_type
 	     || retType == Type.byte_type)
       {

@@ -86,15 +86,18 @@ public class Window extends javax.swing.JTextPane
   public void setSelected()
   {
     Window selected = getSelected();
-    if (selected != null)
+    if (selected != null && selected.buffer != buffer)
       selected.unselect();
+
     frame.selectedWindow = this;
     Frame.selectedFrame = frame;
+    Buffer.setCurrent(buffer);
+
+    // Change buffer's pointMarker so it follows this Window's Caret.
     buffer.curPosition = getCaret();
     if (buffer.pointMarker.index >= 0)
       buffer.content.freePosition(buffer.pointMarker.index);
     buffer.pointMarker.index = Marker.POINT_POSITION_INDEX;
-    Buffer.setCurrent(buffer);
   }
 
   public static void setSelected(Window window)
@@ -125,14 +128,26 @@ public class Window extends javax.swing.JTextPane
 
   public void setBuffer (Buffer buffer)
   {
-    this.buffer = buffer;
+    if (this.buffer == buffer)
+      return;
     setDocument(buffer.document);
     setKeymap(buffer.keymap);
     if (modeline != null)
       modeline.setDocument(buffer.modelineDocument);
-    Caret caret = getCaret();
-    caret.setDot(buffer.getDot());
-    buffer.curPosition = caret;
+
+    Window selected = getSelected();
+    if (selected == this)
+      {
+	unselect();
+	// Change buffer's pointMarker so it follows this Window's Caret.
+	Caret caret = getCaret();
+	caret.setDot(buffer.getDot());
+	buffer.curPosition = caret;
+	if (buffer.pointMarker.index >= 0)
+	  buffer.content.freePosition(buffer.pointMarker.index);
+	buffer.pointMarker.index = Marker.POINT_POSITION_INDEX;
+      }
+    this.buffer = buffer;
   }
 
   /** Returns the "Emacs value" (1-origin) of point. */

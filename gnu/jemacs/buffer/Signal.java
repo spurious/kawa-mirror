@@ -38,4 +38,10 @@ public class Signal extends RuntimeException
     else
       return name+": "+data;
   }
+
+  public static void checkQuit()
+  {
+    if (Thread.currentThread().interrupted())
+      throw new gnu.mapping.WrappedException(new InterruptedException());
+  }
 }

@@ -113,10 +113,26 @@ public final class Marker implements Position
       {
         if (count < 0)
           {
-            point += count;
             count = - count;
+	    if (point - count < buffer.minDot())
+	      Signal.signal("Beginning of buffer");
+            point -= count;
           }
+	else
+	  {
+	    if (point + count > buffer.maxDot())
+	      Signal.signal("End of buffer");
+	  }
         buffer.document.remove(point, count);
+
+	// Should not be needed, but seems to be.  Otherwise, getDot()
+	// returns its *old* value, which is `count' characters too high.
+	// The problem seesm to be that Swing does not properly update
+	// a Windows's caret position when the underlying Document has text
+	// removed.  Unfortunately, this fix probably won't do the right
+	// thing for *other windows* that reference the same buffer.  FIXME.
+	// (Strangely, the correct thing seems to happen for insertions.)
+	buffer.setDot(point);
       }
     catch (javax.swing.text.BadLocationException ex)
       {

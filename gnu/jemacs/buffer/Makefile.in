@@ -78,12 +78,12 @@ SUFFIXES = .java .class
 
 javadir = $(datadir)/java/$(subdir)
 
-java_WITH_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferReader.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   MarkerReader.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   Signal.java   TooLongAction.java   Window.java
+java_WITH_SWING =    Buffer.java   BufferContent.java   BufferKeymap.java   BufferReader.java   BufferWriter.java   CancelledException.java   FinalAction.java   Frame.java   InsertAction.java   Marker.java   MarkerReader.java   Modeline.java   PrefixAction.java   ProcAction.java   ReplBuffer.java   TooLongAction.java   Window.java
 
 
 EXTRA_JAVA = $(java_WITH_SWING)
 
-java_JAVA =    $(java_@SWING_SELECTED@)   Emacs.java
+java_JAVA =    $(java_@SWING_SELECTED@)   Signal.java
 
 
 EXTRA_DIST = emacs.scm overview.html
@@ -234,11 +234,11 @@ scmclasses.stamp: $(SCMSOURCES)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
 	echo timestamp > scmclasses.stamp
 
-scm_WITH_SWING: scmclasses.stamp
+WITH_SWING: classjava.stamp scmclasses.stamp
 
-scm_WITHOUT_SWING:
+WITHOUT_SWING:
 
-all: Makefile classjava.stamp scm_@SWING_SELECTED@
+all: Makefile @SWING_SELECTED@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

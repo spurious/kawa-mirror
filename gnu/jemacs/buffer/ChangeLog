@@ -1,3 +1,28 @@
+2000-02-25  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java (class GapUndoableEdit):  Replace field
+	startIndex field by an on offset (startOffset).  (This creates
+	fewer unneeded positin indexes).
+
+	* BufferKeymap.java (defaultInsertAction):  New static field.
+	* InsertAction.java (actionPerformed):  Don't insert backspace.
+
+	* BufferKeymap.java (asKeyStroke):  Handle modifier keys.
+	* emacs.scm (emacs-help):  New command, bound ot (control h).
+	Add some type declarations.
+
+	* Emacs.java:  Removed.
+	* Signal.java (checkQuit):  New method.
+	* Makefile.am:  Emacs.java no longer used;  Signal.java is now
+	always compiled (even without Swing);  re-orginanize so it all
+	works whether or not --with-swing is configured.
+
+	* Marker.java (deleteChar):  Signal if count is out of range.
+	Call setDot to (partially) work around what appears to be a Swing bug.
+
+	* Window.java (setBuffer):  Only update position if window is selected.
+	(setSelected):  Make the buffer current *before* updatings its point.
+
 2000-02-19  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (point):  Removed - use pointMarker.getOffset() instead.

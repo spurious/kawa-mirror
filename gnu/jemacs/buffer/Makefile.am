@@ -22,7 +22,6 @@ java_WITH_SWING = \
   PrefixAction.java \
   ProcAction.java \
   ReplBuffer.java \
-  Signal.java \
   TooLongAction.java \
   Window.java
 
@@ -30,7 +29,7 @@ EXTRA_JAVA = $(java_WITH_SWING)
 
 java_JAVA=\
   $(java_@SWING_SELECTED@) \
-  Emacs.java
+  Signal.java
 
 EXTRA_DIST = emacs.scm overview.html
 
@@ -46,9 +45,9 @@ scmclasses.stamp: $(SCMSOURCES)
 	$(CLASSPATH_ENV) $(KAWA) -d $(JAVAROOT) $(KAWAFLAGS) $?
 	echo timestamp > scmclasses.stamp
 
-scm_WITH_SWING: scmclasses.stamp
+WITH_SWING: classjava.stamp scmclasses.stamp
 
-scm_WITHOUT_SWING:
+WITHOUT_SWING:
 
-all: Makefile classjava.stamp scm_@SWING_SELECTED@
+all: Makefile @SWING_SELECTED@
 

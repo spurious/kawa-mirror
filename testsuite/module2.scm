@@ -1,10 +1,12 @@
-(module-export list-length-1 list-length-3 classify
+(module-export list-length-1 list-length-3 classify list1234
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair)
 (require <module1>)
 (define (list-length-1 x) :: <integer>
   (list-length-2 x))
 (define list-length-3 #t)
 (set! list-length-3 list-length-2)
+
+(define list1234 (deldup '(1 1 2 3 4 4)))
 
 ;; Caused VerifyError
 (define name internal-node-name)

@@ -1,3 +1,10 @@
+2002-10-20  Per Bothner  <per@bothner.com>
+
+	New test based on bug report from Khairul Azhar <kazar1my@yahoo.co.uk>.
+	* module1.scm (deldup):  Macro, uses function imported from list-lib.
+	* module2.scm (list1234):  Invoke imported deldup macro.
+	* obj-test.scm:  New test, that list1234 has teh correct value.	
+
 2002-09-27  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check-no-inline):  New rule.

@@ -1,4 +1,4 @@
-(test-init "Objects" 71)
+(test-init "Objects" 72)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -165,6 +165,8 @@
 (test 3 length-diff1 'abcdef 'abc)
 (test 3 length-diff2 'abcdef 'abc)
 (test 3 length-diff3 'abcdef 'abc)
+
+(test '(1 2 3 4) 'deldup-test list1234)
 
 ;; Test bug reported by Jocelyn Paine.
 (test '(boolean #t) make-literal #t)

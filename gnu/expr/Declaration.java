@@ -122,6 +122,7 @@ public class Declaration
   public void load (Compilation comp)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
+    Object val;
     if (field != null)
       {
         if (! field.getStaticFlag())
@@ -144,6 +145,10 @@ public class Declaration
 	  property = EnvironmentKey.FUNCTION;
 	gnu.mapping.Location loc = env.getLocation(sym, property);
 	comp.compileConstant(loc, Target.pushValue(Compilation.typeLocation));
+      }
+    else if (comp.immediate && (val = getConstantValue()) != null)
+      {
+	comp.compileConstant(val);
       }
     else
       {
@@ -197,7 +202,7 @@ public class Declaration
   /** If getValue() is a constant, return the constant value, otherwise null. */
   public final Object getConstantValue()
   {
-    if (! (value instanceof QuoteExp))
+    if (! (value instanceof QuoteExp) || value == QuoteExp.undefined_exp)
       return null;
     return ((QuoteExp) value).getValue();
   }

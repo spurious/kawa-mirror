@@ -1,24 +1,15 @@
 package kawa.standard;
+import kawa.lang.*;
 
-//-- Exceptions
-import kawa.lang.WrongArguments;
+/** Implement the standard Scheme function "boolean?". */
 
-import kawa.lang.Procedure1;
-import java.io.PrintStream;
-
-public class boolean_p extends kawa.lang.Procedure1 {
-   public kawa.standard.boolean_p() {
-      super("boolean?");
-   }
-
-   public Object apply1 (Object arg1)
-     throws kawa.lang.WrongArguments 
-   {
-      if (arg1 instanceof java.lang.Boolean) {
-         return kawa.lang.Interpreter.trueObject;
-      } else {
-         return kawa.lang.Interpreter.falseObject;
-      }
-   }
-
+public class boolean_p extends Procedure1
+{
+  public Object apply1 (Object arg1)
+  {
+    if (arg1 instanceof Boolean)
+      return Interpreter.trueObject;
+    else
+      return Interpreter.falseObject;
+  }
 }

@@ -1,13 +1,10 @@
 package kawa.standard;
 import kawa.lang.*;
 
+/** Implement the standard Scheme function "apply". */
+
 public class apply extends ProcedureN
 {
-  public apply()
-  {
-    super("apply");
-  }
-
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {

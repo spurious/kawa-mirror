@@ -1,3 +1,7 @@
+2003-09-04  Per Bothner  <per@bothner.com>
+
+	* CpsMethodProc.java (getName):  New method.
+
 2003-08-08  Daniel Bonniot  <Daniel.Bonniot@inria.fr>
 
 	* ProecdureN.java (noArgs):  New static field.

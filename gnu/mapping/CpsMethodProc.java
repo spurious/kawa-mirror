@@ -9,6 +9,16 @@ public class CpsMethodProc extends CpsProcedure
   public final int selector;
   private int numArgs;
 
+  public String getName ()
+  {
+    String name = super.getName();
+    if (name == null)
+      {
+	name = "{" + module.getClass().getName() + ':' + selector + '}';
+      }
+    return name;
+  }
+
   public CpsMethodProc(CpsMethodContainer module, int selector,
 			String name, int numArgs)
   {

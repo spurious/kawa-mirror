@@ -23,6 +23,7 @@ public class Compilation
   static public ClassType scmObjectType = new ClassType ("java.lang.Object");
   static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
   static public ClassType scmSymbolType = new ClassType ("kawa.lang.Symbol");
+  static public ClassType scmKeywordType = new ClassType ("kawa.lang.Keyword");
   static public ClassType scmSequenceType = new ClassType ("kawa.lang.Sequence");
   static public ClassType javaStringType = new ClassType ("java.lang.String");
   static public ClassType javaIntegerType = new ClassType ("java.lang.Integer");
@@ -50,16 +51,12 @@ public class Compilation
     = scmInterpreterType.new_field ("falseObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nullConstant
-  = scmInterpreterType.new_field ("nullObject", scmListType,
-				    Access.PUBLIC|Access.STATIC);
+  = scmListType.new_field ("Empty", scmListType, Access.PUBLIC|Access.STATIC);
   static final Field voidConstant
-  = scmInterpreterType.new_field ("voidObject", scmUndefinedType,
-				    Access.PUBLIC|Access.STATIC);
+  = scmInterpreterType.new_field ("voidObject", scmObjectType,
+				  Access.PUBLIC|Access.STATIC);
   static final Field undefinedConstant
   = scmInterpreterType.new_field ("undefinedObject", scmUndefinedType,
-				    Access.PUBLIC|Access.STATIC);
-  static final Field eofConstant
-  = scmSequenceType.new_field ("eofValue", scmSymbolType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nameField
   = scmNamedType.new_field ("sym_name", scmSymbolType, Access.PUBLIC);
@@ -68,6 +65,8 @@ public class Compilation
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
   static Method makeListMethod;
+  static Method searchForKeywordMethod;
+  
   static Type[] int1Args = { Type.int_type };
   static Type[] string1Arg = { javaStringType };
 
@@ -171,9 +170,7 @@ public class Compilation
 	  }
 	else if (value == Interpreter.voidObject)
 	  literal = new Literal (value, voidConstant, this);
-	else if (value == Sequence.eofValue)
-	  literal = new Literal (value, eofConstant, this);
-	else if (value == Interpreter.nullObject)
+	else if (value == List.Empty)
 	  literal = new Literal (value, nullConstant, this);
 	else if (value == Interpreter.undefinedObject)
 	  literal = new Literal (value, undefinedConstant, this);
@@ -370,7 +367,7 @@ public class Compilation
     ClassType superType
       = new ClassType (lexp.isModuleBody () ? "kawa.lang.ModuleBody"
 		       : "kawa.lang.Procedure" + arg_letter);
-    curClass.set_super (superType);
+    curClass.setSuper (superType);
 
     Type[] constructor_args = apply0args;
     boolean constructor_takes_staticLink = false;
@@ -395,7 +392,7 @@ public class Compilation
 
     constructor_method.init_param_slots ();
     constructor_method.compile_push_this ();
-    constructor_method.compile_invoke_nonvirtual (superConstructor);
+    constructor_method.compile_invoke_special (superConstructor);
     if (constructor_takes_staticLink)
       {
 	constructor_method.compile_push_this ();
@@ -495,6 +492,11 @@ public class Compilation
     // location (a local variable register, or the argsArray) into
     // its home location, if they are different.
     i = 0;
+    int opt_i = 0;
+    int key_i = 0;
+    int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
+    int opt_args = lexp.defaultArgs == null ? 0
+      : lexp.defaultArgs.length - key_args;
     for (Variable var = lexp.firstVar ();  var != null; var = var.nextVar ())
       {
 	if (var.isParameter () && ! var.isArtificial ())
@@ -518,22 +520,55 @@ public class Compilation
 		    // Simple case:  Incoming register is in incomingMap[i]:
 		    method.compile_push_value (incomingMap[i]);
 		  }
-		else
-		  {
-		    // Incoming parameters are in argsArray.
+		else if (i < lexp.min_args)
+		  { // This is a required parameter, in argsArray[i].
 		    method.compile_push_value (argsArray);
 		    method.compile_push_int (i);
-		    if (i >= lexp.min_args)
+		    method.compile_array_load (scmObjectType);
+		  }
+		else if (i < lexp.min_args + opt_args)
+		  { // An optional parameter
+                    method.compile_push_int(i);
+		    method.compile_push_value(argsArray);
+		    method.compile_arraylength();
+		    method.compile_ifi_lt();
+		    method.compile_push_value(argsArray);
+                    method.compile_push_int(i);
+                    method.compile_array_load(scmObjectType);
+		    method.compile_else();
+		    lexp.defaultArgs[opt_i++].compile(this, 0);
+		    method.compile_fi();
+		  }
+		else if (lexp.max_args < 0 && i == lexp.min_args + opt_args)
+		  {
+		    // This is the "rest" parameter (i.e. following a "."):
+		    // Convert argsArray[i .. ] to a list.
+		    method.compile_push_value(argsArray);
+		    method.compile_push_int(i);
+		    method.compile_invoke_static(makeListMethod);
+		  }
+		else
+		  { // Keyword argument.
+		    if (searchForKeywordMethod == null)
 		      {
-			// This is the "rest" parameter (i.e. following a "."):
-			// Convert argsArray[i .. ] to a list.
-			method.compile_invoke_static (makeListMethod);
+			Type[] argts = new Type[3];
+			argts[0] = objArrayType;
+			argts[1] = Type.int_type;
+			argts[2] = scmObjectType;
+			searchForKeywordMethod
+			  = scmKeywordType.new_method("searchForKeyword",
+						      argts, scmObjectType,
+						      Access.PUBLIC|Access.STATIC);
 		      }
-		    else
-		      {
-			// This is a required parameter, in argsArray[i].
-			method.compile_array_load (scmObjectType);
-		      }
+		    method.compile_push_value(argsArray);
+		    method.compile_push_int(lexp.min_args + opt_args);
+		    compileConstant(lexp.keywords[key_i++]);
+		    method.compile_invoke_static(searchForKeywordMethod);
+		    method.compile_dup(1);
+		    method.compile_goto_if (199); // ifnonnull
+		    method.compile_pop(1);
+		    lexp.defaultArgs[opt_i++].compile(this, 0);
+		    method.compile_fi();
 		  }
 		// Now finish copying the incoming argument into its
 		// home location.

@@ -14,6 +14,8 @@ public class LambdaExp extends ScopeExp
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
   int max_args;
+  Keyword[] keywords;
+  Expression[] defaultArgs;
 
   /** The name to give to a dummy implicit function that surrounds a file. */
   public static String fileFunctionName = "atFileLevel";
@@ -54,23 +56,99 @@ public class LambdaExp extends ScopeExp
   {
     /* Count formals, while checking that the syntax is OK. */
     Object bindings = formals;
-    for (; bindings instanceof Pair; min_args++)
-      bindings = ((Pair)bindings).cdr;
-    if (bindings == List.Empty)
-      max_args = min_args;
-    else if (bindings instanceof Symbol)
-      max_args = -1;
-    else
+    int opt_args = -1;
+    int rest_args = -1;
+    int key_args = -1;
+    Pair pair;
+    for (; bindings instanceof Pair;  bindings = pair.cdr)
+      {
+	pair = (Pair) bindings;
+	if (pair.car == Special.optional)
+	  {
+	    if (opt_args >= 0)
+	      {
+		tr.syntaxError ("multiple #!optional in parameter list");
+		return;
+	      }
+	    else if (rest_args >= 0 || key_args >= 0)
+	      {
+		tr.syntaxError ("#!optional after #!rest or #!key");
+		return;
+	      }
+	    opt_args = 0;
+	  }
+	else if (pair.car == Special.rest)
+	  {
+	    if (rest_args >= 0)
+	      {
+		tr.syntaxError ("multiple #!rest in parameter list");
+		return;
+	      }
+	    else if (key_args >= 0)
+	      {
+		tr.syntaxError ("#!rest after #!key");
+		return;
+	      }
+	    rest_args = 0;
+	  }
+	else if (pair.car == Special.key)
+	  {
+	    if (key_args >= 0)
+	      {
+		tr.syntaxError ("multiple #!key in parameter list");
+		return;
+	      }
+	    key_args = 0;
+	  }
+	else if (key_args >= 0)
+	  key_args++;
+	else if (rest_args >= 0)
+	  rest_args++;
+	else if (opt_args >= 0)
+	  opt_args++;
+	else
+	  min_args++;
+	bindings = pair.cdr;
+      }
+    if (bindings instanceof Symbol)
+      {
+	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
+	  {
+	    tr.syntaxError ("dotted rest-arg after #!optional, #!rest, or #!key");
+	    return;
+	  }
+	rest_args = 1;
+      }
+    else if (bindings != List.Empty)
       {
 	tr.syntaxError ("misformed formals in lambda");
 	return;
       }
+    if (rest_args > 1)
+      {
+	tr.syntaxError ("multiple #!rest parameters");
+        return;
+      }
+    if (opt_args < 0)
+      opt_args = 0;
+    if (rest_args < 0)
+      rest_args = 0;
+    if (key_args < 0)
+      key_args = 0;
+    if (rest_args > 0)
+      max_args = -1;
+    else
+      max_args = min_args + opt_args + 2 * key_args;  // Is this useful?
+    if (opt_args + key_args > 0)
+      defaultArgs = new Expression[opt_args + key_args];
+    if (key_args > 0)
+      keywords = new Keyword[key_args];
 
     Variable var;
     var = add_decl (Symbol.make ("this"));
     var.setParameter (true);  var.setArtificial (true);
     
-    if (max_args < 0 || max_args > 4)
+    if (min_args != max_args || min_args > 4)
       {
 	// Compilation.compile depends on the "argsArray" variable
 	// being the second one created for this scope.
@@ -79,23 +157,66 @@ public class LambdaExp extends ScopeExp
 	argsArray.setParameter (true);
 	argsArray.setArtificial (true);
       }
+    push (tr);
     bindings = formals;
     int i = 0;
-    while (bindings instanceof Pair)
+    opt_args = 0;
+    key_args = 0;
+    Object mode = null;
+    for (; bindings instanceof Pair;  bindings = pair.cdr)
       {
-	Pair bind_pair = (Pair) bindings;
-	Declaration decl = add_decl ((Symbol) bind_pair.car);
-	decl.setParameter (true);
-	decl.noteValue (null);  // Does not have a known value.
-	bindings = bind_pair.cdr;
+	pair = (Pair) bindings;
+	if (pair.car == Special.optional
+	    || pair.car == Special.rest || pair.car == Special.key)
+	  {
+	    mode = pair.car;
+	    continue;
+	  }
+	Symbol name;
+	Object defaultValue;
+	if (pair.car instanceof Symbol)
+	  {
+	    name = (Symbol) pair.car;
+	    defaultValue = null;
+	  }
+	else if (pair.car instanceof Pair
+		 && ((Pair) pair.car).car instanceof Symbol
+		 && ((Pair) pair.car).cdr instanceof Pair)
+	  {
+	    Pair pair_car = (Pair) pair.car;
+	    name = (Symbol) pair_car.car;
+	    defaultValue = ((Pair) pair_car.cdr).car;
+	    if (mode == null || mode == Special.rest)
+	      {
+		tr.syntaxError ("default value for required or #!rest parameter");
+		
+		return;
+	      }
+	  }
+	else
+	  {
+	    tr.syntaxError ("parameter is neither name nor (name default)");
+	    return;
+	  }
+	if (mode == Special.optional || mode == Special.key)
+	  {
+	    defaultArgs[opt_args++] = defaultValue == null ? QuoteExp.falseExp
+	      : tr.rewrite(defaultValue);
+	  }
+	if (mode == Special.key)
+	  keywords[key_args++] = Keyword.make(name.toString());
+	Declaration decl = add_decl (name);
+	decl.setParameter(true);
+	decl.noteValue(null);  // Does not have a known value.
+	decl.push(tr);
       }
     if (bindings instanceof Symbol)
       {
 	Declaration decl = add_decl ((Symbol) bindings);
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
+	decl.push(tr);
       }
-    push (tr);
     this.body = tr.rewrite_body (body);
     pop (tr);
   }
@@ -156,7 +277,7 @@ public class LambdaExp extends ScopeExp
 	Declaration frame = outerLambda().heapFrame;
 	comp.method.compile_push_value (frame);
       }
-    comp.method.compile_invoke_nonvirtual (new_class.constructor);
+    comp.method.compile_invoke_special (new_class.constructor);
   }
 
   void compile_setLiterals (Compilation comp)
@@ -227,7 +348,7 @@ public class LambdaExp extends ScopeExp
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError ("class I/O errorin lambda eval");
+	throw new GenericError ("I/O error in lambda eval");
       }
     catch (ClassNotFoundException ex)
       {
@@ -245,7 +366,48 @@ public class LambdaExp extends ScopeExp
 
   public void print (java.io.PrintStream ps)
   {
-    ps.print("(#%lambda ... ");
+    ps.print("(#%lambda (");
+    Special prevMode = null;
+    int i = 0;
+    int opt_i = 0;
+    int key_args = keywords == null ? 0 : keywords.length;
+    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
+    for (Variable var = firstVar ();  var != null; var = var.nextVar ())
+      {
+	if (! var.isParameter () || var.isArtificial ())
+	  continue;
+	Special mode;
+	if (i < min_args)
+	  mode = null;
+	else if (i < min_args + opt_args)
+	  mode = Special.optional;
+	else if (max_args < 0 && i == min_args + opt_args)
+	  mode = Special.rest;
+	else
+	  mode = Special.key;
+	if (i > 0)
+	  ps.print(' ');
+	if (mode != prevMode)
+	  {
+	    ps.print(mode);
+	    ps.print(' ');
+	  }
+	Expression defaultArg = null;
+	if (mode == Special.optional || mode == Special.key)
+	  defaultArg = defaultArgs[opt_i++];
+	if (defaultArg != null)
+	  ps.print('(');
+	ps.print(((Declaration)var).string_name());
+	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
+	  {
+	    ps.print(' ');
+	    defaultArg.print(ps);
+	    ps.print(')');
+	  }
+	i++;
+	prevMode = mode;
+      }
+    ps.print(") ");
     body.print (ps);
     ps.print(")");
   }

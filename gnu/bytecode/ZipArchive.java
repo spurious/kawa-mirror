@@ -4,6 +4,7 @@
 package gnu.bytecode;
 import java.util.Hashtable;
 import java.io.*;
+import java.util.zip.*;
 
 /** A class to manipulate a .zip archive.
  * Does not handle compression/uncompression, though that could be added.
@@ -93,9 +94,9 @@ public class ZipArchive
     buffer[2] = (byte) '\003';
     buffer[3] = (byte) '\004';
     buffer[4] = (byte) '\n';          // 4+L_VERSION_NEEDED_TO_EXTRACT_0
-    write2 (zmember.name.length, buffer, 4+22);
-    write4 (zmember.compressed_size, buffer, 4+14);
-    write4 (zmember.uncompressed_size, buffer, 4+18);
+    write2 (zmember.getName().length(), buffer, 4+22);
+    write4 ((int) zmember.compressed_size, buffer, 4+14);
+    write4 ((int) zmember.getSize(), buffer, 4+18);
     file.write (buffer, 0, 4+LREC_SIZE);
   }
 
@@ -110,10 +111,10 @@ public class ZipArchive
     buffer[4] = (byte) '\024';             // 4+C_VERSION_MADE_BY_0
     buffer[5] = (byte) '\003';             // 4+C_VERSION_MADE_BY_1
     buffer[6] = (byte) '\n';               // 4+C_VERSION_NEEDED_TO_EXTRACT_0
-    write4 (zmember.compressed_size, buffer, 4+16);
-    write4 (zmember.uncompressed_size, buffer, 4+20);
-    write2 (zmember.name.length, buffer, 4+24);
-    write4 (zmember.relative_offset_local_header, buffer, 4+38);
+    write4 ((int) zmember.compressed_size, buffer, 4+16);
+    write4 ((int) zmember.getSize(), buffer, 4+20);
+    write2 (zmember.getName().length(), buffer, 4+24);
+    write4 ((int) zmember.relative_offset_local_header, buffer, 4+38);
     file.write (buffer, 0, 4+CREC_SIZE);
   }
 
@@ -127,18 +128,22 @@ public class ZipArchive
   void writeEndHeaders () throws IOException
   {
     int count = 0;
-    int dir_start = lastEntry == null ? 0
+    long dir_start = lastEntry == null ? 0
       : lastEntry.fileStart () + lastEntry.compressed_size;
     file.seek (dir_start);
     for (ZipMember zmemb = firstEntry;  zmemb != null;  zmemb = zmemb.next)
       {
 	writeCentralHeader (zmemb);
-	file.write (zmemb.name);
+	String name = zmemb.getName();
+	int len = name.length ();
+	byte[] bname = new byte[len];
+	name.getBytes (0, len, bname, 0);
+	file.write (bname);
 	count++;
       }
     if (count != count_in + count_out)
       throw new Error ("internal error writeEndHeaders");
-    int dir_size = (int) file.getFilePointer () - dir_start;
+    long dir_size = file.getFilePointer () - dir_start;
     for (int i = 4+ECREC_SIZE;  --i >= 0; )
       buffer[i] = 0;
     buffer[0] = (byte) 'P';
@@ -147,14 +152,14 @@ public class ZipArchive
     buffer[3] = (byte) '\006';
     write2 (count, buffer, 8);       // NUM_ENTRIES_CENTRL_DIR_THS_DISK
     write2 (count, buffer, 10);      // TOTAL_ENTRIES_CENTRAL_DIR
-    write4 (dir_size, buffer, 12);   // SIZE_CENTRAL_DIRECTORY
-    write4 (dir_start, buffer, 16);  // OFFSET_START_CENTRAL_DIRECTORY
+    write4 ((int) dir_size, buffer, 12);   // SIZE_CENTRAL_DIRECTORY
+    write4 ((int) dir_start, buffer, 16);  // OFFSET_START_CENTRAL_DIRECTORY
     file.write (buffer, 0, 4+ECREC_SIZE);
   }
 
-  ZipMember addMember ()
+  ZipMember addMember (String name)
   {
-    ZipMember zmemb = new ZipMember ();
+    ZipMember zmemb = new ZipMember(name);
     if (firstEntry == null)
       firstEntry = zmemb;
     else
@@ -163,28 +168,27 @@ public class ZipArchive
     return zmemb;
   }
 
+  public ZipMember append (byte[] name, byte[] contents) throws IOException
+  {
+    return append(new String(name, 0), contents);
+  }
+
   public ZipMember append (String name, byte[] contents) throws IOException
   {
     int len = name.length ();
     byte[] bname = new byte[len];
     name.getBytes (0, len, bname, 0);
-    return append (bname, contents);
-  }
-
-  public ZipMember append (byte[] name, byte[] contents) throws IOException
-  {
     ZipMember prev = lastEntry;
-    ZipMember zmemb = addMember ();
+    ZipMember zmemb = addMember(name);
     count_out++;
-    zmemb.name = name;
     zmemb.compressed_size = contents.length;
-    zmemb.uncompressed_size = contents.length;
-    int start = prev == null ? 0 : prev.fileStart () + prev.compressed_size;
+    zmemb.setSize(contents.length);
+    long start = prev == null ? 0 : prev.fileStart () + prev.compressed_size;
     zmemb.relative_offset_local_header = start;
     file.seek (start);
-    writeLocalHeader (zmemb);
-    file.write (name);
-    file.write (contents);
+    writeLocalHeader(zmemb);
+    file.write(bname);
+    file.write(contents);
     return zmemb;
   }
 
@@ -226,15 +230,18 @@ public class ZipArchive
 
     for (int i = 0;  i < count_in;  i++)
       {
-	ZipMember zipd = addMember ();
 	file.skipBytes (4+C_COMPRESSED_SIZE);
-	zipd.compressed_size = read4 ();  // Get C_COMPRESSED_SIZE
-	zipd.uncompressed_size = read4 (); // Get C_UNCOMPRESSED_SIZE
-	int filename_length = readu2 ();  // Get C_FILENAME_LENGTH
+	long compressed_size = read4();  // Get C_COMPRESSED_SIZE
+	long uncompressed_size = read4(); // Get C_UNCOMPRESSED_SIZE
+	int filename_length = readu2();  // Get C_FILENAME_LENGTH
 	file.skipBytes (C_RELATIVE_OFFSET_LOCAL_HEADER-(C_FILENAME_LENGTH+2));
-	zipd.relative_offset_local_header = read4 ();
-	zipd.name = new byte[filename_length];
-	file.readFully (zipd.name);
+	long relative_offset_local_header = read4();
+	byte[] name = new byte[filename_length];
+	file.readFully(name);
+	ZipMember zipd = addMember(new String(name, 0));
+	zipd.compressed_size = compressed_size;
+	zipd.setSize(uncompressed_size);
+	zipd.relative_offset_local_header = relative_offset_local_header;
       }
   }
 
@@ -244,33 +251,37 @@ public class ZipArchive
     System.exit (-1);
   }
 
-  private void doit (ZipMember zmember, String command) throws IOException
+  public static long copy(InputStream in, OutputStream out, byte[] buffer)
+    throws IOException
   {
-    if (command.equals ("t"))
-      zmember.print (System.out);
-    else if (command.equals ("p"))
-      System.out.write(zmember.getData(this));
-    else if (command.equals ("x"))
+    long total = 0;
+    for (;;)
       {
-	String file_name = zmember.strName ();
-	File mem_file = new File (file_name);
-	String dir_name = mem_file.getParent ();
-	if (dir_name != null)
-	  {
-	    File mem_dir = new File (dir_name);
-	    if (! mem_dir.exists ())
-	      System.err.println("mkdirs:"+mem_dir.mkdirs ());
-	  }
-	if (file_name.charAt (file_name.length () - 1) != '/')
-	  {
-	    FileOutputStream memfile = new FileOutputStream (mem_file);
-	    memfile.write (zmember.getData(this));
-	    memfile.close ();
-	  }
+	int count = in.read(buffer);
+	if (count <= 0)
+	  return total;
+	out.write(buffer, 0, count); 
+	total += count;
       }
-    else
-      System.err.println ("unimplemented command " + command);
-	   
+  }
+
+  public static void copy(InputStream in, String name, byte[] buffer)
+    throws IOException
+    {
+    File f = new File(name);
+    String dir_name = f.getParent();
+    if (dir_name != null)
+      {
+	File dir = new File(dir_name);
+	if (! dir.exists())
+	  System.err.println("mkdirs:"+dir.mkdirs());
+      }
+    if (name.charAt (name.length () - 1) != '/')
+      {
+	OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
+	copy(in, out, buffer);
+	out.close ();
+      }
   }
 
   /**
@@ -306,25 +317,59 @@ public class ZipArchive
 	    || command.equals ("p")
 	    || command.equals ("x"))
 	  {
-	    ZipArchive zar = new ZipArchive (archive_name, "r");
+	    PrintStream out = System.out;
+	    byte[] buf = new byte[1024];
 	    if (args.length == 2)
 	      {
-		for (ZipMember zipd = zar.firstEntry;
-		     zipd != null;  zipd = zipd.next)
-		  zar.doit (zipd, command);
+		BufferedInputStream in
+		  = new BufferedInputStream(new FileInputStream(archive_name));
+		ZipInputStream zin = new ZipInputStream (in);
+		ZipEntry zent;
+		while ((zent = zin.getNextEntry()) != null)
+		  {
+		    String name = zent.getName();
+		    if (command.equals("t"))
+		      {
+			out.print(name);
+			out.print(" size: ");
+			out.println(zent.getSize());
+		      }
+		    else if (command.equals("p"))
+		      {
+			copy(zin, out, buf);
+		      }
+		    else // commend.equals("x")
+		      {
+			copy(zin, name, buf);
+		      }
+		  }
 	      }
 	    else
 	      {
+		ZipFile zar = new ZipFile(archive_name);
 		for (int i = 2;  i < args.length; i++)
 		  {
-		    ZipMember zipd = zar.find (args[i]);
-		    if (zipd != null)
-		      zar.doit (zipd, command);
-		    else
+		    String name = args[i];
+		    ZipEntry zent = zar.getEntry(name);
+		    if (zent == null)
 		      {
 			System.err.println ("zipfile " + archive_name + ":" +
 					    args[i] + " - not found");
 			System.exit (-1);
+		      }
+		    else if (command.equals("t"))
+		      {
+			out.print(name);
+			out.print(" size: ");
+			out.println(zent.getSize());
+		      }
+		    else if (command.equals("p"))
+		      {
+			copy(zar.getInputStream(zent), out, buf);
+		      }
+		    else // commend.equals("x")
+		      {
+			copy(zar.getInputStream(zent), name, buf);
 		      }
 		  }
 	      }

@@ -20,9 +20,17 @@ public class read extends Procedure0or1 {
       throw new WrongType (this.name(), 0, "input port");
     try
       {
-	return ((InPort)arg1).readSchemeObject ();
+	ScmRead lexer = new ScmRead((InPort)arg1);
+	Object result = lexer.readObject((InPort)arg1);
+	SourceError errors = lexer.getErrors();
+	if (errors != null)
+	  {
+	    lexer.checkErrors(null, 0);
+	    throw new GenericError("syntax error in read: "+errors.toString());
+	  }
+	return result;
       }
-    catch (ReadError e)
+    catch (SyntaxException e)
       {
 	throw new GenericError ("syntax error in read: " + e.toString ());
       }

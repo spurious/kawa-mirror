@@ -4,17 +4,20 @@ import gnu.math.*;
 
 public class string2number extends Procedure1or2
 {
-  static Object parse (String str, int radix)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  static Object parse (Object str, int radix)
   {
     try
       {
-	InPort iport = new CharArrayInPort(str);
-	return iport.readSchemeNumber (radix);
-      }
-    catch (ReadError ex)
-      {
-	return Scheme.falseObject;
+	InPort iport;
+	if (str instanceof FString)
+	  iport = ((FString) str).open();
+	else
+	  iport = new CharArrayInPort(str.toString());
+	ScmRead lexer = new ScmRead(iport);
+	Object result = lexer.readNumber(radix);
+	if (lexer.checkErrors(null, 0))
+	  return Scheme.falseObject;
+	return result;
       }
     catch (java.io.IOException ex)
       {
@@ -24,14 +27,12 @@ public class string2number extends Procedure1or2
   }
 
   public final Object apply1 (Object arg1)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    return parse (arg1.toString (), 10);
+    return parse(arg1, 10);
   }
 
   public final Object apply2 (Object arg1, Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    return parse (arg1.toString (), IntNum.intValue (arg2));
+    return parse(arg1, IntNum.intValue (arg2));
   }
 }

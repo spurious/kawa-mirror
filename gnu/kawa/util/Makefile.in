@@ -71,6 +71,7 @@ EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
 JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -100,6 +101,8 @@ ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 TO_TOPDIR = $(top_builddir)
 GCJ_DEPS = $(java_JAVA)
 
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar
+
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
 ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
@@ -107,35 +110,24 @@ KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 
 java_JAVA = \
+  ConsumeProc.java
+
+
+OLD = \
   AbstractString.java \
   CharBuffer.java \
-  Consumable.java \
-  ConsumeProc.java \
-  Consumer.java \
   ConstantString.java \
-  F32Vector.java \
-  F64Vector.java \
-  FString.java \
-  FVector.java \
-  LList.java \
-  Pair.java \
-  PairWithPosition.java \
   Position.java \
-  S8Vector.java \
   S16Vector.java \
   S32Vector.java \
   S64Vector.java \
-  Sequence.java \
   SubString.java \
-  TreeList.java \
   U8Vector.java \
   U16Vector.java \
   U32Vector.java \
   U64Vector.java \
   UniformVector.java
 
-
-KAWA = $(JAVA) kawa.repl
 
 PACKAGE_FNAME = gnu-kawa-util
 subdir = gnu/kawa/util
@@ -244,7 +236,7 @@ mostlyclean-generic:
 
 
 clean-generic:
-
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)

@@ -1,3 +1,33 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java:  Replaced by gnu.lists.CharSequence.
+	* CharBuffer.java:  Moved to gnu.lists.
+	* ConstantString.java:  Removed for now.
+	* Consumable.java:  Moved to gnu.lists.
+	* Consumer.java:  Moved to gnu.lists.
+	* F32Vector.java:  Moved to gnu.lists.
+	* F64Vector.java:  Moved to gnu.lists.
+	* FString.java:  Moved to gnu.lists.
+	* FVector.java:  Moved to gnu.lists.
+	* LList.java:  Moved to gnu.lists.
+	* Pair.java:  Moved to gnu.lists.
+	* PairWithPosition.java:  Moved to gnu.lists.
+	* S16Vector.java:  Moved to gnu.lists.
+	* S32Vector.java:  Moved to gnu.lists.
+	* S64Vector.java:  Moved to gnu.lists.
+	* S8Vector.java:  Moved to gnu.lists.
+	* Sequence.java:  Moved to gnu.lists and made to an interface, with
+	method implementation moved to AbstractSequence.
+	* SubString.java:  Removed, for now.
+	* TreeList.java:  Moved to gnu.lists.
+	* U16Vector.java:  Moved to gnu.lists.
+	* U32Vector.java:  Moved to gnu.lists.
+	* U64Vector.java:  Moved to gnu.lists.
+	* U8Vector.java:  Moved to gnu.lists.
+	* UniformVector.java:  Replaced by gnu.lists.SimpleVector.
+	* Makefile.am:  Update accordingly.
+	* ConsumeProc.java:  Now need to import gnu.lists.
+
 2001-02-16  Per Bothner  <per@bothner.com>
 
 	* TreeList.java:  New class.

@@ -1,4 +1,5 @@
 package gnu.kawa.util;
+import gnu.lists.*;
 
 public abstract class ConsumeProc extends gnu.mapping.ProcedureN
 {

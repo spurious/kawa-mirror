@@ -1,3 +1,10 @@
+1999-11-18  Per Bothner  <per@bothner.com>
+
+	* emacs.scm:  In various places, fix <gnu.jemacs.text.Marker>
+ 	to <gnu.jemacs.buffer.Marker>.
+	Partly convert to using newer invoke, make etc functions, instead of
+	old primitive-virtual-method etc macros.
+
 1999-09-13  Per Bothner  <per@bothner.com>
 
 	* Buffer.java (current):  New static field.

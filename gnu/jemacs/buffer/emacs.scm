@@ -8,52 +8,40 @@
 
 ;;; READ AND PRINT
 
-(define (open-output-buffer buffer)
-  ((primitive-constructor <gnu.jemacs.buffer.BufferWriter>
-                          (<gnu.jemacs.buffer.Buffer>))
-   buffer))
+(define (open-output-buffer (buffer <gnu.jemacs.buffer.Buffer>))
+  (make <gnu.jemacs.buffer.BufferWriter> buffer))
 
-(define (open-output-marker marker)
-  ((primitive-constructor <gnu.jemacs.buffer.BufferWriter>
-                          (<gnu.jemacs.buffer.Marker>))
-   marker))
+(define (open-output-marker (marker <gnu.jemacs.buffer.Marker>))
+  (make <gnu.jemacs.buffer.BufferWriter> marker #f))
 
 ;;; MINIBUFFERS
 
 (define (read-dialog prompt)
   (symbol->string
-   ((primitive-virtual-method <gnu.jemacs.buffer.Frame> "ask"
-                              <java.lang.String> (<String>))
-    (window-frame) prompt)))
+   (invoke (as <gnu.jemacs.buffer.Frame> (window-frame)) 'ask prompt)))
 
 (define read-from-minibuffer read-dialog)
 
 ;;; KEYMAPS
 
 (define (make-keymap #!optional name)
-  ((primitive-static-method <gnu.jemacs.buffer.BufferKeymap> "makeEmptyKeymap"
-                            <javax.swing.text.Keymap> (<String>))
-   name))
+  (invoke-static <gnu.jemacs.buffer.BufferKeymap> 'makeEmptyKeymap
+                 (as <String> name)))
 
 (define (keymap-name (keymap <javax.swing.text.Keymap>))
-  ((primitive-virtual-method <javax.swing.text.Keymap> "getName" <java.lang.String> ())
-   keymap))
+  (invoke keymap 'getName))
 
 (define global-map
-  ((primitive-static-method <javax.swing.text.JTextComponent> "getKeymap"
-			    <javax.swing.text.Keymap> (<java.lang.String>))
-   ((primitive-get-static <javax.swing.text.JTextComponent> "DEFAULT_KEYMAP"
-			  <java.lang.String>))))
+  (invoke-static <javax.swing.text.JTextComponent> 'getKeymap
+                 (static-field <javax.swing.text.JTextComponent>
+                               'DEFAULT_KEYMAP)))
 
 (define (current-global-map)
   global-map)
 
 (define (current-local-map #!optional (buffer (current-buffer)))
-  ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "getLocalKeymap"
-                             <javax.swing.text.Keymap> ())
-   ((primitive-get-field <gnu.jemacs.buffer.Buffer> "keymap"
-                         <gnu.jemacs.buffer.BufferKeymap>)
-    buffer)))
+  (invoke (field (as <gnu.jemacs.buffer.Buffer> buffer) 'keymap)
+          'getLocalKeymap))
 
 (define (use-local-map keymap #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.BufferKeymap> "setLocalKeymap"
@@ -281,7 +269,7 @@
 ;;; MARKERS
 
 (define (make-marker)
-  ((primitive-constructor <gnu.jemacs.text.Marker> ())))
+  (make <gnu.jemacs.buffer.Marker>))
 
 (define (point-marker #!optional (share #f) (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Buffer> "getPointMarker"
@@ -290,22 +278,22 @@
 
 
 ;; Emacs allows an integer as well as a marker.
-(define (copy-marker (marker <gnu.jemacs.text.Marker>))
-  ((primitive-constructor <gnu.jemacs.text.Marker> (<gnu.jemacs.text.Marker>))
+(define (copy-marker (marker <gnu.jemacs.buffer.Marker>))
+  ((primitive-constructor <gnu.jemacs.buffer.Marker> (<gnu.jemacs.buffer.Marker>))
    marker))
 
-(define (marker-position (marker <gnu.jemacs.text.Marker>))
+(define (marker-position (marker <gnu.jemacs.buffer.Marker>))
   (let ((value
          ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "getPoint" <int> ())
           marker)))
     (if (= value 0) #f value)))
 
-(define (marker-buffer (marker <gnu.jemacs.text.Marker>))
+(define (marker-buffer (marker <gnu.jemacs.buffer.Marker>))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "getBuffer"
                              <gnu.jemacs.buffer.Buffer> ())
    marker))
 
-(define (set-marker (marker <gnu.jemacs.text.Marker>) position
+(define (set-marker (marker <gnu.jemacs.buffer.Marker>) position
                     #!optional (buffer (current-buffer)))
   ((primitive-virtual-method <gnu.jemacs.buffer.Marker> "set" <void>
                              (<gnu.jemacs.buffer.Buffer> <int>))

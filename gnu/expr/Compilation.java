@@ -427,10 +427,18 @@ public class Compilation
           }
         catch (Exception ex)
           {
-            error('w', "cannot convert literal (of type "
-                  + value.getClass().getName() + ") to "
-                  + type.getName());
-          }
+	    StringBuffer sbuf = new StringBuffer();
+	    if (value == Values.empty)
+	      sbuf.append("cannot convert void to ");
+	    else
+	      {
+		sbuf.append("cannot convert literal (of type ");
+                sbuf.append(value.getClass().getName());
+		sbuf.append(") to ");
+	      }
+	    sbuf.append(type.getName());
+            error('w', sbuf.toString());
+         }
       }
     compileConstant(value);
     target.compileFromStack(this,

@@ -1,3 +1,7 @@
+2003-05-23  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileConstant):  Better error message on void.
+
 2003-05-18  Per Bothner  <per@bothner.com>
 
 	* FindCapturedVars.java (walkLetExp):  Generalize letrec-optimization.

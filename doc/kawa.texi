@@ -766,7 +766,7 @@ by using the global variable @samp{command-line-arguments}.
 @node Multiple values, Special named constants, Extensions, Extensions
 @section Multiple values
 
-The multiple-value feature will be in R5RS.
+The multiple-value feature was added in R5RS.
 
 @defun values object ...
 Delivers all of its arguments to its continuation.
@@ -954,6 +954,9 @@ and @code{4cm2} (4 square centimeters).
 @defun quantity? object
 True iff @var{object} is a quantity.  Note that all numbers are
 quantities, but not the other way round.
+Currently, there are no quantities that re not numbers.
+To distinguish a plain unit-less number from a quantity,
+you can use @code{complex?}.
 @end defun
 
 @defun quantity->number q
@@ -1719,7 +1722,7 @@ invoking a continuation), @var{out-guard} is called.
 If the continuation of the dynamic-wind is re-entered (which
 is not yet possible in Kawa), the @var{in-guard} is called again.
 
-This function will be in R5RS.
+This function was added in R5RS.
 @end defun
 
 @node Locations, Eval and Environments, Exceptions, Extensions
@@ -2424,6 +2427,37 @@ An example (derived from the Skij FAQ):
 @example
 (invoke-static <java.lang.Thread> 'sleep 100)
 @end example
+
+The behavior of interpreted code and compiled code is not
+indentical, though you should get the same result either way
+unless you have designed the classes rather strangely.  The
+details will be nailed down later, but the basic idea is that
+the compiler will "inline" the @code{invoke-static} call
+if it can pick a single "best" matching method.
+@end defun
+
+@defun invoke object name args ...
+The @var{name} can be @code{<symbol>} or
+@code{<string>} that names one or more methods in the Java class.
+
+If @var{name} is not a valid Java name, it is "mangled" into a Java name:
+For example, @code{"open-file"} is mangled to @code{"openFile"},
+and @code{"char?"} is mangled to @code{"isChar"}.
+
+Any public methods (static or instance) in the specified @var{class} (or its
+super-classes) that match "@var{name}" or "@var{name}$V" collectively form a
+generic procedure.  When the procedure is applied to the argument list,
+the most specific applicable method is chosen depending on the
+argument list;  that method is then
+called with the given arguments.  Iff the method is an instance method,
+the @var{object} is used as the @code{this} argument;
+otherwise @var{object} is prepended to the @var{args} list.  If there are
+no applicable methods (or no methods at all!), or there is no "best"
+method, @code{WrongType} is thrown.
+
+("@var{name}$V" will be used for procedures with @code{#!rest} or keyword args;
+the last argument must be an array type;  all the "extra" arguments
+must be compatible with the type of the array elements.)
 
 The behavior of interpreted code and compiled code is not
 indentical, though you should get the same result either way

@@ -9,23 +9,21 @@ public class Macro extends Syntax implements Printable, Externalizable
 {
   public Object expander;
 
-  java.util.Vector capturedIdentifiers;
+  private boolean hygienic = true;
 
-  String capturedFields;
-
-  /** The identifiers in the templates that are not pattern variable.
-   * These need re-naming to be "hygienic". */
-  String[] templateIdentifiers;
-
-  /** Declarations captured at macro definition time.
-   * The binding (if any) for templateIdentifiers[i] is capturedDeclarations[i]. */
-  Declaration[] capturedDeclarations;
+  public ScopeExp capturedScope;
 
   public static Macro make (Declaration decl)
   {
     Macro mac = new Macro(decl.getSymbol());
-    mac.capturedIdentifiers = new java.util.Vector ();
     decl.setSyntax();
+    return mac;
+  }
+
+  public static Macro makeNonHygienic (Object name, Procedure expander)
+  {
+    Macro mac = new Macro(name, expander);
+    mac.hygienic = false;
     return mac;
   }
 
@@ -35,43 +33,9 @@ public class Macro extends Syntax implements Printable, Externalizable
     return mac;
   }
 
-  public static Macro make (Object name, Procedure expander,
-			    String[] templateIdentifiers,
-			    String capturedFields)
-  {
-    Macro mac = new Macro(name, expander);
-    mac.templateIdentifiers = templateIdentifiers;
-    mac.capturedFields = capturedFields;
-    return mac;
-  }
 
-  /** Capture field declarations from current macro-definition scope.
-   * Used by kawa.standard.require when a macro is loaded.
-   * See getUsedFieldsList which is called when the macro is exported.
-   * @param table maps field names for Declarations. */
-  public void captureDecls(Hashtable table)
-  {
-    if (capturedFields == null)
-      return;
-    int numFields = 0;
-    for (int i = capturedFields.length();  --i >= 0; )
-      if (capturedFields.charAt(i) == ';')
-        numFields++;
-    Declaration[] decls = new Declaration[numFields];
-    int start = 0;
-    for (int i = 0;  i < numFields; i++)
-      {
-        int end = capturedFields.indexOf(';', start);
-        if (end > start)
-          {
-            String fieldName = capturedFields.substring(start, end);
-            decls[i] = (Declaration) table.get(fieldName);
-          }
-
-        start = end + 1;
-      }
-    capturedDeclarations = decls;
-  }
+  public final boolean isHygienic() { return hygienic; }
+  public final void setHygienic (boolean hygienic) {this.hygienic = hygienic;}
 
   public void setExpander (Procedure expander)
   {
@@ -87,15 +51,12 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     name = old.name;
     expander = old.expander;
-    capturedIdentifiers = old.capturedIdentifiers;
-    templateIdentifiers = old.templateIdentifiers;
-    capturedFields = old.capturedFields;
+    hygienic = old.hygienic;
   }
 
   public Macro(Object name, Procedure expander)
   {
     super(name);
-    //setType(thisType);
     this.expander = new QuoteExp(expander);
   }
 
@@ -104,7 +65,13 @@ public class Macro extends Syntax implements Printable, Externalizable
     super(name);
   }
 
+  /* FIXME redundant */
   public gnu.expr.Expression rewriteForm (Pair form, Translator tr)
+  {
+    return tr.rewrite(expand(form, tr));
+  }
+
+  public gnu.expr.Expression rewriteForm (Object form, Translator tr)
   {
     return tr.rewrite(expand(form, tr));
   }
@@ -121,7 +88,7 @@ public class Macro extends Syntax implements Printable, Externalizable
     ps.print ('>');
   }
 
-  public Object expand (Pair form, Translator tr)
+  public Object expand (Object form, Translator tr)
   {
     try
       {
@@ -148,21 +115,34 @@ public class Macro extends Syntax implements Printable, Externalizable
 	    pr = (Procedure)
 	      ((Expression) exp).eval(tr.getGlobalEnvironment());
 	  }
-        SyntaxForm sform = new SyntaxForm();
-        sform.form = form;
-        sform.tr = tr;
-	Object expansion = pr.apply1(sform);
-        return expansion;
+	if (! hygienic)
+	  {
+	    int nargs = Translator.listLength(form);
+	    if (nargs <= 0)
+	      return tr.syntaxError("invalid macro argument list to "+this);
+	    Object[] args = new Object[nargs-1];
+	    for (int i = 0;  i < nargs;  i++)
+	      {
+		if (form instanceof SyntaxForm)
+		  form = ((SyntaxForm) form).form;
+		Pair pair = (Pair) form;
+		if (i > 0)
+		  args[i-1] = pair.car;
+		form = pair.cdr;
+	      }
+	    return pr.applyN(args);
+	  }
+	return pr.apply1(form);
       }
     catch (Throwable ex)
       {
+	ex.printStackTrace();
         return tr.syntaxError("evaluating syntax transformer '"
                               + getName() + "' threw " + ex);
       }
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                    ScopeExp defs, Translator tr)
+  public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
     String save_filename = tr.getFile();
     int save_line = tr.getLine();
@@ -172,40 +152,14 @@ public class Macro extends Syntax implements Printable, Externalizable
       {
 	tr.setLine(st);
         tr.currentSyntax = this;
-        return tr.scan_form(expand(st, tr), forms, defs);
+	Object x = expand(st, tr);
+	tr.scanForm(x, defs);
       }
     finally
       {
 	tr.setLine(save_filename, save_line, save_column);
         tr.currentSyntax = saveSyntax;
       }
-  }
-
-  /** Given a list of cpatured declarations, get a String containing
-   * a list for field names.
-   * This is called when compiling (exporting) a macro.
-   * Set set up the lexical scope when a macro is loaded,
-   * we call captureDecls. */
-  private static String getUsedFieldsList(Object[] templateDecls)
-  {
-    StringBuffer fieldNames = new StringBuffer();
-    if (templateDecls != null)
-      {
-	int numDecls = templateDecls.length;
-	for (int i = 0;  i < numDecls;  i++)
-	  {
-	    Object d = templateDecls[i];
-	    if (d instanceof Declaration)
-	      {
-		Declaration decl = (Declaration) d;
-		if (decl.field != null
-		    && ! decl.getFlag(Declaration.IS_UNKNOWN))
-		  fieldNames.append(decl.field.getName());
-	      }
-	    fieldNames.append(';');
-	  }
-      }
-    return fieldNames.toString();
   }
 
   /**
@@ -216,8 +170,6 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     out.writeObject(getName());
     out.writeObject(((QuoteExp) expander).getValue());
-    out.writeObject(templateIdentifiers);
-    out.writeObject(Macro.getUsedFieldsList(capturedDeclarations));
   }
 
   public void readExternal(ObjectInput in)
@@ -225,7 +177,5 @@ public class Macro extends Syntax implements Printable, Externalizable
   {
     setName((String) in.readObject());
     expander = new QuoteExp(in.readObject());
-    templateIdentifiers = (String[]) in.readObject();
-    capturedFields = (String) in.readObject();
   }
 }

@@ -8,6 +8,7 @@ import gnu.bytecode.Access;
 import gnu.text.SourceMessages;
 import gnu.lists.*;
 import gnu.kawa.lispexpr.LispInterpreter;
+import java.util.*;
 
 /** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
@@ -22,8 +23,18 @@ public class Translator extends Compilation
   // Global environment used to look for syntax/macros.
   private Environment env;
 
-  /** Set if we're processing a define-syntax or defmacro. */
+  /** Set if we're processing (as opposed to expanding)
+   * a <code>define-syntax</code> or <code>defmacro</code>. */
   public Macro currentMacroDefinition;
+
+  /** Innermost current scope of pattern variable,
+   * from a <code>syntax-case</code>. */
+  public PatternScope patternScope;
+
+  /** A stack of aliases pushed by <code>pushRenamedAlias</code>. */
+  Stack renamedAliasStack;
+
+  public Stack formStack = new Stack();
 
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
@@ -59,6 +70,23 @@ public class Translator extends Compilation
   public Expression parse (Object input)
   {
     return rewrite(input);
+  }
+
+  public final Expression rewrite_car (Pair pair, SyntaxForm syntax)
+  {
+    if (syntax == null || syntax.scope == current_scope
+	|| pair.car instanceof SyntaxForm)
+      return rewrite_car(pair, false);
+    ScopeExp save_scope = current_scope;
+    try
+      {
+	setCurrentScope(syntax.scope);
+	return rewrite_car(pair, false);
+      }
+    finally
+      {
+	setCurrentScope(save_scope);
+      }
   }
 
   public final Expression rewrite_car (Pair pair, boolean function)
@@ -125,6 +153,11 @@ public class Translator extends Compilation
   /** True iff a form matches a literal symbol. */
   public boolean matches(Object form, String literal)
   {
+    if (form instanceof SyntaxForm)
+      {
+	// FIXME
+	return literal == ((SyntaxForm) form).form;
+      }
     if (form instanceof Symbol)
       {
 	ReferenceExp rexp = getOriginalRef(lexical.lookup(form, -1));
@@ -227,9 +260,24 @@ public class Translator extends Compilation
    * @param obj the value to check
    * @return the Syntax bound to obj, or null.
    */
-  public Syntax check_if_Syntax (Object obj)
+  Syntax check_if_Syntax (Object obj)
   {
-    obj = getBinding(obj, true);
+    if (obj instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) obj;
+	ScopeExp save_scope = current_scope;
+	try
+	  {
+	    setCurrentScope(sf.scope);
+	    obj = getBinding(sf.form, true);
+	  }
+	finally
+	  {
+	    setCurrentScope(save_scope);
+	  }
+      }
+    else
+      obj = getBinding(obj, true);
     if (obj instanceof Syntax)
       return (Syntax) obj;
     return null;
@@ -295,21 +343,119 @@ public class Translator extends Compilation
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
-    int cdr_length = LList.listLength(cdr, false);
+    int cdr_length = listLength(cdr);
 
     if (cdr_length < 0)
       return syntaxError("dotted list is not allowed");
 
     Expression[] args = new Expression[cdr_length];
 
+    ScopeExp save_scope = current_scope;
     for (int i = 0; i < cdr_length; i++)
       {
+	if (cdr instanceof SyntaxForm)
+	  {
+	    SyntaxForm sf = (SyntaxForm) cdr;
+	    cdr = sf.form;
+	    setCurrentScope(sf.scope);
+	  }
 	Pair cdr_pair = (Pair) cdr;
 	args[i] = rewrite_car (cdr_pair, false);
 	cdr = cdr_pair.cdr;
       }
+    if (save_scope != current_scope)
+      setCurrentScope(save_scope);
 
     return ((LispInterpreter) getInterpreter()).makeApply(func, args);
+  }
+
+  public static Object stripSyntax (Object obj)
+  {
+    while (obj instanceof SyntaxForm)
+      obj = ((SyntaxForm) obj).form;
+    return obj;
+  }
+
+  public static Object safeCar (Object obj)
+  {
+    while (obj instanceof SyntaxForm)
+      obj = ((SyntaxForm) obj).form;
+    if (! (obj instanceof Pair))
+      return null;
+    return stripSyntax(((Pair) obj).car);
+  }
+
+  public static Object safeCdr (Object obj)
+  {
+    while (obj instanceof SyntaxForm)
+      obj = ((SyntaxForm) obj).form;
+    if (! (obj instanceof Pair))
+      return null;
+    return stripSyntax(((Pair) obj).cdr);
+  }
+
+  /** Returns the length of a syntax list.
+   * Returns Integer.MIN_VALUE for cyclic lists,
+   * for impure lists returns the number of pairs before the "dot".
+   * Similar to LList.listLength, but descends into SyntaxForm. */
+  public static int listLength(Object obj)
+  {
+    // Based on list-length implementation in
+    // Guy L Steele jr: "Common Lisp:  The Language", 2nd edition, page 414
+    int n = 0;
+    Object slow = obj;
+    Object fast = obj;
+    for (;;)
+      {
+	// 'n' is number of previous Pairs before 'fast' cursor.
+	while (fast instanceof SyntaxForm)
+	  fast = ((SyntaxForm) fast).form;
+	while (slow instanceof SyntaxForm)
+	  slow = ((SyntaxForm) slow).form;
+	if (fast == LList.Empty)
+	  return n;
+	if (! (fast instanceof Pair))
+	  return -(n+1);
+	n++;
+	Object next = ((Pair) fast).cdr;
+	while (next instanceof SyntaxForm)
+	  next = ((SyntaxForm) next).form;
+	if (next == LList.Empty)
+	  return n;
+	if (! (next instanceof Pair))
+	  return -(n+1);
+	slow = ((Pair)slow).cdr;
+	fast = ((Pair)next).cdr;
+	n++;
+	if (fast == slow)
+	  return Integer.MIN_VALUE;
+      }
+  }
+
+  public void rewriteInBody (Object exp)
+  {
+    if (exp instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) exp;
+	ScopeExp save_scope = current_scope;
+	try
+	  {
+	    setCurrentScope(sf.scope);
+	    rewriteInBody(sf.form);
+	  }
+	finally
+	  {
+	    setCurrentScope(save_scope);
+	  }
+      }
+    else if (exp instanceof Values)
+      {
+	Object[] vals = ((Values) exp).getValues();
+	for (int i = 0;  i < vals.length;  i++)
+	  rewriteInBody(vals[i]);
+      }
+    else
+      formStack.add(rewrite(exp, false));
   }
 
   /**
@@ -320,11 +466,34 @@ public class Translator extends Compilation
     return rewrite(exp, false);
   }
 
+  public void setCurrentScope (ScopeExp scope)
+  {
+    super.setCurrentScope(scope);
+    while (scope != null && ! (scope instanceof PatternScope))
+      scope = scope.outer;
+    patternScope = (PatternScope) scope;
+  }
+
   /**
    * Re-write a Scheme expression in S-expression format into internal form.
    */
   public Expression rewrite (Object exp, boolean function)
   {
+    if (exp instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) exp;
+	ScopeExp save_scope = current_scope;
+	try
+	  {
+	    setCurrentScope(sf.scope);
+	    Expression s = rewrite(sf.form, function);
+	    return s;
+	  }
+	finally
+	  {
+	    setCurrentScope(save_scope);
+	  }
+      }
     if (exp instanceof PairWithPosition)
       return rewrite_with_position (exp, function, (PairWithPosition) exp);
     else if (exp instanceof Pair)
@@ -434,14 +603,20 @@ public class Translator extends Compilation
                       decl.setFlag(Declaration.IS_SYNTAX);
                   }
               }
-            else if (Compilation.inlineOk)
+            else if (Compilation.inlineOk && function)
               {
+		// Questionable.  fail with new set_b implementation,
+		// which just call rewrite_car on the lhs,
+		// if we don't require function to be true.  FIXME.
                 decl = Declaration.getDeclaration(proc);
               }
           }
 	if (decl != null && decl.getFlag(Declaration.FIELD_OR_METHOD)
 	    && decl.isProcedureDecl() && ! function)
 	  return syntaxError("not implemented: variable reference to a method");
+	if (decl != null && decl.getContext() instanceof PatternScope)
+	  return syntaxError("reference to pattern variable "+decl.getName()+" outside syntax template");
+	  
 	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
 	if (separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
@@ -572,36 +747,89 @@ public class Translator extends Compilation
     return result;
   }
 
-  public boolean scan_form (Object st, java.util.Vector forms, ScopeExp defs)
+  public static Object wrapSyntax (Object form, SyntaxForm syntax)
   {
-    // Process st.
-    if (! (st instanceof Pair))
-      forms.addElement (st);
+    if (syntax == null || form instanceof Expression)
+      return form;
+    else
+      return syntax.fromDatumIfNeeded(form);
+  }
+
+  public Object popForms (int first)
+  {
+    int last = formStack.size();
+    if (last == first)
+      return Values.empty;
+    Object r;
+    if (last == first + 1)
+      r = formStack.elementAt(first);
     else
       {
-        Pair st_pair = (Pair) st;
-        Object op = st_pair.car;
-        Syntax syntax = check_if_Syntax (op);
-	if (syntax == null)
-	  forms.addElement(st);
+	Values vals = new Values();
+	for (int i = first; i < last;  i++)
+	  vals.writeObject(formStack.elementAt(i));
+	r = vals;
+      }
+    formStack.setSize(first);
+    return r;
+  }
+
+  public void scanForm (Object st, ScopeExp defs)
+  {
+    if (st instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) st;
+	ScopeExp save_scope = currentScope();
+	try
+	  {
+	    setCurrentScope(sf.scope);
+	    int first = formStack.size();
+	    scanForm(sf.form, defs);
+	    formStack.add(wrapSyntax(popForms(first), sf));
+	    return;
+	  }
+	finally
+	  {
+	    setCurrentScope(save_scope);
+	  }
+      }
+    if (st instanceof Values)
+      {
+	if (st == Values.empty)
+	  st = QuoteExp.voidExp; // From #!void
 	else
+	  {
+	    Object[] vals = ((Values) st).getValues();
+	    for (int i = 0;  i < vals.length;  i++)
+	      scanForm(vals[i], defs);
+	    return;
+	  }
+      }
+    if (st instanceof Pair)
+      {
+        Pair st_pair = (Pair) st;
+        Syntax syntax = check_if_Syntax(st_pair.car);
+	if (syntax != null)
 	  {
 	    String save_filename = getFile();
 	    int save_line = getLine();
 	    int save_column = getColumn();
+	    Compilation save_comp = Compilation.getCurrent();
 	    try
 	      {
+		Compilation.setCurrent(this);
 		setLine(st_pair);
-		if (! syntax.scanForDefinitions(st_pair, forms, defs, this))
-		  return false;
+		syntax.scanForm(st_pair, defs, this);
+		return;
 	      }
 	    finally
 	      {
+		Compilation.setCurrent(save_comp);
 		setLine(save_filename, save_line, save_column);
 	      }
 	  }
       }
-    return true;
+    formStack.add(st);
   }
 
   /** Recursive helper method for rewrite_body.
@@ -610,23 +838,39 @@ public class Translator extends Compilation
    * If definitions were seen, return a LetExp containing the definitions.
    */
 
-  public boolean scan_body (Object body, java.util.Vector forms, ScopeExp defs)
+  public void scanBody (Object body, ScopeExp defs)
   {
-    boolean result = true;
     while (body != LList.Empty)
       {
-	if (! (body instanceof Pair))
+	if (body instanceof SyntaxForm)
 	  {
-	    forms.addElement (syntaxError ("body is not a proper list"));
-	    return false;
+	    SyntaxForm sf = (SyntaxForm) body;
+	    ScopeExp save_scope = current_scope;
+	    try
+	      {
+		setCurrentScope(sf.scope);
+		int first = formStack.size();
+		scanBody(sf.form, defs);
+		formStack.add(wrapSyntax(popForms(first), sf));
+		return;
+	      }
+	    finally
+	      {
+		setCurrentScope(save_scope);
+	      }
 	  }
-	Pair pair = (Pair) body;
-	Object st = pair.car;
-        if (! scan_form (st, forms, defs))
-          result = false;
-	body = pair.cdr;
+	else if (body instanceof Pair)
+	  {
+	    Pair pair = (Pair) body;
+	    scanForm(pair.car, defs);
+	    body = pair.cdr;
+	  }
+	else
+	  {
+	    formStack.add(syntaxError ("body is not a proper list"));
+	    break;
+	  }
       }
-    return result;
   }
 
   public static Pair makePair(Pair pair, Object car, Object cdr)
@@ -642,18 +886,18 @@ public class Translator extends Compilation
 
   public Expression rewrite_body (Object exp)
   {
+    // NOTE we have both a rewrite_body and a rewriteBody.
+    // This is confusing, at the least.  FIXME.
     Object saved = pushPositionOf(exp);
-    java.util.Vector forms = new java.util.Vector(20);
     LetExp defs = new LetExp(null);
+    int first = formStack.size();
     defs.outer = current_scope;
     current_scope = defs;
     try
       {
-	if (! scan_body (exp, forms, defs))
-	  return new ErrorExp("error while scanning in body");
-	int nforms = forms.size();
-	if (nforms == 0)
-	  return syntaxError ("body with no expressions");
+	scanBody(exp, defs);
+	if (formStack.size() == first)
+	  formStack.add(syntaxError ("body with no expressions"));
 	int ndecls = defs.countDecls();
 	if (ndecls != 0)
 	  {
@@ -662,7 +906,7 @@ public class Translator extends Compilation
 	      inits[i] = QuoteExp.undefined_exp;
 	    defs.inits = inits;
 	  }
-	Expression body = makeBody(forms, null);
+	Expression body = makeBody(first, null);
 	setLineOf(body);
 	if (ndecls == 0)
 	  return body;
@@ -678,19 +922,45 @@ public class Translator extends Compilation
       }
   }
 
-  /** Combine a list of zero or more expression forms info a "body". */
-  public Expression makeBody(java.util.Vector forms, ScopeExp scope)
+  /* Rewrite forms on formStack above first. */
+  public void rewriteBody (int first)
   {
-    int nforms = forms.size();
+    int nforms = formStack.size() - first;
     if (nforms == 0)
-      return QuoteExp.voidExp; 
-   else if (nforms == 1)
-      return rewrite (forms.elementAt(0));
+      return;
+    else if (nforms == 1)
+      {
+	Object f = formStack.pop();
+	rewriteInBody(f);
+      }
     else
       {
-	Expression[] exps = new Expression [nforms];
+	Object[] forms = new Object [nforms];
 	for (int i = 0; i < nforms; i++)
-	  exps[i] = rewrite (forms.elementAt(i));
+	  forms[i] = formStack.elementAt(first + i);
+	formStack.setSize(first);
+	for (int i = 0; i < nforms; i++)
+	  rewriteInBody(forms[i]);
+      }
+  }
+
+  /** Combine a list of zero or more expression forms into a "body". */
+  public Expression makeBody(int first, ScopeExp scope)
+  {
+    rewriteBody(first);
+    int nforms = formStack.size() - first;
+    if (nforms == 0)
+      return QuoteExp.voidExp; 
+    else if (nforms == 1)
+      {
+	return (Expression) formStack.pop();
+      }
+    else
+      {
+	Expression[] exps = new Expression[nforms];
+	for (int i = 0; i < nforms; i++)
+	  exps[i] = (Expression) formStack.elementAt(first + i);
+	formStack.setSize(first);
 	if (scope instanceof ModuleExp)
 	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
 			      exps);
@@ -699,7 +969,48 @@ public class Translator extends Compilation
       }
   }
 
-  public void finishModule(ModuleExp mexp, java.util.Vector forms)
+  /** Storage used by noteAccess and processAccesses. */
+  Vector notedAccess;
+
+  /** Note that we reference name in a given scope.
+   * This may be called when defining a macro, at scan-time,
+   * and the name may be bound to a declaration we haven't seen yet. */
+  public void noteAccess (Object name, ScopeExp scope)
+  {
+    if (notedAccess == null)
+      notedAccess = new Vector();
+    notedAccess.addElement(name);
+    notedAccess.addElement(scope);
+  }
+
+  /** Check references recorded by noteAccess.
+   * Resolve now to a Declaration, and note the access.
+   * This is needed in case an exported macro references a private Declaration.
+   */
+  public void processAccesses ()
+  {
+    if (notedAccess == null)
+      return;
+    int sz = notedAccess.size();
+    ScopeExp saveScope = current_scope;
+    for (int i = 0;  i < sz;  i += 2)
+      {
+	Object name = notedAccess.elementAt(i);
+	ScopeExp scope = (ScopeExp) notedAccess.elementAt(i+1);
+	if (current_scope != scope)
+	  setCurrentScope(scope);
+	Declaration decl =  (Declaration) lexical.lookup(name, -1);
+	if (decl != null && ! decl.getFlag(Declaration.IS_UNKNOWN))
+	  {
+	    decl.setCanRead(true);
+	    decl.setFlag(Declaration.EXTERNAL_ACCESS);
+	  }
+      }
+    if (current_scope != saveScope)
+      setCurrentScope(saveScope);
+  }
+
+  public void finishModule(ModuleExp mexp, int first)
   {
     boolean moduleStatic = mexp.isStatic();
     for (Declaration decl = mexp.firstDecl();
@@ -743,9 +1054,21 @@ public class Translator extends Compilation
     if (! moduleStatic)
       mexp.declareThis(null);
 
+    processAccesses();
+
     setModule(mexp);
-    mexp.body = makeBody(forms, mexp);
-    lexical.pop(mexp);
+    Compilation save_comp = Compilation.getCurrent();
+    try
+      {
+	Compilation.setCurrent(this);
+	mexp.body = makeBody(first, mexp);
+	lexical.pop(mexp);
+      }
+    finally
+      {
+	Compilation.setCurrent(save_comp);
+      }
+
     /* DEBUGGING:
     OutPort err = OutPort.errDefault ();
     err.print ("[Re-written expression for load/compile: ");
@@ -754,5 +1077,64 @@ public class Translator extends Compilation
     err.println();
     err.flush();
     */
+  }
+
+  public Declaration makeRenamedAlias (Declaration decl,
+				       ScopeExp templateScope)
+  {
+    if (templateScope == null)
+      return decl; // ???
+    Object name = decl.getSymbol();
+    Declaration alias = new Declaration(name);
+    alias.setAlias(true);
+    alias.noteValue(new ReferenceExp(decl));
+    alias.setPrivate(true);
+    alias.context = templateScope;
+    return alias;
+  }
+
+  /** Push an alias for a declaration in a scope.
+   * If the name of <code>decl</code> came from a syntax template
+   * whose immediate scope is <code>templateScope</code>,
+   * then the same syntax template may contain local variable references
+   * that are also in the same <code>templateScope</code>.
+   * Such variable references will <em>not</em> look in the current
+   * "physical" scope, where we just created <code>decl</code>, but
+   * will instead search the "lexical" <code>templateScope</scope>.
+   * So that such references can resolve to <code>decl</code>, we
+   * create an alias in <code>templateScope</code> that points
+   * to <code>decl</code>.  We record that we did this in the
+   * <code> renamedLiasStack</code>, so we can remove the alias later.
+   */
+  public void pushRenamedAlias (Declaration alias)
+  {
+    Declaration decl = getOriginalRef(alias).getBinding();
+    ScopeExp templateScope = alias.context;
+    decl.setSymbol(null);
+    Declaration old = templateScope.lookup(decl.getSymbol());
+    if (old != null)
+      templateScope.remove(old);
+    templateScope.addDeclaration(alias);
+    if (renamedAliasStack == null)
+      renamedAliasStack = new Stack();
+    renamedAliasStack.push(old);
+    renamedAliasStack.push(alias);
+    renamedAliasStack.push(templateScope);
+  }
+
+  /** Remove one or more aliases created by <code>pushRenamedAlias</code>. */
+  public void popRenamedAlias (int count)
+  {
+    while (--count >= 0)
+      {
+	ScopeExp templateScope = (ScopeExp) renamedAliasStack.pop();
+	Declaration alias = (Declaration) renamedAliasStack.pop();
+	Declaration decl = getOriginalRef(alias).getBinding();
+	decl.setSymbol(alias.getSymbol());
+	templateScope.remove(alias);
+	Object old = renamedAliasStack.pop();
+	if (old != null)
+	  templateScope.addDeclaration((Declaration) old);
+      }
   }
 }

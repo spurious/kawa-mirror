@@ -79,10 +79,11 @@ public class Eval extends Procedure1or2
 	  interp.setEnvironment(env);
 	Translator tr = new Translator(interp, messages);
 	ModuleExp mod = new ModuleExp();
-	java.util.Vector forms = new java.util.Vector(20);
+	Values forms = new Values();
 	tr.push(mod);
-	tr.scan_body(body, forms, mod);
-	tr.finishModule(mod, forms);
+	int first = tr.formStack.size();
+	tr.scanBody(body, mod);
+	tr.finishModule(mod, first);
 
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());

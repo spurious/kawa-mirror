@@ -61,11 +61,22 @@ public class Lambda extends Syntax implements Printable
     int rest_args = -1;
     int key_args = -1;
     Pair pair;
-    for (; bindings instanceof Pair;  bindings = pair.cdr)
+    for (; ;  bindings = pair.cdr)
       {
+	if (bindings instanceof SyntaxForm)
+	  {
+	    SyntaxForm sf = (SyntaxForm) bindings;
+	    // FIXME
+	    bindings = sf.form;
+	  }
+	if (! (bindings instanceof Pair))
+	  break;
 	pair = (Pair) bindings;
         // An initial pass to count the parameters.
-	if (pair.car == optionalKeyword)
+	Object pair_car = pair.car;
+	if (pair_car instanceof SyntaxForm)
+	  pair_car = ((SyntaxForm) pair_car).form;
+	if (pair_car == optionalKeyword)
 	  {
 	    if (opt_args >= 0)
 	      {
@@ -79,7 +90,7 @@ public class Lambda extends Syntax implements Printable
 	      }
 	    opt_args = 0;
 	  }
-	else if (pair.car == restKeyword)
+	else if (pair_car == restKeyword)
 	  {
 	    if (rest_args >= 0)
 	      {
@@ -95,7 +106,7 @@ public class Lambda extends Syntax implements Printable
 	      }
 	    rest_args = 0;
 	  }
-	else if (pair.car == keyKeyword)
+	else if (pair_car == keyKeyword)
 	  {
 	    if (key_args >= 0)
 	      {
@@ -157,28 +168,47 @@ public class Lambda extends Syntax implements Printable
     opt_args = 0;
     key_args = 0;
     Object mode = null;
-    for (; bindings instanceof Pair;  bindings = pair.cdr)
+    ScopeExp templateScopeRest = null;
+    for (; ;  bindings = pair.cdr)
       {
-	pair = (Pair) bindings;
-	if (pair.car == optionalKeyword
-	    || pair.car == restKeyword || pair.car == keyKeyword)
+	if (bindings instanceof SyntaxForm)
 	  {
-	    mode = pair.car;
+	    SyntaxForm sf = (SyntaxForm) bindings;
+	    bindings = sf.form;
+	    // The SyntaxForm "surrounds" both the current binding (the car),
+	    // as well as the cdr - i.e. the remaining bindings.
+	    templateScopeRest = sf.scope;
+	  }
+	ScopeExp templateScope = templateScopeRest;
+	if (! (bindings instanceof Pair))
+	  break;
+	pair = (Pair) bindings;
+	Object pair_car = pair.car;
+	if (pair_car instanceof SyntaxForm)
+	  {
+	    SyntaxForm sf = (SyntaxForm) pair_car;
+	    pair_car = sf.form;
+	    templateScope = sf.scope;
+	  }
+	if (pair_car == optionalKeyword
+	    || pair_car == restKeyword || pair_car == keyKeyword)
+	  {
+	    mode = pair_car;
 	    continue;
 	  }
 	Object savePos = tr.pushPositionOf(pair);
-	Object name;
+	Object name = null;
 	Object defaultValue = defaultDefault;
 	Pair typeSpecPair = null;
         Pair p;
-	if (tr.matches(pair.car, "::"))
+	if (tr.matches(pair_car, "::"))
 	  {
 	    tr.syntaxError("'::' must follow parameter name");
 	    return;
 	  }
-	if (pair.car instanceof String || pair.car instanceof Symbol)
+	if (pair_car instanceof String || pair_car instanceof Symbol)
           {
-            name = pair.car;
+            name = pair_car;
             if (pair.cdr instanceof Pair
                 && tr.matches((p = (Pair) pair.cdr).car, "::"))
               {
@@ -193,68 +223,78 @@ public class Lambda extends Syntax implements Printable
                 pair = p;
               }
           }
-	else if (pair.car instanceof Pair
-		 && ((p = (Pair) pair.car).car instanceof String
-		     || p.car instanceof Symbol)
-		 && p.cdr instanceof Pair)
-          {
-	    name = p.car;
-            p = (Pair) p.cdr;
-            if (tr.matches(p.car, "::"))
-              {
-                if (! (p.cdr instanceof Pair))
-                  {
-                    tr.syntaxError("'::' not followed by a type specifier"
-                                   + " (for parameter '" + name + "')");
-                    return;
-                  }
-                p = (Pair) p.cdr;
-                typeSpecPair = p;
-                if (p.cdr instanceof Pair)
-                  p = (Pair) p.cdr;
-                else if (p.cdr == LList.Empty)
-                  p = null;
-                else
-                  {
-                    tr.syntaxError("improper list in specifier for parameter '"
-                                   + name + "')");
-                    return;
-                  }
-              }
-            if (p != null && mode != null)
-              {
-                defaultValue = p.car;
-                if (p.cdr instanceof Pair)
-                  p = (Pair) p.cdr;
-                else if (p.cdr == LList.Empty)
-                  p = null;
-                else
-                  {
-                    tr.syntaxError("improper list in specifier for parameter '"
-                                   + name + "')");
-                    return;
-                  }
-              }
-            if (p != null)
-              {
-                if (typeSpecPair != null)
-                  {
-                    tr.syntaxError("duplicate type specifier for parameter '"
-                                   + name + '\'');
-                    return;
-                  }
-                typeSpecPair = p;
-                if (p.cdr != LList.Empty)
-                  {
-                    tr.syntaxError("junk at end of specifier for parameter '"
-                                   + name + '\''+" after type "+p.car);
-                    return;
-                  }
-              }
-	  }
-	else
+	else if (pair_car instanceof Pair)
 	  {
-	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)");
+	    p = (Pair) pair_car;
+	    pair_car = p.car;
+	    if (pair_car instanceof SyntaxForm)
+	      {
+		SyntaxForm sf = (SyntaxForm) pair_car;
+		pair_car = sf.form;
+		templateScope = sf.scope;
+	      }
+	    if ((pair_car instanceof String
+		 || pair_car instanceof Symbol)
+		&& p.cdr instanceof Pair)
+	      {
+		name = pair_car;
+		p = (Pair) p.cdr;
+		if (tr.matches(p.car, "::"))
+		  {
+		    if (! (p.cdr instanceof Pair))
+		      {
+			tr.syntaxError("'::' not followed by a type specifier"
+				       + " (for parameter '" + name + "')");
+			return;
+		      }
+		    p = (Pair) p.cdr;
+		    typeSpecPair = p;
+		    if (p.cdr instanceof Pair)
+		      p = (Pair) p.cdr;
+		    else if (p.cdr == LList.Empty)
+		      p = null;
+		    else
+		      {
+			tr.syntaxError("improper list in specifier for parameter '"
+				       + name + "')");
+			return;
+		      }
+		  }
+		if (p != null && mode != null)
+		  {
+		    defaultValue = p.car;
+		    if (p.cdr instanceof Pair)
+		      p = (Pair) p.cdr;
+		    else if (p.cdr == LList.Empty)
+		      p = null;
+		    else
+		      {
+			tr.syntaxError("improper list in specifier for parameter '"
+				       + name + "')");
+			return;
+		      }
+		  }
+		if (p != null)
+		  {
+		    if (typeSpecPair != null)
+		      {
+			tr.syntaxError("duplicate type specifier for parameter '"
+				       + name + '\'');
+			return;
+		      }
+		    typeSpecPair = p;
+		    if (p.cdr != LList.Empty)
+		      {
+			tr.syntaxError("junk at end of specifier for parameter '"
+				       + name + '\''+" after type "+p.car);
+			return;
+		      }
+		  }
+	      }
+	  }
+	if (name == null)
+	  {
+	    tr.syntaxError ("parameter is neither name nor (name :: type) nor (name default)"+": "+pair);
 	    return;
 	  }
 	if (mode == optionalKeyword || mode == keyKeyword)
@@ -263,7 +303,7 @@ public class Lambda extends Syntax implements Printable
 	  lexp.keywords[key_args++]
 	    = Keyword.make(name instanceof Symbol ? ((Symbol) name).getName()
 			   : name.toString());
-	Declaration decl = lexp.addDeclaration (name);
+	Declaration decl = new Declaration(name);
         if (bindings instanceof PairWithPosition)
           {
             PairWithPosition declPos = (PairWithPosition) bindings;
@@ -278,14 +318,32 @@ public class Lambda extends Syntax implements Printable
 	else if (mode == restKeyword)
 	  decl.setType(Compilation.scmListType);
 	decl.noteValue(null);  // Does not have a known value.
+	addParam(decl, templateScope, lexp, tr);
 	tr.popPositionOf(savePos);
+      }
+    if (bindings instanceof SyntaxForm)
+      {
+	SyntaxForm sf = (SyntaxForm) bindings;
+	bindings = sf.form;
+	templateScopeRest = sf.scope;
       }
     if (bindings instanceof String || bindings instanceof Symbol)
       {
-	Declaration decl = lexp.addDeclaration (bindings);
+	Declaration decl = new Declaration(bindings);
 	decl.setType(Compilation.scmListType);
 	decl.noteValue (null);  // Does not have a known value.
+	addParam(decl, templateScopeRest, lexp, tr);
       }
+  }
+
+  private static void addParam (Declaration decl, ScopeExp templateScope,
+				LambdaExp lexp, Translator tr)
+  {
+    if (templateScope != null)
+      decl = tr.makeRenamedAlias(decl, templateScope);
+    lexp.addDeclaration(decl);
+    if (templateScope != null)
+      decl.context = templateScope;
   }
 
   public Object rewriteAttrs(LambdaExp lexp, Object body, Translator tr)
@@ -294,22 +352,36 @@ public class Lambda extends Syntax implements Printable
     String allocationFlagName = null;
     int accessFlag = 0;
     int allocationFlag = 0;
-    while (body instanceof Pair)
+    SyntaxForm syntax = null;
+    for (;;)
       {
-	Pair pair1 = (Pair) body;
-	if (! (pair1.cdr instanceof Pair))
+	while (body instanceof SyntaxForm)
+	  {
+	    syntax = (SyntaxForm) body;
+	    body = syntax.form;
+	  }
+	if (! (body instanceof Pair))
 	  break;
-	Object attrName = pair1.car;
-	Pair pair2 = (Pair) pair1.cdr;
+	Pair pair1 = (Pair) body;
+	Object attrName = Translator.stripSyntax(pair1.car);
+	Object pair1_cdr = pair1.cdr;
+	while (pair1_cdr instanceof SyntaxForm)
+	  {
+	    syntax = (SyntaxForm) pair1_cdr;
+	    pair1_cdr = syntax.form;
+	  }
+	if (! (pair1_cdr instanceof Pair))
+	  break;
+	Pair pair2 = (Pair) pair1_cdr;
 
-	Object attrValue = pair2.car;
+	Object attrValue;
 	if (tr.matches(attrName, "::"))
 	  attrName = null;
 	else if (! (attrName instanceof Keyword))
 	  break;
 	if (attrName == null)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, false);
+	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
 	    gnu.bytecode.Type rtype
 	      = tr.getInterpreter().getTypeFor(attrExpr);
 	    if (rtype != null)
@@ -317,7 +389,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else if (attrName == kawa.standard.object.accessKeyword)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, false);
+	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
 		      || attrValue instanceof FString))
@@ -348,7 +420,7 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else if (attrName == kawa.standard.object.allocationKeyword)
 	  {
-	    Expression attrExpr = tr.rewrite_car(pair2, false);
+	    Expression attrExpr = tr.rewrite_car(pair2, syntax);
 	    if (! (attrExpr instanceof QuoteExp)
 		|| ! ((attrValue = ((QuoteExp) attrExpr).getValue()) instanceof String
 		      || attrValue instanceof FString))
@@ -375,27 +447,34 @@ public class Lambda extends Syntax implements Printable
 	  }
 	else if (attrName == kawa.standard.object.throwsKeyword)
 	  {
-	    int count = LList.listLength(attrValue, false);
+	    attrValue = pair2.car;
+	    int count = Translator.listLength(attrValue);
 	    if (count < 0)
 	      tr.error('e', "throws: not followed by a list");
 	    else
 	      {
 		ReferenceExp[] exps = new ReferenceExp[count];
+		SyntaxForm syntaxLocal = syntax;
 		for (int i = 0;  i < count; i++)
 		  {
-		    pair2 = (Pair) attrValue;
-		    Expression throwsExpr = tr.rewrite_car(pair2, false);
+		    while (attrValue instanceof SyntaxForm)
+		      {
+			syntaxLocal = (SyntaxForm) attrValue;
+			attrValue = syntaxLocal.form;
+		      }
+		    Pair pair3 = (Pair) attrValue;
+		    Expression throwsExpr = tr.rewrite_car(pair3, syntaxLocal);
 		    if (throwsExpr instanceof ReferenceExp)
 		      {
 			exps[i] = (ReferenceExp) throwsExpr;
 		      }
 		    else
 		      {
-			Object savePos = tr.pushPositionOf(pair2);
+			Object savePos = tr.pushPositionOf(pair3);
 			tr.error('e', "throws not followed by a classname");
 			tr.popPositionOf(savePos);
 		      }
-		    attrValue = pair2.cdr; 
+		    attrValue = pair3.cdr; 
 		  }
 		lexp.setExceptions(exps);
 	      }
@@ -409,6 +488,8 @@ public class Lambda extends Syntax implements Printable
     accessFlag |= allocationFlag;
     if (accessFlag != 0)
       lexp.nameDecl.setFlag(accessFlag);
+    if (syntax != null)
+      body = syntax.fromDatumIfNeeded(body);
     return body;
   }
 
@@ -433,6 +514,22 @@ public class Lambda extends Syntax implements Printable
 
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
+    int numRenamedAlias = 0;
+    Declaration prev = null;
+    for (Declaration cur = lexp.firstDecl(); cur != null; cur = cur.nextDecl())
+      {
+	if (cur.isAlias())
+	  {
+	    Declaration param = tr.getOriginalRef(cur).getBinding();
+	    lexp.replaceFollowing(prev, param);
+	    param.context = lexp;
+	    tr.pushRenamedAlias(cur);
+	    numRenamedAlias++;
+	    cur = param;
+	  }
+	prev = cur;
+      }
+
     tr.push(lexp);
     if (lexp.defaultArgs != null)
       for (int i = 0, n = lexp.defaultArgs.length;  i < n;  i++)
@@ -468,6 +565,9 @@ public class Lambda extends Syntax implements Printable
 	lexp.body.setLine(value);
       }
     tr.pop(lexp);
+    lexp.countDecls();
+    tr.popRenamedAlias(numRenamedAlias);
+    lexp.countDecls();
   }
 
 

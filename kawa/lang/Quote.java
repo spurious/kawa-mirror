@@ -16,7 +16,10 @@ public class Quote extends Syntax implements Printable
     if (! (obj instanceof Pair)
         || (pair = (Pair) obj).cdr != LList.Empty)
       return tr.syntaxError ("quote requires a single argument");
-    return new QuoteExp (pair.car);
+    obj = pair.car;
+    if (obj instanceof SyntaxForm)
+      obj = ((SyntaxForm) obj).form;
+    return new QuoteExp(obj);
   }
 
   public void print(java.io.PrintWriter ps)

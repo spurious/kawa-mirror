@@ -120,8 +120,7 @@ public class AutoloadSyntax extends Syntax implements Externalizable
       { throw_error ("type error"); }
   }
 
-  public boolean scanForDefinitions (Pair st, java.util.Vector forms,
-                                     ScopeExp defs, Translator tr)
+  public void scanForm (Pair st, ScopeExp defs, Translator tr)
   {
     if (loaded == null)
       {
@@ -131,11 +130,11 @@ public class AutoloadSyntax extends Syntax implements Externalizable
 	  }
 	catch (RuntimeException e)
 	  {
-	    tr.syntaxError (e.getMessage ());
-            return false;
+	    tr.syntaxError(e.getMessage ());
+            return;
 	  }
       }
-    return loaded.scanForDefinitions(st, forms, defs, tr);
+    loaded.scanForm(st, defs, tr);
   }
 
   public Expression rewriteForm (Pair form, Translator tr)

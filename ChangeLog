@@ -14,6 +14,19 @@
 	* kawa/lang/PatternScope.java: New class.
 	* kawa/lang/Makefile.am: Add new classes.
 
+	* kawa/lang/PairPat.java (match): Remove no-lobger-useful SyntaxForm
+	support.
+	* kawa/lang/Quote.java (rewrite): Strip off SyntaxForm.
+	* kawa/lang/Translator.java: Major rewrite to handle SyntaxForm.
+	Some methods renamed.  Scan methods now use the new formStack,
+	rather than a freshly-allocated Vector.  Some new helper routines.
+	* kawa/lang/Macro.java: Don't keep track of captured identifiers
+	individually, but instead use a single 'capturedScope'.
+	(hygienic): New field to handline hygienic and non- differently.
+	* kawa/lang/Eval.java (evalBody): Update for new scan protocol.
+	* kawa/lang/AutoloadSyntax.java: Update to define scanForm.
+	* kawa/lang/Lambda.java: Handle incoming SyntaxForms.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* Make-rules: New automake doesn't seem to set DIST_SOURCES from

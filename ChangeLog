@@ -1,6 +1,27 @@
+1999-12-27  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewrite):  Don't call setParameter.
+	* kawa/lang/Syntax.java:  Two trivial cleanups.
+	* kawa/lang/Translator.java (current_decl):  Rename to environ.
+	(rewrite):  Handle non-Declaration in environ.
+	(shadowStack):  New field.
+	(pushBindund, popBinding):  New methods.
+	* kawa/lang/SyntaxRule.java:  Use Translator's environ field.
+	* kawa/standard/define_alias.java:  Likewise.
+
+	* kawa/standard/require.java:  New class; extends Syntax.
+	* kawa/standard/Makefile.am (java_JAVA):  Add require.java.
+	* kawa/standard/Scheme.java (initScheme):  Add require.
+
+	* kawa/standard/define.java:  Use Declaration's new getName() method.
+	* kawa/standard/define_member_alias.java:  Likewise.
+	* kawa/standard/letrec.java:  Use Declaration instead of Variable.
+	* kawa/standard/set_b.java:  Likewise.
+
 1999-12-10  Per Bothner  <per@bothner.com>
 
 	* gnu/kawa/util:  New package directory.
+	* configure.in (AC_OUTPUT):  Add gnu/kawa/util/Makefile.
 	* kawa/lang/Makefile.am (java_JAVA):  Remove classes moved
  	to gnu/kawa/util.
 	* gnu/*:  Update for classes moved to new gnu.kawa.util (some renamed).

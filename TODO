@@ -1,15 +1,24 @@
+Document SRFI 4: Homogeneous numeric vector datatypes 
+
 TO BE DONE FOR 2.0:
 
 Implement SRFI 0: Feature-based conditional expansion construct 
-Implement SRFI 4: Homogeneous numeric vector datatypes 
-Implement SRFI 6: Basic String Ports
 Implement SRFI 9: Defining Record Types
 
 Move more of kawa.lang.* to gnu.kawa.reflect and gnu.kawa.*.
 
 Calls to setter (as in (set! (...)) should be inlined.
 
+'object': being able to pass constructor arguments. eg., to simulate:
+   new javax.swing.JDialog(myFrame) {  public void foo() {} };
+Perhaps:  (object ((<javax.swing.JDialog> myFrame)) ...)
+
 Fix scheme-window in misc.scm.
+
+Implement compileConstant for DComplex and CComplex.
+
+Generate better code for `(and test1 test2 test3)'.
+[See maybe-report-section in testing.scm]
 
 Lexer should implement mark/reset.
 

@@ -1,3 +1,8 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* formatst.scm:  Commented out two SLIB specific tests.
+	Marked another test as expected to fail.
+
 2001-09-24  Per Bothner  <per@bothner.com>
 
 	* obj-test,scm:  Test previous mdoule2.scm change.

@@ -267,6 +267,22 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 	  }
 	target.compileFromStack(comp, ttype);
       }
+    else if (type.isSubtype(typeDFloNum))
+      {
+	PrimType dtype = Type.double_type;
+	Target dtarget = new StackTarget(dtype);
+	CodeAttr code = comp.getCode();
+	args[0].compile(comp, dtarget);
+	for (int i = 1;  i < len;  i++)
+	  {
+	    args[i].compile(comp, dtarget);
+	    if (plusOrMinus > 0)
+	      code.emitAdd(dtype);
+	    else
+	      code.emitSub(dtype);
+	  }
+	target.compileFromStack(comp, dtype);
+      }
     else
       ApplyExp.compile(exp, comp, target);
     

@@ -1,3 +1,7 @@
+2001-08-24  Per Bothner  <per@bothner.com>
+
+	* AddOp.java (compile):  Optimize additions of doubles and DFloNum.
+
 2001-08-16  Per Bothner  <per@bothner.com>
 
 	* ValuesMap.java:  New procedure, extends CpsProcedure.

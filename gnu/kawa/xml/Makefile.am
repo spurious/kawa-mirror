@@ -7,6 +7,7 @@ java_sources = \
   AttributeConstructor.java \
   DefineNamespace.java \
   Document.java \
+  DocumentConstructor.java \
   ElementConstructor.java \
   ElementType.java \
   HttpPrinter.java \
@@ -18,8 +19,10 @@ java_sources = \
   NamedChildren.java \
   NamedDescendants.java \
   NamespaceEnv.java \
+  NodeName.java \
   NodeType.java \
   OutputAsXML.java \
+  TextConstructor.java \
   WriteTo.java \
   XMLParser.java
 

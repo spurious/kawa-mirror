@@ -1,3 +1,10 @@
+2003-03-04  Per Bothner  <per@bothner.com>
+
+	* DocumentConstructor.java:  New class, extends CpsProcedure.
+	* TextConstructor.java:  New class, extends CpsProcedure.
+	* NodeName.java:  New class, extends Procedure1.
+	* Makefile.am (java_sources):  Add new classes.
+
 2003-03-02  Per Bothner  <per@bothner.com>
 
 	* Document.java (makeUrl):  The 'url' argument can be a URL as well as

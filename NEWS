@@ -2,7 +2,7 @@ You can now use Kawa to generate applets, using the new --applet switch,
 Check the "Applet compilation" section in the manual.
 
 Generating an application using the --main flag should work again.
-Neither --applte nor --main has Scheme hard-wired any more.
+Neither --applet nor --main has Scheme hard-wired any more.
 
 A new macro `(this)' evaluates to the "this object" - the current instance
 of the current class.  The current implementation is incomplete, and buggy,

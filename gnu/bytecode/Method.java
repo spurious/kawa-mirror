@@ -1076,7 +1076,7 @@ public class Method {
 
   public void compile_invoke_method (Method method, int opcode)
   {
-    instruction_start_hook (3);
+    instruction_start_hook (opcode == 185 ? 5 : 3);
     int arg_count = method.arg_types.length;
     boolean is_invokestatic = opcode == 184;
     if (is_invokestatic != ((method.access_flags & Access.STATIC) != 0))
@@ -1084,10 +1084,15 @@ public class Method {
 	("compile_invoke_xxx static flag mis-match method.flags="+method.access_flags);
     if (!is_invokestatic)
       arg_count++;
-    while (--arg_count >= 0)
-      pop_stack_type ();
     put1 (opcode);  // invokevirtual, invokespecial, or invokestatic
     put2 (CpoolRef.get_const (classfile, method).index);
+    if (opcode == 185)  // invokeinterface
+      {
+	put1(arg_count);
+	put1(0);
+      }
+    while (--arg_count >= 0)
+      pop_stack_type ();
     if (method.return_type != Type.void_type)
       push_stack_type (method.return_type);
   }

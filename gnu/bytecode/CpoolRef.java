@@ -61,7 +61,11 @@ CpoolRef extends CpoolEntry
   {
     CpoolClass clas
       = CpoolClass.get_const (classfile, method.classfile.this_name);
-    int tag = 10;  // CONSTANT_Methodref
+    int tag;
+    if ((method.getDeclaringClass().access_flags & Access.INTERFACE) == 0)
+      tag = 10; // CONSTANT_Methodref
+    else
+      tag = 11; // CONSTANT_InterfaceMethodref
     CpoolNameAndType nameType = CpoolNameAndType.get_const (classfile, method);
     return get_const (classfile, tag, clas, nameType);
   }

@@ -1,3 +1,11 @@
+2003-11-05  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (<init>):  Use setName method.
+	(setName):  Make final.
+
+	* SetExp.java (compile):  Implement isSetIfUnbound, as used by
+	Scheme define-variable and Common Lisp defvar.
+
 2003-11-02  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (PARSE_IMMEDIATE, PARSE_ONE_LINE):  New constants.

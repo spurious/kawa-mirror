@@ -300,7 +300,7 @@ public class Declaration
       base.setCanRead();
   }
 
-  public void setName(Object symbol)
+  public final void setName(Object symbol)
   {
     this.symbol = symbol;
   }
@@ -384,13 +384,13 @@ public class Declaration
 
   public Declaration (Object s, Type type)
   {
-    symbol = s;
+    setName(s);
     setType(type);
   }
 
   public Declaration (Object name, Field field)
   {
-    this.symbol = name;
+    setName(name);
     setType(field.getType());
     this.field = field;
     setSimple(false);

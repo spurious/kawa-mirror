@@ -193,11 +193,27 @@ public class SetExp extends Expression
 	      }
 	  }
 	else if (decl.isIndirectBinding()
-		 && (! isDefining() || decl.isPublic()))
+		 && (isSetIfUnbound() || ! isDefining() || decl.isPublic()))
 	  {
 	    decl.load(comp);
+	    if (isSetIfUnbound())
+	      {
+		if (needValue)
+		  {
+		    code.emitDup();
+		    valuePushed = true;
+		  }
+		code.pushScope();
+		code.emitDup();
+		Variable symVar = code.addLocal(Compilation.typeSymbol);
+		code.emitStore(symVar);
+		code.emitInvokeVirtual(Compilation.typeSymbol
+				       .getDeclaredMethod("isBound", 0));
+		code.emitIfIntEqZero();
+		code.emitLoad(symVar);
+	      }
 	    new_value.compile (comp, Target.pushObject);
-	    if (needValue)
+	    if (needValue && ! isSetIfUnbound())
 	      {
 		code.emitDupX();
 		valuePushed = true;
@@ -207,6 +223,11 @@ public class SetExp extends Expression
 		("set", Compilation.apply1args,
 		 Type.void_type, Access.PUBLIC|Access.FINAL);
 	    code.emitInvokeVirtual (setMethod);
+	    if (isSetIfUnbound())
+	      {
+		code.emitFi();
+		code.popScope();
+	      }
 	  }
 	else if (decl.isFluid())
 	  {

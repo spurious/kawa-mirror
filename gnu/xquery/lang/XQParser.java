@@ -2920,7 +2920,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	kawa.standard.require.importDefinitions(type, uri, forms, module, parser);
 	Expression[] inits = new Expression[forms.size()];
 	forms.toArray(inits);
-	return BeginExp.canonicalize(new BeginExp(inits));
+	return BeginExp.canonicalize(inits);
       }
     if (curToken == DEFAULT_ELEMENT_TOKEN
 	|| curToken == DEFAULT_FUNCTION_TOKEN

@@ -409,8 +409,20 @@ public class XQParser extends LispReader // should be extends Lexer
 	    next = read();
 	    if (next < 0)
 	      eofError("unexpected end-of-file in string");
-	    if (ch == next)
-	      break;
+	    if (next == '&')
+	      {
+		parseEntityOrCharRef();
+		continue;
+	      }
+	    else if (ch == next)
+	      {
+		next = read ();
+		if (ch != next)
+		  {
+		    unread(next);
+		    break;
+		  }
+	      }
 	    tokenBufferAppend((char) next);
 	  }
 	popNesting(saveReadState);
@@ -525,7 +537,7 @@ public class XQParser extends LispReader // should be extends Lexer
     return ch;
   }
 
-  public void appendNamedEntity(String name, StringBuffer sbuf)
+  public void appendNamedEntity(String name)
   {
     name = name.intern();
     char ch = '?';
@@ -541,7 +553,7 @@ public class XQParser extends LispReader // should be extends Lexer
       ch = '\'';
     else
       error("unknown enity reference: '"+name+"'");
-    sbuf.append(ch);
+    tokenBufferAppend(ch);
   }
 
   /** Return the current token, assuming it is in operator context.
@@ -1282,23 +1294,84 @@ public class XQParser extends LispReader // should be extends Lexer
     return exp;
   }
 
+  void parseEntityOrCharRef ()
+      throws java.io.IOException, SyntaxException
+  {
+    int next = read();
+    if (next == '#')
+      {
+	int base;
+	next = read();
+	if (next == 'x')
+	  {
+	    base = 16;
+	    next = read();
+	  }
+	else
+	  base = 10;
+	int value = 0;
+	while (next >= 0)
+	  {
+	    char ch = (char) next;
+	    int digit = Character.digit((char) ch, base);
+	    if (digit < 0)
+	      break;
+	    if (value >= 0x8000000)
+	      break; // Overflow likely.
+	    value = value * base;
+	    value += digit;
+	    next = read();
+	  }
+	if (next != ';')
+	  {
+	    unread();
+	    error("invalid character reference");
+	  }
+	else
+	  tokenBufferAppend(value);
+      }
+    else
+      {
+	int saveLength = tokenBufferLength;
+	while (next >= 0)
+	  {
+	    char ch = (char) next;
+	    if (! isNamePart(ch))
+	      break;
+	    tokenBufferAppend(ch);
+	    next = read();
+	  }
+	if (next != ';')
+	  {
+	    unread();
+	    error("invalid entity reference");
+	    return;
+	  }
+	String ref = new String(tokenBuffer, saveLength,
+				tokenBufferLength - saveLength);
+	tokenBufferLength = saveLength;
+	appendNamedEntity(ref);
+      }
+  }
+
   /** Parse ElementContent (delimiter == '<')  or AttributeContext (otherwise).
    * @param delimiter is '<' if parsing ElementContent, is either '\'' or
    *   '\"' if parsing AttributeContent depending on the starting quote
    * @param result a buffer to place the resulting Expressions.
    */
-  void parseContent(int delimiter, Vector result)
+  void parseContent(char delimiter, Vector result)
       throws java.io.IOException, SyntaxException
   {
-    StringBuffer sbuf = new StringBuffer();
+    tokenBufferLength = 0;
     for (;;)
       {
 	int next = read();
 	if ((next < 0 || next == '{' || next == delimiter)
-	    && sbuf.length() > 0)
+	    && tokenBufferLength > 0)
 	  {
-	    result.addElement(new QuoteExp(sbuf.toString()));
-	    sbuf.setLength(0);
+	    String str = new String(tokenBuffer, 0, tokenBufferLength);
+	    result.addElement(new QuoteExp(str));
+	    tokenBufferLength = 0;
 	  }
 	if (next < 0)
 	  eofError("unexpected end-of-file");
@@ -1306,7 +1379,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    next = read();
 	    if (next == '{')
-	      sbuf.append('{');
+	      tokenBufferAppend('{');
 	    else
 	      {
 		unread(next);
@@ -1314,80 +1387,42 @@ public class XQParser extends LispReader // should be extends Lexer
 		if (delimiter != '<')
 		  exp = stringValue(exp);
 		result.addElement(exp);
+		tokenBufferLength = 0;
 	      }
 	  }
 	else if (next == '}')
 	  {
 	    next = read();
 	    if (next == '}')
-	      sbuf.append('}');
+	      tokenBufferAppend('}');
 	    else
 	      {
 		error("unexpected '}' in element content");
 		unread(next);
 	      }
 	  }
-	else if (next == '<' && delimiter == '<')
-	  {
-	    next = read();
-	    if (next == '/')
-	      {
-		break;
-	      }
-	    unread(next);
-	    getRawToken();
-	    Expression exp = parseElementConstructor();
-	    if (delimiter != '<')
-	      exp = stringValue(exp);
-	    result.addElement(exp);
-	  }
 	else if (next == delimiter)
-	  break;
-	else if (next == '&')
 	  {
-	    StringBuffer cbuf = new StringBuffer(30);
-	    int base = 0;
-	    next = read();
-	    if (next == '#')
+	    if (delimiter != '<')
 	      {
-		next = read();
-		if (next == 'x')
-		  {
-		    base = 16;
-		    next = read();
-		  }
-		base = 10;
-	      }
-	    while (next >= 0)
-	      {
-		char ch = (char) next;
-		if (! isNamePart(ch))
+		if (checkNext(delimiter))
+		  tokenBufferAppend(delimiter);
+		else
 		  break;
-		cbuf.append(ch);
-		next = read();
 	      }
-	    if (next != ';')
-	      error("invalid entity/character reference");
 	    else
 	      {
-		String ref = cbuf.toString();
-		if (base == 0)
-		  appendNamedEntity(ref, sbuf);
-		else
-		  {
-		    try
-		      {
-			sbuf.append((char) Integer.parseInt(ref, base));
-		      }
-		    catch (NumberFormatException ex)
-		      {
-			error("invalid character references");
-		      }
-		  }
+		if (checkNext('/'))
+		  break;
+		getRawToken();
+		result.addElement(parseElementConstructor());
+		tokenBufferLength = 0;
 	      }
 	  }
+	else if (next == '&')
+	  parseEntityOrCharRef();
 	else
-	  sbuf.append((char) next);
+	  tokenBufferAppend((char) next);
       }
   }
 
@@ -1503,7 +1538,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (ch == '{')
 	  vec.addElement(stringValue(parseEnclosedExpr()));
 	else
-	  parseContent(ch, vec);
+	  parseContent((char) ch, vec);
 	args = new Expression[vec.size() - vecSize];
 	for (int i = args.length;  --i>= 0; )
 	  args[i] = (Expression) vec.elementAt(vecSize + i);

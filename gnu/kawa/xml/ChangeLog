@@ -1,3 +1,8 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* NamespaceEnv.java:  New class extends Environment.
+	* Makefile.am:  Update accordingly.
+
 2001-10-17  Per Bothner  <per@bothner.com>
 
 	New package.  XML-related Procedures and other classes.

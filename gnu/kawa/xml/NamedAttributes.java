@@ -6,6 +6,8 @@ import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.*;
 
+/** Helper procedure to implement PATH/@ATTR and PATH/*. */
+
 public class NamedAttributes extends CpsProcedure
 {
   public static final NamedAttributes namedAttributes = new NamedAttributes();

@@ -1,3 +1,13 @@
+2002-07-22  Per Bothner  <per@bothner.com>
+
+	* ExpWalker.java (messages):  New field.
+	(getFile, getLine, getColumn, setFile, setLine, setColumn,
+	error, notError):  New methods.
+	(walk(Expression)):  New method.
+	(walkExps):  Re-write to set/restore line numbers.
+	* BlockExp.java, CatchClause.java, ExitExp.java, IfExp.java,
+	LambdaExp.java (walkChildren):  Use new ExpWalk walk method.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* CanInline.java (inline):  Take extra ExpWalker parameter.

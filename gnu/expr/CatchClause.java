@@ -36,7 +36,7 @@ public class CatchClause extends ScopeExp
 
   protected void walkChildren(ExpWalker walker)
   {
-    body = body.walk(walker);
+    body = walker.walk(body);
   }
 
   public void print (OutPort ps)

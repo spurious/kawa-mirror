@@ -75,9 +75,9 @@ public class BlockExp extends Expression
 
   protected void walkChildren (ExpWalker walker)
   {
-    body = body.walk(walker);
+    body = walker.walk(body);
     if (walker.exitValue == null && exitBody != null)
-      exitBody = exitBody.walk(walker);
+      exitBody = walker.walk(exitBody);
   }
 
   public void print (OutPort out)

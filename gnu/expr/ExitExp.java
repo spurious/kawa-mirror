@@ -43,7 +43,7 @@ public class ExitExp extends Expression
 
   protected void walkChildren (ExpWalker walker)
   {
-    result = result.walk(walker);
+    result = walker.walk(result);
   }
 
   public void print (OutPort out)

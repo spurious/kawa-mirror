@@ -56,9 +56,9 @@ public class SynchronizedExp extends Expression
 
   protected void walkChildren(ExpWalker walker)
   {
-    object = object.walk(walker);
+    object = walker.walk(object);
     if (walker.exitValue == null)
-      body = body.walk(walker);
+      body = walker.walk(body);
   }
 
   public void print (OutPort ps)

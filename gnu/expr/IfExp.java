@@ -133,9 +133,9 @@ public class IfExp extends Expression
   {
     test = test.walk(walker);
     if (walker.exitValue == null)
-      then_clause = then_clause.walk(walker);
+      then_clause = walker.walk(then_clause);
     if (walker.exitValue == null)
-     else_clause = else_clause.walk(walker);
+     else_clause = walker.walk(else_clause);
   }
 
   public void print (OutPort out)

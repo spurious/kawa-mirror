@@ -1355,7 +1355,7 @@ public class LambdaExp extends ScopeExp
       {
 	walker.walkDefaultArgs(this);
 	if (walker.exitValue == null && body != null)
-	  body = body.walk(walker);
+	  body = walker.walk(body);
       }
     finally
       {
@@ -1373,7 +1373,7 @@ public class LambdaExp extends ScopeExp
 	    Object val = properties[i];
 	    if (val instanceof Expression)
 	      {
-		properties[i] = ((Expression) properties[i]).walk(walker);
+		properties[i] = walker.walk((Expression) properties[i]);
 	      }
 	  }
       }
@@ -1422,6 +1422,13 @@ public class LambdaExp extends ScopeExp
 	if (defaultArg != null)
 	  out.print('(');
 	out.print(decl.getName());
+	Type type = decl.getType();
+	if (type != null && type != Type.pointer_type)
+	  {
+	    out.writeSpaceFill();
+	    out.print(":: ");
+	    out.print(type);
+	  }
 	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
 	  {
 	    out.print(' ');

@@ -82,16 +82,16 @@ public class TryExp extends Expression
 
   protected void walkChildren(ExpWalker walker)
   {
-    try_clause = try_clause.walk(walker);
+    try_clause = walker.walk(try_clause);
     CatchClause catch_clause = catch_clauses;
     while (walker.exitValue == null && catch_clause != null)
       {
-	catch_clause.walk(walker);
+	walker.walk(catch_clause);
 	catch_clause = catch_clause.getNext();
       }
 
     if (walker.exitValue == null && finally_clause != null)
-      finally_clause = finally_clause.walk(walker);
+      finally_clause =walker.walk( finally_clause);
   }
 
   public void print (OutPort ps)

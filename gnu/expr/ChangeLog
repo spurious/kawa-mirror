@@ -1,3 +1,7 @@
+2002-12-16  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (eval(String,PrintConsumer)):  New method overload.
+
 2002-11-23  Per Bothner  <per@bothner.com>
 
 	*  Interpreter.java (define_field):  Move 2 methods from

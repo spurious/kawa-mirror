@@ -535,7 +535,14 @@ public abstract class Interpreter
   {
     eval(string, out instanceof Consumer ? (Consumer) out : new OutPort(out));
   }
-  
+
+  /** Evaluate a string and write the result value(s) to a PrintConsumer.
+   * This is to disambiguate calls using OutPort or XMLPrinter,
+   * which are both Writer and Consumer. */
+  public final void eval (String string, PrintConsumer out) throws Throwable
+  {
+    eval(string, (Consumer) out);
+  }
 
   /** Evaluate a string and write the result value(s) to a Consumer. */
   public final void eval (String string, Consumer out) throws Throwable

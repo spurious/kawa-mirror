@@ -1,3 +1,10 @@
+(define (string? x)
+  (instance? x <string>))
+
+(define (string=? x y)
+  ((primitive-virtual-method <object> "equals" <boolean> (<object>))
+   ((primitive-virtual-method <object> "toString" <String> ()) x)
+   ((primitive-virtual-method <object> "toString" <String> ()) y)))
 
 (define (make-string n #!optional (ch #\Space))
   ((primitive-constructor <string> (<int> <char>))

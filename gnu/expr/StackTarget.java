@@ -14,7 +14,8 @@ public class StackTarget extends Target
 
   public static Target getInstance(Type type)
   {
-    return (type == Type.pointer_type ? Target.pushObject
+    return (type.isVoid() ? Target.Ignore
+	    : type == Type.pointer_type ? Target.pushObject
             : new StackTarget(type));
   }
 

@@ -35,6 +35,7 @@ public class ConsumerTarget extends Target
 	code.emitStore(values);
 	exp.compile(comp, ctarget);
 	code.emitLoad(values);
+	code.emitInvokeVirtual(comp.typeValues.getDeclaredMethod("canonicalize", 0));
 	code.popScope();
 	target.compileFromStack(comp, Compilation.typeValues);
       }

@@ -1,3 +1,10 @@
+2002-07-02  Per Bothner  <per@bothner.com>
+
+	* StackTarget.java (getInstance):  Handle type.isVoid() specially.
+
+	* ConsumerTarget.java (compileUsingConsumer):  Call canonicalize
+	method gnu.mapping.Values.
+
 2002-06-18  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (slotToMethodName):  Do Compilation.mangleNameIfNeeded.

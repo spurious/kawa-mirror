@@ -3,8 +3,6 @@
 
 package gnu.kawa.xml;
 import gnu.mapping.*;
-import gnu.bytecode.*;
-import gnu.expr.*;
 import gnu.lists.*;
 import gnu.xquery.util.StringValue;  // FIXME bad dependency
 

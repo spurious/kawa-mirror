@@ -3,7 +3,6 @@
 
 package gnu.kawa.xml;
 import gnu.lists.*;
-import gnu.xml.*;
 import gnu.mapping.*;
 
 /** A procedure that implements the "response-header" function.

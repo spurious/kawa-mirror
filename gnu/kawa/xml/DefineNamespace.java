@@ -1,9 +1,7 @@
 package gnu.kawa.xml;
 import kawa.lang.*;
-import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
-import gnu.kawa.xml.NamespaceEnv;
 
 public class DefineNamespace extends Syntax
 {

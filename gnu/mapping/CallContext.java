@@ -4,7 +4,6 @@
 package gnu.mapping;
 import gnu.math.*;
 import gnu.lists.*;
-import java.util.Hashtable;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
@@ -15,7 +14,7 @@ public class CallContext implements Runnable
   static ThreadLocal currentContext = new ThreadLocal();
   /* END JAVA2 */
   /* BEGIN JAVA1 */
-  // static Hashtable threadMap = new Hashtable(50);
+  // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
   /* END JAVA1 */
   Thread currentThread;
 

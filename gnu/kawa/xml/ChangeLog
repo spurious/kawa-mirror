@@ -1,3 +1,24 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* AttributeConstructor.java:  Remove unused import statements.
+	* CommentConstructor.java:  Likewise.
+	* DefineNamespace.java:  Likewise.
+	* KAttr.java:  Likewise.
+	* KCDATASection.java:  Likewise.
+	* KCharacterData.java:  Likewise.
+	* KComment.java:  Likewise.
+	* KDocument.java:  Likewise.
+	* KElement.java:  Likewise.
+	* KProcessingInstruction.java:  Likewise.
+	* KText.java:  Likewise.
+	* MakeCDATA.java:  Likewise.
+	* MakeProcInst.java:  Likewise.
+	* MakeResponseHeader.java:  Likewise.
+	* MakeText.java:  Likewise.
+	* MakeUnescapedData.java:  Likewise.
+	* SortedNodes.java:  Likewise.
+	* WriteTo.java:  Likewise.
+
 2004-06-22  Per Bothner  <per@bothner.com>
 
 	* KAttr.java (getObjectValue):  New method.

@@ -1,5 +1,4 @@
 package gnu.mapping;
-import java.io.*;
 
 /**
  * Similar to CharArrayWriter.

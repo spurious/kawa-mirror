@@ -6,7 +6,6 @@ import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import java.io.*;
-import gnu.xml.*;
 import gnu.lists.*;
 
 public class AttributeConstructor extends NodeConstructor

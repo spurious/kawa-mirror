@@ -1,6 +1,5 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
-import gnu.xml.*;
 import gnu.expr.*;
 import gnu.lists.UnescapedData;
 

@@ -2,11 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
-import gnu.bytecode.*;
 import gnu.mapping.*;
-import gnu.expr.*;
-import java.io.*;
-import gnu.xml.*;
 import gnu.lists.*;
 
 public class MakeProcInst extends CpsProcedure // NodeConstructor

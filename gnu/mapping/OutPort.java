@@ -1,6 +1,5 @@
 package gnu.mapping;
 import java.io.*;
-import java.text.*;
 import gnu.text.*;
 import gnu.lists.*;
 

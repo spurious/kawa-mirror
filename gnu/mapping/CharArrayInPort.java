@@ -1,6 +1,5 @@
 package gnu.mapping;
 import gnu.text.NullReader;
-import java.io.*;
 
 /** An Inport for reading from a char array.
   * Essentially the same as an InPort wrapped around a CharArrayReader, but

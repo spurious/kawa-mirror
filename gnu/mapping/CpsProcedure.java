@@ -1,5 +1,4 @@
 package gnu.mapping;
-import gnu.lists.*;
 
 public abstract class CpsProcedure extends MethodProc
 {

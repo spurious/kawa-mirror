@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
-import gnu.mapping.Values;
 import gnu.lists.*;
 import gnu.xml.*;
 

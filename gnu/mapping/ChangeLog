@@ -1,3 +1,12 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* CallContext.java:  Remove unused import statements.
+	* CharArrayInPort.java:  Likewise.
+	* CharArrayOutPort.java:  Likewise.
+	* CpsProcedure.java:  Likewise.
+	* OutPort.java:  Likewise.
+	* Printable.java:  Likewise.
+
 2004-06-12  Per Bothner  <per@bothner.com>
 
 	* InPort.java (readState, getReadState):

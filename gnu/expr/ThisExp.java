@@ -33,8 +33,11 @@ public class ThisExp extends ReferenceExp
 
   public void compile (Compilation comp, Target target)
   {
+    if (target instanceof IgnoreTarget)
+      return;
     CodeAttr code = comp.getCode();
     code.emitPushThis();
+    target.compileFromStack(comp, getType());
   }
 
   protected Expression walk (ExpWalker walker)

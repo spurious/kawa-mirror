@@ -1,3 +1,7 @@
+2001-06-04  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (WITHOUT_GCJ_DEFS, kawa.sh):  Change KAWALIB to jar file.
+
 2001-05-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Many changes to support shared libraries using libtool.

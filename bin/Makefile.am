@@ -9,14 +9,14 @@ READLINE_LIB_PATH =
 kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 WITH_GCJ_DEFS = -DGCJ_COMPILED
-WITHOUT_GCJ_DEFS = -DKAWALIB='"$(datadir)/java"'
+WITHOUT_GCJ_DEFS = -DKAWALIB='"$(datadir)/java/kawa-$(VERSION).jar"'
 DEFS = $(@GCJ_SELECTED@_DEFS)
 INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp
-	echo 'KAWALIB=$${KAWALIB-$(datadir)/java}' >>tmp
+	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
 	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
 	echo 'export CLASSPATH' >>tmp
 	if JAVA=`which $(JAVA)`; then true; else JAVA=$(JAVA); fi; \

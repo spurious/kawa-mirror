@@ -1,3 +1,9 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* LList.java (compareTo):  Move comment, so it doesn't get
+	removed by select-java1.
+	* TreeList.java:  If JAVA5 is selected, implement Appendable.
+
 2004-08-31  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java (getIterator(int)): New overloaded method.

@@ -80,8 +80,7 @@ public class LList extends ExtSequence
 
   /* BEGIN JAVA2 */
   public int compareTo(Object obj)
-  {
-    // Over-ridden in Pair!
+  { // Over-ridden in Pair!
     return obj == Empty ? 0 : -1;
   }
   /* END JAVA2 */

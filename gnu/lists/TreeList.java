@@ -13,7 +13,11 @@ package gnu.lists;
  */
 
 public class TreeList extends AbstractSequence
-implements XConsumer, PositionConsumer, Consumable
+  implements
+  /* BEGIN JAVA5 */
+  // Appendable,
+  /* END JAVA5 */
+  XConsumer, PositionConsumer, Consumable
 {
   // Some public fields and methods are public which probably shouldn't be,
   // for the sake of ParsedXMLToConsumer.  FIXME.  Perhaps an abstract class
@@ -708,6 +712,30 @@ implements XConsumer, PositionConsumer, Consumable
     System.arraycopy(chars, offset, data, i, length);
     gapStart = i + length;
   }
+
+  /* BEGIN JAVA5 */
+  // public Appendable append (char c)
+  // {
+    // writeChar(c);
+    // return this;
+  // }
+
+  // public Appendable append (CharSequence csq)
+  // {
+    // if (csq == null)
+      // csq = "null";
+    // return append(csq, 0, csq.length());
+  // }
+
+  // public Appendable append (CharSequence csq, int start, int end)
+  // {
+    // if (csq == null)
+      // csq = "null";
+    // for (int i = start; i < end;  i++)
+      // append(csq.charAt(i));
+    // return this;
+  // }
+  /* END JAVA5 */
 
   public boolean isEmpty()
   {

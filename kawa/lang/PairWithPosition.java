@@ -49,6 +49,14 @@ public class PairWithPosition extends Pair
     setLine (port.getLineNumber() + 1, port.getColumnNumber() + 1);
   }
 
+  public PairWithPosition (PairWithPosition where,
+                           Object car, Object cdr)
+  {
+    super (car, cdr);
+    filename = where.filename;
+    position = where.position;
+  }
+
   public PairWithPosition (Object car, Object cdr)
   {
     super (car, cdr);

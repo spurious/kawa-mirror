@@ -25,7 +25,8 @@ public abstract class Sequence
     int len = length(); 
     if (len > alen) 
     { 
-      arr = new Object[len]; 
+      Class componentType = arr.getClass().getComponentType();
+      arr = (Object[]) java.lang.reflect.Array.newInstance(componentType, len);
       alen = len; 
     } 
     for (int i = 0;  i < len;  i++) 

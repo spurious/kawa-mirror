@@ -9,14 +9,13 @@ import gnu.expr.*;
 
 public class Quote extends Syntax implements Printable
 {
-  static private Pattern pattern = new ListPat (1);
-
   public Expression rewrite (Object obj, Translator tr)
   {
-    Object [] match = pattern.match (obj);
-    if (match == null)
+    Pair pair;
+    if (! (obj instanceof Pair)
+        || (pair = (Pair) obj).cdr != List.Empty)
       return tr.syntaxError ("quote requires a single argument");
-    return new QuoteExp (match[0]);
+    return new QuoteExp (pair.car);
   }
 
   public void print(java.io.PrintWriter ps)

@@ -15,7 +15,7 @@ import gnu.xml.*;
  * change the position, so if the node is saved in a data structure it
  * must be copied. */
 
-public class NodeType extends ClassType implements TypeValue, NodePredicate, Externalizable
+public class NodeType extends ObjectType implements TypeValue, NodePredicate, Externalizable
 {
   public static final int TEXT_OK = 1;
   public static final int GROUP_OK = 2;

@@ -45,7 +45,7 @@ It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
 @end ifhtml
 @ifclear html
 Per Bothner @w{<bothner@@cygnus.com>}.
-It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
+It is a re-write of Kawa 0.2, which was written by
 R. Alexander Milowski @w{<alex@@copsol.com>}.
 @end ifclear
 
@@ -90,7 +90,7 @@ see @ref{License}.
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
 * Restrictions::         Features of R4RS not implemented
-* Extensions::
+* Extensions::           Kawa features not in standard Scheme
 * Compiling::            Compiling Scheme code to byte-codes
 * Primitive functions::  The Scheme-Java interface
 * Reporting Bugs::
@@ -98,7 +98,7 @@ see @ref{License}.
 @end menu
 
 @node Features, Getting Kawa, Top, Top
-@section Features
+@chapter Features
 
 Kawa is a full Scheme implementation.  It implements almost
 all of R4RS (for exceptions @pxref{Restrictions}), plus some extensions.
@@ -122,40 +122,39 @@ missing are character properties, @code{external-procedure},
 the time-relationed procedures, and character name escapes in
 string literals.  Also, Kawa is not generally tail-recursive.
 From the full expression language, Kawa additionally is missing
-@code{format-number}, @code{format-numer-list}, and language objects.
+@code{format-number}, @code{format-number-list}, and language objects.
 Quantities, keyword values, and the expanded @code{lambda} form
 (with optional and keyword parameters) are supported.
 
 @node Getting Kawa, Installation, Features, Top
-@section Getting Kawa
+@chapter Getting Kawa
 
 The current sources release is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.5.tar.gz">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.5.tar.gz}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz}.
 @end ifclear
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.5-compiled.zip">here</a>.
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-current-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.5-compiled.zip}.
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-current-compiled.zip}.
 @end ifclear
 
-@c A snapshot of the development tree is
-@c @ifhtml
-@c <a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz">here</a>.
-@c @end ifhtml
-@c @ifclear html
-@c @url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.2beta.tar.gz}.
-@c @end ifclear
-@c @end comment
+A snapshot of the development tree is in
+@ifhtml
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz">here</a>.
+@end ifhtml
+@ifclear html
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz}.
+@end ifclear
 
 @node Installation, Running, Getting Kawa, Top
-@section Building and installing Kawa
+@chapter Building and installing Kawa
 
 Before installing Kawa, you must have Java working on your
 system.
@@ -170,7 +169,7 @@ Alternatively, you can install the pre-compiled binary distribution.
 @end menu
 
 @node Running Java, Binary distribution, Installation, Installation
-@subsection Getting and running Java
+@section Getting and running Java
 
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
@@ -211,7 +210,7 @@ export PATH CLASSPATH
 @end example
 
 @node Binary distribution, Source distribution, Running Java, Installation
-@subsection Installing and using the binary distribution
+@section Installing and using the binary distribution
 
 The binary release includes only the binary compiled @samp{.class}
 versions of the same @samp{.java} source files in the source release.
@@ -239,7 +238,7 @@ java kawa.repl
 @end example
 
 @node Source distribution,  , Binary distribution, Installation
-@subsection Installing and using the source distribution
+@section Installing and using the source distribution
 The Kawa release normally comes as a gzip-compressed tar file named
 @samp{kawa-@value{VERSION}.tar.gz}.
 
@@ -306,7 +305,7 @@ export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
 This is done automatically if you use the @samp{kawa} script.
 
 @node Running, Restrictions, Installation, Top
-@section How to start up and run Kawa
+@chapter How to start up and run Kawa
 
 The easiest way to start up Kawa is to run the @samp{kawa}
 script.  This finds your java interpreter, and sets up @samp{CLASSPATH}
@@ -332,13 +331,20 @@ Then you do:
 java kawa.repl
 @end example
 
-In either case, you will then get the @samp{kawa>} prompt, which means you are
+In either case, you will then get the @samp{#|kawa:1|#} prompt,
+which means you are
 in the Kawa read-eval-print-loop.  If you type a Scheme
 expression, Kawa will evaluate it.  Kawa will then print the
 result (if there is a non-"void" result).
 
-To exit Kawa, type the end-of-file character (normally ctrl/D),
-or call the @code{exit} procedure (with 0 or 1 integer arguments).
+@menu
+* Options::      Command-line arguments
+* New-Window::   Running a Command Interpreter in a new Window
+* Exiting::      Exiting Kawa
+@end menu
+
+@node Options, New-Window, , Running
+@section Command-line arguments
 
 You can pass various flags to Kawa, for example:
 @example
@@ -374,6 +380,15 @@ If @var{filename} is @samp{-}, standard input is read (with no prompting).
 @itemx --
 The global variable @samp{command-line-arguments} is set to the remaining
 arguments (if any), and an interactive read-eval-print loop is started.
+This uses the same "console" as whwre you started up Kawa;
+use @samp{-w} to get a new window.
+@item -w
+Creates a new top-level window, and runs an interactive read-eval-print
+in the new window.  See @ref{New-Window}.
+Same as @code{-e (scheme-window #t)}.
+You can specify multiple @samp{-w} options, but if you mix @samp{-w}
+with @samp{s}, the new windows will not repaint until
+the read-eval-print-loop in the original "console" is done.
 @end table
 
 The options @samp{-C}, @samp{-d}, @samp{-T} and @samp{-P}
@@ -386,15 +401,8 @@ then Kawa enters an interactive read-eval-print loop,
 but only if none of the @samp{-c}, @samp{-e}, @samp{-f}, @samp{-s},
 @samp{-C}, or @samp{--} options were specified.
 
-@defvar command-line-arguments
-The remaining arguments (following any switches processed by Kawa itself)
-are assigned to the global variable @samp{command-line-arguments},
-which is a vector of strings.
-@end defvar
-
-@defvar home-directory
-A string containing the home directory of the user.
-@end defvar
+@node New-Window, Exiting, Options,Running
+@section Running a Command Interpreter in a new Window
 
 An alternative interface runs the Java read-eval-print-loop
 inside a new window. This is in some ways nicer.  One reason
@@ -402,12 +410,24 @@ is that it provides better editing.  You can also create
 new windows.  They can either have different top-level
 environments or they can share environments.  To try it, do:
 @example
-java kawa.GuiConsole
+java kawa.repl -w
 @end example
-Note that @code{GuiConsole} currently ignores all command-line options.
+
+@node Exiting, , New-Window, Running
+@section Exiting Kawa
+Kawa normally keeps running as long as there is an active
+read-eval-print loop still awaiting input or there is an unfinished
+other computation (such as requested by a @samp{-e} of @samp{-f} option).
+
+To close a read-eval-print-loop, you type an end-of-file character
+(normally ctrl/D until Unix).  (If the read-eval-print-loop
+is in a new window, you can select @samp{Close} from the @samp{File} menu.)
+
+To exit the entire Kawa session, call the
+@code{exit} procedure (with 0 or 1 integer arguments).
 
 @node Restrictions, Extensions, Running, Top
-@section Features of R4RS not implemented
+@chapter Features of R4RS not implemented
 
 Kawa implements all the required and optional features of R4RS,
 with the following exceptions.
@@ -436,7 +456,7 @@ making it not properly hygienic.  Neither @code{let-syntax}
 nor @code{letrec-syntax} are implemented.
 
 @node Extensions, Compiling, Restrictions, Top
-@section Extensions
+@chapter Extensions
 
 @menu
 * Multiple values::
@@ -456,7 +476,7 @@ nor @code{letrec-syntax} are implemented.
 @end menu
 
 @node Multiple values, Special named constants, Extensions, Extensions
-@subsection Multiple values
+@section Multiple values
 
 The multiple-value feature will be in R5RS.
 
@@ -471,7 +491,7 @@ with those values as arguments.
 @end defun
 
 @node Special named constants, Keywords, Multiple values, Extensions
-@subsection Special named constants
+@section Special named constants
 
 @defvr Constant #!optional
 Special self-evaluating literal used in lambda parameter lists
@@ -504,7 +524,7 @@ but is useful when interfacing to low-level Java code.
 @end defvr
 
 @node Keywords, Optional and keyword lambda parameters, Special named constants, Extensions
-@subsection Keywords
+@section Keywords
 
 Keywords are similar to symbols.  The main difference is that keywords are
 self-evaluating and therefore do not need to be quoted in expressions.
@@ -533,7 +553,7 @@ Returns the keyword whose name is @var{string}.
 @end defun
 
 @node Optional and keyword lambda parameters, Logical Number Operations, Keywords, Extensions
-@subsection Optional and keyword lambda parameters
+@section Optional and keyword lambda parameters
 
 Kawa borrows the extended formal argument list of DSSSL:
 
@@ -597,7 +617,7 @@ environment in which all the previous formal parameters have been bound.
 @end itemize
 
 @node Logical Number Operations, Records, Optional and keyword lambda parameters, Extensions
-@subsection Logical Number Operations
+@section Logical Number Operations
 
 These functions operate on the 2's complement binary representation
 of an exact integer.
@@ -666,7 +686,7 @@ Same as @code{(arithmetic-shift (bitand n (bitnot (arithmetic-shift -1 end))) (-
 @end defun
 
 @node Records, Files, Logical Number Operations, Extensions
-@subsection Records
+@section Records
 
 The Record package provides a facility for user to define their own
 record data types.  A record type is implemented as Java Class
@@ -792,7 +812,7 @@ created the type represented by @var{rtd}.@refill
 @end defun
 
 @node Files, Ports, Records, Extensions
-@subsection File System Interface
+@section File System Interface
 
 @defun file-exists? filename
 Returns true iff the file named @var{filename} actually exists.
@@ -836,7 +856,7 @@ with scsh.)
 @end defun
 
 @node Ports, Exceptions, Files, Extensions
-@subsection Ports
+@section Ports
 
 @defun call-with-input-string string proc
 Create an input port that gets its data from @var{string},
@@ -872,7 +892,7 @@ and returning a string.
 
 @defun default-prompter port
 The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
-@var{L} is the number of the current line of @var{port}.
+@var{L} is the current line number of @var{port}.
 When reading a continuation line, the result
 is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
 by @code{(input-port-read-state @var{port})}.
@@ -906,20 +926,20 @@ correct except when reading a new-line.
 
 @defvar symbol-read-case
 A symbol that controls how @code{read} handles letters when reading a symbol.
-(Letter following a @samp{\} are unchanged in all cases.)
 If the first letter is @samp{U}, then letters in symbols are upper-cased.
 If the first letter is @samp{D} or @samp{L}, then letters
 in symbols are down-cased.
 If the first letter is @samp{I}, then the case of letters in symbols
 is inverted.
 Otherwise (the default), the letter is not changed.
+(Letters following a @samp{\} are always unchanged.)
 @end defvar
 
 @defvar port-char-encoding
 Controls how bytes in external files are converted to/from internal
 Unicode characters.  Can be either a symbol or a boolean.
 If @code{port-char-encoding} is @code{#f}, the file is assumed
-to be a binary files and no conversion is done.
+to be a binary file and no conversion is done.
 Otherwise, the file is a text file.  The default is @code{#t}, which
 uses a locale-dependent conversion.  If @code{port-char-encoding}
 is a symbol, it must be the name of a character encoding known to Java.
@@ -930,7 +950,7 @@ are converted into plain @code{#\Newline}.
 @end defvar
 
 @node Exceptions, Eval and Environments, Ports, Extensions
-@subsection Signalling and recovering from exceptions
+@section Signalling and recovering from exceptions
 
 @defun catch key thunk handler
 Invoke @var{thunk} in the dynamic context of @var{handler} for
@@ -986,7 +1006,7 @@ Even if @var{body} returns abnormally (by throwing an exception),
 
 @deffn Syntax try-catch body handler ...
 Evaluate @var{body}, in the conect of the given @var{handler-spec}s.
-Eavh @var{handler} has the form:
+Each @var{handler} has the form:
 @example
 @var{var} @var{type} @var{exp} ...
 @end example
@@ -1021,7 +1041,7 @@ This function will be in R5RS.
 @end defun
 
 @node Eval and Environments, Quantities, Exceptions, Extensions
-@subsection Eval and Environments
+@section Eval and Environments
 
 @defun eval expression [environment]
 @code{eval} evaluates @var{expression} in the environment indicated
@@ -1072,7 +1092,7 @@ descendent threads.
 @end deffn
 
 @node Quantities, Threads, Eval and Environments, Extensions
-@subsection Quantities
+@section Quantities
 
 As a super-class of numbers, Kawa also provides quantities.
 A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
@@ -1116,7 +1136,7 @@ equal to the quantity @var{expression}.
 @end deffn
 
 @node Threads, Standard Types, Quantities, Extensions
-@subsection Threads
+@section Threads
 
 There is a very preliminary interface to create parallel threads.
 The interface is similar to the standard @code{delay}/@code{force},
@@ -1145,7 +1165,7 @@ or a quantity whose unit is a time unit (such as @code{10s}).
 @end defun
 
 @node Standard Types, Miscellaneous, Threads, Extensions
-@subsection Standard Types
+@section Standard Types
 
 Kawa has first-class types, that you can use in various ways.
 Currently, these are mainly useful for interfacing with primitive Java methods
@@ -1179,7 +1199,7 @@ The type of Scheme lists (pure and impure, including the empty list).
 @end defvar
 
 @defvar <pair>
-The type of Scheme pairs.  This is a sub-type of @var{list}.
+The type of Scheme pairs.  This is a sub-type of @code{<list>}.
 @end defvar
 
 @defvar <string>
@@ -1198,8 +1218,12 @@ The type of Scheme procedures.
 
 More will be added later.
 
+In addition, any Java type can be named using this syntax.
+For example @code{<java.lang.StringBuffer[]>} represents
+an array of references to @code{java.lang.StringBuffer} objects.
+
 @node Miscellaneous,  , Standard Types, Extensions
-@subsection Miscellaneous
+@section Miscellaneous
 
 @defun scheme-implementation-version
 Returns the Kawa version number as a string.
@@ -1225,11 +1249,33 @@ the macro in the same compilation as the definition.
 This restriction does not apply to macros defined by @code{define-syntax}.
 @end deffn
 
+@defvar command-line-arguments
+Any command-line arguments (following flags processed by Kawa itself)
+are assigned to the global variable @samp{command-line-arguments},
+which is a vector of strings.
+@end defvar
+
+@defvar home-directory
+A string containing the home directory of the user.
+@end defvar
+
 @defun exit [code]
 Exits the Kawa interpreter, and ends the Java session.
 The integer value @var{code} is returned to the operating
 system.  If @var{code} is not specified, zero is returned,
 indicating normal (non-error) termination.
+@end defun
+
+@defun scheme-window [shared]
+Create a read-eval-print-loop in a new top-level window.
+If @var{shared} is true, it uses the same environment as the
+current @code{(interaction-environment)};  if not (the default),
+a new top-level environment is created.
+
+You can create multiple top-level window that can co-exist.
+These run in separate threads.  However, because of some unknown
+thread dependency, these windows will not work if you started an
+non-window command-loop.
 @end defun
 
 @defun apply proc [arg1 ...] args
@@ -1257,7 +1303,7 @@ appended together.   Each @var{arg} may be a vector or a list.
 @end defun
 
 @node Compiling, Primitive functions, Extensions, Top
-@section Compiling Scheme code to byte-codes
+@chapter Compiling Scheme code to byte-codes
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
@@ -1298,7 +1344,7 @@ in the @code{CLASSPATH}.
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
-@subsection Compiling Scheme to an archive file
+@section Compiling Scheme to an archive file
 
 To byte-compile a file @samp{foo.scm} do:
 @example
@@ -1317,7 +1363,7 @@ This will load @samp{foo.zip}, which should have the same effect as
 loading @samp{foo.scm}, except you will get the byte-compiled versions.
 
 @node Files compilation,  , Archive compilation, Compiling
-@subsection Compiling Scheme to a set of .class files
+@section Compiling Scheme to a set of .class files
 
 Invoking @samp{kawa} (or @samp{java kawa.repl}) with
 the @samp{-C} flag will compile
@@ -1374,9 +1420,9 @@ kawa -f macs.scm -C foosrc.scm
 @end example
 
 @node Primitive functions, Reporting Bugs, Compiling, Top
-@section The Scheme-Java interface
+@chapter The Scheme-Java interface
 
-@subsection Scheme types in Java
+@section Scheme types in Java
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 
@@ -1416,7 +1462,7 @@ The @samp{Procedure2} class provides implementations of all
 the @samp{apply*} methods @emph{except} @samp{apply2},
 which must be provided by any class that extends @code{Procedure2}.
 
-@subsection Calling Java methods from Scheme
+@section Calling Java methods from Scheme
 
 Kawa provides a simple yet powerful "Foreign Function Interface",
 which allows you to call any (virtual or static) Java method
@@ -1475,7 +1521,7 @@ Some examples using these primitives are @samp{vectors.scm}
 and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
-@subsection Loading a ModuleBody
+@section Loading a ModuleBody
 
 The "top" class created by @code{kawa -C} (@pxref{Files compilation})
 extends the @code{ModuleBody} class.  It is actually fairly
@@ -1527,7 +1573,7 @@ This will cause the actions in @code{MyDevice.run} to be executed.
 The current environment is passed in as the parameter @code{env}.
 One of those actions is to define the procedure @code{handle-my-device}.
 
-@subsection Evaluating Scheme expressions from Java
+@section Evaluating Scheme expressions from Java
 
 The following methods are recommended if you need to evaluate a
 Scheme expression from a Java method.
@@ -1556,7 +1602,7 @@ For the @code{Environment} in most cases you could use
 @samp{Environment.current()}.
 
 @node Reporting Bugs, License, Primitive functions, Top
-@section Reporting Bugs
+@chapter Reporting Bugs
 
 If you have a problem installing or using Kawa,
 send mail to @code{kawa@@cygnus.com}
@@ -1566,7 +1612,7 @@ changes to Kawa, and announcing snapshots.  If you wish to subscribe
 (or later unsubscribe), send a request to @code{kawa-request@@cygnus.com}.
 
 @node License,  , Reporting Bugs, Top
-@section License
+@chapter License
 
 This is the license for the Kawa software:
 

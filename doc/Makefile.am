@@ -7,9 +7,12 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
              -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
 
-kawa.html:  $(srcdir)/kawa.texi version.texi
-	texi2html -menu $<
+kawa_toc.html:  $(srcdir)/kawa.texi version.texi
+	texi2html -menu -split_chapter $<
 
-EXTRA_DIST = kawa.txt kawa.html scm2java.html license.terms \
-  kawa-tour.tex kawa-tour.ps Compliance.html
+kawa.html: kawa_toc.html
+
+EXTRA_DIST = kawa.txt kawa_toc.html kawa_[1-9*.html scm2java.html \
+  license.terms kawa-tour.tex kawa-tour.ps Compliance.html
 info_TEXINFOS = kawa.texi
+CLEANFILES = kawa.txt *.info kawa_toc.html kawa_[1-9]*.html

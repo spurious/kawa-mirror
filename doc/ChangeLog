@@ -1,3 +1,14 @@
+Fri Feb  6 17:39:12 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Fix various minor mistakes.
+  	Fix URLs to name kawa-current instead of kawa-1.5,
+	and kawa-1.2beta (in comments) to kawa-newest.
+	(Running):  Split into multiple sections.
+	Document new -w flag, and creating a new window.
+	Document new scheme-window procedure.
+	Change every @section to @chapter, and @subsection to @section.
+	* Makefile.am (kawa.html):  Invoke texi2html with -split_chapter.
+
 Tue Jan 27 12:03:59 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Document catch, thow, primitive-throw, try-catch,

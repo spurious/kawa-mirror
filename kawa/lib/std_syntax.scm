@@ -115,13 +115,14 @@
   (syntax-rules ()
 		((do ((name init . step) ...)
 		     (test . result) commands ...)
-		 (letrec ((loop
+		 ;; The identifier %do%loop is optimized specially ...
+		 (letrec ((%do%loop
 			   (lambda (name ...)
 			     (if test
 				 (begin #!void . result)
 				 (begin commands ...
-					(loop (%do-step name . step) ...))))))
-		   (loop init ...)))))
+					(%do%loop (%do-step name . step) ...))))))
+		   (%do%loop init ...)))))
 
 ;;; DELAY
 

@@ -178,11 +178,24 @@ TAGS:
 subdir = kawa/lang
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 distdir: $(DEP_DISTFILES)
-	@for file in `cd $(srcdir) && echo $(DISTFILES)`; do \
+	if test "$(srcdir)" = "." && ln -s . linkdir ; then true; \
+	else \
+	  mkdir linkdir; \
+	  for dir in $(srcdir) . ; do \
+	    for file in `cd $$dir && echo *` ; do \
+	      test -f linkdir/$$file \
+	      || test -d $$dir/$$file \
+	      || ln $$dir/$$file linkdir/$$file 2> /dev/null \
+	      || cp -p $$dir/$$file linkdir/$$file; \
+	    done; \
+	  done; \
+	fi
+	for file in `cd linkdir && echo $(DISTFILES)`; do \
 	  test -f $(distdir)/$$file \
-	  || ln $(srcdir)/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p $(srcdir)/$$file $(distdir)/$$file; \
+	  || ln linkdir/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p linkdir/$$file $(distdir)/$$file; \
 	done
+	rm -rf linkdir
 info:
 
 dvi:

@@ -1,3 +1,8 @@
+Tue Dec 15 10:31:38 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/object.java:  Support field declarations,
+	and put field declarations in scope of methods.
+	
 Tue Nov 24 23:05:36 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* configure.in:  Set version to 1.6.56.

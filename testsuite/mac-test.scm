@@ -1,4 +1,4 @@
-(test-init "macros" 50)
+(test-init "macros" 61)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -224,3 +224,74 @@
 		 (let ((a 2))
 		   (foo a))))))
 
+;; A posting by Taylor Campell to comp.lang.scheme 2004/10/9:
+(test #(1 2 unquote (list 3 4)) 'unquote-vector `#(1 2 unquote (list 3 4)))
+
+;; Example in Dybvig's "The Scheme Programming Language" 3rd ed chapter 8:
+(test #t 'dybvig-SchemePL3-8Syntax-ex1
+      (let ()
+	(define even? (lambda (x) (or (= x 0) (odd? (- x 1)))))
+	(define-syntax odd? (syntax-rules () ((_ x) (not (even? x)))))
+	(even? 10)))
+;; Example in Dybvig's "The Scheme Programming Language" 3rd ed chapter 8:
+(test 0 'dybvig-SchemePL3-8Syntax-ex2
+      (let ()
+	(define-syntax bind-to-zero
+	  (syntax-rules () ((_ id) (define id 0))))
+	(bind-to-zero x)
+	x))
+
+(test '(1 2) 'dybvig-SchemePL3-8Syntax-ex3
+      (let ((f (lambda (x) (+ x 1))))
+	(let-syntax ((f (syntax-rules () ((_ x) x)))
+		     (g (syntax-rules () ((_ x) (f x)))))
+	  (list (f 1) (g 1)))))
+
+(test '(1 1) 'dybvig-SchemePL3-8Syntax-ex4
+      (let ((f (lambda (x) (+ x 1))))
+	(letrec-syntax ((f (syntax-rules () ((_ x) x)))
+			(g (syntax-rules () ((_ x) (f x)))))
+	  (list (f 1) (g 1)))))
+
+;; Savannah bug report #10561 from Chris Dean
+(define-syntax log-mode
+  (syntax-rules ()
+    ((log-mode mode)
+     (case 'mode
+       ((error) "error mode")
+       ((warning) "warning mode")
+       (else "bad mode")))))
+(test "warning mode" 'log-mode (log-mode warning))
+
+;; Savannah bug report #9483
+(define-syntax macro-chain
+  (syntax-rules ()
+    ((macro-chain . z)
+     (letrec-syntax
+	 ((m1 (syntax-rules () ((m1 x) (id (m2 x)))))
+	  (m2 (syntax-rules () ((m2 x) (id (m3 x)))))
+	  (m3 (syntax-rules () ((m3 x) (quote x))))
+	  (id (syntax-rules () ((id x) x))))
+       (m1 z)))))
+(test '(1) 'macro-chain (macro-chain 1))
+
+;; From FLT MzScheme Manual section 12.3.5 Macro-Gnerated Top-Level
+(define-syntax def-and-use-of-x
+  (syntax-rules ()
+    ((def-and-use-of-x val)
+     ; x below originates from this macro:
+     (begin (define x val) x))))
+(define x 1)
+(test 2 'mzscheme-lang-12.3.5-1 (def-and-use-of-x 2))
+(test 1 'mzscheme-lang-12.3.5-2 x)
+
+;; From FLT MzScheme Manual section 12.3.5 Macro-Gnerated Top-Level
+(define-syntax def-and-use
+  (syntax-rules ()
+    ((def-and-use x val)
+     ; x below was provided by the macro use:
+     (begin (define x val) x))))
+(set! x 2)
+(test 3 'mzscheme-lang-12.3.5-3 (def-and-use x 3))
+(set! fail-expected "mzscheme-lang-12.3.5-4 is 2 but should be 3")
+(test 3 'mzscheme-lang-12.3.5-4 x)

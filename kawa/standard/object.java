@@ -11,8 +11,7 @@ public class object extends Syntax
   Lambda lambda;
   static final Keyword typeKeyword = Keyword.make("type");
   static final Keyword allocationKeyword = Keyword.make("allocation");
-  static final Keyword instanceKeyword = Keyword.make("instance");
-  static final Keyword classKeyword = Keyword.make("class");
+  static final Keyword initKeyword = Keyword.make("init");
   static final Keyword initformKeyword = Keyword.make("initform");
   static final Keyword init_formKeyword = Keyword.make("init-form");
   static final Keyword init_valueKeyword = Keyword.make("init-value");
@@ -62,7 +61,8 @@ public class object extends Syntax
     LambdaExp last_method = null;
     // First pass (get Declarations).
     // Should be done at scan time.  FIXME.
-    Vector inits = null;
+    Vector inits = new Vector(20);
+    Vector clinits = new Vector(20);
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	if (! (obj instanceof Pair)
@@ -70,16 +70,29 @@ public class object extends Syntax
 	  return tr.syntaxError("object member not a list");
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
-	if (pair.car instanceof String || pair.car instanceof Symbol)
+	if (pair.car instanceof String || pair.car instanceof Symbol
+	    || pair.car instanceof Keyword)
 	  { // Field declaration.
 	    Pair typePair = null;
 	    Object sname = pair.car;
-	    Declaration decl = oexp.addDeclaration(sname);
-	    decl.setSimple(false);
-	    decl.setFlag(Declaration.FIELD_OR_METHOD);
+	    Object args;
+	    Declaration decl;
+	    int allocationFlag = 0;
+	    if (sname instanceof Keyword)
+	      {
+		decl = null;
+		args = pair;
+	      }
+	    else
+	      {
+		decl = oexp.addDeclaration(sname);
+		decl.setSimple(false);
+		decl.setFlag(Declaration.FIELD_OR_METHOD);
+		args = pair.cdr;
+	      }
 	    int nKeywords = 0;
-	    Object args = pair.cdr;
 	    Object init = null;
+	    Expression initExp = null;
 	    while (args instanceof Pair)
 	      {
 		pair = (Pair) args;
@@ -97,18 +110,27 @@ public class object extends Syntax
 		      typePair = pair;
 		    else if (key == allocationKeyword)
 		      {
-			if (value == classKeyword)
-			  decl.setFlag(Declaration.STATIC_SPECIFIED);
-			else if (value == instanceKeyword)
-			  decl.setFlag(Declaration.NONSTATIC_SPECIFIED);
+			if (allocationFlag != 0)
+			  tr.error('e', "duplicate allocation: specification");
+			if (matches(value, "class", tr)
+			    || matches(value, "static", tr))
+			  allocationFlag = Declaration.STATIC_SPECIFIED;
+			else if (matches(value, "instance", tr))
+			  allocationFlag = Declaration.NONSTATIC_SPECIFIED;
 			else
 			  tr.error('e', "unknown allocation kind '"+value+"'");
 		      }
-		    else if (key == initformKeyword
+		    else if (key == initKeyword
+			     || key == initformKeyword
 			     || key == init_formKeyword
 			     || key == init_valueKeyword)
 		      {
 			init = value;
+			// In the case of 'init-form: EXPR' the scope of EXPR
+			// doesn't include this class;
+			// in the case of 'init: EXPR' it does.
+			if (key != initKeyword)
+			  initExp = tr.rewrite(init);
 		      }
 		    else if (key == init_keywordKeyword)
 		      {
@@ -148,14 +170,26 @@ public class object extends Syntax
 				    + sname + '\''+" args:"+(args==null?"null":args.getClass().getName()));
 	    if (init != null)
 	      {
-		if (inits == null)
-		  inits = new Vector (20);
-		inits.addElement(decl);
+		boolean isStatic
+		  = allocationFlag == Declaration.STATIC_SPECIFIED;
+		inits.addElement(decl != null ? (Object) decl
+				 : isStatic ? Boolean.TRUE : Boolean.FALSE);
+		inits.addElement(initExp);
 	      }
-	    if (typePair != null)
-	      decl.setType(tr.exp2Type(typePair));
-	    decl.setCanRead(true);
-	    decl.setCanWrite(true);
+	    if (decl == null)
+	      {
+		if (init == null)
+		  return tr.syntaxError("missing field name");
+	      }
+	    else
+	      {
+		if (typePair != null)
+		  decl.setType(tr.exp2Type(typePair));
+		if (allocationFlag != 0)
+		  decl.setFlag(allocationFlag);
+		decl.setCanRead(true);
+		decl.setCanWrite(true);
+	      }
 	  }
 	else if (pair.car instanceof Pair)
 	  { // Method declaration.
@@ -186,7 +220,8 @@ public class object extends Syntax
 
     // Second pass (rewrite method/initializer bodies).
     LambdaExp meth = method_list;
-    int init_index = 0;
+    int init_index = 0;  // Input index in inits Vector.
+    int finit_index = 0;   // Output index in inits vector.
     for (Object obj = components;  obj != LList.Empty;  )
       {
 	pair = (Pair) obj;
@@ -195,11 +230,12 @@ public class object extends Syntax
 	  {
 	    obj = pair.cdr; // Next member.
 	    pair = (Pair) pair.car;
-	    if (pair.car instanceof String || pair.car instanceof Symbol)
+	    if (pair.car instanceof String || pair.car instanceof Symbol
+		|| pair.car instanceof Keyword)
 	      { // Field declaration.
 		Object type = null;
 		int nKeywords = 0;
-		Object args = pair.cdr;
+		Object args = pair.car instanceof Keyword ? pair : pair.cdr;
 		Object init = null;
 		while (args instanceof Pair)
 		  {
@@ -215,7 +251,8 @@ public class object extends Syntax
 			args = pair.cdr;
 			if (key == "::" || key == typeKeyword)
 			  type = value;
-			else if (key == initformKeyword
+			else if (key == initKeyword
+				 || key == initformKeyword
 				 || key == init_formKeyword
 				 || key == init_valueKeyword)
 			  {
@@ -248,12 +285,29 @@ public class object extends Syntax
 		  }
 		if (init != null)
 		  {
-		    Declaration decl = (Declaration) inits.elementAt(init_index);
-		    Expression initValue = tr.rewrite(init);
-		    SetExp sexp = new SetExp (decl.getName(), initValue);
-		    sexp.binding = decl;
-		    decl.noteValue(null);
-		    inits.setElementAt(sexp, init_index++);
+		    boolean isStatic;
+		    Object d = inits.elementAt(init_index++);
+		    Expression initValue
+		      = (Expression) inits.elementAt(init_index++);
+		    if (initValue == null)
+		      initValue = tr.rewrite(init);
+		    if (d instanceof Declaration)
+		      {
+			Declaration decl = (Declaration) d;
+			isStatic = decl.getFlag(Declaration.STATIC_SPECIFIED);
+			SetExp sexp = new SetExp (decl.getName(), initValue);
+			sexp.binding = decl;
+			decl.noteValue(null);
+			initValue = sexp;
+		      }
+		    else
+		      {
+			isStatic = d == Boolean.TRUE;
+		      }
+		    if (isStatic)
+		      clinits.addElement(initValue);
+		    else
+		      inits.setElementAt(initValue, finit_index++);
 		  }
 	      }
 	    else if (pair.car instanceof Pair)
@@ -272,23 +326,60 @@ public class object extends Syntax
 	  }
 	
       }
-    if (inits != null)
-      {
-	int len = inits.size();
-	Expression[] assignments = new Expression[len+1];
-	inits.copyInto((Object[]) assignments);
-	assignments[len] = QuoteExp.voidExp;
-	BeginExp bexp = new BeginExp(assignments);
-	LambdaExp initMethod = new LambdaExp(bexp);
-	tr.push(initMethod);
-	initMethod.setName("$finit$");
-	initMethod.setClassMethod(true);
-	oexp.initMethod = initMethod;
-	initMethod.nextSibling = oexp.firstChild;
-	oexp.firstChild = initMethod;
-	tr.pop(initMethod);
-      }
+    inits.setSize(finit_index);
+    makeInitMethod(inits, false, oexp, tr);
+    makeInitMethod(clinits, true, oexp, tr);
     tr.pop(oexp);
     return oexp;
+  }
+
+  private static void makeInitMethod (Vector inits, boolean isStatic,
+				      ClassExp oexp, Translator tr)
+  {
+    int len = inits.size();
+    if (len == 0)
+      return;
+    Expression[] assignments = new Expression[len+1];
+    inits.copyInto((Object[]) assignments);
+    assignments[len] = QuoteExp.voidExp;
+    BeginExp bexp = new BeginExp(assignments);
+    LambdaExp initMethod = new LambdaExp(bexp);
+    initMethod.setClassMethod(true);
+    tr.push(initMethod);
+    if (isStatic)
+      {
+	initMethod.setName("$clinit$");
+	oexp.clinitMethod = initMethod;
+      }
+    else
+      {
+	initMethod.setName("$finit$");
+	oexp.initMethod = initMethod;
+      }
+    initMethod.nextSibling = oexp.firstChild;
+    oexp.firstChild = initMethod;
+    tr.pop(initMethod);
+  }
+
+  /** True if <code>exp</code> matches <code>tag:</code>, <code>"tag"</code>,
+   * or <code>'tag</code>.  The latter is recommended as a matter of style.
+   */
+  static boolean matches (Object exp, String tag, Translator tr)
+  {
+    String value;
+    Pair pair;
+    if (exp instanceof Keyword)
+      value = ((Keyword) exp).getName();
+    else if (exp instanceof FString)
+      value = ((FString) exp).toString();
+    else if (exp instanceof Pair
+	     && tr.matches((pair = (Pair) exp).car, Scheme.quote_sym)
+	     && pair.cdr instanceof Pair
+	     && (pair = (Pair) pair.cdr).cdr == LList.Empty
+	     && pair.car instanceof String)
+      value = (String) pair.car;
+    else
+      return false;
+    return tag == null || tag.equals(value);
   }
 }

@@ -17,6 +17,26 @@ public abstract class KNode extends SeqPosition
     super(seq, ipos);
   }
 
+  /** Convert value to a KNode, returning null if it isn't a node. */
+  public static KNode coerce (Object value)
+  {
+    if (value instanceof KNode)
+      return (KNode) value;
+    if (value instanceof NodeTree)
+      {
+	NodeTree ntree = (NodeTree) value;
+	return make(ntree, ntree.startPos());
+      }
+    if (value instanceof SeqPosition
+	&& ! (value instanceof TreePosition))
+      {
+	SeqPosition seqp = (SeqPosition) value;
+	if (seqp.sequence instanceof NodeTree)
+	  return make((NodeTree) seqp.sequence, seqp.ipos);
+      }
+    return null;
+  }
+
   public static KNode make(NodeTree seq, int ipos)
   {
     int kind = seq.getNextKind(ipos);
@@ -78,9 +98,14 @@ public abstract class KNode extends SeqPosition
   public String getNodeValue()
   {
     StringBuffer sbuf = new StringBuffer();
+    getNodeValue(sbuf);
+    return sbuf.toString();
+  }
+
+  public void getNodeValue (StringBuffer sbuf)
+  {
     NodeTree tlist = (NodeTree) sequence;
     tlist.stringValue(tlist.posToDataIndex(ipos), sbuf);
-    return sbuf.toString();
   }
 
   public Node getParentNode()
@@ -217,6 +242,26 @@ public abstract class KNode extends SeqPosition
 			   "appendChild not supported");
   }
 
+  /** Not implemented. */
+   public void setTextContent (String textContent)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "setTextContent not supported");
+  }
+
+  public String getTextContent ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    getTextContent(sbuf);
+    return sbuf.toString();
+  }
+
+  protected void getTextContent (StringBuffer sbuf)
+  {
+    // What is the difference between getTextContent and getNodeValue?  FIXME.
+    getNodeValue(sbuf);
+  }
 
   /** Only implemented if deep is true. */
   public Node cloneNode(boolean deep)
@@ -250,6 +295,54 @@ public abstract class KNode extends SeqPosition
     throw new UnsupportedOperationException("getAttributes not implemented yet");
   }
 
+  public String getBaseURI ()
+  {
+    Object uri = sequence.baseUriOfPos(ipos);
+    return uri == null ? null : uri.toString();
+  }
+
+  public boolean isDefaultNamespace (String namespaceURI)
+  {
+    return ((NodeTree) sequence).posIsDefaultNamespace(ipos, namespaceURI);
+  }
+
+  public String lookupNamespaceURI (String prefix)
+  {
+    return ((NodeTree) sequence).posLookupNamespaceURI(ipos, prefix);
+  }
+
+  public String lookupPrefix (String namespaceURI)
+  {
+    return ((NodeTree) sequence).posLookupPrefix(ipos, namespaceURI);
+  }
+
+  public short compareDocumentPosition (Node other)
+    throws DOMException
+  {
+    if (! (other instanceof KNode))
+      throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+			     "other Node is a "+other.getClass().getName());
+    KNode n = (KNode) other;
+    AbstractSequence nseq = n.sequence;
+    return (short) (sequence == nseq ? nseq.compare(ipos, n.ipos)
+		    : (int) sequence.stableCompare(nseq));
+  }
+    
+  public boolean isSameNode (Node node)
+  {
+    if (! (node instanceof KNode))
+      return false;
+    KNode n = (KNode) node;
+    if (sequence != n.sequence)
+      return false;
+    return sequence.equals(ipos, n.ipos);
+  }
+
+  public boolean isEqualNode (Node node)
+  {
+    throw new UnsupportedOperationException("getAttributesisEqualNode not implemented yet");
+  }
+
   public String toString ()
   {
     CharArrayOutPort wr = new CharArrayOutPort();
@@ -257,4 +350,21 @@ public abstract class KNode extends SeqPosition
     ((NodeTree) sequence).consumeNext(ipos, xp);
     return wr.toString();
   }
+
+  public Object getFeature (String feature, String version)
+  {
+    return null;
+  }
+
+  /* BEGIN JAXP 1.3+ */
+  // public Object setUserData (String key, Object data, UserDataHandler handler)
+  // {
+    // throw new UnsupportedOperationException("setUserData not implemented yet");
+  // }
+
+  // public Object getUserData (String key)
+  // {
+    // return null;
+  // }
+  /* END JAXP 1.3+ */
 }

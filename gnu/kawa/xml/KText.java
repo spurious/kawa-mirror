@@ -27,7 +27,24 @@ public class KText extends KCharacterData
 			   "splitText not supported");
   }
 
+  public String getWholeText ()
+  {
+    throw new UnsupportedOperationException("getWholeText not implemented yet");
+  }
+
+  public Text replaceWholeText (String content)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "splitText not supported");
+  }
+
   public boolean hasAttributes ()
+  {
+    return false;
+  }
+
+  public boolean isElementContentWhitespace ()
   {
     return false;
   }

@@ -1,3 +1,20 @@
+2004-11-06  Per Bothner  <per@bothner.com>
+
+	* ElementConstructor.java (setNamespaceNodes): Use new XName
+	constructor.
+	* KNnode.java (coerce): New static convenience methods.
+	(getNodeValue(StringBuffer)): New helper method.
+
+	* KNode.java: Add some DOM3 (in JAXP 1.3 and Java 5) methods.
+	Some are commented out unless --with-java-source=5, since they
+	reference types that aren't in DOM 2.
+	* KAttr.java: Likewise.
+	* KDocument.java: Likewise.
+	* KElement.java: Likewise.
+	* KText.java: Likewise.
+
+	* NodeCompare.java: Use non-deprecated WrongType.make variants.
+
 2004-08-03  Per Bothner  <per@bothner.com>
 
 	* Attributes.java:  Extend MethodProc instead of CpsProcedure.

@@ -45,6 +45,31 @@ public class KElement extends KNode
   }
 
   /** Not implemented. */
+  public void setIdAttribute (String name, boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "setIdAttribute not supported");
+  }
+
+  /** Not implemented. */
+  public void setIdAttributeNS (String namespaceURI, String localName,
+				boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "setIdAttributeNS not supported");
+  }
+
+  /** Not implemented. */
+  public void setIdAttributeNode (Attr idAttr, boolean isId)
+     throws DOMException
+  {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+			   "setIdAttributeNode not supported");
+  }
+
+  /** Not implemented. */
    public void removeAttribute (String name)
      throws DOMException
   {
@@ -127,4 +152,11 @@ public class KElement extends KNode
   {
     return getAttributeNS(namespaceURI, localName) != null;
   }
+
+  /* BEGIN JAXP 1.3+ */
+  // public TypeInfo getSchemaTypeInfo ()
+  // {
+    // return null;
+  // }
+  /* END JAXP 1.3+ */
 }

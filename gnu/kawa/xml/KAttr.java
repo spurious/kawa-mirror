@@ -53,4 +53,16 @@ public class KAttr extends KNode
     return true;
   }
 
+  /* BEGIN JAXP 1.3+ */
+  // public TypeInfo getSchemaTypeInfo ()
+  // {
+    // return null;
+  // }
+
+  // public boolean isId ()
+  // {
+    // return false;
+  // }
+  /* END JAXP 1.3+ */
+
 }

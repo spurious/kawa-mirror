@@ -45,6 +45,16 @@ public class KDocument extends KNode
     return null;
   }
 
+  public String getTextContent ()
+  {
+    return null;
+  }
+
+  protected void getTextContent (StringBuffer sbuf)
+  {
+    // Do nothing.
+  }
+
   /** Not implemented. */
    public Element createElement (String tagName)
   {
@@ -128,4 +138,76 @@ public class KDocument extends KNode
   {
     return false;
   }
+
+  public String getInputEncoding ()
+  {
+    return null;
+  }
+
+  public String getXmlEncoding ()
+  {
+    return null;
+  }
+
+  public boolean getXmlStandalone ()
+  {
+    return false;
+  }
+
+  public void setXmlStandalone (boolean xmlStandalone)
+  {
+  }
+
+  public String getXmlVersion ()
+  {
+    return "1.1";
+  }
+
+  public void setXmlVersion (String xmlVersion)
+  {
+  }
+
+  public boolean getStrictErrorChecking ()
+  {
+    return false;
+  }
+
+  public void setStrictErrorChecking(boolean strictErrorChecking)
+  {
+  }
+
+  public String getDocumentURI ()
+  {
+    return null;
+  }
+
+  public void setDocumentURI (String documentURI)
+  {
+  }
+
+  public Node renameNode (Node n, String namespaceURI, String qualifiedname)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+			   "renameNode not implemented");
+  }
+
+  public Node adoptNode (Node source)
+    throws DOMException
+  {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+			   "adoptNode not implemented");
+  }
+
+  public void normalizeDocument ()
+  {
+  }
+
+  /* BEGIN JAXP 1.3+ */
+  // public DOMConfiguration getDomConfig ()
+  // {
+    // throw new DOMException(DOMException.NOT_SUPPORTED_ERR,
+			   // "getDomConfig not implemented");
+  // }
+  /* END JAXP 1.3+ */
 }

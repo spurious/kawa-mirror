@@ -62,7 +62,7 @@ public class NodeCompare extends Procedure2
 	  }
 	catch (ClassCastException ex)
 	  {
-	    throw WrongType.make(ex, this, 1);
+	    throw WrongType.make(ex, this, 1, arg1);
 	  }
       }
     if (arg2 instanceof AbstractSequence)
@@ -80,7 +80,7 @@ public class NodeCompare extends Procedure2
 	  }
 	catch (ClassCastException ex)
 	  {
-	    throw WrongType.make(ex, this, 2);
+	    throw WrongType.make(ex, this, 2, arg2);
 	  }
       }
 

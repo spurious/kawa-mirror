@@ -50,10 +50,7 @@ implements Externalizable
       ((XName) type).setNamespaceNodes(bindings);
     else
       {
-	XName xname = new XName();
-	xname.setNamespaceNodes(bindings);
-	xname.setQName((Symbol) type);
-	type = xname;
+	type = new XName((Symbol) type, bindings);
       }
   }
 

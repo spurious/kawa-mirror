@@ -290,6 +290,56 @@ public class CallContext implements Runnable
       }
   }
 
+  /** Setup routine before calling a method that takes a CallContext.
+   * The compiler emits a call to this before a call to a method that takes
+   * a CallContext, when it wants the function result as an Object.
+   * It pushes the CallContest state so it can uses tthe vstack for a
+   * temporary, After the method, getFromContext extract the method's result
+   * from the vstack and restores the state.
+   */
+  public final int startFromContext ()
+  {
+    ValueStack vst = vstack;
+    int oindex = vst.find(consumer);
+    vst.ensureSpace(3);
+    int gapStart = vst.gapStart;
+    vst.data[gapStart++] = TreeList.INT_FOLLOWS;
+    vst.setIntN(gapStart, oindex);
+    gapStart += 2;
+    consumer = vst;
+    vst.gapStart = gapStart;
+    return gapStart;
+  }
+
+  /** Routine to extract result and restore state after startFromContext.
+   */
+  public final Object getFromContext (int oldIndex) throws Throwable
+  {
+    runUntilDone();
+    ValueStack vst = vstack;
+    Object result = Values.make(vst, oldIndex, vst.gapStart);
+    cleanupFromContext(oldIndex);
+    return result;
+  }
+
+  /** Cleanup-only part of getFromContext.
+   * This can be in an exception handler as an alternative
+   * to getFromContext, which is called in the non-exception case.
+   * (Alternatively, the compiler could call cleanupFromContext
+   * from a finally clause but that is less efficient, partly
+   * because the JVM stack must be empty before a finally subroutine.)
+   */
+  public final void cleanupFromContext (int oldIndex) throws Throwable
+  {
+    ValueStack vst = vstack;
+    char[] data = vst.data;
+    int oindex = (data[oldIndex-2] << 16) | (data[oldIndex -1] & 0xFFFF);
+    consumer = (Consumer) vst.objects[oindex];
+    vst.objects[oindex] = null;
+    vst.oindex = oindex;
+    vst.gapStart = oldIndex - 3;
+  }
+
   /** Run until no more continuations, returning final result. */
   public final Object runUntilValue() throws Throwable
   {

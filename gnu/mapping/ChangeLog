@@ -1,3 +1,8 @@
+2003-09-30  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (startFromContext, getFromContext,
+	cleanupFromContext):  New methods. 
+
 2003-09-11  Per Bothner  <per@bothner.com>
 
 	* Values.java (nextValue):  Adjust curIndex by buffer gap size.

@@ -28,7 +28,7 @@ public class GuiConsole extends Frame implements ActionListener {
   Environment environment;
   Future thread;
 
-  kawa.lang.QueueReader in_r;
+  gnu.text.QueueReader in_r;
   OutPort out_p, err_p;
 
   MessageArea message = null;
@@ -43,7 +43,7 @@ public class GuiConsole extends Frame implements ActionListener {
     this.interp = interp;
     this.environment = environment;
 
-    in_r = new kawa.lang.QueueReader ();
+    in_r = new gnu.text.QueueReader ();
     message = new MessageArea(false, in_r);
     window_number++;
     numConsoles++;

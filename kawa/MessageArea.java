@@ -18,7 +18,7 @@ public class MessageArea extends TextArea
   private kawa.TextAreaWriter out_stream;
   private PrintWriter out;
   private PrintWriter err;
-  kawa.lang.QueueReader in;
+  gnu.text.QueueReader in;
 
   public int outputMark = 0;
   public int endMark = -1;
@@ -31,7 +31,7 @@ public class MessageArea extends TextArea
    *
    * @param     focus    specifies if this is focus traversable
    */
-  public MessageArea(boolean focus, kawa.lang.QueueReader in) {
+  public MessageArea(boolean focus, gnu.text.QueueReader in) {
     super();
 
     this.doFocus = focus;

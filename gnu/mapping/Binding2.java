@@ -36,7 +36,6 @@ public class Binding2 extends Binding
     binding2 = new Binding2(name);
     binding2.constraint = binding.constraint;
     binding2.value = binding.value;
-    System.err.println("getB2 "+name+" b2:"+binding2);
     binding.value = binding2;
     binding.constraint = new AliasConstraint();  // FIXME;
     return binding2;

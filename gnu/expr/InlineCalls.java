@@ -154,4 +154,17 @@ public class InlineCalls extends ExpWalker
       }
     return exp;
   }
+
+  protected Expression walkClassExp (ClassExp exp)
+  {
+    // Give name to object class.
+    exp.getCompiledClassType(comp);
+    comp.addClass(exp.type);
+    if (exp.isMakingClassPair())
+      {
+	exp.instanceType.setName(exp.type.getName()+"$class");
+	comp.addClass(exp.instanceType);
+      }
+    return super.walkClassExp(exp);
+  }
 }

@@ -73,7 +73,7 @@ public class ChainLambdas extends ExpWalker
   }
 
   protected Expression walkClassExp (ClassExp exp)
-  {    
+  {
     LambdaExp parent = currentLambda;
     if (parent != null && ! (parent instanceof ClassExp))
       {
@@ -83,14 +83,6 @@ public class ChainLambdas extends ExpWalker
 
     walkScopeExp(exp);
 
-    // Give name to object class.
-    exp.getCompiledClassType(comp);
-    comp.addClass(exp.type);
-    if (exp.isMakingClassPair())
-      {
-	exp.instanceType.setName(exp.type.getName()+"$class");
-	comp.addClass(exp.instanceType);
-      }
     return exp;
   }
 }

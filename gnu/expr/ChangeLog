@@ -1,3 +1,10 @@
+2003-04-28  Per Bothner  <per@bothner.com>
+
+	* ChainLambda.java (walkClassExp):  Don't set ClassExp types here
+	(since that is too late given that it may be needed by Inlinecalls).
+	* InlineCalls.java (walkClassExp):  Do it here instead.
+	Fixes bug reported 03-20 by Vladimir Tsichevski <wowa1@online.ru>.
+	
 2003-04-27  Per Bothner  <per@bothner.com>
 
 	* ThisExp.java (compile):  Do nothing if IgnoreTarget.  Otherwise call

@@ -29,8 +29,8 @@ public class WithTransform implements Paintable
 
   public Rectangle2D getBounds2D()
   {
-    // FIXME!
-    return paintable.getBounds2D();
+    return transform.createTransformedShape(paintable.getBounds2D())
+      .getBounds2D();
   }
 
   public Paintable transform (AffineTransform tr)

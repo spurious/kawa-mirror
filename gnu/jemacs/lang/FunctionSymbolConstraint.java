@@ -5,9 +5,9 @@ import gnu.mapping.*;
 
 public class FunctionSymbolConstraint extends SymbolConstraint
 {
-  ObArray environment;
+  Environment environment;
 
-  FunctionSymbolConstraint (ObArray environment)
+  FunctionSymbolConstraint (Environment environment)
   {
     this.environment = environment;
   }  

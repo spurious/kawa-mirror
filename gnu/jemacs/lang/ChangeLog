@@ -1,3 +1,28 @@
+2000-01-31  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (nilExpr):  New constant.
+ 	(isTrue, booleanObject):  New methods (overriding Interpreter).
+	(loadClass):  New method.
+	(ELisp):  New constructor.
+
+	* ELispReader.java (isDelimiter):  New overriding method -
+	the chars '[' and ']' also need to be treated as delimiters.
+	(readVector):  Fix to use '[' and ']' as delimiters.
+	(readObject):  Call readVector after seeing '['.
+	No longer recognize #(...) or #f #t #eNUM. or #iNUM.
+	
+	* lambda.java:  New file, extends Syntax.
+	* setq.java:  New file, extends Syntax.
+	* SymbolOps.scm:  New file.
+	* Makefile.am (java_JAVA):  Add lambda.java, setq.java.
+	Add rules to build SymbolOps.class from SymbolOps.scm.
+
+	* Symbol.java (isBound):  Avoid creating unneeded binding.
+	(getBinding, setValueBinding, getPrintName):  New methods.
+	* SymbolConstraint.java (defineAll):  New method.
+	(getFunctionBinding, setFunctionBinding):  New methods.
+	* FunctionSymbolConstraint.java (environment):  Change type.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* ELisp.java (getName):  New method - set the "language name".

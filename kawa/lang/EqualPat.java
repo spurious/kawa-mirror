@@ -18,10 +18,7 @@ public class EqualPat extends Pattern implements Printable, Compilable
   static public EqualPat make (Object obj) { return new EqualPat (obj); }
 
   public int match (Object obj, Object[] vars, int start_vars) {
-    if (kawa.standard.equal_p.equal_p (value, obj))
-      return 0;
-    else
-      return -1;
+    return value.equals (obj) ? 0 : -1;
   }
 
   public int varCount () { return 0; }

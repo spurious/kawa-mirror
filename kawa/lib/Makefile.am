@@ -5,16 +5,18 @@ AUTOMAKE_OPTIONS = foreign
 SUFFIXES = .java .scm .class
 
 JAVA = java
-JAVAFLAGS = -classpath ../..:$$CLASSPATH
+CLASSPATH = ../..:$(srcdir)/../..:$$CLASSPATH
+# Use an environment variable for CLASSPATH so we pick up standard classes:
+CLASSPATH_ENV = CLASSPATH=$(CLASSPATH)
 
-JAVAC = javac -classpath ../..:$(srcdir)/../..:$$CLASSPATH
-KAWA = $(JAVA) $(JAVAFLAGS) kawa.repl
+JAVAC = javac
+KAWA = $(JAVA) kawa.repl
 
 .java.class:
-	$(JAVAC) -d ../.. $<
+	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
 
 .scm.class:
-	$(KAWA) -d ../.. -P $(subdir). -C $< 
+	$(CLASSPATH_ENV) $(KAWA) -d ../.. -P $(subdir). -C $< 
 
 javadir=$(prefix)/java/$(subdir)
 
@@ -22,6 +24,7 @@ OBJ=\
   std_syntax.class \
   thread.class \
   characters.class \
+  files.class \
   keywords.class \
   ports.class \
   quantities.class \
@@ -48,6 +51,14 @@ SECONDARY_OBJS=\
   characters$$char__upper__case_P.class \
   characters$$char__whitespace_P.class \
   characters$$integer_2_char.class \
+  files$$file__exists_P.class \
+  files$$file__readable_P.class \
+  files$$create__directory.class \
+  files$$delete__file.class \
+  files$$file__directory_P.class \
+  files$$file__writable_P.class \
+  files$$rename__file.class \
+  files$$_2_pathname.class \
   keywords$$keyword_2_string.class \
   keywords$$keyword_P.class \
   keywords$$string_2_keyword.class \

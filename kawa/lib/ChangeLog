@@ -1,3 +1,8 @@
+Mon May 26 12:34:29 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* files.scm:  New file.
+	* Makefile.{am,in}:  Update for new file.
+
 Tue Apr  1 23:11:06 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* Makefile.am (SECONDARY_OBJS, MISC_1_1):  Use new mangling.

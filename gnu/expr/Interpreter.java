@@ -2,6 +2,7 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
+import gnu.lists.FormatToConsumer;
 
 /**
  * Contains various language-dependent methods.
@@ -140,7 +141,36 @@ public abstract class Interpreter
 
   public abstract Object read (InPort in)
     throws java.io.IOException, gnu.text.SyntaxException;
-  public abstract void print (Object obj, OutPort out);
+
+  public void print (Object obj, OutPort out)
+  {
+    print(obj, out, false);
+  }
+
+  public void print (Object value, OutPort out, boolean readable)
+  {
+    if (value == Values.empty)
+      return;
+    FormatToConsumer saveFormat = out.objectFormat;
+    try
+      {
+	out.objectFormat = getFormat(readable);
+	if (value instanceof Values)
+	  {
+	    Object[] values = ((Values) value).getValues();
+	    for (int i = 0;  i < values.length;  i++)
+	      out.println(values[i]);
+	  }
+	else
+	  out.println(value);
+      }
+    finally
+      {
+	out.objectFormat = saveFormat;
+      }
+  }
+
+  public abstract FormatToConsumer getFormat(boolean readable);
 
   public Environment getNewEnvironment ()
   {

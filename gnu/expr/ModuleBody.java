@@ -42,7 +42,16 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
   public final void runAsMain (String[] args)
   {
     kawa.repl.setArgs(args, 0);
-    apply0();
+    gnu.text.WriterManager.instance.registerShutdownHook();
+    try
+      {
+	apply0();
+      }
+    finally
+      {
+	// Redundant if registerShutdownHook succeeded (e.g on JDK 1.3).
+	gnu.mapping.OutPort.runCleanups();
+      }
   }
 
   /**

@@ -110,7 +110,7 @@ char_upcase.class \
 char_downcase.class \
 string_p.class \
 make_string.class \
-string.class \
+string_v.class \
 string_length.class \
 string_ref.class \
 string_set_b.class \
@@ -132,7 +132,7 @@ string_copy.class \
 string_fill_b.class \
 vector_p.class \
 make_vector.class \
-vector.class \
+vector_v.class \
 vector_length.class \
 vector_ref.class \
 vector_set_b.class \
@@ -169,6 +169,7 @@ apply.class \
 map.class \
 callcc.class \
 exit.class \
+ashift.class \
 define.class \
 define_syntax.class \
 syntax_error.class \
@@ -179,7 +180,10 @@ begin.class \
 ifp.class \
 values.class \
 call_with_values.class \
-StandardInterpreter.class 
+Scheme.class \
+null_env.class \
+user_env.class \
+scheme_env.class
 
 java_DATA=$(OBJ)
 

@@ -1,3 +1,10 @@
+Tue Mar  3 19:23:23 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa.texi:  Document --main and --version flags.
+	(Primitive functions):  Renamed to Low-level functions, and improved.
+	Document new macros for accessing fields and arrays.
+	* license.terms:  Add my name to copyright.
+
 Thu Feb 19 19:36:14 1998  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi:  Simplify CLASSPATH description, and mention Windows95.

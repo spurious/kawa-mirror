@@ -30,6 +30,7 @@ public class IfState {
     previous = code.if_stack;
     code.if_stack = this;
     end_label = new Label(code);
+    start_stack_size = code.SP;
   }
 }
 

@@ -8,6 +8,7 @@ Sat Apr  4 17:36:03 1998  Per Bothner  <bothner@cygnus.com>
 	(emitRet):  Add missing calls to reserve.
 	* Label.java (define):  Remove version that takes a Method.
 	(define):  If label follows goto of label, try to optimize away goto.
+	* IfState.java (<init>):  Default start_stack_size to code.PC.
 
 	* CodeAttr.java (emitTryStart):  Extra result_type argument.
 	Generate code to save stack (if non-empty) in new Variables.

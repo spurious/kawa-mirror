@@ -33,10 +33,10 @@ public class letstar extends Syntax implements Printable
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body)");
     if (! (bind_match[0] instanceof Symbol))
       throw new WrongArguments("let*", 2, "(let* ((var init)...) body) [var is not an identifier]");
-    decls[0] = new Declaration ((Symbol) bind_match[0]);
+    LetExp let = new LetExp (decls, inits);
+    let.add_decl ((Symbol) bind_match[0]);
     decls[0].index = 0;
     inits[0] = interp.rewrite (bind_match[1]);
-    LetExp let = new LetExp (decls, inits);
     let.push (interp);
     let.body = rewrite (bind_pair.cdr, body, interp); // self-recurse
     let.pop (interp);

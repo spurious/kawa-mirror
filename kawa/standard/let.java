@@ -22,6 +22,7 @@ public class let extends Syntax implements Printable
     int decl_count = kawa.standard.length.length (bindings);
     Expression[] inits = new Expression[decl_count];
     Declaration[] decls = new Declaration [decl_count];
+    LetExp let = new LetExp (decls, inits);
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
@@ -30,12 +31,10 @@ public class let extends Syntax implements Printable
 	throw new WrongArguments("let", 2, "(let ((var init)...) body)");
 	if (! (bind_match[0] instanceof Symbol))
 	  throw new WrongArguments("let", 2, "(let ((var init)...) body) [var is not an identifier]");
-	decls[i] = new Declaration ((Symbol) bind_match[0]);
-	decls[i].index = i;
+	let.add_decl ((Symbol) bind_match[0]);
 	inits[i] = interp.rewrite (bind_match[1]);
 	bindings = bind_pair.cdr;
       }
-    LetExp let = new LetExp (decls, inits);
     let.push (interp);
     let.body = interp.rewrite_body (body);
     let.pop (interp);

@@ -66,6 +66,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 SHELL = @SHELL@
+SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 extra_java = @extra_java@
@@ -96,7 +97,7 @@ DIST_COMMON =  $(java_JAVA) ChangeLog Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:

@@ -1,3 +1,16 @@
+Sat Mar 20 10:58:53 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* Constraint.java:  New abstract class.
+	* TrivialConstraint.java:  New Constraint sub-class.
+	* UnboundConstraint.java:  New Constraint sub-class.
+	* IndirectConstraint.java:  New Constraint sub-class.
+	* Makefile.am, Makefile.in (java_JAVA):  Add new classes.
+	* Binding.java (constraint):  New field. Re-write to use Constraints.
+	Add methods to implement JDK1.2 java.util.Map.Entry interface.
+	* Environment.java:  Misc changes for Constraint model.
+	* NameMap.java (get):  Rename to getChecked.
+	(get(Object)):  New, for compatibility with JDK1.2 collections.
+	
 Sun Mar  7 16:45:08 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
  	* CallStack.java:  New class.

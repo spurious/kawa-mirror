@@ -16,6 +16,9 @@ public class Environment extends NameMap
 
   int time_stamp;
 
+  protected TrivialConstraint trivialConstraint = new TrivialConstraint(this);
+  protected UnboundConstraint unboundConstraint = new UnboundConstraint(this);
+
   /** The value of previous.time_stamp when this was created.
    * Newer Bindings in previous are ignored. */
   int previous_time_stamp;
@@ -28,10 +31,10 @@ public class Environment extends NameMap
   public static Object lookup_global (String name)
        throws UnboundSymbol
   {
-    Object result = user().get (name);
-    if (result == null)
+    Binding binding = user().lookup(name);
+    if (binding == null)
       throw new UnboundSymbol(name);
-    return result;
+    return binding.get ();
   }
 
   /** Define name (interned) to have a given value. */
@@ -84,6 +87,21 @@ public class Environment extends NameMap
     this.previous_time_stamp = this.time_stamp = previous.time_stamp;
   }
 
+  public Binding getBinding (String name)
+  {
+    Binding binding = lookup(name);
+    if (binding != null)
+      return binding;
+    binding = addBinding(name, null);
+    binding.constraint = unboundConstraint;
+    return binding;
+  }
+
+  public static Binding getCurrentBinding (String name)
+  {
+    return getCurrent().getBinding(name);
+  }
+
   /**
    * Search for a variable binding by name.
    * @param sym the (interned) name of the binding to search for
@@ -92,8 +110,12 @@ public class Environment extends NameMap
 
   public Binding lookup (String name)
   {
+    return lookup(name, System.identityHashCode(name));
+  }
+
+  private Binding lookup (String name, int hash)
+  {
     int time_stamp = this.time_stamp;
-    int hash = System.identityHashCode(name);
     for (Environment env = this;  env != null;  env = env.previous)
       {
 	Binding[] env_tab = env.table;
@@ -101,7 +123,7 @@ public class Environment extends NameMap
 	for (Binding binding = env_tab[index];
 	     binding != null;  binding = binding.chain)
 	  {
-	    if (binding.name == name && binding.time_stamp < time_stamp)
+	    if (binding.sym_name == name && binding.time_stamp < time_stamp)
 	      return binding;
 	  }
 	time_stamp = env.previous_time_stamp;
@@ -111,6 +133,13 @@ public class Environment extends NameMap
 
   public Binding define (String name, Object value)
   {
+    Binding binding = getBinding(name);
+    binding.set(value);
+    return binding;
+  }
+
+  public Binding addBinding (String name, Object value)
+  {
     if (num_bindings >= table.length * threshold)
       rehash (2 * table.length);
 
@@ -119,7 +148,8 @@ public class Environment extends NameMap
     int index = (hash & 0x7FFFFFFF) % table.length;
 
     Binding binding = new Binding ();
-    binding.name = name;
+    binding.constraint = trivialConstraint;
+    binding.setName(name);
     binding.value = value;
     binding.time_stamp = time_stamp++;
     binding.chain = table[index];
@@ -145,7 +175,7 @@ public class Environment extends NameMap
 
 	for (Binding cur = table[i];  cur != null; )
 	  {
-	    int hash = System.identityHashCode(cur.name);
+	    int hash = System.identityHashCode(cur.sym_name);
 	    int new_index = (hash & 0x7FFFFFFF) % new_capacity;
 	    Binding next = cur.chain;
 	    cur.chain = new_table[new_index];
@@ -170,7 +200,7 @@ public class Environment extends NameMap
 	for (Binding binding = env_tab[index];
 	     binding != null;  binding = binding.chain)
 	  {
-	    if (binding.name == name && binding.time_stamp < time_stamp)
+	    if (binding.sym_name == name && binding.time_stamp < time_stamp)
 	      {
 		Object old = binding.get(); 
 		env.remove(binding);
@@ -188,7 +218,7 @@ public class Environment extends NameMap
 
   public void remove (Binding binding)
   {
-    int hash = System.identityHashCode(binding.name);
+    int hash = System.identityHashCode(binding.sym_name);
     int index = (hash & 0x7FFFFFFF) % table.length;
     Binding prev = null;
     for (Binding b = table[index];  b != null ; )
@@ -210,16 +240,16 @@ public class Environment extends NameMap
       }
   }
 
-  public Object get (String name)
+  /** Get the value bound to the given name.
+   * @exception gnu.mapping.UnboundSymbol the name has no binding
+   * @see Environment#get(Object)
+   */
+  public Object getChecked(String name)
   {
     Binding binding = lookup (name);
-    return binding == null ? null : binding.get ();
-  }
-
-  public Object get (Object name)
-  {
-    Binding binding = lookup ((String) name);
-    return binding == null ? null : binding.get ();
+    if (binding == null)
+      throw new UnboundSymbol(name);
+    return binding.get ();
   }
 
   public Object put (/* interned */ String name, Object value)

@@ -2,8 +2,10 @@ package gnu.jemacs.lang;
 import gnu.mapping.*;
 import gnu.kawa.util.*;
 import gnu.expr.*;
+import kawa.standard.Scheme;
+import gnu.bytecode.Type;
 
-public class ELisp extends kawa.standard.Scheme
+public class ELisp extends Interpreter
 {
   public static final LList FALSE = LList.Empty;
   public static final String TRUE = "t";
@@ -50,6 +52,17 @@ public class ELisp extends kawa.standard.Scheme
     return getString(symbol.getName());
   }
 
+  static boolean charIsInt = false;
+
+  /** Get a ELisp character object. */
+  public static Object getCharacter(int c)
+  {
+    if (charIsInt)
+      return gnu.math.IntNum.make(c);
+    else
+      return Char.make((char)c);
+  }
+
   public gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages)
   {
     return new ELispReader(inp, messages);
@@ -82,6 +95,12 @@ public class ELisp extends kawa.standard.Scheme
   private void defun(String name, Object value)
   {
     Symbol.setFunctionBinding(environ, name, value);
+    if (value instanceof Named)
+      {
+	Named n = (Named) value;
+	if (n.getName() == null)
+	  n.setName(name);
+      }
   }
 
   private void defun(Procedure proc)
@@ -89,11 +108,39 @@ public class ELisp extends kawa.standard.Scheme
     defun(proc.getName(), proc);
   }
 
+  static int elispCounter = 0;
+
   public ELisp()
   {
+
+    environ = new Environment();
+    environ.setName ("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
+
+    BindingEnumeration e
+      = Scheme.getInstance().builtin().enumerateAllBindings();
+    while (e.hasMoreElements())
+      {
+	Binding b = e.nextBinding();
+	if (b.isBound())
+	  {
+	    String name = b.getName();
+	    Object val = b.get();
+	    if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
+	      defun(name, val);
+	    else
+	      define(name, val);
+	  }
+      }
+    System.err.println("done");
+
+    if (instance == null)
+      instance = this;
+
     loadClass("gnu.jemacs.lang.SymbolOps", environ);
     loadClass("gnu.jemacs.lang.NumberOps", environ);
+    loadClass("gnu.jemacs.lang.ArrayOps", environ);
+    //    loadClass("kawa.lib.std_syntax", environ);
     define("t", "t");
     define("nil", "nil");
     defun(NumberCompare.makeLss("<"));
@@ -103,10 +150,14 @@ public class ELisp extends kawa.standard.Scheme
     defun("lambda", new gnu.jemacs.lang.lambda());
     defun("defun", new gnu.jemacs.lang.defun());
     defun("setq", new gnu.jemacs.lang.setq());
+    defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
+    defun("while", new gnu.jemacs.lang.While());
+    defun("let", new kawa.standard.fluid_let(false, nilExpr));
+    defun("let*", new kawa.standard.fluid_let(true, nilExpr));
   }
 
-  public static kawa.standard.Scheme getInstance() // Bad return type FIXME
+  public static ELisp getInstance()
   {
     if (instance == null)
       instance = new ELisp();
@@ -123,9 +174,41 @@ public class ELisp extends kawa.standard.Scheme
 
   public Environment getNewEnvironment ()
   {
-    if (kawaEnvironment == null)
-      initScheme();
-    return new ObArray(kawaEnvironment);
+    return new ObArray(environ);
+  }
+
+  public Object read (InPort in)
+    throws java.io.IOException, gnu.text.SyntaxException
+  {
+    return ELispReader.readObject(in);
+  }
+
+  public void print (Object value, OutPort out)
+  {
+    if (value == Scheme.voidObject)
+      return;
+    if (value instanceof Values)
+      {
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  {
+	    SFormat.print (values[i], out);
+	    out.println();
+	  }
+      }
+    else
+      {
+	SFormat.print (value, out);
+	out.println();
+      }
+    out.flush();
+  }
+
+  public Type getTypeFor (Class clas)
+  {
+    if (clas.isPrimitive())
+      return Scheme.getNamedType(clas.getName());
+    return Type.make(clas);
   }
 
   /** Import all the public fields of an object. */

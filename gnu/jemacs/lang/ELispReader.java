@@ -137,8 +137,6 @@ public class ELispReader extends gnu.text.LispReader
     return IntNum.valueOf(str.toString(), base);
   }
 
-  boolean charIsInt = true;
-
   /**
    * Read a ELisp character literal.
    * Assumes the initial '?' and has already been read.
@@ -147,17 +145,18 @@ public class ELispReader extends gnu.text.LispReader
     throws java.io.IOException, SyntaxException
   {
     int c = read();
+    if (c == '\\')
+      {
+	c = read();
+	if (c != ' ' && c >= 0)
+	  c = readEscape(c);
+      }
     if (c < 0)
       {
 	error("unexpected EOF in character literal");
 	c = '?';
       }
-    if (c == '\\')
-      c = readEscape();
-    if (charIsInt)
-      return IntNum.make(c);
-    else
-      return Char.make((char)c);
+    return ELisp.getCharacter(c);
   }
 
   /** Read a word of alphabetic characters.

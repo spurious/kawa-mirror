@@ -4,17 +4,17 @@
 
 (define (emacs:read #!optional (port (current-input-port)))
   (let ((lexer
-	 ((primitive-constructor <gnu.elisp.ELispReader> (<input-port>))
+	 ((primitive-constructor <gnu.jemacs.lang.ELispReader> (<input-port>))
 	  port)))
-    ((primitive-virtual-method <gnu.elisp.ELispReader> "readObject"
+    ((primitive-virtual-method <gnu.jemacs.lang.ELispReader> "readObject"
 			       <object> ())
      lexer)))
 
 (define (emacs:symbol-name (symbol <gnu.mapping.Binding>))
-  ((primitive-static-method <gnu.elisp.ELisp> "getString" <object> (<gnu.mapping.Binding>))
+  ((primitive-static-method <gnu.jemacs.lang.ELisp> "getString" <object> (<gnu.mapping.Binding>))
    symbol))
 
 (define (boundp symbol)
-  ((primitive-static-method <gnu.elisp.Symbol> "isBound"
+  ((primitive-static-method <gnu.jemacs.lang.Symbol> "isBound"
                             <boolean> (<object>))
    symbol))

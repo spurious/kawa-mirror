@@ -1,3 +1,9 @@
+1999-09-10  Per Bothner  <per@bothner.com>
+
+	* files.scm (*temp-file-number*):  Revert to non-private, until we
+	work out handling of private non-static variables.
+	* emacs.scm:  Update gnu.elisp.* to gnu.jemacs.lang.*.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* ports.scm (transcript-on):  Use <String> as parameter type,

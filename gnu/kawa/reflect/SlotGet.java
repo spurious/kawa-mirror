@@ -247,7 +247,9 @@ public class SlotGet extends Procedure2
 		&& (modifiers & Access.FINAL) != 0)
 	      code.emitInvokeVirtual(Compilation.getLocationMethod);
 	    Interpreter interpreter = Interpreter.getInterpreter();
-	    ftype = interpreter.getTypeFor(ftype.getReflectClass());
+	    Class fclass = ftype.getReflectClass();
+	    if (fclass != null)
+	      ftype = interpreter.getTypeFor(fclass);
 	    target.compileFromStack(comp, ftype);
             return;
           }

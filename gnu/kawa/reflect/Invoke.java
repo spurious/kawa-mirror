@@ -236,7 +236,11 @@ public class Invoke extends ProcedureN implements CanInline
     int nargs = args.length;
     ClassType type = getClassType(args);
     String name = getMethodName(args);
-    if (type != null && name != null)
+    if (type != null && name != null
+	// We can't generate <init> until we know whether it needs
+	// a lexical link, which we don't know until FindCapturedVars is run.
+	// Unfortunately, this means make doesn't get property inlined.  FIXME
+	&& (kind != 'N' || type.isExisting()))
       {
         PrimProcedure[] methods;
         int okCount, maybeCount;

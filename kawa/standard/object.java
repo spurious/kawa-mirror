@@ -108,7 +108,7 @@ public class object extends Syntax
 	obj = pair.cdr; // Next member.
 	pair = (Pair) pair.car;
 	if (pair.car instanceof String)
-	  { // Method declaration.
+	  { // Field declaration.
 	    Object type = null;
 	    if (pair.cdr instanceof Pair)
 	      {
@@ -148,6 +148,7 @@ public class object extends Syntax
 	LambdaExp initMethod = new LambdaExp(bexp);
 	tr.push(initMethod);
 	initMethod.setName("$finit$");
+	initMethod.setClassMethod(true);
 	oexp.initMethod = initMethod;
 	initMethod.nextSibling = oexp.firstChild;
 	oexp.firstChild = initMethod;

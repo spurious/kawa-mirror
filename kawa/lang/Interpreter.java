@@ -11,7 +11,6 @@ public class Interpreter extends Object
   static public List nullObject = List.Empty;
   static public Undefined undefinedObject = new kawa.lang.Undefined();
   static public Undefined voidObject = new kawa.lang.Undefined();
-  static public Symbol eofObject = Symbol.makeUninterned ("#<eof>");
 
   static public Symbol quote_sym = Symbol.make ("quote");
   static public Symbol unquote_sym = Symbol.make ("unquote");

@@ -10,4 +10,6 @@ public abstract class Sequence
   abstract public int length ();
 
   abstract public Object elementAt (int index);
+
+  public static Symbol eofValue = Symbol.makeUninterned ("#<eof>"); 
 }

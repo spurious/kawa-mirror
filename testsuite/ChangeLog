@@ -1,3 +1,7 @@
+2003-01-29  Per Bothner  <per@bothner.com>
+
+	* gui-test.scm:  New file, tests the 'gui modele.
+
 2003-01-26  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm:  Extend tests to using record-type as a NameMap,

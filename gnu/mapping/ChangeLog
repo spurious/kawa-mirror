@@ -1,3 +1,8 @@
+2003-04-08  Per Bothner  <per@bothner.com>
+
+	* Symbol.java (defineValue):  Check for null env.
+	Fixes bug reported 04-08 by Vladimir Tsichevski.
+
 2003-04-06  Per Bothner  <per@bothner.com>
 
 	* SFormat.java:  Removed.

@@ -80,7 +80,7 @@ public class Symbol extends Location implements Externalizable
   public final void defineValue(Object value)
   {
     Environment env = constraint.getEnvironment(this);
-    if (env.locked)
+    if (env == null || env.locked)
       set(value);
     else
       {

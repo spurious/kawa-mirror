@@ -49,7 +49,7 @@ JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) $(JAR_DEPS_SERVLET) \
 
 kawa-@VERSION@.jar: $(JAR_DEPS)
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
-	    `find . -name '*.class' -print`
+	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 

@@ -514,7 +514,7 @@ kawa-@VERSION@-compiled.zip:
 
 kawa-@VERSION@.jar: $(JAR_DEPS)
 	$(JAR) cmf $(srcdir)/jar-manifest kawa-@VERSION@.jar \
-	    `find . -name '*.class' -print`
+	    `find gnu -name '*.class' -print` `find kawa -name '*.class' -print`
 
 kawa-doc.tar.gz: kawa-doc-$(VERSION).tar.gz
 

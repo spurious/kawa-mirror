@@ -36,4 +36,4 @@ Replace use of ZipArchive by jar files (once JDK 1.1 is out).
 
 Perhaps add #|...|# comments.  (Supposedly SCM and others have them.)
 
-Need a way for kawac to pre-load other files for the sake of macros.
+Implement keyword and optional arguments as in DSSSL.

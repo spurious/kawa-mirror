@@ -1,5 +1,24 @@
-Changes in 1.2 since 1.0
-========================
+Changes from Kawa 1.0 to 1.2
+============================
+
+Added primitives to make it easy to call arbitrary Java methods
+from Scheme.
+
+Exact rational arithetic is now fully implemented.
+All integer functions now believed to correctly handle bignums.
+Logical operations on exact integers have been implemented.
+These include all the logical functions from Guile.
+
+Complex numbers are implemented (except {,a}{sin,cos,tan}).
+Quantities (with units) are implemented (as in DSSSL).
+
+Eval is available, as specified for R5RS.
+Also implemented are scheme-report-environment, null-environment, and
+interaction-environment.
+
+Internal define is implemented.
+
+Rough support for multiple threads is implemented.
 
 Moved kawa class to kawa/repl.  Merged in kawac (compiler)
 functionality.  A 'kawa' shell-script is now created.
@@ -10,34 +29,10 @@ Now builds "without a snag" using Cafe 1.51 under Win95.
 (Symantec JIT (ver 2.00b19) requires disabling JIT - JAVA_COMPCMD=disable.)
 Compiles under JDK 1.1 beta (with some warnings).
 
-Documentation moved to doc directory.
-There is now an internals overview, in doc/kawa-tour.ps.
-
-Added primitives to make it easy to call arbitrary Java methods
-from Scheme.
-
-Internal define is implemented.
-
-Rough support for multiple threads is implemented.
-
-Quantities (with units) are implemented (as in DSSSL).
-Complex numbers are implemented (except {,a}{sin,cos,tan}).
-
-Logical operations on exact integers have been implemented.
-These include all the logical functions from Guile.
-
-Exact rational arithetic is now fully implemented.
-All integer functions now believed to correctly handle bignums.
-
 A testsuite (and testing framework) was added.
 
-Eval is available, as specified for R5RS.
-Also implemented are scheme-report-environment, null-environment, and
-interaction-environment.
-
-Lexical bindings are now always handled by the compiler.
-The evaluator no longer understand lexical scopes (such as a "let");
-a top-level "let" (just like a "lambda") now forces compilation.
+Documentation moved to doc directory.
+There is now an internals overview, in doc/kawa-tour.ps.
 
 Changes since 0.4:
 ==================

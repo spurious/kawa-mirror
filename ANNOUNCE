@@ -1,66 +1,65 @@
 To: java@relog.ch
-Subject: code/misc/Kawa - Scheme compiler and runtime v. 1.0
+Subject: code/misc/Kawa - Scheme compiler and runtime v. 1.2
 --------
 SUBJECT 
-  code/misc/Kawa - Scheme compiler and runtime v. 1.0
+  code/misc/Kawa - Scheme compiler and runtime v. 1.2
 
 URL
-  ftp://ftp.cygnus.com/pub/bothner/kawa-1.0.tar.gz  (Code)
-  ftp://ftp.cygnus.com/pub/bothner/kawa-1.0-compiled.tar.gz  (Application)
+  http://www.cygnus.com/~bothner/kawa.html  (Information)
+  ftp://ftp.cygnus.com/pub/bothner/kawa-1.2.tar.gz  (Code)
+  ftp://ftp.cygnus.com/pub/bothner/kawa-1.2-compiled.zip  (Application)
 
 DESCRIPTION
   Kawa (pronounced kava) is a Scheme interpreter written completely in Java.
   Scheme procedures are compiled into Java bytecodes for efficiency.
 
   The release includes a number of useful classes, including
-  a package that makes it easy to create .class files.
+  a package that makes it easy to create .class files, and
+  powerful Number classes.
 
   The full sources and documentation is available by anonymous ftp
-  from ftp.cygnus.com, in pub/bothner/kawa-1.0.tar.gz.
+  from ftp.cygnus.com, in pub/bothner/kawa-1.2.tar.gz.
 
   The pre-compiled .class files (only) are in the same directory
-  in kawa-1.0-compiled.tar.gz.
+  in kawa-1.2-compiled.tar.gz.
 
 VERSION
-  Kawa 1.0.
+  Kawa 1.2.
 
 CHANGES
-  Basically all of R4RS has been implemented.  All the essential
-  forms and functions are implemented.  (Exact for limitations
-  in call/cc and tail-call-elimination.)  Almost all of the optional
-  forms are implemented.  The exceptions are transcript-on,
-  transcript-off, and the functions for complex numbers, and
-  fractions (exact non-integer rationals).
 
-  The hygienic macros described in the appendix to R4RS are now
-  impemented (but only the define-syntax form).
+  Added primitives to make it easy to call arbitrary Java methods
+  from Scheme.
 
-  Compile time errors include line numbers.
-  Uncaught exceptions cause a stack trace that includes .scm line numbers.
-  This makes it more practical to debug Kawa with a Java debugger.
+  Exact rational arithetic is now fully implemented.
+  All integer functions now believed to correctly handle bignums.
+  Logical operations on exact integers have been implemented.
+  These include all the logical functions from Guile.
 
-  New kawac application compiles to one or more .class files.
+  Complex numbers are implemented (except {,a}{sin,cos,tan}).
+  Quantities (with units) are implemented (as in DSSSL).
 
-  The numeric classes have been re-written.  There is partial support
-  for bignums (infinite-precision integers), but divide (for example)
-  has not been implemented yet.  The representation of bignums uses
-  2's complement, where the "big digits" are laid out so as to be
-  compatible with the mpn functions of the GNU Multi-Precision library
-  (gmp).  (The intent is that a future version of Kawa will support
-  an option to use gmp native functions for speed.)
+  Eval is available, as specified for R5RS.
+  Also implemented are scheme-report-environment, null-environment, and
+  interaction-environment.
 
-  The kawa application takes a number of useful command-line switches.
+  Internal define is implemented.
 
-  Loading a source file with load now wraps the entire file in
-  a lambda (named "atFileLevel").  This is for better error
-  reporting, and consistency with compile-file.
+  Rough support for multiple threads is implemented.
 
-  The R5RS multiple value functions values and call-with-values are
-  implemented.
+  Moved kawa class to kawa/repl.  Merged in kawac (compiler)
+  functionality.  A 'kawa' shell-script is now created.
+  This is now the preferred interface to both the interactive
+  evaluator and the compiler (on Unix-like systems).
 
-  Macros (and primitive syntax) can now be autoloaded as well as procedures.
+  Now builds "without a snag" using Cafe 1.51 under Win95.
+  (Symantec JIT (ver 2.00b19) requires disabling JIT - JAVA_COMPCMD=disable.)
+  Compiles under JDK 1.1 beta (with some warnings).
 
-  Many bug fixes and improvements.
+  A testsuite (and testing framework) was added.
+
+  Documentation moved to doc directory.
+  There is now an internals overview, in doc/kawa-tour.ps.
 
 PRICE
   Free for commercial and non-commercial use.

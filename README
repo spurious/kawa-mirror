@@ -8,15 +8,13 @@ Documentation is in the doc directory.
 The file doc/kawa.txt (which was automatically generated from doc/kawa.texi)
 explains how to build, install, and use Kawa.
 The file doc/kawa.html contains the same information in HTML format.
+An overview of how Kawa works is in doc/kawa-tour.ps.
 
 The file NEWS summarizes recent changes.
 
 Kawa's copyright is in doc/license.terms.
 
 The file Compliance.html summarizes divergence from the R4RS.
-
-A slightly out-of-date design document discussing how to compile
-Scheme into Java is in http://www.cygnus.com/~bothner/scm2java.html.
 
 	--Per Bothner
 Cygnus Support     bothner@cygnus.com

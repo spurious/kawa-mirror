@@ -29,7 +29,10 @@ public class ObjectExp extends ClassExp
 	Variable closureEnv =
 	  ! Compilation.usingTailCalls ? getOwningLambda().heapFrame
 	  : caller.heapFrame != null ? caller.heapFrame	: caller.closureEnv;
-	code.emitLoad(closureEnv);
+	if (closureEnv == null)
+	  code.emitPushThis();
+	else
+	  code.emitLoad(closureEnv);
       }
     code.emitInvokeSpecial(init);
 

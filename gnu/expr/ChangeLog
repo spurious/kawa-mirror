@@ -1,3 +1,8 @@
+2003-04-12  Vladimir Tsichevski <wowa1@online.ru>
+
+	* ObjectExp.java (compile): If closureEnv is null, push this instead.
+	Change needed because of 03-02 change.
+
 2003-04-08  Per Bothner  <per@bothner.com>
 
 	* Special.java (make):  Return Special instead of Object.
@@ -59,7 +64,7 @@
 
 2003-03-02  Per Bothner  <per@bothner.com>
 
-	* LambdaExp.java (addMethodFor):  DOn't set closureEnv.
+	* LambdaExp.java (addMethodFor):  Don't set closureEnv.
 
 	* Declaration.java (printInfo):  New method.
 	* LetExp.java (print):  Use printInfo.

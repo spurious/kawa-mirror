@@ -23,7 +23,7 @@ public class NumberCompare extends ProcedureN
 
   public int numArgs() { return (-1 << 12) | 2; }
 
-  // The fuuny name of the static fields and methods correspond to
+  // The funny name of the static fields and methods correspond to
   // the name mangling scheme defined in Compilation.mangleName.
   // They can therefor be statically resolved by the compiler.
 

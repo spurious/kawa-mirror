@@ -1,3 +1,8 @@
+Tue Apr  1 23:11:06 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* Makefile.am (SECONDARY_OBJS, MISC_1_1):  Use new mangling.
+	* Makefile.in:  Re-generate - requires patched automake.
+
 Mon Mar 31 17:06:25 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* quantities.scm: Update kawa.math -> gnu.math various places.

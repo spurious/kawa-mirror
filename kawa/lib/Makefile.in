@@ -78,43 +78,42 @@ EXTRA_DATA = $(OBJ_1_0) $(OBJ_1_1)
 # The funny names are because the Scheme functions names get "mangled"
 # into valid Java class names.
 SECONDARY_OBJS=\
-  _0025defmacro.class\
-  char_002d_003einteger.class\
-  char_002ddowncase.class\
-  char_002dlower_002dcase_003f.class\
-  char_002dnumeric_003f.class\
-  char_002dupcase.class\
-  char_002dupper_002dcase_003f.class\
-  char_002dwhitespace_003f.class\
-  eof_002dobject_003f.class\
-  exit.class\
-  force_002doutput.class\
-  gentemp.class\
-  integer_002d_003echar.class\
-  keyword_002d_003estring.class\
-  keyword_003f.class\
-  keywords.class\
-  list_002d_003evector.class\
-  make_002dstring.class\
-  newline.class\
-  string_002d_003ekeyword.class\
-  string_002dlength.class\
-  vector_002dlength.class\
-  vector_002dref.class\
-  vector_002dset_0021.class\
+  characters$$char_2_integer.class \
+  characters$$char__downcase.class \
+  characters$$char__lower__case_P.class \
+  characters$$char__numeric_P.class \
+  characters$$char__upcase.class \
+  characters$$char__upper__case_P.class \
+  characters$$char__whitespace_P.class \
+  characters$$integer_2_char.class \
+  keywords$$keyword_2_string.class \
+  keywords$$keyword_P.class \
+  keywords$$string_2_keyword.class \
+  ports$$eof__object_P.class \
+  ports$$force__output.class \
+  ports$$newline.class \
+  strings$$make__string.class \
+  strings$$string__length.class \
+  syntax$$_Cdefmacro.class \
+  syntax$$gentemp.class \
+  thread$$exit.class \
+  vectors$$list_2_vector.class \
+  vectors$$vector__length.class \
+  vectors$$vector__ref.class \
+  vectors$$vector__set_B.class \
   @EXTRA_MISC@
 
 MISC_1_1 = \
-  lambda.class\
-  make_002drecord_002dtype.class\
-  record_002daccessor.class\
-  record_002dconstructor.class\
-  record_002dmodifier.class\
-  record_002dpredicate.class\
-  record_002dtype_002ddescriptor.class\
-  record_002dtype_002dfield_002dnames.class\
-  record_002dtype_002dname.class\
-  record_003f.class
+  reflection$$lambda.class \
+  reflection$$make__record__type.class \
+  reflection$$record_P.class \
+  reflection$$record__accessor.class \
+  reflection$$record__constructor.class \
+  reflection$$record__modifier.class \
+  reflection$$record__predicate.class \
+  reflection$$record__type__descriptor.class \
+  reflection$$record__type__field__names.class \
+  reflection$$record__type__name.class
 
 java_DATA=$(OBJ) $(SECONDARY_OBJS)
 
@@ -146,7 +145,7 @@ Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
 install-javaDATA: $(java_DATA)
 	$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(javadir)
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    $(INSTALL_DATA) $(srcdir)/$$p $(javadir)/$$p; \
 	  else if test -f $$p; then \
@@ -155,7 +154,7 @@ install-javaDATA: $(java_DATA)
 	done
 
 uninstall-javaDATA:
-	list="$(java_DATA)"; for p in $$list; do \
+	list='$(java_DATA)'; for p in $$list; do \
 	  rm -f $(javadir)/$$p; \
 	done
 tags: TAGS

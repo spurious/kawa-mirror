@@ -161,7 +161,6 @@ public class Lambda extends Syntax implements Printable
 	    else
 	      {
 		tr.syntaxError ("default value for #!rest parameter");
-		
 		return;
 	      }
 	  }

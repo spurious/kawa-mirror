@@ -1,3 +1,7 @@
+2004-08-24  Per Bothner  <per@bothner.com>
+
+	* OutPort.java (openFile): New static method.
+
 2004-08-14  Per Bothner  <per@bothner.com>
 
 	* CallFrame.java:  Remove unused class.

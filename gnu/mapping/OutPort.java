@@ -111,6 +111,25 @@ public class OutPort extends PrintConsumer implements Printable
       err = e;
   }
 
+  public static OutPort openFile(String fname)
+    throws java.io.UnsupportedEncodingException,
+           java.io.FileNotFoundException
+  {
+      Object conv = Environment.user().get("port-char-encoding");
+      java.io.OutputStream strm = new java.io.FileOutputStream(fname);
+      strm = new java.io.BufferedOutputStream(strm);
+      java.io.Writer wr;
+      if (conv == null || conv == Boolean.TRUE)
+	wr = new java.io.OutputStreamWriter(strm);
+      else
+	{
+	  if (conv == Boolean.FALSE)
+	    conv = "8859_1";
+	  wr = new java.io.OutputStreamWriter(strm, conv.toString());
+	}
+      return new OutPort(wr, fname);
+  }
+
   public void echo (char[] buf, int off, int len)  throws java.io.IOException
   {
     if (base instanceof LogWriter)

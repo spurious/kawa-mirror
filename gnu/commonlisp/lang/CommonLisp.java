@@ -1,71 +1,18 @@
+// Copyright (c) 2001  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.commonlisp.lang;
 import gnu.mapping.*;
-import gnu.jemacs.lang.Symbol;
-import gnu.jemacs.lang.ObArray;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
-import gnu.bytecode.CodeAttr;
 import gnu.kawa.lispexpr.LangPrimType;
 import gnu.kawa.functions.DisplayFormat;
 
-public class CommonLisp extends Interpreter
+public class CommonLisp extends Lisp2
 {
-  public static final LList FALSE = LList.Empty;
-  public static final String TRUE = "t";
-  public static final Expression nilExpr = new QuoteExp(FALSE);
-
-  public boolean isTrue(Object value)
-  {
-    return value != FALSE;
-  }
-
-  public Object booleanObject(boolean b)
-  {
-    if (b) return TRUE; else return FALSE;
-  }
-
-  public void emitPushBoolean(boolean value, CodeAttr code)
-  {
-    if (value)
-      code.emitPushString("t");
-    else
-      code.emitGetStatic(Compilation.scmListType.getDeclaredField("Empty"));
-  }
-
-  public Object noValue()
-  {
-    return FALSE;
-  }
-
-  public boolean hasSeparateFunctionNamespace()
-  {
-    return true;
-  }
-
-  /** Get a symbol for a given (interned) Java string. */
-  public static Object getSymbol (String name)
-  {
-    if (name == "nil")
-      return FALSE;
-    // return Environment.getCurrentBinding(name);
-    return name;
-  }
-
-  /** Get a string for a given Java string. */
-  public static Object getString (String name)
-  {
-    return new FString(name);
-  }
-
-  /** Get a string for a given CommonLisp symbol. */
-  public static Object getString (Binding symbol)
-  {
-    return getString(symbol.getName());
-  }
-
   static boolean charIsInt = false;
 
   /** Get a CommonLisp character object. */
@@ -94,7 +41,7 @@ public class CommonLisp extends Interpreter
     else
       i = -1;
     if (i < 0 || i > 0xffff)
-      throw new gnu.jemacs.buffer.Signal("error", "not a character value");
+      throw new ClassCastException("not a character value");
     return (char) i;
   }
 
@@ -152,13 +99,12 @@ public class CommonLisp extends Interpreter
 
   public CommonLisp()
   {
-
-    environ = new ObArray();
-    environ.setName ("interaction-environment."+(++elispCounter));
+    Environment scmEnv = Scheme.builtin();
+    environ = new SymbolTable();
+    ((SymbolTable) environ).rename ("Interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
-
-    BindingEnumeration e
-      = Scheme.getInstance().builtin().enumerateAllBindings();
+    System.err.println("import form Scm:"+scmEnv);
+    BindingEnumeration e = scmEnv.enumerateAllBindings();
     while (e.hasMoreElements())
       {
 	Binding b = e.nextBinding();
@@ -182,14 +128,11 @@ public class CommonLisp extends Interpreter
 	loadClass("kawa.lib.std_syntax", environ);
 	loadClass("kawa.lib.lists", environ);
 	loadClass("kawa.lib.strings", environ);
-	loadClass("gnu.jemacs.lang.SymbolOps", environ);
-	loadClass("gnu.jemacs.lang.NumberOps", environ);
-	loadClass("gnu.jemacs.lang.ArrayOps", environ);
-	loadClass("gnu.jemacs.lang.StringOps", environ);
-	loadClass("gnu.jemacs.lang.ListOps", environ);
+	loadClass("gnu.commonlisp.lisp.PrimOps", environ);
       }
     catch (java.lang.ClassNotFoundException ex)
       {
+	  System.err.println("caught "+ex);
 	// Ignore - happens while building this directory.
       }
 
@@ -197,7 +140,9 @@ public class CommonLisp extends Interpreter
     define("nil", "nil");
 
     kawa.lang.Lambda lambda = new kawa.lang.Lambda();
-    lambda.setKeywords("&optional", "&rest", "&key");
+    lambda.setKeywords(getSymbol("&optional"),
+		       getSymbol("&rest"),
+		       getSymbol("&key"));
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
     defun("defun", new defun(lambda));
@@ -244,11 +189,6 @@ public class CommonLisp extends Interpreter
     CommonLisp interp = new CommonLisp();
     Interpreter.defaultInterpreter = interp;
     Environment.setCurrent(interp.getEnvironment());
-  }
-
-  public Environment getNewEnvironment ()
-  {
-    return new ObArray(environ);
   }
 
   public Object read (InPort in)

@@ -2,14 +2,17 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-include $(top_srcdir)/Make-rules
+@Make_rules@
 
-java_JAVA=\
+java_sources = \
   CLispReader.java \
+  Lisp2.java \
   defun.java setq.java defvar.java \
+  Symbol.java \
+  SymbolTable.java \
   UnwindProtect.java \
   CommonLisp.java
 
 PACKAGE_FNAME = gnu-commonlisp-lang
 
-all: $(@GCJ_COMPILED_SELECTED@)
+all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)

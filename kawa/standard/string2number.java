@@ -1,9 +1,8 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.kawa.util.*;
-import gnu.text.CharArrayInPort;
+import gnu.kawa.lispexpr.*;
 
 public class string2number extends Procedure1or2
 {
@@ -24,8 +23,8 @@ public class string2number extends Procedure1or2
       }
     catch (java.io.IOException ex)
       {
-	throw new GenericError ("internal input error in string->number - " +
-                                ex.getMessage ());
+	throw new RuntimeException("internal input error in string->number - "
+				   + ex.getMessage ());
       }
   }
 

@@ -17,7 +17,7 @@ public class call_with_input_file extends Procedure2
        throw new RuntimeException ("file not found: " + fname);
     }
     catch (java.io.IOException e) {
-      throw new GenericError ("caught I/O exception: " + e);
+      throw new WrappedException(e);
     }
   }
 }

@@ -29,11 +29,11 @@ public class with_input_from_file extends Procedure2
 	}
       return result;
     } catch (java.io.FileNotFoundException e) {
-       throw new GenericError ("file not found: " + fname);
+       throw new WrappedException("file not found: " + fname, e);
     }
     catch (java.io.IOException e)
       {
-	throw new GenericError ("caught I/O exception: " + e);
+	throw new WrappedException(e);
       }
   }
 }

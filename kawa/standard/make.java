@@ -27,13 +27,9 @@ public class make extends ProcedureN
       {
 	result = clas.newInstance();
       }
-    catch (InstantiationException ex)
+    catch (Exception ex)
       {
-	throw new GenericError (ex.toString());
-      }
-    catch (IllegalAccessException ex)
-      {
-	throw new GenericError (ex.toString());
+	throw new WrappedException(ex);
       }
     for (int i = 1;  i < nargs;  )
       {

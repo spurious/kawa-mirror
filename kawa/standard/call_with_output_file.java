@@ -18,7 +18,7 @@ public class call_with_output_file extends Procedure2
       }
     catch (java.io.IOException e)
       {
-	throw new GenericError ("caught I/O exception: " + e);
+	throw new WrappedException(e);
       }
   }
 }

@@ -1,7 +1,7 @@
 package kawa.lang;
 
 /**
- * Class used to mark an erroreous expression
+ * Class used to mark an erroneous expression
  * @author	Per Bothner
  */
 
@@ -17,7 +17,7 @@ public class ErrorExp extends Expression
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
     // Should not happen
-    throw new GenericError ("evaluated erroreous expression: " + message);
+    throw new GenericError ("evaluated erroneous expression: " + message);
   }
 
   public void print (java.io.PrintWriter ps)

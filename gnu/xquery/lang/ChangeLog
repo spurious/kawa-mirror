@@ -1,3 +1,7 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* XQuery.java (<init>):  BaseUri moved to gnu.kawa.functions.
+
 2003-02-26  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (<init>):  Explicitly specify field names for

@@ -1,3 +1,8 @@
+Wed Dec 23 15:10:03 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa/standard/object.java (rewrite):  Handle field initialization.
+	Set fields declarations to both redaable and writable.
+
 Tue Dec 15 18:35:44 1998  Per Bothner  <bothner@cygnus.com>
 
 	Moved Kawa source repository to sourceware.cygnus.com.

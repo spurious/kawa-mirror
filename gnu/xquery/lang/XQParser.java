@@ -13,6 +13,7 @@ import gnu.xml.NamespaceBinding;
 import gnu.bytecode.*;
 import gnu.kawa.reflect.OccurrenceType;
 import gnu.kawa.functions.Convert;
+import gnu.xquery.util.NamedCollator;
 
 /** A class to read xquery forms. */
 
@@ -25,7 +26,7 @@ public class XQParser extends LispReader // should be extends Lexer
   int seenPosition;
   int seenLast;
 
-  public static boolean warnOldVersion;
+  public static boolean warnOldVersion = true;
 
   /** The internal name of the variable containing '.', the context node. */
   static final Symbol DOT_VARNAME = Symbol.make(null, "$dot$");
@@ -42,6 +43,8 @@ public class XQParser extends LispReader // should be extends Lexer
   NameLookup lexical;
   /** Only used in deprecated parseQName. */
   XQResolveNames resolver;
+
+  NamedCollator defaultCollator = null;
 
   boolean preserveBoundarySpace;
 
@@ -91,6 +94,17 @@ public class XQParser extends LispReader // should be extends Lexer
 		 ? (ch < 0 || ! Character.isWhitespace((char) ch))
 		 : (ch != ' ' && ch != '\t'))
 	  return ch;
+      }
+  }
+
+  final void skipToSemicolon ()
+    throws java.io.IOException
+  {
+    for (;;)
+      {
+	int next = read();
+	if (next < 0 || next == ';')
+	  break;
       }
   }
 
@@ -193,6 +207,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
   static final int DEFAULT_ELEMENT_TOKEN = 'E'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
+  static final int DEFAULT_COLLATION_TOKEN = 'G';
   static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
   static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
@@ -754,9 +769,28 @@ public class XQParser extends LispReader // should be extends Lexer
 	curValue = name;
 	switch (next)
 	  {
+	  case 'd':
+	    if (lookingAt("declare", /*"d"+*/ "efault"))
+	      {
+		getRawToken();
+		if (match("function"))
+		  return curToken = DEFAULT_FUNCTION_TOKEN;
+		if (match("element"))
+		  return curToken = DEFAULT_ELEMENT_TOKEN;
+		if (match("collation"))
+		  return curToken = DEFAULT_COLLATION_TOKEN;
+		error("unrecognized/unimplemented 'declare default'");
+		skipToSemicolon();
+		return peekOperand();
+	      }
 	  case 'e':
 	    if (lookingAt("default", /*"e"+*/ "lement"))
-	      return curToken = DEFAULT_ELEMENT_TOKEN;
+	      {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'default element' by 'declare default element namespace'");
+		return curToken = DEFAULT_ELEMENT_TOKEN;
+	      }
 	    break;
 	  case 'f':
 	    if (lookingAt("declare", /*"f"+*/ "unction"))
@@ -769,7 +803,12 @@ public class XQParser extends LispReader // should be extends Lexer
 		return curToken = DECLARE_FUNCTION_TOKEN;
 	      }
 	    if (lookingAt("default", /*"f"+*/ "unction"))
-	      return curToken = DEFAULT_FUNCTION_TOKEN;
+	      {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'default function' by 'declare default function namespace'");
+		return curToken = DEFAULT_FUNCTION_TOKEN;
+	      }
 	    break;
 	  case 'm':
 	    if (lookingAt("import", /*"m"+*/ "odule"))
@@ -778,6 +817,13 @@ public class XQParser extends LispReader // should be extends Lexer
 	  case 'n':
 	    if (lookingAt("declare", /*"n"+*/ "amespace"))
 	      return curToken = DECLARE_NAMESPACE_TOKEN;
+	    if (lookingAt("default", /*"n"+*/ "amespace"))
+	      {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'default namespace' by 'declare default element namespace'");
+		return curToken = DEFAULT_ELEMENT_TOKEN;
+	      }
 	    if (lookingAt("module", /*"n"+*/ "amespace"))
 	      return curToken = MODULE_NAMESPACE_TOKEN;
 	    break;
@@ -1871,11 +1917,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	    break;
 	  }
 	if (curToken != ',')
-	  {
-	    exp = syntaxError("missing '}' or ','");
-	  }
-	getRawToken();
+	  exp = syntaxError("missing '}' or ','");
+	else
+	  getRawToken();
+
 	exp = makeExprSequence(exp, parseExpr());
+
       }
     exp.setFile(getName());
     exp.setLine(startLine, startColumn);
@@ -2549,16 +2596,12 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken != ')')
       return syntaxError("missing ')' after 'if (EXPR'");
     getRawToken();
-    if (curToken != NCNAME_TOKEN
-	|| tokenBufferLength != 4
-	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("then"))
+    if (! match("then"))
       syntaxError("missing 'then'");
     else
       getRawToken();
     Expression thenPart = parseExpr();
-    if (curToken != NCNAME_TOKEN
-	|| tokenBufferLength != 4
-	|| ! new String(tokenBuffer, 0, 4).equalsIgnoreCase("else"))
+    if (! match("else"))
       syntaxError("missing 'else'");
     else
       getRawToken();
@@ -3095,51 +3138,68 @@ public class XQParser extends LispReader // should be extends Lexer
 	forms.toArray(inits);
 	return BeginExp.canonicalize(inits);
       }
-    if (curToken == DEFAULT_ELEMENT_TOKEN
-	|| curToken == DEFAULT_FUNCTION_TOKEN
-	|| (curToken == NCNAME_TOKEN
-	    && "default".equals((String) curValue)))
+    if (curToken == DEFAULT_COLLATION_TOKEN)
       {
-	int next = skipSpace(nesting != 0);
-	if (next >= 0)
+	getRawToken();
+	if (curToken != STRING_TOKEN)
+	  return declError("missing collation name");
+	if (defaultCollator != null && ! interactive) // err:XQ0038
+	    return declError("duplicate default collation declaration");
+	String collation = new String(tokenBuffer, 0, tokenBufferLength);
+	try
 	  {
-	    unread();
-	    if (isNameStart((char) next))
-	      {
-		boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
-		if (curToken == NCNAME_TOKEN && warnOldVersion)
-		  error('w', "use 'default element namespace' instead of 'default namespace'");
-		getRawToken();
-		curValue = new String(tokenBuffer, 0, tokenBufferLength);
-		if (curToken != NCNAME_TOKEN ||
-		    ! "namespace".equalsIgnoreCase((String) curValue))
-		  return syntaxError("expected 'namespace' after 'default'");
-		getRawToken();
-		if (curToken != OP_EQU)
-		  return syntaxError("missing '=' in namespace declaration");
-		getRawToken();
-		if (curToken != STRING_TOKEN)
-		  return syntaxError("missing uri namespace declaration");
-		String uri = new String(tokenBuffer, 0, tokenBufferLength);
-		String prefix;
-		if (forFunctions)
-		  {
-		    prefix = XQuery.DEFAULT_FUNCTION_PREFIX;
-		    functionNamespacePath = new Namespace[1];
-		    functionNamespacePath[0] = Namespace.getInstance(uri);
-		  }
-		else
-		  {
-		    prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
-		    defaultElementNamespace = uri;
-		  }
-		Declaration decl = makeNamespaceDecl(prefix, uri);
-		parser.mainLambda.addDeclaration(decl);
-		SetExp sexp = new SetExp(decl, decl.getValue());
-		sexp.setDefining (true);
-		return sexp;
-	      }
+	    defaultCollator = NamedCollator.make(collation);
 	  }
+	catch (Exception name)
+	  { // err:XQ0038
+	    defaultCollator = NamedCollator.codepointCollation;
+	    return declError("unknown collation '"+collation+"'");
+	  }
+	parseSeparator();
+	return QuoteExp.voidExp;
+      }
+    if (curToken == DEFAULT_ELEMENT_TOKEN
+	|| curToken == DEFAULT_FUNCTION_TOKEN)
+      {
+	boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
+	getRawToken();
+	if (match("namespace"))
+	  getRawToken();
+	else
+	  {
+	    String msg = "expected 'namespace' keyword";
+	    if (curToken != STRING_TOKEN && curToken != OP_EQU)
+	      return declError(msg);
+	    else if (warnOldVersion)
+	      error('w', msg);
+	  }
+	if (curToken == OP_EQU || curToken == COLON_EQUAL_TOKEN)
+	  {
+	    if (warnOldVersion)
+	      error('w', "extra '=' in default namespace declaration");
+	    getRawToken();
+	  }
+	if (curToken != STRING_TOKEN)
+	  return declError("missing namespace uri");
+	String uri = new String(tokenBuffer, 0, tokenBufferLength);
+	String prefix;
+	if (forFunctions)
+	  {
+	    prefix = XQuery.DEFAULT_FUNCTION_PREFIX;
+	    functionNamespacePath = new Namespace[1];
+	    functionNamespacePath[0] = Namespace.getInstance(uri);
+	  }
+	else
+	  {
+	    prefix = XQuery.DEFAULT_ELEMENT_PREFIX;
+	    defaultElementNamespace = uri;
+	  }
+	Declaration decl = makeNamespaceDecl(prefix, uri);
+	parser.mainLambda.addDeclaration(decl);
+	SetExp sexp = new SetExp(decl, decl.getValue());
+	sexp.setDefining (true);
+	parseSeparator();
+	return sexp;
       }
     if (curToken == DECLARE_XMLSPACE_TOKEN)
       {
@@ -3276,6 +3336,31 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
+  void error (String message, int columnAdjust)
+    throws java.io.IOException, SyntaxException
+  {
+    int line = port.getLineNumber();
+    int column = port.getColumnNumber();
+    error('e', port.getName(), line + 1,
+	  column < 0 ? 0 : column + 1 - columnAdjust,
+	  message);
+  }
+
+  public Expression declError (String message)
+    throws java.io.IOException, SyntaxException
+  {
+    if (interactive)
+      return syntaxError(message);
+    error(message, tokenWidth());
+    for (;;)
+      {
+	if (curToken==';' || curToken == EOF_TOKEN)
+	  break;
+	getRawToken();
+      }
+    return new ErrorExp (message);
+  }
+
   /**
    * Handle syntax errors (at rewrite time).
    * @param message an error message to print out
@@ -3285,11 +3370,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression syntaxError (String message, int columnAdjust)
     throws java.io.IOException, SyntaxException
   {
-    int line = port.getLineNumber();
-    int column = port.getColumnNumber();
-    error('e', port.getName(), line + 1,
-	  column < 0 ? 0 : column + 1 - columnAdjust,
-	  message);
+    error(message, columnAdjust);
     if (interactive)
       {
 	curToken = 0;
@@ -3311,5 +3392,4 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     return new ErrorExp (message);
   }
-
 }

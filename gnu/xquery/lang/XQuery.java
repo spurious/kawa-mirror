@@ -527,7 +527,10 @@ public class XQuery extends Interpreter
     defProcStFld("index-of", "gnu.xquery.util.IndexOf", "indexOf");
     defProcStFld("last-index-of", "gnu.xquery.util.LastIndexOf", "lastIndexOf");
     defProcStFld("sublist", "gnu.xquery.util.SubList", "subList");
-    defProcStFld("empty", "gnu.xquery.util.IsEmptySequence", "isEmptySequence");
+    define_method("empty", "gnu.xquery.util.SequenceUtils",
+		  "isEmptySequence");
+    define_method("exists", "gnu.xquery.util.SequenceUtils",
+		  "exists");
     defProcStFld("false", "gnu.xquery.lang.XQuery", "falseFunction");
     defProcStFld("true", "gnu.xquery.lang.XQuery", "trueFunction");
     defProcStFld("number", "gnu.xquery.util.NumberValue", "numberValue");

@@ -1,3 +1,12 @@
+2004-12-10  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Implement 'declare default collation'.
+	(warnOldVersion): Change to true. Add soem extra tests/warnings.
+	(defaultCollator): New field.
+	(skipToSemicolon, error, declError): New helper methods.
+	(parseEnclosedExpr): Handle missing comma errors better.
+	* XQuery.java(<init>): Declare fn:exists.  Update fn:empty.
+
 2004-12-07  Per Bothner  <per@bothner.com>
 
 	Update for new Symbol/Namespace handling.

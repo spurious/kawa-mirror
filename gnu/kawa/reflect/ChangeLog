@@ -1,3 +1,8 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* ArrayLength.java:  Remove unused import statements.
+	* TypeSwitch.java:  Likewise.
+
 2004-05-03  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  If existing constaint is

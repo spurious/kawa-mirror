@@ -2,7 +2,6 @@ package gnu.kawa.reflect;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
-import gnu.kawa.lispexpr.LangPrimType;
 import java.io.*;
 
 public class ArrayLength 

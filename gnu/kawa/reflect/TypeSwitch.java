@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.reflect;
-import gnu.lists.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
 import gnu.mapping.*;

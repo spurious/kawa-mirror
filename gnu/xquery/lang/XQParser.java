@@ -706,6 +706,10 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    return parseElementType();
 	  }
+	if ("text".equalsIgnoreCase(tname))
+	  return new QuoteExp(textNodeTest);
+	if ("node".equalsIgnoreCase(tname))
+	  return new QuoteExp(anyNodeTest);
 	Type type = kawa.standard.Scheme.getNamedType(tname);
 	return new QuoteExp(type);
       }
@@ -900,11 +904,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    if (curToken == OP_NODE)
 	      {
-		predicate = new NodeType("node");
+		predicate = anyNodeTest;
 	      }
 	    else // if (curToken == OP_TEXT)
 	      {
-		predicate = new NodeType("text", NodeType.TEXT_OK);
+		predicate = textNodeTest;
 	      }
 	    if (getRawToken() != ')')
 	      return syntaxError("missing '()' after node test");
@@ -2016,6 +2020,9 @@ public class XQParser extends LispReader // should be extends Lexer
 		      "namedDescendantsOrSelf");
   static final Expression funcValuesFilter
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "valuesFilter");
+
+  static final NodeType textNodeTest = new NodeType("text", NodeType.TEXT_OK);
+  static final NodeType anyNodeTest = new NodeType("node");
 
   public void error(String message)
   {

@@ -1,3 +1,9 @@
+2002-07-28  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseDataType):  Handle 'text' and 'node'.
+	(anyNodeTest, textNodeTest):  New static fields.
+	(parseNodeTest):  Use anyNodeTest and textNodeTest.
+
 2002-07-24  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parse, parseFile0:  Update for Interpreter changed API.

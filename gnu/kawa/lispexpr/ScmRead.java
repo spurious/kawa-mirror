@@ -691,7 +691,7 @@ public class ScmRead extends LispReader
     int prev;
     do
       {
-	int next, v;
+	int next;
 
 	prev = c;
 
@@ -716,16 +716,13 @@ public class ScmRead extends LispReader
 	    obj.append('\n');
 	    continue;
 	  case '\\':
-            v = readEscape();
-            if (v == -2)
-              continue;
-            if (v < 0)
-              {
-                eofError("unexpected EOF in string literal");
-                break;
-              }
-            obj.append ((char) v);
-            break;
+            c = readEscape();
+            if (c == -2)
+	      {
+		c = '\n'; // So prev gets set ...
+		continue;
+	      }
+	    /* ... fall through ... */
 	  default:
 	    if (c < 0)
 	      eofError("unexpected EOF in string literal");

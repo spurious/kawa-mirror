@@ -74,7 +74,7 @@ public class Scope
   {
     var.start_pc = code == null ? 0 : code.PC;
     addVariable (var);
-    if (var.isSimple ())
+    if (var.isSimple() && code != null)
       var.allocateLocal(code);
   }
 
@@ -98,6 +98,13 @@ public class Scope
       if (name1[i] != name2[i])
 	return false;
     return true;
+  }
+
+  public void setStartPC(int PC)
+  {
+    start_pc = PC;
+    for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
+      var.start_pc = PC;
   }
 
   /**

@@ -25,7 +25,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void setAttributes (Attribute attributes)
   { this.attributes = attributes; }
   LineNumbersAttr lines;
-  LocalVarsAttr locals;
+  public LocalVarsAttr locals;
 
   Type[] stack_types;
   int SP;  // Current stack size (in "words")
@@ -335,7 +335,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public void enterScope (Scope scope)
   {
-    scope.start_pc = PC;
+    scope.setStartPC(PC);
     locals.enterScope(scope);
   }
 

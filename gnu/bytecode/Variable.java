@@ -17,6 +17,21 @@ public class Variable extends Location implements java.util.Enumeration {
     return next;
   }
 
+  public Variable ()
+  {
+  }
+
+  public Variable (String name)
+  {
+    setName(name);
+  }
+
+  public Variable (String name, Type type)
+  {
+    setName(name);
+    setType(type);
+  }
+
   private int flags = SIMPLE_FLAG;
   /* The SIMPLE_FLAG records the isSimple (q.v.) state. */
   private static final int SIMPLE_FLAG = 0x1;
@@ -128,5 +143,10 @@ public class Variable extends Location implements java.util.Enumeration {
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)
       code.locals.used [offset + size] = null;
+  }
+
+  public String toString()
+  {
+    return "Variable["+getName()+" offset:"+offset+']';
   }
 }

@@ -1,3 +1,13 @@
+1999-12-24  Per Bothner  <per@bothner.com>
+
+	* Variable.java:  New constructors.
+	(toString):  New method.
+	* Scope.java (setStartPC):  New method.
+	(addVariable):  If code is null, don't call allocateLocal.
+	* LocalVarsAttr.java (enterScope)  Don't set start_pc of variables.
+	* CodeAttr.java (locals):  Make field public.
+	(enterScope):  Call scope.setStartPC.
+
 1999-12-16  Luke Gorrie <luke@vegetable.org>
 
 	* ClassType.java (getSuperclass):  Check for null superclass.

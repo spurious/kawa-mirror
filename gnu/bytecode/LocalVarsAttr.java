@@ -57,7 +57,6 @@ public class LocalVarsAttr extends Attribute
 	    else if (used[var.offset] != var)
 	      throw new Error ("inconsistent local variable assignments for "
 +var.getName()+" at "+var.offset+" != "+used[var.offset]);
-	    var.start_pc = code.PC;
 	  }
       }
   }

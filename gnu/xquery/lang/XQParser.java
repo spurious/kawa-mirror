@@ -2539,7 +2539,6 @@ public class XQParser extends LispReader // should be extends Lexer
     decl.setFile(getName());
     decl.setLine(getLineNumber() + 1,
 		 getColumnNumber() + 1 - tokenBufferLength);
-    //System.err.println ("parsed "+decl+" line:"+decl.getLine()+" col:"+decl.getColumn());
     return decl;
   }
 

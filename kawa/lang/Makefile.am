@@ -30,6 +30,7 @@ InPort.class \
 OutPort.class \
 TtyInPort.class SysInPort.class \
 LogWriter.class NullReader.class CharArrayInPort.class \
+Target.class StackTarget.class IgnoreTarget.class TailTarget.class \
 Expression.class \
 ApplyExp.class \
 BeginExp.class \

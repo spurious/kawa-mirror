@@ -1,3 +1,8 @@
+2001-09-21  Per Bothner  <per@bothner.com>
+
+	* LangPrimType.java (compare):  Any type can be converted to
+	boolean and vice versa, so return 0.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (implementationType):  New field.

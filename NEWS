@@ -1,7 +1,41 @@
+XQuery:
+* Support compiled library modules:  'module' and 'import module'
+  statements.  Efficient cross-module calling.  (Needs documentation.)
+* Proper QName handling of variable and function names.
+* Support absolute path expressions (starting with / or //). 
+* Working general implementation of position() and last().
+* Handle the remaining XPath axes, such as parent and also
+  all the optional axes (ancestor, following-sibling etc).
+  (Because of the above changes, you may see a performance
+  regression, as I concentrated on correctness and generality.
+  I'll be gradually adding optimizations when I can.)
+* Implement 'at' (position) clause of FLWOR statement.
+* Implement 'some ... satisfies; and 'every ... satisfies'.
+* Various syntax changes for the August '03 draft:
+  -  Pre-define namespace prefix 'local:'.
+  -  Update 'define function' to 'declare function'
+  -  Update 'define variable' to 'declare variable'
+  -  Update xmlspace syntax.
+  -  Handle semi-colons required after declarations.
+  For now, old syntax is handled quietly as well as new syntax.
+  Later, a warning will become the default.
+  Later still, the old syntax will go away!
+* distinct-nodes and various string functions are implemented.
+* The '|' or 'union' and 'intersect' and 'except' operators are implemented.
+* The 'declare xmlspace' declaration is implemented, which should now
+  correctly handle "Boundary whitespace" in element constructors.
+* Optional function returns are now handled.  Some type specifiers would
+  generate bad bytecode; these should now be fixed.
+
+Various fixes and better error messages in number parsing.
+Some optimizations for the divide function.
+
+New invoke-special syntax form (implemented by Chris Dean).
+
 Changes from Kawa 1.6.99 to 1.7.
 ================================
 
-Various XQuery changes, based on the May '02 specification.
+Various XQuery changes, based on the May '03 specification.
 - Implemented 'define variable', except the 'external' support.
 - Implemented the trace function.
 - Implemented the new comment syntax.
@@ -18,7 +52,7 @@ The default source-base requires various Java 2 features, such as collection.
 However, 'make-select1' will comment out Java2 dependencies, allowing you
 to build Kawa with an older Java implementation.
 
-The -f flag and the load function can take an absoluete URL.
+The -f flag and the load function can take an absolute URL.
 New Scheme functions load-relative and base-uri.
 
 Imported implementation of cut and cute from SRFI-26

@@ -286,13 +286,13 @@ public class Shell
 
   public static void runFile (String fname)
   {
-    Environment env = Environment.user();
+    Environment env = Environment.getCurrent();
     try
       {
 	if (fname.equals ("-"))
 	  kawa.standard.load.loadSource(InPort.inDefault(), env);
 	else
-	  kawa.standard.load.apply(fname,env);
+	  kawa.standard.load.apply(fname, env);
       }
     catch (gnu.text.SyntaxException e)
       {

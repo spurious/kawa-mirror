@@ -1,3 +1,8 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	* kawa/Shell.java (runFile):  Use Environment.getCurrent instead of
+	Environment.user, which should probably be deprecated.
+
 2003-01-29  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java:  Recognize 'gui package.

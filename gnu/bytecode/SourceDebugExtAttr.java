@@ -148,6 +148,7 @@ public class SourceDebugExtAttr  extends Attribute
 	if (i != curFileIndex && fentry.equals(fileNames[i]))
 	  {
 	    curFileIndex = i;
+	    curLineIndex = -1;
 	    return;
 	  }
       }

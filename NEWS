@@ -1,3 +1,7 @@
+The JEmacs code is being re-organized, splitting out the Swing-dependent
+code into a separate gnu.jemacs.swing package.  This should make it
+easier to add JEmacs implementation without Swing.
+
 The class gnu.expr.Interpreter has various new 'eval' methods that
 are useful for evaluating Scheme/BRL/XQuery/... expressions from Java.
 

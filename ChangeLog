@@ -1,3 +1,7 @@
+2002-03-19  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_OUTPUT):  Add gnu/jemacs/swing/Makefile.
+
 2002-03-07  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite_pair):  Use get, with a default,

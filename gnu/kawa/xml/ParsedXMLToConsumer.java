@@ -1,6 +1,6 @@
 package gnu.kawa.xml;
-import gnu.kawa.util.Consumer;
-import gnu.kawa.util.TreeList;
+import gnu.lists.Consumer;
+import gnu.lists.TreeList;
 
 public class ParsedXMLToConsumer extends ParsedXMLHandler
 {

@@ -2,7 +2,7 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xml;
-import gnu.kawa.util.*;
+import gnu.lists.*;
 import java.io.PrintWriter;
 
 public class XMLPrinter implements Consumer
@@ -126,8 +126,13 @@ public class XMLPrinter implements Consumer
 
   public void writeObject(Object v)
   {
-    startWord();
-    out.print(v);
+    if (v instanceof Consumable)
+      ((Consumable) v).consume(this);
+    else
+      {
+	startWord();
+	out.print(v);
+      }
   }
 
   /** Write each element of a sequence, which can be an array,
@@ -163,32 +168,24 @@ public class XMLPrinter implements Consumer
 	ch = c;
 	len--;
       }
-    while (len > 0)
+    int limit = off + len;
+    int count = 0;
+    while (off < limit)
       {
-	int limit = off + len;
-	int count = 0;
-
-	for (;;)
+	c = buf[off++];
+	ch = c;
+	if (ch >= 0x10000 || ch == '<' || ch == '>'
+	    || ch == '&' || (ch == '"' && inAttribute))
 	  {
-	    if (off >= limit)
-	      {
-		out.write(buf, off - count, count);
-		break;
-	      }
-	    c = buf[off++];
-	    ch = c;
-	    if (ch < 0x10000 && ch != '<' && ch != '>'
-		&& ch != '&' && (ch != '"' || ! inAttribute))
-	      count++;
-	    else
-	      {
-		out.write(buf, off - 1 - count, count);
-		writeChar(c);
-		break;
-	      }
+	    if (count > 0)
+	      out.write(buf, off - 1 - count, count);
+	    writeChar(c);
+	    count = 0;
 	  }
-	len -= count;
+	else
+	  count++;
       }
-    prev = ch;
+    if (count > 0)
+      out.write(buf, limit - count, count);
   }
 }

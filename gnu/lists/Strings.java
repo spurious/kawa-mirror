@@ -3,19 +3,19 @@
 
 package gnu.lists;
 
-/** Various static utility methods for general strings (CharSequences). */
+/** Various static utility methods for general strings (CharSeqs). */
 
 public class Strings
 {
   /** Change every character to be uppercase. */
-  public static void makeUpperCase(CharSequence str)
+  public static void makeUpperCase(CharSeq str)
   {
     for (int i = str.length();  --i >= 0; )
       str.setCharAt(i, Character.toUpperCase(str.charAt(i)));
   }
 
   /** Change every character to be lowercase. */
-  public static void makeLowerCase(CharSequence str)
+  public static void makeLowerCase(CharSeq str)
   {
     for (int i = str.length();  --i >= 0; )
       str.setCharAt(i, Character.toLowerCase(str.charAt(i)));
@@ -24,7 +24,7 @@ public class Strings
   /** Capitalize this string.
    * Change first character of each word to titlecase,
    * and change the other characters to lowercase. */
-  public static void makeCapitalize(CharSequence str)
+  public static void makeCapitalize(CharSeq str)
   {
     char prev = ' ';
     int len = str.length();
@@ -40,7 +40,7 @@ public class Strings
       }
   }
 
-  public static void printQuoted (CharSequence str,
+  public static void printQuoted (CharSeq str,
 				  java.io.PrintWriter ps, int escapes)
   {
     int len = str.length();

@@ -8,7 +8,7 @@ package gnu.lists;
  * java.lang.CharSequence, with charAt length, subSequence, and toString.
  */
 
-public interface CharSequence extends Sequence
+public interface CharSeq extends Sequence
 {
   /** Get length of string, in characters.
    * Synonym for size(), for compatibility with String and StringBuffer. */
@@ -40,7 +40,8 @@ public interface CharSequence extends Sequence
 
   public void consume(int start, int count, Consumer out);
 
-  // JDK 1.4 has these:
-  // public CharSequence subSequence (int start, int end;
-  // public String toString();
+  public String toString();
+
+  // JDK 1.4 CharSequence also has:
+  // public CharSequence subSequence (int start, int end);
 }

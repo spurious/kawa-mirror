@@ -1,3 +1,13 @@
+2001-10-05  Per Bothner  <per@bothner.com>
+
+	* CharSequence.java:  Renamed to CharSeq.java to avoid conflict with
+	similar interface java.lang.CharSequence in JDK 1.4beta.
+	* CharSeq.java:  New interface renamed fro CharSequence.
+	(toString):  Added new method - matching JDK 1.4 CharSequence.
+	* CharBuffer.java (toString):  New method.
+	* CharBuffer.java, FString.java, Strings.java, Makefile.am:
+	Update for CharSequence -> CharSeq renaming.
+
 2001-08-15  Per Bothner  <per@bothner.com>
 
 	* Sequence.java.in (DOCUMENT_VALUE):  New constant.

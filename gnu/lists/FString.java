@@ -10,7 +10,7 @@ import java.io.*;
  */
 
 public class FString extends SimpleVector
-implements CharSequence, Externalizable, Consumable
+implements CharSeq, Externalizable, Consumable
 {
   public char[] data;
   protected static char[] empty = new char[0];
@@ -75,7 +75,7 @@ implements CharSequence, Externalizable, Consumable
     addAll(seq);
   }
 
-  public FString(CharSequence seq)
+  public FString(CharSeq seq)
   {
     int size = seq.size();
     char[] data = new char[size];
@@ -84,7 +84,7 @@ implements CharSequence, Externalizable, Consumable
     this.size = size;
   }
 
-  public FString(CharSequence seq, int offset, int length)
+  public FString(CharSeq seq, int offset, int length)
   {
     char[] data = new char[length];
     seq.getChars(offset, offset+length, data, 0);

@@ -99,7 +99,7 @@ libgcj_basedir = @libgcj_basedir@
 
 AUTOMAKE_OPTIONS = foreign
 
-java_sources =    Array.java   BitVector.java   CharBuffer.java   CharSequence.java   Consumer.java   Consumable.java   F32Vector.java   F64Vector.java   FilterConsumer.java   FormatToConsumer.java   FString.java   FVector.java   GapVector.java   GeneralArray.java   LList.java   Pair.java   PairWithPosition.java   PositionConsumer.java   PositionContainer.java   S8Vector.java   S16Vector.java   S32Vector.java   S64Vector.java   SubSequence.java   StableVector.java   Strings.java   TreeList.java   TreePosition.java   TreePositionList.java   U8Vector.java   U16Vector.java   U32Vector.java   U64Vector.java   VoidConsumer.java
+java_sources =    Array.java   BitVector.java   CharBuffer.java   CharSeq.java   Consumer.java   Consumable.java   F32Vector.java   F64Vector.java   FilterConsumer.java   FormatToConsumer.java   FString.java   FVector.java   GapVector.java   GeneralArray.java   LList.java   Pair.java   PairWithPosition.java   PositionConsumer.java   PositionContainer.java   S8Vector.java   S16Vector.java   S32Vector.java   S64Vector.java   SubSequence.java   StableVector.java   Strings.java   TreeList.java   TreePosition.java   TreePositionList.java   U8Vector.java   U16Vector.java   U32Vector.java   U64Vector.java   VoidConsumer.java
 
 
 java_BUILT =    AbstractSequence.java   Convert.java   Sequence.java   SeqPosition.java   SimpleVector.java

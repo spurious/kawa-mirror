@@ -9,7 +9,7 @@ package gnu.lists;
  * javax.swing.text.AbstractDocument.Content
  */
 
-public class CharBuffer extends StableVector implements CharSequence
+public class CharBuffer extends StableVector implements CharSeq
 {
   private FString string;
 
@@ -123,6 +123,23 @@ public class CharBuffer extends StableVector implements CharSequence
       {
 	start += gapEnd - gapStart;
 	dest.write(array, start, count);
+      }
+  }
+
+  public String toString()
+  {
+    char[] array = string.data;
+    int alen = array.length;
+    if (gapStart == 0)
+      return new String(array, gapEnd, alen - gapEnd);
+    else if (gapEnd == alen)
+      return new String(array, 0, gapStart);
+    else
+      {
+	StringBuffer sbuf = new StringBuffer(length());
+	sbuf.append(array, 0, gapStart);
+	sbuf.append(array, gapEnd, alen - gapEnd);
+	return sbuf.toString();
       }
   }
 

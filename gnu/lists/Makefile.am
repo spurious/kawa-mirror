@@ -8,7 +8,7 @@ java_sources = \
   Array.java \
   BitVector.java \
   CharBuffer.java \
-  CharSequence.java \
+  CharSeq.java \
   Consumer.java \
   Consumable.java \
   F32Vector.java \

@@ -259,14 +259,14 @@ public class ClassMethods extends Procedure2
 class MethodFilter implements gnu.bytecode.Filter
 {
   String name;
-  String nameV;
+  int nlen;
   int modifiers;
   int modmask;
 
   public MethodFilter(String name, int modifiers, int modmask)
   {
     this.name = name;
-    this.nameV = name+"$V";
+    this.nlen = name.length();
     this.modifiers = modifiers;
     this.modmask = modmask;
   }
@@ -275,7 +275,19 @@ class MethodFilter implements gnu.bytecode.Filter
   {
     gnu.bytecode.Method method = (gnu.bytecode.Method) value;
     String mname = method.getName();
-    return ((method.getModifiers() & modmask) == modifiers)
-      && (mname.equals(name) || mname.equals(nameV));
+    if ((method.getModifiers() & modmask) == modifiers
+	&& mname.startsWith(name))
+      {
+	int mlen = mname.length();
+	char c;
+	if (mlen == nlen
+	    || (mlen == nlen + 2
+		&& mname.charAt(nlen) == '$'
+		&& ((c = mname.charAt(nlen+1)) == 'V' || c == 'X'))
+	    || (mlen == nlen + 4
+		&& mname.endsWith("$V$X")))
+	  return true;
+      }
+    return false;
   }
 }

@@ -1,3 +1,8 @@
+2003-11-09  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (class MethodFilter):  Enhance so it also matches
+	methods whose names in "$X" or "$V$X".
+
 2003-10-30  Per Bothner  <per@bothner.com>
 
 	* OccurrenceType.java:  Change to extends ObjectType.  This sets

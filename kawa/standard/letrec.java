@@ -38,7 +38,7 @@ public class letrec extends Syntax implements Printable
 	  return tr.syntaxError("letrec variable is not an identifier");
 	String name = (String) binding.car;
 	if (! (binding.cdr instanceof Pair))
-	  return tr.syntaxError("let has no value for `"+name+"'");
+	  return tr.syntaxError("let has no value for '"+name+"'");
 	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
 	Object init;
@@ -46,7 +46,7 @@ public class letrec extends Syntax implements Printable
 	  {
 	    if (! (binding.cdr instanceof Pair)
 		|| (binding = (Pair) binding.cdr).cdr == LList.Empty)
-	      return tr.syntaxError("missing type after `::' in let");
+	      return tr.syntaxError("missing type after '::' in let");
 	  }
 	if (binding.cdr == LList.Empty)
 	  {
@@ -59,7 +59,7 @@ public class letrec extends Syntax implements Printable
 	    init = ((Pair) binding.cdr).car;
 	  }
 	else
-	  return tr.syntaxError("let binding for `"+name+"' is improper list");
+	  return tr.syntaxError("let binding for '"+name+"' is improper list");
 	inits[i] = QuoteExp.nullExp;
 	orig_inits[i] = init;
 	bindings = bind_pair.cdr;

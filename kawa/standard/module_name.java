@@ -18,7 +18,7 @@ public class module_name extends Syntax
 	if (! (arg instanceof Pair)
 	    || (p = (Pair) arg).cdr != LList.Empty
 	    || ! (p.car instanceof String))
-	  return tr.syntaxError("invalid quoted symbol for `module-name'");
+	  return tr.syntaxError("invalid quoted symbol for 'module-name'");
 	name = (String) p.car;
       }
     else if (arg instanceof FString)

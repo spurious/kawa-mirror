@@ -170,8 +170,8 @@ public class load extends Procedure1 {
       }
     catch (SyntaxException ex)
       {
-	throw new RuntimeException("load: errors while compiling `"+
-				   name+"`:\n"+ex.getMessages().toString(20));
+	throw new RuntimeException("load: errors while compiling '"+
+				   name+"':\n"+ex.getMessages().toString(20));
       }
   }
 

@@ -39,10 +39,10 @@ public class let_syntax extends Syntax implements Printable
 	  return tr.syntaxError("variable in let binding is not a symbol");
 	String name = (String) binding.car;
 	if (! (binding.cdr instanceof Pair))
-	  return tr.syntaxError("let has no value for `"+name+"'");
+	  return tr.syntaxError("let has no value for '"+name+"'");
 	binding = (Pair) binding.cdr;
 	if (binding.cdr != LList.Empty)
-	  return tr.syntaxError("let binding for `"+name+"' is improper list");
+	  return tr.syntaxError("let binding for '"+name+"' is improper list");
         macros[i] = new Macro(name);
         decls[i] = new Declaration(name);
         macros[i].bind(decls[i]);

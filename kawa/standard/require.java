@@ -92,13 +92,13 @@ public class require extends Syntax
 	    || (p = (Pair) name).cdr != LList.Empty
 	    || ! (p.car instanceof String))
 	  {
-	    tr.error('e', "invalid quoted symbol for `require'");
+	    tr.error('e', "invalid quoted symbol for 'require'");
 	    return false;
 	  }
 	name = mapFeature((String) p.car);
 	if (name == null)
 	  {
-	    tr.error('e', "unknown feature name `"+p.car+"' for `require'");
+	    tr.error('e', "unknown feature name '"+p.car+"' for 'require'");
 	    return false;
 	  }
 	type = ClassType.make((String) name);
@@ -123,7 +123,7 @@ public class require extends Syntax
       }
     if (type == null)
       {
-	tr.error('e', "invalid specifier for `require'");
+	tr.error('e', "invalid specifier for 'require'");
 	return false;
       }
     String tname = type.getName();

@@ -24,7 +24,7 @@ public class define_variable extends Syntax implements Printable
 	    defs.addDeclaration(decl);
 	  }
 	else
-	  tr.error('w', "duplicate declaration for `"+sym+"'");
+	  tr.error('w', "duplicate declaration for '"+sym+"'");
 	p = tr.makePair(p, decl, p.cdr);
 	st = tr.makePair(st, this, p);
         if (defs instanceof ModuleExp)

@@ -7,6 +7,10 @@
 	* kawa/standard/Scheme.java (getTypeFor):  Map "java.lang.String"
 	to Type.tostring_type, for convenience.
 
+	* kawa/standard/{define_variable.java,let.java,let_syntax.java,
+	letrec.java,load.java,module_name.java,require.java}:  Use 'name'
+	rather than `name' in messages.
+	
 	* kawa/standard/map.java:  The makeGetField helper methods was moved
 	from Expression to SlotGet.
 	* kawa/lang/Lambda.java: makeCoercion moved from Expression to Convert.

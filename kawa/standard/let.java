@@ -37,7 +37,7 @@ public class let extends Syntax implements Printable
 	  return tr.syntaxError("variable in let binding is not a symbol");
 	String name = binding.car.toString();
 	if (! (binding.cdr instanceof Pair))
-	  return tr.syntaxError("let has no value for `"+name+"'");
+	  return tr.syntaxError("let has no value for '"+name+"'");
 	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
 	Object init;
@@ -45,7 +45,7 @@ public class let extends Syntax implements Printable
 	  {
 	    if (! (binding.cdr instanceof Pair)
 		|| (binding = (Pair) binding.cdr).cdr == LList.Empty)
-	      return tr.syntaxError("missing type after `::' in let");
+	      return tr.syntaxError("missing type after '::' in let");
 	  }
 	if (binding.cdr == LList.Empty)
 	  {
@@ -58,7 +58,7 @@ public class let extends Syntax implements Printable
 	    init = ((Pair) binding.cdr).car;
 	  }
 	else
-	  return tr.syntaxError("let binding for `"+name+"' is improper list");
+	  return tr.syntaxError("let binding for '"+name+"' is improper list");
 	inits[i] = tr.rewrite (init);
 	decl.noteValue (inits[i]);
 	bindings = bind_pair.cdr;

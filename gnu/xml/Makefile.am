@@ -11,6 +11,7 @@ java_FUTURE = \
 
 java_sources = \
   NamedChildrenFilter.java \
+  NodeTree.java \
   XMLPrinter.java \
   ParsedXMLToConsumer.java
 

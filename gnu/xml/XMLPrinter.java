@@ -219,17 +219,21 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 
   public void writeObject(Object v)
   {
+    if (v instanceof Consumable && ! (v instanceof UnescapedData))
+      {
+	((Consumable) v).consume(this);
+	return;
+      }
+    if (v instanceof SeqPosition)
+      {
+	SeqPosition pos = (SeqPosition) v;
+	pos.sequence.consumeNext(pos.ipos, this);
+	return;
+      }
     closeTag();
     if (v instanceof UnescapedData)
       {
 	super.write(((UnescapedData) v).getData());
-      }
-    else if (v instanceof Consumable)
-      ((Consumable) v).consume(this);
-    else if (v instanceof SeqPosition)
-      {
-	SeqPosition pos = (SeqPosition) v;
-	pos.sequence.consumeNext(pos.ipos, this);
       }
     else if (v instanceof Char)
       writeChar(((Char) v).intValue());

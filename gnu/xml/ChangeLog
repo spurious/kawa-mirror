@@ -1,3 +1,11 @@
+2003-07-10  Per Bothner  <per@bothner.com>
+
+	* NodeTree.java:  New class, extends TreeList.
+	* Makefile.am (java_sources):  Add NodeTree.java.
+
+	* XMLPrinter.java (writeObject):  Don't call closeTag if parameter
+	is SeqPosition or Consumable and not UnescapedData.
+
 2003-06-27  Per Bothner  <per@bothner.com>
 
 	* NamespaceResolver.java:  Removed - functionality merged with

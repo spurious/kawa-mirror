@@ -1,3 +1,8 @@
+2002-08-16  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (inlineClassName):  Allow plain Type, not just
+	ClassType.  This allows (as <int> exp) to be inlined better.
+
 2002-08-07  Per Bothner  <per@bothner.com>
 
 	* SlotSet.java (compile):  Handle cals whose 2nd arg is a Field or

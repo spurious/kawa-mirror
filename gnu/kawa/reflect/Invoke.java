@@ -218,16 +218,13 @@ public class Invoke extends ProcedureN implements CanInline
     if (args.length > carg)
       {
 	Type type = interpreter.getTypeFor(args[carg]);
-	ClassType ctype;
 	if (type instanceof PairClassType)
-	  ctype = ((PairClassType) type).instanceType;
-        else if (type instanceof ClassType)
-	  ctype = (ClassType) type;
-	else
+	  type = ((PairClassType) type).instanceType;
+	else if (! (type instanceof Type))
 	  return exp;
 	Expression[] nargs = new Expression[args.length];
 	System.arraycopy(args, 0, nargs, 0, args.length);
-	nargs[carg] = new QuoteExp(ctype);
+	nargs[carg] = new QuoteExp(type);
 	return new ApplyExp(exp.getFunction(), nargs);
       }
     return exp;
@@ -235,7 +232,6 @@ public class Invoke extends ProcedureN implements CanInline
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    //if (kind == 'N') return inlineClassName(exp, 0, interpreter);
     Expression[] args = exp.getArgs();
     int nargs = args.length;
     ClassType type = getClassType(args);

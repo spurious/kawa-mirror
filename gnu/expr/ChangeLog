@@ -1,5 +1,18 @@
 1999-07-15  Per Bothner  <per@bothner.com>
 
+	* Target.java (pushValue, returnValue):  New static methods.
+	* IgnoreTarget.java (compileFromStack):  Use Type.isVoid().
+	* TailTarget.java (getInstance):  New method.
+	* Compilation.java (addClass):  Use Target.returnValue().
+	* ObjectExp.java (compile):  Likewise.
+	* Expression.java (compile):  Use StackTarget.getInstance.
+	* StackTarget.java (getInstance):  New method.
+	(compileFromStack):  Use Type.isVoid and Type.isSubtype.
+	* LambdaExp.java (compileAsMethod):  Likewise.
+
+	* ObjectExp.java (print):  New method.
+	(getCompiledClassType):  Fix incorrect implied superclass handling.
+
 	* ApplyExp.java (compile):  Check real parent (even if inline), when
 	seeing if we need to pass a closure when calling a method directly.	
 	* LambdaExp.java (allocFrame):  When allocating closureEnvField, check

@@ -8,7 +8,7 @@ public class IgnoreTarget extends Target
 
   public void compileFromStack(Compilation comp, Type stackType)
   {
-    if (stackType != Type.void_type)
+    if (! stackType.isVoid())
       comp.getCode().emitPop(1);
   }
 }

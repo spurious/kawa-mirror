@@ -34,7 +34,7 @@ public class ObjectExp extends LambdaExp
 	else
 	  {
 	    int len = supers.length;
-	    ClassType[] superTypes = new ClassType[len - 1];
+	    ClassType[] superTypes = new ClassType[len];
 	    int j = 0;
 	    for (int i = 0;  i < len;  i++)
 	      {
@@ -60,6 +60,8 @@ public class ObjectExp extends LambdaExp
 		  }
 		type.setInterfaces(interfaces);
 	      }
+            if (j == len)
+              type.setSuper(Type.pointer_type);
 	  }
       }
     return type;
@@ -147,10 +149,7 @@ public class ObjectExp extends LambdaExp
 	    child.allocParameters(comp, null);
 	    child.enterFunction(comp, null);
 	    Type rtype = child.primMethod.getReturnType();
-	    Target target = rtype == Type.pointer_type ? Target.returnObject
-	      : rtype == Type.void_type ? Target.Ignore
-	      : new TailTarget(rtype);
-	    child.body.compileWithPosition(comp, target);
+	    child.body.compileWithPosition(comp, Target.returnValue(rtype));
 	    child.compileEnd(comp);
 	    child.compileChildMethods(comp);
 	    comp.method = save_method;
@@ -171,6 +170,71 @@ public class ObjectExp extends LambdaExp
   }
 
   Object walk (ExpWalker walker) { return walker.walkObjectExp(this); }
+
+  public void print (java.io.PrintWriter ps)
+  {
+    ps.print("(#%object/");
+    if (name != null)
+      {
+	ps.print(name);
+	ps.print('/');
+      }
+    ps.print(id);
+    ps.print("/ (");
+    Special prevMode = null;
+    int i = 0;
+    int opt_i = 0;
+    int key_args = keywords == null ? 0 : keywords.length;
+    int opt_args = defaultArgs == null ? 0 : defaultArgs.length - key_args;
+    for (Variable var = firstVar ();  var != null; var = var.nextVar ())
+      {
+	if (! var.isParameter () || var.isArtificial ())
+	  continue;
+	Special mode;
+	if (i < min_args)
+	  mode = null;
+	else if (i < min_args + opt_args)
+	  mode = Special.optional;
+	else if (max_args < 0 && i == min_args + opt_args)
+	  mode = Special.rest;
+	else
+	  mode = Special.key;
+	if (i > 0)
+	  ps.print(' ');
+	if (mode != prevMode)
+	  {
+	    ps.print(mode);
+	    ps.print(' ');
+	  }
+	Expression defaultArg = null;
+	if (mode == Special.optional || mode == Special.key)
+	  defaultArg = defaultArgs[opt_i++];
+	if (defaultArg != null)
+	  ps.print('(');
+	ps.print(((Declaration)var).string_name());
+	if (defaultArg != null && defaultArg != QuoteExp.falseExp)
+	  {
+	    ps.print(' ');
+	    defaultArg.print(ps);
+	    ps.print(')');
+	  }
+	i++;
+	prevMode = mode;
+      }
+    ps.print(") ");
+    for (LambdaExp child = firstChild;  child != null;
+	 child = child.nextSibling)
+      {
+        ps.println();
+        ps.print("  method: ");
+        child.print(ps);
+      }
+    if (body == null)
+      ps.print("<null body>");
+    else
+      body.print (ps);
+    ps.print(")");
+  }
 
   public String toString()
   {

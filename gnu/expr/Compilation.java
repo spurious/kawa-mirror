@@ -666,10 +666,7 @@ public class Compilation
 	lexp.allocParameters(this, null);
 	lexp.enterFunction(this, null);
 	Type rtype = method.getReturnType();
-	Target target = rtype == Type.pointer_type ? Target.returnObject
-	  : rtype == Type.void_type ? Target.Ignore
-	  : new TailTarget(rtype);
-	body.compileWithPosition(this, target);
+	body.compileWithPosition(this, Target.returnValue(rtype));
 	lexp.compileEnd(this);
 
 	// Set up for compiling regular virtual applyX method.

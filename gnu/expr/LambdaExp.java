@@ -911,10 +911,7 @@ public class LambdaExp extends ScopeExp
     allocParameters(comp, argsArray);
     enterFunction(comp, argsArray);
     Type rtype = comp.method.getReturnType();
-    Target target = rtype == Type.pointer_type ? Target.returnObject
-      : rtype == Type.void_type ? Target.Ignore
-      : new TailTarget(rtype);
-    body.compileWithPosition(comp, target);
+    body.compileWithPosition(comp, Target.returnValue(rtype));
     compileEnd(comp);
     compileChildMethods(comp);
     comp.method = save_method;

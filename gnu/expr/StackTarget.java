@@ -9,12 +9,18 @@ public class StackTarget extends Target
 
   public Type getType() { return type; }
 
+  public static Target getInstance(Type type)
+  {
+    return (type == Type.pointer_type ? Target.pushObject
+            : new StackTarget(type));
+  }
+
   public void compileFromStack(Compilation comp, Type stackType)
   {
     if (type == stackType)
       return;
     CodeAttr code = comp.getCode();
-    if (stackType == Type.void_type)
+    if (stackType.isVoid())
       {
 	comp.compileConstant (Values.empty);
 	stackType = Type.pointer_type;
@@ -24,17 +30,9 @@ public class StackTarget extends Target
 	code.emitConvert(stackType, type);
 	return;
       }
-    if (stackType instanceof ClassType && type instanceof ClassType)
-      {
-	// If stackType inherits from target type, no coercion is needed.
-	ClassType baseClass = (ClassType) stackType;
-	while (baseClass != null)
-	  {
-	    if (baseClass == type)
-	      return;
-	    baseClass = baseClass.getSuperclass();
-	  }
-      }
+
+    if (stackType.isSubtype(type))
+      return;
     stackType.emitCoerceToObject(code);
     type.emitCoerceFromObject(code);
   }

@@ -6,6 +6,12 @@ public class TailTarget extends StackTarget
 {
   public TailTarget(Type type) { super(type); }
 
+  public static Target getInstance(Type type)
+  {
+    return (type == Type.pointer_type ? Target.returnObject
+            : new TailTarget(type));
+  }
+
   public void compileFromStack(Compilation comp, Type stackType)
   {
     if (! comp.curLambda.isHandlingTailCalls())

@@ -17,4 +17,16 @@ public abstract class Target
   public static final Target pushObject = new StackTarget(Type.pointer_type);
 
   public static final Target returnObject = new TailTarget(Type.pointer_type);
+
+  /** Return a Target to push a value of specified type on JCM stack. */
+  public static Target pushValue(Type type)
+  {
+    return type.isVoid() ? Target.Ignore : StackTarget.getInstance(type);
+  }
+
+  /** A Target to return a value of specified type from a method/function. */
+  public static Target returnValue(Type type)
+  {
+    return type.isVoid() ? Target.Ignore : TailTarget.getInstance(type);
+  }
 }

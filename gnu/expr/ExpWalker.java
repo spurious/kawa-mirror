@@ -94,7 +94,7 @@ public class ExpWalker
     return walkExps(exps, exps.length);
   }
 
-  /** Call walk on the Expression in an array.
+  /** Call walk on the Expressions in an array.
    * However, the walk method is inlined for speed.
    */
   public Expression[] walkExps (Expression[] exps, int n)

@@ -1,3 +1,9 @@
+2004-11-11  Jim White  <jim@pagesmiths.com>
+
+	* build.xml: Update select-java1, select-java2, and add select-java5.
+	Search for BEGIN JAVA|BEGIN JAXP instead of maintaining an
+	explicit lists of files to modify.
+
 2004-11-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (selected-java-source): Depend on Makefile.

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
@@ -19,7 +20,7 @@ public class let extends Syntax implements Printable
     Pair pair = (Pair) obj;
     Object bindings = pair.car;
     Object body = pair.cdr;
-    int decl_count = List.length (bindings);
+    int decl_count = LList.length (bindings);
     Expression[] inits = new Expression[decl_count];
     LetExp let = new LetExp (inits);
     for (int i = 0; i < decl_count; i++)
@@ -39,10 +40,10 @@ public class let extends Syntax implements Printable
 	if ("::" == binding.car) // && "::" is unbound FIXME
 	  {
 	    if (! (binding.cdr instanceof Pair)
-		|| (binding = (Pair) binding.cdr).cdr == List.Empty)
+		|| (binding = (Pair) binding.cdr).cdr == LList.Empty)
 	      return tr.syntaxError("missing type after `::' in let");
 	  }
-	if (binding.cdr == List.Empty)
+	if (binding.cdr == LList.Empty)
 	  {
 	    init = binding.car;
 	  }

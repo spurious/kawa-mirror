@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import java.text.MessageFormat;
 import gnu.text.ReportFormat;
 import gnu.mapping.*;
@@ -79,7 +79,7 @@ public class format extends ProcedureN
 	  }
 	catch (java.io.IOException ex)
 	  {
-	    throw new GenericError("Error in format: "+ ex);
+	    throw new RuntimeException("Error in format: "+ ex);
 	  }
       }
   }
@@ -131,6 +131,6 @@ public class format extends ProcedureN
         return Boolean.TRUE; 
       }
     else
-      throw new GenericError("bad first argument to format");
+      throw new RuntimeException("bad first argument to format");
   }
 }

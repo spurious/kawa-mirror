@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.Procedure;
 import gnu.expr.*;
 import gnu.math.IntNum;
@@ -12,13 +13,13 @@ public class syntax_case extends Syntax
   Expression rewriteClauses (Object clauses, syntax_case_work work,
                              Translator tr)
   {
-    if (clauses == List.Empty)
+    if (clauses == LList.Empty)
       {
         /*
         // FIXME - throw exception instead??  perhaps SyntaxException?
         return new QuoteExp(new Pair("quote",
                                      new Pair("((no match in syntax-case))",
-                                     List.Empty)));
+                                     LList.Empty)));
         */
         Expression[] args = new Expression[2];
         args[0] = new QuoteExp("syntax-case");
@@ -79,13 +80,13 @@ public class syntax_case extends Syntax
 
     Expression output;
     pair = (Pair) pair.cdr;
-    if (pair.cdr == List.Empty)
+    if (pair.cdr == LList.Empty)
       output = tr.rewrite(pair.car);
     else
       {
         Expression fender = tr.rewrite(pair.car);
         if (! (pair.cdr instanceof Pair
-               && (pair = (Pair) pair.cdr).cdr == List.Empty))
+               && (pair = (Pair) pair.cdr).cdr == LList.Empty))
           return tr.syntaxError("syntax-case:  bad clause");
         output = new IfExp(fender, tr.rewrite(pair.car), new ExitExp(block));
       }
@@ -110,7 +111,7 @@ public class syntax_case extends Syntax
           {
             form = (Pair) obj;
             obj = form.car;
-            int num_literals = List.length(obj);
+            int num_literals = LList.length(obj);
             work.literal_identifiers = new String [num_literals + 1];
             work.literal_identifiers[0] = null; // FIXME
             for (int i = 0;  i < num_literals;  i++)

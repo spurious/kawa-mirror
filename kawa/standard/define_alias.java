@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.*;
@@ -15,7 +16,7 @@ public class define_alias extends Syntax implements Printable
 	  {
             String name = (String) p1.car;
 	    Pair p2 = (Pair) p1.cdr;
-	    if (p2.cdr == List.Empty)
+	    if (p2.cdr == LList.Empty)
 	      {
 		Expression arg = location.rewriteArg(p2.car, tr);
 		Expression loc = location.rewrite(arg, tr);

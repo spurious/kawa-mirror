@@ -1,12 +1,12 @@
 package kawa.standard;
 import gnu.text.*;
+import gnu.kawa.util.*;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.NumberFormat;
 import java.io.Writer;
 import gnu.math.*;
-import kawa.lang.*;
 import gnu.mapping.OutPort;
 
 /** A representation of a parsed Common Lisp-style format. */
@@ -439,8 +439,8 @@ public class LispFormat extends CompoundFormat
       return ((Number) arg).intValue();
     if (arg instanceof Character)
       return ((Character) arg).charValue();
-    if (arg instanceof kawa.lang.Char)
-      return ((kawa.lang.Char) arg).charValue();
+    if (arg instanceof Char)
+      return ((Char) arg).charValue();
     //if (arg == null || arg == Boolean.FALSE || arg == Special.dfault)
     return defaultValue;
   }

@@ -4,6 +4,7 @@ import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;
 import gnu.mapping.*;
+import gnu.kawa.util.FString;
 
 public class ParseFormat extends Procedure1
 {

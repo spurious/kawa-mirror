@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.Procedure1;
 
 /**
@@ -10,7 +10,7 @@ public class list2string extends Procedure1
 {
   public Object apply1 (Object arg1)
   {
-    List l = (List)arg1;
+    LList l = (LList) arg1;
     int len = l.length();
     FString result = new FString (len);
     for (int i=0; i < len; i++)

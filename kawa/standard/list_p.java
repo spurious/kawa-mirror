@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.LList;
 import gnu.mapping.*;
 
 /** Implement the standard Scheme function "list?". */
@@ -8,9 +8,9 @@ public class list_p extends Procedure1
 {
   public Object apply1 (Object arg1)
   {
-    if (List.list_length (arg1) >= 0)
-      return Interpreter.trueObject;
+    if (LList.list_length (arg1) >= 0)
+      return Boolean.TRUE;
     else
-      return Interpreter.falseObject;
+      return Boolean.FALSE;
   }
 }

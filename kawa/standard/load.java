@@ -6,6 +6,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.text.SourceMessages;
 import gnu.text.SyntaxException;
+import gnu.kawa.util.Sequence;
 
 public class load extends Procedure1 {
   /** Load using the name of a compile .class file. */

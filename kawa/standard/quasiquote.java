@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the "quasiquote" Scheme primitive.
@@ -24,7 +25,7 @@ public class quasiquote extends Syntax implements Printable
 	depth--;
 	Pair pair_cdr;
 	if (! (pair.cdr instanceof Pair)
-	    || (pair_cdr = (Pair) pair.cdr).cdr != List.Empty)
+	    || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
 	  return tr.syntaxError ("invalid used of " + pair.car +
 				     " in quasiquote template");
 	if (depth == 0)
@@ -41,7 +42,7 @@ public class quasiquote extends Syntax implements Printable
       {
 	Pair pair_car_cdr;
 	if (! (pair_car.cdr instanceof Pair)
-	    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != List.Empty)
+	    || (pair_car_cdr = (Pair) pair_car.cdr).cdr != LList.Empty)
 	  return tr.syntaxError ("invalid used of " + pair_car.car +
 				     " in quasiquote template");
 	Procedure append = kawa.standard.append.appendProcedure;
@@ -77,9 +78,9 @@ public class quasiquote extends Syntax implements Printable
   {
     if (template instanceof Pair)
       return expand_pair ((Pair) template, depth, tr);
-    else if (template instanceof kawa.lang.Vector)
+    else if (template instanceof FVector)
       {
-	kawa.lang.Vector vector = (kawa.lang.Vector) template;
+	FVector vector = (FVector) template;
 	int n = vector.length ();
 	Object[] buffer = new Object[n];
 	// For each element, the state is one of these four:
@@ -101,7 +102,7 @@ public class quasiquote extends Syntax implements Printable
 	      {
 		Pair pair_cdr;
 		if (! (pair.cdr instanceof Pair)
-		    || (pair_cdr = (Pair) pair.cdr).cdr != List.Empty)
+		    || (pair_cdr = (Pair) pair.cdr).cdr != LList.Empty)
 		  return tr.syntaxError ("invalid used of " + pair.car +
 					     " in quasiquote template");
 		buffer[i] = tr.rewrite (pair_cdr.car);
@@ -123,7 +124,7 @@ public class quasiquote extends Syntax implements Printable
 	if (max_state == 0)
 	  return vector;
 	if (max_state == 1)
-	  return new Vector (buffer);
+	  return new FVector (buffer);
 	Expression[] args = new Expression[n];
 	for (int i = 0;  i < n;  i++)
 	  {
@@ -135,7 +136,7 @@ public class quasiquote extends Syntax implements Printable
 	      {
 		Object[] arg1 = new Object[1];
 		arg1[0] = buffer[i];
-		args[i] = new QuoteExp (new Vector (arg1));
+		args[i] = new QuoteExp (new FVector (arg1));
 	      }
 	    else
 	      {
@@ -160,7 +161,7 @@ public class quasiquote extends Syntax implements Printable
   {
     Pair pair;
     if (! (obj instanceof Pair)
-	|| (pair = (Pair) obj).cdr != List.Empty)
+	|| (pair = (Pair) obj).cdr != LList.Empty)
       return tr.syntaxError ("wrong number of arguments to quasiquote");
     return coerceExpression (expand (pair.car, 1, tr));
   }

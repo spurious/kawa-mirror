@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.IntNum;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class list_ref extends Procedure2
 {
@@ -12,6 +12,6 @@ public class list_ref extends Procedure2
     if (tail instanceof Pair)
       return ((Pair)tail).car;
     else
-      throw new GenericError("List is too short.");
+      throw new IndexOutOfBoundsException("List is too short.");
   }
 }

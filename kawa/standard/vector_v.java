@@ -5,6 +5,7 @@ import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.FVector;
 import java.lang.Error;  // To work around case-fold bug in some compilers.
 
 public class vector_v extends ProcedureN implements Compilable
@@ -18,7 +19,7 @@ public class vector_v extends ProcedureN implements Compilable
 
   public Object applyN (Object[] args)
   {
-    return new Vector (args);
+    return new FVector (args);
   }
 
   private static Field vectorConstant;

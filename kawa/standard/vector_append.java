@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
@@ -23,11 +23,11 @@ public class vector_append extends ProcedureN implements Compilable
     for (int i = args_length;  --i >= 0; )
       {
 	Object arg = args[i];
-	if (arg instanceof Vector)
-	  length += ((Vector)arg).length();
+	if (arg instanceof FVector)
+	  length += ((FVector)arg).length();
 	else
 	  {
-	    int n = List.list_length (arg);
+	    int n = LList.list_length (arg);
 	    if (n < 0)
 	      throw new WrongType (this.name (), i, "list or vector");
 	    length += n;
@@ -38,16 +38,16 @@ public class vector_append extends ProcedureN implements Compilable
     for (int i = 0;  i < args_length;  i++)
       {
 	Object arg = args[i];
-	if (arg instanceof Vector)
+	if (arg instanceof FVector)
 	  {
-	    Vector vec = (Vector) arg;
+	    FVector vec = (FVector) arg;
 	    int vec_length = vec.length ();
 	    for (int j = 0;  j < vec_length;  j++)
 	      result[position++] = vec.elementAt (j);
 	  }
 	else if (arg instanceof Pair)
 	  {
-	    while (arg != List.Empty)
+	    while (arg != LList.Empty)
 	      {
 		Pair pair = (Pair) arg;
 		result[position++] = pair.car;
@@ -55,7 +55,7 @@ public class vector_append extends ProcedureN implements Compilable
 	      }
 	  }
       }
-    return new Vector (result);
+    return new FVector (result);
   }
 
   private static Field vappendConstant;

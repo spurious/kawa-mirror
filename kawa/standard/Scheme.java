@@ -7,6 +7,8 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import java.util.Hashtable;
 import gnu.text.SourceMessages;
+import gnu.text.CharArrayInPort;
+import gnu.kawa.util.*;
 
 public class Scheme extends Interpreter
 {
@@ -186,7 +188,7 @@ public class Scheme extends Interpreter
       define_proc ("null?", "kawa.lib.lists");
       define_proc ("list?", "kawa.standard.list_p");
       define_proc ("list", "kawa.standard.list_v");
-      define_proc ("length", "kawa.standard.length");
+      define_proc ("length", "kawa.lib.lists");
       define ("append", kawa.standard.append.appendProcedure);
       define_proc ("reverse", "kawa.standard.reverse");
       define_proc ("list-tail", "kawa.standard.list_tail");
@@ -431,7 +433,6 @@ public class Scheme extends Interpreter
       define_proc("string-upcase", "kawa.lib.strings");
       define_proc("string-downcase", "kawa.lib.strings");
       define_proc("string-capitalize", "kawa.lib.strings");
-
       define_syntax("primitive-virtual-method",
                     new kawa.standard.prim_method(182));
       define_syntax("primitive-static-method",
@@ -543,6 +544,91 @@ public class Scheme extends Interpreter
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
       define ("define-member-alias", new kawa.standard.define_member_alias());
+
+      define_proc ("s8vector?", "kawa.lib.uniform");
+      define_proc ("make-s8vector", "kawa.lib.uniform");
+      define_proc ("s8vector", "kawa.lib.uniform");
+      define_proc ("s8vector-length", "kawa.lib.uniform");
+      define_proc ("s8vector-ref", "kawa.lib.uniform");
+      define_proc ("s8vector-set!", "kawa.lib.uniform");
+      define_proc ("s8vector->list", "kawa.lib.uniform");
+      define_proc ("list->s8vector", "kawa.lib.uniform");
+      define_proc ("u8vector?", "kawa.lib.uniform");
+      define_proc ("make-u8vector", "kawa.lib.uniform");
+      define_proc ("u8vector", "kawa.lib.uniform");
+      define_proc ("u8vector-length", "kawa.lib.uniform");
+      define_proc ("u8vector-ref", "kawa.lib.uniform");
+      define_proc ("u8vector-set!", "kawa.lib.uniform");
+      define_proc ("u8vector->list", "kawa.lib.uniform");
+      define_proc ("list->u8vector", "kawa.lib.uniform");
+
+      define_proc ("s16vector?", "kawa.lib.uniform");
+      define_proc ("make-s16vector", "kawa.lib.uniform");
+      define_proc ("s16vector", "kawa.lib.uniform");
+      define_proc ("s16vector-length", "kawa.lib.uniform");
+      define_proc ("s16vector-ref", "kawa.lib.uniform");
+      define_proc ("s16vector-set!", "kawa.lib.uniform");
+      define_proc ("s16vector->list", "kawa.lib.uniform");
+      define_proc ("list->s16vector", "kawa.lib.uniform");
+      define_proc ("u16vector?", "kawa.lib.uniform");
+      define_proc ("make-u16vector", "kawa.lib.uniform");
+      define_proc ("u16vector", "kawa.lib.uniform");
+      define_proc ("u16vector-length", "kawa.lib.uniform");
+      define_proc ("u16vector-ref", "kawa.lib.uniform");
+      define_proc ("u16vector-set!", "kawa.lib.uniform");
+      define_proc ("u16vector->list", "kawa.lib.uniform");
+      define_proc ("list->u16vector", "kawa.lib.uniform");
+
+      define_proc ("s32vector?", "kawa.lib.uniform");
+      define_proc ("make-s32vector", "kawa.lib.uniform");
+      define_proc ("s32vector", "kawa.lib.uniform");
+      define_proc ("s32vector-length", "kawa.lib.uniform");
+      define_proc ("s32vector-ref", "kawa.lib.uniform");
+      define_proc ("s32vector-set!", "kawa.lib.uniform");
+      define_proc ("s32vector->list", "kawa.lib.uniform");
+      define_proc ("list->s32vector", "kawa.lib.uniform");
+      define_proc ("u32vector?", "kawa.lib.uniform");
+      define_proc ("make-u32vector", "kawa.lib.uniform");
+      define_proc ("u32vector", "kawa.lib.uniform");
+      define_proc ("u32vector-length", "kawa.lib.uniform");
+      define_proc ("u32vector-ref", "kawa.lib.uniform");
+      define_proc ("u32vector-set!", "kawa.lib.uniform");
+      define_proc ("u32vector->list", "kawa.lib.uniform");
+      define_proc ("list->u32vector", "kawa.lib.uniform");
+
+      define_proc ("s64vector?", "kawa.lib.uniform");
+      define_proc ("make-s64vector", "kawa.lib.uniform");
+      define_proc ("s64vector", "kawa.lib.uniform");
+      define_proc ("s64vector-length", "kawa.lib.uniform");
+      define_proc ("s64vector-ref", "kawa.lib.uniform");
+      define_proc ("s64vector-set!", "kawa.lib.uniform");
+      define_proc ("s64vector->list", "kawa.lib.uniform");
+      define_proc ("list->s64vector", "kawa.lib.uniform");
+      define_proc ("u64vector?", "kawa.lib.uniform");
+      define_proc ("make-u64vector", "kawa.lib.uniform");
+      define_proc ("u64vector", "kawa.lib.uniform");
+      define_proc ("u64vector-length", "kawa.lib.uniform");
+      define_proc ("u64vector-ref", "kawa.lib.uniform");
+      define_proc ("u64vector-set!", "kawa.lib.uniform");
+      define_proc ("u64vector->list", "kawa.lib.uniform");
+      define_proc ("list->u64vector", "kawa.lib.uniform");
+
+      define_proc ("f32vector?", "kawa.lib.uniform");
+      define_proc ("make-f32vector", "kawa.lib.uniform");
+      define_proc ("f32vector", "kawa.lib.uniform");
+      define_proc ("f32vector-length", "kawa.lib.uniform");
+      define_proc ("f32vector-ref", "kawa.lib.uniform");
+      define_proc ("f32vector-set!", "kawa.lib.uniform");
+      define_proc ("f32vector->list", "kawa.lib.uniform");
+      define_proc ("list->f32vector", "kawa.lib.uniform");
+      define_proc ("f64vector?", "kawa.lib.uniform");
+      define_proc ("make-f64vector", "kawa.lib.uniform");
+      define_proc ("f64vector", "kawa.lib.uniform");
+      define_proc ("f64vector-length", "kawa.lib.uniform");
+      define_proc ("f64vector-ref", "kawa.lib.uniform");
+      define_proc ("f64vector-set!", "kawa.lib.uniform");
+      define_proc ("f64vector->list", "kawa.lib.uniform");
+      define_proc ("list->f64vector", "kawa.lib.uniform");
   }
 
   static int scheme_counter = 0;
@@ -718,11 +804,11 @@ public class Scheme extends Interpreter
 	types.put ("integer", ClassType.make("gnu.math.IntNum"));
 	types.put ("symbol", ClassType.make("java.lang.String"));
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
-	types.put ("list", ClassType.make("kawa.lang.List"));
-	types.put ("pair", ClassType.make("kawa.lang.Pair"));
-	types.put ("string", ClassType.make("kawa.lang.FString"));
-	types.put ("character", ClassType.make("kawa.lang.Char"));
-	types.put ("vector", ClassType.make("kawa.lang.Vector"));
+	types.put ("list", ClassType.make("gnu.kawa.util.LList"));
+	types.put ("pair", ClassType.make("gnu.kawa.util.Pair"));
+	types.put ("string", ClassType.make("gnu.kawa.util.FString"));
+	types.put ("character", ClassType.make("gnu.kawa.util.Char"));
+	types.put ("vector", ClassType.make("gnu.kawa.util.FVector"));
 	types.put ("function", ClassType.make("gnu.mapping.Procedure"));
 	types.put ("input-port", ClassType.make("gnu.mapping.InPort"));
 	types.put ("output-port", ClassType.make("gnu.mapping.OutPort"));
@@ -731,6 +817,17 @@ public class Scheme extends Interpreter
 	types.put ("record", ClassType.make("kawa.lang.Record"));
 	types.put ("type", ClassType.make("gnu.bytecode.Type"));
 	types.put ("class-type", ClassType.make("gnu.bytecode.ClassType"));
+
+        types.put ("s8vector", ClassType.make("gnu.kawa.util.S8Vector"));
+        types.put ("u8vector", ClassType.make("gnu.kawa.util.U8Vector"));
+        types.put ("s16vector", ClassType.make("gnu.kawa.util.S16Vector"));
+        types.put ("u16vector", ClassType.make("gnu.kawa.util.U16Vector"));
+        types.put ("s32vector", ClassType.make("gnu.kawa.util.S32Vector"));
+        types.put ("u32vector", ClassType.make("gnu.kawa.util.U32Vector"));
+        types.put ("s64vector", ClassType.make("gnu.kawa.util.S64Vector"));
+        types.put ("u64vector", ClassType.make("gnu.kawa.util.U64Vector"));
+        types.put ("f32vector", ClassType.make("gnu.kawa.util.F32Vector"));
+        types.put ("f64vector", ClassType.make("gnu.kawa.util.F64Vector"));
 
         // Only if JEmacs is available.  FIXME.
 	types.put ("buffer", ClassType.make("gnu.jemacs.buffer.Buffer"));
@@ -776,7 +873,7 @@ public class Scheme extends Interpreter
         Object cname = ((QuoteExp) exp).getValue();
         if (cname instanceof Type)
           return (Type) cname;
-        if (cname instanceof kawa.lang.FString || cname instanceof String)
+        if (cname instanceof FString || cname instanceof String)
           return ClassType.make(cname.toString());
       }
     else if (exp instanceof ReferenceExp)

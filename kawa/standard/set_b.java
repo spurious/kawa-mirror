@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "set!" primitive.
@@ -29,11 +30,11 @@ public class set_b extends Syntax implements Printable
 	Object args = pair.cdr;
 	/*
 	args = new Pair(match[1], args);
-	proc = new Pair("setter", new Pair(proc, List.Empty));
+	proc = new Pair("setter", new Pair(proc, LList.Empty));
 	return tr.rewrite(new Pair(proc, args));
 	*/
 
-	int nargs = List.length(args);
+	int nargs = LList.length(args);
 	Expression[] xargs = new Expression[nargs+1];
 	for (int i = 1; i <= nargs; i++)
 	  {

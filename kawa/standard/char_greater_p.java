@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.Char;
 import gnu.mapping.Procedure2;
 import gnu.mapping.WrongType;
 
@@ -12,8 +12,8 @@ public class char_greater_p extends Procedure2
     if (! (arg2 instanceof Char))
       throw new WrongType(this.name(),2,"character");
     if (((Char)arg1).intValue () > ((Char)arg2).intValue())
-      return Interpreter.trueObject;
+      return Boolean.TRUE;
     else
-      return Interpreter.falseObject;
+      return Boolean.FALSE;
   }
 }

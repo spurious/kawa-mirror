@@ -1,11 +1,12 @@
 package kawa.standard;
 import gnu.mapping.WrongType;
 import gnu.mapping.ProcedureN;
-import kawa.lang.*;
 import gnu.bytecode.Field;
 import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.expr.*;
+import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 /**
  * Implement the Scheme standard function "append".
@@ -25,7 +26,7 @@ public class append extends ProcedureN implements Compilable
   {
     int count = args.length;
     if (count == 0)
-      return List.Empty;
+      return LList.Empty;
     Object result = args[count - 1];
     for (int i = count - 1; --i >= 0; )
       {
@@ -43,7 +44,7 @@ public class append extends ProcedureN implements Compilable
 	    last = new_pair;
 	    list = list_pair.cdr;
 	  }
-	if (list != List.Empty)
+	if (list != LList.Empty)
 	  throw new WrongType(this.name (), 2, "list");
 	if (last != null)
 	  {

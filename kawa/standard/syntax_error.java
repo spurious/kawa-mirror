@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
@@ -23,7 +24,7 @@ public class syntax_error extends Syntax
 	obj = pair.cdr;
 	words++;
       }
-    if (obj != List.Empty)
+    if (obj != LList.Empty)
       {
 	if (words > 0)
 	  buffer.append (' ');

@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import java.io.Reader;
 import java.io.InputStream;
 import gnu.mapping.Procedure0or1;
@@ -26,7 +26,7 @@ public class readchar extends Procedure0or1
       }
     catch (java.io.IOException e)
       {
-	throw new GenericError ("IO Exception caught");
+	throw new RuntimeException ("IO Exception caught");
       }
   }
 
@@ -49,7 +49,7 @@ public class readchar extends Procedure0or1
       }
     catch (java.io.IOException e)
       {
-	throw new GenericError ("IO Exception caught");
+	throw new RuntimeException ("IO Exception caught");
       }
   }
 
@@ -72,7 +72,7 @@ public class readchar extends Procedure0or1
       }
     catch (java.io.IOException e)
       {
-	throw new GenericError ("IO Exception caught");
+	throw new RuntimeException ("IO Exception caught");
       }
   }
 

@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class number2string extends Procedure1or2
 {

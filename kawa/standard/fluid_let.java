@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "fluid-let" primitive.
@@ -17,7 +18,7 @@ public class fluid_let extends Syntax implements Printable
     Pair pair = (Pair) obj;
     Object bindings = pair.car;
     Object body = pair.cdr;
-    int decl_count = List.length (bindings);
+    int decl_count = LList.length (bindings);
     Expression[] inits = new Expression[decl_count];
     FluidLetExp let = new FluidLetExp (inits);
     for (int i = 0; i < decl_count; i++)
@@ -33,14 +34,14 @@ public class fluid_let extends Syntax implements Printable
 	decl.setFluid(true);
 	decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
 	Expression value;
-	if (binding.cdr == List.Empty)
+	if (binding.cdr == LList.Empty)
 	  value = new ReferenceExp(name);
 	else if (! (binding.cdr instanceof Pair))
 	  return tr.syntaxError("fluid-let has no value for `"+name+"'");
 	else
 	  {
 	    binding = (Pair) binding.cdr;
-	    if (binding.cdr != List.Empty)
+	    if (binding.cdr != LList.Empty)
 	      return tr.syntaxError("let binding for `" + name
 				    + "' is improper list");
 	    value = tr.rewrite (binding.car);

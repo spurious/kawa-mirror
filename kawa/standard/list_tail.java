@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.IntNum;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
 
 public class list_tail extends Procedure2
 {
@@ -10,7 +10,7 @@ public class list_tail extends Procedure2
     while (--count >= 0)
       {
 	if (! (list instanceof Pair))
-	  throw new GenericError("List is too short.");
+	  throw new IndexOutOfBoundsException("List is too short.");
 	Pair pair = (Pair) list;
 	list = pair.cdr;
       }

@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the "define" Scheme primitive.
@@ -79,7 +80,7 @@ public class define extends Syntax implements Printable
 	if (p1.car instanceof String && p1.cdr instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.cdr;
-	    if (p2.cdr == List.Empty)
+	    if (p2.cdr == LList.Empty)
 	      {
 		name = (String) p1.car;
 		value = tr.rewrite (p2.car);
@@ -88,7 +89,7 @@ public class define extends Syntax implements Printable
 	else if (p1.car instanceof Declaration && p1.cdr instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.cdr;
-	    if (p2.cdr == List.Empty)
+	    if (p2.cdr == LList.Empty)
 	      {
 		decl = (Declaration) p1.car;
                 name = decl.symbol();

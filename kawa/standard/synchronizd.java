@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.expr.*;
 
 public class synchronizd extends Syntax

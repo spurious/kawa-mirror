@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 
 /** Implement the Scheme standard functions "map" and "for-each".
@@ -20,12 +20,12 @@ public class map  extends gnu.mapping.ProcedureN
   /** An optimized single-list version of map. */
   static public Object map1 (Procedure proc, Object list)
   {
-    Object result = List.Empty;
+    Object result = LList.Empty;
     Pair last = null;
-    while (list != List.Empty)
+    while (list != LList.Empty)
       {
 	Pair pair = (Pair) list;
-	Pair new_pair = new Pair (proc.apply1 (pair.car), List.Empty);
+	Pair new_pair = new Pair (proc.apply1 (pair.car), LList.Empty);
 	if (last == null)
 	  result = new_pair;
 	else
@@ -39,7 +39,7 @@ public class map  extends gnu.mapping.ProcedureN
   /** An optimized single-list version of for-each. */
   static public void forEach1 (Procedure proc, Object list)
   {
-    while (list != List.Empty)
+    while (list != LList.Empty)
       {
 	Pair pair = (Pair) list;
 	proc.apply1 (pair.car);
@@ -53,7 +53,7 @@ public class map  extends gnu.mapping.ProcedureN
     if (collect)
       return map1 (proc, arg2);
     forEach1 (proc, arg2);
-    return Interpreter.voidObject;
+    return Values.empty;
   }
 
   public Object applyN (Object[] args)
@@ -65,9 +65,9 @@ public class map  extends gnu.mapping.ProcedureN
     Object result;
     Pair last = null;
     if (collect)
-      result = List.Empty;
+      result = LList.Empty;
     else
-      result = Interpreter.voidObject;
+      result = Values.empty;;
     Object[] rest = new Object [arity];
     System.arraycopy (args, 1, rest, 0, arity);
     Object[] each_args = new Object [arity];
@@ -76,7 +76,7 @@ public class map  extends gnu.mapping.ProcedureN
 	for (int i = 0;  i < arity;  i++)
 	  {
 	    Object list = rest[i];
-	    if (list == List.Empty)
+	    if (list == LList.Empty)
 	      return result;
 	    Pair pair = (Pair) list;
 	    each_args[i] = pair.car;
@@ -85,7 +85,7 @@ public class map  extends gnu.mapping.ProcedureN
 	Object value = proc.applyN (each_args);
 	if (collect)
 	  {
-	    Pair new_pair = new Pair (value, List.Empty);
+	    Pair new_pair = new Pair (value, LList.Empty);
 	    if (last == null)
 	      result = new_pair;
 	    else

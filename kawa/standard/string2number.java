@@ -2,6 +2,8 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
+import gnu.kawa.util.*;
+import gnu.text.CharArrayInPort;
 
 public class string2number extends Procedure1or2
 {

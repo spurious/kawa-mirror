@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.Procedure1;
 
 /**
@@ -10,11 +10,11 @@ public class vector2list extends Procedure1
 {
   public Object apply1 (Object arg1)
   {
-     kawa.lang.Vector v = (kawa.lang.Vector)arg1;
+     FVector v = (FVector)arg1;
 
      int len = v.length();
 
-     kawa.lang.List result = List.Empty;
+     LList result = LList.Empty;
      for (int t=len-1; t>=0; t--) {
         result = new Pair(v.elementAt(t),result);
      }

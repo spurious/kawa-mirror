@@ -4,6 +4,7 @@ import gnu.bytecode.Access;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Type;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 // OPC: (primitive-op1 OPC "rettype"  ("argtype" ...))
 // 182: (primitive-virtual-method "class" "method" "rettype" ("argtype" ...))
@@ -33,7 +34,7 @@ public class prim_method extends Syntax
   public static Type exp2Type (Object obj, Translator tr)
   {
     String str = obj.toString();
-    if (obj instanceof kawa.lang.FString)
+    if (obj instanceof FString)
       return Scheme.string2Type(str);
     else if (obj instanceof String)
       {
@@ -61,9 +62,9 @@ public class prim_method extends Syntax
       return tr.syntaxError ("wrong number of arguments to "+getName()
 			     +"(opcode:"+op_code+")");
 
-    if (! (match[3] instanceof List))
+    if (! (match[3] instanceof LList))
       return tr.syntaxError ("missing/invalid parameter list in "+getName());
-    List argp = (List) match[3];
+    LList argp = (LList) match[3];
 
     int narg = argp.length();
     Type[] args = new Type[narg];
@@ -71,7 +72,7 @@ public class prim_method extends Syntax
       {
 	Pair p = (Pair)argp;
 	args[i] = exp2Type(p.car, tr);
-	argp = (List)p.cdr;
+	argp = (LList)p.cdr;
       }
     Type rtype = exp2Type(match[2], tr);
     PrimProcedure proc;

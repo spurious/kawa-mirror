@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.Char;
 import gnu.mapping.*;
 
 public class char_equal_p extends Procedure2

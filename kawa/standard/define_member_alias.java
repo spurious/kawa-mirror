@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.reflect.*;
@@ -50,12 +51,12 @@ public class define_member_alias extends Syntax
         Pair p2 = (Pair) p1.cdr;
         Expression fname = null;
         Expression arg = tr.rewrite(p2.car);
-        if (p2.cdr == List.Empty)
+        if (p2.cdr == LList.Empty)
           fname = new QuoteExp(gnu.expr.Compilation.mangleName(name));
         else if (p2.cdr instanceof Pair)
           {
             Pair p3 = (Pair) p2.cdr;
-            if (p3.cdr == List.Empty)
+            if (p3.cdr == LList.Empty)
               fname = tr.rewrite(p3.car);
           }
         if (fname != null)

@@ -1,7 +1,7 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.WrongType;
 import gnu.mapping.Procedure2;
+import gnu.kawa.util.*;
 
 public class mem extends Procedure2
 {
@@ -28,7 +28,7 @@ public class mem extends Procedure2
 	arg2 = list.cdr;
       }
 
-    if (arg2 == List.Empty)
+    if (arg2 == LList.Empty)
       return Boolean.FALSE;
     else
       throw new WrongType(this.name (), 2, "list");

@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 
 /**
@@ -11,7 +11,7 @@ public class list_v extends ProcedureN
 {
   public static Object list$V (Object[] args)
   {
-    Object result = List.Empty;
+    Object result = LList.Empty;
     for (int i = args.length;  --i >= 0; )
       result = new Pair (args[i], result);
     return result;

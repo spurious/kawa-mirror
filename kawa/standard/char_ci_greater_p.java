@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.Char;
 import gnu.mapping.Procedure2;
 import gnu.mapping.WrongType;
 
@@ -14,8 +14,8 @@ public class char_ci_greater_p extends Procedure2
     char c1 = ((Char)arg1).charValue ();
     char c2 = ((Char)arg2).charValue ();
     if (Character.toUpperCase (c1) > Character.toUpperCase (c2))
-      return Interpreter.trueObject;
+      return Boolean.TRUE;
     else
-      return Interpreter.falseObject;
+      return Boolean.FALSE;
   }
 }

@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.FString;
 import gnu.text.LineBufferedReader;
 import gnu.mapping.*;
 

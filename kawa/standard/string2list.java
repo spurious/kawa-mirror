@@ -1,5 +1,5 @@
 package kawa.standard;
-import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 
 /**
@@ -14,7 +14,7 @@ public class string2list extends Procedure1
 
     int len = str.length();
 
-    List result = List.Empty;
+    LList result = LList.Empty;
     for (int i=len; --i >= 0; )
       result = new Pair(Char.make (str.charAt(i)), result);
     return result;

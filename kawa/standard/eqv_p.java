@@ -4,6 +4,7 @@ import gnu.bytecode.Type;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /** Implement that standard Scheme function "eqv?". */
 

@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.bytecode.Type;
 import gnu.bytecode.ClassType;
 import gnu.mapping.*;
@@ -24,7 +25,7 @@ public class try_catch extends Syntax implements Printable
     for (;;)
       {
 	obj = pair.cdr;
-	if (obj == List.Empty)
+	if (obj == LList.Empty)
 	  break;
 	if (! (obj instanceof Pair))
 	  return tr.syntaxError("improper list in try-catch");

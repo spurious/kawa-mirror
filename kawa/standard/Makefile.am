@@ -21,7 +21,6 @@ cdr.java \
 cxr.java \
 list_p.java \
 list_v.java \
-length.java \
 append.java \
 reverse.java \
 list_tail.java \

@@ -1,6 +1,7 @@
 package kawa.standard;
 import gnu.expr.*;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.bytecode.*;
 import java.util.Vector;
 
@@ -28,7 +29,7 @@ public class object extends Syntax
 					    Translator tr)
   {
     tr.mustCompileHere();
-    int num_supers = List.list_length (pair.car);
+    int num_supers = LList.list_length (pair.car);
     if (num_supers < 0)
       return tr.syntaxError("object superclass specification not a list");
     Expression[] supers = new Expression[num_supers];
@@ -49,7 +50,7 @@ public class object extends Syntax
     LambdaExp last_method = null;
     // First pass (get Declarations).
     Vector inits = null;
-    for (Object obj = components;  obj != List.Empty;  )
+    for (Object obj = components;  obj != LList.Empty;  )
       {
 	if (! (obj instanceof Pair)
 	    || ! ((pair = (Pair) obj).car instanceof Pair))
@@ -107,7 +108,7 @@ public class object extends Syntax
     // Second pass (rewrite method/initializer bodies).
     LambdaExp meth = method_list;
     int init_index = 0;
-    for (Object obj = components;  obj != List.Empty;  )
+    for (Object obj = components;  obj != LList.Empty;  )
       {
 	pair = (Pair) obj;
 	obj = pair.cdr; // Next member.

@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.util.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "and" and "or" primitives.
@@ -20,12 +21,12 @@ public class and_or extends Syntax implements Printable
 
   public Expression rewrite (Object obj, Translator tr)
   {
-    if (obj == List.Empty)
+    if (obj == LList.Empty)
       return new QuoteExp (Scheme.boolObject (is_and));
     if (! (obj instanceof Pair))
       return tr.syntaxError ("non-list arguments to and/or");
     Pair pair = (Pair) obj;
-    if (pair.cdr == List.Empty)
+    if (pair.cdr == LList.Empty)
       return tr.rewrite (pair.car);
     Expression[] inits = new Expression[1];
     LetExp let = new LetExp (inits);

@@ -2,6 +2,7 @@ package kawa.standard;
 import kawa.lang.*;
 import gnu.expr.*;
 import gnu.bytecode.Method;
+import gnu.kawa.util.*;
 
 public class define_syntax extends Syntax
 {
@@ -65,7 +66,7 @@ public class define_syntax extends Syntax
     Object name = p.car;
     if (! (p.car instanceof String)
         || ! (p.cdr instanceof Pair)
-        || (p = (Pair) p.cdr).cdr != List.Empty)
+        || (p = (Pair) p.cdr).cdr != LList.Empty)
       {
         forms.addElement(tr.syntaxError("invalid syntax for define-syntax"));
         return false;

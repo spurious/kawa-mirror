@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.expr.*;
 
 /** Implement the standard Scheme "syntax-rules" form. */
@@ -11,7 +12,7 @@ public class syntax_rules extends Syntax
     Pair pair = (Pair) form.cdr;
 
     Object literals_list = pair.car;
-    int num_literals = List.length (literals_list);
+    int num_literals = LList.length (literals_list);
     if (num_literals < 0)
       return tr.syntaxError ("define-syntax:  invalid literals list");
     String[] literal_identifiers = new String [num_literals + 1];

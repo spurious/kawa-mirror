@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 
@@ -22,7 +23,7 @@ public class let_syntax extends Syntax implements Printable
     Pair pair = (Pair) obj;
     Object bindings = pair.car;
     Object body = pair.cdr;
-    int decl_count = List.length (bindings);
+    int decl_count = LList.length (bindings);
     Expression[] inits = new Expression[decl_count];
     Macro[] decls = new Macro[decl_count];
     LetExp let = new LetExp (inits);
@@ -38,7 +39,7 @@ public class let_syntax extends Syntax implements Printable
 	if (! (binding.cdr instanceof Pair))
 	  return tr.syntaxError("let has no value for `"+name+"'");
 	binding = (Pair) binding.cdr;
-	if (binding.cdr != List.Empty)
+	if (binding.cdr != LList.Empty)
 	  return tr.syntaxError("let binding for `"+name+"' is improper list");
         decls[i] = new Macro(name, binding.car);
         let.addDeclaration(decls[i]);

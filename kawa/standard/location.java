@@ -1,5 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
+import gnu.kawa.util.*;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.bytecode.Access;
@@ -24,7 +25,7 @@ public class location extends Syntax implements Printable
 	Syntax syntax = tr.check_if_Syntax (proc);
 	if (syntax == null)
 	  {
-	    int nargs = List.length(args);
+	    int nargs = LList.length(args);
 	    Expression[] xargs = new Expression[nargs];
 	    for (int i = 0; i < nargs; i++)
 	      {
@@ -47,7 +48,7 @@ public class location extends Syntax implements Printable
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing argument to location");
     Pair pair = (Pair) obj;
-    if (pair.cdr != List.Empty)
+    if (pair.cdr != LList.Empty)
       return tr.syntaxError ("extra arguments to location");
     //    Expression arg = tr.rewrite(pair.car);
     Expression arg = rewriteArg(pair.car, tr);

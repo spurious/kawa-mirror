@@ -1,3 +1,8 @@
+2000-03-21  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Force kawa.lib.std_syntax to be loaded now.
+	Add definition of `progn' (using kawa.standard.begin).
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* ELisp.java:  Inherit from Interpreter directly, not via Scheme.

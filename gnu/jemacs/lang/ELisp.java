@@ -140,7 +140,8 @@ public class ELisp extends Interpreter
     loadClass("gnu.jemacs.lang.SymbolOps", environ);
     loadClass("gnu.jemacs.lang.NumberOps", environ);
     loadClass("gnu.jemacs.lang.ArrayOps", environ);
-    //    loadClass("kawa.lib.std_syntax", environ);
+    // Force it to be loaded now, so we can over-ride let* etc.
+    loadClass("kawa.lib.std_syntax", environ);
     define("t", "t");
     define("nil", "nil");
     defun(NumberCompare.makeLss("<"));
@@ -150,6 +151,7 @@ public class ELisp extends Interpreter
     defun("lambda", new gnu.jemacs.lang.lambda());
     defun("defun", new gnu.jemacs.lang.defun());
     defun("setq", new gnu.jemacs.lang.setq());
+    defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
     defun("while", new gnu.jemacs.lang.While());

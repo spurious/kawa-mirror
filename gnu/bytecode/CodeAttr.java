@@ -1695,13 +1695,35 @@ public class CodeAttr extends Attribute implements AttrContainer
   public void doPendingFinalizers (TryState limit)
   {
     TryState stack = try_stack;
+
+    /* If a value is returned, it must be saved to a local variable,
+       to prevent a verification error because of inconsistent stack sizes.
+    */
+    boolean saveResult = ! getMethod().getReturnType().isVoid();
+    Variable result = null;
+
     while (stack != limit)
       {
 	if (stack.finally_subr != null         // there is a finally block
 	    && stack.finally_ret_addr == null) // 'return' is not inside it
-	  emitJsr(stack.finally_subr);
+	  {
+	    if (saveResult && result == null)
+	      {
+		result = addLocal(topType());
+		emitStore(result);
+	      }
+	    emitJsr(stack.finally_subr);
+	  }
+
 	stack = stack.previous;
       }
+
+    if (result != null)
+      emitLoad(result);
+    // We'd like to do freeLocal on the result Variable, but then we risk
+    // it being re-used in a finalizer, which would trash its value.  We
+    // don't have any convenient way to to do that (the pending Scope
+    // mechanism is over-kill), we for now we just leak the Variable.
   }
 
   /**

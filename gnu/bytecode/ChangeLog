@@ -1,3 +1,8 @@
+2002-10-21  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* CodeAttr.java (doPendingFinalizers): Fix verification error
+	when returning a value inside a try/finally.
+
 2002-08-16  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (compare):  tostring_type is more general.

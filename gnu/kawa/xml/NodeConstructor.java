@@ -28,17 +28,18 @@ implements Inlineable
       saved.writeObject(current);
   }
 
-  public static Consumer pushNodeContext (CallContext ctx)
+  public static XConsumer pushNodeContext (CallContext ctx)
   {
     Consumer out = ctx.consumer;
-    if (out instanceof Values && ! (out instanceof Nodes))
+    if ((out instanceof Values && ! (out instanceof Nodes))
+	|| ! (out instanceof XConsumer))
       {
 	NodeTree node = new NodeTree();
 	ctx.consumer = node;
 	return node;
       }
     else
-      return out;
+      return (XConsumer) out;
   }
 
   public static void popNodeContext (Consumer saved, CallContext ctx)

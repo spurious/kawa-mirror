@@ -10,6 +10,7 @@ java_sources = \
   AttributeConstructor.java \
   AttributeType.java \
   ChildAxis.java \
+  CommentConstructor.java \
   CoerceNodes.java \
   DefineNamespace.java \
   DescendantAxis.java \

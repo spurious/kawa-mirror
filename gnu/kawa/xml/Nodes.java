@@ -184,6 +184,12 @@ implements org.w3c.dom.NodeList
     maybeEndNonTextNode();
   }
 
+  public void writeCDATA(char[] chars, int offset, int length)
+  {
+    maybeStartNonTextNode();
+    curFragment.writeCDATA(chars, offset, length);
+  }
+
   public void writeProcessingInstruction(String target, char[] content,
 					 int offset, int length)
   {

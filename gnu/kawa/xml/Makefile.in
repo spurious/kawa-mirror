@@ -200,6 +200,7 @@ java_sources = \
   AttributeType.java \
   ChildAxis.java \
   CoerceNodes.java \
+  CommentConstructor.java \
   DefineNamespace.java \
   DescendantAxis.java \
   DescendantOrSelfAxis.java \

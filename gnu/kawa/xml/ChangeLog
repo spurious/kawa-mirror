@@ -1,3 +1,11 @@
+2004-05-05  Per Bothner  <per@bothner.com>
+
+	* CommentConstructor.java:  New class.
+	* Makefile.am:  Update accordingly.
+	* NodeConstructor.java (pushNodeContext):  Now returns XConsumer.
+	* NodeType.java (PROCESSING_INSTRUCTION_OK):  Renamed to PI_OK.
+	* Nodes.java (writeCDATA):  New method.
+
 2004-04-18  Per Bothner  <per@bothner.com>
 
 	* NodeType.java (COMMENT_OK, PROCESSING_INSTRUCTION_OK): New constants.

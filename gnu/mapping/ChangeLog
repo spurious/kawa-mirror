@@ -1,3 +1,14 @@
+2000-04-13  Per Bothner  <per@bothner.com>
+
+	* Location.java (isBound):  New method.
+	* AliasConstraint.java (define):  New method.
+	(get, set):  Generalize to reference to arbitrary Location.
+	(isBound):  New method.
+	* IndirectConstraint.java (define):  New method.
+
+	* Values.java (noArgs):  Make final.
+	* Procedure.java (noArgs):  Make final.
+
 2000-03-12  Per Bothner  <per@bothner.com>
 
 	* BindingEnumeration.java:  New class, implements Enumerations.

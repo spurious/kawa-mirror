@@ -26,4 +26,13 @@ public class IndirectConstraint extends Constraint
 	binding.constraint = new IndirectConstraint();
       }
   }
+
+  public static void define (Binding binding, Procedure location)
+  {
+    synchronized (binding)
+      {
+	binding.value = location;
+	binding.constraint = new IndirectConstraint();
+      }
+  }
 }

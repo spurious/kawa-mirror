@@ -9,13 +9,25 @@ public class AliasConstraint extends Constraint
 {
   public Object get (Binding binding)
   {
-    binding = (Binding) binding.value;
-    return binding.constraint.get(binding);
+    return ((Location) binding.value).get();
   }
 
   public void set (Binding binding, Object value)
   {
-    binding = (Binding) binding.value;
-    binding.constraint.set(binding, value);
+    ((Location) binding.value).set(value);
+  }
+
+  public boolean isBound (Binding binding)
+  {
+    return ((Location) binding.value).isBound();
+  }
+
+  public static void define (Binding binding, Location location)
+  {
+    synchronized (binding)
+      {
+	binding.value = location;
+	binding.constraint = new AliasConstraint();  // FIXME share?
+      }
   }
 }

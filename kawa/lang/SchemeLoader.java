@@ -1,6 +1,6 @@
 package kawa.lang;
 
-/** Load classes from either a set of byte arrays.
+/** Load classes from a set of byte arrays.
  * @author	Per Bothner
  */
 

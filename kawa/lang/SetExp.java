@@ -69,6 +69,7 @@ public class SetExp extends Expression
     else
       {
 	ReferenceExp.compile_load (decl.baseVariable, comp);
+	comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	comp.method.compile_swap ();
 	comp.method.compile_push_int (decl.offset);
 	comp.method.compile_swap ();
@@ -88,6 +89,7 @@ public class SetExp extends Expression
 	else
 	  {
 	    ReferenceExp.compile_load (binding.baseVariable, comp);
+	    comp.method.maybe_compile_checkcast (Compilation.objArrayType);
 	    comp.method.compile_push_int (binding.offset);
 	    new_value.compile (comp, 0);
 	    comp.method.compile_array_store (Compilation.scmObjectType);

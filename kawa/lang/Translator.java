@@ -2,7 +2,7 @@ package kawa.lang;
 import kawa.standard.Scheme;
 import codegen.Method;
 
-/** Used to translate from source for to Expression.
+/** Used to translate from source to Expression.
  * The result has macros expanded, lexical names bound, etc, and is
  * ready for code generation.
  * This is sometimes called a "compilation environment",

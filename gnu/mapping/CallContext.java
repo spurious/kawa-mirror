@@ -179,7 +179,6 @@ public final class CallContext implements Runnable
 	Procedure proc = this.proc;
 	if (proc == null)
 	  break;
-	//System.err.println("step "+proc);
 	this.proc = null;
 	proc.apply(this);
       }

@@ -111,7 +111,8 @@ public class repl extends Procedure0or1
 		setArgs (args, iArg+1);
 		if (arg.equals ("-c"))
 		  checkInitFile();
-		Shell.runString(args[iArg], Interpreter.defaultInterpreter, Environment.getCurrent());
+		Interpreter interp = Interpreter.defaultInterpreter;
+		Shell.runString(args[iArg], interp, interp.getEnvironment());
 		something_done = true;
 	      }
 	    else if (arg.equals ("-f"))
@@ -209,7 +210,6 @@ public class repl extends Procedure0or1
 	      }
 	    else if (arg.equals("--connect"))
 	      {
-		getInterpreter();
 		++iArg;
 		if (iArg == args.length)
 		  bad_option (arg);

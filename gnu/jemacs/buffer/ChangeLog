@@ -1,0 +1,11 @@
+1999-08-07  Per Bothner  <per@bothner.com>
+
+	Move from gnu.emacs to gnu.jemacs.buffer.
+
+1999-06-30  Per Bothner  <per@bothner.com>
+
+	* overview.html:  Add "to-do" section.
+
+1999-06-20  Per Bothner  <per@bothner.com>
+
+	* New package.

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <title>JEmacs and the gnu.jemacs.buffer Package</title>
+  </head>
+
+  <body>
+    <h1>JEmacs and the gnu.jemacs.buffer Package</h1>
+<p>
+The <code>gnu.</code> provides various building blocks
+for building an Emacs-like text editor.  It also provides a
+number of Scheme procedures that have the same name and similar
+functionality as the Emacs Lisp functions.
+<p>
+It uses the Swing tool-kit.
+
+<h2>Plan</h2>
+
+The plan is to use
+this together with the (unfinished) <code>gnu.jemacs.lang</code>
+package to provide a fully-functional re-implementation of
+Emacs Lisp which compiles to Java bytecodes.
+I'm hoping volunteers will help me make "JEmacs" into something
+useful.  I have fairly clear ideas about much of what need to be
+done.  Contact me if you are interested.
+
+<h2>Status</h2>
+Very unfinished proof of concerpt.
+
+<h2>To-do</h2>
+A couple of things volunteers might start with
+(but let me know before you spend serious time on any of these):
+<ul>
+<li>Implement more of the editing commands:  Insert/delete/forward/backward
+char/word/line.  (By default, BS should delete backwards,
+and Delete should delete forwards, but this will be customizable.) 
+<li>Implement commands to read and save files.  Associate a filename
+with a buffer, and display it in the mode line.
+(Until we decide how to handle mini-buffers, just prompt for filename
+with System.out and read from System.in.)
+<li>Display the modeline in inverse video, but extend it to the full
+window width.
+<li>Come up with a design for narrowing a buffer.  One possibility
+is to use some kind of invisible style for the text outside the narrowing.
+But I think a more flexible design would use an "IndirectDocument" class
+that refers to a sub-range of a buffer.  This would help with "Indirect
+Buffers", and might be flexible and elegant in general.
+<li>Perhaps Buffer should inherit from Document (or rather
+DefaultStyledDocument).  Hwever, that might lose some flexibility.
+<li>Split windows correctly, so that the windows that are not split
+keep their sizes, the windows being split gets split as specified,
+and the frame does not change size.  Also handle horizonal splits.
+<li>Work on buffer-local keymaps and keymap search order.
+(Swing provides a single parent keymap;  Emacs may use many.
+For now, just implement a single parent, I think.)
+Handle multi-key key-sequences: 
+When a prefix key is seen, temporarily install a new keymap
+to handle the rest of the sequence, but only in the selected window.
+(This may not quite match Emacs behavior, but I think it is better.)
+<li>Think about how to map extents and faces to Swing attributes
+and styles.
+<li>Decide how to implement Emacs strings.
+Initially, we'll use kawa.lang.FString, but we do want to support strings
+with extents and text properties.
+</ul>
+
+<h2>Usage</h2>
+Load <code>emacs.scm</code> into a running Kawa.
+Then evaluate:
+<pre>
+(emacs)
+</pre>
+That brings up a Emacs window.
+<p>
+You can do <code>(split-window)</code> to create new (sub-)windows
+in an existing frame; type <code>(make-frame)</code> to create
+a new frame (to-level window), or do <code>(get-buffer-create NAME)</code>
+to create a new buffer.
+Note also how <code>ctrl/B</code> and <code>ctrl/F</code> have been
+bound to the correct functions.
+
+<h2>License</h2>
+Same as the package <code>gnu.expr</code>:  Modified Gnu Public License.
+See the file <a href="http:../expr/COPYING">../expr/COPYING</a>.
+For now, the copyright holder is Per Bothner;  in the future it may
+make more sense to make the FSF the copyright owner, since the plan
+is to use a lot of the existing ELisp packages once ELisp support
+is complete.
+
+<h2>Author</h2>
+
+Per Bothner,
+<tt>&lt;<a href="mailto:bothner@gnu.org">bothner@gnu.org</a>&gt;</tt>
+<p>
+<!-- hhmts start -->
+Last modified: Sat Aug  7 20:46:03 PDT 1999
+<!-- hhmts end -->
+  </body>
+</html>

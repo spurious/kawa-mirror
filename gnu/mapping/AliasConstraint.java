@@ -36,6 +36,13 @@ public class AliasConstraint extends Constraint
     return ((Binding) binding.value).getFunctionValue();
   }
 
+  public static Binding followAliases(Binding binding)
+  {
+    while (binding.constraint instanceof AliasConstraint)
+      binding = (Binding) binding.value;
+    return binding;
+  }
+
   public static void define (Binding binding, Location location)
   {
     synchronized (binding)

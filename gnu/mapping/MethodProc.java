@@ -95,18 +95,9 @@ public abstract class MethodProc extends ProcedureN
    * argument that does not match. */
   public static final int NO_MATCH_BAD_TYPE = 0xfff40000;
 
-  public Object match (Object[] args)
-  {
-    CallContext ctx = CallContext.getInstance();
-    return match(ctx, args) == 0 ? ctx : null;
-    // FUTURE:
-    // vars.setArgs(args);
-    // return match(vars) == 0 ? vars : null;
-  }
-
   public abstract Object applyV(CallContext ctx) throws Throwable;
   // FUTURE:
-  // ctx.run();
+  // ctx.runUntilValue();
 
   public static RuntimeException
   matchFailAsException(int code, Procedure proc, Object[] args)
@@ -128,8 +119,8 @@ public abstract class MethodProc extends ProcedureN
     if (err != 0)
       throw matchFailAsException(err, this, args);
     // FUTURE:
-    // vars.run();
-    // return vars.getResult();
+    // vars.setArgs();
+    // vars.runUntilValue();
     return applyV(vars);
   }
 

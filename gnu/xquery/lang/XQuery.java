@@ -163,6 +163,8 @@ public class XQuery extends Interpreter
     define("count", gnu.kawa.functions.CountValues.countValues);
     define("min", gnu.xquery.util.MinMax.min);
     define("max", gnu.xquery.util.MinMax.max);
+    define("sum", gnu.xquery.util.Reduce.sum);
+    define("avg", gnu.xquery.util.Average.avg);
     define("position", gnu.xquery.util.Position.position);
     define("sublist", gnu.xquery.util.SubList.subList);
     define("empty", gnu.xquery.util.IsEmptySequence.isEmptySequence);

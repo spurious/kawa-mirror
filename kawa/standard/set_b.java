@@ -16,6 +16,32 @@ public class set_b extends Syntax implements Printable
     Object [] match = pattern.match (obj);
     if (match == null)
       return tr.syntaxError ("missing or extra arguments to set!");
+
+    if (match[0] instanceof Pair)
+      {
+	// rewrite (set! (proc . args) rhs) => ((setter proc) rhs . args)
+	// NOTE: this does not preserve evaluation order!
+	Pair pair = (Pair) match[0];
+	Object proc = pair.car;
+	Object args = pair.cdr;
+	/*
+	args = new Pair(match[1], args);
+	proc = new Pair("setter", new Pair(proc, List.Empty));
+	return tr.rewrite(new Pair(proc, args));
+	*/
+
+	int nargs = List.length(args);
+	Expression[] xargs = new Expression[nargs+1];
+	for (int i = 1; i <= nargs; i++)
+	  {
+	    pair = (Pair) args;
+	    xargs[i] = tr.rewrite(pair.car);
+	    args = pair.cdr;
+	  }
+	xargs[0] = tr.rewrite(match[1]);
+	return new kawa.lang.SetApplyExp(tr.rewrite(proc), xargs);
+      }
+
     if (! (match[0] instanceof String))
       return tr.syntaxError ("first set! argument is not a variable name");
     String sym = (String) match[0];

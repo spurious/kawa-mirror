@@ -1,3 +1,9 @@
+1999-10-20  Bruce Lewis  <brlewis@alum.mit.edu>
+
+	* gnu/text/LispReader.java: readListBody now takes an int
+	argument for endDelimiter; -1 means read to EOF.  This facilitates
+	reading an entire file with line/column info.
+
 1999-09-05  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (readLine):  New overloaded version.

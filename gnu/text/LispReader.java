@@ -89,10 +89,10 @@ public abstract class LispReader extends Lexer
   public Object readListBody ()
        throws java.io.IOException, SyntaxException
   {
-    return readListBody(')');
+    return readListBody((int) ')');
   }
 
-  public Object readListBody (char endDelimiter)
+  public Object readListBody (int endDelimiter)
        throws java.io.IOException, SyntaxException
   {
     Object last = null;
@@ -165,7 +165,7 @@ public abstract class LispReader extends Lexer
     int column = port.getColumnNumber ();
     try
       {
-	Object list = readListBody(endDelimiter);
+	Object list = readListBody((int) endDelimiter);
 	int c = read ();
 	if (c < 0)
 	  error('e', port.getName(), line+1, column+1,

@@ -137,24 +137,17 @@ public abstract class Lisp2 extends LispLanguage
     // that is in a BSS segment; the address in the _Jv_Field doesn't
     // get initialized.  FIXME.
     // (We do need to use this for JEmacs.  Sigh.)
-    if (System.getProperty("gnu.classpath.home") == null)
     if (loc instanceof FieldLocation
         && ((FieldLocation) loc).isProcedureOrSyntax())
       {
         environ.addLocation(name, EnvironmentKey.FUNCTION, loc);
-        return;
       }
-    try {
-    if ((val = loc.get(null)) != null)
+    else if ((val = loc.get(null)) != null)
       {
         if (val instanceof Procedure || val instanceof kawa.lang.Syntax)
           defun(name, val);
         else
           define(name.getName(), val);
-      }
-    } catch (Exception ex)
-      {
-        System.err.println("(Cannot import "+loc+"::"+loc.getClass().getName()+" from Scheme)");
       }
   }
 }

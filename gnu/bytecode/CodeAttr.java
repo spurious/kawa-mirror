@@ -1151,7 +1151,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     new_if.start_stack_size = SP;
   }
 
-  /** Compile start of conditional:  if (x != 0) */
+  /** Compile start of conditional:  if (x != 0) ...
+   * Also use this if you have pushed a boolean value:  if (b) ... */
   public final void emitIfIntNotZero()
   {
     emitIfCompare1(153); // ifeq

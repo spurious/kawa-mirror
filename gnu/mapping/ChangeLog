@@ -1,3 +1,11 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	* OutPort.java: Implement gnu.lists.Consumer.
+
+	* SFormat.java (printReadable):  New helper function.
+	(print):  Compensate since gnu.lsist classes no longer
+	implement Printable.
+
 2001-02-27  Per Bothner  <per@bothner.com>
 
 	* CpsMethodContainer.java:  New interface.

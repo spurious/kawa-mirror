@@ -1,5 +1,6 @@
 package gnu.mapping;
 import java.io.CharArrayWriter;
+import gnu.lists.*;
 
 /** A Format to print structured objects on streams.
  * After JDK 1.1 comes out, this should be made compatible with
@@ -29,6 +30,11 @@ public class SFormat // extends java.text.Format  [in JDK 1.1.]
     print (obj, ps);
   }
 
+  public static boolean printReadable(java.io.Writer ps)
+  {
+    return ps instanceof OutPort && ((OutPort)ps).printReadable;
+  }
+
   public static void print (Object obj, java.io.PrintWriter ps)
   {
     if (obj instanceof Printable)
@@ -49,6 +55,50 @@ public class SFormat // extends java.text.Format  [in JDK 1.1.]
 	  }
 	ps.print (']');
       }
+    else if (obj instanceof LList)
+      {
+	ps.print('(');
+	boolean first = true;
+	while (obj instanceof Pair)
+	  {
+	    if (! first)
+	      ps.print(' ');
+	    first = false;
+	    Pair pair = (Pair) obj;
+	    print(pair.car, ps);
+	    obj = pair.cdr;
+	  }
+	if (obj != LList.Empty)
+	  {
+	    ps.print(" . ");
+	    print(obj, ps);
+	  }
+	ps.print(')');
+      }
+    else if (obj instanceof CharSequence)
+      {
+	if (printReadable(ps))
+	  Strings.printQuoted((CharSequence) obj, ps, 0);
+	else
+	  ps.print(obj);
+      }
+    else if (obj instanceof SimpleVector)
+      {
+	SimpleVector vec = (SimpleVector) obj;
+	String tag = vec.getTag();
+	int size = vec.size;
+	ps.print('#');
+	if (tag != null)
+	  ps.print(tag);
+	ps.print('(');
+	for (int i = 0;  i < size;  i++)
+	  {
+	    if (i > 0)
+	      ps.print(' ');
+	    print(vec.get(i), ps);
+	  }
+	ps.print(')');
+      }
     else if (obj instanceof int[])
       {
 	int[] arr = (int[]) obj;
@@ -63,7 +113,7 @@ public class SFormat // extends java.text.Format  [in JDK 1.1.]
 	ps.print (']');
       }
     else
-      ps.print(obj.toString ());
+      ps.print(obj);
   }
 
 }

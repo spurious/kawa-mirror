@@ -2,12 +2,13 @@ package gnu.mapping;
 import java.io.*;
 import java.text.*;
 import gnu.text.*;
+import gnu.lists.Consumer;
 
 /**
  * An extended PrintWriter.
  */
 
-public class OutPort extends java.io.PrintWriter implements Printable
+public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 {
   String name;
   private Writer base;
@@ -220,7 +221,8 @@ public class OutPort extends java.io.PrintWriter implements Printable
   {
     if (objectFormat == null)
       super.print(v);
-    else if (objectFormat instanceof ReportFormat)
+    else if (objectFormat instanceof ReportFormat
+	     && ! (v instanceof Object[]))
       {
         try
           {
@@ -244,6 +246,76 @@ public class OutPort extends java.io.PrintWriter implements Printable
 	ps.print (name);
       }
     ps.print ('>');
+  }
+
+  //public void writeChar(int v);
+
+  public void writeBoolean(boolean v)
+  {
+    print(v);
+  }
+
+  public void writeFloat(float v)
+  {
+    print(v);
+  }
+
+  public void writeDouble(double v)
+  {
+    print(v);
+  }
+
+  public void writeInt(int v)
+  {
+    print(v);
+  }
+
+  public void writeLong(long v)
+  {
+    print(v);
+  }
+
+  public void beginGroup(String typeName, Object type)
+  {
+    print('(');
+    print(typeName);
+  }
+
+  public void endGroup(String typeName)
+  {
+    out.print(')');
+  }
+
+  /** Write a attribute for the current group.
+   * This is only allowed immediately after a beginGroup. */
+  public void beginAttribute(String attrName, Object attrType)
+  {
+    print(' ');
+    print(attrName);
+    print(": ");
+  }
+
+  /** No more attributes in this group. */
+  public void endAttributes()
+  {
+    print(' ');
+  }
+
+  public void writeObject(Object v)
+  {
+    print(v);
+  }
+
+  /** True if consumer is ignoring rest of group.
+   * The producer can use this information to skip ahead. */
+  public boolean ignoring()
+  {
+    return false;
+  }
+
+  public void writeChars(String str)
+  {
+    print(str);
   }
 
   public int getColumnNumber ()

@@ -1,3 +1,7 @@
+2001-06-04  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (KAWALIB):  Change to use .jar file.
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* formatst.scm:  Comment out misleading message about missing complex.

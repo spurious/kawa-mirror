@@ -97,7 +97,7 @@ extra_java = @extra_java@
 kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 
-KAWALIB = ..
+KAWALIB = ../kawa-$(VERSION).jar
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)

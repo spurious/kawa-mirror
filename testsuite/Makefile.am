@@ -1,6 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-KAWALIB = ..
+KAWALIB = ../kawa-$(VERSION).jar
 DISABLE_GCJ_COMPILED_KAWA = KAWALIB=$(KAWALIB) ../bin/kawa.sh
 ENABLE_GCJ_COMPILED_KAWA = ../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)

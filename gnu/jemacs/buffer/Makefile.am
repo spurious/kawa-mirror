@@ -8,12 +8,20 @@ javadir=$(datadir)/java/$(subdir)
 
 java_SWING = \
   Buffer.java \
+  BufferContent.java \
+  BufferKeymap.java \
+  BufferWriter.java \
+  CancelledException.java \
+  FinalAction.java \
   Frame.java \
-  Keymap.java \
+  InsertAction.java \
   Marker.java \
   Modeline.java \
-  ProcCommand.java \
+  PrefixAction.java \
+  ProcAction.java \
+  ReplBuffer.java \
   Signal.java \
+  TooLongAction.java \
   Window.java
   
 EXTRA_JAVA = $(java_SWING)

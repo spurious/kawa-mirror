@@ -25,4 +25,9 @@ public class Signal extends RuntimeException
   {
     throw new Signal("error", data);
   }
+
+  public static void message(String msg)
+  {
+    System.err.println(msg);
+  }
 }

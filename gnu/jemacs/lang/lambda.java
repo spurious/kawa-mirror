@@ -26,18 +26,23 @@ public class lambda extends Lambda
       }
     Object interactive = null;
     if (body instanceof Pair
-	&& (pair = (Pair) body).car instanceof Pair
-	&& ((Pair) pair.car).car.toString() == "interactive")
+	&& (pair = (Pair) body).car instanceof Pair)
       {
-	interactive = ((Pair) pair.car).cdr;
-	if (interactive != LList.Empty
-            && ! (interactive instanceof Pair
-                  && ((Pair) interactive).cdr == LList.Empty))
-          {
-            tr.syntaxError ("missing 'interactive' specification");
-            interactive = null;
-          }
-	body = pair.cdr;
+	Pair first_application = (Pair) pair.car;
+	Object first_function = first_application.car;
+	if (first_function instanceof Symbol
+	    && ((Symbol) first_function).getName() == "interactive")
+	  {
+	    interactive = first_application.cdr;
+	    if (interactive != LList.Empty
+		&& ! (interactive instanceof Pair
+		      && ((Pair) interactive).cdr == LList.Empty))
+	      {
+		tr.syntaxError ("missing 'interactive' specification");
+		interactive = null;
+	      }
+	    body = pair.cdr;
+	  }
       }
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());

@@ -1,3 +1,8 @@
+2003-05-17  Per Bothner  <per@bothner.com>
+
+	* lambda.java (rewriteBody):  Use getName to test for 'interactive.
+	* defcustom.java (scanForDefinitions):  Use getName for Symbols.
+
 2003-02-08  Per Bothner  <per@bothner.com>
 
 	* SaveExcursion.java (<init>):  Fix typo.

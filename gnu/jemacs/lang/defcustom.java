@@ -15,7 +15,8 @@ public class defcustom extends Syntax
     Object name = p.car;
     if (name instanceof String || name instanceof Symbol)
       {
-	String sym = name.toString();
+	String sym = name instanceof String ? (String) name
+	  : ((Symbol) name).getName();
 	Declaration decl = defs.lookup(sym);
 	if (decl == null)
 	  {

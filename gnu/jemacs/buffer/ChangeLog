@@ -1,3 +1,9 @@
+2000-02-11  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java (gapContent):  Fix some small but critical bugs.
+
+	* emacs.scm (lookup-key):  Update as Sequence was to gnu.kawa.util.
+
 2000-02-01  Per Bothner  <per@bothner.com>
 
 	* ReplBuffer.java:  Now need to import gnu.expr.Interpreter.

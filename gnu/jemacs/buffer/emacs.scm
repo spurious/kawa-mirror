@@ -55,7 +55,7 @@
   (let ((binding
          ((primitive-static-method <gnu.jemacs.buffer.BufferKeymap> "lookupKey"
                                    <object> (<javax.swing.text.Keymap>
-                                             <kawa.lang.Sequence> <boolean>))
+                                             <gnu.kawa.util.Sequence> <boolean>))
           keymap keys accept-defaults)))
     (if (eq? binding #!null) #f binding)))
 

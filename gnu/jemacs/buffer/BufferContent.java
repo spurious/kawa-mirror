@@ -287,18 +287,18 @@ implements javax.swing.text.AbstractDocument.Content
         else
           newlen = oldlen + 4000;
         int minlen = oldlen + size + 100;
-        if (minlen < newlen)
+        if (minlen > newlen)
           newlen = minlen + 500;
         char[] newarray = new char[newlen];
         if (where <= gapStart)
           {
             System.arraycopy(array, 0, newarray, 0, where);
             int moveSize = gapStart - where;
-            int endSize = oldlen - gapEnd;
-            System.arraycopy(array, where,
-                             newarray, newlen - endSize - moveSize, moveSize);
-            System.arraycopy(array, gapEnd, newarray, newlen-endSize, endSize);
-            gapEnd = newlen - endSize - moveSize;
+            int endSize = array.length - gapEnd;
+	    int newGapEnd = newlen - endSize - moveSize;
+	    System.arraycopy(array, where, newarray, newGapEnd, moveSize);
+	    System.arraycopy(array, gapEnd, newarray, newlen-endSize, endSize);
+            gapEnd = newGapEnd;
           }
         else
           {
@@ -306,10 +306,11 @@ implements javax.swing.text.AbstractDocument.Content
             System.arraycopy(array, gapEnd, newarray, gapStart,
                              where - gapStart);
             int whereOffset = where + (gapEnd - gapStart);
-            int endSize = oldlen - whereOffset;
+            int endSize = array.length - whereOffset;
             gapEnd = newlen - endSize;
             System.arraycopy(array, whereOffset, newarray, gapEnd, endSize);
           }
+	array = newarray;
         gapStart = where;
       }
     else if (where != gapStart)

@@ -27,11 +27,9 @@ class InputStreamHandler extends Thread
     try
       {
 	buffer = new char[512];
-	System.err.println("read from inferior");
 	for (;;)
 	  {
 	    int avail = in_r.read(buffer);
-	    System.err.println("got "+avail+": '"+new String(buffer, 0, avail)+"'");
 	    if (avail <= 0)
 	      break;
 	    wr.buffer = buffer;

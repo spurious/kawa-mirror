@@ -1,3 +1,18 @@
+2000-04-17  Per Bothner  <per@bothner.com>
+
+	* BufferContent.java:  No extends gnu.kawa.util.CharBuffer.
+	Much of the logic was moved to CharBuffer.
+	(class GpaPosition):  Now extends gnu.kawa.util.Position.
+	New constructors.
+	* Marker.java:  Some re-writing because BufferContent re-written.
+	* Buffer.java:  Likewise.
+	* Window.java:  Likewise.
+
+	* Mode.java (getBuffer):  New method.
+	* ProcessMode.java (writeToInferior, getProcessMark):  New methods.
+	* emacs.scm (process?, process-send-string, process-buffer,
+	process-mark, get-buffer-process):  New procedures.
+
 2000-04-14  Per Bothner  <per@bothner.com>
 
 	* BufferWriter.java:  Handle escape sequences.

@@ -96,9 +96,9 @@ public class Window extends javax.swing.JTextPane
 
     // Change buffer's pointMarker so it follows this Window's Caret.
     buffer.curPosition = getCaret();
-    if (buffer.pointMarker.index >= 0)
-      buffer.content.freePosition(buffer.pointMarker.index);
-    buffer.pointMarker.index = Marker.POINT_POSITION_INDEX;
+    if (buffer.pointMarker.position >= 0)
+      buffer.content.releasePosition(buffer.pointMarker.position);
+    buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
   }
 
   public static void setSelected(Window window)
@@ -111,8 +111,8 @@ public class Window extends javax.swing.JTextPane
   {
     int point = buffer.curPosition.getDot();
     int kind = BufferContent.AFTER_MARK_KIND;
-    int index = buffer.content.allocatePosition(point, kind);
-    buffer.pointMarker.index = index;
+    int index = buffer.content.createPosition(point, kind);
+    buffer.pointMarker.position = index;
     buffer.curPosition = null;
     // ?? selected = null;
   }
@@ -144,9 +144,9 @@ public class Window extends javax.swing.JTextPane
 	Caret caret = getCaret();
 	caret.setDot(buffer.getDot());
 	buffer.curPosition = caret;
-	if (buffer.pointMarker.index >= 0)
-	  buffer.content.freePosition(buffer.pointMarker.index);
-	buffer.pointMarker.index = Marker.POINT_POSITION_INDEX;
+	if (buffer.pointMarker.position >= 0)
+	  buffer.content.releasePosition(buffer.pointMarker.position);
+	buffer.pointMarker.position = Marker.POINT_POSITION_INDEX;
       }
     this.buffer = buffer;
   }

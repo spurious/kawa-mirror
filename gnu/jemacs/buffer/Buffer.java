@@ -158,10 +158,7 @@ public class Buffer
     this.name = name;
     content = new BufferContent();
 
-    pointMarker = new Marker();
-    pointMarker.buffer = this;
-    pointMarker.index
-      = content.allocatePosition(0, BufferContent.AFTER_MARK_KIND);
+    pointMarker = new Marker(this, 0, BufferContent.AFTER_MARK_KIND);
 
     document = new javax.swing.text.DefaultStyledDocument(content, styles);
 

@@ -5,8 +5,9 @@ public final class Marker implements Position
 {
   Buffer buffer;
 
-  /** The index of the current position in buffer.content.map. */
-  int index;
+  /** Either POINT_POSITION_INDEX, or a Content-specific magic cookie. */
+  int position;
+  /** Marker follows Buffer's Caret. */
   static final int POINT_POSITION_INDEX = -1;
   //static final int RESERVED_POSITION_COUNT = 1;
 
@@ -19,35 +20,33 @@ public final class Marker implements Position
   public Marker(Marker marker)
   {
     buffer = marker.buffer;
-    if (buffer != null)
+    position = marker.position;
+    if (buffer != null && position != EMACS_MARK_KIND)
       {
         BufferContent content = buffer.content;
-        if (marker.index >= 0)
-          index = content.allocateFromPosition(content.indexes[marker.index]);
-        else
-          index = content.allocatePosition(marker.getOffset(),EMACS_MARK_KIND);
+	position = content.copyPosition(position);
       }
   }
 
   public Marker (Buffer buffer, int offset, int kind)
   {
     this.buffer = buffer;
-    this.index = buffer.content.allocatePosition(offset, kind);
+    this.position = buffer.content.createPosition(offset, kind);
   }
 
   public void finalize()
   {
     if (buffer != null)
-      buffer.content.freePosition(index);
+      buffer.content.releasePosition(position);
   }
 
   public int getOffset()
   {
     if (buffer == null)
       return -1;
-    else if (index == POINT_POSITION_INDEX)
+    else if (position == POINT_POSITION_INDEX)
       return buffer.curPosition.getDot();
-    return buffer.content.positions[buffer.content.indexes[index]];
+    return buffer.content.getPositionOffset(position);
   }
 
   public int getPoint()
@@ -67,7 +66,7 @@ public final class Marker implements Position
 
   public void set(Buffer newBuffer, int newPosition)
   {
-    if (this.index == POINT_POSITION_INDEX)
+    if (this.position == POINT_POSITION_INDEX)
       {
         if (newBuffer != buffer)
           {
@@ -83,7 +82,7 @@ public final class Marker implements Position
     else
       {
         if (buffer != null)
-          buffer.content.freePosition(index);
+          buffer.content.releasePosition(position);
         if (newBuffer == null)
           {
             buffer = null;
@@ -98,17 +97,7 @@ public final class Marker implements Position
             if (newPosition > newLength)
               newPosition = newLength;
           }
-        int newIndex;
-        if (buffer == newBuffer)
-          newIndex = buffer.content.allocatePositionIndex(newPosition,
-                                                          EMACS_MARK_KIND);
-        else
-          {
-            buffer = newBuffer;
-            newIndex = buffer.content.allocatePosition(newPosition,
-                                                       EMACS_MARK_KIND);
-          }
-        buffer.content.indexes[index] = newIndex;
+	position = buffer.content.createPosition(newPosition, EMACS_MARK_KIND);
       }
   }
 

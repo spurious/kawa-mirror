@@ -17,7 +17,7 @@ public class IntFraction extends RatNum implements Externalizable
   {
   }
 
-  IntFraction (IntNum num, IntNum den)
+  public IntFraction (IntNum num, IntNum den)
   {
     this.num = num;
     this.den = den;

@@ -2,10 +2,11 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.io.*;
 
 /** General Cartesian Complex quantity. */
 
-public class CQuantity extends Quantity
+public class CQuantity extends Quantity implements Externalizable
 {
   Complex num;
   Unit unt;
@@ -28,4 +29,22 @@ public class CQuantity extends Quantity
   public boolean isExact () { return num.isExact(); }
 
   public boolean isZero () { return num.isZero(); }
+
+  /**
+   * @serialData Write the complex value (using writeObject) followed
+   *   by the Unit (also using writeUnit).
+   */
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(num);
+    out.writeObject(unt);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    num = (Complex) in.readObject();
+    unt = (Unit) in.readObject();
+  }
 }

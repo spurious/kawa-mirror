@@ -2,12 +2,13 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.io.*;
 
 /* A unit of measurement, either primitive (meter) or derived (kilogram).
  * @author	Per Bothner
  */
 
-public class Unit extends Quantity
+public class Unit extends Quantity implements Externalizable
 {
   String name;
   Dimensions dims;
@@ -229,6 +230,27 @@ public class Unit extends Quantity
   public static Unit lookup (String name)
   {
     return (Unit) unitTable.get (name);
+  }
+
+  /**
+   * @serialData Write the unit name (using writeUTF).
+   *   Not sure if this is the right approach.
+   */
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeUTF(name);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    name = in.readUTF();
+  }
+
+  public Unit readResolve() throws ObjectStreamException
+  {
+    return lookup(name);
   }
 
   public static final BaseUnit meter = new BaseUnit ("m", "Length");

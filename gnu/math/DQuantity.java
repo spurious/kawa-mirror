@@ -2,12 +2,13 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;
+import java.io.*;
 
 /** A Quantity represented as the product of a plain double and a Unit.
  * @author	Per Bothner
  */
 
-public class DQuantity extends Quantity
+public class DQuantity extends Quantity implements Externalizable
 {
   double factor;
   Unit unt;
@@ -108,5 +109,23 @@ public class DQuantity extends Quantity
       return new DQuantity (((RealNum)x).doubleValue () / factor,
 			   Unit.div (Unit.Empty, unit()));
     throw new IllegalArgumentException ();
+  }
+
+  /**
+   * @serialData Write the value (using writeDouble) followed
+   * by the Unit (using writeObject).
+   */
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeDouble(factor);
+    out.writeObject(unt);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    factor = in.readDouble();
+    unt = (Unit) in.readObject();
   }
 }

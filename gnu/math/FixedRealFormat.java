@@ -28,7 +28,7 @@ public class FixedRealFormat extends java.text.Format
   public boolean internalPad;
   public char overflowChar;
 
-  public void format(gnu.math.RatNum number, boolean negative,
+  public void format(RatNum number, boolean negative,
 		     StringBuffer sbuf, FieldPosition fpos)
   {
     int decimals = getMaximumFractionDigits();

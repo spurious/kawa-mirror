@@ -33,7 +33,7 @@ public class AppendValues extends CpsProcedure implements CanInline, Inlineable
       return args[0];
     if (args.length == 0)
       return QuoteExp.voidExp;
-    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
     return exp;

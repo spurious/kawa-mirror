@@ -146,7 +146,7 @@ public class NumberCompare extends ProcedureN implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
     return exp;

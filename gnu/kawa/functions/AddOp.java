@@ -1,4 +1,4 @@
-// Copyright (c) 2000, 2001  Per M.A. Bothner.
+// Copyright (c) 2000, 2001, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -112,7 +112,7 @@ public class AddOp extends ProcedureN implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    Expression folded = ApplyExp.inlineIfConstant(this, exp);
+    Expression folded = exp.inlineIfConstant(this, walker);
     if (folded != exp)
       return folded;
     Expression[] args = exp.getArgs();

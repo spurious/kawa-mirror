@@ -7,6 +7,6 @@ public class string_length extends Procedure1
   public Object apply1 (Object arg1)
        throws kawa.lang.WrongType
   {
-    return IntNum.make (((StringBuffer)arg1).length());
+    return IntNum.make (((FString)arg1).length());
   }
 }

@@ -29,7 +29,7 @@ public class call_with_output_string extends Procedure1
 	      break;
 	    buffer.append ((char)c);
 	  }
-	return buffer;
+	return new FString(buffer);
       }
     catch (java.io.IOException e)
       {

@@ -11,17 +11,8 @@ public class make_string extends Procedure1or2
   }
 
   public final Object apply2 (Object arg1,Object arg2)
-       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    int count = IntNum.intValue (arg1);
-    char ch;
-    if (arg2 instanceof Char)
-      ch = ((Char)arg2).charValue();
-    else
-      throw new WrongArguments(this.name(),2,"character");
-    StringBuffer str = new StringBuffer();
-    for (int i = count;  --i >= 0; )
-      str.append (ch);
-    return str;
+    return new FString (IntNum.intValue (arg1),
+			((Char)arg2).charValue());
   }
 }

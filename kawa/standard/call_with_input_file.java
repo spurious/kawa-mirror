@@ -11,7 +11,7 @@ public class call_with_input_file extends Procedure2
   public Object apply2 (Object string, Object proc)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    String fname = ((StringBuffer)string).toString();
+    String fname = string.toString();
 
     try {
       java.io.InputStream is = new java.io.FileInputStream(fname);

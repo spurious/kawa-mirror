@@ -7,9 +7,9 @@ public class string_set_b extends Procedure3
   public Object apply3 (Object arg1, Object arg2, Object arg3)
        throws WrongType, GenericError
   {
-    if (! (arg1 instanceof StringBuffer))
+    if (! (arg1 instanceof FString))
       throw new WrongType(this.name(),1,"string");
-    StringBuffer str = (StringBuffer) arg1;
+    FString str = (FString) arg1;
     if (! (arg3 instanceof Char))
       throw new WrongType(this.name(),3,"character");
     try

@@ -8,11 +8,6 @@ import kawa.lang.*;
 
 public class string_append extends ProcedureN
 {
-  public string_append()
-  {
-    super("string-append");
-  }
-
   public Object applyN (Object[] args)
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
@@ -20,8 +15,8 @@ public class string_append extends ProcedureN
     java.lang.StringBuffer result = new java.lang.StringBuffer();
 
     for (int t=0; t<count; t++) {
-       result.append(((java.lang.StringBuffer)args[t]).toString());
+       result.append(args[t].toString());
     }
-    return result;
+    return new FString (result);
   }
 }

@@ -7,11 +7,11 @@ public class string_ref extends kawa.lang.Procedure2
   public Object apply2 (Object arg1, Object arg2)
        throws WrongType, GenericError
   {
-    if (! (arg1 instanceof StringBuffer))
+    if (! (arg1 instanceof FString))
       throw new WrongType(this.name(),1,"string");
     try
       {
-	return Char.make (((StringBuffer)arg1).charAt(IntNum.intValue (arg2)));
+	return Char.make (((FString)arg1).charAt(IntNum.intValue (arg2)));
       }
     catch (StringIndexOutOfBoundsException e)
       {

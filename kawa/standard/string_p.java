@@ -1,18 +1,12 @@
 package kawa.standard;
+import kawa.lang.*;
 
-import kawa.lang.Procedure1;
+/** Implement the standard Scheme procedure "string?". */
 
-public class string_p extends kawa.lang.Procedure1 {
-   public kawa.standard.string_p() {
-      super("string?");
-   }
-
+public class string_p extends Procedure1
+{
    public Object apply1 (Object arg1)
    {
-     if (arg1 instanceof java.lang.StringBuffer) {
-        return kawa.lang.Interpreter.trueObject;
-     } else {
-        return kawa.lang.Interpreter.falseObject;
-     }
+     return Interpreter.boolObject (arg1 instanceof FString);
    }
 }

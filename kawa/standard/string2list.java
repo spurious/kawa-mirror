@@ -7,15 +7,10 @@ import kawa.lang.*;
 
 public class string2list extends Procedure1
 {
-  public string2list()
-  {
-    super("string->list");
-  }
-
   public Object apply1 (Object arg1)
        throws WrongType
   {
-    StringBuffer str = (StringBuffer) arg1;
+    FString str = (FString) arg1;
 
     int len = str.length();
 

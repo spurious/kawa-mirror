@@ -9,17 +9,12 @@ public class string_v extends ProcedureN
   }
 
   public Object applyN (Object[] args)
-      throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int count = args.length;
-    StringBuffer str = new java.lang.StringBuffer(count);
+    FString str = new FString (count);
     for (int i = 0; i < count; i++)
       {
-	Object arg = args[i];
-	if (arg instanceof Char)
-	  str.append (((Char)arg).charValue());
-	else
-	  throw new WrongType (this.name(),count,"character");
+	str.setCharAt (i, ((Char)(args[i])).charValue());
       }
     return str;
   }

@@ -1,0 +1,7 @@
+2001-10-17  Per Bothner  <per@bothner.com>
+
+	New package.  XML-related Procedures and other classes.
+	* Attributes.java:  New class, extends CpsProcedure.
+	* ElementConstructor.java:  New class, extends CpsProcedure.
+	* NamedAttributes.java:  New class, extends CpsProcedure.
+	* Makefile.am: New file.

@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang standard
+SUBDIRS = lang standard lib
 
 .SUFFIXES : .java .class
 

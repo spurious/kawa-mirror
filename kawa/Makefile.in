@@ -40,7 +40,7 @@ transform = @program_transform_name@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lang standard
+SUBDIRS = lang standard lib
 
 JAVAC=javac -classpath ..:$$CLASSPATH -d @TOP_BUILDDIR@
 

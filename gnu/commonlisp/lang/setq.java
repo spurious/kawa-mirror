@@ -22,9 +22,9 @@ public class setq extends Syntax implements Printable
 	  return tr.syntaxError("invalid syntax for setq");
 	Pair pair = (Pair) obj;
 	Object sym = pair.car;
-	String name;
-	if (sym instanceof String || sym instanceof Symbol)
-	  name = sym.toString();
+	Object name;
+	if (sym instanceof Symbol || sym instanceof String)
+	  name = sym;
 	else if (sym == CommonLisp.FALSE)
 	  name = "nil";
 	else

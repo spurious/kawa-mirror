@@ -26,7 +26,7 @@ public class defun extends Syntax implements Printable
 	|| ! (((p = (Pair) st.cdr).car instanceof String)
 	      || p.car instanceof Symbol))
       return super.scanForDefinitions(st, forms, defs, tr);
-    String sym = p.car.toString();
+    Object sym = p.car;
     Declaration decl = defs.lookup(sym);
     if (decl == null)
       {
@@ -47,7 +47,7 @@ public class defun extends Syntax implements Printable
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object obj = form.cdr;
-    String name = null;
+    Object name = null;
     Expression value = null;
     Declaration decl = null;
 
@@ -55,21 +55,26 @@ public class defun extends Syntax implements Printable
       {
 	Pair p1 = (Pair) obj;
 	
-	if (p1.car instanceof String || p1.car instanceof Symbol)
+	if (p1.car instanceof Symbol)
+	  {
+	    name = p1.car;
+	  }
+	else if (p1.car instanceof String)
 	  {
 	    name = p1.car.toString();
 	  }
 	else if (p1.car instanceof Declaration)
 	  {
 	    decl = (Declaration) p1.car;
-	    name = decl.getName();
+	    name = decl.getSymbol();
 	  }
 	if (name != null && p1.cdr instanceof Pair)
 	  {
 	    Pair p2 = (Pair) p1.cdr;
 	    LambdaExp lexp = new LambdaExp();
 	    lambdaSyntax.rewrite(lexp, p2.car, p2.cdr, tr);
-	    lexp.setName (name);
+	    lexp.setName (name instanceof Symbol ? ((Symbol) name).getName()
+			  : name.toString());
 	    if (p2 instanceof PairWithPosition)
 	      {
 		PairWithPosition pp = (PairWithPosition) p2;

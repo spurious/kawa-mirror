@@ -1,3 +1,10 @@
+2002-11-15  Per Bothner  <per@bothner.com>
+
+	* defun.java (scanForDefinitions):  Use name as is, even if Symbol.
+	(rewriteForm):  Is name is a Symbol, use it as is, not as String.
+	* defvar.java (scanForDefinitions):  Use name as is, even if Symbol.
+	* setq.java (rewriteForm):  Is name is a Symbol, use it as is.
+
 2002-10-28  Per Bothner  <per@bothner.com>
 
 	* Symbol.java:  Renamed to Symbols.java.

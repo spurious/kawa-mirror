@@ -44,7 +44,6 @@ SUBDIRS = codegen kawa
 
 SUFFIXES = .java .class
 
-MAKEINFO=makeinfo
 JAVAC=javac -classpath .:$(srcdir):$$CLASSPATH
 
 javadir=$(prefix)/java
@@ -56,11 +55,13 @@ java_DATA=$(OBJ)
 # Following only works for GNU make, but is only needed for make dist or TAGS.
 SOURCES = $(OBJ:.class=.java)
 
-EXTRA_DIST = kawa.txt
+EXTRA_DIST = kawa.txt kawa.html
 info_TEXINFOS = kawa.texi
 CLEANFILES=$(OBJ)
 ACLOCAL = aclocal.m4
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
+
+MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 INFOS = kawa.info*
 INFO_DEPS = kawa.info
@@ -356,10 +357,14 @@ kawac.class:  $(srcdir)/kawac.java
 	$(JAVAC) -d . $<
 
 kawa.txt:  $(srcdir)/kawa.texi
-	$(MAKEINFO) --no-split --no-headers --paragraph-indent=asis $< -o - \
+	$(MAKEINFO) -I$(srcdir) \
+	    --no-split --no-headers --paragraph-indent=asis $< -o - \
           | sed -e '/^Concept Index/,$$d' \
-             -e '/Making info file /,2d' \
+             -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
+
+kawa.html:  $(srcdir)/kawa.texi
+	texi2html $<
 
 all-recursive:  kawac.class
 .SUFFIXES:

@@ -7,8 +7,10 @@ package gnu.mapping;
 
 public abstract class Location
 {
+  /* DEBUGGING
   static int counter;
   public int id=++counter;
+  */
 
   public Location ()
   {
@@ -29,9 +31,9 @@ public abstract class Location
     StringBuffer sbuf = new StringBuffer();
     sbuf.append(getClass().getName());
     Symbol sym = getKeySymbol();
+    sbuf.append('[');
     if (sym != null)
       {
-	sbuf.append('[');
 	sbuf.append(sym);
 	Object property = getKeyProperty();
 	if (property != null)
@@ -39,11 +41,11 @@ public abstract class Location
 	    sbuf.append('/');
 	    sbuf.append(property);
 	  }
-	sbuf.append(" #:");
       }
-    else
-      sbuf.append("[#:");
+    /* DEBGUGGING:
+    sbuf.append(" #:");
     sbuf.append(id);
+    */
     sbuf.append("]");
     return sbuf.toString();
   }

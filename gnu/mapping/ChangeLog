@@ -1,3 +1,9 @@
+2005-01-05  Per Bothner  <per@bothner.com>
+
+	* Location.java (counter, id): Comment out, except for debugging.
+	(toString): Update accordingly.
+	* NamedLocation.java (toString): Remove - use inherited version.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* CallContext.java, LocationEnumeration.java, NamedLocation.java,

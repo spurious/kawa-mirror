@@ -37,9 +37,6 @@ public abstract class NamedLocation extends IndirectableLocation
   final Symbol name;
   final Object property;
 
-  public String toString() { return getClass().getName()+"[#:"+id
-      +" name:"+name+(property==null?"":(" prop:"+property))+"]"; }
-
   public NamedLocation (NamedLocation loc)
   {
     name = loc.name;

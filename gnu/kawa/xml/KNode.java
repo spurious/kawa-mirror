@@ -359,12 +359,12 @@ public abstract class KNode extends SeqPosition
   /* #ifdef JAXP-1.3 */
   // public Object setUserData (String key, Object data, UserDataHandler handler)
   // {
-    // throw new UnsupportedOperationException("setUserData not implemented yet");
+  //   throw new UnsupportedOperationException("setUserData not implemented yet");
   // }
 
   // public Object getUserData (String key)
   // {
-    // return null;
+  //   return null;
   // }
   /* #endif JAXP-1.3 */
 }

@@ -156,7 +156,7 @@ public class KElement extends KNode
   /* #ifdef JAXP-1.3 */
   // public TypeInfo getSchemaTypeInfo ()
   // {
-    // return null;
+  //   return null;
   // }
   /* #endif JAXP-1.3 */
 }

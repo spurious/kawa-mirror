@@ -4,7 +4,6 @@
 package gnu.kawa.xml;
 import gnu.mapping.*;
 import gnu.lists.*;
-import gnu.xml.XName;
 
 public class NodeName extends Procedure1
 {

@@ -6,7 +6,6 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
-import gnu.kawa.xml.*;
 import gnu.xml.*;
 
 public class MakeElement extends NodeConstructor

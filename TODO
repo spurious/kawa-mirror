@@ -1,4 +1,5 @@
 BEFORE 1.8
+* properties of symbols
 * Document fluid-let in manual.
 * implement fn:reverse, fn:distinct-values
 * rename sublist to subsequence.  deprecate sublist, item-at
@@ -27,7 +28,6 @@ BEFORE KAWA 1.8?
 * SRFI-9 (define-record-type) constructurs should not use reflection.
 * Resolve whether #!/FILENAME can be followed by embedded options (meta-arg).
 * Interpreter.getInterpreter should get current thread's.
-* define-namespace should work lexically
 * CL reader interface
 * More define-class functionality?
 * Finish modules: define-module?  constructor arguments?
@@ -122,9 +122,6 @@ for int (or shorter) types - but only for "compile-time constants".
 
 Starting (emacs) has wrong keybindings unless --elisp is specified.
 
-ModuleMethod should do type-checking in match, for proper generics.
-
-Move kawa.standard.convert to gnu.kawa.reflect.Convert.
 Move kawa.lang.Lambda to gnu.kawa.lispexpr.Lambda.  Merge with Elisp version.
 Remove Scheme.getTypeValue.
 
@@ -158,9 +155,6 @@ BindingInitializer.emit: global Environment should be cached
 Add --inline and --no-inline flags.
 
 TO BE DONE FOR 2.0:
-
-Implement SRFI 0: Feature-based conditional expansion construct 
-Implement SRFI 9: Defining Record Types
 
 Move more of kawa.lang.* to gnu.kawa.reflect and gnu.kawa.*.
 
@@ -197,37 +191,19 @@ Fix scheme-window so #!eof closes window.
 
 Option(s) to control/disable inlining.
 
-Change Declaration so it no longer inherits from Variable.
-(Instead, maybe it should inherit from constraint.)
-Instead use getVariable() { return (Variable)field; }
-Then we can get rid of the sym field and the symbol method,
-because getName() would be source name, while getVariable.getName()
-is mangled name.  Would also allow us to allocate Variables
-while generating byteocde, which is cleaner and more flexible,
-
 Implement source-filename source-line source-column macros.
-Macro-expansions lose line number information.
-Fix when switching to syntatic closures.
 
 All function calls in kawa.lib that call standard or library functions
 should be resolved statically (inlined or direct methods calls).
 
 Combine primitive field with record facility and define-class.
 
-Support persistence and serialization of Scheme values.
-
 Provide getopt-long (Guile, check scsh).
 
 Implement SwitchExp;  use it for Scheme case.
 
-Replace use of ZipArchive by jar files.
-
 Implement full call-cc by re-writing.
 This would be slower, so should be optional, probably not the default.
-
-Compile a module with top-level function definitions to a single class
-with methods.  More efficient when functions can be statically resolved.
-However less efficient otherwise, since need to use reflection interface.
 
 Implement a pretty-printing AWT container.
 

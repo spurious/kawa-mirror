@@ -1,10 +1,12 @@
 Implement SRFI-39 "Parameter-objects".  These are like anonymous
 fluid values and use the same implementation.
+current-input-port, current-output-port, and current-error-port 
+are now parameters.
 
 Infer types of variables declared with a let.
 
 Character comparisons (such as char-=?, char-ci<?) implemented
-much more efficiently - and (if using Java5) work for character not
+much more efficiently - and (if using Java5) work for characters not
 in the Basic Multilingual Plane.
 
 XQuery:

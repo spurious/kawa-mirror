@@ -1,3 +1,7 @@
+2005-03-29  Per Bothner  <per@bothner.com>
+
+	* QuoteExp.java (getType): Type of undefined_exp is Object.
+
 2005-03-27  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compile): Don't declareThis is STATIC_SPECIFIED.

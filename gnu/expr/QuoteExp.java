@@ -18,6 +18,8 @@ public class QuoteExp extends Expression
       return gnu.bytecode.Type.void_type;
     if (value == null)
       return gnu.bytecode.Type.nullType;
+    if (this == undefined_exp)
+      return gnu.bytecode.Type.pointer_type;
     return gnu.bytecode.Type.make(value.getClass());
   }
 

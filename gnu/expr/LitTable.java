@@ -157,7 +157,8 @@ public class LitTable implements ObjectOutput
       {
 	// It is referenced more than once, so we we need a Field
 	// to save the value.
-	if (lit.field == null && ! (obj instanceof String))
+	if (lit.field == null
+	    && obj != null && ! (obj instanceof String))
 	  lit.assign (comp);
 	if ((lit.flags & Literal.WRITTEN) == 0)
 	  lit.flags |= Literal.CYCLIC;

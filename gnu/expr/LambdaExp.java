@@ -20,7 +20,7 @@ public class LambdaExp extends ScopeExp
   public int max_args;
 
   /** Set of visible top-level LambdaExps that need apply methods. */
-  Vector applyMethods = new Vector();
+  Vector applyMethods;
 
   //  public int plainArgs;
   Variable argsArray;
@@ -504,11 +504,18 @@ public class LambdaExp extends ScopeExp
     return field;
   }
 
+  final void addApplyMethod(LambdaExp lexp)
+  {
+    if (applyMethods == null)
+      applyMethods = new Vector();
+    applyMethods.addElement(lexp);
+  }
+
   public Field compileSetField (Compilation comp)
   {
     compileAsMethod(comp);
 
-    getHeapLambda(outer).applyMethods.addElement(this);
+    getHeapLambda(outer).addApplyMethod(this);
 
     return (new ProcInitializer(this, comp)).field;
   }

@@ -1,3 +1,16 @@
+2001-11-12  Per Bothner  <per@bothner.com>
+
+	* LitTable.java (writeObject);  Don't assign field for null.
+
+	* LambdaExp.java (applyMethods):  Now initialized only if needed.
+	(addApplyMethod):  New method; initialize applyMethods if needed.
+	(compileSetField):  Call addApplyMethod.
+	* Compilation.java (generateApplyMethods):  applyMethods can be null.
+	* SetExp.java (compile):  Call addApplyMethod.
+
+	* ModuleMethod (resolveParameterTypes):  New method.
+	(match):  Also check parameter types.
+
 2001-11-05  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileFromStack):  Use CallContent's new

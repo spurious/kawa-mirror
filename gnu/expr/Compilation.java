@@ -892,7 +892,8 @@ public class Compilation
    * the (public, readable) methods of the current module. */
   public void generateApplyMethods(LambdaExp lexp)
   {
-    int numApplyMethods = lexp.applyMethods.size();
+    int numApplyMethods
+      = lexp.applyMethods == null ? 0 : lexp.applyMethods.size();
     if (numApplyMethods == 0)
       return;
     boolean generateApplyMethodContainer

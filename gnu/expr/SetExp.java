@@ -155,7 +155,7 @@ public class SetExp extends Expression
 	LambdaExp expander = (LambdaExp) value;
 	expander.flags |= LambdaExp.NO_FIELD;
 	expander.compileAsMethod(comp);
-	comp.mainLambda.applyMethods.addElement(expander);
+	comp.mainLambda.addApplyMethod(expander);
 	decl.makeField(comp, new_value);
       }
     else

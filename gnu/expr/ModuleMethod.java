@@ -3,6 +3,7 @@
 
 package gnu.expr;
 import gnu.mapping.*;
+import java.lang.reflect.*;
 
 /** Call a specified method in in a ModuleBody.
  * We use an extra level of indirection, but we save by having
@@ -27,6 +28,49 @@ public class ModuleMethod extends MethodProc
     this.selector = selector;
     this.numArgs = numArgs;
     setName(name);
+  }
+
+  /** Figure out parameter types.
+   * Uses reflection to get method parameter types.
+   * INCOMPLETE - does not handle procedures with optional or rest args. */
+  protected void resolveParameterTypes()
+  {
+    Method method = null;
+    try
+      {
+	Class moduleClass = module.getClass();
+	Method[] methods = moduleClass.getDeclaredMethods();
+	String mangledName = Compilation.mangleNameIfNeeded(getName());
+	for (int i = methods.length;  --i >= 0; )
+	  {
+	    if (methods[i].getName().equals(mangledName))
+	      {
+		if (method != null)
+		  {
+		    method = null;
+		    break;
+		  }
+		method = methods[i];
+	      }
+	  }
+	if (method != null)
+	  {
+	    Interpreter interp = Interpreter.getInterpreter();
+	    Class[] parameterClasses = method.getParameterTypes();
+	    int numParamTypes = parameterClasses.length;
+	    gnu.bytecode.Type[] atypes = new gnu.bytecode.Type[numParamTypes];
+	    for (int i = numParamTypes;  --i >= 0; )
+	      {
+		atypes[i] = interp.getTypeFor(parameterClasses[i]);
+	      }
+	    this.argTypes = atypes;
+	  }
+      }
+    catch (Throwable ex)
+      {
+      }
+    if (argTypes == null)
+      super.resolveParameterTypes();
   }
 
   public int numArgs() { return numArgs; }
@@ -61,7 +105,6 @@ public class ModuleMethod extends MethodProc
     return module.applyN(this, args);
   }
 
-  // FIXME - only checks argument length.
   public int match (CallContext ctx, Object[] args)
   {
     int argCount = args.length;
@@ -74,6 +117,11 @@ public class ModuleMethod extends MethodProc
         int max = num >> 12;
         if (argCount > max)
           return NO_MATCH_TOO_MANY_ARGS|max;
+      }
+    for (int i = 0;  i < args.length;  i++)
+      {
+	if (! getParameterType(i).isInstance(args[i]))
+	  return NO_MATCH_BAD_TYPE|i;
       }
     ctx.value1 = args;
     return 0;

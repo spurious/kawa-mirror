@@ -169,7 +169,7 @@ public abstract class AbstractSequence
 
   /** Get next matching child or descendent (ignoring attributes).
    * @param startPos starting position
-   * @param predicate test to apply to selected elements
+   * @param type a test (predicate) to apply to selected elements
    * @param endPos stop before endPos
    * @param descend if true do depth-first traversal.
    * @return poistion of next match or 0 if none found
@@ -318,7 +318,6 @@ public abstract class AbstractSequence
    * @param count if non-negative, remove that number of elements
    * following (poses, posNumber); if negative the negative of the number
    * of elements to remove before (poses, posNumber).
-   * @return number of elements actually removed (non-negative)
    * @exception java.lang.IndexOutOfBoundsException
    *   if (count >= 0 ? (index < 0 || index + count > size())
    *       : (index + count < 0 || index > size())),

@@ -1,3 +1,7 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java: Fix two javadoc typos.
+
 2005-03-17  Per Bothner  <per@bothner.com>
 
 	* LList.java (checkNonList): New static helper function.

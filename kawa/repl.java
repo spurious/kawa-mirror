@@ -5,7 +5,7 @@ import java.io.*;
 
 /** Start a "Read-Eval-Print-Loop" for the Kawa Scheme evaluator. */
 
-class repl
+public class repl
 {
   public static String compilationDirectory = null;
   public static String compilationTopname = null;
@@ -59,9 +59,7 @@ class repl
   public static void main(String args[])
   {
     Interpreter interp = new Scheme();
-    Environment env = interp.getEnvironment();
-    Environment.setCurrent(env);
-    Environment.define_global("symbol-read-case", "P");
+    Environment.setCurrent(interp.getEnvironment());
 
     int iArg = 0;
     boolean something_done = false;
@@ -143,6 +141,17 @@ class repl
 		ex.printStackTrace(System.err);
 		System.exit(-1);
 	      }
+	    something_done = true;
+	  }
+	else if (args[iArg].equals("--main"))
+	  {
+	    Compilation.generateMainDefault = true;
+	  }
+	else if (args[iArg].equals("--version"))
+	  {
+	    System.out.print("Kawa ");
+	    System.out.print(Version.getVersion());
+	    System.out.println();
 	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')

@@ -34,12 +34,12 @@ OBJ = Shell.class repl.class \
 # but they also need to be installed.
 
 SECONDARY_OBJS=\
-	GuiConsole$$1.class
+	GuiConsole$$1.class Version.class
 
 java_DATA=$(OBJ) $(SECONDARY_OBJS)
 
 # Following only works for GNU make, but is only needed for make dist or TAGS.
-SOURCES = $(OBJ:.class=.java)
+SOURCES = $(OBJ:.class=.java) Version.java.in
 
 CLEANFILES = *.class kawa$(BAT) tmp
 

@@ -46,7 +46,7 @@ class prim_method extends Syntax
 	      return PrimProcedure.string2Type(tstr);
 	  }
       }
-    tr.syntaxError("invalid type spec (must be \"type\" or <type>: " + str);
+    tr.syntaxError("invalid type spec (must be \"type\" or <type>): " + str);
     return Type.pointer_type;
   }
 

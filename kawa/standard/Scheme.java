@@ -46,8 +46,8 @@ public class Scheme extends LispInterpreter
   }
 
   public static Environment nullEnvironment;
-  static Environment r4Environment;
-  static Environment r5Environment;
+  public static Environment r4Environment;
+  public static Environment r5Environment;
   protected static Environment kawaEnvironment;
 
   public static LangPrimType booleanType;
@@ -257,54 +257,54 @@ public class Scheme extends LispInterpreter
       define_proc ("string->number", "kawa.standard.string2number");
 
       //-- Section 6.6  -- complete
-      define_proc ("char?", "kawa.lib.characters");
-      define_proc ("char=?", "kawa.lib.characters");
-      define_proc ("char<?", "kawa.lib.characters");
-      define_proc ("char>?", "kawa.lib.characters");
-      define_proc ("char<=?", "kawa.lib.characters");
-      define_proc ("char>=?", "kawa.lib.characters");
-      define_proc ("char-ci=?", "kawa.lib.characters");
-      define_proc ("char-ci<?", "kawa.lib.characters");
-      define_proc ("char-ci>?", "kawa.lib.characters");
-      define_proc ("char-ci<=?", "kawa.lib.characters");
-      define_proc ("char-ci>=?", "kawa.lib.characters");
-      define_proc ("char-alphabetic?", "kawa.lib.characters");
-      define_proc ("char-numeric?", "kawa.lib.characters");
-      define_proc ("char-whitespace?", "kawa.lib.characters");
-      define_proc ("char-upper-case?", "kawa.lib.characters");
-      define_proc ("char-lower-case?", "kawa.lib.characters");
-      define_proc ("char->integer", "kawa.lib.characters");
-      define_proc ("integer->char", "kawa.lib.characters");
-      define_proc ("char-upcase", "kawa.lib.characters");
-      define_proc ("char-downcase", "kawa.lib.characters");
+      defProcStFld("char?", "kawa.lib.characters");
+      defProcStFld("char=?", "kawa.lib.characters");
+      defProcStFld("char<?", "kawa.lib.characters");
+      defProcStFld("char>?", "kawa.lib.characters");
+      defProcStFld("char<=?", "kawa.lib.characters");
+      defProcStFld("char>=?", "kawa.lib.characters");
+      defProcStFld("char-ci=?", "kawa.lib.characters");
+      defProcStFld("char-ci<?", "kawa.lib.characters");
+      defProcStFld("char-ci>?", "kawa.lib.characters");
+      defProcStFld("char-ci<=?", "kawa.lib.characters");
+      defProcStFld("char-ci>=?", "kawa.lib.characters");
+      defProcStFld("char-alphabetic?", "kawa.lib.characters");
+      defProcStFld("char-numeric?", "kawa.lib.characters");
+      defProcStFld("char-whitespace?", "kawa.lib.characters");
+      defProcStFld("char-upper-case?", "kawa.lib.characters");
+      defProcStFld("char-lower-case?", "kawa.lib.characters");
+      defProcStFld("char->integer", "kawa.lib.characters");
+      defProcStFld("integer->char", "kawa.lib.characters");
+      defProcStFld("char-upcase", "kawa.lib.characters");
+      defProcStFld("char-downcase", "kawa.lib.characters");
       
       //-- Section 6.7  -- complete
-      define_proc ("string?", "kawa.lib.strings");
-      define_proc ("make-string", "kawa.lib.strings");
+      defProcStFld("string?", "kawa.lib.strings");
+      defProcStFld("make-string", "kawa.lib.strings");
       define_proc ("string", "kawa.standard.string_v");
-      define_proc ("string-length", "kawa.lib.strings");
-      define_proc ("string-ref", "kawa.lib.strings");
-      define_proc ("string-set!", "kawa.lib.strings");
+      defProcStFld("string-length", "kawa.lib.strings");
+      defProcStFld("string-ref", "kawa.lib.strings");
+      defProcStFld("string-set!", "kawa.lib.strings");
 
-      define_field("string=?", "kawa.lib.strings");
-      define_field("string-ci=?", "kawa.lib.strings");
-      define_field("string<?", "kawa.lib.strings");
-      define_field("string>?", "kawa.lib.strings");
-      define_field("string<=?", "kawa.lib.strings");
-      define_field("string>=?", "kawa.lib.strings");
+      defProcStFld("string=?", "kawa.lib.strings");
+      defProcStFld("string-ci=?", "kawa.lib.strings");
+      defProcStFld("string<?", "kawa.lib.strings");
+      defProcStFld("string>?", "kawa.lib.strings");
+      defProcStFld("string<=?", "kawa.lib.strings");
+      defProcStFld("string>=?", "kawa.lib.strings");
 
-      define_field ("string-ci<?", "kawa.lib.strings");
-      define_field ("string-ci>?", "kawa.lib.strings");
-      define_field ("string-ci<=?", "kawa.lib.strings");
-      define_field ("string-ci>=?", "kawa.lib.strings");
+      defProcStFld("string-ci<?", "kawa.lib.strings");
+      defProcStFld("string-ci>?", "kawa.lib.strings");
+      defProcStFld("string-ci<=?", "kawa.lib.strings");
+      defProcStFld("string-ci>=?", "kawa.lib.strings");
 
-      define_proc ("substring", "kawa.lib.strings");
-      define_proc ("string-append", "kawa.lib.strings");
-      define_proc ("string-append/shared", "kawa.lib.strings");
-      define_field("string->list", "kawa.lib.strings");
-      define_field("list->string", "kawa.lib.strings");
-      define_proc ("string-copy", "kawa.lib.strings");
-      define_proc ("string-fill!", "kawa.lib.strings");
+      defProcStFld("substring", "kawa.lib.strings");
+      defProcStFld("string-append", "kawa.lib.strings");
+      defProcStFld("string-append/shared", "kawa.lib.strings");
+      defProcStFld("string->list", "kawa.lib.strings");
+      defProcStFld("list->string", "kawa.lib.strings");
+      defProcStFld("string-copy", "kawa.lib.strings");
+      defProcStFld("string-fill!", "kawa.lib.strings");
 
       //-- Section 6.8  -- complete
       define_proc ("vector?", "kawa.lib.vectors");
@@ -331,54 +331,54 @@ public class Scheme extends LispInterpreter
       define_proc ("force", "kawa.standard.force");
 
       //-- Section 6.10  -- complete
-      define_proc ("call-with-input-file", "kawa.lib.ports");
-      define_proc ("call-with-output-file", "kawa.lib.ports");
-      define_proc ("input-port?", "kawa.lib.ports");
-      define_proc ("output-port?", "kawa.lib.ports");
-      define_proc ("current-input-port", "kawa.lib.ports");
-      define_proc ("current-output-port", "kawa.lib.ports");
+      defProcStFld("call-with-input-file", "kawa.lib.ports");
+      defProcStFld("call-with-output-file", "kawa.lib.ports");
+      defProcStFld("input-port?", "kawa.lib.ports");
+      defProcStFld("output-port?", "kawa.lib.ports");
+      defProcStFld("current-input-port", "kawa.lib.ports");
+      defProcStFld("current-output-port", "kawa.lib.ports");
       define_proc ("with-input-from-file",
 		   "kawa.standard.with_input_from_file");
       define_proc ("with-output-to-file",
 		   "kawa.standard.with_output_to_file");
-      define_proc ("open-input-file", "kawa.lib.ports");
-      define_proc ("open-output-file", "kawa.lib.ports");
-      define_proc ("close-input-port", "kawa.lib.ports");
-      define_proc ("close-output-port", "kawa.lib.ports");
+      defProcStFld("open-input-file", "kawa.lib.ports");
+      defProcStFld("open-output-file", "kawa.lib.ports");
+      defProcStFld("close-input-port", "kawa.lib.ports");
+      defProcStFld("close-output-port", "kawa.lib.ports");
       define_proc ("read", "kawa.standard.read");
       define_proc ("read-line", "kawa.standard.read_line");
-      define_field("read-char", "kawa.standard.readchar", "readChar");
-      define_field("peek-char", "kawa.standard.readchar", "peekChar");
-      define_proc ("eof-object?", "kawa.lib.ports");
-      define_proc ("char-ready?", "kawa.standard.char_ready_p");
-      define_field("write", "kawa.standard.Scheme", "writeFormat");
-      define_field("display", "kawa.standard.Scheme", "displayFormat");
-      define_field("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
-      define_proc ("write-char", "kawa.lib.ports");
-      define_proc ("newline", "kawa.lib.ports");
-      define_field("load", "kawa.standard.load", "load");
-      define_field("load-relative", "kawa.standard.load", "loadRelative");
-      define_proc ("transcript-off", "kawa.lib.ports");
-      define_proc ("transcript-on", "kawa.lib.ports");
-      define_proc ("call-with-input-string", "kawa.lib.ports");  // Extension
-      define_proc ("open-input-string", "kawa.lib.ports");  // SRFI-6
-      define_proc ("open-output-string", "kawa.lib.ports");  // SRFI-6
-      define_proc ("get-output-string", "kawa.lib.ports");  // SRFI-6
-      define_proc ("call-with-output-string", "kawa.lib.ports"); // Extension
-      define_proc ("force-output", "kawa.lib.ports");  // Extension
+      defProcStFld("read-char", "kawa.standard.readchar", "readChar");
+      defProcStFld("peek-char", "kawa.standard.readchar", "peekChar");
+      defProcStFld("eof-object?", "kawa.lib.ports");
+      defProcStFld("char-ready?", "kawa.lib.ports");
+      defProcStFld("write", "kawa.standard.Scheme", "writeFormat");
+      defProcStFld("display", "kawa.standard.Scheme", "displayFormat");
+      defProcStFld("print-as-xml", "gnu.xquery.lang.XQuery", "writeFormat");
+      defProcStFld("write-char", "kawa.lib.ports");
+      defProcStFld("newline", "kawa.lib.ports");
+      defProcStFld("load", "kawa.standard.load", "load");
+      defProcStFld("load-relative", "kawa.standard.load", "loadRelative");
+      defProcStFld("transcript-off", "kawa.lib.ports");
+      defProcStFld("transcript-on", "kawa.lib.ports");
+      defProcStFld("call-with-input-string", "kawa.lib.ports");  // Extension
+      defProcStFld("open-input-string", "kawa.lib.ports");  // SRFI-6
+      defProcStFld("open-output-string", "kawa.lib.ports");  // SRFI-6
+      defProcStFld("get-output-string", "kawa.lib.ports");  // SRFI-6
+      defProcStFld("call-with-output-string", "kawa.lib.ports"); // Extension
+      defProcStFld("force-output", "kawa.lib.ports");  // Extension
 
-      define_field("port-line", "kawa.lib.ports");
-      define_field("set-port-line!", "kawa.lib.ports");
-      define_field("port-column", "kawa.lib.ports");
-      define_field("current-error-port", "kawa.lib.ports");
-      define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
-      define_proc ("set-input-port-line-number!", "kawa.lib.ports");
-      define_proc ("input-port-column-number", "kawa.lib.ports");
-      define_proc ("input-port-read-state", "kawa.lib.ports");
-      define_proc ("default-prompter", "kawa.lib.ports");
-      define_field("input-port-prompter", "kawa.lib.ports");
-      define_proc ("set-input-port-prompter!", "kawa.lib.ports");
-      define_field("base-uri", "kawa.lib.misc");
+      defProcStFld("port-line", "kawa.lib.ports");
+      defProcStFld("set-port-line!", "kawa.lib.ports");
+      defProcStFld("port-column", "kawa.lib.ports");
+      defProcStFld("current-error-port", "kawa.lib.ports");
+      defProcStFld("input-port-line-number", "kawa.lib.ports");  // Extension
+      defProcStFld("set-input-port-line-number!", "kawa.lib.ports");
+      defProcStFld("input-port-column-number", "kawa.lib.ports");
+      defProcStFld("input-port-read-state", "kawa.lib.ports");
+      defProcStFld("default-prompter", "kawa.lib.ports");
+      defProcStFld("input-port-prompter", "kawa.lib.ports");
+      defProcStFld("set-input-port-prompter!", "kawa.lib.ports");
+      defProcStFld("base-uri", "kawa.lib.misc");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
@@ -392,10 +392,10 @@ public class Scheme extends LispInterpreter
       define_field("receive", "kawa.lib.syntax");
       define_proc ("eval", "kawa.lang.Eval");
       define_proc ("repl", new kawa.repl(this));
-      define_proc ("scheme-report-environment", "kawa.standard.scheme_env");
-      define_proc ("null-environment", "kawa.lib.misc");
-      define_proc ("interaction-environment", "kawa.lib.misc");
-      define_proc ("dynamic-wind", "kawa.lib.syntax");
+      defProcStFld("scheme-report-environment", "kawa.lib.misc");
+      defProcStFld("null-environment", "kawa.lib.misc");
+      defProcStFld("interaction-environment", "kawa.lib.misc");
+      defProcStFld("dynamic-wind", "kawa.lib.misc");
 
       kawaEnvironment = new Environment (r5Environment);
       environ = kawaEnvironment;

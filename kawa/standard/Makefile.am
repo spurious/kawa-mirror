@@ -51,8 +51,7 @@ define_member_alias.java \
 ScmEnv.java Scheme.java \
 object.java define_class.java thisRef.java \
 TracedProcedure.java \
-IfFeature.java \
-scheme_env.java
+IfFeature.java
 
 PACKAGE_FNAME = kawa-standard
 GCJ_INPUTS =  $(java_Java)

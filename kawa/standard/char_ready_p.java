@@ -1,12 +1,7 @@
 package kawa.standard;
 import gnu.mapping.*;
 
-public class char_ready_p extends Procedure0or1 {
-  public final Object apply0 ()
-  {
-    return apply1 (InPort.inDefault ());
-  }
-  
+public class char_ready_p {
   public static boolean ready (Object arg1)
   {
     try
@@ -22,10 +17,5 @@ public class char_ready_p extends Procedure0or1 {
       {
 	return false;
       }
-  }
-
-  public final Object apply1 (Object arg1)
-  {
-    return ready(arg1) ? Boolean.TRUE : Boolean.FALSE;
   }
 }

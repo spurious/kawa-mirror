@@ -1,3 +1,17 @@
+2004-11-14  Per Bothner  <per@bothner.com>
+	
+	* kawa/standard/char_ready_p.java: No longer extend Procedure0or1.
+	(apply0, apply1): Remove methods.
+
+	* kawa/standard/Scheme.java (r4Environment, r5Environment): Make
+	public, so they can be accessed from kawa.lib.misc.
+	* kawa/standard/scheme_env.java: Remove.
+	* kawa/standard/Makefile.am: Update accordingly.
+
+	* kawa/standard/Scheme.java: The functions dynamic-wind, char-ready?,
+	scheme-report-environment and moved to different classes.
+	* kawa/standard/Scheme.java: Incompletely convert to use defProcStFld.
+
 2004-11-11  Jim White  <jim@pagesmiths.com>
 
 	* build.xml: Update select-java1, select-java2, and add select-java5.

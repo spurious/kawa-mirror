@@ -1,3 +1,14 @@
+2002-09-24  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define.java (scanForDefinitions):  If inlineOk is false,
+	mark declaration as writeable, even if functional definition.
+	* kawa/repl.java (processArgs):  Set compile.inlineOk to false
+	if --no-inline or --inline=none is specified.
+
+	* kawa/repl.java (printOptions):  Also mention --output-format.
+
+	* kawa/repl.java (processArgs):  Update copyright year printed by --version.
+
 2002-09-21  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Lambda.java (rewrite, rewriteBody):  Use 'matches'

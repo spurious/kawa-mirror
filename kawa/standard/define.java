@@ -70,7 +70,9 @@ public class define extends Syntax implements Printable
                 decl.setCanRead(true);
 		// (define (f) ...) defaults f to being read-only,
 		// unless f is assigned to in this module.
-		if (! makeConstant && name instanceof String)
+		if (! makeConstant
+		    && (name instanceof String
+			|| ! Compilation.inlineOk))
 		  decl.setCanWrite(true);
               }
           }

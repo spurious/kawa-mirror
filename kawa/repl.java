@@ -63,6 +63,7 @@ public class repl extends Procedure0or1
     out.println(" --debug-print-final-expr  Print expression after any optimizations");
     out.println(" --[no-]full-tailcalls     (Don't) use full tail-calls");
     out.println(" -C <filename> ...         Compile named files to Java class files");
+    out.println(" --output-format <format>  Use <format> when printing top-level output");
     out.println(" --<language>              Select source language, one of:");
     String[][] languages = Interpreter.getLanguages();
     for (int i = 0; i < languages.length; i++)
@@ -523,6 +524,15 @@ public class repl extends Procedure0or1
 	  {
 	    gnu.expr.Compilation.fewerClasses = true;
 	  }
+	else if (arg.equals("--no-inline")
+		 || arg.equals("--inline=none"))
+	  {
+	    gnu.expr.Compilation.inlineOk = false;
+	  }
+	else if (arg.equals("--inline"))
+	  {
+	    gnu.expr.Compilation.inlineOk = true;
+	  }
 	else if (arg.equals("--cps"))
 	  {
 	    gnu.expr.Compilation.fewerClasses = true;
@@ -552,7 +562,7 @@ public class repl extends Procedure0or1
 	    System.out.print("Kawa ");
 	    System.out.print(Version.getVersion());
 	    System.out.println();
-	    System.out.println("Copyright (C) 2001 Per Bothner");
+	    System.out.println("Copyright (C) 2002 Per Bothner");
 	    something_done = true;
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')

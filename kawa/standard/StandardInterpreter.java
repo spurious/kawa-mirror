@@ -243,6 +243,8 @@ public class StandardInterpreter extends Interpreter
       //-- Section 6.10 [complete except for char-ready? and transcript-on/off]
       define_proc ("call-with-input-file",
 		   "kawa.standard.call_with_input_file");
+      define_proc ("call-with-input-string",  //Extension
+		   "kawa.standard.call_with_input_string");
       define_proc ("call-with-output-file",
 		   "kawa.standard.call_with_output_file");
       define_proc ("input-port?", "kawa.standard.input_port_p.java");

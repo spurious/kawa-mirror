@@ -129,6 +129,7 @@ vector_append.class \
 force.class \
 make_promise.class \
 call_with_input_file.class \
+call_with_input_string.class \
 call_with_output_file.class \
 current_input_port.class \
 current_output_port.class \

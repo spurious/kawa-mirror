@@ -84,7 +84,7 @@ info_TEXINFOS = kawa.texi kawa-tour.texi
 CLEANFILES = kawa.txt *.info kawa_toc.html $(KAWA_HTMLS) kawa1.tmp kawa.1
 
 HTML_HOME = $$HOME/public_html
-mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_srcdir)/../texinfo/util/texi2dvi; else echo texi2dvi; fi`
 TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
@@ -120,7 +120,7 @@ version.texi: @MAINT@stamp-vti
 
 stamp-vti: kawa.texi $(top_srcdir)/configure.in
 	@echo "@set UPDATED `cd $(srcdir) \
-	  && $(SHELL) $(top_srcdir)/../mdate-sh kawa.texi`" > vti.tmp
+	  && $(SHELL) ./mdate-sh kawa.texi`" > vti.tmp
 	@echo "@set EDITION $(VERSION)" >> vti.tmp
 	@echo "@set VERSION $(VERSION)" >> vti.tmp
 	@cmp -s vti.tmp $(srcdir)/stamp-vti \

@@ -1,3 +1,10 @@
+2003-06-03  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (inlinedIn):  New helper method.
+	(declareClosureEnv):  Partially revert 05-30 change, but make
+	use to inlineIn to simplify and fix one case.
+	(enterFunction):  Don't set closureEnv if inlinedIn outer.
+
 2003-05-31  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getOutputConsumer):  Generalize to take Writer.

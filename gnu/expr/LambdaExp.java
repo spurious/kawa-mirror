@@ -324,6 +324,29 @@ public class LambdaExp extends ScopeExp
     return null;
   }
 
+  /** True if given LambdaExp is inlined in this function, perhaps indirectly.
+   * Is false if this is not inline-only or if getCaller() is not inlined is
+   * outer.  Usually the same as (this.outerLambdaNotInline()==outer),
+   * except in the case that other.getInlineOnly(). */
+  boolean inlinedIn (LambdaExp outer)
+  {
+    if (! getInlineOnly())
+      return false;
+    for (ScopeExp exp = getCaller(); (exp = exp.outer) != null; )
+      {
+	if (exp instanceof LambdaExp)
+	  {
+	    
+	    LambdaExp result = (LambdaExp) exp;
+	    if (result == outer)
+	      return true;
+	    if (! result.getInlineOnly())
+	      return false;
+	  }
+      }
+    return false;
+  }
+
   /** For an INLINE_ONLY function, return the function it gets inlined in. */
   public LambdaExp getCaller ()
   {
@@ -359,9 +382,7 @@ public class LambdaExp extends ScopeExp
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
 		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;
-	else if (getInlineOnly())
-	  closureEnv = parentFrame;
-	else if (! isClassGenerated())
+	else if (! isClassGenerated() && ! getInlineOnly())
 	  {
 	    Method primMethod = getMainMethod();
 	    if (! primMethod.getStaticFlag())
@@ -375,6 +396,8 @@ public class LambdaExp extends ScopeExp
 		closureEnv.setParameter(true);
 	      }
 	  }
+	else if (inlinedIn(parent))
+	  closureEnv = parentFrame;
 	else
 	  {
 	    closureEnv = new Variable("closureEnv", parentFrame.getType());
@@ -1003,14 +1026,22 @@ public class LambdaExp extends ScopeExp
     scope.setStartPC(code.getPC());
 
     if (closureEnv != null && ! closureEnv.isParameter()
-	&& ! comp.usingCPStyle() && ! getInlineOnly())
+	&& ! comp.usingCPStyle())
       {
-	code.emitPushThis();
-	Field field = closureEnvField;
-	if (field == null)
-	  field = outerLambda().closureEnvField;
-	code.emitGetField(field);
-	code.emitStore(closureEnv);
+	if (! getInlineOnly())
+	  {
+	    code.emitPushThis();
+	    Field field = closureEnvField;
+	    if (field == null)
+	      field = outerLambda().closureEnvField;
+	    code.emitGetField(field);
+	    code.emitStore(closureEnv);
+	  }
+	else if (! inlinedIn(outerLambda()))
+	  {
+	    outerLambda().loadHeapFrame(comp);
+	    code.emitStore(closureEnv);
+	  }
       }
     if (! comp.usingCPStyle())
       {

@@ -252,7 +252,7 @@ maintainer-clean
 # Assumes you have done a 'make install' first.
 
 kawa-@VERSION@-compiled.zip:
-	(cd $(javadir); zip -r -n .class - kawa codegen) > $@
+	(cd $(javadir); zip -r -n .class - kawa gnu) > $@
 .SUFFIXES:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -1,3 +1,14 @@
+Tue Apr  1 18:55:47 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/Compilation.java (mangleClassName):  Mangle common Scheme
+	identifier chars more legibly.
+	(generateClassName):  Except for the mainClass, use mainClass+'$'
+	as classPrefix, a la JDK 1.1 Inner Classes.
+
+	* kawa/standard/{cons,append,vector_v,vector_append}.java:
+	Add import java.lang.Error to work around case-fold bug in
+	JDK 1.0.2 in NT.
+
 Mon Mar 31 16:56:50 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure.in (VERSION):  Change to 1.4.

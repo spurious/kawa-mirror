@@ -8,4 +8,4 @@ javadir=$(prefix)/java
 # Assumes you have done a 'make install' first.
 
 kawa-@VERSION@-compiled.zip:
-	(cd $(javadir); zip -r -n .class - kawa codegen) > $@
+	(cd $(javadir); zip -r -n .class - kawa gnu) > $@

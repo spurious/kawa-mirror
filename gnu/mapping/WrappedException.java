@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2003  Per M.A. Bothner.
+// Copyright (c) 1999, 2003, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.mapping;
@@ -23,7 +23,7 @@ public class WrappedException extends RuntimeException
    */
   public WrappedException (String message)
   {
-    this.message = message;
+    super(message);
   }
 
   /**
@@ -37,9 +37,7 @@ public class WrappedException extends RuntimeException
    */
   public WrappedException (Throwable e)
   {
-    super();
-    this.message = null;
-    initCause(e);
+    this(e.getMessage(), e);
   }
 
   /**
@@ -53,27 +51,12 @@ public class WrappedException extends RuntimeException
    */
   public WrappedException (String message, Throwable e)
   {
-    super();
-    this.message = message;
+    /* #ifdef JAVA5 */
+    // super(message, e);
+    /* #else */
+    super(message);
     initCause(e);
-  }
-
-  /**
-   * Return a detail message for this exception.
-   *
-   * <p>If there is a embedded exception, and if the WrappedException
-   * has no detail message of its own, this method will return
-   * the detail message from the embedded exception.</p>
-   *
-   * @return The error or warning message.
-   */
-  public String getMessage ()
-  {
-    Throwable cause;
-    if (message == null && (cause = getCause()) != null)
-      return cause.getMessage();
-    else
-      return this.message;
+    /* #endif */
   }
 
   /**
@@ -96,10 +79,8 @@ public class WrappedException extends RuntimeException
     return getMessage();
   }
 
-  /* The initCause/getCause functionality was added in JDK 1.4.
-     It is available in gcj 3.3, so we could perhaps put it in a JAVA1 block,
-     but I'm not quite ready for that yet.
-     Future: BEGIN a JAVA1 section */
+  // The initCause/getCause functionality was added in JDK 1.4.
+  /* #ifndef JAVA5 */
   public Throwable initCause(Throwable cause)
   {
     exception = cause;
@@ -112,6 +93,14 @@ public class WrappedException extends RuntimeException
   }
 
   private Throwable exception;
-  /* Future: END a JAVA1 section. */
-  private String message;
+  /* #endif */
+
+  /** Coerce argument to a RuntimeException. */
+  public static RuntimeException wrapIfNeeded (Throwable ex)
+  {
+    if (ex instanceof RuntimeException)
+      return (RuntimeException) ex;
+    else
+      return new WrappedException(ex);
+  }
 }

@@ -1,3 +1,10 @@
+2005-01-30  Per Bothner  <per@bothner.com>
+
+	* WrappedException.java: Use JDK 1.4 "cause" mechanism ifdef JAVA5.
+	(wrapIfNeeded): New static method.
+	(message): Remove field.  Instead use getMessage() - and set
+	message from cause at constructor time if needed.
+
 2005-01-21  Per Bothner  <per@bothner.com>
 
 	* SimpleEnvironment.java (addLocation): Defer isBound() invocation.

@@ -4559,6 +4559,23 @@ for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
 You can then run the @code{hello} servlet using the URL
 @url{http://localhost:8080/myutils/servlet/hello}.
 
+@defun current-servlet
+When called from a Kawa servlet's handler, returns the
+actual @code{javax.servlet.http.HttpServlet} instance.
+@end defun
+
+@defun current-servlet-context
+Returns the @code{ServletContext} of the currently executing servlet.
+@end defun
+
+@defun current-servlet-config
+Returns the @code{ServletConfig} of the currently executing servlet.
+@end defun
+
+@defun servlet-context-realpath
+Returns the file path of the current servlet's "Web application".
+@end defun
+
 @node CGI scripts, HTTP requests, Servlets, XML tools
 @section Installing Kawa programs as CGI scripts
 
@@ -4688,6 +4705,21 @@ does so when you actually "print" its value to the response output stream.
 @defun response-content-type type
 Species the content-type of the result - for example @code{"text/plain"}.
 Convenience function for @code{(response-header "Content-Type" @var{type})}.
+@end defun
+
+@defun error-response code [message]
+Creates a response-header with an error code of @var{code} and a
+response message of @var{message}.
+(For now this is the same as @code{response-status}.)
+
+Note this also returns a response-header value, which does not actually
+do anything unless it is returned as the result of executing a servlet body.
+@end defun
+
+@defun response-status code [message]
+Creates a response-header with an status code of @var{code} and a
+response message of @var{message}.
+(For now this is the same as @code{error-response}.)
 @end defun
 
 @node KRL, Mailing lists,  XML tools, Top

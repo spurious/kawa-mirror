@@ -1,3 +1,7 @@
+2002-07-30  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Servlets, HTTP response):  Document new functions.
+
 2002-07-25  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Logical Number Operations): Fix typo bittest -> logtest.

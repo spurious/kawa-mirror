@@ -372,6 +372,8 @@ public class Declaration
   {
     if (getFlag(STATIC_SPECIFIED))
       return true;
+    if (getFlag(NONSTATIC_SPECIFIED))
+      return false;
     LambdaExp lambda = context.currentLambda();
     return lambda instanceof ModuleExp
       && ((ModuleExp) lambda).isStatic();
@@ -587,7 +589,7 @@ public class Declaration
       fflags |= Access.FINAL;
     if (! isPrivate() || external_access)
       fflags |= Access.PUBLIC;
-    if (getFlag(STATIC_SPECIFIED)
+    if (isStatic()
 	|| (isConstant && value instanceof QuoteExp)
 	|| (value instanceof ClassExp
 	    && ! ((LambdaExp) value).getNeedsClosureEnv()))

@@ -141,6 +141,9 @@ public class ModuleExp extends LambdaExp
   public final static void evalModule (Environment env, CallContext ctx, Compilation comp) throws Throwable
   {
     ModuleExp mexp = comp.getModule();
+    if (! mexp.getFlag(NONSTATIC_SPECIFIED)
+	&& ! mexp.getFlag(SUPERTYPE_SPECIFIED))
+      mexp.setFlag(STATIC_SPECIFIED);
     Environment orig_env = Environment.getCurrent();
     try
       {
@@ -237,14 +240,14 @@ public class ModuleExp extends LambdaExp
 	  continue;
 	if (decl.getFlag(Declaration.IS_UNKNOWN))
 	  continue;
-	if (value instanceof LambdaExp && ! (value instanceof ClassExp))
-	  {
-	    ((LambdaExp) value).allocFieldFor(comp);
-	  }
-	else if (comp.immediate)
+	if (comp.immediate)
 	  {
 	    decl.setIndirectBinding(true);
 	    decl.setSimple(false);
+	  }
+	else if (value instanceof LambdaExp && ! (value instanceof ClassExp))
+	  {
+	    ((LambdaExp) value).allocFieldFor(comp);
 	  }
 	else
 	  {

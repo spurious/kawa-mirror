@@ -1,3 +1,12 @@
+2004-03-09  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (isStatic):  Also check NONSTATIC_SPECIFIED.
+	(makeField):  Use isStatic method.
+	* LambdaExp.java (allocFieldFor):  If immediate default to static.
+	(compile):  Don't allocate field if immediate and module-level.
+	* ModuleExp.java (evalModule):  Default to static.
+	(allocField):  Don't allocate field if immediate, even for LambdaExp.
+	
 2004-03-08  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (load):  If indirect and immediate, load symbol.

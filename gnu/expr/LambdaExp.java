@@ -514,7 +514,9 @@ public class LambdaExp extends ScopeExp
     int fflags = Access.FINAL;
     if (nameDecl != null && nameDecl.context instanceof ModuleExp)
       {
-	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED))
+	if (nameDecl.getFlag(Declaration.STATIC_SPECIFIED)
+	    || (comp.immediate
+		&& ! nameDecl.getFlag(Declaration.NONSTATIC_SPECIFIED)))
           {
             fflags |= Access.STATIC;
             // If there is no instanceField, then the field gets initialized in
@@ -635,7 +637,8 @@ public class LambdaExp extends ScopeExp
     else
       { LambdaExp outer = outerLambda();
 	rtype = comp.typeModuleMethod;
-	if ((flags & NO_FIELD) != 0)
+	if ((flags & NO_FIELD) != 0
+	    || (comp.immediate && outer instanceof ModuleExp))
 	  {
 	    compileAsMethod(comp);
 	    getOwningLambda().addApplyMethod(this);

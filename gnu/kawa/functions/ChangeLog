@@ -1,5 +1,7 @@
 2000-10-12  Per Bothner  <per@bothner.com>
 
+	* Apply.java (apply(CallContext)):  Use CallContext's getArgs method.
+
 	* MakeProcedure.java:  New class.
 	* Makefile.am:  Update accordingly.
 

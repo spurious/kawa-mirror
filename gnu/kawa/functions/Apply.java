@@ -72,8 +72,7 @@ public class Apply extends ProcedureN
 
   public void apply (CallContext ctx)
   {
-    //Object[] args = ctx.getArgs();
-    Object[] args = ctx.args;
+    Object[] args = ctx.getArgs();
     ctx.proc = (Procedure) args[0];
     ctx.setArgsN(getArguments(args, 1));
   }

@@ -16,6 +16,11 @@ import java.util.Stack;
  * we create a new Compilation.
  */
 
+/** State for a single expression or module.
+ * For each top-level thing (expression or file) we compile or evaluate
+ * we create a new Compilation.
+ */
+
 public class Compilation
 {
   /** True if the form is too complex to evaluate,and we must compile it.
@@ -127,7 +132,7 @@ public class Compilation
   static public ClassType scmListType = ClassType.make("gnu.lists.LList");
   static public ClassType typePair = ClassType.make("gnu.lists.Pair");
   static public ClassType scmPairType = typePair;
-  static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
+  //static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
   public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
@@ -143,9 +148,9 @@ public class Compilation
   static public ClassType typeLocation
     = ClassType.make("gnu.mapping.Location");
   static public ClassType typeSymbol
-    = ClassType.make("gnu.mapping.Symbol", typeLocation);
-  static public final Method getSymbolValueMethod
-    = typeInterpreter.getDeclaredMethod("getSymbolValue", 1);
+    = ClassType.make("gnu.mapping.Symbol");
+  static public final Method getLocationValueMethod
+    = typeLocation.getDeclaredMethod("getValue", 0);
   static public final Method getSymbolProcedureMethod
     = typeInterpreter.getDeclaredMethod("getSymbolProcedure", 1);
   static public final Method getLocationMethod
@@ -155,11 +160,9 @@ public class Compilation
     = typeSymbol.addMethod("getProcedure", Type.typeArray0,
 			    typeProcedure, Access.PUBLIC);
   static public final Field trueConstant
-    = scmBooleanType.addField ("TRUE", scmBooleanType,
-			       Access.PUBLIC|Access.STATIC); 
+    = scmBooleanType.getDeclaredField("TRUE"); 
   static public final Field falseConstant
-    = scmBooleanType.addField ("FALSE", scmBooleanType,
-			       Access.PUBLIC|Access.STATIC);
+    = scmBooleanType.getDeclaredField("FALSE");
 
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
@@ -174,9 +177,15 @@ public class Compilation
   public static final Type[] string1Arg = { javaStringType };
   public static final Type[] sym1Arg = string1Arg;
 
-  static public final Method getSymbolEnvironmentMethod
-    = typeEnvironment.addMethod("getSymbol", string1Arg,
-				typeSymbol, Access.PUBLIC);
+  static public final Method getLocation1EnvironmentMethod
+  = typeEnvironment.getDeclaredMethod("getLocation", 1);
+  static public final Method getLocation2EnvironmentMethod;
+  static {
+    Type[] args = { typeSymbol, Type.pointer_type };
+    getLocation2EnvironmentMethod
+      = typeEnvironment.addMethod("getLocation", args,
+				  typeLocation, Access.PUBLIC|Access.FINAL);
+  }
 
   static {
     Type[] makeListArgs = { objArrayType, Type.int_type };
@@ -874,7 +883,6 @@ public class Compilation
     source_filename = lexp.filename;
     classPrefix = prefix;
     mainLambda = lexp;
-
     if (messages.seenErrors())
       return;
 
@@ -985,6 +993,16 @@ public class Compilation
 	fname = fname + ".zip";
 	makeJar = false;
       }
+    if (ModuleExp.debugPrintExpr)
+      {
+	OutPort dout = OutPort.outDefault();
+	dout.println("[Compiling module-name:" + mexp.getName()
+		     +" to "+fname+"]");
+	mexp.print(dout);
+	dout.println(']');
+	dout.flush();
+      }
+
     compile(mexp, LambdaExp.fileFunctionName, null);
     File zar_file = new File (fname);
     if (zar_file.exists ())
@@ -1001,6 +1019,7 @@ public class Compilation
       }
 
     byte[][] classBytes = new byte[numClasses][];
+    System.err.println("numCl:"+numClasses);
     CRC32 zcrc = new CRC32();
     for (int iClass = 0;  iClass < numClasses;  iClass++)
       {
@@ -2060,6 +2079,16 @@ public class Compilation
     code.emitInvokeStatic(getCallContextInstanceMethod);
   }
 
+  /** Generate code to push the current Environment on the JVM stack. */
+  public final void loadEnvironment()
+  {
+    loadCallContext();
+    CodeAttr code = getCode();
+    Method getEnvironmentMethod
+      = typeCallContext.getDeclaredMethod("getEnvironment", 0);
+    code.emitInvokeVirtual(getEnvironmentMethod);
+  }
+
   public void freeLocalField (Field field)
   {
     // FIXME
@@ -2074,6 +2103,7 @@ public class Compilation
 
   protected Interpreter interp;
   public Interpreter getInterpreter() { return interp; }
+  public Environment getEnvironment() { return interp.getEnvironment(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
@@ -2390,20 +2420,23 @@ public class Compilation
     return forNameHelper;
   }
 
+  /** Look up name in the current Envirinment.
+   * @param name an identifier (either a String or a Symbol).
+   * @function true if name is a function name.
+   */
   public Object resolve(Object name, boolean function)
   {
+    Environment env = interp.getEnvironment();
     Symbol symbol;
     if (name instanceof String)
-      symbol = interp.getEnvironment().lookup((String) name);
+      symbol = env.defaultNamespace().lookup((String) name);
     else
       symbol = (Symbol) name;
     if (symbol == null)
       return null;
     if (function && getInterpreter().hasSeparateFunctionNamespace())
-      return symbol.getFunctionValue(null);
-    if (symbol.isBound())
-      return symbol.getValue();
-    return null;
+      return env.getFunction(symbol, null);
+    return env.get(symbol, null);
   }
 
   /** Current lexical scope - map name to Declaration. */

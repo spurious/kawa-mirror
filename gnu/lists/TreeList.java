@@ -1991,7 +1991,7 @@ implements XConsumer, PositionConsumer, Consumable
       case DOUBLE_FOLLOWS:
 	return pos + 4;
       case PROCESSING_INSTRUCTION:
-	pos++;
+	pos += 2;
 	// ... fall through ...
       case CDATA_SECTION:
       case COMMENT:

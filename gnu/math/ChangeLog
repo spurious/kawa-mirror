@@ -1,3 +1,9 @@
+Tue Mar 25 15:22:30 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	Update for moved package codegen -> gnu.bytecode and new method names.
+
+	* Quantity.java (compare_reversed):  New method.
+
 Tue Mar 18 13:59:42 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* RealNum.java (compare, compare_reversed, equals, grt, geq): Moved to

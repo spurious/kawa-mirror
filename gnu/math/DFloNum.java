@@ -1,9 +1,9 @@
 package kawa.math;
 import kawa.lang.*;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 public class DFloNum extends RealNum implements Compilable
 {
@@ -192,7 +192,7 @@ public class DFloNum extends RealNum implements Compilable
 	thisType = new ClassType ("kawa.math.DFloNum");
 	Type[] args = new Type[1];
 	args[0] = Type.double_type;
-	makeMethod = thisType.new_method ("make", args, thisType,
+	makeMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }
   }

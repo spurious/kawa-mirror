@@ -1,9 +1,9 @@
 package kawa.math;
 import kawa.lang.*;
-import codegen.Method;
-import codegen.ClassType;
-import codegen.Access;
-import codegen.Type;
+import gnu.bytecode.Method;
+import gnu.bytecode.ClassType;
+import gnu.bytecode.Access;
+import gnu.bytecode.Type;
 
 /** A class for infinite-precision integers.
  * @author Per Bothner
@@ -1110,11 +1110,11 @@ public class IntNum extends RatNum implements Compilable
 	thisType = new ClassType ("kawa.math.IntNum");
 	Type[] args = new Type[1];
 	args[0] = Type.int_type;
-	makeIntMethod = thisType.new_method ("make", args, thisType,
+	makeIntMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
 	args = new Type[1];
 	args[0] = Type.int_type;
-	makeLongMethod = thisType.new_method ("make", args, thisType,
+	makeLongMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }
   }

@@ -114,6 +114,13 @@ public abstract class Quantity extends Numeric
     return compare(this, (Quantity) obj);
   }
 
+  public int compare_reversed (Numeric x)
+  {
+    if (x instanceof Quantity)
+      return compare((Quantity)x, this);
+    throw new IllegalArgumentException ();
+  }
+
   public static Quantity add (Quantity x, Quantity y, int k)
   {
     if (x.unit() == y.unit())

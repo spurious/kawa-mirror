@@ -7,7 +7,7 @@ package kawa.lang;
  * @author	Per Bothner
  */
 
-public class Continuation extends Procedure1
+public class Continuation extends ProcedureN
 {
   boolean invoked;
   static int counter;
@@ -25,6 +25,12 @@ public class Continuation extends Procedure1
       throw new GenericError
 	("implementation restriction: continuation can only be used once");
     throw new CalledContinuation (arg1, this);
+  }
+
+  public Object applyN (Object[] args)
+      throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    return apply1 (Values.make (args));
   }
 
   /** Call a precedure with the current continuation. */

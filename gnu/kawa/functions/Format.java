@@ -9,61 +9,6 @@ public class Format extends ProcedureN
   public static final Format format = new Format();
   static { format.setName("format"); }
 
-  /*
-  char magic = '%';
-
-  public boolean ELispStyle() { return true; }
-  public boolean CLispStyle() { return false; }
-  */
-
-  /*
-  public int format(OutPort dst,
-		    char[] format, int fmt_offset, int fmt_length,
-		    Object[] args, int arg_offset, int arg_length)
-  {
-    int arg_index = arg_offset;
-    int arg_max = arg_index + arg_length;
-    for (;;)
-      {
-	if (fmt_offset >= fmt_length)
-	  return arg_index;
-	char ch = format[fmt_offset++];
-	if (ch != magic)
-	  {
-	    dst.print(ch);
-	    continue;
-	  }
-
-	// handle options ...  TODO
-
-	if (fmt_offset >= fmt_length) 
-          return arg_index;  // ERROR
-	ch = format[fmt_offset++];
-	Object arg = null;
-	if (ch == 's' || ch == 'S' || ch == 'a')
-	  {
-	    if (arg_index >= arg_max)
-	      return arg_index;  // ERROR
-	    arg = args[arg_index++];
-	  }
-	switch (ch)
-	  {
-	  case '%':
-	  case '~':
-	    dst.print(ch); 
-	    continue; 
-	  case 's':
-	    dst.writeSchemeObject(arg, CLispStyle());
-	    break;
-	  case 'a':
-	  case 'S':
-	    dst.writeSchemeObject(arg, true);
-	    break;
-	  }
-      }
-  }
-  */
-
   public static void format(OutPort dst, Object[] args, int arg_offset)
   {
     Object format = args[arg_offset++];

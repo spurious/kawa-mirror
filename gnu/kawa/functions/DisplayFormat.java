@@ -79,14 +79,14 @@ public class DisplayFormat extends AbstractFormat
 	if (list != value)
 	  out.writeSpaceFill();
 	Pair pair = (Pair) list;
-	out.writeObject(pair.car);
+	writeObject(pair.car, (Consumer) out);
 	list = pair.cdr;
       }
     if (list != LList.Empty)
       {
 	out.writeSpaceFill();
 	out.writeChars(". ");
-	out.writeObject(list);
+	writeObject(list, (Consumer) out);
       }
     out.endLogicalBlock(")");
   }

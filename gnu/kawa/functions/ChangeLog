@@ -1,3 +1,9 @@
+2003-04-05  Per Bothner  <per@bothner.com>
+
+	* DisplayFormat.java (writeList):  Use our writeObject method.
+
+	* Format.java:  Remove some comment-out code.
+
 2003-03-13  Per Bothner  <per@bothner.com>
 
 	* Arrays.java (make):  Fix thinko - addition should be multiply.

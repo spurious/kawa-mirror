@@ -25,10 +25,10 @@
 (define (values #!rest (args :: <Object[]>))
   (invoke-static <gnu.mapping.Values> 'make args))
 
-(define (environment-bound? (env :: <gnu.mapping.Environment>)
-			    (sym :: <String>))
+(define (environment-bound? (env :: <gnu.mapping.Environment>) sym)
   :: <boolean>
-  (invoke env 'isBound sym))
+  (invoke env 'isBound
+	  (gnu.kawa.lispexpr.LispLanguage:langSymbolToSymbol sym)))
 
 ;; The version number is not optional according to R5RS.
 ;; But since earlier versions of this implementation took 0 arguments,

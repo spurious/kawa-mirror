@@ -23,7 +23,7 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
           >$@
 
 kawa.html:  $(srcdir)/kawa.texi version.texi
-	texi2html $<
+	texi2html -menu $<
 
 javadir=$(prefix)/java
 

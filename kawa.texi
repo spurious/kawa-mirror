@@ -25,17 +25,6 @@ START-INFO-DIR-ENTRY
 * kawa: (kawa).         Kawa, the Java-based Scheme system
 END-INFO-DIR-ENTRY
 @end format
-@menu
-* Features::                    
-* Installation::                
-* Running::                     
-* Restrictions::                
-* Extensions::                  
-* Compiling::                   
-* Primitive functions::         
-* Reporting Bugs::              
-* License::                     
-@end menu
 
 @node Top, Features, (dir), (dir)
 @top
@@ -51,8 +40,43 @@ R. Alexander Milowski @w{<alex@@copsol.com>} wrote the first Kawa releases.
 Per Bothner @w{<bothner@@cygnus.com>} extensively re-wrote Kawa,
 and released version 0.3 and up.
 
+@ifhtml
+<a href="http://www.cygnus.com/~bothner/kawa.html">This</a>
+is my Kawa home-page.
+<p>
+<a href="http://www.copsol.com/kawa/index.html">
+Copsol's Kawa home-page</a>
+is not maintained by Cygnus and so may not be as current.
+@end ifhtml
+@ifclear html
+My Kawa home page (which is currently just an on-line
+version of this document) is
+@url{http://www.cygnus.com/~bothner/kawa.html}.
+
+Copsol's Kawa home-page (@url{http://www.copsol.com/kawa/index.html})
+is not maintained by Cygnus and so may not be as current.
+@end ifclear
+
+The name Kawa may change in the future, to avoid confusion
+with a proprietary product of the same name.
+
+@ifhtml
+The <a href="http://www.cs.indiana.edu/scheme-repository/home.html">
+Scheme repository</a> has various useful information on Scheme,
+including a pointer to an online copy of
+<a href="http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html">R4RS</a>.
+@end ifhtml
+@ifclear html
+The Scheme repository
+(@url{http://www.cs.indiana.edu/scheme-repository/home.html})
+has various useful information on Scheme, including a pointer to
+an online copy of R4RS
+(@url{http://www-swiss.ai.mit.edu/~jaffer/r4rs_toc.html}).
+@end ifclear
+
 @menu
 * Features::
+* Getting Kawa::
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
 * Restrictions::         Features of R4RS not implemented
@@ -63,7 +87,7 @@ and released version 0.3 and up.
 * License::              
 @end menu
 
-@node Features, Installation, Top, Top
+@node Features, Getting Kawa, Top, Top
 @section Features
 
 Kawa is a full Scheme implementation.  It implements almost
@@ -80,7 +104,34 @@ Kawa provides the usual read-eval-print loop, as well as batch modes.
 
 Kawa is written in an object-oriented style.
 
-@node Installation, Running, Features, Top
+@node Getting Kawa, Installation, Features, Top
+@section Getting Kawa
+
+The current sources release is in
+@ifhtml
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.0.tar.gz">here</a>.
+@end ifhtml
+@ifclear html
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.0.tar.gz}.
+@end ifclear
+
+The pre-compiled @code{.class} files are in
+@ifhtml
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.0-compiled.tar.gz">here</a>.
+@end ifhtml
+@ifclear html
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.0-compiled.tar.gz}.
+@end ifclear
+
+A snapshot of the development tree is
+@ifhtml
+<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-1.1alpha.tar.gz">here</a>.
+@end ifhtml
+@ifclear html
+@url{ftp://ftp.cygnus.com/pub/bothner/kawa-1.1alpha.tar.gz}.
+@end ifclear
+
+@node Installation, Running, Getting Kawa, Top
 @section Building and installing Kawa
 
 Before installing Kawa, you must have Java working on your
@@ -101,9 +152,19 @@ Alternatively, you can install the pre-compiled binary distribution.
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) JDK 1.0.x from JavaSoft (Sun).
-You can download free copies of JDK 1.0.2 for Sparc/Solaris,
-x86/Solaris, MS-Windows 95/NT, and MacOS;
-see @samp{http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html}.
+You can download free copies of
+@ifhtml
+<a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
+@end ifhtml
+JDK 1.0.2
+@ifhtml
+</a>.
+for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS.
+@end ifhtml
+@ifclear html
+for Sparc/Solaris, x86/Solaris, MS-Windows 95/NT, and MacOS
+from @url{http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html}.
+@end ifclear
 
 The program 'java' is the Java interpreter.
 The program 'javac' is the Java compiler,

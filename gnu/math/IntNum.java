@@ -346,7 +346,7 @@ public class IntNum extends RatNum implements Compilable
   public static IntNum add (IntNum x, IntNum y, int k)
   {
     if (x.words == null && y.words == null)
-      return IntNum.make ((long) x.ival + (long) k * (long) y.ival);
+      return IntNum.make ((long) k * (long) y.ival + (long) x.ival);
     if (k != 1)
       {
 	if (k == -1)

@@ -1,3 +1,7 @@
+Sat Oct 17 14:45:07 1998  Per Bothner  <bothner@cygnus.com>
+
+	* misc-test.scm:  Add a test for new synchronized form.
+
 Sat Aug 29 20:57:48 1998  Per Bothner  <bothner@cygnus.com>
 
 	* test.scm:  Re-assigning + is now expected to fail.

@@ -23,9 +23,6 @@ public class Translator extends Object
   public Environment current_decls;
   ScopeExp current_scope;
 
-  // This is null in JDK 1.1 and something else in JDK 1.2.
-  private ClassLoader systemClassLoader = getClass().getClassLoader();
-
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
   public ScopeExp currentScope() { return current_scope; }
@@ -109,7 +106,7 @@ public class Translator extends Object
       }
     finally
       {
-        currentSyntax = currentSyntax;
+        currentSyntax = saveSyntax;
       }
     return exp;
   }
@@ -273,69 +270,18 @@ public class Translator extends Object
 	      }
 	    catch (RuntimeException ex)
 	      {
+                ex.printStackTrace(System.err);
 		break tryDirectCall;
 	      }
-	    if (proc == null || ! (proc instanceof Procedure))
+	    if (proc == null || ! (proc instanceof Procedure)
+                || proc instanceof Inlineable)
 	      break tryDirectCall;
 	  }
-	Class procClass = proc.getClass();
-	if (procClass.getClassLoader() != systemClassLoader)
-	  break tryDirectCall;
-	try
-	  {
-	    java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
-	    java.lang.reflect.Method best = null;
-	    Class[] bestTypes = null;
-            Procedure pproc = (Procedure) proc;
-	    String name = pproc.getName();
-	    if (name == null)
-	      break tryDirectCall;
-	    String mangledName = Compilation.mangleName(name);
-	    String mangledNameV = mangledName + "$V";
-	    for (int i = meths.length;  --i >= 0; )
-	      {
-		java.lang.reflect.Method meth = meths[i];
-		int mods = meth.getModifiers();
-		if ((mods & (Modifier.STATIC|Modifier.PUBLIC))
-		    != (Modifier.STATIC|Modifier.PUBLIC))
-		  continue;
-		String mname = meth.getName();
-                boolean variable;
-                if (mname.equals("apply") || mname.equals(mangledName))
-                  variable = false;
-                else if (mname.equals("apply$V") || mname.equals(mangledNameV))
-                  variable = true;
-                else
-		  continue;
-		Class[] ptypes = meth.getParameterTypes();
-		if (variable ? ptypes.length - 1 > cdr_length
-                    : ptypes.length != cdr_length)
-		  continue;
-		// In the future, we may try to find the "best" match.
-		if (best != null)
-		  return syntaxError("ambiguous inline for call to "+name
-				     + " (in class "+procClass.getName()+")");
-		best = meth;
-		bestTypes = ptypes;
-	      }
-	    if (best != null)
-	      {
-		ClassType procType = ClassType.make(procClass.getName());
-		Type[] argTypes = new Type[bestTypes.length];
-		for (int i = argTypes.length;  --i >= 0; )
-		  argTypes[i] = Type.make(bestTypes[i]);
-		gnu.bytecode.Method method
-		  = procType.addMethod(best.getName(), best.getModifiers(),
-				       argTypes,
-				       Type.make(best.getReturnType()));
-                pproc = new PrimProcedure(method);
-                pproc.setName(name);
-		func = new QuoteExp(pproc);
-	      }
-	  }
-	catch (SecurityException ex)
-	  {
-	  }
+
+        PrimProcedure pproc
+          = PrimProcedure.getMethodFor((Procedure) proc, args);
+        if (pproc != null)
+          func = new QuoteExp(pproc);
       }
 
     return new ApplyExp (func, args);

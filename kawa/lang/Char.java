@@ -87,11 +87,6 @@ public class Char implements Printable, Compilable
       }
   }
 
-  public static Char make (char ch)
-  {
-    return make ((int) ch);
-  }
-
   public boolean equals (Object obj)
   {
     // This does not work for hashing in make!  Redo make!  FIXME

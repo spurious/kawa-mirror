@@ -71,8 +71,8 @@ public class Macro extends Syntax
       }
     catch (Exception ex)
       {
-        return tr.syntaxError("evaluating syntax transformer "
-                              + getName() + " threw " + ex);
+        return tr.syntaxError("evaluating syntax transformer `"
+                              + getName() + "' threw " + ex);
       }
   }
 }

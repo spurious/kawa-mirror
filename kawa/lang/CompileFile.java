@@ -18,7 +18,6 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (String name, Translator tr)
-    throws gnu.text.SyntaxException
   {
     try
       {
@@ -38,17 +37,21 @@ public class CompileFile extends Procedure2
   }
 
   public static final Object readBody (InPort port, SourceMessages messages)
-    throws gnu.text.SyntaxException
   {
-    Object body;
+    Object body = null;
     try
       {
 	ScmRead lexer = new ScmRead(port, messages);
 	body = lexer.readListBody ();
-	if (messages.seenErrors())
-	  throw new gnu.text.SyntaxException(lexer.getMessages());
 	if (port.peek() == ')')
 	  lexer.fatal("An unexpected close paren was read.");
+      }
+    catch (gnu.text.SyntaxException ex)
+      {
+        // Got a fatal error.
+        if (ex.getMessages() != messages)
+          throw new GenericError ("confussing syntax error: "+ex);
+        // otherwise ignore it - it's already been recorded in messages.
       }
     catch (java.io.IOException e)
       {
@@ -58,10 +61,38 @@ public class CompileFile extends Procedure2
   }
 
   public static final ModuleExp read (InPort port, Translator tr)
-    throws gnu.text.SyntaxException
   {
-    return kawa.standard.Scheme.makeModuleExp(readBody(port, tr.getMessages()),
-					      tr);
+    ModuleExp mexp = new ModuleExp();
+    java.util.Vector forms = new java.util.Vector(20);
+    SourceMessages messages = tr.getMessages();
+    tr.push(mexp);
+    try
+      {
+	ScmRead lexer = new ScmRead(port, messages);
+        for (;;)
+          {
+	    Object sexp = ((gnu.text.LispReader) lexer).readObject(); // FIXME
+	    if (sexp == Sequence.eofValue)
+	      break;
+            if (! tr.scan_form (sexp, forms, mexp))
+              break;
+          }
+	if (port.peek() == ')')
+	  lexer.fatal("An unexpected close paren was read.");
+      }
+    catch (gnu.text.SyntaxException ex)
+      {
+        // Got a fatal error.
+        if (ex.getMessages() != messages)
+          throw new GenericError ("confussing syntax error: "+ex);
+        // otherwise ignore it - it's already been recorded in messages.
+      }
+    catch (java.io.IOException e)
+      {
+	throw new GenericError ("I/O exception reading file: " + e.toString ());
+      }
+    tr.finishModule(mexp, forms);
+    return mexp;
   }
 
   public final Object apply2 (Object arg1, Object arg2)
@@ -73,6 +104,9 @@ public class CompileFile extends Procedure2
     try
       {
 	lexp = read (arg1.toString (), tr);
+        SourceMessages messages = tr.getMessages();
+        if (messages.seenErrors())
+          throw new gnu.text.SyntaxException(messages);
       }
     catch (gnu.text.SyntaxException e)
       {
@@ -99,9 +133,9 @@ public class CompileFile extends Procedure2
    * @param prefix to prepend classnames for functions
    * @return true iff there were syntax errors
    */
-  public static boolean compile_to_files (String inname, String directory,
-					  String prefix, String topname)
-    throws gnu.text.SyntaxException
+  public static void compile_to_files (String inname, String directory,
+                                       String prefix, String topname,
+                                       SourceMessages messages)
   {
     if (topname == null)
       {
@@ -114,11 +148,8 @@ public class CompileFile extends Procedure2
 	if (prefix != null)
 	  topname = prefix + short_name;
       }
-    SourceMessages messages = new SourceMessages();
     Translator tr = new Translator (Environment.user(), messages);
     ModuleExp mexp = read (inname, tr);
-    if (messages.checkErrors(OutPort.errDefault(), 50))
-      throw new gnu.text.SyntaxException(messages);
 
     try
       {
@@ -128,6 +159,5 @@ public class CompileFile extends Procedure2
       {
         throw new GenericError (ex.toString ());
       }
-    return false;
   }
 }

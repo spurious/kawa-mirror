@@ -120,6 +120,13 @@ public class Translator extends Object
   public void setMessages (SourceMessages messages)
   { this.messages = messages; }
  
+  public void error(char severity, String message)
+  {
+    messages.error(severity, current_filename, current_line, current_column,
+		   message);
+  }
+
+
   /**
    * Handle syntax errors (at rewrite time).
    * @param message an error message to print out
@@ -127,8 +134,7 @@ public class Translator extends Object
    */
   public Expression syntaxError (String message)
   {
-    messages.error('e', current_filename, current_line, current_column,
-		   message);
+    error('e', message);
     return new ErrorExp (message);
   }
 
@@ -195,6 +201,8 @@ public class Translator extends Object
 
   public Expression rewrite_pair (Pair p)
   {
+    if (p.car instanceof Syntax)
+      return apply_rewrite((Syntax) p.car, p);
     Object cdr = p.cdr;
 
     Expression func = rewrite_car (p);
@@ -386,102 +394,175 @@ public class Translator extends Object
     return result;
   }
 
+  boolean scan_form (Object st, java.util.Vector forms, ScopeExp defs)
+  {
+    for (;;)
+      {
+        // Process st.
+        if (! (st instanceof Pair))
+          forms.addElement (st);
+        else
+          {
+            Pair st_pair = (Pair) st;
+            Object op = st_pair.car;
+            Syntax syntax = check_if_Syntax (op);
+
+            if (syntax != null && syntax instanceof Macro)
+              {
+                String save_filename = current_filename;
+                int save_line = current_line;
+                int save_column = current_column;
+                Syntax saveSyntax = currentSyntax;
+                try
+                  {
+                    if (st_pair instanceof PairWithPosition)
+                      {
+                        PairWithPosition ppair = (PairWithPosition) st_pair;
+                        current_filename = ppair.getFile ();
+                        current_line = ppair.getLine ();
+                        current_column = ppair.getColumn ();
+                      }
+                    currentSyntax = syntax;
+                    st = ((Macro) syntax).expand (st_pair, this);
+                  }
+                finally
+                  {
+                    current_filename = save_filename;
+                    current_line = save_line;
+                    current_column = save_column;
+                    currentSyntax = saveSyntax;
+                  }
+                continue;
+		}
+            else if (syntax == Scheme.beginSyntax)
+              {
+                if (! scan_body (st_pair.cdr, forms, defs))
+                  return false;
+              }
+            /*
+            else if (syntax == Scheme.defineSyntax
+                     && st_pair.cdr instanceof Pair
+                     && ! (current_scope instanceof ModuleExp))
+              {
+                Object name = ((Pair) st_pair.cdr).car;
+                if (name instanceof String)
+                  defs.addDeclaration((String) name);
+                else if (name instanceof Pair)
+                  {
+                    Pair name_pair = (Pair) name;
+                    if (name_pair.car instanceof String)
+                      defs.addDeclaration((String) name_pair.car);
+                  }
+                forms.addElement (st);
+              }
+            */
+            else if ((syntax == Scheme.defineSyntax
+                      || syntax == Scheme.defineSyntaxPrivate)
+                     // Later:  || syntax == Scheme.defineSyntax
+                     && st_pair.cdr instanceof Pair)
+              {
+                boolean makePrivate = syntax == Scheme.defineSyntaxPrivate;
+                Pair p = (Pair) st_pair.cdr;
+                Object name = p.car;
+                Declaration decl = null;
+                if (name instanceof String)
+                  {
+                    decl = new Declaration((String) name);
+                    st = makePair(st_pair, syntax, new Pair(decl, p.cdr));
+                  }
+                else if (name instanceof Pair)
+                  {
+                    Pair name_pair = (Pair) name;
+                    if (name_pair.car instanceof String)
+                      {
+                        decl = new Declaration((String) name_pair.car);
+                        p = new Pair(new Pair(decl, name_pair.cdr), p.cdr);
+                        st = makePair(st_pair, syntax, p);
+                      }
+		    }
+                if (decl != null)
+                  {
+                    if (defs instanceof ModuleExp)
+                      {
+                        mustCompileHere();
+                        push(decl);
+                        if (! makePrivate)
+                          {
+                            decl.setCanRead(true);
+                            // decl.setCanWrite(true);
+                          }
+                      }
+                    defs.addDeclaration(decl);
+                  }
+                forms.addElement (st);
+              }
+            else if (syntax == Scheme.defineAliasSyntax
+                     && st_pair.cdr instanceof Pair
+                     && ! (current_scope instanceof ModuleExp)
+                     &&  ((Pair) st_pair.cdr).car instanceof String)
+              {
+                Object name = ((Pair) st_pair.cdr).car;
+                Type typeLocation = ClassType.make("gnu.mapping.Location");
+                Declaration decl
+                  = defs.addDeclaration((String) name, typeLocation);
+                decl.setIndirectBinding(true);
+                forms.addElement (st);
+              }
+            else if (syntax == Scheme.defineSyntaxSyntax
+                     && st_pair.cdr instanceof Pair
+                     && ! (current_scope instanceof ModuleExp)
+                     &&  ((Pair) st_pair.cdr).car instanceof String)
+              {
+                Pair p = (Pair) st_pair.cdr;
+                Object name = p.car;
+                if (! (p.car instanceof String)
+                    || ! (p.cdr instanceof Pair)
+                    || (p = (Pair) p.cdr).cdr != List.Empty)
+                  {
+                    forms.addElement(syntaxError("invalid syntax for define-syntax"));
+                    return false;
+                  }
+                Macro macro = new Macro((String) name, p.car);
+                defs.addDeclaration(macro);
+                p = makePair(st_pair, syntax, new Pair(macro, p));
+                forms.addElement (p);
+              }
+            else
+              forms.addElement (st);
+          }
+        return true;
+      }
+  }
+
   /** Recursive helper method for rewrite_body.
    * Scan body for definitions, placing partially macro-expanded
    * expressions into forms.
    * If definitions were seen, return a LetExp containing the definitions.
    */
 
-  LetExp scan_body (Object body, java.util.Vector forms, LetExp defs)
+  public boolean scan_body (Object body, java.util.Vector forms, ScopeExp defs)
   {
     while (body != List.Empty)
       {
 	if (! (body instanceof Pair))
 	  {
 	    forms.addElement (syntaxError ("body is not a proper list"));
-	    return defs;
+	    return false;
 	  }
 	Pair pair = (Pair) body;
 	Object st = pair.car;
-	for (;;)
-	{
-	  // Process st.
-	  if (! (st instanceof Pair))
-	    forms.addElement (st);
-	  else
-	    {
-	      Pair st_pair = (Pair) st;
-	      Object op = st_pair.car;
-	      Syntax syntax = check_if_Syntax (op);
-
-	      if (syntax != null && syntax instanceof Macro)
-		{
-                  String save_filename = current_filename;
-                  int save_line = current_line;
-                  int save_column = current_column;
-                  Syntax saveSyntax = currentSyntax;
-                  try
-                    {
-                      if (st_pair instanceof PairWithPosition)
-                        {
-                          PairWithPosition ppair = (PairWithPosition) st_pair;
-                          current_filename = ppair.getFile ();
-                          current_line = ppair.getLine ();
-                          current_column = ppair.getColumn ();
-                        }
-                      currentSyntax = syntax;
-                      st = ((Macro) syntax).expand (st_pair, this);
-                    }
-                  finally
-                    {
-                      current_filename = save_filename;
-                      current_line = save_line;
-                      current_column = save_column;
-                      currentSyntax = saveSyntax;
-                    }
-		  continue;
-		}
-	      else if (syntax == Scheme.beginSyntax)
-		defs = scan_body (st_pair.cdr, forms, defs);
-	      else if (syntax == Scheme.defineSyntax
-		       && st_pair.cdr instanceof Pair
-		       && ! (current_scope instanceof ModuleExp))
-		{
-		  Object name = ((Pair) st_pair.cdr).car;
-		  if (defs == null)
-		    defs = new LetExp (null);
-		  if (name instanceof String)
-		    defs.addDeclaration((String) name);
-		  else if (name instanceof Pair)
-		    {
-		      Pair name_pair = (Pair) name;
-		      if (name_pair.car instanceof String)
-			defs.addDeclaration((String) name_pair.car);
-		    }
-		  forms.addElement (st);
-		}
-	      else if (syntax == Scheme.defineAliasSyntax
-		       && st_pair.cdr instanceof Pair
-		       && ! (current_scope instanceof ModuleExp)
-                       &&  ((Pair) st_pair.cdr).car instanceof String)
-		{
-		  Object name = ((Pair) st_pair.cdr).car;
-		  if (defs == null)
-		    defs = new LetExp (null);
-                  Type typeLocation = ClassType.make("gnu.mapping.Location");
-                  Declaration decl
-                    = defs.addDeclaration((String) name, typeLocation);
-                  decl.setIndirectBinding(true);
-		  forms.addElement (st);
-		}
-	      else
-		forms.addElement (st);
-	    }
-	  break;
-	}
+        if (! scan_form (st, forms, defs))
+          return false;
 	body = pair.cdr;
       }
-    return defs;
+    return true;
+  }
+
+  public static Pair makePair(Pair pair, Object car, Object cdr)
+  {
+    if (pair instanceof PairWithPosition)
+      return new PairWithPosition((PairWithPosition) pair, car, cdr);
+    return new Pair(car, cdr);
   }
 
   /**
@@ -491,20 +572,24 @@ public class Translator extends Object
   public Expression rewrite_body (Object exp)
   {
     java.util.Vector forms = new java.util.Vector(20);
-    LetExp defs = scan_body (exp, forms, null);
+    LetExp defs = new LetExp(null);
+    if (! scan_body (exp, forms, defs))
+      return new ErrorExp("error while scanning in body");
+    return rewrite_body(forms, defs);
+  }
+
+  public Expression rewrite_body (java.util.Vector forms, LetExp defs)
+  {
     int nforms = forms.size();
     if (nforms == 0)
       return syntaxError ("body with no expressions");
-    int ndecls;
-    if (defs == null)
-      ndecls = 0;
-    else
+    int ndecls = defs.countDecls();
+    if (ndecls != 0)
       {
-	ndecls = defs.countDecls();
         Expression[] inits = new Expression[ndecls];
-	for (int i = ndecls;  --i >= 0; )
-	  inits[i] = QuoteExp.nullExp;
-	defs.inits = inits;
+        for (int i = ndecls;  --i >= 0; )
+          inits[i] = QuoteExp.nullExp;
+        defs.inits = inits;
 	push(defs);
       }
     Expression body;
@@ -517,11 +602,38 @@ public class Translator extends Object
 	  exps[i] = rewrite (forms.elementAt(i));
 	body = new BeginExp (exps);
       }
-    if (defs == null)
+    if (ndecls == 0)
       return body;
     defs.body = body;
     pop(defs);
     return defs;
+  }
+
+  public void finishModule(ModuleExp mexp, java.util.Vector forms)
+  {
+    int nforms = forms.size();
+    int ndecls = mexp.countDecls();
+    pushDecls(mexp);
+    Expression body;
+    if (nforms == 1)
+      body = rewrite(forms.elementAt(0));
+    else
+      {
+	Expression[] exps = new Expression [nforms];
+	for (int i = 0; i < nforms; i++)
+	  exps[i] = rewrite(forms.elementAt(i));
+	body = new BeginExp (exps);
+      }
+    mexp.body = body;
+    pop(mexp);
+    /* DEBUGGING:
+    OutPort err = OutPort.errDefault ();
+    err.print ("[Re-written expression for load/compile: ");
+    mexp.print (err);
+    //err.print ("\nbefore load<"+mod.getClass().getName()+">");
+    err.println();
+    err.flush();
+    */
   }
 
   /**

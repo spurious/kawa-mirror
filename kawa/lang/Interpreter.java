@@ -47,6 +47,11 @@ public abstract class Interpreter
     return new Environment(environ);
   }
 
+  public String getName()
+  {
+    return "Scheme";
+  }
+
   public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
 
   public abstract gnu.bytecode.Type getTypeFor(Class clas);

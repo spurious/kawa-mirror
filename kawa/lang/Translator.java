@@ -465,10 +465,12 @@ public class Translator extends Object
                 Pair p = (Pair) st_pair.cdr;
                 Object name = p.car;
                 Declaration decl = null;
+                Pair declForm = null;
                 if (name instanceof String)
                   {
                     decl = new Declaration((String) name);
-                    st = makePair(st_pair, syntax, new Pair(decl, p.cdr));
+                    declForm = makePair(p, decl, p.cdr);
+                    st = makePair(st_pair, syntax, declForm);
                   }
                 else if (name instanceof Pair)
                   {
@@ -476,7 +478,8 @@ public class Translator extends Object
                     if (name_pair.car instanceof String)
                       {
                         decl = new Declaration((String) name_pair.car);
-                        p = new Pair(new Pair(decl, name_pair.cdr), p.cdr);
+                        declForm = makePair(name_pair, decl, name_pair.cdr);
+                        p = makePair(p, declForm, p.cdr);
                         st = makePair(st_pair, syntax, p);
                       }
 		    }
@@ -491,6 +494,12 @@ public class Translator extends Object
                             decl.setCanRead(true);
                             // decl.setCanWrite(true);
                           }
+                      }
+                    if (declForm instanceof PairWithPosition)
+                      {
+                        PairWithPosition declPos = (PairWithPosition) declForm;
+                        decl.setFile(declPos.getFile());
+                        decl.setLine(declPos.getLine(), declPos.getColumn());
                       }
                     defs.addDeclaration(decl);
                   }

@@ -174,6 +174,12 @@ public class Lambda extends Syntax implements Printable
 	if (mode == Special.key)
 	  lexp.keywords[key_args++] = Keyword.make(name.toString());
 	Declaration decl = lexp.addDeclaration (name);
+        if (pair instanceof PairWithPosition)
+          {
+            PairWithPosition declPos = (PairWithPosition) pair;
+            decl.setFile(declPos.getFile());
+            decl.setLine(declPos.getLine(), declPos.getColumn());
+          }
 	decl.setParameter(true);
 	if (typeSpec != null)
 	  decl.setType(kawa.standard.prim_method.exp2Type(typeSpec, tr));

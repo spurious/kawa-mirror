@@ -63,6 +63,7 @@ public class CompileFile extends Procedure2
   public static final ModuleExp read (InPort port, Translator tr)
   {
     ModuleExp mexp = new ModuleExp();
+    mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     SourceMessages messages = tr.getMessages();
     tr.push(mexp);

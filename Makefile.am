@@ -118,8 +118,9 @@ MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
 CLEANFILES = *.jar
 
 install-javadoc-html:
-	rm -rf $(JAVADOC_DIR)/*
 	-mkdir $(JAVADOC_DIR)
+	-#rm `find $(JAVADOC_DIR)/ -name CVS -prune -o '(' '!' -type d ')' -print`
+	-rm `find $(JAVADOC_DIR)/ -name '*.html'`
 	$(JAVADOC) $(JAVADOC_FLAGS) -sourcepath .:$(top_srcdir) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
 	cp $(srcdir)/COPYING  $(JAVADOC_DIR)/COPYING
 

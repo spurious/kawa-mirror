@@ -1,3 +1,8 @@
+2003-11-25  Per Bothner  <per@bothner.com>
+
+	* Makefile.in (install-javadoc-html):  Only delete html files.
+	(Specifically, we don't want to delete CVS directories.)
+
 2003-11-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/call_with_input_file.java:  Removed.

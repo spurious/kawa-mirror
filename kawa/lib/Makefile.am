@@ -23,7 +23,6 @@ java_SCM=\
   ports.scm \
   misc.scm \
   numbers.scm \
-  quantities.scm \
   strings.scm \
   syntax.scm \
   vectors.scm \

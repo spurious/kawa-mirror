@@ -1,3 +1,12 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* quantities.scm:  Removed, as define-unit now has its own class.
+	* Makefile.am (java_SCM):  Update accordingly.
+
+	* misc.scm (make-procedure):  New procedures.
+	(procedure-property, set-procedure-property!):  New procedures.
+	* syntax.scm (define-procedure):  New syntax.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* trace.scm (%do-trace):  Fix typo.

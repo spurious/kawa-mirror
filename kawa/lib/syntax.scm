@@ -6,6 +6,11 @@
                      (syntax-case __arg ()
                                   ((__name . pattern) (begin form ...))))))))
 
+(define-syntax define-procedure
+  (syntax-rules ()
+		((define-procedure name . args)
+		 (define-constant name (make-procedure name: name . args)))))
+
 (define (%defmacro form rule)
   (rule (car (form 'form))))
 

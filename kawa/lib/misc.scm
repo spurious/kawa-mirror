@@ -52,3 +52,12 @@
 	(interaction-environment))
        ((primitive-constructor <kawa.standard.Scheme> ())))))
 |#
+
+(define (make-procedure #!rest (args :: <Object[]>))
+  (invoke-static <gnu.expr.GenericProc> 'make$V args))
+
+(define (procedure-property (proc :: <procedure>) key #!optional default)
+  (invoke proc 'getProperty key default))
+
+(define (set-procedure-property! proc :: <procedure> key value)
+  (invoke proc 'setProperty key value))

@@ -1,3 +1,11 @@
+2004-04-22  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (loadHeapFrame):  May need to use closureEnv,
+	even when this is curLambda.  Fix verification error on psyntax.pp
+	* LambdaExp.java (compileEnd):  Don't popScope if inlineOnly,
+	since closureEnv may be needed for nested inlined methods.
+	* ApplyExp.java (compile): Do popScope later after compileChildMethods.
+
 2004-03-09  Per Bothner  <per@bothner.com>
 
 	* Declaration.java (isStatic):  Also check NONSTATIC_SPECIFIED.

@@ -448,19 +448,14 @@ public class LambdaExp extends ScopeExp
       curLambda = curLambda.returnContinuation.context;
 
     gnu.bytecode.CodeAttr code = comp.getCode();
-    if (this == curLambda)
-      {
-	if (this.heapFrame == null)
-	  code.emitPushThis();
-	else
-	  code.emitLoad(this.heapFrame);
-      }
+    if (curLambda.heapFrame != null && this == curLambda)
+      code.emitLoad(curLambda.heapFrame);
+    else if (curLambda.closureEnv != null)
+      code.emitLoad(curLambda.closureEnv);
     else
+      code.emitPushThis();
+    if (this != curLambda)
       {
-	if (curLambda.closureEnv == null)
-	  code.emitPushThis();
-	else
-	  code.emitLoad(curLambda.closureEnv);
 	LambdaExp parent = curLambda.outerLambda();
 	while (parent != this)
 	  {
@@ -495,9 +490,9 @@ public class LambdaExp extends ScopeExp
 		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
 	code.popScope();        // Undoes enterScope in allocParameters
+	if (! Compilation.fewerClasses) // FIXME
+	  code.popScope(); // Undoes pushScope in method.initCode.
       }
-    if (! Compilation.fewerClasses) // FIXME
-      code.popScope(); // Undoes pushScope in method.initCode.
 
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);

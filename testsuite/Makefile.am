@@ -36,7 +36,7 @@ check-mac: testing.zip
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
-check-obj: testing.zip module1.class
+check-obj: testing.zip module1.class classes2.class
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
@@ -60,6 +60,15 @@ scribble.class: $(srcdir)/scribble.scm
 module1.class: $(srcdir)/module1.scm
 	$(KAWA) -C $(srcdir)/module1.scm
 
+classes1.class: $(srcdir)/classes1.scm
+	$(KAWA) -C $(srcdir)/classes1.scm
+
+SimpleB.class: $(srcdir)/SimpleB.java classes1.class
+	CLASSPATH=..:. $(JAVAC) -g $(srcdir)/SimpleB.java -d .
+
+classes2.class: $(srcdir)/classes2.scm SimpleB.class
+	$(KAWA) -C $(srcdir)/classes2.scm
+
 APPLETVIEWER = appletviewer
 
 # Not done by "make check" as it is interactive.
@@ -67,6 +76,7 @@ check-scribble: scribble.class
 	$(APPLETVIEWER) -J-cp -J. -J-cp -J.. file:$(srcdir)/scribble.html
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
+  classes1.scm classes2.scm SimpleB.java obj-test.scm \
+  misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = $(SOURCES) ppfile.out

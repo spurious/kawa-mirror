@@ -1,4 +1,4 @@
-(test-init "Objects" 41)
+(test-init "Objects" 61)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -165,3 +165,41 @@
 (test 3 length-diff1 'abcdef 'abc)
 (test 3 length-diff2 'abcdef 'abc)
 (test 3 length-diff3 'abcdef 'abc)
+
+(require <classes1>)
+(require <classes2>)
+
+(define obj1 (make <SimpleA>))
+(test 4 slot-ref obj1 'a)
+(test 6 slot-ref obj1 'b)
+(test 35 'obj1-f (invoke obj1 'f 5))
+(slot-set! obj1 'a (+ 10 (static-field <SimpleA> 'b)))
+(test 16 field obj1 'a)
+
+(define obj2 (make <SimpleB>))
+(test 4 field obj2 'a)
+(test 6 field obj2 'b)
+(test 6 static-field <SimpleB> 'b)
+(test 10 slot-ref obj2 'c)
+(test 1045 'obj2-f (invoke obj2 'f 15))
+
+(define obj3 (make <SimpleC> d: 25))
+(test 4 'obj3-a (slot-ref obj3 'a))
+(test 6 'obj3-b (slot-ref obj3 'b))
+(test 10 'obj3-c (slot-ref obj3 'c))
+(test 25 slot-ref obj3 'd)
+(test 24 slot-ref obj3 'e)
+
+(define obj4 (make <ClsC>))
+(set! fail-expected "not calling parent initiaizer methods")
+(test 14 'obj4-b (slot-ref obj4 'b))
+(test 22 'obj4-c (slot-ref obj4 'c))
+(test 44 'obj4-f (invoke obj4 'f 2))
+
+(define obj5 (make <ClsD>))
+(test 23 'obj5-d (slot-ref obj5 'd))
+
+(define obj6 (make <ClsE>))
+(set! (field obj6 'e) (- (field obj6 'e) 10))
+(test 29 'obj6-e (slot-ref obj6 'e))
+(test 156 'obj6-f (invoke obj6 'f 7))

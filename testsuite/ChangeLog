@@ -1,3 +1,10 @@
+2001-08-23  Per Bothner  <per@bothner.com>
+
+	* classes1.scm, classes2.scm, SimpleB.java:  New files for
+	testing define-class and define-simple-class.
+	* obj-test.scm:  Added 20 more tests.
+	* Makefile.am:  Rules for new tsets.
+
 2001-07-18  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (check-scribble):  Handle appletviewer changes in JDK:

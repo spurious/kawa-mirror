@@ -45,9 +45,9 @@ of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
 
 The author of Kawa is
 @uref{http://www.bothner.com/per/,Per Bothner}
-@uref{mailto:per@@bothner.com}.
+@email{per@@bothner.com}.
 Kawa is a re-write of Kawa 0.2, which was written by
-R. Alexander Milowski @uref{mailto:alex@@copsol.com}.
+R. Alexander Milowski @email{alex@@copsol.com}.
 
 The Kawa home page (which is currently just an on-line
 version of this document) is @uref{http://www.gnu.org/software/kawa/}.
@@ -73,7 +73,7 @@ For copyright information on the software and documentation,
 see @ref{License}.
 
 This package has nothing to do with the
-@uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
+@uref{http://www.allaire.com/products/kawa/,Kawa commercial Java IDE}.
 
 The packages
 @uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
@@ -102,8 +102,10 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Types::
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
-* XML tools::            Tools for working with XML
+* XML tools::            Tools for working with XML and HTML
 * Mailing lists::        Where to report bugs, discuss changes, etc
+* Support::              Support
+* Support::              Technical support for Kawa
 * Projects::             Projects using Kawa
 * License::
 * Index::
@@ -127,7 +129,8 @@ Kawa provides the usual read-eval-print loop, as well as batch modes.
 
 Kawa provides a framework for implementing other progressing languages,
 and comes with incomplete support for CommonLisp, Emacs Lisp, and
-EcmaScript.
+EcmaScript, and the
+draft @uref{http://www.gnu.org/software/kawa/xquery/,XML Query language}.
 
 Kawa is written in an object-oriented style.
 
@@ -560,6 +563,10 @@ Set the default language to Emacs Lisp.
 @itemx --common-lisp
 Set the default language to CommonLisp.
 (The implementation is @emph{very} incomplete.)
+@item --xquery
+Set the default language to the draft XML Query language.
+See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery page}
+for more information.
 @end table
 
 The following options control which calling conventions are used:
@@ -583,7 +590,7 @@ with @code{--full-tailcalls} can call code compiled
 with @code{--no-full-tailcalls} and vice versa.
 
 The options @samp{-C}, @samp{-d}, @samp{-T}, @samp{-P}, @samp{--main}
-and @samp{--applet} are used to compile a Scheme file;
+@samp{--applet}, and @code{--servlet} are used to compile a Scheme file;
 see @ref{Files compilation}.
 The option @samp{--connect @var{portnum}} is only used by
 the @samp{kawa} front-end program.
@@ -780,6 +787,9 @@ be used as a stand-alone application. @xref{Application compilation}.
 @item --applet
 The resulting class inherits from @code{java.applet.Applet},
 and can be used as an applet.  @xref{Applet compilation}.
+@item --servlet
+The resulting class implements @code{javax.servlet.http.HttpServlet},
+and can be used as an servlet in a servlet container like Tomcat.
 @item --module-static
 If no @code{module-static} is specified, generate a static module
 (as if @code{(module-static #t)} were specified. @xref{Module classes}.
@@ -921,7 +931,7 @@ The reason for the wildcard in @code{myprog*.class} is that sometimes
 Kawa will generate some helper classes in addition to @code{myprog.class}.
 The @code{--main} option tell @code{gcj} which class contains
 the @code{main} method it should use.  The @code{-o} option names
-the resuling executable program.  The @code{-lkawa} option tells
+the resulting executable program.  The @code{-lkawa} option tells
 the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
@@ -931,8 +941,8 @@ find that library.
 
 @menu
 * Multiple values::
-* Keywords::
 * Special named constants::
+* Keywords::
 * Procedures::
 * Quantities::
 * Logical Number Operations::
@@ -3769,7 +3779,7 @@ System.out.println(x);
 @end example
 
 @node XML tools, Mailing lists, Low-level functions, Top
-@chapter Tools for working with XML
+@chapter Tools for working with XML and HTML
 
 Kawa has a number of experimental features for working with XML.
 These are built on the concepts of the @code{gnu.lists} package.
@@ -3789,8 +3799,13 @@ More generally, whether an @var{attribute} or @var{child} is includded
 by copying or by reference is (for now) undefined.
 The @var{tag} should currently be a symbol, though in the future it should
 be a qualified name.
-An @var{attribute} is typically a call to @code{amke-attribute},
+An @var{attribute} is typically a call to @code{make-attribute},
 but it can be any attribute-valued expression.
+@example
+(make-element 'p
+	      "The time is now: "
+	      (make-element 'code (make <java.util.Date>)))
+@end example
 @end defun
 
 @defun make-attribute name value...
@@ -3798,9 +3813,33 @@ Create an "attribute", which is a name-value pair.
 For now, @var{name} should be a symbol
 @end defun
 
+@subsection Compiling to a Servlet
+
+You can compile a Scheme file to a @code{Servlet}, and run it
+in a servlet engine (a Servlet-aware web server).
+For example, the example under @code{make-element} can
+be saved in a file @code{CurDate.scm}, and compiled:
+@example
+kawa --servlet -C CurDate.scm
+@end example
+If you have Tomcat 4.x installed, and you want @code{CurDate} to be
+part of the @code{myutils} "web application", copy @code{CurDate*.class}
+into @code{$CATALINA_HOME/webapps/myutils/WEB-INF/classes/}.
+You also need to copy Kawa somewhere where Tomcat can find it,
+for example @code{$CATALINA_HOME/lib/kawa-@value{VERSION}.jar}.
+You can then run the @code{CurDate} servlet using the URL
+@url{http://localhost::8080/myutils/servlet/CurDate}.
+
 @subsection xquery language
 
-@node Mailing lists, Projects, XML tools, Top
+W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
+and a draft has been released.
+If you start Kawa with the @code{--xquery} it selects the "XQuery"
+source language; this also prints output using XML syntax.
+See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery home page}
+for examples and more information.
+
+@node Mailing lists, Support, XML tools, Top
 @chapter Mailing lists
 
 If you have a problem installing or using Kawa,
@@ -3820,7 +3859,31 @@ Messages to the mailing list are now
 There is a separate mailing list for @uref{http://www.JEmacs.net,JEmacs}.
 See the @uref{http://lists.sourceforge.net/mailman/listinfo/jemacs-info,information page}.
 
-@node Projects, License, Mailing lists, Top
+@node Support, Projects, Mailing lists, Top
+@chapter Technical Support for Kawa
+
+If you have a project that depends on Kawa or one of its component
+packages, you might do well get get paid priority support from
+Kawa's author.
+
+The base price is $2400 for one year.  This entitles you to basic
+support by email or phone.  Per @email{per@@bothner.com} will answer techical
+questions about Kawa or its implementation, investigate bug reports, and
+suggest work-arounds.  I may (at my discretion) provide fixes and
+enhancements (patches) for simple problems.  Reponse for support
+requests received using the day (California time) will normally be
+within a few hours.
+
+All support requests must come through a single designated contact
+person.  If Kawa is important to your business, you probably
+want at least two contact people, doubling the price.
+
+If the support contract is cancelled (by either party), remaining
+time will be prorated and refunded.
+
+Per is also available for development projects.
+
+@node Projects, License, Support, Top
 @chapter Projects using Kawa
 
 JEmacs is included in the Kawa distribution.  It is a project to

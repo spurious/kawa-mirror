@@ -336,9 +336,8 @@ public class ClassType extends ObjectType implements AttrContainer {
     Method method = getDeclaredMethod(name, arg_types);
     if (method != null
         && return_type.equals(method.getReturnType())
-        && flags == method.access_flags)
+        && (flags & method.access_flags) == flags)
       return method;
-
     method = new Method (this, flags);
     method.setName(name);
     method.arg_types = arg_types;
@@ -351,6 +350,42 @@ public class ClassType extends ObjectType implements AttrContainer {
     Method meth = addMethod(name, flags);
     meth.setSignature(signature);
     return meth;
+  }
+
+  public Method getDeclaredMethods()
+  {
+    if ((flags & (ADD_METHODS_DONE|EXISTING_CLASS)) == EXISTING_CLASS)
+      addMethods(getReflectClass());
+    return methods;
+  }
+
+  /** Get methods matching the given filter. */
+  public Method[] getMethods (Filter filter, boolean searchSupers)
+  {
+    int count = 0;
+    for (ClassType ctype = this;  ctype != null;
+	 ctype = ctype.getSuperclass())
+    {
+      for (Method meth = ctype.getDeclaredMethods();
+	   meth != null;  meth = meth.getNext())
+	if (filter.select(meth))
+	  count++;
+      if (! searchSupers)
+	break;
+    }
+    Method[] methods = new Method[count];
+    count = 0;
+    for (ClassType ctype = this;  ctype != null;
+	 ctype = ctype.getSuperclass())
+    {
+      for (Method meth = ctype.getDeclaredMethods();
+	   meth != null;  meth = meth.getNext())
+	if (filter.select(meth))
+	  methods[count++] = meth;
+      if (! searchSupers)
+	break;
+    }
+    return methods;
   }
 
   public Method getDeclaredMethod(String name, Type[] arg_types)
@@ -391,8 +426,9 @@ public class ClassType extends ObjectType implements AttrContainer {
 	    && argCount == method.getParameterTypes().length)
 	  {
 	    if (result != null)
-	      throw new Error("ambiguoys call to getDeclaredMethod(\""
-			      + name + "\", " + argCount);
+	      throw new Error("ambiguous call to getDeclaredMethod(\""
+			      + name + "\", " + argCount+
+			      ")\n - " + result + "\n - " + method);
 	    result = method;
 	  }
       }

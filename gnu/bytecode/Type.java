@@ -96,10 +96,17 @@ public abstract class Type {
       throw new Error("internal error - primitive type not found");
     else
       {
-	ClassType ctype = ClassType.make(reflectClass.getName());
+	String name = reflectClass.getName();
+	type = lookupType(name);
+	if (type == null)
+	  {
+	    ClassType cl = new ClassType(name);
+	    cl.flags |= ClassType.EXISTING_CLASS;
+	    type = cl;
+	    mapNameToType.put(name, type);
+	  }
 	if (reflectClass.isInterface())
-	  ctype.access_flags |= Access.INTERFACE;
-	type = ctype;
+	  ((ClassType) type).access_flags |= Access.INTERFACE;
       }
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
@@ -273,23 +280,10 @@ public abstract class Type {
   }
 
   /** Return true if this is a "subtype" of other. */
-  public boolean isSubtype (Type other)
+  public final boolean isSubtype (Type other)
   {
-    Class thisClass = getReflectClass();
-    Class otherClass = other.getReflectClass();
-    if (thisClass != null && otherClass != null)
-      return otherClass.isAssignableFrom(thisClass);
-    if (other == Type.pointer_type && this instanceof ObjectType)
-      return true;
-
-    if (this instanceof ClassType && other instanceof ClassType)
-      {
-	// If stackType inherits from target type, no coercion is needed.
-        return ((ClassType) this).isSubclass((ClassType) other);
-      }
-    // FIXME - also need to check for implemented interfaces!
-
-    return false;
+    int comp = compare(other);
+    return comp == -1 || comp == 0;
   }
 
   /**
@@ -334,15 +328,15 @@ public abstract class Type {
 
   /** Return a numeric code showing "subtype" relationship:
    *  1: if other is a pure subtype of this;
-   *  0: if has the same members;
+   *  0: if has the same values;
    * -1: if this is a pure subtype of other;
-   * -2: if both a member in common but neither is a subtype of the other;
+   * -2: if they have values in common but neither is a subtype of the other;
    * -3: if the types have no values in common.
    * "Same member" is rather loose;  by "A is a subtype of B"
    * we mean that all instance of A can be "widened" to B.
    * More formally, A.compare(B) returns:
    *  1: all B values can be converted to A without a coercion failure
-   *     (i.e. a ClassCastException), but not vice versa.
+   *     (i.e. a ClassCastException or overflow), but not vice versa.
    *  0: all A values can be converted to B without a coercion failure
    *     and vice versa;
    * -1: all A values can be converted to B without a coercion failure

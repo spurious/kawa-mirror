@@ -1,3 +1,19 @@
+2000-05-22  Per Bothner  <per@bothner.com>
+
+	* Filter.java:  New interface.
+	* Makefile.am (java_JAVA):  Add Filter.java.
+
+	* ClassType.java (addMethod):  Use existing method even if it
+	has extra access flags.
+	(getDeclaredMethods, getMethods):  New methods.
+
+	* Type.java (make(Class)):  If a regular class, set EXISTING_CLASS.
+	Bind reflectClass, but avoid calling Class.forName (runs <clinit>).
+
+	* Type.java (isSubType):  Make final.  Just call compare.
+	* ArrayType.java (compare):  To compare AraryTypes, compare elements.
+	* PrimType.java (compare):  Implement Java char->number widening rules.
+
 2000-05-09  Per Bothner  <per@bothner.com>
 
 	* Type.java (getType):  Class Class.forName to get reflectClass;

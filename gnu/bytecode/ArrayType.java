@@ -38,9 +38,8 @@ public class ArrayType extends ObjectType
 
   public int compare(Type other)
   {
-    // This is rather coarse .. FIXME
     if (other instanceof ArrayType)
-      return -2;
+      return elements.compare(((ArrayType) other).elements);
     else if (other.getName().equals("java.lang.Object"))
       return -1;
     else

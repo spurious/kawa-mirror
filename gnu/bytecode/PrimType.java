@@ -99,10 +99,10 @@ public class PrimType extends Type {
     if (sig1 == 'Z' || sig2 == 'Z')
       return -3;
 
-    // On the other hand, in Java this is not correct,
-    // but it is correct for Scheme.  FIXME.
-    if (sig1 == 'C' || sig2 == 'C')
-      return -3;
+    if (sig1 == 'C')
+      return type2.size > 2 ? -1 : -3;
+    if (sig2 == 'C')
+      return type1.size > 2 ? 1 : -3;
 
     if (sig1 == 'D')
       return 1;

@@ -40,5 +40,6 @@ Implement keyword and optional arguments as in DSSSL.
 
 Implement heapFrame, static link etc as references to objects,
 not arrays.  Make consistent with JDK1.1 inner classes extension.
+Better naming convention for inner lambdas. (I.e. fix kawa.lib.lambda.)
 
 Implement defmacro (as used by slib).

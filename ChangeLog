@@ -1,3 +1,67 @@
+Tue Mar 18 14:03:58 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in, configure:  Change VERSION to 1.3beta.
+
+	* kawa/lang/AutuloadSyntax.java (load):   Make more robust.
+
+	* kawa/standard/{greater_oper,greaterequal_oper,less_oper,
+	lessequal_oper}.java:  Generalize from RealNum to Numeric.	
+	* kawa/standard/equal_oper.java:  Use Numeric.compare, not equals.
+	* kawa/standard/Scheme.java (define-unit):  Fix location.
+
+Mon Mar 17 17:20:20 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* configure.in:  Add --with-jdk11 option.  Add new substitution
+	variables JAVA, JAVAC, EXTRA_OBJ, EXTR_MISC, JAVA_VERSION.
+
+	* kawa/lang/{PrimProcedure,PrimApplyExp}.java:  Generalize, for the
+	sake of primitive-constructor and primitive-interface-method.
+	* kawa/standard/prim_method.java:  Likewise.
+
+	* kawa/lang/Keyword.java:  New class, for keyword values.
+	* kawa/lang/Special.java:  New class, for special values.
+	* kawa/lang/Symbol.java:  Add new static print method overloading.
+	* kawa/lang/Sequence.java (eofValue):  Re-initialize as Special.eof.
+	* kawa/lang/Values.java (empty):  New static field, for #!void.
+	(print):  If printing Values.empty, print as #!void.
+	(make):  If no values, return Values.empty.
+	* kawa/lang/Interpreter (voidObject):  Redefine as Values.empty.
+	(nullObject):  Removed.
+	* kawa/lang/*.java:  Update Interpreter.nullObject -> List.Empty.
+	* kawa/standard/{string2list,vector2list}.java:  Likewise.
+	* kawa/lang/Translator.java (rewrite):  Treat null as any other
+	literal value.  (Needed to make #!null work.)
+	* kawa/lang/Char.java (charNames):  Make array of String, not Symbol.
+	* kawa/lang/InPort.java (readSymbol):  Modify to recognize keywords.
+	(readSpecial):  New function.
+	(readCharacter):  Assume charNames is String array.
+	* kawa/lang/SFormat.java (print):  Print null as #!null.
+	Remove special handling for StringBuffer (no longer used for strings).
+	
+	* kawa/lang/LambdaExp.java:  Support more general formal parameter
+	list (with DSSSL-inspired #!optional, #!rest or #!keyword).
+	* kawa/lang/Compilation.java (addClass(LambdaExp,String)):  Likewise.
+
+	* kawa/lang/{GetFieldProc,SetFieldProc,Record,RecordConstructor}.java:
+	New classes for record feature.
+	* kawa/lang/Makefile.{am,in}:  Update accordingly.
+	
+	* kawa/lang/{FString,Literal,SyntaxRule,SyntaxRules,Vector}.java:
+	Update for renamed compile_invoke_nonvirtual -> compile_invoke_special.
+
+	* kawa/langFString.java (print):  If !readable, just call
+	PrintStream.print (to get better autoflush behavior).
+	* kawa/lang/WrongArguments.java:  Simplify, make more robust.
+	* kawa/lang/QuoteExp.java (falseExp):  New static field.
+
+	* kawa/standard/ifp.java:  Make default else value be #!void.
+	* kawa/standard/{eof_object_p,exit,make_string,newline,
+	string_length}.java:  Removed - replaced by precedures in ../lib.
+	* kawa/standard/error.java:  New procedure (from DSSSL).
+	* kawa/standard/Scheme.java:  Update for new and moved procedures.
+	* kawa/standard/Makefile.{am,in}:  Likewise update.
+	* kawa/standard/values_v.java:  Use Values.make.
+	
 Sat Mar  8 11:00:24 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* kawa/lang/LambdaExp.java (hasNestedScopes):  Removed.  Replaced by:

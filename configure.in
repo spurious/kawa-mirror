@@ -1,7 +1,7 @@
 dnl Process this with autoconf to create configure
 AC_INIT(kawa/repl.java)
 
-AM_INIT_AUTOMAKE(kawa, 1.2)
+AM_INIT_AUTOMAKE(kawa, 1.3beta)
 
 AM_MAINTAINER_MODE
 

@@ -1,0 +1,33 @@
+package kawa;
+
+import kawa.lang.*;
+import java.io.Reader;
+
+/** A TtyInPort that reads from a MessageArea.
+  */
+
+class GuiInPort extends TtyInPort
+{
+  MessageArea buffer;
+
+  public GuiInPort (Reader in, String name, OutPort tie, MessageArea buffer)
+  {
+    super (in, name, tie);
+    this.buffer = buffer;
+  }
+
+  /** Overrides lineStart.
+    * Needed to handle when a multi-line selection is pasted in.
+    * We want the output (and prompt) to be "interpolated" in the right
+    * places, so we fake an <Enter> when we're ready to read the
+    * next line.  This sense the next line to the reader.
+    */
+  public void lineStart (boolean revisited) throws java.io.IOException
+  {
+    super.lineStart(revisited);
+    if (! revisited && buffer.outputMark < buffer.endMark)
+      {
+	buffer.enter();
+      }
+  }
+}

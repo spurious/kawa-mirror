@@ -53,13 +53,14 @@ public class GuiConsole extends Frame implements ActionListener {
 
     out_p = new OutPort(message.getStdout(),"<msg_stdout>");
     err_p = new OutPort(message.getStderr(),"<msg_stderr>");
-    InPort in_p = new TtyInPort(in_r, "<msg_stdin>", out_p);
+    InPort in_p = new GuiInPort(in_r, "<msg_stdin>", out_p, message);
 
     this.setLayout(new BorderLayout(0,0));
 
     this.add("Center",message);
 
     setupMenus();
+    //pack();
     setLocation(100 * window_number, 50 * window_number);
     setSize(700,500);
     setVisible(true);
@@ -141,8 +142,9 @@ public class GuiConsole extends Frame implements ActionListener {
       System.exit(0);
     else if (cmd.equals(CLOSE))
       close();
-    else if (cmd.equals(PURGE_MESSAGE))
-      message.setText("");
+    else if (cmd.equals(PURGE_MESSAGE)) {
+      message.deleteOldText();
+    }
     else
       OutPort.outDefault().println("Unknown menu action: "+cmd);
   }

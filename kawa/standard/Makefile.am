@@ -7,7 +7,7 @@ SUFFIXES = .java .class
 JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
 .java.class:
-	cd $(srcdir); $(JAVAC) $(<F)
+	cd $(srcdir); $(JAVAC) $*.java
 
 javadir=$(prefix)/java/kawa/standard
 
@@ -42,10 +42,15 @@ symbol2string.class \
 string2symbol.class \
 number_p.class \
 real_p.class \
+rational_p.class \
 integer_p.class \
+exact_p.class \
+inexact_p.class \
 zero_p.class \
 positive_p.class \
 negative_p.class \
+odd_p.class \
+even_p.class \
 equal_oper.class \
 less_oper.class \
 lessequal_oper.class \
@@ -56,6 +61,19 @@ minus_oper.class \
 multiply_oper.class \
 divide_oper.class \
 abs.class \
+numerator.class \
+denominator.class \
+exp.class \
+log.class \
+sin.class \
+cos.class \
+tan.class \
+asin.class \
+acos.class \
+atan.class \
+sqrt.class \
+expt.class \
+number2string.class \
 char_p.class \
 char_equal_p.class \
 char_less_p.class \
@@ -148,6 +166,8 @@ call_with_values.class \
 StandardInterpreter.class 
 
 java_DATA=$(OBJ)
+
+EXTRA_DIST = $(OBJ:.class=.java)
 
 CLEANFILES=$(OBJ)
 

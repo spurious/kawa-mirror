@@ -1,3 +1,11 @@
+2003-03-21  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set am__fastdepGCJ_TRUE in non-gcj case.
+	Remove kawa_bin variable.
+	* configure:  Re-generate using auoconf 2.57.
+	* aclocal.m4:  Re-generate using aclocal 1.7.3.
+	* */Makefile.in:  Re-generate using automake 1.7.3.
+
 2003-03-06  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Set version to 1.7beta1.

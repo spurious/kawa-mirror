@@ -94,6 +94,8 @@ case ${with_gcj} in
     JAVA=${JAVA-java}
     JAVAC=${JAVAC-javac}
     test "${with_awt}" = "" && with_awt=yes
+    dnl needed to match _AM_DEPENDENCIES
+    am__fastdepGCJ_TRUE='#'
     ;;
 esac
 
@@ -105,14 +107,6 @@ AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
 AM_CONDITIONAL(WITH_SAX2, test "$with_sax2" = "yes")
 AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
-
-if test $enable_kawa_frontend = yes ; then
-  if test "$with_gcj" = yes ; then
-    kawa_bin="kawa-bin kawa"
-  else
-    kawa_bin=kawa
-  fi
-fi
 
 case ${with_java_collections} in
   yes)
@@ -156,7 +150,6 @@ AC_SUBST(JAVAC)
 #These don't do anything, because Make-rules can't contain autoconf
 #substitutions.  Perhaps fix when new automake is out.
 #AC_SUBST(GCJ) AC_SUBST(GCJFLAGS)
-AC_SUBST(kawa_bin)
 AC_SUBST(XML_SELECTED)
 AC_SUBST(JAVA_COLLECTIONS_SELECTED)
 AC_SUBST(AWT_SELECTED)

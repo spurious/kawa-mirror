@@ -8,12 +8,12 @@ import gnu.kawa.lispexpr.ReadTable;
 
 public class BRL extends Scheme
 {
-  static BRL instance;
+  static BRL krl_instance;
+  static BRL brl_instance;
   static final Object emptyForm = new FString();
 
   public BRL ()
   {
-    instance = this;
     ModuleBody.setMainPrintValues(true);
     Environment.setCurrent(getEnvironment());
     try
@@ -30,22 +30,27 @@ public class BRL extends Scheme
 
   public static Language getInstance(boolean brlCompatible)
   {
-    if (instance == null)
-      new BRL ();
-    instance.setBrlCompatible(brlCompatible);
-    return instance;
+    return brlCompatible ? getBrlInstance() : getBrlInstance();
   }
 
   public static BRL getKrlInstance()
   {
-    getInstance(false);
-    return instance;    
+    if (krl_instance == null)
+      {
+        krl_instance = new BRL();
+        krl_instance.setBrlCompatible(false);
+      }
+    return krl_instance;
   }
 
   public static BRL getBrlInstance()
   {
-    getInstance(true);
-    return instance;    
+    if (brl_instance == null)
+      {
+        brl_instance = new BRL ();
+        brl_instance.setBrlCompatible(true);
+      }
+    return brl_instance;
   }
 
   boolean brlCompatible = false;

@@ -1,3 +1,8 @@
+Fri Jan 15 20:30:58 1999  Per Bothner  <bothner@cygnus.com>
+
+	* ApplyExp.java (compile):  Even if a function is inlined, we
+	need to call allocChildClasses.
+
 Wed Dec 23 13:51:35 1998  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	Literals in immediate mode are now allocated to fields (instead

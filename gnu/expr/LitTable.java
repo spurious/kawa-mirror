@@ -2,7 +2,7 @@ package gnu.expr;
 import java.io.*;
 import gnu.bytecode.*;
 import java.lang.reflect.Array;
-import java.util.Hashtable;
+import java.util.*;
 
 /** Manages the literals of a Compilation.
  * Implements ObjectOutput, because we use externalization to determine
@@ -13,7 +13,12 @@ public class LitTable implements ObjectOutput
   Compilation comp;
   ClassType mainClass;
 
-  Hashtable literalTable = new Hashtable (100);
+  /* #ifdef JAVA2 */ 
+  IdentityHashMap literalTable = new IdentityHashMap(100);
+  /* #endif */
+  /* #ifndef JAVA2 */ 
+  // Hashtable literalTable = new Hashtable(100);
+  /* #endif */
 
   static Hashtable staticTable =  new Hashtable (100);
 
@@ -165,6 +170,15 @@ public class LitTable implements ObjectOutput
   public void writeObject(Object obj) throws IOException
   {
     Literal lit = findLiteral(obj);
+
+    // Usually a no-op, but if the literalTable is a Hashtable (rather
+    // than an IdentityHashMap) then we might find a literal whose
+    // value is equals to obj, but not identical.  This can lead to trouble,
+    // e.g. if one is a Pair and the other is a PairWithPosition.
+    /* #ifndef JAVA2 */
+    obj = lit.value;
+    /* #endif */
+
     if ((lit.flags & (Literal.WRITTEN|Literal.WRITING)) != 0)
       {
 	// It is referenced more than once, so we we need a Field

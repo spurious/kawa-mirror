@@ -1,5 +1,9 @@
 2001-12-24  Per Bothner  <per@bothner.com>
 
+	* CountValues.java:  New class.
+	* WriteTo.java:  New class.
+	* Makefile.am (java_sources):  Add new classes.
+
 	* IsEq.java (compile):  Use ConditionalTarget's emitGotoFirstBranch.
 
 2001-12-24  Per Bothner  <per@bothner.com>

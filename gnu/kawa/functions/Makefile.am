@@ -10,6 +10,7 @@ java_sources=\
   Assoc.java \
   ConstantFunction0.java \
   Convert.java \
+  CountValues.java \
   DisplayFormat.java \
   DivideOp.java \
   IntegerFormat.java \
@@ -21,6 +22,7 @@ java_sources=\
   Member.java \
   Setter.java \
   ValuesMap.java \
+  WriteTo.java \
   ObjectFormat.java LispFormat.java ParseFormat.java Format.java 
 
 PACKAGE_FNAME = gnu-kawa-functions

@@ -23,12 +23,12 @@ public class SetExp extends Expression
 
   public final boolean isDefining ()
   {
-    return flags & DEFINING_FLAG;
+    return (flags & DEFINING_FLAG) != 0;
   }
 
   public final void setDefining (boolean value)
   {
-    if (flag)
+    if (value)
       flags |= DEFINING_FLAG;
     else
       flags &= ~DEFINING_FLAG;

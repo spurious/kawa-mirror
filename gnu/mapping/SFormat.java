@@ -76,10 +76,10 @@ public class SFormat // extends gnu.text.ReportFormat
 	  }
 	ps.print(')');
       }
-    else if (obj instanceof CharSequence)
+    else if (obj instanceof CharSeq)
       {
 	if (printReadable(ps))
-	  Strings.printQuoted((CharSequence) obj, ps, 0);
+	  Strings.printQuoted((CharSeq) obj, ps, 0);
 	else
 	  ps.print(obj);
       }

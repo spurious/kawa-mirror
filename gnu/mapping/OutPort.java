@@ -296,7 +296,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
     else if (v instanceof Consumable)
       ((Consumable) v).consume(this);
     else
-      super.print(v);
+      super.print(v == null ? "null" : v);
   }
 
   public void print(java.io.PrintWriter ps)

@@ -382,7 +382,11 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
     if (index < lenTypes && ! varArgs)
       return argTypes[index];
     // if (! varArgs) ERROR;
-    return ((ArrayType) argTypes[lenTypes - 1]).getComponentType();
+    Type restType = argTypes[lenTypes - 1];
+    if (restType instanceof ArrayType)
+      return ((ArrayType) restType).getComponentType();
+    else // Should be LList or some other Sequence class.
+      return Type.pointer_type;
   }
 
   // This is null in JDK 1.1 and something else in JDK 1.2.
@@ -429,20 +433,32 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
   getMethodFor (Class procClass, String name, Declaration decl,
                 Expression[] args, Interpreter interpreter)
   {
+    return getMethodFor((ClassType) Type.make(procClass),
+			name, decl, args, interpreter);
+  }
+
+  public static PrimProcedure
+  getMethodFor (ClassType procClass, String name, Declaration decl,
+                Expression[] args, Interpreter interpreter)
+  {
+    PrimProcedure best = null;
+    int bestCode = -1;
+    int nargs = args.length;
+    boolean bestIsApply = false;
+    Type[] atypes = new Type[nargs];
+    for (int i = nargs;  --i >= 0;) atypes[i] = args[i].getType();
     try
       {
-        java.lang.reflect.Method[] meths = procClass.getDeclaredMethods();
-        java.lang.reflect.Method best = null;
-        Class[] bestTypes = null;
         if (name == null)
           return null;
         String mangledName
 	  = decl == null || decl.field == null ? Compilation.mangleName(name)
 	  : decl.field.getName();
         String mangledNameV = mangledName + "$V";
-        for (int i = meths.length;  --i >= 0; )
+	boolean applyOk = true; // Also look for "apply" and "apply$V".
+	for (Method meth = procClass.getDeclaredMethods();
+	   meth != null;  meth = meth.getNext())
           {
-            java.lang.reflect.Method meth = meths[i];
             int mods = meth.getModifiers();
             if ((mods & (Access.STATIC|Access.PUBLIC))
                 != (Access.STATIC|Access.PUBLIC))
@@ -452,34 +468,66 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	      }
             String mname = meth.getName();
             boolean variable;
-            if (mname.equals("apply") || mname.equals(mangledName))
-              variable = false;
-            else if (mname.equals("apply$V") || mname.equals(mangledNameV))
-              variable = true;
+	    boolean isApply;
+	    if (mname.equals(mangledName))
+	      {
+		variable = false;
+		isApply = false;
+	      }
+            else if (mname.equals(mangledNameV))
+	      {
+		variable = true;
+		isApply = false;
+	      }
+	    else if (applyOk && mname.equals("apply"))
+	      {
+		variable = false;
+		isApply = true;
+	      }
+            else if (applyOk && mname.equals("apply$V"))
+	      {
+		variable = true;
+		isApply = true;
+	      }
             else
               continue;
-            Class[] ptypes = meth.getParameterTypes();
-            if (variable ? ptypes.length - 1 > args.length
-                : ptypes.length != args.length)
-              continue;
-            // In the future, we may try to find the "best" match.
-            if (best != null)
-              return null;
-            best = meth;
-            bestTypes = ptypes;
-          }
-        if (best != null)
-          {
-            PrimProcedure prproc = new PrimProcedure(best, procClass,
-						     bestTypes, interpreter); 
+	    if (! isApply)
+	      {
+		// If we saw a real match, ignore "apply".
+		applyOk = false;
+		if (bestIsApply)
+		  {
+		    best = null;
+		    bestCode = -1;
+		    bestIsApply = false;
+		  }
+	      }
+	    PrimProcedure prproc = new PrimProcedure(meth, interpreter);
 	    prproc.setName(name);
-            return prproc;
+	    int code = prproc.isApplicable(atypes);
+	    if (code < 0 || code < bestCode)
+	      continue;
+	    if (code > bestCode)
+	      {
+		best = prproc;
+	      }
+	    else if (best != null)
+	      {
+		best = (PrimProcedure) MethodProc.mostSpecific(best, prproc);
+		if (best == null)
+		  { // Ambiguous.
+		    if (bestCode > 0)
+		      return null;
+		  }
+	      }
+	    bestCode = code;
+	    bestIsApply = isApply;
           }
       }
     catch (SecurityException ex)
       {
       }
-    return null;
+    return best;
   }
 
   public String getName()

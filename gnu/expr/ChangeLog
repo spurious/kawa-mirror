@@ -1,3 +1,9 @@
+2002-08-04  Per Bothner  <per@bothner.com>
+
+	* PrimProcedure.java (getParameterType):  Handle <list> #!rest type.
+	(getMethodFor):  New overload, takes ClassType rather than Class.
+	Looks for most specific definitely applicable method.
+
 2002-07-25  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compile):  Pass this to InlineCalls.

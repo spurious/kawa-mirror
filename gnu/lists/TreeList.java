@@ -371,15 +371,17 @@ implements Consumer, PositionConsumer, Consumable
   /** Get a 32-bit int from the data array. */
   final protected int getIntN(int index)
   {
-    return (data[index] << 16) | (data[index + 1]);
+    return (data[index] << 16) | (data[index + 1] & 0xFFFF);
   }
 
   /** Get a 64-bit long from the data array. */
   final protected long getLongN(int index)
   {
     char[] data = this.data; // Optimization.
-    return ((data[index] << 48) | (data[index+1] << 32)
-	    | (data[index+2] << 16) | data[index + 3]);
+    return (data[index] & 0xFFFFL) << 48
+      | (data[index+1] & 0xFFFFL) << 32
+      | (data[index+2] & 0xFFFFL) << 16
+      | (data[index+3] & 0xFFFFL);
   }
 
   final public void setIntN(int index, int i)

@@ -1,4 +1,4 @@
-(test-init "macros" 12)
+(test-init "macros" 14)
 
 (test 'ok 'letxx (let ((xx #f)) (cond (#t xx 'ok))))
 
@@ -88,3 +88,11 @@
     (define x (ten))
     x))
 (test 10 internal-define-syntax)
+
+;; Based on bug report from Stephen L. Peters <portnoy@portnoy.org>:
+(define-syntax test-ds1 (syntax-rules () ((test-ds1 x) (list 'x))))
+(test '((t1)) 'test-ds1 (test-ds1 (t1)))
+(test '((t2)) 'test-ds2
+      (begin
+	(define-syntax test-ds2 (syntax-rules () ((test-ds2 x) (list 'x))))
+	(test-ds2 (t2))))

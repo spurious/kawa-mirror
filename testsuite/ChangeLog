@@ -1,3 +1,8 @@
+2002-08-22  Per Bothner  <per@bothner.com>
+
+	* mac-test.scm :  New test cases based on bug report from
+	 Stephen L. Peters <portnoy@portnoy.org>.
+
 2002-08-07  Per Bothner  <per@bothner.com>
 
 	* module2.scm (make-pair):  New definition.  This tests a bug

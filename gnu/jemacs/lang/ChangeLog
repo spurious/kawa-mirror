@@ -1,3 +1,9 @@
+2001-06-19  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Use SymbolTable.make.
+	* ELisp.java (<init>):  Fix initialization of t and nil.
+	* lambda.java (rewriteBody): "interactive" symbol can be Binding.
+
 2001-06-17  Per Bothner  <per@bothner.com>
 
 	* ELisp.java:  Change to extend Lisp2.

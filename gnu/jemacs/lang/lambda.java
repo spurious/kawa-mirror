@@ -27,7 +27,7 @@ public class lambda extends Lambda
     Object interactive = null;
     if (body instanceof Pair
 	&& (pair = (Pair) body).car instanceof Pair
-	&& ((Pair) pair.car).car == "interactive")
+	&& ((Pair) pair.car).car.toString() == "interactive")
       {
 	interactive = ((Pair) pair.car).cdr;
 	if (interactive != LList.Empty

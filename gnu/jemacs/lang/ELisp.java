@@ -72,10 +72,12 @@ public class ELisp extends Lisp2
       }
     catch (java.lang.ClassNotFoundException ex)
       {
+	ex.printStackTrace();
 	throw ex;
       }
     catch (Exception ex)
       {
+	ex.printStackTrace();
 	throw new WrappedException(ex);
       }
   }
@@ -100,9 +102,13 @@ public class ELisp extends Lisp2
 
   public ELisp()
   {
-    environ = new SymbolTable();
-    environ.setName ("interaction-environment."+(++elispCounter));
+    Environment scmEnv = Scheme.builtin();
+    environ = SymbolTable.make("interaction-environment."+(++elispCounter));
     Environment.setCurrent(environ);
+
+    TRUE = environ.getBinding("t");
+    TRUE.set(TRUE);
+    define("nil", FALSE);
 
     BindingEnumeration e
       = Scheme.getInstance().builtin().enumerateAllBindings();
@@ -138,8 +144,6 @@ public class ELisp extends Lisp2
 	// Ignore - happens while building this directory.
       }
 
-    define("t", "t");
-    define("nil", "nil");
     defun(AddOp.$Pl); // "+"
     defun(AddOp.$Mn); // "-"
     defun(DivideOp.$Sl); // "/"

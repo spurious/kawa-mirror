@@ -1,3 +1,7 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* Type.java (setReflectClass): New method.
+
 2004-12-25  Per Bothner  <per@bothner.com>
 
 	* SourceDebugExtAttr.java (addFile): Clear curLineIndex "cache".

@@ -463,6 +463,11 @@ public abstract class Type {
     return reflectClass;
   }
 
+  public void setReflectClass(java.lang.Class rclass)
+  {
+    reflectClass = rclass;
+  }
+
   public String toString()
   {
     return "Type " + getName();

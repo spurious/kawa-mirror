@@ -14,6 +14,8 @@ public class force extends Procedure1
   {
     if (arg1 instanceof Promise)
       return ((Promise)arg1).force ();
+    if (arg1 instanceof Future)
+      return ((Future)arg1).waitForResult ();
     return arg1;
   }
 }

@@ -384,6 +384,10 @@ public class Scheme extends Interpreter
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");
       define_proc ("make-quantity", "kawa.standard.make_quantity");
+
+      define_syntax ("future", "kawa.lib.thread");
+      define_proc ("%make-future", "kawa.standard.make_future");
+      define_proc ("sleep", "kawa.standard.sleep");
    }
 
   /** Evalutate Scheme expressions from string.

@@ -42,7 +42,7 @@ public class LineBufferedReader extends FilterReader
   // Notice the asymmetry in how "X\r\nY" is handled (assuming convertCR)..
   // When we read forward, the positions are 0, 1, 2, 4.
   // After seeing the '\r', we do not read ahead to look for a '\n'
-  // because if we did, and there were no '\n', terminal input would hand.
+  // because if we did, and there were no '\n', terminal input would hang.
   // The (lineNumber, lineStartPos) goes (0,0), (0,0), (0,0), (1,3).
   // However, the methods (getLineNumber(), getColumnNumber())
   // return the external values (0:0), (0:1), (1:0), (1:1).
@@ -80,7 +80,7 @@ public class LineBufferedReader extends FilterReader
     * one (and are therefore allowed by unread back to the old line),
     * the current line is still the old line; lineStartPos does not
     * get set to the new pos until we read/peek the first char of the new line.
-    * If lineStartPos < 0, if means we went beyond the buffer maximum. */
+    * If lineStartPos < 0, it means we went beyond the buffer maximum. */
   int lineStartPos;
 
   String name;
@@ -399,6 +399,57 @@ public class LineBufferedReader extends FilterReader
     readAheadLimit = 0;
   }
 
+  /** Read a line.
+   * If mode is 'I' ("ignore") ignore delimiters.
+   * If mode is 'P' ("peek") leave delimiter in input stream.
+   * If mode is 'A' ("append") append delimiter to result.
+   */
+
+  public void readLine(StringBuffer sbuf, char mode)
+    throws IOException
+  {
+    for (;;)
+      {
+	int ch = read();
+	if (ch < 0)
+	  return;
+        int start = --pos;
+        while (pos < limit)
+          {
+            ch = buffer[pos++];
+	    if (ch == '\r' || ch == '\n')
+              {
+                sbuf.append(buffer, start, pos - 1 - start);
+                if (mode == 'P')
+                  {
+                    pos--;
+                    return;
+                  }
+                if (getConvertCR () || ch == '\n')
+                  {
+                    if (mode != 'I')
+                      sbuf.append('\n');
+                  }
+                else
+                  {
+                    if (mode != 'I')
+                      sbuf.append('\r');
+                    ch = read();
+                    if (ch == '\n')
+                      {
+                        if (mode != 'I')
+                          sbuf.append('\n');
+                      }
+                    else if (ch >= 0)
+                      unread_quick();
+                  }
+                return;
+              }
+          }
+	sbuf.append(buffer, start, pos - start);
+      }
+  }
+
   public String readLine() throws IOException
   {
     int ch = read();
@@ -411,26 +462,23 @@ public class LineBufferedReader extends FilterReader
       {
 	ch = buffer[pos++];
 	if (ch == '\r' || ch == '\n')
-	  return new String(buffer, start, pos - 1 - start);
+          {
+            if (ch != '\n' && ! getConvertCR())
+              {
+                if (pos >= limit)
+                  {
+                    pos--;
+                    break;
+                  }
+                if (buffer[pos] == '\n')
+                  pos++;
+              }
+            return new String(buffer, start, pos - start);
+          }
       }
-    StringBuffer sbuf = new StringBuffer(200);
-  main_loop:
-    for (;;)
-      {
-	sbuf.append(buffer, start, pos);
-	ch = read();
-	if (ch < 0 || ch == '\r' || ch == '\n')
-	  break;
-	for (start = pos - 1;  pos < limit; )
-	  {
-	    ch = buffer[pos++];
-	    if (ch == '\r' || ch == '\n')
-	      {
-		sbuf.append(buffer, start, pos - 1);
-		break main_loop;
-	      }
-	  }	       
-      }
+    StringBuffer sbuf = new StringBuffer(100);
+    sbuf.append(buffer, start, pos);
+    readLine(sbuf, 'I');
     return sbuf.toString();
   }
 

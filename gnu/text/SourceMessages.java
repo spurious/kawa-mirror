@@ -112,7 +112,7 @@ public class SourceMessages
     return buffer.toString();
   }
 
-  /** Returns true if any error were seen.  Prints and clears the messages
+  /** Returns true if an error was seen.  Prints and clears the messages.
    * @param out where to write the error message to
    * @param max maximum number of messages to print (can be 0) */
   public boolean checkErrors(java.io.PrintWriter out, int max)
@@ -121,8 +121,25 @@ public class SourceMessages
       {
 	printAll(out, max);
 	firstError = lastError = null;
+        int saveCount = errorCount;
 	errorCount = 0;
-	return true;
+	return saveCount > 0;
+      }
+    return false;
+  }
+
+  /** Returns true if an error was seen.  Prints and clears the messages
+   * @param out where to write the error message to
+   * @param max maximum number of messages to print (can be 0) */
+  public boolean checkErrors(java.io.PrintStream out, int max)
+  {
+    if (firstError != null)
+      {
+	printAll(out, max);
+	firstError = lastError = null;
+        int saveCount = errorCount;
+	errorCount = 0;
+	return saveCount > 0;
       }
     return false;
   }

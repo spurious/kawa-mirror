@@ -1,3 +1,12 @@
+1999-09-05  Per Bothner  <per@bothner.com>
+
+	* LineBufferedReader.java (readLine):  New overloaded version.
+
+	* SourceMessages.java (checkErrors):  New method overloading.
+	For both versions, do not return true if only warnings were seen.
+
+	* LispReader.java (readEscape):  Move here from ELispReader.
+
 1999-06-30  Per Bothner  <per@bothner.com>
 
 	* PadFormat.java (format):  Trivial optimization.

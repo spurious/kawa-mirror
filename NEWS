@@ -1,3 +1,10 @@
+A new compilation flag --servlet generates a Servlet which can be
+deployed in a servlet engin like Tomcat.  This is experimental,
+but it seesm to work for both Scheme source and XQuery source.
+
+The interface gnu.lists.CharSequence was renamed to avoid conflitcs
+with the (similar) interface java.lang.CharSequence in JDK 1.4beta.
+
 New --help option (contributed by Andreas Schlapbach).
 
 Changed the code generation used when --full-tailcalls.  It now is

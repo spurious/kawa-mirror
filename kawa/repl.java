@@ -83,6 +83,7 @@ public class repl extends Procedure0or1
     
     out.println(" --main                    Generate an application, with a main method");
     out.println(" --applet                  Generate an applet");
+    out.println(" --servlet                 Generate a servlet");
     out.println(" --module-static           Top-leval definitions are by default static");
     out.println();
     out.println("For more information go to:  http://www.gnu.org/software/kawa/");
@@ -342,6 +343,10 @@ public class repl extends Procedure0or1
 	    else if (arg.equals("--applet"))
 	      {
 		Compilation.generateAppletDefault = true;
+	      }
+	    else if (arg.equals("--servlet"))
+	      {
+		Compilation.generateServletDefault = true;
 	      }
 	    else if (arg.equals("--debug-dump-zip"))
 	      {

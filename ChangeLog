@@ -1,3 +1,13 @@
+2001-10-11  Per Bothner  <per@bothner.com>
+
+	* configure.in:  Set version to 1.6.96.
+
+	* confgure.in:  New --enable-servlet flag.
+	(ENABLE_SERVLET):  New automake conditional.
+	(AC_OUTPUT):  Add gnu/kawa/servlet/Makefile.
+	* gnu/kawa/Makefile.am (SUBDIRS):  Add servlet if ENABLE_SERVLET.
+	* kawa.repl:  Handle --servlet option.
+	
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (getNamedType):  Update "abstract-string"

@@ -9,7 +9,7 @@ import gnu.mapping.*;
 import java.io.*;
 
 /**
- * Represents an "expanded QName" - i.e. a (namepaceURI, localPart)-pair.
+ * Represents an "expanded QName" - a (namepaceURI, localPart)-pair.
  * Also stores namespace prefix used in lexical form, but prefix
  * is ignored for <code>equals</code>.
  * If configured to use JAXP 1.3, then this class extends

@@ -57,7 +57,7 @@ public final class NamespaceBinding implements Externalizable
 
   /** Resolve a prefix, in the initial part of this list.
    * @param prefix an interned namespace prefix to search for.
-   * @param fencPost only search this list until then.
+   * @param fencePost only search this list until then.
    * @return a uri or null if not bound
    */
   public String resolve (String prefix, NamespaceBinding fencePost)

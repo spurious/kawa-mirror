@@ -87,6 +87,9 @@ public class prim_method extends Syntax
       }
     else
       {
+	Pair p;
+	if (match[1] instanceof Pair && (p = (Pair) match[1]).car == "quote")
+	  match[1] = ((Pair) p.cdr).car;
 	ClassType cl = (ClassType) exp2Type(match[0], tr);
 	proc = new PrimProcedure(op_code, cl, match[1].toString(), rtype,args);
       }

@@ -11,47 +11,77 @@ import gnu.kawa.util.*;
 
 public class fluid_let extends Syntax implements Printable
 {
+  /** True if bindings should be evaluated sequentionally, as in ELisp let*. */
+  boolean star;
+
+  /** Value to use if an initial value is not specified.
+   * Null means use the existing binding. */
+  Expression defaultInit;
+
+  public fluid_let(boolean star, Expression defaultInit)
+  {
+    this.star = star;
+    this.defaultInit = defaultInit;
+  }
+
+  public fluid_let()
+  {
+    this.star = false;
+  }
+
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))
       return tr.syntaxError ("missing let arguments");
     Pair pair = (Pair) obj;
-    Object bindings = pair.car;
-    Object body = pair.cdr;
-    int decl_count = LList.length (bindings);
+    return rewrite(pair.car, pair.cdr, tr);
+  }
+
+  public Expression rewrite (Object bindings, Object body, Translator tr)
+  {
+    int decl_count = star ? 1 : LList.length (bindings);
     Expression[] inits = new Expression[decl_count];
     FluidLetExp let = new FluidLetExp (inits);
     for (int i = 0; i < decl_count; i++)
       {
 	Pair bind_pair = (Pair) bindings;
-	if (! (bind_pair.car instanceof Pair))
-	  return tr.syntaxError ("fluid-let binding is not a pair");
-	Pair binding = (Pair) bind_pair.car;
-	if (! (binding.car instanceof String))
-	  return tr.syntaxError("variable in fluid-let binding is not a symbol");
-	String name = (String) binding.car;
+	String name;
+	Expression value;
+	Pair binding;
+	if (bind_pair.car instanceof String)
+	  {
+	    name = (String) bind_pair.car;
+	    value = defaultInit;
+	  }
+	else if (bind_pair.car instanceof Pair
+		 && (binding = (Pair) bind_pair.car).car instanceof String)
+	  {
+	    name = (String) binding.car;
+	    if (binding.cdr == LList.Empty)
+	      value = defaultInit;
+	    else if (! (binding.cdr instanceof Pair)
+		     || (binding = (Pair) binding.cdr).cdr != LList.Empty)
+	      return tr.syntaxError("bad syntax for value of " + name
+				    + " in " + getName());
+	    else
+	      value = tr.rewrite (binding.car);
+	  }
+	else
+	  return tr.syntaxError("invalid " + getName() + " syntax");
 	Declaration decl = let.addDeclaration(name);
 	decl.setFluid(true);
 	decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
-	Expression value;
-	if (binding.cdr == LList.Empty)
+	if (value == null)
 	  value = new ReferenceExp(name);
-	else if (! (binding.cdr instanceof Pair))
-	  return tr.syntaxError("fluid-let has no value for `"+name+"'");
-	else
-	  {
-	    binding = (Pair) binding.cdr;
-	    if (binding.cdr != LList.Empty)
-	      return tr.syntaxError("let binding for `" + name
-				    + "' is improper list");
-	    value = tr.rewrite (binding.car);
-	  }
 	inits[i] = value;
 	decl.noteValue (value);
 	bindings = bind_pair.cdr;
       }
     tr.push(let);
-    let.body = tr.rewrite_body(body);
+    if (star && bindings != LList.Empty)
+      let.body = rewrite (bindings, body, tr);
+    else
+      let.body = tr.rewrite_body(body);
     tr.pop(let);
     return let;
   }

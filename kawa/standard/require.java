@@ -58,7 +58,7 @@ public class require extends Syntax
     boolean immediate = tr.immediate && defs instanceof ModuleExp;
     Object name = ((Pair) st.cdr).car;
     // Type type = Scheme.expType(tr.rewrite(name));
-    Type type;
+    Type type = null;
     Pair p;
     if (name instanceof Pair && (p = (Pair) name).car == "quote")
       {
@@ -79,7 +79,28 @@ public class require extends Syntax
 	type = ClassType.make((String) name);
       }
     else
-      type = prim_method.exp2Type(name, tr);
+      {
+	if (name instanceof String)
+	  {
+	    String str = (String) name;
+	    int len = str.length();
+	    if (len > 2
+		&& str.charAt(0) == '<'
+		&& str.charAt(len-1) == '>')
+	      {
+		str = str.substring(1, len-1);
+		if (str.indexOf('.') < 0
+		    && kawa.repl.compilationPrefix != null)
+		  str = kawa.repl.compilationPrefix + str;
+		type = Scheme.string2Type(str);
+	      }
+	  }
+      }
+    if (type == null)
+      {
+	tr.error('e', "invalid specifier for `require'");
+	return false;
+      }
     String tname = type.getName();
     Object instance = null;
     ClassType t = (ClassType) type;

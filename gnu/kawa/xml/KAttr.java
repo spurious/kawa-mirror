@@ -26,6 +26,12 @@ public class KAttr extends KNode
     return getNodeValue();
   }
 
+  /** Get attribute value as (typed) Object, rather than string. */
+  public Object getObjectValue ()
+  {
+    return sequence.getPosNext(ipos+10);
+  }
+
   public void setValue (String value)
     throws DOMException
   {

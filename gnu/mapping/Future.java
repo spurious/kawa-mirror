@@ -13,16 +13,27 @@ public class Future extends Thread
   OutPort err;
   Exception exception;
 
-  Procedure0 action;
+  Procedure action;
 
-  public Future (Procedure0 action, Environment environment)
+  public Future (Procedure action, Environment environment)
   {
     this.action = action;
     Thread parent_thread = Thread.currentThread();
     this.environment = environment;
   }
 
-  public Future (Procedure0 action)
+  public Future (Procedure action, Environment environment,
+		 InPort in, OutPort out, OutPort err)
+  {
+    this.action = action;
+    Thread parent_thread = Thread.currentThread();
+    this.environment = environment;
+    this.in = in;
+    this.out = out;
+    this.err = err;
+  }
+
+  public Future (Procedure action)
   {
     this.action = action;
     in = InPort.inDefault();

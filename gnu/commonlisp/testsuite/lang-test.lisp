@@ -1,4 +1,4 @@
-(test-init "Common Lisp tests" 4)
+(test-init "Common Lisp tests" 5)
 
 (setq y 100)
 (defun foo1 (x)
@@ -6,6 +6,10 @@
     (/ x y)))
 (defvar foo12 (foo1 12))
 (test 4 'lexical-test-1 (apply foo12 '(3)))
+
+(defvar xx 20)
+(defun xx (a) (+ xx a))
+(test 24 'separate-names-1 (xx 4))
 
 ;(test t 'eq-test-1 (eq t 't))
 

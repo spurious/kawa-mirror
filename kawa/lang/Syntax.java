@@ -31,27 +31,6 @@ abstract public class Syntax extends Named implements Printable
     return rewrite(form.cdr, tr);
   }
 
-  /*
-  public Expression apply(SyntaxForm form)
-  {
-    return rewriteForm((Pair) form.form, form.tr);
-  }
-
-  public Object apply1(Object arg)
-  {
-    SyntaxForm form;
-    try
-      {
-        form = (SyntaxForm) arg;
-      }
-    catch (ClassCastException ex)
-      {
-        throw WrongType.make(ex, this, 0);
-      }
-    return apply(form);
-  }
-  */
-
   public void print(java.io.PrintWriter ps)
   {
     ps.print("#<syntax ");

@@ -46,6 +46,7 @@ AutoloadSyntax.java \
 CompileFile.java \
 loadcompiled.java \
 SpecialType.java \
+SyntaxForm.java \
 PrimGetStatic.java PrimSetStatic.java InvokeStatic.java \
 PrimArrayNew.java PrimArrayLength.java PrimArraySet.java PrimArrayGet.java\
 Promise.java \

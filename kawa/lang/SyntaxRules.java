@@ -19,8 +19,6 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
   /* The largest (num_variables+template_identifier.length) for any rule. */
   int maxVars = 0;
 
-  static public String syntaxRulesSymbol = "syntax-rules"; // OBSOLETE
-
   private void calculate_maxVars ()
   {
     for (int i = rules.length;  --i >= 0; )

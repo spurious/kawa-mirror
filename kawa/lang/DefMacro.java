@@ -5,8 +5,13 @@ import gnu.bytecode.*;
 
 public class DefMacro extends Macro
 {
-  Expression lexp;
+  /** Procedure that gets evaluated to expand macro application. */
   Procedure expander;
+
+  /** Expression that evaluates to expander.
+   * We may need this if the expander is a lambda expression in the current
+   * compilation unit.  (Support for this is incomplete.) */
+  Expression lexp;
 
   public static ClassType thisType;
   static public Method makeMethod;
@@ -28,17 +33,6 @@ public class DefMacro extends Macro
   {
     this.expander = expander;
   }
-
-  /*
-  public DefMacro (String name, Procedure expander)
-  {
-    String sym = Symbol.make(name);
-    this.setName(sym);
-    expander.setName(sym);
-    this.expander = expander;
-    Environment.define_global(sym, this);
-  }
-  */
 
   public static DefMacro make (String name, Procedure expander)
   {

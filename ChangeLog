@@ -1,3 +1,37 @@
+2000-02-01  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (defaultInterpreter):  Static field moved
+ 	to Interpreter.  Updated various uses.
+	* kawa/lang/Interpreter.java:  Moved gnu.expr.
+	* kawa/GuiConsole.java:  Update import statement accordingly.
+	* kawa/lang/Makefile.am (java_JAVA):  Removed Interpreter.java.
+
+	* kawa/lang/Translator.java (getrBinding, rewrite_pair):
+	Call Binding's getFunctionValue method.
+
+	* kawa/standard/{char_ready_p.java,eqv_p.java,exact_p.java,
+	inexact_p.java,integer_p.java,positive_p.java}:
+  	Use Boolean.TRUE/Boolean.FALSE rather than Interpreter.boolObject.
+	* kawa/standard/{string_ci_equal_p.java,string_ci_greaterequal_p.java,
+	string_ci_greaterthan_p.java,string_ci_lessequal_p.java,
+	string_ci_lessthan_p.java,string_greaterequal_p.java,
+	string_greaterthan_p.java,string_lessequal_p.java;
+	kawa/standard/string_lessthan_p.java}:  Likewise.
+	(apply)  New static method.
+	* kawa/standard/{write.java,writechar.java}:  Use Scheme.voidObject
+	instead of Interpreter.voidObject.
+	* kawa/standard/not.java (interpreter):  New field.
+	(apply1):  Use interpreter.booleanObject.
+	* kawa/standard/and_or.java (interpreter):  New field.
+	(rewrite):  Use interpreter.booleanObject.
+
+	* kawa/standard/Scheme.java:  Rename fields to Java conventions:
+ 	(null_environment):  Renamed to nullEnvironment.
+ 	(r4_environment):  Renamed to r4Environment.
+ 	(r5_environment):  Renamed to r5Environment.
+ 	(kawa_environment):  Renamed to kawaEnvironment.
+	* kawa/standard/scheme_env.java (apply1):  Update accordingly.
+
 2000-01-24  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/ScmRead.java: Add #!undefined->Interpreter.undefinedObject.

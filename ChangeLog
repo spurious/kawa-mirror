@@ -1,3 +1,27 @@
+Fri Jan  3 17:35:43 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* kawa/lang/ModuleExp.java:  New class.
+	* kawa/lang/Makefile.{am,in}:  Update accordingly.
+	* kawa/lang/ModuleBody.java (env_formal, formals):  Moved to ModuleExp.
+	* kawa/lang/LambdaExp.java (is_module_body):  Field removed.
+	(isModuleBody):  Reimplement as instanceof ModuleExp.
+	(setModuleBody):  Removed.
+	(constructors):  Remove one, simplify another.
+	* kawa/lang/{CompileFile,Eval}.java:  Create ModuleExp, not LambdaExp.
+	* kawa/Shell.java (run):  Likewise.
+	
+	* kawa/lang/InPort.java (readSchemeReal):  New.
+	(readSchemeNumber):  Re-write.  Add support for complex and units.
+ 	(readAlphaWord, readOptionalExponent):  New helper methods.
+
+	* kawa/standard/equal_oper.java:  Just use equals method.
+	* kawa/standard/expt.java:  Use new Numeric.power(IntNum) virtual.
+	* kawa/standard/integer_p.java:  Handle integral DFloNum.
+
+	* kawa/standard/{complex_p,imag_part,make_quantity,make_rectangular,
+	quantity2number,quantity2unit,quantity_p,real_part}.java:  New.
+	* kawa/standard/{Makefile.{am,in},Scheme.java}:  Update accordingly.
+
 Sun Dec 15 22:29:30 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure, configure.in:  Support new testsuite directory.

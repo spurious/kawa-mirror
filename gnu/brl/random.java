@@ -9,7 +9,6 @@ import gnu.mapping.Procedure1;
 import gnu.mapping.WrongType;
 import gnu.mapping.InPort;
 import gnu.math.*;
-import java.io.*;
 
 public class random extends Procedure1 {
 

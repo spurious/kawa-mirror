@@ -104,7 +104,7 @@ public class define extends Syntax implements Printable
 	    decl = (Declaration) p1.car;
 	    Pair p2 = (Pair) p1.cdr;
 	    Pair p3;
-	    if ("::" == p2.car && p2.cdr instanceof Pair
+	    if (tr.matches(p2.car, "::") && p2.cdr instanceof Pair
 		&& (p3 = (Pair) p2.cdr).cdr instanceof Pair)
 	      {
 		decl.setType(kawa.standard.prim_method.exp2Type(p3.car, tr));

@@ -1,3 +1,9 @@
+2002-07-24  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (matches):  New method.
+	* kawa/standard/define.java (rewriteForm):  Use new matches method.
+	* kawa/standard/let.java (write):  Likewise.
+
 2002-07-21  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/map.java (inline):  Take extra ExpWalker parameter.

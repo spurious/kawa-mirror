@@ -128,6 +128,19 @@ public class Translator extends Parser
 
   private String nameToLookup;
 
+  /** True iff a form matches a literal symbol. */
+  public boolean matches(Object form, String literal)
+  {
+    if (! literal.equals(form))
+      return false;
+    Binding binding = environ.lookup(literal);
+    if (binding == null || ! binding.isBound())
+      return true;
+    Object val1 = binding.getValue();
+    // Check for hygiene re-naming - see SyntaxRule.execute_template.
+    return val1 == literal;
+  }
+
   Binding lookup(Object obj)
   {
     String name = obj.toString();

@@ -41,7 +41,7 @@ public class let extends Syntax implements Printable
 	Declaration decl = let.addDeclaration(name);
 	binding = (Pair) binding.cdr;
 	Object init;
-	if ("::" == binding.car) // && "::" is unbound FIXME
+	if (tr.matches(binding.car, "::"))
 	  {
 	    if (! (binding.cdr instanceof Pair)
 		|| (binding = (Pair) binding.cdr).cdr == LList.Empty)

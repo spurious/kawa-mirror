@@ -150,6 +150,84 @@ public class repl
 	      }
 	    return;
 	  }
+	else if (arg.equals("--connect"))
+	  {
+	    ++iArg;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    int port;
+	    if (args[iArg].equals("-"))
+	      port = 0;
+	    else
+	      {
+		try
+		  {
+		    port = Integer.parseInt(args[iArg]);
+		  }
+		catch (NumberFormatException ex)
+		  {
+		    bad_option ("--server port#");
+		    port = -1; // never seen.
+		  }
+	      }
+	    try
+	      {
+		java.net.Socket socket = new java.net.Socket("localhost",port);
+		TelnetConnection conn = new TelnetConnection(socket, true);
+		java.io.InputStream sin = conn.getInputStream();
+		java.io.OutputStream sout = conn.getOutputStream();
+		java.io.PrintStream pout = new PrintStream (sout, true);
+		System.setIn(sin);
+		System.setOut(pout);
+		System.setErr(pout);
+	      }
+	    catch (java.io.IOException ex)
+	      {
+		ex.printStackTrace(System.err);
+		throw new Error(ex.toString());
+	      }
+	  }
+	else if (arg.equals("--server"))
+	  {
+	    ++iArg;
+	    if (iArg == args.length)
+	      bad_option (arg);
+	    int port;
+	    if (args[iArg].equals("-"))
+	      port = 0;
+	    else
+	      {
+		try
+		  {
+		    port = Integer.parseInt(args[iArg]);
+		  }
+		catch (NumberFormatException ex)
+		  {
+		    bad_option ("--server port#");
+		    port = -1; // never seen.
+		  }
+	      }
+	    try
+	      {
+		java.net.ServerSocket ssocket
+		  = new java.net.ServerSocket(port);
+		port = ssocket.getLocalPort();
+		System.err.println("Listening on port "+port);
+		for (;;)
+		  {
+		    System.err.print("waiting ... ");  System.err.flush();
+		    java.net.Socket client = ssocket.accept();
+		    System.err.println("got connection from "
+				       +client.getInetAddress()
+				       +" port:"+client.getPort());
+		    serveTelnet(client);
+		  }
+	      }
+	    catch (java.io.IOException ex)
+	      {
+		throw new Error(ex.toString());
+	      }
+	  }
 	else if (arg.equals("--main"))
 	  {
 	    Compilation.generateMainDefault = true;
@@ -186,4 +264,28 @@ public class repl
 	Shell.run(interp);
       }
    }
+
+  /** Run a Kawa repl as a telnet server.
+      @param client A client that has connected to us,
+      and that wants to use the telnet protocol to talk to a
+      Scheme read-eval-print-loop. */
+  static void serveTelnet (java.net.Socket client) throws java.io.IOException
+  {
+    TelnetConnection conn = new TelnetConnection(client, true);
+    java.io.OutputStream sout = conn.getOutputStream();
+    java.io.InputStream sin = conn.getInputStream();
+    OutPort out = new OutPort(sout);
+    TtyInPort in = new TtyInPort(sin, "<stdin>", out);
+    /*
+    conn.request(TelnetConnection.DO, TelnetConnection.NAWS);
+    conn.request(TelnetConnection.DO, TelnetConnection.TTYPE);
+    conn.request(TelnetConnection.DO, TelnetConnection.LINEMODE);
+    */
+
+    Interpreter my_interp = new Scheme();
+    Shell shell = new Shell(my_interp, in, out, out);
+    shell.socket = client;
+    Thread thread = new Future(shell, my_interp.getEnvironment());
+    thread.start();
+  }
 }

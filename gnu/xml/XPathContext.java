@@ -163,6 +163,21 @@ public class XPathContext
       }
   }
 
+  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos)
+  {
+    switch (consumeKind)
+      {
+      case CONSUME_COUNT:
+	consumeCount++;
+	return true;
+      case CONSUME_BOOL:
+	consumeCount = 1;
+	return false;
+      default:
+	throw new Error("unknown consumeKind");
+      }
+  }
+
   public void setVariableProvider(VariableProvider newProvider)
   {
     variableProvider = newProvider;

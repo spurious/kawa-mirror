@@ -50,15 +50,22 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     names[depth++] = name;
   }
 
+  boolean inAttribute;
+
   public void emitBeginAttribute(char[] data, int start, int count)
   {
+    if (inAttribute)
+      out.endAttribute();
     String name = new String(data, start, count);
     out.beginAttribute(name, name);
+    inAttribute = true;
   }
 
   public void emitEndAttributes()
   {
-    out.endAttributes();
+    if (inAttribute)
+      out.endAttribute();
+    inAttribute = false;
   }
 
   public void emitEndElement(char[] data, int start, int length)

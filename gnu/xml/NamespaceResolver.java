@@ -9,6 +9,7 @@ import gnu.lists.*;
 public class NamespaceResolver extends FilterConsumer
 {
   // List of (name, prefix, local) for begin and each attribute.
+  // Used while processing a single start tag.
   // We always have nameStack.length == 3 * startIndexes.length.
   String[] nameStack = new String[30];
 
@@ -18,8 +19,13 @@ public class NamespaceResolver extends FilterConsumer
   // Number of attributes seen for the current start element.
   int attrCount;
 
+  boolean inStartTag;
+
+  /** True if currently processing an atribute value.. */
+  boolean inAttribute;
+
   // This is where save attributes while processing a begin element.
-  // It may be the final output if cons instacnceof TreeList.
+  // It may be the final output if cons instancedof TreeList.
   TreeList tlist;
 
   ElementContext context;
@@ -82,6 +88,7 @@ public class NamespaceResolver extends FilterConsumer
       }
     namespaceLengthStack[nesting] = namespaceStackLength;
     nesting++;
+    inStartTag = true;
 
     startIndexes[0] = tlist.gapStart;
     tlist.beginGroup(0);
@@ -103,8 +110,11 @@ public class NamespaceResolver extends FilterConsumer
       }
   }
 
-  private void endAttribute()
+  public void endAttribute()
   {
+    inAttribute = false;
+    if (stringValue == null || namespacePrefixes)
+      tlist.endAttribute();
     if (stringValue != null)
       {
 	String uri = stringValue.toString();
@@ -117,7 +127,6 @@ public class NamespaceResolver extends FilterConsumer
 
   public void beginAttribute(String name, Object attrType)
   {
-    endAttribute();
     if (attrCount >= startIndexes.length)
       {
 	String[] tmp = new String[2 * nameStack.length];
@@ -162,6 +171,7 @@ public class NamespaceResolver extends FilterConsumer
       }
     if (stringValue == null || namespacePrefixes)
       tlist.beginAttribute(0);
+    inAttribute = true;
   }
 
   private String resolve(String prefix)
@@ -227,9 +237,16 @@ public class NamespaceResolver extends FilterConsumer
       }
   }
 
-  public void endAttributes()
+  void closeStartTag ()
   {
-    endAttribute();
+    if (! inStartTag || inAttribute)
+      return;
+    inStartTag = false;
+    endAttributes();
+  }
+
+  protected void endAttributes()
+  {
     for (int i = 0;  i <= attrCount; i++)
       {
 	String name = nameStack[3 * i];
@@ -256,10 +273,10 @@ public class NamespaceResolver extends FilterConsumer
 		int start = startIndexes[i];
 		int end = i < attrCount ? startIndexes[i+1] : tlist.gapStart;
 		tlist.consumeRange(start, end, cons);
+		cons.endAttribute();
 	      }
 	  }
       }
-    cons.endAttributes();
     if (cons != tlist)
       {
 	base = cons;
@@ -311,6 +328,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeDouble(double v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(v);
@@ -322,6 +340,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeInt(int v)
   {
+    closeStartTag();
     if (stringValue != null)
       stringValue.append(v);
     writeInt(v);
@@ -329,6 +348,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeLong(long v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(v);
@@ -340,6 +360,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeObject(Object v)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(v);
@@ -351,6 +372,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void writeChars(String str)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(str);
@@ -362,6 +384,7 @@ public class NamespaceResolver extends FilterConsumer
 
   public void write(char[] buf, int off, int len)
   {
+    closeStartTag();
     if (stringValue != null)
       {
 	stringValue.append(buf, off, len);

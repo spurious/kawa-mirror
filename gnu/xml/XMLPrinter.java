@@ -11,10 +11,11 @@ public class XMLPrinter implements Consumer
 {
   PrintWriter out;
   boolean inAttribute = false;
+  boolean inStartTag = false;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
-  int prev;
+  int prev = ' ';
 
   public XMLPrinter (PrintWriter out)
   {
@@ -33,6 +34,7 @@ public class XMLPrinter implements Consumer
 
   public void writeChar(int v)
   {
+    closeTag();
     if (prev == WORD)
       {
 	if (isWordChar((char) v))
@@ -54,6 +56,7 @@ public class XMLPrinter implements Consumer
 
   private void startWord()
   {
+    closeTag();
     if (prev == WORD || isWordChar((char) prev))
       out.print(' ');
     prev = WORD;
@@ -83,6 +86,16 @@ public class XMLPrinter implements Consumer
     out.print(v);
   }
 
+  private void closeTag()
+  {
+    if (inStartTag && ! inAttribute)
+      {
+	out.print('>');
+	inStartTag = false;
+	prev = '>';
+      }
+  }
+
   public void writeLong(long v)
   {
     startWord();
@@ -91,15 +104,25 @@ public class XMLPrinter implements Consumer
 
   public void beginGroup(String typeName, Object type)
   {
+    closeTag();
     out.print('<');
     out.print(typeName);
+    inStartTag = true;
   }
 
   public void endGroup(String typeName)
   {
-    out.print("</");
-    out.print(typeName);
-    out.print('>');
+    if (inStartTag)
+      {
+	out.print("/>");
+	inStartTag = false;
+      }
+    else
+      {
+	out.print("</");
+	out.print(typeName);
+	out.print('>');
+      }
     prev = '>';
   }
 
@@ -116,13 +139,10 @@ public class XMLPrinter implements Consumer
     prev = ' ';
   }
 
-  /** No more attributes in this group. */
-  public void endAttributes()
+  public void endAttribute()
   {
-    if (inAttribute)
-      out.print('"');
+    out.print('"');
     inAttribute = false;
-    out.print('>');
     prev = ' ';
   }
 
@@ -150,6 +170,7 @@ public class XMLPrinter implements Consumer
 
   public void writeChars(String str)
   {
+    closeTag();
     int len = str.length();
     for (int i = 0;  i < len;  i++)
       writeChar(str.charAt(i));
@@ -159,6 +180,7 @@ public class XMLPrinter implements Consumer
 
   public void write(char[] buf, int off, int len)
   {
+    closeTag();
     if (len <= 0)
       return;
     int ch = prev;

@@ -162,7 +162,7 @@ mostlyclean distclean maintainer-clean
 
 all:
 
-check:  check-scm check-num check-mac check-misc check-obj
+check:  check-scm check-num check-mac check-misc check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
 	$(KAWA) -e '(compile-file "'$(srcdir)/testing.scm'" "testing.zip")'
@@ -185,6 +185,9 @@ check-mac: testing.zip
 
 check-obj: testing.zip
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
+
+check-polytype: testing.zip
+	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,5 +1,13 @@
 2003-05-22  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/EqualPat.java (match):  Generalize 2003-04-21 fix
+	to handle arbitrary String/Symbol pairs.  Fixes bugs reported
+	05-19 by Sven Hartrumpf and 05-22 by Bruce Lewis.
+
+	* kawa/standard/IfFeature.java (hasFeatureX):  Remove debug kludge.
+
+	* kawa/standard/IfFeature.java (hasFeature):  Add new SRFIs.
+
 	* kawa/standard/define.java (scanForDefinitions, rewriteForm):
 	Handle names that are Symbols as well as Strings.  Fixes bug reported
 	05-22 by Bruce Lewis "renamed identifiers in defines in macros" .

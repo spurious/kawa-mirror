@@ -7,13 +7,6 @@ public class IfFeature extends Syntax implements Printable
 {
   public static boolean hasFeature (String name)
   {
-    boolean b = hasFeaturex(name);
-    System.err.println("hasFeature("+name+")->"+b);
-    return b;
-  }
-
-  public static boolean hasFeaturex (String name)
-  {
     if (name == "srfi-0") // cond-expand
       return true;
     //if (name == "srfi-1") return true; // lists - only if require used.
@@ -23,11 +16,21 @@ public class IfFeature extends Syntax implements Printable
       return true;
     if (name == "srfi-8") // receive: Binding to multiple values
       return true;
+    if (name == "srfi-9") // Defining Record Types
+      return true;
     if (name == "srfi-11") // let-values, let*-values
       return true;
     if (name == "srfi-17") // Generalized set!
       return true;
     if (name == "srfi-23") // Error reporting mechanism
+      return true;
+    if (name == "srfi-25") // Multi-dimensional Array Primitives
+      return true;
+    if (name == "srfi-26") // Notation for Specializing Parameters
+      return true;
+    if (name == "srfi-28") // Basic Format Strings
+      return true;
+    if (name == "srfi-30") // Nested Multi-line Comments.
       return true;
     return false;
   }

@@ -20,14 +20,11 @@ public class EqualPat extends Pattern implements Printable, Externalizable
 
   public boolean match (Object obj, Object[] vars, int start_vars)
   {
-    if (value.equals (obj))
-      return true;
     // We should be using Translator's matches routine, but the current
     // Translator isn't available, so here is a special-purpose kludge.
-    if (value == "::" && obj instanceof Symbol
-	&& value.equals(((Symbol) obj).getName()))
-      return true;
-    return false;
+    if (value instanceof String && obj instanceof Symbol)
+      obj = ((Symbol) obj).getName();
+    return value.equals (obj);
   }
 
   public int varCount () { return 0; }

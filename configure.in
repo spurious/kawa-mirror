@@ -1,15 +1,17 @@
 dnl Process this with autoconf to create configure
 AC_INIT(doc/kawa.texi)
 
+AM_MAINTAINER_MODE
+AC_CANONICAL_SYSTEM
+
 AM_INIT_AUTOMAKE(kawa, 1.6.98)
 
-AM_MAINTAINER_MODE
-AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+
 AC_EXEEXT
 AC_OBJEXT
-AC_CANONICAL_HOST
 
-AC_ARG_PROGRAM
 dnl AC_ARG_WITH(classpath,[  --with-classpath          Path to Java classes], classpath=$withval, classpath=$$CLASSPATH)
 AC_ARG_ENABLE(kawa-frontend,
   [  --enable-kawa-frontend  Build "kawa" front-end program using readline],
@@ -39,11 +41,26 @@ AC_ARG_WITH(swing,
 AC_ARG_WITH(awt,
   [  --with-awt              Assume AWT is available (default on)])
 
-AC_PROG_INSTALL
+AC_PROG_CC
+AC_PROG_CXX
+dnl AC_PROG_INSTALL
 #AC_PROG_MAKE_SET
 
+# AM_PROG_GCJ isn't good enough, we have to roll our own.
+# AC_CHECK_TOOL(GCJ, gcj)
+LT_AC_PROG_GCJ
+test -z "$GCJ" && AC_MSG_ERROR([no acceptable gcj found in \$PATH])
+if test "x${GCJFLAGS-unset}" = xunset; then
+   GCJFLAGS="-g -O2"
+fi
+
+# dnl AC_SUBST(GCJFLAGS)
+
 dnl We must have the absolute path to the build directory.
+
 TOP_BUILDDIR=`pwd`
+
+AC_PROG_LIBTOOL
 
 case ${with_gcj} in
   yes)
@@ -51,7 +68,20 @@ case ${with_gcj} in
     GCJ_SELECTED=WITH_GCJ
     JAVA=${JAVA-gij}
     JAVAC=${JAVAC-"gcj -C"}
+
+    # AM_PROG_GCJ isn't good enough, we have to roll our own.
+    # AC_CHECK_TOOL(GCJ, gcj)
     LT_AC_PROG_GCJ
+    test -z "$GCJ" && AC_MSG_ERROR([no acceptable gcj found in \$PATH])
+    if test "x${GCJFLAGS-unset}" = xunset; then
+       GCJFLAGS="-g -O2"
+    fi
+    AC_SUBST(GCJFLAGS)
+    AC_LIBTOOL_GCJ
+
+   _AM_DEPENDENCIES(GCJ)
+    AC_SUBST(LIBTOOL_DEPS)
+
     test "${with_awt}" = "" && with_awt=no
     ;;
   *)
@@ -69,7 +99,7 @@ AM_CONDITIONAL(ENABLE_SERVLET, test "$enable_servlet" = "yes")
 AM_CONDITIONAL(WITH_JAVA_REFERENCES, test "$with_java_references" = "yes")
 AM_CONDITIONAL(WITH_SWING, test "$with_swing" = "yes")
 AM_CONDITIONAL(WITH_AWT, test "$with_awt" = "yes")
-AM_PROG_LIBTOOL
+AM_CONDITIONAL(ENABLE_KAWA_FRONTEND, test "$enable_kawa_frontend" = "yes")
 
 if test $enable_kawa_frontend = yes ; then
   if test "$with_gcj" = yes ; then

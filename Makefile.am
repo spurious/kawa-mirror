@@ -1,6 +1,5 @@
 ## Process this with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = cygnus
 JAVATOP =
 SUBDIRS = doc testsuite gnu kawa bin
 javadir=$(datadir)/java
@@ -95,7 +94,7 @@ jemacs.jar: jemacs-@JEMACS_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
-  libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh \
+  libtool.m4 ltmain.sh \
   build.xml build.properties \
   $(JAVATOP)kawa/Version.java jar-manifest Make-rules
 
@@ -105,14 +104,16 @@ JAVADOC_PACKAGES = \
   gnu.bytecode gnu.ecmascript gnu.expr gnu.mapping gnu.math gnu.text gnu.lists\
   gnu.xml gnu.kawa.reflect gnu.kawa.util gnu.kawa.lispexpr gnu.kawa.functions \
   gnu.kawa.servlet gnu.kawa.ant kawa kawa.lang kawa.standard \
-  gnu.kawa.xml gnu.xquery.lang gnu.xquery.util \
+  gnu.kawa.xml gnu.xquery.lang gnu.xquery.util gnu.brl gnu.kawa.brl \
   gnu.jemacs.lang gnu.jemacs.buffer gnu.commonlisp.lang
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xms40m -J-Xmx40m
-# NOTE:  To update javadoc do 'make install-javadoc-html'.
+# NOTE:  To update javadoc do:
+# make install-javadoc-html
 # cd $JAVADOC_DIR
-# cvs import -m "Javadoc generated." software/kawa/api javadoc kawa_$(VERSION)
+# cvs import -m "Javadoc generated." software/kawa/api javadoc kawa_X_Y_ZZ
 # cvs checkout -jjavadoc:yesterday -jjavadoc software/kawa/api
+# cd software/kawa/api/
 # cvs ci -m 'Updated.' .
 
 MAINTAINERCLEANFILES = makekawa.bat
@@ -139,12 +140,16 @@ install-jar:
 	cd $(DESTDIR)$(javadir) && rm -f kawa.jar \
 	  && $(LN_S) kawa-@VERSION@.jar kawa.jar
 
+uninstall-local: uninstall-jar
+uninstall-jar:
+	rm -f $(DESTDIR)$(javadir)/kawa-@VERSION@.jar \
+	  $(DESTDIR)$(javadir)/kawa.jar
 
 $(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/configure.in
 	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/$(JAVATOP)kawa/Version.java.in >$@
 
 all-recursive:  $(JAVATOP)kawa/Version.java
-all-redirect: kawa-@VERSION@.jar
+all: kawa-@VERSION@.jar
 
 makekawa.bat:  $(srcdir)/configure.in
 	echo "rem Build Kawa under Windows" >tmp

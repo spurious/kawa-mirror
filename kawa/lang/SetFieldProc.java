@@ -63,6 +63,12 @@ public class SetFieldProc extends Procedure2 implements Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    ClassLoader loader = ctype.getReflectClass().getClassLoader();
+    if (loader instanceof gnu.bytecode.ArrayClassLoader)
+      {
+        ApplyExp.compile(exp, comp, target);
+        return;
+      }
     if (field == null)
       {
 	field = ctype.getField(fname);

@@ -72,6 +72,12 @@ public class GetFieldProc extends Procedure1 implements Inlineable
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {
+    ClassLoader loader = ctype.getReflectClass().getClassLoader();
+    if (loader instanceof gnu.bytecode.ArrayClassLoader)
+      {
+        ApplyExp.compile(exp, comp, target);
+        return;
+      }
     exp.getArgs()[0].compile(comp, ctype);
     getField();
     gnu.bytecode.CodeAttr code = comp.getCode();

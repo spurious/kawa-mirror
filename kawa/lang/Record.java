@@ -118,6 +118,8 @@ public class Record extends NameMap
     for (int i = 0;  i < fields.length;  i++)
       {
 	Field field = fields[i];
+	if ((field.getModifiers() & Modifier.STATIC) != 0)
+          continue;
 	Object value;
 	try
 	  {

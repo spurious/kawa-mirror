@@ -80,6 +80,7 @@ check-scribble: scribble.class
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
   classes1.scm classes2.scm SimpleB.java obj-test.scm \
-  misc-test.scm polytype.scm formatst.scm scribble.scm module1.scm
+  misc-test.scm polytype.scm formatst.scm scribble.scm \
+  module1.scm module2.scm
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = $(SOURCES) ppfile.out

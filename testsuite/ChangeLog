@@ -1,3 +1,7 @@
+2001-10-11  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SOURCES):  Add module2.scm.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* formatst.scm:  Commented out two SLIB specific tests.

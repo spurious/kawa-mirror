@@ -325,6 +325,18 @@ public class Compilation
       }
   }
 
+  public static boolean inlineOk = true;
+
+  public boolean inlineOk (Expression proc)
+  {
+    return inlineOk;
+  }
+
+  public boolean inlineOk (Procedure prcc)
+  {
+    return inlineOk;
+  }
+
   public void compileConstant (Object value, Target target)
   {
     if (target instanceof IgnoreTarget)

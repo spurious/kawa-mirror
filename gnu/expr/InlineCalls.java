@@ -46,17 +46,20 @@ public class InlineCalls extends ExpWalker
 	  return noteError(msg);
 	if (proc instanceof CanInline)
 	  return ((CanInline) proc).inline(exp, this);
-	PrimProcedure mproc
-	  = PrimProcedure.getMethodFor(proc, decl, exp.args,
-				       comp.getInterpreter());
-	if (mproc != null)
+	if (comp.inlineOk(proc))
 	  {
-	    if (mproc.getStaticFlag())
-	      return new ApplyExp(mproc, exp.args);
-	    Expression[] margs = new Expression[1 + nargs];
-	    System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
-	    margs[0] = new ReferenceExp(decl.base);
-	    return new ApplyExp(mproc, margs);
+	    PrimProcedure mproc
+	      = PrimProcedure.getMethodFor(proc, decl, exp.args,
+					   comp.getInterpreter());
+	    if (mproc != null)
+	      {
+		if (mproc.getStaticFlag())
+		  return new ApplyExp(mproc, exp.args);
+		Expression[] margs = new Expression[1 + nargs];
+		System.arraycopy(exp.getArgs(), 0, margs, 1, nargs);
+		margs[0] = new ReferenceExp(decl.base);
+		return new ApplyExp(mproc, margs);
+	      }
 	  }
       }
     if (lambda != null)

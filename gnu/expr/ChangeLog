@@ -1,3 +1,10 @@
+2002-09-24  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (inlineOk):  New static field.
+	(inlineOk):  Two new methods.
+	* ApplyExp.java (compile):  Only inline if inlineOk.
+	* InlineCalls.java (walkApplyExp):  Only inline if inlineOk.
+
 2002-09-20  Per Bothner  <per@bothner.com>
 
 	* ConsumerTarget.java (compileFromStack):  Handle the case where

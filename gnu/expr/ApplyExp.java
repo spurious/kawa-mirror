@@ -173,6 +173,7 @@ public class ApplyExp extends Expression
 		 && args_length > func_lambda.max_args)
           msg = "too many args "+args_length+" for ";
 	else if (! func_lambda.isHandlingTailCalls()
+		 && comp.inlineOk(func_lambda)
 		 && (method = func_lambda.getMethod(args_length)) != null)
 	  {
 	    boolean is_static = method.getStaticFlag();

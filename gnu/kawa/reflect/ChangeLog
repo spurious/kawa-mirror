@@ -1,3 +1,11 @@
+2002-11-10  Per Bothner  <per@bothner.com>
+
+	* Invoke.java (kind):  New otpions 's' is static methods only;  'S' is
+	changed to static or non-static (as documented for invoke-static).
+	(applyN, getMethods, inline):  Handle both 's' and 'S' kinds.
+	(inline):  If kinds=='S' and there is a single definitely ok static
+	method, prefer it over non-static methods.
+
 2002-09-26  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  Special handling for aliases,

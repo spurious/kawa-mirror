@@ -6,7 +6,8 @@ import gnu.lists.FString;
 
 public class Invoke extends ProcedureN implements CanInline
 {
-  /** 'N' - make (new);  'S' - invoke-static;  'V'  - non-static invoke. */
+  /** 'N' - make (new);  'S' - invoke-static (static or non-static);
+      's' - like 'S' but only allow static method; 'V'  - non-static invoke. */
   char kind;
 
   Interpreter interpreter;
@@ -95,13 +96,13 @@ public class Invoke extends ProcedureN implements CanInline
       }
     MethodProc proc
       = ClassMethods.apply(dtype, mname, null, null,
-                           thisProc.kind=='S' ? Access.STATIC : 0,
-                           Access.STATIC);
+                           thisProc.kind=='s' ? Access.STATIC : 0,
+                           thisProc.kind=='S' ? 0 : Access.STATIC);
     if (proc == null)
       throw new RuntimeException(thisProc.getName() + ": no method named `"
                                  + mname + "' in class " + dtype.getName());
     Object[] margs
-      = new Object[nargs-(kind == 'S' ? 2 : staticLink != null ? 0 : 1)];
+      = new Object[nargs-(kind == 'S' || kind == 's' ? 2 : staticLink != null ? 0 : 1)];
     int i = 0;
     if (kind == 'V')
       margs[i++] = args[0];
@@ -173,7 +174,8 @@ public class Invoke extends ProcedureN implements CanInline
       atypes[i] = args[i+argsToSkip].getType();
     PrimProcedure[] methods
     = ClassMethods.getMethods(ctype, mname,
-                              kind == 'S' ? Access.STATIC : 0, Access.STATIC,
+                              kind == 's' ? Access.STATIC : 0,
+			      kind=='S' ? 0 : Access.STATIC,
                               interpreter);
 
     long num = ClassMethods.selectApplicable(methods, atypes);
@@ -248,7 +250,8 @@ public class Invoke extends ProcedureN implements CanInline
           {
             try
               {
-                methods = getMethods(type, name, args, kind == 'S' ? 2 : 1);
+                methods = getMethods(type, name, args,
+				     kind == 'S' || kind == 's' ? 2 : 1);
               }
             catch (Exception ex)
               {
@@ -320,6 +323,28 @@ public class Invoke extends ProcedureN implements CanInline
                 index = MethodProc.mostSpecific(methods, okCount);
                 if (index < 0)
 		  {
+		    if (kind == 'S')
+		      {
+			// If we didn't find a most specific method,
+			// check if there is one that is static.  If so,
+			// prefer that - after all, we're using invoke-static.
+			for (int i = 0;  i < okCount;  i++)
+			  {
+			    if (methods[i].getStaticFlag())
+			      {
+				if (index >= 0)
+				  {
+				    index = -1;
+				    break;
+				  }
+				else
+				  index = i;
+			      }
+			  }
+		      }
+		  }
+                if (index < 0)
+		  {
 		    walker.error('w',
 			       "more than one definitely applicable method `"
 			       +name+"' in "+type.getName());
@@ -344,7 +369,7 @@ public class Invoke extends ProcedureN implements CanInline
             if (index >= 0)
               {
                 Expression[] margs
-                  = new Expression[nargs-(kind == 'S' ? 2 : 1)];
+                  = new Expression[nargs-(kind == 'S' || kind == 's' ? 2 : 1)];
                 int i = 0;
                 if (kind == 'V')
 		  margs[i++] = args[0];

@@ -2,6 +2,7 @@ package kawa.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import gnu.bytecode.ClassType;
 
 /**
  * The Syntax transformer that re-writes the lambda builtin.
@@ -277,7 +278,22 @@ public class Lambda extends Syntax implements Printable
 
   public void rewriteBody(LambdaExp lexp, Object body, Translator tr)
   {
-    // Syntatic sugar:  <TYPE> BODY --> (as <TYPE> BODY)
+    // Syntatic sugar:  <TYPE> BODY (or :: <TYPE> BODY) --> (as <TYPE> BODY)
+    if (body instanceof Pair && ((Pair) body).car == "::")
+      body = ((Pair) body).cdr;
+    if (body instanceof Pair && ((Pair) body).car == "<sequence>")
+      {
+        System.err.println("make sequence");
+        ClassType type = ClassType.make("gnu.kawa.util.Consumer");
+        Declaration rdecl = new Declaration("$result$", type);
+        lexp.add(null, rdecl);
+        tr.push(rdecl);
+        lexp.min_args++;
+        if (lexp.max_args >= 0)
+          lexp.max_args++;
+        lexp.setFlag(true, LambdaExp.SEQUENCE_RESULT);
+        body = ((Pair) body).cdr;
+      }
     lexp.body = tr.rewrite_body (body);
     if (lexp.body instanceof BeginExp)
       {
@@ -290,17 +306,17 @@ public class Lambda extends Syntax implements Printable
 	    gnu.bytecode.Type rtype = tr.getInterpreter().getTypeFor(rexp);
 	    if (rtype != null)
 	      {
-		if (len > 2)
-		  {
-		    len--;
-		    Expression[] new_body = new Expression[len];
-		    System.arraycopy(exps, 1, new_body, 0, len);
-		    exps = new Expression[2];
-		    exps[0] = rexp;
-		    exps[1] = new BeginExp(new_body);
-		  }
-		QuoteExp c = new QuoteExp(kawa.standard.convert.getInstance());
-		lexp.body = new ApplyExp(c, exps);
+                len--;
+                Expression value;
+                if (len == 1)
+                  value = exps[1];
+                else
+                  {
+                    Expression[] new_body = new Expression[len];
+                    System.arraycopy(exps, 1, new_body, 0, len);
+                    value = new BeginExp(new_body);
+                  }
+                lexp.body = Expression.makeCoercion(value, rexp);
 	      }
 	  }
       }

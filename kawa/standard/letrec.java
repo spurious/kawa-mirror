@@ -71,7 +71,9 @@ public class letrec extends Syntax implements Printable
          decl != null;  decl = decl.nextDecl(), i++)
       {
 	Expression exp = tr.rewrite(orig_inits[i]);
-	newbody[i] = new SetExp(decl, exp);
+	SetExp sexp = new SetExp(decl, exp);
+	newbody[i] = sexp;
+	sexp.setDefining (true);
 	decl.noteValue (exp);				
       }
     newbody[decl_count] = tr.rewrite_body(body);

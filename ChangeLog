@@ -1,3 +1,7 @@
+2003-05-18  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/letrec.java (rewrite):  Do setDefining on SetExp.
+
 2003-05-17  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (setLineOf):  New method.

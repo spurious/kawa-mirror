@@ -1183,6 +1183,8 @@ public class CodeAttr extends Attribute implements AttrContainer
       opcode = 184;   // invokestatic
     else if (method.classfile.isInterface())
       opcode = 185;   // invokeinterface
+    else if ("<init>".equals(method.getName()))
+      opcode = 183;   // invokespecial
     else
       opcode = 182;   // invokevirtual
     emitInvokeMethod(method, opcode);
@@ -1261,53 +1263,6 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitGoto(label, 168);
   }
 
-  public final void emitGotoIfEq (Label label, boolean invert)
-  {
-    Type type2 = popType().promote();
-    Type type1 = popType().promote();
-    reserve(4);
-    int opcode;
-    char sig1 = type1.getSignature().charAt(0);
-    char sig2 = type2.getSignature().charAt(0);
-    if (sig1 == 'I' && sig2 == 'I')
-      opcode = 159;  // if_icmpeq (inverted: if_icmpne)
-    else if (sig1 == 'J' && sig2 == 'J')
-      {
-	put1(148);   // lcmp
-	opcode = 153;  // ifeq (inverted: ifne)
-      }
-    else if (sig1 == 'F' && sig2 == 'F')
-      {
-	put1(149);   // fcmpl
-	opcode = 153;  // ifeq (inverted: ifne)
-      }
-    else if (sig1 == 'D' && sig2 == 'D')
-      {
-	put1(151);   // dcmpl
-	opcode = 153;  // ifeq (inverted: ifne)
-      }
-    else if ((sig1 == 'L' || sig1 == '[')
-	     && (sig2 == 'L' || sig2 == '['))
-      opcode = 165;  // if_acmpeq (inverted: if_acmpne)
-    else
-      throw new Error ("non-matching types to emitGotoIfEq");
-    if (invert)
-      opcode++;
-    emitTransfer (label, opcode);
-  }
-
-  /** Compile a conditional transfer if 2 top stack elements are equal. */
-  public final void emitGotoIfEq (Label label)
-  {
-    emitGotoIfEq(label, false);
-  }
-
-  /** Compile conditional transfer if 2 top stack elements are not equal. */
-  public final void emitGotoIfNE (Label label)
-  {
-    emitGotoIfEq(label, true);
-  }
-
   public final void emitGotoIfCompare1 (Label label, int opcode)
   {
     popType();
@@ -1349,13 +1304,35 @@ public class CodeAttr extends Attribute implements AttrContainer
       put1(cmpg ? 149 : 150);   // fcmpl/fcmpg
     else if (sig1 == 'D' && sig2 == 'D')
       put1(cmpg ? 151 : 152);   // dcmpl/dcmpg
+    else if ((sig1 == 'L' || sig1 == '[')
+	     && (sig2 == 'L' || sig2 == '[')
+	     && logop <= 154)
+      logop += 12; // ifeq->if_acmpeq, ifne->if_acmpne
     else
-      throw new Error ("non-matching types to emitGotoIfCompare2");
+      throw new Error ("invalid types to emitGotoIfCompare2");
 
     emitTransfer (label, logop);
   }
 
   // binary comparisons
+  /** @deprecated */
+  public final void emitGotoIfEq (Label label, boolean invert)
+  {
+    emitGotoIfCompare2(label, invert ? 154 : 153);
+  }
+
+  /** Compile a conditional transfer if 2 top stack elements are equal. */
+  public final void emitGotoIfEq (Label label)
+  {
+    emitGotoIfCompare2(label, 153);
+  }
+
+  /** Compile conditional transfer if 2 top stack elements are not equal. */
+  public final void emitGotoIfNE (Label label)
+  {
+    emitGotoIfCompare2(label, 154);
+  }
+
   public final void emitGotoIfLt(Label label)
   { emitGotoIfCompare2(label, 155); }
   public final void emitGotoIfGe(Label label)

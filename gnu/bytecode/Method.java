@@ -115,8 +115,8 @@ public class Method implements AttrContainer {
     local.allocateLocal(code);
   }
 
-  /** Allocate a Code attribute, and prepare to generate code. */
-
+  /** Allocate a Code attribute, and prepare to generate code.
+   * Most code generators should use the startCode convenience method. */
   public void initCode ()
   {
     if (classfile.constants == null)
@@ -125,10 +125,21 @@ public class Method implements AttrContainer {
     code.pushScope();
   }
 
+  /**
+   * @deprecated Use startCode instead
+   */
   public void init_param_slots ()
   {
     initCode ();
     code.addParamLocals();
+  }
+
+  /** Recommended method to create a new CodeAttr for this Method. */
+  public CodeAttr startCode ()
+  {
+    initCode();
+    code.addParamLocals();
+    return code;
   }
 
   void kill_local (Variable var) { var.freeLocal(code); }

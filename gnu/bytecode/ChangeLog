@@ -1,3 +1,13 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitInvoke):  If method name is "<init>",
+	do invokeSpecial.
+
+	* CodeAttr.java (emitGotoIfCompare2):  Support object eq/ne compares.
+	(emitGotoIfEq,  emitGotoIfNE):  Re-implement using emitGotoIfCompare2.
+
+	* Method.java (startCode):  New convenience method.
+
 2002-04-16  Phil Walker  <phil_walker@hp.com>
 
 	* InnerClassesAttr.java (write):  Multiple index by 4.

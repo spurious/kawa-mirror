@@ -499,7 +499,7 @@ public class TestMisc
     InPort in = new CharArrayInPort(expr);
     SourceMessages messages = new SourceMessages();
 
-    Compilation comp = interp.parseFile(in, true, messages);
+    Compilation comp = interp.parse(in, messages, interp.PARSE_IMMEDIATE);
     SourceError firstError = messages.getErrors();
     if (firstError != null)
       return "*** syntax error - " + firstError;

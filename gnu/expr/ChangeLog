@@ -1,3 +1,10 @@
+2004-08-11  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (addClass): Don't implement Runnable for Servlets.
+
+	* Compilation.java (generateApplyMethodsWithContext):  May need to load
+	moduleInstanceMainField, just as in generateApplyMethodsWithoutContext.
+
 2004-08-06  Per Bothner  <per@bothner.com>
 
 	Change tailcall function API to use matchX+apply.

@@ -1041,7 +1041,8 @@ public class Compilation
 	else
 	  sup = getModuleType();
       }
-    if (! module.isStatic() && ! generateMain && ! immediate)
+    if (! module.isStatic() && ! generateMain && ! generateServlet
+	&& ! immediate)
       type.addInterface(typeRunnable);
     type.setSuper(sup);
 
@@ -1421,7 +1422,11 @@ public class Compilation
 
 	    int needsThis = primMethod.getStaticFlag() ? 0 : 1;
 	    if (needsThis > 0)
-	      code.emitPushThis();
+	      {
+		code.emitPushThis();
+		if (curClass == moduleClass && mainClass != moduleClass)
+		  code.emitGetField(moduleInstanceMainField);
+	      }
 
 	    Declaration var = source.firstDecl();
 	    for (int k = 0; k < singleArgs;  k++)

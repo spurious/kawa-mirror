@@ -516,7 +516,9 @@ public class LambdaExp extends ScopeExp
     gnu.bytecode.CodeAttr code = comp.getCode();
     if (! getInlineOnly() || Compilation.usingTailCalls)
       {
-	if (comp.method.reachableHere() && ! isHandlingTailCalls())
+	if (comp.method.reachableHere()
+	    && (! Compilation.usingTailCalls
+		|| isModuleBody() || isClassMethod() || isHandlingTailCalls()))
 	  code.emitReturn();
 	code.popScope();        // Undoes enterScope in allocParameters
       }

@@ -1,3 +1,12 @@
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (eval(Environment,CallContext)):  New method.
+
+	* LambdaExp.java (compileEnd):  Always emitReturn if isModuleBody
+	or isClassMethod, even if usingTailCalls.
+
+	* ModuleBody.java (run(Consumer)):  New method.
+
 2001-05-08  Per Bothner  <per@bothner.com>
 
 	Change full-tailcalls calling convention so result is Consumer.

@@ -1,6 +1,6 @@
 package gnu.expr;
 import gnu.mapping.*;
-import gnu.lists.VoidConsumer;
+import gnu.lists.*;
 
 /**
  * Abstract class for the dummy top-level function of a module.
@@ -18,8 +18,13 @@ public abstract class ModuleBody extends CpsProcedure implements Runnable
 
   public void run ()
   {
+    run (new VoidConsumer());
+  }
+
+  public void run(Consumer out)
+  {
     CallContext ctx = new CallContext();
-    ctx.consumer = new VoidConsumer();
+    ctx.consumer = out;
     ctx.values = Values.noArgs;
     ctx.proc = this;
     ctx.run();

@@ -45,6 +45,17 @@ public class ApplyExp extends Expression
     return proc.applyN (vals);
   }
 
+  public void eval (Environment env, CallContext ctx)
+  {
+    Procedure proc = (Procedure) func.eval(env);
+    int n = args.length;
+    Object[] vals = new Object[n];
+    for (int i = 0; i < n; i++)
+      vals[i] = args[i].eval (env);
+    ctx.setArgsN(vals);
+    proc.apply(ctx);
+  }
+
   public static void compileToArray(Expression[] args, Compilation comp)
   {
     CodeAttr code = comp.getCode();

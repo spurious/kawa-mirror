@@ -1,3 +1,11 @@
+2002-03-18  Per Bothner  <per@bothner.com>
+
+	* Environment.java (getPrevious):  New method.
+
+	* Procedure.java:  No longer implements Printable.
+	(print):  Remove method.
+	(toString):  New method.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (SED_REFERENCES_SUBS):  Moved to Make-rules.

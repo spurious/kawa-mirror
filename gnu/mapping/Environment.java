@@ -37,6 +37,11 @@ public class Environment extends NameMap
     this.locked = locked;
   }
 
+  public Environment getPrevious ()
+  {
+    return previous;
+  }
+
   public static Environment user () { return current(); }
 
   public static Object lookup_global (String name)

@@ -5,7 +5,7 @@ package gnu.mapping;
  * @author  Per Bothner
  */
 
-public abstract class Procedure implements Named, Printable
+public abstract class Procedure implements Named
 {
   /** If non-null, a sequence of (key, value)-pairs. */
   private Object[] properties;
@@ -162,14 +162,16 @@ public abstract class Procedure implements Named, Printable
     getSetter().applyN(args);
   }
 
-  public void print(java.io.PrintWriter ps)
+  public String toString ()
   {
-    ps.print ("#<procedure ");
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append ("#<procedure ");
     String n = getName();
     if (n == null)
       n = getClass().getName();
-    ps.print (n);
-    ps.print ('>');
+    sbuf.append(n);
+    sbuf.append('>');
+    return sbuf.toString();
   }
 
   public Object getProperty(Object key, Object defaultValue)

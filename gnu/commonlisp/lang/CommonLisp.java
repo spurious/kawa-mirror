@@ -57,27 +57,6 @@ public class CommonLisp extends Lisp2
 
   static CommonLisp instance;
 
-  public static void loadClass(String name, Environment env)
-    throws java.lang.ClassNotFoundException
-  {
-    try
-      {
-	Class clas = Class.forName(name);
-	Object inst = clas.newInstance ();
-	defineAll(inst, env);
-	if (inst instanceof gnu.expr.ModuleBody)
-	  ((gnu.expr.ModuleBody)inst).run();
-      }
-    catch (java.lang.ClassNotFoundException ex)
-      {
-	throw ex;
-      }
-    catch (Exception ex)
-      {
-	throw new WrappedException(ex);
-      }
-  }
-
   protected void defun(String name, Object value)
   {
     Symbol.setFunctionBinding(environ, name, value);
@@ -127,10 +106,10 @@ public class CommonLisp extends Lisp2
     try
       {
 	// Force it to be loaded now, so we can over-ride let* length etc.
-	loadClass("kawa.lib.std_syntax", environ);
-	loadClass("kawa.lib.lists", environ);
-	loadClass("kawa.lib.strings", environ);
-	loadClass("gnu.commonlisp.lisp.PrimOps", environ);
+	loadClass("kawa.lib.std_syntax");
+	loadClass("kawa.lib.lists");
+	loadClass("kawa.lib.strings");
+	loadClass("gnu.commonlisp.lisp.PrimOps");
       }
     catch (java.lang.ClassNotFoundException ex)
       {
@@ -229,50 +208,20 @@ public class CommonLisp extends Lisp2
   }
 
   /** Import all the public fields of an object. */
-  public static void defineAll(Object object, Environment env)
+  public void defineFromFieldValue(String name, Object part)
+    throws Throwable
   {
-    Class clas = object.getClass();
-    java.lang.reflect.Field[] fields = clas.getFields();
-    for (int i = fields.length;  --i >= 0; )
-      {
-	java.lang.reflect.Field field = fields[i];
-	String name = field.getName();
-	if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
-	  {
-	    try
-	      {
-		Object part = field.get(object);
-		if (part instanceof Named)
-		  name = ((Named) part).getName();
-		else if (part instanceof kawa.lang.Syntax) // FIXME
-		  name = ((kawa.lang.Syntax) part).getName();
-		else
-		  name = name.intern();
-		if (part instanceof Binding)
-		  env.addBinding((Binding) part);
-		else if (part instanceof Procedure
-			 || part instanceof kawa.lang.Syntax)
-		  Symbol.setFunctionBinding(env, name, part);
-		else
-		  env.define(name, part);
-	      }
-	    catch (Exception ex)
-	      {
-		throw new WrappedException("error accessing field "+field, ex);
-	      }
-	  }
-	else
-	  {
-	    System.err.println("INTERNAL ERROR in CommonLisp.defineAll for "+name
-+" in "+clas);
-	    /*
-	    Binding2 binding = new Binding2(name);
-	    setValue(binding, object);
-	    setConstraint(binding, new gnu.kawa.reflect.ClassMemberConstraint(field));
-	    env.addBinding(binding);
-	    */
-	  }
-      }
+    if (part instanceof Named)
+      name = ((Named) part).getName();
+    else
+      name = name.intern();
+    if (part instanceof Binding)
+      environ.addBinding((Binding) part);
+    else if (part instanceof Procedure
+	     || part instanceof kawa.lang.Syntax)
+      Symbol.setFunctionBinding(environ, name, part);
+    else
+      environ.define(name, part);
   }
 }
 

@@ -186,7 +186,7 @@ public class LambdaExp extends ScopeExp
 	if (pair.car instanceof String)
 	  {
 	    name = (String) pair.car;
-	    defaultValue = null;
+	    defaultValue = QuoteExp.falseExp;
 	  }
 	else if (pair.car instanceof Pair
 		 && ((Pair) pair.car).car instanceof String
@@ -208,10 +208,7 @@ public class LambdaExp extends ScopeExp
 	    return;
 	  }
 	if (mode == Special.optional || mode == Special.key)
-	  {
-	    defaultArgs[opt_args++] = defaultValue == null ? QuoteExp.falseExp
-	      : tr.rewrite(defaultValue);
-	  }
+	  defaultArgs[opt_args++] = tr.rewrite(defaultValue);
 	if (mode == Special.key)
 	  keywords[key_args++] = Keyword.make(name.toString());
 	Declaration decl = addDeclaration (name);

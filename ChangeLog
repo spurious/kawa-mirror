@@ -1,3 +1,13 @@
+2005-03-06  Per Bothner  <per@bothner.com>
+
+	* ltmain.sh: New from CVS (patched) libtool 2.1a.
+	* acinclude.m4, libtool.m4: Removed.
+	* Makefile.am (EXTRA_DIST): Remove libtool.m4.
+	* Makefile.in, configure, aclocal.m4: Re-generated.
+	* configure.in: Updat AC_PROG_LIBTOOL to LT_INIT.
+	* missing: New version from automake-1.9.
+	* */Makefile.in: Re-generated.
+
 2005-03-04  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java: Update Interpreter->Language various places.

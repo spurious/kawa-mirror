@@ -120,7 +120,7 @@ bytecode.jar: bytecode-@BYTECODE_VERSION@.jar
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs \
-  libtool.m4 ltmain.sh patch-source-list selected-java-source \
+  ltmain.sh patch-source-list selected-java-source \
   build.xml build.properties \
   kawa/Version.java jar-manifest Make-rules
 

@@ -1,7 +1,7 @@
 package gnu.jemacs.buffer;
 import gnu.mapping.Procedure;
 
-/** An Action that causes a Procedure to be excuted. */
+/** An Action that causes a command (such as a Procedure) to be excuted. */
 
 public class Command extends javax.swing.text.TextAction
 {
@@ -24,6 +24,7 @@ public class Command extends javax.swing.text.TextAction
     return command;
   }
 
+  /** Perform a given command as appropriate for its class. */
   public static void perform(Object command)
   {
     try

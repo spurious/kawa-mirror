@@ -5,9 +5,8 @@
   </head>
 
   <body>
-    <h1>JEmacs and the gnu.jemacs.buffer Package</h1>
 <p>
-The <code>gnu.</code> provides various building blocks
+Provides various building blocks
 for building an Emacs-like text editor.  It also provides a
 number of Scheme procedures that have the same name and similar
 functionality as the Emacs Lisp functions.
@@ -23,6 +22,11 @@ Emacs Lisp which compiles to Java bytecodes.
 I'm hoping volunteers will help me make "JEmacs" into something
 useful.  I have fairly clear ideas about much of what need to be
 done.  Contact me if you are interested.
+
+<h2>Home page</h2>
+There is now a JEmacs <a href="http://JEmacs,SourceForge.net/">home page</a>.
+Also check out the
+<a href="http://www.gnu.org/software/kawa/">Kawa home page</a>.
 
 <h2>Screen snapshot</h2>
 There is a now a <a href="http://www.bothner.com/~per/papers/jemacs.png">
@@ -44,8 +48,7 @@ A couple of things volunteers might start with
 (but let me know before you spend serious time on any of these):
 <ul>
 <li>Implement more of the editing commands:  Insert/delete/forward/backward
-char/word/line.  (By default, BS should delete backwards,
-and Delete should delete forwards, but this will be customizable.) 
+word/line.
 <li>Display the modeline in inverse video, but extend it to the full
 window width.
 <li>Come up with a design for narrowing a buffer.  One possibility
@@ -64,7 +67,14 @@ with extents and text properties.
 </ul>
 
 <h2>Usage</h2>
-Load <code>emacs.scm</code> into a running Kawa.
+These classes depend on Swing, so make sure you have Swing available.
+Then make sure you have a version of the Kawa classes that contains
+the <code>gnu.jemacs.buffer</code> classes.  (In other words,
+Kawa needs to have been configure <code>--with-swing</code> support.)
+Then just start Kawa in the usual way:
+<pre>
+java kawa.repl
+</pre>
 Then evaluate:
 <pre>
 (emacs)
@@ -94,9 +104,5 @@ is complete.
 
 Per Bothner,
 <tt>&lt;<a href="mailto:bothner@gnu.org">bothner@gnu.org</a>&gt;</tt>
-<p>
-<!-- hhmts start -->
-Last modified: Tue Sep 14 11:11:30 PDT 1999
-<!-- hhmts end -->
   </body>
 </html>

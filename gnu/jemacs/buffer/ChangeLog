@@ -1,3 +1,10 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
+	* Window.java (setSelected):  DOn't crash if null frame.
+
 2000-02-26  Per Bothner  <per@bothner.com>
 
 	* ProcAction.java:  Removed, replaced by/renamed to Command.java.

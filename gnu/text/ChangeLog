@@ -1,3 +1,8 @@
+2000-02-27  Per Bothner  <per@bothner.com>
+
+	Various tweaks for better javadoc processing.
+	* overview.html:  Renamed to package.html.
+
 2000-02-19  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (fill):  Change parameters.

@@ -1,5 +1,5 @@
 package kawa.lang;
-import java.lang.reflect.Field;
+//import java.lang.reflect.Field; // Confuses Gcj.  Should FIX gcj.
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import gnu.bytecode.*;
@@ -18,11 +18,11 @@ public class Record extends NameMap
 
   public int hashCode()
   {
-    Field[] fields = getClass().getFields();
+    java.lang.reflect.Field[] fields = getClass().getFields();
     int hash = 12345;
     for (int i = 0;  i < fields.length;  i++)
       {
-	Field field = fields[i];
+	java.lang.reflect.Field field = fields[i];
 	Object value;
 	try
 	  {
@@ -102,7 +102,7 @@ public class Record extends NameMap
 	Object value1, value2;
 	try
 	  {
-	    Field field = fld.getReflectField();
+	    java.lang.reflect.Field field = fld.getReflectField();
 	    value1 = field.get(this);
 	    value2 = field.get(obj);
 	  }
@@ -131,7 +131,7 @@ public class Record extends NameMap
 	Object value;
 	try
 	  {
-	    Field field = fld.getReflectField();
+	    java.lang.reflect.Field field = fld.getReflectField();
 	    value = field.get(this);
 	  }
 	catch (Exception ex)

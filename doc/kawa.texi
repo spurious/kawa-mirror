@@ -37,11 +37,11 @@ and that compiles Scheme code into Java byte-codes.
 This documents version @value{VERSION}, updated @value{UPDATED}.
 
 See the summary
-of @uref{http://www.cygnus.com/~bothner/kawa/News.txt,recent changes}.
+of @uref{http://www.gnu.org/software/kawa/NEWS,recent changes}.
 
 The author of Kawa is
 @ifhtml
-<a href="http://www.cygnus.com/~bothner">Per Bothner</a>
+<a href="http://home.pacbell.net/bothner/">Per Bothner</a>
 <tt>&lt;<a href="mailto:bothner@cygnus.com">bothner@cygnus.com</a>&gt;</tt>.
 It is a re-write of Kawa 0.2, which was written by R. Alexander Milowski
 <tt>&lt;<a href="mailto:alex@copsol.com">alex@copsol.com</a>&gt;</tt>.
@@ -53,8 +53,9 @@ R. Alexander Milowski @w{<alex@@copsol.com>}.
 @end ifclear
 
 The Kawa home page (which is currently just an on-line
-version of this document) is
-@uref{http://www.cygnus.com/~bothner/kawa.html}.
+version of this document) is @uref{http://www.gnu.org/software/kawa/}.
+The @uref{http://www.cygnus.com/~bothner/kawa.html, old Kawa home page}
+shold also work.
 
 The
 @uref{http://www.cs.indiana.edu/scheme-repository/home.html,Scheme repository}
@@ -73,10 +74,14 @@ see @ref{License}.
 This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
-The two packages
-@uref{http://www.cygnus.com/~bothner/gnu.bytecode/,@code{gnu.bytecode}}
-and @uref{http://www.cygnus.com/~bothner/gnu.math/,@code{gnu.math}} are used
-by Kawa, and distributed with it, but may be independently useful.
+The packages
+@uref{http://sourceware.cygnus.com/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
+@uref{http://sourceware.cygnus.com/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
+@uref{http://sourceware.cygnus.com/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
+@uref{http://sourceware.cygnus.com/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
+and
+@uref{http://sourceware.cygnus.com/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
+are used by Kawa, and distributed with it, but may be independently useful.
 
 For a technical overview of Kawa, see these
 @uref{http://sourceware.cygnus.com/kawa/papers/,papers}.
@@ -124,29 +129,21 @@ Quantities, keyword values, and the expanded @code{lambda} form
 @chapter Getting Kawa
 
 To get the Kawa sources, you have choice between the
-@uref{ftp://ftp.cygnus.com/pub/bothner/kawa-current.tar.gz,
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable.tar.gz,
 current stable version} (possibly quite old), or the newer
-@uref{ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz,
-latest snapshot} (builds and passes the testsuite but not
-extensively tested).
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-newest.tar.gz,
+latest snapshot of the development tree} (builds and passes
+the testsuite but less extensively tested).
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-current-compiled.zip">here</a>.
+<a href="ftp://ftp.gnu.org/pub/kawa/kawa-stable-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-current-compiled.zip}.
+@url{ftp://ftp.gnu.org/pub/kawa/kawa-stable-compiled.zip}.
 @end ifclear
 
-A snapshot of the development tree is in
-@ifhtml
-<a href="ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz">here</a>.
-@end ifhtml
-@ifclear html
-@url{ftp://ftp.cygnus.com/pub/bothner/kawa-newest.tar.gz}.
-@end ifclear
-
-These are all in the @uref{ftp://ftp.cygnus.com/pub/bothner,Kawa ftp site},
+These are all in the @uref{ftp://ftp.gnu.org/pub/gnu/kawa/,Kawa ftp site},
 which includes other versions and files, including a @code{.deb}
 Debian package file of Kawa.
 

@@ -63,3 +63,4 @@ install-html:
 	-mkdir $(HTML_HOME)/gnu.bytecode
 	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.bytecode/index.html
 	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.bytecode/COPYING
+	chmod a+r $(HTML_HOME)/gnu.bytecode/*

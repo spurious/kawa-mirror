@@ -185,7 +185,7 @@
 
 (test 24 'factorial-4 factorial-4)
 
-(test 1062831600000 'namespace-syntax-test (namespace-syntax-call))
+(test 1062806400000 'namespace-syntax-test (namespace-syntax-call))
 
 (require <classes1>)
 (require <classes2>)

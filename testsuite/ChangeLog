@@ -1,3 +1,9 @@
+2003-12-25  Per Bothner  <per@bothner.com>
+
+	* module1.scm (namespace-syntax-test):  Specific timezone UTC so
+	result is predictable.
+	(obj-test.scm):  Update result from namespace-syntax-test.
+
 2003-12-20  Per Bothner  <per@bothner.com>
 
 	* obj-test.scm, classes1.scm:  Test new field initialization features.

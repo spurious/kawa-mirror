@@ -25,4 +25,4 @@
 (define-syntax namespace-syntax-test
   (syntax-rules ()
     ((namespace-syntax-test)
-     (date:parse "6 Sep 2003"))))
+     (date:parse "6 Sep 2003 UTC"))))

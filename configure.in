@@ -43,13 +43,8 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_SUBST(SHELL)
 
-# ${javatop} is normally empty, but is useful when the tree has been
-# re-arranged so that Java packages are up a level.
-AC_OUTPUT(Makefile ${javatop}gnu/Makefile ${javatop}gnu/bytecode/Makefile
-  ${javatop}gnu/math/Makefile ${javatop}gnu/text/Makefile
-  ${javatop}gnu/mapping/Makefile ${javatop}gnu/expr/Makefile
-  ${javatop}gnu/ecmascript/Makefile ${javatop}gnu/elisp/Makefile
-  ${javatop}gnu/emacs/Makefile
-  ${javatop}kawa/Makefile ${javatop}kawa/lang/Makefile 
-  ${javatop}kawa/standard/Makefile ${javatop}kawa/lib/Makefile
+AC_OUTPUT(Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
+  gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
+  gnu/ecmascript/Makefile gnu/elisp/Makefile gnu/emacs/Makefile
+  kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
   doc/Makefile testsuite/Makefile)

@@ -1,3 +1,25 @@
+1999-08-06  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_OUTPUT):  Revert use of javatop macro.
+
+	* kawa/lang/Sequence.java (elements):  New method.
+	(SeqEnumeration):  New non-public class.
+	* kawa/lang/List.java (elements):  New method.
+	(ListEnumeration):  New non-public class.
+
+	* kawa/lang/Interpreter.java (getNewEnvironment):  New method.
+	* kawa/standard/Scheme.java (getNewEnvironment):  New method.
+	* kawa/GuiConsole.java:  Separate Environment from Interpreter.
+	* kawa/repl.java (main):  Use new GuiConsole constructor.
+
+	* kawa/Shell.java (run):  No longer need to explicitly catch WrongType.
+	Change confusing message for ClassCastException.
+	* kawa/lang/Translator.java (rewrite_pair):  If directly calling
+	an inlined PrimProcedure, set the name (for better error messages).
+	* kawa/standard/car.java: Catch ClassCastException instead of
+	using instanceof.
+	* kawa/standard/cdr.java:  Likewise.
+
 1999-08-03  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_INIT):  Use doc/kawa.texi instead of kawa/repl.java.

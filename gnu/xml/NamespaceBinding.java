@@ -55,6 +55,21 @@ public final class NamespaceBinding implements Externalizable
     return null;
   }
 
+  /** Resolve a prefix, in the initial part of this list.
+   * @param prefix an interned namespace prefix to search for.
+   * @param fencPost only search this list until then.
+   * @return a uri or null if not bound
+   */
+  public String resolve (String prefix, NamespaceBinding fencePost)
+  {
+    for (NamespaceBinding ns = this;  ns != fencePost;  ns = ns.next)
+      {
+	if (ns.prefix == prefix)
+	  return ns.uri;
+      }
+    return null;
+  }
+
   public static NamespaceBinding commonAncestor (NamespaceBinding ns1,
 						 NamespaceBinding ns2)
   {
@@ -93,6 +108,7 @@ public final class NamespaceBinding implements Externalizable
   }
   */
 
+  /** Reverse the chain, until a fencePost. */
   public NamespaceBinding reversePrefix (NamespaceBinding fencePost)
   {
     NamespaceBinding prev = fencePost;

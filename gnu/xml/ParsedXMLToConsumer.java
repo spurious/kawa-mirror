@@ -3,6 +3,7 @@
 
 package gnu.xml;
 import gnu.lists.Consumer;
+import gnu.lists.XConsumer;
 import gnu.lists.TreeList;
 import gnu.mapping.Symbol;
 
@@ -465,15 +466,23 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
 
   public void emitComment(char[] data, int start, int length)
   {
-    // FIXME?
+    closeStartTag();
+    if (base instanceof XConsumer)
+      ((XConsumer) base).writeComment(data, start, length);
   }
 
   /** Process a processing incluction. */
   public void emitProcessingInstruction(char[] buffer,
-                                        int target, int tlength,
-                                        int data, int dlength)
+                                        int tstart, int tlength,
+                                        int dstart, int dlength)
   {
-    // FIXME?
+    closeStartTag();
+    if (base instanceof XConsumer)
+      {
+	String target = new String(buffer, tstart, tlength);
+	((XConsumer) base).writeProcessingInstruction(target,
+						      buffer, dstart, dlength);
+      }
   }
 
   /** Process a DOCTYPE declaration. */

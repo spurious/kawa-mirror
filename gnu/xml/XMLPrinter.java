@@ -8,10 +8,12 @@ import gnu.text.Char;
 
 /** Print an event stream in XML format on a PrintWriter. */
 
-public class XMLPrinter extends PrintConsumer implements PositionConsumer
+public class XMLPrinter extends PrintConsumer
+  implements PositionConsumer, XConsumer
 {
   boolean inAttribute = false;
   boolean inStartTag = false;
+  boolean needXMLdecl = false;
   boolean canonicalize = true;
   boolean htmlCompat = true;
   public boolean escapeText = true;
@@ -157,6 +159,12 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 	inStartTag = false;
 	prev = '>';
       }
+    else if (needXMLdecl)
+      {
+	// should also include encoding declaration FIXME.
+	super.write("<?xml version=\"1.0\"?>\n");
+	needXMLdecl = false;
+      }
   }
 
   protected void startNumber()
@@ -166,7 +174,9 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 
   public void beginDocument()
   {
-    super.write("<?xml version=\"1.0\"?>\n");
+    // We should emit an XML declaration, but don't emit it set, in case
+    // we get it later as a processing instruction.
+    needXMLdecl = true;
   }
 
   public void beginGroup(String typeName, Object type)
@@ -185,7 +195,8 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
 	  {
 	    String prefix = ns.prefix;
 	    String uri = ns.uri;
-	    if (uri == namespaceBindings.resolve(prefix))
+	    if (uri == namespaceBindings.resolve(prefix)
+		|| uri == groupBindings.resolve(prefix, ns))
 	      // A matching namespace declaration is already in scope.
 	      continue;
 	    super.write(' '); // prettyprint break
@@ -389,6 +400,33 @@ public class XMLPrinter extends PrintConsumer implements PositionConsumer
   {
     seq.consumeNext(ipos, this);
     return true;
+  }
+
+  public void writeBaseUri (Object uri)
+  {
+  }
+
+  public void writeComment(char[] chars, int offset, int length)
+  {
+    closeTag();
+    print("<!--");
+    super.write(chars, offset, length);
+    print("-->");
+    prev = '>';
+  }
+
+  public void writeProcessingInstruction(String target, char[] content,
+					 int offset, int length)
+  {
+    if ("xml".equals(target))
+      needXMLdecl = false;
+    closeTag();
+    print("<?");
+    print(target);
+    print(' ');
+    write(content, offset, length);
+    print("?>");
+    prev = '>';
   }
 
   public boolean consume (SeqPosition position)

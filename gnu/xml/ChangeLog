@@ -1,3 +1,19 @@
+2004-04-18  Per Bothner  <per@bothner.com>
+
+	* ParsedXMLToConsumer.java (emitComment, emitProcessingInstruction):
+	Pass on if base is XConsumer.
+	* XMLPrinter.java:  Implement XConsumer.
+	(writeBaseUri, writeComment, writeProcessingInstruction):  New methods.
+
+	* XMLPrinter.java (needXMLdecl):  New field.
+	(beinDocument):  Don't emit XML decl yet, include it comes later
+	as a processing instruction.  Instead set needXMLdecl.
+	(closeTag):  Emit XML declaration if needXMLdecl is set.
+
+	* NamespaceBinding.java (resolve):  New method.
+	* XMLPrinter.java (beginGroup):  Check we haven't emitted namespace
+	declaration yet in this beginGroup.
+
 2004-01-12  Per Bothner  <per@bothner.com>
 
 	* XMLPrinter.java (beginDocument):  New method - print XML declaration.

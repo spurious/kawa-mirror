@@ -1,6 +1,7 @@
 Sun Dec 15 22:29:30 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure, configure.in:  Support new testsuite directory.
+	* Makefile.{am,in} (SUBDIRS):  Add new testsuite directory.
 
 	* kawa/standard/{ceiling,floor,round,truncate}.java:  Use new
 	RealNum.toInt virtual method.	

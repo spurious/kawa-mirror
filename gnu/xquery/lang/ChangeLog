@@ -1,3 +1,15 @@
+2004-12-12  Per Bothner  <per@bothner.com>
+
+	* XQParser.java: Implement line/column and error handling.
+	(curLine, curColumn): New fields.
+	(getrawToken): Set curLine and curColumn.
+	(skipOldComment, oldComment, getRawToken): Set position before error.
+	(COLON_COLON_TOKEN): Change spelling.  Have getRawToken return it.
+	(getAxis): New helper method.  Use it in peekOperand.
+	(parseMaybePrimaryExpr):  Set startLine from curLine etc.
+	(parseSeparator): Change so error refers to end of declaration.
+	(error, syntaxError, tokenWidth): Remove and simplify.
+
 2004-12-10  Per Bothner  <per@bothner.com>
 
 	* XQParser.java: Implement 'declare default collation'.

@@ -21,6 +21,15 @@ public class XQParser extends LispReader // should be extends Lexer
 {
   int curToken;
   Object curValue;
+
+  /** Value of getLineNumber() at start of current token.
+   * Sometimes set otherwise, to report errors. */
+  int curLine;
+
+  /** Value of getColumnNumber() at start of current token.
+   * Sometimes set otherwise, to report errors. */
+  int curColumn;
+
   XQuery interpreter;
 
   int seenPosition;
@@ -113,6 +122,7 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     int seenDashes = 0;
     int startLine = getLineNumber() + 1;
+    int startColumn = getColumnNumber() - 2;
     for (;;)
       {
 	int ch = read();
@@ -121,7 +131,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	else if (ch == '}' && seenDashes >= 2)
 	  return;
 	else if (ch < 0)
-	  eofError("non-terminated comment starting at line "+startLine);
+	  {
+	    curLine = startLine;
+	    curColumn = startColumn;
+	    eofError("non-terminated comment starting here");
+	  }
 	else
 	  seenDashes = 0;
       }
@@ -131,6 +145,7 @@ public class XQParser extends LispReader // should be extends Lexer
     throws java.io.IOException, SyntaxException
   {
     int startLine = getLineNumber() + 1;
+    int startColumn = getColumnNumber() - 1;
     int prev = 0;
     int commentNesting = 0;
     char saveReadState = pushNesting(':');
@@ -155,7 +170,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	    --commentNesting;
 	  }
 	else if (ch < 0)
-	  eofError("non-terminated comment starting at line "+startLine);
+	  {
+	    curLine = startLine;
+	    curColumn = startColumn;
+	    eofError("non-terminated comment starting here");
+	  }
 	prev = ch;
       }
   }
@@ -179,7 +198,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int SLASHSLASH_TOKEN = 'D';
   static final int DOTDOT_TOKEN = '2';
   static final int COLON_EQUAL_TOKEN = 'L'; // ":="
-  static final int COLONCOLON_TOKEN = 'X';
+  static final int COLON_COLON_TOKEN = 'X';
 
   /** A non-qualified (simple) name (NCName).
    * The tokenBuffer contains the name (which does not contain a ':'). */
@@ -296,6 +315,14 @@ public class XQParser extends LispReader // should be extends Lexer
     super.reset();
   }
 
+  private int setToken (int token, int width)
+  {
+    curToken = token;
+    curLine = port.getLineNumber() + 1;
+    curColumn = port.getColumnNumber() + 1 - width;
+    return token;
+  }
+
   int getRawToken()
       throws java.io.IOException, SyntaxException
   {
@@ -304,30 +331,30 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	next = read();
 	if (next < 0)
-	  return curToken = EOF_TOKEN;
+	  return setToken(EOF_TOKEN, 0);
 	if (next == '\n' || next == '\r')
 	  {
 	    if (nesting <= 0)
-	      return curToken = EOL_TOKEN;
+	      return setToken(EOL_TOKEN, 0);
 	  }
 	else if (next == '(')
 	  {
 	    if (checkNext(':'))
 	      skipComment();
 	    else
-	      return curToken = '(';
+	      return setToken('(', 1);
 	  }
 	else if (next == '{')
 	  {
 	    if (! checkNext('-'))
-	      return curToken = '{';
+	      return setToken('{', 1);
 	    next = read();
 	    if (next != '-')
 	      {
 		// FIXME backup 2 chars. Can fix using special token for '{-'.
 		unread();
 		unread();
-		return curToken = '{';
+		return setToken('{', 1);
 	      }
 	    skipOldComment();
 	  }
@@ -335,6 +362,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	  break;
       }
     tokenBufferLength = 0;
+    curLine = port.getLineNumber() + 1;
+    curColumn = port.getColumnNumber();
     char ch = (char) next;
     switch (ch)
       {
@@ -344,6 +373,8 @@ public class XQParser extends LispReader // should be extends Lexer
       case ':':
 	if (checkNext('='))
 	  ch = COLON_EQUAL_TOKEN;
+	else if (checkNext(':'))
+	  ch = COLON_COLON_TOKEN;
 	break;
       case '|':
 	ch = OP_UNION;
@@ -405,7 +436,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  {
 	    next = read();
 	    if (next < 0)
-	      eofError("unexpected end-of-file in string");
+	      eofError("unexpected end-of-file in string starting here");
 	    if (next == '&')
 	      {
 		parseEntityOrCharRef();
@@ -526,16 +557,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	  }
 	else if (ch >= ' ' && ch < 127)
-	  syntaxError("invalid character '"+ch+'\'', 1);
+	  syntaxError("invalid character '"+ch+'\'');
 	else
-	  syntaxError("invalid character '\\u"+Integer.toHexString(ch)+'\'',
-		      1);
+	  syntaxError("invalid character '\\u"+Integer.toHexString(ch)+'\'');
       }
     curToken = ch;
     return ch;
   }
 
-  /** Scan untl a given delimiter.
+  /** Scan until a given delimiter.
    * On success, text upto the delimiter is in then tokenBuffer (with
    * tokenBufferLength marking its length); the delimiter is not included.
    */
@@ -724,6 +754,22 @@ public class XQParser extends LispReader // should be extends Lexer
     return false;
   }
 
+  int getAxis ()
+  {
+    // match axis name
+    String name = new String(tokenBuffer, 0, tokenBufferLength).intern();
+    int i;
+    for (i = COUNT_OP_AXIS;  --i >= 0; )
+      if (axisNames[i] == name)
+	break;
+    if (i < 0)
+      {
+	error("unknown axis name '" + name + '\'');
+	i = AXIS_CHILD;
+      }
+    return (char) (OP_AXIS_FIRST + i);
+  }
+
   /** Process token, assuming we are in operand context.
    */
 
@@ -765,6 +811,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	      }
 	    return curToken = token;
 	  }
+	if (next == ':' && peek() == ':')
+	  return curToken = getAxis();
 	String name = new String(tokenBuffer, 0, tokenBufferLength);
 	curValue = name;
 	switch (next)
@@ -858,20 +906,7 @@ public class XQParser extends LispReader // should be extends Lexer
       {
 	int next = read();
 	if (next == ':') // We've seen an Axis specifier.
-	  {
-	    // match axis name
-	    String name
-	      = new String(tokenBuffer, 0, tokenBufferLength).intern();
-	    int i;
-	    for (i = COUNT_OP_AXIS;  --i >= 0; )
-	      if (axisNames[i] == name)
-		break;
-	    if (i >= 0)
-	      curToken = (char) (OP_AXIS_FIRST + i);
-	    else
-	      error("unknown axis name '" + name + '\'');
-	    curValue = name;
-	  }
+	  curToken = getAxis();
 	else
 	  unread(next);
       }
@@ -1470,9 +1505,6 @@ public class XQParser extends LispReader // should be extends Lexer
     if (dotDecl == null)
       error("node test when focus is undefined");
     int token = peekOperand();
-    if (token == FNAME_TOKEN)
-      {
-      }
 
     if (curToken == '@' && axis < 0)
       {
@@ -1622,7 +1654,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	getRawToken();
 	Declaration dotDecl = parser.lookup(DOT_VARNAME, -1);
 	if (dotDecl == null)
-	  error("node test when focus is undefined");
+	  error("node test3 when focus is undefined");
 	Expression exp = new ReferenceExp(DOT_VARNAME, dotDecl);
 	if (axis == AXIS_PARENT)
 	  {
@@ -2350,8 +2382,8 @@ public class XQParser extends LispReader // should be extends Lexer
   Expression parseMaybePrimaryExpr()
       throws java.io.IOException, SyntaxException
   {
-    int startLine = getLineNumber() + 1;
-    int startColumn = getColumnNumber()+ 1;
+    int startLine = curLine;
+    int startColumn = curColumn;
     int token = peekOperand();
     Expression exp;
     int c1, c2, c3;
@@ -2582,7 +2614,6 @@ public class XQParser extends LispReader // should be extends Lexer
 	unread(ch);
       }
     */
-    int tt =curToken;
     getRawToken();
     return exp;
   }
@@ -2775,8 +2806,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  return syntaxError("'order by' clause not implemented yet");
 	boolean sawReturn = match("return");
 	if (! sawReturn && ! match("let") && ! match("for"))
-	  return syntaxError("missing 'return' clause tok:"+curToken+" str: '"
-			     +new String(tokenBuffer,0,tokenBufferLength)+"'");
+	  return syntaxError("missing 'return' clause");
 	peekNonSpace("unexpected eof-of-file after 'return'");
 	int bodyLine = getLineNumber() + 1;
 	int bodyColumn = getColumnNumber() + 1;
@@ -2941,11 +2971,17 @@ public class XQParser extends LispReader // should be extends Lexer
   void parseSeparator ()
     throws java.io.IOException, SyntaxException
   {
+    int startLine = port.getLineNumber() + 1;
+    int startColumn = port.getColumnNumber() + 1;
     int next = skipSpace(nesting != 0);
     if (next == ';')
       return;
     if (warnOldVersion && next != '\n')
-      error('w', "missing ';' after declaration");
+      {
+	curLine = startLine;
+	curColumn = startColumn;
+	error('w', "missing ';' after declaration");
+      }
     if (next >= 0)
       unread(next);
   }
@@ -3294,17 +3330,6 @@ public class XQParser extends LispReader // should be extends Lexer
   static final NodeType anyNodeTest
     = new NodeType("node");
 
-  public void error(String message)
-  {
-    super.error(message);
-  }
-
-  public Expression syntaxError (String message)
-    throws java.io.IOException, SyntaxException
-  {
-    return syntaxError(message, tokenWidth());
-  }
-
   /** Helper method for debugging. */
   String tokenString()
   {
@@ -3320,30 +3345,9 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
-  private int tokenWidth()
+  public void error(char severity, String message)
   {
-    switch (curToken)
-      {
-      case EOF_TOKEN:
-	return 0;
-      case QNAME_TOKEN:
-      case NCNAME_TOKEN:
-      case INTEGER_TOKEN:
-      case FLOAT_TOKEN:
-	return tokenBufferLength;
-      default:
-	return 1;
-      }
-  }
-
-  void error (String message, int columnAdjust)
-    throws java.io.IOException, SyntaxException
-  {
-    int line = port.getLineNumber();
-    int column = port.getColumnNumber();
-    error('e', port.getName(), line + 1,
-	  column < 0 ? 0 : column + 1 - columnAdjust,
-	  message);
+    error(severity, port.getName(), curLine, curColumn, message);
   }
 
   public Expression declError (String message)
@@ -3351,7 +3355,7 @@ public class XQParser extends LispReader // should be extends Lexer
   {
     if (interactive)
       return syntaxError(message);
-    error(message, tokenWidth());
+    error(message);
     for (;;)
       {
 	if (curToken==';' || curToken == EOF_TOKEN)
@@ -3364,13 +3368,12 @@ public class XQParser extends LispReader // should be extends Lexer
   /**
    * Handle syntax errors (at rewrite time).
    * @param message an error message to print out
-   * @param columnAdjust number of columns to subtract from current position.
    * @return an ErrorExp
    */
-  public Expression syntaxError (String message, int columnAdjust)
+  public Expression syntaxError (String message)
     throws java.io.IOException, SyntaxException
   {
-    error(message, columnAdjust);
+    error(message);
     if (interactive)
       {
 	curToken = 0;

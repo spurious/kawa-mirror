@@ -1,4 +1,4 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.math;

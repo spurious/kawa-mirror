@@ -492,7 +492,7 @@ public class Scheme extends Interpreter
       define_proc ("keyword->string", "kawa.lib.keywords");
       define_proc ("string->keyword", "kawa.lib.keywords");
       define_proc ("%makeProcLocation", "kawa.standard.makeProcLocation");
-      define_syntax ("location", "kawa.lib.syntax");
+      define_syntax ("location", "kawa.standard.location");
   }
 
   static int scheme_counter = 0;

@@ -88,7 +88,7 @@ public class load extends Procedure1 {
   public final static Object loadSource (InPort port, Environment env)
   {
     // Reading the entire file and evaluting it as a unit is more
-    // consistent with compiled code, and more eifficient.
+    // consistent with compiled code, and more efficient.
     // Unfortunately, it is difficult to get macros to work properly.
     // So instead, we read and evaluate each line individually.
     if (true)

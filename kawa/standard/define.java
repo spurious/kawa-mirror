@@ -62,7 +62,7 @@ public class define extends Syntax implements Printable
 	if (binding == null || binding instanceof String)
 	  return tr.syntaxError ("invalid use of define");
 	SetExp sexp = new SetExp (name, value);
-	sexp.binding = tr.resolve (name, (Declaration) binding);
+	sexp.binding = (Declaration) binding;
 	sexp.binding.noteValue (value);
 	return sexp;
       }

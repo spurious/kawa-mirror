@@ -5,6 +5,8 @@
 	(install-javadoc-html): Add extra jars to CLASSPATH, for newpackages -
 	Eclipse, ant, and servlets.
 
+	* kawa/MessageArea.java: Fix javadoc problem.
+
 	* kawa/package.html: New file, for javadoc.
 	* kawa/lang/package.html: Likewise.
 	* kawa/standard/package.html: Likewise.

@@ -25,8 +25,6 @@ public class MessageArea extends TextArea
    * simple TextArea that always scrolls to the bottom.  Also creates an
    * out and err PrintWriter so that you can redirect stdout/stderr to
    * these streams, using the System.setOut/setErr methods.
-   *
-   * @param     focus    specifies if this is focus traversable
    */
   public MessageArea(gnu.text.QueueReader in) {
     super();

@@ -1,3 +1,7 @@
+Thu May 29 15:08:42 1997  Per Bothner  <bothner@cygnus.com>
+
+	* num-test.scm:  Add some tests for magnitude.
+
 Mon May 26 22:00:05 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* num-test.scm:  Add inexact->exact test that detected gcd of 0 bug.

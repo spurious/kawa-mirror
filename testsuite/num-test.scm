@@ -30,6 +30,12 @@
 (test 10000000000 inexact->exact (exact->inexact 10000000000))
 (test 0 inexact->exact 0.0)
 
+(SECTION "magnitude")
+(test 4.0 magnitude 4.)
+(test 4e3 magnitude -4000.)
+(test 5.0 magnitude 3-4i)
+(test 3/2 magnitude (/ 6 -4))
+
 (SECTION "shift")
 (test 12676506002282294014967032053760 arithmetic-shift 10 100)
 

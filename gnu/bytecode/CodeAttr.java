@@ -27,7 +27,7 @@ public class CodeAttr extends Attribute implements AttrContainer
   LineNumbersAttr lines;
   LocalVarsAttr locals;
 
-  private Type[] stack_types;
+  Type[] stack_types;
   int SP;  // Current stack size (in "words")
   private int max_stack;
   private int max_locals;

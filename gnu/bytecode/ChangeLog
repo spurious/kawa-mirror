@@ -1,3 +1,7 @@
+Thu Jun 25 22:40:05 1998  Per Bothner  <bothner@cygnus.com>
+
+	* CodeAttr.java (stack_types):  Make non-private (for SwitchState).
+
 Mon Jun 22 18:33:13 1998  Per Bothner  <bothner@cygnus.com>
 
 	* Access.java (toString):  Print unrecognized flags as hex value.
@@ -10,8 +14,6 @@ Mon Jun 22 18:33:13 1998  Per Bothner  <bothner@cygnus.com>
 	* InnerClassesAttr.java:  New, for JDK 1.1 "InnerClasses" attribute.
 	* SwitchState.java:  New - state for a switch statement.
 	* Makefile.am:  Add new classes.
-
-
 
 Mon Apr 27 13:18:01 1998  Jeff Haynes  <jhaynes@dascom.com>
 

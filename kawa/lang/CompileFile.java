@@ -43,7 +43,6 @@ public class CompileFile
    * @param topname name for the class of the .class for the top-level code.
    *  If null, topname is derived from prefix and inname.
    * @param prefix to prepend classnames for functions
-   * @return true iff there were syntax errors
    */
   public static void compile_to_files (String inname, String directory,
                                        String prefix, String topname,

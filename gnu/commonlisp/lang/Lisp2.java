@@ -44,6 +44,11 @@ public abstract class Lisp2 extends LispInterpreter
     return true;
   }
 
+  public void defineFunction(String name, Object proc)
+  {
+    Environment.defineFunction(environ, name, proc);
+  }
+
   /** Get a symbol for a given (interned) Java string. */
   public static Object getSymbol (String name)
   {

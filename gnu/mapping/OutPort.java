@@ -70,45 +70,34 @@ public class OutPort extends PrintConsumer implements Printable
 
   public boolean printReadable;
 
-  // For now, these are static.  They should probably be thread-local.
   private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
-  private static OutPort out = outInitial;
 
   private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
-  private static OutPort err = errInitial;
 
+  public static final ThreadLocation outLocation
+    = new ThreadLocation(new Symbol("out-default"));
+  static { outLocation.setGlobal(outInitial); }
+  public static final ThreadLocation errLocation
+    = new ThreadLocation(new Symbol("err-default"));
+  static { errLocation.setGlobal(errInitial); }
   static public OutPort outDefault ()
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      return ((Future) thread).out;
-    return out;
+    return (OutPort) outLocation.get();
   }
 
   static public void setOutDefault (OutPort o)
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      ((Future) thread).out = o;
-    else
-      out = o;
+    outLocation.set(o);
   }
 
   static public OutPort errDefault ()
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      return ((Future) thread).err;
-    return err;
+    return (OutPort) outLocation.get();
   }
 
   static public void setErrDefault (OutPort e)
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      ((Future) thread).err = e;
-    else
-      err = e;
+    errLocation.set(e);
   }
 
   public static OutPort openFile(String fname)
@@ -332,7 +321,7 @@ public class OutPort extends PrintConsumer implements Printable
     if (objectFormat != null)
       objectFormat.endGroup(typeName,this);
     else
-      out.print(')');
+      print(')');
     prev = ')';
   }
 

@@ -6,25 +6,28 @@ public class Future extends Thread
   CallContext context;
 
   private Environment initEnvironment;
-  InPort in;
-  OutPort out;
-  OutPort err;
+  // These are only used to when we need to override the parents' in/out/err
+  // in the child.  This is not needed for normal Future objects, but (say)
+  // when starting a repl in a new window.  In that case we could do te
+  // in/out/err override in the 'action'.  FIXME.
+  private InPort in;
+  private OutPort out;
+  private OutPort err;
   Throwable exception;
 
   Procedure action;
 
   public Future (Procedure action, Environment environment)
   {
-    this(action, environment,
-	 InPort.inDefault(), OutPort.outDefault(), OutPort.errDefault());
+    this.action = action;
+    this.initEnvironment = environment;
+    ((SimpleEnvironment) environment).makeShared();
   }
 
   public Future (Procedure action, Environment environment,
 		 InPort in, OutPort out, OutPort err)
   {
-    this.action = action;
-    this.initEnvironment = environment;
-    ((SimpleEnvironment) environment).makeShared();
+    this(action, environment);
     this.in = in;
     this.out = out;
     this.err = err;
@@ -47,6 +50,12 @@ public class Future extends Thread
 	context.curEnvironment = env;
 	env.makeShared();
 	env.flags &= ~Environment.DIRECT_INHERITED_ON_SET;
+	if (in != null)
+	  InPort.setInDefault(in);
+	if (out != null)
+	  OutPort.setOutDefault(out);
+	if (err != null)
+	  OutPort.setErrDefault(err);
 	result = action.apply0 ();
       }
     catch (Throwable ex)

@@ -1,5 +1,15 @@
 2005-02-24  Per Bothner  <per@bothner.com>
 
+	* InPort.java (inLocation): New static ThreadLocation.
+	(inDefault, setInDefault): Use inLocation.
+	* OutPort.java (outLocation, errLocation): New static ThreadLocations.
+	(outDefault, setOutDefault): Use outLocation.
+	(errDefault, setErrDefault): Use errLocation.
+	* Future.java (in, out, err): This fields are now only used to
+	initialize a Thread, not by inDefault/outDefault/errDefault.
+
+	* OutPort.java (endGroup): Fix small thinko.
+
 	* CallContext.java (getEnvironment): If no Environment, create a new
 	Environment that inherits from global, rather than using it directly.
 

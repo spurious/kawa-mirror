@@ -1,3 +1,9 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* ports.scm (define-alias-parameter): New helper macro.
+	(current-input-port, current-output-port, current-error-port):
+	Re-define as "parameter objects", using define-alias-parameter.
+
 2005-02-23  Per Bothner  <per@bothner.com>
 
 	* std_syntax.scm (syntax-object->datum): Use new Quote.quote method.

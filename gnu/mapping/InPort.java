@@ -62,24 +62,18 @@ public class InPort extends gnu.text.LineBufferedReader implements Printable
 
   private static InPort systemInPort = new TtyInPort (System.in, "<stdin>",
 						      OutPort.outDefault());
-  private static InPort defaultInPort = systemInPort;
+  public static final ThreadLocation inLocation
+    = new ThreadLocation(new Symbol("in-default"));
+  static { inLocation.setGlobal(systemInPort); }
 
   static public InPort inDefault ()
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      return ((Future) thread).in;
-    else
-      return defaultInPort;
+    return (InPort) inLocation.get();
   }
 
   static public void setInDefault (InPort in)
   {
-    Thread thread = Thread.currentThread ();
-    if (thread instanceof Future)
-      ((Future) thread).in = in;
-    else
-      defaultInPort = in;
+    inLocation.set(in);
   }
 
   public static InPort openFile(String fname)

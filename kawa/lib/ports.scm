@@ -22,15 +22,32 @@
 (define (output-port? x) :: <boolean>
   (instance? x <output-port>))
 
-(define (current-input-port) :: <input-port>
-  ((primitive-static-method <input-port> "inDefault" <input-port> ())))
+(define-syntax define-alias-parameter
+  (syntax-rules ()
+    ((define-alias-paramete name type location)
+     (begin
+       (define-constant name :: <gnu.mapping.LocationProc>
+	 (invoke-static <gnu.mapping.LocationProc> 'makeNamed
+			(gnu.mapping.Symbol:make '|| 'name)
+			location))
+       (gnu.mapping.LocationProc:pushConverter
+	name
+	(lambda (arg)
+	  (try-catch
+	   (as type arg)
+	   (ex <java.lang.ClassCastException>
+	       (let ((wt (gnu.mapping.WrongType:make ex name
+						     (as <int> 1) arg)))
+		 (set! (field wt 'expectedType) type)
+		 (primitive-throw wt))))))))))
 
-(define (current-output-port) :: <output-port>
-  ((primitive-static-method <output-port> "outDefault" <output-port> ())))
-
-(define (current-error-port) :: <output-port>
-  ((primitive-static-method <output-port> "errDefault" <output-port> ())))
-
+(define-alias-parameter current-input-port <input-port>
+  (static-field <input-port> 'inLocation))
+(define-alias-parameter current-output-port <output-port>
+  (static-field <output-port> 'outLocation))
+(define-alias-parameter current-error-port <output-port>
+  (static-field <output-port> 'errLocation))
+	 
 (define (write-char ch #!optional
 		    (port :: <output-port>
 			  (invoke-static  <output-port> 'outDefault)))

@@ -116,7 +116,7 @@ public class NumberCompare extends ProcedureN
       return Boolean.FALSE;
   }
 
-  static boolean apply2 (int flags, Object arg1, Object arg2)
+  static public boolean apply2 (int flags, Object arg1, Object arg2)
   {
     return ((1 << (3 + ((Numeric)arg1).compare(arg2))) & flags) != 0;
   }

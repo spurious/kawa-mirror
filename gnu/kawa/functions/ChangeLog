@@ -1,3 +1,8 @@
+2001-11-05  Per Bothner  <per@bothner.com>
+
+	* NumberCompare.java (apply2):  Make public, so it can be used
+	by gnu.xquery.util.Compare.
+
 2001-11-01  Per Bothner  <per@bothner.com>
 
 	* ConstantFunction0.java:  New class, extends Procedure0.

@@ -1,3 +1,8 @@
+2002-07-25  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite_pair):  Remove some optimizations,
+	and argument count checking.  They are now done in InlineCalls.
+
 2002-07-24  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Update for gnu.expr changes.

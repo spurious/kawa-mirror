@@ -284,55 +284,12 @@ public class Translator extends Compilation
         else if (decl.getFlag(Declaration.IS_SYNTAX))
           return apply_rewrite ((Syntax) decl.getConstantValue(), p);
 
-        if (proc != null && proc instanceof Procedure
-            && ! immediate && ref.getBinding() == null)
-          {
-            Procedure pproc = (Procedure) proc;
-
-            Class procClass = PrimProcedure.getProcedureClass(pproc);
-            gnu.bytecode.Field procField;
-	    String pname = pproc.getName();
-            if (procClass != null && pname != null)
-              {
-                ClassType procType = (ClassType) Type.make(procClass);
-                procField
-		  = procType.getDeclaredField(Compilation.mangleName(pname));
-              }
-            else
-              procField = null;
-            if (procField != null)
-              {
-                int fflags = procField.getModifiers();
-                if ((fflags & Access.STATIC) != 0)
-                  {
-                    Declaration fdecl
-                      = new Declaration(pproc.getName(), procField);
-                    fdecl.noteValue(new QuoteExp(pproc));
-                    ref.setBinding(fdecl);
-                    if ((fflags & Access.FINAL) != 0)
-                      fdecl.setFlag(Declaration.IS_CONSTANT);
-                  }
-              }
-          }
-
 	ref.setProcedureName(true);
 	if (getInterpreter().hasSeparateFunctionNamespace())
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
     int cdr_length = LList.listLength(cdr, false);
-
-    if (func instanceof QuoteExp)
-      {
-	proc = ((QuoteExp) func).getValue();
-	if (proc instanceof Procedure)
-	  {
-	    String msg = WrongArguments.checkArgCount((Procedure) proc,
-						      cdr_length);
-	    if (msg != null)
-	      return syntaxError(msg);
-	  }
-      }
 
     if (cdr_length < 0)
       return syntaxError("dotted list is not allowed");

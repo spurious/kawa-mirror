@@ -41,7 +41,7 @@ public abstract class ModuleBody extends Procedure0
 
   public Object apply0(ModuleMethod method)
   {
-    return applyN(method, Procedure.noArgs);
+    return applyN(method, Values.noArgs);
   }
 
   public Object apply1(ModuleMethod method, Object arg1)

@@ -1,3 +1,14 @@
+2000-05-28  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleName):  Readable mangling of initial digit.
+
+	* LambdaExp.java (addmethodFor):  Check for conflicting method names.
+
+	* ModuleBody.java (apply0):  Use Values.noArgs, not rocedure.noArgs.
+
+	* ModuleExp.java (SUPERTYPE_SPECIFIED):  New flag constant.
+	(isStatic): Not default static if SUPERTYPE_SPECIFIED.
+
 2000-05-27  Per Bothner  <per@bothner.com>
 
 	Support (module-static ...) and (module-export ...).

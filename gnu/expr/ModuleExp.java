@@ -21,6 +21,7 @@ public class ModuleExp extends LambdaExp
   public static final int EXPORT_SPECIFIED = LambdaExp.NEXT_AVAIL_FLAG;
   public static final int STATIC_SPECIFIED = EXPORT_SPECIFIED << 1;
   public static final int NONSTATIC_SPECIFIED = STATIC_SPECIFIED << 1;
+  public static final int SUPERTYPE_SPECIFIED = NONSTATIC_SPECIFIED << 1;
 
   public ModuleExp ()
   {
@@ -56,9 +57,10 @@ public class ModuleExp extends LambdaExp
 
   public final boolean isStatic ()
   {
-    return (getFlag(ModuleExp.STATIC_SPECIFIED)
+    return (getFlag(STATIC_SPECIFIED)
 	    || (gnu.expr.Compilation.moduleStatic > 0
-		&& ! getFlag(ModuleExp.NONSTATIC_SPECIFIED)));
+		&& ! getFlag(SUPERTYPE_SPECIFIED)
+		&& ! getFlag(NONSTATIC_SPECIFIED)));
   }
 
   void allocFields (Compilation comp)

@@ -695,7 +695,6 @@ public class LambdaExp extends ScopeExp
 
     Type rtype = body.getType();
     int extraArg = (closureEnvType != null && closureEnvType != ctype) ? 1 : 0;
-    name = nameBuf.toString();
     for (int i = 0;  i <= numStubs;  i++)
       {
 	int plainArgs = min_args + i;
@@ -723,6 +722,37 @@ public class LambdaExp extends ScopeExp
 	      }
 	    firstArgsArrayArg = var;
 	    atypes[atypes.length-1] = lastType;
+	  }
+
+	boolean classSpecified
+	  = (outer instanceof ObjectExp
+	     || (outer instanceof ModuleExp
+		 && (((ModuleExp) outer)
+		     .getFlag(ModuleExp.SUPERTYPE_SPECIFIED))));
+	name = nameBuf.toString();
+	if (! classSpecified)
+	  {
+	    // If the base class or interfaces were not explicitly
+	    // specified, then any existing matching method (such as "run"
+	    // or "apply") is a conflict.  So rename the method.
+	    int renameCount = 0;
+	    int len = nameBuf.length();
+	  retry:
+	    for (;;)
+	      {
+		for (ClassType t = ctype;  t != null; t = t.getSuperclass ())
+		  {
+		    if (t.getDeclaredMethod(name, atypes) != null)
+		      {
+			nameBuf.setLength(len);
+			nameBuf.append('$');
+			nameBuf.append(++renameCount);
+			name = nameBuf.toString();
+			continue retry;
+		      }
+		  }
+		break;
+	      }
 	  }
 	primMethods[i] = ctype.addMethod(name, atypes, rtype, mflags);
       }

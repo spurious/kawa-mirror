@@ -458,8 +458,13 @@ public class Compilation
 	    ch = Character.toTitleCase(ch);
 	    upcaseNext = false;
 	  }
-	if (Character.isLetter(ch)
-	    || (Character.isDigit (ch) && i > 0) || ch == '_' || ch == '$')
+	if (Character.isDigit(ch))
+	  {
+	    if (i == 0)
+	      mangled.append("$N");
+	    mangled.append(ch);
+	  }
+	else if (Character.isLetter(ch) || ch == '_' || ch == '$')
 	  mangled.append(ch);
 	else
 	  {

@@ -5,6 +5,7 @@ import gnu.expr.*;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
+import kawa.lang.SpecialType;
 
 public class ELisp extends Interpreter
 {
@@ -265,13 +266,19 @@ public class ELisp extends Interpreter
     out.flush();
   }
 
+  SpecialType booleanType;
+
   public Type getTypeFor (Class clas)
   {
     if (clas.isPrimitive())
       {
 	String name = clas.getName();
 	if (name.equals("boolean"))
-	  name = "elisp:boolean";
+	  {
+	    if (booleanType == null)
+	      booleanType = new SpecialType(Type.boolean_type, this);
+	    return booleanType;
+	  }
 	return Scheme.getNamedType(name);
       }
     return Type.make(clas);

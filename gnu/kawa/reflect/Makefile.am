@@ -9,8 +9,6 @@ javadir=$(datadir)/java/$(subdir)
 java_JAVA=\
   ClassMethods.java \
   Invoke.java \
-  InvokeStatic.java \
-  MakeInstance.java \
   SlotGet.java \
   SlotSet.java
 

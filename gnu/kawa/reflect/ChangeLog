@@ -1,3 +1,16 @@
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	* ClassMethods.java (selectApplicable, apply):  New static methods.
+	(checkName):  New helper method.
+
+	* Invoke.java:  Generalize to subsume InvokeStatic and MakeInstance.
+	Also implement Inlineable.
+	* InvokeStatic.java:  Remove class - subsumed by Invoke.
+	* MakeInstance.java:  Remove class - subsumed by Invoke.
+	* Makefile.am, Makefile.in (java_JAVA):  Remove rmeoved classes.
+	* SlotGet.java, SlotSet.java:  Also handle `static-field'.
+	Implement Inlineable.
+
 1999-11-03  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (apply):  Check if method isApplicable.

@@ -35,14 +35,20 @@ public class ClassMethods extends ProcedureN
       throw new WrongType(thisProc, 1, null);
     if (! ("<init>".equals(mname)))
       mname = Compilation.mangleName(mname);
-    return apply(dtype, mname, rtype, atypes, modifiers, modmask);
+    MethodProc result = apply(dtype, mname, rtype, atypes, modifiers, modmask);
+    if (result == null)
+      throw new RuntimeException("no applicable method named `"+mname+"' in "
+                                 +dtype.getName());
+    return result;
   }
 
-  public static MethodProc apply(ClassType dtype, String mname,
-                                 Type rtype, Type[] atypes,
-                                 int modifiers, int modmask)
+  /** Return the methods of a class wit the specified name and flag.
+   * @return an array containing the methods.
+   */
+  public static PrimProcedure[] getMethods(ClassType dtype, String mname,
+                                           int modifiers, int modmask,
+                                           kawa.lang.Interpreter interpreter)
   {
-    kawa.lang.Interpreter interpreter = kawa.standard.Scheme.getInstance();
     Class dclass = dtype.getReflectClass();
     if (dclass == null)
       throw new RuntimeException("no such class: "+dtype.getName());
@@ -54,6 +60,7 @@ public class ClassMethods extends ProcedureN
       methods = getMethods(dclass, mname, modifiers, modmask);
     GenericProc gproc = null;
     PrimProcedure pproc = null;
+    PrimProcedure[] result = new PrimProcedure[methods.length];
     for (int i = 0;  i < methods.length;  i++)
       {
         gnu.bytecode.Method method;
@@ -88,11 +95,81 @@ public class ClassMethods extends ProcedureN
                                 interpreter.getTypeFor(rmethod.getReturnType()));
             cur = new PrimProcedure(method);
           }
+        result[i] = cur;
+      }
+    return result;
+  }
+
+  /** Re-order the methods such that the ones that are definite
+   * applicable (all argtypes is subset of parameter type) are first;
+   * those possibly applicable next (argtype overlaps parameter types);
+   * and ending with those definitely not applicable (some argtype does
+   * overlap its parameter type).
+   * @return ((number of definitely applicabable methods) << 32
+   *          + (number of possibly applicable methods.
+   */
+  public static long selectApplicable(PrimProcedure[] methods,
+                                      Type[] atypes)
+  {
+    int limit = methods.length;
+    int numDefApplicable = 0;
+    int numPosApplicable = 0;
+    for (int i = 0;  i < limit;  )
+      {
+        int code = methods[i].isApplicable(atypes);
+        if (code < 0)
+          { // Definitely not applicable.
+            // swap(methods[limit-1], methods[i]):
+            PrimProcedure tmp = methods[limit-1];
+            methods[limit-1] = methods[i];
+            methods[i] = tmp;
+            limit--;
+          }
+        else if (code > 0)
+          { // Definitely applicable.
+            // swap(methods[numDefApplicable], methods[i]):
+            PrimProcedure tmp = methods[numDefApplicable];
+            methods[numDefApplicable] = methods[i];
+            methods[i] = tmp;
+            numDefApplicable++;
+            i++;
+          }
+        else
+          { // Possibly applicable.
+            numPosApplicable++;
+            i++;
+          }
+      }
+    return (((long) numDefApplicable) << 32) + (long) numPosApplicable;
+  }
+
+  public static MethodProc apply(ClassType dtype, String mname,
+                                 Type rtype, Type[] atypes,
+                                 int modifiers, int modmask)
+  {
+    kawa.lang.Interpreter interpreter = kawa.standard.Scheme.getInstance();
+    PrimProcedure[] methods = getMethods(dtype, mname,
+                                         modifiers, modmask, interpreter);
+    GenericProc gproc = null;
+    PrimProcedure pproc = null;
+    for (int i = 0;  i < methods.length;  i++)
+      {
+        PrimProcedure cur = methods[i];;
         if (atypes != null)
           {
             int applicable = cur.isApplicable(atypes);
-            if (applicable == -3)
+            if (applicable == -1)
               continue;
+            if (pproc != null)
+              {
+                MethodProc best = MethodProc.mostSpecific(pproc, cur);
+                if (best != null)
+                  {
+                    if (cur == best)
+                      pproc = cur;
+                    continue;
+                  }
+              }
           }
         if (pproc != null && gproc == null)
           {
@@ -108,10 +185,7 @@ public class ClassMethods extends ProcedureN
         gproc.setName(dtype.getName()+"."+mname);
         return gproc;
       }
-    if (pproc != null)
-      return pproc;
-    throw new RuntimeException("no applicable method named `"+mname+"' in "
-                               +dtype.getName());
+    return pproc;
   }
 
   /** Re-order method array in place so one with selected name are first.
@@ -164,5 +238,16 @@ public class ClassMethods extends ProcedureN
     = new java.lang.reflect.Constructor[nmethods];
     System.arraycopy(methods, 0, matching, 0, nmethods);
     return matching;
+  }
+
+  static String checkName(Expression exp)
+  {
+    if (exp instanceof QuoteExp)
+      {
+        Object name = ((QuoteExp) exp).getValue();
+        if (name instanceof FString || name instanceof String)
+          return Compilation.mangleName(name.toString());
+      }
+    return null;
   }
 }

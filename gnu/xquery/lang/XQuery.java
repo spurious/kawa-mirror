@@ -576,7 +576,7 @@ public class XQuery extends Language
     defProcStFld("distinct-nodes", "gnu.kawa.xml.SortNodes", "sortNodes");
 
     // FIXME - should be imported?
-    defProcStFld("children", "gnu.xquery.util.Children", "children");
+    defProcStFld("children", "gnu.kawa.xml.Children", "children");
     defProcStFld("not", "kawa.standard.Scheme");
 
     defaultNamespace = qexoFunctionNamespace;

@@ -1,3 +1,7 @@
+2005-03-03  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java: Function 'children' has been moved.
+
 2005-02-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java registerEnvironment):

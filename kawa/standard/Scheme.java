@@ -562,7 +562,7 @@ public class Scheme extends LispLanguage
       defProcStFld("make-element", "gnu.kawa.xml.MakeElement", "makeElement");
       defProcStFld("make-attribute", "gnu.kawa.xml.MakeAttribute", "makeAttribute");
       defProcStFld("map-values", "gnu.kawa.functions.ValuesMap", "valuesMap");
-      defProcStFld("children", "gnu.xquery.util.Children", "children");
+      defProcStFld("children", "gnu.kawa.xml.Children", "children");
       defProcStFld("attributes", "gnu.kawa.xml.Attributes");
       defProcStFld("unescaped-data", "gnu.kawa.xml.MakeUnescapedData",
 		   "unescapedData");

@@ -5,6 +5,7 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.*;
+import java.net.URL;
 
 /** Implement the XQuery function 'document'. */
 
@@ -14,7 +15,7 @@ public class Document extends Procedure1
 
   /** If there is no protocol specified, pre-pend "file:" and return a URL. */
 
-  public static java.net.URL makeURL(String fileName)
+  public static URL makeURL(String fileName)
     throws java.net.MalformedURLException
   {
     int len = fileName.length();
@@ -32,19 +33,31 @@ public class Document extends Procedure1
       }
     if (! seenProto)
       fileName = "file:" + fileName;
-    return new java.net.URL(fileName);
+    return new URL(fileName);
+  }
+
+  public static TreeList document (Object url) throws Throwable
+  {
+    TreeList doc = new TreeList();
+    document(url instanceof URL ? (URL) url : makeURL(url.toString()), doc);
+    return doc;
   }
 
   public static TreeList document (String fileName) throws Throwable
   {
     TreeList doc = new TreeList();
-    doc.beginDocument();
-    XMLParser parser
-      = new XMLParser(makeURL(fileName),
-		      new ParsedXMLToConsumer(new NamespaceResolver(doc)));
-    parser.parse();
-    doc.endDocument();
+    document(makeURL(fileName), doc);
     return doc;
+  }
+
+  public static void document (URL url, Consumer out) throws Throwable
+  {
+    out.beginDocument();
+    XMLParser parser
+      = new XMLParser(url,
+		      new ParsedXMLToConsumer(new NamespaceResolver(out)));
+    parser.parse();
+    out.endDocument();
   }
 
   public Object apply1 (Object arg1) throws Throwable
@@ -55,12 +68,6 @@ public class Document extends Procedure1
   public void apply (CallContext ctx) throws Throwable
   {
     String fileName = ctx.getNextArg().toString();
-    Consumer out = ctx.consumer;
-    out.beginDocument();
-    XMLParser parser
-      = new XMLParser(makeURL(fileName),
-		      new ParsedXMLToConsumer(new NamespaceResolver(out)));
-    parser.parse();
-    out.endDocument();
+    document(makeURL(fileName), ctx.consumer);
   }
 }

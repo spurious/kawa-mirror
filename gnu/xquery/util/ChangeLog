@@ -1,3 +1,8 @@
+2002-01-21  Per Bothner  <per@bothner.com>
+
+	* Document.java (document):  New static methods.
+	(apply):  Use one of the new methods.
+
 2002-01-07  Per Bothner  <per@bothner.com>
 
 	* Document.java (makeURL):  New helper method.

@@ -8,7 +8,7 @@ JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 JAVA=java -classpath @TOP_BUILDDIR@:$$CLASSPATH
 
 java.class:
-	cd $(srcdir); $(JAVAC) $(<F)
+	cd $(srcdir); $(JAVAC) $*.java
 
 .scm.class:
 	cd ../..; $(JAVA) kawac $< kawa.lib.
@@ -24,6 +24,8 @@ OBJ=\
   when_unless.class
 
 java_DATA=$(OBJ)
+
+EXTRA_DIST = $(OBJ:.class=.scm)
 
 CLEANFILES=$(OBJ)
 

@@ -233,7 +233,7 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 .java.class:
-	cd $(srcdir); $(JAVAC) $(<F)
+	cd $(srcdir); $(JAVAC) $*.java
 
 all: $(OBJ)
 .SUFFIXES:

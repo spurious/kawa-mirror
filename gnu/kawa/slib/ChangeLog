@@ -1,3 +1,8 @@
+2002-09-21  Per Bothner  <per@bothner.com>
+
+	* DefineRecordType.scm:  New macro, implements SRFI-9.
+	* Makefile.am (java_SCM):  Add DefineRecordType.scm.
+
 2002-07-30  Per Bothner  <per@bothner.com>
 
 	* HTTP.scm (get-response, response-status, error-response,

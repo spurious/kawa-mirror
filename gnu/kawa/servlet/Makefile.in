@@ -100,6 +100,7 @@ libgcj_basedir = @libgcj_basedir@
 AUTOMAKE_OPTIONS = foreign
 
 java_sources = \
+  CGIServletWrapper.java \
   GetRequest.java \
   GetResponse.java \
   KawaServlet.java \
@@ -109,6 +110,9 @@ java_sources = \
 
 PACKAGE_FNAME = gnu-kawa-servlet
 GCJ_INPUTS = $(java_Java)
+SOURCES = $(java_SCM) $(java_sources)
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+java_SCM = HTTP.scm
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  ChangeLog Makefile.am Makefile.in
@@ -212,7 +216,11 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 @Make_rules@
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+./../../kawa/java-classes.stamp:
+	cd ../../../kawa; $(MAKE)
+
+all: Makefile java-classes.stamp ../../../kawa/java-classes.stamp \
+  scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

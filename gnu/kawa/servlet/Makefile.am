@@ -5,6 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 @Make_rules@
 
 java_sources=\
+  CGIServletWrapper.java \
   GetRequest.java \
   GetResponse.java \
   KawaServlet.java \
@@ -13,5 +14,12 @@ java_sources=\
 
 PACKAGE_FNAME = gnu-kawa-servlet
 GCJ_INPUTS =  $(java_Java)
+SOURCES = $(java_SCM) $(java_sources)
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+java_SCM = HTTP.scm
 
-all: Makefile java-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+./../../kawa/java-classes.stamp:
+	cd ../../../kawa; $(MAKE)
+
+all: Makefile java-classes.stamp ../../../kawa/java-classes.stamp \
+  scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)

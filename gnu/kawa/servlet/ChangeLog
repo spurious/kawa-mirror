@@ -1,3 +1,10 @@
+2002-01-29  Per Bothner  <per@bothner.com>
+
+	* CGIServletWrapper.java:  New class, to wrap servlets as CGI scripts.
+	* HTTP.scm:  New helper functions, to access http parameters.
+	* Makefile.am:  Update accordingly.  Thsi incldues adding rules
+	for compiling the new HTTP.scm module.
+
 2002-01-19  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java (doGet):  Use CallContext.setInstance.

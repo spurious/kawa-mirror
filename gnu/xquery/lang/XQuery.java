@@ -57,7 +57,7 @@ public class XQuery extends Interpreter
   public Compilation parse(Environment env, Lexer lexer)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     gnu.text.SourceMessages messages = lexer.getMessages();
     Compilation tr = new Compilation(messages);
     ModuleExp mexp = new ModuleExp();
@@ -78,7 +78,7 @@ public class XQuery extends Interpreter
 				gnu.text.SourceMessages messages)
     throws java.io.IOException, gnu.text.SyntaxException
   {
-    Compilation.usingTailCalls = true;
+    Compilation.defaultCallConvention = Compilation.CALL_WITH_CONSUMER;
     Compilation tr = new Compilation(messages);
     tr.immediate = immediate;
     ModuleExp mexp = new ModuleExp();

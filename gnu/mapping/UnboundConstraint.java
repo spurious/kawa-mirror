@@ -1,6 +1,6 @@
 package gnu.mapping;
 
-/** This is a constraint used to catch unboud variables. */
+/** This is a constraint used to catch unbound variables. */
 
 public class UnboundConstraint extends Constraint
 {

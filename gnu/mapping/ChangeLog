@@ -1,3 +1,10 @@
+2000-12-09  Per Bothner  <per@bothner.com>
+
+	* Binding.java (UNBOUND):  New static field - a special value.
+	(getFunctionValue):  Just call Constraint's getFunctionValue.
+	* Constraint.java (getFunctionValue):  New method.
+	* AliasConstraint.java (getFunctionValue):  New method.
+
 2000-10-12  Per Bothner  <per@bothner.com>
 
 	* CallContext.java (args):  Removed field - use valueX instead.

@@ -13,6 +13,9 @@ public class Binding extends Location
 
   Constraint constraint;
 
+  /** Magic value used to indicate there is no (function) binding. */
+  static final String UNBOUND = new String("#unbound#");
+
   public final Object get ()
   {
     return constraint.get(this);
@@ -233,14 +236,7 @@ public class Binding extends Location
 
   public final Object getFunctionValue()
   {
-    Binding binding = this;
-    while (binding.constraint instanceof AliasConstraint)
-      binding = (Binding) binding.value;
-    if (binding instanceof Binding2)
-      return ((Binding2) binding).functionValue;
-    else if (binding.isBound())
-      return binding.get();
-    else
-      return null;
+    Object value = constraint.getFunctionValue(this);
+    return value == UNBOUND ? null : value;  // FIXME
   }
 }

@@ -55,4 +55,19 @@ public abstract class Constraint
   {
     binding.constraint = constraint;
   }
+
+  /** Get value of "function binding" of a Binding.
+   * Some languages (including Common Lisp and Emacs Lisp) associate both
+   * a value binding and a function binding with a symbol.
+   * @return the function value, or Binding.UNBOUND if no function binding.
+   */
+  public Object getFunctionValue(Binding binding)
+  {
+    if (binding instanceof Binding2)
+      return ((Binding2) binding).functionValue;
+    else if (binding.isBound())
+      return binding.get();
+    else
+      return Binding.UNBOUND;
+  }
 }

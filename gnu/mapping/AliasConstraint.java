@@ -22,6 +22,11 @@ public class AliasConstraint extends Constraint
     return ((Location) binding.value).isBound();
   }
 
+  public Object getFunctionValue(Binding binding)
+  {
+    return ((Binding) binding.value).getFunctionValue();
+  }
+
   public static void define (Binding binding, Location location)
   {
     synchronized (binding)

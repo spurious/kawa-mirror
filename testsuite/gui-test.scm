@@ -1,9 +1,12 @@
 (require 'gui)
 
+(define Yes-button
+  (button label: "Yes"
+	  oncommand: (lambda ()
+		       (format #t "Yes button pressed!~%~!"))))
+
 (frame title: "Kawa GUI Test"
-       contents: (button label: "Yes"
-			 oncommand: (lambda ()
-				      (format #t "Yes button pressed!~%~!")))
+       contents: (values Yes-button (panel width: 100 height: 100) Yes-button)
        menubar: (menubar
 		 (menu label: "File"
 		       (menuitem label: "New"

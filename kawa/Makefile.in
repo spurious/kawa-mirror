@@ -101,7 +101,7 @@ kawa_EXTRA_LIBS = -lncurses  # For Linux
 DEFS = -DKAWALIB='"$(datadir)/java"' $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
-EXTRA_DIST = Version.java
+EXTRA_DIST = Version.java.in Version.java
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
 bin_PROGRAMS =  @kawa_bin@

@@ -1,3 +1,12 @@
+2002-01-21  Per Bothner  <per@bothner.com>
+
+	* Document.java:  Moved form gnu.xquery.util.
+	(document):  Use ParsedXMLToConsumer.parse.  Remove 1 overload.
+	* MakeUnescapedData.java: New class, extends Procedure1.
+	* Makefile.am:  Update accordingly.
+
+	* Document.java:  Moved from gnu.xquery.util.
+
 2002-01-19  Per Bothner  <per@bothner.com>
 
 	* Write.java:  Moved from gnu.kawa.functions.

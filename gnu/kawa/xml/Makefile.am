@@ -8,6 +8,7 @@ java_sources = \
   Attributes.java \
   AttributeConstructor.java \
   DefineNamespace.java \
+  Document.java \
   ElementConstructor.java \
   HttpPrinter.java \
   MakeResponseHeader.java \

@@ -90,7 +90,7 @@ BUILT_SOURCES = Version.java
 SOURCES = $(java_JAVA) Version.java.in
 
 EXTRA_DIST = Version.java
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
 CONFIG_CLEAN_FILES = 
 SCRIPTS =  $(bin_SCRIPTS)
 

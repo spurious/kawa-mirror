@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.RealNum;
 import gnu.mapping.*;
 
@@ -10,8 +9,8 @@ public class positive_p extends Procedure1
   public Object apply1 (Object arg1)
    {
      if (((RealNum)arg1).sign () > 0)
-       return Interpreter.trueObject;
+       return Boolean.TRUE;
      else
-       return Interpreter.falseObject;
+       return Boolean.FALSE;
    }
 }

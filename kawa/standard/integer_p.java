@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.math.*;
 import gnu.mapping.*;
 
@@ -14,6 +13,6 @@ public class integer_p extends Procedure1
        result = Math.IEEEremainder (((DFloNum)arg1).doubleValue(), 1.0) == 0.0;
      else
        result = false;
-     return Interpreter.boolObject (result);
+     return result ? Boolean.TRUE : Boolean.FALSE;
    }
 }

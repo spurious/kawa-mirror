@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.mapping.*;
 
 public class char_ready_p extends Procedure0or1 {
@@ -27,6 +26,6 @@ public class char_ready_p extends Procedure0or1 {
 
   public final Object apply1 (Object arg1)
   {
-    return Scheme.boolObject(ready(arg1));
+    return ready(arg1) ? Boolean.TRUE : Boolean.FALSE;
   }
 }

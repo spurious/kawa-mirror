@@ -1,5 +1,4 @@
 package kawa.standard;
-import kawa.lang.*;
 import gnu.bytecode.Type;
 import gnu.math.*;
 import gnu.mapping.*;
@@ -21,7 +20,7 @@ public class eqv_p extends Procedure2 implements Inlineable
 
   public Object apply2 (Object arg1, Object arg2)
   {
-    return Interpreter.boolObject(apply(arg1, arg2));
+    return apply(arg1, arg2) ? Boolean.TRUE : Boolean.FALSE;
    }
 
   private static boolean nonNumeric(Expression exp)

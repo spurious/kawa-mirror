@@ -29,7 +29,7 @@ java_BUILT = \
   ParsedXMLHandler.java \
   ParsedXMLHandlerByte.java \
   QName.java \
-  XMLParser.java \
+  XMLParserChar.java \
   XMLParserByte.java
 
 BUILT_SOURCES = $(java_BUILT)
@@ -45,7 +45,7 @@ BYTE_SUBS = -e 's|@CHAR@|byte|g' -e 's|@XMLParser@|XMLParserByte|g' \
   -e '/@if CHAR is char@/,/@endif CHAR is char@/d' \
   -e '/@*if CHAR is byte@/d'
 CHAR_SUBS = -e 's|@CHAR@|char|g' \
-  -e 's|@XMLParser@|XMLParser|g'  -e 's|@ParsedXMLHandler@|ParsedXMLHandler|g'\
+  -e 's|@XMLParser@|XMLParserChar|g'  -e 's|@ParsedXMLHandler@|ParsedXMLHandler|g'\
   -e '/@if CHAR is byte@/,/@endif CHAR is byte@/d' \
   -e '/@*if CHAR is char@/d'
 
@@ -53,9 +53,9 @@ XMLParserByte.java:  $(srcdir)/XMLParser.java.in
 	sed $(BYTE_SUBS) $(FROM_XMLParser) \
 	  <$(srcdir)/XMLParser.java.in >XMLParserByte.java 
 
-XMLParser.java:  $(srcdir)/XMLParser.java.in
+XMLParserChar.java:  $(srcdir)/XMLParser.java.in
 	sed $(CHAR_SUBS) $(FROM_XMLParser) \
-	  <$(srcdir)/XMLParser.java.in >XMLParser.java 
+	  <$(srcdir)/XMLParser.java.in >XMLParserChar.java 
 
 ParsedXMLHandlerByte.java:  $(srcdir)/ParsedXMLHandler.java.in
 	sed $(BYTE_SUBS) $(FROM_ParsedXMLHandler) \

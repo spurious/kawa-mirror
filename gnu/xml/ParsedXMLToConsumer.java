@@ -17,25 +17,6 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     this.out = out;
   }
 
-  public static void parse(URL url, Consumer out)
-    throws java.io.IOException
-  {
-    out.beginDocument();
-    XMLParser parser
-      = new XMLParser(url,
-		      new ParsedXMLToConsumer(new NamespaceResolver(out)));
-    parser.parse();
-    out.endDocument();
-  }
-
-  public static TreeList parse(URL url)
-    throws java.io.IOException
-  {
-    TreeList doc = new TreeList();
-    parse(url, doc);
-    return doc;
-  }
-
   public void emitCharacters(char[] data, int start, int length)
   {
     out.write(data, start, length);

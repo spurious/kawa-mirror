@@ -21,12 +21,14 @@ public class ObjectExp extends LambdaExp
     return name == null ? "object" : Compilation.mangleName (name);
   }
 
-  public ClassType getCompiledClassType()
+  public ClassType getCompiledClassType(Compilation comp)
   {
     if (type == null)
       {
 	String name = getName();
-	type = new ClassType(name == null? "object" : name);
+	if (name == null)
+	  name = "object";
+	type = new ClassType(comp.generateClassName(name));
 	if (supers == null || supers.length == 0)
 	  type.setSuper(Type.pointer_type);
 	else
@@ -72,7 +74,7 @@ public class ObjectExp extends LambdaExp
 	code.emitDup(1);
 	code.emitInvokeVirtual(initMethod.primMethod);
       }
-    target.compileFromStack(comp, getCompiledClassType());
+    target.compileFromStack(comp, getCompiledClassType(comp));
   }
 
   public ClassType compile (Compilation comp)
@@ -81,7 +83,7 @@ public class ObjectExp extends LambdaExp
     Method saveMethod = comp.method;
     try
       {
-	ClassType new_class = getCompiledClassType();
+	ClassType new_class = getCompiledClassType(comp);
 	comp.curClass = new_class;
 
 	String filename = getFile();
@@ -91,6 +93,7 @@ public class ObjectExp extends LambdaExp
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = this;
 
+	allocFrame(comp);
 	comp.generateConstructor (comp.curClass, this);
 
 	CodeAttr code;
@@ -112,7 +115,7 @@ public class ObjectExp extends LambdaExp
 	    ClassType method_class;
 	    boolean method_static;
 	    int method_flags;
-	    //method_class = heapFrameLambda.getCompiledClassType();
+	    //method_class = heapFrameLambda.getCompiledClassType(comp);
 	    //method_class = (ClassType) heapFrame.getType();
 	    method_class = type;
 	    child.declareThis(method_class);

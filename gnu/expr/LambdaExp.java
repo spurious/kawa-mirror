@@ -176,7 +176,7 @@ public class LambdaExp extends ScopeExp
   ClassType type = Compilation.typeProcedure;
 
   /** Return the ClassType of the Procedure this is being compiled into. */
-  public ClassType getCompiledClassType()
+  public ClassType getCompiledClassType(Compilation comp)
   {
     if (type == Compilation.typeProcedure)
       throw new Error("internal error: getCompileClassType");
@@ -253,12 +253,16 @@ public class LambdaExp extends ScopeExp
     if (closureEnv == null && (getImportsLexVars() || getNeedsStaticLink()))
       {
 	LambdaExp parent = outerLambda();
+	if (parent instanceof ObjectExp)
+	  parent = parent.outerLambda();
 	Declaration parentFrame = parent.heapFrame != null ?  parent.heapFrame
 	  : parent.closureEnv;
 	if (getInlineOnly())
 	  {
 	    closureEnv = parentFrame;
 	  }
+	else if (parent.heapFrameLambda == this)
+	  closureEnv = thisVariable;
 	else if (! isClassGenerated())
 	  {
 	    if (parent.heapFrame == null)
@@ -274,8 +278,6 @@ public class LambdaExp extends ScopeExp
 		closureEnv.setParameter(true);
 	      }
 	  }
-	else if (parent.heapFrameLambda == this)
-	  closureEnv = thisVariable;
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink())
 	  closureEnv = null;
 	else
@@ -568,14 +570,18 @@ public class LambdaExp extends ScopeExp
             comp.allocClass(child); 
           } 
         child = child.nextSibling; 
-      } 
+      }
+    allocFrame(comp);
+  }
 
+  public void allocFrame (Compilation comp)
+  {
     if (heapFrame != null)
       {
 	ClassType frameType;
 	if (heapFrameLambda != null)
 	  {
-	    frameType = heapFrameLambda.getCompiledClassType();
+	    frameType = heapFrameLambda.getCompiledClassType(comp);
 	    //frameType = comp.curClass;
 	  }
 	else
@@ -590,13 +596,14 @@ public class LambdaExp extends ScopeExp
     if ((getImportsLexVars() || getNeedsStaticLink())
 	&& isClassGenerated())
       {
-	LambdaExp parent = outerLambda();
+	LambdaExp parent = outerLambdaNotInline();
 	LambdaExp heapFrameLambda = parent.heapFrameLambda;
+
 	if (! (parent instanceof ObjectExp) && heapFrameLambda != this)
 	  {
 	    if (heapFrameLambda != null)
 	      {
-		ClassType heapFrameType = heapFrameLambda.getCompiledClassType();
+		ClassType heapFrameType = heapFrameLambda.getCompiledClassType(comp);
 		closureEnvField = comp.curClass.addField ("closureEnv", heapFrameType);
 	      }
 	    else if (parent.getNeedsStaticLink())
@@ -687,10 +694,14 @@ public class LambdaExp extends ScopeExp
     CodeAttr code = comp.getCode();
     // Tail-calls loop back to here!
     code.enterScope (scope);
-    if (closureEnvField != null)
+    if (closureEnv != null && ! closureEnv.isParameter()
+	&& ! getInlineOnly())
       {
 	code.emitPushThis();
-	code.emitGetField(closureEnvField);
+	Field field = closureEnvField;
+	if (field == null)
+	  field = outerLambda().closureEnvField;
+	code.emitGetField(field);
 	code.emitStore(closureEnv);
       }
     if (heapFrame != null && ! comp.usingCPStyle())

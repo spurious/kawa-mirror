@@ -1,3 +1,21 @@
+Mon Mar 29 23:28:59 1999  Per Bothner  <bothner@cygnus.com>
+
+	* LambdaExp.java (getCompiledClassType):  Add Compilation parameter.
+	* ObjectExp.java (getCompiledClassType):  Likewise.
+	Call Compilation.generateClassName to avoid duplicate names.
+	(compile):  Call super.allocFrame.
+	* Compilation.java, LambdaExp.java:  Fix getCompiledClassType calls.
+	* LambdaExp.java (declareClosureEnv):  If parent is ObjectExp,
+	get its parent instead.  Re-order logic for object methods.
+	(allocChildClasses):  Move latter half into new method allocFrame.
+	(allocFrame):  New method.  Use outerLambdaNotInline.
+	(enterFunction):  Initialize closureEnv also for methods in ObjectExp.
+
+	* ApplyExp.java (compile), ReferenceExp.java (compile):  Verifier
+	in JDK1.2 rejects emitInvokeSpecial so use emitInvokeVirtual instead.
+
+	* PrimProcedure.java (applyN):  Check for thrown Error.
+
 Sat Mar 20 11:25:01 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* Declaration.java (pushIndirectBinding):  New method.

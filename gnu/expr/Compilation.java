@@ -539,7 +539,7 @@ public class Compilation
     ClassType type;
     if (lexp instanceof ObjectExp)
       {
-	type = lexp.getCompiledClassType();
+	type = lexp.getCompiledClassType(this);
       }
     else
       {

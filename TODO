@@ -17,6 +17,20 @@ BEFORE KAWA 1.7?
 * Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
 
+Optimize to avoid creating frame classes:
+If a local variable is captured, and all functions intermediate between
+the capture site and the definition are call-only functions, and the
+local variable is never written (except before all calls to these
+intermediate functions), then add the variable as an extra implicit
+parameter to thse intermediate functions, instead of storing the
+variable in a frame.
+
+Optimize (call/cc (lambda (exit) ... (exit ...))) when exit is only
+called, never read, to use BlockExp/ExitExp.  Assumes the latter are
+extended to handle non-local exists - perhaps using the call/cc
+machinery:  Advantage - in many cases call/cc is used to exit a
+loop, so it can be inlined.
+
 Perhaps CallFrame should extend ModuleBody.
 
 Should inline when accessing a final static field (using static-field),

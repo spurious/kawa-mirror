@@ -34,12 +34,12 @@ public abstract class RatNum extends RealNum
     return numerator().isZero();
   }
 
-  /** Positive exact "rational" infinity. */
-  public static RatNum Infinity
-  = new IntFraction (IntNum.one (), IntNum.zero ());
-  /** Negative exact "rational" infinity. */
-  public static RatNum NegInfinity
-  = new IntFraction (IntNum.make (-1), IntNum.zero ());
+  /** Return exact "rational" infinity.
+  * @param sign either 1 or -1 for positive or negative infinity */
+  public static RatNum infinity(int sign)
+  {
+    return new IntFraction (IntNum.make(sign), IntNum.zero());
+  }
 
   public static int compare (RatNum x, RatNum y)
   {

@@ -155,7 +155,7 @@ public class DFloNum extends RealNum implements Compilable
   public static RatNum toExact (double value)
   {
     if (Double.isInfinite (value))
-      return value >= 0.0 ? RatNum.Infinity : RatNum.NegInfinity;
+      return RatNum.infinity(value >= 0.0 ? 1 : -1);
     if (Double.isNaN (value))
       throw new ArithmeticException ("cannot convert NaN to exact rational");
     long bits = Double.doubleToLongBits (value);

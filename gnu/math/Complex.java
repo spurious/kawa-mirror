@@ -13,7 +13,14 @@ public abstract class Complex extends Quantity
     return re().isExact() && im().isExact();
   }
 
-  public static CComplex imOne = new CComplex (IntNum.zero(), IntNum.one());
+  private static CComplex imOne;
+
+  public static CComplex imOne()
+  {
+    if (imOne == null)
+      imOne = new CComplex (IntNum.zero(), IntNum.one());
+    return imOne;
+  }
 
   public double doubleValue () { return re().doubleValue (); }
   public double doubleImagValue () { return im().doubleValue (); }

@@ -1,3 +1,11 @@
+Tue May 20 22:07:14 1997  Per Bothner  <bothner@deneb.cygnus.com>
+
+	Fix class initialization cicularities.
+	* Complex.java (imOne):  Chnage from field to method.
+	* RatNum.java (Infinity, NegInfinity):  Replace fields by ...
+	(infinity):  ... new method.
+	* DFloNum.java, IntNum.java:  Update accordingly.
+
 Wed May  7 12:28:35 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* IntNum.java (power):  Handle overflow into sign bit.

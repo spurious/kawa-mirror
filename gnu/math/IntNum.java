@@ -727,7 +727,7 @@ public class IntNum extends RatNum implements Compilable
     if (y.words == null && y.ival >= 0)
       return power (this, y.ival);
     if (isZero())
-      return y.isNegative () ? RatNum.Infinity : (RatNum) this;
+      return y.isNegative () ? RatNum.infinity(-1) : (RatNum) this;
     return super.power (y);
   }
 

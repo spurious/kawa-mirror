@@ -63,7 +63,7 @@ SECONDARY_OBJS=\
   keywords$$keyword_2_string.class \
   keywords$$keyword_P.class \
   keywords$$string_2_keyword.class \
-  ports$default__prompter.class \
+  ports$$default__prompter.class \
   ports$$eof__object_P.class \
   ports$$force__output.class \
   ports$$input__port__column__number.class \

@@ -5,12 +5,12 @@
 
 (define (%defmacro name expander)
   ((primitive-constructor "kawa.lang.DefMacro"
-			  ("String" "kawa.lang.Procedure"))
+			  (<symbol> <function>))
    name expander))
 
 (define (gentemp)
   ((primitive-static-method "kawa.lang.Symbol" "gentemp"
-			    "kawa.lang.Symbol" ())))
+			    <symbol> ())))
 
 (define-syntax when (syntax-rules ()
 				  ((when cond exp ...)

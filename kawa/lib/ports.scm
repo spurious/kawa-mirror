@@ -43,11 +43,8 @@
    port prompter))
 
 (define (transcript-on filename)
-  ((primitive-virtual-method "kawa.lang.OutPort" "setLogFile"
-			     <void> ("String"))
-   (current-output-port) filename))
+  ((primitive-static-method "kawa.lang.OutPort" "setLogFile" <void> ("String"))
+   filename))
 
 (define (transcript-off)
-  ((primitive-virtual-method "kawa.lang.OutPort" "closeLogFile"
-			     <void> ())
-   (current-output-port)))
+  ((primitive-static-method "kawa.lang.OutPort" "closeLogFile" <void> ())))

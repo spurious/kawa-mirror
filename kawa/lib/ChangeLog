@@ -1,3 +1,11 @@
+Fri Sep 26 23:43:16 1997  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm (transcript-on, transcript-off):  Use new static
+	methods of OutPort.
+	* strings.scm (substring, string-copy!, string-fill!):  New.
+	* misc.scm, syntax.scm:  Use logical types (e.g. <symbol>).
+	* Makefile.am:  Adding missing doubling of '$'.
+
 Mon Jun 23 22:48:37 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* misc.scm:  New file.

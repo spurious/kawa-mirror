@@ -203,13 +203,6 @@ public class Method implements AttrContainer {
     code.emitPushThis();
   }
 
-  public void compile_linenumber (int linenumber)
-  {
-    if (code == null)
-      code = new CodeAttr(this);
-    code.putLineNumber(linenumber);
-  }
-
   void write (DataOutputStream dstr, ClassType classfile)
        throws java.io.IOException
   {

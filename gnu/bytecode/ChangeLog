@@ -1,5 +1,7 @@
 2004-12-24  Per Bothner  <per@bothner.com>
 
+	* Method.java (compile_linenumber): Remove no-longer used method.
+
 	* ClassType.java (setSourceFile): Fix off-by-one error.
 
 	* ClassType.java (setSourceFile): Don't include directories in

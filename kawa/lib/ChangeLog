@@ -1,3 +1,7 @@
+2004-10-23  Per Bothner  <per@bothner.com>
+
+	* std_syntax.scm (letrec): New syntax definition.
+
 2004-08-24  Per Bothner  <per@bothner.com>
 
 	* ports.scm (open-input-file, open-ouput-file,

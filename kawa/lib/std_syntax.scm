@@ -140,6 +140,22 @@
 				  (%syntax-error
 				   "missing bindings list in let*"))))
 
+;;; LETREC
+
+(define-syntax letrec
+  (syntax-rules ()
+    ((letrec bindings . body)
+     (%letrec1 () bindings . body))))
+
+(define-syntax %letrec1
+  (syntax-rules (::)
+    ((%letrec1 done ((x :: type init) . bindings) . body)
+     (%letrec1 ((x :: type #!undefined) . done) bindings (set! x init) . body))
+    ((%letrec1 done ((x init) . bindings) . body)
+     (%letrec1 ((x #!undefined) . done) bindings (set! x init) . body))
+    ((%letrec1 done () . body)
+     (%let done . body))))
+
 ;;; DO
 
 ;;; Helper macro for do, to handle optional step.

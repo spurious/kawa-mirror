@@ -67,7 +67,7 @@ public class AutoloadProcedure extends Procedure
 	if (loaded instanceof ModuleBody)
 	  {
 	    Environment env = Environment.getCurrent();
-	    ((ModuleBody)loaded).run (env);
+	    ((ModuleBody)loaded).run();
 	    Object value = env.get (name);
 	    if (value == null
 		|| !(value instanceof Procedure))

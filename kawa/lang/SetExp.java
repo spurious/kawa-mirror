@@ -9,13 +9,13 @@ public class SetExp extends Expression
   private int flags;
 
   /** The name of the variable to set. */
-  Symbol name;
+  String name;
   /** If non-null, the local Declaration that matches name. */
   public Declaration binding;
   /** The new value to assign to the variable. */
   Expression new_value;
 
-  public SetExp (Symbol sym, Expression val)
+  public SetExp (String sym, Expression val)
   { name = sym;  new_value = val; }
 
   static private int DEFINING_FLAG = 1;

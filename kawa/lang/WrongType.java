@@ -5,18 +5,13 @@ public class WrongType extends Exception {
    //-- number of the argument
    public int number;
    //-- type of the argument
-   public java.lang.String typeExpected;
+   public String typeExpected;
    //-- Procedure name that threw the exception
-   public java.lang.String procname;
+   public String procname;
 
-   public WrongType(java.lang.String name,int n,java.lang.String u) {
-      procname = new java.lang.String(name);
+   public WrongType(String name, int n, String u) {
+      procname = name;
       number = n;
-      typeExpected = new java.lang.String(u);
+      typeExpected = u;
    }
-
-  public WrongType (Symbol name, int n, java.lang.String u)
-  {
-    this (name.toString (), n, u);
-  }
 }

@@ -19,7 +19,7 @@ public class AutoloadProcedure extends Procedure
   /** The loaded procedure, or null if it has not yet been loaded. */
   Procedure loaded;
 
-  public AutoloadProcedure (Symbol name, String className)
+  public AutoloadProcedure (String name, String className)
   {
     super(name);
     this.className = className;
@@ -56,7 +56,7 @@ public class AutoloadProcedure extends Procedure
   void load ()
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    Symbol name = this.name ();
+    String name = this.name();
     try
       {
 	loaded = (Procedure) Class.forName (className).newInstance ();

@@ -19,7 +19,7 @@ public class AutoloadSyntax extends Syntax
   /** The loaded syntax, or null if it has not yet been loaded. */
   Syntax loaded;
 
-  public AutoloadSyntax (Symbol name, String className)
+  public AutoloadSyntax (String name, String className)
   {
     super(name);
     this.className = className;
@@ -54,7 +54,7 @@ public class AutoloadSyntax extends Syntax
   void load ()
        throws WrongType, GenericError
   {
-    Symbol name = this.name ();
+    String name = this.name ();
     try
       {
 	Object value = Class.forName (className).newInstance ();

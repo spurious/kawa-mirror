@@ -4,7 +4,7 @@ package kawa.lang;
 
 public class Eval extends Procedure1or2
 {
-  final static Symbol evalFunctionName = Symbol.make ("atEvalLevel");
+  final static String evalFunctionName = "atEvalLevel";
 
   public static Object eval (ModuleExp mod, Translator tr,
 			      Environment env)

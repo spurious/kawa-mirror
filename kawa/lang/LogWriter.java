@@ -65,21 +65,6 @@ public class LogWriter extends FilterWriter
     super.write(str, off, len);
   }
 
-  /*
-  public void write (char buf[])
-  {
-    if (log != null)
-      log.write(buf);
-    super.write(buf);
-  }
-
-  public void write (String s, int off, int len)
-  {
-    if (log != null)
-      log.write(s, off, len);
-    super.write(s, off, len);
-  }
-  */
   public void flush ()  throws java.io.IOException
   {
     if (log != null)

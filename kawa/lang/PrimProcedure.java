@@ -86,12 +86,13 @@ public class PrimProcedure extends ProcedureN
 	types.put ("<char>", Type.char_type);
 	types.put ("<object>", Type.pointer_type);
 	types.put ("<integer>", new ClassType("gnu.math.IntNum"));
-	types.put ("<symbol>", new ClassType("kawa.lang.Symbol"));
+	types.put ("<symbol>", new ClassType("java.lang.String"));
 	types.put ("<keyword>", new ClassType("kawa.lang.Keyword"));
 	types.put ("<list>", new ClassType("kawa.lang.List"));
 	types.put ("<pair>", new ClassType("kawa.lang.Pair"));
 	types.put ("<string>", new ClassType("kawa.lang.FString"));
 	types.put ("<vector>", new ClassType("kawa.lang.Vector"));
+	types.put ("<function>", new ClassType("kawa.lang.Procedure"));
       }
     return (Type) types.get(name);
   }

@@ -59,7 +59,7 @@ public abstract class ScopeExp extends Expression
 		if (alloc_scope.heapFrame == null)
 		  {
 		    alloc_scope.heapFrame
-		      = alloc_scope.addDeclaration (Symbol.make ("heapFrame"),
+		      = alloc_scope.addDeclaration ("heapFrame",
 						    Compilation.objArrayType);
 		    alloc_scope.heapFrame.setArtificial (true);
 		  }
@@ -122,10 +122,10 @@ public abstract class ScopeExp extends Expression
 
   /**
    * Find a Declaration by name.
-   * @param sym the name of the Declaration sought
+   * @param sym the (interned) name of the Declaration sought
    * @return the matching Declaration, if found;  otherwise null
    */
-  Declaration lookup (Symbol sym)
+  Declaration lookup (String sym)
   {
     for (Variable var = firstVar ();  var != null;  var = var.nextVar ())
       {
@@ -138,9 +138,9 @@ public abstract class ScopeExp extends Expression
 
   /**
    * Create a new declaration in the current Scope.
-   * @param name name to give to the new Declaration.
+   * @param name name (interned) to give to the new Declaration.
    */
-  public final Declaration addDeclaration (Symbol name)
+  public final Declaration addDeclaration (String name)
   {
     Declaration decl = new Declaration (name);
     addDeclaration(decl);
@@ -149,10 +149,10 @@ public abstract class ScopeExp extends Expression
 
   /**
    * Create a new declaration in the current Scope.
-   * @param name name to give to the new Declaration.
+   * @param name name (interned) to give to the new Declaration.
    * @param type type of the new Declaration.
    */
-  public final Declaration addDeclaration (Symbol name, Type type)
+  public final Declaration addDeclaration (String name, Type type)
   {
     Declaration decl = new Declaration (name);
     addDeclaration(decl);

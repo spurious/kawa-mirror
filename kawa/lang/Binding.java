@@ -4,8 +4,8 @@ package kawa.lang;
 
 public class Binding extends Location
 {
-  /** The name of the binding. */
-  Symbol name;
+  /** The (interned) name of the binding. */
+  String name;
 
   /** Used to chain multiple Bindings in the same hash bucket.
    * Note that there can be multiple Bindings with the same name;

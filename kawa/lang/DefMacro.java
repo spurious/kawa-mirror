@@ -11,7 +11,7 @@ public class DefMacro extends Syntax
 
   public DefMacro (String name, Procedure expander)
   {
-    Symbol sym = Symbol.make(name);
+    String sym = Symbol.make(name);
     this.setName(sym);
     expander.setName(sym);
     this.expander = expander;

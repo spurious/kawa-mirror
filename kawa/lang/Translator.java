@@ -13,7 +13,7 @@ import gnu.bytecode.Method;
 public class Translator extends Object
 {
   // Map name to Declaration.
-  public java.util.Hashtable current_decls;
+  public Environment current_decls;
   ScopeExp current_scope;
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
@@ -33,7 +33,7 @@ public class Translator extends Object
   public Translator (Environment env)
   {
     this.env = env;
-    current_decls = new java.util.Hashtable();
+    current_decls = new Environment();
   }
 
   public Translator ()
@@ -85,20 +85,21 @@ public class Translator extends Object
   public Expression syntaxError (String message)
   {
     errors++;
+    OutPort err = OutPort.errDefault();
     if (current_line > 0)
       {
 	if (current_filename != null)
-	  System.err.print (current_filename);
-	System.err.print (':');
-	System.err.print (current_line);
+	  err.print (current_filename);
+	err.print (':');
+	err.print (current_line);
 	if (current_column > 1)
 	  {
-	    System.err.print (':');
-	    System.err.print (current_column);
+	    err.print (':');
+	    err.print (current_column);
 	  }
-	System.err.print (": ");
+	err.print (": ");
       }
-    System.err.println (message);
+    err.println (message);
     return new ErrorExp (message);
   }
 
@@ -107,7 +108,7 @@ public class Translator extends Object
    * @param sym the symbol whose Declaration we want
    * @param decl the current lexical binding, if any
    * @return the Declaration, or null if there no lexical Declaration */
-  public Declaration resolve (Symbol sym, Declaration decl)
+  public Declaration resolve (String sym, Declaration decl)
   {
     if (decl != null)
       {
@@ -121,7 +122,7 @@ public class Translator extends Object
 	      {
 		if (lambda.staticLink == null)
 		  lambda.staticLink
-		    = lambda.addDeclaration(Symbol.make ("staticLink"),
+		    = lambda.addDeclaration("staticLink",
 					    Compilation.objArrayType);
 		if (lambda != curLambda)
 		  lambda.staticLink.setSimple (false);
@@ -136,7 +137,7 @@ public class Translator extends Object
    * as the define-syntax.
    */
 
-  public void addGlobal (Symbol name, Object value)
+  public void addGlobal (String name, Object value)
   {
     env.put (name, value);
   }
@@ -157,16 +158,16 @@ public class Translator extends Object
    */
   public Syntax check_if_Syntax (Object obj)
   {
-    if (obj instanceof Symbol)
+    if (obj instanceof String)
       {
-	Symbol sym = (Symbol) obj;
+	String sym = (String) obj;
 	obj = current_decls.get (sym);
         if (obj != null)
 	  {
-	    // Hygenic macro expansion may bind a renamed (uninterned) Symbol
-	    // to the original Symbol.  Here, use the original Symbol.
-	    if (obj instanceof Symbol)
-	      obj = env.get ((Symbol) obj);
+	    // Hygenic macro expansion may bind a renamed (uninterned) symbol
+	    // to the original symbol.  Here, use the original symbol.
+	    if (obj instanceof String)
+	      obj = env.get ((String) obj);
 	  }
 	else
 	  obj = env.get (sym);
@@ -220,15 +221,15 @@ public class Translator extends Object
       return rewrite_with_position (exp, (PairWithPosition) exp);
     else if (exp instanceof Pair)
       return rewrite_pair ((Pair) exp);
-    else if (exp instanceof Symbol)
+    else if (exp instanceof String)
       {
-	Symbol sym = (Symbol) exp;
-	Object binding = current_decls.get (sym);
-	// Hygenic macro expansion may bind a renamed (uninterned) Symbol
-	// to the original Symbol.  Here, use the original Symbol.
-	if (binding != null && binding instanceof Symbol)
-	  return new ReferenceExp ((Symbol) binding);
-	String name = sym.toString();
+	String name = (String) exp;
+	Object binding = current_decls.get (name);
+
+	// Hygenic macro expansion may bind a renamed (uninterned) symbol
+	// to the original symbol.  Here, use the original symbol.
+	if (binding != null && binding instanceof String)
+	  return new ReferenceExp ((String) binding);
 	int len = name.length();
 	if (len > 2 && name.charAt(0) == '<' && name.charAt(len-1) == '>')
 	  {
@@ -236,7 +237,7 @@ public class Translator extends Object
 	    if (type != null)
 	      return new QuoteExp(type);
 	  }
-	return new ReferenceExp (sym, resolve (sym, (Declaration) binding));
+	return new ReferenceExp (name, resolve (name, (Declaration) binding));
       }
     else if (exp instanceof Expression)
       return (Expression) exp;
@@ -317,13 +318,13 @@ public class Translator extends Object
 		  Object name = ((Pair) st_pair.cdr).car;
 		  if (defs == null)
 		    defs = new LetExp (null);
-		  if (name instanceof Symbol)
-		    defs.addDeclaration((Symbol) name);
+		  if (name instanceof String)
+		    defs.addDeclaration((String) name);
 		  else if (name instanceof Pair)
 		    {
 		      Pair name_pair = (Pair) name;
-		      if (name_pair.car instanceof Symbol)
-			defs.addDeclaration((Symbol) name_pair.car);
+		      if (name_pair.car instanceof String)
+			defs.addDeclaration((String) name_pair.car);
 		    }
 		  forms.addElement (st);
 		}

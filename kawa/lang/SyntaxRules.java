@@ -10,14 +10,14 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
    * the rest are as specied in the syntax-rules form. */
-  Symbol[] literal_identifiers;
+  String[] literal_identifiers;
 
   SyntaxRule[] rules;
 
   /* The largest (num_variables+template_identifier.length) for any rule. */
   int maxVars = 0;
 
-  static public Symbol syntaxRulesSymbol = Symbol.make ("syntax-rules");
+  static public String syntaxRulesSymbol = "syntax-rules";
 
   private void calculate_maxVars ()
   {
@@ -30,14 +30,14 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
       }
   }
 
-  public SyntaxRules (Symbol[] literal_identifiers, SyntaxRule[] rules)
+  public SyntaxRules (String[] literal_identifiers, SyntaxRule[] rules)
   {
     this.literal_identifiers = literal_identifiers;
     this.rules = rules;
     calculate_maxVars ();    
   }
 
-  public SyntaxRules (Symbol[] literal_identifiers, Object rules,
+  public SyntaxRules (String[] literal_identifiers, Object rules,
 		      Translator tr)
   {
     this.literal_identifiers = literal_identifiers;
@@ -95,7 +95,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	    StringBuffer pattern_nesting_buffer = new StringBuffer ();
 	    java.util.Vector pattern_names = new java.util.Vector ();
 	    if (! (pattern instanceof Pair)
-		|| ! (((Pair)pattern).car instanceof Symbol))
+		|| ! (((Pair)pattern).car instanceof String))
 	      {
 		tr.syntaxError ("pattern does not start with name");
 		return;
@@ -138,7 +138,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
    * @return the translated Pattern
    */
   public static Pattern translate_pattern (Object pattern,
-					   Symbol[] literal_identifiers,
+					   String[] literal_identifiers,
 					   java.util.Vector pattern_names,
 					   StringBuffer pattern_nesting,
 					   int nesting, Translator tr )
@@ -168,7 +168,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 					       pattern_names, pattern_nesting,
 					       nesting, tr));
       }
-    else if (pattern instanceof Symbol)
+    else if (pattern instanceof String)
       {
 	for (int i = literal_identifiers.length;  --i >= 0; )
 	  {

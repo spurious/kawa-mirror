@@ -25,12 +25,12 @@ public class SyntaxRule implements Compilable
 
   /** The identifiers in the template that are not pattern variable.
    * These need re-naming to be "hygienic". */
-  Symbol[] template_identifiers;
+  String[] template_identifiers;
 
   public SyntaxRule (Pattern pattern,
 		     String pattern_nesting,
 		     String template_program,
-		     Symbol[] template_identifiers,
+		     String[] template_identifiers,
 		     Object[] literal_values,
 		     int max_nesting)
   {
@@ -59,11 +59,11 @@ public class SyntaxRule implements Compilable
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
 
-    this.template_identifiers = new Symbol[template_identifiers.size()];
+    this.template_identifiers = new String[template_identifiers.size()];
     template_identifiers.copyInto (this.template_identifiers);
   }
 
-  static Symbol dots3 = Symbol.make ("...");
+  static final String dots3 = "...";
 
   // A syntax-rule template is translated into a "template program."
   // The template program is a simple bytecode stored in a string.
@@ -191,9 +191,9 @@ public class SyntaxRule implements Compilable
 	template_program.append ((char) code);
 	return;
       }
-    if (template instanceof Symbol)
+    if (template instanceof String)
       {
-	int pattern_var_num = pattern_names.indexOf (template);
+	int pattern_var_num = indexOf(pattern_names, template);
 	if (pattern_var_num >= 0)
 	  {
 	    // R4RS requires that the nesting be equal.
@@ -210,7 +210,7 @@ public class SyntaxRule implements Compilable
 		 && template != Interpreter.unquote_sym
 		 && template != Interpreter.unquotesplicing_sym)
 	  {
-	    int identifier_num = template_identifiers.indexOf (template);
+	    int identifier_num = indexOf(template_identifiers, template);
 	    if (identifier_num < 0)
 	      {
 		identifier_num = template_identifiers.size ();
@@ -222,7 +222,7 @@ public class SyntaxRule implements Compilable
 	  }
 	// else treated quoted symbol as literal:
       }
-    int literals_index = literals_vector.indexOf (template);
+    int literals_index = indexOf(literals_vector,template);
     if (literals_index < 0)
       {
 	literals_index = literals_vector.size ();
@@ -231,14 +231,28 @@ public class SyntaxRule implements Compilable
     template_program.append ((char) (FIRST_LITERALS + 2 * literals_index));
   }
 
+  /** Similar to vec.indexOf(elem), but uses == (not equals) to compare. */
+  static private int indexOf(java.util.Vector vec, Object elem)
+  {
+    int len = vec.size();
+    for (int i = 0;  i < len;  i++)
+      {
+	if (vec.elementAt(i) == elem)
+	  return i;
+      }
+    return -1;
+  }
+
+  static int counter;
+
   public Object execute_template (Object[] vars, Translator tr)
   {
     int[] indexes = new int[max_nesting];
     int num_identifiers = template_identifiers.length;
     for (int i = 0;  i < num_identifiers;  i++)
       {
-	Symbol name = template_identifiers[i];
-	Symbol renamed_symbol = Symbol.makeUninterned (name.toString ());
+	String name = template_identifiers[i];
+	String renamed_symbol = Symbol.makeUninterned (name);
 	vars[num_variables + i] = renamed_symbol;
 	tr.current_decls.put (renamed_symbol, name);
       }

@@ -133,8 +133,8 @@ public class Literal
       {
 	comp.method.compile_push_string (value.toString ());
       }
-    else if (value instanceof Symbol[])
-      emitArray (comp, comp.scmSymbolType);
+    else if (value instanceof String[])
+      emitArray (comp, comp.javaStringType);
     else if (value instanceof Object[])
       emitArray (comp, comp.scmObjectType);
     else

@@ -12,12 +12,7 @@ public abstract class Procedure extends Named implements Printable
     super ();
   }
 
-  public Procedure(java.lang.String n)
-  {
-    super(n);
-  }
-
-  public Procedure(Symbol n)
+  public Procedure(String n)
   {
     super(n);
   }
@@ -44,7 +39,7 @@ public abstract class Procedure extends Named implements Printable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<procedure ");
-    Symbol n = name ();
+    String n = name ();
     if (n == null)
       ps.print ("<unnamed>");
     else

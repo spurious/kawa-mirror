@@ -22,10 +22,10 @@ public class Compilation
   // Various standard classes
   static public ClassType scmObjectType = new ClassType ("java.lang.Object");
   static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
-  static public ClassType scmSymbolType = new ClassType ("kawa.lang.Symbol");
+  static public ClassType javaStringType = new ClassType ("java.lang.String");
+  static public ClassType scmSymbolType = javaStringType;
   static public ClassType scmKeywordType = new ClassType ("kawa.lang.Keyword");
   static public ClassType scmSequenceType = new ClassType ("kawa.lang.Sequence");
-  static public ClassType javaStringType = new ClassType ("java.lang.String");
   static public ClassType javaIntegerType = new ClassType ("java.lang.Integer");
   static public ClassType scmListType = new ClassType ("kawa.lang.List");
   static public ClassType scmPairType = new ClassType ("kawa.lang.Pair");
@@ -60,7 +60,6 @@ public class Compilation
 				    Access.PUBLIC|Access.STATIC);
   static final Field nameField
   = scmNamedType.addField ("sym_name", scmSymbolType, Access.PUBLIC);
-  static Method makeSymbolMethod;
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;
   static Method defineGlobalMethod;
@@ -79,9 +78,6 @@ public class Compilation
 						    int1Args, Type.void_type,
 						    Access.PUBLIC);
 
-    makeSymbolMethod = scmSymbolType.addMethod ("make", string1Arg,
-						 scmSymbolType,
-						 Access.PUBLIC|Access.STATIC);
     Type[] sym1Arg = { scmSymbolType };
     lookupGlobalMethod
       = scmEnvironmentType.addMethod ("lookup_global", sym1Arg,
@@ -441,7 +437,7 @@ public class Compilation
     method = apply_method;
 
 
-    // If imcomingMap[i] is non-null, it means that the user's i'th
+    // If incomingMap[i] is non-null, it means that the user's i'th
     // formal parameter (numbering the left-most one as 0) is captured
     // by an inferior lambda, so it needs to be saved in the heapFrame.
     // The incoming variable is incomingMap[i], which is in register (i+1)
@@ -481,7 +477,7 @@ public class Compilation
 	    // Later, we copy it from it's incoming register
 	    // to its home location heapFrame.  Here we just create and
 	    // assign a Variable for the incoming (register) value.
-	    Symbol incoming_name = Symbol.make (var.getName ()+"Incoming");
+	    String incoming_name = (var.getName ()+"Incoming").intern();
 	    Declaration incoming = lexp.addDeclaration (incoming_name);
 	    incoming.setArtificial (true);
 	    incoming.setParameter (true);

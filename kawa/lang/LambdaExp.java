@@ -1,6 +1,5 @@
 package kawa.lang;
 import gnu.bytecode.*;
-import java.util.Hashtable;
 
 /**
  * Class used to implement Scheme lambda expressions.
@@ -9,7 +8,7 @@ import java.util.Hashtable;
 
 public class LambdaExp extends ScopeExp
 {
-  Symbol name;
+  String name;
   Expression body;
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
@@ -36,7 +35,7 @@ public class LambdaExp extends ScopeExp
     return min_args == max_args && max_args <= 4 && max_args > 0 ? max_args : 1;
   }
 
-  public void setName (Symbol name)
+  public void setName (String name)
   {
     this.name = name;
   }
@@ -110,7 +109,7 @@ public class LambdaExp extends ScopeExp
 	  min_args++;
 	bindings = pair.cdr;
       }
-    if (bindings instanceof Symbol)
+    if (bindings instanceof String)
       {
 	if (opt_args >= 0 || key_args >= 0 || rest_args >= 0)
 	  {
@@ -145,15 +144,14 @@ public class LambdaExp extends ScopeExp
       keywords = new Keyword[key_args];
 
     Variable var;
-    var = addDeclaration (Symbol.make ("this"));
+    var = addDeclaration ("this");
     var.setParameter (true);  var.setArtificial (true);
     
     if (min_args != max_args || min_args > 4)
       {
 	// Compilation.compile depends on the "argsArray" variable
 	// being the second one created for this scope.
-	argsArray = addDeclaration (Symbol.make ("argsArray"),
-				    Compilation.objArrayType);
+	argsArray = addDeclaration ("argsArray", Compilation.objArrayType);
 	argsArray.setParameter (true);
 	argsArray.setArtificial (true);
       }
@@ -172,19 +170,19 @@ public class LambdaExp extends ScopeExp
 	    mode = pair.car;
 	    continue;
 	  }
-	Symbol name;
+	String name;
 	Object defaultValue;
-	if (pair.car instanceof Symbol)
+	if (pair.car instanceof String)
 	  {
-	    name = (Symbol) pair.car;
+	    name = (String) pair.car;
 	    defaultValue = null;
 	  }
 	else if (pair.car instanceof Pair
-		 && ((Pair) pair.car).car instanceof Symbol
+		 && ((Pair) pair.car).car instanceof String
 		 && ((Pair) pair.car).cdr instanceof Pair)
 	  {
 	    Pair pair_car = (Pair) pair.car;
-	    name = (Symbol) pair_car.car;
+	    name = (String) pair_car.car;
 	    defaultValue = ((Pair) pair_car.cdr).car;
 	    if (mode == null || mode == Special.rest)
 	      {
@@ -210,9 +208,9 @@ public class LambdaExp extends ScopeExp
 	decl.noteValue(null);  // Does not have a known value.
 	decl.push(tr);
       }
-    if (bindings instanceof Symbol)
+    if (bindings instanceof String)
       {
-	Declaration decl = addDeclaration ((Symbol) bindings);
+	Declaration decl = addDeclaration ((String) bindings);
 	decl.setParameter (true);
 	decl.noteValue (null);  // Does not have a known value.
 	decl.push(tr);

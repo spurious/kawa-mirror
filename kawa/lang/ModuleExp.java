@@ -8,7 +8,7 @@ package kawa.lang;
 public class ModuleExp extends LambdaExp
 {
   /** The name of the formal parameter for the incoming Environment. */
-  static private Symbol env_formal = Symbol.makeUninterned ("theEnvironment");
+  static private String env_formal = Symbol.makeUninterned ("theEnvironment");
   /** The formal parameter list of a ModuleBody. */
   static public Object formals = new Pair (env_formal, List.Empty);
 

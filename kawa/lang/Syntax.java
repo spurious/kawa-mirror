@@ -10,7 +10,7 @@ abstract public class Syntax extends Named implements Printable
 {
   public Syntax () { super (); }
 
-  public Syntax (Symbol name) { super (name); }
+  public Syntax (String name) { super (name); }
 
   /**
    * Re-write an expression that is an "application" of this Syntax object.
@@ -24,7 +24,7 @@ abstract public class Syntax extends Named implements Printable
   public void print(java.io.PrintWriter ps)
   {
     ps.print("#<syntax ");
-    Symbol name = this.name ();
+    String name = this.name ();
     if (name == null)
       ps.print ("<unnamed>");
     else

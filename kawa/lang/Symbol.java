@@ -2,48 +2,78 @@ package kawa.lang;
 
 import java.io.PrintWriter;
 
-public class Symbol extends Object implements Printable, Compilable
-{
-  private String name;
+/** Utility class containing various routines to manipulate Scheme symbols.
+  * Note Scheme symbols are represented using java.lang.String objects,
+  * and there are no Symbol objects. */
 
-  // Note:  No public constructor!
-  private Symbol (String n)
+public class Symbol
+{
+  /** There are no instances of this class. */
+  private Symbol ()
   {
-    name = n;
   }
 
-  public static final Symbol makeUninterned (String s)
+  public static final String makeUninterned (String str)
   {
-    return new Symbol (s);
+    str = new String(str);
+    /* DEBUGGING:
+    gensyms.addElement(str);
+    */
+    return str;
   }
 
   private static int gensym_counter;
+
+  /* DEBUGGING:
+  static java.util.Vector gensyms = new java.util.Vector();
+
+  public static String show (String str)
+  {
+    StringBuffer buf = new StringBuffer(str);
+    if (str.intern() == str)
+      buf.append("<I>");
+    else
+      {
+	for (int i = gensyms.size();  ; )
+	  {
+	    if (--i < 0)
+	      {
+		buf.append("<?>");
+		break;
+	      }
+	    else if (gensyms.elementAt(i) == str)
+	      {
+		buf.append('<');
+		buf.append(i);
+		buf.append('>');
+		break;
+	      }
+	  }
+      }
+    return buf.toString();
+  }
+  */
 
   /**
    * Generate a new un-interned Symbol with a unique name.
    * @return the new Symbol
    */
-  public static final Symbol generate ()
+  public static final String generate ()
   {
-    return new Symbol ("GS." + Integer.toString(++gensym_counter));
+    String str = new String ("GS." + Integer.toString(++gensym_counter));
+    /* DEBUGGING:
+    gensyms.addElement(str);
+    */
+    return str;
   }
 
   /**
-   * Generate a new (interned) Symbol with a unique name.
-   * @return the new Symbol
+   * Generate a new (interned) symbol with a unique name.
+   * @return the new symbol
    */
-  public static final Symbol gentemp ()
+  public static final String gentemp ()
   {
     return Symbol.make("GS." + Integer.toString(++gensym_counter));
-  }
-
-  private static java.util.Hashtable symbolTable = new java.util.Hashtable ();
-
-  public int hashCode () { return name.hashCode (); }
-
-  public final String toString()
-  {
-    return name;
   }
 
   /**
@@ -51,17 +81,12 @@ public class Symbol extends Object implements Printable, Compilable
    * @param name the print-name of the desired Symbol
    * @return a Symbol with the given name, newly created iff none such exist
    */
-  static public Symbol make (String name)
+  static public String make (String name)
   {
-    Symbol symbol = (Symbol) symbolTable.get (name);
-    if (symbol == null) {
-      symbol = new Symbol (name);
-      symbolTable.put (name, symbol);
-    }
-    return symbol;
+    return name.intern();
   }
 
-  static public final Symbol intern (String name)
+  static public final String intern (String name)
   {
     return make (name);
   }
@@ -92,19 +117,4 @@ public class Symbol extends Object implements Printable, Compilable
       ps.print(name);
   }
 
-  public void print(java.io.PrintWriter ps)
-  {
-    print(name, ps);
-  }
-
-  public Literal makeLiteral (Compilation comp)
-  {
-    return new Literal (this, comp.scmSymbolType, comp);
-  }
-
-  public void emit (Literal literal, Compilation comp)
-  {
-    comp.method.compile_push_string (((Symbol)literal.value).toString ());
-    comp.method.compile_invoke_static (comp.makeSymbolMethod);
-  }
 }

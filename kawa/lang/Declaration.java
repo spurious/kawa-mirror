@@ -54,10 +54,11 @@ import gnu.bytecode.*;
 
 public class Declaration extends Variable
 {
-  /** The name of the new variable. */
-  Symbol sym;
+  /** The (interned) name of the new variable. */
+  // Redundant with Variable.name, except sym is interned.  FIXME */
+  String sym;
 
-  public final Symbol symbol () { return sym; }
+  public final String symbol () { return sym; }
 
   ScopeExp context;
 
@@ -79,7 +80,7 @@ public class Declaration extends Variable
   public Declaration baseVariable;
 
   /** If non-null, the Declaration that we "shadow" (hide). */
-  Object shadowed;  /* Either a Declaration or a Symbol. */
+  Object shadowed;  /* Either a Declaration or a String. */
 
   /** If non-null, the single expression used to set this variable.
    * If the variable can be set more than once, then value is null. */
@@ -94,14 +95,14 @@ public class Declaration extends Variable
       this.value = null;
   }
 
-  public Declaration (Symbol s)
+  public Declaration (String s)
   {
     sym = s;
-    name = s.toString ();
+    name = s;
     setType(Type.pointer_type);
   }
 
-  public String string_name () { return sym.toString (); }
+  public String string_name () { return sym; }
 
   /**
    * Insert this into Translator.current_decls.

@@ -103,7 +103,7 @@ public class InPort extends LineBufferedReader implements Printable
 	str.setLength(str.length()-1);
 	return Keyword.make(str.toString());
       }
-    return Symbol.make (str.toString ());
+    return str.toString().intern();
   }
 
   /**
@@ -496,7 +496,7 @@ public class InPort extends LineBufferedReader implements Printable
     return new FString (obj);
   }
 
-  protected Object readQuote (Symbol func_symbol)
+  protected Object readQuote (String func_symbol)
       throws java.io.IOException, ReadError
   {
     return new Pair (func_symbol,
@@ -624,7 +624,7 @@ public class InPort extends LineBufferedReader implements Printable
 	  case '`':
 	    return readQuote(Interpreter.quasiquote_sym);
 	  case ',':
-	    Symbol func;
+	    String func;
 	    if (peek()=='@')
 	      {
 		skip ();

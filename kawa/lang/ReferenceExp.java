@@ -7,16 +7,16 @@ package kawa.lang;
 
 public class ReferenceExp extends Expression
 {
-  Symbol symbol;
+  String symbol;
   Declaration binding;
-  public String string_name () { return symbol.toString (); }
+  public String string_name () { return symbol; }
 
-  public ReferenceExp (Symbol symbol)
+  public ReferenceExp (String symbol)
   {
     this.symbol = symbol;
   }
 
-  public ReferenceExp (Symbol symbol, Declaration binding)
+  public ReferenceExp (String symbol, Declaration binding)
   {
     this.symbol = symbol;
     this.binding = binding;
@@ -27,7 +27,7 @@ public class ReferenceExp extends Expression
   {
     Object val;
     if (binding != null)
-      throw new Error("internal error: ReeferenceExp.eval on lexical binding");
+      throw new Error("internal error: ReferenceExp.eval on lexical binding");
     else
       {
 	val = env.get (symbol);

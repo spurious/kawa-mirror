@@ -2,10 +2,11 @@ package kawa.lang;
 
 /**
  * An environment contains (name->value) bindings.
+ * Names are Strings that are compared by ==, not equal.
  * @author	Per Bothner
  */
 
-public class Environment // extends [somewhat] java.util.Dictionary
+public class Environment // extends [almost] java.util.Dictionary
 {
   private Binding[] table;
 
@@ -38,7 +39,7 @@ public class Environment // extends [somewhat] java.util.Dictionary
     return kawa.standard.Scheme.curEnvironment ();
   }
 
-  public static Object lookup_global (Symbol name)
+  public static Object lookup_global (String name)
        throws UnboundSymbol
   {
     Object result = user().get (name);
@@ -47,7 +48,8 @@ public class Environment // extends [somewhat] java.util.Dictionary
     return result;
   }
 
-  public static void define_global (Symbol name, Object new_value)
+  /** Define name (interned) to have a given value. */
+  public static void define_global (String name, Object new_value)
   {
     user().define (name, new_value);
   }
@@ -85,11 +87,11 @@ public class Environment // extends [somewhat] java.util.Dictionary
 
   /**
    * Search for a variable binding by name.
-   * @param sym the name of the binding to search for
+   * @param sym the (interned) name of the binding to search for
    * @return the value of the binding, or null if not found
    */
 
-  public Binding lookup (Symbol name)
+  public Binding lookup (String name)
   {
     int time_stamp = this.time_stamp;
     int hash = name.hashCode ();
@@ -97,11 +99,9 @@ public class Environment // extends [somewhat] java.util.Dictionary
       {
 	Binding[] env_tab = env.table;
 	int index = (hash & 0x7FFFFFFF) % env_tab.length;
-//System.err.println ("lookup("+name +") in "+env+" index:"+index + " ts:"+time_stamp);
 	for (Binding binding = env_tab[index];
 	     binding != null;  binding = binding.chain)
 	  {
- //System.err.println (" - binding:"+binding + " ts:"+binding.time_stamp);
 	    if (binding.name == name && binding.time_stamp < time_stamp)
 	      return binding;
 	  }
@@ -110,12 +110,7 @@ public class Environment // extends [somewhat] java.util.Dictionary
     return null;
   }
 
-  public final Binding define (String name, Object value)
-  {
-    return define (Symbol.make (name), value);
-  }
-
-  public Binding define (Symbol name, Object value)
+  public Binding define (String name, Object value)
   {
     if (num_bindings >= table.length * threshold)
       rehash (2 * table.length);
@@ -129,7 +124,6 @@ public class Environment // extends [somewhat] java.util.Dictionary
     binding.value = value;
     binding.time_stamp = time_stamp++;
     binding.chain = table[index];
-//System.err.println ("define("+name+") in "+this +" index:"+index);
     table[index] = binding;
     return binding;
   }
@@ -163,6 +157,36 @@ public class Environment // extends [somewhat] java.util.Dictionary
     table = new_table;
   }
 
+  public Object remove (String name)
+  {
+    int time_stamp = this.time_stamp;
+    int hash = name.hashCode ();
+    Environment env = this;
+    for ( ; ;  env = env.previous)
+      {
+	if (env == null)
+	  return null;
+	Binding[] env_tab = env.table;
+	int index = (hash & 0x7FFFFFFF) % env_tab.length;
+	for (Binding binding = env_tab[index];
+	     binding != null;  binding = binding.chain)
+	  {
+	    if (binding.name == name && binding.time_stamp < time_stamp)
+	      {
+		Object old = binding.get(); 
+		env.remove(binding);
+		return old;
+	      }
+	  }
+	time_stamp = env.previous_time_stamp;
+      }
+  }
+
+  public Object remove (Object name)
+  {
+    return remove((String) name);
+  }
+
   public void remove (Binding binding)
   {
     int hash = binding.name.hashCode ();
@@ -170,23 +194,24 @@ public class Environment // extends [somewhat] java.util.Dictionary
     Binding prev = null;
     for (Binding b = table[index];  b != null ; )
       {
+	Binding next = b.chain;
 	if (b == binding)
 	  {
 	    if (prev == null)
-	      table[index] = null;
+	      table[index] = next;
 	    else
-	      prev.chain = b.chain;
+	      prev.chain = next;
 	    if (b.time_stamp + 1 == time_stamp)
 	      time_stamp--;
 	    num_bindings--;
 	    return;
 	  }
 	prev = b;
-	b = b.chain;
+	b = next;
       }
   }
 
-  public Object get (Symbol name)
+  public Object get (String name)
   {
     Binding binding = lookup (name);
     return binding == null ? null : binding.get ();
@@ -194,11 +219,11 @@ public class Environment // extends [somewhat] java.util.Dictionary
 
   public Object get (Object name)
   {
-    Binding binding = lookup ((Symbol) name);
+    Binding binding = lookup ((String) name);
     return binding == null ? null : binding.get ();
   }
 
-  public Object put (Symbol name, Object value)
+  public Object put (/* interned */ String name, Object value)
   {
     Binding binding = lookup (name);
     if (binding == null)
@@ -216,7 +241,7 @@ public class Environment // extends [somewhat] java.util.Dictionary
 
   public Object put (Object name, Object value)
   {
-    return put ((Symbol) name, value);
+    return put ((String) name, value);
   }
 
   public String toString ()

@@ -165,4 +165,12 @@ public class AutoloadProcedure extends Procedure implements Externalizable
     setName((String) in.readObject());
     className = (String) in.readObject();
   }
+
+  public Object getProperty(Object key, Object defaultValue)
+  {
+    Object value = super.getProperty(key, null);
+    if (value != null)
+      return value;
+    return getLoaded().getProperty(key, defaultValue);
+  }
 }

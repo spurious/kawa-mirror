@@ -1,0 +1,290 @@
+// -*-Java-*-
+// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+package gnu.lists;
+
+import java.util.NoSuchElementException;
+
+/**
+ * A position in a sequence (list).
+ *
+ * A position points *between* two elements in its "containing" sequence, or
+ * it points before the first element (if any), or after the last.
+ * Sometimes, we loosely say that the position refers to or points to
+ * an element of the sequence; in that case we mean the position is
+ * immediately before the element.
+ *
+ * Conceptually similar to Java2's ListIterator, but we use the name "Position"
+ * to indicate that it can be used to both indicate a position in a sequence
+ * and to iterate through a sequence.  If you use a SeqPosition as a
+ * "position", you would not modify if (though it is possible the offset
+ * of the position in the sequence may change due to other update operations
+ * on the sequence).  If you use a SeqPosition as an "iterator", you would
+ * initialize it to some beginnning position, and then modify the current
+ * position of the SeqPosition so it refers to successive elements.
+ *
+ * What needs to be emphasized is that *all* Sequence classes use the
+ * *same* SeqPosition class for positions and iteration.  You would
+ * never extend this class to handle a new Sequence type; instead
+ * add the needed methods to the new AbstractSequence sub-clsss.
+ * If you have an unused SeqPosition object, it can be used to iterate
+ * over *any* Sequence you choose.  This potentially saves memory allocation.
+ * We do this by requiring that any position be representable using a pair
+ * of an int and an Object.  In other words, the state of an iterator is
+ * restricted to be an (int, Object) pair.  Of course that is all you need,
+ * since if you need more state you can always create a helper object,
+ * and store the extra state there.  The assumption, though is that for
+ * most Sequence object, an (int, Object) would be enough, without creating
+ * any new objects (beyond, sometimes, the SeqPosition itself).
+ *
+ * The int part of the position-state is stored in the ipos field, and
+ * the Object part of the position-state is stored in the xpos field.
+ * Neither of those fields have any meaning in themselves, they only have
+ * meaning as interpreted by the specific Sequence.  For example, ipos
+ * might be the offset of the position in the sequence, but it might also
+ * some "magic cookie".  If a Sequence supports insertions and deletions,
+ * and you want positions to be automatically adjusted, then a position
+ * has to be a magic cookie, instead of an offset.  (A typical implementation
+ * is for such a position to be an index into a table of positions managed
+ * by the Sequence itself.)  So a complete position is actually an
+ * (int, Object, AbstractSequence) triple, where the AbstractSequence
+ * component is the object that interprets the (int, Object) pair.
+ * Normally, the AbstractSequence part of a position triple is the
+ * Sequence "containing" the position, but it can be any Abstract Sequence
+ * that implements the various methods that provide the semantics
+ * for the (int, Object) pair.
+ *
+ * The PositionContainer interface is a more abstract version of
+ * SeqPosition, in that it can represents more than one position.
+ * For example, instead of an array of separately allocated SeqPosition
+ * obejcts, you might use some data structure that implements PositionContainer
+ * (which is abstractly a list of (int, Object, Sequence)-triples).
+ */
+
+public class SeqPosition
+implements
+@if WITH COLLECTIONS@
+    java.util.ListIterator,
+@endif WITH COLLECTIONS@
+    PositionContainer, java.util.Enumeration
+{
+  /**
+   * The Sequence relative to which ipos and xpos have meaning.
+   * This is normally the same as the Sequence we iterate through.
+   * However, if this is a TreePosition, it may an ancestor instead.
+   */
+  public AbstractSequence sequence;
+
+  /**
+   * An integer that (together with xpos) indicates the current position.
+   * The actual value has no meaning, except as interpreted by sequence.
+   */
+  public int ipos;
+
+  /**
+   * An Object that (together with ipos) indicates the current position.
+   * The actual value has no meaning, except as interpreted by sequence.
+   */
+  public Object xpos;
+
+  public SeqPosition()
+  {
+  }
+
+  public SeqPosition(AbstractSequence seq)
+  {
+    this.sequence = seq;
+  }
+
+  public SeqPosition(AbstractSequence seq, int offset, boolean isAfter)
+  {
+    this.sequence = seq;
+    seq.makePosition(offset, isAfter, this, 0);
+  }
+
+  public final void gotoStart(AbstractSequence seq)
+  {
+    if (sequence != null)
+      sequence.releasePosition(ipos, xpos);
+    sequence = seq;
+    seq.makeStartPosition(this, 0);
+  }
+
+  public final void gotoEnd(AbstractSequence seq)
+  {
+    if (sequence != null)
+      sequence.releasePosition(ipos, xpos);
+    sequence = seq;
+    seq.makeEndPosition(this, 0);
+  }
+
+  /** True if there is an element following the current position.
+   * False if we are at the end.  See java.util.Enumeration. */
+  public boolean hasMoreElements()
+  {
+    return sequence.hasNext(ipos, xpos);
+  }
+
+  /** See java.util.Iterator. */
+  public boolean hasNext()
+  {
+    return sequence.hasNext(ipos, xpos);
+  }
+
+  /** See java.util.Iterator. */
+  public boolean hasPrevious()
+  {
+    return sequence.hasPrevious(ipos, xpos);
+  }
+
+  /** See java.util.ListIterator. */
+  public Object next()
+  {
+    Object result = sequence.getNext(ipos, xpos);
+    if (result == Sequence.eofValue || ! sequence.gotoNext(this))
+      throw new NoSuchElementException();
+    return result;
+  }
+
+  /** Move one element forwards, if possible.
+   * @returns if we succeeded in moving forwards (i.e. not at end of sequence).
+   */
+  public final boolean gotoNext()
+  {
+    return sequence.gotoNext(this);
+  }
+
+  /** See java.util.ListIterator. */
+  public Object previous()
+  {
+    Object result = sequence.getPrevious(ipos, xpos);
+    if (result == Sequence.eofValue || ! sequence.gotoPrevious(this, 0))
+      throw new NoSuchElementException();
+    return result;
+  }
+
+  /** See java.util.Enumeration. */
+  public Object nextElement()
+    throws NoSuchElementException
+  {
+    Object result = sequence.getNext(ipos, xpos);
+    if (result == Sequence.eofValue || ! sequence.gotoNext(this))
+      throw new NoSuchElementException();
+    return result;
+  }
+
+  /**
+   * Get element following current position.
+   * Does not move the position, in contrast to nextElement method.
+   * @return EOF if at end of sequence, otherwise the value following.
+   */
+  public Object getNext()
+  {
+    return sequence.getNext(ipos, xpos);
+  }
+
+  public Object getPrevious()
+  {
+    return sequence.getPrevious(ipos, xpos);
+  }
+
+  /** See java.util.Iterator. */
+  public final int nextIndex()
+  {
+    return sequence.nextIndex(ipos, xpos);
+  }
+
+  public final int fromEndIndex()
+  {
+    return sequence.fromEndIndex(ipos, xpos);
+  }
+
+  public int getContainingSequenceSize()
+  {
+    return sequence.getContainingSequenceSize(ipos, xpos);
+  }
+
+  /** See java.util.Iterator. */
+  public final int previousIndex()
+  {
+    return sequence.nextIndex(ipos, xpos) - 1;
+  }
+
+  /** Does the position pair have the "isAfter" property?
+   * I.e. if something is inserted at the position, will
+   * the iterator end up being after the new data?
+   * A toNext() or next() command should set isAfter() to true;
+   * a toPrevious or previous command should set isAfter() to false.
+   */
+  public final boolean isAfter()
+  {
+    return sequence.isAfter(ipos, xpos);
+  }
+
+  public final void set(Object value)
+  {
+    if (sequence.isAfter(ipos, xpos))
+      sequence.setPrevious(ipos, xpos, value);
+    else
+      sequence.setNext(ipos, xpos, value);
+  }
+
+  public void remove()
+  {
+    sequence.remove(ipos, xpos, isAfter() ? -1 : 1);
+  }
+
+  public void add(Object o)
+  { 
+    sequence.add(this, 0, o);
+  }
+
+  /** Implements PositionContainer. */
+  public int getPositionInt(int positionNumber) { return ipos; }
+  /** Implements PositionContainer. */
+  public Object getPositionPtr(int positionNumber) { return xpos; }
+  /** Implements PositionContainer. */
+  public void setPosition(int positionNumber, int ipos, Object xpos)
+  { this.ipos = ipos;  this.xpos = xpos; }
+  /** Implements PositionContainer. */
+  public void setSequence(int positionNumber, AbstractSequence seq)
+  { sequence = seq; }
+  /** Implements PositionContainer. */
+  public int countPositions() { return 1; }
+
+  public void init(AbstractSequence seq, int index, boolean isAfter)
+  {
+    if (sequence != null)
+      sequence.releasePosition(ipos, xpos);
+    sequence = seq;
+    seq.makePosition(index, isAfter, this, 0);
+  }
+
+  public void init(SeqPosition pos)
+  {
+    if (sequence != null)
+      sequence.releasePosition(ipos, xpos);
+    sequence = pos.sequence;
+    sequence.copyPosition(pos.ipos, pos.xpos, this, 0);
+  }
+
+  public void release()
+  {
+    if (sequence != null)
+      {
+	sequence.releasePosition(ipos, xpos);
+	sequence = null;
+      }
+  }
+
+  public void finalize()
+  {
+    release();
+  }
+}
+// This is for people using the Emacs editor:
+// Local Variables:
+// c-file-style: "gnu"
+// tab-width: 8
+// indent-tabs-mode: t
+// End:

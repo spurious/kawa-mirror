@@ -1,0 +1,4 @@
+2001-03-08  Per Bothner  <per@bothner.com>
+
+	New package.
+	Many of the classes are based on ones that used to be in gnu.kawa.util.

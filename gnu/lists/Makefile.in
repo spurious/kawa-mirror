@@ -1,0 +1,369 @@
+# Makefile.in generated automatically by automake 1.4c from Makefile.am
+
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ../..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_FLAG =
+INSTALL_HEADER = $(INSTALL_DATA)
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+
+@SET_MAKE@
+AMDEP = @AMDEP@
+AMINCLUDE = @AMINCLUDE@
+AMTAR = @AMTAR@
+AWK = @AWK@
+AWT_SELECTED = @AWT_SELECTED@
+CC = @CC@
+CFLAGS = @CFLAGS@
+DEPDIR = @DEPDIR@
+EXEEXT = @EXEEXT@
+GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
+JEMACS_VERSION = @JEMACS_VERSION@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+SHELL = @SHELL@
+SWING_SELECTED = @SWING_SELECTED@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+VERSION = @VERSION@
+XML_SELECTED = @XML_SELECTED@
+extra_java = @extra_java@
+install_sh = @install_sh@
+kawa_bin = @kawa_bin@
+
+
+
+AUTOMAKE_OPTIONS = foreign
+
+SUFFIXES = .java .class .scm .el .lisp
+
+javadir = $(datadir)/java/$(subdir)
+
+GCJ = gcj
+JAR = fastjar
+GCJFLAGS = -gdwarf-2
+OFILES_DIR = $(TO_TOPDIR)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+TO_TOPDIR = $(top_builddir)
+GCJ_DEPS = $(java_JAVA)
+
+CLEANFILES = $(java_BUILT) *.class *.stamp *.jar
+
+DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
+ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
+# Compiler to use for compiling builtin .scm/.el/.cl files.
+KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
+ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
+
+java_JAVA = \
+  Array.java \
+  CharBuffer.java \
+  CharSequence.java \
+  Consumer.java \
+  Consumable.java \
+  Convert.java \
+  F32Vector.java \
+  F64Vector.java \
+  FString.java \
+  FVector.java \
+  GapVector.java \
+  GeneralArray.java \
+  LList.java \
+  Pair.java \
+  PairWithPosition.java \
+  PositionContainer.java \
+  S8Vector.java \
+  S16Vector.java \
+  S32Vector.java \
+  S64Vector.java \
+  SubSequence.java \
+  StableVector.java \
+  Strings.java \
+  TreeList.java \
+  TreePosition.java \
+  U8Vector.java \
+  U16Vector.java \
+  U32Vector.java \
+  U64Vector.java \
+  $(java_BUILT)
+
+
+java_BUILT = \
+  AbstractSequence.java \
+  Sequence.java \
+  SeqPosition.java \
+  SimpleVector.java
+
+
+BUILT_SOURCES = $(java_BUILT)
+SOURCES = $(java_JAVA) Sequence.java.in SeqPosition.java.in
+
+SED_COLLECTIONS_SUBS = $(SED_@JAVA_COLLECTIONS_SELECTED@_SUBS) \
+  -e '1i\' -e '// DO NOT EDIT!  -*- buffer-read-only: t -*-'  
+
+SED_WITH_JAVA_COLLECTIONS_SUBS = \
+  -e '/@if WITHOUT COLLECTIONS@/,/@endif WITHOUT COLLECTIONS@/d' \
+  -e '/@*if WITH COLLECTIONS@/d'
+
+SED_WITHOUT_JAVA_COLLECTIONS_SUBS = \
+  -e '/@if WITH COLLECTIONS@/,/@endif WITH COLLECTIONS@/d' \
+  -e '/@*if WITHOUT COLLECTIONS@/d'
+
+
+PACKAGE_FNAME = gnu-lists
+
+COLL = @JAVA_COLLECTIONS_SELECTED@
+subdir = gnu/lists
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+DIST_SOURCES = 
+JAVACFLAGS = 
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
+depcomp = 
+DIST_COMMON =  $(java_JAVA) COPYING ChangeLog Makefile.am Makefile.in \
+TODO
+
+
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+
+GZIP_ENV = --best
+all: all-redirect
+.SUFFIXES:
+.SUFFIXES: .java .class .scm .el .lisp
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/Make-rules
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/lists/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+
+
+mostlyclean-javaJAVA:
+
+
+clean-javaJAVA:
+	-rm *.class classjava.stamp
+
+distclean-javaJAVA:
+
+
+maintainer-clean-javaJAVA:
+
+
+install-javaJAVA: classjava.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
+	done
+
+uninstall-javaJAVA:
+	@$(NORMAL_UNINSTALL)
+	@for p in *.class; do \
+	  echo " rm -f $(DESTDIR)$(javadir)/$$p"; \
+	  rm -f $(DESTDIR)$(javadir)/$$p; \
+	done
+classjava.stamp: $(java_JAVA)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > classjava.stamp
+tags: TAGS
+TAGS:
+
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -d $$d/$$file; then \
+	    cp -pR $$d/$$file $(distdir) \
+	    || exit 1; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || cp -p $$d/$$file $(distdir)/$$file \
+	    || exit 1; \
+	  fi; \
+	done
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am:
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-info-am: 
+install-info: install-info-am
+all-recursive-am: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+
+install-exec-am:
+install-exec: install-exec-am
+
+install-data-am: install-javaJAVA
+install-data: install-data-am
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-javaJAVA
+uninstall: uninstall-am
+all-am: Makefile classjava.stamp
+all-redirect: all-am
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(javadir)
+
+
+mostlyclean-generic:
+
+
+clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+	@echo "This command is intended for maintainers to use"
+	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f Makefile.in
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+clean: clean-am
+
+clean-am: clean-generic clean-javaJAVA mostlyclean-am
+
+distclean: distclean-am
+
+distclean-am: clean-am distclean-generic distclean-javaJAVA
+
+maintainer-clean: maintainer-clean-am
+
+maintainer-clean-am: distclean-am maintainer-clean-generic \
+	maintainer-clean-javaJAVA
+
+mostlyclean: mostlyclean-am
+
+mostlyclean-am: mostlyclean-generic mostlyclean-javaJAVA
+
+.PHONY: all all-am all-recursive-am all-redirect check check-am clean \
+	clean-generic clean-javaJAVA distclean distclean-generic \
+	distclean-javaJAVA distdir dvi dvi-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-javaJAVA \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-javaJAVA mostlyclean mostlyclean-generic \
+	mostlyclean-javaJAVA uninstall uninstall-am uninstall-javaJAVA
+
+
+# Make sure $(KAWA1) is available, if --enable-gcj-compiled.
+$(TO_TOPDIR)/kawa1$(exeext):
+	cd $(TO_TOPDIR) && $(MAKE) kawa1$(exeext)
+
+$(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
+
+$(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
+	$(JAR) cf classes.jar *.class
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	  classes.jar -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+	rm classes.jar
+
+scm-classes.stamp: $(java_SCM)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --module-static -C $?
+	echo timestamp > scm-classes.stamp
+
+elisp-classes.stamp: $(java_ELISP)
+	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
+	  $(KAWA1) -d $(top_builddir) \
+	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
+	echo timestamp > elisp-classes.stamp
+all: Makefile classjava.stamp $(@GCJ_COMPILED_SELECTED@)
+
+Sequence.java:  $(srcdir)/Sequence.java.in
+	sed $(SED_COLLECTIONS_SUBS) \
+	  -e '1s|//.*-Java-.*|// This file is automatically generated from Sequence.java.in.|' \
+	  <$(srcdir)/Sequence.java.in >Sequence.java
+
+AbstractSequence.java:  $(srcdir)/AbstractSequence.java.in
+	sed $(SED_COLLECTIONS_SUBS) \
+	  -e '1s|//.*-Java-.*|// This file is automatically generated from AbstractSequence.java.in.|' \
+	  <$(srcdir)/AbstractSequence.java.in >AbstractSequence.java
+
+SeqPosition.java:  $(srcdir)/SeqPosition.java.in
+	sed $(SED_COLLECTIONS_SUBS) \
+	  -e '1s|//.*-Java-.*|// This file is automatically generated from SeqPosition.java.in.|' \
+	  <$(srcdir)/SeqPosition.java.in >SeqPosition.java
+
+SimpleVector.java:  $(srcdir)/SimpleVector.java.in
+	sed $(SED_COLLECTIONS_SUBS) \
+	  -e '1s|//.*-Java-.*|// This file is automatically generated from SimpleVector.java.in.|' \
+	  <$(srcdir)/SimpleVector.java.in >SimpleVector.java
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+

@@ -1,0 +1,43 @@
+// -*-Java-*-
+// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.lists;
+@if WITH COLLECTIONS@
+import java.util.*;
+@endif WITH COLLECTIONS@
+
+/**
+ * A Sequence is an ordered list of elements.
+ * It is similar to and compatible with the Java2 java,util.List interface,
+ * but does not require it.
+ *
+ * All standard classes that implement Sequence also extend AbstractSequence.
+ * Using AbstractSequence provides default implementations for many methods,
+ * and also makes things a bit more efficient.  However, client code should
+ * use Sequence rather than AbstractSequence.
+ *
+ * @author Per Bothner
+ */
+
+public interface Sequence
+extends
+@if WITH COLLECTIONS@
+    java.util.List,
+@endif WITH COLLECTIONS@
+    Array, Consumable
+{
+  /** Special magic end-of-file marker. */
+  public static final Object eofValue = new String[] { "(EOF)" };
+
+  /** See java.util.List. */
+  public int size();
+
+  /** See java.util.List. */
+  public Object get (int index);
+
+  public void fill(Object value);
+
+  public java.util.Enumeration elements();
+  
+}

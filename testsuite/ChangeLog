@@ -1,5 +1,7 @@
 2004-08-03  Per Bothner  <per@bothner.com>
 
+	* module2.scm:  Make module extend <pair>, for extra testing.
+
 	* testing.scm (test):  Add commented-out debugging hook.
 
 2004-05-23  Per Bothner  <per@bothner.com>

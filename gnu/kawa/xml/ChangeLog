@@ -1,5 +1,7 @@
 2003-09-04  Per Bothner  <per@bothner.com>
 
+	* SortNodes.java (compile):  Fix infinite compile-time recursion.
+
 	* Focus.java (size, contextSize):  Remove unused fields.
 
 	* ParentAxis.java (scan):  Fix thinko.

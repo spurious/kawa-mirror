@@ -9,7 +9,6 @@ public class Pair extends List implements Printable, Compilable
 
   public Pair (Object carval, Object cdrval)
   {
-    super ();
     car = carval;
     cdr = cdrval;
   }

@@ -338,7 +338,7 @@ public class InPort extends FilterInputStream implements Printable
   }
 
   /** Read a number (with a <prefix> in Scheme syntax from this.
-   * @param radix the radix/base specified, or zoer if it specified.
+   * @param radix the radix/base specified, or zero if it specified.
    * @param exactness 'i' if #i was seen;  'e' if #i was seen;  else ' '
    *  (currently ignored)
    * @return the number read
@@ -387,16 +387,23 @@ public class InPort extends FilterInputStream implements Printable
 	str.append ((char) c);
 	c = readChar ();
       }
-    do
+
+    int digits = 0;
+    for (;;)
       {
-	if ((c=='.' || c=='e' || c=='E') && radix == 10)
+	if (Character.digit ((char)c, radix) >= 0)
+	  digits++;
+	else if ((c=='.' || c=='e' || c=='E') && radix == 10)
 	  isFloat = true;
+	else // catches EOF
+	  break;
 	str.append ((char) c);
 	c = readChar ();
-      } while (Character.digit ((char)c, radix) >= 0
-	       || c=='.' || c=='e' || c=='E');
-
-    unreadChar();
+      }
+    if (c >= 0)
+      unreadChar();
+    if (digits == 0)
+      throw new ReadError (this, "number constant with no digits");
 
     if (isFloat)
       return new DFloNum (str.toString ());

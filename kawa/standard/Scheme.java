@@ -454,7 +454,7 @@ public class Scheme extends LispInterpreter
       define_syntax("primitive-array-set", "kawa.lib.reflection");
       define_syntax("primitive-array-length", "kawa.lib.reflection");
       define_proc("subtype?", "kawa.lib.reflection");
-      define_proc("primitive-throw", new kawa.standard.prim_throw());
+      define_field("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
       define_syntax("try-finally", "kawa.standard.try_finally");
       define_syntax("try-catch", "kawa.standard.try_catch");
       define_proc("throw", "kawa.standard.throw_name");

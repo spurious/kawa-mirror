@@ -1,3 +1,13 @@
+2002-07-29  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/prim_throw.java (primitiveThrow):  New static field.
+	* kawa/standard/Scheme.java (initScheme):  Define "primitive-throw"
+	using define_field, so it can be inlined.
+
+2002-07-28  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/Scheme.java (getNamedType):  Define <never-returns>.
+
 2002-07-25  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (rewrite_pair):  Remove some optimizations,

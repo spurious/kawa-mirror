@@ -5,6 +5,8 @@ import gnu.expr.*;
 
 public class prim_throw extends Procedure1 implements Inlineable
 {
+  public static final prim_throw primitiveThrow = new prim_throw();
+
   public static void throw_it (Object arg1)
     throws Throwable
   {

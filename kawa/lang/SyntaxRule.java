@@ -231,8 +231,7 @@ public class SyntaxRule implements Compilable
     template_program.append ((char) (FIRST_LITERALS + 2 * literals_index));
   }
 
-  public Object execute_template (Object[] vars,
-				  Interpreter interp)
+  public Expression execute_template (Object[] vars, Interpreter interp)
   {
     int[] indexes = new int[max_nesting];
     int num_identifiers = template_identifiers.length;
@@ -243,13 +242,25 @@ public class SyntaxRule implements Compilable
 	vars[num_variables + i] = renamed_symbol;
 	interp.current_decls.put (renamed_symbol, name);
       }
-    Object result = execute_template (0, vars, 0, indexes, interp);
-    for (int i = 0;  i < num_identifiers;  i++)
+    try
       {
-	Symbol renamed_symbol = (Symbol) vars[num_variables + i];
-	interp.current_decls.remove (renamed_symbol);
+	Object expansion = execute_template (0, vars, 0, indexes, interp);
+	/* DEBUGGING:
+	System.err.print ("{Expanded macro: ");
+	kawa.lang.print.print (expansion, System.err);
+	System.err.println ('}');
+	*/
+	Expression exp = interp.rewrite (expansion);
+	return exp;
       }
-    return result;
+    finally
+      {
+	for (int i = 0;  i < num_identifiers;  i++)
+	  {
+	    Symbol renamed_symbol = (Symbol) vars[num_variables + i];
+	    interp.current_decls.remove (renamed_symbol);
+	  }
+      }
   }
 
   /**

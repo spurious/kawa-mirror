@@ -190,13 +190,12 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
   }
 
   public Expression rewrite (Object obj, Interpreter interp)
-       throws kawa.lang.WrongArguments
   {
     Object[] vars = new Object[maxVars];
     for (int i = 0;  i < rules.length;  i++)
       {
 	SyntaxRule rule = rules[i];
-	// check that literals have correct binding !!
+	// check that literals have correct binding - FIXME!!
 	if (rule.pattern.match (obj, vars, 0) >= 0)
 	  {
 	    /* DEBUGGING:
@@ -209,14 +208,7 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	      }
 	    System.err.println ('}');
 	    */
-
-	    Object expansion = rule.execute_template (vars, interp);
-	    /* DEBUGGING:
-	    System.err.print ("{Expanded macro: ");
-	    kawa.lang.print.print (expansion, System.err);
-	    System.err.println ('}');
-	    */
-	    return interp.rewrite (expansion);
+	    return rule.execute_template (vars, interp);
 	  }
       }
     return interp.syntaxError ("no matching syntax-rule for "

@@ -1,5 +1,9 @@
 2003-07-16  Per Bothner  <per@bothner.com>
 
+	* Arrays.java (effectiveIndex):  Minor optimization - I hope.
+	(shareArray):  Be careful to not call getEffectiveIndex with invalid
+	indexes.  Fixes Savannah [bug #4310] share-array edge case.
+
 	* AddOp.java (inline):  Use new inlineIfConstant method overloading.
 	Fixes bug reported 7/15 by Joerg-Cyril.Hoehle@t-systems.com.
 	* AppendValues.java (inline):  Likewise.

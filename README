@@ -1,37 +1,23 @@
-	README for kawa-0.3 release
+KAWA, THE JAVA-BASED SCHEME SYSTEM
+----------------------------------
 
-This documents how to install and use Kawa, a Scheme system
-implemented in Java, and which compiles into Java bytecodes.
+Kawa is an implementation of the Scheme programming language.
+It is implemented in Java, and compiles Scheme into Java bytecodes.
 
-The file NEWS summarizes changes since previous releases.
+The file kawa.txt (which was automatically generated from kawa.texi)
+explains how to build, install, and use Kawa.
 
+The file NEWS summarizes recent changes.
 
-Running Kawa
-============
-
-The interface to Kawa is typical of Scheme interpreters.
-You start it by typing:
-
-	java kawa
-
-(Remember, the Java interpreter must be on your PATH,
-and the kawa.class file must be in your CLASSPATH.)
-
-You will then get the "kawa>" prompt, which means you are
-in the Java read-eval-print-loop.  If you type a Scheme
-expression, Kawa will evaluate it.  Kawa will then print the
-result (if there is a non-"void" result).
-
-To exit Kawa, type the end-of-file character (normally ctrl/D),
-or call the exit procedure (with 0 or 1 integer argument).
+The file Compliance.html summarizes divergence from the R4RS.
 
 Authors
 =======
 R. Alexander Milowski <alex@copsol.com> wrote and released
-versions 0.1 and 0.2.  He is still actively involved.
+versions 0.1 and 0.2.
 
-Per Bothner <bothner@cygnus.com> re-wrote the evaluator to
-use byte compilation, made many other changes, and released 0.3.
+Per Bothner <bothner@cygnus.com> re-wrote the evaluator to use byte
+compilation, made many other changes, and released 0.3 and later versions.
 
 If you have a problem or bug, for now send a report to the authors.
 If there is demand, we will set up a mailing list.

@@ -6,3 +6,26 @@ Add fraction and complex support.
 
 Add access to native java methods.
 
+We depend on 2 hacks to automake:
+- info files make in builddir, not $(srcdir)
+- DATA is added to DIST_DEPFILES
+Try to get automake maintainers to accept these.
+
+Implement Scheme record types as Java classes, once JDK 1.1 reflection
+stuff is released.
+
+Implement Environment properly.  Support threads, fluidvars, and modules.
+
+Move readSchemeObject readSchemeNumber etc from InPort
+to new class(es) Parser:
+	class Parser;
+	class SchemeReader extends Parser;  // Provides read
+	class SchemeParser extends SchemeReader;  // Provides read+rewrite
+Move Interpreter.syntaxError to Parser.
+Treat ReadError as SyntaxError.
+Support warning, error, fatal.
+Parser accumulates list of syntax errors.
+When done, if errors or warnings, throw SyntaxErrors.
+Printing SyntaxError prints error log.
+
+Replace use of ZipArchive by jar files (once JDK 1.1 is out).

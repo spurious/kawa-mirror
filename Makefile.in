@@ -53,7 +53,10 @@ OBJ = kawa.class kawac.class
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java) kawa.txt
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
+
+EXTRA_DIST = kawa.txt
 info_TEXINFOS = kawa.texi
 CLEANFILES=$(OBJ)
 ACLOCAL = aclocal.m4
@@ -75,9 +78,9 @@ PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST)
 DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST) $(DATA)
+	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST)
 
 TAR = tar
 default: all

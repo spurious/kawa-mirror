@@ -19,7 +19,7 @@ kawac.class:  $(srcdir)/kawac.java
 kawa.txt:  $(srcdir)/kawa.texi
 	$(MAKEINFO) --no-split --no-headers --paragraph-indent=asis $< -o - \
           | sed -e '/^Concept Index/,$$d' \
-             -e '/Making info file /,2d' \
+             -e '/Making info file /,/END-INFO-DIR-ENTRY/d' \
           >$@
 
 
@@ -29,7 +29,10 @@ OBJ = kawa.class kawac.class
 
 java_DATA=$(OBJ)
 
-EXTRA_DIST = $(OBJ:.class=.java) kawa.txt
+# Following only works for GNU make, but is only needed for make dist or TAGS.
+SOURCES = $(OBJ:.class=.java)
+
+EXTRA_DIST = kawa.txt
 info_TEXINFOS = kawa.texi
 CLEANFILES=$(OBJ)
 

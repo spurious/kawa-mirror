@@ -154,10 +154,23 @@ export CLASSPATH=.:$PREFIX/java:$JDK/lib/classes.zip
 
 To running Kawa, you must start a Java interpreter.
 This depends on the Java interpreter.
-For JavaSoft's JDK, you do:
+For JavaSoft's JDK, you must have the Java interpreter
+in your @code{PATH}.
+You must also make sure that the @code{kawa.class} file,
+the rest of the Kawa packages, and the standard Java
+packages can be found by searching CLASSPATH.
+Then you do:
 @example
 java kawa
 @end example
+
+You will then get the @samp{kawa>} prompt, which means you are
+in the Kawa read-eval-print-loop.  If you type a Scheme
+expression, Kawa will evaluate it.  Kawa will then print the
+result (if there is a non-"void" result).
+
+To exit Kawa, type the end-of-file character (normally ctrl/D),
+or call the exit procedure (with 0 or 1 integer arguments).
 
 You can pass various flags to Kawa, for example:
 @example
@@ -198,9 +211,13 @@ which is a vector of strings.
 The file Compliance.html specifies which functions and syntax
 have been implemented so far.
 
-The only numeric datatypes are fix-width (32-bit) integers, and
-double-precision floats.  Many of the numeric and math functions
-have not been implemented yet.
+Of the "numeric tower", only integers and double-precision
+floats are implemented.  There is partial bignum support,
+but many operations are only available for 32-bit
+(or sometimes 64-bit) fixnums.
+Integral function do not necessarily work on
+inexact (floating-point) integers.
+(The whole idea of "inexact integer" in R4RS seems rather pointless ...)
 
 Also, call-with-current-continuation is only "upwards" (?).
 I.e. once a continuation has been exited, it cannot be invoked.
@@ -239,6 +256,18 @@ returning the value of the last one.
 @defun vector-append arg...
 Creates a new vector, containing the elements from all the @var{arg}s
 appended together.   Each @var{arg} may be a vector or a list.
+@end defun
+
+@defun call-with-input-string string proc
+Create an input port that gets its data from @var{string},
+call @var{proc} with that port as its one argument, and return
+the result from the call of @var{proc}
+@end defun
+
+@defun call-with-output-string proc
+Create an output port that writes its data to a @var{string},
+and call @var{proc} with that port as its one argument.
+Return a string consisting of the data written to the port.
 @end defun
 
 @node Compilation,  , Extensions, Top

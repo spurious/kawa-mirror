@@ -1,3 +1,23 @@
+Sun Sep 15 11:07:48 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* **/Makefile.{am,in}: (javadir):  Use $(subdir)
+	{DEP_,}DISTFILES):  Do not include DATA (i.e. *.class).
+	Replace generated EXTRA_DIST with ditto SOURCES.
+	* kawa/Shell.java:  Less verbose error messages.
+	* kawa/standard/{gcd,string2number,call_with_output_string}.java:  New.
+	* kawa/standard/{StandardInterpreter.java,Makefile.{am,in}}:  Update.
+	* CompileFile.java (read):  Take Environment, not Interpreter.
+	Add overloaded method that uses an InPort.
+	* kawa/lang/Environment.java (getInterpreter):  New method.
+	* kawa/lang/InPort.java (throws clauses): ReadError -> SyntaxError.
+	* kawa/lang/InPort (readNumber -> readSchemeNumber): Make more general.
+	* kawa/lang/LambdaExp.java (fileFunctionName):  New static field.
+	* kawa/lang/Named.java:  Don't implement no-longer-existing Nameable.
+	* kawa/lang/ReadError.java:  Change so getMessage gets raw message,
+	* kawa/lang/SetExp.java (compile):  Do maybe_compile_checkcast.
+	* kawa/lang/SyntaxError.java:  Removed.
+	* kawa/lang/UnboundSymbol.java: Call super so getMessage works.
+	
 Fri Sep 13 14:27:31 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* configure{.in,}:  Update to version 0.5.

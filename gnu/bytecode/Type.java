@@ -419,14 +419,18 @@ public abstract class Type {
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
 
   /** The "return type" of an expression that never returns, e.g. a throw. */
-  public static final PrimType neverReturnsType
-    = new PrimType ("(never-returns)", "V", 0, java.lang.Void.TYPE);
+  public static final PrimType neverReturnsType = new PrimType (void_type);
+  static { neverReturnsType.this_name = "(never-returns)"; }
 
   /** The magic type of null. */
   public static final ObjectType nullType = new ObjectType("(type of null)");
 
-  static public ClassType pointer_type = ClassType.make("java.lang.Object");
+  /* The String type. but coercion is handled by toString. */
+  //static public ClassType string_type = new ClassType("java.lang.String");
+  //  static { string_type.flags |= ClassType.EXISTING_CLASS; }
   static public ClassType string_type = ClassType.make("java.lang.String");
+
+  static public ClassType pointer_type = ClassType.make("java.lang.Object");
   static public ClassType boolean_ctype = ClassType.make("java.lang.Boolean");
   static public ClassType throwable_type = ClassType.make("java.lang.Throwable");
   static public Type[] typeArray0 = new Type[0];

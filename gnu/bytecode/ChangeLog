@@ -1,3 +1,8 @@
+2001-09-12  Per Bothner  <per@bothner.com>
+
+	* Type.java (neverReturnsType):  Use different constructor, to
+	avoid it being registered in place of void_type.
+
 2001-08-23  Per Bothner  <per@bothner.com>
 
 	* Access.java (SUPER):  New constant.

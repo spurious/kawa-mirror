@@ -187,6 +187,8 @@ public class ELisp extends Interpreter
 	loadClass("gnu.jemacs.lang.StringOps", environ);
 	loadClass("gnu.jemacs.lang.ListOps", environ);
 	loadClass("gnu.jemacs.lang.MiscOps", environ);
+
+	loadClass("gnu.jemacs.lisp.autoloads", environ);
       }
     catch (java.lang.ClassNotFoundException ex)
       {

@@ -1,3 +1,9 @@
+2000-06-09  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (<init>):  Load new gnu.jemacs.lisp.autoloads.
+
+	* AddOp.java ($Mn):  Fix "slip-of-the-fingers": -11 should be -1.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Only compile MiscOps.scm unless Swing is enabled.

@@ -1,3 +1,9 @@
+2001-12-27  Daniel Bonniot  <bonniot@users.sourceforge.net>
+
+	* CodeAttr.java (various):  Replace emitGoto(L, 168) by emitJsr(L).
+
+	* CodeAttr.java (emitReturn): Jump to the finally blocks before return.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* CodeAttr.java (emitPushString):  Tolerate null String argument.

@@ -1533,9 +1533,21 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   /**
    * Compile a method return.
+   * If inside a 'catch' clause, first call 'finally' clauses.
+   * The return value (unless the return type is void) must be on the stack,
+   * and have the correct type.
    */
   public final void emitReturn ()
   {
+    TryState stack = try_stack;
+    while (stack != null)
+      {
+	if (stack.finally_subr != null         // there is a finally block
+	    && stack.finally_ret_addr == null) // 'return' is not inside it
+	  emitJsr(stack.finally_subr);
+	stack = stack.previous;
+      }
+
     if (getMethod().getReturnType().size == 0)
       {
 	reserve(1);
@@ -1621,7 +1633,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (reachableHere())
 	  {
 	    if (try_stack.finally_subr != null)
-	      emitGoto(try_stack.finally_subr, 168);  // jsr
+	      emitJsr(try_stack.finally_subr);
 	    emitGoto(try_stack.end_label);
 	  }
 	readPC = PC;
@@ -1656,7 +1668,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 	if (try_stack.saved_result != null)
 	  emitStore(try_stack.saved_result);
 	if (try_stack.finally_subr != null)
-	  emitGoto(try_stack.finally_subr, 168); // jsr
+	  emitJsr(try_stack.finally_subr);
 	emitGoto(try_stack.end_label);
       }
     try_stack.try_type = null;
@@ -1676,7 +1688,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     Variable except = addLocal(except_type);
     emitCatchStart(null);
     emitStore(except);
-    emitGoto(try_stack.finally_subr, 168); // jsr
+    emitJsr(try_stack.finally_subr);
     emitLoad(except);
     emitThrow();
     

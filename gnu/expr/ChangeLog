@@ -1,3 +1,7 @@
+2002-03-18  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getInstance):  Check for InvocationTargetException.
+
 2002-03-06  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (setFunction):  New method.

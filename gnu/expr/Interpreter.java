@@ -9,6 +9,7 @@ import gnu.lists.*;
 import gnu.text.Lexer;
 import gnu.text.SourceMessages;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Contains various language-dependent methods.
@@ -150,9 +151,14 @@ public abstract class Interpreter
     catch (Exception ex)
       {
 	langName = langClass.getName();
-	ex.printStackTrace();
+	Throwable th;
+	if (ex instanceof InvocationTargetException)
+	  th = ((InvocationTargetException) ex).getTargetException();
+	else
+	  th = ex;
+	// th.printStackTrace();
 	throw new WrappedException("getInstance for '" + langName + "' failed",
-				   ex);
+				   th);
       }
   }
 

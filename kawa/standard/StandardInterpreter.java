@@ -247,6 +247,8 @@ public class StandardInterpreter extends Interpreter
       proc = new kawa.standard.exit();
       define(proc.name,proc);
 
+      define_proc ("compile-func", "kawa.lang.compilefune");
+      define_proc ("compile-file", "kawa.lang.CompileFile");
+      define_proc ("load-compiled", "kawa.lang.loadcompiled");
    }
-
 }

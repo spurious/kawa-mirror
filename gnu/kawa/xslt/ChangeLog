@@ -1,3 +1,7 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* XSLT.java:  Update for gnu.lists changes.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* TemplateTable.java, XSLT.java, XslTranslator.java:

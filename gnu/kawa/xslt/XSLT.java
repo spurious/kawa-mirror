@@ -1,4 +1,4 @@
-// Copyright (c) 2002  Per M.A. Bothner.
+// Copyright (c) 2002, 2003  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.xslt;
@@ -167,7 +167,7 @@ public class XSLT extends XQuery
   {
     TreeList doc = Document.parse(url);
     Focus pos = Focus.getCurrent();
-    pos.push(doc, 0, null);
+    pos.push(doc, 0);
     process(doc, pos, ctx);
   }
 
@@ -178,11 +178,11 @@ public class XSLT extends XQuery
     for (;;)
       {
 	int ipos = pos.ipos;
-	int kind = doc.getNextKind(ipos, null);
+	int kind = doc.getNextKind(ipos);
 	switch (kind)
 	  {
 	  case Sequence.DOCUMENT_VALUE:
-	    ipos = doc.gotoChildrenStart(ipos >> 1) << 1;
+	    ipos = doc.firstChildPos(ipos);
 	    break;
 	  case Sequence.GROUP_VALUE:
 	    Object type = pos.getNextTypeObject();
@@ -194,7 +194,7 @@ public class XSLT extends XQuery
 	      {
 		out.beginGroup(name, type);
 		// FIXME emit attributes
-		pos.push(doc, doc.gotoChildrenStart(ipos >> 1) << 1, null);
+		pos.push(doc, doc.firstChildPos(ipos));
 		process(doc, pos, ctx);
 		pos.pop();
 		out.endGroup(name);
@@ -207,7 +207,7 @@ public class XSLT extends XQuery
 	    int next = doc.nextNodeIndex(ichild, -1 >>> 1);
 	    if (ipos == next)
 	      next = doc.nextDataIndex(ichild);
-	    doc.consumeRange(ichild, next, out);
+	    doc.consumeIRange(ichild, next, out);
 	    ipos = next << 1;
 	    break;
 	  case Sequence.TEXT_BYTE_VALUE:
@@ -242,7 +242,7 @@ public class XSLT extends XQuery
     CallContext ctx = CallContext.getInstance();
     Focus pos = Focus.getCurrent();
     TreeList doc = (TreeList) pos.sequence;
-    pos.push(doc, doc.gotoChildrenStart(pos.ipos >> 1) << 1, null);
+    pos.push(doc, doc.firstChildPos(pos.ipos));
     process(doc, pos, ctx);
     pos.pop();
   }

@@ -834,6 +834,8 @@ public class Scheme extends Interpreter
 	types.put ("keyword", ClassType.make("gnu.expr.Keyword"));
 	types.put ("list", ClassType.make("gnu.lists.LList"));
 	types.put ("pair", ClassType.make("gnu.lists.Pair"));
+	types.put ("pair-with-position",
+		   ClassType.make("gnu.lists.PairWithPosition"));
 	types.put ("string", ClassType.make("gnu.lists.FString"));
 	types.put ("abstract-string", ClassType.make("gnu.lists.CharSequence"));
 	types.put ("character", ClassType.make("gnu.text.Char"));

@@ -1,3 +1,10 @@
+2001-04-11  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Eval.java (eval):  If argument is PairWithPosition,
+	use it to set position of temporary "body" PairWithPosition.
+	(evalBody):  If body is PairWithPosition, set ModuleExp's filename.
+	* kawa/standard/Scheme.java (initScheme):  Define <pair-with-position>.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/require.java (<clinit>):  Also handle require 'xml.

@@ -12,8 +12,15 @@ public class Eval extends Procedure1or2
 
   public static Object eval (Object sexpr, Environment env)
   {
-    PairWithPosition body = new PairWithPosition(sexpr, LList.Empty);
-    body.setFile("<eval>");
+    PairWithPosition body;
+    if (sexpr instanceof PairWithPosition)
+      body = new PairWithPosition((PairWithPosition) sexpr,
+				  sexpr, LList.Empty);
+    else
+      {
+	body = new PairWithPosition(sexpr, LList.Empty);
+	body.setFile("<eval>");
+      }
     return evalBody(body, env, new SourceMessages());
   }
 
@@ -27,6 +34,8 @@ public class Eval extends Procedure1or2
 	  Environment.setCurrent(env);
 	Translator tr = new Translator (env, messages);
 	ModuleExp mod = kawa.standard.Scheme.makeModuleExp(body, tr);
+	if (body instanceof PairWithPosition)
+	  mod.setFile(((PairWithPosition) body).getFile());
 	mod.setName (evalFunctionName);
 	if (messages.seenErrors())
 	  throw new RuntimeException("invalid syntax in eval form:\n"

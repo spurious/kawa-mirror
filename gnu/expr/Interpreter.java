@@ -361,7 +361,10 @@ public abstract class Interpreter
       }
   }
 
-  public abstract FormatToConsumer getFormat(boolean readable);
+  public FormatToConsumer getFormat(boolean readable)
+  {
+    return null;
+  }
 
   public Consumer getOutputConsumer(Writer out)
   {
@@ -376,7 +379,14 @@ public abstract class Interpreter
     return Environment.make(null, environ);
   }
 
-  public abstract String getName();
+  public String getName()
+  {
+    String name = getClass().getName();
+    int dot = name.lastIndexOf('.');
+    if (dot >= 0)
+      name = name.substring(dot+1);
+    return name;
+  }
 
   public abstract Lexer getLexer(InPort inp, SourceMessages messages);
 
@@ -407,7 +417,10 @@ public abstract class Interpreter
   public abstract Compilation parse(Lexer lexer, int options)
     throws java.io.IOException, gnu.text.SyntaxException;
 
-  public abstract Type getTypeFor(Class clas);
+  public Type getTypeFor(Class clas)
+  {
+    return Type.make(clas);
+  }
 
   public static Type string2Type (String name)
   {

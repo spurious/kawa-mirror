@@ -1,3 +1,8 @@
+2005-01-16  Per Bothner  <per@bothner.com>
+
+	* Interpreter.java (getFormat, getName, getTypeFor): Provide default
+	implementations for formerly abstract methods.
+
 2005-01-09  Per Bothner  <per@bothner.com>
 
 	* ClassExp.java (compilePushClass): Use new loadClassRef method.

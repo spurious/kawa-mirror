@@ -25,6 +25,9 @@
          "ant -buildfile ../kawa/build.xml" and
          "ant -buildfile ../kawa/build.xml -Ddist.dir=." 
          would produce different results.
+      4) The value of user.dir is not useful when using a Java IDE
+         (like NetBeans or JBuilder) since it is the directory that 
+         happened to be current when the IDE started.
     So, the only way to use Ant where the current directory (user.dir)
     is not the directory containing the buildfile, you *must* supply
     absolute paths as arguments.  That is:
@@ -33,7 +36,7 @@
     as plain Java files and so are relative to the current directory.
   -->
   <property name="src.dir"      value="${basedir}"/>
-  <property name="build.dir"    value="${user.dir}"/>
+  <property name="build.dir"    value="${basedir}"/>
   <property name="dist.dir"     value="${build.dir}"/>
   
   <property name="build.tools"        value="${build.dir}/tools"/>
@@ -158,8 +161,9 @@
     <property name="enable-servlet" value="false"/>
   
     <echo>
-	build.dir=${build.dir}
         version=${version}
+        dist.kawa.jar=${dist.kawa.jar}
+        build.dir=${build.dir}
         with-collections=${with-collections}
         with-references=${with-references}
         with-awt=${with-awt}

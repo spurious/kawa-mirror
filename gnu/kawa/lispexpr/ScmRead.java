@@ -16,11 +16,13 @@ public class ScmRead extends LispReader
   public ScmRead(InPort port)
   {
     super(port);
+    initialColonIsKeyword = false;
   }
   
   public ScmRead(InPort port, SourceMessages messages)
   {
     super(port, messages);
+    initialColonIsKeyword = false;
   }
   
   protected ReadTable getReadTable () { return scmReadTable; }

@@ -1,3 +1,9 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* LispReader.scm (initialColonIsKeyword, finalColonIsKeyword):  New.
+	(returnSymbol):  Use new flags.
+	* ScmRead.scm (<init>):  Set initialColonIsKeyword to false.
+	
 2001-11-14  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java (compare):  Boolean is less specific than

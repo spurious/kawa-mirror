@@ -45,7 +45,7 @@ public class SlotGet extends Procedure2
   {
     if (! (name instanceof String) && ! (name instanceof FString))
       throw WrongType.make(null, this, 1);
-    Interpreter interpreter = Interpreter.defaultInterpreter; // FIXME
+    Interpreter interpreter = Interpreter.getInterpreter();
     String fname = gnu.expr.Compilation.mangleNameIfNeeded(name.toString());
     Class clas = isStatic ? coerceToClass(obj) : obj.getClass();
     if (clas.isArray() && "length".equals(fname))
@@ -168,7 +168,7 @@ public class SlotGet extends Procedure2
   public Expression inline (ApplyExp exp)
   {
     if (isStatic)
-      return Invoke.inlineClassName (exp, 0, Interpreter.defaultInterpreter);
+      return Invoke.inlineClassName (exp, 0, Interpreter.getInterpreter());
     else
       return exp;
   }
@@ -246,6 +246,8 @@ public class SlotGet extends Procedure2
 	    if ("gnu.mapping.Binding".equals(ftype.getName())
 		&& (modifiers & Access.FINAL) != 0)
 	      code.emitInvokeVirtual(Compilation.getLocationMethod);
+	    Interpreter interpreter = Interpreter.getInterpreter();
+	    ftype = interpreter.getTypeFor(ftype.getReflectClass());
 	    target.compileFromStack(comp, ftype);
             return;
           }

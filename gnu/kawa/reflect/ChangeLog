@@ -1,3 +1,9 @@
+2002-06-05  Per Bothner  <per@bothner.com>
+
+	* SlotGet.java (compile):  Convert field type to language type.
+
+	* SlotGet.java (apply2, inline):  Use getInterpreter method.
+
 2002-05-19  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (setup):  Fix name/this.name confusion.

@@ -1,3 +1,8 @@
+2005-03-17  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (processArgs): Don't setDefaultLanguage until
+	default Environment has been set.
+
 2005-03-16  Per Bothner  <per@bothner.com>
 
 	* kawa/repl.java (previousLanguage): New static field.

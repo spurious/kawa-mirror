@@ -1,3 +1,8 @@
+1999-08-26  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getSuperclass):  If superClass unset, but
+	reflectClass is set, call java.lang.Class.getSuperclass.
+
 1999-08-22  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (adMethods, getMatchingMethods):  New methods.

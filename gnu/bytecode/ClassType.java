@@ -114,6 +114,9 @@ public class ClassType extends ObjectType implements AttrContainer {
 
   public ClassType getSuperclass ()
   {
+    if (superClass == null && reflectClass != null
+        && this != Type.pointer_type)
+      superClass = (ClassType) make(reflectClass.getSuperclass());
     return superClass;
  }
 

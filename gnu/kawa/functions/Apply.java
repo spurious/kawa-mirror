@@ -73,7 +73,6 @@ public class Apply extends ProcedureN
   public void apply (CallContext ctx) throws Throwable
   {
     Object[] args = ctx.getArgs();
-    ctx.proc = (Procedure) args[0];
-    ctx.setArgsN(getArguments(args, 1));
+    ((Procedure) args[0]).checkN(getArguments(args, 1), ctx);
   }
 }

@@ -1,3 +1,7 @@
+2004-08-08  Per Bothner  <per@bothner.com>
+
+	* ValuesMap.java (apply):  Use new check1/check1 methods.
+
 2004-08-07  Per Bothner  <per@bothner.com>
 
 	* Apply.java (getArgument):  Make non-static.

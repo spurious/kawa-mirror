@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003, 2004  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.kawa.functions;
@@ -41,20 +41,18 @@ public class ValuesMap extends MethodProc implements CanInline, Inlineable
 	  {
 	    Object v = values.getPosPrevious(ipos);
 	    if (startCounter >= 0)
-	      ctx.setArgs(v, IntNum.make(count++));
+	      proc.check2(v, IntNum.make(count++), ctx);
 	    else
-	      ctx.setArgs(v);
-	    ctx.proc = proc;
+	      proc.check1(v, ctx);
 	    ctx.runUntilDone();
 	  }
       }
     else
       {
 	if (startCounter >= 0)
-	  ctx.setArgs(val, IntNum.make(startCounter));
+	  proc.check2(val, IntNum.make(startCounter), ctx);
 	else
-	  ctx.setArgs(val);
-	ctx.proc = proc;
+	  proc.check1(val, ctx);
 	ctx.runUntilDone();
       }
   }

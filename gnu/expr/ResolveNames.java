@@ -22,10 +22,20 @@ public class ResolveNames extends ExpWalker
 
   public void resolveModule(ModuleExp exp)
   {
-    push(exp);
-    exp.walkChildren(this);
-    // Note we don't do lookup.pop(exp).  This is so top-level
-    // declarations remain for future uses of the same Lexer.
+    Compilation save_comp = Compilation.getCurrent();
+    try
+      {
+        if (comp != null)
+          Compilation.setCurrent(comp);
+        push(exp);
+        exp.walkChildren(this);
+      }
+    finally
+      {
+        Compilation.setCurrent(save_comp);
+        // Note we don't do lookup.pop(exp).  This is so top-level
+        // declarations remain for future uses of the same Lexer.
+      }
   }
 
   protected void push (ScopeExp exp)

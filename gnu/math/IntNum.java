@@ -1127,7 +1127,7 @@ public class IntNum extends RatNum implements Compilable
 	makeIntMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
 	args = new Type[1];
-	args[0] = Type.int_type;
+	args[0] = Type.long_type;
 	makeLongMethod = thisType.addMethod ("make", args, thisType,
 					     Access.PUBLIC|Access.STATIC);
       }

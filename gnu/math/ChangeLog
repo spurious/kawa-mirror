@@ -1,3 +1,8 @@
+Fri Jun 13 09:26:16 1997  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java (initMakeMethods):  Fix typo for makeLogMethod.
+	Reported by Joseph Bowbeer <jozart@compuserve.com>.
+
 Thu May 29 15:04:35 1997  Per Bothner  <bothner@cygnus.com>
 
 	* DFloNum.java (isNegative):  Fix bad think-o.

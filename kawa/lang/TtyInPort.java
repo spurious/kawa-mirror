@@ -6,7 +6,7 @@ import java.io.*;
 
 public class TtyInPort extends InPort
 {
-  private OutPort tie;
+  protected OutPort tie;
 
   private Procedure prompter;
 
@@ -15,7 +15,7 @@ public class TtyInPort extends InPort
   public Procedure getPrompter () { return prompter; }
 
   /** Set the prompter function.
-   * The arguemnt is called when a new line is read.
+   * The argument is called when a new line is read.
    * It is passed one argument (this input port), and should return
    * a string.  That string is printed as teh prompt string.  */
 

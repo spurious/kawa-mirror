@@ -99,7 +99,8 @@ kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 ENABLE_GCJ_COMPILED_DEFS = -DGCJ_COMPILED
 DISABLE_GCJ_COMPILED_DEFS = -DKAWALIB='"$(datadir)/java"'
-DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS) -Dxxx
+DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS)
+INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 KAWA1_OFILES = \
@@ -312,7 +313,6 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic tags uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-$(READLINE_INCLUDE_PATH)
 
 kawa.sh:
 	echo '#!/bin/sh' >tmp

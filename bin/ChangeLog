@@ -1,3 +1,8 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* Makefile.am:  $(READLINE_INCLUDE_PATH) should be part of INCLUDES.
+	(DEFS):  Get rid of junk -Dxxx. (Old testing, I believe.)
+
 2001-04-10  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (KAWA2_OFILES):  Update gnu-kawa-xml.o -> gnu-xml.o.

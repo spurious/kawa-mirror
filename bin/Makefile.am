@@ -10,8 +10,8 @@ kawa_EXTRA_LIBS = -lncurses  # For Linux
 #kawa_EXTRA_LIBS = -lcurses -lsocket # For Solaris2
 ENABLE_GCJ_COMPILED_DEFS = -DGCJ_COMPILED
 DISABLE_GCJ_COMPILED_DEFS = -DKAWALIB='"$(datadir)/java"'
-DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS) -Dxxx
-$(READLINE_INCLUDE_PATH)
+DEFS = $(@GCJ_COMPILED_SELECTED@_DEFS)
+INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 kawa.sh:

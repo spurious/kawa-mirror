@@ -32,3 +32,7 @@ java_SCM=\
   emacs.scm
 
 SOURCES = $(java_JAVA)
+
+# Used to generate makekawa.bat in ../.. .
+list-sources:
+	echo $(SOURCES)

@@ -1,5 +1,12 @@
 2003-06-01  Per Bothner  <per@bothner.com>
 
+	* configure.in:  Set version to 1.7.
+	* build.xml (version.release):  Set to 1.7.
+
+	* Makefile.am (dist-kawa-@VERSION@.jar):  Add --with-sax2 to configure.
+
+2003-06-01  Per Bothner  <per@bothner.com>
+
 	* kawa/standard/Scheme.java (initScheme):  Specify field name for
 	vector-append.  Fixes bug reported by Sven.Hartrumpf@FernUni-Hagen.de.
 

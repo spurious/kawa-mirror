@@ -1,3 +1,9 @@
+Fri Sep 26 21:01:25 1997  Per Bothner  <bothner@cygnus.com>
+
+	* CpoolUtf8.java (intern):  New method.
+	* CpoolValue2.java (CpoolValue2):  Extra slot count increment needed.
+	* CpoolEntry.java (getIndex):  New method.
+
 Sun Jun 22 14:00:10 1997  Per Bothner  <bothner@cygnus.com>
 
 	* ConstantPool.java:  Add missing break, missing increment.

@@ -23,6 +23,8 @@ abstract public class CpoolEntry
   /** This entry's index in the constant pool. */
   public int index;
 
+  public int getIndex() { return index; }
+
   /** The next entry in the same hash bucket
    * (of the owning ConstantPool's hashTab). */
   CpoolEntry next;

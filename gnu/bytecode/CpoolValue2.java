@@ -18,6 +18,7 @@ public class CpoolValue2 extends CpoolEntry
     super (cpool, hash);
     this.tag = tag;
     this.value = value;
+    cpool.count++;  /* Long and Double take an extra cpool slot. */
   }
 
   public int getTag() { return tag; }

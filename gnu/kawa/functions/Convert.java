@@ -6,7 +6,7 @@ import gnu.bytecode.CodeAttr;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class Convert extends Procedure2 implements Inlineable
+public class Convert extends Procedure2 implements CanInline, Inlineable
 {
   public static final Convert as = new Convert();
   static { as.setName("as"); }
@@ -24,6 +24,11 @@ public class Convert extends Procedure2 implements Inlineable
 
   static gnu.bytecode.ClassType typeType;
   static gnu.bytecode.Method coerceMethod;
+
+  public Expression inline (ApplyExp exp)
+  {
+    return gnu.kawa.reflect.Invoke.inlineClassName(exp, 0, Interpreter.defaultInterpreter);
+  }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)
   {

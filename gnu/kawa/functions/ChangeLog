@@ -1,3 +1,8 @@
+2002-01-31  Per Bothner  <per@bothner.com>
+
+	* Convert.java:  Implement CanInline.
+	(inline): New method calls inlineClassName
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* AppendValues.java:  Moved from gnu.xquery.util.

@@ -356,7 +356,6 @@ public class Invoke extends ProcedureN implements CanInline
               }
           }
       }
-    //System.err.println("inline invoke type:"+type+" name:"+name);
     return exp;
   }
 

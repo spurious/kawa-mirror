@@ -42,7 +42,6 @@ public class Setter extends Procedure1 implements CanInline
                           {
                             decl
                               = Declaration.getDeclaration((Procedure) setter);
-	System.err.println("inline setter of  "+value+" decl:"+decl);
                             if (decl != null)
                               return new ReferenceExp(decl);
                           }

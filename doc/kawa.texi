@@ -2611,14 +2611,18 @@ System.out.println(x);
 @chapter Reporting Bugs and the Kawa Mailing List
 
 If you have a problem installing or using Kawa,
-send mail to @code{kawa@@cygnus.com}
+send mail to @code{kawa@@sourceware.cygnus.com}
 
 This mailing list is used for reporting bugs, patches, discussing
-changes to Kawa, and announcing snapshots.  If you wish to subscribe
-(or later unsubscribe), send a request to @code{kawa-request@@cygnus.com}.
+changes to Kawa, and announcing snapshots.  If you wish to subscribe,
+send a blank message request to @code{kawa-subscribe@@cygnus.com}.
+To unsubscribe, send a blank message to
+@code{kawa-unsubscribe@@sourcware.cygnus.com}.  (If your mail is forwarded,
+send mail to the address following @code{mailto:} in the
+@code{List-Unsubscribe} line in the messages you get form the list.)
 
 Messages to the mailing list are now
-@uref{http://www.cygnus.com/ml/kawa/, archived}.
+@uref{http://sourcware.cygnus.com/ml/kawa/, archived}.
 
 @node License, , Reporting Bugs, Top
 @chapter License

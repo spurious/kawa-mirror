@@ -1,3 +1,7 @@
+1999-08-22  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Change Kawa mail address to sourceware.cygnus.com.
+
 1999-08-08  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Add two links to Scheme tutorials.

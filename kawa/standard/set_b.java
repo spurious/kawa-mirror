@@ -48,9 +48,9 @@ public class set_b extends Syntax implements Printable
                                          setterArgs), xargs);
       }
 
-    if (! (match[0] instanceof String))
+    Object sym = match[0];
+    if (! (sym instanceof String)  && ! (sym instanceof Symbol))
       return tr.syntaxError ("first set! argument is not a variable name");
-    String sym = (String) match[0];
     Expression value = tr.rewrite (match[1]);
     Object binding = tr.environ.get (sym);
     // Hygenic macro expansion may bind a renamed (uninterned) symbol

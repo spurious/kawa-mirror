@@ -17,6 +17,7 @@ OBJ=\
   RealNum.class \
   DFloNum.class \
   RatNum.class \
+  IntFraction.class \
   MPN.class \
   IntNum.class
 

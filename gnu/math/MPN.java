@@ -28,7 +28,7 @@ class MPN
 
   /** Add x[0:len-1] and y[0:len-1] and write the len least
    * significant words of the result to dest[0:len-1].
-   * All words are traeted as unsigned.
+   * All words are treated as unsigned.
    * @return the carry, either 0 or 1
    * This function is basically the same as gmp's mpn_add_n.
    */
@@ -37,10 +37,9 @@ class MPN
     long carry = 0;
     for (int i = 0; i < len;  i++)
       {
-	carry = ((long) x[i] & (long) 0xffffffffL) +
-	  ((long) y[i] & (long) 0xffffffffL) + carry;
+	carry = (long) x[i] + (long) y[i] + carry;
 	dest[i] = (int) carry;
-	carry >>= 32;
+	carry = (carry >> 32) & 1;
       }
     return (int) carry;
   }
@@ -86,7 +85,7 @@ class MPN
       {
         carry += ((long) x[j] & 0xffffffffL) * yword;
         dest[j] = (int) carry;
-        carry >>= 32;
+        carry >>>= 32;
       }
     return (int) carry;
   }
@@ -115,7 +114,7 @@ class MPN
 	  {
 	    carry += ((long) x[j] & 0xffffffffL) * yword;
 	    dest[i+j] += (int) carry;
-	    carry >>= 32;
+	    carry >>>= 32;
 	  }
 	dest[i+xlen] = (int) carry;
       }
@@ -180,7 +179,7 @@ class MPN
 		q += k;
 	      }
 	  }
-	else				/* Implies c1 = b1 */
+	else				/* Implies c1 = b1 WRONG!! FIXME! */
 	  {				/* Hence a1 = d - 1 = 2*b1 - 1 */
 	    r = a0 + D;
 	    if (a0 >= ((long)(-D) & 0xffffffffL))
@@ -196,7 +195,7 @@ class MPN
   }
 
     /** Divide divident[0:len-1] by (unsigned int)divisor.
-     * Write result into qutient[0:len-1.
+     * Write result into quotient[0:len-1.
      * Return the one-word (unsigned) remainder.
      * OK for quotient==dividend.
      */
@@ -222,6 +221,69 @@ class MPN
 	quotient[i] = (int) r;
       }
     return (int)(r >> 32);
+  }
+
+  /** Divide zds[0:nx] by y[0:ny-1].
+   * The remainder ends up in zds[0:ny-1].
+   * The quotient ends up in zds[ny:nx].
+   * Assumes:  nx>ny.
+   * (int)y[ny-1] < 0  (i.e. most significant bit set)
+   */
+
+  public static void divide (int[] zds, int nx, int[] y, int ny)
+  {
+    // This is basically Knuth's formulation of the classical algorithm,
+    // but translated from in scm_divbigbig in Jaffar's SCM implementation.
+
+    // Could be re-implemented using gmp's mpn_devrem:
+    // zds[nx] = mpn_divrem (&zds[ny], 0, zds, nx, y, ny).
+
+    int j = nx; 
+    do
+      {                          // loop over digits of quotient
+	int qhat;  // treated as unsigned
+	if (zds[j]==y[ny-1])
+	  qhat = -1;  // 0xffffffff
+	else
+	  {
+	    long w = (((long)(zds[j])) << 32) + ((long)zds[j-1] & 0xffffffffL);
+	    qhat = (int) udiv_qrnnd (w, y[ny-1]);
+	  }
+	if (qhat == 0) continue;
+	int i = 0;
+	long num = 0;
+	long t2 = 0;   // treated as unsigned
+	do
+	  {                        // multiply and subtract
+	    t2 += ((long) y[i] & 0xffffffffL) * ((long) qhat & 0xffffffffL);
+	    num += ((long)zds[j - ny + i] &0xffffffffL) - (t2 & 0xffffffffL);
+	    long num_adjust = num;
+	    if (num < 0)
+	      {
+		num_adjust += 0x100000000L;
+		num = -1;
+	      }
+	    else
+	      num = 0;
+	    zds[j - ny + i] = (int) num_adjust;
+	    t2 = t2 >>> 32;
+	  } while (++i < ny);
+	//borrow from high digit; don't update
+	num += ((long)zds[j - ny + i] & 0xffffffffL) - (t2 & 0xffffffffL);
+	while (num != 0)
+	  {	// "add back" required
+	    i = 0; num = 0; qhat--;
+	    do
+	      {
+		num += 
+		  ((long) zds[j - ny + i] + (long) y[i]) & 0x1ffffffffL;
+		zds[j - ny + i] = (int) num;
+		num >>= 32;
+	      } while (++i < ny);
+	    num--;
+	  }
+	zds[j] = qhat;
+      } while (--j >= ny);
   }
 
   /** Number of digits in the conversion base that always fits in a word.
@@ -291,6 +353,22 @@ class MPN
 	  power *= radix;
 	return power;
       }
+  }
+
+  /** Count the number of leading zero bits in an int. */
+  public static int count_leading_zeros (int i)
+  {
+    if (i == 0)
+      return 32;
+    int count = 0;
+    for (int k = 16;  k > 0;  k = k >> 1) {
+      int j = i >>> k;
+      if (j == 0)
+	count += k;
+      else
+	i = j;
+    }
+    return count;
   }
 
   public static int set_str (int dest[], byte[] str, int str_len, int base)
@@ -401,6 +479,14 @@ class MPN
 	  }
       }
     return 0;
+  }
+
+  /** Compare x[0:xlen-1] with y[0:ylen-1], treating them as unsigned integers.
+   * @result -1, 0, or 1 depending on if x<y, x==y, or x>y.
+   */
+  public static int cmp (int[] x, int xlen, int[] y, int ylen)
+  {
+    return xlen > ylen ? 1 : xlen < ylen ? -1 : cmp (x, y, xlen);
   }
 
   /* Shift x[x_start:x_start+len-1]count bits to the "right"
@@ -589,5 +675,18 @@ class MPN
 	len += initShiftWords;
       }
     return len;
+  }
+
+  public static int intLength (int i)
+  {
+    return 32 - count_leading_zeros (i < 0 ? ~i : i);
+  }
+
+  /** Calcaulte the Common Lisp "integer-length" function.
+   * Assumes input is canonicalized:  len==IntNum.wordsNeeded(words,len) */
+  public static int intLength (int[] words, int len)
+  {
+    len--;
+    return intLength (words[len]) + 32 * len;
   }
 }

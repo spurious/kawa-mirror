@@ -1,3 +1,26 @@
+Wed Nov 20 17:50:03 1996  Per Bothner  <bothner@deneb.cygnus.com>
+
+	* DFloNum.java:  Make arithmetic generic:  We now have
+	other kinds of RealNum besides DFloNum and IntNum.
+	* IntNum (isOne, intLength):  New methods.
+	(set):  Changed to not copy.
+	(divide):  Finish the implementation to support long division.
+	(quotient, remainder, modulo):  Canonicalize result.
+	(add, sub, mul):  Make more generic (don't just support DFloNum).
+	(setAbsolute):  Removed.
+	* MPN.java (add_n):  Minor optimizaton - can avoid masking.
+	(mul_1, mul):  Must use unsigned shift (>>>).
+	(divide):  New method, does long division.
+	(count_leading_zeros):  New method.
+	(cmp):  New method overloading handles differently-sized arguments.
+	(intLength):  New methods.
+	* Numeric.java (add_reversed, sub_reversed, mul_reversed,
+	div_reversed):  New methods.
+	* RatNum.java:  Implement arithmetic on rationals.
+	* RealNum.java (compare_reversed):  New method.
+	* IntFraction.java:  New class, for exact rationals.
+	* Makefile.am, Makefile.in (OBJ):  Add IntFraction.java.
+
 Mon Oct 21 12:59:50 1996  Per Bothner  <bothner@deneb.cygnus.com>
 
 	* IntNum.java (set):  Fix ival clash problem.

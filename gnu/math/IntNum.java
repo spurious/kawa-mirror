@@ -160,14 +160,9 @@ public class IntNum extends RatNum implements Compilable
   {
     if (obj instanceof IntNum)
       return compare (this, (IntNum) obj);
-    else if (obj instanceof RealNum)
-      return DFloNum.compare (doubleValue (), ((RealNum)obj).doubleValue ());
-    throw new IllegalArgumentException ();
-  }
-
-  public boolean isExact ()
-  {
-    return true;
+    if (! (obj instanceof RealNum))
+      throw new IllegalArgumentException ();
+    return ((RealNum)obj).compare_reversed (this);
   }
 
   public boolean isOdd ()
@@ -179,6 +174,11 @@ public class IntNum extends RatNum implements Compilable
   public boolean isZero ()
   {
     return words == null && ival == 0;
+  }
+
+  public boolean isOne ()
+  {
+    return words == null && ival == 1;
   }
 
   /** Calculate how many words are significant in words[0:len-1].
@@ -296,23 +296,21 @@ public class IntNum extends RatNum implements Compilable
       }
   }
 
-  /** Destructively set the value of this to the given words. */
+  /** Destructively set the value of this to the given words.
+  * The words array is reused, not copied. */
   public final void set (int[] words, int length)
   {
-    if (this.words == null || this.words.length < length)
-      realloc (length + 1);  // Allocate one extra word to grow on.
-    for (int i = length;  --i >= 0; )
-      this.words[i] = words[i];
     this.ival = length;
+    this.words = words;
   }
 
-  /** Destructively set the value of this to a long. */
+  /** Destructively set the value of this to that of y. */
   public final void set (IntNum y)
   {
     if (y.words == null)
       set (y.ival);
     else if (this != y)
-      set (y.words, y.ival);
+      set (y.words, y.ival); //COPY
   }
 
   // Assumes that words != 0.
@@ -616,28 +614,77 @@ public class IntNum extends RatNum implements Compilable
     boolean yNegative = y.isNegative ();
     boolean qNegative = xNegative ^ yNegative;
 
-    int xlen = x.words == null ? 1 : x.ival;
     int ylen = y.words == null ? 1 : y.ival;
-    int[] xwords = new int[xlen];
     int[] ywords = new int[ylen];
-    x.getAbsolute (xwords);
     y.getAbsolute (ywords);
-    int[] qwords, rwords;
+    while (ylen > 1 && ywords[ylen-1] == 0)  ylen--;
+
+    int xlen = x.words == null ? 1 : x.ival;
+    int[] xwords = new int[xlen+2];
+    x.getAbsolute (xwords);
+    while (xlen > 1 && xwords[xlen-1] == 0)  xlen--;
+
     int qlen, rlen;
 
-    if (ylen == 1)
+    int cmpval = MPN.cmp (xwords, xlen, ywords, ylen);
+    if (cmpval < 0)  // abs(x) < abs(y)
+      { // quotient = 0;  remainder = num.
+	int[] rwords = xwords;  xwords = ywords;  ywords = rwords;
+	rlen = xlen;  qlen = 1;  xwords[0] = 0;
+      }
+    else if (cmpval == 0)  // abs(x) == abs(y)
       {
-	qwords = xwords;
-	rwords = ywords;
+	xwords[0] = 1;  qlen = 1;  // quotient = 1
+	ywords[0] = 0;  rlen = 0;  // remainder = 0;
+      }
+    else if (ylen == 1)
+      {
 	qlen = xlen;
 	rlen = 1;
-	rwords[0] = MPN.divmod_1 (qwords, xwords, xlen, ywords[0]);
+	ywords[0] = MPN.divmod_1 (xwords, xwords, xlen, ywords[0]);
       }
-    else
-      throw new Error ("general bignum division not implemented");
+    else  // abs(x) > abs(y)
+      {
+	// Normalize the denominator, i.e. make its most significant bit set by
+	// shifting it normalization_steps bits to the left.  Also shift the
+	// numerator the same number of steps (to keep the quotient the same!).
+
+	int nshift = MPN.count_leading_zeros (ywords[ylen-1]);
+	
+	if (nshift != 0)
+	  {
+	    // Shift up the denominator setting the most significant bit of
+	    // the most significant word.
+	    MPN.lshift (ywords, 0, ywords, ylen, nshift);
+
+	    // Shift up the numerator, possibly introducing a new most
+	    // significant word.
+	    int x_high = MPN.lshift (xwords, 0, xwords, xlen, nshift);
+	    xwords[xlen++] = x_high;
+	}
+
+	if (xlen == ylen)
+	  xwords[xlen++] = 0;
+	MPN.divide (xwords, xlen, ywords, ylen);
+	rlen = ylen;
+	if (remainder != null || rounding_mode != TRUNCATE)
+	  {
+	    // Optimize nshift == FIXME
+	    MPN.rshift (ywords, xwords, 0, rlen, nshift);
+	  }
+
+	qlen = xlen+1-ylen;
+	if (quotient != null)
+	  {
+	    for (int i = 0;  i < qlen;  i++)
+	      xwords[i] = xwords[i+ylen];
+	  }
+      }
+
+    // Now the quotient is in xwords, and the remainder is in ywords.
 
     boolean add_one = false;
-    if (rlen > 0 || rwords[0] != 0)
+    if (rlen > 0 || ywords[0] != 0)
       { // Non-zero remainder i.e. in-exact quotient.
 	switch (rounding_mode)
 	  {
@@ -654,7 +701,7 @@ public class IntNum extends RatNum implements Compilable
       }
     if (quotient != null)
       {
-	quotient.set (qwords, qlen);
+	quotient.set (xwords, qlen);
 	if (qNegative)
 	  {
 	    if (add_one)  // -(quotient + 1) == ~(quotient)
@@ -675,14 +722,14 @@ public class IntNum extends RatNum implements Compilable
 	    // In this case, abs(Q*Y) > abs(X).
 	    // So sign(remainder) = -sign(X).
 	    xNegative = ! xNegative;	
-	    throw new Error ("r_l = y_l - r_l");
+	    throw new Error ("r_l = y_l - r_l"); // FIXME
 	  }
 	else
 	  {
 	    // If !add_one, then: abs(Q*Y) <= abs(X).
 	    // So sign(remainder) = sign(X).
 	  }
-	remainder.set (rwords, rlen);
+	remainder.set (ywords, rlen);
 	if (xNegative)
 	  remainder.setNegative ();
       }
@@ -692,21 +739,21 @@ public class IntNum extends RatNum implements Compilable
   {
     IntNum quotient = new IntNum ();
     divide (x, y, quotient, null, TRUNCATE);
-    return quotient;
+    return quotient.canonicalize ();
   }
 
   public static IntNum remainder (IntNum x, IntNum y)
   {
     IntNum rem = new IntNum ();
     divide (x, y, null, rem, TRUNCATE);
-    return rem;
+    return rem.canonicalize ();
   }
 
   public static IntNum modulo (IntNum x, IntNum y)
   {
     IntNum rem = new IntNum ();
     divide (x, y, null, rem, FLOOR);
-    return rem;
+    return rem.canonicalize ();
   }
 
   /*
@@ -845,7 +892,7 @@ public class IntNum extends RatNum implements Compilable
     y = IntNum.abs (y);
     IntNum quotient = new IntNum ();
     divide (times (x, y), gcd (x, y), quotient, null, TRUNCATE);
-    return quotient;
+    return quotient.canonicalize ();
   }
 
   void setInvert ()
@@ -1013,11 +1060,6 @@ public class IntNum extends RatNum implements Compilable
     return buffer.toString ();
   }
 
-  public String toString ()
-  {
-    return toString (10);
-  }
-
   public int intValue ()
   {
     if (words == null)
@@ -1147,7 +1189,7 @@ public class IntNum extends RatNum implements Compilable
 	comp.method.compile_invoke_static (makeLongMethod);
       }
     else
-      System.err.println ("IntNum.emit for bignum - not implemented");
+      throw new Error ("IntNum.emit for bignum - not implemented");
   }
 
   public double doubleValue ()
@@ -1163,30 +1205,27 @@ public class IntNum extends RatNum implements Compilable
   {
     if (y instanceof IntNum)
       return IntNum.plus (this, (IntNum) y);
-    else if (y instanceof RealNum)
-      return ((RealNum)y).add (this);
-    else
+    if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
+    return ((Numeric)y).add_reversed (this);
   }
 
   public Numeric sub (Object y)
   {
     if (y instanceof IntNum)
       return IntNum.minus (this, (IntNum) y);
-    else if (y instanceof RealNum)
-      return new DFloNum (doubleValue () - ((RealNum)y).doubleValue ());
-    else
+    if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
+    return ((Numeric)y).sub_reversed (this);
   }
 
   public Numeric mul (Object y)
   {
     if (y instanceof IntNum)
       return IntNum.times (this, (IntNum) y);
-    else if (y instanceof RealNum)
-      return ((RealNum)y).mul (this);
-    else
+    if (!(y instanceof Numeric))
       throw new IllegalArgumentException ();
+    return ((Numeric)y).mul_reversed (this);
   }
 
   public Numeric div (Object y)
@@ -1262,16 +1301,6 @@ public class IntNum extends RatNum implements Compilable
     setNegative (this);
   }
 
-  /** Destructively set this to the absolute value of x.
-   * It is OK if x==this.*/
-  public final void setAbsolute (IntNum x)
-  {
-    if (x.isNegative ())
-      setNegative (x);
-    else
-      set (x);
-  }
-
   public static IntNum abs (IntNum x)
   {
     return x.isNegative () ? neg (x) : x;
@@ -1289,5 +1318,16 @@ public class IntNum extends RatNum implements Compilable
   public Numeric neg ()
   {
     return IntNum.neg (this);
+  }
+
+  /** Calculates ceiling(log2(this < 0 ? -this : this+1))
+   * See Common Lisp: the Language, 2nd ed, p. 361.
+   */
+  public int intLength ()
+  {
+    if (words == null)
+      return MPN.intLength (ival);
+    else
+      return MPN.intLength (words, ival);
   }
 }

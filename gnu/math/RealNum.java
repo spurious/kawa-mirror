@@ -14,6 +14,11 @@ public abstract class RealNum extends Numeric
    * -2 if either is NaN. */
   public abstract int compare (Object obj);
 
+  public int compare_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
+
   public boolean equ (Object x)
   {
     return compare (x) == 0;

@@ -31,11 +31,25 @@ public abstract class Numeric
   public static final int TRUNCATE = 3;
   public static final int ROUND = 4;
 
-  /*
-  public abstract Object add_reversed (Numeric obj);
+  /** Calculate x+this. */
+  public Numeric add_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
 
-  public abstract Object mul_reversed (Numeric obj);
+  /** Calculate x-this. */
+  public Numeric sub_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
 
-  public abstract Numeric zero ();
-  */
+  public Numeric mul_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
+
+  public Numeric div_reversed (Numeric x)
+  {
+    throw new IllegalArgumentException ();
+  }
 }

@@ -48,6 +48,15 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (y instanceof RealNum)
       return new DFloNum (value + ((RealNum)y).doubleValue ());
+    if (!(y instanceof Numeric))
+      throw new IllegalArgumentException ();
+    return ((Numeric)y).add_reversed (this);
+  }
+
+  public Numeric add_reversed (Numeric x)
+  {
+    if (x instanceof RealNum)
+      return new DFloNum (((RealNum)x).doubleValue () + value);
     throw new IllegalArgumentException ();
   }
 
@@ -55,6 +64,15 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (y instanceof RealNum)
       return new DFloNum (value - ((RealNum)y).doubleValue ());
+    if (!(y instanceof Numeric))
+      throw new IllegalArgumentException ();
+    return ((Numeric)y).sub_reversed (this);
+  }
+
+  public Numeric sub_reversed (Numeric x)
+  {
+    if (x instanceof RealNum)
+      return new DFloNum (((RealNum)x).doubleValue () - value);
     throw new IllegalArgumentException ();
   }
 
@@ -62,6 +80,15 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (y instanceof RealNum)
       return new DFloNum (value * ((RealNum)y).doubleValue ());
+    if (!(y instanceof Numeric))
+      throw new IllegalArgumentException ();
+    return ((Numeric)y).mul_reversed (this);
+  }
+
+  public Numeric mul_reversed (Numeric x)
+  {
+    if (x instanceof RealNum)
+      return new DFloNum (((RealNum)x).doubleValue () * value);
     throw new IllegalArgumentException ();
   }
 
@@ -69,6 +96,15 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (y instanceof RealNum)
       return new DFloNum (value / ((RealNum)y).doubleValue ());
+    if (!(y instanceof Numeric))
+      throw new IllegalArgumentException ();
+    return ((Numeric)y).div_reversed (this);
+  }
+
+  public Numeric div_reversed (Numeric x)
+  {
+    if (x instanceof RealNum)
+      return new DFloNum (((RealNum)x).doubleValue () / value);
     throw new IllegalArgumentException ();
   }
 
@@ -96,7 +132,16 @@ public class DFloNum extends RealNum implements Compilable
   {
     if (obj instanceof RealNum)
       return compare (value, ((RealNum)obj).doubleValue ());
-    throw new IllegalArgumentException ();
+    if (! (obj instanceof RealNum))
+      throw new IllegalArgumentException ();
+    return ((RealNum)obj).compare_reversed (this);
+  }
+
+  public int compare_reversed (Numeric x)
+  {
+    if (!(x instanceof RealNum))
+      throw new IllegalArgumentException ();
+    return compare (((RealNum)x).doubleValue (), value);
   }
 
   public boolean isExact ()

@@ -52,25 +52,7 @@ public class Shell {
                      if (obj instanceof kawa.lang.Exit) {
                         obj = null;
                      } else if (display) {
-                        if (obj instanceof kawa.lang.Printable) {
-                           ((kawa.lang.Printable)obj).print(pout);
-                        } else if (obj instanceof java.lang.StringBuffer) {
-                           pout.print(((java.lang.StringBuffer)obj).toString());
-                        } else if (obj instanceof java.lang.Integer) {
-                           pout.print(((java.lang.Integer)obj).toString());
-                        } else if (obj instanceof java.lang.Double) {
-                           pout.print(((java.lang.Double)obj).toString());
-                        } else if (obj instanceof java.lang.Boolean) {
-                           if (((java.lang.Boolean)obj).booleanValue()) {
-                              pout.print("#t");
-                           } else {
-                              pout.print("#f");
-                           }
-                        } else if (obj instanceof java.lang.Character) {
-                           pout.print(((java.lang.Character)obj).charValue());
-                        } else {
-                           pout.print(obj.getClass().getName());
-                        }
+			kawa.lang.print.print (obj, pout);
                         pout.println();
                         pout.flush();
                      }

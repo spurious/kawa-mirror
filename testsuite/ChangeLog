@@ -1,3 +1,11 @@
+2003-03-02  Per Bothner  <per@bothner.com>
+
+	New test based on a bug reported by <Chris.Dean@sokitomi.com>.
+	* module3.scm:  New file.
+	* module1.scm:  Make explicitly non-static.
+	* obj-test.scm:  Add test using modules3.
+	* Makefile.am:  Added appropriate rules.
+
 2003-01-29  Per Bothner  <per@bothner.com>
 
 	* gui-test.scm:  New file, tests the 'gui modele.

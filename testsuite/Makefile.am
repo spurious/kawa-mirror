@@ -52,7 +52,8 @@ check-mac: testing.zip
 	$(KAWATEST) -e '(define src-prefix "$(srcdir)/")' \
 	  -f "$(srcdir)/mac-test.scm" -e '(test-report)'
 
-check-obj: testing.zip module2.class classes2.class MyFunc.class MyModule.class
+check-obj: testing.zip module2.class module3.class classes2.class \
+  MyFunc.class MyModule.class
 	$(KAWATEST) -f "$(srcdir)/obj-test.scm" -e '(test-report)'
 
 check-polytype: testing.zip
@@ -78,6 +79,9 @@ module1.class: $(srcdir)/module1.scm
 
 module2.class: $(srcdir)/module2.scm module1.class
 	$(KAWA) -C $(srcdir)/module2.scm
+
+module3.class: $(srcdir)/module3.scm module1.class
+	$(KAWA) -C $(srcdir)/module3.scm
 
 classes1.class: $(srcdir)/classes1.scm
 	$(KAWA) -C $(srcdir)/classes1.scm

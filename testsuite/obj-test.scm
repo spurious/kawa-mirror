@@ -1,4 +1,4 @@
-(test-init "Objects" 72)
+(test-init "Objects" 73)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -173,6 +173,9 @@
 (test '(boolean #t) make-literal #t)
 
 (test '(3 . 4) make-pair 3 4)
+
+(require <module3>)
+(test 0 list-length-4 '())
 
 (require <classes1>)
 (require <classes2>)

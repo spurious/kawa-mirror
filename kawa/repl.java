@@ -41,8 +41,7 @@ class repl
 	  }
 	else
 	  scmHomeDirectory = Scheme.falseObject;
-	Environment.define_global(Symbol.make("home-directory"),
-				  scmHomeDirectory);
+	Environment.define_global("home-directory", scmHomeDirectory);
       }
   }
 
@@ -53,13 +52,14 @@ class repl
       array[i - arg_start] = new FString (args[i]);
     commandLineArguments = new Vector (array);  // FIXME scsh has list
     // FIXME scsh also has command-line proc
-    Environment.define_global (Symbol.make ("command-line-arguments"),
+    Environment.define_global ("command-line-arguments",
 			       commandLineArguments);
   }
 
   public static void main(String args[])
   {
     Environment env = Scheme.makeEnvironment ();
+    Environment.define_global("symbol-read-case", "P");
 
     int iArg = 0;
     boolean something_done = false;

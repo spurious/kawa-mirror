@@ -2,8 +2,8 @@ package kawa.lang;
 
 public class CalledContinuation extends RuntimeException
 {
-  Object value;
-  Continuation continuation;
+  public Object value;
+  public Continuation continuation;
 
   CalledContinuation (Object value, Continuation continuation)
   {

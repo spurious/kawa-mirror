@@ -10,7 +10,7 @@ import gnu.mapping.*;
 
 public class Continuation extends ProcedureN
 {
-  boolean invoked;
+  public boolean invoked;
   static int counter;
   int id;
 
@@ -30,26 +30,6 @@ public class Continuation extends ProcedureN
   public Object applyN (Object[] args)
   {
     return apply1 (Values.make (args));
-  }
-
-  /** Call a precedure with the current continuation. */
-  public static Object callcc (Procedure proc)
-  {
-    Continuation cont = new Continuation ();
-    try
-      {
-	return proc.apply1 (cont);
-      }
-    catch (CalledContinuation ex)
-      {
-	if (ex.continuation != cont)
-	  throw ex;
-	return ex.value;
-      }
-    finally
-      {
-	cont.invoked = true;
-      }
   }
 
   public final String toString()

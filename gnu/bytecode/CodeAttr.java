@@ -686,6 +686,9 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitMul () { emitBinop (104); }
   public final void emitDiv () { emitBinop (108); }
   public final void emitRem () { emitBinop (112); }
+  public final void emitShl () { emitBinop (120); }
+  public final void emitShr () { emitBinop (122); }
+  public final void emitUshr() { emitBinop (124); }
   public final void emitAnd () { emitBinop (126); }
   public final void emitIOr () { emitBinop (128); }
   public final void emitXOr () { emitBinop (130); }
@@ -854,6 +857,11 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitInvokeMethod(method, 184);  // invokestatic
   }
 
+  public void emitInvokeInterface (Method method)
+  {
+    emitInvokeMethod(method, 185);  // invokeinterface
+  }
+  
   final void emitTransfer (Label label, int opcode)
   {
     put1(opcode);

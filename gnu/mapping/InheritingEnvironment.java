@@ -169,4 +169,15 @@ public class InheritingEnvironment extends SimpleEnvironment
       }
     return super.hasMoreElements(it);
   }
+
+  protected void toStringBase (StringBuffer sbuf)
+  {
+    sbuf.append(" baseTs:");
+    sbuf.append(baseTimestamp);
+    for (int i = 0;  i < numInherited; i++)
+      {
+	sbuf.append(" base:");
+	sbuf.append(inherited[i].toStringVerbose());
+      }
+  }
 }

@@ -388,6 +388,16 @@ public class SimpleEnvironment extends Environment
     return new EnvironmentMappings(this);
   }
   /* #endif */
+
+  public String toStringVerbose ()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    toStringBase(sbuf);
+    return "#<environment "+getName()+" num:"+num_bindings
+      +" ts:"+currentTimestamp+sbuf+'>';
+  }
+
+  protected void toStringBase (StringBuffer sbuf) { ; }
 }
 
 /* #ifdef JAVA2 */

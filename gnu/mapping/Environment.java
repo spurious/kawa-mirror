@@ -349,6 +349,12 @@ public abstract class Environment
   {
     return "#<environment "+getName()+'>';
   }
+
+  /** Overridden in sub-classes - useful for more verbose debug output. */
+  public String toStringVerbose ()
+  {
+    return toString();
+  }
 }
 
 

@@ -2,7 +2,6 @@ package gnu.kawa.functions;
 import gnu.math.IntNum;
 import gnu.math.Numeric;
 import gnu.expr.*;
-import gnu.bytecode.*;
 import gnu.mapping.*;
 
 /**

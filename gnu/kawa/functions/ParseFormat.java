@@ -1,5 +1,4 @@
 package gnu.kawa.functions;
-import kawa.lang.*;
 import gnu.text.*;
 import java.text.ParseException;
 import java.text.Format;

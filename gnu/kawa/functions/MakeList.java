@@ -47,13 +47,15 @@ public class MakeList extends ProcedureN implements Inlineable
       {
 	for (int i = 0;  i < len;  i++)
 	  args[offset+i].compile(comp, Target.pushObject);
-	Method method = comp.scmListType.getDeclaredMethod("list"+len, null);
+	Method method
+	  = Compilation.scmListType.getDeclaredMethod("list"+len, null);
 	code.emitInvokeStatic(method);
       }
     else
       {
 	args[offset].compile(comp, Target.pushObject);
-	Method method = comp.scmListType.getDeclaredMethod("list1", null);
+	Method method
+	  = Compilation.scmListType.getDeclaredMethod("list1", null);
 	code.emitInvokeStatic(method);
 	code.emitDup(1);
 	offset++;  len--;
@@ -65,7 +67,7 @@ public class MakeList extends ProcedureN implements Inlineable
 	    args[offset+2].compile(comp, Target.pushObject);
 	    args[offset+3].compile(comp, Target.pushObject);
 	    len -= 4;  offset += 4;
-	    method = comp.scmListType.getDeclaredMethod("chain4", null);
+	    method = Compilation.scmListType.getDeclaredMethod("chain4", null);
 	    code.emitInvokeStatic(method);
 	  }
 
@@ -73,7 +75,7 @@ public class MakeList extends ProcedureN implements Inlineable
 	  {
 	    args[offset].compile(comp, Target.pushObject);
 	    len -= 1;  offset += 1;
-	    method = comp.scmListType.getDeclaredMethod("chain1", null);
+	    method = Compilation.scmListType.getDeclaredMethod("chain1", null);
 	    code.emitInvokeStatic(method);
 	  }
 	code.emitPop(1);

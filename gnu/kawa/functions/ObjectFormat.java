@@ -1,7 +1,6 @@
 package gnu.kawa.functions;
 import gnu.text.*;
 import java.text.*;
-import java.util.*;
 import java.io.Writer;
 import java.io.CharArrayWriter;
 import gnu.mapping.*;

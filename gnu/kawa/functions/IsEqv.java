@@ -1,5 +1,4 @@
 package gnu.kawa.functions;
-import gnu.bytecode.Type;
 import gnu.math.*;
 import gnu.mapping.*;
 import gnu.text.Char;

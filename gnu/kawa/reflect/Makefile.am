@@ -11,6 +11,7 @@ java_sources = \
   ClassMethods.java \
   InstanceOf.java \
   Invoke.java \
+  InvokeNamed.java \
   SlotGet.java \
   SlotSet.java \
   StaticGet.java \

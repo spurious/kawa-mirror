@@ -1,3 +1,8 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* InvokeNamed.java:  New class, extends ProcedureN.
+	* Makefile.am (java_sources):  Add InvokeNamed.java.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* ClassMethods.java (checkName):  Use Symbol's getName, not toString.

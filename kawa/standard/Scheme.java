@@ -60,16 +60,7 @@ public class Scheme extends Interpreter
   static Environment r5Environment;
   protected static Environment kawaEnvironment;
 
-  public static SpecialType byteType = new SpecialType(Type.byte_type);
-  public static SpecialType shortType = new SpecialType(Type.short_type);
-  public static SpecialType intType = new SpecialType(Type.int_type);
-  public static SpecialType longType = new SpecialType(Type.long_type);
-  public static SpecialType floatType = new SpecialType(Type.float_type);
-  public static SpecialType doubleType = new SpecialType(Type.double_type);
-  public static SpecialType booleanType;
-  public static SpecialType charType = new SpecialType(Type.char_type);
-  public static SpecialType voidType = new SpecialType(Type.void_type);
-
+  public static LangPrimType booleanType;
   static Scheme instance;
 
   public static gnu.kawa.reflect.InstanceOf instanceOf;
@@ -813,18 +804,18 @@ public class Scheme extends Interpreter
   {
     if (types == null)
       {
-	booleanType = new SpecialType(Type.boolean_type,
-				      Scheme.getInstance());
+	booleanType
+	  = new LangPrimType(Type.boolean_type, Scheme.getInstance());
 	types = new Hashtable ();
-	types.put ("void", Scheme.voidType);
-	types.put ("int", Scheme.intType);
-	types.put ("char", Scheme.charType);
-	types.put ("boolean", Scheme.booleanType);
-	types.put ("byte", Scheme.byteType);
-	types.put ("short", Scheme.shortType);
-	types.put ("long", Scheme.longType);
-	types.put ("float", Scheme.floatType);
-	types.put ("double", Scheme.doubleType);
+	types.put ("void", LangPrimType.voidType);
+	types.put ("int", LangPrimType.intType);
+	types.put ("char", LangPrimType.charType);
+	types.put ("boolean", booleanType);
+	types.put ("byte", LangPrimType.byteType);
+	types.put ("short", LangPrimType.shortType);
+	types.put ("long", LangPrimType.longType);
+	types.put ("float", LangPrimType.floatType);
+	types.put ("double", LangPrimType.doubleType);
 
 	types.put ("Object", Type.pointer_type);
 	types.put ("java.lang.Object", Type.pointer_type);

@@ -29,7 +29,6 @@ SyntaxRules.java \
 AutoloadSyntax.java \
 CompileFile.java \
 loadcompiled.java \
-SpecialType.java \
 SyntaxForm.java \
 Promise.java \
 Record.java GetFieldProc.java SetFieldProc.java RecordConstructor.java \

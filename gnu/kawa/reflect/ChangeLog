@@ -1,0 +1,9 @@
+1999-09-14  Per Bothner  <per@bothner.com>
+
+	New package.
+	* ClassMethods.java:  Moved from kawa/standard/class_methods.java.
+	* InvokeStatic.java:  Moved from kawa/lang/InvokeStatic.java.
+	* MakeInstance.java:  New, but subsumes kawa/standard/make.java.
+	* SlotGet.java:  Moved from kawa/standard/field.java.
+	* SlotSet.java:  New class.
+	* Makefile.am, Makefile.in:  New files.

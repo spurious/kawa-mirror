@@ -277,20 +277,16 @@ public class IntNum extends RatNum implements Compilable
       }
     int len = x.ival;
     realloc (len + 1);
-    if (x.words[len - 1] >= 0)
-      words[len] = MPN.add_1 (words, x.words, len, y);
-    else
+    long carry = y;
+    for (int i = 0;  i < len;  i++)
       {
-	long carry = y;
-	for (int i = 0;  i < len;  i++)
-	  {
-	    carry += ((long) x.words[i] & 0xffffffffL);
-	    words[i] = (int) carry;
-	    carry >>= 32;
-	  }
-	carry--;
-	words[len] = (int) carry;
+	carry += ((long) x.words[i] & 0xffffffffL);
+	words[i] = (int) carry;
+	carry >>= 32;
       }
+    if (x.words[len - 1] < 0)
+      carry--;
+    words[len] = (int) carry;
     ival = wordsNeeded (words, len+1);
   }
 

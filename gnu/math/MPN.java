@@ -40,7 +40,7 @@ class MPN
     long carry = 0;
     for (int i = 0; i < len;  i++)
       {
-	carry += ((long) x[i] & 0xffffffffL) 
+	carry += ((long) x[i] & 0xffffffffL)
 	  + ((long) y[i] & 0xffffffffL);
 	dest[i] = (int) carry;
 	carry >>>= 32;
@@ -171,29 +171,38 @@ class MPN
 		c = ~(c - (b1 << 32));
 		q = c / b1;  /* (A/2) / (d/2) */
 		r = c % b1;
-		q = ~q;    /* (A/2)/b1 */
+		q = (~q) & 0xffffffffL;    /* (A/2)/b1 */
 		r = (b1 - 1) - r; /* r < b1 => new r >= 0 */
 	      }
 	    r = 2 * r + (a0 & 1);
 	    if ((D & 1) != 0)
 	      {
-		int k = (r >= q) ? 0 : (q - r <= D) ? 1: 2;
-		r = r - q + k * D;
-		q -= k;
+		if (r >= q) {
+		        r = r - q;
+		} else if (q - r <= ((long) D & 0xffffffffL)) {
+                       r = r - q + D;
+        		q -= 1;
+		} else {
+                       r = r - q + D + D;
+        		q -= 2;
+		}
 	      }
 	  }
 	else				/* Implies c1 = b1 */
 	  {				/* Hence a1 = d - 1 = 2*b1 - 1 */
-	    r = a0 + D;
 	    if (a0 >= ((long)(-D) & 0xffffffffL))
+	      {
 		q = -1;
+	        r = a0 + D;
+ 	      }
 	    else
 	      {
 		q = -2;
-		r += D;
+	        r = a0 + D + D;
 	      }
 	  }
       }
+
     return (r << 32) | (q & 0xFFFFFFFFl);
   }
 
@@ -278,7 +287,7 @@ class MPN
     // Could be re-implemented using gmp's mpn_divrem:
     // zds[nx] = mpn_divrem (&zds[ny], 0, zds, nx, y, ny).
 
-    int j = nx; 
+    int j = nx;
     do
       {                          // loop over digits of quotient
 	// Knuth's j == our nx-j.
@@ -349,7 +358,7 @@ class MPN
       return 6;
     // The following are conservative, but we don't care.
     else if (radix <= 256)
-      return 4;	     
+      return 4;
     else
       return 1;
   }
@@ -377,12 +386,12 @@ class MPN
       {
 	// The base is a power of 2.  Read the input string from
 	// least to most significant character/digit.  */
- 
+
 	int next_bitpos = 0;
 	int bits_per_indigit = 0;
 	for (int i = base; (i >>= 1) != 0; ) bits_per_indigit++;
 	int res_digit = 0;
- 
+
 	for (int i = str_len;  --i >= 0; )
 	  {
 	    int inp_digit = str[i];
@@ -395,7 +404,7 @@ class MPN
 		res_digit = inp_digit >> (bits_per_indigit - next_bitpos);
 	      }
 	  }
- 
+
 	if (res_digit != 0)
 	  dest[size++] = res_digit;
       }
@@ -404,7 +413,7 @@ class MPN
 	// General case.  The base is not a power of 2.
 	int indigits_per_limb = MPN.chars_per_word (base);
 	int str_pos = 0;
- 
+
 	while (str_pos < str_len)
 	  {
 	    int chunk = str_len - str_pos;
@@ -418,7 +427,7 @@ class MPN
 		res_digit = res_digit * base + str[str_pos++];
 		big_base *= base;
 	      }
- 
+
 	    int cy_limb;
 	    if (size == 0)
 	      cy_limb = res_digit;
@@ -552,7 +561,7 @@ class MPN
   }
 
   /** Return least i such that word&(1<<i). Assumes word!=0. */
-  
+
   static int findLowestBit (int word)
   {
     int i = 0;
@@ -639,7 +648,7 @@ class MPN
 	i = findLowestBit(other_arg[0]);
 	if (i > 0)
 	  MPN.rshift (other_arg, other_arg, 0, len, i);
-	
+
 	// Now both odd_arg and other_arg are odd.
 
 	// Subtract the smaller from the larger.

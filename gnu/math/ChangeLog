@@ -1,3 +1,11 @@
+Sun Dec 14 15:52:08 1997  Per Bothner  <bothner@cygnus.com>
+
+	* IntNum.java (setAdd);  Fix to handle negative int argument.
+
+Tue Dec  9 14:59:02 1997  James P. White <jim@pagesmiths.com>
+
+	* MPN.java (udiv_qrnnd):  Fix carry bug.
+
 Thu Nov 27 21:37:03 1997  Per Bothner  <bothner@cygnus.com>
 
 	* DFloNum.java, IntNum.java (emit):  Update for gnu.bytecode changes.

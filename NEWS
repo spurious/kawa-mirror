@@ -2,6 +2,9 @@ The map and for-each procedure is now inlined.  This is most especially
 beneficial when it allows the mapped-over procedure to also be inlined,
 such as when that procedure is a lambda expression.
 
+Added documentation on compiling with Jikes.
+Renamed some classes to avoid warning when compiling with Jikes.
+
 The reverse! procedure was added.
 
 Internal changes:
@@ -9,6 +12,7 @@ Internal changes:
 instance with the IS_UNKNOWN flag to represent an imported binding.
 * The ExpWalker framework for "tree walking" Expressions had a bit of
 reorganization.
+* New package gnu.kawa.functions, for primitive functions (written in Java).
 
 Added a hook for constant-folding and other optimization/inlining at
 traversal (ExpWalker) time.  Optimization of + and - procedures to
@@ -21,9 +25,6 @@ with a procedure, either using make-procedure or set-procedure-property!.
 Also, (setter f) is now inlined, when possible.
 
 Internally, Syntax (and hence Macro) no longer extend Declaration.
-
-Accessing a final static field (using static-field) is inlined by
-the compiler, but only for int (or shorter) types.
 
 Various Java-level changes, which may be reflected in Scheme later:
 * gnu.kawa.util.Consumer interface is similar to ObjectOutput

@@ -1,3 +1,13 @@
+2001-05-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (install-data-am):  Removed bogus dependency.
+
+	* TreeList.java (data, hasNext):  Make public.
+	(getNext):  New method.
+
+	* PairWithPosition.java (<init>):  Remove constructor taking a
+	LineBufferedReader to remove dependency on gnu.text.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* Convert.java:  Moved to ...

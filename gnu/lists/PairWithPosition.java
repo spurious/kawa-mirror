@@ -42,16 +42,6 @@ public class PairWithPosition extends Pair
     return position >>> 20;
   }
 
-  /** Get the line number of (the start of) this pair.
-    * The "first" line is line 1. */
-  public PairWithPosition (gnu.text.LineBufferedReader port,
-			   Object car, Object cdr)
-  {
-    super (car, cdr);
-    filename = port.getName ();
-    setLine (port.getLineNumber() + 1, port.getColumnNumber() + 1);
-  }
-
   public PairWithPosition (PairWithPosition where,
                            Object car, Object cdr)
   {

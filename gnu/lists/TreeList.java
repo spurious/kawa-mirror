@@ -21,7 +21,7 @@ implements Consumer, Consumable
 
   public Object[] objects;
   static final Object availObject = new String("(AVAIL");
-  char[] data;
+  public char[] data;
   public int gapStart;
   public int gapEnd;
 
@@ -755,7 +755,7 @@ implements Consumer, Consumable
     return pos;
   }
 
-  protected boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos, Object xpos)
   {
     int index = ipos >>> 1;
     if (index >= gapStart)
@@ -844,6 +844,62 @@ implements Consumer, Consumable
   {
     int index = getNextTypeIndex(ipos, xpos);
     return index < 0 ? null : objects[index+1];
+  }
+
+  public Object getNext(int ipos, Object xpos)
+  {
+    int index = ipos >>> 1;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return Sequence.eofValue;
+    char datum = data[index];
+    if (datum <= MAX_CHAR_SHORT)
+      return Convert.toObject(datum);
+    if (datum >= OBJECT_REF_SHORT
+	&& datum <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
+      return objects[datum-OBJECT_REF_SHORT];
+    /*
+    if (datum >= BEGIN_GROUP_SHORT
+	    && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      return Sequence.GROUP_VALUE;
+    if ((datum & 0xFF00) == BYTE_PREFIX)
+      return Sequence.TEXT_BYTE_VALUE;
+    */
+    if (datum >= INT_SHORT_ZERO + MIN_INT_SHORT
+	&& datum <= INT_SHORT_ZERO + MAX_INT_SHORT)
+      return Convert.toObject(datum-INT_SHORT_ZERO);
+    switch (datum)
+      {
+      case BOOL_FALSE:
+      case BOOL_TRUE:
+	return Convert.toObject(datum != BOOL_FALSE);
+      case INT_FOLLOWS:
+	return Convert.toObject(getIntN(index+1));
+      case LONG_FOLLOWS:
+	return Convert.toObject(getLongN(index+1));
+      case FLOAT_FOLLOWS:
+	return Convert.toObject(Float.intBitsToFloat(getIntN(index+1)));
+      case DOUBLE_FOLLOWS:
+	return Convert.toObject(Double.longBitsToDouble(getLongN(index+1)));
+      case CHAR_FOLLOWS:
+	return Convert.toObject(data[index+1]);
+	/*
+      case CHAR_PAIR_FOLLOWS:
+	return Sequence.CHAR_VALUE;
+      case BEGIN_GROUP_LONG:
+	return Sequence.GROUP_VALUE;
+      case END_GROUP_SHORT:
+      case END_GROUP_LONG:
+      case END_ATTRIBUTES:
+	return Sequence.EOF_VALUE;
+      case BEGIN_ATTRIBUTE_LONG: // FIXME
+	*/
+      case OBJECT_REF_FOLLOWS:
+	return objects[getIntN(index+1)];
+      default:
+	throw unsupported("getNext");
+      }
   }
 
   protected void makeRelativePosition(int istart, Object xstart,
@@ -957,7 +1013,9 @@ implements Consumer, Consumable
 			 && ch <= OBJECT_REF_SHORT+OBJECT_REF_SHORT_INDEX_MAX)
 		  {
 		    ch = ch - OBJECT_REF_SHORT;
-		    out.print("=Object#"+((int)ch)+objects[ch]);
+		    Object obj = objects[ch];
+		    out.print("=Object#"+((int)ch)+'='
+			      +obj+':'+obj.getClass().getName());
 		  }
 		else if (ch >= BEGIN_GROUP_SHORT
 			 && ch <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)

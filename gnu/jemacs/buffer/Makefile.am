@@ -43,7 +43,6 @@ EXTRA_DIST = emacs.scm $(EXTRA_JAVA) package.html
 GCJ_INPUTS = $(java_WITH_SWING) *emacs*.class
 GCJ_DEPS = $(java_WITH_SWING) scm-classes.stamp
 PACKAGE_CFNAME = gnu-jemacs-buffer
-CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_CFNAME).o
 
 WITH_SWING: classjava.stamp $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)
 

@@ -9,7 +9,6 @@ java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
 
 GCJ_DEPS = elisp-classes.stamp
 PACKAGE_CFNAME = gnu-jemacs-lisp
-CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 java_JAVA =
 

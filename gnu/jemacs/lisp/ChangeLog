@@ -1,3 +1,7 @@
+2001-04-09  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (CLEANFILES):  Remove redundant macro.
+
 2001-03-22  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (classjava.stamp): New rule, depend on elisp-classes.scm.

@@ -12,10 +12,14 @@ endif
 if ENABLE_SERVLET
 SERVLET_SCM = HTTP.scm
 endif
+if WITH_SWING
+SWING_SCM = gui.scm
+endif
+
 # NOTE if this list is changed, also update build,xml.
 java_SCM = genwrite.scm pp.scm ppfile.scm printf.scm srfi1.scm readtable.scm \
-  DefineRecordType.scm cut.scm $(XML_SCM) $(SERVLET_SCM)
-EXTRA_DIST = $(java_SCM) XML.scm HTTP.scm
+  DefineRecordType.scm cut.scm $(XML_SCM) $(SERVLET_SCM) $(SWING_SCM)
+EXTRA_DIST = $(java_SCM) XML.scm HTTP.scm gui.scm
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 
 all: Makefile  $(@GCJ_COMPILED_SELECTED@_CDEP) ../../../kawa/java-classes.stamp scm-classes.stamp $(@GCJ_COMPILED_SELECTED@)

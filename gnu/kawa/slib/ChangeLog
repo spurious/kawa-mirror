@@ -1,3 +1,7 @@
+2003-01-29  Per Bothner  <per@bothner.com>
+
+	* gui.scm: New file.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* cut.scm:  New file.  Imported implementation of SRFI-26, written

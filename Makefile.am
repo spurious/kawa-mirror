@@ -9,8 +9,18 @@ javadir=$(datadir)/java
 kawa-@VERSION@-compiled.zip:
 	zip -q -r -n .class $@ kawa gnu -i '*.class'
 
-EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs
+EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
+  config.guess config.sub install-sh ./mkinstalldirs
 
+# Work-around for automake problem:
+config.guess: $(srcdir)/../config.guess
+	ln $< .
+config.sub: $(srcdir)/../config.sub
+	ln $< .
+install-sh: $(srcdir)/../install-sh
+	ln $< .
+./mkinstalldirs: $(srcdir)/../mkinstalldirs
+	ln $< .
 
 HTML_HOME = $$HOME/public_html
 HTML_DOC_DIR = $(HTML_HOME)/kawa/api

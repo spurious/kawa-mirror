@@ -95,15 +95,18 @@ public class CommonLisp extends Lisp2
     defun(proc.getName(), proc);
   }
 
-  static int elispCounter = 0;
+  static int lispCounter = 0;
 
   public CommonLisp()
   {
     Environment scmEnv = Scheme.builtin();
-    environ = new SymbolTable();
-    ((SymbolTable) environ).rename ("Interaction-environment."+(++elispCounter));
+    environ = SymbolTable.make("interaction-environment."+(++lispCounter));
     Environment.setCurrent(environ);
-    System.err.println("import form Scm:"+scmEnv);
+
+    TRUE = environ.getBinding("t");
+    TRUE.set(TRUE);
+    define("nil", FALSE);
+
     BindingEnumeration e = scmEnv.enumerateAllBindings();
     while (e.hasMoreElements())
       {
@@ -135,9 +138,6 @@ public class CommonLisp extends Lisp2
 	  System.err.println("caught "+ex);
 	// Ignore - happens while building this directory.
       }
-
-    define("t", "t");
-    define("nil", "nil");
 
     kawa.lang.Lambda lambda = new kawa.lang.Lambda();
     lambda.setKeywords(getSymbol("&optional"),

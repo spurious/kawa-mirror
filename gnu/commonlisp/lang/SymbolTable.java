@@ -12,7 +12,14 @@ public class SymbolTable extends Environment implements Externalizable
 
   public static SymbolTable make(String name)
   {
-    return (SymbolTable) packageTable.get(name);
+    SymbolTable p = (SymbolTable) packageTable.get(name);
+    if (p == null)
+      {
+	p = new SymbolTable();
+	p.setName(name);
+	packageTable.put(name, p);
+      }
+    return p;
   }
 
   public void registerPackage(String name)
@@ -134,7 +141,7 @@ public class SymbolTable extends Environment implements Externalizable
       return this;
     else
       {
-	SymbolTable p = make(name);
+	SymbolTable p = (SymbolTable) packageTable.get(name);
 	if (p != null)
 	  return p;
 	registerPackage(name);

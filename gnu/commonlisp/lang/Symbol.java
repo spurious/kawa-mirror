@@ -31,7 +31,8 @@ public class Symbol extends Binding
   {
     if (sym == Lisp2.FALSE)
       return true;
-    Binding binding = Environment.getCurrent().lookup((String) sym);
+    Binding binding = sym instanceof Binding ? (Binding) sym
+      :Environment.getCurrent().lookup((String) sym);
     return binding != null && binding.isBound();
   }
   
@@ -39,14 +40,16 @@ public class Symbol extends Binding
   {
     if (sym == Lisp2.FALSE)
       sym = "nil";
-    return env.getBinding((String) sym);
+    return sym instanceof Binding ? (Binding) sym
+      : env.getBinding((String) sym);
   }
 
   public static Binding getBinding(Object sym)
   {
     if (sym == Lisp2.FALSE)
       sym = "nil";
-    return Environment.getCurrent().getBinding((String) sym);
+    return sym instanceof Binding ? (Binding) sym
+      : Environment.getCurrent().getBinding((String) sym);
   }
 
   public static void setValueBinding(Object symbol, Object value)
@@ -81,37 +84,6 @@ public class Symbol extends Binding
   {
     Binding binding = getBinding(environ, symbol);
     binding.setFunctionValue(value);
-  }
-
-  /**
-   * The mapping from symbols (Java Strings) to property lists.
-   * The traditional implementation of property lists is that each Symbol
-   * contains a field pointing to the property list.  We prefer to use
-   * Java Strings to implement Symbols, so there is no place for the
-   * property list field.  Instead, we use this global table to map
-   * from a symbol to the symbol's property list.
-   */
-  static Environment propertyLists = new Environment(100);
-
-  /**
-   * Get the property list of a symbol.
-   */
-  public static Object getPropertyList(Object symbol)
-  {
-    String name = symbol == Lisp2.FALSE ? "nil" : (String) symbol;
-    Binding binding = propertyLists.lookup(name);
-    if (binding == null)
-      return Lisp2.FALSE;
-    return binding.isBound() ? binding.get() : Lisp2.FALSE;
-  }
-
-  /**
-   * Set the property list of a symbol.
-   */
-  public static void setPropertyList(Object symbol, Object plist)
-  {
-    String name = symbol == Lisp2.FALSE ? "nil" : (String) symbol;
-    propertyLists.defineValue(name, plist);
   }
 
   /**

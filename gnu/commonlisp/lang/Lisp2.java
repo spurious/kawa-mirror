@@ -12,7 +12,7 @@ import gnu.bytecode.CodeAttr;
 public abstract class Lisp2 extends Interpreter
 {
   public static final LList FALSE = LList.Empty;
-  public static final String TRUE = "t"; // FIXME
+  public static Binding TRUE;
   public static final Expression nilExpr = new QuoteExp(FALSE);
 
   public boolean isTrue(Object value)

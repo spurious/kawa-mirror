@@ -1940,13 +1940,33 @@ Returns a new instance of an anonymous (inner) class.
 @end display
 
 Returns a new instance of a unique (anonymous) class.
-The class inherits from the list of @var{supers}, where the first element
-should be the base class being extended from, and the rest are interfaces.
-@end deffn
+The class inherits from the list of @var{supers}, where at most one of the
+elements should be the base class being extended from, and the rest
+are interfaces.
 
-The implementation is rather preliminary.  For one thing,
-the declared  @var{method-name}s are @emph{not}
-in the scope of the @var{body} - but they should be.
+Each @var{field-decl} declares a public instance field.
+If @var{field-type} is given, it specifies the type of the field.
+If @var{field-init} is given, it is an expression whose value
+becomes the initial value of the field.
+The @var{field-init} is evaluated at the same time as the @code{object}
+expression is evaluated,
+in a scope where all the @var{field-name}s are visible.
+
+Each @var{method-decl} declares a public non-static method,
+whose name is @var{method-name}.  (If @var{method-name} is not a valid
+Java method name, it is mapped to something reasonable.
+For example @code{foo-bar?} is mapped to @code{isFooBar}.)
+The types of the method arguments can be specified in the
+@var{formal-arguments}.  The return type can be specified by @var{rtype},
+or is otherwise the type of the @var{body}.
+Currently, the @var{formal-arguments} cannot contain optional, rest,
+or keyword parameters.  (The plan is to allow optional parameters,
+implemented using multiple overloaded methods.)
+
+The scope of the @var{body} of a method includes the @var{field-decl}s
+of the object.  It does include the surrounding lexical scope.
+It sort-of also includes the declared methods, but this is not working yet.
+@end deffn
 
 @node Loading a ModuleBody, Evaluating Scheme expressions from Java, Anonymous classes, Low-level functions
 @section Loading a ModuleBody

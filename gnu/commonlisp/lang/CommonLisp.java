@@ -8,7 +8,7 @@ import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
-import kawa.lang.SpecialType;
+import gnu.kawa.lispexpr.LangPrimType;
 
 public class CommonLisp extends Interpreter
 {
@@ -276,7 +276,7 @@ public class CommonLisp extends Interpreter
     out.flush();
   }
 
-  SpecialType booleanType;
+  LangPrimType booleanType;
 
   public Type getTypeFor(String name)
   {
@@ -293,7 +293,7 @@ public class CommonLisp extends Interpreter
 	if (name.equals("boolean"))
 	  {
 	    if (booleanType == null)
-	      booleanType = new SpecialType(Type.boolean_type, this);
+	      booleanType = new LangPrimType(Type.boolean_type, this);
 	    return booleanType;
 	  }
 	return Scheme.getNamedType(name);

@@ -6,7 +6,8 @@ import gnu.text.Char;
 import kawa.standard.Scheme;
 import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
-import kawa.lang.SpecialType;
+import gnu.kawa.lispexpr.LangPrimType;
+import gnu.commonlisp.lang.CommonLisp;
 
 // Should perhaps inherit from CommonLisp, but getInstance (different
 // return types) is a problem.  Perhaps have both inherit from "Lisp2"?  FIXME
@@ -15,7 +16,7 @@ public class ELisp extends Interpreter
 {
   public static final LList FALSE = LList.Empty;
   public static final String TRUE = "t";
-  public static final Expression nilExpr = new QuoteExp(FALSE);
+  public static final Expression nilExpr = CommonLisp.nilExpr;
 
   public boolean isTrue(Object value)
   {
@@ -310,7 +311,7 @@ public class ELisp extends Interpreter
     out.flush();
   }
 
-  SpecialType booleanType;
+  LangPrimType booleanType;
 
   public Type getTypeFor(String name)
   {
@@ -333,7 +334,7 @@ public class ELisp extends Interpreter
 	if (name.equals("boolean"))
 	  {
 	    if (booleanType == null)
-	      booleanType = new SpecialType(Type.boolean_type, this);
+	      booleanType = new LangPrimType(Type.boolean_type, this);
 	    return booleanType;
 	  }
 	return Scheme.getNamedType(name);

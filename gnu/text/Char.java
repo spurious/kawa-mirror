@@ -262,12 +262,4 @@ public class Char
   {
     return value - ((Char) o).value;
   }
-
-  /**
-   * Temporary methods, because Kawa cannot inline primitive comparisons yet.*/
-  public static boolean $Eq(char c1, char c2)    { return c1 == c2; }
-  public static boolean $Ls(char c1, char c2)    { return c1 < c2; }
-  public static boolean $Gr(char c1, char c2)    { return c1 > c2; }
-  public static boolean $Ls$Eq(char c1, char c2) { return c1 <= c2; }
-  public static boolean $Gr$Eq(char c1, char c2) { return c1 >= c2; }
 }

@@ -1,3 +1,7 @@
+2005-01-28  Per Bothner  <per@bothner.com>
+
+	* Char.java ($Eq, $Ls, $Gr, $Ls$Eq, $Gr$Eq): Remove now-unused methods.
+
 2005-01-19  Per Bothner  <per@bothner.com>
 
 	* LineBufferedReader.java (read): Return before buffer full if

@@ -70,6 +70,8 @@ public class read_line extends ProcedureN
     int limit = in.limit;
     char[] buffer = in.buffer;
     int delim = -1;  // Length of delimiter.
+
+    // First do a quick scan of what is in in's input buffer.
     while (pos < limit)
       {
         ch = buffer[pos++];
@@ -82,8 +84,8 @@ public class read_line extends ProcedureN
                   delim = 0;
                 if (ch == '\n')
                   delim = 1;
-                else if (pos < limit)
-                  delim = buffer[pos] == '\n' ? 2 : 1;
+                else if (pos+1 < limit)
+                  delim = buffer[pos+1] == '\n' ? 2 : 1;
                 else
                   break;
                 in.pos = pos + delim;
@@ -97,6 +99,9 @@ public class read_line extends ProcedureN
             return new FString(buffer, start, pos - start);
           }
       }
+
+    // Ok, we haven't found the end-of-line yet, so use the general
+    // readLine method in LineBufferedReader.
     StringBuffer sbuf = new StringBuffer(100);
     if (pos > start)
       sbuf.append(buffer, start, pos - start);

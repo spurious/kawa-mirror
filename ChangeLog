@@ -1,3 +1,8 @@
+2000-06-09  Bruce Lewis  <brlewis@alum.mit.edu>
+
+	* kawa/standard/read_line.java (apply):  Fix off-by-one error in
+	handling of '\r' followed by '\n'.
+
 2000-05-28  Per Bothner  <per@bothner.com>
 
 	* configure.in (AC_OUTPUT):  Added gnu/kawa/lispexpr/Makefile.

@@ -1,16 +1,19 @@
+XQuery:
+* Implement namespace declaration attributes such as <a xmlns:a="URL">. 
+
 In define-class/define-simple-class:
 * Such classes are no longer initialized when the containing module is loaded.
 * The EXPR in 'init-form: EXPR' is now evaluated in the outer scope.
 * A new 'init: EXPR' evalues EXPR in the inner scope.
 * An option name following 'allocation:' can now be a string literal or a
-quoted symbol.  The latter is preferred:  'allocation: 'class'.
-Added 'static as a synonym for 'class following 'allocation:'.
+  quoted symbol.  The latter is preferred:  'allocation: 'class'.  
+  Added 'static as a synonym for 'class following 'allocation:'.
 * Initialization of static field ('allocation: 'class init: EXPR') now
-works, and is performed at class initialization time.
+  works, and is performed at class initialization time.
 * You can use unnamed "dummy fields" to add initialization-time actions
-not tied to a field:
+  not tied to a field:
   (define-simple-class Foo ()
-   (:init (perform-some-action)))
+    (:init (perform-some-action)))
 
 Changes from Kawa 1.7 to 1.7.90.
 ================================

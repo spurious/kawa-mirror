@@ -31,17 +31,16 @@ public class UnboundLocationException extends RuntimeException
   public String getMessage()
   {
     StringBuffer sbuf = new StringBuffer();
-    if (location instanceof NamedLocation)
+    Symbol name = location == null ? null : location.getKeySymbol();
+    if (name != null)
       {
-	NamedLocation nloc = (NamedLocation) location;
 	sbuf.append("unbound location ");
-	sbuf.append(nloc.name);
-	if (nloc.name != null)
-	  sbuf.append("@"+Integer.toHexString(System.identityHashCode(nloc.name))+" env:"+nloc.getEnvironment()+" loc:"+nloc);
-	if (nloc.property != null)
+	sbuf.append(name);
+	Object property = location.getKeyProperty();
+	if (property != null)
 	  {
 	    sbuf.append(" (property ");
-	    sbuf.append(nloc.property);
+	    sbuf.append(property);
 	    sbuf.append(')');
 	  }
       }

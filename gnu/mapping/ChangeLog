@@ -1,5 +1,8 @@
 2005-02-11  Per Bothner  <per@bothner.com>
 
+	* UnboundLocationException.java (getMessage): A Location may have
+	a non-null getKeySymbol even if it isn't a NamedLocation.
+
 	* ThreadLocation.java: New class, extends Location.
 	* Makefile.am: Update accordingly.
 

@@ -24,14 +24,18 @@ class repl
   static void checkInitFile ()
   {
     /* Set homeDirectory;  if first time called, run ~/.kawarc.scm. */
-    if (homeDirectory != null)
+    if (homeDirectory == null)
       {
 	homeDirectory = System.getProperty ("user.home");
 	Object scmHomeDirectory;
 	if (homeDirectory != null)
 	  {
 	    scmHomeDirectory = new FString (homeDirectory);
-	    File initFile = new File(homeDirectory, ".kawarc.scm");
+	    String file_separator = System.getProperty("file.separator");
+	    String kawarc_name =
+	      "/".equals(file_separator) ? ".kawarc.scm"
+	      : "kawarc.scm";
+	    File initFile = new File(homeDirectory, kawarc_name);
 	    if (initFile.exists())
 	      Shell.runFile(initFile.getPath());
 	  }

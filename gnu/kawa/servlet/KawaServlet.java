@@ -61,6 +61,12 @@ extends HttpServlet implements CpsMethodContainer
       {
 	// Clear partial output on an error.
 	response.resetBuffer();
+	if (throwable instanceof WrappedException)
+	  {
+	    Throwable cause = ((WrappedException) throwable).getCause();
+	    if (cause != null)
+	      throwable = cause;
+	  }
 	throw new ServletException(throwable);
       }
     ctx.consumer.endDocument();

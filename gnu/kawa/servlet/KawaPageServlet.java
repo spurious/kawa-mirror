@@ -5,7 +5,7 @@ package gnu.kawa.servlet;
 
 import gnu.expr.*;
 import gnu.mapping.*;
-import gnu.text.SourceMessages;
+import gnu.text.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -71,15 +71,27 @@ public class KawaPageServlet extends KawaServlet
 	if (entry.proc == null || saveClass)
 	  {
 	    InputStream resourceStream = url.openStream();
-	    InPort port = new InPort(resourceStream);
+	    InPort port = new InPort(resourceStream,
+				     path.substring(path.lastIndexOf('/')+1));
 	    Interpreter interp = Interpreter.getInstanceFromFilenameExtension(path);
 	    Interpreter.defaultInterpreter = interp;
 	    Environment.setCurrent(interp.getEnvironment());
 	    SourceMessages messages = new SourceMessages();
-	    Compilation comp = interp.parseFile(port, true, messages);
-	    String name = path.substring(path.lastIndexOf('/')+1, path.indexOf('.'));
-
-	    comp.getModule().setName(name);
+	    Compilation comp;
+	    try
+	      {
+		comp = interp.parseFile(port, true, messages);
+		String name = path.substring(path.lastIndexOf('/')+1,
+					     path.indexOf('.'));
+		comp.getModule().setName(name);
+	      }
+	    catch (SyntaxException ex)
+	      {
+		if (ex.getMessages() != messages)
+		  throw ex;
+		// Otherwise handled below ...
+		comp = null; // Needed to avoid spurious compilation error.
+	      }
 
 	    // FIXME: we could output a nice pretty HTML table of the errors
 	    // or show the script with the errors highlighted, for bonus

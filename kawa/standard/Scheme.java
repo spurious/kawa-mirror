@@ -410,6 +410,8 @@ public class Scheme extends Interpreter
 
       define_proc ("compile-file", "kawa.lang.CompileFile");
       define_proc ("load-compiled", "kawa.lang.loadcompiled");
+      define_proc ("environment-bound?", "kawa.lib.misc");
+      define_proc ("scheme-implementation-version", "kawa.lib.misc");
 
       define_proc ("quantity->number", "kawa.standard.quantity2number");
       define_proc ("quantity->unit", "kawa.standard.quantity2unit");

@@ -7,9 +7,10 @@ SUFFIXES = .java .class
 # Use an environment variable for CLASSPATH so we pick up standard classes:
 CLASSPATH_ENV = CLASSPATH=../..:$(srcdir)/../..:$$CLASSPATH
 JAVAC = javac
+JCFLAGS = -g
 
 .java.class:
-	$(CLASSPATH_ENV) $(JAVAC) -d ../.. $<
+	$(CLASSPATH_ENV) $(JAVAC) $(JCFLAGS) -d ../.. $<
 
 javadir=$(prefix)/java/$(subdir)
 

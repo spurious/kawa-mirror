@@ -1,3 +1,7 @@
+Thu Feb 19 19:33:57 1998  Per Bothner  <bothner@cygnus.com>
+
+	* misc-test.scm:  Add tests for new-line (CR and CRLF) handling.
+
 Tue Jan 27 11:48:50 1998  Per Bothner  <bothner@cygnus.com>
 
 	* misc-test.scm:  Add tests for try-catch, catch, and throw.

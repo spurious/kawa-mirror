@@ -50,3 +50,51 @@
     (list x y)))
 
 (test '(20 30) test-catch)
+
+(section "new-line handling")
+;;; Test that #\return and #\newline are read robustly.
+
+(define cr-test-string "a \"bRLc\" dRklLXY")
+(do ((i 0 (+ i 1)))
+    ((= i (string-length cr-test-string)) #t)
+  (if (char=? #\R (string-ref cr-test-string i))
+      (string-set! cr-test-string i #\Return))
+  (if (char=? #\L (string-ref cr-test-string i))
+      (string-set! cr-test-string i #\Linefeed)))
+(call-with-input-string
+ cr-test-string
+ (lambda (iport)
+   (test 1 input-port-column-number iport)
+   (test 1 input-port-line-number iport)
+   (test 'a read iport)
+   (test "b\nc" read iport)
+   (test 'd read iport)
+   (test 'kl read iport)
+   (test 'XY read iport)
+   (test #!eof read iport)))
+
+(call-with-input-string
+ cr-test-string
+ (lambda (iport)
+   (test #\a read-char iport)
+   (test #\Space read-char iport)
+   (test #\" read-char iport)
+   (test #\b read-char iport)
+   (test #\Return peek-char iport)
+   (test 5 input-port-column-number iport)
+   (test 1 input-port-line-number iport)
+   (test #\Return read-char iport)
+   (test #\Linefeed read-char iport)
+   (test #\c read-char iport)
+   (test #\" read-char iport)
+   (test #\Space read-char iport)
+   (test #\d read-char iport)
+   (test #\Return read-char iport)
+   (test 3 input-port-line-number iport)
+   (test 1 input-port-column-number iport)
+   (test #\k read-char iport)
+   (test #\l read-char iport)
+   (test #\Linefeed read-char iport)
+   (test #\X read-char iport)
+   (test #\Y read-char iport)
+   (test #!eof read-char iport)))

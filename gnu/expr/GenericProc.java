@@ -29,7 +29,18 @@ public class GenericProc extends MethodProc
         System.arraycopy(methods, 0, copy, 0, count);
         methods = copy;
       }
-    methods[count++] = method;
+
+    int i;
+    for (i = 0;  i < count;  i++)
+      {
+	MethodProc best = MethodProc.mostSpecific(method, methods[i]);
+	if (best == method)
+	  break;
+      }
+    if (i < count)
+      System.arraycopy(methods, i, methods, i + 1, count - i);
+    methods[i] = method;
+    count++;
 
     int n = method.minArgs();
     if (n < minArgs)
@@ -42,37 +53,14 @@ public class GenericProc extends MethodProc
   public Object applyN(Object[] args) throws Throwable
   {
     checkArgCount(this, args.length);
-    MethodProc best = null;
-    CallContext bestVars = null;
-    CallContext vars = null;
-    for (int i = count;  --i >= 0; )
+    CallContext ctx = CallContext.getInstance();
+    for (int i = 0;  i < count;  i++)
       {
         MethodProc method = methods[i];
-        if (vars == null)
-          vars = new CallContext();
-        if (method.match(vars, args) == 0)
-          {
-            if (best == null)
-              {
-                best = method;
-                bestVars = vars;
-                vars = null;
-              }
-            else
-              {
-                best = MethodProc.mostSpecific(best, method);
-                if (best == method)
-                  {
-                    bestVars = vars;
-                    vars = null;
-                  }
-              }
-            
-          }
+        if (method.match(ctx, args) == 0)
+	  return method.applyV(ctx);
       }
-    if (best == null)
-      throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
-    return best.applyV(bestVars);
+    throw new WrongType(this, WrongType.ARG_UNKNOWN, null);
   }
 
   public int isApplicable(Type[] args)
@@ -94,47 +82,22 @@ public class GenericProc extends MethodProc
   {
     if (count == 1)
       return methods[0].match(ctx, args);
-    MethodProc best = null;
-    CallContext vars = null;
-    CallContext bestVars = null;
-    for (int i = count;  --i >= 0; )
+    for (int i = 0;  i < count;  i++)
       {
         MethodProc method = methods[i];
-	if (vars == null)
-          vars = new CallContext();
-	int code = method.match(vars, args);
+	int code = method.match(ctx, args);
 	if (code == 0)
-          {
-            if (best == null)
-              {
-                best = method;
-                bestVars = vars;
-                vars = null;
-              }
-            else
-              {
-                best = MethodProc.mostSpecific(best, method);
-                if (best == method)
-                  {
-                    bestVars = vars;
-                    vars = null;
-                  }
-              }
-            
-          }
-      }
-    if (best != null)
-      {
-	ctx.value1 = best;
-	ctx.value2 = bestVars;
-	return 0;
+	  {
+	    ctx.ivalue1 = i;
+	    return 0;
+	  }
       }
     return NO_MATCH;
   }
 
   public Object applyV(CallContext ctx) throws Throwable
   {
-    return ((MethodProc) ctx.value1).applyV((CallContext) ctx.value2);
+    return methods[ctx.ivalue1].applyV(ctx);
   }
 
   /** Create a GenericProc from one or more methods, plus properties. */

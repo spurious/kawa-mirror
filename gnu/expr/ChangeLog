@@ -1,3 +1,9 @@
+2002-02-12  Per Bothner  <per@bothner.com>
+
+	* GenericProc.java (add):  Sort methods by specificity.
+	(applyN, match):  Since methods are sorted, just use first match.
+	(applyV):  Update to match change to match.
+
 2002-01-31  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (defineFromFieldValue):  New method.

@@ -7,14 +7,14 @@
 
 (define (response-status (code :: <int>) #!optional (message :: <String>  #!null))
   (response-header '|Status|
-		     (format (if (eq? message #!null) "~d" "~d ~a")
+		     (format (if (eq? message #!null) "~d " "~d ~a")
 			     code message)))
 
-;; For now the same as response-status
-(define (error-response (code :: <int>) #!optional (message :: <String>  #!null))
+;; For now the same as response-status, "Error" is the default for message.
+(define (error-response (code :: <int>)
+			#!optional (message :: <String>  "Error"))
   (response-header '|Status|
-		     (format (if (eq? message #!null) "~d" "~d ~a")
-			     code message)))
+		     (format "~d ~a" code message)))
 
 (define (current-servlet) :: <javax.servlet.http.HttpServlet>
   (invoke-static <gnu.kawa.servlet.ServletCallContext> "getServlet"))

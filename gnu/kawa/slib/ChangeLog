@@ -1,3 +1,8 @@
+2003-09-04  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm (response-status, error-response):  HTTP requires a space
+	after the response code, even if the message is empty,
+
 2003-07-21  Per Bothner  <per@bothner.com>
 
 	* gui.scm:  Rewrite to make use of gnu.kawa.models and

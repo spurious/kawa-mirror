@@ -129,6 +129,7 @@ public class ELisp extends Lisp2
     defun(NumberCompare.$Gr);
     defun(NumberCompare.$Ls$Eq);
     defun(NumberCompare.$Gr$Eq);
+    defun("self-insert-command", new gnu.jemacs.buffer.SelfInsertCommand());
 
     lambda lambda = new gnu.jemacs.lang.lambda();
     lambda.setKeywords(getSymbol("&optional"),

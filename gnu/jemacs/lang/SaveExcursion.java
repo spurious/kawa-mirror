@@ -76,21 +76,12 @@ public class SaveExcursion extends Syntax
    * Returns a pair (packed in a long) of buffer posistions. */
   public static long savePointMark(Buffer buffer)
   {
-    CharBuffer content = (CharBuffer) buffer.getStringContent();
-    int pointPosition = content.createPosition(buffer.getDot(), false);
-    int markPosition = 0;  // FIXME
-    return ((long) markPosition) << 32 | ((long) pointPosition & 0xffffffffl);
+    return buffer.savePointMark();
   }
 
   public static void restoreBufferPointMark(Buffer buffer, long pointMark)
   {
     Buffer.setCurrent(buffer);
-    CharBuffer content = (CharBuffer) buffer.getStringContent();
-    int pointPosition = (int) pointMark;
-    int markPosition = (int) (pointMark >> 32);
-    buffer.setDot(content.nextIndex(pointPosition, null));
-    content.releasePosition(pointPosition, null);
-    // Restore mark - FIXME
-    // content.releasePosition(markPosition);
+    buffer.restorePointMark(pointMark);
   }
 }

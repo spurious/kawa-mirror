@@ -1,8 +1,14 @@
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	* configure.in:  Support new flag --without-awt.
+	* kawa/GuiConsole.java:  Addd default constructor.
+	* kawa/repl.java (main):  Load GuiConsole using reflection.
+	* kawa/Makefile.am:  Don't build GuiConsole etc if --without-awt.
 
 	* Makefile.am:  Add rules for kawa-compiled.jar.
+
+	* kawa/lang/Syntax.java:  Also implements Named.
+	* kawa/standard/Scheme.java:  Use Procedure.getName instead of name.
 
 2000-02-26  Per Bothner  <per@bothner.com>
 

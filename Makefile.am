@@ -28,6 +28,7 @@ install-javadoc-html:
 	rm -rf $(JAVADOC_DIR)
 	-mkdir $(JAVADOC_DIR)
 	cd $(top_srcdir) && $(JAVADOC) -d $(JAVADOC_DIR) $(JAVADOC_PACKAGES)
+	echo "Now also copy over the COPYING files!"
 
 install-html: install-javadoc-html
 	cp $(srcdir)/NEWS $(HTML_HOME)/kawa/News.txt

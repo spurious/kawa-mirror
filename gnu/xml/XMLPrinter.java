@@ -9,15 +9,16 @@ import java.io.PrintWriter;
 
 public class XMLPrinter implements Consumer, PositionConsumer
 {
-  PrintWriter out;
+  Consumer out;
   boolean inAttribute = false;
   boolean inStartTag = false;
+  boolean canonicalize = true;
 
   /* If prev==WORD, last output was a number or similar. */
   private static final int WORD = -2;
   int prev = ' ';
 
-  public XMLPrinter (PrintWriter out)
+  public XMLPrinter (Consumer out)
   {
     this.out = out;
   }
@@ -27,9 +28,9 @@ public class XMLPrinter implements Consumer, PositionConsumer
     return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
   }
 
-  public void writeRaw(String str)
+  private final void writeRaw(String str)
   {
-    out.write(str);
+    out.writeChars(str);
   }
 
   public void writeChar(int v)
@@ -38,19 +39,19 @@ public class XMLPrinter implements Consumer, PositionConsumer
     if (prev == WORD)
       {
 	if (isWordChar((char) v))
-	  out.print(' ');
+	  out.writeChar(' ');
       }
     // if (v >= 0x10000) emit surrogtes FIXME;
     if (v == '<')
-      out.print("&lt;");
+      writeRaw("&lt;");
     else if (v == '>')
-      out.print("&gt;");
+      writeRaw("&gt;");
     else if (v == '&')
-      out.print("&amp;");
+      writeRaw("&amp;");
     else if (v == '\"' && inAttribute)
-      out.print("&quot;");
+      writeRaw("&quot;");
     else
-      out.print((char) v);
+      out.writeChar((char) v);
     prev = v;
   }
 
@@ -58,39 +59,39 @@ public class XMLPrinter implements Consumer, PositionConsumer
   {
     closeTag();
     if (prev == WORD || isWordChar((char) prev))
-      out.print(' ');
+      out.writeChar(' ');
     prev = WORD;
   }
 
   public void writeBoolean(boolean v)
   {
     startWord();
-    out.print(v);
+    out.writeBoolean(v);
   }
 
   public void writeFloat(float v)
   {
     startWord();
-    out.print(v);
+    out.writeFloat(v);
   }
 
   public void writeDouble(double v)
   {
     startWord();
-    out.print(v);
+    out.writeDouble(v);
   }
 
   public void writeInt(int v)
   {
     startWord();
-    out.print(v);
+    out.writeInt(v);
   }
 
   private void closeTag()
   {
     if (inStartTag && ! inAttribute)
       {
-	out.print('>');
+	out.writeChar('>');
 	inStartTag = false;
 	prev = '>';
       }
@@ -99,29 +100,31 @@ public class XMLPrinter implements Consumer, PositionConsumer
   public void writeLong(long v)
   {
     startWord();
-    out.print(v);
+    out.writeLong(v);
   }
 
   public void beginGroup(String typeName, Object type)
   {
     closeTag();
-    out.print('<');
-    out.print(typeName);
+    out.writeChar('<');
+    writeRaw(typeName);
     inStartTag = true;
   }
 
   public void endGroup(String typeName)
   {
+    if (canonicalize)
+      closeTag();
     if (inStartTag)
       {
-	out.print("/>");
+	writeRaw("/>");
 	inStartTag = false;
       }
     else
       {
-	out.print("</");
-	out.print(typeName);
-	out.print('>');
+	writeRaw("</");
+	writeRaw(typeName);
+	writeRaw(">");
       }
     prev = '>';
   }
@@ -131,17 +134,17 @@ public class XMLPrinter implements Consumer, PositionConsumer
   public void beginAttribute(String attrName, Object attrType)
   {
     if (inAttribute)
-      out.print('"');
+      out.writeChar('"');
     inAttribute = true;
-    out.print(' ');
-    out.print(attrName);
-    out.print("=\"");
+    out.writeChar(' ');
+    writeRaw(attrName);
+    writeRaw("=\"");
     prev = ' ';
   }
 
   public void endAttribute()
   {
-    out.print('"');
+    out.writeChar('"');
     inAttribute = false;
     prev = ' ';
   }
@@ -158,7 +161,7 @@ public class XMLPrinter implements Consumer, PositionConsumer
     else
       {
 	startWord();
-	out.print(v);
+	out.writeChars(v.toString());
       }
   }
 

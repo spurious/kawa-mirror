@@ -1222,6 +1222,8 @@ public class XPath implements XPathConstants
     }
   */
 
+  
+  /*
   public static void main( String[] args )
     throws Exception
   {
@@ -1251,14 +1253,13 @@ public class XPath implements XPathConstants
 	System.out.println("}");
       }
 
-
-    java.io.PrintWriter out = new java.io.PrintWriter(System.out);
+    gnu.mapping.OutPort out = new gnu.mapping.OutPort(System.out);
     XMLPrinter printer = new XMLPrinter(out);
-    /*
-    out.println("Input document:");
-    doc.consume(printer);
-    out.flush();
-    */
+
+    // out.println("Input document:");
+    // doc.consume(printer);
+    // out.flush();
+
     // doc.dump();
 
     // TreePosition pos = new TreePosition(doc, 0); // ????
@@ -1286,5 +1287,6 @@ public class XPath implements XPathConstants
     else
       System.err.println("result: "+result);
   }
+  */
 
 }

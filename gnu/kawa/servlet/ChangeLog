@@ -1,3 +1,10 @@
+2001-11-24  Per Bothner  <per@bothner.com>
+
+	* GetRequest.java:  Now implements Inlineable.
+
+	* KawaServlet.java (apply):  No longer final.  Needs to be overridden
+	if servlet contains a function definition.  Make body empty - not used.
+
 2001-11-18  Per Bothner  <per@bothner.com>
 
 	* ServletCallContext.java:  New file, old class moved

@@ -11,7 +11,6 @@ import java.io.IOException;
 public abstract class KawaServlet
 extends HttpServlet implements CpsMethodContainer
 {
-
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
   {
@@ -50,9 +49,8 @@ extends HttpServlet implements CpsMethodContainer
     out.println("</html>");
   }
 
-  public final void apply(CpsMethodProc proc, CallContext context)
+  public void apply(CpsMethodProc proc, CallContext context)
   {
-    apply(context);
   }
 
   public abstract void apply(CallContext context);

@@ -61,6 +61,11 @@ public class Method implements AttrContainer {
     return access_flags;
   }
 
+  public void setModifiers (int modifiers)
+  {
+    access_flags = modifiers;
+  }
+
   public final ConstantPool getConstants ()
   {
     return classfile.constants;

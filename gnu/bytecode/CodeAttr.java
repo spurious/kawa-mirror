@@ -662,7 +662,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       throw new Error ("unimplemented type in emitNewArray");
-    pushType(Type.pointer_type);
+    pushType(new ArrayType(element_type));
   }
 
   private void emitBinop (int base_code)
@@ -1234,6 +1234,7 @@ public class CodeAttr extends Attribute implements AttrContainer
       }
     else
       emitTypedOp (172, popType().promote());
+    unreachable_here = true;
   }
 
   /** Add an exception handler. */
@@ -1846,5 +1847,29 @@ public class CodeAttr extends Attribute implements AttrContainer
 	pos = str.indexOf(';', last);
       }
     dst.write(str, last, pos-last);
+  }
+
+  /** Return an object encapsulating the type state of the JVM stack. */
+  public Type[] saveStackTypeState(boolean clear)
+  {
+    if (SP == 0)
+      return null;
+    Type[] typeState = new Type[SP];
+    System.arraycopy(stack_types, 0, typeState, 0, SP);
+    if (clear)
+      SP = 0;
+    return typeState;
+  }
+
+  /** Restore a type state as saved by saveStackTypeState. */
+  public void restoreStackTypeState (Type[] save)
+  {
+    if (save == null)
+      SP = 0;
+    else
+      {
+	SP = save.length;
+	System.arraycopy(save, 0, stack_types, 0, SP);
+      }
   }
 }

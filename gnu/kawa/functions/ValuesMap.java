@@ -96,12 +96,17 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 	return;
       }
     CodeAttr code = comp.getCode();
-    if (! (target instanceof SeriesTarget))
-      code.pushScope();
     SeriesTarget starget = new SeriesTarget();
+    starget.scope = code.pushScope();
     starget.function = new Label(code);
     starget.done = new Label(code);
-    starget.value = param.allocateVariable(code);
+    // If the param Declaration is captured, then it gets messy initializing
+    // it.  So just cheat and create a helper varaible.
+    if (param.isSimple())
+      param.allocateVariable(code);
+    else
+      param = new Declaration(code.addLocal(param.getType(), param.getName()));
+    starget.param = param;
     Type retAddrType = Type.pointer_type;
     Variable retAddr = code.addLocal(retAddrType);
     vals.compileWithPosition(comp, starget);
@@ -111,11 +116,10 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
     starget.function.define(code);
     code.pushType(retAddrType);
     code.emitStore(retAddr);
-    lambda.allocChildClasses(comp);
-    lambda.body.compileWithPosition(comp, target);
+    args = new Expression[] { new ReferenceExp(param) };
+    new ApplyExp(lambda, args).compile(comp, target);
     code.emitRet(retAddr);
-    if (! (target instanceof SeriesTarget))
-      code.popScope();
+    code.popScope();
     starget.done.define(code);
   }
 

@@ -1,3 +1,9 @@
+2002-03-07  Per Bothner  <per@bothner.com>
+
+	* ValuesMap.java (compile):  Can now safely always pushScope/popScope.
+	Set SeriesTarget scope and param to new local.
+	Create helper ApplyExp and call compile on it.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	Optimize calls like (< x 10) or (> x y) if x and y are <int>.

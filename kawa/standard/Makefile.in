@@ -217,8 +217,6 @@ string2number.java \
 string_v.java \
 vector_append.java \
 force.java \
-call_with_input_file.java \
-call_with_output_file.java \
 with_input_from_file.java \
 with_output_to_file.java \
 read.java \

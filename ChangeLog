@@ -1,3 +1,11 @@
+2003-11-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/call_with_input_file.java:  Removed.
+	* kawa/standard/call_with_output_file.java:  Removed.
+	* kawa/standard/Makefile.am:  Update accordingly.
+	* kawa/standard/Scheme.java:  For call-with-input-file and
+	call-with-output-file use new implementations in kawa.lib.ports.
+
 2003-11-20  Per Bothner  <per@bothner.com>
 
 	* kawa/Shell.java (run):  Better error robustness.

@@ -335,10 +335,8 @@ public class Scheme extends LispInterpreter
       define_proc ("force", "kawa.standard.force");
 
       //-- Section 6.10  -- complete
-      define_proc ("call-with-input-file",
-		   "kawa.standard.call_with_input_file");
-      define_proc ("call-with-output-file",
-		   "kawa.standard.call_with_output_file");
+      define_proc ("call-with-input-file", "kawa.lib.ports");
+      define_proc ("call-with-output-file", "kawa.standard.ports");
       define_proc ("input-port?", "kawa.lib.ports");
       define_proc ("output-port?", "kawa.lib.ports");
       define_proc ("current-input-port", "kawa.lib.ports");

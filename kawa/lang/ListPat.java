@@ -15,33 +15,55 @@ public class ListPat extends Pattern
   public ListPat (int min, int max, Object default_val)
   { min_length = min;  max_length = max; default_value = default_val; }
 
+  public static boolean match (int min, int max, Object default_val,
+                               Object obj, Object[] vars, int start_vars)
+  {
+    int i;
+    for (i = 0; i < max; i++)
+      {
+	if (obj instanceof Pair)
+	  {
+	    Pair p = (Pair)obj;
+	    vars[start_vars + i] = p.car;
+	    obj = p.cdr;
+	  }
+	else if (i < min)
+	  return false;
+	else
+	  break;
+      }
+    for ( ; i < max; i++)
+      vars[start_vars + i] = default_val;
+    return true;
+  }
+
   /**
-   * Succeeds if obj is a list of length [min_length..max_length].
+   * Succeeds if obj is a list of length [min..max].
    * @param obj the object to match against
    * @return true iff the match succeeded
    * On success, max_length values from the elements of the list are placed
    * in vars (starting at start_vars); if obj is shorter, missing elements
    * are set to default_value.
    */
+  public static Object[] match(int min, int max, Object default_val,
+                               Object obj)
+  {
+    Object[] vars = new Object[max];
+    return match(min, max, default_val, obj, vars, 0) ? vars : null;
+  }
+
+  /**
+   * Succeeds if obj is a list of length [min_length..max_length].
+   * @param obj the object to match against
+   * @return null on failure, or an array of bound pattern variables:
+   * max_length values from the elements of the list are placed
+   * in the result; if obj is shorter, missing elements
+   * are set to default_value.
+   */
   public boolean match (Object obj, Object[] vars, int start_vars)
   {
-    int i;
-    for (i = 0; i < max_length; i++)
-      {
-	if (obj instanceof Pair)
-	  {
-	    Pair p = (Pair)obj;
-	    vars [start_vars + i] = p.car;
-	    obj = p.cdr;
-	  }
-	else if (i < min_length)
-	  return false;
-	else
-	  break;
-      }
-    for ( ; i < max_length; i++)
-      vars [start_vars + i] = default_value;
-    return true;
+    return match(min_length, max_length, default_value,
+                 obj, vars, start_vars);
   }
 
   public int varCount () { return max_length; }

@@ -10,11 +10,9 @@ import gnu.expr.*;
 
 public class ifp extends Syntax implements Printable
 {
-  static private Pattern pattern = new ListPat (2, 3, Values.empty);
-
   public Expression rewrite (Object obj, Translator tr)
   {
-    Object [] match = pattern.match (obj);
+    Object [] match = ListPat.match(2, 3, Values.empty, obj);
     if (match == null)
       return tr.syntaxError ("invalid syntax for if");
     return new IfExp (tr.rewrite (match[0]),

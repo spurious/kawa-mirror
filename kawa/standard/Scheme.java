@@ -555,8 +555,8 @@ public class Scheme extends Interpreter
       {
 	// The '\n' is because a SyntaxException includes a line number,
 	// and it is better if that starts the line.  FIXME OBSOLETE
-	throw new RuntimeException("eval: errors while compiling `"+
-				   name+"`:\n"+e.getMessages().toString(20));
+	throw new RuntimeException("eval: errors while compiling:\n"
+				   +e.getMessages().toString(20));
       }
   }
 

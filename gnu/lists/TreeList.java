@@ -12,20 +12,37 @@ package gnu.lists;
  * It is a reasonable choice for a "DOM" for XML data.
  */
 
-public class TreeList // extends AbstractSequence
+public class TreeList extends AbstractSequence
 implements Consumer, Consumable
 {
-  Object[] objects;
+  // Some public fields and methods are public which probably shouldn't be,
+  // for the sake of NamespaceResolver.  FIXME.  Perhaps an abstract class
+  // in gnu.lists that NamespaceResolver could extend?
+
+  public Object[] objects;
   static final Object availObject = new String("(AVAIL");
   char[] data;
-  int gapStart;
-  int gapEnd;
+  public int gapStart;
+  public int gapEnd;
 
   public TreeList()
   {
     resizeObjects();
     gapEnd = 200;
     data = new char[gapEnd];
+  }
+
+  public void clear()
+  {
+    gapStart = 0;
+    gapEnd = data.length;
+    if (gapEnd > 1500)
+      {
+	gapEnd = 200;
+	data = new char[gapEnd];
+      }
+    objects = null;
+    resizeObjects();
   }
 
   // The data array contains an encoding of values, as follows:
@@ -223,10 +240,11 @@ implements Consumer, Consumable
 	if (afterGap > 0)
 	  System.arraycopy(data, gapEnd, tmp, newSize - afterGap, afterGap);
 	gapEnd = newSize - afterGap;
+	data = tmp;
       }
   }
 
-  protected final void resizeObjects()
+  public final void resizeObjects()
   {
     int oldLength;
     int newLength;
@@ -318,12 +336,10 @@ implements Consumer, Consumable
 	    | (data[index+2] << 16) | data[index + 3]);
   }
 
-  final protected void setIntN(int index, int i)
+  final public void setIntN(int index, int i)
   {
     data[index] = (char) (i >> 16);
     data[index+1] = (char) i;
-    //System.err.println("setIntN("+index+", "+i+") -> "+((int)data[index])+", "+((int)data[index+1]));
-    
   }
 
   public void writeObject(Object v)
@@ -342,7 +358,11 @@ implements Consumer, Consumable
 
   public void beginGroup(String typeName, Object type)
   {
-    int index = find(typeName, type);
+    beginGroup(find(typeName, type));
+  }
+
+  public void beginGroup(int index)
+  {
     ensureSpace(3 + 1 + 7);
     gapEnd -= 7;
     data[gapStart++] = BEGIN_GROUP_LONG;
@@ -393,13 +413,17 @@ implements Consumer, Consumable
 
   public void beginAttribute(String attrName, Object attrType)
   {
+    beginAttribute(find(attrName, attrType));
+  }
+
+  public void beginAttribute(int index)
+  {
     if (data[gapEnd] != END_ATTRIBUTES)
       throw new Error("unexpected beginAttribute");
     if (attributeStart > 0)
       setIntN(attributeStart + 3, gapStart - attributeStart);
     attributeStart = gapStart;
     ensureSpace(6);
-    int index = find(attrName, attrType);
     data[gapStart++] = BEGIN_ATTRIBUTE_LONG;
     setIntN(gapStart, index);
     setIntN(gapStart + 2, gapEnd - data.length);
@@ -516,6 +540,35 @@ implements Consumer, Consumable
 	    ensureSpace(len);
 	  }
       }
+  }
+
+  public int size()
+  {
+    int size = 0;
+    int pos = 0;
+    int end = data.length;
+    Consumer ignore = VoidConsumer.getInstance();
+    for (;;)
+      {
+	if (pos == gapStart)
+	  pos = gapEnd;
+	if (pos == end)
+	  return size;
+	pos = consumeRange(pos, end, 1, ignore);
+	size++;
+      }
+  }
+
+  protected void
+  makePosition(int index, boolean isAfter,
+	       PositionContainer posSet, int posNumber)
+  {
+    throw unsupported("makePosition");
+  }
+
+  public Object get (int index)
+  {
+    throw unsupported("get");
   }
 
   public int consumeStep(int startPosition, Consumer out)
@@ -655,6 +708,18 @@ implements Consumer, Consumable
 	  }
       }
     return pos;
+  }
+
+  protected boolean hasNext(int ipos, Object xpos)
+  {
+    int index = ipos >>> 1;
+    if (index >= gapStart)
+      index += gapEnd - gapStart;
+    if (index == data.length)
+      return false;
+    char ch = data[index];
+    return ch != END_ATTRIBUTES && ch != END_GROUP_SHORT
+      && ch != END_GROUP_LONG;
   }
 
   public void consumeRange(int startPosition, int endPosition, Consumer out)

@@ -1,3 +1,11 @@
+2001-04-02  Per Bothner  <per@bothner.com>
+
+	* TreeList.java:  Make it extend AbstractSequence.
+	Made various fields public for convenience that probably shouldn't be.
+	(clear, size, makePosition, get, hasNext):  New method.
+	(ensureSpace):  Set data to new array.  Oops.
+	(beginGroup, beginAttribute):  New versions that just take an index.
+
 2001-03-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  The automake Java support does not handle "built"

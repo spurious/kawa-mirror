@@ -8,7 +8,8 @@ java_sources = \
   Attributes.java \
   ElementConstructor.java \
   NamedAttributes.java \
-  NamespaceEnv.java
+  NamespaceEnv.java \
+  OutputAsXML.java
 
 PACKAGE_FNAME = gnu-kawa-xml
 GCJ_INPUTS =  $(java_Java)

@@ -1,3 +1,7 @@
+2001-11-06  Per Bothner  <per@bothner.com>
+
+	* OutputAsXML.java:  New class, extends CpsProcedure.
+
 2001-11-01  Per Bothner  <per@bothner.com>
 
 	* NamedAttributes.java:  Fixed wrong "package" specifier.  Oops.

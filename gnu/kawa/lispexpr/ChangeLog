@@ -1,3 +1,8 @@
+2003-11-02  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (parse, parseFile):  Combined to single
+	'parse' method.
+
 2003-10-19  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (parse, parseFile):  Pass this to Translator.

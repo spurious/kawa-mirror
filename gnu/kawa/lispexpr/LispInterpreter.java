@@ -12,50 +12,17 @@ import kawa.lang.Translator; // FIXME
 
 public abstract class LispInterpreter extends Interpreter
 {
-  public static ModuleExp makeModuleExp(Object body, Translator tr)
-  {
-    ModuleExp mexp = new ModuleExp();
-    java.util.Vector forms = new java.util.Vector(20);
-    SourceMessages messages = tr.getMessages();
-    tr.push(mexp);
-    tr.scan_body(body, forms, mexp);
-    tr.finishModule(mexp, forms);
-    return mexp;
-  }
-
-  public Compilation parse(Environment env, Lexer lexer)
-    throws java.io.IOException, gnu.text.SyntaxException
-  {
-    gnu.text.SourceMessages messages = lexer.getMessages();
-    kawa.lang.Translator tr = new Translator(this, messages);
-    tr.immediate = true;
-    lexer.clearErrors();
-    PairWithPosition body
-      = PairWithPosition.make(null, LList.Empty,
-			      lexer.getName(),
-			      lexer.getLineNumber() + 1,
-			      lexer.getColumnNumber() + 1);
-    Object sexp = ((LispReader) lexer).readObject(); // FIXME
-    if (sexp == Sequence.eofValue)
-      return null; // FIXME
-    
-    body.car = sexp;
-    /* If the errors were minor, we could perhaps try to
-       do Translation (to check for more errors)  .  ??? */
-    makeModuleExp(body, tr);
-    return tr;
-  }
-
-  public Compilation parseFile (InPort port, boolean immediate,
-				SourceMessages messages)
+  public Compilation parse(InPort port, gnu.text.SourceMessages messages,
+			   int options)
     throws java.io.IOException, gnu.text.SyntaxException
   {
     kawa.lang.Translator tr = new Translator (this, messages);
-        tr.immediate = immediate;
+    tr.immediate = (options & PARSE_IMMEDIATE) != 0;
     ModuleExp mexp = new ModuleExp();
     if (Compilation.generateAppletDefault)
       mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
-    mexp.setFile(port.getName());
+    String fname = port.getName();
+    mexp.setFile(fname);
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
     LispReader lexer = (LispReader) getLexer(port, messages);
@@ -63,8 +30,13 @@ public abstract class LispInterpreter extends Interpreter
       {
 	Object sexp = lexer.readObject(); // FIXME
 	if (sexp == Sequence.eofValue)
-	  break;
-	if (! tr.scan_form (sexp, forms, mexp))
+	  {
+	    if ((options & PARSE_ONE_LINE) != 0)
+	      return null;  // FIXME
+	    break;
+	  }
+	if (! tr.scan_form (sexp, forms, mexp)
+	    || (options & PARSE_ONE_LINE) != 0)
 	  break;
       }
     if (port.peek() == ')')

@@ -829,8 +829,7 @@ public class Compilation
       = clas.getSuperclass().addMethod("<init>", Access.PUBLIC,
 				       apply0args, Type.void_type);
     method = constructor_method;
-    constructor_method.init_param_slots ();
-    CodeAttr code = getCode();
+    CodeAttr code = constructor_method.startCode();
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
 
@@ -948,8 +947,7 @@ public class Compilation
 		method = curClass.addMethod (mname, applyArgs,
 					     Compilation.usingTailCalls ? (Type) Type.void_type : (Type) Type.pointer_type,
 					     Access.PUBLIC);
-		method.init_param_slots();
-		code = getCode();
+		code = method.startCode();
 
 		code.emitLoad(code.getArg(1)); // method
 		code.emitGetField(procType.getDeclaredField("selector"));
@@ -1132,9 +1130,8 @@ public class Compilation
   {
     method = curClass.addMethod ("<clinit>", apply0args, Type.void_type,
 				 Access.PUBLIC|Access.STATIC);
-    method.init_param_slots ();
 
-    CodeAttr code = getCode();
+    CodeAttr code = method.startCode();
 
     if (generateMain || generateApplet || generateServlet)
       {
@@ -1196,8 +1193,7 @@ public class Compilation
       {
 	method = curClass.addMethod("numArgs", apply0args, Type.int_type,
 				    Access.PUBLIC);
-	method.init_param_slots ();
-	code = getCode();
+	code = method.startCode();
 	code.emitPushInt(module.min_args | (module.max_args << 12));
 	code.emitReturn();
       }
@@ -1366,8 +1362,7 @@ public class Compilation
 	method = curClass.addMethod("main", Access.PUBLIC|Access.STATIC,
 				    args, Type.void_type);
 				    
-	method.init_param_slots ();
-	code = getCode();
+	code = method.startCode();
 
 	if (Shell.defaultFormatName != null)
 	  {

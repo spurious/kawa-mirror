@@ -1,3 +1,7 @@
+2002-04-18  Per Bothner  <per@bothner.com>
+
+	* Compilation.java:  Use Methods's new startCode method.
+
 2002-03-18  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (getInstance):  Check for InvocationTargetException.

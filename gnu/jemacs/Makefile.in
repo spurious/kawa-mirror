@@ -55,7 +55,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = lang buffer lisp testsuite swing
+DIST_SUBDIRS = lang buffer lisp testsuite swt swing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -138,6 +138,8 @@ WITH_SAX2_FALSE = @WITH_SAX2_FALSE@
 WITH_SAX2_TRUE = @WITH_SAX2_TRUE@
 WITH_SWING_FALSE = @WITH_SWING_FALSE@
 WITH_SWING_TRUE = @WITH_SWING_TRUE@
+WITH_SWT_FALSE = @WITH_SWT_FALSE@
+WITH_SWT_TRUE = @WITH_SWT_TRUE@
 XML_SELECTED = @XML_SELECTED@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
@@ -191,8 +193,10 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = lang $(SWING_SUBDIRS)
-@WITH_SWING_TRUE@SWING_SUBDIRS = buffer lisp testsuite swing
+SUBDIRS = lang $(GUI_SUBDIRS)
+@WITH_SWING_FALSE@GUI_SUBDIRS = buffer lisp testsuite swt
+@WITH_SWING_TRUE@@WITH_SWT_FALSE@GUI_SUBDIRS = buffer lisp testsuite swing
+@WITH_SWING_TRUE@@WITH_SWT_TRUE@GUI_SUBDIRS = buffer lisp testsuite swing swt
 EXTRA_DIST = jar-manifest status.html
 all: all-recursive
 

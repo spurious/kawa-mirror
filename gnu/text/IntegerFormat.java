@@ -1,8 +1,10 @@
+// Copyright (c) 2001  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
 package gnu.text;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.io.Writer;
-import gnu.math.*;
 
 /** Handle formatting of integers.
  * Used to implement the Common Lisp ~D (Decimal), ~X (Hexadecimal),
@@ -10,13 +12,13 @@ import gnu.math.*;
 
 public class IntegerFormat extends ReportFormat
 {
-  int base;
-  int minWidth;
-  int padChar;
-  int commaChar;
-  int commaInterval;
+  public int base;
+  public int minWidth;
+  public int padChar;
+  public int commaChar;
+  public int commaInterval;
 
-  int flags;
+  public int flags;
   /** Do groups (for example thousands, using commas). */
   public static final int SHOW_GROUPS = 1;
 
@@ -33,15 +35,6 @@ public class IntegerFormat extends ReportFormat
 
   public static final int UPPERCASE = 32;
 
-  private static IntegerFormat plainDecimalFormat;
-
-  public static IntegerFormat getInstance()
-  {
-    if (plainDecimalFormat == null)
-      plainDecimalFormat = new IntegerFormat();
-    return plainDecimalFormat;
-  }
-
   public IntegerFormat ()
   {
     base = 10;
@@ -50,44 +43,6 @@ public class IntegerFormat extends ReportFormat
     commaChar = (int) ',';
     commaInterval = 3;
     flags = 0;
-  }
-
-  public static Format
-  getInstance (int base, int minWidth, int padChar,
-	       int commaChar, int commaInterval, int flags)
-  {
-    if (base == PARAM_UNSPECIFIED)
-      {
-	if (padChar == PARAM_UNSPECIFIED
-	    && padChar == PARAM_UNSPECIFIED
-	    && commaChar == PARAM_UNSPECIFIED
-	    && commaInterval == PARAM_UNSPECIFIED)
-	  {
-            // Common Lisp ~R format:
-            boolean seenColon = (flags&SHOW_GROUPS) != 0;
-	    if ((flags & SHOW_PLUS) != 0)
-	      return RomanIntegerFormat.getInstance(seenColon);
-	    else
-	      return EnglishIntegerFormat.getInstance(seenColon);
-	  }
-	base = 10;
-      }
-    if (minWidth == PARAM_UNSPECIFIED)  minWidth = 1;
-    if (padChar == PARAM_UNSPECIFIED)  padChar = ' ';
-    if (commaChar == PARAM_UNSPECIFIED)  commaChar = ',';
-    if (commaInterval == PARAM_UNSPECIFIED)  commaInterval = 3;
-    if (base == 10 && minWidth == 1 && padChar == ' '
-	&& commaChar == ',' && commaInterval == 3
-	&& flags == 0)
-      return getInstance();
-    IntegerFormat fmt = new IntegerFormat();
-    fmt.base = base;
-    fmt.minWidth = minWidth;
-    fmt.padChar = padChar;
-    fmt.commaChar = commaChar;
-    fmt.commaInterval = commaInterval;
-    fmt.flags = flags;
-    return fmt;
   }
 
   public int format(Object[] args, int start, 
@@ -115,10 +70,9 @@ public class IntegerFormat extends ReportFormat
     boolean padInternal = padChar == '0';
     if (args != null)
       arg = args[start];
-    IntNum iarg = asInteger(arg);
-    if (iarg != null)
+    String sarg = convertToIntegerString(arg, base);
+    if (sarg != null)
       {
-	String sarg = iarg.toString(base);
         char sarg0 = sarg.charAt(0);
 	boolean neg = sarg0 == '-';
 	int slen = sarg.length();
@@ -182,21 +136,13 @@ public class IntegerFormat extends ReportFormat
     return start + 1;
   }
 
-  static IntNum asInteger(Object arg)
+  public String convertToIntegerString(Object x, int radix)
   {
-    try
-      {
-	if (arg instanceof RealNum)
-	  return ((RealNum) arg).toExactInt(Numeric.ROUND);
-	if (arg instanceof Long)
-	  return IntNum.make(((Long) arg).longValue());
-	if (arg instanceof Number)
-	  return RealNum.toExactInt(((Number) arg).doubleValue(),
-				    Numeric.ROUND);
-      }
-    catch (Exception ex)
-      {
-      }
-    return null;
+    if (! (x instanceof Number))
+      return null;
+    else if (x instanceof java.math.BigInteger)
+      return ((java.math.BigInteger) x).toString(radix);
+    else
+      return Long.toString(((Number) x).longValue(), radix);
   }
 }

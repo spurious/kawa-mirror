@@ -12,6 +12,7 @@ java_sources=\
   Convert.java \
   DisplayFormat.java \
   DivideOp.java \
+  IntegerFormat.java \
   IsEq.java IsEqual.java IsEqv.java \
   MakeList.java \
   MakeProcedure.java \

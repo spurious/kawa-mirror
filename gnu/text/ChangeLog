@@ -1,3 +1,12 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* IntegerFormat.java:  Remove dependencies on gnu.math.
+	Move them to new class gnu.kawa.functions.IntegerFormat.
+	(base, minWidth, padChar, commaChar, commaInterval, flags): Now public.
+	(plainDecimalFormat, getInstance):  Move to new class.
+	(asInteger):  Remove method.
+	(convertToIntegerString):  New method.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* Lexer.java (unread):  Only unread if character is not eof.

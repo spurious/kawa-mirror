@@ -1,3 +1,8 @@
+2001-12-24  Per Bothner  <per@bothner.com>
+
+	* IntegerFormat.java:  New class, extends gnu.text.IntegerFormat.
+	* Makefile.am (java_sources):  Add IntegerFormat.java.
+
 2001-11-24  Per Bothner  <per@bothner.com>
 
 	* Convert.java:  Moved from kawa.standard.convert.java.

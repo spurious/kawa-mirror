@@ -1,3 +1,7 @@
+Sat Oct 17 13:24:08 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Parser.java:  Add (parser-only) support for while loops.
+
 Thu Jul 23 08:44:16 1998  Per Bothner  <bothner@cygnus.com>
 
 	Update import statements due to classes moved from kawa.lang to gnu.

@@ -19,6 +19,7 @@ UnboundSymbol.class \
 WrongArguments.class \
 WrongType.class \
 GenericError.class\
+NamedException.class \
 ReadError.class \
 EofReadError.class
 
@@ -56,7 +57,7 @@ PairPat.class \
 VarListPat.class \
 \
 Printable.class \
-Named.class \
+Named.class Inlineable.class \
 Sequence.class \
 List.class \
 Pair.class \
@@ -97,7 +98,7 @@ CompileFile.class \
 loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
-PrimProcedure.class PrimApplyExp.class \
+PrimProcedure.class \
 Values.class \
 Promise.class \
 Future.class \

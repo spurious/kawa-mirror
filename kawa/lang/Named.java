@@ -17,6 +17,11 @@ public class Named extends Object {
     return sym_name;
   }
 
+  public final String getName()
+  {
+    return sym_name;
+  }
+
   public final void setName (String name)
   {
     sym_name = name;

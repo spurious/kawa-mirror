@@ -14,6 +14,12 @@ public class TryExp extends Expression
 
   Expression finally_clause;
   
+  public final CatchClause getCatchClauses () { return catch_clauses; }
+  public final void setCatchClauses (CatchClause catch_clauses)
+  {
+    this.catch_clauses = catch_clauses;
+  }
+
   public TryExp (Expression try_clause, Expression finally_clause)
   {
     this.try_clause = try_clause;
@@ -57,21 +63,9 @@ public class TryExp extends Expression
     CatchClause catch_clause = catch_clauses;
     for (; catch_clause != null;  catch_clause = catch_clause.getNext())
       {
-	code.emitCatchStart(catch_clause.firstVar());
 	catch_clause.compile(comp, flags);
-	code.emitCatchEnd();
       }
 
-    /*
-    for (int i = 0;  i < catch_count;  i++)
-      {
-	code.emitCatchStart(catch_vars[i]);
-`	code.enterScope(catch_clause.scope); // pushScope ??
-	catch_bodies[i].compile_with_linenumber(comp, flags);
-	code.popScope();
-	code.emitCatchEnd();
-      }
-    */
     if (finally_clause != null)
       {
 	code.emitFinallyStart();

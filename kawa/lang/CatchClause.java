@@ -9,20 +9,25 @@ public class CatchClause extends ScopeExp
   Expression body;
   CatchClause next;
 
-  public CatchClause (String name, ClassType type, Expression body)
+  public CatchClause (String name, ClassType type)
   {
     super ();
     addDeclaration (name, type);
-    this.body = body;
   }
 
-  public CatchClause getNext () { return next; }
+  public final CatchClause getNext() { return next; }
+  public final void setNext (CatchClause next) { this.next = next; }
+
+  public final Expression getBody() { return body; }
+  public final void setBody(Expression body) { this.body = body; }
 
   public void compile (Compilation comp, int flags)
   {
     gnu.bytecode.CodeAttr code = comp.getCode();
     code.enterScope (scope);
+    code.emitCatchStart(firstVar());
     body.compile_with_linenumber (comp, flags);
+    code.emitCatchEnd();
     code.popScope ();
   }
 

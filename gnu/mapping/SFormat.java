@@ -6,8 +6,9 @@ import gnu.lists.*;
  * After JDK 1.1 comes out, this should be made compatible with
  * java.text.Format.   We will also encapulate formatting flags
  * and pretty-printing here. */
+// FIXME this class is deprecated - use DisplayFormat instead!
 
-public class SFormat // extends java.text.Format  [in JDK 1.1.]
+public class SFormat // extends gnu.text.ReportFormat
 {
   public String format (Object obj)
   {

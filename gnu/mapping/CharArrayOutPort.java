@@ -7,20 +7,14 @@ import java.io.*;
 
 public class CharArrayOutPort extends OutPort
 {
-  public CharArrayOutPort(int bufsize)
-  {
-    super(null, bufsize, false);
-    name = "<string>";
-  }
-
   public CharArrayOutPort()
   {
-    this(200);
+    super(null, false, "<string>");
   }
 
   public char[] toCharArray()
   {
-    int length = bout.bufWritePos;
+    int length = bout.bufferFillPointer;
     char[] result = new char[length];
     System.arraycopy(bout.buffer, 0, result, 0, length);
     return result;

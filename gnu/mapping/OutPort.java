@@ -2,7 +2,7 @@ package gnu.mapping;
 import java.io.*;
 import java.text.*;
 import gnu.text.*;
-import gnu.lists.Consumer;
+import gnu.lists.*;
 
 /**
  * An extended PrintWriter.
@@ -16,18 +16,30 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
   // To keep track of column-numbers, we use a helper class.
   // Otherwise, it is too painful, as there is no documented
   // interface that would allow PrintWriter to be cleanly extended ...
-  BufferedPort bout;
+  // The helper class also lets us make transparent use of WriterManager.
+  PrettyWriter bout;
 
-  OutPort(Writer base, BufferedPort out, boolean autoflush)
+  /** An index into the WriterManager's internal table. */
+  protected int index;
+  
+  OutPort(Writer base, PrettyWriter out, boolean autoflush)
   {
     super(out, autoflush);
     this.bout = out;
     this.base = base;
+    index = WriterManager.instance.register(out);
   }
 
-  public OutPort(Writer base, int bufsize, boolean autoflush)
+  public OutPort(Writer base, boolean printPretty, boolean autoflush)
   {
-    this(base, new BufferedPort(base, bufsize), autoflush);
+    this(base, new PrettyWriter(base, printPretty), autoflush);
+  }
+
+  public OutPort(Writer base, boolean printPretty,
+		 boolean autoflush, String name)
+  {
+    this(base, new PrettyWriter(base, printPretty), autoflush);
+    this.name = name;
   }
 
   public OutPort (OutputStream out)
@@ -42,28 +54,28 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public OutPort (Writer out)
   {
-    this(out, 512, false);
+    this(out, false, false);
   }
 
   public OutPort (Writer base, String name)
   {
-    this(base, 512, false);
+    this(base, false, false);
     this.name = name;
   }
 
   public OutPort (Writer base, boolean autoflush, String name)
   {
-    this (base, 512, autoflush);
+    this (base, false, autoflush);
     this.name = name;
   }
 
   public boolean printReadable;
 
   // For now, these are static.  They should probably be thread-local.
-  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, "<stdout>");
+  private static OutPort outInitial = new OutPort (new LogWriter (new BufferedWriter(new OutputStreamWriter(System.out))), true, true, "<stdout>");
   private static OutPort out = outInitial;
 
-  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, "<stderr>");
+  private static OutPort errInitial = new OutPort (new LogWriter(new OutputStreamWriter(System.err)), true, true, "<stderr>");
   private static OutPort err = errInitial;
 
   static public OutPort outDefault ()
@@ -146,6 +158,52 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
   }
   */
 
+  protected static final int WORD = -2;
+  protected int prev = '\n';
+
+  protected static final boolean isWordChar(char ch)
+  {
+    return Character.isJavaIdentifierPart(ch) || ch == '-' || ch == '+';
+  }
+
+  private void startWord()
+  {
+    /*
+    if (prev == WORD || isWordChar((char) prev))
+      {
+	super.write(' ');
+      }
+    */
+    prev = WORD;
+  }
+
+  public void write (int c)
+  {
+    // if (prev == WORD && isWordChar((char) c))    out.print(' ');
+    super.write(c);
+    prev = c;
+  }
+
+  public void write (char[] buffer, int start, int count)
+  {
+    if (count > 0)
+      {
+	// if (prev == WORD && isWordChar(buffer[start]))  out.print(' ');
+	super.write(buffer, start, count);
+	prev = buffer[start+count-1];
+      }
+  }
+
+  public void write(String v)
+  {
+    int len = v.length();
+    if (len == 0)
+      return;
+    //if (prev == WORD && isWordChar(v.charAt(0)))  out.write(' ');
+    prev = v.charAt(len-1);
+    super.write(v);
+  }
+
   /**
    * Write a character value to a byte-stream.
    * The default transation generates UTF-8 multi-bytes.
@@ -170,18 +228,28 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
       }
   }
 
+  //  java.text.FieldPosition fieldPosition;
+
   /** If non-null, use this to print numbers. */
   java.text.NumberFormat numberFormat;
 
-  java.text.Format objectFormat;
+  public FormatToConsumer objectFormat;
 
   public void print(char v)
   {
+    /*
+    if (prev == WORD && isWordChar((char) v))
+      {
+	out.print(' ');
+      }
+    */
     super.print(v);
+    prev = v;
   }
 
   public void print(int v)
   {
+    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -190,6 +258,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void print(long v)
   {
+    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -198,6 +267,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void print(double v)
   {
+    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -206,6 +276,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void print(float v)
   {
+    startWord();
     if (numberFormat == null)
       super.print(v);
     else
@@ -214,27 +285,18 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void print(String v)
   {
-    super.print(v);
+    write(v);
   }
 
   public void print(Object v)
   {
-    if (objectFormat == null)
-      super.print(v);
-    else if (objectFormat instanceof ReportFormat
-	     && ! (v instanceof Object[]))
-      {
-        try
-          {
-            ((ReportFormat) objectFormat).format(v, 0, this, null);
-          }
-        catch (IOException ex)
-          {
-            throw new WrappedException(ex);
-          }
-      }
+    startWord();
+    if (objectFormat != null)
+      objectFormat.writeObject(v, this);
+    else if (v instanceof Consumable)
+      ((Consumable) v).consume(this);
     else
-      print(objectFormat.format(v));
+      super.print(v);
   }
 
   public void print(java.io.PrintWriter ps)
@@ -284,6 +346,7 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
   public void endGroup(String typeName)
   {
     out.print(')');
+    prev = ')';
   }
 
   /** Write a attribute for the current group.
@@ -293,11 +356,13 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
     print(' ');
     print(attrName);
     print(": ");
+    prev = WORD;
   }
 
   /** No more attributes in this group. */
   public void endAttributes()
   {
+    prev = WORD;
     print(' ');
   }
 
@@ -318,178 +383,86 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
     print(str);
   }
 
+  public void freshLine()
+  {
+    int col = bout.getColumnNumber();
+    if (col != 0)
+      println();
+  }
+
   public int getColumnNumber ()
   {
     return bout.getColumnNumber();
   }
-}
 
-/** Not yet used ... for future pretty-printing. */
-
-class Break
-{
-  /** Text to emit if we do not break the line here.
-   * Typically a space. */
-  String textNoBreak;
-
-  /** Text to emit before the break, if we break the line here.
-   * Typically empty. */
-  String textAfterBreak;
-
-  /** Text to emit after the break, if we break the line here.
-   * Does not include indentation inherited from the outer group.
-   * Typically empty. */
-  String textBeforeBreak;
-
-  int kind;
-
-  /** If kind==FORCED_BREAK, always break the line. */
-  final static int FORCED_BREAK = 0;
-
-  /** If kind==LINEAR_BREAK, break the line here if it needs any breaks. */
-  final static int LINEAR_BREAK = 1;
-
-  /** If kind==LINEAR_BREAK, break the line here if next word will not fit. */
-  final static int FILL_BREAK = 2;
-}
-
-/** A Writer with buffering and that tracks column numbers.
- * (Does not handle TABs specially - probably should.)
- * Should move to a separate file, and maybe rename, but deferring that
- * until more general output framework (e.g. pretty-printing).
- */
-
-class BufferedPort extends Writer
-{
-  protected Writer out;
-
-  char[] buffer;
-
-  /** First used (unflushed) position in buffer. */
-  int bufStartPos = 0;
-
-  /** Next available position in buffer. */
-  int bufWritePos = 0;
-
-  /** Column number (0-origin) corresponding to bufStartPos. */
-  int startColumn = 0;
-
-  BufferedPort(Writer out, int bufsize)
+  public void setColumnNumber (int column)
   {
-    this.out = out;
-    buffer = new char[bufsize];
+    bout.setColumnNumber(column);
   }
 
-  public void write (int ch)
-    throws IOException
+  public void clearBuffer ()
   {
-    if (bufWritePos >= buffer.length)
-      {
-	flushLocal();
-      }
-    buffer[bufWritePos++] = (char) ch;
-  }
-
-  public void write (char[] chars, int offset, int count)
-    throws IOException
-  {
-    while (count > 0)
-      {
-	if (bufWritePos + count > buffer.length)
-	  flushLocal();
-	int can_do = buffer.length - bufWritePos;
-	if (can_do > count)
-	  can_do = count;
-	if (can_do == 0)
-	  throw new Error("can't do anything!");
-	System.arraycopy(chars, offset, buffer, bufWritePos, can_do);
-	bufWritePos += can_do;
-	offset += can_do;
-	count -= can_do;
-      }
-  }
-
-  public void write (String str, int offset, int count)
-    throws IOException
-  {
-    while (count > 0)
-      {
-	if (bufWritePos + count > buffer.length)
-	  flushLocal();
-	int can_do = buffer.length - bufWritePos;
-	if (can_do > count)
-	  can_do = count;
-	if (can_do == 0)
-	  throw new Error("can't do anything! buflen:"+buffer.length+" bwpos:"+bufWritePos);
-	str.getChars(offset, offset + can_do, buffer, bufWritePos);
-	bufWritePos += can_do;
-	offset += can_do;
-	count -= can_do;
-      }
-  }
-
-  // FIXME:  This should have a different name.  Check java.io.*.
-  void flushLocal()
-    throws IOException
-  {
-    if (out == null)
-      {
-        char[] newBuffer = new char[2 * buffer.length];
-        System.arraycopy(buffer, 0, newBuffer, 0, bufWritePos);
-        buffer = newBuffer;
-        return;
-      }
-    int i = bufWritePos;
-    for (;;)
-      {
-	if (--i < bufStartPos)
-	  {
-	    startColumn += bufWritePos - bufStartPos;
-	    break;
-	  }
-	char ch = buffer[i];
-	if (ch == '\n' || ch == '\r')
-	  {
-	    startColumn = bufWritePos - i;
-	    break;
-	  }
-      }
-    out.write(buffer, bufStartPos, bufWritePos - bufStartPos);
-    bufWritePos = 0;
-    bufStartPos = 0;
-  }
-
-  public void flush()
-    throws IOException
-  {
-    if (out == null)
-      return;
-    flushLocal();
-    out.flush();
-  }
-
-  public int getColumnNumber ()
-  {
-    int i = bufWritePos;
-    for (;;)
-      {
-	if (--i < bufStartPos)
-	  return startColumn + bufWritePos - bufStartPos;
-	char ch = buffer[i];
-	if (ch == '\n' || ch == '\r')
-	  return bufWritePos - i;
-      }
+    bout.clearBuffer();
   }
 
   public void close()
-    throws IOException
   {
-    if (out != null)
-      {
-        flushLocal();
-        out.close();
-        out = null;
-      }
-    buffer = null;
+    super.close();
+    WriterManager.instance.unregister(index);
+  }
+
+  public static void runCleanups ()
+  {
+    WriterManager.instance.run();
+  }
+
+  public void startLogicalBlock (String prefix, boolean perLine,
+				 String suffix)
+  {
+    bout.startLogicalBlock(prefix, perLine, suffix);
+  }
+
+  public void startLogicalBlock (String prefix, String suffix, int indent)
+  {
+    bout.startLogicalBlock(prefix, false, suffix);
+    bout.addIndentation(prefix == null ? indent :  indent - prefix.length(),
+			false);
+  }
+
+  public void endLogicalBlock (String suffix)
+  {
+    bout.endLogicalBlock(suffix);
+  }
+
+  public void writeBreak(int kind)
+  {
+    bout.writeBreak(kind);
+  }
+
+  public void writeSpaceLinear()
+  {
+    write(' ');
+    writeBreak(PrettyWriter.NEWLINE_LINEAR);
+  }
+
+  public void writeBreakLinear()
+  {
+    writeBreak(PrettyWriter.NEWLINE_LINEAR);
+  }
+
+  public void writeSpaceFill()
+  {
+    write(' ');
+    writeBreak(PrettyWriter.NEWLINE_FILL);
+  }
+
+  public void writeBreakFill()
+  {
+    writeBreak(PrettyWriter.NEWLINE_FILL);
+  }
+
+  public void setIndentation(int amount, boolean current)
+  {
+    bout.addIndentation(amount, current);
   }
 }

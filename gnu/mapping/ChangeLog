@@ -1,3 +1,21 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* CpsProcedure.java (applyN):  Use checkArgCount method.
+
+	* OutPort.java:  Major changes.
+	(class BufferedPort):  removed, replaced by gnu.text.PrettyWriter.
+	(startLogicalBlock, endLogicalBlock, writeBreak, writeSpaceLinear,
+	writeBreakLinear, writeSpaceFill, writeBreakFill, setIndentation):
+	Wrappers for PrettyWriter's features.
+	(class Break):  Removed.
+	(objectFormat):  Change type to FormatToConsumer.
+	(print(Object)):  Use objectFormat appropriately.
+
+	* OutPort.java (freshLine):  New method.
+	* TtyInPort.java (lineStart):  Call freshLine, and clearBuffer.
+
+	* CharArrayOutPort.java:  Tweaks because of use of PrettyWriter.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	* CpsProcedure.java (applyN, match):  Use CallContext's setArgsN.

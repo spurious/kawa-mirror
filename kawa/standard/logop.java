@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.*;
+import gnu.math.*;
 
 public class logop extends Procedure3
 {

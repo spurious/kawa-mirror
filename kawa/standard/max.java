@@ -1,7 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.RealNum;
-import kawa.math.Numeric;
+import gnu.math.RealNum;
+import gnu.math.Numeric;
 
 /**
  * Implement the Scheme standard function "max".

@@ -1,5 +1,5 @@
 package kawa.lang;
-import kawa.math.*;
+import gnu.math.*;
 import java.io.*;
 
 /**

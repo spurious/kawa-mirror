@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.*;
+import gnu.math.*;
 
 /** Implement the standard Scheme procedure "atan". */
 

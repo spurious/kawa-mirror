@@ -1,7 +1,7 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.IntNum;
-import kawa.math.Numeric;
+import gnu.math.IntNum;
+import gnu.math.Numeric;
 
 /**
  * Implement the Scheme standard function "lcm".

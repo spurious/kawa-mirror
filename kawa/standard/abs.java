@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.Numeric;
+import gnu.math.Numeric;
 
 public class abs extends Procedure1
 {

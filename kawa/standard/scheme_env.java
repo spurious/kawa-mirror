@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.IntNum;
+import gnu.math.IntNum;
 
 /** Implements the R5RS procedure "scheme-report-environment". */
 

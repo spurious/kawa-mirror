@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.IntNum;
+import gnu.math.IntNum;
 
 public class string_set_b extends Procedure3
 {

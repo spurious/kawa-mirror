@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.Quantity;
+import gnu.math.Quantity;
 
 /** Implement the standard Scheme procedure "angle". */
 

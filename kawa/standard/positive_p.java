@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.RealNum;
+import gnu.math.RealNum;
 
 /** Implement the standard Scheme procedure "positive?". */
 

@@ -1,7 +1,7 @@
 package kawa.lang;
 import gnu.bytecode.*;
-import kawa.math.IntNum;
-import kawa.math.DFloNum;
+import gnu.math.IntNum;
+import gnu.math.DFloNum;
 
 /** A call to a plain Java method. */
 

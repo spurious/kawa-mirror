@@ -1,6 +1,6 @@
 package kawa.standard;
 import kawa.lang.*;
-import kawa.math.*;
+import gnu.math.*;
 
 public class number2string extends Procedure1or2
 {

@@ -132,7 +132,7 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
     return ipos >>> 1;
   }
 
-  protected boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos, Object xpos)
   {
     // Equivalent to getNext(ipos, xpos) != eofValue.
     Object next;

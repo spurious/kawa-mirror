@@ -130,7 +130,7 @@ public class StableVector extends GapVector
     return (positions[ipos] & 1) != 0;
   }
 
-  protected boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos, Object xpos)
   {
     int ppos = positions[ipos];
     int index = ppos >>> 1;

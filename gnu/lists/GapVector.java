@@ -25,7 +25,7 @@ public class GapVector extends AbstractSequence implements Sequence
     return base.getBufferLength() - (gapEnd - gapStart);
   }
 
-  protected boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos, Object xpos)
   {
     int index = ipos >>> 1;
     if (index >= gapStart)

@@ -1,3 +1,10 @@
+2002-04-06  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java.in (hasNext):  Make public.
+	* GapVector.java (hasNext):  Likewise.
+	* LList.java (hasNext):  Likewise.
+	* StableVector.java (hasNext):  Likewise.
+
 2002-03-19  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in (remove):  Make public.

@@ -489,7 +489,7 @@ public abstract class AbstractSequence
   }
 
   /** Called by SeqPosition.hasNext. */
-  protected boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos, Object xpos)
   {
     return nextIndex(ipos, xpos) != size();
   }

@@ -32,6 +32,8 @@ public class compilefunc
 	arg_types = new Type[arg_count];
 	for (int i = arg_count;  --i >= 0; )
 	  arg_types[i] = comp.scmObjectType;
+	if (lexp.isModuleBody ())
+	  arg_types[0] = Compilation.scmEnvironmentType;
 	argsArray = null;
       }
 
@@ -85,10 +87,10 @@ public class compilefunc
 	constructor_method.compile_putfield (comp.nameField);
       }
 
-    Method apply_method = comp.curClass.new_method ("apply"+arg_letter,
-					 arg_types,
-					 comp.scmObjectType,
-					 Access.PUBLIC|Access.FINAL);
+    String apply_name = lexp.isModuleBody () ? "run" : "apply"+arg_letter;
+    Method apply_method
+      = comp.curClass.new_method (apply_name, arg_types, comp.scmObjectType,
+				  Access.PUBLIC|Access.FINAL);
     comp.method = apply_method;
 
 

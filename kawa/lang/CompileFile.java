@@ -69,17 +69,9 @@ public class CompileFile extends Procedure2
 
       }
 
-    try
-      {
-	LambdaExp lexp = new LambdaExp (List.Empty, body, interpreter);
-	lexp.setModuleBody (true);
-	lexp.filename = port.getName ();
-	return lexp;
-      }
-    catch (WrongArguments ex)
-      {
-	throw new IllegalArgumentException (ex.toString ());
-      }
+    LambdaExp lexp = new LambdaExp (ModuleBody.formals, body, interpreter);
+    lexp.filename = port.getName ();
+    return lexp;
   }
 
   public final Object apply2 (Object arg1, Object arg2)
@@ -88,7 +80,7 @@ public class CompileFile extends Procedure2
     if (! (arg1 instanceof StringBuffer))
       throw new WrongType (this.name (), 1, "file name");
     Interpreter interpreter = Interpreter.current ();
-    LambdaExp lexp = read (arg1.toString (), new Environment (interpreter));
+    LambdaExp lexp = read (arg1.toString (), Environment.user ());
     Compilation comp = new Compilation (lexp,
 					LambdaExp.fileFunctionName, false);
 
@@ -145,7 +137,7 @@ public class CompileFile extends Procedure2
       }
     Interpreter interpreter = Interpreter.current ();
     int save_errors = interpreter.errors;
-    LambdaExp lexp = read (inname, new Environment (interpreter));
+    LambdaExp lexp = read (inname, Environment.user ());
     if (interpreter.errors > save_errors)
       return;
     Compilation comp = new Compilation (lexp, topname, prefix);

@@ -52,7 +52,7 @@ public class AutoloadSyntax extends Syntax
 
   /** Load the class named in className. */
   void load ()
-       throws WrongArguments, WrongType, GenericError
+       throws WrongType, GenericError
   {
     Symbol name = this.name ();
     try
@@ -60,8 +60,9 @@ public class AutoloadSyntax extends Syntax
 	Object value = Class.forName (className).newInstance ();
 	if (value instanceof ModuleBody)
 	  {
-	    ((ModuleBody) value).apply0 ();
-	    value = Interpreter.current().lookup (name);
+            Environment env = Environment.current ();
+	    ((ModuleBody) value).run (env);
+	    value = env.get (name);
 	    if (value == null
 		|| !(value instanceof Syntax))
 	      throw_error ("invalid ModuleBody class");
@@ -89,10 +90,11 @@ public class AutoloadSyntax extends Syntax
       { throw_error ("illegal access in class "); }
     catch (UnboundSymbol e)
       { throw_error ("missing symbol " + e.getMessage ()); }
+    catch (WrongArguments ex)
+      { throw_error ("type error"); }
   }
 
   public Expression rewrite (Object obj, Interpreter interp)
-    throws kawa.lang.WrongArguments
   {
     if (loaded == null)
       {

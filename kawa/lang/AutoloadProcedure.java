@@ -31,16 +31,18 @@ public class AutoloadProcedure extends Procedure
     if (name () != null)
       {
 	ps.print (name ());
-	ps.print (' ');
+	// ps.print (' ');
       }
+    /*
     if (loaded != null)
-      ps.print ("autoloaded>");
+      ps.print ("autoloaded");
     else
       {
 	ps.print ("autoload ");
 	ps.print (className);
-	ps.print (">");
       }
+    */
+    ps.print ('>');
   }
 
   private void throw_error (String prefix) throws GenericError
@@ -60,8 +62,9 @@ public class AutoloadProcedure extends Procedure
 	loaded = (Procedure) Class.forName (className).newInstance ();
 	if (loaded instanceof ModuleBody)
 	  {
-	    loaded.apply0 ();
-	    Object value = Interpreter.lookup_global (name);
+	    Environment env = Environment.current ();
+	    ((ModuleBody)loaded).run (env);
+	    Object value = env.get (name);
 	    if (value == null
 		|| !(value instanceof Procedure))
 	      throw_error

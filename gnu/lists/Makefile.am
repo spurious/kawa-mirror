@@ -12,6 +12,8 @@ java_sources = \
   ConsumerWriter.java \
   Consumable.java \
   ElementPredicate.java \
+  ExtPosition.java \
+  ExtSequence.java \
   F32Vector.java \
   F64Vector.java \
   FilterConsumer.java \
@@ -27,7 +29,7 @@ java_sources = \
   Pair.java \
   PairWithPosition.java \
   PositionConsumer.java \
-  PositionContainer.java \
+  PositionManager.java \
   PrintConsumer.java \
   S8Vector.java \
   S16Vector.java \
@@ -38,7 +40,6 @@ java_sources = \
   Strings.java \
   TreeList.java \
   TreePosition.java \
-  TreePositionList.java \
   U8Vector.java \
   U16Vector.java \
   U32Vector.java \

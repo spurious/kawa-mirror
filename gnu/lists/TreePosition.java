@@ -17,14 +17,15 @@ package gnu.lists;
 
 public class TreePosition extends SeqPosition implements Cloneable
 {
+  /** Used when dpsth==-1 to indicate the "entire" object.
+   * Usually an AbstractSequence, but need not be. */
+  private Object xpos;
+
   /** Stack of pushed values for sequence. */
   AbstractSequence[] sstack;
 
   /** Stack of pushed values for iposition. */
   int[] istack; 
-
-  /** Stack of pushed values for xposition. */
-  Object[] xstack;
 
   /** Depth of the above stacks.
    * Note that getDepth returns depth+1; this should perhaps match. */
@@ -75,19 +76,18 @@ public class TreePosition extends SeqPosition implements Cloneable
       sstack = new AbstractSequence[d + 10];
     if (istack == null || istack.length <= d)
       istack = new int[d + 10];
-    if (xstack == null || xstack.length <= d)
-      xstack = new Object[d + 10];
     AbstractSequence seq;
     int i;
     for (i = 0;  i < depth;  i++)
       {
 	int j = i + position.start;
 	seq = position.sstack[j];
-	seq.copyPosition(position.istack[j], position.xstack[j],
-			 this, depth - i);
+	sstack[depth-1] = seq;
+	istack[depth - i] = seq.copyPos(position.istack[j]);
       }
     seq = position.sequence;
-    seq.copyPosition(position.ipos, position.xpos, this, 0);
+    sequence = seq;
+    ipos = seq.copyPos(position.ipos);
   }
 
   /** Number of ancestor sequences, including current sequence. */
@@ -102,12 +102,12 @@ public class TreePosition extends SeqPosition implements Cloneable
     return depth == 0 ? sequence : sstack[start];
   }
 
-  public Object getNext()
+  public Object getPosNext()
   {
-    return sequence == null ? xpos : sequence.getNext(ipos, xpos);
+    return sequence == null ? xpos : sequence.getPosNext(ipos);
   }
 
-  public void push(AbstractSequence child, int iposChild, Object xposChild)
+  public void push(AbstractSequence child, int iposChild)
   {
     int d = depth + start;
     if (d >= 0)
@@ -115,7 +115,6 @@ public class TreePosition extends SeqPosition implements Cloneable
 	if (d == 0)
 	  {
 	    istack = new int[8];
-	    xstack = new Object[8];
 	    sstack = new AbstractSequence[8];
 	  }
 	else if (d >= istack.length)
@@ -125,25 +124,21 @@ public class TreePosition extends SeqPosition implements Cloneable
 	    Object[] xtemp = new Object[ndepth];
 	    AbstractSequence[] stemp = new AbstractSequence[ndepth];
 	    System.arraycopy(istack, 0, itemp, 0, depth);
-	    System.arraycopy(xstack, 0, xtemp, 0, depth);
 	    System.arraycopy(sstack, 0, stemp, 0, depth);
 	    istack = itemp;
-	    xstack = xtemp;
 	    sstack = stemp;
 	  }
 	sstack[d] = sequence;
 	istack[d] = ipos;
-	xstack[d] = xpos;
       }
     depth++;
     sequence = child;
     ipos = iposChild;
-    xpos = xposChild;
   }
 
   public void pop()
   {
-    sequence.releasePosition(ipos, xpos);
+    sequence.releasePos(ipos);
     popNoRelease();
   }
 
@@ -158,7 +153,6 @@ public class TreePosition extends SeqPosition implements Cloneable
       {
 	sequence = sstack[start+depth];
 	ipos = istack[start+depth];
-	xpos = xstack[start+depth];
       }
   }
 
@@ -180,7 +174,7 @@ public class TreePosition extends SeqPosition implements Cloneable
 	  return false;
 	depth = 0;
 	sequence = (AbstractSequence) xpos;
-	sequence.makeStartPosition(this, 0);
+	setPos(sequence.startPos());
       }
     else
       {
@@ -221,12 +215,12 @@ public class TreePosition extends SeqPosition implements Cloneable
   public Object getAncestor(int up)
   {
     if (up == 0)
-      return sequence.getNext(ipos, xpos);
+      return sequence.getPosNext(ipos);
     int i = depth - up;
     if (i <= 0)
       return getRoot();
     i += start;
-    return sstack[i].getNext(istack[i], xstack[i]);
+    return sstack[i].getPosNext(istack[i]);
   }
 
   public void finalize()
@@ -238,7 +232,7 @@ public class TreePosition extends SeqPosition implements Cloneable
   {
     while (sequence != null)
       {
-        sequence.releasePosition(ipos, xpos);
+        sequence.releasePos(ipos);
         pop();
       }
     xpos = null;
@@ -259,50 +253,14 @@ public class TreePosition extends SeqPosition implements Cloneable
   }
   */
 
-  /** Implements PositionContainer. */
-  public int getPositionInt(int positionNumber)
-  { return positionNumber == 0 ? ipos : istack[depth-positionNumber]; }
-
-  /** Implements PositionContainer. */
-  public Object getPositionPtr(int positionNumber)
-  { return positionNumber == 0 ? xpos : xstack[depth-positionNumber]; }
-
-  /** Implements PositionContainer. */
-  public void setPosition(int positionNumber, int ipos, Object xpos)
-  {
-    if (positionNumber == 0)
-      {	this.ipos = ipos;  this.xpos = xpos; }
-    else
-      {
-	istack[depth-positionNumber] = ipos;
-	xstack[depth-positionNumber] = xpos;
-      }
-  }
-
-  /** Implements PositionContainer. */
-  public void setSequence(int positionNumber, AbstractSequence seq)
-  {
-    if (positionNumber == 0)
-      this.sequence = seq;
-    else
-      sstack[depth-positionNumber] = seq;
-  }
-
-  /** Implements PositionContainer. */
-  public int countPositions() { return depth + 1; }
-
   public void dump()
   {
     System.err.println("TreePosition dump depth:"+depth+" start:"+start);
-    if (depth < 0)
-      {
-	System.err.println("#- xpos:"+getPositionPtr(0));
-      }
     for (int i = 0;  i <= depth;  i++)
       {
 	AbstractSequence seq = i==0 ? sequence : sstack[depth-i];
 	System.err.print("#"+i+" seq:"+seq);
-	System.err.println(" ipos:"+getPositionInt(i)+" xpos:"+getPositionPtr(i));
+	System.err.println(" ipos:" + (i == 0 ? ipos : istack[depth-i]));
       }
   }
 }

@@ -1,3 +1,142 @@
+2003-01-05  Per Bothner  <per@bothner.com>
+
+	Replace position triples (including xpos), with positions pairs,
+	using just an 'int' "Pos" cookie to identify a position.
+	* PositionContainer.java:  Remove no-longer-useful interface.
+	* AbstractSequence.java.in (fillPosRange):  New method.
+	(fill):  Re-write to use nextPos+setPosPrevious.
+	(elements, iterator):  Use getIterator and make final.
+	(getIterator):  Default implementation uses startPos.
+	(indexOf, removeAll, retailAll, toArray, hashCode):  Re-implement using
+	startPos+nextPos+getPosPrevious.
+	(contains):  Re-implement to just call indexOf.
+	(containsAll):  Fix bug.
+	(listIterator):  Use new SeqPosition constructor.
+	(add, releasePosition, copyPosition, gotoNext, gotoPrevious):
+	Remove methods taking a PositionContainer.
+	(addPos):  New method.
+	(removePos):  Renamed from remove.  Remove xpos parameter.  Update.
+	(removePosRange):  Renamed from remove.  Remove xpos parameters.
+	(isAfter):  Rename to isAfterPos.  Remove xpos parameter.
+	(getNext):  Renamed to getPosNext.  Remove xpos parameter.
+	(getPrevious):  Renamed to getPosPrevious.  Remove xpos parameter.
+	(subSequence):  Renamed to subSequencePos.  Remove xpos parameter.
+	(setNext):  Renamed to setPosNext.  Remove xpos parameter.
+	(setPrevious):  Renamed to setPosPrevious.  Remove xpos parameter.
+	(consume):  Renamed to consumePosRange.  Remove xpos parameters.
+	(getIndexDifference, nextIndex, getContainingSequenceSize, hasNext,
+	fromEndIndex, getNextKind, getNextTypeName, getNextTypeObject, equals,
+	compare, hasPrevious, consumeNext):  Remove xpos parameter.
+	(remove(int)): Re-implement using createPos+getNext+removePos.
+	(remove(Object)):  Likewise.
+	(clear):  Re-implement using removePos.
+	(createPos):  New abstract method.
+	(makePosition, createPosition, makeRelativePosition,
+	makeStartPosition, makeEndPosition):  Remove methods.
+	(createRelativePos, startPos, endPos, releasePos, copyPos, nextPos,
+	previousPos, firstChildPos):  New methods.
+	(subList):  Re-implement using createPos.
+	(toString(String,StringBuffer)):  New helper method.
+	* SeqPosition.java.in:  No longer implement PositionContainer.
+	(getPositionInt, getPositionPtr, setPosition, setSequence,
+	countPositions):  Remove PositionContainer methods.
+	(xpos):  Remove field.
+	(toString):  Don't print xpos.
+	(hasNext, getNextKind, getNextTypeName, getNextTypeObject, hasPrevious,
+	getNext, nextIndex, fromEndIndex, getContainingSequenceSize, isAfter,
+	previousIndex, remove, add, init, release):  Don't pass xpos to
+	corresponding sequence method.
+	(<init>(AbstractSequence,int,boolean)):  Re-implement using createPos.
+	(<init>(AbstractSequence,int,Object)):  Remove xpos parameter.
+	(make):  Likewise.
+	(copy):  New method.
+	(gotoStart):  Re-implement using setPos and startPos.
+	(gotoEnd):  Re-implement using setPos and endPos.
+	(gotoChildrenStart):  New method.
+	(hasMoreElements):  Use hasNext and make final.
+	(gotoNext):  Make non-final.  Use nextPos.
+	(gotoPrevious):  New method.
+	(next):  Use getNext and gotNext  methods in this class, not sequence.
+	(previous):  Use getPosPrevious and new gotoPrevious method.
+	(nextElement):  Make final, define in terms of next.
+	(nextIndex):  Make non-final.
+	(getNext, getPrevious)   Use renamed getPosNext, getPosPrevious.
+	(init, release):  Update for renamed releasePos, copyPos.
+	(setNext, setPrevious):  New methods.
+	(set)  Use them.
+	(setPos, setPos):  New methods.
+	(init):  Renamed to set.
+	(getPos):  New method.
+	(various):  Use getPos instead of accessing ipos directly.
+	* SimpleVector.java.in (createPosition):  Rename to createPos.
+	(isAfter):  Rename to isAfterPos.  Remove xpos parameter.
+	(getNext):  Rename to getPosNext.  Remove xpos parameter.
+	(remove):  Rename to consumePosRange.  Remove xpos parameters.
+	(consume):  Rename to getPosNext.  Remove xpos parameter.
+	(nextIndex, consumeNext, getNextKind):  Remove xpos parameter.
+	(nextPos):  New method.
+	(add):  Remove methods taking a PositionContainer.
+	(addPos):  New method.
+	* U8Vector.java, U16Vector.java, U32Vector.java, U64Vector.java,
+	S8Vector.java, S16Vector.java, S32Vector.java, S64Vector.java,
+	F32Vector.java, F64Vector.java, FString.java, FVector.java, 
+	BitVector.java (consumeNext):  Remove xpos parameter.
+	(remove):  Rename to consumePosRange.  Remove xpos parameters.
+	* FVector.java (consumePosRange):  New method.
+	* GapVector.java (add):  Remove methods taking a PositionContainer.
+	(addPos):  New method.
+	(nextIndex, nextIndex, getNextKind):  Remove xpos parameter.
+	(remove):  Rename to consumePosRange.  Remove xpos parameters.
+	(clear):  Remove - use inherited method.
+	(createPosition):  Rename to createPos.
+	(consume):  Renamed to consumePosRange.  Rmeove xpos parammeters.
+	(fill):  Replaced by fillPosRange.
+	* StableVector.java (createPosition):  Rename to createPos.
+	(startPos, endPos, nextPos. copyPos, addPos):  New methods.
+	(makeStartPosition, makeEndPosition, gotoNext, copyPosition, add):
+	Removed methods.
+	(isAfter):  Rename to isAfterPos.
+	(hasNext, nextIndex):  Remove xpos parameter.
+	(releasePosition):  Renamed to releasePos.  Remove xpos parameter.
+	(remove):  Renamed to removePosRange.  Rmeove xpos parammeters.
+	(consume):  Renamed to consumePosRange.  Rmeove xpos parammeters.
+	(fillPosRange):  New method.
+	* CharBuffer.java (delete):  Use createPos+removePos.
+	* GeneralArray.java (createPos):  New method.
+	* SubSequence.java:  No longer implement PositionContainer.
+	(xpos0, xpos1):  Remove fields.
+	(<init>):  New constructor.
+	Update various methods.
+	* PositionManager.java:  New class.
+	* ExtPosition.java:  New class, extends SeqPosition.
+	* ExtSequence:  New abatract class; extends AbstacrtSequence.
+	* ElementPredicate.java (isInstance):  Renamed to isInstancePos,
+	remove xpos parameter.
+	* GroupPredicate.java:  Remove xpos parameter.
+	* LList.java:  new inherit from ExtSequence.
+	(getIterator, createPos, createRelativePos):  New methods.
+	(various):  Other updates; some logic moved to LListPosition.
+	(makePosition):  Removed PositionContainer method.
+	(class LListPosition):  New, inherits from ExtPosition.
+	* Pair.java (hasNext, nextPos, getPosNext, getPosPrevious, lastPair,
+	getPosPrevious, lastPaur):  New methods.
+	* TreeList.java (consumeRange):  Rebane to consumeIRange.
+	Fix bug in INT_FOLLOWS/FLOAT_FOLLOWS/LONG_FOLLOWS/DOUBLE_FOLLOWS cases.
+	(consumePosRange):  New method.
+	(POSITION_TRIPLE_FOLLOWS):  Renamed to POSITION_PAIR_FOLLOWS.
+	(posToDataIndex, firstChildPos, toSrring, compare, hashCode):
+	New methods.
+	(various):  Update various methods.
+	* PositionConsumer.java (consume):  Take SeqPosition, not TreePosition.
+	(wrotePosition):  Remove xpos parameter.
+	* TreePosition.java (xpos):  "New" field, now private and here.
+	(xstack):  Removed.
+	Remove PosutionContainer methods.
+	Various updates.
+	* TreePositionList.java:  Removed, since it was unused.
+	* Makefile.am:  Update accordingly.
+	* package.html:  Update for new world.
+	
 2003-01-06  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in (isEmpty):  Fix obvious thinko.

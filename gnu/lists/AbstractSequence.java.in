@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -87,16 +87,26 @@ public abstract class AbstractSequence
 
   public void fill(Object value)
   {
-    SeqPosition it = getIterator();
-    while (gotoNext(it))
-      setPrevious(it.ipos, it.xpos, value);
-    it.finalize();
+    for (int i = startPos(); (i = nextPos(i)) != 0; )
+      setPosPrevious(i, value);
+  }
+
+  public void fillPosRange(int fromPos, int toPos, Object value)
+  {
+    int i = copyPos(fromPos);
+    for (;  compare(i, toPos) < 0;  i = nextPos(i))
+      setPosNext(i, value);
+    releasePos(i);
   }
 
   public void fill(int fromIndex, int toIndex, Object value)
   {
-    for (int i = fromIndex;  i < toIndex;  i++)
-      set(i, value);
+    int i = createPos(fromIndex, false);
+    int limit = createPos(toIndex, true);
+    for (;  compare(i, limit) < 0;  i = nextPos(i))
+      setPosNext(i, value);
+    releasePos(i);
+    releasePos(limit);
   }
 
   // FIXME?
@@ -106,12 +116,14 @@ public abstract class AbstractSequence
   public int indexOf(Object o)
   {
     int i = 0;
-    SeqPosition it = getIterator();
-    for (; it.hasNext();  i++)
+    for (int iter = startPos();  (iter = nextPos(iter)) != 0;  i++)
       {
-        Object e = it.next();
-        if (o==null ? e==null : o.equals(e))
-          return i;
+	Object v = getPosPrevious(iter);
+        if (o==null ? v==null : o.equals(v))
+	  {
+	    releasePos(iter);
+	    return i;
+	  }
       }
     return -1;
   }
@@ -132,21 +144,14 @@ public abstract class AbstractSequence
   /** See java.util.List. */
   public boolean contains(Object o)
   {
-    SeqPosition i = getIterator();
-    while (i.hasNext())
-      {
-        Object e = i.next();
-        if (o==null ? e==null : o.equals(e))
-          return true;
-      }
-    return false;
+    return indexOf(o) >= 0;
   }
 
 @if WITH COLLECTIONS@
   /** See java.util.List. */
   public boolean containsAll(Collection c)
   {
-    SeqPosition i = getIterator();
+    Iterator i = c.iterator();
     while (i.hasNext())
       {
         Object e = i.next();
@@ -157,26 +162,20 @@ public abstract class AbstractSequence
   }
 @endif WITH COLLECTIONS@
 
-  public Enumeration elements()
+  public final Enumeration elements()
   {
-    SeqPosition it = new SeqPosition();
-    makeStartPosition(it);
-    return it;
+    return getIterator();
   }
 
   public SeqPosition getIterator()
   {
-    SeqPosition it = new SeqPosition();
-    makeStartPosition(it);
-    return it;
+    return new SeqPosition(this, startPos());
   }
 
 @if WITH COLLECTIONS@
-  public Iterator iterator()
+  public final Iterator iterator()
   {
-    SeqPosition it = new SeqPosition();
-    makeStartPosition(it);
-    return it;
+    return getIterator();
   }
 
   public ListIterator listIterator()
@@ -186,28 +185,31 @@ public abstract class AbstractSequence
 
   public ListIterator listIterator(int index)
   {
-    SeqPosition it = new SeqPosition();
-    makePosition(index, it);
-    return it;
+    return new SeqPosition(this, index, false);
   }
 @endif WITH COLLECTIONS@
 
-  protected void add(PositionContainer posSet, int posNumber, Object value)
+  /** Add a value at a specified Pos.
+   * @return the updated Pos, which is after the inserted value..
+   */
+  protected int addPos (int ipos, Object value)
   {
-    throw unsupported("add");
+    throw unsupported("addPos");
   }
 
   /** See java.util.Collection. */
   public boolean add(Object o)
   {
-    add(size(), o);
+    addPos(endPos(), o);
     return true;
   }
 
   /** See java.util.List. */
   public void add(int index, Object o)
   {
-    throw unsupported("add single Object at index");
+    int pos = createPos(index, false);
+    addPos(pos, o);
+    releasePos(pos);
   }
 
 @if WITH COLLECTIONS@
@@ -221,11 +223,13 @@ public abstract class AbstractSequence
   public boolean addAll(int index, Collection c)
   {
     boolean changed = false;
+    int pos = createPos(index, false);
     for (Iterator it = c.iterator();  it.hasNext(); )
       {
-	add(index++, it.next());
+	pos = addPos(pos, it.next());
 	changed = true;
       }
+    releasePos(pos);
     return changed;
   }
 @endif WITH COLLECTIONS@
@@ -238,19 +242,20 @@ public abstract class AbstractSequence
   public boolean addAll(int index, Sequence c)
   {
     boolean changed = false;
-    for (Enumeration it = c.elements();  it.hasMoreElements(); )
+    int pos = createPos(index, false);
+    for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-	add(index++, it.nextElement());
+	pos = addPos(pos, getPosPrevious(iter);
 	changed = true;
       }
+    releasePos(pos);
     return changed;
   }
 @endif WITHOUT COLLECTIONS@
 
   /**
    * Remove one or more elements.
-   * @param ipos integer part of position where elements should be removed
-   * @param xpos object part of position where elements should be removed
+   * @param ipos position where elements should be removed
    * @param count if non-negative, remove that number of elements
    * following (poses, posNumber); if negative the negative of the number
    * of elements to remove before (poses, posNumber).
@@ -260,38 +265,36 @@ public abstract class AbstractSequence
    *       : (index + count < 0 || index > size())),
    *   where index == nextIndex(ipos, xpos).
    */
-  public void remove(int ipos, Object xpos, int count)
+  public void removePos(int ipos, int count)
   {
-    SeqPosition it = new SeqPosition(this);
-    makeRelativePosition(ipos, xpos, count, true, it, 0);
+    int rpos = createRelativePos(ipos, count, false);
     if (count >= 0)
-      remove (ipos, xpos, it.ipos, it.xpos);
+      removePosRange(ipos, rpos);
     else
-      remove (it.ipos, it.xpos, ipos, xpos);
+      removePosRange(rpos, ipos);
+    releasePos(rpos);
   }
 
   /** Remove a range where each end-point is a position in a container.
-   * @param ipos0 integer part of start of range
-   * @param xpos0 object part of start of range
-   * @param ipos1 integer part of end of range
-   * @param xpos1 object part of end of range
+   * @param ipos0 start of range, as a poistion
+   * @param ipos1 end of range
    * @exception java.lang.IndexOutOfBoundsException
-   *   if nextIndex(ipos0, xpos0) > nextIndex(ipos1, xpos1)
-   *   || nextIndex(ipos0, xpos0) < 0 || nextIndex(ipos1, xpos1) > size()
+   *   if nextIndex(ipos0) > nextIndex(ipos1)
+   *   || nextIndex(ipos0) < 0 || nextIndex(ipos1) > size()
    */
-  protected void remove(int ipos0, Object xpos0, int ipos1, Object xpos1)
+  protected void removePosRange(int ipos0, int ipos1)
   {
-    throw unsupported("remove (with range)");
+    throw unsupported("removePosRange");
   }
 
   public Object remove(int index)
   {
     if (index < 0 || index >= size())
       throw new IndexOutOfBoundsException();
-    SeqPosition it = new SeqPosition(this);
-    makePosition(index, it);
-    Object result = getNext(it.ipos, it.xpos);
-    remove(it.ipos, it.xpos, 1);
+    int ipos = createPos(index, false);
+    Object result = getPosNext(ipos);
+    removePos(ipos, 1);
+    releasePos(ipos);
     return result;
   }
 
@@ -300,9 +303,9 @@ public abstract class AbstractSequence
     int index = indexOf(o);
     if (index < 0)
       return false;
-    SeqPosition it = new SeqPosition();
-    makePosition(index, it);
-    remove(it.ipos, it.xpos, 1);
+    int ipos = createPos(index, false);
+    removePos(ipos, 1);
+    releasePos(ipos);
     return true;
   }
 
@@ -310,12 +313,12 @@ public abstract class AbstractSequence
   public boolean removeAll(Collection c)
   {
     boolean changed = false;
-    for (SeqPosition it = getIterator();  it.hasNext(); )
+    for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-        Object value = it.next();
-        if (c.contains(value))
+	Object value = getPosPrevious(iter);
+	if (c.contains(value))
           {
-            it.remove();
+	    removePos(iter, -1);
             changed = true;
           }
       }
@@ -325,12 +328,12 @@ public abstract class AbstractSequence
   public boolean retainAll(Collection c)
   {
     boolean changed = false;
-    for (SeqPosition it = getIterator();  it.hasNext(); )
+    for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-        Object value = it.next();
+	Object value = getPosPrevious(iter);
         if (! c.contains(value))
           {
-            it.remove();
+	    removePos(iter, -1);
             changed = true;
           }
       }
@@ -340,167 +343,73 @@ public abstract class AbstractSequence
 
   public void clear()
   {
-    SeqPosition it = new SeqPosition();
-    makeStartPosition(it);
-    remove(it.ipos, it.xpos, size());
+    removePos(startPos(), endPos());
   }
 
   /** Does the position pair have the "isAfter" property?
    * I.e. if something is inserted at the position, will
    * the iterator end up being after the new data? */
-  protected boolean isAfter(int ipos, Object xpos)
+  protected boolean isAfterPos (int ipos)
   {
-    return false;
-  }
-
-  protected final void makePosition(int index, SeqPosition pos)
-  {
-    makePosition(index, true, pos);
+    return (ipos & 1) != 0;
   }
 
   /** Generate a position at a given index.
-   * @param index offset from beginning of desired position
-   * @param isAfter should the position have the isAfter property
-   * @param pos where to store the generated position
-   *   This old position should be already released, if needed.
-   * @exception IndexOutOfBoundsException if index is out of bounds
-   */
-  public void makePosition(int index, boolean isAfter, SeqPosition pos)
-  {
-    makePosition(index, isAfter, pos, 0);
-  }
-
-  /** Generate a position at a given index.
-   * The result is a position cookie that must be free'd with releasePosition.
+   * The result is a position cookie that must be free'd with releasePos.
    * @param index offset from beginning of desired position
    * @param isAfter should the position have the isAfter property
    * @exception IndexOutOfBoundsException if index is out of bounds
    */
-  public int createPosition(int index, boolean isAfter)
+  public abstract int createPos (int index, boolean isAfter);
+
+  public int createRelativePos(int pos, int delta, boolean isAfter)
   {
-    throw unsupported("createPosition");
+    return createPos(nextIndex(pos) + delta, isAfter);
   }
 
-  /** Generate a position at a given index.
-   * @param index offset from beginning of desired position
-   * @param isAfter should the position have the isAfter property
-   * @param posSet where to store the generated position
-   * @param posNumber index in posSet for the generated position.  Any old
-   *   position there should be alread released, if needed.
-   * @exception IndexOutOfBoundsException if index is out of bounds
-   */
-  protected void
-  makePosition(int index, boolean isAfter,
-	       PositionContainer posSet, int posNumber)
-  {
-    posSet.setPosition(posNumber, createPosition(index, isAfter), null);
-    posSet.setSequence(posNumber, this); // FIXME - handled by caller?
-  }
-
-  /** Generate a position relative to an existing position.
-   * @param istart int part of initial position
-   * @param xstart object part of initial position
-   * @param offset offset from (istart,xstart) of desired position
-   * @param isAfter should the position have the isAFter property
-   * @param posSet where to store the generated position
-   * @param positionNumber index in posSet for the generated position.  Any
-   *   old position there should be alread released, if needed.
-   * @exception IndexOutOfBoundsException if resulting index is out of bounds
-   */
-  protected void makeRelativePosition(int istart, Object xstart,
-				      int offset, boolean isAfter,
-				      PositionContainer posSet,
-				      int posNumber)
-  {
-    makePosition(nextIndex(istart, xstart) + offset, isAfter, posSet, posNumber);
-  }
-
-  public void makeStartPosition(SeqPosition pos)
-  {
-    makeStartPosition(pos, 0);
-  }
-
-  /** Set a position to the start of this sequence. */
-  protected void makeStartPosition(PositionContainer poses, int positionNumber)
-  {
-    makePosition(0, false, poses, positionNumber);
-  }
-
-  /** Set a position to the end of this sequence. */
-  public void makeEndPosition(SeqPosition pos)
-  {
-    makeEndPosition(pos, 0);
-    pos.setSequence(0, this); // FIXME - handled by caller?
-  }
-
-  protected void makeEndPosition(PositionContainer poses, int positionNumber)
-  {
-    makePosition(size(), true, poses, positionNumber);
-  }
+  public int startPos () { return 0; }
+  public int endPos () { return -1; }
 
   /**
-   * Reclaim any resources used by the given position pair.
-   * @param ipos integer part of the position being free'd.
-   * @param xpos Object part of the position being free'd.
+   * Reclaim any resources used by the given position int.
+   * @param ipos the Pos being free'd.
    */
-  protected void releasePosition(int ipos, Object xpos)
+  protected void releasePos(int ipos)
   {
   }
 
-  protected final void releasePosition(SeqPosition pos)
-  {
-    releasePosition(pos.ipos, pos.xpos);
-  }
-
-  protected void releasePosition(PositionContainer posSet, int posNumber)
-  {
-    int ipos = posSet.getPositionInt(posNumber);
-    Object xpos = posSet.getPositionPtr(posNumber);
-    releasePosition(ipos, xpos);
-  }
-
-  /** Make a copy of a position pair.
-   * For simple positions this is a simple copy (assignment).
+  /** Make a copy of a position int.
+   * For simple positions returns the argument.
    * However, if the positions are magic cookies that are actively managed
    * by the sequence (as opposed to for example a simple index), then making
    * a copy may need to increment a reference count, or maybe allocate a
-   * new position pair.  In any case, the new pair is initialized to the
-   * same offset (and isAfter property) as the original.
-   * @param ipos integer part of the position being copied.
-   * @param xpos Object part of the position being copied.
-   * @param posSet where to put the new copy
-   * @param posNumber which psoition in posSet that gets the copy.
+   * new position cookie.  In any case, the new position is initialized to
+   * the same offset (and isAfter property) as the original.
+   * @param ipos the position being copied.
+   * @return the new position
    */
-  public void copyPosition(int ipos, Object xpos,
-			   PositionContainer posSet, int posNumber)
+  public int copyPos (int ipos)
   {
-    /*
-    makePosition(nextIndex(ipos, xpos), isAfter(ipos, xpos),
-		 posSet, posNumber);
-    */
-    posSet.setSequence(posNumber, this);
-    posSet.setPosition(posNumber, ipos, xpos);
+    return ipos;
   }
 
-  /** Get offset of (ipos1,xpos1) relative to (ipos0,xpos0). */
-  protected int getIndexDifference(int ipos1, Object xpos1,
-                                   int ipos0, Object xpos0)
+  /** Get offset of (ipos1) relative to (ipos0). */
+  protected int getIndexDifference(int ipos1, int ipos0)
   {
-    return nextIndex(ipos1, xpos1) - nextIndex(ipos0, xpos0);
+    return nextIndex(ipos1) - nextIndex(ipos0);
   }
 
   /**
    * Get the offset from the beginning corresponding to a position pair.
-   * Note default implementation only works for array-like sequences!
    */
-  protected int nextIndex(int ipos, Object xpos)
+  protected int nextIndex(int ipos)
   {
     throw unsupported("nextIndex");
   }
 
-  protected int fromEndIndex(int ipos, Object xpos)
+  protected int fromEndIndex(int ipos)
   {
-    return size() - nextIndex(ipos, xpos);
+    return size() - nextIndex(ipos);
   }
 
   /**
@@ -508,82 +417,63 @@ public abstract class AbstractSequence
    * Normally the same as size(), but may be different if this Sequence
    * is a tree and the position points at an interior node.
    */
-  protected int getContainingSequenceSize(int ipos, Object xpos)
+  protected int getContainingSequenceSize(int ipos)
   {
     return size();
   }
 
-  /** Called by SeqPosition.hasNext. */
-  public boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext (int ipos)
   {
-    return nextIndex(ipos, xpos) != size();
+    return nextIndex(ipos) != size();
   }
 
-  public int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos)
   {
-    return hasNext(ipos, xpos) ? Sequence.OBJECT_VALUE : Sequence.EOF_VALUE;
+    return hasNext(ipos) ? Sequence.OBJECT_VALUE : Sequence.EOF_VALUE;
   }
 
-  public String getNextTypeName(int ipos, Object xpos)
+  public String getNextTypeName(int ipos)
   {
     return null;
   }
 
-  public Object getNextTypeObject(int ipos, Object xpos)
+  public Object getNextTypeObject(int ipos)
   {
     return null;
   }
 
   /** Called by SeqPosition.hasPrevious. */
-  protected boolean hasPrevious(int ipos, Object xpos)
+  protected boolean hasPrevious(int ipos)
   {
-    return nextIndex(ipos, xpos) != 0;
+    return nextIndex(ipos) != 0;
   }
 
-  /** Move forward one element position.
-   * @return true unless at end of sequence.
+  /** Return the next position following the argument.
+   * The new position has the isAfter property.
+   * The argument is implicitly released (as in releasePos).
+   * Returns 0 if we are already at end of file.
    */
-  public boolean gotoNext(PositionContainer posSet, int posNumber)
+  public int nextPos (int ipos)
   {
-    int ipos = posSet.getPositionInt(posNumber);
-    Object xpos = posSet.getPositionPtr(posNumber);
-    if (! hasNext(ipos, xpos))
-      return false;
-    if (true) // FIXME if not managed positions
-      makeRelativePosition(ipos, xpos, 1, true, posSet, posNumber);
-    else
-      {
-	int index = nextIndex(ipos, xpos);
-	releasePosition(posSet, posNumber);
-	makePosition(index + 1, true, posSet, posNumber);
-      }
-    return true;
+    if (! hasNext(ipos))
+      return 0;
+    int next = createRelativePos(ipos, 1, true);
+    releasePos(ipos);
+    return next;
   }
 
-  /** Potential optimization. */
-  public boolean gotoNext(SeqPosition pos)
-  {
-    return gotoNext(pos, 0);
-  }
-
-  /** Move backwards one element.
-   * @return false iff already at beginning.
+  /** Return the previous position following the argument.
+   * The new position has the isBefore property.
+   * The argument is implicitly released (as in releasePos).
+   * Returns -1 if we are already at beginning of file.
    */
-  protected boolean gotoPrevious(PositionContainer posSet, int posNumber)
+  public int previousPos (int ipos)
   {
-    int ipos = posSet.getPositionInt(posNumber);
-    Object xpos = posSet.getPositionPtr(posNumber);
-    if (! hasPrevious(ipos, xpos))
-      return false;
-    if (true) // FIXME if not managed positions
-      makeRelativePosition(ipos, xpos, -1, false, posSet, posNumber);
-    else
-      {
-	int index = nextIndex(ipos, xpos);
-	releasePosition(posSet, posNumber);
-	makePosition(index - 1, false, posSet, posNumber);
-      }
-    return true;
+    if (! hasPrevious(ipos))
+      return 0;
+    int next = createRelativePos(ipos, -1, false);
+    releasePos(ipos);
+    return next;
   }
 
   /** Set position before first child (of the element following position).
@@ -591,9 +481,24 @@ public abstract class AbstractSequence
    *   false if current position is end of sequence or following element
    *   is atomic (cannot have children).
    */
-  public boolean gotoChildrenStart(TreePosition pos)
+  public final boolean gotoChildrenStart(TreePosition pos)
   {
-    return false;
+    int ipos = firstChildPos(pos.getPos());
+    if (ipos == 0)
+      return false;
+    pos.push(this, ipos);
+    return true;
+  }
+
+  /** Get position before first child (of the element following position).
+   * @param inpos parant position.  It is not released by this method.
+   * @return non-zero position cookie if there is a child sequence
+   *   (which might be empty);  zero if current position is end of sequence
+   *   or following element is atomic (cannot have children).
+   */
+  public int firstChildPos (int ipos)
+  {
+    return 0;
   }
 
   protected boolean gotoParent(TreePosition pos)
@@ -620,37 +525,38 @@ public abstract class AbstractSequence
   }
 
   /** Get the element following the specified position.
-   * @param ipos integer part of the specified position.
-   * @param xpos Object part of the specified position.
+   * @param ipos the specified position.
    * @return the following element, or eofValue if there is none.
    * Called by SeqPosition.getNext. */
-  protected  Object getNext(int ipos, Object xpos)
+  public Object getPosNext(int ipos)
   {
-    // wrong result if out of bounds FIXME
-    return get(nextIndex(ipos, xpos));
+    if (! hasNext(ipos))
+      return Sequence.eofValue;
+    return get(nextIndex(ipos));
   }
 
   /** Get the element before the specified position.
-   * @param ipos integer part of the specified position.
-   * @param xpos Object part of the specified position.
-   * @return the following element, or eofValue if there is none.
-   * Called by SeqPosition.getNext. */
-  protected Object getPrevious(int ipos, Object xpos)
+   * @param ipos the specified position.
+   * @return the following element, or eofValue if there is none. */
+  protected Object getPosPrevious(int ipos)
   {
-    return get(nextIndex(ipos, xpos) - 1);
+    int index = nextIndex(ipos);
+    if (index <= 0)
+      return Sequence.eofValue;
+    return get(index - 1);
   }
 
-  protected void setNext(int ipos, Object xpos, Object value)
+  protected void setPosNext(int ipos, Object value)
   {
-    int index = nextIndex(ipos, xpos);
+    int index = nextIndex(ipos);
     if (index >= size())
       throw new IndexOutOfBoundsException();
     set(index, value);
   }
 
-  protected void setPrevious(int ipos, Object xpos, Object value)
+  protected void setPosPrevious(int ipos, Object value)
   {
-    int index = nextIndex(ipos, xpos);
+    int index = nextIndex(ipos);
     if (index == 0)
       throw new IndexOutOfBoundsException();
     set(index - 1, value);
@@ -658,36 +564,36 @@ public abstract class AbstractSequence
 
   public final int nextIndex(SeqPosition pos)
   {
-    return nextIndex(pos.ipos, pos.xpos);
+    return nextIndex(pos.ipos);
   }
 
-  /** Compare two positions, and indicate if the are the same position. */
-  public boolean equals(int ipos1, Object xpos1, int ipos2, Object xpos2)
+  /** Compare two positions, and indicate if they are the same position. */
+  public boolean equals(int ipos1, int ipos2)
   {
-    return compare(ipos1, xpos1, ipos2, xpos2) == 0;
+    return compare(ipos1, ipos2) == 0;
   }
 
   /** Compare two positions, and indicate their relative order. */
-  public int compare(int ipos1, Object xpos1, int ipos2, Object xpos2)
+  public int compare(int ipos1, int ipos2)
   {
-    int i1 = nextIndex(ipos1, xpos1);
-    int i2 = nextIndex(ipos2, xpos2);
+    int i1 = nextIndex(ipos1);
+    int i2 = nextIndex(ipos2);
     return i1 < i2 ? -1 : i1 > i2 ? 1 : 0;
   }
 
   public final int compare(SeqPosition i1, SeqPosition i2)
   {
-    return compare(i1.ipos, i1.xpos, i2.ipos, i2.xpos);
+    return compare(i1.ipos, i2.ipos);
   }
 
   public Object[] toArray() 
   { 
     int len = size(); 
     Object[] arr = new Object[len];
-    
-    java.util.Enumeration e = elements();
-    for (int i = 0;  e.hasMoreElements(); i++)
-      arr[i] = e.nextElement();
+    int it = startPos();
+    int i = 0;
+    while ((it = nextPos(it)) != 0)
+      arr[i++] = getPosPrevious(it);
     return arr;
   } 
 
@@ -702,10 +608,10 @@ public abstract class AbstractSequence
       alen = len; 
     }
     
-    java.util.Enumeration e = elements();
-    for (int i = 0;  e.hasMoreElements(); i++)
+    int it = startPos();
+    for (int i = 0;  (it = nextPos(it)) != 0; i++)
     {
-      arr[i] = e.nextElement();
+      arr[i] = getPosPrevious(it);
     } 
     if (len < alen) 
       arr[len] = null; 
@@ -714,13 +620,12 @@ public abstract class AbstractSequence
 
   public int hashCode()
   {
-    // Implementation specified by the Collections specification. 
+    // Implementation specified by the Collections specification.
     int hash = 1;
-    SeqPosition i = getIterator();
-    while (i.hasNext())
+    for (int i = startPos(); (i = nextPos(i)) != 0;  )
       {
-        Object obj = i.next();
-        hash = 31*hash + (obj==null ? 0 : obj.hashCode());
+	Object obj = getPosPrevious(i);
+	hash = 31*hash + (obj==null ? 0 : obj.hashCode());
       }
     return hash;
   }
@@ -775,67 +680,80 @@ public abstract class AbstractSequence
 
   public Sequence subSequence(SeqPosition start, SeqPosition end)
   {
-    return subSequence(start.ipos, start.xpos, end.ipos, end.xpos);
+    return subSequencePos(start.ipos, end.ipos);
   }
 
-  protected Sequence subSequence(int ipos0, Object xpos0,
-				 int ipos1, Object xpos1)
+  protected Sequence subSequencePos(int ipos0, int ipos1)
   {
-    SubSequence sub = new SubSequence(this);
-    copyPosition(ipos0, xpos0, sub, 0);
-    copyPosition(ipos1, xpos1, sub, 1);
-    return sub;
+    return new SubSequence(this, ipos0, ipos1);
   }
 
 @if WITH COLLECTIONS@
   public List subList(int fromIx, int toIx)
   {
-    SubSequence sub = new SubSequence(this);
-    makePosition(fromIx, false, sub, 0);
-    makePosition(toIx, true, sub, 1);
-    return sub;
+    return new SubSequence(this,
+			   createPos(fromIx, false),
+			   createPos(toIx, true));
   }
 @endif WITH COLLECTIONS@
 
   /** Copy an element specified by a position pair to a Consumer.
-   * @return if hasNext(ipos, xpos). */
-  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+   * @return if hasNext(ipos). */
+  public boolean consumeNext (int ipos, Consumer out)
   {
-    if (! hasNext(ipos, xpos))
+    if (! hasNext(ipos))
       return false;
-    out.writeObject(getNext(ipos, xpos));
+    out.writeObject(getPosNext(ipos));
     return true;
   }
 
-  protected void consume(int iposStart, Object xposStart,
-			 int iposEnd, Object xposEnd, Consumer out)
+  public void consumePosRange(int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())
       return;
-    SeqPosition it = new SeqPosition();
-    copyPosition(iposStart, xposStart, it, 0);
-    while (! equals(it.ipos, it.xpos, iposEnd, xposEnd))
+    int it = copyPos(iposStart);
+    while (! equals(it, iposEnd))
       {
-	if (! it.hasNext())
+	if (! hasNext(it))
 	  throw new RuntimeException();
-	out.writeObject(it.nextElement());
+	out.writeObject(getPosNext(it));
       }
-    it.finalize();
+    releasePos(it);
   }
-
-  /*
-  Consume wlements, without any beginGroup/endGroup.
-  public void consumeElements() ...
-  */
 
   public void consume(Consumer out)
   {
+    boolean isSequence = this instanceof Sequence;
     String typeName = "#sequence"; 
     String type = typeName;
-    out.beginGroup(typeName, type);
-    java.util.Enumeration e = elements();
-    for (int i = 0;  e.hasMoreElements(); i++)
-      out.writeObject(e.nextElement());
-    out.endGroup(typeName);
+    if (isSequence)
+      out.beginGroup(typeName, type);
+    consumePosRange(startPos(), endPos(), out);
+    if (isSequence)
+      out.endGroup(typeName);
+  }
+
+  public void toString (String sep, StringBuffer sbuf)
+  {
+    boolean seen = false;
+    for (int i = startPos();  (i = nextPos(i)) != 0; )
+      {
+	if (seen)
+	  sbuf.append(sep);
+	else
+	  seen = true;
+	sbuf.append(getPosPrevious(i));
+      }
+  }
+
+  public String toString ()
+  {
+    StringBuffer sbuf = new StringBuffer(100);
+    if (this instanceof Sequence)
+      sbuf.append('[');
+    toString(", ", sbuf);
+    if (this instanceof Sequence)
+      sbuf.append(']');
+    return sbuf.toString();
   }
 }

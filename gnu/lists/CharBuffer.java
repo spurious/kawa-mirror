@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -11,6 +11,7 @@ package gnu.lists;
 
 public class CharBuffer extends StableVector implements CharSeq
 {
+  // Same as super.base but pre-cast to FString.
   private FString string;
 
   public CharBuffer(FString str)
@@ -94,9 +95,9 @@ public class CharBuffer extends StableVector implements CharSeq
 
   public void delete(int where, int count)
   {
-    int ipos = createPosition(where, false);
-    remove(ipos, null, count);
-    releasePosition(ipos, null);
+    int ipos = createPos(where, false);
+    removePos(ipos, count);
+    releasePos(ipos);
   }
 
   public void insert(int where, String str, boolean beforeMarkers/*ignored*/)

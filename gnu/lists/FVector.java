@@ -132,13 +132,25 @@ implements Externalizable, Consumable
        data[i] = new_value;
   }
 
-  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  public boolean consumeNext(int ipos, Consumer out)
   {
     int index = ipos >>> 1;
     if (index >= size)
       return false;
     out.writeObject(data[index]);
     return true;
+  }
+
+  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
+  {
+    if (out.ignoring())
+      return;
+    int i = iposStart >>> 1;
+    int end = iposEnd >>> 1;
+    if (end > size)
+      end = size;
+    for (;  i < end;  i++)
+      out.writeObject(data[i]);
   }
 
   public void consume(Consumer out)

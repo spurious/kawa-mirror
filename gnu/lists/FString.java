@@ -296,7 +296,7 @@ implements CharSeq, Externalizable, Consumable
     out.write(data, 0, data.length);
   }
 
-  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  public boolean consumeNext (int ipos, Consumer out)
   {
     int index = ipos >>> 1;
     if (index >= size)
@@ -305,14 +305,16 @@ implements CharSeq, Externalizable, Consumable
     return true;
   }
 
-  protected void consume(int iposStart, Object xposStart,
-			 int iposEnd, Object xposEnd, Consumer out)
+  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())
       return;
     int i = iposStart >>> 1;
     int end = iposEnd >>> 1;
-    out.write(data, i, end - i);
+    if (end > size)
+      end = size;
+    if (end > i)
+      out.write(data, i, end - i);
   }
 
   public void writeTo(int start, int count, java.io.Writer dest)

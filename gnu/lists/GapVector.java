@@ -25,7 +25,7 @@ public class GapVector extends AbstractSequence implements Sequence
     return base.getBufferLength() - (gapEnd - gapStart);
   }
 
-  public boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos)
   {
     int index = ipos >>> 1;
     if (index >= gapStart)
@@ -33,9 +33,9 @@ public class GapVector extends AbstractSequence implements Sequence
     return index < base.getBufferLength();
   }
 
-  public int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos)
   {
-    return hasNext(ipos, xpos) ? base.getElementKind() : EOF_VALUE;
+    return hasNext(ipos) ? base.getElementKind() : EOF_VALUE;
   }
 
   public Object get (int index)
@@ -60,17 +60,15 @@ public class GapVector extends AbstractSequence implements Sequence
     base.fill(0, gapStart, value);
   }
 
-  public void fill(int fromIndex, int toIndex, Object value)
+  public void fillPosRange(int fromPos, int toPos, Object value)
   {
-    int i = fromIndex;
-    int limit = gapStart < toIndex ? gapStart : toIndex;
-    for (;  i < limit;  i++)
-      set(i, value);
-    int gapSize = gapEnd - gapStart;
-    i = limit + gapSize;
-    limit += toIndex;
-    for (;  i < limit;  i++)
-      set(i, value);
+    int from = fromPos == -1 ? base.size : fromPos >>> 1;
+    int to = toPos == -1 ? base.size : toPos >>> 1;
+    int limit = gapStart < to ? gapStart : to;
+    for (int i = from;  i < limit;  i++)
+      base.setBuffer(i, value);
+    for (int i = gapEnd;  i < to;  i++)
+      base.setBuffer(i, value);
   }
 
   protected void shiftGap(int newGapStart)
@@ -111,14 +109,13 @@ public class GapVector extends AbstractSequence implements Sequence
       shiftGap(where);
   }
 
-  protected void add(PositionContainer posSet, int posNumber, Object value)
+  protected int addPos (int ipos, Object value)
   {
-    int ipos = posSet.getPositionInt(posNumber);
     int index = ipos >>> 1;
     if (index >= gapStart)
       index += gapEnd - gapStart;
     add(index, value);
-    posSet.setPosition(posNumber, ((index + 1) << 1) | 1, null);
+    return ((index + 1) << 1) | 1;
   }
 
   public void add(int index, Object o)
@@ -128,7 +125,7 @@ public class GapVector extends AbstractSequence implements Sequence
     gapStart++;
   }
 
-  protected void remove(int ipos0, Object xpos0, int ipos1, Object xpos1)
+  protected void removePosRange(int ipos0, int ipos1)
   {
     ipos0 >>>= 1;
     ipos1 >>>= 1;
@@ -157,12 +154,7 @@ public class GapVector extends AbstractSequence implements Sequence
   }
   */
 
-  public void clear()
-  {
-    remove(0, null, base.getBufferLength() << 1, null);
-  }
-
-  public int createPosition(int index, boolean isAfter)
+  public int createPos(int index, boolean isAfter)
   {
     if (index > gapStart)
       index += gapEnd - gapStart;
@@ -170,21 +162,20 @@ public class GapVector extends AbstractSequence implements Sequence
     return (index << 1) | (isAfter ? 1 : 0);
   }
 
-  protected boolean isAfter(int ipos, Object xpos)
+  protected boolean isAfterPos(int ipos)
   {
     return (ipos & 1) != 0;
   }
 
-  protected int nextIndex(int ipos, Object xpos)
+  protected int nextIndex(int ipos)
   {
-    int index = ipos >>> 1;
+    int index = ipos == -1 ? base.getBufferLength() : ipos >>> 1;
     if (index > gapStart)
       index -= gapEnd - gapStart;
     return index;
   }
 
-  public void consume(int iposStart, Object xposStart,
-		      int iposEnd, Object xposEnd, Consumer out)
+  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())
       return;
@@ -193,12 +184,12 @@ public class GapVector extends AbstractSequence implements Sequence
     if (i < gapStart)
       {
 	int lim = end > gapStart ? end : gapStart;
-	consume(iposStart, null, lim << 1, null, out);
+	consumePosRange(iposStart, lim << 1, out);
       }
     if (end > gapEnd)
       {
 	i = i < gapEnd ? gapEnd : i;
-	consume(i << 1, null, iposEnd, null, out);
+	consumePosRange(i << 1, iposEnd, out);
       }
   }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -82,6 +82,53 @@ public class Pair extends LList implements Externalizable
 	slow = ((Pair)slow).cdr;
 	fast = ((Pair)fast_pair.cdr).cdr;
 	n += 2;
+      }
+  }
+
+  public boolean hasNext (int ipos)
+  {
+    if (ipos <= 0)
+      return ipos == 0;
+    return PositionManager.getPositionObject(ipos).hasNext();
+  }
+
+  public int nextPos (int ipos)
+  {
+    if (ipos <= 0)
+      {
+	if (ipos < 0)
+	  return 0;
+	return PositionManager.manager
+	  .register(new LListPosition(this, 1, true));
+      }
+    LListPosition it = (LListPosition) PositionManager.getPositionObject(ipos);
+    return it.gotoNext() ? ipos : 0;
+  }
+
+  public Object getPosNext (int ipos)
+  {
+    if (ipos <= 0)
+      return ipos == 0 ? car : eofValue;
+    return PositionManager.getPositionObject(ipos).getNext();
+  }
+
+  public Object getPosPrevious (int ipos)
+  {
+    if (ipos <= 0)
+      return ipos == 0 ? eofValue : lastPair().car;
+    return PositionManager.getPositionObject(ipos).getPrevious();
+  }
+
+  public final Pair lastPair()
+  {
+    Pair pair = this;
+    for (;;)
+      {
+	Object next = pair.cdr;
+	if (cdr instanceof Pair)
+	  pair = (Pair) next;
+	else
+	  return pair;
       }
   }
 

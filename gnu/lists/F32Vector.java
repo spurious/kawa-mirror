@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -124,7 +124,7 @@ public class F32Vector extends SimpleVector  implements Externalizable
 
   public String getTag() { return "f32"; }
 
-  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  public boolean consumeNext (int ipos, Consumer out)
   {
     int index = ipos >>> 1;
     if (index >= size)
@@ -133,8 +133,7 @@ public class F32Vector extends SimpleVector  implements Externalizable
     return true;
   }
 
-  public void consume(int iposStart, Object xposStart,
-		      int iposEnd, Object xposEnd, Consumer out)
+    public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())
       return;

@@ -10,5 +10,5 @@ package gnu.lists;
 
 public interface ElementPredicate
 {
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos);
+  public boolean isInstancePos (AbstractSequence seq, int ipos);
 }

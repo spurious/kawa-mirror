@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -59,6 +59,9 @@ public class StableVector extends GapVector
    * positions[END] is always (size()<<1)+1. */
   static final int END_POSITION = 1;
 
+  public int startPos () { return START_POSITION; }
+  public int endPos () { return END_POSITION; }
+
   public StableVector(SimpleVector base)
   {
     super(base);
@@ -94,17 +97,7 @@ public class StableVector extends GapVector
     return pos;
   }
 
-  protected void makeStartPosition(PositionContainer posSet, int posNumber)
-  {
-    posSet.setPosition(posNumber, START_POSITION, null);
-  }
-
-  protected void makeEndPosition(PositionContainer posSet, int posNumber)
-  {
-    posSet.setPosition(posNumber, END_POSITION, null);
-  }
-
-  public int createPosition(int index, boolean isAfter)
+  public int createPos (int index, boolean isAfter)
   {
     if (index == 0 && ! isAfter)
       return START_POSITION;
@@ -117,12 +110,12 @@ public class StableVector extends GapVector
     return ipos;
   }
 
-  protected boolean isAfter(int ipos)
+  protected boolean isAfterPos (int ipos)
   {
     return (positions[ipos] & 1) != 0;
   }
 
-  public boolean hasNext(int ipos, Object xpos)
+  public boolean hasNext(int ipos)
   {
     int ppos = positions[ipos];
     int index = ppos >>> 1;
@@ -131,22 +124,24 @@ public class StableVector extends GapVector
     return index < base.getBufferLength();
   }
 
-  public boolean gotoNext(PositionContainer posSet, int posNumber)
+  public int nextPos (int ipos)
   {
-    int ipos = posSet.getPositionInt(posNumber);
     int ppos = positions[ipos];
     int index = ppos >>> 1;
     if (index >= gapStart)
       index += gapEnd - gapStart;
     if (index >= base.getBufferLength())
-      return false;
+      {
+	releasePos(ipos);
+	return 0;
+      }
     if (ipos == 0)
-      ipos = createPosition(0, true);
+      ipos = createPos(0, true);
     positions[ipos] = ppos | 1;
-    return true;
+    return ipos;
   }
 
-  public int nextIndex(int ipos, Object xpos)
+  public int nextIndex (int ipos)
   {
     int index = positions[ipos] >>> 1;
     if (index > gapStart)
@@ -154,7 +149,7 @@ public class StableVector extends GapVector
     return index;
   }
 
-  public void releasePosition(int ipos, Object xpos)
+  public void releasePos(int ipos)
   {
     if (ipos >= 2)
       {
@@ -165,8 +160,7 @@ public class StableVector extends GapVector
       }
   }
 
-  public void copyPosition(int ipos, Object xpos,
-			   PositionContainer posSet, int posNumber)
+  public int copyPos (int ipos)
   {
     if (ipos > END_POSITION)
       {
@@ -174,8 +168,12 @@ public class StableVector extends GapVector
 	positions[i] = positions[ipos];
 	ipos = i;
       }
-    posSet.setPosition(posNumber, ipos, null);
-    posSet.setSequence(posNumber, this); // FIXME - handled by caller?
+    return ipos;
+  }
+
+  public void fillPosRange(int fromPos, int toPos, Object value)
+  {
+    fillPosRange(positions[fromPos], positions[toPos], value);
   }
 
   protected void shiftGap(int newGapStart)
@@ -245,9 +243,8 @@ public class StableVector extends GapVector
 		    (newLength - oldLength) << 1);
   }
 
-  protected void add(PositionContainer posSet, int posNumber, Object value)
+  protected int addPos(int ipos, Object value)
   {
-    int ipos = posSet.getPositionInt(posNumber);
     int ppos = positions[ipos];
     int index = ppos >>> 1;
     if (index >= gapStart)
@@ -256,16 +253,17 @@ public class StableVector extends GapVector
     if ((ppos & 1) == 0)
       {
 	if (ipos == 0)
-	  ipos = createPosition(0, true);
+	  ipos = createPos(0, true);
 	else
 	  positions[ipos] = ppos | 1;
       }
     add(index, value);
+    return ipos;
   }
 
-  protected void remove(int ipos0, Object xpos0, int ipos1, Object xpos1)
+  protected void removePosRange(int ipos0, int ipos1)
   {
-    super.remove(positions[ipos0], null, positions[ipos1], null);
+    super.removePosRange(positions[ipos0], positions[ipos1]);
 
     // adjust positions in gap
     int low = gapStart;
@@ -290,9 +288,8 @@ public class StableVector extends GapVector
   }
   */
 
-  public void consume(int iposStart, Object xposStart,
-		      int iposEnd, Object xposEnd, Consumer out)
+  public void consumePosRange (int iposStart, int iposEnd, Consumer out)
   {
-    super.consume(positions[iposStart], null, positions[iposEnd], null, out);
+    super.consumePosRange(positions[iposStart], positions[iposEnd], out);
   }
 }

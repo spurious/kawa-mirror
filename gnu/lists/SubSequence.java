@@ -1,4 +1,4 @@
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -8,7 +8,7 @@ package gnu.lists;
  */
 
 public class SubSequence
-extends AbstractSequence implements Sequence, PositionContainer
+extends AbstractSequence implements Sequence
 {
   /** Normally the Sequence this a sub-sequence of.
    * Actually the sequence that provides context for the
@@ -18,17 +18,18 @@ extends AbstractSequence implements Sequence, PositionContainer
   /** Integer part of start position. */
   int ipos0;
 
-  /** Pointer part of start position. */
-  Object xpos0;
-
   /** Integer part of end position. */
   int ipos1;
 
-  /** Pointer part of end position. */
-  Object xpos1;
-
   public SubSequence()
   {
+  }
+
+  public SubSequence(AbstractSequence base, int startPos, int endPos)
+  {
+    this.base = base;
+    this.ipos0 = startPos;
+    this.ipos1 = endPos;
   }
 
   public SubSequence(AbstractSequence base)
@@ -40,103 +41,83 @@ extends AbstractSequence implements Sequence, PositionContainer
   {
     if (index < 0)
       throw new IndexOutOfBoundsException();
-    int start = base.nextIndex(ipos0, xpos0);
+    int start = base.nextIndex(ipos0);
     return base.get(start + index);
   }
 
   public int size()
   {
-    return base.getIndexDifference(ipos1, xpos1, ipos0, xpos0);
+    return base.getIndexDifference(ipos1, ipos0);
   }
 
-  public void remove(int ipos0, Object xpos0, int ipos1, Object xpos1)
+  public void removePosRange(int istart, int iend)
   {
-    base.remove(ipos0, xpos0, ipos1, xpos1);
+    base.removePosRange(istart == 0 ? ipos0 : istart == -1 ? ipos1 : istart,
+			iend == -1 ? ipos1 : iend == 0 ? ipos0 : iend);
   }
 
-  public int getPositionInt(int positionNumber)
-  { return positionNumber == 0 ? ipos0 : ipos1; }
-  public Object getPositionPtr(int positionNumber)
-  { return positionNumber == 0 ? xpos0 : xpos1; }
-  public void setPosition(int positionNumber, int ipos, Object xpos)
-  {
-    if (positionNumber == 0)
-      { ipos0 = ipos;  xpos0 = xpos; }
-    else
-      { ipos1 = ipos;  xpos1 = xpos; }
-  }
-  public void setSequence(int positionNumber, AbstractSequence seq) { }
-  public int countPositions() { return 2; }
+  protected boolean isAfterPos(int ipos)
+  { return base.isAfterPos(ipos); }
 
-  protected boolean isAfter(int ipos, Object xpos)
-  { return base.isAfter(ipos, xpos); }
-
-  public void makePosition(int offset, boolean isAfter,
-			   PositionContainer posSet, int posNumber)
+  public int createPos(int offset, boolean isAfter)
   {
-    base.makeRelativePosition(ipos0, xpos0, offset, isAfter,
-                             posSet, posNumber);
+    return base.createRelativePos(ipos0, offset, isAfter);
   }
 
-  public void makeRelativePosition(int istart, Object xstart,
-                                  int offset, boolean isAfter,
-                                  PositionContainer posSet,
-                                  int posNumber)
+  public int createRelativePos(int pos, int offset, boolean isAfter)
   {
-    base.makeRelativePosition(istart, xstart, offset, isAfter,
-                             posSet, posNumber);
+    return base.createRelativePos(pos, offset, isAfter);
   }
 
-  protected int getIndexDifference(int ipos1, Object xpos1,
-                                 int ipos0, Object xpos0)
+  protected int getIndexDifference(int ipos1, int ipos0)
   {
-    return base.getIndexDifference(ipos1, xpos1, ipos0, xpos0);
+    return base.getIndexDifference(ipos1, ipos0);
   }
 
-  public void releasePosition(int ipos, Object xpos)
+  public void releasePos(int ipos)
   {
-    base.releasePosition(ipos, xpos);
+    base.releasePos(ipos);
   }
 
-  protected int nextIndex(int ipos, Object xpos)
+  protected int nextIndex (int ipos)
   {
-    return getIndexDifference(ipos, xpos, ipos0, xpos0);
+    return getIndexDifference(ipos, ipos0);
   }
 
-  public int compare(int ipos1, Object xpos1, int ipos2, Object xpos2)
+  public int compare (int ipos1, int ipos2)
   {
-    return base.compare(ipos1, xpos1, ipos2, xpos2);
+    return base.compare(ipos1, ipos2);
   }
 
-  protected Object getNext(int ipos, Object xpos)
+  public Object getPosNext(int ipos)
   {
-    if (base.compare(ipos, xpos, ipos1, xpos1) >= 0)
+    if (base.compare(ipos, ipos1) >= 0)
       return eofValue;
-    return base.getNext(ipos, xpos);
+    return base.getPosNext(ipos);
   }
 
-  public int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos)
   {
-    if (base.compare(ipos, xpos, ipos1, xpos1) >= 0)
+    if (base.compare(ipos, ipos1) >= 0)
       return EOF_VALUE;
-    return base.getNextKind(ipos, xpos);
+    return base.getNextKind(ipos);
   }
 
-  protected Object getPrevious(int ipos, Object xpos)
+  protected Object getPosPrevious(int ipos)
   {
-    if (base.compare(ipos, xpos, ipos0, xpos0) <= 0)
+    if (base.compare(ipos, ipos0) <= 0)
       return eofValue;
-    return base.getPrevious(ipos, xpos);
+    return base.getPosPrevious(ipos);
   }
 
   public void clear()
   {
-    remove(ipos0, xpos0, ipos1, xpos1);
+    removePosRange(ipos0, ipos1);
   }
 
   public void finalize()
   {
-    base.releasePosition(ipos0, xpos0);
-    base.releasePosition(ipos1, xpos1);
+    base.releasePos(ipos0);
+    base.releasePos(ipos1);
   }
 }

@@ -9,6 +9,5 @@ package gnu.lists;
 
 public interface GroupPredicate extends NodePredicate
 {
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
-			    Object groupType);
+  public boolean isInstance(AbstractSequence seq, int ipos, Object groupType);
 }

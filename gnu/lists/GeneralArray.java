@@ -97,6 +97,19 @@ implements Array //, Consumable
     return getRowMajor(index);
   }
 
+  public int createPos(int index, boolean isAfter)
+  {
+    int total = offset;
+    for (int i = dimensions.length;  --i >= 0; )
+      {
+	int dim = dimensions[i];
+	int cur = index % dim;
+	index = index / dim;
+	total = total + strides[i] * cur;
+      }
+    return (total << 1) | (isAfter ? 1 : 0);
+  }
+
   public Object getRowMajor(int index)
   {
     if (simple)

@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 package gnu.lists;
 
@@ -26,7 +26,7 @@ implements
 @if WITH COLLECTIONS@
     java.util.ListIterator,
 @endif WITH COLLECTIONS@
-    PositionContainer, java.util.Enumeration
+    java.util.Enumeration
 {
   /**
    * The Sequence relative to which ipos and xpos have meaning.
@@ -41,12 +41,6 @@ implements
    */
   public int ipos;
 
-  /**
-   * An Object that (together with ipos) indicates the current position.
-   * The actual value has no meaning, except as interpreted by sequence.
-   */
-  public Object xpos;
-
   public SeqPosition()
   {
   }
@@ -59,84 +53,94 @@ implements
   public SeqPosition(AbstractSequence seq, int offset, boolean isAfter)
   {
     this.sequence = seq;
-    seq.makePosition(offset, isAfter, this, 0);
+    ipos = seq.createPos(offset, isAfter);
   }
 
-  public SeqPosition(AbstractSequence seq, int ipos, Object xpos)
+  public SeqPosition(AbstractSequence seq, int ipos)
   {
     this.sequence = seq;
     this.ipos = ipos;
-    this.xpos = xpos;
   }
 
-  /** Creates a new SeqPosition, from a position triple.
-   * The position triple is copied (using copyPosition).
+  /** Creates a new SeqPosition, from a position pair.
+   * The position pair is copied (using copyPos).
    */
-  public static SeqPosition make(AbstractSequence seq, int ipos, Object xpos)
+  public static SeqPosition make(AbstractSequence seq, int ipos)
   {
-    SeqPosition pos = new SeqPosition();
-    seq.copyPosition(ipos, xpos, pos, 0);
-    return pos;
+    return new SeqPosition(seq, seq.copyPos(ipos));
+  }
+
+  public SeqPosition copy ()
+  {
+    return new SeqPosition(sequence, sequence.copyPos(getPos()));
   }
  
   public final void gotoStart(AbstractSequence seq)
   {
-    if (sequence != null)
-      sequence.releasePosition(ipos, xpos);
-    sequence = seq;
-    seq.makeStartPosition(this, 0);
+    setPos(seq, seq.startPos());
   }
 
   public final void gotoEnd(AbstractSequence seq)
   {
-    if (sequence != null)
-      sequence.releasePosition(ipos, xpos);
-    sequence = seq;
-    seq.makeEndPosition(this, 0);
+    setPos(seq, seq.endPos());
+  }
+
+  /** Set position before first child (of the element following position).
+   * @return true if there is a child sequence (which might be empty);
+   *   false if current position is end of sequence or following element
+   *   is atomic (cannot have children).
+   */
+  public boolean gotoChildrenStart()
+  {
+    int child = sequence.firstChildPos(getPos());
+    if (child == 0)
+      return false;
+    ipos = child;
+    return true;
   }
 
   /** True if there is an element following the current position.
    * False if we are at the end.  See java.util.Enumeration. */
-  public boolean hasMoreElements()
+  public final boolean hasMoreElements()
   {
-    return sequence.hasNext(ipos, xpos);
+    return hasNext();
   }
 
   /** See java.util.Iterator. */
   public boolean hasNext()
   {
-    return sequence.hasNext(ipos, xpos);
+    return sequence.hasNext(getPos());
   }
 
   /** Return a code (defined in Sequence) for the type of the next element. */
   public int getNextKind()
   {
-    return sequence.getNextKind(ipos, xpos);
+    return sequence.getNextKind(getPos());
   }
 
   /** Get the "tag name" for the next element, if any. */
   public String getNextTypeName()
   {
-    return sequence.getNextTypeName(ipos, xpos);
+    return sequence.getNextTypeName(getPos());
   }
 
   /** Get the "tag object" for the next element, if any. */
   public Object getNextTypeObject()
   {
-    return sequence.getNextTypeObject(ipos, xpos);
+    return sequence.getNextTypeObject(getPos());
   }
 
   /** See java.util.Iterator. */
   public boolean hasPrevious()
   {
-    return sequence.hasPrevious(ipos, xpos);
+    return sequence.hasPrevious(getPos());
   }
 
   /** See java.util.ListIterator. */
   public Object next()
   {
-    Object result = sequence.getNext(ipos, xpos);
-    if (result == Sequence.eofValue || ! sequence.gotoNext(this))
+    Object result = getNext();
+    if (result == Sequence.eofValue || ! gotoNext())
       throw new NoSuchElementException();
     return result;
   }
@@ -144,65 +148,95 @@ implements
   /** Move one element forwards, if possible.
    * @returns if we succeeded in moving forwards (i.e. not at end of sequence).
    */
-  public final boolean gotoNext()
+  public boolean gotoNext()
   {
-    return sequence.gotoNext(this);
+    int next = sequence.nextPos(ipos);
+    if (next != 0)
+      {
+	ipos = next;
+	return true;
+      }
+    else
+      {
+	ipos = -1;
+	return false;
+      }
+  }
+
+  /** Move backwards one element.
+   * @return false iff already at beginning.
+   */
+  public boolean gotoPrevious()
+  {
+    int prev = sequence.previousPos(ipos);
+    if (prev != -1)
+      {
+	ipos = prev;
+	return true;
+      }
+    else
+      {
+	ipos = 0;
+	return false;
+      }
   }
 
   /** See java.util.ListIterator. */
   public Object previous()
   {
-    Object result = sequence.getPrevious(ipos, xpos);
-    if (result == Sequence.eofValue || ! sequence.gotoPrevious(this, 0))
+    Object result = sequence.getPosPrevious(getPos());
+    if (result == Sequence.eofValue || ! gotoPrevious())
       throw new NoSuchElementException();
     return result;
   }
 
   /** See java.util.Enumeration. */
-  public Object nextElement()
+  public final Object nextElement()
     throws NoSuchElementException
   {
-    Object result = sequence.getNext(ipos, xpos);
-    if (result == Sequence.eofValue || ! sequence.gotoNext(this))
-      throw new NoSuchElementException();
-    return result;
+    return next();
   }
 
   /**
    * Get element following current position.
-   * Does not move the position, in contrast to nextElement method.
+   * Does not move the position, in contrast to next() method.
    * @return EOF if at end of sequence, otherwise the value following.
    */
   public Object getNext()
   {
-    return sequence.getNext(ipos, xpos);
+    return sequence.getPosNext(getPos());
   }
 
+  /**
+   * Get element before the current position.
+   * Does not move the position, in contrast to previous() method.
+   * @return EOF if at beginning of sequence, otherwise the value prior.
+   */
   public Object getPrevious()
   {
-    return sequence.getPrevious(ipos, xpos);
+    return sequence.getPosPrevious(getPos());
   }
 
   /** See java.util.Iterator. */
-  public final int nextIndex()
+  public int nextIndex()
   {
-    return sequence.nextIndex(ipos, xpos);
+    return sequence.nextIndex(getPos());
   }
 
   public final int fromEndIndex()
   {
-    return sequence.fromEndIndex(ipos, xpos);
+    return sequence.fromEndIndex(getPos());
   }
 
   public int getContainingSequenceSize()
   {
-    return sequence.getContainingSequenceSize(ipos, xpos);
+    return sequence.getContainingSequenceSize(getPos());
   }
 
   /** See java.util.Iterator. */
   public final int previousIndex()
   {
-    return sequence.nextIndex(ipos, xpos) - 1;
+    return sequence.nextIndex(getPos()) - 1;
   }
 
   /** Does the position pair have the "isAfter" property?
@@ -211,63 +245,85 @@ implements
    * A toNext() or next() command should set isAfter() to true;
    * a toPrevious or previous command should set isAfter() to false.
    */
-  public final boolean isAfter()
+  public boolean isAfter()
   {
-    return sequence.isAfter(ipos, xpos);
+    return sequence.isAfterPos(getPos());
   }
 
   public final void set(Object value)
   {
-    if (sequence.isAfter(ipos, xpos))
-      sequence.setPrevious(ipos, xpos, value);
+    if (isAfter())
+      setPrevious(value);
     else
-      sequence.setNext(ipos, xpos, value);
+      setNext(value);
+  }
+
+  public void setNext (Object value)
+  {
+    sequence.setPosNext(getPos(), value);
+  }
+
+  public void setPrevious (Object value)
+  {
+    sequence.setPosPrevious(getPos(), value);
   }
 
   public void remove()
   {
-    sequence.remove(ipos, xpos, isAfter() ? -1 : 1);
+    sequence.removePos(getPos(), isAfter() ? -1 : 1);
   }
 
   public void add(Object o)
   { 
-    sequence.add(this, 0, o);
+    setPos(sequence.addPos(getPos(), o));
   }
 
-  /** Implements PositionContainer. */
-  public int getPositionInt(int positionNumber) { return ipos; }
-  /** Implements PositionContainer. */
-  public Object getPositionPtr(int positionNumber) { return xpos; }
-  /** Implements PositionContainer. */
-  public void setPosition(int positionNumber, int ipos, Object xpos)
-  { this.ipos = ipos;  this.xpos = xpos; }
-  /** Implements PositionContainer. */
-  public void setSequence(int positionNumber, AbstractSequence seq)
-  { sequence = seq; }
-  /** Implements PositionContainer. */
-  public int countPositions() { return 1; }
+  /** Get a Pos int for this SeqPosition.
+   * By default this is the ipos cookie, but for sequences that need extra
+   * state that an ipos for efficient position, we use a PositionManager index.
+   * So this gets over-ridden in ExtPosition.
+   */
+  public int getPos ()
+  {
+    return ipos;
+  }
 
-  public void init(AbstractSequence seq, int index, boolean isAfter)
+  public void setPos (AbstractSequence seq, int ipos)
   {
     if (sequence != null)
-      sequence.releasePosition(ipos, xpos);
+      sequence.releasePos(getPos());
+    this.ipos = ipos;
+    this.sequence = seq;
+  }
+
+  public void setPos (int ipos)
+  {
+    if (sequence != null)
+      sequence.releasePos(getPos());
+    this.ipos = ipos;
+  }
+
+  public void set (AbstractSequence seq, int index, boolean isAfter)
+  {
+    if (sequence != null)
+      sequence.releasePos(ipos);
     sequence = seq;
-    seq.makePosition(index, isAfter, this, 0);
+    ipos = seq.createPos(index, isAfter);
   }
 
-  public void init(SeqPosition pos)
+  public void set (SeqPosition pos)
   {
     if (sequence != null)
-      sequence.releasePosition(ipos, xpos);
+      sequence.releasePos(ipos);
     sequence = pos.sequence;
-    sequence.copyPosition(pos.ipos, pos.xpos, this, 0);
+    pos.ipos = sequence.copyPos(pos.ipos);
   }
 
   public void release()
   {
     if (sequence != null)
       {
-	sequence.releasePosition(ipos, xpos);
+	sequence.releasePos(getPos());
 	sequence = null;
       }
   }
@@ -291,8 +347,6 @@ implements
       }
     sbuf.append(" ipos: ");
     sbuf.append(ipos);
-    sbuf.append(" xpos: ");
-    sbuf.append(xpos);
     sbuf.append('}');
     return sbuf.toString();
   }

@@ -1,5 +1,5 @@
 // -*-Java-*-
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -57,19 +57,29 @@ public abstract class SimpleVector extends AbstractSequence
 
   public abstract void setBufferLength(int length);
 
-  protected boolean isAfter(int ipos, Object xpos)
+  protected boolean isAfterPos (int ipos)
   {
     return (ipos & 1) != 0;
   }
 
-  protected int nextIndex(int ipos, Object xpos)
+  protected int nextIndex(int ipos)
   {
-    return ipos >>> 1;
+    return ipos == -1 ? size : ipos >>> 1;
   }
 
-  public int createPosition(int index, boolean isAfter)
+  public int createPos(int index, boolean isAfter)
   {
     return (index << 1) | (isAfter ? 1 : 0);
+  }
+
+  public int nextPos (int ipos)
+  {
+    if (ipos == -1)
+      return 0;
+    int index = ipos >>> 1;
+    if (index == size)
+      return 0;
+    return  (index << 1) + 3;
   }
 
   /*
@@ -92,7 +102,7 @@ public abstract class SimpleVector extends AbstractSequence
     return getBuffer(index);
   }
 
-  protected  Object getNext(int ipos, Object xpos)
+  public Object getPosNext (int ipos)
   {
     int index = ipos >>> 1;
     return index >= size ? eofValue : getBuffer(index);
@@ -146,6 +156,14 @@ public abstract class SimpleVector extends AbstractSequence
       setBuffer(i, value);
   }
 
+  public void fillPosRange(int fromPos, int toPos, Object value)
+  {
+    int i = fromPos == -1 ? size : fromPos >>> 1;
+    int j = toPos == -1 ? size : toPos >>> 1;
+    for (; i < j;  i++)
+      setBuffer(i, value);
+  }
+
   public void fill(int fromIndex, int toIndex, Object value)
   {
     if (fromIndex < 0 || toIndex > size)
@@ -166,11 +184,12 @@ public abstract class SimpleVector extends AbstractSequence
     return true;
   }
 
-  protected void add(PositionContainer posSet, int posNumber, Object value)
+  protected int addPos(int ipos, Object value)
   {
-    int ipos = posSet.getPositionInt(posNumber);
-    add(ipos >>> 1, value);
-    posSet.setPosition(posNumber, ipos + 2, null);
+    int index = ipos >>> 1;
+    add(index, value);
+    // Increment index and set isAfter bit.
+    return (index << 1) + 3;
   }
 
   public void add(int index, Object o)
@@ -219,21 +238,25 @@ public abstract class SimpleVector extends AbstractSequence
 
   protected abstract void clearBuffer(int start, int count);
 
-  protected void remove(int ipos0, Object xpos0, int ipos1, Object xpos1)
+  protected void removePosRange(int ipos0, int ipos1)
   {
     ipos0 = ipos0 >>> 1;
     ipos1 = ipos1 >>> 1;
-    if (ipos0 < 0 || ipos0 > ipos1 || ipos1 >= size)
-      throw new IndexOutOfBoundsException();
+    if (ipos0 >= ipos1)
+      return;
+    if (ipos1 > size)
+      ipos1 = size;
     shift(ipos1, ipos0, size - ipos1);
     int count = ipos1 - ipos0;
     size = size - count;
     clearBuffer(size, count);
   }
 
-  public void remove(int ipos, Object xpos, int count)
+  public void removePos(int ipos, int count)
   {
     int index = ipos >>> 1;
+    if (index > size)
+      index = size;
     int ipos0, ipos1;
     if (count >= 0)
       {
@@ -333,10 +356,10 @@ public abstract class SimpleVector extends AbstractSequence
 
   public void consume(int start, int length, Consumer out)
   {
-    consume(start << 1, null, (start + length) << 1, null, out);
+    consumePosRange(start << 1, (start + length) << 1, out);
   }
 
-  public boolean consumeNext(int ipos, Object xpos, Consumer out)
+  public boolean consumeNext(int ipos, Consumer out)
   {
     int index = ipos >>> 1;
     if (index >= size)
@@ -345,20 +368,21 @@ public abstract class SimpleVector extends AbstractSequence
     return true;
   }
 
-  protected void consume(int iposStart, Object xposStart,
-			 int iposEnd, Object xposEnd, Consumer out)
+  public void consumePosRange(int iposStart, int iposEnd, Consumer out)
   {
     if (out.ignoring())
       return;
     int i = iposStart >>> 1;
     int end = iposEnd >>> 1;
+    if (end > size)
+      end = size;
     for (;  i < end;  i++)
       out.writeObject(getBuffer(i));
   }
 
-  public int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos)
   {
-    return hasNext(ipos, xpos) ? getElementKind() : EOF_VALUE;
+    return hasNext(ipos) ? getElementKind() : EOF_VALUE;
   }
 
   public int getElementKind()

@@ -20,13 +20,13 @@ public interface PositionConsumer
    * @return true if we are interested in more nodes.
    */
   // FIXME rename to add or writePosition?
-  public boolean consume(TreePosition position);
+  public boolean consume(SeqPosition position);
 
-  /** Consume a single position triple.
+  /** Consume a single position pair.
    * This PositionConsumer may assume the sequence does no reference
-   * management; i.e. that copyPosition is trivial and releasePosition is
+   * management; i.e. that copyPos is trivial and releasePos is
    * a no-op.  If that is not the case, use consume(TreePosition) instead.
    */
-  public boolean writePosition(AbstractSequence seq, int ipos, Object xpos);
+  public boolean writePosition(AbstractSequence seq, int ipos);
 
 }

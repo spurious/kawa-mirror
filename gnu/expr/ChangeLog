@@ -1,3 +1,12 @@
+2001-08-30  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (mangleNameIfNeeded):  New method.
+	(mangleName): If reversible, '?' becomes plain "$Qu".
+	(demangle2):  Re-write to use one big switch and add missing chars.
+	* ClassExp.java (getCompiledClassType):  Use mangleNameIfNeeded.
+	(getJavaName):  Likewise.
+	(declareParts):  Likewise.  Mangling was missing before.
+
 2001-08-27  Per Bothner  <per@bothner.com>
 
 	* ModuleExp.java (evalModule):  Call CallContext's run method always.

@@ -96,7 +96,7 @@ public class ClassExp extends LambdaExp
 
   public String getJavaName ()
   {
-    return name == null ? "object" : Compilation.mangleName (name);
+    return name == null ? "object" : Compilation.mangleNameIfNeeded (name);
   }
 
   public ClassType getCompiledClassType(Compilation comp)
@@ -120,8 +120,8 @@ public class ClassExp extends LambdaExp
 	  }
 	if (! isSimple() || this instanceof ObjectExp)
 	  name = comp.generateClassName(name);
-	else if (! comp.isValidJavaName(name))
-	  name = comp.mangleName(name, true);
+	else
+	  name = comp.mangleNameIfNeeded(name);
 	type.setName(name);
       }
     return type;
@@ -223,9 +223,10 @@ public class ClassExp extends LambdaExp
 	      }
 	    else
 	      {
+		String fname
+		  = Compilation.mangleNameIfNeeded(decl.getName(), true);
 		decl.field
-		  = instanceType.addField(decl.getName(), decl.getType(),
-					  flags);
+		  = instanceType.addField(fname, decl.getType(), flags);
 		decl.setSimple(false);
 	      }
 	  }

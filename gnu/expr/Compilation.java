@@ -456,6 +456,14 @@ public class Compilation
     return mangleName(name, false);
   }
 
+  public static String mangleNameIfNeeded (String name)
+  {
+    if (isValidJavaName(name))
+      return name;
+    else
+      return mangleName(name, true);
+  }
+
   public static boolean isValidJavaName(String name)
   {
     int len = name.length();
@@ -468,7 +476,7 @@ public class Compilation
   }
 
   /** Convert a string to a safe Java identifier.
-   * @param reversible if we shoudl use an invertible mapping. */
+   * @param reversible if we should use an invertible mapping. */
   public static String mangleName (String name, boolean reversible)
   {
     int len = name.length ();
@@ -534,7 +542,8 @@ public class Compilation
 	      case '#':  mangled.append("$Nm");  break;
 	      case '?':
 		char first = mangled.length() > 0 ? mangled.charAt(0) : '\0';
-		if (i + 1 == len && Character.isLowerCase(first))
+		if (! reversible
+		    && i + 1 == len && Character.isLowerCase(first))
 		  {
 		    mangled.setCharAt(0, Character.toTitleCase(first));
 		    mangled.insert(0, "is");
@@ -567,47 +576,37 @@ public class Compilation
    */
   public static char demangle2(char char1, char char2)
   {
-    switch (char1)
+    switch (char1 << 16 | char2)
       {
-      case 'E':
-	switch (char2)
-	  {
-	  case 'x':  return '!';
-	  }
-	break;
-      case 'G':
-	switch (char2)
-	  {
-	  case 'r':   return '>';
-	  }
-	break;
-      case 'L':
-	switch (char2)
-	  {
-	  case 's':   return '<';
-	  case 'P':   return '(';
-	  }
-	break;
-      case 'M':
-	switch (char2)
-	  {
-	  case 'c':  return '%';
-	  case 'n':  return '-';
-	  }
-	break;
-      case 'P':
-	switch (char2)
-	  {
-	  case 'l':  return '+';
-	  }
-	break;
-      case 'S':
-	switch (char2)
-	  {
-	  case 'l':  return '/';
-	  case 't':  return '*';
-	  }
-	break;
+      case 'A' << 16 | 'm':  return '&';
+      case 'A' << 16 | 't':  return '@';
+      case 'C' << 16 | 'l':  return ':';
+      case 'C' << 16 | 'm':  return ',';
+      case 'D' << 16 | 'q':  return '\"';
+      case 'D' << 16 | 't':  return '.';
+      case 'E' << 16 | 'q':  return '=';
+      case 'E' << 16 | 'x':  return '!';
+      case 'G' << 16 | 'r':  return '>';
+      case 'L' << 16 | 'B':  return '[';
+      case 'L' << 16 | 'C':  return '{';
+      case 'L' << 16 | 'P':  return '(';
+      case 'L' << 16 | 's':  return '<';
+      case 'M' << 16 | 'c':  return '%';
+      case 'M' << 16 | 'n':  return '-';
+      case 'N' << 16 | 'm':  return '#';
+      case 'P' << 16 | 'c':  return '%';
+      case 'P' << 16 | 'l':  return '+';
+      case 'Q' << 16 | 'u':  return '?';
+      case 'R' << 16 | 'B':  return ']';
+      case 'R' << 16 | 'C':  return '}';
+      case 'R' << 16 | 'P':  return ')';
+      case 'S' << 16 | 'C':  return ';';
+      case 'S' << 16 | 'l':  return '/';
+      case 'S' << 16 | 'q':  return '\\';
+      case 'S' << 16 | 't':  return '*';
+      case 'T' << 16 | 'l':  return '~';
+      case 'U' << 16 | 'p':  return '^';
+      case 'V' << 16 | 'B':  return '|';
       }
     return (char) (-1);
   }

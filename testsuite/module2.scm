@@ -1,4 +1,4 @@
-(module-export list-length-1 list-length-3 classify list1234
+(module-export list-length-1 list-length-3 classify list1234 <a8711>
 	       length-diff1 length-diff2 length-diff3 make-literal make-pair)
 (require <module1>)
 (require <module1a>)
@@ -45,3 +45,17 @@
 
 ;; Used to cause stack overflow - see bug #8818.
 (define-abc-func abc-returner)
+
+;; Based on Savannah bug #8711, from Dominique Boucher
+;; If I remove the (module-export <A>) clause or add <B> to the exported
+;; variables, everything works fine. 
+(define-simple-class <A8711> (<java.lang.Object>)
+  ((execute (x :: <int>) (y :: <int>) (z :: <int>) (w :: <int>)) :: <void>
+   #!void))
+(define-simple-class <B8711> (<A8711>)
+  (objects type: <list> init-keyword: objects:)
+  ((execute (x :: <int>) (y :: <int>) (z :: <int>) (w :: <int>)) :: <void>
+   (for-each
+    (lambda (object :: <A8711>)
+      (invoke object 'execute x y z y))
+    objects)))

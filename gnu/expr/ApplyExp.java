@@ -234,9 +234,9 @@ public class ApplyExp extends Expression
   private static void popParams (CodeAttr code, LambdaExp lexp)
   {
     Variable params = lexp.firstVar();
-    if (params.getName() == "this")
+    if (params != null && params.getName() == "this")
       params = params.nextVar();
-    if (params.getName() == "argsArray")
+    if (params != null && params.getName() == "argsArray")
       params = params.nextVar();
     popParams (code, params, lexp.min_args);
   }

@@ -3,6 +3,8 @@
 @setfilename kawa.info
 @settitle Kawa, the Java-based Scheme system
 @setchapternewpage off
+@c @syncodeindex fn cp
+@c @syncodeindex vr cp
 @c version: %W% %G%
 @c %**end of header
 
@@ -137,10 +139,10 @@ the testsuite but less extensively tested).
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
 @ifhtml
-<a href="ftp://ftp.gnu.org/pub/kawa/kawa-stable-compiled.zip">here</a>.
+<a href="ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip">here</a>.
 @end ifhtml
 @ifclear html
-@url{ftp://ftp.gnu.org/pub/kawa/kawa-stable-compiled.zip}.
+@url{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip}.
 @end ifclear
 
 These are all in the @uref{ftp://ftp.gnu.org/pub/gnu/kawa/,Kawa ftp site},
@@ -149,15 +151,15 @@ Debian package file of Kawa.
 
 You can also check out the very latest version via anonymous cvs.
 @example
-cvs -d :pserver:anoncvs@@sourceware.cygnus.com:/cvs/kawa login
+cvs -d :pserver:anoncvs@@anoncvs.cygnus.com:/cvs/kawa login
      (password is ``anoncvs'')
-cvs -d :pserver:anoncvs@@sourceware.cygnus.com:/cvs/kawa co kawa
+cvs -d :pserver:anoncvs@@anoncvs.cygnus.com:/cvs/kawa co kawa
 @end example
 
 Once you have it checked out, you can update it with @code{cvs update}.
 
 You can also
-@uref{http://sourceware.cygnus.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
+@uref{http://anoncvs.cygnus.com/cgi-bin/cvsweb.cgi/kawa/?cvsroot=kawa,view
 the cvs archive} via cvsweb.
 
 @node Installation, Running, Getting Kawa, Top
@@ -333,12 +335,20 @@ export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
 
-I have not yet tried to build Kawa from source on Windows95, though I
-understand others have done so.
-Unless you are using CygWin32 or some other Unix-emulation package,
+@subsection Building Kawa under Windows
+
+The Kawa @code{configure} and @code{make} process assumes a Unix-like
+environment.  If you want to build Kawa from source under Windows
+(95, 98, or NT), one option you might consider is using Cygwin,
+a free Unix-like environment available from
+@url{http://sourceware.cygnus.com/cygwin/}.  The standard
+build instructions then apply.
+
+It is possible to build Kawa from source on Windows95, without
+CygWin32 or some other Unix-emulation package, but in that case
 you will probably be unable to use the @code{configure} scripts
 and @code{Makefile}s.  However, importing all the Java source
-files into your Java develipment environment, and having it
+files into your Java development environment, and having it
 compile them, will handle most of the needed work.  You then
 need to compile the builtin Scheme procedures:
 @example
@@ -438,6 +448,12 @@ Start a server listening from connections on the specified @var{portnum}.
 Each connection using the Telnet protocol causes a new read-eval-print-loop
 to started.  This option allows you to connect using any
 Telnet client program to a remote "Kawa server".
+@item --scheme
+Set the default language to Scheme.
+(This is the default unless you select another language.)
+@item --elisp
+Set the default language to Emacs Lisp.
+(This is not very useful yet - little beyond the parser works.)
 @end table
 
 The following options control which calling conventions are used:
@@ -548,6 +564,7 @@ nor @code{letrec-syntax} are implemented.
 * Keywords::
 * Special named constants::
 * Formals:: Extended formal arguments list
+* Quantities::
 * Logical Number Operations::
 * Strings::
 * Records::
@@ -557,7 +574,7 @@ nor @code{letrec-syntax} are implemented.
 * Exceptions:: Signalling and recovering from exceptions
 * Locations::
 * Eval and Environments::
-* Quantities::
+* Debugging::
 * Threads::
 * Standard Types::
 * Declaring Types of Variables::
@@ -657,7 +674,7 @@ Returns the keyword whose name is @var{string}.
 (The @var{string} does not include a final @code{#\:}.)
 @end defun
 
-@node Formals, Logical Number Operations, Keywords, Extensions
+@node Formals, Quantities, Keywords, Extensions
 @section Extended Formal Arguments List
 
 The formal arguments list of a lambda expression has two
@@ -737,7 +754,51 @@ is @samp{<} and the last is @samp{>}), then tha specifies the
 functions return type.  It is syntactic sugar for
 @code{(as <TYPE> (begin BODY))}.
 
-@node Logical Number Operations, Strings, Formals, Extensions
+@node Quantities, Logical Number Operations, Formals, Extensions
+@section Quantities
+
+As a super-class of numbers, Kawa also provides quantities.
+A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
+The number part can be an arbitrary complex number.
+The unit is a product of integer powers of base units,
+such as meter or second.
+
+Kawa quantities are a generalization of the quantities in DSSSL,
+which only has length-derived quantities.
+
+The precise syntax of quantity literals may change,
+but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
+and @code{4cm2} (4 square centimeters).
+
+@defun quantity? object
+True iff @var{object} is a quantity.  Note that all numbers are
+quantities, but not the other way round.
+@end defun
+
+@defun quantity->number q
+Returns the pure number part of the quantity @var{q}, relative to
+primitive (base) units.
+If @var{q} is a number, returns @var{q}.
+If @var{q} is a unit, yields the magitude of @var{q} relative to base units.
+@end defun
+
+@defun quantity->unit q
+Returns the unit of the quantity @var{q}.
+If @var{q} is a number, returns the empty unit.
+@end defun
+
+@defun make-quantity x unit
+Returns the product of @var{x} (a pure number) and @var{unit}.
+You can specify a string instead of @var{unit}, such as @code{"cm"}
+or @code{"s"} (seconds).
+@end defun
+
+@deffn Syntax define-unit unit-name expression
+Define @var{unit-name} as a unit (that can be used in literals)
+equal to the quantity @var{expression}.
+@end deffn
+
+@node Logical Number Operations, Strings, Quantities, Extensions
 @section Logical Number Operations
 
 These functions operate on the 2's complement binary representation
@@ -997,6 +1058,18 @@ Unspecified what happens on error (such as exiting file with the same name).
 with scsh.)
 @end defun
 
+@defun system-tmpdir
+Return the name of the default directory for temporary files.
+@end defun
+
+@defun make-temporary-file [format]
+Return a file with a name that does not match any existing file.
+Use @var{format} (which defaults to @code{"kawa~d.tmp"}) to generate
+a unique filename in @code{(system-tmpdir)}.
+The current implementation is @emph{not} safe from race conditions;
+this will be fixed in a future release (using Java2 features).
+@end defun
+
 @node Ports, Format, Files, Extensions
 @section Ports
 
@@ -1154,13 +1227,328 @@ A format string passed to @code{format} or @code{parse-format}
 consists of format directives (that start with @samp{~}),
 and regular characters (that are written directly to the destination).
 Most of the Common Lisp (and Slib) format directives are implemented.
-An important exception is that the floating-point directives
-@samp{E}, @samp{G}, and @samp{$} are not implemented, and @samp{F}
-is only supported if the number of digits after the decimal point
-is specified.  Also, neither tabulation, justification, nor pretty-printing
-are supported yet.
+Neither justification, nor pretty-printing are supported yet.
 
 Plus of course, we need documentation for @code{format}!
+
+@subsection Implemented CL Format Control Directives
+
+Documentation syntax: Uppercase characters represent the corresponding
+control directive characters. Lowercase characters represent control
+directive parameter descriptions.
+
+@table @asis
+@item @code{~A}
+Any (print as @code{display} does).
+@table @asis
+@item @code{~@@A}
+left pad.
+@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}A}
+full padding.
+@end table
+@item @code{~S}
+S-expression (print as @code{write} does).
+@table @asis
+@item @code{~@@S}
+left pad.
+@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}S}
+full padding.
+@end table
+
+@item @code{~C}
+Character.
+@table @asis
+@item @code{~@@C}
+prints a character as the reader can understand it (i.e. @code{#\} prefixing).
+@item @code{~:C}
+prints a character as emacs does (eg. @code{^C} for ASCII 03).
+@end table
+@end table
+
+@subsection Formatting Integers
+
+@table @asis
+@item @code{~D}
+Decimal.
+@table @asis
+@item @code{~@@D}
+print number sign always.
+@item @code{~:D}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}D}
+padding.
+@end table
+@item @code{~X}
+Hexadecimal.
+@table @asis
+@item @code{~@@X}
+print number sign always.
+@item @code{~:X}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}X}
+padding.
+@end table
+@item @code{~O}
+Octal.
+@table @asis
+@item @code{~@@O}
+print number sign always.
+@item @code{~:O}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}O}
+padding.
+@end table
+@item @code{~B}
+Binary.
+@table @asis
+@item @code{~@@B}
+print number sign always.
+@item @code{~:B}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}B}
+padding.
+@end table
+@item @code{~@var{n}R}
+Radix @var{n}.
+@table @asis
+@item @code{~@var{n},@var{mincol},@var{padchar},@var{commachar},@var{commawidth}R}
+padding.
+@end table
+@item @code{~@@R}
+print a number as a Roman numeral.
+@item @code{~:@@R}
+print a number as an ``old fashioned'' Roman numeral.
+@item @code{~:R}
+print a number as an ordinal English number.
+@item @code{~:@@R}
+print a number as a cardinal English number.
+@item @code{~P}
+Plural.
+@table @asis
+@item @code{~@@P}
+prints @code{y} and @code{ies}.
+@item @code{~:P}
+as @code{~P but jumps 1 argument backward.}
+@item @code{~:@@P}
+as @code{~@@P but jumps 1 argument backward.}
+@end table
+@end table
+
+@var{commawidth} is the number of characters between two comma characters.
+
+
+@subsection Formatting floating-point (real) numbers
+
+@table @asis
+@item @code{~F}
+Fixed-format floating-point (prints a flonum like @var{mmm.nnn}).
+@table @asis
+@item @code{~@var{width},@var{digits},@var{scale},@var{overflowchar},@var{padchar}F}
+@item @code{~@@F}
+If the number is positive a plus sign is printed.
+@end table
+@end table
+
+@table @asis
+@item @code{~E}
+Exponential floating-point (prints a flonum like @var{mmm.nnn}@code{E}@var{ee})
+@table @asis
+@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}E}
+@item @code{~@@E}
+If the number is positive a plus sign is printed.
+@end table
+@end table
+
+@table @asis
+@item @code{~G}
+General floating-point (prints a flonum either fixed or exponential).
+@table @asis
+@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}G}
+@item @code{~@@G}
+If the number is positive a plus sign is printed.
+@end table
+A slight difference from Common Lisp:  If the number is printed
+in fixed form and the fraction is zero,
+then a zero digit is printed for the fraction, if allowed by the @var{width}
+and @var{digits} is unspecified.
+@end table
+
+@table @asis
+@item @code{~$}
+Dollars floating-point (prints a flonum in fixed with signs separated).
+@table @asis
+@item @code{~@var{digits},@var{scale},@var{width},@var{padchar}$}
+@item @code{~@@$}
+If the number is positive a plus sign is printed.
+@item @code{~:@@$}
+A sign is always printed and appears before the padding.
+@item @code{~:$}
+The sign appears before the padding.
+@end table
+@end table
+
+@subsection Miscellaneous formatting operators
+
+@table @asis
+@item @code{~%}
+Newline.
+@table @asis
+@item @code{~@var{n}%}
+print @var{n} newlines.
+@end table
+@item @code{~&}
+print newline if not at the beginning of the output line.
+@table @asis
+@item @code{~@var{n}&}
+prints @code{~&} and then @var{n-1} newlines.
+@end table
+@item @code{~|}
+Page Separator.
+@table @asis
+@item @code{~@var{n}|}
+print @var{n} page separators.
+@end table
+@item @code{~~}
+Tilde.
+@table @asis
+@item @code{~@var{n}~}
+print @var{n} tildes.
+@end table
+@item @code{~}<newline>
+Continuation Line.
+@table @asis
+@item @code{~:}<newline>
+newline is ignored, white space left.
+@item @code{~@@}<newline>
+newline is left, white space ignored.
+@end table
+@item @code{~T}
+Tabulation.
+@table @asis
+@item @code{~@@T}
+relative tabulation.
+@item @code{~@var{colnum,colinc}T}
+full tabulation.
+@end table
+@item @code{~?}
+Indirection (expects indirect arguments as a list).
+@table @asis
+@item @code{~@@?}
+extracts indirect arguments from format arguments.
+@end table
+@item @code{~(@var{str}~)}
+Case conversion (converts by @code{string-downcase}).
+@table @asis
+@item @code{~:(@var{str}~)}
+converts by @code{string-capitalize}.
+@item @code{~@@(@var{str}~)}
+converts by @code{string-capitalize-first}.
+@item @code{~:@@(@var{str}~)}
+converts by @code{string-upcase}.
+@end table
+@item @code{~*}
+Argument Jumping (jumps 1 argument forward).
+@table @asis
+@item @code{~@var{n}*}
+jumps @var{n} arguments forward.
+@item @code{~:*}
+jumps 1 argument backward.
+@item @code{~@var{n}:*}
+jumps @var{n} arguments backward.
+@item @code{~@@*}
+jumps to the 0th argument.
+@item @code{~@var{n}@@*}
+jumps to the @var{n}th argument (beginning from 0)
+@end table
+@item @code{~[@var{str0}~;@var{str1}~;...~;@var{strn}~]}
+Conditional Expression (numerical clause conditional).
+@table @asis
+@item @code{~@var{n}[}
+take argument from @var{n}.
+@item @code{~@@[}
+true test conditional.
+@item @code{~:[}
+if-else-then conditional.
+@item @code{~;}
+clause separator.
+@item @code{~:;}
+default clause follows.
+@end table
+@item @code{~@{@var{str}~@}}
+Iteration (args come from the next argument (a list)).
+@table @asis
+@item @code{~@var{n}@{}
+at most @var{n} iterations.
+@item @code{~:@{}
+args from next arg (a list of lists).
+@item @code{~@@@{}
+args from the rest of arguments.
+@item @code{~:@@@{}
+args from the rest args (lists).
+@end table
+@item @code{~^}
+Up and out.
+@table @asis
+@item @code{~@var{n}^}
+aborts if @var{n} = 0
+@item @code{~@var{n},@var{m}^}
+aborts if @var{n} = @var{m}
+@item @code{~@var{n},@var{m},@var{k}^}
+aborts if @var{n} <= @var{m} <= @var{k}
+@end table
+@end table
+
+@subsection Not Implemented CL Format Control Directives
+
+@table @asis
+@item @code{~:A}
+print @code{#f} as an empty list (see below).
+@item @code{~:S}
+print @code{#f} as an empty list (see below).
+@item @code{~<~>}
+Justification.
+@item @code{~:^}
+@end table
+
+@subsubsection Extended, Replaced and Additional Control Directives
+
+These are not necesasrily implemented in Kawa!
+
+@table @asis
+@item @code{~I}
+print a R4RS complex number as @code{~F~@@Fi} with passed parameters for
+@code{~F}.
+@item @code{~Y}
+Pretty print formatting of an argument for scheme code lists.
+@item @code{~K}
+Same as @code{~?.}
+@item @code{~!}
+Flushes the output if format @var{destination} is a port.
+@item @code{~_}
+Print a @code{#\space} character
+@table @asis
+@item @code{~@var{n}_}
+print @var{n} @code{#\space} characters.
+@end table
+
+@item @code{~@var{n}C}
+Takes @var{n} as an integer representation for a character. No arguments
+are consumed. @var{n} is converted to a character by
+@code{integer->char}.  @var{n} must be a positive decimal number.@refill
+@item @code{~:S}
+Print out readproof.  Prints out internal objects represented as
+@code{#<...>} as strings @code{"#<...>"} so that the format output can always
+be processed by @code{read}.
+@refill
+@item @code{~:A}
+Print out readproof.  Prints out internal objects represented as
+@code{#<...>} as strings @code{"#<...>"} so that the format output can always
+be processed by @code{read}.
+@refill
+@item @code{~F, ~E, ~G, ~$}
+may also print number strings, i.e. passing a number as a string and
+format it accordingly.
+@end table
 
 @node Exceptions, Locations, Format, Extensions
 @section Signalling and recovering from exceptions
@@ -1313,7 +1701,7 @@ as a settable @dfn{thunk}.  Others may find it useful to
 think of the @code{location} syntax as similar to the C @samp{&} operator;
 for the @samp{*} indirection operator, Kawa uses procedure application.
 
-@node Eval and Environments, Quantities, Locations, Extensions
+@node Eval and Environments, Debugging, Locations, Extensions
 @section Eval and Environments
 
 @defun eval expression [environment]
@@ -1364,51 +1752,20 @@ The temporary bindings are only visible in the current thread, and its
 descendent threads.
 @end deffn
 
-@node Quantities, Threads, Eval and Environments, Extensions
-@section Quantities
+@node Debugging, Threads, Eval and Environments, Extensions
+@section Debugging
 
-As a super-class of numbers, Kawa also provides quantities.
-A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
-The number part can be an arbitrary complex number.
-The unit is a product of integer powers of base units,
-such as meter or second.
-
-Kawa quantities are a generalization of the quantities in DSSSL,
-which only has length-derived quantities.
-
-The precise syntax of quantity literals may change,
-but some examples are @code{10pt} (10 points), @code{5s} (5 seconds),
-and @code{4cm2} (4 square centimeters).
-
-@defun quantity? object
-True iff @var{object} is a quantity.  Note that all numbers are
-quantities, but not the other way round.
-@end defun
-
-@defun quantity->number q
-Returns the pure number part of the quantity @var{q}, relative to
-primitive (base) units.
-If @var{q} is a number, returns @var{q}.
-If @var{q} is a unit, yields the magitude of @var{q} relative to base units.
-@end defun
-
-@defun quantity->unit q
-Returns the unit of the quantity @var{q}.
-If @var{q} is a number, returns the empty unit.
-@end defun
-
-@defun make-quantity x unit
-Returns the product of @var{x} (a pure number) and @var{unit}.
-You can specify a string instead of @var{unit}, such as @code{"cm"}
-or @code{"s"} (seconds).
-@end defun
-
-@deffn Syntax define-unit unit-name expression
-Define @var{unit-name} as a unit (that can be used in literals)
-equal to the quantity @var{expression}.
+@deffn Syntax trace procedure
+Cause @var{procedure} to be "traced", that is debugging output will
+be written to the standard error port every time @var{procedure}
+is called, with the parameters and return value.
 @end deffn
 
-@node Threads, Standard Types, Quantities, Extensions
+@deffn Syntax untrace procedure
+Turn off tracing (debugging output) of @var{procedure}.
+@end deffn
+
+@node Threads, Standard Types, Debugging, Extensions
 @section Threads
 
 There is a very preliminary interface to create parallel threads.
@@ -1864,7 +2221,7 @@ and call Java methods,
 @menu
 * Scheme types in Java::
 * Method operations::     Calling Java methods from Scheme
-* Field operations::      Acessing fields of Java objects
+* Field operations::      Accessing fields of Java objects
 * Array operations::      Low-level operations on Java arrays
 * Anonymous classes::
 * Loading a ModuleBody::
@@ -1973,7 +2330,7 @@ and @samp{characters.scm} the directory @samp{kawa/lib} in
 the Kawa sources.
 
 @node Field operations, Array operations, Method operations, Low-level functions
-@section Acessing fields of Java objects
+@section Accessing fields of Java objects
 
 Kawa has both a high-level interface and a low-level interface for accessing
 the fields of Java objects and static fields.
@@ -2228,7 +2585,7 @@ changes to Kawa, and announcing snapshots.  If you wish to subscribe
 Messages to the mailing list are now
 @uref{http://www.cygnus.com/ml/kawa/, archived}.
 
-@node License,  , Reporting Bugs, Top
+@node License, , Reporting Bugs, Top
 @chapter License
 
 This is the license for the Kawa software:
@@ -2236,7 +2593,7 @@ This is the license for the Kawa software:
 Note that the Kawa distribution includes two
 packages @uref{http:../gnu.bytecode/,gnu.bytecode}
 and @uref{http:../gnu.math/,gnu.math}
-which have different terms than Kawa itself
+which have different terms than Kawa\x itself
 (but which impose no restrictions as long as you do not modify
 those two packages).
 
@@ -2267,5 +2624,8 @@ into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation approved
 by the author.
 
+@c @node Index, , License, Top
+@c @unnumbered Index
+@c @printindex fn
 
 @bye

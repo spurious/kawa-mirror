@@ -1,3 +1,13 @@
+1999-07-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Fix ftp addresses.
+  	Change sourceware.cygnus.com to anoncvs.cygnus.com for cvs access.
+	Mention where to get Cygwin.
+	Move Quanties section before Logical Number Operations.
+	Add some documentation (from SLib manual) on format directives.
+	Document trace, untrace, system-tmpdir, make-temporary-file.
+	Document --scheme and --elisp options.
+
 1999-05-13  Per Bothner  <bothner@magnus.cygnus.com>
 
 	* kawa.texi:  Update to use ftp.gnu.org site.

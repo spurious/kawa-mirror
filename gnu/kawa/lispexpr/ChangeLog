@@ -1,3 +1,9 @@
+2004-10-26  Per Bothner  <per@bothner.com>
+
+	* ScmRead.java (makeSchemeReadTable): New static method.
+	(schemeReadTable): New static field, set using makeSchemeReadTable.
+	(getReadTable): New methods override, returns schemeReadTable.
+
 2004-08-05  Per Bothner  <per@bothner.com>
 
 	* LangPrimType.java:  Now implement TypeValue.

@@ -1,3 +1,11 @@
+2002-05-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Use new qexo url.
+
+	* kawa.texi (Eval and Environments):  null-environment takes version.
+
+	* kawa.texi (Writing web-server-side Kawa scripts):  Add paragraph.
+
 2002-03-21  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Lists):  New node.

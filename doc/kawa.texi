@@ -131,7 +131,7 @@ Kawa provides the usual read-eval-print loop, as well as batch modes.
 Kawa provides a framework for implementing other progressing languages,
 and comes with incomplete support for CommonLisp, Emacs Lisp, and
 EcmaScript, and the
-draft @uref{http://www.gnu.org/software/kawa/xquery/,XML Query language}.
+draft @uref{http://www.gnu.org/software/qexo/,XML Query language}.
 
 Kawa is written in an object-oriented style.
 
@@ -650,7 +650,7 @@ Set the default language to KRL.  See @ref{KRL}.
 Set the default language to KRL, in BRL-compatibility mode.  See @ref{KRL}.
 @item --xquery
 Set the default language to the draft XML Query language.
-See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery page}
+See the @uref{http://www.gnu.org/software/qexo/,Kawa-XQuery page}
 for more information.
 @end table
 
@@ -2022,7 +2022,7 @@ The default for @var{environment} is the result
 of @code{(interaction-environment)}.
 @end defun
 
-@defun null-environment
+@defun null-environment version
 This procedure returns an environment that contains no variable bindings,
 but contains (syntactic) bindings for all the syntactic keywords.
 
@@ -4287,15 +4287,30 @@ W3C is working an an @uref{http://www.w3c.org/XML/Query,XML Query language},
 and a draft has been released.
 If you start Kawa with the @code{--xquery} it selects the "XQuery"
 source language; this also prints output using XML syntax.
-See the @uref{http://www.gnu.org/software/kawa/xquery/,Kawa-XQuery home page}
+See the @uref{http://www.gnu.org/software/qexo/,Qexo (Kawa-XQuery) home page}
 for examples and more information.
 
 @node Server-side scripts, Servlets, , XML tools
 @section Writing web-server-side Kawa scripts
 
-You can take a Kawa program, in any supported language,
+You can compile a Kawa program (written in any supported
+Kawa language, including Scheme, BRL, KRL, or XQuery),
 and run it as either servlet engine (using a web server
 that supports servlets), or as a "CGI script" on most web servers.
+
+In either case, the result of evaluating the top-level expressions
+becomes the HTTP response that the servlet sends back to the browser.
+The result is typically an HTML/XML element code object;
+Kawa will automatically format the result as appropriate for the type.
+The initial result values may be special "response header values",
+as created by the @code{response-header} function.
+Kawa will use the response header values to set various
+required and optional fields of the HTTP response.
+Note that @code{response-header} does not actually do anything
+until it is "printed" to the standard output.
+Note also that if a @code{"Content-Type"} response value is
+printed that controls the formatting of the following
+non-response-header values.
 
 Here is a simple program @code{hello.scm}:
 @example
@@ -4348,7 +4363,7 @@ as either a servlet or a CGI script.
 @node Servlets, CGI scripts, Server-side scripts, XML tools
 @section Installing Kawa programs as Servlets
 
-You can compile a Scheme file to a @code{Servlet}, and run it
+You can compile a Kawa program to a @code{Servlet}, and run it
 in a servlet engine (a Servlet-aware web server).
 I assume you have compiled your program to a servlet as
 descrbibed in the previous section.
@@ -4420,7 +4435,7 @@ Kawa servlets more practical.
 @section Functions for accessing HTTP requests
 
 The following functions are useful for accessing
-properties of a HTT request, in a Kawa program that is
+properties of a HTTP request, in a Kawa program that is
 run either as a servlet or a CGI script.  These functions
 can be used from plain Scheme, from KRL (whether
 in BRL-compatible mode or not), and from XQuery.

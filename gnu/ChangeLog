@@ -1,3 +1,8 @@
+2002-11-16  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (SUBDIRS):  Build mapping before xml, since
+	gnu.xml now uses gnu.mapping.Symbol.
+
 2002-06-11  Per Bothner  <per@bothner.com>
 
 	* kawa/Makefile.am (SUBDIRS):  Add xslt and sax, if enabled.

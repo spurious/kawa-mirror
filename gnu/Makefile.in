@@ -113,7 +113,7 @@ kawa_bin = @kawa_bin@
 libgcj_basedir = @libgcj_basedir@
 pathsep = @pathsep@
 
-SUBDIRS = bytecode math lists $(XML_SUBDIR) text mapping expr \
+SUBDIRS = bytecode math lists text mapping $(XML_SUBDIR) expr \
 	kawa commonlisp ecmascript $(BRL_SUBDIR) $(XQUERY_SUBDIR) \
 	$(SWING_SUBDIRS)
 
@@ -133,7 +133,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 	install-exec-recursive installdirs-recursive install-recursive \
 	uninstall-recursive check-recursive installcheck-recursive
 DIST_COMMON = ChangeLog Makefile.am Makefile.in
-DIST_SUBDIRS = bytecode math lists xml text mapping expr kawa commonlisp \
+DIST_SUBDIRS = bytecode math lists text mapping xml expr kawa commonlisp \
 	ecmascript brl xquery jemacs
 all: all-recursive
 

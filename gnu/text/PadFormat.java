@@ -3,7 +3,7 @@ import java.text.*;
 import java.text.FieldPosition;
 import java.io.Writer;
 
-/** Given a Format, pad he formatted result to a specified width. */
+/** Given a Format, pad the formatted result to a specified width. */
 
 public class PadFormat extends ReportFormat
 {

@@ -1,3 +1,9 @@
+2001-03-22  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (classjava.stamp): New rule, depend on elisp-classes.scm.
+	(java_JAVA):  New macro, to force automake to add Java rules.
+	(EXTRA_DIST):  Add the elisp files.
+
 2000-06-26  Per Bothner  <per@bothner.com>
 
 	* Makefile.am:  Rename targets, to match *.stamp convention.

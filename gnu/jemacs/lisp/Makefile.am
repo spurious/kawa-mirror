@@ -11,10 +11,15 @@ GCJ_DEPS = elisp-classes.stamp
 PACKAGE_CFNAME = gnu-jemacs-lisp
 CLEANFILES = *.class *.stamp $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
-SOURCES = $(java_ELISP)
+java_JAVA =
+
+EXTRA_DIST = $(java_ELISP)
 
 CLEANFILES = *.class *.stamp
 
 all: Makefile $(@SWING_SELECTED@)
 
 WITH_SWING = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+
+classjava.stamp: elisp-classes.stamp
+	touch classjava.stamp

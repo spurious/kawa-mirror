@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4c from Makefile.am
+# Makefile.in generated automatically by automake 1.4e from Makefile.am.
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -47,7 +47,6 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
 
@@ -92,20 +91,23 @@ AUTOMAKE_OPTIONS = foreign
 SUFFIXES = .java .class .scm .el .lisp
 
 javadir = $(datadir)/java/$(subdir)
-
+JAVACFLAGS = 
+CLASSPATH_ENV = CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT):$$CLASSPATH
+JAVAROOT = $(top_builddir)
 GCJ = gcj
 JAR = fastjar
-GCJFLAGS = -gdwarf-2
-OFILES_DIR = $(TO_TOPDIR)
-ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
+#GCJFLAGS = -gdwarf-2
+GCJFLAGS = -g
+OFILES_DIR = $(TO_TOPDIR)/bin
 TO_TOPDIR = $(top_builddir)
+ENABLE_GCJ_COMPILED = $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 GCJ_DEPS = elisp-classes.stamp
 
 CLEANFILES = *.class *.stamp
 
 DISABLE_GCJ_COMPILED_KAWA1 = $(JAVA) kawa.repl
-ENABLE_GCJ_COMPILED_KAWA1 = $(top_builddir)/kawa1$(exeext)
+ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 # Compiler to use for compiling builtin .scm/.el/.cl files.
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
@@ -115,79 +117,72 @@ java_ELISP = primitives.el alist.el simple.el keymap.el keydefs.el hanoi.el \
 
 PACKAGE_CFNAME = gnu-jemacs-lisp
 
-SOURCES = $(java_ELISP)
+java_JAVA = 
+
+EXTRA_DIST = $(java_ELISP)
 
 WITH_SWING = $(@GCJ_COMPILED_SELECTED@_CDEP) elisp-classes.stamp $(@GCJ_COMPILED_SELECTED@)
+OBJEXT = o
 subdir = gnu/jemacs/lisp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = 
-DIST_SOURCES = 
+CONFIG_CLEAN_FILES =
+DIST_SOURCES =
 depcomp = 
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+all: all-am
 
-
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-
-GZIP_ENV = --best
-all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .java .class .scm .el .lisp
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(top_srcdir)/Make-rules
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus gnu/jemacs/lisp/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/Make-rules $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --cygnus  gnu/jemacs/lisp/Makefile
 
+Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
+
+install-javaJAVA: classjava.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
+	done
+
+uninstall-javaJAVA:
+	@$(NORMAL_UNINSTALL)
+	@for p in *.class; do \
+	  echo " rm -f $(DESTDIR)$(javadir)/$$p"; \
+	  rm -f $(DESTDIR)$(javadir)/$$p; \
+	done
+
+clean-javaJAVA:
+	-rm -f *.class classjava.stamp
 tags: TAGS
 TAGS:
 
-
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-
-
-distdir: $(DISTFILES)
-	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  if test -d $$d/$$file; then \
-	    cp -pR $$d/$$file $(distdir) \
-	    || exit 1; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || cp -p $$d/$$file $(distdir)/$$file \
-	    || exit 1; \
-	  fi; \
-	done
-info-am:
-info: info-am
-dvi-am:
-dvi: dvi-am
 check-am:
 check: check-am
-installcheck-am:
-installcheck: installcheck-am
-install-info-am: 
-install-info: install-info-am
-install-exec-am:
-install-exec: install-exec-am
+all-am: Makefile
 
-install-data-am:
+installdirs:
+
+install: install-am
+install-exec: install-exec-am
 install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-am
-uninstall-am:
-uninstall: uninstall-am
-all-am: Makefile
-all-redirect: all-am
-install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
-installdirs:
 
+installcheck: installcheck-am
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  INSTALL_PROGRAM_ENV='$(INSTALL_STRIP_PROGRAM_ENV)' install
 
 mostlyclean-generic:
-
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -202,11 +197,29 @@ maintainer-clean-generic:
 	-rm -f Makefile.in
 clean: clean-am
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-javaJAVA mostlyclean-am
 
 distclean: distclean-am
 
 distclean-am: clean-am distclean-generic
+
+dvi:
+
+dvi-am:
+
+info:
+
+info-am:
+
+install-data-am: install-javaJAVA
+
+install-exec-am:
+
+install-info:
+
+install-man:
+
+installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 
@@ -216,28 +229,32 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-generic
 
-.PHONY: all all-am all-redirect check check-am clean clean-generic \
-	distclean distclean-generic distdir dvi dvi-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	uninstall uninstall-am
+uninstall-am: uninstall-javaJAVA
+
+.PHONY: all all-am check check-am clean clean-generic clean-javaJAVA \
+	distclean distclean-generic dvi dvi-am info info-am install \
+	install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-javaJAVA install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic uninstall uninstall-am uninstall-javaJAVA
 
 
 # Make sure $(KAWA1) is available, if --enable-gcj-compiled.
 $(TO_TOPDIR)/kawa1$(exeext):
-	cd $(TO_TOPDIR) && $(MAKE) kawa1$(exeext)
+	cd $(OFILES_DIR) && $(MAKE) kawa1$(exeext)
 
 $(OFILES_DIR)/$(PACKAGE_FNAME).o:  $(GCJ_DEPS)
-	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
+	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(JAVAROOT):$(srcdir)/$(JAVAROOT) -c \
 	  $^ -o $(OFILES_DIR)/$(PACKAGE_FNAME).o
 
 $(OFILES_DIR)/$(PACKAGE_CFNAME).o:  $(GCJ_DEPS)
-	$(JAR) cf classes.jar *.class
 	$(GCJ) $(GCJFLAGS) --CLASSPATH=$(TO_TOPDIR) -c \
-	  classes.jar -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
-	rm classes.jar
+	  *.class -o $(OFILES_DIR)/$(PACKAGE_CFNAME).o
+
+java-classes.stamp: $(java_Java)
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $?
+	echo timestamp > java-classes.stamp
 
 scm-classes.stamp: $(java_SCM)
 	CLASSPATH=$(top_builddir):$(top_srcdir):$$CLASSPATH \
@@ -251,9 +268,21 @@ elisp-classes.stamp: $(java_ELISP)
 	    -P `echo $(PACKAGE_CFNAME)|sed -e s/-/./g`. --elisp -C $?
 	echo timestamp > elisp-classes.stamp
 
+# Almost the same as automake's install-javaJAVA, but the standard
+# automake support for Java doesn't handle built Java classes.
+install-java-classes: java-classes.stamp
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(javadir)
+	for p in *.class; do \
+	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(DESTDIR)$(javadir)/$$p; \
+	done
+
 all: Makefile $(@SWING_SELECTED@)
+
+classjava.stamp: elisp-classes.stamp
+	touch classjava.stamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-

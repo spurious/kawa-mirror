@@ -10,7 +10,8 @@
   (or (eq? x #t) (eq? x #f)))
 
 (define (symbol? x) :: <boolean>
-  (instance? x <java.lang.String>))
+  (or (instance? x <java.lang.String>)
+      (instance? x <gnu.mapping.Symbol>)))
 
 (define (symbol->string (s <symbol>))
   (make <string> s))

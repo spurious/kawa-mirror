@@ -14,8 +14,7 @@ public class call_with_input_file extends Procedure2
     String fname = string.toString();
 
     try {
-      java.io.Reader is = new java.io.FileReader(fname);
-      InPort port = new InPort(is, fname);
+      InPort port = InPort.openFile(fname);
       Object result = ((Procedure)proc).apply1 (port);
       port.close ();
       return result;

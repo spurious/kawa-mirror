@@ -14,7 +14,7 @@ public class with_input_from_file extends Procedure2
     String fname = string.toString();
 
     try {
-      InPort port = new InPort(new java.io.FileReader(fname), fname);
+      InPort port = InPort.openFile(fname);
       Object result;
       InPort save_port = InPort.inDefault ();
       try
@@ -25,18 +25,15 @@ public class with_input_from_file extends Procedure2
       finally
 	{
 	  InPort.setInDefault (save_port);
-	  try
-	    {
-	      port.close ();
-	    }
-	  catch (java.io.IOException e)
-	    {
-	      throw new GenericError ("caught I/O exception: " + e);
-	    }
+	  port.close ();
 	}
       return result;
     } catch (java.io.FileNotFoundException e) {
        throw new GenericError ("file not found: " + fname);
     }
+    catch (java.io.IOException e)
+      {
+	throw new GenericError ("caught I/O exception: " + e);
+      }
   }
 }

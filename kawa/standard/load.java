@@ -74,25 +74,21 @@ public class load extends Procedure1 {
   public final static Object loadSource (String name, Environment env)
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
-    FileReader fstream;
     try
       {
-	fstream = new FileReader (name);
+	InPort fstream = InPort.openFile(name);
+	Object result = loadSource (fstream, env);
+	fstream.close();
+	return result;
       }
     catch (java.io.FileNotFoundException e)
       {
 	throw new GenericError ("load: file not found: " + name);
       }
-    Object result = loadSource (new InPort (fstream, name), env);
-    try
-      {
-	fstream.close();
-      }
     catch (java.io.IOException ex)
       {
 	throw new GenericError("failed to close \""+name+"\" after loading");
       }
-    return result;
   }
 
   public final static Object loadSource (InPort port, Environment env)
@@ -170,18 +166,18 @@ public class load extends Procedure1 {
 		  }
 	      }
 	    fs.reset();
-	    InPort src = new InPort(fs, name);
-	    Object result = loadSource (src, env);
 	    try
 	      {
+		InPort src = InPort.openFile(fs, name);
+		Object result = loadSource (src, env);
 		src.close();
+		return result;
 	      }
 	    catch (java.io.IOException ex)
 	      {
 		throw new GenericError("failed to close \""+name
 				       +"\" after loading");
 	      }
-	    return result;
 	  }
 	catch (java.io.FileNotFoundException e)
 	  {

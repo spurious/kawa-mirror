@@ -1,3 +1,23 @@
+Tue Apr 28 21:58:49 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/Makefile.am: Change AUTOMAKE_OPTIONS to cygnus.
+
+Mon Apr 27 00:03:51 1998  Per Bothner  <bothner@cygnus.com>
+
+	* kawa/lang/LambdaExp.java (declareThis):  New method.
+	Make some fields public (for EcmaScript).
+
+	* kawa/lang/SysInPort.java (fill): Work-around for NTEmacs shell mode.
+	* kawa/lang/TtyInPort.java (tie):  Make protected.
+
+	* kawa/lang/InPort.java (readSchemeReal):  Cleaner (and more
+ 	portable I hope) handling of inexact zero denominator.
+
+Tue Apr 14 10:09:17 1998  Patrick Barta <patr@welchlink.welch.jhu.edu>
+
+	* kawa/lang/InPort.java (readSchemeReal):  Simplification that
+	avoids javac (on NT) problem.
+
 Sat Apr  4 17:53:18 1998  Per Bothner  <bothner@cygnus.com>
 
 	* configure.in:  Set version number to 1.6.51.

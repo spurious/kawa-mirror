@@ -12,8 +12,6 @@ import gnu.expr.*;
 
 public class let extends Syntax implements Printable
 {
-  static private Pattern pattern2 = new ListPat (2);
-
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))

@@ -61,7 +61,7 @@ public class location extends Syntax implements Printable
 	ReferenceExp rexp = (ReferenceExp) arg;
 	rexp.setDontDereference(true);
 	Declaration binding = rexp.getBinding();
-	if (binding != null)
+	if (binding != null && ! binding.isFluid())
 	  {
 	    binding.setIndirectBinding(true);
 	    return rexp;

@@ -473,7 +473,7 @@ public class Scheme extends Interpreter
 
       define_syntax ("when", "kawa.lib.syntax"); //-- (when cond exp ...)
       define_syntax ("unless", "kawa.lib.syntax"); //-- (unless cond exp ...)
-      define_syntax ("fluid-let", "kawa.lib.syntax");
+      define_syntax ("fluid-let", "kawa.standard.fluid_let");
       define_syntax("constant-fold", "kawa.standard.constant_fold");
 
       define_proc ("compile-file", "kawa.lang.CompileFile");

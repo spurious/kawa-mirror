@@ -23,7 +23,7 @@ public abstract class LispInterpreter extends Interpreter
 			      lexer.getName(),
 			      lexer.getLineNumber() + 1,
 			      lexer.getColumnNumber() + 1);
-    Object sexp = ((gnu.kawa.lispexpr.LispReader) lexer).readObject(); // FIXME
+    Object sexp = ((LispReader) lexer).readObject(); // FIXME
     if (sexp == Sequence.eofValue)
       return null; // FIXME
     
@@ -34,40 +34,26 @@ public abstract class LispInterpreter extends Interpreter
   }
 
   public ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages)
+    throws java.io.IOException, gnu.text.SyntaxException
   {
-    kawa.lang.Translator tr = new  kawa.lang.Translator (Environment.user(), messages);
+    kawa.lang.Translator tr = new  kawa.lang.Translator (environ, messages);
     ModuleExp mexp = new ModuleExp();
     if (Compilation.generateAppletDefault)
       mexp.setFlag(ModuleExp.SUPERTYPE_SPECIFIED);
     mexp.setFile(port.getName());
     java.util.Vector forms = new java.util.Vector(20);
     tr.push(mexp);
-    try
+    LispReader lexer = (LispReader) getLexer(port, messages);
+    for (;;)
       {
-	gnu.kawa.lispexpr.LispReader lexer
-	  = (gnu.kawa.lispexpr.LispReader) getLexer(port, messages);
-        for (;;)
-          {
-	    Object sexp = lexer.readObject(); // FIXME
-	    if (sexp == Sequence.eofValue)
-	      break;
-            if (! tr.scan_form (sexp, forms, mexp))
-              break;
-          }
-	if (port.peek() == ')')
-	  lexer.fatal("An unexpected close paren was read.");
+	Object sexp = lexer.readObject(); // FIXME
+	if (sexp == Sequence.eofValue)
+	  break;
+	if (! tr.scan_form (sexp, forms, mexp))
+	  break;
       }
-    catch (gnu.text.SyntaxException ex)
-      {
-        // Got a fatal error.
-        if (ex.getMessages() != messages)
-          throw new RuntimeException ("confussing syntax error: "+ex);
-        // otherwise ignore it - it's already been recorded in messages.
-      }
-    catch (java.io.IOException e)
-      {
-	throw new RuntimeException ("I/O exception reading file: " + e.toString ());
-      }
+    if (port.peek() == ')')
+      lexer.fatal("An unexpected close paren was read.");
     tr.finishModule(mexp, forms);
     return mexp;
   }

@@ -1,3 +1,8 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java (parseFile):  Now throws IOException and
+	SyntaxException.
+
 2002-02-13  Per Bothner  <per@bothner.com>
 
 	* LispReader.java:  Make non-abstract.

@@ -1,3 +1,11 @@
+2005-03-22  Per Bothner  <per@bothner.com>
+
+	* BindingInitializer.java: Generalize to work without a field.
+	(<init>): Remove field parameter - set it from decl.field.
+	(emit): If no field, use decl's type instead of field type.
+	Store value into local Variable if there is no field.
+	* Declaration.java (makeField): Adjust call to match.
+
 2005-03-18  Per Bothner  <per@bothner.com>
 
 	* CatchClause.java (<init>): Change to take a LambdaExp rather than

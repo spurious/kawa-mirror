@@ -770,7 +770,7 @@ public class Declaration
     if (isIndirectBinding()
 	     || (value != null && ! (value instanceof ClassExp)))
       {
-	BindingInitializer init = new BindingInitializer(this, field, value);
+	BindingInitializer init = new BindingInitializer(this, value);
 	// In immediate mode we can't initialize variables in <clinit>,
 	// even though the field is static.  This is because the literals
 	// (which might be needed by the initializer) are passed in using

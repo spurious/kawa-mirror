@@ -10,11 +10,11 @@ public class BindingInitializer extends Initializer
   static final Method makeSymbolMethod
   = Compilation.typeSymbol.getDeclaredMethod("makeUninterned", 1);
 
-  public BindingInitializer(Declaration decl, Field field, Expression value)
+  public BindingInitializer(Declaration decl, Expression value)
   {
     this.decl = decl;
     this.value = value;
-    this.field = field;
+    this.field = decl.field;
   }
 
   public void emit(Compilation comp)
@@ -32,7 +32,7 @@ public class BindingInitializer extends Initializer
 	  }
       }
 
-    if (! field.getStaticFlag())
+    if (field != null && ! field.getStaticFlag())
       code.emitPushThis();
 
     if (value == null)
@@ -45,6 +45,7 @@ public class BindingInitializer extends Initializer
 	if (name instanceof String && ! decl.isAlias())
 	  name = Namespace.EmptyNamespace.getSymbol((String) name);
 	comp.compileConstant(name, Target.pushObject);
+
 	if (decl.isAlias())
 	  code.emitInvokeStatic(makeLocationMethod(name));
 	else
@@ -67,10 +68,18 @@ public class BindingInitializer extends Initializer
       }
     else
       {
-	value.compile (comp, field.getType());
+	value.compile (comp, field == null ? decl.getType() : field.getType());
       }
 
-    if (field.getStaticFlag())
+    // Optimization of Declaration.compileStore, to avoid swap.
+    if (field == null)
+      {
+	Variable var = decl.getVariable();
+	if (var == null)
+	  var = decl.allocateVariable(code);
+	code.emitStore(var);
+      }
+    else if (field.getStaticFlag())
       code.emitPutStatic(field);
     else
       code.emitPutField(field);

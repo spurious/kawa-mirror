@@ -1,0 +1,5 @@
+2000-06-25  Per Bothner  <per@bothner.com>
+
+	New package.
+	* CommonLisp.java:  New class, extends Interpreter.
+	* Makefile.am:  New.

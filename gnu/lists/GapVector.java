@@ -33,7 +33,7 @@ public class GapVector extends AbstractSequence implements Sequence
     return index < base.getBufferLength();
   }
 
-  protected int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos, Object xpos)
   {
     return hasNext(ipos, xpos) ? base.getElementKind() : EOF_VALUE;
   }

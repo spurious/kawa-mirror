@@ -199,7 +199,7 @@ public class LList extends AbstractSequence implements Sequence, Externalizable
     return (ipos & 1) != 0;
   }
 
-  protected boolean gotoNext(PositionContainer posSet, int posNumber)
+  public boolean gotoNext(PositionContainer posSet, int posNumber)
   {
     int ipos = posSet.getPositionInt(posNumber);
     Object xpos = posSet.getPositionPtr(posNumber);

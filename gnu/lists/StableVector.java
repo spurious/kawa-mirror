@@ -139,7 +139,7 @@ public class StableVector extends GapVector
     return index < base.getBufferLength();
   }
 
-  protected boolean gotoNext(PositionContainer posSet, int posNumber)
+  public boolean gotoNext(PositionContainer posSet, int posNumber)
   {
     int ipos = posSet.getPositionInt(posNumber);
     int ppos = positions[ipos];

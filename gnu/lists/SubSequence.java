@@ -115,7 +115,7 @@ extends AbstractSequence implements Sequence, PositionContainer
     return base.getNext(ipos, xpos);
   }
 
-  protected int getNextKind(int ipos, Object xpos)
+  public int getNextKind(int ipos, Object xpos)
   {
     if (base.compare(ipos, xpos, ipos1, xpos1) >= 0)
       return EOF_VALUE;

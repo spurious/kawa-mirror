@@ -965,7 +965,7 @@ implements Consumer, PositionConsumer, Consumable
     return -1;
   }
 
-  protected String getNextTypeName(int ipos, Object xpos)
+  public String getNextTypeName(int ipos, Object xpos)
   {
     int index = getNextTypeIndex(ipos, xpos);
     return index < 0 ? null : (String) objects[index];

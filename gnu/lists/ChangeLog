@@ -2,6 +2,8 @@
 
 	* AbstractSequence.java.in (getNextKind, getNextTypeName,
 	getNextTypeObject, gotoNext, gotoChildrenStart):  Make public.
+	* GapVector.java, LList.java, SimpleVector.java.in,  StableVector.java,
+	SubSequence.java, TreeList.java:  Update accordingly.
 
 2001-10-17  Per Bothner  <per@bothner.com>
 

@@ -1808,7 +1808,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  kind = 't';
 	else
 	  return '\0';
-	if (kind == 'e' || kind == 'a')
+	if (next != '{' && (kind == 'e' || kind == 'a'))
 	  {
 	    if (! isNameStart((char) next))
 	      return '\0';

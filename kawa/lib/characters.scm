@@ -1,6 +1,11 @@
 (define (char? x)
   (instance? x <kawa.lang.Char>))
 
+(define (char-alphabetic? char)
+  ((primitive-static-method <java.lang.Character> "isLetter"
+			     <boolean> (<char>))
+   char))
+
 (define (char-numeric? char)
   ((primitive-static-method <java.lang.Character> "isDigit"
 			     <boolean> (<char>))

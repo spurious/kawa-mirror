@@ -1,3 +1,12 @@
+2004-08-10  Per Bothner  <per@bothner.com>
+
+	* KawaPageServlet.java (getProcedure): Rename to getModule and
+	change return type to Module.
+	(apply):  Call run method of module, not apply method.
+	(class CacheEnty):  Change proc field to ModuleBody.
+	* KawaServlet.java (run)  Add abstract method, overriden by compiler.
+	(doGet):  Call run method, rather than apply method.
+
 2004-08-08  Per Bothner  <per@bothner.com>
 
 	* KawaServlet.java (doGet): Change for new Procedure API.

@@ -11,6 +11,8 @@ import java.io.IOException;
 public abstract class KawaServlet
 extends HttpServlet
 {
+  public abstract void run(CallContext ctx);
+
    public void doPost (HttpServletRequest request,
 		       HttpServletResponse response)
      throws ServletException, IOException
@@ -61,9 +63,7 @@ extends HttpServlet
     ctx.consumer.beginDocument();
     try
       {
-	// FIXME - untested!
-	apply(ctx);
-	//ctx.run();
+	run(ctx);
       }
     catch (Throwable throwable)
       {

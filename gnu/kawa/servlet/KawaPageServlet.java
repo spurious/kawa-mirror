@@ -45,13 +45,13 @@ public class KawaPageServlet extends KawaServlet
 
     boolean saveClass = request.getParameter("qexo-save-class") != null;
     String path = request.getServletPath();
-    Procedure proc = getProcedure(ctx, path, saveClass);
+    ModuleBody mod = getModule(ctx, path, saveClass);
 
-    if (proc != null)
-      proc.apply(ctx);
+    if (mod != null)
+      mod.run(ctx);
   }
 
-  private Procedure getProcedure(ServletCallContext ctx, String path, boolean saveClass)
+  private ModuleBody getModule(ServletCallContext ctx, String path, boolean saveClass)
     throws Exception
   {
     URL url = context.getResource(path);
@@ -111,7 +111,7 @@ public class KawaPageServlet extends KawaServlet
 	    if (saveClass)
 	      comp.outputClass(context.getRealPath("WEB-INF/classes")+'/');
 
-	    entry.proc = (Procedure) cl.newInstance();
+	    entry.proc = (ModuleBody) cl.newInstance();
 	  }
 
 	return entry.proc;
@@ -151,7 +151,7 @@ public class KawaPageServlet extends KawaServlet
   {
     long lastCheck;
     long lastModified;
-    Procedure proc;
+    ModuleBody proc;
   }
 }
 

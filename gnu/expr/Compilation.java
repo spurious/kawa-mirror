@@ -120,7 +120,6 @@ public class Compilation
   static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
   static public ClassType typeString = ClassType.make("java.lang.String");
   static public ClassType javaStringType = typeString;
-  static public ClassType scmSymbolType = typeString;
   static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
   static public ClassType scmSequenceType = ClassType.make("gnu.lists.Sequence");
   static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
@@ -129,7 +128,6 @@ public class Compilation
   static public ClassType scmPairType = typePair;
   static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
   public static final ArrayType objArrayType = ArrayType.make(typeObject);
-  public static final ArrayType symbolArrayType= ArrayType.make(scmSymbolType);
   static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType typeRunnable = ClassType.make("java.lang.Runnable");
   static public ClassType typeObjectType = ClassType.make("gnu.bytecode.ObjectType");
@@ -163,11 +161,6 @@ public class Compilation
 
   static final Method setNameMethod
     = typeProcedure.getDeclaredMethod("setName", 1);
-  static Method initIntegerMethod;
-  static Method lookupGlobalMethod;
-  static Method defineGlobalMethod;
-  static Method defineFunctionMethod;
-  static Method putGlobalMethod;
   static Method makeListMethod;
   
   public static final Type[] int1Args = { Type.int_type };
@@ -189,24 +182,6 @@ public class Compilation
     makeListMethod = scmListType.addMethod ("makeList",
 					     makeListArgs, scmListType,
 					     Access.PUBLIC|Access.STATIC);
-    initIntegerMethod = javaIntegerType.addMethod ("<init>",
-						    int1Args, Type.void_type,
-						    Access.PUBLIC);
-
-    lookupGlobalMethod
-      = typeEnvironment.addMethod ("lookup_global", sym1Arg,
-				   typeObject,
-				   Access.PUBLIC|Access.STATIC);
-    Type[] symObjArgs = { scmSymbolType, typeObject };
-    defineGlobalMethod
-      = typeEnvironment.addMethod ("define_global", symObjArgs,
-				   Type.void_type,Access.PUBLIC|Access.STATIC);
-    defineFunctionMethod
-      = typeEnvironment.addMethod ("defineFunction", symObjArgs,
-				   Type.void_type,Access.PUBLIC|Access.STATIC);
-    putGlobalMethod
-      = typeEnvironment.addMethod ("put_global", symObjArgs,
-				   Type.void_type,Access.PUBLIC|Access.STATIC);
   }
 
   public static Method getCurrentEnvironmentMethod

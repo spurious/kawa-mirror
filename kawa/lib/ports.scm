@@ -1,3 +1,15 @@
+(define (call-with-input-file pathname proc)
+  (let ((port :: <input-port> (open-input-file pathname)))
+    (try-finally
+     (proc port)
+     (close-input-port port))))
+
+(define (call-with-output-file pathname proc)
+  (let ((port :: <output-port> (open-output-file pathname)))
+    (try-finally
+     (proc port)
+     (close-output-port port))))
+
 (define (input-port? x)
   (instance? x <input-port>))
 

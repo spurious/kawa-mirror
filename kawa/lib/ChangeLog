@@ -1,3 +1,12 @@
+2003-11-21  Per Bothner  <per@bothner.com>
+
+	* ports.scm (call-with-input-file):  New functiom.
+	(call-with-output-file):  Add type declaration.
+
+2003-11-21  Hoehle, Joerg-Cyril <Joerg-Cyril.Hoehle@t-systems.com>
+
+	* ports.scm (call-with-output-file):  New functiom.
+
 2003-11-09  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* strings.scm (string-append, string-append/shared):  New functions.

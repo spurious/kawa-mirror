@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003, 2004  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.xquery.lang;
@@ -252,7 +252,7 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int OP_AND       = OP_BASE + 4;      // 'and'
   static final int OP_EQU       = OP_BASE + 8;      // '='
   static final int OP_NEQ       = OP_BASE + 8 + 1;  // '!='
-  static final int OP_INSTANCEOF= OP_BASE + 8 + 2;  // 'instanceof'
+  static final int OP_INSTANCEOF= OP_BASE + 8 + 2;  // 'instance' 'of'
   static final int OP_RANGE_TO  = OP_BASE + 8 + 3;  // 'to'
   static final int OP_LSS       = OP_BASE + 12;     // '<'
   static final int OP_GRT       = OP_BASE + 12 + 1; // '>'
@@ -642,6 +642,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (match("except"))
 	      curToken = OP_EXCEPT;
 	  }
+	else if (len == 8)
+	  {
+	    if (match("instance"))
+	      curToken = OP_INSTANCEOF;
+	  }
 	else if (len == 9)
 	  {
 	    if (match("intersect"))
@@ -649,16 +654,8 @@ public class XQParser extends LispReader // should be extends Lexer
 	  }
 	else if (len == 10)
 	  {
-	    for (int i = 0; ;   i++)
-	      {
-		if (i == 10)
-		  {
-		    curToken = OP_INSTANCEOF;
-		    break;
-		  }
-		else if (tokenBuffer[i] != "instanceof".charAt(i))
-		  break;
-	      }
+	    if (match("instanceof")) // obsolete
+	      curToken = OP_INSTANCEOF;
 	  }
       }
     return curToken;
@@ -1134,6 +1131,11 @@ public class XQParser extends LispReader // should be extends Lexer
 	    parseSimpleKindType();
 	    return textNodeTest;
 	  }
+	if (match("document-node"))
+	  {
+	    parseSimpleKindType();
+	    return documentNodeTest;
+	  }
 	if (match("node"))
 	  {
 	    parseSimpleKindType();
@@ -1188,10 +1190,28 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (tokPriority < prio || tokPriority > (OP_MOD >> 2))
 	  return exp;
 	char saveReadState = pushNesting('%');
+	boolean sawInstanceof = false;
+	if (token == OP_INSTANCEOF)
+	  {
+	    curToken = NCNAME_TOKEN;
+	    sawInstanceof = match("instanceof");
+	  }
 	getRawToken();
 	popNesting(saveReadState);
 	if (token == OP_INSTANCEOF)
 	  {
+	    if (sawInstanceof)
+	      {
+		if (warnOldVersion)
+		  error('w', "use 'instanceof of' (two words) instead of 'instanceof'");
+	      }
+	    else
+	      {
+		if (match("of"))
+		  getRawToken();
+		else
+		  error('e', "expected 'instance' to be followed by 'of'");
+	      }
 	    Expression[] args = { exp, parseDataType() };
 	    exp = new ApplyExp(makeFunctionExp("gnu.xquery.lang.XQParser",
 					       "instanceOf"),
@@ -3158,6 +3178,8 @@ public class XQParser extends LispReader // should be extends Lexer
   static final Expression funcExprFilter
     = makeFunctionExp("gnu.xquery.util.ValuesFilter", "exprFilter");
 
+  static final NodeType documentNodeTest
+  = new NodeType("document-node", NodeType.DOCUMENT_OK);
   static final NodeType textNodeTest = new NodeType("text", NodeType.TEXT_OK);
   static final NodeType anyNodeTest = new NodeType("node");
 

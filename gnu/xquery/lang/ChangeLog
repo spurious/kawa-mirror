@@ -1,3 +1,12 @@
+2004-03-09  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (parseItemTime):  Handle 'document-node()'.
+	(documentNodeTest):  New constant.
+
+	* XQParser.java (peekOperator):  Handle 'instance' like 'instanceof'.
+	(parseBinaryExp):  Recognize 'instance' followed by 'of'.
+	If warnOldVersion compain about 'instanceof'.
+
 2004-01-09  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (registerEnvironment):  Update setCurrent to setGlobal.

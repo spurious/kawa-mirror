@@ -149,8 +149,6 @@ public class ELisp extends Lisp2
     defun("prog1", gnu.commonlisp.lang.prog1.prog1);
     defun("prog2", gnu.commonlisp.lang.prog1.prog2);
     defun("progn", new kawa.standard.begin());
-    defun("or", new kawa.standard.and_or(false, this));
-    defun("and", new kawa.standard.and_or(true, this));
     defun("while", new gnu.jemacs.lang.While());
     defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
     defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));

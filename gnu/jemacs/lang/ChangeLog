@@ -1,3 +1,8 @@
+2004-11-10  Per Bothner  <per@bothner.com>
+
+	* ELisp.java (ELisp): Remove definitions of 'and' and 'or'.
+	Instead used definitions in kawa.lib.std_syntax.
+
 2004-11-06  Per Bothner  <per@bothner.com>
 
 	* MiscOps.scm (if): Define elisp-specific macro.

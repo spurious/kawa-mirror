@@ -67,7 +67,7 @@ TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = bytecode math ecmascript
+SUBDIRS = bytecode math text ecmascript
 EXTRA_DIST = PACKAGES
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 

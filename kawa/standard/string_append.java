@@ -17,9 +17,6 @@ public class string_append extends ProcedureN
       throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     int count = args.length;
-    if (count == 0) {
-       throw new kawa.lang.WrongArguments(name,-1,"(string-append string ...)");
-    }
     java.lang.StringBuffer result = new java.lang.StringBuffer();
 
     for (int t=0; t<count; t++) {

@@ -1,3 +1,9 @@
+2005-02-24  Per Bothner  <per@bothner.com>
+
+	* kawa/repl.java (getInterpreterFromFilenameExtension): Change return
+	type and name to getLanguageFromFilenameExtension.
+	(getInterpreter): Also change return type and rename to getLanguage.
+
 2005-02-23  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Quote.java: Add an option to not namespace-expand.

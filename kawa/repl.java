@@ -191,32 +191,29 @@ public class repl extends Procedure0or1
 				 commandLineArguments);
   }
 
-  public static Interpreter getInterpreterFromFilenameExtension(String name)
+  public static Language getLanguageFromFilenameExtension(String name)
   {
-    if (Interpreter.defaultInterpreter == null)
+    if (Language.getDefaultLanguage() == null)
       {
-	Interpreter interp
-	  = Interpreter.getInstanceFromFilenameExtension(name);
-	if (interp != null)
+	Language lang = Language.getInstanceFromFilenameExtension(name);
+	if (lang != null)
 	  {
-	    Interpreter.defaultInterpreter = interp;
-	    Environment.setCurrent(interp.getEnvironment());
-	    return interp;
+	    Language.setDefaults(lang);
+	    return lang;
 	  }
       }
-    return getInterpreter();
+    return getLanguage();
   }
 
-  public static Interpreter getInterpreter()
+  public static Language getLanguage()
   {
-    Interpreter interpreter = Interpreter.defaultInterpreter;
-    if (interpreter == null)
+    Language lang = Language.getDefaultLanguage();
+    if (lang == null)
       {
-	interpreter = Interpreter.getInstance(null);
-	Interpreter.defaultInterpreter = interpreter;
-	Environment.setCurrent(interpreter.getEnvironment());
+	lang = Language.getInstance(null);
+	Language.setDefaults(lang);
       }
-    return interpreter;
+    return lang;
   }
 
   static boolean shutdownRegistered
@@ -233,7 +230,7 @@ public class repl extends Procedure0or1
 	    iArg++;
 	    if (iArg == maxArg)
 	      bad_option (arg);
-	    getInterpreter();
+	    getLanguage();
 	    setArgs (args, iArg+1);
 	    if (arg.equals ("-c"))
 	      checkInitFile();
@@ -247,7 +244,7 @@ public class repl extends Procedure0or1
 	    if (iArg == maxArg)
 	      bad_option (arg);
 	    String filename = args[iArg];
-	    getInterpreterFromFilenameExtension(filename);
+	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
 	    Shell.runFile (filename);
@@ -321,7 +318,7 @@ public class repl extends Procedure0or1
 			  }
 		      }
 		  }
-		getInterpreterFromFilenameExtension(filename);
+		getLanguageFromFilenameExtension(filename);
 		freader = InPort.openFile(fstream, filename);
 		// FIXME adjust line number
 		setArgs(args, iArg+1);
@@ -348,7 +345,7 @@ public class repl extends Procedure0or1
 	else if (arg.equals ("-s") || arg.equals ("--"))
 	  {
 	    iArg++;
-	    getInterpreter();
+	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
 	    Shell.run(Interpreter.defaultInterpreter, Environment.getCurrent());
@@ -357,7 +354,7 @@ public class repl extends Procedure0or1
 	else if (arg.equals ("-w"))
 	  {
 	    iArg++;
-	    getInterpreter();
+	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
 	    // Do this instead of just new GuiConsole in case we have
@@ -402,7 +399,7 @@ public class repl extends Procedure0or1
 	    for ( ; iArg < maxArg;  iArg++)
 	      {
 		arg = args[iArg];
-		getInterpreterFromFilenameExtension(arg);
+		getLanguageFromFilenameExtension(arg);
 		try
 		  {
 		    System.err.println("(compiling "+arg+")");
@@ -473,7 +470,7 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.equals("--server"))
 	  {
-	    getInterpreter();
+	    getLanguage();
 	    ++iArg;
 	    if (iArg == maxArg)
 	      bad_option (arg);
@@ -590,16 +587,16 @@ public class repl extends Procedure0or1
 	  }
 	else if (arg.length () > 0 && arg.charAt(0) == '-')
 	  { // Check if arg is a known language name.
-	    Interpreter previous = Interpreter.defaultInterpreter;
+	    Language previous = Language.getDefaultLanguage();
 	    String name = arg;
 	    if (name.length() > 2 && name.charAt(0) == '-')
 	      name = name.substring(name.charAt(1) == '-' ? 2 :1);
-	    Interpreter interpreter = Interpreter.getInstance(name);
-	    if (interpreter != null)
+	    Language lang = Language.getInstance(name);
+	    if (lang != null)
 	      {
-		Interpreter.defaultInterpreter = interpreter;
+		Language.setDefaultLanguage(lang);
 		if (previous == null)
-		  Environment.setCurrent(interpreter.getEnvironment());
+		  Language.setDefaults(lang);
 	      }
 	    else
 	      {
@@ -659,14 +656,14 @@ public class repl extends Procedure0or1
 	if (iArg < args.length)
 	  {
 	    String filename = args[iArg];
-	    getInterpreterFromFilenameExtension(filename);
+	    getLanguageFromFilenameExtension(filename);
 	    setArgs (args, iArg+1);
 	    checkInitFile();
 	    Shell.runFile (filename);
 	  }
 	else
 	  {
-	    getInterpreter();
+	    getLanguage();
 	    setArgs (args, iArg);
 	    checkInitFile();
 	    Shell.run(Interpreter.defaultInterpreter);

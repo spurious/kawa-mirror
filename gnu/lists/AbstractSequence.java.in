@@ -245,7 +245,7 @@ public abstract class AbstractSequence
     int pos = createPos(index, false);
     for (int iter = startPos();  (iter = nextPos(iter)) != 0; )
       {
-	pos = addPos(pos, getPosPrevious(iter);
+	pos = addPos(pos, getPosPrevious(iter));
 	changed = true;
       }
     releasePos(pos);

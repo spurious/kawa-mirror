@@ -1,3 +1,7 @@
+2003-05-03  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java.in (addAll):  Fix typo in non-collections case.
+
 2003-04-08  Per Bothner  <per@bothner.com>
 
 	* Sequence.java.in (EofClass): New non-public class.

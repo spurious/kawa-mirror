@@ -1271,7 +1271,7 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitIfThen ()
   {
-    new IfState(this);
+    new IfState(this, null);
   }
 
   /** Compile start of else clause. */
@@ -1297,7 +1297,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     while (SP > if_stack.start_stack_size)
       popType();
     SP = if_stack.start_stack_size;
-    else_label.define (this);
+    if (else_label != null)
+      else_label.define (this);
     if_stack.doing_else = true;    
   }
 
@@ -1331,7 +1332,8 @@ public class CodeAttr extends Attribute implements AttrContainer
     else if (unreachable_here)
       make_unreachable = true;
 
-    if_stack.end_label.define (this);
+    if (if_stack.end_label != null)
+      if_stack.end_label.define (this);
     if (make_unreachable)
       setUnreachable();
     // Pop the if_stack.

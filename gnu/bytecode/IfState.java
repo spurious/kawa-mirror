@@ -31,9 +31,14 @@ public class IfState {
 
   public IfState (CodeAttr code)
   {
+    this(code, new Label(code));
+  }
+
+  public IfState (CodeAttr code, Label endLabel)
+  {
     previous = code.if_stack;
     code.if_stack = this;
-    end_label = new Label(code);
+    end_label = endLabel;
     start_stack_size = code.SP;
   }
 }

@@ -125,15 +125,19 @@ public class ClassType extends ObjectType implements AttrContainer {
     return superClass;
   }
 
+  /**
+   * @return the interfaces this class is declared to implement
+   * (not those inherited from its superclass/superinterfaces).
+   */
   public ClassType[] getInterfaces()
   {
     if (superClass == null && reflectClass != null)
       {
-	Class[] javaItfs = reflectClass.getInterfaces();
-	interfaces = new ClassType[javaItfs.length];
+	Class[] reflectInterfaces = reflectClass.getInterfaces();
+	interfaces = new ClassType[reflectInterfaces.length];
 
-	for (int i=0; i<javaItfs.length; i++)
-	interfaces[i] = (ClassType) Type.make(javaItfs[i]);
+	for (int i = 0; i < reflectInterfaces.length; i++)
+	  interfaces[i] = (ClassType) Type.make(reflectInterfaces[i]);
       }
     return interfaces;
   }

@@ -1,3 +1,12 @@
+2000-02-01  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (getInterfaces):  Style tweaks.
+
+	* IfState.java (<init>):  New constructor.
+	* CodeAttr.java (emitIfThen):  Use new IfState constructor to avoid
+	that doesn't set end_label (which may be unneeded).
+	(emitElse, emitFi):  Only set end_label if defined.
+
 2000-01-19  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
 
         * CodeAttr.java (emitConvert):  Ensured that conversion from a

@@ -3,6 +3,9 @@
 	* ReaderParens.java (readList):  Re-order tests so that the case
 	that there is no closing delimiter (ch==-1).  Fixes Scheme.eval.
 
+	* LispReader.java (makePair):  Don't used to-be-removed
+	PairWithPosition constructor; use static make method instead.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber):  Use new Convert.parseDouble.

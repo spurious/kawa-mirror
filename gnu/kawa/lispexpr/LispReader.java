@@ -956,10 +956,8 @@ public abstract class LispReader extends Lexer
 
   protected Object makePair (Object car, int line, int column)
   {
-    PairWithPosition pair = new PairWithPosition (port, car, LList.Empty);
-    pair.setLine(line + 1, column + 1);
-    pair.setFile (port.getName());
-    return pair;
+    return PairWithPosition.make(car, LList.Empty,
+                                 port.getName(), line + 1, column + 1);
   }
 
   public Object makePair (Object car, Object cdr)

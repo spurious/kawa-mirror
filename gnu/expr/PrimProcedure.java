@@ -338,7 +338,7 @@ public class PrimProcedure extends MethodProc implements gnu.expr.Inlineable
 	Target target =
 	  source == null ? CheckedTarget.getInstance(arg_type, name, i)
 	  : CheckedTarget.getInstance(arg_type, source, i);
-	args[i].compileNotePosition(comp, target);
+	args[i].compileNotePosition(comp, target, args[i]);
         if (i >= fix_arg_count)
           code.emitArrayStore(arg_type);
 	if (argDecl != null && (is_static || i > 0))

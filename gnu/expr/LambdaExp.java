@@ -1379,7 +1379,8 @@ public class LambdaExp extends ScopeExp
       }
     else
       target = Target.pushValue(comp.method.getReturnType());
-    body.compileWithPosition(comp, target);
+    body.compileWithPosition(comp, target,
+			     body.getLine() > 0 ? body : this);
   }
 
   /** A cache if this has already been evaluated. */

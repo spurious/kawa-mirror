@@ -66,19 +66,35 @@ public abstract class Expression implements Printable
     if (line > 0)
       {
         comp.method.compile_linenumber (line);
-        compileNotePosition(comp, target);
+        compileNotePosition(comp, target, this);
+      }
+    else
+      compile(comp, target);
+  }
+
+  /** Same as 2-argument compileWithPosition,
+   * but use some other Expression's line number. */
+  public final void compileWithPosition(Compilation comp, Target target,
+					Expression position)
+  {
+    int line = position.getLine ();
+    if (line > 0)
+      {
+        comp.method.compile_linenumber (line);
+        compileNotePosition(comp, target, position);
       }
     else
       compile(comp, target);
   }
 
   /** Compile, but take note of line number. */
-  public final void compileNotePosition(Compilation comp, Target target)
+  public final void compileNotePosition(Compilation comp, Target target,
+					Expression position)
   {
     String saveFilename = comp.getFile();
     int saveLine = comp.getLine();
     int saveColumn = comp.getColumn();
-    comp.setLine(filename, getLine(), getColumn());
+    comp.setLine(position.filename, position.getLine(), position.getColumn());
     compile(comp, target);
     // This might logically belong in a `finally' clause.
     // It is intentionally not so, so if there is an internal error causing

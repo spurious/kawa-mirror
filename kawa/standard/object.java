@@ -138,7 +138,7 @@ public class object extends Syntax
 		args = pair.cdr;
 	      }
 	    int nKeywords = 0;
-	    Object init = null;
+	    boolean seenInit = false;
 	    Pair initPair = null;
 	    while (args instanceof Pair)
 	      {
@@ -173,9 +173,9 @@ public class object extends Syntax
 			     || key == init_formKeyword
 			     || key == init_valueKeyword)
 		      {
-			if (init != null)
+			if (seenInit)
 			  tr.error('e', "duplicate initialization");
-			init = value;
+			seenInit = true;
 			// In the case of 'init-form: EXPR' the scope of EXPR
 			// doesn't include this class;
 			// in the case of 'init: EXPR' it does.
@@ -230,19 +230,21 @@ public class object extends Syntax
 			tr.error('w', "unknown slot keyword '"+key+"'");
 		      }
 		  }
-		else if (args == LList.Empty && init == null)
+		else if (args == LList.Empty && ! seenInit)
 		  {
 		    // CLtL:2 explicitly prohibits this as an extension.
-		    init = key;
+		    initPair = keyPair;
+		    seenInit = true;
 		  }
 		else if (args instanceof Pair
-			 && nKeywords == 0 && init == null && typePair == null
+			 && nKeywords == 0 && ! seenInit && typePair == null
 			 && (pair = (Pair) args).cdr == LList.Empty)
 		  {
 		    // Backward compatibility.
 		    typePair = keyPair;
-		    init = pair.car;
+		    initPair = pair;
 		    args = pair.cdr;
+		    seenInit = true;
 		  }
 		else
 		  {
@@ -257,7 +259,7 @@ public class object extends Syntax
 			 + sname + '\''+" args:"+(args==null?"null":args.getClass().getName()));
 		return null;
 	      }
-	    if (init != null)
+	    if (seenInit)
 	      {
 		boolean isStatic
 		  = allocationFlag == Declaration.STATIC_SPECIFIED;
@@ -267,7 +269,7 @@ public class object extends Syntax
 	      }
 	    if (decl == null)
 	      {
-		if (init == null)
+		if (! seenInit)
 		  {
 		    tr.error('e', "missing field name");
 		    return null;

@@ -4,6 +4,7 @@
 	is a SyntaxForm remember that, and use it to setCurrentScope.
 	Fixes Savannah PR 11822.
 	(rewriteClassDef): Also use SyntaxForm to rewrite init forms.
+	(scanClassDef): Fix some bugs in handling of init forms.
 
 	* kawa/standard/define_class.java (scanForDefinitions): Handle the
 	case that the input form is wrapped in a SyntaxForm.

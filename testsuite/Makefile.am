@@ -35,5 +35,5 @@ check-polytype: testing.zip
 	$(KAWATEST) -f "$(srcdir)/polytype.scm" -e '(test-report)'
 
 SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
-  obj-test.scm misc-test.scm polytest.scm
+  obj-test.scm misc-test.scm polytype.scm
 CLEANFILES = tmp? *.log testing.zip

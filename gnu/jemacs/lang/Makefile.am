@@ -13,15 +13,11 @@ java_WITH_SWING =\
   Symbol.java \
   NumberCompare.java \
   SaveExcursion.java \
-  UnwindProtect.java \
   defcustom.java defgroup.java \
   lambda.java
 
 java_sources=\
-  defun.java \
-  defvar.java \
   While.java \
-  setq.java \
   $(java_@SWING_SELECTED@)
 
 SCM_WITH_SWING = SymbolOps.scm NumberOps.scm StringOps.scm ArrayOps.scm \

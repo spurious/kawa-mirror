@@ -8,6 +8,9 @@ import gnu.bytecode.Type;
 import gnu.bytecode.CodeAttr;
 import kawa.lang.SpecialType;
 
+// Should perhaps inherit from CommonLisp, but getInstance (different
+// return types) is a problem.  Perhaps have both inherit from "Lisp2"?  FIXME
+
 public class ELisp extends Interpreter
 {
   public static final LList FALSE = LList.Empty;
@@ -209,20 +212,20 @@ public class ELisp extends Interpreter
     lambda.setKeywords("&optional", "&rest", "&key");
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
-    defun("defun", new gnu.jemacs.lang.defun(lambda));
+    defun("defun", new gnu.commonlisp.lang.defun(lambda));
 
     defun("defgroup", new defgroup());
     defun("defcustom", new defcustom());
-    defun("defvar", new defvar(false));
-    defun("defconst", new defvar(true));
-    defun("defsubst", new gnu.jemacs.lang.defun(lambda));
-    defun("setq", new gnu.jemacs.lang.setq());
+    defun("defvar", new gnu.commonlisp.lang.defvar(false));
+    defun("defconst", new gnu.commonlisp.lang.defvar(true));
+    defun("defsubst", new gnu.commonlisp.lang.defun(lambda));
+    defun("setq", new gnu.commonlisp.lang.setq());
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
     defun("and", new kawa.standard.and_or(true, this));
     defun("while", new gnu.jemacs.lang.While());
-    defun("unwind-protect", new gnu.jemacs.lang.UnwindProtect());
+    defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
     defun("save-excursion", new gnu.jemacs.lang.SaveExcursion(false));
     defun("save-current-buffer", new gnu.jemacs.lang.SaveExcursion(true));
     defun("let", new kawa.standard.fluid_let(false, nilExpr));

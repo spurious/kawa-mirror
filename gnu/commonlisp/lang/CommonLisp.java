@@ -1,7 +1,7 @@
 package gnu.commonlisp.lang;
 import gnu.mapping.*;
-import gnu.jemacs.lang.*;
 import gnu.jemacs.lang.Symbol;
+import gnu.jemacs.lang.ObArray;
 import gnu.lists.*;
 import gnu.expr.*;
 import gnu.text.Char;
@@ -200,18 +200,17 @@ public class CommonLisp extends Interpreter
     lambda.setKeywords("&optional", "&rest", "&key");
     lambda.defaultDefault = nilExpr;
     defun("lambda", lambda);
-    defun("defun", new gnu.jemacs.lang.defun(lambda));
+    defun("defun", new defun(lambda));
 
     defun("defvar", new defvar(false));
     defun("defconst", new defvar(true));
-    defun("defsubst", new gnu.jemacs.lang.defun(lambda));
-    defun("setq", new gnu.jemacs.lang.setq());
+    defun("defsubst", new defun(lambda));
+    defun("setq", new setq());
     defun("progn", new kawa.standard.begin());
     defun("if", new kawa.standard.ifp());
     defun("or", new kawa.standard.and_or(false, this));
     defun("and", new kawa.standard.and_or(true, this));
-    defun("while", new gnu.jemacs.lang.While());
-    defun("unwind-protect", new gnu.jemacs.lang.UnwindProtect());
+    defun("unwind-protect", new gnu.commonlisp.lang.UnwindProtect());
     Procedure not = new kawa.standard.not(this);
     defun("not", not);
     defun("null", not);
@@ -283,12 +282,6 @@ public class CommonLisp extends Interpreter
   {
     if (name == "t")
       name = "java.lang.Object";
-    else if (name == "marker")
-      name = "gnu.jemacs.buffer.Marker";
-    else if (name == "buffer")
-      name = "gnu.jemacs.buffer.Bufffer";
-    else if (name == "window")
-      name = "gnu.jemacs.buffer.Window";
     return Scheme.string2Type(name);
   }
 

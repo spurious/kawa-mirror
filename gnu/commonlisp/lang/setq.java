@@ -1,4 +1,4 @@
-package gnu.jemacs.lang;
+package gnu.commonlisp.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
@@ -25,7 +25,7 @@ public class setq extends Syntax implements Printable
 	String name;
 	if (sym instanceof String)
 	  name = (String) sym;
-	else if (sym == ELisp.FALSE)
+	else if (sym == CommonLisp.FALSE)
 	  name = "nil";
 	else
 	  return tr.syntaxError("invalid variable name in setq");
@@ -48,7 +48,7 @@ public class setq extends Syntax implements Printable
 	results.addElement(sexp);
       }
     if (results == null)
-      return ELisp.nilExpr;
+      return CommonLisp.nilExpr;
     Expression[] stmts = new Expression[results.size()];
     results.copyInto(stmts);
     return new BeginExp(stmts);

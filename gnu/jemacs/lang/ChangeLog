@@ -1,3 +1,13 @@
+2001-05-01  Per Bothner  <per@bothner.com>
+
+	Steps to making jemacs depends on commonlisp rather than vice versa.
+	* UnwindProtect.java:  Moved to ../../../gnu/commonlisp/lang.
+	* defun.java:  Moved to ../../../gnu/commonlisp/lang.
+	* defvar.java:  Moved to ../../../gnu/commonlisp/lang.
+	* setq.java:  Moved to ../../../gnu/commonlisp/lang.
+	* Makefile.am:  Update accordingly.
+	* ELisp.java:  Likewise.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* ELispReader.java:  Extend CLispreader rather than LispReader.

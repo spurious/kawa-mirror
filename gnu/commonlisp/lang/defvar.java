@@ -1,4 +1,4 @@
-package gnu.jemacs.lang;
+package gnu.commonlisp.lang;
 import kawa.lang.*;
 import gnu.lists.*;
 import gnu.expr.*;
@@ -75,7 +75,7 @@ public class defvar extends Syntax
     if (value == null)
       {
 	if (force)
-	  value = ELisp.nilExpr;
+	  value = CommonLisp.nilExpr;
 	else
 	  return new QuoteExp(name);
       }

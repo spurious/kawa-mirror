@@ -1,3 +1,14 @@
+2001-05-01  Per Bothner  <per@bothner.com>
+
+	Steps to making jemacs depens on commonlisp rather than vice versa.
+	* UnwindProtect.java:  Moved from ../../../gnu/jemacs/lang.
+	* defun.java:  Moved from ../../../gnu/jemacs/lang.
+	* defvar.java:  Moved from ../../../gnu/jemacs/lang.
+	* setq.java:  Moved from ../../../gnu/jemacs/lang.
+	* Makefile.am (java_JAVA):  Update accordingly.
+	* CommonLisp.java:  Likewise update.
+	(getTypeFor):  Remove Emacs-specific types.
+
 2001-04-24  Per Bothner  <per@bothner.com>
 
 	* CLispReader.java:  New class, extends LispReader.

@@ -1,4 +1,4 @@
-package gnu.jemacs.lang;
+package gnu.commonlisp.lang;
 import kawa.lang.*;
 import gnu.expr.Expression;
 import gnu.expr.TryExp;

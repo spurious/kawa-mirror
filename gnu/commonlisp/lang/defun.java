@@ -1,4 +1,4 @@
-package gnu.jemacs.lang;
+package gnu.commonlisp.lang;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;

@@ -552,6 +552,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public void getDelimited(String delimiter)
       throws java.io.IOException, SyntaxException
   {
+    tokenBufferLength = 0;
     int dlen = delimiter.length();
     char last = delimiter.charAt(dlen-1);
     for (;;)
@@ -2010,6 +2011,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  syntaxError("missing target after '<?'");
 	String target = new String(tokenBuffer, 0, tokenBufferLength);
 	skipSpace();
+	unread();
 	getDelimited("?>");
 	String content = new String(tokenBuffer, 0, tokenBufferLength);
 	Expression[] args = { new QuoteExp(target), new QuoteExp(content) };

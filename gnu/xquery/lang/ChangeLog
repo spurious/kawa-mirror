@@ -1,3 +1,9 @@
+2004-05-29  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (getDelimited):  Reset tokenBufferLength.
+
+	* XQParser.java (parseXMLConstructor):  Unread before PI content.
+
 2004-05-28  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (parseContent):  Changes to fix space handling.

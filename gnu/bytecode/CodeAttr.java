@@ -102,6 +102,7 @@ public class CodeAttr extends Attribute implements AttrContainer
     setContainer(meth);
     setNext(meth.getAttributes());
     meth.setAttributes(this);
+    meth.code = this;
   }
 
   public final void reserve (int bytes)
@@ -368,7 +369,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * @param name name to search for
    * @return the Variable, or null if not found (in any scope of this Method).
    */
-  Variable lookup (String name)
+  public Variable lookup (String name)
   {
     Scope scope = locals.current_scope;
     for (; scope != null;  scope = scope.parent)
@@ -392,7 +393,7 @@ public class CodeAttr extends Attribute implements AttrContainer
    * @param type type of the new Variable.
    * @param name name of the new Variable.
    * @return the new Variable. */
-  Variable addLocal (Type type, String name)
+  public Variable addLocal (Type type, String name)
   {
     return locals.current_scope.addVariable (this, type, name);
   }

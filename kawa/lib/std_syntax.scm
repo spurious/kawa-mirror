@@ -78,8 +78,10 @@
 ;;; LET (including named let)
 
 (define-syntax %let-lambda1
-  (syntax-rules ()
+  (syntax-rules (::)
 		((%let-lambda1 ((var type init) . in) out body)
+		 (%let-lambda1 in ((var type) . out) body))
+		((%let-lambda1 ((var :: type init) . in) out body)
 		 (%let-lambda1 in ((var type) . out) body))
 		((%let-lambda1 ((var init) . in) out body)
 		 (%let-lambda1 in (var . out) body))
@@ -95,8 +97,10 @@
 		 (lambda out . body))))
 
 (define-syntax %let-init
-  (syntax-rules ()
+  (syntax-rules (::)
 		((%let-init (var init))
+		 init)
+		((%let-init (var :: type init))
 		 init)
 		((%let-init (var type init))
 		 init)
@@ -135,7 +139,6 @@
 				 ((let* . body)
 				  (%syntax-error
 				   "missing bindings list in let*"))))
-
 ;;; DO
 
 ;;; Helper macro for do, to handle optional step.
@@ -145,7 +148,19 @@
 		((%do-step variable) variable)))
 
 (define-syntax do
-  (syntax-rules ()
+  (syntax-rules (::)
+		;;; Handle type specifier - but only for one variable.
+		;;; I don't know how to handle the general case, by just
+		;;; using syntax-rules, so fix that later.  FIXME.
+		((do ((name :: type init step))
+		     (test . result) commands ...)
+		 (letrec ((%do%loop
+			   (lambda ((name type))
+			     (if test
+				 (begin #!void . result)
+				 (begin commands ...
+					(%do%loop step))))))
+		   (%do%loop init)))
 		((do ((name init . step) ...)
 		     (test . result) commands ...)
 		 ;; The identifier %do%loop is optimized specially ...

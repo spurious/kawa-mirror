@@ -57,3 +57,20 @@
 
 (define (string-capitalize str)
   (string-capitalize! (string-copy str)))
+
+#|
+(define (string->list (str <string>))
+  (let* ((len :: <int>
+	      ((primitive-virtual-method <string> "length" <int> ()) str))
+	 (result '()))
+    (do ((i :: <int> (- len (as <int> 1)) (- i (as <int> 1))))
+	((>= i (as <int> 0))
+	 result)
+      (set! result ((primitive-constructor <pair> (<object> <object>))
+		    ((primitive-static-method <character> "make" <character>
+					      (<char>))
+		       ((primitive-virtual-function <string> "charAt"
+						    <char> (<int>))
+			str i))
+		    result)))))
+|#

@@ -123,3 +123,7 @@
 		   (<gnu.bytecode.ClassType> <String> <gnu.bytecode.Type>
 					     <int>))
 		  ctype fname ftype 9 #|PUBLIC|STATIC|#))))
+
+(define (subtype? (t1 <type>) (t2 <type>)) <boolean>
+  ((primitive-virtual-method <type> "isSubtype" <boolean> (<type>))
+   t1 t2))

@@ -174,18 +174,15 @@ public class ClassExp extends LambdaExp
       }
     instanceType.setModifiers(Access.SUPER);
 
-    if (j > 0)
+    ClassType[] interfaces;
+    if (j == len)
+      interfaces = superTypes;
+    else
       {
-	ClassType[] interfaces;
-	if (j == len)
-	  interfaces = superTypes;
-	else
-	  {
-	    interfaces = new ClassType[j];
-	    System.arraycopy(superTypes, 0, interfaces, 0, j);
-	  }
-	type.setInterfaces(interfaces);
+	interfaces = new ClassType[j];
+	System.arraycopy(superTypes, 0, interfaces, 0, j);
       }
+    type.setInterfaces(interfaces);
   }
 
   public Type getType()

@@ -131,24 +131,19 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
     String tag = getName();
     int nargs = ctx.count;
     out.beginGroup(tag, this);
-    boolean inAttributes = true;
     for (int i = 0;  i < nargs;  i++)
       {
 	Object arg = ctx.getArgAsObject(i);
-	if (arg instanceof Keyword && i + 1 < nargs && inAttributes)
+	if (arg instanceof Keyword && i + 1 < nargs)
 	  {
 	    Keyword attr = (Keyword) arg;
 	    arg = ctx.getArgAsObject(++i);
 	    out.beginAttribute(attr.getName(), attr);
 	    out.writeObject(arg);
+	    out.endAttribute();
 	  }
 	else
 	  {
-	    if (inAttributes)
-	      {
-		out.endAttributes();
-		inAttributes = false;
-	      }
 	    /*
 	    if (arg instanceof Consumable)
 	      ((Consumable) arg).consume(out);
@@ -157,8 +152,6 @@ public class Keyword extends CpsProcedure implements Printable, Externalizable
 	      out.writeObject(arg);
 	  }
       }
-    if (inAttributes)
-      out.endAttributes();
     out.endGroup(tag);
   }
 

@@ -335,11 +335,6 @@ public class OutPort extends PrintConsumer implements Printable
     print(' ');  // FIXME
   }
 
-  public void writeChars(String str)
-  {
-    print(str);
-  }
-
   public void freshLine()
   {
     int col = bout.getColumnNumber();

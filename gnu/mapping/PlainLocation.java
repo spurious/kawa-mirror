@@ -3,7 +3,7 @@
 
 package gnu.mapping;
 
-public class PlainLocation extends IndirectableLocation
+public class PlainLocation extends NamedLocation
 {
   public PlainLocation (Symbol symbol, Object property)
   {
@@ -70,5 +70,4 @@ public class PlainLocation extends IndirectableLocation
     else
       value = oldValue;
   }
-
 }

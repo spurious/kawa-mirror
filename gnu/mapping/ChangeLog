@@ -1,3 +1,33 @@
+2004-12-29  Per Bothner  <per@bothner.com>
+
+	* IndirectableLocation.java: Changed to inherit directly from
+	Location, rather than via NamedLocation.
+	(getKeySymbol, getKeyProperty): New methods.
+	(setBase): Simplify.
+	* NamedLocation.java: Inherit from IndirectableLocation.
+	* PlainLocation.java: Inherit from NamedLocation
+	* SharedLocation.java: Likewise.
+	* Location.java (getKeySymbol, getKeyProperty): New methods.
+	(toString): New method.
+
+	* InheritingEnvironment.java (lookupDirect): Moved to super class.
+	* SimpleEnvironment.java (lookupDirect): New method.
+	(put): Simplify using getLocation.
+	(newEntry): New helper method.
+	* Environment.java (addLocation): Change to a non-void return.
+	* InheritingEnvironment.java (getLocation): Use new addLocation.
+
+	* UnboundLocation.java: Removed class - just use a PlainLocation.
+	* Makefile.am: Update accordingly.
+	* IndirectableLocation.java (undefine): Handle UNBOUND ourself.
+	* Location.java (make): No longer use UnboundLocation.
+	* LocationEnumeration.java (nextLocation): Likewise.
+	* NamedLocation.java (genEnvironment): Update likewise.
+	* SimpleEnvironment.java (unbound): Rename field ...
+	(sharedTail): and change type to namedLocation.
+	(addUnboundLocation, define, addLocation): Major simplification,
+	since we don't try to use an extra WeakReference.
+
 2004-12-22  Per Bothner  <per@bothner.com>
 
 	* Namespace.java: New protected constructor. Kludge used by SName.

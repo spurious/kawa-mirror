@@ -6,7 +6,7 @@ import gnu.lists.*;
 
 /** A Location that can be used as an entry in an Environment. */
 
-public abstract class NamedLocation extends Location
+public abstract class NamedLocation extends IndirectableLocation
   implements
   /* BEGIN JAVA2 */
   java.util.Map.Entry /* <EnvironmentKey, Object> */,
@@ -24,14 +24,14 @@ public abstract class NamedLocation extends Location
   {
     for (NamedLocation loc = this;  loc != null;  loc = loc.next)
       {
-	if (loc instanceof UnboundLocation)
+	if (loc.name == null)
 	  {
-	    Environment env = ((UnboundLocation) loc).env;
+	    Environment env = (Environment) loc.value;
 	    if (env != null)
 	      return env;
 	  }
       }
-    return null;
+    return super.getEnvironment();
   }
 
   final Symbol name;

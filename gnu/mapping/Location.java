@@ -14,7 +14,39 @@ public abstract class Location
   {
   }
 
-  public String toString() { return getClass().getName()+"[#:"+id+"]"; }
+  public Symbol getKeySymbol ()
+  {
+    return null;
+  }
+
+  public Object getKeyProperty ()
+  {
+    return null;
+  }
+
+  public String toString()
+  {
+    StringBuffer sbuf = new StringBuffer();
+    sbuf.append(getClass().getName());
+    Symbol sym = getKeySymbol();
+    if (sym != null)
+      {
+	sbuf.append('[');
+	sbuf.append(sym);
+	Object property = getKeyProperty();
+	if (property != null)
+	  {
+	    sbuf.append('/');
+	    sbuf.append(property);
+	  }
+	sbuf.append(" #:");
+      }
+    else
+      sbuf.append("[#:");
+    sbuf.append(id);
+    sbuf.append("]");
+    return sbuf.toString();
+  }
 
   /** Magic value used to indicate there is no property binding. */
   public static final String UNBOUND = new String("(unbound)");
@@ -22,7 +54,7 @@ public abstract class Location
   public abstract Object get (Object defaultValue);
 
   /** Get the current value of this location.
-   * @exception UnboundLocation the location does not have a value. */
+   * @exception UnboundLocationException the location does not have a value. */
   public final Object get ()
   {
     Object unb = Location.UNBOUND;
@@ -118,16 +150,16 @@ public abstract class Location
   {
     Symbol sym = Namespace.EmptyNamespace.getSymbol(name.intern());
     PlainLocation loc = new PlainLocation(sym, null);
-    loc.base = UnboundLocation.instance;
-    loc.value = IndirectableLocation.DIRECT_ON_SET;
+    loc.base = null;
+    loc.value = UNBOUND;
     return loc;
   }
 
   public static IndirectableLocation make (Symbol name)
   {
     PlainLocation loc = new PlainLocation(name, null);
-    loc.base = UnboundLocation.instance;
-    loc.value = IndirectableLocation.DIRECT_ON_SET;
+    loc.base = null;
+    loc.value = UNBOUND;
     return loc;
   }
 }

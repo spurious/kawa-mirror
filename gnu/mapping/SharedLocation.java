@@ -7,7 +7,7 @@ package gnu.mapping;
  * multiple threads.  Accesses are synchronized.
  * Also, setWithSave setRestore are different than PlainLocation. */
 
-public class SharedLocation extends IndirectableLocation
+public class SharedLocation extends NamedLocation
 {
   int timestamp;
 

@@ -44,8 +44,6 @@ public class LocationEnumeration
     if (curLoc == null && ! hasMoreElements())
       throw new java.util.NoSuchElementException();
     Location r = curLoc;
-    if (r instanceof UnboundLocation)
-      r = ((UnboundLocation) r).getLocation();
     curLoc = curLoc.next;
     return r;
   }

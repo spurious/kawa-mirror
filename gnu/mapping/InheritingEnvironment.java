@@ -32,11 +32,6 @@ public class InheritingEnvironment extends SimpleEnvironment
     numInherited++;
   }
 
-  public NamedLocation lookupDirect (Symbol name, Object property, int hash)
-  {
-    return super.lookup(name, property, hash);
-  }
-
   public NamedLocation lookupExtend (Symbol name, Object property, int hash)
   {
     return null;
@@ -105,10 +100,9 @@ public class InheritingEnvironment extends SimpleEnvironment
       {
 	if (create /* && loc.getEnvironment() != this*/)
 	  {
-	    IndirectableLocation xloc = newLocation(name, property);
+	    NamedLocation xloc = addLocation(name, property, hash, loc);
 	    xloc.value = IndirectableLocation.DIRECT_ON_SET;
 	    xloc.base = loc;
-	    addLocation(name, property, hash, xloc);
 	    return xloc;
 	  }
 	else

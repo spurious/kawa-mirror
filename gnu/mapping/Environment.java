@@ -320,7 +320,7 @@ public abstract class Environment
     addLocation(loc.getKeySymbol(), loc.getKeyProperty(), loc);
   }
 
-  public abstract void addLocation (Symbol name, Object prop, Location loc);
+  public abstract NamedLocation addLocation (Symbol name, Object prop, Location loc);
 
   public final void addLocation (EnvironmentKey key, Location loc)
   {

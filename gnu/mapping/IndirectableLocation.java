@@ -3,7 +3,7 @@
 
 package gnu.mapping;
 
-public abstract class IndirectableLocation extends NamedLocation
+public abstract class IndirectableLocation extends Location
 {
   /** If <code>value==DIRECT_ON_SET</code>, break indirection on a <code>set</code>. */
   protected static final Object DIRECT_ON_SET = new String("(direct-on-set)");
@@ -20,9 +20,14 @@ public abstract class IndirectableLocation extends NamedLocation
    */
   protected Object value;
 
-  public IndirectableLocation (Symbol symbol, Object property)
+  public Symbol getKeySymbol ()
   {
-    super(symbol, property);
+    return base != null ? base.getKeySymbol() : null;
+  }
+
+  public Object getKeyProperty ()
+  {
+    return base != null ? base.getKeyProperty() : null;
   }
 
   public boolean isConstant ()
@@ -37,27 +42,20 @@ public abstract class IndirectableLocation extends NamedLocation
 
   public void setBase (Location base)
   { 
-    Environment env = getEnvironment();
-    if (env != null && next == null && this.base instanceof UnboundLocation)
-      env.addLocation(name, property, this);
     this.base = base;
     this.value = null;
   }
 
   public void undefine ()
   {
-    base = UnboundLocation.getInstance();
+    base = null;
     value = UNBOUND;
   }
 
   public Environment getEnvironment ()
   {
-    return (! entered() && base instanceof NamedLocation
+    return (base instanceof NamedLocation
 	    ? ((NamedLocation) base).getEnvironment()
-	    : super.getEnvironment());
+	    : null);
   }
-
-  public String toString() { return getClass().getName()+"[#:"+id
-      +" name:"+name+(property==null?"":(" prop:"+property))
-      +(base==null?"":(" base:"+base.id)) +"]"; }
 }

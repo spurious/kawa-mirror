@@ -7,7 +7,7 @@ public abstract class NameMap extends Procedure1
   implements HasSetter
 {
   /** Get the value bound to the given name.
-   * @exception gnu.mapping.UnboundLocation the name has no binding
+   * @exception gnu.mapping.UnboundLocationException the name has no binding
    * @see Environment#get(Object)
    */
   public final Object getChecked(String name)

@@ -44,7 +44,6 @@ java_sources=\
   SimpleEnvironment.java \
   Symbol.java \
   TtyInPort.java \
-  UnboundLocation.java \
   UnboundLocationException.java \
   Values.java \
   ValueStack.java \

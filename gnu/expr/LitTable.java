@@ -176,7 +176,7 @@ public class LitTable implements ObjectOutput
     // value is equals to obj, but not identical.  This can lead to trouble,
     // e.g. if one is a Pair and the other is a PairWithPosition.
     /* #ifndef JAVA2 */
-    obj = lit.value;
+    // obj = lit.value;
     /* #endif */
 
     if ((lit.flags & (Literal.WRITTEN|Literal.WRITING)) != 0)

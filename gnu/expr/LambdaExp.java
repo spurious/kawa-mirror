@@ -511,7 +511,7 @@ public class LambdaExp extends ScopeExp
     if (heapFrame != null)
       comp.generateConstructor((ClassType) heapFrame.getType(), this);
     comp.generateMatchMethods(this);
-    if (comp.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
+    if (Compilation.defaultCallConvention >= Compilation.CALL_WITH_CONSUMER)
       comp.generateApplyMethodsWithContext(this);
     else
       comp.generateApplyMethodsWithoutContext(this);

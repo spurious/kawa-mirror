@@ -1,3 +1,10 @@
+2005-01-07  Per Bothner  <per@bothner.com>
+
+	* FluidLetExp: Use class name to static reference, to shut up ecj.
+	* LambdaExp.java: Likewise.
+
+	* LitTable.java: Comment out line if JAVA2, which is the default.
+
 2005-01-05  Per Bothner  <per@bothner.com>
 
 	* Compilation.java: Remove various unused static fields.

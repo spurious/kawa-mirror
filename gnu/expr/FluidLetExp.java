@@ -42,7 +42,7 @@ public class FluidLetExp extends LetExp
       {
 	decl.load(comp);
 	code.emitLoad(save[i]);
-	code.emitInvokeVirtual(comp.typeLocation
+	code.emitInvokeVirtual(Compilation.typeLocation
 			       .getDeclaredMethod("setRestore", 1));
 	
       }

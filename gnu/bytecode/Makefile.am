@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = foreign
 SUFFIXES = .java .class
 
 JAVAC = @JAVAC@
-#JAVAFLAGS = -g
+JAVACFLAGS = -g
 SOURCES = $(java_JAVA)
 
 javadir=$(datadir)/java/$(subdir)
@@ -49,3 +49,24 @@ install-html:
 	cp $(srcdir)/overview.html $(HTML_HOME)/gnu.bytecode/index.html
 	cp $(srcdir)/COPYING $(HTML_HOME)/gnu.bytecode/COPYING
 	chmod a+r $(HTML_HOME)/gnu.bytecode/*
+
+JC1FLAGS = -g
+GCC = ../../../gcc/xgcc -B../../../gcc/
+
+gnu-bytecode.zip: classjava.stamp
+	cd ../..; \
+	  zip -q -r -n .class gnu/bytecode/gnu-bytecode.zip \
+	  gnu/bytecode -i '*.class' -x gnu/bytecode/ZipLoader.class
+
+gnu-bytecode.o:  gnu-bytecode.zip
+	CLASSPATH=`pwd`/../../../libjava \
+	  $(GCC) -c -fassume-compiled $(JC1FLAGS) \
+	  -x java gnu-bytecode.zip -o gnu-bytecode.o
+
+dump-main.o:  dump-main.cc
+	$(GCC) -g -I$(srcdir)/../../../libjava/include -c \
+	  $(srcdir)/dump-main.cc -o dump-main.o	
+
+dump$(exext):  dump-main.o gnu-bytecode.o
+	$(GCC) -o dump dump-main.o gnu-bytecode.o \
+	  ../../../libjava/libjava.a

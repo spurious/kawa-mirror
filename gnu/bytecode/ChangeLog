@@ -1,3 +1,9 @@
+Tue Apr 21 00:04:41 1998  Per Bothner  <bothner@cygnus.com>
+
+	* dump-main.cc:  New file - a main() wrapper for dump.main.
+	* Makefile.am:  Add rules to build stand-alone executable
+	for dump, when compiled by gcc, and linked with libjava.
+
 Sat Apr  4 17:36:03 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (readPC):  New instance variable.

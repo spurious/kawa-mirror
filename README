@@ -171,7 +171,7 @@ I believe Sun's VM does not.)
 
 Authors
 =======
-R. Alexander Milowski <sgml@winternet.com> wrote and released
+R. Alexander Milowski <alex@copsol.com> wrote and released
 versions 0.1 and 0.2.  He is still actively involved.
 
 Per Bothner <bothner@cygnus.com> re-wrote the evaluator to

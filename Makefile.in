@@ -52,6 +52,8 @@ OBJ = kawa.class kawac.class
 
 java_DATA=$(OBJ)
 
+EXTRA_DIST = $(OBJ:.class=.java)
+
 CLEANFILES=$(OBJ)
 ACLOCAL = aclocal.m4
 mkinstalldirs = $(top_srcdir)/mkinstalldirs

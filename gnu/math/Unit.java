@@ -206,4 +206,7 @@ public class Unit extends Quantity
   public static final Unit in = new Unit ("in", 0.0254, meter);
   public static final Unit pt = new Unit ("pt", 0.0003527778, meter);
   public static final Unit pica = new Unit ("pica", 0.004233333, meter);
+
+  public static final Unit minute = new Unit ("min", 60.0, second);
+  public static final Unit hour = new Unit ("hour", 60.0, minute);
 }

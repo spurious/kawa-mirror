@@ -339,14 +339,6 @@ public class IntNum extends RatNum implements Compilable
       set (y.words, y.ival); //COPY
   }
 
-  // Assumes that words != 0.
-  final void appendWord (int word)
-  {
-    if (ival == words.length)
-      realloc (ival + 1);
-    words[ival++] = word;
-  }
-
   /** Add two IntNums, yielding their sum as another IntNum. */
   public static IntNum add (IntNum x, IntNum y, int k)
   {
@@ -785,38 +777,6 @@ public class IntNum extends RatNum implements Compilable
     return IntNum.make (rwords, rlen);
   }
 
-  /** Add an unsigned int to this.
-   * @param i add (long)i & 0xFFFFFFF to this.
-   */
-  /*
-  void increment_unsigned (int i)
-  {
-    if (words != null)
-      {
-	int top = words[ival - 1];
-	long carry = (long) i & 0xffffffffL;
-	for (int i = 0;  i < ival;  i++)
-	  {
-	    long result = ((long)words[i] & 0xffffffffL) + carry;
-	    words[i] = (int) result;
-	    carry = carry >> 32;
-	  }
-	...;
-      }
-    else
-      ...;
-  }
-  */
-  /*
-  void increment ()
-  {
-    if (words == null && ival != Integer.MAX_VAL)
-      ival++;
-    else
-      increment_unsigned (1);
-  }
-  */
-
   /** Calculate Greatest Common Divisor for non-negative ints. */
   public static final int gcd (int a, int b)
   {
@@ -1048,7 +1008,6 @@ public class IntNum extends RatNum implements Compilable
   {
     if (words == null)
       return ival;
-    // Should we throw an exception?  java.lang.Long doesn't.
     return words[0];
   }
 
@@ -1066,7 +1025,8 @@ public class IntNum extends RatNum implements Compilable
   {
     if (words == null)
       return ival;
-    // Should we throw an exception if too large?
+    if (ival == 1)
+      return words[0];
     return ((long)words[1] << 32) + ((long)words[0] & 0xffffffffL);
   }
 

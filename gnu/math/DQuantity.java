@@ -28,7 +28,8 @@ public class DQuantity extends Quantity
   {
     if (x.dimensions() != y.dimensions())
       throw new ArithmeticException ("units mis-match");
-    return new DQuantity (x.factor + k * y.factor, x.unit());
+    double unit_ratio = y.unit().factor / x.unit().factor;
+    return new DQuantity (x.factor + k * unit_ratio * y.factor, x.unit());
   }
 
   public static DQuantity mul (DQuantity x, DQuantity y)

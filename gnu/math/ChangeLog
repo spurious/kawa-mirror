@@ -1,3 +1,10 @@
+Mon Jan 20 15:58:50 1997  Per Bothner  <bothner@kalessin.cygnus.com>
+
+	* DQuantity.java (add):  Adjust for different units.
+	* IntNum.java (longValue):  Support non-normalized value.
+	(appendWord, increment_unsigned, increment): Remove useless code.
+	* Unit.java:  Added minute and hour.
+
 Fri Jan  3 14:44:53 1997  Per Bothner  <bothner@deneb.cygnus.com>
 
 	Implemented units, quantities, and dimensions for measurements.

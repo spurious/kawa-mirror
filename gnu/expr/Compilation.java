@@ -496,8 +496,6 @@ public class Compilation
 	if (Character.isLowerCase (ch) || Character.isUpperCase (ch)
 	    || (Character.isDigit (ch) && i > 0) || ch == '_' || ch == '$')
 	  mangled.append(ch);
-	else if (ch == '!')
-	  mangled.append("_B");
 	else if (ch == '?')
 	  {
 	    char first = mangled.length() > 0 ? mangled.charAt(0) : '\0';
@@ -509,24 +507,13 @@ public class Compilation
 	    else
 	      mangled.append("_P");
 	  }
-	else if (ch == '%')
-	  mangled.append("_C");
 	else if (ch == '-')
 	  {
 	    char next = i + 1 < len ? name.charAt(i+1) : '\0';
 	    if (next == '>')
 	      {
+		mangled.append("$To$");
 		i++;
-		next = i + 1 < len ? name.charAt(i+1) : '\0';
-		if (Character.isLowerCase(next))
-		  {
-		    mangled.append(i == 1 ? "to" : "To");
-		    next = Character.toTitleCase(next);
-		    mangled.append(next);
-		    i++;
-		  }
-		else
-		  mangled.append("_2_");
 	      }
 	    else if (Character.isLowerCase(next))
 	      {
@@ -582,6 +569,43 @@ public class Compilation
     return mname.equals(name) ? name : mname;
   }
 
+  /** Demangle a three-character mangling starting with '$'.
+   * UNFINISHED!
+   */
+  public static char demangle2(char char1, char char2)
+  {
+    switch (char1)
+      {
+      case 'E':
+	switch (char2)
+	  {
+	  case 'x':  return '!';
+	  }
+	break;
+      case 'M':
+	switch (char2)
+	  {
+	  case 'c':  return '%';
+	  case 'n':  return '-';
+	  }
+	break;
+      case 'P':
+	switch (char2)
+	  {
+	  case 'l':  return '+';
+	  }
+	break;
+      case 'S':
+	switch (char2)
+	  {
+	  case 'l':  return '/';
+	  case 't':  return '*';
+	  }
+	break;
+      }
+    return (char) (-1);
+  }
+
   /** Generate an unused class name.
    * @param hint the requested name (or prefix)
    * @return a unique class name.
@@ -605,6 +629,12 @@ public class Compilation
 
   String source_filename;
 
+  /** Create a new Compilation environment.
+   * @param lexp top-level function
+   * @param classname name of top-level class to generate
+   * @param prefix prefix to pre-pend to the names of other (non-top) classes
+   * @param immediate true if the classes will be immediately loaded
+   */
   public Compilation (LambdaExp lexp, String classname, String prefix,
 		      boolean immediate)
   {

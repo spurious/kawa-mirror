@@ -93,6 +93,11 @@ public abstract class Interpreter
     return getTypeFor(clas).coerceToObject(obj);
   }
 
+  public Object coerceToObject(int val)
+  {
+    return gnu.math.IntNum.make(val);
+  }
+
   // The compiler finds registerEnvironment by using reflection.
   //
   // public static void registerEnvironment()

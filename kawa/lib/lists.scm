@@ -12,8 +12,5 @@
   ((primitive-set-field <pair> "cdr" <object>)
    p x))
 
-#|
-(define (length list)
-  ((primitive-static-method "kawa.lang.List" "length" "int" ())
-   list))
-|#
+(define (length list :: <list>) <int>
+  (invoke-static <list> 'length list))

@@ -13,8 +13,7 @@
   (instance? x <java.lang.String>))
 
 (define (symbol->string (s <symbol>))
-  ((primitive-constructor <kawa.lang.FString> (<symbol>))
-   s))
+  (make <string> s))
 
 (define (string->symbol (str <string>))
   ((primitive-virtual-method <String> "intern" <symbol> ())

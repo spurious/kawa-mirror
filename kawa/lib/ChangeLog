@@ -1,3 +1,8 @@
+1999-12-10  Per Bothner  <per@bothner.com>
+
+	* uniform.scm:  New file.  Implements SRFI-4.
+	* lists.scm (length):  New procedure.
+
 1999-12-06  Per Bothner  <per@bothner.com>
 
 	* vectors.scm (vector-length):  Use new `::' type-specification syntax.

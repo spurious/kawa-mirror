@@ -27,6 +27,7 @@ java_SCM=\
   strings.scm \
   syntax.scm \
   vectors.scm \
+  uniform.scm \
   system.scm \
   trace.scm \
   emacs.scm

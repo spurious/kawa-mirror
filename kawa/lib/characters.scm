@@ -1,5 +1,5 @@
 (define (char? x)
-  (instance? x <kawa.lang.Char>))
+  (instance? x <gnu.kawa.util.Char>))
 
 (define (char-alphabetic? (char <char>))
   (invoke-static <java.lang.Character> "isLetter" char))
@@ -17,12 +17,12 @@
   (invoke-static <java.lang.Character> "isLowerCase" char))
 
 (define (char->integer (char <char>))
-  ((primitive-virtual-method <kawa.lang.Char> "intValue"
+  ((primitive-virtual-method <gnu.kawa.util.Char> "intValue"
 			     <int> ())
    char))
 
 (define (integer->char (n <int>))
-  (invoke-static <kawa.lang.Char> "make" n))
+  (invoke-static <gnu.kawa.util.Char> "make" n))
 
 (define (char-upcase (char <char>))
   (invoke-static <java.lang.Character> "toUpperCase" char))

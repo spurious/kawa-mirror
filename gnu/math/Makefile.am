@@ -22,6 +22,4 @@ EXTRA_DIST = package.html
 
 PACKAGE_FNAME = gnu-math
 
-CLEANFILES = *.class *.o *.stamp
-
 all: $(@GCJ_COMPILED_SELECTED@)

@@ -19,17 +19,9 @@ public class ScmRead extends LispReader
     //initialColonIsKeyword = false;
   }
   
-  protected ReadTable getReadTable () { return scmReadTable; }
-
   public static Object readObject(InPort port)
       throws java.io.IOException, SyntaxException
   {
     return (new ScmRead(port)).readObject();
-  }
-
-  public static ReadTable scmReadTable;
-  static
-  {
-    scmReadTable = ReadTable.getInitial();
   }
 }

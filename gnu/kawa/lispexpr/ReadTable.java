@@ -16,6 +16,9 @@ public class ReadTable extends RangeTable
   public static final int TERMINATING_MACRO = 5;
   public static final int NON_TERMINATING_MACRO = 6;
 
+  /** Default value to pass to setBracketMode() unless overridden. */
+  public static int defaultBracketMode = -1;
+
   static ReadTable current = getInitial();
 
   public ReadTable()
@@ -75,11 +78,8 @@ public class ReadTable extends RangeTable
     return tab;
   }
 
-  /** Default value to pass to setBracketMode() unless overridden. */
-  public static int defaultBracketMode = -1;
-
   /** Specify how '[' and ']' (and '<') are handled.
-   * The value - means that '[' and ']' are plain token constituents.
+   * The value -1 means that '[' and ']' are plain token constituents.
    * The value 0 means that '[' and ']' are equivalent to '(' and ')'.
    * The value 1 means that '[' and ']' are equivalent to '(' and ')', except
    * within a token starting with '<', in which case they are constituents.

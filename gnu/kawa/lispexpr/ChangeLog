@@ -1,3 +1,10 @@
+2003-02-23  Per Bothner  <per@bothner.com>
+
+	* ScmRead.java (scmReadTable):  Remove static field.
+	(getReadTable):  Remove method
+	* ReadTable.java (defaultBracketMode):  Move earlier, so it's set
+	before call to getInitial.
+
 2002-11-05  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (parseFile): Take and use new 'immediate'

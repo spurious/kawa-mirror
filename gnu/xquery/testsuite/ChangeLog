@@ -1,3 +1,7 @@
+2002-10-22  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Update 'namespace' to 'declare namespace'.
+
 2002-07-28  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Add 4 for tests for type testing.

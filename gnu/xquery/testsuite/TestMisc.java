@@ -145,42 +145,42 @@ public class TestMisc
 	     "<b atr1=\"11\" atr2=\"12\"><a>24</a>99<a>24</a></b>");
 
     // Simple namespace tests.
-    evalTest("namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
-    evalTest("namespace x1='XXX'\n namespace x2='XXX'\n"
+    evalTest("declare namespace xx='XXX'\n <xx:a>XX</xx:a>", "<xx:a>XX</xx:a>");
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='XXX'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
 	     "X1X2");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x2:ab)",
 	     "X2");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*)",
 	     "X1X2");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:*)",
 	     "X1X2");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/x1:*)",
 	     "X1");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:ab>X2</x2:ab></top>)/*:ab)",
 	     "X1X2");
-    evalTest("namespace x1='XXX'\n namespace x2='YYY'\n"
+    evalTest("declare namespace x1='XXX'\n declare namespace x2='YYY'\n"
 	     + "string((<top><x1:ab>X1</x1:ab><x2:cd>X2</x2:cd></top>)/*:cd)",
 	     "X2");
-    evalTest("namespace h='H'\n"
+    evalTest("declare namespace h='H'\n"
 	     + "string(document(\"tab.xml\")/result/h:row)",
 	     "\nc1\n33\n44\nc2\n");
-    evalTest("namespace xx='H'\n"
+    evalTest("declare namespace xx='H'\n"
 	     + "string(document(\"tab.xml\")/result/xx:row)",
 	     "\nc1\n33\n44\nc2\n");
     evalTest("string(document(\"tab.xml\")/result/*:row)",
 	     "\na1\n12\n\nb1\n22\n\nc1\n33\n44\nc2\n");
     evalTest("string(document(\"tab.xml\")/result/*:row/*:fld1)",
 	     "a1b1c1c2");
-    evalTest("namespace k='J'\n"
+    evalTest("declare namespace k='J'\n"
 	     + "string(document(\"tab.xml\")/result/*:row/k:fld1)",
 	     "c1c2");
-    evalTest("namespace k='J'\n"
+    evalTest("declare namespace k='J'\n"
 	     + "string(document(\"tab.xml\")/result/*:row[k:fld1])",
 	     "\nc1\n33\n44\nc2\n");
 
@@ -208,8 +208,8 @@ public class TestMisc
     // Check for catching errors:
     evalTest("+ +", "*** syntax error - <string>:1:4: missing PrimaryExpr");
 
-    evalTest("namespace x1='XXX",
-	     "*** caught SyntaxException - <string>:1:18: "
+    evalTest("declare namespace x1='XXX",
+	     "*** caught SyntaxException - <string>:1:26: "
 	     + "unexpected end-of-file in string");
 
     evalTest("unescaped-data('<?--->'),let $x:=unescaped-data('an &oslash;') return <b>{unescaped-data('<![CDATA[saw]]>')} {$x}</b>",

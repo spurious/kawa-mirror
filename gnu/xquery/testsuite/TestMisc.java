@@ -201,6 +201,11 @@ public class TestMisc
 	     + "<fld2 align=\"right\">12</fld2></row>"
 	     + "<fld1>a1</fld1><fld2 align=\"right\">12</fld2>");
 
+    evalTest("let $bx := <b x='xx'></b> return"
+	     + " let $x := <a>{for $y in $bx return $y}</a>"
+	     + "  return $x/b",
+	     "<b x=\"xx\" />");
+
     // Testcase from <Seshukumar_Adiraju@infosys.com>:
     evalTest("let $books := "
 	     + "<books><book id='book1'/><book id='book2'/></books> "

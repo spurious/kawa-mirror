@@ -1,3 +1,7 @@
+2003-06-27  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  New test based on report from vizawalou@wanadoo.fr.
+
 2003-05-21  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java (main):  Test case.

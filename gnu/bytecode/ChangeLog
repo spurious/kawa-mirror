@@ -1,3 +1,10 @@
+2004-12-24  Per Bothner  <per@bothner.com>
+
+	* ClassType.java (setSourceFile): Fix off-by-one error.
+
+	* ClassType.java (setSourceFile): Don't include directories in
+	SourceFile attribute, following class file spec.
+
 2004-12-23  Per Bothner  <per@bothner.com>
 
 	* ClassFileInput.java (readAttribute): Fix NullPointerException if

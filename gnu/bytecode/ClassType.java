@@ -132,10 +132,14 @@ public class ClassType extends ObjectType
     if (sourceDbgExt != null)
       {
 	sourceDbgExt.addFile(name);
-	if (sourceDbgExt.fileCount > 0)
+	if (sourceDbgExt.fileCount > 1)
 	  return;
       }
+
     name = SourceFileAttr.fixSourceFile(name);
+    int slash = name.lastIndexOf('/');
+    if (slash >= 0)
+      name = name.substring(slash+1);
     SourceFileAttr.setSourceFile(this, name);
   }
 

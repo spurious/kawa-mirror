@@ -251,13 +251,13 @@ public class ScmRead extends gnu.text.LispReader
    * @return the number read
    */
 
-  public Numeric readNumber (int radix)
+  public Object readNumber (int radix)
        throws java.io.IOException
   {
     return readNumber (read (), radix);
   }
 
-  public Numeric readNumber (int c, int radix)
+  public Object readNumber (int c, int radix)
        throws java.io.IOException
   {
     char exactness = ' ';
@@ -291,6 +291,7 @@ public class ScmRead extends gnu.text.LispReader
 
     Complex cnum = readComplex (c, radix, exactness);
     
+    /*
     Unit unit = null;
     if (radix == 10)
       {
@@ -319,8 +320,39 @@ public class ScmRead extends gnu.text.LispReader
 	    c = peek ();
 	  }
       }
-
     return unit == null ? cnum : Quantity.make (cnum, unit);
+    */
+    Object unit = null;
+    if (radix == 10)
+      {
+	c = peek ();
+	while (Character.isLowerCase ((char)c)
+	       || Character.isUpperCase ((char)c))
+	  {
+	    skip();
+	    String word = readAlphaWord (c);
+	    Object u = word+"$unit";
+	    int power;
+	    try {
+	      power = readOptionalExponent ();
+	    } catch (ClassCastException e) {
+	      error("unit exponent too large");
+	      power = 1;
+	    }
+	    if (power != 1)
+              u = List.list3("expt", u, IntNum.make(power));
+	    if (unit == null)
+	      unit = u;
+	    else
+	      unit = List.list3("*", unit, u);
+	    c = peek ();
+	  }
+      }
+
+    if (unit == null)
+      return cnum;
+    else
+      return List.list3("*", cnum, unit);
   }
 
   Complex readComplex (int c, int radix, char exactness)
@@ -632,68 +664,15 @@ public class ScmRead extends gnu.text.LispReader
 	    obj.append('\n');
 	    continue;
 	  case '\\':
-	    switch (c = read())
-	      {
-	      case 'a':  v = '\007';  break;
-	      case 'b':  v = '\b';    break;
-	      case 'f':  v = '\f';    break;
-	      case 'n':  v = '\n';    break;
-	      case 'r':  v = '\r';    break;
-	      case 't':  v = '\t';    break;
-	      case 'v':  v = '\013';  break;
-
-	      case 'u':
-		v = 0;
-		for (int i = 4;  --i >= 0; )
-		  {
-		    c = read ();
-		    if (c < 0)
-		      eofError("premature EOF in \\u escape");
-		    int d = Character.digit ((char) c, 16);
-		    if (d < 0)
-		      error("non-hex character following \\u");
-		    v = 16 * v + d;
-		  }
-		break;
-	      case '0':  case '1':  case '2':  case '3':
-	      case '4':  case '5':  case '6':  case '7':
-		v = c - '0';
-		if ((next = read()) >= 0)
-		  {
-		    next -= '0';
-		    if ((char) next > '\007')
-		      unread(next + '0');
-		    else
-		      {
-			v = v * 8 + next;
-			if ((next = read()) >= 0)
-			  {
-			    next -= '0';
-			    if ((char) next > '\007')
-			      unread(next + '0');
-			    else
-			      v = v * 8 + next;
-			  }
-		      }
-		  }
-		break;
-	      case '\r':
-		if (peek() == '\n')
-		  skip();
-		continue;
-	      case '\n':
-		continue;
-	      case '"':
-	      case '\\':
-		v = c;
-		break;
-	      default:
-		if (c < 0)
-		  eofError("unexpected EOF in string literal");
-		error("bad string escape");
-		continue;
-	      }
-	    obj.append ((char) v);
+            v = readEscape();
+            if (v == -2)
+              continue;
+            if (v < 0)
+              {
+                eofError("unexpected EOF in string literal");
+                break;
+              }
+            obj.append ((char) v);
             break;
 	  default:
 	    if (c < 0)

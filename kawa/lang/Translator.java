@@ -452,7 +452,7 @@ public class Translator extends Compilation
     else if (exp instanceof Expression)
       return (Expression) exp;
     else
-      return new QuoteExp (exp);
+      return QuoteExp.getInstance(exp);
   }
 
   public static void setLine(Declaration decl, Object pair)
@@ -659,7 +659,7 @@ public class Translator extends Compilation
 	  {
 	    Expression[] inits = new Expression[ndecls];
 	    for (int i = ndecls;  --i >= 0; )
-	      inits[i] = QuoteExp.nullExp;
+	      inits[i] = QuoteExp.undefined_exp;
 	    defs.inits = inits;
 	  }
 	Expression body = makeBody(forms, null);

@@ -1,3 +1,11 @@
+2004-10-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite): Use new QuoteExp.getInstance.
+	(rewrite_body): Initialize variables using #!undefined, not #!null.
+	* kawa/standard/Scheme.java (initScheme):  letrec in now in kawa/lib.
+	* kawa/standard/letrec.java: Removed, no longer needed.
+	* kawa/standard/Makefile.am (java_sources): Remove letrec.java.
+
 2004-09-05  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/ifp.java (allowElseList): New flag.

@@ -40,7 +40,6 @@ module_compile_options.java with_compile_options.java \
 module_static.java export.java define_unit.java \
 syntax_error.java \
 let.java \
-letrec.java \
 begin.java \
 ifp.java \
 call_with_values.java \

@@ -111,7 +111,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("%let-decl", "kawa.lib.std_syntax");
       define_syntax ("%let-init", "kawa.lib.std_syntax");
       define_syntax ("let*", "kawa.lib.std_syntax");
-      define_syntax ("letrec", "kawa.standard.letrec");
+      define_syntax ("letrec", "kawa.lib.std_syntax");
 
       define ("begin", new kawa.standard.begin());
       define_syntax ("do", "kawa.lib.std_syntax");

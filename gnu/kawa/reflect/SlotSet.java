@@ -189,7 +189,7 @@ public class SlotSet extends Procedure3 implements CanInline, Inlineable
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     if (isStatic)
-      return Invoke.inlineClassName (exp, 0, Interpreter.defaultInterpreter);
+      return Invoke.inlineClassName (exp, 0, (InlineCalls) walker);
     else
       return exp;
   }

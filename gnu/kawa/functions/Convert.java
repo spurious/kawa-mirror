@@ -5,6 +5,7 @@ import gnu.bytecode.ClassType;
 import gnu.bytecode.CodeAttr;
 import gnu.mapping.*;
 import gnu.expr.*;
+import gnu.kawa.reflect.Invoke;
 
 public class Convert extends Procedure2 implements CanInline, Inlineable
 {
@@ -27,7 +28,7 @@ public class Convert extends Procedure2 implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    return gnu.kawa.reflect.Invoke.inlineClassName(exp, 0, Interpreter.defaultInterpreter);
+    return Invoke.inlineClassName(exp, 0, (InlineCalls) walker);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

@@ -214,8 +214,10 @@ public class Invoke extends ProcedureN implements CanInline
    * created for the class name. */
 
   public static Expression inlineClassName (ApplyExp exp, int carg,
-					    Interpreter interpreter)
+					    InlineCalls walker)
   {
+    Compilation comp = walker.getCompilation();
+    Interpreter interpreter = comp.getInterpreter();
     Expression[] args = exp.getArgs();
     if (args.length > carg)
       {
@@ -224,6 +226,17 @@ public class Invoke extends ProcedureN implements CanInline
 	  type = ((PairClassType) type).instanceType;
 	else if (! (type instanceof Type))
 	  return exp;
+	if (type instanceof ClassType && ((ClassType) type).isExisting())
+	  {
+	    try
+	      {
+		type.getReflectClass();
+	      }
+	    catch (Exception ex)
+	      {
+		comp.error('e', "unknown class: " + type.getName());
+	      }
+	  }
 	Expression[] nargs = new Expression[args.length];
 	System.arraycopy(args, 0, nargs, 0, args.length);
 	nargs[carg] = new QuoteExp(type);

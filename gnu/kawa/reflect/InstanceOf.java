@@ -29,7 +29,7 @@ public class InstanceOf extends Procedure2 implements CanInline, Inlineable
 
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
-    return Invoke.inlineClassName(exp, 1, interpreter);
+    return Invoke.inlineClassName(exp, 1, (InlineCalls) walker);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

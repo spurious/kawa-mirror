@@ -168,7 +168,7 @@ public class SlotGet extends Procedure2
   public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     if (isStatic)
-      return Invoke.inlineClassName (exp, 0, Interpreter.getInterpreter());
+      return Invoke.inlineClassName (exp, 0, (InlineCalls) walker);
     else
       return exp;
   }

@@ -75,8 +75,23 @@ public class TestMisc
 	     "<fld1 align=\"left\">b1</fld1>\n" +
 	     "<fld2 align=\"right\">22</fld2>\n" +
 	     "</row>");
+    evalTest("for $x in document(\"tab.xml\")/result/row[2]/node()" +
+	     "  return ('[',$x,']')",
+	     "[\n][<fld1 align=\"left\">b1</fld1>][\n" +
+	     "][<fld2 align=\"right\">22</fld2>][\n]");
+    evalTest("for $x in document(\"tab.xml\")/result/row[2]/text()" +
+	     "  return ('[',$x,']')",
+	     "[\n][\n][\n]");
+    evalTest("for $x in document(\"tab.xml\")/result/row[2]//text()" +
+	     "  return ('[',$x,']')",
+	     "[\n][b1][\n][22][\n]");
     evalTest("document(\"tab.xml\")/result/row/*[2]",
 	     "<fld2 align=\"right\">12</fld2><fld2 align=\"right\">22</fld2>");
+
+    evalTest("for $x in <T>r1<fld1>a1</fld1><fld3/>r2<fld2>12</fld2></T>" +
+	     "  /node()" +
+	     "    return ('[',$x,']')",
+	     "[r1][<fld1>a1</fld1>][<fld3 />][r2][<fld2>12</fld2>]");
 
     evalTest("(document(\"tab.xml\")/result/row/*)[2]",
 	     "<fld2 align=\"right\">12</fld2>");
@@ -97,6 +112,12 @@ public class TestMisc
     evalTest("string(document('tab.xml')/result/row/fld1/@align)", "left");
     evalTest("string(document('tab.xml')/result/row/fld2/@align)",
 	     "rightright");
+ 
+    evalTest("for $x in children(<a>xy{3+4}kl<c>def</c>{9}{11}</a>)" +
+	     "  return ('[',$x,']')",
+	     "[xy 7 kl][<c>def</c>][9 11]");
+    evalTest("children(<a>xy{3+4}kl<c>def</c>{9}{11}</a>)",
+	     "xy 7 kl<c>def</c>9 11");
 
     evalTest("<a>aab</a> ='aab'", "true");
     evalTest("<a>abc</a>='abb'", "false");

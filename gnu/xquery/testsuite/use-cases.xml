@@ -120,7 +120,6 @@
 <ident>Use Case "XMP": Experiences and Exemplars: Q5</ident>
 <description>For each book found at both bn.com and amazon.com, list
 the title of the book and its price from each source.</description>
-<NOTE>Q5 kludged text() to use string() FIXME</NOTE>
 <query><![CDATA[
 <books-with-prices>
 {
@@ -130,8 +129,8 @@ the title of the book and its price from each source.</description>
     return
         <book-with-prices>
 { $b/title }
-            <price-amazon>{ string($a/price) }</price-amazon>
-<price-bn>{ string($b/price) }</price-bn>
+            <price-amazon>{ $a/price/text() }</price-amazon>
+<price-bn>{ $b/price/text() }</price-bn>
 </book-with-prices>
 }
 </books-with-prices>
@@ -223,7 +222,6 @@ and how many figures?</description>
 
 <test>
 <ident>Use Case "TREE": Queries that preserve hierarchy: Q5</ident>
-<NOTE>replaced text() by string</NOTE>
 <description>
 Make a flat list of the section elements in Book1. In place of its
 original attributes, each section element should have two attributes,
@@ -235,7 +233,7 @@ immediately contained in the section.</description>
     for $s in document("book1.xml")//section
     let $f := $s/figure 
     return
-        <section title={ string($s/title) } figcount={ count($f) }/>
+        <section title={ $s/title/text() } figcount={ count($f) }/>
 }
 </section_list> ]]>
 </query>

@@ -140,6 +140,7 @@ public class ClassMemberConstraint extends Constraint
   public static void define (String name, Object object,
                              java.lang.reflect.Field field, Environment env)
   {
+    String vname = null;
     if ((field.getModifiers() & java.lang.reflect.Modifier.FINAL) != 0)
       {
 	try
@@ -166,35 +167,27 @@ public class ClassMemberConstraint extends Constraint
 		    return;
 		  }
 	      }
-	    String vname
-    	      = value instanceof Named ? ((Named) value).getName() : null;
-	    name = (vname != null ? vname
-		    : Compilation.demangleName(name, true));
+	    if (value instanceof Named)
+	      vname = ((Named) value).getName();
+	    if (vname == null)
+	      vname = Compilation.demangleName(name, true).intern();
 
-	    // The problem with the following is that we can't catch
-	    // set! to a constant (defined using define-constant).  (Note we
-	    // do want to allow a new define, at least when interactive.)
-	    // However, if we always use a ClassMemberConstraint then
-	    // some hitherto-valid Scheme programs will break:  Since it
-	    // will also prohibit re-assigning to a procedure defined
-	    // using (define (foo ...) ...) since that gets compiled to a
-	    // final Procedure field.  FIXME.
-	    if (true)
-	      {
-		name = name.intern();
-		env.define(name, value);
-		return;
-	      }
+	    Symbol symbol = env.getSymbol(vname);
+	    Constraint constraint = symbol.getConstraint();
+	    if (constraint instanceof ClassMemberConstraint
+		&& symbol.getValue() == value)
+	      return;
 	  }
 	catch (Exception ex)
 	  {
 	    throw new WrappedException("error accessing field "+field, ex);
 	  }
       }
-    Symbol symbol = new Symbol(Compilation.demangleName(name, true).intern());
+    if (vname == null)
+      vname = Compilation.demangleName(name, true).intern();
+    Symbol symbol = env.getSymbol(vname);
     setValue(symbol, object);
     setConstraint(symbol, new ClassMemberConstraint(field));
-    env.addSymbol(symbol);
   }
 
   /** Import all the public fields of an object. */

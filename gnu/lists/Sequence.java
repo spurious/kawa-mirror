@@ -66,6 +66,7 @@ extends
    * Part of a char, in contrast with INT_S8_VALUE, which is an integer. */
   public static final int TEXT_BYTE_VALUE = PRIM_VALUE + 12;
   public static final int CHAR_VALUE = PRIM_VALUE + 13;
+  public static final int CDATA_VALUE = 31;
   public static final int OBJECT_VALUE = 32;
   public static final int GROUP_VALUE = 33;
   public static final int DOCUMENT_VALUE = 34;

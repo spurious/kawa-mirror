@@ -1039,7 +1039,7 @@ implements XConsumer, PositionConsumer, Consumable
 	      if (out instanceof PositionConsumer)
 		((PositionConsumer) out).writePosition(seq, ipos);
 	      else
-		out.writeObject(SeqPosition.make(seq, ipos));
+		out.writeObject(seq.getIteratorAtPos(ipos));
 	      pos += 4;
 	    }
 	    continue;
@@ -1240,10 +1240,12 @@ implements XConsumer, PositionConsumer, Consumable
 	    continue;
 	  case POSITION_PAIR_FOLLOWS:
 	    if (inStartTag) { sbuf.append('>'); inStartTag = false; }
+	    if (seen) sbuf.append(sep); else seen = true;
 	    {
 	      AbstractSequence seq = (AbstractSequence) objects[getIntN(pos)];
 	      int ipos = getIntN(pos+2);
-	      sbuf.append(SeqPosition.make(seq, ipos));
+	      // This could lead to to a lot of copying.  FIXME.
+	      sbuf.append(seq.getIteratorAtPos(ipos));
 	      pos += 4;
 	    }
 	    continue;
@@ -1392,7 +1394,7 @@ implements XConsumer, PositionConsumer, Consumable
       case BEGIN_ATTRIBUTE_LONG:
 	return Sequence.ATTRIBUTE_VALUE;
       case CDATA_SECTION:
-	return Sequence.CHAR_VALUE;
+	return Sequence.CDATA_VALUE;
       case COMMENT:
 	return Sequence.COMMENT_VALUE;
       case PROCESSING_INSTRUCTION:

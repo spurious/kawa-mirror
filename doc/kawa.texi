@@ -67,7 +67,7 @@ discusses Scheme implementation is
 @uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
 
-Javadoc generated @uref{hhttp://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
+Javadoc generated @uref{http://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -79,7 +79,7 @@ The packages
 @uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
 @uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
 @uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
-@uref{http://www.gnu.org/software/kawa/api/gnu/xml/lists/package-summary.html,@code{gnu.xml}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/xml/package-summary.html,@code{gnu.xml}},
 @uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
 @uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
 and

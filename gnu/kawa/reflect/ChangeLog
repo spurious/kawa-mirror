@@ -1,3 +1,13 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* ArrayGet.java:  Moved/renamed from kawa/lang/PrimArrayGet.java.
+	* ArraySet.java:  Moved/renamed from kawa/lang/PrimArraySet.java.
+	* ArrayNew.java:  Moved/renamed from kawa/lang/PrimArrayNew.java.
+	* ArrayLength.java:  Moved/renamed from kawa/lang/PrimArrayLength.java.
+	* StaticGet.java:  Moved/renamed from kawa/lang/GetStatic.java.
+	* StaticSet.java:  Moved/renamed from kawa/lang/SetStatic.java.
+	* Makefile.am, Makefile.in (java_JAVA):  Update for now classes.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (<Init>(Field)):  New constructor.

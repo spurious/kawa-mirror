@@ -11,7 +11,8 @@ public class ApplyExp extends Expression
   Expression func;
   Expression[] args;
 
-  public Expression[] getArgs() { return args; }
+  public final Expression getFunction() { return func; }
+  public final Expression[] getArgs() { return args; }
 
   public ApplyExp (Expression f, Expression[] a) { func = f; args = a; }
 

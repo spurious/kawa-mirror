@@ -53,13 +53,13 @@ public class PrimProcedure extends ProcedureN implements Inlineable
 	      member = clas.getMethod(method.getName(), paramTypes);
 	  }
 	if (is_constructor)
-	  return ((java.lang.reflect.Constructor) member).newInstance(args);
+	  return ((java.lang.reflect.Constructor) member).newInstance(rargs);
 	else
 	  {
 	    java.lang.reflect.Method meth = (java.lang.reflect.Method) member;
 	    Object result;
 	    if (method.getStaticFlag())
-	      result = meth.invoke(null, args);
+	      result = meth.invoke(null, rargs);
 	    else
 	      result = meth.invoke(this_type.coerceFromObject(args[0]), rargs);
 	    return retType.coerceToObject(result);

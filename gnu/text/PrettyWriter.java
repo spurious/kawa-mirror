@@ -109,16 +109,16 @@ public class PrettyWriter extends java.io.Writer
   // operation types, and each operation can require a variable number
   // of elements in the buffer, depending on the operation type.  Given
   // an operation at 'index', the type operation type code is
-  // 'getQueueType(index)' (one of the QUEUED_OP_XXX_TYPE macros
+  // 'getQueueType(index)' (one of the QITEM_XXX_TYPE macros
   // below), and the number of elements in the buffer is
-  // 'getQueueSize(index)' (one of the QUEUED_OP_XXX_SIZE values
-  // below).  You can think of the various QUEUED_OP_XXX_TYPEs as
+  // 'getQueueSize(index)' (one of the QITEM_XXX_SIZE values
+  // below).  You can think of the various QITEM_XXX_TYPEs as
   // "sub-classes" of queued operations, but instead of creating
   // actual Java objects, we allocate the objects' fields in the
   // queueInts and QueueStrings arrays, to avoid expensive object
-  // allocation.  The special QUEUED_OP_NOP_TYPE is a used as a
+  // allocation.  The special QITEM_NOP_TYPE is a used as a
   // marker for when there isn't enough space in the rest of buffer,
-  // so we have to wrap around to the start.  The other QUEUED_OP_XXX
+  // so we have to wrap around to the start.  The other QITEM_XXX
   // macros are the offsets of the various "fields" relative to the
   // start index.
       
@@ -135,66 +135,70 @@ public class PrettyWriter extends java.io.Writer
   /** Number of startLogicalBlock - number of endLogicalBlock. */
   public int pendingBlocksCount;
 
-  static final int QUEUED_OP_TYPE = 0;
+  /** The first it QITEM contains it type code and size.
+   * The type code is one of the QITEM_XXX_TYPE values below.
+   * The size is the corresponding QITEM_XXX_SIZE value below,
+   * except for the case of QITEM_NOP_TYPE (which is used as a filler). */
+  static final int QITEM_TYPE_AND_SIZE = 0;
   private int getQueueType(int index) { return queueInts[index] & 0xFF; }
   private int getQueueSize(int index) { return queueInts[index] >> 16; }
-  /** Relative offset of POSN field of a QUEUED_OP> */
-  static final int QUEUED_OP_POSN = 1;
-  /** Size of "base part" of a QUEUED_OP. */
-  static final int QUEUED_OP_SIZE = 2;
+  /** Relative offset of POSN field of a QITEM> */
+  static final int QITEM_POSN = 1;
+  /** Size of "base part" of a QITEM. */
+  static final int QITEM_BASE_SIZE = 2;
 
   /** A dummy queue item used at the high end of the queue buffer
    * when there isn't enough space for the needed queue item. */
-  static final int QUEUED_OP_NOP_TYPE = 0;
+  static final int QITEM_NOP_TYPE = 0;
 
   /** "Abstract" type for beginning of section.
    * A section is from a block-start to a newline, from a newline to
    * the next newline (in the same block?), or from a newline to
    * the block end (?). */
-  /*static final int QUEUED_OP_SECTION_START_TYPE = 1;*/
-  static final int QUEUED_OP_SECTION_START_SIZE = QUEUED_OP_SIZE + 2;
-  static final int QUEUED_OP_SECTION_START_DEPTH = QUEUED_OP_SIZE;
-  static final int QUEUED_OP_SECTION_START_SECTION_END = QUEUED_OP_SIZE + 1;
+  /*static final int QITEM_SECTION_START_TYPE = 1;*/
+  static final int QITEM_SECTION_START_SIZE = QITEM_BASE_SIZE + 2;
+  static final int QITEM_SECTION_START_DEPTH = QITEM_BASE_SIZE;
+  static final int QITEM_SECTION_START_SECTION_END = QITEM_BASE_SIZE + 1;
 
   /** A newline queue item. */
-  static final int QUEUED_OP_NEWLINE_TYPE = 2;
-  static final int QUEUED_OP_NEWLINE_SIZE = QUEUED_OP_SECTION_START_SIZE + 1;
-  static final int QUEUED_OP_NEWLINE_KIND = QUEUED_OP_SECTION_START_SIZE;
+  static final int QITEM_NEWLINE_TYPE = 2;
+  static final int QITEM_NEWLINE_SIZE = QITEM_SECTION_START_SIZE + 1;
+  static final int QITEM_NEWLINE_KIND = QITEM_SECTION_START_SIZE;
   public static final int NEWLINE_LINEAR = 'N';
   public static final int NEWLINE_LITERAL = 'L';
   public static final int NEWLINE_FILL = 'F';
   public static final int NEWLINE_MISER = 'M';
   public static final int NEWLINE_MANDATORY = 'R';  // "required"
 
-  static final int QUEUED_OP_INDENTATION_TYPE = 3;
-  static final int QUEUED_OP_INDENTATION_SIZE = QUEUED_OP_SIZE + 2;
-  static final int QUEUED_OP_INDENTATION_KIND = QUEUED_OP_SIZE;
-  static final int QUEUED_OP_INDENTATION_BLOCK = 'B';
-  static final int QUEUED_OP_INDENTATION_CURRENT = 'C';
-  static final int QUEUED_OP_INDENTATION_AMOUNT = QUEUED_OP_SIZE + 1;
+  static final int QITEM_INDENTATION_TYPE = 3;
+  static final int QITEM_INDENTATION_SIZE = QITEM_BASE_SIZE + 2;
+  static final int QITEM_INDENTATION_KIND = QITEM_BASE_SIZE;
+  static final int QITEM_INDENTATION_BLOCK = 'B';
+  static final int QITEM_INDENTATION_CURRENT = 'C';
+  static final int QITEM_INDENTATION_AMOUNT = QITEM_BASE_SIZE + 1;
 
   /** A "block-start" queue item. */
-  static final int QUEUED_OP_BLOCK_START_TYPE = 4;
-  static final int QUEUED_OP_BLOCK_START_SIZE = QUEUED_OP_SECTION_START_SIZE + 3;
-  /** If the QUEUED_OP_SECTION_START_BLOCK_END < 0, it points to
+  static final int QITEM_BLOCK_START_TYPE = 4;
+  static final int QITEM_BLOCK_START_SIZE = QITEM_SECTION_START_SIZE + 3;
+  /** If the QITEM_SECTION_START_BLOCK_END < 0, it points to
    * the previous (outer) un-closed block-start.
-   * If QUEUED_OP_SECTION_START_BLOCK_END > 0, it points to the
+   * If QITEM_SECTION_START_BLOCK_END > 0, it points to the
    * corresponding block-end node.
    * In both cases the pointers are relative to the current BLOCK_START. */
-  static final int QUEUED_OP_BLOCK_START_BLOCK_END = QUEUED_OP_SECTION_START_SIZE;
-  static final int QUEUED_OP_BLOCK_START_PREFIX = QUEUED_OP_SECTION_START_SIZE + 1;
-  static final int QUEUED_OP_BLOCK_START_SUFFIX = QUEUED_OP_SECTION_START_SIZE + 2;
+  static final int QITEM_BLOCK_START_BLOCK_END = QITEM_SECTION_START_SIZE;
+  static final int QITEM_BLOCK_START_PREFIX = QITEM_SECTION_START_SIZE + 1;
+  static final int QITEM_BLOCK_START_SUFFIX = QITEM_SECTION_START_SIZE + 2;
 
-  static final int QUEUED_OP_BLOCK_END_TYPE = 5;
-  static final int QUEUED_OP_BLOCK_END_SIZE = QUEUED_OP_SIZE;
+  static final int QITEM_BLOCK_END_TYPE = 5;
+  static final int QITEM_BLOCK_END_SIZE = QITEM_BASE_SIZE;
 
-  static final int QUEUED_OP_TAB_TYPE = 6;
-  static final int QUEUED_OP_TAB_SIZE = QUEUED_OP_SIZE + 3;
-  static final int QUEUED_OP_TAB_FLAGS = QUEUED_OP_SIZE;
-  static final int QUEUED_OP_TAB_IS_SECTION = 1;
-  static final int QUEUED_OP_TAB_IS_RELATIVE = 2;
-  static final int QUEUED_OP_TAB_COLNUM = QUEUED_OP_SIZE + 1;
-  static final int QUEUED_OP_TAB_COLINC = QUEUED_OP_SIZE + 2;
+  static final int QITEM_TAB_TYPE = 6;
+  static final int QITEM_TAB_SIZE = QITEM_BASE_SIZE + 3;
+  static final int QITEM_TAB_FLAGS = QITEM_BASE_SIZE;
+  static final int QITEM_TAB_IS_SECTION = 1;
+  static final int QITEM_TAB_IS_RELATIVE = 2;
+  static final int QITEM_TAB_COLNUM = QITEM_BASE_SIZE + 1;
+  static final int QITEM_TAB_COLINC = QITEM_BASE_SIZE + 2;
 
   private int getSectionColumn()
   {
@@ -376,10 +380,10 @@ public class PrettyWriter extends java.io.Writer
 
   int enqueueTab (int flags, int colnum, int colinc) // DONE
   {
-    int addr = enqueue(QUEUED_OP_TAB_TYPE, QUEUED_OP_TAB_SIZE);
-    queueInts[addr + QUEUED_OP_TAB_FLAGS] = flags;
-    queueInts[addr + QUEUED_OP_TAB_COLNUM] = colnum;
-    queueInts[addr + QUEUED_OP_TAB_COLINC] = colinc;
+    int addr = enqueue(QITEM_TAB_TYPE, QITEM_TAB_SIZE);
+    queueInts[addr + QITEM_TAB_FLAGS] = flags;
+    queueInts[addr + QITEM_TAB_COLNUM] = colnum;
+    queueInts[addr + QITEM_TAB_COLINC] = colinc;
     return addr;
   }
 
@@ -433,7 +437,7 @@ public class PrettyWriter extends java.io.Writer
     int oldLength = queueInts.length;
     int endAvail = oldLength - queueTail - queueSize;
     if (endAvail > 0 && size > endAvail)
-      enqueue (QUEUED_OP_NOP_TYPE, endAvail);
+      enqueue(QITEM_NOP_TYPE, endAvail);
     if (queueSize + size > oldLength)
       {
 	int newLength = enoughSpace(oldLength, size);
@@ -462,9 +466,9 @@ public class PrettyWriter extends java.io.Writer
     int addr = queueTail + queueSize;
     if (addr >= queueInts.length)
       addr -= queueInts.length;
-    queueInts[addr + QUEUED_OP_TYPE] = kind | (size << 16);
+    queueInts[addr + QITEM_TYPE_AND_SIZE] = kind | (size << 16);
     if (size > 1)
-      queueInts[addr + QUEUED_OP_POSN] = indexPosn(bufferFillPointer);
+      queueInts[addr + QITEM_POSN] = indexPosn(bufferFillPointer);
     queueSize += size;
     //log("enqueue kind:"+kind+" size:"+size+" -> "+queueSize);
     return addr;
@@ -473,11 +477,11 @@ public class PrettyWriter extends java.io.Writer
   public void enqueueNewline (int kind)
   {
     int depth = pendingBlocksCount;
-    int newline = enqueue(QUEUED_OP_NEWLINE_TYPE, QUEUED_OP_NEWLINE_SIZE);
+    int newline = enqueue(QITEM_NEWLINE_TYPE, QITEM_NEWLINE_SIZE);
     //log("enqueueNewline kind:"+((char) kind)+" at:"+newline);
-    queueInts[newline + QUEUED_OP_NEWLINE_KIND] = kind;
-    queueInts[newline + QUEUED_OP_SECTION_START_DEPTH] = pendingBlocksCount;
-    queueInts[newline + QUEUED_OP_SECTION_START_SECTION_END] = 0;
+    queueInts[newline + QITEM_NEWLINE_KIND] = kind;
+    queueInts[newline + QITEM_SECTION_START_DEPTH] = pendingBlocksCount;
+    queueInts[newline + QITEM_SECTION_START_SECTION_END] = 0;
     int entry = queueTail;
     int todo = queueSize;
     while (todo > 0)
@@ -487,15 +491,15 @@ public class PrettyWriter extends java.io.Writer
 	if (entry == newline)
 	  break;
 	int type = getQueueType(entry);
-	if ((type == QUEUED_OP_NEWLINE_TYPE
-	     || type == QUEUED_OP_BLOCK_START_TYPE)
-	    && queueInts[entry + QUEUED_OP_SECTION_START_SECTION_END] == 0
-	    && depth <= queueInts[entry + QUEUED_OP_SECTION_START_DEPTH])
+	if ((type == QITEM_NEWLINE_TYPE
+	     || type == QITEM_BLOCK_START_TYPE)
+	    && queueInts[entry + QITEM_SECTION_START_SECTION_END] == 0
+	    && depth <= queueInts[entry + QITEM_SECTION_START_DEPTH])
 	  {
 	    int delta = newline - entry;
 	    if (delta < 0)
 	      delta += queueInts.length;
-	    queueInts[entry + QUEUED_OP_SECTION_START_SECTION_END] = delta;
+	    queueInts[entry + QITEM_SECTION_START_SECTION_END] = delta;
 	  }
 	int size = getQueueSize(entry);
 	todo -= size;
@@ -513,17 +517,17 @@ public class PrettyWriter extends java.io.Writer
 
   public int enqueueIndent (int kind, int amount)
   {
-    int result = enqueue(QUEUED_OP_INDENTATION_TYPE, QUEUED_OP_INDENTATION_SIZE);
-    queueInts[result + QUEUED_OP_INDENTATION_KIND] = kind;
-    queueInts[result + QUEUED_OP_INDENTATION_AMOUNT] = amount;
+    int result = enqueue(QITEM_INDENTATION_TYPE, QITEM_INDENTATION_SIZE);
+    queueInts[result + QITEM_INDENTATION_KIND] = kind;
+    queueInts[result + QITEM_INDENTATION_AMOUNT] = amount;
     return result;
   }
 
   public void addIndentation(int amount, boolean current)
   {
     if (isPrettyPrinting)
-      enqueueIndent((current ? QUEUED_OP_INDENTATION_CURRENT
-		     : QUEUED_OP_INDENTATION_BLOCK),
+      enqueueIndent((current ? QITEM_INDENTATION_CURRENT
+		     : QITEM_INDENTATION_BLOCK),
 		    amount);
   }
 
@@ -533,12 +537,12 @@ public class PrettyWriter extends java.io.Writer
       write(prefix);
     if (! isPrettyPrinting)
       return;
-    int start = enqueue (QUEUED_OP_BLOCK_START_TYPE,
-			 QUEUED_OP_BLOCK_START_SIZE);
-    queueInts[start + QUEUED_OP_SECTION_START_DEPTH] = pendingBlocksCount;
-    queueStrings[start + QUEUED_OP_BLOCK_START_PREFIX]
+    int start = enqueue (QITEM_BLOCK_START_TYPE,
+			 QITEM_BLOCK_START_SIZE);
+    queueInts[start + QITEM_SECTION_START_DEPTH] = pendingBlocksCount;
+    queueStrings[start + QITEM_BLOCK_START_PREFIX]
       = perLine ? prefix : null;
-    queueStrings[start + QUEUED_OP_BLOCK_START_SUFFIX] = suffix;
+    queueStrings[start + QITEM_BLOCK_START_SUFFIX] = suffix;
     pendingBlocksCount++;
     int outerBlock = currentBlock;
     if (outerBlock < 0)
@@ -549,14 +553,14 @@ public class PrettyWriter extends java.io.Writer
 	if (outerBlock > 0)
 	  outerBlock -= queueInts.length;
       }
-    queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END] = outerBlock;
-    queueInts[start + QUEUED_OP_SECTION_START_SECTION_END] = 0;
+    queueInts[start + QITEM_BLOCK_START_BLOCK_END] = outerBlock;
+    queueInts[start + QITEM_SECTION_START_SECTION_END] = 0;
     currentBlock = start;
   }
 
   public void endLogicalBlock ()
   {
-    int end = enqueue (QUEUED_OP_BLOCK_END_TYPE, QUEUED_OP_BLOCK_END_SIZE);
+    int end = enqueue (QITEM_BLOCK_END_TYPE, QITEM_BLOCK_END_SIZE);
     pendingBlocksCount--;
     if (currentBlock < 0)
       {
@@ -574,7 +578,7 @@ public class PrettyWriter extends java.io.Writer
 	return;
       }
     int start = currentBlock;
-    int outerBlock = queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END];
+    int outerBlock = queueInts[start + QITEM_BLOCK_START_BLOCK_END];
     if (outerBlock == 0)
       currentBlock = -1;
     else
@@ -585,13 +589,13 @@ public class PrettyWriter extends java.io.Writer
 	  outerBlock += queueInts.length;
 	currentBlock = outerBlock;
       }
-    String suffix = queueStrings[start + QUEUED_OP_BLOCK_START_SUFFIX];
+    String suffix = queueStrings[start + QITEM_BLOCK_START_SUFFIX];
     if (suffix != null)
       write(suffix);
     int endFromStart = end - start;
     if (endFromStart < 0) // wrap-around.
       endFromStart += queueInts.length;
-    queueInts[start + QUEUED_OP_BLOCK_START_BLOCK_END] = endFromStart;
+    queueInts[start + QITEM_BLOCK_START_BLOCK_END] = endFromStart;
     //log("endLogicalBlock end:"+end+" start:"+start+" rel:"+endFromStart);
   }
 
@@ -607,12 +611,12 @@ public class PrettyWriter extends java.io.Writer
 
   int computeTabSize (int tab, int sectionStart, int column) // DONE
   {
-    int flags = queueInts[tab + QUEUED_OP_TAB_FLAGS];
-    boolean isSection = (flags & QUEUED_OP_TAB_IS_SECTION) != 0;
-    boolean isRelative = (flags & QUEUED_OP_TAB_IS_RELATIVE) != 0;
+    int flags = queueInts[tab + QITEM_TAB_FLAGS];
+    boolean isSection = (flags & QITEM_TAB_IS_SECTION) != 0;
+    boolean isRelative = (flags & QITEM_TAB_IS_RELATIVE) != 0;
     int origin = isSection ? sectionStart : 0;
-    int colnum = queueInts[tab + QUEUED_OP_TAB_COLNUM];
-    int colinc = queueInts[tab + QUEUED_OP_TAB_COLINC];
+    int colnum = queueInts[tab + QITEM_TAB_COLNUM];
+    int colinc = queueInts[tab + QITEM_TAB_COLINC];
     if (isRelative)
       {
 	if (colinc > 1)
@@ -643,18 +647,18 @@ public class PrettyWriter extends java.io.Writer
 	if (op >= queueInts.length)
 	  op = 0;
 	int type = getQueueType(op);
-	if (type != QUEUED_OP_NOP_TYPE)
+	if (type != QITEM_NOP_TYPE)
 	  {
-	    int posn = queueInts[op + QUEUED_OP_POSN];
+	    int posn = queueInts[op + QITEM_POSN];
 	    if (posn >= endPosn)
 	      break;
-	    if (type == QUEUED_OP_TAB_TYPE)
+	    if (type == QITEM_TAB_TYPE)
 	      column += computeTabSize(op, sectionStart,
 				       column + posnIndex (posn));
-	    else if (type == QUEUED_OP_NEWLINE_TYPE
-		     || type == QUEUED_OP_BLOCK_START_TYPE)
+	    else if (type == QITEM_NEWLINE_TYPE
+		     || type == QITEM_BLOCK_START_TYPE)
 	      sectionStart
-		= column + posnIndex(queueInts[op + QUEUED_OP_POSN]);
+		= column + posnIndex(queueInts[op + QITEM_POSN]);
 	  }
 	int size = getQueueSize(op);
 	todo -= size;
@@ -679,9 +683,9 @@ public class PrettyWriter extends java.io.Writer
 	if (op == through)
 	  break;
 	int type = getQueueType(op);
-	if (type == QUEUED_OP_TAB_TYPE)
+	if (type == QITEM_TAB_TYPE)
 	  {
-	    int index = posnIndex(queueInts[op + QUEUED_OP_POSN]);
+	    int index = posnIndex(queueInts[op + QITEM_POSN]);
 	    int tabsize = computeTabSize (op, sectionStart, column + index);
 	    if (tabsize != 0)
 	      {
@@ -699,9 +703,9 @@ public class PrettyWriter extends java.io.Writer
 		column += tabsize;
 	      }
 	  }
-	else if (op == QUEUED_OP_NEWLINE_TYPE || op == QUEUED_OP_BLOCK_START_TYPE)
+	else if (op == QITEM_NEWLINE_TYPE || op == QITEM_BLOCK_START_TYPE)
 	  {
-	    sectionStart = column + posnIndex(queueInts[op + QUEUED_OP_POSN]);
+	    sectionStart = column + posnIndex(queueInts[op + QITEM_POSN]);
 	  }
 	int size = getQueueSize(op);
 	todo -= size;
@@ -779,9 +783,9 @@ public class PrettyWriter extends java.io.Writer
 	int type = getQueueType(next);
 	switch (type)
 	  {
-	  case QUEUED_OP_NEWLINE_TYPE:
+	  case QITEM_NEWLINE_TYPE:
 	    boolean cond;
-	    switch (queueInts[next+QUEUED_OP_NEWLINE_KIND])
+	    switch (queueInts[next+QITEM_NEWLINE_KIND])
 	      {
 	      default: // LINEAR, LITERAL, or MANDATORY:
 		cond = true;
@@ -796,7 +800,7 @@ public class PrettyWriter extends java.io.Writer
 		    cond = true;
 		    break;
 		  }
-		int end = queueInts[next+QUEUED_OP_SECTION_START_SECTION_END];
+		int end = queueInts[next+QITEM_SECTION_START_SECTION_END];
 		if (end == 0)
 		  end = -1;
 		else
@@ -827,21 +831,21 @@ public class PrettyWriter extends java.io.Writer
 		  }
 	      }
 	    break;
-	  case QUEUED_OP_INDENTATION_TYPE:
+	  case QITEM_INDENTATION_TYPE:
 	    if (! isMisering())
 	      {
-		int kind = queueInts[next+QUEUED_OP_INDENTATION_KIND];
-		int indent = queueInts[next+QUEUED_OP_INDENTATION_AMOUNT];
-		if (kind == QUEUED_OP_INDENTATION_BLOCK)
+		int kind = queueInts[next+QITEM_INDENTATION_KIND];
+		int indent = queueInts[next+QITEM_INDENTATION_AMOUNT];
+		if (kind == QITEM_INDENTATION_BLOCK)
 		  indent += getStartColumn();
 		else
-		  indent += posnColumn(queueInts[next+QUEUED_OP_POSN]);
+		  indent += posnColumn(queueInts[next+QITEM_POSN]);
 		setIndentation(indent);
 	      }
 	    break;
-	  case QUEUED_OP_BLOCK_START_TYPE:
+	  case QITEM_BLOCK_START_TYPE:
 	    int start = next;
-	    int end = queueInts[next + QUEUED_OP_SECTION_START_SECTION_END];
+	    int end = queueInts[next + QITEM_SECTION_START_SECTION_END];
 	    // Convert relative offset to absolute index:
 	    end = end > 0 ? (end + next) % queueInts.length : -1;
 	    int fits = fitsOnLine (end, forceNewlines);
@@ -850,7 +854,7 @@ public class PrettyWriter extends java.io.Writer
 	      {
 		// Just nuke the whole logical block and make it look
 		// like one nice long literal.
-		int endr = queueInts[next + QUEUED_OP_BLOCK_START_BLOCK_END];
+		int endr = queueInts[next + QITEM_BLOCK_START_BLOCK_END];
 		// make absolute:
 		next = (endr + next) % queueInts.length;
 		expandTabs(next);
@@ -860,10 +864,10 @@ public class PrettyWriter extends java.io.Writer
 	      }
 	    else if (fits < 0)
 	      {
-		String prefix = queueStrings[next + QUEUED_OP_BLOCK_START_PREFIX];
-		String suffix = queueStrings[next + QUEUED_OP_BLOCK_START_SUFFIX];
+		String prefix = queueStrings[next + QITEM_BLOCK_START_PREFIX];
+		String suffix = queueStrings[next + QITEM_BLOCK_START_SUFFIX];
 		//log("reallyStartLogicalBlock: "+blockDepth+" at:"+next);
-		reallyStartLogicalBlock (posnColumn(queueInts[next + QUEUED_OP_POSN]),
+		reallyStartLogicalBlock (posnColumn(queueInts[next + QITEM_POSN]),
 					 prefix, suffix);
 	      }
 	    else // Don't know.
@@ -871,11 +875,11 @@ public class PrettyWriter extends java.io.Writer
 	    if (currentBlock == start)
 	      currentBlock = -1;
 	    break;
-	  case QUEUED_OP_BLOCK_END_TYPE:
+	  case QITEM_BLOCK_END_TYPE:
 	    //log("reallyEndLogicalBlock: "+blockDepth+" at:"+next);
 	    reallyEndLogicalBlock();
 	    break;
-	  case QUEUED_OP_TAB_TYPE:
+	  case QITEM_TAB_TYPE:
 	    expandTabs(next);
 	    break;
 	  }
@@ -923,7 +927,7 @@ public class PrettyWriter extends java.io.Writer
 	available -= getSuffixLength();
       }
     if (sectionEnd >= 0)
-      return posnColumn(queueInts[sectionEnd + QUEUED_OP_POSN]) <= available ? 1 : -1;
+      return posnColumn(queueInts[sectionEnd + QITEM_POSN]) <= available ? 1 : -1;
     if (forceNewlines)
       return -1;
     if (indexColumn(bufferFillPointer) > available)
@@ -942,9 +946,9 @@ public class PrettyWriter extends java.io.Writer
   void outputLine (int newline)  throws IOException
   {
     char[] buffer = this.buffer;
-    int kind = queueInts[newline + QUEUED_OP_NEWLINE_KIND];
+    int kind = queueInts[newline + QITEM_NEWLINE_KIND];
     boolean isLiteral = kind == NEWLINE_LITERAL;
-    int amountToConsume = posnIndex(queueInts[newline + QUEUED_OP_POSN]);
+    int amountToConsume = posnIndex(queueInts[newline + QITEM_POSN]);
     int amountToPrint;
     if (isLiteral)
       amountToPrint = amountToConsume;
@@ -1017,7 +1021,7 @@ public class PrettyWriter extends java.io.Writer
   {
     int fillPtr = bufferFillPointer;
     int tail = queueTail;
-    while (queueSize > 0 && getQueueType(tail) == QUEUED_OP_NOP_TYPE)
+    while (queueSize > 0 && getQueueType(tail) == QITEM_NOP_TYPE)
       {
 	int size = getQueueSize(tail);
 	queueSize -= size;
@@ -1026,7 +1030,7 @@ public class PrettyWriter extends java.io.Writer
 	  tail = 0;
 	queueTail = tail;
       }
-    int count = queueSize > 0 ? posnIndex (queueInts[tail + QUEUED_OP_POSN])
+    int count = queueSize > 0 ? posnIndex (queueInts[tail + QITEM_POSN])
       : fillPtr;
     int newFillPtr = fillPtr - count;
     if (count <= 0)
@@ -1147,9 +1151,9 @@ public class PrettyWriter extends java.io.Writer
 	  }
 	int type = getQueueType(start);
 	int size = getQueueSize(start);
-	if (type != QUEUED_OP_NOP_TYPE)
+	if (type != QITEM_NOP_TYPE)
 	  {
-	    int newIndex = posnIndex(queueInts[start+QUEUED_OP_POSN]);
+	    int newIndex = posnIndex(queueInts[start+QITEM_POSN]);
 	    int count = newIndex - bufIndex;
 	    if (count > 0)
 	      {
@@ -1163,53 +1167,53 @@ public class PrettyWriter extends java.io.Writer
 	out.print("type:");  out.print(type);
 	switch (type)
 	  {
-	  case QUEUED_OP_NEWLINE_TYPE:
+	  case QITEM_NEWLINE_TYPE:
 	    out.print("(newline)");  break;
-	  case QUEUED_OP_INDENTATION_TYPE:
+	  case QITEM_INDENTATION_TYPE:
 	    out.print("(indentation)");  break;
-	  case QUEUED_OP_BLOCK_START_TYPE:
+	  case QITEM_BLOCK_START_TYPE:
 	    out.print("(block-start)");  break;
-	  case QUEUED_OP_BLOCK_END_TYPE:
+	  case QITEM_BLOCK_END_TYPE:
 	    out.print("(block-end)");  break;
-	  case QUEUED_OP_TAB_TYPE:  out.print("(tab)");
+	  case QITEM_TAB_TYPE:  out.print("(tab)");
 	    break;
-	  case QUEUED_OP_NOP_TYPE:
+	  case QITEM_NOP_TYPE:
 	    out.print("(nop)");  break;
 	  }
 	out.print(" size:");  out.print(size);
-	out.print(";  @");  out.print(start+QUEUED_OP_POSN);
-	if (type != QUEUED_OP_NOP_TYPE)
+	out.print(";  @");  out.print(start+QITEM_POSN);
+	if (type != QITEM_NOP_TYPE)
 	  {
 	    out.print(": posn:");
-	    int posn = queueInts[start+QUEUED_OP_POSN];
+	    int posn = queueInts[start+QITEM_POSN];
 	    out.print(posn);
 	    out.print(" index:");
 	    out.println(posnIndex(posn));
 	  }
-	if (type == QUEUED_OP_NEWLINE_TYPE
-	    || type == QUEUED_OP_BLOCK_START_TYPE)
+	if (type == QITEM_NEWLINE_TYPE
+	    || type == QITEM_BLOCK_START_TYPE)
 	    
 	  {
-	    out.print('@');  out.print(start+QUEUED_OP_SECTION_START_DEPTH);
+	    out.print('@');  out.print(start+QITEM_SECTION_START_DEPTH);
 	    out.print(": - depth:");
-	    out.print(queueInts[start+QUEUED_OP_SECTION_START_DEPTH]);
+	    out.print(queueInts[start+QITEM_SECTION_START_DEPTH]);
 	    out.print(";  @");
-	    out.print(start+QUEUED_OP_SECTION_START_SECTION_END);
+	    out.print(start+QITEM_SECTION_START_SECTION_END);
 	    out.print(": section-end:");
-	    out.println(queueInts[start+QUEUED_OP_SECTION_START_SECTION_END]);
+	    out.println(queueInts[start+QITEM_SECTION_START_SECTION_END]);
 	  }
 	switch (type)
 	  {
-	  case QUEUED_OP_BLOCK_START_TYPE:
-	    printQueueWord(start, QUEUED_OP_BLOCK_START_BLOCK_END, "block-end", out);
-	    printQueueStringWord(start, QUEUED_OP_BLOCK_START_PREFIX, "prefix", out);
-	    printQueueStringWord(start, QUEUED_OP_BLOCK_START_SUFFIX, "suffix", out);
+	  case QITEM_BLOCK_START_TYPE:
+	    printQueueWord(start, QITEM_BLOCK_START_BLOCK_END, "block-end", out);
+	    printQueueStringWord(start, QITEM_BLOCK_START_PREFIX, "prefix", out);
+	    printQueueStringWord(start, QITEM_BLOCK_START_SUFFIX, "suffix", out);
 	    break;
-	  case QUEUED_OP_NEWLINE_TYPE:
+	  case QITEM_NEWLINE_TYPE:
 	    out.print('@');
-	    out.print(start+QUEUED_OP_NEWLINE_KIND);
+	    out.print(start+QITEM_NEWLINE_KIND);
 	    out.print(": - kind: ");
-	    int kind = queueInts[start+QUEUED_OP_NEWLINE_KIND];
+	    int kind = queueInts[start+QITEM_NEWLINE_KIND];
 	    String skind = "???";
 	    switch (kind)
 	      {

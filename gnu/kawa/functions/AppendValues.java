@@ -7,7 +7,7 @@ import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.expr.*;
 
-public class AppendValues extends CpsProcedure implements CanInline, Inlineable
+public class AppendValues extends MethodProc implements CanInline, Inlineable
 {
   public static final AppendValues appendValues = new AppendValues();
 

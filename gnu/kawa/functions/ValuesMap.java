@@ -14,7 +14,7 @@ import gnu.math.IntNum;
  * Used to implement XQuery's 'for' form.
  */
 
-public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
+public class ValuesMap extends MethodProc implements CanInline, Inlineable
 {
   public static final ValuesMap valuesMap = new ValuesMap();
   public static final ValuesMap valuesMapWithPos = new ValuesMap();

@@ -1,3 +1,8 @@
+2004-08-03  Per Bothner  <per@bothner.com>
+
+	* AppendValues.java:  Extend MethodProc instead of CpsProcedure.
+	* ValuesMap.java:  Likewise.
+	
 2004-07-20  Per Bothner  <per@bothner.com>
 
 	* IsEqv.java:  Remove unused import statements.

@@ -624,7 +624,7 @@ public class IntNum extends RatNum implements Externalizable
 
   /** Divide two integers, yielding quotient and remainder.
    * @param x the numerator in the division
-   * @param t the denominator in the division
+   * @param y the denominator in the division
    * @param quotient is set to the quotient of the result (iff quotient!=null)
    * @param remainder is set to the remainder of the result
    *  (iff remainder!=null)
@@ -1504,7 +1504,7 @@ public class IntNum extends RatNum implements Externalizable
     return IntNum.neg (this);
   }
 
-  /** Calculates ceiling(log2(this < 0 ? -this : this+1)).
+  /** Calculates <code>ceiling(log2(this &lt; 0 ? -this : this+1))</code>.
    * See Common Lisp: the Language, 2nd ed, p. 361.
    */
   public int intLength ()

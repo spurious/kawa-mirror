@@ -1,3 +1,7 @@
+2005-04-03  Per Bothner  <per@bothner.com>
+
+	* IntNum.java: Fix two javadoc problems.
+
 2005-01-19  Dominique Boucher <dominique.boucher@nuecho.com>
 	    Per Bothner  <per@bothner.com>
 

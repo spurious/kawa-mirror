@@ -4,7 +4,6 @@ include $(top_srcdir)/Make-rules
 
 java_sources = \
 set_b.java \
-quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
 not.java \
 cxr.java \

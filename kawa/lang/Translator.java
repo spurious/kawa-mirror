@@ -728,7 +728,7 @@ public class Translator extends Compilation
     else if (exp instanceof Expression)
       return (Expression) exp;
     else
-      return QuoteExp.getInstance(exp);
+      return QuoteExp.getInstance(Quote.quote(exp, this));
   }
 
   public static void setLine(Expression exp, Object pair)

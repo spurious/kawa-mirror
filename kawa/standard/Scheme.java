@@ -90,7 +90,7 @@ public class Scheme extends LispInterpreter
       define_syntax ("lambda", lambda);
 
       //-- Section 4.1  -- complete
-      define (LispInterpreter.quote_sym, new Quote ());
+      defProcStFld(LispInterpreter.quote_sym, "kawa.lang.Quote", "plainQuote");
       define_syntax("%define", new kawa.standard.define(lambda));
       defSntxStFld("define", "kawa.lib.prim_syntax");
 
@@ -111,7 +111,7 @@ public class Scheme extends LispInterpreter
       defSntxStFld("do", "kawa.lib.std_syntax");
       defSntxStFld("delay", "kawa.lib.std_syntax");
       defProcStFld("%make-promise", "kawa.lib.std_syntax");
-      define_syntax ("quasiquote", "kawa.standard.quasiquote");
+      defProcStFld("quasiquote", "kawa.lang.Quote", "quasiQuote");
 
       //-- Section 5  -- complete [except for internal definitions]
 

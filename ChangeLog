@@ -1,7 +1,14 @@
 2004-12-20  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (rewrite): "Filter" through Quote.quote.
+	* kawa/lang/Quote.java: Merge with quasiquote.java to handle both
+	quasiquote and regular quote. Check for cycles.
+	* kawa/standard.Scheme (initScheme): Update 'quote' and 'quasiquote'.
+
 	* kawa/lang/Translator.java (selfEvauatingSymbol): New method.
 	(matches, getBinding, rewrite_pair, rewrite): Use new method.
+	* kawa/standard/quasiquote.java: Remove no-longer-used class.
+	* kawa/standard/Makefile.am: Update accordingly.
 
 2004-12-19  Per Bothner  <per@bothner.com>
 

@@ -208,7 +208,6 @@ ENABLE_GCJ_COMPILED_KAWA1 = $(OFILES_DIR)/kawa1$(exeext)
 ENABLE_GCJ_COMPILED_CDEP = $(TO_TOPDIR)/kawa1$(exeext)
 java_sources = \
 set_b.java \
-quasiquote.java \
 prim_method.java prim_throw.java throw_name.java \
 not.java \
 cxr.java \

@@ -175,7 +175,7 @@ Alternatively, you can install the pre-compiled binary distribution.
 You will need a working Java system.
 The discussion below assumes you are using the Java Developer's Kit
 (JDK) version 1.0.x or 1.1 from JavaSoft (Sun).
-(Kawa has also been reported to work with Kaffe, Semantec Cafe, and J++.)
+(Kawa has also been reported to work with Kaffe, Symantec Cafe, and J++.)
 You can download free copies of
 @ifhtml
 <a href="http://java.sun.com:80/java.sun.com/products/JDK/1.0.2/index.html">
@@ -398,8 +398,8 @@ A string containing the home directory of the user.
 @node Restrictions, Extensions, Running, Top
 @section Features of R4RS not implemented
 
-The file Compliance.html specifies which functions and syntax
-have been implemented so far.
+Kawa implements all the required and optional features of R4RS,
+with the following exceptions.
 
 The entire "numeric tower" is implemented.
 However, some transcendental function only work on reals.
@@ -839,6 +839,42 @@ device and returns an unspecified value.  If the @var{port} argument is
 omitted it defaults to the value returned by @code{(current-output-port)}.
 @end defun
 
+An interactive input port has a prompt procedure associated with it.
+The prompt procedure is called before a new line is read.  It is passed
+the port as an argument, and returns a string, which gets printed as a prompt.
+
+@defun input-port-prompter port
+Get the prompt procedure associated with @var{port}.
+@end defun
+
+@defun set-input-port-prompter! port prompter
+Set the prompt procedure associated with @var{port} to @var{prompter},
+which must be a one-argument procedure taking an input port,
+and returning a string.
+@end defun
+
+@defun default-prompter port
+The default prompt procedure.  It returns @code{"#|kawa:@var{L}#| "}, where
+@var{L} is the number of the current line of @var{port}.  The prompt has
+the form of a comment to make it easier to cut-and-paste.
+@end defun
+
+@defun input-port-line-number port
+Get the line number of the current line of @var{port},
+which must be a (non-binary) input port.
+The initial line is line 1.
+@end defun
+
+@defun set-input-port-line-number! port num
+Set line number of the current line of @var{port} to @var{num}.
+@end defun
+
+@defun input-port-column-number port 
+Get the column number of the current line of @var{port}, 
+which must be a (non-binary) input port.
+The initial column is column 1.
+@end defun
+
 @node Eval and Environments, Quantities, Ports, Extensions
 @subsection Eval and Environments
 
@@ -1133,10 +1169,13 @@ kawa -f macs.scm -C foosrc.scm
 
 All Scheme values are implemented by sub-classes of @samp{java.lang.Object}.
 
-Scheme symbols are implemented by @code{kawa.lang.Symbol}.
-Use the @samp{make} static method to create a new (interned) symbol.
-(It is likely that Scheme Symbols will be represented by java.lang.String
-values after JDK 1.1 is released.)
+Scheme symbols are implemented using @code{java.lang.String}.
+(Don't be confused by the fact the Scheme sybols are represented
+using Java Strings, while Scheme strings are represented by
+@code{kawa.lang.Scheme}.  It is just that the semantics of Java strings
+match Scheme symbols, but do not match mutable Scheme strings.)
+Interned symbols are presented as interned Strings.
+(Note that with JDK 1.1 string literals are automatically interned.)
 
 Scheme integers are implemented by @code{kawa.math.IntNum}.
 Use the make static function to create a new IntNum from an int or a long.

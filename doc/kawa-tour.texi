@@ -177,7 +177,7 @@ this means that all classes inherit from a distinguished class
 
 Standard Scheme @cite{W. Clinger and J. Rees (editors):
  Revised 4 report on the algorithmic language Scheme.
- LISP Pointers}, 4(3):1--55, 1991.} has a fixed set of
+ LISP Pointers, 4(3):1--55, 1991.} has a fixed set of
 types, with no way of creating
 new types.  It has run-time typing, which means that types are not declared,
 and a variable can contain values of different types at different times.

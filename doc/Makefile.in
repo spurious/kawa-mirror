@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.1g from Makefile.am
+# Makefile.in generated automatically by automake 1.2 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 
@@ -32,19 +32,34 @@ pkgincludedir = $(includedir)/@PACKAGE@
 
 top_builddir = ..
 
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
-TOP_BUILDDIR = @TOP_BUILDDIR@
-JAVA = @JAVA@
-PACKAGE = @PACKAGE@
-JAVAC = @JAVAC@
-VERSION = @VERSION@
-EXTRA_OBJ = @EXTRA_OBJ@
-JAVA_VERSION = @JAVA_VERSION@
+
+NORMAL_INSTALL = true
+PRE_INSTALL = true
+POST_INSTALL = true
+NORMAL_UNINSTALL = true
+PRE_UNINSTALL = true
+POST_UNINSTALL = true
+EXEEXT = @EXEEXT@
 EXTRA_MISC = @EXTRA_MISC@
+EXTRA_OBJ = @EXTRA_OBJ@
+JAVA = @JAVA@
+JAVAC = @JAVAC@
+JAVA_VERSION = @JAVA_VERSION@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+TOP_BUILDDIR = @TOP_BUILDDIR@
+VERSION = @VERSION@
 
 info_TEXINFOS = kawa-tour.texi
 
@@ -53,39 +68,43 @@ EXTRA_DIST = kawa.txt kawa.html scm2java.html license.terms \
 info_TEXINFOS = kawa.texi
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-MAKEINFO = `if test -f $(top_builddir)/../texinfo/makeinfo/makeinfo; then echo $(top_builddir)/../texinfo/makeinfo/makeinfo; else echo makeinfo; fi`
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_srcdir)/../texinfo/util/texi2dvi; else echo texi2dvi; fi`
+TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 INFO_DEPS = kawa.info
 DVIS = kawa.dvi
 TEXINFOS = kawa.texi
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in mdate-sh texinfo.tex \
-version.texi
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in mdate-sh stamp-vti \
+texinfo.tex version.texi
 
 
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(MANS) $(EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
+GZIP = --best
 default: all
 
+.SUFFIXES:
+.SUFFIXES: .dvi .info .ps .texi .texinfo
+$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus doc/Makefile
 
-$(srcdir)/Makefile.in: @MAINT@Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake --strictness=foreign --cygnus $(subdir)/Makefile
-
-Makefile: $(top_builddir)/config.status $(srcdir)/Makefile.in $(BUILT_SOURCES)
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
+
 version.texi: @MAINT@stamp-vti
+	cp $(srcdir)/stamp-vti $(srcdir)/version.texi
 
 stamp-vti: kawa.texi $(top_srcdir)/configure.in
-	echo "@set UPDATED `cd $(srcdir) \
+	@echo "@set UPDATED `cd $(srcdir) \
 	  && $(SHELL) ./mdate-sh kawa.texi`" > vti.tmp
-	echo "@set EDITION $(VERSION)" >> vti.tmp
-	echo "@set VERSION $(VERSION)" >> vti.tmp
-	cmp -s vti.tmp version.texi || cp vti.tmp version.texi
-	rm vti.tmp
-	echo timestamp > stamp-vti
+	@echo "@set EDITION $(VERSION)" >> vti.tmp
+	@echo "@set VERSION $(VERSION)" >> vti.tmp
+	@cmp -s vti.tmp $(srcdir)/stamp-vti \
+	  || (echo "Updating $(srcdir)/stamp-vti"; \
+	      cp vti.tmp $(srcdir)/stamp-vti)
+	@rm -f vti.tmp
 
 mostlyclean-vti:
 	rm -f vti.tmp
@@ -101,43 +120,65 @@ kawa.info: kawa.texi version.texi
 kawa.dvi: kawa.texi version.texi
 
 
+DVIPS = dvips
+
 .texi.info:
+	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
 	$(MAKEINFO) -I $(srcdir) $<
 
 .texi.dvi:
-	TEXINPUTS=$(srcdir):$$TEXINPUTS \
+	TEXINPUTS=$(top_srcdir)/../texinfo:$$TEXINPUTS \
 	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2DVI) $<
 
+.texi:
+	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
+	$(MAKEINFO) -I $(srcdir) $<
+
 .texinfo.info:
+	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
+	$(MAKEINFO) -I $(srcdir) $<
+
+.texinfo:
+	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
 	$(MAKEINFO) -I $(srcdir) $<
 
 .texinfo.dvi:
-	TEXINPUTS=$(srcdir):$$TEXINPUTS $(TEXI2DVI) $<
+	TEXINPUTS=$(top_srcdir)/../texinfo:$$TEXINPUTS \
+	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2DVI) $<
+.dvi.ps:
+	$(DVIPS) $< -o $@
 
 install-info-am: $(INFO_DEPS)
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(infodir)
-	for file in $(INFO_DEPS); do \
-	  for ifile in `cd $(srcdir) && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
-	    if test -f $(srcdir)/$$ifile; then \
-	      $(INSTALL_DATA) $(srcdir)/$$ifile $(infodir)/$$ifile; \
+	@for file in $(INFO_DEPS); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  for ifile in `cd $$d && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
+	    if test -f $$d/$$ifile; then \
+	      echo " $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile"; \
+	      $(INSTALL_DATA) $$d/$$ifile $(infodir)/$$ifile; \
 	    else : ; fi; \
 	  done; \
 	done
-	$(POST_INSTALL)
-	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	@$(POST_INSTALL)
+	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
 	  for file in $(INFO_DEPS); do \
-	    install-info --info-dir=$(infodir) $$file; :;\
+	    echo " install-info --info-dir=$(infodir) $(infodir)/$$file";\
+	    install-info --info-dir=$(infodir) $(infodir)/$$file || :;\
 	  done; \
 	else : ; fi
 
 uninstall-info:
-	if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+	$(PRE_UNINSTALL)
+	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
 	  ii=yes; \
 	else ii=; fi; \
 	for file in $(INFO_DEPS); do \
-	  (cd $(infodir) && rm -f $$file $$file-[0-9] $$file-[0-9][0-9]); \
 	  test -z $ii || install-info --info-dir=$(infodir) --remove $$file; \
+	done
+	$(NORMAL_UNINSTALL)
+	for file in $(INFO_DEPS); do \
+	  (cd $(infodir) && rm -f $$file $$file-[0-9] $$file-[0-9][0-9]); \
 	done
 
 dist-info: $(INFO_DEPS)
@@ -150,16 +191,18 @@ dist-info: $(INFO_DEPS)
 	  done; \
 	done
 
-mostlyclean-info:
+mostlyclean-aminfo:
 	rm -f kawa.aux kawa.cp kawa.cps kawa.dvi kawa.fn kawa.fns kawa.ky \
-	  kawa.log kawa.pg kawa.toc kawa.tp kawa.vr kawa.op
+	  kawa.log kawa.pg kawa.toc kawa.tp kawa.tps kawa.vr kawa.vrs \
+	  kawa.op kawa.tr kawa.cv
 
-clean-info:
+clean-aminfo:
 
-distclean-info:
+distclean-aminfo:
 
-maintainer-clean-info:
-	for i in $(INFO_DEPS); do rm `eval echo $i*`; done
+maintainer-clean-aminfo:
+	for i in $(INFO_DEPS); do rm -f `eval echo $$i*`; done
+clean-info: mostlyclean-aminfo
 tags: TAGS
 TAGS:
 
@@ -167,6 +210,7 @@ TAGS:
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
 
 subdir = doc
+
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
@@ -174,17 +218,18 @@ distdir: $(DISTFILES)
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-	$(MAKE) distdir="$(distdir)" dist-info
+	$(MAKE) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-info
 info: $(INFO_DEPS)
 dvi: $(DVIS)
 check: all
+	$(MAKE)
 installcheck:
 install-info: install-info-am
 install-exec: 
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 
 install-data: 
-	$(NORMAL_INSTALL)
+	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
@@ -194,7 +239,7 @@ uninstall:
 all: Makefile
 
 install-strip:
-	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
+	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
 
 
@@ -206,28 +251,28 @@ clean-generic:
 
 distclean-generic:
 	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log stamp-h
+	rm -f config.cache config.log stamp-h stamp-h[0-9]*
 	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
 	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-mostlyclean:  mostlyclean-vti mostlyclean-info mostlyclean-generic
+mostlyclean:  mostlyclean-vti mostlyclean-aminfo mostlyclean-generic
 
-clean:  clean-vti clean-info clean-generic mostlyclean 
+clean:  clean-vti clean-aminfo clean-generic mostlyclean
 
-distclean:  distclean-vti distclean-info distclean-generic clean 
+distclean:  distclean-vti distclean-aminfo distclean-generic clean
 	rm -f config.status
 
-maintainer-clean:  maintainer-clean-vti maintainer-clean-info \
-		maintainer-clean-generic distclean 
+maintainer-clean:  maintainer-clean-vti maintainer-clean-aminfo \
+		maintainer-clean-generic distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
 .PHONY: default mostlyclean-vti distclean-vti clean-vti \
-maintainer-clean-vti install-info-am uninstall-info mostlyclean-info \
-distclean-info clean-info maintainer-clean-info tags distdir info dvi \
-check installcheck install-info install-exec install-data install \
+maintainer-clean-vti install-info-am uninstall-info mostlyclean-aminfo \
+distclean-aminfo clean-aminfo maintainer-clean-aminfo tags distdir info \
+dvi installcheck install-info install-exec install-data install \
 uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
@@ -242,8 +287,6 @@ kawa.txt:  $(srcdir)/kawa.texi version.texi
 
 kawa.html:  $(srcdir)/kawa.texi version.texi
 	texi2html -menu $<
-.SUFFIXES:
-.SUFFIXES: .texi .texinfo .info .dvi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-import java.util.Hashtable;
 import java.io.*;
 import java.util.zip.*;
 

@@ -1,3 +1,17 @@
+2004-07-20  Per Bothner  <per@bothner.com>
+
+	* CodeFragment.java:  Remove useless import statements.
+	* IfState.java:  Likewise.
+	* Label.java:  Likewise.
+	* Location.java:  Likewise.
+	* PrimType.java:  Likewise.
+	* Scope.java:  Likewise.
+	* TryState.java:  Likewise.
+	* Type.java:  Likewise.
+	* Variable.java:  Likewise.
+	* ZipArchive.java:  Likewise.
+	* dump.java:  Likewise.
+
 2004-05-13  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (getFields, getDeclaredMethods):  Make synchronized.

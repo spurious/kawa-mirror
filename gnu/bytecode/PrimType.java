@@ -1,5 +1,4 @@
 package gnu.bytecode;
-import java.io.*;
 
 public class PrimType extends Type {
 

@@ -2,7 +2,6 @@
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-import java.io.*;
 
 /** A sequence of bytecode instructions belonging to a method's Code attribute.
  * This provides a hook for re-arranging instruction sequences.

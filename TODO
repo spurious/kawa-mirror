@@ -55,10 +55,6 @@ Implement IntRange class.
 Use it to replace Char's hashtable.
 Replace Char by Character.
 
-JEmacs:
-* clean up function-binding hacks
-* vertical-motion
-
 Modules:
 * Infer parameter and return types when defaulted and otherwise match
 method in explicit module-extends or module-interface.
@@ -254,6 +250,10 @@ gnu.mapping.Symbol should implement java.util.Map.Entry.
 Possibly replace GuiConsole to use JTextPane (or gnu.jemacs.buffer.Window).
 
 JEMACS
+
+clean up function-binding hacks
+
+vertical-motion
 
 Make it so that JEmacs does not require Swing.  There is a start in
 that gnu.jemacs.buffer mostly contains toolkit-independentcode, and

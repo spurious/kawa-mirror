@@ -1,9 +1,23 @@
+(define (input-port? x)
+  (instance? x <input-port>))
+
+(define (output-port? x)
+  (instance? x <output-port>))
+
+(define (call-with-input-string str proc)
+  (let* ((port
+	  ((primitive-virtual-method <string> "open" <input-port> ())
+	   str))
+	 (result (proc port)))
+    (close-input-port port)
+    result))
+
 (define (force-output #!optional (port (current-output-port)))
   ((primitive-virtual-method <java.io.Writer> "flush" <void> ())
    port))
 
 (define (newline #!optional (port (current-output-port)))
-  ((primitive-virtual-method <kawa.lang.OutPort> "println"
+  ((primitive-virtual-method <output-port> "println"
 			     <void> ())
    port))
 
@@ -11,7 +25,7 @@
   (eq? obj #!eof))
 
 (define (input-port-read-state port)
-  ((primitive-virtual-method <kawa.lang.InPort> "getReadState" <char> ())
+  ((primitive-virtual-method <input-port> "getReadState" <char> ())
    port))
 
 (define (input-port-line-number port)
@@ -52,9 +66,9 @@
    port prompter))
 
 (define (transcript-on filename)
-  ((primitive-static-method <kawa.lang.OutPort> "setLogFile" <void>
+  ((primitive-static-method <output-port> "setLogFile" <void>
 			    (<java.lang.String>))
    filename))
 
 (define (transcript-off)
-  ((primitive-static-method <kawa.lang.OutPort> "closeLogFile" <void> ())))
+  ((primitive-static-method <output-port> "closeLogFile" <void> ())))

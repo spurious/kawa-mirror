@@ -1,3 +1,9 @@
+Mon Feb 16 17:15:21 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ports.scm (input-port?, output-port?, call-with-input-string):
+	These are now here, written in Scheme.
+	* Makefile.am, Makefile.in (SECONDARY_OBJS): Update for new procedures.
+
 Fri Feb  6 17:24:02 1998  Per Bothner  <bothner@cygnus.com>
 
 	* misc.scm (scheme-window):  New procedure.

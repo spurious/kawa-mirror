@@ -125,6 +125,9 @@
 
 ;;; DELAY
 
+(define (%make-promise x)
+  ((primitive-constructor <kawa.lang.Promise> (<gnu.mapping.Procedure0>)) x))
+
 (define-syntax delay (syntax-rules ()
 				   ((delay expression)
 				    (%make-promise (lambda () expression)))))

@@ -1,3 +1,8 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* ReplBuffer.java (<init>): Use new OutPort contructors, and
+	specify pretty-printing.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES):  Remove redundant definition.

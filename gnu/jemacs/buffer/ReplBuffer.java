@@ -26,8 +26,8 @@ public class ReplBuffer extends Buffer
     processMark = new Marker(pointMarker);
     processWriter = new BufferWriter(processMark, true);
     in_r = new QueueReader ();
-    out = new OutPort(processWriter, 512, true);
-    err = new OutPort(processWriter, 512, true);
+    out = new OutPort(processWriter, true, true);
+    err = new OutPort(processWriter, true, true);
     // GuiInPort proves better cut/paste support.
     in = new TtyInPort(in_r, "<stdin>", out);
 

@@ -27,8 +27,11 @@ implements Externalizable, Consumable
   public FVector (int num, Object o)
   {
     Object[] data = new Object[num];
-    for (int i = 0;  i < num;  i++)
-      data[i] = o;
+    if (o != null)
+      {
+	for (int i = 0;  i < num;  i++)
+	  data[i] = o;
+      }
     this.data = data;
     this.size = num;
   }

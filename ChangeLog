@@ -1,3 +1,11 @@
+2005-04-02  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Eval.java (evalBody): Save/set/restore current Compilation.
+
+	* kawa/lang/Eval.java (eval): New static field.
+	* kawa/standard/Scheme.java (repl): New static field.
+	(initScheme): Use defProcStFld for 'eval' and 'repl'.
+
 2005-03-31  Dean Ferreyra <dferreyra@igc.org>
 	    Per Bothner  <per@bothner.com>
 

@@ -8,6 +8,9 @@ import gnu.lists.*;
 
 public class Eval extends Procedure1or2
 {
+  public static final Eval eval = new Eval();
+  static { eval.setName("eval"); }
+
   final static String evalFunctionName = "atEvalLevel";
 
   public static void eval (Object sexpr, Environment env, CallContext ctx)
@@ -81,9 +84,18 @@ public class Eval extends Procedure1or2
 	ModuleExp mod = new ModuleExp();
 	Values forms = new Values();
 	tr.push(mod);
-	int first = tr.formStack.size();
-	tr.scanBody(body, mod, false);
-	tr.finishModule(mod, first);
+        Compilation save_comp = Compilation.getCurrent();
+        try
+          {
+            Compilation.setCurrent(tr);
+            int first = tr.formStack.size();
+            tr.scanBody(body, mod, false);
+            tr.finishModule(mod, first);
+          }
+        finally
+          {
+            Compilation.setCurrent(save_comp);
+          }
 
 	if (body instanceof PairWithPosition)
 	  mod.setFile(((PairWithPosition) body).getFile());

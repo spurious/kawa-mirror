@@ -47,6 +47,7 @@ public class Scheme extends LispLanguage
   public static final gnu.kawa.functions.IsEq isEq;
   public static final gnu.kawa.functions.IsEqv isEqv;
   public static final gnu.kawa.functions.IsEqual isEqual;
+  public static final kawa.repl repl;
 
   static {
     // (null-environment)
@@ -60,6 +61,7 @@ public class Scheme extends LispLanguage
     isEq = new gnu.kawa.functions.IsEq(instance, "eq?");
     isEqv = new gnu.kawa.functions.IsEqv(instance, "eqv?", isEq);
     isEqual = new gnu.kawa.functions.IsEqual(instance, "equal?");
+    repl = new kawa.repl(instance);
     instance.initScheme();
     instance.environ = instance.getNewEnvironment();
   }
@@ -383,8 +385,8 @@ public class Scheme extends LispLanguage
       defSntxStFld("let*-values", "kawa.lib.syntax");
       defSntxStFld("case-lambda", "kawa.lib.syntax");
       defSntxStFld("receive", "kawa.lib.syntax");
-      define_proc ("eval", "kawa.lang.Eval");
-      define_proc ("repl", new kawa.repl(this));
+      defProcStFld("eval", "kawa.lang.Eval");
+      defProcStFld("repl", "kawa.standard.Scheme", "repl");
       defProcStFld("scheme-report-environment", "kawa.lib.misc");
       defProcStFld("null-environment", "kawa.lib.misc");
       defProcStFld("interaction-environment", "kawa.lib.misc");

@@ -1,3 +1,7 @@
+Tue Feb 24 23:08:41 1998  Per Bothner  <bothner@cygnus.com>
+
+	* obj-test.scm:  Add tests for make, (record 'field), and set!.
+
 Thu Feb 19 19:33:57 1998  Per Bothner  <bothner@cygnus.com>
 
 	* misc-test.scm:  Add tests for new-line (CR and CRLF) handling.

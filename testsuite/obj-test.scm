@@ -7,6 +7,7 @@
 (test z make-rcomplex 4 3)
 (test 4 'accessor1 ((record-accessor complex 'im) z))
 ((record-modifier complex 're) z 5)
+(test z make complex im: 4 re: 5)
 (test 5 'accessor2 ((record-accessor complex 're) z))
 (test #t record? z)
 (test #f record? 5)
@@ -14,3 +15,5 @@
 (test complex record-type-descriptor z)
 (test "complex" record-type-name complex)
 (test '(re im) record-type-field-names complex)
+
+(test 20 'set! (begin (set! (z 'im) 15) (+ (z 're) (z 'im))))

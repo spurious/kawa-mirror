@@ -1,3 +1,9 @@
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* reflection.scm (subtype?):  New procedure.
+	* std_syntax.scm (%let-lambda1, %et-init):  Handle :: TYPE specifier.
+	(do):  Handle type specifier - but only for one variable.
+
 Wed Apr  7 23:37:10 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* syntax.scm (fluid-let):  Remove; replaced by kawa.standard.fluid_let.

@@ -92,7 +92,7 @@ public class define extends Syntax implements Printable
 	    if (p2.cdr == LList.Empty)
 	      {
 		decl = (Declaration) p1.car;
-                name = decl.symbol();
+                name = decl.getName();
 		value = tr.rewrite (p2.car);
 	      }
 	  }
@@ -106,7 +106,7 @@ public class define extends Syntax implements Printable
             else if (p2.car instanceof Declaration)
               {
                 decl = (Declaration) p2.car;
-                name = decl.symbol();
+                name = decl.getName();
               }
             if (name != null)
               {

@@ -65,10 +65,10 @@ public class letrec extends Syntax implements Printable
       }
     tr.push(let);
     i = 0;
-    for (Variable var = let.firstVar(); var != null; var = var.nextVar(), i++)
+    for (Declaration decl = let.firstDecl();
+         decl != null;  decl = decl.nextDecl(), i++)
       {
 	Expression exp = tr.rewrite(orig_inits[i]);
-	Declaration decl = (Declaration) var;
 	newbody[i] = new SetExp(decl, exp);
 	decl.noteValue (exp);				
       }

@@ -112,6 +112,7 @@ logbit_p.java logtest.java logcount.java \
 ashift.java bit_extract.java int_length.java \
 define.java \
 define_syntax.java syntax_rules.java let_syntax.java syntax_case.java \
+require.java \
 syntax_error.java \
 let.java \
 letrec.java \

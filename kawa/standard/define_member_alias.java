@@ -41,7 +41,7 @@ public class define_member_alias extends Syntax
         if (p1.car instanceof Declaration)
           {
             decl = (Declaration) p1.car;
-            name = decl.symbol();
+            name = decl.getName();
           }
         else
           {

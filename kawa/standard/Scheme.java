@@ -544,6 +544,7 @@ public class Scheme extends Interpreter
       define_syntax ("location", "kawa.standard.location");
       define ("define-alias", new kawa.standard.define_alias());
       define ("define-member-alias", new kawa.standard.define_member_alias());
+      define ("require", new kawa.standard.require());
 
       define_proc ("s8vector?", "kawa.lib.uniform");
       define_proc ("make-s8vector", "kawa.lib.uniform");

@@ -50,13 +50,13 @@ public class set_b extends Syntax implements Printable
       return tr.syntaxError ("first set! argument is not a variable name");
     String sym = (String) match[0];
     Expression value = tr.rewrite (match[1]);
-    Object binding = tr.current_decls.get (sym);
+    Object binding = tr.environ.get (sym);
     // Hygenic macro expansion may bind a renamed (uninterned) symbol
     // to the original symbol.  Here, use the original symbol.
     if (binding != null && binding instanceof String)
       return new SetExp ((String) binding, value);
     SetExp sexp = new SetExp (sym, value);
-    if (binding != null)
+    if (binding instanceof Declaration)
       {
 	Declaration decl = (Declaration) binding;
 	if (tr.isLexical(decl))

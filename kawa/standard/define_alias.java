@@ -38,7 +38,7 @@ public class define_alias extends Syntax implements Printable
                   }
                 else
                   {
-                    Object binding = tr.current_decls.get(name);
+                    Object binding = tr.environ.get(name);
                     // Hygenic macro expansion may bind a renamed (uninterned)
                     // symbol to the original symbol.
                     if (binding == null || binding instanceof String)

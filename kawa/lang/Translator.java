@@ -321,6 +321,9 @@ public class Translator extends Parser
 	  }
       }
 
+    if (cdr_length < 0)
+      return syntaxError("dotted list is not allowed");
+
     Expression[] args = new Expression[cdr_length];
 
     for (int i = 0; i < cdr_length; i++)

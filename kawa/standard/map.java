@@ -99,7 +99,7 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
       }
   }
 
-  public Expression inline (ApplyExp exp)
+  public Expression inline (ApplyExp exp, ExpWalker walker)
   {
     Expression[] args = exp.getArgs();
     int nargs = args.length;

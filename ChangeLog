@@ -1,3 +1,9 @@
+2002-07-21  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/map.java (inline):  Take extra ExpWalker parameter.
+
+	* kawa/lang/Translator.java (rewrite_pair):  Check for dotted list.
+
 2002-07-02  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/string_append.java (stringAppend$V):  Remove

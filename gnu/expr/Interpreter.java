@@ -2,7 +2,8 @@ package gnu.expr;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.Type;
-import gnu.lists.FormatToConsumer;
+import gnu.lists.*;
+import gnu.text.Lexer;
 
 /**
  * Contains various language-dependent methods.
@@ -41,6 +42,7 @@ public abstract class Interpreter
   {
     { "scheme", ".scm", ".sc", "kawa.standard.Scheme" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
+    { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
     { "commonlisp", "common-lisp", "clisp", "lisp",
       ".lisp", ".lsp", ".cl",
       "gnu.commonlisp.lang.CommonLisp" }
@@ -172,6 +174,12 @@ public abstract class Interpreter
 
   public abstract FormatToConsumer getFormat(boolean readable);
 
+  public Consumer getOutputConsumer(OutPort out)
+  {
+    out.objectFormat = getFormat(false);
+    return out;
+  }
+
   public Environment getNewEnvironment ()
   {
     return new Environment(environ);
@@ -179,7 +187,12 @@ public abstract class Interpreter
 
   public abstract String getName();
 
-  public abstract gnu.text.Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+  public abstract Lexer getLexer(InPort inp, gnu.text.SourceMessages messages);
+
+  public abstract ModuleExp parse(Environment env, Lexer lexer)
+    throws java.io.IOException, gnu.text.SyntaxException;
+
+  public abstract ModuleExp parseFile (InPort port, gnu.text.SourceMessages messages);
 
   public abstract Type getTypeFor(Class clas);
 
@@ -291,6 +304,12 @@ public abstract class Interpreter
   public Object coerceToObject(int val)
   {
     return gnu.math.IntNum.make(val);
+  }
+
+  public Procedure getPrompter()
+  {
+    Binding pr = Environment.getCurrentBinding("default-prompter");
+    return pr == null ? null : pr.getProcedure();
   }
 
   // The compiler finds registerEnvironment by using reflection.

@@ -57,6 +57,7 @@ public class PrintConsumer extends PrintWriter implements Consumer
 
   public void writeInt(int v)
   {
+    startNumber();
     print(v);
   }
 

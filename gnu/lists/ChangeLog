@@ -1,3 +1,7 @@
+2002-02-01  Per Bothner  <per@bothner.com>
+
+	* PrintConsumer.java (writeInt):  Add missing startNumber call.
+
 2002-01-23  Per Bothner  <per@bothner.com>
 
 	* ConsumerWriter.java:  Extends Writer.

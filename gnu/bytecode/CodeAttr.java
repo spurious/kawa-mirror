@@ -562,6 +562,9 @@ public class CodeAttr extends Attribute implements AttrContainer
 
   public final void emitArrayLength ()
   {
+    if (! (popType() instanceof ArrayType))
+      throw new Error( "non-array type in emitArrayLength" );
+    
     reserve(1);
     put1(190);  // arraylength
     pushType(Type.int_type);
@@ -634,9 +637,11 @@ public class CodeAttr extends Attribute implements AttrContainer
    * The size shold have been already pushed on the stack.
    * @param type type of the array elements
    */
-  public void emitNewArray (Type element_type)
+  public void emitNewArray (Type element_type, int dims)
   {
-    popType();
+    if (popType ().promote () != Type.int_type)
+      throw new Error ("non-int dim. spec. in emitNewArray");
+
     if (element_type instanceof PrimType)
       {
 	int code;
@@ -658,11 +663,29 @@ public class CodeAttr extends Attribute implements AttrContainer
       {
 	reserve(3);
 	put1(189); // anewarray
-	putIndex2(getConstants().addClass((ClassType) element_type));
+	putIndex2(getConstants().addClass((ObjectType) element_type));
       }
+    else if (element_type instanceof ArrayType)
+    {
+      reserve(4);
+      put1(197); // multianewarray
+      putIndex2 (getConstants ().addClass (new ArrayType (element_type)));
+      if (dims < 1 || dims > 255)
+	throw new Error ("dims out of range in emitNewArray");
+      put1(dims);
+      while (-- dims > 0) // first dim already popped
+	if (popType ().promote () != Type.int_type)
+	  throw new Error ("non-int dim. spec. in emitNewArray");
+    }
     else
       throw new Error ("unimplemented type in emitNewArray");
-    pushType(new ArrayType(element_type));
+
+    pushType (new ArrayType (element_type));
+  }
+
+  public void emitNewArray (Type element_type)
+  {
+    emitNewArray (element_type, 1);
   }
 
   private void emitBinop (int base_code)
@@ -765,6 +788,37 @@ public class CodeAttr extends Attribute implements AttrContainer
       emitMaybeWide(54 + kind, offset); // [ilfda]store
   }
 
+
+  public void emitInc (Variable var, short inc)
+  {
+    if (var.dead ())
+      throw new Error ("attempting to increment dead variable");
+    int offset = var.offset;
+    if (offset < 0 || !var.isSimple ())
+      throw new Error ("attempting to increment unassigned variable"+var.getName()
+		       +" simple:"+var.isSimple()+", offset: "+offset);
+    Type type = var.getType().promote ();
+    reserve(6);
+    if (type != Type.int_type)
+      throw new Error("attempting to increment non-int variable");
+
+    boolean wide = offset > 255 || inc > 255 || inc < -256;
+
+    if (wide)
+    {
+      put1(196); // wide
+      put1(132); // iinc
+      put2(offset);
+      put2(inc);
+    }
+    else
+    {
+      put1(132); // iinc
+      put1(offset);
+      put1(inc);
+    }
+  }
+  
 
   private final void emitFieldop (Field field, int opcode)
   {
@@ -912,21 +966,21 @@ public class CodeAttr extends Attribute implements AttrContainer
     char sig1 = type1.getSignature().charAt(0);
     char sig2 = type2.getSignature().charAt(0);
     if (sig1 == 'I' && sig2 == 'I')
-      opcode = 159;  // if_cmpeq (inverted: if_icmpne)
+      opcode = 159;  // if_icmpeq (inverted: if_icmpne)
     else if (sig1 == 'J' && sig2 == 'J')
       {
 	put1(148);   // lcmp
-	opcode = 153;  // ifeq (inverted: ifeq)
+	opcode = 153;  // ifeq (inverted: ifne)
       }
     else if (sig1 == 'F' && sig2 == 'F')
       {
 	put1(149);   // fcmpl
-	opcode = 153;  // ifeq (inverted: ifeq)
+	opcode = 153;  // ifeq (inverted: ifne)
       }
     else if (sig1 == 'D' && sig2 == 'D')
       {
-	put1(149);   // fcmpl
-	opcode = 153;  // ifeq (inverted: ifeq)
+	put1(151);   // dcmpl
+	opcode = 153;  // ifeq (inverted: ifne)
       }
     else if ((sig1 == 'L' || sig1 == '[')
 	     && (sig2 == 'L' || sig2 == '['))
@@ -970,12 +1024,51 @@ public class CodeAttr extends Attribute implements AttrContainer
   public final void emitGotoIfIntLeZero(Label label)
   { emitGotoIfCompare1(label, 158); }
 
+  public final void emitGotoIfCompare2 (Label label, int logop)
+  { 
+    if( logop < 155 || logop > 158 )
+      throw new Error ("emitGotoIfCompare2: logop must be one of iflt, ifgt, ifle, ifge");
+    
+    Type type2 = popType().promote();
+    Type type1 = popType().promote();
+    reserve(4);
+    char sig1 = type1.getSignature().charAt(0);
+    char sig2 = type2.getSignature().charAt(0);
+
+    boolean cmpg = (logop == 155 || logop == 158); // iflt,ifle
+
+    if (sig1 == 'I' && sig2 == 'I')
+      logop += 6;  // iflt -> if_icmplt etc.
+    else if (sig1 == 'J' && sig2 == 'J')
+      put1(148);   // lcmp
+    else if (sig1 == 'F' && sig2 == 'F')
+      put1(cmpg ? 149 : 150);   // fcmpl/fcmpg
+    else if (sig1 == 'D' && sig2 == 'D')
+      put1(cmpg ? 151 : 152);   // dcmpl/dcmpg
+    else
+      throw new Error ("non-matching types to emitGotoIfCompare2");
+
+    emitTransfer (label, logop);
+  }
+
+  // binary comparisons
+  public final void emitGotoIfLt(Label label)
+  { emitGotoIfCompare2(label, 155); }
+  public final void emitGotoIfGe(Label label)
+  { emitGotoIfCompare2(label, 156); }
+  public final void emitGotoIfGt(Label label)
+  { emitGotoIfCompare2(label, 157); }
+  public final void emitGotoIfLe(Label label)
+  { emitGotoIfCompare2(label, 158); }
+
+
   /** Compile start of a conditional:  if (!(x OPCODE 0)) ...
    * The value of x must already have been pushed. */
   public final void emitIfCompare1 (int opcode)
   {
     IfState new_if = new IfState(this);
-    popType();
+    if (popType().promote() != Type.int_type)
+      throw new Error ("non-int type to emitIfCompare1");
     reserve(3);
     emitTransfer (new_if.end_label, opcode);
     new_if.start_stack_size = SP;
@@ -987,6 +1080,31 @@ public class CodeAttr extends Attribute implements AttrContainer
     emitIfCompare1(153); // ifeq
   }
 
+  /** Compile start of a conditional:  if (!(x OPCODE null)) ...
+   * The value of x must already have been pushed and must be of
+   * reference type. */
+  public final void emitIfRefCompare1 (int opcode)
+  {
+    IfState new_if = new IfState(this);
+    if (! (popType() instanceof ObjectType))
+      throw new Error ("non-ref type to emitIfRefCompare1");
+    reserve(3);
+    emitTransfer (new_if.end_label, opcode);
+    new_if.start_stack_size = SP;
+  }  
+  
+  /** Compile start of conditional:  if (x != null) */
+  public final void emitIfNotNull()
+  {
+    emitIfRefCompare1(198); // ifnull
+  }
+
+  /** Compile start of conditional:  if (x == null) */
+  public final void emitIfNull()
+  {
+    emitIfRefCompare1(199); // ifnonnull
+  }  
+  
   /** Compile start of a conditional:  if (!(x OPCODE y)) ...
    * The value of x and y must already have been pushed. */
   public final void emitIfIntCompare(int opcode)
@@ -1020,6 +1138,42 @@ public class CodeAttr extends Attribute implements AttrContainer
   {
     IfState new_if = new IfState (this);
     emitGotoIfNE(new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of a conditional:  if (x < y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfLt ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfGe(new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of a conditional:  if (x >= y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfGe ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfLt(new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of a conditional:  if (x > y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfGt ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfLe(new_if.end_label);
+    new_if.start_stack_size = SP;
+  }
+
+  /** Compile start of a conditional:  if (x <= y) ...
+   * The values of x and y must already have been pushed. */
+  public final void emitIfLe ()
+  {
+    IfState new_if = new IfState (this);
+    emitGotoIfGt(new_if.end_label);
     new_if.start_stack_size = SP;
   }
 
@@ -1185,7 +1339,8 @@ public class CodeAttr extends Attribute implements AttrContainer
 	putIndex2(getConstants().addClass((ClassType) type));
       }
     else
-      throw new Error ("unimplemented type in emitCheckcast/emitInstanceof");
+      throw new Error ("unimplemented type " + type
+		       + " in emitCheckcast/emitInstanceof");
   } 
 
   public void emitCheckcast (Type type)
@@ -1744,13 +1899,21 @@ public class CodeAttr extends Attribute implements AttrContainer
 		    print("getstatic;putstatic;getfield;putfield;", op-178, dst);
 		    printConstant = 2;
 		  }
-		else if (op < 186) // op >= 182 && op <= 185 [invoke*]
+		else if (op < 185) // op >= 182 && op <= 185 [invoke*]
 		  {
 		    dst.print("invoke");
-		    print("virtual;special;static;interface;", op-182, dst);
+		    print("virtual;special;static;", op-182, dst);
 		    printConstant = 2;
-		    if (op == 185) // invokeinterface
-		      i += 2;
+		  }
+		else if (op == 185) // invokeinterface
+		  {
+		    dst.print("invokeinterface (");
+		    int index = readUnsignedShort(i);
+		    i += 2;
+		    int args = 0xff & code[i];
+		    i += 2;
+		    dst.print(args + " args)");
+		    dst.printConstantOperand(index);
 		  }
 		else if (op < 196)
 		  {

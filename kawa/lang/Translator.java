@@ -338,6 +338,44 @@ public class Translator extends Compilation
 	Object value = environ.get(exp);
 	Declaration decl = null;
 	Symbol symbol = null;
+	if (exp instanceof String && ! (value instanceof Declaration))
+	  {
+	    String str = (String) exp;
+	    int colon = str.indexOf(':');
+	    if (colon > 0 && colon < str.length() - 1)
+	      {
+		String prefix = str.substring(0, colon);
+		String local = str.substring(colon + 1);
+		String xprefix = Interpreter.NAMESPACE_PREFIX+prefix;
+		Object uri_decl = environ.get(xprefix);
+		if (uri_decl instanceof Declaration)
+		  {
+		    decl = (Declaration) uri_decl;
+		    Expression dval = decl.getValue();
+		    if (dval instanceof QuoteExp)
+		      {
+			String uri = ((QuoteExp) dval).getValue().toString();
+			return rewrite(Symbol.make(uri, local), function);
+		      }
+		  }
+		else
+		  {
+		    value = resolve(env.lookup(xprefix.intern()), function);
+		    if (value != null)
+		      return rewrite(Symbol.make(value.toString(), local),
+				     function);
+		    try
+		      {
+			Class cl = Class.forName(prefix);
+			return rewrite(Symbol.make("class:"+prefix, local),
+				       function);
+		      }
+		    catch (Exception ex)
+		      {
+		      }
+		  }
+	      }
+	  }
 	if (value instanceof Declaration)
 	  {
 	    decl = (Declaration) value;

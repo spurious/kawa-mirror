@@ -1,3 +1,18 @@
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* Lisp2.java:  New class, extends Interpreter.
+	Move some shared CommonLisp/ELisp stuff here.
+	Symbols are now instances of Binding, not String.
+	* CommonLisp.java:  New extends Lisp2.
+	Remove dependencies on gnu.jemacs (and thus Swing) code.
+	Use ../lisp/PrimOps rather than gnu.jemacs.lang.*Ops.
+	* Symbol.java:  Moved from gnu.jemacs.lang.
+	* SymbolTable.java:  Renamed from gnu.jemacs.lang.Package.
+	* Makefile.am (java_sources):  Renamed from java_JAVA and update.
+	* defun.java (scanForDefinitions):  Handle symbols as Bindings.
+	* defvar.java (scanForDefinitions):  Likewise.
+	* setq.java (rewriteForm):  Likewise.
+
 2001-06-03  Per Bothner  <per@bothner.com>
 
 	* CommonLisp.java (writeFormat, displayFormat):  New fields.

@@ -10,7 +10,7 @@ public class Eval extends Procedure1or2
 {
   final static String evalFunctionName = "atEvalLevel";
 
-  public static Object eval (Object sexpr, Environment env)
+  public static void eval (Object sexpr, Environment env, CallContext ctx)
   {
     PairWithPosition body;
     if (sexpr instanceof PairWithPosition)
@@ -21,11 +21,28 @@ public class Eval extends Procedure1or2
 	body = new PairWithPosition(sexpr, LList.Empty);
 	body.setFile("<eval>");
       }
-    return evalBody(body, env, new SourceMessages());
+    evalBody(body, env, new SourceMessages(), ctx);
   }
 
   public static Object evalBody (Object body, Environment env,
 				 SourceMessages messages)
+  {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    evalBody(body, env, messages, ctx);
+    return Values.make((gnu.lists.TreeList) ctx.vstack);
+  }
+
+  public static Object eval (Object sexpr, Environment env)
+  {
+    CallContext ctx = new CallContext();
+    ctx.values = Values.noArgs;
+    eval(sexpr, env, ctx);
+    return Values.make((gnu.lists.TreeList) ctx.vstack);
+  }
+
+  public static void evalBody (Object body, Environment env,
+			       SourceMessages messages, CallContext ctx)
   {
     Environment orig_env = Environment.getCurrent();
     try
@@ -40,7 +57,7 @@ public class Eval extends Procedure1or2
 	if (messages.seenErrors())
 	  throw new RuntimeException("invalid syntax in eval form:\n"
 				     + messages.toString(20));
-	return mod.evalModule (env);
+	mod.evalModule(env, ctx);
       }
     finally
       {
@@ -57,5 +74,17 @@ public class Eval extends Procedure1or2
   public Object apply2 (Object arg1, Object arg2)
   {
     return eval (arg1, (Environment) arg2);
+  }
+
+  public void apply (CallContext ctx)
+  {
+    Procedure.checkArgCount(this, ctx.count);
+    Object exp = ctx.getArgAsObject(0);
+    Environment env;
+    if (ctx.count > 1)
+      env = (Environment) ctx.getArgAsObject(1);
+    else
+      env = Environment.user();
+    eval(exp, env, ctx);
   }
 }

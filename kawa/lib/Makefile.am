@@ -33,4 +33,4 @@ all: Makefile $(@GCJ_COMPILED_SELECTED@_CDEP) scm-classes.stamp $(@GCJ_COMPILED_
 PACKAGE_FNAME = kawa-lib
 KAWA1 = $(@GCJ_COMPILED_SELECTED@_KAWA1)
 ENABLE_GCJ_COMPILED = ../../bin/kawa1$(exeext) scm-classes.stamp $(OFILES_DIR)/$(PACKAGE_FNAME).o
-GCJ_INPUTS = *.class
+EXTRA_GCJ_INPUTS = *.class

@@ -47,8 +47,11 @@ public class Shell
 	try
 	  {
 	    lexer.clearErrors();
-	    PairWithPosition body = new PairWithPosition(inp,
-							 null, LList.Empty);
+	    PairWithPosition body
+	      = PairWithPosition.make(null, LList.Empty,
+				      inp.getName(),
+				      inp.getLineNumber() + 1,
+				      inp.getColumnNumber() + 1);
 	    Object sexp = ((LispReader) lexer).readObject(); // FIXME
 	    if (sexp == Sequence.eofValue)
 	      return;

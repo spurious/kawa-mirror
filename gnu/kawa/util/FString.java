@@ -12,12 +12,10 @@ import gnu.expr.*;
  * @author Per Bothner
  */
 
-public class FString extends UniformVector implements Printable, Compilable
+public class FString extends AbstractString implements Printable, Compilable
 {
 
   char[] value;
-
-  public String getTag() { return "ch"; }
 
   public FString (int num)
   {
@@ -69,15 +67,6 @@ public class FString extends UniformVector implements Printable, Compilable
     return new FString(copy);
   }
 
-  public FString copy ()
-  {
-    int i = value.length;
-    char[] copy = new char[i];
-    while (--i >= 0)
-      copy[i] = value[i];
-    return new FString(copy);
-  }
-
   public final int length ()
   {
     return value.length;
@@ -88,15 +77,8 @@ public class FString extends UniformVector implements Printable, Compilable
     return new String (value);
   }
 
-  public final Object get (int index)
-  {
-    return Char.make (value[index]);
-  }
-
   public char charAt (int index)
   {
-    if (index < 0 || index >= value.length)
-      throw new StringIndexOutOfBoundsException(index);
     return value[index];
   }
 
@@ -107,9 +89,13 @@ public class FString extends UniformVector implements Printable, Compilable
     value[index] = ch;
   }
 
-  public void setElementAt (Object new_value, int index)
+  public void writeTo(int start, int count, java.io.Writer dest)
+    throws java.io.IOException
   {
-    value[index] = ((Char) new_value).charValue();
+    int len = value.length - start;
+    if (count > len || count == -1)
+      count = len;
+    dest.write(value, start, count);
   }
 
   /** Set all the elements to a given character. */
@@ -119,9 +105,14 @@ public class FString extends UniformVector implements Printable, Compilable
       value[i] = ch;
   }
 
-  public final void setAll(Object value)
+  public void replace(int where, char[] chars, int start, int count)
   {
-    fill(((Char) value).charValue());
+    System.arraycopy(chars, start, value, where, count);
+  }
+
+  public void replace(int where, String string)
+  {
+    string.getChars(0, string.length(), value, where);
   }
 
   public void getChars (int srcBegin, int srcEnd, char dst[], int dstBegin)
@@ -196,39 +187,6 @@ public class FString extends UniformVector implements Printable, Compilable
     code.emitDup(scmStringType);
     code.emitPushString(toString ());
     code.emitInvokeSpecial(initFStringMethod);
-  }
-
-  /** Change every character to be uppercase. */
-  public void makeUpperCase()
-  {
-    for (int i = value.length;  --i >= 0; )
-      value[i] = Character.toUpperCase(value[i]);
-  }
-
-  /** Change every character to be lowercase. */
-  public void makeLowerCase()
-  {
-    for (int i = value.length;  --i >= 0; )
-      value[i] = Character.toLowerCase(value[i]);
-  }
-
-  /** Capitalize this string.
-   * Change first character of each word to titlecase,
-   * and change the other characters to lowercase. */
-  public void makeCapitalize()
-  {
-    char prev = ' ';
-    int len = value.length;
-    for (int i = 0;  i < len;  i++)
-      {
-	char ch = value[i];
-	if (! Character.isLetterOrDigit(prev))
-	  ch = Character.toTitleCase(ch); 
-        else 
-          ch = Character.toLowerCase(ch);
-	value[i] = ch;
-	prev = ch;
-      }
   }
 
   public void print (java.io.PrintWriter ps)

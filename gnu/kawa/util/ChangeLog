@@ -1,3 +1,17 @@
+2000-04-17  Per Bothner  <per@bothner.com>
+
+	* AbstractString.java:  New class, extends UniformVector.
+	* FString.java:  Changed to extend AbstractString.
+	(getTag, copy, get, setAll, makeUpperCase, makeLowerCase,
+	makeCapitalize, get):  Moved to AbstractString.
+	(writeTo, replace):  New method.
+	* CharBuffer.java:  New class, extends AbstractString.
+	Moved some logic from gnu.jemacs.buffer.BufferContent, but simplified
+	data structure managing positions.
+	* SubString.java:  New class, extends AbstractString.
+	* Position.java:  New class, similar t
+	* Makefile.am (java_JAVA):  Update for new classes.
+
 2000-03-17  Per Bothner  <per@bothner.com>
 
 	* Char.java (nameToChar):  Handle Unicode syntax: #\uaaaa .

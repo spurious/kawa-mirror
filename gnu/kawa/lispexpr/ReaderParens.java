@@ -59,12 +59,7 @@ public class ReaderParens extends ReadTableEntry
     throws java.io.IOException, SyntaxException
   {
     LineBufferedReader port = lexer.getPort();
-    char saveReadState = '\n';
-    if (port instanceof InPort)
-      {
-	saveReadState = ((InPort) port).readState;
-	((InPort) port).readState = close == ']' ? '[' : '(';
-      }
+    char saveReadState = lexer.pushNesting(close == ']' ? '[' : '(');
     int startLine = port.getLineNumber();
     int startColumn = port.getColumnNumber();
     try
@@ -164,8 +159,7 @@ public class ReaderParens extends ReadTableEntry
       }
     finally
       {
-	 if (port instanceof InPort)
-	   ((InPort) port).readState = saveReadState;
+	lexer.popNesting(saveReadState);
       }
      
   }

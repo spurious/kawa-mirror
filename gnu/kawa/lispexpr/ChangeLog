@@ -1,3 +1,12 @@
+2004-06-12  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (readValues):  Fatal on invalid char if interactive.
+
+	* LispReader.java (readCommand):  New method.
+	* LispInterpreter.java (parse):  Use readCommand instead of readObject.
+
+	* ReaderParens (readList):  Use new pushNesting/popNesting methods.
+
 2004-05-09  Per Bothner  <per@bothner.com>
 
 	* ReaderParens.java (readList):  For list as a whole, set line/column

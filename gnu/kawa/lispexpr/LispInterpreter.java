@@ -33,7 +33,7 @@ public abstract class LispInterpreter extends Interpreter
     LispReader reader = (LispReader) lexer;
     for (;;)
       {
-	Object sexp = reader.readObject(); // FIXME
+	Object sexp = reader.readCommand();
 	if (sexp == Sequence.eofValue)
 	  {
 	    if ((options & PARSE_ONE_LINE) != 0)

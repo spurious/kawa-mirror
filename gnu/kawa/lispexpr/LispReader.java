@@ -110,7 +110,9 @@ public class LispReader extends Lexer
     if (entry == null)
       {
 	// Step 2:
-	error("invalid character #\\"+((char) ch));  // FIXME
+	String err = ("invalid character #\\"+((char) ch));  // FIXME
+	if (interactive) fatal(err);
+	else error(err);
 	return Values.empty;
       }
     int kind = entry.getKind();
@@ -987,10 +989,18 @@ public class LispReader extends Lexer
     return c;
   }
 
-   public final Object readObject (int c)
+  public final Object readObject (int c)
       throws java.io.IOException, SyntaxException
   {
     unread(c);
+    return readObject();
+  }
+
+  /** Read a "command" - a top-level expression or declaration.
+   * Return Sequence.eofValue of end of file. */
+  public Object readCommand ()
+      throws java.io.IOException, SyntaxException
+  {
     return readObject();
   }
 

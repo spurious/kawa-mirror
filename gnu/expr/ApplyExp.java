@@ -447,10 +447,10 @@ public class ApplyExp extends Expression
 	if (proc instanceof Inlineable)
           return ((Inlineable) proc).getReturnType(args);
       }
+    /* Don't do this for now - causes infinite recursion.
     if (afunc instanceof LambdaExp)
-      {
-	return ((LambdaExp) afunc).body.getType();
-      }
+      return ((LambdaExp) afunc).body.getType();
+    */
     return super.getType();
   }
 

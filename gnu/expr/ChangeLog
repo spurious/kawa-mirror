@@ -1,3 +1,7 @@
+2001-04-24  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (getType):  Avoid infinite recursion.
+
 2001-04-23  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (getType):  Handle functions that are ReferenceExp

@@ -1,4 +1,4 @@
-(test-init "numbers" 1644)
+(test-init "numbers" 1650)
 
 ;; A problem posed by Ken Dickey (kend@data.UUCP) on comp.lang.lisp
 ;; to check numerical exactness of Lisp implementations.
@@ -120,3 +120,11 @@
 (test #t = (expt 2. 100) (exact->inexact (+ (expt 2 100) 1)))
 
 (test 2650239300 remainder 14853098170650239300 4000000000)
+
+(test "8000000000000000" number->string #x8000000000000000 16)
+(test "80000000000000000" number->string #x80000000000000000 16)
+;; From Aubrey Jaffer <agj@alum.mit.edu>
+(test #t number? (string->number "#i0/0+1i"))
+(test #t number? (string->number "#i1+0/0i"))
+(test #t positive? 2147483648)
+(test #t negative? (string->number "#i-1/0"))

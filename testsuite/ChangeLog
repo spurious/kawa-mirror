@@ -1,3 +1,9 @@
+2003-08-20  Per Bothner  <per@bothner.com>
+
+	* test.scm:  Merge in new tests from Aubrey Jaffer's latest version
+	of r4rstest.scm.
+	* num-test.scm:  6 new tests, mostly from Aubrey Jaffer.
+
 2003-08-09  Per Bothner  <per@bothner.com>
 
 	* classes1.scm (counter, get-new-count, <IdClass1>, <IdClass2>):  New

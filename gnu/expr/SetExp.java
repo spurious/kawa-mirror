@@ -13,17 +13,22 @@ public class SetExp extends Expression
 {
   private int flags;
 
-  /** The name of the variable to set. */
-  String name;
+  /** The name of the variable to set - either a String or a Symbol. */
+  Object symbol;
   /** If non-null, the local Declaration this refers to. */
   public Declaration binding;
   /** The new value to assign to the variable. */
   Expression new_value;
 
-  public SetExp (String sym, Expression val)
-  { name = sym;  new_value = val; }
+  public SetExp (Object symbol, Expression val)
+  { this.symbol = symbol;  new_value = val; }
 
-  public final String getName() { return name; }
+  public final String getName()
+  {
+    return symbol instanceof Symbol ? ((Symbol) symbol).getName()
+      : symbol.toString();
+  }
+  public final Object getSymbol() { return symbol; }
 
   /** Get the Expression for calculating the new ("right-hand") value. */
   public final Expression getNewValue() { return new_value; }
@@ -68,19 +73,20 @@ public class SetExp extends Expression
   public SetExp (Declaration decl, Expression val)
   {
     this.binding = decl;
-    name = decl.getName();
+    symbol = decl.getSymbol();
     new_value = val;
   }
 
   public Object eval (Environment env) throws Throwable
   {
+    Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+      : env.getSymbol(symbol.toString());
     if (isSetIfUnbound())
       {
-	Symbol binding = env.getSymbol(name);
-	if (! binding.isBound())
-	  binding.set(new_value.eval (env));
+	if (! sym.isBound())
+	  sym.set(new_value.eval (env));
 	if (getHasValue())
-	  return name;
+	  return sym;
 	else
 	  return Interpreter.getInterpreter().noValue();
       }
@@ -93,18 +99,17 @@ public class SetExp extends Expression
     if (isDefining ())
       {
 	if (binding != null && binding.isAlias())
-	  AliasConstraint.define(env.getSymbol(name),
+	  AliasConstraint.define(sym,
 				 (gnu.mapping.Location) new_val);
 	else
-	  env.define (name, new_val);
+	  sym.defineValue(new_val);
       }
     else
       {
-	Symbol bind = env.lookup (name);
-	if (bind != null)
-	  env.put (name, new_val);
+	if (sym != null)
+	  sym.set(new_val);
 	else
-	  env.define (name, new_val);
+	  sym.defineValue(new_val);
 	//	  throw new UnboundSymbol (name);
       }
     return getHasValue() ? new_val : Interpreter.getInterpreter().noValue();
@@ -296,10 +301,10 @@ public class SetExp extends Expression
     out.startLogicalBlock(isDefining () ? "(Define" : "(Set", ")", 2);
     out.writeSpaceFill();
     printLineColumn(out);
-    if (binding == null || name.toString() != binding.getName())
+    if (binding == null || symbol.toString() != binding.getName())
       {
 	out.print('/');
-	SFormat.print (name, out);
+	SFormat.print (symbol, out);
       }
     if (binding != null)
       {

@@ -1,3 +1,17 @@
+2002-11-12  Per Bothner  <per@bothner.com>
+
+	* Declaration.java (name):  Removed field, replaced by:
+	(symbol):  New field, either a String or a Symbol.
+	(getName, toString):  Changed to match.
+	(getSymbol):  New method.
+	(setName. <init>):  Changed parameter type.
+	* ScopeExp.java (lookup, getNoDefined, getDefine, addDeclaration):
+	Declaration name an be arbitrary Object, not just String.
+	* SetExp.java:  Removed field, replaced by:
+	(symbol):  New field, either a String or a Symbol.
+	(getSymbol):  New method.
+	(getName, <init>, eval, compile. print):  Changed accordingly.
+
 2002-11-10  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (match): Catch ClassCastException if coercing

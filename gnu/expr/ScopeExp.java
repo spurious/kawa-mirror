@@ -102,23 +102,23 @@ public abstract class ScopeExp extends Expression
    * @param sym the (interned) name of the Declaration sought
    * @return the matching Declaration, if found;  otherwise null
    */
-  public Declaration lookup (String sym)
+  public Declaration lookup (Object sym)
   {
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.name == sym)
+	if (decl.symbol == sym)
 	  return decl;
       }
     return null;
   }
 
-  public Declaration lookup (String sym, Interpreter interp, int namespace)
+  public Declaration lookup (Object sym, Interpreter interp, int namespace)
   {
     for (Declaration decl = firstDecl();
          decl != null;  decl = decl.nextDecl())
       {
-	if (decl.name == sym
+	if (decl.symbol == sym
 	    && (interp.getNamespaceOf(decl) & namespace) != 0)
 	  return decl;
       }
@@ -126,7 +126,7 @@ public abstract class ScopeExp extends Expression
   }
 
   /** Lookup a declaration, create a non-defining declaration if needed. */
-  public Declaration getNoDefine (String name)
+  public Declaration getNoDefine (Object name)
   {
     Declaration decl = lookup(name);
     if (decl == null)
@@ -138,7 +138,7 @@ public abstract class ScopeExp extends Expression
   }
 
   /** Add a new Declaration, with a message if there is an existing one. */
-  public Declaration getDefine (String name, char severity, Compilation parser)
+  public Declaration getDefine (Object name, char severity, Compilation parser)
   {
     Declaration decl = lookup(name);
     if (decl == null)
@@ -184,7 +184,7 @@ public abstract class ScopeExp extends Expression
    * Create a new declaration in the current Scope.
    * @param name name (interned) to give to the new Declaration.
    */
-  public final Declaration addDeclaration (String name)
+  public final Declaration addDeclaration (Object name)
   {
     Declaration decl = new Declaration (name);
     addDeclaration(decl);
@@ -196,7 +196,7 @@ public abstract class ScopeExp extends Expression
    * @param name name (interned) to give to the new Declaration.
    * @param type type of the new Declaration.
    */
-  public final Declaration addDeclaration (String name, Type type)
+  public final Declaration addDeclaration (Object name, Type type)
   {
     Declaration decl = new Declaration (name);
     addDeclaration(decl);

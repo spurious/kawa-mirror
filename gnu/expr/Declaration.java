@@ -1,6 +1,7 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Named;
+import gnu.mapping.Symbol;
 
 /**
  * The static information associated with a local variable binding.
@@ -44,9 +45,9 @@ public class Declaration
   /** Unique id number, to ease print-outs and debugging. */
   protected int id = ++counter;
 
-  /** The (interned) name of the new variable.
+  /** The name of the new variable, either an interned String or a Symbol.
    * This is the source-level (non-mangled) name. */
-  String name;
+  Object symbol;
 
   public ScopeExp context;
 
@@ -54,7 +55,12 @@ public class Declaration
   public final Type getType() { return type; }
   public final void setType(Type type)
   { this.type = type;  if (var != null) var.setType(type); }
-  public final String getName() { return name; }
+  public final String getName()
+  {
+    return symbol == null ? null : symbol instanceof Symbol ? ((Symbol) symbol).getName()
+      : symbol.toString();
+  }
+  public final Object getSymbol() { return symbol; }
 
   /* Declarations in a ScopeExp are linked together in a linked list. */
   Declaration next;
@@ -284,9 +290,9 @@ public class Declaration
       base.setCanRead();
   }
 
-  public void setName(String name)
+  public void setName(Object symbol)
   {
-    this.name = name;
+    this.symbol = symbol;
   }
 
   /** True if we never need to access this declaration. */
@@ -359,20 +365,20 @@ public class Declaration
     this.var = var;
   }
 
-  public Declaration (String name)
+  public Declaration (Object name)
   {
     this(name, Type.pointer_type);
   }
 
-  public Declaration (String s, Type type)
+  public Declaration (Object s, Type type)
   {
-    name = s;
+    symbol = s;
     setType(type);
   }
 
-  public Declaration (String name, Field field)
+  public Declaration (Object name, Field field)
   {
-    this.name = name;
+    this.symbol = name;
     setType(field.getType());
     this.field = field;
     setSimple(false);
@@ -407,7 +413,7 @@ public class Declaration
     if (var == null)
       {
         String vname = null;
-        if (name != null)
+        if (symbol != null)
           vname = Compilation.mangleName(getName());
 	if (isAlias() && getValue() instanceof ReferenceExp)
 	  {
@@ -476,7 +482,7 @@ public class Declaration
 
   public String toString()
   {
-    return "Declaration["+getName()+'/'+id+']';
+    return "Declaration["+symbol+'/'+id+']';
   }
 
 

@@ -903,7 +903,7 @@ The symbol names are implementation-dependent.
 
 @defmac defmacro name lambda-list form ...
 Defines an old-style macro a la Common Lisp,
-and installs @code{(lambda @var{lambda-list} @var{form} ...)
+and installs @code{(lambda @var{lambda-list} @var{form} ...)}
 as the expansion function for @var{name}.
 When the translator sees an application of @var{name},
 the expansion function is called with the rest of the application

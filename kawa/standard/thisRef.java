@@ -13,7 +13,7 @@ public class thisRef extends Syntax
 	while (sc != null && ! (sc instanceof ClassExp))
 	  sc = sc.outer;
 	if (sc == null)
-	  tr.error('w', "use fo this not inside a class");
+	  tr.error('w', "use of 'this' not inside a class");
 	return new ThisExp(sc);
       }
     else

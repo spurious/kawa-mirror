@@ -219,7 +219,10 @@ public class ModuleExp extends LambdaExp
 		      : Symbol.make("", dname.toString().intern());
 		    Object property = comp.getInterpreter()
 		      .getEnvPropertyFor(decl);
-		    if (decl.getFlag(Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
+		    // Would it be better to check if fld is FINAL?
+		    // If it is, gets its value; other wise create
+		    // a ClassMemberLocation to access it?  FIXME.
+		    if (decl.getFlag(Declaration.PROCEDURE|Declaration.IS_CONSTANT|Declaration.INDIRECT_BINDING))
 		      {
 			Expression dvalue = decl.getValue();
 			Object value;
@@ -232,6 +235,7 @@ public class ModuleExp extends LambdaExp
 			  env.addLocation(sym, property, (Location) value);
 			else
 			  env.define(sym, property, value);
+			// if IS_CONSTANT ... make Location constant.  FIXME.
 		      }
 		    else
 		      {

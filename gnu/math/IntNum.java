@@ -362,6 +362,18 @@ public class IntNum extends RatNum implements Externalizable
   }
 
   /** Add two IntNums, yielding their sum as another IntNum. */
+  public static IntNum add (IntNum x, IntNum y)
+  {
+    return add(x, y, 1);
+  }
+
+  /** Subtract two IntNums, yielding their sum as another IntNum. */
+  public static IntNum sub (IntNum x, IntNum y)
+  {
+    return add(x, y, -1);
+  }
+
+  /** Add two IntNums, yielding their sum as another IntNum. */
   public static IntNum add (IntNum x, IntNum y, int k)
   {
     if (x.words == null && y.words == null)

@@ -113,6 +113,10 @@ public class IntFraction extends RatNum implements Externalizable
   public double doubleValue ()
   {
     boolean neg = num.isNegative ();
+    if (den.isZero())
+      return (neg ? Double.NEGATIVE_INFINITY
+	      : num.isZero() ? Double.NaN
+	      : Double.POSITIVE_INFINITY);
     IntNum n = num;
     if (neg)
       n = IntNum.neg (n);

@@ -1,3 +1,10 @@
+2001-04-22  Per Bothner  <per@bothner.com>
+
+	* IntNum.java (add, sub):  New static convenience methods.
+
+	* IntFraction.java (doubleValue):  If denominator is zero,
+	return infinity or NaN.
+
 2001-04-09  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (CLEANFILES):  Remove redundant macro.

@@ -1,3 +1,8 @@
+2002-03-02  Per Bothner  <per@bothner.com>
+
+	* HTTP.scm:  Moved from gnu/kawa/servlet.
+	* Makefile.am:  Compile HTTP.scm - but only if --enable-servlet.
+
 2002-01-21  Per Bothner  <per@bothner.com>
 
 	* XML.scm (parse-xml-from-url):  Document moved to gnu.kawa.xml.

@@ -1,3 +1,23 @@
+Sat Nov  7 09:46:18 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ConstantPool.java (rehash):  New method.
+	(addUtf8, addClass, addValue1, addvalue2, addString, addNameAndType,
+	addRef):  Call rehash if no hashTab.
+	(<init>(DataInputStream)):  Don't lock.
+	* CpoolEntry.java (add_hashed):  Make package private.
+	(<init>):  Handle creating or growing hashTab by ConstantPool.rehash.
+	* CpoolClass.java, CpoolNameAndType.java, CpoolRef.java,
+	CpoolString.java, CpoolUtf8.java, CpoolValue1.java, CpoolValue2.java
+ 	(hashCode):  Add new non-static override - recalculate if hash is 0.
+	* LineNumbersAttr.java (<init>):  Set code.lines to this.
+	* LocalVarsAttr.java (<init>):  Set code.locals to this.
+	* CodeAttr.java (<init>):  Set meth.code to this.
+
+1998-10-06  Geoff Berry  <gcb@cs.duke.edu>
+
+	* CodeAttr.java: (lookup(String)): Make public.
+	(addLocal(Type,String)): Make public.
+
 Sat Oct 17 13:04:32 1998  Per Bothner  <bothner@cygnus.com>
 
 	* CodeAttr.java (emitNot):  Use explicit parameter instead of topType.

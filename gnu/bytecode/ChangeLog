@@ -1,3 +1,9 @@
+Fri May 15 21:33:19 1998  Per Bothner  <bothner@cygnus.com>
+
+	* Type.java (registerTypeForClass):  New static method.
+	(make):  Call registerTypeForClass.
+	* PrimType.java (<init>):  Call registerTypeForClass.
+
 Tue Apr 21 00:04:41 1998  Per Bothner  <bothner@cygnus.com>
 
 	* dump-main.cc:  New file - a main() wrapper for dump.main.

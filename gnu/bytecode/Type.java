@@ -15,16 +15,35 @@ public abstract class Type {
 
   Type () { }
 
+  // Maps java.lang.Class to corresponding Type.
+  static java.util.Hashtable mapClassToType;
+
+  /** Register that the Type for class is type. */
+  public static void registerTypeForClass(Class clas, Type type)
+  {
+    if (mapClassToType == null)
+      mapClassToType = new java.util.Hashtable(100);
+    mapClassToType.put(clas, type);
+    type.reflectClass = clas;
+  }
+
   public static Type make(Class reflectClass)
   {
     Type type;
+    if (mapClassToType != null)
+      {
+	Object t = mapClassToType.get(reflectClass);
+	if (t != null)
+	  return (Type) t;
+      }
     if (reflectClass.isArray())
       type = new ArrayType(Type.make(reflectClass.getComponentType()));
     else if (reflectClass.isPrimitive())
-      throw new Error("not implemented - make(primitive type)"); // FIXME
+      throw new Error("internal error - primitive type not found");
     else
       type = new ClassType(reflectClass.getName());
     type.reflectClass = reflectClass;
+    registerTypeForClass(reflectClass, type);
     return type;
   }
 

@@ -7,6 +7,7 @@ public class PrimType extends Type {
     super(nam, sig);
     size = siz;
     this.reflectClass = reflectClass;
+    Type.registerTypeForClass(reflectClass, this);
   }
 
   public Object coerceFromObject (Object obj)

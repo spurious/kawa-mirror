@@ -14,4 +14,9 @@ public class WrongArguments extends Exception {
       number = n;
       usage = new java.lang.String(u);
    }
+
+  public WrongArguments(Symbol name, int n, String u)
+  {
+    this (name.toString (), n, u);
+  }
 }

@@ -14,4 +14,9 @@ public class WrongType extends Exception {
       number = n;
       typeExpected = new java.lang.String(u);
    }
+
+  public WrongType (Symbol name, int n, java.lang.String u)
+  {
+    this (name.toString (), n, u);
+  }
 }

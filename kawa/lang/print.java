@@ -43,6 +43,18 @@ public class print
 	  }
 	ps.print (']');
       }
+    else if (obj instanceof int[])
+      {
+	int[] arr = (int[]) obj;
+	ps.print ('[');
+	for (int i = 0;  i < arr.length;  i++)
+	  {
+	    if (i > 0)
+	      ps.print (' ');
+	    ps.print (arr[i]);
+	  }
+	ps.print (']');
+      }
     else
       ps.print(obj.toString ());
   }

@@ -35,7 +35,7 @@ public class IfExp extends Expression
     else if (else_clause != null)
       return else_clause.eval (env);
     else
-      return Interpreter.undefinedObject;
+      return Interpreter.voidObject;
   }
 
   public void compile (Compilation comp, int flags)
@@ -59,7 +59,7 @@ public class IfExp extends Expression
     if (else_clause != null)
       else_clause.compile (comp, flags);
     else if ((flags & IGNORED) == 0)
-      comp.compileConstant (Interpreter.undefinedObject);
+      comp.compileConstant (Interpreter.voidObject);
     if (end_label != null)
       end_label.define (comp.method);
   }

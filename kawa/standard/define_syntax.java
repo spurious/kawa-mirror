@@ -92,7 +92,7 @@ public class define_syntax extends Syntax
     p = tr.makePair(st, this, new Pair(decl, p));
     forms.addElement (p);
 
-    tr.pushBinding(name, decl);
+    tr.push(decl);
     return true;
   }
 }

@@ -1,3 +1,11 @@
+2003-04-14  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/define_alias.java (scanForDefinitions):  Use
+	Translator's push method instead of pushBinding.
+	* kawa/standard/define_syntax.java (scanForDefinitions):   Likewise.
+	* kawa/standard/define_unit.java (scanForDefinitions):
+	Remove call to pushBinding.  Call push on decl instead.
+
 2003-04-12  Per Bothner  <per@bothner.com>
 
 	* kawa/lang/Translator.java (finishModule):  Remove unused variables.

@@ -30,6 +30,7 @@ public class define_unit extends Syntax
 	    String name = (String) q;
 	    String sym = (name + "$unit").intern();
 	    Declaration decl = defs.getDefine(sym, 'w', tr);
+	    tr.push(decl);
 	    Translator.setLine(decl, p);
 	    decl.setFlag(Declaration.IS_CONSTANT);
 	    if (defs instanceof ModuleExp)
@@ -46,11 +47,7 @@ public class define_unit extends Syntax
 		  unit = Unit.make(name, (Quantity) v);
 	      }
 	    if (unit != null)
-	      {
-		// Add to translation environment, so read will find it.
-		tr.pushBinding(name, unit);
-		decl.noteValue(new QuoteExp(unit));
-	      }
+	      decl.noteValue(new QuoteExp(unit));
 	    p = tr.makePair(p, decl, p.cdr);
 	    st = tr.makePair(st, this, p);
 	    forms.addElement (st);

@@ -47,7 +47,7 @@ public class define_alias extends Syntax implements Printable
     Declaration decl = defs.addDeclaration(name);
     decl.setIndirectBinding(true);
     decl.setAlias(true);
-    tr.pushBinding(name, decl);
+    tr.push(decl);
     st = tr.makePair(st, this, tr.makePair(p, decl, p.cdr));
     forms.addElement(st);
     return true;

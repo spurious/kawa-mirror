@@ -1,3 +1,16 @@
+2003-09-11  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (skipSpaceOrComment):  Rename to skipSpace, taking
+	an extra argument to indicate skipping past new line.
+	(parseFLWRExpression):  Use renamed skipSpace.
+	(skipSpace):  Use new skipSpace(true).
+	(skipHSpace):  Replaced by skipSpace(false).
+	(peekNonSpace, peekOperand, parseMaybePrimaryExpr, parse):
+	Use new unary skipSpace.
+	(parseSeparator):  Provide implementation.
+	(parse):  Add missing parseSeparator calls.
+	(parse):  Update to new xmlspace syntax.
+
 2003-09-10  Per Bothner  <per@bothner.com>
 
 	* XQParser.java (warnOldVersion):  New static variable.

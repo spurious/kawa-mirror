@@ -74,17 +74,12 @@ public class XQParser extends LispReader // should be extends Lexer
    * and returns that.  If there are no more non-space characters,
    * returns ' '.  */
   final int skipSpace()
-    throws java.io.IOException
+    throws java.io.IOException, SyntaxException
   {
-    for (;;)
-      {
-	int ch = read();
-	if (ch < 0 || ! Character.isWhitespace((char) ch))
-	  return ch;
-      }
+    return skipSpace(true);
   }
 
-  final int skipSpaceOrComment()
+  final int skipSpace(boolean verticalToo)
     throws java.io.IOException, SyntaxException
   {
     for (;;)
@@ -113,7 +108,9 @@ public class XQParser extends LispReader // should be extends Lexer
 	       }
 	     skipOldComment();
 	  }
-	else if (ch < 0 || ! Character.isWhitespace((char) ch))
+	else if (verticalToo
+		 ? (ch < 0 || ! Character.isWhitespace((char) ch))
+		 : (ch != ' ' && ch != '\t'))
 	  return ch;
       }
   }
@@ -170,23 +167,11 @@ public class XQParser extends LispReader // should be extends Lexer
       }
   }
 
-
-  final int skipHSpace()
-    throws java.io.IOException
-  {
-    for (;;)
-      {
-	int ch = read();
-	if (ch != ' ' && ch != '\t')
-	  return ch;
-      }
-  }
-
   /** Do skipSpace followed by unread to find next non-space character. */
   final int peekNonSpace(String message)
     throws java.io.IOException, SyntaxException
   {
-    int ch = skipSpaceOrComment();
+    int ch = skipSpace();
     if (ch < 0)
       eofError(message);
     unread(ch);
@@ -682,7 +667,7 @@ public class XQParser extends LispReader // should be extends Lexer
       getRawToken();
     if (curToken == NCNAME_TOKEN || curToken == QNAME_TOKEN)
       {
-	int next = nesting == 0 ? skipHSpace() : skipSpace();
+	int next = skipSpace(nesting != 0);
 	if (next == '(' && peek() != ':')
 	  {
 	    int token = FNAME_TOKEN;
@@ -2169,7 +2154,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     else if (token == NCNAME_TOKEN || token == QNAME_TOKEN)
       {
-	int next = nesting == 0 ? skipHSpace() : skipSpace();
+	int next = skipSpace(nesting != 0);
 	if (next == '$')
 	  {
 	    // A FLWR-expression isn't technically a PrimaryExpr.
@@ -2267,12 +2252,13 @@ public class XQParser extends LispReader // should be extends Lexer
     /*
     if (nesting == 0)
       {
-	int ch = skipHSpace();
+	int ch = skipSpace(false);
 	if (ch < 0 || ch == '\n' || ch == '\r')
 	  return exp;
 	unread(ch);
       }
     */
+    int tt =curToken;
     getRawToken();
     return exp;
   }
@@ -2387,7 +2373,7 @@ public class XQParser extends LispReader // should be extends Lexer
     Expression body;
     if (curToken == ',')
       {
-	int next = skipSpaceOrComment();
+	int next = skipSpace();
 	if (next != '$')
 	  return syntaxError("missing $NAME after ','");
 	body = parseFLWRExpression(isFor);
@@ -2558,8 +2544,15 @@ public class XQParser extends LispReader // should be extends Lexer
   Hashtable namespaces = new Hashtable(50);
 
   void parseSeparator ()
+    throws java.io.IOException, SyntaxException
   {
-    //System.err.println("parseSep tk:"+curToken);
+    int next = skipSpace(nesting != 0);
+    if (next == ';')
+      return;
+    if (warnOldVersion && next != '\n')
+      error('w', "missing ';' after declaration");
+    if (next >= 0)
+      unread(next);
   }
 
   /** Parse an expression.
@@ -2668,7 +2661,7 @@ public class XQParser extends LispReader // should be extends Lexer
       }
     if (curToken == DECLARE_NAMESPACE_TOKEN)
       {
-	int next = nesting == 0 ? skipHSpace() : skipSpace();
+	int next = skipSpace(nesting != 0);
 	if (next >= 0)
 	  {
 	    unread();
@@ -2686,6 +2679,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		  return syntaxError("missing uri namespace declaration");
 		String uri = new String(tokenBuffer, 0, tokenBufferLength);
 		namespaces.put(prefix, uri);
+		parseSeparator();
 		return QuoteExp.voidExp;
 	      }
 	  }
@@ -2695,7 +2689,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	|| (curToken == NCNAME_TOKEN
 	    && "default".equals((String) curValue)))
       {
-	int next = nesting == 0 ? skipHSpace() : skipSpace();
+	int next = skipSpace(nesting != 0);
 	if (next >= 0)
 	  {
 	    unread();
@@ -2730,15 +2724,19 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == DECLARE_XMLSPACE_TOKEN)
       {
 	getRawToken();
-	if (curToken != OP_EQU)
-	  return syntaxError("missing '=' in xmlspace declaration");
-	getRawToken();
+	if (curToken == OP_EQU)
+	  {
+	    if (warnOldVersion)
+	      error('w', "obsolate '=' in xmlspace declaration");
+	    getRawToken();
+	  }
 	if (match("preserve"))
 	  preserveBoundarySpace = true;
 	else if (match("skip"))
 	  preserveBoundarySpace = false;
 	else
 	  return syntaxError("xmlspace declaration must be preserve or strip");
+	parseSeparator();
 	return QuoteExp.voidExp;
       }
 

@@ -1,3 +1,12 @@
+2003-01-26  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Record.java (getField):  New static helper method.
+	(get, set1):  Use it.
+	Fixes bug reported 1/24 by Wen-Chun Ni <wcn@tbcommerce.com>.
+
+	* kawa/lang/Record.java (makeRecordType):  Twice use Method's startCode
+	method instead of deprecated init_param_slots.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java:  Define cut and cute.

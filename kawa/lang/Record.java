@@ -38,14 +38,30 @@ public class Record extends NameMap
     return hash;
   }
 
+  static java.lang.reflect.Field getField (Class clas, String fname)
+    throws NoSuchFieldException
+  {
+    ClassType ctype = (ClassType) Type.make(clas);
+    for (gnu.bytecode.Field fld = ctype.getFields();
+	 fld != null;  fld = fld.getNext())
+      {
+	if ((fld.getModifiers() & (Modifier.STATIC|Modifier.PUBLIC))
+	    != Modifier.PUBLIC)
+	  continue;
+	if (! fld.getSourceName().equals(fname))
+	  continue;
+	Object value;
+	return fld.getReflectField();
+      }
+    throw new NoSuchFieldException();
+  }
+
   public Object get (String fname, Object defaultValue)
   {
     Class clas = getClass();
-    java.lang.reflect.Field fld;
     try
       {
-	fld = clas.getField (fname);
-	return fld.get(this);
+	return getField(clas, fname).get(this);
       }
     catch (NoSuchFieldException ex)
       {
@@ -66,10 +82,9 @@ public class Record extends NameMap
   public static Object set1 (Object record, String fname, Object value)
   {
     Class clas = record.getClass();
-    java.lang.reflect.Field fld;
     try
       {
-	fld = clas.getField (fname);
+	java.lang.reflect.Field fld = getField(clas, fname);
 	Object old = fld.get(record);
 	fld.set(record, value);
 	return old;
@@ -166,8 +181,7 @@ public class Record extends NameMap
     Method superConstructor
       = superClass.addMethod ("<init>", Type.typeArray0,
 			       Type.void_type, Access.PUBLIC);
-    constructor.init_param_slots ();
-    gnu.bytecode.CodeAttr code = constructor.getCode();
+    gnu.bytecode.CodeAttr code = constructor.startCode();
     code.emitPushThis();
     code.emitInvokeSpecial(superConstructor);
     code.emitReturn();
@@ -175,8 +189,7 @@ public class Record extends NameMap
       {
 	Method meth = clas.addMethod ("getTypeName", Type.typeArray0,
 				      Compilation.typeString, Access.PUBLIC);
-	meth.init_param_slots ();
-	code = meth.getCode();
+	code = meth.startCode();
 	code.emitPushString(name);
 	code.emitReturn();
       }

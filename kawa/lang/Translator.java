@@ -369,7 +369,8 @@ public class Translator extends Compilation
 	      {
 		String prefix = str.substring(0, colon);
 		String local = str.substring(colon + 1);
-		String xprefix = Interpreter.NAMESPACE_PREFIX+prefix;
+		String xprefix
+		  = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
 		Object uri_decl = lexical.lookup(xprefix, function);
 		if (uri_decl instanceof Declaration)
 		  {
@@ -383,7 +384,7 @@ public class Translator extends Compilation
 		  }
 		else
 		  {
-		    Object v = resolve(env.lookup(xprefix.intern()), function);
+		    Object v = resolve(env.lookup(xprefix), function);
 		    if (v != null)
 		      return rewrite(Symbol.make(v.toString(), local),
 				     function);

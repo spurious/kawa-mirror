@@ -1,3 +1,7 @@
+2003-04-30  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Translator.java (rewrite):  Intern name before lookup.
+
 2003-04-25  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (select-java1, select-java2):  New rules to convert

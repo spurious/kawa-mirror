@@ -1,6 +1,6 @@
 package kawa.lang;
 
-public class WrongArguments extends Exception {
+public class WrongArguments extends RuntimeException {
    //-- negative indicates that the right number of arguments was used
    public int number;
    //-- usage description for procedure

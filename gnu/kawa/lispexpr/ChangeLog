@@ -1,3 +1,7 @@
+2003-09-04  Per Bothner  <per@bothner.com>
+
+	* LispReader.java (parseNumber):  Handle multi-unit products.
+
 2003-08-23  Per Bothner  <per@bothner.com>
 
 	* LispReader.java (parseNumber):  Fix bug reported by Aubrey Jaffer.

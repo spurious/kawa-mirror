@@ -672,13 +672,17 @@ public class LispReader extends Lexer
 		    boolean neg = ch == '-';
 		    if ((ch == '-' || ch == '+') && ++pos < end)
 		      ch = buffer[pos];
-		    power = 0;
+		    power = -1;
 		    for (;;)
 		      {
 			int d = Character.digit(ch, 10);
 			if (d < 0)
-			  return "junk after unit name";
-			power = 10 * power + d;
+			  {
+			    if (power < 0)
+			      return "junk after unit name";
+			    break;
+			  }
+			power = power < 0 ? d  : 10 * power + d;
 			if (++pos == end)
 			  break;
 			if (power > 1000000)

@@ -93,7 +93,7 @@ public class Variable implements java.util.Enumeration {
 
   public String strName ()
   {
-    // FFIXME - only works for ASCII names!
+    // FIXME - only works for ASCII names!
     return name == null ? null : new String (name, 0);
   }
 }

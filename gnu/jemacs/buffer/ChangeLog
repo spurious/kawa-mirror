@@ -1,3 +1,7 @@
+2000-01-24  Per Bothner  <per@bothner.com>
+
+	* ReplBuffer.java:  Fix kawa.lang.QueueReader ->gnu.text.QueueReader.
+
 2000-01-23  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (EXTRA_DIST):  Added, with emacs.scm overview.html.

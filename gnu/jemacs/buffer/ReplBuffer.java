@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import kawa.lang.*;
 import kawa.standard.Scheme;
 import javax.swing.text.*;
+import gnu.text.QueueReader;
 
 /** A Buffer for "read-eval-print"-style command processors. */
 
@@ -10,7 +11,7 @@ public class ReplBuffer extends Buffer
 {
   Marker processMark;
   BufferWriter processWriter;
-  kawa.lang.QueueReader in_r;
+  QueueReader in_r;
   InPort in;
   OutPort out;
   OutPort err;

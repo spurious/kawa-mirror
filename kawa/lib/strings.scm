@@ -1,16 +1,16 @@
-(define (string? x)
+(define (string? x) :: <boolean>
   (instance? x <string>))
 
-(define (string=? x y)
+(define (string=? x y) :: <boolean>
   (invoke (invoke x 'toString) 'equals (invoke y 'toString)))
 
-(define (make-string (n :: <int>) #!optional (ch #\Space))
+(define (make-string (n :: <int>) #!optional (ch #\Space)) :: <string>
   (make <string> n ch))
 
-(define (string-length (str :: <abstract-string>))
+(define (string-length (str :: <abstract-string>)) :: <int>
   (invoke str 'length))
 
-(define (string-ref (string :: <abstract-string>) (k :: <int>))
+(define (string-ref (string :: <abstract-string>) (k :: <int>)) :: <char>
   (invoke string 'charAt k))
 
 (define (string-set! (string :: <abstract-string>) (k <int>) (char <char>))
@@ -18,6 +18,7 @@
   (invoke string 'setCharAt k char))
 
 (define (substring (str <abstract-string>) (start <int>) (end <int>))
+  :: <string>
   (make <string> str start (- end start)))
 
 (define (string->list (str :: <abstract-string>)) :: <list>
@@ -37,46 +38,35 @@
 	(string-set! result i (car pair))
 	(set! list (cdr pair))))))
 
-(define (string-copy (str <abstract-string>))
+(define (string-copy (str <abstract-string>)) :: <string>
   (make <string> str))
 
-(define (string-fill! (str <abstract-string>) (ch <char>))
+(define (string-fill! (str <abstract-string>) (ch <char>)) :: <void>
   (invoke str 'fill ch))
 
-(define (string-upcase! (str :: <abstract-string>))
+(define (string-upcase! (str :: <abstract-string>)) :: <abstract-string>
   (invoke-static <gnu.lists.Strings> 'makeUpperCase str)
   str)
 
-(define (string-downcase! (str :: <abstract-string>))
+(define (string-downcase! (str :: <abstract-string>)) :: <abstract-string>
   (invoke-static <gnu.lists.Strings> 'makeLowerCase str)
   str)
 
-(define (string-capitalize! (str :: <abstract-string>))
+(define (string-capitalize! (str :: <abstract-string>)) :: <abstract-string>
   (invoke-static <gnu.lists.Strings> 'makeCapitalize str)
   str)
 
-(define (string-upcase (str :: <abstract-string>))
-  (string-upcase! (string-copy str)))
+(define (string-upcase (str :: <abstract-string>)) :: <string> 
+  (let ((copy :: <string> (string-copy str)))
+    (invoke-static <gnu.lists.Strings> 'makeUpperCase copy)
+    copy))
 
-(define (string-downcase (str :: <abstract-string>))
-  (string-downcase! (string-copy str)))
+(define (string-downcase (str :: <abstract-string>)) :: <string> 
+  (let ((copy :: <string> (string-copy str)))
+    (invoke-static <gnu.lists.Strings> 'makeLowerCase copy)
+    copy))
 
-(define (string-capitalize (str :: <abstract-string>))
-  (string-capitalize! (string-copy str)))
-
-#|
-(define (string->list (str <string>))
-  (let* ((len :: <int>
-	      ((primitive-virtual-method <string> "length" <int> ()) str))
-	 (result '()))
-    (do ((i :: <int> (- len (as <int> 1)) (- i (as <int> 1))))
-	((>= i (as <int> 0))
-	 result)
-      (set! result ((primitive-constructor <pair> (<object> <object>))
-		    ((primitive-static-method <character> "make" <character>
-					      (<char>))
-		       ((primitive-virtual-function <string> "charAt"
-						    <char> (<int>))
-			str i))
-		    result)))))
-|#
+(define (string-capitalize (str :: <abstract-string>)) :: <string> 
+  (let ((copy :: <string> (string-copy str)))
+    (invoke-static <gnu.lists.Strings> 'makeCapitalize copy)
+    copy))

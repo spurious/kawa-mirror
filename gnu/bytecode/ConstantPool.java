@@ -99,7 +99,7 @@ public class ConstantPool
 
   public CpoolClass addClass (ObjectType otype)
   {
-    return addClass(otype.getNameOrSignature());
+    return addClass(addUtf8(otype.getInternalName()));
   }
 
   public CpoolClass addClass (String name)

@@ -34,7 +34,7 @@ public class ArrayType extends ObjectType
 
   public Type getComponentType() { return elements; }
 
-  public String getNameOrSignature() { return getSignature(); }
+  public String getInternalName() { return getSignature(); }
 
   public int compare(Type other)
   {

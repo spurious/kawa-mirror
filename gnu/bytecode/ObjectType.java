@@ -25,9 +25,15 @@ public class ObjectType extends Type
   final static int EXISTING_CLASS = 4;
   int flags;
 
-  public String getNameOrSignature()
+  /** Returns class name if a class type, signature if an array type.
+   * In both cases, uses '/' rather than '.' after packages prefixes.
+   * Seems rather arbitrary - but that is how classes are represented
+   * in the constant pool (CONSTANT_Class constants).
+   * Also, Class.forName is the same, except using '.'.
+   */
+  public String getInternalName()
   {
-    return getName();
+    return getName().replace('.', '/');
   }
 
   /** Get the java.lang.Class object for the representation type. */
@@ -36,7 +42,7 @@ public class ObjectType extends Type
     try
       {
 	if (reflectClass == null)
-	  reflectClass = Class.forName(getNameOrSignature().replace('/', '.'));
+	  reflectClass = Class.forName(getInternalName().replace('/', '.'));
         flags |= EXISTING_CLASS;
       }
     catch (java.lang.ClassNotFoundException ex)
@@ -59,11 +65,16 @@ public class ObjectType extends Type
   {
     if (this == Type.string_type)
       return obj.toString();
-    if (obj == null || getReflectClass().isAssignableFrom(obj.getClass()))
-      return obj;
-    throw new ClassCastException("don't know how to coerce "
-				 + obj.getClass().getName() + " to "
-				 + getName());
+    if (obj != null)
+      {
+        Class clas = getReflectClass();
+        Class objClass = obj.getClass();
+        if (! clas.isAssignableFrom(objClass))
+          throw new ClassCastException("don't know how to coerce "
+                                       + objClass.getName() + " to "
+                                       + getName());
+      }
+    return obj;
   }
 
   /** Compile (in given method) cast from Object to this Type. */

@@ -6,10 +6,15 @@ import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
-public class ListRepeatPat extends Pattern implements Printable, Compilable
+public class ListRepeatPat extends Pattern implements Printable, Compilable, Externalizable
 {
   Pattern element_pattern;
+
+  public ListRepeatPat ()
+  {
+  }
 
   public ListRepeatPat (Pattern element_pattern)
   {
@@ -68,6 +73,20 @@ public class ListRepeatPat extends Pattern implements Printable, Compilable
 
   static public ClassType thisType;
   static Method makeListRepeatMethod;
+
+  /**
+   * @serialData Write the element_pattern (using writeObject).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(element_pattern);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    element_pattern = (Pattern) in.readObject();
+  }
 
   public Literal makeLiteral (Compilation comp)
   {

@@ -5,15 +5,18 @@ import gnu.bytecode.Access;
 import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
 /**
  * A pattern that requires an exact match (using equal?).
  */
 
-public class EqualPat extends Pattern implements Printable, Compilable
+public class EqualPat extends Pattern implements Printable, Compilable, Externalizable
 {
 
   Object value;
+
+  public EqualPat () { }
 
   public EqualPat (Object obj) { value = obj; }
 
@@ -30,6 +33,20 @@ public class EqualPat extends Pattern implements Printable, Compilable
     ps.print ("#<equals: ");
     SFormat.print (value, ps);
     ps.print ('>');
+  }
+
+  /**
+   * @serialData Write the value (using writeObject).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(value);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    value = in.readObject();
   }
 
   static public ClassType EqualPatType;

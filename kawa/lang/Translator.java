@@ -48,25 +48,22 @@ public class Translator extends Parser
   }
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
-  String current_filename;
-  int current_line;
-  int current_column;
 
   // Global environment used to look for syntax/macros.
   private Environment env;
 
   public Translator (Environment env, SourceMessages messages)
   {
+    super(messages);
     this.env = env;
     environ = new Environment();
-    this.messages = messages;
   }
 
   public Translator (Environment env)
   {
+    super(new SourceMessages());
     this.env = env;
     environ = new Environment();
-    messages = new SourceMessages();
   }
 
   public Translator ()
@@ -114,19 +111,6 @@ public class Translator extends Parser
       }
     return exp;
   }
-
-  SourceMessages messages;
-
-  public SourceMessages getMessages() { return messages; }
-  public void setMessages (SourceMessages messages)
-  { this.messages = messages; }
- 
-  public void error(char severity, String message)
-  {
-    messages.error(severity, current_filename, current_line, current_column,
-		   message);
-  }
-
 
   /**
    * Handle syntax errors (at rewrite time).
@@ -336,6 +320,25 @@ public class Translator extends Parser
       return new QuoteExp (exp);
   }
 
+  public static void setLine(Declaration decl, Object pair)
+  {
+    if (pair instanceof PairWithPosition)
+      {
+	PairWithPosition declPos = (PairWithPosition) pair;
+	decl.setFile(declPos.getFile());
+	decl.setLine(declPos.getLine(), declPos.getColumn());
+      }
+  }
+
+  public void setLine (Object pair)
+  {
+    if (pair instanceof PairWithPosition)
+      {
+	PairWithPosition pos = (PairWithPosition) pair;
+	setLine(pos.getFile(), pos.getLine(), pos.getColumn());
+      }
+  }
+
   public Expression rewrite_with_position (Object exp, PairWithPosition pair)
   {
     String save_filename = current_filename;
@@ -387,13 +390,7 @@ public class Translator extends Parser
 	    int save_column = current_column;
 	    try
 	      {
-		if (st_pair instanceof PairWithPosition)
-		  {
-		    PairWithPosition pp = (PairWithPosition) st_pair;
-		    current_filename = pp.getFile();
-		    current_line = pp.getLine();
-		    current_column = pp.getColumn();
-		  }
+		setLine(st_pair);
 		if (! syntax.scanForDefinitions(st_pair, forms, defs, this))
 		  return false;
 	      }

@@ -7,8 +7,9 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
-public class SyntaxRules extends Procedure1 implements Printable, Compilable
+public class SyntaxRules extends Procedure1 implements Printable, Compilable, Externalizable 
 {
   /** The list of literals identifiers.
    * The 0'th element is name of the macro being defined;
@@ -29,6 +30,10 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 	if (size > maxVars)
 	  maxVars = size;
       }
+  }
+
+  public SyntaxRules ()
+  {
   }
 
   public SyntaxRules (String[] literal_identifiers, SyntaxRule[] rules)
@@ -63,19 +68,13 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 	Pair syntax_rule_pair = (Pair) syntax_rule;
 	Object pattern = syntax_rule_pair.car;
 
-	String save_filename = tr.current_filename;
-	int save_line = tr.current_line;
-	int save_column = tr.current_column;
+	String save_filename = tr.getFile();
+	int save_line = tr.getLine();
+	int save_column = tr.getColumn();
 
 	try
 	  {
-	    if (syntax_rule_pair instanceof PairWithPosition)
-	      {
-		PairWithPosition pp = (PairWithPosition) syntax_rule_pair;
-		tr.current_filename = pp.getFile ();
-		tr.current_line = pp.getLine ();
-		tr.current_column = pp.getColumn ();
-	      }
+	    tr.setLine(syntax_rule_pair);
 	    if (! (syntax_rule_pair.cdr instanceof Pair))
 	      {
 		tr.syntaxError ("missing template in " + i + "'th syntax rule");
@@ -122,9 +121,7 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
 	  }
 	finally
 	  {
-	    tr.current_filename = save_filename;
-	    tr.current_line = save_line;
-	    tr.current_column = save_column;
+	    tr.setLine(save_filename, save_line, save_column);
 	  }
       }
     calculate_maxVars ();    
@@ -247,6 +244,24 @@ public class SyntaxRules extends Procedure1 implements Printable, Compilable
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<macro " + literal_identifiers[0] + ">");
+  }
+
+  /**
+   * @serialData Write literal_identifiers followed by rules,
+   *   using writeObject.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(literal_identifiers);
+    out.writeObject(rules);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    literal_identifiers = (String[]) in.readObject();
+    rules = (SyntaxRule[]) in.readObject();
+    calculate_maxVars ();
   }
 
   static public ClassType thisType;

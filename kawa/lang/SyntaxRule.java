@@ -7,8 +7,9 @@ import gnu.bytecode.ArrayType;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
-public class SyntaxRule implements Compilable
+public class SyntaxRule implements Compilable, Externalizable 
 {
   Pattern pattern;
   String template_program;
@@ -33,6 +34,10 @@ public class SyntaxRule implements Compilable
   /** Declarations captured at macro definition time.
    * The binding (if any) for template_identifiers[i] is captured_decls[i]. */
   Object[] captured_decls;
+
+  public SyntaxRule ()
+  {
+  }
 
   public SyntaxRule (Pattern pattern,
 		     String pattern_nesting,
@@ -394,6 +399,30 @@ public class SyntaxRule implements Compilable
 	  }
       }
     return stack.pop ();
+  }
+
+  /**
+   * @serialData 
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(pattern);
+    out.writeObject(pattern_nesting);
+    out.writeObject(template_program);
+    out.writeObject(template_identifiers);
+    out.writeObject(literal_values);
+    out.writeInt(max_nesting);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    pattern = (Pattern) in.readObject();
+    pattern_nesting = (String) in.readObject();
+    template_program = (String) in.readObject();
+    template_identifiers = (String[]) in.readObject();
+    literal_values = (Object[]) in.readObject();
+    max_nesting = in.readInt();
   }
 
   static public ClassType thisType;

@@ -1,5 +1,23 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/AnyPat.java:  Implement java.io.Externalizable.
+	* kawa/lang/EqualPat.java:  Likewise.
+	* kawa/lang/ListRepeatPat.java:  Likewise.
+	* kawa/lang/PairPat.java:  Likewise.
+	* kawa/lang/Macro.java:  Likewise.
+	* kawa/lang/SyntaxRule.java:  Likewise.
+	* kawa/lang/SyntaxRules.java:  Likewise.
+
+	* kawa/lang/Macro.java (scanForDefinitions):  Use new Parser methods
+	to set line position.
+
+	* kawa/lang/Translator.java (current_filename, current_line,
+	current_column. messages):  Moved fields to superclass (Parser).
+	(getMessages, setMessages, error):  Likewise moved methods.
+	(setLine):  New methods.
+	(scan_form):  Use new setLine method.
+	* kawa/lang/SyntaxRules.java (<init>):  Likewise.
+
 	* kawa/repl.java (setInterpreter):  Method removed.
 	(getInterpreter):  Don't hard-wire in Scheme.
 	(main):  Don't hard-wire in languages, instead ask Interpreter.

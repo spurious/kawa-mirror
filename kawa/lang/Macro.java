@@ -3,8 +3,9 @@ import gnu.expr.*;
 import gnu.mapping.*;
 import gnu.bytecode.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
-public class Macro extends Syntax implements Compilable, Printable
+public class Macro extends Syntax implements Compilable, Printable, Externalizable
 {
   public static final ClassType thisType = ClassType.make("kawa.lang.Macro");
   static public Method makeMethod;
@@ -25,6 +26,10 @@ public class Macro extends Syntax implements Compilable, Printable
                                         thisType, Access.STATIC|Access.PUBLIC);
       }
     return makeMethod;
+  }
+
+  public Macro ()
+  {
   }
 
   public Macro(String name, Procedure expander)
@@ -83,29 +88,38 @@ public class Macro extends Syntax implements Compilable, Printable
   public boolean scanForDefinitions (Pair st, java.util.Vector forms,
                                     ScopeExp defs, Translator tr)
   {
-    String save_filename = tr.current_filename;
-    int save_line = tr.current_line;
-    int save_column = tr.current_column;
+    String save_filename = tr.getFile();
+    int save_line = tr.getLine();
+    int save_column = tr.getColumn();
     Syntax saveSyntax = tr.currentSyntax;
     try
       {
-        if (st instanceof PairWithPosition)
-          {
-            PairWithPosition ppair = (PairWithPosition) st;
-            tr.current_filename = ppair.getFile ();
-            tr.current_line = ppair.getLine ();
-            tr.current_column = ppair.getColumn ();
-          }
+	tr.setLine(st);
         tr.currentSyntax = this;
         return tr.scan_form(expand(st, tr), forms, defs);
       }
     finally
       {
-        tr.current_filename = save_filename;
-        tr.current_line = save_line;
-        tr.current_column = save_column;
+	tr.setLine(save_filename, save_line, save_column);
         tr.currentSyntax = saveSyntax;
       }
+  }
+
+  /**
+   * @serialData Write the name followed by the expansion procedure,
+   *   both using writeObject.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(getName());
+    out.writeObject(((QuoteExp) expander).getValue());
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    setName((String) in.readObject());
+    expander = new QuoteExp(in.readObject());
   }
 
   public Literal makeLiteral (Compilation comp)

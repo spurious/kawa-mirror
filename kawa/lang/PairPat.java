@@ -6,12 +6,17 @@ import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.util.*;
+import java.io.*;
 
-public class PairPat extends Pattern implements Printable, Compilable
+public class PairPat extends Pattern implements Printable, Compilable, Externalizable
 {
   Pattern car;
   Pattern cdr;
   private int car_count, cdr_count;
+
+  public PairPat ()
+  {
+  }
 
   public PairPat (Pattern car, Pattern cdr)
   {
@@ -47,6 +52,22 @@ public class PairPat extends Pattern implements Printable, Compilable
   }
 
   public int varCount () { return car_count + cdr_count; }
+
+  /**
+   * @serialData Write the car and then the cdr patterns (using writeObject).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(car);
+    out.writeObject(cdr);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    car = (Pattern) in.readObject();
+    cdr = (Pattern) in.readObject();
+  }
 
   static public ClassType classPairPat;
   static Method makePairPatMethod;

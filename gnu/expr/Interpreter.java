@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public abstract class Interpreter
 {
+  // FIXME should be a fluid variable!
   public static Interpreter defaultInterpreter = null;
 
   public static Interpreter getInterpreter() { return defaultInterpreter; }

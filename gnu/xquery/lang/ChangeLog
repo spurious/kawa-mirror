@@ -1,5 +1,7 @@
 2005-01-25  Per Bothner  <per@bothner.com>
 
+	* XQuery.java (registerEnvironment): Update Interpreter -> Language.
+
 	* XQuery.java: Put gnu.kawa.slib.HTTP function in qexo namespace.
 
 2005-01-22  Per Bothner  <per@bothner.com>

@@ -68,16 +68,16 @@ public class Eval extends Procedure1or2
 			       SourceMessages messages, CallContext ctx)
     throws Throwable
   {
-    Interpreter interp = Interpreter.getInterpreter();
-    Environment saveInterpEnv = interp.getEnvironment();
+    Language language = Language.getDefaultLanguage();
+    Environment saveLangEnv = language.getEnvironment();
     Environment saveGlobalEnv = Environment.getCurrent();
     try
       {
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(env);
-	if (env != saveInterpEnv)
-	  interp.setEnvironment(env);
-	Translator tr = new Translator(interp, messages);
+	if (env != saveLangEnv)
+	  language.setEnvironment(env);
+	Translator tr = new Translator(language, messages);
 	ModuleExp mod = new ModuleExp();
 	Values forms = new Values();
 	tr.push(mod);
@@ -97,8 +97,8 @@ public class Eval extends Procedure1or2
       {
 	if (env != saveGlobalEnv)
 	  Environment.setCurrent(saveGlobalEnv);
-	if (env != saveInterpEnv)
-	  interp.setEnvironment(saveInterpEnv);
+	if (env != saveLangEnv)
+	  language.setEnvironment(saveLangEnv);
       }
   }
 

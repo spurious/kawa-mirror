@@ -612,9 +612,9 @@ public class XQuery extends Language
   /** The compiler insert calls to this method for applications and applets. */
   public static void registerEnvironment()
   {
-    XQuery interp = new XQuery();
-    Interpreter.defaultInterpreter = interp;
-    Environment.setGlobal(interp.getEnvironment());
+    XQuery language = new XQuery();
+    Language.setDefaultLanguage(language);
+    Environment.setGlobal(language.getEnvironment());
   }
 
   public static final ConstantFunction0 falseFunction

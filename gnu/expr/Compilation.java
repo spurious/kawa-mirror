@@ -1,4 +1,4 @@
-// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004  Per M.A. Bothner.
+// Copyright (c) 1999, 2000, 2001, 2002, 2003, 2004, 2005  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.expr;
@@ -366,7 +366,7 @@ public class Compilation
     if (target instanceof ConditionalTarget)
       {
 	ConditionalTarget ctarg = (ConditionalTarget) target;
-	getCode().emitGoto(getInterpreter().isTrue(value) ? ctarg.ifTrue
+	getCode().emitGoto(getLanguage().isTrue(value) ? ctarg.ifTrue
 			   : ctarg.ifFalse);
 	return;
       }
@@ -819,20 +819,20 @@ public class Compilation
   public Compilation (SourceMessages messages)
   {
     this.messages = messages;
-    lexical = new NameLookup(getInterpreter());
+    lexical = new NameLookup(getLanguage());
   }
 
-  public Compilation (Interpreter interp, SourceMessages messages)
+  public Compilation (Language language, SourceMessages messages)
   {
-    this.interp = interp;
+    this.language = language;
     this.messages = messages;
-    lexical = new NameLookup(interp);
+    lexical = new NameLookup(language);
   }
 
-  public Compilation (Interpreter interp, SourceMessages messages,
+  public Compilation (Language language, SourceMessages messages,
 		      NameLookup lexical)
   {
-    this.interp = interp;
+    this.language = language;
     this.messages = messages;
     this.lexical = lexical;
   }
@@ -1012,7 +1012,7 @@ public class Compilation
     if (source_filename != null)
       {
 	if (emitSourceDebugExtAttr)
-	  new_class.setStratum(getInterpreter().getName());
+	  new_class.setStratum(getLanguage().getName());
 	new_class.setSourceFile(source_filename);
       }
     if (classes == null)
@@ -1283,7 +1283,7 @@ public class Compilation
 			      falseLabel = new Label(code);
 			    ConditionalTarget ctarget =
 			      new ConditionalTarget(trueLabel, falseLabel,
-						    getInterpreter());
+						    getLanguage());
 			    code.emitDup();
 			    ((TypeValue) ptype).emitIsInstance(null, this,
 							       ctarget);
@@ -1771,7 +1771,7 @@ public class Compilation
     if (generateMain || generateApplet || generateServlet)
       {
 	ClassType interpreterType
-	  = (ClassType) Type.make(getInterpreter().getClass());
+	  = (ClassType) Type.make(getLanguage().getClass());
 	Method registerMethod
 	  = interpreterType.getDeclaredMethod("registerEnvironment", 0);
 	if (registerMethod != null)
@@ -2063,9 +2063,11 @@ public class Compilation
     throw new Error("unimeplemented parse");
   }
 
-  protected Interpreter interp;
-  public Interpreter getInterpreter() { return interp; }
-  public Environment getEnvironment() { return interp.getEnvironment(); }
+  protected Language language;
+  public Interpreter getLanguage() { return language; }
+  /** @deprecated */
+  public Interpreter getInterpreter() { return language; }
+  public Environment getEnvironment() { return language.getEnvironment(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
@@ -2421,7 +2423,7 @@ public class Compilation
       symbol = (Symbol) name;
     if (symbol == null)
       return null;
-    if (function && getInterpreter().hasSeparateFunctionNamespace())
+    if (function && getLanguage().hasSeparateFunctionNamespace())
       return env.getFunction(symbol, null);
     return env.get(symbol, null);
   }

@@ -62,10 +62,10 @@ public class Translator extends Compilation
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
 
-  public Translator (Interpreter interp, SourceMessages messages)
+  public Translator (Language language, SourceMessages messages)
   {
-    super(interp, messages);
-    this.env = interp.getEnvironment();
+    super(language, messages);
+    this.env = language.getEnvironment();
   }
 
   public final Environment getGlobalEnvironment() { return env; }
@@ -142,7 +142,7 @@ public class Translator extends Compilation
 
   final boolean selfEvaluatingSymbol (Object obj)
   {
-    return ((LispInterpreter) getInterpreter()).selfEvaluatingSymbol(obj);
+    return ((LispInterpreter) getLanguage()).selfEvaluatingSymbol(obj);
   }
 
   /** True iff a form matches a literal symbol. */
@@ -166,7 +166,7 @@ public class Translator extends Compilation
   {
     Declaration decl = lexical.lookup(name, namespace);
     if (decl != null
-	&& (getInterpreter().getNamespaceOf(decl) & namespace) != 0)
+	&& (getLanguage().getNamespaceOf(decl) & namespace) != 0)
       return decl;
     return lookupGlobal(name, namespace);
   }
@@ -179,7 +179,7 @@ public class Translator extends Compilation
   public Declaration lookupGlobal(Object name, int namespace)
   {
     ModuleExp module = currentModule();
-    Declaration decl = module.lookup(name, getInterpreter(), namespace);
+    Declaration decl = module.lookup(name, getLanguage(), namespace);
     if (decl == null)
       {
         decl = module.getNoDefine(name);
@@ -260,7 +260,7 @@ public class Translator extends Compilation
 	    Symbol symbol = nameToLookup instanceof Symbol ? (Symbol) nameToLookup
 	      : env.getSymbol(nameToLookup.toString());
 	    Object prop;
-	    if (function && getInterpreter().hasSeparateFunctionNamespace())
+	    if (function && getLanguage().hasSeparateFunctionNamespace())
 	      prop = EnvironmentKey.FUNCTION;
 	    else
 	      prop = null;
@@ -329,7 +329,7 @@ public class Translator extends Compilation
 		symbol = env.getSymbol(name);
 	      }
 	    proc = env.get(symbol,
-			   getInterpreter().hasSeparateFunctionNamespace()
+			   getLanguage().hasSeparateFunctionNamespace()
 			   ? EnvironmentKey.FUNCTION
 			   : null,
 			   null);
@@ -371,7 +371,7 @@ public class Translator extends Compilation
 	  }
 
 	ref.setProcedureName(true);
-	if (getInterpreter().hasSeparateFunctionNamespace())
+	if (getLanguage().hasSeparateFunctionNamespace())
 	  func.setFlag(ReferenceExp.PREFER_BINDING2);
       }
 
@@ -400,7 +400,7 @@ public class Translator extends Compilation
     if (save_scope != current_scope)
       setCurrentScope(save_scope);
 
-    return ((LispInterpreter) getInterpreter()).makeApply(func, args);
+    return ((LispInterpreter) getLanguage()).makeApply(func, args);
   }
 
   public static Object stripSyntax (Object obj)
@@ -508,8 +508,8 @@ public class Translator extends Compilation
       return str;
     String prefix = str.substring(0, colon);
     String local = str.substring(colon + 1);
-    String xprefix = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
-    Object uri_decl = lexical.lookup(xprefix, Interpreter.VALUE_NAMESPACE);
+    String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
+    Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
     if (uri_decl instanceof Declaration)
       {
 	Declaration decl = Declaration.followAliases((Declaration) uri_decl);
@@ -531,8 +531,8 @@ public class Translator extends Compilation
       return null;
     String prefix = str.substring(0, colon);
     String local = str.substring(colon + 1);
-    String xprefix = (Interpreter.NAMESPACE_PREFIX+prefix).intern();
-    Object uri_decl = lexical.lookup(xprefix, Interpreter.VALUE_NAMESPACE);
+    String xprefix = (Language.NAMESPACE_PREFIX+prefix).intern();
+    Object uri_decl = lexical.lookup(xprefix, Language.VALUE_NAMESPACE);
     Symbol sym;
     if (uri_decl instanceof Declaration)
       {
@@ -658,7 +658,7 @@ public class Translator extends Compilation
 	symbol = exp instanceof String ? env.getSymbol((String) exp)
 	  : (Symbol) exp;
 	Object value = resolve(symbol, function);
-	boolean separate = getInterpreter().hasSeparateFunctionNamespace();
+	boolean separate = getLanguage().hasSeparateFunctionNamespace();
         if (decl != null)
           {
             if (! isLexical(decl)
@@ -810,7 +810,7 @@ public class Translator extends Compilation
 	Expression texp = rewrite_car(typeSpecPair, false);
 	if (texp instanceof ErrorExp)
 	  return null;
-	Type type = getInterpreter().getTypeFor(texp);
+	Type type = getLanguage().getTypeFor(texp);
 	 if (type == null)
 	   {
 	     if (texp instanceof ReferenceExp)
@@ -1097,7 +1097,7 @@ public class Translator extends Compilation
 	  return new ApplyExp(gnu.kawa.functions.AppendValues.appendValues,
 			      exps);
 	else
-	  return ((LispInterpreter) getInterpreter()).makeBody(exps);
+	  return ((LispInterpreter) getLanguage()).makeBody(exps);
       }
   }
 

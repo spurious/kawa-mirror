@@ -1,3 +1,8 @@
+Mon Feb 22 23:17:08 1999  Per Bothner  <bothner@cygnus.com>
+
+	* ObjectType.java (getReflectClass):  Replace '/' by '.' in
+	signature before passing it to Class.forName.  Needed for array types.
+
 Tue Feb  9 09:52:36 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* CodeAttr.java (emitNewArray):  Result is appropriate ArrayType.

@@ -16,11 +16,10 @@ EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
 all:
 
 TestMisc.class:  TestMisc.java
-	$(CLASSPATH_ENV) $(JAVAC) -d . $(JAVACFLAGS) $<
-#$(JAVAC) -g -d . $<
+	$(CLASSPATH_ENV) $(JAVAC) -d $(JAVAROOT) $(JAVACFLAGS) $<
 
 check-misc: TestMisc.class
-	CLASSPATH=.:$(KAWALIB) $(JAVA) TestMisc
+	CLASSPATH=$(KAWALIB) $(JAVA) gnu.xquery.testsuite.TestMisc
 
 maketab1.class:  maketab1.xql
 	$(KAWA) --main --xquery -C $<

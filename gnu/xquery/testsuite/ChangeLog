@@ -1,3 +1,11 @@
+2001-11-18  Per Bothner  <per@bothner.com>
+
+	* TestMisc.java:  Change 3.4 and 4.4.to 3.5 and 4.5 to avoid
+	risk of round-off error.
+
+	* TestMisc.java:  Specify package as gnu.xquery.testsuite.
+	* Makefile.am (TestMisc.class, check-misc):  Change accordingly.
+
 2001-11-12  Per Bothner  <per@bothner.com>
 
 	* TestMisc.java:  More new tests.

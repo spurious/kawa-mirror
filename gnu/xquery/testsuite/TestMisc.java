@@ -1,3 +1,4 @@
+package gnu.xquery.testsuite;
 import gnu.expr.*;
 import kawa.*;
 import gnu.mapping.*;
@@ -23,8 +24,8 @@ public class TestMisc
     // gnu.expr.ModuleExp.debugPrintExpr = true;
     // Compilation.debugPrintFinalExpr = true;
 
-    evalTest("3.4+1", "4.4");
-    evalTest("3.4+1 ,4*2.5", "4.4 10.0");
+    evalTest("3.5+1", "4.5");
+    evalTest("3.5+1 ,4*2.5", "4.5 10.0");
     evalTest("3<5", "true");
     evalTest("let $x:=3+4 return $x", "7");
     evalTest("let $x:=3+4 return <a>{$x}</a>", "<a>7</a>");

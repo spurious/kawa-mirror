@@ -62,13 +62,22 @@ public class InnerClassesAttr  extends Attribute
 	dst.print("; ");
 
 	index = data[4*i+1]; // outer_class_info_index
-	centry = constants.getForced(index, ConstantPool.CLASS);
-	dst.print(((CpoolClass) centry).getStringName());
+	if (index != 0)
+	  {
+	    dst.print("Member of ");
+	    centry = constants.getForced(index, ConstantPool.CLASS);
+	    dst.print(((CpoolClass) centry).getStringName());
+	  }
 	dst.print("; ");
 
 	index = data[4*i+2]; // inner_name_index
-	centry = constants.getForced(index, ConstantPool.UTF8);
-	dst.print(((CpoolUtf8) centry).string);
+	if (index != 0)
+	  {
+	    centry = constants.getForced(index, ConstantPool.UTF8);
+	    dst.print(((CpoolUtf8) centry).string);
+	  }
+	else
+	  dst.print("(Anonymous)");
 	dst.print(";");
 
 	dst.print(Access.toString(data[4*i+3] & 0xFFFF));

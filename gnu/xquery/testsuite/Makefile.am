@@ -4,7 +4,7 @@ ENABLE_GCJ_COMPILED_KAWA = ../../../bin/kawa-bin
 KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 CLEANFILES = tmp? *.log testing.zip *.class
 
-SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql
+SOURCES = test1.xql expected1.xml tab.xml.in maketab1.xql tab.html
 
 all:
 

@@ -1,3 +1,18 @@
+Wed Apr  7 18:04:27 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* FluidLetExp.java:  New LetExp class.
+	* BlockExp.java:  New Expression class (untested).
+	* ExitExp.java:  New Expression class (untested).
+	* Makefile.am (java_JAVA), Makefile.in:  Update for new classes.
+
+	* Declaration.java (IS_FLUID):  New flag bit.
+	(setFlag, isFluid, setFluid):  New methods.
+	* ExpWalker.java (walkBlockExp, walkExitExp, walkFluidLetExp):  New.
+	* LetExp.java (getType):  New method.
+	* SetExp.java (getType):  New method.
+	* ReferenceExp.java (compile, getType):  Check if isFluid().
+	* SetExp.java (compile):  Check if isFluid().
+
 Tue Mar 30 17:15:14 1999  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* LambdaExp.java (CLASS_METHOD):  New flag.

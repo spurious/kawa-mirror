@@ -82,13 +82,7 @@ public class Binding extends Location implements Externalizable
 
   public boolean isBound ()
   {
-    try{
     return constraint.isBound(this);
-    } catch (RuntimeException ex)
-      {
-	System.err.println("isBound failed for "+getName());
-	throw ex;
-      }
   }
 
   public Binding ()
@@ -113,7 +107,7 @@ public class Binding extends Location implements Externalizable
   public static Binding make (String name, Environment env)
   {
     if (env == null)
-      return new Binding(null);
+      return new Binding(name);
     else
       return env.getBinding(name);
   }

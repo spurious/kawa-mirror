@@ -1,3 +1,9 @@
+2001-06-19  Per Bothner  <per@bothner.com>
+
+	* Binding.java (isBound):  Remove debugging junk.
+
+	* Binding.java (make):  Use name when creating new Binding.
+
 2001-06-17  Per Bothner  <per@bothner.com>
 
 	* Binding.java:  Implement Externalizeable.

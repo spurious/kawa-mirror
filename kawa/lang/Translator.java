@@ -107,35 +107,6 @@ public class Translator extends Object
     return new ErrorExp (message);
   }
 
-  /** Resolve a symbol to a Declaration.
-   * May cause the Declaration to be "captured" in a closure ("heapFrame").
-   * @param sym the symbol whose Declaration we want
-   * @param decl the current lexical binding, if any
-   * @return the Declaration, or null if there no lexical Declaration */
-  public Declaration resolve (String sym, Declaration decl)
-  {
-    if (decl != null)
-      {
-	LambdaExp curLambda = currentLambda ();
-	LambdaExp declLambda = decl.getContext().currentLambda ();
-	if (curLambda != declLambda || declLambda == null)
-	  {
-	    decl.setSimple (false);
-	    LambdaExp lambda = curLambda;
-	    for (; lambda != declLambda; lambda = lambda.outerLambda ())
-	      {
-		if (lambda.staticLink == null)
-		  lambda.staticLink
-		    = lambda.addDeclaration("staticLink",
-					    Compilation.objArrayType);
-		if (lambda != curLambda)
-		  lambda.staticLink.setSimple (false);
-	      }
-	  }
-      }
-    return decl;
-  }
-
   /** Enter a global definition.
    * This allows macro definitions to be used in the same Translation
    * as the define-syntax.
@@ -249,7 +220,7 @@ public class Translator extends Object
 	// to the original symbol.  Here, use the original symbol.
 	if (binding != null && binding instanceof String)
 	  return new ReferenceExp ((String) binding);
-	return new ReferenceExp (name, resolve (name, (Declaration) binding));
+	return new ReferenceExp (name, (Declaration) binding);
       }
     else if (exp instanceof Expression)
       return (Expression) exp;
@@ -438,17 +409,13 @@ public class Translator extends Object
   {
     scope.outer = current_scope;
     if (! (scope instanceof LambdaExp)) // which implies: outer != null
-      {
-	scope.shared = true;
-	mustCompileHere();
-      }
+      mustCompileHere();
     current_scope = scope;
     pushDecls(scope);
   }
 
   public void pop (ScopeExp scope)
   {
-    scope.assign_space();
     popDecls(scope);
     current_scope = scope.outer;
   }

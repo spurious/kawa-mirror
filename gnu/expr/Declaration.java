@@ -282,7 +282,7 @@ public class Declaration
 	  ((LambdaExp) value).nameDecl = this;
 	this.value = value;
       }
-    else
+    else if (this.value != value)
       {
 	if (this.value instanceof LambdaExp) 
           ((LambdaExp) this.value).nameDecl = null; 
@@ -417,5 +417,63 @@ public class Declaration
 	decl = ((ReferenceExp) declValue).binding;
       }
     return decl;
+  }
+
+  public void makeField(Compilation comp, Expression value)
+  {
+    setSimple(false);
+    String fname = Compilation.mangleName(getName());
+    int fflags = 0;
+    boolean isConstant = getFlag(IS_CONSTANT);
+    boolean typeSpecified = getFlag(TYPE_SPECIFIED);
+    if (isPublic() && ! isConstant && ! typeSpecified)
+      setIndirectBinding(true);
+    if (isIndirectBinding() || isConstant)
+      fflags |= Access.FINAL;
+    if (! isPrivate())
+      fflags |= Access.PUBLIC;
+    if (getFlag(STATIC_SPECIFIED)
+	|| (isConstant && value instanceof QuoteExp))
+      fflags |= Access.STATIC;
+    Type ftype;
+    if (isIndirectBinding())
+      {
+	ftype = comp.getInterpreter().hasSeparateFunctionNamespace()
+	  ? Compilation.typeBinding2 : Compilation.typeBinding;
+      }
+    else
+      ftype = value == null || typeSpecified ? getType()
+	: value.getType();
+    field = comp.mainClass.addField (fname, ftype, fflags);
+    if (value instanceof QuoteExp)
+      {
+	Object val = ((QuoteExp) value).getValue();
+	if (val.getClass().getName().equals(ftype.getName()))
+	  {
+	    Literal literal = comp.findLiteral(val);
+	    if (literal.field == null)
+	      literal.assign(field, comp);
+	  }
+      }
+    if (value instanceof QuoteExp
+	&& (ftype instanceof PrimType
+	    || "java.lang.String".equals(ftype.getName())))
+      {
+	field.setConstantValue(((QuoteExp) value).getValue(), comp.mainClass);
+      }
+    else if (isIndirectBinding() || value != null)
+      {
+	BindingInitializer init = new BindingInitializer(this, field, value);
+	if ((fflags & Access.STATIC) != 0)
+	  {
+	    init.next = comp.clinitChain;
+	    comp.clinitChain = init;
+	  }
+	else
+	  {
+	    init.next = comp.initChain;
+	    comp.initChain = init;
+	  }
+      }
   }
 }

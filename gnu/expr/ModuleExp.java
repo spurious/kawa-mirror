@@ -79,12 +79,12 @@ public class ModuleExp extends LambdaExp
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }
-	else if (value instanceof QuoteExp && ! comp.immediate)
-	  {
-	  }
 	else
 	  {
-	    new BindingInitializer(decl, comp);
+	    if (! (value instanceof QuoteExp)
+		|| ! decl.getFlag(Declaration.IS_CONSTANT) || comp.immediate)
+	      value = null;
+	    decl.makeField(comp, value);
 	  }
       }
   }

@@ -145,12 +145,7 @@ public class SetExp extends Expression
 	     && (new_value instanceof QuoteExp)
 	     && ! binding.isPrivate() && ! comp.immediate
 	     && binding.getValue() != null)
-      { // This handles macros a la syntax-rules - and other constants.
-	Object value = ((QuoteExp) new_value).getValue();
-	String fname = Compilation.mangleName(name);
-	Literal literal = comp.findLiteral(value);
-	if (literal.field == null)
-	  literal.assign(fname, comp);
+      { // This is handled in ModuleExp's allocFields method.
       }
     else if (binding instanceof kawa.lang.Macro
 	     && binding.context instanceof ModuleExp
@@ -164,7 +159,7 @@ public class SetExp extends Expression
 	    expander.compileAsMethod(comp);
 	    comp.applyMethods.addElement(expander);
 	  }
-	new BindingInitializer(binding, comp, new_value);
+	binding.makeField(comp, new_value);
       }
     else if (binding != null)
       {

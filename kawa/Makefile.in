@@ -46,7 +46,7 @@ EXTRA_MISC = @EXTRA_MISC@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = math lang standard lib
+SUBDIRS = lang standard lib
 
 SUFFIXES = .java .class
 

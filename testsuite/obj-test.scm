@@ -1,4 +1,4 @@
-(test-init "Objects" 37)
+(test-init "Objects" 38)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -156,6 +156,8 @@
                (list (invoke obj1 'one)
                      (invoke obj2 'two))))
 
+(define internal-node-name list)
 (require <module1>)
 (test 4 list-length-1 '(a b c d))
 (test 2 list-length-3 '(a b))
+(test 1 length (classify))

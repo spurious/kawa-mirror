@@ -1,3 +1,10 @@
+1999-04-25  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* kawa.texi (Getting Kawa):  Mention both stable version and snapshots.
+	(Options):  Document --full-tail-calls and --no-full-tail-calls.
+	(Standard Types):  Docuemnt more types.
+ 	(Declaring Types of Variables):  New section.
+	
 1999-04-11  Per Bothner  <bothner@cygnus.com>
 
 	* kawa.texi (Running Java):   Point to Mac-related web page.

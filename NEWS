@@ -1,16 +1,28 @@
+Changes from Kawa 1.6.99 to 1.7.
+================================
+
 Various XQuery changes, based on the May '02 specification.
+- Implemented 'define variable', except the 'external' support.
 - Implemented the trace function.
 - Implemented the new comment syntax.
 - Expanded string literal syntax, with references and doubled quotes.
 - Allow doc as synonym for document function.
+- Implemented the full 2-operand document function (now-deprecated, sigh).
+- Implemented base-uri support.
 
-base-uri;  document generalized; load takes URL; load-relative
+The default source-base requires various Java 2 features, such as collection.
+However, 'make-select1' will comment out Java2 dependencies, allowing you
+to build Kawa with an older Java implementation.
+
+The -f flag and the load function can take an absoluete URL.
+New Scheme functions load-relative and base-uri.
 
 Imported implementation of cut and cute from SRFI-26
 (Notation for Specializing Parameters without Currying).
 
 The way top-level definitions (including Scheme procedures) are mapped
 into Java fields is changed to use a mostly reversible mapping.
+(The mapping to method names remains more natural but non-reversible.)
 
 define-alias of types can now be exported from a module.
 
@@ -28,9 +40,6 @@ SRFI-9 (define-record-type) has been implemented, and compiled to a
 define-class, with efficient code.
 
 The configure option --with-collections is now the default.
-
-Changes since Kawa 1.6.99
-=========================
 
 Unknowns are no longer automatically static.
 

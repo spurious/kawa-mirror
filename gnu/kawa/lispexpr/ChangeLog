@@ -1,3 +1,8 @@
+2004-12-20  Per Bothner  <per@bothner.com>
+
+	* LispInterpreter.java: New method.
+	* LispPackage.kava (lookup): Use new add method.
+
 2004-12-05  Per Bothner  <per@bothner.com>
 
 	* LispInterpreter.java (defSntxStFld): New methods.

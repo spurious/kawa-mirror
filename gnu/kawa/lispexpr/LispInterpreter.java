@@ -82,4 +82,9 @@ public abstract class LispInterpreter extends Interpreter
   {
     return new ApplyExp(func, args);
   }
+
+  public boolean selfEvaluatingSymbol (Object obj)
+  {
+    return obj instanceof Keyword;
+  }
 }

@@ -1,5 +1,8 @@
 2004-01-12  Per Bothner  <per@bothner.com>
 
+	* TestMisc.java (main): New testcase for navigating from attribute
+	to parent based on bug reported 2003-11-29 by sascha_opletal@web.de.
+
 	* exp-format-users.html:  Update to include XML declaration.
 
 2003-12-26  Per Bothner  <per@bothner.com>

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4c from Makefile.am
+# Makefile.in generated automatically by automake 1.4e from Makefile.am.
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -47,7 +47,6 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
 
@@ -60,7 +59,6 @@ POST_UNINSTALL = :
 
 @SET_MAKE@
 AMDEP = @AMDEP@
-AMINCLUDE = @AMINCLUDE@
 AMTAR = @AMTAR@
 AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
@@ -69,6 +67,8 @@ CFLAGS = @CFLAGS@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTALL_STRIP_PROGRAM_ENV = @INSTALL_STRIP_PROGRAM_ENV@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
@@ -76,11 +76,12 @@ JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
-SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
+_am_include = @_am_include@
 extra_java = @extra_java@
 install_sh = @install_sh@
 kawa_bin = @kawa_bin@
@@ -99,75 +100,48 @@ SOURCES = testing.scm test.scm num-test.scm mac-test.scm mac1.scm \
 
 CLEANFILES = tmp? *.log testing.zip *.class
 EXTRA_DIST = $(SOURCES) ppfile.out
+OBJEXT = o
 subdir = testsuite
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = 
-DIST_SOURCES = 
+CONFIG_CLEAN_FILES =
+DIST_SOURCES =
 depcomp = 
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+all: all-am
 
-
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-
-GZIP_ENV = --best
-all: all-redirect
 .SUFFIXES:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus testsuite/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --cygnus  testsuite/Makefile
 
+Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
 tags: TAGS
 TAGS:
 
-
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-
-
-distdir: $(DISTFILES)
-	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  if test -d $$d/$$file; then \
-	    cp -pR $$d/$$file $(distdir) \
-	    || exit 1; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || cp -p $$d/$$file $(distdir)/$$file \
-	    || exit 1; \
-	  fi; \
-	done
-info-am:
-info: info-am
-dvi-am:
-dvi: dvi-am
 check-am:
 check: check-am
-installcheck-am:
-installcheck: installcheck-am
-install-info-am: 
-install-info: install-info-am
-install-exec-am:
-install-exec: install-exec-am
+all-am: Makefile
 
-install-data-am:
+installdirs:
+
+install: install-am
+install-exec: install-exec-am
 install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-am
-uninstall-am:
-uninstall: uninstall-am
-all-am: Makefile
-all-redirect: all-am
-install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
-installdirs:
 
+installcheck: installcheck-am
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  INSTALL_PROGRAM_ENV='$(INSTALL_STRIP_PROGRAM_ENV)' install
 
 mostlyclean-generic:
-
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -188,6 +162,24 @@ distclean: distclean-am
 
 distclean-am: clean-am distclean-generic
 
+dvi:
+
+dvi-am:
+
+info:
+
+info-am:
+
+install-data-am:
+
+install-exec-am:
+
+install-info:
+
+install-man:
+
+installcheck-am:
+
 maintainer-clean: maintainer-clean-am
 
 maintainer-clean-am: distclean-am maintainer-clean-generic
@@ -196,11 +188,11 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-generic
 
-.PHONY: all all-am all-redirect check check-am clean clean-generic \
-	distclean distclean-generic distdir dvi dvi-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+.PHONY: all all-am check check-am clean clean-generic distclean \
+	distclean-generic dvi dvi-am info info-am install install-am \
+	install-data install-data-am install-exec install-exec-am \
+	install-info install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic \
 	uninstall uninstall-am
 
@@ -266,4 +258,3 @@ check-scribble: scribble.class
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-

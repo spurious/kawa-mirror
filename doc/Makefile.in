@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4c from Makefile.am
+# Makefile.in generated automatically by automake 1.4e from Makefile.am.
 
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -47,7 +47,6 @@ INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
 INSTALL_HEADER = $(INSTALL_DATA)
 transform = @program_transform_name@
 
@@ -60,7 +59,6 @@ POST_UNINSTALL = :
 
 @SET_MAKE@
 AMDEP = @AMDEP@
-AMINCLUDE = @AMINCLUDE@
 AMTAR = @AMTAR@
 AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
@@ -69,6 +67,8 @@ CFLAGS = @CFLAGS@
 DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 GCJ_COMPILED_SELECTED = @GCJ_COMPILED_SELECTED@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTALL_STRIP_PROGRAM_ENV = @INSTALL_STRIP_PROGRAM_ENV@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
 JAVA_COLLECTIONS_SELECTED = @JAVA_COLLECTIONS_SELECTED@
@@ -76,11 +76,12 @@ JEMACS_VERSION = @JEMACS_VERSION@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
-SHELL = @SHELL@
+STRIP = @STRIP@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
 XML_SELECTED = @XML_SELECTED@
+_am_include = @_am_include@
 extra_java = @extra_java@
 install_sh = @install_sh@
 kawa_bin = @kawa_bin@
@@ -112,13 +113,14 @@ HTML_HOME = $$HOME/public_html
 
 XSL_CLASSPATH = /home/bothner/Java/xalan_1_0_0/xalan.jar:/home/bothner/Java/xalan_1_0_0/xerces.jar:$$CLASSPATH
 XSL = $(JAVA) org.apache.xalan.xslt.Process
+OBJEXT = o
 subdir = doc
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = 
+CONFIG_CLEAN_FILES =
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = 
+DIST_SOURCES =
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_srcdir)/../texinfo/util/texi2dvi; else echo texi2dvi; fi`
 TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 INFO_DEPS = kawa.info kawa-tour.info
@@ -129,25 +131,21 @@ MANS = $(man_MANS)
 
 NROFF = nroff
 depcomp = 
-DIST_COMMON =  ChangeLog Makefile.am Makefile.in mdate-sh stamp-vti \
-texinfo.tex version.texi
+all: all-am
 
-
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-
-GZIP_ENV = --best
-all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .pdf .dvi .info .ps .texi .texinfo .txi
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --cygnus doc/Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
-	cd $(top_builddir) \
-	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= CONFIG_LINKS= CONFIG_COMMANDS= $(SHELL) ./config.status
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && \
+	  $(AUTOMAKE) --cygnus  doc/Makefile
 
+Makefile: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) && \
+	  CONFIG_HEADERS= CONFIG_LINKS= \
+	  CONFIG_FILES=$(subdir)/$@ $(SHELL) ./config.status
 
-$(srcdir)/version.texi: @MAINTAINER_MODE_TRUE@$(srcdir)/stamp-vti
+$(srcdir)/version.texi: @MAINTAINER_MODE_TRUE@ $(srcdir)/stamp-vti
 	@:
 
 $(srcdir)/stamp-vti: kawa.texi $(top_srcdir)/configure.in
@@ -166,17 +164,13 @@ mostlyclean-vti:
 	-rm -f vti.tmp
 
 maintainer-clean-vti:
-	-@MAINTAINER_MODE_TRUE@rm -f $(srcdir)/stamp-vti $(srcdir)/version.texi
+@MAINTAINER_MODE_TRUE@	-rm -f $(srcdir)/stamp-vti $(srcdir)/version.texi
 
 kawa.info: kawa.texi $(srcdir)/version.texi
 kawa.dvi: kawa.texi $(srcdir)/version.texi
 
-
 kawa-tour.info: kawa-tour.texi
 kawa-tour.dvi: kawa-tour.texi
-
-
-DVIPS = dvips
 
 .texi.info:
 	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
@@ -190,55 +184,11 @@ DVIPS = dvips
 	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
 	$(MAKEINFO) -I $(srcdir) $<
 
-.texinfo.info:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) -I $(srcdir) $<
-
-.texinfo:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) -I $(srcdir) $<
-
-.texinfo.dvi:
-	TEXINPUTS=$(top_srcdir)/../texinfo:$$TEXINPUTS \
-	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2DVI) $<
-
-.txi.info:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) -I $(srcdir) $<
-
-.txi.dvi:
-	TEXINPUTS=$(top_srcdir)/../texinfo:$$TEXINPUTS \
-	  MAKEINFO='$(MAKEINFO) -I $(srcdir)' $(TEXI2DVI) $<
-
-.txi:
-	@rm -f $@ $@-[0-9] $@-[0-9][0-9]
-	$(MAKEINFO) -I $(srcdir) $<
+DVIPS = dvips
 .dvi.ps:
 	$(DVIPS) $< -o $@
 
-install-info-am: $(INFO_DEPS)
-	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(infodir)
-	@list='$(INFO_DEPS)'; \
-	for file in $$list; do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  for ifile in `CDPATH=: && cd $$d && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
-	    if test -f $$d/$$ifile; then \
-	      echo " $(INSTALL_DATA) $$d/$$ifile $(DESTDIR)$(infodir)/$$ifile"; \
-	      $(INSTALL_DATA) $$d/$$ifile $(DESTDIR)$(infodir)/$$ifile; \
-	    else : ; fi; \
-	  done; \
-	done
-	@$(POST_INSTALL)
-	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
-	  list='$(INFO_DEPS)'; \
-	  for file in $$list; do \
-	    echo " install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/$$file";\
-	    install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/$$file || :;\
-	  done; \
-	else : ; fi
-
-uninstall-info:
+uninstall-info-am:
 	$(PRE_UNINSTALL)
 	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
 	  list='$(INFO_DEPS)'; \
@@ -267,15 +217,11 @@ dist-info: $(INFO_DEPS)
 	done
 
 mostlyclean-aminfo:
-	-rm -f kawa.aux kawa.cp kawa.cps kawa.dvi kawa.fn kawa.fns kawa.pgs \
-	  kawa.ky kawa.kys kawa.ps kawa.log kawa.pg kawa.toc kawa.tp \
-	  kawa.tps kawa.vr kawa.vrs kawa.op kawa.tr kawa.cv kawa.cn \
-	  kawa.cm kawa.ov kawa-tour.aux kawa-tour.cp kawa-tour.cps \
-	  kawa-tour.dvi kawa-tour.fn kawa-tour.fns kawa-tour.pgs \
-	  kawa-tour.ky kawa-tour.kys kawa-tour.ps kawa-tour.log \
-	  kawa-tour.pg kawa-tour.toc kawa-tour.tp kawa-tour.tps \
-	  kawa-tour.vr kawa-tour.vrs kawa-tour.op kawa-tour.tr \
-	  kawa-tour.cv kawa-tour.cn kawa-tour.cm kawa-tour.ov
+	-rm -f kawa.aux kawa.cp kawa.cps kawa.dvi kawa.fn kawa.ky kawa.log kawa.pg \
+	  kawa.ps kawa.toc kawa.tp kawa.vr kawa-tour.aux kawa-tour.cp \
+	  kawa-tour.dvi kawa-tour.fn kawa-tour.ky kawa-tour.log \
+	  kawa-tour.pg kawa-tour.ps kawa-tour.toc kawa-tour.tp \
+	  kawa-tour.vr
 
 maintainer-clean-aminfo:
 	for i in $(INFO_DEPS); do \
@@ -286,10 +232,8 @@ maintainer-clean-aminfo:
 	done
 
 clean-info: mostlyclean-aminfo
-
-clean-info: mostlyclean-aminfo
-
-install-man1:
+install-man1: $(man1_MANS) $(man_MANS)
+	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(man1dir)
 	@list='$(man1_MANS)'; \
 	l2='$(man_MANS)'; for i in $$l2; do \
@@ -309,6 +253,7 @@ install-man1:
 	done
 
 uninstall-man1:
+	@$(NORMAL_UNINSTALL)
 	@list='$(man1_MANS)'; \
 	l2='$(man_MANS)'; for i in $$l2; do \
 	  case "$$i" in \
@@ -323,63 +268,31 @@ uninstall-man1:
 	  echo " rm -f $(DESTDIR)$(man1dir)/$$inst"; \
 	  rm -f $(DESTDIR)$(man1dir)/$$inst; \
 	done
-install-man: $(MANS)
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-man1
-uninstall-man:
-	@$(NORMAL_UNINSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) uninstall-man1
 tags: TAGS
 TAGS:
 
-
-distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-
-
-distdir: $(DISTFILES)
-	@for file in $(DISTFILES); do \
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  if test -d $$d/$$file; then \
-	    cp -pR $$d/$$file $(distdir) \
-	    || exit 1; \
-	  else \
-	    test -f $(distdir)/$$file \
-	    || cp -p $$d/$$file $(distdir)/$$file \
-	    || exit 1; \
-	  fi; \
-	done
-	$(MAKE) $(AM_MAKEFLAGS) top_distdir="$(top_distdir)" distdir="$(distdir)" dist-info
-info-am: $(INFO_DEPS)
-info: info-am
-dvi-am: $(DVIS)
-dvi: dvi-am
 check-am:
 check: check-am
-installcheck-am:
-installcheck: installcheck-am
-install-info-am: 
-install-info: install-info-am
-install-exec-am:
-install-exec: install-exec-am
+all-am: Makefile $(MANS)
 
-install-data-am: install-man
+installdirs:
+	$(mkinstalldirs) $(DESTDIR)$(man1dir)
+
+install: install-am
+install-exec: install-exec-am
 install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
-install: install-am
-uninstall-am: uninstall-man
-uninstall: uninstall-am
-all-am: Makefile $(MANS)
-all-redirect: all-am
-install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_STRIP_FLAG=-s install
-installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(mandir)/man1
 
+installcheck: installcheck-am
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	  INSTALL_PROGRAM_ENV='$(INSTALL_STRIP_PROGRAM_ENV)' install
 
 mostlyclean-generic:
-
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -400,6 +313,45 @@ distclean: distclean-am
 
 distclean-am: clean-am distclean-generic
 
+dvi: dvi-am
+
+dvi-am: $(DVIS)
+
+info: info-am
+
+info-am: $(INFO_DEPS)
+
+install-data-am: install-man
+
+install-exec-am:
+
+install-info: install-info-am
+
+install-info-am: $(INFO_DEPS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(infodir)
+	@list='$(INFO_DEPS)'; \
+	for file in $$list; do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  for ifile in `CDPATH=: && cd $$d && echo $$file $$file-[0-9] $$file-[0-9][0-9]`; do \
+	    if test -f $$d/$$ifile; then \
+	      echo " $(INSTALL_DATA) $$d/$$ifile $(DESTDIR)$(infodir)/$$ifile"; \
+	      $(INSTALL_DATA) $$d/$$ifile $(DESTDIR)$(infodir)/$$ifile; \
+	    else : ; fi; \
+	  done; \
+	done
+	@$(POST_INSTALL)
+	@if $(SHELL) -c 'install-info --version | sed 1q | fgrep -s -v -i debian' >/dev/null 2>&1; then \
+	  list='$(INFO_DEPS)'; \
+	  for file in $$list; do \
+	    echo " install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/$$file";\
+	    install-info --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/$$file || :;\
+	  done; \
+	else : ; fi
+install-man: install-man1
+
+installcheck-am:
+
 maintainer-clean: maintainer-clean-am
 
 maintainer-clean-am: distclean-am maintainer-clean-aminfo \
@@ -409,16 +361,22 @@ mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-aminfo mostlyclean-generic mostlyclean-vti
 
-.PHONY: all all-am all-redirect check check-am clean clean-generic \
-	clean-info distclean distclean-generic distdir dvi dvi-am info \
-	info-am install install-am install-data install-data-am \
-	install-exec install-exec-am install-info install-info-am \
-	install-info-am install-man install-man1 install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-aminfo maintainer-clean-generic \
-	maintainer-clean-vti mostlyclean mostlyclean-aminfo \
-	mostlyclean-generic mostlyclean-vti uninstall uninstall-am \
-	uninstall-info uninstall-man uninstall-man1
+uninstall-am: uninstall-man
+
+uninstall-info: uninstall-info-am
+
+uninstall-man: uninstall-man1
+
+.PHONY: all all-am check check-am clean clean-generic clean-info \
+	dist-info distclean distclean-generic dvi dvi-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-info install-info-am install-man \
+	install-man1 install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-aminfo \
+	maintainer-clean-generic maintainer-clean-vti mostlyclean \
+	mostlyclean-aminfo mostlyclean-generic mostlyclean-vti \
+	uninstall uninstall-am uninstall-info-am uninstall-man \
+	uninstall-man1
 
 
 kawa.txt:  $(srcdir)/kawa.texi version.texi
@@ -470,4 +428,3 @@ internals.ps: internals.dvi
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-

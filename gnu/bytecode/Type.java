@@ -41,7 +41,12 @@ public abstract class Type {
     else if (reflectClass.isPrimitive())
       throw new Error("internal error - primitive type not found");
     else
-      type = ClassType.make(reflectClass.getName());
+      {
+	ClassType ctype = ClassType.make(reflectClass.getName());
+	if (reflectClass.isInterface())
+	  ctype.access_flags |= Access.INTERFACE;
+	type = ctype;
+      }
     type.reflectClass = reflectClass;
     registerTypeForClass(reflectClass, type);
     return type;
@@ -231,6 +236,42 @@ public abstract class Type {
     // FIXME - also need to check for implemented interfaces!
 
     return false;
+  }
+
+  /**
+   * Computes the common supertype
+   *
+   * Interfaces are not taken into account.
+   * This would be difficult, since interfaces allow multiple-inheritance.
+   * This means that there may exists multiple common supertypes
+   * to t1 and t2 that are not comparable.
+   *
+   * @return the lowest type that is both above t1 and t2,
+   *  or null if t1 and t2 have no common supertype.
+   */
+  public static Type lowestCommonSuperType(Type t1, Type t2)
+  {
+    if (t1 == null || t2 == null)
+     return null;
+
+    if (t1.isSubtype(t2))
+      return t2;
+    else if (t2.isSubtype(t1))
+      return t1;
+    else
+      {
+       // the only chance left is that t1 and t2 are ClassTypes.
+       if (!(t1 instanceof ClassType && t2 instanceof ClassType))
+         return null;
+       ClassType c1 = (ClassType) t1;
+       ClassType c2 = (ClassType) t2;
+       if (c1.isInterface())
+         return Type.pointer_type;
+       if (c2.isInterface())
+         return Type.pointer_type;
+
+       return lowestCommonSuperType(c1.getSuperclass(), c2.getSuperclass());
+      }
   }
 
   /** Return a numeric code showing "subtype" relationship:

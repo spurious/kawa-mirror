@@ -1,3 +1,15 @@
+2000-01-19  Daniel Bonniot  <d.bonniot@mail.dotcom.fr>
+
+        * CodeAttr.java (emitConvert):  Ensured that conversion from a
+        primitive type to itself always succeeds, and that no code is
+        generated.
+
+	* Type.java (lowestCommonSuperType): New method.
+
+	* Type.java (make):  Set INTERFACE flag if appropriate.
+
+	* gnu/bytecode/ClassType.java (getInterfaces):  Get from reflectClass.
+
 2000-01-22  Per Bothner  <per@bothner.com>
 
 	* ClassType.java (addField):  Remove redundant setName, type setting.

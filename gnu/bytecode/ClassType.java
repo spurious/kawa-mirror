@@ -123,9 +123,20 @@ public class ClassType extends ObjectType implements AttrContainer {
           superClass = (ClassType) make(superReflectClass);
       }
     return superClass;
- }
+  }
 
-  public ClassType[] getInterfaces() { return interfaces; }
+  public ClassType[] getInterfaces()
+  {
+    if (superClass == null && reflectClass != null)
+      {
+	Class[] javaItfs = reflectClass.getInterfaces();
+	interfaces = new ClassType[javaItfs.length];
+
+	for (int i=0; i<javaItfs.length; i++)
+	interfaces[i] = (ClassType) Type.make(javaItfs[i]);
+      }
+    return interfaces;
+  }
 
   public String getNameOrSignature() { return getName(); }
 

@@ -111,9 +111,11 @@ JAR = jar
 @WITH_SWING_TRUE@  ./gnu/jemacs/lang/scm-classes.stamp \
 @WITH_SWING_TRUE@  ./gnu/jemacs/lisp/elisp-classes.stamp
 @ENABLE_XML_TRUE@JAR_DEPS_XML = @ENABLE_XML_TRUE@./gnu/xml/java-classes.stamp \
-@ENABLE_XML_TRUE@  ./gnu/xquery/lang/java-classes.stamp
+@ENABLE_XML_TRUE@  ./gnu/xquery/lang/java-classes.stamp \
+@ENABLE_XML_TRUE@  ./gnu/xquery/util/java-classes.stamp
+@ENABLE_SERVLET_TRUE@JAR_DEPS_SERVLET = @ENABLE_SERVLET_TRUE@./gnu/kawa/servlet/java-classes.stamp
 
-JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) \
+JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) $(JAR_DEPS_SERVLET) \
   ./gnu/bytecode/java-classes.stamp \
   ./gnu/math/java-classes.stamp \
   ./gnu/lists/java-classes.stamp \

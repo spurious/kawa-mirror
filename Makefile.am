@@ -22,10 +22,14 @@ JAR_DEPS_SWING = \
 endif
 if ENABLE_XML
 JAR_DEPS_XML = ./gnu/xml/java-classes.stamp \
-  ./gnu/xquery/lang/java-classes.stamp
+  ./gnu/xquery/lang/java-classes.stamp \
+  ./gnu/xquery/util/java-classes.stamp
+endif
+if ENABLE_SERVLET
+JAR_DEPS_SERVLET = ./gnu/kawa/servlet/java-classes.stamp
 endif
 
-JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) \
+JAR_DEPS = $(JAR_DEPS_SWING) $(JAR_DEPS_XML) $(JAR_DEPS_SERVLET) \
   ./gnu/bytecode/java-classes.stamp \
   ./gnu/math/java-classes.stamp \
   ./gnu/lists/java-classes.stamp \

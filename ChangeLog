@@ -1,5 +1,7 @@
 2001-11-24  Per Bothner  <per@bothner.com>
 
+	* Makefile.am:  Add more directories (conditionally) to JAR_DEPS.
+
 	* kawa/standard/convert.java:  Moved to gnu.kawa.functions.Convert.
 	* kawa/standard/Makefile.am:  Update accordingly
 	* kawa/standard/Scheme.java (initScheme):  Likewise.

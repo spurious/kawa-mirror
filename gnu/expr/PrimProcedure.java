@@ -20,6 +20,8 @@ public class PrimProcedure extends ProcedureN implements gnu.expr.Inlineable
 
   public Type getReturnType () { return retType; }
 
+  public Type getReturnType (Expression[] args) { return retType; }
+
   public int numArgs()
   {
     int num = argTypes.length;

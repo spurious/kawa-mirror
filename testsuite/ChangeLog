@@ -1,3 +1,7 @@
+2003-08-01  Per Bothner  <per@bothner.com>
+
+	* HelloCgiX.xql:  Add now-needed xmlspace declaration.
+
 2003-07-22  Chris Dean  <Chris.Dean@sokitomi.com>
 
 	* misc-test.scm: Test for Savannah bug #4423.

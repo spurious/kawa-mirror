@@ -9,8 +9,19 @@ public class open_output_file extends Procedure1
     String fname = arg1.toString();
 
     try {
-      java.io.Writer os = new java.io.FileWriter(fname);
-      return new OutPort(os, fname);
+      Object conv = Environment.user().get("port-char-encoding");
+      java.io.OutputStream strm = new java.io.FileOutputStream(fname);
+      strm = new java.io.BufferedOutputStream(strm);
+      java.io.Writer wr;
+      if (conv == null || conv == Boolean.TRUE)
+	wr = new java.io.OutputStreamWriter(strm);
+      else
+	{
+	  if (conv == Boolean.FALSE)
+	    conv = "8859_1";
+	  wr = new java.io.OutputStreamWriter(strm, conv.toString());
+	}
+      return new OutPort(wr, fname);
     } catch (java.io.IOException e) {
       throw new GenericError(e.getMessage());
     }

@@ -45,6 +45,7 @@ public class Scheme extends Interpreter
   static Environment null_environment;
   static Environment r4_environment;
   static Environment r5_environment;
+  static Environment kawa_environment;
   static Environment user_environment;
 
   public static Syntax beginSyntax;
@@ -58,7 +59,7 @@ public class Scheme extends Interpreter
     return user_environment;
   }
 
-  public Scheme ()
+  public void initScheme ()
   {
       kawa.lang.Named proc;
       kawa.lang.Named syn;
@@ -345,11 +346,13 @@ public class Scheme extends Interpreter
       define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
       define_proc ("set-input-port-line-number!", "kawa.lib.ports");
       define_proc ("input-port-column-number", "kawa.lib.ports");
+      define_proc ("input-port-read-state", "kawa.lib.ports");
       define_proc ("default-prompter", "kawa.lib.ports");
       define_proc ("input-port-prompter", "kawa.lib.ports");
       define_proc ("set-input-port-prompter!", "kawa.lib.ports");
       define_proc ("transcript-off", "kawa.lib.ports");
       define_proc ("transcript-on", "kawa.lib.ports");
+      define_proc ("copy-file", "kawa.lib.ports");
 
       define_syntax ("%syntax-error", "kawa.standard.syntax_error");
 
@@ -364,9 +367,9 @@ public class Scheme extends Interpreter
       define_proc ("interaction-environment", "kawa.standard.user_env");
       define_proc ("dynamic-wind", "kawa.lib.syntax");
 
-      user_environment = new Environment (r5_environment);
-      user_environment.setName ("interaction-environment");
-      env = user_environment;
+      kawa_environment = new Environment (r5_environment);
+      env = kawa_environment;
+
       define_proc ("exit", "kawa.lib.thread");
 
       String sym = "arithmetic-shift";
@@ -398,6 +401,7 @@ public class Scheme extends Interpreter
       define_proc("delete-file", "kawa.lib.files");
       define_proc("rename-file", "kawa.lib.files");
       define_proc("create-directory", "kawa.lib.files");
+      define("port-char-encoding", Boolean.TRUE);
       
       // JDK 1.1 only:
       define_proc ("record-accessor", "kawa.lib.reflection");
@@ -435,7 +439,21 @@ public class Scheme extends Interpreter
       define_proc ("keyword?", "kawa.lib.keywords");
       define_proc ("keyword->string", "kawa.lib.keywords");
       define_proc ("string->keyword", "kawa.lib.keywords");
-   }
+  }
+
+  public Scheme ()
+  {
+    if (kawa_environment == null)
+      initScheme();
+    user_environment = new Environment (kawa_environment);
+    user_environment.setName ("interaction-environment");
+    env = environ = user_environment;
+  }
+
+  public Scheme (Environment environ)
+  {
+    this.environ = environ;
+  }
 
   /** Evalutate Scheme expressions from string.
    * @param string the string constaining Scheme expressions
@@ -445,6 +463,12 @@ public class Scheme extends Interpreter
        throws WrongArguments, WrongType, GenericError, UnboundSymbol
   {
     return eval (call_with_input_string.open_input_string (string), env);
+  }
+
+  public Object eval (String string)
+       throws WrongArguments, WrongType, GenericError, UnboundSymbol
+  {
+    return eval(string, environ);
   }
 
   /** Evalutate Scheme expressions from stream.
@@ -466,6 +490,33 @@ public class Scheme extends Interpreter
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {
     return Eval.eval (sexpr, env);
+  }
+
+  public Object read (InPort in)
+    throws java.io.IOException, kawa.lang.ReadError
+  {
+    return in.readSchemeObject();
+  }
+
+  public void print (Object value, OutPort out)
+  {
+    if (value == Scheme.voidObject)
+      return;
+    if (value instanceof Values)
+      {
+	Object[] values = ((Values) value).values();
+	for (int i = 0;  i < values.length;  i++)
+	  {
+	    SFormat.print (values[i], out);
+	    out.println();
+	  }
+      }
+    else
+      {
+	SFormat.print (value, out);
+	out.println();
+      }
+    out.flush();
   }
 
 }

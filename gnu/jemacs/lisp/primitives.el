@@ -1,6 +1,9 @@
 (defun integerp (object)
   (typep object 'integer))
 
+(defun listp (object)
+  (typep object 'list))
+
 (defun characterp (object)
   (typep object 'character))
 

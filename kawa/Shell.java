@@ -129,8 +129,7 @@ public class Shell extends Procedure0
 
   public static void runString (String str, Interpreter interp)
   {
-    InPort str_port = call_with_input_string.open_input_string (str);
-    run (interp, str_port, null, OutPort.errDefault());
+    run (interp, new CharArrayInPort(str), null, OutPort.errDefault());
   }
 
   public static void runFile (String fname)

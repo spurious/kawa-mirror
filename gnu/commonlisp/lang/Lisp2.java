@@ -7,11 +7,11 @@ import gnu.lists.*;
 import gnu.mapping.*;
 import gnu.bytecode.CodeAttr;
 import gnu.bytecode.ClassType;
-import gnu.kawa.lispexpr.LispInterpreter;
+import gnu.kawa.lispexpr.LispLanguage;
 
 /** Abstract class for Lisp-like languages with separate namespaces. */
 
-public abstract class Lisp2 extends LispInterpreter
+public abstract class Lisp2 extends LispLanguage
 {
   public static final LList FALSE = LList.Empty;
   public static Symbol TRUE;
@@ -76,6 +76,13 @@ public abstract class Lisp2 extends LispInterpreter
       return FALSE;
     return Environment.getCurrent().getSymbol(name);
     //return name;
+  }
+
+  protected Symbol fromLangSymbol (Object obj)
+  {
+    if (obj == LList.Empty)
+      return environ.getSymbol("nil");
+    return super.fromLangSymbol(obj);
   }
 
   /** Get a string for a given Java string. */

@@ -241,10 +241,11 @@ public class TestMisc
     evalTest("declare function x(){<a><b x='1'/><b x='2'/></a>};"
 	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
 	     " x=\"1\" x=\"2\"");
-    evalTest("declare function s(){ <a x='10'>{for $n in (<a x='2'/>) return ($n) }</a>};"
-	     + " let $st := s()/a return ("
+
+    evalTest("declare function s(){ <a x='10'>{for $n in (<b x='2'/>) return ($n) }</a>};"
+	     + " let $st := s()/b return ("
 	     + " '[',$st/@x ,'] [',$st ,']')",
-	     "[ x=\"2\"] [<a x=\"2\" />]");
+	     "[ x=\"2\"] [<b x=\"2\" />]");
 
     // Testcase from <Seshukumar_Adiraju@infosys.com>:
     evalTest("let $books := "
@@ -454,46 +455,29 @@ public class TestMisc
   {
     CharArrayOutPort out = new CharArrayOutPort();
     InPort in = new CharArrayInPort(expr);
-    OutPort err = OutPort.errDefault();
     SourceMessages messages = new SourceMessages();
-    Lexer lexer = interp.getLexer(in, messages);
-    CallContext ctx = CallContext.getInstance();
-    ctx.consumer = interp.getOutputConsumer(out);
 
-    for (;;)
+    Compilation comp = interp.parseFile(in, true, messages);
+    SourceError firstError = messages.getErrors();
+    if (firstError != null)
+      return "*** syntax error - " + firstError;
+
+    CallContext ctx = CallContext.getInstance();
+    gnu.lists.Consumer save = ctx.consumer;
+
+    try
       {
-	Compilation comp = interp.parse(env, lexer);
-	if (comp == null)
-	  break; // return "*** end-of-file ***";
+	ctx.consumer = interp.getOutputConsumer(out);
 	ModuleExp mod = comp.getModule();
 	mod.setName("atInteractiveLevel");  // FIXME
 	ModuleExp.evalModule(env, ctx, comp);
-	SourceError firstError = messages.getErrors();
-	if (firstError != null)
-	  return "*** syntax error - " + firstError;
-
-	/*
-	int ch;
-	for (;;)
-	  {
-	    ch = in.read();
-	    if (ch < 0 || ch == '\r' || ch == '\n')
-	      break;
-	    if (ch != ' ' && ch != '\t')
-	      {
-		in.unread();
-		break;
-	      }
-	  }
-	*/
-
-	ctx.runUntilDone();
       }
-    /*
-    if (ch >= 0)
-      return "*** junk at end of input ***";
-    */
+    finally
+      {
+	ctx.consumer = save;
+      }
 
     return new String(out.toCharArray());
   }
+
 }

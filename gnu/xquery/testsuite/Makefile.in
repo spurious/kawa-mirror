@@ -204,7 +204,7 @@ EXTRA_CLEAN = tmp* *.log testing.zip *.class
 
 java_sources = TestMisc.java TestSuite.java
 
-EXTRA_DIST = tab.xml.in maketab1.xql tab.html \
+EXTRA_DIST = tab.xml.in maketab1.xql tab.html usemod.exp \
   multab.xql expectedmul.xml descend.xql expdescend.xml \
   bib.xml.in use-cases.xml book1.xml.in reviews.xml.in report1.xml.in \
   bids.xml.in users.xml.in items.xml.in format-users.xsl exp-format-users.html
@@ -440,8 +440,20 @@ check-format-users:
 	  |sed 's/^ *//'>tmp-format-users.html
 	@if diff -b -B $(srcdir)/exp-format-users.html tmp-format-users.html; then echo '#  format-users test passes'; else echo FAIL format-users test; fi
 
+./Mod1.class: mod1.xql
+	$(KAWA) --module-static -d ../../.. -C $<
+./Mod2.class: mod2.xql
+	$(KAWA) -d ../../.. -C $<
+usemod.class: usemod.xql ./Mod1.class ./Mod2.class
+	$(KAWA) --main -C $<
+check-mod: usemod.class
+	CLASSPATH=.:$(KAWALIB) $(JAVA) usemod >tmp-usemod
+	@if diff -b $(srcdir)/usemod.exp tmp-usemod; \
+	  then echo '# usemod test passes'; \
+	  else echo FAIL usemod test; fi
+
 check:  check-misc check-suite check-maketab1 check-multab check-descend \
-	  check-format-users
+	  check-format-users check-mod
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

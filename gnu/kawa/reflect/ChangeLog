@@ -1,3 +1,8 @@
+2003-09-30  Per Bothner  <per@bothner.com>
+
+	* ClassMemberConstraint.java (get):  Inline the 'setup' method,
+	but return defaultValue instead of throwing UnboundSymbol.
+
 2003-08-09  Per Bothner  <per@bothner.com>
 
 	* ClassMemberConstraint.java (define):  Demangle field name

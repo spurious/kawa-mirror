@@ -74,7 +74,26 @@ public class ClassMemberConstraint extends Constraint
 
   public Object get (Symbol symbol, Object defaultValue)
   {
-    setup(symbol);
+    if (rfield == null)
+      {
+	Class clas;
+	try
+	  {
+	    clas = type.getReflectClass();
+	  }
+	catch (RuntimeException ex)
+	  {
+	    return defaultValue;
+	  }
+        try
+          {
+            rfield = clas.getField(name);
+          }
+        catch (java.lang.NoSuchFieldException ex)
+          {
+	    return defaultValue;
+          }
+      }
     try
       {
         return rfield.get(getValue(symbol));

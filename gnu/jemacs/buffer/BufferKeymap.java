@@ -19,7 +19,10 @@ import kawa.lang.Sequence;
 public class BufferKeymap implements javax.swing.text.Keymap
 {
   Buffer buffer;
-  static Keymap globalKeymap = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
+  static Keymap defaultKeymap
+    = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP);
+  static Keymap globalKeymap
+    = JTextComponent.addKeymap("global", defaultKeymap);
   static
   {
     globalKeymap.setDefaultAction(new InsertAction(null)) ;

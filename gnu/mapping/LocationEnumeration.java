@@ -5,9 +5,9 @@ package gnu.mapping;
 
 public class LocationEnumeration
   implements
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   java.util.Iterator,
-  /* END JAVA2 */
+  /* #endif */
   java.util.Enumeration
 {
   Environment env;

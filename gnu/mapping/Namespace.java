@@ -265,15 +265,15 @@ public class Namespace
  * even though they're referenced from a <code>Namespace</code>. */
 
 class SymbolRef
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   extends java.lang.ref.WeakReference
-  /* END JAVA2 */
+  /* #endif */
 {
   SymbolRef next;
 
-  /* BEGIN JAVA1 */
+  /* #ifndef JAVA2 */
   // Symbol sym;
-  /* END JAVA1 */
+  /* #endif */
 
   /*
   String getName ()
@@ -285,22 +285,22 @@ class SymbolRef
 
   SymbolRef (Symbol sym, Namespace ns)
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     super(sym);
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // this.sym = sym;
-    /* END JAVA1 */
+    /* #endif */
   }
 
   Symbol getSymbol()
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     return (Symbol) get();
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // return sym;
-    /* END JAVA1 */
+    /* #endif */
   }
 
   public String toString()

@@ -1,3 +1,9 @@
+2005-01-02  Per Bothner  <per@bothner.com>
+
+	* CallContext.java, LocationEnumeration.java, NamedLocation.java,
+	Namespace.java, SimpleEnvironment.java, Symbol.java:
+	Change "select" (preprocessor) syntax.
+
 2004-12-29  Per Bothner  <per@bothner.com>
 
 	* IndirectableLocation.java: Changed to inherit directly from

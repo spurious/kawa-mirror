@@ -15,9 +15,9 @@ import java.io.*;
 public class Symbol
   implements
   EnvironmentKey,
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   Comparable,
-  /* END JAVA2 */
+  /* #endif */
   Externalizable
 {
   static int counter;

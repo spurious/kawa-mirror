@@ -16,9 +16,9 @@ public class SimpleEnvironment extends Environment
   int num_bindings;
   int currentTimestamp;
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   java.lang.ref.ReferenceQueue queue = new java.lang.ref.ReferenceQueue();
-  /* END JAVA2 */
+  /* #endif */
 
   /** Size does not include inherited Locations. */
   public int size () { return num_bindings; }
@@ -369,15 +369,15 @@ public class SimpleEnvironment extends Environment
       }
   }
 
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   public java.util.Set entrySet ()
   {
     return new EnvironmentMappings(this);
   }
-  /* END JAVA2 */
+  /* #endif */
 }
 
-/* BEGIN JAVA2 */
+/* #ifdef JAVA2 */
 class EnvironmentMappings
   extends java.util.AbstractSet /* <Location> */
 {
@@ -392,4 +392,4 @@ class EnvironmentMappings
     return new LocationEnumeration(env);
   }
 }
-/* END JAVA2 */
+/* #endif */

@@ -10,12 +10,12 @@ import gnu.lists.*;
 public class CallContext // implements Runnable
     // extends ValueStack ??? FIXME
 {
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   static ThreadLocal currentContext = new ThreadLocal();
-  /* END JAVA2 */
-  /* BEGIN JAVA1 */
+  /* #endif */
+  /* #ifndef JAVA2 */
   // static java.util.Hashtable threadMap = new java.util.Hashtable(50);
-  /* END JAVA1 */
+  /* #endif */
   Thread currentThread;
 
   Environment curEnvironment;
@@ -29,29 +29,29 @@ public class CallContext // implements Runnable
   {
     Thread thread = Thread.currentThread();
     ctx.currentThread = thread; 
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     currentContext.set(ctx);
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // if (thread instanceof Future)
     //   ((Future) thread).context = ctx;
     // else
     //   threadMap.put(thread, ctx);
-    /* END JAVA1 */
+    /* #endif */
   }
 
   /** Get but don't create a CallContext for the current thread. */
   public static CallContext getOnlyInstance()
   {
-    /* BEGIN JAVA2 */
+    /* #ifdef JAVA2 */
     return (CallContext) currentContext.get();
-    /* END JAVA2 */
-    /* BEGIN JAVA1 */
+    /* #endif */
+    /* #ifndef JAVA2 */
     // Thread thread = Thread.currentThread();
     // if (thread instanceof Future)
     //   return ((Future) thread).getCallContext();
     // return (CallContext) threadMap.get(thread);
-    /* END JAVA1 */
+    /* #endif */
   }
 
   /** Get or create a CallContext for the current thread. */

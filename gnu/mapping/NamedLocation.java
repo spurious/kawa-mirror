@@ -8,9 +8,9 @@ import gnu.lists.*;
 
 public abstract class NamedLocation extends IndirectableLocation
   implements
-  /* BEGIN JAVA2 */
+  /* #ifdef JAVA2 */
   java.util.Map.Entry /* <EnvironmentKey, Object> */,
-  /* END JAVA2 */
+  /* #endif */
   EnvironmentKey
 {
   NamedLocation next;

@@ -1,3 +1,11 @@
+2003-08-20  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Quantities):  Document extended definition of
+	quotient, remainder, and modulo.
+
+	* kawa.texi (Standard Types):  Note that <rational> and <integer>
+	are exact.
+
 2003-08-03  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Standard Types):  Add note about #f and #t representation.

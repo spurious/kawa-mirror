@@ -1137,7 +1137,7 @@ find that library.
 * Special named constants::
 * Keywords::
 * Procedures::
-* Quantities::
+* Quantities::  Quantities and Numbers
 * Logical Number Operations::
 * Lists::
 * Strings::
@@ -1641,7 +1641,7 @@ evaluate it during every invocation of the resulting procedure.
 @end deffn
 
 @node Quantities, Logical Number Operations, Procedures, Extensions
-@section Quantities
+@section Quantities and Numbers
 
 As a super-class of numbers, Kawa also provides quantities.
 A @dfn{quantity} is a product of a @dfn{unit} and a pure number.
@@ -1697,6 +1697,28 @@ equal to the quantity @var{expression}.
 (define-unit cent 0.01dollar)
 @end example
 @end deffn
+
+@defun quotient x y
+Generalized to arbitrary real numbers, using the definition:
+@code{(truncate (/ x y))}.
+@end defun
+
+@defun remainder x y
+Generalized to arbitrary real numbers, using the definition:
+@code{(- x (* y (truncate (/ x y))))}.
+If @code{y} is @code{0}, the result is @code{x} - i.e. we take
+@code{(* 0 (quotient x 0))} to be @code{0}.
+The result is inexact if either argument is inexact,
+even if @code{x} is exact and @code{y} is 0.
+@end defun
+
+@defun modulo x y
+Generalized to arbitrary real numbers, using the definition:
+@code{(- x (* y (floor (/ x y))))}.
+If @code{y} is @code{0}, the result is @code{x}.
+The result is inexact if either argument is inexact,
+even if @code{x} is exact and @code{y} is 0.
+@end defun
 
 @node Logical Number Operations, Lists, Quantities, Extensions
 @section Logical Number Operations
@@ -3310,12 +3332,12 @@ This is a sub-type of @code{<complex>}.
 @end defvar
 
 @defvar <rational>
-The type of complex numbers.
+The type of exact rationl numbers.
 This is a sub-type of @code{<real>}.
 @end defvar
 
 @defvar <integer>
-The type of Scheme integers.
+The type of exact Scheme integers.
 This is a sub-type of @code{<rational>}.
 @end defvar
 

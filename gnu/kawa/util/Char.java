@@ -26,10 +26,15 @@ import gnu.expr.*;
  * Finally, we can use 32-bit character values to allow for non-Unicode chars.
  */
 
-public class Char implements Printable, Compilable
+public class Char implements Printable, Compilable, Externalizable
 {
   // Leave open the possibility for characters beyond Unicode.
   int value;
+
+  /** Should only be used for serialization. */
+  public Char ()
+  {
+  }
 
   private Char (char ch)
   {
@@ -186,6 +191,46 @@ public class Char implements Printable, Compilable
       ps.print(toScmReadableString(ch));
     else
       ps.print (ch);
+  }
+
+  /**
+   * @serialData Writes the char value as a char.
+   *   If the value is > 0xFFFF, write a pair of surrogate values.
+   *   If the value is is a high surrogate only, write it followed by '\0'.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    if (value > 0xD800)
+      {
+	if (value > 0xFFFF)
+	  {
+	    out.writeChar(((value - 0x10000) >> 10) + 0xD800);
+	    value = (value & 0x3FF) + 0xDC00;
+	  }
+	else if (value <= 0xDBFF)
+	  {
+	    out.writeChar(value);
+	    value = '\0';
+	  }
+      }
+    out.writeChar(value);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    value = in.readChar();
+    if (value >= 0xD800 && value < 0xDBFF)
+      {
+	char next = in.readChar();
+	if (next >= 0xDC00 && next <= 0xDFFF)
+	  value = ((value - 0xD800) << 10) + (next - 0xDC00) + 0x10000;
+      }
+  }
+
+  public Char readResolve() throws ObjectStreamException
+  {
+    return make(value);
   }
 
   static public ClassType scmCharType;

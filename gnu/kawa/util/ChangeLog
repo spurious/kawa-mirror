@@ -1,3 +1,12 @@
+2000-05-09  Per Bothner  <per@bothner.com>
+
+	* FString.java:  Make implement java.io.Externalizable/
+	(writeExternal, readExternal, default constructor):  Added new methods.
+	* FVector.java:  Likewise.
+	* Pair.java:  Likewise.
+	* Char.java:  Likewise.  Also add readResolve method.
+	* LList.java:  Likewise.
+
 2000-04-21  Per Bothner  <per@bothner.com>
 
 	* AbstractString.java (insert):  Use RuntimeException instead of

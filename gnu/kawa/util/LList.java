@@ -3,6 +3,7 @@ import java.io.PrintWriter;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
 /**
  * Semi-abstract class for Scheme lists.
@@ -10,9 +11,10 @@ import gnu.expr.*;
  * @author	Per Bothner
  */
 
-public class LList extends Sequence implements Printable, Compilable
+public class LList extends Sequence implements Printable, Compilable, Externalizable
 {
-  protected LList () { }
+  /** Do not use - only public for serialization! */
+  public LList () { }
 
   static public final LList Empty = new LList ();
 
@@ -132,6 +134,24 @@ public class LList extends Sequence implements Printable, Compilable
 	list = pair.cdr;
       }
     return new FVector (values);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+  }
+
+  /**
+   * @serialData Write nothing.
+   *  (Don't need to write anything.)
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+  }
+
+  public LList readResolve() throws ObjectStreamException
+  {
+    return Empty;
   }
 
   static private Field nullConstant = null;

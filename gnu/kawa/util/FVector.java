@@ -1,4 +1,5 @@
 package gnu.kawa.util;
+import java.io.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
@@ -6,11 +7,15 @@ import gnu.bytecode.Type;
 import gnu.mapping.*;
 import gnu.expr.*;
 
-public class FVector extends UniformVector implements Printable, Compilable
+public class FVector extends UniformVector implements Printable, Compilable, Externalizable
 {
   public String getTag() { return ""; }
 
   Object[] value;
+
+  public FVector ()
+  {
+  }
 
   public FVector (int num, Object o)
   {
@@ -120,5 +125,29 @@ public class FVector extends UniformVector implements Printable, Compilable
 	SFormat.print (value[t], ps);
       }
     ps.print(")");
+  }
+
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the elements in order (written using writeObject).
+   *   (It might seem simpler (and increase sharing) to just call
+   *   writeObject(value), but that exposes the implementation.)
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = value.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeObject(value[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    Object[] value = new Object[len];
+    for (int i = 0;  i < len;  i++)
+      value[i] = in.readObject();
+    this.value = value;
   }
 }

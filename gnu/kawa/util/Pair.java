@@ -2,10 +2,11 @@ package gnu.kawa.util;
 import gnu.bytecode.*;
 import gnu.mapping.*;
 import gnu.expr.*;
+import java.io.*;
 
 import java.io.PrintWriter;
 
-public class Pair extends LList implements Printable, Compilable
+public class Pair extends LList implements Printable, Compilable, Externalizable
 {
    public Object car;
    public Object cdr;
@@ -14,6 +15,10 @@ public class Pair extends LList implements Printable, Compilable
   {
     car = carval;
     cdr = cdrval;
+  }
+
+  public Pair ()
+  {
   }
 
   public void print(java.io.PrintWriter ps)
@@ -253,5 +258,21 @@ public class Pair extends LList implements Printable, Compilable
     if (len < alen)
       arr[len] = null;
     return arr;
+  }
+
+  /**
+   * @serialData Write the car followed by the cdr.
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeObject(car);
+    out.writeObject(cdr);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    car = in.readObject();
+    cdr = in.readObject();
   }
 };

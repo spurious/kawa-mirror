@@ -1,4 +1,5 @@
 package gnu.kawa.util;
+import java.io.*;
 import gnu.bytecode.Method;
 import gnu.bytecode.ClassType;
 import gnu.bytecode.Access;
@@ -12,10 +13,14 @@ import gnu.expr.*;
  * @author Per Bothner
  */
 
-public class FString extends AbstractString implements Printable, Compilable
+public class FString extends AbstractString implements Printable, Compilable, Externalizable
 {
 
   char[] value;
+
+  public FString ()
+  {
+  }
 
   public FString (int num)
   {
@@ -224,4 +229,25 @@ public class FString extends AbstractString implements Printable, Compilable
   public InPort open ()
   { return new CharArrayInPort(value, value.length); }
 
+  /**
+   * @serialData Write the length (using writeInt), followed by
+   *   the elements in order (written using writeChar).
+   */
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    int len = value.length;
+    out.writeInt(len);
+    for (int i = 0;  i < len;  i++)
+      out.writeChar(value[i]);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    int len = in.readInt();
+    char[] value = new char[len];
+    for (int i = 0;  i < len;  i++)
+      value[i] = in.readChar();
+    this.value = value;
+  }
 }

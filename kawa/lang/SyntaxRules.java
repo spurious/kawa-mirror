@@ -57,51 +57,73 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	if (! (syntax_rule instanceof Pair))
 	  {
 	    interp.syntaxError ("missing pattern in " + i + "'th syntax rule");
-	    continue;
+	    return;
 	  }
 	Pair syntax_rule_pair = (Pair) syntax_rule;
 	Object pattern = syntax_rule_pair.car;
-	if (! (syntax_rule_pair.cdr instanceof Pair))
+
+	String save_filename = interp.current_filename;
+	int save_line = interp.current_line;
+	int save_column = interp.current_column;
+
+	try
 	  {
-	    interp.syntaxError ("missing template in " + i + "'th syntax rule");
-	    continue;
+	    if (syntax_rule_pair instanceof PairWithPosition)
+	      {
+		PairWithPosition pp = (PairWithPosition) syntax_rule_pair;
+		interp.current_filename = pp.getFile ();
+		interp.current_line = pp.getLine ();
+		interp.current_column = pp.getColumn ();
+	      }
+	    if (! (syntax_rule_pair.cdr instanceof Pair))
+	      {
+		interp.syntaxError ("missing template in " + i + "'th syntax rule");
+		return;
+	      }
+	    syntax_rule_pair = (Pair) syntax_rule_pair.cdr;
+	    if (syntax_rule_pair.cdr != List.Empty)
+	      {
+		interp.syntaxError ("junk after "+i+"'th syntax rule");
+		return;
+	      }
+	    Object template = syntax_rule_pair.car;
+
+	    // For the i'th pattern variable, pattern_names.elementAt(i)
+	    // is the name of the variable, and
+	    // (int) patter_nesting.charAt (i) is the nesting (in terms
+	    // of number of ellipsis that indicate the variable is repeated).
+	    StringBuffer pattern_nesting_buffer = new StringBuffer ();
+	    java.util.Vector pattern_names = new java.util.Vector ();
+	    if (! (pattern instanceof Pair)
+		|| ! (((Pair)pattern).car instanceof Symbol))
+	      {
+		interp.syntaxError ("pattern does not start with name");
+		return;
+	      }
+	    pattern = ((Pair) pattern).cdr;
+
+
+	    Pattern translated_pattern
+	      = translate_pattern (pattern, literal_identifiers,
+				   pattern_names, pattern_nesting_buffer,
+				   0, interp);
+	    String pattern_nesting = pattern_nesting_buffer.toString ();
+
+	    this.rules[i]
+	      = new SyntaxRule (translated_pattern, pattern_nesting,
+				pattern_names, template, interp);
+	    /* DEBUGGING:
+	    System.err.println ("{translated template:");
+	    this.rules[i].print_template_program (System.err);
+	    System.err.println ('}');
+	    */
 	  }
-	syntax_rule_pair = (Pair) syntax_rule_pair.cdr;
-	if (syntax_rule_pair.cdr != List.Empty)
+	finally
 	  {
-	    interp.syntaxError ("junk after " + i + "'th syntax rule");
-	    continue;
+	    interp.current_filename = save_filename;
+	    interp.current_line = save_line;
+	    interp.current_column = save_column;
 	  }
-	Object template = syntax_rule_pair.car;
-
-
-	// For the i'th pattern variable, pattern_names.elementAt(i)
-	// is the name of the variable, and
-	// (int) patter_nesting.charAt (i) is the nesting (in terms
-	// of number of ellipsis that indicate the variable is repeated).
-	StringBuffer pattern_nesting_buffer = new StringBuffer ();
-	java.util.Vector pattern_names = new java.util.Vector ();
-	if (! (pattern instanceof Pair)
-	    || ! (((Pair)pattern).car instanceof Symbol))
-	  interp.syntaxError ("pattern does not start with name");
-	else
-	  pattern = ((Pair) pattern).cdr;
-
-
-	Pattern translated_pattern
-	  = translate_pattern (pattern, literal_identifiers,
-			       pattern_names, pattern_nesting_buffer,
-			       0, interp);
-	String pattern_nesting = pattern_nesting_buffer.toString ();
-
-	this.rules[i] = new SyntaxRule (translated_pattern, pattern_nesting,
-					pattern_names,
-					template, interp);
-	/* DEBUGGING:
-	System.err.println ("{translated template:");
-	this.rules[i].print_template_program (System.err);
-	System.err.println ('}');
-	*/
       }
     calculate_maxVars ();    
   }
@@ -197,7 +219,8 @@ public class SyntaxRules extends Syntax implements Printable, Compilable
 	    return interp.rewrite (expansion);
 	  }
       }
-    return interp.syntaxError ("non-matching macro application");
+    return interp.syntaxError ("no matching syntax-rule for "
+				+ literal_identifiers[0]);
   }
 
   public void print(java.io.PrintStream ps)

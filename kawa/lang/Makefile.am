@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 SUFFIXES = .java .class
 
-JAVAC=javac -classpath ../..:$$CLASSPATH -d @TOP_BUILDDIR@
+JAVAC=javac -classpath @TOP_BUILDDIR@:$$CLASSPATH -d @TOP_BUILDDIR@
 
 .java.class:
 	cd $(srcdir); $(JAVAC) $(<F)
@@ -86,6 +86,7 @@ loadcompiled.class \
 SchemeLoader.class \
 CompiledProc.class \
 Values.class \
+Promise.class \
 $(EXCEPTIONS)
 
 java_DATA=$(OBJ) $(EXCEPTIONS)

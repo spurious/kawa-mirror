@@ -266,13 +266,30 @@ public class Compilation
   /** If non-null: a prefix for generateClassNam to prepend to names. */
   public String classPrefix;
 
+  /** Convert a string to a safe class name. */
+  public static String mangleClassName (String name)
+  {
+    int len = name.length ();
+    StringBuffer mangled = new StringBuffer (len);
+    for (int i = 0;  i < len;  i++)
+      {
+	char ch = name.charAt (i);
+	// This function is probably not quite enough ...
+	// (Note the verifier may be picky about class names.)
+	if (ch == '.' || ch == '/' || ch == '-' || ch == '%')
+	  ch = '_';
+	mangled.append (ch);
+      }
+    return mangled.toString ();
+  }
+
   /** Generate an unused class name.
    * @param hint the requested name (or prefix)
    * @return a unique class name.
    */
   public String generateClassName (String hint)
   {
-    hint = hint.replace ('.', '_').replace ('/', '_');
+    hint = mangleClassName (hint);
     if (classPrefix != null)
       hint = classPrefix + hint;
     if (findNamedClass (hint) == null)

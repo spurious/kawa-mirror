@@ -54,7 +54,7 @@ public class SyntaxRule implements Compilable
     java.util.Vector literals_vector = new java.util.Vector ();
     java.util.Vector template_identifiers = new java.util.Vector ();
     translate_template (template, program, pattern_names,
-			0, literals_vector, template_identifiers, interp);
+			0, literals_vector, template_identifiers, 0, interp);
     this.template_program = program.toString ();
     this.literal_values = new Object[literals_vector.size ()];
     literals_vector.copyInto (this.literal_values);
@@ -86,7 +86,7 @@ public class SyntaxRule implements Compilable
   // Instruction FIRST_LITERALS+2*i pushes literal_values[i].
   final static int FIRST_LITERALS = 6;
 
-  // /* DEBUGGING
+  /* DEBUGGING
   void print_template_program (java.io.PrintStream ps)
   {
     for (int i = 0;  i < template_program.length (); i++)
@@ -119,7 +119,7 @@ public class SyntaxRule implements Compilable
 	  }
       }
   }
-  // */
+  */
 
   /** Recursively translate a syntax-rule template to a template program.
    * @param template the template from the syntax-rule
@@ -127,6 +127,8 @@ public class SyntaxRule implements Compilable
    * @param pattern_names the names of the pattern variables
    * @param nesting the depth of ... we are inside
    * @param literals_vector (output) the literal data in the template
+   * @param quote_nesting if inside a quote: -1; if inside n levels
+   *   of quasiquote: n;  otherwise: 0
    * @param interp  the current interpreter
    */
   public void translate_template (Object template,
@@ -135,6 +137,7 @@ public class SyntaxRule implements Compilable
 				  int nesting,
 				  java.util.Vector literals_vector,
 				  java.util.Vector template_identifiers,
+				  int quote_nesting,
 				  Interpreter interp)
   {
     if (template instanceof Pair)
@@ -148,14 +151,14 @@ public class SyntaxRule implements Compilable
 		translate_template (cdr_pair.cdr, template_program,
 				    pattern_names, nesting,
 				    literals_vector, template_identifiers,
-				    interp);
+				    quote_nesting, interp);
 		template_program.append ((char) START_REPEAT);
 		if (nesting >= max_nesting)
 		  max_nesting = nesting + 1;
 		translate_template (pair.car, template_program,
 				    pattern_names, nesting + 1,
 				    literals_vector, template_identifiers,
-				    interp);
+				    quote_nesting, interp);
 		template_program.append ((char) END_REPEAT);
 		return;
 	      }
@@ -166,20 +169,30 @@ public class SyntaxRule implements Compilable
 	else
 	  {
 	    code = RCONS;
+	    int cdr_quote_nesting = quote_nesting;
+	    if (pair.car == Interpreter.quote_sym)
+	      cdr_quote_nesting = -1;
+	    else if (pair.car == Interpreter.quasiquote_sym
+		     && cdr_quote_nesting >= 0)
+	      cdr_quote_nesting++;
+	    else if ((pair.car == Interpreter.unquote_sym
+		      || pair.car == Interpreter.unquotesplicing_sym)
+		     && cdr_quote_nesting > 0)
+	      cdr_quote_nesting--;
 	    translate_template (pair.cdr, template_program,
 				pattern_names, nesting,
-				literals_vector, template_identifiers, interp);
+				literals_vector, template_identifiers,
+				cdr_quote_nesting, interp);
 	  }
 	translate_template (pair.car, template_program,
 			    pattern_names, nesting,
-			    literals_vector, template_identifiers, interp);
+			    literals_vector, template_identifiers,
+			    quote_nesting, interp);
 	template_program.append ((char) code);
+	return;
       }
-    else if (template instanceof Symbol)
+    if (template instanceof Symbol)
       {
-	if (template == Interpreter.quote_sym
-	    || template == Interpreter.quasiquote_sym)
-	  System.err.println ("warning - use of "+template+" in define-syntax template is not safe");
 	int pattern_var_num = pattern_names.indexOf (template);
 	if (pattern_var_num >= 0)
 	  {
@@ -188,8 +201,14 @@ public class SyntaxRule implements Compilable
 	    // rules like (x (y ...) ...)  => (((x y) ...) ...)
 	    if (pattern_nesting.charAt (pattern_var_num) > nesting)
 	      interp.syntaxError ("inconsistent ... nesting of " + template);
+	    template_program.append ((char) (FIRST_VARS + 2*pattern_var_num));
+	    return;
 	  }
-	else
+	else if (quote_nesting == 0
+		 && template != Interpreter.quote_sym
+		 && template != Interpreter.quasiquote_sym
+		 && template != Interpreter.unquote_sym
+		 && template != Interpreter.unquotesplicing_sym)
 	  {
 	    int identifier_num = template_identifiers.indexOf (template);
 	    if (identifier_num < 0)
@@ -198,19 +217,18 @@ public class SyntaxRule implements Compilable
 		template_identifiers.addElement (template);
 	      }
 	    pattern_var_num = identifier_num + num_variables;
+	    template_program.append ((char) (FIRST_VARS + 2*pattern_var_num));
+	    return;
 	  }
-	template_program.append ((char) (FIRST_VARS + 2*pattern_var_num));
+	// else treated quoted symbol as literal:
       }
-    else
+    int literals_index = literals_vector.indexOf (template);
+    if (literals_index < 0)
       {
-	int literals_index = literals_vector.indexOf (template);
-	if (literals_index < 0)
-	  {
-	    literals_index = literals_vector.size ();
-	    literals_vector.addElement (template);
-	  }
-	template_program.append ((char) (FIRST_LITERALS + 2 * literals_index));
+	literals_index = literals_vector.size ();
+	literals_vector.addElement (template);
       }
+    template_program.append ((char) (FIRST_LITERALS + 2 * literals_index));
   }
 
   public Object execute_template (Object[] vars,

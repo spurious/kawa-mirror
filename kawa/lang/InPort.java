@@ -426,13 +426,12 @@ public class InPort extends FilterInputStream implements Printable
   protected void skipWhitespaceAndComments()
       throws java.io.IOException
   {
-    boolean notAtEnd = true;
     int c;
     do
       {
 	c = readChar ();
 	if (c < 0)
-	  break;
+	  return;
 	if (c == ';')
 	  {
 	    for (;;)
@@ -469,6 +468,8 @@ public class InPort extends FilterInputStream implements Printable
     skipWhitespaceAndComments();
 
     c = readChar ();
+    if (c < 0)
+      throw new EofReadError (this, "unexpected EOF in list");
     if (c != ')')
       {
 	int next;

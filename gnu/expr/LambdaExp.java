@@ -811,6 +811,7 @@ public class LambdaExp extends ScopeExp
 		|| child.isHandlingTailCalls())
 	      {
 		child.argsArray = new Variable("argsArray", comp.objArrayType);
+		child.firstArgsArrayArg = child.firstDecl();
 	      }
 	  }
 	else if (! child.getInlineOnly())

@@ -1,6 +1,7 @@
 package gnu.expr;
 import java.io.*;
 import java.util.zip.*;
+// import java.util.jar.*; // Java2
 import gnu.mapping.*;
 import gnu.bytecode.*;
 
@@ -85,16 +86,31 @@ public class ModuleExp extends LambdaExp
   public void compileToArchive (String fname)
     throws java.io.IOException
   {
-    if (! fname.endsWith(".zip") && ! fname.endsWith(".jar"))
-      fname = fname + ".zip";
+    boolean makeJar = false;
+    if (fname.endsWith(".zip"))
+      makeJar = false;
+    else if (fname.endsWith(".jar"))
+      makeJar = true;
+    else
+      {
+	fname = fname + ".zip";
+	makeJar = false;
+      }
     Compilation comp = new Compilation(this, LambdaExp.fileFunctionName,
 				       null, false);
     File zar_file = new File (fname);
     if (zar_file.exists ())
       zar_file.delete ();
-    ZipOutputStream zout
-	= new ZipOutputStream (new FileOutputStream (zar_file));
-    zout.setMethod(zout.STORED); // no compression
+    ZipOutputStream zout;
+    /* Java2:
+    if (makeJar)
+      zout = new JarOutputStream (new FileOutputStream (zar_file));
+    else
+    */
+      {
+	zout = new ZipOutputStream (new FileOutputStream (zar_file));
+	zout.setMethod(zout.STORED); // no compression
+      }
 
     byte[][] classes = new byte[comp.numClasses][];
     CRC32 zcrc = new CRC32();

@@ -1,3 +1,8 @@
+2000-02-29  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (allocChildClasses):  Set firstArgsArrayArg for
+	child when isClassGenerated().  Fixes bug reported by Bruce R. Lewis.
+
 2000-02-27  Per Bothner  <per@bothner.com>
 
 	Various tweaks for better javadoc processing.

@@ -84,7 +84,7 @@ public class Scheme extends Interpreter
       // Section 4.2  -- complete
       define_syntax ("cond", "kawa.lib.std_syntax");
       define_syntax ("case", "kawa.lib.std_syntax");
-      define ("and", new kawa.standard.and_or (true));
+      define_syntax ("and", "kawa.lib.std_syntax");
       define ("or", new kawa.standard.and_or (false));
       define_syntax ("%let", "kawa.standard.let");
       define_syntax ("let", "kawa.lib.std_syntax");
@@ -108,7 +108,7 @@ public class Scheme extends Interpreter
       environ = r4_environment;
 
       //-- Section 6.1  -- complete
-      define_proc ("not", "kawa.standard.not");
+      define_proc ("not", new kawa.standard.not());
       define_proc ("boolean?", "kawa.standard.boolean_p");
 
       //-- Section 6.2  -- complete
@@ -346,6 +346,9 @@ public class Scheme extends Interpreter
 		   "kawa.standard.call_with_output_string");
       define_proc ("force-output", "kawa.lib.ports");  // Extension
 
+      define_proc ("port-line", "kawa.lib.ports");
+      define_proc ("set-port-line!", "kawa.lib.ports");
+      define_proc ("port-column", "kawa.lib.ports");
       define_proc ("input-port-line-number", "kawa.lib.ports");  // Extension
       define_proc ("set-input-port-line-number!", "kawa.lib.ports");
       define_proc ("input-port-column-number", "kawa.lib.ports");

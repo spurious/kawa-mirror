@@ -3,6 +3,7 @@ import kawa.lang.*;
 
 /**
  * The Syntax transformer that re-writes the Scheme "and" and "or" primitives.
+ * (Now only used for "or".)
  * @author	Per Bothner
  */
 

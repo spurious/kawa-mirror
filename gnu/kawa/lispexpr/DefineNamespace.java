@@ -17,7 +17,7 @@ public class DefineNamespace extends Syntax
 	tr.error('e', "invalid syntax for define-alias");
 	return false;
       }
-    String name = (Interpreter.NAMESPACE_PREFIX + p1.car).intern();
+    String name = (Language.NAMESPACE_PREFIX + p1.car).intern();
     Declaration decl = defs.getDefine(name, 'w', tr);
     tr.push(decl);
     decl.setFlag(Declaration.IS_CONSTANT);

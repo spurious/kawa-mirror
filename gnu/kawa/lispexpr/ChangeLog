@@ -1,3 +1,8 @@
+2005-03-07  Per Bothner  <per@bothner.com>
+
+	* DefineNamespace.java: Update Interpreter -> Language.
+	* LangPrimType.java: Likewise.
+
 2005-03-06  Per Bothner  <per@bothner.com>
 
 	* DefineNamespace.java: Moved here from gnu.kawa.xml.

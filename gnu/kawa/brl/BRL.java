@@ -27,7 +27,7 @@ public class BRL extends Scheme
       }
   }
 
-  public static Interpreter getInstance(boolean brlCompatible)
+  public static Language getInstance(boolean brlCompatible)
   {
     if (instance == null)
       new BRL ();

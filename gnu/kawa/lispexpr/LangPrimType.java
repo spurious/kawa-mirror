@@ -9,7 +9,7 @@ import gnu.text.Char;
 
 public class LangPrimType extends PrimType implements TypeValue
 {
-  Interpreter interpreter;
+  Language language;
   PrimType implementationType;
 
   public static final LangPrimType byteType
@@ -35,10 +35,10 @@ public class LangPrimType extends PrimType implements TypeValue
     implementationType = type;
   }
 
-  public LangPrimType (PrimType type, Interpreter interpreter)
+  public LangPrimType (PrimType type, Language language)
   {
     super(type);
-    this.interpreter = interpreter;
+    this.language = language;
     implementationType = type;
   }
 
@@ -48,11 +48,11 @@ public class LangPrimType extends PrimType implements TypeValue
   }
 
   public LangPrimType (String nam, String sig, int siz, Class reflectClass,
-		      Interpreter interpreter)
+		      Language language)
   {
     this(nam, sig, siz, reflectClass);
     implementationType = Type.signatureToPrimitive(sig.charAt(0));
-    this.interpreter = interpreter;
+    this.language = language;
   }
 
   public Type getImplementationType()
@@ -68,7 +68,7 @@ public class LangPrimType extends PrimType implements TypeValue
     switch (sig1)
       {
       case 'Z':
-	return interpreter.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
+	return language.isTrue(obj) ? Boolean.TRUE : Boolean.FALSE;
       case 'C':
 	return new Character(((Char) obj).charValue());
       }
@@ -106,7 +106,7 @@ public class LangPrimType extends PrimType implements TypeValue
     switch (sig1)
       {
       case 'Z':
-	interpreter.emitCoerceToBoolean(code);
+	language.emitCoerceToBoolean(code);
 	break;
       case 'C':
 	// We handle char specially, because Kawa does not use standard
@@ -127,7 +127,7 @@ public class LangPrimType extends PrimType implements TypeValue
     switch (sig1)
       {
       case 'Z':
-	return interpreter.booleanObject(((Boolean) obj).booleanValue());
+	return language.booleanObject(((Boolean) obj).booleanValue());
       case 'C':
 	if (obj instanceof Char)
 	  return obj;
@@ -153,9 +153,9 @@ public class LangPrimType extends PrimType implements TypeValue
       {
       case 'Z':
 	code.emitIfIntNotZero();
-	interpreter.emitPushBoolean(true, code);
+	language.emitPushBoolean(true, code);
 	code.emitElse();
-	interpreter.emitPushBoolean(false, code);
+	language.emitPushBoolean(false, code);
 	code.emitFi();
 	break;
       case 'C':

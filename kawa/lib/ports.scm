@@ -50,7 +50,7 @@
 
 (define-syntax define-alias-parameter
   (syntax-rules ()
-    ((define-alias-paramete name type location)
+    ((define-alias-parameter name type location)
      (begin
        (define-constant name :: <gnu.mapping.LocationProc>
 	 (invoke-static <gnu.mapping.LocationProc> 'makeNamed

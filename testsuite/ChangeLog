@@ -1,3 +1,7 @@
+2001-06-03  Per Bothner  <per@bothner.com>
+
+	* formatst.scm:  Comment out misleading message about missing complex.
+
 2001-05-16  Per Bothner  <per@bothner.com>
 
 	New tests Based on a bug report from Walter C. Pelissero

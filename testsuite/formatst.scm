@@ -64,9 +64,11 @@
 
 ;; Slib specific: (format #t "~q")
 
-(format #t "This implementation has~@[ no~] flonums ~
-            ~:[but no~;and~] complex numbers~%"
-	(not format:floats) format:complex-numbers)
+;; Kawa does have complex numbers, but does not support the
+;; non-standard ~i format specifier.
+;;(format #t "This implementation has~@[ no~] flonums ~
+;;            ~:[but no~;and~] complex numbers~%"
+;;	(not format:floats) format:complex-numbers)
 
 ; any object test
 

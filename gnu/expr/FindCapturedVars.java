@@ -7,6 +7,18 @@ public class FindCapturedVars extends ExpFullWalker
     exp.walk(new FindCapturedVars());
   }
 
+  public Object walkLambdaExp (LambdaExp exp)
+  {
+    if (! exp.getCanRead())
+      {
+	ApplyExp caller = exp.returnContinuation;
+	if (caller != null && caller != LambdaExp.unknownContinuation
+	    && exp.min_args == exp.max_args)
+	  exp.setInlineOnly(true);
+      }
+    return super.walkLambdaExp (exp);
+  }
+
   public void capture(Declaration decl)
   {
     LambdaExp curLambda = getCurrentLambda ();
@@ -60,7 +72,7 @@ public class FindCapturedVars extends ExpFullWalker
     Declaration decl = exp.getBinding();
     if (decl != null)
       capture(decl);
-   return null;
+   return exp;
   }
 
   public Object walkSetExp (SetExp exp)

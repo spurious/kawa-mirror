@@ -1,75 +1,77 @@
 package gnu.expr;
 
-/** An ExpWalker for doing a complete left-to-right tree walk.
- * Returns the first non-null  walk result. */
+/** An ExpWalker for doing a complete left-to-right tree walk. */
 
 public class ExpFullWalker extends ExpWalker
 {
   LambdaExp currentLambda = null;
 
+  /** If exitValue is set to non-null, the walk stops. */
+  Object exitValue = null;
+
   public final LambdaExp getCurrentLambda() { return currentLambda; }
 
-  public Object walkExps (Expression[] exps)
+  public Expression[] walkExps (Expression[] exps)
   {
     int n = exps.length;
-    Object result = null;
-    for (int i = 0;  i < n && result == null;  i++)
-      result = exps[i].walk(this);
-    return result;
+    for (int i = 0;  i < n && exitValue == null;  i++)
+      exps[i] = (Expression) exps[i].walk(this);
+    return exps;
   }
+
+  public Object walkExpression (Expression exp) { return exp; }
 
   public Object walkApplyExp (ApplyExp exp)
   {
-    Object result = exp.func.walk(this);
-    if (result == null)
-      result = walkExps(exp.args);
-    return result;
+    exp.func = (Expression) exp.func.walk(this);
+    if (exitValue == null)
+      exp.args = walkExps(exp.args);
+    return exp;
   }
 
   public Object walkBeginExp (BeginExp exp)
   {
-    return walkExps(exp.exps);
+    exp.exps = walkExps(exp.exps);
+    return exp;
   }
 
   public Object walkIfExp (IfExp exp)
   {
-    Object result = exp.test.walk(this);
-    if (result == null)
-      result = exp.then_clause.walk(this);
-    if (result == null)
-      result = exp.else_clause.walk(this);
-    return result;
+    exp.test = (Expression) exp.test.walk(this);
+    if (exitValue == null)
+      exp.then_clause = (Expression) exp.then_clause.walk(this);
+    if (exitValue == null)
+      exp.else_clause = (Expression) exp.else_clause.walk(this);
+    return exp;
   }
 
   public Object walkLetExp (LetExp exp)
   {
-    Object result = null;
-    int n = exp.inits.length; 
-    for (int i = 0;  i < n && result == null;  i++) 
-      result = exp.inits[i].walk(this);
-    if (result == null)
-      result = exp.body.walk(this);
-    return result;
+    exp.inits = walkExps (exp.inits);
+    if (exitValue == null)
+      exp.body = (Expression) exp.body.walk(this);
+    return exp;
   }
 
   public Object walkSetExp (SetExp exp)
   {
-    return exp.new_value.walk(this);
+    exp.new_value = (Expression) exp.new_value.walk(this);
+    return exp;
   }
 
   public Object walkTryExp (TryExp exp)
   {
-    Object result = exp.try_clause.walk(this);
+    exp.try_clause = (Expression) exp.try_clause.walk(this);
     CatchClause catch_clause = exp.catch_clauses;
-    while (result == null && catch_clause != null)
+    while (exitValue == null && catch_clause != null)
       {
-	result = catch_clause.body.walk(this);
+	catch_clause.body = (Expression) catch_clause.body.walk(this);
 	catch_clause = catch_clause.getNext();
       }
 
-    if (result == null)
-      result = exp.try_clause.walk(this);
-    return result;
+    if (exitValue == null && exp.finally_clause != null)
+      exp.finally_clause = (Expression) exp.finally_clause.walk(this);
+    return exp;
   }
 
   public Object walkLambdaExp (LambdaExp exp)
@@ -78,11 +80,11 @@ public class ExpFullWalker extends ExpWalker
     currentLambda = exp;
     try
       {
-	Object result = exp.defaultArgs == null ? null
-	  : walkExps(exp.defaultArgs);
-	if (result == null)
-	  result = exp.body.walk(this);
-	return result;
+	if (exp.defaultArgs != null)
+	  exp.defaultArgs = walkExps(exp.defaultArgs);
+	if (exitValue == null)
+	  exp.body = (Expression) exp.body.walk(this);
+	return exp;
       }
     finally
       {

@@ -133,7 +133,7 @@
 	(report-display total-expected-count)
 	(report-display ". ***")
 	(report-newline)
-	(report-display "*** Discrepency indicates testsuite error or exceptions. ***")
+	(report-display "*** Discrepancy indicates testsuite error or exceptions. ***")
 	(report-newline)))
   (cond (*log-file*
 	 (close-output-port *log-file*)

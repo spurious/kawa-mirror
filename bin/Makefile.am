@@ -15,8 +15,8 @@ INCLUDES = $(READLINE_INCLUDE_PATH)
 kawa_LDADD = $(READLINE_LIB_PATH) -lreadline -lhistory $(kawa_EXTRA_LIBS)
 
 if ENABLE_XML
-KAWA2_XML_OFILES = gnu-xml.o
-LIBADD_XML = gnu-xml.lo
+KAWA2_XML_OFILES = gnu-xml.o gnu-xquery-util.o gnu-xquery-lang.o
+LIBADD_XML = gnu-xml.lo gnu-xquery-util.lo gnu-xquery-lang.lo
 endif
 
 kawa.sh:
@@ -28,6 +28,16 @@ kawa.sh:
 	  echo 'exec $${JAVA-'$${JAVA}'} kawa.repl "$$@"' >>tmp
 	chmod +x tmp
 	mv tmp kawa.sh
+
+gckawa:
+	echo '#!/bin/sh' >tmp
+	echo 'LD_LIBRARY_PATH=$(libdir):$$LD_LIBRARY_PATH' >>tmp
+	echo 'KAWALIB=$${KAWALIB-$(datadir)/java/kawa-$(VERSION).jar}' >>tmp
+	echo 'CLASSPATH=$${KAWALIB}:$${CLASSPATH-$(CLASSPATH)}' >>tmp
+	echo 'export CLASSPATH LD_LIBRARY_PATH' >>tmp
+	echo 'exec gcj "$$@" -L$(libdir) -lkawa' >>tmp
+	chmod +x tmp
+	mv tmp gckawa
 
 KAWA1_OFILES = \
   gnu-bytecode.lo \
@@ -63,7 +73,7 @@ WITH_GCJ_LIBS =  libkawa.la
 WITHOUT_GCJ_LIBS =
 #lib_LTLIBRARIES = $(@GCJ_SELECTED@_LIBS)
 #EXTRA_LTLIBRARIES = libkawa.la
-if LIBKAWA
+if WITH_GCJ
 lib_LTLIBRARIES     = libkawa.la
 endif
 #libkawa_la_LDFLAGS = -rpath $(libdir)
@@ -83,7 +93,7 @@ kawa1$(EXEEXT): $(KAWA1_OFILES)
 kawa-bin$(EXEEXT): libkawa.la
 	../libtool --mode=link --tag=GCJ $(GCJ) -g -O2  -o kawa-bin$(EXEEXT)  libkawa.la --main=kawa.repl
 
-WITH_GCJ_COMPILED = kawa-bin$(EXEEXT)
+WITH_GCJ_COMPILED = kawa-bin$(EXEEXT) gckawa
 WITHOUT_GCJ_COMPILED = kawa.sh
 
 all: $(@GCJ_SELECTED@)
@@ -94,4 +104,5 @@ install-exec-bindir: $(noninst_SCRIPTS)
 	$(mkinstalldirs) $(bindir)
 	if test "@kawa_bin@" = "" ; then \
 	  $(INSTALL_SCRIPT) kawa.sh $(DESTDIR)$(bindir)/kawa; \
+	$(INSTALL_SCRIPT) gckawa $(DESTDIR)$(bindir)/gckawa; \
 	fi

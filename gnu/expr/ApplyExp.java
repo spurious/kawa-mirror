@@ -349,7 +349,7 @@ public class ApplyExp extends Expression
 	code.emitDup(comp.callStackContext.getType());
 	//  evaluate args to frame-locals vars;  // may recurse! 
 	compileToArray (exp.args, comp);
-	code.emitPutField(comp.argsCallContextField);
+	code.emitInvoke(comp.typeCallContext.getDeclaredMethod("setArgsN", 1));
 	code.emitReturn();
 	return;
       }

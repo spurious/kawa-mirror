@@ -4,21 +4,32 @@ import gnu.text.SourceMessages;
 /** A very abstract "parser".
  * Converts some input representation to Expression trees. */
 
-public abstract class Parser
+public class Parser
 {
+  /** If doing immediate evaluation. */
+  public boolean immediate;
+
   public Parser(SourceMessages messages)
   {
     this.messages = messages;
   }
 
-  public abstract Expression parse (Object input);
+  /** This may not make sense, except for Lisp-like languages.
+   * For those, 'input' an s-expression  from the reader. */
+  public Expression parse (Object input)
+  {
+    throw new Error("unimeplemented parse");
+  }
 
   public Interpreter getInterpreter() { return Interpreter.getInterpreter(); }
 
   public LambdaExp currentLambda () { return current_scope.currentLambda (); }
 
-  /**
-   * Note that we have seen a construct that must be compiled, not evaluated.
+  public ModuleExp currentModule() { return current_scope.currentModule(); }
+
+  /** Note that we have seen a construct that must be compiled, not evaluated.
+   * If we are not inside a lambda (which is always compiled), but
+   * only inside the outer-most ModuleExp, note that it must be compiled.
    */
   public void mustCompileHere ()
   {
@@ -37,47 +48,9 @@ public abstract class Parser
 
   public ScopeExp currentScope() { return current_scope; }
 
-  public abstract boolean popBinding();
+  //public abstract boolean popBinding();
 
-  public abstract void pushBinding(String name, Object value);
-
- /**
-   * Insert decl into environ.
-   * (Used at rewrite time, not eval time.)
-   */
-  public void push (Declaration decl)
-  {
-    String sym = decl.getName();
-    if (sym == null)
-      return;
-    pushBinding(sym, decl);
-  }
-
-  /** Remove this from Translator.environ.
-   * (Used at rewrite time, not eval time.)
-   */
-  void pop (Declaration decl)
-  {
-    String sym = decl.getName();
-    if (sym == null)
-      return;
-    popBinding();
-  }
-
-  public final void pushDecls (ScopeExp scope)
-  {
-    //shadowStack.push(null);
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      push(decl);
-  }
-
-  public final void popDecls (ScopeExp scope)
-  {
-    for (Declaration decl = scope.firstDecl();
-         decl != null;  decl = decl.nextDecl())
-      pop(decl);
-  }
+  //public abstract void pushBinding(String name, Object value);
 
   public void push (ScopeExp scope)
   {
@@ -85,13 +58,28 @@ public abstract class Parser
     if (! (scope instanceof ModuleExp))
       mustCompileHere();
     current_scope = scope;
-    pushDecls(scope);
   }
 
   public void pop (ScopeExp scope)
   {
-    popDecls(scope);
     current_scope = scope.outer;
+  }
+
+  public final void pop ()
+  {
+    pop(current_scope);
+  }
+
+  public Declaration lookup(String name, int namespace)
+  {
+    Interpreter interp = getInterpreter();
+    for (ScopeExp scope = current_scope;  scope != null;  scope = scope.outer)
+      {
+	Declaration decl = scope.lookup(name, interp, namespace);
+	if (decl != null)
+	  return decl;
+      }
+    return null;
   }
 
   public SourceMessages getMessages() { return messages; }
@@ -135,7 +123,7 @@ public abstract class Parser
     current_column = column;
   }
 
-  ScopeExp current_scope;
+  protected ScopeExp current_scope;
 
   protected String current_filename;
   protected int current_line;

@@ -84,7 +84,7 @@ public class Macro extends Syntax implements Printable, Externalizable
       }
     catch (Throwable ex)
       {
-        return tr.syntaxError("evaluating syntax transformer `"
+        return tr.syntaxError("evaluating syntax transformer '"
                               + getName() + "' threw " + ex);
       }
   }

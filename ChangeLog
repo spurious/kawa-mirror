@@ -1,3 +1,10 @@
+2001-11-23  Per Bothner  <per@bothner.com>
+
+	* kawa/lang/Lambda.java (rewriteBody):  Call setReturnType.
+
+	* kawa/lang/AutoloadSyntax.java, kawa/lang/Lambda.java,
+	kawa/lang/Macro.java:  Change errors message to use 'name' not `name'.
+
 2001-11-19  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/call_with_values.java (apply):  Use CallContext's

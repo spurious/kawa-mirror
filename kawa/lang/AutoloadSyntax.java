@@ -104,7 +104,7 @@ public class AutoloadSyntax extends Syntax implements Externalizable
     catch (IllegalAccessException ex)
       { throw_error ("illegal access in class "); }
     catch (UnboundSymbol e)
-      { throw_error ("missing symbol `" + e.getMessage () + "' "); }
+      { throw_error ("missing symbol '" + e.getMessage () + "' "); }
     catch (WrongArguments ex)
       { throw_error ("type error"); }
   }

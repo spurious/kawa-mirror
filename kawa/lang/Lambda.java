@@ -171,8 +171,8 @@ public class Lambda extends Syntax implements Printable
               {
                 if (! (pair.cdr instanceof Pair))
                   {
-                    tr.syntaxError("`::' not followed by a type specifier"
-                                   + " (for parameter `" + name + "')");
+                    tr.syntaxError("'::' not followed by a type specifier"
+                                   + " (for parameter '" + name + "')");
                     return;
                   }
                 p = (Pair) p.cdr;
@@ -191,8 +191,8 @@ public class Lambda extends Syntax implements Printable
               {
                 if (! (p.cdr instanceof Pair))
                   {
-                    tr.syntaxError("`::' not followed by a type specifier"
-                                   + " (for parameter `" + name + "')");
+                    tr.syntaxError("'::' not followed by a type specifier"
+                                   + " (for parameter '" + name + "')");
                     return;
                   }
                 p = (Pair) p.cdr;
@@ -203,7 +203,7 @@ public class Lambda extends Syntax implements Printable
                   p = null;
                 else
                   {
-                    tr.syntaxError("improper list in specifier for parameter `"
+                    tr.syntaxError("improper list in specifier for parameter '"
                                    + name + "')");
                     return;
                   }
@@ -217,7 +217,7 @@ public class Lambda extends Syntax implements Printable
                   p = null;
                 else
                   {
-                    tr.syntaxError("improper list in specifier for parameter `"
+                    tr.syntaxError("improper list in specifier for parameter '"
                                    + name + "')");
                     return;
                   }
@@ -226,14 +226,14 @@ public class Lambda extends Syntax implements Printable
               {
                 if (typeSpecPair != null)
                   {
-                    tr.syntaxError("duplicate type specifier for parameter `"
+                    tr.syntaxError("duplicate type specifier for parameter '"
                                    + name + '\'');
                     return;
                   }
                 typeSpecPair = p;
                 if (p.cdr != LList.Empty)
                   {
-                    tr.syntaxError("junk at end of specifier for parameter `"
+                    tr.syntaxError("junk at end of specifier for parameter '"
                                    + name + '\'');
                     return;
                   }
@@ -317,6 +317,7 @@ public class Lambda extends Syntax implements Printable
                     value = new BeginExp(new_body);
                   }
                 lexp.body = Expression.makeCoercion(value, rexp);
+		lexp.setReturnType(rtype);
 	      }
 	  }
       }

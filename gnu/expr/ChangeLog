@@ -1,3 +1,8 @@
+2003-02-04  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (addMethodFor):  Only make $finit$ method private
+	if this is a simple (non-pair) class.
+
 2003-01-24  Per Bothner  <per@bothner.com>
 
 	* ApplyExp.java (eval): If procedure is null, throw exception.

@@ -726,9 +726,18 @@ public class LambdaExp extends ScopeExp
       + (nameDecl != null && ! nameDecl.isPrivate() ? Access.PUBLIC : 0);
     if (isInitMethod)
       {
-	// Make it provide to prevent inherited $finit$ from overriding
-	// the current one - and thus preventing its execution.
-	mflags = (mflags & ~(Access.PUBLIC|Access.PROTECTED))+Access.PRIVATE;
+	if (isStatic)
+	  { // if cl.isMakingClassPair() - i.e. defining a non-simple class:
+	    // In this case the $finit$ method needs to be explicitly called
+	    // by sub-class constructors.  See Compilation.callInitMethods.
+	    mflags = (mflags & ~Access.PROTECTED+Access.PRIVATE)+Access.PUBLIC;
+	  }
+	else
+	  { // if ! cl.isMakingClassPair() - i.e. defining a simple class:
+	    // Make it private to prevent inherited $finit$ from overriding
+	    // the current one - and thus preventing its execution.
+	    mflags = (mflags & ~Access.PUBLIC+Access.PROTECTED)+Access.PRIVATE;
+	  }
       }
     if (ctype.isInterface())
       mflags |= Access.ABSTRACT;

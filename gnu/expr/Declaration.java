@@ -3,9 +3,7 @@
 
 package gnu.expr;
 import gnu.bytecode.*;
-import gnu.mapping.Named;
-import gnu.mapping.Symbol;
-import gnu.mapping.OutPort;
+import gnu.mapping.*;
 
 /**
  * The static information associated with a local variable binding.
@@ -123,6 +121,12 @@ public class Declaration
           }
         else
           code.emitGetStatic(field);
+      }
+    else if (isIndirectBinding() && comp.immediate && getVariable() == null)
+      {
+	Symbol sym = symbol instanceof Symbol ? (Symbol) symbol
+	  : Environment.getCurrent().getSymbol(symbol.toString());
+	comp.compileConstant(sym, Target.pushValue(Compilation.typeLocation));
       }
     else
       {

@@ -115,8 +115,6 @@ public class SetExp extends Expression
     return getHasValue() ? new_val : Interpreter.getInterpreter().noValue();
   }
 
-  static Method setMethod = null;
-
   public void compile (Compilation comp, Target target)
   {
     if (new_value instanceof LambdaExp
@@ -143,6 +141,7 @@ public class SetExp extends Expression
     Declaration decl = binding;
     Expression declValue = decl.getValue();
     if (declValue instanceof LambdaExp
+	&& ! comp.immediate
 	&& decl.context instanceof ModuleExp
 	&& (! decl.isPrivate() || declValue instanceof ClassExp)
 	&& ((LambdaExp) declValue).getName() != null // FIXME
@@ -151,6 +150,7 @@ public class SetExp extends Expression
 	((LambdaExp) new_value).compileSetField(comp);
       }
     else if (decl.context instanceof ModuleExp
+	     && ! comp.immediate
 	     && (new_value instanceof QuoteExp
 		 || decl.getFlag(Declaration.IS_CONSTANT))
 	     && isDefining()
@@ -205,11 +205,9 @@ public class SetExp extends Expression
 		code.emitDupX();
 		valuePushed = true;
 	      }
-	    if (setMethod == null)
-	      setMethod = comp.typeLocation.addMethod
-		("set", Compilation.apply1args,
-		 Type.void_type, Access.PUBLIC|Access.FINAL);
-	    code.emitInvokeVirtual (setMethod);
+	    String setterName = isFuncDef() ? "setFunctionValue" : "set";
+	    code.emitInvokeVirtual(comp.typeSymbol
+				   .getDeclaredMethod(setterName, 1));
 	    if (isSetIfUnbound())
 	      {
 		code.emitFi();

@@ -119,7 +119,10 @@ public class ReferenceExp extends Expression
     if (decl.isIndirectBinding() && ! getDontDereference())
       {
 	if (! isProcedureName())
-	  code.emitInvokeStatic(Compilation.getSymbolValueMethod);
+	  {
+	    code.emitInvokeStatic(Compilation.getSymbolValueMethod);
+	    rtype = Compilation.typeLocation;
+	  }
 	// else if (comp.getInterpreter().hasSeparateFunctionNamespace())
 	//   code.emitGetField(Compilation.functionValueBinding2Field);
 	else

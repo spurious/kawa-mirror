@@ -1,5 +1,11 @@
 2004-03-08  Per Bothner  <per@bothner.com>
 
+	* Declaration.java (load):  If indirect and immediate, load symbol.
+	* ModuleExp.java (allocFields):  In immediate mode, make indirect.
+	* ReferenceExp.java (compile):  If indirect, fix return type.
+	* SetExp.java (compile):  If immediate, skip first two options.
+	If indirect procedure use setFunctionValue.
+
 	* Interpreter.java (getSymbolProcedure):  Trivial optimization.
 
 2004-03-03  Per Bothner  <per@bothner.com>

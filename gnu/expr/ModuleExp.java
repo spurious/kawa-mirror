@@ -241,6 +241,11 @@ public class ModuleExp extends LambdaExp
 	  {
 	    ((LambdaExp) value).allocFieldFor(comp);
 	  }
+	else if (comp.immediate)
+	  {
+	    decl.setIndirectBinding(true);
+	    decl.setSimple(false);
+	  }
 	else
 	  {
 	    if (! decl.getFlag(Declaration.IS_CONSTANT|Declaration.IS_ALIAS)

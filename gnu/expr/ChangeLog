@@ -1,5 +1,10 @@
 2004-11-05  Per Bothner  <per@bothner.com>
 
+	* Interpreter.java (languages): Add "xq" and "xquery" as extensions
+	for XQuery, to match section H.2.3 of 20041029 XQuery draft.
+
+	* InlineCalls.java (walkApplyExp):  More specific error message.
+
 	* CatchClause.java (<init>): New constructor.
 	(print): Do pretty-printing.
 	* TryExp.java (print): Do pretty-printing.

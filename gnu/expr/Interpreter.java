@@ -40,7 +40,7 @@ public abstract class Interpreter
     { "krl", ".krl", "gnu.kawa.brl.BRL" },
     { "brl", ".brl", "gnu.kawa.brl.BRL" },
     { "emacs", "elisp", "emacs-lisp", ".el", "gnu.jemacs.lang.ELisp" },
-    { "xquery", ".xql", "gnu.xquery.lang.XQuery" },
+    { "xquery", ".xquery", ".xq", ".xql", "gnu.xquery.lang.XQuery" },
     { "q2", ".q2", "gnu.q2.lang.Q2" },
     { "xslt", "xsl", ".xsl", "gnu.kawa.xslt.XSLT" },
     { "commonlisp", "common-lisp", "clisp", "lisp",

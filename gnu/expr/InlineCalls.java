@@ -88,9 +88,9 @@ public class InlineCalls extends ExpWalker
       {
 	Object fval = ((QuoteExp) func).getValue();
 	if (! (fval instanceof Procedure))
-	  return noteError(decl == null ? "called value is not a procedure"
+	  return noteError(decl == null || fval == null ? "called value is not a procedure"
 			   : ("calling " + decl.getName()
-			      + " which is not a procedure"));
+			      + " which is a "+fval.getClass().getName()));
 	Procedure proc = (Procedure) fval;
 	String msg = WrongArguments.checkArgCount(proc, nargs);
 	if (msg != null)

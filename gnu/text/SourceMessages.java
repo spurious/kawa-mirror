@@ -15,6 +15,10 @@ public class SourceMessages
 
   public SourceError getErrors() { return firstError; }
 
+  String current_filename;
+  int current_line;
+  int current_column;
+
   /** Return true iff errors (not warnings) have been seen. */
   public boolean seenErrors() { return errorCount > 0; }
 
@@ -86,6 +90,12 @@ public class SourceMessages
     error(new SourceError(severity, filename, line, column, message));
   }
 
+  public void error(char severity, String message)
+  {
+    error(new SourceError(severity, current_filename,
+			  current_line, current_column, message));
+  }
+
   public void printAll(java.io.PrintStream out, int max)
   {
     for (SourceError err = firstError;
@@ -148,6 +158,21 @@ public class SourceMessages
 	return saveCount > 0;
       }
     return false;
+  }
+
+  public final String getFile() { return current_filename; }
+  public final int getLine() { return current_line; }
+  public final int getColumn() { return current_column; }
+
+  public void setFile(String filename) { current_filename = filename; }
+  public void setLine(int line) { current_line = line; }
+  public void setColumn(int column) { current_column = column; }
+
+  public void setLine(String filename, int line, int column)
+  {
+    current_filename = filename;
+    current_line = line;
+    current_column = column;
   }
 
 }

@@ -505,7 +505,7 @@ public class Scheme extends Interpreter
   {
     if (kawa_environment == null)
       initScheme();
-    environ = new Environment (kawa_environment);
+    environ = new ScmEnv (kawa_environment);
     environ.setName ("interaction-environment."+(++scheme_counter));
   }
 

@@ -58,11 +58,11 @@ public class prim_method extends Syntax
     if (! (op_code == 0 ? pattern3.match(obj, match, 1)
 	   : op_code == 183 ? pattern2.match(obj, match, 2) // constructor
 	   : pattern4.match(obj, match, 0))) // virtual or static
-      return tr.syntaxError ("wrong number of arguments to "+name()
+      return tr.syntaxError ("wrong number of arguments to "+getName()
 			     +"(opcode:"+op_code+")");
 
     if (! (match[3] instanceof List))
-      return tr.syntaxError ("missing/invalid parameter list in "+name());
+      return tr.syntaxError ("missing/invalid parameter list in "+getName());
     List argp = (List) match[3];
 
     int narg = argp.length();

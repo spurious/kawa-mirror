@@ -8,11 +8,20 @@ import gnu.expr.*;
  * @author	Per Bothner
  */
 
-abstract public class Syntax extends Named implements Printable
+abstract public class Syntax extends Declaration implements Printable
 {
-  public Syntax () { super (); }
+  public Syntax ()
+  {
+    super ();
+    setSimple(false);
+  }
 
-  public Syntax (String name) { super (name); }
+  public Syntax (String name)
+  {
+    setName(name);
+    sym = name;
+    setSimple(false);
+  }
 
   /**
    * Re-write an expression that is an "application" of this Syntax object.

@@ -30,10 +30,10 @@ public class AutoloadSyntax extends Syntax
   public void print(java.io.PrintWriter ps)
   {
     ps.print ("#<syntax ");
-    if (name () != null)
+    if (getName() != null)
       {
-	ps.print (name ());
-	ps.print (' ');
+	ps.print(getName());
+	ps.print(' ');
       }
     if (loaded != null)
       ps.print ("autoloaded>");
@@ -49,13 +49,13 @@ public class AutoloadSyntax extends Syntax
   {
     throw new GenericError (prefix + className
 				+ " while autoloading "
-				+ (name () == null ? "" : name().toString ()));
+				+ (getName() == null ? "" : getName().toString()));
   }
 
   /** Load the class named in className. */
   void load ()
   {
-    String name = this.name ();
+    String name = this.getName();
     try
       {
 	Object value = Class.forName (className).newInstance ();
@@ -76,7 +76,7 @@ public class AutoloadSyntax extends Syntax
 	      {
 		if (Environment.lookup_global (name) == this)
 		  Environment.define_global (name, loaded);
-		if (loaded.name () == null)
+		if (loaded.getName() == null)
 		  loaded.setName (name);
 	      }
 	  }
@@ -90,7 +90,7 @@ public class AutoloadSyntax extends Syntax
     catch (IllegalAccessException ex)
       { throw_error ("illegal access in class "); }
     catch (UnboundSymbol e)
-      { throw_error ("missing symbol " + e.getMessage ()); }
+      { throw_error ("missing symbol `" + e.getMessage () + "' "); }
     catch (WrongArguments ex)
       { throw_error ("type error"); }
   }

@@ -62,7 +62,7 @@ public class Compare extends Procedure2 implements CanInline
 	    int next = values1.nextDataIndex(index);
 	    if (next < 0)
 	      return false;
-	    if (apply(flags, values1.getNext(index << 1, null), arg2))
+	    if (apply(flags, values1.getPosNext(index << 1), arg2))
 	      return true;
 	    index = next;
 	  }
@@ -76,7 +76,7 @@ public class Compare extends Procedure2 implements CanInline
 	    int next = values2.nextDataIndex(index);
 	    if (next < 0)
 	      return false;
-	    if (apply(flags, arg1, values2.getNext(index << 1, null)))
+	    if (apply(flags, arg1, values2.getPosNext(index << 1)))
 	      return true;
 	    index = next;
 	  }

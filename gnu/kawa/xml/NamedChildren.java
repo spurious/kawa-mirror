@@ -24,20 +24,21 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     if (child < 0)
       return;
     TreePosition pos = Focus.getCurrent();
-    pos.push(tlist, child << 1, null);
+    pos.push(tlist, child << 1);
     for (;;)
       {
 	if (! getNamedChild(pos, type))
 	  break;
-	int ichild = pos.ipos >>> 1;
+	int ichild = tlist.posToDataIndex(pos.ipos);
 	int next = tlist.nextNodeIndex(ichild, -1 >>> 1);
 	if (ichild == next)
 	  next = tlist.nextDataIndex(ichild);
+	if (next == -1)
+	  break;
 	if (consumer instanceof PositionConsumer)
-	  ((PositionConsumer) consumer).writePosition(tlist,
-						      pos.ipos, pos.xpos);
+	  ((PositionConsumer) consumer).writePosition(tlist, pos.ipos);
 	else
-	  tlist.consumeRange(ichild, next, consumer);
+	  tlist.consumeIRange(ichild, next, consumer);
 	pos.ipos = next << 1;
       }
     pos.pop();
@@ -56,7 +57,11 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedChildren(type, (TreeList) pos.sequence, pos.ipos >> 1, consumer);
+	  {
+	    TreeList tlist = (TreeList) pos.sequence;
+	    namedChildren(type, atlist,
+			  tlist.posToDataIndex(pos.ipos), consumer);
+	  }
       }
     else if (type instanceof ElementType
 	     && ((ElementType) type).getNamespaceURI() == "")
@@ -121,11 +126,11 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index << 1);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedChildren(predicate, tlist.getNext(index << 1, null), consumer);
+	      namedChildren(predicate, tlist.getPosNext(index << 1), consumer);
 	    else
 	      namedChildren(predicate, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);
@@ -139,7 +144,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
     throws Throwable
   {
     AbstractSequence seq = position.sequence;
-
+    /* FIXME
     if (seq == null)
       {
 	if (type instanceof ElementType
@@ -154,26 +159,26 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	  }
 	return false;
       }
-    for (;;)
+    */
+    while (position.hasNext())
       {
-	int ipos = position.ipos;
-	Object xpos = position.xpos;
-	boolean hasNext = seq.hasNext(ipos, xpos);
-	if (! hasNext)
-	  return false;
-	if (type.isInstance(seq, ipos, xpos))
+	int ipos = position.getPos();
+	if (type.isInstancePos(seq, ipos))
 	  return true;
-	int next;
-	int index = ipos >> 1;
 	if (seq instanceof TreeList)
-	  next = ((TreeList) seq).nextNodeIndex(index, -1 >>> 1);
-	else
-	  next = index;
-	if (next != index)
-	  position.ipos = next << 1;
-	else
-	  seq.gotoNext(position, 0);
+	  {
+	    TreeList tlist = (TreeList) seq;
+	    int index = tlist.posToDataIndex(ipos);
+	    int next = tlist.nextNodeIndex(index, -1 >>> 1);
+	    if (next != index)
+	      {
+		position.ipos = next << 1;
+		continue;
+	      }
+	  }
+	position.gotoNext();
       }
+    return false;
   }
 
 
@@ -184,16 +189,18 @@ public class NamedChildren extends CpsProcedure implements Inlineable
       pos.ipos++;
     else
       {
-	int index = pos.ipos >> 1;
-	int next;
 	if (seq instanceof TreeList)
-	  next = ((TreeList) seq).nextNodeIndex(index, -1 >>> 1);
-	else
-	  next = index;
-	if (next != index)
-	  pos.ipos = next << 1;
-	else
-	  seq.gotoNext(pos, 0);
+	  {
+	    TreeList tlist = (TreeList) seq;
+	    int index = tlist.posToDataIndex(pos.ipos);
+	    int next = tlist.nextNodeIndex(index, -1 >>> 1);
+	    if (next != index)
+	      {
+		pos.ipos = next << 1;
+		return;
+	      }
+	  }
+	pos.gotoNext();
       }
   }
 
@@ -202,7 +209,7 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 
   public static SeqPosition gotoFirstChild(SeqPosition pos)
   {
-    TreeList seq = (TreeList) pos.sequence;
+    AbstractSequence seq = pos.sequence;
     if (seq == null)
       {
 	if (pos.ipos == 0)
@@ -212,10 +219,10 @@ public class NamedChildren extends CpsProcedure implements Inlineable
 	  }
 	return nullPosition;
       }
-    int child = seq.gotoChildrenStart(pos.ipos >> 1);
-    if (child < 0)
+    int child = seq.firstChildPos(pos.ipos);
+    if (child == 0)
       return nullPosition;
-    return SeqPosition.make(seq, child << 1, null);
+    return SeqPosition.make(seq, child);
   }
 
   public void compile (ApplyExp exp, Compilation comp, Target target)

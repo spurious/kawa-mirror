@@ -29,9 +29,9 @@ public class Children extends CpsProcedure
 	if (next < 0)
 	  break;
 	if (consumer instanceof PositionConsumer)
-	  ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
+	  ((PositionConsumer) consumer).writePosition(tlist,  ipos);
 	else
-	  tlist.consumeRange(child, next, consumer);
+	  tlist.consumeIRange(child, next, consumer);
 	child = next;
       }
   }
@@ -61,11 +61,11 @@ public class Children extends CpsProcedure
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index << 1);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      children(tlist.getNext(index << 1, null), consumer);
+	      children(tlist.getPosNext(index << 1), consumer);
 	    else
 	      children(tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);

@@ -140,7 +140,7 @@ public class DisplayFormat extends AbstractFormat
 	  {
 	    if (ipos > 0 && out instanceof OutPort)
 	      ((OutPort) out).writeSpaceFill();
-	    if (! vec.consumeNext(ipos, null, out))
+	    if (! vec.consumeNext(ipos, out))
 	      break;
 	  }
 	if (out instanceof OutPort)

@@ -36,7 +36,7 @@ public class Reduce extends Procedure1
 	int index = 0;
 	for (;;)
 	  {
-	    Object next = tlist.getNext(index << 1, null);
+	    Object next = tlist.getPosNext(index << 1);
 	    if (next == Sequence.eofValue)
 	      return result;
 	    result = combine(result, next);

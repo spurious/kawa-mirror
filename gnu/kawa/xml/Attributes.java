@@ -18,15 +18,15 @@ public class Attributes extends CpsProcedure
     while (attr >= 0)
       {
 	int ipos = attr << 1;
-	int kind = tlist.getNextKind(ipos, null);
+	int kind = tlist.getNextKind(ipos);
 	if (kind != Sequence.ATTRIBUTE_VALUE)
 	  break;
 	// if kind is CHAR_VALUE return text node.  FIXME
 	int next = tlist.nextDataIndex(attr);
 	if (consumer instanceof PositionConsumer)
-	  ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
+	  ((PositionConsumer) consumer).writePosition(tlist,  ipos);
 	else
-	  tlist.consumeRange(attr, next, consumer);
+	  tlist.consumeIRange(attr, next, consumer);
 	attr = next;
       }
   }
@@ -56,11 +56,11 @@ public class Attributes extends CpsProcedure
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index << 1);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      attributes(tlist.getNext(index << 1, null), consumer);
+	      attributes(tlist.getPosNext(index << 1), consumer);
 	    else
 	      attributes(tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);

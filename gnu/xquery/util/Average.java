@@ -34,12 +34,12 @@ public class Average extends Procedure1
 	int index = 0;
 	for (;;)
 	  {
-	    Object next = tlist.getNext(index << 1, null);
+	    Object next = tlist.getPosNext(index);
 	    if (next == Sequence.eofValue)
 	      break;
 	    count++;
 	    sum = combine(sum, next);
-	    index = tlist.nextDataIndex(index);
+	    index = tlist.nextPos(index);
 	  }
       }
     else

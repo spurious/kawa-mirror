@@ -18,7 +18,7 @@ public class BooleanValue extends Procedure1
     if (value instanceof Values)
       {
 	Values values = (Values) value;
-	value = values.getNext(0, null);
+	value = values.getPosNext(0);
 	if (value == Sequence.eofValue)
 	  return false;
 	if (value instanceof SeqPosition

@@ -36,7 +36,8 @@ public class StringValue extends Procedure1
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
 	  {
-	    ((TreeList) pos.sequence).stringValue(pos.ipos >> 1, sbuf);
+	    TreeList tlist = (TreeList) pos.sequence;
+	    tlist.stringValue(tlist.posToDataIndex(pos.ipos), sbuf);
 	    return;
 	  }
       }
@@ -52,14 +53,14 @@ public class StringValue extends Procedure1
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      stringValue(tlist.getNext(index << 1, null), sbuf);
+	      stringValue(tlist.getPosNext(index), sbuf);
 	    else
-	      tlist.stringValue(index, sbuf);
-	    index = tlist.nextDataIndex(index);
+	      tlist.stringValue(tlist.posToDataIndex(index), sbuf);
+	    index = tlist.nextPos(index);
 	  }
       }
     else

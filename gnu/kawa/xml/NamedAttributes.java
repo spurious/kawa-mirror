@@ -24,12 +24,12 @@ public class NamedAttributes extends CpsProcedure
     while (child >= 0)
       {
 	int ipos = child << 1;
-	int kind = tlist.getNextKind(ipos, null);
+	int kind = tlist.getNextKind(ipos);
 	if (kind != Sequence.ATTRIBUTE_VALUE)
 	  break;
 	int next = tlist.nextDataIndex(child);
 
-	Object curName = tlist.getNextTypeObject(ipos, null);
+	Object curName = tlist.getNextTypeObject(ipos);
 	String curNamespaceURI;
 	String curLocalName;
 	if (curName instanceof Symbol)
@@ -47,9 +47,9 @@ public class NamedAttributes extends CpsProcedure
 	    && (namespaceURI == curNamespaceURI || namespaceURI == null))
 	  {
 	    if (consumer instanceof PositionConsumer)
-	      ((PositionConsumer) consumer).writePosition(tlist,  ipos, null);
+	      ((PositionConsumer) consumer).writePosition(tlist,  ipos);
 	    else
-	      tlist.consumeRange(child, next, consumer);
+	      tlist.consumeIRange(child, next, consumer);
 	  }
 	child = next;
       }
@@ -81,11 +81,11 @@ public class NamedAttributes extends CpsProcedure
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index << 1);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedAttributes(qname, tlist.getNext(index << 1, null), consumer);
+	      namedAttributes(qname, tlist.getPosNext(index << 1), consumer);
 	    else
 	      namedAttributes(qname, tlist, index, consumer);
 	    index = tlist.nextDataIndex(index);

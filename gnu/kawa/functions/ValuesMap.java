@@ -29,13 +29,13 @@ public class ValuesMap extends CpsProcedure implements CanInline, Inlineable
 	Values values = (Values) val;
 	for (;;)
 	  {
-	    Object v = values.getNext(ipos, null);
+	    Object v = values.getPosNext(ipos);
 	    if (v == Sequence.eofValue)
 	      break;
 	    ctx.setArgs(v);
 	    ctx.proc = proc;
 	    ctx.runUntilDone();
-	    ipos = values.nextDataIndex(ipos >> 1);
+	    ipos = values.nextDataIndex(values.posToDataIndex(ipos));
 	    /*
 	    if (ipos < 0)
 	      break;

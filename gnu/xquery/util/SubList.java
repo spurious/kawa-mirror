@@ -36,7 +36,7 @@ public class SubList extends CpsProcedure
 	      break;
 	    endPosition = i;
 	  }
-	vals.consumeRange(startPosition, endPosition, out);
+	vals.consumeIRange(startPosition, endPosition, out);
       }
     else
       {

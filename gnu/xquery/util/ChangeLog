@@ -1,3 +1,14 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* Average.java:  Update for gnu.lists changes.
+	* BooleanValue.java:  Likewise.
+	* Children.java:  Likewise.
+	* Compare.java:  Likewise.
+	* Reduce.java:  Likewise.
+	* StringValue.java:  Likewise.
+	* SubList.java:  Likewise.
+	* ValuesFilter.java:  Likewise.
+
 2002-11-16  Per Bothner  <per@bothner.com>
 
 	* MakeAttribute.java, MakeElement.java:  Use gnu.mapping.Symbol

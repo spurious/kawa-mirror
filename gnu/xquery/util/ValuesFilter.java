@@ -29,7 +29,7 @@ public class ValuesFilter extends CpsProcedure
 	    int next = values.nextDataIndex(index);
 	    if (next < 0)
 	      return false;
-	    if (matches(values.getNext(index << 1, null), count))
+	    if (matches(values.getPosNext(index << 1), count))
 	      return true;
 	    index = next;
 	  }

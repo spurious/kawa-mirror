@@ -47,17 +47,16 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
     return typeSeqPosition;
   }
 
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos)
+  public boolean isInstancePos(AbstractSequence seq, int ipos)
   {
-    return isInstance(seq, ipos, xpos, kinds);
+    return isInstance(seq, ipos, kinds);
   }
 
-  public static boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
-				   int kinds)
+  public static boolean isInstance(AbstractSequence seq, int ipos, int kinds)
   {
     if (kinds >= 0)
       {
-	int kind = seq.getNextKind(ipos, xpos);
+	int kind = seq.getNextKind(ipos);
 	switch (kind)
 	  {
 	  case Sequence.EOF_VALUE:
@@ -104,7 +103,7 @@ public class NodeType extends ClassType implements TypeValue, NodePredicate, Ext
       pos = (SeqPosition) obj;
     else
       return null;
-    return isInstance(pos.sequence, pos.ipos, pos.xpos, kinds) ? pos : null;
+    return isInstance(pos.sequence, pos.ipos, kinds) ? pos : null;
   }
 
   protected void emitCoerceOrNullMethod(Variable incoming,

@@ -25,16 +25,16 @@ public class NamedDescendants extends CpsProcedure
 				      Consumer consumer, boolean orSelf)
   {
     int limit = list.nextDataIndex(pos);
-    if (orSelf && predicate.isInstance(list, pos << 1, null))
+    if (orSelf && predicate.isInstancePos(list, pos << 1))
       {
 	if (consumer instanceof PositionConsumer)
-	  ((PositionConsumer) consumer).writePosition(list, pos << 1, null);
+	  ((PositionConsumer) consumer).writePosition(list, pos << 1);
 	else
 	  {
 	    int next = list.nextNodeIndex(pos, -1 >>> 1);
 	    if (pos == next)
 	      next = list.nextDataIndex(pos);
-	    list.consumeRange(pos, next, consumer);
+	    list.consumeIRange(pos, next, consumer);
 	  }
       }
     for (;;)
@@ -43,13 +43,13 @@ public class NamedDescendants extends CpsProcedure
 	if (pos < 0)
 	  break;
 	if (consumer instanceof PositionConsumer)
-	  ((PositionConsumer) consumer).writePosition(list, pos << 1, null);
+	  ((PositionConsumer) consumer).writePosition(list, pos << 1);
 	else
 	  {
 	    int next = list.nextNodeIndex(pos, -1 >>> 1);
 	    if (pos == next)
 	      next = list.nextDataIndex(pos);
-	    list.consumeRange(pos, next, consumer);
+	    list.consumeIRange(pos, next, consumer);
 	  }
       }
   }
@@ -66,7 +66,12 @@ public class NamedDescendants extends CpsProcedure
       {
 	SeqPosition pos = (SeqPosition) node;
 	if (pos.sequence instanceof TreeList)
-	  namedDescendants(predicate, (TreeList) pos.sequence, pos.ipos >> 1, consumer, orSelf);
+	  {
+	    TreeList tlist = (TreeList) pos.sequence;
+	    namedDescendants(predicate, tlist,
+			     tlist.posToDataIndex(pos.ipos),
+			     consumer, orSelf);
+	  }
       }
   }
 
@@ -82,11 +87,12 @@ public class NamedDescendants extends CpsProcedure
 	int index = 0;
 	for (;;)
 	  {
-	    int kind = tlist.getNextKind(index << 1, null);
+	    int kind = tlist.getNextKind(index << 1);
 	    if (kind == Sequence.EOF_VALUE)
 	      break;
 	    if (kind == Sequence.OBJECT_VALUE)
-	      namedDescendants(predicate, tlist.getNext(index << 1, null), consumer, orSelf);
+	      namedDescendants(predicate, tlist.getPosNext(index << 1),
+			       consumer, orSelf);
 	    else
 	      namedDescendants(predicate, tlist, index, consumer, orSelf);
 	    index = tlist.nextDataIndex(index);

@@ -20,7 +20,11 @@ public class ListItems extends CpsProcedure
     ctx.lastArg();
 
     List list = (List) arg;
-    // FIXME - should just 'consume' the list.
+    if (list instanceof AbstractSequence)
+      {
+	((AbstractSequence) list).consumePosRange(0, -1, out);
+	return;
+      }
     Iterator iter = list.iterator();
     while (iter.hasNext())
       {

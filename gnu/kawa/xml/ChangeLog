@@ -1,3 +1,14 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* Attributes.java:  Update for gnu.lists changes.
+	* ElementType.java:  Likewise.
+	* NamedAttributes.java:  Likewise.
+	* NamedDescendants.java:  Likewise.
+	* NodeType.java:  Likewise.
+	* NamedChildren.java:  Likewise.
+	* NamedChildren.java (namedChildren):  Exit if no more children.
+	* ListItems.java (apply):  Optimize - try using consumePosRange.
+
 2002-11-23  Per Bothner  <per@bothner.com>
 
 	* IteratorItems.java:  New class, extends CpsProcedure.

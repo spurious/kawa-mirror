@@ -1,3 +1,10 @@
+2003-01-09  Per Bothner  <per@bothner.com>
+
+	* Arrays.java (effectiveIndex):  Optimization - use SeqPosition's next,
+	instead of nextElement which just calls next.
+	* DisplayFormat.java (writeObject):  consumeNext no longer takes xpos.
+	* ValuesMap.java (apply):  Update for gnu.lists changes.
+
 2002-11-15  Per Bothner  <per@bothner.com>
 
 	* Setter.java:  Implement HasSetter.

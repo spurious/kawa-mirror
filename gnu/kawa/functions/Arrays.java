@@ -77,7 +77,7 @@ public class Arrays
 	int nvals = mapvals.size();
 	SeqPosition ivals = mapvals.getIterator();
 	for (int j = 0;  j < nvals;  j++)
-	  work[j] = ((Number) ivals.nextElement()).intValue();
+	  work[j] = ((Number) ivals.next()).intValue();
       }
     else
       work[0] = ((Number) proc.applyN(args)).intValue();

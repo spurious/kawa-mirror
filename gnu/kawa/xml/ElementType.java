@@ -46,14 +46,13 @@ implements TypeValue, Externalizable, GroupPredicate
     return coerce(obj, qname.getNamespaceURI(), qname.getLocalName());
   }
 
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos)
+  public boolean isInstancePos (AbstractSequence seq, int ipos)
   {
-    return seq.getNextKind(ipos, xpos) == Sequence.GROUP_VALUE
-      && isInstance(seq, ipos, xpos, seq.getNextTypeObject(ipos, xpos));
+    return seq.getNextKind(ipos) == Sequence.GROUP_VALUE
+      && isInstance(seq, ipos, seq.getNextTypeObject(ipos));
   }
 
-  public boolean isInstance(AbstractSequence seq, int ipos, Object xpos,
-			    Object groupType)
+  public boolean isInstance(AbstractSequence seq, int ipos, Object groupType)
   {
     String namespaceURI = qname.getNamespaceURI();
     String localName = qname.getLocalName();

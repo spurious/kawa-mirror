@@ -1,3 +1,11 @@
+2003-02-19  Per Bothner  <per@bothner.com>
+
+	* TreeList.java (oindex):  Field moved here from ValuesStack.
+	(availOject):  Removed field
+	(find(Object), find(Object,Object)):  Methods moved here
+	from ValuesStack.  This fixes quadratic behavior, at the cost of
+	not sharing duplicate indexes.
+
 2003-02-13  Per Bothner  <per@bothner.com>
 
 	* AbstractSequence.java.in (parentPos, baseUriOfPos):  New methods.

@@ -19,8 +19,8 @@ implements Consumer, PositionConsumer, Consumable
   // for the sake of NamespaceResolver.  FIXME.  Perhaps an abstract class
   // in gnu.lists that NamespaceResolver could extend?
 
-  public Object[] objects;
-  static final Object availObject = new String("(AVAIL)");
+  public Object[] objects; 
+  public int oindex;
   public char[] data;
   public int gapStart;
   public int gapEnd;
@@ -316,64 +316,27 @@ implements Consumer, PositionConsumer, Consumable
 	tmp = new Object[newLength];
 	System.arraycopy(objects, 0, tmp, 0, oldLength);
       }
-    Object availObject = this.availObject;
-    for (int i = oldLength;  i < newLength;  i++)
-      tmp[i] = availObject;
     objects = tmp;
   }
 
-  public int find(Object arg1)
+  public int find (Object arg1)
   {
-    // FIXME - linear search!
-    int i = 0;
-    int len = objects.length;
-    Object availObject = this.availObject;
-    int avail = -1;
-    for (; i < len; i++)
-      {
-	Object obj = objects[i];
-	if (obj == arg1)
-	  return i;
-	if (obj == availObject && avail < 0)
-	  avail = i;
-      }
-    if (avail >= 0)
-      {
-	objects[avail] = arg1;
-	return avail;
-      }
-    resizeObjects();
-    objects[len] = arg1;
-    return len;
+    if (oindex == objects.length)
+      resizeObjects();
+    objects[oindex] = arg1;
+    return oindex++;
   }
 
-  public int find(Object arg1, Object arg2)
+  public int find (Object arg1, Object arg2)
   {
-    // FIXME - linear search!
-    int i = 0;
-    int len = objects.length;
-    Object availObject = this.availObject; // Optimization.
-    int avail = -1;
-    Object[] objects = this.objects; // Optimization.
-    for (; i + 1 < len; i++)
-      {
-	Object obj1 = objects[i];
-	if (obj1 == arg1 && objects[i+1] == arg2)
-	  return i;
-	if (avail < 0 && obj1 == availObject && objects[i+1] == availObject)
-	  avail = i;
-      }
-    if (avail >= 0)
-      {
-	objects[avail] = arg1;
-	objects[avail+1] = arg2;
-	return avail;
-      }
-    resizeObjects();
-    objects = this.objects;
-    objects[len] = arg1;
-    objects[len+1] = arg2;
-    return len;
+    int i = oindex;
+    int i2 = i + 2;
+    if (i2 > objects.length)
+      resizeObjects();
+    objects[i] = arg1;
+    objects[i+1] = arg2;
+    oindex = i2;
+    return i;
   }
 
   /** Get a 32-bit int from the data array. */

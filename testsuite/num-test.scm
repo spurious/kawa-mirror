@@ -36,6 +36,7 @@
 
 (section "convert")
 (test 10000000000 inexact->exact (exact->inexact 10000000000))
+(test 1.4285714285714286e22 exact->inexact 14285714285714285714285)
 (test 0 inexact->exact 0.0)
 (test 123451/10 rationalize (inexact->exact 12345.1) (inexact->exact 0.00001))
 
@@ -111,3 +112,5 @@
   31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679)
 (test 3 ssin pi)
 
+(test #f = (expt 2. 100) (+ (expt 2 100) 1))
+(test #t = (expt 2. 100) (exact->inexact (+ (expt 2 100) 1)))

@@ -619,6 +619,90 @@ public class CodeAttr extends Attribute implements AttrContainer
     pushType(getMethod().getDeclaringClass());
   }
 
+  /** Emit code to push a constant primitive array.
+   * @param value The array value that we want the emitted code to re-create.
+   * @param arrayType The ArrayType that matches value.
+   */
+  public final void emitPushPrimArray(Object value, ArrayType arrayType)
+  {
+    Type elementType = arrayType.getComponentType();
+    int len = java.lang.reflect.Array.getLength(value);
+    emitPushInt(len);
+    emitNewArray(elementType);
+    char sig = elementType.getSignature().charAt(0);
+    for (int i = 0;  i < len;  i++)
+      {
+	long ival = 0;  float fval = 0;  double dval = 0;
+	switch (sig)
+	  {
+	  case 'J':
+	    ival = ((long[]) value)[i];
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'I':
+	    ival = ((int[]) value)[i];
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'S':
+	    ival = ((short[]) value)[i];
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'C':
+	    ival = ((char[]) value)[i];
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'B':
+	    ival = ((byte[]) value)[i];
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'Z':
+	    ival = ((boolean[]) value)[i] ? 1 : 0;
+	    if (ival == 0)
+	      continue;
+	    break;
+	  case 'F':
+	    fval = ((float[]) value)[i];
+	    if (fval == 0.0)
+	      continue;
+	    break;
+	  case 'D':
+	    dval = ((double[]) value)[i];
+	    if (dval == 0.0)
+	      continue;
+	    break;
+	  }
+	emitDup(arrayType);
+	emitPushInt(i);
+	switch (sig)
+	  {
+	  case 'Z':
+	  case 'C':
+	  case 'B':
+	  case 'S':
+	  case 'I':
+	    emitPushInt((int) ival);
+	    break;
+	  case 'J':
+	    emitPushLong(ival);
+	    break;
+	  case 'F':
+	    emitPushFloat(fval);
+	    break;
+	  case 'D':
+	    emitPushDouble(dval);
+	    break;
+	  }
+	emitArrayStore(elementType);
+      }
+  }
+
+
+
   void emitNewArray (int type_code)
   {
     reserve(2);

@@ -1,3 +1,8 @@
+2002-01-07  Per Bothner  <per@bothner.com>
+
+	* CodeAttr.java (emitPushPrimArray):  New method.
+	Replaces gnu.expr.LitTable.emitPrimArray.
+
 2001-12-27  Daniel Bonniot  <bonniot@users.sourceforge.net>
 
 	* CodeAttr.java (various):  Replace emitGoto(L, 168) by emitJsr(L).

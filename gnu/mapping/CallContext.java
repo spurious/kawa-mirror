@@ -4,7 +4,7 @@ import gnu.lists.*;
 
 /** A procedure activation stack (when compiled with explicit stacks). */
 
-public class CallContext implements Runnable
+public final class CallContext implements Runnable
     // extends ValueStack ??? FIXME
 {
   public Procedure proc;
@@ -35,6 +35,10 @@ public class CallContext implements Runnable
   /** Number of actual arguments. */
   public int count;
   
+  /** Index of next argument.
+   * This is used methods like getNextArg, uses by callees. */
+  public int next;
+
   /** Encoding of where the arguments are.
    * Each argument uses 4 bits.
    * Arguments beyond 8 are implicitly ARG_IN_VALUES_ARRAY.
@@ -65,10 +69,41 @@ public class CallContext implements Runnable
     return values[i];
   }
 
+  /** Get the next incoming argument.
+   * Throw WrongArguments if there are no more arguments.
+   */
+  public Object getNextArg()
+  {
+    if (next >= count)
+      throw new WrongArguments(proc, count);
+    return getArgAsObject(next++);
+  }
+
+  /** Get the next incoming argument.
+   * Return defaultValue if there are no more arguments.
+   */
+  public Object getNextArg(Object defaultValue)
+  {
+    if (next >= count)
+      return defaultValue;
+    return getArgAsObject(next++);
+  }
+
+  /** Note that we are done with the input arguments.
+   * Throw WrongArguments if there are unprocessed arguments.
+   */
+  public void lastArg()
+  {
+    if (next < count)
+      throw new WrongArguments(proc, count);
+    values = null;
+  }
+
   public void setArgs()
   {
     count = 0;
     where = 0;
+    next = 0;
   }
 
   public void setArgs(Object arg1)
@@ -76,6 +111,7 @@ public class CallContext implements Runnable
     value1 = arg1;
     count = 1;
     where = ARG_IN_VALUE1;
+    next = 0;
   }
 
   public void setArgs(Object arg1, Object arg2)
@@ -84,6 +120,7 @@ public class CallContext implements Runnable
     value2 = arg2;
     count = 2;
     where = ARG_IN_VALUE1|(ARG_IN_VALUE2<<4);
+    next = 0;
   }
   public void setArgs(Object arg1, Object arg2, Object arg3)
   {
@@ -92,6 +129,7 @@ public class CallContext implements Runnable
     value3 = arg3;
     count = 3;
     where = ARG_IN_VALUE1|(ARG_IN_VALUE2<<4)|(ARG_IN_VALUE3<<8);
+    next = 0;
   }
 
   public void setArgs(Object arg1, Object arg2, Object arg3, Object arg4)
@@ -103,6 +141,7 @@ public class CallContext implements Runnable
     count = 4;
     where = (ARG_IN_VALUE1|(ARG_IN_VALUE2<<4)
       |(ARG_IN_VALUE3<<8|ARG_IN_VALUE4<<12));
+    next = 0;
   }
 
   public void setArgsN(Object[] args)
@@ -110,6 +149,7 @@ public class CallContext implements Runnable
     values = args;
     count = args.length;
     where = 0;
+    next = 0;
   }
 
   public Object[] getArgs()
@@ -155,6 +195,18 @@ public class CallContext implements Runnable
 	  writeValue(values[i]);
       }
     else
+      /*
+    if (value instanceof Consumable)
+      {
+	/ *
+	Object[] values = ((Values) value).getValues();
+	for (int i = 0;  i < values.length;  i++)
+	  writeValue(values[i]);
+	* /
+	((Consumable) value).consume(consumer);
+      }
+    else
+*/
       consumer.writeObject(value);
   }
 }

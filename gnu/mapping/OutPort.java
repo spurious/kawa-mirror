@@ -339,13 +339,21 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
 
   public void beginGroup(String typeName, Object type)
   {
-    print('(');
-    print(typeName);
+    if (objectFormat != null)
+      objectFormat.beginGroup(typeName, type,this);
+    else
+      {
+	print('(');
+	print(typeName);
+      }
   }
 
   public void endGroup(String typeName)
   {
-    out.print(')');
+    if (objectFormat != null)
+      objectFormat.endGroup(typeName,this);
+    else
+      out.print(')');
     prev = ')';
   }
 
@@ -360,10 +368,10 @@ public class OutPort extends java.io.PrintWriter implements Printable, Consumer
   }
 
   /** No more attributes in this group. */
-  public void endAttributes()
+  public void endAttribute()
   {
     prev = WORD;
-    print(' ');
+    print(' ');  // FIXME
   }
 
   public void writeObject(Object v)

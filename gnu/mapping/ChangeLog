@@ -1,3 +1,17 @@
+2001-07-16  Per Bothner  <per@bothner.com>
+
+	* CallContext.java (next):  New field.
+	(getNextArg, lastArg):  New methods.
+	(setArgs, setArgsN):  Initialize next to 0.
+
+	* OutPort.java (beginGroup, endGroup):  If objectFormat is non-null,
+	re-direct to its methods.
+	* OutPort (endAttribute):  Removed method (no longer in Consumer).
+	(endAttribute):  New method (to implement Consumer).
+
+	* Values.java: Now extends TreeList, used to store the Values.
+	(equals):  Only succeed if other Obejct is instanceof Values.
+
 2001-06-19  Per Bothner  <per@bothner.com>
 
 	* Binding.java (isBound):  Remove debugging junk.

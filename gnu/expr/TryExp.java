@@ -77,8 +77,11 @@ public class TryExp extends Expression
       {
 	catch_clause.print(ps);
       }
-    ps.print(" finally: ");
-    finally_clause.print(ps);
+    if (finally_clause != null)
+      {
+	ps.print(" finally: ");
+	finally_clause.print(ps);
+      }
     ps.print(")");
   }
 }

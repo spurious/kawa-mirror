@@ -1,3 +1,26 @@
+2003-09-10  Per Bothner  <per@bothner.com>
+
+	* XQParser.java (warnOldVersion):  New static variable.
+	(DEFINE_FUNCTION_TOKEN):  Rename to DEFINE_VARIABLE_TOKEN.
+	(DECLARE_FUNCTION_TOKEN):  Rename to DECLARE_VARIABLE_TOKEN.
+	(peekOperand):  Recognize <declare function> amd <declare variable>.
+	Also recognize (and if warnOldVersion warn) the <define ...> syntax.
+	(parse):  Update to handle new syntax as well as old syntax.
+
+	* XQParser.java (DOT_VARNAME, POSITION_VARNAME, LAST_VARNAME):  Change
+	values to names don't need to be mangled.
+
+	* XQParser.java (pushStandardNamespaces):  Define 'local' prefix.
+
+	* XQParser.java (parseNodeTest, parseRelativePathExpr):  Simplify
+	using ApplyExp constructor that takes a method or Procedure..
+
+	* XQParser.java (parseMaybePrimaryExpr):  Do syntaxError instead of
+	throw on syntax confusion.
+
+	* XQParser.java (parseFLWRExpression):  Re-organize methods so we
+	can parse and handle 'at' clause.
+
 2003-09-04  Per Bothner  <per@bothner.com>
 
 	* XQuery.java (parse, parseFile):  Change defaultCallConvention

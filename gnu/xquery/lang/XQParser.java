@@ -26,14 +26,16 @@ public class XQParser extends LispReader // should be extends Lexer
   int seenPosition;
   int seenLast;
 
+  public static boolean warnOldVersion;
+
   /** The inetrnal name of the variable containing '.', teh context node. */
-  static final String DOT_VARNAME = "{dot}";
+  static final String DOT_VARNAME = "$dot$";
 
   /** The pseduo-function position() is mapped to a reference. */
-  static final String POSITION_VARNAME = "{position}";
+  static final String POSITION_VARNAME = "$position$";
 
   /** The pseduo-function last() is mapped to a reference to this variable. */
-  static final String LAST_VARNAME = "{last}";
+  static final String LAST_VARNAME = "$last$";
 
   public static final gnu.kawa.reflect.InstanceOf instanceOf
   = new gnu.kawa.reflect.InstanceOf(XQuery.getInstance(), "instance");
@@ -224,8 +226,8 @@ public class XQParser extends LispReader // should be extends Lexer
   static final int DECLARE_XMLSPACE_TOKEN = 'S'; // <"declare" "xmlspace">
   static final int DEFAULT_ELEMENT_TOKEN = 'N'; // <"default" "element">
   static final int DEFAULT_FUNCTION_TOKEN = 'O'; // <"default" "function">
-  static final int DEFINE_FUNCTION_TOKEN = 'P'; // <"define" "function">
-  static final int DEFINE_VARIABLE_TOKEN = 'V'; // <"define" "variable">
+  static final int DECLARE_FUNCTION_TOKEN = 'P'; // <"declare" "function">
+  static final int DECLARE_VARIABLE_TOKEN = 'V'; // <"declare" "variable">
   static final int DEFINE_QNAME_TOKEN = 'W'; // <"define" QName> - an error
 
   /* 'Q': QName (intern'ed name is curValue)
@@ -711,8 +713,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	      return curToken = DEFAULT_ELEMENT_TOKEN;
 	    break;
 	  case 'f':
+	    if (lookingAt("declare", /*"f"+*/ "unction"))
+	      return curToken = DECLARE_FUNCTION_TOKEN;
 	    if (lookingAt("define", /*"f"+*/ "unction"))
-	      return curToken = DEFINE_FUNCTION_TOKEN;
+	      {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'define function' by 'declare function'");
+		return curToken = DECLARE_FUNCTION_TOKEN;
+	      }
 	    if (lookingAt("default", /*"f"+*/ "unction"))
 	      return curToken = DEFAULT_FUNCTION_TOKEN;
 	    break;
@@ -721,8 +730,15 @@ public class XQParser extends LispReader // should be extends Lexer
 	      return curToken = DECLARE_NAMESPACE_TOKEN;
 	    break;
 	  case 'v':
+	    if (lookingAt("declare", /*"v"+*/ "ariable"))
+	      return curToken = DECLARE_VARIABLE_TOKEN;
 	    if (lookingAt("define", /*"v"+*/ "ariable"))
-	      return curToken = DEFINE_VARIABLE_TOKEN;
+	      {
+		if (warnOldVersion)
+		  error('w',
+			"replace 'define variable' by 'declare variable'");
+		return curToken = DECLARE_VARIABLE_TOKEN;
+	      }
 	    break;
 	  case 'x':
 	    if (lookingAt("declare", /*"x"+*/ "mlspace"))
@@ -770,6 +786,7 @@ public class XQParser extends LispReader // should be extends Lexer
     namespaces.put("xs", "http://www.w3.org/2001/XMLSchema");
     namespaces.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
     namespaces.put("fn", "http://www.w3.org/2002/11/xquery-functions");
+    namespaces.put("local", "http://www.w3.org/2003/08/xquery-local-functions");
   }
 
   public XQParser (InPort port)
@@ -1305,7 +1322,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	  op = ParentAxis.make(predicate);
 	else
 	  op = ChildAxis.make(predicate);
-	exp = new ApplyExp(new QuoteExp(op), args);
+	exp = new ApplyExp(op, args);
       }
     else if (axis == AXIS_ATTRIBUTE)
       {
@@ -1315,7 +1332,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    Symbol qname = parseNameTest("");
 	    Expression[] args = { dot };
 	    TreeScanner op = AttributeAxis.make(new AttributeType(qname));
-	    exp = new ApplyExp(new QuoteExp(op), args);
+	    exp = new ApplyExp(op, args);
 	  }
 	else
 	  return syntaxError("missing name or '*' after '@' or attribute::");
@@ -1349,7 +1366,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    Expression dot = new ReferenceExp(DOT_VARNAME, dotDecl);
 	    Expression[] args = { dot };
 	    TreeScanner op = DescendantOrSelfAxis.make(anyNodeTest);
-	    lexp.body = new ApplyExp(new QuoteExp(op), args);
+	    lexp.body = new ApplyExp(op, args);
 	    //descendants = false; // FIXME Actually simplify below.
 	  }
 	else
@@ -2170,7 +2187,7 @@ public class XQParser extends LispReader // should be extends Lexer
 		  forOrLet = 1;
 	      }
 	    if (forOrLet < 0)
-	      throw new Error/*return syntaxError*/("invalid syntax - variable following name");
+	      return syntaxError("invalid syntax - variable following name");
 	    exp = parseFLWRExpression(forOrLet > 0);
 	    exp.setFile(getName());
 	    exp.setLine(startLine, startColumn - 3);
@@ -2305,26 +2322,66 @@ public class XQParser extends LispReader // should be extends Lexer
   }
 
   public Expression parseFLWRExpression (boolean isFor,
-					 String name, Expression init)
+					 String name, char saveNesting)
       throws java.io.IOException, SyntaxException
   {
     ScopeExp sc;
-    Expression[] inits = { init };
+    Expression[] inits = new Expression[1];
+    String posVar = null;
     if (isFor)
       {
-	LambdaExp lexp = new LambdaExp(1);
+	boolean sawAt = match("at");
+	LambdaExp lexp = new LambdaExp(sawAt ? 2 : 1);
+	if (sawAt)
+	  {
+	    getRawToken();
+	    if (curToken == '$')
+	      getRawToken();
+	    else
+	      syntaxError("missing '$'");
+	    // FIXME handle QNAME_TOKEN
+	    if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
+	      posVar = new String(tokenBuffer, 0, tokenBufferLength).intern();
+	    else
+	      return syntaxError("missing Variable");
+	    getRawToken();
+	  }
 	sc = lexp;
+	if (match("in"))
+	  getRawToken();
+	else
+	  {	
+	    if (curToken == COLON_EQUAL_TOKEN)
+	      getRawToken();
+	    syntaxError("missing 'in' in 'for' clause");
+	  }
       }
     else
       {
+	if (curToken == COLON_EQUAL_TOKEN)
+	  getRawToken();
+	else
+	  {	
+	    if (match("in"))
+	      getRawToken();
+	    syntaxError("missing ':=' in 'let' clause");
+	  }
 	LetExp let = new LetExp(inits);
 	sc = let;
       }
+    inits[0] = parseBinaryExpr(priority(OP_OR));
+    popNesting(saveNesting);
     Declaration decl = sc.addDeclaration(name);
     if (isFor)
       {
 	decl.noteValue (null);  // Does not have a known value.
 	decl.setFlag(Declaration.IS_SINGLE_VALUE);
+      }
+    if (posVar != null)
+      {
+	Declaration posDecl = sc.addDeclaration(posVar, Type.int_type);
+	posDecl.noteValue(null);
+	posDecl.setFlag(Declaration.IS_SINGLE_VALUE);
       }
     parser.push(sc);
     Expression body;
@@ -2370,10 +2427,12 @@ public class XQParser extends LispReader // should be extends Lexer
     parser.pop(sc);
     if (isFor)
       {
-	((LambdaExp) sc).body = body;
+	LambdaExp lexp = (LambdaExp) sc;
+	lexp.body = body;
 	Expression[] args = { sc, inits[0]};  // SIC
 	return new ApplyExp(makeFunctionExp("gnu.kawa.functions.ValuesMap",
-					    "valuesMap"),
+					    lexp.min_args == 1 ? "valuesMap"
+					    : "valuesMapWithPos"),
 			    args);
       }
     else
@@ -2387,7 +2446,7 @@ public class XQParser extends LispReader // should be extends Lexer
   public Expression parseFLWRExpression (boolean isFor)
       throws java.io.IOException, SyntaxException
   {
-    char save = pushNesting(isFor ? 'f' : 'l');
+    char saveNesting = pushNesting(isFor ? 'f' : 'l');
     getRawToken();
     String name;
     if (curToken == QNAME_TOKEN || curToken == NCNAME_TOKEN)
@@ -2396,32 +2455,7 @@ public class XQParser extends LispReader // should be extends Lexer
       return syntaxError("missing Variable token:"+curToken);
     getRawToken();
     
-    if (isFor)
-      {
-	char ch;
-	if (match("in"))
-	  getRawToken();
-	else
-	  {	
-	    if (curToken == COLON_EQUAL_TOKEN)
-	      getRawToken();
-	    syntaxError("missing 'in' in 'for' clause");
-	  }
-      }
-    else
-      {
-	if (curToken == COLON_EQUAL_TOKEN)
-	  getRawToken();
-	else
-	  {	
-	    if (match("in"))
-	      getRawToken();
-	    syntaxError("missing ':=' in 'let' clause");
-	  }
-      }
-    Expression value = parseBinaryExpr(priority(OP_OR));
-    popNesting(save);
-    return parseFLWRExpression(isFor, name, value);
+    return parseFLWRExpression(isFor, name, saveNesting);
   }
 
   public Expression parseFunctionDefinition(int declLine, int declColumn)
@@ -2523,6 +2557,11 @@ public class XQParser extends LispReader // should be extends Lexer
   String defaultFunctionNamespace = XQuery.XQUERY_FUNCTION_NAMESPACE;
   Hashtable namespaces = new Hashtable(50);
 
+  void parseSeparator ()
+  {
+    //System.err.println("parseSep tk:"+curToken);
+  }
+
   /** Parse an expression.
    * Return null on EOF. */
   public Expression parse(Compilation parser)
@@ -2563,7 +2602,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	else
 	  return syntaxError("missing keyword after 'define'");
       }
-    if (curToken == DEFINE_FUNCTION_TOKEN)
+    if (curToken == DECLARE_FUNCTION_TOKEN)
       {
 	int declLine = getLineNumber() + 1;
 	int declColumn = getColumnNumber() + 1;
@@ -2572,11 +2611,12 @@ public class XQParser extends LispReader // should be extends Lexer
 	char save = pushNesting('d');
 	Expression exp = parseFunctionDefinition(declLine, declColumn);
 	popNesting(save);
+	parseSeparator();
 	exp.setFile(getName());
 	exp.setLine(startLine, startColumn);
 	return exp;
       }
-    if (curToken == DEFINE_VARIABLE_TOKEN)
+    if (curToken == DECLARE_VARIABLE_TOKEN)
       {
 	String name;
 	getRawToken();
@@ -2596,6 +2636,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	if (curToken == '{')
 	  {
 	    init = parseEnclosedExpr();
+	    parseSeparator();
 	  }
 	else if (match("external"))
 	  {
@@ -2621,7 +2662,8 @@ public class XQParser extends LispReader // should be extends Lexer
     if (curToken == NCNAME_TOKEN
 	&& "namespace".equals((String) curValue))
       {
-	error('w', "use 'declare namespace' instead of 'namespace'");
+	if (warnOldVersion)
+	  error('w', "use 'declare namespace' instead of 'namespace'");
 	curToken = DECLARE_NAMESPACE_TOKEN;
       }
     if (curToken == DECLARE_NAMESPACE_TOKEN)
@@ -2660,7 +2702,7 @@ public class XQParser extends LispReader // should be extends Lexer
 	    if (isNameStart((char) next))
 	      {
 		boolean forFunctions = curToken == DEFAULT_FUNCTION_TOKEN;
-		if (curToken == NCNAME_TOKEN)
+		if (curToken == NCNAME_TOKEN && warnOldVersion)
 		  error('w', "use 'default element namespace' instead of 'default namespace'");
 		getRawToken();
 		curValue = new String(tokenBuffer, 0, tokenBufferLength);

@@ -22,7 +22,7 @@ public abstract class CpsProcedure extends MethodProc
         || (num >= 0 && count > (num >> 12)))
       throw new WrongArguments(this, count);
     CallContext stack = new CallContext();
-    stack.values = args;
+    stack.setArgsN(args);
     stack.proc = this;
     return applyV(stack);
   }
@@ -41,7 +41,7 @@ public abstract class CpsProcedure extends MethodProc
         if (argCount > max)
           return NO_MATCH_TOO_MANY_ARGS|max;
       }
-    ctx.values = args;
+    ctx.setArgsN(args);
     ctx.proc = this;
     return 0;
   }

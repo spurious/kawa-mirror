@@ -71,7 +71,7 @@ public class Values implements Printable, Externalizable
   {
     int index = startPosition;
     Object prev = null;
-    int count = 0;
+    int count = -1; // One less than the number of values seen.
     Object[] vals = null;
     int limit = startPosition <= list.gapStart && endPosition > list.gapStart ? list.gapStart
       : endPosition;
@@ -88,8 +88,9 @@ public class Values implements Printable, Externalizable
 	    else
 	      break;
 	  }
-	if (count > 0)
+	if (count >= 0)
 	  {
+	    // count is number of values stored so far in vals array.
 	    if (vals == null)
 	      vals = new Object[10];
 	    else if (vals.length <= count)
@@ -100,18 +101,19 @@ public class Values implements Printable, Externalizable
 	      }
 	    vals[count] = prev;
 	  }
-	prev = list.getNext(index, null);
+	prev = list.getNext(index << 1, null);
 	index = list.nextDataIndex(index);
 	count++;
       }
-    if (count == 0)
+    if (count < 0)
       return empty;
-    if (count == 1)
+    if (count == 0)
       return prev;
+    count++;
     if (count != vals.length)
       {
 	Object[] tmp = new Object[count];
-	System.arraycopy(vals, 0,tmp, 0, count);
+	System.arraycopy(vals, 0, tmp, 0, count);
 	vals = tmp;
       }
     vals[count-1] = prev;

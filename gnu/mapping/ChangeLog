@@ -1,3 +1,13 @@
+2001-05-16  Per Bothner  <per@bothner.com>
+
+	* CpsProcedure.java (applyN, match):  Use CallContext's setArgsN.
+
+	* Values.java (make(TreeList,int,int)):  Change count variable
+	to be one less, and fix some off-by-one errors.
+
+	* Values.java (make(TreeList,int,int)):  Shift argument to getNext
+	to convert index to ipos.
+
 2001-05-08  Per Bothner  <per@bothner.com>
 
 	Change full-tailcalls calling convention so result is Consumer.

@@ -1,3 +1,12 @@
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* ZipMember.java:  Inherit from java.util.zip.ZipEntry.
+	Various related changes.
+	* ZipArchive.java:  Add casts and other changes from ZipMember changes.
+	(copy - two overload variants):  New methods.
+	(doit):  Removed.
+	(main):  Use java.util.zip classes (except for 'q' command).
+
 1999-04-17  Per Bothner  <bothner@Magnus.Cygnus.COM>
 
 	* ClassFileInput.java (readAttribute):  Revert previous change.

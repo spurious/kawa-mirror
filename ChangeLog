@@ -1,3 +1,11 @@
+2004-12-02  Per Bothner  <per@bothner.com>
+
+	* kawa/standard/force.java: Converted to Scheme and removed.
+	* kawa/standard/make_future.java: Likewise.
+	* kawa/standard/Makefile.am: Update accordingly.
+	* kawa/standard/Scheme.java: Update accordingly.
+	Also use defProcStFld for 'as' and 'throw'.
+
 2004-11-16  Per Bothner  <per@bothner.com>
 
 	* kawa/standard/Scheme.java (defSntxStFld): New method.

@@ -338,7 +338,7 @@ public class Scheme extends LispInterpreter
       defProcStFld("for-each", "kawa.standard.Scheme", "forEach");
       define_proc ("call-with-current-continuation", "kawa.standard.callcc");
       define_proc ("call/cc", "kawa.standard.callcc");
-      define_proc ("force", "kawa.standard.force");
+      defProcStFld("force", "kawa.lib.misc");
 
       //-- Section 6.10  -- complete
       defProcStFld("call-with-input-file", "kawa.lib.ports");
@@ -460,10 +460,10 @@ public class Scheme extends LispInterpreter
       defProcStFld("primitive-throw", "kawa.standard.prim_throw", "primitiveThrow");
       defSntxStFld("try-finally", "kawa.lib.syntax");
       defSntxStFld("try-catch", "kawa.lib.prim_syntax");
-      define_proc("throw", "kawa.standard.throw_name");
+      defProcStFld("throw", "kawa.standard.throw_name", "throwName");
       defProcStFld("catch", "kawa.lib.syntax");
       defProcStFld("error", "kawa.lib.misc");
-      define_proc("as", gnu.kawa.functions.Convert.as);
+      defProcStFld("as", "gnu.kawa.functions.Convert", "as");
       defProcStFld("instance?", "kawa.standard.Scheme", "instanceOf");
       defSntxStFld("synchronized", "kawa.lib.syntax");
       object objectSyntax = new kawa.standard.object(lambda);
@@ -552,7 +552,6 @@ public class Scheme extends LispInterpreter
       defProcStFld("setter", "gnu.kawa.functions.Setter", "setter");
 
       defSntxStFld("future", "kawa.lib.thread");
-      define_proc ("%make-future", "kawa.standard.make_future");
       define_proc ("sleep", "kawa.standard.sleep");
 
       defSntxStFld("trace", "kawa.lib.trace");

@@ -5,7 +5,7 @@ KAWA = $(@GCJ_COMPILED_SELECTED@_KAWA)
 DOTEST = $(KAWA) --elisp\
  -e '(load "$(KAWALIB)/testsuite/testing.zip")' $(OPTIONS)
 
-SOURCES = lang-test.el
+EXTRA_DIST = lang-test.el
 
 all:
 

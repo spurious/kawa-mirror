@@ -145,7 +145,7 @@ public class ObjectExp extends LambdaExp
 	      : rtype == Type.void_type ? Target.Ignore
 	      : new TailTarget(rtype);
 	    child.body.compileWithPosition(comp, target);
-	    compileEnd(comp);
+	    child.compileEnd(comp);
 	    comp.method = save_method;
 	    comp.curClass = new_class;
 	    comp.curLambda = save_lambda;

@@ -23,9 +23,12 @@ public class VarEnumerator implements java.util.Enumeration
   public final void reset ()
   {
     currentScope = topScope;
-    next = currentScope.firstVar ();
-    if (next == null)
-      fixup ();
+    if (topScope != null)
+      {
+	next = currentScope.firstVar ();
+	if (next == null)
+	  fixup ();
+      }
   }
 
   private void fixup ()

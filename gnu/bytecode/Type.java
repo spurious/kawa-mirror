@@ -34,7 +34,8 @@ public class Type {
     return size < 4 ? int_type : this;
   }
 
-  /** Returns the primitive typecorresponding to a signature character. */
+  /** Returns the primitive type corresponding to a signature character.
+   * @return a primitive type, or null if there is no such type. */
   public static Type signatureToPrimitive(char sig)
   {
     switch(sig)
@@ -52,12 +53,12 @@ public class Type {
     return null;
   }
 
-  public static Type signatureToType(String sig)
+  /** Get a Type corresponding to the given signature string. */
+  public static Type signatureToType(String sig, int off, int len)
   {
-    int len = sig.length();
     if (len == 0)
       return null;
-    char c = sig.charAt(0);
+    char c = sig.charAt(off);
     Type type;
     if (len == 1)
       {
@@ -67,12 +68,18 @@ public class Type {
       }
     if (c == '[')
       {
-	type = signatureToType(sig.substring(1));
-	return new ArrayType(type);
+	type = signatureToType(sig, off+1, len-1);
+	return type == null ? null : new ArrayType(type);
       }
-    if (c == 'L' && len > 2 && sig.indexOf(';') == len-1)
-      return ClassType.make(sig.substring(1,len-1).replace('/', '.'));
+    if (c == 'L' && len > 2 && sig.indexOf(';', off) == len-1+off)
+      return ClassType.make(sig.substring(off+1,len-1+off).replace('/', '.'));
     return null;
+  }
+
+  /** Get a Type corresponding to the given signature string. */
+  public static Type signatureToType(String sig)
+  {
+    return signatureToType(sig, 0, sig.length());
   }
 
   /** Return the length of the signature starting at a given string position.

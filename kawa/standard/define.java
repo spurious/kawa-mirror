@@ -33,7 +33,7 @@ public class define extends Syntax implements Printable
 	      {
 		Symbol name = (Symbol) p2.car;
 		LambdaExp lexp = new LambdaExp (p2.cdr, p1.cdr, interp);
-		lexp.setName (name.toString ());
+		lexp.setName (name);
 		SetExp result = new SetExp (name, lexp);
 		result.setDefining (true);
 		return result;

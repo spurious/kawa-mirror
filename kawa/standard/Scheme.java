@@ -631,6 +631,8 @@ public class Scheme extends Interpreter
       define_proc ("f64vector-set!", "kawa.lib.uniform");
       define_proc ("f64vector->list", "kawa.lib.uniform");
       define_proc ("list->f64vector", "kawa.lib.uniform");
+
+      define_proc ("emacs", "gnu.jemacs.buffer.emacs");
   }
 
   static int scheme_counter = 0;

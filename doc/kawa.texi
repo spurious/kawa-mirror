@@ -1935,13 +1935,17 @@ Applying the procedure returns the length of the array.
 Returns a new instance of an anonymous (inner) class.
 @display
 @var{field-or-method} = @var{field-decl} | @var{method-decl}
-@var{field-decl} = (@var{field-name})
+@var{field-decl} = (@var{field-name} [[@var{field-type}] @var{field-init}])
 @var{method-decl} = ((@var{method-name} @var{formal-arguments}) [@var{rtype}] @var{body})
 @end display
+
+Returns a new instance of a unique (anonymous) class.
+The class inherits from the list of @var{supers}, where the first element
+should be the base class being extended from, and the rest are interfaces.
 @end deffn
 
-The implementation is very preliminary.  For one thing,
-the declared @var{field-name} and @var{method-name} are @emph{not}
+The implementation is rather preliminary.  For one thing,
+the declared  @var{method-name}s are @emph{not}
 in the scope of the @var{body} - but they should be.
 
 @node Loading a ModuleBody, Evaluating Scheme expressions from Java, Anonymous classes, Low-level functions

@@ -359,7 +359,9 @@ public class LambdaExp extends ScopeExp
 	else if (parent.heapFrame == null && ! parent.getNeedsStaticLink()
 		 && ! (parent instanceof ModuleExp))
 	  closureEnv = null;
-	else if (! isClassGenerated() && ! getInlineOnly())
+	else if (getInlineOnly())
+	  closureEnv = parentFrame;
+	else if (! isClassGenerated())
 	  {
 	    Method primMethod = getMainMethod();
 	    if (! primMethod.getStaticFlag())
@@ -375,18 +377,9 @@ public class LambdaExp extends ScopeExp
 	  }
 	else
 	  {
-	    LambdaExp caller = getInlineOnly() ? getCaller() : null;
-	    if (parent == caller)
-	      closureEnv = parentFrame;
-	    else if (caller != null && parent == caller.outerLambdaNotInline())
-	      closureEnv = caller.closureEnv;
-	    else
-	      {
-		closureEnv = new Variable("closureEnv",
-                                          parentFrame.getType());
-		scope.addVariable(closureEnv);
-		closureEnv.setArtificial(true);
-	      }
+	    closureEnv = new Variable("closureEnv", parentFrame.getType());
+	    scope.addVariable(closureEnv);
+	    closureEnv.setArtificial(true);
 	  }
       }
     return closureEnv;
@@ -1010,18 +1003,13 @@ public class LambdaExp extends ScopeExp
     scope.setStartPC(code.getPC());
 
     if (closureEnv != null && ! closureEnv.isParameter()
-	&& ! comp.usingCPStyle())
+	&& ! comp.usingCPStyle() && ! getInlineOnly())
       {
-	if (getInlineOnly())
-	  outerLambda().loadHeapFrame(comp);
-	else
-	  {
-	    code.emitPushThis();
-	    Field field = closureEnvField;
-	    if (field == null)
-	      field = outerLambda().closureEnvField;
-	    code.emitGetField(field);
-	  }
+	code.emitPushThis();
+	Field field = closureEnvField;
+	if (field == null)
+	  field = outerLambda().closureEnvField;
+	code.emitGetField(field);
 	code.emitStore(closureEnv);
       }
     if (! comp.usingCPStyle())

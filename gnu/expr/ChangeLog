@@ -1,3 +1,10 @@
+2003-05-30  Per Bothner  <per@bothner.com>
+
+	* LambdaExp.java (declareClosureEnv):  Simplify - if inline-only,
+	used the parentFrame.
+	(enterFunction):  Don;'t need to set closeEnv if inline-only.
+	Fixes bug reported 05-26 by Sven.Hartrumpf@FernUni-Hagen.de.
+
 2003-05-23  Per Bothner  <per@bothner.com>
 
 	* Compilation.java (compileConstant):  Better error message on void.

@@ -1,5 +1,8 @@
 2002-02-13  Per Bothner  <per@bothner.com>
 
+	* kawa/lang/Translator.java (lookup, resolve):  New methods.
+	(getBinding, rewrite):  Using new methods reduces code duplication. 
+
 	* kawa/repl.java:  Remove calls to CallContext.setMainContext.
 
 	* Make-rules (DONT_EDIT_SUBS):  Moved from gnu/xml/Makefile.am.

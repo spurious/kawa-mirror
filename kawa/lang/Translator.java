@@ -23,8 +23,11 @@ import gnu.kawa.lispexpr.LispInterpreter;
 
 public class Translator extends Parser
 {
-  // Map name to Declaration.
+  // Current lexical scope - map name to Declaration.
   public Environment environ;
+
+  // Global environment used to look for syntax/macros.
+  private Environment env;
 
   /** Return true if decl is lexical and not fluid. */
   public boolean isLexical (Declaration decl)
@@ -48,9 +51,6 @@ public class Translator extends Parser
   }
 
   private static Expression errorExp = new ErrorExp ("unknown syntax error");
-
-  // Global environment used to look for syntax/macros.
-  private Environment env;
 
   public Translator (Environment env, SourceMessages messages)
   {
@@ -123,6 +123,39 @@ public class Translator extends Parser
     return new ErrorExp (message);
   }
 
+  private String nameToLookup;
+
+  Binding lookup(Object obj)
+  {
+    String name = obj.toString();
+    Binding binding = environ.lookup(name);
+    if (binding == null)
+      binding = obj instanceof Binding ? (Binding) obj : env.lookup(name);
+    else if (binding.isBound())
+      {
+	Object val1 = binding.getValue();
+	// Check for hygiene re-naming - see SyntaxRule.execute_template.
+	if (val1 instanceof String)
+	  {
+	    name = (String) val1;
+	    binding = env.lookup(name);
+	  }
+      }
+    nameToLookup = name;
+    return binding;
+  }
+
+  Object resolve(Binding binding, boolean function)
+  {
+    if (binding == null)
+      return null;
+    if (function && getInterpreter().hasSeparateFunctionNamespace())
+      return binding.getFunctionValue(null);
+    if (binding.isBound())
+      return binding.getValue();
+    return null;
+  }
+
   /**
    * @param function true if obj is in function-call position (i.e. first).
    */
@@ -130,29 +163,8 @@ public class Translator extends Parser
   {
     if (obj instanceof String || obj instanceof Binding)
       {
-	String name = obj.toString();
-	// Same logic as in rewrite(Object,boolean)..
-	Binding binding = environ.lookup(name);
-	if (binding == null)
-	  binding = obj instanceof Binding ? (Binding) obj : env.lookup(name);
-	else if (binding.isBound())
-	  {
-	    Object val1 = binding.getValue();
-            // Check for hygiene re-naming - see SyntaxRule.execute_template.
-	    if (val1 instanceof String)
-	      {
-		name = (String) val1;
-		binding = env.lookup(name);
-	      }
-	  }
-	if (binding == null)
-	  obj = null;
-	else if (function && getInterpreter().hasSeparateFunctionNamespace())
-	  obj = binding.getFunctionValue(null);
-        else if (binding.isBound())
-          obj = binding.getValue();
-        else
-          obj = null;
+	Binding binding = lookup(obj);
+	obj = resolve(binding, function);
         if (obj instanceof Syntax)
           return obj;
 	if (obj instanceof Declaration)
@@ -161,7 +173,6 @@ public class Translator extends Parser
 	    if (dval instanceof QuoteExp)
 	      return ((QuoteExp) dval).getValue();
 	  }
-	binding = null;
         if (obj != null)
 	  {
             if (obj instanceof Declaration
@@ -169,9 +180,11 @@ public class Translator extends Parser
 	      obj = null;
 	  }
 	else
-	  binding = env.lookup(name);
-	if (binding != null && binding.isBound())
-	  return binding.get();
+	  {
+	    binding = env.lookup(nameToLookup);
+	    if (binding != null && binding.isBound())
+	      return binding.get();
+	  }
 	return null;
       }
      return obj;
@@ -309,31 +322,8 @@ public class Translator extends Parser
       return rewrite_pair ((Pair) exp);
     else if (exp instanceof String || exp instanceof Binding)
       {
-	String name = exp.toString();
-	// Same logic as in getBinding.  The duplication is difficult to avoid,
-	// because there are two results: Binding and name may is changed.
-	Binding binding = environ.lookup(name);
-        if (binding == null)
-	  binding = exp instanceof Binding ? (Binding) exp : env.lookup(name);
-        else if (binding.isBound())
-          {
-            // Check for hygiene re-naming - see SyntaxRule.execute_template.
-            Object val1 = binding.getValue();
-            if (val1 instanceof String)
-              {
-                name = (String) val1;
-                binding = env.lookup(name);
-              }
-          }
-        Object value;
-	if (binding == null)
-	  value = null;
-	else if (function && getInterpreter().hasSeparateFunctionNamespace())
-	  value = binding.getFunctionValue(null);
-        else if (binding.isBound())
-          value = binding.getValue();
-        else
-          value = null;
+	Binding binding = lookup(exp);
+	Object value = resolve(binding, function);
         boolean separate = getInterpreter().hasSeparateFunctionNamespace();
 	Declaration decl = null;
         if (value instanceof Declaration) // ?? FIXME
@@ -380,7 +370,7 @@ public class Translator extends Parser
                 decl = Declaration.getDeclaration(proc);
               }
           }
-	ReferenceExp rexp = new ReferenceExp (name, decl);
+	ReferenceExp rexp = new ReferenceExp (nameToLookup, decl);
 	if (separate)
 	  rexp.setFlag(ReferenceExp.PREFER_BINDING2);
 	return rexp;

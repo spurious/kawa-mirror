@@ -84,13 +84,12 @@ public class ModuleExp extends LambdaExp
     String name = getName();
     if (name != null)
       {
-	int index = name.lastIndexOf('.');
-	if (index < 0)
-	  topname = name;
-	else
+	topname = name;
+	if (prefix == null)
 	  {
-	    prefix = name.substring(0, index);
-	    topname = name.substring(index+1);
+	    int index = name.lastIndexOf('.');
+	    if (index >= 0)
+	      prefix = name.substring(0, index+1);
 	  }
       }
     Compilation comp = new Compilation(this, topname, prefix, false);
@@ -98,7 +97,11 @@ public class ModuleExp extends LambdaExp
       {
 	ClassType clas = comp.classes[iClass];
 	String out_name
-	  = directory + clas.getName().replace('.', '/') + ".class";
+	  = (directory + clas.getName().replace('.', File.separatorChar)
+	     + ".class");
+	String parent = new File(out_name).getParent();
+	if (parent != null)
+	  new File(parent).mkdirs();
 	clas.writeToFile(out_name);
       }
   }

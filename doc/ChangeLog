@@ -1,5 +1,7 @@
 2003-11-05  Per Bothner  <per@bothner.com>
 
+	* Makefile.am (../kawa-doc-$(VERSION).tar.gz):  Add kawa.pdf.
+
 	* kawa.texi (Module classes):  Deocument define-variable.
 	(Compilation options):  Mention define-variable.
 

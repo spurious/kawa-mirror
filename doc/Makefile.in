@@ -530,8 +530,8 @@ kawa.1: $(srcdir)/kawa.man
 	nroff -man $(srcdir)/kawa.man | col -b > kawa1.tmp
 	mv kawa1.tmp kawa.1
 
-../kawa-doc-$(VERSION).tar.gz: kawa/index.html internals.html kawa-tour.ps
-	tar cf - kawa/*.html internals.html kawa-tour.ps|gzip -c --best >$@
+../kawa-doc-$(VERSION).tar.gz: kawa/index.html kawa.pdf internals.html kawa-tour.ps
+	tar cf - kawa/*.html kawa.pdf internals.html kawa-tour.ps|gzip -c --best >$@
 
 # Redundant if configured with  --enable-maintainer-mode.
 # Work around a questionable autoconf feature.

@@ -29,9 +29,8 @@ AC_ARG_ENABLE(servlet,
   enable_servlet=$enableval, enable_servlet=no)
 
 AC_ARG_WITH(java-collections,
-    --without-java-collections Don't assume Java collections (java.util.List) is available],
+  [  --without-java-collections Don't use Java collections (java.util.List)],
   with_java_collections=$withval, with_java_collections=yes)
-
 
 AC_ARG_WITH(java-references,
   [  --without-java-references  Don't use java.lang.ref],

@@ -96,6 +96,8 @@ are used by Kawa, and distributed with it, but may be independently useful.
 For a technical overview of Kawa, see these
 @uref{http://sourceware.cygnus.com/kawa/papers/,papers}.
 
+Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
+
 @menu
 * Features::
 * Getting Kawa::

@@ -78,10 +78,11 @@ public class TreePosition extends SeqPosition implements Cloneable
     for (i = 0;  i < depth;  i++)
       {
 	seq = position.sstack[i];
-	seq.copyPosition(position.istack[i], position.xstack[i], this, i);
+	seq.copyPosition(position.istack[i], position.xstack[i],
+			 this, depth - i);
       }
     seq = position.sequence;
-    seq.copyPosition(position.ipos, position.xpos, this, i);
+    seq.copyPosition(position.ipos, position.xpos, this, 0);
   }
 
   /** Number of ancestor sequences, including current sequence. */
@@ -157,7 +158,7 @@ public class TreePosition extends SeqPosition implements Cloneable
 
   public final boolean gotoParent()
   {
-    return sequence.gotoParent(this);
+    return sequence == null ? false : sequence.gotoParent(this);
   }
 
   /** Set position before first child (of the element following position).

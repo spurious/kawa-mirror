@@ -6,7 +6,7 @@ public class Eval extends Procedure1or2
 {
   final static Symbol evalFunctionName = Symbol.make ("atEvalLevel");
 
-  private static Object eval (ModuleExp mod, Translator tr,
+  public static Object eval (ModuleExp mod, Translator tr,
 			      Environment env)
        throws UnboundSymbol, WrongArguments, WrongType, GenericError
   {

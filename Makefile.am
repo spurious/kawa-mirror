@@ -124,6 +124,10 @@ EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   build.xml build.properties \
   kawa/Version.java jar-manifest Make-rules
 
+MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
+MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
+CLEANFILES = *.jar
+
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/api
 JAVADOC_PACKAGES = \
@@ -137,18 +141,23 @@ JAVADOC_PACKAGES = \
 
 JAVADOC = javadoc
 JAVADOC_FLAGS = -J-Xmx60m
-# NOTE:  To update javadoc do:
-# make install-javadoc-html
-# cd ~/Kawa/api
-# export CVSROOT=bothner@subversions.gnu.org:/webcvs/
-# cvs -z 7 import -m "Javadoc generated." software/kawa/api javadoc kawa_X_Y_ZZ
-# cvs checkout -jjavadoc:yesterday -jjavadoc software/kawa/api
-# cd software/kawa/api/
-# cvs ci -m 'Updated.' .
 
-MAINTAINERCLEANFILES = makekawa.bat kawa/Version.java
-MOSTLYCLEANFILES = tmp *.o kawa1$(exeext)
-CLEANFILES = *.jar
+# NOTE:  To update javadoc:
+#   make install-javadoc-html
+# When satisfied:
+#   make javadoc-cvs.log
+# When satisfied:
+#   cd ~/Kawa/api && cvs ci -m 'Re-run javadoc.'
+javadoc-cvs.log:
+	cd $(JAVADOC_DIR) \
+	  && find . -name CVS -prune -o -type f -exec echo rm '{}' ';'
+	$(MAKE) install-javadoc-html >&LOG.JAVADOC
+	(cd $(JAVADOC_DIR) && cvs -n update -d .>&/tmp/cvs-changes \
+	  && cvs add `grep '^[?] ' /tmp/cvs-changes |sed -e 's|[?] ||'` \
+	  && cvs remove `grep '^[U] ' /tmp/cvs-changes |sed -e 's|[U] ||'` \
+	  && cvs update -d .) >cvs-update.log
+	echo ExamineCheck ./cvs-update.log
+	echo then: "(cd $(JAVADOC_DIR) && cvs ci -m 'Re-run javadoc.')".
 
 ECLIPSE_PLUGINS_PATH = /opt/eclipse/plugins
 JAVADOC_ANT_JARS = /opt/ant/lib/ant.jar

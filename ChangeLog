@@ -1,3 +1,7 @@
+2005-04-04  Per Bothner  <per@bothner.com>
+
+	* Makefile.am (javadoc-cvs.log): New rule for updating javadoc.
+
 2005-04-03  Per Bothner  <per@bothner.com>
 
 	* Makefile.am (JAVADOC_PACKAGES): Add a number of new packages.

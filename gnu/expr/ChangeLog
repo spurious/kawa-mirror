@@ -1,5 +1,7 @@
 2004-09-05  Per Bothner  <per@bothner.com>
 
+	* IfExp.java (walkChildren):  Allow else_clause to be null.
+
 	* LitTable.java (findLiteral): Also search superclasses for
 	static fields.
 

@@ -98,7 +98,8 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Running::              How to start up and run Kawa
 * Restrictions::         Features of R5RS not implemented
 * Compiling::            Compiling Scheme code to byte-code or an executable
-* Extensions::           Kawa features not in standard Scheme
+* Extensions::           Various Kawa features not in standard Scheme
+* Input-Output::         Input, output, and file handling
 * Types::
 * Objects Classes and Modules::
 * Low-level functions::  The Scheme-Java interface
@@ -655,6 +656,10 @@ Use a calling convention that does not support proper tail recursion.
 Self-tail-recursion (i.e. a recursive call to the current function)
 is still implemented correctly, assuming that the called function
 is known at compile time.
+@item --output-format @var{format}
+@itemx --format @var{format}
+Change the default output format to that specified by @var{format}.
+See @ref{Named output formats} for more information and a list.
 @end table
 
 The default is currently @code{--no-full-tailcalls} because I believe it is
@@ -1013,7 +1018,7 @@ the linker it should link with the kawa shared library, and
 the @code{-L$PREFIX/bin} option tells the linker where it can
 find that library.
 
-@node Extensions, Types, Compiling, Top
+@node Extensions, Input-Output, Compiling, Top
 @chapter Extensions
 
 @menu
@@ -1025,9 +1030,6 @@ find that library.
 * Logical Number Operations::
 * Strings::
 * Uniform vectors::
-* Files:: File System Interface
-* Ports::
-* Format:: Formatted Output (Common-Lisp-style)
 * Exceptions:: Signalling and recovering from exceptions
 * Locations::
 * Eval and Environments::
@@ -1505,7 +1507,7 @@ are replaced by their title-case equivalents, while non-initial letters
 are replaced by their lower-case equivalents.
 @end defun
 
-@node Uniform vectors, Files, Strings, Extensions
+@node Uniform vectors, Exceptions, Strings, Extensions
 @section Uniform vectors
 
 Uniform vectors are vectors whose elements are of the same numeric type.
@@ -1678,598 +1680,7 @@ with the elements of the list @var{l}.  The elements of @var{l}
 must be numbers coercible the new vector's element type.
 @end defun
 
-@node Files, Ports, Uniform vectors, Extensions
-@section File System Interface
-
-@defun file-exists? filename
-Returns true iff the file named @var{filename} actually exists.
-@end defun
-
-@defun file-directory? filename
-Returns true iff the file named @var{filename} actually exists
-and is a directory.
-@end defun
-
-@defun file-readable? filename
-Returns true iff the file named @var{filename} actually exists
-and can be read from.
-@end defun
-
-@defun file-writable? filename
-Returns true iff the file named @var{filename} actually exists
-and can be writen to.
-(Undefined if the @var{filename} does not exist,
-but the file can be created in the directory.)
-@end defun
-
-@defun delete-file filename
-Delete the file named @var{filename}.
-@end defun
-
-@defun rename-file oldname newname
-Renames the file named @var{oldname} to @var{newname}.
-@end defun
-
-@defun copy-file oldname newname-from path-to
-Copy the file named @var{oldname} to @var{newname}.
-The return value is unspecified.
-@end defun
-
-@defun create-directory dirname
-Create a new directory named @var{dirname}.
-Unspecified what happens on error (such as exiting file with the same name).
-(Currently returns @code{#f} on error, but may change to be more compatible
-with scsh.)
-@end defun
-
-@defun system-tmpdir
-Return the name of the default directory for temporary files.
-@end defun
-
-@defun make-temporary-file [format]
-Return a file with a name that does not match any existing file.
-Use @var{format} (which defaults to @code{"kawa~d.tmp"}) to generate
-a unique filename in @code{(system-tmpdir)}.
-The current implementation is @emph{not} safe from race conditions;
-this will be fixed in a future release (using Java2 features).
-@end defun
-
-@node Ports, Format, Files, Extensions
-@section Ports
-
-@defun current-error-port
-Return the port to which errors and warnings should be sent
-(the @dfn{standard error} in Unix and C terminology).
-@end defun
-
-@defun read-line [port [handle-newline]]
-Reads a line of input from @var{port}.
-The @var{handle-newline} parameter determines what is done with
-terminating end-of-line delimiter.
-The default, @code{'trim}, ignores the delimiter;
-@code{'peek} leaves the delimiter in the input stream;
-@code{'concat} appends the delimiter to the returned value;
-and @code{'split} returns the delimiter as a second value.
-You can use the last three options to tell if the string was
-terminated by end-or-line or by end-of-file.
-@end defun
-
-@defun open-input-string string
-Takes a string and returns an input port that delivers characters
-from the string. The port can be closed by @code{close-input-port},
-though its storage will be reclaimed by the
-garbage collector if it becomes inaccessible. 
-
-@example
-(define p
-  (open-input-string "(a . (b c . ())) 34"))
-
-(input-port? p)                 -->  #t
-(read p)                        -->  (a b c)
-(read p)                        -->  34
-(eof-object? (peek-char p))     -->  #t
-@end example
-@end defun
-
-@defun open-output-string
-Returns an output port that will accumulate characters
-for retrieval by @code{get-output-string}.
-The port can be closed by the procedure @code{close-output-port},
-though its storage will be reclaimed by the garbage collector
-if it becomes inaccessible. 
-@example
-(let ((q (open-output-string))
-  (x '(a b c)))
-    (write (car x) q)
-    (write (cdr x) q)
-    (get-output-string q))        -->  "a(b c)"
-@end example
-@end defun
-
-@defun get-output-string output-port
-Given an output port created by @code{open-output-string},
-returns a string consisting of the characters that have been
-output to the port so far. 
-@end defun
-
-@defun call-with-input-string string proc
-Create an input port that gets its data from @var{string},
-call @var{proc} with that port as its one argument, and return
-the result from the call of @var{proc}
-@end defun
-
-@defun call-with-output-string proc
-Create an output port that writes its data to a @var{string},
-and call @var{proc} with that port as its one argument.
-Return a string consisting of the data written to the port.
-@end defun
-
-@defun force-output [port]
-Forces any pending output on @var{port} to be delivered to the output
-device and returns an unspecified value.  If the @var{port} argument is
-omitted it defaults to the value returned by @code{(current-output-port)}.
-@end defun
-
-An interactive input port has a prompt procedure associated with it.
-The prompt procedure is called before a new line is read.  It is passed
-the port as an argument, and returns a string, which gets printed as a prompt.
-
-@defun input-port-prompter port
-Get the prompt procedure associated with @var{port}.
-@end defun
-
-@defun set-input-port-prompter! port prompter
-Set the prompt procedure associated with @var{port} to @var{prompter},
-which must be a one-argument procedure taking an input port,
-and returning a string.
-@end defun
-
-@defun default-prompter port
-The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
-@var{L} is the current line number of @var{port}.
-When reading a continuation line, the result
-is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
-by @code{(input-port-read-state @var{port})}.
-The prompt has the form of a comment to make it easier to cut-and-paste.
-@end defun
-
-@deffn Function port-column input-port
-@deffnx Function port-line input-port
-Return the current column number or line number of @var{input-port},
-using the current input port if none is specified.
-If the number is unknown, the result is @code{#f}.  Otherwise,
-the result is a 0-origin integer - i.e. the first character
-of the first line is line 0, column 0.  (However, when you
-display a file position, for example in an error message,
-we recommend you add 1 to get 1-origin integers.  This is
-because lines and column numbers traditionally start with
-1, and that is what non-programmers will find most natural.)
-@end deffn
-
-@defun set-port-line! port line
-Set (0-origin) line number of the current line of @var{port} to @var{num}.
-@end defun
-
-@defun input-port-line-number port
-Get the line number of the current line of @var{port},
-which must be a (non-binary) input port.
-The initial line is line 1.
-Deprecated; replaced by @code{(+ 1 (port-line @var{port}))}.
-@end defun
-
-@defun set-input-port-line-number! port num
-Set line number of the current line of @var{port} to @var{num}.
-Deprecated;  replaced by @code{(set-port-line! @var{port} (- @var{num} 1))}.
-@end defun
-
-@defun input-port-column-number port 
-Get the column number of the current line of @var{port}, 
-which must be a (non-binary) input port.
-The initial column is column 1.
-Deprecated; replaced by @code{(+ 1 (port-column @var{port}))}.
-@end defun
-
-@defun input-port-read-state port
-Returns a character indicating the current @code{read} state of the @var{port}.
-Returns @code{#\Return} if not current doing a @var{read},
-@code{#\"} if reading a string;  @code{#\|} if reading a comment;  @code{#\(}
-if inside a list; and @code{#\Space} when otherwise in a @code{read}.
-The result is intended for use by prompt prcedures, and is not necessarily
-correct except when reading a new-line.
-@end defun
-
-@defvar symbol-read-case
-A symbol that controls how @code{read} handles letters when reading a symbol.
-If the first letter is @samp{U}, then letters in symbols are upper-cased.
-If the first letter is @samp{D} or @samp{L}, then letters
-in symbols are down-cased.
-If the first letter is @samp{I}, then the case of letters in symbols
-is inverted.
-Otherwise (the default), the letter is not changed.
-(Letters following a @samp{\} are always unchanged.)
-@end defvar
-
-@defvar port-char-encoding
-Controls how bytes in external files are converted to/from internal
-Unicode characters.  Can be either a symbol or a boolean.
-If @code{port-char-encoding} is @code{#f}, the file is assumed
-to be a binary file and no conversion is done.
-Otherwise, the file is a text file.  The default is @code{#t}, which
-uses a locale-dependent conversion.  If @code{port-char-encoding}
-is a symbol, it must be the name of a character encoding known to Java.
-For all text files (that is if @code{port-char-encoding} is not @code{#f}),
-on input a @code{#\Return} character or
-a @code{#\Return} followed by @code{#\Newline}
-are converted into plain @code{#\Newline}.
-
-This variable is checked when the file is opened;  not when actually
-reading or writing.  Here is an example of how you can safely
-change the encoding temporarily:
-@example
-(define (open-binary-input-file name)
-  (fluid-let ((port-char-encoding #f)) (open-input-file name)))
-@end example
-@end defvar
-
-@node Format, Exceptions, Ports, Extensions
-@section Formatted Output (Common-Lisp-style)
-
-@defun format destination fmt . arguments
-An almost complete implementation of Common LISP format description
-according to the CL reference book @cite{Common LISP} from Guy L.
-Steele, Digital Press.  Backward compatible to most of the available
-Scheme format implementations.
-
-Returns @code{#t}, @code{#f} or a string; has side effect of printing
-according to @var{fmt}.  If @var{destination} is @code{#t},
-the output is to the current output port and @code{#t} is returned.  If
-@var{destination} is @code{#f}, a formatted string is returned as the
-result of the call.  If @var{destination} is a string,
-@var{destination} is regarded as the format string; @var{fmt} is
-then the first argument and the output is returned as a string. If
-@var{destination} is a number, the output is to the current error port
-if available by the implementation. Otherwise @var{destination} must be
-an output port and @code{#t} is returned.@refill
-
-@var{fmt} must be a string or an instance of @code{gnu.text.MessageFormat}
-or @code{java.text.MessageFormat}.  If @var{fmt} is a string,
-it is parsed as if by @code{parse-format}.
-@end defun
-
-@defun parse-format format-string
-Parses @code{format-string}, which is a string of the form of a Common LISP
-format description.  Returns an instance of @code{gnu.text.ReportFormat},
-which can be passed to the @code{format} function.
-@end defun
-
-A format string passed to @code{format} or @code{parse-format}
-consists of format directives (that start with @samp{~}),
-and regular characters (that are written directly to the destination).
-Most of the Common Lisp (and Slib) format directives are implemented.
-Neither justification, nor pretty-printing are supported yet.
-
-Plus of course, we need documentation for @code{format}!
-
-@subsection Implemented CL Format Control Directives
-
-Documentation syntax: Uppercase characters represent the corresponding
-control directive characters. Lowercase characters represent control
-directive parameter descriptions.
-
-@table @asis
-@item @code{~A}
-Any (print as @code{display} does).
-@table @asis
-@item @code{~@@A}
-left pad.
-@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}A}
-full padding.
-@end table
-@item @code{~S}
-S-expression (print as @code{write} does).
-@table @asis
-@item @code{~@@S}
-left pad.
-@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}S}
-full padding.
-@end table
-
-@item @code{~C}
-Character.
-@table @asis
-@item @code{~@@C}
-prints a character as the reader can understand it (i.e. @code{#\} prefixing).
-@item @code{~:C}
-prints a character as emacs does (eg. @code{^C} for ASCII 03).
-@end table
-@end table
-
-@subsection Formatting Integers
-
-@table @asis
-@item @code{~D}
-Decimal.
-@table @asis
-@item @code{~@@D}
-print number sign always.
-@item @code{~:D}
-print comma separated.
-@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}D}
-padding.
-@end table
-@item @code{~X}
-Hexadecimal.
-@table @asis
-@item @code{~@@X}
-print number sign always.
-@item @code{~:X}
-print comma separated.
-@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}X}
-padding.
-@end table
-@item @code{~O}
-Octal.
-@table @asis
-@item @code{~@@O}
-print number sign always.
-@item @code{~:O}
-print comma separated.
-@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}O}
-padding.
-@end table
-@item @code{~B}
-Binary.
-@table @asis
-@item @code{~@@B}
-print number sign always.
-@item @code{~:B}
-print comma separated.
-@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}B}
-padding.
-@end table
-@item @code{~@var{n}R}
-Radix @var{n}.
-@table @asis
-@item @code{~@var{n},@var{mincol},@var{padchar},@var{commachar},@var{commawidth}R}
-padding.
-@end table
-@item @code{~@@R}
-print a number as a Roman numeral.
-@item @code{~:@@R}
-print a number as an ``old fashioned'' Roman numeral.
-@item @code{~:R}
-print a number as an ordinal English number.
-@item @code{~:@@R}
-print a number as a cardinal English number.
-@item @code{~P}
-Plural.
-@table @asis
-@item @code{~@@P}
-prints @code{y} and @code{ies}.
-@item @code{~:P}
-as @code{~P but jumps 1 argument backward.}
-@item @code{~:@@P}
-as @code{~@@P but jumps 1 argument backward.}
-@end table
-@end table
-
-@var{commawidth} is the number of characters between two comma characters.
-
-
-@subsection Formatting floating-point (real) numbers
-
-@table @asis
-@item @code{~F}
-Fixed-format floating-point (prints a flonum like @var{mmm.nnn}).
-@table @asis
-@item @code{~@var{width},@var{digits},@var{scale},@var{overflowchar},@var{padchar}F}
-@item @code{~@@F}
-If the number is positive a plus sign is printed.
-@end table
-@end table
-
-@table @asis
-@item @code{~E}
-Exponential floating-point (prints a flonum like @var{mmm.nnn}@code{E}@var{ee})
-@table @asis
-@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}E}
-@item @code{~@@E}
-If the number is positive a plus sign is printed.
-@end table
-@end table
-
-@table @asis
-@item @code{~G}
-General floating-point (prints a flonum either fixed or exponential).
-@table @asis
-@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}G}
-@item @code{~@@G}
-If the number is positive a plus sign is printed.
-@end table
-A slight difference from Common Lisp:  If the number is printed
-in fixed form and the fraction is zero,
-then a zero digit is printed for the fraction, if allowed by the @var{width}
-and @var{digits} is unspecified.
-@end table
-
-@table @asis
-@item @code{~$}
-Dollars floating-point (prints a flonum in fixed with signs separated).
-@table @asis
-@item @code{~@var{digits},@var{scale},@var{width},@var{padchar}$}
-@item @code{~@@$}
-If the number is positive a plus sign is printed.
-@item @code{~:@@$}
-A sign is always printed and appears before the padding.
-@item @code{~:$}
-The sign appears before the padding.
-@end table
-@end table
-
-@subsection Miscellaneous formatting operators
-
-@table @asis
-@item @code{~%}
-Newline.
-@table @asis
-@item @code{~@var{n}%}
-print @var{n} newlines.
-@end table
-@item @code{~&}
-print newline if not at the beginning of the output line.
-@table @asis
-@item @code{~@var{n}&}
-prints @code{~&} and then @var{n-1} newlines.
-@end table
-@item @code{~|}
-Page Separator.
-@table @asis
-@item @code{~@var{n}|}
-print @var{n} page separators.
-@end table
-@item @code{~~}
-Tilde.
-@table @asis
-@item @code{~@var{n}~}
-print @var{n} tildes.
-@end table
-@item @code{~}<newline>
-Continuation Line.
-@table @asis
-@item @code{~:}<newline>
-newline is ignored, white space left.
-@item @code{~@@}<newline>
-newline is left, white space ignored.
-@end table
-@item @code{~T}
-Tabulation.
-@table @asis
-@item @code{~@@T}
-relative tabulation.
-@item @code{~@var{colnum},@var{colinc}T}
-full tabulation.
-@end table
-@item @code{~?}
-Indirection (expects indirect arguments as a list).
-@table @asis
-@item @code{~@@?}
-extracts indirect arguments from format arguments.
-@end table
-@item @code{~(@var{str}~)}
-Case conversion (converts by @code{string-downcase}).
-@table @asis
-@item @code{~:(@var{str}~)}
-converts by @code{string-capitalize}.
-@item @code{~@@(@var{str}~)}
-converts by @code{string-capitalize-first}.
-@item @code{~:@@(@var{str}~)}
-converts by @code{string-upcase}.
-@end table
-@item @code{~*}
-Argument Jumping (jumps 1 argument forward).
-@table @asis
-@item @code{~@var{n}*}
-jumps @var{n} arguments forward.
-@item @code{~:*}
-jumps 1 argument backward.
-@item @code{~@var{n}:*}
-jumps @var{n} arguments backward.
-@item @code{~@@*}
-jumps to the 0th argument.
-@item @code{~@var{n}@@*}
-jumps to the @var{n}th argument (beginning from 0)
-@end table
-@item @code{~[@var{str0}~;@var{str1}~;...~;@var{strn}~]}
-Conditional Expression (numerical clause conditional).
-@table @asis
-@item @code{~@var{n}[}
-take argument from @var{n}.
-@item @code{~@@[}
-true test conditional.
-@item @code{~:[}
-if-else-then conditional.
-@item @code{~;}
-clause separator.
-@item @code{~:;}
-default clause follows.
-@end table
-@item @code{~@{@var{str}~@}}
-Iteration (args come from the next argument (a list)).
-@table @asis
-@item @code{~@var{n}@{}
-at most @var{n} iterations.
-@item @code{~:@{}
-args from next arg (a list of lists).
-@item @code{~@@@{}
-args from the rest of arguments.
-@item @code{~:@@@{}
-args from the rest args (lists).
-@end table
-@item @code{~^}
-Up and out.
-@table @asis
-@item @code{~@var{n}^}
-aborts if @var{n} = 0
-@item @code{~@var{n},@var{m}^}
-aborts if @var{n} = @var{m}
-@item @code{~@var{n},@var{m},@var{k}^}
-aborts if @var{n} <= @var{m} <= @var{k}
-@end table
-@end table
-
-@subsection Not Implemented CL Format Control Directives
-
-@table @asis
-@item @code{~:A}
-print @code{#f} as an empty list (see below).
-@item @code{~:S}
-print @code{#f} as an empty list (see below).
-@item @code{~<~>}
-Justification.
-@item @code{~:^}
-@end table
-
-@subsubsection Extended, Replaced and Additional Control Directives
-
-These are not necesasrily implemented in Kawa!
-
-@table @asis
-@item @code{~I}
-print a R4RS complex number as @code{~F~@@Fi} with passed parameters for
-@code{~F}.
-@item @code{~Y}
-Pretty print formatting of an argument for scheme code lists.
-@item @code{~K}
-Same as @code{~?.}
-@item @code{~!}
-Flushes the output if format @var{destination} is a port.
-@item @code{~_}
-Print a @code{#\space} character
-@table @asis
-@item @code{~@var{n}_}
-print @var{n} @code{#\space} characters.
-@end table
-
-@item @code{~@var{n}C}
-Takes @var{n} as an integer representation for a character. No arguments
-are consumed. @var{n} is converted to a character by
-@code{integer->char}.  @var{n} must be a positive decimal number.@refill
-@item @code{~:S}
-Print out readproof.  Prints out internal objects represented as
-@code{#<...>} as strings @code{"#<...>"} so that the format output can always
-be processed by @code{read}.
-@refill
-@item @code{~:A}
-Print out readproof.  Prints out internal objects represented as
-@code{#<...>} as strings @code{"#<...>"} so that the format output can always
-be processed by @code{read}.
-@refill
-@item @code{~F, ~E, ~G, ~$}
-may also print number strings, i.e. passing a number as a string and
-format it accordingly.
-@end table
-
-@node Exceptions, Locations, Format, Extensions
+@node Exceptions, Locations, Uniform vectors, Extensions
 @section Signalling and recovering from exceptions
 
 @defun catch key thunk handler
@@ -2651,7 +2062,684 @@ Equivalent to the Java @code{synchronized} statement,
 except that it may return a result.
 @end deffn
 
-@node Types, Objects Classes and Modules, Extensions, Top
+@node Input-Output, Types, Extensions, Top
+@chapter Input, output, and file handling
+
+Kawa has a number of useful tools for controlling input and output:
+
+A programmable reader.
+
+A powerful pretty-printer.
+
+@menu
+* Named output formats::
+* Files:: File System Interface
+* Ports::
+* Format:: Formatted Output (Common-Lisp-style)
+@end menu
+
+@node Named output formats, Files, , Input-Output
+
+The @code{--output-format} (or @code{--format}) command-line switch
+can be used to override the default format for how values are
+printed on the standard output.  This format is used for values printed
+by the read-eval-print interactive interface.  It is also used to
+control how values are printed when Kawa evaluates a file named on the
+command line (using the @code{-f} flag or a just a script name).
+(It also effects applications compiled with the @code{--main} flag.)
+It currently effects how values are printed by a @code{load},
+though that may change.
+
+The default format depends on the current programming language.
+For Scheme, the default is @code{--scheme} for read-eval-print
+interaction, and @code{--ignore} for files that are loaded.
+
+The formats currently supported include the following:
+@table @samp
+@item scheme
+Values are printed in a format matching the Scheme programming language,
+as if using @code{display}.  "Groups" or "elements" are written as lists.
+@item readable-scheme
+Like @code{scheme}, as if using @code{write}:
+Values are generally printed in a way that they can
+be read back by a Scheme reader.  For example, strings have quotation marks,
+and character values are written like @samp{#\A}.
+@item elisp
+Values are printed in a format matching the Emacs Lisp programming language.
+Mostly the same as @code{scheme}.
+@item readable-elisp
+Like @code{elisp}, but values are generally printed in a way that they can
+be read back by an Emacs Lisp reader.  For example, strings have quotation
+marks, and character values are written like @samp{?A}.
+@item clisp
+@itemx commonlisp
+Values are printed in a format matching the Common Lisp programming language,
+as if written by @code{princ}.
+Mostly the same as @code{scheme}.
+@item readable-clisp
+@itemx readable-commonlisp
+Like @code{clisp}, but as if written by @code{prin1}: values are generally
+printed in a way that they can be read back by a Common Lisp reader.
+For example, strings have quotation marks, and character values are
+written like @samp{#\A}.
+@item xml
+Values are printed in XML format.
+"Groups" or "elements" are written as using xml element syntax.
+Plain characters (such as @samp{<}) are escaped (such as @samp{&lt;}).
+@item xhtml
+Same as @code{xml}, but follows the xhtml compatibility guidelines.
+@item html
+Values are printed in HTML format.
+Mostly same as @code{xml} format, but certain element without body,
+are written without a closing tag.   For example @code{<img>} is written
+without @code{</img>}, which would be illegal for html, but required for xml.
+Plain characters (such as @samp{<}) are not escaped inside @code{<script>}
+or @code{<style>} elements.
+@item cgi
+The output should be a follow the CGI standards.  I.e. assume that this
+script is invoked by a web server as a CGI script/program, and that the
+output should start with some response header,
+followed by the actual response data.
+To generate the response headers, use the @code{response-header} function.
+If the @code{Content-type} response header has not been specified, and
+it is required by the CGI standard, Kawa will attempt
+to infer an appropriate @code{Content-ty[e} depending on the following value.
+@item ignore
+Top-level values are ignored, instead of printed.
+@end table
+
+@node Files, Ports, Named output formats, Input-Output
+@section File System Interface
+
+@defun file-exists? filename
+Returns true iff the file named @var{filename} actually exists.
+@end defun
+
+@defun file-directory? filename
+Returns true iff the file named @var{filename} actually exists
+and is a directory.
+@end defun
+
+@defun file-readable? filename
+Returns true iff the file named @var{filename} actually exists
+and can be read from.
+@end defun
+
+@defun file-writable? filename
+Returns true iff the file named @var{filename} actually exists
+and can be writen to.
+(Undefined if the @var{filename} does not exist,
+but the file can be created in the directory.)
+@end defun
+
+@defun delete-file filename
+Delete the file named @var{filename}.
+@end defun
+
+@defun rename-file oldname newname
+Renames the file named @var{oldname} to @var{newname}.
+@end defun
+
+@defun copy-file oldname newname-from path-to
+Copy the file named @var{oldname} to @var{newname}.
+The return value is unspecified.
+@end defun
+
+@defun create-directory dirname
+Create a new directory named @var{dirname}.
+Unspecified what happens on error (such as exiting file with the same name).
+(Currently returns @code{#f} on error, but may change to be more compatible
+with scsh.)
+@end defun
+
+@defun system-tmpdir
+Return the name of the default directory for temporary files.
+@end defun
+
+@defun make-temporary-file [format]
+Return a file with a name that does not match any existing file.
+Use @var{format} (which defaults to @code{"kawa~d.tmp"}) to generate
+a unique filename in @code{(system-tmpdir)}.
+The current implementation is @emph{not} safe from race conditions;
+this will be fixed in a future release (using Java2 features).
+@end defun
+
+@node Ports, Format, Files, Input-Output
+@section Ports
+
+@defun current-error-port
+Return the port to which errors and warnings should be sent
+(the @dfn{standard error} in Unix and C terminology).
+@end defun
+
+@defun read-line [port [handle-newline]]
+Reads a line of input from @var{port}.
+The @var{handle-newline} parameter determines what is done with
+terminating end-of-line delimiter.
+The default, @code{'trim}, ignores the delimiter;
+@code{'peek} leaves the delimiter in the input stream;
+@code{'concat} appends the delimiter to the returned value;
+and @code{'split} returns the delimiter as a second value.
+You can use the last three options to tell if the string was
+terminated by end-or-line or by end-of-file.
+@end defun
+
+@defun open-input-string string
+Takes a string and returns an input port that delivers characters
+from the string. The port can be closed by @code{close-input-port},
+though its storage will be reclaimed by the
+garbage collector if it becomes inaccessible. 
+
+@example
+(define p
+  (open-input-string "(a . (b c . ())) 34"))
+
+(input-port? p)                 -->  #t
+(read p)                        -->  (a b c)
+(read p)                        -->  34
+(eof-object? (peek-char p))     -->  #t
+@end example
+@end defun
+
+@defun open-output-string
+Returns an output port that will accumulate characters
+for retrieval by @code{get-output-string}.
+The port can be closed by the procedure @code{close-output-port},
+though its storage will be reclaimed by the garbage collector
+if it becomes inaccessible. 
+@example
+(let ((q (open-output-string))
+  (x '(a b c)))
+    (write (car x) q)
+    (write (cdr x) q)
+    (get-output-string q))        -->  "a(b c)"
+@end example
+@end defun
+
+@defun get-output-string output-port
+Given an output port created by @code{open-output-string},
+returns a string consisting of the characters that have been
+output to the port so far. 
+@end defun
+
+@defun call-with-input-string string proc
+Create an input port that gets its data from @var{string},
+call @var{proc} with that port as its one argument, and return
+the result from the call of @var{proc}
+@end defun
+
+@defun call-with-output-string proc
+Create an output port that writes its data to a @var{string},
+and call @var{proc} with that port as its one argument.
+Return a string consisting of the data written to the port.
+@end defun
+
+@defun force-output [port]
+Forces any pending output on @var{port} to be delivered to the output
+device and returns an unspecified value.  If the @var{port} argument is
+omitted it defaults to the value returned by @code{(current-output-port)}.
+@end defun
+
+An interactive input port has a prompt procedure associated with it.
+The prompt procedure is called before a new line is read.  It is passed
+the port as an argument, and returns a string, which gets printed as a prompt.
+
+@defun input-port-prompter port
+Get the prompt procedure associated with @var{port}.
+@end defun
+
+@defun set-input-port-prompter! port prompter
+Set the prompt procedure associated with @var{port} to @var{prompter},
+which must be a one-argument procedure taking an input port,
+and returning a string.
+@end defun
+
+@defun default-prompter port
+The default prompt procedure.  It returns @code{"#|kawa:@var{L}|# "}, where
+@var{L} is the current line number of @var{port}.
+When reading a continuation line, the result
+is @code{"#|@var{C}---:@var{L}|# "}, where @code{C} is the character returned
+by @code{(input-port-read-state @var{port})}.
+The prompt has the form of a comment to make it easier to cut-and-paste.
+@end defun
+
+@deffn Function port-column input-port
+@deffnx Function port-line input-port
+Return the current column number or line number of @var{input-port},
+using the current input port if none is specified.
+If the number is unknown, the result is @code{#f}.  Otherwise,
+the result is a 0-origin integer - i.e. the first character
+of the first line is line 0, column 0.  (However, when you
+display a file position, for example in an error message,
+we recommend you add 1 to get 1-origin integers.  This is
+because lines and column numbers traditionally start with
+1, and that is what non-programmers will find most natural.)
+@end deffn
+
+@defun set-port-line! port line
+Set (0-origin) line number of the current line of @var{port} to @var{num}.
+@end defun
+
+@defun input-port-line-number port
+Get the line number of the current line of @var{port},
+which must be a (non-binary) input port.
+The initial line is line 1.
+Deprecated; replaced by @code{(+ 1 (port-line @var{port}))}.
+@end defun
+
+@defun set-input-port-line-number! port num
+Set line number of the current line of @var{port} to @var{num}.
+Deprecated;  replaced by @code{(set-port-line! @var{port} (- @var{num} 1))}.
+@end defun
+
+@defun input-port-column-number port 
+Get the column number of the current line of @var{port}, 
+which must be a (non-binary) input port.
+The initial column is column 1.
+Deprecated; replaced by @code{(+ 1 (port-column @var{port}))}.
+@end defun
+
+@defun input-port-read-state port
+Returns a character indicating the current @code{read} state of the @var{port}.
+Returns @code{#\Return} if not current doing a @var{read},
+@code{#\"} if reading a string;  @code{#\|} if reading a comment;  @code{#\(}
+if inside a list; and @code{#\Space} when otherwise in a @code{read}.
+The result is intended for use by prompt prcedures, and is not necessarily
+correct except when reading a new-line.
+@end defun
+
+@defvar symbol-read-case
+A symbol that controls how @code{read} handles letters when reading a symbol.
+If the first letter is @samp{U}, then letters in symbols are upper-cased.
+If the first letter is @samp{D} or @samp{L}, then letters
+in symbols are down-cased.
+If the first letter is @samp{I}, then the case of letters in symbols
+is inverted.
+Otherwise (the default), the letter is not changed.
+(Letters following a @samp{\} are always unchanged.)
+@end defvar
+
+@defvar port-char-encoding
+Controls how bytes in external files are converted to/from internal
+Unicode characters.  Can be either a symbol or a boolean.
+If @code{port-char-encoding} is @code{#f}, the file is assumed
+to be a binary file and no conversion is done.
+Otherwise, the file is a text file.  The default is @code{#t}, which
+uses a locale-dependent conversion.  If @code{port-char-encoding}
+is a symbol, it must be the name of a character encoding known to Java.
+For all text files (that is if @code{port-char-encoding} is not @code{#f}),
+on input a @code{#\Return} character or
+a @code{#\Return} followed by @code{#\Newline}
+are converted into plain @code{#\Newline}.
+
+This variable is checked when the file is opened;  not when actually
+reading or writing.  Here is an example of how you can safely
+change the encoding temporarily:
+@example
+(define (open-binary-input-file name)
+  (fluid-let ((port-char-encoding #f)) (open-input-file name)))
+@end example
+@end defvar
+
+@node Format, , Ports, Input-Output
+@section Formatted Output (Common-Lisp-style)
+
+@defun format destination fmt . arguments
+An almost complete implementation of Common LISP format description
+according to the CL reference book @cite{Common LISP} from Guy L.
+Steele, Digital Press.  Backward compatible to most of the available
+Scheme format implementations.
+
+Returns @code{#t}, @code{#f} or a string; has side effect of printing
+according to @var{fmt}.  If @var{destination} is @code{#t},
+the output is to the current output port and @code{#t} is returned.  If
+@var{destination} is @code{#f}, a formatted string is returned as the
+result of the call.  If @var{destination} is a string,
+@var{destination} is regarded as the format string; @var{fmt} is
+then the first argument and the output is returned as a string. If
+@var{destination} is a number, the output is to the current error port
+if available by the implementation. Otherwise @var{destination} must be
+an output port and @code{#t} is returned.@refill
+
+@var{fmt} must be a string or an instance of @code{gnu.text.MessageFormat}
+or @code{java.text.MessageFormat}.  If @var{fmt} is a string,
+it is parsed as if by @code{parse-format}.
+@end defun
+
+@defun parse-format format-string
+Parses @code{format-string}, which is a string of the form of a Common LISP
+format description.  Returns an instance of @code{gnu.text.ReportFormat},
+which can be passed to the @code{format} function.
+@end defun
+
+A format string passed to @code{format} or @code{parse-format}
+consists of format directives (that start with @samp{~}),
+and regular characters (that are written directly to the destination).
+Most of the Common Lisp (and Slib) format directives are implemented.
+Neither justification, nor pretty-printing are supported yet.
+
+Plus of course, we need documentation for @code{format}!
+
+@subsection Implemented CL Format Control Directives
+
+Documentation syntax: Uppercase characters represent the corresponding
+control directive characters. Lowercase characters represent control
+directive parameter descriptions.
+
+@table @asis
+@item @code{~A}
+Any (print as @code{display} does).
+@table @asis
+@item @code{~@@A}
+left pad.
+@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}A}
+full padding.
+@end table
+@item @code{~S}
+S-expression (print as @code{write} does).
+@table @asis
+@item @code{~@@S}
+left pad.
+@item @code{~@var{mincol},@var{colinc},@var{minpad},@var{padchar}S}
+full padding.
+@end table
+
+@item @code{~C}
+Character.
+@table @asis
+@item @code{~@@C}
+prints a character as the reader can understand it (i.e. @code{#\} prefixing).
+@item @code{~:C}
+prints a character as emacs does (eg. @code{^C} for ASCII 03).
+@end table
+@end table
+
+@subsection Formatting Integers
+
+@table @asis
+@item @code{~D}
+Decimal.
+@table @asis
+@item @code{~@@D}
+print number sign always.
+@item @code{~:D}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}D}
+padding.
+@end table
+@item @code{~X}
+Hexadecimal.
+@table @asis
+@item @code{~@@X}
+print number sign always.
+@item @code{~:X}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}X}
+padding.
+@end table
+@item @code{~O}
+Octal.
+@table @asis
+@item @code{~@@O}
+print number sign always.
+@item @code{~:O}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}O}
+padding.
+@end table
+@item @code{~B}
+Binary.
+@table @asis
+@item @code{~@@B}
+print number sign always.
+@item @code{~:B}
+print comma separated.
+@item @code{~@var{mincol},@var{padchar},@var{commachar},@var{commawidth}B}
+padding.
+@end table
+@item @code{~@var{n}R}
+Radix @var{n}.
+@table @asis
+@item @code{~@var{n},@var{mincol},@var{padchar},@var{commachar},@var{commawidth}R}
+padding.
+@end table
+@item @code{~@@R}
+print a number as a Roman numeral.
+@item @code{~:@@R}
+print a number as an ``old fashioned'' Roman numeral.
+@item @code{~:R}
+print a number as an ordinal English number.
+@item @code{~:@@R}
+print a number as a cardinal English number.
+@item @code{~P}
+Plural.
+@table @asis
+@item @code{~@@P}
+prints @code{y} and @code{ies}.
+@item @code{~:P}
+as @code{~P but jumps 1 argument backward.}
+@item @code{~:@@P}
+as @code{~@@P but jumps 1 argument backward.}
+@end table
+@end table
+
+@var{commawidth} is the number of characters between two comma characters.
+
+
+@subsection Formatting floating-point (real) numbers
+
+@table @asis
+@item @code{~F}
+Fixed-format floating-point (prints a flonum like @var{mmm.nnn}).
+@table @asis
+@item @code{~@var{width},@var{digits},@var{scale},@var{overflowchar},@var{padchar}F}
+@item @code{~@@F}
+If the number is positive a plus sign is printed.
+@end table
+@end table
+
+@table @asis
+@item @code{~E}
+Exponential floating-point (prints a flonum like @var{mmm.nnn}@code{E}@var{ee})
+@table @asis
+@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}E}
+@item @code{~@@E}
+If the number is positive a plus sign is printed.
+@end table
+@end table
+
+@table @asis
+@item @code{~G}
+General floating-point (prints a flonum either fixed or exponential).
+@table @asis
+@item @code{~@var{width},@var{digits},@var{exponentdigits},@var{scale},@var{overflowchar},@var{padchar},@var{exponentchar}G}
+@item @code{~@@G}
+If the number is positive a plus sign is printed.
+@end table
+A slight difference from Common Lisp:  If the number is printed
+in fixed form and the fraction is zero,
+then a zero digit is printed for the fraction, if allowed by the @var{width}
+and @var{digits} is unspecified.
+@end table
+
+@table @asis
+@item @code{~$}
+Dollars floating-point (prints a flonum in fixed with signs separated).
+@table @asis
+@item @code{~@var{digits},@var{scale},@var{width},@var{padchar}$}
+@item @code{~@@$}
+If the number is positive a plus sign is printed.
+@item @code{~:@@$}
+A sign is always printed and appears before the padding.
+@item @code{~:$}
+The sign appears before the padding.
+@end table
+@end table
+
+@subsection Miscellaneous formatting operators
+
+@table @asis
+@item @code{~%}
+Newline.
+@table @asis
+@item @code{~@var{n}%}
+print @var{n} newlines.
+@end table
+@item @code{~&}
+print newline if not at the beginning of the output line.
+@table @asis
+@item @code{~@var{n}&}
+prints @code{~&} and then @var{n-1} newlines.
+@end table
+@item @code{~|}
+Page Separator.
+@table @asis
+@item @code{~@var{n}|}
+print @var{n} page separators.
+@end table
+@item @code{~~}
+Tilde.
+@table @asis
+@item @code{~@var{n}~}
+print @var{n} tildes.
+@end table
+@item @code{~}<newline>
+Continuation Line.
+@table @asis
+@item @code{~:}<newline>
+newline is ignored, white space left.
+@item @code{~@@}<newline>
+newline is left, white space ignored.
+@end table
+@item @code{~T}
+Tabulation.
+@table @asis
+@item @code{~@@T}
+relative tabulation.
+@item @code{~@var{colnum},@var{colinc}T}
+full tabulation.
+@end table
+@item @code{~?}
+Indirection (expects indirect arguments as a list).
+@table @asis
+@item @code{~@@?}
+extracts indirect arguments from format arguments.
+@end table
+@item @code{~(@var{str}~)}
+Case conversion (converts by @code{string-downcase}).
+@table @asis
+@item @code{~:(@var{str}~)}
+converts by @code{string-capitalize}.
+@item @code{~@@(@var{str}~)}
+converts by @code{string-capitalize-first}.
+@item @code{~:@@(@var{str}~)}
+converts by @code{string-upcase}.
+@end table
+@item @code{~*}
+Argument Jumping (jumps 1 argument forward).
+@table @asis
+@item @code{~@var{n}*}
+jumps @var{n} arguments forward.
+@item @code{~:*}
+jumps 1 argument backward.
+@item @code{~@var{n}:*}
+jumps @var{n} arguments backward.
+@item @code{~@@*}
+jumps to the 0th argument.
+@item @code{~@var{n}@@*}
+jumps to the @var{n}th argument (beginning from 0)
+@end table
+@item @code{~[@var{str0}~;@var{str1}~;...~;@var{strn}~]}
+Conditional Expression (numerical clause conditional).
+@table @asis
+@item @code{~@var{n}[}
+take argument from @var{n}.
+@item @code{~@@[}
+true test conditional.
+@item @code{~:[}
+if-else-then conditional.
+@item @code{~;}
+clause separator.
+@item @code{~:;}
+default clause follows.
+@end table
+@item @code{~@{@var{str}~@}}
+Iteration (args come from the next argument (a list)).
+@table @asis
+@item @code{~@var{n}@{}
+at most @var{n} iterations.
+@item @code{~:@{}
+args from next arg (a list of lists).
+@item @code{~@@@{}
+args from the rest of arguments.
+@item @code{~:@@@{}
+args from the rest args (lists).
+@end table
+@item @code{~^}
+Up and out.
+@table @asis
+@item @code{~@var{n}^}
+aborts if @var{n} = 0
+@item @code{~@var{n},@var{m}^}
+aborts if @var{n} = @var{m}
+@item @code{~@var{n},@var{m},@var{k}^}
+aborts if @var{n} <= @var{m} <= @var{k}
+@end table
+@end table
+
+@subsection Not Implemented CL Format Control Directives
+
+@table @asis
+@item @code{~:A}
+print @code{#f} as an empty list (see below).
+@item @code{~:S}
+print @code{#f} as an empty list (see below).
+@item @code{~<~>}
+Justification.
+@item @code{~:^}
+@end table
+
+@subsubsection Extended, Replaced and Additional Control Directives
+
+These are not necesasrily implemented in Kawa!
+
+@table @asis
+@item @code{~I}
+print a R4RS complex number as @code{~F~@@Fi} with passed parameters for
+@code{~F}.
+@item @code{~Y}
+Pretty print formatting of an argument for scheme code lists.
+@item @code{~K}
+Same as @code{~?.}
+@item @code{~!}
+Flushes the output if format @var{destination} is a port.
+@item @code{~_}
+Print a @code{#\space} character
+@table @asis
+@item @code{~@var{n}_}
+print @var{n} @code{#\space} characters.
+@end table
+
+@item @code{~@var{n}C}
+Takes @var{n} as an integer representation for a character. No arguments
+are consumed. @var{n} is converted to a character by
+@code{integer->char}.  @var{n} must be a positive decimal number.@refill
+@item @code{~:S}
+Print out readproof.  Prints out internal objects represented as
+@code{#<...>} as strings @code{"#<...>"} so that the format output can always
+be processed by @code{read}.
+@refill
+@item @code{~:A}
+Print out readproof.  Prints out internal objects represented as
+@code{#<...>} as strings @code{"#<...>"} so that the format output can always
+be processed by @code{read}.
+@refill
+@item @code{~F, ~E, ~G, ~$}
+may also print number strings, i.e. passing a number as a string and
+format it accordingly.
+@end table
+
+@node Types, Objects Classes and Modules, Input-Output, Top
 @chapter Types
 
 A @dfn{type} is a set of values, plus an associated set of operations
@@ -3226,6 +3314,10 @@ efficient, and it is easier to access it from Java code.
 
 The syntax of @code{define-class} are mostly compatible with that
 in the Guile and Stk dialects of Scheme.
+
+An implementation restriction is that you should only use
+@code{define-class} and @code{define-simple-class} in compiled code.
+The problem involves Java class loaders.
 
 @deffn Syntax define-class name (supers ...) field-or-method-decl ...
 @deffnx Syntax define-simple-class name (supers ...) field-or-method-decl ...

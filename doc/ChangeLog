@@ -1,3 +1,8 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* kawa.texi:  Move some nodes into new Input-Output chapter.
+	Document --output-format switch; new Named output formats node.
+
 2001-11-27  Per Bothner  <per@bothner.com>
 
 	* kawa.texi:  Note environment problem and fix from Jim White

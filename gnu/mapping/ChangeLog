@@ -1,3 +1,8 @@
+2001-10-25  Per Bothner  <per@bothner.com>
+
+	* Values.java (nextIndex, nextValue):  New static helper method
+	called by code using a SeriesTarget.
+
 2001-10-19  Per Bothner  <per@bothner.com>
 
 	* Constraint.java, AliasConstraint.java, ConstantConstraint.java,

@@ -1,3 +1,14 @@
+Thu Sep 24 19:35:14 1998  Per Bothner  <bothner@cygnus.com>
+
+	* ExpFullWalker.java:  New conventions to support replacement.
+	* FindCapturedVars.java, FindTailCalls.java:  Change to new convention.
+	* FindTailCalls.java:  Add some extra optimizations.
+	* FindCapturedVars.java (walkLambdaExp):  Inline if single caller.
+	* LambdaExp.java (returnContinuation, unknownContinuation):
+	New fields, used to determine if local function can be inlined.
+
+	* ApplyExp.java (popParams):  Handle zero parameters, not even "this".
+
 Sun Sep 13 13:00:01 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ApplyExp.java (context, nextCall):  New fields.

@@ -1,4 +1,4 @@
-(test-init "Miscellaneous" 66)
+(test-init "Miscellaneous" 71)
 
 ;;; DSSSL spec example 11
 (test '(3 4 5 6) (lambda x x) 3 4 5 6)
@@ -98,6 +98,20 @@
    (test #\X read-char iport)
    (test #\Y read-char iport)
    (test #!eof read-char iport)))
+
+(define str-inport (open-input-string "(a . (b c . ())) 34"))
+(test #t input-port? str-inport)
+(test '(a b c) read str-inport)
+(test 34 read str-inport)
+(test #t eof-object? (peek-char str-inport))
+(close-input-port str-inport)
+
+(test "a(b c)" 'open-output-string
+      (let ((q (open-output-string))
+            (x '(a b c)))
+        (write (car x) q)
+        (write (cdr x) q)
+        (get-output-string q)))
 
 ;;; From: Hallvard Traetteberg <Hallvard.Traetteberg@idi.ntnu.no>
 ;;; Triggered bug with try-finally nested in an expression.
@@ -261,6 +275,15 @@
   97)
 (test 97 test-duplicate-names)
 
+;; Used to cause a verification error.
+(define (sql-rsmd-all op rsmd . iter)
+  (if (null? iter)
+      (sql-rsmd-all op rsmd (sql-rsmd-columncount rsmd) '())
+      (if (zero? (car iter))
+        (cadr iter)
+	  (sql-rsmd-all op rsmd (- (car iter) 1)
+			      (cons (op rsmd (car iter))
+					      (cadr iter))))))
 (define (test-location-local x)
   (let* ((xl (location x))  ;; test location of formal parameter x
 	 (z (xl))

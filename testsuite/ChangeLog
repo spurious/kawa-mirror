@@ -1,3 +1,10 @@
+1999-11-15  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Add some tests for SRFI-6 string-port procedures.
+	(sql-rsmd-all):  Verification regression test.
+	* obj-test.scm:  Added some reflection tests (invoke, slot-set!, etc).
+ 	(force-eval, force-compile):  Helper procedures.
+
 1999-09-08  Per Bothner  <per@bothner.com>
 
 	* mac-test.scm:  More test, mostly let-syntax and friends.

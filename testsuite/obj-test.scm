@@ -1,4 +1,14 @@
-(test-init "objects" 17)
+(test-init "Objects" 29)
+
+;; Force procedure to be applied without being inlined:
+(define-syntax force-eval
+  (syntax-rules () ((force-eval proc arg ...)
+                    (apply proc (list arg ...)))))
+
+;; Force call to be compiled with (hopefully) inlining:
+(define-syntax force-compile
+  (syntax-rules () ((force-compile proc arg ...)
+                    (let () (proc arg ...)))))
 
 (define complex (make-record-type "complex" '(re im)))
 (define make-complex (record-constructor complex))
@@ -97,3 +107,27 @@
 
 (test "{arg1: 23 arg2: 12}" 'object-with-closure-3
       (symbol->string ((document-filter 23) 12)))
+
+(define i100 (force-eval make <integer> ival: 100))
+(define i200 (force-compile make <integer> ival: 200))
+(test 100 'test-make-1 i100)
+(test 200 'test-make-2 i200)
+(define cons1 (force-eval make <pair> 7 9))
+(test '(7 . 9) 'test-make-3 cons1)
+(test '(9 . 6) 'test-make-3 (force-compile make <pair> 9 6))
+(force-eval slot-set! cons1 'cdr 99)
+(test '(7 . 99) 'test-slot-set-1 cons1)
+(force-compile slot-set! cons1 'cdr (field '(88 99) 'car))
+(test '(7 . 88) 'test-slot-set-2 cons1)
+(set! (slot-ref cons1 'car) 8)
+(test '(8 . 88) 'test-slot-set-3 cons1)
+(set! (field cons1 'cdr) 55)
+(test '(8 . 55) 'test-slot-set-3 cons1)
+(test #t 'test-slot-ref-1
+      (force-eval static-field <java.lang.Boolean> 'TRUE))
+(test '() 'test-slot-ref-2
+      (force-compile static-field <list> 'Empty))
+(test #t 'test-slot-ref-3
+      (force-eval field #f 'TRUE))
+(test #f 'test-slot-ref-4
+      (force-compile field #t 'FALSE))

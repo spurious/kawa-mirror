@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--<!DOCTYPE article PUBLIC "-//Davenport//DTD DocBook V3.0//EN">-->
-<article>
+<article id="Root">
 <artheader>
 <title>Kawa internals: Compiling Scheme to Java</title>
 <authorgroup>
@@ -80,7 +80,7 @@ represented by Java objects.  The paper is structured
 as a <quote>tour</quote> of the Java classes used in the implementation.
 -->
 </abstract>
-<sect1><title>Introduction</title>
+<sect1 id="Introduction"><title>Introduction</title>
 <para>
 While Java is a decent programming language, 
 the reason for the <quote>Java explosion</quote> is largely
@@ -159,7 +159,7 @@ from <ulink url="http://www.cygnus.com/~bothner/kawa.html">here</ulink>.-->
 development environment.)</para>
 </sect1>
 
-<sect1><title>History</title>
+<sect1 id="History"><title>History</title>
 <para>
 Starting in 1995 Cygnus (on behalf of the Free Software Foundation)
 developed Guile, an implementation of Scheme suitable as a general
@@ -200,7 +200,7 @@ The long-term goal is an object-oriented environment that harmoniously
 integrates Scheme, Java, EcmaScript, and other languages. </para>
 </sect1>
 
-<sect1><title>Basic implementation strategy</title>
+<sect1 id="Basic"><title>Basic implementation strategy</title>
 <para>
 There are three basic ways one might implement some programming language
 X using Java:
@@ -268,7 +268,7 @@ I will discuss the compiler later, but first we will give an
 overview of the run-time environment of Kawa, and the
 classes used to implement Scheme values.</para>
 </sect1>
-<sect1><title>Objects and Values</title>
+<sect1 id="Objects"><title>Objects and Values</title>
 <para>
 Java <citation>JavaSpec</citation> has primitive types (such as
 32-bit <classname>int</classname>) as well reference types.
@@ -323,7 +323,7 @@ own classes for those.
 The next sections will give skeletal definitions of the classes used to
 to represent Scheme values.
 </para>
-<sect2><title>Collections</title>
+<sect2 id="Collections"><title>Collections</title>
 <para>
 Kawa has a rudimentary hierarchy of collection classes.
 <programlisting>
@@ -402,7 +402,7 @@ I will also integrate the Kawa collections into the new JDK 1.2
 collections framework.</para>
 </sect2>
 
-<sect2><title>Top-level environments</title>
+<sect2 id="Top-level"><title>Top-level environments</title>
 <programlisting>
 class <classname>Environment</classname>
 { ...;
@@ -424,7 +424,7 @@ Environments will be integrated into a more general name-table interface,
 which will also include records and ECMAScript objects.</para>
 </sect2>
 
-<sect2><title>Symbols</title>
+<sect2 id="Symbols"><title>Symbols</title>
 <para>
 Symbols represent identifiers, and do not need much functionality.  Scheme
 needs to be able to convert them to and from Scheme strings, and they need to
@@ -445,7 +445,7 @@ mapping needed for Scheme strings.</para>
 </sect2>
 
 </sect1>
-<sect1><title>Numbers</title>
+<sect1 is="Numbers"><title>Numbers</title>
 <para>
 Scheme defines a <quote>numerical tower</quote> of numerical types:
 number, complex, real, rational, and integer.
@@ -566,7 +566,7 @@ array, and also allows us to special-case the common case.</para>
 As a further optimization, the integers in the range -100 to 1024
 are pre-allocated.</para>
 
-<sect2><title>Mixed-type arithmetic</title>
+<sect2 id="Arithmetric"><title>Mixed-type arithmetic</title>
 <para>
 Many operations are overloaded to have different
 definitions depending on the argument types.
@@ -635,7 +635,7 @@ super-classes.  This makes is easier to add new classes without
 having to modify existing ones.</para>
 </sect2>
 
-<sect2><title>Quantities</title>
+<sect2 id="Quantities"><title>Quantities</title>
 <para>
 The DSSSL language <citation>DSSSL</citation> is a dialect of Scheme used
 to process SGML documents.  DSSSL has <quote>quantities</quote> in addition
@@ -770,7 +770,7 @@ Exactly how this should best be done is not obvious.</para>
 </sect2>
 </sect1>
 
-<sect1><title>Procedures</title>
+<sect1 id="Procedures"><title>Procedures</title>
 <para>
 Scheme has procedures as first-class values.
 Java does not.  However, we can simulate procedure values,
@@ -833,7 +833,7 @@ class <classname>car</classname> extends Procedure1
 }
 </programlisting>
 
-<sect2><title>Program bodies</title>
+<sect2 id="Program-bodies"><title>Program bodies</title>
 <para>
 A user-defined Scheme procedure is compiled to a
 class that is descended from <literal>Procedure</literal>.
@@ -862,7 +862,7 @@ When a file is <literal>load</literal>ed, the result is a
 the top-level actions to be executed.</para>
 </sect2>
 
-<sect2><title>Inlining</title>
+<sect2 id="Inlining"><title>Inlining</title>
 <para>
 Kawa has various hooks for inlining procedures.
 This can allow substantial speedups, at the cost of some generality
@@ -910,7 +910,7 @@ be implemented as an inlined loop, so implementing that equally
 efficiently will need the planned analysis phase.</para>
 </sect2>
 
-<sect2><title>Closures</title>
+<sect2 id="Closures"><title>Closures</title>
 <para>
 Languages that provide first-class nested functions with lexical scoping
 have to deal with variables that an inner function <quote>captures</quote>
@@ -1200,7 +1200,7 @@ Handling inlining also requires care.
 </sect2>
 </sect1>
 
-<sect1><title>Overview of compilation</title>
+<sect1 id="Overview-of-Compilation"><title>Overview of compilation</title>
 <para>
 These are the stages of compilation:
 <variablelist>
@@ -1253,7 +1253,7 @@ various side-effects.</para>
 </variablelist></para>
 </sect1>
 
-<sect1><title>Expressions</title>
+<sect1 id="Expressions"><title>Expressions</title>
 <para>
 The abstract <literal>Expression</literal> class represents partially processed expressions.
 These are in principle independent of the source language,
@@ -1351,7 +1351,7 @@ Other sub-classes of <literal>Expression</literal> are
 <literal>ErrorExp</literal> (used where a syntax error was found);</para>
 </sect1>
 
-<sect1><title>Semantic analysis</title>
+<sect1 id="Semantic-analysis"><title>Semantic analysis</title>
 <para>
 The translation phase takes a top-level form (or body),
 and generates a <literal>ModuleExp</literal>, which is a top-level expression.
@@ -1373,7 +1373,7 @@ method is called when a syntax error is seen.
 It prints out the current source filename and line number with
 the given <literal>message</literal>.</para>
 
-<sect2><title>Syntax and Macros</title>
+<sect2 id="Syntax-and-Macros"><title>Syntax and Macros</title>
 <programlisting>
 class <classname>Syntax</classname>
 { ...;
@@ -1443,7 +1443,7 @@ a <literal>define-syntax</literal> only causes a new
 </sect2>
 </sect1>
 
-<sect1><title>Interpretation: Eval</title>
+<sect1 id="Eval"><title>Interpretation: Eval</title>
 <para>
 Many people think of Scheme, Lisp, and ECMAScript as <quote>interpreted</quote>
 languages, though many of these languages have compilers.
@@ -1515,7 +1515,7 @@ The result of <literal>eval</literal> is a <literal>ModuleBody</literal>,
 which we can <literal>run</literal>.</para>
 </sect1>
 
-<sect1><title>Code generation</title>
+<sect1 id="Code-generation"><title>Code generation</title>
 <para>
 A <classname>Compilation</classname> object manages the classes, methods, and
 temporary state generated as a result of compiling a
@@ -1560,7 +1560,7 @@ the class corresponding to the <literal>lambda</literal>, and then it emits
 instructions to create a new instance of the generated <literal>Procedure</literal> class,
 and pushes it on the Java stack.</para>
 
-<sect2><title>Targets</title>
+<sect2 id="Targets"><title>Targets</title>
 <para>
 Most operations in the Java VM leave their result on the VM stack,
 where they are available for succeeding operations.
@@ -1639,7 +1639,7 @@ in a function.)  It is used to do (restricted) tail-recursion-elimination.
 -->
 </sect2>
 
-<sect2><title>The <literal>bytecode</literal> package</title>
+<sect2 id="bytecode-package"><title>The <literal>bytecode</literal> package</title>
 <para>
 The <literal>ClassType</literal> and <literal>Method</literal> classes are in a separate
 <literal>gnu.bytecode</literal> package, which is an intermediate-level
@@ -1774,7 +1774,7 @@ You will in any case want a byte-array representation for input and output.)
 </para>
 </sect2>
 
-<sect2><title>Literals</title>
+<sect2 id="Literals"><title>Literals</title>
 <para>
 A Scheme quoted form or self-evaluating form expands to a <literal>QuoteExp</literal>.
 Compiling a <literal>QuoteExp</literal> would seem a trivial exercise, but it is not.
@@ -1934,7 +1934,7 @@ Only requires standard JDK 1.1 features.
 </sect2>
 </sect1>
 
-<sect1><title>Class, types, and declarations</title>
+<sect1 id="Declarations"><title>Class, types, and declarations</title>
 <para>
 Java supports <quote>reflection</quote>, that is the ability to determine
 and examine the class of an object, and use the class at run-time
@@ -2049,7 +2049,7 @@ signature/interfaces.  Perhaps we can use Java interface types.</para>
 -->
 </sect1>
 
-<sect1><title>Low-level Java access</title>
+<sect1 id="Low-level"><title>Low-level Java access</title>
 <para>
 Many implementations of a high-level language provide an interface
 to functions written in a lower-level language, usually C.
@@ -2129,14 +2129,14 @@ when the compiler knows that the procedure being called is a primitive;
 otherwise, the Java reflection features are used.</para>
 </sect1>
 
-<sect1><title>Scheme complications</title>
+<sect1 id="complications"><title>Scheme complications</title>
 <para>Scheme has a few features that do not map easily into Java.
 We discussed closures earlier;  next we will discuss
 tail-call-elimination, continuations,
 and multiple return values.
 </para>
 
-<sect2><title>Multiple values</title>
+<sect2 id="Multiple-values"><title>Multiple values</title>
 <para>
 R5RS defines a procedure <function>values</function>, which allows
 an expression or a function to yield multiple (or zero) values, rather
@@ -2189,7 +2189,7 @@ extra overhead to the common case.
 </para>
 </sect2>
 
-  <sect2><title>Continuations</title>
+<sect2 id="Continuations"><title>Continuations</title>
 <para>
 Scheme continuations <quote>capture</quote> the current execution
 state.  They can be implemented by copying the stack, but
@@ -2268,7 +2268,7 @@ class <classname>CalledContinuation</classname>
 <literal>CalledContinuation</literal> is the exception that is thrown
 when the continuation is invoked.</para>
 </sect2>
-<sect2><title>Tail-calls</title>
+<sect2 id="Tail-calls"><title>Tail-calls</title>
 <para>
 Scheme requires that tail-calls be implemented without
 causing stack growth.
@@ -2290,7 +2290,7 @@ it does optimize Scheme's standard looping forms <literal>do</literal>
 and named-<literal>let</literal>.</para>
 </sect2>
 
-<sect2><title>General tail-call elimination</title>
+<sect2 id="General-tail-call"><title>General tail-call elimination</title>
 <para>
 Implementing general tail-calls and continuations require being
 able to manipulate the procedure call stack.  Many environments, including
@@ -2445,7 +2445,7 @@ stack, and optionally continue.</para>
 </sect2>
 </sect1>
 
-<sect1><title>Benchmark Results</title>
+<sect1 id="Benchmark"><title>Benchmark Results</title>
 <para>
 In one sense benchmarking Kawa is meaningless, because performance
 will vary so much depending on the underlying Java implementation.
@@ -2514,7 +2514,7 @@ as opposed to Scheme48's bytecodes tailored specifically to Scheme.
 </para>
 </sect1>
 
-<sect1><title>Current and Future Work</title>
+<sect1 id="Future"><title>Current and Future Work</title>
 <para>
 The main current priorities of Kawa are making it fully compatible
 with standard (R5RS) Scheme, implementing debugging facilities, and
@@ -2574,7 +2574,7 @@ and inlining are also on the wishlist.</para>
 -->
 </sect1>
 
-<sect1><title>Conclusion</title>
+<sect1 id="Conclusion"><title>Conclusion</title>
 <para>
 Kawa is a solid implementation of Scheme with many features.
 It is portable to any environment that can run Java applications.

@@ -102,7 +102,7 @@ Kawa is partly sponsored by @uref{http://www.brainfood.com/,Brainfood}.
 * Installation::         Building and installing Kawa
 * Running::              How to start up and run Kawa
 * Restrictions::         Features of R5RS not implemented
-* Compiling::            Compiling Scheme code to byte-codes
+* Compiling::            Compiling Scheme code to byte-code or an executable
 * Extensions::           Kawa features not in standard Scheme
 * Types::
 * Objects Classes and Modules::
@@ -124,9 +124,28 @@ It is completely written in Java.  Scheme functions and files
 are automatically compiled into Java byte-codes.  Kawa does some
 optimizations, and the compiled code runs at reasonable speed.
 
+Kawa uses Unicode internally, and uses the Java facilities to convert
+files using other character encodings.
+
 Kawa provides the usual read-eval-print loop, as well as batch modes.
 
+Kawa provides a framework for implementing other progressing languages,
+and comes with incomplete support for CommonLisp, Emacs Lisp, and
+EcmaScript.
+
 Kawa is written in an object-oriented style.
+
+Kawa has builtin pretty-printer support, and fancy formatting.
+
+Kawa supports class-definition facilities, and separately-compiled modules.
+
+Kawa implements the full numeric tower, including infinite-precision
+rational numbers and complex numbers.  It also supports "quantities"
+with units, such as @code{3cm}.
+
+You can optionally declare the types of variables.
+
+You can conveniently access Java objects, methods, fields, and classes.
 
 Kawa implements most of the features of the expression language of DSSSL,
 the Scheme-derived ISO-standard Document Style Semantics and Specification
@@ -192,24 +211,12 @@ Alternatively, you can install the pre-compiled binary distribution.
 @node Running Java, Binary distribution, , Installation
 @section Getting and running Java
 
-You will need a working Java system.
+You will need a working Java system.  Kawa has been reported to
+work with JDK 1.1, JDK 1.2, JDK 1.3, Kaffe, Symantec Cafe, J++, and GCJ.
+
 The discussion below assumes you are using the Java Developer's Kit
-(JDK) version 1.1.x from JavaSoft (Sun).
-(Kawa has also been reported to work with Kaffe, Symantec Cafe, J++,
-and JDK 1.2beta.)
-You can download free copies of
-@ifhtml
-<a href="http://java.sun.com/products/jdk/1.1/index.html">
-@end ifhtml
-JDK 1.1.x
-@ifhtml
-</a>
-for various platforms.
-@end ifhtml
-@ifclear html
-for various platforms
-from @url{http://java.sun.com/products/jdk/1.1/index.html/index.html}.
-@end ifclear
+(JDK) from JavaSoft (Sun).  You can download free copies of
+@uref{http://java.sun.com/j2se/1.3/, JDK 1.3} for various platforms.
 
 If you want to run Kawa on a Macintosh, see
 @uref{http://home.earthlink.net/%7Eathene/scheme/mackawa.html}.
@@ -218,19 +225,12 @@ The program @code{java} is the Java interpreter.
 The program @code{javac} is the Java compiler,
 and is needed if you want to compile the source release yourself.
 Both programs must be in your @code{PATH}.
-
-You also need to set @code{CLASSPATH} so it includes both the
-current directory, and the standard Java library.
-After you have installed Kawa, the @code{CLASSPATH} needs to
-include wherever you installed Kawa.
-
 If you have the JDK in directory @code{$JDK},
 and you are using a Bourne-shell compatible shell
-(/bin/sh, ksh, bash, and some others) you can set both variables thus:
+(/bin/sh, ksh, bash, and some others) you can set @code{PATH} thus:
 @example
 PATH=$JDK/bin:$PATH
-CLASSPATH=.:$JDK/lib/classes.zip
-export PATH CLASSPATH
+export PATH
 @end example
 
 @node Binary distribution, Source distribution, Running Java, Installation
@@ -352,9 +352,9 @@ to configure with the @code{--prefix} option, or @code{/usr/local} if you
 did not specify a @code{--prefix} option.
 
 To use the installed files, you need to set @code{CLASSPATH} so
-that @code{$PREFIX/share/java} is on the path:
+that @code{$PREFIX/share/java/kawa.jar} is in the path:
 @example
-CLASSPATH=$PREFIX/share/java
+CLASSPATH=$PREFIX/share/java/kawa.jar
 export CLASSPATH
 @end example
 This is done automatically if you use the @samp{kawa} script.
@@ -377,6 +377,45 @@ You also need to inform Jikes where it should find the standard Java classes
 @example
 CLASSPATH=.:/opt/jdk1.3/jre/lib/rt.jar
 export CLASSPATH
+@end example
+
+@subsection Compiling Kawa to native code with GCJ
+
+The GNU Compiler for the Java(tm) Programming Language
+(@uref{http://gcc.gnu.org/java/,GCJ}) is part of the
+GNU Compiler Collection (@uref{http://gcc.gnu.org/,GCC}).
+It can compile Java source or bytecode
+files into native code on supported systems.  As of this writing,
+you need to get a recent pre-release gcc-3.0 snapshot, and only
+Intel x86-based Linux/GNU system have been tested with Kawa.
+
+First, get and install (a beta of) GCC 3.0.  Set @code{PREFIX} to where
+you want to install GCJ, and configure it with these options:
+@example
+./configure --enable-threads --enable-languages=c++,java --prefix $PREFIX
+make bootstrap
+make install
+@end example
+Make sure @code{gcj} is in your path and refers to the newly-installed
+version, and if needed, set @code{LD_LIBRARY_PATH} to point to the
+directory where @code{libgcj.so} was installed:
+@example
+PATH=$PREFIX/bin:$PATH
+LD_LIBRARY_PATH=$PREFIX/lib
+export LD_LIBRARY_PATH
+@end example
+
+To build Kawa, you need to specify @code{--with-gcj} to
+@code{configure} which tells it to use GCJ.  Currently you also
+need to specify @code{--without-awt --without-swing} because
+GCJ does not yet support AWT or Swing:
+@example
+./configure --with-gcj --without-awt --without-swing --prefix $PREFIX
+@end example
+Then as before:
+@example
+make
+make install
 @end example
 
 @subsection Building Kawa under Windows
@@ -423,9 +462,8 @@ cd kawa\lib
 @node Running, Restrictions, Installation, Top
 @chapter How to start up and run Kawa
 
-The easiest way to start up Kawa is to run the @samp{kawa}
-program.  This finds your java interpreter, and sets up @samp{CLASSPATH}
-correctly.
+The easiest way to start up Kawa is to run the @samp{kawa} program.
+This finds your java interpreter, and sets up @samp{CLASSPATH} correctly.
 If you have installed Kawa such @code{$PREFIX/bin} is in your @code{$PATH},
 just do:
 @example
@@ -557,6 +595,24 @@ see @ref{Files compilation}.
 The option @samp{--connect @var{portnum}} is only used by
 the @samp{kawa} front-end program.
 
+The following options are useful if you want to debug or understand
+how Kawa works.
+@table @samp
+@item --debug-dump-zip
+Normally, when Kawa loads a soyrce file, or evaluates a non-trivial expression,
+it generates new internal Java classes but does not write them out.  This
+option asks it to write out generated classes in a @samp{.zip} archive
+whose name has the prefix @samp{kawa-zip-dump-}.
+@item --debug-print-expr
+Kawa translates source language forms into an internal @code{Expression}
+data structure.  This option causes that data structure to be written out
+in a readable format to the standard output.
+@item --debug-print-final-expr
+Similar to the previous option, but prints out the @code{Expression} after
+various transformations and optimizations have been done, and just before
+code generation.
+@end table
+
 If there are further command-line arguments after the options
 have been processed, then the first remaining argument names a
 file that is read and evaluated.  If there is no such argument,
@@ -629,7 +685,7 @@ re-define a global definition), and there must be no assignments
 (using @code{set!}) to the procedure binding.
 
 @node Compiling, Extensions, Restrictions, Top
-@chapter Compiling Scheme code to byte-codes
+@chapter Compiling Scheme code to byte-code or an executable
 
 All Scheme functions and source files are invisibly compiled
 into internal Java byte-codes.
@@ -664,11 +720,14 @@ loading a little faster.
 The compiled class files do have to be installed be installed somewhere
 in the @code{CLASSPATH}.
 
+You can also compile your Scheme program to native code using GCJ.
+
 @menu
 * Archive compilation::         Compiling Scheme to an archive file
 * Files compilation::           Compiling Scheme to a set of .class files
 * Application compilation::     Compiling Scheme to a standalone application
 * Applet compilation::          Compiling Scheme to an applet
+* Compiling to executable::     Compiling Scheme to a native executable
 @end menu
 
 @node Archive compilation, Files compilation, Compiling, Compiling
@@ -695,7 +754,10 @@ loading @samp{foo.scm}, except you will get the byte-compiled versions.
 
 Invoking @samp{kawa} (or @samp{java kawa.repl}) with
 the @samp{-C} flag will compile
-a @samp{.scm} source file into one or more @samp{.class} files.
+a @samp{.scm} source file into one or more @samp{.class} files:
+@example
+kawa --main -C myprog.scm
+@end example
 
 You run it as follows:
 @example
@@ -779,7 +841,7 @@ java MyProgram [@var{args}]
 Your Scheme program can access the command-line arguments @var{args}
 by using the global variable @samp{command-line-arguments}.
 
-@node Applet compilation, , Application compilation, Compiling
+@node Applet compilation, Compiling to executable, Application compilation, Compiling
 @section Compiling Scheme to an applet
 An applet is a Java class that inherits from @code{java.applet.Applet}.
 The applet can be downloaded and run in a Java-capable web-browser.
@@ -844,6 +906,39 @@ Sorry, Java is needed.</applet>
 </body></html>
 @end example
 
+@node Compiling to executable, , Applet compilation, Compiling
+@section Compiling Scheme to a native executable
+
+You can compile your Scheme program to native code using GCJ,
+as long as you have built Kawa using GCJ.
+
+First, you need to compile the Scheme code to a set of @code{.class} files;
+see @ref{Files compilation}.
+@example
+kawa --main -C myprog.scm
+@end example
+
+Now assuming that @code{$PREFIX} is where both GCJ and Kawa are installed
+(the name of the @code{--prefix} argument you used when configuring both),
+you may need to set these environment variables:
+@example
+CLASSPATH=$PREFIX/share/java/kawa.jar:$CLASSPATH
+PATH=$PREFIX/bin:$PATH
+LD_LIBRARY_PATH=$PREFIX/lib
+export LD_LIBRARY_PATH CLASSPATH
+@end example
+
+Then to create an executable @code{myprog} do:
+@example
+gcj --main=myprog myprog*.class -o myprog -L$PREFIX/bin -lkawa
+@end example
+
+The @code{--main} option tell @code{gcj} which class contains
+the @code{main} method it should use.  The @code{-o} option names
+the resuling executable program.  The @code{-lkawa} option tells
+the linker it should link with the kawa shared library, and
+the @code{-L$PREFIX/bin} option tells the linker where it can
+find that library.
 
 @node Extensions, Types, Compiling, Top
 @chapter Extensions

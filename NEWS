@@ -1,12 +1,33 @@
+XQuery:
+* Warn about old syntax.
+* Handle 'declare default collation'.  This is mainly a place-holder
+so we can correctly implement functions that use collations.
+* Implement fn:exists.
+
+Major re-write of symbol and namespace handling.  A Symbol is now immutable,
+consisting of a "print-name" and a pointer to a Namespace (package).
+An Environment is a mapping from Symbol to Location.
+
+Constant-time property list operations.
+
+Namespace-prefix are now always resolved at compile-time, never at run-time.
+
+(define-namespace PREFIX <CLASS>) is loosely the same as
+(define-namespace PREFIX "class:CLASS") but does the right thing for
+classes defined in this module, including nested or non-simple classes.
+
+Macros capture proper scope automatically, not just when using require.
+This allows some internal macros to become private.
+
 Major re-write of the macro-handling and hygiene framework.
 Usable support for syntax-case; in fact some of the primitives (such as
 'if') are now implemented using syntax-case.
-(syntax FORM) (or the short-cut #!FORM) evaluates to a syntax object
+(syntax FORM) (or the short-cut #!FORM) evaluates to a syntax object.
 (define-syntax (mac x) tr) same as (define-syntax mac (lambda (x) tr))
 The following non-hygienic forms are equivalent:
   (define-macro (MACRO-NAME (PARAM ...) TRANSFORMER)
   (define-macro MACRO-NAME (lambda (PARAM ...) TRANSFORMER))
-  (defmac MACRO-NAME (PARAM ...) TRANSFORMER)
+  (defmacro MACRO-NAME (PARAM ...) TRANSFORMER)
 Allow vectors and more general ellipsis-forms in patterns and templates.
 
 Added .xq and .xquery as XQuery file extensions, to match latest draft.

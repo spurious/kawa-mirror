@@ -1,4 +1,5 @@
 BEFORE 1.8
+* Document fluid-let in manual.
 * implement fn:reverse, fn:distinct-values
 * rename sublist to subsequence.  deprecate sublist, item-at
 * Should complain if user-defined function called with too many args.
@@ -10,6 +11,8 @@ BEFORE 1.8
   fn:namespace-for-uri-prefix, get-in-scope-prefixes
 * XML pretty-printing?
 * Output formatting of empty arrays? (make-array (shape 0 0 0 3))
+
+Remove pretty-print implementation in slib.
 
 Optimize NumberCompare further.
 document eval methods
@@ -33,6 +36,69 @@ BEFORE KAWA 1.8?
 * Implement Scheme API for serialization.
 * Tail-calls in top-level functions should loop.
 * Document in internals.html how ModuleMethod/ModuleBody works.
+
+ORDER BY
+for $x in q1 return r($x) = ValuesMap(r, q1)
+  = eval q1 out: Consumer[writeObject(x) { eval r(x) out: mainConsumer}]
+
+for $x in q1 order by o($x) return r($x) = OrderedMap(r, o, q1)
+
+for $x in q1 for $y in q2($x) [where w($x,$y)] order by o($x,$y) return r($x) = OrderedMap(r, o, w, q1, q2)
+consumer1 = Consumer[writeObject(x) {consumer2.x = x; eval q2 out: consumer2}]
+consumer2 = Consumer[Object x;
+                     storage for tuple sequence;
+                     writeObject(y) {[if (w(x,y)] add(x,y) to tuple sequence}
+                     sort() { sort the suple sequence }
+                     out(Consumer out) { for each tuple eval r($x, $y) }]
+eval q1 out: consumer1; consumer2.sort(); consumer2.out(mainConsumer);
+
+for $x as int in e1 order by o1, o2 return r($x);
+
+class tmp implements Consumer {
+  Consumer out; // outer Consumer
+  int[] x;  // Or Values x;
+  Object[] y; // Or Values y;
+  Object[] o1_save;
+  Object[] o2_save;
+  static void eval (CallContext ctx) {
+    tmp t = new tmp;
+    t.out = ctx.consumer;
+    ctx.consumer = t;
+    [compile e1](ctx);
+    int n = x.length;
+    sort(compare);
+    ctx.consumer = t.out;
+    for (int i = 0;  i < n;  i++)
+      t.body(i, ctx);
+  }
+  sort() {
+    o1_save = new Object[n];
+    o2_save = new Object[n];
+    mergesort;
+  }
+  int compare(int i, int j) {
+    if (o1_save[i] == null)
+      o1_save[i] = [o1[x[i]];
+    if (o1_save[j] == null)
+      o1_save[j] = [o1[x[j]];
+    int c = compare(o1_save[i], o1_save[j]);
+    if (c == 0) {
+      if (o2_save[i] == null)
+        o2_save[i] = [o2[x[i]];
+      if (o2_save[j] == null)
+        o2_save[j] = [o2[x[j]];
+      c = compare(o2_save[i], o2_save[j]);
+    }
+    return c;
+  }
+  void writeObject (Object val) {
+    x = x ++ [val];
+  }
+  void body(int i, CallContext ctx) {
+    [compile r(x[i], ...)](ctx);
+  }
+}
+for $x as int in e1, $y in e2 order by o1, o2 return r($x);
 
 Optimize to avoid creating frame classes:
 If a local variable is captured, and all functions intermediate between

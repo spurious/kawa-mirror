@@ -1,6 +1,6 @@
 package gnu.mapping;
 
-/** A Procedure that can be used on the left-and-side of an assignment.
+/** A Procedure that can be used on the left-hand-side of an assignment.
   * It can do that by overriding getSetter.
   * Alternatively, it can use the default getSetter, as long as it
   * overrides one of set0 (if a 0-argument Procedure)

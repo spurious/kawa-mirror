@@ -14,6 +14,9 @@ public class lambda extends Syntax implements Printable
   public static final String optionalKeyword = "&optional";
   public static final String restKeyword = "&rest";
 
+  /** True if parameters should be bound fluidly. */
+  static boolean fluidBindings = true;
+
   public Expression rewrite (Object obj, Translator tr)
   {
     if (! (obj instanceof Pair))
@@ -150,9 +153,44 @@ public class lambda extends Syntax implements Printable
 	decl.noteValue (null);  // Does not have a known value.
 	tr.push(decl);
       }
+    if (body instanceof Pair
+	&& (pair = (Pair) body).car instanceof FString)
+      {
+	// Process documentation string.  FIXME.
+	body = pair.cdr;
+      }
+    if (body instanceof Pair
+	&& (pair = (Pair) body).car instanceof Pair
+	&& ((Pair) pair.car).car == "interactive")
+      {
+	// System.err.println("ignore interactive for "+lexp);  // FIXME
+	body = pair.cdr;
+      }
     if (body instanceof PairWithPosition)
       lexp.setFile(((PairWithPosition) body).getFile());
-    lexp.body = tr.rewrite_body (body);
+    FluidLetExp let = null;
+    if (fluidBindings)
+      {
+	int decl_count = lexp.min_args + opt_args + rest_args;
+	Expression[] inits = new Expression[decl_count];
+	let = new FluidLetExp (inits);
+	i = 0;
+	for (Declaration arg = lexp.firstDecl();  arg != null;
+	     arg = arg.nextDecl(), i++)
+	  {
+	    Declaration decl = let.addDeclaration(arg.getName());
+	    decl.setFluid(true);
+	    decl.setType(gnu.expr.FluidLetExp.typeFluidBinding);
+	    inits[i] = new ReferenceExp(arg);
+	    decl.noteValue(inits[i]);
+	  }
+	tr.push(let);
+	let.body = tr.rewrite_body (body);
+	tr.pop(let);
+	lexp.body = let;
+      }
+    else
+      lexp.body = tr.rewrite_body (body);
     tr.pop(lexp);
   }
 

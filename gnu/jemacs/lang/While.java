@@ -8,6 +8,8 @@ import gnu.mapping.*;
 
 public class While extends Syntax implements Printable
 {
+  static kawa.standard.begin begin = new kawa.standard.begin();
+
   public Expression rewriteForm (Pair form, Translator tr)
   {
     Object obj = form.cdr;
@@ -15,7 +17,6 @@ public class While extends Syntax implements Printable
       return tr.syntaxError("missing arguments for while");
     tr.mustCompileHere();
     form = (Pair) obj;
-    return Expression.makeWhile(tr.rewrite(form.car),
-				tr.rewrite_body(form.cdr));
+    return Expression.makeWhile(form.car, new Pair (begin, form.cdr), tr);
   }
 }

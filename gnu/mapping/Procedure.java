@@ -58,7 +58,7 @@ public abstract class Procedure extends Named implements Printable
   public int numArgs() { return 0xfffff000; }
 
   /* CPS:
-  public void apply1(Object arg, CpsContext context, CpsFrame rlink, int rpc)
+  public void apply1(Object arg, CallStack stack, CallFrame rlink, int rpc)
   {
     context.value = apply1(arg);
     context.frame = rlink;

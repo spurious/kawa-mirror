@@ -1,3 +1,18 @@
+2003-02-13  Per Bothner  <per@bothner.com>
+
+	* AbstractSequence.java.in (parentPos, baseUriOfPos):  New methods.
+	* TreeList.java (BASE_URI):  New constant.
+	(writeBaseUri):  New method, to add base-uri property.
+	(baseUriOfPos):  New method.
+	(gotoChildrenStart):  Skip BASE_URI for documents and groups.
+	(consumeIRange, dump):  Handle BASE_URI.
+	(toString, stringValue, nextNodeIndex, nextMatchingChild):
+	Skip BASE_URI.
+	(parentPos):  New method.
+
+	* TreeList.java (curerntBeginGroup):  Re-named to currentParent.
+	(beginDocument, endDocument):  Set and clear currentParent.
+
 2003-01-05  Per Bothner  <per@bothner.com>
 
 	Replace position triples (including xpos), with positions pairs,

@@ -1,4 +1,4 @@
-// Copyright (c) 2001, 2002  Per M.A. Bothner and Brainfood Inc.
+// Copyright (c) 2001, 2002, 2003  Per M.A. Bothner and Brainfood Inc.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.lists;
@@ -93,6 +93,7 @@ implements Consumer, PositionConsumer, Consumable
   // 0xF10F A B C D: POSITION_PAIR_FOLLOWS
   // 0xF110 BEGIN_DOCUMENT
   // 0xF111 END_DOCUMENT
+  // 0xF112 BASE_URI: Not a node, but a property of the previous node (start).
 
   /** The largest Unicode character that can be encoded in one char. */
   static final int MAX_CHAR_SHORT = 0x9FFF;
@@ -197,6 +198,14 @@ implements Consumer, PositionConsumer, Consumable
   /** End of a document. */
   static final int END_DOCUMENT = 0xF111;
 
+  /** The base-uri property of a node.
+   * This is not an actual value, but it is a property of the previous
+   * node, or the surrounding node just after a BEGIN_XXX entry.
+   * [BASE_URI]
+   * [index]. 2 shorts, where objects[index] is the base-uri value.
+   */
+  static final int BASE_URI = 0xF112;
+
   /** Beginning of a group, compact form.
    *
    * [BEGIN_GROUP_SHORT + index], where objects[index] is the group's
@@ -204,8 +213,8 @@ implements Consumer, PositionConsumer, Consumable
    * [end_offset], the unsigned offset (from the initial word)
    *   to the corresponding END_GROUP_SHORT.
    * [parent_offset], the (unsigned absolute value of the) offset
-   *   to the outer BEGIN_GROUP_SHORT/BEGIN_GROUP_LONG.  (If this is the
-   *   outermost group, then parent_offset==0.)
+   *   to the outer BEGIN_GROUP_SHORT/BEGIN_GROUP_LONG/BEGIN_DOCUMENT.
+   *.  (If these is no parent, then parent_offset==0.)
    *
    * This should is used when index < BEGIN_GROUP_SHORT_INDEX_MAX,
    * both end_offset and parent_offset fit in 16 bits,
@@ -257,16 +266,16 @@ implements Consumer, PositionConsumer, Consumable
    *   to the END_GROUP_LONG word.  (Hence shifting an entire group when
    *   the gap is moved does not require changing its begin_offset.)
    *   relative to data.length.
-   * [parent_offset], in 2 shorts.  The position of the outer BEGIN_GROUP_LONG
-   *   or BEGIN_GROUP_SHORT.  If the difference straddles the gap (i.e.
-   *   either this group straddles the gap or the parent group does and the
-   *   gap precedes this group), then parent_offset is the actual index
-   *   of the parent group.  Otherwise, then parent_offset is a negative
-   *   offset relative to the END_GROUP_LONG word.
+   * [parent_offset], in 2 shorts.  The position of the outer BEGIN_GROUP_LONG,
+   *   BEGIN_GROUP_SHORT or BEGIN_DOCUMENT.  If the difference straddles
+   *   the gap (i.e. either this group straddles the gap or the parent group
+   *   does and the gap precedes this group), then parent_offset is the
+   *   actual index of the parent group.  Otherwise, then parent_offset is a
+   *   negative offset relative to the END_GROUP_LONG word.
    */
   static final int END_GROUP_LONG = 0xF10C;
 
-  int currentBeginGroup = 0;
+  int currentParent = 0;
 
   public void ensureSpace(int needed)
   {
@@ -433,6 +442,18 @@ implements Consumer, PositionConsumer, Consumable
       }
   }
 
+  /** Write/set the base-uri property of the current element or document.
+   * Only allowed immediately following beginDocument or beginGroup.
+   */
+  public void writeBaseUri (Object uri)
+  {
+    ensureSpace(3);
+    int index = find(uri);
+    data[gapStart++] = BASE_URI;
+    setIntN(gapStart, index);
+    gapStart += 2;
+  }
+
   public void beginGroup(String typeName, Object type)
   {
     beginGroup(find(typeName, type));
@@ -442,6 +463,7 @@ implements Consumer, PositionConsumer, Consumable
   {
     ensureSpace(3+1);
     gapEnd--;
+    currentParent = gapStart;
     data[gapStart++] = BEGIN_DOCUMENT;
     if (docStart != 0)
       throw new Error("nested document");
@@ -460,6 +482,7 @@ implements Consumer, PositionConsumer, Consumable
     setIntN(docStart, gapStart - docStart + 1);
     docStart = 0;
     data[gapStart++] = END_DOCUMENT;
+    currentParent = 0;
   }
 
   public void beginGroup(int index)
@@ -472,8 +495,8 @@ implements Consumer, PositionConsumer, Consumable
     data[gapEnd] = END_GROUP_LONG;
     setIntN(gapEnd + 1, index);  // begin_offset
     setIntN(gapEnd + 3, gapStart - 3);  // begin_offset
-    setIntN(gapEnd + 5, currentBeginGroup);  // parent_offset
-    currentBeginGroup = gapStart - 3;
+    setIntN(gapEnd + 5, currentParent);  // parent_offset
+    currentParent = gapStart - 3;
   }
 
   public void endGroup(String typeName)
@@ -508,7 +531,7 @@ implements Consumer, PositionConsumer, Consumable
 	setIntN(gapStart + 5, parent);
 	gapStart += 7;
       }
-    currentBeginGroup = parent;
+    currentParent = parent;
   }
 
   public void beginAttribute(String attrName, Object attrType)
@@ -521,7 +544,7 @@ implements Consumer, PositionConsumer, Consumable
     /* This needs to be tested.  FIXME.  Anyway only solves limited problem.
     // If there is whitespace and nothing else between the BEGIN_GROUP_LONG
     // and the current position, get rid of the spaces.
-    int i = currentBeginGroup;
+    int i = currentParent;
     if (i > 0 && (i += 3) < gapStart)
       {
 	for (int j = i;  ; j++)
@@ -731,10 +754,9 @@ implements Consumer, PositionConsumer, Consumable
     char datum = data[index];
     if ((datum >= BEGIN_GROUP_SHORT
 	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
-	|| datum == BEGIN_GROUP_LONG)
+	|| datum == BEGIN_GROUP_LONG
+	|| datum == BEGIN_DOCUMENT)
       index += 3;
-    else if (datum == BEGIN_DOCUMENT)
-      return index + 3;
     else
       return -1;
     for (;;)
@@ -749,10 +771,69 @@ implements Consumer, PositionConsumer, Consumable
 	  }
 	else if (datum == END_ATTRIBUTE)
 	  index++;
+	else if (datum == BASE_URI)
+	  index += 3;
 	else
 	  break;
       }
     return index;
+  }
+
+  public int parentPos (int ipos)
+  {
+    int index = posToDataIndex(ipos);
+    if (index == data.length)
+      return -1;
+    char datum = data[index];
+    if (datum == BEGIN_DOCUMENT)
+      return -1;
+    if (datum >= BEGIN_GROUP_SHORT
+	 && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+      {
+	int parent_offset = data[index+2];
+	return parent_offset == 0 ? -1 : (index - parent_offset) << 1;
+      }
+    if (datum == BEGIN_GROUP_LONG)
+      {
+	int end_offset = getIntN(index+1);
+	end_offset += end_offset < 0 ? data.length : index;
+	int parent_offset = getIntN(end_offset+5);
+	if (parent_offset == 0)
+	  return -1;
+	if (parent_offset < 0)
+	  parent_offset += end_offset;
+	return parent_offset << 1;
+      }
+    for (;;)
+      {
+	if (index == gapStart)
+	  index = gapEnd;
+	if (index == data.length)
+	  return -1;
+	int j;
+	datum = data[index];
+	int parent_offset;
+	switch (datum)
+	  {
+	  case END_GROUP_SHORT:
+	    return (index - getIntN(index+1)) << 1;
+	  case END_GROUP_LONG:
+	    int begin_offset = getIntN(index+3);
+	    if (begin_offset < 0)
+	      begin_offset += index;
+	    return begin_offset;
+	  case END_ATTRIBUTE:
+	    index++;
+	    continue;
+	  case END_DOCUMENT:
+	    return -1;
+	  default:
+	    index = nextDataIndex(index);
+	  }
+	if (index < 0)
+	  break;
+      }
+    return -1;
   }
 
   public boolean gotoAttributesStart(TreePosition pos)
@@ -883,6 +964,11 @@ implements Consumer, PositionConsumer, Consumable
 	    continue;
 	  case END_DOCUMENT:
 	    out.endDocument();
+	    continue;
+	  case BASE_URI:
+	    if (out instanceof TreeList)
+	      ((TreeList) out).writeObject(objects[getIntN(pos)]);
+	    pos += 2;
 	    continue;
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
@@ -1045,6 +1131,7 @@ implements Consumer, PositionConsumer, Consumable
 	switch (datum)
 	  {
 	  case BEGIN_DOCUMENT:
+	  case BASE_URI:
 	    pos += 2;
 	    continue;
 	  case END_DOCUMENT:
@@ -1220,6 +1307,7 @@ implements Consumer, PositionConsumer, Consumable
 	return Sequence.EOF_VALUE;
       case BEGIN_ATTRIBUTE_LONG:
 	return Sequence.ATTRIBUTE_VALUE;
+      case BASE_URI:  // FIXME
       case POSITION_REF_FOLLOWS: // FIXME	
       case POSITION_PAIR_FOLLOWS:
       case OBJECT_REF_FOLLOWS:
@@ -1410,6 +1498,8 @@ implements Consumer, PositionConsumer, Consumable
       {
 	switch (datum)
 	  {
+	  case BASE_URI:
+	    return index + 2;
 	  case BOOL_FALSE:
 	  case BOOL_TRUE:
 	    sbuf.append(datum != BOOL_FALSE);
@@ -1527,6 +1617,9 @@ implements Consumer, PositionConsumer, Consumable
 	  return pos;
 	switch (datum)
 	  {
+	  case BASE_URI:
+	    pos += 3;
+	    break;
 	  case BEGIN_DOCUMENT:
 	  case BEGIN_GROUP_LONG:
 	  case BEGIN_ATTRIBUTE_LONG:
@@ -1609,6 +1702,9 @@ implements Consumer, PositionConsumer, Consumable
 	  }
 	switch (datum)
 	  {
+	  case BASE_URI:
+	    next = pos + 3;
+	    continue;
 	  case BEGIN_DOCUMENT:
 	    next = pos + 3;
 	    if (checkNode) break;
@@ -1751,6 +1847,32 @@ implements Consumer, PositionConsumer, Consumable
       }
   }
 
+  public Object baseUriOfPos (int pos)
+  {
+    for (;;)
+      {
+	int index = posToDataIndex(pos);
+	if (index == data.length)
+	  return null;
+	char datum = data[index];
+	if ((datum >= BEGIN_GROUP_SHORT
+	     && datum <= BEGIN_GROUP_SHORT+BEGIN_GROUP_SHORT_INDEX_MAX)
+	    || datum == BEGIN_GROUP_LONG
+	    || datum == BEGIN_DOCUMENT)
+	  {
+	    int next = index + 3;
+	    if (next == gapStart)
+	      next = gapEnd;
+	    if (next < data.length && data[next] == BASE_URI)
+	      return objects[getIntN(next+1)];
+	  }
+	pos = parentPos(pos);
+	if (pos == -1)
+	  break;
+      }
+    return null;
+  }
+
   /** Compare two positions, and indicate their relative order. */
   public int compare(int ipos1, int ipos2)
   {
@@ -1804,14 +1926,14 @@ implements Consumer, PositionConsumer, Consumable
   }
 
   // /* DEBUGGING
-  public void dump()
+  public void dump ()
   {
     java.io.PrintWriter out = new java.io.PrintWriter(System.out);
     dump(out);
     out.flush();
   }
 
-  public void dump(java.io.PrintWriter out)
+  public void dump (java.io.PrintWriter out)
   {
     out.println("TreeList @"+System.identityHashCode(this)
 		       + " gapStart:"+gapStart+" gapEnd:"+gapEnd+" length:"+data.length);
@@ -1887,6 +2009,12 @@ implements Consumer, PositionConsumer, Consumable
 			j += j < 0 ? data.length : i;
 			out.print("=BEGIN_DOCUMENT end:");
 			out.print(j);
+			toskip = 2;
+			break;
+		      case BASE_URI:
+			out.print("=BASE_URI: ");
+			j = getIntN(i+1);
+			out.print(objects[j]);
 			toskip = 2;
 			break;
 		      case END_DOCUMENT:

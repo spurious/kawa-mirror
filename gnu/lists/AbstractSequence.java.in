@@ -491,7 +491,7 @@ public abstract class AbstractSequence
   }
 
   /** Get position before first child (of the element following position).
-   * @param inpos parant position.  It is not released by this method.
+   * @param ipos parent position.  It is not released by this method.
    * @return non-zero position cookie if there is a child sequence
    *   (which might be empty);  zero if current position is end of sequence
    *   or following element is atomic (cannot have children).
@@ -499,6 +499,15 @@ public abstract class AbstractSequence
   public int firstChildPos (int ipos)
   {
     return 0;
+  }
+
+  /** Get position of parent.
+   * @param ipos child position.  It is not released by this method.
+   * @return the p os of the parent, or endPos() is there is no known parent.
+   */
+  public int parentPos (int ipos)
+  {
+    return endPos();
   }
 
   protected boolean gotoParent(TreePosition pos)
@@ -565,6 +574,12 @@ public abstract class AbstractSequence
   public final int nextIndex(SeqPosition pos)
   {
     return nextIndex(pos.ipos);
+  }
+
+  /** Return of the base-uri property, if known, of the node at pos. */
+  public Object baseUriOfPos (int pos)
+  {
+    return null;
   }
 
   /** Compare two positions, and indicate if they are the same position. */

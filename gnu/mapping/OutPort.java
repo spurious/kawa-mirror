@@ -2,13 +2,30 @@ package gnu.mapping;
 import java.io.*;
 
 /**
- * An extended Writer.
+ * An extended PrintWriter.
  */
 
 public class OutPort extends PrintWriter implements Printable
 {
   String name;
   private Writer base;
+
+  // To keep track of column-numbers, we use a helper class.
+  // Otherwise, it is too painful, as there is no documented
+  // interface that would allow PrintWriter to be cleanly extended ...
+  BufferedPort bout;
+
+  OutPort(Writer base, BufferedPort out, boolean autoflush)
+  {
+    super(out, autoflush);
+    this.bout = out;
+    this.base = base;
+  }
+
+  public OutPort(Writer base, int bufsize, boolean autoflush)
+  {
+    this(base, new BufferedPort(base, bufsize), autoflush);
+  }
 
   public OutPort (OutputStream out)
   {
@@ -17,27 +34,24 @@ public class OutPort extends PrintWriter implements Printable
 
   public OutPort (OutputStream out, String name)
   {
-    this(new BufferedWriter(new OutputStreamWriter(out)), true, name);
+    this(new OutputStreamWriter(out), true, name);
   }
 
   public OutPort (Writer out)
   {
-    super (out);
-    base = base;
+    this(out, 512, false);
   }
 
-  public OutPort (Writer out, String name)
+  public OutPort (Writer base, String name)
   {
-    super (out);
+    this(base, 512, false);
     this.name = name;
-    base = out;
   }
 
-  public OutPort (Writer out, boolean autoflush, String name)
+  public OutPort (Writer base, boolean autoflush, String name)
   {
-    super (out, autoflush);
+    this (base, 512, autoflush);
     this.name = name;
-    base = out;
   }
 
   public boolean printReadable;
@@ -166,6 +180,160 @@ public class OutPort extends PrintWriter implements Printable
 
   public int getColumnNumber ()
   {
-    return -1;
+    return bout.getColumnNumber();
+  }
+}
+
+/** Not yet used ... for future pretty-printing. */
+
+class Break
+{
+  /** Text to emit if we do not break the line here.
+   * Typically a space. */
+  String textNoBreak;
+
+  /** Text to emit before the break, if we break the line here.
+   * Typically empty. */
+  String textAfterBreak;
+
+  /** Text to emit after the break, if we break the line here.
+   * Does not include indentation inherited from the outer group.
+   * Typically empty. */
+  String textBeforeBreak;
+
+  int kind;
+
+  /** If kind==FORCED_BREAK, always break the line. */
+  final static int FORCED_BREAK = 0;
+
+  /** If kind==LINEAR_BREAK, break the line here if it needs any breaks. */
+  final static int LINEAR_BREAK = 1;
+
+  /** If kind==LINEAR_BREAK, break the line here if next word will not fit. */
+  final static int FILL_BREAK = 2;
+}
+
+/** A Writer with buffering and that tracks column numbers.
+ * (Does not handle TABs specially - probably should.)
+ * Should move to a separate file, and maybe rename, but deferring that
+ * until more general output framework (e.g. pretty-printing).
+ */
+
+class BufferedPort extends FilterWriter
+{
+  char[] buffer;
+
+  /** First used (unflushed) position in buffer. */
+  int bufStartPos = 0;
+
+  /** Next available position in buffer. */
+  int bufWritePos = 0;
+
+  /** Column number (0-origin) corresponding to bufStartPos. */
+  int startColumn = 0;
+
+  BufferedPort(Writer out, int bufsize)
+  {
+    super(out);
+    buffer = new char[bufsize];
+  }
+
+  public void write (int ch)
+    throws IOException
+  {
+    if (bufWritePos >= buffer.length)
+      {
+	flushLocal();
+      }
+    buffer[bufWritePos++] = (char) ch;
+  }
+
+  public void write (char[] chars, int offset, int count)
+    throws IOException
+  {
+    while (count > 0)
+      {
+	if (bufWritePos + count > buffer.length)
+	  flushLocal();
+	int can_do = buffer.length - bufWritePos;
+	if (can_do > count)
+	  can_do = count;
+	if (can_do == 0)
+	  throw new Error("can't do anything!");
+	System.arraycopy(chars, offset, buffer, bufWritePos, can_do);
+	bufWritePos += can_do;
+	offset += can_do;
+	count -= can_do;
+      }
+  }
+
+  public void write (String str, int offset, int count)
+    throws IOException
+  {
+    while (count > 0)
+      {
+	if (bufWritePos + count > buffer.length)
+	  flushLocal();
+	int can_do = buffer.length - bufWritePos;
+	if (can_do > count)
+	  can_do = count;
+	if (can_do == 0)
+	  throw new Error("can't do anything! buflen:"+buffer.length+" bwpos:"+bufWritePos);
+	str.getChars(offset, offset + can_do, buffer, bufWritePos);
+	bufWritePos += can_do;
+	offset += can_do;
+	count -= can_do;
+      }
+  }
+
+  // FIXME:  This should have a different name.  Check java.io.*.
+  void flushLocal()
+    throws IOException
+  {
+    int i = bufWritePos;
+    for (;;)
+      {
+	if (--i < bufStartPos)
+	  {
+	    startColumn += bufWritePos - bufStartPos;
+	    break;
+	  }
+	char ch = buffer[i];
+	if (ch == '\n' || ch == '\r')
+	  {
+	    startColumn = bufWritePos - i;
+	    break;
+	  }
+      }
+    out.write(buffer, bufStartPos, bufWritePos - bufStartPos);
+    bufWritePos = 0;
+    bufStartPos = 0;
+  }
+
+  public void flush()
+    throws IOException
+  {
+    flushLocal();
+    out.flush();
+  }
+
+  public int getColumnNumber ()
+  {
+    int i = bufWritePos;
+    for (;;)
+      {
+	if (--i < bufStartPos)
+	  return startColumn + bufWritePos - bufStartPos;
+	char ch = buffer[i];
+	if (ch == '\n' || ch == '\r')
+	  return bufWritePos - i;
+      }
+  }
+
+  public void close()
+    throws IOException
+  {
+    flushLocal();
+    out.close();
   }
 }

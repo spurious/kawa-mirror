@@ -1,3 +1,9 @@
+2001-10-19  Per Bothner  <per@bothner.com>
+
+	* BufferLocalConstraint.java (get):  Now takes defaultValue argument.
+
+	* Command.java (perform):  Catch Throwable.
+
 2001-10-05  Per Bothner  <per@bothner.com>
 
 	* Buffer.java:  Update for CharSequence -> CharSeq renaming.

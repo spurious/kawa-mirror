@@ -101,6 +101,18 @@ public class Command extends javax.swing.text.TextAction
       {
 	// Do nothing.
       }
+    catch (RuntimeException ex)
+      {
+	throw ex;
+      }
+    catch (Error ex)
+      {
+	throw ex;
+      }
+    catch (Throwable ex)
+      {
+	throw new WrappedException(ex);
+      }
   }
 
   public static Object[] processInteractionString (String str)

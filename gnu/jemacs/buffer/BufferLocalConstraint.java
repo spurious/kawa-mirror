@@ -99,7 +99,7 @@ public class BufferLocalConstraint extends Constraint
     return oldConstraint.isBound(binding);
   }
 
-  public Object get (Binding binding)
+  public Object get (Binding binding, Object defaultValue)
   {
     Buffer buffer = Buffer.getCurrent();
     if (buffer == lastBuffer)
@@ -123,7 +123,7 @@ public class BufferLocalConstraint extends Constraint
 	      }
 	  }
       }
-    lastValue = oldConstraint.get(binding);
+    lastValue = oldConstraint.get(binding, defaultValue);
     lastBuffer = buffer;
     return lastValue;
   }

@@ -1,15 +1,17 @@
 package gnu.expr;
 import gnu.bytecode.*;
 import gnu.mapping.Printable;
+import java.io.*;
 
-import java.io.PrintWriter;
-
-public class Keyword extends Object implements Printable, Compilable
+public class Keyword extends Object implements Printable, Compilable, Externalizable
 {
   // Does not include final ':'.
   private String name;
 
-  // Note:  No public constructor!
+  public Keyword()
+  {
+  }
+
   private Keyword (String n)
   {
     name = new String(n);
@@ -104,6 +106,26 @@ public class Keyword extends Object implements Printable, Compilable
   public final String getName() { return name; }
   
   static Method makeKeywordMethod;
+
+  /**
+   * @serialData Write the keyword name (without colons) using writeUTF.
+   */
+
+  public void writeExternal(ObjectOutput out) throws IOException
+  {
+    out.writeUTF(name);
+  }
+
+  public void readExternal(ObjectInput in)
+    throws IOException, ClassNotFoundException
+  {
+    name = in.readUTF();
+  }
+
+  public Keyword readResolve() throws ObjectStreamException
+  {
+    return make(name);
+  }
 
   public Literal makeLiteral (Compilation comp)
   {

@@ -1,5 +1,11 @@
 2000-05-09  Per Bothner  <per@bothner.com>
 
+	* Keyword.java:  Implement java.io.Externalizable
+	* Special.java:  Likewise.
+	Change so name does not include "#!" prefix.
+	
+	* PrimProcedure.java (<init>):  Call non-deprecated addMethod version.
+
 	* Parser.java (current_filename, current_line, current_column,
 	messages):  Move fields here from Translator.
 	(<init>):  New constructor.

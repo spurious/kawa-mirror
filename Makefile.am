@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = gnu kawa doc testsuite
-javadir=$(prefix)/java
+javadir=$(datadir)/java
 
 # Build a .zip archive from the compiled classes.
 # Assumes you have done a 'make install' first.

@@ -201,7 +201,6 @@ public class Declaration
   public static final int IS_SYNTAX = 0x8000;
   public static final int IS_UNKNOWN = 0x10000;
   public static final int IS_IMPORTED = 0x20000;
-  public static final int PRIVATE_SPECIFIED = 0x40000;
 
   // This should be a type property, not a variable property, at some point!
   public static final int IS_SINGLE_VALUE = 0x40000;
@@ -216,6 +215,12 @@ public class Declaration
 
   /** Set if this declares a namespace prefix (as in XML namespaces). */
   public static final int IS_NAMESPACE_PREFIX = 0x200000;
+
+  public static final int PRIVATE_ACCESS = 0x1000000;
+  public static final int PRIVATE_SPECIFIED = PRIVATE_ACCESS; /* deprecated*/
+  public static final int PROTECTED_ACCESS = 0x2000000;
+  public static final int PUBLIC_ACCESS = 0x4000000;
+  public static final int PACKAGE_ACCESS = 0x8000000;
 
   protected int flags = IS_SIMPLE;
 
@@ -243,6 +248,19 @@ public class Declaration
   public final void setPrivate(boolean isPrivate)
   {
     setFlag(isPrivate, PRIVATE);
+  }
+
+  public short getAccessFlags (short defaultFlags)
+  {
+    if (getFlag(Declaration.PRIVATE_ACCESS))
+      return Access.PRIVATE;
+    if (getFlag(Declaration.PROTECTED_ACCESS))
+      return Access.PROTECTED;
+    if (getFlag(Declaration.PACKAGE_ACCESS))
+      return 0;
+    if (getFlag(Declaration.PUBLIC_ACCESS))
+      return Access.PUBLIC;
+    return defaultFlags;
   }
 
   public final boolean isAlias() { return (flags & IS_ALIAS) != 0; }

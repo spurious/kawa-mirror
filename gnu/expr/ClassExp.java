@@ -109,7 +109,7 @@ public class ClassExp extends LambdaExp
       {
 	if (type == null)
 	  setTypes(comp);
-	declareParts();
+	declareParts(comp);
       }
     if (type.getName() == null)
       {
@@ -237,7 +237,7 @@ public class ClassExp extends LambdaExp
 
   boolean partsDeclared;
 
-  public void declareParts()
+  public void declareParts(Compilation comp)
   {
     if (partsDeclared)
       return;
@@ -248,7 +248,7 @@ public class ClassExp extends LambdaExp
 	// If the declaration derives from a method, don't create field.
 	if (decl.getCanRead())
 	  {
-	    int flags = Access.PUBLIC;
+	    int flags = decl.getAccessFlags(Access.PUBLIC);
 	    if (decl.getFlag(Declaration.STATIC_SPECIFIED))
 	      flags |= Access.STATIC;
 	    if (isMakingClassPair())
@@ -277,9 +277,9 @@ public class ClassExp extends LambdaExp
       {
 	if ((child != initMethod && child != clinitMethod)
 	    || ! isMakingClassPair())
-	  child.addMethodFor(type, null, null);
+	  child.addMethodFor(type, comp, null);
 	if (isMakingClassPair())
-	  child.addMethodFor(instanceType, null, type);
+	  child.addMethodFor(instanceType, comp, type);
       }
   }
 
@@ -448,7 +448,7 @@ public class ClassExp extends LambdaExp
 		    String msg = vec.size() == 0
 		      ? "missing implementation for "
 		      : "ambiguous implementation for ";
-		    comp.error('e', msg+meth);
+		    comp.error('e', msg+meth+" mname:"+mname);
 		  }
 		else
 		  {
@@ -478,7 +478,19 @@ public class ClassExp extends LambdaExp
 
   protected Expression walk (ExpWalker walker)
   {
-    return walker.walkClassExp(this);
+    Compilation comp = walker.getCompilation();
+    if (comp == null)
+      return walker.walkClassExp(this);
+    ClassType saveClass = comp.curClass;
+    try
+      {
+	comp.curClass = getCompiledClassType(comp);
+	return walker.walkClassExp(this);
+      }
+    finally
+      {
+	comp.curClass = saveClass;
+      }
   }
 
   protected void walkChildren(ExpWalker walker)

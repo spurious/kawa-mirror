@@ -961,7 +961,8 @@ public class Compilation
     */
 
     compile(mexp, topname, prefix);
-    outputClass(directory);
+    if (! messages.seenErrors())
+      outputClass(directory);
   }
 
   public void outputClass (String directory) throws IOException

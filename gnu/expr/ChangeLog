@@ -1,3 +1,17 @@
+2004-02-11  Per Bothner  <per@bothner.com>
+
+	* Compilation.java (compileToFiles):  Don't outputClass after error.
+
+	* Declaration.java (PRIVATE_ACCESS, PROTECTED_ACCESS, PUBLIC_ACCESS,
+	PACKAGE_ACCESS):  New flags.
+	(getAccessFlags):  New method.
+	* ClassExp.java (declareParts):  Use new method.
+	Take Compilation parameter.  Pass it to LambdaExp's addMethodFor.
+	(getCompiledClassType):  Adjust declareParts call accordingly.
+
+	* ClassExp.java (walk):  Set/restore Compilation's curClass.
+	Used by isAccessible calls in gnu.kawa.reflect.
+
 2003-12-25  Per Bothner  <per@bothner.com>
 
 	* ReferenceExp.java (ReferenceExp):  Use decl's getSymbol, not getName.

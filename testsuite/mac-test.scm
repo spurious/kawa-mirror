@@ -20,3 +20,9 @@
 
 (test "POS" 'arithmetic-if-pos (arithmetic-if 234 "NEG" "ZERO" "POS"))
 (test "NEG" 'arithmetic-if-pos (arithmetic-if -234 "NEG" "ZERO" "POS"))
+
+;;; Posted to comp.lang.scheme by mooreb@lark.cc.ukans.edu (Brian M. Moore)
+(test '(x) 'lambda*3
+      ((lambda lambda lambda) 'x))
+(test '(1 2 3) 'lambda-begin
+      ((lambda (begin) (begin 1 2 3)) (lambda lambda lambda)))

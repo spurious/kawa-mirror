@@ -458,7 +458,7 @@ echo > confdefs.h
 
 # A filename unique to this package, relative to the directory that
 # configure is in, which we can look for to find out if srcdir is correct.
-ac_unique_file=kawa/repl.java
+ac_unique_file=doc/kawa.texi
 
 # Find the source files, if location was not specified.
 if test -z "$srcdir"; then
@@ -1183,6 +1183,9 @@ esac
 
 
 
+
+# ${javatop} is normally empty, but is useful when the tree has been
+# re-arranged so that Java packages are up a level.
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -1296,10 +1299,13 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
-  gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile gnu/elisp/Makefile gnu/emacs/Makefile
-  kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
+trap 'rm -fr `echo "Makefile ${javatop}gnu/Makefile ${javatop}gnu/bytecode/Makefile
+  ${javatop}gnu/math/Makefile ${javatop}gnu/text/Makefile
+  ${javatop}gnu/mapping/Makefile ${javatop}gnu/expr/Makefile
+  ${javatop}gnu/ecmascript/Makefile ${javatop}gnu/elisp/Makefile
+  ${javatop}gnu/emacs/Makefile
+  ${javatop}kawa/Makefile ${javatop}kawa/lang/Makefile 
+  ${javatop}kawa/standard/Makefile ${javatop}kawa/lib/Makefile
   doc/Makefile testsuite/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -1394,10 +1400,13 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile gnu/Makefile gnu/bytecode/Makefile gnu/math/Makefile
-  gnu/text/Makefile gnu/mapping/Makefile gnu/expr/Makefile
-  gnu/ecmascript/Makefile gnu/elisp/Makefile gnu/emacs/Makefile
-  kawa/Makefile kawa/lang/Makefile kawa/standard/Makefile kawa/lib/Makefile
+CONFIG_FILES=\${CONFIG_FILES-"Makefile ${javatop}gnu/Makefile ${javatop}gnu/bytecode/Makefile
+  ${javatop}gnu/math/Makefile ${javatop}gnu/text/Makefile
+  ${javatop}gnu/mapping/Makefile ${javatop}gnu/expr/Makefile
+  ${javatop}gnu/ecmascript/Makefile ${javatop}gnu/elisp/Makefile
+  ${javatop}gnu/emacs/Makefile
+  ${javatop}kawa/Makefile ${javatop}kawa/lang/Makefile 
+  ${javatop}kawa/standard/Makefile ${javatop}kawa/lib/Makefile
   doc/Makefile testsuite/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

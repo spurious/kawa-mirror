@@ -1,6 +1,7 @@
 ## Process this with automake to create Makefile.in
 
 AUTOMAKE_OPTIONS = cygnus
+JAVATOP =
 SUBDIRS = gnu kawa doc testsuite
 javadir=$(datadir)/java
 
@@ -13,7 +14,7 @@ kawa-compiled.zip: kawa-@VERSION@-compiled.zip
 
 EXTRA_DIST = debian/control debian/rules debian/changelog debian/dirs \
   config.guess config.sub install-sh ./mkinstalldirs makekawa.bat \
-  kawa/Version.java
+  $(JAVATOP)kawa/Version.java
 
 HTML_HOME = $$HOME/public_html
 JAVADOC_DIR = $$HOME/Kawa/htdocs/api
@@ -33,10 +34,10 @@ install-html: install-javadoc-html
 	cd doc;  make install-html HTML_HOME="$(HTML_HOME)"
 	cd gnu;  make install-html HTML_HOME="$(HTML_HOME)"
 
-kawa/Version.java: $(srcdir)/kawa/Version.java.in $(srcdir)/configure.in
-	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/kawa/Version.java.in >$@
+$(JAVATOP)kawa/Version.java: $(srcdir)/$(JAVATOP)kawa/Version.java.in $(srcdir)/configure.in
+	sed -e 's|VERSION|@VERSION@|' <$(srcdir)/$(JAVATOP)kawa/Version.java.in >$@
 
-all-recursive:  kawa/Version.java
+all-recursive:  $(JAVATOP)kawa/Version.java
 
 makekawa.bat:
 	echo "rem Build Kawa under Windows" >tmp

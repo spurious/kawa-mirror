@@ -1,3 +1,9 @@
+1999-08-03  Per Bothner  <per@bothner.com>
+
+	* configure.in (AC_INIT):  Use doc/kawa.texi instead of kawa/repl.java.
+	(AC_OUTPUT):  Use (normally undefined) javatop macro.
+	* Makefile.am (JAVATOP):  New (normally undefined) macro.
+
 1999-07-20  Per Bothner  <per@bothner.com>
 
 	* kawa/Makefile.am, kawa/Makefile.in (BUILT_SOURCES, Version.java):

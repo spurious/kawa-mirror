@@ -321,6 +321,10 @@ public class LambdaExp extends ScopeExp
 	              classes[iClass]);
 	zar.close ();
 	*/
+	/* DEBUGGING:
+	for (int iClass = 0;  iClass < comp.numClasses;  iClass++)
+	  ClassTypeWriter.print(comp.classes[iClass], System.out, 0);
+	*/
 
 	SchemeLoader loader = new SchemeLoader (classNames, classes);
 	Class clas = loader.loadClass (class_name, true);

@@ -1,3 +1,11 @@
+1999-12-11  Per Bothner  <per@bothner.com>
+
+	* FindCapturedVars.java (walkLetExp)  Don't optimize if FluidLetExp.
+	* gnu/expr/FindTailCalls.java (walkFluidLetExp):  New method.  Fixes
+	bug reported by Walter C. Pelissero <wcp@lpds.sublink.org>.
+	* gnu/expr/PushApply.java (walkApplyExp):  Don't re-write if
+	function is FluidLetExp.
+
 1999-12-06  Per Bothner  <per@bothner.com>
 
 	* PrimProcedure.java (compile):  If too few/many arguments,

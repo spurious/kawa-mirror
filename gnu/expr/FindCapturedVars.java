@@ -9,7 +9,7 @@ public class FindCapturedVars extends ExpFullWalker
 
   public Object walkLetExp (LetExp exp)
   {
-    if (exp.body instanceof BeginExp)
+    if (exp.body instanceof BeginExp && ! (exp instanceof FluidLetExp))
       {
 	// Optimize "letrec"-like forms.
 	// If init[i] is the magic QuoteExp.nullExp, and the real value

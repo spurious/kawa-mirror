@@ -18,19 +18,21 @@ public class PushApply extends ExpFullWalker
 
   public Object walkApplyExp(ApplyExp exp)
   {
-    if (exp.func instanceof LetExp) // [APPLY-LET]
+    Expression func = exp.func;
+    if (func instanceof LetExp
+        && ! (func instanceof FluidLetExp)) // [APPLY-LET]
       {
 	// Optimize ((let (...) body) . args) to (let (...) (body . args)).
-	LetExp let = (LetExp) exp.func;
+	LetExp let = (LetExp) func;
 	Expression body = let.body;
 	let.body = exp;
 	exp.func = body;
 	return let.walk(this);
       }
-    if (exp.func instanceof BeginExp)  // [APPLY-BEGIN]
+    if (func instanceof BeginExp)  // [APPLY-BEGIN]
       {
 	// Optimize ((begin ... last) . args) to (begin ... (last . args)).
-	BeginExp begin = (BeginExp) exp.func;
+	BeginExp begin = (BeginExp) func;
 	Expression[] stmts = begin.exps;
 	int last_index = begin.exps.length - 1;
 	exp.func = stmts[last_index];

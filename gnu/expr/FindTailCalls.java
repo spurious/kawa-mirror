@@ -84,6 +84,18 @@ public class FindTailCalls extends ExpFullWalker
       }
   }
 
+  public Object walkFluidLetExp (FluidLetExp exp)
+  {
+    for (gnu.bytecode.Variable var = exp.firstVar ();
+         var != null; var = var.nextVar ())
+      {
+	Declaration decl = (Declaration) var;
+        decl.setCanRead(true);
+        decl.setCanWrite(true);
+      }
+    return super.walkFluidLetExp(exp);
+  }
+
   public Object walkLetExp (LetExp exp)
   {
     int n = exp.inits.length; 

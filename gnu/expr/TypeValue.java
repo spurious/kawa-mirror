@@ -31,7 +31,8 @@ public interface TypeValue
    *        the type of 'this'.  If null, use top-of-stack.
    * @param comp The compilation state.
    * @param target Where to leave the result.
-   * @note  Implementation can use gnu.kawa.reflect.InstanceOf.emitIsInstance.
+   * @note  Implementation can use gnu.kawa.reflect.InstanceOf.emitIsInstance,
+   *   which is a conveniece method that calls emitTestIf.
    */
   public void emitIsInstance(Variable incoming,
 			     Compilation comp, Target target);

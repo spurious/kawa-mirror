@@ -1,3 +1,14 @@
+2001-06-18  Daniel Bonniot <d.bonniot@@mail.dotcom.fr>
+
+	* kawa.texi (Projects):  "Bossa" renamed to "Nice"; update.
+
+2001-06-17  Per Bothner  <per@bothner.com>
+
+	* kawa.texi (Top):  Update URLs for Javadoc APIs.
+	Note gnu.lists and gnu.xml.
+
+	* kawa.texi (Getting Kawa):  Remove more ifhtml conditionals.
+
 2001-06-09  Per Bothner  <per@bothner.com>
 
 	* kawa.texi (Top):  Use @uref and remove @ifhtml conditionals

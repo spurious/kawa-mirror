@@ -67,7 +67,7 @@ discusses Scheme implementation is
 @uref{http://www.cs.utexas.edu/users/wilson/schintro/schintro_toc.html, Paul Wilson's "An Introduction to Scheme and its Implementation"}.
 
 
-Javadoc generated @uref{http://sources.redhat.com/kawa/api/,documentation of the Kawa classes} is also available.
+Javadoc generated @uref{hhttp://www.gnu.org/software/kawa/api/,documentation of the Kawa classes} is also available.
 
 For copyright information on the software and documentation,
 see @ref{License}.
@@ -76,12 +76,14 @@ This package has nothing to do with the
 @uref{http://www.tek-tools.com/kawa/,Kawa commercial Java IDE}.
 
 The packages
-@uref{http://sources.redhat.com/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
-@uref{http://sources.redhat.com/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
-@uref{http://sources.redhat.com/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
-@uref{http://sources.redhat.com/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/bytecode/package-summary.html,@code{gnu.bytecode}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/math/package-summary.html,@code{gnu.math}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/lists/package-summary.html,@code{gnu.lists}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/xml/lists/package-summary.html,@code{gnu.xml}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/expr/package-summary.html,@code{gnu.expr}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/mapping/package-summary.html,@code{gnu.mapping}},
 and
-@uref{http://sources.redhat.com/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
+@uref{http://www.gnu.org/software/kawa/api/gnu/text/package-summary.html,@code{gnu.text}},
 are used by Kawa, and distributed with it, but may be independently useful.
 
 For a technical overview of Kawa, see these
@@ -162,12 +164,7 @@ latest snapshot of the development tree} (builds and passes
 the testsuite but less extensively tested).
 
 A ready-to-run @code{.zip} archive of the pre-compiled classes is in
-@ifhtml
-<a href="ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip">here</a>.
-@end ifhtml
-@ifclear html
-@url{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip}.
-@end ifclear
+@uref{ftp://ftp.gnu.org/pub/gnu/kawa/kawa-stable-compiled.zip}.
 
 These are all in the @uref{ftp://ftp.gnu.org/pub/gnu/kawa/,Kawa ftp site},
 which includes other versions and files, including a @code{.deb}
@@ -382,7 +379,7 @@ files into native code on supported systems.  As of this writing,
 you need to get a recent pre-release gcc-3.0 snapshot, and only
 Intel x86-based Linux/GNU system have been tested with Kawa.
 
-First, get and install (a beta of) GCC 3.0.  Set @code{PREFIX} to where
+First, get and install GCC 3.0.  Set @code{PREFIX} to where
 you want to install GCJ, and configure it with these options:
 @example
 ./configure --enable-threads --enable-languages=c++,java --prefix $PREFIX
@@ -3713,13 +3710,15 @@ uses Kawa in a prototypal
 intranet 3tier information retrival system as a communication protocol
 between server and clients and to do server agents programming.
 
-Bossa is a research programming language that has a Java-like syntax,
-and features multiple dispatch
-methods, quantified parametric types, higher-order functions, and the new
-concept of "abstract interfaces".
-The Bossa compiler uses Kawa's @code{gnu.expr} and @code{gnu.bytecode}
-packages to generate Java bytecode.
-A GPLed release is planned. For more information feel free to contact
+The Nice Programming Language is an open source research language that
+has a Java-like syntax.
+It features multiple dispatch methods, parametric types, higher-order
+functions, tuples, ..., and the new concept of "abstract interfaces". 
+The Nice compiler (@code{nicec}) uses Kawa's @code{gnu.expr}
+and @code{gnu.bytecode}
+packages to generate Java bytecode. 
+You can find more about Nice at @uref{http://nice.sourceforge.net}.
+For more information feel free to contact
 Daniel Bonniot (@w{@code{d.bonniot@@mail.dotcom.fr}}).
 
 @node License, Index, Projects, Top

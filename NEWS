@@ -2,13 +2,13 @@ Changed lots of error messages to use pairs of single quotes rather
 than starting with a backquote (accent grave):  'name' instead of `name'.
 Many newer fonts make the latter look bad, so it is now discouraged.
 
-The types <String> and <java.lang.String> new behave differently.
-finally matching the documentation.  The type <java.lang.String> now
-works just like (say) <java.util.Hashtable>: Converting an object to a
-<java.lang.String> is done by a single coercion, so the incoming value
-must be a java.lang.String reference or null.  The special type
-<String> converts any object to a java.string.String by calling toString;
-it also handles null by specially testing for it.
+The types <String> and <java.lang.String> new behave differently.  The
+type <java.lang.String> now works just like (say) <java.util.Hashtable>
+Converting an object to a <java.lang.String> is done by a simple
+coercion, so the incoming value must be a java.lang.String reference
+or null.  The special type <String> converts any object to a 
+java.string.String by calling toString; it also handles null by
+specially testing for it.
 
 For convenience (and backwards compatibility) Kawa uses the type
 <Scheme> (rather than <java.lang.String>) when it sees the Java
@@ -26,14 +26,10 @@ most Java systems, without requiring a Unix shell and commands.
 Specifically, this makes it easy to build Kawa under MS-Windows.
 Thanks to James White for contributing this support.
 
-The syntax ':NAME' no longer by default reads as a keyword,
-but as a symbol, to allow convenient XML syntax.
-
-define-namespace
-
 Added (current-error-port) which does the obvious.
 
-let-values from srfi-11
+The new let-values and let-values* macros from srfi-11 provide a
+more convenient way to use multiple values.
 
 All the abstract apply* and eval* methods now specify 'throws Throwable'.
 A bunch of code was changed to match.  The main visible advantage is

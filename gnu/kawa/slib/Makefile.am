@@ -11,8 +11,10 @@ KAWAFLAGS = -P gnu.kawa.slib. -C
 
 java_JAVA = SLib.java
 
-SCMSOURCES = genwrite.scm pp.scm ppfile.scm printf.scm
-EXTRA_DIST = $(SCMSOURCES)
+SCMSOURCES = genwrite.scm pp.scm ppfile.scm printf.scm \
+  $(SCMSOURCES_@XML_SELECTED@)
+SCMSOURCES_XML_ENABLED = XML.scm
+EXTRA_DIST = $(SCMSOURCES) XML.scm
 
 CLEANFILES = *.class *.stamp
 

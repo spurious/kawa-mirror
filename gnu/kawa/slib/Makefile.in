@@ -57,9 +57,14 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+AMDEP = @AMDEP@
+AMINCLUDE = @AMINCLUDE@
+AMTAR = @AMTAR@
+AWK = @AWK@
 AWT_SELECTED = @AWT_SELECTED@
 CC = @CC@
 CFLAGS = @CFLAGS@
+DEPDIR = @DEPDIR@
 EXEEXT = @EXEEXT@
 JAVA = @JAVA@
 JAVAC = @JAVAC@
@@ -71,7 +76,9 @@ SHELL = @SHELL@
 SWING_SELECTED = @SWING_SELECTED@
 TOP_BUILDDIR = @TOP_BUILDDIR@
 VERSION = @VERSION@
+XML_SELECTED = @XML_SELECTED@
 extra_java = @extra_java@
+install_sh = @install_sh@
 kawa_bin = @kawa_bin@
 
 AUTOMAKE_OPTIONS = foreign
@@ -85,8 +92,10 @@ KAWAFLAGS = -P gnu.kawa.slib. -C
 
 java_JAVA = SLib.java
 
-SCMSOURCES = genwrite.scm pp.scm ppfile.scm printf.scm
-EXTRA_DIST = $(SCMSOURCES)
+SCMSOURCES = genwrite.scm pp.scm ppfile.scm printf.scm   $(SCMSOURCES_@XML_SELECTED@)
+
+SCMSOURCES_XML_ENABLED = XML.scm
+EXTRA_DIST = $(SCMSOURCES) XML.scm
 
 CLEANFILES = *.class *.stamp
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs

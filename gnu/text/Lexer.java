@@ -12,6 +12,7 @@ import java.io.*;
 public class Lexer extends Reader
 {
   protected LineBufferedReader port;
+  protected boolean interactive;
 
   public Lexer(LineBufferedReader port)
   {
@@ -127,6 +128,13 @@ public class Lexer extends Reader
     fatal(msg);
   }
 
+  public void eofError(String message, int startLine, int startColumn)
+    throws SyntaxException
+  {
+    error('f', port.getName(), startLine, startColumn, message);
+    throw new SyntaxException(messages);
+  }
+
   /** Read an optional signed integer.
    * If there is no integer in the input stream, return 1.
    * For excessively large exponents, return Integer.MIN_VALUE
@@ -209,6 +217,9 @@ public class Lexer extends Reader
   public String getName() { return port.getName(); }
   public int getLineNumber() { return port.getLineNumber(); }
   public int getColumnNumber() { return port.getColumnNumber(); }
+
+  public boolean isInteractive() { return interactive; }
+  public void setInteractive(boolean v) { interactive = v; }
 
   /** For building tokens of various kinds. */
   public char[] tokenBuffer = new char[100];

@@ -1,3 +1,10 @@
+2002-01-23  Per Bothner  <per@bothner.com>
+
+	* Lexer.java (interactive):  New field.
+	(isInteractive, setInteractive):  New methods.
+
+	* Lexer.java (eofError):  New method.
+
 2001-12-24  Per Bothner  <per@bothner.com>
 
 	* IntegerFormat.java:  Remove dependencies on gnu.math.

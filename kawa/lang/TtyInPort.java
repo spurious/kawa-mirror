@@ -38,11 +38,12 @@ public class TtyInPort extends InPort
 
   private boolean promptEmitted;
 
-  public int readHook (char[] buffer, int off, int len) throws java.io.IOException
+  public int fill (char[] buffer, int off, int len) throws java.io.IOException
   {
-    if (tie != null)
+    int count = in.read(buffer, pos, len);
+    if (tie != null && count > 0)
       tie.echo(buffer, off, len);
-    return len;
+    return count;
   }
 
   public void lineStart (boolean revisited) throws java.io.IOException

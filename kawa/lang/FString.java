@@ -171,4 +171,9 @@ public class FString extends Sequence implements Printable, Compilable
     else
       ps.print(value);
   }
+
+  /** Return a new InPort that reads characters from this string. */
+  public CharArrayInPort open ()
+  { return new CharArrayInPort(value, value.length); }
+
 }

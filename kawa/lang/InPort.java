@@ -115,23 +115,18 @@ public class InPort extends LineBufferedReader implements Printable
   Object readSymbol (int c, char read_case)
        throws java.io.IOException, ReadError
   {
+    if (c < 0 || isDelimiter((char) c))
+      throw new ReadError(this, "no symbol start character");
     StringBuffer str = new StringBuffer (30);
     char lastChar = ' ';
     for (;;)
       {
-	if (c < 0)
-	  break;
 	char ch = (char)c;
-	if (isDelimiter(ch))
-	  {
-	    unread ();
-	    break;
-	  }
 	if (ch == '\\')
 	  {
 	    c = read ();
 	    if (c < 0)
-	      break;  // Error
+	      throw new EofReadError(this, "EOF after \\ escape");
 	    ch = (char) c;
 	    lastChar = ' ';
 	  }
@@ -146,7 +141,10 @@ public class InPort extends LineBufferedReader implements Printable
 	      ch = Character.toLowerCase (ch);
 	  }
 	str.append (ch);
-	c = read ();
+	c = peek();
+	if (c < 0 || isDelimiter((char) c))
+	  break;
+	skip_quick();
       }
     if (lastChar == ':')
       {
@@ -337,33 +335,33 @@ public class InPort extends LineBufferedReader implements Printable
 
     Complex cnum = readSchemeComplex (c, radix, exactness);
     
-    c = read ();
     Unit unit = null;
     if (radix == 10)
-      while (Character.isLowerCase ((char)c)
-	     || Character.isUpperCase ((char)c))
-	{
-	  String word = readAlphaWord (c);
-	  Unit u = Unit.lookup (word);
-	  if (u == null)
-	    throw new ReadError (this, "unknown unit: " + word);
-	  int power;
-	  try {
-	    power = readOptionalExponent ();
-	  } catch (ClassCastException e) {
-	    throw new ReadError (this, "unit exponent too large");
+      {
+	c = peek ();
+	while (Character.isLowerCase ((char)c)
+	       || Character.isUpperCase ((char)c))
+	  {
+	    skip_quick();
+	    String word = readAlphaWord (c);
+	    Unit u = Unit.lookup (word);
+	    if (u == null)
+	      throw new ReadError (this, "unknown unit: " + word);
+	    int power;
+	    try {
+	      power = readOptionalExponent ();
+	    } catch (ClassCastException e) {
+	      throw new ReadError (this, "unit exponent too large");
+	    }
+	    if (power != 1)
+	      u = Unit.pow (u, power);
+	    if (unit == null)
+	      unit = u;
+	    else
+	      unit = Unit.mul (unit, u);
+	    c = peek ();
 	  }
-	  if (power != 1)
-	    u = Unit.pow (u, power);
-	  if (unit == null)
-	    unit = u;
-	  else
-	    unit = Unit.mul (unit, u);
-	  c = read ();
-	}
-
-    if (c >= 0)
-      unread ();
+      }
 
     return unit == null ? cnum : Quantity.make (cnum, unit);
   }
@@ -375,7 +373,7 @@ public class InPort extends LineBufferedReader implements Printable
     if (((c == '+') || (c == '-'))
 	&& (((next = peek ()) == 'i') || (next == 'I')))
       {
-	read ();
+	skip();
 	if (exactness == 'i')
 	  return new DComplex (0, (c == '+') ? 1 : -1);
 	else
@@ -435,33 +433,84 @@ public class InPort extends LineBufferedReader implements Printable
       }
 
     if (c >= 0)
-      unread ();
+      unread_quick();
     return num;
+  }
+
+  /** Read digits, up to the first non-digit or the buffer limit
+    * @return the digits seen as a non-negative long, or -1 on overflow
+    */
+  public long readDigits (int radix)
+  {
+    long ival = 0;
+    boolean overflow = false;
+    long max_val = Long.MAX_VALUE / radix;
+    int i = pos;
+    if (i >= limit)
+      return 0;
+    for (;;)
+      {
+	char c = buffer[i];
+	int dval = Character.digit(c, radix);
+	if (dval < 0)
+	  break;
+	if (ival > max_val)
+	  overflow = true;
+	else
+	  ival = ival * radix + dval;
+	if (ival < 0)
+	  overflow = true;
+	if (++i >= limit)
+	  break;
+      }
+    this.pos = i;
+    return overflow ? -1 : ival;
   }
 
   RealNum readSchemeReal (int c, int radix, char exactness)
        throws java.io.IOException, ReadError
   {
-    StringBuffer str = new StringBuffer (20);
     boolean negative = false;
-   /* location of decimal point in str.  */
-    int point_loc = -1;
-    int exp = 0;
 
     if (c=='+')
       c = read ();
     else if (c=='-')
       {
-	str.append ('-');
 	negative = true;
 	c = read ();
       }
 
-    boolean hash_seen = false;
-    boolean digit_seen = false;
-    boolean exp_seen = false;
-    for (;; c = read ())
+    int i = this.pos;
+    if (c >= 0)
+      i--;   // Reset to position before current char c.
+    this.pos = i;
+    long ival = readDigits(radix);
+    boolean digit_seen = this.pos > i;
+    if (digit_seen && this.pos < this.limit)
       {
+	if (isDelimiter(this.buffer[this.pos]))
+	  {
+	    if (ival >= 0)
+	      return IntNum.make(negative ? -ival : ival);
+	    else
+	      return IntNum.valueOf(this.buffer, i, this.pos - i,
+				    radix, negative);
+	  }
+      }
+    StringBuffer str = new StringBuffer (20);
+    if (negative)
+      str.append('-');
+    if (digit_seen)
+      str.append(this.buffer, i, this.pos - i);
+
+   /* location of decimal point in str.  */
+    int point_loc = -1;
+    int exp = 0;
+    boolean hash_seen = false;
+    boolean exp_seen = false;
+    for (;;)
+      {
+	c = read ();
 	if (Character.digit ((char)c, radix) >= 0)
 	  {
 	    if (hash_seen)
@@ -496,8 +545,8 @@ public class InPort extends LineBufferedReader implements Printable
 	  case 'e': case 's': case 'f': case 'd': case 'l':
 	  case 'E': case 'S': case 'F': case 'D': case 'L':
 	    int next;
-	    if (!(radix == 10 && ((next = peek ()) == '+' || next == '-'
-				  || Character.digit ((char)next, 10) >= 0)))
+	    if (radix != 10 || !((next = peek ()) == '+' || next == '-'
+				 || Character.digit ((char)next, 10) >= 0))
 	      break;
 	    if (!digit_seen)
 	      throw new ReadError (this, "mantissa with no digits");
@@ -517,17 +566,16 @@ public class InPort extends LineBufferedReader implements Printable
 	  throw new ReadError (this, "numerator with no digits");
 	IntNum numer = IntNum.valueOf (str.toString (), radix);
 	str.setLength (0);
-	c = read ();
+	c = peek();
 	if (Character.digit ((char)c, radix) < 0)
 	  throw new ReadError (this, "denominator with no digits");
 	do
 	  {
-	    str.append ((char) c);
-	    c = read ();
+	    str.append((char) c);
+	    skip_quick();
+	    c = peek();
 	  }
 	while (Character.digit ((char)c, radix) >= 0);
-	if (c >= 0)
-	  unread ();
 	
 	IntNum denom = IntNum.valueOf (str.toString (), radix);
 
@@ -615,7 +663,19 @@ public class InPort extends LineBufferedReader implements Printable
     do
       {
 	int next, v;
-	c = read();
+
+	// Read next char - inline the common case.
+	if (this.pos < this.limit)
+	  {
+	    c = this.buffer[this.pos];
+	    if (c == '\n' || c == '\r')
+	      c = read();
+	    else
+	      this.pos++;
+	  }
+	else
+	  c = read();
+
 	switch (c)
 	  {
 	  case '"':
@@ -754,10 +814,10 @@ public class InPort extends LineBufferedReader implements Printable
 	else if (!Character.isWhitespace ((char)c))
 	  break;
       }
-    unread ();
+    unread_quick ();
   }
 
-  /** Read a list (possibly improper) of zero or more Scheme forms.
+ /** Read a list (possibly improper) of zero or more Scheme forms.
    * Assumes '(' has been read.  Does not read the final ')'.
    */
   protected Object readListBody ()
@@ -775,7 +835,7 @@ public class InPort extends LineBufferedReader implements Printable
 	int line = getLineNumber ();
 	int column = getColumnNumber ();
 
-	skip ();
+	skip_quick ();
 	if (c == '.')
 	  {
 	    int next = peek ();
@@ -922,7 +982,7 @@ public class InPort extends LineBufferedReader implements Printable
 	    String func;
 	    if (peek()=='@')
 	      {
-		skip ();
+		skip_quick();
 		func = Interpreter.unquotesplicing_sym;
 	      }
 	    else

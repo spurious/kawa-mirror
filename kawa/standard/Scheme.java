@@ -222,11 +222,11 @@ public class Scheme extends Interpreter
       define_proc ("integer?", "kawa.standard.integer_p");
       define_proc ("exact?", "kawa.standard.exact_p");
       define_proc ("inexact?", "kawa.standard.inexact_p");
-      define_proc ("=", "kawa.standard.equal_oper");
-      define_proc ("<", "kawa.standard.less_oper");
-      define_proc (">", "kawa.standard.greater_oper");
-      define_proc ("<=", "kawa.standard.lessequal_oper");
-      define_proc (">=", "kawa.standard.greaterequal_oper");
+      define_proc ("=", NumberCompare.$Eq);
+      define_proc ("<", NumberCompare.$Ls);
+      define_proc (">", NumberCompare.$Gr);
+      define_proc ("<=", NumberCompare.$Ls$Eq);
+      define_proc (">=", NumberCompare.$Gr$Eq);
       define_proc ("zero?", "kawa.lib.numbers");
       define_proc ("positive?", "kawa.standard.positive_p");
       define_proc ("negative?", "kawa.lib.numbers");
@@ -366,9 +366,9 @@ public class Scheme extends Interpreter
       define_proc (new readchar (true));   // peek-char
       define_proc ("eof-object?", "kawa.lib.ports");
       define_proc ("char-ready?", "kawa.standard.char_ready_p");
-      define_proc (new write(true));       // write
-      define_proc (new write(false));      // display
-      define_proc ("write-char", "kawa.standard.writechar");
+      define_proc ("write", "kawa.lib.ports");
+      define_proc ("display", "kawa.lib.ports");
+      define_proc ("write-char", "kawa.lib.ports");
       define_proc ("newline", "kawa.lib.ports");
       define_proc ("load", "kawa.standard.load");
       define_proc ("transcript-off", "kawa.lib.ports");

@@ -32,11 +32,7 @@ inexact_p.java \
 positive_p.java \
 max.java \
 min.java \
-equal_oper.java \
-less_oper.java \
-lessequal_oper.java \
-greater_oper.java \
-greaterequal_oper.java \
+NumberCompare.java \
 plus_oper.java \
 minus_oper.java \
 multiply_oper.java \
@@ -91,8 +87,6 @@ read.java \
 readchar.java \
 read_line.java \
 char_ready_p.java \
-write.java \
-writechar.java \
 open_input_file.java \
 open_output_file.java \
 call_with_output_string.java \

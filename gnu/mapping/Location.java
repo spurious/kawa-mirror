@@ -36,7 +36,9 @@ public abstract class Location
       {
 	sbuf.append(sym);
 	Object property = getKeyProperty();
-	if (property != null)
+	// For a ThreadLocation the property defaults to "this".
+	// In that case we'd better not print the property ...
+	if (property != null && property != this)
 	  {
 	    sbuf.append('/');
 	    sbuf.append(property);

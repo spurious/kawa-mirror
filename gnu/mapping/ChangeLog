@@ -1,3 +1,12 @@
+2005-02-12  Per Bothner  <per@bothner.com>
+
+	* LocationProc.java: New file, but class was extracted from
+	kawa/standard/location.java.
+	Add some extra "features" to support srfi-39 "parameter objects".
+	* Makefile.am: Update accordingly.
+	* ThreadLocation.java (setGlobal): New method.
+	* Location.java (toString): Don't print property if it is this.
+
 2005-02-11  Per Bothner  <per@bothner.com>
 
 	* Environment.java (toString): New method.

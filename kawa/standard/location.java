@@ -64,15 +64,3 @@ public class location extends Syntax implements Printable
     return new LocationProc(loc);
   }
 }
-
-class LocationProc extends Procedure0 implements HasSetter
-{
-  public LocationProc (Location loc) { this.loc = loc; }
-
-  Location loc;
-
-  public Object apply0 () { return loc.get(); }
-  public void set0 (Object value) { loc.set(value); }
-
-  public String toString () { return "#<location-proc "+loc+">"; }
-}

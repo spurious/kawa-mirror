@@ -15,6 +15,7 @@ java_sources=\
   KeyPair.java \
   Location.java \
   LocationEnumeration.java \
+  LocationProc.java \
   LogWriter.java \
   MethodProc.java \
   NameMap.java \

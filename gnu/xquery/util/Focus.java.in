@@ -1,0 +1,39 @@
+// -*-Java-*-
+// Copyright (c) 2002  Per M.A. Bothner.
+// This is free software;  for terms and warranty disclaimer see ./COPYING.
+
+package gnu.xquery.util;
+import gnu.lists.*;
+import gnu.math.IntNum;
+
+public final class Focus extends SeqPosition
+{
+  
+@if WITH REFERENCES@
+static ThreadLocal current = new ThreadLocal();
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+static Focus current = new Focus();
+@endif WITHOUT REFERENCES@
+
+  public static Focus getCurrent()
+  {
+@if WITH REFERENCES@
+    Object obj = current.get();
+    if (obj == null)
+      {
+	obj = new Focus();
+	current.set(obj);
+      }
+    return (Focus) obj;
+@endif WITH REFERENCES@
+@if WITHOUT REFERENCES@
+    return current;
+@endif WITHOUT REFERENCES@
+  }
+
+  int position;
+  IntNum contextPosition;
+  int size;
+  IntNum contextSize;
+}

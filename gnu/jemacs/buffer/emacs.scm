@@ -107,7 +107,7 @@
 (define (redraw-modeline)  ;;XEmacs has optional "all" parameter!
   (invoke (as <buffer> (current-buffer)) 'redrawModeline))
 
-(define force-mode-line-update redraw-modeline)
+(define (force-mode-line-update) (redraw-modeline))
 
 ;;; FILES
 
@@ -355,7 +355,7 @@
          (n  :: <int> 1)
          (buffer  :: <buffer> (current-buffer)))
   <int>
-  (as <int> (invoke buffer 'forwardLine (- n 1) (invoke buffer 'getDot))))
+  (+ 1 (as <int> (invoke buffer 'forwardLine (- n 1) (invoke buffer 'getDot)))))
 
 (define (point-at-eol #!optional (count  :: <int> 1)
                       (buffer  :: <buffer> (current-buffer)))
@@ -404,17 +404,6 @@
 ;;; POSITIONS/EXCURSIONS
 
 ;;; MARKERS
-
-(define-syntax save-excursion
-  (syntax-rules ()
-		((save-excursion form ...)
-		 (let* ((save-buffer (current-buffer))
-			(save-point (point save-buffer)))
-		   (try-finally
-		    (begin form ...)
-		    (begin
-		      (set-buffer save-buffer)
-		      (goto-char save-point save-buffer)))))))
 
 (define (marker? x)
   (instance? x <marker>))

@@ -20,11 +20,14 @@ public final class Marker implements Position
   public Marker(Marker marker)
   {
     buffer = marker.buffer;
-    position = marker.position;
-    if (buffer != null && position != EMACS_MARK_KIND)
+    if (buffer != null)
       {
         BufferContent content = buffer.content;
-	position = content.copyPosition(position);
+	if (marker.position == POINT_POSITION_INDEX)
+	  position = content.createPosition(marker.getOffset(),
+					    BufferContent.AFTER_MARK_KIND);
+	else
+	  position = content.copyPosition(marker.position);
       }
   }
 

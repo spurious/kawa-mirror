@@ -187,7 +187,7 @@ check:
 	$(MAKE) check1
 
 check1:  check-num check-format
-check2:  check-scm check-misc check-mac check-misc check-obj check-polytype
+check2:  check-scm check-misc check-mac check-obj check-polytype
 
 testing.zip: $(srcdir)/testing.scm
 	$(KAWA) -e '(compile-file "'$(srcdir)/testing.scm'" "testing.zip")'

@@ -1,3 +1,9 @@
+1999-07-15  Per Bothner  <per@bothner.com>
+
+	* misc-test.scm:  Added 3 new (originally failing) test-cases reported
+ 	by "Otto, Marcus, Mathe/Informatik" <Otto_Marcus@ph-ludwigsburg.de>.
+	* Makefile.am, Makefile.in (check2):  Remove duplication. 
+	
 1999-07-11  Per Bothner  <per@bothner.com>
 
 	* formatst.scm:  Set fail-expected 4 places.  Some other fixes.

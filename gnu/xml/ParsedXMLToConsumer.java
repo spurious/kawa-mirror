@@ -4,6 +4,7 @@
 package gnu.xml;
 import gnu.lists.Consumer;
 import gnu.lists.TreeList;
+import java.net.URL;
 
 public class ParsedXMLToConsumer extends ParsedXMLHandler
 {
@@ -16,19 +17,22 @@ public class ParsedXMLToConsumer extends ParsedXMLHandler
     this.out = out;
   }
 
-  public static void parse(java.net.URL url, Consumer out)
+  public static void parse(URL url, Consumer out)
     throws java.io.IOException
   {
-    XMLParser parser = new XMLParser(url, new ParsedXMLToConsumer(out));
+    out.beginDocument();
+    XMLParser parser
+      = new XMLParser(url,
+		      new ParsedXMLToConsumer(new NamespaceResolver(out)));
     parser.parse();
+    out.endDocument();
   }
 
-  public static TreeList parse(java.net.URL url)
+  public static TreeList parse(URL url)
     throws java.io.IOException
   {
     TreeList doc = new TreeList();
-    XMLParser parser = new XMLParser(url, new ParsedXMLToConsumer(doc));
-    parser.parse();
+    parse(url, doc);
     return doc;
   }
 

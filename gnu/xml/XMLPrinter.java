@@ -195,7 +195,12 @@ public class XMLPrinter implements Consumer, PositionConsumer
 
   public void writeObject(Object v)
   {
-    if (v instanceof Consumable)
+    closeTag();
+    if (v instanceof UnescapedData)
+      {
+	writeRaw(((UnescapedData) v).getData());
+      }
+    else if (v instanceof Consumable)
       ((Consumable) v).consume(this);
     else if (v instanceof SeqPosition)
       {

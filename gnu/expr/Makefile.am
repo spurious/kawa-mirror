@@ -51,7 +51,6 @@ java_JAVA=\
   PushApply.java \
   ReferenceExp.java \
   ScopeExp.java \
-  SetApplyExp.java \
   SetExp.java \
   Special.java \
   StackTarget.java \

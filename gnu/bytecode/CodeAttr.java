@@ -1814,6 +1814,19 @@ public class CodeAttr extends Attribute implements AttrContainer
     return (readUnsignedShort(offset) << 16) | readUnsignedShort(offset+2);
   }
 
+  /*
+  public saveStack (ClassType into)
+  {
+    Field[] flds = new Field[SP];
+    while (SP > 0)
+      {
+	Field fld = ?;
+	emitStore(fld);
+	flds[SP...]
+      }
+  }
+  */
+
   /* Print the i'th ';'-delimited substring of str on dst. */
   private void print (String str, int i, PrintWriter dst)
   {

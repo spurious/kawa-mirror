@@ -13,6 +13,7 @@ java_sources = \
   MakeAttribute.java \
   MakeElement.java \
   NamedChildren.java \
+  NodeType.java \
   StringValue.java \
   XMLFormat.java
 

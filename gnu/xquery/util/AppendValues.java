@@ -35,6 +35,24 @@ public class AppendValues extends CpsProcedure implements Inlineable
 	for (int i = 0;  i < nargs;  i++)
 	  args[i].compile(comp, target);
       }
+    else if (target instanceof SeriesTarget)
+      {
+	CodeAttr code = comp.getCode();
+	SeriesTarget serTarget = (SeriesTarget) target;
+	Label done = serTarget.done;
+	for (int i = 0;  i < nargs;  i++)
+	  {
+	    Label next;
+	    if (i + 1 < nargs)
+	      next = new Label(code);
+	    else
+	      next = done;
+	    serTarget.done = next;
+	    args[i].compile(comp, serTarget);
+	    if (i + 1 < nargs)
+	      next.define(code);
+	  }
+      }
     else
       {
 	ConsumerTarget.compileUsingConsumer(exp, comp, target);

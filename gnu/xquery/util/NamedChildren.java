@@ -5,8 +5,10 @@ package gnu.xquery.util;
 import gnu.mapping.*;
 import gnu.lists.*;
 import gnu.xml.*;
+import gnu.bytecode.*;
+import gnu.expr.*;
 
-public class NamedChildren extends CpsProcedure
+public class NamedChildren extends CpsProcedure implements Inlineable
 {
   public static final NamedChildren namedChildren = new NamedChildren();
   
@@ -93,4 +95,132 @@ public class NamedChildren extends CpsProcedure
     else
       namedChildren(namespaceURI, localName, node, consumer);
   }
+
+  public static boolean getNamedChild(SeqPosition position,
+				      String namespaceURI, String localName)
+  {
+    AbstractSequence seq = position.sequence;
+    for (;;)
+      {
+	int ipos = position.ipos;
+	Object xpos = position.xpos;
+	int kind = seq.getNextKind(ipos, xpos);
+	if (kind == Sequence.EOF_VALUE)
+	  return false;
+	if (kind == Sequence.GROUP_VALUE)
+	  {
+	    Object curName = seq.getNextTypeObject(ipos, xpos);
+	    String curNamespaceURI;
+	    String curLocalName;
+	    if (curName instanceof QName)
+	      {
+		QName qname = (QName) curName;
+		curNamespaceURI = qname.getNamespaceURI();
+		curLocalName = qname.getLocalName();
+	      }
+	    else
+	      {
+		curNamespaceURI = "";
+		curLocalName = curName.toString().intern();  // FIXME
+	      }
+	    if ((localName == curLocalName || localName == null)
+		&& (namespaceURI == curNamespaceURI || namespaceURI == null))
+	      return true;
+	  }
+	seq.gotoNext(position, 0);
+      }
+  }
+
+  public static void gotoNext(SeqPosition pos)
+  {
+    pos.sequence.gotoNext(pos, 0);
+  }
+
+  static final SeqPosition nullPosition
+  = new SeqPosition(LList.Empty, 0, false);
+
+  public static SeqPosition gotoFirstChild(SeqPosition pos)
+  {
+    TreeList seq = (TreeList) pos.sequence;
+    int child = seq.gotoChildrenStart(pos.ipos >> 1);
+    if (child < 0)
+      return nullPosition;
+    return SeqPosition.make(seq, child << 1, null);
+  }
+
+  public void compile (ApplyExp exp, Compilation comp, Target target)
+  {
+    Expression[] args = exp.getArgs();
+    int nargs = args.length;
+
+    if (nargs == 3
+	&& (target instanceof SeriesTarget
+	    /* || target instanceof ConsumerTarget */))
+      {
+	CodeAttr code = comp.getCode();
+
+	code.pushScope();
+	Variable child = code.addLocal(typeSeqPosition);
+	Type retAddrType = Type.pointer_type;
+	Variable retAddr = code.addLocal(retAddrType);
+	Variable namespaceURIVar = code.addLocal(comp.typeString);
+	args[1].compile(comp, comp.typeString);
+	code.emitStore(namespaceURIVar);
+	Variable localNameVar = code.addLocal(comp.typeString);
+	args[2].compile(comp, comp.typeString);
+	code.emitStore(localNameVar);
+
+	SeriesTarget pathTarget = new SeriesTarget();
+	pathTarget.function = new Label(code);
+	pathTarget.done = new Label(code);
+	pathTarget.value = code.addLocal(typeSeqPosition);
+
+	args[0].compile(comp, pathTarget);
+
+	if (code.reachableHere())
+	  code.emitGoto(pathTarget.done);
+	pathTarget.function.define(code);
+	code.pushType(retAddrType);
+	code.emitStore(retAddr);
+	code.emitLoad(pathTarget.value);
+	code.emitInvokeStatic(gotoFirstChildMethod);
+	code.emitStore(child);
+	Label nextChildLoopTop = new Label(code);
+	nextChildLoopTop.define(code);
+	code.emitLoad(child);
+	code.emitLoad(namespaceURIVar);
+	code.emitLoad(localNameVar);
+	code.emitInvokeStatic(getNamedChildMethod);
+	Label ok = new Label(code);
+	code.emitGotoIfIntNeZero(ok);
+	code.emitRet(retAddr);
+	ok.define(code);
+	SeriesTarget starget = (SeriesTarget) target;
+	code.emitLoad(child);
+	starget.compileFromStackSimple(comp, typeSeqPosition);
+	code.emitLoad(child);
+	code.emitInvokeStatic(gotoNextMethod);
+	code.emitGoto(nextChildLoopTop);
+
+	code.popScope();
+	pathTarget.done.define(code);
+	return;
+      }
+    ApplyExp.compile(exp, comp, target);
+  }
+
+  public Type getReturnType (Expression[] args)
+  {
+    return Compilation.typeObject;
+  }
+
+  static final ClassType typeNamedChildren
+    = ClassType.make("gnu.xquery.util.NamedChildren");
+  static final ClassType typeSeqPosition = NodeType.nodeType;
+  static final Method getNamedChildMethod
+    = typeNamedChildren.getDeclaredMethod("getNamedChild", 3);
+  static final Method gotoFirstChildMethod
+    = typeNamedChildren.getDeclaredMethod("gotoFirstChild", 1);
+  static final Method gotoNextMethod
+    = typeNamedChildren.getDeclaredMethod("gotoNext", 1);
 }

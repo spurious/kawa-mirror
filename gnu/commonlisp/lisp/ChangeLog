@@ -1,3 +1,7 @@
+2003-10-12  Per Bothner  <per@bothner.com>
+
+	* PrimOps.scm (prog1):  Define syntax definition.
+
 2002-11-10  Per Bothner  <per@bothner.com>
 
 	* PrimOps.scm (apply):  Add cast to <function>.

@@ -111,15 +111,6 @@
 		     (if (symbol? func) (symbol-function func) func))
 		 args))
 
-(define-syntax prog1
-  (syntax-rules ()
-		((prog1 first)
-		 first)
-		((prog1 first rest ...)
-		 (let ((%prog1-save% first)) ;; Should be lexical-let? FIXME
-		   (begin rest ...)
-		   %prog1-save%))))
-
 ;;; ARRAYS
 
 (define (length (x :: <gnu.lists.Sequence>))

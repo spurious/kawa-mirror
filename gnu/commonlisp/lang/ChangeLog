@@ -1,3 +1,7 @@
+2000-10-12  Per Bothner  <per@bothner.com>
+
+	* CommonLisp.java (<init>):  Update classes used for eq and equal.
+
 2000-06-25  Per Bothner  <per@bothner.com>
 
 	New package.

@@ -219,8 +219,8 @@ public class CommonLisp extends Interpreter
     Procedure not = new kawa.standard.not(this);
     defun("not", not);
     defun("null", not);
-    defun("eq", new kawa.standard.eq_p(this));
-    defun("equal", new kawa.standard.equal_p(this));
+    defun("eq", new gnu.kawa.functions.IsEq(this, "eq"));
+    defun("equal", new gnu.kawa.functions.IsEqual(this, "equal"));
     defun("typep", new gnu.kawa.reflect.InstanceOf(this));
   }
 

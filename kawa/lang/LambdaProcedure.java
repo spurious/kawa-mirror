@@ -15,7 +15,7 @@ public class LambdaProcedure extends ProcedureN
 
   public LambdaProcedure (LambdaExp lexp, Environment env)
   {
-    super (lexp.name == null ? "<lambda>" : lexp.name);
+    super (lexp.name == null ? Symbol.make ("<lambda>") : lexp.name);
     lexpr = lexp;  environment = env;
   }
 

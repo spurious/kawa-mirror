@@ -60,7 +60,7 @@ public class Compilation
   = scmInterpreterType.new_field ("eofObject", scmSymbolType,
 				    Access.PUBLIC|Access.STATIC);
   static final Field nameField
-  = scmNamedType.new_field ("name", javaStringType, Access.PUBLIC);
+  = scmNamedType.new_field ("sym_name", scmSymbolType, Access.PUBLIC);
   static Method makeSymbolMethod;
   static Method initIntegerMethod;
   static Method lookupGlobalMethod;

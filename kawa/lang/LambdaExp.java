@@ -9,7 +9,7 @@ import java.util.Hashtable;
 
 public class LambdaExp extends ScopeExp
 {
-  String name;
+  Symbol name;
   Expression body;
   int min_args;
   // Maximum number of actual arguments;  -1 if variable.
@@ -35,7 +35,7 @@ public class LambdaExp extends ScopeExp
     return min_args == max_args && max_args <= 4 && max_args > 0 ? max_args : 1;
   }
 
-  public void setName (String name)
+  public void setName (Symbol name)
   {
     this.name = name;
   }
@@ -143,7 +143,7 @@ public class LambdaExp extends ScopeExp
     try
       {
 	String new_name
-	  = comp.generateClassName (name == null ? "lambda" : name);
+	  = comp.generateClassName (name == null ? "lambda" : name.toString());
 	new_class = new ClassType (new_name);
 	comp.curClass = new_class;
 	comp.addClass (new_class);

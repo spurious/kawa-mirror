@@ -12,7 +12,12 @@ public abstract class ProcedureN extends Procedure
     super();
   }
 
-  public ProcedureN(java.lang.String n)
+  public ProcedureN (Symbol n)
+  {
+      super(n);
+  }
+
+  public ProcedureN (String n)
   {
       super(n);
   }

@@ -1,3 +1,7 @@
+1999-04-22  Per Bothner  <bothner@Magnus.Cygnus.COM>
+
+	* LetExp.java (compile):  Target for init expr is decl type.
+
 1999-04-22  Per Bothner  <bothner@cygnus.com>
 
 	* Compilation.java (addClass):  Remove (commented-out) call to

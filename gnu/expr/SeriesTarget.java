@@ -11,7 +11,7 @@ import gnu.mapping.*;
 public class SeriesTarget extends Target
 {
   /** Where to place each value. */
-  public Variable value;
+  public Declaration param;
 
   /** A function to call (using jsr/jsr_w). */
   public Label function;
@@ -19,12 +19,23 @@ public class SeriesTarget extends Target
   /** Where to go when done. */
   public Label done;
 
+  /** A surrounding Scope for local Variables.
+   * This Scope should include both any calls to compileFromStackSimple
+   * and the entirety of the 'function' subroutine. This is protect against
+   * where a variable logically goes out of scope, but we cannot re-use
+   * the local variable slot until we're past the 'function'. */
+  public Scope scope;
+
   public void compileFromStackSimple(Compilation comp, Type stackType)
   {
     CodeAttr code = comp.getCode();
-    StackTarget.convert(comp, stackType, value.getType());
-    code.emitStore(value);
+    StackTarget.convert(comp, stackType, param.getType());
+    param.compileStore(comp);
     code.emitJsr(function);
+    // Make sure we don't free the local variable slots for any variable
+    // slots prematurely.  I.e. any local variables in use at this point
+    // must be protected from being re-used in the Jsr subroutine.
+    code.locals.preserveVariablesUpto(scope);
   }
 
   public void compileFromStack(Compilation comp, Type stackType)

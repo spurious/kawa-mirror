@@ -1,3 +1,22 @@
+2002-03-06  Per Bothner  <per@bothner.com>
+
+	* ApplyExp.java (setFunction):  New method.
+
+	* Compilation.java (loadCallContext):  Look for $ctx variable,
+	instead of using callStackContext field.
+	(addClass):  Use loadCallContext.
+	(callStackContext):  Remove field.
+	* ApplyExp.java (compile):  Use Compilation's loadCallContext method.
+	* LambdaExp.java (allocParameters, compileBody):  Likewise.
+	(allocParameters):  callStackContext is now local.
+	(compileAsMethod):  Don't save/restore/set removed variable.
+	
+	* Declaration.java:  New constructor, takes Variable.
+
+	* SeriesTarget.java (value):  Replace field by Declaration param.
+	(scope):  New field.
+	(compileFromStackSimple):  Update for new fields.
+
 2002-03-02  Per Bothner  <per@bothner.com>
 
 	* Interpreter.java (parseFile):  Now throws IOException and

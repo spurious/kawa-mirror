@@ -16,7 +16,7 @@ public class Shell
     boolean prompt = pflag;
     boolean display = dflag;
 
-    Environment env = new Environment (interpreter);
+    Environment env = Environment.user ();
     for (;;)
       {
 	try
@@ -36,7 +36,15 @@ public class Shell
 	      }
 
 	    interpreter.errors = 0;
-	    Expression exp = interpreter.rewrite (sexp);
+
+	    LambdaExp lexp = new LambdaExp (ModuleBody.formals,
+					    new Pair (sexp, List.Empty),
+					    interpreter);
+	    lexp.setName (Symbol.make ("atInteractiveLevel"));  // FIXME
+	    String filename = inp.getName ();
+	    if (filename == null)
+	      filename = "<unknown>";
+	    lexp.setFile (filename);
 
 	    /* DEBUGGING:
 	    perr.print ("[Re-written expression: ");
@@ -48,7 +56,7 @@ public class Shell
 
 	    if (interpreter.errors == 0)
 	      {
-		Object result = exp.eval (env);
+		Object result = lexp.eval_module (env);
 		if (result == null)
 		  pout.println ("[null returned]\n");
 		else if (display && result != Interpreter.voidObject)

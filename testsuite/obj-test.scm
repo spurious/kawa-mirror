@@ -1,4 +1,4 @@
-(test-init "Objects" 98)
+(test-init "Objects" 99)
 
 ;; Force procedure to be applied without being inlined:
 (define-syntax force-eval
@@ -173,6 +173,8 @@
 (test '(boolean #t) make-literal #t)
 
 (test '(3 . 4) make-pair 3 4)
+
+(test 7 'my-array-length (field my-array-7 'length))
 
 (define-variable dvar1 2)
 (define-variable dvar2 3)

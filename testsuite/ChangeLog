@@ -1,3 +1,10 @@
+2005-01-08  Per Bothner  <per@bothner.com>
+
+	* module1.scm: New test for Savannh bug #11508,
+	from Thomas Kirk <tk@research.att.com>.
+	* module2.scm (my-array-7): New variableusing above macro.
+	* obj-test.scm: new test to check my-array-7.
+
 2005-01-02  Per Bothner  <per@bothner.com>
 
 	* formatst.scm: Add 4 tests for ~<...~:> (Logical Block).

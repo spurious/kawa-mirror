@@ -1,7 +1,8 @@
 ;; The next line is just to test the case that we don't extend ModuleBody.
 (module-extends <pair>)
 (module-export list-length-1 list-length-3 classify list1234 <a8711>
-	       length-diff1 length-diff2 length-diff3 make-literal make-pair)
+	       length-diff1 length-diff2 length-diff3 make-literal make-pair
+	       my-array-7)
 (require <module1>)
 (require <module1a>)
 (define (list-length-1 x) :: <integer>
@@ -61,3 +62,5 @@
     (lambda (object :: <A8711>)
       (invoke object 'execute x y z y))
     objects)))
+
+(define my-array-7 (make-array-fun 7))

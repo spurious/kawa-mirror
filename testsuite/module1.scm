@@ -27,3 +27,13 @@
   (syntax-rules ()
     ((namespace-syntax-test)
      (date:parse "6 Sep 2003 UTC"))))
+
+;; Test for Savannah bug #11508 submitted by Thomas Kirk <tk@research.att.com>:
+(define-syntax make-array
+  (syntax-rules ()
+    ((make-array len type)
+     ((primitive-array-new type) len))
+    ((make-array len)
+     ((primitive-array-new <java.lang.Object>) len))))
+(define (make-array-fun n)
+  (make-array n))

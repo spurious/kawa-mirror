@@ -1,3 +1,8 @@
+2002-01-19  Per Bothner  <per@bothner.com>
+
+	* Write.java:  Moved from gnu.kawa.functions.
+	* Makefile.am:  Update accordingly.
+
 2002-01-13  Per Bothner  <per@bothner.com>
 
 	* HttpPrinter.java:  New class, extends FilterConsumer,

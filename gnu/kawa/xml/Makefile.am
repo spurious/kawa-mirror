@@ -13,7 +13,8 @@ java_sources = \
   MakeResponseHeader.java \
   NamedAttributes.java \
   NamespaceEnv.java \
-  OutputAsXML.java
+  OutputAsXML.java \
+  WriteTo.java
 
 PACKAGE_FNAME = gnu-kawa-xml
 GCJ_INPUTS =  $(java_Java)

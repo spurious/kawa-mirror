@@ -3,6 +3,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.lists.*;
 import gnu.bytecode.ClassType;
+import gnu.kawa.functions.Convert;
 
 /**
  * The Syntax transformer that re-writes the lambda builtin.
@@ -316,7 +317,7 @@ public class Lambda extends Syntax implements Printable
                     System.arraycopy(exps, 1, new_body, 0, len);
                     value = new BeginExp(new_body);
                   }
-                lexp.body = Expression.makeCoercion(value, rexp);
+                lexp.body = Convert.makeCoercion(value, rexp);
 		lexp.setReturnType(rtype);
 	      }
 	  }

@@ -4,6 +4,7 @@ import gnu.mapping.*;
 import gnu.expr.*;
 import gnu.kawa.functions.IsEq;
 import gnu.kawa.reflect.Invoke;
+import gnu.kawa.reflect.SlotGet;
 
 /** Implement the Scheme standard functions "map" and "for-each".
  * @author Per Bothner
@@ -145,8 +146,8 @@ public class map  extends gnu.mapping.ProcedureN implements CanInline
     Expression[] recArgs = new Expression[collect ? nargs + 1 : nargs];
     for (int i = 0;  i < nargs;  i++)
       {
-	doArgs[i] = Expression.makeGetField(new ReferenceExp(pargs[i]), "car");
-	recArgs[i] = Expression.makeGetField(new ReferenceExp(pargs[i]), "cdr");
+	doArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "car");
+	recArgs[i] = SlotGet.makeGetField(new ReferenceExp(pargs[i]), "cdr");
       }
     ApplyExp doit = new ApplyExp(new ReferenceExp(procDecl), doArgs); 
     Expression rec = new ApplyExp(new ReferenceExp(loopDecl), recArgs);

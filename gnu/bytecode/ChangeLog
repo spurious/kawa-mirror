@@ -1,3 +1,7 @@
+2003-06-18  Jim White  <jim@pagesmiths.com>
+
+	* Type.java (mapNameToType):  Initialize statically.
+
 2003-06-22  Per Bothner  <per@bothner.com>
 
 	* PrimType.java (emitCoerceToObject):  Fix handling of boolean case.

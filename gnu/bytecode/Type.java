@@ -35,19 +35,6 @@ public abstract class Type {
 
   public static Type lookupType (String name)
   {
-    if (mapNameToType == null)
-      {
-	mapNameToType = new java.util.Hashtable();
-	mapNameToType.put("byte",    byte_type);
-	mapNameToType.put("short",   short_type);
-	mapNameToType.put("int",     int_type);
-	mapNameToType.put("long",    long_type);
-	mapNameToType.put("float",   float_type);
-	mapNameToType.put("double",  double_type);
-	mapNameToType.put("boolean", boolean_type);
-	mapNameToType.put("char",    char_type);
-	mapNameToType.put("void",    void_type);
-      }
     return (Type) mapNameToType.get(name);
   }
 
@@ -416,6 +403,19 @@ public abstract class Type {
     = new PrimType ("char", "C", 2, java.lang.Character.TYPE);
   public static final PrimType void_type
     = new PrimType ("void", "V", 0, java.lang.Void.TYPE);
+
+  static {
+	mapNameToType = new java.util.Hashtable();
+	mapNameToType.put("byte",    byte_type);
+	mapNameToType.put("short",   short_type);
+	mapNameToType.put("int",     int_type);
+	mapNameToType.put("long",    long_type);
+	mapNameToType.put("float",   float_type);
+	mapNameToType.put("double",  double_type);
+	mapNameToType.put("boolean", boolean_type);
+	mapNameToType.put("char",    char_type);
+	mapNameToType.put("void",    void_type);
+  }
 
   /** The "return type" of an expression that never returns, such as a throw. */
   public static final PrimType neverReturnsType = new PrimType (void_type);

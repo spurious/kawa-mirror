@@ -209,9 +209,9 @@ public class TestMisc
     evalTest("element r {let $y := <b x='1'/>"
 	     + " let $x:=<a>{$y}</a> return $x/b/@x}",
 	     "<r x=\"1\" />");
-    evalTest("let $y := <b x='1'/>"
-	     + " let $x:=<a>{$y}</a> return $x/b/@x",
-	     " x=\"1\"");
+    evalTest("define function x(){<a><b x='1'/><b x='2'/></a>}"
+	     + " let $i := <a>{for $a in x()/b return $a}</a>  return $i/b/@x",
+	     " x=\"1\" x=\"2\"");
 
     // Testcase from <Seshukumar_Adiraju@infosys.com>:
     evalTest("let $books := "

@@ -829,10 +829,17 @@ public class ScmRead extends gnu.text.LispReader
 	    if (Character.isDigit((char)c))
 	      return readNumber (c, 10);
 	    else
-	      return readSymbol(c, getReadCase());
+	      return readDefault(c);
 	  }
 	c = read ();
       }
+  }
+
+  // To be overridden by subclasses
+  public Object readDefault(int c)
+       throws java.io.IOException, SyntaxException
+  {
+    return readSymbol(c, getReadCase());
   }
 
 }

@@ -66,6 +66,8 @@ public class Declaration extends Variable
     gnu.bytecode.CodeAttr code = comp.getCode();
     LambdaExp curLambda = comp.curLambda;
     LambdaExp lambda = getContext().currentLambda ();
+    while (curLambda != lambda && curLambda.getInlineOnly())
+      curLambda = curLambda.outerLambda();
     if (lambda == curLambda)
       code.emitLoad(lambda.heapFrame);
     else

@@ -23,26 +23,26 @@ public class Compilation
   public final CodeAttr getCode() { return method.getCode(); }
 
   // Various standard classes
-  static public ClassType scmObjectType = new ClassType ("java.lang.Object");
-  static public ClassType scmBooleanType = new ClassType ("java.lang.Boolean");
-  static public ClassType javaStringType = new ClassType ("java.lang.String");
+  static public ClassType scmObjectType = Type.pointer_type;
+  static public ClassType scmBooleanType = ClassType.make("java.lang.Boolean");
+  static public ClassType javaStringType = ClassType.make("java.lang.String");
   static public ClassType scmSymbolType = javaStringType;
-  static public ClassType scmKeywordType = new ClassType ("gnu.expr.Keyword");
-  static public ClassType scmSequenceType = new ClassType ("kawa.lang.Sequence");
-  static public ClassType javaIntegerType = new ClassType ("java.lang.Integer");
-  static public ClassType scmListType = new ClassType ("kawa.lang.List");
-  static public ClassType scmPairType = new ClassType ("kawa.lang.Pair");
-  static public ClassType scmUndefinedType = new ClassType ("gnu.expr.Undefined");
-  static public ClassType scmPatternType = new ClassType ("kawa.lang.Pattern");
+  static public ClassType scmKeywordType = ClassType.make("gnu.expr.Keyword");
+  static public ClassType scmSequenceType = ClassType.make("kawa.lang.Sequence");
+  static public ClassType javaIntegerType = ClassType.make("java.lang.Integer");
+  static public ClassType scmListType = ClassType.make("kawa.lang.List");
+  static public ClassType scmPairType = ClassType.make("kawa.lang.Pair");
+  static public ClassType scmUndefinedType = ClassType.make("gnu.expr.Undefined");
+  static public ClassType scmPatternType = ClassType.make("kawa.lang.Pattern");
   public static final ArrayType objArrayType = new ArrayType (scmObjectType);
   public static final ArrayType symbolArrayType = new ArrayType(scmSymbolType);
-  static public ClassType scmNamedType = new ClassType ("gnu.mapping.Named");
+  static public ClassType scmNamedType = ClassType.make("gnu.mapping.Named");
   static public ClassType scmProcedureType
-    = new ClassType ("gnu.mapping.Procedure");
+    = ClassType.make("gnu.mapping.Procedure");
   static public ClassType scmInterpreterType
-    = new ClassType ("kawa.lang.Interpreter");
+    = ClassType.make("kawa.lang.Interpreter");
   static public ClassType scmEnvironmentType
-    = new ClassType ("gnu.mapping.Environment");
+    = ClassType.make("gnu.mapping.Environment");
   static public final Field trueConstant
     = scmInterpreterType.addField ("trueObject", scmBooleanType,
 				    Access.PUBLIC|Access.STATIC); 
@@ -62,7 +62,6 @@ public class Compilation
   static Method defineGlobalMethod;
   static Method putGlobalMethod;
   static Method makeListMethod;
-  static Method searchForKeywordMethod;
   
   public static final Type[] int1Args = { Type.int_type };
   public static final Type[] string1Arg = { javaStringType };
@@ -509,7 +508,6 @@ public class Compilation
     // If a parameter !isSimple(), we cannot assign it to a local slot,
     // so instead create an artificial Variable for the incoming argument.
     // Below, we assign the value to the slot.
-    int i = 0;
     method.initCode();
     code = getCode();
     Variable var = lexp.firstVar();
@@ -535,170 +533,9 @@ public class Compilation
 	  }
       }
 
-    while (var != null)
-      {
-	if (var instanceof Declaration && var.isParameter ())
-	  {
-	    // i is the register to use for the current parameter
-	    Declaration decl = (Declaration) var;
-	    if (var.isSimple ())
-	      {
-		// For a simple parameter not captured by an inferior lambda,
-		// just allocate it in the incoming register.  This case also
-		// handles the artificial "this" and "argsArray" variables.
-		if (! var.isAssigned ()
-		    && ! var.reserveLocal(i, code))
-		  throw new Error ("internal error assigning parameters");
-	      }
-	    else if (lexp.min_args != lexp.max_args)
-	      {
-		// The incoming value is an element in the argsArray variable
-		// (or many elements in the case of a "rest" parameter).
-		// We do not need to do anything here (but see below).
-	      }
-	    else
-	      {
-		// This variable was captured by an inner lambda.
-		// It's home location is in the heapFrame.
-		// Later, we copy it from it's incoming register
-		// to its home location heapFrame.  Here we just create and
-		// assign a Variable for the incoming (register) value.
-		String incoming_name = (var.getName ()+"Incoming").intern();
-		decl = new Declaration(incoming_name);
-		lexp.scope.addVariableAfter(var, decl);
-		decl.setArtificial (true);
-		decl.setParameter (true);
-		if (! decl.isAssigned () && ! decl.reserveLocal(i, code))
-		  throw new Error ("internal error assigning parameters");
-	      }
-	    
-	    // If the only reason we are using an argsArray is because there
-	    // are more than 4 arguments, copy the arguments in local register.
-	    // Then forget about the args array.  We do this first, before
-	    // the label that tail-recursion branches back to.
-	    // This way, a self-tail-call knows where to leave the argumnents.
-	    if (argsArray != null && lexp.min_args == lexp.max_args
-		&& ! var.isArtificial())
-	      {
-		if (! decl.isAssigned () && ! decl.reserveLocal(i, code))
-		  throw new Error ("internal error assigning parameters");
-		code.emitLoad(argsArray);
-		// The first two slots are "this" and "argsArray".
-		code.emitPushInt(i-2);
-		code.emitArrayLoad(scmObjectType);
-		code.emitStore(decl);
-	      }
-	    if (var != decl)
-	      var = decl;  // Skip "incomingXxx" before next iteration.
-	    i++;
-	  }
-	var = var.nextVar();
-      }
+    lexp.allocParameters(this, argsArray);
+    lexp.enterFunction(this, argsArray);
 
-    // Tail-calls loop back to here! 
-    code.enterScope (lexp.scope);
-
-    if (lexp.min_args == lexp.max_args)
-      argsArray = null;
-
-    if (lexp.heapFrameLambda != null)
-      {
-	lexp.heapFrameLambda.compileAlloc(this);
-	code.emitStore(lexp.heapFrame);
-      }
-
-    // For each non-artificial parameter, copy it from its incoming
-    // location (a local variable register, or the argsArray) into
-    // its home location, if they are different.
-    i = 0;
-    int opt_i = 0;
-    int key_i = 0;
-    int key_args = lexp.keywords == null ? 0 : lexp.keywords.length;
-    int opt_args = lexp.defaultArgs == null ? 0
-      : lexp.defaultArgs.length - key_args;
-    for (var = lexp.firstVar ();  var != null; var = var.nextVar ())
-      {
-	if (var.isParameter () && ! var.isArtificial ())
-	  {
-	    if (argsArray != null || ! var.isSimple())
-	      {
-		// If the parameter is captured by an inferior lambda,
-		// then the incoming parameter needs to be copied into its
-		// slot in the heapFrame.  Thus we emit an aaload instruction.
-		// Unfortunately, it expects the new value *last*,
-		// so first push the heapFrame array and the array index.
-		Declaration param = (Declaration) var;
-		if (!param.isSimple ())
-		  {
-		    param.loadOwningObject(this);
-		  }
-		// This part of the code pushes the incoming argument.
-		if (argsArray == null)
-		  {
-		    // Simple case:  Use Incoming register.
-		    code.emitLoad(param.nextVar());
-		  }
-		else if (i < lexp.min_args)
-		  { // This is a required parameter, in argsArray[i].
-		    code.emitLoad(argsArray);
-		    code.emitPushInt(i);
-		    code.emitArrayLoad(scmObjectType);
-		  }
-		else if (i < lexp.min_args + opt_args)
-		  { // An optional parameter
-		    code.emitPushInt(i);
-		    code.emitLoad(argsArray);
-		    code.emitArrayLength();
-		    code.emitIfIntLt();
-		    code.emitLoad(argsArray);
-		    code.emitPushInt(i);
-                    code.emitArrayLoad(scmObjectType);
-		    code.emitElse();
-		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
-		    code.emitFi();
-		  }
-		else if (lexp.max_args < 0 && i == lexp.min_args + opt_args)
-		  {
-		    // This is the "rest" parameter (i.e. following a "."):
-		    // Convert argsArray[i .. ] to a list.
-		    code.emitLoad(argsArray);
-		    code.emitPushInt(i);
-		    code.emitInvokeStatic(makeListMethod);
-		  }
-		else
-		  { // Keyword argument.
-		    if (searchForKeywordMethod == null)
-		      {
-			Type[] argts = new Type[3];
-			argts[0] = objArrayType;
-			argts[1] = Type.int_type;
-			argts[2] = scmObjectType;
-			searchForKeywordMethod
-			  = scmKeywordType.addMethod("searchForKeyword",
-						      argts, scmObjectType,
-						      Access.PUBLIC|Access.STATIC);
-		      }
-		    code.emitLoad(argsArray);
-		    code.emitPushInt(lexp.min_args + opt_args);
-		    compileConstant(lexp.keywords[key_i++]);
-		    code.emitInvokeStatic(searchForKeywordMethod);
-		    code.emitDup(1);
-		    compileConstant(Special.dfault);
-		    code.emitIfEq();
-		    code.emitPop(1);
-		    lexp.defaultArgs[opt_i++].compile(this, Target.pushObject);
-		    code.emitFi();
-		  }
-		// Now finish copying the incoming argument into its
-		// home location.
-		if (param.isSimple ())
-		  code.emitStore(param);
-		else
-		  code.emitPutField(param.field);
-	      }
-	    i++;
-	  }
-      }
 
     lexp.body.compileWithPosition(this, Target.returnObject);
     if (method.reachableHere ())

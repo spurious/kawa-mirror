@@ -115,11 +115,9 @@ public class ApplyExp extends Expression
 	  exp.args[i].compile (comp, Target.pushObject);
 	LambdaExp saveLambda = comp.curLambda;
 	comp.curLambda = func_lambda;
-	code.enterScope (func_lambda.scope);
-	/* Assign the initial values to the proper variables, in reverse order. */
-	store_rest (comp, func_lambda.firstVar ());
-	code.beginScope(); // ???
-
+	func_lambda.allocParameters(comp, null);
+	popParams (code, func_lambda);
+	func_lambda.enterFunction(comp, null);
 	func_lambda.body.compileWithPosition(comp, Target.returnObject);
 	code.popScope();
 	comp.curLambda = saveLambda;
@@ -156,12 +154,7 @@ public class ApplyExp extends Expression
       }
     if (tail_recurse)
       {
-	Variable params = func_lambda.firstVar();
-	if (params.getName() == "this")
-	  params = params.nextVar();
-	if (params.getName() == "argsArray")
-	  params = params.nextVar();
-	popParams (code, params, args_length);
+	popParams(code, func_lambda);
 	code.emitTailCall(false, func_lambda.scope);
 	return;
       }
@@ -185,18 +178,17 @@ public class ApplyExp extends Expression
     ps.print(")");
   }
 
-  /* Recursive helper routine, to store the values on the stack
-   * into the variables in vars, in reverse order. */
-  private static void store_rest (Compilation comp, Variable vars)
+  private static void popParams (CodeAttr code, LambdaExp lexp)
   {
-    if (vars != null)
-      {
-	store_rest (comp, vars.nextVar ());
-	if (! vars.isArtificial())
-	  ((Declaration) vars).initBinding(comp);
-      }
+    Variable params = lexp.firstVar();
+    if (params.getName() == "this")
+      params = params.nextVar();
+    if (params.getName() == "argsArray")
+      params = params.nextVar();
+    popParams (code, params, lexp.min_args);
   }
 
+  // Recursive helper function.
   private static void popParams (CodeAttr code, Variable vars, int count)
   {
     if (count > 0)

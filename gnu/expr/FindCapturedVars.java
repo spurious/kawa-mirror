@@ -10,9 +10,9 @@ public class FindCapturedVars extends ExpFullWalker
   public void capture(Declaration decl)
   {
     LambdaExp curLambda = getCurrentLambda ();
-    while (curLambda.getInlineOnly())
-      curLambda = curLambda.outerLambda();
     LambdaExp declLambda = decl.getContext().currentLambda ();
+    while (curLambda != declLambda && curLambda.getInlineOnly())
+      curLambda = curLambda.outerLambda();
     if (curLambda != declLambda)
       {
 	LambdaExp heapLambda = curLambda;
@@ -28,6 +28,12 @@ public class FindCapturedVars extends ExpFullWalker
 	  {
 	    if (declLambda.heapFrameLambda == null)
 	      {
+		if (heapLambda.getInlineOnly())
+		  {
+		    // First look for other non-line siblings of heapLambda,
+		    // It that fails, create a dummy LambdaExp.  FIXME
+		    throw new Error("not implemented - capture thru inline");
+		  }
 		declLambda.heapFrameLambda = heapLambda;
 		declLambda.heapFrame
 		  = declLambda.addDeclaration("heapFrame",

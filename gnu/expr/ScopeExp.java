@@ -24,7 +24,7 @@ public abstract class ScopeExp extends Expression
       {
 	if (exp == null)
 	  return null;
-	if (exp instanceof LambdaExp && ! ((LambdaExp) exp).getInlineOnly())
+	if (exp instanceof LambdaExp)
 	  return (LambdaExp) exp;
       }
   }

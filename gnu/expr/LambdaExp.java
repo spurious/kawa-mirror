@@ -220,6 +220,178 @@ public class LambdaExp extends ScopeExp
     target.compileFromStack(comp, rtype);
   }
 
+  void allocParameters (Compilation comp, Variable argsArray)
+  {
+    CodeAttr code = comp.getCode();
+    int i = 0;
+    Variable var = firstVar();
+    while (var != null)
+      {
+	if (var instanceof Declaration && var.isParameter ())
+	  {
+	    // i is the register to use for the current parameter
+	    Declaration decl = (Declaration) var;
+	    if (var.isSimple ())
+	      {
+		// For a simple parameter not captured by an inferior lambda,
+		// just allocate it in the incoming register.  This case also
+		// handles the artificial "this" and "argsArray" variables.
+		var.allocateLocal(code);
+	      }
+	    else if (min_args != max_args)
+	      {
+		// The incoming value is an element in the argsArray variable
+		// (or many elements in the case of a "rest" parameter).
+		// We do not need to do anything here (but see below).
+	      }
+	    else
+	      {
+		// This variable was captured by an inner lambda.
+		// It's home location is in the heapFrame.
+		// Later, we copy it from it's incoming register
+		// to its home location heapFrame.  Here we just create and
+		// assign a Variable for the incoming (register) value.
+		String incoming_name = (var.getName ()+"Incoming").intern();
+		decl = new Declaration(incoming_name);
+		scope.addVariableAfter(var, decl);
+		decl.setArtificial (true);
+		decl.setParameter (true);
+		decl.allocateLocal(code);
+	      }
+	    
+	    // If the only reason we are using an argsArray is because there
+	    // are more than 4 arguments, copy the arguments in local register.
+	    // Then forget about the args array.  We do this first, before
+	    // the label that tail-recursion branches back to.
+	    // This way, a self-tail-call knows where to leave the argumnents.
+	    if (argsArray != null && min_args == max_args
+		&& ! var.isArtificial())
+	      {
+		code.emitLoad(argsArray);
+		// The first two slots are "this" and "argsArray".
+		code.emitPushInt(i-2);
+		code.emitArrayLoad(Type.pointer_type);
+		code.emitStore(decl);
+	      }
+	    if (var != decl)
+	      var = decl;  // Skip "incomingXxx" before next iteration.
+	    i++;
+	  }
+	var = var.nextVar();
+      }
+  }
+
+  static Method searchForKeywordMethod;
+
+  void enterFunction (Compilation comp, Variable argsArray)
+  {
+    CodeAttr code = comp.getCode();
+    // Tail-calls loop back to here! 
+    code.enterScope (scope);
+
+    if (heapFrameLambda != null)
+      {
+	heapFrameLambda.compileAlloc(comp);
+	code.emitStore(heapFrame);
+      }
+
+    if (min_args == max_args)
+      argsArray = null;
+
+    // For each non-artificial parameter, copy it from its incoming
+    // location (a local variable register, or the argsArray) into
+    // its home location, if they are different.
+    int i = 0;
+    int opt_i = 0;
+    int key_i = 0;
+    int key_args = keywords == null ? 0 : keywords.length;
+    int opt_args = defaultArgs == null ? 0
+      : defaultArgs.length - key_args;
+    for (Variable var = firstVar ();  var != null; var = var.nextVar ())
+      {
+	if (var.isParameter () && ! var.isArtificial ())
+	  {
+	    if (argsArray != null || ! var.isSimple())
+	      {
+		// If the parameter is captured by an inferior lambda,
+		// then the incoming parameter needs to be copied into its
+		// slot in the heapFrame.  Thus we emit an aaload instruction.
+		// Unfortunately, it expects the new value *last*,
+		// so first push the heapFrame array and the array index.
+		Declaration param = (Declaration) var;
+		if (!param.isSimple ())
+		  {
+		    param.loadOwningObject(comp);
+		  }
+		// This part of the code pushes the incoming argument.
+		if (argsArray == null)
+		  {
+		    // Simple case:  Use Incoming register.
+		    code.emitLoad(param.nextVar());
+		  }
+		else if (i < min_args)
+		  { // This is a required parameter, in argsArray[i].
+		    code.emitLoad(argsArray);
+		    code.emitPushInt(i);
+		    code.emitArrayLoad(Type.pointer_type);
+		  }
+		else if (i < min_args + opt_args)
+		  { // An optional parameter
+		    code.emitPushInt(i);
+		    code.emitLoad(argsArray);
+		    code.emitArrayLength();
+		    code.emitIfIntLt();
+		    code.emitLoad(argsArray);
+		    code.emitPushInt(i);
+                    code.emitArrayLoad(Type.pointer_type);
+		    code.emitElse();
+		    defaultArgs[opt_i++].compile(comp, Target.pushObject);
+		    code.emitFi();
+		  }
+		else if (max_args < 0 && i == min_args + opt_args)
+		  {
+		    // This is the "rest" parameter (i.e. following a "."):
+		    // Convert argsArray[i .. ] to a list.
+		    code.emitLoad(argsArray);
+		    code.emitPushInt(i);
+		    code.emitInvokeStatic(Compilation.makeListMethod);
+		  }
+		else
+		  { // Keyword argument.
+		    if (searchForKeywordMethod == null)
+		      {
+			Type[] argts = new Type[3];
+			argts[0] = Compilation.objArrayType;
+			argts[1] = Type.int_type;
+			argts[2] = Type.pointer_type;
+			searchForKeywordMethod
+			  = Compilation.scmKeywordType.addMethod("searchForKeyword",
+						      argts, Type.pointer_type,
+						      Access.PUBLIC|Access.STATIC);
+		      }
+		    code.emitLoad(argsArray);
+		    code.emitPushInt(min_args + opt_args);
+		    comp.compileConstant(keywords[key_i++]);
+		    code.emitInvokeStatic(searchForKeywordMethod);
+		    code.emitDup(1);
+		    comp.compileConstant(Special.dfault);
+		    code.emitIfEq();
+		    code.emitPop(1);
+		    defaultArgs[opt_i++].compile(comp, Target.pushObject);
+		    code.emitFi();
+		  }
+		// Now finish copying the incoming argument into its
+		// home location.
+		if (param.isSimple ())
+		  code.emitStore(param);
+		else
+		  code.emitPutField(param.field);
+	      }
+	    i++;
+	  }
+      }
+  }
+
   void compile_setLiterals (Compilation comp)
   {
     ClassType[] interfaces = { new ClassType ("gnu.expr.CompiledProc") };

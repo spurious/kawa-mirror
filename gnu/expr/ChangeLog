@@ -1,3 +1,16 @@
+Sat Aug 29 20:32:46 1998  Per Bothner  <bothner@cygnus.com>
+
+	* FindCapturedVars.java (capture):  Handle inline functions better.
+	* Compilation.java (addClass):  Move lots of stuff to LambdaExp.
+	* LambdaExp.java (allocParameters, enterFunctions):  New functions
+	* ApplyExp.java:  Handle inlined functions.
+	* Declaration.java (loadOwningObject):  Skip inlined functions first.
+	* ScopeExp.java (currentLambda):  Inline functions are not special.
+	* SetExp.java (<init>):  Handle do special form specially.
+
+	* Compilation.java, Special.java:  Do ClassType.make instead of
+	new ClassType.
+
 Sat Aug 29 09:16:01 1998  Per Bothner  <bothner@cygnus.com>
 
 	* ApplyExp.java (compile):  Fix problems with tails-calls.

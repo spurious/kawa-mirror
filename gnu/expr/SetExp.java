@@ -41,14 +41,10 @@ public class SetExp extends Expression
     this.binding = decl;
     name = decl.sym;
     new_value = val;
-    /*
+
     if ("%do%loop".equals(decl.symbol())
 	&& val instanceof LambdaExp)
-      {
-	((LambdaExp) val).setInlineOnly(true);
-System.err.println("recognized do loop");
-      }
-    */
+      ((LambdaExp) val).setInlineOnly(true);
   }
 
   public Object eval (Environment env)
